@@ -498,7 +498,12 @@ export function createSimpleGitWebAppVersionSynchronizationClient(
   const authenticationEnvironment = createWebAppVersionSynchronizationGitAuthenticationEnvironment(
     options.authentication,
   );
-  const authenticatedGit = simpleGit(options.repositoryPath).env(authenticationEnvironment);
+  const authenticatedGit = simpleGit({
+    baseDir: options.repositoryPath,
+    unsafe: {
+      allowUnsafeConfigEnvCount: true,
+    },
+  }).env(authenticationEnvironment);
   const basicCredential = createGitHubBasicCredential(options.authentication.githubToken);
   const redactedAuthenticationValues = [options.authentication.githubToken, basicCredential];
 
@@ -695,7 +700,9 @@ export function createSimpleGitWebAppVersionSynchronizationClient(
           createPackageDocumentContents(packageDocument),
         );
       },
-    }).map(() => Unit);
+    }).map(() => {
+      return Unit;
+    });
   }
 
   return {
@@ -793,7 +800,9 @@ export function createSimpleGitWebAppVersionSynchronizationClient(
           async execute() {
             return git.raw(['switch', '--create', createBranchOptions.branchName, createBranchOptions.mainCommitSha]);
           },
-        }).map(() => Unit);
+        }).map(() => {
+          return Unit;
+        });
       });
     },
 
@@ -814,7 +823,11 @@ export function createSimpleGitWebAppVersionSynchronizationClient(
           return git.status();
         },
       }).map(status => {
-        return status.files.map(file => file.path).toSorted();
+        return status.files
+          .map(file => {
+            return file.path;
+          })
+          .toSorted();
       });
     },
 
@@ -867,7 +880,9 @@ export function createSimpleGitWebAppVersionSynchronizationClient(
           ]);
         },
         redactedSecretValues: redactedAuthenticationValues,
-      }).map(() => Unit);
+      }).map(() => {
+        return Unit;
+      });
     },
 
     verifyMainCommit(mainCommitSha) {

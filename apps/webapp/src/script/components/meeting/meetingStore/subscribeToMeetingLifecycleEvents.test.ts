@@ -32,12 +32,16 @@ type MeetingLifecycleDispatcherDouble = {
   [Key in keyof MeetingLifecycleDispatcher]: jest.Mock;
 };
 
-const createDispatcherDouble = (): MeetingLifecycleDispatcherDouble => ({
-  enqueueInitialLoad: jest.fn(),
-  enqueueMeetingSync: jest.fn(),
-  enqueueMeetingRemoval: jest.fn(),
-  waitUntilAllSettled: jest.fn(async () => undefined),
-});
+const createDispatcherDouble = (): MeetingLifecycleDispatcherDouble => {
+  return {
+    enqueueInitialLoad: jest.fn(),
+    enqueueMeetingSync: jest.fn(),
+    enqueueMeetingRemoval: jest.fn(),
+    waitUntilAllSettled: jest.fn(async () => {
+      return undefined;
+    }),
+  };
+};
 
 describe('subscribeToMeetingLifecycleEvents', () => {
   const activeUnsubscribeCallbacks: (() => void)[] = [];
@@ -48,7 +52,9 @@ describe('subscribeToMeetingLifecycleEvents', () => {
     const onMeetingCancelled = jest.fn();
     const unsubscribe = subscribeToMeetingLifecycleEvents({
       dispatcher,
-      getSelfUserQualifiedId: () => selfUserId,
+      getSelfUserQualifiedId: () => {
+        return selfUserId;
+      },
       notifyMeetingChange,
       notifyUpdate,
       onMeetingCancelled,
@@ -59,7 +65,9 @@ describe('subscribeToMeetingLifecycleEvents', () => {
   };
 
   afterEach(() => {
-    activeUnsubscribeCallbacks.splice(0).forEach(unsubscribe => unsubscribe());
+    activeUnsubscribeCallbacks.splice(0).forEach(unsubscribe => {
+      unsubscribe();
+    });
   });
 
   it('queues a meeting sync when a meeting created event is published', () => {

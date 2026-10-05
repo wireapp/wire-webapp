@@ -19,16 +19,18 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const wrapperStyles = (isOpen: boolean): CSSObject => ({
-  width: isOpen ? '200px' : '0',
-  overflowY: 'auto',
-  borderRight: '1px solid var(--border-color)',
-  padding: '8px 4px',
-  height: '100%',
-  transition: 'all 0.3s var(--ease-out-quart)',
-  opacity: isOpen ? 1 : 0,
-  visibility: isOpen ? 'visible' : 'hidden',
-});
+export const wrapperStyles = (isOpen: boolean): CSSObject => {
+  return {
+    width: isOpen ? '200px' : '0',
+    overflowY: 'auto',
+    borderRight: '1px solid var(--border-color)',
+    padding: '8px 4px',
+    height: '100%',
+    transition: 'all 0.3s var(--ease-out-quart)',
+    opacity: isOpen ? 1 : 0,
+    visibility: isOpen ? 'visible' : 'hidden',
+  };
+};
 
 export const listStyles: CSSObject = {
   width: '100%',

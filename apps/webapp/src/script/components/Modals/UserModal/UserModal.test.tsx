@@ -138,7 +138,9 @@ describe('UserModal', () => {
     };
     showUserModal({domain: 'test-domain.mock', id: 'mock-id'});
     const {getByTestId} = render(<UserModal {...props} />, {wrapper: rootProviderWrapper});
-    await waitFor(() => getByTestId('do-close'));
+    await waitFor(() => {
+      return getByTestId('do-close');
+    });
 
     expect(refreshUser).toHaveBeenCalledTimes(1);
   });

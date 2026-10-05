@@ -23,6 +23,8 @@ import {PrekeysTrackerStore} from './prekeysTracker.store';
 
 import {CryptoClient} from '../..';
 
+const prekeyReplenishmentDivisor = 2;
+
 type CoreCryptoPrekeyGenerator = Pick<CryptoClient, 'newPrekey'>;
 
 interface PrekeysGeneratorConfig {
@@ -70,7 +72,7 @@ export class PrekeyTracker {
   }
 
   private numberOfMissingPrekeys(currentNumberOfPrekeys: number): number {
-    const threshold = Math.ceil(this.config.nbPrekeys / 2);
+    const threshold = Math.ceil(this.config.nbPrekeys / prekeyReplenishmentDivisor);
     const hasHitThreshold = currentNumberOfPrekeys <= threshold;
     return hasHitThreshold ? this.config.nbPrekeys - currentNumberOfPrekeys : 0;
   }

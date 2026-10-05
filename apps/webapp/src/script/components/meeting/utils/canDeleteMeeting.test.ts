@@ -23,19 +23,21 @@ import {canDeleteMeetingForAll, canDeleteMeetingForMe} from 'Components/meeting/
 import {User} from 'Repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';
 
-const createSeries = (overrides: Partial<MeetingSeries> = {}): MeetingSeries => ({
-  series_start_date: '2026-06-15T14:00:00.000Z',
-  series_end_date: '2026-06-15T15:00:00.000Z',
-  duration_ms: 3_600_000,
-  recurrence: 'weekly',
-  conversation_id: 'conv-id',
-  title: 'Weekly sync',
-  qualified_id: {id: 'meeting-id', domain: 'example.com'},
-  qualified_creator: {id: 'host-id', domain: 'example.com'},
-  qualified_conversation: {id: 'conv-id', domain: 'example.com'},
-  tzid: 'Europe/Berlin',
-  ...overrides,
-});
+const createSeries = (overrides: Partial<MeetingSeries> = {}): MeetingSeries => {
+  return {
+    series_start_date: '2026-06-15T14:00:00.000Z',
+    series_end_date: '2026-06-15T15:00:00.000Z',
+    duration_ms: 3_600_000,
+    recurrence: 'weekly',
+    conversation_id: 'conv-id',
+    title: 'Weekly sync',
+    qualified_id: {id: 'meeting-id', domain: 'example.com'},
+    qualified_creator: {id: 'host-id', domain: 'example.com'},
+    qualified_conversation: {id: 'conv-id', domain: 'example.com'},
+    tzid: 'Europe/Berlin',
+    ...overrides,
+  };
+};
 
 const createMeetingInstance = (overrides: Partial<MeetingSeries> = {}): MeetingInstance => {
   const meetingSeries = createSeries(overrides);

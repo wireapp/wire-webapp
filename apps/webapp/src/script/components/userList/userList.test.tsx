@@ -27,6 +27,7 @@ import {UserList} from 'Components/userList/userList';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
+import type {Translate} from 'Util/localizerUtil/translationTypes';
 import {translateForTest} from 'Util/test/translateForTest';
 import {
   createRootContextValueForTest,
@@ -34,7 +35,7 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
-import {withTheme} from '../../auth/util/test/testUtil';
+import {withTheme, withThemeAndRootContext} from '../../auth/util/test/testUtil';
 
 const testFactory = new TestFactory();
 let conversationRepository: ConversationRepository;
@@ -55,19 +56,49 @@ describe('UserList', () => {
     const user = new User('test-id', '', translateForTest);
     user.isMe = true;
 
-    const users = ['1', '2', '3', '4'].map(id => new User(id, '', translateForTest));
+    const users = ['1', '2', '3', '4'].map(id => {
+      return new User(id, '', translateForTest);
+    });
     const props = {
       conversationRepository,
-      onSelectUser: (user: User) => jest.fn(),
+      onSelectUser: (user: User) => {
+        return jest.fn();
+      },
       selfUser: user,
       selectedUsers: users,
       users,
       isSelectable: true,
     };
 
-    const {getByTestId} = render(withTheme(<UserList {...props} />), {wrapper: rootProviderWrapper});
+    const {getByRole, getByTestId} = render(withTheme(<UserList {...props} />), {wrapper: rootProviderWrapper});
     const selectedSearchList = getByTestId('selected-search-list');
     expect(selectedSearchList.getAttribute('data-uie-value')).toEqual('4');
+    const selectedToggle = getByRole('button', {name: 'userListSelectedContacts'});
+    expect(selectedToggle).toHaveAttribute('aria-expanded', 'false');
+
+    fireEvent.click(selectedToggle);
+
+    expect(selectedToggle).toHaveAttribute('aria-expanded', 'true');
+  });
+
+  it('counts all unselected users before the contact list is expanded', () => {
+    const selfUser = new User('self-id', '', translateForTest);
+    selfUser.isMe = true;
+    const users = Array.from({length: 70}, (_, index) => {
+      return new User(`user-${index}`, '', translateForTest);
+    });
+
+    const translateWithCount: Translate = (key, substitutions) => {
+      return `${key}:${substitutions?.count ?? ''}`;
+    };
+    const {getByRole} = render(
+      withThemeAndRootContext(
+        <UserList conversationRepository={conversationRepository} isSelectable selfUser={selfUser} users={users} />,
+        createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateWithCount})),
+      ),
+    );
+
+    expect(getByRole('button', {name: 'userListContactsWithCount:70'})).toBeInTheDocument();
   });
 
   it('select user', async () => {
@@ -75,14 +106,20 @@ describe('UserList', () => {
     user.isMe = true;
 
     const setStateMock = jest.fn();
-    const useStateMock: any = (useState: any) => [useState, setStateMock];
+    const useStateMock: any = (useState: any) => {
+      return [useState, setStateMock];
+    };
     jest.spyOn(React, 'useState').mockImplementation(useStateMock);
 
     const [selectedUsers, setSelectedUsers] = useStateMock([]);
 
-    const mockOnSelectUser = jest.fn((user: User) => setSelectedUsers(user));
+    const mockOnSelectUser = jest.fn((user: User) => {
+      return setSelectedUsers(user);
+    });
 
-    const users = ['1', '2', '3', '4'].map(id => new User(id, '', translateForTest));
+    const users = ['1', '2', '3', '4'].map(id => {
+      return new User(id, '', translateForTest);
+    });
     const props = {
       conversationRepository,
       onSelectUser: mockOnSelectUser,

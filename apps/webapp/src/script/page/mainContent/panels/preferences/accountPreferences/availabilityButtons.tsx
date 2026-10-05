@@ -45,22 +45,30 @@ const AvailabilityButtons = ({availability}: AvailabilityInputProps) => {
   const entries: ContextMenuEntry[] = [
     {
       availability: Availability.Type.AVAILABLE,
-      click: () => amplify.publish(WebAppEvents.USER.SET_AVAILABILITY, Availability.Type.AVAILABLE),
+      click: () => {
+        return amplify.publish(WebAppEvents.USER.SET_AVAILABILITY, Availability.Type.AVAILABLE);
+      },
       label: translate('userAvailabilityAvailable'),
     },
     {
       availability: Availability.Type.BUSY,
-      click: () => amplify.publish(WebAppEvents.USER.SET_AVAILABILITY, Availability.Type.BUSY),
+      click: () => {
+        return amplify.publish(WebAppEvents.USER.SET_AVAILABILITY, Availability.Type.BUSY);
+      },
       label: translate('userAvailabilityBusy'),
     },
     {
       availability: Availability.Type.AWAY,
-      click: () => amplify.publish(WebAppEvents.USER.SET_AVAILABILITY, Availability.Type.AWAY),
+      click: () => {
+        return amplify.publish(WebAppEvents.USER.SET_AVAILABILITY, Availability.Type.AWAY);
+      },
       label: translate('userAvailabilityAway'),
     },
     {
       availability: Availability.Type.NONE,
-      click: () => amplify.publish(WebAppEvents.USER.SET_AVAILABILITY, Availability.Type.NONE),
+      click: () => {
+        return amplify.publish(WebAppEvents.USER.SET_AVAILABILITY, Availability.Type.NONE);
+      },
       label: translate('userAvailabilityNone'),
     },
   ];
@@ -85,7 +93,9 @@ const AvailabilityButtons = ({availability}: AvailabilityInputProps) => {
               })}
               key={item.availability}
               type="button"
-              onClick={() => item.click?.()}
+              onClick={() => {
+                return item.click?.();
+              }}
               aria-label={
                 isActive
                   ? `${translate('preferencesAccountSelectedLabel')}, ${item.label}`

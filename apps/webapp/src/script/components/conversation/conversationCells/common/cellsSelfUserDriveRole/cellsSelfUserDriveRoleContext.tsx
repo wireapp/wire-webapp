@@ -19,8 +19,7 @@
 
 import {createContext, type ReactNode, useCallback, useContext} from 'react';
 
-import {viewerPermissionFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import {isNonEmptyString} from '@sindresorhus/is';
 
 export const CELLS_SELF_USER_DRIVE_ROLE = {
   EDITOR: 'editor',
@@ -38,11 +37,11 @@ export const getSelfUserDriveRole = ({
   conversationTeamId,
   selfUserTeamId,
 }: GetSelfUserDriveRoleParams): CellsSelfUserDriveRole => {
-  if (!conversationTeamId) {
+  if (!isNonEmptyString(conversationTeamId)) {
     return CELLS_SELF_USER_DRIVE_ROLE.EDITOR;
   }
 
-  if (!selfUserTeamId) {
+  if (!isNonEmptyString(selfUserTeamId)) {
     return CELLS_SELF_USER_DRIVE_ROLE.VIEWER;
   }
 
@@ -50,15 +49,13 @@ export const getSelfUserDriveRole = ({
 };
 
 interface ShouldRestrictCellsViewerActionsParams {
-  isViewerPermissionFeatureEnabled: boolean;
   selfUserDriveRole: CellsSelfUserDriveRole;
 }
 
 export const shouldRestrictCellsViewerActions = ({
-  isViewerPermissionFeatureEnabled,
   selfUserDriveRole,
 }: ShouldRestrictCellsViewerActionsParams): boolean => {
-  return isViewerPermissionFeatureEnabled && selfUserDriveRole === CELLS_SELF_USER_DRIVE_ROLE.VIEWER;
+  return selfUserDriveRole === CELLS_SELF_USER_DRIVE_ROLE.VIEWER;
 };
 
 export const CELLS_ACTION = {
@@ -91,20 +88,14 @@ const RESTRICTED_VIEWER_ACTIONS: readonly CellsAction[] = [
 
 interface CanPerformCellsActionParams {
   action: CellsAction;
-  isViewerPermissionFeatureEnabled: boolean;
   selfUserDriveRole: CellsSelfUserDriveRole;
 }
 
-export const canPerformCellsAction = ({
-  action,
-  isViewerPermissionFeatureEnabled,
-  selfUserDriveRole,
-}: CanPerformCellsActionParams): boolean => {
-  if (!shouldRestrictCellsViewerActions({isViewerPermissionFeatureEnabled, selfUserDriveRole})) {
+export const canPerformCellsAction = ({action, selfUserDriveRole}: CanPerformCellsActionParams): boolean => {
+  if (!shouldRestrictCellsViewerActions({selfUserDriveRole})) {
     return true;
   }
 
-  // Viewer restrictions are being rolled out incrementally, so actions stay allowed until explicitly restricted.
   return !RESTRICTED_VIEWER_ACTIONS.includes(action);
 };
 
@@ -128,17 +119,15 @@ export const useCellsSelfUserDriveRole = (): CellsSelfUserDriveRole => {
 };
 
 export const useCellsActionPermissions = () => {
-  const {isFeatureToggleEnabled} = useApplicationContext();
   const selfUserDriveRole = useCellsSelfUserDriveRole();
-  const isViewerPermissionFeatureEnabled = isFeatureToggleEnabled(viewerPermissionFeatureToggleName);
 
   return useCallback(
-    (action: CellsAction) =>
-      canPerformCellsAction({
+    (action: CellsAction) => {
+      return canPerformCellsAction({
         action,
-        isViewerPermissionFeatureEnabled,
         selfUserDriveRole,
-      }),
-    [isViewerPermissionFeatureEnabled, selfUserDriveRole],
+      });
+    },
+    [selfUserDriveRole],
   );
 };

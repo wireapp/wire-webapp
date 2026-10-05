@@ -17,7 +17,7 @@
  *
  */
 
-import {isValidDate} from '@sindresorhus/is';
+import {isNonEmptyString, isTruthy, isUndefined, isValidDate} from '@sindresorhus/is';
 import {
   CONVERSATION_EVENT,
   ConversationAdminlessDeleteReminderEvent,
@@ -127,7 +127,11 @@ export class EventMapper {
    * @returns Resolves with the mapped message entities
    */
   mapJsonEvents(events: EventRecord[], conversationEntity: Conversation): Message[] {
-    const reversedEvents = events.filter(event => !!event).toReversed();
+    const reversedEvents = events
+      .filter(event => {
+        return isTruthy(event);
+      })
+      .toReversed();
     const mappedEvents = reversedEvents.map((event): Message | void => {
       try {
         return this._mapJsonEvent(event, conversationEntity);
@@ -135,8 +139,12 @@ export class EventMapper {
         const errorMessage = `Failure while mapping events. Affected '${event.type}' event: ${toError(error).message}`;
         this.logger.error(errorMessage, error);
       }
+
+      return undefined;
     });
-    return mappedEvents.filter(messageEntity => !!messageEntity) as Message[];
+    return mappedEvents.filter(messageEntity => {
+      return !isUndefined(messageEntity);
+    }) as Message[];
   }
 
   /**
@@ -176,8 +184,8 @@ export class EventMapper {
     const {id, data: eventData, edited_time: editedTime, qualified_conversation} = event;
 
     // Handle quote for both regular text messages and multipart messages
-    const quoteData = eventData.quote || eventData.text?.quote;
-    if (quoteData) {
+    const quoteData = isTruthy(eventData.quote) ? eventData.quote : eventData.text?.quote;
+    if (isTruthy(quoteData)) {
       const {hash, message_id: messageId, user_id: userId, error} = quoteData;
       originalEntity.quote(new QuoteEntity({error, hash, messageId, userId}));
     }
@@ -197,18 +205,18 @@ export class EventMapper {
       originalEntity.assets.removeAll();
       const textAsset = this._mapAssetText(eventData);
       originalEntity.assets.push(textAsset);
-    } else if (originalEntity.getFirstAsset) {
+    } else if (isTruthy(originalEntity.getFirstAsset)) {
       const asset = originalEntity.getFirstAsset();
-      if (asset === undefined) {
+      if (isUndefined(asset)) {
         return originalEntity;
       }
-      if (eventData.status !== undefined && (asset as FileAsset).status !== undefined) {
+      if (!isUndefined(eventData.status) && !isUndefined((asset as FileAsset).status)) {
         const assetEntity = this._mapAsset(event);
-        if (assetEntity !== undefined) {
+        if (!isUndefined(assetEntity)) {
           originalEntity.assets([assetEntity]);
         }
       }
-      if (eventData.previews !== undefined) {
+      if (!isUndefined(eventData.previews)) {
         if ((asset as TextAsset).previews().length !== eventData.previews.length) {
           const previews = this._mapAssetLinkPreviews(eventData.previews);
           (asset as TextAsset).previews(previews as LinkPreviewEntity[]);
@@ -222,7 +230,7 @@ export class EventMapper {
         preview_sha256,
         preview_token,
       } = eventData as AssetData;
-      if (preview_otr_key !== undefined && preview_key !== undefined && preview_domain !== undefined) {
+      if (!isUndefined(preview_otr_key) && !isUndefined(preview_key) && !isUndefined(preview_domain)) {
         const assetRemoteData = new AssetRemoteData({
           assetKey: preview_key,
           assetDomain: preview_domain,
@@ -235,20 +243,20 @@ export class EventMapper {
       }
     }
 
-    if (event.reactions !== undefined) {
+    if (!isUndefined(event.reactions)) {
       originalEntity.reactions(userReactionMapToReactionMap(event.reactions));
       originalEntity.version = event.version ?? 1;
     }
 
-    if (event.failedToSend !== undefined) {
+    if (!isUndefined(event.failedToSend)) {
       originalEntity.failedToSend(event.failedToSend);
     }
 
-    if (event.fileData !== undefined) {
+    if (!isUndefined(event.fileData)) {
       originalEntity.fileData(event.fileData);
     }
 
-    if (event.selected_button_id !== undefined) {
+    if (!isUndefined(event.selected_button_id)) {
       originalEntity.version = event.version ?? 1;
     }
 
@@ -260,7 +268,7 @@ export class EventMapper {
 
     originalEntity.replacing_message_id = eventData.replacing_message_id;
     const editedTimestamp = editedTime ?? eventData.edited_time;
-    if (editedTimestamp !== undefined) {
+    if (!isUndefined(editedTimestamp)) {
       originalEntity.edited_timestamp(new Date(editedTimestamp).getTime());
     }
 
@@ -458,7 +466,7 @@ export class EventMapper {
 
       default: {
         const {type, id} = event as LegacyEventRecord;
-        this.logger.warn(`Ignored unhandled '${type}' event ${id ? `'${id}' ` : ''}`);
+        this.logger.warn(`Ignored unhandled '${type}' event ${isTruthy(id) ? `'${id}' ` : ''}`);
         throw new ConversationError(
           ConversationError.TYPE.MESSAGE_NOT_FOUND,
           ConversationError.MESSAGE.MESSAGE_NOT_FOUND,
@@ -492,7 +500,7 @@ export class EventMapper {
     messageEntity.type = type;
     messageEntity.version = version ?? 1;
 
-    if (data !== undefined) {
+    if (!isUndefined(data)) {
       messageEntity.legalHoldStatus = data.legal_hold_status;
     }
 
@@ -511,7 +519,7 @@ export class EventMapper {
       );
     }
 
-    if (ephemeral_expires !== undefined) {
+    if (!isUndefined(ephemeral_expires)) {
       messageEntity.ephemeral_expires(ephemeral_expires);
       const ephemeralStartedMilliseconds = Number(ephemeral_started ?? 0);
       messageEntity.ephemeral_started(Number.isNaN(ephemeralStartedMilliseconds) ? 0 : ephemeralStartedMilliseconds);
@@ -543,7 +551,7 @@ export class EventMapper {
     messageEntity.memberMessageType = SystemMessageType.CONNECTION_ACCEPTED;
     messageEntity.userIds(userIds);
 
-    if (hasService) {
+    if (isTruthy(hasService)) {
       messageEntity.showServicesWarning = true;
     }
 
@@ -560,7 +568,7 @@ export class EventMapper {
     const messageEntity = new ContentMessage(undefined, this.translate);
 
     const assetEntity = this._mapAsset(event);
-    if (assetEntity === undefined) {
+    if (isUndefined(assetEntity)) {
       throw new Error('Asset entity could not be mapped');
     }
     messageEntity.assets.push(assetEntity);
@@ -645,7 +653,11 @@ export class EventMapper {
   ) {
     const {data: eventData, from: sender} = event;
     const {has_service: hasService} = eventData;
-    const userIds = eventData.qualified_user_ids || eventData.user_ids.map(id => ({domain: '', id}));
+    const userIds = isTruthy(eventData.qualified_user_ids)
+      ? eventData.qualified_user_ids
+      : eventData.user_ids.map(id => {
+          return {domain: '', id};
+        });
     let messageUserIds = userIds;
 
     const messageEntity = new MemberMessage(this.translate);
@@ -655,7 +667,9 @@ export class EventMapper {
 
     if (conversationEntity.isGroupOrChannel()) {
       const messageFromCreator = sender === conversationEntity.creator;
-      const creatorIndex = messageUserIds.findIndex(user => user.id === sender);
+      const creatorIndex = messageUserIds.findIndex(user => {
+        return user.id === sender;
+      });
       const creatorIsJoiningMember = messageFromCreator && creatorIndex !== -1;
 
       if (creatorIsJoiningMember) {
@@ -663,7 +677,7 @@ export class EventMapper {
         messageEntity.memberMessageType = SystemMessageType.CONVERSATION_CREATE;
       }
 
-      if (hasService) {
+      if (hasService === true) {
         messageEntity.showServicesWarning = true;
       }
 
@@ -681,7 +695,11 @@ export class EventMapper {
    */
   private _mapEventMemberLeave({data: eventData}: MemberLeaveEvent | TeamMemberLeaveEvent) {
     const messageEntity = new MemberMessage(this.translate);
-    const userIds = eventData.qualified_user_ids || eventData.user_ids.map(id => ({domain: '', id}));
+    const userIds = isTruthy(eventData.qualified_user_ids)
+      ? eventData.qualified_user_ids
+      : eventData.user_ids.map(id => {
+          return {domain: '', id};
+        });
     messageEntity.userIds(userIds);
     messageEntity.reason = eventData.reason;
     return messageEntity;
@@ -700,11 +718,11 @@ export class EventMapper {
     const assets = this._mapAssetText(eventData);
     messageEntity.assets.push(assets);
     messageEntity.replacing_message_id = eventData.replacing_message_id;
-    if (editedTime) {
+    if (isTruthy(editedTime)) {
       messageEntity.edited_timestamp(new Date(editedTime).getTime());
     }
 
-    if (eventData.quote) {
+    if (isTruthy(eventData.quote)) {
       const {message_id: messageId, user_id: userId, error} = eventData.quote as any;
       messageEntity.quote(new QuoteEntity({error, messageId, userId}));
     }
@@ -725,11 +743,11 @@ export class EventMapper {
     const assets = this._mapAssetMultipart(eventData);
     messageEntity.assets.push(assets);
     messageEntity.replacing_message_id = eventData.replacing_message_id;
-    if (editedTime) {
+    if (isTruthy(editedTime)) {
       messageEntity.edited_timestamp(new Date(editedTime).getTime());
     }
 
-    if (eventData.text?.quote) {
+    if (isTruthy(eventData.text?.quote)) {
       const {message_id: messageId, user_id: userId, error} = eventData.text.quote as any;
       messageEntity.quote(new QuoteEntity({error, messageId, userId}));
     }
@@ -740,12 +758,12 @@ export class EventMapper {
   private _mapAssetMultipart(eventData: MultipartMessageAddEvent['data']) {
     const {text, attachments} = eventData;
 
-    const assetEntity = new Multipart({id: '', text: text?.content || '', attachments});
+    const assetEntity = new Multipart({id: '', text: isTruthy(text?.content) ? text.content : '', attachments});
 
     const mentions = text?.mentions;
 
-    if (mentions && mentions.length) {
-      const mappedMentions = this._mapAssetMentions(mentions, text?.content || '');
+    if (isTruthy(mentions) && mentions.length > 0) {
+      const mappedMentions = this._mapAssetMentions(mentions, isTruthy(text?.content) ? text.content : '');
       assetEntity.mentions(mappedMentions);
     }
 
@@ -754,10 +772,10 @@ export class EventMapper {
 
   private _mapAssetComposite(eventData: CompositeMessageAddEvent['data']) {
     return eventData.items.flatMap(item => {
-      if (item.button) {
+      if (isTruthy(item.button)) {
         return [new Button(item.button.id, item.button.text)];
       }
-      if (item.text) {
+      if (isTruthy(item.text)) {
         return [this._mapAssetText(item.text)];
       }
       return [];
@@ -870,7 +888,7 @@ export class EventMapper {
    * @returns receipt mode update message entity
    */
   private _mapEventReceiptModeUpdate({data: eventData}: LegacyEventRecord) {
-    return new ReceiptModeUpdateMessage(!!eventData.receipt_mode, this.translate);
+    return new ReceiptModeUpdateMessage(isTruthy(eventData.receipt_mode), this.translate);
   }
 
   /**
@@ -892,7 +910,7 @@ export class EventMapper {
   private _mapEventTeamMemberLeave(event: TeamMemberLeaveEvent) {
     const messageEntity = this._mapEventMemberLeave(event);
     const eventData = event.data;
-    messageEntity.name(eventData.name || this.translate('conversationSomeone'));
+    messageEntity.name(isTruthy(eventData.name) ? eventData.name : this.translate('conversationSomeone'));
     return messageEntity;
   }
 
@@ -917,7 +935,7 @@ export class EventMapper {
   private _mapEventVerification({data: eventData}: LegacyEventRecord) {
     const messageEntity = new VerificationMessage(this.translate);
     // Database can contain non-camelCased naming. For backwards compatibility reasons we handle both.
-    messageEntity.userIds(eventData.userIds || eventData.user_ids);
+    messageEntity.userIds(isTruthy(eventData.userIds) ? eventData.userIds : eventData.user_ids);
     messageEntity.VerificationMessageType(eventData.type);
 
     return messageEntity;
@@ -954,7 +972,7 @@ export class EventMapper {
       this.translate,
     );
 
-    if (typeof eventData.duration !== 'undefined') {
+    if (!isUndefined(eventData.duration)) {
       // new message format, including duration
       messageEntity.visible(!messageEntity.wasCompleted());
     } else {
@@ -974,8 +992,8 @@ export class EventMapper {
     const category = event.category;
     const isFile = category === MessageCategory.FILE;
     const mimeType = eventData.content_type;
-    const isImage = mimeType && mimeType.startsWith('image/');
-    return isImage && !isFile ? this._mapAssetImage(event) : this._mapAssetFile(event);
+    const isImage = isTruthy(mimeType) ? mimeType.startsWith('image/') : mimeType;
+    return isTruthy(isImage) && !isFile ? this._mapAssetImage(event) : this._mapAssetFile(event);
   }
 
   /**
@@ -998,7 +1016,7 @@ export class EventMapper {
     assetEntity.meta = meta;
 
     // info
-    if (info) {
+    if (isTruthy(info)) {
       const {correlation_id, name} = info;
       assetEntity.correlation_id = correlation_id;
       assetEntity.file_name = name;
@@ -1007,7 +1025,7 @@ export class EventMapper {
     // Remote data - full
     const {key, otr_key, sha256, token, domain = qualified_conversation?.domain} = eventData as AssetData;
 
-    if (key && domain) {
+    if (isTruthy(key) && isTruthy(domain)) {
       const assetRemoteData = new AssetRemoteData({
         assetKey: key,
         assetDomain: domain,
@@ -1021,12 +1039,12 @@ export class EventMapper {
     // Remote data - preview
     const {
       preview_key,
-      preview_domain = qualified_conversation?.domain || this.fallbackDomain,
+      preview_domain = isTruthy(qualified_conversation?.domain) ? qualified_conversation.domain : this.fallbackDomain,
       preview_otr_key,
       preview_sha256,
       preview_token,
     } = eventData as AssetData;
-    if (preview_otr_key && preview_key && preview_domain) {
+    if (isTruthy(preview_otr_key) && isTruthy(preview_key) && isTruthy(preview_domain)) {
       const assetRemoteData = new AssetRemoteData({
         assetKey: preview_key,
         assetDomain: preview_domain,
@@ -1038,7 +1056,7 @@ export class EventMapper {
       assetEntity.preview_resource(assetRemoteData);
     }
 
-    assetEntity.status(status || AssetTransferState.UPLOAD_PENDING);
+    assetEntity.status(isTruthy(status) ? status : AssetTransferState.UPLOAD_PENDING);
 
     return assetEntity;
   }
@@ -1052,12 +1070,12 @@ export class EventMapper {
   private _mapAssetImage(event: LegacyEventRecord<AssetData>): MediumImage | undefined {
     const {data: eventData, qualified_conversation} = event;
 
-    if (!eventData) {
+    if (!isTruthy(eventData)) {
       this.logger.warn('Event data is undefined, cannot map image asset.');
       return undefined;
     }
 
-    if (!eventData?.id) {
+    if (!isTruthy(eventData?.id)) {
       this.logger.warn('Event data => id is undefined');
     }
     const {content_length, content_type, id: assetId = '', info} = eventData;
@@ -1065,14 +1083,20 @@ export class EventMapper {
     assetEntity.file_size = content_length;
     assetEntity.file_type = content_type;
 
-    if (info) {
+    if (isTruthy(info)) {
       assetEntity.width = `${info.width}px`;
       assetEntity.height = `${info.height}px`;
     }
 
-    const {key, otr_key, sha256, token, domain = qualified_conversation?.domain || this.fallbackDomain} = eventData;
+    const {
+      key,
+      otr_key,
+      sha256,
+      token,
+      domain = isTruthy(qualified_conversation?.domain) ? qualified_conversation.domain : this.fallbackDomain,
+    } = eventData;
 
-    if (!otr_key || !sha256 || !key || !domain) {
+    if (!isTruthy(otr_key) || !isTruthy(sha256) || !isTruthy(key) || !isTruthy(domain)) {
       this.logger.warn('Required asset data is missing, cannot map remote image asset.');
       return assetEntity;
     }
@@ -1097,33 +1121,34 @@ export class EventMapper {
    * @returns Mapped link preview
    */
   private _mapAssetLinkPreview(linkPreview: LinkPreview): LinkPreviewEntity | void {
-    if (linkPreview) {
+    if (isTruthy(linkPreview)) {
       const {image, title, url, tweet} = linkPreview;
-      const {image: article_image, title: article_title} = linkPreview.article || {};
+      const {image: article_image, title: article_title} = isTruthy(linkPreview.article) ? linkPreview.article : {};
 
+      const articleTitle = isNonEmptyString(article_title) ? article_title : '';
       const linkPreviewData: LinkPreviewData = {
-        title: title || article_title || '',
+        title: isNonEmptyString(title) ? title : articleTitle,
         tweet: tweet ?? undefined,
         url: url,
       };
-      const previewImage = image || article_image;
-      if (previewImage && previewImage.uploaded) {
+      const previewImage = isTruthy(image) ? image : article_image;
+      if (isTruthy(previewImage) && isTruthy(previewImage.uploaded)) {
         const {assetId: assetKey, assetToken, assetDomain} = previewImage.uploaded;
 
-        if (assetKey) {
+        if (isNonEmptyString(assetKey)) {
           let {otrKey, sha256} = previewImage.uploaded;
 
           otrKey = new Uint8Array(otrKey);
           sha256 = new Uint8Array(sha256);
 
-          const domain = assetDomain || this.fallbackDomain;
+          const domain = isNonEmptyString(assetDomain) ? assetDomain : this.fallbackDomain;
 
-          if (!domain) {
+          if (!isNonEmptyString(domain)) {
             this.logger.warn(`Missing asset domain for link preview with asset key. Cannot create remote data.`);
             return;
           }
 
-          if (!assetToken) {
+          if (!isNonEmptyString(assetToken)) {
             this.logger.warn(`Missing asset token for link preview with asset key. Cannot create remote data.`);
             return;
           }
@@ -1151,11 +1176,19 @@ export class EventMapper {
    * @returns Array of mapped link previews
    */
   private _mapAssetLinkPreviews(linkPreviews: string[]) {
-    const encodedLinkPreviews = linkPreviews.map(base64 => base64ToArray(base64));
+    const encodedLinkPreviews = linkPreviews.map(base64 => {
+      return base64ToArray(base64);
+    });
     return encodedLinkPreviews
-      .map(encodedLinkPreview => LinkPreview.decode(encodedLinkPreview))
-      .map(linkPreview => this._mapAssetLinkPreview(linkPreview))
-      .filter(linkPreviewEntity => linkPreviewEntity);
+      .map(encodedLinkPreview => {
+        return LinkPreview.decode(encodedLinkPreview);
+      })
+      .map(linkPreview => {
+        return this._mapAssetLinkPreview(linkPreview);
+      })
+      .filter(linkPreviewEntity => {
+        return !isUndefined(linkPreviewEntity);
+      });
   }
 
   /**
@@ -1166,7 +1199,9 @@ export class EventMapper {
    * @returns Array of mapped mentions
    */
   private _mapAssetMentions(mentions: string[], messageText: string) {
-    const encodedMentions = mentions.map(base64 => base64ToArray(base64));
+    const encodedMentions = mentions.map(base64 => {
+      return base64ToArray(base64);
+    });
     return encodedMentions
       .map(encodedMention => {
         const protoMention = Mention.decode(encodedMention);
@@ -1177,8 +1212,8 @@ export class EventMapper {
           protoMention.qualifiedUserId?.domain ?? undefined,
         );
       })
-      .filter((MentionEntity, _, allMentions): boolean | void => {
-        if (MentionEntity !== undefined) {
+      .filter((MentionEntity, _, allMentions): boolean => {
+        if (!isUndefined(MentionEntity)) {
           try {
             return MentionEntity.validate(messageText, allMentions);
           } catch (error: unknown) {
@@ -1186,6 +1221,8 @@ export class EventMapper {
             return false;
           }
         }
+
+        return false;
       });
   }
 
@@ -1200,11 +1237,11 @@ export class EventMapper {
     const messageText = content ?? message ?? '';
     const assetEntity = new Text(id, messageText);
 
-    if (mentions !== undefined && mentions.length > 0) {
+    if (!isUndefined(mentions) && mentions.length > 0) {
       const mappedMentions = this._mapAssetMentions(mentions, messageText);
       assetEntity.mentions(mappedMentions);
     }
-    if (previews !== undefined && previews.length > 0) {
+    if (!isUndefined(previews) && previews.length > 0) {
       const mappedLinkPreviews = this._mapAssetLinkPreviews(previews) as unknown as LinkPreviewEntity[];
       assetEntity.previews(mappedLinkPreviews);
     }
@@ -1224,10 +1261,10 @@ export class EventMapper {
 // TODO: Method is probably being used for data from backend & database. If yes, it should be split up (Single-responsibility principle).
 function addMetadata<T extends Message>(entity: T, event: LegacyEventRecord): T {
   const {data: eventData, read_receipts} = event;
-  if (eventData) {
+  if (isTruthy(eventData)) {
     entity.expectsReadConfirmation = eventData.expects_read_confirmation;
     entity.legalHoldStatus = eventData.legal_hold_status;
   }
-  entity.readReceipts(read_receipts || []);
+  entity.readReceipts(isTruthy(read_receipts) ? read_receipts : []);
   return entity;
 }

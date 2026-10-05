@@ -21,6 +21,8 @@ import {useState, useEffect} from 'react';
 
 import {formatSeconds} from 'Util/timeUtil';
 
+const millisecondsPerSecond = 1000;
+
 interface DurationProps {
   startedAt?: number;
 }
@@ -32,13 +34,15 @@ const Duration = ({startedAt}: DurationProps) => {
     let durationUpdateInterval: number;
     if (startedAt != null) {
       const updateTimer = () => {
-        const time = Math.floor((Date.now() - startedAt) / 1000);
+        const time = Math.floor((Date.now() - startedAt) / millisecondsPerSecond);
         setDuration(formatSeconds(time));
       };
       updateTimer();
-      durationUpdateInterval = window.setInterval(updateTimer, 1000);
+      durationUpdateInterval = window.setInterval(updateTimer, millisecondsPerSecond);
     }
-    return () => window.clearInterval(durationUpdateInterval);
+    return () => {
+      return window.clearInterval(durationUpdateInterval);
+    };
   }, [startedAt]);
 
   return <>{duration}</>;

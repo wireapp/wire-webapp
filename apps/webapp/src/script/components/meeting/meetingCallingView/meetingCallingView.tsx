@@ -36,7 +36,9 @@ export const MeetingCallingView = () => {
   const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
   const {callingRepository} = callingViewModel;
-  const hasMeetingNotifications = useMeetingNotificationStore(state => state.notifications.length > 0);
+  const hasMeetingNotifications = useMeetingNotificationStore(state => {
+    return state.notifications.length > 0;
+  });
 
   if (activeCalls.length === 0) {
     return null;
@@ -44,19 +46,21 @@ export const MeetingCallingView = () => {
 
   return (
     <div css={meetingCallingViewStyles(hasMeetingNotifications)} data-uie-name="meeting-calling-view">
-      {activeCalls.map(call => (
-        <CallingCell
-          key={`${call.conversation.qualifiedId.id}-${call.conversation.qualifiedId.domain}`}
-          classifiedDomains={classifiedDomains}
-          call={call}
-          callActions={callingViewModel.callActions}
-          callingRepository={callingRepository}
-          propertiesRepository={propertiesRepository}
-          isFullUi
-          isNotificationHostVisible={false}
-          hasAccessToCamera={callingViewModel.hasAccessToCamera()}
-        />
-      ))}
+      {activeCalls.map(call => {
+        return (
+          <CallingCell
+            key={`${call.conversation.qualifiedId.id}-${call.conversation.qualifiedId.domain}`}
+            classifiedDomains={classifiedDomains}
+            call={call}
+            callActions={callingViewModel.callActions}
+            callingRepository={callingRepository}
+            propertiesRepository={propertiesRepository}
+            isFullUi
+            isNotificationHostVisible={false}
+            hasAccessToCamera={callingViewModel.hasAccessToCamera()}
+          />
+        );
+      })}
     </div>
   );
 };

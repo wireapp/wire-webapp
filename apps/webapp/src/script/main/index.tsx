@@ -19,6 +19,7 @@
 
 import {createClock} from '@enormora/clock/clock';
 import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
+import {isNull} from '@sindresorhus/is';
 // eslint-disable-next-line import/order
 import 'core-js/full/reflect';
 
@@ -67,7 +68,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const appContainer = document.getElementById('wire-app');
 
-  if (!appContainer) {
+  if (isNull(appContainer)) {
     throw new Error('container for application does not exist in the DOM');
   }
 

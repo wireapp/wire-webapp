@@ -38,12 +38,18 @@ const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 describe('MessageTimerButton', () => {
   it('hides the timer button when the feature is disabled', () => {
     const conversation: Partial<Conversation> = {
-      hasGlobalMessageTimer: ko.pureComputed(() => false),
-      messageTimer: ko.pureComputed(() => 0),
+      hasGlobalMessageTimer: ko.pureComputed(() => {
+        return false;
+      }),
+      messageTimer: ko.pureComputed(() => {
+        return 0;
+      }),
     };
 
     const mockTeamState: Partial<TeamState> = {
-      isSelfDeletingMessagesEnabled: ko.pureComputed(() => false),
+      isSelfDeletingMessagesEnabled: ko.pureComputed(() => {
+        return false;
+      }),
     };
 
     const props = {
@@ -59,12 +65,18 @@ describe('MessageTimerButton', () => {
 
   it('shows the inactive message timer button', () => {
     const conversation: Partial<Conversation> = {
-      hasGlobalMessageTimer: ko.pureComputed(() => false),
-      messageTimer: ko.pureComputed(() => 0),
+      hasGlobalMessageTimer: ko.pureComputed(() => {
+        return false;
+      }),
+      messageTimer: ko.pureComputed(() => {
+        return 0;
+      }),
     };
 
     const mockTeamState: Partial<TeamState> = {
-      isSelfDeletingMessagesEnabled: ko.pureComputed(() => true),
+      isSelfDeletingMessagesEnabled: ko.pureComputed(() => {
+        return true;
+      }),
     };
 
     const props = {
@@ -82,12 +94,18 @@ describe('MessageTimerButton', () => {
     jest.spyOn(Context, 'showContextMenu').mockClear();
 
     const conversation: Partial<Conversation> = {
-      hasGlobalMessageTimer: ko.pureComputed(() => false),
-      messageTimer: ko.pureComputed(() => 0),
+      hasGlobalMessageTimer: ko.pureComputed(() => {
+        return false;
+      }),
+      messageTimer: ko.pureComputed(() => {
+        return 0;
+      }),
     };
 
     const mockTeamState: Partial<TeamState> = {
-      isSelfDeletingMessagesEnabled: ko.pureComputed(() => true),
+      isSelfDeletingMessagesEnabled: ko.pureComputed(() => {
+        return true;
+      }),
     };
 
     const props = {
@@ -112,12 +130,18 @@ describe('MessageTimerButton', () => {
     const duration = TIME_IN_MILLIS.MINUTE * minutes;
 
     const conversation: Partial<Conversation> = {
-      hasGlobalMessageTimer: ko.pureComputed(() => false),
-      messageTimer: ko.pureComputed(() => duration),
+      hasGlobalMessageTimer: ko.pureComputed(() => {
+        return false;
+      }),
+      messageTimer: ko.pureComputed(() => {
+        return duration;
+      }),
     };
 
     const mockTeamState: Partial<TeamState> = {
-      isSelfDeletingMessagesEnabled: ko.pureComputed(() => true),
+      isSelfDeletingMessagesEnabled: ko.pureComputed(() => {
+        return true;
+      }),
     };
 
     const props = {
@@ -142,12 +166,18 @@ describe('MessageTimerButton', () => {
     const duration = TIME_IN_MILLIS.MINUTE * minutes;
 
     const conversation: Partial<Conversation> = {
-      hasGlobalMessageTimer: ko.pureComputed(() => true),
-      messageTimer: ko.pureComputed(() => duration),
+      hasGlobalMessageTimer: ko.pureComputed(() => {
+        return true;
+      }),
+      messageTimer: ko.pureComputed(() => {
+        return duration;
+      }),
     };
 
     const mockTeamState: Partial<TeamState> = {
-      isSelfDeletingMessagesEnabled: ko.pureComputed(() => true),
+      isSelfDeletingMessagesEnabled: ko.pureComputed(() => {
+        return true;
+      }),
     };
 
     const props = {
@@ -171,13 +201,21 @@ describe('MessageTimerButton', () => {
     const duration = TIME_IN_MILLIS.MINUTE * minutes;
 
     const conversation: Partial<Conversation> = {
-      hasGlobalMessageTimer: ko.pureComputed(() => false),
-      messageTimer: ko.pureComputed(() => duration),
+      hasGlobalMessageTimer: ko.pureComputed(() => {
+        return false;
+      }),
+      messageTimer: ko.pureComputed(() => {
+        return duration;
+      }),
     };
 
     const mockTeamState: Partial<TeamState> = {
-      isSelfDeletingMessagesEnabled: ko.pureComputed(() => true),
-      isSelfDeletingMessagesEnforced: ko.pureComputed(() => true),
+      isSelfDeletingMessagesEnabled: ko.pureComputed(() => {
+        return true;
+      }),
+      isSelfDeletingMessagesEnforced: ko.pureComputed(() => {
+        return true;
+      }),
     };
 
     const props = {
@@ -202,12 +240,18 @@ describe('MessageTimerButton', () => {
     const duration = TIME_IN_MILLIS.MINUTE * minutes;
 
     const conversation: Partial<Conversation> = {
-      hasGlobalMessageTimer: ko.pureComputed(() => true),
-      messageTimer: ko.pureComputed(() => duration),
+      hasGlobalMessageTimer: ko.pureComputed(() => {
+        return true;
+      }),
+      messageTimer: ko.pureComputed(() => {
+        return duration;
+      }),
     };
 
     const mockTeamState: Partial<TeamState> = {
-      isSelfDeletingMessagesEnabled: ko.pureComputed(() => true),
+      isSelfDeletingMessagesEnabled: ko.pureComputed(() => {
+        return true;
+      }),
     };
 
     const props = {

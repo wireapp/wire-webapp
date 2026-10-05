@@ -17,6 +17,8 @@
  *
  */
 
+import {isTruthy} from '@sindresorhus/is';
+
 import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
@@ -29,7 +31,7 @@ import {CONVERSATION, ClientEvent} from '../../../Client';
 import {DBOperation, EventHandler, HandledEvents} from '../types';
 
 function validateAssetEvent(originalEvent: HandledEvents | undefined): originalEvent is StoredEvent<AssetAddEvent> {
-  if (!originalEvent) {
+  if (!isTruthy(originalEvent)) {
     return false;
   }
 
@@ -50,8 +52,8 @@ function computeEventUpdates(
   const ASSET_PREVIEW = 'preview';
   // similarly, no status is sent by the client when we retry sending a failed message
   const RETRY_EVENT = 'retry';
-  const isPreviewEvent = !newEventData.status && !!newEventData.preview_key;
-  const isRetryEvent = !!newEventData.content_length;
+  const isPreviewEvent = !isTruthy(newEventData.status) && isTruthy(newEventData.preview_key);
+  const isRetryEvent = isTruthy(newEventData.content_length);
   const handledEvent = isRetryEvent ? RETRY_EVENT : newEventData.status;
   const previewStatus = isPreviewEvent ? ASSET_PREVIEW : handledEvent;
 

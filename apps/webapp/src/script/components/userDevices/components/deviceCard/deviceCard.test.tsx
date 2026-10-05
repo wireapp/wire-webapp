@@ -32,7 +32,9 @@ import {translateForTest} from 'Util/test/translateForTest';
 
 function createClientEntity(clientEntity: Partial<ClientEntity>): ClientEntity {
   const device: Partial<ClientEntity> = {
-    getName: () => 'example name',
+    getName: () => {
+      return 'example name';
+    },
     id: 'example',
     label: 'example label',
     ...clientEntity,

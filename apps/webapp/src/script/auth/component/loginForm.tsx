@@ -45,7 +45,9 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
 
   const [validEmailInput, setValidEmailInput] = useState(true);
   const [validPasswordInput, setValidPasswordInput] = useState(true);
-  const {email: defaultEmail} = useSelector((state: RootState) => AuthSelector.getAccount(state));
+  const {email: defaultEmail} = useSelector((state: RootState) => {
+    return AuthSelector.getAccount(state);
+  });
 
   const [email, setEmail] = useState(defaultEmail ?? '');
   const [password, setPassword] = useState('');

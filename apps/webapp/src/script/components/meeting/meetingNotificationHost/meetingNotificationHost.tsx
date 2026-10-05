@@ -43,8 +43,12 @@ type MeetingNotificationHostProps = {
 
 export const MeetingNotificationHost = ({isStandalone}: MeetingNotificationHostProps) => {
   const {translate} = useApplicationContext();
-  const notifications = useMeetingNotificationStore(state => state.notifications);
-  const isExpanded = useMeetingNotificationStore(state => state.isExpanded);
+  const notifications = useMeetingNotificationStore(state => {
+    return state.notifications;
+  });
+  const isExpanded = useMeetingNotificationStore(state => {
+    return state.isExpanded;
+  });
   const hostRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -56,7 +60,7 @@ export const MeetingNotificationHost = ({isStandalone}: MeetingNotificationHostP
       const target = event.target;
       const isInsideNotificationHost =
         target instanceof Node &&
-        (hostRef.current?.contains(target) ||
+        (hostRef.current?.contains(target) === true ||
           (target instanceof Element && target.closest('.meeting-notification-host') !== null));
 
       if (!(target instanceof Node) || isInsideNotificationHost) {
@@ -67,7 +71,9 @@ export const MeetingNotificationHost = ({isStandalone}: MeetingNotificationHostP
     };
 
     document.addEventListener('click', collapseWhenClickedOutside);
-    return () => document.removeEventListener('click', collapseWhenClickedOutside);
+    return () => {
+      return document.removeEventListener('click', collapseWhenClickedOutside);
+    };
   }, [notifications.length]);
 
   if (notifications.length === 0) {
@@ -91,7 +97,9 @@ export const MeetingNotificationHost = ({isStandalone}: MeetingNotificationHostP
             <button
               type="button"
               css={meetingNotificationHostDismissAllButtonStyles}
-              onClick={() => useMeetingNotificationStore.getState().clearNotifications()}
+              onClick={() => {
+                return useMeetingNotificationStore.getState().clearNotifications();
+              }}
             >
               {translate('meetings.notifications.dismissAll')}
             </button>
@@ -103,13 +111,17 @@ export const MeetingNotificationHost = ({isStandalone}: MeetingNotificationHostP
             css={meetingNotificationHostListStyles}
             data-uie-name="meeting-notification-list"
           >
-            {notifications.map(notification => (
-              <MeetingNotificationCard
-                key={notification.id}
-                {...notification}
-                onDismiss={() => useMeetingNotificationStore.getState().dismissNotification(notification.id)}
-              />
-            ))}
+            {notifications.map(notification => {
+              return (
+                <MeetingNotificationCard
+                  key={notification.id}
+                  {...notification}
+                  onDismiss={() => {
+                    return useMeetingNotificationStore.getState().dismissNotification(notification.id);
+                  }}
+                />
+              );
+            })}
           </div>
         )}
         <div css={meetingNotificationHostFooterStyles}>
@@ -119,7 +131,9 @@ export const MeetingNotificationHost = ({isStandalone}: MeetingNotificationHostP
             aria-expanded={isExpanded}
             aria-controls="meeting-notification-list"
             data-uie-name="meeting-notification-expand"
-            onClick={() => useMeetingNotificationStore.getState().setIsExpanded(!isExpanded)}
+            onClick={() => {
+              return useMeetingNotificationStore.getState().setIsExpanded(!isExpanded);
+            }}
           >
             <ChevronIcon css={meetingNotificationHostExpandIconStyles(isExpanded)} />
             {translate(isExpanded ? 'meetings.notifications.hide' : 'meetings.notifications.showAll')}

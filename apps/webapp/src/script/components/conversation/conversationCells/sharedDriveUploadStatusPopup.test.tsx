@@ -42,8 +42,8 @@ const renderPopup = (
   isExpanded = false,
   isRetrying = false,
   fileName = upload.fileName,
-) =>
-  render(
+) => {
+  return render(
     <ThemeProvider>
       <SharedDriveUploadStatusPopup
         upload={{
@@ -76,6 +76,7 @@ const renderPopup = (
       />
     </ThemeProvider>,
   );
+};
 
 describe('SharedDriveUploadStatusPopup', () => {
   it('renders ordered rows with distinct queued and active states', async () => {
@@ -409,7 +410,9 @@ describe('SharedDriveUploadStatusPopup', () => {
     );
 
     expect(screen.getAllByRole('button', {name: 'Cancel'})).toHaveLength(2);
-    screen.getAllByRole('button', {name: 'Cancel'}).forEach(cancel => expect(cancel).toBeDisabled());
+    screen.getAllByRole('button', {name: 'Cancel'}).forEach(cancel => {
+      expect(cancel).toBeDisabled();
+    });
   });
 
   it('invokes retry from the failed file row', async () => {

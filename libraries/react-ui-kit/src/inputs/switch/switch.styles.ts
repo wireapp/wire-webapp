@@ -21,6 +21,10 @@ import {CSSObject} from '@emotion/react';
 
 import {COLOR, COLOR_V2} from '../../identity';
 
+const disabledSwitchOpacity = 0.5;
+const disabledSwitchTint = 0.4;
+const disabledSwitchLabelOpacity = 0.7;
+
 export const wrapperStyles: CSSObject = {
   display: 'grid',
   position: 'relative',
@@ -39,14 +43,16 @@ export const inputStyles: CSSObject = {
   },
 };
 
-export const labelStyles = (disabled: boolean, showLoading: boolean): CSSObject => ({
-  borderRadius: '20px',
-  cursor: disabled || showLoading ? 'not-allowed' : 'pointer',
-  display: 'block',
-  margin: 0,
-  overflow: 'hidden',
-  opacity: disabled ? 0.5 : 1,
-});
+export const labelStyles = (disabled: boolean, showLoading: boolean): CSSObject => {
+  return {
+    borderRadius: '20px',
+    cursor: disabled || showLoading ? 'not-allowed' : 'pointer',
+    display: 'block',
+    margin: 0,
+    overflow: 'hidden',
+    opacity: disabled ? disabledSwitchOpacity : 1,
+  };
+};
 
 type SwitchStylesProps = {
   disabled: boolean;
@@ -66,7 +72,8 @@ export const switchStyles = ({
   disabledColor,
 }: SwitchStylesProps): CSSObject => {
   const baseColor = checked ? activatedColor : deactivatedColor;
-  const backgroundColor = disabled || showLoading ? (disabledColor ?? COLOR.tint(baseColor, 0.4)) : baseColor;
+  const backgroundColor =
+    disabled || showLoading ? (disabledColor ?? COLOR.tint(baseColor, disabledSwitchTint)) : baseColor;
 
   return {
     '&:after': {
@@ -101,18 +108,20 @@ export const loadingStyles: CSSObject = {
   position: 'absolute',
 };
 
-export const switchDotStyles = (disabled: boolean, checked: boolean): CSSObject => ({
-  background: COLOR.WHITE,
-  borderRadius: '100%',
-  bottom: 0,
-  boxShadow: '0px 0px 2px -1px gray',
-  display: 'block',
-  height: '23px',
-  margin: '1px',
-  opacity: disabled ? 0.7 : undefined,
-  position: 'absolute',
-  right: checked ? '0px' : '17px',
-  top: 0,
-  transition: 'all 0.15s ease-in 0s',
-  width: '23px',
-});
+export const switchDotStyles = (disabled: boolean, checked: boolean): CSSObject => {
+  return {
+    background: COLOR.WHITE,
+    borderRadius: '100%',
+    bottom: 0,
+    boxShadow: '0px 0px 2px -1px gray',
+    display: 'block',
+    height: '23px',
+    margin: '1px',
+    opacity: disabled ? disabledSwitchLabelOpacity : undefined,
+    position: 'absolute',
+    right: checked ? '0px' : '17px',
+    top: 0,
+    transition: 'all 0.15s ease-in 0s',
+    width: '23px',
+  };
+};

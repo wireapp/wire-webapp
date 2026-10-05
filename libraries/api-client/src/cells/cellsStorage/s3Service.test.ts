@@ -47,7 +47,9 @@ describe('S3Service', () => {
       send: mockSend,
     } as unknown as jest.Mocked<S3Client>;
 
-    (S3Client as jest.Mock).mockImplementation(() => mockS3Client);
+    (S3Client as jest.Mock).mockImplementation(() => {
+      return mockS3Client;
+    });
 
     service = new S3Service({
       config: testConfig,
@@ -110,7 +112,9 @@ describe('S3Service', () => {
     const originalXMLHttpRequest = globalThis.XMLHttpRequest;
     Object.defineProperty(globalThis, 'XMLHttpRequest', {
       configurable: true,
-      value: jest.fn(() => xhr),
+      value: jest.fn(() => {
+        return xhr;
+      }),
       writable: true,
     });
 
@@ -146,7 +150,9 @@ describe('S3Service', () => {
         done: jest.fn().mockResolvedValue(undefined),
       };
 
-      (Upload as unknown as jest.Mock).mockImplementation(() => mockUpload);
+      (Upload as unknown as jest.Mock).mockImplementation(() => {
+        return mockUpload;
+      });
 
       await service.putObject({path: testFilePath, file: testFile});
 
@@ -180,7 +186,9 @@ describe('S3Service', () => {
         done: jest.fn().mockResolvedValue(undefined),
       };
 
-      (Upload as unknown as jest.Mock).mockImplementation(() => mockUpload);
+      (Upload as unknown as jest.Mock).mockImplementation(() => {
+        return mockUpload;
+      });
 
       await service.putObject({path: testFilePath, file: testFile, metadata});
 
@@ -200,7 +208,9 @@ describe('S3Service', () => {
         done: jest.fn().mockRejectedValue(error),
       };
 
-      (Upload as unknown as jest.Mock).mockImplementation(() => mockUpload);
+      (Upload as unknown as jest.Mock).mockImplementation(() => {
+        return mockUpload;
+      });
 
       await expect(service.putObject({path: testFilePath, file: testFile})).rejects.toThrow(CellsStorageError);
       await expect(service.putObject({path: testFilePath, file: testFile})).rejects.toThrow(/The object was too large/);
@@ -215,7 +225,9 @@ describe('S3Service', () => {
         done: jest.fn().mockRejectedValue(error),
       };
 
-      (Upload as unknown as jest.Mock).mockImplementation(() => mockUpload);
+      (Upload as unknown as jest.Mock).mockImplementation(() => {
+        return mockUpload;
+      });
 
       await expect(service.putObject({path: testFilePath, file: testFile})).rejects.toThrow(CellsStorageError);
       await expect(service.putObject({path: testFilePath, file: testFile})).rejects.toThrow(
@@ -230,7 +242,9 @@ describe('S3Service', () => {
         done: jest.fn().mockRejectedValue(error),
       };
 
-      (Upload as unknown as jest.Mock).mockImplementation(() => mockUpload);
+      (Upload as unknown as jest.Mock).mockImplementation(() => {
+        return mockUpload;
+      });
 
       await expect(service.putObject({path: testFilePath, file: testFile})).rejects.toBe(error);
     });
@@ -248,7 +262,9 @@ describe('S3Service', () => {
         done: jest.fn().mockResolvedValue(undefined),
       };
 
-      (Upload as unknown as jest.Mock).mockImplementation(() => mockUpload);
+      (Upload as unknown as jest.Mock).mockImplementation(() => {
+        return mockUpload;
+      });
 
       await service.putObject({path: testFilePath, file: testFile, progressCallback});
 
@@ -268,7 +284,9 @@ describe('S3Service', () => {
         done: jest.fn().mockResolvedValue(undefined),
       };
 
-      (Upload as unknown as jest.Mock).mockImplementation(() => mockUpload);
+      (Upload as unknown as jest.Mock).mockImplementation(() => {
+        return mockUpload;
+      });
 
       await service.putObject({path: testFilePath, file: testFile, progressCallback});
 
@@ -281,7 +299,9 @@ describe('S3Service', () => {
         done: jest.fn().mockResolvedValue(undefined),
       };
 
-      (Upload as unknown as jest.Mock).mockImplementation(() => mockUpload);
+      (Upload as unknown as jest.Mock).mockImplementation(() => {
+        return mockUpload;
+      });
 
       await service.putObject({path: testFilePath, file: testFile});
 
@@ -317,7 +337,9 @@ class MockFile {
   arrayBuffer = jest.fn().mockResolvedValue(new ArrayBuffer(0));
   slice = jest.fn().mockReturnValue(new MockBlob());
   stream = jest.fn().mockReturnValue({locked: false, getReader: jest.fn()});
-  text = jest.fn().mockImplementation(() => Promise.resolve(this.content));
+  text = jest.fn().mockImplementation(() => {
+    return Promise.resolve(this.content);
+  });
 }
 
 const createS3Error = (name: string, message: string): S3ServiceException => {

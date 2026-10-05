@@ -21,13 +21,19 @@ const TargetURLKey = 'E2EIdentity_OIDCService_TargetURL';
 
 const OIDCServiceStore = {
   store: {
-    targetURL: (url: string) => localStorage.setItem(TargetURLKey, url),
+    targetURL: (url: string) => {
+      return localStorage.setItem(TargetURLKey, url);
+    },
   },
   get: {
-    targetURL: () => localStorage.getItem(TargetURLKey),
+    targetURL: () => {
+      return localStorage.getItem(TargetURLKey);
+    },
   },
   clear: {
-    targetURL: () => localStorage.removeItem(TargetURLKey),
+    targetURL: () => {
+      return localStorage.removeItem(TargetURLKey);
+    },
     all: () => {
       OIDCServiceStore.clear.targetURL();
     },

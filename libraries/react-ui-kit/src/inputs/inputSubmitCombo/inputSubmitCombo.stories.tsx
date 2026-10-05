@@ -38,37 +38,43 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-  render: () => (
-    <InputSubmitCombo>
-      <Input placeholder="Type a message..." name="message" />
-      <RoundIconButton type="submit">
-        <ArrowIcon />
-      </RoundIconButton>
-    </InputSubmitCombo>
-  ),
+  render: () => {
+    return (
+      <InputSubmitCombo>
+        <Input placeholder="Type a message..." name="message" />
+        <RoundIconButton type="submit">
+          <ArrowIcon />
+        </RoundIconButton>
+      </InputSubmitCombo>
+    );
+  },
 };
 
 export const WithMultipleButtons: Story = {
-  render: () => (
-    <InputSubmitCombo>
-      <Input placeholder="Type a message..." name="message" />
-      <RoundIconButton>
-        <AttachmentIcon />
-      </RoundIconButton>
-      <RoundIconButton type="submit">
-        <ArrowIcon />
-      </RoundIconButton>
-    </InputSubmitCombo>
-  ),
+  render: () => {
+    return (
+      <InputSubmitCombo>
+        <Input placeholder="Type a message..." name="message" />
+        <RoundIconButton>
+          <AttachmentIcon />
+        </RoundIconButton>
+        <RoundIconButton type="submit">
+          <ArrowIcon />
+        </RoundIconButton>
+      </InputSubmitCombo>
+    );
+  },
 };
 
 export const Invalid: Story = {
-  render: () => (
-    <InputSubmitCombo markInvalid>
-      <Input placeholder="Invalid input" name="message" markInvalid />
-      <RoundIconButton type="submit">
-        <ArrowIcon />
-      </RoundIconButton>
-    </InputSubmitCombo>
-  ),
+  render: () => {
+    return (
+      <InputSubmitCombo markInvalid>
+        <Input placeholder="Invalid input" name="message" markInvalid />
+        <RoundIconButton type="submit">
+          <ArrowIcon />
+        </RoundIconButton>
+      </InputSubmitCombo>
+    );
+  },
 };

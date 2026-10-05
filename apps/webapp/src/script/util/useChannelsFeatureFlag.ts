@@ -17,7 +17,7 @@
  *
  */
 
-import {isString} from '@sindresorhus/is';
+import {isString, isUndefined} from '@sindresorhus/is';
 import {ACCESS_TYPE, FEATURE_KEY, FEATURE_STATUS, Role} from '@wireapp/api-client/lib/team';
 import {container} from 'tsyringe';
 
@@ -41,7 +41,7 @@ const useChannelFeature = () => {
   const {teamFeatures} = useKoSubscribableChildren(teamState as any, ['teamFeatures']) as {
     teamFeatures?: Record<string, any>;
   };
-  return teamFeatures ? teamFeatures[FEATURE_KEY.CHANNELS] : null;
+  return !isUndefined(teamFeatures) ? teamFeatures[FEATURE_KEY.CHANNELS] : null;
 };
 
 const useCanCreateChannels = () => {
@@ -97,7 +97,11 @@ export const useChannelsFeatureFlag = () => {
 
   // Determine if the channel tab should be shown based on the same logic used in ConversationTabs
   const shouldShowChannelTab =
-    isChannelsEnabled && (channelConversations.some(channel => !channel.is_archived()) || isChannelsFeatureEnabled);
+    isChannelsEnabled &&
+    (channelConversations.some(channel => {
+      return !channel.is_archived();
+    }) ||
+      isChannelsFeatureEnabled);
 
   return {
     canCreateChannels,

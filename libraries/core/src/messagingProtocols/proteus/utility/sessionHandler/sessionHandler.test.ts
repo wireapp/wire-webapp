@@ -136,9 +136,9 @@ describe('SessionHandler', () => {
         'missing-user2': ['client1', 'client2'],
       };
 
-      jest
-        .spyOn(cryptoClient, 'sessionExists')
-        .mockImplementation(sessionId => Promise.resolve(sessionId.includes('missing') as any));
+      jest.spyOn(cryptoClient, 'sessionExists').mockImplementation(sessionId => {
+        return Promise.resolve(sessionId.includes('missing') as any);
+      });
 
       const sessionFromPrekeySpy = jest.spyOn(cryptoClient, 'sessionFromPrekey');
       const {sessions} = await initSessions({

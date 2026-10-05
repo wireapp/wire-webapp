@@ -46,12 +46,15 @@ export const useConversationCall = (conversation: Conversation): ConversationCal
   const callState = container.resolve(CallState);
   const {calls} = useKoSubscribableChildren(callState, ['calls']);
 
-  const call = useMemo(
-    () => calls.find(call => matchQualifiedIds(call.conversation.qualifiedId, conversation.qualifiedId)),
-    [calls, conversation.qualifiedId],
-  );
+  const call = useMemo(() => {
+    return calls.find(call => {
+      return matchQualifiedIds(call.conversation.qualifiedId, conversation.qualifiedId);
+    });
+  }, [calls, conversation.qualifiedId]);
 
-  const [currentCallState, setCurrentCallState] = useState<CALL_STATE | null>(() => call?.state() ?? null);
+  const [currentCallState, setCurrentCallState] = useState<CALL_STATE | null>(() => {
+    return call?.state() ?? null;
+  });
 
   // Subscribe to the call's state changes
   useEffect(() => {

@@ -17,10 +17,15 @@
  *
  */
 
+import type {Clock, TimeoutIdentifier} from '@enormora/clock/clock';
+import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
+import {isNonEmptyString, isNullOrUndefined, isTruthy, isUndefined} from '@sindresorhus/is';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {NotificationPreference, WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
 import ko from 'knockout';
+import {result} from 'true-myth';
+import {match} from 'ts-pattern';
 import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
@@ -64,13 +69,20 @@ import {AppPermissionState} from './AppPermissionState';
 
 import {SuperType} from '../../message/superType';
 import {SystemMessageType} from '../../message/systemMessageType';
+import type {SystemNotificationApi, SystemNotificationHandle} from '../../notification/systemNotificationTypes';
 import {ContentState, useAppState} from '../../page/useAppState';
 import {Warnings} from '../../view_model/WarningsContainer';
 
-type NotificationData = {conversationId?: QualifiedId; messageId?: string; messageType: string};
+const notificationTimeoutInSeconds = 5;
+
+type NotificationData = {
+  conversationId?: QualifiedId;
+  messageId?: string;
+  messageType: string;
+};
 interface NotificationContent {
   /** Notification options */
-  options: {data: NotificationData; tag: string};
+  options: {body: string; data: NotificationData; icon: string; silent: boolean; tag: string};
   /** Timeout for notification */
   timeout: number;
   /** Notification title */
@@ -78,9 +90,19 @@ interface NotificationContent {
   /** Function to be triggered on click */
   trigger: Function;
 }
-interface WebappNotifications extends Notification {
+type NotificationEntry = {
+  body: string;
   data: NotificationData;
-}
+  handle: SystemNotificationHandle;
+  icon: string;
+  /** Consumed by the E2E notification bridge to simulate user clicks. */
+  onclick: (event?: Event) => void;
+  title: string;
+  timeoutIdentifier?: TimeoutIdentifier;
+};
+
+type PresentationState =
+  {kind: 'pending'; entry?: NotificationEntry} | {kind: 'shown'; entry?: NotificationEntry} | {kind: 'closed'};
 
 /**
  * Notification repository to trigger browser and audio notifications.
@@ -91,7 +113,9 @@ interface WebappNotifications extends Notification {
 export class NotificationRepository {
   private readonly conversationRepository: ConversationRepository;
   private readonly logger: Logger;
-  notifications: ReadonlyArray<WebappNotifications>;
+  notifications: readonly NotificationEntry[];
+  private readonly notificationApi: SystemNotificationApi;
+  private readonly clock: Clock;
   private readonly notificationsPreference: ko.Observable<NotificationPreference>;
   private readonly assetRepository: AssetRepository;
   private isSoftLock = false;
@@ -100,7 +124,8 @@ export class NotificationRepository {
     return {
       BODY_LENGTH: 80,
       ICON_URL: '/image/logo/notification.png',
-      TIMEOUT: TIME_IN_MILLIS.SECOND * 5,
+      // Keep system notifications visible long enough to be noticed before auto-closing.
+      TIMEOUT: TIME_IN_MILLIS.SECOND * notificationTimeoutInSeconds,
       TITLE_LENGTH: 17,
       TITLE_MAX_LENGTH: 38,
     };
@@ -113,20 +138,32 @@ export class NotificationRepository {
   /**
    * Construct a new Notification Repository.
    * @param conversationRepository Repository for all conversation interactions
-   * @param permissionRepository Repository for all permission interactions
+   * @param audioRepository
+   * @param callingRepository
+   * @param translate
+   * @param clock
+   * @param notificationApi
+   * @param fireAndForgetInvoker
    * @param userState Repository for users
+   * @param conversationState
+   * @param callState
    */
   constructor(
     conversationRepository: ConversationRepository,
     private readonly audioRepository: AudioRepository,
     private readonly callingRepository: CallingRepository,
     private readonly translate: Translate,
+    clock: Clock,
+    notificationApi: SystemNotificationApi,
+    private readonly fireAndForgetInvoker: FireAndForgetInvoker,
     private readonly userState = container.resolve(UserState),
     private readonly conversationState = container.resolve(ConversationState),
     private readonly callState = container.resolve(CallState),
   ) {
     this.assetRepository = container.resolve(AssetRepository);
     this.conversationRepository = conversationRepository;
+    this.clock = clock;
+    this.notificationApi = notificationApi;
 
     this.logger = getLogger('NotificationRepository');
 
@@ -137,7 +174,9 @@ export class NotificationRepository {
     this.notificationsPreference.subscribe(notificationsPreference => {
       const preferenceIsNone = notificationsPreference === NotificationPreference.NONE;
       if (!preferenceIsNone) {
-        this.checkPermission();
+        this.fireAndForgetInvoker.fireAndForget(() => {
+          return this.checkPermission();
+        });
       }
     });
   }
@@ -165,7 +204,7 @@ export class NotificationRepository {
       return isPermitted;
     }
 
-    if (!Runtime.isSupportingNotifications()) {
+    if (!this.notificationApi.isSupported()) {
       return this.updatePermissionState(AppPermissionState.UNSUPPORTED);
     }
 
@@ -175,7 +214,17 @@ export class NotificationRepository {
       return shouldRequestPermission ? this.requestPermission() : this.checkPermissionState();
     }
 
-    const currentPermission = window.Notification.permission as BrowserPermissionStatus;
+    const currentPermission = match(this.notificationApi.getPermission())
+      .with('default', () => {
+        return BrowserPermissionStatus.PROMPT;
+      })
+      .with('denied', () => {
+        return BrowserPermissionStatus.DENIED;
+      })
+      .with('granted', () => {
+        return BrowserPermissionStatus.GRANTED;
+      })
+      .exhaustive();
     const shouldRequestPermission = currentPermission === BrowserPermissionStatus.PROMPT;
     return shouldRequestPermission ? this.requestPermission() : this.updatePermissionState(currentPermission);
   }
@@ -185,11 +234,12 @@ export class NotificationRepository {
    */
   clearNotifications(): void {
     this.notifications.forEach(notification => {
-      notification.close();
-      if (notification.data) {
-        const {conversationId, messageId} = notification.data;
-        this.logger.info(`Notification for '${messageId}' in '${conversationId?.id}' closed on unload.`);
-      }
+      const {conversationId, messageId} = notification.data;
+      this.closeNotification(
+        notification.handle,
+        `Notification for '${messageId}' in '${conversationId?.id}' closed on unload.`,
+        `Failed to close notification for '${messageId}' in '${conversationId?.id}' on unload.`,
+      );
     });
   }
 
@@ -222,7 +272,7 @@ export class NotificationRepository {
       return Promise.resolve();
     }
 
-    const notifyInConversation = conversationEntity
+    const notifyInConversation = !isNullOrUndefined(conversationEntity)
       ? NotificationRepository.shouldNotifyInConversation(
           conversationEntity,
           messageEntity,
@@ -241,17 +291,19 @@ export class NotificationRepository {
   /** Remove notifications from the queue that are no longer unread */
   readonly removeReadNotifications = (): void => {
     this.notifications.forEach(notification => {
-      const {conversationId, messageId, messageType} = notification.data || {};
+      const {conversationId, messageId, messageType} = notification.data;
 
-      if (conversationId && messageId) {
-        this.conversationRepository.isMessageRead(conversationId, messageId).then(isRead => {
+      if (!isNullOrUndefined(conversationId) && isNonEmptyString(messageId)) {
+        this.fireAndForgetInvoker.fireAndForget(async () => {
+          const isRead = await this.conversationRepository.isMessageRead(conversationId, messageId);
           if (isRead) {
-            notification.close();
-            const messageInfo = messageId
+            const messageInfo = isNonEmptyString(messageId)
               ? `message '${messageId}' of type '${messageType}'`
               : `'${messageType}' message`;
-            this.logger.info(
-              `Removed read notification for ${messageInfo} in '${conversationId?.id || conversationId}'.`,
+            this.closeNotification(
+              notification.handle,
+              `Removed read notification for ${messageInfo} in '${isNonEmptyString(conversationId?.id) ? conversationId?.id : conversationId}'.`,
+              `Failed to close read notification for ${messageInfo} in '${isNonEmptyString(conversationId?.id) ? conversationId?.id : conversationId}'.`,
             );
           }
         });
@@ -330,7 +382,7 @@ export class NotificationRepository {
 
     if (messageEntity.hasAsset()) {
       const assetEntity = messageEntity.getFirstAsset();
-      if (assetEntity === undefined) {
+      if (isUndefined(assetEntity)) {
         return undefined;
       }
 
@@ -384,7 +436,7 @@ export class NotificationRepository {
    */
   private createBodyMemberLeave(messageEntity: MemberMessage): string | void {
     const updatedOneParticipant = messageEntity.userEntities().length === 1;
-    if (updatedOneParticipant && !messageEntity.remoteUserEntities().length) {
+    if (updatedOneParticipant && messageEntity.remoteUserEntities().length === 0) {
       return this.translate('notificationMemberLeaveRemovedYou', {user: messageEntity.user().name()}, {}, true);
     }
   }
@@ -396,7 +448,7 @@ export class NotificationRepository {
    * @param conversationEntity Conversation entity
    */
   private createBodyMemberUpdate(messageEntity?: MemberMessage, conversationEntity?: Conversation): string | void {
-    const isGroupOrChannel = conversationEntity && conversationEntity.isGroupOrChannel();
+    const isGroupOrChannel = !isNullOrUndefined(conversationEntity) && conversationEntity.isGroupOrChannel();
 
     switch (messageEntity?.memberMessageType) {
       case SystemMessageType.NORMAL:
@@ -473,7 +525,7 @@ export class NotificationRepository {
         (messageEntity as MessageTimerUpdateMessage).message_timer,
       );
 
-      if (messageTimer) {
+      if (isTruthy(messageTimer)) {
         const timeString = formatDuration(messageTimer, this.translate).text;
         const substitutions = {time: timeString, user: messageEntity.user().name()};
         return this.translate('notificationConversationMessageTimerUpdate', substitutions, {}, true);
@@ -510,7 +562,7 @@ export class NotificationRepository {
     conversationEntity?: Conversation,
   ): Promise<NotificationContent | undefined> {
     const body = this.createOptionsBody(messageEntity, conversationEntity);
-    if (!body) {
+    if (!isNonEmptyString(body)) {
       return Promise.resolve(undefined);
     }
     const shouldObfuscateSender = this.shouldObfuscateNotificationSender(messageEntity);
@@ -585,7 +637,7 @@ export class NotificationRepository {
    * @returns Resolves with the icon URL
    */
   private async createOptionsIcon(shouldObfuscateSender: boolean, userEntity: User): Promise<string> {
-    const canShowUserImage = userEntity.previewPictureResource() && !shouldObfuscateSender;
+    const canShowUserImage = isTruthy(userEntity.previewPictureResource()) && !shouldObfuscateSender;
     if (canShowUserImage) {
       try {
         return await this.assetRepository.getObjectUrl(userEntity.previewPictureResource());
@@ -607,7 +659,9 @@ export class NotificationRepository {
    * @param conversationEntity Conversation entity
    */
   private createOptionsTag(connectionEntity?: ConnectionEntity, conversationEntity?: Conversation): string {
-    return this.getConversationId(connectionEntity, conversationEntity)?.id || '';
+    const conversationId = this.getConversationId(connectionEntity, conversationEntity)?.id;
+
+    return isTruthy(conversationId) ? conversationId : '';
   }
 
   /**
@@ -626,7 +680,7 @@ export class NotificationRepository {
    * @param Notification message title
    */
   private createTitle(messageEntity: Message, conversationEntity?: Conversation): string {
-    const conversationName = conversationEntity && conversationEntity.display_name();
+    const conversationName = conversationEntity?.display_name();
     const userEntity = messageEntity.user();
 
     const truncatedConversationName = truncate(
@@ -638,7 +692,7 @@ export class NotificationRepository {
     const truncatedName = truncate(userEntity.name(), this.calculatedTitleLength(conversationName ?? ''), false);
 
     let title;
-    if (conversationName) {
+    if (!isNullOrUndefined(conversationEntity) && isNonEmptyString(conversationName)) {
       title = conversationEntity.isGroupOrChannel()
         ? this.translate(
             'notificationTitleGroup',
@@ -678,7 +732,9 @@ export class NotificationRepository {
       messageEntity.isContent() && (messageEntity as ContentMessage).isUserMentioned(this.userState.self().qualifiedId);
     if (containsSelfMention) {
       const showOptions = {exposeMessage: messageEntity, openFirstSelfMention: true};
-      return () => amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, showOptions);
+      return () => {
+        return amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, showOptions);
+      };
     }
 
     const isConnectionRequest = messageEntity.isMember() && (messageEntity as MemberMessage).isConnectionRequest();
@@ -688,7 +744,9 @@ export class NotificationRepository {
       };
     }
 
-    return () => amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity || conversationId, {});
+    return () => {
+      return amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity ?? conversationId, {});
+    };
   }
 
   /**
@@ -702,7 +760,7 @@ export class NotificationRepository {
     connectionEntity?: ConnectionEntity,
     conversationEntity?: Conversation,
   ): QualifiedId | undefined {
-    if (connectionEntity) {
+    if (!isNullOrUndefined(connectionEntity)) {
       return connectionEntity.conversationId;
     }
     return conversationEntity?.qualifiedId;
@@ -750,9 +808,9 @@ export class NotificationRepository {
       connectionEntity,
       conversationEntity,
     );
-    if (notificationContent) {
+    if (!isUndefined(notificationContent)) {
       const isPermitted = await this.checkPermission();
-      if (isPermitted) {
+      if (isPermitted === true) {
         this.showNotification(notificationContent);
       }
     }
@@ -788,11 +846,20 @@ export class NotificationRepository {
     Warnings.showWarning(Warnings.TYPE.REQUEST_NOTIFICATION);
     // Note: The callback will be only triggered in Chrome.
     // If you ignore a permission request on Firefox, then the callback will not be triggered.
-    if (window.Notification.requestPermission) {
-      const permissionState = await window.Notification.requestPermission();
-      Warnings.hideWarning(Warnings.TYPE.REQUEST_NOTIFICATION);
-      this.updatePermissionState(permissionState);
+    const permissionState = await this.notificationApi.requestPermission();
+    Warnings.hideWarning(Warnings.TYPE.REQUEST_NOTIFICATION);
+    this.updatePermissionState(permissionState);
+  }
+
+  private closeNotification(handle: SystemNotificationHandle, successMessage: string, failureMessage: string): void {
+    const closeAttempt = handle.close();
+
+    if (result.isErr(closeAttempt)) {
+      this.logger.error(failureMessage, closeAttempt.error);
+      return;
     }
+
+    this.logger.info(successMessage);
   }
 
   /**
@@ -824,17 +891,17 @@ export class NotificationRepository {
    * @returns Returns `true` if the notification should be shown, `false` otherwise
    */
   private shouldShowNotification(messageEntity: Message, conversationEntity?: Conversation): boolean {
-    if (conversationEntity !== undefined && isMeetingConversation(conversationEntity)) {
+    if (!isUndefined(conversationEntity) && isMeetingConversation(conversationEntity)) {
       return false;
     }
 
-    const inActiveConversation = conversationEntity
+    const inActiveConversation = !isNullOrUndefined(conversationEntity)
       ? this.conversationState.isActiveConversation(conversationEntity)
       : false;
     const {contentState} = useAppState.getState();
     const inConversationView = contentState === ContentState.CONVERSATION;
     const inMaximizedCall =
-      !!this.callState.joinedCall() && this.callState.viewMode() === CallingViewMode.DETACHED_WINDOW;
+      !isNullOrUndefined(this.callState.joinedCall()) && this.callState.viewMode() === CallingViewMode.DETACHED_WINDOW;
 
     const activeConversation = document.hasFocus() && inConversationView && inActiveConversation && !inMaximizedCall;
     const messageFromSelf = messageEntity.user().isMe;
@@ -843,7 +910,7 @@ export class NotificationRepository {
     // The in-app notification settings should be ignored for alerts (which are composite messages for now)
     const preferenceIsNone =
       this.notificationsPreference() === NotificationPreference.NONE && !messageEntity.isComposite();
-    const supportsNotification = Runtime.isSupportingNotifications();
+    const supportsNotification = this.notificationApi.isSupported();
 
     const hideNotification =
       activeConversation || messageFromSelf || permissionDenied || preferenceIsNone || !supportsNotification;
@@ -868,49 +935,102 @@ export class NotificationRepository {
    */
   private showNotificationInBrowser(notificationContent: NotificationContent): void {
     this.removeReadNotifications();
-    const notification: WebappNotifications = new window.Notification(
-      notificationContent.title,
-      notificationContent.options,
-    );
     const {conversationId, messageId, messageType} = notificationContent.options.data;
-    let timeoutTriggerId: number;
+    const messageInfo = isNonEmptyString(messageId)
+      ? `message '${messageId}' of type '${messageType}'`
+      : `'${messageType}' message`;
+    let presentationState: PresentationState = {kind: 'pending'};
 
-    const messageInfo = messageId ? `message '${messageId}' of type '${messageType}'` : `'${messageType}' message`;
-    notification.onclick = () => {
-      amplify.publish(WebAppEvents.NOTIFICATION.CLICK);
-      window.focus();
-      void this.callingRepository.setViewModeMinimized();
-      notificationContent.trigger();
+    const scheduleTimeout = () => {
+      if (presentationState.kind !== 'shown' || isUndefined(presentationState.entry)) {
+        return;
+      }
 
-      this.logger.info(`Notification for ${messageInfo} in '${conversationId?.id || conversationId}' closed by click.`);
-      notification.close();
-    };
+      const {entry: notificationEntry} = presentationState;
+      if (!isUndefined(notificationEntry.timeoutIdentifier)) {
+        return;
+      }
 
-    notification.onclose = () => {
-      window.clearTimeout(timeoutTriggerId);
-      this.notifications = this.notifications.toSpliced(this.notifications.indexOf(notification), 1);
-      this.logger.info(`Removed notification for ${messageInfo} in '${conversationId?.id || conversationId}' locally.`);
-    };
-
-    notification.onerror = error => {
-      this.logger.error(
-        `Notification for ${messageInfo} in '${conversationId?.id || conversationId}' closed by error.`,
-        error,
-      );
-      notification.close();
-    };
-
-    notification.onshow = () => {
-      timeoutTriggerId = window.setTimeout(() => {
-        this.logger.info(
-          `Notification for ${messageInfo} in '${conversationId?.id || conversationId}' closed by timeout.`,
+      notificationEntry.timeoutIdentifier = this.clock.setTimeout(() => {
+        this.closeNotification(
+          notificationEntry.handle,
+          `Notification for ${messageInfo} in '${isNonEmptyString(conversationId?.id) ? conversationId?.id : conversationId}' closed by timeout.`,
+          `Failed to close notification for ${messageInfo} in '${isNonEmptyString(conversationId?.id) ? conversationId?.id : conversationId}' by timeout.`,
         );
-        notification.close();
       }, notificationContent.timeout);
     };
 
-    this.notifications = this.notifications.concat(notification);
-    this.logger.info(`Added notification for ${messageInfo} in '${conversationId?.id || conversationId}' to queue.`);
+    const onClick = () => {
+      void this.callingRepository.setViewModeMinimized();
+      notificationContent.trigger();
+
+      if (presentationState.kind !== 'closed') {
+        const notificationEntry = presentationState.entry;
+        if (!isUndefined(notificationEntry)) {
+          this.closeNotification(
+            notificationEntry.handle,
+            `Notification for ${messageInfo} in '${isNonEmptyString(conversationId?.id) ? conversationId?.id : conversationId}' closed by click.`,
+            `Failed to close notification for ${messageInfo} in '${isNonEmptyString(conversationId?.id) ? conversationId?.id : conversationId}' by click.`,
+          );
+        }
+      }
+    };
+    const isClosed = (): boolean => {
+      return presentationState.kind === 'closed';
+    };
+    const notificationResult = this.notificationApi.show({
+      ...notificationContent.options,
+      title: notificationContent.title,
+      requireInteraction: false,
+      onClick,
+      onShow: () => {
+        if (presentationState.kind === 'pending') {
+          presentationState = {kind: 'shown', entry: presentationState.entry};
+        }
+        scheduleTimeout();
+      },
+      onClose: () => {
+        if (presentationState.kind !== 'closed') {
+          const {entry: notificationEntry} = presentationState;
+          if (!isUndefined(notificationEntry?.timeoutIdentifier)) {
+            this.clock.clearTimeout(notificationEntry.timeoutIdentifier);
+          }
+          if (!isUndefined(notificationEntry)) {
+            this.notifications = this.notifications.filter(entry => {
+              return entry !== notificationEntry;
+            });
+          }
+        }
+        presentationState = {kind: 'closed'};
+        this.logger.info(
+          `Removed notification for ${messageInfo} in '${isNonEmptyString(conversationId?.id) ? conversationId?.id : conversationId}' locally.`,
+        );
+      },
+    });
+
+    if (result.isErr(notificationResult)) {
+      this.logger.error(`Failed to present notification for ${messageInfo}.`, notificationResult.error);
+      return;
+    }
+
+    if (isClosed()) {
+      return;
+    }
+
+    const notificationEntry: NotificationEntry = {
+      body: notificationContent.options.body,
+      data: notificationContent.options.data,
+      handle: notificationResult.value,
+      icon: notificationContent.options.icon,
+      onclick: onClick,
+      title: notificationContent.title,
+    };
+    presentationState = {...presentationState, entry: notificationEntry};
+    this.notifications = this.notifications.concat(notificationEntry);
+    scheduleTimeout();
+    this.logger.info(
+      `Added notification for ${messageInfo} in '${isNonEmptyString(conversationId?.id) ? conversationId?.id : conversationId}' to queue.`,
+    );
   }
 
   /**

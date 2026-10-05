@@ -27,10 +27,14 @@ import {flattenUserMap, nestUsersList} from '../../../conversation/message/userC
 import {isQualifiedUserClients} from '../../../util';
 
 function toQualifiedUserClients(publicClients: QualifiedUserClientMap): QualifiedUserClients {
-  const userList = flattenUserMap(publicClients).map(({userId, data: clientInfo}) => ({
-    userId,
-    data: clientInfo.map(client => client.id),
-  }));
+  const userList = flattenUserMap(publicClients).map(({userId, data: clientInfo}) => {
+    return {
+      userId,
+      data: clientInfo.map(client => {
+        return client.id;
+      }),
+    };
+  });
   return nestUsersList(userList);
 }
 

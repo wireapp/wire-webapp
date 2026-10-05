@@ -20,7 +20,7 @@
 import type {ComponentProps} from 'react';
 import {useCallback, useEffect, useMemo, useRef} from 'react';
 
-import {isNonEmptyString} from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {Maybe, maybe} from 'true-myth';
 
 import {
@@ -71,8 +71,14 @@ import {
   type ScheduleMeetingRecurrenceOption,
 } from './scheduleMeetingTypes';
 
-const firstNonEmptyError = (...errorMessages: Array<string | undefined>): string | undefined =>
-  errorMessages.find(message => isNonEmptyString(message));
+const millisecondsPerSecond = 1000;
+const secondsPerMinute = 60;
+
+const firstNonEmptyError = (...errorMessages: (string | undefined)[]): string | undefined => {
+  return errorMessages.find(message => {
+    return isNonEmptyString(message);
+  });
+};
 
 export interface ScheduleMeetingFormProps {
   isOpen: boolean;
@@ -117,34 +123,33 @@ export const ScheduleMeetingForm = ({
   const searchRepository = contentViewModel.repositories.search;
   const teamRepository = contentViewModel.repositories.team;
 
-  const recurrenceSelectOptions = useMemo(
-    () =>
-      SCHEDULE_MEETING_RECURRENCE_OPTIONS.map(value => ({
+  const recurrenceSelectOptions = useMemo(() => {
+    return SCHEDULE_MEETING_RECURRENCE_OPTIONS.map(value => {
+      return {
         value,
         label: translate(SCHEDULE_MEETING_RECURRENCE_TRANSLATION_KEYS[value]),
-      })),
-    [translate],
-  );
+      };
+    });
+  }, [translate]);
 
-  const selectedRecurrenceOption = useMemo(
-    () => recurrenceSelectOptions.find(option => option.value === formState.recurrence),
-    [formState.recurrence, recurrenceSelectOptions],
-  );
+  const selectedRecurrenceOption = useMemo(() => {
+    return recurrenceSelectOptions.find(option => {
+      return option.value === formState.recurrence;
+    });
+  }, [formState.recurrence, recurrenceSelectOptions]);
 
-  const dateTimePickerLabels = useMemo(
-    () => ({
+  const dateTimePickerLabels = useMemo(() => {
+    return {
       openCalendarLabel: translate('meetings.scheduleModal.openCalendarAriaLabel'),
       previousMonthLabel: translate('meetings.scheduleModal.previousMonthAriaLabel'),
       nextMonthLabel: translate('meetings.scheduleModal.nextMonthAriaLabel'),
-    }),
-    [translate],
-  );
+    };
+  }, [translate]);
 
   const todayValue = dateValueFromDate(clock.currentDate);
-  const currentDateTime = useMemo(
-    () => new Date(clock.currentUnixEpochMilliseconds),
-    [clock.currentUnixEpochMilliseconds],
-  );
+  const currentDateTime = useMemo(() => {
+    return new Date(clock.currentUnixEpochMilliseconds);
+  }, [clock.currentUnixEpochMilliseconds]);
 
   const getMinTimeForDate = useCallback(
     (date: Date | null): Date | null => {
@@ -163,15 +168,13 @@ export const ScheduleMeetingForm = ({
     [clock, currentDateTime],
   );
 
-  const startMinTime = useMemo(
-    () => (mode === scheduleMeetingModes.edit ? null : getMinTimeForDate(formState.start.unwrapOr(null))),
-    [formState.start, getMinTimeForDate, mode],
-  );
+  const startMinTime = useMemo(() => {
+    return mode === scheduleMeetingModes.edit ? null : getMinTimeForDate(formState.start.unwrapOr(null));
+  }, [formState.start, getMinTimeForDate, mode]);
 
-  const endMinTime = useMemo(
-    () => (mode === scheduleMeetingModes.edit ? null : getMinTimeForDate(formState.end.unwrapOr(null))),
-    [formState.end, getMinTimeForDate, mode],
-  );
+  const endMinTime = useMemo(() => {
+    return mode === scheduleMeetingModes.edit ? null : getMinTimeForDate(formState.end.unwrapOr(null));
+  }, [formState.end, getMinTimeForDate, mode]);
 
   const startErrorText = firstNonEmptyError(
     errors.startInPast,
@@ -184,8 +187,16 @@ export const ScheduleMeetingForm = ({
   );
 
   const startDate = formState.start.map(dateValueFromDate).unwrapOr(null);
-  const startTime = formState.start.map(value => nearestTimeOptionFromDate(value, regionalLocale)).unwrapOr(null);
-  const endTime = formState.end.map(value => nearestTimeOptionFromDate(value, regionalLocale)).unwrapOr(null);
+  const startTime = formState.start
+    .map(value => {
+      return nearestTimeOptionFromDate(value, regionalLocale);
+    })
+    .unwrapOr(null);
+  const endTime = formState.end
+    .map(value => {
+      return nearestTimeOptionFromDate(value, regionalLocale);
+    })
+    .unwrapOr(null);
 
   const handleDateChange = (date: Parameters<ComponentProps<typeof DatePickerField>['onChange']>[0]) => {
     if (date === null) {
@@ -194,7 +205,7 @@ export const ScheduleMeetingForm = ({
     }
 
     const currentStart = formState.start.unwrapOr(
-      new Date(clock.currentUnixEpochMilliseconds + TIME_INTERVAL_MINUTES * 60 * 1000),
+      new Date(clock.currentUnixEpochMilliseconds + TIME_INTERVAL_MINUTES * secondsPerMinute * millisecondsPerSecond),
     );
     const nextStart = combineDateAndTime(date, nearestTimeOptionFromDate(currentStart, regionalLocale));
     const adjustedStart =
@@ -245,7 +256,9 @@ export const ScheduleMeetingForm = ({
           label={translate('meetings.scheduleModal.titleLabel')}
           placeholder={translate('meetings.scheduleModal.titlePlaceholder')}
           value={formState.title}
-          onChange={event => onTitleChange(event.currentTarget.value)}
+          onChange={event => {
+            return onTitleChange(event.currentTarget.value);
+          }}
           markInvalid={isNonEmptyString(errors.title)}
           error={
             isNonEmptyString(errors.title) ? (
@@ -258,7 +271,9 @@ export const ScheduleMeetingForm = ({
             formState.title.length > 0 && !isNonEmptyString(errors.title) ? (
               <button
                 type="button"
-                onClick={() => onTitleChange('')}
+                onClick={() => {
+                  return onTitleChange('');
+                }}
                 css={scheduleMeetingTitleClearButtonStyles}
                 aria-label={translate('accessibility.userProfileDeleteEntry')}
               >
@@ -297,10 +312,14 @@ export const ScheduleMeetingForm = ({
             passwordValueRef={passwordInputRef}
             passwordError={errors.password}
             passwordConfirmationError={errors.passwordConfirmation}
-            onPasswordValueChange={password => onPasswordChange?.(password)}
+            onPasswordValueChange={password => {
+              return onPasswordChange?.(password);
+            }}
             isPasswordInputMarkInvalid={isNonEmptyString(errors.password)}
             passwordConfirmationValue={formState.passwordConfirmation}
-            onPasswordConfirmationChange={password => onPasswordConfirmationChange?.(password)}
+            onPasswordConfirmationChange={password => {
+              return onPasswordConfirmationChange?.(password);
+            }}
             isPasswordConfirmationMarkInvalid={isNonEmptyString(errors.passwordConfirmation)}
             copyDisabled={!isNonEmptyString(formState.password) || isNonEmptyString(errors.password)}
           />
@@ -369,7 +388,7 @@ export const ScheduleMeetingForm = ({
           options={recurrenceSelectOptions}
           value={selectedRecurrenceOption}
           onChange={option => {
-            if (option) {
+            if (!isNullOrUndefined(option)) {
               onRecurrenceChange(option.value as ScheduleMeetingRecurrenceOption);
             }
           }}

@@ -38,12 +38,16 @@ import {setStrings, translate} from 'Util/localizerUtil';
 import {MemberMessage} from './memberMessage';
 import {CONFIG} from './memberMessage/messageContent';
 
-jest.mock('Components/avatar', () => ({
-  AVATAR_SIZE: {
-    X_LARGE: 'avatar-xl',
-  },
-  Avatar: () => <div data-uie-name="mock-avatar" />,
-}));
+jest.mock('Components/avatar', () => {
+  return {
+    AVATAR_SIZE: {
+      X_LARGE: 'avatar-xl',
+    },
+    Avatar: () => {
+      return <div data-uie-name="mock-avatar" />;
+    },
+  };
+});
 
 setStrings({en});
 
@@ -78,7 +82,11 @@ function createMemberMessage({systemType, type}: {systemType?: SystemMessageType
   const actor = generateUser();
   message.user(actor);
   if (users) {
-    message.userIds(users.map(user => user.qualifiedId));
+    message.userIds(
+      users.map(user => {
+        return user.qualifiedId;
+      }),
+    );
     message.userEntities(users);
   } else {
     message.userIds([actor.qualifiedId]);
@@ -196,7 +204,9 @@ describe('MemberMessage', () => {
   describe('CONVERSATION_CREATE', () => {
     it('displays participants of a newly created conversation', () => {
       const nbUsers = randomInt(1, 10);
-      const users = Array.from({length: nbUsers}, () => generateUser());
+      const users = Array.from({length: nbUsers}, () => {
+        return generateUser();
+      });
       const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, users);
       const props = {
         ...baseProps,
@@ -213,7 +223,9 @@ describe('MemberMessage', () => {
       const nbExtraUsers = randomInt(1, 10);
       const nbUsers = CONFIG.MAX_USERS_VISIBLE + nbExtraUsers;
 
-      const users = Array.from({length: nbUsers}, () => generateUser());
+      const users = Array.from({length: nbUsers}, () => {
+        return generateUser();
+      });
       const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, users);
       const props = {
         ...baseProps,
@@ -233,7 +245,9 @@ describe('MemberMessage', () => {
       const nbExtraUsers = randomInt(1, 10);
       const nbTeamUsers = CONFIG.MAX_WHOLE_TEAM_USERS_VISIBLE + nbExtraUsers;
 
-      const teamUsers = Array.from({length: nbTeamUsers}, () => generateUser());
+      const teamUsers = Array.from({length: nbTeamUsers}, () => {
+        return generateUser();
+      });
       const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, teamUsers);
       message.allTeamMembers = teamUsers;
       const props = {
@@ -252,7 +266,9 @@ describe('MemberMessage', () => {
       const nbExtraUsers = randomInt(1, 10);
       const nbTeamUsers = CONFIG.MAX_WHOLE_TEAM_USERS_VISIBLE + nbExtraUsers;
 
-      const teamUsers = Array.from({length: nbTeamUsers}, () => generateUser());
+      const teamUsers = Array.from({length: nbTeamUsers}, () => {
+        return generateUser();
+      });
       const guest = generateUser();
       guest.isGuest(true);
       const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, [...teamUsers, guest]);
@@ -270,7 +286,9 @@ describe('MemberMessage', () => {
       const nbGuests = randomInt(2, 10);
       const nbTeamUsers = CONFIG.MAX_WHOLE_TEAM_USERS_VISIBLE;
 
-      const teamUsers = Array.from({length: nbTeamUsers}, () => generateUser());
+      const teamUsers = Array.from({length: nbTeamUsers}, () => {
+        return generateUser();
+      });
       const guests = Array.from({length: nbGuests}, () => {
         const guest = generateUser();
         guest.isGuest(true);
@@ -292,7 +310,9 @@ describe('MemberMessage', () => {
 
     it('displays that another user created a conversation', () => {
       const nbUsers = randomInt(1, 10);
-      const users = Array.from({length: nbUsers}, () => generateUser());
+      const users = Array.from({length: nbUsers}, () => {
+        return generateUser();
+      });
       const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, users);
       message.name('');
       message.user().name('Creator');
@@ -307,7 +327,9 @@ describe('MemberMessage', () => {
 
     it('displays that self user created a conversation', () => {
       const nbUsers = randomInt(1, 10);
-      const users = Array.from({length: nbUsers}, () => generateUser());
+      const users = Array.from({length: nbUsers}, () => {
+        return generateUser();
+      });
       const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, users);
       message.name('');
       message.user().isMe = true;
@@ -617,7 +639,9 @@ describe('MemberMessage', () => {
   describe('MEMBER_JOIN', () => {
     it('displays that self user added new members', () => {
       const nbUsers = randomInt(1, 10);
-      const users = Array.from({length: nbUsers}, () => generateUser());
+      const users = Array.from({length: nbUsers}, () => {
+        return generateUser();
+      });
       const message = createMemberMessage({type: CONVERSATION_EVENT.MEMBER_JOIN}, users);
       message.user().isMe = true;
       const props = {
@@ -631,7 +655,9 @@ describe('MemberMessage', () => {
 
     it('displays that a new members were added by someone', () => {
       const nbUsers = randomInt(1, 10);
-      const users = Array.from({length: nbUsers}, () => generateUser());
+      const users = Array.from({length: nbUsers}, () => {
+        return generateUser();
+      });
       const message = createMemberMessage({type: CONVERSATION_EVENT.MEMBER_JOIN}, users);
       const props = {
         ...baseProps,
@@ -692,7 +718,9 @@ describe('MemberMessage', () => {
 
     it('displays that many users were removed', () => {
       const nbUsers = randomInt(1, 10);
-      const users = Array.from({length: nbUsers}, () => generateUser());
+      const users = Array.from({length: nbUsers}, () => {
+        return generateUser();
+      });
       const message = createMemberMessage({type: CONVERSATION_EVENT.MEMBER_LEAVE}, users);
       message.user().id = '';
       const props = {

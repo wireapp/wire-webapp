@@ -22,16 +22,22 @@ import type {Conversation} from 'Repositories/entity/Conversation';
 
 import {getDriveEnabledConversations} from './useDriveEnabledConversationFilterItems';
 
-const createConversation = ({id, lastEventTimestamp}: {id: string; lastEventTimestamp: number}): Conversation =>
-  ({
+const createConversation = ({id, lastEventTimestamp}: {id: string; lastEventTimestamp: number}): Conversation => {
+  return {
     id,
-    last_event_timestamp: () => lastEventTimestamp,
-  }) as Conversation;
+    last_event_timestamp: () => {
+      return lastEventTimestamp;
+    },
+  } as Conversation;
+};
 
-const createConversationRepository = (conversations: Conversation[]): ConversationRepository =>
-  ({
-    getAllCellEnabledGroupConversations: () => conversations,
-  }) as ConversationRepository;
+const createConversationRepository = (conversations: Conversation[]): ConversationRepository => {
+  return {
+    getAllCellEnabledGroupConversations: () => {
+      return conversations;
+    },
+  } as ConversationRepository;
+};
 
 describe('getDriveEnabledConversations', () => {
   it('returns drive-enabled conversations sorted by recent first', () => {

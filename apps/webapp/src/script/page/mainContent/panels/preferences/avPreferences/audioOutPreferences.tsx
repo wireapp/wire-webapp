@@ -37,11 +37,13 @@ const AudioOutPreferences: FunctionComponent<AudioOutPreferencesProps> = ({
   hasActiveCall,
 }: AudioOutPreferencesProps) => {
   const {translate} = useApplicationContext();
-  const {audioOutputDeviceId, setAudioOutputDeviceId, audioOutputDevices} = useMediaDevicesStore(state => ({
-    audioOutputDeviceId: state.audio.output.selectedId,
-    setAudioOutputDeviceId: state.setAudioOutputDeviceId,
-    audioOutputDevices: state.audio.output.devices,
-  }));
+  const {audioOutputDeviceId, setAudioOutputDeviceId, audioOutputDevices} = useMediaDevicesStore(state => {
+    return {
+      audioOutputDeviceId: state.audio.output.activeId,
+      setAudioOutputDeviceId: state.setAudioOutputDeviceId,
+      audioOutputDevices: state.audio.output.devices,
+    };
+  });
 
   const handleChange = (deviceId: string): void => {
     if (deviceId !== audioOutputDeviceId) {

@@ -30,11 +30,13 @@ const daysPerWeek = 7;
 const daysPerBiweeklyPeriod = 14;
 const daysPerFourWeeksPeriod = 28;
 
-const inMeetingSeriesTimeZone = (date: Date, meetingSeries: MeetingSeries): TZDate =>
-  new TZDate(date.getTime(), meetingSeries.tzid);
+const inMeetingSeriesTimeZone = (date: Date, meetingSeries: MeetingSeries): TZDate => {
+  return new TZDate(date.getTime(), meetingSeries.tzid);
+};
 
-const getSeriesAnchorInTimeZone = (meetingSeries: MeetingSeries): TZDate =>
-  new TZDate(Date.parse(meetingSeries.series_start_date), meetingSeries.tzid);
+const getSeriesAnchorInTimeZone = (meetingSeries: MeetingSeries): TZDate => {
+  return new TZDate(Date.parse(meetingSeries.series_start_date), meetingSeries.tzid);
+};
 
 const createMeetingInstance = (meetingSeries: MeetingSeries, start: Date): MeetingInstance => {
   const utcStart = new Date(start.getTime());
@@ -46,11 +48,13 @@ const createMeetingInstance = (meetingSeries: MeetingSeries, start: Date): Meeti
   };
 };
 
-const isMeetingInstanceStartInRange = (meetingInstance: MeetingInstance, from: Date, to: Date): boolean =>
-  meetingInstance.start.getTime() >= from.getTime() && meetingInstance.start.getTime() < to.getTime();
+const isMeetingInstanceStartInRange = (meetingInstance: MeetingInstance, from: Date, to: Date): boolean => {
+  return meetingInstance.start.getTime() >= from.getTime() && meetingInstance.start.getTime() < to.getTime();
+};
 
-const isAfterRecurrenceUntil = (start: Date, recurrenceUntil?: string): boolean =>
-  recurrenceUntil !== undefined && start.getTime() > Date.parse(recurrenceUntil);
+const isAfterRecurrenceUntil = (start: Date, recurrenceUntil?: string): boolean => {
+  return recurrenceUntil !== undefined && start.getTime() > Date.parse(recurrenceUntil);
+};
 
 const advanceInstanceStart = (start: TZDate, recurrence: ScheduleMeetingRecurrenceOption): TZDate => {
   switch (recurrence) {
@@ -122,7 +126,9 @@ export const getEditAnchorMeetingInstance = (meetingSeries: MeetingSeries, now: 
   const startOfToday = startOfDay(now);
   const startOfTomorrow = addDays(startOfToday, 1);
   const todaysNotYetEnded = getMeetingInstancesInRange(meetingSeries, startOfToday, startOfTomorrow).find(
-    meetingInstance => meetingInstance.end.getTime() > now.getTime(),
+    meetingInstance => {
+      return meetingInstance.end.getTime() > now.getTime();
+    },
   );
 
   if (!isUndefined(todaysNotYetEnded)) {
@@ -226,8 +232,9 @@ export const getMeetingInstanceAt = (meetingSeries: MeetingSeries, now: Date): M
   const from = new Date(now.getTime() - meetingSeries.duration_ms);
   const to = new Date(now.getTime() + 1);
 
-  return getMeetingInstancesInRange(meetingSeries, from, to).find(
-    meetingInstance =>
-      getMeetingTemporalStatusAt(now, meetingInstance.start, meetingInstance.end) === MeetingTemporalStatuses.ON_GOING,
-  );
+  return getMeetingInstancesInRange(meetingSeries, from, to).find(meetingInstance => {
+    return (
+      getMeetingTemporalStatusAt(now, meetingInstance.start, meetingInstance.end) === MeetingTemporalStatuses.ON_GOING
+    );
+  });
 };

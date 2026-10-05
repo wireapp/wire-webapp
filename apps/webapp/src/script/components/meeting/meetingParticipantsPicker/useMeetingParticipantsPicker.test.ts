@@ -25,7 +25,9 @@ import type {Conversation} from 'Repositories/entity/Conversation';
 import {useMeetingParticipantsPicker} from './useMeetingParticipantsPicker';
 
 const createUser = (id: string, name: string): User => {
-  const user = new User(id, 'example.com', key => key);
+  const user = new User(id, 'example.com', key => {
+    return key;
+  });
   user.name(name);
   return user;
 };
@@ -35,24 +37,37 @@ const createConversation = (
   name: string,
   members: User[],
   {removed = false, archived = false, cleared = false}: {removed?: boolean; archived?: boolean; cleared?: boolean} = {},
-) =>
-  ({
-    display_name: () => name,
-    isSelfUserRemoved: () => removed,
-    is_archived: () => archived,
-    is_cleared: () => cleared,
-    participating_user_ets: () => members,
+) => {
+  return {
+    display_name: () => {
+      return name;
+    },
+    isSelfUserRemoved: () => {
+      return removed;
+    },
+    is_archived: () => {
+      return archived;
+    },
+    is_cleared: () => {
+      return cleared;
+    },
+    participating_user_ets: () => {
+      return members;
+    },
     qualifiedId: {domain: 'example.com', id},
-  }) as unknown as Conversation;
+  } as unknown as Conversation;
+};
 
-const createOptions = (overrides: Partial<Parameters<typeof useMeetingParticipantsPicker>[0]> = {}) => ({
-  disabled: false,
-  filter: '',
-  selectedUsers: [],
-  onSelectedUsersChange: jest.fn(),
-  onFilterChange: jest.fn(),
-  ...overrides,
-});
+const createOptions = (overrides: Partial<Parameters<typeof useMeetingParticipantsPicker>[0]> = {}) => {
+  return {
+    disabled: false,
+    filter: '',
+    selectedUsers: [],
+    onSelectedUsersChange: jest.fn(),
+    onFilterChange: jest.fn(),
+    ...overrides,
+  };
+};
 
 describe('useMeetingParticipantsPicker', () => {
   it('returns active conversations matching the filter', () => {
@@ -60,16 +75,18 @@ describe('useMeetingParticipantsPicker', () => {
     const active = createConversation('active', 'Engineering', members);
     const other = createConversation('other', 'Announcements', members);
     const removed = createConversation('removed', 'Engineering old', members, {removed: true});
-    const getAllGroupConversations = jest.fn(() => [active, other, removed]);
+    const getAllGroupConversations = jest.fn(() => {
+      return [active, other, removed];
+    });
 
-    const {result} = renderHook(() =>
-      useMeetingParticipantsPicker(
+    const {result} = renderHook(() => {
+      return useMeetingParticipantsPicker(
         createOptions({
           filter: 'engine',
           conversationRepository: {getAllGroupConversations},
         }),
-      ),
-    );
+      );
+    });
 
     expect(result.current.matchingConversations).toEqual([active]);
     expect(getAllGroupConversations).toHaveBeenCalledTimes(1);
@@ -77,39 +94,64 @@ describe('useMeetingParticipantsPicker', () => {
 
   it('opens and closes the picker while clearing the filter on close', () => {
     const onFilterChange = jest.fn();
-    const {result} = renderHook(() => useMeetingParticipantsPicker(createOptions({onFilterChange})));
+    const {result} = renderHook(() => {
+      return useMeetingParticipantsPicker(createOptions({onFilterChange}));
+    });
 
-    act(() => result.current.handleOpenChange(true));
+    act(() => {
+      return result.current.handleOpenChange(true);
+    });
     expect(result.current.isOpen).toBe(true);
 
-    act(() => result.current.handleOpenChange(false));
+    act(() => {
+      return result.current.handleOpenChange(false);
+    });
     expect(result.current.isOpen).toBe(false);
     expect(onFilterChange).toHaveBeenCalledWith('');
   });
 
   it('does not open when disabled', () => {
-    const {result} = renderHook(() => useMeetingParticipantsPicker(createOptions({disabled: true})));
+    const {result} = renderHook(() => {
+      return useMeetingParticipantsPicker(createOptions({disabled: true}));
+    });
 
-    act(() => result.current.handleOpenChange(true));
+    act(() => {
+      return result.current.handleOpenChange(true);
+    });
 
     expect(result.current.isOpen).toBe(false);
   });
 
-  it('imports conversation members and removes only imported users when deselected', () => {
+  it('imports only eligible conversation members and removes only imported users when deselected', () => {
     const manual = createUser('manual', 'Manual');
     const imported = createUser('imported', 'Imported');
-    const conversation = createConversation('conversation', 'Project', [imported]);
+    const guest = createUser('guest', 'Guest');
+    guest.isGuest(true);
+    const temporaryGuest = createUser('temporary-guest', 'Temporary guest');
+    temporaryGuest.isTemporaryGuest(true);
+    const service = createUser('service', 'Service');
+    service.isService = true;
+    const conversation = createConversation('conversation', 'Project', [imported, guest, temporaryGuest, service]);
     const onSelectedUsersChange = jest.fn();
     const options = createOptions({selectedUsers: [manual], onSelectedUsersChange});
-    const {result, rerender} = renderHook(currentOptions => useMeetingParticipantsPicker(currentOptions), {
-      initialProps: options,
-    });
+    const {result, rerender} = renderHook(
+      currentOptions => {
+        return useMeetingParticipantsPicker(currentOptions);
+      },
+      {
+        initialProps: options,
+      },
+    );
 
-    act(() => result.current.handleSelectConversation(conversation));
+    act(() => {
+      return result.current.handleSelectConversation(conversation);
+    });
     expect(onSelectedUsersChange).toHaveBeenLastCalledWith([manual, imported]);
 
     rerender({...options, selectedUsers: [manual, imported]});
-    act(() => result.current.handleSelectConversation(conversation));
+    act(() => {
+      return result.current.handleSelectConversation(conversation);
+    });
 
     expect(onSelectedUsersChange).toHaveBeenLastCalledWith([manual]);
     expect(result.current.selectedConversationIds).toEqual(new Set());
@@ -117,12 +159,41 @@ describe('useMeetingParticipantsPicker', () => {
 
   it('closes and clears the filter when clicking outside', () => {
     const onFilterChange = jest.fn();
-    const {result} = renderHook(() => useMeetingParticipantsPicker(createOptions({onFilterChange})));
+    const {result} = renderHook(() => {
+      return useMeetingParticipantsPicker(createOptions({onFilterChange}));
+    });
 
-    act(() => result.current.handleOpenChange(true));
-    act(() => fireEvent.pointerDown(document.body));
+    act(() => {
+      return result.current.handleOpenChange(true);
+    });
+    act(() => {
+      return fireEvent.pointerDown(document.body);
+    });
 
     expect(result.current.isOpen).toBe(false);
     expect(onFilterChange).toHaveBeenCalledWith('');
+  });
+
+  it('stops Escape from propagating to the meeting dialog', () => {
+    const dialogKeyDown = jest.fn();
+    window.addEventListener('keydown', dialogKeyDown);
+    const {result} = renderHook(() => {
+      return useMeetingParticipantsPicker(createOptions());
+    });
+
+    act(() => {
+      return result.current.handleOpenChange(true);
+    });
+
+    const event = new KeyboardEvent('keydown', {bubbles: true, cancelable: true, key: 'Escape'});
+    act(() => {
+      document.dispatchEvent(event);
+    });
+
+    expect(result.current.isOpen).toBe(false);
+    expect(event.defaultPrevented).toBe(true);
+    expect(dialogKeyDown).not.toHaveBeenCalled();
+
+    window.removeEventListener('keydown', dialogKeyDown);
   });
 });

@@ -32,63 +32,83 @@ interface ColorBoxProps {
   name: string;
 }
 
-const ColorBox = ({color, name}: ColorBoxProps) => (
-  <div style={{marginBottom: '8px'}}>
-    <div
-      style={{
-        backgroundColor: color,
-        border: '1px solid #E5E5E5',
-        borderRadius: '4px',
-        height: '48px',
-        marginBottom: '4px',
-        width: '100%',
-      }}
-    />
-    <div style={{fontSize: '12px'}}>
-      <strong>{name}</strong>
-      <br />
-      <code>{color}</code>
+const ColorBox = ({color, name}: ColorBoxProps) => {
+  return (
+    <div style={{marginBottom: '8px'}}>
+      <div
+        style={{
+          backgroundColor: color,
+          border: '1px solid #E5E5E5',
+          borderRadius: '4px',
+          height: '48px',
+          marginBottom: '4px',
+          width: '100%',
+        }}
+      />
+      <div style={{fontSize: '12px'}}>
+        <strong>{name}</strong>
+        <br />
+        <code>{color}</code>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
-const ColorSection = ({title, colors}: {title: string; colors: Record<string, string>}) => (
-  <div style={{marginBottom: '32px'}}>
-    <h3>{title}</h3>
-    <div
-      style={{
-        display: 'grid',
-        gap: '16px',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-      }}
-    >
-      {Object.entries(colors).map(([key, value]) => (
-        <ColorBox key={key} color={value} name={key} />
-      ))}
+const ColorSection = ({title, colors}: {title: string; colors: Record<string, string>}) => {
+  return (
+    <div style={{marginBottom: '32px'}}>
+      <h3>{title}</h3>
+      <div
+        style={{
+          display: 'grid',
+          gap: '16px',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+        }}
+      >
+        {Object.entries(colors).map(([key, value]) => {
+          return <ColorBox key={key} color={value} name={key} />;
+        })}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const getColorScale = (prefix: string) => {
   const lightColors = Object.entries(COLOR_V2)
-    .filter(([key]) => key.includes(`${prefix}_LIGHT_`))
-    .reduce((acc, [key, value]) => ({...acc, [key]: value}), {});
+    .filter(([key]) => {
+      return key.includes(`${prefix}_LIGHT_`);
+    })
+    .reduce((acc, [key, value]) => {
+      return {...acc, [key]: value};
+    }, {});
 
   const darkColors = Object.entries(COLOR_V2)
-    .filter(([key]) => key.includes(`${prefix}_DARK_`))
-    .reduce((acc, [key, value]) => ({...acc, [key]: value}), {});
+    .filter(([key]) => {
+      return key.includes(`${prefix}_DARK_`);
+    })
+    .reduce((acc, [key, value]) => {
+      return {...acc, [key]: value};
+    }, {});
 
   return {lightColors, darkColors};
 };
 
 export const BaseColors = () => {
   const lightColors = Object.entries(COLOR_V2)
-    .filter(([key]) => key.includes('LIGHT_500'))
-    .reduce((acc, [key, value]) => ({...acc, [key]: value}), {});
+    .filter(([key]) => {
+      return key.includes('LIGHT_500');
+    })
+    .reduce((acc, [key, value]) => {
+      return {...acc, [key]: value};
+    }, {});
 
   const darkColors = Object.entries(COLOR_V2)
-    .filter(([key]) => key.includes('DARK_500'))
-    .reduce((acc, [key, value]) => ({...acc, [key]: value}), {});
+    .filter(([key]) => {
+      return key.includes('DARK_500');
+    })
+    .reduce((acc, [key, value]) => {
+      return {...acc, [key]: value};
+    }, {});
 
   return (
     <>
@@ -100,8 +120,12 @@ export const BaseColors = () => {
 
 export const GrayScale = () => {
   const colors = Object.entries(COLOR_V2)
-    .filter(([key]) => key.includes('GRAY_'))
-    .reduce((acc, [key, value]) => ({...acc, [key]: value}), {});
+    .filter(([key]) => {
+      return key.includes('GRAY_');
+    })
+    .reduce((acc, [key, value]) => {
+      return {...acc, [key]: value};
+    }, {});
 
   return <ColorSection title="Gray Scale" colors={colors} />;
 };

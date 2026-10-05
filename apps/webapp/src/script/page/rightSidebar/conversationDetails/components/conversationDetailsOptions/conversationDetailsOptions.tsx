@@ -40,7 +40,6 @@ import {supportsReadReceipts} from 'Repositories/conversation/ConversationSelect
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
-import {viewerPermissionFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
@@ -120,7 +119,7 @@ function ConversationDetailsOptionsContent({
   firstParticipant,
   isParticipantBlocked,
 }: ConversationDetailsOptionsContentProps): ReactElement {
-  const {isFeatureToggleEnabled, translate} = useApplicationContext();
+  const {translate} = useApplicationContext();
   const {isMutable, receiptMode, is1to1, isRequest, isSelfUserRemoved, isChannel, isGroupOrChannel, cellsState} =
     useKoSubscribableChildren(activeConversation, [
       'isMutable',
@@ -158,7 +157,6 @@ function ConversationDetailsOptionsContent({
   const isActiveGroupParticipant = isGroupOrChannel && !isSelfUserRemoved;
   const isTeamConversation = isNonEmptyString(teamId);
   const isCellsConversation = isNonEmptyString(cellsState) && cellsState !== CONVERSATION_CELLS_STATE.DISABLED;
-  const isViewerPermissionFeatureEnabled = isFeatureToggleEnabled(viewerPermissionFeatureToggleName);
   const selfUserDriveRole = getSelfUserDriveRole({conversationTeamId: teamId, selfUserTeamId: selfUser.teamId});
   const showOptionGuests = isActiveGroupParticipant && isTeamConversation;
   const showOptionNotificationsGroup = isMutable && isGroupOrChannel;
@@ -174,21 +172,37 @@ function ConversationDetailsOptionsContent({
   const canEditTimeout = roleRepository.canToggleTimeout(activeConversation) && !isCellsConversation;
   const canEditReadReceipts = roleRepository.canToggleReadReceipts(activeConversation);
 
-  const openNotificationsPanel = () => togglePanel(PanelState.NOTIFICATIONS, activeConversation);
+  const openNotificationsPanel = () => {
+    return togglePanel(PanelState.NOTIFICATIONS, activeConversation);
+  };
 
-  const openTimedMessagePanel = () => togglePanel(PanelState.TIMED_MESSAGES, activeConversation);
+  const openTimedMessagePanel = () => {
+    return togglePanel(PanelState.TIMED_MESSAGES, activeConversation);
+  };
 
-  const openSharedDrivePanel = () => togglePanel(PanelState.SHARED_DRIVE, activeConversation);
+  const openSharedDrivePanel = () => {
+    return togglePanel(PanelState.SHARED_DRIVE, activeConversation);
+  };
 
-  const openGuestPanel = () => togglePanel(PanelState.GUEST_OPTIONS, activeConversation);
+  const openGuestPanel = () => {
+    return togglePanel(PanelState.GUEST_OPTIONS, activeConversation);
+  };
 
-  const openServicePanel = () => togglePanel(PanelState.SERVICES_OPTIONS, activeConversation);
+  const openServicePanel = () => {
+    return togglePanel(PanelState.SERVICES_OPTIONS, activeConversation);
+  };
 
-  const showNotifications = () => togglePanel(PanelState.NOTIFICATIONS, activeConversation);
+  const showNotifications = () => {
+    return togglePanel(PanelState.NOTIFICATIONS, activeConversation);
+  };
 
-  const openAccessPanel = () => togglePanel(PanelState.ACCESS, activeConversation);
+  const openAccessPanel = () => {
+    return togglePanel(PanelState.ACCESS, activeConversation);
+  };
 
-  const openConversationHistoryPanel = () => togglePanel(PanelState.CONVERSATION_HISTORY, activeConversation);
+  const openConversationHistoryPanel = () => {
+    return togglePanel(PanelState.CONVERSATION_HISTORY, activeConversation);
+  };
 
   const openParticipantDevices = () => {
     if (isUndefined(firstParticipant)) {
@@ -198,10 +212,6 @@ function ConversationDetailsOptionsContent({
   };
 
   const getSharedDriveStatusTranslationKey = () => {
-    if (!isViewerPermissionFeatureEnabled) {
-      return 'conversationDetailsActionCellsOption';
-    }
-
     return selfUserDriveRole === CELLS_SELF_USER_DRIVE_ROLE.EDITOR
       ? 'cells.sharedDriveAccess.editorAccess'
       : 'cells.sharedDriveAccess.viewerAccess';
@@ -259,13 +269,12 @@ function ConversationDetailsOptionsContent({
         {isCellsConversation && (
           <ConversationDetailsOption
             className="conversation-details__cells-info"
-            dataUieName={isViewerPermissionFeatureEnabled ? 'go-shared-drive' : 'cells-info'}
+            dataUieName="go-shared-drive"
             icon={<CollectionIcon />}
-            onClick={isViewerPermissionFeatureEnabled ? openSharedDrivePanel : undefined}
+            onClick={openSharedDrivePanel}
             title={translate('conversationDetailsActionCellsTitle')}
             statusUieName="status-cells-info"
             statusText={translate(getSharedDriveStatusTranslationKey())}
-            disabled={!isViewerPermissionFeatureEnabled}
           />
         )}
 
@@ -352,18 +361,22 @@ function ConversationDetailsOptionsContent({
                       {
                         start: '[button]',
                         end: '[/button]',
-                        render: text => (
-                          <button
-                            className="button-reset-default"
-                            css={{
-                              textDecoration: 'underline',
-                            }}
-                            key={text}
-                            onClick={() => amplify.publish(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT)}
-                          >
-                            {text}
-                          </button>
-                        ),
+                        render: text => {
+                          return (
+                            <button
+                              className="button-reset-default"
+                              css={{
+                                textDecoration: 'underline',
+                              }}
+                              key={text}
+                              onClick={() => {
+                                return amplify.publish(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT);
+                              }}
+                            >
+                              {text}
+                            </button>
+                          );
+                        },
                       },
                     ])}
                   </p>

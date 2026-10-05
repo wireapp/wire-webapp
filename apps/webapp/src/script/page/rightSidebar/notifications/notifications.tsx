@@ -45,14 +45,14 @@ const Notifications: FC<NotificationsProps> = ({activeConversation, onGoBack, on
     void repositories.conversation.setNotificationState(activeConversation, value);
   };
 
-  const settings = useMemo(
-    () =>
-      Object.values(NOTIFICATION_STATE).map(status => ({
+  const settings = useMemo(() => {
+    return Object.values(NOTIFICATION_STATE).map(status => {
+      return {
         label: getNotificationText(status, translate),
         value: status,
-      })),
-    [translate],
-  );
+      };
+    });
+  }, [translate]);
 
   return (
     <div id="notification-settings" className="panel__page notification-settings">

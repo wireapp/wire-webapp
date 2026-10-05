@@ -33,21 +33,23 @@ import {SystemMessageBase} from './systemMessageBase';
 import {Config} from 'src/script/Config';
 import {withTheme} from 'src/script/auth/util/test/testUtil';
 
-jest.mock('Components/icon', () => ({
-  EditIcon: () => {
-    return <span data-uie-name="editicon" className="editicon"></span>;
-  },
-  InfoIcon: () => {
-    return <span data-uie-name="infoicon" className="infoicon"></span>;
-  },
-  ReadIcon: () => {
-    return <span data-uie-name="readicon" className="readicon"></span>;
-  },
-  TimerIcon: () => {
-    return <span data-uie-name="timericon" className="timericon"></span>;
-  },
-  __esModule: true,
-}));
+jest.mock('Components/icon', () => {
+  return {
+    EditIcon: () => {
+      return <span data-uie-name="editicon" className="editicon"></span>;
+    },
+    InfoIcon: () => {
+      return <span data-uie-name="infoicon" className="infoicon"></span>;
+    },
+    ReadIcon: () => {
+      return <span data-uie-name="readicon" className="readicon"></span>;
+    },
+    TimerIcon: () => {
+      return <span data-uie-name="timericon" className="timericon"></span>;
+    },
+    __esModule: true,
+  };
+});
 
 describe('SystemMessage', () => {
   it('shows edit icon for RenameMessage', async () => {

@@ -27,18 +27,20 @@ import {
   getNextMeetingInstance,
 } from './getMeetingInstancesInRange';
 
-const createMeetingSeries = (overrides: Partial<MeetingSeries> & Pick<MeetingSeries, 'recurrence'>): MeetingSeries => ({
-  series_start_date: '2026-06-01T10:00:00.000Z',
-  series_end_date: '2026-06-01T11:00:00.000Z',
-  duration_ms: 3_600_000,
-  conversation_id: 'conversation-id',
-  qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
-  qualified_id: {id: 'meeting-id', domain: 'example.com'},
-  qualified_creator: {id: 'creator-id', domain: 'example.com'},
-  title: 'Weekly sync',
-  tzid: 'UTC',
-  ...overrides,
-});
+const createMeetingSeries = (overrides: Partial<MeetingSeries> & Pick<MeetingSeries, 'recurrence'>): MeetingSeries => {
+  return {
+    series_start_date: '2026-06-01T10:00:00.000Z',
+    series_end_date: '2026-06-01T11:00:00.000Z',
+    duration_ms: 3_600_000,
+    conversation_id: 'conversation-id',
+    qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
+    qualified_id: {id: 'meeting-id', domain: 'example.com'},
+    qualified_creator: {id: 'creator-id', domain: 'example.com'},
+    title: 'Weekly sync',
+    tzid: 'UTC',
+    ...overrides,
+  };
+};
 
 describe('getMeetingInstancesInRange', () => {
   const from = new Date('2026-06-15T00:00:00.000Z');
@@ -49,10 +51,11 @@ describe('getMeetingInstancesInRange', () => {
 
     const meetingInstances = getMeetingInstancesInRange(meetingSeries, from, to);
 
-    expect(meetingInstances.map(meetingInstance => meetingInstance.start.toISOString())).toEqual([
-      '2026-06-15T10:00:00.000Z',
-      '2026-06-22T10:00:00.000Z',
-    ]);
+    expect(
+      meetingInstances.map(meetingInstance => {
+        return meetingInstance.start.toISOString();
+      }),
+    ).toEqual(['2026-06-15T10:00:00.000Z', '2026-06-22T10:00:00.000Z']);
   });
 
   it('includes only instances whose start falls in [from, to)', () => {
@@ -105,11 +108,11 @@ describe('getMeetingInstancesInRange', () => {
 
     const meetingInstances = getMeetingInstancesInRange(meetingSeries, windowStart, windowEnd);
 
-    expect(meetingInstances.map(meetingInstance => meetingInstance.start.toISOString())).toEqual([
-      '2026-06-01T10:00:00.000Z',
-      '2026-06-15T10:00:00.000Z',
-      '2026-06-29T10:00:00.000Z',
-    ]);
+    expect(
+      meetingInstances.map(meetingInstance => {
+        return meetingInstance.start.toISOString();
+      }),
+    ).toEqual(['2026-06-01T10:00:00.000Z', '2026-06-15T10:00:00.000Z', '2026-06-29T10:00:00.000Z']);
   });
 
   it('stops generating instances after recurrence_until', () => {
@@ -120,9 +123,11 @@ describe('getMeetingInstancesInRange', () => {
 
     const meetingInstances = getMeetingInstancesInRange(meetingSeries, from, to);
 
-    expect(meetingInstances.map(meetingInstance => meetingInstance.start.toISOString())).toEqual([
-      '2026-06-15T10:00:00.000Z',
-    ]);
+    expect(
+      meetingInstances.map(meetingInstance => {
+        return meetingInstance.start.toISOString();
+      }),
+    ).toEqual(['2026-06-15T10:00:00.000Z']);
   });
 
   it('keeps weekly local wall time across Europe/Berlin DST end', () => {
@@ -137,11 +142,11 @@ describe('getMeetingInstancesInRange', () => {
 
     const meetingInstances = getMeetingInstancesInRange(meetingSeries, windowStart, windowEnd);
 
-    expect(meetingInstances.map(meetingInstance => meetingInstance.start.toISOString())).toEqual([
-      '2026-10-19T09:00:00.000Z',
-      '2026-10-26T10:00:00.000Z',
-      '2026-11-02T10:00:00.000Z',
-    ]);
+    expect(
+      meetingInstances.map(meetingInstance => {
+        return meetingInstance.start.toISOString();
+      }),
+    ).toEqual(['2026-10-19T09:00:00.000Z', '2026-10-26T10:00:00.000Z', '2026-11-02T10:00:00.000Z']);
     expect(meetingInstances[1]?.end.toISOString()).toBe('2026-10-26T11:00:00.000Z');
   });
 
@@ -172,11 +177,11 @@ describe('getMeetingInstancesInRange', () => {
 
     const meetingInstances = getMeetingInstancesInRange(meetingSeries, windowStart, windowEnd);
 
-    expect(meetingInstances.map(meetingInstance => meetingInstance.start.toISOString())).toEqual([
-      '2026-03-02T16:00:00.000Z',
-      '2026-03-09T15:00:00.000Z',
-      '2026-03-16T15:00:00.000Z',
-    ]);
+    expect(
+      meetingInstances.map(meetingInstance => {
+        return meetingInstance.start.toISOString();
+      }),
+    ).toEqual(['2026-03-02T16:00:00.000Z', '2026-03-09T15:00:00.000Z', '2026-03-16T15:00:00.000Z']);
     expect(meetingInstances[1]?.end.toISOString()).toBe('2026-03-09T16:00:00.000Z');
   });
 
@@ -219,11 +224,11 @@ describe('getMeetingInstancesInRange', () => {
 
       const meetingInstances = getMeetingInstancesInRange(meetingSeries, windowStart, windowEnd);
 
-      expect(meetingInstances.map(meetingInstance => meetingInstance.start.toISOString())).toEqual([
-        '2026-03-12T10:00:00.000Z',
-        '2026-04-09T10:00:00.000Z',
-        '2026-05-07T10:00:00.000Z',
-      ]);
+      expect(
+        meetingInstances.map(meetingInstance => {
+          return meetingInstance.start.toISOString();
+        }),
+      ).toEqual(['2026-03-12T10:00:00.000Z', '2026-04-09T10:00:00.000Z', '2026-05-07T10:00:00.000Z']);
     });
 
     it('advances every-four-weeks series with a past anchor into the visible window', () => {
@@ -236,11 +241,11 @@ describe('getMeetingInstancesInRange', () => {
 
       const meetingInstances = getMeetingInstancesInRange(meetingSeries, windowStart, windowEnd);
 
-      expect(meetingInstances.map(meetingInstance => meetingInstance.start.toISOString())).toEqual([
-        '2026-07-02T10:00:00.000Z',
-        '2026-07-30T10:00:00.000Z',
-        '2026-08-27T10:00:00.000Z',
-      ]);
+      expect(
+        meetingInstances.map(meetingInstance => {
+          return meetingInstance.start.toISOString();
+        }),
+      ).toEqual(['2026-07-02T10:00:00.000Z', '2026-07-30T10:00:00.000Z', '2026-08-27T10:00:00.000Z']);
     });
 
     it('advances end-of-month anchors by 28 days without calendar-month clamping', () => {
@@ -253,7 +258,11 @@ describe('getMeetingInstancesInRange', () => {
 
       const meetingInstances = getMeetingInstancesInRange(meetingSeries, windowStart, windowEnd);
 
-      expect(meetingInstances.map(meetingInstance => meetingInstance.start.toISOString())).toEqual([
+      expect(
+        meetingInstances.map(meetingInstance => {
+          return meetingInstance.start.toISOString();
+        }),
+      ).toEqual([
         '2026-02-28T10:00:00.000Z',
         '2026-03-28T10:00:00.000Z',
         '2026-04-25T10:00:00.000Z',
@@ -273,11 +282,11 @@ describe('getMeetingInstancesInRange', () => {
 
       const meetingInstances = getMeetingInstancesInRange(meetingSeries, windowStart, windowEnd);
 
-      expect(meetingInstances.map(meetingInstance => meetingInstance.start.toISOString())).toEqual([
-        '2026-06-04T10:00:00.000Z',
-        '2026-07-02T10:00:00.000Z',
-        '2026-07-30T10:00:00.000Z',
-      ]);
+      expect(
+        meetingInstances.map(meetingInstance => {
+          return meetingInstance.start.toISOString();
+        }),
+      ).toEqual(['2026-06-04T10:00:00.000Z', '2026-07-02T10:00:00.000Z', '2026-07-30T10:00:00.000Z']);
     });
 
     it('advances across a year boundary', () => {
@@ -290,10 +299,11 @@ describe('getMeetingInstancesInRange', () => {
 
       const meetingInstances = getMeetingInstancesInRange(meetingSeries, windowStart, windowEnd);
 
-      expect(meetingInstances.map(meetingInstance => meetingInstance.start.toISOString())).toEqual([
-        '2026-12-15T10:00:00.000Z',
-        '2027-01-12T10:00:00.000Z',
-      ]);
+      expect(
+        meetingInstances.map(meetingInstance => {
+          return meetingInstance.start.toISOString();
+        }),
+      ).toEqual(['2026-12-15T10:00:00.000Z', '2027-01-12T10:00:00.000Z']);
     });
   });
 });

@@ -62,49 +62,65 @@ import {SubconversationService} from '../subconversationService/subconversationS
 const createMLSMessageAddEventMock = (
   conversationId: QualifiedId,
   subconversationId?: SUBCONVERSATION_ID,
-): ConversationMLSMessageAddEvent => ({
-  data: '',
-  conversation: conversationId.id,
-  qualified_conversation: conversationId,
-  from: '',
-  senderClientId: '',
-  type: CONVERSATION_EVENT.MLS_MESSAGE_ADD,
-  time: '2023-08-21T06:47:43.387Z',
-  subconv: subconversationId,
-});
+): ConversationMLSMessageAddEvent => {
+  return {
+    data: '',
+    conversation: conversationId.id,
+    qualified_conversation: conversationId,
+    from: '',
+    senderClientId: '',
+    type: CONVERSATION_EVENT.MLS_MESSAGE_ADD,
+    time: '2023-08-21T06:47:43.387Z',
+    subconv: subconversationId,
+  };
+};
 
-const createMLSWelcomeMessageEventMock = (conversationId: QualifiedId): ConversationMLSWelcomeEvent => ({
-  data: '',
-  conversation: conversationId.id,
-  qualified_conversation: conversationId,
-  from: '',
-  type: CONVERSATION_EVENT.MLS_WELCOME_MESSAGE,
-  time: '2023-08-21T06:47:43.387Z',
-});
+const createMLSWelcomeMessageEventMock = (conversationId: QualifiedId): ConversationMLSWelcomeEvent => {
+  return {
+    data: '',
+    conversation: conversationId.id,
+    qualified_conversation: conversationId,
+    from: '',
+    type: CONVERSATION_EVENT.MLS_WELCOME_MESSAGE,
+    time: '2023-08-21T06:47:43.387Z',
+  };
+};
 
-jest.mock('../../messagingProtocols/proteus', () => ({
-  ...jest.requireActual('../../messagingProtocols/proteus'),
-  getGenericMessageParams: jest.fn(),
-  getRecipientsForConversation: jest.fn(),
-  getConversationQualifiedMembers: jest.fn(),
-}));
+jest.mock('../../messagingProtocols/proteus', () => {
+  return {
+    ...jest.requireActual('../../messagingProtocols/proteus'),
+    getGenericMessageParams: jest.fn(),
+    getRecipientsForConversation: jest.fn(),
+    getConversationQualifiedMembers: jest.fn(),
+  };
+});
 const MockedMessagingProtocols = MessagingProtocols as jest.Mocked<typeof MessagingProtocols>;
 
-jest.mock('../message/messageSender', () => ({
-  ...jest.requireActual('../message/messageSender'),
-  sendMessage: jest.fn().mockImplementation(fn => fn()),
-}));
+jest.mock('../message/messageSender', () => {
+  return {
+    ...jest.requireActual('../message/messageSender'),
+    sendMessage: jest.fn().mockImplementation(fn => {
+      return fn();
+    }),
+  };
+});
 
 const mockedProteusService = {
-  encryptGenericMessage: () => Promise.resolve(),
-  sendProteusMessage: () => Promise.resolve({sentAt: new Date()}),
+  encryptGenericMessage: () => {
+    return Promise.resolve();
+  },
+  sendProteusMessage: () => {
+    return Promise.resolve({sentAt: new Date()});
+  },
 } as unknown as ProteusService;
 
 const apiClients: APIClient[] = [];
 
 describe('ConversationService', () => {
   afterAll(() => {
-    apiClients.forEach(client => client.disconnect());
+    apiClients.forEach(client => {
+      client.disconnect();
+    });
   });
 
   async function buildConversationService(coreDatabase?: CoreDatabase) {
@@ -144,8 +160,12 @@ describe('ConversationService', () => {
     const mockedMLSService = {
       on: jest.fn(),
       encryptMessage: noop,
-      commitPendingProposals: () => Promise.resolve(),
-      getEpoch: () => Promise.resolve(),
+      commitPendingProposals: () => {
+        return Promise.resolve();
+      },
+      getEpoch: () => {
+        return Promise.resolve();
+      },
       getSafeEpoch: jest.fn(),
       joinByExternalCommit: jest.fn(),
       registerConversation: jest.fn(),
@@ -166,7 +186,9 @@ describe('ConversationService', () => {
 
     const mockedDb = coreDatabase ?? (await openDB('core-test-db'));
 
-    const groupIdFromConversationId = jest.fn(async () => 'groupId');
+    const groupIdFromConversationId = jest.fn(async () => {
+      return 'groupId';
+    });
 
     const mockedSubconversationService = {
       joinConferenceSubconversation: jest.fn(),
@@ -178,7 +200,9 @@ describe('ConversationService', () => {
       mockedDb,
       groupIdFromConversationId,
       mockedSubconversationService,
-      () => Promise.resolve(true),
+      () => {
+        return Promise.resolve(true);
+      },
       mockedMLSService,
     );
 
@@ -806,7 +830,9 @@ describe('ConversationService', () => {
 
       await conversationService.handleEvent(mockMLSMessageAddEvent);
 
-      await new Promise(resolve => setImmediate(resolve));
+      await new Promise(resolve => {
+        return setImmediate(resolve);
+      });
 
       expect(conversationService.joinByExternalCommit).toHaveBeenCalledWith(conversationId);
       expect(conversationService.emit).toHaveBeenCalledWith('MLSConversationRecovered', {conversationId});
@@ -848,11 +874,17 @@ describe('ConversationService', () => {
         client,
         {} as ProteusService,
         mockedDb,
-        async () => 'mock-group-id',
+        async () => {
+          return 'mock-group-id';
+        },
         {joinConferenceSubconversation: jest.fn()} as unknown as SubconversationService,
-        () => Promise.resolve(true),
+        () => {
+          return Promise.resolve(true);
+        },
         mockedMLSService as unknown as MLSService,
-        () => isConnectionLive,
+        () => {
+          return isConnectionLive;
+        },
       );
 
       jest.spyOn(conversationService, 'joinByExternalCommit');
@@ -915,7 +947,9 @@ describe('ConversationService', () => {
 
       await conversationService.handleEvent(mockMLSMessageAddEvent);
 
-      await new Promise(resolve => setImmediate(resolve));
+      await new Promise(resolve => {
+        return setImmediate(resolve);
+      });
 
       expect(conversationService.joinByExternalCommit).not.toHaveBeenCalled();
       expect(subconversationService.joinConferenceSubconversation).toHaveBeenCalledWith(conversationId, 'groupId');
@@ -940,7 +974,9 @@ describe('ConversationService', () => {
 
       await conversationService.handleEvent(mockMLSWelcomeMessageEvent);
 
-      await new Promise(resolve => setImmediate(resolve));
+      await new Promise(resolve => {
+        return setImmediate(resolve);
+      });
 
       // Orchestrator triggers a low-level join (performJoinByExternalCommitAPI -> mlsService.joinByExternalCommit)
       expect(mlsService.joinByExternalCommit).toHaveBeenCalled();
@@ -970,7 +1006,9 @@ describe('ConversationService', () => {
 
       await conversationService.handleEvent(mockMLSWelcomeMessageEvent);
 
-      await new Promise(resolve => setImmediate(resolve));
+      await new Promise(resolve => {
+        return setImmediate(resolve);
+      });
 
       // Expect a single wipe with the extracted group id, and a single retry of welcome handling
       expect(mlsService.wipeConversation).toHaveBeenCalledTimes(1);
@@ -982,7 +1020,9 @@ describe('ConversationService', () => {
   describe('getConversations', () => {
     it('returns a list of conversations by conversation ids', async () => {
       const [conversationService, {apiClient}] = await buildConversationService();
-      const conversationIds = Array.from({length: 10}, () => ({id: PayloadHelper.getUUID(), domain: 'test.zinfra.io'}));
+      const conversationIds = Array.from({length: 10}, () => {
+        return {id: PayloadHelper.getUUID(), domain: 'test.zinfra.io'};
+      });
       jest.spyOn(apiClient.api.conversation, 'getConversationsByQualifiedIds').mockResolvedValueOnce({
         found: conversationIds as unknown as Conversation[],
       });
@@ -1004,10 +1044,12 @@ describe('ConversationService', () => {
     it('includes a list of ids to skip if they exist in db store', async () => {
       const [conversationService, {apiClient}] = await buildConversationService();
 
-      const conversationIdsToSkip = Array.from({length: 2}, () => ({
-        id: PayloadHelper.getUUID(),
-        domain: 'test.zinfra.io',
-      }));
+      const conversationIdsToSkip = Array.from({length: 2}, () => {
+        return {
+          id: PayloadHelper.getUUID(),
+          domain: 'test.zinfra.io',
+        };
+      });
 
       conversationIdsToSkip.forEach(conversationService.blacklistConversation);
 
@@ -1059,7 +1101,9 @@ describe('ConversationService', () => {
 
       const otherUsersToAdd = Array(3)
         .fill(0)
-        .map(() => ({id: PayloadHelper.getUUID(), domain: 'local.wire.com'}));
+        .map(() => {
+          return {id: PayloadHelper.getUUID(), domain: 'local.wire.com'};
+        });
 
       const selfUserToAdd = {id: 'self-user-id', domain: 'local.wire.com', skipOwnClientId: apiClient.clientId};
 
@@ -1096,7 +1140,9 @@ describe('ConversationService', () => {
 
       const otherUsersToAdd = Array(4)
         .fill(0)
-        .map(() => ({id: PayloadHelper.getUUID(), domain: 'local.wire.com'}));
+        .map(() => {
+          return {id: PayloadHelper.getUUID(), domain: 'local.wire.com'};
+        });
 
       const selfUserToAdd = {id: 'self-user-id', domain: 'local.wire.com', skipOwnClientId: apiClient.clientId};
 
@@ -1145,7 +1191,9 @@ describe('ConversationService', () => {
 
       const otherUsersToAdd = Array(2)
         .fill(0)
-        .map(() => ({id: PayloadHelper.getUUID(), domain: 'local.wire.com'}));
+        .map(() => {
+          return {id: PayloadHelper.getUUID(), domain: 'local.wire.com'};
+        });
       const qualifiedUsers = [...otherUsersToAdd];
 
       const staleMessageError = {
@@ -1233,7 +1281,9 @@ describe('ConversationService', () => {
       const mockGroupId = 'groupId';
       const otherUsersToAdd = Array(3)
         .fill(0)
-        .map(() => ({id: PayloadHelper.getUUID(), domain: 'local.wire.com'}));
+        .map(() => {
+          return {id: PayloadHelper.getUUID(), domain: 'local.wire.com'};
+        });
 
       jest.spyOn(mlsService, 'tryEstablishingMLSGroup').mockResolvedValueOnce(true);
       jest
@@ -1262,7 +1312,9 @@ describe('ConversationService', () => {
       const mockGroupId = 'groupId';
       const otherUsersToAdd = Array(3)
         .fill(0)
-        .map(() => ({id: PayloadHelper.getUUID(), domain: 'local.wire.com'}));
+        .map(() => {
+          return {id: PayloadHelper.getUUID(), domain: 'local.wire.com'};
+        });
 
       jest.spyOn(mlsService, 'tryEstablishingMLSGroup').mockResolvedValueOnce(false);
       jest.spyOn(conversationService, 'addUsersToMLSConversation');
@@ -1285,7 +1337,9 @@ describe('ConversationService', () => {
       const mockGroupId = 'groupId';
       const otherUsersToAdd = Array(3)
         .fill(0)
-        .map(() => ({id: PayloadHelper.getUUID(), domain: 'local.wire.com'}));
+        .map(() => {
+          return {id: PayloadHelper.getUUID(), domain: 'local.wire.com'};
+        });
 
       const addUsersSpy = jest.spyOn(conversationService, 'addUsersToMLSConversation');
 
@@ -1306,7 +1360,9 @@ describe('ConversationService', () => {
   describe('reactToKeyMaterialUpdateFailure', () => {
     function getKeyMaterialFailureHandler(mlsService: MLSService) {
       const onMock = mlsService.on as jest.Mock;
-      const call = onMock.mock.calls.find(([event]) => event === MLSServiceEvents.KEY_MATERIAL_UPDATE_FAILURE);
+      const call = onMock.mock.calls.find(([event]) => {
+        return event === MLSServiceEvents.KEY_MATERIAL_UPDATE_FAILURE;
+      });
       expect(call).toBeTruthy();
       return call[1] as (payload: {error: unknown; groupId: string}) => Promise<void>;
     }
@@ -1399,7 +1455,9 @@ describe('ConversationService', () => {
 
       // Make the recovery hang until we resolve it, to simulate overlapping calls
       let resolveDeferred: (() => void) | undefined;
-      const deferred = new Promise<void>(res => (resolveDeferred = res));
+      const deferred = new Promise<void>(res => {
+        return (resolveDeferred = res);
+      });
       const resetSpy = jest
         .spyOn(conversationService as any, 'handleBrokenMLSConversation')
         .mockReturnValue(deferred as any);
@@ -1506,9 +1564,9 @@ describe('ConversationService', () => {
       // Pre-populate cache
       (conversationService as any).groupIdConversationMap.set('g-hit', conv);
 
-      const getListSpy = jest
-        .spyOn(apiClient.api.conversation, 'getConversationList')
-        .mockImplementation(() => Promise.reject(new Error('should not be called')));
+      const getListSpy = jest.spyOn(apiClient.api.conversation, 'getConversationList').mockImplementation(() => {
+        return Promise.reject(new Error('should not be called'));
+      });
 
       const result: Conversation | undefined = await (conversationService as any).getConversationByGroupId('g-hit');
       expect(result?.qualified_id.id).toBe('c-hit');

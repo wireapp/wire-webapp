@@ -17,14 +17,23 @@
  *
  */
 
-jest.mock('@tanstack/react-virtual', () => ({
-  useVirtualizer: ({count}: {count: number}) => ({
-    getVirtualItems: () =>
-      Array.from({length: count}, (_, index) => ({index, key: index, size: 56, start: index * 56})),
-    getTotalSize: () => count * 56, // default estimated row size
-    scrollToIndex: jest.fn(),
-  }),
-}));
+jest.mock('@tanstack/react-virtual', () => {
+  return {
+    useVirtualizer: ({count}: {count: number}) => {
+      return {
+        getVirtualItems: () => {
+          return Array.from({length: count}, (_, index) => {
+            return {index, key: index, size: 56, start: index * 56};
+          });
+        },
+        getTotalSize: () => {
+          return count * 56;
+        }, // default estimated row size
+        scrollToIndex: jest.fn(),
+      };
+    },
+  };
+});
 
 import {createRef} from 'react';
 
@@ -77,17 +86,23 @@ describe('ConversationsList', () => {
     listViewModel = {} as ListViewModel;
     connectRequests = [];
     conversationState = {isActiveConversation: ko.observable(false) as any} as ConversationState;
-    callState = {joinableCalls: ko.pureComputed(() => [] as any[]) as any} as CallState;
+    callState = {
+      joinableCalls: ko.pureComputed(() => {
+        return [] as any[];
+      }) as any,
+    } as CallState;
     currentFocus = '';
     currentFolder = {} as ConversationLabel;
     resetConversationFocus = jest.fn();
-    handleArrowKeyDown = jest.fn(() => jest.fn());
+    handleArrowKeyDown = jest.fn(() => {
+      return jest.fn();
+    });
     clearSearchFilter = jest.fn();
     useSidebarStore.setState({currentTab: SidebarTabs.RECENT});
   });
 
-  const renderComponent = (conversations: Conversation[], searchFilter: string = '', isEmpty = false) =>
-    render(
+  const renderComponent = (conversations: Conversation[], searchFilter: string = '', isEmpty = false) => {
+    return render(
       <ConversationsList
         conversationLabelRepository={conversationLabelRepository}
         conversations={conversations}
@@ -108,6 +123,7 @@ describe('ConversationsList', () => {
       />,
       {wrapper: rootProviderWrapper},
     );
+  };
 
   it("should render all 1:1 conversations if there's no search filter", async () => {
     const userNames = ['Alice', 'Bob', 'Charlie'];
@@ -117,7 +133,11 @@ describe('ConversationsList', () => {
 
     const {findByText} = renderComponent(conversations);
 
-    await Promise.all(userNames.map(async userName => expect(await findByText(userName)).toBeDefined()));
+    await Promise.all(
+      userNames.map(async userName => {
+        return expect(await findByText(userName)).toBeDefined();
+      }),
+    );
   });
 
   it.each(['', 'Alice'])(

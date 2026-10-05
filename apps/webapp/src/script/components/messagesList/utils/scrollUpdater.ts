@@ -22,6 +22,9 @@ import {isNullOrUndefined} from '@sindresorhus/is';
 import {Message} from 'Repositories/entity/message/message';
 import {StatusType} from 'src/script/message/statusType';
 
+const bottomStickThresholdInPixels = 100;
+const centerOffsetDivisor = 2;
+
 export type FocusedElement = {center?: boolean; element: Element};
 
 type MessageListContext = {
@@ -39,7 +42,7 @@ export function updateScroll(
   const newNbMessages = messages.length;
   const lastMessage = messages[newNbMessages - 1];
   const scrollBottomPosition = container.scrollTop + container.clientHeight;
-  const shouldStickToBottom = prevScrollHeight - scrollBottomPosition < 100;
+  const shouldStickToBottom = prevScrollHeight - scrollBottomPosition < bottomStickThresholdInPixels;
 
   if (!isNullOrUndefined(focusedElement)) {
     // If we have an element we want to focus
@@ -47,7 +50,7 @@ export function updateScroll(
     const elementPosition = element.getBoundingClientRect();
     const containerPosition = container.getBoundingClientRect();
     const scrollBy = container.scrollTop + elementPosition.top - containerPosition.top;
-    container.scrollTo?.({top: scrollBy - (center === true ? container.offsetHeight / 2 : 0)});
+    container.scrollTo?.({top: scrollBy - (center === true ? container.offsetHeight / centerOffsetDivisor : 0)});
   } else if (container.scrollTop === 0 && container.scrollHeight > prevScrollHeight) {
     // If we hit the top and new messages were loaded, we keep the scroll position stable
     container.scrollTop = container.scrollHeight - prevScrollHeight;

@@ -19,7 +19,7 @@
 
 import React from 'react';
 
-import {isNonEmptyObject} from '@sindresorhus/is';
+import {isNonEmptyObject, isNullOrUndefined} from '@sindresorhus/is';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
@@ -48,7 +48,7 @@ export const LeaveGroupAdminModal = ({translate}: LeaveGroupAdminModalProps) => 
   const {isOpen, params, selectedUser, clearContent, isLoading, hide, setSelectedUser, setClearContent, setIsLoading} =
     useLeaveGroupAdminModalStore();
 
-  if (!params) {
+  if (isNullOrUndefined(params)) {
     return null;
   }
 
@@ -57,7 +57,9 @@ export const LeaveGroupAdminModal = ({translate}: LeaveGroupAdminModalProps) => 
   const hasEligibleUsers = eligibleUsers.length > 0;
   const canLeave = hasEligibleUsers && selectedUser !== null;
 
-  const handleClose = () => hide();
+  const handleClose = () => {
+    return hide();
+  };
 
   const handleLeave = async () => {
     setIsLoading(true);
@@ -87,7 +89,9 @@ export const LeaveGroupAdminModal = ({translate}: LeaveGroupAdminModalProps) => 
       isShown={isOpen}
       onBgClick={handleClose}
       data-uie-name="leave-group-admin-modal"
-      onKeyDown={(event: React.KeyboardEvent<HTMLDivElement>) => handleEscDown(event, handleClose)}
+      onKeyDown={(event: React.KeyboardEvent<HTMLDivElement>) => {
+        return handleEscDown(event, handleClose);
+      }}
     >
       <div style={modalHeaderStyles}>
         <h2 style={modalTitleStyles} data-uie-name="leave-group-admin-modal-title">

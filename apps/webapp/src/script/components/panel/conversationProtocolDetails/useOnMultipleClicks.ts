@@ -59,7 +59,9 @@ export const useOnMultipleClicks = ({
       }
     };
     document.addEventListener('click', resetOnOtherClick, true);
-    return () => document.removeEventListener('click', resetOnOtherClick, true);
+    return () => {
+      return document.removeEventListener('click', resetOnOtherClick, true);
+    };
   }, [elementRef, elementSelector, reset]);
 
   const activate = () => {

@@ -43,19 +43,24 @@ const expectedFileTypeFilterItemIds = [
   'text',
 ];
 
-const isFileTypePopoverFilter = (filter: FilterConfig): filter is PopoverFilterConfig =>
-  filter.id === 'fileType' && filter.type === 'popover';
+const isFileTypePopoverFilter = (filter: FilterConfig): filter is PopoverFilterConfig => {
+  return filter.id === 'fileType' && filter.type === 'popover';
+};
 
 const cellsRepository = {} as CellsRepository;
 
 const conversationRepository = {
-  getAllCellEnabledGroupConversations: () => [],
+  getAllCellEnabledGroupConversations: () => {
+    return [];
+  },
 } as unknown as ConversationRepository;
 
 describe('useConversationDriveFilters', () => {
   it('exposes file type filter items in the required display order', () => {
     const {result} = renderHook(
-      () => useConversationDriveFilters({cellsRepository, conversationRepository, translate: translateForTest}),
+      () => {
+        return useConversationDriveFilters({cellsRepository, conversationRepository, translate: translateForTest});
+      },
       {
         wrapper: createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest})),
       },
@@ -63,6 +68,10 @@ describe('useConversationDriveFilters', () => {
 
     const fileTypeFilter = result.current.filters.find(isFileTypePopoverFilter);
 
-    expect(fileTypeFilter?.items.map(({id}) => id)).toEqual(expectedFileTypeFilterItemIds);
+    expect(
+      fileTypeFilter?.items.map(({id}) => {
+        return id;
+      }),
+    ).toEqual(expectedFileTypeFilterItemIds);
   });
 });

@@ -17,6 +17,7 @@
  *
  */
 
+import {isTruthy} from '@sindresorhus/is';
 import type {NotificationList} from '@wireapp/api-client/lib/notification/';
 import {DatabaseKeys} from '@wireapp/core/lib/notification/notificationDatabaseRepository';
 import {container} from 'tsyringe';
@@ -24,6 +25,8 @@ import {container} from 'tsyringe';
 import {StorageSchemata, StorageService} from 'Repositories/storage/';
 
 import {APIClient} from '../../service/apiClientSingleton';
+
+const notificationPageSize = 100;
 
 export class NotificationService {
   private readonly AMPLIFY_STORE_NAME: string;
@@ -57,7 +60,11 @@ export class NotificationService {
 
   async getServerTime(): Promise<string> {
     // Info: We use "100" as size limit because it's the minimum value accepted by the backend's notification stream
-    const notificationList = await this.apiClient.api.notification.getNotifications(undefined, 100, undefined);
+    const notificationList = await this.apiClient.api.notification.getNotifications(
+      undefined,
+      notificationPageSize,
+      undefined,
+    );
     return notificationList.time;
   }
 
@@ -69,7 +76,7 @@ export class NotificationService {
     return this.storageService
       .load<{value: string}>(this.AMPLIFY_STORE_NAME, NotificationService.CONFIG.PRIMARY_KEY_MISSED)
       .then(record => {
-        if (record?.value) {
+        if (isTruthy(record?.value)) {
           return record.value;
         }
         return undefined;

@@ -19,6 +19,8 @@
 
 import {Encoder, Decoder} from 'bazinga64';
 
+const initializationVectorLengthInBytes = 12;
+
 export class EncryptedStorage {
   private encryptionKey: Promise<CryptoKey>;
   length = Promise.resolve(0);
@@ -33,7 +35,7 @@ export class EncryptedStorage {
   async setItem(key: string, value: string) {
     try {
       const encryptionKey = await this.encryptionKey;
-      const iv = window.crypto.getRandomValues(new Uint8Array(12));
+      const iv = window.crypto.getRandomValues(new Uint8Array(initializationVectorLengthInBytes));
       const encodedBytes = Encoder.toBase64(value).asBytes;
       const encryptedValue = await window.crypto.subtle.encrypt(
         {name: 'AES-GCM', iv},

@@ -17,6 +17,8 @@
  *
  */
 
+import {isNonEmptyArray} from '@sindresorhus/is';
+
 import {CellsBreadcrumbs} from 'Components/conversation/conversationCells/common/cellsBreadcrumbs/cellsBreadcrumbs';
 import {getBreadcrumbsFromPath} from 'Components/conversation/conversationCells/common/getBreadcrumbsFromPath/getBreadcrumbsFromPath';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -28,7 +30,7 @@ import {CellsFolderListLoading} from './cellsFolderListLoading/cellsFolderListLo
 import {breadcrumbsWrapperStyles, listWrapperStyles} from './cellsFoldersListModalContent.styles';
 
 interface CellsFoldersListModalContentProps {
-  items: Array<{id: string; name: string; path: string}>;
+  items: {id: string; name: string; path: string}[];
   status: 'idle' | 'loading' | 'success' | 'error';
   shouldShowLoadingSpinner: boolean;
   conversationName: string;
@@ -53,7 +55,7 @@ export const CellsFoldersListModalContent = ({
     recycleBinLabel: translate('cells.recycleBin.breadcrumb'),
   });
 
-  const shouldDisplayEmptyItems = status === 'success' && !items.length;
+  const shouldDisplayEmptyItems = status === 'success' && !isNonEmptyArray(items);
 
   const handleFolderNavigate = (path: string) => {
     const newPath = path.split('/').slice(1).join('/');
@@ -61,7 +63,10 @@ export const CellsFoldersListModalContent = ({
   };
 
   const handleBreadcrumbClick = (item: {name: string}) => {
-    const path = breadcrumbs.find(crumb => crumb.name === item.name)?.path ?? '';
+    const path =
+      breadcrumbs.find(crumb => {
+        return crumb.name === item.name;
+      })?.path ?? '';
     onPathChange(path);
   };
 
@@ -77,7 +82,11 @@ export const CellsFoldersListModalContent = ({
           <CellsFolderList items={items} onNavigate={handleFolderNavigate} />
         )}
       </div>
-      <CellsCreateNewFolderHint onCreate={() => onChangeModalContent('create')} />
+      <CellsCreateNewFolderHint
+        onCreate={() => {
+          return onChangeModalContent('create');
+        }}
+      />
     </>
   );
 };

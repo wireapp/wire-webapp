@@ -43,7 +43,9 @@ export function getStorage(): Storage | undefined {
  */
 export function clearKeysStartingWith(prefix: string, storage: Storage): void {
   Object.keys(storage)
-    .filter(item => item.startsWith(prefix))
+    .filter(item => {
+      return item.startsWith(prefix);
+    })
     .forEach(item => {
       storage.removeItem(item);
     });

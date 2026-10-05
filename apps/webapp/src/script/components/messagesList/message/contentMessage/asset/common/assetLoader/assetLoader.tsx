@@ -24,6 +24,10 @@ import {TabIndex} from '@wireapp/react-ui-kit';
 import {CloseIcon} from 'Components/icon';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 
+const largeLoaderScale = 2;
+const completeProgressPercentage = 100;
+const loaderViewBoxSize = 32;
+
 interface AssetLoaderProps {
   large?: boolean;
   loadProgress: number;
@@ -31,9 +35,9 @@ interface AssetLoaderProps {
 }
 
 const AssetLoader = ({large, loadProgress, onCancel}: AssetLoaderProps) => {
-  const elementScale = large === true ? 2 : 1;
-  const progress = `${loadProgress * elementScale} ${100 * elementScale}`;
-  const viewBoxSize = 32 * elementScale;
+  const elementScale = large === true ? largeLoaderScale : 1;
+  const progress = `${loadProgress * elementScale} ${completeProgressPercentage * elementScale}`;
+  const viewBoxSize = loaderViewBoxSize * elementScale;
   const viewBox = `0 0 ${viewBoxSize} ${viewBoxSize}`;
 
   const onClick = (event: React.UIEvent) => {
@@ -47,7 +51,15 @@ const AssetLoader = ({large, loadProgress, onCancel}: AssetLoaderProps) => {
       tabIndex={TabIndex.FOCUSABLE}
       className="media-button"
       onClick={onClick}
-      onKeyDown={event => handleKeyDown({event, callback: () => onClick(event), keys: [KEY.ENTER, KEY.SPACE]})}
+      onKeyDown={event => {
+        return handleKeyDown({
+          event,
+          callback: () => {
+            return onClick(event);
+          },
+          keys: [KEY.ENTER, KEY.SPACE],
+        });
+      }}
       data-uie-name="status-loading-media"
     >
       <svg aria-hidden="true" viewBox={viewBox} data-uie-name="asset-loader-svg">

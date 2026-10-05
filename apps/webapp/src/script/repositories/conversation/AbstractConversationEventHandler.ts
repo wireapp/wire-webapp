@@ -58,6 +58,8 @@ export class AbstractConversationEventHandler {
     if (handler === undefined) {
       return Promise.resolve();
     }
-    return Promise.resolve(handler.call(this, conversationEntity, eventJson)).then((): void => undefined);
+    return Promise.resolve(handler.call(this, conversationEntity, eventJson)).then((): void => {
+      return undefined;
+    });
   }
 }

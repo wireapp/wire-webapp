@@ -17,8 +17,10 @@
  *
  */
 
+const sleepDetectionToleranceMultiplier = 2;
+
 const CHECK_INTERVAL = 2000;
-const TOLERANCE = CHECK_INTERVAL * 2;
+const TOLERANCE = CHECK_INTERVAL * sleepDetectionToleranceMultiplier;
 
 export type BackFromSleepDetails = {
   readonly expectedIntervalMilliseconds: number;
@@ -79,5 +81,7 @@ export const onBackFromSleep = ({
     }
   }, CHECK_INTERVAL);
 
-  return () => clearInterval(tid);
+  return () => {
+    return clearInterval(tid);
+  };
 };

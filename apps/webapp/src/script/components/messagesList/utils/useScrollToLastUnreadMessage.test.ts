@@ -96,7 +96,9 @@ describe('useScrollToLastUnreadMessage', () => {
   });
 
   it('waits for grouped messages before measuring and scrolling the loaded conversation', () => {
-    let animationFrameCallback: FrameRequestCallback = () => 0;
+    let animationFrameCallback: FrameRequestCallback = () => {
+      return 0;
+    };
     jest.spyOn(window, 'requestAnimationFrame').mockImplementation(callback => {
       animationFrameCallback = callback;
       return 1;

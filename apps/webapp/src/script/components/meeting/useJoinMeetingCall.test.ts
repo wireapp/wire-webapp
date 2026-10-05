@@ -54,7 +54,7 @@ describe('handleJoinMeetingCallResult', () => {
     const showConversationNotFoundModal = jest.fn();
     const showJoinFailedModal = jest.fn();
 
-    handleJoinMeetingCallResult(Result.ok(undefined), {
+    handleJoinMeetingCallResult(Result.ok(true), {
       showConversationNotFoundModal,
       showJoinFailedModal,
     });

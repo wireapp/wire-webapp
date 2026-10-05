@@ -73,7 +73,9 @@ export const PastePlugin = ({getMentionCandidates, isPreviewMode}: PastePluginPr
       }
 
       const username = value.startsWith('@') ? value.substring(1) : value;
-      const userExists = availableUsers.some(user => user.name() === username);
+      const userExists = availableUsers.some(user => {
+        return user.name() === username;
+      });
 
       return {
         isValid: userExists,

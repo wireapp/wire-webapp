@@ -37,30 +37,33 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
 );
 
-const createProps = (overrides: Partial<React.ComponentProps<typeof CallingHeader>> = {}) => ({
-  isMeeting: false,
-  isOngoing: false,
-  isGroupCall: false,
-  isChannel: false,
-  showAlert: false,
-  isVideoCall: false,
-  clearShowAlert,
-  conversationUrl,
-  callStartedAlert: 'Call started',
-  ongoingCallAlert: 'Ongoing call',
-  isTemporaryUser: false,
-  conversationParticipants: [] as User[],
-  conversationName: 'Conversation',
-  currentCallStatus: null,
-  isCbrEnabled: false,
-  toggleDetachedWindow: jest.fn(),
-  isDetachedWindow: false,
-  conversationID: 'conversation-id',
-  ...overrides,
-});
+const createProps = (overrides: Partial<React.ComponentProps<typeof CallingHeader>> = {}) => {
+  return {
+    isMeeting: false,
+    isOngoing: false,
+    isGroupCall: false,
+    isChannel: false,
+    showAlert: false,
+    isVideoCall: false,
+    clearShowAlert,
+    conversationUrl,
+    callStartedAlert: 'Call started',
+    ongoingCallAlert: 'Ongoing call',
+    isTemporaryUser: false,
+    conversationParticipants: [] as User[],
+    conversationName: 'Conversation',
+    currentCallStatus: null,
+    isCbrEnabled: false,
+    toggleDetachedWindow: jest.fn(),
+    isDetachedWindow: false,
+    conversationID: 'conversation-id',
+    ...overrides,
+  };
+};
 
-const renderHeader = (overrides: Partial<React.ComponentProps<typeof CallingHeader>> = {}) =>
-  render(<CallingHeader {...createProps(overrides)} />, {wrapper: rootProviderWrapper});
+const renderHeader = (overrides: Partial<React.ComponentProps<typeof CallingHeader>> = {}) => {
+  return render(<CallingHeader {...createProps(overrides)} />, {wrapper: rootProviderWrapper});
+};
 
 describe('CallingHeader', () => {
   beforeEach(() => {
@@ -69,9 +72,24 @@ describe('CallingHeader', () => {
   });
 
   it.each([
-    ['click', (header: HTMLElement) => fireEvent.click(header)],
-    ['Enter', (header: HTMLElement) => fireEvent.keyDown(header, {key: 'Enter'})],
-    ['Space', (header: HTMLElement) => fireEvent.keyDown(header, {key: ' '})],
+    [
+      'click',
+      (header: HTMLElement) => {
+        return fireEvent.click(header);
+      },
+    ],
+    [
+      'Enter',
+      (header: HTMLElement) => {
+        return fireEvent.keyDown(header, {key: 'Enter'});
+      },
+    ],
+    [
+      'Space',
+      (header: HTMLElement) => {
+        return fireEvent.keyDown(header, {key: ' '});
+      },
+    ],
   ])('navigates regular calls on %s', (_interaction, interact) => {
     const {getByRole} = renderHeader();
 
@@ -81,9 +99,24 @@ describe('CallingHeader', () => {
   });
 
   it.each([
-    ['click', (header: HTMLElement) => fireEvent.click(header)],
-    ['Enter', (header: HTMLElement) => fireEvent.keyDown(header, {key: 'Enter'})],
-    ['Space', (header: HTMLElement) => fireEvent.keyDown(header, {key: ' '})],
+    [
+      'click',
+      (header: HTMLElement) => {
+        return fireEvent.click(header);
+      },
+    ],
+    [
+      'Enter',
+      (header: HTMLElement) => {
+        return fireEvent.keyDown(header, {key: 'Enter'});
+      },
+    ],
+    [
+      'Space',
+      (header: HTMLElement) => {
+        return fireEvent.keyDown(header, {key: ' '});
+      },
+    ],
   ])('does not navigate meeting calls on %s', (_interaction, interact) => {
     const {getByRole} = renderHeader({isMeeting: true});
 

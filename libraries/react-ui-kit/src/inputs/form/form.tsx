@@ -19,15 +19,17 @@
 
 import * as React from 'react';
 
-export const Form = (props: React.HTMLProps<HTMLFormElement>) => (
-  <form
-    css={{
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'space-between',
-      marginBottom: 0,
-      width: '100%',
-    }}
-    {...props}
-  />
-);
+export const Form = (props: React.HTMLProps<HTMLFormElement>) => {
+  return (
+    <form
+      css={{
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        marginBottom: 0,
+        width: '100%',
+      }}
+      {...props}
+    />
+  );
+};

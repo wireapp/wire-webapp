@@ -69,12 +69,14 @@ export const createLabel = (
   conversations: Conversation[] = [],
   id: string = createUuid(),
   type: LabelType = LabelType.Custom,
-): ConversationLabel => ({
-  conversations: ko.observableArray(conversations),
-  id,
-  name,
-  type,
-});
+): ConversationLabel => {
+  return {
+    conversations: ko.observableArray(conversations),
+    id,
+    name,
+    type,
+  };
+};
 
 export class ConversationLabelRepository extends TypedEventTarget<{type: 'conversation-favorited'}> {
   labels: ko.ObservableArray<ConversationLabel>;
@@ -91,41 +93,49 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
   ) {
     super();
     this.labels = ko.observableArray([]);
-    this.allLabeledConversations = ko.pureComputed(() =>
-      this.labels().reduce(
-        (accumulated: Conversation[], {conversations, type}) =>
-          type === LabelType.Custom ? accumulated.concat(conversations()) : accumulated,
-        [],
-      ),
-    );
+    this.allLabeledConversations = ko.pureComputed(() => {
+      return this.labels().reduce((accumulated: Conversation[], {conversations, type}) => {
+        return type === LabelType.Custom ? accumulated.concat(conversations()) : accumulated;
+      }, []);
+    });
     this.logger = getLogger('ConversationLabelRepository');
     amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent);
   }
 
   readonly marshal = (): LabelProperty => {
-    const labelJson = this.labels().map(({id, type, name, conversations}) => ({
-      conversations: conversations().map(({id}) => id),
-      id,
-      name,
-      type,
-    }));
+    const labelJson = this.labels().map(({id, type, name, conversations}) => {
+      return {
+        conversations: conversations().map(({id}) => {
+          return id;
+        }),
+        id,
+        name,
+        type,
+      };
+    });
 
     return {labels: labelJson};
   };
 
   readonly unmarshal = (labelJson: LabelProperty) => {
-    const labels = labelJson.labels.map(({id, type, name, conversations}): ConversationLabel => ({
-      conversations: ko.observableArray(
-        conversations
-          .map(conversationId =>
-            this.allConversations().find(({id}) => id.toLowerCase() === conversationId.toLowerCase()),
-          )
-          .filter(conversation => !isNullOrUndefined(conversation)),
-      ),
-      id,
-      name,
-      type,
-    }));
+    const labels = labelJson.labels.map(({id, type, name, conversations}): ConversationLabel => {
+      return {
+        conversations: ko.observableArray(
+          conversations
+            .map(conversationId => {
+              return this.allConversations().find(({id}) => {
+                return id.toLowerCase() === conversationId.toLowerCase();
+              });
+            })
+            .filter(conversation => {
+              return !isNullOrUndefined(conversation);
+            }),
+        ),
+        id,
+        name,
+        type,
+      };
+    });
 
     this.labels(labels);
   };
@@ -248,19 +258,22 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
   };
 
   readonly getGroupsWithoutLabel = (conversations = this.conversations()) => {
-    return conversations.filter(
-      conversation => conversation.isGroupOrChannel() && !this.allLabeledConversations().includes(conversation),
-    );
+    return conversations.filter(conversation => {
+      return conversation.isGroupOrChannel() && !this.allLabeledConversations().includes(conversation);
+    });
   };
 
   readonly getContactsWithoutLabel = (conversations = this.conversations()) => {
-    return conversations.filter(
-      conversation => !conversation.isGroupOrChannel() && !this.allLabeledConversations().includes(conversation),
-    );
+    return conversations.filter(conversation => {
+      return !conversation.isGroupOrChannel() && !this.allLabeledConversations().includes(conversation);
+    });
   };
 
-  readonly getFavoriteLabel = (): ConversationLabel | undefined =>
-    this.labels().find(({type}) => type === LabelType.Favorite);
+  readonly getFavoriteLabel = (): ConversationLabel | undefined => {
+    return this.labels().find(({type}) => {
+      return type === LabelType.Favorite;
+    });
+  };
 
   readonly getFavorites = (conversations = this.conversations()): Conversation[] => {
     const favoriteLabel = this.getFavoriteLabel();
@@ -268,10 +281,14 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
   };
 
   readonly getLabelConversations = (label: ConversationLabel, conversations = this.conversations()): Conversation[] => {
-    return conversations.filter(conversation => label.conversations().includes(conversation));
+    return conversations.filter(conversation => {
+      return label.conversations().includes(conversation);
+    });
   };
 
-  readonly isFavorite = (conversation: Conversation): boolean => this.getFavorites().includes(conversation);
+  readonly isFavorite = (conversation: Conversation): boolean => {
+    return this.getFavorites().includes(conversation);
+  };
 
   readonly addConversationToFavorites = (addedConversation: Conversation): void => {
     // update the reference to the favorite label in the labels array to trigger a rerender
@@ -301,7 +318,9 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
     if (!isNullOrUndefined(favoriteLabel)) {
       const updatedLabel = createLabel(
         '',
-        favoriteLabel.conversations().filter(conversation => conversation !== removedConversation),
+        favoriteLabel.conversations().filter(conversation => {
+          return conversation !== removedConversation;
+        }),
         undefined,
         LabelType.Favorite,
       );
@@ -340,16 +359,21 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
     return ids;
   };
 
-  readonly getConversationCustomLabel = (conversation: Conversation, includeFavorites: boolean = false) =>
-    this.labels().find(
-      ({type, conversations}) =>
-        (includeFavorites || type === LabelType.Custom) && conversations().includes(conversation),
-    );
+  readonly getConversationCustomLabel = (conversation: Conversation, includeFavorites: boolean = false) => {
+    return this.labels().find(({type, conversations}) => {
+      return (includeFavorites || type === LabelType.Custom) && conversations().includes(conversation);
+    });
+  };
 
-  readonly getLabels = (): ConversationLabel[] =>
-    this.labels()
-      .filter(({type}) => type === LabelType.Custom)
-      .toSorted(({name: nameA}, {name: nameB}) => nameA.localeCompare(nameB, undefined, {sensitivity: 'base'}));
+  readonly getLabels = (): ConversationLabel[] => {
+    return this.labels()
+      .filter(({type}) => {
+        return type === LabelType.Custom;
+      })
+      .toSorted(({name: nameA}, {name: nameB}) => {
+        return nameA.localeCompare(nameB, undefined, {sensitivity: 'base'});
+      });
+  };
 
   readonly removeConversationFromLabel = (label: ConversationLabel, removeConversation: Conversation): void => {
     const {setCurrentTab} = useSidebarStore.getState();
@@ -358,7 +382,9 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
     const folderIndex = this.labels.indexOf(label);
     const updatedFolder = createLabel(
       label.name,
-      label.conversations().filter(conversation => conversation !== removeConversation),
+      label.conversations().filter(conversation => {
+        return conversation !== removeConversation;
+      }),
       label.id,
       label.type,
     );
@@ -384,7 +410,11 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
     this.labels().forEach(label => {
       const isCustom = label.type === LabelType.Custom;
       if (removeFromFavorites || isCustom) {
-        label.conversations(label.conversations().filter(conversation => conversation !== removeConversation));
+        label.conversations(
+          label.conversations().filter(conversation => {
+            return conversation !== removeConversation;
+          }),
+        );
       }
       if (isCustom && isEmptyArray(label.conversations())) {
         this.labels.remove(label);

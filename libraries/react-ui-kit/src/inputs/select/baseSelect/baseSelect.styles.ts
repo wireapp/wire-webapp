@@ -30,26 +30,32 @@ export interface BaseSelectStylesParams {
   containerCSS?: CSSObject;
 }
 
-const getSelectAccentColor = (theme: Theme): string => theme.general.primaryColor;
+const getSelectAccentColor = (theme: Theme): string => {
+  return theme.general.primaryColor;
+};
 
-export const baseIndicatorSeparatorStyles = (): CSSObject => ({
-  display: 'none',
-});
+export const baseIndicatorSeparatorStyles = (): CSSObject => {
+  return {
+    display: 'none',
+  };
+};
 
-export const baseContainerStyles = (containerCSS: CSSObject): CSSObject => ({
-  width: '100%',
-  minWidth: 0,
-  '& > div': {
-    minWidth: 0,
+export const baseContainerStyles = (containerCSS: CSSObject): CSSObject => {
+  return {
     width: '100%',
-    '&:-moz-focusring': {
-      color: 'transparent',
-      textShadow: '0 0 0 #000',
+    minWidth: 0,
+    '& > div': {
+      minWidth: 0,
+      width: '100%',
+      '&:-moz-focusring': {
+        color: 'transparent',
+        textShadow: '0 0 0 #000',
+      },
+      position: 'relative',
+      ...containerCSS,
     },
-    position: 'relative',
-    ...containerCSS,
-  },
-});
+  };
+};
 
 export const baseControlStyles = ({
   theme,
@@ -66,35 +72,37 @@ export const baseControlStyles = ({
     menuIsOpen: boolean;
   };
   controlCSS: CSSObject;
-}): CSSObject => ({
-  display: 'flex',
-  alignItems: 'center',
-  appearance: 'none',
-  padding: '0 8px 0 16px',
-  height: 'auto',
-  minHeight: '48px',
-  ...inputStyle(theme, {disabled: selectProps.isDisabled, markInvalid}),
-  borderRadius: 12,
-  ...(isDisabled && {
-    backgroundColor: theme.Input.backgroundColorDisabled,
-    color: theme.Select.disabledColor,
-    cursor: 'default',
-  }),
-  ...(markInvalid && {
-    boxShadow: `0 0 0 1px ${theme.general.dangerColor}`,
-  }),
-  ...(selectProps.menuIsOpen && {
-    boxShadow: `0 0 0 1px ${getSelectAccentColor(theme)}`,
-    '&:hover': {
+}): CSSObject => {
+  return {
+    display: 'flex',
+    alignItems: 'center',
+    appearance: 'none',
+    padding: '0 8px 0 16px',
+    height: 'auto',
+    minHeight: '48px',
+    ...inputStyle(theme, {disabled: selectProps.isDisabled, markInvalid}),
+    borderRadius: 12,
+    ...(isDisabled && {
+      backgroundColor: theme.Input.backgroundColorDisabled,
+      color: theme.Select.disabledColor,
+      cursor: 'default',
+    }),
+    ...(markInvalid && {
+      boxShadow: `0 0 0 1px ${theme.general.dangerColor}`,
+    }),
+    ...(selectProps.menuIsOpen && {
       boxShadow: `0 0 0 1px ${getSelectAccentColor(theme)}`,
+      '&:hover': {
+        boxShadow: `0 0 0 1px ${getSelectAccentColor(theme)}`,
+      },
+    }),
+    cursor: selectProps.isDisabled ? undefined : 'pointer',
+    '&:focus:visible, active': {
+      boxShadow: selectProps.isDisabled ? undefined : `0 0 0 1px ${getSelectAccentColor(theme)}`,
     },
-  }),
-  cursor: selectProps.isDisabled ? undefined : 'pointer',
-  '&:focus:visible, active': {
-    boxShadow: selectProps.isDisabled ? undefined : `0 0 0 1px ${getSelectAccentColor(theme)}`,
-  },
-  ...controlCSS,
-});
+    ...controlCSS,
+  };
+};
 
 export const baseDropdownIndicatorStyles = ({
   theme,
@@ -119,22 +127,26 @@ export const baseMenuStyles = ({
 }: {
   theme: Theme;
   menuPosition: 'absolute' | 'relative';
-}): CSSObject => ({
-  boxShadow: `0 0 0 1px ${getSelectAccentColor(theme)}, 0 4px 11px hsl(0deg 0% 0% / 10%)`,
-  backgroundColor: theme.Input.backgroundColor,
-  borderRadius: 12,
-  marginBottom: 0,
-  marginTop: 4,
-  overflowY: 'auto',
-  position: menuPosition,
-});
+}): CSSObject => {
+  return {
+    boxShadow: `0 0 0 1px ${getSelectAccentColor(theme)}, 0 4px 11px hsl(0deg 0% 0% / 10%)`,
+    backgroundColor: theme.Input.backgroundColor,
+    borderRadius: 12,
+    marginBottom: 0,
+    marginTop: 4,
+    overflowY: 'auto',
+    position: menuPosition,
+  };
+};
 
-export const baseMenuListStyles = (): CSSObject => ({
-  borderRadius: 0,
-  paddingBottom: 0,
-  paddingTop: 0,
-  maxHeight: 400,
-});
+export const baseMenuListStyles = (): CSSObject => {
+  return {
+    borderRadius: 0,
+    paddingBottom: 0,
+    paddingTop: 0,
+    maxHeight: 400,
+  };
+};
 
 export const baseOptionStyles = ({
   theme,
@@ -148,65 +160,67 @@ export const baseOptionStyles = ({
   isFocused: boolean;
   isSelected: boolean;
   isMulti: boolean;
-}): CSSObject => ({
-  backgroundColor: theme.Input.backgroundColor,
-  color: theme.general.color,
-  cursor: isDisabled ? 'not-allowed' : 'pointer',
-  fontSize: theme.fontSizes.base,
-  lineHeight: '1.5rem',
-  ...(isSelected &&
-    !isDisabled &&
-    !isMulti && {
-      background: getSelectAccentColor(theme),
-      borderColor: getSelectAccentColor(theme),
-      color: theme.Select.contrastTextColor,
-      '&:hover': {
-        backgroundColor: theme.Select.selectedActiveBg,
+}): CSSObject => {
+  return {
+    backgroundColor: theme.Input.backgroundColor,
+    color: theme.general.color,
+    cursor: isDisabled ? 'not-allowed' : 'pointer',
+    fontSize: theme.fontSizes.base,
+    lineHeight: '1.5rem',
+    ...(isSelected &&
+      !isDisabled &&
+      !isMulti && {
+        background: getSelectAccentColor(theme),
+        borderColor: getSelectAccentColor(theme),
         color: theme.Select.contrastTextColor,
-      },
-      '&:active': {
-        backgroundColor: theme.general.primaryColor,
-        boxShadow: `inset 0 0 0 1px ${theme.Select.selectedActiveBg}`,
-        color: theme.Select.contrastTextColor,
-      },
-    }),
-  ...(isFocused &&
-    !isDisabled &&
-    !isSelected && {
-      backgroundColor: theme.Select.optionHoverBg,
-      borderColor: theme.Select.optionHoverBg,
-      color: theme.general.color,
-      '&:active': {
-        background: theme.Select.optionHoverBg,
-        boxShadow: `inset 0 0 0 1px ${theme.Select.selectedActiveBg}`,
-        color: theme.general.color,
-      },
-    }),
-  ...(isMulti &&
-    isSelected && {
-      backgroundColor: theme.Input.backgroundColor,
-      '&:hover': {
+        '&:hover': {
+          backgroundColor: theme.Select.selectedActiveBg,
+          color: theme.Select.contrastTextColor,
+        },
+        '&:active': {
+          backgroundColor: theme.general.primaryColor,
+          boxShadow: `inset 0 0 0 1px ${theme.Select.selectedActiveBg}`,
+          color: theme.Select.contrastTextColor,
+        },
+      }),
+    ...(isFocused &&
+      !isDisabled &&
+      !isSelected && {
         backgroundColor: theme.Select.optionHoverBg,
-      },
-      '&:active': {
-        background: theme.Select.optionHoverBg,
-        boxShadow: `inset 0 0 0 1px ${theme.Select.selectedActiveBg}`,
+        borderColor: theme.Select.optionHoverBg,
         color: theme.general.color,
+        '&:active': {
+          background: theme.Select.optionHoverBg,
+          boxShadow: `inset 0 0 0 1px ${theme.Select.selectedActiveBg}`,
+          color: theme.general.color,
+        },
+      }),
+    ...(isMulti &&
+      isSelected && {
+        backgroundColor: theme.Input.backgroundColor,
+        '&:hover': {
+          backgroundColor: theme.Select.optionHoverBg,
+        },
+        '&:active': {
+          background: theme.Select.optionHoverBg,
+          boxShadow: `inset 0 0 0 1px ${theme.Select.selectedActiveBg}`,
+          color: theme.general.color,
+        },
+      }),
+    ...(isDisabled && {
+      backgroundColor: theme.Input.backgroundColorDisabled,
+      color: theme.Select.disabledColor,
+      '&:hover, &:active, &:focus': {
+        backgroundColor: theme.Select.borderColor,
+        color: theme.Select.disabledColor,
       },
+      ...(isFocused && {
+        backgroundColor: theme.Select.borderColor,
+        color: theme.Select.disabledColor,
+      }),
     }),
-  ...(isDisabled && {
-    backgroundColor: theme.Input.backgroundColorDisabled,
-    color: theme.Select.disabledColor,
-    '&:hover, &:active, &:focus': {
-      backgroundColor: theme.Select.borderColor,
-      color: theme.Select.disabledColor,
-    },
-    ...(isFocused && {
-      backgroundColor: theme.Select.borderColor,
-      color: theme.Select.disabledColor,
-    }),
-  }),
-});
+  };
+};
 
 export const baseSingleValueStyles = ({
   theme,

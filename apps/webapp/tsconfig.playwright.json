@@ -12,6 +12,8 @@
     // @wireapp/* packages use their workspace package exports; only local E2E aliases that fail
     // package resolution are retained here.
     "paths": {
+      // E2E startup feature toggles import the production definitions and query-string updater.
+      "src/*": ["./src/*"],
       // Calling specs and audio.util.ts import Repositories/audio/audioType.
       "Repositories/*": ["./src/script/repositories/*"],
       // localization.spec.ts imports I18n/de-DE.json and I18n/en-US.json.

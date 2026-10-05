@@ -27,6 +27,8 @@ import fragmentShader from './fragmentShader.glsl';
 // @ts-ignore
 import vertexShader from './vertexShader.glsl';
 
+const rectangleVertexCount = 6;
+
 export type VideoDimensions = {width: number; height: number};
 
 let program: WebGLProgram;
@@ -146,7 +148,7 @@ export function blurBackground(
 
   setFramebuffer(gl, null, width, height);
 
-  gl.drawArrays(gl.TRIANGLES, 0, 6 /* we draw a rectangle with 2 triangles (so 6 points) */);
+  gl.drawArrays(gl.TRIANGLES, 0, rectangleVertexCount /* we draw a rectangle with 2 triangles (so 6 points) */);
 }
 
 function setFramebuffer(gl: WebGLRenderingContext, fbo: WebGLFramebuffer | null, width: number, height: number) {

@@ -1,7 +1,7 @@
 import {useFileUploadState, FileWithPreview} from './useFilesUploadState';
 
-const file = (id: string): FileWithPreview =>
-  Object.assign(new File(['content'], `${id}.txt`, {type: 'text/plain'}), {
+const file = (id: string): FileWithPreview => {
+  return Object.assign(new File(['content'], `${id}.txt`, {type: 'text/plain'}), {
     id,
     preview: `blob:${id}`,
     remoteUuid: '',
@@ -9,9 +9,12 @@ const file = (id: string): FileWithPreview =>
     uploadStatus: 'uploading' as const,
     uploadProgress: 0,
   });
+};
 
 describe('useFileUploadState', () => {
-  beforeEach(() => useFileUploadState.getState().clearAll({conversationId: 'conversation'}));
+  beforeEach(() => {
+    return useFileUploadState.getState().clearAll({conversationId: 'conversation'});
+  });
 
   it('stores and updates upload progress and remote identifiers', () => {
     const upload = file('local-id');
@@ -39,7 +42,9 @@ describe('useFileUploadState', () => {
       useFileUploadState
         .getState()
         .getFiles({conversationId: 'conversation'})
-        .map(({id}) => id),
+        .map(({id}) => {
+          return id;
+        }),
     ).toEqual(['second']);
   });
 });

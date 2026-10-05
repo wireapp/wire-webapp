@@ -50,18 +50,30 @@ const fakeHttpClient: any = {
   accessTokenStore: {
     accessToken: accessTokenPayload,
   },
-  refreshAccessToken: () => Promise.resolve(accessTokenPayload),
-  hasValidAccessToken: () => true,
-  sendRequest: () => Promise.resolve({data: {}}),
+  refreshAccessToken: () => {
+    return Promise.resolve(accessTokenPayload);
+  },
+  hasValidAccessToken: () => {
+    return true;
+  },
+  sendRequest: () => {
+    return Promise.resolve({data: {}});
+  },
 };
 
 const invalidTokenHttpClient: any = {
   accessTokenStore: {
     accessToken: accessTokenPayload,
   },
-  refreshAccessToken: () => Promise.reject(new InvalidTokenError('Invalid token')),
-  hasValidAccessToken: () => true,
-  sendRequest: () => Promise.resolve({data: {}}),
+  refreshAccessToken: () => {
+    return Promise.reject(new InvalidTokenError('Invalid token'));
+  },
+  hasValidAccessToken: () => {
+    return true;
+  },
+  sendRequest: () => {
+    return Promise.resolve({data: {}});
+  },
 };
 
 const fakeSocket = {
@@ -189,7 +201,9 @@ describe('WebSocketClient', () => {
   });
 
   afterAll(() => {
-    webSocketClients.forEach(client => client.disconnect());
+    webSocketClients.forEach(client => {
+      client.disconnect();
+    });
   });
 
   describe('handler', () => {
@@ -239,7 +253,9 @@ describe('WebSocketClient', () => {
       const invalidTokenError = new InvalidTokenError(rawCredential);
       const httpClient = createWebSocketReconnectHttpClient({
         refreshAccessToken: jest.fn().mockRejectedValue(invalidTokenError),
-        hasValidAccessToken: () => true,
+        hasValidAccessToken: () => {
+          return true;
+        },
         sendRequest: jest.fn().mockResolvedValue({data: {}}),
       });
       const websocketClient = createWebSocketClientWithTestWallClock(testWebSocketBaseUrl, httpClient);
@@ -272,7 +288,9 @@ describe('WebSocketClient', () => {
       const networkError = new NetworkError('Failed to fetch');
       const httpClient = createWebSocketReconnectHttpClient({
         refreshAccessToken: jest.fn().mockRejectedValue(networkError),
-        hasValidAccessToken: () => true,
+        hasValidAccessToken: () => {
+          return true;
+        },
         sendRequest: jest.fn().mockResolvedValue({data: {}}),
       });
       const websocketClient = createWebSocketClientWithTestWallClock(testWebSocketBaseUrl, httpClient);
@@ -345,7 +363,9 @@ describe('WebSocketClient', () => {
       await websocketClient.connect();
 
       return new Promise<void>(resolve => {
-        websocketClient.on(WebSocketClient.TOPIC.ON_INVALID_TOKEN, () => resolve());
+        websocketClient.on(WebSocketClient.TOPIC.ON_INVALID_TOKEN, () => {
+          return resolve();
+        });
 
         fakeSocket.onerror(new Error('error'));
       });
@@ -366,7 +386,9 @@ describe('WebSocketClient', () => {
       });
       const httpClient = createWebSocketReconnectHttpClient({
         refreshAccessToken,
-        hasValidAccessToken: () => accessTokenIsValid,
+        hasValidAccessToken: () => {
+          return accessTokenIsValid;
+        },
         sendRequest: jest.fn().mockResolvedValue({data: {}}),
       });
       const websocketClient = createWebSocketClientWithTestWallClock(testWebSocketBaseUrl, httpClient);
@@ -403,7 +425,9 @@ describe('WebSocketClient', () => {
         });
       const httpClient = createWebSocketReconnectHttpClient({
         refreshAccessToken,
-        hasValidAccessToken: () => accessTokenIsValid,
+        hasValidAccessToken: () => {
+          return accessTokenIsValid;
+        },
         sendRequest: jest.fn().mockResolvedValue({data: {}}),
       });
       const websocketClient = createWebSocketClient(testWebSocketBaseUrl, httpClient, manualRetryWallClock.wallClock);
@@ -433,7 +457,9 @@ describe('WebSocketClient', () => {
       const sendRequest = jest.fn();
       const httpClient = createWebSocketReconnectHttpClient({
         refreshAccessToken: jest.fn().mockRejectedValue(invalidTokenError),
-        hasValidAccessToken: () => false,
+        hasValidAccessToken: () => {
+          return false;
+        },
         sendRequest,
       });
       const websocketClient = createWebSocketClientWithTestWallClock(testWebSocketBaseUrl, httpClient);
@@ -456,7 +482,9 @@ describe('WebSocketClient', () => {
       const sendRequest = jest.fn().mockResolvedValue({data: {}});
       const httpClient = createWebSocketReconnectHttpClient({
         refreshAccessToken,
-        hasValidAccessToken: () => true,
+        hasValidAccessToken: () => {
+          return true;
+        },
         sendRequest,
       });
       const websocketClient = createWebSocketClientWithTestWallClock(testWebSocketBaseUrl, httpClient);
@@ -502,7 +530,9 @@ describe('WebSocketClient', () => {
       const sendRequest = jest.fn().mockRejectedValue(preflightError);
       const httpClient = createWebSocketReconnectHttpClient({
         refreshAccessToken: jest.fn().mockResolvedValue(accessTokenPayload),
-        hasValidAccessToken: () => true,
+        hasValidAccessToken: () => {
+          return true;
+        },
         sendRequest,
       });
       const websocketClient = createWebSocketClientWithTestWallClock(testWebSocketBaseUrl, httpClient);
@@ -520,7 +550,9 @@ describe('WebSocketClient', () => {
       const sendRequest = jest.fn().mockResolvedValue({data: {}});
       const httpClient = createWebSocketReconnectHttpClient({
         refreshAccessToken,
-        hasValidAccessToken: () => true,
+        hasValidAccessToken: () => {
+          return true;
+        },
         sendRequest,
       });
       const websocketClient = createWebSocketClientWithTestWallClock(testWebSocketBaseUrl, httpClient);
@@ -540,8 +572,12 @@ describe('WebSocketClient', () => {
       return {
         ...fakeHttpClient,
         accessTokenStore: {
-          getAccessToken: () => accessToken,
-          getNextMarkerToken: () => nextMarkerToken,
+          getAccessToken: () => {
+            return accessToken;
+          },
+          getNextMarkerToken: () => {
+            return nextMarkerToken;
+          },
         },
       };
     }

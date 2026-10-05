@@ -26,6 +26,8 @@ import type {Translate} from './translationTypes';
 
 import {sortUsersByPriority} from '../stringUtil';
 
+const finalNamePairCount = 2;
+
 export function getSelfName(
   translation: Translate,
   declension = Declension.NOMINATIVE,
@@ -59,9 +61,13 @@ export function joinNames(
   skipAnd = false,
   boldNames = false,
 ): string {
-  const containsSelfUser = userEntities.some(userEntity => userEntity.isMe);
+  const containsSelfUser = userEntities.some(userEntity => {
+    return userEntity.isMe;
+  });
   if (containsSelfUser) {
-    userEntities = userEntities.filter(userEntity => !userEntity.isMe);
+    userEntities = userEntities.filter(userEntity => {
+      return !userEntity.isMe;
+    });
   }
 
   const userNames = userEntities.toSorted(sortUsersByPriority).map(userEntity => {
@@ -74,13 +80,13 @@ export function joinNames(
   }
 
   const numberOfNames = userNames.length;
-  const joinByAnd = !skipAnd && numberOfNames >= 2;
+  const joinByAnd = !skipAnd && numberOfNames >= finalNamePairCount;
   if (joinByAnd) {
-    const finalPairStartIndex = userNames.length - 2;
+    const finalPairStartIndex = userNames.length - finalNamePairCount;
     const [secondLastName, lastName] = userNames.slice(finalPairStartIndex);
-    const userNamesWithoutFinalPair = userNames.toSpliced(finalPairStartIndex, 2);
+    const userNamesWithoutFinalPair = userNames.toSpliced(finalPairStartIndex, finalNamePairCount);
 
-    const exactlyTwoNames = numberOfNames === 2;
+    const exactlyTwoNames = numberOfNames === finalNamePairCount;
     const additionalNames = exactlyTwoNames
       ? `${secondLastName} ${translation('and')} ${lastName}`
       : `${secondLastName}${translation('enumerationAnd')}${lastName}`;

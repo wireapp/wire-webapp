@@ -21,6 +21,9 @@ import {isNonEmptyArray, isNonEmptyString} from '@sindresorhus/is';
 
 import {Config, Configuration} from '../Config';
 
+const redactedValuePrefixLength = 3;
+const loggedUserIdentifierPrefixLength = 8;
+
 const uuidRegex = /([a-z\d]{8})-([a-z\d]{4})-([a-z\d]{4})-([a-z\d]{4})-([a-z\d]{12})/gim;
 
 let isDataDogInitialized = false;
@@ -46,14 +49,24 @@ export async function initializeDataDog(config: Configuration, user: {id?: strin
 
   const {domain, id: userId} = user ?? {};
 
-  const replacer = (_match: string, p1: string) => `${p1}***`;
-  const truncateDomain = (value: string) => `${value.substring(0, 3)}***`;
-  const replaceAllStrings = (string: string) => string.replaceAll(uuidRegex, replacer);
-  const replaceDomains = (string: string) =>
-    isNonEmptyString(domain) ? string.replaceAll(domain, truncateDomain(domain)) : string;
-  const removeColors = (string: string) =>
-    string.replaceAll(/%c/g, '').replaceAll(/color:[^;]+; font-weight:[^;]+; /g, '');
-  const removeTimestamp = (string: string) => string.replaceAll(/\[\d+-\d+-\d+ \d+:\d+:\d+\] /g, '');
+  const replacer = (_match: string, p1: string) => {
+    return `${p1}***`;
+  };
+  const truncateDomain = (value: string) => {
+    return `${value.substring(0, redactedValuePrefixLength)}***`;
+  };
+  const replaceAllStrings = (string: string) => {
+    return string.replaceAll(uuidRegex, replacer);
+  };
+  const replaceDomains = (string: string) => {
+    return isNonEmptyString(domain) ? string.replaceAll(domain, truncateDomain(domain)) : string;
+  };
+  const removeColors = (string: string) => {
+    return string.replaceAll(/%c/g, '').replaceAll(/color:[^;]+; font-weight:[^;]+; /g, '');
+  };
+  const removeTimestamp = (string: string) => {
+    return string.replaceAll(/\[\d+-\d+-\d+ \d+:\d+:\d+\] /g, '');
+  };
 
   const commonConfig = {
     clientToken,
@@ -109,7 +122,7 @@ export async function initializeDataDog(config: Configuration, user: {id?: strin
   });
 
   if (isNonEmptyString(userId)) {
-    const id = userId.substring(0, 8);
+    const id = userId.substring(0, loggedUserIdentifierPrefixLength);
     datadogRum.setUser({id});
     datadogLogs.setUser({id});
   }

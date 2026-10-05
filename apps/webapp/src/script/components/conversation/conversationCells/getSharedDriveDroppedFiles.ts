@@ -50,12 +50,15 @@ export interface SharedDriveDropReadError {
   readonly path: string;
 }
 
-const toReadError =
-  (path: string) =>
-  (cause: unknown): SharedDriveDropReadError => ({cause, path});
+const toReadError = (path: string) => {
+  return (cause: unknown): SharedDriveDropReadError => {
+    return {cause, path};
+  };
+};
 
 const withRelativePath = (file: File, entry: DroppedFileEntry): File => {
-  const relativePath = entry.fullPath.replace(/^\/+/, '') || entry.name;
+  const normalizedRelativePath = entry.fullPath.replace(/^\/+/, '');
+  const relativePath = normalizedRelativePath.length > 0 ? normalizedRelativePath : entry.name;
   if (relativePath === file.name) {
     return file;
   }
@@ -68,48 +71,50 @@ const withRelativePath = (file: File, entry: DroppedFileEntry): File => {
   return fileWithRelativePath;
 };
 
-const readFileEntry = (entry: DroppedFileEntry): Task<File[], SharedDriveDropReadError> =>
-  task.tryOrElse(
-    toReadError(entry.fullPath),
-    () =>
-      new Promise<File[]>((resolve, reject) => {
-        entry.file(file => resolve([withRelativePath(file, entry)]), reject);
-      }),
-  );
+const readFileEntry = (entry: DroppedFileEntry): Task<File[], SharedDriveDropReadError> => {
+  return task.tryOrElse(toReadError(entry.fullPath), () => {
+    return new Promise<File[]>((resolve, reject) => {
+      entry.file(file => {
+        return resolve([withRelativePath(file, entry)]);
+      }, reject);
+    });
+  });
+};
 
-const readDirectoryEntries = (entry: DroppedDirectoryEntry): Task<DroppedEntry[], SharedDriveDropReadError> =>
-  task.tryOrElse(
-    toReadError(entry.fullPath),
-    () =>
-      new Promise<DroppedEntry[]>((resolve, reject) => {
-        const reader = entry.createReader();
-        const entries: DroppedEntry[] = [];
-        const readNextBatch = (): void => {
-          // Chromium returns directory entries in batches, so reading must continue
-          // until an empty batch signals that the directory is exhausted.
-          reader.readEntries(batch => {
-            if (batch.length === 0) {
-              resolve(entries);
-              return;
-            }
+const readDirectoryEntries = (entry: DroppedDirectoryEntry): Task<DroppedEntry[], SharedDriveDropReadError> => {
+  return task.tryOrElse(toReadError(entry.fullPath), () => {
+    return new Promise<DroppedEntry[]>((resolve, reject) => {
+      const reader = entry.createReader();
+      const entries: DroppedEntry[] = [];
+      const readNextBatch = (): void => {
+        // Chromium returns directory entries in batches, so reading must continue
+        // until an empty batch signals that the directory is exhausted.
+        reader.readEntries(batch => {
+          if (batch.length === 0) {
+            resolve(entries);
+            return;
+          }
 
-            entries.push(...batch);
-            readNextBatch();
-          }, reject);
-        };
+          entries.push(...batch);
+          readNextBatch();
+        }, reject);
+      };
 
-        readNextBatch();
-      }),
-  );
+      readNextBatch();
+    });
+  });
+};
 
 const readEntryFiles = (entry: DroppedEntry): Task<File[], SharedDriveDropReadError> => {
   if (entry.isFile) {
     return readFileEntry(entry);
   }
 
-  return readDirectoryEntries(entry).andThen(childEntries =>
-    task.all(childEntries.map(readEntryFiles)).map(childFiles => childFiles.flat()),
-  );
+  return readDirectoryEntries(entry).andThen(childEntries => {
+    return task.all(childEntries.map(readEntryFiles)).map(childFiles => {
+      return childFiles.flat();
+    });
+  });
 };
 
 /**
@@ -118,17 +123,28 @@ const readEntryFiles = (entry: DroppedEntry): Task<File[], SharedDriveDropReadEr
  * Every drop returns a Task so callers use one success/failure flow; ordinary
  * files still resolve directly from dataTransfer.files without entry traversal.
  */
-export const getSharedDriveDroppedFiles = (dataTransfer: DataTransfer): Task<File[], SharedDriveDropReadError> =>
-  task
-    .tryOrElse(toReadError(''), async () =>
-      Array.from(dataTransfer.items ?? [])
-        .map(item => (item as unknown as DataTransferItemWithEntry).webkitGetAsEntry?.() ?? null)
-        .filter((entry): entry is DroppedEntry => entry !== null),
-    )
+export const getSharedDriveDroppedFiles = (dataTransfer: DataTransfer): Task<File[], SharedDriveDropReadError> => {
+  return task
+    .tryOrElse(toReadError(''), async () => {
+      return Array.from(dataTransfer.items ?? [])
+        .map(item => {
+          return (item as unknown as DataTransferItemWithEntry).webkitGetAsEntry?.() ?? null;
+        })
+        .filter((entry): entry is DroppedEntry => {
+          return entry !== null;
+        });
+    })
     .andThen(entries => {
-      if (!entries.some(entry => entry.isDirectory)) {
+      if (
+        !entries.some(entry => {
+          return entry.isDirectory;
+        })
+      ) {
         return task.resolve(Array.from(dataTransfer.files));
       }
 
-      return task.all(entries.map(readEntryFiles)).map(files => files.flat());
+      return task.all(entries.map(readEntryFiles)).map(files => {
+        return files.flat();
+      });
     });
+};

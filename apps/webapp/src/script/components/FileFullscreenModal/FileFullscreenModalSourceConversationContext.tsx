@@ -31,10 +31,14 @@ interface FileFullscreenModalSourceConversationProviderProps {
 export const FileFullscreenModalSourceConversationProvider = ({
   children,
   sourceConversation,
-}: FileFullscreenModalSourceConversationProviderProps) => (
-  <FileFullscreenModalSourceConversationContext.Provider value={sourceConversation}>
-    {children}
-  </FileFullscreenModalSourceConversationContext.Provider>
-);
+}: FileFullscreenModalSourceConversationProviderProps) => {
+  return (
+    <FileFullscreenModalSourceConversationContext.Provider value={sourceConversation}>
+      {children}
+    </FileFullscreenModalSourceConversationContext.Provider>
+  );
+};
 
-export const useFileFullscreenModalSourceConversation = () => useContext(FileFullscreenModalSourceConversationContext);
+export const useFileFullscreenModalSourceConversation = () => {
+  return useContext(FileFullscreenModalSourceConversationContext);
+};

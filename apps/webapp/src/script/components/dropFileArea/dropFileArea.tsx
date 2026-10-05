@@ -24,7 +24,9 @@ interface DropFileAreaProps extends HTMLAttributes<HTMLDivElement> {
   onFileDropped: (files: File[]) => void;
 }
 
-const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => event.preventDefault();
+const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+  return event.preventDefault();
+};
 
 export const DropFileArea = forwardRef<HTMLDivElement, DropFileAreaProps>(
   ({children, onFileDropped, ...props}, ref) => {

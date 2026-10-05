@@ -83,8 +83,9 @@ import {ListViewModel} from '../../../../view_model/ListViewModel';
 import {ListWrapper} from '../listWrapper';
 import {StartUI} from '../startUi';
 
-export const shouldClearDeepLinkForTab = (tab: SidebarTabs): boolean =>
-  ![SidebarTabs.PREFERENCES, SidebarTabs.MEETINGS].includes(tab);
+export const shouldClearDeepLinkForTab = (tab: SidebarTabs): boolean => {
+  return ![SidebarTabs.PREFERENCES, SidebarTabs.MEETINGS].includes(tab);
+};
 
 type FocusConversation = (conversationId: string) => boolean | 'pending';
 
@@ -124,9 +125,13 @@ export const Conversations = ({
   const {translate} = useApplicationContext();
   const [conversationListRef, setConversationListRef] = useState<HTMLElement | null>(null);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
-  const focusConversationRef = useRef<FocusConversation>(() => false);
+  const focusConversationRef = useRef<FocusConversation>(() => {
+    return false;
+  });
   const cancelPendingFocusRef = useRef<(() => void) | null>(null);
-  const focusConversation = useCallback((conversationId: string) => focusConversationRef.current(conversationId), []);
+  const focusConversation = useCallback((conversationId: string) => {
+    return focusConversationRef.current(conversationId);
+  }, []);
 
   const {
     currentTab,
@@ -136,7 +141,11 @@ export const Conversations = ({
     setConversationListStatus,
     setCurrentTab,
     resetDisabledFeatureTabs,
-  } = useSidebarStore(useShallow(state => state));
+  } = useSidebarStore(
+    useShallow(state => {
+      return state;
+    }),
+  );
   const {isChannelsEnabled} = useChannelsFeatureFlag();
   const [conversationsFilter, setConversationsFilter] = useState<string>('');
   const {classifiedDomains, isTeam} = useKoSubscribableChildren(teamState, ['classifiedDomains', 'isTeam']);
@@ -166,7 +175,9 @@ export const Conversations = ({
     'channelAndGroupConversations',
   ]);
 
-  const conversations = useMemo(() => visibleConversations, [visibleConversations]);
+  const conversations = useMemo(() => {
+    return visibleConversations;
+  }, [visibleConversations]);
 
   const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
 
@@ -187,9 +198,15 @@ export const Conversations = ({
 
   const showSearchInput = isConversationListTab(currentTab);
 
-  const {setCurrentView} = useAppMainState(useShallow(state => state.responsiveView));
+  const {setCurrentView} = useAppMainState(
+    useShallow(state => {
+      return state.responsiveView;
+    }),
+  );
   const {openFolder, closeFolder, expandedFolder, isFoldersTabOpen, toggleFoldersTab} = useFolderStore(
-    useShallow(state => state),
+    useShallow(state => {
+      return state;
+    }),
   );
   // false when screen is larger than 1000px
   // true when screen is smaller than 1000px
@@ -246,8 +263,12 @@ export const Conversations = ({
   });
 
   const currentFolder = labels
-    .map(label => createLabel(label.name, conversationLabelRepository.getLabelConversations(label), label.id))
-    .find(folder => folder.id === expandedFolder);
+    .map(label => {
+      return createLabel(label.name, conversationLabelRepository.getLabelConversations(label), label.id);
+    })
+    .find(folder => {
+      return folder.id === expandedFolder;
+    });
 
   const groupParticipantsConversations = getGroupParticipantsConversations({
     currentTab,
@@ -265,25 +286,23 @@ export const Conversations = ({
     ![SidebarTabs.DIRECTS, SidebarTabs.GROUPS, SidebarTabs.FAVORITES].includes(currentTab) &&
     groupParticipantsConversations.length > 0;
 
-  const conversationsForFocus = useMemo(
-    () =>
-      getConversationFocusCandidates({
-        conversations: currentTabConversations,
-        conversationsFilter,
-        currentFolder,
-        currentTab,
-        groupParticipantsConversations,
-        isGroupParticipantsVisible,
-      }),
-    [
-      currentTab,
-      currentTabConversations,
+  const conversationsForFocus = useMemo(() => {
+    return getConversationFocusCandidates({
+      conversations: currentTabConversations,
       conversationsFilter,
       currentFolder,
+      currentTab,
       groupParticipantsConversations,
       isGroupParticipantsVisible,
-    ],
-  );
+    });
+  }, [
+    currentTab,
+    currentTabConversations,
+    conversationsFilter,
+    currentFolder,
+    groupParticipantsConversations,
+    isGroupParticipantsVisible,
+  ]);
   const {
     currentFocus,
     focusMountedConversation,
@@ -353,7 +372,9 @@ export const Conversations = ({
     };
 
     amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, handleConversationShow);
-    return () => amplify.unsubscribe(WebAppEvents.CONVERSATION.SHOW, handleConversationShow);
+    return () => {
+      return amplify.unsubscribe(WebAppEvents.CONVERSATION.SHOW, handleConversationShow);
+    };
   }, [currentTab, currentTabConversations, setCurrentTab]);
 
   useEffect(() => {
@@ -375,7 +396,9 @@ export const Conversations = ({
     };
   }, [activeConversation, openFolder]);
 
-  const clearConversationFilter = useCallback(() => setConversationsFilter(''), []);
+  const clearConversationFilter = useCallback(() => {
+    return setConversationsFilter('');
+  }, []);
 
   const switchList = listViewModel.switchList;
   const switchContent = listViewModel.contentViewModel.switchContent;
@@ -441,7 +464,9 @@ export const Conversations = ({
   );
 
   useEffect(() => {
-    const openFavorites = () => changeTab(SidebarTabs.FAVORITES);
+    const openFavorites = () => {
+      return changeTab(SidebarTabs.FAVORITES);
+    };
     conversationLabelRepository.addEventListener('conversation-favorited', openFavorites);
     return () => {
       conversationLabelRepository.removeEventListener('conversation-favorited', openFavorites);

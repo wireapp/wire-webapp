@@ -37,6 +37,8 @@ type MeetingReminderOsNotifierLogger = {
 export type CreateMeetingReminderOsNotifierDependencies = {
   notificationApi: SystemNotificationApi;
   openMeetingsList: () => void;
+  openMeetingPrep: (payload: MeetingReminderFirePayload) => void;
+  currentReminderPayload: (payload: MeetingReminderFirePayload) => Maybe<MeetingReminderFirePayload>;
   formatMeetingTime: (meetingStartTime: string) => string;
   translate: Translate;
   logger: MeetingReminderOsNotifierLogger;
@@ -49,8 +51,9 @@ export type MeetingReminderOsNotifier = {
 
 const grantedPermission: SystemNotificationPermission = 'granted';
 
-export const toMeetingReminderNotificationTag = (payload: MeetingReminderFirePayload): string =>
-  `meeting-reminder:${toMeetingIdKey(payload.qualifiedId)}:${payload.meetingStartTime}`;
+export const toMeetingReminderNotificationTag = (payload: MeetingReminderFirePayload): string => {
+  return `meeting-reminder:${toMeetingIdKey(payload.qualifiedId)}:${payload.meetingStartTime}`;
+};
 
 /**
  * Presents a meeting reminder as an OS/browser notification.
@@ -63,6 +66,8 @@ export const toMeetingReminderNotificationTag = (payload: MeetingReminderFirePay
 export const createMeetingReminderOsNotifier = ({
   notificationApi,
   openMeetingsList,
+  openMeetingPrep,
+  currentReminderPayload,
   formatMeetingTime,
   translate,
   logger,
@@ -115,10 +120,13 @@ export const createMeetingReminderOsNotifier = ({
         title: payload.meetingTitle,
         body: translate('meetings.notifications.startsAt', {time: formatMeetingTime(payload.meetingStartTime)}),
         tag,
+        requireInteraction: true,
         onClick: () => {
-          // WPB-28121 will additionally open the meeting prep modal from here. Until it ships,
-          // focusing Wire on the meetings list is the whole click behaviour.
           openMeetingsList();
+          const currentPayload = currentReminderPayload(payload);
+          if (maybe.isJust(currentPayload)) {
+            openMeetingPrep(currentPayload.value);
+          }
           closeAndForget(tag);
         },
         onClose: () => {

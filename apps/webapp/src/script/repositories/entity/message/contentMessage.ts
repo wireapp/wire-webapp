@@ -89,7 +89,9 @@ export class ContentMessage extends Message {
    */
   isUserMentioned(userId: QualifiedId): boolean {
     return this.hasAssetText()
-      ? this.assets().some(assetEntity => assetEntity.isText() && assetEntity.isUserMentioned(userId))
+      ? this.assets().some(assetEntity => {
+          return assetEntity.isText() && assetEntity.isUserMentioned(userId);
+        })
       : false;
   }
 

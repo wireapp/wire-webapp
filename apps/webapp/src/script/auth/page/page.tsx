@@ -70,10 +70,12 @@ const PageComponent = ({
 };
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
-const mapStateToProps = (state: RootState) => ({
-  account: AuthSelector.getAccount(state),
-  isStateAuthenticated: AuthSelector.isAuthenticated(state),
-});
+const mapStateToProps = (state: RootState) => {
+  return {
+    account: AuthSelector.getAccount(state),
+    isStateAuthenticated: AuthSelector.isAuthenticated(state),
+  };
+};
 
 const Page = connect(mapStateToProps)(PageComponent);
 

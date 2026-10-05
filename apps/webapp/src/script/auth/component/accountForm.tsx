@@ -170,7 +170,9 @@ const AccountFormComponent = ({
             break;
           }
           default: {
-            const isValidationError = Object.values(ValidationError.ERROR).some(errorType => label.endsWith(errorType));
+            const isValidationError = Object.values(ValidationError.ERROR).some(errorType => {
+              return label.endsWith(errorType);
+            });
             if (!isValidationError) {
               throw error;
             }
@@ -208,7 +210,11 @@ const AccountFormComponent = ({
           value={registrationData.name}
           autoComplete="section-create-team username"
           placeholder={translate('accountForm.namePlaceholder')}
-          onKeyDown={event => handleEnterDown(event, () => inputs.email.current?.focus())}
+          onKeyDown={event => {
+            handleEnterDown(event, () => {
+              inputs.email.current?.focus();
+            });
+          }}
           maxLength={64}
           minLength={2}
           pattern=".{2,64}"
@@ -229,7 +235,11 @@ const AccountFormComponent = ({
           value={registrationData.email}
           autoComplete="section-create-team email"
           placeholder={translate('accountForm.emailPersonalPlaceholder')}
-          onKeyDown={event => handleEnterDown(event, () => inputs.password.current?.focus())}
+          onKeyDown={event => {
+            handleEnterDown(event, () => {
+              inputs.password.current?.focus();
+            });
+          }}
           maxLength={128}
           type="email"
           data-uie-name="enter-email"
@@ -267,8 +277,12 @@ const AccountFormComponent = ({
           id="confirmPassword"
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
             inputs.confirmPassword.current?.setCustomValidity('');
-            setRegistrationData(prevState => ({...prevState, confirmPassword: event.target.value}));
-            setValidInputs(prevState => ({...prevState, confirmPassword: true}));
+            setRegistrationData(prevState => {
+              return {...prevState, confirmPassword: event.target.value};
+            });
+            setValidInputs(prevState => {
+              return {...prevState, confirmPassword: true};
+            });
           }}
           ref={inputs.confirmPassword}
           markInvalid={!validInputs.confirmPassword}
@@ -368,21 +382,24 @@ const AccountFormComponent = ({
 };
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
-const mapStateToProps = (state: RootState) => ({
-  account: AuthSelector.getAccount(state),
-  authError: AuthSelector.getError(state),
-  isFetching: AuthSelector.isFetching(state),
-});
+const mapStateToProps = (state: RootState) => {
+  return {
+    account: AuthSelector.getAccount(state),
+    authError: AuthSelector.getError(state),
+    isFetching: AuthSelector.isFetching(state),
+  };
+};
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
-  bindActionCreators(
+const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => {
+  return bindActionCreators(
     {
       doSendActivationCode: ROOT_ACTIONS.userAction.doSendActivationCode,
       pushAccountRegistrationData: ROOT_ACTIONS.authAction.pushAccountRegistrationData,
     },
     dispatch,
   );
+};
 
 const AccountForm = connect(mapStateToProps, mapDispatchToProps)(AccountFormComponent);
 

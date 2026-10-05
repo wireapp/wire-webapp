@@ -60,6 +60,8 @@ export class Text extends Asset {
   }
 
   isUserMentioned(userId: QualifiedId): boolean {
-    return this.mentions().some(MentionEntity => MentionEntity.targetsUser(userId));
+    return this.mentions().some(MentionEntity => {
+      return MentionEntity.targetsUser(userId);
+    });
   }
 }

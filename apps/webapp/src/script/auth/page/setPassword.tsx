@@ -145,20 +145,23 @@ const SetPasswordComponent = ({
 };
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
-const mapStateToProps = (state: RootState) => ({
-  hasSelfPassword: SelfSelector.hasSelfPassword(state),
-  isFetching: SelfSelector.isFetching(state),
-  isSelfSSOUser: SelfSelector.isSSOUser(state),
-});
+const mapStateToProps = (state: RootState) => {
+  return {
+    hasSelfPassword: SelfSelector.hasSelfPassword(state),
+    isFetching: SelfSelector.isFetching(state),
+    isSelfSSOUser: SelfSelector.isSSOUser(state),
+  };
+};
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
-  bindActionCreators(
+const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => {
+  return bindActionCreators(
     {
       doSetPassword: actionRoot.selfAction.doSetPassword,
     },
     dispatch,
   );
+};
 
 const SetPassword = connect(mapStateToProps, mapDispatchToProps)(SetPasswordComponent);
 

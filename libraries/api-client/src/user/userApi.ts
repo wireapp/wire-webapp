@@ -49,6 +49,9 @@ import {
   VerifyDelete,
 } from '../user/';
 
+const defaultUsersChunkSize = 50;
+const defaultUsersPrekeyBundleChunkSize = 128;
+
 type PrekeysResponse = {
   qualified_user_client_prekeys: QualifiedUserPreKeyBundleMap;
   failed_to_list?: QualifiedId[];
@@ -74,8 +77,8 @@ const apiBreakpoint = {
 };
 
 export class UserAPI {
-  public static readonly DEFAULT_USERS_CHUNK_SIZE = 50;
-  public static readonly DEFAULT_USERS_PREKEY_BUNDLE_CHUNK_SIZE = 128;
+  public static readonly DEFAULT_USERS_CHUNK_SIZE = defaultUsersChunkSize;
+  public static readonly DEFAULT_USERS_PREKEY_BUNDLE_CHUNK_SIZE = defaultUsersPrekeyBundleChunkSize;
   public static readonly URL = {
     ACTIVATE: 'activate',
     BY_HANDLE: 'by-handle',
@@ -310,7 +313,9 @@ export class UserAPI {
     };
 
     return {
-      cancel: () => cancelSource.cancel(SyntheticErrorLabel.REQUEST_CANCELLED),
+      cancel: () => {
+        return cancelSource.cancel(SyntheticErrorLabel.REQUEST_CANCELLED);
+      },
       response: handleRequest(),
     };
   }
@@ -391,14 +396,22 @@ export class UserAPI {
     if ('handles' in parameters && Boolean(parameters.handles.length)) {
       const uniqueHandles = ArrayUtil.removeDuplicates(parameters.handles);
       const handleChunks = ArrayUtil.chunk(uniqueHandles, limit);
-      const resolvedTasks = await Promise.all(handleChunks.map(handleChunk => fetchUsers({handles: handleChunk})));
+      const resolvedTasks = await Promise.all(
+        handleChunks.map(handleChunk => {
+          return fetchUsers({handles: handleChunk});
+        }),
+      );
       return ArrayUtil.flatten(resolvedTasks);
     }
 
     if ('ids' in parameters && Boolean(parameters.ids.length)) {
       const uniqueIds = ArrayUtil.removeDuplicates(parameters.ids);
       const idChunks = ArrayUtil.chunk(uniqueIds, limit);
-      const resolvedTasks = await Promise.all(idChunks.map(idChunk => fetchUsers({ids: idChunk})));
+      const resolvedTasks = await Promise.all(
+        idChunks.map(idChunk => {
+          return fetchUsers({ids: idChunk});
+        }),
+      );
       return ArrayUtil.flatten(resolvedTasks);
     }
 
@@ -595,8 +608,12 @@ export class UserAPI {
         'qualified_ids' in users
       ) {
         const selfDomain = this.backendFeatures.domain;
-        const sameBackendUsers = users.qualified_ids.filter(userId => userId.domain === selfDomain);
-        const federatedUsers = users.qualified_ids.filter(userId => userId.domain !== selfDomain);
+        const sameBackendUsers = users.qualified_ids.filter(userId => {
+          return userId.domain === selfDomain;
+        });
+        const federatedUsers = users.qualified_ids.filter(userId => {
+          return userId.domain !== selfDomain;
+        });
 
         const {data: sameBackendUserData} = await this.client.sendJSON<User[]>({
           data: {qualified_ids: sameBackendUsers},
@@ -636,10 +653,12 @@ export class UserAPI {
   ): Promise<PrekeysResponse> {
     const flattenUsers = Object.entries(userClientMap).reduce(
       (users, [domain, domainUsersClients]) => {
-        const domainUsers = Object.entries(domainUsersClients).map(([userId, clients]) => ({
-          userId: {id: userId, domain},
-          clients,
-        }));
+        const domainUsers = Object.entries(domainUsersClients).map(([userId, clients]) => {
+          return {
+            userId: {id: userId, domain},
+            clients,
+          };
+        });
         return users.concat(domainUsers);
       },
       [] as {userId: QualifiedId; clients: string[]}[],
@@ -657,7 +676,9 @@ export class UserAPI {
           };
         }, {});
       })
-      .map(chunkedMap => this.postMultiPreKeyBundlesChunk(chunkedMap));
+      .map(chunkedMap => {
+        return this.postMultiPreKeyBundlesChunk(chunkedMap);
+      });
 
     const userPreKeyBundleMapChunks = await Promise.all(chunksPromises);
 

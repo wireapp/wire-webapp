@@ -20,7 +20,7 @@
 import type {ReactNode} from 'react';
 import {useCallback, useEffect, useMemo, useRef} from 'react';
 
-import {isNonEmptyString} from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -153,7 +153,7 @@ export const TitleBar = ({
   }, [hasApps, hasDirectGuest, hasExternal, hasFederatedUsers, hasService, is1to1, isRequest]);
 
   const hasCall = useMemo(() => {
-    const hasEntities = !!joinedCall;
+    const hasEntities = !isNullOrUndefined(joinedCall);
     return hasEntities && matchQualifiedIds(conversation.qualifiedId, joinedCall.conversation.qualifiedId);
   }, [conversation, joinedCall]);
 
@@ -167,9 +167,13 @@ export const TitleBar = ({
   const mdBreakpoint = useMatchMedia('max-width: 1000px');
   const smBreakpoint = useMatchMedia(QUERY.tabletSMDown);
 
-  const {close: closeRightSidebar} = useAppMainState(state => state.rightSidebar);
+  const {close: closeRightSidebar} = useAppMainState(state => {
+    return state.rightSidebar;
+  });
 
-  const {setCurrentView: setView} = useAppMainState(state => state.responsiveView);
+  const {setCurrentView: setView} = useAppMainState(state => {
+    return state.responsiveView;
+  });
 
   const setLeftSidebar = () => {
     setView(ViewType.MOBILE_LEFT_SIDEBAR);
@@ -203,9 +207,13 @@ export const TitleBar = ({
 
   useEffect(() => {
     // TODO remove the titlebar for now to ensure that buttons are clickable in macOS wrappers
-    window.setTimeout(() => document.querySelector('.titlebar')?.remove(), TIME_IN_MILLIS.SECOND);
+    window.setTimeout(() => {
+      return document.querySelector('.titlebar')?.remove();
+    }, TIME_IN_MILLIS.SECOND);
 
-    amplify.subscribe(WebAppEvents.SHORTCUT.PEOPLE, () => showDetails(false));
+    amplify.subscribe(WebAppEvents.SHORTCUT.PEOPLE, () => {
+      return showDetails(false);
+    });
     amplify.subscribe(WebAppEvents.SHORTCUT.ADD_PEOPLE, () => {
       if (isActivatedAccount) {
         showAddParticipant();
@@ -218,9 +226,13 @@ export const TitleBar = ({
     };
   }, [isActivatedAccount, showAddParticipant, showDetails]);
 
-  const onClickCollectionButton = () => amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentState.COLLECTION);
+  const onClickCollectionButton = () => {
+    return amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentState.COLLECTION);
+  };
 
-  const onClickDetails = () => showDetails(false);
+  const onClickDetails = () => {
+    return showDetails(false);
+  };
 
   const startCallAndShowAlert = () => {
     if (isStartingCallRef.current || isCallButtonDisabled) {
@@ -250,7 +262,7 @@ export const TitleBar = ({
   };
 
   useEffect(() => {
-    if (!activeCalls.length && currentFocusedElementRef.current) {
+    if (activeCalls.length === 0 && !isNullOrUndefined(currentFocusedElementRef.current)) {
       currentFocusedElementRef.current.focus();
       currentFocusedElementRef.current = null;
     }
@@ -310,13 +322,13 @@ export const TitleBar = ({
           onClick={onClickDetails}
           title={conversationDetailsTooltip}
           aria-label={conversationDetailsTooltip}
-          onKeyDown={event =>
-            handleKeyDown({
+          onKeyDown={event => {
+            return handleKeyDown({
               event,
               callback: onClickDetails,
               keys: [KEY.ENTER, KEY.SPACE],
-            })
-          }
+            });
+          }}
           data-placement="bottom"
           role="button"
           tabIndex={TabIndex.FOCUSABLE}
@@ -339,7 +351,11 @@ export const TitleBar = ({
             <ConversationVerificationBadges conversation={conversation} />
           </div>
 
-          {conversationSubtitle && <div className="conversation-title-bar-name--subtitle">{conversationSubtitle}</div>}
+          {isNonEmptyString(conversationSubtitle) ? (
+            <div className="conversation-title-bar-name--subtitle">{conversationSubtitle}</div>
+          ) : (
+            conversationSubtitle
+          )}
         </div>
       </li>
 

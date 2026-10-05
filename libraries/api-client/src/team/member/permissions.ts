@@ -17,6 +17,7 @@
  *
  */
 
+/* eslint-disable @typescript-eslint/no-magic-numbers -- Permission members document their backend bit positions inline. */
 export enum Permissions {
   DEFAULT = 0,
   CREATE_CONVERSATION = 1 << 0,
@@ -33,6 +34,7 @@ export enum Permissions {
   DELETE_TEAM = 1 << 11,
   SET_MEMBER_PERMISSIONS = 1 << 12,
 }
+/* eslint-enable @typescript-eslint/no-magic-numbers */
 
 export const hasPermissions = (permissions: number, expectedPermissions: Permissions): boolean => {
   const validPermissions = Number.isSafeInteger(permissions) && permissions > 0;
@@ -40,5 +42,7 @@ export const hasPermissions = (permissions: number, expectedPermissions: Permiss
 };
 
 export const combinePermissions = (permissionList: Permissions[]): Permissions => {
-  return permissionList.reduce<number>((acc, permission) => acc | permission, 0);
+  return permissionList.reduce<number>((acc, permission) => {
+    return acc | permission;
+  }, 0);
 };

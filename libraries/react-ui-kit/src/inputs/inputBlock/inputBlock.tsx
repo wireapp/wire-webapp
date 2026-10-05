@@ -27,18 +27,22 @@ import {INPUT_SUBMIT_COMBO_CLASSNAME} from '../inputSubmitCombo';
 
 export type InputBlockProps<T = HTMLDivElement> = React.HTMLProps<T>;
 
-const inputBlockStyle: (props: InputBlockProps) => CSSObject = _ => ({
-  backgroundColor: COLOR.GRAY_LIGHTEN_88,
-  borderRadius: '4px',
-  boxShadow: `inset 16px 16px 0 ${COLOR.WHITE}, inset -16px -16px 0 ${COLOR.WHITE}`,
-  marginBottom: '16px',
-  [`.${INPUT_CLASSNAME}, .${INPUT_SUBMIT_COMBO_CLASSNAME}`]: {
-    marginBottom: '1px !important',
-    marginTop: '0 !important',
-  },
-  [`.${INPUT_GROUP}`]: {
-    marginBottom: 0,
-  },
-});
+const inputBlockStyle: (props: InputBlockProps) => CSSObject = _ => {
+  return {
+    backgroundColor: COLOR.GRAY_LIGHTEN_88,
+    borderRadius: '4px',
+    boxShadow: `inset 16px 16px 0 ${COLOR.WHITE}, inset -16px -16px 0 ${COLOR.WHITE}`,
+    marginBottom: '16px',
+    [`.${INPUT_CLASSNAME}, .${INPUT_SUBMIT_COMBO_CLASSNAME}`]: {
+      marginBottom: '1px !important',
+      marginTop: '0 !important',
+    },
+    [`.${INPUT_GROUP}`]: {
+      marginBottom: 0,
+    },
+  };
+};
 
-export const InputBlock = (props: InputBlockProps) => <div css={inputBlockStyle(props)} {...props} />;
+export const InputBlock = (props: InputBlockProps) => {
+  return <div css={inputBlockStyle(props)} {...props} />;
+};

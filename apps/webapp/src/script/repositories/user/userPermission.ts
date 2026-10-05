@@ -28,6 +28,7 @@ import {TeamError} from '../../error/teamError';
 /**
  * Enum for various team permissions.
  */
+/* eslint-disable @typescript-eslint/no-magic-numbers -- Team features document their backend permission bit positions inline. */
 const TEAM_FEATURES = {
   NONE: 0,
   CREATE_CONVERSATION: 1 << 0,
@@ -44,6 +45,7 @@ const TEAM_FEATURES = {
   DELETE_TEAM: 1 << 11,
   SET_MEMBER_PERMISSIONS: 1 << 12,
 };
+/* eslint-enable @typescript-eslint/no-magic-numbers */
 
 /*
  * While the values for team features are set by the backend,
@@ -165,9 +167,11 @@ export function roleFromTeamPermissions(permissions: PermissionsData): ROLE {
   }
 
   const invalidRoles = [ROLE.INVALID, ROLE.NONE];
-  const detectedRole = RolesByPriority.filter(role => !invalidRoles.includes(role)).find(role =>
-    hasPermissionForRole(permissions.self, role),
-  );
+  const detectedRole = RolesByPriority.filter(role => {
+    return !invalidRoles.includes(role);
+  }).find(role => {
+    return hasPermissionForRole(permissions.self, role);
+  });
 
   return isNonEmptyString(detectedRole) ? detectedRole : ROLE.INVALID;
 }
@@ -184,7 +188,9 @@ export function generatePermissionHelpers(boundRole = ROLE.NONE): Record<string,
   return Object.entries(FEATURES).reduce<Record<string, (role: ROLE) => boolean>>(
     (helpers, [featureKey, featureValue]: [string, number]) => {
       const camelCasedFeature = featureKey.toLowerCase().split('_').map(capitalizeFirstChar).join('');
-      helpers[`can${camelCasedFeature}`] = (role = boundRole) => hasAccessToFeature(featureValue, role);
+      helpers[`can${camelCasedFeature}`] = (role = boundRole) => {
+        return hasAccessToFeature(featureValue, role);
+      };
       return helpers;
     },
     {},
@@ -197,7 +203,9 @@ export function hasAccessToFeature(feature: number, role: ROLE): boolean {
 }
 
 export function combinePermissions(permissions: number[]): number {
-  return permissions.reduce((acc, permission) => acc | permission, 0);
+  return permissions.reduce((acc, permission) => {
+    return acc | permission;
+  }, 0);
 }
 
 export function hasPermissions(memberPermissions: number, expectedPermissions: number): boolean {

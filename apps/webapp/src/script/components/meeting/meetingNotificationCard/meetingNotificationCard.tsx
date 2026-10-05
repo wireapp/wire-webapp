@@ -19,12 +19,14 @@
 
 import {useEffect} from 'react';
 
+import {isNonEmptyString} from '@sindresorhus/is';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {match, P} from 'ts-pattern';
 import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, CallIcon, CalendarIcon} from '@wireapp/react-ui-kit';
 
+import {useMeetingPrepModal} from 'Components/meeting/meetingPrep/useMeetingPrepModal';
 import {useJoinMeetingCall} from 'Components/meeting/useJoinMeetingCall';
 import {UserState} from 'Repositories/user/userState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -52,19 +54,24 @@ type MeetingNotificationCardProps = MeetingNotification & {
 };
 
 type MeetingNotificationJoinButtonProps = {
+  meetingTitle: string;
+  meetingStartTime: string;
+  qualifiedId: QualifiedId;
   qualifiedConversationId: QualifiedId;
   onDismiss: () => void;
   onCallJoined?: () => void;
 };
 
 const MeetingNotificationJoinButton = ({
+  meetingTitle,
+  meetingStartTime,
+  qualifiedId,
   qualifiedConversationId,
   onDismiss,
   onCallJoined,
 }: MeetingNotificationJoinButtonProps) => {
   const {translate} = useApplicationContext();
-  const {joinMeeting, isJoinDisabled, isCallActive, isCallConnecting, isJoining} =
-    useJoinMeetingCall(qualifiedConversationId);
+  const {isJoinDisabled, isCallActive, isCallConnecting, isJoining} = useJoinMeetingCall(qualifiedConversationId);
 
   useEffect(() => {
     if (isCallActive) {
@@ -77,7 +84,14 @@ const MeetingNotificationJoinButton = ({
       variant={ButtonVariant.PRIMARY}
       css={meetingNotificationCardActionStyles}
       type="button"
-      onClick={joinMeeting}
+      onClick={() => {
+        useMeetingPrepModal.getState().open({
+          meetingTitle,
+          meetingStartTime,
+          qualifiedMeetingId: qualifiedId,
+          qualifiedConversationId,
+        });
+      }}
       disabled={isJoinDisabled}
       showLoading={isJoining || isCallConnecting}
       aria-label={translate('callJoin')}
@@ -97,14 +111,21 @@ const notificationLabels = {
   [MeetingNotificationKind.REMINDER]: 'meetings.notifications.reminder',
 } as const satisfies Record<MeetingNotificationKind, TranslationKey>;
 
-const getOrganizer = (qualifiedCreator: QualifiedId) =>
-  container
-    .resolve(UserState)
-    .users()
-    .find(user => matchQualifiedIds(user.qualifiedId, qualifiedCreator))
-    ?.name() ?? qualifiedCreator.id;
+const getOrganizer = (qualifiedCreator: QualifiedId) => {
+  return (
+    container
+      .resolve(UserState)
+      .users()
+      .find(user => {
+        return matchQualifiedIds(user.qualifiedId, qualifiedCreator);
+      })
+      ?.name() ?? qualifiedCreator.id
+  );
+};
 
-const getMeetingTime = (meetingStartTime: string) => formatLocale(meetingStartTime, 'PP, p');
+const getMeetingTime = (meetingStartTime: string) => {
+  return formatLocale(meetingStartTime, 'PP, p');
+};
 
 const MeetingNotificationOrganizerAndTimeMetadata = ({
   qualifiedCreator,
@@ -121,7 +142,7 @@ const MeetingNotificationOrganizerAndTimeMetadata = ({
   return (
     <>
       {translate('meetings.notifications.by', {organizer}, undefined, true)}
-      {organizer && meetingTime && <span aria-hidden="true"> • </span>}
+      {isNonEmptyString(organizer) && isNonEmptyString(meetingTime) ? <span aria-hidden="true"> • </span> : ''}
       {meetingTime}
     </>
   );
@@ -143,13 +164,15 @@ const MeetingNotificationMetadata = ({
           MeetingNotificationKind.CANCELLED,
         ),
       },
-      ({qualifiedCreator, meetingStartTime}) => (
-        <MeetingNotificationOrganizerAndTimeMetadata
-          qualifiedCreator={qualifiedCreator}
-          meetingStartTime={meetingStartTime}
-          translate={translate}
-        />
-      ),
+      ({qualifiedCreator, meetingStartTime}) => {
+        return (
+          <MeetingNotificationOrganizerAndTimeMetadata
+            qualifiedCreator={qualifiedCreator}
+            meetingStartTime={meetingStartTime}
+            translate={translate}
+          />
+        );
+      },
     )
     .with({kind: MeetingNotificationKind.ONGOING}, ({qualifiedCreator, meetingStartTime}) => {
       const organizer = getOrganizer(qualifiedCreator);
@@ -158,7 +181,7 @@ const MeetingNotificationMetadata = ({
       return (
         <>
           {translate('meetings.notifications.by', {organizer}, undefined, true)}
-          {organizer && <span aria-hidden="true"> • </span>}
+          {isNonEmptyString(organizer) ? <span aria-hidden="true"> • </span> : organizer}
           <span css={meetingNotificationCardOngoingTimeStyles}>
             {translate('meetings.meetingStatus.startedAt', {time: meetingTime})}
           </span>
@@ -172,7 +195,7 @@ const MeetingNotificationMetadata = ({
       return (
         <>
           {translate('meetings.notifications.by', {organizer}, undefined, true)}
-          {organizer && <span aria-hidden="true"> • </span>}
+          {isNonEmptyString(organizer) ? <span aria-hidden="true"> • </span> : organizer}
           {translate('meetings.notifications.startsAt', {time: meetingTime})}
         </>
       );
@@ -191,6 +214,9 @@ export const MeetingNotificationCard = (notification: MeetingNotificationCardPro
     if (kind === MeetingNotificationKind.ONGOING) {
       return (
         <MeetingNotificationJoinButton
+          meetingTitle={notification.meetingTitle}
+          meetingStartTime={notification.meetingStartTime}
+          qualifiedId={notification.qualifiedId}
           qualifiedConversationId={notification.qualifiedConversationId}
           onDismiss={onDismiss}
           onCallJoined={notification.onCallJoined}

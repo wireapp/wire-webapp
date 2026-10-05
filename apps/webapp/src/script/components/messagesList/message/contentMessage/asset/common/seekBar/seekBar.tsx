@@ -24,6 +24,9 @@ import cx from 'classnames';
 import {useMessageFocusedTabIndex} from 'Components/messagesList/message/util';
 import {clamp} from 'Util/numberUtil';
 
+const percentageScale = 100;
+const decimalRadix = 10;
+
 interface SeekBarProps extends React.HTMLProps<HTMLDivElement> {
   dark?: boolean;
   ['data-uie-name']?: string;
@@ -54,12 +57,12 @@ const SeekBar = ({
       if (mediaElement.currentTime > mediaElement.duration) {
         mediaElement.currentTime = mediaElement.duration;
       }
-      const value = (100 / mediaElement.duration) * mediaElement.currentTime;
+      const value = (percentageScale / mediaElement.duration) * mediaElement.currentTime;
       setProgress(value);
     };
 
     const onEnded = () => {
-      setProgress(100);
+      setProgress(percentageScale);
     };
 
     mediaElement?.addEventListener('timeupdate', onTimeUpdate);
@@ -82,7 +85,7 @@ const SeekBar = ({
         })}
         max={100}
         onChange={({target}: React.ChangeEvent<HTMLInputElement>) => {
-          const currentTime = mediaElement.duration * (parseInt(target.value, 10) / 100);
+          const currentTime = mediaElement.duration * (parseInt(target.value, 10) / percentageScale);
           mediaElement.currentTime = clamp(currentTime, 0, mediaElement.duration);
         }}
         onMouseDown={() => {
@@ -93,11 +96,15 @@ const SeekBar = ({
           mediaElement.play();
           setIsSeekBarThumbDragged(false);
         }}
-        onMouseEnter={() => setIsSeekBarMouseOver(true)}
-        onMouseLeave={() => setIsSeekBarMouseOver(false)}
+        onMouseEnter={() => {
+          return setIsSeekBarMouseOver(true);
+        }}
+        onMouseLeave={() => {
+          return setIsSeekBarMouseOver(false);
+        }}
         style={
           {
-            '--seek-bar-progress': `${progress.toString(10)}%`,
+            '--seek-bar-progress': `${progress.toString(decimalRadix)}%`,
           } as SeekBarCSS
         }
         type="range"

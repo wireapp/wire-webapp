@@ -52,7 +52,9 @@ export class CacheRepository {
     }
 
     for (const storedKey in amplify.store()) {
-      const shouldBeDeleted = !protectedKeyPatterns.some(pattern => storedKey.startsWith(pattern));
+      const shouldBeDeleted = !protectedKeyPatterns.some(pattern => {
+        return storedKey.startsWith(pattern);
+      });
 
       if (shouldBeDeleted) {
         resetStoreValue(storedKey);

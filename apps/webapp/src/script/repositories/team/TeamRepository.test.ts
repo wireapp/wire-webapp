@@ -51,7 +51,9 @@ function buildConnectionRepository() {
   const assetRepository = {} as AssetRepository;
   const teamService = new TeamService({} as any);
   const onMemberDeleted = jest.fn();
-  const translate = jest.fn((translationKey: string) => `translated:${translationKey}`);
+  const translate = jest.fn((translationKey: string) => {
+    return `translated:${translationKey}`;
+  });
   return [
     new TeamRepository(userRepository, assetRepository, onMemberDeleted, teamService, translate, userState, teamState),
     {userState, teamState, userRepository, assetRepository, teamService, translate},

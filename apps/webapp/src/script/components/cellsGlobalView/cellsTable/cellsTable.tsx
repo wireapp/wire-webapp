@@ -17,6 +17,7 @@
  *
  */
 
+import {isNonEmptyString} from '@sindresorhus/is';
 import {flexRender, getCoreRowModel, type Header, useReactTable} from '@tanstack/react-table';
 
 import {CellsSortDirection} from 'Components/conversation/conversationCells/common/cellsSortIcon/cellsSortIcon';
@@ -58,7 +59,7 @@ interface CellsTableHeaderCellProps {
 
 const CellsTableHeaderCell = ({header, getDirectionFor, isSortingEnabled}: CellsTableHeaderCellProps) => {
   const sortField = SORTABLE_COLUMN_FIELD[header.column.id];
-  const ariaSort = isSortingEnabled && sortField ? toAriaSort(getDirectionFor(sortField)) : undefined;
+  const ariaSort = isSortingEnabled && isNonEmptyString(sortField) ? toAriaSort(getDirectionFor(sortField)) : undefined;
 
   return (
     <th
@@ -98,37 +99,45 @@ export const CellsTable = ({
       <div css={tableWrapperStyles}>
         <table css={tableStyles}>
           <thead>
-            {table.getHeaderGroups().map(headerGroup => (
-              <tr key={headerGroup.id}>
-                {headerGroup.headers.map(header => (
-                  <CellsTableHeaderCell
-                    key={header.id}
-                    header={header}
-                    getDirectionFor={getDirectionFor}
-                    isSortingEnabled={isSortingEnabled}
-                  />
-                ))}
-              </tr>
-            ))}
+            {table.getHeaderGroups().map(headerGroup => {
+              return (
+                <tr key={headerGroup.id}>
+                  {headerGroup.headers.map(header => {
+                    return (
+                      <CellsTableHeaderCell
+                        key={header.id}
+                        header={header}
+                        getDirectionFor={getDirectionFor}
+                        isSortingEnabled={isSortingEnabled}
+                      />
+                    );
+                  })}
+                </tr>
+              );
+            })}
           </thead>
           {rows.length > 0 && (
             <tbody>
-              {rows.map(row => (
-                <tr key={row.id} css={tableCellRow}>
-                  {row.getVisibleCells().map(cell => (
-                    <td
-                      key={cell.id}
-                      css={cell.column.id === 'id' ? tableActionsCellStyles : tableCellStyles}
-                      data-cell={cellLabels[cell.column.id]}
-                      style={{
-                        width: cell.column.id == 'name' ? undefined : cell.column.getSize(),
-                      }}
-                    >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </td>
-                  ))}
-                </tr>
-              ))}
+              {rows.map(row => {
+                return (
+                  <tr key={row.id} css={tableCellRow}>
+                    {row.getVisibleCells().map(cell => {
+                      return (
+                        <td
+                          key={cell.id}
+                          css={cell.column.id === 'id' ? tableActionsCellStyles : tableCellStyles}
+                          data-cell={cellLabels[cell.column.id]}
+                          style={{
+                            width: cell.column.id == 'name' ? undefined : cell.column.getSize(),
+                          }}
+                        >
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                );
+              })}
             </tbody>
           )}
         </table>

@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -97,7 +98,7 @@ function createE2EICertificateRenewalTranslation(
   isGracePeriodOver: boolean | undefined,
   supportUrl: string,
 ): PrimaryModalTranslatedTranslation {
-  if (isGracePeriodOver) {
+  if (isGracePeriodOver === true) {
     return createE2EITranslation(
       'acme.renewCertificate.gracePeriodOver.paragraph',
       [createE2EIUrlValue(supportUrl)],
@@ -113,7 +114,7 @@ function createE2EICertificateRenewalTranslation(
 }
 
 function createE2EIErrorTranslation(isGracePeriodOver: boolean | undefined): PrimaryModalTranslatedTranslation {
-  if (isGracePeriodOver) {
+  if (isGracePeriodOver === true) {
     return createE2EITranslation('acme.error.gracePeriod.paragraph', [], [e2eiMarkerLineBreakComponent]);
   }
 
@@ -161,7 +162,7 @@ export const getModalOptions = (
   }: GetModalOptions,
   translate: Translate,
 ) => {
-  if (!secondaryActionFn) {
+  if (isUndefined(secondaryActionFn)) {
     hideSecondary = true;
   }
   let options: ModalOptions = {};
@@ -181,12 +182,12 @@ export const getModalOptions = (
   );
 
   let successTranslationKey: TranslationKey = 'acme.done.paragraph';
-  if (extraParams?.isRenewal) {
+  if (extraParams?.isRenewal === true) {
     successTranslationKey = 'acme.renewal.done.paragraph';
   }
 
   let selectedSettingsChangedTranslation = settingsChangedTranslation;
-  if (extraParams?.isGracePeriodOver) {
+  if (extraParams?.isGracePeriodOver === true) {
     selectedSettingsChangedTranslation = gracePeriodOverTranslation;
   }
 
@@ -209,7 +210,7 @@ export const getModalOptions = (
         ...hideCloseBtn,
       };
       modalType =
-        hideSecondary || secondaryActionFn === undefined ? PrimaryModal.type.ACKNOWLEDGE : PrimaryModal.type.CONFIRM;
+        hideSecondary || isUndefined(secondaryActionFn) ? PrimaryModal.type.ACKNOWLEDGE : PrimaryModal.type.CONFIRM;
       break;
 
     case ModalType.CERTIFICATE_RENEWAL:
@@ -230,7 +231,7 @@ export const getModalOptions = (
         ...hideCloseBtn,
       };
       modalType =
-        hideSecondary || secondaryActionFn === undefined ? PrimaryModal.type.ACKNOWLEDGE : PrimaryModal.type.CONFIRM;
+        hideSecondary || isUndefined(secondaryActionFn) ? PrimaryModal.type.ACKNOWLEDGE : PrimaryModal.type.CONFIRM;
       break;
 
     case ModalType.SELF_CERTIFICATE_REVOKED:
@@ -279,7 +280,7 @@ export const getModalOptions = (
         ...hideCloseBtn,
       };
       modalType =
-        hideSecondary || secondaryActionFn === undefined ? PrimaryModal.type.ACKNOWLEDGE : PrimaryModal.type.CONFIRM;
+        hideSecondary || isUndefined(secondaryActionFn) ? PrimaryModal.type.ACKNOWLEDGE : PrimaryModal.type.CONFIRM;
       break;
 
     case ModalType.ERROR:
@@ -299,7 +300,7 @@ export const getModalOptions = (
         },
       };
       modalType =
-        hideSecondary || secondaryActionFn === undefined ? PrimaryModal.type.ACKNOWLEDGE : PrimaryModal.type.CONFIRM;
+        hideSecondary || isUndefined(secondaryActionFn) ? PrimaryModal.type.ACKNOWLEDGE : PrimaryModal.type.CONFIRM;
       break;
 
     case ModalType.LOADING:
@@ -370,7 +371,7 @@ export const getModalOptions = (
     };
   }
 
-  if (hideSecondary || secondaryActionFn === undefined) {
+  if (hideSecondary || isUndefined(secondaryActionFn)) {
     delete options.secondaryAction;
     options = {
       ...options,

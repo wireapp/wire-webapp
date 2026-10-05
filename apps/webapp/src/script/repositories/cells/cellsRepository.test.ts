@@ -32,12 +32,11 @@ const createRepository = () => {
   const apiClient = {
     api: {
       cells: {
-        uploadNodeDraft: jest.fn(
-          ({abortController}: UploadCall) =>
-            new Promise<void>((resolve, reject) => {
-              calls.push({abortController, resolve, reject});
-            }),
-        ),
+        uploadNodeDraft: jest.fn(({abortController}: UploadCall) => {
+          return new Promise<void>((resolve, reject) => {
+            calls.push({abortController, resolve, reject});
+          });
+        }),
       },
     },
   };
@@ -45,14 +44,15 @@ const createRepository = () => {
   return {repository: new CellsRepository(apiClient as unknown as APIClient), calls};
 };
 
-const upload = (repository: CellsRepository, options?: {uuid?: string; abortController?: AbortController}) =>
-  repository.uploadNodeDraft({
+const upload = (repository: CellsRepository, options?: {uuid?: string; abortController?: AbortController}) => {
+  return repository.uploadNodeDraft({
     uuid: options?.uuid ?? 'upload-id',
     file: new File(['content'], 'document.txt', {type: 'text/plain'}),
     path: 'conversation-path',
     versionId: 'version-id',
     abortController: options?.abortController,
   });
+};
 
 describe('CellsRepository upload cancellation', () => {
   it('cancels legacy uploads through cancelUpload', async () => {
@@ -102,14 +102,16 @@ describe('CellsRepository upload cancellation', () => {
 describe('CellsRepository upload paths', () => {
   const uploadPath = 'conversation-id@example.com/direct-upload';
 
-  const createApiClient = () => ({
-    api: {
-      cells: {
-        uploadNode: jest.fn().mockResolvedValue(undefined),
-        uploadNodeDraft: jest.fn().mockResolvedValue(undefined),
+  const createApiClient = () => {
+    return {
+      api: {
+        cells: {
+          uploadNode: jest.fn().mockResolvedValue(undefined),
+          uploadNodeDraft: jest.fn().mockResolvedValue(undefined),
+        },
       },
-    },
-  });
+    };
+  };
 
   it('directly uploads shared drive files at the selected conversation path', async () => {
     const apiClient = createApiClient();

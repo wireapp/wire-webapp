@@ -103,10 +103,13 @@ export const CONVERSATION_LIST_TABS: readonly SidebarTabs[] = [
   SidebarTabs.ARCHIVES,
 ];
 
-export const isConversationListTab = (tab: SidebarTabs): boolean => CONVERSATION_LIST_TABS.includes(tab);
+export const isConversationListTab = (tab: SidebarTabs): boolean => {
+  return CONVERSATION_LIST_TABS.includes(tab);
+};
 
-export const getConversationListTab = (tab: SidebarTabs): SidebarTabs =>
-  isConversationListTab(tab) ? tab : SidebarTabs.RECENT;
+export const getConversationListTab = (tab: SidebarTabs): SidebarTabs => {
+  return isConversationListTab(tab) ? tab : SidebarTabs.RECENT;
+};
 
 type ConversationListCollapseParams = {
   isFeatureEnabled: boolean;
@@ -118,14 +121,16 @@ export const getCanCollapseConversationList = ({
   isFeatureEnabled,
   currentTab,
   isScreenLessThanMdBreakpoint,
-}: ConversationListCollapseParams): boolean =>
-  isFeatureEnabled && isConversationListTab(currentTab) && !isScreenLessThanMdBreakpoint;
+}: ConversationListCollapseParams): boolean => {
+  return isFeatureEnabled && isConversationListTab(currentTab) && !isScreenLessThanMdBreakpoint;
+};
 
 export const getIsConversationListCollapsed = ({
   conversationListStatus,
   ...params
-}: ConversationListCollapseParams & {conversationListStatus: ConversationListStatus}): boolean =>
-  getCanCollapseConversationList(params) && conversationListStatus === ConversationListStatus.COLLAPSED;
+}: ConversationListCollapseParams & {conversationListStatus: ConversationListStatus}): boolean => {
+  return getCanCollapseConversationList(params) && conversationListStatus === ConversationListStatus.COLLAPSED;
+};
 
 export interface SidebarStore {
   status: SidebarStatus;
@@ -142,59 +147,78 @@ export interface SidebarStore {
 
 const useSidebarStore = create<SidebarStore>()(
   persist(
-    set => ({
-      currentTab: SidebarTabs.RECENT,
-      setCurrentTab: (tab: SidebarTabs) => {
-        set({currentTab: tab});
-      },
-      status: SidebarStatus.OPEN,
-      setStatus: status => set({status: status}),
-      conversationListStatus: ConversationListStatus.EXPANDED,
-      setConversationListStatus: status => set({conversationListStatus: status}),
-      visibleTabs: [...DEFAULT_TABS],
-      setVisibleTabs: (tabs: SidebarTabs[]) => set({visibleTabs: tabs}),
-      resetDisabledFeatureTabs: () =>
-        set(state => ({
-          visibleTabs: DEFAULT_TABS,
-          currentTab: FILTER_TABS.includes(state.currentTab) ? SidebarTabs.RECENT : state.currentTab,
-        })),
-      toggleTabVisibility: (tab: SidebarTabs) => {
-        if (ALWAYS_VISIBLE_TABS.includes(tab)) {
-          return;
-        }
-
-        set(state => {
-          const isCurrentlyVisible = state.visibleTabs.includes(tab);
-          const isActiveTab = state.currentTab === tab;
-
-          if (isCurrentlyVisible && isActiveTab) {
+    set => {
+      return {
+        currentTab: SidebarTabs.RECENT,
+        setCurrentTab: (tab: SidebarTabs) => {
+          set({currentTab: tab});
+        },
+        status: SidebarStatus.OPEN,
+        setStatus: status => {
+          return set({status: status});
+        },
+        conversationListStatus: ConversationListStatus.EXPANDED,
+        setConversationListStatus: status => {
+          return set({conversationListStatus: status});
+        },
+        visibleTabs: [...DEFAULT_TABS],
+        setVisibleTabs: (tabs: SidebarTabs[]) => {
+          return set({visibleTabs: tabs});
+        },
+        resetDisabledFeatureTabs: () => {
+          return set(state => {
             return {
-              currentTab: SidebarTabs.RECENT,
-              visibleTabs: state.visibleTabs.filter(visibleTab => visibleTab !== tab),
+              visibleTabs: DEFAULT_TABS,
+              currentTab: FILTER_TABS.includes(state.currentTab) ? SidebarTabs.RECENT : state.currentTab,
             };
+          });
+        },
+        toggleTabVisibility: (tab: SidebarTabs) => {
+          if (ALWAYS_VISIBLE_TABS.includes(tab)) {
+            return;
           }
 
-          const newVisibleTabs = isCurrentlyVisible
-            ? state.visibleTabs.filter(visibleTab => visibleTab !== tab)
-            : [...state.visibleTabs, tab];
+          set(state => {
+            const isCurrentlyVisible = state.visibleTabs.includes(tab);
+            const isActiveTab = state.currentTab === tab;
 
-          return {visibleTabs: newVisibleTabs};
-        });
-      },
-    }),
+            if (isCurrentlyVisible && isActiveTab) {
+              return {
+                currentTab: SidebarTabs.RECENT,
+                visibleTabs: state.visibleTabs.filter(visibleTab => {
+                  return visibleTab !== tab;
+                }),
+              };
+            }
+
+            const newVisibleTabs = isCurrentlyVisible
+              ? state.visibleTabs.filter(visibleTab => {
+                  return visibleTab !== tab;
+                })
+              : [...state.visibleTabs, tab];
+
+            return {visibleTabs: newVisibleTabs};
+          });
+        },
+      };
+    },
     {
       name: 'sidebar-store',
-      storage: createJSONStorage(() => localStorage),
-      partialize: state => ({
-        status: state.status,
-        conversationListStatus: state.conversationListStatus,
-        currentTab: [SidebarTabs.PREFERENCES, SidebarTabs.CONNECT, SidebarTabs.CELLS, SidebarTabs.MEETINGS].includes(
-          state.currentTab,
-        )
-          ? SidebarTabs.RECENT
-          : state.currentTab,
-        visibleTabs: state.visibleTabs,
+      storage: createJSONStorage(() => {
+        return localStorage;
       }),
+      partialize: state => {
+        return {
+          status: state.status,
+          conversationListStatus: state.conversationListStatus,
+          currentTab: [SidebarTabs.PREFERENCES, SidebarTabs.CONNECT, SidebarTabs.CELLS, SidebarTabs.MEETINGS].includes(
+            state.currentTab,
+          )
+            ? SidebarTabs.RECENT
+            : state.currentTab,
+          visibleTabs: state.visibleTabs,
+        };
+      },
     },
   ),
 );

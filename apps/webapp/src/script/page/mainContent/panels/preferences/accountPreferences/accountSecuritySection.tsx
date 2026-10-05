@@ -58,12 +58,14 @@ const AccountSecuritySection = ({
   const {isTeam} = useKoSubscribableChildren(teamState, ['isTeam']);
   const isMacOsWrapper = Runtime.isDesktopApp() && Runtime.isMacOS();
 
-  const onClickDeleteAccount = () =>
-    PrimaryModal.show(
+  const onClickDeleteAccount = () => {
+    return PrimaryModal.show(
       PrimaryModal.type.CONFIRM,
       {
         primaryAction: {
-          action: () => userRepository.deleteMe(),
+          action: () => {
+            return userRepository.deleteMe();
+          },
           text: translate('modalAccountDeletionAction'),
         },
         text: {
@@ -74,6 +76,7 @@ const AccountSecuritySection = ({
       undefined,
       translate,
     );
+  };
 
   return (
     <PreferencesSection hasSeparator className="preferences-section-account-security">
@@ -99,7 +102,9 @@ const AccountSecuritySection = ({
         <Link
           tabIndex={TabIndex.FOCUSABLE}
           variant={LinkVariant.PRIMARY}
-          onClick={() => amplify.publish(WebAppEvents.PREFERENCES.CHANGE_APP_LOCK_PASSPHRASE)}
+          onClick={() => {
+            return amplify.publish(WebAppEvents.PREFERENCES.CHANGE_APP_LOCK_PASSPHRASE);
+          }}
           data-uie-name="do-reset-app-lock"
           type="button"
         >

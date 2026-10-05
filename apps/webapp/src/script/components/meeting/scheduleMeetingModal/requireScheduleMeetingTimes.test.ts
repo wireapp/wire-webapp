@@ -33,16 +33,18 @@ const pastStartDate = new Date('2026-06-23T10:00:00.000Z');
 
 const clock = createDeterministicClock({initialUnixEpochMicroseconds: BigInt(fixedNow.getTime()) * 1_000n});
 
-const baseFormState = (): ScheduleMeetingFormState => ({
-  title: 'Weekly sync',
-  start: maybe.just(futureStartDate),
-  end: maybe.just(futureEndDate),
-  recurrence: 'weekly',
-  selectedUsers: [],
-  participantsFilter: '',
-  password: '',
-  passwordConfirmation: '',
-});
+const baseFormState = (): ScheduleMeetingFormState => {
+  return {
+    title: 'Weekly sync',
+    start: maybe.just(futureStartDate),
+    end: maybe.just(futureEndDate),
+    recurrence: 'weekly',
+    selectedUsers: [],
+    participantsFilter: '',
+    password: '',
+    passwordConfirmation: '',
+  };
+};
 
 describe('requireScheduleMeetingTimes', () => {
   it('returns start and end when both are present', () => {

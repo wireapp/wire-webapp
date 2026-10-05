@@ -49,7 +49,9 @@ export const Form = ({onNextStep, onPreviousStep, teamName, setTeamName}: StepPr
       <Input
         type="text"
         value={teamName}
-        onChange={(event: React.ChangeEvent<HTMLInputElement>) => setTeamName(event.target.value)}
+        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+          return setTeamName(event.target.value);
+        }}
         label={translate('teamCreationFormNameLabel')}
         autoComplete="off"
         placeholder={translate('teamCreationFormNamePlaceholder')}

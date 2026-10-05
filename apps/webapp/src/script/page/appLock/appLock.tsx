@@ -44,6 +44,8 @@ import type {Translate} from 'Util/localizerUtil/translationTypes';
 
 import {applockStyles} from './appLock.styles';
 
+const millisecondsPerSecond = 1000;
+
 export enum APPLOCK_STATE {
   FORGOT = 'applock.forgot',
   LOCKED = 'applock.locked',
@@ -204,7 +206,7 @@ const AppLock = ({
 
   const startAppLockTimeout = useCallback(() => {
     window.clearTimeout(inactivityTimeoutId);
-    const id = window.setTimeout(showAppLock, getInactivityAppLockTimeoutInSeconds() * 1000);
+    const id = window.setTimeout(showAppLock, getInactivityAppLockTimeoutInSeconds() * millisecondsPerSecond);
     setInactivityTimeoutId(id);
   }, [inactivityTimeoutId]);
 
@@ -283,7 +285,7 @@ const AppLock = ({
       if (scheduledAppLockTimeoutInSeconds === null) {
         return;
       }
-      setScheduledTimeoutId(window.setTimeout(showAppLock, scheduledAppLockTimeoutInSeconds * 1000));
+      setScheduledTimeoutId(window.setTimeout(showAppLock, scheduledAppLockTimeoutInSeconds * millisecondsPerSecond));
     }
   };
 
@@ -311,9 +313,15 @@ const AppLock = ({
   const isSetupPassphraseLength = passwordRegexLength.test(setupPassphrase);
   const isSetupPassphraseSpecial = passwordRegexSpecial.test(setupPassphrase);
 
-  const clearUnlockError = () => setUnlockError('');
-  const onGoBack = () => setLocalAppLockState(APPLOCK_STATE.LOCKED);
-  const onClickForgot = () => setLocalAppLockState(APPLOCK_STATE.FORGOT);
+  const clearUnlockError = () => {
+    return setUnlockError('');
+  };
+  const onGoBack = () => {
+    return setLocalAppLockState(APPLOCK_STATE.LOCKED);
+  };
+  const onClickForgot = () => {
+    return setLocalAppLockState(APPLOCK_STATE.FORGOT);
+  };
   const onClickLogout = async () => {
     if (isTemporaryClient === true) {
       await clientRepository.logoutClient();
@@ -383,7 +391,9 @@ const AppLock = ({
               type="password"
               placeholder={translate('modalAppLockInputPlaceholder')}
               value={setupPassphrase}
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSetupPassphrase(event.target.value)}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                return setSetupPassphrase(event.target.value);
+              }}
               data-uie-status={isSetupPassphraseValid ? 'valid' : 'invalid'}
               data-uie-name="input-applock-set-a"
               autoComplete="new-password"
@@ -470,7 +480,9 @@ const AppLock = ({
               type="password"
               placeholder={translate('modalAppLockInputPlaceholder')}
               value={setupPassphrase}
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSetupPassphrase(event.target.value)}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                return setSetupPassphrase(event.target.value);
+              }}
               data-uie-status={isSetupPassphraseValid ? 'valid' : 'invalid'}
               data-uie-name="input-applock-set-a"
               autoComplete="new-password"
@@ -589,7 +601,13 @@ const AppLock = ({
                 {translate('modalAppLockLogoutCancelButton')}
               </Button>
 
-              <Button css={applockStyles.buttonStyle} onClick={() => onLogout(clearData)} data-uie-name="do-action">
+              <Button
+                css={applockStyles.buttonStyle}
+                onClick={() => {
+                  return onLogout(clearData);
+                }}
+                data-uie-name="do-action"
+              >
                 {translate('modalAccountLogoutAction')}
               </Button>
             </div>
@@ -600,10 +618,12 @@ const AppLock = ({
   );
 };
 
-const ErrorMessage = ({message}: {message: string}) => (
-  <p className="modal__input__error" data-uie-name="label-applock-unlock-error">
-    {message}
-  </p>
-);
+const ErrorMessage = ({message}: {message: string}) => {
+  return (
+    <p className="modal__input__error" data-uie-name="label-applock-unlock-error">
+      {message}
+    </p>
+  );
+};
 
 export {AppLock};

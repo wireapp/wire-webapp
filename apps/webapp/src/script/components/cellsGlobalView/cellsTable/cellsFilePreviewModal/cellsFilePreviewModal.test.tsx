@@ -25,7 +25,6 @@ import {container} from 'tsyringe';
 import {CELLS_SELF_USER_DRIVE_ROLE} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
-import {viewerPermissionFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {
   createRootContextValueForTest,
   createExecutingFireAndForgetInvokerForTest,
@@ -39,30 +38,30 @@ import {
   CellsFilePreviewModalContextValue,
 } from '../common/cellsFilePreviewModalContext/cellsFilePreviewModalContext';
 
-const translate = (key: string) =>
-  ({
-    'cells.imageFullScreenModal.closeButton': 'Close',
-    'cells.imageFullScreenModal.downloadButton': 'Download',
-    'cells.options.label': 'More options',
-    'cells.options.versionHistory': 'Version History',
-    'fileFullscreenModal.editor.iframeTitle': 'Collabora editor',
-  })[key] ?? key;
+const translate = (key: string) => {
+  return (
+    {
+      'cells.imageFullScreenModal.closeButton': 'Close',
+      'cells.imageFullScreenModal.downloadButton': 'Download',
+      'cells.options.label': 'More options',
+      'cells.options.versionHistory': 'Version History',
+      'fileFullscreenModal.editor.iframeTitle': 'Collabora editor',
+    }[key] ?? key
+  );
+};
 
 const createRootProviderWrapper = ({
   fireAndForgetInvoker,
-  isViewerPermissionFeatureEnabled,
 }: {
   fireAndForgetInvoker: ReturnType<typeof createExecutingFireAndForgetInvokerForTest>;
-  isViewerPermissionFeatureEnabled: boolean;
-}) =>
-  createRootProviderWrapperForTest(
+}) => {
+  return createRootProviderWrapperForTest(
     createRootContextValueForTest({
       fireAndForgetInvoker,
-      isFeatureToggleEnabled: featureName =>
-        featureName === viewerPermissionFeatureToggleName && isViewerPermissionFeatureEnabled,
       translate,
     }),
   );
+};
 
 const file: CellFile = {
   id: 'file-id',
@@ -123,11 +122,9 @@ describe('CellsFilePreviewModal', () => {
   });
 
   const renderModal = ({
-    isViewerPermissionFeatureEnabled = true,
     selfUserDriveRole,
     selectedFile,
   }: {
-    isViewerPermissionFeatureEnabled?: boolean;
     selfUserDriveRole: CellFile['selfUserDriveRole'];
     selectedFile?: CellFile;
   }) => {
@@ -138,7 +135,7 @@ describe('CellsFilePreviewModal', () => {
         <FakeFilePreviewProvider selfUserDriveRole={selfUserDriveRole} selectedFile={selectedFile}>
           <CellsFilePreviewModal />
         </FakeFilePreviewProvider>,
-        createRootProviderWrapper({fireAndForgetInvoker, isViewerPermissionFeatureEnabled}),
+        createRootProviderWrapper({fireAndForgetInvoker}),
       ),
     );
 
@@ -162,7 +159,9 @@ describe('CellsFilePreviewModal', () => {
     expect(screen.getByRole('button', {name: 'Download'})).toBeInTheDocument();
     expect(screen.getByRole('button', {name: 'Editing'})).toBeInTheDocument();
     expect(screen.getByRole('button', {name: 'More options'})).toBeInTheDocument();
-    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
-    expect(screen.getByTitle('Collabora editor')).toBeInTheDocument();
+    await act(() => {
+      return fireAndForgetInvoker.waitUntilAllSettled();
+    });
+    expect(await screen.findByTitle('Collabora editor')).toBeInTheDocument();
   });
 });

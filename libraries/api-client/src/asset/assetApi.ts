@@ -38,6 +38,8 @@ import {base64MD5FromBuffer, concatToBuffer} from '../shims/node/buffer';
 import {unsafeAlphanumeric} from '../shims/node/random';
 import {QualifiedId, RequestCancellationError} from '../user';
 
+const redactedTokenPrefixLength = 5;
+
 export interface CipherOptions {
   /** Set a custom algorithm for encryption */
   algorithm?: string;
@@ -93,7 +95,9 @@ export class AssetAPI {
     progressCallback?: ProgressCallback,
   ): RequestCancelable<AssetResponse> {
     if (token !== null && token !== undefined && token.length > 0 && !isValidToken(token)) {
-      throw new TypeError(`Expected token "${token.substr(0, 5)}..." (redacted) to be base64 encoded string.`);
+      throw new TypeError(
+        `Expected token "${token.substr(0, redactedTokenPrefixLength)}..." (redacted) to be base64 encoded string.`,
+      );
     }
 
     const cancelSource = axios.CancelToken.source();
@@ -132,7 +136,9 @@ export class AssetAPI {
     };
 
     return {
-      cancel: () => cancelSource.cancel(SyntheticErrorLabel.REQUEST_CANCELLED),
+      cancel: () => {
+        return cancelSource.cancel(SyntheticErrorLabel.REQUEST_CANCELLED);
+      },
       response: handleRequest(),
     };
   }
@@ -213,7 +219,9 @@ export class AssetAPI {
     };
 
     return {
-      cancel: () => cancelSource.cancel(SyntheticErrorLabel.REQUEST_CANCELLED),
+      cancel: () => {
+        return cancelSource.cancel(SyntheticErrorLabel.REQUEST_CANCELLED);
+      },
       response: handleRequest(),
     };
   }
@@ -229,8 +237,9 @@ export class AssetAPI {
       throw new TypeError(`Expected asset ID "${assetId}" to only contain alphanumeric values and dashes.`);
     }
 
-    const isValidDomain = (domain: string) =>
-      !!Boolean(domain) && /^([a-zA-Z0-9]+(-[a-zA-Z0-9]+)*\.)+[a-zA-Z]{2,}$/.test(domain);
+    const isValidDomain = (domain: string) => {
+      return !!Boolean(domain) && /^([a-zA-Z0-9]+(-[a-zA-Z0-9]+)*\.)+[a-zA-Z]{2,}$/.test(domain);
+    };
 
     if (!isValidDomain(assetDomain)) {
       throw new TypeError(`Invalid asset domain ${assetDomain}`);

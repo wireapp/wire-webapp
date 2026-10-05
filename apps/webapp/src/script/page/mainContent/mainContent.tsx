@@ -19,6 +19,7 @@
 
 import {ReactNode, useEffect, useRef, useState} from 'react';
 
+import {isNullOrUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
 import {CSSTransition, SwitchTransition} from 'react-transition-group';
 import {container} from 'tsyringe';
@@ -101,11 +102,15 @@ const MainContent = ({
 
   const {isActivatedAccount} = useKoSubscribableChildren(selfUser, ['isActivatedAccount']);
 
-  const contentState = useAppState(state => state.contentState);
-  const isShowingConversation = useAppState(state => state.isShowingConversation);
+  const contentState = useAppState(state => {
+    return state.contentState;
+  });
+  const isShowingConversation = useAppState(state => {
+    return state.isShowingConversation;
+  });
 
   useEffect(() => {
-    if (!isShowingConversation() && conversationState.activeConversation()) {
+    if (!isShowingConversation() && !isNullOrUndefined(conversationState.activeConversation())) {
       // Reset active conversation for all states that do not require a loaded conversation
       conversationState.activeConversation(undefined);
     }
@@ -121,11 +126,13 @@ const MainContent = ({
   const contentViewModel = mainViewModel.content;
   const {isFederated, repositories, switchContent} = contentViewModel;
 
-  const {audioInputSupported, audioOutputSupported, videoInputSupported} = useMediaDevicesStore(state => ({
-    audioInputSupported: state.audio.input.supported,
-    audioOutputSupported: state.audio.output.supported,
-    videoInputSupported: state.video.input.supported,
-  }));
+  const {audioInputSupported, audioOutputSupported, videoInputSupported} = useMediaDevicesStore(state => {
+    return {
+      audioInputSupported: state.audio.input.supported,
+      audioOutputSupported: state.audio.output.supported,
+      videoInputSupported: state.video.input.supported,
+    };
+  });
   const deviceSupport = {
     [MediaDeviceType.AUDIO_INPUT]: audioInputSupported,
     [MediaDeviceType.AUDIO_OUTPUT]: audioOutputSupported,
@@ -161,15 +168,18 @@ const MainContent = ({
       <SwitchTransition>
         <Animated key={contentState}>
           <>
-            {contentState === ContentState.COLLECTION && activeConversation && (
-              <Collection
-                conversation={activeConversation}
-                conversationRepository={repositories.conversation}
-                assetRepository={repositories.asset}
-                messageRepository={repositories.message}
-                selfUser={selfUser}
-              />
-            )}
+            {contentState === ContentState.COLLECTION &&
+              (isNullOrUndefined(activeConversation) ? (
+                activeConversation
+              ) : (
+                <Collection
+                  conversation={activeConversation}
+                  conversationRepository={repositories.conversation}
+                  assetRepository={repositories.asset}
+                  messageRepository={repositories.message}
+                  selfUser={selfUser}
+                />
+              ))}
 
             {contentState === ContentState.PREFERENCES_ABOUT && (
               <div
@@ -227,13 +237,13 @@ const MainContent = ({
                   conversationState={conversationState}
                   cryptographyRepository={repositories.cryptography}
                   removeDevice={contentViewModel.mainViewModel.actions.deleteClient}
-                  resetSession={(userId, device, conversation) =>
-                    repositories.message.resetSession(userId, device.id, conversation)
-                  }
+                  resetSession={(userId, device, conversation) => {
+                    return repositories.message.resetSession(userId, device.id, conversation);
+                  }}
                   selfUser={selfUser}
-                  verifyDevice={(userId, device, verified) =>
-                    repositories.client.verifyClient(userId, device, verified)
-                  }
+                  verifyDevice={(userId, device, verified) => {
+                    return repositories.client.verifyClient(userId, device, verified);
+                  }}
                 />
               </div>
             )}
@@ -274,14 +284,17 @@ const MainContent = ({
               <HistoryExport user={selfUser} switchContent={switchContent} />
             )}
 
-            {contentState === ContentState.HISTORY_IMPORT && uploadedFile && (
-              <HistoryImport
-                user={selfUser}
-                file={uploadedFile}
-                backupRepository={repositories.backup}
-                switchContent={switchContent}
-              />
-            )}
+            {contentState === ContentState.HISTORY_IMPORT &&
+              (isNullOrUndefined(uploadedFile) ? (
+                uploadedFile
+              ) : (
+                <HistoryImport
+                  user={selfUser}
+                  file={uploadedFile}
+                  backupRepository={repositories.backup}
+                  switchContent={switchContent}
+                />
+              ))}
 
             {contentState === ContentState.CELLS && (
               <CellsGlobalView

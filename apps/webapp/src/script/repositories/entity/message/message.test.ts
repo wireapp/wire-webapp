@@ -34,7 +34,9 @@ import {SuperType} from '../../../message/superType';
 describe('Message', () => {
   describe('translation injection', () => {
     it('uses the injected translate function for ephemeral captions', () => {
-      const translate = jest.fn((translationKey: string) => `translated:${translationKey}`);
+      const translate = jest.fn((translationKey: string) => {
+        return `translated:${translationKey}`;
+      });
       const message = new Message('message-id', undefined, translate);
 
       message.ephemeral_remaining(1000);
@@ -43,7 +45,9 @@ describe('Message', () => {
     });
 
     it('uses the injected translate function for ping captions', () => {
-      const translate = jest.fn((translationKey: string) => `translated:${translationKey}`);
+      const translate = jest.fn((translationKey: string) => {
+        return `translated:${translationKey}`;
+      });
       const message = new PingMessage(translate);
 
       expect(message.caption()).toBe('translated:conversationPing');
@@ -137,7 +141,11 @@ describe('Message', () => {
       const result = message.getMultipartAssets();
 
       expect(result).toHaveLength(3);
-      expect(result.every(asset => asset.isMultipart())).toBe(true);
+      expect(
+        result.every(asset => {
+          return asset.isMultipart();
+        }),
+      ).toBe(true);
     });
 
     it('filters out assets that are not multipart', () => {
@@ -154,8 +162,16 @@ describe('Message', () => {
 
       expect(result).toHaveLength(1);
       expect(result[0]).toBe(multipartAsset);
-      expect(result.some(asset => asset.isText())).toBe(false);
-      expect(result.some(asset => asset.isFile())).toBe(false);
+      expect(
+        result.some(asset => {
+          return asset.isText();
+        }),
+      ).toBe(false);
+      expect(
+        result.some(asset => {
+          return asset.isFile();
+        }),
+      ).toBe(false);
     });
 
     it('returns empty array when hasMultipartAsset returns false', () => {

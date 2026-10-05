@@ -31,11 +31,13 @@ import {getLogger, Logger} from 'Util/logger';
 import {AudioPlayingType} from './audioPlayingType';
 import {AudioType} from './audioType';
 
+/* eslint-disable @typescript-eslint/no-magic-numbers -- Playback outcomes define their existing numeric values inline. */
 enum AUDIO_PLAY_PERMISSION {
   ALLOWED = 0,
   DISALLOWED_BY_MUTE_STATE = 3,
   DISALLOWED_BY_PREFERENCES = 2,
 }
+/* eslint-enable @typescript-eslint/no-magic-numbers */
 
 export class AudioRepository {
   private readonly logger: Logger;
@@ -78,7 +80,7 @@ export class AudioRepository {
   }
 
   private updateSinkIds() {
-    const currentOutputDevice = mediaDevicesStore.getState().audio.output.selectedId;
+    const currentOutputDevice = mediaDevicesStore.getState().audio.output.activeId;
     if (!isNonEmptyString(currentOutputDevice)) {
       return;
     }
@@ -102,7 +104,9 @@ export class AudioRepository {
   }
 
   private stopAll(): void {
-    Object.keys(this.audioElements).forEach((audioId: AudioType) => this.stop(audioId));
+    Object.keys(this.audioElements).forEach((audioId: AudioType) => {
+      this.stop(audioId);
+    });
   }
 
   private subscribeToEvents(): void {

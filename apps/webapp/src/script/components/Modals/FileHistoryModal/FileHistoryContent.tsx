@@ -40,23 +40,27 @@ export const FileHistoryContent: FunctionComponent<FileHistoryContentProps> = pr
   return (
     <div css={fileHistoryContentCss}>
       <div css={fileHistoryListCss}>
-        {Object.keys(fileVersions).map((date, groupIndex) => (
-          <div key={date}>
-            <h3 css={fileHistoryDateHeadingCss}>{date}</h3>
-            <div css={fileHistoryTimelineContainerCss}>
-              {fileVersions[date].map((version, versionIndex) => (
-                <FileVersionItem
-                  key={version.versionId}
-                  version={version}
-                  isCurrentVersion={versionIndex === 0 && groupIndex === 0}
-                  showTimelineConnector={versionIndex < fileVersions[date].length - 1}
-                  onDownload={handleDownload}
-                  onRestore={handleRestore}
-                />
-              ))}
+        {Object.keys(fileVersions).map((date, groupIndex) => {
+          return (
+            <div key={date}>
+              <h3 css={fileHistoryDateHeadingCss}>{date}</h3>
+              <div css={fileHistoryTimelineContainerCss}>
+                {fileVersions[date].map((version, versionIndex) => {
+                  return (
+                    <FileVersionItem
+                      key={version.versionId}
+                      version={version}
+                      isCurrentVersion={versionIndex === 0 && groupIndex === 0}
+                      showTimelineConnector={versionIndex < fileVersions[date].length - 1}
+                      onDownload={handleDownload}
+                      onRestore={handleRestore}
+                    />
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

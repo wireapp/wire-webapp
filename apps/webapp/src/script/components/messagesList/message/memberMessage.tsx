@@ -145,7 +145,9 @@ export const MemberMessage = ({
       <ConnectedMessage
         user={otherUser}
         showServicesWarning={message.showServicesWarning}
-        onClickCancelRequest={() => onClickCancelRequest(message)}
+        onClickCancelRequest={() => {
+          return onClickCancelRequest(message);
+        }}
         classifiedDomains={classifiedDomains}
       />
     );

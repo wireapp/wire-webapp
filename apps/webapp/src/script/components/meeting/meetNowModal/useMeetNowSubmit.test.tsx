@@ -23,10 +23,10 @@ import {act, renderHook} from '@testing-library/react';
 import {task} from 'true-myth';
 import {createStore} from 'zustand/vanilla';
 
+import {useMeetingPrepModal} from 'Components/meeting/meetingPrep/useMeetingPrepModal';
 import type {MeetingStoreState} from 'Components/meeting/meetingStore/createMeetingStore';
 import {MeetingStoreProvider} from 'Components/meeting/meetingStore/meetingStoreProvider';
 import {meetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {ConversationState} from 'Repositories/conversation/ConversationState';
 import {
   createRootContextValueForTest,
@@ -34,7 +34,6 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {MainViewModel} from 'src/script/view_model/MainViewModel';
 import {useWarningsState} from 'src/script/view_model/WarningsContainer/WarningsState';
-import {TYPE} from 'src/script/view_model/WarningsContainer/WarningsTypes';
 import {translateForTest} from 'Util/test/translateForTest';
 
 import {type MeetNowSubmitResult, meetNowSubmitResults, wasMeetNowMeetingCreated} from './meetNowTypes';
@@ -104,25 +103,27 @@ const createJoinTestMocks = ({
 const createMeetingStore = ({
   loadMeetings = jest.fn().mockResolvedValue(undefined),
   meetNowMeeting = jest.fn().mockReturnValue(task.resolve({failedToAdd: [], qualifiedConversation})),
-}: Partial<Pick<MeetingStoreState, 'loadMeetings' | 'meetNowMeeting'>> = {}) =>
-  createStore<MeetingStoreState>(() => ({
-    meetingSeries: [],
-    isLoading: false,
-    hasLoadError: false,
-    loadMeetings,
-    scheduleMeeting: jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
-    meetNowMeeting,
-    updateMeeting: jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
-    loadMeetingForEdit: jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.updateFailed)),
-    deleteMeetingForMe: jest.fn().mockReturnValue(task.resolve(undefined)),
-    deleteMeetingForAll: jest.fn().mockReturnValue(task.resolve(undefined)),
-    removeMeetingByQualifiedId: jest.fn(),
-    syncMeetingByQualifiedId: jest.fn().mockReturnValue(task.reject('meetingNotFound')),
-  }));
+}: Partial<Pick<MeetingStoreState, 'loadMeetings' | 'meetNowMeeting'>> = {}) => {
+  return createStore<MeetingStoreState>(() => {
+    return {
+      meetingSeries: [],
+      isLoading: false,
+      hasLoadError: false,
+      loadMeetings,
+      scheduleMeeting: jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
+      meetNowMeeting,
+      updateMeeting: jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
+      loadMeetingForEdit: jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.updateFailed)),
+      deleteMeetingForMe: jest.fn().mockReturnValue(task.resolve(undefined)),
+      deleteMeetingForAll: jest.fn().mockReturnValue(task.resolve(undefined)),
+      removeMeetingByQualifiedId: jest.fn(),
+      syncMeetingByQualifiedId: jest.fn().mockReturnValue(task.reject('meetingNotFound')),
+    };
+  });
+};
 
-const createWrapper =
-  (store: ReturnType<typeof createMeetingStore>, mainViewModel: MainViewModel) =>
-  ({children}: {children: ReactNode}) => {
+const createWrapper = (store: ReturnType<typeof createMeetingStore>, mainViewModel: MainViewModel) => {
+  return ({children}: {children: ReactNode}) => {
     const RootProviderWrapper = createRootProviderWrapperForTest(
       createRootContextValueForTest({
         translate: translateForTest,
@@ -136,6 +137,7 @@ const createWrapper =
       </RootProviderWrapper>
     );
   };
+};
 
 describe('useMeetNowSubmit', () => {
   beforeEach(() => {
@@ -146,31 +148,41 @@ describe('useMeetNowSubmit', () => {
     jest.restoreAllMocks();
     act(() => {
       useWarningsState.setState({name: '', warnings: []});
+      useMeetingPrepModal.getState().close();
     });
   });
 
-  it('returns joined and joins the created conversation after a successful submit', async () => {
+  it('opens the prep modal after a successful submit', async () => {
     const loadMeetings = jest.fn().mockResolvedValue(undefined);
-    const meetNowMeeting = jest.fn().mockReturnValue(task.resolve({failedToAdd: [], qualifiedConversation}));
+    const meetNowMeeting = jest.fn().mockReturnValue(
+      task.resolve({
+        failedToAdd: [],
+        qualifiedConversation,
+        qualifiedMeetingId: {id: 'meeting-id', domain: 'example.com'},
+      }),
+    );
     const store = createMeetingStore({loadMeetings, meetNowMeeting});
-    const {conversationState, findConversation, safeGetConversationById, startAudio, mainViewModel} =
-      createJoinTestMocks();
+    const {startAudio, mainViewModel} = createJoinTestMocks();
 
-    const {result} = renderHook(() => useMeetNowSubmit(conversationState), {
-      wrapper: createWrapper(store, mainViewModel),
-    });
+    const {result} = renderHook(
+      () => {
+        return useMeetNowSubmit();
+      },
+      {
+        wrapper: createWrapper(store, mainViewModel),
+      },
+    );
 
     let submitResult: MeetNowSubmitResult = meetNowSubmitResults.creationFailed;
     await act(async () => {
       submitResult = await result.current.submit(formState);
     });
 
-    expect(submitResult).toBe(meetNowSubmitResults.joined);
+    expect(submitResult).toBe(meetNowSubmitResults.prepOpened);
     expect(meetNowMeeting).toHaveBeenCalledWith(meetNowCommand);
     expect(loadMeetings).not.toHaveBeenCalled();
-    expect(findConversation).toHaveBeenCalledWith(qualifiedConversation);
-    expect(safeGetConversationById).toHaveBeenCalledWith(qualifiedConversation);
-    expect(startAudio).toHaveBeenCalledTimes(1);
+    expect(startAudio).not.toHaveBeenCalled();
+    expect(useMeetingPrepModal.getState().session.isJust).toBe(true);
   });
 
   it('returns creationFailed when meeting creation fails', async () => {
@@ -179,9 +191,14 @@ describe('useMeetNowSubmit', () => {
     const store = createMeetingStore({loadMeetings, meetNowMeeting});
     const {conversationState, startAudio, mainViewModel} = createJoinTestMocks();
 
-    const {result} = renderHook(() => useMeetNowSubmit(conversationState), {
-      wrapper: createWrapper(store, mainViewModel),
-    });
+    const {result} = renderHook(
+      () => {
+        return useMeetNowSubmit();
+      },
+      {
+        wrapper: createWrapper(store, mainViewModel),
+      },
+    );
 
     let submitResult: MeetNowSubmitResult = meetNowSubmitResults.joined;
     await act(async () => {
@@ -200,9 +217,14 @@ describe('useMeetNowSubmit', () => {
     const store = createMeetingStore({loadMeetings, meetNowMeeting});
     const {conversationState, startAudio, mainViewModel} = createJoinTestMocks();
 
-    const {result} = renderHook(() => useMeetNowSubmit(conversationState), {
-      wrapper: createWrapper(store, mainViewModel),
-    });
+    const {result} = renderHook(
+      () => {
+        return useMeetNowSubmit();
+      },
+      {
+        wrapper: createWrapper(store, mainViewModel),
+      },
+    );
 
     let submitResult: MeetNowSubmitResult = meetNowSubmitResults.creationFailed;
     await act(async () => {
@@ -221,9 +243,14 @@ describe('useMeetNowSubmit', () => {
     const store = createMeetingStore({loadMeetings, meetNowMeeting});
     const {conversationState, startAudio, mainViewModel} = createJoinTestMocks();
 
-    const {result} = renderHook(() => useMeetNowSubmit(conversationState), {
-      wrapper: createWrapper(store, mainViewModel),
-    });
+    const {result} = renderHook(
+      () => {
+        return useMeetNowSubmit();
+      },
+      {
+        wrapper: createWrapper(store, mainViewModel),
+      },
+    );
 
     let submitResult: MeetNowSubmitResult = meetNowSubmitResults.creationFailed;
     await act(async () => {
@@ -234,103 +261,5 @@ describe('useMeetNowSubmit', () => {
     expect(wasMeetNowMeetingCreated(submitResult)).toBe(true);
     expect(loadMeetings).toHaveBeenCalledTimes(1);
     expect(startAudio).not.toHaveBeenCalled();
-  });
-
-  it('returns joinBlocked when there is no internet connection', async () => {
-    const showModalSpy = jest.spyOn(PrimaryModal, 'show');
-    useWarningsState.setState({name: '', warnings: [TYPE.NO_INTERNET]});
-
-    const loadMeetings = jest.fn().mockResolvedValue(undefined);
-    const meetNowMeeting = jest.fn().mockReturnValue(task.resolve({failedToAdd: [], qualifiedConversation}));
-    const store = createMeetingStore({loadMeetings, meetNowMeeting});
-    const {conversationState, startAudio, mainViewModel} = createJoinTestMocks();
-
-    const {result} = renderHook(() => useMeetNowSubmit(conversationState), {
-      wrapper: createWrapper(store, mainViewModel),
-    });
-
-    let submitResult: MeetNowSubmitResult = meetNowSubmitResults.creationFailed;
-    await act(async () => {
-      submitResult = await result.current.submit(formState);
-    });
-
-    expect(submitResult).toBe(meetNowSubmitResults.joinBlocked);
-    expect(loadMeetings).not.toHaveBeenCalled();
-    expect(startAudio).not.toHaveBeenCalled();
-    expect(showModalSpy).toHaveBeenCalledWith(
-      PrimaryModal.type.ACKNOWLEDGE,
-      expect.objectContaining({
-        text: expect.objectContaining({
-          title: 'callNotEstablishedTitle',
-        }),
-      }),
-      undefined,
-      translateForTest,
-    );
-  });
-
-  it('returns joinFailed when joining the created conversation fails', async () => {
-    const showModalSpy = jest.spyOn(PrimaryModal, 'show');
-    const loadMeetings = jest.fn().mockResolvedValue(undefined);
-    const meetNowMeeting = jest.fn().mockReturnValue(task.resolve({failedToAdd: [], qualifiedConversation}));
-    const store = createMeetingStore({loadMeetings, meetNowMeeting});
-    const {conversationState, startAudio, mainViewModel} = createJoinTestMocks({
-      startAudioResult: Promise.reject(new Error('join failed')),
-    });
-
-    const {result} = renderHook(() => useMeetNowSubmit(conversationState), {
-      wrapper: createWrapper(store, mainViewModel),
-    });
-
-    let submitResult: MeetNowSubmitResult = meetNowSubmitResults.creationFailed;
-    await act(async () => {
-      submitResult = await result.current.submit(formState);
-    });
-
-    expect(submitResult).toBe(meetNowSubmitResults.joinFailed);
-    expect(startAudio).toHaveBeenCalledTimes(1);
-    expect(showModalSpy).toHaveBeenCalledWith(
-      PrimaryModal.type.ACKNOWLEDGE,
-      expect.objectContaining({
-        text: expect.objectContaining({
-          title: 'callNotEstablishedTitle',
-        }),
-      }),
-      undefined,
-      translateForTest,
-    );
-  });
-
-  it('returns joinFailed when the created conversation cannot be found', async () => {
-    const showModalSpy = jest.spyOn(PrimaryModal, 'show');
-    const loadMeetings = jest.fn().mockResolvedValue(undefined);
-    const meetNowMeeting = jest.fn().mockReturnValue(task.resolve({failedToAdd: [], qualifiedConversation}));
-    const store = createMeetingStore({loadMeetings, meetNowMeeting});
-    const {conversationState, safeGetConversationById, startAudio, mainViewModel} = createJoinTestMocks({
-      safeGetConversationByIdResult: task.reject('not found'),
-    });
-
-    const {result} = renderHook(() => useMeetNowSubmit(conversationState), {
-      wrapper: createWrapper(store, mainViewModel),
-    });
-
-    let submitResult: MeetNowSubmitResult = meetNowSubmitResults.creationFailed;
-    await act(async () => {
-      submitResult = await result.current.submit(formState);
-    });
-
-    expect(submitResult).toBe(meetNowSubmitResults.joinFailed);
-    expect(safeGetConversationById).toHaveBeenCalledWith(qualifiedConversation);
-    expect(startAudio).not.toHaveBeenCalled();
-    expect(showModalSpy).toHaveBeenCalledWith(
-      PrimaryModal.type.ACKNOWLEDGE,
-      expect.objectContaining({
-        text: expect.objectContaining({
-          title: 'conversationNotFoundTitle',
-        }),
-      }),
-      undefined,
-      translateForTest,
-    );
   });
 });

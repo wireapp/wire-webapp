@@ -36,6 +36,8 @@ import {RequestCancellationError} from '../../user';
 import {MemberData, Members} from '../member/';
 import {TeamAPI} from '../team/teamApi';
 
+const defaultMembersChunkSize = 1600;
+
 function getHeaderStringOrUndefined(headerValue: AxiosHeaderValue | undefined): string | undefined {
   if (typeof headerValue === 'string') {
     return headerValue;
@@ -46,7 +48,7 @@ function getHeaderStringOrUndefined(headerValue: AxiosHeaderValue | undefined): 
 
 export class MemberAPI {
   // Maximum 1600 due to "413 Request Entity Too Large" response
-  private static readonly DEFAULT_MEMBERS_CHUNK_SIZE = 1600;
+  private static readonly DEFAULT_MEMBERS_CHUNK_SIZE = defaultMembersChunkSize;
   constructor(private readonly client: HttpClient) {}
 
   public static readonly URL = {
@@ -182,7 +184,9 @@ export class MemberAPI {
     };
 
     return {
-      cancel: () => cancelSource.cancel(SyntheticErrorLabel.REQUEST_CANCELLED),
+      cancel: () => {
+        return cancelSource.cancel(SyntheticErrorLabel.REQUEST_CANCELLED);
+      },
       response: handleRequest(),
     };
   }

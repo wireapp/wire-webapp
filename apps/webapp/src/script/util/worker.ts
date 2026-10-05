@@ -38,8 +38,12 @@ export class WebWorker {
 
   post<T>(data: string | ArrayBuffer | Record<string, any>): Promise<T> {
     return new Promise((resolve, reject) => {
-      this.worker.onmessage = event => resolve(event.data);
-      this.worker.onerror = error => reject(error);
+      this.worker.onmessage = event => {
+        return resolve(event.data);
+      };
+      this.worker.onerror = error => {
+        return reject(error);
+      };
       this.worker.postMessage(data);
     });
   }

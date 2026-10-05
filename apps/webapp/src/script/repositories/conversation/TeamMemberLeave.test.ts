@@ -32,7 +32,9 @@ import {generateConversation} from 'test/helper/ConversationGenerator';
 import {generateUser} from 'test/helper/UserGenerator';
 import {translate} from 'Util/localizerUtil';
 
-jest.mock('./EventMapper', () => ({EventMapper: jest.fn().mockReturnValue({})}));
+jest.mock('./EventMapper', () => {
+  return {EventMapper: jest.fn().mockReturnValue({})};
+});
 
 import {ConversationRepository} from './ConversationRepository';
 import type {ConversationService} from './ConversationService';
@@ -179,9 +181,9 @@ describe('ConversationRepository.teamMemberLeave', () => {
     deps.userRepository.getUserById.mockResolvedValue(userB);
     deps.userRepository.getUsersById.mockResolvedValue([]);
 
-    jest
-      .spyOn(conversationRepository, 'updateParticipatingUserEntities')
-      .mockImplementation(async conversation => conversation);
+    jest.spyOn(conversationRepository, 'updateParticipatingUserEntities').mockImplementation(async conversation => {
+      return conversation;
+    });
 
     const conversationWithoutUser = generateConversation({
       users: [otherUser],

@@ -58,23 +58,33 @@ export const AdminSearchInput = ({
   onClearContentChange,
   onUserSelect,
 }: AdminSearchInputProps) => {
-  const options: Option[] = eligibleUsers.map(user => ({value: user.id, label: user.name()}));
-  const selectedOption = selectedUser ? (options.find(opt => opt.value === selectedUser.id) ?? null) : null;
+  const options: Option[] = eligibleUsers.map(user => {
+    return {value: user.id, label: user.name()};
+  });
+  const selectedOption = !isNullOrUndefined(selectedUser)
+    ? (options.find(opt => {
+        return opt.value === selectedUser.id;
+      }) ?? null)
+    : null;
 
   const handleChange = (option: Option | null) => {
     if (isNullOrUndefined(option)) {
       onUserSelect(null);
       return;
     }
-    const user = eligibleUsers.find(usr => usr.id === option.value);
+    const user = eligibleUsers.find(usr => {
+      return usr.id === option.value;
+    });
     if (!isNullOrUndefined(user)) {
       onUserSelect(user);
     }
   };
 
   const formatOptionLabel = (option: Option, meta: FormatOptionLabelMeta<Option>) => {
-    const user = eligibleUsers.find(usr => usr.id === option.value);
-    if (!user || meta.context === 'value') {
+    const user = eligibleUsers.find(usr => {
+      return usr.id === option.value;
+    });
+    if (isNullOrUndefined(user) || meta.context === 'value') {
       return <span>{option.label}</span>;
     }
 
@@ -100,7 +110,9 @@ export const AdminSearchInput = ({
         dataUieName="input-leave-group-admin-search"
         options={options}
         value={selectedOption}
-        onChange={option => handleChange(option)}
+        onChange={option => {
+          return handleChange(option);
+        }}
         formatOptionLabel={formatOptionLabel}
         isSearchable
         placeholder={translate('leaveGroupAdminModalSearchPlaceholder')}
@@ -117,7 +129,9 @@ export const AdminSearchInput = ({
             type="checkbox"
             id="leave-group-admin-clear-content-checkbox"
             checked={clearContent}
-            onChange={event => onClearContentChange(event.target.checked)}
+            onChange={event => {
+              return onClearContentChange(event.target.checked);
+            }}
             style={checkboxStyles}
             data-uie-name="input-leave-group-clear-content"
           />

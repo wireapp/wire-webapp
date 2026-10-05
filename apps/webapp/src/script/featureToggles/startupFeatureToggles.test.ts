@@ -28,13 +28,13 @@ import {
   disableMessagePreprocessingFeatureToggleName,
   sharedDriveDirectUploadFeatureToggleName,
   startupFeatureToggleNames,
-  viewerPermissionFeatureToggleName,
+  forTestsOnlyFeatureToggleName,
 } from './startupFeatureToggleNames';
 
 const featureToggleNamesWithDedicatedExistenceTests = [
   applockRefactoredFeatureToggleName,
   conversationListCollapseFeatureToggleName,
-  viewerPermissionFeatureToggleName,
+  forTestsOnlyFeatureToggleName,
   disableMessagePreprocessingFeatureToggleName,
   sharedDriveDirectUploadFeatureToggleName,
 ] as const;
@@ -62,6 +62,15 @@ describe('startupFeatureToggles', function () {
 
     expect(startupFeatureToggles.isFeatureToggleEnabled(applockRefactoredFeatureToggleName)).toBe(true);
     expect(startupFeatureToggles.enabledFeatureToggleNames).not.toContain('unknown-feature');
+  });
+
+  it('enables multiple startup feature toggles', () => {
+    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
+      `?${startupFeatureToggleQueryParameterName}=${conversationListCollapseFeatureToggleName},${applockRefactoredFeatureToggleName}`,
+    );
+
+    expect(startupFeatureToggles.isFeatureToggleEnabled(conversationListCollapseFeatureToggleName)).toBe(true);
+    expect(startupFeatureToggles.isFeatureToggleEnabled(applockRefactoredFeatureToggleName)).toBe(true);
   });
 
   it('ignores unknown feature toggles from the query parameter', () => {
@@ -97,12 +106,12 @@ describe('startupFeatureToggles', function () {
     expect(startupFeatureToggles.isFeatureToggleEnabled(conversationListCollapseFeatureToggleName)).toBe(true);
   });
 
-  it('enables the viewer permission feature toggle when present in the query parameter', () => {
+  it('enables the for-tests-only feature toggle when present in the query parameter', () => {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
-      `?${startupFeatureToggleQueryParameterName}=${viewerPermissionFeatureToggleName}`,
+      `?${startupFeatureToggleQueryParameterName}=${forTestsOnlyFeatureToggleName}`,
     );
 
-    expect(startupFeatureToggles.isFeatureToggleEnabled(viewerPermissionFeatureToggleName)).toBe(true);
+    expect(startupFeatureToggles.isFeatureToggleEnabled(forTestsOnlyFeatureToggleName)).toBe(true);
   });
 
   it('enables the disable message preprocessing feature toggle when present in the query parameter', () => {
@@ -161,7 +170,7 @@ describe('startupFeatureToggles', function () {
     expect(allowedStartupFeatureToggleNames).toEqual([
       applockRefactoredFeatureToggleName,
       conversationListCollapseFeatureToggleName,
-      viewerPermissionFeatureToggleName,
+      forTestsOnlyFeatureToggleName,
       disableMessagePreprocessingFeatureToggleName,
       sharedDriveDirectUploadFeatureToggleName,
     ]);

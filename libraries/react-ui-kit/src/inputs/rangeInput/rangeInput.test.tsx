@@ -28,26 +28,32 @@ import {matchComponent} from '../../utils/testUtil';
 
 expect.extend(matchers);
 
-const getDefaultProps = () => ({
-  id: 'zoom-input',
-  label: 'Zoom',
-  minValueLabel: '-',
-  maxValueLabel: '+',
-  onChange: jest.fn(),
-  value: 0,
-  min: 1,
-  max: 3,
-  step: 0.1,
-});
+const getDefaultProps = () => {
+  return {
+    id: 'zoom-input',
+    label: 'Zoom',
+    minValueLabel: '-',
+    maxValueLabel: '+',
+    onChange: jest.fn(),
+    value: 0,
+    min: 1,
+    max: 3,
+    step: 0.1,
+  };
+};
 
-const ThemedRangeInput = (props: RangeInputProps) => (
-  <StyledApp themeId={THEME_ID.LIGHT}>
-    <RangeInput {...props} />
-  </StyledApp>
-);
+const ThemedRangeInput = (props: RangeInputProps) => {
+  return (
+    <StyledApp themeId={THEME_ID.LIGHT}>
+      <RangeInput {...props} />
+    </StyledApp>
+  );
+};
 
 describe('"RangeInput"', () => {
-  it('matches snapshot', () => matchComponent(<ThemedRangeInput {...getDefaultProps()} />));
+  it('matches snapshot', () => {
+    return matchComponent(<ThemedRangeInput {...getDefaultProps()} />);
+  });
 
   it('renders label', () => {
     const props = getDefaultProps();

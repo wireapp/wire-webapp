@@ -23,6 +23,8 @@ import {MeetingRecurrenceFrequency} from './meetingRecurrence';
 
 import {meetingConversationSchema, qualifiedIdSchema} from '../conversation/conversationSchema';
 
+const maximumMeetingTitleLength = 256;
+
 export {meetingConversationSchema};
 export type {ValidatedMeetingConversation} from '../conversation/conversationSchema';
 
@@ -49,7 +51,7 @@ const meetingFieldsSchema = {
   qualified_id: qualifiedIdSchema,
   recurrence: meetingRecurrenceSchema.optional(),
   start_time: utcTimeSchema,
-  title: z.string().min(1).max(256),
+  title: z.string().min(1).max(maximumMeetingTitleLength),
   tzid: z.string().min(1),
   updated_at: utcTimeSchema,
 } as const;

@@ -17,6 +17,8 @@
  *
  */
 
+import {isNonEmptyString} from '@sindresorhus/is';
+
 import {getWebEnvironment} from 'Util/environment';
 import {getLogger, Logger} from 'Util/logger';
 
@@ -31,7 +33,9 @@ let forceActivateErrorReporting: boolean = false;
 export const disableForcedErrorReporting = (): void => {
   forceActivateErrorReporting = false;
 };
-export const getForcedErrorReportingStatus = (): boolean => forceActivateErrorReporting;
+export const getForcedErrorReportingStatus = (): boolean => {
+  return forceActivateErrorReporting;
+};
 
 // Init the forced activation of error reporting based on the environment
 export const initForcedErrorReporting = () => {
@@ -53,8 +57,12 @@ export function isTelemetryEnabledAtCurrentEnvironment(): boolean {
 
   const {COUNTLY_API_KEY, COUNTLY_ALLOWED_BACKEND, BACKEND_REST} = Config.getConfig();
 
-  const allowedBackendUrls = COUNTLY_ALLOWED_BACKEND?.split(',').map(url => url.trim()) || [];
-  const isEnabled = !!COUNTLY_API_KEY && allowedBackendUrls.length > 0 && allowedBackendUrls.includes(BACKEND_REST);
+  const allowedBackendUrls =
+    COUNTLY_ALLOWED_BACKEND?.split(',').map(url => {
+      return url.trim();
+    }) ?? [];
+  const isEnabled =
+    isNonEmptyString(COUNTLY_API_KEY) && allowedBackendUrls.length > 0 && allowedBackendUrls.includes(BACKEND_REST);
 
   return isEnabled;
 }

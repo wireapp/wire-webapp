@@ -37,7 +37,11 @@ const getElementNodesInSelection = (selection: RangeSelection): Set<ElementNode>
     return new Set([selection.anchor.getNode().getParentOrThrow(), selection.focus.getNode().getParentOrThrow()]);
   }
 
-  return new Set(nodesInSelection.map(node => ($isElementNode(node) ? node : node.getParentOrThrow())));
+  return new Set(
+    nodesInSelection.map(node => {
+      return $isElementNode(node) ? node : node.getParentOrThrow();
+    }),
+  );
 };
 
 const $shouldPreventIndent = (maxDepth: number): boolean => {
@@ -74,7 +78,9 @@ export const ListMaxIndentLevelPlugin = ({maxDepth = 7}: {maxDepth?: number}): n
   useEffect(() => {
     return editor.registerCommand(
       INDENT_CONTENT_COMMAND,
-      () => $shouldPreventIndent(maxDepth),
+      () => {
+        return $shouldPreventIndent(maxDepth);
+      },
       COMMAND_PRIORITY_CRITICAL,
     );
   }, [editor, maxDepth]);

@@ -121,7 +121,9 @@ const OptionPreferences = ({propertiesRepository, selfUser}: OptionPreferencesPr
       setOptionMarkdownPreview(settings.interface.markdown_preview);
     };
 
-    const updateDarkMode = (newDarkMode: boolean) => setOptionDarkMode(newDarkMode);
+    const updateDarkMode = (newDarkMode: boolean) => {
+      return setOptionDarkMode(newDarkMode);
+    };
 
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.USE_DARK_MODE, updateDarkMode);
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, updateProperties);

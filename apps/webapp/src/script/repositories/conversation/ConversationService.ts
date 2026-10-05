@@ -17,7 +17,7 @@
  *
  */
 
-import {isArray} from '@sindresorhus/is';
+import {isArray, isEmptyString, isNonEmptyString, isTruthy, isUndefined} from '@sindresorhus/is';
 import type {
   CONVERSATION_ACCESS_ROLE,
   Conversation as BackendConversation,
@@ -65,6 +65,9 @@ import {MessageCategory} from '../../message/messageCategory';
 import {APIClient} from '../../service/apiClientSingleton';
 import {Core} from '../../service/coreSingleton';
 
+const minimumLegacyAccessRoleBackendVersion = 3;
+const remoteConversationLookbackInDays = 30;
+
 const logger = getLogger('ConversationService');
 const SEARCH_BATCH_SIZE = 500;
 
@@ -88,7 +91,9 @@ type SearchableConversationEvent = EventRecord & {
 type ConversationSearchEventLoader = Pick<EventService, 'loadEventsWithCategory'>;
 
 function waitForNextSearchBatch() {
-  return new Promise<void>(resolve => setTimeout(resolve, 0));
+  return new Promise<void>(resolve => {
+    return setTimeout(resolve, 0);
+  });
 }
 
 function createSearchAbortError() {
@@ -98,27 +103,37 @@ function createSearchAbortError() {
 }
 
 function throwIfSearchAborted(abortSignal?: AbortSignal) {
-  if (abortSignal?.aborted) {
+  if (abortSignal?.aborted === true) {
     throw createSearchAbortError();
   }
 }
 
 const TextExtractors: Partial<Record<string, (event: SearchableConversationEvent) => string>> = {
-  [ClientEvent.CONVERSATION.MESSAGE_ADD]: event => event.data?.content || event.data?.message || '',
-  [ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD]: event => event.data?.text?.content || '',
+  [ClientEvent.CONVERSATION.MESSAGE_ADD]: event => {
+    const messageTextContent = event.data?.content;
+
+    return isNonEmptyString(messageTextContent) ? messageTextContent : (event.data?.message ?? '');
+  },
+  [ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD]: event => {
+    return event.data?.text?.content ?? '';
+  },
   [ClientEvent.CONVERSATION.COMPOSITE_MESSAGE_ADD]: event => {
     const items: CompositeMessageItem[] = isArray(event.data?.items) ? event.data.items : [];
     return items
       .flatMap(item => {
-        if (item?.text) {
-          return [item.text.content || item.text.message || ''];
+        if (!isUndefined(item?.text)) {
+          const messageTextContent = item.text.content;
+
+          return [isNonEmptyString(messageTextContent) ? messageTextContent : (item.text.message ?? '')];
         }
-        if (item?.button) {
-          return [item.button.text || ''];
+        if (!isUndefined(item?.button)) {
+          return [item.button.text ?? ''];
         }
         return [];
       })
-      .filter((text: string) => text.length > 0)
+      .filter((text: string) => {
+        return text.length > 0;
+      })
       .join(' ');
   },
 };
@@ -151,7 +166,7 @@ async function findMatchingConversationEvents(
 
     const searchableText = getSearchableText(event);
     searchRegex.lastIndex = 0;
-    if (searchableText && searchRegex.test(searchableText)) {
+    if (isNonEmptyString(searchableText) && searchRegex.test(searchableText)) {
       matchingEvents.push(event);
     }
   }
@@ -174,7 +189,7 @@ export class ConversationService {
   private get coreConversationService() {
     const conversationService = this.core.service?.conversation;
 
-    if (!conversationService) {
+    if (isUndefined(conversationService)) {
       throw new Error('Conversation service not available');
     }
 
@@ -215,8 +230,12 @@ export class ConversationService {
    */
   getSafeConversationById(conversationId: QualifiedId): Task<BackendConversation, unknown> {
     return task.tryOrElse(
-      error => error,
-      () => this.apiClient.api.conversation.getConversation(conversationId),
+      error => {
+        return error;
+      },
+      () => {
+        return this.apiClient.api.conversation.getConversation(conversationId);
+      },
     );
   }
 
@@ -388,7 +407,10 @@ export class ConversationService {
     accessModes: CONVERSATION_ACCESS[],
     accessRole: CONVERSATION_ACCESS_ROLE[],
   ): Promise<ConversationEvent> {
-    const accessRoleField = this.apiClient.backendFeatures.version >= 3 ? 'access_role' : 'access_role_v2';
+    const accessRoleField =
+      this.apiClient.backendFeatures.version >= minimumLegacyAccessRoleBackendVersion
+        ? 'access_role'
+        : 'access_role_v2';
 
     return this.apiClient.api.conversation.putAccess(conversationId, {
       access: accessModes,
@@ -470,11 +492,11 @@ export class ConversationService {
    */
   async getActiveConversationsFromDb(): Promise<QualifiedId[]> {
     const min_date = new Date();
-    min_date.setDate(min_date.getDate() - 30);
+    min_date.setDate(min_date.getDate() - remoteConversationLookbackInDays);
 
     let events;
 
-    if (this.storageService.db) {
+    if (!isUndefined(this.storageService.db)) {
       events = await this.storageService.db
         .table(StorageSchemata.OBJECT_STORE.EVENTS)
         .where('time')
@@ -483,19 +505,28 @@ export class ConversationService {
     } else {
       const records = await this.storageService.getAll<{time: number}>(StorageSchemata.OBJECT_STORE.EVENTS);
       events = records
-        .filter(record => record.time.toString() >= min_date.toISOString())
-        .toSorted((a, b) => a.time - b.time);
+        .filter(record => {
+          return record.time.toString() >= min_date.toISOString();
+        })
+        .toSorted((a, b) => {
+          return a.time - b.time;
+        });
     }
 
     const conversations = events.reduce((accumulated, event) => {
       // TODO(federation): generate fully qualified ids
-      accumulated[event.conversation] = (accumulated[event.conversation] || 0) + 1;
+      const eventCount = accumulated[event.conversation];
+      accumulated[event.conversation] = (isTruthy(eventCount) ? eventCount : 0) + 1;
       return accumulated;
     }, {});
 
     return Object.keys(conversations)
-      .toSorted((id_a, id_b) => conversations[id_b] - conversations[id_a])
-      .map(id => ({domain: '', id}));
+      .toSorted((id_a, id_b) => {
+        return conversations[id_b] - conversations[id_a];
+      })
+      .map(id => {
+        return {domain: '', id};
+      });
   }
 
   /**
@@ -512,8 +543,10 @@ export class ConversationService {
    * @returns Resolves with a list of conversation records
    */
   async saveConversationsInDb(conversations: ConversationRecord[]): Promise<ConversationRecord[]> {
-    if (this.storageService.db) {
-      const keys = conversations.map(conversation => conversation.id);
+    if (!isUndefined(this.storageService.db)) {
+      const keys = conversations.map(conversation => {
+        return conversation.id;
+      });
       await this.storageService.db.table(StorageSchemata.OBJECT_STORE.CONVERSATIONS).bulkPut(conversations, keys);
     } else {
       for (const conversation of conversations) {
@@ -534,7 +567,9 @@ export class ConversationService {
 
     return this.storageService
       .save(StorageSchemata.OBJECT_STORE.CONVERSATIONS, conversation_et.id, conversationData)
-      .then(() => conversation_et);
+      .then(() => {
+        return conversation_et;
+      });
   }
 
   /**
@@ -550,7 +585,7 @@ export class ConversationService {
     abortSignal?: AbortSignal,
   ): Promise<SearchableConversationEvent[]> {
     const trimmedQuery = query.trim();
-    if (!trimmedQuery.length) {
+    if (isEmptyString(trimmedQuery)) {
       return [];
     }
 
@@ -576,10 +611,13 @@ export class ConversationService {
 
   private getEventSearchableText(event: SearchableConversationEvent): string {
     try {
-      const contentOrLegacyText = event.data?.content || event.data?.message || '';
-      const extractor = event.type ? TextExtractors[event.type] : undefined;
-      const extractedText = extractor?.(event) || '';
-      return extractedText.length ? extractedText : contentOrLegacyText;
+      const messageTextContent = event.data?.content;
+      const contentOrLegacyText = isNonEmptyString(messageTextContent)
+        ? messageTextContent
+        : (event.data?.message ?? '');
+      const extractor = isNonEmptyString(event.type) ? TextExtractors[event.type] : undefined;
+      const extractedText = extractor?.(event) ?? '';
+      return isNonEmptyString(extractedText) ? extractedText : contentOrLegacyText;
     } catch (err) {
       logger.error('Error extracting searchable text from event', {event, error: err});
       return '';
@@ -596,14 +634,16 @@ export class ConversationService {
   }
 
   public addMLSConversationRecoveredListener(onRecovered: (conversationId: QualifiedId) => void) {
-    this.coreConversationService.on('MLSConversationRecovered', ({conversationId}) => onRecovered(conversationId));
+    this.coreConversationService.on('MLSConversationRecovered', ({conversationId}) => {
+      return onRecovered(conversationId);
+    });
   }
 
   public addMLSEventDistributedListener(onDistributed: (events: any, time: string) => void) {
     // Listen to the MLS distributed event to handle events that were distributed
-    this.coreConversationService.on(MLSServiceEvents.MLS_EVENT_DISTRIBUTED, ({events, time}) =>
-      onDistributed(events, time),
-    );
+    this.coreConversationService.on(MLSServiceEvents.MLS_EVENT_DISTRIBUTED, ({events, time}) => {
+      return onDistributed(events, time);
+    });
   }
 
   /**

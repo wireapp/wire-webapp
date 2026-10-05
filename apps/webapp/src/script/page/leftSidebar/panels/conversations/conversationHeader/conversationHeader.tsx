@@ -107,8 +107,12 @@ export const ConversationHeaderComponent = ({
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    handleEscDown(event, () => setSearchValue(''));
-    handleEnterDown(event, () => onSearchEnterClick(event));
+    handleEscDown(event, () => {
+      return setSearchValue('');
+    });
+    handleEnterDown(event, () => {
+      return onSearchEnterClick(event);
+    });
 
     if (!event.shiftKey && isTabKey(event)) {
       onSearchTab(event);
@@ -211,11 +215,19 @@ export const ConversationHeaderComponent = ({
           ref={searchInputRef}
           className="label-1"
           value={searchValue}
-          onChange={event => setSearchValue(event.currentTarget.value)}
+          onChange={event => {
+            return setSearchValue(event.currentTarget.value);
+          }}
           startContent={<SearchIcon width={14} height={14} css={searchIconStyles} />}
           endContent={
             isNonEmptyString(searchValue) ? (
-              <CircleCloseIcon className="cursor-pointer" onClick={() => setSearchValue('')} css={closeIconStyles} />
+              <CircleCloseIcon
+                className="cursor-pointer"
+                onClick={() => {
+                  return setSearchValue('');
+                }}
+                css={closeIconStyles}
+              />
             ) : (
               searchValue
             )

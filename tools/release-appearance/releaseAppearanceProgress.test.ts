@@ -123,7 +123,11 @@ describe('release appearance Actions progress reporter', () => {
     expect(fakeActionsCore.informationMessages.at(-1)).toBe(
       'Release appearance: discovery 20/20 (100%) · 20 PRs · 0 failures · 0 active · elapsed 2s',
     );
-    expect(fakeActionsCore.informationMessages.filter(message => message.includes('(100%)'))).toHaveLength(1);
+    expect(
+      fakeActionsCore.informationMessages.filter(message => {
+        return message.includes('(100%)');
+      }),
+    ).toHaveLength(1);
     expect(fakeActionsCore.informationMessages.join('\n')).not.toMatch(/\x1B|::group::|::endgroup::/u);
   });
 
@@ -161,7 +165,11 @@ describe('release appearance Actions progress reporter', () => {
     expect(fakeActionsCore.informationMessages.at(-1)).toBe(
       'Release appearance: comments 10/10 (100%) · created 6 · updated 2 · unchanged 1 · failed 1 · 0 active · elapsed 21s',
     );
-    expect(fakeActionsCore.informationMessages.filter(message => message.includes('(100%)'))).toHaveLength(1);
+    expect(
+      fakeActionsCore.informationMessages.filter(message => {
+        return message.includes('(100%)');
+      }),
+    ).toHaveLength(1);
   });
 
   it('renders zero-item phases without dividing by zero', () => {
@@ -185,7 +193,11 @@ describe('release appearance Actions progress reporter', () => {
     expect(fakeActionsCore.informationMessages).toContain(
       'Release appearance: comments 0/0 (100%) · created 0 · updated 0 · unchanged 0 · failed 0 · 0 active · elapsed 0s',
     );
-    expect(fakeActionsCore.informationMessages.filter(message => message.includes('(100%)'))).toHaveLength(2);
+    expect(
+      fakeActionsCore.informationMessages.filter(message => {
+        return message.includes('(100%)');
+      }),
+    ).toHaveLength(2);
     expect(fakeActionsCore.endedGroups).toHaveLength(2);
   });
 

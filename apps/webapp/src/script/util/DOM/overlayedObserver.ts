@@ -19,6 +19,9 @@
 
 import {isUndefined} from '@sindresorhus/is';
 
+const midpointDivisor = 2;
+const overlayCheckIntervalInMilliseconds = 300;
+
 interface OverlayElement {
   onChange?: (isChanged: boolean) => void;
   onVisible?: () => void;
@@ -34,7 +37,8 @@ function checkOverlayedElements() {
   overlayedElements.forEach(({onVisible, onChange}, element) => {
     const isVisible = !isOverlayed(element);
     if (!isUndefined(onChange)) {
-      return onChange(isVisible);
+      onChange(isVisible);
+      return;
     }
     if (isVisible) {
       onVisible?.();
@@ -53,8 +57,8 @@ const isOverlayed = (domElement: HTMLElement): boolean => {
   if (isNaN(box.right + box.left + box.bottom + box.top)) {
     return true;
   }
-  const middlePointX = (box.right + box.left) / 2;
-  const middlePointY = (box.bottom + box.top) / 2;
+  const middlePointX = (box.right + box.left) / midpointDivisor;
+  const middlePointY = (box.bottom + box.top) / midpointDivisor;
   const elementAtPoint = document.elementFromPoint(middlePointX, middlePointY);
   return elementAtPoint !== null && domElement !== elementAtPoint && !domElement.contains(elementAtPoint);
 };
@@ -64,7 +68,7 @@ const onElementVisible = (element: HTMLElement, onVisible: () => void) => {
     return onVisible();
   }
   if (overlayCheckerInterval === undefined) {
-    overlayCheckerInterval = window.setInterval(checkOverlayedElements, 300);
+    overlayCheckerInterval = window.setInterval(checkOverlayedElements, overlayCheckIntervalInMilliseconds);
   }
   overlayedElements.set(element, {onVisible});
 };
@@ -72,7 +76,7 @@ const onElementVisible = (element: HTMLElement, onVisible: () => void) => {
 const trackElement = (element: HTMLElement, onChange: (isChanged: boolean) => void) => {
   onChange(!isOverlayed(element));
   if (overlayCheckerInterval === undefined) {
-    overlayCheckerInterval = window.setInterval(checkOverlayedElements, 300);
+    overlayCheckerInterval = window.setInterval(checkOverlayedElements, overlayCheckIntervalInMilliseconds);
   }
   overlayedElements.set(element, {onChange});
 };

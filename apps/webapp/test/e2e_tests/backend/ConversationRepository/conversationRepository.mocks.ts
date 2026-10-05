@@ -20,25 +20,29 @@
 export interface createGroupConversationDataParams {
   name: string;
   protocol: 'proteus' | 'mls';
-  qualifiedUsers: Array<{
+  qualifiedUsers: {
     domain: string;
     id: string;
-  }>;
+  }[];
   team: {
     teamid: string;
   };
 }
-export const createGroupConversationData = (data: createGroupConversationDataParams) => ({
-  access: ['invite', 'code'],
-  add_permission: 'admins',
-  access_role_v2: ['team_member', 'non_team_member', 'guest', 'service'],
-  conversation_role: 'wire_member',
-  name: data.name,
-  protocol: data.protocol,
-  qualified_users: data.qualifiedUsers,
-  users: data.qualifiedUsers.map(user => user.id),
-  team: {
-    managed: false,
-    teamid: data.team.teamid,
-  },
-});
+export const createGroupConversationData = (data: createGroupConversationDataParams) => {
+  return {
+    access: ['invite', 'code'],
+    add_permission: 'admins',
+    access_role_v2: ['team_member', 'non_team_member', 'guest', 'service'],
+    conversation_role: 'wire_member',
+    name: data.name,
+    protocol: data.protocol,
+    qualified_users: data.qualifiedUsers,
+    users: data.qualifiedUsers.map(user => {
+      return user.id;
+    }),
+    team: {
+      managed: false,
+      teamid: data.team.teamid,
+    },
+  };
+};

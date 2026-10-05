@@ -54,7 +54,9 @@ function generateNamedUsers(
   if (Array.isArray(userClientsOrQualifiedIds)) {
     return userClientsOrQualifiedIds.reduce<ParsedUsers>(
       (parsedUsers, currentQulifiedId) => {
-        const user = users.find(user => matchQualifiedIds(user.qualifiedId, currentQulifiedId));
+        const user = users.find(user => {
+          return matchQualifiedIds(user.qualifiedId, currentQulifiedId);
+        });
         if (!isNullOrUndefined(user) && isNonEmptyString(user.name())) {
           parsedUsers.namedUsers.push(user);
         } else {
@@ -69,7 +71,9 @@ function generateNamedUsers(
     (namedUsers, [domain, domainUsers]) => {
       const domainNamedUsers = Object.keys(domainUsers).reduce<ParsedUsers>(
         (domainNamedUsers, userId) => {
-          const user = users.find(user => matchQualifiedIds(user.qualifiedId, {id: userId, domain}));
+          const user = users.find(user => {
+            return matchQualifiedIds(user.qualifiedId, {id: userId, domain});
+          });
           if (!isNullOrUndefined(user) && isNonEmptyString(user.name())) {
             domainNamedUsers.namedUsers.push(user);
           } else {
@@ -89,7 +93,9 @@ function generateNamedUsers(
 
 function generateUnreachableUsers(users: QualifiedId[]) {
   const userCountByDomain = countBy(users, 'domain');
-  return map(userCountByDomain, (count, domain) => ({count, domain}));
+  return map(userCountByDomain, (count, domain) => {
+    return {count, domain};
+  });
 }
 
 function joinWith(elements: React.ReactNode[], separator: string) {
@@ -105,7 +111,9 @@ export const PartialFailureToSendWarning = ({failedToSend, isMessageFocused, kno
 
   const userCount = Array.isArray(queued)
     ? queued.length
-    : Object.entries(queued).reduce((count, [, users]) => count + Object.keys(users).length, 0) + failed.length;
+    : Object.entries(queued).reduce((count, [, users]) => {
+        return count + Object.keys(users).length;
+      }, 0) + failed.length;
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
 
   const showToggle = userCount > 1;
@@ -140,16 +148,18 @@ export const PartialFailureToSendWarning = ({failedToSend, isMessageFocused, kno
               {namedUsers.length !== 0 && (
                 <p css={warning}>
                   {joinWith(
-                    namedUsers.map(user => (
-                      <Bold
-                        css={warning}
-                        data-uie-name="named-user"
-                        data-uie-value={user.qualifiedId.id}
-                        key={user.qualifiedId.id}
-                      >
-                        {user.name()}
-                      </Bold>
-                    )),
+                    namedUsers.map(user => {
+                      return (
+                        <Bold
+                          css={warning}
+                          data-uie-name="named-user"
+                          data-uie-value={user.qualifiedId.id}
+                          key={user.qualifiedId.id}
+                        >
+                          {user.name()}
+                        </Bold>
+                      );
+                    }),
                     ', ',
                   )}
                   {` ${translate('messageFailedToSendWillReceivePlural')}`}
@@ -161,18 +171,24 @@ export const PartialFailureToSendWarning = ({failedToSend, isMessageFocused, kno
               {unreachableUsers.length !== 0 && (
                 <p css={warning}>
                   {joinWith(
-                    unreachableUsers.map(user => (
-                      <Bold css={warning} data-uie-name="unreachable-domain" key={user.domain + user.count.toString()}>
-                        {user.count > 1
-                          ? translate('messageFailedToSendParticipantsFromDomainPlural', {
-                              count: user.count.toString(),
-                              domain: user.domain,
-                            })
-                          : translate('messageFailedToSendParticipantsFromDomainSingular', {
-                              domain: user.domain,
-                            })}
-                      </Bold>
-                    )),
+                    unreachableUsers.map(user => {
+                      return (
+                        <Bold
+                          css={warning}
+                          data-uie-name="unreachable-domain"
+                          key={user.domain + user.count.toString()}
+                        >
+                          {user.count > 1
+                            ? translate('messageFailedToSendParticipantsFromDomainPlural', {
+                                count: user.count.toString(),
+                                domain: user.domain,
+                              })
+                            : translate('messageFailedToSendParticipantsFromDomainSingular', {
+                                domain: user.domain,
+                              })}
+                        </Bold>
+                      );
+                    }),
                     ', ',
                   )}
                   {unreachableUsers.length === 1
@@ -197,7 +213,11 @@ export const PartialFailureToSendWarning = ({failedToSend, isMessageFocused, kno
             type="button"
             tabIndex={messageFocusedTabIndex}
             variant={ButtonVariant.TERTIARY}
-            onClick={() => setIsOpen(state => !state)}
+            onClick={() => {
+              return setIsOpen(state => {
+                return !state;
+              });
+            }}
           >
             {isOpen ? translate('messageFailedToSendHideDetails') : translate('messageFailedToSendShowDetails')}
           </Button>

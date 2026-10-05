@@ -17,10 +17,11 @@
  *
  */
 
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {FeatureMLSMigration, FEATURE_STATUS} from '@wireapp/api-client/lib/team';
 
 const hasMigrationStartTimeArrived = (mlsMigrationFeature: FeatureMLSMigration): boolean => {
-  if (!mlsMigrationFeature) {
+  if (isNullOrUndefined(mlsMigrationFeature)) {
     return false;
   }
 
@@ -29,13 +30,13 @@ const hasMigrationStartTimeArrived = (mlsMigrationFeature: FeatureMLSMigration):
   }
 
   const startDateISO = mlsMigrationFeature.config.startTime;
-  const startTime = startDateISO ? Date.parse(startDateISO) : Infinity;
+  const startTime = isNonEmptyString(startDateISO) ? Date.parse(startDateISO) : Infinity;
 
   return Date.now() >= startTime;
 };
 
 const hasMigrationFinaliseRegardlessAfterDateArrived = (mlsMigrationFeature: FeatureMLSMigration): boolean => {
-  if (!mlsMigrationFeature) {
+  if (isNullOrUndefined(mlsMigrationFeature)) {
     return false;
   }
 
@@ -44,7 +45,7 @@ const hasMigrationFinaliseRegardlessAfterDateArrived = (mlsMigrationFeature: Fea
   }
 
   const finaliseDateISO = mlsMigrationFeature.config.finaliseRegardlessAfter;
-  const finaliseTime = finaliseDateISO ? Date.parse(finaliseDateISO) : Infinity;
+  const finaliseTime = isNonEmptyString(finaliseDateISO) ? Date.parse(finaliseDateISO) : Infinity;
 
   return Date.now() >= finaliseTime;
 };
@@ -57,7 +58,7 @@ export enum MLSMigrationStatus {
 }
 
 export const getMLSMigrationStatus = (mlsMigrationFeature?: FeatureMLSMigration): MLSMigrationStatus => {
-  if (!mlsMigrationFeature || mlsMigrationFeature.status === FEATURE_STATUS.DISABLED) {
+  if (isNullOrUndefined(mlsMigrationFeature) || mlsMigrationFeature.status === FEATURE_STATUS.DISABLED) {
     return MLSMigrationStatus.DISABLED;
   }
 

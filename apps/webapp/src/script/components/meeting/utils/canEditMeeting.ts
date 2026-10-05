@@ -22,8 +22,9 @@ import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
 import type {User} from 'Repositories/entity/User';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
-export const isMeetingHost = (meetingSeries: MeetingSeries, selfUser: User): boolean =>
-  matchQualifiedIds(meetingSeries.qualified_creator, selfUser.qualifiedId);
+export const isMeetingHost = (meetingSeries: MeetingSeries, selfUser: User): boolean => {
+  return matchQualifiedIds(meetingSeries.qualified_creator, selfUser.qualifiedId);
+};
 
 /**
  * Edit is allowed per list row: the host may edit an instance until it ends.

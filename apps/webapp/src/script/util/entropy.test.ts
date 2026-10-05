@@ -232,7 +232,11 @@ describe('Entropy', () => {
 
   describe('Entropy based on random data', () => {
     const randGen = seedrandom('Seed This test!');
-    const randomdata = new Uint8Array([...Array(900)].map(_ => randGen.int32()));
+    const randomdata = new Uint8Array(
+      [...Array(900)].map(_ => {
+        return randGen.int32();
+      }),
+    );
 
     it('has generated exactly 900 bytes of random data', () => {
       expect(randomdata.length).toBe(900);

@@ -105,7 +105,9 @@ describe('StringUtil', () => {
       const result = StringUtil.serializeArgs([circularObj]);
 
       expect(result[0]).toContain('[Circular]'); // Should replace circular references
-      expect(() => JSON.parse(result[0])).not.toThrow(); // Should be valid JSON
+      expect(() => {
+        return JSON.parse(result[0]);
+      }).not.toThrow(); // Should be valid JSON
     });
 
     it('should serialize a large object safely', () => {
@@ -126,7 +128,9 @@ describe('StringUtil', () => {
 
       const result = StringUtil.serializeArgs([obj]);
 
-      expect(() => JSON.parse(result[0])).not.toThrow(); // Should be valid JSON
+      expect(() => {
+        return JSON.parse(result[0]);
+      }).not.toThrow(); // Should be valid JSON
       expect(JSON.parse(result[0])).toEqual(obj); // Should match original object
     });
 

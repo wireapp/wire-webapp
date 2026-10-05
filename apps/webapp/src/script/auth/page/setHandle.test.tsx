@@ -33,11 +33,17 @@ const setHandleButtonId = 'do-send-handle';
 
 describe('SetHandle', () => {
   it('has disabled submit button as long as there is no input', async () => {
-    spyOn(actionRoot.selfAction, 'doGetConsents').and.returnValue(() => Promise.resolve());
-    spyOn(actionRoot.userAction, 'checkHandles').and.returnValue(() => Promise.resolve(''));
+    spyOn(actionRoot.selfAction, 'doGetConsents').and.returnValue(() => {
+      return Promise.resolve();
+    });
+    spyOn(actionRoot.userAction, 'checkHandles').and.returnValue(() => {
+      return Promise.resolve('');
+    });
     const {getByTestId} = mountComponent(<SetHandle />, mockStoreFactory()(initialRootState));
 
-    await waitFor(() => getByTestId(handleInputId));
+    await waitFor(() => {
+      return getByTestId(handleInputId);
+    });
     const handleInput = getByTestId(handleInputId);
     const setHandleButton = getByTestId(setHandleButtonId) as HTMLButtonElement;
 
@@ -50,15 +56,23 @@ describe('SetHandle', () => {
   });
 
   it('trims the handle', async () => {
-    spyOn(actionRoot.userAction, 'checkHandles').and.returnValue(() => Promise.resolve(''));
-    spyOn(actionRoot.selfAction, 'doGetConsents').and.returnValue(() => Promise.resolve());
-    spyOn(actionRoot.selfAction, 'setHandle').and.returnValue(() => Promise.resolve());
+    spyOn(actionRoot.userAction, 'checkHandles').and.returnValue(() => {
+      return Promise.resolve('');
+    });
+    spyOn(actionRoot.selfAction, 'doGetConsents').and.returnValue(() => {
+      return Promise.resolve();
+    });
+    spyOn(actionRoot.selfAction, 'setHandle').and.returnValue(() => {
+      return Promise.resolve();
+    });
 
     const handle = 'handle';
 
     const {getByTestId} = mountComponent(<SetHandle />, mockStoreFactory()(initialRootState));
 
-    await waitFor(() => getByTestId(handleInputId));
+    await waitFor(() => {
+      return getByTestId(handleInputId);
+    });
     const handleInput = getByTestId(handleInputId);
     const setHandleButton = getByTestId(setHandleButtonId) as HTMLButtonElement;
     await act(async () => {

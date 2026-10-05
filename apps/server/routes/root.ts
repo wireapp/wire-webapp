@@ -47,20 +47,24 @@ async function addGeoIP(req: Request) {
   req.app.locals.country = countryCode;
 }
 
-const Root = () => [
-  Router().get('/', (_req, res) => res.render('index')),
-  Router().get('/auth', async (req, res) => {
-    await addGeoIP(req);
-    return res.render('auth/index');
-  }),
-  Router().get('/unsupported', async (req, res) => {
-    await addGeoIP(req);
-    return res.render('unsupported/index');
-  }),
-  Router().get('/login', async (req, res) => {
-    await addGeoIP(req);
-    return res.render('login/index');
-  }),
-];
+const Root = () => {
+  return [
+    Router().get('/', (_req, res) => {
+      return res.render('index');
+    }),
+    Router().get('/auth', async (req, res) => {
+      await addGeoIP(req);
+      return res.render('auth/index');
+    }),
+    Router().get('/unsupported', async (req, res) => {
+      await addGeoIP(req);
+      return res.render('unsupported/index');
+    }),
+    Router().get('/login', async (req, res) => {
+      await addGeoIP(req);
+      return res.render('login/index');
+    }),
+  ];
+};
 
 export {Root};

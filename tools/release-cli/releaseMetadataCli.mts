@@ -183,7 +183,8 @@ function createRuntimeDependencies(): ReleaseMetadataCliDependencies {
 }
 
 async function main(): Promise<void> {
-  process.exitCode = await runReleaseMetadataCommand(process.argv.slice(2), {
+  const runtimeArgumentPrefixLength = 2;
+  process.exitCode = await runReleaseMetadataCommand(process.argv.slice(runtimeArgumentPrefixLength), {
     executeCommand(command: ReleaseMetadataCommand): number {
       return executeReleaseMetadataCommand(command, createRuntimeDependencies());
     },

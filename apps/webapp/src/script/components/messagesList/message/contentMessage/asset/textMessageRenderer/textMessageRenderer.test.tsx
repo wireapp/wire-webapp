@@ -94,8 +94,16 @@ describe('TextMessageRenderer', () => {
 
     const text = 'this is a link<br>multiline text';
 
-    Object.defineProperty(HTMLParagraphElement.prototype, 'clientHeight', {get: () => 100});
-    Object.defineProperty(HTMLParagraphElement.prototype, 'scrollHeight', {get: () => 200});
+    Object.defineProperty(HTMLParagraphElement.prototype, 'clientHeight', {
+      get: () => {
+        return 100;
+      },
+    });
+    Object.defineProperty(HTMLParagraphElement.prototype, 'scrollHeight', {
+      get: () => {
+        return 200;
+      },
+    });
 
     const {getByText} = render(
       <TextMessageRenderer text={text} onMessageClick={onClickElement} isFocusable={false} collapse />,

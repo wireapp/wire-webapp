@@ -36,7 +36,11 @@ import Cookies from 'js-cookie';
 
 import {QUERY_KEY} from '../auth/route';
 
-const isOauth = (): boolean => location?.hash?.includes(QUERY_KEY.SCOPE) ?? false;
+const browserCompatibilityCheckTimeoutInMilliseconds = 10000;
+
+const isOauth = (): boolean => {
+  return location?.hash?.includes(QUERY_KEY.SCOPE) ?? false;
+};
 
 const cookieName = 'cookie_supported_test_wire_cookie_name';
 
@@ -71,8 +75,8 @@ const redirectUnsupportedBrowser = (error: string): void => {
   console.error(error);
 };
 
-const supportsIndexDB = (): Promise<boolean> =>
-  new Promise<boolean>((resolve, _reject) => {
+const supportsIndexDB = (): Promise<boolean> => {
+  return new Promise<boolean>((resolve, _reject) => {
     if (!('indexedDB' in window)) {
       return resolve(false);
     }
@@ -90,7 +94,9 @@ const supportsIndexDB = (): Promise<boolean> =>
       return resolve(false);
     }
 
-    const connectionTimeout = setTimeout(() => resolve(false), 10000);
+    const connectionTimeout = setTimeout(() => {
+      return resolve(false);
+    }, browserCompatibilityCheckTimeoutInMilliseconds);
 
     dbOpenRequest.onerror = event => {
       clearTimeout(connectionTimeout);
@@ -105,6 +111,7 @@ const supportsIndexDB = (): Promise<boolean> =>
       return resolve(true);
     };
   });
+};
 
 const checkBrowser = (): void => {
   if (!supportsCookies()) {
@@ -126,7 +133,9 @@ const checkBrowser = (): void => {
     return;
   }
   void supportsIndexDB()
-    .catch(() => false)
+    .catch(() => {
+      return false;
+    })
     .then(res => {
       if (!res) {
         redirectUnsupportedBrowser("This browser doesn't support IndexDB to run the Wire app!");

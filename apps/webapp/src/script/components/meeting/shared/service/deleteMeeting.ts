@@ -17,6 +17,7 @@
  *
  */
 
+import {isNullOrUndefined} from '@sindresorhus/is';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import type {Task} from 'true-myth';
 
@@ -44,7 +45,7 @@ const mapLeaveSyncErrorToDeleteError = (error: LeaveMeetingConversationError): M
 };
 
 const leaveCallIfActive = (deps: MeetingServiceDeps, qualifiedConversationId: QualifiedId): void => {
-  if (deps.callingRepository.findCall(qualifiedConversationId)) {
+  if (!isNullOrUndefined(deps.callingRepository.findCall(qualifiedConversationId))) {
     deps.callingRepository.leaveCall(qualifiedConversationId, LEAVE_CALL_REASON.MANUAL_LEAVE_BY_UI_CLICK);
   }
 };
@@ -77,10 +78,14 @@ export const deleteMeetingForAll = (
 
   return deps.meetingsRepository
     .deleteMeeting(command.meetingId)
-    .mapRejected(() => meetingSubmitErrors.deleteFailed)
-    .andThen(() =>
-      removeMeetingConversationLocally(deps.conversationRepository, command.qualifiedConversation).mapRejected(
-        () => meetingSubmitErrors.deleteSucceededButLocalCleanupFailed,
-      ),
-    );
+    .mapRejected(() => {
+      return meetingSubmitErrors.deleteFailed;
+    })
+    .andThen(() => {
+      return removeMeetingConversationLocally(deps.conversationRepository, command.qualifiedConversation).mapRejected(
+        () => {
+          return meetingSubmitErrors.deleteSucceededButLocalCleanupFailed;
+        },
+      );
+    });
 };

@@ -84,7 +84,11 @@ test.describe('Proteus verification', () => {
     async ({createPage}) => {
       await createPage(withLogin(userA));
       // create 6 devices to reach the limit
-      await Promise.all(Array.from({length: 6}, () => createPage(withLogin(userA, {confirmNewHistory: true}))));
+      await Promise.all(
+        Array.from({length: 6}, () => {
+          return createPage(withLogin(userA, {confirmNewHistory: true}));
+        }),
+      );
 
       const newDevicePage = await createPage();
       const pageManager = PageManager.from(newDevicePage);
@@ -111,7 +115,11 @@ test.describe('Proteus verification', () => {
     {tag: ['@TC-716', '@regression']},
     async ({createPage}) => {
       await createPage(withLogin(userA));
-      await Promise.all(Array.from({length: 6}, () => createPage(withLogin(userA, {confirmNewHistory: true}))));
+      await Promise.all(
+        Array.from({length: 6}, () => {
+          return createPage(withLogin(userA, {confirmNewHistory: true}));
+        }),
+      );
 
       const newDevicePage = await createPage();
       const pageManager = PageManager.from(newDevicePage);

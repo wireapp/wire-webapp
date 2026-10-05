@@ -19,6 +19,8 @@
 
 import {EncryptedStore} from './encryptedStore';
 
+const bitsPerByte = 8;
+
 export class CorruptedKeyError extends Error {}
 
 export type GeneratedKey = {
@@ -60,7 +62,7 @@ export async function generateSecretKey({
       key = await crypto.subtle.generateKey(
         {
           name: 'AES-GCM',
-          length: keySize * 8,
+          length: keySize * bitsPerByte,
         },
         true,
         ['encrypt', 'decrypt'],
@@ -69,7 +71,13 @@ export async function generateSecretKey({
       await secretsDb.saveSecretValue(keyId, key);
       freshlyGenerated = true;
     }
-    return {key, deleteKey: () => secretsDb.deleteSecretValue(keyId), freshlyGenerated};
+    return {
+      key,
+      deleteKey: () => {
+        return secretsDb.deleteSecretValue(keyId);
+      },
+      freshlyGenerated,
+    };
   } catch (error: unknown) {
     throw error;
   }

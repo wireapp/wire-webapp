@@ -36,14 +36,18 @@ export const PaginationDot = ({page, isCurrentPage, isSmaller, onClick}: Paginat
     <button
       className="icon-button"
       css={dotButtonStyles(isSmaller)}
-      onClick={() => onClick(page)}
-      onKeyDown={event =>
-        handleKeyDown({
+      onClick={() => {
+        return onClick(page);
+      }}
+      onKeyDown={event => {
+        return handleKeyDown({
           event,
-          callback: () => onClick(page),
+          callback: () => {
+            return onClick(page);
+          },
           keys: [KEY.ENTER, KEY.SPACE],
-        })
-      }
+        });
+      }}
       aria-label={translate('paginationDotAriaLabel', {page: page + 1})}
       aria-current={isCurrentPage ? 'page' : undefined}
       data-page={page}

@@ -56,28 +56,36 @@ export const getMeetingActionEntries = ({
   onDeleteForMe,
 }: GetMeetingActionEntriesParams): ContextMenuEntry[] => {
   const joinEntry: ContextMenuEntry = {
-    icon: () => <CallIcon css={isJoinDisabled ? contextMenuDisabledItemIconStyles : undefined} />,
+    icon: () => {
+      return <CallIcon css={isJoinDisabled ? contextMenuDisabledItemIconStyles : undefined} />;
+    },
     label: translate(MEETING_ACTION_TRANSLATION_KEYS.joinNow),
     isDisabled: isJoinDisabled,
     click: onJoin,
   };
 
   const editEntry: ContextMenuEntry = {
-    icon: () => <EditIcon />,
+    icon: () => {
+      return <EditIcon />;
+    },
     label: translate(MEETING_ACTION_TRANSLATION_KEYS.editMeeting),
     click: onEdit,
   };
 
   const deleteForMeEntry: ContextMenuEntry = {
     css: contextMenuDangerItemStyles,
-    icon: () => <TrashIcon css={contextMenuDangerItemIconStyles} />,
+    icon: () => {
+      return <TrashIcon css={contextMenuDangerItemIconStyles} />;
+    },
     label: translate(MEETING_ACTION_TRANSLATION_KEYS.deleteMeetingForMe),
     click: onDeleteForMe,
   };
 
   const deleteForAllEntry: ContextMenuEntry = {
     css: contextMenuDangerItemStyles,
-    icon: () => <TrashIcon css={contextMenuDangerItemIconStyles} />,
+    icon: () => {
+      return <TrashIcon css={contextMenuDangerItemIconStyles} />;
+    },
     label: translate(MEETING_ACTION_TRANSLATION_KEYS.deleteMeetingForAll),
     click: onDeleteForAll,
   };

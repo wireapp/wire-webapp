@@ -17,11 +17,15 @@
  *
  */
 
+import {isNonEmptyString, isTruthy} from '@sindresorhus/is';
 import Long from 'long';
 
 import {ClientEvent} from 'Repositories/event/Client';
 import {LegacyEventRecord} from 'Repositories/storage/record/eventRecord';
 import {stringToUtf16BE, utf8ToUtf16BE} from 'Util/stringUtil';
+
+const locationCoordinatePrecisionScale = 1000;
+const millisecondsPerSecond = 1e3;
 
 /**
  * @returns Promise with hashed string bytes
@@ -34,15 +38,17 @@ const createSha256Hash = async (bytes: number[]): Promise<ArrayBuffer> => {
 /**
  * @returns Array of assetId bytes
  */
-const getAssetBytes = (event: any): number[] => utf8ToUtf16BE(event.data.key);
+const getAssetBytes = (event: any): number[] => {
+  return utf8ToUtf16BE(event.data.key);
+};
 
 /**
  * @returns Array of longitude bytes
  */
 const getLocationBytes = (event: any): number[] => {
   const {longitude, latitude} = event.data.location;
-  const latitudeApproximate = Math.round(latitude * 1000);
-  const longitudeApproximate = Math.round(longitude * 1000);
+  const latitudeApproximate = Math.round(latitude * locationCoordinatePrecisionScale);
+  const longitudeApproximate = Math.round(longitude * locationCoordinatePrecisionScale);
 
   const latitudeLong = Long.fromInt(latitudeApproximate).toBytesBE();
   const longitudeLong = Long.fromInt(longitudeApproximate).toBytesBE();
@@ -55,11 +61,13 @@ const getLocationBytes = (event: any): number[] => {
  */
 const getTimestampBytes = (event: any): number[] => {
   const unixTimestamp = new Date(event.time).getTime();
-  const timestampSeconds = Math.floor(unixTimestamp / 1e3);
+  const timestampSeconds = Math.floor(unixTimestamp / millisecondsPerSecond);
   return Long.fromInt(timestampSeconds).toBytesBE();
 };
 
-const getTextBytes = (event: any): number[] => utf8ToUtf16BE(event.data.content);
+const getTextBytes = (event: any): number[] => {
+  return utf8ToUtf16BE(event.data.content);
+};
 
 /**
  * Gets bytes for multipart message including text content and attachment UUIDs.
@@ -74,11 +82,13 @@ const getMultipartTextBytes = (event: any): number[] => {
 
   const attachments = event.data?.attachments ?? [];
   const uuidString = attachments
-    .map((attachment: any) => attachment?.cellAsset?.uuid)
-    .filter(Boolean)
+    .map((attachment: any) => {
+      return attachment?.cellAsset?.uuid;
+    })
+    .filter(isTruthy)
     .join(', ');
 
-  const attachmentBytes = uuidString ? stringToUtf16BE(uuidString) : [];
+  const attachmentBytes = isNonEmptyString(uuidString) ? stringToUtf16BE(uuidString) : [];
 
   return textBytes.concat(attachmentBytes);
 };

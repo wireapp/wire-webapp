@@ -40,16 +40,22 @@ export const KEY = {
 } as const;
 
 export const isOneOfKeys = (keyboardEvent: KeyboardEvent | ReactKeyboardEvent, expectedKeys: string[] = []) => {
-  expectedKeys = expectedKeys.map(key => key.toLowerCase());
+  expectedKeys = expectedKeys.map(key => {
+    return key.toLowerCase();
+  });
   const eventKey = keyboardEvent.key?.toLowerCase() ?? '';
-  return expectedKeys.some(key => key === eventKey);
+  return expectedKeys.some(key => {
+    return key === eventKey;
+  });
 };
 
-export const isArrowKey = (keyboardEvent: KeyboardEvent): boolean =>
-  isOneOfKeys(keyboardEvent, [KEY.ARROW_DOWN, KEY.ARROW_LEFT, KEY.ARROW_RIGHT, KEY.ARROW_UP]);
+export const isArrowKey = (keyboardEvent: KeyboardEvent): boolean => {
+  return isOneOfKeys(keyboardEvent, [KEY.ARROW_DOWN, KEY.ARROW_LEFT, KEY.ARROW_RIGHT, KEY.ARROW_UP]);
+};
 
-export const isPageUpDownKey = (keyboardEvent: KeyboardEvent): boolean =>
-  isOneOfKeys(keyboardEvent, [KEY.PAGE_UP, KEY.PAGE_DOWN]);
+export const isPageUpDownKey = (keyboardEvent: KeyboardEvent): boolean => {
+  return isOneOfKeys(keyboardEvent, [KEY.PAGE_UP, KEY.PAGE_DOWN]);
+};
 
 export const isKey = (keyboardEvent?: KeyboardEvent | ReactKeyboardEvent, expectedKey = '') => {
   const eventKey = keyboardEvent?.key?.toLowerCase() ?? '';
@@ -60,30 +66,42 @@ export const isKeyboardEvent = (event: Event | ReactEvent): event is KeyboardEve
   return 'key' in event;
 };
 
-export const isTabKey = (keyboardEvent: KeyboardEvent | ReactKeyboardEvent): boolean => isKey(keyboardEvent, KEY.TAB);
+export const isTabKey = (keyboardEvent: KeyboardEvent | ReactKeyboardEvent): boolean => {
+  return isKey(keyboardEvent, KEY.TAB);
+};
 
-export const isEnterKey = (keyboardEvent: KeyboardEvent | ReactKeyboardEvent): boolean =>
-  isKey(keyboardEvent, KEY.ENTER);
+export const isEnterKey = (keyboardEvent: KeyboardEvent | ReactKeyboardEvent): boolean => {
+  return isKey(keyboardEvent, KEY.ENTER);
+};
 
-export const isSpaceKey = (keyboardEvent: KeyboardEvent | ReactKeyboardEvent): boolean =>
-  isKey(keyboardEvent, KEY.SPACE);
+export const isSpaceKey = (keyboardEvent: KeyboardEvent | ReactKeyboardEvent): boolean => {
+  return isKey(keyboardEvent, KEY.SPACE);
+};
 
-export const isEscapeKey = (keyboardEvent: KeyboardEvent | ReactKeyboardEvent): boolean =>
-  isKey(keyboardEvent, KEY.ESC);
+export const isEscapeKey = (keyboardEvent: KeyboardEvent | ReactKeyboardEvent): boolean => {
+  return isKey(keyboardEvent, KEY.ESC);
+};
 
-export const isFunctionKey = (keyboardEvent: KeyboardEvent | ReactKeyboardEvent): boolean =>
-  keyboardEvent.altKey || keyboardEvent.ctrlKey || keyboardEvent.metaKey || keyboardEvent.shiftKey;
+export const isFunctionKey = (keyboardEvent: KeyboardEvent | ReactKeyboardEvent): boolean => {
+  return keyboardEvent.altKey || keyboardEvent.ctrlKey || keyboardEvent.metaKey || keyboardEvent.shiftKey;
+};
 
 /** On macOS the meta key is '⌘', which represents 'Ctrl' in the Windows world: https://www.oreilly.com/library/view/switching-to-the/9781449372927/ch01s08.html */
-export const isMetaKey = (keyboardEvent: KeyboardEvent): boolean =>
-  keyboardEvent.metaKey ||
-  keyboardEvent.ctrlKey ||
-  (isString(keyboardEvent.key) && keyboardEvent.key.toLowerCase() === 'control');
+export const isMetaKey = (keyboardEvent: KeyboardEvent): boolean => {
+  return (
+    keyboardEvent.metaKey ||
+    keyboardEvent.ctrlKey ||
+    (isString(keyboardEvent.key) && keyboardEvent.key.toLowerCase() === 'control')
+  );
+};
 
-export const isPasteAction = (keyboardEvent: KeyboardEvent): boolean =>
-  isMetaKey(keyboardEvent) && isKey(keyboardEvent, KEY.KEY_V);
+export const isPasteAction = (keyboardEvent: KeyboardEvent): boolean => {
+  return isMetaKey(keyboardEvent) && isKey(keyboardEvent, KEY.KEY_V);
+};
 
-export const isSpaceOrEnterKey = (key: string): boolean => key === KEY.SPACE || key === KEY.ENTER;
+export const isSpaceOrEnterKey = (key: string): boolean => {
+  return key === KEY.SPACE || key === KEY.ENTER;
+};
 
 export const handleKeyDown = ({
   event,
@@ -92,7 +110,7 @@ export const handleKeyDown = ({
 }: {
   event: ReactKeyboardEvent<Element> | KeyboardEvent;
   callback: (event?: ReactKeyboardEvent<Element> | KeyboardEvent) => void;
-  keys: Array<(typeof KEY)[keyof typeof KEY]>;
+  keys: (typeof KEY)[keyof typeof KEY][];
 }) => {
   if (keys.includes(event.key as (typeof KEY)[keyof typeof KEY])) {
     if ('preventDefault' in event) {

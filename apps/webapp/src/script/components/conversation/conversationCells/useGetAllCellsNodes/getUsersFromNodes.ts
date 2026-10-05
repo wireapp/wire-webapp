@@ -17,15 +17,20 @@
  *
  */
 
+import {isNonEmptyArray} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {RestNode} from 'cells-sdk-ts';
 
 import {getUserQualifiedIdFromNode} from 'Components/cells/common/getUserQualifiedIdFromNode/getUserQualifiedIdFromNode';
 import {UserRepository} from 'Repositories/user/userRepository';
 
-const getQualifiedIdKey = ({domain, id}: QualifiedId): string => `${domain}/${id}`;
+const getQualifiedIdKey = ({domain, id}: QualifiedId): string => {
+  return `${domain}/${id}`;
+};
 
-const isQualifiedId = (userId: QualifiedId | null): userId is QualifiedId => userId !== null;
+const isQualifiedId = (userId: QualifiedId | null): userId is QualifiedId => {
+  return userId !== null;
+};
 
 const getUniqueQualifiedIds = (userIds: QualifiedId[]): QualifiedId[] => {
   const uniqueUserIds = new Map<string, QualifiedId>();
@@ -48,11 +53,15 @@ export const getUsersFromNodes = async ({
   nodes: RestNode[];
   userRepository: UserRepository;
 }) => {
-  if (!nodes?.length) {
+  if (!isNonEmptyArray(nodes)) {
     return [];
   }
 
-  const userIds = nodes.map(node => getUserQualifiedIdFromNode(node)).filter(isQualifiedId);
+  const userIds = nodes
+    .map(node => {
+      return getUserQualifiedIdFromNode(node);
+    })
+    .filter(isQualifiedId);
 
   return userRepository.getUsersById(getUniqueQualifiedIds(userIds));
 };

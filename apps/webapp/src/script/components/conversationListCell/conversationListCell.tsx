@@ -72,7 +72,9 @@ export const ConversationListCell = ({
   conversation,
   onJoinCall,
   onClick = noop,
-  isSelected = () => false,
+  isSelected = () => {
+    return false;
+  },
   rightClick = noop,
   dataUieName,
   handleArrowKeyDown,

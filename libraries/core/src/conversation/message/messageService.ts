@@ -35,6 +35,8 @@ import {flattenUserMap} from './userClientsUtil';
 import type {EncryptionResult, ProteusService} from '../../messagingProtocols/proteus';
 import {isQualifiedIdArray} from '../../util';
 
+const clientIdentifierRadix = 16;
+
 type ClientMismatchError = AxiosError<MessageSendingStatus>;
 
 export class MessageService {
@@ -112,7 +114,7 @@ export class MessageService {
           const clientEntries = Object.entries(otrClientMap).map<ProtobufOTR.IClientEntry>(([clientId, payload]) => {
             return {
               client: {
-                client: Long.fromString(clientId, 16),
+                client: Long.fromString(clientId, clientIdentifierRadix),
               },
               text: payload,
             };
@@ -133,7 +135,7 @@ export class MessageService {
     const protoMessage = ProtobufOTR.QualifiedNewOtrMessage.create({
       recipients: qualifiedUserEntries,
       sender: {
-        client: Long.fromString(sendingClientId, 16),
+        client: Long.fromString(sendingClientId, clientIdentifierRadix),
       },
       nativePush: options.nativePush,
     });
@@ -180,7 +182,7 @@ export class MessageService {
   ): Promise<EncryptionResult> {
     const deleted = flattenUserMap(mismatch.deleted);
     // remove deleted clients to the recipients
-    deleted.forEach(({userId, data}) =>
+    deleted.forEach(({userId, data}) => {
       data.forEach(clientId => {
         const payloadsForDomain = initialPayloads.payloads[userId.domain];
         const payloadsForUser = payloadsForDomain?.[userId.id];
@@ -190,8 +192,8 @@ export class MessageService {
         }
 
         delete payloadsForUser[clientId];
-      }),
-    );
+      });
+    });
 
     if (Object.keys(mismatch.missing).length === 0) {
       return initialPayloads;

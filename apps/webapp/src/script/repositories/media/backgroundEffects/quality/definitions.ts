@@ -71,8 +71,9 @@ const QUALITY_TIERS = [TIER_DEFINITIONS.fhd, TIER_DEFINITIONS.hd, TIER_DEFINITIO
 
 export function getBestMatchingQualityTier(resolution: Resolution): QualityTierParams {
   return (
-    QUALITY_TIERS.find(({resolution: minResolution}) => resolutionIsGreaterThanOrEqualTo(resolution, minResolution)) ??
-    TIER_DEFINITIONS.nhd
+    QUALITY_TIERS.find(({resolution: minResolution}) => {
+      return resolutionIsGreaterThanOrEqualTo(resolution, minResolution);
+    }) ?? TIER_DEFINITIONS.nhd
   );
 }
 

@@ -65,13 +65,17 @@ const AVPreferencesComponent = ({propertiesRepository, callingRepository, device
       {areMediaDevicesInitialized && deviceSupport.audioinput && (
         <MicrophonePreferences
           {...{devicesHandler, streamHandler}}
-          refreshStream={() => callingRepository.refreshAudioInput()}
+          refreshStream={() => {
+            return callingRepository.refreshAudioInput();
+          }}
           hasActiveCall={callingRepository.hasActiveCall()}
         />
       )}
       {areMediaDevicesInitialized && deviceSupport.audiooutput && (
         <AudioOutPreferences
-          refreshCallOutputSpeaker={() => callingRepository.refreshAudioOutput()}
+          refreshCallOutputSpeaker={() => {
+            return callingRepository.refreshAudioOutput();
+          }}
           hasActiveCall={callingRepository.hasActiveCall()}
         />
       )}
@@ -79,7 +83,9 @@ const AVPreferencesComponent = ({propertiesRepository, callingRepository, device
         <CameraPreferences
           key={`camera-${shouldReloadCamera}`} // Force remount when call ends
           {...{streamHandler}}
-          refreshStream={() => callingRepository.refreshVideoInput()}
+          refreshStream={() => {
+            return callingRepository.refreshVideoInput();
+          }}
           hasActiveCameraStream={callingRepository.hasActiveCameraStream()}
         />
       )}

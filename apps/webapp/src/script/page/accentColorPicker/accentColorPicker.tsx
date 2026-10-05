@@ -75,7 +75,9 @@ const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({use
                   type="radio"
                   name="accent"
                   checked={isChecked}
-                  onChange={() => doSetAccentColor(id)}
+                  onChange={() => {
+                    return doSetAccentColor(id);
+                  }}
                   data-uie-name="do-set-accent-color"
                   data-uie-value={id}
                   css={{

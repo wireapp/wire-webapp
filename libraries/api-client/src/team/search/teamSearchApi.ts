@@ -71,7 +71,9 @@ export class TeamSearchAPI {
     };
 
     return {
-      cancel: () => cancelSource.cancel(SyntheticErrorLabel.REQUEST_CANCELLED),
+      cancel: () => {
+        return cancelSource.cancel(SyntheticErrorLabel.REQUEST_CANCELLED);
+      },
       response: handleRequest(),
     };
   }

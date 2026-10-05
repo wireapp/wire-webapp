@@ -33,9 +33,11 @@ export type SystemNotificationError = {
   cause: unknown;
 };
 
-export const toSystemNotificationError =
-  (kind: SystemNotificationErrorKind) =>
-  (cause: unknown): SystemNotificationError => ({kind, cause});
+export const toSystemNotificationError = (kind: SystemNotificationErrorKind) => {
+  return (cause: unknown): SystemNotificationError => {
+    return {kind, cause};
+  };
+};
 
 /** The three permission states, owned here so the port carries no DOM type. */
 export type SystemNotificationPermission = 'default' | 'denied' | 'granted';
@@ -44,7 +46,13 @@ export type SystemNotificationRequest = {
   title: string;
   body: string;
   tag: string;
+  icon?: string;
+  silent?: boolean;
+  data?: unknown;
+  requireInteraction: boolean;
   onClick: () => void;
+  /** Called when the platform has displayed the notification. */
+  onShow?: () => void;
   /** Called when the platform closed the notification on its own: user dismissal, OS lifecycle or an error. */
   onClose: () => void;
 };
@@ -63,5 +71,6 @@ export type SystemNotificationHandle = {
 export type SystemNotificationApi = {
   isSupported: () => boolean;
   getPermission: () => SystemNotificationPermission;
+  requestPermission: () => Promise<SystemNotificationPermission>;
   show: (request: SystemNotificationRequest) => Result<SystemNotificationHandle, SystemNotificationError>;
 };

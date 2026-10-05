@@ -19,7 +19,7 @@
 
 import {FC, ReactNode, useCallback, useEffect, useRef, useState} from 'react';
 
-import {isUndefined} from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {LegalHoldMemberStatus} from '@wireapp/api-client/lib/team/legalhold/';
 import cx from 'classnames';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
@@ -338,10 +338,12 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
       return;
     }
 
-    if (currentConversation) {
+    if (!isNullOrUndefined(currentConversation)) {
       await messageRepository.updateAllClients(currentConversation, false);
       const allUsers = await conversationRepository.getAllUsersInConversation(currentConversation);
-      const legalHoldUsers = allUsers.filter(user => user.isOnLegalHold());
+      const legalHoldUsers = allUsers.filter(user => {
+        return user.isOnLegalHold();
+      });
 
       if (legalHoldUsers.length === 0) {
         setIsModalOpen(false);
@@ -384,7 +386,9 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
       className="legal-hold-modal"
     >
       <div className="modal__header">
-        {userDevices && (
+        {isNullOrUndefined(userDevices) ? (
+          userDevices
+        ) : (
           <button
             className="button-reset-default modal__header__button modal__header__button__left"
             type="button"
@@ -421,15 +425,21 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
                 type="password"
                 value={passwordValue}
                 placeholder={translate('login.passwordPlaceholder')}
-                onChange={ev => setPasswordValue(ev.target.value)}
-                onKeyDown={ev => handleEnterDown(ev, acceptRequest)}
+                onChange={ev => {
+                  return setPasswordValue(ev.target.value);
+                }}
+                onKeyDown={ev => {
+                  return handleEnterDown(ev, acceptRequest);
+                }}
               />
             )}
 
-            {requestError && (
+            {isNonEmptyString(requestError) ? (
               <div className="modal__input__error" data-uie-name="status-error">
                 {requestError}
               </div>
+            ) : (
+              requestError
             )}
 
             <div className="modal__buttons">
@@ -462,7 +472,7 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
 
         {!isRequest && (
           <>
-            {!userDevices ? (
+            {isNullOrUndefined(userDevices) ? (
               <>
                 <div className="legal-hold-modal__logo">
                   <LegalHoldDot large dataUieName="status-modal-legal-hold-icon" />

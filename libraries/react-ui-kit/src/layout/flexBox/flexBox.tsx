@@ -36,18 +36,21 @@ export const flexBoxStyle: <T>(props: FlexBoxProps<T>) => CSSObject = ({
   column = false,
   justify = 'flex-start',
   flexWrap = 'nowrap',
-}) => ({
-  alignItems: align,
-  display: 'flex',
-  flexDirection: column ? 'column' : 'row',
-  flexWrap: flexWrap,
-  justifyContent: justify,
+}) => {
+  return {
+    alignItems: align,
+    display: 'flex',
+    flexDirection: column ? 'column' : 'row',
+    flexWrap: flexWrap,
+    justifyContent: justify,
+  };
+};
+
+export const filterFlexBoxProps = (props: FlexBoxProps) => {
+  return filterProps(props, ['align', 'column', 'justify', 'flexWrap']);
+};
+
+export const FlexBox = React.forwardRef<HTMLDivElement, FlexBoxProps>((props, ref) => {
+  return <div ref={ref} css={flexBoxStyle(props)} {...filterFlexBoxProps(props)} />;
 });
-
-export const filterFlexBoxProps = (props: FlexBoxProps) =>
-  filterProps(props, ['align', 'column', 'justify', 'flexWrap']);
-
-export const FlexBox = React.forwardRef<HTMLDivElement, FlexBoxProps>((props, ref) => (
-  <div ref={ref} css={flexBoxStyle(props)} {...filterFlexBoxProps(props)} />
-));
 FlexBox.displayName = 'FlexBox';

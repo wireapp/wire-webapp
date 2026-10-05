@@ -26,18 +26,18 @@ import type {ConversationRepository} from 'Repositories/conversation/Conversatio
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
-export const getDriveEnabledConversationFilterId = (conversation: Conversation): string =>
-  stringifyQualifiedId(conversation.qualifiedId);
+export const getDriveEnabledConversationFilterId = (conversation: Conversation): string => {
+  return stringifyQualifiedId(conversation.qualifiedId);
+};
 
-export const getDriveEnabledConversations = (conversationRepository: ConversationRepository): Conversation[] =>
-  conversationRepository
-    .getAllCellEnabledGroupConversations()
-    .toSorted(
-      (conversationA, conversationB) => conversationB.last_event_timestamp() - conversationA.last_event_timestamp(),
-    );
+export const getDriveEnabledConversations = (conversationRepository: ConversationRepository): Conversation[] => {
+  return conversationRepository.getAllCellEnabledGroupConversations().toSorted((conversationA, conversationB) => {
+    return conversationB.last_event_timestamp() - conversationA.last_event_timestamp();
+  });
+};
 
-const getConversationFilterStartContent = (conversation: Conversation, isChannelsEnabled: boolean) =>
-  conversation.isChannel() && isChannelsEnabled ? (
+const getConversationFilterStartContent = (conversation: Conversation, isChannelsEnabled: boolean) => {
+  return conversation.isChannel() && isChannelsEnabled ? (
     <ChannelAvatar
       conversationID={conversation.id}
       isLocked={conversation.accessModes?.includes(CONVERSATION_ACCESS.LINK) !== true}
@@ -46,6 +46,7 @@ const getConversationFilterStartContent = (conversation: Conversation, isChannel
   ) : (
     <GroupAvatar conversationID={conversation.id} size="medium" />
   );
+};
 
 export const useDriveEnabledConversationFilterItems = ({
   conversationRepository,
@@ -54,9 +55,11 @@ export const useDriveEnabledConversationFilterItems = ({
 }): FilterItem[] => {
   const {isChannelsEnabled} = useChannelsFeatureFlag();
 
-  return getDriveEnabledConversations(conversationRepository).map(conversation => ({
-    id: getDriveEnabledConversationFilterId(conversation),
-    label: conversation.display_name(),
-    startContent: getConversationFilterStartContent(conversation, isChannelsEnabled),
-  }));
+  return getDriveEnabledConversations(conversationRepository).map(conversation => {
+    return {
+      id: getDriveEnabledConversationFilterId(conversation),
+      label: conversation.display_name(),
+      startContent: getConversationFilterStartContent(conversation, isChannelsEnabled),
+    };
+  });
 };

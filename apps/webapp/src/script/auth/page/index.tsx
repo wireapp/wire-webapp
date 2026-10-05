@@ -137,14 +137,23 @@ const IndexComponent = ({defaultSSOCode, doInit}: Props & ConnectedProps & Dispa
         {features.ENABLE_ACCOUNT_REGISTRATION && (
           <Button
             type="button"
-            onClick={() => navigate(ROUTE.SET_ACCOUNT_TYPE)}
+            onClick={() => {
+              return navigate(ROUTE.SET_ACCOUNT_TYPE);
+            }}
             block
             data-uie-name="go-set-account-type"
           >
             {translate('index.createAccount')}
           </Button>
         )}
-        <Button type="button" onClick={() => navigate(ROUTE.LOGIN)} block data-uie-name="go-login">
+        <Button
+          type="button"
+          onClick={() => {
+            return navigate(ROUTE.LOGIN);
+          }}
+          block
+          data-uie-name="go-login"
+        >
           {translate('index.login')}
         </Button>
         {isNonEmptyString(logoutReason) && (
@@ -161,7 +170,9 @@ const IndexComponent = ({defaultSSOCode, doInit}: Props & ConnectedProps & Dispa
           <Button
             type="button"
             variant={ButtonVariant.SECONDARY}
-            onClick={() => navigate(ROUTE.SSO)}
+            onClick={() => {
+              return navigate(ROUTE.SSO);
+            }}
             block
             style={{marginTop: '120px'}}
             data-uie-name="go-sso-login"
@@ -175,18 +186,21 @@ const IndexComponent = ({defaultSSOCode, doInit}: Props & ConnectedProps & Dispa
 };
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
-const mapStateToProps = (state: RootState) => ({
-  defaultSSOCode: AuthSelector.getDefaultSSOCode(state),
-});
+const mapStateToProps = (state: RootState) => {
+  return {
+    defaultSSOCode: AuthSelector.getDefaultSSOCode(state),
+  };
+};
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
-  bindActionCreators(
+const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => {
+  return bindActionCreators(
     {
       doInit: actionRoot.authAction.doInit,
     },
     dispatch,
   );
+};
 
 const Index = connect(mapStateToProps, mapDispatchToProps)(IndexComponent);
 

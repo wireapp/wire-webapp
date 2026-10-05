@@ -42,13 +42,15 @@ export const Default: Story = {
 };
 
 export const WithLink: Story = {
-  render: () => (
-    <Checkbox>
-      <CheckboxLabel>
-        I accept the <Link href="#">Terms and Conditions</Link>
-      </CheckboxLabel>
-    </Checkbox>
-  ),
+  render: () => {
+    return (
+      <Checkbox>
+        <CheckboxLabel>
+          I accept the <Link href="#">Terms and Conditions</Link>
+        </CheckboxLabel>
+      </Checkbox>
+    );
+  },
 };
 
 export const Invalid: Story = {

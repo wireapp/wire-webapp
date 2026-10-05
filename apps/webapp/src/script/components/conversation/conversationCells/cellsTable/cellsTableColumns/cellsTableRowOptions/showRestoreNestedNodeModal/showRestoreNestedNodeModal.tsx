@@ -55,7 +55,9 @@ export const showRestoreNestedNodeModal = ({
                 [
                   {
                     exactMatch: '{name}',
-                    render: () => <b>{parentNodeName}</b>,
+                    render: () => {
+                      return <b>{parentNodeName}</b>;
+                    },
                   },
                 ],
               )}

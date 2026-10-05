@@ -22,13 +22,15 @@ import {Maybe} from 'true-myth';
 import {CapabilityInfo} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
 
 // Business logic for checking if the capability info has changed
-const capabilityComparator = (initialCapabilityInfo: CapabilityInfo) => (futureCapabilityInfo: CapabilityInfo) => {
-  return (
-    initialCapabilityInfo.webgl2 === futureCapabilityInfo.webgl2 &&
-    initialCapabilityInfo.worker === futureCapabilityInfo.worker &&
-    initialCapabilityInfo.offscreenCanvas === futureCapabilityInfo.offscreenCanvas &&
-    initialCapabilityInfo.requestVideoFrameCallback === futureCapabilityInfo.requestVideoFrameCallback
-  );
+const capabilityComparator = (initialCapabilityInfo: CapabilityInfo) => {
+  return (futureCapabilityInfo: CapabilityInfo) => {
+    return (
+      initialCapabilityInfo.webgl2 === futureCapabilityInfo.webgl2 &&
+      initialCapabilityInfo.worker === futureCapabilityInfo.worker &&
+      initialCapabilityInfo.offscreenCanvas === futureCapabilityInfo.offscreenCanvas &&
+      initialCapabilityInfo.requestVideoFrameCallback === futureCapabilityInfo.requestVideoFrameCallback
+    );
+  };
 };
 
 // Guard for checking if the capability info has changed

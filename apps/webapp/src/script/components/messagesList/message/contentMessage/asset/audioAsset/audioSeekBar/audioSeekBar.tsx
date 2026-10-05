@@ -27,6 +27,12 @@ import {interpolate} from 'Util/arrayUtil';
 import {clamp} from 'Util/numberUtil';
 import {createUuid} from 'Util/uuid';
 
+const audioLevelValueCount = 256;
+const audioBarSlotWidth = 3;
+const audioBarWidthUnits = 2;
+const amplitudeCenterDivisor = 2;
+const normalizedAmplitudeCenter = 0.5;
+
 interface AudioSeekBarProps {
   asset: FileAsset;
   audioElement: HTMLAudioElement;
@@ -43,14 +49,20 @@ const AudioSeekBar = ({asset, audioElement, disabled}: AudioSeekBarProps) => {
 
   useEffect(() => {
     window.addEventListener('resize', updateSvgWidth);
-    return () => window.removeEventListener('resize', updateSvgWidth);
+    return () => {
+      return window.removeEventListener('resize', updateSvgWidth);
+    };
   }, []);
 
   useEffect(() => {
     const loudness = asset.meta?.loudness;
 
     if (!isUndefined(loudness)) {
-      setLoudness(Array.from(loudness).map(level => level / 256));
+      setLoudness(
+        Array.from(loudness).map(level => {
+          return level / audioLevelValueCount;
+        }),
+      );
     }
   }, [asset]);
 
@@ -63,28 +75,32 @@ const AudioSeekBar = ({asset, audioElement, disabled}: AudioSeekBarProps) => {
     };
   }, [audioElement]);
 
-  useEffect(() => updateSvgWidth(), [svgNode.current]);
+  useEffect(() => {
+    return updateSvgWidth();
+  }, [svgNode.current]);
 
   useEffect(() => {
     if (svgWidth === 0 || isNan(svgWidth)) {
       return setPath('');
     }
 
-    const numberOfLevelsFitOnScreen = Math.floor(svgWidth / 3);
+    const numberOfLevelsFitOnScreen = Math.floor(svgWidth / audioBarSlotWidth);
     const singleWidth = 1 / numberOfLevelsFitOnScreen;
-    const barWidth = (singleWidth / 3) * 2;
+    const barWidth = (singleWidth / audioBarSlotWidth) * audioBarWidthUnits;
     const scaledLoudness = interpolate(loudness, numberOfLevelsFitOnScreen);
     const newPath = scaledLoudness
       .map((loudness, index) => {
         const x = index * singleWidth;
-        const y = 0.5 - loudness / 2;
+        const y = normalizedAmplitudeCenter - loudness / amplitudeCenterDivisor;
         return `M${x},${y}h${barWidth}V${1 - y}H${x}z`;
       })
       .join('');
     setPath(newPath);
   }, [svgWidth]);
 
-  const updateSvgWidth = () => setSvgWidth(svgNode.current?.clientWidth ?? 0);
+  const updateSvgWidth = () => {
+    return setSvgWidth(svgNode.current?.clientWidth ?? 0);
+  };
 
   const onLevelClick = (event: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
     if (isNull(svgNode.current)) {
@@ -98,7 +114,9 @@ const AudioSeekBar = ({asset, audioElement, disabled}: AudioSeekBarProps) => {
     onTimeUpdate();
   };
 
-  const onAudioEnded = () => setPosition(0);
+  const onAudioEnded = () => {
+    return setPosition(0);
+  };
 
   const onTimeUpdate = () => {
     if (audioElement.duration !== 0 && !isNan(audioElement.duration)) {

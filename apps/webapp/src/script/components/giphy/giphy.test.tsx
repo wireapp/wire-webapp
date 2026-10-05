@@ -30,11 +30,13 @@ import {
 import {Giphy, GiphyState} from '.';
 
 const inputValue = 'Yammy yammy';
-const getDefaultProps = () => ({
-  giphyRepository: {getGifs: jest.fn().mockResolvedValue([]), resetOffset: jest.fn()} as unknown as GiphyRepository,
-  inputValue,
-  onClose: jest.fn(),
-});
+const getDefaultProps = () => {
+  return {
+    giphyRepository: {getGifs: jest.fn().mockResolvedValue([]), resetOffset: jest.fn()} as unknown as GiphyRepository,
+    inputValue,
+    onClose: jest.fn(),
+  };
+};
 
 const closeButtonId = 'do-close-giphy-modal';
 const rootProviderWrapper = createRootProviderWrapperForTest(
@@ -47,13 +49,17 @@ describe('Giphy', () => {
       withTheme(<Giphy {...getDefaultProps()} defaultGiphyState={GiphyState.RESULT} />),
       {wrapper: rootProviderWrapper},
     );
-    await waitFor(() => getByTestId(closeButtonId));
+    await waitFor(() => {
+      return getByTestId(closeButtonId);
+    });
     expect(getByText(inputValue)).not.toBeNull();
   });
 
   it('closes giphy modal', async () => {
     const {getByTestId} = render(withTheme(<Giphy {...getDefaultProps()} />), {wrapper: rootProviderWrapper});
-    await waitFor(() => getByTestId(closeButtonId));
+    await waitFor(() => {
+      return getByTestId(closeButtonId);
+    });
     const closeButton = getByTestId(closeButtonId);
 
     expect(closeButton).not.toBeNull();
@@ -66,7 +72,9 @@ describe('Giphy', () => {
       {wrapper: rootProviderWrapper},
     );
 
-    await waitFor(() => getByTestId(closeButtonId));
+    await waitFor(() => {
+      return getByTestId(closeButtonId);
+    });
     expect(getByText('extensionsGiphyNoGifs')).not.toBeNull();
   });
 });

@@ -27,6 +27,8 @@ import {replaceInRange} from './stringUtil';
 
 import type {MentionEntity} from '../message/mentionEntity';
 
+const linkClosingTokenOffset = 2;
+
 interface MentionText {
   domain: string | null | undefined;
   isSelfMentioned: boolean;
@@ -89,7 +91,9 @@ markdownit.renderer.rules.heading_open = (tokens, idx) => {
   const headingLevel = tokens[idx].tag.slice(1);
   return `<div class="md-heading md-heading--${headingLevel}">`;
 };
-markdownit.renderer.rules.heading_close = () => '</div>';
+markdownit.renderer.rules.heading_close = () => {
+  return '</div>';
+};
 const originalNormalizeLink = markdownit.normalizeLink;
 if (isUndefined(originalNormalizeLink)) {
   throw new Error('Markdown link normalizer is not configured');
@@ -112,11 +116,19 @@ markdownit.normalizeLink = (url: string): string => {
   return url;
 };
 
-markdownit.renderer.rules.blockquote_open = () => '<blockquote class="md-blockquote">';
-markdownit.renderer.rules.blockquote_close = () => '</blockquote>';
+markdownit.renderer.rules.blockquote_open = () => {
+  return '<blockquote class="md-blockquote">';
+};
+markdownit.renderer.rules.blockquote_close = () => {
+  return '</blockquote>';
+};
 
-markdownit.renderer.rules.softbreak = () => '<br>';
-markdownit.renderer.rules.hardbreak = () => '<br>';
+markdownit.renderer.rules.softbreak = () => {
+  return '<br>';
+};
+markdownit.renderer.rules.hardbreak = () => {
+  return '<br>';
+};
 markdownit.renderer.rules.paragraph_open = (tokens, idx) => {
   const tokenMap = tokens[idx].map;
   const [position] = isNullOrUndefined(tokenMap) ? [0, 0] : tokenMap;
@@ -124,7 +136,9 @@ markdownit.renderer.rules.paragraph_open = (tokens, idx) => {
   const previousWithMap = tokens
     .slice(0, idx)
     .toReversed()
-    .find(({map}) => isNonEmptyArray(map));
+    .find(({map}) => {
+      return isNonEmptyArray(map);
+    });
   const previousMap = previousWithMap?.map;
   const previousPosition = isNullOrUndefined(previousWithMap)
     ? 0
@@ -143,7 +157,9 @@ markdownit.renderer.rules.paragraph_open = (tokens, idx) => {
   }
   return '<br>'.repeat(Math.max(count, 0));
 };
-markdownit.renderer.rules.paragraph_close = () => '';
+markdownit.renderer.rules.paragraph_close = () => {
+  return '';
+};
 
 const renderMention = (mentionData: MentionText) => {
   const elementClasses = mentionData.isSelfMentioned ? ' self-mention' : '';
@@ -159,17 +175,23 @@ const renderMention = (mentionData: MentionText) => {
   return `<span class="message-mention${elementClasses}"${elementAttributes}>${content}</span>`;
 };
 
-markdownit.normalizeLinkText = text => text;
+markdownit.normalizeLinkText = text => {
+  return text;
+};
 
 export const renderMessage = (message: string, selfId?: QualifiedId, mentionEntities: MentionEntity[] = []) => {
-  const createMentionHash = (mention: MentionEntity) => `@@${window.btoa(JSON.stringify(mention)).replace(/=/g, '')}`;
+  const createMentionHash = (mention: MentionEntity) => {
+    return `@@${window.btoa(JSON.stringify(mention)).replace(/=/g, '')}`;
+  };
 
   const mentionTexts: Record<string, MentionText> = {};
 
   let mentionlessText = mentionEntities
     .slice()
     // sort mentions to start with the latest mention first (in order not to have to recompute the index every time we modify the original text)
-    .toSorted((mention1, mention2) => mention2.startIndex - mention1.startIndex)
+    .toSorted((mention1, mention2) => {
+      return mention2.startIndex - mention1.startIndex;
+    })
     .reduce((strippedText, mention) => {
       const mentionText = message.slice(mention.startIndex, mention.startIndex + mention.length);
       const mentionKey = createMentionHash(mention);
@@ -183,16 +205,19 @@ export const renderMessage = (message: string, selfId?: QualifiedId, mentionEnti
     }, message);
 
   const removeMentionsHashes = (hashedText: string): string => {
-    return Object.entries(mentionTexts).reduce(
-      (text, [mentionHash, mention]) => text.replace(mentionHash, () => mention.text),
-      hashedText,
-    );
+    return Object.entries(mentionTexts).reduce((text, [mentionHash, mention]) => {
+      return text.replace(mentionHash, () => {
+        return mention.text;
+      });
+    }, hashedText);
   };
 
   const renderMentions = (inputText: string): string => {
     const replacedText = Object.keys(mentionTexts).reduce((text, mentionHash) => {
       const mentionMarkup = renderMention(mentionTexts[mentionHash]);
-      return text.replace(mentionHash, () => mentionMarkup);
+      return text.replace(mentionHash, () => {
+        return mentionMarkup;
+      });
     }, inputText);
     return replacedText;
   };
@@ -235,16 +260,24 @@ export const renderMessage = (message: string, selfId?: QualifiedId, mentionEnti
   });
 
   markdownit.renderer.rules.link_open = (tokens, idx, options, env, self) => {
-    const cleanString = (hashedString: string) => escape(removeMentionsHashes(hashedString));
+    const cleanString = (hashedString: string) => {
+      return escape(removeMentionsHashes(hashedString));
+    };
     const link = tokens[idx];
     const href = removeMentionsHashes(link.attrGet('href') ?? '');
     const isEmail = href.startsWith('mailto:');
     const isWireDeepLink = href.toLowerCase().startsWith('wire://');
     const nextToken = tokens[idx + 1];
     const text = nextToken?.type === 'text' ? nextToken.content : '';
-    const closeToken = tokens.slice(idx).find(token => token.type === 'link_close');
+    const closeToken = tokens.slice(idx).find(token => {
+      return token.type === 'link_close';
+    });
 
-    if (href == '' || closeToken == nextToken || (isEmptyString(text.trim()) && closeToken == tokens[idx + 2])) {
+    if (
+      href == '' ||
+      closeToken == nextToken ||
+      (isEmptyString(text.trim()) && closeToken == tokens[idx + linkClosingTokenOffset])
+    ) {
       if (!isNullOrUndefined(closeToken)) {
         closeToken.type = 'text';
         closeToken.content = `](${cleanString(href)})`;

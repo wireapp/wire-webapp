@@ -28,8 +28,16 @@ describe('timePickerUtils', () => {
 
     const filteredOptions = filterTimeOptionsAfter(options, minTime);
 
-    expect(filteredOptions.some(option => option.label === '4:15 PM')).toBe(false);
-    expect(filteredOptions.some(option => option.label === '4:30 PM')).toBe(true);
+    expect(
+      filteredOptions.some(option => {
+        return option.label === '4:15 PM';
+      }),
+    ).toBe(false);
+    expect(
+      filteredOptions.some(option => {
+        return option.label === '4:30 PM';
+      }),
+    ).toBe(true);
     const firstFilteredOption = filteredOptions[0];
     if (isUndefined(firstFilteredOption)) {
       throw new Error('Expected filtered time options to be non-empty');
@@ -40,13 +48,21 @@ describe('timePickerUtils', () => {
   it('formats options according to the provided regional locale', () => {
     const options = buildTimeOptions('de-DE');
 
-    expect(options.find(option => option.value === '14:00')).toEqual({value: '14:00', label: '14:00'});
+    expect(
+      options.find(option => {
+        return option.value === '14:00';
+      }),
+    ).toEqual({value: '14:00', label: '14:00'});
   });
 
   it('formats a regional locale not supported for application translations', () => {
     const options = buildTimeOptions('en-GB');
 
-    expect(options.find(option => option.value === '14:00')).toEqual({value: '14:00', label: '14:00'});
+    expect(
+      options.find(option => {
+        return option.value === '14:00';
+      }),
+    ).toEqual({value: '14:00', label: '14:00'});
   });
 
   it.each([

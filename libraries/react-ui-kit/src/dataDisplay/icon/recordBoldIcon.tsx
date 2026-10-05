@@ -21,19 +21,21 @@ import {SVGIcon, SVGIconProps} from './svgIcon';
 
 import {COLOR} from '../../identity';
 
-export const RecordBoldIcon = ({color = COLOR.TEXT, ...props}: SVGIconProps) => (
-  <SVGIcon realWidth={20} realHeight={16} color={color} {...props}>
-    <path fill="none" d="M0 0H24V24H0z" />
-    <circle fill="none" cx="10" cy="10" r="9" css={{stroke: color}} strokeWidth="2" />
-    <circle
-      cx="10"
-      cy="10"
-      r="4"
-      css={{
-        fill: color,
-        stroke: color,
-      }}
-      strokeWidth="2"
-    />
-  </SVGIcon>
-);
+export const RecordBoldIcon = ({color = COLOR.TEXT, ...props}: SVGIconProps) => {
+  return (
+    <SVGIcon realWidth={20} realHeight={16} color={color} {...props}>
+      <path fill="none" d="M0 0H24V24H0z" />
+      <circle fill="none" cx="10" cy="10" r="9" css={{stroke: color}} strokeWidth="2" />
+      <circle
+        cx="10"
+        cy="10"
+        r="4"
+        css={{
+          fill: color,
+          stroke: color,
+        }}
+        strokeWidth="2"
+      />
+    </SVGIcon>
+  );
+};

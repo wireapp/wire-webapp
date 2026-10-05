@@ -54,7 +54,9 @@ describe('ClientRepository', () => {
     userId = testFactory.client_repository.selfUser().id;
   });
 
-  beforeEach(() => testFactory.storage_repository.clearStores());
+  beforeEach(() => {
+    return testFactory.storage_repository.clearStores();
+  });
 
   afterEach(() => {
     PrimaryModal.show = originalPrimaryModalShow;
@@ -79,9 +81,9 @@ describe('ClientRepository', () => {
         '': {[entities.user.john_doe.id]: clients},
       };
 
-      spyOn(testFactory.client_repository.clientService, 'getClientsByUserIds').and.callFake(() =>
-        Promise.resolve(apiResponse),
-      );
+      spyOn(testFactory.client_repository.clientService, 'getClientsByUserIds').and.callFake(() => {
+        return Promise.resolve(apiResponse);
+      });
 
       const clientEntities = await testFactory.client_repository.getClientsByUserIds(
         [entities.user.john_doe.qualified_id],
@@ -134,7 +136,9 @@ describe('ClientRepository', () => {
       );
       const backendError: Error & {code?: HTTP_STATUS} = new Error('not found locally');
       backendError.code = HTTP_STATUS.NOT_FOUND;
-      spyOn(clientService, 'getClientById').and.callFake(() => Promise.reject(backendError));
+      spyOn(clientService, 'getClientById').and.callFake(() => {
+        return Promise.reject(backendError);
+      });
 
       return testFactory.client_repository
         .getValidLocalClient()
@@ -155,7 +159,9 @@ describe('ClientRepository', () => {
       spyOn(testFactory.storage_service, 'deleteDatabase').and.returnValue(Promise.resolve(true));
       const backendError: Error & {response?: {status: HTTP_STATUS}} = new Error('not found on backend');
       backendError.response = {status: HTTP_STATUS.NOT_FOUND};
-      spyOn(clientService, 'getClientById').and.callFake(() => Promise.reject(backendError));
+      spyOn(clientService, 'getClientById').and.callFake(() => {
+        return Promise.reject(backendError);
+      });
 
       return testFactory.client_repository
         .getValidLocalClient()
@@ -220,7 +226,9 @@ describe('ClientRepository', () => {
 
     it('throws an error on Electron if no current client', () => {
       spyOn(Runtime, 'isDesktopApp').and.returnValue(true);
-      const functionCall = () => testFactory.client_repository.isCurrentClientPermanent();
+      const functionCall = () => {
+        return testFactory.client_repository.isCurrentClientPermanent();
+      };
 
       expect(functionCall).toThrow(ClientError);
     });
@@ -254,7 +262,9 @@ describe('ClientRepository', () => {
     });
 
     it('throws an error if no current client', () => {
-      const functionCall = () => testFactory.client_repository.isCurrentClientPermanent();
+      const functionCall = () => {
+        return testFactory.client_repository.isCurrentClientPermanent();
+      };
 
       expect(functionCall).toThrow(ClientError);
     });
@@ -262,7 +272,9 @@ describe('ClientRepository', () => {
 
   describe('isCurrentClient', () => {
     //@ts-ignore
-    beforeEach(() => (testFactory.client_repository['clientState'].currentClient = undefined));
+    beforeEach(() => {
+      return (testFactory.client_repository['clientState'].currentClient = undefined);
+    });
 
     it('returns true if user ID and client ID match', () => {
       const clientEntity = new ClientEntity(false, null);
@@ -293,23 +305,30 @@ describe('ClientRepository', () => {
     });
 
     it('throws an error if current client is not set', () => {
-      const functionCall = () => testFactory.client_repository['isCurrentClient']({domain: '', id: userId}, clientId);
+      const functionCall = () => {
+        return testFactory.client_repository['isCurrentClient']({domain: '', id: userId}, clientId);
+      };
 
       expect(functionCall).toThrow(ClientError);
     });
 
     it('throws an error if client ID is not specified', () => {
       testFactory.client_repository['clientState'].currentClient = new ClientEntity(false, null);
-      const functionCall = () =>
-        testFactory.client_repository['isCurrentClient']({domain: '', id: userId}, undefined as unknown as string);
+      const functionCall = () => {
+        return testFactory.client_repository['isCurrentClient'](
+          {domain: '', id: userId},
+          undefined as unknown as string,
+        );
+      };
 
       expect(functionCall).toThrow(ClientError);
     });
 
     it('throws an error if user ID is not specified', () => {
       testFactory.client_repository['clientState'].currentClient = new ClientEntity(false, null);
-      const functionCall = () =>
-        testFactory.client_repository['isCurrentClient'](undefined as unknown as QualifiedId, clientId);
+      const functionCall = () => {
+        return testFactory.client_repository['isCurrentClient'](undefined as unknown as QualifiedId, clientId);
+      };
 
       expect(functionCall).toThrow(ClientError);
     });
@@ -317,15 +336,21 @@ describe('ClientRepository', () => {
 
   describe('logoutClient', () => {
     it('uses the injected translate function for the logout modal copy', async () => {
-      const translate = jest.fn(
-        (translationKey: Parameters<Translate>[0]) => `translated:${translationKey}`,
-      ) as Translate;
+      const translate = jest.fn((translationKey: Parameters<Translate>[0]) => {
+        return `translated:${translationKey}`;
+      }) as Translate;
       const primaryModalShow = jest.fn();
       const clientRepository = new ClientRepository(
         {} as any,
         {} as any,
         translate,
-        {currentClient: {isTemporary: () => false}} as any,
+        {
+          currentClient: {
+            isTemporary: () => {
+              return false;
+            },
+          },
+        } as any,
         {} as any,
       );
 

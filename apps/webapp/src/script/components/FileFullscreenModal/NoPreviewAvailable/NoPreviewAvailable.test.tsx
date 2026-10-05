@@ -22,6 +22,7 @@ import {render, screen} from '@testing-library/react';
 import {
   CELLS_SELF_USER_DRIVE_ROLE,
   CellsSelfUserDriveRoleProvider,
+  type CellsSelfUserDriveRole,
 } from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {
@@ -31,14 +32,17 @@ import {
 
 import {NoPreviewAvailable} from './NoPreviewAvailable';
 
-const translate = (key: string) =>
-  ({
-    'fileFullscreenModal.noPreviewAvailable.title': 'No preview available',
-    'fileFullscreenModal.noPreviewAvailable.description': 'Download this file to view it.',
-    'fileFullscreenModal.noPreviewAvailable.viewerDescription':
-      "Previews aren't available for this file type, and viewers can't download files.",
-    'fileFullscreenModal.noPreviewAvailable.callToAction': 'Download',
-  })[key] ?? key;
+const translate = (key: string) => {
+  return (
+    {
+      'fileFullscreenModal.noPreviewAvailable.title': 'No preview available',
+      'fileFullscreenModal.noPreviewAvailable.description': 'Download this file to view it.',
+      'fileFullscreenModal.noPreviewAvailable.viewerDescription':
+        "Previews aren't available for this file type, and viewers can't download files.",
+      'fileFullscreenModal.noPreviewAvailable.callToAction': 'Download',
+    }[key] ?? key
+  );
+};
 
 const defaultProps = {
   fileExtension: 'zip',
@@ -46,33 +50,34 @@ const defaultProps = {
   fileUrl: 'https://example.com/archive.zip',
 };
 
-const createWrapper = (isViewerPermissionFeatureEnabled: boolean) =>
-  createRootProviderWrapperForTest(
+const createWrapper = () => {
+  return createRootProviderWrapperForTest(
     createRootContextValueForTest({
-      isFeatureToggleEnabled: () => isViewerPermissionFeatureEnabled,
       translate,
     }),
   );
+};
 
 describe('NoPreviewAvailable', () => {
-  const renderPlaceholder = (isViewerPermissionFeatureEnabled: boolean) =>
-    render(
+  const renderPlaceholder = (selfUserDriveRole: CellsSelfUserDriveRole) => {
+    return render(
       withThemeAndRootContext(
-        <CellsSelfUserDriveRoleProvider selfUserDriveRole={CELLS_SELF_USER_DRIVE_ROLE.VIEWER}>
+        <CellsSelfUserDriveRoleProvider selfUserDriveRole={selfUserDriveRole}>
           <NoPreviewAvailable {...defaultProps} />
         </CellsSelfUserDriveRoleProvider>,
-        createWrapper(isViewerPermissionFeatureEnabled),
+        createWrapper(),
       ),
     );
+  };
 
   it('hides download action when download is restricted', () => {
-    renderPlaceholder(true);
+    renderPlaceholder(CELLS_SELF_USER_DRIVE_ROLE.VIEWER);
 
     expect(screen.queryByRole('button', {name: 'Download'})).not.toBeInTheDocument();
   });
 
   it('shows viewer-specific message when download is restricted', () => {
-    renderPlaceholder(true);
+    renderPlaceholder(CELLS_SELF_USER_DRIVE_ROLE.VIEWER);
 
     expect(
       screen.getByText("Previews aren't available for this file type, and viewers can't download files."),
@@ -80,7 +85,7 @@ describe('NoPreviewAvailable', () => {
   });
 
   it('shows download action when download is allowed', () => {
-    renderPlaceholder(false);
+    renderPlaceholder(CELLS_SELF_USER_DRIVE_ROLE.EDITOR);
 
     expect(screen.getByRole('button', {name: 'Download'})).toBeInTheDocument();
     expect(screen.getByText('Download this file to view it.')).toBeInTheDocument();

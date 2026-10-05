@@ -26,18 +26,26 @@ import {MentionEntity} from 'src/script/message/mentionEntity';
 import {MentionNode} from '../nodes/mentionNode';
 
 export const parseMentions = (editor: LexicalEditor, textValue: string, mentions: User[]) => {
-  const editorMentions = editor.getEditorState().read(() =>
-    $nodesOfType(MentionNode)
-      // The nodes given by lexical are not sorted by their position in the text. Instead they are sorted according to the moment they were inserted into the global text.
-      // We need to manually sort the nodes by their position before parsing the mentions in the entire text
-      .toSorted((m1, m2) => (m1.isBefore(m2) ? -1 : 1))
-      .map(node => node.getValue()),
-  );
+  const editorMentions = editor.getEditorState().read(() => {
+    return (
+      $nodesOfType(MentionNode)
+        // The nodes given by lexical are not sorted by their position in the text. Instead they are sorted according to the moment they were inserted into the global text.
+        // We need to manually sort the nodes by their position before parsing the mentions in the entire text
+        .toSorted((m1, m2) => {
+          return m1.isBefore(m2) ? -1 : 1;
+        })
+        .map(node => {
+          return node.getValue();
+        })
+    );
+  });
   let position = -1;
 
   return editorMentions.flatMap(mention => {
     const mentionPosition = textValue.indexOf(`@${mention}`, position + 1);
-    const mentionOption = mentions.find(user => user.name() === mention);
+    const mentionOption = mentions.find(user => {
+      return user.name() === mention;
+    });
 
     position = mentionPosition;
     return !isNullOrUndefined(mentionOption) ? [createMentionEntity(mentionOption, mentionPosition)] : [];

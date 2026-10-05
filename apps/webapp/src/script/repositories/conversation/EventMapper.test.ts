@@ -27,6 +27,7 @@ import {createMessageAddEvent} from 'test/helper/EventGenerator';
 import {AssetType} from 'Repositories/assets/assetType';
 import {EventBuilder} from 'Repositories/conversation/EventBuilder';
 import {Conversation} from 'Repositories/entity/Conversation';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {User} from 'Repositories/entity/User';
 import {MentionEntity} from 'src/script/message/mentionEntity';
 import {translate} from 'Util/localizerUtil';
@@ -50,6 +51,21 @@ describe('Event Mapper', () => {
   });
 
   describe('mapJsonEvent', () => {
+    it.each([
+      {editedTime: undefined, expectedTimestamp: null},
+      {editedTime: '', expectedTimestamp: NaN},
+      {editedTime: '1970-01-01T00:00:00.000Z', expectedTimestamp: 0},
+    ])('preserves optional edited timestamp $editedTime', options => {
+      const {editedTime, expectedTimestamp} = options;
+      const event = createMessageAddEvent({
+        overrides: {edited_time: editedTime, time: '2026-09-30T10:00:00.000Z'},
+      });
+
+      const actualMessage = eventMapper.mapJsonEvent(event, conversation) as ContentMessage;
+
+      expect(actualMessage.edited_timestamp()).toBe(expectedTimestamp);
+    });
+
     it('maps a stored Proteus session reset event to a system message with its sender', () => {
       const clock = createDeterministicClock({initialUnixEpochMicroseconds: BigInt(1_700_000_000_000) * 1_000n});
       const event = {
@@ -257,7 +273,9 @@ describe('Event Mapper', () => {
     });
 
     it('uses the injected translate function for team member leave fallback names', () => {
-      const translate = jest.fn((translationKey: string) => `translated:${translationKey}`);
+      const translate = jest.fn((translationKey: string) => {
+        return `translated:${translationKey}`;
+      });
       const teamMember = new User(createUuid(), '', translateForTest);
       const mapperWithTranslate = new EventMapper(undefined, translate);
       const event = EventBuilder.buildTeamMemberLeave(conversation, teamMember, Date.now());

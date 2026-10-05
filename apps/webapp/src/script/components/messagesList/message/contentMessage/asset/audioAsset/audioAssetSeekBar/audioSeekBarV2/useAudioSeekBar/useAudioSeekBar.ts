@@ -25,6 +25,11 @@ import {FileAsset} from 'Repositories/entity/message/fileAsset';
 import {interpolate} from 'Util/arrayUtil';
 import {clamp} from 'Util/numberUtil';
 
+const audioBarWidthUnits = 2;
+const audioBarSlotWidth = 3;
+const amplitudeCenterDivisor = 2;
+const normalizedAmplitudeCenter = 0.5;
+
 interface UseAudioSeekBarProps {
   asset: FileAsset;
   audioElement: HTMLAudioElement;
@@ -48,7 +53,9 @@ export const useAudioSeekBar = ({asset, audioElement, svgRef}: UseAudioSeekBarPr
   });
 
   const updateSvgWidth = useCallback(() => {
-    setState(state => ({...state, svgWidth: svgRef.current?.clientWidth ?? 0}));
+    setState(state => {
+      return {...state, svgWidth: svgRef.current?.clientWidth ?? 0};
+    });
   }, [svgRef]);
 
   const onTimeUpdate = useCallback(() => {
@@ -57,14 +64,18 @@ export const useAudioSeekBar = ({asset, audioElement, svgRef}: UseAudioSeekBarPr
       return;
     }
 
-    setState(state => ({
-      ...state,
-      position: audioElement.currentTime / audioDuration,
-    }));
+    setState(state => {
+      return {
+        ...state,
+        position: audioElement.currentTime / audioDuration,
+      };
+    });
   }, [audioElement]);
 
   const onAudioEnded = useCallback(() => {
-    setState(state => ({...state, position: 0}));
+    setState(state => {
+      return {...state, position: 0};
+    });
   }, []);
 
   const onLevelClick = useCallback(
@@ -92,13 +103,13 @@ export const useAudioSeekBar = ({asset, audioElement, svgRef}: UseAudioSeekBarPr
 
     const numberOfLevelsFitOnScreen = Math.floor(svgWidth / LEVELS_PER_WIDTH);
     const singleWidth = 1 / numberOfLevelsFitOnScreen;
-    const barWidth = (singleWidth / 3) * 2;
+    const barWidth = (singleWidth / audioBarSlotWidth) * audioBarWidthUnits;
     const scaledLoudness = interpolate(loudness, numberOfLevelsFitOnScreen);
 
     return scaledLoudness
       .map((level, index) => {
         const x = index * singleWidth;
-        const y = 0.5 - level / 2;
+        const y = normalizedAmplitudeCenter - level / amplitudeCenterDivisor;
         return `M${x},${y}h${barWidth}V${1 - y}H${x}z`;
       })
       .join('');
@@ -106,7 +117,9 @@ export const useAudioSeekBar = ({asset, audioElement, svgRef}: UseAudioSeekBarPr
 
   useEffect(() => {
     window.addEventListener('resize', updateSvgWidth);
-    return () => window.removeEventListener('resize', updateSvgWidth);
+    return () => {
+      return window.removeEventListener('resize', updateSvgWidth);
+    };
   }, [updateSvgWidth]);
 
   useEffect(() => {
@@ -115,10 +128,14 @@ export const useAudioSeekBar = ({asset, audioElement, svgRef}: UseAudioSeekBarPr
       return;
     }
 
-    setState(state => ({
-      ...state,
-      loudness: Array.from(assetLoudness).map(level => level / NORMALIZED_LOUDNESS),
-    }));
+    setState(state => {
+      return {
+        ...state,
+        loudness: Array.from(assetLoudness).map(level => {
+          return level / NORMALIZED_LOUDNESS;
+        }),
+      };
+    });
   }, [asset]);
 
   useEffect(() => {

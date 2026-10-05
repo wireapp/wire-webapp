@@ -31,7 +31,15 @@ interface SwitchStoryProps {
 
 const DefaultStory = ({checked, disabled}: SwitchStoryProps) => {
   const [isChecked, setIsChecked] = useState(checked);
-  return <Switch checked={isChecked} disabled={disabled} onToggle={() => setIsChecked(!isChecked)} />;
+  return (
+    <Switch
+      checked={isChecked}
+      disabled={disabled}
+      onToggle={() => {
+        return setIsChecked(!isChecked);
+      }}
+    />
+  );
 };
 
 const meta = {
@@ -41,7 +49,9 @@ const meta = {
     layout: 'centered',
   },
   tags: ['autodocs'],
-  render: ({checked, disabled, ...args}) => <DefaultStory {...args} checked={checked} disabled={disabled} />,
+  render: ({checked, disabled, ...args}) => {
+    return <DefaultStory {...args} checked={checked} disabled={disabled} />;
+  },
 } satisfies Meta<typeof Switch>;
 
 export default meta;

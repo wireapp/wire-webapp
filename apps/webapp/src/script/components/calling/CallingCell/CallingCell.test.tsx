@@ -49,20 +49,26 @@ const mockCallAlertState = {
   showAlert: false,
 };
 
-jest.mock('Components/calling/useCallAlertState', () => ({
-  useCallAlertState: jest.fn(() => mockCallAlertState),
-}));
+jest.mock('Components/calling/useCallAlertState', () => {
+  return {
+    useCallAlertState: jest.fn(() => {
+      return mockCallAlertState;
+    }),
+  };
+});
 
-jest.mock('Components/inViewport', () => ({
-  InViewport: ({onVisible, children}: {onVisible: () => void; children: ReactNode}) => {
-    require('react').useEffect(() => {
-      onVisible();
-    }, [onVisible]);
+jest.mock('Components/inViewport', () => {
+  return {
+    InViewport: ({onVisible, children}: {onVisible: () => void; children: ReactNode}) => {
+      require('react').useEffect(() => {
+        onVisible();
+      }, [onVisible]);
 
-    return <div>{children}</div>;
-  },
-  __esModule: true,
-}));
+      return <div>{children}</div>;
+    },
+    __esModule: true,
+  };
+});
 
 const createCall = (
   state: CALL_STATE,
@@ -160,7 +166,9 @@ describe('ConversationListCallingCell', () => {
       rerender(<CallingCell {...props} />);
     });
 
-    await waitFor(() => getByText('00:00'));
+    await waitFor(() => {
+      return getByText('00:00');
+    });
 
     const callDuration = container.querySelector('[data-uie-name="call-duration"]');
 

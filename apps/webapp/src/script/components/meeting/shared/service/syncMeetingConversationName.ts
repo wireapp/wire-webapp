@@ -36,10 +36,12 @@ export type SyncMeetingConversationNameParams = {
 export const syncMeetingConversationName = (
   conversationRepository: ConversationRepository,
   {qualifiedConversationId, title}: SyncMeetingConversationNameParams,
-): Task<void, MeetingSubmitErrors> =>
-  conversationRepository
+): Task<void, MeetingSubmitErrors> => {
+  return conversationRepository
     .safeGetConversationById(qualifiedConversationId)
-    .mapRejected(() => meetingSubmitErrors.conversationRenameFailed)
+    .mapRejected(() => {
+      return meetingSubmitErrors.conversationRenameFailed;
+    })
     .andThen(conversation => {
       if (!isMeetingConversation(conversation)) {
         return task.resolve(undefined);
@@ -51,8 +53,15 @@ export const syncMeetingConversationName = (
 
       return task
         .tryOrElse(
-          () => meetingSubmitErrors.conversationRenameFailed,
-          () => conversationRepository.renameConversation(conversation, title),
+          () => {
+            return meetingSubmitErrors.conversationRenameFailed;
+          },
+          () => {
+            return conversationRepository.renameConversation(conversation, title);
+          },
         )
-        .map(() => undefined);
+        .map(() => {
+          return undefined;
+        });
     });
+};

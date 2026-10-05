@@ -81,7 +81,9 @@ describe('CellsAPI', () => {
       patchNode: jest.fn(),
     } as unknown as jest.Mocked<NodeServiceApi>;
 
-    (NodeServiceApi as jest.Mock).mockImplementation(() => mockNodeServiceApi);
+    (NodeServiceApi as jest.Mock).mockImplementation(() => {
+      return mockNodeServiceApi;
+    });
 
     testFile = new File([TEST_FILE_CONTENT], TEST_FILE_NAME, {type: TEST_FILE_TYPE}) as File;
 

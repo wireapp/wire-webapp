@@ -327,12 +327,16 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
 };
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
-const mapStateToProps = (state: RootState) => ({
-  hasDefaultSSOCode: AuthSelector.hasDefaultSSOCode(state),
-});
+const mapStateToProps = (state: RootState) => {
+  return {
+    hasDefaultSSOCode: AuthSelector.hasDefaultSSOCode(state),
+  };
+};
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => bindActionCreators({}, dispatch);
+const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => {
+  return bindActionCreators({}, dispatch);
+};
 
 const SingleSignOn = connect(mapStateToProps, mapDispatchToProps)(SingleSignOnComponent);
 

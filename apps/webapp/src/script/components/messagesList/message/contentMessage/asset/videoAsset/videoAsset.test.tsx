@@ -45,14 +45,20 @@ describe('VideoAsset', () => {
   const progressObservable = ko.observable(-1);
 
   const assetRepository = {
-    getUploadProgress: jest.fn().mockReturnValue(ko.pureComputed(() => progressObservable())),
+    getUploadProgress: jest.fn().mockReturnValue(
+      ko.pureComputed(() => {
+        return progressObservable();
+      }),
+    ),
     load: jest.fn(),
     cancelUpload: jest.fn(),
     downloadFile: jest.fn().mockResolvedValue(undefined),
   } as unknown as jest.Mocked<AssetRepository>;
 
   const teamState = {
-    isFileSharingReceivingEnabled: ko.pureComputed(() => true),
+    isFileSharingReceivingEnabled: ko.pureComputed(() => {
+      return true;
+    }),
   } as TeamState;
 
   const remoteAssetData = new AssetRemoteData({
@@ -79,7 +85,11 @@ describe('VideoAsset', () => {
 
   const setupAssetRepository = (): void => {
     progressObservable(-1);
-    assetRepository.getUploadProgress.mockReturnValue(ko.pureComputed(() => progressObservable()));
+    assetRepository.getUploadProgress.mockReturnValue(
+      ko.pureComputed(() => {
+        return progressObservable();
+      }),
+    );
     assetRepository.load.mockReset().mockResolvedValueOnce(previewBlob).mockResolvedValueOnce(videoBlob);
 
     jest
@@ -88,10 +98,11 @@ describe('VideoAsset', () => {
       .mockReturnValueOnce('blob:mock-video-src');
   };
 
-  const renderVideoAsset = (message: ContentMessage) =>
-    render(<VideoAsset message={message} teamState={teamState} assetRepository={assetRepository} />, {
+  const renderVideoAsset = (message: ContentMessage) => {
+    return render(<VideoAsset message={message} teamState={teamState} assetRepository={assetRepository} />, {
       wrapper: rootProviderWrapper,
     });
+  };
 
   beforeAll(() => {
     HTMLVideoElement.prototype.play = jest.fn().mockResolvedValue(undefined);
@@ -115,7 +126,9 @@ describe('VideoAsset', () => {
 
       Object.defineProperty(videoElement, 'src', {
         configurable: true,
-        get: () => currentSrc,
+        get: () => {
+          return currentSrc;
+        },
         set: (value: string) => {
           currentSrc = value;
           queueMicrotask(() => {
@@ -232,7 +245,9 @@ describe('VideoAsset', () => {
     assetRepository.load
       .mockReset()
       .mockResolvedValueOnce(previewBlob)
-      .mockImplementationOnce(() => deferredLoad);
+      .mockImplementationOnce(() => {
+        return deferredLoad;
+      });
 
     jest.mocked(URL.createObjectURL).mockReset();
     jest

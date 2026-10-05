@@ -68,8 +68,8 @@ export const ScheduleMeetingModal = () => {
   const {isSubmitting, submit} = useScheduleMeetingSubmit();
   const selfUser = container.resolve(UserState).self();
 
-  const displayErrors = useMemo(
-    () => ({
+  const displayErrors = useMemo(() => {
+    return {
       title: isUndefined(errors.title) ? undefined : translate(errors.title),
       missingTimes: isUndefined(errors.missingTimes) ? undefined : translate(errors.missingTimes),
       startInPast: isUndefined(errors.startInPast) ? undefined : translate(errors.startInPast),
@@ -79,9 +79,8 @@ export const ScheduleMeetingModal = () => {
       passwordConfirmation: isUndefined(errors.passwordConfirmation)
         ? undefined
         : translate(errors.passwordConfirmation),
-    }),
-    [errors, translate],
-  );
+    };
+  }, [errors, translate]);
 
   const handleClose = () => {
     if (isSubmitting) {
@@ -123,7 +122,9 @@ export const ScheduleMeetingModal = () => {
       isShown={isOpen}
       onClosed={handleClose}
       data-uie-name="schedule-meeting-modal"
-      onKeyDown={event => handleEscDown(event, handleClose)}
+      onKeyDown={event => {
+        return handleEscDown(event, handleClose);
+      }}
     >
       <div css={wrapperStyles}>
         <header css={headerStyles}>

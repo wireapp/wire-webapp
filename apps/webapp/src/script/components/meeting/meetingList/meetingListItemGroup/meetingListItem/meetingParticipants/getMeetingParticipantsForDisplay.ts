@@ -17,6 +17,7 @@
  *
  */
 
+import {isNullOrUndefined} from '@sindresorhus/is';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import type {User} from 'Repositories/entity/User';
@@ -29,16 +30,19 @@ export const getMeetingParticipantsForDisplay = (
   organizerUser?: User,
 ): User[] => {
   const organizer =
-    participants.find(participant => matchQualifiedIds(participant.qualifiedId, qualifiedCreator)) ?? organizerUser;
-  const otherParticipants = participants.filter(
-    participant =>
+    participants.find(participant => {
+      return matchQualifiedIds(participant.qualifiedId, qualifiedCreator);
+    }) ?? organizerUser;
+  const otherParticipants = participants.filter(participant => {
+    return (
       !matchQualifiedIds(participant.qualifiedId, selfUser.qualifiedId) &&
-      !matchQualifiedIds(participant.qualifiedId, qualifiedCreator),
-  );
+      !matchQualifiedIds(participant.qualifiedId, qualifiedCreator)
+    );
+  });
 
   return [
-    ...(organizer ? [organizer] : []),
-    ...(!organizer || !matchQualifiedIds(selfUser.qualifiedId, qualifiedCreator) ? [selfUser] : []),
+    ...(!isNullOrUndefined(organizer) ? [organizer] : []),
+    ...(isNullOrUndefined(organizer) || !matchQualifiedIds(selfUser.qualifiedId, qualifiedCreator) ? [selfUser] : []),
     ...otherParticipants,
   ];
 };

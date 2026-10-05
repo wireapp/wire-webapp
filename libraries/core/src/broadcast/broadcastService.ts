@@ -45,7 +45,9 @@ export class BroadcastService {
     const plainTextArray = GenericMessage.encode(genericMessage).finish();
     const send = (): Promise<MessageSendingStatus> => {
       return this.messageService.sendMessage(this.apiClient.validatedClientId, recipients, plainTextArray, {
-        reportMissing: flattenUserMap(recipients).map(({userId}) => userId),
+        reportMissing: flattenUserMap(recipients).map(({userId}) => {
+          return userId;
+        }),
         onClientMismatch,
       });
     };

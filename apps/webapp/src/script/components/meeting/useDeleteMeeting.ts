@@ -31,15 +31,23 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 
 export const useDeleteMeeting = () => {
   const {translate, fireAndForgetInvoker} = useApplicationContext();
-  const deleteMeetingForMe = useMeetingStore(state => state.deleteMeetingForMe);
-  const deleteMeetingForAll = useMeetingStore(state => state.deleteMeetingForAll);
-  const removeMeetingByQualifiedId = useMeetingStore(state => state.removeMeetingByQualifiedId);
-  const loadMeetings = useMeetingStore(state => state.loadMeetings);
+  const deleteMeetingForMe = useMeetingStore(state => {
+    return state.deleteMeetingForMe;
+  });
+  const deleteMeetingForAll = useMeetingStore(state => {
+    return state.deleteMeetingForAll;
+  });
+  const removeMeetingByQualifiedId = useMeetingStore(state => {
+    return state.removeMeetingByQualifiedId;
+  });
+  const loadMeetings = useMeetingStore(state => {
+    return state.loadMeetings;
+  });
 
   const submitDelete = useCallback(
     (meetingInstance: MeetingInstance, mode: DeleteMeetingModalMode, selfUser: User | undefined) => {
-      fireAndForgetInvoker.fireAndForget(() =>
-        submitDeleteMeeting({
+      fireAndForgetInvoker.fireAndForget(() => {
+        return submitDeleteMeeting({
           meetingInstance,
           mode,
           selfUser,
@@ -48,8 +56,8 @@ export const useDeleteMeeting = () => {
           deleteMeetingForAll,
           removeMeetingByQualifiedId,
           loadMeetings,
-        }),
-      );
+        });
+      });
     },
     [
       deleteMeetingForAll,
@@ -67,7 +75,9 @@ export const useDeleteMeeting = () => {
         mode,
         isRecurring: meetingInstance.meetingSeries.recurrence !== 'doesNotRepeat',
         translate,
-        onConfirm: () => submitDelete(meetingInstance, mode, selfUser),
+        onConfirm: () => {
+          return submitDelete(meetingInstance, mode, selfUser);
+        },
       });
     },
     [submitDelete, translate],

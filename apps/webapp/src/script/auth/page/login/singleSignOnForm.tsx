@@ -346,7 +346,9 @@ const SingleSignOnFormComponent = ({
     <>
       {isLinkPasswordModalOpen && (
         <JoinGuestLinkPasswordModal
-          onClose={() => setIsLinkPasswordModalOpen(false)}
+          onClose={() => {
+            return setIsLinkPasswordModalOpen(false);
+          }}
           error={conversationError}
           conversationName={conversationInfo?.name}
           isLoading={isFetching || conversationInfoFetching}
@@ -407,37 +409,53 @@ const SingleSignOnFormComponent = ({
 };
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
-const mapStateToProps = (state: RootState) => ({
-  isFetching: AuthSelector.isFetching(state),
-  account: AuthSelector.getAccount(state),
-  authError: AuthSelector.getError(state),
-  conversationError: ConversationSelector.getError(state),
-  conversationInfo: ConversationSelector.conversationInfo(state),
-  conversationInfoFetching: ConversationSelector.conversationInfoFetching(state),
-});
+const mapStateToProps = (state: RootState) => {
+  return {
+    isFetching: AuthSelector.isFetching(state),
+    account: AuthSelector.getAccount(state),
+    authError: AuthSelector.getError(state),
+    conversationError: ConversationSelector.getError(state),
+    conversationInfo: ConversationSelector.conversationInfo(state),
+    conversationInfoFetching: ConversationSelector.conversationInfoFetching(state),
+  };
+};
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: ThunkDispatch) => ({
-  doCheckConversationCode: (...args: Parameters<typeof ROOT_ACTIONS.conversationAction.doCheckConversationCode>) =>
-    dispatch(ROOT_ACTIONS.conversationAction.doCheckConversationCode(...args)),
-  doFinalizeSSOLogin: (...args: Parameters<typeof ROOT_ACTIONS.authAction.doFinalizeSSOLogin>) =>
-    dispatch(ROOT_ACTIONS.authAction.doFinalizeSSOLogin(...args)),
-  doGetDomainInfo: (...args: Parameters<typeof ROOT_ACTIONS.authAction.doGetDomainInfo>) =>
-    dispatch(ROOT_ACTIONS.authAction.doGetDomainInfo(...args)),
-  doJoinConversationByCode: (...args: Parameters<typeof ROOT_ACTIONS.conversationAction.doJoinConversationByCode>) =>
-    dispatch(ROOT_ACTIONS.conversationAction.doJoinConversationByCode(...args)),
-  doGetConversationInfoByCode: (
-    ...args: Parameters<typeof ROOT_ACTIONS.conversationAction.doGetConversationInfoByCode>
-  ) => dispatch(ROOT_ACTIONS.conversationAction.doGetConversationInfoByCode(...args)),
-  doNavigate: (...args: Parameters<typeof ROOT_ACTIONS.navigationAction.doNavigate>) =>
-    dispatch(ROOT_ACTIONS.navigationAction.doNavigate(...args)),
-  resetAuthError: (...args: Parameters<typeof ROOT_ACTIONS.authAction.resetAuthError>) =>
-    dispatch(ROOT_ACTIONS.authAction.resetAuthError(...args)),
-  validateSSOCode: (...args: Parameters<typeof ROOT_ACTIONS.authAction.validateSSOCode>) =>
-    dispatch(ROOT_ACTIONS.authAction.validateSSOCode(...args)),
-  pushAccountRegistrationData: (...args: Parameters<typeof ROOT_ACTIONS.authAction.pushAccountRegistrationData>) =>
-    dispatch(ROOT_ACTIONS.authAction.pushAccountRegistrationData(...args)),
-});
+const mapDispatchToProps = (dispatch: ThunkDispatch) => {
+  return {
+    doCheckConversationCode: (...args: Parameters<typeof ROOT_ACTIONS.conversationAction.doCheckConversationCode>) => {
+      return dispatch(ROOT_ACTIONS.conversationAction.doCheckConversationCode(...args));
+    },
+    doFinalizeSSOLogin: (...args: Parameters<typeof ROOT_ACTIONS.authAction.doFinalizeSSOLogin>) => {
+      return dispatch(ROOT_ACTIONS.authAction.doFinalizeSSOLogin(...args));
+    },
+    doGetDomainInfo: (...args: Parameters<typeof ROOT_ACTIONS.authAction.doGetDomainInfo>) => {
+      return dispatch(ROOT_ACTIONS.authAction.doGetDomainInfo(...args));
+    },
+    doJoinConversationByCode: (
+      ...args: Parameters<typeof ROOT_ACTIONS.conversationAction.doJoinConversationByCode>
+    ) => {
+      return dispatch(ROOT_ACTIONS.conversationAction.doJoinConversationByCode(...args));
+    },
+    doGetConversationInfoByCode: (
+      ...args: Parameters<typeof ROOT_ACTIONS.conversationAction.doGetConversationInfoByCode>
+    ) => {
+      return dispatch(ROOT_ACTIONS.conversationAction.doGetConversationInfoByCode(...args));
+    },
+    doNavigate: (...args: Parameters<typeof ROOT_ACTIONS.navigationAction.doNavigate>) => {
+      return dispatch(ROOT_ACTIONS.navigationAction.doNavigate(...args));
+    },
+    resetAuthError: (...args: Parameters<typeof ROOT_ACTIONS.authAction.resetAuthError>) => {
+      return dispatch(ROOT_ACTIONS.authAction.resetAuthError(...args));
+    },
+    validateSSOCode: (...args: Parameters<typeof ROOT_ACTIONS.authAction.validateSSOCode>) => {
+      return dispatch(ROOT_ACTIONS.authAction.validateSSOCode(...args));
+    },
+    pushAccountRegistrationData: (...args: Parameters<typeof ROOT_ACTIONS.authAction.pushAccountRegistrationData>) => {
+      return dispatch(ROOT_ACTIONS.authAction.pushAccountRegistrationData(...args));
+    },
+  };
+};
 
 const SingleSignOnForm = connect(mapStateToProps, mapDispatchToProps)(SingleSignOnFormComponent);
 

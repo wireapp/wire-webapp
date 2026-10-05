@@ -51,5 +51,7 @@ export function useIsMounted() {
     };
   }, []);
 
-  return useCallback(() => isMounted.current, []);
+  return useCallback(() => {
+    return isMounted.current;
+  }, []);
 }

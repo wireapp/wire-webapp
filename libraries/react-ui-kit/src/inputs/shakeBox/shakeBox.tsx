@@ -47,21 +47,29 @@ export const ShakeBox = React.forwardRef<ShakeBoxRef, ShakeBoxProps>(
         targetOffset *= -damping;
       }
       if (Math.abs(targetOffset) >= threshold) {
-        requestAnimationId = requestAnimationFrame(() => shakeLoop(targetOffset, currentOffset));
+        requestAnimationId = requestAnimationFrame(() => {
+          return shakeLoop(targetOffset, currentOffset);
+        });
       } else {
         currentOffset = 0;
       }
       setOffset(currentOffset);
     };
 
-    useImperativeHandle(ref, () => ({
-      shake: () => {
-        cancelAnimationFrame(requestAnimationId);
-        shakeLoop(amplitude);
-      },
-    }));
+    useImperativeHandle(ref, () => {
+      return {
+        shake: () => {
+          cancelAnimationFrame(requestAnimationId);
+          shakeLoop(amplitude);
+        },
+      };
+    });
 
-    useEffect(() => () => cancelAnimationFrame(requestAnimationId), []);
+    useEffect(() => {
+      return () => {
+        return cancelAnimationFrame(requestAnimationId);
+      };
+    }, []);
 
     return <div css={{transform: `translateX(${offset}px)`}}>{children}</div>;
   },

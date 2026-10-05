@@ -19,6 +19,7 @@
 
 import {useCallback, useEffect, useState} from 'react';
 
+import {isNonEmptyString, isTruthy, isUndefined} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 import {noop} from 'noop-esm';
@@ -31,11 +32,13 @@ export const useUserIdentity = (userId: QualifiedId, groupId?: string, updateAft
   const core = container.resolve(Core);
   const [deviceIdentities, setDeviceIdentities] = useState<WireIdentity[] | undefined>();
   const getDeviceIdentity = (deviceId: string) => {
-    return deviceIdentities?.find(identity => identity.deviceId === deviceId);
+    return deviceIdentities?.find(identity => {
+      return identity.deviceId === deviceId;
+    });
   };
 
   const refreshDeviceIdentities = useCallback(async () => {
-    if (!groupId || !core.isMLSActiveForClient()) {
+    if (!isNonEmptyString(groupId) || !isTruthy(core.isMLSActiveForClient())) {
       return;
     }
 
@@ -52,7 +55,7 @@ export const useUserIdentity = (userId: QualifiedId, groupId?: string, updateAft
   }, [refreshDeviceIdentities]);
 
   useEffect(() => {
-    if (!updateAfterEnrollment) {
+    if (updateAfterEnrollment !== true) {
       return noop;
     }
     E2EIHandler.getInstance().on('deviceStatusUpdated', refreshDeviceIdentities);
@@ -62,9 +65,14 @@ export const useUserIdentity = (userId: QualifiedId, groupId?: string, updateAft
   }, [refreshDeviceIdentities, updateAfterEnrollment]);
 
   let status: MLSStatuses | undefined;
-  if (!deviceIdentities) {
+  if (isUndefined(deviceIdentities)) {
     status = undefined;
-  } else if (deviceIdentities.length > 0 && deviceIdentities.every(identity => identity.status === MLSStatuses.VALID)) {
+  } else if (
+    deviceIdentities.length > 0 &&
+    deviceIdentities.every(identity => {
+      return identity.status === MLSStatuses.VALID;
+    })
+  ) {
     status = MLSStatuses.VALID;
   } else {
     status = MLSStatuses.NOT_ACTIVATED;

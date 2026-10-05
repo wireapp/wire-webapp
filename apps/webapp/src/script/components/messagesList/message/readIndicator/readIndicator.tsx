@@ -77,7 +77,9 @@ export const ReadIndicator = ({
     <div css={ReadIndicatorContainer} className="read-indicator-wrapper">
       <button
         css={ReadIndicatorStyles(false)}
-        onClick={() => onClick?.(message)}
+        onClick={() => {
+          return onClick?.(message);
+        }}
         className="button-reset-default read-indicator"
         data-uie-name="status-message-read-receipts"
       >

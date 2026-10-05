@@ -63,13 +63,13 @@ const DeviceCard = ({click, getDeviceIdentity, device: clientEntity, showIcon = 
       tabIndex={messageFocusedTabIndex}
       className={cx('device-card', {'device-card__no-hover': !clickable})}
       onClick={clickOnDevice}
-      onKeyDown={event =>
-        handleKeyDown({
+      onKeyDown={event => {
+        return handleKeyDown({
           event,
           callback: clickOnDevice,
           keys: [KEY.ENTER, KEY.SPACE],
-        })
-      }
+        });
+      }}
       data-uie-uid={id}
       data-uie-name="device-card"
     >

@@ -21,6 +21,8 @@ import {SUBCONVERSATION_ID} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {noop} from 'noop-esm';
 
+import {LogFactory} from '@wireapp/commons';
+
 import {DomainMlsError, MlsErrorMapper} from './mlsErrorMapper';
 import {
   MlsRecoveryOrchestratorImpl,
@@ -39,13 +41,15 @@ function makeMapperReturning(err: DomainMlsError): MlsErrorMapper {
 }
 
 describe('MlsRecoveryOrchestrator', () => {
-  const baseDeps = () => ({
-    joinViaExternalCommit: jest.fn().mockResolvedValue(undefined),
-    resetAndReestablish: jest.fn().mockResolvedValue(undefined),
-    recoverFromEpochMismatch: jest.fn().mockResolvedValue(undefined),
-    addMissingUsers: jest.fn().mockResolvedValue(undefined),
-    wipeMLSConversation: jest.fn().mockResolvedValue(undefined),
-  });
+  const baseDeps = () => {
+    return {
+      joinViaExternalCommit: jest.fn().mockResolvedValue(undefined),
+      resetAndReestablish: jest.fn().mockResolvedValue(undefined),
+      recoverFromEpochMismatch: jest.fn().mockResolvedValue(undefined),
+      addMissingUsers: jest.fn().mockResolvedValue(undefined),
+      wipeMLSConversation: jest.fn().mockResolvedValue(undefined),
+    };
+  };
 
   it('does nothing when callback succeeds', async () => {
     const deps = baseDeps();
@@ -62,6 +66,49 @@ describe('MlsRecoveryOrchestrator', () => {
     expect(cb).toHaveBeenCalledTimes(1);
     expect(deps.joinViaExternalCommit).not.toHaveBeenCalled();
     expect(deps.wipeMLSConversation).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    {recoveryError: null, expectedDetails: '(not an object)'},
+    {recoveryError: undefined, expectedDetails: '(not an object)'},
+    {recoveryError: 'recovery failed', expectedDetails: '(not an object)'},
+    {recoveryError: noop, expectedDetails: '(not an object)'},
+    {recoveryError: new Error('recovery failed'), expectedDetails: '(no meaningful data)'},
+    {recoveryError: {}, expectedDetails: '(no meaningful data)'},
+    {recoveryError: {status: undefined}, expectedDetails: '(no meaningful data)'},
+    {recoveryError: {status: 0}, expectedDetails: {status: 0}},
+    {recoveryError: {response: null}, expectedDetails: '(no meaningful data)'},
+    {recoveryError: {response: 'response'}, expectedDetails: '(no meaningful data)'},
+    {recoveryError: {response: noop}, expectedDetails: '(no meaningful data)'},
+    {
+      recoveryError: {status: 503, response: {data: {message: 'unavailable'}, headers: {secret: 'private'}}},
+      expectedDetails: {status: 503, response: {data: {message: 'unavailable'}}},
+    },
+  ])('logs only selected recovery error details and rethrows $recoveryError', async testCase => {
+    const {recoveryError, expectedDetails} = testCase;
+    const dependencies = baseDeps();
+    dependencies.joinViaExternalCommit.mockRejectedValue(recoveryError);
+    const mapper = makeMapperReturning({type: 'OrphanWelcome'} as DomainMlsError);
+    const logger = LogFactory.getLogger('recovery-error-test');
+    logger.warn = jest.fn();
+    const orchestrator = new MlsRecoveryOrchestratorImpl(
+      mapper,
+      minimalDefaultPolicies,
+      dependencies,
+      new Set(),
+      logger,
+    );
+
+    await expect(
+      orchestrator.execute({
+        context: {operationName: OperationName.handleWelcome, qualifiedConversationId: qid()},
+        callBack: jest.fn().mockRejectedValue(new Error('operation failed')),
+      }),
+    ).rejects.toBe(recoveryError);
+
+    expect(logger.warn).toHaveBeenCalledWith(expect.stringContaining('Recovery failed for key'), {
+      error: expectedDetails,
+    });
   });
 
   it('retries original when policy requests reRunOriginalOperation (WrongEpoch/send)', async () => {
@@ -248,19 +295,25 @@ describe('MlsRecoveryOrchestrator', () => {
     const joinPromise = new Promise<void>(resolve => {
       resolveJoin = resolve;
     });
-    deps.joinViaExternalCommit.mockImplementation(() => joinPromise);
+    deps.joinViaExternalCommit.mockImplementation(() => {
+      return joinPromise;
+    });
 
     const ctx = {
       operationName: OperationName.handleWelcome,
       qualifiedConversationId: qid('same') as QualifiedId,
     } as const;
-    const callBack = () => Promise.reject(new Error('orphan'));
+    const callBack = () => {
+      return Promise.reject(new Error('orphan'));
+    };
 
     const p1 = orch.execute({context: ctx, callBack});
     const p2 = orch.execute({context: ctx, callBack});
 
     // Let both catch handlers run and start recovery
-    await new Promise(r => setImmediate(r));
+    await new Promise(r => {
+      return setImmediate(r);
+    });
     // Release the recovery
     resolveJoin();
 

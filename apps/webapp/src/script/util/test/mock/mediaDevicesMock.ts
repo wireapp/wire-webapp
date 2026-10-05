@@ -19,16 +19,18 @@
 
 Object.defineProperty(window.navigator, 'mediaDevices', {
   value: {
-    enumerateDevices: jest.fn().mockImplementation(() =>
-      Promise.resolve([
+    enumerateDevices: jest.fn().mockImplementation(() => {
+      return Promise.resolve([
         {
           deviceId: '',
           groupId: '87ea57a1cef35b7614c579fa44c2e0417c7cf906f8eec46d1d783b94e9b5e5d0',
           kind: 'audioinput',
           label: '',
         },
-      ]),
-    ),
-    getUserMedia: jest.fn().mockImplementation(() => Promise.resolve()),
+      ]);
+    }),
+    getUserMedia: jest.fn().mockImplementation(() => {
+      return Promise.resolve();
+    }),
   },
 });

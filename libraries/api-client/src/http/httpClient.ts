@@ -46,6 +46,9 @@ import {BackendError, ConnectionState, ContentType, StatusCode, mapBackendError}
 import {ObfuscationUtil} from '../obfuscation';
 import {sendRequestWithCookie} from '../shims/node/cookie';
 
+const unauthorizedStatusCode = 401;
+const forbiddenStatusCode = 403;
+
 enum TOPIC {
   ON_CONNECTION_STATE_CHANGE = 'HttpClient.TOPIC.ON_CONNECTION_STATE_CHANGE',
   ON_INVALID_TOKEN = 'HttpClient.TOPIC.ON_INVALID_TOKEN',
@@ -124,7 +127,7 @@ export class HttpClient extends EventEmitter {
           this.updateConnectionState(ConnectionState.DISCONNECTED);
           return true;
         }
-        if (response?.status !== 401 && response?.status !== 403) {
+        if (response?.status !== unauthorizedStatusCode && response?.status !== forbiddenStatusCode) {
           // we only want to retry auth failures (access token will automatically be regenerated)
           return false;
         }

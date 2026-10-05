@@ -112,8 +112,8 @@ export const DatePickerField = ({
 }: DatePickerFieldProps) => {
   const labelId = isNonEmptyString(id) ? `${id}-label` : undefined;
   const portalContainer = popoverPortalContainer ?? getOverlayPortalContainer();
-  const getDateGroupStyles = useMemo(
-    () => (theme: Theme) => {
+  const getDateGroupStyles = useMemo(() => {
+    return (theme: Theme) => {
       const styles = {...datePickerGroupStyles(theme), ...datePickerGroupFocusStyles(theme)};
 
       if (markInvalid) {
@@ -125,20 +125,21 @@ export const DatePickerField = ({
       }
 
       return styles;
-    },
-    [disabled, markInvalid],
-  );
+    };
+  }, [disabled, markInvalid]);
 
   return (
     <div
-      css={(theme: Theme) => ({
-        marginBottom: markInvalid ? '2px' : '20px',
-        ...datePickerWrapperStyles,
-        '&:focus-within label': {
-          color: theme.general.primaryColor,
-        },
-        ...wrapperCSS,
-      })}
+      css={(theme: Theme) => {
+        return {
+          marginBottom: markInvalid ? '2px' : '20px',
+          ...datePickerWrapperStyles,
+          '&:focus-within label': {
+            color: theme.general.primaryColor,
+          },
+          ...wrapperCSS,
+        };
+      }}
       data-uie-name={dataUieName}
     >
       {isNonEmptyString(label) && (
@@ -160,11 +161,13 @@ export const DatePickerField = ({
         >
           <Group css={getDateGroupStyles}>
             <DateInput css={dateInputStyles}>
-              {segment => (
-                <DateSegment segment={segment} css={dateSegmentStyles}>
-                  {segment.type === 'literal' ? '.' : segment.text}
-                </DateSegment>
-              )}
+              {segment => {
+                return (
+                  <DateSegment segment={segment} css={dateSegmentStyles}>
+                    {segment.type === 'literal' ? '.' : segment.text}
+                  </DateSegment>
+                );
+              }}
             </DateInput>
             <Button css={calendarButtonStyles} aria-label={labels.openCalendarLabel} isDisabled={disabled}>
               <CalendarIcon css={calendarIconStyles} aria-hidden="true" />
@@ -191,9 +194,15 @@ export const DatePickerField = ({
                 </div>
                 <CalendarGrid css={calendarGridStyles}>
                   <CalendarGridHeader css={calendarGridHeaderStyles}>
-                    {day => <CalendarHeaderCell css={calendarHeaderCellStyles}>{day}</CalendarHeaderCell>}
+                    {day => {
+                      return <CalendarHeaderCell css={calendarHeaderCellStyles}>{day}</CalendarHeaderCell>;
+                    }}
                   </CalendarGridHeader>
-                  <CalendarGridBody>{date => <CalendarCell date={date} css={calendarCellStyles} />}</CalendarGridBody>
+                  <CalendarGridBody>
+                    {date => {
+                      return <CalendarCell date={date} css={calendarCellStyles} />;
+                    }}
+                  </CalendarGridBody>
                 </CalendarGrid>
               </Calendar>
             </Dialog>

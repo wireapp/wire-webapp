@@ -53,7 +53,9 @@ describe('ConversationLabelRepository Synchronization', () => {
     // Create repository instance
     conversationLabelRepository = new ConversationLabelRepository(
       mockAllConversations,
-      ko.pureComputed(() => mockConversations()),
+      ko.pureComputed(() => {
+        return mockConversations();
+      }),
       mockPropertiesService,
       translate,
     );

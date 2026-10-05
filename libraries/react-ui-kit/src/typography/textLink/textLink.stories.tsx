@@ -49,11 +49,13 @@ export const Default: Story = {
 };
 
 export const InText: Story = {
-  render: () => (
-    <Text>
-      This is a paragraph with a <TextLink href="#">text link</TextLink> inside.
-    </Text>
-  ),
+  render: () => {
+    return (
+      <Text>
+        This is a paragraph with a <TextLink href="#">text link</TextLink> inside.
+      </Text>
+    );
+  },
 };
 
 export const CustomColor: Story = {

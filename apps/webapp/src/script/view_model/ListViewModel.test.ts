@@ -50,7 +50,9 @@ const createListViewModel = () => {
   const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
 
   const listViewModel = new ListViewModel(mainViewModel, repositories, translateForTest, fireAndForgetInvoker);
-  (listViewModel as unknown as {isActivatedAccount: () => boolean}).isActivatedAccount = () => true;
+  (listViewModel as unknown as {isActivatedAccount: () => boolean}).isActivatedAccount = () => {
+    return true;
+  };
   return {fireAndForgetInvoker, listViewModel, teamRepository};
 };
 
@@ -184,7 +186,9 @@ describe('ListViewModel', () => {
 
   it('does not switch back to Account if another preference is opened while getTeam is in flight', async () => {
     const {fireAndForgetInvoker, listViewModel, teamRepository} = createListViewModel();
-    let resolveGetTeam: (value?: unknown) => void = () => undefined;
+    let resolveGetTeam: (value?: unknown) => void = () => {
+      return undefined;
+    };
     const getTeamPromise = new Promise(resolve => {
       resolveGetTeam = resolve;
     });

@@ -29,6 +29,8 @@ import {StorageKey} from 'Repositories/storage';
 
 import {conversationHasDraft} from '../utils/draftUtils';
 
+const draftCheckDebounceInMilliseconds = 200;
+
 export const useDraftConversations = (conversations: Conversation[]): Conversation[] => {
   const [draftConversations, setDraftConversations] = useState<Conversation[]>([]);
   const conversationsRef = useRef(conversations);
@@ -75,7 +77,7 @@ export const useDraftConversations = (conversations: Conversation[]): Conversati
   }, []);
 
   // Debounce the check to avoid too frequent updates
-  const debouncedCheck = useDebouncedCallback(checkForDrafts, 200);
+  const debouncedCheck = useDebouncedCallback(checkForDrafts, draftCheckDebounceInMilliseconds);
 
   useEffect(() => {
     // Initial check

@@ -46,10 +46,18 @@ const createParticipant = (name: string) => {
 };
 
 const mediaDevices = {
-  audioinput: ko.pureComputed(() => 'test'),
-  audiooutput: ko.pureComputed(() => 'test'),
-  screeninput: ko.pureComputed(() => 'test'),
-  videoinput: ko.pureComputed(() => 'test'),
+  audioinput: ko.pureComputed(() => {
+    return 'test';
+  }),
+  audiooutput: ko.pureComputed(() => {
+    return 'test';
+  }),
+  screeninput: ko.pureComputed(() => {
+    return 'test';
+  }),
+  videoinput: ko.pureComputed(() => {
+    return 'test';
+  }),
 };
 
 const buildMediaDevicesHandler = () => {
@@ -127,7 +135,11 @@ describe('Call', () => {
     it('everyone is muted then sort alphabetically', async () => {
       call.updatePages();
       const pages = call.pages.pop();
-      expect(pages.map(p => p.user.name())).toEqual([
+      expect(
+        pages.map(p => {
+          return p.user.name();
+        }),
+      ).toEqual([
         selfParticipant.user.name(),
         firstParticipant.user.name(),
         secondParticipant.user.name(),
@@ -142,7 +154,11 @@ describe('Call', () => {
       fourthParticipant.videoState(4);
       call.updatePages();
       const pages = call.pages.pop();
-      expect(pages.map(p => p.user.name())).toEqual([
+      expect(
+        pages.map(p => {
+          return p.user.name();
+        }),
+      ).toEqual([
         selfParticipant.user.name(),
         thirdParticipant.user.name(),
         fourthParticipant.user.name(),
@@ -157,7 +173,11 @@ describe('Call', () => {
       thirdParticipant.videoState(1);
       call.updatePages();
       const pages = call.pages.pop();
-      expect(pages.map(p => p.user.name())).toEqual([
+      expect(
+        pages.map(p => {
+          return p.user.name();
+        }),
+      ).toEqual([
         selfParticipant.user.name(),
         secondParticipant.user.name(),
         thirdParticipant.user.name(),
@@ -174,7 +194,11 @@ describe('Call', () => {
 
       call.updatePages();
       const pages = call.pages.pop();
-      expect(pages.map(p => p.user.name())).toEqual([
+      expect(
+        pages.map(p => {
+          return p.user.name();
+        }),
+      ).toEqual([
         selfParticipant.user.name(),
         fourthParticipant.user.name(),
         thirdParticipant.user.name(),
@@ -196,7 +220,11 @@ describe('Call', () => {
       call.updatePages();
 
       const pages = call.pages.pop();
-      expect(pages.map(p => p.user.name())).toEqual([
+      expect(
+        pages.map(p => {
+          return p.user.name();
+        }),
+      ).toEqual([
         selfParticipant.user.name(),
         thirdParticipant.user.name(),
         fourthParticipant.user.name(),
@@ -218,7 +246,11 @@ describe('Call', () => {
       call.updatePages();
 
       const pages = call.pages.pop();
-      expect(pages.map(p => p.user.name())).toEqual([
+      expect(
+        pages.map(p => {
+          return p.user.name();
+        }),
+      ).toEqual([
         selfParticipant.user.name(),
         fourthParticipant.user.name(),
         fifthParticipant.user.name(),

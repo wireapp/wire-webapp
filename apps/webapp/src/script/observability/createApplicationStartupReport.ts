@@ -45,7 +45,7 @@ function createStartupTimings(timings: StartupTimings): ApplicationStartupReport
     app_bootstrap_started_ms: 0,
   };
 
-  const timingMappings: ReadonlyArray<readonly [string, AppInitTimingsStep]> = [
+  const timingMappings: readonly (readonly [string, AppInitTimingsStep])[] = [
     ['dom_content_loaded_ms', AppInitTimingsStep.DOM_CONTENT_LOADED],
     ['init_app_started_ms', AppInitTimingsStep.INIT_APP_STARTED],
     ['received_access_token_ms', AppInitTimingsStep.RECEIVED_ACCESS_TOKEN],
@@ -93,7 +93,7 @@ function createStartupStatistics(
     result,
   };
 
-  const statisticMappings: ReadonlyArray<readonly [string, AppInitStatisticsValue]> = [
+  const statisticMappings: readonly (readonly [string, AppInitStatisticsValue])[] = [
     ['notification_count', AppInitStatisticsValue.NOTIFICATIONS],
     ['connection_count_bucket', AppInitStatisticsValue.CONNECTIONS],
     ['conversation_count_bucket', AppInitStatisticsValue.CONVERSATIONS],

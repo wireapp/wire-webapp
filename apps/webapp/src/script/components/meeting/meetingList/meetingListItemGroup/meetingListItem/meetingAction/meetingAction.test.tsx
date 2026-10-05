@@ -54,8 +54,8 @@ const series: MeetingSeries = {
 const meetingInstance: MeetingInstance = {meetingSeries: series, start, end};
 const selfUser = new User('host-id', 'example.com', translateForTest);
 
-const createMeetingStoreForTest = () =>
-  createMeetingStore({
+const createMeetingStoreForTest = () => {
+  return createMeetingStore({
     meetingsRepository: {} as MeetingsRepository,
     conversationRepository: {} as ConversationRepository,
     callingRepository: {} as CallingRepository,
@@ -69,19 +69,22 @@ const createMeetingStoreForTest = () =>
       deleteMeetingForAll: jest.fn(),
     } as MeetingStoreServiceTasks,
   });
+};
 
 const renderAction = (
   now: string,
   user = selfUser,
   clock = createDeterministicClock({initialUnixEpochMicroseconds: BigInt(Date.parse(now)) * 1_000n}),
-) =>
-  render(
+) => {
+  return render(
     <MeetingStoreProvider store={createMeetingStoreForTest()}>
       <ThemeProvider>
         <MeetingAction
           meetingInstance={meetingInstance}
           selfUser={user}
-          joinMeeting={() => undefined}
+          joinMeeting={() => {
+            return undefined;
+          }}
           isJoinDisabled={false}
         />
       </ThemeProvider>
@@ -95,6 +98,7 @@ const renderAction = (
       ),
     },
   );
+};
 
 describe('MeetingAction', () => {
   it.each([

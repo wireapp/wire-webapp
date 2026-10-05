@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {E2eiConversationState, MLSServiceEvents} from '@wireapp/core/lib/messagingProtocols/mls';
@@ -59,13 +60,15 @@ export class MLSConversationVerificationStateHandler {
   ) {
     this.logger = getLogger('MLSConversationVerificationStateHandler');
     // We need to check if the core account has a valid MLS device and that e2ei is enabled
-    if (!this.core.hasMLSDevice || !this.core.service?.e2eIdentity) {
+    if (!this.core.hasMLSDevice || isUndefined(this.core.service?.e2eIdentity)) {
       return;
     }
 
     // We hook into the newEpoch event of the MLS service to check if the conversation needs to be verified or degraded
     this.core.service?.mls?.on(MLSServiceEvents.NEW_EPOCH, this.onEpochChanged);
-    this.core.service.e2eIdentity.on('crlChanged', ({domain}) => this.handleNewRevocationList(domain));
+    this.core.service.e2eIdentity.on('crlChanged', ({domain}) => {
+      return this.handleNewRevocationList(domain);
+    });
   }
 
   /**
@@ -76,7 +79,7 @@ export class MLSConversationVerificationStateHandler {
     conversation: MLSConversation,
     userIdentities: Map<string, WireIdentity[]> | undefined,
   ) {
-    if (!userIdentities) {
+    if (isUndefined(userIdentities)) {
       return;
     }
 
@@ -85,7 +88,12 @@ export class MLSConversationVerificationStateHandler {
     const degradedUsers: QualifiedId[] = [];
 
     for (const [, identities] of userIdentities.entries()) {
-      if (identities.length > 0 && identities.some(identity => identity.status !== MLSStatuses.VALID)) {
+      if (
+        identities.length > 0 &&
+        identities.some(identity => {
+          return identity.status !== MLSStatuses.VALID;
+        })
+      ) {
         degradedUsers.push(identities[0].qualifiedUserId);
       }
     }
@@ -136,7 +144,7 @@ export class MLSConversationVerificationStateHandler {
     const processedUserIds: Set<StringifiedQualifiedId> = new Set();
     let userVerificationState = UserVerificationState.ALL_VALID;
 
-    if (userIdentities) {
+    if (!isUndefined(userIdentities)) {
       for (const [stringifiedQualifiedId, identities] of userIdentities.entries()) {
         if (processedUserIds.has(stringifiedQualifiedId)) {
           continue;
@@ -147,14 +155,14 @@ export class MLSConversationVerificationStateHandler {
          * We need to wait for the user entity to be available
          * There is a race condition when adding a new user to a conversation, the host will receive the epoch update before the user entity is available
          */
-        const user = await waitFor(() =>
-          conversation
-            .allUserEntities()
-            .find(user => stringifyQualifiedId(user.qualifiedId) === stringifiedQualifiedId),
-        );
+        const user = await waitFor(() => {
+          return conversation.allUserEntities().find(user => {
+            return stringifyQualifiedId(user.qualifiedId) === stringifiedQualifiedId;
+          });
+        });
         const identity = identities.at(0);
 
-        if (!identity || !user) {
+        if (isUndefined(identity) || isUndefined(user)) {
           this.logger.warn(`Could not find user or identity for userId: ${stringifiedQualifiedId}`);
           userVerificationState = UserVerificationState.SOME_INVALID;
           break;
@@ -181,16 +189,20 @@ export class MLSConversationVerificationStateHandler {
    */
   private checkAllConversationsVerificationState = async (): Promise<void> => {
     const conversations = this.conversationState.conversations();
-    await Promise.all(conversations.map(conversation => this.checkConversationVerificationState(conversation)));
+    await Promise.all(
+      conversations.map(conversation => {
+        return this.checkConversationVerificationState(conversation);
+      }),
+    );
   };
   private onEpochChanged = async ({groupId, epoch: newEpoch}: {groupId: string; epoch: number}): Promise<void> => {
     // There could be a race condition where we would receive an epoch update for a conversation that is not yet known by the webapp.
     // We just wait for it to be available and then check the verification state
-    const conversation = await waitFor(() =>
-      getConversationByGroupId({conversationState: this.conversationState, groupId}),
-    );
+    const conversation = await waitFor(() => {
+      return getConversationByGroupId({conversationState: this.conversationState, groupId});
+    });
 
-    if (!conversation) {
+    if (isUndefined(conversation)) {
       return this.logger.warn(`Epoch changed but conversation could not be found after waiting for 5 seconds`);
     }
 
@@ -216,7 +228,7 @@ export class MLSConversationVerificationStateHandler {
     }
 
     const conversationExists = await this.core.service?.mls?.conversationExists(conversation.groupId);
-    if (!conversationExists) {
+    if (conversationExists !== true) {
       conversation.mlsVerificationState(ConversationVerificationState.UNVERIFIED);
       return;
     }
@@ -242,7 +254,7 @@ export class MLSConversationVerificationStateHandler {
 }
 
 export const checkUserHandle = (identity: WireIdentity, user: User): boolean => {
-  if (!identity.x509Identity) {
+  if (isUndefined(identity.x509Identity)) {
     return false;
   }
   // WireIdentity handle format is "{scheme}%40{username}@{domain}"

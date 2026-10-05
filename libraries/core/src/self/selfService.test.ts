@@ -58,9 +58,9 @@ describe('SelfService', () => {
 
       jest.spyOn(apiClient.api.self, 'putSupportedProtocols').mockImplementation(jest.fn());
 
-      await expect(() => selfService.putSupportedProtocols(supportedProtocols)).rejects.toThrow(
-        'Supported protocols must be a non-empty protocols list',
-      );
+      await expect(() => {
+        return selfService.putSupportedProtocols(supportedProtocols);
+      }).rejects.toThrow('Supported protocols must be a non-empty protocols list');
     });
 
     it('throws if supported protocols list is empty', async () => {
@@ -70,9 +70,9 @@ describe('SelfService', () => {
 
       jest.spyOn(apiClient.api.self, 'putSupportedProtocols').mockImplementation(jest.fn());
 
-      await expect(() => selfService.putSupportedProtocols(supportedProtocols)).rejects.toThrow(
-        'Supported protocols must be a non-empty protocols list',
-      );
+      await expect(() => {
+        return selfService.putSupportedProtocols(supportedProtocols);
+      }).rejects.toThrow('Supported protocols must be a non-empty protocols list');
     });
   });
 });

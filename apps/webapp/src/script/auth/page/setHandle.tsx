@@ -48,6 +48,8 @@ import {createSuggestions} from '../util/handleUtil';
 import {PageView, resetTelemetrySession, trackTelemetryPageView} from '../util/trackingUtil';
 import {pathWithParams} from '../util/urlUtil';
 
+const minimumHandleLength = 2;
+
 type Props = React.HTMLProps<HTMLDivElement>;
 
 const SetHandleComponent = ({
@@ -91,7 +93,9 @@ const SetHandleComponent = ({
     trackTelemetryPageView(PageView.ACCOUNT_USERNAME_SCREEN_3);
   }, []);
 
-  const updateConsent = (consentType: ConsentType, value: number): Promise<void> => doSetConsent(consentType, value);
+  const updateConsent = (consentType: ConsentType, value: number): Promise<void> => {
+    return doSetConsent(consentType, value);
+  };
 
   const onSetHandle = async (event: React.FormEvent): Promise<void> => {
     event.preventDefault();
@@ -104,7 +108,11 @@ const SetHandleComponent = ({
         navigate(ROUTE.SUCCESS);
       }
     } catch (error: unknown) {
-      if (isBackendError(error) && error.label === BackendErrorLabel.INVALID_HANDLE && handle.trim().length < 2) {
+      if (
+        isBackendError(error) &&
+        error.label === BackendErrorLabel.INVALID_HANDLE &&
+        handle.trim().length < minimumHandleLength
+      ) {
         error.label = SyntheticErrorLabel.HANDLE_TOO_SHORT;
       }
       setError(error);
@@ -177,26 +185,35 @@ const SetHandleComponent = ({
 };
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
-const mapStateToProps = (state: RootState) => ({
-  hasSelfHandle: SelfSelector.hasSelfHandle(state),
-  hasUnsetMarketingConsent: SelfSelector.hasUnsetConsent(state, ConsentType.MARKETING) ?? false,
-  isFetching: SelfSelector.isFetching(state),
-  name: SelfSelector.getSelfName(state),
-});
+const mapStateToProps = (state: RootState) => {
+  return {
+    hasSelfHandle: SelfSelector.hasSelfHandle(state),
+    hasUnsetMarketingConsent: SelfSelector.hasUnsetConsent(state, ConsentType.MARKETING) ?? false,
+    isFetching: SelfSelector.isFetching(state),
+    name: SelfSelector.getSelfName(state),
+  };
+};
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: ThunkDispatch) => ({
-  checkHandles: (...args: Parameters<typeof ROOT_ACTIONS.userAction.checkHandles>) =>
-    dispatch(ROOT_ACTIONS.userAction.checkHandles(...args)),
-  doGetConsents: (...args: Parameters<typeof ROOT_ACTIONS.selfAction.doGetConsents>) =>
-    dispatch(ROOT_ACTIONS.selfAction.doGetConsents(...args)),
-  doSetConsent: (...args: Parameters<typeof ROOT_ACTIONS.selfAction.doSetConsent>) =>
-    dispatch(ROOT_ACTIONS.selfAction.doSetConsent(...args)),
-  doSetHandle: (...args: Parameters<typeof ROOT_ACTIONS.selfAction.setHandle>) =>
-    dispatch(ROOT_ACTIONS.selfAction.setHandle(...args)),
-  removeLocalStorage: (...args: Parameters<typeof ROOT_ACTIONS.localStorageAction.deleteLocalStorage>) =>
-    dispatch(ROOT_ACTIONS.localStorageAction.deleteLocalStorage(...args)),
-});
+const mapDispatchToProps = (dispatch: ThunkDispatch) => {
+  return {
+    checkHandles: (...args: Parameters<typeof ROOT_ACTIONS.userAction.checkHandles>) => {
+      return dispatch(ROOT_ACTIONS.userAction.checkHandles(...args));
+    },
+    doGetConsents: (...args: Parameters<typeof ROOT_ACTIONS.selfAction.doGetConsents>) => {
+      return dispatch(ROOT_ACTIONS.selfAction.doGetConsents(...args));
+    },
+    doSetConsent: (...args: Parameters<typeof ROOT_ACTIONS.selfAction.doSetConsent>) => {
+      return dispatch(ROOT_ACTIONS.selfAction.doSetConsent(...args));
+    },
+    doSetHandle: (...args: Parameters<typeof ROOT_ACTIONS.selfAction.setHandle>) => {
+      return dispatch(ROOT_ACTIONS.selfAction.setHandle(...args));
+    },
+    removeLocalStorage: (...args: Parameters<typeof ROOT_ACTIONS.localStorageAction.deleteLocalStorage>) => {
+      return dispatch(ROOT_ACTIONS.localStorageAction.deleteLocalStorage(...args));
+    },
+  };
+};
 
 const SetHandle = connect(mapStateToProps, mapDispatchToProps)(SetHandleComponent);
 

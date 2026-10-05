@@ -74,6 +74,9 @@ import {SSOAPI} from './team/sso';
 import {UserAPI} from './user/';
 import {UserGroupAPI} from './userGroups/';
 
+const minimumMlsBackendVersion = 5;
+const minimumGuestLinkPasswordBackendVersion = 4;
+
 const {version}: {version: string} = require('../package.json');
 
 enum TOPIC {
@@ -197,11 +200,13 @@ export class APIClient extends EventEmitter {
     super();
     this.config = {...defaultConfig, ...config};
     this.accessTokenStore = new AccessTokenStore();
-    this.accessTokenStore.on(AccessTokenStore.TOPIC.ACCESS_TOKEN_REFRESH, (accessToken: AccessTokenData) =>
-      this.emit(APIClient.TOPIC.ACCESS_TOKEN_REFRESH, accessToken),
-    );
+    this.accessTokenStore.on(AccessTokenStore.TOPIC.ACCESS_TOKEN_REFRESH, (accessToken: AccessTokenData) => {
+      return this.emit(APIClient.TOPIC.ACCESS_TOKEN_REFRESH, accessToken);
+    });
     // Store the listener reference so we can remove it on disconnect
-    this.cookieRefreshListener = (cookie?: Cookie) => this.emit(APIClient.TOPIC.COOKIE_REFRESH, cookie);
+    this.cookieRefreshListener = (cookie?: Cookie) => {
+      return this.emit(APIClient.TOPIC.COOKIE_REFRESH, cookie);
+    };
     CookieStore.emitter.on(CookieStore.TOPIC.COOKIE_REFRESH, this.cookieRefreshListener);
 
     this.logger = LogFactory.getLogger('@wireapp/api-client/Client');
@@ -291,8 +296,8 @@ export class APIClient extends EventEmitter {
       domain: responsePayload?.domain ?? '',
       federationEndpoints: backendVersion > 0,
       isFederated: responsePayload?.federation ?? false,
-      supportsMLS: backendVersion >= 5,
-      supportsGuestLinksWithPassword: backendVersion >= 4,
+      supportsMLS: backendVersion >= minimumMlsBackendVersion,
+      supportsGuestLinksWithPassword: backendVersion >= minimumGuestLinkPasswordBackendVersion,
     };
   }
 
@@ -342,8 +347,12 @@ export class APIClient extends EventEmitter {
    * @returns The highest version in the allowed range, or undefined if none are compatible
    */
   private findHighestCompatibleVersion(versions: number[], min: number, max: number): number | undefined {
-    const inRangeVersions = versions.filter(version => version >= min && version <= max);
-    const [highestVersion] = inRangeVersions.toSorted((a, b) => b - a);
+    const inRangeVersions = versions.filter(version => {
+      return version >= min && version <= max;
+    });
+    const [highestVersion] = inRangeVersions.toSorted((a, b) => {
+      return b - a;
+    });
     return highestVersion;
   }
 

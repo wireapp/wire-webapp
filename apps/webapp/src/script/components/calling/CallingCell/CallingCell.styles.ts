@@ -23,12 +23,14 @@ import {meetingNotificationHostCollapsedOffset} from 'Components/meeting/meeting
 
 const callingContainerBottomPadding = 20;
 
-export const callingContainer = (hasNotifications: boolean): CSSObject => ({
-  position: 'relative',
-  display: 'flex',
-  flexDirection: 'column',
-  flexShrink: '0',
-  padding: `10px 12px ${callingContainerBottomPadding + (hasNotifications ? meetingNotificationHostCollapsedOffset : 0)}px`,
-  transition: 'padding-bottom var(--animation-timing-fast) ease-in-out',
-  animation: 'show-call-ui var(--animation-timing-fast) ease-in-out 0s 1',
-});
+export const callingContainer = (hasNotifications: boolean): CSSObject => {
+  return {
+    position: 'relative',
+    display: 'flex',
+    flexDirection: 'column',
+    flexShrink: '0',
+    padding: `10px 12px ${callingContainerBottomPadding + (hasNotifications ? meetingNotificationHostCollapsedOffset : 0)}px`,
+    transition: 'padding-bottom var(--animation-timing-fast) ease-in-out',
+    animation: 'show-call-ui var(--animation-timing-fast) ease-in-out 0s 1',
+  };
+};

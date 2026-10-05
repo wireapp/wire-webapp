@@ -17,6 +17,8 @@
  *
  */
 
+import {isEmptyArray, isNonEmptyArray, isNumber, isUndefined} from '@sindresorhus/is';
+
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import type {FileAsset} from 'Repositories/entity/message/fileAsset';
@@ -68,7 +70,9 @@ const _accumulateSummary = (
     [ACTIVITY_TYPE.MESSAGE]: unreadOtherMessages.length,
   };
 
-  const alertCount = Object.values(activities).reduce((accumulator, value) => accumulator + value, 0);
+  const alertCount = Object.values(activities).reduce((accumulator, value) => {
+    return accumulator + value;
+  }, 0);
   const hasSingleAlert = alertCount === 1;
   const hasOnlyReplies = activities[ACTIVITY_TYPE.REPLY] > 0 && alertCount === activities[ACTIVITY_TYPE.REPLY];
 
@@ -108,7 +112,7 @@ const _accumulateSummary = (
 const _generateSummaryDescription = (activities: Record<ACTIVITY_TYPE, number>, translate: Translate): string => {
   return Object.entries(activities)
     .map(([activity, activityCount]): string | void => {
-      if (activityCount) {
+      if (isNumber(activityCount) && activityCount !== 0) {
         const activityCountIsOne = activityCount === 1;
 
         switch (activity) {
@@ -146,6 +150,8 @@ const _generateSummaryDescription = (activities: Record<ACTIVITY_TYPE, number>, 
             throw new ConversationError(ConversationError.TYPE.UNKNOWN_ACTIVITY, `Unknown activity "${activity}"`);
         }
       }
+
+      return undefined;
     })
     .filter((activityString): activityString is string => {
       return typeof activityString === 'string' && activityString.length > 0;
@@ -154,8 +160,9 @@ const _generateSummaryDescription = (activities: Record<ACTIVITY_TYPE, number>, 
 };
 
 const _getStateAlert: ConversationCellStateDefinition = {
-  description: (conversationEntity: Conversation, translate: Translate) =>
-    _accumulateSummary(conversationEntity, translate, true),
+  description: (conversationEntity: Conversation, translate: Translate) => {
+    return _accumulateSummary(conversationEntity, translate, true);
+  },
   icon: (conversationEntity: Conversation): ConversationStatusIcon | void => {
     const {
       calls: unreadCalls,
@@ -164,19 +171,19 @@ const _getStateAlert: ConversationCellStateDefinition = {
       selfReplies: unreadSelfReplies,
     } = conversationEntity.unreadState();
 
-    if (unreadSelfMentions.length) {
+    if (isNonEmptyArray(unreadSelfMentions)) {
       return ConversationStatusIcon.UNREAD_MENTION;
     }
 
-    if (unreadSelfReplies.length) {
+    if (isNonEmptyArray(unreadSelfReplies)) {
       return ConversationStatusIcon.UNREAD_REPLY;
     }
 
-    if (unreadCalls.length) {
+    if (isNonEmptyArray(unreadCalls)) {
       return ConversationStatusIcon.MISSED_CALL;
     }
 
-    if (unreadPings.length) {
+    if (isNonEmptyArray(unreadPings)) {
       return ConversationStatusIcon.UNREAD_PING;
     }
   },
@@ -196,9 +203,15 @@ const _getStateAlert: ConversationCellStateDefinition = {
 };
 
 const _getStateDefault: ConversationCellStateDefinition = {
-  description: () => '',
-  icon: () => ConversationStatusIcon.NONE,
-  match: () => false,
+  description: () => {
+    return '';
+  },
+  icon: () => {
+    return ConversationStatusIcon.NONE;
+  },
+  match: () => {
+    return false;
+  },
 };
 
 const _getStateGroupActivity: ConversationCellStateDefinition = {
@@ -217,7 +230,7 @@ const _getStateGroupActivity: ConversationCellStateDefinition = {
 
         if ((lastMessageEntity as MemberMessage).isMemberJoin()) {
           if (userCountIsOne) {
-            if (!(lastMessageEntity as MemberMessage).remoteUserEntities().length) {
+            if (isEmptyArray((lastMessageEntity as MemberMessage).remoteUserEntities())) {
               return translate('conversationsSecondaryLinePersonAddedYou', {
                 user: (lastMessageEntity as MemberMessage).user().name(),
               });
@@ -277,7 +290,9 @@ const _getStateGroupActivity: ConversationCellStateDefinition = {
   },
   match: (conversationEntity: Conversation) => {
     const lastMessageEntity = conversationEntity.getNewestMessage();
-    const isExpectedType = lastMessageEntity ? lastMessageEntity.isMember() || lastMessageEntity.isSystem() : false;
+    const isExpectedType = !isUndefined(lastMessageEntity)
+      ? lastMessageEntity.isMember() || lastMessageEntity.isSystem()
+      : false;
     const unreadEvents = conversationEntity.unreadState().allEvents;
 
     return conversationEntity.isGroupOrChannel() && unreadEvents.length > 0 && isExpectedType;
@@ -304,7 +319,9 @@ const _getStateMuted: ConversationCellStateDefinition = {
 
     return ConversationStatusIcon.MUTED;
   },
-  match: (conversationEntity: Conversation) => !conversationEntity.showNotificationsEverything(),
+  match: (conversationEntity: Conversation) => {
+    return !conversationEntity.showNotificationsEverything();
+  },
 };
 
 const _getStateRemoved: ConversationCellStateDefinition = {
@@ -320,7 +337,9 @@ const _getStateRemoved: ConversationCellStateDefinition = {
       lastMessageEntity !== undefined && lastMessageEntity.isMember() && lastMessageEntity.isMemberRemoval();
     const wasSelfRemoved =
       isMemberRemoval &&
-      (lastMessageEntity as MemberMessage).userIds().some(userId => matchQualifiedIds(userId, selfUser));
+      (lastMessageEntity as MemberMessage).userIds().some(userId => {
+        return matchQualifiedIds(userId, selfUser);
+      });
     if (wasSelfRemoved) {
       const selfLeft = lastMessageEntity.user().id === selfUserId;
       return selfLeft
@@ -330,16 +349,24 @@ const _getStateRemoved: ConversationCellStateDefinition = {
 
     return '';
   },
-  icon: () => ConversationStatusIcon.UNREAD_MESSAGES,
-  match: (conversationEntity: Conversation) => conversationEntity.isSelfUserRemoved(),
+  icon: () => {
+    return ConversationStatusIcon.UNREAD_MESSAGES;
+  },
+  match: (conversationEntity: Conversation) => {
+    return conversationEntity.isSelfUserRemoved();
+  },
 };
 
 const _getStateGhostGroup: ConversationCellStateDefinition = {
   description: (conversationEntity: Conversation, translate: Translate) => {
     return conversationEntity.isGhostGroup() ? translate('conversationsSecondaryLineGhostGroup') : '';
   },
-  icon: () => ConversationStatusIcon.GHOST_GROUP,
-  match: (conversationEntity: Conversation) => conversationEntity.isGhostGroup(),
+  icon: () => {
+    return ConversationStatusIcon.GHOST_GROUP;
+  },
+  match: (conversationEntity: Conversation) => {
+    return conversationEntity.isGhostGroup();
+  },
 };
 
 const _getStateUnreadMessage: ConversationCellStateDefinition = {
@@ -401,7 +428,9 @@ const _getStateUnreadMessage: ConversationCellStateDefinition = {
     }
     return '';
   },
-  icon: () => ConversationStatusIcon.UNREAD_MESSAGES,
+  icon: () => {
+    return ConversationStatusIcon.UNREAD_MESSAGES;
+  },
   match: (conversationEntity: Conversation) => {
     const {allMessages, systemMessages} = conversationEntity.unreadState();
     const hasUnreadMessages = [...allMessages, ...systemMessages].length > 0;
@@ -446,7 +475,10 @@ export const generateCellState = (
     _getStateUserName,
   ] satisfies ConversationCellStateDefinition[];
 
-  const matchingState = states.find(state => state.match(conversationEntity)) || _getStateDefault;
+  const matchingState =
+    states.find(state => {
+      return state.match(conversationEntity);
+    }) ?? _getStateDefault;
 
   return {
     description: matchingState.description(conversationEntity, translate),

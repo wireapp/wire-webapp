@@ -19,6 +19,9 @@
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
+const pairedMarkdownDelimiterEndOffset = -2;
+const pairedMarkdownDelimiterLength = 2;
+
 // Basic markdown patterns (used for both detection and sanitization)
 const HEADER_PATTERN = /^#{1,6}\s+/m;
 const BOLD_PATTERN_1 = /\*\*[^*]+\*\*/;
@@ -79,7 +82,9 @@ export const isMarkdownText = (text: string): boolean => {
     return false;
   }
 
-  return MARKDOWN_PATTERNS.some(pattern => pattern.test(text));
+  return MARKDOWN_PATTERNS.some(pattern => {
+    return pattern.test(text);
+  });
 };
 
 /**
@@ -91,7 +96,9 @@ export const sanitizeMarkdown = (text: string): string => {
   }
 
   return markdownSanitizers
-    .reduce((sanitizedText, {pattern, transform}) => sanitizedText.replace(pattern, transform), text)
+    .reduce((sanitizedText, {pattern, transform}) => {
+      return sanitizedText.replace(pattern, transform);
+    }, text)
     .trim();
 };
 
@@ -105,33 +112,47 @@ const isTableSeparator = (line: string): boolean => {
     return false;
   }
   const cells = line.slice(1, -1).split('|');
-  return cells.every(cell => /^[-:|]+$/.test(cell.trim()));
+  return cells.every(cell => {
+    return /^[-:|]+$/.test(cell.trim());
+  });
 };
 
 const markdownSanitizers: MarkdownSanitizer[] = [
   {
     pattern: ESCAPED_CHARS_PATTERN,
-    transform: (_match: string, char: string) => char,
+    transform: (_match: string, char: string) => {
+      return char;
+    },
   },
   {
     pattern: HEADER_PATTERN,
-    transform: (_match: string) => '',
+    transform: (_match: string) => {
+      return '';
+    },
   },
   {
     pattern: BOLD_PATTERN_1,
-    transform: (match: string) => match.slice(2, -2),
+    transform: (match: string) => {
+      return match.slice(pairedMarkdownDelimiterLength, pairedMarkdownDelimiterEndOffset);
+    },
   },
   {
     pattern: BOLD_PATTERN_2,
-    transform: (match: string) => match.slice(2, -2),
+    transform: (match: string) => {
+      return match.slice(pairedMarkdownDelimiterLength, pairedMarkdownDelimiterEndOffset);
+    },
   },
   {
     pattern: ITALIC_PATTERN_1,
-    transform: (match: string) => match.slice(1, -1),
+    transform: (match: string) => {
+      return match.slice(1, -1);
+    },
   },
   {
     pattern: ITALIC_PATTERN_2,
-    transform: (match: string) => match.slice(1, -1),
+    transform: (match: string) => {
+      return match.slice(1, -1);
+    },
   },
   {
     pattern: LINK_PATTERN,
@@ -151,27 +172,39 @@ const markdownSanitizers: MarkdownSanitizer[] = [
   },
   {
     pattern: LIST_UNORDERED_SANITIZE_PATTERN,
-    transform: (match: string) => match.replace(/^[-*+]\s/, ''),
+    transform: (match: string) => {
+      return match.replace(/^[-*+]\s/, '');
+    },
   },
   {
     pattern: LIST_ORDERED_SANITIZE_PATTERN,
-    transform: (match: string) => match.replace(/^[\d]+\.\s/, ''),
+    transform: (match: string) => {
+      return match.replace(/^[\d]+\.\s/, '');
+    },
   },
   {
     pattern: BLOCKQUOTE_PATTERN,
-    transform: (_match: string) => '',
+    transform: (_match: string) => {
+      return '';
+    },
   },
   {
     pattern: CODE_BLOCK_PATTERN,
-    transform: (match: string) => match.replace(/```/g, '').trim(),
+    transform: (match: string) => {
+      return match.replace(/```/g, '').trim();
+    },
   },
   {
     pattern: CODE_INLINE_PATTERN,
-    transform: (match: string) => match.slice(1, -1),
+    transform: (match: string) => {
+      return match.slice(1, -1);
+    },
   },
   {
     pattern: HORIZONTAL_RULE_PATTERN,
-    transform: (_match: string) => '',
+    transform: (_match: string) => {
+      return '';
+    },
   },
   {
     pattern: TABLE_SANITIZE_PATTERN,
@@ -182,13 +215,19 @@ const markdownSanitizers: MarkdownSanitizer[] = [
       }
       return line
         .split('|')
-        .filter(cell => isNonEmptyString(cell.trim()))
-        .map(cell => cell.trim())
+        .filter(cell => {
+          return isNonEmptyString(cell.trim());
+        })
+        .map(cell => {
+          return cell.trim();
+        })
         .join(' ');
     },
   },
   {
     pattern: STRIKETHROUGH_PATTERN,
-    transform: (match: string) => match.slice(2, -2),
+    transform: (match: string) => {
+      return match.slice(pairedMarkdownDelimiterLength, pairedMarkdownDelimiterEndOffset);
+    },
   },
 ];

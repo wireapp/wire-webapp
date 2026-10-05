@@ -31,7 +31,12 @@ type QualifiedUserMap<T> = {[domain: string]: UserMap<T>};
 export function flattenUserMap<T = unknown>(userMap: QualifiedUserMap<T>): {data: T; userId: QualifiedId}[] {
   return Object.entries(userMap).reduce(
     (ids, [domain, userClients]) => {
-      return [...ids, ...Object.entries(userClients).map(([id, data]) => ({data, userId: {domain, id}}))];
+      return [
+        ...ids,
+        ...Object.entries(userClients).map(([id, data]) => {
+          return {data, userId: {domain, id}};
+        }),
+      ];
     },
     [] as {data: T; userId: QualifiedId}[],
   );

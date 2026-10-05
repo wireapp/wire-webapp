@@ -50,10 +50,14 @@ import {createUuid} from 'Util/uuid';
 import {TestFactory} from '../../../../test/helper/TestFactory';
 import {translateForTest} from 'Util/test/translateForTest';
 
-jest.mock('Components/avatar', () => ({
-  AVATAR_SIZE: {X_LARGE: 'avatar-xl'},
-  Avatar: () => <div data-uie-name="mock-avatar" />,
-}));
+jest.mock('Components/avatar', () => {
+  return {
+    AVATAR_SIZE: {X_LARGE: 'avatar-xl'},
+    Avatar: () => {
+      return <div data-uie-name="mock-avatar" />;
+    },
+  };
+});
 
 const testFactory = new TestFactory();
 const defaultConfig = {
@@ -78,40 +82,42 @@ describe('InputBar', () => {
   });
 
   let propertiesRepository: PropertiesRepository;
-  const createRootProviderWrapper = (isViewerPermissionFeatureEnabled = false) =>
-    createRootProviderWrapperForTest(
+  const createRootProviderWrapper = () => {
+    return createRootProviderWrapperForTest(
       createRootContextValueForTest({
         translate: translateForTest,
-        isFeatureToggleEnabled: () => isViewerPermissionFeatureEnabled,
       }),
     );
+  };
 
-  const getDefaultProps = () => ({
-    assetRepository: new AssetRepository(),
-    conversation: new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest),
-    cellsRepository: new CellsRepository(),
-    files: [] as FileWithPreview[],
-    conversationRepository: {
-      sendTypingStart: jest.fn(),
-      sendTypingStop: jest.fn(),
-    } as unknown as ConversationRepository,
-    eventRepository,
-    messageRepository: {} as MessageRepository,
-    openGiphy: jest.fn(),
-    propertiesRepository,
-    searchRepository,
-    storageRepository,
-    isCellsEnabled: false,
-    teamState: new TeamState(),
-    selfUser: new User('id', '', translateForTest),
-    onShiftTab: jest.fn(),
-    uploadDroppedFiles: jest.fn(),
-    uploadImages: jest.fn(),
-    uploadPastedFiles: jest.fn(),
-    uploadFiles: jest.fn(),
-    onCellImageUpload: jest.fn(),
-    onCellAssetUpload: jest.fn(),
-  });
+  const getDefaultProps = () => {
+    return {
+      assetRepository: new AssetRepository(),
+      conversation: new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest),
+      cellsRepository: new CellsRepository(),
+      files: [] as FileWithPreview[],
+      conversationRepository: {
+        sendTypingStart: jest.fn(),
+        sendTypingStop: jest.fn(),
+      } as unknown as ConversationRepository,
+      eventRepository,
+      messageRepository: {} as MessageRepository,
+      openGiphy: jest.fn(),
+      propertiesRepository,
+      searchRepository,
+      storageRepository,
+      isCellsEnabled: false,
+      teamState: new TeamState(),
+      selfUser: new User('id', '', translateForTest),
+      onShiftTab: jest.fn(),
+      uploadDroppedFiles: jest.fn(),
+      uploadImages: jest.fn(),
+      uploadPastedFiles: jest.fn(),
+      uploadFiles: jest.fn(),
+      onCellImageUpload: jest.fn(),
+      onCellAssetUpload: jest.fn(),
+    };
+  };
 
   beforeEach(() => {
     const propertiesService = new PropertiesService();
@@ -127,39 +133,18 @@ describe('InputBar', () => {
   const testMessage = 'text';
   const pngFile = new File(['(⌐□_□)'], 'wire-example-image.png', {type: 'image/png'});
 
-  function renderInputBar(
-    properties: ReturnType<typeof getDefaultProps>,
-    isViewerPermissionFeatureEnabled = false,
-  ): ReturnType<typeof render> {
-    return render(
-      withThemeAndRootContext(
-        <InputBar {...properties} />,
-        createRootProviderWrapper(isViewerPermissionFeatureEnabled),
-      ),
-    );
+  function renderInputBar(properties: ReturnType<typeof getDefaultProps>): ReturnType<typeof render> {
+    return render(withThemeAndRootContext(<InputBar {...properties} />, createRootProviderWrapper()));
   }
 
-  it('shows cells upload buttons for viewers when the viewer permission feature is disabled', () => {
+  it('hides cells upload buttons for viewers', () => {
     const props = getDefaultProps();
     props.isCellsEnabled = true;
     props.conversation.teamId = 'conversation-team';
     props.conversation.cellsState(CONVERSATION_CELLS_STATE.READY);
     props.selfUser.teamId = 'guest-team';
 
-    const {getByTitle} = renderInputBar(props);
-
-    expect(getByTitle('tooltipConversationAddImage')).not.toBe(null);
-    expect(getByTitle('tooltipConversationFile')).not.toBe(null);
-  });
-
-  it('hides cells upload buttons for viewers when the viewer permission feature is enabled', () => {
-    const props = getDefaultProps();
-    props.isCellsEnabled = true;
-    props.conversation.teamId = 'conversation-team';
-    props.conversation.cellsState(CONVERSATION_CELLS_STATE.READY);
-    props.selfUser.teamId = 'guest-team';
-
-    const {queryByTitle} = renderInputBar(props, true);
+    const {queryByTitle} = renderInputBar(props);
 
     expect(queryByTitle('tooltipConversationAddImage')).toBe(null);
     expect(queryByTitle('tooltipConversationFile')).toBe(null);
@@ -182,7 +167,9 @@ describe('InputBar', () => {
     const props = getDefaultProps();
     const {getByTestId} = renderInputBar(props);
 
-    await new Promise(resolve => setTimeout(resolve));
+    await new Promise(resolve => {
+      return setTimeout(resolve);
+    });
     const inputBar = getByTestId('input-message');
 
     expect(inputBar).not.toBeNull();
@@ -202,8 +189,9 @@ describe('InputBar', () => {
 
     const renderWithMessagePreprocessingDisabled = (isDisabled: boolean) => {
       const featureToggleRootContextValue = createRootContextValueForTest({
-        isFeatureToggleEnabled: (featureToggleName: string) =>
-          featureToggleName === disableMessagePreprocessingFeatureToggleName && isDisabled,
+        isFeatureToggleEnabled: (featureToggleName: string) => {
+          return featureToggleName === disableMessagePreprocessingFeatureToggleName && isDisabled;
+        },
         translate: translateForTest,
       });
       const featureToggleRootProviderWrapper = createRootProviderWrapperForTest(featureToggleRootContextValue);
@@ -253,7 +241,9 @@ describe('InputBar', () => {
     });
     expect(propertiesRepository.typingIndicatorMode()).not.toBe(defaultValue);
 
-    await new Promise(resolve => setTimeout(resolve));
+    await new Promise(resolve => {
+      return setTimeout(resolve);
+    });
     await act(async () => {
       fireEvent.input(inputBar, {data: testMessage});
     });

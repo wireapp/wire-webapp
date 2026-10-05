@@ -27,30 +27,34 @@ export const listItemStyles: CSSObject = {
   flexShrink: 0,
 };
 
-export const buttonStyles = ({isFirst}: {isFirst: boolean}): CSSObject => ({
-  background: 'none',
-  border: 'none',
-  padding: '0 8px',
-  cursor: 'pointer',
-  fontSize: '14px',
-  color: COLOR_V2.GRAY_70,
-  display: 'flex',
-  alignItems: 'center',
-  gap: '8px',
+export const buttonStyles = ({isFirst}: {isFirst: boolean}): CSSObject => {
+  return {
+    background: 'none',
+    border: 'none',
+    padding: '0 8px',
+    cursor: 'pointer',
+    fontSize: '14px',
+    color: COLOR_V2.GRAY_70,
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
 
-  ...(isFirst && {paddingLeft: '0'}),
+    ...(isFirst && {paddingLeft: '0'}),
 
-  '&:hover': {
+    '&:hover': {
+      color: 'var(--main-color)',
+    },
+  };
+};
+
+export const activeItemStyles = ({isFirst}: {isFirst: boolean}): CSSObject => {
+  return {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '8px',
+    paddingLeft: isFirst ? '0' : '8px',
+    paddingRight: '0',
+    fontSize: '14px',
     color: 'var(--main-color)',
-  },
-});
-
-export const activeItemStyles = ({isFirst}: {isFirst: boolean}): CSSObject => ({
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: '8px',
-  paddingLeft: isFirst ? '0' : '8px',
-  paddingRight: '0',
-  fontSize: '14px',
-  color: 'var(--main-color)',
-});
+  };
+};

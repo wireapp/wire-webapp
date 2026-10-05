@@ -23,9 +23,23 @@ import getSlug from 'speakingurl';
 import type {User} from 'Repositories/entity/User';
 import {randomElement} from 'Util/arrayUtil';
 
-export const startsWith = (string = '', query: string): boolean => string.toLowerCase().startsWith(query.toLowerCase());
-export const includesString = (string = '', query = ''): boolean => string.toLowerCase().includes(query.toLowerCase());
-export const getFirstChar = (string: string): string => [...string][0]; // the destructuring is needed to properly return unicode characters
+const obfuscationExtraCharacterRange = 10;
+const wordBoundarySearchLength = 25;
+const bitsPerByte = 8;
+const utf16HighByteMask = 0xff00;
+const utf16LowByteMask = 0xff;
+const paddedFingerprintLength = 16;
+const randomSortOutcomeCount = 2;
+
+export const startsWith = (string = '', query: string): boolean => {
+  return string.toLowerCase().startsWith(query.toLowerCase());
+};
+export const includesString = (string = '', query = ''): boolean => {
+  return string.toLowerCase().includes(query.toLowerCase());
+};
+export const getFirstChar = (string: string): string => {
+  return [...string][0];
+}; // the destructuring is needed to properly return unicode characters
 
 /**
  * @param bytes bytes to convert
@@ -34,10 +48,14 @@ export const getFirstChar = (string: string): string => [...string][0]; // the d
 export const bytesToHex = (bytes: number[]): string => {
   const hexBase = 16;
   const padIndex = 2;
-  return Array.from(bytes, byte => byte.toString(hexBase).padStart(padIndex, '0')).join('');
+  return Array.from(bytes, byte => {
+    return byte.toString(hexBase).padStart(padIndex, '0');
+  }).join('');
 };
 
-export const capitalizeFirstChar = (string = ''): string => `${string.charAt(0).toUpperCase()}${string.substring(1)}`;
+export const capitalizeFirstChar = (string = ''): string => {
+  return `${string.charAt(0).toUpperCase()}${string.substring(1)}`;
+};
 
 export const computeTransliteration = (string: string, excludedChars = {}): string => {
   const options = {custom: excludedChars, uric: true};
@@ -52,8 +70,11 @@ export const getRandomChar = (): string => {
 export const obfuscate = (text: string): string => {
   const alphabet = Array.from('abcdefghijklmnopqrstuvwxyz ');
 
-  const obfuscatedText = Array.from({length: text.length + Math.floor((1 + Math.random()) * 10)}, () =>
-    randomElement(alphabet),
+  const obfuscatedText = Array.from(
+    {length: text.length + Math.floor((1 + Math.random()) * obfuscationExtraCharacterRange)},
+    () => {
+      return randomElement(alphabet);
+    },
   ).join('');
 
   return obfuscatedText;
@@ -79,12 +100,14 @@ export const compareTransliteration = (
   return fromStart ? nameSlug.startsWith(querySlug) : includesString(nameSlug, querySlug);
 };
 
-export const transliterationIndex = (nameSlug: string, querySlug: string): number => nameSlug.indexOf(querySlug);
+export const transliterationIndex = (nameSlug: string, querySlug: string): number => {
+  return nameSlug.indexOf(querySlug);
+};
 
 export const truncate = (string: string, outputLength: number, wordBoundary = true): string => {
   if (string.length > outputLength) {
     let truncateIndex = outputLength - 1;
-    if (wordBoundary && string.lastIndexOf(' ', outputLength - 1) > outputLength - 25) {
+    if (wordBoundary && string.lastIndexOf(' ', outputLength - 1) > outputLength - wordBoundarySearchLength) {
       truncateIndex = string.lastIndexOf(' ', outputLength - 1);
     }
     string = `${string.slice(0, truncateIndex)}…`;
@@ -108,7 +131,9 @@ export const formatString = (string: string, ...args: any[]): string => {
   return string;
 };
 
-export const removeLineBreaks = (string = ''): string => string.replace(/[\r\n]/gm, '');
+export const removeLineBreaks = (string = ''): string => {
+  return string.replace(/[\r\n]/gm, '');
+};
 
 export const replaceInRange = (text: string, replacement: string, startIndex: number, endIndex: number): string => {
   const beforePartial = text.slice(0, startIndex);
@@ -132,7 +157,9 @@ export const sortByPriority = (stringA: string = '', stringB: string = '', query
   return stringA.localeCompare(stringB);
 };
 
-export const sortUsersByPriority = (userA: User, userB: User): number => sortByPriority(userA.name(), userB.name());
+export const sortUsersByPriority = (userA: User, userB: User): number => {
+  return sortByPriority(userA.name(), userB.name());
+};
 
 /**
  * Converts a string to UTF-16 Big Endian byte array without BOM
@@ -143,10 +170,12 @@ export const stringToUtf16BE = (str = ''): number[] => {
   const bytes: number[] = [];
   str
     .split('')
-    .map(char => char.charCodeAt(0))
+    .map(char => {
+      return char.charCodeAt(0);
+    })
     .forEach(charCode => {
-      bytes.push((charCode & 0xff00) >> 8);
-      bytes.push(charCode & 0xff);
+      bytes.push((charCode & utf16HighByteMask) >> bitsPerByte);
+      bytes.push(charCode & utf16LowByteMask);
     });
 
   return bytes;
@@ -171,13 +200,19 @@ export const utf8ToUtf16BE = (str = ''): number[] => {
   return addBOM(stringToUtf16BE(str));
 };
 
-export const splitFingerprint = (fingerprint: string): string[] => fingerprint?.padStart(16, '0').match(/(..?)/g) ?? [];
+export const splitFingerprint = (fingerprint: string): string[] => {
+  return fingerprint?.padStart(paddedFingerprintLength, '0').match(/(..?)/g) ?? [];
+};
 
 // When we receive strings via Websocket, it will have been converted to utf-8,
 // In order to keep Emojis and other unicode characters, we need to run the TextDecoder
 // over the numeric values of the single characters of the received string.
 export const fixWebsocketString = (originalString: string): string => {
-  const charArray = Uint8Array.from([...originalString].map(c => c.charCodeAt(0)));
+  const charArray = Uint8Array.from(
+    [...originalString].map(c => {
+      return c.charCodeAt(0);
+    }),
+  );
   const decoder = new TextDecoder();
   return decoder.decode(charArray);
 };
@@ -233,7 +268,9 @@ const accentsMap: Record<string, string> = {
  * @param text The string to replace accents its charachters
  * @returns new string with replaced accents charachters
  */
-export const replaceAccents = (text: string) => getSlug(text, {custom: accentsMap, uric: true});
+export const replaceAccents = (text: string) => {
+  return getSlug(text, {custom: accentsMap, uric: true});
+};
 
 /**
  * generate a random password
@@ -276,7 +313,9 @@ export const generateRandomPassword = (passwordLength: number = 8): string => {
   // Shuffle the characters of the password randomly to make it more secure
   password = password
     .split('')
-    .toSorted(() => getRandomIndex(2) - 1) // Generates either -1 or 1 for shuffling
+    .toSorted(() => {
+      return getRandomIndex(randomSortOutcomeCount) - 1;
+    }) // Generates either -1 or 1 for shuffling
     .join('');
 
   // Truncate the password to the desired length if necessary

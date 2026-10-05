@@ -25,6 +25,9 @@ import {Message} from './message';
 
 import {SuperType} from '../../../message/superType';
 
+const decryptionErrorCodeUpperBound = 300;
+const minimumDecryptionErrorCode = 200;
+
 export class DecryptErrorMessage extends Message {
   constructor(
     public readonly clientId: string,
@@ -36,7 +39,9 @@ export class DecryptErrorMessage extends Message {
   }
 
   get isRecoverable(): boolean {
-    return !this.isIdentityChanged && this.code >= 200 && this.code < 300;
+    return (
+      !this.isIdentityChanged && this.code >= minimumDecryptionErrorCode && this.code < decryptionErrorCodeUpperBound
+    );
   }
 
   get isIdentityChanged(): boolean {

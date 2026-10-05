@@ -28,7 +28,7 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 
 interface ImageUploadButtonProps {
   onSelectImages: (files: File[]) => void;
-  acceptedImageTypes: ReadonlyArray<string>;
+  acceptedImageTypes: readonly string[];
 }
 
 export const ImageUploadButton = ({onSelectImages, acceptedImageTypes}: ImageUploadButtonProps) => {
@@ -54,7 +54,9 @@ export const ImageUploadButton = ({onSelectImages, acceptedImageTypes}: ImageUpl
         aria-label={translate('tooltipConversationAddImage')}
         title={translate('tooltipConversationAddImage')}
         className="input-bar-control file-button"
-        onClick={() => imageRef.current?.click()}
+        onClick={() => {
+          return imageRef.current?.click();
+        }}
         data-uie-name="do-share-image"
       >
         <Icon.ImageIcon />

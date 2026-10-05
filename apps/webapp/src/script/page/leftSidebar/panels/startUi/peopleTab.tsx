@@ -126,10 +126,11 @@ export const PeopleTab = ({
     if (normalizedQuery === '') {
       return teamApps;
     }
-    return teamApps.filter(
-      app =>
-        app.name().toLowerCase().includes(normalizedQuery) || app.username().toLowerCase().includes(normalizedQuery),
-    );
+    return teamApps.filter(app => {
+      return (
+        app.name().toLowerCase().includes(normalizedQuery) || app.username().toLowerCase().includes(normalizedQuery)
+      );
+    });
   }, [teamApps, searchQuery]);
 
   const getLocalUsers = (unfiltered?: boolean) => {
@@ -148,16 +149,20 @@ export const PeopleTab = ({
       contacts =
         unfiltered === true
           ? teamUsers
-          : teamUsers.filter(
-              user => conversationState.hasConversationWith(user) || teamRepository.isSelfConnectedTo(user.id),
-            );
+          : teamUsers.filter(user => {
+              return conversationState.hasConversationWith(user) || teamRepository.isSelfConnectedTo(user.id);
+            });
     }
 
-    return contacts.filter(user => user.isAvailable());
+    return contacts.filter(user => {
+      return user.isAvailable();
+    });
   };
 
   const [results, setResults] = useState<SearchResultsData>({contacts: getLocalUsers(), others: []});
-  const searchOnFederatedDomain = () => '';
+  const searchOnFederatedDomain = () => {
+    return '';
+  };
   const hasResults = results.contacts.length + results.others.length + filteredApps.length > 0;
 
   const manageTeamUrl = getManageTeamUrl('client_landing');
@@ -168,13 +173,15 @@ export const PeopleTab = ({
     query: string,
   ): Promise<SearchResultsData> => {
     const selfTeamId = selfUser.teamId;
-    const [contacts, others] = partition(remoteUsers, user => user.teamId === selfTeamId);
+    const [contacts, others] = partition(remoteUsers, user => {
+      return user.teamId === selfTeamId;
+    });
     const nonExternalContacts = await teamRepository.filterExternals(contacts);
     return {
       ...searchResults,
-      contacts: [...searchResults.contacts, ...nonExternalContacts].toSorted((userA, userB) =>
-        sortByPriority(userA.name(), userB.name(), query),
-      ),
+      contacts: [...searchResults.contacts, ...nonExternalContacts].toSorted((userA, userB) => {
+        return sortByPriority(userA.name(), userB.name(), query);
+      }),
       others: others,
     };
   };
@@ -184,12 +191,22 @@ export const PeopleTab = ({
       .getMostActiveConversations()
       .then(conversationEntities => {
         return conversationEntities
-          .filter(conversation => conversation.is1to1())
+          .filter(conversation => {
+            return conversation.is1to1();
+          })
           .slice(0, TOP_PEOPLE_LIMIT)
-          .map(conversation => conversation.participating_user_ids()[0]);
+          .map(conversation => {
+            return conversation.participating_user_ids()[0];
+          });
       })
-      .then(userIds => userRepository.getUsersById(userIds))
-      .then(userEntities => userEntities.filter(user => !user.isBlocked()));
+      .then(userIds => {
+        return userRepository.getUsersById(userIds);
+      })
+      .then(userEntities => {
+        return userEntities.filter(user => {
+          return !user.isBlocked();
+        });
+      });
   }, [conversationRepository, userRepository]);
 
   useEffect(() => {
@@ -209,12 +226,13 @@ export const PeopleTab = ({
     const localSearchSources = getLocalUsers(true);
 
     const contactResults = searchRepository.searchUserInSet(searchQuery, localSearchSources);
-    const filteredResults = contactResults.filter(
-      user =>
+    const filteredResults = contactResults.filter(user => {
+      return (
         conversationState.hasConversationWith(user) ||
         teamRepository.isSelfConnectedTo(user.id) ||
-        user.username() === query,
-    );
+        user.username() === query
+      );
+    });
 
     const localSearchResults: SearchResultsData = {
       contacts: filteredResults,
@@ -225,8 +243,12 @@ export const PeopleTab = ({
     if (canSearchUnconnectedUsers) {
       try {
         const userEntities = await searchRepository.searchByName(searchQuery, selfUser.teamId);
-        const localUserIds = localSearchResults.contacts.map(({id}) => id);
-        const onlyRemoteUsers = userEntities.filter(user => !localUserIds.includes(user.id));
+        const localUserIds = localSearchResults.contacts.map(({id}) => {
+          return id;
+        });
+        const onlyRemoteUsers = userEntities.filter(user => {
+          return !localUserIds.includes(user.id);
+        });
         const results = inTeam
           ? await organizeTeamSearchResults(onlyRemoteUsers, localSearchResults, query)
           : {...localSearchResults, others: onlyRemoteUsers};
@@ -287,7 +309,9 @@ export const PeopleTab = ({
                 <button
                   className="left-list-item-button"
                   type="button"
-                  onClick={() => safeWindowOpen(manageTeamUrl)}
+                  onClick={() => {
+                    return safeWindowOpen(manageTeamUrl);
+                  }}
                   data-uie-name="do-invite-member"
                 >
                   <span className="left-column-icon icon-envelope"></span>
@@ -352,7 +376,9 @@ export const PeopleTab = ({
             )}
             <div className="search-list-theme-black">
               <UserList
-                onClick={user => onClickContact(user)}
+                onClick={user => {
+                  return onClickContact(user);
+                }}
                 conversationRepository={conversationRepository}
                 mode={UserlistMode.COMPACT}
                 users={results.contacts}

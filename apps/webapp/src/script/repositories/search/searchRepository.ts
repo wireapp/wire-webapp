@@ -36,6 +36,11 @@ import {
 import {APIClient} from '../../service/apiClientSingleton';
 import {Core} from '../../service/coreSingleton';
 
+const propertyOrderWeightMultiplier = 10;
+const exactPrefixMatchWeight = 100;
+const transliteratedPrefixMatchWeight = 50;
+const tokenPrefixMatchWeightMultiplier = 10;
+
 const CONFIG = {
   MAX_DIRECTORY_RESULTS: 30,
   MAX_SEARCH_RESULTS: 10,
@@ -96,7 +101,7 @@ export class SearchRepository {
 
       const uniqueValues = Array.from(new Set(values));
       const matchWeight = uniqueValues.reduce((weight, value, index) => {
-        const propertyWeight = 10 * index + 1;
+        const propertyWeight = propertyOrderWeightMultiplier * index + 1;
         const propertyMatchWeight = this.matches(query, termSlug, excludedEmojis, value);
         return weight + propertyMatchWeight * propertyWeight;
       }, 0);
@@ -111,7 +116,9 @@ export class SearchRepository {
         }
         return result2.weight - result1.weight;
       })
-      .map(result => result.user);
+      .map(result => {
+        return result.user;
+      });
   }
 
   /**
@@ -131,7 +138,7 @@ export class SearchRepository {
     const isStrictMatch = (isNonEmptyString(value) ? value : '').toLowerCase().startsWith(term.toLowerCase());
     if (isStrictMatch) {
       // if the pattern matches the raw text, give the maximum value to the match
-      return 100;
+      return exactPrefixMatchWeight;
     }
     const nameSlug = computeTransliteration(value, excludedChars);
     const nameIndexWithSlug = transliterationIndex(nameSlug, termSlug);
@@ -140,7 +147,7 @@ export class SearchRepository {
     const isStrictTransliteratedMatch = nameIndex === 0;
     if (isStrictTransliteratedMatch) {
       // give a little less points if the pattern strictly matches the transliterated string
-      return 50;
+      return transliteratedPrefixMatchWeight;
     }
     const noMatch = nameIndex < 0;
     if (noMatch) {
@@ -155,7 +162,7 @@ export class SearchRepository {
       const tokenIndex = transliterationIndex(token, termSlug);
 
       if (tokenIndex === 0) {
-        tokenWeight = indexWeight * 10;
+        tokenWeight = indexWeight * tokenPrefixMatchWeightMultiplier;
       } else if (tokenIndex > 0) {
         tokenWeight = indexWeight;
       }
@@ -184,7 +191,11 @@ export class SearchRepository {
     const [name, domain] = validateHandle(rawName, rawDomain) ? [rawName, rawDomain] : [query];
 
     const userIds: QualifiedId[] = await this.getContacts(name, CONFIG.MAX_DIRECTORY_RESULTS, domain).then(
-      ({documents}) => documents.map(match => ({domain: match.qualified_id?.domain ?? '', id: match.id})),
+      ({documents}) => {
+        return documents.map(match => {
+          return {domain: match.qualified_id?.domain ?? '', id: match.id};
+        });
+      },
     );
 
     const users = await this.userRepository.getUsersById(userIds);
@@ -192,8 +203,12 @@ export class SearchRepository {
     return (
       users
         // Filter out selfUser
-        .filter(user => !user.isMe)
-        .filter(user => !isHandleQuery || startsWith(user.username(), query))
+        .filter(user => {
+          return !user.isMe;
+        })
+        .filter(user => {
+          return !isHandleQuery || startsWith(user.username(), query);
+        })
         .toSorted((userA, userB) => {
           if (userA.teamId === teamId && userB.teamId !== teamId) {
             // put team members first

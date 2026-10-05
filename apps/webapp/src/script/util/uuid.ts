@@ -19,4 +19,9 @@
 
 import {v4 as uuidv4, v1 as uuidv1} from 'uuid';
 
-export const createUuid = (version: 4 | 1 = 4): string => (version === 4 ? uuidv4() : uuidv1());
+type UuidVersion = 4 | 1;
+const randomUuidVersion = 4;
+
+export const createUuid = (version: UuidVersion = randomUuidVersion): string => {
+  return version === randomUuidVersion ? uuidv4() : uuidv1();
+};

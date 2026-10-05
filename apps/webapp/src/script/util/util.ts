@@ -17,6 +17,7 @@
  *
  */
 
+import {isNull, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {Decoder, Encoder} from 'bazinga64';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {noop} from 'noop-esm';
@@ -29,6 +30,9 @@ import {isTabKey} from './keyboardUtil';
 import {getLogger} from './logger';
 
 import {AuthError} from '../error/authError';
+
+const decimalRadix = 10;
+const environmentPollingIntervalInMilliseconds = 100;
 
 export const checkIndexedDb = (): Promise<void> => {
   if (!Runtime.isSupportingIndexedDb()) {
@@ -43,7 +47,7 @@ export const checkIndexedDb = (): Promise<void> => {
     try {
       dbOpenRequest = window.indexedDB.open('test');
       dbOpenRequest.onerror = event => {
-        if (dbOpenRequest.error) {
+        if (!isNull(dbOpenRequest.error)) {
           event.preventDefault();
           return Promise.reject(new AuthError(AuthError.TYPE.PRIVATE_MODE, AuthError.MESSAGE.PRIVATE_MODE));
         }
@@ -106,7 +110,7 @@ const loadUrlBuffer = (
       const isStatusOK = xhr.status === HTTP_STATUS.OK;
       return isStatusOK
         ? resolve({buffer: xhr.response, mimeType: xhr.getResponseHeader('content-type') ?? ''})
-        : reject(new Error(xhr.status.toString(10)));
+        : reject(new Error(xhr.status.toString(decimalRadix)));
     };
 
     xhr.onerror = reject;
@@ -134,14 +138,18 @@ export const loadImage = function (blob: Blob): Promise<HTMLImageElement> {
 export const loadFileBuffer = (file: Blob | File): Promise<ArrayBuffer> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = () => resolve(reader.result as ArrayBuffer);
+    reader.onload = () => {
+      return resolve(reader.result as ArrayBuffer);
+    };
     reader.onerror = reject;
     reader.readAsArrayBuffer(file);
   });
 };
 
 export const loadUrlBlob = (url: string): Promise<Blob> => {
-  return loadUrlBuffer(url).then(({buffer, mimeType}) => new Blob([new Uint8Array(buffer)], {type: mimeType}));
+  return loadUrlBuffer(url).then(({buffer, mimeType}) => {
+    return new Blob([new Uint8Array(buffer)], {type: mimeType});
+  });
 };
 
 export const getFileExtension = (filename: string): string => {
@@ -227,7 +235,9 @@ export const getContentTypeFromDataUrl = (dataUrl: string): string => {
   return dataUrl.match(/^.*:(.*);.*,/)?.[1] ?? '';
 };
 
-export const stripDataUri = (string: string): string => string.replace(/^data:.*,/, '');
+export const stripDataUri = (string: string): string => {
+  return string.replace(/^data:.*,/, '');
+};
 
 /**
  * Convert a base64 string to an Uint8Array.
@@ -280,7 +290,7 @@ export const downloadFile = (url: string, fileName: string, mimeType?: string): 
     const objectURL = anchor.href;
     document.body.removeChild(anchor);
     window.URL.revokeObjectURL(objectURL);
-  }, 100);
+  }, environmentPollingIntervalInMilliseconds);
 };
 
 /**
@@ -320,24 +330,34 @@ export const zeroPadding = (value: string | number, length = 2): string => {
   return `${'0'.repeat(zerosNeeded)}${value}`;
 };
 
-export const sortGroupsByLastEvent = (groupA: Conversation, groupB: Conversation): number =>
-  groupB.last_event_timestamp() - groupA.last_event_timestamp();
+export const sortGroupsByLastEvent = (groupA: Conversation, groupB: Conversation): number => {
+  return groupB.last_event_timestamp() - groupA.last_event_timestamp();
+};
 
 // Removes url(' and url(" from the beginning of the string and also ") and ') from the end
-export const stripUrlWrapper = (url: string) => url.replace(/^url\(["']?/, '').replace(/["']?\)$/, '');
+export const stripUrlWrapper = (url: string) => {
+  return url.replace(/^url\(["']?/, '').replace(/["']?\)$/, '');
+};
 
 export const validateProfileImageResolution = (file: File, minWidth: number, minHeight: number): Promise<boolean> => {
   return new Promise((resolve, reject) => {
     const image = new Image();
-    image.onload = () => resolve(image.width >= minWidth && image.height >= minHeight);
-    image.onerror = () => reject(new Error('Failed to load profile picture for size validation'));
+    image.onload = () => {
+      return resolve(image.width >= minWidth && image.height >= minHeight);
+    };
+    image.onerror = () => {
+      return reject(new Error('Failed to load profile picture for size validation'));
+    };
     image.src = window.URL.createObjectURL(file);
   });
 };
 
 // https://developer.mozilla.org/en-US/Firefox/Performance_best_practices_for_Firefox_fe_engineers
-export const afterRender = (callback: TimerHandler): number =>
-  window.requestAnimationFrame(() => window.setTimeout(callback, 0));
+export const afterRender = (callback: TimerHandler): number => {
+  return window.requestAnimationFrame(() => {
+    return window.setTimeout(callback, 0);
+  });
+};
 
 /**
  * No operation
@@ -387,15 +407,19 @@ export const setContextMenuPosition = (event: React.KeyboardEvent) => {
   });
 };
 
-const supportsSecretStorage = () => !Runtime.isDesktopApp() || !!window.systemCrypto;
+const supportsSecretStorage = () => {
+  return !Runtime.isDesktopApp() || !isUndefined(window.systemCrypto);
+};
 
 // disables mls for old 'broken' desktop clients, see https://github.com/wireapp/wire-desktop/pull/6094
-export const supportsMLS = () => supportsSecretStorage();
+export const supportsMLS = () => {
+  return supportsSecretStorage();
+};
 
 export const incomingCssClass = 'content-animation-incoming-horizontal-left';
 
 export const removeAnimationsClass = (element: HTMLElement | null) => {
-  if (element) {
+  if (!isNullOrUndefined(element)) {
     element.addEventListener('animationend', () => {
       if (element.classList.contains(incomingCssClass)) {
         element.classList.remove(incomingCssClass);

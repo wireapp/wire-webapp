@@ -19,6 +19,7 @@
 
 import {memo, useCallback, useEffect, useRef, useState} from 'react';
 
+import {isNonEmptyArray} from '@sindresorhus/is';
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
@@ -97,8 +98,12 @@ export const ConversationCells = memo(
     const folderUploadInput = useRef<HTMLInputElement>(null);
     const [activeFolderDropTargetName, setActiveFolderDropTargetName] = useState<string | null>(null);
     const [folderDropResetKey, setFolderDropResetKey] = useState(0);
-    const onUploadFiles = () => uploadInput.current?.click();
-    const onUploadFolder = () => folderUploadInput.current?.click();
+    const onUploadFiles = () => {
+      return uploadInput.current?.click();
+    };
+    const onUploadFolder = () => {
+      return folderUploadInput.current?.click();
+    };
     const {
       cellsState: initialCellState,
       name,
@@ -193,7 +198,9 @@ export const ConversationCells = memo(
 
       closeSearchInRecycleBin();
       window.addEventListener('hashchange', handleHashChange);
-      return () => window.removeEventListener('hashchange', handleHashChange);
+      return () => {
+        return window.removeEventListener('hashchange', handleHashChange);
+      };
     }, [isSearchViewOpen, onCloseSearchView, setSort]);
 
     const handleRefresh = useCallback((): void => {
@@ -221,8 +228,9 @@ export const ConversationCells = memo(
       },
       [maxSharedDriveUploadFileSize, translate],
     );
-    const handleSharedDriveDropReadError = (): void =>
-      handleSharedDriveUploadRejection({reason: 'readFailed', invalidFiles: []});
+    const handleSharedDriveDropReadError = (): void => {
+      return handleSharedDriveUploadRejection({reason: 'readFailed', invalidFiles: []});
+    };
     const handleDroppedFiles = useSharedDriveFileDrop({
       conversationQualifiedId: sharedDriveConversationQualifiedId,
       fireAndForgetInvoker,
@@ -240,7 +248,9 @@ export const ConversationCells = memo(
       isUploadFilesEnabled: canUploadToSharedDrive,
       isInRecycleBin,
       maxFileSize: maxSharedDriveUploadFileSize,
-      isAcceptedFile: (file: File) => allowsAllFiles() || hasAllowedExtension(file.name),
+      isAcceptedFile: (file: File) => {
+        return allowsAllFiles() || hasAllowedExtension(file.name);
+      },
       sharedDriveUploadController,
       uploadPath: sharedDriveUploadPath,
       conversationQualifiedId: sharedDriveConversationQualifiedId,
@@ -248,7 +258,9 @@ export const ConversationCells = memo(
 
     const resetSharedDriveDropState = useCallback((): void => {
       setActiveFolderDropTargetName(null);
-      setFolderDropResetKey(key => key + 1);
+      setFolderDropResetKey(key => {
+        return key + 1;
+      });
     }, []);
 
     const handleDropFilesToFolder = useCallback(
@@ -272,8 +284,12 @@ export const ConversationCells = memo(
 
     const handleLoadMore = useCallback(async (): Promise<void> => {
       await loadMoreOffset.match({
-        Just: offset => loadMoreSearchResults(offset),
-        Nothing: () => Promise.resolve(),
+        Just: offset => {
+          return loadMoreSearchResults(offset);
+        },
+        Nothing: () => {
+          return Promise.resolve();
+        },
       });
     }, [loadMoreOffset, loadMoreSearchResults]);
 
@@ -286,7 +302,7 @@ export const ConversationCells = memo(
     const isError = nodesStatus === 'error';
     const isSuccess = nodesStatus === 'success';
 
-    const hasNodes = !!nodes.length;
+    const hasNodes = isNonEmptyArray(nodes);
     const emptyView = !isError && !hasNodes && isCellsStateReady;
 
     const isLoadingVisible = isLoading && isCellsStateReady;

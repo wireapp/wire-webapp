@@ -19,10 +19,12 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const singleActionButtonStyle = (oneButtonPerRow = false): CSSObject => ({
-  width: '100%',
-  margin: 0,
-  flex: oneButtonPerRow ? '1' : '1 1 125px',
-  minWidth: 'unset',
-  overflow: 'unset',
-});
+export const singleActionButtonStyle = (oneButtonPerRow = false): CSSObject => {
+  return {
+    width: '100%',
+    margin: 0,
+    flex: oneButtonPerRow ? '1' : '1 1 125px',
+    minWidth: 'unset',
+    overflow: 'unset',
+  };
+};

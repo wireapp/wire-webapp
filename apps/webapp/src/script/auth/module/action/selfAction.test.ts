@@ -33,7 +33,9 @@ describe('SelfAction', () => {
     const team = {teams: [{id: 'team'}]};
     const expectedSelfUser = {assets: [], id: 'selfUserId'} as unknown as Self;
     const spies = {
-      doCheckPasswordState: jasmine.createSpy().and.returnValue(() => Promise.resolve()),
+      doCheckPasswordState: jasmine.createSpy().and.returnValue(() => {
+        return Promise.resolve();
+      }),
     };
     const mockedActions = {
       selfAction: {
@@ -43,11 +45,15 @@ describe('SelfAction', () => {
     const mockedApiClient = {
       api: {
         self: {
-          getSelf: () => Promise.resolve(selfUser),
+          getSelf: () => {
+            return Promise.resolve(selfUser);
+          },
         },
         teams: {
           team: {
-            getTeam: (teamId: string) => Promise.resolve(team),
+            getTeam: (teamId: string) => {
+              return Promise.resolve(team);
+            },
           },
         },
       },
@@ -78,7 +84,9 @@ describe('SelfAction', () => {
     const mockedApiClient = {
       api: {
         self: {
-          getSelf: () => Promise.reject(error),
+          getSelf: () => {
+            return Promise.reject(error);
+          },
         },
       },
     };
@@ -94,7 +102,11 @@ describe('SelfAction', () => {
   it('fetches the set password state', async () => {
     const mockedApiClient = {
       api: {
-        self: {headPassword: () => Promise.resolve({status: HTTP_STATUS.OK})},
+        self: {
+          headPassword: () => {
+            return Promise.resolve({status: HTTP_STATUS.OK});
+          },
+        },
       },
     };
 
@@ -111,7 +123,13 @@ describe('SelfAction', () => {
 
   it('fetches the unset password state', async () => {
     const mockedApiClient = {
-      api: {self: {headPassword: () => Promise.reject({response: {status: HTTP_STATUS.NOT_FOUND}})}},
+      api: {
+        self: {
+          headPassword: () => {
+            return Promise.reject({response: {status: HTTP_STATUS.NOT_FOUND}});
+          },
+        },
+      },
     };
 
     const store = mockStoreFactory({
@@ -129,7 +147,13 @@ describe('SelfAction', () => {
     const error = {response: {status: HTTP_STATUS.BAD_REQUEST}} as unknown as Error;
     const expectedError = toError(error);
     const mockedApiClient = {
-      api: {self: {headPassword: () => Promise.reject(error)}},
+      api: {
+        self: {
+          headPassword: () => {
+            return Promise.reject(error);
+          },
+        },
+      },
     };
 
     const store = mockStoreFactory({
@@ -150,7 +174,13 @@ describe('SelfAction', () => {
   it('can set the self email', async () => {
     const email = 'myemail@mail.com';
     const mockedApiClient = {
-      api: {auth: {putEmail: () => Promise.resolve()}},
+      api: {
+        auth: {
+          putEmail: () => {
+            return Promise.resolve();
+          },
+        },
+      },
     };
 
     const store = mockStoreFactory({
@@ -168,7 +198,13 @@ describe('SelfAction', () => {
     const email = 'myemail@mail.com';
     const error = new Error('test error');
     const mockedApiClient = {
-      api: {auth: {putEmail: () => Promise.reject(error)}},
+      api: {
+        auth: {
+          putEmail: () => {
+            return Promise.reject(error);
+          },
+        },
+      },
     };
 
     const store = mockStoreFactory({
@@ -184,7 +220,13 @@ describe('SelfAction', () => {
   it('can set the self password', async () => {
     const password = 'password';
     const mockedApiClient = {
-      api: {self: {putPassword: () => Promise.resolve()}},
+      api: {
+        self: {
+          putPassword: () => {
+            return Promise.resolve();
+          },
+        },
+      },
     };
 
     const store = mockStoreFactory({
@@ -202,7 +244,13 @@ describe('SelfAction', () => {
     const password = 'password';
     const error = new Error('test error');
     const mockedApiClient = {
-      api: {self: {putPassword: () => Promise.reject(error)}},
+      api: {
+        self: {
+          putPassword: () => {
+            return Promise.reject(error);
+          },
+        },
+      },
     };
 
     const store = mockStoreFactory({

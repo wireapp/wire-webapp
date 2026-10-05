@@ -22,6 +22,8 @@ import {isNonEmptyString} from '@sindresorhus/is';
 import {currentLanguage} from './auth/localeConfig';
 import {Config} from './Config';
 
+const languageCodeLength = 2;
+
 const {URL, TERMS_OF_USE_URL_DE, PRIVACY_POLICY_URL_DE} = Config.getConfig();
 
 const isProductionWebsite = isNonEmptyString(URL.WEBSITE_BASE) && URL.WEBSITE_BASE === 'https://wire.com';
@@ -72,8 +74,9 @@ const getTermsOfUseUrl = () => {
  * @param  utmSource - Optional. The source of the UTM parameters.
  * @returns  The URL for managing services with optional UTM parameters.
  */
-export const getManageServicesUrl = (utmSource?: string): string | undefined =>
-  getTeamSettingsUrl(URL.URL_PATH?.MANAGE_SERVICES, utmSource);
+export const getManageServicesUrl = (utmSource?: string): string | undefined => {
+  return getTeamSettingsUrl(URL.URL_PATH?.MANAGE_SERVICES, utmSource);
+};
 
 /**
  * Retrieves the URL for managing team settings with optional UTM parameters.
@@ -82,11 +85,15 @@ export const getManageServicesUrl = (utmSource?: string): string | undefined =>
  * @param utmSource - Optional. The source of the UTM parameters.
  * @returns The URL for managing team settings with optional UTM parameters.
  */
-export const getManageTeamUrl = (utmSource?: string): string | undefined =>
-  getTeamSettingsUrl(URL.URL_PATH?.MANAGE_TEAM, utmSource);
+export const getManageTeamUrl = (utmSource?: string): string | undefined => {
+  return getTeamSettingsUrl(URL.URL_PATH?.MANAGE_TEAM, utmSource);
+};
 
-const getCreateTeamUrl = (): string | undefined =>
-  Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION ? `${URL.TEAMS_BASE}${URL.URL_PATH.CREATE_TEAM}` : undefined;
+const getCreateTeamUrl = (): string | undefined => {
+  return Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION
+    ? `${URL.TEAMS_BASE}${URL.URL_PATH.CREATE_TEAM}`
+    : undefined;
+};
 
 const addLocaleToUrl = (url?: string): string | undefined => {
   if (!isNonEmptyString(url)) {
@@ -95,7 +102,7 @@ const addLocaleToUrl = (url?: string): string | undefined => {
   if (!isProductionWebsite) {
     return url;
   }
-  const language = currentLanguage().slice(0, 2);
+  const language = currentLanguage().slice(0, languageCodeLength);
   const websiteLanguage = language == 'de' ? language : 'en';
   return url.replace(Config.getConfig().URL.WEBSITE_BASE, `${Config.getConfig().URL.WEBSITE_BASE}/${websiteLanguage}`);
 };

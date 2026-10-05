@@ -19,36 +19,40 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const conversationsSidebarStyles = (mdBreakpoint: boolean): CSSObject => ({
-  position: mdBreakpoint ? 'absolute' : 'relative',
-  zIndex: mdBreakpoint ? '1000' : 'auto',
-});
+export const conversationsSidebarStyles = (mdBreakpoint: boolean): CSSObject => {
+  return {
+    position: mdBreakpoint ? 'absolute' : 'relative',
+    zIndex: mdBreakpoint ? '1000' : 'auto',
+  };
+};
 
-export const conversationsSidebarHandleStyles = (isSidebarOpen: boolean): CSSObject => ({
-  position: 'absolute',
-  zIndex: '1000',
-  top: '8px',
-  right: '-12px',
-  width: '24px',
-  height: '24px',
-  borderWidth: '2px',
-  display: 'none',
-  transform: isSidebarOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-  '&:hover': {
-    borderColor: 'var(--accent-color-300)',
-    backgroundColor: 'var(--accent-color-50)',
-    'body.theme-default &': {
-      '& svg': {fill: 'var(--accent-color)'},
+export const conversationsSidebarHandleStyles = (isSidebarOpen: boolean): CSSObject => {
+  return {
+    position: 'absolute',
+    zIndex: '1000',
+    top: '8px',
+    right: '-12px',
+    width: '24px',
+    height: '24px',
+    borderWidth: '2px',
+    display: 'none',
+    transform: isSidebarOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+    '&:hover': {
+      borderColor: 'var(--accent-color-300)',
+      backgroundColor: 'var(--accent-color-50)',
+      'body.theme-default &': {
+        '& svg': {fill: 'var(--accent-color)'},
+      },
+      'body.theme-dark &': {
+        borderColor: 'var(--accent-color-800)',
+        backgroundColor: 'var(--accent-color-800)',
+      },
     },
-    'body.theme-dark &': {
-      borderColor: 'var(--accent-color-800)',
-      backgroundColor: 'var(--accent-color-800)',
+    '&:focus': {
+      borderColor: 'var(--accent-color)',
     },
-  },
-  '&:focus': {
-    borderColor: 'var(--accent-color)',
-  },
-});
+  };
+};
 
 export const conversationsSidebarHandleIconStyles: CSSObject = {
   marginLeft: '1px',

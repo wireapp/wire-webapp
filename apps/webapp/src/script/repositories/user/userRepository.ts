@@ -81,6 +81,9 @@ import {Config} from '../../Config';
 import {UserError} from '../../error/userError';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
 
+const connectionUpdateDebounceInMilliseconds = 100;
+const maximumUserClients = 8;
+
 type GetUserOptions = {
   /**
    * will only lookup for users that are in memory (will avoid a backend request in case the user is not found locally)
@@ -139,7 +142,9 @@ export class UserRepository extends TypedEventEmitter<Events> {
 
     this.userMapper = new UserMapper(serverTimeHandler, this.translate);
 
-    this.getTeamMembersFromUsers = async (_: User[]) => undefined;
+    this.getTeamMembersFromUsers = async (_: User[]) => {
+      return undefined;
+    };
 
     amplify.subscribe(WebAppEvents.CLIENT.ADD, this.addClientToUser);
     amplify.subscribe(WebAppEvents.CLIENT.REMOVE, this.removeClientFromUser);
@@ -206,12 +211,20 @@ export class UserRepository extends TypedEventEmitter<Events> {
     conversations: Conversation[],
     extraUsers: QualifiedId[],
   ): Promise<User[]> {
-    const conversationMembers = flatten(conversations.map(conversation => conversation.participating_user_ids()));
+    const conversationMembers = flatten(
+      conversations.map(conversation => {
+        return conversation.participating_user_ids();
+      }),
+    );
     const allUserIds = connections
-      .map(connectionEntity => connectionEntity.userId)
+      .map(connectionEntity => {
+        return connectionEntity.userId;
+      })
       .concat(conversationMembers)
       .concat(extraUsers);
-    const users = uniq(allUserIds, false, (userId: QualifiedId) => userId.id);
+    const users = uniq(allUserIds, false, (userId: QualifiedId) => {
+      return userId.id;
+    });
 
     // Remove all users that have non-qualified Ids in DB (there could be duplicated entries one qualified and one non-qualified)
     // we want to get rid of the ambiguous entries
@@ -221,16 +234,20 @@ export class UserRepository extends TypedEventEmitter<Events> {
     const dbUsers = await this.userService.loadUsersFromDb();
 
     // The self user doesn't need to be re-fetched
-    const usersToFetch = users.filter(user => !matchQualifiedIds(selfUser.qualifiedId, user));
+    const usersToFetch = users.filter(user => {
+      return !matchQualifiedIds(selfUser.qualifiedId, user);
+    });
 
     const {found, failed} = await this.fetchRawUsers(usersToFetch, selfUser.domain);
 
     const usersWithAvailability = found.map(user => {
-      const localUser = dbUsers.find(
-        dbUser => dbUser.id === user.id || matchQualifiedIds(dbUser.qualified_id, user.qualified_id),
-      );
+      const localUser = dbUsers.find(dbUser => {
+        return dbUser.id === user.id || matchQualifiedIds(dbUser.qualified_id, user.qualified_id);
+      });
 
-      const userWithAvailability = [...dbUsers, ...nonQualifiedUsers].find(userRecord => userRecord.id === user.id);
+      const userWithAvailability = [...dbUsers, ...nonQualifiedUsers].find(userRecord => {
+        return userRecord.id === user.id;
+      });
 
       const userWithEscapedDefaultName = this.replaceDeletedUserNameWithNameInDb(user, localUser);
 
@@ -245,13 +262,19 @@ export class UserRepository extends TypedEventEmitter<Events> {
     });
 
     // Save all new users to the database
-    await Promise.all(usersWithAvailability.map(user => this.saveUserInDb(user)));
+    await Promise.all(
+      usersWithAvailability.map(user => {
+        return this.saveUserInDb(user);
+      }),
+    );
 
     const mappedUsers = this.mapUserResponse(usersWithAvailability, failed, dbUsers);
 
     // Assign connections to users
     mappedUsers.forEach(user => {
-      const connection = connections.find(connection => matchQualifiedIds(connection.userId, user.qualifiedId));
+      const connection = connections.find(connection => {
+        return matchQualifiedIds(connection.userId, user.qualifiedId);
+      });
       if (!isNullOrUndefined(connection)) {
         user.connection(connection);
       }
@@ -259,7 +282,9 @@ export class UserRepository extends TypedEventEmitter<Events> {
 
     // Map self user's availability status
     const {availability: selfUserAvailability} =
-      dbUsers.concat(nonQualifiedUsers).find(user => user.id === selfUser.id) ?? {};
+      dbUsers.concat(nonQualifiedUsers).find(user => {
+        return user.id === selfUser.id;
+      }) ?? {};
     if (selfUserAvailability !== undefined) {
       await this.updateUser(selfUser.qualifiedId, {availability: selfUserAvailability});
     }
@@ -294,7 +319,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
       // database connection gets closed and the database gets deleted (WEBAPP-6379).
       window.setTimeout(() => {
         amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.ACCOUNT_DELETED, true);
-      }, 100);
+      }, connectionUpdateDebounceInMilliseconds);
     }
   }
 
@@ -321,7 +346,9 @@ export class UserRepository extends TypedEventEmitter<Events> {
       isNullOrUndefined(localSupportedProtocols) ||
       !(
         localSupportedProtocols.length === newSupportedProtocols.length &&
-        [...localSupportedProtocols].every(protocol => newSupportedProtocols.includes(protocol))
+        [...localSupportedProtocols].every(protocol => {
+          return newSupportedProtocols.includes(protocol);
+        })
       );
 
     if (hasSupportedProtocolsChanged) {
@@ -365,12 +392,16 @@ export class UserRepository extends TypedEventEmitter<Events> {
    */
   async updateUsersFromConnections(connectionEntities: ConnectionEntity[]): Promise<User[]> {
     // TODO(Federation): Include domain as soon as connections to federated backends are supported.
-    const userIds = connectionEntities.map(connectionEntity => connectionEntity.userId);
+    const userIds = connectionEntities.map(connectionEntity => {
+      return connectionEntity.userId;
+    });
 
     const userEntities = await this.getUsersById(userIds);
 
     userEntities.forEach(userEntity => {
-      const connectionEntity = connectionEntities.find(({userId}) => matchQualifiedIds(userId, userEntity));
+      const connectionEntity = connectionEntities.find(({userId}) => {
+        return matchQualifiedIds(userId, userEntity);
+      });
       if (!isNullOrUndefined(connectionEntity)) {
         userEntity.connection(connectionEntity);
       }
@@ -394,7 +425,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
     const userEntities = await this.getUsersById(userIds);
     userEntities.forEach(userEntity => {
       const clientEntities = recipients[userEntity.id];
-      const tooManyClients = clientEntities.length > 8;
+      const tooManyClients = clientEntities.length > maximumUserClients;
       if (tooManyClients) {
         this.logger.debug(`Found '${clientEntities.length}' clients for user`);
       }
@@ -460,9 +491,15 @@ export class UserRepository extends TypedEventEmitter<Events> {
     const addedClients = flatten(
       await Promise.all(
         users.map(async ({userId, clients}) => {
-          return (await Promise.all(clients.map(client => this.addClientToUser(userId, client, true)))).filter(
-            client => !isUndefined(client),
-          );
+          return (
+            await Promise.all(
+              clients.map(client => {
+                return this.addClientToUser(userId, client, true);
+              }),
+            )
+          ).filter(client => {
+            return !isUndefined(client);
+          });
         }),
       ),
     );
@@ -561,15 +598,19 @@ export class UserRepository extends TypedEventEmitter<Events> {
     defaultDomain: string,
   ): Promise<{found: APIClientUser[]; failed: QualifiedId[]}> {
     const chunksOfUserIds = chunk<QualifiedId>(
-      userIds.filter(({id}) => isNonEmptyString(id)),
+      userIds.filter(({id}) => {
+        return isNonEmptyString(id);
+      }),
       Config.getConfig().MAXIMUM_USERS_PER_REQUEST,
     );
 
     const getChunk = async (chunkOfUserIds: QualifiedId[]) => {
-      const chunkOfQualifiedUserIds = chunkOfUserIds.map(({id, domain}) => ({
-        domain: isNonEmptyString(domain) ? domain : defaultDomain,
-        id,
-      }));
+      const chunkOfQualifiedUserIds = chunkOfUserIds.map(({id, domain}) => {
+        return {
+          domain: isNonEmptyString(domain) ? domain : defaultDomain,
+          id,
+        };
+      });
 
       try {
         const {found, failed = [], not_found = []} = await this.userService.getUsers(chunkOfQualifiedUserIds);
@@ -624,7 +665,9 @@ export class UserRepository extends TypedEventEmitter<Events> {
 
     const failedToLoad = failed.map(userId => {
       // When a federated backend is unreachable, we try to load a user from the local database.
-      const dbUserRecord = dbUsers?.find(user => matchQualifiedIds(user.qualified_id, userId));
+      const dbUserRecord = dbUsers?.find(user => {
+        return matchQualifiedIds(user.qualified_id, userId);
+      });
 
       if (!isNullOrUndefined(dbUserRecord) && !isNullOrUndefined(selfUser)) {
         return this.userMapper.mapUserFromJson(dbUserRecord, selfDomain);
@@ -665,9 +708,13 @@ export class UserRepository extends TypedEventEmitter<Events> {
   }
 
   findUsersByIds(userIds: QualifiedId[]): User[] {
-    return this.userState
-      .users()
-      .filter(user => !isUndefined(userIds.find(userId => matchQualifiedIds(user.qualifiedId, userId))));
+    return this.userState.users().filter(user => {
+      return !isUndefined(
+        userIds.find(userId => {
+          return matchQualifiedIds(user.qualifiedId, userId);
+        }),
+      );
+    });
   }
 
   /**
@@ -675,7 +722,11 @@ export class UserRepository extends TypedEventEmitter<Events> {
    * Users that are no longer cached in IndexedDB are represented as deleted users.
    */
   readonly getUsersByIdsFromDb = async (userIds: QualifiedId[]): Promise<User[]> => {
-    const storedUsers = await Promise.all(userIds.map(userId => this.userService.loadUserFromDb(userId)));
+    const storedUsers = await Promise.all(
+      userIds.map(userId => {
+        return this.userService.loadUserFromDb(userId);
+      }),
+    );
     const localDomain = this.userState.self().domain;
 
     return storedUsers.map((storedUser, index) => {
@@ -697,7 +748,9 @@ export class UserRepository extends TypedEventEmitter<Events> {
    * Find a local user.
    */
   findUserById(userId: QualifiedId): User | undefined {
-    return this.userState.users().find(knownUser => matchQualifiedIds(knownUser, userId));
+    return this.userState.users().find(knownUser => {
+      return matchQualifiedIds(knownUser, userId);
+    });
   }
 
   /**
@@ -763,7 +816,9 @@ export class UserRepository extends TypedEventEmitter<Events> {
         isNullOrUndefined(localSupportedProtocols) ||
         !(
           localSupportedProtocols.length === supportedProtocols.length &&
-          [...localSupportedProtocols].every(protocol => supportedProtocols.includes(protocol))
+          [...localSupportedProtocols].every(protocol => {
+            return supportedProtocols.includes(protocol);
+          })
         );
 
       if (!haveSupportedProtocolsChanged) {
@@ -841,11 +896,14 @@ export class UserRepository extends TypedEventEmitter<Events> {
       return [];
     }
 
-    const allUsers = await Promise.all(userIds.map(userId => this.findUserById(userId) ?? userId));
-    const [knownUserEntities, unknownUserIds] = partition(allUsers, item => item instanceof User) as [
-      User[],
-      QualifiedId[],
-    ];
+    const allUsers = await Promise.all(
+      userIds.map(userId => {
+        return this.findUserById(userId) ?? userId;
+      }),
+    );
+    const [knownUserEntities, unknownUserIds] = partition(allUsers, item => {
+      return item instanceof User;
+    }) as [User[], QualifiedId[]];
 
     if (localOnly === true || unknownUserIds.length === 0) {
       return knownUserEntities;
@@ -880,7 +938,9 @@ export class UserRepository extends TypedEventEmitter<Events> {
    * @returns Resolves with users passed as parameter
    */
   private saveUsers(userEntities: User[]): User[] {
-    const newUsers = userEntities.filter(userEntity => isNullOrUndefined(this.findUserById(userEntity.qualifiedId)));
+    const newUsers = userEntities.filter(userEntity => {
+      return isNullOrUndefined(this.findUserById(userEntity.qualifiedId));
+    });
     this.userState.users.push(...newUsers);
     return userEntities;
   }
@@ -895,14 +955,18 @@ export class UserRepository extends TypedEventEmitter<Events> {
 
   async refreshUsers(userIds: QualifiedId[]) {
     const {found: users} = await this.fetchRawUsers(userIds, this.userState.self().domain);
-    return users.map(user => this.updateSavedUser(user));
+    return users.map(user => {
+      return this.updateSavedUser(user);
+    });
   }
 
   /**
    * Refresh all known users (in local state) from the backend.
    */
   public readonly refreshAllKnownUsers = async (): Promise<void> => {
-    const userIds = this.userState.users().map(user => user.qualifiedId);
+    const userIds = this.userState.users().map(user => {
+      return user.qualifiedId;
+    });
     void this.refreshUsers(userIds);
   };
 
@@ -945,7 +1009,9 @@ export class UserRepository extends TypedEventEmitter<Events> {
   }
 
   private findMatchingUser(userId: QualifiedId, userEntities: User[]): User | undefined {
-    return userEntities.find(userEntity => matchQualifiedIds(userEntity, userId));
+    return userEntities.find(userEntity => {
+      return matchQualifiedIds(userEntity, userId);
+    });
   }
 
   private createDeletedUser(userId: QualifiedId): User {

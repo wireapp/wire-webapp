@@ -74,7 +74,9 @@ describe('useSidebarStore', () => {
 
     useSidebarStore.getState().setConversationListStatus(ConversationListStatus.COLLAPSED);
 
-    const persistedEntry = setItem.mock.calls.find(([key]) => key === 'sidebar-store');
+    const persistedEntry = setItem.mock.calls.find(([key]) => {
+      return key === 'sidebar-store';
+    });
     expect(persistedEntry).toBeDefined();
 
     const persistedState = JSON.parse(String(persistedEntry?.[1])).state;

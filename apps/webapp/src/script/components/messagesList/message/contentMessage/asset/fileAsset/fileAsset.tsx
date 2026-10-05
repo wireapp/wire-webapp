@@ -109,7 +109,9 @@ const FileAsset = ({
           tabIndex={messageFocusedTabIndex}
           aria-label={`${translate('conversationContextMenuDownload')} ${fileName}.${fileExtension}`}
           onClick={onDownloadAsset}
-          onKeyDown={event => handleKeyDown({event, callback: onDownloadAsset, keys: [KEY.ENTER, KEY.SPACE]})}
+          onKeyDown={event => {
+            return handleKeyDown({event, callback: onDownloadAsset, keys: [KEY.ENTER, KEY.SPACE]});
+          }}
         >
           {isPendingUpload ? (
             <div className="asset-placeholder loading-dots" />
@@ -122,13 +124,20 @@ const FileAsset = ({
               )}
 
               {isDownloading && (
-                <AssetLoader loadProgress={downloadProgress ?? 0} onCancel={() => asset.cancelDownload()} />
+                <AssetLoader
+                  loadProgress={downloadProgress ?? 0}
+                  onCancel={() => {
+                    return asset.cancelDownload();
+                  }}
+                />
               )}
 
               {isUploading && (
                 <AssetLoader
                   loadProgress={uploadProgress === 0 || isNan(uploadProgress) ? 0 : uploadProgress}
-                  onCancel={() => cancelUpload()}
+                  onCancel={() => {
+                    return cancelUpload();
+                  }}
                 />
               )}
 

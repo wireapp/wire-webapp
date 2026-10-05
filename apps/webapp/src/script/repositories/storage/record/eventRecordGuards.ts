@@ -17,6 +17,8 @@
  *
  */
 
+import {isTruthy} from '@sindresorhus/is';
+
 import {EventRecord} from './eventRecord';
 
 import {MessageAddEvent, MultipartMessageAddEvent} from '../../conversation/EventBuilder';
@@ -44,7 +46,7 @@ export const hasQuoteForMessage = (event: EventRecord, quotedMessageId: string):
   // Check normal message quote (MessageAddEvent)
   if (
     isMessageAddEvent(event) &&
-    event.data.quote &&
+    isTruthy(event.data.quote) &&
     typeof event.data.quote === 'object' &&
     'message_id' in event.data.quote
   ) {
@@ -53,8 +55,8 @@ export const hasQuoteForMessage = (event: EventRecord, quotedMessageId: string):
   // Check multipart message quote (MultipartMessageAddEvent)
   if (
     isMultipartMessageAddEvent(event) &&
-    event.data.text &&
-    event.data.text.quote &&
+    isTruthy(event.data.text) &&
+    isTruthy(event.data.text.quote) &&
     typeof event.data.text.quote === 'object' &&
     'message_id' in event.data.text.quote
   ) {

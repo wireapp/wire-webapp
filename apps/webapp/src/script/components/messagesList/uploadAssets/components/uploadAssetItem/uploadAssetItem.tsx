@@ -40,7 +40,9 @@ export const UploadAssetItem = ({assetRepository, message, scrollToEnd}: Props) 
   useEffect(() => {
     const progressSubscribable = assetRepository.getUploadProgress(message.messageId);
     setUploadProgress(progressSubscribable());
-    const subscription = progressSubscribable.subscribe(value => setUploadProgress(value));
+    const subscription = progressSubscribable.subscribe(value => {
+      return setUploadProgress(value);
+    });
 
     scrollToEnd?.();
 

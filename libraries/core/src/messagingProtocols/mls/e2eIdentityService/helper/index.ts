@@ -91,5 +91,6 @@ export const getMLSDeviceStatus = (
   return MLSDeviceStatus.REGISTERED;
 };
 
-export const isResponseStatusValid = (status: string | undefined) =>
-  status !== undefined && status.length > 0 && status === 'valid';
+export const isResponseStatusValid = (status: string | undefined) => {
+  return status !== undefined && status.length > 0 && status === 'valid';
+};

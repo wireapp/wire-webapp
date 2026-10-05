@@ -43,7 +43,9 @@ export const SharedDriveUploadInput = forwardRef<HTMLInputElement, SharedDriveUp
         hidden
         multiple
         {...folderInputAttributes}
-        onChange={event => handleSharedDriveUploadInput(event, dependencies)}
+        onChange={event => {
+          return handleSharedDriveUploadInput(event, dependencies);
+        }}
       />
     );
   },

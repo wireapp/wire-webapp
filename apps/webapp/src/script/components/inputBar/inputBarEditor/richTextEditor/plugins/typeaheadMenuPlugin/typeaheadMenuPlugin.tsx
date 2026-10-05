@@ -85,7 +85,7 @@ export type ItemProps<TOption extends TypeaheadOption> = {
   selectedIndex: number | null;
   selectOptionAndCleanUp: (option: TOption) => void;
   setHighlightedIndex: (index: number) => void;
-  options: Array<TOption>;
+  options: TOption[];
 };
 
 export type MenuRenderFn<TOption extends TypeaheadOption> = (
@@ -296,7 +296,9 @@ function useDynamicPositioning(
       };
     }
 
-    return () => null;
+    return () => {
+      return null;
+    };
   }, [targetElement, editor, onVisibilityChange, onReposition, resolution]);
 }
 
@@ -319,7 +321,7 @@ function LexicalPopoverMenu<TOption extends TypeaheadOption>({
   setResolution: (r: Resolution | null) => void;
   containerId: string;
   anchorClassName?: string;
-  options: Array<TOption>;
+  options: TOption[];
   menuRenderFn: MenuRenderFn<TOption>;
   onSelectOption: (
     option: TOption,
@@ -460,15 +462,14 @@ function LexicalPopoverMenu<TOption extends TypeaheadOption>({
     );
   }, [selectOptionAndCleanUp, close, editor, options, selectedIndex, updateSelectedIndex]);
 
-  const listItemProps = useMemo(
-    () => ({
+  const listItemProps = useMemo(() => {
+    return {
       options,
       selectOptionAndCleanUp,
       selectedIndex,
       setHighlightedIndex,
-    }),
-    [selectOptionAndCleanUp, selectedIndex, options],
-  );
+    };
+  }, [selectOptionAndCleanUp, selectedIndex, options]);
 
   const menu = menuRenderFn(anchorElementRef, listItemProps, resolution.match.matchingString);
 
@@ -575,7 +576,7 @@ export type TypeaheadMenuPluginProps<TOption extends TypeaheadOption> = {
     closeMenu: () => void,
     matchingString: string,
   ) => void;
-  options: Array<TOption>;
+  options: TOption[];
   menuRenderFn: MenuRenderFn<TOption>;
   triggerFn: TriggerFn;
   onOpen?: (resolution: Resolution) => void;
@@ -648,12 +649,14 @@ export function TypeaheadMenuPlugin<TOption extends TypeaheadOption>({
         if (match !== null && !isSelectionOnEntityBoundary(editor, match.leadOffset)) {
           const isRangePositioned = tryToPositionRange(match.leadOffset, range);
           if (isRangePositioned !== null) {
-            startTransition(() =>
-              openTypeahead({
-                getRect: () => range.getBoundingClientRect(),
+            startTransition(() => {
+              return openTypeahead({
+                getRect: () => {
+                  return range.getBoundingClientRect();
+                },
                 match,
-              }),
-            );
+              });
+            });
             return;
           }
         }

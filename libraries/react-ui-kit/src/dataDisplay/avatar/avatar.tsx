@@ -27,6 +27,12 @@ import {DURATION, EASE} from '../../identity/motions/motions';
 import {IsInViewport, IsInViewportProps} from '../../utils';
 import {filterProps} from '../../utils/util';
 
+const largeAvatarBorderWidth = 2;
+const avatarFontSizeDivisor = 2.2;
+const avatarGridFontWeight = 700;
+const avatarFontWeight = 400;
+const maximumAvatarInitialsLength = 2;
+
 export const DEFAULT_AVATAR_SIZE = 28;
 
 export interface AvatarProps<T = HTMLDivElement> extends IsInViewportProps<T> {
@@ -49,9 +55,9 @@ const avatarStyle: <T>(props: AvatarProps<T>) => CSSObject = ({
   isAvatarGridItem,
 }) => {
   const BORDER_SIZE_LIMIT = 32;
-  const borderSize = size > BORDER_SIZE_LIMIT ? 2 : 1;
+  const borderSize = size > BORDER_SIZE_LIMIT ? largeAvatarBorderWidth : 1;
   const borderWidth = isNonEmptyString(url) ? 0 : borderSize;
-  const fontSize = `${Math.ceil(size / 2.2)}px`;
+  const fontSize = `${Math.ceil(size / avatarFontSizeDivisor)}px`;
 
   return {
     alignItems: 'center',
@@ -61,7 +67,7 @@ const avatarStyle: <T>(props: AvatarProps<T>) => CSSObject = ({
     color,
     display: 'flex',
     fontSize,
-    fontWeight: isAvatarGridItem === true ? 700 : 400,
+    fontWeight: isAvatarGridItem === true ? avatarGridFontWeight : avatarFontWeight,
     height: `${size}px`,
     justifyContent: 'center',
     minHeight: `${size}px`,
@@ -71,8 +77,8 @@ const avatarStyle: <T>(props: AvatarProps<T>) => CSSObject = ({
   };
 };
 
-const filteredAvatarProps = (props: AvatarProps) =>
-  filterProps(props, [
+const filteredAvatarProps = (props: AvatarProps) => {
+  return filterProps(props, [
     'size',
     'forceInitials',
     'name',
@@ -82,22 +88,28 @@ const filteredAvatarProps = (props: AvatarProps) =>
     'fetchImage',
     'isAvatarGridItem',
   ]);
+};
 
 export const Avatar = (props: AvatarProps) => {
   const {url, forceInitials, name, fetchImage, isAvatarGridItem} = props;
   const [scale, setScale] = useState(0);
   useEffect(() => {
     if (isNonEmptyString(url)) {
-      requestAnimationFrame(() => setScale(1));
+      requestAnimationFrame(() => {
+        return setScale(1);
+      });
     }
   }, [url]);
-  const getInitials = (name: string = '') =>
-    name
+  const getInitials = (name: string = '') => {
+    return name
       .split(' ')
       .filter(Boolean)
-      .map(([initial]) => initial.toUpperCase())
+      .map(([initial]) => {
+        return initial.toUpperCase();
+      })
       .join('')
-      .substring(0, isAvatarGridItem === true ? 1 : 2);
+      .substring(0, isAvatarGridItem === true ? 1 : maximumAvatarInitialsLength);
+  };
 
   return (
     <IsInViewport

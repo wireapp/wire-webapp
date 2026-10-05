@@ -26,6 +26,9 @@ import {COLOR} from '../../identity';
 import {Theme} from '../../identity/theme';
 import {filterProps} from '../../utils/util';
 
+const boldTextFontWeight = 600;
+const thinTextFontWeight = 200;
+
 export interface TextProps<T = HTMLSpanElement> extends React.PropsWithRef<React.HTMLProps<T>> {
   block?: boolean;
   bold?: boolean;
@@ -71,9 +74,9 @@ export const textStyle: <T>(theme: Theme, props: TextProps<T>) => CSSObject = (
 ) => {
   let fontWeight = 400;
   if (bold) {
-    fontWeight = 600;
+    fontWeight = boldTextFontWeight;
   } else if (light) {
-    fontWeight = 200;
+    fontWeight = thinTextFontWeight;
   }
 
   return {
@@ -89,32 +92,40 @@ export const textStyle: <T>(theme: Theme, props: TextProps<T>) => CSSObject = (
   };
 };
 
-export const Text = React.forwardRef<HTMLSpanElement, TextProps<HTMLSpanElement>>((props, ref) => (
-  <span ref={ref} css={(theme: Theme) => textStyle(theme, props)} {...filterTextProps(props)} />
-));
+export const Text = React.forwardRef<HTMLSpanElement, TextProps<HTMLSpanElement>>((props, ref) => {
+  return (
+    <span
+      ref={ref}
+      css={(theme: Theme) => {
+        return textStyle(theme, props);
+      }}
+      {...filterTextProps(props)}
+    />
+  );
+});
 Text.displayName = 'Text';
 
-export const Bold = React.forwardRef<HTMLSpanElement, TextProps<HTMLSpanElement>>((props, ref) => (
-  <Text ref={ref} bold {...props} />
-));
+export const Bold = React.forwardRef<HTMLSpanElement, TextProps<HTMLSpanElement>>((props, ref) => {
+  return <Text ref={ref} bold {...props} />;
+});
 Bold.displayName = 'Bold';
 
-export const Small = React.forwardRef<HTMLSpanElement, TextProps<HTMLSpanElement>>((props, ref) => (
-  <Text ref={ref} fontSize={'12px'} {...props} />
-));
+export const Small = React.forwardRef<HTMLSpanElement, TextProps<HTMLSpanElement>>((props, ref) => {
+  return <Text ref={ref} fontSize={'12px'} {...props} />;
+});
 Small.displayName = 'Small';
 
-export const Muted = React.forwardRef<HTMLSpanElement, TextProps<HTMLSpanElement>>((props, ref) => (
-  <Text ref={ref} muted {...props} />
-));
+export const Muted = React.forwardRef<HTMLSpanElement, TextProps<HTMLSpanElement>>((props, ref) => {
+  return <Text ref={ref} muted {...props} />;
+});
 Muted.displayName = 'Muted';
 
-export const Uppercase = React.forwardRef<HTMLSpanElement, TextProps<HTMLSpanElement>>((props, ref) => (
-  <Text ref={ref} textTransform={'uppercase'} {...props} />
-));
+export const Uppercase = React.forwardRef<HTMLSpanElement, TextProps<HTMLSpanElement>>((props, ref) => {
+  return <Text ref={ref} textTransform={'uppercase'} {...props} />;
+});
 Uppercase.displayName = 'Uppercase';
 
-export const Large = React.forwardRef<HTMLSpanElement, TextProps<HTMLSpanElement>>((props, ref) => (
-  <Text ref={ref} fontSize={'48px'} light {...props} />
-));
+export const Large = React.forwardRef<HTMLSpanElement, TextProps<HTMLSpanElement>>((props, ref) => {
+  return <Text ref={ref} fontSize={'48px'} light {...props} />;
+});
 Large.displayName = 'Large';

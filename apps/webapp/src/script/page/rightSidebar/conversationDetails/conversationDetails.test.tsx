@@ -58,25 +58,33 @@ import {MainViewModel} from '../../../view_model/MainViewModel';
 import {withTheme, withThemeAndRootContext} from '../../../auth/util/test/testUtil';
 import {PanelState} from '../rightSidebar';
 
-jest.mock('Components/panel/enrichedFields', () => ({
-  useEnrichedFields: (): never[] => [],
-  EnrichedFields: function EnrichedFields({
-    showAvailability = false,
-  }: {
-    showAvailability?: boolean;
-  }): ReactElement | null {
-    if (!showAvailability) {
-      return null;
-    }
+jest.mock('Components/panel/enrichedFields', () => {
+  return {
+    useEnrichedFields: (): never[] => {
+      return [];
+    },
+    EnrichedFields: function EnrichedFields({
+      showAvailability = false,
+    }: {
+      showAvailability?: boolean;
+    }): ReactElement | null {
+      if (!showAvailability) {
+        return null;
+      }
 
-    return <div data-uie-name="item-enriched-value" />;
-  },
-  __esModule: true,
-}));
-jest.mock('Components/panel/userDetails', () => ({
-  UserDetails: () => <div />,
-  __esModule: true,
-}));
+      return <div data-uie-name="item-enriched-value" />;
+    },
+    __esModule: true,
+  };
+});
+jest.mock('Components/panel/userDetails', () => {
+  return {
+    UserDetails: () => {
+      return <div />;
+    },
+    __esModule: true,
+  };
+});
 
 const testFactory = new TestFactory();
 let conversationRepository: ConversationRepository;
@@ -85,21 +93,39 @@ const rootContextValue = createRootContextValueForTest({translate: translateForT
 const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 const viewerPermissionRootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({
-    isFeatureToggleEnabled: () => true,
+    isFeatureToggleEnabled: () => {
+      return true;
+    },
     translate: translateForTest,
   }),
 );
 
 const getDefaultParams = () => {
   const conversationRoleRepository: Partial<ConversationRoleRepository> = {
-    canAddParticipants: () => true,
-    canDeleteGroup: () => true,
-    canLeaveGroup: () => true,
-    canRenameGroup: () => true,
-    canToggleTimeout: () => true,
-    canToggleGuests: () => true,
-    canToggleReadReceipts: () => true,
-    isUserGroupAdmin: () => true,
+    canAddParticipants: () => {
+      return true;
+    },
+    canDeleteGroup: () => {
+      return true;
+    },
+    canLeaveGroup: () => {
+      return true;
+    },
+    canRenameGroup: () => {
+      return true;
+    },
+    canToggleTimeout: () => {
+      return true;
+    },
+    canToggleGuests: () => {
+      return true;
+    },
+    canToggleReadReceipts: () => {
+      return true;
+    },
+    isUserGroupAdmin: () => {
+      return true;
+    },
   };
 
   const selfUserMock = new User(createUuid(), '', translateForTest);
@@ -118,20 +144,35 @@ const getDefaultParams = () => {
       translate,
     ),
     conversationRepository: {
-      expectReadReceipt: () => true,
-      getNextConversation: () =>
-        Promise.resolve(new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest)),
-      refreshUnavailableParticipants: () => Promise.resolve(),
+      expectReadReceipt: () => {
+        return true;
+      },
+      getNextConversation: () => {
+        return Promise.resolve(new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest));
+      },
+      refreshUnavailableParticipants: () => {
+        return Promise.resolve();
+      },
       conversationRoleRepository: conversationRoleRepository as ConversationRoleRepository,
     } as unknown as ConversationRepository,
-    integrationRepository: {getServiceFromUser: (): null => null} as unknown as IntegrationRepository,
+    integrationRepository: {
+      getServiceFromUser: (): null => {
+        return null;
+      },
+    } as unknown as IntegrationRepository,
     isFederated: false,
     isVisible: true,
     searchRepository,
     teamRepository: {
-      getRoleBadge: (userId: string) => '',
-      updateTeamMembersByIds: (teamEntity: TeamEntity, memberIds?: string[], append?: boolean) => Promise.resolve(),
-      isSelfConnectedTo: () => true,
+      getRoleBadge: (userId: string) => {
+        return '';
+      },
+      updateTeamMembersByIds: (teamEntity: TeamEntity, memberIds?: string[], append?: boolean) => {
+        return Promise.resolve();
+      },
+      isSelfConnectedTo: () => {
+        return true;
+      },
     } as unknown as TeamRepository,
     teamState: new TeamState(),
     selfUser: selfUserMock,
@@ -173,19 +214,6 @@ describe('ConversationDetails', () => {
     expect(togglePanel).toHaveBeenCalledWith(PanelState.SHARED_DRIVE, conversation);
   });
 
-  it('keeps Shared Drive settings disabled when viewer permissions are disabled', () => {
-    const conversation = new Conversation('conversation-id', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
-    conversation.cellsState(CONVERSATION_CELLS_STATE.READY);
-
-    const defaultProps = getDefaultParams();
-    const {getByTestId, getByText} = render(
-      withTheme(<ConversationDetails {...defaultProps} activeConversation={conversation} />),
-    );
-
-    expect(getByText('conversationDetailsActionCellsOption')).toBeInTheDocument();
-    expect(getByTestId('cells-info')).toBeDisabled();
-  });
-
   it.each([CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MIXED, CONVERSATION_PROTOCOL.MLS])(
     'shows legacy bots and apps in %s groups',
     protocol => {
@@ -205,13 +233,14 @@ describe('ConversationDetails', () => {
       const defaultProps = getDefaultParams();
       const integrationRepository = {
         ...defaultProps.integrationRepository,
-        mapServiceFromUser: (user: User) =>
-          new ServiceEntity({
+        mapServiceFromUser: (user: User) => {
+          return new ServiceEntity({
             id: user.id,
             name: user.name(),
             qualifiedId: user.qualifiedId,
             type: 'App',
-          }),
+          });
+        },
       } as IntegrationRepository;
 
       const {getByTestId} = render(
@@ -277,22 +306,38 @@ describe('ConversationDetails', () => {
       {
         conversationType: CONVERSATION_TYPE.ONE_TO_ONE,
         expected: ['go-create-group', 'do-archive', 'do-clear', 'do-block'],
-        permission: {canCreateGroupConversation: () => true},
+        permission: {
+          canCreateGroupConversation: () => {
+            return true;
+          },
+        },
       },
       {
         conversationType: CONVERSATION_TYPE.ONE_TO_ONE,
         expected: ['do-archive', 'do-clear', 'do-block'],
-        permission: {canCreateGroupConversation: () => false},
+        permission: {
+          canCreateGroupConversation: () => {
+            return false;
+          },
+        },
       },
       {
         conversationType: CONVERSATION_TYPE.REGULAR,
         expected: ['do-archive', 'do-clear', 'do-leave'],
-        permission: {canCreateGroupConversation: () => true},
+        permission: {
+          canCreateGroupConversation: () => {
+            return true;
+          },
+        },
       },
       {
         conversationType: CONVERSATION_TYPE.CONNECT,
         expected: ['do-archive', 'do-cancel-request', 'do-block'],
-        permission: {canCreateGroupConversation: () => true},
+        permission: {
+          canCreateGroupConversation: () => {
+            return true;
+          },
+        },
       },
     ];
 

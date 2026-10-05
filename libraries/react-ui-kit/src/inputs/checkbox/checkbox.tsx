@@ -24,6 +24,8 @@ import {Theme} from '../../identity/theme';
 import {Text, TextProps, textStyle} from '../../typography';
 import {INPUT_CLASSNAME, InputProps} from '../input';
 
+const disabledCheckboxOpacity = 0.56;
+
 export interface StyledLabelProps<T = HTMLLabelElement> extends React.HTMLProps<T> {
   disabled?: boolean;
   markInvalid?: boolean;
@@ -41,68 +43,70 @@ const StyledLabel = ({
 }: StyledLabelProps) => {
   return (
     <label
-      css={(theme: Theme) => ({
-        [`.${INPUT_CLASSNAME}:checked + &::before`]: {
-          background: `${disabled === true ? theme.Checkbox.disablecheckedBgColor : theme.general.primaryColor}`,
-          borderColor: disabled === true ? theme.Checkbox.disablecheckedBgColor : theme.general.primaryColor,
-        },
-        [`.${INPUT_CLASSNAME}:checked + & > svg`]: {
-          fill: theme.general.backgroundColor,
-        },
-        [`.${INPUT_CLASSNAME} + & > svg`]: {
-          fill: 'none',
-          position: 'absolute',
-          top: '50%',
-          transform: 'translateY(-50%)',
-          ...(labelBeforeCheckbox
-            ? {
-                right: '11px',
-              }
-            : {
-                left: '4px',
-              }),
-        },
-        ...(disabled !== true && {
-          [`.${INPUT_CLASSNAME}:hover + &::before`]: {
-            borderColor: theme.general.primaryColor,
+      css={(theme: Theme) => {
+        return {
+          [`.${INPUT_CLASSNAME}:checked + &::before`]: {
+            background: `${disabled === true ? theme.Checkbox.disablecheckedBgColor : theme.general.primaryColor}`,
+            borderColor: disabled === true ? theme.Checkbox.disablecheckedBgColor : theme.general.primaryColor,
           },
-        }),
-        [`.${INPUT_CLASSNAME} + &::before`]: {
-          background: disabled === true ? theme.Checkbox.disableBgColor : theme.Checkbox.background,
-          ...(disabled !== true
-            ? {
-                border:
-                  markInvalid === true
-                    ? `2px solid ${theme.Checkbox.invalidBorderColor}`
-                    : `2px solid ${theme.Checkbox.border}`,
-              }
-            : {
-                border: `2px solid ${theme.Checkbox.disableBorderColor}`,
-              }),
-          borderRadius: '3px',
-          boxSizing: 'border-box',
-          content: '""',
-          display: 'inline-block',
-          minWidth: '22px',
-          height: '22px',
+          [`.${INPUT_CLASSNAME}:checked + & > svg`]: {
+            fill: theme.general.backgroundColor,
+          },
+          [`.${INPUT_CLASSNAME} + & > svg`]: {
+            fill: 'none',
+            position: 'absolute',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            ...(labelBeforeCheckbox
+              ? {
+                  right: '11px',
+                }
+              : {
+                  left: '4px',
+                }),
+          },
+          ...(disabled !== true && {
+            [`.${INPUT_CLASSNAME}:hover + &::before`]: {
+              borderColor: theme.general.primaryColor,
+            },
+          }),
+          [`.${INPUT_CLASSNAME} + &::before`]: {
+            background: disabled === true ? theme.Checkbox.disableBgColor : theme.Checkbox.background,
+            ...(disabled !== true
+              ? {
+                  border:
+                    markInvalid === true
+                      ? `2px solid ${theme.Checkbox.invalidBorderColor}`
+                      : `2px solid ${theme.Checkbox.border}`,
+                }
+              : {
+                  border: `2px solid ${theme.Checkbox.disableBorderColor}`,
+                }),
+            borderRadius: '3px',
+            boxSizing: 'border-box',
+            content: '""',
+            display: 'inline-block',
+            minWidth: '22px',
+            height: '22px',
+            lineHeight: '1.4rem',
+            margin: '0 8px 0 0px',
+            color: theme.general.color,
+          },
+          ...(labelBeforeCheckbox && {
+            flexDirection: 'row-reverse',
+            justifyContent: 'space-between',
+          }),
+          alignItems: 'center',
+          position: 'relative',
+          margin: '0 0 0 -16px',
+          width: aligncenter ? 'auto' : '100%',
           lineHeight: '1.4rem',
-          margin: '0 8px 0 0px',
-          color: theme.general.color,
-        },
-        ...(labelBeforeCheckbox && {
-          flexDirection: 'row-reverse',
-          justifyContent: 'space-between',
-        }),
-        alignItems: 'center',
-        position: 'relative',
-        margin: '0 0 0 -16px',
-        width: aligncenter ? 'auto' : '100%',
-        lineHeight: '1.4rem',
-        display: 'flex',
-        opacity: disabled === true ? 0.56 : 1,
-        cursor: disabled === true ? 'not-allowed' : 'pointer',
-        borderRadius: '4px',
-      })}
+          display: 'flex',
+          opacity: disabled === true ? disabledCheckboxOpacity : 1,
+          cursor: disabled === true ? 'not-allowed' : 'pointer',
+          borderRadius: '4px',
+        };
+      }}
       {...props}
     >
       {children}
@@ -140,18 +144,20 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
 
     return (
       <div
-        css={(theme: Theme) => ({
-          alignItems: 'center',
-          display: 'flex',
-          justifyContent: 'flex-start',
-          position: 'relative',
-          left: '-0.3rem',
-          [`.${INPUT_CLASSNAME}:focus-visible + label`]: {
-            outline: `1px solid ${theme.general.primaryColor}`,
-            outlineOffset: outlineOffset,
-          },
-          ...wrapperCSS,
-        })}
+        css={(theme: Theme) => {
+          return {
+            alignItems: 'center',
+            display: 'flex',
+            justifyContent: 'flex-start',
+            position: 'relative',
+            left: '-0.3rem',
+            [`.${INPUT_CLASSNAME}:focus-visible + label`]: {
+              outline: `1px solid ${theme.general.primaryColor}`,
+              outlineOffset: outlineOffset,
+            },
+            ...wrapperCSS,
+          };
+        }}
         style={style}
       >
         <input
@@ -187,13 +193,17 @@ Checkbox.displayName = 'Checkbox';
 
 export type CheckboxLabelProps<T = HTMLSpanElement> = TextProps<T>;
 
-export const CheckboxLabel = ({...props}: CheckboxLabelProps) => (
-  <Text
-    css={(theme: Theme) => ({
-      ...textStyle(theme, {
-        ...props,
-      }),
-    })}
-    {...props}
-  />
-);
+export const CheckboxLabel = ({...props}: CheckboxLabelProps) => {
+  return (
+    <Text
+      css={(theme: Theme) => {
+        return {
+          ...textStyle(theme, {
+            ...props,
+          }),
+        };
+      }}
+      {...props}
+    />
+  );
+};

@@ -167,7 +167,9 @@ describe('meetingSchema', () => {
   });
 
   it('validated meeting conversations are assignable to backend conversations', () => {
-    const assertBackendConversation = (conversation: BackendConversation): BackendConversation => conversation;
+    const assertBackendConversation = (conversation: BackendConversation): BackendConversation => {
+      return conversation;
+    };
     const result = meetingWithConversationSchema.safeParse(validMeetingWithConversation);
 
     expect(result.success).toBe(true);

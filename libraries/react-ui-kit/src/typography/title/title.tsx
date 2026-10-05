@@ -28,11 +28,20 @@ export type TitleProps<T = HTMLDivElement> = TextProps<T>;
 const titleStyle: <T>(theme: Theme, props: TitleProps<T>) => CSSObject = (
   theme,
   {block = true, center = true, fontSize = ' 2rem', color = COLOR.GRAY, bold = true, ...props},
-) => ({
-  ...textStyle(theme, {block, bold, center, color, fontSize, ...props}),
-  marginBottom: '8px',
-});
+) => {
+  return {
+    ...textStyle(theme, {block, bold, center, color, fontSize, ...props}),
+    marginBottom: '8px',
+  };
+};
 
-export const Title = (props: TitleProps) => (
-  <div css={(theme: Theme) => titleStyle(theme, props)} {...filterTextProps(props)} />
-);
+export const Title = (props: TitleProps) => {
+  return (
+    <div
+      css={(theme: Theme) => {
+        return titleStyle(theme, props);
+      }}
+      {...filterTextProps(props)}
+    />
+  );
+};

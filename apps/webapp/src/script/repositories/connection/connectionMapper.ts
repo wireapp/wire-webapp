@@ -34,9 +34,9 @@ export class ConnectionMapper {
    * Convert multiple JSON connections into connection entities.
    */
   static mapConnectionsFromJson(connectionsData: ConnectionData[]): ConnectionEntity[] {
-    return connectionsData
-      .filter(Boolean)
-      .map(connectionData => ConnectionMapper.mapConnectionFromJson(connectionData));
+    return connectionsData.filter(Boolean).map(connectionData => {
+      return ConnectionMapper.mapConnectionFromJson(connectionData);
+    });
   }
 
   /**

@@ -47,7 +47,9 @@ export const FileCardLoading = ({progress = MAX_PROGRESS}: FileCardLoadingProps)
       setFakeProgress(FAKE_PROGRESS);
     }, FAKE_PROGRESS_DELAY);
 
-    return () => clearTimeout(timer);
+    return () => {
+      return clearTimeout(timer);
+    };
   }, [progress]);
 
   return (

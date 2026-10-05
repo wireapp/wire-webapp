@@ -50,21 +50,31 @@ const conversationSelfMemberSchema = z.object({
   hidden_ref: z
     .string()
     .nullish()
-    .transform(value => value ?? null),
+    .transform(value => {
+      return value ?? null;
+    }),
   otr_archived: z.boolean().optional(),
   otr_archived_ref: z
     .string()
     .nullish()
-    .transform(value => value ?? null),
+    .transform(value => {
+      return value ?? null;
+    }),
   otr_muted_ref: z
     .string()
     .nullish()
-    .transform(value => value ?? null),
+    .transform(value => {
+      return value ?? null;
+    }),
   otr_muted_status: z
     .number()
     .nullish()
-    .transform(value => value ?? null),
-  service: serviceRefSchema.nullish().transform(value => value ?? null),
+    .transform(value => {
+      return value ?? null;
+    }),
+  service: serviceRefSchema.nullish().transform(value => {
+    return value ?? null;
+  }),
   status_ref: z.string(),
   status_time: z.string(),
   qualified_id: qualifiedIdSchema.optional(),
@@ -82,7 +92,9 @@ const conversationOtherMemberSchema = z.object({
   service: serviceRefSchema
     .nullable()
     .optional()
-    .transform(service => service ?? undefined),
+    .transform(service => {
+      return service ?? undefined;
+    }),
   status_ref: z.string().optional(),
   status_time: z.string().optional(),
   qualified_id: qualifiedIdSchema.optional(),
@@ -114,7 +126,9 @@ export const conversationSchema = z.object({
     .nativeEnum(ADD_PERMISSION)
     .nullable()
     .optional()
-    .transform(addPermission => addPermission ?? undefined),
+    .transform(addPermission => {
+      return addPermission ?? undefined;
+    }),
   name: z.string().optional(),
   last_event: z.string().optional(),
   last_event_time: z.string().optional(),
@@ -122,17 +136,23 @@ export const conversationSchema = z.object({
     .string()
     .nullable()
     .optional()
-    .transform(team => team ?? undefined),
+    .transform(team => {
+      return team ?? undefined;
+    }),
   message_timer: z
     .number()
     .nullable()
     .optional()
-    .transform(messageTimer => messageTimer ?? undefined),
+    .transform(messageTimer => {
+      return messageTimer ?? undefined;
+    }),
   receipt_mode: z
     .nativeEnum(RECEIPT_MODE)
     .nullable()
     .optional()
-    .transform(receiptMode => receiptMode ?? undefined),
+    .transform(receiptMode => {
+      return receiptMode ?? undefined;
+    }),
   members: conversationMembersSchema,
   protocol: z.nativeEnum(CONVERSATION_PROTOCOL),
   initial_protocol: z.nativeEnum(CONVERSATION_PROTOCOL).optional(),

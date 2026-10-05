@@ -24,6 +24,8 @@ const nodeFileSystem = require('fs');
 const path = require('path');
 const appConfigPkg = require('../../apps/webapp/app-config/package.json');
 
+const shortenedCommitIdentifierLength = 7;
+
 require('dotenv').config({quiet: true});
 
 /**
@@ -43,7 +45,13 @@ function selectReleaseCommit({releaseCommitSha, commandLineCommitSha, githubSha}
 }
 
 function createUniqueImageTag({versionTag, configurationVersion, releaseCommitSha}) {
-  return versionTag.replace('/', '-') + '-' + configurationVersion + '-' + releaseCommitSha.substring(0, 7);
+  return (
+    versionTag.replace('/', '-') +
+    '-' +
+    configurationVersion +
+    '-' +
+    releaseCommitSha.substring(0, shortenedCommitIdentifierLength)
+  );
 }
 
 function runProcess(command, commandArguments, processOptions, spawnProcess = child.spawnSync) {
@@ -121,7 +129,10 @@ function runDockerPublication(
   /** Version tag of webapp (e.g. "2023-11-09-staging.0", "dev") */
   const versionTag = commandLineArguments[0].replace('/', '-');
   const uniqueTagOut = commandLineArguments[1] || '';
-  const commandLineCommitSha = commandLineArguments[2]?.startsWith('--') ? undefined : commandLineArguments[2];
+  const releaseCommitArgumentIndex = 2;
+  const commandLineCommitSha = commandLineArguments[releaseCommitArgumentIndex]?.startsWith('--')
+    ? undefined
+    : commandLineArguments[releaseCommitArgumentIndex];
   /** Commit ID of https://github.com/wireapp/wire-webapp (i.e. "1240cfda9e609470cf1154e18f5bc582ca8907ff") */
   const releaseCommitSha = selectReleaseCommit({
     releaseCommitSha: environment.WIRE_WEBAPP_RELEASE_COMMIT_SHA,
@@ -136,7 +147,7 @@ function runDockerPublication(
     );
   }
 
-  const commitShortSha = releaseCommitSha.substring(0, 7);
+  const commitShortSha = releaseCommitSha.substring(0, shortenedCommitIdentifierLength);
   const dockerRegistryDomain = 'quay.io';
   const repository = dockerRegistryDomain + '/wire/webapp';
   const containerImageTags = [];
@@ -217,7 +228,8 @@ function runDockerPublication(
 }
 
 if (require.main === module) {
-  runDockerPublication(process.argv.slice(2), process.env);
+  const runtimeArgumentPrefixLength = 2;
+  runDockerPublication(process.argv.slice(runtimeArgumentPrefixLength), process.env);
 }
 
 module.exports = {

@@ -46,15 +46,20 @@ const createParticipant = (name: string) => {
   return new Participant(user, `client-${name}`);
 };
 
-const createMediaStream = () =>
-  ({
-    getVideoTracks: jest.fn(() => []),
-  }) as unknown as MediaStream;
+const createMediaStream = () => {
+  return {
+    getVideoTracks: jest.fn(() => {
+      return [];
+    }),
+  } as unknown as MediaStream;
+};
 
-const createProcessedVideoStream = (stream: MediaStream) => ({
-  stream,
-  release: jest.fn(),
-});
+const createProcessedVideoStream = (stream: MediaStream) => {
+  return {
+    stream,
+    release: jest.fn(),
+  };
+};
 
 const renderComponent = ({
   participant = createParticipant('self'),
@@ -62,8 +67,8 @@ const renderComponent = ({
 }: {
   participant?: Participant;
   selfParticipant?: Participant;
-} = {}) =>
-  render(
+} = {}) => {
+  return render(
     <GroupVideoGridTile
       minimized={false}
       participant={participant}
@@ -74,6 +79,7 @@ const renderComponent = ({
     />,
     {wrapper: rootProviderWrapper},
   );
+};
 
 describe('GroupVideoGridTile', () => {
   beforeEach(() => {

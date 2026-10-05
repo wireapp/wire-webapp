@@ -17,6 +17,7 @@
  *
  */
 
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
@@ -94,7 +95,7 @@ function createPlaceholder1to1Conversation(
 ) {
   const userConnection = user.connection();
 
-  if (!userConnection) {
+  if (isNullOrUndefined(userConnection)) {
     throw new Error(`There's no connection with user ${user.qualifiedId.id}.`);
   }
 
@@ -298,7 +299,7 @@ const UserActions = ({
           click: async () => {
             const connectionData = await actionsViewModel.sendConnectionRequest(user);
 
-            if (!connectionData) {
+            if (isNullOrUndefined(connectionData)) {
               // Sending the connection failed, there is nothing more to do
               return;
             }
@@ -313,7 +314,7 @@ const UserActions = ({
                 : await actionsViewModel.getConversationById(conversationId);
 
             const savedConversation = await actionsViewModel.saveConversation(connectionConversation);
-            if (!conversation) {
+            if (isNullOrUndefined(conversation)) {
               // Only open the new conversation if we aren't currently in a conversation context
               await actionsViewModel.open1to1Conversation(savedConversation);
               setCurrentSidebarTab(SidebarTabs.RECENT);
@@ -345,7 +346,7 @@ const UserActions = ({
       ? {
           click: async () => {
             await actionsViewModel.unblockUser(user);
-            await create1to1Conversation(user, !conversation);
+            await create1to1Conversation(user, isNullOrUndefined(conversation));
             onAction(Actions.UNBLOCK);
           },
           Icon: Icon.BlockIcon,
@@ -356,9 +357,11 @@ const UserActions = ({
 
   const removeUserFromConversation: MenuItem | undefined =
     isNotMe &&
-    conversation &&
+    !isNullOrUndefined(conversation) &&
     !conversation.isSelfUserRemoved() &&
-    conversation.participating_user_ids().some(userId => matchQualifiedIds(userId, user)) &&
+    conversation.participating_user_ids().some(userId => {
+      return matchQualifiedIds(userId, user);
+    }) &&
     conversationRoleRepository?.canRemoveParticipants(conversation) === true
       ? {
           click: async () => {
@@ -383,7 +386,9 @@ const UserActions = ({
     blockUser,
     unblockUser,
     removeUserFromConversation,
-  ].filter((item): item is MenuItem => !!item);
+  ].filter((item): item is MenuItem => {
+    return !isNullOrUndefined(item);
+  });
 
   return items.length === 1 && isModal ? (
     <SingleAction

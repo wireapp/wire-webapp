@@ -17,6 +17,8 @@
  *
  */
 
+import {isNonEmptyString} from '@sindresorhus/is';
+
 import {Checkbox, CheckboxLabel, ChevronDownIcon} from '@wireapp/react-ui-kit';
 
 import {ChannelAvatar} from 'Components/avatar/channelAvatar';
@@ -60,16 +62,18 @@ export const MeetingConversationsSearchableList = ({
     <>
       <button
         type="button"
-        onClick={() => onOpenChange(!isOpen)}
+        onClick={() => {
+          return onOpenChange(!isOpen);
+        }}
         css={collapseButton}
-        data-uie-name={dataUieName ? `${dataUieName}-toggle` : undefined}
+        data-uie-name={isNonEmptyString(dataUieName) ? `${dataUieName}-toggle` : undefined}
         aria-expanded={isOpen}
         aria-controls={`${id}-conversation-list`}
       >
         <span css={collapseIcon(isOpen)} aria-hidden="true">
           <ChevronDownIcon width={16} height={16} />
         </span>
-        {translate('meetings.scheduleModal.groupsAndChannels')}
+        {translate('meetings.scheduleModal.groupsAndChannelsWithCount', {count: conversations.length})}
       </button>
       <div id={`${id}-conversation-list`} css={conversationListStyles} role="list">
         {isOpen &&
@@ -82,7 +86,9 @@ export const MeetingConversationsSearchableList = ({
                 <Checkbox
                   id={checkboxId}
                   checked={selectedConversationIds.has(conversationKey)}
-                  onChange={() => onSelectConversation(conversation)}
+                  onChange={() => {
+                    return onSelectConversation(conversation);
+                  }}
                   labelBeforeCheckbox
                   aligncenter={false}
                   outlineOffset="0"

@@ -82,6 +82,9 @@ import {handleMLSMessageAdd, handleMLSWelcomeMessage} from '../eventHandler/even
 import {ClientId, HandlePendingProposalsParams} from '../types';
 import {generateMLSDeviceId} from '../utils/mlsId';
 
+const keyingMaterialLifetimeInDays = 30;
+const keyPackageReplenishmentDivisor = 2;
+
 type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 
 interface MLSConfig {
@@ -111,7 +114,7 @@ export const optionalToUint8Array = (array: Uint8Array | []): Uint8Array => {
 };
 
 const defaultConfig = {
-  keyingMaterialUpdateThreshold: TimeUtil.TimeInMillis.DAY * 30,
+  keyingMaterialUpdateThreshold: TimeUtil.TimeInMillis.DAY * keyingMaterialLifetimeInDays,
   nbKeyPackages: 100,
 };
 
@@ -194,7 +197,7 @@ export class MLSService extends TypedEventEmitter<Events> {
   }
 
   private get minRequiredKeyPackages() {
-    return Math.floor(this.keyPackageUploadAmount / 2);
+    return Math.floor(this.config.nbKeyPackages / keyPackageReplenishmentDivisor);
   }
 
   /** Recheck after a consumer policy change, without reinitializing the MLS client. */
@@ -218,7 +221,9 @@ export class MLSService extends TypedEventEmitter<Events> {
   ): Promise<void> {
     // filter out undefined values from mlsConfig
     const filteredMLSConfig = Object.fromEntries(
-      Object.entries(mlsConfig).filter(([_, value]) => value !== undefined),
+      Object.entries(mlsConfig).filter(([_, value]) => {
+        return value !== undefined;
+      }),
     ) as typeof mlsConfig;
 
     this.initialKeyPackageUploadDeferred = skipInitIdentity === true;
@@ -272,7 +277,9 @@ export class MLSService extends TypedEventEmitter<Events> {
    * returns true if the client has a valid MLS identity in regard of the default ciphersuite set
    * @param client the client to check
    */
-  public isInitializedMLSClient = (client: RegisteredClient) => isMLSDevice(client, this.config.defaultCiphersuite);
+  public isInitializedMLSClient = (client: RegisteredClient) => {
+    return isMLSDevice(client, this.config.defaultCiphersuite);
+  };
 
   private async getCredentialType() {
     return (await this.coreCryptoClient.e2eiIsEnabled(this.config.defaultCiphersuite))
@@ -381,9 +388,9 @@ export class MLSService extends TypedEventEmitter<Events> {
         keyPackages,
       );
     } else {
-      crlNewDistributionPoints = await this.coreCryptoClient.transaction(transactionContext =>
-        transactionContext.addClientsToConversation(new ConversationId(groupIdBytes), keyPackages),
-      );
+      crlNewDistributionPoints = await this.coreCryptoClient.transaction(transactionContext => {
+        return transactionContext.addClientsToConversation(new ConversationId(groupIdBytes), keyPackages);
+      });
     }
 
     this.dispatchNewCrlDistributionPoints(crlNewDistributionPoints);
@@ -458,8 +465,12 @@ export class MLSService extends TypedEventEmitter<Events> {
      * a specific user's key packages.
      */
     const keyPackages = keyPackagesSettledResult
-      .filter((result): result is PromiseFulfilledResult<ClaimedKeyPackages> => result.status === 'fulfilled')
-      .map(result => result.value);
+      .filter((result): result is PromiseFulfilledResult<ClaimedKeyPackages> => {
+        return result.status === 'fulfilled';
+      })
+      .map(result => {
+        return result.value;
+      });
 
     const coreCryptoKeyPackagesPayload = keyPackages.reduce<Uint8Array[]>((previousValue, {key_packages}) => {
       // skip users that have not uploaded their MLS key packages
@@ -467,8 +478,12 @@ export class MLSService extends TypedEventEmitter<Events> {
         return [
           ...previousValue,
           ...key_packages
-            .filter(keyPackage => !skipClientIds.includes(keyPackage.client))
-            .map(keyPackage => Decoder.fromBase64(keyPackage.key_package).asBytes),
+            .filter(keyPackage => {
+              return !skipClientIds.includes(keyPackage.client);
+            })
+            .map(keyPackage => {
+              return Decoder.fromBase64(keyPackage.key_package).asBytes;
+            }),
         ];
       }
       return previousValue;
@@ -484,7 +499,9 @@ export class MLSService extends TypedEventEmitter<Events> {
       failures.push({
         reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS,
         users: failedToFetchKeyPackages,
-        backends: failedToFetchKeyPackages.map(({domain}) => domain),
+        backends: failedToFetchKeyPackages.map(({domain}) => {
+          return domain;
+        }),
       });
     }
 
@@ -511,7 +528,9 @@ export class MLSService extends TypedEventEmitter<Events> {
    */
   public getSafeEpoch(groupId: string | Uint8Array): Task<number, unknown> {
     return task.tryOrElse(
-      errorReason => `Failed to get safe epoch for group ${groupId}: ${errorReason}`,
+      errorReason => {
+        return `Failed to get safe epoch for group ${groupId}: ${errorReason}`;
+      },
       () => {
         const groupIdBytes = typeof groupId === 'string' ? Decoder.fromBase64(groupId).asBytes : groupId;
         return this.coreCryptoClient.conversationEpoch(new ConversationId(groupIdBytes));
@@ -526,9 +545,9 @@ export class MLSService extends TypedEventEmitter<Events> {
 
       const groupInfo = await getGroupInfo();
 
-      const welcomeBundle = await this.coreCryptoClient.transaction(cx =>
-        cx.joinByExternalCommit(new GroupInfo(groupInfo), credentialType),
-      );
+      const welcomeBundle = await this.coreCryptoClient.transaction(cx => {
+        return cx.joinByExternalCommit(new GroupInfo(groupInfo), credentialType);
+      });
 
       await this.dispatchNewCrlDistributionPoints(welcomeBundle.crlNewDistributionPoints);
 
@@ -564,9 +583,9 @@ export class MLSService extends TypedEventEmitter<Events> {
   }
 
   public async processWelcomeMessage(welcomeMessage: Uint8Array): Promise<ConversationId> {
-    const welcomeBundle = await this.coreCryptoClient.transaction(cx =>
-      cx.processWelcomeMessage(new Welcome(welcomeMessage)),
-    );
+    const welcomeBundle = await this.coreCryptoClient.transaction(cx => {
+      return cx.processWelcomeMessage(new Welcome(welcomeMessage));
+    });
     this.dispatchNewCrlDistributionPoints(welcomeBundle.crlNewDistributionPoints);
     return welcomeBundle.id;
   }
@@ -579,16 +598,18 @@ export class MLSService extends TypedEventEmitter<Events> {
     try {
       const start = Date.now();
       this.logger.info('Decrypting message', {qualifiedConversationId});
-      const decryptedMessage = await this.coreCryptoClient.transaction(cx =>
-        cx.decryptMessage(conversationId, payload),
-      );
+      const decryptedMessage = await this.coreCryptoClient.transaction(cx => {
+        return cx.decryptMessage(conversationId, payload);
+      });
       this.dispatchNewCrlDistributionPoints(decryptedMessage.crlNewDistributionPoints);
       this.logger.info('Message decrypted successfully', {qualifiedConversationId, duration: Date.now() - start});
       return decryptedMessage;
     } catch (error: unknown) {
       // This is safe (read-only) and helps correlate decryption failures with local epoch.
       const coreCryptoEpochNumber = await task.tryOrElse<number, unknown>(
-        errorReason => `Failed to collect epoch details for decryption failure: ${conversationId}: ${errorReason}`,
+        errorReason => {
+          return `Failed to collect epoch details for decryption failure: ${conversationId}: ${errorReason}`;
+        },
         () => {
           return this.coreCryptoClient.conversationEpoch(conversationId);
         },
@@ -596,8 +617,12 @@ export class MLSService extends TypedEventEmitter<Events> {
       this.logger.warn('Failed to decrypt MLS message', {
         qualifiedConversationId,
         coreCryptoEpochError: coreCryptoEpochNumber.match({
-          Ok: epoch => epoch,
-          Err: errorReason => errorReason,
+          Ok: epoch => {
+            return epoch;
+          },
+          Err: errorReason => {
+            return errorReason;
+          },
         }),
         error,
       });
@@ -613,7 +638,9 @@ export class MLSService extends TypedEventEmitter<Events> {
   }
 
   public async encryptMessage(conversationId: ConversationId, message: Uint8Array): Promise<Uint8Array> {
-    return this.coreCryptoClient.transaction(cx => cx.encryptMessage(conversationId, message));
+    return this.coreCryptoClient.transaction(cx => {
+      return cx.encryptMessage(conversationId, message);
+    });
   }
 
   /**
@@ -636,7 +663,9 @@ export class MLSService extends TypedEventEmitter<Events> {
   }
 
   public async updateKeyingMaterialForConversation(groupId: string) {
-    await this.coreCryptoClient.transaction(context => this.updateKeyingMaterial(groupId, context));
+    await this.coreCryptoClient.transaction(context => {
+      return this.updateKeyingMaterial(groupId, context);
+    });
   }
 
   /**
@@ -768,7 +797,9 @@ export class MLSService extends TypedEventEmitter<Events> {
       if (otherUserKeyPackages.length <= 0) {
         if (
           otherUserKeysClaimingFailures.length > 0 &&
-          otherUserKeysClaimingFailures.some(({reason}) => reason === AddUsersFailureReasons.OFFLINE_FOR_TOO_LONG)
+          otherUserKeysClaimingFailures.some(({reason}) => {
+            return reason === AddUsersFailureReasons.OFFLINE_FOR_TOO_LONG;
+          })
         ) {
           throw new ClientMLSError(ClientMLSErrorLabel.NO_KEY_PACKAGES_AVAILABLE);
         }
@@ -778,9 +809,13 @@ export class MLSService extends TypedEventEmitter<Events> {
         {...selfUser.user, skipOwnClientId: selfUser.client},
       ]);
 
-      await this.coreCryptoClient.transaction(transactionContext =>
-        this.addUsersToExistingConversation(groupId, [...otherUserKeyPackages, ...selfKeyPackages], transactionContext),
-      );
+      await this.coreCryptoClient.transaction(transactionContext => {
+        return this.addUsersToExistingConversation(
+          groupId,
+          [...otherUserKeyPackages, ...selfKeyPackages],
+          transactionContext,
+        );
+      });
 
       // We schedule a periodic key material renewal
       await this.scheduleKeyMaterialRenewal(groupId);
@@ -836,12 +871,14 @@ export class MLSService extends TypedEventEmitter<Events> {
   public removeClientsFromConversation(groupId: string, clientIds: ClientId[]) {
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
 
-    return this.coreCryptoClient.transaction(cx =>
-      cx.removeClientsFromConversation(
+    return this.coreCryptoClient.transaction(cx => {
+      return cx.removeClientsFromConversation(
         new ConversationId(groupIdBytes),
-        clientIds.map(id => new CoreCryptoClientId(this.textEncoder.encode(id))),
-      ),
-    );
+        clientIds.map(id => {
+          return new CoreCryptoClientId(this.textEncoder.encode(id));
+        }),
+      );
+    });
   }
 
   /**
@@ -865,16 +902,16 @@ export class MLSService extends TypedEventEmitter<Events> {
 
   public async clientValidKeypackagesCount(): Promise<number> {
     const credentialType = await this.getCredentialType();
-    return this.coreCryptoClient.transaction(cx =>
-      cx.clientValidKeypackagesCount(this.config.defaultCiphersuite, credentialType),
-    );
+    return this.coreCryptoClient.transaction(cx => {
+      return cx.clientValidKeypackagesCount(this.config.defaultCiphersuite, credentialType);
+    });
   }
 
   public async clientKeypackages(amountRequested: number): Promise<Uint8Array[]> {
     const credentialType = await this.getCredentialType();
-    return this.coreCryptoClient.transaction(cx =>
-      cx.clientKeypackages(this.config.defaultCiphersuite, credentialType, amountRequested),
-    );
+    return this.coreCryptoClient.transaction(cx => {
+      return cx.clientKeypackages(this.config.defaultCiphersuite, credentialType, amountRequested);
+    });
   }
 
   /**
@@ -930,7 +967,9 @@ export class MLSService extends TypedEventEmitter<Events> {
     const key = this.createKeyMaterialUpdateTaskSchedulerId(groupId);
 
     return this.recurringTaskScheduler.registerTask({
-      task: () => this.renewKeyMaterial(groupId),
+      task: () => {
+        return this.renewKeyMaterial(groupId);
+      },
       every: this.config.keyingMaterialUpdateThreshold,
       key,
     });
@@ -1073,7 +1112,9 @@ export class MLSService extends TypedEventEmitter<Events> {
   private async replaceKeyPackages(clientId: string, keyPackages: Uint8Array[]) {
     return this.apiClient.api.client.replaceMLSKeyPackages(
       clientId,
-      keyPackages.map(keyPackage => btoa(Converter.arrayBufferViewToBaselineString(keyPackage))),
+      keyPackages.map(keyPackage => {
+        return btoa(Converter.arrayBufferViewToBaselineString(keyPackage));
+      }),
       numberToHex(this.config.defaultCiphersuite),
     );
   }
@@ -1081,7 +1122,9 @@ export class MLSService extends TypedEventEmitter<Events> {
   private async uploadMLSKeyPackages(clientId: string, keyPackages: Uint8Array[]) {
     return this.apiClient.api.client.uploadMLSKeyPackages(
       clientId,
-      keyPackages.map(keyPackage => btoa(Converter.arrayBufferViewToBaselineString(keyPackage))),
+      keyPackages.map(keyPackage => {
+        return btoa(Converter.arrayBufferViewToBaselineString(keyPackage));
+      }),
     );
   }
 
@@ -1096,7 +1139,9 @@ export class MLSService extends TypedEventEmitter<Events> {
     }
 
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
-    return this.coreCryptoClient.transaction(cx => cx.wipeConversation(new ConversationId(groupIdBytes)));
+    return this.coreCryptoClient.transaction(cx => {
+      return cx.wipeConversation(new ConversationId(groupIdBytes));
+    });
   }
 
   /**
@@ -1162,7 +1207,9 @@ export class MLSService extends TypedEventEmitter<Events> {
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
 
     try {
-      await this.coreCryptoClient.transaction(cx => cx.commitPendingProposals(new ConversationId(groupIdBytes)));
+      await this.coreCryptoClient.transaction(cx => {
+        return cx.commitPendingProposals(new ConversationId(groupIdBytes));
+      });
       await this.cancelPendingProposalsTask(groupId);
     } catch (error: unknown) {
       if (!shouldRetry) {

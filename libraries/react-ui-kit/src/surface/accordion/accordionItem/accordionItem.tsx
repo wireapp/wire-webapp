@@ -39,17 +39,19 @@ interface AccordionItemProps {
 }
 
 export const AccordionItem = forwardRef<ElementRef<typeof AccordionPrimitive.Item>, AccordionItemProps>(
-  ({title, children, value}, ref) => (
-    <AccordionPrimitive.Item value={value} ref={ref} css={itemStyles}>
-      <AccordionPrimitive.Trigger css={triggerStyles}>
-        <span css={triggerTextStyles}>{title}</span>
-        <ChevronDownIcon css={chevronStyles} />
-      </AccordionPrimitive.Trigger>
-      <AccordionPrimitive.Content css={contentStyles}>
-        <div css={contentTextStyles}>{children}</div>
-      </AccordionPrimitive.Content>
-    </AccordionPrimitive.Item>
-  ),
+  ({title, children, value}, ref) => {
+    return (
+      <AccordionPrimitive.Item value={value} ref={ref} css={itemStyles}>
+        <AccordionPrimitive.Trigger css={triggerStyles}>
+          <span css={triggerTextStyles}>{title}</span>
+          <ChevronDownIcon css={chevronStyles} />
+        </AccordionPrimitive.Trigger>
+        <AccordionPrimitive.Content css={contentStyles}>
+          <div css={contentTextStyles}>{children}</div>
+        </AccordionPrimitive.Content>
+      </AccordionPrimitive.Item>
+    );
+  },
 );
 
 AccordionItem.displayName = 'AccordionItem';

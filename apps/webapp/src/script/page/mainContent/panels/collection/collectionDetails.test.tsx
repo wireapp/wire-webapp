@@ -37,22 +37,38 @@ import {createUuid} from 'Util/uuid';
 import {CollectionDetails} from './collectionDetails';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-jest.mock('Components/image', () => ({
-  AssetImage: () => <div>Image</div>,
-  __esModule: true,
-}));
-jest.mock('Components/messagesList/message/contentMessage/asset/audioAsset/audioAsset', () => ({
-  AudioAsset: () => <div>Audio</div>,
-  __esModule: true,
-}));
-jest.mock('Components/messagesList/message/contentMessage/asset/fileAsset/fileAsset', () => ({
-  FileAsset: () => <div>File</div>,
-  __esModule: true,
-}));
-jest.mock('Components/messagesList/message/contentMessage/asset/linkPreviewAssetComponent', () => ({
-  LinkPreviewAsset: () => <div>Link Preview</div>,
-  __esModule: true,
-}));
+jest.mock('Components/image', () => {
+  return {
+    AssetImage: () => {
+      return <div>Image</div>;
+    },
+    __esModule: true,
+  };
+});
+jest.mock('Components/messagesList/message/contentMessage/asset/audioAsset/audioAsset', () => {
+  return {
+    AudioAsset: () => {
+      return <div>Audio</div>;
+    },
+    __esModule: true,
+  };
+});
+jest.mock('Components/messagesList/message/contentMessage/asset/fileAsset/fileAsset', () => {
+  return {
+    FileAsset: () => {
+      return <div>File</div>;
+    },
+    __esModule: true,
+  };
+});
+jest.mock('Components/messagesList/message/contentMessage/asset/linkPreviewAssetComponent', () => {
+  return {
+    LinkPreviewAsset: () => {
+      return <div>Link Preview</div>;
+    },
+    __esModule: true,
+  };
+});
 
 const createImageMessage = (timestamp: number = Date.now()) => {
   const message = new ContentMessage(createUuid(), translateForTest);

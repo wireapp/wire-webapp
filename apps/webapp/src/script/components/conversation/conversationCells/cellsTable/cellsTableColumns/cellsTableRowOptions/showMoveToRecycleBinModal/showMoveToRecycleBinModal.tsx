@@ -35,7 +35,9 @@ export const showMoveToRecycleBinModal = ({
     PrimaryModal.type.CONFIRM,
     {
       primaryAction: {
-        action: () => onMoveToRecycleBin(node.id),
+        action: () => {
+          return onMoveToRecycleBin(node.id);
+        },
         text: translate('cells.moveToRecycleBinModal.button'),
       },
       text: {
@@ -51,7 +53,9 @@ export const showMoveToRecycleBinModal = ({
           [
             {
               exactMatch: '{name}',
-              render: () => <b>{node.name}</b>,
+              render: () => {
+                return <b>{node.name}</b>;
+              },
             },
           ],
         ),

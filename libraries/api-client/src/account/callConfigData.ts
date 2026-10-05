@@ -23,7 +23,19 @@ export interface ICECandidate {
   username: string;
 }
 
+export type SFTServer = {
+  readonly urls: readonly string[];
+};
+
+export type AuthSFTServer = SFTServer & {
+  readonly username?: string;
+  readonly credential?: string;
+};
+
 export interface CallConfigData {
   ice_servers: ICECandidate[];
   ttl: number;
+  readonly sft_servers?: readonly SFTServer[];
+  readonly sft_servers_all?: readonly AuthSFTServer[];
+  readonly is_federating?: boolean;
 }

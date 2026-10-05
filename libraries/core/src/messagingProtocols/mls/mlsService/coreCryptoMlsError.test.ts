@@ -152,7 +152,9 @@ describe('CoreCryptoMLSError helpers', () => {
         serializeAbortReason({message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_STALE_MESSAGE}),
       );
 
-      expect(() => getMLSGroupOutOfSyncErrorMissingUsers(err)).toThrow('Error is not MLSGroupOutOfSyncError');
+      expect(() => {
+        return getMLSGroupOutOfSyncErrorMissingUsers(err);
+      }).toThrow('Error is not MLSGroupOutOfSyncError');
     });
 
     it('returns false for non-mls message rejected errors', () => {

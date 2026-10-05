@@ -19,23 +19,27 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const containerStyles = (sidebarOpen: boolean): CSSObject => ({
-  cursor: 'pointer',
-  padding: '2px',
-  width: '120px',
-  marginBottom: '4px',
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  opacity: sidebarOpen ? 1 : 0,
-  transition: 'opacity 0.2s var(--ease-in-out-quart)',
-  gap: '4px',
-  height: '160px',
-});
+export const containerStyles = (sidebarOpen: boolean): CSSObject => {
+  return {
+    cursor: 'pointer',
+    padding: '2px',
+    width: '120px',
+    marginBottom: '4px',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    opacity: sidebarOpen ? 1 : 0,
+    transition: 'opacity 0.2s var(--ease-in-out-quart)',
+    gap: '4px',
+    height: '160px',
+  };
+};
 
-export const thumbnailWrapperStyles = (isActive: boolean): CSSObject => ({
-  border: isActive ? '2px solid var(--accent-color)' : '2px solid transparent',
-});
+export const thumbnailWrapperStyles = (isActive: boolean): CSSObject => {
+  return {
+    border: isActive ? '2px solid var(--accent-color)' : '2px solid transparent',
+  };
+};
 
 export const pageNumberStyle: CSSObject = {
   fontSize: '11px',

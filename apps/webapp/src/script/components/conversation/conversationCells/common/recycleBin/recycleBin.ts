@@ -21,15 +21,22 @@ import {getCellsFilesPath} from '../getCellsFilesPath/getCellsFilesPath';
 
 export const RECYCLE_BIN_PATH = 'recycle_bin';
 
-export const isPathInRecycleBin = (path: string): boolean =>
-  path === RECYCLE_BIN_PATH || path.startsWith(`${RECYCLE_BIN_PATH}/`);
+export const isPathInRecycleBin = (path: string): boolean => {
+  return path === RECYCLE_BIN_PATH || path.startsWith(`${RECYCLE_BIN_PATH}/`);
+};
 
-export const isRootRecycleBinPath = (): boolean => getCellsFilesPath() === RECYCLE_BIN_PATH;
+export const isRootRecycleBinPath = (): boolean => {
+  return getCellsFilesPath() === RECYCLE_BIN_PATH;
+};
 
-export const isInRecycleBin = (): boolean => isPathInRecycleBin(getCellsFilesPath());
+export const isInRecycleBin = (): boolean => {
+  return isPathInRecycleBin(getCellsFilesPath());
+};
 
 export const getNodeRootParentPath = ({nodePath}: {nodePath: string}) => {
   const segments = nodePath.split('/');
   const recycleBinIndex = segments.indexOf(RECYCLE_BIN_PATH);
-  return segments[recycleBinIndex + 1] || '';
+  const rootParentPath = segments[recycleBinIndex + 1];
+
+  return rootParentPath ?? '';
 };

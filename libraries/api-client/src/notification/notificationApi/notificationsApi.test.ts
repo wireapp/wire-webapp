@@ -38,12 +38,12 @@ describe('NotificationAPI', () => {
 
   describe('"getAllNotifications"', () => {
     it('returns a list of notifications', async () => {
-      jest.spyOn(client, 'sendJSON').mockImplementationOnce(() =>
-        Promise.resolve<AxiosResponse>({
+      jest.spyOn(client, 'sendJSON').mockImplementationOnce(() => {
+        return Promise.resolve<AxiosResponse>({
           status: 200,
           data: {...mockedResultData},
-        } as AxiosResponse),
-      );
+        } as AxiosResponse);
+      });
       const result = await getAllNotificationsResult();
       expect(result).toBeDefined();
       expect(result.notifications).toBeDefined();
@@ -59,7 +59,9 @@ describe('NotificationAPI', () => {
           data: {},
         } as AxiosResponse,
       } as AxiosError;
-      jest.spyOn(client, 'sendJSON').mockImplementationOnce(() => Promise.reject<AxiosResponse>(ErrorResponse));
+      jest.spyOn(client, 'sendJSON').mockImplementationOnce(() => {
+        return Promise.reject<AxiosResponse>(ErrorResponse);
+      });
       const result = await getAllNotificationsResult();
       expect(result).toBeDefined();
       expect(result.notifications.length).toBe(0);
@@ -74,7 +76,9 @@ describe('NotificationAPI', () => {
           data: {...mockedResultData},
         } as AxiosResponse,
       } as AxiosError;
-      jest.spyOn(client, 'sendJSON').mockImplementationOnce(() => Promise.reject<AxiosResponse>(ErrorResponse));
+      jest.spyOn(client, 'sendJSON').mockImplementationOnce(() => {
+        return Promise.reject<AxiosResponse>(ErrorResponse);
+      });
       const result = await getAllNotificationsResult();
       expect(result).toBeDefined();
       expect(result.notifications.length).toBe(mockedResultData.notifications.length);
@@ -89,13 +93,15 @@ describe('NotificationAPI', () => {
       //second call returns all the notifications with id of missed notification
       jest
         .spyOn(client, 'sendJSON')
-        .mockImplementationOnce(() => Promise.reject(ErrorResponse))
-        .mockImplementationOnce(() =>
-          Promise.resolve<AxiosResponse>({
+        .mockImplementationOnce(() => {
+          return Promise.reject(ErrorResponse);
+        })
+        .mockImplementationOnce(() => {
+          return Promise.resolve<AxiosResponse>({
             status: 200,
             data: {...mockedResultData},
-          } as AxiosResponse),
-        );
+          } as AxiosResponse);
+        });
 
       const result = await getAllNotificationsResult();
 
@@ -113,19 +119,21 @@ describe('NotificationAPI', () => {
       //third call returns next page of notifications
       jest
         .spyOn(client, 'sendJSON')
-        .mockImplementationOnce(() => Promise.reject(ErrorResponse))
-        .mockImplementationOnce(() =>
-          Promise.resolve<AxiosResponse>({
+        .mockImplementationOnce(() => {
+          return Promise.reject(ErrorResponse);
+        })
+        .mockImplementationOnce(() => {
+          return Promise.resolve<AxiosResponse>({
             status: 200,
             data: {...mockedResultData, has_more: true},
-          } as AxiosResponse),
-        )
-        .mockImplementationOnce(() =>
-          Promise.resolve<AxiosResponse>({
+          } as AxiosResponse);
+        })
+        .mockImplementationOnce(() => {
+          return Promise.resolve<AxiosResponse>({
             status: 200,
             data: {...mockedResultData},
-          } as AxiosResponse),
-        );
+          } as AxiosResponse);
+        });
 
       const result = await getAllNotificationsResult();
 
@@ -148,13 +156,15 @@ describe('NotificationAPI', () => {
 
       jest
         .spyOn(client, 'sendJSON')
-        .mockImplementationOnce(() => Promise.reject(ErrorResponse))
-        .mockImplementationOnce(() =>
-          Promise.resolve<AxiosResponse>({
+        .mockImplementationOnce(() => {
+          return Promise.reject(ErrorResponse);
+        })
+        .mockImplementationOnce(() => {
+          return Promise.resolve<AxiosResponse>({
             status: 200,
             data: {...mockedResultData},
-          } as AxiosResponse),
-        );
+          } as AxiosResponse);
+        });
 
       const result = await getAllNotificationsResult();
 

@@ -23,6 +23,8 @@ import {CSS_SQUARE} from 'Util/cssMixin';
 
 import {DIAMETER, AVATAR_SIZE} from '.';
 
+const pixelsPerRem = 16;
+
 interface AvatarWrapperProps {
   avatarSize: AVATAR_SIZE;
   color: string;
@@ -34,7 +36,7 @@ interface AvatarWrapperProps {
 }
 
 const AvatarWrapper = ({color, avatarSize, isResponsive = false, ...props}: AvatarWrapperProps) => {
-  const avatarDiameter = isResponsive ? `${DIAMETER[avatarSize] / 16}rem` : DIAMETER[avatarSize];
+  const avatarDiameter = isResponsive ? `${DIAMETER[avatarSize] / pixelsPerRem}rem` : DIAMETER[avatarSize];
   return (
     <div
       css={{

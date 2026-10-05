@@ -36,9 +36,9 @@ export type MeetingInstancesByDay = {
  * @returns Day buckets used to add date headers to the virtualized timeline.
  */
 export const groupMeetingInstancesByDay = (meetingInstances: MeetingInstance[]): MeetingInstancesByDay[] => {
-  const sortedMeetingInstances = [...meetingInstances].toSorted(
-    (left, right) => left.start.getTime() - right.start.getTime(),
-  );
+  const sortedMeetingInstances = [...meetingInstances].toSorted((left, right) => {
+    return left.start.getTime() - right.start.getTime();
+  });
   const groups: MeetingInstancesByDay[] = [];
 
   for (const meetingInstance of sortedMeetingInstances) {

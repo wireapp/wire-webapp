@@ -81,7 +81,9 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
   }
 
   public async getConversationState(conversationId: Uint8Array): Promise<E2eiConversationState> {
-    return this.coreCryptoClient.transaction(cx => cx.e2eiConversationState(new ConversationId(conversationId)));
+    return this.coreCryptoClient.transaction(cx => {
+      return cx.e2eiConversationState(new ConversationId(conversationId));
+    });
   }
 
   public isE2EIEnabled(): Promise<boolean> {
@@ -128,43 +130,61 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     // we get all the devices that have an identity (either valid, expired or revoked)
     const userIdentities = await this.coreCryptoClient.getUserIdentities(
       new ConversationId(groupIdBytes),
-      userIds.map(userId => userId.id),
+      userIds.map(userId => {
+        return userId.id;
+      }),
     );
 
     // We get all the devices in the conversation (in order to get devices that have no identity)
     const allUsersMLSDevices = (await this.coreCryptoClient.getClientIds(new ConversationId(groupIdBytes)))
-      .map(id => textDecoder.decode(id.copyBytes()))
-      .map(fullyQualifiedId => parseFullQualifiedClientId(fullyQualifiedId));
+      .map(id => {
+        return textDecoder.decode(id.copyBytes());
+      })
+      .map(fullyQualifiedId => {
+        return parseFullQualifiedClientId(fullyQualifiedId);
+      });
 
     const mappedUserIdentities = new Map<StringifiedQualifiedId, DeviceIdentity[]>();
     for (const userId of userIds) {
-      const identities = (userIdentities.get(userId.id) ?? []).map(identity => ({
-        ...identity,
-        deviceId: parseFullQualifiedClientId(identity.clientId).client,
-        qualifiedUserId: userId,
-      }));
+      const identities = (userIdentities.get(userId.id) ?? []).map(identity => {
+        return {
+          ...identity,
+          deviceId: parseFullQualifiedClientId(identity.clientId).client,
+          qualifiedUserId: userId,
+        };
+      });
 
       const basicMLSDevices = allUsersMLSDevices
-        .filter(({user}) => user === userId.id)
+        .filter(({user}) => {
+          return user === userId.id;
+        })
         // filtering devices that have a valid identity
-        .filter(({client}) => !identities.map(identity => identity.deviceId).includes(client))
+        .filter(({client}) => {
+          return !identities
+            .map(identity => {
+              return identity.deviceId;
+            })
+            .includes(client);
+        })
         // map basic MLS devices to "fake" identity object
-        .map<DeviceIdentity>(id => ({
-          ...id,
-          deviceId: id.client,
-          thumbprint: '',
-          user: '',
-          certificate: '',
-          displayName: '',
-          handle: '',
-          notAfter: BigInt(0),
-          notBefore: BigInt(0),
-          serialNumber: '',
-          clientId: id.client,
-          qualifiedUserId: userId,
-          credentialType: CredentialType.Basic,
-          x509Identity: undefined,
-        }));
+        .map<DeviceIdentity>(id => {
+          return {
+            ...id,
+            deviceId: id.client,
+            thumbprint: '',
+            user: '',
+            certificate: '',
+            displayName: '',
+            handle: '',
+            notAfter: BigInt(0),
+            notBefore: BigInt(0),
+            serialNumber: '',
+            clientId: id.client,
+            qualifiedUserId: userId,
+            credentialType: CredentialType.Basic,
+            x509Identity: undefined,
+          };
+        });
 
       mappedUserIdentities.set(stringifyQualifiedId(userId), [...identities, ...basicMLSDevices]);
     }
@@ -177,9 +197,9 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     groupId: string,
     userClientsMap: Record<string, QualifiedId>,
   ): Promise<DeviceIdentity[]> {
-    const clientIds: Array<ClientId> = Object.entries(userClientsMap).map(
-      ([clientId, userId]) => new ClientId(getE2EIClientId(clientId, userId.id, userId.domain).asBytes),
-    );
+    const clientIds: ClientId[] = Object.entries(userClientsMap).map(([clientId, userId]) => {
+      return new ClientId(getE2EIClientId(clientId, userId.id, userId.domain).asBytes);
+    });
     const deviceIdentities = await this.coreCryptoClient.getDeviceIdentities(
       new ConversationId(Decoder.fromBase64(groupId).asBytes),
       clientIds,
@@ -210,7 +230,9 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
 
   private async registerLocalCertificateRoot(acmeService: AcmeService): Promise<string> {
     const localCertificateRoot = await acmeService.getLocalCertificateRoot();
-    await this.coreCryptoClient.transaction(cx => cx.e2eiRegisterAcmeCA(localCertificateRoot));
+    await this.coreCryptoClient.transaction(cx => {
+      return cx.e2eiRegisterAcmeCA(localCertificateRoot);
+    });
 
     return localCertificateRoot;
   }
@@ -224,9 +246,9 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
   public async initialize(discoveryUrl: string): Promise<void> {
     this._acmeService = new AcmeService(discoveryUrl);
 
-    this.mlsService.on(MLSServiceEvents.NEW_CRL_DISTRIBUTION_POINTS, distributionPoints =>
-      this.handleNewCrlDistributionPoints(distributionPoints),
-    );
+    this.mlsService.on(MLSServiceEvents.NEW_CRL_DISTRIBUTION_POINTS, distributionPoints => {
+      return this.handleNewCrlDistributionPoints(distributionPoints);
+    });
 
     await this.registerServerCertificates();
     await this.initialiseCrlDistributionTimers();
@@ -241,7 +263,13 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     await this.registerCrossSignedCertificates(this.acmeService);
 
     const knownCrlDistributionPoints = await this.coreDatabase.getAll('crls');
-    const uniqueDistributionPointUrls = Array.from(new Set(knownCrlDistributionPoints.map(crl => crl.url)));
+    const uniqueDistributionPointUrls = Array.from(
+      new Set(
+        knownCrlDistributionPoints.map(crl => {
+          return crl.url;
+        }),
+      ),
+    );
 
     for (const distributionPointUrl of uniqueDistributionPointUrls) {
       await this.validateCrlDistributionPoint(distributionPointUrl);
@@ -258,7 +286,11 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
   private async registerCrossSignedCertificates(acmeService: AcmeService): Promise<void> {
     const certificates = await acmeService.getFederationCrossSignedCertificates();
     await Promise.all(
-      certificates.map(cert => this.coreCryptoClient.transaction(cx => cx.e2eiRegisterIntermediateCA(cert))),
+      certificates.map(cert => {
+        return this.coreCryptoClient.transaction(cx => {
+          return cx.e2eiRegisterIntermediateCA(cert);
+        });
+      }),
     );
   }
 
@@ -276,7 +308,9 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
    * Both must be registered before the first enrollment.
    */
   private async registerServerCertificates(): Promise<void> {
-    const isRootRegistered = await this.coreCryptoClient.transaction(cx => cx.e2eiIsPKIEnvSetup());
+    const isRootRegistered = await this.coreCryptoClient.transaction(cx => {
+      return cx.e2eiIsPKIEnvSetup();
+    });
 
     // Register root certificate if not already registered
     if (!isRootRegistered) {
@@ -288,7 +322,9 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     const INTERMEDIATE_CA_KEY = 'update-intermediate-certificates';
     const hasPendingTask = await this.recurringTaskScheduler.hasTask(INTERMEDIATE_CA_KEY);
 
-    const task = () => this.registerCrossSignedCertificates(this.acmeService);
+    const task = () => {
+      return this.registerCrossSignedCertificates(this.acmeService);
+    };
 
     // If the task was never registered, we run it once, and then register it to run every 24 hours
     if (!hasPendingTask) {
@@ -307,7 +343,9 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
       intervalDelay: TimeInMillis.SECOND,
       firingDate: expiresAt,
       key: url,
-      task: () => this.validateCrlDistributionPoint(url),
+      task: () => {
+        return this.validateCrlDistributionPoint(url);
+      },
     });
   }
 
@@ -332,13 +370,15 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     const domain = new URL(distributionPointUrl).hostname;
     const crl = await this.acmeService.getCRLFromDistributionPoint(domain);
 
-    await this.validateCrl(distributionPointUrl, crl, () => this.emit('crlChanged', {domain}));
+    await this.validateCrl(distributionPointUrl, crl, () => {
+      return this.emit('crlChanged', {domain});
+    });
   }
 
   private async validateCrl(url: string, crl: Uint8Array, onDirty: () => void): Promise<void> {
-    const {expiration: expirationTimestampSeconds, dirty} = await this.coreCryptoClient.transaction(cx =>
-      cx.e2eiRegisterCRL(url, crl),
-    );
+    const {expiration: expirationTimestampSeconds, dirty} = await this.coreCryptoClient.transaction(cx => {
+      return cx.e2eiRegisterCRL(url, crl);
+    });
 
     const expirationTimestamp =
       expirationTimestampSeconds !== undefined ? expirationTimestampSeconds * TimeInMillis.SECOND : undefined;

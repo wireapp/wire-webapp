@@ -33,7 +33,7 @@ interface S3ServiceConfig {
 }
 
 export const MAX_QUEUE_SIZE = 3;
-export const PART_SIZE = 10 * 1024 * 1024; // 10MB
+export const PART_SIZE = 10_485_760; // 10 MiB in bytes
 
 const createReliableXhrHttpHandler = (abortSignal?: AbortSignal): XhrHttpHandler => {
   const requestHandler = new XhrHttpHandler();
@@ -50,8 +50,9 @@ const createReliableXhrHttpHandler = (abortSignal?: AbortSignal): XhrHttpHandler
   return requestHandler;
 };
 
-export const createAbortableXhrHttpHandler = (abortSignal: AbortSignal): XhrHttpHandler =>
-  createReliableXhrHttpHandler(abortSignal);
+export const createAbortableXhrHttpHandler = (abortSignal: AbortSignal): XhrHttpHandler => {
+  return createReliableXhrHttpHandler(abortSignal);
+};
 
 export class S3Service implements CellsStorage {
   private config: S3ServiceConfig;

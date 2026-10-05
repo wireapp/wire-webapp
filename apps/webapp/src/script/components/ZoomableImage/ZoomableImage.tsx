@@ -25,6 +25,9 @@ import {containerStyle, imageStyle} from './ZoomableImage.style';
 
 import {isHTMLImageElement} from '../../guards/HTMLElement';
 
+const centerCoordinateDivisor = 2;
+const imageTransitionDurationInMilliseconds = 300;
+
 type Offset = {
   x: number;
   y: number;
@@ -63,10 +66,12 @@ function calculateMaxOffset(
 
   return {
     maxXOffset:
-      imgRef.current.naturalWidth >= containerRect.width ? (containerRect.width - imgRef.current.naturalWidth) / 2 : 0,
+      imgRef.current.naturalWidth >= containerRect.width
+        ? (containerRect.width - imgRef.current.naturalWidth) / centerCoordinateDivisor
+        : 0,
     maxYOffset:
       imgRef.current.naturalHeight >= containerRect.height
-        ? (containerRect.height - imgRef.current.naturalHeight) / 2
+        ? (containerRect.height - imgRef.current.naturalHeight) / centerCoordinateDivisor
         : 0,
   };
 }
@@ -114,7 +119,7 @@ export const ZoomableImage = (props: ZoomableImageProps) => {
         requestAnimationFrame(() => {
           element.style.transition = '';
         });
-      }, 300);
+      }, imageTransitionDurationInMilliseconds);
     }
 
     requestAnimationFrame(() => {
@@ -130,8 +135,8 @@ export const ZoomableImage = (props: ZoomableImageProps) => {
       const {maxXOffset, maxYOffset} = calculateMaxOffset(containerRef, imageRef);
 
       const imageRect = imageRef.current.getBoundingClientRect();
-      const imageCenterY = imageRef.current.naturalHeight / 2;
-      const imageCenterX = imageRef.current.naturalWidth / 2;
+      const imageCenterY = imageRef.current.naturalHeight / centerCoordinateDivisor;
+      const imageCenterX = imageRef.current.naturalWidth / centerCoordinateDivisor;
       const currentPosX = (event.clientX - imageRect.left) / imageRatio - imageCenterX;
       const currentPosY = (event.clientY - imageRect.top) / imageRatio - imageCenterY;
 
@@ -141,7 +146,9 @@ export const ZoomableImage = (props: ZoomableImageProps) => {
       });
     }
 
-    setIsZoomEnabled(prevState => !prevState);
+    setIsZoomEnabled(prevState => {
+      return !prevState;
+    });
   };
 
   const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {

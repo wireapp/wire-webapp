@@ -19,8 +19,10 @@
 
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
+const typingTimeoutInSeconds = 10;
+
 export * from './typingIndicator';
 
 export {useTypingIndicatorState} from './useTypingIndicatorState/useTypingIndicatorState';
 
-export const TYPING_TIMEOUT = TIME_IN_MILLIS.SECOND * 10;
+export const TYPING_TIMEOUT = TIME_IN_MILLIS.SECOND * typingTimeoutInSeconds;

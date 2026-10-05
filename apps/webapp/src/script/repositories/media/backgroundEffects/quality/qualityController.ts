@@ -63,7 +63,7 @@ export class QualityController {
   /** Maximum number of samples to retain in the rolling window. */
   private readonly maxSamples = DEFAULT_TUNING.maxSamples;
   /** Rolling window of performance samples for averaging (ring buffer). */
-  private readonly samples: Array<PerformanceSample | null> = new Array<PerformanceSample | null>(this.maxSamples).fill(
+  private readonly samples: (PerformanceSample | null)[] = new Array<PerformanceSample | null>(this.maxSamples).fill(
     null,
   );
   /** Next write index into the sample ring buffer. */

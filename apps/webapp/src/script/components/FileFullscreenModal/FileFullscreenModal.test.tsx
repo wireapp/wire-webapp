@@ -33,17 +33,25 @@ import {
 
 import {FileFullscreenModal} from './FileFullscreenModal';
 
-jest.mock('Components/fullscreenModal/fullscreenModal', () => ({
-  FullscreenModal: ({children, isOpen}: any) => (isOpen ? <div>{children}</div> : null),
-}));
+jest.mock('Components/fullscreenModal/fullscreenModal', () => {
+  return {
+    FullscreenModal: ({children, isOpen}: any) => {
+      return isOpen ? <div>{children}</div> : null;
+    },
+  };
+});
 
-jest.mock('./FileHeader/FileHeader', () => ({
-  FileHeader: ({showViewOnlyLabel}: {showViewOnlyLabel?: boolean}) => (
-    <div data-uie-name="file-header" data-show-view-only-label={String(showViewOnlyLabel === true)}>
-      Header
-    </div>
-  ),
-}));
+jest.mock('./FileHeader/FileHeader', () => {
+  return {
+    FileHeader: ({showViewOnlyLabel}: {showViewOnlyLabel?: boolean}) => {
+      return (
+        <div data-uie-name="file-header" data-show-view-only-label={String(showViewOnlyLabel === true)}>
+          Header
+        </div>
+      );
+    },
+  };
+});
 
 jest.mock('./FileEditor/FileEditor', () => {
   let renderCount = 0;
@@ -59,50 +67,65 @@ jest.mock('./FileEditor/FileEditor', () => {
   };
 });
 
-jest.mock('./FileLoader/FileLoader', () => ({
-  FileLoader: () => <div data-uie-name="file-loader">Loading...</div>,
-}));
+jest.mock('./FileLoader/FileLoader', () => {
+  return {
+    FileLoader: () => {
+      return <div data-uie-name="file-loader">Loading...</div>;
+    },
+  };
+});
 
-jest.mock('./ImageFileView/ImageFileView', () => ({
-  ImageFileView: ({src}: {src?: string}) => (
-    <div data-uie-name="image-view" data-src={src}>
-      Image View
-    </div>
-  ),
-}));
+jest.mock('./ImageFileView/ImageFileView', () => {
+  return {
+    ImageFileView: ({src}: {src?: string}) => {
+      return (
+        <div data-uie-name="image-view" data-src={src}>
+          Image View
+        </div>
+      );
+    },
+  };
+});
 
-jest.mock('./NoPreviewAvailable/NoPreviewAvailable', () => ({
-  NoPreviewAvailable: () => <div data-uie-name="no-preview">No preview available</div>,
-}));
+jest.mock('./NoPreviewAvailable/NoPreviewAvailable', () => {
+  return {
+    NoPreviewAvailable: () => {
+      return <div data-uie-name="no-preview">No preview available</div>;
+    },
+  };
+});
 
-jest.mock('./PdfViewer/PdfViewer', () => ({
-  PDFViewer: () => <div data-uie-name="pdf-viewer">PDF Viewer</div>,
-}));
+jest.mock('./PdfViewer/PdfViewer', () => {
+  return {
+    PDFViewer: () => {
+      return <div data-uie-name="pdf-viewer">PDF Viewer</div>;
+    },
+  };
+});
 
 interface CreateWrapperOptions {
-  isViewerPermissionFeatureEnabled?: boolean;
   selfUserDriveRole?: CellsSelfUserDriveRole;
 }
 
 describe('FileFullscreenModal - File Version Restore', () => {
-  const createWrapper = ({
-    isViewerPermissionFeatureEnabled = false,
-    selfUserDriveRole = CELLS_SELF_USER_DRIVE_ROLE.EDITOR,
-  }: CreateWrapperOptions = {}) => {
+  const createWrapper = ({selfUserDriveRole = CELLS_SELF_USER_DRIVE_ROLE.EDITOR}: CreateWrapperOptions = {}) => {
     const RootProviderWrapper = createRootProviderWrapperForTest(
       createRootContextValueForTest({
-        isFeatureToggleEnabled: () => isViewerPermissionFeatureEnabled,
-        translate: key => key,
+        translate: key => {
+          return key;
+        },
       }),
     );
 
-    return ({children}: {children: ReactNode}) => (
-      <RootProviderWrapper>
-        <CellsSelfUserDriveRoleProvider selfUserDriveRole={selfUserDriveRole}>
-          {children}
-        </CellsSelfUserDriveRoleProvider>
-      </RootProviderWrapper>
-    );
+    return ({children}: {children: ReactNode}) => {
+      return (
+        <RootProviderWrapper>
+          <CellsSelfUserDriveRoleProvider selfUserDriveRole={selfUserDriveRole}>
+            {children}
+          </CellsSelfUserDriveRoleProvider>
+        </RootProviderWrapper>
+      );
+    };
   };
   const wrapper = createWrapper();
 
@@ -214,7 +237,6 @@ describe('FileFullscreenModal - File Version Restore', () => {
     it('should pass viewer access state to header for restricted viewers when preview url is available', () => {
       render(<FileFullscreenModal {...defaultProps} filePreviewUrl="file.xlsx" fileExtension="xlsx" />, {
         wrapper: createWrapper({
-          isViewerPermissionFeatureEnabled: true,
           selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER,
         }),
       });
@@ -225,7 +247,6 @@ describe('FileFullscreenModal - File Version Restore', () => {
     it('should pass viewer access state to header for restricted viewers when preview is unavailable', () => {
       render(<FileFullscreenModal {...defaultProps} status="unavailable" />, {
         wrapper: createWrapper({
-          isViewerPermissionFeatureEnabled: true,
           selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER,
         }),
       });
@@ -244,7 +265,6 @@ describe('FileFullscreenModal - File Version Restore', () => {
         />,
         {
           wrapper: createWrapper({
-            isViewerPermissionFeatureEnabled: true,
             selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER,
           }),
         },
@@ -347,7 +367,16 @@ describe('FileFullscreenModal - File Version Restore', () => {
 
   describe('Behavior for Recycled Files', () => {
     it('should not allow editing if file is in recycle bin', () => {
-      render(<FileFullscreenModal {...defaultProps} isEditMode checkIsInRecycleBin={() => true} />, {wrapper});
+      render(
+        <FileFullscreenModal
+          {...defaultProps}
+          isEditMode
+          checkIsInRecycleBin={() => {
+            return true;
+          }}
+        />,
+        {wrapper},
+      );
 
       expect(screen.queryByTestId('file-editor')).not.toBeInTheDocument();
       expect(screen.getByTestId('no-preview')).toBeInTheDocument();
@@ -355,13 +384,27 @@ describe('FileFullscreenModal - File Version Restore', () => {
 
     it('should keep view mode when edit mode prop changes while file is in recycle bin', () => {
       const {rerender} = render(
-        <FileFullscreenModal {...defaultProps} isEditMode={false} checkIsInRecycleBin={() => true} />,
+        <FileFullscreenModal
+          {...defaultProps}
+          isEditMode={false}
+          checkIsInRecycleBin={() => {
+            return true;
+          }}
+        />,
         {wrapper},
       );
 
       expect(screen.queryByTestId('file-editor')).not.toBeInTheDocument();
 
-      rerender(<FileFullscreenModal {...defaultProps} isEditMode checkIsInRecycleBin={() => true} />);
+      rerender(
+        <FileFullscreenModal
+          {...defaultProps}
+          isEditMode
+          checkIsInRecycleBin={() => {
+            return true;
+          }}
+        />,
+      );
 
       expect(screen.queryByTestId('file-editor')).not.toBeInTheDocument();
       expect(screen.getByTestId('no-preview')).toBeInTheDocument();
@@ -369,7 +412,13 @@ describe('FileFullscreenModal - File Version Restore', () => {
 
     it('should be editable and previewable if file is not in recycle bin', () => {
       const {rerender} = render(
-        <FileFullscreenModal {...defaultProps} isEditMode checkIsInRecycleBin={() => false} />,
+        <FileFullscreenModal
+          {...defaultProps}
+          isEditMode
+          checkIsInRecycleBin={() => {
+            return false;
+          }}
+        />,
         {
           wrapper,
         },
@@ -378,7 +427,15 @@ describe('FileFullscreenModal - File Version Restore', () => {
       expect(screen.getByTestId('file-editor')).toBeInTheDocument();
       expect(screen.queryByTestId('no-preview')).not.toBeInTheDocument();
 
-      rerender(<FileFullscreenModal {...defaultProps} isEditMode={false} checkIsInRecycleBin={() => false} />);
+      rerender(
+        <FileFullscreenModal
+          {...defaultProps}
+          isEditMode={false}
+          checkIsInRecycleBin={() => {
+            return false;
+          }}
+        />,
+      );
 
       expect(screen.queryByTestId('file-editor')).not.toBeInTheDocument();
       expect(screen.getByTestId('no-preview')).toBeInTheDocument();

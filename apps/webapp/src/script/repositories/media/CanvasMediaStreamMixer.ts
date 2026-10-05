@@ -19,6 +19,8 @@
 
 import {isNan, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 
+const millisecondsPerSecond = 1000;
+
 // Canvas configuration
 const DEFAULT_CANVAS_WIDTH = 1920;
 const DEFAULT_CANVAS_HEIGHT = 1080;
@@ -154,7 +156,7 @@ export class CanvasMediaStreamMixer {
       }
 
       const now = performance.now();
-      const frameInterval = 1000 / SCREEN_SHARE_FPS;
+      const frameInterval = millisecondsPerSecond / SCREEN_SHARE_FPS;
 
       if (now - this.lastScreenFrameTime >= frameInterval) {
         this.lastScreenFrameTime = now;
@@ -323,7 +325,9 @@ export class CanvasMediaStreamMixer {
     [this.screenVideo, this.cameraVideo].forEach(video => {
       if (!isNullOrUndefined(video)) {
         const tracks = video.srcObject as MediaStream;
-        tracks?.getTracks().forEach(track => track.stop());
+        tracks?.getTracks().forEach(track => {
+          track.stop();
+        });
         video.srcObject = null;
         if (document.body.contains(video)) {
           document.body.removeChild(video);

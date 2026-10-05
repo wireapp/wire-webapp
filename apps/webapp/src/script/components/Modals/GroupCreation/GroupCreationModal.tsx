@@ -19,7 +19,7 @@
 
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 
-import {isUndefined} from '@sindresorhus/is';
+import {isTruthy, isUndefined} from '@sindresorhus/is';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/conversationReceiptModeUpdateData';
 import {CONVERSATION_PROTOCOL, mapToConversationProtocol} from '@wireapp/api-client/lib/team';
 import {isNonFederatingBackendsError} from '@wireapp/core/lib/errors';
@@ -48,7 +48,6 @@ import {ConversationRepository} from 'Repositories/conversation/ConversationRepo
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/userState';
-import {viewerPermissionFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
@@ -77,7 +76,7 @@ const GroupCreationModal = ({
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
 }: GroupCreationModalProps) => {
-  const {isFeatureToggleEnabled, mainViewModel, translate} = useApplicationContext();
+  const {mainViewModel, translate} = useApplicationContext();
   const {
     isTeam,
     isMLSEnabled: isMLSEnabledForTeam,
@@ -111,7 +110,9 @@ const GroupCreationModal = ({
     });
   }, [defaultProtocol, translate]);
 
-  const initialProtocol = protocolOptions.find(protocol => protocol.value === defaultProtocol);
+  const initialProtocol = protocolOptions.find(protocol => {
+    return protocol.value === defaultProtocol;
+  });
   if (isUndefined(initialProtocol)) {
     throw new Error(`No protocol option exists for ${defaultProtocol}`);
   }
@@ -122,7 +123,6 @@ const GroupCreationModal = ({
   //both environment feature flag and team feature flag must be enabled to create conversations with cells
   const isCellsEnabledForEnvironment = Config.getConfig().FEATURE.ENABLE_CELLS;
   const enableCellsToggle = isCellsEnabledForEnvironment && isCellsEnabledForTeam;
-  const isViewerPermissionFeatureEnabled = isFeatureToggleEnabled(viewerPermissionFeatureToggleName);
   const [isCellsOptionEnabled, setIsCellsOptionEnabled] = useState(false);
   const isCellsEnabledForGroup = isCellsEnabledForEnvironment && isCellsOptionEnabled;
 
@@ -171,7 +171,9 @@ const GroupCreationModal = ({
   }, [isTeam]);
 
   useEffect(() => {
-    const nextProtocol = protocolOptions.find(protocol => protocol.value === selectedProtocol.value);
+    const nextProtocol = protocolOptions.find(protocol => {
+      return protocol.value === selectedProtocol.value;
+    });
     if (isUndefined(nextProtocol)) {
       throw new Error(`No protocol option exists for ${selectedProtocol.value}`);
     }
@@ -204,7 +206,9 @@ const GroupCreationModal = ({
     return [];
   }, [isGuestEnabled, isTeam, showContacts, teamState, userState]);
 
-  const filteredContacts = contacts.filter(user => user.isAvailable());
+  const filteredContacts = contacts.filter(user => {
+    return user.isAvailable();
+  });
 
   const handleEscape = useCallback(
     (event: React.KeyboardEvent<HTMLElement> | KeyboardEvent): void => {
@@ -220,7 +224,9 @@ const GroupCreationModal = ({
   useEffect(() => {
     let timerId: number;
     if (stateIsParticipants) {
-      timerId = window.setTimeout(() => setShowContacts(true));
+      timerId = window.setTimeout(() => {
+        return setShowContacts(true);
+      });
     } else {
       setShowContacts(false);
     }
@@ -348,7 +354,7 @@ const GroupCreationModal = ({
 
     const trimmedNameInput = value.trim();
     const nameTooLong = trimmedNameInput.length > maxNameLength;
-    const nameTooShort = !trimmedNameInput.length;
+    const nameTooShort = trimmedNameInput.length === 0;
 
     setGroupName(value);
     if (nameTooLong) {
@@ -383,7 +389,7 @@ const GroupCreationModal = ({
   const clickOnNext = (): void => {
     const nameTooLong = groupNameLength > maxNameLength;
 
-    if (groupNameLength && !nameTooLong) {
+    if (groupNameLength > 0 && !nameTooLong) {
       setGroupCreationState(GroupCreationModalState.PARTICIPANTS);
     }
   };
@@ -392,16 +398,21 @@ const GroupCreationModal = ({
     const newAccessState = toggleFeature(feature, accessState);
     setAccessState(newAccessState);
   };
-  const clickOnToggleServicesMode = () => clickOnToggle(ACCESS_TYPES.SERVICE);
-  const clickOnToggleGuestMode = () => clickOnToggle(teamPermissionsForAccessState(ACCESS_STATE.TEAM.GUEST_FEATURES));
+  const clickOnToggleServicesMode = () => {
+    return clickOnToggle(ACCESS_TYPES.SERVICE);
+  };
+  const clickOnToggleGuestMode = () => {
+    return clickOnToggle(teamPermissionsForAccessState(ACCESS_STATE.TEAM.GUEST_FEATURES));
+  };
   const clickOnBack = (): void => {
     setGroupCreationState(GroupCreationModalState.PREFERENCES);
   };
 
-  const participantsActionText = selectedContacts.length
-    ? translate('groupCreationParticipantsActionCreate')
-    : translate('groupCreationParticipantsActionSkip');
-  const isInputValid = groupNameLength && !nameError.length;
+  const participantsActionText =
+    selectedContacts.length > 0
+      ? translate('groupCreationParticipantsActionCreate')
+      : translate('groupCreationParticipantsActionSkip');
+  const isInputValid = isTruthy(groupNameLength) ? nameError.length === 0 : groupNameLength;
 
   return (
     <ModalComponent
@@ -427,7 +438,7 @@ const GroupCreationModal = ({
             </button>
 
             <h2 id="group-creation-label" className="modal__header__title" data-uie-name="status-people-selected">
-              {selectedContacts.length
+              {selectedContacts.length > 0
                 ? translate('groupCreationParticipantsHeaderWithCounter', {number: selectedContacts.length})
                 : translate('groupCreationParticipantsHeader')}
             </h2>
@@ -450,7 +461,9 @@ const GroupCreationModal = ({
             <button
               className="button-reset-default"
               type="button"
-              onClick={() => setIsShown(false)}
+              onClick={() => {
+                return setIsShown(false);
+              }}
               aria-label={translate('accessibility.groupCreationActionCloseModal')}
               data-uie-name="do-close"
             >
@@ -468,7 +481,7 @@ const GroupCreationModal = ({
                 enabled: isInputValid,
               })}
               css={{marginBottom: 0}}
-              disabled={isInputValid !== true}
+              disabled={!isInputValid}
               type="button"
               onClick={clickOnNext}
               aria-label={translate('groupCreationPreferencesAction')}
@@ -521,7 +534,9 @@ const GroupCreationModal = ({
                 uieName="enter-group-name"
                 name="enter-group-name"
                 errorUieName="error-group-name"
-                onCancel={() => setGroupName('')}
+                onCancel={() => {
+                  return setGroupName('');
+                }}
                 onChange={onGroupNameChange}
                 onBlur={event => {
                   const {value} = event.target as HTMLInputElement;
@@ -587,7 +602,7 @@ const GroupCreationModal = ({
                     isDisabled={false}
                     name={translate('modalCreateGroupCellsToggleHeading')}
                     info={translate('modalCreateGroupCellsToggleInfo')}
-                    adminHintForShareDrive={getSharedDrivePermissionHint(translate, isViewerPermissionFeatureEnabled)}
+                    adminHintForShareDrive={getSharedDrivePermissionHint(translate)}
                   />
                 )}
                 {enableMLSToggle && (

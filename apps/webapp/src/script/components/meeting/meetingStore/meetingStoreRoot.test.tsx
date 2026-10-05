@@ -51,17 +51,19 @@ const selfUserId: QualifiedId = {id: 'self-user-id', domain: 'example.com'};
 const otherUserId: QualifiedId = {id: 'other-user-id', domain: 'example.com'};
 const conversationId: QualifiedId = {id: 'conversation-id', domain: 'example.com'};
 
-const createApiMeeting = (title: string, qualifiedId: QualifiedId = meetingId) => ({
-  created_at: '2026-06-15T09:00:00.000Z',
-  updated_at: '2026-06-15T09:00:00.000Z',
-  start_time: '2026-06-16T10:00:00.000Z',
-  end_time: '2026-06-16T11:00:00.000Z',
-  title,
-  qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
-  qualified_creator: {id: 'creator-id', domain: 'example.com'},
-  qualified_id: qualifiedId,
-  tzid: 'Europe/Berlin',
-});
+const createApiMeeting = (title: string, qualifiedId: QualifiedId = meetingId) => {
+  return {
+    created_at: '2026-06-15T09:00:00.000Z',
+    updated_at: '2026-06-15T09:00:00.000Z',
+    start_time: '2026-06-16T10:00:00.000Z',
+    end_time: '2026-06-16T11:00:00.000Z',
+    title,
+    qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
+    qualified_creator: {id: 'creator-id', domain: 'example.com'},
+    qualified_id: qualifiedId,
+    tzid: 'Europe/Berlin',
+  };
+};
 
 const meetingTitlesTestId = 'meeting-titles';
 
@@ -76,9 +78,19 @@ const setNegotiatedApiVersion = (apiVersion: number) => {
 };
 
 const MeetingTitlesProbe = () => {
-  const meetingSeries = useMeetingStore(state => state.meetingSeries);
+  const meetingSeries = useMeetingStore(state => {
+    return state.meetingSeries;
+  });
 
-  return <div data-uie-name={meetingTitlesTestId}>{meetingSeries.map(series => series.title).join(',')}</div>;
+  return (
+    <div data-uie-name={meetingTitlesTestId}>
+      {meetingSeries
+        .map(series => {
+          return series.title;
+        })
+        .join(',')}
+    </div>
+  );
 };
 
 type RenderParameters = {
@@ -90,8 +102,12 @@ type RenderParameters = {
 };
 
 const renderMeetingStoreRoot = ({
-  getMeetingsList = jest.fn(() => task.resolve([createApiMeeting('Weekly sync')])),
-  getMeeting = jest.fn(() => task.resolve(createApiMeeting('Weekly sync (updated)'))),
+  getMeetingsList = jest.fn(() => {
+    return task.resolve([createApiMeeting('Weekly sync')]);
+  }),
+  getMeeting = jest.fn(() => {
+    return task.resolve(createApiMeeting('Weekly sync (updated)'));
+  }),
   isMeetingsFeatureEnabled = true,
   apiVersion = Config.getConfig().MIN_MEETINGS_SUPPORTED_API_VERSION,
   clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
@@ -128,7 +144,9 @@ const renderMeetingStoreRoot = ({
   return {...renderResult, getMeetingsList, getMeeting};
 };
 
-const getRenderedMeetingTitles = () => screen.getByTestId(meetingTitlesTestId).textContent;
+const getRenderedMeetingTitles = () => {
+  return screen.getByTestId(meetingTitlesTestId).textContent;
+};
 
 describe('MeetingStoreRoot', () => {
   afterEach(() => {
@@ -151,8 +169,12 @@ describe('MeetingStoreRoot', () => {
 
   it('syncs a meeting into the store when a meeting created event is published', async () => {
     const {getMeeting} = renderMeetingStoreRoot({
-      getMeetingsList: jest.fn(() => task.resolve([])),
-      getMeeting: jest.fn(() => task.resolve(createApiMeeting('Newly created meeting'))),
+      getMeetingsList: jest.fn(() => {
+        return task.resolve([]);
+      }),
+      getMeeting: jest.fn(() => {
+        return task.resolve(createApiMeeting('Newly created meeting'));
+      }),
     });
 
     amplify.publish(WebAppEvents.MEETING.CREATED, meetingId);
@@ -166,8 +188,12 @@ describe('MeetingStoreRoot', () => {
 
   it('does not create a notification for the host when a meeting is created', async () => {
     const {getMeeting} = renderMeetingStoreRoot({
-      getMeetingsList: jest.fn(() => task.resolve([])),
-      getMeeting: jest.fn(() => task.resolve(createApiMeeting('Newly created meeting'))),
+      getMeetingsList: jest.fn(() => {
+        return task.resolve([]);
+      }),
+      getMeeting: jest.fn(() => {
+        return task.resolve(createApiMeeting('Newly created meeting'));
+      }),
     });
 
     act(() => {
@@ -224,8 +250,12 @@ describe('MeetingStoreRoot', () => {
 
   it('syncs a meeting into the store when a meeting member-added event is published', async () => {
     const {getMeeting} = renderMeetingStoreRoot({
-      getMeetingsList: jest.fn(() => task.resolve([])),
-      getMeeting: jest.fn(() => task.resolve(createApiMeeting('Late joiner meeting'))),
+      getMeetingsList: jest.fn(() => {
+        return task.resolve([]);
+      }),
+      getMeeting: jest.fn(() => {
+        return task.resolve(createApiMeeting('Late joiner meeting'));
+      }),
     });
 
     amplify.publish(WebAppEvents.MEETING.MEMBER_ADDED, meetingId, otherUserId);
@@ -239,8 +269,12 @@ describe('MeetingStoreRoot', () => {
 
   it('creates an invite notification from the freshly synced member-added meeting', async () => {
     const {getMeeting} = renderMeetingStoreRoot({
-      getMeetingsList: jest.fn(() => task.resolve([])),
-      getMeeting: jest.fn(() => task.resolve(createApiMeeting('Late joiner meeting'))),
+      getMeetingsList: jest.fn(() => {
+        return task.resolve([]);
+      }),
+      getMeeting: jest.fn(() => {
+        return task.resolve(createApiMeeting('Late joiner meeting'));
+      }),
     });
 
     act(() => {
@@ -348,19 +382,23 @@ describe('MeetingStoreRoot', () => {
   });
 
   it('does not add an update notification when a queued sync is followed by deletion', async () => {
-    let resolveMeeting: () => void = () => undefined;
+    let resolveMeeting: () => void = () => {
+      return undefined;
+    };
     const meetingFetch = new Promise<void>(resolve => {
       resolveMeeting = resolve;
     });
-    const getMeeting = jest.fn(() =>
-      task.tryOrElse(
-        () => new Error('fetch failed'),
+    const getMeeting = jest.fn(() => {
+      return task.tryOrElse(
+        () => {
+          return new Error('fetch failed');
+        },
         async () => {
           await meetingFetch;
           return createApiMeeting('Weekly sync (updated)');
         },
-      ),
-    );
+      );
+    });
     renderMeetingStoreRoot({getMeeting});
 
     await waitFor(() => {
@@ -517,8 +555,12 @@ describe('MeetingStoreRoot', () => {
       initialUnixEpochMicroseconds: BigInt(Date.parse('2026-06-16T09:49:00.000Z')) * 1_000n,
     });
     renderMeetingStoreRoot({
-      getMeetingsList: jest.fn(() => task.resolve([])),
-      getMeeting: jest.fn(() => task.resolve(createApiMeeting('Newly created meeting'))),
+      getMeetingsList: jest.fn(() => {
+        return task.resolve([]);
+      }),
+      getMeeting: jest.fn(() => {
+        return task.resolve(createApiMeeting('Newly created meeting'));
+      }),
       clock,
     });
 

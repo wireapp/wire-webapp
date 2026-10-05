@@ -295,7 +295,11 @@ describe('Server Config', () => {
 
         Object.values(config.CSP).forEach(value => {
           const array = Array.from(value as Iterable<string>);
-          expect(array.every(item => item.length > 0)).toBe(true);
+          expect(
+            array.every(item => {
+              return item.length > 0;
+            }),
+          ).toBe(true);
         });
       });
     });

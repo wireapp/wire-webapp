@@ -19,6 +19,7 @@
 
 import {useId} from 'react';
 
+import {isUndefined} from '@sindresorhus/is';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {Ciphersuite} from '@wireapp/core';
@@ -54,7 +55,7 @@ export const ConversationProtocolDetails = ({
       <h3 className="conversation-details__list-head">{translate('conversationDetailsProtocolDetails')}</h3>
 
       <div css={wrapperStyles}>
-        {onProtocolActivated ? (
+        {!isUndefined(onProtocolActivated) ? (
           <button
             type="button"
             onClick={onProtocolActivated}

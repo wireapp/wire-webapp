@@ -121,7 +121,9 @@ describe('store.TransientStore', () => {
       jest.setSystemTime(new Date('20 Aug 2020 00:12:00 GMT').getTime());
     });
 
-    afterEach(() => jest.useRealTimers());
+    afterEach(() => {
+      return jest.useRealTimers();
+    });
 
     it('publishes an event when an entity expires.', async () => {
       expect.assertions(2);

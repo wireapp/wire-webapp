@@ -22,6 +22,10 @@ import {setTimeout} from 'worker-timers';
 
 import {getSafeLogger} from 'Repositories/media/backgroundEffects/helper/logger';
 
+const defaultFramesPerSecond = 15;
+const millisecondsPerSecond = 1000;
+const microsecondsPerMillisecond = 1000;
+
 interface MediaStreamTrackProcessor {
   readable: ReadableStream;
 }
@@ -55,7 +59,7 @@ class FallbackProcessor implements MediaStreamTrackProcessor {
       throw new Error('Failed to get 2D context from OffscreenCanvas');
     }
     let timestamp = 0;
-    let frameDuration = 1000 / 15;
+    let frameDuration = millisecondsPerSecond / defaultFramesPerSecond;
     const close = () => {
       video.pause();
       video.srcObject = null;
@@ -67,7 +71,7 @@ class FallbackProcessor implements MediaStreamTrackProcessor {
         const configuredFrameRate = track.getSettings().frameRate;
 
         if (!isNullOrUndefined(configuredFrameRate) && configuredFrameRate > 0) {
-          frameDuration = 1000 / configuredFrameRate;
+          frameDuration = millisecondsPerSecond / configuredFrameRate;
         }
         timestamp = performance.now();
         this.logger.log(`[virtual-background] processor start frameDuration=${frameDuration}`);
@@ -80,7 +84,9 @@ class FallbackProcessor implements MediaStreamTrackProcessor {
         }
         const delta = performance.now() - timestamp;
         if (delta < frameDuration) {
-          await new Promise(r => setTimeout(r, frameDuration - delta));
+          await new Promise(r => {
+            return setTimeout(r, frameDuration - delta);
+          });
         }
         timestamp = performance.now();
         const width = video.videoWidth;
@@ -96,7 +102,9 @@ class FallbackProcessor implements MediaStreamTrackProcessor {
         }
         ctx.drawImage(video, 0, 0);
         try {
-          controller.enqueue(new VideoFrame(canvas, {timestamp: Math.round(performance.now() * 1000)})); // µs
+          controller.enqueue(
+            new VideoFrame(canvas, {timestamp: Math.round(performance.now() * microsecondsPerMillisecond)}),
+          ); // µs
         } catch (e: unknown) {
           running = false;
           close();

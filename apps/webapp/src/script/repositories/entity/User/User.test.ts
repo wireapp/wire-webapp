@@ -93,7 +93,11 @@ describe('User', () => {
       user.addClient(olderClient);
       user.addClient(newerClient);
 
-      expect(user.devices().map(clientEntity => clientEntity.id)).toEqual(['newer-client', 'older-client']);
+      expect(
+        user.devices().map(clientEntity => {
+          return clientEntity.id;
+        }),
+      ).toEqual(['newer-client', 'older-client']);
     });
   });
 

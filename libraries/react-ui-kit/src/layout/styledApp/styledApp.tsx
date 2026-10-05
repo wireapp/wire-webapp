@@ -43,23 +43,35 @@ export type StyledAppProps = React.HTMLProps<HTMLDivElement> & StyledAppContaine
 const styledAppContainerStyle: (
   theme: Theme,
   props: React.HTMLProps<HTMLDivElement> & BackgroundColorProps,
-) => CSSObject = (theme, {backgroundColor = theme.general.backgroundColor}) => ({
-  background: backgroundColor,
-  transition: 'background 0.15s',
-});
+) => CSSObject = (theme, {backgroundColor = theme.general.backgroundColor}) => {
+  return {
+    background: backgroundColor,
+    transition: 'background 0.15s',
+  };
+};
 
-const filterStyledAppProps = (props: Partial<StyledAppProps>) =>
-  filterProps(props, ['backgroundColor', 'themeId', 'theme']);
+const filterStyledAppProps = (props: Partial<StyledAppProps>) => {
+  return filterProps(props, ['backgroundColor', 'themeId', 'theme']);
+};
 
-const StyledAppContainer = (props: React.HTMLProps<HTMLDivElement> & BackgroundColorProps) => (
-  <div css={(theme: Theme) => styledAppContainerStyle(theme, props)} {...filterStyledAppProps(props)} />
-);
+const StyledAppContainer = (props: React.HTMLProps<HTMLDivElement> & BackgroundColorProps) => {
+  return (
+    <div
+      css={(theme: Theme) => {
+        return styledAppContainerStyle(theme, props);
+      }}
+      {...filterStyledAppProps(props)}
+    />
+  );
+};
 
-export const StyledApp: React.FC<StyledAppProps> = ({themeId = THEME_ID.LIGHT, theme, children, ...props}) => (
-  <ThemeProvider theme={Boolean(theme) ? theme : themes[themeId]}>
-    <StyledAppContainer {...props}>
-      <GlobalStyle />
-      {children}
-    </StyledAppContainer>
-  </ThemeProvider>
-);
+export const StyledApp: React.FC<StyledAppProps> = ({themeId = THEME_ID.LIGHT, theme, children, ...props}) => {
+  return (
+    <ThemeProvider theme={Boolean(theme) ? theme : themes[themeId]}>
+      <StyledAppContainer {...props}>
+        <GlobalStyle />
+        {children}
+      </StyledAppContainer>
+    </ThemeProvider>
+  );
+};

@@ -47,12 +47,18 @@ export const EmojisBar = ({onEmojiClick, onPickerEmojiClick, targetWindow}: Emoj
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
   const handleEmojiClick = (selectedEmoji: string) => {
-    setDisabledEmojis(prev => [...prev, selectedEmoji]);
+    setDisabledEmojis(prev => {
+      return [...prev, selectedEmoji];
+    });
 
     onEmojiClick(selectedEmoji);
 
     setTimeout(() => {
-      setDisabledEmojis(prev => prev.filter(emoji => emoji !== selectedEmoji));
+      setDisabledEmojis(prev => {
+        return prev.filter(emoji => {
+          return emoji !== selectedEmoji;
+        });
+      });
     }, CallingRepository.EMOJI_TIME_OUT_DURATION);
   };
 
@@ -82,8 +88,12 @@ export const EmojisBar = ({onEmojiClick, onPickerEmojiClick, targetWindow}: Emoj
   );
 
   const recentTopEmojis = recentEmojis
-    .toSorted((emojiA, emojiB) => emojiB.count - emojiA.count)
-    .map(emoji => String.fromCodePoint(parseInt(emoji.unified, 16)))
+    .toSorted((emojiA, emojiB) => {
+      return emojiB.count - emojiA.count;
+    })
+    .map(emoji => {
+      return String.fromCodePoint(parseInt(emoji.unified, 16));
+    })
     .concat(DEFAULT_EMOJI_LIST)
     .slice(0, MAX_RECENT_TOP_EMOJIS);
 
@@ -114,7 +124,9 @@ export const EmojisBar = ({onEmojiClick, onPickerEmojiClick, targetWindow}: Emoj
                 data-uie-value={emoji}
                 key={emoji}
                 disabled={isDisabled}
-                onClick={() => handleEmojiClick(emoji)}
+                onClick={() => {
+                  return handleEmojiClick(emoji);
+                }}
                 css={styles.button}
               >
                 {emoji}
@@ -128,7 +140,9 @@ export const EmojisBar = ({onEmojiClick, onPickerEmojiClick, targetWindow}: Emoj
             className="icon-more font-size-sm"
             onClick={event => {
               event.stopPropagation();
-              setShowEmojiPicker(prev => !prev);
+              setShowEmojiPicker(prev => {
+                return !prev;
+              });
             }}
             css={styles.button}
           ></button>

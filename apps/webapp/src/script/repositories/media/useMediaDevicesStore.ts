@@ -22,7 +22,7 @@ import {useStore} from 'zustand';
 import {immer} from 'zustand/middleware/immer';
 import {createStore} from 'zustand/vanilla';
 
-import {ElectronDesktopCapturerSource} from 'Repositories/media/MediaDevicesHandler';
+import type {ElectronDesktopCapturerSource} from 'Repositories/media/MediaDevicesHandler';
 
 export const defaultAudioInputId = 'default';
 export const defaultAudioOutputId = 'default';
@@ -33,30 +33,42 @@ export const defaultScreenInputId = 'screen';
  * Filter out invalid devices empty deviceId or label
  * return MediaDeviceInfo[]
  */
-const filterInvalidDevices = (devices: MediaDeviceInfo[]): MediaDeviceInfo[] =>
-  devices.filter(device => isNonEmptyString(device.deviceId) && isNonEmptyString(device.label));
+function filterInvalidDevices(devices: MediaDeviceInfo[]): MediaDeviceInfo[] {
+  return devices.filter(device => {
+    return isNonEmptyString(device.deviceId) && isNonEmptyString(device.label);
+  });
+}
 
-type MediaChannelPatch<T> = Partial<Pick<MediaChannel<T>, 'devices' | 'selectedId' | 'supported'>>;
+type MediaChannelPatch<Device> = Readonly<
+  Partial<Pick<MediaChannel<Device>, 'devices' | 'activeId' | 'preferredId' | 'supported'>>
+>;
 // omit thumbnail (which is a native image) to avoid serialization issues in Zustand immer
-type ScreenDevice = Omit<ElectronDesktopCapturerSource, 'thumbnail'> & {thumbnail: unknown};
+type ScreenDevice = Omit<ElectronDesktopCapturerSource, 'thumbnail'> & {readonly thumbnail: unknown};
 
-type MediaChannel<TDevice> = {
-  devices: TDevice[];
-  selectedId: string;
+type MediaChannel<Device> = {
+  devices: Device[];
+  activeId: string;
+  preferredId: string;
+  supported: boolean;
+};
+
+type ScreenChannel = {
+  devices: ScreenDevice[];
+  activeId: string;
   supported: boolean;
 };
 
 // Partial batch update type
 type MediaDevicesBatch = {
-  audio?: {
-    input?: MediaChannelPatch<MediaDeviceInfo>;
-    output?: MediaChannelPatch<MediaDeviceInfo>;
+  readonly audio?: {
+    readonly input?: MediaChannelPatch<MediaDeviceInfo>;
+    readonly output?: MediaChannelPatch<MediaDeviceInfo>;
   };
-  video?: {
-    input?: MediaChannelPatch<MediaDeviceInfo>;
+  readonly video?: {
+    readonly input?: MediaChannelPatch<MediaDeviceInfo>;
   };
-  screen?: {
-    input?: MediaChannelPatch<ScreenDevice>;
+  readonly screen?: {
+    readonly input?: Readonly<Partial<Pick<ScreenChannel, 'devices' | 'activeId' | 'supported'>>>;
   };
 };
 
@@ -69,7 +81,7 @@ export type MediaDevicesState = {
     input: MediaChannel<MediaDeviceInfo>;
   };
   screen: {
-    input: MediaChannel<ScreenDevice>;
+    input: ScreenChannel;
   };
 
   // device list setters
@@ -78,7 +90,7 @@ export type MediaDevicesState = {
   setVideoInputDevices(devices: MediaDeviceInfo[]): void;
   setScreenInputSources(sources: ScreenDevice[]): void;
 
-  // selection setters
+  // explicit physical-device preference setters
   setAudioInputDeviceId(id: string): void;
   setAudioOutputDeviceId(id: string): void;
   setVideoInputDeviceId(id: string): void;
@@ -100,162 +112,222 @@ export type MediaDevicesState = {
 };
 
 export const mediaDevicesStore = createStore<MediaDevicesState>()(
-  immer<MediaDevicesState>((set, get) => ({
-    audio: {
-      input: {devices: [], selectedId: defaultAudioInputId, supported: false},
-      output: {devices: [], selectedId: defaultAudioOutputId, supported: false},
-    },
-    video: {
-      input: {devices: [], selectedId: defaultVideoInputId, supported: false},
-    },
-    screen: {
-      input: {devices: [], selectedId: defaultScreenInputId, supported: false},
-    },
+  immer<MediaDevicesState>((set, get) => {
+    return {
+      audio: {
+        input: {devices: [], activeId: defaultAudioInputId, preferredId: defaultAudioInputId, supported: false},
+        output: {devices: [], activeId: defaultAudioOutputId, preferredId: defaultAudioOutputId, supported: false},
+      },
+      video: {
+        input: {devices: [], activeId: defaultVideoInputId, preferredId: defaultVideoInputId, supported: false},
+      },
+      screen: {
+        input: {devices: [], activeId: defaultScreenInputId, supported: false},
+      },
 
-    // devices setters
-    setAudioInputDevices: devices =>
-      set(state => {
-        state.audio.input.devices = filterInvalidDevices(devices);
-      }),
+      // devices setters
+      setAudioInputDevices: devices => {
+        return set(state => {
+          state.audio.input.devices = filterInvalidDevices(devices);
+        });
+      },
 
-    setAudioOutputDevices: devices =>
-      set(state => {
-        state.audio.output.devices = filterInvalidDevices(devices);
-      }),
+      setAudioOutputDevices: devices => {
+        return set(state => {
+          state.audio.output.devices = filterInvalidDevices(devices);
+        });
+      },
 
-    setVideoInputDevices: devices =>
-      set(state => {
-        state.video.input.devices = filterInvalidDevices(devices);
-      }),
+      setVideoInputDevices: devices => {
+        return set(state => {
+          state.video.input.devices = filterInvalidDevices(devices);
+        });
+      },
 
-    setScreenInputSources: sources =>
-      set(state => {
-        state.screen.input.devices = sources;
-      }),
+      setScreenInputSources: sources => {
+        return set(state => {
+          state.screen.input.devices = sources;
+        });
+      },
 
-    // id setters
-    setAudioInputDeviceId: id =>
-      set(state => {
-        const exists = state.audio.input.devices.some((device: MediaDeviceInfo) => device.deviceId === id);
-        state.audio.input.selectedId = exists ? id : defaultAudioInputId;
-      }),
+      // explicit physical-device preference setters
+      setAudioInputDeviceId: id => {
+        return set(state => {
+          const exists = state.audio.input.devices.some((device: MediaDeviceInfo) => {
+            return device.deviceId === id;
+          });
+          if (exists) {
+            state.audio.input.activeId = id;
+            state.audio.input.preferredId = id;
 
-    setAudioOutputDeviceId: id =>
-      set(state => {
-        const exists = state.audio.output.devices.some((device: MediaDeviceInfo) => device.deviceId === id);
-        state.audio.output.selectedId = exists ? id : defaultAudioOutputId;
-      }),
+            return;
+          }
+          state.audio.input.activeId = defaultAudioInputId;
+        });
+      },
 
-    setVideoInputDeviceId: id =>
-      set(state => {
-        const exists = state.video.input.devices.some((device: MediaDeviceInfo) => device.deviceId === id);
-        state.video.input.selectedId = exists ? id : defaultVideoInputId;
-      }),
+      setAudioOutputDeviceId: id => {
+        return set(state => {
+          const exists = state.audio.output.devices.some((device: MediaDeviceInfo) => {
+            return device.deviceId === id;
+          });
+          if (exists) {
+            state.audio.output.activeId = id;
+            state.audio.output.preferredId = id;
 
-    setScreenInputDeviceId: id =>
-      set(state => {
-        const exists = state.screen.input.devices.some((device: ScreenDevice) => device.id === id);
-        state.screen.input.selectedId = exists ? id : defaultScreenInputId;
-      }),
+            return;
+          }
+          state.audio.output.activeId = defaultAudioOutputId;
+        });
+      },
 
-    // isSupported setters
-    setAudioInputSupported: value =>
-      set(state => {
-        state.audio.input.supported = value;
-      }),
-    setAudioOutputSupported: value =>
-      set(state => {
-        state.audio.output.supported = value;
-      }),
-    setVideoInputSupported: value =>
-      set(state => {
-        state.video.input.supported = value;
-      }),
-    setScreenInputSupported: value =>
-      set(state => {
-        state.screen.input.supported = value;
-      }),
+      setVideoInputDeviceId: id => {
+        return set(state => {
+          const exists = state.video.input.devices.some((device: MediaDeviceInfo) => {
+            return device.deviceId === id;
+          });
+          if (exists) {
+            state.video.input.activeId = id;
+            state.video.input.preferredId = id;
 
-    // set state in batch
-    setAll: payload =>
-      set(state => {
-        // audio.input
-        if (payload.audio?.input?.devices !== undefined) {
-          state.audio.input.devices = filterInvalidDevices(payload.audio.input.devices);
-        }
-        const audioInputSelectedId = payload.audio?.input?.selectedId;
-        if (!isUndefined(audioInputSelectedId)) {
-          state.audio.input.selectedId = audioInputSelectedId;
-        }
-        const audioInputSupported = payload.audio?.input?.supported;
-        if (!isUndefined(audioInputSupported)) {
-          state.audio.input.supported = audioInputSupported;
-        }
+            return;
+          }
+          state.video.input.activeId = defaultVideoInputId;
+        });
+      },
 
-        // audio.output
-        if (payload.audio?.output?.devices !== undefined) {
-          state.audio.output.devices = filterInvalidDevices(payload.audio.output.devices);
-        }
-        const audioOutputSelectedId = payload.audio?.output?.selectedId;
-        if (!isUndefined(audioOutputSelectedId)) {
-          state.audio.output.selectedId = audioOutputSelectedId;
-        }
-        const audioOutputSupported = payload.audio?.output?.supported;
-        if (!isUndefined(audioOutputSupported)) {
-          state.audio.output.supported = audioOutputSupported;
-        }
+      setScreenInputDeviceId: id => {
+        return set(state => {
+          const exists = state.screen.input.devices.some((device: ScreenDevice) => {
+            return device.id === id;
+          });
+          state.screen.input.activeId = exists ? id : defaultScreenInputId;
+        });
+      },
 
-        // video.input
-        if (payload.video?.input?.devices !== undefined) {
-          state.video.input.devices = filterInvalidDevices(payload.video.input.devices);
-        }
-        const videoInputSelectedId = payload.video?.input?.selectedId;
-        if (!isUndefined(videoInputSelectedId)) {
-          state.video.input.selectedId = videoInputSelectedId;
-        }
-        const videoInputSupported = payload.video?.input?.supported;
-        if (!isUndefined(videoInputSupported)) {
-          state.video.input.supported = videoInputSupported;
-        }
+      // isSupported setters
+      setAudioInputSupported: value => {
+        return set(state => {
+          state.audio.input.supported = value;
+        });
+      },
+      setAudioOutputSupported: value => {
+        return set(state => {
+          state.audio.output.supported = value;
+        });
+      },
+      setVideoInputSupported: value => {
+        return set(state => {
+          state.video.input.supported = value;
+        });
+      },
+      setScreenInputSupported: value => {
+        return set(state => {
+          state.screen.input.supported = value;
+        });
+      },
 
-        // screen.input
-        if (payload.screen?.input?.devices !== undefined) {
-          state.screen.input.devices = payload.screen.input.devices;
-        }
-        const screenInputSelectedId = payload.screen?.input?.selectedId;
-        if (!isUndefined(screenInputSelectedId)) {
-          state.screen.input.selectedId = screenInputSelectedId;
-        }
-        const screenInputSupported = payload.screen?.input?.supported;
-        if (!isUndefined(screenInputSupported)) {
-          state.screen.input.supported = screenInputSupported;
-        }
-      }),
+      // set state in batch
+      setAll: payload => {
+        return set(state => {
+          // audio.input
+          if (payload.audio?.input?.devices !== undefined) {
+            state.audio.input.devices = filterInvalidDevices(payload.audio.input.devices);
+          }
+          const audioInputActiveId = payload.audio?.input?.activeId;
+          if (!isUndefined(audioInputActiveId)) {
+            state.audio.input.activeId = audioInputActiveId;
+          }
+          const audioInputPreferredId = payload.audio?.input?.preferredId;
+          if (!isUndefined(audioInputPreferredId)) {
+            state.audio.input.preferredId = audioInputPreferredId;
+          }
+          const audioInputSupported = payload.audio?.input?.supported;
+          if (!isUndefined(audioInputSupported)) {
+            state.audio.input.supported = audioInputSupported;
+          }
 
-    // resets
-    resetDevices: () =>
-      set(state => {
-        state.audio.input.devices = [];
-        state.audio.output.devices = [];
-        state.video.input.devices = [];
-        state.screen.input.devices = [];
-      }),
-    resetSelections: () =>
-      set(state => {
-        state.audio.input.selectedId = defaultAudioInputId;
-        state.audio.output.selectedId = defaultAudioOutputId;
-        state.video.input.selectedId = defaultVideoInputId;
-        state.screen.input.selectedId = defaultScreenInputId;
-      }),
-    resetSupport: () =>
-      set(state => {
-        state.audio.input.supported = false;
-        state.audio.output.supported = false;
-        state.video.input.supported = false;
-        state.screen.input.supported = false;
-      }),
-  })),
+          // audio.output
+          if (payload.audio?.output?.devices !== undefined) {
+            state.audio.output.devices = filterInvalidDevices(payload.audio.output.devices);
+          }
+          const audioOutputActiveId = payload.audio?.output?.activeId;
+          if (!isUndefined(audioOutputActiveId)) {
+            state.audio.output.activeId = audioOutputActiveId;
+          }
+          const audioOutputPreferredId = payload.audio?.output?.preferredId;
+          if (!isUndefined(audioOutputPreferredId)) {
+            state.audio.output.preferredId = audioOutputPreferredId;
+          }
+          const audioOutputSupported = payload.audio?.output?.supported;
+          if (!isUndefined(audioOutputSupported)) {
+            state.audio.output.supported = audioOutputSupported;
+          }
+
+          // video.input
+          if (payload.video?.input?.devices !== undefined) {
+            state.video.input.devices = filterInvalidDevices(payload.video.input.devices);
+          }
+          const videoInputActiveId = payload.video?.input?.activeId;
+          if (!isUndefined(videoInputActiveId)) {
+            state.video.input.activeId = videoInputActiveId;
+          }
+          const videoInputPreferredId = payload.video?.input?.preferredId;
+          if (!isUndefined(videoInputPreferredId)) {
+            state.video.input.preferredId = videoInputPreferredId;
+          }
+          const videoInputSupported = payload.video?.input?.supported;
+          if (!isUndefined(videoInputSupported)) {
+            state.video.input.supported = videoInputSupported;
+          }
+
+          // screen.input
+          if (payload.screen?.input?.devices !== undefined) {
+            state.screen.input.devices = payload.screen.input.devices;
+          }
+          const screenInputActiveId = payload.screen?.input?.activeId;
+          if (!isUndefined(screenInputActiveId)) {
+            state.screen.input.activeId = screenInputActiveId;
+          }
+          const screenInputSupported = payload.screen?.input?.supported;
+          if (!isUndefined(screenInputSupported)) {
+            state.screen.input.supported = screenInputSupported;
+          }
+        });
+      },
+
+      // resets
+      resetDevices: () => {
+        return set(state => {
+          state.audio.input.devices = [];
+          state.audio.output.devices = [];
+          state.video.input.devices = [];
+          state.screen.input.devices = [];
+        });
+      },
+      resetSelections: () => {
+        return set(state => {
+          state.audio.input.activeId = defaultAudioInputId;
+          state.audio.input.preferredId = defaultAudioInputId;
+          state.audio.output.activeId = defaultAudioOutputId;
+          state.audio.output.preferredId = defaultAudioOutputId;
+          state.video.input.activeId = defaultVideoInputId;
+          state.video.input.preferredId = defaultVideoInputId;
+          state.screen.input.activeId = defaultScreenInputId;
+        });
+      },
+      resetSupport: () => {
+        return set(state => {
+          state.audio.input.supported = false;
+          state.audio.output.supported = false;
+          state.video.input.supported = false;
+          state.screen.input.supported = false;
+        });
+      },
+    };
+  }),
 );
 
-export const useMediaDevicesStore = <T>(selector: (state: MediaDevicesState) => T): T =>
-  useStore(mediaDevicesStore, selector);
+export function useMediaDevicesStore<T>(selector: (state: MediaDevicesState) => T): T {
+  return useStore(mediaDevicesStore, selector);
+}

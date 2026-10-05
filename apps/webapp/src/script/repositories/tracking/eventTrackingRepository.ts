@@ -17,7 +17,7 @@
  *
  */
 
-import {isUndefined} from '@sindresorhus/is';
+import {isNullOrUndefined, isTruthy, isUndefined} from '@sindresorhus/is';
 import {HttpClient, LongRunningRetryDetails} from '@wireapp/api-client/lib/http';
 import {WebSocketClient} from '@wireapp/api-client/lib/tcp';
 import {amplify} from 'amplify';
@@ -113,7 +113,7 @@ export class EventTrackingRepository {
     const type = eventJson.type;
     if (type === ClientEvent.USER.DATA_TRANSFER && this.teamState.isTeam()) {
       this.telemetryLogger.info('Received data transfer event with new telemetry tracking id', eventJson.data);
-      if (!!eventJson.data.trackingIdentifier && eventJson.data.trackingIdentifier !== this.telemetryDeviceId) {
+      if (isTruthy(eventJson.data.trackingIdentifier) && eventJson.data.trackingIdentifier !== this.telemetryDeviceId) {
         void this.migrateDeviceId(eventJson.data.trackingIdentifier);
       }
     }
@@ -125,7 +125,7 @@ export class EventTrackingRepository {
       return;
     }
 
-    if (!newId || !newId.length) {
+    if (!isTruthy(newId) || !isTruthy(newId.length)) {
       this.telemetryLogger.warn('New telemetry tracking id is not defined');
       return;
     }
@@ -160,11 +160,7 @@ export class EventTrackingRepository {
       EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_SYNCED_AT_LEAST_ONCE_LOCAL_STORAGE_KEY,
     );
 
-    if (
-      unsyncedTelemetryDeviceId !== undefined &&
-      unsyncedTelemetryDeviceId !== null &&
-      unsyncedTelemetryDeviceId !== ''
-    ) {
+    if (!isNullOrUndefined(unsyncedTelemetryDeviceId) && unsyncedTelemetryDeviceId !== '') {
       try {
         await this.messageRepository.sendCountlySync(this.telemetryDeviceId ?? '');
         resetStoreValue(EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_UNSYNCED_DEVICE_ID_LOCAL_STORAGE_KEY);
@@ -173,17 +169,17 @@ export class EventTrackingRepository {
       }
     }
 
-    if (previousTelemetryDeviceId) {
+    if (isTruthy(previousTelemetryDeviceId)) {
       this.telemetryDeviceId = previousTelemetryDeviceId;
       const notMigratedTelemetryTrackingId = loadValue<string>(
         EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_FAILED_TO_MIGRATE_DEVICE_ID,
       );
 
       // Migrate the device id if it has not been migrated yet and it is different from the previous one
-      if (!!notMigratedTelemetryTrackingId && notMigratedTelemetryTrackingId !== previousTelemetryDeviceId) {
+      if (isTruthy(notMigratedTelemetryTrackingId) && notMigratedTelemetryTrackingId !== previousTelemetryDeviceId) {
         await this.migrateDeviceId(notMigratedTelemetryTrackingId);
       }
-      if (!hasAtLeastSyncedOnce) {
+      if (!isTruthy(hasAtLeastSyncedOnce)) {
         try {
           await this.messageRepository.sendCountlySync(this.telemetryDeviceId);
           storeValue(
@@ -259,7 +255,7 @@ export class EventTrackingRepository {
 
     // Initialize telemetry if it is not initialized yet
     if (!this.telemetryInitialized) {
-      if (!COUNTLY_API_KEY.length) {
+      if (COUNTLY_API_KEY.length === 0) {
         this.telemetryLogger.error('Countly API key is not defined in the environment');
         return;
       }
@@ -286,9 +282,9 @@ export class EventTrackingRepository {
       this.telemetryInitialized = true;
     }
 
-    const device_id = Boolean(trackingId.length) ? trackingId : this.telemetryDeviceId;
+    const device_id = isTruthy(trackingId.length) ? trackingId : this.telemetryDeviceId;
 
-    if (!device_id) {
+    if (!isTruthy(device_id)) {
       this.telemetryLogger.error('Telemetry device id is not defined');
       return;
     }
@@ -391,7 +387,7 @@ export class EventTrackingRepository {
       segmentation[Segmentation.COMMON.TEAM_IS_ENTERPRISE] = this.teamState.isConferenceCallingEnabled();
       if (this.teamState.teamSize() >= TEAM_SIZE_THRESHOLD_VALUE) {
         const selfRole = this.teamState.selfRole();
-        segmentation[Segmentation.COMMON.TEAM_USER_TYPE] = selfRole ? selfRole.toString() : '';
+        segmentation[Segmentation.COMMON.TEAM_USER_TYPE] = isTruthy(selfRole) ? selfRole.toString() : '';
         const teamId = this.teamState.team().id;
         if (isUndefined(teamId)) {
           throw new Error('Team tracking data is missing the team id');

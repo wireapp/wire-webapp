@@ -31,7 +31,13 @@ describe('ConversationAction', () => {
     const code = 'code';
     const mockedActions = {};
     const mockedApiClient = {
-      api: {conversation: {postConversationCodeCheck: () => Promise.resolve()}},
+      api: {
+        conversation: {
+          postConversationCodeCheck: () => {
+            return Promise.resolve();
+          },
+        },
+      },
     };
     const mockedCore = {};
 
@@ -54,7 +60,13 @@ describe('ConversationAction', () => {
     const code = 'code';
     const mockedActions = {};
     const mockedApiClient = {
-      api: {conversation: {postConversationCodeCheck: () => Promise.reject(error)}},
+      api: {
+        conversation: {
+          postConversationCodeCheck: () => {
+            return Promise.reject(error);
+          },
+        },
+      },
     };
     const mockedCore = {};
 
@@ -76,7 +88,13 @@ describe('ConversationAction', () => {
     const code = 'code';
     const mockedActions = {};
     const mockedApiClient = {
-      api: {conversation: {postJoinByCode: () => Promise.resolve(conversationEvent)}},
+      api: {
+        conversation: {
+          postJoinByCode: () => {
+            return Promise.resolve(conversationEvent);
+          },
+        },
+      },
     };
     const mockedCore = {};
 
@@ -99,7 +117,13 @@ describe('ConversationAction', () => {
     const code = 'code';
     const mockedActions = {};
     const mockedApiClient = {
-      api: {conversation: {postJoinByCode: () => Promise.reject(error)}},
+      api: {
+        conversation: {
+          postJoinByCode: () => {
+            return Promise.reject(error);
+          },
+        },
+      },
     };
     const mockedCore = {};
 

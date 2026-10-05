@@ -93,7 +93,15 @@ const LinkPreviewAsset = ({header = false, message, isFocusable = true}: LinkPre
       tabIndex={messageFocusedTabIndex}
       className="link-preview-asset"
       onClick={onClick}
-      onKeyDown={event => handleKeyDown({event, callback: () => onClick(event), keys: [KEY.ENTER, KEY.SPACE]})}
+      onKeyDown={event => {
+        return handleKeyDown({
+          event,
+          callback: () => {
+            return onClick(event);
+          },
+          keys: [KEY.ENTER, KEY.SPACE],
+        });
+      }}
     >
       <div className="link-preview-image-container">
         {!isUndefined(previewImage) ? (

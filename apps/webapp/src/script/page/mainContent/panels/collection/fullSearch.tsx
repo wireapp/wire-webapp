@@ -20,6 +20,7 @@
 import {useEffect, useMemo, useRef} from 'react';
 
 import {CSSObject} from '@emotion/react';
+import {isNonEmptyArray, isNonEmptyString, isNull, isNumber} from '@sindresorhus/is';
 
 import {CloseIcon, Input, InputSubmitCombo, SearchIcon} from '@wireapp/react-ui-kit';
 
@@ -83,7 +84,7 @@ function FullSearch(props: FullSearchProps) {
   useEffect(() => {
     const parent = element?.closest('.collection-list') as HTMLDivElement;
     const onScroll = () => {
-      const showAdditionalMessages = isScrolledBottom(parent) && messages.length;
+      const showAdditionalMessages = isScrolledBottom(parent) && isNonEmptyArray(messages);
       if (showAdditionalMessages) {
         setMessageCount(currentCount => {
           return currentCount + MAX_VISIBLE_MESSAGES;
@@ -97,7 +98,7 @@ function FullSearch(props: FullSearchProps) {
   }, [element, messages, setMessageCount]);
 
   useEffect(() => {
-    if (inputRef.current) {
+    if (!isNull(inputRef.current)) {
       inputRef.current.focus();
     }
   }, []);
@@ -110,18 +111,20 @@ function FullSearch(props: FullSearchProps) {
       const matches = [...text.matchAll(regex)];
       const firstIndex = matches[0]?.index;
       let firstPart = text.substring(0, firstIndex ?? text.length);
-      if (firstIndex && firstIndex > MAX_OFFSET_INDEX && text.length > MAX_TEXT_LENGTH) {
+      if (isNumber(firstIndex) && firstIndex > MAX_OFFSET_INDEX && text.length > MAX_TEXT_LENGTH) {
         let splitOffset = firstIndex - 1;
         const firstSpace = firstPart.indexOf(' ', splitOffset - PRE_MARKED_OFFSET);
         splitOffset = firstSpace > -1 ? firstSpace : splitOffset;
         firstPart = `…${firstPart.substring(splitOffset)}`;
       }
       const parts = matches.reduce(
-        (accumulator, match, matchIndex) => [
-          ...accumulator,
-          match[0],
-          text.substring((match.index ?? 0) + match[0].length, matches[matchIndex + 1]?.index ?? text.length),
-        ],
+        (accumulator, match, matchIndex) => {
+          return [
+            ...accumulator,
+            match[0],
+            text.substring((match.index ?? 0) + match[0].length, matches[matchIndex + 1]?.index ?? text.length),
+          ];
+        },
         [firstPart],
       );
 
@@ -148,7 +151,7 @@ function FullSearch(props: FullSearchProps) {
             data-uie-name="full-search-header-input"
           />
 
-          {searchValue && (
+          {isNonEmptyString(searchValue) && (
             <CloseIcon
               css={{cursor: 'pointer'}}
               data-uie-name="full-search-dismiss"
@@ -168,14 +171,18 @@ function FullSearch(props: FullSearchProps) {
       )}
 
       <div className="full-search__list" data-uie-name="full-search-list">
-        {messages.slice(0, messageCount).map(message => (
-          <FullSearchItem
-            key={message.id}
-            message={message}
-            onClick={() => click(message)}
-            formatText={formatSearchResult}
-          />
-        ))}
+        {messages.slice(0, messageCount).map(message => {
+          return (
+            <FullSearchItem
+              key={message.id}
+              message={message}
+              onClick={() => {
+                return click(message);
+              }}
+              formatText={formatSearchResult}
+            />
+          );
+        })}
       </div>
     </div>
   );

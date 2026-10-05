@@ -42,9 +42,9 @@ const renderStackedAvatars = (participants: User[], organizer?: User) => {
   return render(
     <StackedAvatars
       participants={participants}
-      getParticipantLabel={(participant, name) =>
-        participant === organizer ? `${name} (${translateForTest('meetings.participant.organizer')})` : name
-      }
+      getParticipantLabel={(participant, name) => {
+        return participant === organizer ? `${name} (${translateForTest('meetings.participant.organizer')})` : name;
+      }}
     />,
     {
       wrapper: rootProviderWrapper,
@@ -68,7 +68,9 @@ describe('StackedAvatars', () => {
   });
 
   it('renders four avatars and overflow count when more than four participants are provided', () => {
-    const participants = Array.from({length: 17}, (_, index) => createUser(`${index + 1}`, `User ${index + 1}`));
+    const participants = Array.from({length: 17}, (_, index) => {
+      return createUser(`${index + 1}`, `User ${index + 1}`);
+    });
 
     renderStackedAvatars(participants);
 
@@ -76,7 +78,9 @@ describe('StackedAvatars', () => {
   });
 
   it('renders +1 overflow for exactly five participants', () => {
-    const participants = Array.from({length: 5}, (_, index) => createUser(`${index + 1}`, `User ${index + 1}`));
+    const participants = Array.from({length: 5}, (_, index) => {
+      return createUser(`${index + 1}`, `User ${index + 1}`);
+    });
 
     renderStackedAvatars(participants);
 

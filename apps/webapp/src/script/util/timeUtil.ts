@@ -61,6 +61,16 @@ import {
 import type {Translate} from './localizerUtil';
 import {zeroPadding} from './util';
 
+const millisecondsPerSecond = 1000;
+const secondsPerMinute = 60;
+const fiveMinuteDurationInMinutes = 5;
+const minutesPerHour = 60;
+const hoursPerDay = 24;
+const daysPerWeek = 7;
+const daysPerYear = 365;
+const maximumDisplayedDurationUnits = 2;
+const isoDatePrefixLength = 10;
+
 export type FnDate = number | Date;
 
 interface DiscreteTimeUnit {
@@ -76,13 +86,13 @@ export interface DurationUnit {
 }
 
 export enum TIME_IN_MILLIS {
-  SECOND = 1000,
-  MINUTE = SECOND * 60,
-  FIVE_MINUTES = MINUTE * 5,
-  HOUR = MINUTE * 60,
-  DAY = HOUR * 24,
-  WEEK = DAY * 7,
-  YEAR = DAY * 365,
+  SECOND = millisecondsPerSecond,
+  MINUTE = SECOND * secondsPerMinute,
+  FIVE_MINUTES = MINUTE * fiveMinuteDurationInMinutes,
+  HOUR = MINUTE * minutesPerHour,
+  DAY = HOUR * hoursPerDay,
+  WEEK = DAY * daysPerWeek,
+  YEAR = DAY * daysPerYear,
 }
 const dateFnsLocales = {
   cs,
@@ -126,9 +136,9 @@ const dayMonthNumeralFormatOptions: Intl.DateTimeFormatOptions = {
 };
 
 function findDateFnsLocale(localeName: string): typeof enUS {
-  const matchingLocale = Object.entries(dateFnsLocales).find(
-    ([supportedLocaleName]): boolean => supportedLocaleName === localeName,
-  );
+  const matchingLocale = Object.entries(dateFnsLocales).find(([supportedLocaleName]): boolean => {
+    return supportedLocaleName === localeName;
+  });
 
   if (isUndefined(matchingLocale)) {
     return defaultDateFnsLocale;
@@ -160,10 +170,13 @@ export function setRegionalDateLocale(newLocale: string): void {
   regionalDateLocale = resolveRegionalDateLocale(newLocale);
 }
 
-export const getRegionalDateLocale = (): string => regionalDateLocale;
+export const getRegionalDateLocale = (): string => {
+  return regionalDateLocale;
+};
 
-export const formatLocale = (date: FnDate | string | number, formatString: string) =>
-  format(new Date(date), formatString, {locale: dateFnsLocale});
+export const formatLocale = (date: FnDate | string | number, formatString: string) => {
+  return format(new Date(date), formatString, {locale: dateFnsLocale});
+};
 
 function formatRegionalDate(date: FnDate | string | number, options: Intl.DateTimeFormatOptions): string {
   return new Intl.DateTimeFormat(regionalDateLocale, options).format(new Date(date));
@@ -173,17 +186,22 @@ function formatRegionalDate(date: FnDate | string | number, options: Intl.DateTi
  * Format the time as `12:00 AM`.
  * This is equivalent to momentjs' `LT` formatting
  */
-export const formatTimeShort = (date: FnDate | string | number) => formatLocale(date, 'p');
+export const formatTimeShort = (date: FnDate | string | number) => {
+  return formatLocale(date, 'p');
+};
 
 /**
  * Format the date as `May 29, 2020`.
  * This is equivalent to momentjs' `LL` formatting
  */
-export const formatDateShort = (date: FnDate | string | number) => formatLocale(date, 'PP');
-export const formatDayMonth = (date: FnDate | string | number) =>
-  formatDateShort(date)
+export const formatDateShort = (date: FnDate | string | number) => {
+  return formatLocale(date, 'PP');
+};
+export const formatDayMonth = (date: FnDate | string | number) => {
+  return formatDateShort(date)
     .replace(/[0-9]{4}/g, '')
     .replace(dateFnsLocale === de ? /^\s*|\s*$/g : /^\W|\W$|\W\W/, '');
+};
 
 /**
  * Format the date numerically according to the browser's regional locale.
@@ -196,44 +214,46 @@ export function formatDayMonthNumeral(date: FnDate | string | number): string {
   return formatRegionalDate(date, dayMonthNumeralFormatOptions);
 }
 
-const durationUnits = (translate: Translate) => [
-  {
-    plural: translate('ephemeralUnitsYears'),
-    singular: translate('ephemeralUnitsYear'),
-    symbol: 'y',
-    value: TIME_IN_MILLIS.YEAR,
-  },
-  {
-    plural: translate('ephemeralUnitsWeeks'),
-    singular: translate('ephemeralUnitsWeek'),
-    symbol: 'w',
-    value: TIME_IN_MILLIS.WEEK,
-  },
-  {
-    plural: translate('ephemeralUnitsDays'),
-    singular: translate('ephemeralUnitsDay'),
-    symbol: 'd',
-    value: TIME_IN_MILLIS.DAY,
-  },
-  {
-    plural: translate('ephemeralUnitsHours'),
-    singular: translate('ephemeralUnitsHour'),
-    symbol: 'h',
-    value: TIME_IN_MILLIS.HOUR,
-  },
-  {
-    plural: translate('ephemeralUnitsMinutes'),
-    singular: translate('ephemeralUnitsMinute'),
-    symbol: 'm',
-    value: TIME_IN_MILLIS.MINUTE,
-  },
-  {
-    plural: translate('ephemeralUnitsSeconds'),
-    singular: translate('ephemeralUnitsSecond'),
-    symbol: 's',
-    value: TIME_IN_MILLIS.SECOND,
-  },
-];
+const durationUnits = (translate: Translate) => {
+  return [
+    {
+      plural: translate('ephemeralUnitsYears'),
+      singular: translate('ephemeralUnitsYear'),
+      symbol: 'y',
+      value: TIME_IN_MILLIS.YEAR,
+    },
+    {
+      plural: translate('ephemeralUnitsWeeks'),
+      singular: translate('ephemeralUnitsWeek'),
+      symbol: 'w',
+      value: TIME_IN_MILLIS.WEEK,
+    },
+    {
+      plural: translate('ephemeralUnitsDays'),
+      singular: translate('ephemeralUnitsDay'),
+      symbol: 'd',
+      value: TIME_IN_MILLIS.DAY,
+    },
+    {
+      plural: translate('ephemeralUnitsHours'),
+      singular: translate('ephemeralUnitsHour'),
+      symbol: 'h',
+      value: TIME_IN_MILLIS.HOUR,
+    },
+    {
+      plural: translate('ephemeralUnitsMinutes'),
+      singular: translate('ephemeralUnitsMinute'),
+      symbol: 'm',
+      value: TIME_IN_MILLIS.MINUTE,
+    },
+    {
+      plural: translate('ephemeralUnitsSeconds'),
+      singular: translate('ephemeralUnitsSecond'),
+      symbol: 's',
+      value: TIME_IN_MILLIS.SECOND,
+    },
+  ];
+};
 
 /**
  * Calculate the discrete time units (years, weeks, days, hours, minutes, seconds) for a given duration
@@ -267,7 +287,9 @@ const mapUnits = (duration: number, rounded: boolean, translate: Translate): Dis
  */
 export const formatDuration = (duration: number, translate: Translate): DurationUnit => {
   const mappedUnits = mapUnits(duration, true, translate);
-  const firstNonZeroUnit = mappedUnits.find(unit => unit.value > 0);
+  const firstNonZeroUnit = mappedUnits.find(unit => {
+    return unit.value > 0;
+  });
 
   if (isUndefined(firstNonZeroUnit)) {
     const seconds = durationUnits(translate).pop();
@@ -293,8 +315,12 @@ export const formatDuration = (duration: number, translate: Translate): Duration
  */
 export const formatDurationCaption = (duration: number, translate: Translate): string => {
   const mappedUnits = mapUnits(duration, false, translate);
-  const hours = mappedUnits.find(unit => unit.symbol === 'h');
-  const minutes = mappedUnits.find(unit => unit.symbol === 'm');
+  const hours = mappedUnits.find(unit => {
+    return unit.symbol === 'h';
+  });
+  const minutes = mappedUnits.find(unit => {
+    return unit.symbol === 'm';
+  });
   const hasHours = (hours?.value ?? 0) > 0;
   const validUnitStrings = [];
   for (let index = 0; index < mappedUnits.length; index++) {
@@ -306,7 +332,7 @@ export const formatDurationCaption = (duration: number, translate: Translate): s
     if (unit.value > 0) {
       validUnitStrings.push(`${unit.value} ${unit.longUnit}`);
     }
-    if (validUnitStrings.length === 2) {
+    if (validUnitStrings.length === maximumDisplayedDurationUnits) {
       break;
     }
     const nextUnit = mappedUnits[index + 1];
@@ -326,12 +352,12 @@ export const formatDurationCaption = (duration: number, translate: Translate): s
 export const formatSeconds = (duration: number): string => {
   duration = Math.round(duration !== 0 && !isNan(duration) ? duration : 0);
 
-  const hours = Math.floor(duration / (60 * 60));
+  const hours = Math.floor(duration / (minutesPerHour * secondsPerMinute));
 
-  const divisorForMinutes = duration % (60 * 60);
-  const minutes = Math.floor(divisorForMinutes / 60);
+  const divisorForMinutes = duration % (minutesPerHour * secondsPerMinute);
+  const minutes = Math.floor(divisorForMinutes / secondsPerMinute);
 
-  const divisor_for_seconds = divisorForMinutes % 60;
+  const divisor_for_seconds = divisorForMinutes % secondsPerMinute;
   const seconds = Math.ceil(divisor_for_seconds);
 
   const components = [zeroPadding(minutes), zeroPadding(seconds)];
@@ -361,14 +387,28 @@ export const formatTimestamp = (timestamp: number | string, longFormat: boolean 
   return formatLocale(time, format);
 };
 
-export const getCurrentDate = () => new Date().toISOString().substring(0, 10);
-export const getUnixTimestamp = () => Math.floor(Date.now() / TIME_IN_MILLIS.SECOND);
-export const isBeforeToday = (date: FnDate): boolean => isBefore(date, startOfToday());
-export const isYoungerThanMinute = (date: FnDate): boolean => differenceInMinutes(new Date(), date) < 1;
-export const isYoungerThan1Hour = (date: FnDate) => differenceInHours(new Date(), date) < 1;
-export const isYoungerThan7Days = (date: FnDate) => differenceInDays(new Date(), date) < 7;
+export const getCurrentDate = () => {
+  return new Date().toISOString().substring(0, isoDatePrefixLength);
+};
+export const getUnixTimestamp = () => {
+  return Math.floor(Date.now() / TIME_IN_MILLIS.SECOND);
+};
+export const isBeforeToday = (date: FnDate): boolean => {
+  return isBefore(date, startOfToday());
+};
+export const isYoungerThanMinute = (date: FnDate): boolean => {
+  return differenceInMinutes(new Date(), date) < 1;
+};
+export const isYoungerThan1Hour = (date: FnDate) => {
+  return differenceInHours(new Date(), date) < 1;
+};
+export const isYoungerThan7Days = (date: FnDate) => {
+  return differenceInDays(new Date(), date) < daysPerWeek;
+};
 
-export const fromNowLocale = (date: FnDate) => formatDistanceToNow(date, {addSuffix: true, locale: dateFnsLocale});
+export const fromNowLocale = (date: FnDate) => {
+  return formatDistanceToNow(date, {addSuffix: true, locale: dateFnsLocale});
+};
 
 export {isToday, fromUnixTime, isYesterday, isSameDay, isSameMonth, isThisYear, differenceInHours, differenceInMinutes};
 
@@ -447,7 +487,9 @@ export const formatCoarseDuration = (duration: number, translate: Translate) => 
  * @param date - The past date to compare (Date or timestamp).
  * @returns Duration in milliseconds between now and the given date.
  */
-export const durationFrom = (date: Date | number | string) => Date.now() - new Date(date).getTime();
+export const durationFrom = (date: Date | number | string) => {
+  return Date.now() - new Date(date).getTime();
+};
 
 /**
  * Calculate the number of days between two dates

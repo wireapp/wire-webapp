@@ -39,27 +39,29 @@ export const MeetingLinkForm = ({
   onGeneratePassword,
   copyDisabled,
   ...passwordFieldsProps
-}: MeetingLinkFormProps) => (
-  <div css={embeddedPasswordSectionStyles}>
-    <div css={embeddedPasswordActionsStyles}>
-      <div>
-        <PasswordGeneratorButton
-          translate={translate}
-          passwordLength={Config.getConfig().MINIMUM_PASSWORD_LENGTH}
-          onGeneratePassword={onGeneratePassword}
-        />
+}: MeetingLinkFormProps) => {
+  return (
+    <div css={embeddedPasswordSectionStyles}>
+      <div css={embeddedPasswordActionsStyles}>
+        <div>
+          <PasswordGeneratorButton
+            translate={translate}
+            passwordLength={Config.getConfig().MINIMUM_PASSWORD_LENGTH}
+            onGeneratePassword={onGeneratePassword}
+          />
+        </div>
+        <div>
+          <CopyToClipboardButton
+            disabled={copyDisabled}
+            textToCopy={passwordFieldsProps.passwordValue}
+            displayText={translate('guestOptionsPasswordCopyToClipboard')}
+            copySuccessText={translate('guestOptionsPasswordCopyToClipboardSuccess')}
+          />
+        </div>
       </div>
-      <div>
-        <CopyToClipboardButton
-          disabled={copyDisabled}
-          textToCopy={passwordFieldsProps.passwordValue}
-          displayText={translate('guestOptionsPasswordCopyToClipboard')}
-          copySuccessText={translate('guestOptionsPasswordCopyToClipboardSuccess')}
-        />
+      <div css={passwordFieldsStyles}>
+        <PasswordFields translate={translate} required={false} {...passwordFieldsProps} />
       </div>
     </div>
-    <div css={passwordFieldsStyles}>
-      <PasswordFields translate={translate} required={false} {...passwordFieldsProps} />
-    </div>
-  </div>
-);
+  );
+};

@@ -52,28 +52,17 @@ describe('getSelfUserDriveRole', () => {
 });
 
 describe('shouldRestrictCellsViewerActions', () => {
-  it('returns true for viewer access when the feature flag is enabled', () => {
+  it('returns true for viewer access', () => {
     expect(
       shouldRestrictCellsViewerActions({
-        isViewerPermissionFeatureEnabled: true,
         selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER,
       }),
     ).toBe(true);
   });
 
-  it('returns false for viewer access when the feature flag is disabled', () => {
+  it('returns false for editor access', () => {
     expect(
       shouldRestrictCellsViewerActions({
-        isViewerPermissionFeatureEnabled: false,
-        selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER,
-      }),
-    ).toBe(false);
-  });
-
-  it('returns false for editor access when the feature flag is enabled', () => {
-    expect(
-      shouldRestrictCellsViewerActions({
-        isViewerPermissionFeatureEnabled: true,
         selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.EDITOR,
       }),
     ).toBe(false);
@@ -81,33 +70,21 @@ describe('shouldRestrictCellsViewerActions', () => {
 });
 
 describe('canPerformCellsAction', () => {
-  it('blocks version history for viewer access when the feature flag is enabled', () => {
+  it('blocks version history for viewer access', () => {
     expect(
       canPerformCellsAction({
         action: CELLS_ACTION.VIEW_VERSION_HISTORY,
-        isViewerPermissionFeatureEnabled: true,
         selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER,
       }),
     ).toBe(false);
   });
 
-  it('blocks restricted actions for viewer access when the feature flag is enabled', () => {
+  it('blocks restricted actions for viewer access', () => {
     expect(
       canPerformCellsAction({
         action: CELLS_ACTION.RESTORE,
-        isViewerPermissionFeatureEnabled: true,
         selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER,
       }),
     ).toBe(false);
-  });
-
-  it('allows restricted actions for viewer access when the feature flag is disabled', () => {
-    expect(
-      canPerformCellsAction({
-        action: CELLS_ACTION.DOWNLOAD,
-        isViewerPermissionFeatureEnabled: false,
-        selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER,
-      }),
-    ).toBe(true);
   });
 });

@@ -19,26 +19,28 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const filterButton = (isActive: boolean): CSSObject => ({
-  background: 'none',
-  border: 'none',
-  padding: '4px',
-  cursor: 'pointer',
-  color: isActive ? 'var(--accent-color)' : 'var(--foreground)',
-  transition: 'color 0.15s ease',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  '&:hover': {
-    color: 'var(--accent-color)',
-  },
-  '&:focus': {
-    outline: 'none',
-  },
-  '& svg': {
-    fill: 'currentColor',
-  },
-});
+export const filterButton = (isActive: boolean): CSSObject => {
+  return {
+    background: 'none',
+    border: 'none',
+    padding: '4px',
+    cursor: 'pointer',
+    color: isActive ? 'var(--accent-color)' : 'var(--foreground)',
+    transition: 'color 0.15s ease',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    '&:hover': {
+      color: 'var(--accent-color)',
+    },
+    '&:focus': {
+      outline: 'none',
+    },
+    '& svg': {
+      fill: 'currentColor',
+    },
+  };
+};
 
 export const dropdown: CSSObject = {
   position: 'absolute',

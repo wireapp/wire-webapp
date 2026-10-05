@@ -36,7 +36,9 @@ describe('loadMeetingsList', () => {
     tzid: 'Europe/Berlin',
   };
 
-  const createRepository = (getMeetingsList: jest.Mock) => ({getMeetingsList}) as unknown as MeetingsRepository;
+  const createRepository = (getMeetingsList: jest.Mock) => {
+    return {getMeetingsList} as unknown as MeetingsRepository;
+  };
 
   it('returns an empty list after a successful response with no meetings', async () => {
     const getMeetingsList = jest.fn().mockReturnValue(task.resolve([]));

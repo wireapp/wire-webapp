@@ -48,7 +48,9 @@ describe('useKeyPressAndHold', () => {
   });
 
   it('triggers onHold after holdDelay and onRelease when key is released', () => {
-    renderHook(() => useKeyPressAndHold(defaultProps));
+    renderHook(() => {
+      return useKeyPressAndHold(defaultProps);
+    });
 
     act(() => {
       window.dispatchEvent(new KeyboardEvent('keydown', {key: KEY.SPACE}));
@@ -68,7 +70,9 @@ describe('useKeyPressAndHold', () => {
   });
 
   it('calls onRelease only when onHold returns true', () => {
-    renderHook(() => useKeyPressAndHold(defaultProps));
+    renderHook(() => {
+      return useKeyPressAndHold(defaultProps);
+    });
 
     act(() => {
       window.dispatchEvent(new KeyboardEvent('keyup', {key: KEY.SPACE}));
@@ -87,7 +91,9 @@ describe('useKeyPressAndHold', () => {
   });
 
   it("doesn't call onRelease only when onHold returns false", () => {
-    renderHook(() => useKeyPressAndHold({...defaultProps, onHold: jest.fn().mockReturnValue(false)}));
+    renderHook(() => {
+      return useKeyPressAndHold({...defaultProps, onHold: jest.fn().mockReturnValue(false)});
+    });
 
     act(() => {
       window.dispatchEvent(new KeyboardEvent('keydown', {key: KEY.SPACE}));
@@ -99,7 +105,9 @@ describe('useKeyPressAndHold', () => {
   });
 
   it("doesn't respond to key events when disabled", () => {
-    renderHook(() => useKeyPressAndHold({...defaultProps, enabled: false}));
+    renderHook(() => {
+      return useKeyPressAndHold({...defaultProps, enabled: false});
+    });
 
     act(() => {
       window.dispatchEvent(new KeyboardEvent('keydown', {key: KEY.SPACE}));
@@ -112,7 +120,9 @@ describe('useKeyPressAndHold', () => {
   });
 
   it('cleans up timeouts on unmount', () => {
-    const {unmount} = renderHook(() => useKeyPressAndHold(defaultProps));
+    const {unmount} = renderHook(() => {
+      return useKeyPressAndHold(defaultProps);
+    });
 
     act(() => {
       window.dispatchEvent(new KeyboardEvent('keydown', {key: KEY.SPACE}));
@@ -128,7 +138,9 @@ describe('useKeyPressAndHold', () => {
   });
 
   it('handles multiple key presses correctly', () => {
-    renderHook(() => useKeyPressAndHold(defaultProps));
+    renderHook(() => {
+      return useKeyPressAndHold(defaultProps);
+    });
 
     act(() => {
       window.dispatchEvent(new KeyboardEvent('keydown', {key: KEY.SPACE}));
@@ -155,7 +167,9 @@ describe('useKeyPressAndHold', () => {
       removeEventListener: jest.fn(),
     } as unknown as Window;
 
-    renderHook(() => useKeyPressAndHold({...defaultProps, activeWindow: mockWindow}));
+    renderHook(() => {
+      return useKeyPressAndHold({...defaultProps, activeWindow: mockWindow});
+    });
 
     expect(mockWindow.addEventListener).toHaveBeenCalledWith('keydown', expect.any(Function), true);
     expect(mockWindow.addEventListener).toHaveBeenCalledWith('keyup', expect.any(Function), true);

@@ -35,21 +35,25 @@ export type MeetNowFormErrors = {
   passwordConfirmation: MeetingPasswordErrorKey | undefined;
 };
 
-export const emptyMeetNowFormErrors = (): MeetNowFormErrors => ({
-  title: undefined,
-  password: undefined,
-  passwordConfirmation: undefined,
-});
+export const emptyMeetNowFormErrors = (): MeetNowFormErrors => {
+  return {
+    title: undefined,
+    password: undefined,
+    passwordConfirmation: undefined,
+  };
+};
 
 export const meetNowSubmitResults = {
   creationFailed: 'creationFailed',
   setupFailed: 'setupFailed',
   joined: 'joined',
+  prepOpened: 'prepOpened',
   joinBlocked: 'joinBlocked',
   joinFailed: 'joinFailed',
 } as const;
 
 export type MeetNowSubmitResult = (typeof meetNowSubmitResults)[keyof typeof meetNowSubmitResults];
 
-export const wasMeetNowMeetingCreated = (result: MeetNowSubmitResult): boolean =>
-  result !== meetNowSubmitResults.creationFailed;
+export const wasMeetNowMeetingCreated = (result: MeetNowSubmitResult): boolean => {
+  return result !== meetNowSubmitResults.creationFailed;
+};

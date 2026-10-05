@@ -62,14 +62,24 @@ describe('GroupCreationModal', () => {
       const mockUserState: UserState = {
         self: ko.observable(mockUser),
         users: ko.observableArray<User>([]),
-        connectedUsers: ko.pureComputed(() => [] as User[]),
-        connectRequests: ko.pureComputed(() => [] as User[]),
+        connectedUsers: ko.pureComputed(() => {
+          return [] as User[];
+        }),
+        connectRequests: ko.pureComputed(() => {
+          return [] as User[];
+        }),
       };
 
       const mockTeamState: TypeUtil.RecursivePartial<TeamState> = {
-        isMLSEnabled: ko.pureComputed(() => isMLSEnabled),
-        isAppsEnabled: ko.pureComputed(() => isAppsEnabled),
-        isTeam: ko.pureComputed(() => true),
+        isMLSEnabled: ko.pureComputed(() => {
+          return isMLSEnabled;
+        }),
+        isAppsEnabled: ko.pureComputed(() => {
+          return isAppsEnabled;
+        }),
+        isTeam: ko.pureComputed(() => {
+          return true;
+        }),
         teamFeatures: ko.observable({
           mls: {
             config: {

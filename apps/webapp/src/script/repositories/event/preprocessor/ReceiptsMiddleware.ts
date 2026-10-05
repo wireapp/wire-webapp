@@ -17,6 +17,7 @@
  *
  */
 
+import {isTruthy} from '@sindresorhus/is';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
@@ -51,7 +52,9 @@ export class ReceiptsMiddleware implements EventMiddleware {
       case ClientEvent.CONVERSATION.KNOCK:
       case ClientEvent.CONVERSATION.LOCATION:
       case ClientEvent.CONVERSATION.MESSAGE_ADD: {
-        const qualifiedConversation = event.qualified_conversation || {domain: '', id: event.conversation};
+        const qualifiedConversation = isTruthy(event.qualified_conversation)
+          ? event.qualified_conversation
+          : {domain: '', id: event.conversation};
         const conversation = await this.conversationRepository.getConversationById(qualifiedConversation);
         if (conversation?.isGroupOrChannel()) {
           // We only override the value of expects_read_confirmation for group conversations (one to one conversation use the value set by the sender)
@@ -63,7 +66,10 @@ export class ReceiptsMiddleware implements EventMiddleware {
       case ClientEvent.CONVERSATION.CONFIRMATION: {
         const messageIds = event.data.more_message_ids.concat(event.data.message_id);
         const originalEvents = await this.eventService.loadEvents(event.conversation, messageIds);
-        originalEvents.forEach(originalEvent => this.updateConfirmationStatus(originalEvent, event));
+        originalEvents.forEach(originalEvent => {
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises -- Receipt updates are intentionally started without awaiting this batch.
+          this.updateConfirmationStatus(originalEvent, event);
+        });
         this.logger.info(
           `Confirmed '${originalEvents.length}' messages with status '${event.data.status}' from '${event.from}'`,
         );
@@ -84,7 +90,8 @@ export class ReceiptsMiddleware implements EventMiddleware {
     confirmationEvent: ConfirmationEvent,
   ): Promise<EventRecord | void> {
     const status = confirmationEvent.data.status;
-    const currentReceipts = ('read_receipts' in originalEvent && originalEvent.read_receipts) || [];
+    const currentReceipts =
+      'read_receipts' in originalEvent && isTruthy(originalEvent.read_receipts) ? originalEvent.read_receipts : [];
 
     // I shouldn't receive this read receipt
     if (!this.isMyMessage(originalEvent)) {
@@ -92,7 +99,10 @@ export class ReceiptsMiddleware implements EventMiddleware {
     }
 
     const hasReadMessage =
-      status === StatusType.SEEN && currentReceipts.some(({userId}) => confirmationEvent.from === userId);
+      status === StatusType.SEEN &&
+      currentReceipts.some(({userId}) => {
+        return confirmationEvent.from === userId;
+      });
     if (hasReadMessage) {
       // if the user is already among the readers of the message, nothing more to do
       return Promise.resolve();

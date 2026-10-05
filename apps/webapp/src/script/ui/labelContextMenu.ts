@@ -35,7 +35,9 @@ export const showLabelContextMenu = (
   labelContextMenuCopy: LabelContextMenuCopy,
 ): void => {
   const newLabel: ContextMenuEntry = {
-    click: () => labelRepository.addConversationToNewLabel(conversation),
+    click: () => {
+      return labelRepository.addConversationToNewLabel(conversation);
+    },
     icon: PlusIcon,
     label: labelContextMenuCopy.newFolder,
   };
@@ -47,14 +49,21 @@ export const showLabelContextMenu = (
   };
 
   const conversationLabel = labelRepository.getConversationCustomLabel(conversation);
-  const labels = labelRepository.getLabels().filter(label => !!labelRepository.getLabelConversations(label).length);
-  const namedLabels: ContextMenuEntry[] = labels.length
-    ? labels.map(label => ({
-        click: () => labelRepository.addConversationToLabel(label, conversation),
-        isChecked: label === conversationLabel,
-        label: label.name,
-      }))
-    : [noLabels];
+  const labels = labelRepository.getLabels().filter(label => {
+    return labelRepository.getLabelConversations(label).length > 0;
+  });
+  const namedLabels: ContextMenuEntry[] =
+    labels.length > 0
+      ? labels.map(label => {
+          return {
+            click: () => {
+              return labelRepository.addConversationToLabel(label, conversation);
+            },
+            isChecked: label === conversationLabel,
+            label: label.name,
+          };
+        })
+      : [noLabels];
 
   const entries: ContextMenuEntry[] = [newLabel, separator, ...namedLabels];
   showContextMenu({event, entries, identifier: 'conversation-label-context-menu'});

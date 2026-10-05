@@ -130,20 +130,23 @@ const SetEmailComponent = ({
 };
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
-const mapStateToProps = (state: RootState) => ({
-  hasSelfEmail: SelfSelector.hasSelfEmail(state),
-  isFetching: SelfSelector.isFetching(state),
-  isSelfSSOUser: SelfSelector.isSSOUser(state),
-});
+const mapStateToProps = (state: RootState) => {
+  return {
+    hasSelfEmail: SelfSelector.hasSelfEmail(state),
+    isFetching: SelfSelector.isFetching(state),
+    isSelfSSOUser: SelfSelector.isSSOUser(state),
+  };
+};
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
-  bindActionCreators(
+const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => {
+  return bindActionCreators(
     {
       doSetEmail: actionRoot.selfAction.doSetEmail,
     },
     dispatch,
   );
+};
 
 const SetEmail = connect(mapStateToProps, mapDispatchToProps)(SetEmailComponent);
 

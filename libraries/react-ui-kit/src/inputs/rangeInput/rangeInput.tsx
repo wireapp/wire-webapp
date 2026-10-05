@@ -33,6 +33,8 @@ import {Theme} from '../../identity/theme';
 import {TextProps} from '../../typography';
 import {InputLabel} from '../inputLabel';
 
+const percentageScale = 100;
+
 export interface RangeInputProps<T = HTMLInputElement> extends TextProps<T> {
   label?: string;
   minValueLabel?: string;
@@ -60,21 +62,35 @@ export const RangeInput = forwardRef<HTMLInputElement, RangeInputProps<HTMLInput
     const maxNum = Number(max);
     const valueNum = Number(value);
 
-    const backgroundSize = `${((valueNum - minNum) * 100) / (maxNum - minNum)}% 100%` as const;
+    const backgroundSize = `${((valueNum - minNum) * percentageScale) / (maxNum - minNum)}% 100%` as const;
 
     return (
       <div css={wrapperCSS}>
         {isNonEmptyString(label) && <InputLabel htmlFor={id}>{label}</InputLabel>}
         <div css={rangeInputWrapperStyles}>
           {isNonEmptyString(minValueLabel) && (
-            <span css={(theme: Theme) => getValueLabelStyles(theme, ValueLabelPosition.LEFT)}>{minValueLabel}</span>
+            <span
+              css={(theme: Theme) => {
+                return getValueLabelStyles(theme, ValueLabelPosition.LEFT);
+              }}
+            >
+              {minValueLabel}
+            </span>
           )}
           {isNonEmptyString(maxValueLabel) && (
-            <span css={(theme: Theme) => getValueLabelStyles(theme, ValueLabelPosition.RIGHT)}>{maxValueLabel}</span>
+            <span
+              css={(theme: Theme) => {
+                return getValueLabelStyles(theme, ValueLabelPosition.RIGHT);
+              }}
+            >
+              {maxValueLabel}
+            </span>
           )}
           <input
             ref={ref}
-            css={(theme: Theme) => getImageCropZoomInputStyles(theme, backgroundSize)}
+            css={(theme: Theme) => {
+              return getImageCropZoomInputStyles(theme, backgroundSize);
+            }}
             id={id}
             name={id}
             min={min}

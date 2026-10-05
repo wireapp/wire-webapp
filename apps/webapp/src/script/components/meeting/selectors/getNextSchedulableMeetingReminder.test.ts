@@ -28,19 +28,21 @@ import {getNextSchedulableMeetingReminder} from './getNextSchedulableMeetingRemi
 
 const reminderOffsetMs = TIME_IN_MILLIS.MINUTE * 10;
 
-const createMeetingSeries = (overrides: Partial<MeetingSeries> = {}): MeetingSeries => ({
-  series_start_date: '2026-06-01T10:00:00.000Z',
-  series_end_date: '2026-06-01T11:00:00.000Z',
-  duration_ms: TIME_IN_MILLIS.HOUR,
-  recurrence: 'doesNotRepeat',
-  conversation_id: 'conversation-id',
-  qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
-  qualified_id: {id: 'meeting-id', domain: 'example.com'},
-  qualified_creator: {id: 'creator-id', domain: 'example.com'},
-  title: 'Weekly sync',
-  tzid: 'UTC',
-  ...overrides,
-});
+const createMeetingSeries = (overrides: Partial<MeetingSeries> = {}): MeetingSeries => {
+  return {
+    series_start_date: '2026-06-01T10:00:00.000Z',
+    series_end_date: '2026-06-01T11:00:00.000Z',
+    duration_ms: TIME_IN_MILLIS.HOUR,
+    recurrence: 'doesNotRepeat',
+    conversation_id: 'conversation-id',
+    qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
+    qualified_id: {id: 'meeting-id', domain: 'example.com'},
+    qualified_creator: {id: 'creator-id', domain: 'example.com'},
+    title: 'Weekly sync',
+    tzid: 'UTC',
+    ...overrides,
+  };
+};
 
 describe('getNextSchedulableMeetingReminder', () => {
   it('schedules ten minutes before the next scheduled start', () => {
@@ -109,7 +111,9 @@ describe('getNextSchedulableMeetingReminder', () => {
     const reminder = getNextSchedulableMeetingReminder(
       meeting,
       Date.parse('2026-06-01T09:00:00.000Z'),
-      occurrenceStartMs => occurrenceStartMs === firedStartMs,
+      occurrenceStartMs => {
+        return occurrenceStartMs === firedStartMs;
+      },
     );
 
     assert(maybe.isJust(reminder));

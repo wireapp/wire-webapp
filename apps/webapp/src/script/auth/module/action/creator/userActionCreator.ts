@@ -40,14 +40,20 @@ export interface SendActivationCodeFailedAction extends AppAction {
 }
 
 export class UserActionCreator {
-  static startSendActivationCode = (): SendActivationCodeStartAction => ({
-    type: USER_ACTION.USER_SEND_ACTIVATION_CODE_START,
-  });
-  static successfulSendActivationCode = (): SendActivationCodeSuccessAction => ({
-    type: USER_ACTION.USER_SEND_ACTIVATION_CODE_SUCCESS,
-  });
-  static failedSendActivationCode = (error: Error): SendActivationCodeFailedAction => ({
-    error,
-    type: USER_ACTION.USER_SEND_ACTIVATION_CODE_FAILED,
-  });
+  static startSendActivationCode = (): SendActivationCodeStartAction => {
+    return {
+      type: USER_ACTION.USER_SEND_ACTIVATION_CODE_START,
+    };
+  };
+  static successfulSendActivationCode = (): SendActivationCodeSuccessAction => {
+    return {
+      type: USER_ACTION.USER_SEND_ACTIVATION_CODE_SUCCESS,
+    };
+  };
+  static failedSendActivationCode = (error: Error): SendActivationCodeFailedAction => {
+    return {
+      error,
+      type: USER_ACTION.USER_SEND_ACTIVATION_CODE_FAILED,
+    };
+  };
 }

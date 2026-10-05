@@ -24,6 +24,8 @@ import {BreadcrumbLeaf} from './breadcrumbLeaf/breadcrumbLeaf';
 import {listStyles} from './breadcrumbs.styles';
 import {CombainedBreadcrumbs} from './combainedBreadcrumbs/combainedBreadcrumbs';
 
+const trailingBreadcrumbCount = 2;
+
 const DEFAULT_MAX_VISIBLE_BREADCRUMBS = 4;
 
 interface BreadcrumbsProps {
@@ -33,7 +35,7 @@ interface BreadcrumbsProps {
    */
   maxNotCombinedItems?: number;
 
-  items: Array<{name: string; icon?: ReactNode}>;
+  items: {name: string; icon?: ReactNode}[];
 
   onItemClick: (item: {name: string}) => void;
 }
@@ -56,29 +58,31 @@ export const Breadcrumbs = ({
   if (items.length <= maxNotCombinedItems) {
     return (
       <ol css={listStyles}>
-        {items.map((crumb, index) => (
-          <>
-            {index > 0 && <BreadcrumbLeaf />}
-            <BreadcrumbItem
-              key={crumb.name}
-              name={crumb.name}
-              icon={crumb.icon}
-              isActive={index === items.length - 1}
-              onClick={() => onItemClick(crumb)}
-              isFirst={index === 0}
-            />
-          </>
-        ))}
+        {items.map((crumb, index) => {
+          return (
+            <>
+              {index > 0 && <BreadcrumbLeaf />}
+              <BreadcrumbItem
+                key={crumb.name}
+                name={crumb.name}
+                icon={crumb.icon}
+                isActive={index === items.length - 1}
+                onClick={() => {
+                  return onItemClick(crumb);
+                }}
+                isFirst={index === 0}
+              />
+            </>
+          );
+        })}
       </ol>
     );
   }
 
   const firstCrumb = items[0];
 
-  // eslint-disable-next-line no-magic-numbers
-  const lastTwoCrumbs = items.slice(-2);
-  // eslint-disable-next-line no-magic-numbers
-  const middleCrumbs = items.slice(1, -2);
+  const lastTwoCrumbs = items.slice(-trailingBreadcrumbCount);
+  const middleCrumbs = items.slice(1, -trailingBreadcrumbCount);
 
   return (
     <ol css={listStyles}>
@@ -86,25 +90,31 @@ export const Breadcrumbs = ({
         name={firstCrumb.name}
         icon={firstCrumb.icon}
         isActive={false}
-        onClick={() => onItemClick(firstCrumb)}
+        onClick={() => {
+          return onItemClick(firstCrumb);
+        }}
         isFirst={true}
       />
       <BreadcrumbLeaf />
       <CombainedBreadcrumbs items={middleCrumbs} onItemClick={onItemClick} />
       <BreadcrumbLeaf />
-      {lastTwoCrumbs.map((crumb, index) => (
-        <>
-          {index > 0 && <BreadcrumbLeaf />}
-          <BreadcrumbItem
-            key={crumb.name}
-            name={crumb.name}
-            icon={crumb.icon}
-            isActive={index === lastTwoCrumbs.length - 1}
-            onClick={() => onItemClick(crumb)}
-            isFirst={false}
-          />
-        </>
-      ))}
+      {lastTwoCrumbs.map((crumb, index) => {
+        return (
+          <>
+            {index > 0 && <BreadcrumbLeaf />}
+            <BreadcrumbItem
+              key={crumb.name}
+              name={crumb.name}
+              icon={crumb.icon}
+              isActive={index === lastTwoCrumbs.length - 1}
+              onClick={() => {
+                return onItemClick(crumb);
+              }}
+              isFirst={false}
+            />
+          </>
+        );
+      })}
     </ol>
   );
 };

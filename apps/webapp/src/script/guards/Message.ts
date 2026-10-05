@@ -17,22 +17,42 @@
  *
  */
 
+import {isTruthy} from '@sindresorhus/is';
+
 import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {DeleteMessage} from 'Repositories/entity/message/deleteMessage';
 import {MemberMessage} from 'Repositories/entity/message/memberMessage';
 
 import {SuperType} from '../message/superType';
 
-export const isReadableMessage = (message: any): message is ContentMessage =>
-  message &&
-  'super_type' in message &&
-  (message.super_type === SuperType.CONTENT || message.super_type === SuperType.PING);
+export const isReadableMessage = (message: any): message is ContentMessage => {
+  if (!isTruthy(message)) {
+    return message;
+  }
 
-export const isContentMessage = (message: any): message is ContentMessage =>
-  message && 'super_type' in message && message.super_type === SuperType.CONTENT;
+  return 'super_type' in message && (message.super_type === SuperType.CONTENT || message.super_type === SuperType.PING);
+};
 
-export const isDeleteMessage = (message: any): message is DeleteMessage =>
-  message && 'super_type' in message && message.super_type === SuperType.DELETE;
+export const isContentMessage = (message: any): message is ContentMessage => {
+  if (!isTruthy(message)) {
+    return message;
+  }
 
-export const isMemberMessage = (message: any | undefined | null): message is MemberMessage =>
-  message && 'super_type' in message && message.super_type === SuperType.MEMBER;
+  return 'super_type' in message && message.super_type === SuperType.CONTENT;
+};
+
+export const isDeleteMessage = (message: any): message is DeleteMessage => {
+  if (!isTruthy(message)) {
+    return message;
+  }
+
+  return 'super_type' in message && message.super_type === SuperType.DELETE;
+};
+
+export const isMemberMessage = (message: any | undefined | null): message is MemberMessage => {
+  if (!isTruthy(message)) {
+    return message;
+  }
+
+  return 'super_type' in message && message.super_type === SuperType.MEMBER;
+};

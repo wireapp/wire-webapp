@@ -19,12 +19,16 @@
 
 import {useCallback, useEffect, useRef, useState} from 'react';
 
+import {isUndefined} from '@sindresorhus/is';
 import {Virtualizer} from '@tanstack/react-virtual';
 
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {isLastReceivedMessage} from 'Util/conversationMessages';
+
+const viewportCenterDivisor = 2;
+const messageLoadDebounceInMilliseconds = 100;
 
 type UseLoadMessagesProps = {
   conversation: Conversation;
@@ -70,7 +74,7 @@ export const useLoadMessages = (
   const loadFollowingMessages = useCallback(async () => {
     const lastMessage = conversation.getNewestMessage();
 
-    if (lastMessage) {
+    if (!isUndefined(lastMessage)) {
       if (!isLastReceivedMessage(lastMessage, conversation)) {
         virtualizer.measure();
         setIsLoadingMessages(true);
@@ -78,7 +82,7 @@ export const useLoadMessages = (
         await conversationRepository.getSubsequentMessages(conversation, lastMessage).finally(() => {
           requestAnimationFrame(() => {
             const clientHeight = parentElement.clientHeight;
-            const diff = clientHeight / 2;
+            const diff = clientHeight / viewportCenterDivisor;
 
             parentElement.scrollTop += diff;
             setIsLoadingMessages(false);
@@ -93,7 +97,9 @@ export const useLoadMessages = (
   // Load previous messages when scrolling to the top
   useEffect(() => {
     if (isLoadingMessages) {
-      return () => undefined;
+      return () => {
+        return undefined;
+      };
     }
 
     const timeout = setTimeout(() => {
@@ -109,15 +115,19 @@ export const useLoadMessages = (
       if (firstItem.index === 0) {
         fireAndForgetInvoker.fireAndForget(loadPrecedingMessages);
       }
-    }, 100);
+    }, messageLoadDebounceInMilliseconds);
 
-    return () => clearTimeout(timeout);
+    return () => {
+      return clearTimeout(timeout);
+    };
   }, [fireAndForgetInvoker, isConversationLoaded, isLoadingMessages, loadPrecedingMessages, virtualItems]);
 
   // Load new messages when scrolling to the down
   useEffect(() => {
     if (isLoadingMessages) {
-      return () => undefined;
+      return () => {
+        return undefined;
+      };
     }
 
     const timeout = setTimeout(() => {
@@ -133,9 +143,11 @@ export const useLoadMessages = (
       if (lastItem.index >= itemsLength - 1) {
         fireAndForgetInvoker.fireAndForget(loadFollowingMessages);
       }
-    }, 100);
+    }, messageLoadDebounceInMilliseconds);
 
-    return () => clearTimeout(timeout);
+    return () => {
+      return clearTimeout(timeout);
+    };
   }, [
     fireAndForgetInvoker,
     isConversationLoaded,
@@ -152,7 +164,9 @@ export const useLoadMessages = (
   // Load more messages on mount if the list doesn't fill the viewport
   useEffect(() => {
     if (itemsLength === 0 || fillContainerByMessagesRef.current) {
-      return () => undefined;
+      return () => {
+        return undefined;
+      };
     }
 
     const frame = requestAnimationFrame(() => {
@@ -166,6 +180,8 @@ export const useLoadMessages = (
       fillContainerByMessagesRef.current = true;
     });
 
-    return () => cancelAnimationFrame(frame);
+    return () => {
+      return cancelAnimationFrame(frame);
+    };
   }, [fireAndForgetInvoker, itemsLength, loadPrecedingMessages, virtualizer]);
 };

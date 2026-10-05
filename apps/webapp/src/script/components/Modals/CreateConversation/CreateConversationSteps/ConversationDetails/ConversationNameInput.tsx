@@ -78,7 +78,9 @@ export const ConversationNameInput = () => {
       uieName="enter-group-name"
       name="enter-group-name"
       errorUieName="error-group-name"
-      onCancel={() => setConversationName('')}
+      onCancel={() => {
+        return setConversationName('');
+      }}
       onChange={onGroupNameChange}
       onBlur={event => {
         const {value} = event.target as HTMLInputElement;

@@ -25,8 +25,8 @@ import {DecryptionError} from '../../../../errors/decryptionError';
 
 const basePayload = {userId: {id: 'user1', domain: 'domain'}, clientId: 'client1'};
 
-const createStructuredProteusError = (errorCode?: number) =>
-  Object.assign(new Error('proteus decryption error'), {
+const createStructuredProteusError = (errorCode?: number) => {
+  return Object.assign(new Error('proteus decryption error'), {
     name: 'ProteusErrorOther',
     errorStack: [],
     type: ErrorType.Proteus,
@@ -35,6 +35,7 @@ const createStructuredProteusError = (errorCode?: number) =>
       context: errorCode === undefined ? {} : {errorCode},
     },
   });
+};
 
 describe('generateDecryptionError', () => {
   it.each([ProteusErrors.TooDistantFuture, ProteusErrors.PreKeyMessageUnMatchedSignature])(

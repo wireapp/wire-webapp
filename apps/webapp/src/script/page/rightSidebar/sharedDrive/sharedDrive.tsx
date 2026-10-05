@@ -19,6 +19,7 @@
 
 import {useMemo} from 'react';
 
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {UserType} from '@wireapp/api-client/lib/user';
 import {noop} from 'noop-esm';
 
@@ -70,11 +71,11 @@ const SharedDrive = ({activeConversation, onBack, onClose}: SharedDriveProps) =>
   } = useKoSubscribableChildren(activeConversation, ['isSelfUserRemoved', 'participating_user_ets', 'selfUser']);
 
   const participants = useMemo(() => {
-    const users = participatingUsers.filter(
-      (participant): participant is User => participant.type === UserType.REGULAR,
-    );
+    const users = participatingUsers.filter((participant): participant is User => {
+      return participant.type === UserType.REGULAR;
+    });
 
-    if (!isSelfUserRemoved && selfUser) {
+    if (!isSelfUserRemoved && !isNullOrUndefined(selfUser)) {
       return [...users, selfUser].toSorted(sortUsersByPriority);
     }
 

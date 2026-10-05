@@ -186,10 +186,11 @@ describe('generate-unit-test-reports', (): void => {
     );
 
     expect(executedProjectNames).toEqual(['first-project', 'second-project']);
-    expect(projectTestResults.map((projectTestResult): string => projectTestResult.status)).toEqual([
-      'failed',
-      'passed',
-    ]);
+    expect(
+      projectTestResults.map((projectTestResult): string => {
+        return projectTestResult.status;
+      }),
+    ).toEqual(['failed', 'passed']);
     expect(createManifest(projectTestResults, reportSettings).overallStatus).toBe('failed');
   });
 });

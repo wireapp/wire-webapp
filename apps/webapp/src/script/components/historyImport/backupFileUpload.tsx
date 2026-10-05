@@ -41,7 +41,9 @@ const BackupFileUpload = ({
   const {translate} = useApplicationContext();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const fileInputClick = () => fileInputRef.current?.click();
+  const fileInputClick = () => {
+    return fileInputRef.current?.click();
+  };
 
   return (
     <>
@@ -74,7 +76,9 @@ const BackupFileUpload = ({
           type="file"
           accept={`.${HistoryExportConfig.LEGACY_FILE_EXTENSION},.${HistoryExportConfig.UNIVERSAL_FILE_EXTENSION}`}
           onChange={onFileChange}
-          onFocus={({target}) => target.blur()}
+          onFocus={({target}) => {
+            return target.blur();
+          }}
           data-uie-name="input-import-file"
           aria-describedby="preferences-history-describe-2"
         />
@@ -84,8 +88,12 @@ const BackupFileUpload = ({
         className={cssClassName}
         role="button"
         tabIndex={TabIndex.FOCUSABLE}
-        onKeyDown={event => handleKeyDown({event, callback: fileInputClick, keys: [KEY.ENTER, KEY.SPACE]})}
-        onClick={() => fileInputRef.current?.click()}
+        onKeyDown={event => {
+          return handleKeyDown({event, callback: fileInputClick, keys: [KEY.ENTER, KEY.SPACE]});
+        }}
+        onClick={() => {
+          return fileInputRef.current?.click();
+        }}
         aria-label={translate('backupImportRestoreHistory')}
       >
         <span>{backupImportHeadLine}</span>

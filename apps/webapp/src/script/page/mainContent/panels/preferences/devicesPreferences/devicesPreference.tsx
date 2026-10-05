@@ -71,8 +71,9 @@ export const DevicesPreferences = ({
   const currentClient = clientState.currentClient;
 
   const isSSO = selfUser.isNoPasswordSSO;
-  const getFingerprint = (device: ClientEntity) =>
-    cryptographyRepository.getRemoteFingerprint(selfUser.qualifiedId, device.id);
+  const getFingerprint = (device: ClientEntity) => {
+    return cryptographyRepository.getRemoteFingerprint(selfUser.qualifiedId, device.id);
+  };
 
   useEffect(() => {
     void cryptographyRepository.getLocalFingerprint().then(setLocalFingerprint);
@@ -88,11 +89,15 @@ export const DevicesPreferences = ({
           await removeDevice(device);
           setSelectedDevice(undefined);
         }}
-        onClose={() => setSelectedDevice(undefined)}
-        onVerify={(device, verified) => verifyDevice(selfUser.qualifiedId, device, verified)}
-        onResetSession={device =>
-          resetSession(selfUser.qualifiedId, device, conversationState.getSelfProteusConversation())
-        }
+        onClose={() => {
+          return setSelectedDevice(undefined);
+        }}
+        onVerify={(device, verified) => {
+          return verifyDevice(selfUser.qualifiedId, device, verified);
+        }}
+        onResetSession={device => {
+          return resetSession(selfUser.qualifiedId, device, conversationState.getSelfProteusConversation());
+        }}
       />
     );
   }
@@ -116,17 +121,19 @@ export const DevicesPreferences = ({
       {devices.length > 0 && (
         <fieldset className="preferences-section">
           <legend className="preferences-header">{translate('preferencesDevicesActive')}</legend>
-          {devices.map((device, index) => (
-            <Device
-              device={device}
-              key={device.id}
-              isSSO={isSSO}
-              onSelect={setSelectedDevice}
-              onRemove={removeDevice}
-              deviceNumber={++index}
-              getDeviceIdentity={getDeviceIdentity}
-            />
-          ))}
+          {devices.map((device, index) => {
+            return (
+              <Device
+                device={device}
+                key={device.id}
+                isSSO={isSSO}
+                onSelect={setSelectedDevice}
+                onRemove={removeDevice}
+                deviceNumber={++index}
+                getDeviceIdentity={getDeviceIdentity}
+              />
+            );
+          })}
           <p className="preferences-detail">{translate('preferencesDevicesActiveDetail')}</p>
         </fieldset>
       )}

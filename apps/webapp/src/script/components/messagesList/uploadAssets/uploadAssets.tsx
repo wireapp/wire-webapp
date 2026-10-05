@@ -17,6 +17,8 @@
  *
  */
 
+import {isEmptyArray, isNonEmptyArray, isUndefined} from '@sindresorhus/is';
+
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
@@ -35,24 +37,30 @@ export const UploadAssets = ({assetRepository, conversationId, scrollToEnd}: Pro
     'uploadProgressQueue',
   ]);
 
-  if (!processQueue?.length) {
+  if (!isNonEmptyArray(processQueue)) {
     return null;
   }
 
-  const currentConversationProcessQueue = processQueue.filter(item => item.conversationId === conversationId);
+  const currentConversationProcessQueue = processQueue.filter(item => {
+    return item.conversationId === conversationId;
+  });
 
-  if (!currentConversationProcessQueue.length) {
+  if (isEmptyArray(currentConversationProcessQueue)) {
     return null;
   }
 
-  const uploadProgressMap = new Map(uploadProgressQueue.map(item => [item.messageId, item]));
+  const uploadProgressMap = new Map(
+    uploadProgressQueue.map(item => {
+      return [item.messageId, item];
+    }),
+  );
 
   return (
     <div css={uploadAssetsContainer} data-uie-name="upload-assets">
       {currentConversationProcessQueue.map(processingMessage => {
         const processingAsset = uploadProgressMap.get(processingMessage.message.messageId);
 
-        if (!processingAsset) {
+        if (isUndefined(processingAsset)) {
           return null;
         }
 

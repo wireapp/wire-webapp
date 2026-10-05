@@ -41,7 +41,9 @@ const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
             }, TIME_IN_MILLIS.SECOND);
           }
         }}
-        onFocus={({target}) => target.blur()}
+        onFocus={({target}) => {
+          return target.blur();
+        }}
         {...rest}
       />
     );

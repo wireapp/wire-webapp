@@ -80,7 +80,9 @@ export class ConversationListPage {
         return enhancedLocator;
       },
 
-      openContextMenu: () => this.openContextMenu(conversation),
+      openContextMenu: () => {
+        return this.openContextMenu(conversation);
+      },
     });
 
     return enhancedLocator;

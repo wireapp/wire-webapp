@@ -108,14 +108,16 @@ describe('ActionsViewModel.leaveConversation', () => {
     jest.spyOn(PrimaryModal, 'show').mockReturnValue(undefined);
   });
 
-  afterEach(() => jest.restoreAllMocks());
+  afterEach(() => {
+    return jest.restoreAllMocks();
+  });
 
   it('uses the injected translate function for modal copy', () => {
     const selfUser = new User('self-id', 'example.com', translateForTest);
     const userToBlock = makeEligibleUser('blocked-user');
-    const translate = jest.fn(
-      (translationKey: Parameters<Translate>[0]) => `translated:${translationKey}`,
-    ) as Translate;
+    const translate = jest.fn((translationKey: Parameters<Translate>[0]) => {
+      return `translated:${translationKey}`;
+    }) as Translate;
 
     const {vm} = buildActionsViewModel({selfUser, translate});
 
@@ -219,7 +221,11 @@ describe('ActionsViewModel.leaveConversation', () => {
       await vm.leaveConversation(conversation);
 
       const {eligibleUsers} = mockShow.mock.calls[0][0] as {eligibleUsers: User[]};
-      expect(eligibleUsers.every(u => u.id !== selfUser.id)).toBe(true);
+      expect(
+        eligibleUsers.every(u => {
+          return u.id !== selfUser.id;
+        }),
+      ).toBe(true);
     });
 
     it('passes an empty eligibleUsers list to the modal when no participant meets eligibility criteria', async () => {
@@ -251,8 +257,12 @@ describe('ActionsViewModel.leaveConversation', () => {
       conversation.roles({[selfUser.id]: DefaultConversationRoleName.WIRE_ADMIN});
 
       const callOrder: string[] = [];
-      const setMemberConversationRole = jest.fn().mockImplementation(async () => callOrder.push('setRole'));
-      const leaveConversationMock = jest.fn().mockImplementation(async () => callOrder.push('leave'));
+      const setMemberConversationRole = jest.fn().mockImplementation(async () => {
+        return callOrder.push('setRole');
+      });
+      const leaveConversationMock = jest.fn().mockImplementation(async () => {
+        return callOrder.push('leave');
+      });
 
       const {vm} = buildActionsViewModel({
         selfUser,

@@ -32,13 +32,13 @@ export const VideoCallCancelButton = ({onAction}: VideoCallCancelButtonProps) =>
     <button
       className="video-controls__button video-controls__button--red"
       onClick={onAction}
-      onKeyDown={event =>
-        handleKeyDown({
+      onKeyDown={event => {
+        return handleKeyDown({
           event,
           callback: onAction,
           keys: [KEY.ENTER, KEY.SPACE],
-        })
-      }
+        });
+      }}
       type="button"
       data-uie-name="do-call-controls-video-call-cancel"
       title={translate('videoCallOverlayHangUp')}

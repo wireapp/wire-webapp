@@ -38,11 +38,14 @@ export const requiresPasswordModal = (
   isOpen: boolean,
   hasPassword: boolean,
   conversationError: ConversationState['error'],
-): boolean =>
-  !isOpen &&
-  (hasPassword ||
-    (!isNullOrUndefined(conversationError) &&
-      conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD));
+): boolean => {
+  return (
+    !isOpen &&
+    (hasPassword ||
+      (!isNullOrUndefined(conversationError) &&
+        conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD))
+  );
+};
 
 export const buildDomainRedirectUrl = (welcomeUrl: string, existingQuery: string, clientType: ClientType): string => {
   const [path] = welcomeUrl.split('?');
@@ -71,7 +74,9 @@ export const handleSSOBackendError = (
       resetAuthError();
       navigate(ROUTE.CLIENTS);
     })
-    .with(BackendErrorLabel.CUSTOM_BACKEND_NOT_FOUND, () => setSsoError(error))
+    .with(BackendErrorLabel.CUSTOM_BACKEND_NOT_FOUND, () => {
+      return setSsoError(error);
+    })
     .with(
       P.union(
         BackendErrorLabel.INVALID_CONVERSATION_PASSWORD,
@@ -82,9 +87,9 @@ export const handleSSOBackendError = (
     )
     .otherwise(() => {
       setSsoError(error);
-      const isValidationError = Object.values(ValidationError.ERROR).some(
-        errorType => isNonEmptyString(error.label) && error.label.endsWith(errorType),
-      );
+      const isValidationError = Object.values(ValidationError.ERROR).some(errorType => {
+        return isNonEmptyString(error.label) && error.label.endsWith(errorType);
+      });
       if (!isValidationError) {
         console.warn('SSO authentication error', JSON.stringify(Object.entries(error)), error);
       }

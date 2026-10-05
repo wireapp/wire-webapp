@@ -65,7 +65,9 @@ export const createMeetingLifecycleDispatcher = (
 
   const enqueue = (operationName: string, operation: () => Promise<unknown>): void => {
     queuedOperations = queuedOperations.then(async () => {
-      const operationResult = await task.tryOrElse(() => dispatcherOperationFailed, operation);
+      const operationResult = await task.tryOrElse(() => {
+        return dispatcherOperationFailed;
+      }, operation);
 
       if (operationResult.isErr) {
         dependencies.reportOperationFailure(operationName);
@@ -101,6 +103,8 @@ export const createMeetingLifecycleDispatcher = (
         dependencies.removeMeeting(meetingId);
       });
     },
-    waitUntilAllSettled: () => queuedOperations,
+    waitUntilAllSettled: () => {
+      return queuedOperations;
+    },
   };
 };

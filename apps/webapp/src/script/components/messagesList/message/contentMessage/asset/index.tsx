@@ -114,15 +114,17 @@ const ContentAsset = ({
           {shouldRenderTextMultipart && (
             <ReadIndicator message={message} is1to1Conversation={is1to1Conversation} onClick={onClickDetails} />
           )}
-          {previews.map(() => (
-            <div key={asset.id} className="message-asset">
-              <LinkPreviewAsset message={message} isFocusable={isMessageFocused} />
+          {previews.map(() => {
+            return (
+              <div key={asset.id} className="message-asset">
+                <LinkPreviewAsset message={message} isFocusable={isMessageFocused} />
 
-              {!shouldRenderText && (
-                <ReadIndicator message={message} is1to1Conversation={is1to1Conversation} onClick={onClickDetails} />
-              )}
-            </div>
-          ))}
+                {!shouldRenderText && (
+                  <ReadIndicator message={message} is1to1Conversation={is1to1Conversation} onClick={onClickDetails} />
+                )}
+              </div>
+            );
+          })}
         </>
       );
     case AssetType.TEXT:
@@ -150,15 +152,17 @@ const ContentAsset = ({
             <ReadIndicator message={message} is1to1Conversation={is1to1Conversation} onClick={onClickDetails} />
           )}
 
-          {previews.map(() => (
-            <div key={asset.id} className="message-asset">
-              <LinkPreviewAsset message={message} isFocusable={isMessageFocused} />
+          {previews.map(() => {
+            return (
+              <div key={asset.id} className="message-asset">
+                <LinkPreviewAsset message={message} isFocusable={isMessageFocused} />
 
-              {!shouldRenderText && (
-                <ReadIndicator message={message} is1to1Conversation={is1to1Conversation} onClick={onClickDetails} />
-              )}
-            </div>
-          ))}
+                {!shouldRenderText && (
+                  <ReadIndicator message={message} is1to1Conversation={is1to1Conversation} onClick={onClickDetails} />
+                )}
+              </div>
+            );
+          })}
         </>
       );
     case AssetType.FILE:
@@ -200,7 +204,9 @@ const ContentAsset = ({
 
       return (
         <MessageButton
-          onClick={() => onClickButton(message, assetId)}
+          onClick={() => {
+            return onClickButton(message, assetId);
+          }}
           label={asset.text}
           id={assetId}
           message={message as CompositeMessage}

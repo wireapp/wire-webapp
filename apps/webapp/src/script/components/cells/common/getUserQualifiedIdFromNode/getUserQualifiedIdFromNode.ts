@@ -23,9 +23,9 @@ import {parseQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 import {RestNode} from 'cells-sdk-ts';
 
 export const getUserQualifiedIdFromNode = (node: RestNode): QualifiedId | null => {
-  const userQualifiedIdJson = node.UserMetadata?.find(
-    metadata => metadata.Namespace === 'usermeta-owner-uuid',
-  )?.JsonValue;
+  const userQualifiedIdJson = node.UserMetadata?.find(metadata => {
+    return metadata.Namespace === 'usermeta-owner-uuid';
+  })?.JsonValue;
 
   if (!isNonEmptyString(userQualifiedIdJson)) {
     return null;

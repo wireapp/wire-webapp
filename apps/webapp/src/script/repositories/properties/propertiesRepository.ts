@@ -17,7 +17,8 @@
  *
  */
 
-import {isNan} from '@sindresorhus/is';
+import createDeepmerge from '@fastify/deepmerge';
+import {isNan, isPlainObject} from '@sindresorhus/is';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {ConsentType} from '@wireapp/api-client/lib/self/';
 import {AudioPreference, NotificationPreference, WebappProperties} from '@wireapp/api-client/lib/user/data/';
@@ -35,7 +36,6 @@ import {isTelemetryEnabledAtCurrentEnvironment} from 'Repositories/tracking/tele
 import {ConsentValue} from 'Repositories/user/consentValue';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from 'Repositories/user/typingIndicatorMode';
 import {Config} from 'src/script/Config';
-import {deepMerge} from 'Util/deepMerge';
 import {Environment} from 'Util/environment';
 import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
@@ -43,6 +43,10 @@ import {loadValue} from 'Util/storageUtil';
 
 import type {PropertiesService} from './propertiesService';
 import {PROPERTIES_TYPE, UserConsentStatus} from './propertiesType';
+
+const mergeWebappProperties = createDeepmerge();
+const nestedPreferencePathDepth = 2;
+const deeplyNestedPreferencePathDepth = 3;
 
 export class PropertiesRepository {
   // Value names are specified by the protocol but key names can be changed.
@@ -196,12 +200,16 @@ export class PropertiesRepository {
         },
         primaryAction: {
           text: this.translate('dataSharingModalAgree'),
-          action: () => toggleTelemetrySharing(true),
+          action: () => {
+            return toggleTelemetrySharing(true);
+          },
           runActionOnEnterClick: true,
         },
         secondaryAction: {
           text: this.translate('dataSharingModalDecline'),
-          action: () => toggleTelemetrySharing(false),
+          action: () => {
+            return toggleTelemetrySharing(false);
+          },
         },
         closeOnSecondaryAction: true,
       },
@@ -217,9 +225,9 @@ export class PropertiesRepository {
     switch (typeParts.length) {
       case 1:
         return this.properties[partOne];
-      case 2:
+      case nestedPreferencePathDepth:
         return this.properties[partOne][partTwo];
-      case 3:
+      case deeplyNestedPreferencePathDepth:
         return this.properties[partOne][partTwo][partThree];
       default:
         throw new Error(`Failed to get preference of type ${propertiesType}`);
@@ -236,9 +244,14 @@ export class PropertiesRepository {
 
   private fetchWebAppAccountSettings(): Promise<void> {
     return this.propertiesService
-      .getPropertiesByKey(PropertiesRepository.CONFIG.WEBAPP_ACCOUNT_SETTINGS)
+      .getPropertiesByKey<unknown>(PropertiesRepository.CONFIG.WEBAPP_ACCOUNT_SETTINGS)
       .then(properties => {
-        deepMerge(this.properties, properties);
+        if (isPlainObject(properties)) {
+          this.properties = mergeWebappProperties(
+            this.properties,
+            properties as Partial<WebappProperties>,
+          ) as WebappProperties;
+        }
       })
       .catch(() => {
         this.logger.warn(
@@ -250,7 +263,9 @@ export class PropertiesRepository {
   private fetchPropertySetting({key, defaultValue}: {key: string; defaultValue: any}): Promise<void> {
     return this.propertiesService
       .getPropertiesByKey(key)
-      .then(value => this.setProperty(key, value))
+      .then(value => {
+        return this.setProperty(key, value);
+      })
       .catch(() => {
         const message = `Property "${key}" doesn't exist for this account. Continuing with the default value of "${defaultValue}".`;
         this.logger.warn(message);
@@ -286,7 +301,9 @@ export class PropertiesRepository {
           ? this.savePreferenceTemporaryGuestAccount(propertiesType, updatedPreference)
           : this.savePreferenceActivatedAccount(propertiesType, updatedPreference);
 
-      void savePromise.then(() => this.publishPropertyUpdate(propertiesType, updatedPreference));
+      void savePromise.then(() => {
+        return this.publishPropertyUpdate(propertiesType, updatedPreference);
+      });
     }
   }
 
@@ -352,7 +369,9 @@ export class PropertiesRepository {
   private savePreferenceActivatedAccount(propertiesType: string, updatedPreference: any): Promise<void> {
     return this.propertiesService
       .putPropertiesByKey(PropertiesRepository.CONFIG.WEBAPP_ACCOUNT_SETTINGS, this.properties)
-      .then(() => this.logger.info(`Saved updated preference "${propertiesType}": ${updatedPreference}`));
+      .then(() => {
+        return this.logger.info(`Saved updated preference "${propertiesType}": ${updatedPreference}`);
+      });
   }
 
   private savePreferenceTemporaryGuestAccount(propertiesType: string, updatedPreference: any): Promise<void> {
@@ -411,10 +430,10 @@ export class PropertiesRepository {
       case 1:
         this.properties[partOne] = changedPreference;
         break;
-      case 2:
+      case nestedPreferencePathDepth:
         this.properties[partOne][partTwo] = changedPreference;
         break;
-      case 3:
+      case deeplyNestedPreferencePathDepth:
         this.properties[partOne][partTwo][partThree] = changedPreference;
         break;
       default:

@@ -86,13 +86,19 @@ export const pillStyle: <T>(theme: Theme, props: PillProps<T>) => CSSObject = (
   };
 };
 
-export const filterPillProps = (props: PillProps) => filterProps(props, ['active']);
+export const filterPillProps = (props: PillProps) => {
+  return filterProps(props, ['active']);
+};
 
-export const Pill = (props: PillProps) => (
-  <span
-    css={(theme: Theme) => pillStyle(theme, props)}
-    data-uie-name="element-pill"
-    data-uie-status={props.type}
-    {...filterPillProps(props)}
-  />
-);
+export const Pill = (props: PillProps) => {
+  return (
+    <span
+      css={(theme: Theme) => {
+        return pillStyle(theme, props);
+      }}
+      data-uie-name="element-pill"
+      data-uie-status={props.type}
+      {...filterPillProps(props)}
+    />
+  );
+};

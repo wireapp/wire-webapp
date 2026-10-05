@@ -20,7 +20,9 @@
 class LocalStorageMock {
   store: {[key: string]: string} = {};
 
-  getItem = (key: string) => this.store[key];
+  getItem = (key: string) => {
+    return this.store[key];
+  };
   setItem = (key: string, value: any) => {
     this.store[key] = value.toString();
   };

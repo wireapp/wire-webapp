@@ -34,9 +34,16 @@ import type {CallingRepository} from 'Repositories/calling/CallingRepository';
 import type {CallingViewModel} from 'src/script/view_model/CallingViewModel';
 
 const qualifiedConversationId = {domain: 'example.com', id: 'meeting-conversation-id'};
+const media = {cameraEnabled: true, microphoneEnabled: false};
 
-const createMeetingConversation = (): Conversation =>
-  createConversation(CONVERSATION_TYPE.REGULAR, CONVERSATION_PROTOCOL.MLS, qualifiedConversationId, 'meeting-group-id');
+const createMeetingConversation = (): Conversation => {
+  return createConversation(
+    CONVERSATION_TYPE.REGULAR,
+    CONVERSATION_PROTOCOL.MLS,
+    qualifiedConversationId,
+    'meeting-group-id',
+  );
+};
 
 const createIncomingCall = (conversation: Conversation): Call => {
   const selfParticipant = createSelfParticipant();
@@ -56,16 +63,24 @@ const createDeps = (overrides: Partial<JoinMeetingCallDeps> = {}): JoinMeetingCa
   const conversation = createMeetingConversation();
 
   const conversationState = {
-    findConversation: () => conversation,
+    findConversation: () => {
+      return conversation;
+    },
   } as unknown as ConversationState;
 
   const conversationRepository = {
-    safeGetConversationById: () => task.reject('not found'),
-    safeEnsureConversationExists: () => task.resolve(undefined),
+    safeGetConversationById: () => {
+      return task.reject('not found');
+    },
+    safeEnsureConversationExists: () => {
+      return task.resolve(undefined);
+    },
   } as unknown as ConversationRepository;
 
   const callingRepository = {
-    findCall: () => undefined,
+    findCall: () => {
+      return undefined;
+    },
   } as unknown as CallingRepository;
 
   const callingViewModel = {
@@ -86,32 +101,38 @@ const createDeps = (overrides: Partial<JoinMeetingCallDeps> = {}): JoinMeetingCa
 
 describe('joinMeetingCall', () => {
   it('starts an outgoing call when the meeting conversation is found locally and no incoming call exists', async () => {
-    const startAudio = jest.fn().mockResolvedValue(undefined);
-    const answer = jest.fn().mockResolvedValue(undefined);
+    const startAudio = jest.fn().mockResolvedValue(true);
+    const answer = jest.fn().mockResolvedValue(true);
     const deps = createDeps({
       callingViewModel: {
         callActions: {answer, startAudio},
       } as unknown as CallingViewModel,
     });
 
-    const result = await joinMeetingCall(deps, qualifiedConversationId);
+    const result = await joinMeetingCall(deps, qualifiedConversationId, media);
 
-    expect(result.isOk).toBe(true);
+    expect(result.isOk && result.value).toBe(true);
     expect(startAudio).toHaveBeenCalledTimes(1);
     expect(answer).not.toHaveBeenCalled();
   });
 
   it('ensures the MLS group exists locally before starting the call', async () => {
     const conversation = createMeetingConversation();
-    const startAudio = jest.fn().mockResolvedValue(undefined);
-    const safeEnsureConversationExists = jest.fn(() => task.resolve(undefined));
+    const startAudio = jest.fn().mockResolvedValue(true);
+    const safeEnsureConversationExists = jest.fn(() => {
+      return task.resolve(undefined);
+    });
 
     const deps = createDeps({
       conversationState: {
-        findConversation: () => conversation,
+        findConversation: () => {
+          return conversation;
+        },
       } as unknown as ConversationState,
       conversationRepository: {
-        safeGetConversationById: () => task.reject('not found'),
+        safeGetConversationById: () => {
+          return task.reject('not found');
+        },
         safeEnsureConversationExists,
       } as unknown as ConversationRepository,
       callingViewModel: {
@@ -119,34 +140,40 @@ describe('joinMeetingCall', () => {
       } as unknown as CallingViewModel,
     });
 
-    const result = await joinMeetingCall(deps, qualifiedConversationId);
+    const result = await joinMeetingCall(deps, qualifiedConversationId, media);
 
-    expect(result.isOk).toBe(true);
+    expect(result.isOk && result.value).toBe(true);
     expect(safeEnsureConversationExists).toHaveBeenCalledWith({
       conversationId: conversation.qualifiedId,
       groupId: conversation.groupId,
     });
-    expect(startAudio).toHaveBeenCalledWith(conversation);
+    expect(startAudio).toHaveBeenCalledWith(conversation, media);
   });
 
   it('returns joinFailed when ensuring the MLS group fails', async () => {
     const conversation = createMeetingConversation();
-    const startAudio = jest.fn().mockResolvedValue(undefined);
+    const startAudio = jest.fn().mockResolvedValue(true);
 
     const deps = createDeps({
       conversationState: {
-        findConversation: () => conversation,
+        findConversation: () => {
+          return conversation;
+        },
       } as unknown as ConversationState,
       conversationRepository: {
-        safeGetConversationById: () => task.reject('not found'),
-        safeEnsureConversationExists: () => task.reject(new Error('mls missing')),
+        safeGetConversationById: () => {
+          return task.reject('not found');
+        },
+        safeEnsureConversationExists: () => {
+          return task.reject(new Error('mls missing'));
+        },
       } as unknown as ConversationRepository,
       callingViewModel: {
         callActions: {answer: jest.fn(), startAudio},
       } as unknown as CallingViewModel,
     });
 
-    const result = await joinMeetingCall(deps, qualifiedConversationId);
+    const result = await joinMeetingCall(deps, qualifiedConversationId, media);
 
     expect(result.isErr).toBe(true);
     expect(unwrapErr(result)).toBe(joinMeetingCallErrors.joinFailed);
@@ -156,34 +183,44 @@ describe('joinMeetingCall', () => {
   it('answers an incoming call when one exists in the meeting conversation', async () => {
     const conversation = createMeetingConversation();
     const incomingCall = createIncomingCall(conversation);
-    const startAudio = jest.fn().mockResolvedValue(undefined);
-    const answer = jest.fn().mockResolvedValue(undefined);
+    const startAudio = jest.fn().mockResolvedValue(true);
+    const answer = jest.fn().mockResolvedValue(true);
 
     const deps = createDeps({
       conversationState: {
-        findConversation: () => conversation,
+        findConversation: () => {
+          return conversation;
+        },
       } as unknown as ConversationState,
       callingRepository: {
-        findCall: () => incomingCall,
+        findCall: () => {
+          return incomingCall;
+        },
       } as unknown as CallingRepository,
       callingViewModel: {
         callActions: {answer, startAudio},
       } as unknown as CallingViewModel,
     });
 
-    const result = await joinMeetingCall(deps, qualifiedConversationId);
+    const result = await joinMeetingCall(deps, qualifiedConversationId, media);
 
-    expect(result.isOk).toBe(true);
-    expect(answer).toHaveBeenCalledWith(incomingCall);
+    expect(result.isOk && result.value).toBe(true);
+    expect(answer).toHaveBeenCalledWith(incomingCall, media);
     expect(startAudio).not.toHaveBeenCalled();
   });
 
   it('fetches the conversation when it is not available locally', async () => {
     const conversation = createMeetingConversation();
-    const startAudio = jest.fn().mockResolvedValue(undefined);
-    const findConversation = jest.fn(() => undefined);
-    const safeGetConversationById = jest.fn(() => task.resolve(conversation));
-    const safeEnsureConversationExists = jest.fn(() => task.resolve(undefined));
+    const startAudio = jest.fn().mockResolvedValue(true);
+    const findConversation = jest.fn(() => {
+      return undefined;
+    });
+    const safeGetConversationById = jest.fn(() => {
+      return task.resolve(conversation);
+    });
+    const safeEnsureConversationExists = jest.fn(() => {
+      return task.resolve(undefined);
+    });
 
     const deps = createDeps({
       conversationState: {
@@ -198,32 +235,51 @@ describe('joinMeetingCall', () => {
       } as unknown as CallingViewModel,
     });
 
-    const result = await joinMeetingCall(deps, qualifiedConversationId);
+    const result = await joinMeetingCall(deps, qualifiedConversationId, media);
 
-    expect(result.isOk).toBe(true);
+    expect(result.isOk && result.value).toBe(true);
     expect(findConversation).toHaveBeenCalledWith(qualifiedConversationId);
     expect(safeGetConversationById).toHaveBeenCalledWith(qualifiedConversationId);
     expect(safeEnsureConversationExists).toHaveBeenCalledWith({
       conversationId: conversation.qualifiedId,
       groupId: conversation.groupId,
     });
-    expect(startAudio).toHaveBeenCalledWith(conversation);
+    expect(startAudio).toHaveBeenCalledWith(conversation, media);
   });
 
   it('returns conversationNotFound when the conversation cannot be resolved', async () => {
     const deps = createDeps({
       conversationState: {
-        findConversation: () => undefined,
+        findConversation: () => {
+          return undefined;
+        },
       } as unknown as ConversationState,
       conversationRepository: {
-        safeGetConversationById: () => task.reject('not found'),
+        safeGetConversationById: () => {
+          return task.reject('not found');
+        },
       } as unknown as ConversationRepository,
     });
 
-    const result = await joinMeetingCall(deps, qualifiedConversationId);
+    const result = await joinMeetingCall(deps, qualifiedConversationId, media);
 
     expect(result.isErr).toBe(true);
     expect(unwrapErr(result)).toBe(joinMeetingCallErrors.conversationNotFound);
+  });
+
+  it('reports that the call was not joined when startAudio resolves without starting one', async () => {
+    const deps = createDeps({
+      callingViewModel: {
+        callActions: {
+          answer: jest.fn(),
+          startAudio: jest.fn().mockResolvedValue(false),
+        },
+      } as unknown as CallingViewModel,
+    });
+
+    const result = await joinMeetingCall(deps, qualifiedConversationId, media);
+
+    expect(result.isOk && result.value).toBe(false);
   });
 
   it('returns joinFailed when startAudio rejects', async () => {
@@ -238,7 +294,7 @@ describe('joinMeetingCall', () => {
       } as unknown as CallingViewModel,
     });
 
-    const result = await joinMeetingCall(deps, qualifiedConversationId);
+    const result = await joinMeetingCall(deps, qualifiedConversationId, media);
 
     expect(result.isErr).toBe(true);
     expect(unwrapErr(result)).toBe(joinMeetingCallErrors.joinFailed);
@@ -250,7 +306,9 @@ describe('joinMeetingCall', () => {
 
     const deps = createDeps({
       callingRepository: {
-        findCall: () => incomingCall,
+        findCall: () => {
+          return incomingCall;
+        },
       } as unknown as CallingRepository,
       callingViewModel: {
         callActions: {
@@ -262,7 +320,7 @@ describe('joinMeetingCall', () => {
       } as unknown as CallingViewModel,
     });
 
-    const result = await joinMeetingCall(deps, qualifiedConversationId);
+    const result = await joinMeetingCall(deps, qualifiedConversationId, media);
 
     expect(result.isErr).toBe(true);
     expect(unwrapErr(result)).toBe(joinMeetingCallErrors.joinFailed);

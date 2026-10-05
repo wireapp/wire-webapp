@@ -22,6 +22,17 @@ import {isNullOrUndefined} from '@sindresorhus/is';
 import {getSafeLogger} from 'Repositories/media/backgroundEffects/helper/logger';
 import {BackgroundSource} from 'Repositories/media/VideoBackgroundEffects';
 
+const opaqueAlphaChannel = 255;
+const defaultBackgroundBlueChannel = 243;
+const defaultBackgroundGreenChannel = 150;
+const defaultBackgroundRedChannel = 33;
+const rectangleVertexCount = 6;
+const stateBufferCount = 2;
+const previousStateTextureUnit = 2;
+const backgroundTextureUnit = 2;
+const blendTextureCount = 3;
+const vertexCoordinateComponentCount = 2;
+
 export type ImageTexture = {
   texture: WebGLTexture;
   width: number;
@@ -101,7 +112,12 @@ export class WebGLRenderer {
   private backgroundRenderInfo: BackgroundRenderInfo | null = null;
   private activeBackgroundSourceIdentifier: string | null = null;
 
-  private static readonly DEFAULT_BG_COLOR: readonly [number, number, number, number] = [33, 150, 243, 255];
+  private static readonly DEFAULT_BG_COLOR: readonly [number, number, number, number] = [
+    defaultBackgroundRedChannel,
+    defaultBackgroundGreenChannel,
+    defaultBackgroundBlueChannel,
+    opaqueAlphaChannel,
+  ];
 
   constructor(canvas: OffscreenCanvas) {
     this.canvas = canvas;
@@ -439,7 +455,17 @@ export class WebGLRenderer {
 
       gl.bindTexture(gl.TEXTURE_2D, texture);
 
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 255]));
+      gl.texImage2D(
+        gl.TEXTURE_2D,
+        0,
+        gl.RGBA,
+        1,
+        1,
+        0,
+        gl.RGBA,
+        gl.UNSIGNED_BYTE,
+        new Uint8Array([0, 0, 0, opaqueAlphaChannel]),
+      );
 
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 
@@ -554,7 +580,7 @@ export class WebGLRenderer {
 
     this.bindVertexAttributes(blendLocations.position, blendLocations.texCoord);
 
-    gl.drawArrays(gl.TRIANGLES, 0, 6);
+    gl.drawArrays(gl.TRIANGLES, 0, rectangleVertexCount);
 
     gl.deleteTexture(frameTexture);
 
@@ -582,7 +608,7 @@ export class WebGLRenderer {
 
     const readStateIndex = this.currentStateIndex;
 
-    const writeStateIndex = (this.currentStateIndex + 1) % 2;
+    const writeStateIndex = (this.currentStateIndex + 1) % stateBufferCount;
 
     const previousStateTexture = storedStateTextures[readStateIndex];
 
@@ -620,7 +646,7 @@ export class WebGLRenderer {
 
     gl.bindTexture(gl.TEXTURE_2D, previousStateTexture);
 
-    gl.uniform1i(stateUpdateLocations.prevStateTexture, 2);
+    gl.uniform1i(stateUpdateLocations.prevStateTexture, previousStateTextureUnit);
 
     gl.uniform1f(stateUpdateLocations.smoothingFactor, options.smoothing);
 
@@ -632,7 +658,7 @@ export class WebGLRenderer {
 
     this.bindVertexAttributes(stateUpdateLocations.position, stateUpdateLocations.texCoord);
 
-    gl.drawArrays(gl.TRIANGLES, 0, 6);
+    gl.drawArrays(gl.TRIANGLES, 0, rectangleVertexCount);
 
     this.currentStateIndex = writeStateIndex;
 
@@ -690,7 +716,7 @@ export class WebGLRenderer {
         backgroundHeight = this.backgroundRenderInfo.height;
       }
 
-      gl.uniform1i(blendLocations.backgroundTexture, 2);
+      gl.uniform1i(blendLocations.backgroundTexture, backgroundTextureUnit);
 
       gl.uniform2f(
         blendLocations.bgImageDimensions,
@@ -713,11 +739,11 @@ export class WebGLRenderer {
 
     this.bindVertexAttributes(blendLocations.position, blendLocations.texCoord);
 
-    gl.drawArrays(gl.TRIANGLES, 0, 6);
+    gl.drawArrays(gl.TRIANGLES, 0, rectangleVertexCount);
 
     gl.deleteTexture(frameTexture);
 
-    this.unbindTextures(3);
+    this.unbindTextures(blendTextureCount);
   }
 
   private createFrameTexture(videoFrame: VideoFrame): WebGLTexture | null {
@@ -753,13 +779,13 @@ export class WebGLRenderer {
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
 
-    gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(positionLocation, vertexCoordinateComponentCount, gl.FLOAT, false, 0, 0);
 
     gl.enableVertexAttribArray(texCoordLocation);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.texCoordBuffer);
 
-    gl.vertexAttribPointer(texCoordLocation, 2, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(texCoordLocation, vertexCoordinateComponentCount, gl.FLOAT, false, 0, 0);
   }
 
   private unbindTextures(numberOfTextureUnits: number): void {

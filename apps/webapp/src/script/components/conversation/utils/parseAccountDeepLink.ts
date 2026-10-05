@@ -53,7 +53,9 @@ const normalizePath = (pathname: string): string => {
   return pathname.slice(0, end);
 };
 
-const normalizeOrigin = (url: URL): string => url.origin.toLowerCase();
+const normalizeOrigin = (url: URL): string => {
+  return url.origin.toLowerCase();
+};
 
 export const parseAccountDeepLink = (href: string, accountBase?: string): ParseAccountDeepLink => {
   if (href.length === 0 || accountBase === undefined || accountBase.length === 0) {

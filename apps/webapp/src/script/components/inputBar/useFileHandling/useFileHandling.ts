@@ -19,6 +19,7 @@
 
 import {useEffect, useState} from 'react';
 
+import {isNull} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -50,10 +51,12 @@ export const useFileHandling = ({
     translate,
   });
 
-  const clearPastedFile = () => setPastedFile(null);
+  const clearPastedFile = () => {
+    return setPastedFile(null);
+  };
 
   const sendPastedFile = () => {
-    if (pastedFile) {
+    if (!isNull(pastedFile)) {
       uploadDroppedFiles([pastedFile]);
       clearPastedFile();
     }
@@ -66,8 +69,10 @@ export const useFileHandling = ({
   };
 
   useEffect(() => {
-    if (!pastedFile) {
-      return () => undefined;
+    if (isNull(pastedFile)) {
+      return () => {
+        return undefined;
+      };
     }
 
     window.addEventListener('keydown', sendImageOnEnterClick);

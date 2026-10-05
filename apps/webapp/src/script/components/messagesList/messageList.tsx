@@ -51,6 +51,10 @@ import {UploadAssets} from './uploadAssets';
 import {groupMessagesBySenderAndTime, isMarker} from './utils/messagesGroup';
 import {updateScroll, FocusedElement} from './utils/scrollUpdater';
 
+const messageScrollDelayInMilliseconds = 10;
+const messageFocusDelayInMilliseconds = 1000;
+const messageHighlightDurationInMilliseconds = 5000;
+
 interface MessagesListParams {
   assetRepository: AssetRepository;
   cancelConnectionRequest: (message: MemberMessage) => void;
@@ -214,9 +218,11 @@ export const MessagesList: FC<MessagesListParams> = ({
         if (!conversation.hasLastReceivedMessageLoaded()) {
           conversation.isLastMessageVisible(false);
         }
-      }, 10);
+      }, messageScrollDelayInMilliseconds);
     });
-    return () => conversation.release();
+    return () => {
+      return conversation.release();
+    };
   }, [conversation]);
 
   useLayoutEffect(() => {
@@ -225,7 +231,11 @@ export const MessagesList: FC<MessagesListParams> = ({
     }
   }, [loaded]);
 
-  const {focusedId, handleKeyDown, setFocusedId} = useRoveFocus(filteredMessages.map(message => message.id));
+  const {focusedId, handleKeyDown, setFocusedId} = useRoveFocus(
+    filteredMessages.map(message => {
+      return message.id;
+    }),
+  );
 
   // when a new conversation is opened using keyboard(enter), focus on the last message
   useEffect(() => {
@@ -251,7 +261,9 @@ export const MessagesList: FC<MessagesListParams> = ({
       return;
     }
     focusedElement.current = {center, element};
-    setTimeout(() => (focusedElement.current = null), 1000);
+    setTimeout(() => {
+      return (focusedElement.current = null);
+    }, messageFocusDelayInMilliseconds);
     syncScrollPosition();
   };
 
@@ -336,15 +348,23 @@ export const MessagesList: FC<MessagesListParams> = ({
                   onClickAvatar={showUserDetails}
                   onClickCancelRequest={cancelConnectionRequest}
                   onClickImage={showImageDetails}
-                  onClickInvitePeople={() => invitePeople(conversation)}
-                  onClickReactionDetails={message => showMessageReactions(message, true)}
+                  onClickInvitePeople={() => {
+                    return invitePeople(conversation);
+                  }}
+                  onClickReactionDetails={message => {
+                    return showMessageReactions(message, true);
+                  }}
                   onClickMessage={onClickMessage}
                   onClickParticipants={showParticipants}
-                  onClickDetails={message => showMessageDetails(message)}
+                  onClickDetails={message => {
+                    return showMessageDetails(message);
+                  }}
                   onClickResetSession={resetSession}
                   onClickTimestamp={async function (messageId: string) {
                     setHighlightedMessage(messageId);
-                    setTimeout(() => setHighlightedMessage(undefined), 5000);
+                    setTimeout(() => {
+                      return setHighlightedMessage(undefined);
+                    }, messageHighlightDurationInMilliseconds);
                     const messageIsLoaded = conversation.getMessage(messageId);
 
                     if (isNullOrUndefined(messageIsLoaded)) {

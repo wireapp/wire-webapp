@@ -17,8 +17,10 @@
  *
  */
 
+/* eslint-disable @typescript-eslint/no-magic-numbers -- Priority members define their ordering weights inline. */
 export enum Priority {
   LOW = 0,
   MEDIUM = 5,
   HIGH = 9,
 }
+/* eslint-enable @typescript-eslint/no-magic-numbers */

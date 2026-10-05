@@ -17,6 +17,7 @@
  *
  */
 
+import {isNonEmptyString} from '@sindresorhus/is';
 import {CONVERSATION_PROTOCOL, FEATURE_STATUS, type FeatureMLSMigration} from '@wireapp/api-client/lib/team';
 import {Maybe, Task, task} from 'true-myth';
 
@@ -32,16 +33,19 @@ export const canManuallyMigrateConversation = (
   conversation: Conversation,
   selfUser: Pick<User, 'teamId' | 'qualifiedId'>,
   feature: Maybe<NonNullable<FeatureMLSMigration>>,
-): boolean =>
-  conversation.isGroupOrChannel() &&
-  !conversation.isSelfUserRemoved() &&
-  conversation.isAdmin(selfUser.qualifiedId) &&
-  !!conversation.teamId &&
-  conversation.teamId === selfUser.teamId &&
-  [CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MIXED].includes(conversation.protocol) &&
-  feature.isJust &&
-  feature.value.status === FEATURE_STATUS.ENABLED &&
-  feature.value.config.allowManualMigration === true;
+): boolean => {
+  return (
+    conversation.isGroupOrChannel() &&
+    !conversation.isSelfUserRemoved() &&
+    conversation.isAdmin(selfUser.qualifiedId) &&
+    isNonEmptyString(conversation.teamId) &&
+    conversation.teamId === selfUser.teamId &&
+    [CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MIXED].includes(conversation.protocol) &&
+    feature.isJust &&
+    feature.value.status === FEATURE_STATUS.ENABLED &&
+    feature.value.config.allowManualMigration === true
+  );
+};
 
 export type ManualMigrationFailure = {
   stage: 'eligibility' | 'busy' | 'initialise' | 'establish' | 'finalise';
@@ -76,16 +80,23 @@ export const manuallyMigrateConversation = ({
   }
   mlsMigrationLogger.info('Manual MLS migration started');
 
-  const failure = (stage: ManualMigrationFailure['stage'], cause: unknown): ManualMigrationFailure => ({
-    stage,
-    reason: 'requestFailed',
-    cause: Maybe.of(cause),
-  });
-  const update = (current: Conversation, protocol: CONVERSATION_PROTOCOL.MIXED | CONVERSATION_PROTOCOL.MLS) =>
-    task.tryOrElse(
-      cause => failure(protocol === CONVERSATION_PROTOCOL.MIXED ? 'initialise' : 'finalise', cause),
-      () => repository.updateConversationProtocol(current, protocol),
+  const failure = (stage: ManualMigrationFailure['stage'], cause: unknown): ManualMigrationFailure => {
+    return {
+      stage,
+      reason: 'requestFailed',
+      cause: Maybe.of(cause),
+    };
+  };
+  const update = (current: Conversation, protocol: CONVERSATION_PROTOCOL.MIXED | CONVERSATION_PROTOCOL.MLS) => {
+    return task.tryOrElse(
+      cause => {
+        return failure(protocol === CONVERSATION_PROTOCOL.MIXED ? 'initialise' : 'finalise', cause);
+      },
+      () => {
+        return repository.updateConversationProtocol(current, protocol);
+      },
     );
+  };
 
   const initialized =
     conversation.protocol === CONVERSATION_PROTOCOL.PROTEUS
@@ -109,42 +120,49 @@ export const manuallyMigrateConversation = ({
         current.epoch > 0
           ? repository
               .safeEnsureConversationExists({conversationId: current.qualifiedId, groupId: current.groupId})
-              .mapRejected(cause => failure('establish', cause))
+              .mapRejected(cause => {
+                return failure('establish', cause);
+              })
           : task
               .tryOrElse(
-                cause => failure('establish', cause),
-                () =>
-                  repository.tryEstablishingMLSGroup({
+                cause => {
+                  return failure('establish', cause);
+                },
+                () => {
+                  return repository.tryEstablishingMLSGroup({
                     conversationId: current.qualifiedId,
                     groupId: current.groupId,
                     qualifiedUsers: current.participating_user_ids(),
                     selfUserId: selfUser.qualifiedId,
-                  }),
+                  });
+                },
               )
-              .andThen(() =>
-                repository
+              .andThen(() => {
+                return repository
                   .safeEnsureConversationExists({conversationId: current.qualifiedId, groupId: current.groupId})
-                  .mapRejected(cause => failure('establish', cause)),
-              );
+                  .mapRejected(cause => {
+                    return failure('establish', cause);
+                  });
+              });
       return established
-        .andThen(() =>
-          canManuallyMigrateConversation(current, selfUser, getFeature())
+        .andThen(() => {
+          return canManuallyMigrateConversation(current, selfUser, getFeature())
             ? update(current, CONVERSATION_PROTOCOL.MLS)
             : task.reject<Conversation, ManualMigrationFailure>({
                 stage: 'eligibility',
                 reason: 'notAllowed',
                 cause: Maybe.nothing(),
-              }),
-        )
-        .andThen(updated =>
-          isMLSConversation(updated)
+              });
+        })
+        .andThen(updated => {
+          return isMLSConversation(updated)
             ? task.resolve<Conversation, ManualMigrationFailure>(updated)
             : task.reject<Conversation, ManualMigrationFailure>({
                 stage: 'finalise',
                 reason: 'protocolUnchanged',
                 cause: Maybe.nothing(),
-              }),
-        );
+              });
+        });
     })
     .inspect(() => {
       finish(key);

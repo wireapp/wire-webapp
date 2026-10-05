@@ -40,6 +40,46 @@ CI/CD PR git actions job can be found [here](/.github/workflows/precommit-crit-f
 
 [Playwright config can be found in the root folder of the repo](/playwright.config.ts)
 
+### Startup feature toggles
+
+Set startup feature toggles per page through `withLogin` options:
+
+```typescript
+import {forTestsOnlyFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
+
+const enabledPage = await createPage(
+  withLogin(userA, {
+    startupFeatureToggles: {[forTestsOnlyFeatureToggleName]: true},
+  }),
+);
+
+const disabledPage = await createPage(
+  withLogin(userB, {
+    startupFeatureToggles: {[forTestsOnlyFeatureToggleName]: false},
+  }),
+);
+```
+
+The same `startupFeatureToggles` option is available on `PageManager.openMainPage`, `openLoginPage`,
+`openRegistrationPage`, and `openSSOPage`:
+
+```typescript
+await pageManager.openLoginPage({
+  startupFeatureToggles: {[forTestsOnlyFeatureToggleName]: true},
+});
+```
+
+Keys derive from the production `StartupFeatureToggleName` type, so arbitrary feature strings are not accepted.
+`true` enables a feature; `false` removes it from the URL. Omitted or `undefined` overrides leave its state unchanged.
+Existing `baseUrl` and `confirmNewHistory` options still work with `withLogin`; navigation methods accept `baseUrl`
+in the options object.
+
+The pure URL adapter tests need no browser, backend, or credentials:
+
+```bash
+yarn nx run webapp:e2e --excludeTaskDependencies -- utils/startupFeatureToggleOverrides.spec.ts --workers=1 --reporter=line
+```
+
 ### Running the tests
 
 For hosted manual regression runs, use the logical company-facing Beta environment (`https://wire-webapp-beta.wire.com/`) for release-candidate validation or QA (`https://wire-webapp-qa.zinfra.io/`) for QA validation. Nightly trunk testing will return to Edge once its canonical URL and TLS configuration are confirmed.

@@ -37,7 +37,9 @@ export const MeetingsConversationTab = ({
   onChangeTab,
 }: MeetingsConversationTabProps) => {
   const {fireAndForgetInvoker, translate} = useApplicationContext();
-  const loadMeetings = useMeetingStore(state => state.loadMeetings);
+  const loadMeetings = useMeetingStore(state => {
+    return state.loadMeetings;
+  });
 
   const openMeetings = () => {
     onChangeTab(SidebarTabs.MEETINGS);

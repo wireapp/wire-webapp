@@ -24,8 +24,10 @@ import {Availability} from '@wireapp/protocol-messaging';
 import * as Icon from 'Components/icon';
 import {CSS_SQUARE} from 'Util/cssMixin';
 
+const availabilityIconSizeInPixels = 10;
+
 const iconStyles: CSSObject = {
-  ...CSS_SQUARE(10),
+  ...CSS_SQUARE(availabilityIconSizeInPixels),
   fill: 'currentColor',
   margin: '0 6px 1px 0',
   minWidth: 10,

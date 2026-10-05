@@ -120,7 +120,11 @@ describe('UserAvatar', () => {
       avatarSize: AVATAR_SIZE.LARGE,
       participant: participant,
       state: STATE.NONE,
-      teamState: {isInTeam: () => true} as unknown as TeamState,
+      teamState: {
+        isInTeam: () => {
+          return true;
+        },
+      } as unknown as TeamState,
     };
 
     participant.availability(Availability.Type.AVAILABLE);
@@ -137,7 +141,11 @@ describe('UserAvatar', () => {
       avatarSize: AVATAR_SIZE.LARGE,
       participant: participant,
       state: STATE.NONE,
-      teamState: {isInTeam: () => true} as unknown as TeamState,
+      teamState: {
+        isInTeam: () => {
+          return true;
+        },
+      } as unknown as TeamState,
     };
 
     participant.availability(Availability.Type.AWAY);
@@ -155,7 +163,11 @@ describe('UserAvatar', () => {
       avatarSize: AVATAR_SIZE.LARGE,
       participant: participant,
       state: STATE.NONE,
-      teamState: {isInTeam: () => true} as unknown as TeamState,
+      teamState: {
+        isInTeam: () => {
+          return true;
+        },
+      } as unknown as TeamState,
     };
 
     participant.availability(Availability.Type.BUSY);
@@ -203,7 +215,11 @@ describe('UserAvatar', () => {
       avatarSize: AVATAR_SIZE.LARGE,
       participant: participant,
       state: STATE.NONE,
-      teamState: {isInTeam: () => true} as unknown as TeamState,
+      teamState: {
+        isInTeam: () => {
+          return true;
+        },
+      } as unknown as TeamState,
     };
 
     participant.availability(Availability.Type.AVAILABLE);

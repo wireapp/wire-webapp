@@ -51,7 +51,9 @@ export const CellsMoveNodeModal = ({
   conversationName,
 }: CellsMoveNodeModalProps) => {
   const {fireAndForgetInvoker, translate} = useApplicationContext();
-  const [currentPath, setCurrentPath] = useState(() => getCellsFilesPath());
+  const [currentPath, setCurrentPath] = useState(() => {
+    return getCellsFilesPath();
+  });
   const [activeModalContent, setActiveModalContent] = useState<'move' | 'create'>('move');
 
   const {folders, refresh, status, shouldShowLoadingSpinner} = useGetCellsFolders({
@@ -152,7 +154,11 @@ export const CellsMoveNodeModal = ({
             isOpen={isOpen}
           />
           <CellsModal.Actions>
-            <CellsModal.SecondaryButton onClick={() => setActiveModalContent('move')}>
+            <CellsModal.SecondaryButton
+              onClick={() => {
+                return setActiveModalContent('move');
+              }}
+            >
               {translate('cells.newItemMenuModal.secondaryAction')}
             </CellsModal.SecondaryButton>
             <CellsModal.PrimaryButton onClick={handleCreateNewFolder} isDisabled={isSubmitting}>

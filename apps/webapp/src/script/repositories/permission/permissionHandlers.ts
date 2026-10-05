@@ -140,5 +140,7 @@ export const isPermissionGranted = (permissionType: PermissionType): boolean => 
  * Check if multiple permissions are granted
  */
 export const arePermissionsGranted = (permissionTypes: PermissionType[]): boolean => {
-  return permissionTypes.every(type => isPermissionGranted(type));
+  return permissionTypes.every(type => {
+    return isPermissionGranted(type);
+  });
 };

@@ -40,8 +40,12 @@ import {CorruptedKeyError, GeneratedKey} from '../../../../../secretStore/secret
 import {CoreCryptoConfig} from '../../../../common.types';
 import {CryptoClient} from '../cryptoClient.types';
 
+type SecretKeySizeInBytes = 16 | 32;
+const legacySecretKeySizeInBytes = 16;
+const secretKeySizeInBytes = 32;
+
 type Config = {
-  generateSecretKey: (keyId: string, keySize: 16 | 32) => Promise<GeneratedKey>;
+  generateSecretKey: (keyId: string, keySize: SecretKeySizeInBytes) => Promise<GeneratedKey>;
   nbPrekeys: number;
   onNewPrekeys: (prekeys: PreKey[]) => void;
 };
@@ -67,7 +71,11 @@ const coreCryptoLogger = {
   },
 };
 
-const getKey = async (generateSecretKey: Config['generateSecretKey'], keyName: string, keySize: 16 | 32) => {
+const getKey = async (
+  generateSecretKey: Config['generateSecretKey'],
+  keyName: string,
+  keySize: SecretKeySizeInBytes,
+) => {
   return await generateSecretKey(keyName, keySize);
 };
 
@@ -83,9 +91,9 @@ const migrateOnceAndGetKey = async (
   const coreCryptoKeyId = 'corecrypto-key';
 
   // We retrieve the old key if it exists or generate a new one
-  const keyOld = await getKey(generateSecretKey, coreCryptoKeyId, 16);
+  const keyOld = await getKey(generateSecretKey, coreCryptoKeyId, legacySecretKeySizeInBytes);
   // We retrieve the new key if it exists or generate a new one
-  const keyNew = await getKey(generateSecretKey, coreCryptoNewKeyId, 32);
+  const keyNew = await getKey(generateSecretKey, coreCryptoNewKeyId, secretKeySizeInBytes);
 
   if (keyNew === undefined || keyOld === undefined) {
     // If we dont retreive any key, we throw an error
@@ -194,18 +202,24 @@ export class CoreCryptoWrapper implements CryptoClient {
   }
 
   encrypt(sessions: string[], plainText: Uint8Array) {
-    return this.coreCrypto.transaction(cx => cx.proteusEncryptBatched(sessions, plainText));
+    return this.coreCrypto.transaction(cx => {
+      return cx.proteusEncryptBatched(sessions, plainText);
+    });
   }
 
   decrypt(sessionId: string, message: Uint8Array) {
-    return this.coreCrypto.transaction(cx => cx.proteusDecrypt(sessionId, message));
+    return this.coreCrypto.transaction(cx => {
+      return cx.proteusDecrypt(sessionId, message);
+    });
   }
 
   init(nbInitialPrekeys?: number) {
     if (nbInitialPrekeys !== undefined) {
       this.prekeyTracker.setInitialState(nbInitialPrekeys);
     }
-    return this.coreCrypto.transaction(cx => cx.proteusInit());
+    return this.coreCrypto.transaction(cx => {
+      return cx.proteusInit();
+    });
   }
 
   async create(nbPrekeys: number, entropy?: Uint8Array) {
@@ -218,7 +232,9 @@ export class CoreCryptoWrapper implements CryptoClient {
       prekeys.push(await this.newPrekey());
     }
 
-    const lastPrekeyBytes = await this.coreCrypto.transaction(cx => cx.proteusLastResortPrekey());
+    const lastPrekeyBytes = await this.coreCrypto.transaction(cx => {
+      return cx.proteusLastResortPrekey();
+    });
     const lastPrekey = Encoder.toBase64(lastPrekeyBytes).asString;
 
     const lastPrekeyId = CoreCrypto.proteusLastResortPrekeyId();
@@ -243,11 +259,15 @@ export class CoreCryptoWrapper implements CryptoClient {
 
   async sessionFromMessage(sessionId: string, message: Uint8Array) {
     await this.consumePrekey(); // we need to mark a prekey as consumed since if we create a session from a message, it means the sender has consumed one of our prekeys
-    return this.coreCrypto.transaction(cx => cx.proteusSessionFromMessage(sessionId, message));
+    return this.coreCrypto.transaction(cx => {
+      return cx.proteusSessionFromMessage(sessionId, message);
+    });
   }
 
   sessionFromPrekey(sessionId: string, prekey: Uint8Array) {
-    return this.coreCrypto.transaction(cx => cx.proteusSessionFromPrekey(sessionId, prekey));
+    return this.coreCrypto.transaction(cx => {
+      return cx.proteusSessionFromPrekey(sessionId, prekey);
+    });
   }
 
   sessionExists(sessionId: string) {
@@ -255,11 +275,15 @@ export class CoreCryptoWrapper implements CryptoClient {
   }
 
   saveSession(sessionId: string) {
-    return this.coreCrypto.transaction(cx => cx.proteusSessionSave(sessionId));
+    return this.coreCrypto.transaction(cx => {
+      return cx.proteusSessionSave(sessionId);
+    });
   }
 
   deleteSession(sessionId: string) {
-    return this.coreCrypto.transaction(cx => cx.proteusSessionDelete(sessionId));
+    return this.coreCrypto.transaction(cx => {
+      return cx.proteusSessionDelete(sessionId);
+    });
   }
 
   consumePrekey() {
@@ -267,17 +291,23 @@ export class CoreCryptoWrapper implements CryptoClient {
   }
 
   async newPrekey() {
-    const {id, pkb} = await this.coreCrypto.transaction(cx => cx.proteusNewPrekeyAuto());
+    const {id, pkb} = await this.coreCrypto.transaction(cx => {
+      return cx.proteusNewPrekeyAuto();
+    });
     return {id, key: Encoder.toBase64(pkb).asString};
   }
 
   async debugBreakSession(sessionId: string) {
+    /* eslint-disable @typescript-eslint/no-magic-numbers -- Encoded prekey bytes are clearer as an exact wire-format sequence. */
     const fakePrekey = [
       165, 0, 1, 1, 24, 57, 2, 161, 0, 88, 32, 212, 202, 30, 83, 242, 93, 67, 164, 202, 137, 214, 167, 166, 183, 236,
       249, 32, 21, 117, 247, 56, 223, 135, 170, 3, 151, 16, 228, 165, 186, 124, 208, 3, 161, 0, 161, 0, 88, 32, 123,
       200, 16, 166, 184, 70, 21, 81, 43, 80, 21, 231, 182, 142, 51, 220, 131, 162, 11, 255, 162, 74, 78, 162, 95, 156,
       131, 48, 203, 5, 77, 122, 4, 246,
     ];
-    await this.coreCrypto.transaction(cx => cx.proteusSessionFromPrekey(sessionId, Uint8Array.from(fakePrekey)));
+    /* eslint-enable @typescript-eslint/no-magic-numbers */
+    await this.coreCrypto.transaction(cx => {
+      return cx.proteusSessionFromPrekey(sessionId, Uint8Array.from(fakePrekey));
+    });
   }
 }

@@ -41,8 +41,8 @@ export const CellsFilePreviewModalProvider = ({children}: FilePreviewProviderPro
 
   const id = useId();
 
-  const value = useMemo(
-    () => ({
+  const value = useMemo(() => {
+    return {
       id,
       selectedFile,
       isEditMode,
@@ -50,10 +50,11 @@ export const CellsFilePreviewModalProvider = ({children}: FilePreviewProviderPro
         setSelectedFile(file);
         setIsEditMode(isEditMode === true);
       },
-      handleCloseFile: () => setSelectedFile(null),
-    }),
-    [id, selectedFile, isEditMode],
-  );
+      handleCloseFile: () => {
+        return setSelectedFile(null);
+      },
+    };
+  }, [id, selectedFile, isEditMode]);
 
   return <CellsFilePreviewModalContext.Provider value={value}>{children}</CellsFilePreviewModalContext.Provider>;
 };

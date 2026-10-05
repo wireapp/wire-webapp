@@ -52,7 +52,11 @@ function buildConfigTree(value: unknown): ConfigTree {
     return value === undefined ? 'optional' : 'required';
   }
 
-  return Object.fromEntries(Object.entries(value).map(([key, child]) => [key, buildConfigTree(child)]));
+  return Object.fromEntries(
+    Object.entries(value).map(([key, child]) => {
+      return [key, buildConfigTree(child)];
+    }),
+  );
 }
 
 function collectTreePaths(tree: ConfigTree, prefix: string[] = []): string[] {
@@ -137,7 +141,9 @@ test.describe('runtime configuration', () => {
     }
 
     await page.goto(webappUrl, {waitUntil: 'networkidle'});
-    await page.waitForFunction(() => window.wire?.env !== undefined);
+    await page.waitForFunction(() => {
+      return window.wire?.env !== undefined;
+    });
 
     const runtimeConfig = await page.evaluate(() => {
       return window.wire.env;

@@ -30,8 +30,16 @@ const initialState = {
   isModalOpen: false,
 };
 
-export const useTeamCreationModal = create<TeamCreationModalState>(set => ({
-  ...initialState,
-  showModal: () => set(state => ({...state, isModalOpen: true})),
-  hideModal: () => set({...initialState}),
-}));
+export const useTeamCreationModal = create<TeamCreationModalState>(set => {
+  return {
+    ...initialState,
+    showModal: () => {
+      return set(state => {
+        return {...state, isModalOpen: true};
+      });
+    },
+    hideModal: () => {
+      return set({...initialState});
+    },
+  };
+});

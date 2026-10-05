@@ -19,7 +19,9 @@
 
 import {ComboboxSelectOption} from '@wireapp/react-ui-kit';
 
-export const transformTagToSelectOption = (tag: string): ComboboxSelectOption => ({
-  label: tag,
-  value: tag,
-});
+export const transformTagToSelectOption = (tag: string): ComboboxSelectOption => {
+  return {
+    label: tag,
+    value: tag,
+  };
+};

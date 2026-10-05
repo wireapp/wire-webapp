@@ -20,7 +20,7 @@
 import {MutableRefObject, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
 
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
-import {isUndefined} from '@sindresorhus/is';
+import {isNonEmptyArray, isNumber, isUndefined} from '@sindresorhus/is';
 import {useVirtualizer} from '@tanstack/react-virtual';
 import cx from 'classnames';
 
@@ -47,6 +47,9 @@ import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {VirtualizedJumpToLastMessageButton} from '../virtualizedJumpToLastMessageButton';
 
+const messageHighlightDurationInMilliseconds = 5000;
+const scrollUpdateDelayInMilliseconds = 100;
+
 const ESTIMATED_ELEMENT_SIZE = 70;
 const MARKER_ESTIMATE = 56;
 
@@ -69,7 +72,7 @@ async function loadMessagesForTimestampSelection(options: LoadMessagesForTimesta
 
   const messageIsLoaded = conversation.getMessage(messageId);
 
-  if (messageIsLoaded) {
+  if (!isUndefined(messageIsLoaded)) {
     return;
   }
 
@@ -128,7 +131,9 @@ export const VirtualizedMessagesList = ({
   ]);
 
   const {processQueue} = useKoSubscribableChildren(assetRepository, ['processQueue', 'uploadProgressQueue']);
-  const currentConversationProcessQueue = processQueue.filter(item => item.conversationId === conversation.id);
+  const currentConversationProcessQueue = processQueue.filter(item => {
+    return item.conversationId === conversation.id;
+  });
 
   const filteredMessages = filterMessages(allMessages);
 
@@ -138,7 +143,11 @@ export const VirtualizedMessagesList = ({
 
   const [highlightedMessage, setHighlightedMessage] = useState<string | undefined>(conversation.initialMessage()?.id);
 
-  const {focusedId, handleKeyDown, setFocusedId} = useRoveFocus(filteredMessages.map(message => message.id));
+  const {focusedId, handleKeyDown, setFocusedId} = useRoveFocus(
+    filteredMessages.map(message => {
+      return message.id;
+    }),
+  );
 
   const shouldShowInvitePeople = isActiveParticipant && inTeam && (isGuestRoom || isGuestAndServicesRoom);
 
@@ -157,7 +166,9 @@ export const VirtualizedMessagesList = ({
 
   const virtualizer = useVirtualizer({
     count: groupedMessages.length,
-    getScrollElement: () => parentElement,
+    getScrollElement: () => {
+      return parentElement;
+    },
     estimateSize: index => {
       const item = groupedMessages[index];
       return isMarker(item) ? MARKER_ESTIMATE : ESTIMATED_ELEMENT_SIZE;
@@ -176,7 +187,9 @@ export const VirtualizedMessagesList = ({
         return element.getBoundingClientRect().height;
       }
 
-      return cachedMeasurement || element.getBoundingClientRect().height;
+      return isNumber(cachedMeasurement) && cachedMeasurement !== 0
+        ? cachedMeasurement
+        : element.getBoundingClientRect().height;
     },
     getItemKey,
   });
@@ -236,7 +249,7 @@ export const VirtualizedMessagesList = ({
       setHighlightedMessage(undefined);
       scrolledToHighlightedMessage.current = false;
       clearTimeout(clearHighlightedMessage);
-    }, 5000);
+    }, messageHighlightDurationInMilliseconds);
 
     await loadMessagesForTimestampSelection({
       conversation,
@@ -249,9 +262,9 @@ export const VirtualizedMessagesList = ({
 
   useLayoutEffect(() => {
     if (highlightedMessage !== undefined && highlightedMessage !== '' && !scrolledToHighlightedMessage.current) {
-      const highlightedMessageIndex = groupedMessages.findIndex(
-        msg => !isMarker(msg) && msg.message.id === highlightedMessage,
-      );
+      const highlightedMessageIndex = groupedMessages.findIndex(msg => {
+        return !isMarker(msg) && msg.message.id === highlightedMessage;
+      });
 
       if (highlightedMessageIndex !== -1) {
         virtualizer.scrollToIndex(highlightedMessageIndex, {align: 'center'});
@@ -259,7 +272,7 @@ export const VirtualizedMessagesList = ({
 
         const setScrolledToHighlightedMessageTimeout = setTimeout(() => {
           clearTimeout(setScrolledToHighlightedMessageTimeout);
-        }, 100);
+        }, scrollUpdateDelayInMilliseconds);
       }
     }
   }, [groupedMessages, highlightedMessage]);
@@ -280,12 +293,14 @@ export const VirtualizedMessagesList = ({
     const scrollTimeout = setTimeout(() => {
       virtualizer.scrollToIndex(groupedMessages.length - 1, {align: 'end'});
       clearTimeout(scrollTimeout);
-    }, 100);
+    }, scrollUpdateDelayInMilliseconds);
   };
 
   const virtualItems = virtualizer.getVirtualItems();
   const lastIndex = groupedMessages.length - 1;
-  const isLastMessageVisible = virtualItems.some(item => item.index === lastIndex);
+  const isLastMessageVisible = virtualItems.some(item => {
+    return item.index === lastIndex;
+  });
 
   useEffect(() => {
     // Timeout to ensure that the messages are rendered before calling getVisibleCallback
@@ -300,9 +315,11 @@ export const VirtualizedMessagesList = ({
           getVisibleCallback(conversation, item.message)?.();
         }
       });
-    }, 100);
+    }, scrollUpdateDelayInMilliseconds);
 
-    return () => clearTimeout(timeout);
+    return () => {
+      return clearTimeout(timeout);
+    };
   }, [isConversationLoaded, virtualItems]);
 
   useLayoutEffect(() => {
@@ -341,7 +358,7 @@ export const VirtualizedMessagesList = ({
                 position: 'absolute',
                 width: '100%',
                 ...(isLast &&
-                  !currentConversationProcessQueue?.length && {
+                  !isNonEmptyArray(currentConversationProcessQueue) && {
                     '.message': {
                       paddingBottom: '40px',
                     },
@@ -371,11 +388,17 @@ export const VirtualizedMessagesList = ({
                   onClickAvatar={showUserDetails}
                   onClickCancelRequest={cancelConnectionRequest}
                   onClickImage={showImageDetails}
-                  onClickInvitePeople={() => invitePeople(conversation)}
-                  onClickReactionDetails={message => showMessageReactions(message, true)}
+                  onClickInvitePeople={() => {
+                    return invitePeople(conversation);
+                  }}
+                  onClickReactionDetails={message => {
+                    return showMessageReactions(message, true);
+                  }}
                   onClickMessage={onClickMessage}
                   onClickParticipants={showParticipants}
-                  onClickDetails={message => showMessageDetails(message)}
+                  onClickDetails={message => {
+                    return showMessageDetails(message);
+                  }}
                   onClickResetSession={resetSession}
                   onClickTimestamp={onTimestampClick}
                   selfId={selfUser.qualifiedId}
@@ -405,7 +428,9 @@ export const VirtualizedMessagesList = ({
             <UploadAssets
               assetRepository={assetRepository}
               conversationId={conversation.id}
-              scrollToEnd={() => virtualizer.scrollToOffset(parentElement.scrollHeight, {align: 'end'})}
+              scrollToEnd={() => {
+                return virtualizer.scrollToOffset(parentElement.scrollHeight, {align: 'end'});
+              }}
             />
           </div>
         )}

@@ -409,6 +409,39 @@ describe('WebApp version synchronization orchestration', () => {
     });
   });
 
+  it('bootstraps the next release after an earlier Production release has no synchronization marker', async () => {
+    const failedProductionReleaseIdentifier = '2026-09-23.1';
+    const failedProductionTagName = '2026-09-23.1-production';
+    const nextProductionReleaseIdentifier = '2026-09-30.1';
+    const nextProductionTagName = '2026-09-30.1-production';
+    const fakeGitHubClient = createFakeGitHubClient({pullRequestsByListCall: [[], [], [], [], []]});
+
+    const failedReleaseInspectionResult = await inspectWebAppVersionSynchronization({
+      releaseIdentifier: failedProductionReleaseIdentifier,
+      productionTagName: failedProductionTagName,
+      githubClient: fakeGitHubClient.client,
+    });
+
+    assert(failedReleaseInspectionResult.isOk);
+    expect(failedReleaseInspectionResult.value.kind).toBe('available');
+
+    const fakeGitClient = createFakeGitClient();
+    const actualResult = await synchronizeWebAppVersion(
+      createSynchronizationOptions({
+        releaseIdentifier: nextProductionReleaseIdentifier,
+        productionTagName: nextProductionTagName,
+        githubClient: fakeGitHubClient.client,
+        gitClient: fakeGitClient.client,
+      }),
+    );
+
+    expect(expectSynchronizationResult(actualResult).webAppVersion).toBe('1.0.0');
+    expect(fakeGitClient.state.writePackageDocumentsOptions[0]).toEqual({
+      rootPackageDocument: {...createPackageDocument('0.27.0'), version: '1.0.0'},
+      webAppPackageDocument: {...createPackageDocument('0.27.0'), version: '1.0.0'},
+    });
+  });
+
   it('increments only the patch version after the bootstrap release', async () => {
     const fakeGitHubClient = createFakeGitHubClient({pullRequestsByListCall: [[], [], [], []]});
     const fakeGitClient = createFakeGitClient({mainSnapshot: createMainSnapshot('1.0.9')});

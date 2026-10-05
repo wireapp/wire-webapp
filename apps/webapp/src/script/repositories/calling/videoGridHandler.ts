@@ -24,6 +24,8 @@ import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {Call} from './Call';
 import type {Participant} from './Participant';
 
+const participantPairSize = 2;
+
 export interface Grid {
   grid: Participant[];
   thumbnail: Participant | null;
@@ -37,7 +39,7 @@ export function getGrid(call: Call | undefined) {
     };
   }
 
-  if (call.participants()?.length === 2) {
+  if (call.participants()?.length === participantPairSize) {
     return {
       grid: call.getRemoteParticipants(),
       thumbnail: call.getSelfParticipant(),
@@ -59,19 +61,35 @@ export function updateVideoGrid(call: Call | undefined, setGrid: Dispatch<SetSta
 }
 
 export const useVideoGrid = (call: Call): Grid => {
-  const [grid, setGrid] = useState<Grid>(() => getGrid(call));
+  const [grid, setGrid] = useState<Grid>(() => {
+    return getGrid(call);
+  });
   const {participants, currentPage, pages} = useKoSubscribableChildren(call, ['participants', 'currentPage', 'pages']);
 
   useEffect(() => {
-    const updateGrid = () => updateVideoGrid(call, setGrid);
+    const updateGrid = () => {
+      return updateVideoGrid(call, setGrid);
+    };
     updateGrid();
-    const nameSubscriptions = participants?.map(p => p.user.name.subscribe(updateGrid));
-    const videoSubscriptions = participants?.map(p => p.isSendingVideo.subscribe(updateGrid));
-    const screenShareSubscriptions = participants?.map(p => p.sharesScreen.subscribe(updateGrid));
+    const nameSubscriptions = participants?.map(p => {
+      return p.user.name.subscribe(updateGrid);
+    });
+    const videoSubscriptions = participants?.map(p => {
+      return p.isSendingVideo.subscribe(updateGrid);
+    });
+    const screenShareSubscriptions = participants?.map(p => {
+      return p.sharesScreen.subscribe(updateGrid);
+    });
     return () => {
-      nameSubscriptions?.forEach(s => s.dispose());
-      videoSubscriptions?.forEach(s => s.dispose());
-      screenShareSubscriptions?.forEach(s => s.dispose());
+      nameSubscriptions?.forEach(s => {
+        s.dispose();
+      });
+      videoSubscriptions?.forEach(s => {
+        s.dispose();
+      });
+      screenShareSubscriptions?.forEach(s => {
+        s.dispose();
+      });
     };
   }, [participants, participants?.length, call, currentPage, pages?.length]);
 

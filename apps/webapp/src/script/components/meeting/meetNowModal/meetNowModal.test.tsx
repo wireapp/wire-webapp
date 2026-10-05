@@ -63,8 +63,12 @@ const createDeferredMeetNowMeeting = () => {
   return {
     meetNowMeeting: jest.fn().mockReturnValue(
       task.tryOrElse(
-        () => meetingSubmitErrors.createFailed,
-        () => deferred.promise,
+        () => {
+          return meetingSubmitErrors.createFailed;
+        },
+        () => {
+          return deferred.promise;
+        },
       ),
     ),
     resolveMeetNowMeeting: (
@@ -85,20 +89,34 @@ const createMainViewModel = (): MainViewModel => {
         conversation: {
           safeGetConversationById,
           hasConversationWith: jest.fn().mockReturnValue(false),
-          getAllGroupConversations: () => [],
+          getAllGroupConversations: () => {
+            return [];
+          },
         },
         calling: {
           findCall: jest.fn().mockReturnValue(undefined),
         },
         search: {
-          normalizeQuery: (query: string) => ({query: query.trim().toLowerCase(), isHandleQuery: false}),
-          searchByName: async () => [],
-          searchUserInSet: () => [],
+          normalizeQuery: (query: string) => {
+            return {query: query.trim().toLowerCase(), isHandleQuery: false};
+          },
+          searchByName: async () => {
+            return [];
+          },
+          searchUserInSet: () => {
+            return [];
+          },
         },
         team: {
-          filterExternals: async (candidateUsers: User[]) => candidateUsers,
-          filterRemoteDomainUsers: async (candidateUsers: User[]) => candidateUsers,
-          isSelfConnectedTo: () => false,
+          filterExternals: async (candidateUsers: User[]) => {
+            return candidateUsers;
+          },
+          filterRemoteDomainUsers: async (candidateUsers: User[]) => {
+            return candidateUsers;
+          },
+          isSelfConnectedTo: () => {
+            return false;
+          },
         },
       },
     },
@@ -110,21 +128,24 @@ const createMainViewModel = (): MainViewModel => {
   } as unknown as MainViewModel;
 };
 
-const createMeetingStore = (meetNowMeeting: MeetingStoreState['meetNowMeeting']) =>
-  createStore<MeetingStoreState>(() => ({
-    meetingSeries: [],
-    isLoading: false,
-    hasLoadError: false,
-    loadMeetings: jest.fn().mockResolvedValue(undefined),
-    scheduleMeeting: jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
-    meetNowMeeting,
-    updateMeeting: jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
-    loadMeetingForEdit: jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.updateFailed)),
-    deleteMeetingForMe: jest.fn().mockReturnValue(task.resolve(undefined)),
-    deleteMeetingForAll: jest.fn().mockReturnValue(task.resolve(undefined)),
-    removeMeetingByQualifiedId: jest.fn(),
-    syncMeetingByQualifiedId: jest.fn().mockReturnValue(task.reject('meetingNotFound')),
-  }));
+const createMeetingStore = (meetNowMeeting: MeetingStoreState['meetNowMeeting']) => {
+  return createStore<MeetingStoreState>(() => {
+    return {
+      meetingSeries: [],
+      isLoading: false,
+      hasLoadError: false,
+      loadMeetings: jest.fn().mockResolvedValue(undefined),
+      scheduleMeeting: jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
+      meetNowMeeting,
+      updateMeeting: jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
+      loadMeetingForEdit: jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.updateFailed)),
+      deleteMeetingForMe: jest.fn().mockReturnValue(task.resolve(undefined)),
+      deleteMeetingForAll: jest.fn().mockReturnValue(task.resolve(undefined)),
+      removeMeetingByQualifiedId: jest.fn(),
+      syncMeetingByQualifiedId: jest.fn().mockReturnValue(task.reject('meetingNotFound')),
+    };
+  });
+};
 
 const setupContainerMocks = () => {
   const selfUser = new User('self-id', 'example.com', translateForTest);
@@ -133,11 +154,17 @@ const setupContainerMocks = () => {
   } as unknown as ConversationState;
   const userState = {
     self: ko.observable(selfUser),
-    connectedUsers: ko.pureComputed(() => [] as User[]),
+    connectedUsers: ko.pureComputed(() => {
+      return [] as User[];
+    }),
   } as unknown as UserState;
   const teamState = {
-    isTeam: ko.pureComputed(() => false),
-    teamUsers: ko.pureComputed(() => [] as User[]),
+    isTeam: ko.pureComputed(() => {
+      return false;
+    }),
+    teamUsers: ko.pureComputed(() => {
+      return [] as User[];
+    }),
   } as unknown as TeamState;
 
   jest.spyOn(container, 'resolve').mockImplementation(token => {
@@ -202,7 +229,9 @@ const submitForm = async () => {
   await userEvent.click(screen.getByRole('button', {name: 'meetings.meetNowModal.startMeeting'}));
 };
 
-const getModalOverlay = () => screen.getByRole('dialog');
+const getModalOverlay = () => {
+  return screen.getByRole('dialog');
+};
 
 const getModalContent = () => {
   const overlay = getModalOverlay();

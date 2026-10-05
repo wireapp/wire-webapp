@@ -42,16 +42,18 @@ const defaultActions = actionRoot;
 const defaultClient = new APIClient({urls: APIClient.BACKEND.STAGING});
 const defaultCore = new Account(defaultClient);
 const defaultLocalStorage = window.localStorage;
-const defaultGetConfig = () => ({
-  APP_INSTANCE_ID: 'app-id',
-  FEATURE: {
-    CHECK_CONSENT: true,
-    DEFAULT_LOGIN_TEMPORARY_CLIENT: false,
-    ENABLE_ACCOUNT_REGISTRATION: true,
-    ENABLE_DEBUG: true,
-    ENABLE_SSO: true,
-  },
-});
+const defaultGetConfig = () => {
+  return {
+    APP_INSTANCE_ID: 'app-id',
+    FEATURE: {
+      CHECK_CONSENT: true,
+      DEFAULT_LOGIN_TEMPORARY_CLIENT: false,
+      ENABLE_ACCOUNT_REGISTRATION: true,
+      ENABLE_DEBUG: true,
+      ENABLE_SSO: true,
+    },
+  };
+};
 
 export const mockStoreFactory = (
   parameters: MockStoreParameters = {

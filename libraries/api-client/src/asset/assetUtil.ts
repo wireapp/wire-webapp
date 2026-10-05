@@ -17,6 +17,10 @@
  *
  */
 
-export const isValidUUID = (id: string): boolean => /^[A-Za-z0-9-]+$/.test(id);
+export const isValidUUID = (id: string): boolean => {
+  return /^[A-Za-z0-9-]+$/.test(id);
+};
 
-export const isValidToken = (token: string): boolean => /^[A-Za-z0-9+/=_\-]+$/.test(token);
+export const isValidToken = (token: string): boolean => {
+  return /^[A-Za-z0-9+/=_\-]+$/.test(token);
+};

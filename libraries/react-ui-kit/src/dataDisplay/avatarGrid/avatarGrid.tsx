@@ -27,6 +27,9 @@ import {IsInViewport} from '../../utils';
 import {filterProps} from '../../utils/util';
 import {Avatar, AvatarProps, DEFAULT_AVATAR_SIZE} from '../avatar';
 
+const maximumAvatarGridItems = 4;
+const avatarGridColumnCount = 2;
+
 interface Props<T = HTMLDivElement> extends React.HTMLProps<T> {
   backgroundColor?: string;
   borderColor?: string;
@@ -59,15 +62,16 @@ const avatarGridStyle: <T>(props: Props<T>) => CSSObject = ({
   };
 };
 
-const filteredAvatarGridProps = (props: Props) =>
-  filterProps(props, ['backgroundColor', 'borderColor', 'items', 'size', 'borderWidth']);
+const filteredAvatarGridProps = (props: Props) => {
+  return filterProps(props, ['backgroundColor', 'borderColor', 'items', 'size', 'borderWidth']);
+};
 
 type AvatarGridItem = Props['items'][number] | null;
 
 export const AvatarGrid = ({borderWidth = 1, size = DEFAULT_AVATAR_SIZE, items, fetchImages, ...props}: Props) => {
   const allProps = {borderWidth, items, size, ...props};
-  const slicedItems: AvatarGridItem[] = items.slice(0, 4);
-  const missing = 4 - slicedItems.length;
+  const slicedItems: AvatarGridItem[] = items.slice(0, maximumAvatarGridItems);
+  const missing = maximumAvatarGridItems - slicedItems.length;
   for (let index = 0; index < missing; index++) {
     slicedItems.push(null);
   }
@@ -78,8 +82,8 @@ export const AvatarGrid = ({borderWidth = 1, size = DEFAULT_AVATAR_SIZE, items, 
       css={avatarGridStyle(allProps)}
       {...filteredAvatarGridProps(allProps)}
     >
-      {slicedItems.map(item =>
-        !isNullOrUndefined(item) ? (
+      {slicedItems.map(item => {
+        return !isNullOrUndefined(item) ? (
           <Avatar
             key={Math.random().toString()}
             backgroundColor={item.backgroundColor ?? COLOR.GRAY_DARKEN_80}
@@ -88,7 +92,7 @@ export const AvatarGrid = ({borderWidth = 1, size = DEFAULT_AVATAR_SIZE, items, 
             forceInitials={item.forceInitials}
             isAvatarGridItem
             name={item.name}
-            size={size / 2 - borderWidth}
+            size={size / avatarGridColumnCount - borderWidth}
             style={{height: '100%', width: '100%'}}
           />
         ) : (
@@ -100,8 +104,8 @@ export const AvatarGrid = ({borderWidth = 1, size = DEFAULT_AVATAR_SIZE, items, 
               width: '100%',
             }}
           />
-        ),
-      )}
+        );
+      })}
     </IsInViewport>
   );
 };

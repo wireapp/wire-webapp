@@ -66,31 +66,33 @@ export function captureModalFocusContext(context: ModalFocusContext = {}): Modal
   return {
     targetDocument,
     container: context.container,
-    createFocusRestorationCallback: (additionalCallback?: () => void) => () => {
-      // Execute additional callback if provided
-      if (!isUndefined(additionalCallback)) {
-        try {
-          additionalCallback();
-        } catch (error: unknown) {
-          console.error('Error in modal close callback:', error);
-        }
-      }
-
-      // Restore focus to the previously focused element
-      if (!isNull(previouslyFocusedElement) && isFunction(previouslyFocusedElement.focus)) {
-        try {
-          // Check if the element is still in the document before focusing
-          if (
-            document.contains(previouslyFocusedElement) ||
-            (!isNullOrUndefined(context.targetDocument) && context.targetDocument.contains(previouslyFocusedElement))
-          ) {
-            previouslyFocusedElement.focus();
+    createFocusRestorationCallback: (additionalCallback?: () => void) => {
+      return () => {
+        // Execute additional callback if provided
+        if (!isUndefined(additionalCallback)) {
+          try {
+            additionalCallback();
+          } catch (error: unknown) {
+            console.error('Error in modal close callback:', error);
           }
-        } catch (error: unknown) {
-          // Silently handle focus errors (e.g., element no longer in DOM)
-          console.error('Failed to restore focus to element:', error);
         }
-      }
+
+        // Restore focus to the previously focused element
+        if (!isNull(previouslyFocusedElement) && isFunction(previouslyFocusedElement.focus)) {
+          try {
+            // Check if the element is still in the document before focusing
+            if (
+              document.contains(previouslyFocusedElement) ||
+              (!isNullOrUndefined(context.targetDocument) && context.targetDocument.contains(previouslyFocusedElement))
+            ) {
+              previouslyFocusedElement.focus();
+            }
+          } catch (error: unknown) {
+            // Silently handle focus errors (e.g., element no longer in DOM)
+            console.error('Failed to restore focus to element:', error);
+          }
+        }
+      };
     },
   };
 }

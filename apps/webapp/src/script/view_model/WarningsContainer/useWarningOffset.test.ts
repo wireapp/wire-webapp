@@ -30,7 +30,9 @@ describe('useWarningOffset', () => {
   });
 
   it('returns no offset when there are no warnings', () => {
-    const {result} = renderHook(() => useWarningOffset());
+    const {result} = renderHook(() => {
+      return useWarningOffset();
+    });
 
     expect(result.current).toEqual({hasLargeOffset: false, hasSmallOffset: false});
   });
@@ -42,7 +44,9 @@ describe('useWarningOffset', () => {
   ])('returns the expected offset for %s', (warning, hasLargeOffset, hasSmallOffset) => {
     useWarningsState.setState({name: '', warnings: [warning]});
 
-    const {result} = renderHook(() => useWarningOffset());
+    const {result} = renderHook(() => {
+      return useWarningOffset();
+    });
 
     expect(result.current).toEqual({hasLargeOffset, hasSmallOffset});
   });

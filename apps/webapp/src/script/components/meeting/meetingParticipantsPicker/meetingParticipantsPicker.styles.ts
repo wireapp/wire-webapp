@@ -117,14 +117,16 @@ export const searchInputStyles: CSSObject = {
 const CHEVRON_MARGIN_TOP_OPEN = 2;
 const CHEVRON_MARGIN_TOP_CLOSED = 4;
 
-export const chevronIconStyles = (isOpen: boolean): CSSObject => ({
-  flexShrink: 0,
-  height: '16px',
-  marginTop: isOpen ? CHEVRON_MARGIN_TOP_OPEN : CHEVRON_MARGIN_TOP_CLOSED,
-  transform: isOpen ? 'rotateX(180deg)' : undefined,
-  transition: 'transform 0.15s ease',
-  width: '16px',
-});
+export const chevronIconStyles = (isOpen: boolean): CSSObject => {
+  return {
+    flexShrink: 0,
+    height: '16px',
+    marginTop: isOpen ? CHEVRON_MARGIN_TOP_OPEN : CHEVRON_MARGIN_TOP_CLOSED,
+    transform: isOpen ? 'rotateX(180deg)' : undefined,
+    transition: 'transform 0.15s ease',
+    width: '16px',
+  };
+};
 
 export const chevronButtonStyles: CSSObject = {
   alignItems: 'center',

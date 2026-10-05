@@ -94,8 +94,8 @@ const createMainViewModel = ({
 }: {
   renameConversation?: jest.Mock;
   safeGetConversationById?: jest.Mock;
-} = {}) =>
-  ({
+} = {}) => {
+  return {
     content: {
       repositories: {
         conversation: {
@@ -104,31 +104,37 @@ const createMainViewModel = ({
         },
       },
     },
-  }) as unknown as MainViewModel;
+  } as unknown as MainViewModel;
+};
 
 const createMeetingStore = ({
   loadMeetings = jest.fn().mockResolvedValue(undefined),
   scheduleMeeting = jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
   updateMeeting = jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
-}: Partial<Pick<MeetingStoreState, 'loadMeetings' | 'scheduleMeeting' | 'updateMeeting'>> = {}) =>
-  createStore<MeetingStoreState>(() => ({
-    meetingSeries: [],
-    isLoading: false,
-    hasLoadError: false,
-    loadMeetings,
-    scheduleMeeting,
-    meetNowMeeting: jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
-    updateMeeting,
-    deleteMeetingForMe: jest.fn().mockReturnValue(task.resolve(undefined)),
-    deleteMeetingForAll: jest.fn().mockReturnValue(task.resolve(undefined)),
-    removeMeetingByQualifiedId: jest.fn(),
-    syncMeetingByQualifiedId: jest.fn().mockReturnValue(task.reject('meetingNotFound')),
-    loadMeetingForEdit: jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.updateFailed)),
-  }));
+}: Partial<Pick<MeetingStoreState, 'loadMeetings' | 'scheduleMeeting' | 'updateMeeting'>> = {}) => {
+  return createStore<MeetingStoreState>(() => {
+    return {
+      meetingSeries: [],
+      isLoading: false,
+      hasLoadError: false,
+      loadMeetings,
+      scheduleMeeting,
+      meetNowMeeting: jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
+      updateMeeting,
+      deleteMeetingForMe: jest.fn().mockReturnValue(task.resolve(undefined)),
+      deleteMeetingForAll: jest.fn().mockReturnValue(task.resolve(undefined)),
+      removeMeetingByQualifiedId: jest.fn(),
+      syncMeetingByQualifiedId: jest.fn().mockReturnValue(task.reject('meetingNotFound')),
+      loadMeetingForEdit: jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.updateFailed)),
+    };
+  });
+};
 
-const createWrapper =
-  (store: ReturnType<typeof createMeetingStore>, mainViewModel: MainViewModel = createMainViewModel()) =>
-  ({children}: {children: ReactNode}) => {
+const createWrapper = (
+  store: ReturnType<typeof createMeetingStore>,
+  mainViewModel: MainViewModel = createMainViewModel(),
+) => {
+  return ({children}: {children: ReactNode}) => {
     const RootProviderWrapper = createRootProviderWrapperForTest(
       createRootContextValueForTest({
         translate: translateForTest,
@@ -143,6 +149,7 @@ const createWrapper =
       </RootProviderWrapper>
     );
   };
+};
 
 describe('useScheduleMeetingSubmit', () => {
   beforeEach(() => {
@@ -159,7 +166,12 @@ describe('useScheduleMeetingSubmit', () => {
     const scheduleMeeting = jest.fn().mockReturnValue(task.resolve({failedToAdd: []}));
     const store = createMeetingStore({loadMeetings, scheduleMeeting});
 
-    const {result} = renderHook(() => useScheduleMeetingSubmit(), {wrapper: createWrapper(store)});
+    const {result} = renderHook(
+      () => {
+        return useScheduleMeetingSubmit();
+      },
+      {wrapper: createWrapper(store)},
+    );
 
     let submitResult: ScheduleMeetingSubmitResult = scheduleMeetingSubmitResults.submitFailed;
     await act(async () => {
@@ -176,7 +188,12 @@ describe('useScheduleMeetingSubmit', () => {
     const scheduleMeeting = jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.addParticipantsFailed));
     const store = createMeetingStore({loadMeetings, scheduleMeeting});
 
-    const {result} = renderHook(() => useScheduleMeetingSubmit(), {wrapper: createWrapper(store)});
+    const {result} = renderHook(
+      () => {
+        return useScheduleMeetingSubmit();
+      },
+      {wrapper: createWrapper(store)},
+    );
 
     let submitResult: ScheduleMeetingSubmitResult = scheduleMeetingSubmitResults.submitFailed;
     await act(async () => {
@@ -211,7 +228,12 @@ describe('useScheduleMeetingSubmit', () => {
       [],
     );
 
-    const {result} = renderHook(() => useScheduleMeetingSubmit(), {wrapper: createWrapper(store)});
+    const {result} = renderHook(
+      () => {
+        return useScheduleMeetingSubmit();
+      },
+      {wrapper: createWrapper(store)},
+    );
 
     let submitResult: ScheduleMeetingSubmitResult = scheduleMeetingSubmitResults.submitFailed;
     await act(async () => {
@@ -229,7 +251,12 @@ describe('useScheduleMeetingSubmit', () => {
     const scheduleMeeting = jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.createFailed));
     const store = createMeetingStore({loadMeetings, scheduleMeeting});
 
-    const {result} = renderHook(() => useScheduleMeetingSubmit(), {wrapper: createWrapper(store)});
+    const {result} = renderHook(
+      () => {
+        return useScheduleMeetingSubmit();
+      },
+      {wrapper: createWrapper(store)},
+    );
 
     let submitResult: ScheduleMeetingSubmitResult = scheduleMeetingSubmitResults.submitFailed;
     await act(async () => {
@@ -248,7 +275,12 @@ describe('useScheduleMeetingSubmit', () => {
     openEditMeetingModal();
     useScheduleMeetingModal.setState({originalStart: maybe.nothing(), originalEnd: maybe.nothing()});
 
-    const {result} = renderHook(() => useScheduleMeetingSubmit(), {wrapper: createWrapper(store)});
+    const {result} = renderHook(
+      () => {
+        return useScheduleMeetingSubmit();
+      },
+      {wrapper: createWrapper(store)},
+    );
 
     let submitResult: ScheduleMeetingSubmitResult = scheduleMeetingSubmitResults.succeeded;
     await act(async () => {
@@ -294,7 +326,12 @@ describe('useScheduleMeetingSubmit', () => {
       seriesEndDate: '2026-06-16T10:00:00.000Z',
     });
 
-    const {result} = renderHook(() => useScheduleMeetingSubmit(), {wrapper: createWrapper(store)});
+    const {result} = renderHook(
+      () => {
+        return useScheduleMeetingSubmit();
+      },
+      {wrapper: createWrapper(store)},
+    );
 
     await act(async () => {
       await result.current.submit(formState);
@@ -310,7 +347,12 @@ describe('useScheduleMeetingSubmit', () => {
 
     openEditMeetingModal();
 
-    const {result} = renderHook(() => useScheduleMeetingSubmit(), {wrapper: createWrapper(store)});
+    const {result} = renderHook(
+      () => {
+        return useScheduleMeetingSubmit();
+      },
+      {wrapper: createWrapper(store)},
+    );
 
     let submitResult: ScheduleMeetingSubmitResult = scheduleMeetingSubmitResults.submitFailed;
     await act(async () => {
@@ -354,9 +396,14 @@ describe('useScheduleMeetingSubmit', () => {
 
     openEditMeetingModal();
 
-    const {result} = renderHook(() => useScheduleMeetingSubmit(), {
-      wrapper: createWrapper(store, mainViewModel),
-    });
+    const {result} = renderHook(
+      () => {
+        return useScheduleMeetingSubmit();
+      },
+      {
+        wrapper: createWrapper(store, mainViewModel),
+      },
+    );
 
     await act(async () => {
       await result.current.submit(formState);

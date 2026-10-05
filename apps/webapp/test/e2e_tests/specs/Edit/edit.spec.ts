@@ -216,7 +216,9 @@ test.describe('Edit', () => {
     'I want to see the last edited text including a timestamp in message detail view if the message has been edited',
     {tag: ['@TC-3563', '@regression']},
     async ({createPage}) => {
-      const pages = await PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages);
+      const pages = await PageManager.from(createPage(withLogin(userA))).then(pm => {
+        return pm.webapp.pages;
+      });
       await createGroup(pages, 'Test Group', [userB]); // The message detail view is only available for group conversations
 
       await pages.conversationList().getConversation('Test Group').open();

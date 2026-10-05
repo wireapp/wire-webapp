@@ -24,6 +24,7 @@ import {Maybe, Task, task} from 'true-myth';
 import {STATE as CALL_STATE} from '@wireapp/avs';
 
 import type {CallingRepository} from 'Repositories/calling/CallingRepository';
+import type {CallMediaChoice} from 'Repositories/calling/callMediaChoice';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {isMLSCapableConversation} from 'Repositories/conversation/ConversationSelectors';
 import type {ConversationState} from 'Repositories/conversation/ConversationState';
@@ -54,9 +55,9 @@ const resolveConversation = (
     return task.resolve(localConversation.value);
   }
 
-  return deps.conversationRepository
-    .safeGetConversationById(qualifiedConversationId)
-    .mapRejected(() => joinMeetingCallErrors.conversationNotFound);
+  return deps.conversationRepository.safeGetConversationById(qualifiedConversationId).mapRejected(() => {
+    return joinMeetingCallErrors.conversationNotFound;
+  });
 };
 
 /**
@@ -77,23 +78,39 @@ const ensureMlsConversationReady = (
       conversationId: conversation.qualifiedId,
       groupId: conversation.groupId,
     })
-    .map(() => conversation)
-    .mapRejected(() => joinMeetingCallErrors.joinFailed);
+    .map(() => {
+      return conversation;
+    })
+    .mapRejected(() => {
+      return joinMeetingCallErrors.joinFailed;
+    });
 };
 
-const performJoin = (deps: JoinMeetingCallDeps, conversation: Conversation): Task<void, JoinMeetingCallError> => {
+const performJoin = (
+  deps: JoinMeetingCallDeps,
+  conversation: Conversation,
+  media: CallMediaChoice,
+): Task<boolean, JoinMeetingCallError> => {
   const call = deps.callingRepository.findCall(conversation.qualifiedId);
 
   if (!isUndefined(call) && call.state() === CALL_STATE.INCOMING) {
     return task.tryOrElse(
-      () => joinMeetingCallErrors.joinFailed,
-      () => deps.callingViewModel.callActions.answer(call),
+      () => {
+        return joinMeetingCallErrors.joinFailed;
+      },
+      () => {
+        return deps.callingViewModel.callActions.answer(call, media);
+      },
     );
   }
 
   return task.tryOrElse(
-    () => joinMeetingCallErrors.joinFailed,
-    () => deps.callingViewModel.callActions.startAudio(conversation),
+    () => {
+      return joinMeetingCallErrors.joinFailed;
+    },
+    () => {
+      return deps.callingViewModel.callActions.startAudio(conversation, media);
+    },
   );
 };
 
@@ -104,7 +121,13 @@ const performJoin = (deps: JoinMeetingCallDeps, conversation: Conversation): Tas
 export const joinMeetingCall = (
   deps: JoinMeetingCallDeps,
   qualifiedConversationId: QualifiedId,
-): Task<void, JoinMeetingCallError> =>
-  resolveConversation(deps, qualifiedConversationId)
-    .andThen(conversation => ensureMlsConversationReady(deps, conversation))
-    .andThen(conversation => performJoin(deps, conversation));
+  media: CallMediaChoice,
+): Task<boolean, JoinMeetingCallError> => {
+  return resolveConversation(deps, qualifiedConversationId)
+    .andThen(conversation => {
+      return ensureMlsConversationReady(deps, conversation);
+    })
+    .andThen(conversation => {
+      return performJoin(deps, conversation, media);
+    });
+};

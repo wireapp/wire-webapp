@@ -40,7 +40,9 @@ describe('overlayedObserver', () => {
       const element = document.createElement('div');
       element.style.height = '10px';
       document.body.appendChild(element);
-      document.elementFromPoint = () => element;
+      document.elementFromPoint = () => {
+        return element;
+      };
 
       overlayedObserver.onElementVisible(element, callbackSpy.onVisible);
 
@@ -67,7 +69,9 @@ describe('overlayedObserver', () => {
       element.style.width = '10px';
       document.body.appendChild(element);
       document.body.appendChild(overlay);
-      document.elementFromPoint = () => overlay;
+      document.elementFromPoint = () => {
+        return overlay;
+      };
 
       overlayedObserver.onElementVisible(element, callbackSpy.onVisible);
 
@@ -95,17 +99,73 @@ describe('overlayedObserver', () => {
       element.style.width = '10px';
       document.body.appendChild(element);
       document.body.appendChild(overlay);
-      document.elementFromPoint = () => overlay;
+      document.elementFromPoint = () => {
+        return overlay;
+      };
 
       overlayedObserver.onElementVisible(element, callbackSpy.onVisible);
 
       expect(callbackSpy.onVisible).not.toHaveBeenCalled();
 
       document.body.removeChild(overlay);
-      document.elementFromPoint = () => element;
+      document.elementFromPoint = () => {
+        return element;
+      };
       jest.advanceTimersByTime(301);
 
       expect(callbackSpy.onVisible).toHaveBeenCalled();
+    });
+  });
+
+  describe('trackElement', () => {
+    it('continues reporting visibility changes while tracking the element', () => {
+      const callbackSpy = {
+        onChange: noop,
+      };
+      spyOn(callbackSpy, 'onChange');
+
+      const element = document.createElement('div');
+      element.style.height = '10px';
+      const overlay = document.createElement('div');
+      overlay.style.position = 'absolute';
+      overlay.style.top = '0';
+      overlay.style.left = '0';
+      overlay.style.height = '100px';
+      overlay.style.width = '100px';
+      document.body.appendChild(element);
+
+      const originalElementFromPoint = document.elementFromPoint;
+
+      try {
+        document.elementFromPoint = () => {
+          return element;
+        };
+
+        overlayedObserver.trackElement(element, callbackSpy.onChange);
+
+        expect(callbackSpy.onChange).toHaveBeenNthCalledWith(1, true);
+
+        document.body.appendChild(overlay);
+        document.elementFromPoint = () => {
+          return overlay;
+        };
+        jest.advanceTimersByTime(301);
+
+        expect(callbackSpy.onChange).toHaveBeenNthCalledWith(2, false);
+
+        document.body.removeChild(overlay);
+        document.elementFromPoint = () => {
+          return element;
+        };
+        jest.advanceTimersByTime(301);
+
+        expect(callbackSpy.onChange).toHaveBeenNthCalledWith(3, true);
+      } finally {
+        overlayedObserver.removeElement(element);
+        element.remove();
+        overlay.remove();
+        document.elementFromPoint = originalElementFromPoint;
+      }
     });
   });
 });

@@ -46,15 +46,23 @@ export interface ButtonProps<T = HTMLButtonElement> extends TextProps<T> {
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({showLoading, children, loadingColor = COLOR.WHITE, ...props}, ref) => (
-    <button ref={ref} css={(theme: Theme) => buttonStyle(theme, props)} {...filterButtonProps(props)}>
-      {showLoading === true ? (
-        <Loading size={30} color={loadingColor} style={{display: 'flex', margin: 'auto'}} />
-      ) : (
-        children
-      )}
-    </button>
-  ),
+  ({showLoading, children, loadingColor = COLOR.WHITE, ...props}, ref) => {
+    return (
+      <button
+        ref={ref}
+        css={(theme: Theme) => {
+          return buttonStyle(theme, props);
+        }}
+        {...filterButtonProps(props)}
+      >
+        {showLoading === true ? (
+          <Loading size={30} color={loadingColor} style={{display: 'flex', margin: 'auto'}} />
+        ) : (
+          children
+        )}
+      </button>
+    );
+  },
 );
 
 Button.displayName = 'Button';

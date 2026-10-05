@@ -50,5 +50,7 @@ export const TruncatedParagraph: Story = {
 };
 
 export const LeadParagraph: Story = {
-  render: () => <Lead>{LOREM_IPSUM}</Lead>,
+  render: () => {
+    return <Lead>{LOREM_IPSUM}</Lead>;
+  },
 };

@@ -39,17 +39,24 @@ describe('InputLevel', () => {
   let originalAudioContext: any;
   beforeAll(() => {
     originalAudioContext = window.AudioContext;
-    window.AudioContext = jest.fn().mockImplementation(() => ({
-      close: () => Promise.resolve(),
-      createAnalyser: () =>
-        ({
-          frequencyBinCount: 100,
-          getByteFrequencyData: (arr: Uint8Array) => {
-            arr.fill(128);
-          },
-        }) as AnalyserNode,
-      createMediaStreamSource: (stream: MediaStream) => ({connect: noop, disconnect: noop}),
-    }));
+    window.AudioContext = jest.fn().mockImplementation(() => {
+      return {
+        close: () => {
+          return Promise.resolve();
+        },
+        createAnalyser: () => {
+          return {
+            frequencyBinCount: 100,
+            getByteFrequencyData: (arr: Uint8Array) => {
+              arr.fill(128);
+            },
+          } as AnalyserNode;
+        },
+        createMediaStreamSource: (stream: MediaStream) => {
+          return {connect: noop, disconnect: noop};
+        },
+      };
+    });
 
     jest.spyOn(global, 'setInterval').mockImplementation((callback: () => void, interval: any) => {
       callback();
@@ -63,7 +70,12 @@ describe('InputLevel', () => {
 
   it('represents the audio input volume in an audiometer with active audio bullets', () => {
     const expectedAudioLevel = (128 / 160) * MAX_AUDIO_BULLETS;
-    const mediaStream = new MediaStream();
+    const mediaStream = {
+      id: 'test-stream',
+      getAudioTracks: () => {
+        return [{}];
+      },
+    } as MediaStream;
 
     const props = {
       disabled: false,

@@ -22,6 +22,8 @@ import {isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {Message} from 'Repositories/entity/message/message';
 import {isSameDay, fromUnixTime, TIME_IN_MILLIS} from 'Util/timeUtil';
 
+const groupedMessageIntervalInSeconds = 30;
+
 interface MessagesGroup {
   sender: string;
   firstMessageTimestamp: number;
@@ -90,7 +92,7 @@ function shouldGroupMessagesByTimestamp(
   currentMessageTimestamp: number,
 ) {
   // Interval in seconds, within which messages are grouped together
-  const GROUPED_MESSAGE_INTERVAL = 30 * TIME_IN_MILLIS.SECOND;
+  const GROUPED_MESSAGE_INTERVAL = groupedMessageIntervalInSeconds * TIME_IN_MILLIS.SECOND;
 
   const currentMessageDate = fromUnixTime(currentMessageTimestamp / TIME_IN_MILLIS.SECOND);
   const firstMessageDate = fromUnixTime(firstMessageTimestamp / TIME_IN_MILLIS.SECOND);
@@ -115,8 +117,8 @@ function shouldGroupMessagesByTimestamp(
 export function groupMessagesBySenderAndTime(
   messages: Message[],
   lastReadTimestamp: number,
-): Array<MessagesGroup | Marker> {
-  return messages.reduce<Array<MessagesGroup | Marker>>((acc, message, index) => {
+): (MessagesGroup | Marker)[] {
+  return messages.reduce<(MessagesGroup | Marker)[]>((acc, message, index) => {
     const previousMessage = messages[index - 1];
 
     const marker = getMessageMarkerType(message, lastReadTimestamp, previousMessage);

@@ -17,6 +17,7 @@
  *
  */
 
+import {isTruthy, isUndefined} from '@sindresorhus/is';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 import {container} from 'tsyringe';
 
@@ -55,11 +56,13 @@ export class EventStorageMiddleware implements EventMiddleware {
      * - The event is a link preview of a text message previously sent
      * - The event is an asset upload success of a metadata asset message
      */
-    const duplicateEvent = eventId ? await this.eventService.loadEvent(event.conversation, eventId) : undefined;
+    const duplicateEvent = isTruthy(eventId)
+      ? await this.eventService.loadEvent(event.conversation, eventId)
+      : undefined;
 
     // We first validate that the event is valid
     this.validateEvent(event, source, duplicateEvent);
-    if (event.type === CONVERSATION.SESSION_RESET && duplicateEvent) {
+    if (event.type === CONVERSATION.SESSION_RESET && isTruthy(duplicateEvent)) {
       return duplicateEvent;
     }
     // Then ask the different handlers which DB operations to perform
@@ -74,9 +77,11 @@ export class EventStorageMiddleware implements EventMiddleware {
       const operation = await handler(event, {
         duplicateEvent,
         selfUserId: this.selfUser.id,
-        findEvent: eventId => this.eventService.loadEvent(event.conversation, eventId),
+        findEvent: eventId => {
+          return this.eventService.loadEvent(event.conversation, eventId);
+        },
       });
-      if (operation) {
+      if (!isUndefined(operation)) {
         return operation;
       }
     }
@@ -92,25 +97,25 @@ export class EventStorageMiddleware implements EventMiddleware {
         of the conversation, then we can throw a validation error
         (that means the user was already removed by another member-leave event)
       */
-      if (!event.qualified_conversation) {
+      if (!isTruthy(event.qualified_conversation)) {
         return;
       }
       const conversation = this.conversationState.findConversation(event.qualified_conversation);
 
       const qualifiedUserIds = event.data.qualified_user_ids;
 
-      if (!conversation || !qualifiedUserIds) {
+      if (isUndefined(conversation) || !isTruthy(qualifiedUserIds)) {
         return;
       }
 
       const usersNotPartofConversation = qualifiedUserIds.reduce((acc, qualifiedUserId) => {
-        const isDeleted = conversation
-          .allUserEntities()
-          .find(user => matchQualifiedIds(user.qualifiedId, qualifiedUserId))?.isDeleted;
+        const isDeleted = conversation.allUserEntities().find(user => {
+          return matchQualifiedIds(user.qualifiedId, qualifiedUserId);
+        })?.isDeleted;
 
         const isParticipant = UserFilter.isParticipant(conversation, qualifiedUserId);
 
-        return acc || isDeleted || !isParticipant;
+        return acc || isDeleted === true || !isParticipant;
       }, false);
 
       if (usersNotPartofConversation) {
@@ -118,7 +123,7 @@ export class EventStorageMiddleware implements EventMiddleware {
       }
     }
 
-    if (!duplicateEvent) {
+    if (!isTruthy(duplicateEvent)) {
       return;
     }
 
@@ -131,7 +136,7 @@ export class EventStorageMiddleware implements EventMiddleware {
     }
 
     if (event.type === CONVERSATION.MESSAGE_ADD && duplicateEvent.type === CONVERSATION.MESSAGE_ADD) {
-      const isValidUpdate = !!event.data.previews?.length || event.data.replacing_message_id;
+      const isValidUpdate = isTruthy(event.data.previews?.length) || isTruthy(event.data.replacing_message_id);
       const isRetryAttempt = isEventRecordFailed(duplicateEvent) || isEventRecordWithFederationError(duplicateEvent);
 
       if (!isValidUpdate && !isRetryAttempt) {

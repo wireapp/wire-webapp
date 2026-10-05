@@ -21,6 +21,7 @@ import {useEffect, useLayoutEffect, useMemo} from 'react';
 
 import type {Clock} from '@enormora/clock/clock';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
+import {isNonEmptyString, isNullOrUndefined, isTruthy} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {ErrorBoundary} from 'react-error-boundary';
@@ -113,7 +114,7 @@ export const AppMain = (properties: AppMainProps) => {
 
   useInitializeRootFontSize();
 
-  if (!apiContext) {
+  if (isNullOrUndefined(apiContext)) {
     throw new Error('API Context has not been set');
   }
 
@@ -133,7 +134,9 @@ export const AppMain = (properties: AppMainProps) => {
   const teamState = container.resolve(TeamState);
   const core = container.resolve(Core);
   const userState = container.resolve(UserState);
-  const appLockRepository = useMemo(() => new AppLockRepository(translate), [translate]);
+  const appLockRepository = useMemo(() => {
+    return new AppLockRepository(translate);
+  }, [translate]);
 
   const isScreenshareActive =
     hasAvailableScreensToShare && desktopScreenShareMenu === DesktopScreenShareMenu.MAIN_WINDOW;
@@ -144,7 +147,9 @@ export const AppMain = (properties: AppMainProps) => {
     close: closeRightSidebar,
     lastViewedMessageDetailsEntity,
     goTo,
-  } = useAppMainState(state => state.rightSidebar);
+  } = useAppMainState(state => {
+    return state.rightSidebar;
+  });
   const currentState = history[history.length - 1];
 
   const {currentTab} = useSidebarStore();
@@ -162,8 +167,12 @@ export const AppMain = (properties: AppMainProps) => {
 
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
   const isMobileView = useMatchMedia(QUERY.tabletSMDown);
-  const {currentView} = useAppMainState(state => state.responsiveView);
-  const {isHidden: isLeftSidebarHidden} = useAppMainState(state => state.leftSidebar);
+  const {currentView} = useAppMainState(state => {
+    return state.responsiveView;
+  });
+  const {isHidden: isLeftSidebarHidden} = useAppMainState(state => {
+    return state.leftSidebar;
+  });
 
   const isMobileLeftSidebarView = currentView == ViewType.MOBILE_LEFT_SIDEBAR;
   const isMobileCentralColumnView = currentView == ViewType.MOBILE_CENTRAL_COLUMN;
@@ -180,14 +189,14 @@ export const AppMain = (properties: AppMainProps) => {
       if (selfUser.isTemporaryGuest()) {
         return mainView.list.showTemporaryGuest();
       }
-      if (activeConversation) {
+      if (!isNullOrUndefined(activeConversation)) {
         // There is already an active conversation, keeping state as is
         return;
       }
       const mostRecentConversation = conversationState.getMostRecentConversation();
-      if (mostRecentConversation) {
+      if (!isNullOrUndefined(mostRecentConversation)) {
         navigate(generateConversationUrl(mostRecentConversation.qualifiedId));
-      } else if (repositories.user['userState'].connectRequests().length) {
+      } else if (repositories.user['userState'].connectRequests().length > 0) {
         amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentState.CONNECTION_REQUESTS);
       }
     };
@@ -195,7 +204,7 @@ export const AppMain = (properties: AppMainProps) => {
     // on app load reset last message focus to ensure last message is focused
     // only when user enters a new conversation using keyboard(press enter)
     const historyState = window.history.state;
-    if (historyState && !!historyState.eventKey) {
+    if (isTruthy(historyState) && isTruthy(historyState.eventKey)) {
       historyState.eventKey = '';
       window.history.replaceState(historyState, '', window.location.hash);
     }
@@ -213,16 +222,23 @@ export const AppMain = (properties: AppMainProps) => {
 
       await mainView.content.showConversation(
         {id: conversationId, domain},
-        {filePath: `files${pathString ? `/${pathString}` : ''}`},
+        {filePath: `files${isNonEmptyString(pathString) ? `/${pathString}` : ''}`},
       );
     };
 
     const showUserProfile = (param1: string, param2?: string) => {
       // If param1 is a UUID, it's the userId, otherwise param2 must be the userId
       const userId = isUUID(param1) ? param1 : param2;
-      const domain = isUUID(param1) ? param2 || apiContext.domain || '' : param1;
+      let domain = param1;
+      if (isUUID(param1)) {
+        if (isNonEmptyString(param2)) {
+          domain = param2;
+        } else {
+          domain = isNonEmptyString(apiContext.domain) ? apiContext.domain : '';
+        }
+      }
 
-      if (!userId) {
+      if (!isNonEmptyString(userId)) {
         navigate('/');
         return;
       }
@@ -244,7 +260,9 @@ export const AppMain = (properties: AppMainProps) => {
       }
 
       showMostRecentConversation();
-      showUserModal({domain, id: userId}, () => navigate('/'));
+      showUserModal({domain, id: userId}, () => {
+        return navigate('/');
+      });
     };
 
     configureRouterClock(clock);
@@ -256,18 +274,29 @@ export const AppMain = (properties: AppMainProps) => {
       '/conversation/:conversationId/files': showConversationFiles,
       '/conversation/:conversationId/:domain/files/*path': showConversationFiles,
       '/conversation/:conversationId/files/*path': showConversationFiles,
-      '/preferences/about': () => mainView.list.openPreferencesAbout(),
-      '/preferences/account': () => mainView.list.openPreferencesAccount(),
-      '/preferences/av': () => mainView.list.openPreferencesAudioVideo(),
-      '/preferences/devices': () => mainView.list.openPreferencesDevices(),
-      '/preferences/options': () => mainView.list.openPreferencesOptions(),
-      '/meetings': () =>
-        canUseMeetings({
+      '/preferences/about': () => {
+        return mainView.list.openPreferencesAbout();
+      },
+      '/preferences/account': () => {
+        return mainView.list.openPreferencesAccount();
+      },
+      '/preferences/av': () => {
+        return mainView.list.openPreferencesAudioVideo();
+      },
+      '/preferences/devices': () => {
+        return mainView.list.openPreferencesDevices();
+      },
+      '/preferences/options': () => {
+        return mainView.list.openPreferencesOptions();
+      },
+      '/meetings': () => {
+        return canUseMeetings({
           isTeamMeetingsFeatureEnabled: teamState.isMeetingsEnabled(),
           apiVersion: core.backendFeatures.version,
         })
           ? mainView.list.openMeetingsList()
-          : navigate('/'),
+          : navigate('/');
+      },
       '/user/:userId/:domain': showUserProfile,
       '/user/:domain/:userId': showUserProfile,
       '/user/:userId': showUserProfile,
@@ -275,21 +304,23 @@ export const AppMain = (properties: AppMainProps) => {
 
     const redirect = localStorage.getItem(App.LOCAL_STORAGE_LOGIN_REDIRECT_KEY);
 
-    if (redirect) {
+    if (isNonEmptyString(redirect)) {
       localStorage.removeItem(App.LOCAL_STORAGE_LOGIN_REDIRECT_KEY);
       window.location.replace(redirect);
     }
 
     const conversationRedirect = localStorage.getItem(App.LOCAL_STORAGE_LOGIN_CONVERSATION_KEY);
 
-    if (conversationRedirect) {
+    if (isNonEmptyString(conversationRedirect)) {
       const {conversation, domain} = JSON.parse(conversationRedirect)?.data;
       localStorage.removeItem(App.LOCAL_STORAGE_LOGIN_CONVERSATION_KEY);
-      window.location.replace(`#/conversation/${conversation}${domain ? `/${domain}` : ''}`);
+      window.location.replace(`#/conversation/${conversation}${isTruthy(domain) ? `/${domain}` : ''}`);
     }
 
     repositories.properties.checkTelemetrySharingPermission();
-    window.setTimeout(() => repositories.notification.checkPermission(), App.CONFIG.NOTIFICATION_CHECK);
+    window.setTimeout(() => {
+      return repositories.notification.checkPermission();
+    }, App.CONFIG.NOTIFICATION_CHECK);
 
     //after app is loaded, check mls migration configuration and start migration if needed
     await initialiseMLSMigrationFlow({
@@ -353,14 +384,14 @@ export const AppMain = (properties: AppMainProps) => {
             {showMainContent && (
               <MainContent
                 selfUser={selfUser}
-                isRightSidebarOpen={!!currentState}
+                isRightSidebarOpen={isTruthy(currentState)}
                 openRightSidebar={toggleRightSidebar}
                 reloadApp={app.refresh}
                 appLockRepository={appLockRepository}
               />
             )}
 
-            {currentState && (
+            {isTruthy(currentState) ? (
               <RightSidebar
                 lastViewedMessageDetailsEntity={lastViewedMessageDetailsEntity}
                 currentEntity={currentEntity}
@@ -371,6 +402,8 @@ export const AppMain = (properties: AppMainProps) => {
                 selfUser={selfUser}
                 userState={userState}
               />
+            ) : (
+              currentState
             )}
           </div>
         )}

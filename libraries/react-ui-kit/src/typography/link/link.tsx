@@ -75,12 +75,16 @@ export const linkStyle: <T>(theme: Theme, props: LinkProps<T>) => CSSObject = (
   };
 };
 
-export const filterLinkProps = (props: LinkProps) => filterProps(filterTextProps(props) as LinkProps, []);
+export const filterLinkProps = (props: LinkProps) => {
+  return filterProps(filterTextProps(props) as LinkProps, []);
+};
 
 export const Link = ({targetBlank, ...props}: LinkProps) => {
   return (
     <a
-      css={(theme: Theme) => linkStyle(theme, props)}
+      css={(theme: Theme) => {
+        return linkStyle(theme, props);
+      }}
       target={Boolean(targetBlank) ? '_blank' : (targetBlank as unknown as undefined)}
       rel="noopener noreferrer"
       {...filterLinkProps(props)}

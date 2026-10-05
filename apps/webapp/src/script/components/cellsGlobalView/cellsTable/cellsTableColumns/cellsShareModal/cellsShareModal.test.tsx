@@ -32,35 +32,40 @@ import {CellsShareModal} from './cellsShareModal';
 
 import {useCellsStore} from '../../../common/useCellsStore/useCellsStore';
 
-const withTheme = (component: ReactNode) => <StyledApp themeId={THEME_ID.DEFAULT}>{component}</StyledApp>;
+const withTheme = (component: ReactNode) => {
+  return <StyledApp themeId={THEME_ID.DEFAULT}>{component}</StyledApp>;
+};
 
 describe('CellsShareModal', () => {
   const nodeId = 'node-id';
 
-  const createNode = (): CellNode => ({
-    id: nodeId,
-    name: 'file.pdf',
-    path: '/file.pdf',
-    mimeType: 'application/pdf',
-    sizeMb: '1',
-    extension: 'pdf',
-    uploadedAtTimestamp: Date.now(),
-    owner: 'owner',
-    conversationName: 'Conversation',
-    tags: [],
-    presignedUrlExpiresAt: null,
-    user: null,
-    type: CellNodeType.FILE,
-    selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.EDITOR,
-  });
+  const createNode = (): CellNode => {
+    return {
+      id: nodeId,
+      name: 'file.pdf',
+      path: '/file.pdf',
+      mimeType: 'application/pdf',
+      sizeMb: '1',
+      extension: 'pdf',
+      uploadedAtTimestamp: Date.now(),
+      owner: 'owner',
+      conversationName: 'Conversation',
+      tags: [],
+      presignedUrlExpiresAt: null,
+      user: null,
+      type: CellNodeType.FILE,
+      selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.EDITOR,
+    };
+  };
 
-  const createCellsRepository = (): CellsRepository =>
-    ({
+  const createCellsRepository = (): CellsRepository => {
+    return {
       createPublicLink: jest.fn(),
       getPublicLink: jest.fn(),
       deletePublicLink: jest.fn(),
       updatePublicLink: jest.fn(),
-    }) as unknown as CellsRepository;
+    } as unknown as CellsRepository;
+  };
 
   beforeEach(() => {
     useCellsStore.getState().clearAll();
@@ -68,8 +73,8 @@ describe('CellsShareModal', () => {
   });
 
   it('renders global share modal outside RootProvider when fireAndForgetInvoker is provided', () => {
-    expect(() =>
-      render(
+    expect(() => {
+      return render(
         withTheme(
           <CellsShareModal
             type="file"
@@ -82,7 +87,7 @@ describe('CellsShareModal', () => {
             }}
           />,
         ),
-      ),
-    ).not.toThrow('RootContext has not been set');
+      );
+    }).not.toThrow('RootContext has not been set');
   });
 });

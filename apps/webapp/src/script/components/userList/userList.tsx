@@ -45,11 +45,6 @@ export enum UserlistMode {
   OTHERS = 'UserlistMode.OTHERS',
 }
 
-enum UserListSections {
-  CONTACTS = 'UserListSections.CONTACTS',
-  SELECTED_CONTACTS = 'UserListSections.SELECTED_CONTACTS',
-}
-
 const USER_CHUNK_SIZE = 64;
 
 interface UserListProps {
@@ -74,6 +69,8 @@ interface UserListProps {
   isSelectable?: boolean;
   selfUser: User;
   filterDeletedUsers?: boolean;
+  isContactsOpen?: boolean;
+  onContactsOpenChange?: (isOpen: boolean) => void;
 }
 
 export const UserList = ({
@@ -97,21 +94,29 @@ export const UserList = ({
   onSelectUser,
   selfUser,
   filterDeletedUsers = true,
+  isContactsOpen: controlledContactsOpen,
+  onContactsOpenChange,
 }: UserListProps) => {
   const {translate} = useApplicationContext();
   const [maxShownUsers, setMaxShownUsers] = useState(USER_CHUNK_SIZE);
 
   // filter out deleted users
-  const filteredUsers = useMemo(
-    () => (filterDeletedUsers ? users.filter(user => !user.isDeleted) : users),
-    [users, filterDeletedUsers],
-  );
+  const filteredUsers = useMemo(() => {
+    return filterDeletedUsers
+      ? users.filter(user => {
+          return !user.isDeleted;
+        })
+      : users;
+  }, [users, filterDeletedUsers]);
 
-  const [expandedFolders, setExpandedFolders] = useState<UserListSections[]>([UserListSections.CONTACTS]);
+  const [isSelectedContactsOpen, setIsSelectedContactsOpen] = useState(false);
+  const [internalContactsOpen, setInternalContactsOpen] = useState(true);
 
   const hasMoreUsers = !truncate && filteredUsers.length > maxShownUsers;
 
-  const highlightedUserIds = highlightedUsers.map(user => user.id);
+  const highlightedUserIds = highlightedUsers.map(user => {
+    return user.id;
+  });
   const {is_verified: isSelfVerified} = useKoSubscribableChildren(selfUser, ['is_verified']);
 
   const isCompactMode = mode === UserlistMode.COMPACT;
@@ -137,8 +142,14 @@ export const UserList = ({
 
   const renderListItem = useCallback(
     (user: User, isLastItem: boolean = false) => {
-      const isSelected = (userEntity: User): boolean =>
-        isSelectable && selectedUsers.some(user => user.id === userEntity.id);
+      const isSelected = (userEntity: User): boolean => {
+        return (
+          isSelectable &&
+          selectedUsers.some(user => {
+            return user.id === userEntity.id;
+          })
+        );
+      };
 
       return (
         <li key={user.id}>
@@ -198,30 +209,43 @@ export const UserList = ({
     );
   } else {
     const truncatedUsers = truncate ? filteredUsers.slice(0, reducedUserCount) : filteredUsers;
-    const isSelected = (userEntity: User): boolean =>
-      isSelectable && !!selectedUsers?.some(user => user.id === userEntity.id);
+    const isSelected = (userEntity: User): boolean => {
+      return (
+        isSelectable &&
+        !!selectedUsers?.some(user => {
+          return user.id === userEntity.id;
+        })
+      );
+    };
 
     const selectedUsersCount = selectedUsers.length;
     const hasSelectedUsers = selectedUsersCount > 0;
 
-    const toggleFolder = (folderName: UserListSections) => {
-      setExpandedFolders(prevState =>
-        prevState.includes(folderName) ? prevState.filter(name => folderName !== name) : [...prevState, folderName],
-      );
+    const isContactsOpen = controlledContactsOpen ?? internalContactsOpen;
+    const handleContactsOpenChange = (open: boolean) => {
+      if (controlledContactsOpen === undefined) {
+        setInternalContactsOpen(open);
+      }
+      onContactsOpenChange?.(open);
     };
-
-    const isSelectedContactsOpen = expandedFolders.includes(UserListSections.SELECTED_CONTACTS);
-    const isContactsOpen = expandedFolders.includes(UserListSections.CONTACTS);
-    const unselectedUsers = truncatedUsers.slice(0, maxShownUsers).filter(user => !isSelected(user));
+    const unselectedUsers = truncatedUsers.filter(user => {
+      return !isSelected(user);
+    });
+    const visibleUnselectedUsers = unselectedUsers.slice(0, maxShownUsers);
 
     content = (
       <Fragment>
         {isSelectable && hasSelectedUsers && (
           <Fragment>
             <button
-              onClick={() => toggleFolder(UserListSections.SELECTED_CONTACTS)}
+              onClick={() => {
+                return setIsSelectedContactsOpen(prevState => {
+                  return !prevState;
+                });
+              }}
               css={collapseButton}
               data-uie-name="do-toggle-selected-search-list"
+              aria-expanded={isSelectedContactsOpen}
             >
               <span css={collapseIcon(isSelectedContactsOpen)} aria-hidden="true">
                 <ChevronDownIcon width={16} height={16} />
@@ -247,22 +271,25 @@ export const UserList = ({
 
         {isSelectable && (
           <button
-            onClick={() => toggleFolder(UserListSections.CONTACTS)}
+            onClick={() => {
+              return handleContactsOpenChange(!isContactsOpen);
+            }}
             css={collapseButton}
             data-uie-name="do-toggle-search-list"
+            aria-expanded={isContactsOpen}
           >
             <span css={collapseIcon(isContactsOpen)} aria-hidden="true">
               <ChevronDownIcon width={16} height={16} />
             </span>
 
-            {translate('userListContacts')}
+            {translate('userListContactsWithCount', {count: unselectedUsers.length})}
           </button>
         )}
 
         <ul className={cx('search-list', cssClasses)} data-uie-name="search-list">
           {isContactsOpen &&
-            unselectedUsers.map((user, index) => {
-              const isLastItem = index === unselectedUsers.length - 1;
+            visibleUnselectedUsers.map((user, index) => {
+              const isLastItem = index === visibleUnselectedUsers.length - 1;
 
               return renderListItem(user, isLastItem);
             })}
@@ -277,7 +304,9 @@ export const UserList = ({
 
       {hasMoreUsers && (
         <InViewport
-          onVisible={() => setMaxShownUsers(maxShownUsers + USER_CHUNK_SIZE)}
+          onVisible={() => {
+            return setMaxShownUsers(maxShownUsers + USER_CHUNK_SIZE);
+          }}
           key={`in-viewport-${Math.random()}`}
           style={{height: 10, transform: 'translateY(-60px)', width: 10}}
         />
@@ -355,7 +384,9 @@ function ConversationUserList({
 
           {hasAdmins && (
             <ul className={cx('search-list', cssClasses)} data-uie-name="list-admins" aria-labelledby={adminsHeaderId}>
-              {admins.slice(0, maxShownUsers).map(user => renderListItem(user))}
+              {admins.slice(0, maxShownUsers).map(user => {
+                return renderListItem(user);
+              })}
             </ul>
           )}
 
@@ -374,7 +405,9 @@ function ConversationUserList({
           </h3>
 
           <ul className={cx('search-list', cssClasses)} data-uie-name="list-members" aria-labelledby={membersHeaderId}>
-            {members.slice(0, maxShownUsers - admins.length).map(user => renderListItem(user))}
+            {members.slice(0, maxShownUsers - admins.length).map(user => {
+              return renderListItem(user);
+            })}
           </ul>
         </Fragment>
       )}

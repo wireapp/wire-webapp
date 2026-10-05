@@ -17,6 +17,8 @@
  *
  */
 
+import {isTruthy} from '@sindresorhus/is';
+
 import {Quote} from '@wireapp/protocol-messaging';
 
 import {MessageAddEvent, MultipartMessageAddEvent, QuoteData} from 'Repositories/conversation/EventBuilder';
@@ -37,22 +39,30 @@ type QuoteAccessor<T> = {
 };
 
 const messageAddQuoteAccessor: QuoteAccessor<MessageAddEvent> = {
-  get: event => event.data.quote,
-  set: (event, quote) => ({
-    ...event,
-    data: {...event.data, quote},
-  }),
+  get: event => {
+    return event.data.quote;
+  },
+  set: (event, quote) => {
+    return {
+      ...event,
+      data: {...event.data, quote},
+    };
+  },
 };
 
 const multipartMessageAddQuoteAccessor: QuoteAccessor<MultipartMessageAddEvent> = {
-  get: event => event.data.text?.quote,
-  set: (event, quote) => ({
-    ...event,
-    data: {
-      ...event.data,
-      text: {...event.data.text, quote},
-    },
-  }),
+  get: event => {
+    return event.data.text?.quote;
+  },
+  set: (event, quote) => {
+    return {
+      ...event,
+      data: {
+        ...event.data,
+        text: {...event.data.text, quote},
+      },
+    };
+  },
 };
 
 export class QuotedMessageMiddleware implements EventMiddleware {
@@ -73,13 +83,13 @@ export class QuotedMessageMiddleware implements EventMiddleware {
     switch (event.type) {
       case ClientEvent.CONVERSATION.MESSAGE_ADD: {
         const originalMessageId = event.data.replacing_message_id;
-        return originalMessageId
+        return isTruthy(originalMessageId)
           ? this.handleEditEvent(event, originalMessageId, messageAddQuoteAccessor)
           : this.handleAddEvent(event, messageAddQuoteAccessor);
       }
       case ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD: {
         const originalMessageId = event.data.replacing_message_id;
-        return originalMessageId
+        return isTruthy(originalMessageId)
           ? this.handleEditEvent(event, originalMessageId, multipartMessageAddQuoteAccessor)
           : this.handleAddEvent(event, multipartMessageAddQuoteAccessor);
       }
@@ -95,7 +105,7 @@ export class QuotedMessageMiddleware implements EventMiddleware {
     const originalEvent = (await this.eventService.loadEvent(event.conversation, originalMessageId)) as StoredEvent<
       MessageAddEvent | MultipartMessageAddEvent | undefined
     >;
-    if (!originalEvent) {
+    if (!isTruthy(originalEvent)) {
       return event;
     }
 
@@ -120,7 +130,7 @@ export class QuotedMessageMiddleware implements EventMiddleware {
   ): Promise<T> {
     const rawQuote = accessor.get(event);
 
-    if (!rawQuote || typeof rawQuote !== 'string') {
+    if (!isTruthy(rawQuote) || typeof rawQuote !== 'string') {
       return event;
     }
 
@@ -142,7 +152,7 @@ export class QuotedMessageMiddleware implements EventMiddleware {
     const messageId = quote.quotedMessageId;
 
     const quotedMessage = await this.eventService.loadEvent(event.conversation, messageId);
-    if (!quotedMessage) {
+    if (!isTruthy(quotedMessage)) {
       this.logger.warn(`Quoted message with ID "${messageId}" not found.`);
       const quoteData: ProcessedQuoteData = {
         error: {

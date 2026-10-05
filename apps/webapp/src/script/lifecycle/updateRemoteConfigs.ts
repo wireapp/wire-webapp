@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import {TaskParams} from '@wireapp/core/lib/util/recurringTaskScheduler';
 import {container} from 'tsyringe';
 
@@ -30,14 +31,14 @@ let core: Core | undefined = undefined;
 export const updateRemoteConfigLogger = getLogger('updateRemoteConfigs');
 
 export const scheduleRecurringTask = async (params: TaskParams) => {
-  if (!core) {
+  if (isUndefined(core)) {
     core = container.resolve(Core);
   }
   return core.recurringTaskScheduler.registerTask(params);
 };
 
 export const updateApiVersion = async () => {
-  if (!core) {
+  if (isUndefined(core)) {
     core = container.resolve(Core);
   }
   const {

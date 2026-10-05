@@ -73,7 +73,9 @@ const ReceiptModeToggle = ({receiptMode, onReceiptModeChanged, disabled = false}
           data-uie-name="toggle-receipt-mode-checkbox"
           id="receipt-toggle-input"
           name="preferences_device_verification_toggle"
-          onChange={() => updateValue()}
+          onChange={() => {
+            return updateValue();
+          }}
           type="checkbox"
           disabled={disabled}
         />
@@ -82,7 +84,9 @@ const ReceiptModeToggle = ({receiptMode, onReceiptModeChanged, disabled = false}
           className={`button-label${disabled ? ' disabled' : ''}`}
           aria-pressed={receiptMode !== RECEIPT_MODE.OFF}
           type="button"
-          onClick={() => updateValue()}
+          onClick={() => {
+            return updateValue();
+          }}
           disabled={disabled}
         >
           <span className="button-label__switch" />

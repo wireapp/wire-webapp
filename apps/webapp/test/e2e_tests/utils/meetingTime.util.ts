@@ -38,8 +38,9 @@ export const roundDateUpToFifteenMinutes = (date: Date): Date => {
   return rounded;
 };
 
-export const formatMeetingTimeLabel = (date: Date): string =>
-  date.toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', hour12: true});
+export const formatMeetingTimeLabel = (date: Date): string => {
+  return date.toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', hour12: true});
+};
 
 export const formatMeetingDateIso = (date: Date): string => {
   const year = date.getFullYear();
@@ -62,5 +63,6 @@ export const createEndedMeetingWindow = (now = new Date()) => {
   return {start, end};
 };
 
-export const meetingWindowWithinPastEditPeriod = (start: Date, now = new Date()): boolean =>
-  now.getTime() - start.getTime() <= TWENTY_FOUR_HOURS_MS + FIFTEEN_MINUTES_MS;
+export const meetingWindowWithinPastEditPeriod = (start: Date, now = new Date()): boolean => {
+  return now.getTime() - start.getTime() <= TWENTY_FOUR_HOURS_MS + FIFTEEN_MINUTES_MS;
+};

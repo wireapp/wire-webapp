@@ -54,12 +54,16 @@ export const TeamCreationModalContainer = ({selfUser, userRepository, teamReposi
         <TeamCreationModal
           userName={name}
           onSuccess={modalCloseHandler}
-          onClose={() => setIsLeaveConfirmModalVisible(true)}
+          onClose={() => {
+            return setIsLeaveConfirmModalVisible(true);
+          }}
         />
       )}
       <ConfirmLeaveModal
         isShown={isLeaveConfirmModalVisible}
-        onClose={() => setIsLeaveConfirmModalVisible(false)}
+        onClose={() => {
+          return setIsLeaveConfirmModalVisible(false);
+        }}
         onLeave={modalCloseHandler}
       />
     </>

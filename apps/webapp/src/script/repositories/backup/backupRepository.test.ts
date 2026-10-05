@@ -17,6 +17,7 @@
  *
  */
 
+import {isUint8Array, isUndefined} from '@sindresorhus/is';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {container} from 'tsyringe';
 import {omit} from 'underscore';
@@ -85,9 +86,11 @@ async function buildBackupRepository() {
   const testFactory = new TestFactory();
   const conversationRepository = await testFactory.exposeConversationActors();
 
-  jest
-    .spyOn(conversationRepository, 'mapConversations')
-    .mockImplementation(conversations => conversations.map(c => generateConversation({type: c.type, overwites: c})));
+  jest.spyOn(conversationRepository, 'mapConversations').mockImplementation(conversations => {
+    return conversations.map(c => {
+      return generateConversation({type: c.type, overwites: c});
+    });
+  });
   jest.spyOn(conversationRepository, 'updateConversationStates');
   jest.spyOn(conversationRepository, 'updateConversations');
   jest.spyOn(conversationRepository, 'syncDeletedConversations').mockResolvedValue(undefined);
@@ -156,7 +159,9 @@ describe('BackupRepository', () => {
       const [backupRepository, {storageService}] = await buildBackupRepository();
       const password = '';
       await Promise.all([
-        ...messages.map(message => storageService.save(eventStoreName, '', message)),
+        ...messages.map(message => {
+          return storageService.save(eventStoreName, '', message);
+        }),
         storageService.save('conversations', conversationId, conversation),
         storageService.save(StorageSchemata.OBJECT_STORE.USERS, 'user-1', generateAPIUser()),
       ]);
@@ -174,6 +179,59 @@ describe('BackupRepository', () => {
   });
 
   describe('importHistory', () => {
+    it.each([
+      [undefined, undefined],
+      [null, null],
+      [false, false],
+      [0, 0],
+      ['', ''],
+      [[], []],
+      [{}, {}],
+      [
+        {otr_key: null, sha256: ''},
+        {otr_key: null, sha256: ''},
+      ],
+      [
+        {otr_key: false, sha256: 0},
+        {otr_key: false, sha256: 0},
+      ],
+      [
+        {otr_key: {}, sha256: []},
+        {otr_key: new Uint8Array(0), sha256: new Uint8Array(0)},
+      ],
+      [{otr_key: {'0': 1, '1': 2}}, {otr_key: new Uint8Array([1, 2])}],
+    ])('preserves legacy JSON record truthiness for %p', async (eventContent, expectedEventContent) => {
+      const [backupRepository, {backupService}] = await buildBackupRepository();
+      const user = new User('user1', '', translateForTest);
+      const importEntities = jest.spyOn(backupService, 'importEntities').mockResolvedValue(1);
+      const restoredEvent = {
+        conversation: conversationId,
+        from: 'sender',
+        id: 'runtime-characterization',
+        time: '2016-08-04T13:27:55.182Z',
+        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
+        data: eventContent,
+      };
+      const files = {
+        [Filename.METADATA]: JSON.stringify(createMetaData(user, 'client1', backupService)),
+        [Filename.EVENTS]: JSON.stringify([restoredEvent]),
+      };
+      const archive = await handleZipEvent({type: 'zip', files});
+      if (!isUint8Array(archive)) {
+        throw new Error('Expected ZIP bytes for the legacy backup fixture');
+      }
+
+      await backupRepository.importHistory(user, createBlobFromUint8Array(archive), noop, noop, '');
+
+      const expectedEvent = {...restoredEvent, data: expectedEventContent};
+      if (isUndefined(expectedEventContent)) {
+        delete expectedEvent.data;
+      }
+      expect(importEntities).toHaveBeenCalledWith(StorageSchemata.OBJECT_STORE.EVENTS, [expectedEvent], {
+        generateId: expect.any(Function),
+      });
+    });
+
     it.each([
       [
         {
@@ -251,7 +309,9 @@ describe('BackupRepository', () => {
 
       expect(importSpy).toHaveBeenCalledWith(
         StorageSchemata.OBJECT_STORE.EVENTS,
-        messages.map(message => omit(message, 'primary_key')),
+        messages.map(message => {
+          return omit(message, 'primary_key');
+        }),
         {generateId: expect.any(Function)},
       );
 
@@ -269,7 +329,9 @@ describe('BackupRepository', () => {
       const user = new User('user1', '', translateForTest);
       const mockHashedUserId = new Uint8Array(32);
       const mockEncodeHeader = jest.fn().mockResolvedValue(new Uint8Array(63));
-      const mockGenerateChaCha20Key = jest.fn().mockImplementation((header: DecodedHeader) => new Uint8Array(32));
+      const mockGenerateChaCha20Key = jest.fn().mockImplementation((header: DecodedHeader) => {
+        return new Uint8Array(32);
+      });
       const mockSalt = new Uint8Array(16);
       const mockReadBackupHeader = jest.fn().mockReturnValue({
         decodedHeader: {
@@ -316,7 +378,9 @@ describe('BackupRepository', () => {
       const clientId = 'ClientId';
       const user = new User('user1', '', translateForTest);
       const mockEncodeHeader = jest.fn().mockResolvedValue(new Uint8Array(63));
-      const mockGenerateChaCha20Key = jest.fn().mockImplementation(_header => new Uint8Array(32));
+      const mockGenerateChaCha20Key = jest.fn().mockImplementation(_header => {
+        return new Uint8Array(32);
+      });
 
       // Mock the behavior of BackUpHeader methods
       jest.spyOn(BackUpHeader.prototype, 'encodeHeader').mockImplementation(mockEncodeHeader);

@@ -17,4 +17,6 @@
  *
  */
 
-export const isObject = (value: unknown): value is {} => typeof value === 'object' && value !== null;
+export const isObject = (value: unknown): value is {} => {
+  return typeof value === 'object' && value !== null;
+};

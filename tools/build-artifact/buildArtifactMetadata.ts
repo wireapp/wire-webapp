@@ -112,7 +112,9 @@ function readCacheBustingValue(resourceUrl: string): Maybe<string> {
 function readCacheBustingValues(htmlContents: string): readonly string[] {
   return readHtmlResourceAttributeValues(htmlContents).flatMap(resourceUrl => {
     return readCacheBustingValue(resourceUrl)
-      .map(cacheBustingValue => [cacheBustingValue])
+      .map(cacheBustingValue => {
+        return [cacheBustingValue];
+      })
       .unwrapOr([]);
   });
 }
@@ -123,7 +125,9 @@ function containsExpectedMetadata(htmlDocument: BuildArtifactHtmlDocument, metad
   return (
     htmlDocument.contents.includes(`<!--! ${metadata.version} -->`) &&
     cacheBustingValues.length > 0 &&
-    cacheBustingValues.every(cacheBustingValue => cacheBustingValue === metadata.assetVersion)
+    cacheBustingValues.every(cacheBustingValue => {
+      return cacheBustingValue === metadata.assetVersion;
+    })
   );
 }
 

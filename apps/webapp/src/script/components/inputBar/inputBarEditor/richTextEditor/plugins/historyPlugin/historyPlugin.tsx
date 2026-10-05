@@ -29,7 +29,9 @@ export function HistoryPlugin(): null {
   const [editor] = useLexicalComposerContext();
 
   const historySavingDelay = 300;
-  useEffect(() => registerHistory(editor, createEmptyHistoryState(), historySavingDelay), [editor]);
+  useEffect(() => {
+    return registerHistory(editor, createEmptyHistoryState(), historySavingDelay);
+  }, [editor]);
 
   return null;
 }

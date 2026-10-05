@@ -36,7 +36,9 @@ test.describe('Connections', () => {
     {tag: ['@TC-365', '@regression']},
     async ({createPage}) => {
       const [memberBPages, memberAPageManager] = await Promise.all([
-        PageManager.from(createPage(withLogin(memberB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(memberB))).then(pm => {
+          return pm.webapp.pages;
+        }),
         PageManager.from(createPage(withLogin(memberA))),
       ]);
       await sendConnectionRequest(memberAPageManager, memberB);
@@ -59,9 +61,9 @@ test.describe('Connections', () => {
         PageManager.from(createPage(withLogin(memberC))),
       ]);
 
-      const [memberAPages, memberBPages, memberCPages] = [memberAPage, memberBPage, memberCPage].map(
-        page => page.webapp.pages,
-      );
+      const [memberAPages, memberBPages, memberCPages] = [memberAPage, memberBPage, memberCPage].map(page => {
+        return page.webapp.pages;
+      });
 
       await test.step('B & C accept connection requests from A', async () => {
         await sendConnectionRequest(memberAPage, memberB);
@@ -102,7 +104,9 @@ test.describe('Connections', () => {
     {tag: ['@TC-370', '@regression']},
     async ({createPage}) => {
       const [memberBPages, memberAPageManager] = await Promise.all([
-        PageManager.from(createPage(withLogin(memberB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(memberB))).then(pm => {
+          return pm.webapp.pages;
+        }),
         PageManager.from(createPage(withLogin(memberA))),
       ]);
       await sendConnectionRequest(memberAPageManager, memberB);

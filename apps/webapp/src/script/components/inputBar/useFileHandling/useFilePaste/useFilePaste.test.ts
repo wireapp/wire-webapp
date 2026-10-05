@@ -25,13 +25,19 @@ import * as TimeUtil from 'Util/timeUtil';
 
 import {useFilePaste} from './useFilePaste';
 
-jest.mock('Components/conversation/utils/checkFileSharingPermission', () => ({
-  checkFileSharingPermission: jest.fn(callback => callback),
-}));
+jest.mock('Components/conversation/utils/checkFileSharingPermission', () => {
+  return {
+    checkFileSharingPermission: jest.fn(callback => {
+      return callback;
+    }),
+  };
+});
 
-jest.mock('Util/timeUtil', () => ({
-  formatLocale: jest.fn(),
-}));
+jest.mock('Util/timeUtil', () => {
+  return {
+    formatLocale: jest.fn(),
+  };
+});
 
 describe('useFilePaste', () => {
   const mockOnFilePasted = jest.fn();
@@ -52,12 +58,12 @@ describe('useFilePaste', () => {
   });
 
   it('handles file paste event', () => {
-    renderHook(() =>
-      useFilePaste({
+    renderHook(() => {
+      return useFilePaste({
         onFilePasted: mockOnFilePasted,
         translate,
-      }),
-    );
+      });
+    });
 
     const file = new File(['test content'], 'test.txt', {type: 'text/plain', lastModified: mockDate.getTime()});
     const clipboardEvent = new MockClipboardEvent([file]);
@@ -74,12 +80,12 @@ describe('useFilePaste', () => {
   });
 
   it('ignores paste events with text/plain content', () => {
-    renderHook(() =>
-      useFilePaste({
+    renderHook(() => {
+      return useFilePaste({
         onFilePasted: mockOnFilePasted,
         translate,
-      }),
-    );
+      });
+    });
 
     const clipboardEvent = new MockClipboardEvent([], ['text/plain']);
 
@@ -92,12 +98,12 @@ describe('useFilePaste', () => {
   });
 
   it('does nothing when no files are pasted', () => {
-    renderHook(() =>
-      useFilePaste({
+    renderHook(() => {
+      return useFilePaste({
         onFilePasted: mockOnFilePasted,
         translate,
-      }),
-    );
+      });
+    });
 
     const clipboardEvent = new MockClipboardEvent([]);
 
@@ -135,7 +141,9 @@ class MockDataTransfer implements Partial<DataTransfer> {
     this.files = {
       ...files,
       length: files.length,
-      item: (index: number) => files[index] || null,
+      item: (index: number) => {
+        return files[index] || null;
+      },
       [Symbol.iterator]: function* () {
         for (let i = 0; i < files.length; i++) {
           yield files[i];

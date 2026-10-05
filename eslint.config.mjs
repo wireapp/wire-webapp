@@ -31,6 +31,15 @@ const runtimeGlobals = {
   ...globals.node,
 };
 
+const magicNumberOptions = {
+  ignoreDefaultValues: true,
+  ignoreArrayIndexes: false,
+  detectObjects: false,
+  enforceConst: false,
+  ignoreClassFieldInitialValues: false,
+  ignore: [-1, 0, 1],
+};
+
 const ignores = [
   '.git/',
   'docs/',
@@ -47,7 +56,7 @@ const ignores = [
   '!**/*.config.test.*',
   '!**/*.config.spec.*',
   'apps/webapp/src/sw.js',
-  'apps/server/bin/',
+  'apps/server/bin/copy_server_assets.js',
   'apps/server/coverage/',
   'apps/server/dist/',
   'apps/server/node_modules/',
@@ -121,14 +130,7 @@ const legacyRules = {
   'no-else-return': 'error',
   'no-inner-declarations': 'error',
   'no-lonely-if': 'error',
-  'no-magic-numbers': [
-    'warn',
-    {
-      ignore: [-1, 0, 1],
-      ignoreArrayIndexes: true,
-      ignoreDefaultValues: true,
-    },
-  ],
+  'no-magic-numbers': ['error', magicNumberOptions],
   'no-restricted-globals': [
     'warn',
     {
@@ -259,16 +261,6 @@ const strictBooleanExpressionsRule = [
   },
 ];
 
-const strictBooleanRules = {
-  '@typescript-eslint/strict-boolean-expressions': strictBooleanExpressionsRule,
-  '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'error',
-};
-
-const strictBooleanRulesWithUnnecessaryCondition = {
-  ...strictBooleanRules,
-  '@typescript-eslint/no-unnecessary-condition': 'error',
-};
-
 const emptyArrowFunctionRestrictions = [
   {
     selector: "ArrowFunctionExpression[async=false][body.type='BlockStatement'][body.body.length=0]",
@@ -347,12 +339,44 @@ const productionConfigs = [
     },
   },
   {
+    files: ['**/*.{ts,tsx,mts,cts}'],
+    rules: {
+      'no-magic-numbers': 'off',
+      '@typescript-eslint/no-magic-numbers': [
+        'error',
+        {
+          ignoreEnums: false,
+          ignoreNumericLiteralTypes: true,
+          ignoreReadonlyClassProperties: false,
+          ignoreTypeIndexes: false,
+          ...magicNumberOptions,
+        },
+      ],
+    },
+  },
+  {
     files: ['**/*.{ts,tsx,js,jsx,cjs,mjs}'],
     plugins: {
       '@stylistic': stylisticPlugin,
     },
     rules: {
       '@stylistic/eol-last': ['error', 'always'],
+    },
+  },
+  {
+    files: ['**/*.mts'],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: repositoryRootDirectory,
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+      },
+      globals: {
+        ...runtimeGlobals,
+        NodeJS: 'readonly',
+      },
     },
   },
   {
@@ -439,6 +463,12 @@ const productionConfigs = [
         },
       ],
       '@typescript-eslint/use-unknown-in-catch-callback-variable': 'error',
+      '@typescript-eslint/array-type': [
+        'error',
+        {
+          default: 'array',
+        },
+      ],
       '@typescript-eslint/typedef': 'off',
       'no-dupe-class-members': 'off',
       'no-unsanitized/property': 'off',
@@ -459,10 +489,19 @@ const productionConfigs = [
     },
   },
   {
-    files: ['tools/release-cli/webappVersionSynchronization.mts'],
+    files: ['tools/release-cli/**/*.mts'],
     languageOptions: {
       parserOptions: {
         project: './tsconfig.release-cli.json',
+        projectService: false,
+      },
+    },
+  },
+  {
+    files: ['tools/build-artifact/**/*.mts', 'tools/runtime-verification/**/*.mts'],
+    languageOptions: {
+      parserOptions: {
+        project: './tsconfig.tools.json',
         projectService: false,
       },
     },
@@ -492,7 +531,8 @@ const productionConfigs = [
       'libraries/react-ui-kit/**/*.{ts,tsx}',
     ],
     rules: {
-      ...strictBooleanRules,
+      '@typescript-eslint/strict-boolean-expressions': strictBooleanExpressionsRule,
+      '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'error',
     },
   },
   {
@@ -522,6 +562,7 @@ const productionConfigs = [
     files: ['**/*.test.tsx', '**/*.test.ts', '**/*.spec.tsx', '**/*.spec.ts', '**/test/**/*', '**/mocks/**/*'],
     rules: {
       'no-magic-numbers': 'off',
+      '@typescript-eslint/no-magic-numbers': 'off',
       'id-length': 'off',
     },
   },
@@ -536,7 +577,6 @@ const productionConfigs = [
       },
     },
     rules: {
-      '@typescript-eslint/strict-boolean-expressions': 'off',
       // Webapp path aliases (Util/*, Components/*, …) resolve to lowercase dirs on disk.
       'import/no-unresolved': ['error', {caseSensitive: false}],
       // Pin alias import order so Linux CI and macOS agree on webapp path aliases.
@@ -544,423 +584,16 @@ const productionConfigs = [
     },
   },
   {
-    files: [
-      'apps/webapp/src/script/components/LoadingBar/LoadingBar.tsx',
-      'apps/webapp/src/script/components/Note/Note.tsx',
-      'apps/webapp/src/script/components/ProgressBar/ProgressBar.tsx',
-      'apps/webapp/src/script/components/Radio/RadioGroup.tsx',
-      'apps/webapp/src/script/components/SearchInput/SearchInput.tsx',
-      'apps/webapp/src/script/components/SelectText/SelectText.tsx',
-      'apps/webapp/src/script/components/TextInput/TextInput.tsx',
-      'apps/webapp/src/script/components/UserName/UserName.tsx',
-      'apps/webapp/src/script/components/VerificationIcon/VerificationIcon.tsx',
-      'apps/webapp/src/script/components/fadingScrollbar/fadingScrollbar.tsx',
-      'apps/webapp/src/script/components/inViewport/inViewport.tsx',
-      'apps/webapp/src/script/components/ZoomableImage/ZoomableImage.tsx',
-      'apps/webapp/src/script/components/copyToClipboardButton/copyToClipboardButton.tsx',
-      'apps/webapp/src/script/components/draggableClickWrapper/draggableClickWrapper.tsx',
-      'apps/webapp/src/script/components/dropFileArea/dropFileArea.tsx',
-      'apps/webapp/src/script/components/toggle/BaseToggle.tsx',
-      'apps/webapp/src/script/hooks/useActiveWindow.ts',
-      'apps/webapp/src/script/hooks/useClickOutside.tsx',
-      'apps/webapp/src/script/hooks/useElementSize/useElementSize.ts',
-      'apps/webapp/src/script/hooks/useInView/useInView.ts',
-      'apps/webapp/src/script/hooks/useKeyPressAndHold/useKeyPressAndHold.ts',
-      'apps/webapp/src/script/hooks/useRoveFocus.ts',
-      'apps/webapp/src/script/hooks/useToggleState.ts',
-    ],
-    rules: {
-      ...strictBooleanRules,
-    },
-  },
-  {
-    files: ['apps/webapp/src/script/auth/**/*.{ts,tsx}'],
-    rules: {
-      ...strictBooleanRules,
-    },
-  },
-  {
-    files: [
-      'apps/webapp/src/script/browser/**/*.{ts,tsx}',
-      'apps/webapp/src/script/localization/**/*.{ts,tsx}',
-      'apps/webapp/src/script/router/**/*.{ts,tsx}',
-    ],
-    rules: {
-      ...strictBooleanRules,
-    },
-  },
-  {
-    files: [
-      'apps/webapp/src/script/externalRoute.ts',
-      'apps/webapp/src/script/hooks/useActiveWindow.ts',
-      'apps/webapp/src/script/hooks/useClickOutside.tsx',
-      'apps/webapp/src/script/hooks/useConnectionQuality.ts',
-      'apps/webapp/src/script/hooks/useDatePassed/useDatePassed.ts',
-      'apps/webapp/src/script/hooks/useElementSize/useElementSize.ts',
-      'apps/webapp/src/script/hooks/useInView/useInView.ts',
-      'apps/webapp/src/script/hooks/useKeyPressAndHold/useKeyPressAndHold.ts',
-      'apps/webapp/src/script/hooks/useLocalStorage.ts',
-      'apps/webapp/src/script/hooks/usePausableInterval.ts',
-      'apps/webapp/src/script/hooks/useRootFontSize.ts',
-      'apps/webapp/src/script/hooks/useRoveFocus.ts',
-      'apps/webapp/src/script/hooks/useSingleInstance.ts',
-      'apps/webapp/src/script/hooks/useToggleState.ts',
-      'apps/webapp/src/script/util/DOM/**/*.{ts,tsx}',
-      'apps/webapp/src/script/util/arrayUtil.ts',
-      'apps/webapp/src/script/util/connectionQualityHandler/**/*.{ts,tsx}',
-      'apps/webapp/src/script/util/countryCodes.ts',
-      'apps/webapp/src/script/util/dataDog.ts',
-      'apps/webapp/src/script/util/environment.ts',
-      'apps/webapp/src/script/util/focusUtil.ts',
-      'apps/webapp/src/script/util/imageUtil.ts',
-      'apps/webapp/src/script/util/localizerUtil/reactLocalizerUtil.tsx',
-      'apps/webapp/src/script/util/locationUtil.ts',
-      'apps/webapp/src/script/util/markdownUtil.ts',
-      'apps/webapp/src/script/util/modalFocusUtil.ts',
-      'apps/webapp/src/script/util/renderElement.ts',
-      'apps/webapp/src/script/util/sanitizationUtil.ts',
-      'apps/webapp/src/script/util/storageUtil.ts',
-      'apps/webapp/src/script/util/stringUtil.ts',
-      'apps/webapp/src/script/util/timeUtil.ts',
-      'apps/webapp/src/script/util/urlUtil.ts',
-      'apps/webapp/src/script/util/worker.ts',
-    ],
-    rules: {
-      ...strictBooleanRules,
-    },
-  },
-  {
-    files: [
-      'apps/webapp/src/script/guards/common.ts',
-      'apps/webapp/src/script/guards/Event.ts',
-      'apps/webapp/src/script/guards/HTMLElement.ts',
-      'apps/webapp/src/script/guards/Mouse.ts',
-      'apps/webapp/src/script/main/reportStartupFailure.ts',
-      'apps/webapp/src/script/observability/**/*.{ts,tsx}',
-      'apps/webapp/src/script/service/apiClientSingleton.ts',
-      'apps/webapp/src/script/service/backendEnvironment.ts',
-      'apps/webapp/src/script/telemetry/app_init/**/*.{ts,tsx}',
-      'apps/webapp/src/script/featureToggles/**/*.{ts,tsx}',
-    ],
-    rules: {
-      ...strictBooleanRules,
-    },
-  },
-  {
-    files: ['apps/webapp/src/script/page/mainContent/panels/preferences/**/*.{ts,tsx}'],
-    ignores: [
-      'apps/webapp/src/script/page/mainContent/panels/preferences/devicesPreferences/components/mlsDeviceDetails/**/*',
-    ],
-    rules: {
-      ...strictBooleanRules,
-    },
-  },
-  {
-    files: [
-      'apps/webapp/src/script/components/appLoader/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/appNotification/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/asset/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/availabilityIcon/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/avatar/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/badge/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/bannerPortal/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/draggableClickWrapper/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/dropFileArea/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/emojiPicker/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/errorFallback/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/fadingScrollbar/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/fileCard/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/FileFullscreenModal/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/fullscreenModal/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/giphy/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/historyExport/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/historyImport/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/image/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/inViewport/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/LegalHoldDot/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/LoadingBar/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/Note/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/participantItemContent/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/PasswordGeneratorButton/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/ProgressBar/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/Radio/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/SearchInput/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/SelectText/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/ServiceList/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/TextInput/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/toggle/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/UserInfo/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/UserName/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/UserSearchableList/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/userDevices/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/userList/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/VerificationIcon/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/ZoomableImage/**/*.{ts,tsx}',
-    ],
-    ignores: ['apps/webapp/src/script/components/badge/components/verificationBadges/**/*'],
-    rules: {
-      ...strictBooleanRules,
-    },
-  },
-  {
-    files: [
-      'apps/webapp/src/script/components/Modals/DetailViewModal/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/Modals/InviteModal/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/Modals/ModalComponent/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/Modals/PrimaryModal/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/Modals/QualityFeedbackModal/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/Modals/ServiceModal/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/Modals/UserModal/**/*.{ts,tsx}',
-    ],
-    rules: {
-      ...strictBooleanRules,
-    },
-  },
-  {
-    files: [
-      'apps/webapp/src/script/components/panel/enrichedFields.tsx',
-      'apps/webapp/src/script/components/panel/panelActions/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/panel/serviceDetails.tsx',
-      'apps/webapp/src/script/components/panel/singleAction/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/panel/userDetails.tsx',
-    ],
-    rules: {
-      ...strictBooleanRules,
-    },
-  },
-  {
-    files: [
-      'apps/webapp/src/script/hooks/useActiveWindowMatchMedia.ts',
-      'apps/webapp/src/script/hooks/useAppSoftLock.ts',
-      'apps/webapp/src/script/hooks/useInitializeMediaDevices.ts',
-      'apps/webapp/src/script/hooks/useRelativeTimestamp.tsx',
-      'apps/webapp/src/script/hooks/useUserDevicesHistory/**/*.{ts,tsx}',
-      'apps/webapp/src/script/hooks/useUserProperty.ts',
-    ],
-    rules: {
-      ...strictBooleanRules,
-    },
-  },
-  {
-    files: [
-      'apps/webapp/src/script/legal-hold/LegalHoldWarning.ts',
-      'apps/webapp/src/script/page/appLock/**/*.{ts,tsx}',
-      'apps/webapp/src/script/page/components/featureConfigChange/featureConfigChangeNotifier/**/*.{ts,tsx}',
-      'apps/webapp/src/script/page/components/forceReloadModal/**/*.{ts,tsx}',
-      'apps/webapp/src/script/page/components/windowTitleUpdater.ts',
-      'apps/webapp/src/script/page/leftSidebar/panels/listWrapper.tsx',
-      'apps/webapp/src/script/page/leftSidebar/panels/preferences.tsx',
-      'apps/webapp/src/script/page/leftSidebar/panels/startUi/**/*.{ts,tsx}',
-      'apps/webapp/src/script/page/rightSidebar/panelHeader/**/*.{ts,tsx}',
-      'apps/webapp/src/script/ui/contextMenu.tsx',
-      'apps/webapp/src/script/view_model/WarningsContainer/**/*.{ts,tsx}',
-    ],
-    rules: {
-      ...strictBooleanRules,
-    },
-  },
-  {
     files: ['apps/webapp/src/script/page/rightSidebar/groupParticipantService/groupParticipantService.tsx'],
     rules: {
-      ...strictBooleanRulesWithUnnecessaryCondition,
+      '@typescript-eslint/no-unnecessary-condition': 'error',
     },
   },
   {
-    files: ['apps/webapp/src/script/repositories/entity/message/**/*.{ts,tsx}'],
-    ignores: ['**/*.test.ts', '**/*.test.tsx', '**/*.spec.ts', '**/*.spec.tsx', '**/test/**', '**/mocks/**'],
+    files: ['apps/webapp/src/script/**/*.{ts,tsx}'],
     rules: {
-      ...strictBooleanRules,
-    },
-  },
-  {
-    files: ['apps/webapp/src/script/components/messagesList/message/contentMessage/asset/**/*.{ts,tsx}'],
-    ignores: [
-      '**/*.test.ts',
-      '**/*.test.tsx',
-      '**/*.spec.ts',
-      '**/*.spec.tsx',
-      '**/test/**',
-      '**/mocks/**',
-      'apps/webapp/src/script/components/messagesList/message/contentMessage/asset/common/useAssetTransfer/useAssetTransfer.ts',
-    ],
-    rules: {
-      ...strictBooleanRules,
-    },
-  },
-  {
-    files: [
-      'apps/webapp/src/script/repositories/assets/**/*.{ts,tsx}',
-      'apps/webapp/src/script/repositories/audio/**/*.{ts,tsx}',
-      'apps/webapp/src/script/repositories/backup/**/*.{ts,tsx}',
-      'apps/webapp/src/script/repositories/cache/**/*.{ts,tsx}',
-      'apps/webapp/src/script/repositories/client/**/*.{ts,tsx}',
-      'apps/webapp/src/script/repositories/connection/**/*.{ts,tsx}',
-      'apps/webapp/src/script/repositories/extension/**/*.{ts,tsx}',
-      'apps/webapp/src/script/repositories/integration/**/*.{ts,tsx}',
-      'apps/webapp/src/script/repositories/media/**/*.{ts,tsx}',
-      'apps/webapp/src/script/repositories/meetings/**/*.{ts,tsx}',
-      'apps/webapp/src/script/repositories/permission/**/*.{ts,tsx}',
-      'apps/webapp/src/script/repositories/properties/**/*.{ts,tsx}',
-      'apps/webapp/src/script/repositories/search/**/*.{ts,tsx}',
-      'apps/webapp/src/script/repositories/self/**/*.{ts,tsx}',
-      'apps/webapp/src/script/repositories/storage/**/*.{ts,tsx}',
-      'apps/webapp/src/script/repositories/team/**/*.{ts,tsx}',
-      'apps/webapp/src/script/repositories/user/**/*.{ts,tsx}',
-      'apps/webapp/src/script/repositories/entity/User/**/*.{ts,tsx}',
-      'apps/webapp/src/script/error/conversationError.ts',
-      'apps/webapp/src/script/page/state.ts',
-      'apps/webapp/src/script/page/useAppState.ts',
-      'apps/webapp/src/script/page/leftSidebar/panels/conversations/useFoldersStore.ts',
-      'apps/webapp/src/script/page/leftSidebar/panels/conversations/useSidebarStore.ts',
-      'apps/webapp/src/script/cleanupStack/**/*.{ts,tsx}',
-      'apps/webapp/src/script/applicationPeriodicChecks/**/*.{ts,tsx}',
-    ],
-    ignores: [
-      '**/*.test.ts',
-      '**/*.test.tsx',
-      '**/*.spec.ts',
-      '**/*.spec.tsx',
-      '**/*.d.ts',
-      '**/test/**',
-      '**/mocks/**',
-      // Backup import/export and event conversion have persistence/event semantics outside this batch.
-      'apps/webapp/src/script/repositories/backup/backupRepository.ts',
-      'apps/webapp/src/script/repositories/backup/crossPlatformBackup/CPB.export.ts',
-      'apps/webapp/src/script/repositories/backup/crossPlatformBackup/CPB.import.ts',
-      'apps/webapp/src/script/repositories/backup/crossPlatformBackup/importMappers/mapEventRecord.ts',
-      // MLS configuration needs protocol-specific reasoning.
-      'apps/webapp/src/script/repositories/client/clientMLSConfig.ts',
-      // Event record validation and persisted schema changes need a separate storage pass.
-      'apps/webapp/src/script/repositories/storage/record/eventRecordGuards.ts',
-      'apps/webapp/src/script/repositories/storage/storageSchemata.ts',
-    ],
-    rules: {
-      ...strictBooleanRules,
-    },
-  },
-  {
-    files: ['apps/webapp/src/script/components/conversation/**/*.{ts,tsx}'],
-    ignores: [
-      'apps/webapp/src/script/components/conversation/conversation.tsx',
-      'apps/webapp/src/script/components/conversation/conversationCells/**',
-      'apps/webapp/src/script/components/conversation/conversationTabs/conversationTabs.tsx',
-      'apps/webapp/src/script/components/conversation/hooks/useReadReceipt.ts',
-      'apps/webapp/src/script/components/conversation/useFilesUploadDropzone/buildCellFileMetadata/**',
-      'apps/webapp/src/script/components/conversation/useFilesUploadDropzone/createFileDropHandler/**',
-      'apps/webapp/src/script/components/conversation/useFilesUploadDropzone/transformAcceptedFiles/**',
-      'apps/webapp/src/script/components/conversation/useFilesUploadDropzone/useFilesUploadDropzone.ts',
-    ],
-    rules: {
-      ...strictBooleanRules,
-    },
-  },
-  {
-    files: ['apps/webapp/src/script/components/messagesList/**/*.{ts,tsx}'],
-    ignores: [
-      'apps/webapp/src/script/components/messagesList/message/contentMessage/asset/**',
-      'apps/webapp/src/script/components/messagesList/message/e2eiVerificationMessage/**',
-      'apps/webapp/src/script/components/messagesList/message/messageWrapper.tsx',
-      'apps/webapp/src/script/components/messagesList/uploadAssets/**',
-      'apps/webapp/src/script/components/messagesList/utils/messagesFilter.ts',
-      'apps/webapp/src/script/components/messagesList/utils/useLoadConversation.ts',
-      'apps/webapp/src/script/components/messagesList/virtualizedMessagesList/useLoadMessages.ts',
-      'apps/webapp/src/script/components/messagesList/virtualizedMessagesList/virtualizedMessagesList.tsx',
-    ],
-    rules: {
-      ...strictBooleanRules,
-    },
-  },
-  {
-    files: ['apps/webapp/src/script/components/inputBar/**/*.{ts,tsx}'],
-    ignores: [
-      'apps/webapp/src/script/components/inputBar/inputBar.tsx',
-      'apps/webapp/src/script/components/inputBar/filePreviews/useFilePreview/useFilePreview.ts',
-      'apps/webapp/src/script/components/inputBar/inputBarEditor/richTextEditor/plugins/sendPlugin/sendPlugin.tsx',
-      'apps/webapp/src/script/components/inputBar/useFileHandling/**',
-      'apps/webapp/src/script/components/inputBar/useMessageHandling/**',
-      'apps/webapp/src/script/components/inputBar/usePing/usePing.ts',
-    ],
-    rules: {
-      ...strictBooleanRules,
-    },
-  },
-  {
-    files: [
-      'apps/webapp/src/script/components/inputBar/useMessageHandling/useDraftState/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/inputBar/useMessageHandling/useOutsideInputClick/**/*.{ts,tsx}',
-    ],
-    rules: {
-      ...strictBooleanRules,
-    },
-  },
-  {
-    files: ['apps/webapp/src/script/page/leftSidebar/panels/conversations/**/*.{ts,tsx}'],
-    ignores: [
-      'apps/webapp/src/script/page/leftSidebar/panels/conversations/conversationCallingView/**',
-      'apps/webapp/src/script/page/leftSidebar/panels/conversations/useFoldersStore.ts',
-      'apps/webapp/src/script/page/leftSidebar/panels/conversations/useSidebarStore.ts',
-    ],
-    rules: {
-      ...strictBooleanRules,
-    },
-  },
-  {
-    files: ['apps/webapp/src/script/page/rightSidebar/**/*.{ts,tsx}'],
-    ignores: [
-      'apps/webapp/src/script/page/rightSidebar/calling/**',
-      'apps/webapp/src/script/page/rightSidebar/groupParticipantService/**',
-      'apps/webapp/src/script/page/rightSidebar/panelHeader/**',
-      'apps/webapp/src/script/page/rightSidebar/sharedDrive/**',
-    ],
-    rules: {
-      ...strictBooleanRules,
-    },
-  },
-  {
-    files: [
-      'apps/webapp/src/script/repositories/conversation/AccessState.ts',
-      'apps/webapp/src/script/repositories/conversation/ConversationAccessPermission.ts',
-      'apps/webapp/src/script/repositories/conversation/ClientMismatchUtil.ts',
-      'apps/webapp/src/script/repositories/conversation/ConversationFilter.ts',
-      'apps/webapp/src/script/repositories/conversation/ConversationLabelRepository.ts',
-      'apps/webapp/src/script/repositories/conversation/ConversationMapper.ts',
-      'apps/webapp/src/script/repositories/conversation/ConversationRoleRepository.ts',
-      'apps/webapp/src/script/repositories/conversation/ConversationState.ts',
-      'apps/webapp/src/script/repositories/conversation/ConversationStatus.ts',
-      'apps/webapp/src/script/repositories/conversation/ConversationStatusIcon.ts',
-      'apps/webapp/src/script/repositories/conversation/NotificationSetting.ts',
-      'apps/webapp/src/script/repositories/conversation/isSelfInitiatedConversationLeave.ts',
-      'apps/webapp/src/script/repositories/conversation/linkPreviews/**/*.{ts,tsx}',
-      'apps/webapp/src/script/repositories/conversation/userClientsUtils.ts',
-    ],
-    rules: {
-      ...strictBooleanRules,
-    },
-  },
-  {
-    files: [
-      'apps/webapp/src/script/components/Modals/CreateConversation/CreateConversationHeader.tsx',
-      'apps/webapp/src/script/components/Modals/CreateConversation/CreateConversationSteps/ConversationDetails/ConversationNameInput.tsx',
-      'apps/webapp/src/script/components/Modals/CreateConversation/CreateConversationSteps/ConversationDetails/CustomHistoryModal.tsx',
-      'apps/webapp/src/script/components/Modals/CreateConversation/utils.ts',
-    ],
-    rules: {
-      ...strictBooleanRules,
-    },
-  },
-  {
-    files: [
-      'apps/webapp/src/script/components/conversationListCell/**/*.{ts,tsx}',
-      'apps/webapp/src/script/hooks/useConversationFocus.ts',
-    ],
-    rules: {
-      ...strictBooleanRules,
-    },
-  },
-  {
-    files: ['apps/webapp/src/script/util/messageRenderer.ts'],
-    rules: {
-      ...strictBooleanRules,
+      '@typescript-eslint/strict-boolean-expressions': strictBooleanExpressionsRule,
+      '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'error',
     },
   },
   {
@@ -1061,24 +694,6 @@ const productionConfigs = [
     rules: {
       '@typescript-eslint/no-floating-promises': 'error',
       'no-void': 'error',
-    },
-  },
-  {
-    files: [
-      'apps/webapp/src/script/components/calling/**/*.{ts,tsx}',
-      'apps/webapp/src/script/repositories/calling/**/*.{ts,tsx}',
-      'apps/webapp/src/script/page/leftSidebar/panels/conversations/conversationCallingView/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/meeting/meetingCallingView/**/*.{ts,tsx}',
-      'apps/webapp/src/script/components/meeting/joinMeetingCall.ts',
-      'apps/webapp/src/script/components/meeting/useJoinMeetingCall.ts',
-      'apps/webapp/src/script/guards/CallView.ts',
-      'apps/webapp/src/script/hooks/useConversationCall.ts',
-      'apps/webapp/src/script/hooks/useNoInternetCallGuard/**/*.{ts,tsx}',
-      'apps/webapp/src/script/util/isDetachedCallingFeatureEnabled.ts',
-      'apps/webapp/src/script/view_model/CallingViewModel.ts',
-    ],
-    rules: {
-      ...strictBooleanRules,
     },
   },
 ].map(addProductionFileIgnores);
@@ -1196,6 +811,20 @@ const config = [
   {linterOptions: repositoryLinterOptions},
   ...productionConfigs,
   {
+    files: ['**/*.{ts,tsx,mts}'],
+    rules: {
+      'arrow-body-style': ['error', 'always'],
+      'array-callback-return': [
+        'error',
+        {
+          allowImplicit: false,
+          checkForEach: true,
+          allowVoid: false,
+        },
+      ],
+    },
+  },
+  {
     files: testTypeScriptFilePatterns,
     linterOptions: testLinterOptions,
     languageOptions: {
@@ -1261,6 +890,8 @@ const config = [
     ],
     rules: {
       'no-restricted-syntax': testRestrictedSyntaxRule,
+      'no-magic-numbers': 'off',
+      '@typescript-eslint/no-magic-numbers': 'off',
     },
   },
   {

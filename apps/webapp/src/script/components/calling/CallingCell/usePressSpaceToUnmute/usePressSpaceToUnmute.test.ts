@@ -25,24 +25,30 @@ import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
 
 import {usePressSpaceToUnmute} from './usePressSpaceToUnmute';
 
-jest.mock('Hooks/useKeyPressAndHold/useKeyPressAndHold', () => ({
-  useKeyPressAndHold: jest.fn(),
-}));
+jest.mock('Hooks/useKeyPressAndHold/useKeyPressAndHold', () => {
+  return {
+    useKeyPressAndHold: jest.fn(),
+  };
+});
 
-jest.mock('Components/appNotification/index', () => ({
-  useAppNotification: jest.fn(),
-}));
+jest.mock('Components/appNotification/index', () => {
+  return {
+    useAppNotification: jest.fn(),
+  };
+});
 
-jest.mock('Hooks/useActiveWindow', () => ({
-  useActiveWindowState: {
-    getState: jest.fn().mockReturnValue({
-      activeWindow: {
-        addEventListener: jest.fn(),
-        removeEventListener: jest.fn(),
-      } as unknown as Window,
-    }),
-  },
-}));
+jest.mock('Hooks/useActiveWindow', () => {
+  return {
+    useActiveWindowState: {
+      getState: jest.fn().mockReturnValue({
+        activeWindow: {
+          addEventListener: jest.fn(),
+          removeEventListener: jest.fn(),
+        } as unknown as Window,
+      }),
+    },
+  };
+});
 
 describe('usePressSpaceToUnmute', () => {
   const notificationMessage = 'videoCallParticipantPressSpaceToUnmuteNotification';
@@ -54,9 +60,15 @@ describe('usePressSpaceToUnmute', () => {
   };
 
   const defaultCallState = {
-    joinedCall: () => true,
-    viewMode: () => CallingViewMode.FULL_SCREEN,
-    detachedWindow: (): Window | null => null,
+    joinedCall: () => {
+      return true;
+    },
+    viewMode: () => {
+      return CallingViewMode.FULL_SCREEN;
+    },
+    detachedWindow: (): Window | null => {
+      return null;
+    },
   } as unknown as CallState;
 
   beforeEach(() => {
@@ -66,15 +78,17 @@ describe('usePressSpaceToUnmute', () => {
   });
 
   it("doesn't set up key press handler when not enabled", () => {
-    renderHook(() =>
-      usePressSpaceToUnmute({
+    renderHook(() => {
+      return usePressSpaceToUnmute({
         callState: defaultCallState,
         toggleMute: mockToggleMute,
-        isMuted: () => true,
+        isMuted: () => {
+          return true;
+        },
         enabled: false,
         notificationMessage,
-      }),
-    );
+      });
+    });
 
     expect(useKeyPressAndHold).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -86,18 +100,22 @@ describe('usePressSpaceToUnmute', () => {
   it("doesn't set up key press handler when not in call", () => {
     const callStateNotInCall = {
       ...defaultCallState,
-      joinedCall: () => false,
+      joinedCall: () => {
+        return false;
+      },
     } as unknown as CallState;
 
-    renderHook(() =>
-      usePressSpaceToUnmute({
+    renderHook(() => {
+      return usePressSpaceToUnmute({
         callState: callStateNotInCall,
         toggleMute: mockToggleMute,
-        isMuted: () => true,
+        isMuted: () => {
+          return true;
+        },
         enabled: true,
         notificationMessage,
-      }),
-    );
+      });
+    });
 
     expect(useKeyPressAndHold).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -109,15 +127,15 @@ describe('usePressSpaceToUnmute', () => {
   it('handles space key press when muted', () => {
     mockIsMuted.mockReturnValue(true);
 
-    renderHook(() =>
-      usePressSpaceToUnmute({
+    renderHook(() => {
+      return usePressSpaceToUnmute({
         callState: defaultCallState,
         toggleMute: mockToggleMute,
         isMuted: mockIsMuted,
         enabled: true,
         notificationMessage,
-      }),
-    );
+      });
+    });
 
     const onHoldCallback = (useKeyPressAndHold as jest.Mock).mock.calls[0][0].onHold;
 
@@ -131,15 +149,15 @@ describe('usePressSpaceToUnmute', () => {
   it("doesn't unmute when already unmuted on space key press", () => {
     mockIsMuted.mockReturnValue(false);
 
-    renderHook(() =>
-      usePressSpaceToUnmute({
+    renderHook(() => {
+      return usePressSpaceToUnmute({
         callState: defaultCallState,
         toggleMute: mockToggleMute,
         isMuted: mockIsMuted,
         enabled: true,
         notificationMessage,
-      }),
-    );
+      });
+    });
 
     const onHoldCallback = (useKeyPressAndHold as jest.Mock).mock.calls[0][0].onHold;
 
@@ -151,15 +169,17 @@ describe('usePressSpaceToUnmute', () => {
   });
 
   it('mutes on key release', () => {
-    renderHook(() =>
-      usePressSpaceToUnmute({
+    renderHook(() => {
+      return usePressSpaceToUnmute({
         callState: defaultCallState,
         toggleMute: mockToggleMute,
-        isMuted: () => true,
+        isMuted: () => {
+          return true;
+        },
         enabled: true,
         notificationMessage,
-      }),
-    );
+      });
+    });
 
     const onReleaseCallback = (useKeyPressAndHold as jest.Mock).mock.calls[0][0].onRelease;
 
@@ -174,23 +194,29 @@ describe('usePressSpaceToUnmute', () => {
 
     const detachedCallState = {
       ...defaultCallState,
-      viewMode: () => CallingViewMode.DETACHED_WINDOW,
-      detachedWindow: () => mockActiveWindow,
+      viewMode: () => {
+        return CallingViewMode.DETACHED_WINDOW;
+      },
+      detachedWindow: () => {
+        return mockActiveWindow;
+      },
     } as unknown as CallState;
 
     jest
       .spyOn(require('Hooks/useActiveWindow').useActiveWindowState, 'getState')
       .mockReturnValue({activeWindow: mockActiveWindow});
 
-    renderHook(() =>
-      usePressSpaceToUnmute({
+    renderHook(() => {
+      return usePressSpaceToUnmute({
         callState: detachedCallState,
         toggleMute: mockToggleMute,
-        isMuted: () => true,
+        isMuted: () => {
+          return true;
+        },
         enabled: true,
         notificationMessage,
-      }),
-    );
+      });
+    });
 
     expect(useKeyPressAndHold).toHaveBeenCalledWith(
       expect.objectContaining({

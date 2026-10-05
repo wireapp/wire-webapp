@@ -224,7 +224,11 @@ const getOwnerNamesByUserIdMap = (versions: Partial<RestVersion>[]): Map<string,
       return ownerIds.has(user.id) && user.name() !== '';
     });
 
-    return new Map<string, string>(matchingUsers.map(user => [user.id, user.name()]));
+    return new Map<string, string>(
+      matchingUsers.map(user => {
+        return [user.id, user.name()];
+      }),
+    );
   } catch (error) {
     logger.warn('Failed to resolve owner names from UserState', {ownerIdsCount: ownerIds.size, error});
     return new Map();

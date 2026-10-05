@@ -26,31 +26,35 @@ import {Theme} from '../../identity/theme';
 import {Button, ButtonProps, ButtonVariant} from '../button';
 import {buttonStyle} from '../button/button.styles';
 
-const buttonGroupStyle: (theme: Theme) => CSSObject = () => ({
-  display: 'flex',
-  alignItems: 'center',
-});
+const buttonGroupStyle: (theme: Theme) => CSSObject = () => {
+  return {
+    display: 'flex',
+    alignItems: 'center',
+  };
+};
 
-const groupedButtonStyle: <T>(theme: Theme, props: ButtonProps<T>) => CSSObject = (theme, props) => ({
-  height: '32px',
-  borderRadius: '12px',
-  padding: '0 12px',
-  cursor: 'pointer',
-  display: 'flex',
-  alignItems: 'center',
-  '&:not(:last-of-type)': {
-    borderTopRightRadius: '0',
-    borderBottomRightRadius: '0',
-  },
-  '&:not(:first-of-type)': {
-    borderTopLeftRadius: '0',
-    borderBottomLeftRadius: '0',
-  },
-  '&:first-of-type:last-of-type': {
-    borderRadius: '0',
-  },
-  ...buttonStyle(theme, props),
-});
+const groupedButtonStyle: <T>(theme: Theme, props: ButtonProps<T>) => CSSObject = (theme, props) => {
+  return {
+    height: '32px',
+    borderRadius: '12px',
+    padding: '0 12px',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    '&:not(:last-of-type)': {
+      borderTopRightRadius: '0',
+      borderBottomRightRadius: '0',
+    },
+    '&:not(:first-of-type)': {
+      borderTopLeftRadius: '0',
+      borderBottomLeftRadius: '0',
+    },
+    '&:first-of-type:last-of-type': {
+      borderRadius: '0',
+    },
+    ...buttonStyle(theme, props),
+  };
+};
 
 type GroupedButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   icon?: ReactNode;
@@ -60,25 +64,41 @@ type GroupedButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 interface ButtonGroupProps {
   children: ReactNode;
 }
-const ButtonGroup = ({children}: ButtonGroupProps) => (
-  <div css={(theme: Theme) => buttonGroupStyle(theme)} role="group" aria-label="Button Group">
-    {children}
-  </div>
-);
+const ButtonGroup = ({children}: ButtonGroupProps) => {
+  return (
+    <div
+      css={(theme: Theme) => {
+        return buttonGroupStyle(theme);
+      }}
+      role="group"
+      aria-label="Button Group"
+    >
+      {children}
+    </div>
+  );
+};
 
 const GroupedButton = forwardRef<HTMLButtonElement, GroupedButtonProps>(({children, icon, ...props}, ref) => {
   return (
-    <Button ref={ref} css={(theme: Theme) => groupedButtonStyle(theme, props)} {...props}>
+    <Button
+      ref={ref}
+      css={(theme: Theme) => {
+        return groupedButtonStyle(theme, props);
+      }}
+      {...props}
+    >
       {icon}
       {!isNullOrUndefined(children) ? (
         <span
-          css={(theme: Theme) => ({
-            marginLeft: !isNullOrUndefined(icon) ? '6px' : undefined,
-            fontSize: theme.fontSizes.small,
-            fontWeight: 'bold',
-            lineHeight: '0.875rem',
-            letterSpacing: '0.25px',
-          })}
+          css={(theme: Theme) => {
+            return {
+              marginLeft: !isNullOrUndefined(icon) ? '6px' : undefined,
+              fontSize: theme.fontSizes.small,
+              fontWeight: 'bold',
+              lineHeight: '0.875rem',
+              letterSpacing: '0.25px',
+            };
+          }}
         >
           {children}
         </span>

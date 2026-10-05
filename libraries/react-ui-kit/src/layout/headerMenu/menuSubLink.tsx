@@ -26,38 +26,47 @@ import {QueryKeys, media} from '../../utils';
 
 type MenuSubLinkProps<T = HTMLDivElement> = TextProps<T>;
 
-export const menuSubLinkStyle: <T>(theme: Theme, props: MenuSubLinkProps<T>) => CSSObject = (theme, props) => ({
-  ...textStyle(theme, props),
-  '&:hover': {
-    filter: 'brightness(70%)',
-  },
-  color: theme.general.color,
-  cursor: 'pointer',
-  fontWeight: 600,
-  textDecoration: 'none',
-  transition: defaultTransition,
-  [media[QueryKeys.DESKTOP]]: {
-    '&:first-of-type': {
-      marginLeft: 0,
+export const menuSubLinkStyle: <T>(theme: Theme, props: MenuSubLinkProps<T>) => CSSObject = (theme, props) => {
+  return {
+    ...textStyle(theme, props),
+    '&:hover': {
+      filter: 'brightness(70%)',
     },
-    '&:last-child': {
-      marginRight: 0,
+    color: theme.general.color,
+    cursor: 'pointer',
+    fontWeight: 600,
+    textDecoration: 'none',
+    transition: defaultTransition,
+    [media[QueryKeys.DESKTOP]]: {
+      '&:first-of-type': {
+        marginLeft: 0,
+      },
+      '&:last-child': {
+        marginRight: 0,
+      },
+      fontSize: theme.fontSizes.extraSmall,
+      margin: '0 26px 0 10px',
+      textTransform: 'uppercase',
     },
-    fontSize: theme.fontSizes.extraSmall,
-    margin: '0 26px 0 10px',
-    textTransform: 'uppercase',
-  },
 
-  [media[QueryKeys.TABLET_DOWN]]: {
-    border: 'none',
-    fontSize: '2rem !important',
-    fontWeight: '400 !important',
-    maxWidth: '480px',
-    padding: '8px 24px',
-    textTransform: 'none',
-  },
-});
+    [media[QueryKeys.TABLET_DOWN]]: {
+      border: 'none',
+      fontSize: '2rem !important',
+      fontWeight: '400 !important',
+      maxWidth: '480px',
+      padding: '8px 24px',
+      textTransform: 'none',
+    },
+  };
+};
 
-export const MenuSubLink = (props: MenuSubLinkProps) => (
-  <div css={(theme: Theme) => menuSubLinkStyle(theme, props)} {...props} />
-);
+export const MenuSubLink = (props: MenuSubLinkProps) => {
+  return (
+    <div
+      css={(theme: Theme) => {
+        return menuSubLinkStyle(theme, props);
+      }}
+      {...props}
+    />
+  );
+};

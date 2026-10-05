@@ -20,6 +20,7 @@
 import {useEffect, useMemo, useState} from 'react';
 
 import {DateValue, getLocalTimeZone, today} from '@internationalized/date';
+import {isNull, isNullOrUndefined, isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import {
   Button,
   Calendar,
@@ -68,6 +69,12 @@ import {
   timeSelectMenuPortalStyles,
 } from './cellsShareExpirationStyles';
 
+const hoursPerHalfDay = 12;
+const twelveHourClockOffset = 11;
+const timeComponentDigitCount = 2;
+const timeOptionIntervalInMinutes = 15;
+const minutesPerHour = 60;
+
 interface CellsShareExpirationFieldsLabels {
   expiresLabel: string;
   dateAriaLabel: string;
@@ -93,16 +100,16 @@ export interface CellsShareExpirationSelection {
 
 const parseTimeLabel = (value: string | number) => {
   const [timePart, periodPart] = `${value}`.trim().split(' ');
-  const [hourPart, minutePart] = (timePart || '').split(':');
+  const [hourPart, minutePart] = (isNonEmptyString(timePart) ? timePart : '').split(':');
   const hour = Number(hourPart);
   const minutes = Number(minutePart);
-  const isPm = (periodPart || '').toUpperCase() === 'PM';
+  const isPm = (isNonEmptyString(periodPart) ? periodPart : '').toUpperCase() === 'PM';
   let hour24 = 0;
   if (Number.isFinite(hour)) {
     if (isPm) {
-      hour24 = (hour % 12) + 12;
+      hour24 = (hour % hoursPerHalfDay) + hoursPerHalfDay;
     } else {
-      hour24 = hour % 12;
+      hour24 = hour % hoursPerHalfDay;
     }
   }
   const safeMinutes = Number.isFinite(minutes) ? minutes : 0;
@@ -111,9 +118,9 @@ const parseTimeLabel = (value: string | number) => {
 };
 
 const formatTimeLabel = (hour24: number, minutes: number): string => {
-  const hour12 = ((hour24 + 11) % 12) + 1;
-  const period = hour24 < 12 ? 'AM' : 'PM';
-  return `${hour12}:${String(minutes).padStart(2, '0')} ${period}`;
+  const hour12 = ((hour24 + twelveHourClockOffset) % hoursPerHalfDay) + 1;
+  const period = hour24 < hoursPerHalfDay ? 'AM' : 'PM';
+  return `${hour12}:${String(minutes).padStart(timeComponentDigitCount, '0')} ${period}`;
 };
 
 export const getNextHourDateTime = (): Date => {
@@ -123,14 +130,15 @@ export const getNextHourDateTime = (): Date => {
   return plusOneHour;
 };
 
-const buildTimeOptions = (): Option[] =>
-  Array.from({length: 96}, (_, index) => {
-    const totalMinutes = index * 15;
-    const hour24 = Math.floor(totalMinutes / 60);
-    const minutes = totalMinutes % 60;
+const buildTimeOptions = (): Option[] => {
+  return Array.from({length: 96}, (_, index) => {
+    const totalMinutes = index * timeOptionIntervalInMinutes;
+    const hour24 = Math.floor(totalMinutes / minutesPerHour);
+    const minutes = totalMinutes % minutesPerHour;
     const label = formatTimeLabel(hour24, minutes);
     return {value: label, label};
   });
+};
 
 const getInitialState = (dateTime: Date | null | undefined): {time: Option; date: DateValue} => {
   const effectiveDateTime = dateTime ?? getNextHourDateTime();
@@ -155,8 +163,12 @@ export const CellsShareExpirationFields = ({
   dateTime,
   onChange,
 }: CellsShareExpirationFieldsProps) => {
-  const timeOptions = useMemo(() => buildTimeOptions(), []);
-  const [initialState] = useState(() => getInitialState(dateTime));
+  const timeOptions = useMemo(() => {
+    return buildTimeOptions();
+  }, []);
+  const [initialState] = useState(() => {
+    return getInitialState(dateTime);
+  });
   const [selectedTime, setSelectedTime] = useState<Option>(initialState.time);
   const [selectedDate, setSelectedDate] = useState<DateValue | null>(initialState.date);
   const menuMaxHeight = 200;
@@ -172,10 +184,9 @@ export const CellsShareExpirationFields = ({
     const date = selectedDate.toDate(getLocalTimeZone());
     return new Date(date.getFullYear(), date.getMonth(), date.getDate(), hour24, minutes, 0, 0);
   }, [selectedDate, selectedTime]);
-  const isExpirationInvalid = useMemo(
-    () => Boolean(selectedDateTime && selectedDateTime.getTime() < Date.now()),
-    [selectedDateTime],
-  );
+  const isExpirationInvalid = useMemo(() => {
+    return !isNull(selectedDateTime) && selectedDateTime.getTime() < Date.now();
+  }, [selectedDateTime]);
   const dateGroupStyles = isExpirationInvalid
     ? {...datePickerGroupStyles, ...expirationErrorBorderStyles}
     : {...datePickerGroupStyles, ...datePickerGroupFocusStyles};
@@ -203,11 +214,13 @@ export const CellsShareExpirationFields = ({
           <DatePicker aria-label={labels.dateAriaLabel} value={selectedDate} onChange={setSelectedDate}>
             <Group css={dateGroupStyles} data-uie-name="cells-share-expiration-date">
               <DateInput css={dateInputStyles}>
-                {segment => (
-                  <DateSegment segment={segment} css={dateSegmentStyles}>
-                    {segment.type === 'literal' ? '.' : segment.text}
-                  </DateSegment>
-                )}
+                {segment => {
+                  return (
+                    <DateSegment segment={segment} css={dateSegmentStyles}>
+                      {segment.type === 'literal' ? '.' : segment.text}
+                    </DateSegment>
+                  );
+                }}
               </DateInput>
               <Button css={calendarButtonStyles} aria-label={labels.openCalendarLabel}>
                 <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false" css={calendarIconStyles}>
@@ -255,7 +268,7 @@ export const CellsShareExpirationFields = ({
               placement="top start"
               shouldFlip={false}
               offset={8}
-              {...(portalContainer ? {portalContainer} : {})}
+              {...(!isUndefined(portalContainer) ? {portalContainer} : {})}
             >
               <Dialog>
                 <Calendar>
@@ -270,9 +283,15 @@ export const CellsShareExpirationFields = ({
                   </div>
                   <CalendarGrid css={calendarGridStyles}>
                     <CalendarGridHeader css={calendarGridHeaderStyles}>
-                      {day => <CalendarHeaderCell css={calendarHeaderCellStyles}>{day}</CalendarHeaderCell>}
+                      {day => {
+                        return <CalendarHeaderCell css={calendarHeaderCellStyles}>{day}</CalendarHeaderCell>;
+                      }}
                     </CalendarGridHeader>
-                    <CalendarGridBody>{date => <CalendarCell date={date} css={calendarCellStyles} />}</CalendarGridBody>
+                    <CalendarGridBody>
+                      {date => {
+                        return <CalendarCell date={date} css={calendarCellStyles} />;
+                      }}
+                    </CalendarGridBody>
                   </CalendarGrid>
                 </Calendar>
               </Dialog>
@@ -293,9 +312,9 @@ export const CellsShareExpirationFields = ({
             menuCSS={timeSelectMenuStyles}
             menuPlacement="top"
             maxMenuHeight={menuMaxHeight}
-            {...(portalContainer && {menuPortalTarget: portalContainer})}
+            {...(!isUndefined(portalContainer) ? {menuPortalTarget: portalContainer} : {})}
             onChange={option => {
-              if (option) {
+              if (!isNullOrUndefined(option)) {
                 setSelectedTime(option as Option);
               }
             }}

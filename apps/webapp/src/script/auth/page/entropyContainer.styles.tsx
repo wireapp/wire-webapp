@@ -51,9 +51,11 @@ const subheadline: CSSObject = {
   marginBottom: '24px',
 };
 
-const entropyCanvas = (pause: boolean): CSSObject => ({
-  border: pause ? 'red 2px solid' : 'black 2px solid',
-});
+const entropyCanvas = (pause: boolean): CSSObject => {
+  return {
+    border: pause ? 'red 2px solid' : 'black 2px solid',
+  };
+};
 
 const screenReaderOnly: CSSProperties = {
   clip: 'rect(0 0 0 0)',

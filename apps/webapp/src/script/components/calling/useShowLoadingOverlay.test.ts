@@ -23,15 +23,20 @@ import {backgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsSto
 
 import {useShowLoadingOverlay} from './useShowLoadingOverlay';
 
-const createMediaStream = () =>
-  ({
-    getVideoTracks: jest.fn(() => []),
-  }) as unknown as MediaStream;
+const createMediaStream = () => {
+  return {
+    getVideoTracks: jest.fn(() => {
+      return [];
+    }),
+  } as unknown as MediaStream;
+};
 
-const createProcessedVideoStream = (stream: MediaStream) => ({
-  stream,
-  release: jest.fn(),
-});
+const createProcessedVideoStream = (stream: MediaStream) => {
+  return {
+    stream,
+    release: jest.fn(),
+  };
+};
 
 describe('useShowLoadingOverlay', () => {
   beforeEach(() => {
@@ -45,13 +50,17 @@ describe('useShowLoadingOverlay', () => {
       isInitializing: true,
     });
 
-    const {result} = renderHook(() => useShowLoadingOverlay(true, false, undefined));
+    const {result} = renderHook(() => {
+      return useShowLoadingOverlay(true, false, undefined);
+    });
 
     expect(result.current.showLoadingOverlay).toBe(true);
   });
 
   it('should hide loading overlay when background effect is done initializing', () => {
-    const {result} = renderHook(() => useShowLoadingOverlay(true, false, undefined));
+    const {result} = renderHook(() => {
+      return useShowLoadingOverlay(true, false, undefined);
+    });
 
     expect(result.current.showLoadingOverlay).toBe(false);
   });
@@ -59,13 +68,17 @@ describe('useShowLoadingOverlay', () => {
   it('should show loading overlay while video is loading', () => {
     const processedVideoStream = createProcessedVideoStream(createMediaStream());
 
-    const {result} = renderHook(() => useShowLoadingOverlay(true, true, processedVideoStream));
+    const {result} = renderHook(() => {
+      return useShowLoadingOverlay(true, true, processedVideoStream);
+    });
 
     expect(result.current.showLoadingOverlay).toBe(true);
   });
 
   it('should show loading overlay while raw video is loading when background effects are disabled', () => {
-    const {result} = renderHook(() => useShowLoadingOverlay(true, true, undefined));
+    const {result} = renderHook(() => {
+      return useShowLoadingOverlay(true, true, undefined);
+    });
 
     expect(result.current.showLoadingOverlay).toBe(true);
 
@@ -79,7 +92,9 @@ describe('useShowLoadingOverlay', () => {
   it('should hide loading overlay when video is ready', () => {
     const processedVideoStream = createProcessedVideoStream(createMediaStream());
 
-    const {result} = renderHook(() => useShowLoadingOverlay(true, true, processedVideoStream));
+    const {result} = renderHook(() => {
+      return useShowLoadingOverlay(true, true, processedVideoStream);
+    });
 
     act(() => {
       result.current.onVideoCanPlay();
@@ -95,7 +110,9 @@ describe('useShowLoadingOverlay', () => {
 
     const processedVideoStream = createProcessedVideoStream(createMediaStream());
 
-    const {result} = renderHook(() => useShowLoadingOverlay(false, true, processedVideoStream));
+    const {result} = renderHook(() => {
+      return useShowLoadingOverlay(false, true, processedVideoStream);
+    });
 
     expect(result.current.showLoadingOverlay).toBe(false);
   });

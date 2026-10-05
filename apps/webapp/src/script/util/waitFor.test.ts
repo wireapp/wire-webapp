@@ -34,7 +34,9 @@ describe('waitFor', () => {
 
   it('should resolve if condition is true after some time', async () => {
     const condition = jest.fn().mockReturnValue(false);
-    setTimeout(() => condition.mockReturnValue('hello'), 100);
+    setTimeout(() => {
+      return condition.mockReturnValue('hello');
+    }, 100);
 
     const promise = waitFor(condition, 200, 50);
     jest.advanceTimersByTime(101);

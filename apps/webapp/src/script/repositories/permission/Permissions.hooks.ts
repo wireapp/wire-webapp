@@ -21,5 +21,6 @@ import {useStore} from 'zustand';
 
 import {permissionsStore, PermissionsState} from './Permissions.store';
 
-export const usePermissionsStore = <T>(selector: (state: PermissionsState) => T): T =>
-  useStore(permissionsStore, selector);
+export const usePermissionsStore = <T>(selector: (state: PermissionsState) => T): T => {
+  return useStore(permissionsStore, selector);
+};

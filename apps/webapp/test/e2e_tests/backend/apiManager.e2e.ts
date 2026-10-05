@@ -131,7 +131,9 @@ export class ApiManagerE2E {
       if (isEnabled) {
         return true;
       }
-      await new Promise(resolve => setTimeout(resolve, interval));
+      await new Promise(resolve => {
+        return setTimeout(resolve, interval);
+      });
     }
 
     throw new Error(`${featureKey} feature is not enabled after waiting for ${timeout / 1000} seconds`);
@@ -198,7 +200,9 @@ export class ApiManagerE2E {
       if (isUndefined(cookies)) {
         throw new Error('Response did not contain cookies');
       }
-      const zuidCookie = cookies.find((cookieString: string) => cookieString.startsWith('zuid='));
+      const zuidCookie = cookies.find((cookieString: string) => {
+        return cookieString.startsWith('zuid=');
+      });
       if (isUndefined(zuidCookie)) {
         throw new Error('Response did not contain a zuid cookie');
       }

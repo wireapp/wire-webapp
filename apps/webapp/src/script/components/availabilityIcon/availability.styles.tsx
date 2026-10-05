@@ -24,24 +24,28 @@ import {Availability as AvailabilityProp} from '@wireapp/protocol-messaging';
 import {AVATAR_SIZE} from 'Components/avatar';
 import {CSS_SQUARE} from 'Util/cssMixin';
 
+const defaultAvailabilityIconSizeInPixels = 8;
+
 const availabilityStateColors: Partial<Record<AvailabilityProp.Type, string>> = {
   [AvailabilityProp.Type.AVAILABLE]: 'var(--green-500)',
   [AvailabilityProp.Type.AWAY]: 'var(--red-500)',
   [AvailabilityProp.Type.BUSY]: 'var(--amber-500)',
 };
 
-const getSquareIconSize = (): Partial<Record<AVATAR_SIZE, number>> => ({
-  [AVATAR_SIZE.X_SMALL]: 6,
-  [AVATAR_SIZE.SMALL]: 7,
-  [AVATAR_SIZE.MEDIUM]: 10,
-  [AVATAR_SIZE.LARGE]: 12,
-});
+const getSquareIconSize = (): Partial<Record<AVATAR_SIZE, number>> => {
+  return {
+    [AVATAR_SIZE.X_SMALL]: 6,
+    [AVATAR_SIZE.SMALL]: 7,
+    [AVATAR_SIZE.MEDIUM]: 10,
+    [AVATAR_SIZE.LARGE]: 12,
+  };
+};
 
 export const iconStyles = (availabilityState: AvailabilityProp.Type, avatarSize: AVATAR_SIZE): CSSObject => {
   const squareIconSize = getSquareIconSize();
 
   return {
-    ...CSS_SQUARE(squareIconSize[avatarSize] ?? 8),
+    ...CSS_SQUARE(squareIconSize[avatarSize] ?? defaultAvailabilityIconSizeInPixels),
     fill: availabilityStateColors[availabilityState],
     stroke: availabilityStateColors[availabilityState],
     borderRadius: '50%',

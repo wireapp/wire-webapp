@@ -129,7 +129,9 @@ describe('Pagination', () => {
     expect(dots).toHaveLength(5);
 
     // Verify that page 8 is active
-    const activeDot = dots.find(dot => dot.getAttribute('data-uie-status') === 'active');
+    const activeDot = dots.find(dot => {
+      return dot.getAttribute('data-uie-status') === 'active';
+    });
     expect(activeDot).toBeTruthy();
     expect(Number(activeDot?.getAttribute('data-page'))).toBe(8);
   });

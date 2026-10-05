@@ -19,8 +19,10 @@
 
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
-export const CheckRoundIcon = (props: SVGIconProps) => (
-  <SVGIcon realWidth={20} realHeight={16} {...props}>
-    <path d="M10 0c5.523 0 10 4.477 10 10s-4.477 10-10 10S0 15.523 0 10 4.477 0 10 0zm5.382 5.563-7.06 6.974-3.765-3.69-1.768 1.769 5.532 5.456 8.829-8.74-1.768-1.769z" />
-  </SVGIcon>
-);
+export const CheckRoundIcon = (props: SVGIconProps) => {
+  return (
+    <SVGIcon realWidth={20} realHeight={16} {...props}>
+      <path d="M10 0c5.523 0 10 4.477 10 10s-4.477 10-10 10S0 15.523 0 10 4.477 0 10 0zm5.382 5.563-7.06 6.974-3.765-3.69-1.768 1.769 5.532 5.456 8.829-8.74-1.768-1.769z" />
+    </SVGIcon>
+  );
+};

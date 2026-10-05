@@ -217,8 +217,12 @@ export class IntegrationRepository {
         normalizedQuery === IntegrationRepository.normalizeQuery(queryObservable());
       if (isCurrentQuery) {
         serviceEntities = serviceEntities
-          .filter(serviceEntity => compareTransliteration(serviceEntity.name(), normalizedQuery))
-          .toSorted((serviceA, serviceB) => sortByPriority(serviceA.name(), serviceB.name(), normalizedQuery));
+          .filter(serviceEntity => {
+            return compareTransliteration(serviceEntity.name(), normalizedQuery);
+          })
+          .toSorted((serviceA, serviceB) => {
+            return sortByPriority(serviceA.name(), serviceB.name(), normalizedQuery);
+          });
         this.services(serviceEntities);
         return serviceEntities;
       }

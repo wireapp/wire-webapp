@@ -17,7 +17,7 @@
  *
  */
 
-import {isNonEmptyString, isObject, isUndefined} from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined, isObject, isUndefined} from '@sindresorhus/is';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
 import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
 import {
@@ -75,6 +75,12 @@ import {Core} from '../service/coreSingleton';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
 import {Warnings} from '../view_model/WarningsContainer';
 
+const debugDumpIndentationSpaces = 2;
+const debugFrameRectangleSizeInPixels = 10;
+const debugFrameUpdateIntervalInMilliseconds = 500;
+const debugCaptureFramesPerSecond = 25;
+
+/* eslint-disable @typescript-eslint/no-magic-numbers -- Log levels define the external logging API values inline. */
 export enum CoreCryptoLogLevel {
   Off = 1,
   Trace = 2,
@@ -83,6 +89,7 @@ export enum CoreCryptoLogLevel {
   Warn = 5,
   Error = 6,
 }
+/* eslint-enable @typescript-eslint/no-magic-numbers */
 
 export type NotificationBackendDumpEvent = {
   notificationId: string;
@@ -195,10 +202,12 @@ export class DebugUtil {
       return;
     }
 
-    const participants = new Array(number)
-      .fill(0)
-      .map((_, i) => new Participant(new User('', '', translate), `some-client-id-${i}`));
-    participants.forEach(participant => call.addParticipant(participant));
+    const participants = new Array(number).fill(0).map((_, i) => {
+      return new Participant(new User('', '', translate), `some-client-id-${i}`);
+    });
+    participants.forEach(participant => {
+      call.addParticipant(participant);
+    });
   }
 
   /** will print all the ids of entities that show on screen (userIds, conversationIds, messageIds) */
@@ -209,9 +218,11 @@ export class DebugUtil {
         return;
       }
       const value = eventTarget.innerText;
-      const localConversation = this.conversationState.conversations().find(({id}) => id === value);
+      const localConversation = this.conversationState.conversations().find(({id}) => {
+        return id === value;
+      });
 
-      if (!localConversation || !isMLSCapableConversation(localConversation)) {
+      if (isNullOrUndefined(localConversation) || !isMLSCapableConversation(localConversation)) {
         return;
       }
 
@@ -236,10 +247,14 @@ export class DebugUtil {
       });
     };
 
-    const removeDebugInfo = (els: NodeListOf<HTMLElement>) => els.forEach(el => el.parentNode?.removeChild(el));
+    const removeDebugInfo = (els: NodeListOf<HTMLElement>) => {
+      return els.forEach(el => {
+        el.parentNode?.removeChild(el);
+      });
+    };
 
-    const addDebugInfo = (els: NodeListOf<HTMLElement>) =>
-      els.forEach(el => {
+    const addDebugInfo = (els: NodeListOf<HTMLElement>) => {
+      return els.forEach(el => {
         const debugInfo = document.createElement('div');
         debugInfo.classList.add('debug-info');
         const value = el.dataset.uieUid;
@@ -255,6 +270,7 @@ export class DebugUtil {
         }
         debugInfo.addEventListener('click', logMLSInfo);
       });
+    };
 
     const debugInfos = document.querySelectorAll<HTMLElement>('.debug-info');
     const isShowingDebugInfo = debugInfos.length > 0;
@@ -386,7 +402,9 @@ export class DebugUtil {
 
   /** Used by QA test automation. */
   blockAllConnections(): Promise<void[]> {
-    const blockUsers = this.userState.users().map(userEntity => this.connectionRepository.blockUser(userEntity));
+    const blockUsers = this.userState.users().map(userEntity => {
+      return this.connectionRepository.blockUser(userEntity);
+    });
     return Promise.all(blockUsers);
   }
 
@@ -412,7 +430,7 @@ export class DebugUtil {
 
     const mlsFeature = this.teamState.teamFeatures()?.mls;
 
-    if (!mlsFeature) {
+    if (isUndefined(mlsFeature)) {
       throw new Error('MLS feature is not enabled');
     }
 
@@ -502,7 +520,7 @@ export class DebugUtil {
   async refreshE2EIRevocationData(): Promise<void> {
     const e2eIdentityService = this.core.service?.e2eIdentity;
 
-    if (!e2eIdentityService) {
+    if (isUndefined(e2eIdentityService)) {
       throw new Error('E2EI service is not available');
     }
 
@@ -553,9 +571,11 @@ export class DebugUtil {
     amount = 10,
     conversationId = this.conversationState.activeConversation()?.id ?? '',
   ): Promise<EventRecord[]> {
-    if (this.storageRepository.storageService.db) {
+    if (!isNullOrUndefined(this.storageRepository.storageService.db)) {
       const records = await this.storageRepository.storageService.db.events.toArray();
-      const messages = records.filter(event => event.conversation === conversationId);
+      const messages = records.filter(event => {
+        return event.conversation === conversationId;
+      });
       return messages.slice(-amount).toReversed();
     }
     return [];
@@ -581,7 +601,11 @@ export class DebugUtil {
     }
 
     const clients = await this.clientRepository.getClientsForSelf();
-    return clients.find(client => client.isPermanent())?.id ?? clients[0]?.id;
+    return (
+      clients.find(client => {
+        return client.isPermanent();
+      })?.id ?? clients[0]?.id
+    );
   }
 
   private async fetchAllNotifications(clientId?: string): Promise<Notification[]> {
@@ -623,12 +647,16 @@ export class DebugUtil {
     );
     const lastNotificationId = lastNotificationRecord?.value;
     const notifications = await this.fetchAllNotifications(clientId);
-    const notificationsInRange = notifications.filter(notification =>
-      notification.payload.some(event => this.isEventInTimeRange(event, from, to)),
-    );
-    const eventsInRange = notificationsInRange.flatMap(notification =>
-      notification.payload
-        .filter((event): event is BackendEvent & {time: string} => this.isEventInTimeRange(event, from, to))
+    const notificationsInRange = notifications.filter(notification => {
+      return notification.payload.some(event => {
+        return this.isEventInTimeRange(event, from, to);
+      });
+    });
+    const eventsInRange = notificationsInRange.flatMap(notification => {
+      return notification.payload
+        .filter((event): event is BackendEvent & {time: string} => {
+          return this.isEventInTimeRange(event, from, to);
+        })
         .map(event => {
           const summary: NotificationBackendDumpEvent = {
             notificationId: notification.id,
@@ -655,8 +683,8 @@ export class DebugUtil {
           }
 
           return summary;
-        }),
-    );
+        });
+    });
 
     const dump: NotificationBackendDump = {
       fetchedAt: new Date().toISOString(),
@@ -665,7 +693,9 @@ export class DebugUtil {
       timeRange: {from: from.toISOString(), to: to.toISOString()},
       counts: {
         notifications: notificationsInRange.length,
-        events: notifications.flatMap(notification => notification.payload).length,
+        events: notifications.flatMap(notification => {
+          return notification.payload;
+        }).length,
         eventsInRange: eventsInRange.length,
       },
       eventsInRange,
@@ -678,7 +708,7 @@ export class DebugUtil {
 
   async downloadNotificationsDump(from: Date, to: Date): Promise<void> {
     const dump = await this.dumpNotificationsFromBackend(from, to);
-    const blob = new Blob([JSON.stringify(dump, null, 2)], {type: 'application/json'});
+    const blob = new Blob([JSON.stringify(dump, null, debugDumpIndentationSpaces)], {type: 'application/json'});
     const filename = `wire-notifications-${from.toISOString()}-${to.toISOString()}.json`.replaceAll(':', '-');
     downloadBlob(blob, filename, 'application/json');
   }
@@ -690,12 +720,18 @@ export class DebugUtil {
     const clientId = this.clientState.currentClient?.id;
     const userId = this.userState.self().id;
 
-    const isOTRMessage = (notification: BackendEvent) => notification.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD;
-    const isInCurrentConversation = (notification: ConversationEvent) => notification.conversation === conversationId;
-    const wasSentByOurCurrentClient = (notification: ConversationOtrMessageAddEvent) =>
-      notification.from === userId && notification.data.sender === clientId;
-    const hasExpectedTimestamp = (notification: ConversationOtrMessageAddEvent, dateTime: Date) =>
-      notification.time === dateTime.toISOString();
+    const isOTRMessage = (notification: BackendEvent) => {
+      return notification.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD;
+    };
+    const isInCurrentConversation = (notification: ConversationEvent) => {
+      return notification.conversation === conversationId;
+    };
+    const wasSentByOurCurrentClient = (notification: ConversationOtrMessageAddEvent) => {
+      return notification.from === userId && notification.data.sender === clientId;
+    };
+    const hasExpectedTimestamp = (notification: ConversationOtrMessageAddEvent, dateTime: Date) => {
+      return notification.time === dateTime.toISOString();
+    };
     const conversation = await this.conversationRepository.getConversationById({domain: '', id: conversationId});
     const message = await this.messageRepository.getMessageInConversationById(conversation, messageId);
     const notificationList = await this.eventRepository.notificationService.getNotifications(
@@ -705,7 +741,9 @@ export class DebugUtil {
     );
     const dateTime = new Date(message.timestamp());
     const filteredEvents: ConversationOtrMessageAddEvent[] = notificationList.notifications
-      .flatMap((notification: Notification) => notification.payload)
+      .flatMap((notification: Notification) => {
+        return notification.payload;
+      })
       .filter((event: ConversationOtrMessageAddEvent) => {
         return (
           isOTRMessage(event) &&
@@ -714,13 +752,20 @@ export class DebugUtil {
           hasExpectedTimestamp(event, dateTime)
         );
       }) as ConversationOtrMessageAddEvent[];
-    const recipients = filteredEvents.map(event => event.data.recipient);
+    const recipients = filteredEvents.map(event => {
+      return event.data.recipient;
+    });
     const selfClients = await this.clientRepository.getClientsForSelf();
-    const selfClientIds = selfClients.map(client => client.id);
-    const missingClients = selfClientIds.filter(id => recipients.includes(id));
-    const logMessage = missingClients.length
-      ? `Message was sent to all other "${selfClients.length}" clients.`
-      : `Message was NOT sent to the following own clients: ${missingClients.join(',')}`;
+    const selfClientIds = selfClients.map(client => {
+      return client.id;
+    });
+    const missingClients = selfClientIds.filter(id => {
+      return recipients.includes(id);
+    });
+    const logMessage =
+      missingClients.length > 0
+        ? `Message was sent to all other "${selfClients.length}" clients.`
+        : `Message was NOT sent to the following own clients: ${missingClients.join(',')}`;
     this.logger.info(logMessage);
   }
 
@@ -731,8 +776,8 @@ export class DebugUtil {
     const conversation = await this.conversationRepository.getConversationById(conversationId);
 
     // Some events (e.g. system-initiated conversation deletions/reminders) have no sender.
-    const senderId = event.qualified_from ?? (event.from ? {domain: '', id: event.from} : undefined);
-    const user = senderId ? await this.userRepository.getUserById(senderId) : undefined;
+    const senderId = event.qualified_from ?? (isNonEmptyString(event.from) ? {domain: '', id: event.from} : undefined);
+    const user = !isUndefined(senderId) ? await this.userRepository.getUserById(senderId) : undefined;
 
     const debugInformation = {
       conversation,
@@ -743,7 +788,10 @@ export class DebugUtil {
     const logMessage = `Hey ${this.userState.self().name()}, this is for you:`;
     this.logger.warn(logMessage, debugInformation);
     this.logger.warn(`Conversation: ${debugInformation.conversation.name()}`, debugInformation.conversation);
-    this.logger.warn(`From: ${debugInformation.user ? debugInformation.user.name() : 'system'}`, debugInformation.user);
+    this.logger.warn(
+      `From: ${!isUndefined(debugInformation.user) ? debugInformation.user.name() : 'system'}`,
+      debugInformation.user,
+    );
 
     return debugInformation;
   }
@@ -755,7 +803,7 @@ export class DebugUtil {
 
   getActiveCallStats() {
     const activeCall = this.callState.joinedCall();
-    if (!activeCall) {
+    if (isNullOrUndefined(activeCall)) {
       throw new Error('no active call found');
     }
     return this.callingRepository.getStats(activeCall.conversation.qualifiedId);
@@ -772,7 +820,9 @@ export class DebugUtil {
       {deviceId: '440', groupId: 'fakeMic1', kind: 'audioinput', label: 'First mic'},
       {deviceId: '100', groupId: 'fakeMic2', kind: 'audioinput', label: 'Second mic'},
     ];
-    navigator.mediaDevices.enumerateDevices = () => Promise.resolve(cameras.concat(microphones) as MediaDeviceInfo[]);
+    navigator.mediaDevices.enumerateDevices = () => {
+      return Promise.resolve(cameras.concat(microphones) as MediaDeviceInfo[]);
+    };
 
     navigator.mediaDevices.getUserMedia = (constraints: MediaStreamConstraints) => {
       const audioSet = isObject(constraints.audio) ? (constraints.audio as MediaTrackConstraintSet) : undefined;
@@ -816,10 +866,15 @@ export class DebugUtil {
         ctx.fillStyle = `#${color}`;
         ctx.fillRect(0, 0, width, height);
         ctx.fillStyle = '#000';
-        ctx.fillRect(0, 0, Math.random() * 10, Math.random() * 10);
-      }, 500);
+        ctx.fillRect(
+          0,
+          0,
+          Math.random() * debugFrameRectangleSizeInPixels,
+          Math.random() * debugFrameRectangleSizeInPixels,
+        );
+      }, debugFrameUpdateIntervalInMilliseconds);
       // Typings missing for: https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/captureStream
-      const stream = (canvas as any).captureStream(25);
+      const stream = (canvas as any).captureStream(debugCaptureFramesPerSecond);
       return stream.getVideoTracks();
     }
 
@@ -846,7 +901,9 @@ export class DebugUtil {
           conversation: conversation.id,
           data: {
             reason: MemberLeaveReason.LEGAL_HOLD_POLICY_CONFLICT,
-            user_ids: users.map(({id}) => id),
+            user_ids: users.map(({id}) => {
+              return id;
+            }),
             qualified_user_ids: users,
           },
           from: this.userState.self().id,

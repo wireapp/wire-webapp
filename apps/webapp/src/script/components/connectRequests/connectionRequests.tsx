@@ -19,6 +19,7 @@
 
 import {useEffect, useRef} from 'react';
 
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-kit';
@@ -53,7 +54,7 @@ export const ConnectRequests = ({
     const user1Connection = user1.connection();
     const user2Connection = user2.connection();
 
-    if (!user1Connection || !user2Connection) {
+    if (isNullOrUndefined(user1Connection) || isNullOrUndefined(user2Connection)) {
       return 0;
     }
 
@@ -63,12 +64,14 @@ export const ConnectRequests = ({
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
   const smBreakpoint = useMatchMedia('max-width: 640px');
 
-  const {setCurrentView} = useAppMainState(state => state.responsiveView);
+  const {setCurrentView} = useAppMainState(state => {
+    return state.responsiveView;
+  });
 
   const {setCurrentTab: setCurrentSidebarTab} = useSidebarStore();
 
   const scrollToBottom = (behavior: ScrollBehavior = 'auto') => {
-    if (connectRequestsRefEnd.current) {
+    if (!isNullOrUndefined(connectRequestsRefEnd.current)) {
       connectRequestsRefEnd.current.scrollIntoView({behavior});
     }
   };
@@ -115,61 +118,71 @@ export const ConnectRequests = ({
                 variant={IconButtonVariant.SECONDARY}
                 className="connect-requests-icon-back icon-back"
                 css={{marginBottom: 0}}
-                onClick={() => setCurrentView(ViewType.MOBILE_LEFT_SIDEBAR)}
+                onClick={() => {
+                  return setCurrentView(ViewType.MOBILE_LEFT_SIDEBAR);
+                }}
               />
             </div>
           )}
-          {connectionRequests.map(connectRequest => (
-            <div
-              key={connectRequest.id}
-              className="connect-request"
-              data-uie-uid={connectRequest.id}
-              data-uie-name="connect-request"
-            >
-              <div className="connect-request-name ellipsis">
-                <UserName user={connectRequest} />
+          {connectionRequests.map(connectRequest => {
+            return (
+              <div
+                key={connectRequest.id}
+                className="connect-request"
+                data-uie-uid={connectRequest.id}
+                data-uie-name="connect-request"
+              >
+                <div className="connect-request-name ellipsis">
+                  <UserName user={connectRequest} />
+                </div>
+
+                <div className="connect-request-username label-username">{connectRequest.handle}</div>
+
+                {isNullOrUndefined(classifiedDomains) ? (
+                  classifiedDomains
+                ) : (
+                  <UserClassifiedBar users={[connectRequest]} classifiedDomains={classifiedDomains} />
+                )}
+
+                <Avatar
+                  className="connect-request-avatar avatar-no-filter cursor-default"
+                  participant={connectRequest}
+                  avatarSize={AVATAR_SIZE.X_LARGE}
+                  noBadge
+                  noFilter
+                  hideAvailabilityStatus
+                  hideProfilePicture={
+                    connectRequest.domain === 'wire.com' || connectRequest.domain === 'staging.zinfra.io'
+                  }
+                />
+
+                <UnverifiedUserWarning />
+
+                <div className="connect-request-button-group">
+                  <Button
+                    variant={ButtonVariant.SECONDARY}
+                    data-uie-name="do-ignore"
+                    aria-label={translate('connectionRequestIgnore')}
+                    onClick={() => {
+                      return onIgnoreClick(connectRequest);
+                    }}
+                  >
+                    {translate('connectionRequestIgnore')}
+                  </Button>
+
+                  <Button
+                    onClick={() => {
+                      return void onAcceptClick(connectRequest);
+                    }}
+                    data-uie-name="do-accept"
+                    aria-label={translate('connectionRequestConnect')}
+                  >
+                    {translate('connectionRequestConnect')}
+                  </Button>
+                </div>
               </div>
-
-              <div className="connect-request-username label-username">{connectRequest.handle}</div>
-
-              {classifiedDomains && (
-                <UserClassifiedBar users={[connectRequest]} classifiedDomains={classifiedDomains} />
-              )}
-
-              <Avatar
-                className="connect-request-avatar avatar-no-filter cursor-default"
-                participant={connectRequest}
-                avatarSize={AVATAR_SIZE.X_LARGE}
-                noBadge
-                noFilter
-                hideAvailabilityStatus
-                hideProfilePicture={
-                  connectRequest.domain === 'wire.com' || connectRequest.domain === 'staging.zinfra.io'
-                }
-              />
-
-              <UnverifiedUserWarning />
-
-              <div className="connect-request-button-group">
-                <Button
-                  variant={ButtonVariant.SECONDARY}
-                  data-uie-name="do-ignore"
-                  aria-label={translate('connectionRequestIgnore')}
-                  onClick={() => onIgnoreClick(connectRequest)}
-                >
-                  {translate('connectionRequestIgnore')}
-                </Button>
-
-                <Button
-                  onClick={() => void onAcceptClick(connectRequest)}
-                  data-uie-name="do-accept"
-                  aria-label={translate('connectionRequestConnect')}
-                >
-                  {translate('connectionRequestConnect')}
-                </Button>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <div className="connect-request-list-end" ref={connectRequestsRefEnd} />

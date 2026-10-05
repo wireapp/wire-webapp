@@ -22,7 +22,9 @@ import {$getSelection, $isRangeSelection, $isTextNode, LexicalNode, RangeSelecti
 
 const PUNCTUATION = '\\.,\\*\\?\\$\\|#{}\\(\\)\\^\\[\\]\\\\/!%\'"~=<>_:;\\s';
 
-const VALID_CHARS = (triggers: string[]) => `(?!${triggers.join('|')})[^${PUNCTUATION}]`;
+const VALID_CHARS = (triggers: string[]) => {
+  return `(?!${triggers.join('|')})[^${PUNCTUATION}]`;
+};
 
 export function getNextSibling(node: LexicalNode) {
   let nextSibling = node.getNextSibling();

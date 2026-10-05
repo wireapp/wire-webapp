@@ -101,8 +101,12 @@ export const getMeetingInstancePage = (
   limit: number,
 ): MeetingInstancePage => {
   const candidates = meetingSeriesList
-    .map(meetingSeries => getFirstMeetingInstanceOnOrAfter(meetingSeries, from))
-    .filter((meetingInstance): meetingInstance is MeetingInstance => meetingInstance !== undefined)
+    .map(meetingSeries => {
+      return getFirstMeetingInstanceOnOrAfter(meetingSeries, from);
+    })
+    .filter((meetingInstance): meetingInstance is MeetingInstance => {
+      return meetingInstance !== undefined;
+    })
     .toSorted(compareMeetingInstances);
 
   return getNextMeetingInstancePage({candidates}, limit);

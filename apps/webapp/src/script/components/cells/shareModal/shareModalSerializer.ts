@@ -17,6 +17,10 @@
  *
  */
 
+import {isNull} from '@sindresorhus/is';
+
+const millisecondsPerSecond = 1000;
+
 interface ShareModalInput {
   passwordEnabled: boolean;
   passwordValue: string;
@@ -46,13 +50,13 @@ export const serializeShareModalInput = ({
   isEditingPassword,
 }: ShareModalInput): ShareModalSerializedInput => {
   const trimmedPassword = passwordValue.trim();
-  const hasValidExpiration = !expirationEnabled || (expirationDateTime && !expirationInvalid);
+  const hasValidExpiration = !expirationEnabled || (!isNull(expirationDateTime) && !expirationInvalid);
 
   let accessEnd: string | null | undefined;
   if (!expirationEnabled) {
     accessEnd = null;
-  } else if (expirationDateTime && !expirationInvalid) {
-    accessEnd = Math.floor(expirationDateTime.getTime() / 1000).toString();
+  } else if (!isNull(expirationDateTime) && !expirationInvalid) {
+    accessEnd = Math.floor(expirationDateTime.getTime() / millisecondsPerSecond).toString();
   } else {
     accessEnd = undefined;
   }
@@ -66,7 +70,7 @@ export const serializeShareModalInput = ({
 
   return {
     accessEnd,
-    isValid: Boolean(isPasswordValid && hasValidExpiration),
+    isValid: isPasswordValid && hasValidExpiration,
     passwordEnabled,
     updatePassword,
   };

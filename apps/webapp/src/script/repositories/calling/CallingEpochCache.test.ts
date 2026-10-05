@@ -49,7 +49,9 @@ describe('CallingEpochCache', () => {
   ];
   beforeEach(() => {
     cache = new CallingEpochCache();
-    epochData.forEach(d => cache.store(d));
+    epochData.forEach(d => {
+      cache.store(d);
+    });
   });
 
   describe('Cache', () => {

@@ -17,7 +17,7 @@
  *
  */
 
-import {isEmptyArray, isNonEmptyString} from '@sindresorhus/is';
+import {isEmptyArray, isNonEmptyString, isNull, isUndefined} from '@sindresorhus/is';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
@@ -339,23 +339,22 @@ export class ActionsViewModel {
       const roles = conversation.roles();
       const selfRole = roles[selfUser.id];
       const isSelfAdmin = selfRole === DefaultConversationRoleName.WIRE_ADMIN;
-      const otherAdminCount = Object.entries(roles).filter(
-        ([id, role]) => id !== selfUser.id && role === DefaultConversationRoleName.WIRE_ADMIN,
-      ).length;
+      const otherAdminCount = Object.entries(roles).filter(([id, role]) => {
+        return id !== selfUser.id && role === DefaultConversationRoleName.WIRE_ADMIN;
+      }).length;
       const isLastAdmin = isSelfAdmin && otherAdminCount === 0;
 
       if (isLastAdmin) {
-        const eligibleUsers = conversation
-          .participating_user_ets()
-          .filter(
-            user =>
-              !user.isFederated &&
-              !user.isService &&
-              user.type !== UserType.APP &&
-              isNonEmptyString(user.name()) &&
-              isNonEmptyString(user.username()) &&
-              !user.isTemporaryGuest(),
+        const eligibleUsers = conversation.participating_user_ets().filter(user => {
+          return (
+            !user.isFederated &&
+            !user.isService &&
+            user.type !== UserType.APP &&
+            isNonEmptyString(user.name()) &&
+            isNonEmptyString(user.username()) &&
+            !user.isTemporaryGuest()
           );
+        });
 
         useLeaveGroupAdminModalStore.getState().show({
           conversation,
@@ -371,7 +370,9 @@ export class ActionsViewModel {
 
             await this.leaveOrClearConversation(conversation, {leave: true, clear: clearContent});
           },
-          onDelete: () => this.deleteConversation(conversation),
+          onDelete: () => {
+            return this.deleteConversation(conversation);
+          },
         });
         return Promise.resolve();
       }
@@ -406,7 +407,9 @@ export class ActionsViewModel {
       PrimaryModal.type.CONFIRM,
       {
         primaryAction: {
-          action: () => this.conversationRepository.deleteConversation(conversationEntity),
+          action: () => {
+            return this.conversationRepository.deleteConversation(conversationEntity);
+          },
           text: this.translate('modalConversationDeleteGroupAction'),
         },
         text: {
@@ -430,7 +433,9 @@ export class ActionsViewModel {
       PrimaryModal.type.CONFIRM,
       {
         primaryAction: {
-          action: () => this.conversationRepository.deleteConversationLocally(conversationEntity, true),
+          action: () => {
+            return this.conversationRepository.deleteConversationLocally(conversationEntity, true);
+          },
           text: this.translate('modalConversationRemoveGroupAction'),
         },
         text: {
@@ -457,7 +462,7 @@ export class ActionsViewModel {
     const conversationEntity = await this.conversationRepository.resolve1To1Conversation(userEntity.qualifiedId, {
       mls: {allowUnestablished: false},
     });
-    if (conversationEntity) {
+    if (!isNull(conversationEntity)) {
       return conversationEntity;
     }
     throw new Error(`Cannot find or create 1:1 conversation with user ID "${userEntity.qualifiedId.id}".`);
@@ -477,7 +482,7 @@ export class ActionsViewModel {
       return this.openConversation(conversationEntity);
     }
 
-    if (!serviceEntity.qualifiedId) {
+    if (isUndefined(serviceEntity.qualifiedId)) {
       throw new Error("Can't create 1on1 conversation for an entity without qualifiedId");
     }
 
@@ -486,7 +491,7 @@ export class ActionsViewModel {
   };
 
   readonly openGroupConversation = async (conversationEntity?: Conversation): Promise<void> => {
-    if (!conversationEntity) {
+    if (isUndefined(conversationEntity)) {
       throw new Error();
     }
     return this.openConversation(conversationEntity);
@@ -577,7 +582,7 @@ export class ActionsViewModel {
                 userEntity.qualifiedId,
               );
               resolve();
-              if (conversationEntity) {
+              if (!isNull(conversationEntity)) {
                 await this.conversationRepository.updateParticipatingUserEntities(conversationEntity);
               }
             },

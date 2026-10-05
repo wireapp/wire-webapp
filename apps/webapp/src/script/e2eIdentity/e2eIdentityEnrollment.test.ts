@@ -44,49 +44,55 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 jest.mock('./oidcService', () => {
   return {
     // Mock the OIDCService class
-    OIDCService: jest.fn().mockImplementation(() => ({
-      handleSilentAuthentication: jest.fn().mockResolvedValue({
-        id_token: 'ID_TOKEN',
-        access_token: 'ACCESS_TOKEN',
-        refresh_token: 'REFRESH_TOKEN  ',
-        token_type: 'auth',
-        profile: 'sub',
-      }),
-      clearProgress: jest.fn(),
-      handleAuthentication: jest.fn().mockResolvedValue({}),
-      // ... other methods of OIDCService
-    })),
+    OIDCService: jest.fn().mockImplementation(() => {
+      return {
+        handleSilentAuthentication: jest.fn().mockResolvedValue({
+          id_token: 'ID_TOKEN',
+          access_token: 'ACCESS_TOKEN',
+          refresh_token: 'REFRESH_TOKEN  ',
+          token_type: 'auth',
+          profile: 'sub',
+        }),
+        clearProgress: jest.fn(),
+        handleAuthentication: jest.fn().mockResolvedValue({}),
+        // ... other methods of OIDCService
+      };
+    }),
     getOIDCServiceInstance: jest.fn(), // if needed
   };
 });
 
 function wait(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise(resolve => {
+    return setTimeout(resolve, ms);
+  });
 }
 
 const generateWireIdentity = (
   selfClientId: string,
   credentialType: CredentialType = CredentialType.X509,
   status: e2eIdentityVerification.MLSStatuses = e2eIdentityVerification.MLSStatuses.NOT_ACTIVATED,
-): e2eIdentityVerification.WireIdentity => ({
-  x509Identity: {
-    free: jest.fn(),
-    certificate: '',
-    displayName: 'John Doe',
-    domain: 'domain',
-    handle: 'johndoe',
-    notAfter: BigInt(0),
-    notBefore: BigInt(0),
-    serialNumber: '',
-    [Symbol.dispose]: noop,
-  },
-  thumbprint: '',
-  credentialType,
-  status,
-  clientId: selfClientId,
-  deviceId: selfClientId,
-  qualifiedUserId: {id: 'userId', domain: 'domain'},
-});
+): e2eIdentityVerification.WireIdentity => {
+  return {
+    x509Identity: {
+      free: jest.fn(),
+      certificate: '',
+      displayName: 'John Doe',
+      domain: 'domain',
+      handle: 'johndoe',
+      notAfter: BigInt(0),
+      notBefore: BigInt(0),
+      serialNumber: '',
+      [Symbol.dispose]: noop,
+    },
+    thumbprint: '',
+    credentialType,
+    status,
+    clientId: selfClientId,
+    deviceId: selfClientId,
+    qualifiedUserId: {id: 'userId', domain: 'domain'},
+  };
+};
 
 const modalMock = jest.spyOn(PrimaryModal, 'show');
 
@@ -292,7 +298,9 @@ describe('E2EIHandler', () => {
       );
     });
 
-    jest.spyOn(handler, 'enroll').mockImplementation(() => Promise.resolve());
+    jest.spyOn(handler, 'enroll').mockImplementation(() => {
+      return Promise.resolve();
+    });
 
     modalMock.mock.lastCall?.[1].primaryAction?.action?.();
 
@@ -328,7 +336,9 @@ describe('E2EIHandler', () => {
       );
     });
 
-    jest.spyOn(handler, 'enroll').mockImplementation(() => Promise.resolve());
+    jest.spyOn(handler, 'enroll').mockImplementation(() => {
+      return Promise.resolve();
+    });
 
     modalMock.mock.lastCall?.[1].primaryAction?.action?.();
 
@@ -360,6 +370,45 @@ describe('E2EIHandler', () => {
   });
 
   describe('startTimers()', () => {
+    it.each([0, NaN, -1, 1])(
+      'preserves persisted activation timestamp truthiness for %p',
+      async storedActivationMilliseconds => {
+        jest.spyOn(getE2EIServiceForTest(), 'isEnrollmentInProgress').mockResolvedValue(false);
+        jest.spyOn(getE2EIServiceForTest(), 'isFreshMLSSelfClient').mockResolvedValue(false);
+        jest.spyOn(e2eIdentityVerification, 'getActiveWireIdentity').mockResolvedValue(undefined);
+        const instance = await E2EIHandler.getInstance().initialize(params);
+        const enrollmentStore = getEnrollmentStore(user.qualifiedId, selfClientId);
+        enrollmentStore.store.e2eiActivatedAt(storedActivationMilliseconds);
+
+        await instance.startTimers();
+
+        const expectedActivationMilliseconds = [0, NaN].includes(storedActivationMilliseconds)
+          ? clock.currentUnixEpochMilliseconds
+          : storedActivationMilliseconds;
+        expect(enrollmentStore.get.e2eiActivatedAt()).toBe(expectedActivationMilliseconds);
+      },
+    );
+
+    it.each([0, NaN, -1, 1])(
+      'preserves persisted firing timestamp truthiness for %p',
+      async storedFiringMilliseconds => {
+        jest.spyOn(getE2EIServiceForTest(), 'isEnrollmentInProgress').mockResolvedValue(false);
+        jest.spyOn(getE2EIServiceForTest(), 'isFreshMLSSelfClient').mockResolvedValue(false);
+        jest.spyOn(e2eIdentityVerification, 'getActiveWireIdentity').mockResolvedValue(undefined);
+        const instance = await E2EIHandler.getInstance().initialize(params);
+        const enrollmentStore = getEnrollmentStore(user.qualifiedId, selfClientId);
+        enrollmentStore.store.e2eiActivatedAt(clock.currentUnixEpochMilliseconds);
+        enrollmentStore.store.timer(storedFiringMilliseconds);
+
+        const actualTimer = await instance.startTimers();
+
+        const expectedReminderDelayMilliseconds = [0, NaN].includes(storedFiringMilliseconds)
+          ? params.gracePeriodInSeconds * 1000
+          : storedFiringMilliseconds - clock.currentUnixEpochMilliseconds;
+        expect(actualTimer.nextReminderDelay).toBe(expectedReminderDelayMilliseconds);
+      },
+    );
+
     it('should reset the timer after user interaction with modal', async () => {
       jest.spyOn(getE2EIServiceForTest(), 'isEnrollmentInProgress').mockResolvedValue(false);
       jest.spyOn(getE2EIServiceForTest(), 'isFreshMLSSelfClient').mockResolvedValue(false);

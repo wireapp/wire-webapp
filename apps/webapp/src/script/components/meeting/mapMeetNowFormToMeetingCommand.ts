@@ -17,6 +17,7 @@
  *
  */
 
+import {isNonEmptyString} from '@sindresorhus/is';
 import {Result} from 'true-myth';
 
 import type {MeetNowFormErrors, MeetNowFormState} from 'Components/meeting/meetNowModal/meetNowTypes';
@@ -25,9 +26,12 @@ import type {MeetNowMeetingCommand} from 'Components/meeting/shared/types/meetin
 
 export const mapMeetNowFormToMeetingCommand = (
   formState: MeetNowFormState,
-): Result<MeetNowMeetingCommand, MeetNowFormErrors> =>
-  validateMeetNowForm(formState).map(validatedFormState => ({
-    title: validatedFormState.title.trim(),
-    selectedUsers: validatedFormState.selectedUsers,
-    ...(validatedFormState.password?.trim() ? {password: validatedFormState.password} : {}),
-  }));
+): Result<MeetNowMeetingCommand, MeetNowFormErrors> => {
+  return validateMeetNowForm(formState).map(validatedFormState => {
+    return {
+      title: validatedFormState.title.trim(),
+      selectedUsers: validatedFormState.selectedUsers,
+      ...(isNonEmptyString(validatedFormState.password?.trim()) ? {password: validatedFormState.password} : {}),
+    };
+  });
+};

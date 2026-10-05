@@ -181,7 +181,8 @@ function createRuntimeDependencies(): ProductionDistributionCommandDependencies 
 }
 
 async function main(): Promise<void> {
-  process.exitCode = await runProductionDistributionCommand(process.argv.slice(2), {
+  const runtimeArgumentPrefixLength = 2;
+  process.exitCode = await runProductionDistributionCommand(process.argv.slice(runtimeArgumentPrefixLength), {
     executeCommand(command: ProductionDistributionCommand): number {
       return executeProductionDistributionCommand(command, createRuntimeDependencies());
     },

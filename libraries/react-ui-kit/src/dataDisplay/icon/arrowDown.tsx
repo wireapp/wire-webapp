@@ -19,8 +19,10 @@
 
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
-export const ArrowDown = ({...props}: SVGIconProps) => (
-  <SVGIcon realWidth={16} realHeight={16} {...props}>
-    <path d="M7.99963 12.5711L15.6565 4.91421L14.2423 3.5L7.99963 9.74264L1.75699 3.5L0.342773 4.91421L7.99963 12.5711Z" />
-  </SVGIcon>
-);
+export const ArrowDown = ({...props}: SVGIconProps) => {
+  return (
+    <SVGIcon realWidth={16} realHeight={16} {...props}>
+      <path d="M7.99963 12.5711L15.6565 4.91421L14.2423 3.5L7.99963 9.74264L1.75699 3.5L0.342773 4.91421L7.99963 12.5711Z" />
+    </SVGIcon>
+  );
+};

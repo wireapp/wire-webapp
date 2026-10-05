@@ -25,7 +25,9 @@ import {handleReactionEvent} from './reactionEventHandler';
 describe('reactionEventHandler', () => {
   it('throws an error if the target message does not exist', async () => {
     const operation = handleReactionEvent(createReactionEvent(createUuid(), '🫶'), {
-      findEvent: () => Promise.resolve(undefined),
+      findEvent: () => {
+        return Promise.resolve(undefined);
+      },
       selfUserId: createUuid(),
     });
 
@@ -42,7 +44,9 @@ describe('reactionEventHandler', () => {
       const reactionEvent = createReactionEvent(createUuid(), '🫶');
 
       const operation: any = await handleReactionEvent(reactionEvent, {
-        findEvent: () => Promise.resolve(targetMessage),
+        findEvent: () => {
+          return Promise.resolve(targetMessage);
+        },
         selfUserId: createUuid(),
       });
 
@@ -62,7 +66,9 @@ describe('reactionEventHandler', () => {
       reactionEvent.from = reactor;
 
       const operation: any = await handleReactionEvent(reactionEvent, {
-        findEvent: () => Promise.resolve(targetMessage),
+        findEvent: () => {
+          return Promise.resolve(targetMessage);
+        },
         selfUserId: createUuid(),
       });
 

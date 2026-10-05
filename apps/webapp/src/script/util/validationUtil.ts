@@ -21,6 +21,8 @@ import {isNonEmptyString} from '@sindresorhus/is';
 
 import {ValidationError} from '../auth/module/action/validationError';
 
+const assetRetentionPolicyUpperBound = 6;
+
 export class ValidationUtilError extends Error {
   constructor(message = 'Unknown ValidationUtilError') {
     super();
@@ -36,7 +38,9 @@ export class ValidationUtilError extends Error {
   }
 }
 
-export const isValidUsername = (username: string) => /^@?[a-z_0-9.-]{2,256}$/.test(username);
+export const isValidUsername = (username: string) => {
+  return /^@?[a-z_0-9.-]{2,256}$/.test(username);
+};
 
 export const isValidEmail = (email: string): boolean => {
   const regExp =
@@ -46,10 +50,13 @@ export const isValidEmail = (email: string): boolean => {
 
 // Since some special chars are allowed, remember to always
 // encode Bearer tokens using encodeURIComponents afterwards!
-export const isBearerToken = (token: string): boolean => /^[a-zA-Z0-9\-._~+/]+[=]{0,2}$/.test(token);
+export const isBearerToken = (token: string): boolean => {
+  return /^[a-zA-Z0-9\-._~+/]+[=]{0,2}$/.test(token);
+};
 
-export const isUUID = (string: string): boolean =>
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(string);
+export const isUUID = (string: string): boolean => {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(string);
+};
 
 export const isValidApiPath = (path: string): boolean => {
   const [urlPath] = path.split('?');
@@ -74,7 +81,9 @@ export const legacyAsset = (assetId: string, conversationId: string): true => {
 
 // Asset retention policy validation
 // Reference: https://github.com/wireapp/wire-server/blob/dc3e9a8af5250c0d045e96a31aa23c255b4e01a3/libs/cargohold-types/src/CargoHold/Types/V3.hs#L156-L177
-export const assetRetentionPolicy = (policyId: number): boolean => policyId > 0 && policyId < 6;
+export const assetRetentionPolicy = (policyId: number): boolean => {
+  return policyId > 0 && policyId < assetRetentionPolicyUpperBound;
+};
 
 export const isValidAsset = (assetKey: string, assetToken?: string): true => {
   if (!isNonEmptyString(assetKey)) {

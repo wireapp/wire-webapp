@@ -23,6 +23,9 @@ import {Result} from 'true-myth';
 import {createProductionTagName} from './releaseMetadata.ts';
 import type {ProductionTagName, ReleaseIdentifier} from './releaseMetadata.ts';
 
+const productionTagCaptureIndex = 2;
+const webappVersionCaptureIndex = 3;
+
 declare const webAppVersionBrand: unique symbol;
 
 export type WebAppVersion = string & {readonly [webAppVersionBrand]: 'WebAppVersion'};
@@ -311,8 +314,8 @@ export function parseWebAppVersionSynchronizationMarker(
   }
 
   const releaseIdentifier = markerMatch[1];
-  const productionTagName = markerMatch[2];
-  const webAppVersion = markerMatch[3];
+  const productionTagName = markerMatch[productionTagCaptureIndex];
+  const webAppVersion = markerMatch[webappVersionCaptureIndex];
 
   if (!isString(releaseIdentifier) || !isString(productionTagName) || !isString(webAppVersion)) {
     return Result.err(new Error('Malformed WebApp version synchronization marker'));

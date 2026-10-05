@@ -48,9 +48,13 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 function buildEventStorageMiddleware() {
   const eventService = {
-    saveEvent: jest.fn(event => event),
+    saveEvent: jest.fn(event => {
+      return event;
+    }),
     loadEvent: jest.fn(),
-    replaceEvent: jest.fn(event => event),
+    replaceEvent: jest.fn(event => {
+      return event;
+    }),
     deleteEvent: jest.fn(),
   } as unknown as jest.Mocked<EventService>;
   const conversationState = {
@@ -66,6 +70,16 @@ function buildEventStorageMiddleware() {
 
 describe('EventStorageMiddleware', () => {
   describe('processEvent', () => {
+    it('persists an empty event ID without querying for a duplicate', async () => {
+      const [middleware, {eventService}] = buildEventStorageMiddleware();
+      const event = createMessageAddEvent({overrides: {id: ''}});
+
+      await middleware.processEvent(event, EventSource.WEBSOCKET);
+
+      expect(eventService.loadEvent).not.toHaveBeenCalled();
+      expect(eventService.saveEvent).toHaveBeenCalledWith(event);
+    });
+
     it('persists a decoded session reset that can be mapped again after reload', async () => {
       const [middleware, {eventService}] = buildEventStorageMiddleware();
       const incomingEvent = {
@@ -164,7 +178,9 @@ describe('EventStorageMiddleware', () => {
       const userIds = [createUuid(), createUuid(), createUuid(), createUuid()];
       const conversation = new Conversation(conversationId, '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
-      conversationState.findConversation.mockImplementation(() => conversation);
+      conversationState.findConversation.mockImplementation(() => {
+        return conversation;
+      });
 
       const event = createMemberLeaveEvent(conversationId, userIds);
 
@@ -189,7 +205,9 @@ describe('EventStorageMiddleware', () => {
       const conversation = new Conversation(conversationId, '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
       conversation.participating_user_ets([user1, user2, user3]);
 
-      conversationState.findConversation.mockImplementation(() => conversation);
+      conversationState.findConversation.mockImplementation(() => {
+        return conversation;
+      });
 
       const event = createMemberLeaveEvent(conversationId, userIds);
 
@@ -211,7 +229,9 @@ describe('EventStorageMiddleware', () => {
       const conversation = new Conversation(conversationId, '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
       conversation.participating_user_ets([user1, user2, user3]);
 
-      conversationState.findConversation.mockImplementation(() => conversation);
+      conversationState.findConversation.mockImplementation(() => {
+        return conversation;
+      });
 
       const event = createMemberLeaveEvent(conversationId, userIds);
 

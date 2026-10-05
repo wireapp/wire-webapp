@@ -28,6 +28,7 @@ import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import {
   getConversationKey,
+  isAllowedMeetingParticipant,
   mergeConversationUsersIntoSelection,
   mergeUsersIntoSelection,
 } from './participantPickerUtils';
@@ -50,27 +51,30 @@ export const useMeetingParticipantsPicker = ({
   conversationRepository,
 }: UseMeetingParticipantsPickerOptions) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isConversationsOpen, setIsConversationsOpen] = useState(true);
+  const [isContactsOpen, setIsContactsOpen] = useState(false);
+  const [isConversationsOpen, setIsConversationsOpen] = useState(false);
   const [selectedConversations, setSelectedConversations] = useState<Map<string, User[]>>(new Map());
   const triggerRef = useRef<HTMLDivElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
 
   const matchingConversations = useMemo(() => {
-    if (!conversationRepository) {
+    if (isNullOrUndefined(conversationRepository)) {
       return [];
     }
 
     const normalizedFilter = filter.trim().toLowerCase();
-    return conversationRepository
-      .getAllGroupConversations()
-      .filter(
-        conversation =>
-          !conversation.isSelfUserRemoved() &&
-          !conversation.is_archived() &&
-          !conversation.is_cleared() &&
-          conversation.display_name().toLowerCase().includes(normalizedFilter),
+    return conversationRepository.getAllGroupConversations().filter(conversation => {
+      return (
+        !conversation.isSelfUserRemoved() &&
+        !conversation.is_archived() &&
+        !conversation.is_cleared() &&
+        conversation.display_name().toLowerCase().includes(normalizedFilter)
       );
+    });
   }, [conversationRepository, filter]);
+  const selectedConversationIds = useMemo(() => {
+    return new Set(selectedConversations.keys());
+  }, [selectedConversations]);
 
   const handleOpenChange = useCallback(
     (open: boolean) => {
@@ -80,13 +84,14 @@ export const useMeetingParticipantsPicker = ({
 
       if (!open) {
         onFilterChange('');
-      } else {
-        setIsConversationsOpen(true);
+      } else if (!isOpen) {
+        setIsContactsOpen(false);
+        setIsConversationsOpen(false);
       }
 
       setIsOpen(open);
     },
-    [disabled, onFilterChange],
+    [disabled, isOpen, onFilterChange],
   );
 
   const handleSelectedUsersChange = useCallback(
@@ -105,14 +110,19 @@ export const useMeetingParticipantsPicker = ({
       if (nextSelectedConversations.has(conversationKey)) {
         nextSelectedConversations.delete(conversationKey);
         const importedUsers = [...selectedConversations.values()].flat();
-        const manuallySelectedUsers = selectedUsers.filter(
-          user => !importedUsers.some(imported => matchQualifiedIds(imported.qualifiedId, user.qualifiedId)),
-        );
+        const manuallySelectedUsers = selectedUsers.filter(user => {
+          return !importedUsers.some(imported => {
+            return matchQualifiedIds(imported.qualifiedId, user.qualifiedId);
+          });
+        });
         onSelectedUsersChange(
           mergeUsersIntoSelection(manuallySelectedUsers, [...nextSelectedConversations.values()].flat()),
         );
       } else {
-        nextSelectedConversations.set(conversationKey, conversation.participating_user_ets());
+        nextSelectedConversations.set(
+          conversationKey,
+          conversation.participating_user_ets().filter(isAllowedMeetingParticipant),
+        );
         onSelectedUsersChange(mergeConversationUsersIntoSelection(selectedUsers, conversation));
       }
 
@@ -141,10 +151,20 @@ export const useMeetingParticipantsPicker = ({
       handleOpenChange(false);
     };
 
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        event.stopPropagation();
+        handleOpenChange(false);
+      }
+    };
+
     document.addEventListener('pointerdown', handlePointerDown, true);
+    document.addEventListener('keydown', handleKeyDown, true);
 
     return () => {
       document.removeEventListener('pointerdown', handlePointerDown, true);
+      document.removeEventListener('keydown', handleKeyDown, true);
     };
   }, [handleOpenChange, isOpen]);
 
@@ -152,11 +172,13 @@ export const useMeetingParticipantsPicker = ({
     handleOpenChange,
     handleSelectedUsersChange,
     handleSelectConversation,
+    isContactsOpen,
     isConversationsOpen,
     isOpen,
     matchingConversations,
     popoverRef,
-    selectedConversationIds: new Set(selectedConversations.keys()),
+    selectedConversationIds,
+    setIsContactsOpen,
     setIsConversationsOpen,
     triggerRef,
   };

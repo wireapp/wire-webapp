@@ -83,56 +83,74 @@ describe('MemoryEngine', () => {
   });
 
   describe('create', () => {
-    Object.entries(createSpec).map(([description, testFunction]) => {
-      it(description, () => testFunction(engine));
+    Object.entries(createSpec).forEach(([description, testFunction]) => {
+      it(description, () => {
+        return testFunction(engine);
+      });
     });
   });
 
   describe('delete', () => {
-    Object.entries(deleteSpec).map(([description, testFunction]) => {
-      it(description, () => testFunction(engine));
+    Object.entries(deleteSpec).forEach(([description, testFunction]) => {
+      it(description, () => {
+        return testFunction(engine);
+      });
     });
   });
 
   describe('deleteAll', () => {
-    Object.entries(deleteAllSpec).map(([description, testFunction]) => {
-      it(description, () => testFunction(engine));
+    Object.entries(deleteAllSpec).forEach(([description, testFunction]) => {
+      it(description, () => {
+        return testFunction(engine);
+      });
     });
   });
 
   describe('purge', () => {
-    Object.entries(purgeSpec).map(([description, testFunction]) => {
-      it(description, () => testFunction(engine, initEngine));
+    Object.entries(purgeSpec).forEach(([description, testFunction]) => {
+      it(description, () => {
+        return testFunction(engine, initEngine);
+      });
     });
   });
 
   describe('readAllPrimaryKeys', () => {
-    Object.entries(readAllPrimaryKeysSpec).map(([description, testFunction]) => {
-      it(description, () => testFunction(engine));
+    Object.entries(readAllPrimaryKeysSpec).forEach(([description, testFunction]) => {
+      it(description, () => {
+        return testFunction(engine);
+      });
     });
   });
 
   describe('readAll', () => {
-    Object.entries(readAllSpec).map(([description, testFunction]) => {
-      it(description, () => testFunction(engine));
+    Object.entries(readAllSpec).forEach(([description, testFunction]) => {
+      it(description, () => {
+        return testFunction(engine);
+      });
     });
   });
 
   describe('read', () => {
-    Object.entries(readSpec).map(([description, testFunction]) => {
-      it(description, () => testFunction(engine));
+    Object.entries(readSpec).forEach(([description, testFunction]) => {
+      it(description, () => {
+        return testFunction(engine);
+      });
     });
   });
 
   describe('updateOrCreate', () => {
-    Object.entries(updateOrCreateSpec).map(([description, testFunction]) => {
-      it(description, () => testFunction(engine));
+    Object.entries(updateOrCreateSpec).forEach(([description, testFunction]) => {
+      it(description, () => {
+        return testFunction(engine);
+      });
     });
   });
 
   describe('update', () => {
-    Object.entries(updateSpec).map(([description, testFunction]) => {
-      it(description, () => testFunction(engine));
+    Object.entries(updateSpec).forEach(([description, testFunction]) => {
+      it(description, () => {
+        return testFunction(engine);
+      });
     });
   });
 });

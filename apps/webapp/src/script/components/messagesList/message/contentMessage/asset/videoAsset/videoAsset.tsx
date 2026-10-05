@@ -76,7 +76,9 @@ const VideoAsset = ({
     useAssetTransfer(message, assetRepository);
 
   const [hideControls, setHideControls] = useState(false);
-  const hideControlsCallback = useCallback(() => setHideControls(true), []);
+  const hideControlsCallback = useCallback(() => {
+    return setHideControls(true);
+  }, []);
   const {removeTimeout, startTimeout} = useTimeout(hideControlsCallback, hideControlsDelayMilliseconds);
 
   const isMountedRef = useRef(true);
@@ -90,11 +92,15 @@ const VideoAsset = ({
   }, []);
 
   useEffect(() => {
-    return () => videoPreview?.dispose();
+    return () => {
+      return videoPreview?.dispose();
+    };
   }, [videoPreview]);
 
   useEffect(() => {
-    return () => videoSrc?.dispose();
+    return () => {
+      return videoSrc?.dispose();
+    };
   }, [videoSrc]);
 
   useEffect(() => {
@@ -149,7 +155,9 @@ const VideoAsset = ({
         }
         resolve(true);
       };
-      video.onerror = () => resolve(false);
+      video.onerror = () => {
+        return resolve(false);
+      };
       video.src = url;
     });
   };
@@ -283,7 +291,12 @@ const VideoAsset = ({
             {videoPlaybackError ? (
               <div className="video-asset__playback-error">
                 <p className="label-medium">{translate('conversationPlaybackError')}</p>
-                <Button variant={ButtonVariant.TERTIARY} onClick={() => downloadAsset(asset)}>
+                <Button
+                  variant={ButtonVariant.TERTIARY}
+                  onClick={() => {
+                    return downloadAsset(asset);
+                  }}
+                >
                   {translate('conversationPlaybackErrorDownload')}
                 </Button>
               </div>
@@ -304,7 +317,9 @@ const VideoAsset = ({
                         asset={asset}
                         play={onPlayButtonClicked}
                         pause={onPauseButtonClicked}
-                        cancel={() => (isUploading ? cancelUpload() : asset.cancelDownload())}
+                        cancel={() => {
+                          return isUploading ? cancelUpload() : asset.cancelDownload();
+                        }}
                         transferState={transferState}
                         uploadProgress={uploadProgress}
                         isFocusable={isFocusable}

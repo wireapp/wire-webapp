@@ -91,11 +91,12 @@ export const DateTimePickerField = ({
   minTimeForToday = null,
 }: DateTimePickerFieldProps) => {
   const labelId = `${dataUieName}-label`;
-  const selectedDate = useMemo(() => (value !== null ? dateValueFromDate(value) : null), [value]);
-  const selectedTime = useMemo(
-    () => (value !== null ? nearestTimeOptionFromDate(value, timeLocale) : null),
-    [timeLocale, value],
-  );
+  const selectedDate = useMemo(() => {
+    return value !== null ? dateValueFromDate(value) : null;
+  }, [value]);
+  const selectedTime = useMemo(() => {
+    return value !== null ? nearestTimeOptionFromDate(value, timeLocale) : null;
+  }, [timeLocale, value]);
   const isDateDisabled = dateDisabled ?? disabled;
   const isTimeDisabled = timeDisabled ?? disabled;
   const effectiveMinTime = useMemo(() => {
@@ -167,7 +168,13 @@ export const DateTimePickerField = ({
       </div>
 
       {markInvalid && isNonEmptyString(errorText) && (
-        <p css={(theme: Theme) => dateTimePickerErrorTextStyles(theme)}>{errorText}</p>
+        <p
+          css={(theme: Theme) => {
+            return dateTimePickerErrorTextStyles(theme);
+          }}
+        >
+          {errorText}
+        </p>
       )}
     </div>
   );

@@ -73,7 +73,9 @@ const BaseToggle = ({
             type="checkbox"
             name="toggler"
             id={uuid}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => setIsChecked(event.target.checked)}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              return setIsChecked(event.target.checked);
+            }}
             checked={isChecked}
             data-uie-name={`allow-${toggleId}-input`}
           />

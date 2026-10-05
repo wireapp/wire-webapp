@@ -34,6 +34,8 @@ import {sortUsersByPriority} from 'Util/stringUtil';
 
 import {TeamEntity} from './TeamEntity';
 
+const millisecondsPerSecond = 1000;
+
 @singleton()
 export class TeamState {
   public readonly isTeamDeleted: ko.Observable<boolean>;
@@ -74,26 +76,38 @@ export class TeamState {
   readonly isAppsEnabled: ko.PureComputed<boolean>;
 
   constructor(private readonly userState = container.resolve(UserState)) {
-    this.isTeam = ko.pureComputed(() => isNonEmptyString(this.team()?.id));
+    this.isTeam = ko.pureComputed(() => {
+      return isNonEmptyString(this.team()?.id);
+    });
     this.isTeamDeleted = ko.observable(false);
 
     /** Note: this does not include the self user, nor apps (type === UserType.APP) */
-    this.teamMembers = ko.pureComputed(() =>
-      this.userState.users().filter(user => !user.isMe && this.isInTeam(user) && user.type !== UserType.APP),
-    );
+    this.teamMembers = ko.pureComputed(() => {
+      return this.userState.users().filter(user => {
+        return !user.isMe && this.isInTeam(user) && user.type !== UserType.APP;
+      });
+    });
     this.memberRoles = ko.observable({});
     this.memberInviters = ko.observable({});
     this.teamFeatures = ko.observable();
     this.teamApps = ko.observable([]);
     this.teamCollaborators = ko.observable([]);
 
-    this.teamDomain = ko.pureComputed(() => userState.self().domain);
-    this.teamName = ko.pureComputed(() => (this.isTeam() ? this.team().name() : this.userState.self().name()));
-    this.teamSize = ko.pureComputed(() => this.teamMembers().length + 1);
+    this.teamDomain = ko.pureComputed(() => {
+      return userState.self().domain;
+    });
+    this.teamName = ko.pureComputed(() => {
+      return this.isTeam() ? this.team().name() : this.userState.self().name();
+    });
+    this.teamSize = ko.pureComputed(() => {
+      return this.teamMembers().length + 1;
+    });
     this.teamUsers = ko.pureComputed(() => {
       return this.teamMembers()
         .concat(this.userState.connectedUsers())
-        .filter((item, index, array) => array.indexOf(item) === index)
+        .filter((item, index, array) => {
+          return array.indexOf(item) === index;
+        })
         .toSorted(sortUsersByPriority);
     });
 
@@ -115,42 +129,44 @@ export class TeamState {
         : undefined;
     });
 
-    this.isSelfDeletingMessagesEnabled = ko.pureComputed(
-      () => this.teamFeatures()?.selfDeletingMessages?.status === FEATURE_STATUS.ENABLED,
-    );
+    this.isSelfDeletingMessagesEnabled = ko.pureComputed(() => {
+      return this.teamFeatures()?.selfDeletingMessages?.status === FEATURE_STATUS.ENABLED;
+    });
     this.getEnforcedSelfDeletingMessagesTimeout = ko.pureComputed(() => {
       const timeoutSeconds = this.teamFeatures()?.selfDeletingMessages?.config?.enforcedTimeoutSeconds;
       const effectiveTimeoutSeconds =
         !isNullOrUndefined(timeoutSeconds) && timeoutSeconds !== 0 && !isNan(timeoutSeconds)
           ? timeoutSeconds
           : SELF_DELETING_TIMEOUT.OFF;
-      return effectiveTimeoutSeconds * 1000;
+      return effectiveTimeoutSeconds * millisecondsPerSecond;
     });
-    this.isSelfDeletingMessagesEnforced = ko.pureComputed(
-      () => this.getEnforcedSelfDeletingMessagesTimeout() > SELF_DELETING_TIMEOUT.OFF,
-    );
+    this.isSelfDeletingMessagesEnforced = ko.pureComputed(() => {
+      return this.getEnforcedSelfDeletingMessagesTimeout() > SELF_DELETING_TIMEOUT.OFF;
+    });
 
     this.isVideoCallingEnabled = ko.pureComputed(
       // TODO connect to video calling feature config
-      () => true || this.teamFeatures()?.videoCalling?.status === FEATURE_STATUS.ENABLED,
+      () => {
+        return true || this.teamFeatures()?.videoCalling?.status === FEATURE_STATUS.ENABLED;
+      },
     );
 
     this.isMLSEnabled = ko.pureComputed(() => {
       return this.teamFeatures()?.mls?.status === FEATURE_STATUS.ENABLED;
     });
 
-    this.isProtocolToggleEnabledForUser = ko.pureComputed(
-      () => this.teamFeatures()?.mls?.config.protocolToggleUsers.includes(this.userState.self().id) ?? false,
-    );
+    this.isProtocolToggleEnabledForUser = ko.pureComputed(() => {
+      return this.teamFeatures()?.mls?.config.protocolToggleUsers.includes(this.userState.self().id) ?? false;
+    });
 
     // this feature is used to check if the customer is part of premium plan
-    this.isConferenceCallingEnabled = ko.pureComputed(
-      () => this.teamFeatures()?.conferenceCalling?.status === FEATURE_STATUS.ENABLED,
-    );
+    this.isConferenceCallingEnabled = ko.pureComputed(() => {
+      return this.teamFeatures()?.conferenceCalling?.status === FEATURE_STATUS.ENABLED;
+    });
 
-    this.isGuestLinkEnabled = ko.pureComputed(
-      () => this.teamFeatures()?.conversationGuestLinks?.status === FEATURE_STATUS.ENABLED,
-    );
+    this.isGuestLinkEnabled = ko.pureComputed(() => {
+      return this.teamFeatures()?.conversationGuestLinks?.status === FEATURE_STATUS.ENABLED;
+    });
 
     this.isProfileLinkEnabled = ko.pureComputed(() => {
       const status = this.teamFeatures()?.simplifiedUserConnectionRequestQRCode?.status;

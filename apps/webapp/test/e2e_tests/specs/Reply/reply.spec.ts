@@ -328,8 +328,12 @@ test.describe('Reply', () => {
     {tag: ['@TC-3014', '@regression']},
     async ({createPage}) => {
       const [userAPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userA))).then(pm => {
+          return pm.webapp.pages;
+        }),
+        PageManager.from(createPage(withLogin(userB))).then(pm => {
+          return pm.webapp.pages;
+        }),
       ]);
       await createGroup(userAPages, 'Test Group', [userB]);
 

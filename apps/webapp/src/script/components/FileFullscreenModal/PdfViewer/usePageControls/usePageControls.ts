@@ -33,11 +33,15 @@ export const usePageControls = () => {
     currentPage,
     thumbnailsRef,
     handleNextPage: () => {
-      setCurrentPage(prev => prev + 1);
+      setCurrentPage(prev => {
+        return prev + 1;
+      });
       scrollToThumbnail(currentPage + 1);
     },
     handlePreviousPage: () => {
-      setCurrentPage(prev => prev - 1);
+      setCurrentPage(prev => {
+        return prev - 1;
+      });
       scrollToThumbnail(currentPage - 1);
     },
     handlePageChange: setCurrentPage,

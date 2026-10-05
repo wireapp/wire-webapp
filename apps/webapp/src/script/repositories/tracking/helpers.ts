@@ -17,6 +17,7 @@
  *
  */
 
+import {isNonEmptyString, isTruthy, isUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
 import {Runtime} from '@wireapp/commons';
@@ -50,7 +51,7 @@ export function getConversationType(conversationEntity: any): ConversationType |
   }
 }
 export function getGuestAttributes(conversationEntity: Conversation): GuestAttributes {
-  const isTeamConversation = !!conversationEntity.teamId;
+  const isTeamConversation = isNonEmptyString(conversationEntity.teamId);
   if (isTeamConversation) {
     const isAllowGuests = !conversationEntity.isTeamOnly();
     const _getUserType = (_conversationEntity: Conversation) => {
@@ -78,7 +79,7 @@ export function getParticipantTypes(
   userEntities: User[],
   countSelf?: boolean,
 ): {guests: number; temporaryGuests: number; users: number} {
-  const initialValue = {guests: 0, temporaryGuests: 0, users: countSelf ? 1 : 0};
+  const initialValue = {guests: 0, temporaryGuests: 0, users: countSelf === true ? 1 : 0};
   return userEntities.reduce((accumulator, userEntity) => {
     if (userEntity.isTemporaryGuest()) {
       accumulator.temporaryGuests += 1;
@@ -108,13 +109,17 @@ export function getPlatform(): PlatformType {
 }
 
 export function trackCallQualityFeedback({call, score, label}: {call?: Call; score?: number; label: RatingListLabel}) {
-  if (!call) {
+  if (isUndefined(call)) {
     return;
   }
 
-  const duration = call.endedAt() - (call.startedAt() || 0) / TIME_IN_MILLIS.SECOND;
+  const callEndedAtMilliseconds = call.endedAt();
+  const callStartedAtMilliseconds = call.startedAt();
+  const duration =
+    callEndedAtMilliseconds -
+    (isTruthy(callStartedAtMilliseconds) ? callStartedAtMilliseconds : 0) / TIME_IN_MILLIS.SECOND;
   amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.QUALITY_REVIEW, {
-    ...(score && {[Segmentation.CALL.SCORE]: score}),
+    ...(isTruthy(score) ? {[Segmentation.CALL.SCORE]: score} : score),
     [Segmentation.CALL.QUALITY_REVIEW_LABEL]: label,
     [Segmentation.CALL.DURATION]: duration,
     [Segmentation.CALL.SCREEN_SHARE]: call.analyticsScreenSharing,

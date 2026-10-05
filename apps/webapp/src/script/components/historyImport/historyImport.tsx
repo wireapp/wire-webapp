@@ -93,7 +93,9 @@ const HistoryImport = ({user, backupRepository, file, switchContent}: HistoryImp
 
   const loadingMessage = historyImportMessages[historyImportState] ?? '';
 
-  const onCancel = () => backupRepository.cancelAction();
+  const onCancel = () => {
+    return backupRepository.cancelAction();
+  };
 
   const dismissImport = useCallback(() => {
     switchContent(ContentState.PREFERENCES_ACCOUNT);
@@ -106,7 +108,9 @@ const HistoryImport = ({user, backupRepository, file, switchContent}: HistoryImp
   }, []);
 
   const onProgress = useCallback((numberProcessed: number) => {
-    setNumberOfProcessedRecords(prevState => prevState + numberProcessed);
+    setNumberOfProcessedRecords(prevState => {
+      return prevState + numberProcessed;
+    });
   }, []);
 
   const onSuccess = useCallback((): void => {

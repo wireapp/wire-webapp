@@ -25,14 +25,19 @@ import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
 
 import {MLSStatuses, WireIdentity} from '../e2eIdentityVerification';
 
-const FIVE_MINUTES = TimeInMillis.MINUTE * 5;
-const FIFTEEN_MINUTES = TimeInMillis.MINUTE * 15;
+const shortEnrollmentReminderInMinutes = 5;
+const longEnrollmentReminderInMinutes = 15;
+const enrollmentReminderInHours = 4;
+const messageRetentionInDays = 28;
+
+const FIVE_MINUTES = TimeInMillis.MINUTE * shortEnrollmentReminderInMinutes;
+const FIFTEEN_MINUTES = TimeInMillis.MINUTE * longEnrollmentReminderInMinutes;
 const ONE_HOUR = TimeInMillis.HOUR;
-const FOUR_HOURS = TimeInMillis.HOUR * 4;
+const FOUR_HOURS = TimeInMillis.HOUR * enrollmentReminderInHours;
 const ONE_DAY = TimeInMillis.DAY;
 
 // message retention time on backend (hardcoded to 28 days)
-export const messageRetentionTime = 28 * TimeInMillis.DAY;
+export const messageRetentionTime = messageRetentionInDays * TimeInMillis.DAY;
 
 type GracePeriod = {
   /** start date of the grace period (unix timestamp) */

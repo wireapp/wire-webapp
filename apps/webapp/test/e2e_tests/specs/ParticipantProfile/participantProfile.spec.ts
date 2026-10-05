@@ -57,7 +57,9 @@ test.describe('Participant Profile', () => {
     async ({createPage, createUser}) => {
       const userC = await createUser();
       const [userAPage, userCPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userC))]);
-      const [userAPages, userCPages] = [userAPage, userCPage].map(page => PageManager.from(page).webapp.pages);
+      const [userAPages, userCPages] = [userAPage, userCPage].map(page => {
+        return PageManager.from(page).webapp.pages;
+      });
 
       await sendConnectionRequest(userAPage, userC);
       await acceptConnectionRequest(userCPages);
@@ -97,9 +99,9 @@ test.describe('Participant Profile', () => {
         createPage(withLogin(userC)),
       ]);
 
-      const [userAPages, userBPages, userCPages] = [userAPage, userBPage, userCPage].map(
-        page => PageManager.from(page).webapp.pages,
-      );
+      const [userAPages, userBPages, userCPages] = [userAPage, userBPage, userCPage].map(page => {
+        return PageManager.from(page).webapp.pages;
+      });
 
       await sendConnectionRequest(userAPage, userC);
       await acceptConnectionRequest(userCPages);
@@ -182,8 +184,12 @@ test.describe('Participant Profile', () => {
     {tag: ['@TC-1480', '@regression']},
     async ({createPage}) => {
       const [adminPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userA))).then(pm => {
+          return pm.webapp.pages;
+        }),
+        PageManager.from(createPage(withLogin(userB))).then(pm => {
+          return pm.webapp.pages;
+        }),
       ]);
 
       await createGroup(adminPages, groupName, [userB]);
@@ -203,8 +209,12 @@ test.describe('Participant Profile', () => {
       await team.addTeamMember(externalUser, {role: 'EXTERNAL'});
 
       const [adminPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userA))).then(pm => {
+          return pm.webapp.pages;
+        }),
+        PageManager.from(createPage(withLogin(userB))).then(pm => {
+          return pm.webapp.pages;
+        }),
       ]);
 
       await createGroup(adminPages, groupName, [userB, externalUser]);
@@ -219,8 +229,12 @@ test.describe('Participant Profile', () => {
     {tag: ['@TC-1485', '@regression']},
     async ({createPage}) => {
       const [adminPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userA))).then(pm => {
+          return pm.webapp.pages;
+        }),
+        PageManager.from(createPage(withLogin(userB))).then(pm => {
+          return pm.webapp.pages;
+        }),
       ]);
 
       await createGroup(adminPages, groupName, [userB]);
@@ -269,8 +283,12 @@ test.describe('Participant Profile', () => {
       await team.addTeamMember(userC);
 
       const [adminPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userA))).then(pm => {
+          return pm.webapp.pages;
+        }),
+        PageManager.from(createPage(withLogin(userB))).then(pm => {
+          return pm.webapp.pages;
+        }),
       ]);
 
       await createGroup(adminPages, groupName, [userB, userC]);

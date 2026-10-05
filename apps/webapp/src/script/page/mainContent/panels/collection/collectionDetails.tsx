@@ -52,7 +52,7 @@ const groupByDate = (
   return Object.entries(
     messages.reduce<{[group: string]: ContentMessage[]}>((groups, message) => {
       const group = getTitleForHeader(message.timestamp(), translate);
-      groups[group] = groups[group] || [];
+      groups[group] = groups[group] ?? [];
       groups[group].unshift(message);
       return groups;
     }, {}),
@@ -85,14 +85,16 @@ const CollectionDetails = ({conversation, messages, onClose = noop, onImageClick
               return (
                 <Fragment key={groupName}>
                   <header className="collection-date-separator">{groupName}</header>
-                  {groupMessages.map(message => (
-                    <CollectionItem
-                      message={message}
-                      key={message.id}
-                      allMessages={messages}
-                      onImageClick={onImageClick}
-                    />
-                  ))}
+                  {groupMessages.map(message => {
+                    return (
+                      <CollectionItem
+                        message={message}
+                        key={message.id}
+                        allMessages={messages}
+                        onImageClick={onImageClick}
+                      />
+                    );
+                  })}
                 </Fragment>
               );
             })}

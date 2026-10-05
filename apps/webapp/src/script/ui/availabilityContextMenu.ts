@@ -35,19 +35,27 @@ export const AvailabilityContextMenu = {
   show: (event: MouseEvent, elementName: string, labels: AvailabilityLabels): void => {
     const entries: ContextMenuEntry[] = [
       {
-        click: () => amplify.publish(WebAppEvents.USER.SET_AVAILABILITY, Availability.Type.NONE),
+        click: () => {
+          return amplify.publish(WebAppEvents.USER.SET_AVAILABILITY, Availability.Type.NONE);
+        },
         label: labels.none,
       },
       {
-        click: () => amplify.publish(WebAppEvents.USER.SET_AVAILABILITY, Availability.Type.AVAILABLE),
+        click: () => {
+          return amplify.publish(WebAppEvents.USER.SET_AVAILABILITY, Availability.Type.AVAILABLE);
+        },
         label: labels.available,
       },
       {
-        click: () => amplify.publish(WebAppEvents.USER.SET_AVAILABILITY, Availability.Type.BUSY),
+        click: () => {
+          return amplify.publish(WebAppEvents.USER.SET_AVAILABILITY, Availability.Type.BUSY);
+        },
         label: labels.busy,
       },
       {
-        click: () => amplify.publish(WebAppEvents.USER.SET_AVAILABILITY, Availability.Type.AWAY),
+        click: () => {
+          return amplify.publish(WebAppEvents.USER.SET_AVAILABILITY, Availability.Type.AWAY);
+        },
         label: labels.away,
       },
     ];

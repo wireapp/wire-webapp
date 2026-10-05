@@ -46,7 +46,11 @@ export const SelectMenuList = <IsMulti extends boolean = false, Group extends Gr
             'data-uie-name': `menu-list-${dataUieName}`,
           })}
         >
-          <div css={(theme: Theme) => headingContainerStyles(theme)}>
+          <div
+            css={(theme: Theme) => {
+              return headingContainerStyles(theme);
+            }}
+          >
             {menuListHeading}
             <button onClick={handleClose} css={closeButtonStyles} aria-label={`Close: ${menuListHeading}`}>
               <CloseIcon width={16} height={16} />

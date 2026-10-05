@@ -33,13 +33,14 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
 );
 
-const renderOverlay = (mode: 'upload' | 'restricted') =>
-  render(
+const renderOverlay = (mode: 'upload' | 'restricted') => {
+  return render(
     <StyledApp themeId={THEME_ID.DEFAULT}>
       <FileDropzoneOverlay isActive mode={mode} />
     </StyledApp>,
     {wrapper: rootProviderWrapper},
   );
+};
 
 describe('FileDropzoneOverlay', () => {
   it('announces how to upload files while hiding the decorative icon', () => {

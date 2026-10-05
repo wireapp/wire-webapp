@@ -79,17 +79,19 @@ export function parseError(error: unknown): ReactElement | null {
 
 export function parseValidationErrors(errors: unknown | unknown[]): ReactElement[] {
   const errorMessages: unknown[] = ([] as unknown[]).concat(errors ?? []);
-  return errorMessages.map(error => (
-    <ErrorMessage
-      data-uie-name="error-message"
-      data-uie-value={hasLabel(error) ? error.label : 'unexpected-error'}
-      key={hasLabel(error) ? error.label : 'unexpected-error'}
-    >
-      {hasLabel(error) && Object.hasOwn(validationErrorStrings, error.label) ? (
-        <FormattedMessage id={validationErrorStrings[error.label]} />
-      ) : (
-        <FormattedMessage id="BackendError.unexpected" values={toMessageInterpolationValues(error)} />
-      )}
-    </ErrorMessage>
-  ));
+  return errorMessages.map(error => {
+    return (
+      <ErrorMessage
+        data-uie-name="error-message"
+        data-uie-value={hasLabel(error) ? error.label : 'unexpected-error'}
+        key={hasLabel(error) ? error.label : 'unexpected-error'}
+      >
+        {hasLabel(error) && Object.hasOwn(validationErrorStrings, error.label) ? (
+          <FormattedMessage id={validationErrorStrings[error.label]} />
+        ) : (
+          <FormattedMessage id="BackendError.unexpected" values={toMessageInterpolationValues(error)} />
+        )}
+      </ErrorMessage>
+    );
+  });
 }

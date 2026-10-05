@@ -42,30 +42,32 @@ const ConversationDetailsOption: FC<ConversationDetailsOptionProps> = ({
   dataUieName,
   statusUieName,
   disabled = false,
-}) => (
-  <li className={className}>
-    <button
-      className="panel__action-item"
-      onClick={onClick}
-      data-uie-name={dataUieName}
-      type="button"
-      disabled={disabled}
-    >
-      <span className="panel__action-item__icon">{icon}</span>
+}) => {
+  return (
+    <li className={className}>
+      <button
+        className="panel__action-item"
+        onClick={onClick}
+        data-uie-name={dataUieName}
+        type="button"
+        disabled={disabled}
+      >
+        <span className="panel__action-item__icon">{icon}</span>
 
-      <span className="panel__action-item__summary">
-        <span className="panel__action-item__text">
-          <p>{title}</p>
+        <span className="panel__action-item__summary">
+          <span className="panel__action-item__text">
+            <p>{title}</p>
+          </span>
+
+          <p className="panel__action-item__status" data-uie-name={statusUieName}>
+            {statusText}
+          </p>
         </span>
 
-        <p className="panel__action-item__status" data-uie-name={statusUieName}>
-          {statusText}
-        </p>
-      </span>
-
-      {!disabled && <Icon.ChevronRight className="chevron-right-icon" />}
-    </button>
-  </li>
-);
+        {!disabled && <Icon.ChevronRight className="chevron-right-icon" />}
+      </button>
+    </li>
+  );
+};
 
 export {ConversationDetailsOption};

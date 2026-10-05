@@ -29,11 +29,13 @@ const meta: Meta<typeof Badge> = {
   },
   tags: ['autodocs'],
   decorators: [
-    Story => (
-      <div style={{padding: '24px', maxWidth: '300px', margin: '0 auto', background: 'white'}}>
-        <Story />
-      </div>
-    ),
+    Story => {
+      return (
+        <div style={{padding: '24px', maxWidth: '300px', margin: '0 auto', background: 'white'}}>
+          <Story />
+        </div>
+      );
+    },
   ],
 };
 

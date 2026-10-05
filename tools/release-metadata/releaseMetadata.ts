@@ -21,6 +21,8 @@ import {isUndefined} from '@sindresorhus/is';
 import {Maybe, maybe, Result} from 'true-myth';
 import type {NonEmptyString} from 'type-fest';
 
+const shortenedCommitIdentifierLength = 7;
+
 declare const commitHashBrand: unique symbol;
 
 type NonZeroDecimalDigit = '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9';
@@ -347,7 +349,7 @@ export function resolveWebappBuildVersion(
     }
 
     const versionPrefix = buildChannel === 'main' ? 'main' : 'dev';
-    return Result.ok(`${versionPrefix}-${commitSha.slice(0, 7) || 'unknown'}`);
+    return Result.ok(`${versionPrefix}-${commitSha.slice(0, shortenedCommitIdentifierLength) || 'unknown'}`);
   }
 
   const productionTagNameMatch = productionTagNamePattern.exec(buildReferenceName);
@@ -364,7 +366,7 @@ export function resolveWebappBuildVersion(
     return Result.err(new Error(`Invalid production tag name: ${buildReferenceName}`));
   }
 
-  return Result.ok(`dev-${commitSha.slice(0, 7) || 'unknown'}`);
+  return Result.ok(`dev-${commitSha.slice(0, shortenedCommitIdentifierLength) || 'unknown'}`);
 }
 
 export function createNextBetaTagName(

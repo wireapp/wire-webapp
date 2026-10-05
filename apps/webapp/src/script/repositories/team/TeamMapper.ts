@@ -60,7 +60,9 @@ export class TeamMapper {
   }
 
   mapMembers(membersData: MemberData[]): TeamMemberEntity[] {
-    return membersData.map(data => this.mapMember(data));
+    return membersData.map(data => {
+      return this.mapMember(data);
+    });
   }
 
   mapMember(data: MemberData): TeamMemberEntity {

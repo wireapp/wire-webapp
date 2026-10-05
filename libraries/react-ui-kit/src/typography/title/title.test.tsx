@@ -23,6 +23,10 @@ import {THEME_ID} from '../../identity';
 import {matchComponent} from '../../utils/testUtil';
 
 describe('"Title"', () => {
-  it('renders', () => matchComponent(<Title>Title</Title>));
-  it('renders (dark theme)', () => matchComponent(<Title>Title</Title>, THEME_ID.DARK));
+  it('renders', () => {
+    return matchComponent(<Title>Title</Title>);
+  });
+  it('renders (dark theme)', () => {
+    return matchComponent(<Title>Title</Title>, THEME_ID.DARK);
+  });
 });

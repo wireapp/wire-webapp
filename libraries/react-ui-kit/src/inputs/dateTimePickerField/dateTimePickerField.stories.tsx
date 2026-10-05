@@ -38,11 +38,13 @@ const meta = {
     layout: 'centered',
   },
   decorators: [
-    Story => (
-      <div style={{width: '420px'}}>
-        <Story />
-      </div>
-    ),
+    Story => {
+      return (
+        <div style={{width: '420px'}}>
+          <Story />
+        </div>
+      );
+    },
   ],
   tags: ['autodocs'],
 } satisfies Meta<typeof DateTimePickerField>;
@@ -57,28 +59,38 @@ const ControlledDateTimePicker = (args: React.ComponentProps<typeof DateTimePick
 };
 
 export const Default: Story = {
-  render: args => <ControlledDateTimePicker {...args} />,
+  render: args => {
+    return <ControlledDateTimePicker {...args} />;
+  },
   args: {
     dataUieName: 'datetime-picker-default',
     labels: defaultLabels,
     value: getNextHourDateTime(),
-    onChange: () => undefined,
+    onChange: () => {
+      return undefined;
+    },
   },
 };
 
 export const WithLabel: Story = {
-  render: args => <ControlledDateTimePicker {...args} />,
+  render: args => {
+    return <ControlledDateTimePicker {...args} />;
+  },
   args: {
     dataUieName: 'datetime-picker-with-label',
     label: 'Starts at',
     labels: defaultLabels,
     value: getNextHourDateTime(),
-    onChange: () => undefined,
+    onChange: () => {
+      return undefined;
+    },
   },
 };
 
 export const Invalid: Story = {
-  render: args => <ControlledDateTimePicker {...args} />,
+  render: args => {
+    return <ControlledDateTimePicker {...args} />;
+  },
   args: {
     dataUieName: 'datetime-picker-invalid',
     label: 'Starts at',
@@ -86,18 +98,24 @@ export const Invalid: Story = {
     markInvalid: true,
     errorText: 'Please select a future date and time.',
     value: getNextHourDateTime(),
-    onChange: () => undefined,
+    onChange: () => {
+      return undefined;
+    },
   },
 };
 
 export const Disabled: Story = {
-  render: args => <ControlledDateTimePicker {...args} />,
+  render: args => {
+    return <ControlledDateTimePicker {...args} />;
+  },
   args: {
     dataUieName: 'datetime-picker-disabled',
     label: 'Starts at',
     labels: defaultLabels,
     disabled: true,
     value: getNextHourDateTime(),
-    onChange: () => undefined,
+    onChange: () => {
+      return undefined;
+    },
   },
 };

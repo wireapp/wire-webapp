@@ -17,6 +17,8 @@
  *
  */
 
+import {isNull} from '@sindresorhus/is';
+
 import {Avatar, AVATAR_SIZE} from 'Components/avatar';
 import {showUserModal} from 'Components/Modals/UserModal';
 import {User} from 'Repositories/entity/User';
@@ -29,12 +31,17 @@ interface CellsTableOwnerColumnProps {
 }
 
 export const CellsTableOwnerColumn = ({owner, user}: CellsTableOwnerColumnProps) => {
-  if (!user) {
+  if (isNull(user)) {
     return <span css={textStyles}>{owner}</span>;
   }
 
   return (
-    <button css={wrapperStyles} onClick={() => showUserModal(user.qualifiedId)}>
+    <button
+      css={wrapperStyles}
+      onClick={() => {
+        return showUserModal(user.qualifiedId);
+      }}
+    >
       <div css={avatarWrapperStyles}>
         <Avatar participant={user} avatarSize={AVATAR_SIZE.XXX_SMALL} />
       </div>

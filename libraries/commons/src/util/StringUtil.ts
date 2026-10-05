@@ -19,6 +19,12 @@
 
 import {isError, isNonEmptyString, isString} from '@sindresorhus/is';
 
+const uuidTimeLowEndIndex = 8;
+const uuidTimeMidEndIndex = 12;
+const uuidTimeHighEndIndex = 16;
+const uuidClockSequenceEndIndex = 20;
+const truncationMarkerLength = 15;
+
 export function capitalize(text: string): string {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
@@ -34,7 +40,7 @@ export function uuidToBytes(uuid: string): Buffer {
 
 export function bytesToUUID(uuid: Buffer | Uint8Array): string {
   const str = uuid.toString('hex');
-  return `${str.slice(0, 8)}-${str.slice(8, 12)}-${str.slice(12, 16)}-${str.slice(16, 20)}-${str.slice(20)}`;
+  return `${str.slice(0, uuidTimeLowEndIndex)}-${str.slice(uuidTimeLowEndIndex, uuidTimeMidEndIndex)}-${str.slice(uuidTimeMidEndIndex, uuidTimeHighEndIndex)}-${str.slice(uuidTimeHighEndIndex, uuidClockSequenceEndIndex)}-${str.slice(uuidClockSequenceEndIndex)}`;
 }
 
 const maxSize = 10_000;
@@ -55,7 +61,7 @@ export function serializeArgs(args: any[]): any[] {
     let result: any;
 
     if (typeof arg === 'string') {
-      result = arg.length > maxSize ? `${arg.slice(0, maxSize - 15)}... [truncated]` : arg;
+      result = arg.length > maxSize ? `${arg.slice(0, maxSize - truncationMarkerLength)}... [truncated]` : arg;
     } else if (typeof arg === 'object' && arg !== null) {
       try {
         result = safeJsonStringify(arg);
@@ -89,7 +95,7 @@ function safeJsonStringify(obj: any): string {
     const json = JSON.stringify(obj, getCircularReplacer());
 
     if (json.length > maxSize) {
-      return `${json.slice(0, maxSize - 15)}... [truncated]`;
+      return `${json.slice(0, maxSize - truncationMarkerLength)}... [truncated]`;
     }
 
     return json;
@@ -135,10 +141,9 @@ function redactSensitiveString(value: string): string {
     `$1=${redactedValue}`,
   );
   const valueWithSanitizedHeaders = valueWithSanitizedQueryParameters
-    .replace(
-      bearerCredentialPattern,
-      (_matchedValue, authorizationPrefix: string | undefined) => `${authorizationPrefix ?? ''}Bearer ${redactedValue}`,
-    )
+    .replace(bearerCredentialPattern, (_matchedValue, authorizationPrefix: string | undefined) => {
+      return `${authorizationPrefix ?? ''}Bearer ${redactedValue}`;
+    })
     .replace(cookieHeaderPattern, `Cookie: ${redactedValue}`);
 
   return valueWithSanitizedHeaders.replace(jsonWebTokenPattern, redactedValue);

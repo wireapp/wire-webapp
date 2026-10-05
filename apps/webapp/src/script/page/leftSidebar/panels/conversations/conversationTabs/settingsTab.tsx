@@ -50,8 +50,12 @@ export const SettingsTab = ({
       return;
     }
 
-    const updateAltKeyPressed = (event: KeyboardEvent) => setIsAltKeyPressed(event.altKey);
-    const resetAltKeyPressed = () => setIsAltKeyPressed(false);
+    const updateAltKeyPressed = (event: KeyboardEvent) => {
+      return setIsAltKeyPressed(event.altKey);
+    };
+    const resetAltKeyPressed = () => {
+      return setIsAltKeyPressed(false);
+    };
 
     window.addEventListener('keydown', updateAltKeyPressed);
     window.addEventListener('keyup', updateAltKeyPressed);
@@ -86,10 +90,18 @@ export const SettingsTab = ({
       dataUieName="go-preferences"
       showNotificationsBadge={showNotificationsBadge}
       isActive={isActive}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      onFocus={() => setIsFocused(true)}
-      onBlur={() => setIsFocused(false)}
+      onMouseEnter={() => {
+        return setIsHovered(true);
+      }}
+      onMouseLeave={() => {
+        return setIsHovered(false);
+      }}
+      onFocus={() => {
+        return setIsFocused(true);
+      }}
+      onBlur={() => {
+        return setIsFocused(false);
+      }}
     />
   );
 };

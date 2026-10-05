@@ -21,7 +21,7 @@
 
 import type {Clock} from '@enormora/clock/clock';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
-import {isNonEmptyArray} from '@sindresorhus/is';
+import {isNonEmptyArray, isNonEmptyString, isNullOrUndefined, isTruthy} from '@sindresorhus/is';
 import {Context} from '@wireapp/api-client/lib/auth';
 import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
 import {FEATURE_KEY, FEATURE_STATUS, FeatureList} from '@wireapp/api-client/lib/team';
@@ -96,6 +96,7 @@ import {EventTrackingRepository} from 'Repositories/tracking/eventTrackingReposi
 import {UserRepository} from 'Repositories/user/userRepository';
 import {UserService} from 'Repositories/user/userService';
 import {UserState} from 'Repositories/user/userState';
+import {createBrowserSystemNotificationApi} from 'src/script/browser/notification/createSystemNotificationApiFromBrowserNotification';
 import {initializeDataDog} from 'Util/dataDog';
 import {DebugUtil} from 'Util/debugUtil';
 import {Environment} from 'Util/environment';
@@ -120,8 +121,8 @@ import {CLIENT_ERROR_TYPE, ClientError} from '../error/clientError';
 import {TeamError} from '../error/teamError';
 import {
   createNewVersionPollingCallback,
-  NEW_VERSION_POLLING_INTERVAL_MILLISECONDS,
   type FetchLatestBuildMetadata,
+  NEW_VERSION_POLLING_INTERVAL_MILLISECONDS,
   startNewVersionPolling,
 } from '../lifecycle/newVersionHandler';
 import {scheduleApiVersionUpdate, updateApiVersion} from '../lifecycle/updateRemoteConfigs';
@@ -141,6 +142,12 @@ import {serverTimeHandler} from '../time/serverTimeHandler';
 import {WindowHandler} from '../ui/windowHandler';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
 import {Warnings} from '../view_model/WarningsContainer';
+
+const notificationCheckIntervalInSeconds = 10;
+const connectionStatisticsRoundingFactor = 50;
+const conversationStatisticsRoundingFactor = 50;
+const notificationStatisticsRoundingFactor = 100;
+const clientStatisticsRoundingFactor = 5;
 
 // Initialize PDF.js worker for react-pdf package
 pdfjs.GlobalWorkerOptions.workerSrc = '/min/pdf.worker.mjs';
@@ -199,24 +206,30 @@ export class App {
       COOKIES_CHECK: {
         COOKIE_NAME: 'cookies_enabled',
       },
-      NOTIFICATION_CHECK: TIME_IN_MILLIS.SECOND * 10,
+      NOTIFICATION_CHECK: TIME_IN_MILLIS.SECOND * notificationCheckIntervalInSeconds,
     };
   }
 
   /**
    * @param core
    * @param apiClient Configured backend client
+   * @param config
+   * @param translate
+   * @param clock
+   * @param fireAndForgetInvoker
    */
   constructor(
     private readonly core: Core,
     private readonly apiClient: APIClient,
     private readonly config: Configuration,
     private readonly translate: Translate,
+    private readonly clock: Clock,
+    private readonly fireAndForgetInvoker: FireAndForgetInvoker,
   ) {
     this.config = config;
-    this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () =>
-      this.repository.lifeCycle.logout(SIGN_OUT_REASON.SESSION_EXPIRED, false),
-    );
+    this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () => {
+      return this.repository.lifeCycle.logout(SIGN_OUT_REASON.SESSION_EXPIRED, false);
+    });
     this.logger = getLogger('App');
 
     new WindowHandler();
@@ -243,7 +256,7 @@ export class App {
    * Create all app repositories.
    * @returns All repositories
    */
-  private _setupRepositories() {
+  private _setupRepositories(): ViewModelRepositories {
     const repositories: ViewModelRepositories = {} as ViewModelRepositories;
     const selfService = new SelfService();
     const teamService = new TeamService();
@@ -293,7 +306,9 @@ export class App {
     repositories.team = new TeamRepository(
       repositories.user,
       repositories.asset,
-      () => this.repository.lifeCycle.logout(SIGN_OUT_REASON.ACCOUNT_DELETED, true),
+      () => {
+        return this.repository.lifeCycle.logout(SIGN_OUT_REASON.ACCOUNT_DELETED, true);
+      },
       teamService,
       this.translate,
     );
@@ -304,7 +319,9 @@ export class App {
        * MessageRepository should NOT depend upon ConversationRepository.
        * We need to remove all usages of conversationRepository inside the messageRepository
        */
-      () => repositories.conversation,
+      () => {
+        return repositories.conversation;
+      },
       repositories.cryptography,
       repositories.event,
       repositories.properties,
@@ -356,6 +373,9 @@ export class App {
       repositories.audio,
       repositories.calling,
       this.translate,
+      this.clock,
+      createBrowserSystemNotificationApi(),
+      this.fireAndForgetInvoker,
     );
     repositories.preferenceNotification = new PreferenceNotificationRepository(repositories.user['userState'].self);
 
@@ -532,22 +552,21 @@ export class App {
         void userRepository.addClientToUser(userId, newClient, true);
       });
 
-      this.core.service?.mls?.on(
-        MLSServiceEvents.MLS_CLIENT_MISMATCH,
-        async () => await this.showForceLogoutModal(SIGN_OUT_REASON.MLS_CLIENT_MISMATCH),
-      );
+      this.core.service?.mls?.on(MLSServiceEvents.MLS_CLIENT_MISMATCH, async () => {
+        return await this.showForceLogoutModal(SIGN_OUT_REASON.MLS_CLIENT_MISMATCH);
+      });
 
       await this.initiateSelfUser(selfUser);
       eventLogger.log(AppInitializationStep.UserInitialize);
       const localClient = await this.core.getLocalClient();
-      if (!localClient) {
+      if (isNullOrUndefined(localClient)) {
         throw new ClientError(CLIENT_ERROR_TYPE.NO_VALID_CLIENT, 'Client has been deleted on backend');
       }
 
       let teamFeatures: FeatureList = {};
       let teamMembers: QualifiedId[] = [];
 
-      if (selfUser.teamId) {
+      if (isNonEmptyString(selfUser.teamId)) {
         const {features, members} = await teamRepository.initTeam(selfUser.teamId);
         teamFeatures = features;
         teamMembers = members;
@@ -625,18 +644,22 @@ export class App {
 
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_USER_DATA);
 
-      telemetry.addStatistic(AppInitStatisticsValue.CONNECTIONS, connections.length, 50);
+      telemetry.addStatistic(
+        AppInitStatisticsValue.CONNECTIONS,
+        connections.length,
+        connectionStatisticsRoundingFactor,
+      );
 
       const conversations = await conversationRepository.loadConversations(connections, deadConnections);
       eventLogger.log(AppInitializationStep.ConversationsLoaded);
       // We load all the users the self user is connected with
       await userRepository.loadUsers(selfUser, connections, conversations, teamMembers);
 
-      fireAndForgetInvoker.fireAndForget(() =>
-        bgEffectsHandler.preloadResources().catch((error: unknown) => {
+      fireAndForgetInvoker.fireAndForget(() => {
+        return bgEffectsHandler.preloadResources().catch((error: unknown) => {
           this.logger.warn('[virtual-background] preload failed, starting without resources', error);
-        }),
-      );
+        });
+      });
 
       if (this.core.hasMLSDevice) {
         //if mls is supported, we need to initialize the callbacks (they are used when decrypting messages)
@@ -650,7 +673,11 @@ export class App {
       }
 
       onProgress(this.translate('initReceivedUserData'));
-      telemetry.addStatistic(AppInitStatisticsValue.CONVERSATIONS, conversations.length, 50);
+      telemetry.addStatistic(
+        AppInitStatisticsValue.CONVERSATIONS,
+        conversations.length,
+        conversationStatisticsRoundingFactor,
+      );
       this._subscribeToUnloadEvents(selfUser);
       this._subscribeToBeforeUnload();
       eventLogger.log(AppInitializationStep.UserDataLoaded);
@@ -715,8 +742,9 @@ export class App {
           conversationRepository,
           core: this.core,
           onSuccess: conversationRepository.injectJoinedAfterMigrationFinalisationMessage,
-          onError: ({id}, error) =>
-            this.logger.error(`Failed when joining a migrated mls conversation with id ${id}, error: `, error),
+          onError: ({id}, error) => {
+            return this.logger.error(`Failed when joining a migrated mls conversation with id ${id}, error: `, error);
+          },
         });
 
         this.logger.info('Finished joining conversations after migration finalization');
@@ -724,8 +752,9 @@ export class App {
         // join all the mls groups we're member of and have not yet joined (eg. we were not send welcome message)
         await initMLSGroupConversations(conversations, conversationRepository, {
           core: this.core,
-          onError: ({id}, error) =>
-            this.logger.error(`Failed when initialising mls conversation with id ${id}, error: `, error),
+          onError: ({id}, error) => {
+            return this.logger.error(`Failed when initialising mls conversation with id ${id}, error: `, error);
+          },
         });
 
         this.logger.info('Finished initializing MLS group conversations');
@@ -733,7 +762,11 @@ export class App {
 
       eventLogger.log(AppInitializationStep.SetupMLS);
       telemetry.timeStep(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
-      telemetry.addStatistic(AppInitStatisticsValue.NOTIFICATIONS, totalNotifications, 100);
+      telemetry.addStatistic(
+        AppInitStatisticsValue.NOTIFICATIONS,
+        totalNotifications,
+        notificationStatisticsRoundingFactor,
+      );
       onProgress(this.translate('initUpdatedFromNotifications', {brandName: this.config.BRAND_NAME}));
 
       const clientEntities = await clientRepository.updateClientsForSelf();
@@ -742,7 +775,7 @@ export class App {
       void eventTrackerRepository.init(propertiesRepository.getUserConsentStatus().isTelemetryConsentGiven);
 
       eventLogger.log(AppInitializationStep.ClientsUpdated, {count: clientEntities.length});
-      telemetry.addStatistic(AppInitStatisticsValue.CLIENTS, clientEntities.length, 5);
+      telemetry.addStatistic(AppInitStatisticsValue.CLIENTS, clientEntities.length, clientStatisticsRoundingFactor);
       telemetry.timeStep(AppInitTimingsStep.APP_PRE_LOADED);
 
       selfUser.devices(clientEntities);
@@ -825,10 +858,10 @@ export class App {
    * Initialize ServiceWorker if supported.
    */
   private async initServiceWorker() {
-    if (navigator.serviceWorker) {
-      await navigator.serviceWorker
-        .register(`/sw.js?${Environment.version(false)}`)
-        .then(({scope}) => this.logger.debug(`ServiceWorker registration successful with scope: ${scope}`));
+    if (isTruthy(navigator.serviceWorker)) {
+      await navigator.serviceWorker.register(`/sw.js?${Environment.version(false)}`).then(({scope}) => {
+        return this.logger.debug(`ServiceWorker registration successful with scope: ${scope}`);
+      });
     }
   }
 
@@ -847,9 +880,12 @@ export class App {
     }
 
     let recoveryInProgress = false;
-    const isApplicationActive = () => document.visibilityState === 'visible';
-    const isNotificationSyncLive = () =>
-      eventRepository.notificationHandlingState() === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
+    const isApplicationActive = () => {
+      return document.visibilityState === 'visible';
+    };
+    const isNotificationSyncLive = () => {
+      return eventRepository.notificationHandlingState() === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
+    };
 
     const recoverConversations = async (): Promise<void> => {
       // Atomic check-and-set to prevent concurrent recovery attempts
@@ -859,7 +895,9 @@ export class App {
 
       recoveryInProgress = true;
       const recoveryTask = await task.tryOrElse(
-        error => error,
+        error => {
+          return error;
+        },
         async () => {
           if (!(await mlsService.prepareMLSConversationRecovery(this.core.clientId))) {
             return;
@@ -870,7 +908,11 @@ export class App {
 
           // Only process conversations that haven't been recovered yet
           const conversations = isNonEmptyArray(pendingIds)
-            ? allConversations.filter(conv => pendingIds.some(pending => matchQualifiedIds(pending, conv.qualifiedId)))
+            ? allConversations.filter(conv => {
+                return pendingIds.some(pending => {
+                  return matchQualifiedIds(pending, conv.qualifiedId);
+                });
+              })
             : allConversations;
 
           const result = await recoverMLSConversationsInBatches({
@@ -896,7 +938,9 @@ export class App {
       }
     };
 
-    const triggerRecovery = () => fireAndForgetInvoker.fireAndForget(recoverConversations);
+    const triggerRecovery = () => {
+      return fireAndForgetInvoker.fireAndForget(recoverConversations);
+    };
     const handleVisibilityChange = () => {
       if (isApplicationActive()) {
         triggerRecovery();
@@ -958,7 +1002,7 @@ export class App {
         }
 
         default: {
-          this.logger.error(`Caused by: ${message || error}`, error);
+          this.logger.error(`Caused by: ${isNonEmptyString(message) ? message : error}`, error);
 
           const isAccessTokenError = error instanceof AccessTokenError;
           if (isAccessTokenError) {
@@ -1109,7 +1153,7 @@ export class App {
         await this.repository.event.injectEvent(allVerifiedEvent);
         break;
       case ConversationVerificationState.DEGRADED:
-        if (VerificationMessageType) {
+        if (isTruthy(VerificationMessageType)) {
           const degradedEvent = EventBuilder.buildE2EIDegraded(conversationEntity, VerificationMessageType, userIds);
           await this.repository.event.injectEvent(degradedEvent);
         } else {
@@ -1125,7 +1169,9 @@ export class App {
     const {modalOptions, modalType} = getModalOptions(
       {
         type: ModalType.SELF_CERTIFICATE_REVOKED,
-        primaryActionFn: () => void this.repository.lifeCycle.logout(SIGN_OUT_REASON.APP_INIT, false),
+        primaryActionFn: () => {
+          return void this.repository.lifeCycle.logout(SIGN_OUT_REASON.APP_INIT, false);
+        },
       },
       this.translate,
     );

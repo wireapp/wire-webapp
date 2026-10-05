@@ -46,7 +46,9 @@ const getElectronVersion = (userAgent: string): string => {
   return electronVersion;
 };
 
-const isLocalhost = (): boolean => [APP_ENV.LOCALHOST, APP_ENV.VIRTUAL_HOST].includes(window.location.hostname);
+const isLocalhost = (): boolean => {
+  return [APP_ENV.LOCALHOST, APP_ENV.VIRTUAL_HOST].includes(window.location.hostname);
+};
 const isProduction = (): boolean => {
   return Config.getConfig().ENVIRONMENT === BackendEnvironment.PRODUCTION;
 };
@@ -119,5 +121,7 @@ export const Environment: Environment = {
     const showElectronVersion = isNonEmptyString(electronVersion) && showWrapperVersion;
     return showElectronVersion ? electronVersion : Config.getConfig().VERSION;
   },
-  avsVersion: (): string => Config.getConfig().AVS_VERSION,
+  avsVersion: (): string => {
+    return Config.getConfig().AVS_VERSION;
+  },
 };

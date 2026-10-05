@@ -19,10 +19,12 @@
 
 import {CSSObject} from '@emotion/serialize';
 
-export const CSS_SQUARE: (size: number | string) => CSSObject = size => ({
-  height: size,
-  width: size,
-});
+export const CSS_SQUARE: (size: number | string) => CSSObject = size => {
+  return {
+    height: size,
+    width: size,
+  };
+};
 
 export const CSS_FILL_PARENT: CSSObject = {
   bottom: 0,
@@ -38,19 +40,21 @@ export const CSS_FLEX_CENTER: CSSObject = {
   justifyContent: 'center',
 };
 
-export const CSS_ICON: (code: string, iconSize?: string | number) => CSSObject = (code, iconSize = '16px') => ({
-  MozOsxFontSmoothing: 'grayscale',
-  WebkitFontSmoothing: 'antialiased',
-  content: `'${code}'`,
-  fontFamily: 'Wire',
-  fontSize: iconSize,
-  fontStyle: 'normal',
-  fontVariant: 'normal',
-  fontWeight: 'normal',
-  lineHeight: 1,
-  speak: 'none',
-  textTransform: 'none',
-});
+export const CSS_ICON: (code: string, iconSize?: string | number) => CSSObject = (code, iconSize = '16px') => {
+  return {
+    MozOsxFontSmoothing: 'grayscale',
+    WebkitFontSmoothing: 'antialiased',
+    content: `'${code}'`,
+    fontFamily: 'Wire',
+    fontSize: iconSize,
+    fontStyle: 'normal',
+    fontVariant: 'normal',
+    fontWeight: 'normal',
+    lineHeight: 1,
+    speak: 'none',
+    textTransform: 'none',
+  };
+};
 
 export const CSS_VISUALLY_HIDDEN: CSSObject = {
   position: 'absolute',

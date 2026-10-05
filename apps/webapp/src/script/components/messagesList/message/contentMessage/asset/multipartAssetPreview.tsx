@@ -94,7 +94,9 @@ export const MultipartAssetPreview: FC<MultipartAssetPreviewProps> = ({
     attachmentIcon = (
       <div
         className="message-quote__preview-thumbnail"
-        onClick={() => setIsModalOpen(true)}
+        onClick={() => {
+          return setIsModalOpen(true);
+        }}
         style={{cursor: 'pointer'}}
         role="button"
         tabIndex={0}
@@ -146,7 +148,9 @@ export const MultipartAssetPreview: FC<MultipartAssetPreviewProps> = ({
         <FileFullscreenModal
           id={modalId}
           isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          onClose={() => {
+            return setIsModalOpen(false);
+          }}
           filePreviewUrl={previewUrl}
           fileExtension={fileExtension}
           fileName={fileName}

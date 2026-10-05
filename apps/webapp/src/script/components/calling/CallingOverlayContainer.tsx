@@ -98,7 +98,9 @@ function CallingContainerWithJoinedCall({
 
   const videoGrid = useVideoGrid(joinedCall);
 
-  const changePage = (newPage: number, call: Call) => callingRepository.changeCallPage(call, newPage);
+  const changePage = (newPage: number, call: Call) => {
+    return callingRepository.changeCallPage(call, newPage);
+  };
 
   const {clearShowAlert} = useCallAlertState();
 
@@ -121,11 +123,13 @@ function CallingContainerWithJoinedCall({
     }
   };
 
-  const {setVideoInputDeviceId, setAudioInputDeviceId, setAudioOutputDeviceId} = useMediaDevicesStore(state => ({
-    setVideoInputDeviceId: state.setVideoInputDeviceId,
-    setAudioInputDeviceId: state.setAudioInputDeviceId,
-    setAudioOutputDeviceId: state.setAudioOutputDeviceId,
-  }));
+  const {setVideoInputDeviceId, setAudioInputDeviceId, setAudioOutputDeviceId} = useMediaDevicesStore(state => {
+    return {
+      setVideoInputDeviceId: state.setVideoInputDeviceId,
+      setAudioInputDeviceId: state.setAudioInputDeviceId,
+      setAudioOutputDeviceId: state.setAudioOutputDeviceId,
+    };
+  });
 
   const switchCameraInput = (deviceId: string) => {
     setVideoInputDeviceId(deviceId);
@@ -158,9 +162,13 @@ function CallingContainerWithJoinedCall({
     });
   };
 
-  const toggleCamera = (call: Call) => callingRepository.toggleCamera(call);
+  const toggleCamera = (call: Call) => {
+    return callingRepository.toggleCamera(call);
+  };
 
-  const toggleMute = (call: Call, muteState: boolean) => callingRepository.muteCall(call, muteState);
+  const toggleMute = (call: Call, muteState: boolean) => {
+    return callingRepository.muteCall(call, muteState);
+  };
 
   const conversation = joinedCall.conversation;
 
@@ -197,7 +205,9 @@ function CallingContainerWithJoinedCall({
           switchCameraInput={switchCameraInput}
           switchMicrophoneInput={switchMicrophoneInput}
           switchSpeakerOutput={switchSpeakerOutput}
-          switchVideoBackgroundEffect={effect => callingRepository.switchVideoBackgroundEffect(effect)}
+          switchVideoBackgroundEffect={effect => {
+            return callingRepository.switchVideoBackgroundEffect(effect);
+          }}
           fireAndForgetInvoker={fireAndForgetInvoker}
           setMaximizedParticipant={setMaximizedParticipant}
           setActiveCallViewTab={setActiveCallViewTab}

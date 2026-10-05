@@ -17,7 +17,7 @@
  *
  */
 
-import {isNonEmptyArray} from '@sindresorhus/is';
+import {isNonEmptyArray, isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Maybe, task} from 'true-myth';
 import {match, P} from 'ts-pattern';
@@ -75,24 +75,25 @@ export async function recoverMLSConversationsInBatches({
   batchSize?: number;
 }): Promise<MLSConversationRecoveryResult> {
   const conversationService = core.service?.conversation;
-  if (conversationService === undefined) {
+  if (isUndefined(conversationService)) {
     logger.error('Conversation service is not available for MLS conversation recovery');
     return {completed: false, failedConversationCount: 1, recoveredConversationCount: 0};
   }
 
-  const eligibleConversations = conversations.filter(
-    (conversation): conversation is MLSCapableConversation =>
-      isMLSCapableConversation(conversation) && !conversation.isSelfUserRemoved(),
-  );
+  const eligibleConversations = conversations.filter((conversation): conversation is MLSCapableConversation => {
+    return isMLSCapableConversation(conversation) && !conversation.isSelfUserRemoved();
+  });
   const boundedBatchSize = Math.max(1, batchSize);
   let failedConversationCount = 0;
   let recoveredConversationCount = 0;
 
   // Initialize pending conversation IDs on first run
-  if (mlsService && eligibleConversations.length > 0) {
+  if (!isUndefined(mlsService) && eligibleConversations.length > 0) {
     const pendingIds = await mlsService.getPendingRecoveryConversationIds();
     if (!isNonEmptyArray(pendingIds)) {
-      const allPendingIds = eligibleConversations.map(conv => conv.qualifiedId);
+      const allPendingIds = eligibleConversations.map(conv => {
+        return conv.qualifiedId;
+      });
       await mlsService.updatePendingRecoveryConversationIds(allPendingIds);
     }
   }
@@ -109,8 +110,12 @@ export async function recoverMLSConversationsInBatches({
     const batch = eligibleConversations.slice(offset, offset + boundedBatchSize);
     for (const conversation of batch) {
       const localGroupResult = await task.tryOrElse(
-        error => error,
-        () => conversationService.mlsGroupExistsLocally(conversation.groupId),
+        error => {
+          return error;
+        },
+        () => {
+          return conversationService.mlsGroupExistsLocally(conversation.groupId);
+        },
       );
 
       if (localGroupResult.isErr) {
@@ -144,9 +149,11 @@ export async function recoverMLSConversationsInBatches({
       recoveredConversationCount++;
 
       // Remove successfully recovered conversation from pending list
-      if (mlsService !== undefined) {
+      if (!isUndefined(mlsService)) {
         const pendingIds = (await mlsService.getPendingRecoveryConversationIds()) ?? [];
-        const updatedPending = pendingIds.filter(id => !matchQualifiedIds(id, conversation.qualifiedId));
+        const updatedPending = pendingIds.filter(id => {
+          return !matchQualifiedIds(id, conversation.qualifiedId);
+        });
         await mlsService.updatePendingRecoveryConversationIds(updatedPending);
       }
     }
@@ -185,17 +192,18 @@ export async function initMLSGroupConversations(
     onError?: (conversation: Conversation, error: unknown) => void;
   },
 ): Promise<void> {
-  const {mls: mlsService, conversation: conversationService} = core.service || {};
-  if (!mlsService || !conversationService) {
+  const {mls: mlsService, conversation: conversationService} = core.service ?? {};
+  if (isUndefined(mlsService) || isUndefined(conversationService)) {
     throw new Error('MLS or Conversation service is not available!');
   }
 
-  const mlsGroupConversations = conversations.filter(
-    (conversation): conversation is MLSCapableConversation =>
+  const mlsGroupConversations = conversations.filter((conversation): conversation is MLSCapableConversation => {
+    return (
       (conversation.isGroupOrChannel() || conversation.isMeeting()) &&
       isMLSCapableConversation(conversation) &&
-      !conversation.isSelfUserRemoved(),
-  );
+      !conversation.isSelfUserRemoved()
+    );
+  });
 
   for (const mlsConversation of mlsGroupConversations) {
     await initMLSGroupConversation(mlsConversation, conversationRepository, {
@@ -229,8 +237,8 @@ export async function initMLSGroupConversation(
     conversationId: mlsConversation.qualifiedId,
     groupId: mlsConversation.groupId,
   });
-  const {mls: mlsService, conversation: conversationService} = core.service || {};
-  if (!mlsService || !conversationService) {
+  const {mls: mlsService, conversation: conversationService} = core.service ?? {};
+  if (isUndefined(mlsService) || isUndefined(conversationService)) {
     throw new Error('MLS or Conversation service is not available!');
   }
 
@@ -276,15 +284,14 @@ export async function initialiseSelfAndTeamConversations(
   core: Account,
 ): Promise<void> {
   logger.info('Initialising self and team conversations');
-  const {mls: mlsService, conversation: conversationService} = core.service || {};
-  if (!mlsService || !conversationService) {
+  const {mls: mlsService, conversation: conversationService} = core.service ?? {};
+  if (isUndefined(mlsService) || isUndefined(conversationService)) {
     throw new Error('MLS or Conversation service is not available!');
   }
 
-  const conversationsToEstablish = conversations.filter(
-    (conversation): conversation is MLSConversation =>
-      isMLSConversation(conversation) && (isSelfConversation(conversation) || isTeamConversation(conversation)),
-  );
+  const conversationsToEstablish = conversations.filter((conversation): conversation is MLSConversation => {
+    return isMLSConversation(conversation) && (isSelfConversation(conversation) || isTeamConversation(conversation));
+  });
 
   await Promise.all(
     conversationsToEstablish.map(async conversation => {
@@ -362,19 +369,32 @@ export const classifyLocal = ({existsLocally, epoch}: LocalMLSState): LocalDecis
 
   return match(epoch)
     .returnType<LocalDecision>()
-    .with({kind: 'unreadable'}, ({error}) => ({kind: 'epochUnreadable', error}))
-    .with({kind: 'epoch', value: P.number.gt(0)}, () => ({kind: 'alreadyEstablished'}))
-    .with({kind: 'epoch'}, () => ({kind: 'staleNeedsWipe'}))
+    .with({kind: 'unreadable'}, ({error}) => {
+      return {kind: 'epochUnreadable', error};
+    })
+    .with({kind: 'epoch', value: P.number.gt(0)}, () => {
+      return {kind: 'alreadyEstablished'};
+    })
+    .with({kind: 'epoch'}, () => {
+      return {kind: 'staleNeedsWipe'};
+    })
     .exhaustive();
 };
 
-export const classifyRemote = (reading: EpochReading): RemoteDecision =>
-  match(reading)
+export const classifyRemote = (reading: EpochReading): RemoteDecision => {
+  return match(reading)
     .returnType<RemoteDecision>()
-    .with({kind: 'unreadable'}, ({error}) => ({kind: 'unreadable', error}))
-    .with({kind: 'epoch', value: 0}, () => ({kind: 'establish', epoch: 0}))
-    .with({kind: 'epoch'}, ({value}) => ({kind: 'joinExisting', epoch: value}))
+    .with({kind: 'unreadable'}, ({error}) => {
+      return {kind: 'unreadable', error};
+    })
+    .with({kind: 'epoch', value: 0}, () => {
+      return {kind: 'establish', epoch: 0};
+    })
+    .with({kind: 'epoch'}, ({value}) => {
+      return {kind: 'joinExisting', epoch: value};
+    })
     .exhaustive();
+};
 
 export async function readLocalMLSState(
   groupId: string,
@@ -384,7 +404,9 @@ export async function readLocalMLSState(
   const existsLocally = await conversationService.mlsGroupExistsLocally(groupId);
   const epochResult = await mlsService.getSafeEpoch(groupId);
   const epoch = epochResult.match<EpochReading>({
-    Ok: value => ({kind: 'epoch', value}),
+    Ok: value => {
+      return {kind: 'epoch', value};
+    },
     Err: error => {
       logger.warn('Failed to read local MLS epoch', {error});
       return {kind: 'unreadable', error};
@@ -454,7 +476,9 @@ export async function ensureMLSGroupIsEstablished(
       logger.info('MLS group is already established, no action needed');
       return false;
     })
-    .with({kind: 'missing'}, async () => true)
+    .with({kind: 'missing'}, async () => {
+      return true;
+    })
     .with({kind: 'staleNeedsWipe'}, async () => {
       logger.info('MLS group exists locally but epoch is 0, wiping it');
       await wipeLocalMLSGroup(groupId, core);
@@ -517,13 +541,13 @@ async function establishMlsGroupConversation({
   const selfUser = userState.self();
   const conversation = conversationState.findConversation(conversationId);
 
-  if (!selfUser || !conversation) {
+  if (isNullOrUndefined(selfUser) || isNullOrUndefined(conversation)) {
     logger.error('Self user or conversation is not available!', {selfUser, conversation});
     throw new Error('Self user or conversation is not available!');
   }
 
   const selfUserClientId = selfUser.localClient?.id;
-  if (!selfUserClientId) {
+  if (!isNonEmptyString(selfUserClientId)) {
     logger.error('Self user client id is not available!', {selfUserClientId});
     throw new Error('Self user client id is not available!');
   }

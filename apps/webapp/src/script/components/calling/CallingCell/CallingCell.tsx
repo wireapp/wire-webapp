@@ -124,7 +124,9 @@ export const CallingCell = ({
     'display_name',
   ]);
   const {activeCallViewTab, viewMode} = useKoSubscribableChildren(callState, ['activeCallViewTab', 'viewMode']);
-  const hasMeetingNotifications = useMeetingNotificationStore(state => state.notifications.length > 0);
+  const hasMeetingNotifications = useMeetingNotificationStore(state => {
+    return state.notifications.length > 0;
+  });
 
   const guardCall = useNoInternetCallGuard({
     description: translate('callNotEstablishedDescription'),
@@ -155,7 +157,9 @@ export const CallingCell = ({
   const isFullScreen = viewMode === CallingViewMode.FULL_SCREEN;
 
   const isMuted = muteState !== MuteState.NOT_MUTED;
-  const isCurrentlyMuted = useCallback(() => muteState === MuteState.SELF_MUTED, [muteState]);
+  const isCurrentlyMuted = useCallback(() => {
+    return muteState === MuteState.SELF_MUTED;
+  }, [muteState]);
 
   const isDeclined =
     reason !== undefined &&
@@ -204,15 +208,16 @@ export const CallingCell = ({
   const isOutgoingVideoCall = isOutgoing && selfSharesCamera;
 
   const toggleMute = useCallback(
-    (shouldMute: boolean) => callActions.toggleMute(call, shouldMute),
+    (shouldMute: boolean) => {
+      return callActions.toggleMute(call, shouldMute);
+    },
     [call, callActions],
   );
 
   const isPressSpaceToUnmutePreferenceEnabled =
-    useUserPropertyValue(
-      () => propertiesRepository.getPreference(PROPERTIES_TYPE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE),
-      WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE,
-    ) === true;
+    useUserPropertyValue(() => {
+      return propertiesRepository.getPreference(PROPERTIES_TYPE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE);
+    }, WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE) === true;
   const isPressSpaceToUnmuteEnabled =
     isPressSpaceToUnmutePreferenceEnabled && Config.getConfig().FEATURE.ENABLE_PRESS_SPACE_TO_UNMUTE;
 
@@ -264,7 +269,9 @@ export const CallingCell = ({
     });
   }, [callingRepository, fireAndForgetInvoker, isOngoing]);
 
-  const {setCurrentView} = useAppMainState(state => state.responsiveView);
+  const {setCurrentView} = useAppMainState(state => {
+    return state.responsiveView;
+  });
   const {showAlert, clearShowAlert} = useCallAlertState();
 
   const answerCall = useCallback(() => {
@@ -290,7 +297,9 @@ export const CallingCell = ({
       const answerCallShortcut = !event.shiftKey && event.ctrlKey && isEnterKey(event);
       const hangUpCallShortcut = event.ctrlKey && event.shiftKey && isEnterKey(event);
 
-      const removeEventListener = () => window.removeEventListener('keydown', answerOrRejectCall);
+      const removeEventListener = () => {
+        return window.removeEventListener('keydown', answerOrRejectCall);
+      };
 
       if (answerCallShortcut || hangUpCallShortcut) {
         event.preventDefault();

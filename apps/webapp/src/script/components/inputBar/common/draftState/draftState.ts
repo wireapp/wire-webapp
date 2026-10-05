@@ -33,8 +33,9 @@ export interface DraftState {
   plainMessage?: string;
 }
 
-export const generateConversationInputStorageKey = (conversationEntity: Conversation): string =>
-  `${StorageKey.CONVERSATION.INPUT}|${conversationEntity.id}`;
+export const generateConversationInputStorageKey = (conversationEntity: Conversation): string => {
+  return `${StorageKey.CONVERSATION.INPUT}|${conversationEntity.id}`;
+};
 
 type SaveDraftState = {
   storageRepository: StorageRepository;
@@ -97,7 +98,7 @@ export const loadDraftState = async (
     messageReply = await loadMessage(replyMessageId);
   }
 
-  let editedMessage = null;
+  let editedMessage: ContentMessage | undefined;
   if (typeof editedMessageId === 'string' && editedMessageId !== '') {
     editedMessage = await loadMessage(editedMessageId);
   }

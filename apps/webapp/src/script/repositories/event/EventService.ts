@@ -17,6 +17,7 @@
  *
  */
 
+import {isNonEmptyString, isNullOrUndefined, isTruthy, isUndefined} from '@sindresorhus/is';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import type {Dexie} from 'dexie';
@@ -74,25 +75,29 @@ export class EventService {
   }
 
   async loadEvents(conversationId: string, eventIds: string[]): Promise<EventRecord[]> {
-    if (!conversationId || !eventIds) {
+    if (!isNonEmptyString(conversationId) || !isTruthy(eventIds)) {
       this.logger.error(`Cannot get events '${eventIds}' in conversation '${conversationId}' without IDs`);
       throw new ConversationError(BASE_ERROR_TYPE.MISSING_PARAMETER, BaseError.MESSAGE.MISSING_PARAMETER);
     }
 
     try {
-      if (this.storageService.db) {
+      if (!isNullOrUndefined(this.storageService.db)) {
         const events = await this.storageService.db
           .table(StorageSchemata.OBJECT_STORE.EVENTS)
           .where('id')
           .anyOf(eventIds)
-          .filter(record => record.conversation === conversationId)
+          .filter(record => {
+            return record.conversation === conversationId;
+          })
           .toArray();
         return events;
       }
 
       const records = await this.storageService.getAll<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS);
       return records
-        .filter(record => record.conversation === conversationId && eventIds.includes(record.id ?? ''))
+        .filter(record => {
+          return record.conversation === conversationId && eventIds.includes(record.id ?? '');
+        })
         .toSorted(compareEventsById);
     } catch (error: unknown) {
       const logMessage = `Failed to get events '${eventIds.join(',')}' for conversation '${conversationId}': ${
@@ -104,25 +109,29 @@ export class EventService {
   }
 
   async loadEphemeralEvents(conversationId: string): Promise<EventRecord[]> {
-    if (!conversationId) {
+    if (!isNonEmptyString(conversationId)) {
       this.logger.error(`Cannot get ephemeral events in conversation '${conversationId}' without ID`);
       throw new ConversationError(BASE_ERROR_TYPE.MISSING_PARAMETER, BaseError.MESSAGE.MISSING_PARAMETER);
     }
 
     try {
-      if (this.storageService.db) {
+      if (!isNullOrUndefined(this.storageService.db)) {
         const events = await this.storageService.db
           .table(StorageSchemata.OBJECT_STORE.EVENTS)
           .where('conversation')
           .equals(conversationId)
-          .and(record => !!record.ephemeral_expires)
+          .and(record => {
+            return isTruthy(record.ephemeral_expires);
+          })
           .toArray();
         return events;
       }
 
       const records = await this.storageService.getAll<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS);
       return records
-        .filter(record => record.conversation === conversationId && !!record.ephemeral_expires)
+        .filter(record => {
+          return record.conversation === conversationId && isTruthy(record.ephemeral_expires);
+        })
         .toSorted(compareEventsById);
     } catch (error: unknown) {
       const logMessage = `Failed to get ephemeral events for conversation '${conversationId}': ${toError(error).message}`;
@@ -138,30 +147,33 @@ export class EventService {
    * @param eventId ID of event to retrieve
    */
   async loadEvent(conversationId: string, eventId: string): Promise<EventRecord | undefined> {
-    if (!conversationId || !eventId) {
+    if (!isNonEmptyString(conversationId) || !isNonEmptyString(eventId)) {
       this.logger.error(`Cannot get event '${eventId}' in conversation '${conversationId}' without IDs`);
       throw new ConversationError(BASE_ERROR_TYPE.MISSING_PARAMETER, BaseError.MESSAGE.MISSING_PARAMETER);
     }
 
     try {
-      if (this.storageService.db) {
+      if (!isNullOrUndefined(this.storageService.db)) {
         const eventStore = this.storageService.db.table(StorageSchemata.OBJECT_STORE.EVENTS);
         // First lookup the event by its direct id (using the index)
         const event = eventStore.where('id').equals(eventId).first();
-        return (
-          event ||
-          // If the event was not found, fallback to filtering all the events and check if a `replacing` message is found
-          eventStore
-            .where('conversation')
-            .equals(conversationId)
-            .filter(item => item.data?.replacing_message_id === eventId || item.id === eventId)
-            .first()
-        );
+        return isTruthy(event)
+          ? event
+          : // If the event was not found, fallback to filtering all the events and check if a `replacing` message is found
+            eventStore
+              .where('conversation')
+              .equals(conversationId)
+              .filter(item => {
+                return item.data?.replacing_message_id === eventId || item.id === eventId;
+              })
+              .first();
       }
 
       const records = await this.storageService.getAll<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS);
       return records
-        .filter(record => record.id === eventId && record.conversation === conversationId)
+        .filter(record => {
+          return record.id === eventId && record.conversation === conversationId;
+        })
         .toSorted(compareEventsById)
         .shift();
     } catch (error: unknown) {
@@ -184,14 +196,14 @@ export class EventService {
     categoryMax = MessageCategory.LIKED,
   ): Promise<DBEvents> {
     const filterExpired = (record: EventRecord) => {
-      if (typeof record.ephemeral_expires !== 'undefined') {
+      if (!isUndefined(record.ephemeral_expires)) {
         return +record.ephemeral_expires - Date.now() > 0;
       }
 
       return true;
     };
 
-    if (this.storageService.db) {
+    if (!isNullOrUndefined(this.storageService.db)) {
       const events = await this.storageService.db
         .table(StorageSchemata.OBJECT_STORE.EVENTS)
         .where('[conversation+category]')
@@ -203,21 +215,24 @@ export class EventService {
 
     const records = await this.storageService.getAll<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS);
     return records
-      .filter(
-        record =>
-          record.conversation === conversationId && record.category >= categoryMin && record.category <= categoryMax,
-      )
+      .filter(record => {
+        return (
+          record.conversation === conversationId && record.category >= categoryMin && record.category <= categoryMax
+        );
+      })
       .filter(filterExpired)
       .toSorted(compareEventsByTime);
   }
 
   async loadEventsReplyingToMessage(conversationId: string, quotedMessageId: string, quotedMessageTime: string) {
-    if (this.storageService.db) {
+    if (!isNullOrUndefined(this.storageService.db)) {
       const events = await this.storageService.db
         .table(StorageSchemata.OBJECT_STORE.EVENTS)
         .where(['conversation', 'time'])
         .between([conversationId, quotedMessageTime], [conversationId, new Date().toISOString()], true, true)
-        .filter(event => hasQuoteForMessage(event, quotedMessageId))
+        .filter(event => {
+          return hasQuoteForMessage(event, quotedMessageId);
+        })
         .toArray();
       return events;
     }
@@ -231,7 +246,9 @@ export class EventService {
           record.time <= new Date().toISOString()
         );
       })
-      .filter(event => hasQuoteForMessage(event, quotedMessageId))
+      .filter(event => {
+        return hasQuoteForMessage(event, quotedMessageId);
+      })
       .toSorted(compareEventsByConversation);
   }
 
@@ -256,7 +273,7 @@ export class EventService {
 
     try {
       const events = await this._loadEventsInDateRange(conversationId, fromDate, toDate, limit, includeParams);
-      return this.storageService.db
+      return !isNullOrUndefined(this.storageService.db)
         ? // Dexie.Collection.reverse() is a query API, not Array.prototype.reverse().
           // eslint-disable-next-line unicorn/no-array-reverse
           await (events as Dexie.Collection<any, any>).reverse().sortBy('time')
@@ -293,7 +310,7 @@ export class EventService {
     const toDate = new Date(Math.max(fromDate.getTime() + 1, Date.now()));
 
     const events = await this._loadEventsInDateRange(conversationId, fromDate, toDate, limit, includeParams);
-    return this.storageService.db
+    return !isNullOrUndefined(this.storageService.db)
       ? (events as DexieCollection).sortBy('time')
       : (events as EventRecord[]).toSorted(compareEventsByTime);
   }
@@ -324,7 +341,7 @@ export class EventService {
       throw new Error(errorMessage);
     }
 
-    if (this.storageService.db) {
+    if (!isNullOrUndefined(this.storageService.db)) {
       const events = await this.storageService.db
         .table(StorageSchemata.OBJECT_STORE.EVENTS)
         .where('[conversation+time]')
@@ -394,7 +411,7 @@ export class EventService {
     reason: ProtobufAsset.NotUploaded | AssetTransferState,
   ): Promise<EventRecord | undefined> {
     const record = await this.storageService.load<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey);
-    if (!record || record.type !== ClientEvent.CONVERSATION.ASSET_ADD) {
+    if (!isTruthy(record) || record.type !== ClientEvent.CONVERSATION.ASSET_ADD) {
       this.logger.warn('Did not find message to update asset (failed)');
       return undefined;
     }
@@ -413,11 +430,11 @@ export class EventService {
    * @param updates Updates to perform on the message.
    */
   async updateEvent<T extends Partial<EventRecord>>(primaryKey: string, updates: T): Promise<IdentifiedUpdatePayload> {
-    const hasNoChanges = !updates || !Object.keys(updates).length;
+    const hasNoChanges = !isTruthy(updates) || Object.keys(updates).length === 0;
     if (hasNoChanges) {
       throw new ConversationError(ConversationError.TYPE.NO_CHANGES, ConversationError.MESSAGE.NO_CHANGES);
     }
-    const hasVersionedUpdates = !!updates.version;
+    const hasVersionedUpdates = isTruthy(updates.version);
     if (hasVersionedUpdates) {
       const error = new ConversationError(ConversationError.TYPE.WRONG_CHANGE, ConversationError.MESSAGE.WRONG_CHANGE);
       error.message += ' Use the `updateEventSequentially` method to perform a versioned update of an event';
@@ -434,23 +451,23 @@ export class EventService {
    * @param changes Changes to update message with
    */
   async updateEventSequentially(changes: IdentifiedUpdatePayload): Promise<number> {
-    const hasVersionedChanges = !!changes.version;
+    const hasVersionedChanges = isTruthy(changes.version);
     if (!hasVersionedChanges) {
       throw new ConversationError(ConversationError.TYPE.WRONG_CHANGE, ConversationError.MESSAGE.WRONG_CHANGE);
     }
 
     const {primary_key: primaryKey, ...updates} = changes;
-    if (this.storageService.db) {
+    if (!isNullOrUndefined(this.storageService.db)) {
       // Create a DB transaction to avoid concurrent sequential update.
       return this.storageService.db.transaction('rw', StorageSchemata.OBJECT_STORE.EVENTS, async () => {
         const record = await this.storageService.load<LegacyEventRecord>(
           StorageSchemata.OBJECT_STORE.EVENTS,
           primaryKey,
         );
-        if (!record) {
+        if (!isTruthy(record)) {
           throw new StorageError(StorageError.TYPE.NOT_FOUND, StorageError.MESSAGE.NOT_FOUND);
         }
-        const databaseVersion = record.version || 1;
+        const databaseVersion = isTruthy(record.version) ? record.version : 1;
         const isSequentialUpdate = changes.version === databaseVersion + 1;
         if (isSequentialUpdate) {
           return this.storageService.update(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey, updates);
@@ -500,11 +517,13 @@ export class EventService {
 
     const events = await this.loadAllConversationEvents(conversationId.id, eventsToSkip);
 
-    const eventsToMove = events.map(event => ({
-      ...event,
-      conversation: newConversationId.id,
-      qualified_conversation: newConversationId,
-    }));
+    const eventsToMove = events.map(event => {
+      return {
+        ...event,
+        conversation: newConversationId.id,
+        qualified_conversation: newConversationId,
+      };
+    });
 
     return Promise.all(
       eventsToMove.map(event => {
@@ -522,12 +541,14 @@ export class EventService {
     eventTypesToSkip: (CONVERSATION_EVENT | CLIENT_CONVERSATION_EVENT)[] = [],
   ): Promise<EventRecord[]> {
     try {
-      if (this.storageService.db) {
+      if (!isNullOrUndefined(this.storageService.db)) {
         const events = await this.storageService.db
           .table(StorageSchemata.OBJECT_STORE.EVENTS)
           .where('conversation')
           .equals(conversationId)
-          .and(record => !eventTypesToSkip.includes(record.type))
+          .and(record => {
+            return !eventTypesToSkip.includes(record.type);
+          })
           .toArray();
         return events;
       }

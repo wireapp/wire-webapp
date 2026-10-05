@@ -26,52 +26,57 @@ import {createPortal} from 'react-dom';
 import {Theme} from '../../identity';
 import {filterProps} from '../../utils';
 
+const centeredWidthDivisor = 2;
+const paddingSideCount = 2;
+
 const paddingDistance = 8;
 
-const tooltipStyle: (theme: Theme) => CSSObject = theme => ({
-  position: 'fixed',
-  zIndex: 'var(--z-index-level-8)',
-  maxWidth: '300px',
-  filter: 'drop-shadow(1px 2px 6px rgba(0, 0, 0, 0.3))',
-  borderRadius: '4px',
-
-  "&[data-position='top']": {
-    paddingBottom: `${paddingDistance}px`,
-
-    '.tooltip-arrow': {
-      borderTop: `10px solid ${theme.Tooltip.backgroundColor}`,
-      bottom: 0,
-    },
-  },
-  "&[data-position='bottom']": {
-    paddingTop: `${paddingDistance}px`,
-
-    '.tooltip-arrow': {
-      borderBottom: `10px solid ${theme.Tooltip.backgroundColor}`,
-      top: 0,
-    },
-  },
-
-  '.tooltip-content': {
-    color: theme.Tooltip.color,
-    backgroundColor: theme.Tooltip.backgroundColor,
+const tooltipStyle: (theme: Theme) => CSSObject = theme => {
+  return {
+    position: 'fixed',
+    zIndex: 'var(--z-index-level-8)',
+    maxWidth: '300px',
+    filter: 'drop-shadow(1px 2px 6px rgba(0, 0, 0, 0.3))',
     borderRadius: '4px',
-    fontSize: '12px',
-    lineHeight: '14px',
-    fontWeight: 400,
-    padding: `${paddingDistance}px 8px`,
-    textAlign: 'center',
-    overflowWrap: 'break-word',
-  },
 
-  '.tooltip-arrow': {
-    width: 0,
-    height: 0,
-    borderLeft: '8px solid transparent',
-    borderRight: '8px solid transparent',
-    position: 'absolute',
-  },
-});
+    "&[data-position='top']": {
+      paddingBottom: `${paddingDistance}px`,
+
+      '.tooltip-arrow': {
+        borderTop: `10px solid ${theme.Tooltip.backgroundColor}`,
+        bottom: 0,
+      },
+    },
+    "&[data-position='bottom']": {
+      paddingTop: `${paddingDistance}px`,
+
+      '.tooltip-arrow': {
+        borderBottom: `10px solid ${theme.Tooltip.backgroundColor}`,
+        top: 0,
+      },
+    },
+
+    '.tooltip-content': {
+      color: theme.Tooltip.color,
+      backgroundColor: theme.Tooltip.backgroundColor,
+      borderRadius: '4px',
+      fontSize: '12px',
+      lineHeight: '14px',
+      fontWeight: 400,
+      padding: `${paddingDistance}px 8px`,
+      textAlign: 'center',
+      overflowWrap: 'break-word',
+    },
+
+    '.tooltip-arrow': {
+      width: 0,
+      height: 0,
+      borderLeft: '8px solid transparent',
+      borderRight: '8px solid transparent',
+      position: 'absolute',
+    },
+  };
+};
 
 interface TooltipArrowProps {
   wrapperRect: DOMRect;
@@ -91,8 +96,11 @@ const TooltipArrow = ({wrapperRect}: TooltipArrowProps) => {
 
     const tooltipRect = parentElement.getBoundingClientRect();
 
-    const isTouchingLeftEdge = wrapperRect.x <= tooltipRect.width / 2 + paddingDistance * 2;
-    const isTouchingRightEdge = wrapperRect.left + tooltipRect.width / 2 + paddingDistance * 2 >= window.innerWidth;
+    const isTouchingLeftEdge =
+      wrapperRect.x <= tooltipRect.width / centeredWidthDivisor + paddingDistance * paddingSideCount;
+    const isTouchingRightEdge =
+      wrapperRect.left + tooltipRect.width / centeredWidthDivisor + paddingDistance * paddingSideCount >=
+      window.innerWidth;
 
     if (isTouchingLeftEdge) {
       element.style.left = `${wrapperRect.left - paddingDistance}px`;
@@ -128,18 +136,21 @@ const PortalComponent = ({children, wrapperRect, selector = '#wire-app'}: Portal
     }
 
     const tooltipRect = element.getBoundingClientRect();
-    const isTouchingTopEdge = wrapperRect.y <= tooltipRect.height + paddingDistance * 2;
+    const isTouchingTopEdge = wrapperRect.y <= tooltipRect.height + paddingDistance * paddingSideCount;
     setIsTouchingTop(isTouchingTopEdge);
 
-    const isTouchingLeftEdge = wrapperRect.x <= tooltipRect.width / 2 + paddingDistance * 2;
-    const isTouchingRightEdge = wrapperRect.left + tooltipRect.width / 2 + paddingDistance * 2 >= window.innerWidth;
+    const isTouchingLeftEdge =
+      wrapperRect.x <= tooltipRect.width / centeredWidthDivisor + paddingDistance * paddingSideCount;
+    const isTouchingRightEdge =
+      wrapperRect.left + tooltipRect.width / centeredWidthDivisor + paddingDistance * paddingSideCount >=
+      window.innerWidth;
 
     if (isTouchingLeftEdge) {
       element.style.left = `${paddingDistance}px`;
     } else if (isTouchingRightEdge) {
       element.style.right = `${paddingDistance}px`;
     } else {
-      const elementWidth = (element.scrollWidth - wrapperRect.width) / 2;
+      const elementWidth = (element.scrollWidth - wrapperRect.width) / centeredWidthDivisor;
       element.style.left = `${wrapperRect.x - elementWidth}px`;
     }
 
@@ -154,7 +165,9 @@ const PortalComponent = ({children, wrapperRect, selector = '#wire-app'}: Portal
     <div
       ref={tooltipRef}
       className="tooltip"
-      css={(theme: Theme) => tooltipStyle(theme)}
+      css={(theme: Theme) => {
+        return tooltipStyle(theme);
+      }}
       data-position={isTouchingTop ? 'bottom' : 'top'}
       role="tooltip"
     >
@@ -173,7 +186,9 @@ export interface TooltipProps<T = HTMLDivElement> extends HTMLProps<T> {
   selector?: string;
 }
 
-const filterTooltipProps = (props: TooltipProps) => filterProps(props, ['body', 'selector']);
+const filterTooltipProps = (props: TooltipProps) => {
+  return filterProps(props, ['body', 'selector']);
+};
 
 export const Tooltip = ({children, ...props}: TooltipProps) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -188,7 +203,9 @@ export const Tooltip = ({children, ...props}: TooltipProps) => {
     wrapperRectRef.current = wrapperRect;
   };
 
-  const onElementLeave = () => setIsHovered(false);
+  const onElementLeave = () => {
+    return setIsHovered(false);
+  };
 
   return (
     <div

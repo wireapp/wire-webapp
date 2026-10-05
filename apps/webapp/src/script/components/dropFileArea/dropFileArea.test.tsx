@@ -21,9 +21,11 @@ import {fireEvent, render} from '@testing-library/react';
 
 import {DropFileArea} from './dropFileArea';
 
-const getDefaultProps = () => ({
-  onFileDropped: jest.fn(),
-});
+const getDefaultProps = () => {
+  return {
+    onFileDropped: jest.fn(),
+  };
+};
 
 const pngFileName = 'chucknorris.png';
 const pngFile = new File(['(⌐□_□)'], pngFileName, {type: 'image/png'});

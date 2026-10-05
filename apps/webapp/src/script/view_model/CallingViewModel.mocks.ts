@@ -37,6 +37,7 @@ import {Core} from '../service/coreSingleton';
 export const mockCallingRepository = {
   startCall: jest.fn(),
   answerCall: jest.fn(),
+  findCall: jest.fn(),
   onIncomingCall: jest.fn(),
   onRequestClientsCallback: jest.fn(),
   onRequestNewEpochCallback: jest.fn(),
@@ -54,7 +55,9 @@ export const mockAudioRepository = {
 } as unknown as AudioRepository;
 
 const mockMediaDevicesHandler = {
-  initializeMediaDevices: jest.fn(() => Promise.resolve()),
+  initializeMediaDevices: jest.fn(() => {
+    return Promise.resolve();
+  }),
 } as unknown as MediaDevicesHandler;
 
 export const callState = new CallState();
@@ -78,7 +81,11 @@ export function buildCallingViewModel(translate: Translate) {
     translate,
     {} as any,
     callState,
-    {isConferenceCallingEnabled: ko.pureComputed(() => true)} as any,
+    {
+      isConferenceCallingEnabled: ko.pureComputed(() => {
+        return true;
+      }),
+    } as any,
   );
 
   return [callingViewModel, {core: mockCore}] as const;

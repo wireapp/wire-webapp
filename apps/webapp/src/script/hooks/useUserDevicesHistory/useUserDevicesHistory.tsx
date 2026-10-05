@@ -25,7 +25,9 @@ export const useUserDevicesHistory = () => {
   const [history, setHistory] = useState<UserDevicesHistoryEntry[]>([
     {headline: '', state: UserDevicesState.DEVICE_LIST},
   ]);
-  const current = useMemo<UserDevicesHistoryEntry>(() => history[history.length - 1], [history]);
+  const current = useMemo<UserDevicesHistoryEntry>(() => {
+    return history[history.length - 1];
+  }, [history]);
   return {
     current,
     goBack: () => {

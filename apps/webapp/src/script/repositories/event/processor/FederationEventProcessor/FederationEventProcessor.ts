@@ -36,6 +36,8 @@ import {
 import {EventProcessor, IncomingEvent} from '../../EventProcessor';
 import {EventRepository} from '../../EventRepository';
 
+const federationEventDebounceInMilliseconds = 1000;
+
 export class FederationEventProcessor implements EventProcessor {
   constructor(
     private eventRepository: EventRepository,
@@ -69,9 +71,9 @@ export class FederationEventProcessor implements EventProcessor {
    * @param deletedDomain the domain that stopped federating
    */
   private onFederationDelete = debounce(async (deletedDomain: string) => {
-    const allConversations = this.conversationState
-      .conversations()
-      .filter(conversation => !this.conversationState.isSelfConversation(conversation));
+    const allConversations = this.conversationState.conversations().filter(conversation => {
+      return !this.conversationState.isSelfConversation(conversation);
+    });
 
     const {conversationsToDeleteUsers, conversationsToLeave, connectionRequestsToDelete, conversationsToDisable} =
       getFederationDeleteEventUpdates(deletedDomain, allConversations);
@@ -95,7 +97,7 @@ export class FederationEventProcessor implements EventProcessor {
       await this.insertFederationStopSystemMessage(conversation, [deletedDomain]);
       await this.removeDeletedFederationUsers(conversation, users);
     });
-  }, 1000);
+  }, federationEventDebounceInMilliseconds);
 
   /**
    * For the `federation.connectionRemoved` event: (Backend A & B stopped federating, user is on C)
@@ -120,7 +122,7 @@ export class FederationEventProcessor implements EventProcessor {
       await this.insertFederationStopSystemMessage(conversation, domains);
       await this.removeDeletedFederationUsers(conversation, usersToRemove);
     }
-  }, 1000);
+  }, federationEventDebounceInMilliseconds);
 
   private async removeDeletedFederationUsers(conversation: Conversation, users: User[]) {
     if (users.length === 0) {
@@ -144,7 +146,9 @@ export class FederationEventProcessor implements EventProcessor {
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
     const event = EventBuilder.buildMemberLeave(
       conversation,
-      users.map(user => user.qualifiedId),
+      users.map(user => {
+        return user.qualifiedId;
+      }),
       '',
       currentTimestamp,
     );

@@ -99,8 +99,9 @@ export const useCellsSorting = (scopeKey = DEFAULT_SCOPE_KEY, displayedSort?: Ce
   );
 
   const getDirectionFor = useCallback(
-    (field: CellsSortField): CellsSortDirection | undefined =>
-      visibleSort?.field === field ? visibleSort.direction : undefined,
+    (field: CellsSortField): CellsSortDirection | undefined => {
+      return visibleSort?.field === field ? visibleSort.direction : undefined;
+    },
     [visibleSort],
   );
 

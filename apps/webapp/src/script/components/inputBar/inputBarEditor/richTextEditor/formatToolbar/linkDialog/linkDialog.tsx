@@ -88,19 +88,25 @@ export const LinkDialog = ({
       // The setTimeout is needed here to ensure the input is mounted and visible in the DOM
       // This is necessary because the modal's animation needs to complete first.
       // The timeout does the trick.
-      setTimeout(() => textInputRef.current?.focus());
+      setTimeout(() => {
+        return textInputRef.current?.focus();
+      });
     }
   }, [isOpen, initialUrl, initialText, resetForm]);
 
   const handleInputChange = ({event, field}: {event: FormEvent<HTMLInputElement>; field: keyof FormData}) => {
     const {value} = event.target as HTMLInputElement;
-    setFormData(prev => ({...prev, [field]: value}));
+    setFormData(prev => {
+      return {...prev, [field]: value};
+    });
 
     if (isSubmitted) {
-      setErrors(prev => ({
-        ...prev,
-        [field]: !isFieldValid(field, value) ? getFieldError(field, translate) : undefined,
-      }));
+      setErrors(prev => {
+        return {
+          ...prev,
+          [field]: !isFieldValid(field, value) ? getFieldError(field, translate) : undefined,
+        };
+      });
     }
   };
 
@@ -149,7 +155,9 @@ export const LinkDialog = ({
           label={translate('richTextLinkDialogTextLabel')}
           value={formData.text}
           markInvalid={isSubmitted && hasTextError}
-          onChange={event => handleInputChange({event, field: 'text'})}
+          onChange={event => {
+            return handleInputChange({event, field: 'text'});
+          }}
           error={isSubmitted && hasTextError ? <ErrorMessage>{errors.text}</ErrorMessage> : undefined}
         />
         <Input
@@ -157,7 +165,9 @@ export const LinkDialog = ({
           label={translate('richTextLinkDialogLinkLabel')}
           value={formData.url}
           markInvalid={isSubmitted && hasUrlError}
-          onChange={event => handleInputChange({event, field: 'url'})}
+          onChange={event => {
+            return handleInputChange({event, field: 'url'});
+          }}
           error={isSubmitted && hasUrlError ? <ErrorMessage>{errors.url}</ErrorMessage> : undefined}
         />
         <div css={buttonGroupStyles}>
@@ -176,7 +186,9 @@ export const LinkDialog = ({
 const isFieldValid = (field: keyof FormData, value: string): boolean => {
   const fieldValidators = {
     url: validateUrl,
-    text: (value: string) => value.length > 0,
+    text: (value: string) => {
+      return value.length > 0;
+    },
   } as const;
 
   return fieldValidators[field](value) ?? true;

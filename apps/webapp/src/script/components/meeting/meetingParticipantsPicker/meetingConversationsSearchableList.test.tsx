@@ -35,14 +35,21 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
   }),
 );
 
-const createConversation = (id: string, name: string, channel = false) =>
-  ({
-    display_name: () => name,
+const createConversation = (id: string, name: string, channel = false) => {
+  return {
+    display_name: () => {
+      return name;
+    },
     id,
-    isChannel: () => channel,
-    participating_user_ets: () => [],
+    isChannel: () => {
+      return channel;
+    },
+    participating_user_ets: () => {
+      return [];
+    },
     qualifiedId: {domain: 'example.com', id},
-  }) as unknown as Conversation;
+  } as unknown as Conversation;
+};
 
 describe('MeetingConversationsSearchableList', () => {
   it('renders groups and channels with their selection state', () => {
@@ -69,6 +76,7 @@ describe('MeetingConversationsSearchableList', () => {
 
     expect(screen.getByText('Project group')).toBeInTheDocument();
     expect(screen.getByText('Project channel')).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'meetings.scheduleModal.groupsAndChannelsWithCount'})).toBeInTheDocument();
     expect(screen.getByRole('checkbox', {name: 'Project group'})).toBeChecked();
     expect(screen.getByRole('checkbox', {name: 'Project channel'})).not.toBeChecked();
 

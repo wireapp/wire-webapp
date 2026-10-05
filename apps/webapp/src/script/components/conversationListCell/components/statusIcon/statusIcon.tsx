@@ -39,10 +39,9 @@ export const StatusIcon = ({conversation}: Props) => {
     'isGhostGroup',
   ]);
 
-  const cellState = useMemo(
-    () => generateCellState(conversation, translate),
-    [conversation, isRequest, mutedState, isGhostGroup, translate, unreadState],
-  );
+  const cellState = useMemo(() => {
+    return generateCellState(conversation, translate);
+  }, [conversation, isRequest, mutedState, isGhostGroup, translate, unreadState]);
 
   return (
     <>

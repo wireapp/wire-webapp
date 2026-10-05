@@ -25,8 +25,12 @@ import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSu
 
 import * as ActiveWindowMod from '../hooks/useActiveWindow';
 
-const px = (n: number) => `${n}px`;
-const queryMenu = () => document.querySelector('ul.ctx-menu') as HTMLUListElement | null;
+const px = (n: number) => {
+  return `${n}px`;
+};
+const queryMenu = () => {
+  return document.querySelector('ul.ctx-menu') as HTMLUListElement | null;
+};
 
 const setMenuOffsetSize = (width: number, height: number) => {
   Object.defineProperty(HTMLElement.prototype, 'offsetWidth', {
@@ -47,7 +51,9 @@ const openMenu = async (args: Parameters<typeof showContextMenu>[0]) => {
   await act(async () => {
     showContextMenu(args);
   });
-  await waitFor(() => expect(queryMenu()).toBeInTheDocument());
+  await waitFor(() => {
+    return expect(queryMenu()).toBeInTheDocument();
+  });
 };
 
 const closeMenu = async () => {
@@ -57,13 +63,19 @@ const closeMenu = async () => {
   await act(async () => {
     window.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape'}));
   });
-  await waitFor(() => expect(queryMenu()).not.toBeInTheDocument());
+  await waitFor(() => {
+    return expect(queryMenu()).not.toBeInTheDocument();
+  });
 };
 
 describe('ContextMenu positioning', () => {
   beforeAll(() => {
-    jest.spyOn(ActiveWindowMod, 'useActiveWindowState').mockImplementation(() => ({activeWindow: window}));
-    (ActiveWindowMod.useActiveWindowState as any).getState = () => ({activeWindow: window});
+    jest.spyOn(ActiveWindowMod, 'useActiveWindowState').mockImplementation(() => {
+      return {activeWindow: window};
+    });
+    (ActiveWindowMod.useActiveWindowState as any).getState = () => {
+      return {activeWindow: window};
+    };
   });
 
   beforeEach(() => {
@@ -91,7 +103,9 @@ describe('ContextMenu positioning', () => {
       height: 20,
       x: 100,
       y: 100,
-      toJSON: () => ({}),
+      toJSON: () => {
+        return {};
+      },
     } as DOMRect);
 
     await openMenu({
@@ -167,7 +181,9 @@ describe('ContextMenu positioning', () => {
       window.dispatchEvent(new KeyboardEvent('keydown', {key: 'Enter'}));
     });
 
-    await waitFor(() => expect(clickSpy).toHaveBeenCalledTimes(1));
+    await waitFor(() => {
+      return expect(clickSpy).toHaveBeenCalledTimes(1);
+    });
   });
 
   it('exposes disabled entries and does not invoke their action', async () => {

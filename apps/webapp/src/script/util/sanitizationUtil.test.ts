@@ -64,7 +64,9 @@ describe('sanitizationUtil', () => {
 
       expect(escapedDativeName).toEqual(translate('conversationYouDative'));
 
-      const translateUnsafeSelfName = () => '<script>you</script>';
+      const translateUnsafeSelfName = () => {
+        return '<script>you</script>';
+      };
       const escapedAccusativeName = getSelfName(translateUnsafeSelfName, Declension.DATIVE, false);
 
       expect(escapedAccusativeName).toEqual('&lt;script&gt;you&lt;/script&gt;');
@@ -81,7 +83,9 @@ describe('sanitizationUtil', () => {
         focus: jest.fn(),
         opener: 'remove me',
       };
-      jest.spyOn(window, 'open').mockImplementation(() => mockedWindow as any);
+      jest.spyOn(window, 'open').mockImplementation(() => {
+        return mockedWindow as any;
+      });
       const newWindow = safeWindowOpen('https://wire.com/');
       assertNotNullOrUndefined(newWindow);
 

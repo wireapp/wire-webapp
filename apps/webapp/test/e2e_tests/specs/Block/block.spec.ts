@@ -161,7 +161,9 @@ test.describe('User Blocking', () => {
           PageManager.from(createPage(withLogin(userA))),
           PageManager.from(createPage(withLogin(userB))),
         ]);
-        const [userAPages, userBPages] = [userAPageManager, userBPageManager].map(pm => pm.webapp.pages);
+        const [userAPages, userBPages] = [userAPageManager, userBPageManager].map(pm => {
+          return pm.webapp.pages;
+        });
 
         // Preconditions: User B accepts the connection request
         await sendConnectionRequest(userAPageManager, userB);

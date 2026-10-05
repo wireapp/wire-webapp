@@ -89,21 +89,28 @@ export const AppContainer = (properties: AppProps) => {
   } = properties;
   setAppLocale();
   const app = useMemo(() => {
-    return new App(container.resolve(Core), container.resolve(APIClient), config, translate);
-  }, [config, translate]);
+    return new App(
+      container.resolve(Core),
+      container.resolve(APIClient),
+      config,
+      translate,
+      clock,
+      fireAndForgetInvoker,
+    );
+  }, [config, fireAndForgetInvoker, translate, clock]);
   const enableAutoLogin = Config.getConfig().FEATURE.ENABLE_AUTO_LOGIN;
   // Publishing application on the global scope for debug and testing purposes.
   window.wire.app = app;
-  const mainView = useMemo(
-    () => new MainViewModel(app.repository, translate, fireAndForgetInvoker),
-    [app.repository, fireAndForgetInvoker, translate],
-  );
-  useTheme(() => app.repository.properties.getPreference(PROPERTIES_TYPE.INTERFACE.THEME));
+  const mainView = useMemo(() => {
+    return new MainViewModel(app.repository, translate, fireAndForgetInvoker);
+  }, [app.repository, fireAndForgetInvoker, translate]);
+  useTheme(() => {
+    return app.repository.properties.getPreference(PROPERTIES_TYPE.INTERFACE.THEME);
+  });
   useAccentColor();
-  const themePreference = useUserPropertyValue(
-    () => app.repository.properties.getPreference(PROPERTIES_TYPE.INTERFACE.THEME),
-    WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME,
-  );
+  const themePreference = useUserPropertyValue(() => {
+    return app.repository.properties.getPreference(PROPERTIES_TYPE.INTERFACE.THEME);
+  }, WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME);
   const themeId = themePreference === 'dark' ? THEME_ID.DARK : THEME_ID.DEFAULT;
 
   const {hasOtherInstance, registerInstance} = useSingleInstance(clock);
@@ -122,10 +129,14 @@ export const AppContainer = (properties: AppProps) => {
   useEffect(() => {
     // Prevent Chrome (and Electron) from pushing the content out of the
     // viewport when using form elements (e.g. in the preferences)
-    const resetWindowScroll = () => window.scrollTo(0, 0);
+    const resetWindowScroll = () => {
+      return window.scrollTo(0, 0);
+    };
     document.addEventListener('scroll', resetWindowScroll);
 
-    return () => document.removeEventListener('scroll', resetWindowScroll);
+    return () => {
+      return document.removeEventListener('scroll', resetWindowScroll);
+    };
   }, []);
 
   const {repository: repositories} = app;

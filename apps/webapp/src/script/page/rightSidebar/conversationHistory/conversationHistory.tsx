@@ -90,9 +90,9 @@ export const ConversationHistory = ({onGoBack, onClose}: AccessProps) => {
                   ? historySharingQuantity
                   : ''
               }
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                setHistorySharingQuantity(Number(event.target.value))
-              }
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                return setHistorySharingQuantity(Number(event.target.value));
+              }}
             />
 
             <Select
@@ -100,7 +100,9 @@ export const ConversationHistory = ({onGoBack, onClose}: AccessProps) => {
               dataUieName="history-sharing-unit-select"
               menuCSS={{position: 'sticky'}}
               options={chatHistorySharingUnitOptions}
-              value={chatHistorySharingUnitOptions.find(option => option.value === historySharingUnit)}
+              value={chatHistorySharingUnitOptions.find(option => {
+                return option.value === historySharingUnit;
+              })}
               onChange={option => {
                 setHistorySharingUnit(option?.value as HistorySharingUnit);
               }}

@@ -20,6 +20,7 @@
 import {useEffect} from 'react';
 
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
+import {isNull} from '@sindresorhus/is';
 import {COMMAND_PRIORITY_LOW, INSERT_PARAGRAPH_COMMAND, KEY_ENTER_COMMAND} from 'lexical';
 
 import {Config} from 'src/script/Config';
@@ -35,7 +36,7 @@ export function SendPlugin({onSend}: Props): null {
     return editor.registerCommand(
       KEY_ENTER_COMMAND,
       event => {
-        if (!event) {
+        if (isNull(event)) {
           return false;
         }
 

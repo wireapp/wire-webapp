@@ -37,7 +37,9 @@ export const useAutoFocus = ({
   useEffect(() => {
     // Early return if should not focus
     if (!shouldFocus) {
-      return () => undefined;
+      return () => {
+        return undefined;
+      };
     }
 
     const focusId = requestAnimationFrame(() => {
@@ -57,6 +59,8 @@ export const useAutoFocus = ({
       }
     });
 
-    return () => cancelAnimationFrame(focusId);
+    return () => {
+      return cancelAnimationFrame(focusId);
+    };
   }, [shouldFocus, preventScroll, cursorAtEnd, elementRef]);
 };

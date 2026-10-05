@@ -218,14 +218,22 @@ const UserModal = ({
 }: UserModalProps) => {
   const {translate} = useApplicationContext();
   const legalHoldBlockUrl = Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK;
-  const onClose = useUserModalState(state => state.onClose);
-  const userId = useUserModalState(state => state.userId);
-  const resetState = useUserModalState(state => state.resetState);
+  const onClose = useUserModalState(state => {
+    return state.onClose;
+  });
+  const userId = useUserModalState(state => {
+    return state.userId;
+  });
+  const resetState = useUserModalState(state => {
+    return state.resetState;
+  });
 
   const [isShown, setIsShown] = useState<boolean>(false);
   const [userNotFound, setUserNotFound] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
-  const hide = () => setIsShown(false);
+  const hide = () => {
+    return setIsShown(false);
+  };
   const onModalClosed = () => {
     setUser(null);
     setUserNotFound(false);
@@ -260,7 +268,9 @@ const UserModal = ({
           }
           setUser(user);
         })
-        .catch(() => setUserNotFound(true));
+        .catch(() => {
+          return setUserNotFound(true);
+        });
       setIsShown(true);
     }
 
@@ -297,13 +307,13 @@ const UserModal = ({
         <Icon.CloseIcon
           className="modal__header__button"
           onClick={hide}
-          onKeyDown={event =>
-            handleKeyDown({
+          onKeyDown={event => {
+            return handleKeyDown({
               event,
               callback: hide,
               keys: [KEY.ENTER, KEY.SPACE],
-            })
-          }
+            });
+          }}
           data-uie-name="do-close"
           tabIndex={TabIndex.FOCUSABLE}
         />

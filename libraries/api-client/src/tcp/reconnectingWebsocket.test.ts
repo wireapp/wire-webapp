@@ -181,7 +181,9 @@ async function startEchoServer(): Promise<WebSocketServer> {
     });
   });
 
-  server.on('error', error => console.error(`Echo WebSocket server error: "${error.message}"`));
+  server.on('error', error => {
+    return console.error(`Echo WebSocket server error: "${error.message}"`);
+  });
   await once(server, 'listening');
   return server;
 }
@@ -426,7 +428,9 @@ describe('ReconnectingWebsocket', () => {
         resolveReconnectUrl = resolve;
       });
       const RWS = createRWS(
-        jest.fn(() => reconnectUrlPromise),
+        jest.fn(() => {
+          return reconnectUrlPromise;
+        }),
         {
           ...defaultReconnectingWebsocketTestOptions,
           wallClock: deterministicWallClock,
@@ -468,7 +472,9 @@ describe('ReconnectingWebsocket', () => {
         resolveReconnectUrl = resolve;
       });
       const RWS = createRWS(
-        jest.fn(() => reconnectUrlPromise),
+        jest.fn(() => {
+          return reconnectUrlPromise;
+        }),
         {
           ...defaultReconnectingWebsocketTestOptions,
           wallClock: deterministicWallClock,
@@ -754,7 +760,9 @@ describe('ReconnectingWebsocket', () => {
       RWS.connect();
       await RWS['internalOnReconnect']();
 
-      expect(() => deterministicWallClock.advanceByMilliseconds(connectingTimeoutInMilliseconds)).not.toThrow();
+      expect(() => {
+        return deterministicWallClock.advanceByMilliseconds(connectingTimeoutInMilliseconds);
+      }).not.toThrow();
       expect(firstSocket.close).toHaveBeenCalledTimes(1);
       expect(websocketFactory).toHaveBeenCalledTimes(2);
       expect(RWS['socket']).toBe(secondSocket);
@@ -1449,7 +1457,9 @@ describe('ReconnectingWebsocket', () => {
       const onReconnect = jest.fn().mockReturnValue(getServerAddress());
       const RWS = createRWS(onReconnect);
 
-      expect(() => RWS.send('test')).not.toThrow();
+      expect(() => {
+        return RWS.send('test');
+      }).not.toThrow();
       RWS.disconnect();
     });
   });

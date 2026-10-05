@@ -19,16 +19,17 @@
  *
  */
 
+import {Maybe} from 'true-myth';
+
 import {execFileSync} from 'node:child_process';
 import {mkdirSync, writeFileSync} from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 
-import {Maybe} from 'true-myth';
-
 import {createBuildMetadata, isBuildMetadataInput, type BuildMetadataInput, resolveBuildVersion} from '@wireapp/config';
 
 const DEFAULT_METADATA_FILE_PATH = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../dist/version.json');
+const JSON_INDENTATION_SPACES = 2;
 
 function resolveNonEmptyEnvironmentValue(environmentValue: Maybe<string>): Maybe<string> {
   return environmentValue.andThen(environmentString => {
@@ -74,7 +75,7 @@ function generateVersionFile(): void {
   const authoritativeBuildMetadata = createBuildMetadata(buildMetadataInput);
 
   mkdirSync(path.dirname(metadataFilePath), {recursive: true});
-  writeFileSync(metadataFilePath, `${JSON.stringify(authoritativeBuildMetadata, null, 2)}\n`);
+  writeFileSync(metadataFilePath, `${JSON.stringify(authoritativeBuildMetadata, null, JSON_INDENTATION_SPACES)}\n`);
 }
 
 function run(): void {
