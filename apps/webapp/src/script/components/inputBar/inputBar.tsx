@@ -91,6 +91,7 @@ interface InputBarProps {
   readonly teamState: TeamState;
   readonly selfUser: User;
   readonly isCellsEnabled: boolean;
+  readonly isCellsUploadEnabled: boolean;
   onShiftTab: () => void;
   uploadDroppedFiles: (droppedFiles: File[]) => void;
   uploadImages: (images: File[]) => void;
@@ -141,6 +142,7 @@ function InputBarContent({
   selfUser,
   teamState = container.resolve(TeamState),
   isCellsEnabled,
+  isCellsUploadEnabled,
   onShiftTab,
   uploadDroppedFiles,
   uploadImages,
@@ -195,11 +197,12 @@ function InputBarContent({
       : translate('tooltipConversationInputPlaceholder');
 
   const isConnectionRequest = isOutgoingRequest || isIncomingRequest;
-  const isCellsUploadAllowed = isConversationFileDropAllowed({
-    conversationTeamId: conversation.teamId,
-    selfUserTeamId: selfUser.teamId,
-    isCellsEnabled,
-  });
+  const isCellsUploadAllowed =
+    isConversationFileDropAllowed({
+      conversationTeamId: conversation.teamId,
+      selfUserTeamId: selfUser.teamId,
+      isCellsEnabled,
+    }) && isCellsUploadEnabled;
   const hasLocalEphemeralTimer =
     isSelfDeletingMessagesEnabled && isNumber(localMessageTimer) && localMessageTimer !== 0 && !hasGlobalMessageTimer;
   const isTypingRef = useRef(false);
@@ -278,7 +281,7 @@ function InputBarContent({
     translate,
   });
 
-  if (!isNull(fileHandling.pastedFile) && !!isCellsEnabled) {
+  if (!isNull(fileHandling.pastedFile) && isCellsUploadEnabled) {
     uploadPastedFiles(fileHandling.pastedFile);
     fileHandling.clearPastedFile();
   }

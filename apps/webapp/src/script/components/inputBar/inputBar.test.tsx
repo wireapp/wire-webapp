@@ -107,6 +107,7 @@ describe('InputBar', () => {
       searchRepository,
       storageRepository,
       isCellsEnabled: false,
+      isCellsUploadEnabled: false,
       teamState: new TeamState(),
       selfUser: new User('id', '', translateForTest),
       onShiftTab: jest.fn(),
@@ -140,27 +141,43 @@ describe('InputBar', () => {
   it('hides cells upload buttons for viewers', () => {
     const props = getDefaultProps();
     props.isCellsEnabled = true;
+    props.isCellsUploadEnabled = true;
     props.conversation.teamId = 'conversation-team';
     props.conversation.cellsState(CONVERSATION_CELLS_STATE.READY);
     props.selfUser.teamId = 'guest-team';
 
-    const {queryByTitle} = renderInputBar(props);
+    const {container} = renderInputBar(props);
 
-    expect(queryByTitle('tooltipConversationAddImage')).toBe(null);
-    expect(queryByTitle('tooltipConversationFile')).toBe(null);
+    expect(container.querySelector('[data-uie-name="do-share-image"]')).not.toBeInTheDocument();
+    expect(container.querySelector('[data-uie-name="do-share-file"]')).not.toBeInTheDocument();
   });
 
   it('shows cells upload buttons for editors', () => {
     const props = getDefaultProps();
     props.isCellsEnabled = true;
+    props.isCellsUploadEnabled = true;
     props.conversation.teamId = 'conversation-team';
     props.conversation.cellsState(CONVERSATION_CELLS_STATE.READY);
     props.selfUser.teamId = 'conversation-team';
 
-    const {getByTitle} = renderInputBar(props);
+    const {container} = renderInputBar(props);
 
-    expect(getByTitle('tooltipConversationAddImage')).not.toBe(null);
-    expect(getByTitle('tooltipConversationFile')).not.toBe(null);
+    expect(container.querySelector('[data-uie-name="do-share-image"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-uie-name="do-share-file"]')).toBeInTheDocument();
+  });
+
+  it('hides Cells upload buttons when the team Cells feature is disabled', () => {
+    const props = getDefaultProps();
+    props.isCellsEnabled = true;
+    props.isCellsUploadEnabled = false;
+    props.conversation.teamId = 'conversation-team';
+    props.conversation.cellsState(CONVERSATION_CELLS_STATE.READY);
+    props.selfUser.teamId = 'conversation-team';
+
+    const {container} = renderInputBar(props);
+
+    expect(container.querySelector('[data-uie-name="do-share-image"]')).not.toBeInTheDocument();
+    expect(container.querySelector('[data-uie-name="do-share-file"]')).not.toBeInTheDocument();
   });
 
   it('has passed value', async () => {

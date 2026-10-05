@@ -167,9 +167,10 @@ function ConversationContent({
   const [isSharedDriveSearchViewOpen, setIsSharedDriveSearchViewOpen] = useState<boolean>(false);
 
   const callState = container.resolve(CallState);
-  const {classifiedDomains} = useKoSubscribableChildren(teamState, [
+  const {classifiedDomains, isCellsEnabled: isCellsEnabledForTeam} = useKoSubscribableChildren(teamState, [
     'classifiedDomains',
     'isFileSharingSendingEnabled',
+    'isCellsEnabled',
   ]);
 
   const {is1to1, isRequest, isReadOnlyConversation, isSelfUserRemoved} = useKoSubscribableChildren(activeConversation, [
@@ -676,12 +677,15 @@ function ConversationContent({
 
   const isCellsEnabled =
     Config.getConfig().FEATURE.ENABLE_CELLS && activeConversation?.cellsState() !== CONVERSATION_CELLS_STATE.DISABLED;
+  const isCellsUploadEnabled = isCellsEnabled && isCellsEnabledForTeam;
   const isSharedDriveDirectUploadFeatureEnabled = isFeatureToggleEnabled(sharedDriveDirectUploadFeatureToggleName);
-  const isFileDropAllowed = isConversationFileDropAllowed({
-    conversationTeamId: activeConversation?.teamId,
-    selfUserTeamId: activeConversation?.selfUser()?.teamId,
-    isCellsEnabled,
-  });
+  const isFileDropAllowed =
+    isConversationFileDropAllowed({
+      conversationTeamId: activeConversation?.teamId,
+      selfUserTeamId: activeConversation?.selfUser()?.teamId,
+      isCellsEnabled,
+    }) &&
+    (!isCellsEnabled || isCellsUploadEnabled);
 
   useEffect(() => {
     if (!isFileTabActive && isSharedDriveSearchViewOpen) {
@@ -782,7 +786,7 @@ function ConversationContent({
                         onCloseSearchView={() => {
                           return setIsSharedDriveSearchViewOpen(false);
                         }}
-                        isUploadFilesEnabled={isSharedDriveDirectUploadFeatureEnabled}
+                        isUploadFilesEnabled={isSharedDriveDirectUploadFeatureEnabled && isCellsUploadEnabled}
                         showViewerPermission={showViewerPermission}
                       />
                     </SharedDriveUploadProvider>
@@ -862,6 +866,7 @@ function ConversationContent({
                     teamState={teamState}
                     selfUser={selfUser}
                     isCellsEnabled={isCellsEnabled}
+                    isCellsUploadEnabled={isCellsUploadEnabled}
                     onShiftTab={() => {
                       return setMsgElementsFocusable(false);
                     }}
