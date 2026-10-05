@@ -18,7 +18,7 @@
  */
 
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
-import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
+import {TimeInMillis} from '@wireapp/commons/lib/util/timeUtil';
 import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
 import {noop} from 'noop-esm';
 

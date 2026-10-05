@@ -20,7 +20,7 @@
 import {isUndefined} from '@sindresorhus/is';
 import {MessageSendingStatus, QualifiedOTRRecipients, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId, QualifiedUserPreKeyBundleMap} from '@wireapp/api-client/lib/user';
-import {uuidToBytes} from '@wireapp/commons/lib/util/StringUtil';
+import {uuidToBytes} from '@wireapp/commons/lib/util/stringUtil';
 import {proteus as ProtobufOTR} from '@wireapp/protocol-messaging/web/otr';
 import {AxiosError} from 'axios';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';

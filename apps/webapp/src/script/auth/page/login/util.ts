@@ -21,7 +21,7 @@ import {isNonEmptyString, isNullOrUndefined, isString} from '@sindresorhus/is';
 import {DomainRedirect} from '@wireapp/api-client/lib/account/domainRedirect';
 import {ClientType} from '@wireapp/api-client/lib/client';
 import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http';
-import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
+import {pathWithParams} from '@wireapp/commons/lib/util/urlUtil';
 import {noop} from 'noop-esm';
 import {Dispatch, UnknownAction} from 'redux';
 import {match, P} from 'ts-pattern';

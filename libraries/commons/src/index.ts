@@ -17,8 +17,8 @@
  *
  */
 
-export * as CommonConfig from './config/CommonConfig';
+export * as CommonConfig from './config/commonConfig';
 
-export * from './LogFactory';
+export * from './logFactory';
 export * from './util/';
-export * from './TypedEventEmitter';
+export * from './typedEventEmitter';

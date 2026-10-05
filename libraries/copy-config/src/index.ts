@@ -17,5 +17,5 @@
  *
  */
 
-export * from './CopyConfig';
-export * from './CopyConfigOptions';
+export * from './copyConfig';
+export * from './copyConfigOptions';

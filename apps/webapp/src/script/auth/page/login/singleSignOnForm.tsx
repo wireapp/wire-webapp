@@ -22,7 +22,7 @@ import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {isError, isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import {ClientType} from '@wireapp/api-client/lib/client/index';
 import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
-import {isValidEmail, PATTERN} from '@wireapp/commons/lib/util/ValidationUtil';
+import {isValidEmail, PATTERN} from '@wireapp/commons/lib/util/validationUtil';
 import {FormattedMessage} from 'react-intl';
 import {connect, useDispatch} from 'react-redux';
 import {Navigate, useNavigate} from 'react-router';

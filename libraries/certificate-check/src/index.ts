@@ -17,5 +17,5 @@
  *
  */
 
-export * from './CertUtil';
+export * from './certUtil';
 export * from './pinningData';

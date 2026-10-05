@@ -17,14 +17,14 @@
  *
  */
 
-export * as AccentColor from './AccentColor';
-export * as ArrayUtil from './ArrayUtil';
-export * as DateUtil from './DateUtil';
-export * as RandomUtil from './RandomUtil';
-export * as StringUtil from './StringUtil';
-export * as TimeUtil from './TimeUtil';
-export * as TypeUtil from './TypeUtil';
-export * as UrlUtil from './UrlUtil';
-export * as ValidationUtil from './ValidationUtil';
+export * as AccentColor from './accentColor';
+export * as ArrayUtil from './arrayUtil';
+export * as DateUtil from './dateUtil';
+export * as RandomUtil from './randomUtil';
+export * as StringUtil from './stringUtil';
+export * as TimeUtil from './timeUtil';
+export * as TypeUtil from './typeUtil';
+export * as UrlUtil from './urlUtil';
+export * as ValidationUtil from './validationUtil';
 
-export * from './Runtime';
+export * from './runtime';

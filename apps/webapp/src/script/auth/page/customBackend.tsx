@@ -18,7 +18,7 @@
  */
 
 import {isNonEmptyString} from '@sindresorhus/is';
-import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
+import {pathWithParams} from '@wireapp/commons/lib/util/urlUtil';
 import {useSelector} from 'react-redux';
 import {useNavigate} from 'react-router';
 

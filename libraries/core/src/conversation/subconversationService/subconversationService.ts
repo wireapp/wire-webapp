@@ -20,7 +20,7 @@
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {SUBCONVERSATION_ID, Subconversation} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
+import {TimeInMillis} from '@wireapp/commons/lib/util/timeUtil';
 
 import {APIClient} from '@wireapp/api-client';
 import {LogFactory, TypedEventEmitter} from '@wireapp/commons';

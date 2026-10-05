@@ -17,9 +17,9 @@
  *
  */
 
-export {LowDiskSpaceError} from './LowDiskSpaceError';
-export {PathValidationError} from './PathValidationError';
-export {RecordAlreadyExistsError} from './RecordAlreadyExistsError';
-export {RecordNotFoundError} from './RecordNotFoundError';
-export {RecordTypeError} from './RecordTypeError';
-export {UnsupportedError} from './UnsupportedError';
+export {LowDiskSpaceError} from './lowDiskSpaceError';
+export {PathValidationError} from './pathValidationError';
+export {RecordAlreadyExistsError} from './recordAlreadyExistsError';
+export {RecordNotFoundError} from './recordNotFoundError';
+export {RecordTypeError} from './recordTypeError';
+export {UnsupportedError} from './unsupportedError';

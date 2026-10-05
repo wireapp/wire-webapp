@@ -44,7 +44,7 @@ import {WebSocketClient} from '@wireapp/api-client/lib/tcp';
 import {type WebSocketReconnectContext, WEBSOCKET_STATE} from '@wireapp/api-client/lib/tcp/reconnectingWebsocket';
 import {FEATURE_KEY, FEATURE_STATUS} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
+import {TimeInMillis} from '@wireapp/commons/lib/util/timeUtil';
 import {once} from 'lodash';
 import logdown from 'logdown';
 import {asyncNoop, noop} from 'noop-esm';

@@ -17,9 +17,9 @@
  *
  */
 
-export * from './Converter';
-export * from './DecodedData';
-export * from './Decoder';
-export * from './EncodedData';
-export * from './Encoder';
-export * from './UnsupportedInputError';
+export * from './converter';
+export * from './decodedData';
+export * from './decoder';
+export * from './encodedData';
+export * from './encoder';
+export * from './unsupportedInputError';

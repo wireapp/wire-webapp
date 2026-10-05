@@ -17,4 +17,4 @@
  *
  */
 
-export * from './LicenseCollector';
+export * from './licenseCollector';

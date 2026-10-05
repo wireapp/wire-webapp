@@ -24,7 +24,7 @@ import {
   ConversationMLSWelcomeEvent,
 } from '@wireapp/api-client/lib/event';
 import {BackendError, BackendErrorLabel, StatusCode} from '@wireapp/api-client/lib/http';
-import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
+import {TimeInMillis} from '@wireapp/commons/lib/util/timeUtil';
 
 import {randomUUID} from 'crypto';
 import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';

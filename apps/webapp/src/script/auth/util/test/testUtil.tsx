@@ -23,7 +23,7 @@ import {render} from '@testing-library/react';
 import {CONVERSATION_TYPE, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {RecursivePartial} from '@wireapp/commons/lib/util/TypeUtil';
+import {RecursivePartial} from '@wireapp/commons/lib/util/typeUtil';
 import ko from 'knockout';
 import {IntlProvider} from 'react-intl';
 import {Provider} from 'react-redux';

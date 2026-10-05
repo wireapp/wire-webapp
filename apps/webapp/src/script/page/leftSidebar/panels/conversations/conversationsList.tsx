@@ -30,7 +30,7 @@ import React, {
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {useVirtualizer} from '@tanstack/react-virtual';
-import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
+import {TimeInMillis} from '@wireapp/commons/lib/util/timeUtil';
 import {useDebouncedCallback} from 'use-debounce';
 
 import {WIDTH} from '@wireapp/react-ui-kit';

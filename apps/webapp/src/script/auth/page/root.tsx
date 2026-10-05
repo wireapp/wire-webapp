@@ -22,7 +22,7 @@ import {FC, ReactNode, useEffect, useMemo} from 'react';
 import type {Clock} from '@enormora/clock/clock';
 import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isNonEmptyString} from '@sindresorhus/is';
-import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
+import {pathWithParams} from '@wireapp/commons/lib/util/urlUtil';
 import {IntlProvider} from 'react-intl';
 import {connect} from 'react-redux';
 import {HashRouter as Router, Navigate, Route, Routes} from 'react-router';

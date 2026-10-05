@@ -41,7 +41,7 @@ import {readFileSync, writeJSON} from 'fs-extra';
 
 import path from 'path';
 
-import {LicenseCollector} from './LicenseCollector';
+import {LicenseCollector} from './licenseCollector';
 
 const repositories = readFileSync('repositories.txt', 'utf8').split('\n').filter(Boolean);
 

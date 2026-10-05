@@ -18,7 +18,7 @@
  */
 
 import {isUndefined} from '@sindresorhus/is';
-import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
+import {TimeInMillis} from '@wireapp/commons/lib/util/timeUtil';
 
 import {getLogger} from 'Util/logger';
 

@@ -17,6 +17,6 @@
  *
  */
 
-export * from './ExpiredBundle';
-export * from './TransientBundle';
-export * from './TransientStore';
+export * from './expiredBundle';
+export * from './transientBundle';
+export * from './transientStore';

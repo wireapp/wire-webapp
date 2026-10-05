@@ -17,7 +17,7 @@
  *
  */
 
-import {chunk} from '@wireapp/commons/lib/util/ArrayUtil';
+import {chunk} from '@wireapp/commons/lib/util/arrayUtil';
 import {proteus as ProtobufOTR} from '@wireapp/protocol-messaging/web/otr';
 import {AxiosRequestConfig, isAxiosError} from 'axios';
 

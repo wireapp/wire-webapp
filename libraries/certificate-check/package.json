@@ -10,7 +10,7 @@
   "files": [
     "lib"
   ],
-  "main": "lib/CertUtil",
+  "main": "lib/certUtil",
   "types": "lib/CertUtil.d.ts",
   "dependencies": {
     "jsrsasign": "11.1.5"

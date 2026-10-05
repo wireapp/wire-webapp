@@ -20,7 +20,7 @@
 import {VerificationActionType} from '@wireapp/api-client/lib/auth/verificationActionType';
 import {ClientType} from '@wireapp/api-client/lib/client/';
 import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http/';
-import {RecursivePartial} from '@wireapp/commons/lib/util/TypeUtil';
+import {RecursivePartial} from '@wireapp/commons/lib/util/typeUtil';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import type {APIClient} from '@wireapp/api-client';

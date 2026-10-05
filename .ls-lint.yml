@@ -3779,3 +3779,265 @@ ls:
   apps/webapp/test/unitTests/viewModel:
     .dir: camelCase
     .js: camelCase
+
+  libraries/bazinga64/src:
+    .dir: camelCase
+    .json: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+
+  libraries/bazinga64/jest.config.js:
+    .config.js: camelCase
+
+  libraries/bazinga64/package.json:
+    .json: camelCase
+
+  libraries/bazinga64/project.json:
+    .json: camelCase
+
+  libraries/bazinga64/tsconfig.json:
+    .json: camelCase
+
+  libraries/bazinga64/tsconfig.type-check.json:
+    .type-check.json: camelCase
+
+  libraries/certificate-check/src:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+
+  libraries/certificate-check/spec:
+    .dir: camelCase
+
+  libraries/certificate-check/spec/helpers:
+    .der: camelCase
+    .dir: camelCase
+    .pem: camelCase
+
+  libraries/certificate-check/jest.config.js:
+    .config.js: camelCase
+
+  libraries/certificate-check/package.json:
+    .json: camelCase
+
+  libraries/certificate-check/project.json:
+    .json: camelCase
+
+  libraries/certificate-check/tsconfig.json:
+    .json: camelCase
+
+  libraries/certificate-check/tsconfig.type-check.json:
+    .type-check.json: camelCase
+
+  libraries/commons/src:
+    .dir: camelCase
+    .js: camelCase
+    .mock.ts: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+
+  libraries/commons/jest.config.js:
+    .config.js: camelCase
+
+  libraries/commons/package.json:
+    .json: camelCase
+
+  libraries/commons/project.json:
+    .json: camelCase
+
+  libraries/commons/tsconfig.json:
+    .json: camelCase
+
+  libraries/commons/tsconfig.type-check.json:
+    .type-check.json: camelCase
+
+  libraries/config/jest.config.js:
+    .config.js: camelCase
+
+  libraries/config/package.json:
+    .json: camelCase
+
+  libraries/config/project.json:
+    .json: camelCase
+
+  libraries/config/tsconfig.json:
+    .json: camelCase
+
+  libraries/config/tsconfig.type-check.json:
+    .type-check.json: camelCase
+
+  libraries/copy-config/src:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+
+  libraries/copy-config/spec:
+    .dir: camelCase
+
+  libraries/copy-config/spec/helpers:
+    .dir: camelCase
+    .txt: camelCase
+
+  libraries/copy-config/jest.config.js:
+    .config.js: camelCase
+
+  libraries/copy-config/package.json:
+    .json: camelCase
+
+  libraries/copy-config/project.json:
+    .json: camelCase
+
+  libraries/copy-config/tsconfig.json:
+    .json: camelCase
+
+  libraries/copy-config/tsconfig.type-check.json:
+    .type-check.json: camelCase
+
+  libraries/license-collector/src:
+    .dir: camelCase
+    .ts: camelCase
+
+  libraries/license-collector/filter.txt:
+    .txt: camelCase
+
+  libraries/license-collector/jest.config.js:
+    .config.js: camelCase
+
+  libraries/license-collector/package.json:
+    .json: camelCase
+
+  libraries/license-collector/project.json:
+    .json: camelCase
+
+  libraries/license-collector/repositories.txt:
+    .txt: camelCase
+
+  libraries/license-collector/tsconfig.json:
+    .json: camelCase
+
+  libraries/prettier-config/index.json:
+    .json: camelCase
+
+  libraries/prettier-config/package.json:
+    .json: camelCase
+
+  libraries/prettier-config/project.json:
+    .json: camelCase
+
+  libraries/priority-queue/src:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+
+  libraries/priority-queue/jest.config.js:
+    .config.js: camelCase
+
+  libraries/priority-queue/package.json:
+    .json: camelCase
+
+  libraries/priority-queue/project.json:
+    .json: camelCase
+
+  libraries/priority-queue/tsconfig.json:
+    .json: camelCase
+
+  libraries/priority-queue/tsconfig.type-check.json:
+    .type-check.json: camelCase
+
+  libraries/store-engine-dexie/src:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+
+  libraries/store-engine-dexie/jest.config.js:
+    .config.js: camelCase
+
+  libraries/store-engine-dexie/jest.setup.js:
+    .setup.js: camelCase
+
+  libraries/store-engine-dexie/package.json:
+    .json: camelCase
+
+  libraries/store-engine-dexie/project.json:
+    .json: camelCase
+
+  libraries/store-engine-dexie/tsconfig.json:
+    .json: camelCase
+
+  libraries/store-engine-dexie/tsconfig.type-check.json:
+    .type-check.json: camelCase
+
+  libraries/store-engine-fs/src:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+
+  libraries/store-engine-fs/jest.config.js:
+    .config.js: camelCase
+
+  libraries/store-engine-fs/package.json:
+    .json: camelCase
+
+  libraries/store-engine-fs/project.json:
+    .json: camelCase
+
+  libraries/store-engine-fs/tsconfig.json:
+    .json: camelCase
+
+  libraries/store-engine-fs/tsconfig.type-check.json:
+    .type-check.json: camelCase
+
+  libraries/store-engine/src:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+
+  libraries/store-engine/jest.config.js:
+    .config.js: camelCase
+
+  libraries/store-engine/package.json:
+    .json: camelCase
+
+  libraries/store-engine/project.json:
+    .json: camelCase
+
+  libraries/store-engine/tsconfig.json:
+    .json: camelCase
+
+  libraries/telemetry/src:
+    .dir: camelCase
+    .ts: camelCase
+
+  libraries/telemetry/adr:
+    .dir: camelCase
+
+  libraries/telemetry/jest.config.js:
+    .config.js: camelCase
+
+  libraries/telemetry/package.json:
+    .json: camelCase
+
+  libraries/telemetry/project.json:
+    .json: camelCase
+
+  libraries/telemetry/tsconfig.json:
+    .json: camelCase
+
+  libraries/telemetry/vite.config.js:
+    .config.js: camelCase
+
+  libraries/webapp-events/src:
+    .dir: camelCase
+    .ts: camelCase
+
+  libraries/webapp-events/jest.config.js:
+    .config.js: camelCase
+
+  libraries/webapp-events/package.json:
+    .json: camelCase
+
+  libraries/webapp-events/project.json:
+    .json: camelCase
+
+  libraries/webapp-events/tsconfig.json:
+    .json: camelCase

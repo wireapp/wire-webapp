@@ -17,5 +17,5 @@
  *
  */
 
-export * from './CRUDEngine';
-export * from './MemoryEngine';
+export * from './crudEngine';
+export * from './memoryEngine';

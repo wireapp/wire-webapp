@@ -17,6 +17,6 @@
  *
  */
 
-export * from './Item';
-export * from './Priority';
-export * from './PriorityQueue';
+export * from './item';
+export * from './priority';
+export * from './priorityQueue';

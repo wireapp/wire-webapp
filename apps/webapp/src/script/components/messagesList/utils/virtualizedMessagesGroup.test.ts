@@ -17,7 +17,7 @@
  *
  */
 
-import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
+import {TimeInMillis} from '@wireapp/commons/lib/util/timeUtil';
 
 import {EventMapper} from 'Repositories/conversation/eventMapper';
 import {Conversation} from 'Repositories/entity/conversation';

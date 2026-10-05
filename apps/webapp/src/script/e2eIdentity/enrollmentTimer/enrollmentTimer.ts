@@ -19,8 +19,8 @@
 
 import type {Clock} from '@enormora/clock/clock';
 import {isUndefined} from '@sindresorhus/is';
-import {randomInt} from '@wireapp/commons/lib/util/RandomUtil';
-import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
+import {randomInt} from '@wireapp/commons/lib/util/randomUtil';
+import {TimeInMillis} from '@wireapp/commons/lib/util/timeUtil';
 import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
 
 import {MLSStatuses, WireIdentity} from '../e2eIdentityVerification';

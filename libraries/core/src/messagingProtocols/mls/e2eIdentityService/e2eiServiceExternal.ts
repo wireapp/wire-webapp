@@ -18,7 +18,7 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
+import {TimeInMillis} from '@wireapp/commons/lib/util/timeUtil';
 import {Decoder} from 'bazinga64';
 
 import {TypedEventEmitter} from '@wireapp/commons';
