@@ -163,7 +163,7 @@ test.describe('Drive file uploads', () => {
       });
 
       await test.step('File is not uploaded to the Shared Drive root or sent as a message', async () => {
-        await sharedDrive.openRoot();
+        await sharedDrive.openRoot(conversationName);
         await expect(async () => {
           await sharedDrive.refresh();
           await expect(sharedDrive.getFile(TextFileName)).toHaveCount(0);

@@ -63,8 +63,8 @@ export class CellsSharedDrivePage {
     await this.getFolder(folderName).click();
   }
 
-  async openRoot() {
-    await this.page.locator('ol').getByRole('button').first().click();
+  async openRoot(conversationName: string) {
+    await this.page.getByRole('button', {name: `${conversationName} files`, exact: true}).click();
   }
 
   async uploadFile(filePath: string | readonly string[]) {
