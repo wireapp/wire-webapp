@@ -1439,7 +1439,7 @@ export class CallingRepository {
        * Further info: https://wearezeta.atlassian.net/browse/SQCALL-551
        */
       if (media !== undefined) {
-        this.setMute(!media.microphoneEnabled);
+        this.applyChosenMicrophone(call, media.microphoneEnabled);
       } else {
         this.wCall?.setMute(this.wUser, 0);
       }
@@ -1858,7 +1858,7 @@ export class CallingRepository {
         return;
       }
       if (media !== undefined) {
-        this.setMute(!media.microphoneEnabled);
+        this.applyChosenMicrophone(call, media.microphoneEnabled);
       } else {
         this.setMute(call.muteState() !== MuteState.NOT_MUTED);
       }
@@ -2217,6 +2217,12 @@ export class CallingRepository {
   setMute(shouldMute: boolean, reason: MuteState = MuteState.SELF_MUTED): void {
     this.nextMuteState = reason;
     this.wCall?.setMute(this.wUser, shouldMute ? 1 : 0);
+  }
+
+  /** AVS reports mute only after the call is active, so the button state is stored here. */
+  private applyChosenMicrophone(call: Call, microphoneEnabled: boolean): void {
+    this.setMute(!microphoneEnabled);
+    call.muteState(microphoneEnabled ? MuteState.NOT_MUTED : MuteState.SELF_MUTED);
   }
 
   private readonly setAvsVersion = (version: number) => {
