@@ -25,10 +25,10 @@ import {isError, isNonEmptyStringAndNotWhitespace, isString} from '@sindresorhus
 import {Command, CommanderError} from 'commander';
 import {Result} from 'true-myth';
 
-import {ensureProductionGitHubRelease} from '../release-appearance/ensureProductionGitHubRelease.ts';
-import {createGitHubReleaseClient} from '../release-appearance/githubReleaseClient.ts';
-import type {ProductionGitHubReleaseHandoff} from '../release-appearance/ensureProductionGitHubRelease.ts';
-import {createRuntimeKyHttpClient} from '../release-appearance/httpClient.ts';
+import {ensureProductionGitHubRelease} from '../releaseAppearance/ensureProductionGitHubRelease.ts';
+import {createGitHubReleaseClient} from '../releaseAppearance/githubReleaseClient.ts';
+import type {ProductionGitHubReleaseHandoff} from '../releaseAppearance/ensureProductionGitHubRelease.ts';
+import {createRuntimeKyHttpClient} from '../releaseAppearance/httpClient.ts';
 
 type CreateEnsureProductionGitHubReleaseCommandOptions = {
   readonly executeCommand: (productionTagName: string) => Promise<void> | void;

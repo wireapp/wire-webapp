@@ -78,7 +78,7 @@ jobs:
           cache: 'yarn'
 
       - name: Verify sparse runtime validation entry point
-        run: bash ./tools/runtime-verification/verifySparseRuntimeValidation.sh
+        run: bash ./tools/runtimeVerification/verifySparseRuntimeValidation.sh
 
       - name: Install dependencies
         run: ./bin/yarn --immutable
@@ -90,7 +90,7 @@ jobs:
           printf '%s\n' '[]' > "${published_charts_path}"
 
           helm_action="$(
-            ./tools/production-distribution/run-production-distribution-cli.sh \
+            ./tools/productionDistribution/runProductionDistributionCli.sh \
               select-helm-chart \
               --charts-path "${published_charts_path}" \
               --image-tag "dev-test-image"
@@ -289,7 +289,7 @@ jobs:
         run: ./bin/yarn --immutable
 
       - name: Test
-        run: ./tools/ci/run-with-network-isolation.sh ./bin/yarn nx run-many -t test --all --configuration=ci --detectOpenHandles=false
+        run: ./tools/ci/runWithNetworkIsolation.sh ./bin/yarn nx run-many -t test --all --configuration=ci --detectOpenHandles=false
 
       - name: Upload coverage reports
         if: always()
@@ -349,4 +349,4 @@ jobs:
           BUILD_ARTIFACT_PATH=apps/server/dist/s3/ebs.zip \
           EXPECTED_COMMIT="${WIRE_WEBAPP_BUILD_COMMIT}" \
           EXPECTED_VERSION="${expected_version}" \
-            node ./tools/build-artifact/validateBuildArtifact.mts
+            node ./tools/buildArtifact/validateBuildArtifact.mts

@@ -24,7 +24,7 @@
 # is greater than the published version it is used in place of the latest
 # published version.
 #
-# Usage: ./tools/helm-publication/chart-next-version.sh <prerelease|release>
+# Usage: ./tools/helmPublication/chartNextVersion.sh <prerelease|release>
 
 set -eo pipefail
 

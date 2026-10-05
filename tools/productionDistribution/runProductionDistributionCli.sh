@@ -9,5 +9,5 @@ cd "${repository_root}"
 "${repository_root}/bin/yarn" nx run config-lib:build >&2
 
 exec node \
-  "${repository_root}/tools/release-cli/productionDistributionCli.mts" \
+  "${repository_root}/tools/releaseCli/productionDistributionCli.mts" \
   "$@"

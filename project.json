@@ -5,7 +5,7 @@
     "docker": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "node ./tools/docker-publication/push_docker.js"
+        "command": "node ./tools/dockerPublication/pushDocker.js"
       }
     },
     "clean-jest": {
@@ -31,7 +31,7 @@
       "executor": "nx:run-commands",
       "dependsOn": [],
       "options": {
-        "command": "eslint --config eslint.config.mjs --max-warnings=0 tools/i18n tools/release-appearance 'tools/release-metadata/web*Version*.ts' tools/release-cli/webappVersionSynchronization.mts 'tools/**/*.test.ts'"
+        "command": "eslint --config eslint.config.mjs --max-warnings=0 tools/i18n tools/releaseAppearance 'tools/releaseMetadata/web*Version*.ts' tools/releaseCli/webappVersionSynchronization.mts 'tools/**/*.test.ts'"
       }
     },
     "e2e": {
@@ -43,7 +43,7 @@
     "type-check": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "tsc --project ./tsconfig.tools.json --noEmit && tsc --project ./tools/release-appearance/tsconfig.json --noEmit && tsc --project ./tsconfig.release-cli.json --noEmit"
+        "command": "tsc --project ./tsconfig.tools.json --noEmit && tsc --project ./tools/releaseAppearance/tsconfig.json --noEmit && tsc --project ./tsconfig.release-cli.json --noEmit"
       }
     }
   },

@@ -24,7 +24,7 @@ import {isUndefined} from '@sindresorhus/is';
 import {resolveWebAppVersionSynchronizationState} from './webappVersionSynchronization.ts';
 import {createWebAppVersionSynchronizationGitHubClient} from './webappVersionSynchronizationGitHubClient.ts';
 
-import type {HttpClient, HttpRequest} from '../release-appearance/httpClient.ts';
+import type {HttpClient, HttpRequest} from '../releaseAppearance/httpClient.ts';
 
 const githubToken = 'otto-secret-token';
 

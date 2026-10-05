@@ -546,7 +546,7 @@ The server build depends on:
         "rimraf {projectRoot}/dist",
         "nx run server:build",
         "nx run webapp:build:production",
-        "node tools/server-packaging/zip.js"
+        "node tools/serverPackaging/zip.js"
       ],
       "parallel": false
     }
@@ -558,7 +558,7 @@ The `server:package` command:
 1. Depends on `^build` (all upstream libraries)
 2. Runs `server:build` (which includes webapp:build as a dependency)
 3. Runs `webapp:build:production` explicitly for production assets
-4. Creates the deployment bundle via [`tools/server-packaging/zip.js`](../tools/server-packaging/zip.js)
+4. Creates the deployment bundle via [`tools/serverPackaging/zip.js`](../tools/serverPackaging/zip.js)
 
 ### Workspace Dependencies
 
@@ -739,7 +739,7 @@ graph TD
     E --> E3[generateVersionFile.js]
     E --> E4[copyServerAssets.js]
     C --> F[nx run webapp:build:production]
-    B --> G[node tools/server-packaging/zip.js]
+    B --> G[node tools/serverPackaging/zip.js]
     G --> G1[Modify package.json]
     G --> G2[Archive dist/]
     G --> G3[Archive .ebextensions/]
@@ -773,7 +773,7 @@ This command is defined in [`apps/server/project.json`](apps/server/project.json
         "rimraf {projectRoot}/dist",
         "nx run server:build",
         "nx run webapp:build:production",
-        "node tools/server-packaging/zip.js"
+        "node tools/serverPackaging/zip.js"
       ],
       "parallel": false
     }
@@ -785,7 +785,7 @@ The package command executes these steps sequentially:
 1. `rimraf {projectRoot}/dist` - Clean the dist directory
 2. `nx run server:build` - Build the server (which includes library builds)
 3. `nx run webapp:build:production` - Build the webapp for production
-4. `node tools/server-packaging/zip.js` - Create the deployment bundle
+4. `node tools/serverPackaging/zip.js` - Create the deployment bundle
 
 ### Workspace Dependency Pre-Bundling
 
@@ -821,7 +821,7 @@ This creates a self-contained deployment where all workspace dependencies are pr
 
 ### Version Resolution for Workspace Dependencies
 
-The [`tools/server-packaging/zip.js`](../tools/server-packaging/zip.js) script handles version resolution for workspace dependencies:
+The [`tools/serverPackaging/zip.js`](../tools/serverPackaging/zip.js) script handles version resolution for workspace dependencies:
 
 ```javascript
 // Read and modify package.json to handle workspace dependencies
@@ -854,7 +854,7 @@ This ensures that:
 
 ### Deployment Bundle Structure
 
-The [`tools/server-packaging/zip.js`](../tools/server-packaging/zip.js) script creates the `ebs.zip` file with the following structure:
+The [`tools/serverPackaging/zip.js`](../tools/serverPackaging/zip.js) script creates the `ebs.zip` file with the following structure:
 
 ```
 ebs.zip
@@ -1496,7 +1496,7 @@ From [`.github/workflows/ci.yml`](.github/workflows/ci.yml):
 
 ```yaml
 - name: Test
-  run: ./tools/ci/run-with-network-isolation.sh ./bin/yarn nx run-many -t test --all --configuration=ci --detectOpenHandles=false
+  run: ./tools/ci/runWithNetworkIsolation.sh ./bin/yarn nx run-many -t test --all --configuration=ci --detectOpenHandles=false
 
 - name: Upload coverage reports
   if: always()

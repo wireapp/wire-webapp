@@ -23,8 +23,8 @@ import {z} from 'zod';
 
 import type {WebAppVersionSynchronizationPullRequest} from './webappVersionSynchronization.ts';
 
-import {formatHttpRequestFailure, isHttpRequestFailure} from '../release-appearance/httpClient.ts';
-import type {HttpClient, HttpMethod, HttpRequest} from '../release-appearance/httpClient.ts';
+import {formatHttpRequestFailure, isHttpRequestFailure} from '../releaseAppearance/httpClient.ts';
+import type {HttpClient, HttpMethod, HttpRequest} from '../releaseAppearance/httpClient.ts';
 
 export type CreateWebAppVersionSynchronizationPullRequestOptions = {
   readonly title: string;

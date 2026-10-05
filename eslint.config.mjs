@@ -380,7 +380,7 @@ const productionConfigs = [
     },
   },
   {
-    files: ['**/*.{ts,tsx}', 'tools/release-cli/webappVersionSynchronization.mts'],
+    files: ['**/*.{ts,tsx}', 'tools/releaseCli/webappVersionSynchronization.mts'],
     languageOptions: {
       parser: tsParser,
       parserOptions: {
@@ -489,7 +489,7 @@ const productionConfigs = [
     },
   },
   {
-    files: ['tools/release-cli/**/*.mts'],
+    files: ['tools/releaseCli/**/*.mts'],
     languageOptions: {
       parserOptions: {
         project: './tsconfig.release-cli.json',
@@ -498,7 +498,7 @@ const productionConfigs = [
     },
   },
   {
-    files: ['tools/build-artifact/**/*.mts', 'tools/runtime-verification/**/*.mts'],
+    files: ['tools/buildArtifact/**/*.mts', 'tools/runtimeVerification/**/*.mts'],
     languageOptions: {
       parserOptions: {
         project: './tsconfig.tools.json',

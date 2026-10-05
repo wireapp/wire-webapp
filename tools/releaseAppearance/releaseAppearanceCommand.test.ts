@@ -1238,7 +1238,7 @@ describe('executeReleaseAppearanceCommand', () => {
 
 describe('native release appearance command entrypoint', () => {
   it('reports missing required arguments through the Commander entrypoint', async () => {
-    const commandProcess = spawn(process.execPath, ['tools/release-cli/releaseAppearanceCommand.mts', 'beta'], {
+    const commandProcess = spawn(process.execPath, ['tools/releaseCli/releaseAppearanceCommand.mts', 'beta'], {
       cwd: process.cwd(),
       env: process.env,
     });

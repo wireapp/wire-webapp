@@ -17,71 +17,119 @@
  *
  */
 
+import * as actionsCore from '@actions/core';
 import {isError, isString} from '@sindresorhus/is';
 import {Command, CommanderError} from 'commander';
 
 import process from 'node:process';
-import {appendFile} from 'node:fs/promises';
 import {execFile} from 'node:child_process';
 import {resolve} from 'node:path';
 import {promisify} from 'node:util';
 import {fileURLToPath} from 'node:url';
 
-import {createGitHubClient} from '../release-appearance/githubClient.ts';
-import {createRuntimeKyHttpClient} from '../release-appearance/httpClient.ts';
-import {executePreviewNextBetaCommand} from '../release-appearance/previewNextBetaCommand.ts';
-import {validateTargetMainCommit} from '../release-appearance/previewNextBetaCommand.ts';
-import type {PreviewNextBetaCommandDependencies} from '../release-appearance/previewNextBetaCommand.ts';
-import {planNextBetaPreviewHistory} from '../release-appearance/releaseHistory.ts';
-import {readCommandEnvironment, redactSecret} from '../release-appearance/releaseAppearanceCommand.ts';
-import type {CommandEnvironment} from '../release-appearance/releaseAppearanceCommand.ts';
+import {createDefaultGitHubActionsProgressReporter} from '../releaseAppearance/githubActionsProgressReporter.ts';
+import {createGitHubClient} from '../releaseAppearance/githubClient.ts';
+import {createRuntimeKyHttpClient} from '../releaseAppearance/httpClient.ts';
+import {
+  createBetaCommand,
+  createProductionCommand,
+  executeReleaseAppearanceCommand,
+  readCommandEnvironment,
+  redactSecret,
+} from '../releaseAppearance/releaseAppearanceCommand.ts';
+import type {
+  CommandEnvironment,
+  ExecutionMode,
+  ParsedCommand,
+  ReleaseAppearanceCommandDependencies,
+} from '../releaseAppearance/releaseAppearanceCommand.ts';
 
-type CreatePreviewNextBetaCommandOptions = {
-  readonly executeCommand: (targetMainCommit: string) => Promise<number> | number;
+type CreateReleaseAppearanceCommandOptions = {
+  readonly executeCommand: (command: ParsedCommand) => Promise<number> | number;
   readonly writeOutput: (message: string) => void;
   readonly writeError: (message: string) => void;
 };
 
+type ReleaseAppearanceOptionValues = {
+  readonly dryRun: boolean;
+};
+
 const executeFile = promisify(execFile);
 
-export function createCommand(createCommandOptions: CreatePreviewNextBetaCommandOptions): Command {
+export function createCommand(createCommandOptions: CreateReleaseAppearanceCommandOptions): Command {
   const command = new Command()
-    .name('previewNextBetaCommand')
-    .description('Preview changes waiting for the next Beta release.')
-    .argument('<target-main-commit-sha>')
+    .name('releaseAppearanceCommand')
+    .description('Create or preview release-appearance comments.')
     .configureOutput({
       writeOut: createCommandOptions.writeOutput,
       writeErr: createCommandOptions.writeError,
     })
-    .exitOverride()
-    .action(async (targetMainCommit: string) => {
-      const targetMainCommitResult = validateTargetMainCommit(targetMainCommit);
-      if (targetMainCommitResult.isErr) {
-        throw targetMainCommitResult.error;
+    .exitOverride();
+
+  command
+    .command('beta')
+    .argument('<beta-tag>')
+    .argument('<release-commit-sha>')
+    .option('--dry-run', 'run without writing changes', false)
+    .action(async (betaTag: string, releaseCommit: string, optionValues: ReleaseAppearanceOptionValues) => {
+      const parsedCommandResult = createBetaCommand({
+        betaTag,
+        releaseCommit,
+        executionMode: getExecutionMode(optionValues),
+      });
+      if (parsedCommandResult.isErr) {
+        throw parsedCommandResult.error;
       }
 
-      await createCommandOptions.executeCommand(targetMainCommit);
+      await createCommandOptions.executeCommand(parsedCommandResult.value);
     });
+
+  command
+    .command('production')
+    .argument('<production-tag>')
+    .argument('<release-commit-sha>')
+    .argument('<promoted-beta-tag>')
+    .option('--dry-run', 'run without writing changes', false)
+    .action(
+      async (
+        productionTag: string,
+        releaseCommit: string,
+        promotedBetaTag: string,
+        optionValues: ReleaseAppearanceOptionValues,
+      ) => {
+        const parsedCommandResult = createProductionCommand({
+          productionTag,
+          releaseCommit,
+          promotedBetaTag,
+          executionMode: getExecutionMode(optionValues),
+        });
+        if (parsedCommandResult.isErr) {
+          throw parsedCommandResult.error;
+        }
+
+        await createCommandOptions.executeCommand(parsedCommandResult.value);
+      },
+    );
 
   return command;
 }
 
-export async function runPreviewNextBetaCommand(
+export async function runReleaseAppearanceCommand(
   commandLineArguments: readonly string[],
-  createCommandOptions: CreatePreviewNextBetaCommandOptions,
+  createCommandOptions: CreateReleaseAppearanceCommandOptions,
 ): Promise<number> {
   let executionExitCode = 0;
   const command = createCommand({
     ...createCommandOptions,
-    async executeCommand(targetMainCommit: string): Promise<number> {
-      executionExitCode = await createCommandOptions.executeCommand(targetMainCommit);
+    async executeCommand(applicationCommand: ParsedCommand): Promise<number> {
+      executionExitCode = await createCommandOptions.executeCommand(applicationCommand);
 
       return executionExitCode;
     },
   });
 
   try {
-    await command.parseAsync(['node', 'previewNextBetaCommand', ...commandLineArguments]);
+    await command.parseAsync(['node', 'releaseAppearanceCommand', ...commandLineArguments]);
 
     return executionExitCode;
   } catch (error: unknown) {
@@ -91,6 +139,10 @@ export async function runPreviewNextBetaCommand(
 
     throw error;
   }
+}
+
+function getExecutionMode(optionValues: ReleaseAppearanceOptionValues): ExecutionMode {
+  return optionValues.dryRun === true ? 'dry-run' : 'write';
 }
 
 async function executeRuntimeGitCommand(commandArguments: readonly string[]): Promise<string> {
@@ -119,8 +171,13 @@ function writeRuntimeInformation(message: string): Promise<void> {
   return Promise.resolve();
 }
 
-function createRuntimeDependencies(commandEnvironment: CommandEnvironment): PreviewNextBetaCommandDependencies {
-  const httpClient = createRuntimeKyHttpClient({reportRateLimitWait: writeRuntimeOutput});
+function readMonotonicTime(): number {
+  return performance.now();
+}
+
+function createRuntimeDependencies(commandEnvironment: CommandEnvironment): ReleaseAppearanceCommandDependencies {
+  actionsCore.setSecret(commandEnvironment.githubToken);
+  const httpClient = createRuntimeKyHttpClient({reportRateLimitWait: actionsCore.info});
   const githubClient = createGitHubClient({
     httpClient,
     githubApiUrl: commandEnvironment.githubApiUrl,
@@ -131,23 +188,24 @@ function createRuntimeDependencies(commandEnvironment: CommandEnvironment): Prev
   return {
     executeGitCommand: executeRuntimeGitCommand,
     githubClient,
-    planNextBetaPreviewHistory,
+    now: readMonotonicTime,
+    progressReporter: createDefaultGitHubActionsProgressReporter(),
     writeFailure: writeRuntimeFailure,
     writeInformation: writeRuntimeInformation,
     async writeSummary(summary): Promise<void> {
-      await appendFile(commandEnvironment.githubStepSummary, `${summary}\n`, 'utf8');
+      await actionsCore.summary.addRaw(`${summary}\n`).write();
     },
   };
 }
 
-async function executeRuntimeCommand(targetMainCommit: string): Promise<number> {
+async function executeRuntimeCommand(command: ParsedCommand): Promise<number> {
   const commandEnvironmentResult = readCommandEnvironment(process.env);
   if (commandEnvironmentResult.isErr) {
     throw commandEnvironmentResult.error;
   }
 
-  const commandResult = await executePreviewNextBetaCommand({
-    targetMainCommit,
+  const commandResult = await executeReleaseAppearanceCommand({
+    command,
     environment: process.env,
     dependencies: createRuntimeDependencies(commandEnvironmentResult.value),
   });
@@ -157,7 +215,7 @@ async function executeRuntimeCommand(targetMainCommit: string): Promise<number> 
 
 async function main(): Promise<void> {
   const runtimeArgumentPrefixLength = 2;
-  process.exitCode = await runPreviewNextBetaCommand(process.argv.slice(runtimeArgumentPrefixLength), {
+  process.exitCode = await runReleaseAppearanceCommand(process.argv.slice(runtimeArgumentPrefixLength), {
     executeCommand: executeRuntimeCommand,
     writeError: writeRuntimeError,
     writeOutput: writeRuntimeOutput,

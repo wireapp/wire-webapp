@@ -24,32 +24,32 @@ import {resolve} from 'node:path';
 import process from 'node:process';
 import {fileURLToPath} from 'node:url';
 
-import {createRuntimeKyHttpClient} from '../release-appearance/httpClient.ts';
+import {createRuntimeKyHttpClient} from '../releaseAppearance/httpClient.ts';
 import {
   createWebAppVersionSynchronizationInspectionOutput,
   createWebAppVersionSynchronizationResultOutput,
   serializeWebAppVersionSynchronizationOutput,
-} from '../release-metadata/webappVersionSynchronizationCli.ts';
+} from '../releaseMetadata/webappVersionSynchronizationCli.ts';
 import {
   createRuntimeWebAppVersionSynchronizationFileSystem,
   createSimpleGitWebAppVersionSynchronizationClient,
-} from '../release-metadata/webappVersionSynchronizationGit.ts';
-import {createWebAppVersionSynchronizationGitHubClient} from '../release-metadata/webappVersionSynchronizationGitHubClient.ts';
-import type {WebAppVersionSynchronizationGitHubClient} from '../release-metadata/webappVersionSynchronizationGitHubClient.ts';
+} from '../releaseMetadata/webappVersionSynchronizationGit.ts';
+import {createWebAppVersionSynchronizationGitHubClient} from '../releaseMetadata/webappVersionSynchronizationGitHubClient.ts';
+import type {WebAppVersionSynchronizationGitHubClient} from '../releaseMetadata/webappVersionSynchronizationGitHubClient.ts';
 import type {
   InspectWebAppVersionSynchronizationOptions,
   SynchronizeWebAppVersionOptions,
-} from '../release-metadata/webappVersionSynchronizationOrchestration.ts';
+} from '../releaseMetadata/webappVersionSynchronizationOrchestration.ts';
 import {
   inspectWebAppVersionSynchronization,
   synchronizeWebAppVersion,
-} from '../release-metadata/webappVersionSynchronizationOrchestration.ts';
-import {validateWebAppVersionSynchronizationPreflight} from '../release-metadata/webappVersionSynchronizationPreflight.ts';
+} from '../releaseMetadata/webappVersionSynchronizationOrchestration.ts';
+import {validateWebAppVersionSynchronizationPreflight} from '../releaseMetadata/webappVersionSynchronizationPreflight.ts';
 import {
   readInspectionRuntimeEnvironment,
   readSynchronizationRuntimeEnvironment,
-} from '../release-metadata/webappVersionSynchronizationRuntime.ts';
-import type {WebAppVersionSynchronizationSynchronizationRuntimeEnvironment} from '../release-metadata/webappVersionSynchronizationRuntime.ts';
+} from '../releaseMetadata/webappVersionSynchronizationRuntime.ts';
+import type {WebAppVersionSynchronizationSynchronizationRuntimeEnvironment} from '../releaseMetadata/webappVersionSynchronizationRuntime.ts';
 
 type InspectCommand = {
   readonly kind: 'inspect';

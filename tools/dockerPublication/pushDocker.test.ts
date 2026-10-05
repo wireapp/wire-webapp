@@ -27,7 +27,7 @@ const {
   runDockerPublication,
   runProcess,
   selectReleaseCommit,
-} = require('./push_docker');
+} = require('./pushDocker');
 
 type ProcessEvent =
   | {
@@ -42,7 +42,7 @@ type ProcessEvent =
       fileContents: string;
     };
 
-describe('push_docker metadata', () => {
+describe('pushDocker metadata', () => {
   it('prefers the explicit release environment over the caller SHA and argument', () => {
     const actualReleaseCommitSha = selectReleaseCommit({
       releaseCommitSha: 'release-commit-sha',

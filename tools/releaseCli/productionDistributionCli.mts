@@ -29,7 +29,7 @@ import {
   executeProductionDistributionCommand,
   type ProductionDistributionCommand,
   type ProductionDistributionCommandDependencies,
-} from '../production-distribution/productionDistributionCli.ts';
+} from '../productionDistribution/productionDistributionCli.ts';
 
 type CreateProductionDistributionCommandOptions = {
   readonly executeCommand: (command: ProductionDistributionCommand) => Promise<number> | number;

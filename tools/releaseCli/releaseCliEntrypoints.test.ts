@@ -35,17 +35,17 @@ type WriteJsonFileOptions = {
   readonly value: unknown;
 };
 
-const releaseMetadataEntrypointPath = join(process.cwd(), 'tools/release-cli/releaseMetadataCli.mts');
-const productionDistributionEntrypointPath = join(process.cwd(), 'tools/release-cli/productionDistributionCli.mts');
-const releaseAppearanceEntrypointPath = join(process.cwd(), 'tools/release-cli/releaseAppearanceCommand.mts');
-const previewNextBetaEntrypointPath = join(process.cwd(), 'tools/release-cli/previewNextBetaCommand.mts');
+const releaseMetadataEntrypointPath = join(process.cwd(), 'tools/releaseCli/releaseMetadataCli.mts');
+const productionDistributionEntrypointPath = join(process.cwd(), 'tools/releaseCli/productionDistributionCli.mts');
+const releaseAppearanceEntrypointPath = join(process.cwd(), 'tools/releaseCli/releaseAppearanceCommand.mts');
+const previewNextBetaEntrypointPath = join(process.cwd(), 'tools/releaseCli/previewNextBetaCommand.mts');
 const webAppVersionSynchronizationEntrypointPath = join(
   process.cwd(),
-  'tools/release-cli/webappVersionSynchronization.mts',
+  'tools/releaseCli/webappVersionSynchronization.mts',
 );
 const ensureProductionGitHubReleaseEntrypointPath = join(
   process.cwd(),
-  'tools/release-cli/ensureProductionGitHubRelease.mts',
+  'tools/releaseCli/ensureProductionGitHubRelease.mts',
 );
 
 function runNativeCommand(entrypointPath: string, commandLineArguments: readonly string[]): NativeCommandResult {

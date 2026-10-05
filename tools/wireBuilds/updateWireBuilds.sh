@@ -29,7 +29,7 @@ wire_builds_field_options=(
 run_distribution_cli() {
   (
     cd "${webapp_repository_root}"
-    "${webapp_repository_root}/tools/production-distribution/run-production-distribution-cli.sh" \
+    "${webapp_repository_root}/tools/productionDistribution/runProductionDistributionCli.sh" \
       "$@"
   )
 }

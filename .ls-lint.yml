@@ -1,8 +1,4 @@
 ls:
-  tools/build-artifact/verifyPublicProductionBundle.ts:
-    .ts: camelCase
-  tools/build-artifact/verifyPublicProductionBundle.test.ts:
-    .test.ts: camelCase
   libraries/config/src:
     .dir: camelCase
     .ts: camelCase
@@ -4216,3 +4212,15 @@ ls:
 
   apps/server/.platform/hooks/predeploy/npmInstall01.sh:
     .sh: camelCase
+
+  tools:
+    .dir: camelCase | regex:^__snapshots__$
+    .test.ts: camelCase
+    .ts: camelCase
+    .mts: camelCase
+    .js: camelCase
+    .sh: camelCase
+    .json: camelCase
+
+  tools/README.md:
+    .md: regex:^README$

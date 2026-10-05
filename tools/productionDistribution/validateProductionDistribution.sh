@@ -37,7 +37,7 @@ if [[ -n "${EXPECTED_COMMIT_SHA}" ]]; then
   validation_options+=(--expected-commit-sha "${EXPECTED_COMMIT_SHA}")
 fi
 
-"${script_directory}/run-production-distribution-cli.sh" \
+"${script_directory}/runProductionDistributionCli.sh" \
   validate-manifest "${validation_options[@]}"
 
 for required_context_path in \

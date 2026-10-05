@@ -21,7 +21,7 @@ import {Result, Task} from 'true-myth';
 
 import type {GitHubReleaseClient, GitHubReleaseRecord} from './githubReleaseClient.ts';
 
-import {selectPrecedingProductionTag, validateProductionTagName} from '../release-metadata/releaseMetadata.ts';
+import {selectPrecedingProductionTag, validateProductionTagName} from '../releaseMetadata/releaseMetadata.ts';
 
 export type ProductionGitHubReleaseAction = 'created' | 'already_draft' | 'already_published';
 export type ProductionGitHubReleaseState = 'draft' | 'published';

@@ -28,7 +28,7 @@ import {
   executeReleaseMetadataCommand,
   type ReleaseMetadataCliDependencies,
   type ReleaseMetadataCommand,
-} from '../release-metadata/releaseMetadataCli.ts';
+} from '../releaseMetadata/releaseMetadataCli.ts';
 
 type CreateReleaseMetadataCommandOptions = {
   readonly executeCommand: (command: ReleaseMetadataCommand) => Promise<number> | number;
