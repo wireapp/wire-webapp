@@ -20,7 +20,7 @@
 import {isNonEmptyArray} from '@sindresorhus/is';
 
 import {FileTypeIcon} from 'Components/conversation/common/fileTypeIcon/fileTypeIcon';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from 'Components/modals/primaryModal';
 import type {Translate} from 'Util/localizerUtil';
 import {getFileExtension} from 'Util/util';
 

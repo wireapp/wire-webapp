@@ -22,7 +22,7 @@ import React from 'react';
 import cx from 'classnames';
 
 import * as Icon from 'Components/icon';
-import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
+import {useLegalHoldModalState} from 'Components/modals/legalHoldModal/legalHoldModal.state';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 

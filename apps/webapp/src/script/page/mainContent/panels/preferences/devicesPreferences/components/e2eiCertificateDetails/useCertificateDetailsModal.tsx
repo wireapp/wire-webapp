@@ -19,8 +19,8 @@
 
 import {useCallback, useEffect, useMemo, useState} from 'react';
 
-import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
-import {ModalOptions} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
+import {PrimaryModal, removeCurrentModal} from 'Components/modals/primaryModal';
+import {ModalOptions} from 'Components/modals/primaryModal/primaryModalTypes';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {downloadFile} from 'Util/util';
 

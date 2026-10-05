@@ -19,7 +19,7 @@
 
 import {render} from '@testing-library/react';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from 'Components/modals/primaryModal';
 import {translateForTest} from 'Util/test/translateForTest';
 import {
   createRootContextValueForTest,

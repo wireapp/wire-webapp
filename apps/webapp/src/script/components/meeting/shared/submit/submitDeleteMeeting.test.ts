@@ -22,7 +22,7 @@ import {task} from 'true-myth';
 import {meetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
 import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
 import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from 'Components/modals/primaryModal';
 import {User} from 'Repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';
 

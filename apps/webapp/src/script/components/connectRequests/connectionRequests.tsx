@@ -26,7 +26,7 @@ import {Button, ButtonVariant, IconButton, IconButtonVariant, useMatchMedia} fro
 
 import {Avatar, AVATAR_SIZE} from 'Components/avatar';
 import {UserClassifiedBar} from 'Components/classifiedBar/classifiedBar';
-import {UnverifiedUserWarning} from 'Components/Modals/UserModal';
+import {UnverifiedUserWarning} from 'Components/modals/userModal';
 import {UserName} from 'Components/UserName';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';

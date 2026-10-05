@@ -1,0 +1,127 @@
+/*
+ * Wire
+ * Copyright (C) 2025 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {isNan} from '@sindresorhus/is';
+
+import {Button, ButtonVariant, FlexBox, Input, Select, Text} from '@wireapp/react-ui-kit';
+
+import {ModalComponent} from 'Components/modals/modalComponent';
+import {useApplicationContext} from 'src/script/page/rootProvider';
+import {handleEscDown, handleKeyDown, KEY} from 'Util/keyboardUtil';
+
+import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';
+import {ChatHistory, HistorySharingUnit} from '../../types';
+import {getChatHistorySharingUnitOptions} from '../../utils';
+import {
+  customHistorySharingModalCss,
+  customHistorySharingFormContainerCss,
+  customHistorySharingInputCss,
+  customHistorySharingSelectCss,
+  customHistorySharingButtonContainerCss,
+  customHistorySharingButtonCss,
+} from '../createConversationSteps.styles';
+
+export const CustomHistoryModal = () => {
+  const {translate} = useApplicationContext();
+  const {
+    setIsCustomHistoryModalOpen,
+    historySharingUnit,
+    setHistorySharingQuantity,
+    setHistorySharingUnit,
+    historySharingQuantity,
+    setChatHistory,
+    isCustomHistoryModalOpen,
+  } = useCreateConversationModal();
+
+  const chatHistorySharingUnitOptions = getChatHistorySharingUnitOptions(translate, historySharingQuantity);
+
+  const onCancel = () => {
+    setHistorySharingQuantity(1);
+    setHistorySharingUnit(HistorySharingUnit.Days);
+    setIsCustomHistoryModalOpen(false);
+  };
+
+  const onSubmit = () => {
+    setIsCustomHistoryModalOpen(false);
+    setChatHistory(ChatHistory.Custom);
+  };
+
+  return (
+    <ModalComponent
+      wrapperCSS={customHistorySharingModalCss}
+      id="custom-history-modal"
+      isShown={isCustomHistoryModalOpen}
+      data-uie-name="custom-history-modal"
+      onKeyDown={event => {
+        return handleEscDown(event, onCancel);
+      }}
+    >
+      <Text>{translate('conversationHistoryModalText')}</Text>
+      <FlexBox css={customHistorySharingFormContainerCss}>
+        <Input
+          wrapperCSS={customHistorySharingInputCss}
+          value={historySharingQuantity !== 0 && !isNan(historySharingQuantity) ? historySharingQuantity : ''}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            return setHistorySharingQuantity(Number(event.target.value));
+          }}
+        />
+
+        <Select
+          menuCSS={customHistorySharingSelectCss}
+          id="history-sharing-unit-select"
+          dataUieName="history-sharing-unit-select"
+          options={chatHistorySharingUnitOptions}
+          value={chatHistorySharingUnitOptions.find(option => {
+            return option.value === historySharingUnit;
+          })}
+          onChange={option => {
+            return setHistorySharingUnit(option?.value as HistorySharingUnit);
+          }}
+        />
+      </FlexBox>
+
+      <FlexBox css={customHistorySharingButtonContainerCss}>
+        <Button
+          css={customHistorySharingButtonCss}
+          variant={ButtonVariant.SECONDARY}
+          type="button"
+          onClick={onCancel}
+          data-uie-name="do-cancel"
+          onKeyDown={event => {
+            return handleEscDown(event, onCancel);
+          }}
+        >
+          {translate('conversationHistoryModalCancel')}
+        </Button>
+        <Button
+          css={customHistorySharingButtonCss}
+          disabled={historySharingQuantity === 0 || isNan(historySharingQuantity) || historySharingQuantity < 1}
+          type="button"
+          onClick={onSubmit}
+          data-uie-name="do-submit"
+          onKeyDown={event => {
+            return handleKeyDown({event, callback: onSubmit, keys: [KEY.ENTER, KEY.SPACE]});
+          }}
+        >
+          {translate('conversationHistoryModalApply')}
+        </Button>
+      </FlexBox>
+    </ModalComponent>
+  );
+};

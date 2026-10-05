@@ -1,0 +1,635 @@
+/*
+ * Wire
+ * Copyright (C) 2022 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
+
+import {isTruthy, isUndefined} from '@sindresorhus/is';
+import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/conversationReceiptModeUpdateData';
+import {CONVERSATION_PROTOCOL, mapToConversationProtocol} from '@wireapp/api-client/lib/team';
+import {isNonFederatingBackendsError} from '@wireapp/core/lib/errors';
+import {amplify} from 'amplify';
+import cx from 'classnames';
+import {container} from 'tsyringe';
+
+import {Button, ButtonVariant, Option, Select} from '@wireapp/react-ui-kit';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
+import {FadingScrollbar} from 'Components/fadingScrollbar';
+import * as Icon from 'Components/icon';
+import {ModalComponent} from 'Components/modals/modalComponent';
+import {AppsDisabledNote} from 'Components/Note/AppsDisabledNote/AppsDisabledNote';
+import {SearchInput} from 'Components/SearchInput';
+import {TextInput} from 'Components/TextInput';
+import {InfoToggle} from 'Components/toggle/InfoToggle';
+import {UserSearchableList} from 'Components/UserSearchableList';
+import {ACCESS_STATE} from 'Repositories/conversation/AccessState';
+import {
+  ACCESS_TYPES,
+  teamPermissionsForAccessState,
+  toggleFeature,
+} from 'Repositories/conversation/ConversationAccessPermission';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {User} from 'Repositories/entity/User';
+import {TeamState} from 'Repositories/team/TeamState';
+import {UserState} from 'Repositories/user/userState';
+import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
+import {useApplicationContext} from 'src/script/page/rootProvider';
+import {generateConversationUrl} from 'src/script/router/routeGenerator';
+import {createNavigate, createNavigateKeyboard} from 'src/script/router/routerBindings';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {checkAppsFeatureAvailability} from 'Util/featureUtil';
+import {handleEnterDown, handleEscDown, isKeyboardEvent} from 'Util/keyboardUtil';
+import {sortUsersByPriority} from 'Util/stringUtil';
+
+import {Config} from '../../../Config';
+import {isProtocolOption, ProtocolOption} from '../../../guards/Protocol';
+import {getSharedDrivePermissionHint} from '../createConversation/utils';
+import {PrimaryModal} from '../primaryModal';
+
+interface GroupCreationModalProps {
+  userState?: UserState;
+  teamState?: TeamState;
+}
+enum GroupCreationModalState {
+  DEFAULT = 'GroupCreationModal.STATE.DEFAULT',
+  PARTICIPANTS = 'GroupCreationModal.STATE.PARTICIPANTS',
+  PREFERENCES = 'GroupCreationModal.STATE.PREFERENCES',
+}
+
+const GroupCreationModal = ({
+  userState = container.resolve(UserState),
+  teamState = container.resolve(TeamState),
+}: GroupCreationModalProps) => {
+  const {mainViewModel, translate} = useApplicationContext();
+  const {
+    isTeam,
+    isMLSEnabled: isMLSEnabledForTeam,
+    isProtocolToggleEnabledForUser,
+    isCellsEnabled: isCellsEnabledForTeam,
+    isAppsEnabled: isAppsEnabledForTeam,
+  } = useKoSubscribableChildren(teamState, [
+    'isTeam',
+    'isMLSEnabled',
+    'isProtocolToggleEnabledForUser',
+    'isCellsEnabled',
+    'isAppsEnabled',
+  ]);
+  const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
+
+  const enableMLSToggle = isMLSEnabledForTeam && isProtocolToggleEnabledForUser;
+
+  //if feature flag is set to false or mls is disabled for current team use proteus as default
+  const defaultProtocol = isMLSEnabledForTeam
+    ? mapToConversationProtocol(teamState.teamFeatures()?.mls?.config.defaultProtocol)
+    : CONVERSATION_PROTOCOL.PROTEUS;
+
+  const protocolOptions: ProtocolOption[] = useMemo(() => {
+    return ([CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS] as const).map(protocol => {
+      return {
+        label: `${translate(`modalCreateGroupProtocolSelect.${protocol}`)}${
+          protocol === defaultProtocol ? translate(`modalCreateGroupProtocolSelect.default`) : ''
+        }`,
+        value: protocol,
+      };
+    });
+  }, [defaultProtocol, translate]);
+
+  const initialProtocol = protocolOptions.find(protocol => {
+    return protocol.value === defaultProtocol;
+  });
+  if (isUndefined(initialProtocol)) {
+    throw new Error(`No protocol option exists for ${defaultProtocol}`);
+  }
+
+  // Read receipts are temorarily disabled for MLS groups and channels until it is supported
+  const areReadReceiptsEnabled = defaultProtocol !== CONVERSATION_PROTOCOL.MLS;
+
+  //both environment feature flag and team feature flag must be enabled to create conversations with cells
+  const isCellsEnabledForEnvironment = Config.getConfig().FEATURE.ENABLE_CELLS;
+  const enableCellsToggle = isCellsEnabledForEnvironment && isCellsEnabledForTeam;
+  const [isCellsOptionEnabled, setIsCellsOptionEnabled] = useState(false);
+  const isCellsEnabledForGroup = isCellsEnabledForEnvironment && isCellsOptionEnabled;
+
+  const [isShown, setIsShown] = useState<boolean>(false);
+  const [selectedContacts, setSelectedContacts] = useState<User[]>([]);
+  const [enableReadReceipts, setEnableReadReceipts] = useState<boolean>(false);
+  const [selectedProtocol, setSelectedProtocol] = useState<ProtocolOption>(initialProtocol);
+
+  const isAppsFeatureAvailable =
+    isTeam &&
+    checkAppsFeatureAvailability({
+      protocol: selectedProtocol.value,
+      isAppsEnabled: isAppsEnabledForTeam,
+    });
+
+  const [showContacts, setShowContacts] = useState<boolean>(false);
+  const [isCreatingConversation, setIsCreatingConversation] = useState<boolean>(false);
+  const [accessState, setAccessState] = useState<ACCESS_STATE>(
+    isAppsFeatureAvailable ? ACCESS_STATE.TEAM.GUESTS_SERVICES : ACCESS_STATE.TEAM.GUEST_ROOM,
+  );
+  const [nameError, setNameError] = useState<string>('');
+  const [groupName, setGroupName] = useState<string>('');
+  const [participantsInput, setParticipantsInput] = useState<string>('');
+  const [groupCreationState, setGroupCreationState] = useState<GroupCreationModalState>(
+    GroupCreationModalState.DEFAULT,
+  );
+
+  useEffect(() => {
+    const showCreateGroup = (_eventName: string, userEntity?: User) => {
+      setEnableReadReceipts(isTeam);
+      setIsShown(true);
+      setGroupCreationState(GroupCreationModalState.PREFERENCES);
+
+      if (userEntity !== undefined) {
+        setSelectedContacts(previousSelectedContacts => {
+          return [...previousSelectedContacts, userEntity];
+        });
+      }
+    };
+
+    amplify.subscribe(WebAppEvents.CONVERSATION.CREATE_GROUP, showCreateGroup);
+
+    return () => {
+      amplify.unsubscribe(WebAppEvents.CONVERSATION.CREATE_GROUP, showCreateGroup);
+    };
+  }, [isTeam]);
+
+  useEffect(() => {
+    const nextProtocol = protocolOptions.find(protocol => {
+      return protocol.value === selectedProtocol.value;
+    });
+    if (isUndefined(nextProtocol)) {
+      throw new Error(`No protocol option exists for ${selectedProtocol.value}`);
+    }
+    setSelectedProtocol(nextProtocol);
+  }, [protocolOptions, selectedProtocol.value]);
+
+  const stateIsPreferences = groupCreationState === GroupCreationModalState.PREFERENCES;
+  const stateIsParticipants = groupCreationState === GroupCreationModalState.PARTICIPANTS;
+  const isServicesRoom = accessState === ACCESS_STATE.TEAM.SERVICES;
+  const isGuestAndServicesRoom = accessState === ACCESS_STATE.TEAM.GUESTS_SERVICES;
+  const isGuestRoom = accessState === ACCESS_STATE.TEAM.GUEST_ROOM;
+  const isGuestEnabled = isGuestRoom || isGuestAndServicesRoom;
+
+  const isServicesEnabled = isAppsFeatureAvailable && (isServicesRoom || isGuestAndServicesRoom);
+
+  const {setCurrentTab: setCurrentSidebarTab} = useSidebarStore();
+
+  const contacts = useMemo(() => {
+    if (showContacts) {
+      if (!isTeam) {
+        return userState.connectedUsers();
+      }
+
+      if (isGuestEnabled) {
+        return teamState.teamUsers();
+      }
+
+      return teamState.teamMembers().toSorted(sortUsersByPriority);
+    }
+    return [];
+  }, [isGuestEnabled, isTeam, showContacts, teamState, userState]);
+
+  const filteredContacts = contacts.filter(user => {
+    return user.isAvailable();
+  });
+
+  const handleEscape = useCallback(
+    (event: React.KeyboardEvent<HTMLElement> | KeyboardEvent): void => {
+      handleEscDown(event, () => {
+        if (stateIsPreferences) {
+          setIsShown(false);
+        }
+      });
+    },
+    [setIsShown, stateIsPreferences],
+  );
+
+  useEffect(() => {
+    let timerId: number;
+    if (stateIsParticipants) {
+      timerId = window.setTimeout(() => {
+        return setShowContacts(true);
+      });
+    } else {
+      setShowContacts(false);
+    }
+    return () => {
+      window.clearTimeout(timerId);
+    };
+  }, [stateIsParticipants]);
+
+  const contentViewModel = mainViewModel.content;
+  const conversationRepository = contentViewModel.repositories.conversation;
+  const searchRepository = contentViewModel.repositories.search;
+  const teamRepository = contentViewModel.repositories.team;
+
+  const maxNameLength = ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
+  const maxSize = ConversationRepository.CONFIG.GROUP.MAX_SIZE;
+
+  const onOpen = () => {
+    setAccessState(isAppsFeatureAvailable ? ACCESS_STATE.TEAM.GUESTS_SERVICES : ACCESS_STATE.TEAM.GUEST_ROOM);
+  };
+
+  const onClose = () => {
+    setIsCreatingConversation(false);
+    setNameError('');
+    setGroupName('');
+    setParticipantsInput('');
+    setSelectedContacts([]);
+    setGroupCreationState(GroupCreationModalState.DEFAULT);
+    setAccessState(isAppsFeatureAvailable ? ACCESS_STATE.TEAM.GUESTS_SERVICES : ACCESS_STATE.TEAM.GUEST_ROOM);
+  };
+
+  const clickOnCreate = async (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent> | React.KeyboardEvent<HTMLInputElement>,
+  ): Promise<void> => {
+    if (!isCreatingConversation) {
+      setIsCreatingConversation(true);
+
+      try {
+        const conversation = await conversationRepository.createGroupConversation(
+          selectedContacts,
+          groupName,
+          isTeam ? accessState : undefined,
+          {
+            protocol: enableMLSToggle ? selectedProtocol.value : defaultProtocol,
+            receipt_mode: enableReadReceipts ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF,
+            cells: isCellsEnabledForGroup,
+          },
+        );
+
+        setCurrentSidebarTab(SidebarTabs.RECENT);
+
+        if (isKeyboardEvent(event)) {
+          createNavigateKeyboard(generateConversationUrl(conversation.qualifiedId), true)(event);
+        } else {
+          createNavigate(generateConversationUrl(conversation.qualifiedId))(event);
+        }
+      } catch (error: unknown) {
+        if (isNonFederatingBackendsError(error)) {
+          const tempName = groupName;
+          setIsShown(false);
+
+          const backendString = error.backends.join(', and ');
+          return PrimaryModal.show(
+            PrimaryModal.type.MULTI_ACTIONS,
+            {
+              preventClose: true,
+              primaryAction: {
+                text: translate('groupCreationPreferencesNonFederatingEditList'),
+                action: () => {
+                  setGroupName(tempName);
+                  setIsShown(true);
+                  setIsCreatingConversation(false);
+                  setGroupCreationState(GroupCreationModalState.PARTICIPANTS);
+                },
+              },
+              secondaryAction: {
+                text: translate('groupCreationPreferencesNonFederatingLeave'),
+                action: () => {
+                  setIsCreatingConversation(false);
+                },
+              },
+              text: {
+                translatedMessage: {
+                  compatibilityReplacements: [],
+                  components: [
+                    {
+                      className: 'modal__text__read-more',
+                      dataUieName: 'read-more-backends',
+                      href: Config.getConfig().URL.SUPPORT.NON_FEDERATING_INFO,
+                      kind: 'link',
+                      legacyClosingTokens: [],
+                      legacyOpeningTokens: [],
+                      markerName: 'link',
+                      rel: 'nofollow noopener noreferrer',
+                      target: '_blank',
+                    },
+                  ],
+                  kind: 'translation',
+                  layout: 'default',
+                  translationKey: 'groupCreationPreferencesNonFederatingMessage',
+                  values: [
+                    {
+                      alternatePlaceholders: [],
+                      placeholder: 'backends',
+                      runtimeText: backendString,
+                    },
+                  ],
+                },
+                title: translate('groupCreationPreferencesNonFederatingHeadline'),
+              },
+            },
+            undefined,
+            translate,
+          );
+        }
+        amplify.publish(WebAppEvents.CONVERSATION.SHOW, undefined, {});
+        setIsCreatingConversation(false);
+      }
+
+      setIsShown(false);
+    }
+  };
+
+  const onGroupNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const {value} = event.target;
+
+    const trimmedNameInput = value.trim();
+    const nameTooLong = trimmedNameInput.length > maxNameLength;
+    const nameTooShort = trimmedNameInput.length === 0;
+
+    setGroupName(value);
+    if (nameTooLong) {
+      return setNameError(translate('groupCreationPreferencesErrorNameLong'));
+    }
+
+    if (nameTooShort) {
+      return setNameError(translate('groupCreationPreferencesErrorNameShort'));
+    }
+    setNameError('');
+  };
+
+  const onProtocolChange = (option: Option | null) => {
+    if (!isProtocolOption(option)) {
+      return;
+    }
+
+    setSelectedProtocol(option);
+
+    if (
+      (option.value === CONVERSATION_PROTOCOL.MLS && isServicesEnabled) ||
+      (option.value === CONVERSATION_PROTOCOL.PROTEUS && !isServicesEnabled)
+    ) {
+      clickOnToggleServicesMode();
+    }
+  };
+
+  const groupNameLength = groupName.length;
+
+  const hasNameError = nameError.length > 0;
+
+  const clickOnNext = (): void => {
+    const nameTooLong = groupNameLength > maxNameLength;
+
+    if (groupNameLength > 0 && !nameTooLong) {
+      setGroupCreationState(GroupCreationModalState.PARTICIPANTS);
+    }
+  };
+
+  const clickOnToggle = (feature: number): void => {
+    const newAccessState = toggleFeature(feature, accessState);
+    setAccessState(newAccessState);
+  };
+  const clickOnToggleServicesMode = () => {
+    return clickOnToggle(ACCESS_TYPES.SERVICE);
+  };
+  const clickOnToggleGuestMode = () => {
+    return clickOnToggle(teamPermissionsForAccessState(ACCESS_STATE.TEAM.GUEST_FEATURES));
+  };
+  const clickOnBack = (): void => {
+    setGroupCreationState(GroupCreationModalState.PREFERENCES);
+  };
+
+  const participantsActionText =
+    selectedContacts.length > 0
+      ? translate('groupCreationParticipantsActionCreate')
+      : translate('groupCreationParticipantsActionSkip');
+  const isInputValid = isTruthy(groupNameLength) ? nameError.length === 0 : groupNameLength;
+
+  return (
+    <ModalComponent
+      id="group-creation-modal"
+      className="group-creation__modal"
+      isShown={isShown}
+      onOpened={onOpen}
+      onClosed={onClose}
+      data-uie-name="group-creation-label"
+      onKeyDown={stateIsPreferences ? handleEscape : undefined}
+    >
+      <div className="modal__header modal__header--list">
+        {stateIsParticipants && (
+          <>
+            <button
+              className="button-reset-default"
+              type="button"
+              onClick={clickOnBack}
+              aria-label={translate('accessibility.groupCreationParticipantsActionBack')}
+              data-uie-name="go-back"
+            >
+              <Icon.ArrowLeftIcon aria-hidden="true" className="modal__header__button" />
+            </button>
+
+            <h2 id="group-creation-label" className="modal__header__title" data-uie-name="status-people-selected">
+              {selectedContacts.length > 0
+                ? translate('groupCreationParticipantsHeaderWithCounter', {number: selectedContacts.length})
+                : translate('groupCreationParticipantsHeader')}
+            </h2>
+
+            <Button
+              className="enabled accent-text"
+              css={{marginBottom: 0}}
+              type="button"
+              onClick={clickOnCreate}
+              aria-label={participantsActionText}
+              data-uie-name="do-create-group"
+              variant={ButtonVariant.TERTIARY}
+            >
+              {participantsActionText}
+            </Button>
+          </>
+        )}
+        {stateIsPreferences && (
+          <>
+            <button
+              className="button-reset-default"
+              type="button"
+              onClick={() => {
+                return setIsShown(false);
+              }}
+              aria-label={translate('accessibility.groupCreationActionCloseModal')}
+              data-uie-name="do-close"
+            >
+              <Icon.CloseIcon aria-hidden="true" className="modal__header__button" />
+            </button>
+
+            <h2 id="group-creation-label" className="modal__header__title">
+              {translate('groupCreationPreferencesHeader')}
+            </h2>
+
+            <Button
+              id="group-go-next"
+              className={cx({
+                'accent-text': groupNameLength,
+                enabled: isInputValid,
+              })}
+              css={{marginBottom: 0}}
+              disabled={!isInputValid}
+              type="button"
+              onClick={clickOnNext}
+              aria-label={translate('groupCreationPreferencesAction')}
+              data-uie-name="go-next"
+              variant={ButtonVariant.TERTIARY}
+            >
+              {translate('groupCreationPreferencesAction')}
+            </Button>
+          </>
+        )}
+      </div>
+      <FadingScrollbar className="modal__body">
+        {stateIsParticipants && (
+          <SearchInput
+            input={participantsInput}
+            setInput={setParticipantsInput}
+            selectedUsers={selectedContacts}
+            placeholder={translate('groupCreationParticipantsPlaceholder')}
+            onEnter={clickOnCreate}
+          />
+        )}
+
+        {stateIsParticipants && (
+          <FadingScrollbar className="group-creation__list">
+            <UserSearchableList
+              selfUser={selfUser}
+              users={filteredContacts}
+              filter={participantsInput}
+              selected={selectedContacts}
+              isSelectable
+              onUpdateSelectedUsers={setSelectedContacts}
+              searchRepository={searchRepository}
+              teamRepository={teamRepository}
+              conversationRepository={conversationRepository}
+              noUnderline
+              allowRemoteSearch
+              filterRemoteTeamUsers
+            />
+          </FadingScrollbar>
+        )}
+
+        {/* eslint jsx-a11y/no-autofocus : "off" */}
+        {stateIsPreferences && (
+          <>
+            <div className="modal-input-wrapper">
+              <TextInput
+                autoFocus
+                label={translate('groupCreationPreferencesPlaceholder')}
+                placeholder={translate('groupCreationPreferencesPlaceholder')}
+                uieName="enter-group-name"
+                name="enter-group-name"
+                errorUieName="error-group-name"
+                onCancel={() => {
+                  return setGroupName('');
+                }}
+                onChange={onGroupNameChange}
+                onBlur={event => {
+                  const {value} = event.target as HTMLInputElement;
+                  const trimmedName = value.trim();
+                  setGroupName(trimmedName);
+                }}
+                onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
+                  handleEnterDown(event, clickOnNext);
+                }}
+                value={groupName}
+                isError={hasNameError}
+                errorMessage={nameError}
+              />
+            </div>
+
+            {isTeam && (
+              <>
+                <p
+                  className="modal__info"
+                  style={{visibility: hasNameError ? 'hidden' : 'visible'}}
+                  data-uie-name="status-group-size-info"
+                >
+                  {translate('groupSizeInfo', {count: maxSize})}
+                </p>
+                <hr className="group-creation__modal__separator" />
+                <InfoToggle
+                  className="modal-style"
+                  dataUieName="guests"
+                  isChecked={isGuestEnabled}
+                  setIsChecked={clickOnToggleGuestMode}
+                  isDisabled={false}
+                  name={translate('guestOptionsTitle')}
+                  info={translate('guestRoomToggleInfo')}
+                />
+                <InfoToggle
+                  className="modal-style"
+                  dataUieName="info-toggle-services"
+                  isChecked={isServicesEnabled}
+                  setIsChecked={clickOnToggleServicesMode}
+                  isDisabled={!isAppsFeatureAvailable}
+                  name={translate('appsOptionsTitle')}
+                  info={translate('appsRoomToggleInfo')}
+                  footer={!isAppsFeatureAvailable && <AppsDisabledNote />}
+                />
+
+                {areReadReceiptsEnabled && (
+                  <InfoToggle
+                    className="modal-style"
+                    dataUieName="read-receipts"
+                    info={translate('readReceiptsToggleInfo')}
+                    isChecked={enableReadReceipts}
+                    setIsChecked={setEnableReadReceipts}
+                    isDisabled={false}
+                    name={translate('readReceiptsToggleName')}
+                  />
+                )}
+                {enableCellsToggle && (
+                  <InfoToggle
+                    className="modal-style info-toggle--no-separator"
+                    dataUieName="cells"
+                    isChecked={isCellsOptionEnabled}
+                    setIsChecked={setIsCellsOptionEnabled}
+                    isDisabled={false}
+                    name={translate('modalCreateGroupCellsToggleHeading')}
+                    info={translate('modalCreateGroupCellsToggleInfo')}
+                    adminHintForShareDrive={getSharedDrivePermissionHint(translate)}
+                  />
+                )}
+                {enableMLSToggle && (
+                  <>
+                    <Select
+                      id="select-protocol"
+                      onChange={onProtocolChange}
+                      dataUieName="select-protocol"
+                      options={protocolOptions}
+                      value={selectedProtocol}
+                      label={translate('modalCreateGroupProtocolHeading')}
+                      menuPosition="absolute"
+                      wrapperCSS={{marginBottom: 0}}
+                    />
+                    <p className="modal__info" data-uie-name="status-group-protocol-info">
+                      {translate('modalCreateGroupProtocolInfo')}
+                    </p>
+                  </>
+                )}
+                <br />
+              </>
+            )}
+          </>
+        )}
+      </FadingScrollbar>
+    </ModalComponent>
+  );
+};
+
+export {GroupCreationModal};

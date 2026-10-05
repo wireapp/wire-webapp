@@ -23,7 +23,7 @@ import {Maybe} from 'true-myth';
 
 import {Button, ButtonVariant, COLOR} from '@wireapp/react-ui-kit';
 
-import {ModalComponent} from 'Components/Modals/ModalComponent';
+import {ModalComponent} from 'Components/modals/modalComponent';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import type {User} from 'Repositories/entity/User';

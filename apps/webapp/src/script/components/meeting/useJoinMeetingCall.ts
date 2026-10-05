@@ -33,7 +33,7 @@ import {
   type JoinMeetingCallDeps,
   type JoinMeetingCallError,
 } from 'Components/meeting/joinMeetingCall';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from 'Components/modals/primaryModal';
 import {showCallNotEstablishedModal, useNoInternetCallGuard} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard';
 import type {CallMediaChoice} from 'Repositories/calling/callMediaChoice';
 import {CallState} from 'Repositories/calling/CallState';

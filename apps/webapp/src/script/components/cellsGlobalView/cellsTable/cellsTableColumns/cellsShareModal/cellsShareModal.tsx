@@ -26,7 +26,7 @@ import {CellsShareModalContent} from 'Components/cells/shareModal/cellsShareModa
 import {serializeShareModalInput} from 'Components/cells/shareModal/shareModalSerializer';
 import {useCellExpirationToggle} from 'Components/cells/shareModal/useCellExpirationToggle';
 import {useCellPasswordToggle} from 'Components/cells/shareModal/useCellPasswordToggle';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from 'Components/modals/primaryModal';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import type {RootContextValue} from 'src/script/page/rootProvider';
 import {createUuid} from 'Util/uuid';

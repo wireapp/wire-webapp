@@ -21,7 +21,7 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {joinMeetingCall, type JoinMeetingCallDeps} from 'Components/meeting/joinMeetingCall';
 import {handleJoinMeetingCallResult} from 'Components/meeting/useJoinMeetingCall';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from 'Components/modals/primaryModal';
 import {
   showCallNotEstablishedModal,
   type NoInternetCallGuardCopy,

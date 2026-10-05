@@ -26,7 +26,7 @@ import {container} from 'tsyringe';
 import {Button, ButtonVariant, FlexBox} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from 'Components/modals/primaryModal';
 import {ProgressBar} from 'Components/ProgressBar/ProgressBar';
 import {CancelError} from 'Repositories/backup/error';
 import {ClientState} from 'Repositories/client/ClientState';

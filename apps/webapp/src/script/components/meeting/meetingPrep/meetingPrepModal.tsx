@@ -23,7 +23,7 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {maybe} from 'true-myth';
 
 import {modalWrapperStyles} from 'Components/meeting/shared/styles/meetingModalShell.styles';
-import {ModalComponent} from 'Components/Modals/ModalComponent';
+import {ModalComponent} from 'Components/modals/modalComponent';
 import type {CallMediaChoice} from 'Repositories/calling/callMediaChoice';
 import {handleEscDown} from 'Util/keyboardUtil';
 

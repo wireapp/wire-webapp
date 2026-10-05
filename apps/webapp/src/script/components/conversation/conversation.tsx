@@ -31,10 +31,10 @@ import {parseAccountDeepLink} from 'Components/conversation/utils/parseAccountDe
 import {Giphy} from 'Components/giphy';
 import {InputBar} from 'Components/inputBar';
 import {MessageListWrapper} from 'Components/messagesList/messageListWrapper';
-import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {showUserModal} from 'Components/Modals/UserModal';
-import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
+import {showDetailViewModal} from 'Components/modals/detailViewModal';
+import {PrimaryModal} from 'Components/modals/primaryModal';
+import {showUserModal} from 'Components/modals/userModal';
+import {showWarningModal} from 'Components/modals/utils/showWarningModal';
 import {TitleBar} from 'Components/titleBar';
 import {CallState} from 'Repositories/calling/CallState';
 import {ConversationState} from 'Repositories/conversation/ConversationState';

@@ -33,7 +33,7 @@ import {
   isInRecycleBin,
   isRootRecycleBinPath,
 } from 'Components/conversation/conversationCells/common/recycleBin/recycleBin';
-import {useFileHistoryModal} from 'Components/Modals/FileHistoryModal/hooks/useFileHistoryModal';
+import {useFileHistoryModal} from 'Components/modals/fileHistoryModal/hooks/useFileHistoryModal';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';

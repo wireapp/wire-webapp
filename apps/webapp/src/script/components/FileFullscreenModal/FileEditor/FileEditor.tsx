@@ -23,8 +23,8 @@ import {Node} from '@wireapp/api-client/lib/cells';
 import {Maybe, result} from 'true-myth';
 import {container} from 'tsyringe';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {removeCurrentModal} from 'Components/Modals/PrimaryModal/PrimaryModalState';
+import {PrimaryModal} from 'Components/modals/primaryModal';
+import {removeCurrentModal} from 'Components/modals/primaryModal/primaryModalState';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';

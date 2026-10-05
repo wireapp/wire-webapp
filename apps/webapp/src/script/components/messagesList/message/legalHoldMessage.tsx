@@ -20,7 +20,7 @@
 import {container} from 'tsyringe';
 
 import {LegalHoldDot} from 'Components/LegalHoldDot';
-import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
+import {useLegalHoldModalState} from 'Components/modals/legalHoldModal/legalHoldModal.state';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {LegalHoldMessage as LegalHoldMessageEntity} from 'Repositories/entity/message/legalHoldMessage';
 import {useApplicationContext} from 'src/script/page/rootProvider';

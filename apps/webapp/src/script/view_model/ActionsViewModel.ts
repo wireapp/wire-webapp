@@ -28,8 +28,8 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {useLeaveGroupAdminModalStore} from 'Components/Modals/LeaveGroupAdminModal/useLeaveGroupAdminModalStore';
-import {PrimaryModal, removeCurrentModal, usePrimaryModalState} from 'Components/Modals/PrimaryModal';
+import {useLeaveGroupAdminModalStore} from 'Components/modals/leaveGroupAdminModal/useLeaveGroupAdminModalStore';
+import {PrimaryModal, removeCurrentModal, usePrimaryModalState} from 'Components/modals/primaryModal';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import type {ClientEntity} from 'Repositories/client';
 import type {ConnectionRepository} from 'Repositories/connection/connectionRepository';

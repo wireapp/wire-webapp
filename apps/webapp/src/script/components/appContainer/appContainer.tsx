@@ -30,9 +30,9 @@ import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {MeetingStoreRoot} from 'Components/meeting/meetingStore/meetingStoreRoot';
-import {LeaveGroupAdminModal} from 'Components/Modals/LeaveGroupAdminModal/LeaveGroupAdminModal';
-import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
-import {QualityFeedbackModal} from 'Components/Modals/QualityFeedbackModal';
+import {LeaveGroupAdminModal} from 'Components/modals/leaveGroupAdminModal/leaveGroupAdminModal';
+import {PrimaryModalComponent} from 'Components/modals/primaryModal/primaryModal';
+import {QualityFeedbackModal} from 'Components/modals/qualityFeedbackModal';
 import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
 import {SIGN_OUT_REASON} from 'src/script/auth/signOutReason';
 import {useAppSoftLock} from 'src/script/hooks/useAppSoftLock';

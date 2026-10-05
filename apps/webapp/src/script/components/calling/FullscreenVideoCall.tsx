@@ -42,7 +42,7 @@ import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {VideoBackgroundPerformancePanel} from 'Components/calling/VideoControls/videoBackgroundPerformancePanel/videoBackgroundPerformancePanel';
 import {ConversationClassifiedBar} from 'Components/classifiedBar/classifiedBar';
 import * as Icon from 'Components/icon';
-import {ModalComponent} from 'Components/Modals/ModalComponent';
+import {ModalComponent} from 'Components/modals/modalComponent';
 import type {Call} from 'Repositories/calling/Call';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {CallingViewMode, CallState, MuteState} from 'Repositories/calling/CallState';

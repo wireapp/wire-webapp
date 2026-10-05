@@ -60,7 +60,7 @@ import {container} from 'tsyringe';
 import {CALL_TYPE, CONV_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from 'Components/modals/primaryModal';
 import {buildMediaDevicesHandler, createSelfParticipant} from 'src/script/auth/util/test/testUtil';
 import {SystemMessageType} from 'src/script/message/systemMessageType';
 import {Call} from 'Repositories/calling/Call';

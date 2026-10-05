@@ -25,7 +25,7 @@ import {Runtime} from '@wireapp/commons';
 
 import {UserVerificationBadges} from 'Components/badge';
 import {ErrorFallback} from 'Components/errorFallback';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from 'Components/modals/primaryModal';
 import {useEnrichedFields} from 'Components/panel/enrichedFields';
 import {ClientRepository} from 'Repositories/client';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';

@@ -29,8 +29,8 @@ import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import 'Components/calling/ChooseScreen';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import type {PrimaryModalTranslatedMessage} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
+import {PrimaryModal} from 'Components/modals/primaryModal';
+import type {PrimaryModalTranslatedMessage} from 'Components/modals/primaryModal/primaryModalTypes';
 import type {AudioRepository} from 'Repositories/audio/audioRepository';
 import {AudioType} from 'Repositories/audio/audioType';
 import type {Call} from 'Repositories/calling/Call';

@@ -28,7 +28,7 @@ import {showMeetingSubmitError} from 'Components/meeting/shared/submit/showMeeti
 import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
 import {canDeleteMeetingForAll, canDeleteMeetingForMe} from 'Components/meeting/utils/canDeleteMeeting';
 import {toMeetingIdKey} from 'Components/meeting/utils/toMeetingIdKey';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from 'Components/modals/primaryModal';
 import type {User} from 'Repositories/entity/User';
 import type {Translate, TranslationKey} from 'Util/localizerUtil';
 

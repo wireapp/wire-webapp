@@ -1,0 +1,329 @@
+/*
+ * Wire
+ * Copyright (C) 2022 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
+import {isValid} from 'date-fns';
+import {escape} from 'underscore';
+import {create} from 'zustand';
+
+import {ClientNotificationData} from 'Repositories/notification/PreferenceNotificationRepository';
+import {getLogger} from 'Util/logger';
+import {formatLocale} from 'Util/timeUtil';
+import {noop} from 'Util/util';
+import {createUuid} from 'Util/uuid';
+
+import {
+  ButtonAction,
+  ModalContent,
+  ModalOptions,
+  ModalQueue,
+  PrimaryModalType,
+  QueuedModalItem,
+  Text,
+  type Translate,
+} from './primaryModalTypes';
+
+import {Config} from '../../../Config';
+
+type PrimaryModalState = {
+  errorMessage: string | null;
+  queue: ModalQueue;
+  currentModalContent: ModalContent;
+  currentModalId: string | null;
+  existsInQueue: (modalItem: QueuedModalItem) => boolean;
+  addToQueue: (modalItem: QueuedModalItem) => void;
+  removeFirstItemInQueue: () => void;
+  replaceInQueue: (modalItem: QueuedModalItem) => void;
+  updateCurrentModalId: (nextCurrentModalId: string | null) => void;
+  updateErrorMessage: (nextErrorMessage: string | null) => void;
+  updateCurrentModalContent: (nextCurrentModaContent: ModalContent) => void;
+};
+
+const defaultContent: ModalContent = {
+  checkboxLabel: '',
+  closeBtnTitle: '',
+  closeFn: noop,
+  currentType: '',
+  inputPlaceholder: '',
+  message: '',
+  modalUie: '',
+  onBgClick: noop,
+  primaryAction: {} as ButtonAction,
+  secondaryAction: [],
+  titleText: '',
+  copyPassword: false,
+};
+
+const logger = getLogger('PrimaryModalState');
+
+const usePrimaryModalState = create<PrimaryModalState>((set, get) => {
+  return {
+    addToQueue: (modalItem: QueuedModalItem) => {
+      return set(state => {
+        return {...state, queue: [...state.queue, modalItem]};
+      });
+    },
+    currentModalContent: defaultContent,
+    currentModalId: null,
+    errorMessage: null,
+    existsInQueue: (modalItem: QueuedModalItem): boolean => {
+      return (
+        get().queue.findIndex(queueItem => {
+          return queueItem.id === modalItem.id;
+        }) !== -1
+      );
+    },
+    queue: [],
+    removeFirstItemInQueue: () => {
+      return set(state => {
+        return {...state, queue: state.queue.slice(1)};
+      });
+    },
+    replaceInQueue: (modalItem: QueuedModalItem) => {
+      return set(state => {
+        return {
+          ...state,
+          queue: state.queue.map(queueItem => {
+            return queueItem.id === modalItem.id ? modalItem : queueItem;
+          }),
+        };
+      });
+    },
+    updateCurrentModalContent: nextCurrentModaContent => {
+      return set(state => {
+        return {...state, currentModalContent: nextCurrentModaContent};
+      });
+    },
+    updateCurrentModalId: (nextCurrentModalId: string | null) => {
+      return set(state => {
+        return {...state, currentModalId: nextCurrentModalId};
+      });
+    },
+    updateErrorMessage: nextErrorMessage => {
+      return set(state => {
+        return {...state, errorMessage: nextErrorMessage};
+      });
+    },
+  };
+});
+
+const addNewModalToQueue = (
+  type: PrimaryModalType,
+  options: ModalOptions,
+  modalId: string | undefined,
+  translate: Translate,
+): void => {
+  const nextModalId = modalId ?? createUuid();
+  const {currentModalId, existsInQueue, addToQueue, replaceInQueue} = usePrimaryModalState.getState();
+
+  const alreadyOpen = nextModalId === currentModalId;
+  if (alreadyOpen) {
+    return showNextModalInQueue();
+  }
+  const newModal = {id: nextModalId, options, type, translate};
+  const found = nextModalId !== '' && existsInQueue(newModal);
+  if (found) {
+    replaceInQueue(newModal);
+  } else {
+    addToQueue(newModal);
+  }
+
+  showNextModalInQueue();
+};
+
+const showNextModalInQueue = (): void => {
+  const {queue, currentModalId, removeFirstItemInQueue} = usePrimaryModalState.getState();
+  if (!isNullOrUndefined(currentModalId) && currentModalId !== '') {
+    // we already have a modal open which is awaiting a manual user action
+    return;
+  }
+  if (queue.length > 0) {
+    const nextModalToShow = queue[0];
+    const {type, options, id, translate} = nextModalToShow;
+    updateCurrentModalContent(type, options, id, translate);
+    removeFirstItemInQueue();
+  }
+};
+
+const updateCurrentModalContent = (
+  type: PrimaryModalType,
+  options: ModalOptions,
+  id: string,
+  translate: Translate,
+): void => {
+  if (!Object.values(PrimaryModalType).includes(type)) {
+    return logger.warn(`Modal of type '${type}' is not supported`);
+  }
+
+  const {
+    close = noop,
+    closeOnConfirm = true,
+    copyPassword,
+    data,
+    preventClose = false,
+    primaryAction,
+    secondaryAction,
+    hideSecondary,
+    hideCloseBtn = false,
+    passwordOptional = false,
+    text = {} as Text,
+    confirmCancelBtnLabel,
+    allButtonsFullWidth = false,
+    primaryBtnFirst = false,
+    closeOnSecondaryAction = true,
+    size = 'small',
+    container,
+  } = options;
+
+  const content = {
+    checkboxLabel: text.option ?? '',
+    closeBtnTitle: text.closeBtnLabel,
+    closeFn: close,
+    closeOnConfirm,
+    copyPassword,
+    currentType: type,
+    inputPlaceholder: text.input ?? '',
+    message: text.message,
+    translatedMessage: text.translatedMessage,
+    modalUie: type,
+    onBgClick: preventClose ? noop : removeCurrentModal,
+    primaryAction: primaryAction ?? null,
+    secondaryAction: secondaryAction ?? null,
+    hideCloseBtn,
+    titleText: text.title ?? '',
+    passwordOptional,
+    confirmCancelBtnLabel,
+    allButtonsFullWidth,
+    primaryBtnFirst,
+    closeOnSecondaryAction,
+    size,
+    container,
+  };
+
+  switch (type) {
+    case PrimaryModalType.ACCOUNT_NEW_DEVICES: {
+      content.titleText = translate('modalAccountNewDevicesHeadline');
+      content.primaryAction = {...primaryAction, text: translate('modalAcknowledgeAction')};
+      content.secondaryAction = {...secondaryAction, text: translate('modalAccountNewDevicesSecondary')};
+      const deviceList = (data as ClientNotificationData[]).map(device => {
+        const deviceDate = new Date(device.time);
+        const deviceTime = isValid(deviceDate) ? new Date(deviceDate) : new Date();
+        const formattedDate = formatLocale(deviceTime, 'PP, p');
+        const deviceModel = `${translate('modalAccountNewDevicesFrom')} ${escape(device.model)}`;
+        return (
+          <>
+            <div>{formattedDate} - UTC</div>
+            <div>{deviceModel}</div>
+          </>
+        );
+      });
+      content.message = (
+        <>
+          <div className="modal__content__device-list">{deviceList}</div>
+          {translate('modalAccountNewDevicesMessage')}
+        </>
+      );
+      break;
+    }
+    case PrimaryModalType.ACCOUNT_READ_RECEIPTS_CHANGED: {
+      content.primaryAction = {...primaryAction, text: translate('modalAcknowledgeAction')};
+      content.titleText = !isNullOrUndefined(data)
+        ? translate('modalAccountReadReceiptsChangedOnHeadline')
+        : translate('modalAccountReadReceiptsChangedOffHeadline');
+      content.message = translate('modalAccountReadReceiptsChangedMessage');
+      break;
+    }
+    case PrimaryModalType.ACKNOWLEDGE: {
+      content.primaryAction = {text: translate('modalAcknowledgeAction'), ...primaryAction};
+      content.titleText = text.title ?? translate('modalAcknowledgeHeadline');
+      content.message = text.message ?? '';
+      break;
+    }
+    case PrimaryModalType.WITHOUT_TITLE: {
+      content.primaryAction = {...primaryAction};
+      content.message = text.message ?? '';
+      break;
+    }
+    case PrimaryModalType.CONFIRM: {
+      content.secondaryAction = {
+        text: content.confirmCancelBtnLabel ?? translate('modalConfirmSecondary'),
+        ...content.secondaryAction,
+      };
+      break;
+    }
+    case PrimaryModalType.INPUT:
+    case PrimaryModalType.PASSWORD:
+    case PrimaryModalType.OPTION: {
+      if (hideSecondary !== true) {
+        content.secondaryAction = {text: translate('modalOptionSecondary'), ...content.secondaryAction};
+        content.modalUie = PrimaryModalType.OPTION;
+      }
+      break;
+    }
+    case PrimaryModalType.SESSION_RESET: {
+      content.titleText = translate('modalSessionResetHeadline');
+      content.primaryAction = {...primaryAction, text: translate('modalAcknowledgeAction')};
+      content.translatedMessage = {
+        compatibilityReplacements: [],
+        components: [
+          {
+            className: '',
+            dataUieName: '',
+            href: Config.getConfig().URL.SUPPORT.BUG_REPORT,
+            kind: 'link',
+            legacyClosingTokens: ['[/link]', '/link]'],
+            legacyOpeningTokens: ['[link]', '[линк]'],
+            markerName: 'link',
+            rel: 'nofollow noopener noreferrer',
+            target: '_blank',
+          },
+        ],
+        kind: 'translation',
+        layout: 'default',
+        translationKey: 'modalSessionResetMessage',
+        values: [],
+      };
+      break;
+    }
+  }
+  if (!isNullOrUndefined(content.secondaryAction)) {
+    const updatedSecondaryAction = Array.isArray(content.secondaryAction)
+      ? content.secondaryAction
+      : [content.secondaryAction];
+    // force it into array format
+    const uieNames = ['do-secondary', 'do-tertiary', 'do-quaternary'];
+    content.secondaryAction = updatedSecondaryAction.map((action, index) => {
+      const uieName = isNonEmptyString(uieNames[index]) ? uieNames[index] : 'do-remaining';
+      return {...action, uieName};
+    });
+  }
+
+  const {updateCurrentModalContent, updateCurrentModalId} = usePrimaryModalState.getState();
+  updateCurrentModalContent(content);
+  updateCurrentModalId(id ?? null);
+};
+
+const removeCurrentModal = (): void => {
+  const {currentModalContent, updateCurrentModalId} = usePrimaryModalState.getState();
+
+  currentModalContent?.closeFn();
+  updateCurrentModalId(null);
+};
+
+export {usePrimaryModalState, defaultContent, addNewModalToQueue, showNextModalInQueue, removeCurrentModal};

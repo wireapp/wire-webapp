@@ -22,7 +22,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {Runtime} from '@wireapp/commons';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from 'Components/modals/primaryModal';
 
 import {User} from 'Repositories/entity/User';
 import {ClientRecord} from 'Repositories/storage/record/clientRecord';

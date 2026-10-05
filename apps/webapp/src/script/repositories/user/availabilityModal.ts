@@ -21,7 +21,7 @@ import {isNan, isNullOrUndefined} from '@sindresorhus/is';
 
 import {Availability} from '@wireapp/protocol-messaging';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from 'Components/modals/primaryModal';
 import type {Substitutions, TranslationKey} from 'Util/localizerUtil';
 import {loadValue, storeValue} from 'Util/storageUtil';
 

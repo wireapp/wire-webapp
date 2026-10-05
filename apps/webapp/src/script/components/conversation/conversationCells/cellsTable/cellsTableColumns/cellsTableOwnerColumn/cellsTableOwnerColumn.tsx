@@ -20,7 +20,7 @@
 import {isNull} from '@sindresorhus/is';
 
 import {Avatar, AVATAR_SIZE} from 'Components/avatar';
-import {showUserModal} from 'Components/Modals/UserModal';
+import {showUserModal} from 'Components/modals/userModal';
 import {User} from 'Repositories/entity/User';
 
 import {avatarWrapperStyles, textStyles, wrapperStyles} from './cellsTableOwnerColumn.styles';

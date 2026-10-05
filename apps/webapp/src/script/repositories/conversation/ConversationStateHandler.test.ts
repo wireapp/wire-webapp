@@ -19,7 +19,7 @@
 
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from 'Components/modals/primaryModal';
 import type {Translate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 

@@ -19,7 +19,7 @@
 
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from 'Components/modals/primaryModal';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {getLogger} from 'Util/logger';

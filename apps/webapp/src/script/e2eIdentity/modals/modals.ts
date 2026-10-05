@@ -22,14 +22,14 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from 'Components/modals/primaryModal';
 import {
   ModalOptions,
   PrimaryModalTranslatedComponent,
   PrimaryModalTranslatedTranslation,
   PrimaryModalTranslatedValue,
   PrimaryModalType,
-} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
+} from 'Components/modals/primaryModal/primaryModalTypes';
 import {Config} from 'src/script/Config';
 import type {Translate, TranslationKey} from 'Util/localizerUtil';
 

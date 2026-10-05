@@ -29,7 +29,7 @@ import {createStore} from 'zustand/vanilla';
 import type {MeetingStoreState} from 'Components/meeting/meetingStore/createMeetingStore';
 import {MeetingStoreProvider} from 'Components/meeting/meetingStore/meetingStoreProvider';
 import {meetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from 'Components/modals/primaryModal';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {
   createRootContextValueForTest,

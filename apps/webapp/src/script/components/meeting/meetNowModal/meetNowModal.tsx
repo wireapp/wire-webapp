@@ -35,7 +35,7 @@ import {
   submitButtonStyles,
   wrapperStyles,
 } from 'Components/meeting/shared/styles/meetingModalShell.styles';
-import {ModalComponent} from 'Components/Modals/ModalComponent';
+import {ModalComponent} from 'Components/modals/modalComponent';
 import {UserState} from 'Repositories/user/userState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleEscDown} from 'Util/keyboardUtil';

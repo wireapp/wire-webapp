@@ -24,7 +24,7 @@ import {meetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
 import {useScheduleMeetingModal} from 'Components/meeting/scheduleMeetingModal/useScheduleMeetingModal';
 import {getScheduleMeetingSubmitErrorTranslationKeys} from 'Components/meeting/shared/submit/meetingSubmitErrorKeys';
 import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from 'Components/modals/primaryModal';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 export const useEditMeeting = () => {

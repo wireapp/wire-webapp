@@ -21,13 +21,13 @@ import {isEmptyArray, isUndefined} from '@sindresorhus/is';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {AddUsersFailure, AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from 'Components/modals/primaryModal';
 import type {
   PrimaryModalTranslatedCompatibilityReplacement,
   PrimaryModalTranslatedMessage,
   PrimaryModalTranslatedTranslation,
   PrimaryModalTranslatedValue,
-} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
+} from 'Components/modals/primaryModal/primaryModalTypes';
 import {getUserNameWithTranslate} from 'Components/UserName';
 import type {User} from 'Repositories/entity/User';
 import type {Translate, TranslationKey} from 'Util/localizerUtil';

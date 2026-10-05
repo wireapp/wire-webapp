@@ -20,7 +20,7 @@
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {PropertiesService} from 'Repositories/properties/propertiesService';
 import {SelfService} from 'Repositories/self/SelfService';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from 'Components/modals/primaryModal';
 import {translate} from 'Util/localizerUtil';
 
 describe('PropertiesRepository', () => {

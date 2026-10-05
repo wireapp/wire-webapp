@@ -1708,3 +1708,136 @@ ls:
   apps/webapp/src/script/components/inputBar/util:
     .dir: camelCase
     .tsx: camelCase
+  apps/webapp/src/script/components/modals:
+    .dir: camelCase
+  apps/webapp/src/script/components/modals/createConversation:
+    .dir: camelCase
+    .test.ts: camelCase
+    .styles.ts: camelCase
+    .tsx: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/modals/createConversation/conversationType:
+    .dir: camelCase
+    .test.tsx: camelCase
+    .styles.ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/modals/createConversation/createConversationSteps:
+    .dir: camelCase
+    .test.tsx: camelCase
+    .styles.ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/modals/createConversation/createConversationSteps/conversationDetails:
+    .dir: camelCase
+    .styles.ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/modals/createConversation/hooks:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/modals/detailViewModal:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/modals/fileHistoryModal:
+    .dir: camelCase
+    .test.tsx: camelCase
+    .styles.ts: camelCase
+    .tsx: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/modals/fileHistoryModal/hooks:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/modals/fileHistoryModal/utils:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/modals/groupCreation:
+    .dir: camelCase
+    .test.tsx: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/modals/inviteModal:
+    .dir: camelCase
+    .test.tsx: camelCase
+    .tsx: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/modals/leaveGroupAdminModal:
+    .dir: camelCase
+    .test.tsx: camelCase
+    .tsx: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/modals/legalHoldModal:
+    .dir: camelCase
+    .test.tsx: camelCase
+    .state.ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/modals/modalComponent:
+    .dir: camelCase
+    .test.tsx: camelCase
+    .styles.tsx: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/modals/primaryModal:
+    .dir: camelCase
+    .test.tsx: camelCase
+    .tsx: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/modals/primaryModal/checkboxOption:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/modals/primaryModal/content:
+    .dir: camelCase
+    .test.tsx: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/modals/primaryModal/guestLinkPasswordForm:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/modals/primaryModal/inputForm:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/modals/primaryModal/joinGuestLinkPasswordForm:
+    .dir: camelCase
+    .styles.ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/modals/primaryModal/passwordAdvancedSecurityForm:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/modals/primaryModal/passwordForm:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/modals/primaryModal/primaryButton:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/modals/primaryModal/primaryModalButtons:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/modals/primaryModal/primaryModalHeader:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/modals/primaryModal/primaryModalLoading:
+    .dir: camelCase
+    .styles.ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/modals/primaryModal/primaryModalShell:
+    .dir: camelCase
+    .styles.ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/modals/primaryModal/secondaryButton:
+    .dir: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/components/modals/qualityFeedbackModal:
+    .dir: camelCase
+    .test.tsx: camelCase
+    .styles.ts: camelCase
+    .tsx: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/modals/serviceModal:
+    .dir: camelCase
+    .tsx: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/modals/userModal:
+    .dir: camelCase
+    .test.tsx: camelCase
+    .styles.ts: camelCase
+    .state.ts: camelCase
+    .tsx: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/components/modals/utils:
+    .dir: camelCase
+    .ts: camelCase

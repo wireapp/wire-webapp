@@ -25,7 +25,7 @@ import {
   deleteMeetingConfirmButtonContentStyles,
   deleteMeetingConfirmButtonIconStyles,
 } from 'Components/meeting/shared/delete/showDeleteMeetingModal.styles';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from 'Components/modals/primaryModal';
 import type {Translate, TranslationKey} from 'Util/localizerUtil';
 
 export type DeleteMeetingModalMode = 'forAll' | 'forMe';

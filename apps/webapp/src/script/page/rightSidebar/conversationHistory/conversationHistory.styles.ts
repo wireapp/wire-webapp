@@ -23,8 +23,8 @@ import {
   salesModalWrapperCss,
   salesModalBodyCss,
   salesModalBodyButtonCss,
-} from 'Components/Modals/CreateConversation/CreateConversationSteps/ConversationDetails/ConversationDetails.styles';
-import {customHistorySharingFormContainerCss} from 'Components/Modals/CreateConversation/CreateConversationSteps/CreateConversationSteps.styles';
+} from 'Components/modals/createConversation/createConversationSteps/conversationDetails/conversationDetails.styles';
+import {customHistorySharingFormContainerCss} from 'Components/modals/createConversation/createConversationSteps/createConversationSteps.styles';
 
 export const teamCreationWrapperCss: CSSObject = {
   ...salesModalWrapperCss,

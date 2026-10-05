@@ -60,10 +60,10 @@ import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import type {PrimaryModalTranslatedMessage} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
-import {CALL_QUALITY_FEEDBACK_KEY} from 'Components/Modals/QualityFeedbackModal/constants';
-import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
+import {PrimaryModal} from 'Components/modals/primaryModal';
+import type {PrimaryModalTranslatedMessage} from 'Components/modals/primaryModal/primaryModalTypes';
+import {CALL_QUALITY_FEEDBACK_KEY} from 'Components/modals/qualityFeedbackModal/constants';
+import {RatingListLabel} from 'Components/modals/qualityFeedbackModal/typings';
 import {useActiveWindowState} from 'Hooks/useActiveWindow';
 import {
   NetworkQualityInfo,

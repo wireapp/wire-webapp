@@ -24,7 +24,7 @@ import {isNonEmptyString} from '@sindresorhus/is';
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from 'Components/modals/primaryModal';
 import {ProgressBar} from 'Components/ProgressBar/ProgressBar';
 import {BackupRepository} from 'Repositories/backup/backupRepository';
 import {

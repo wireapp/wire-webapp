@@ -19,7 +19,7 @@
 
 import {ReactNode} from 'react';
 
-import {ModalComponent} from 'Components/Modals/ModalComponent';
+import {ModalComponent} from 'Components/modals/modalComponent';
 import {handleEscDown} from 'Util/keyboardUtil';
 
 import {largeModalStyles, wrapperStyles} from './cellsModal.styles';

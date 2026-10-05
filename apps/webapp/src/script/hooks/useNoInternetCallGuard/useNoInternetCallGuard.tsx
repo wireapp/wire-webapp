@@ -19,7 +19,7 @@
 
 import {useCallback} from 'react';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from 'Components/modals/primaryModal';
 import {styles} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard.styles';
 import type {Translate} from 'Util/localizerUtil';
 

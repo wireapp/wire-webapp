@@ -20,7 +20,7 @@
 import {task} from 'true-myth';
 
 import {meetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from 'Components/modals/primaryModal';
 import {translateForTest} from 'Util/test/translateForTest';
 
 import {showMeetingConversationRenameFailedModal} from './showMeetingConversationRenameFailedModal';

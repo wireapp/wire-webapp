@@ -23,7 +23,7 @@ import {
   CELLS_ACTION,
   useCellsActionPermissions,
 } from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
-import {useFileHistoryModal} from 'Components/Modals/FileHistoryModal/hooks/useFileHistoryModal';
+import {useFileHistoryModal} from 'Components/modals/fileHistoryModal/hooks/useFileHistoryModal';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {isFileEditable} from 'Util/fileTypeUtil';
 import {forcedDownloadFile, getFileNameWithExtension} from 'Util/util';
