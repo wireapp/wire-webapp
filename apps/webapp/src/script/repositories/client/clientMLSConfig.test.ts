@@ -17,16 +17,19 @@
  *
  */
 
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {FEATURE_KEY, FEATURE_STATUS, CONVERSATION_PROTOCOL, FeatureList} from '@wireapp/api-client/lib/team';
 
 import {getClientMLSConfig} from './clientMLSConfig';
 
 describe('getClientMLSConfig', () => {
   it('returns undefined when MLS configuration is missing', () => {
-    expect(getClientMLSConfig({} as FeatureList)).toBeUndefined();
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    expect(getClientMLSConfig({} as FeatureList, clock)).toBeUndefined();
   });
 
   it.each(['', 'https://identity.example.com'])('preserves enrollment selection for discovery URL %p', discoveryUrl => {
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
     const teamFeatures = {
       [FEATURE_KEY.MLS]: {
         status: FEATURE_STATUS.ENABLED,
@@ -41,7 +44,7 @@ describe('getClientMLSConfig', () => {
         config: {verificationExpiration: 0, acmeDiscoveryUrl: discoveryUrl},
       },
     } as FeatureList;
-    const actualConfiguration = getClientMLSConfig(teamFeatures);
+    const actualConfiguration = getClientMLSConfig(teamFeatures, clock);
 
     expect(actualConfiguration).toMatchObject({
       defaultCiphersuite: 1,
