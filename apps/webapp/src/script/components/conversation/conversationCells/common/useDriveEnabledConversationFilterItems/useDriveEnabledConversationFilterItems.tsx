@@ -22,8 +22,8 @@ import {stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 
 import {GroupAvatar, ChannelAvatar} from 'Components/avatar';
 import type {FilterItem} from 'Components/conversation/conversationCells/common/cellsFiltersBar/filterConfig';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import type {Conversation} from 'Repositories/entity/Conversation';
+import type {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import type {Conversation} from 'Repositories/entity/conversation';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 export const getDriveEnabledConversationFilterId = (conversation: Conversation): string => {

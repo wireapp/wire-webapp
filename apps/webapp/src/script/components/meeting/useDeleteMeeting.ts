@@ -26,7 +26,7 @@ import {
 } from 'Components/meeting/shared/delete/showDeleteMeetingModal';
 import {submitDeleteMeeting} from 'Components/meeting/shared/submit/submitDeleteMeeting';
 import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
-import type {User} from 'Repositories/entity/User';
+import type {User} from 'Repositories/entity/user';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 export const useDeleteMeeting = () => {

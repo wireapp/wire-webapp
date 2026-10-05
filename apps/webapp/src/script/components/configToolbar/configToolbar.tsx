@@ -26,7 +26,7 @@ import {container} from 'tsyringe';
 
 import {Button, Input, Switch} from '@wireapp/react-ui-kit';
 
-import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {ConversationState} from 'Repositories/conversation/conversationState';
 import {Config, Configuration} from 'src/script/Config';
 import {StartupFeatureToggleName, startupFeatureToggleNames} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {updateLocationSearchForStartupFeatureToggle} from 'src/script/featureToggles/startupFeatureToggleQueryParameters';

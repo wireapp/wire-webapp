@@ -24,7 +24,7 @@ import {isNullOrUndefined} from '@sindresorhus/is';
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
 
 const REFRESH_INTERVAL_MS = 10000;
 const MAX_REFRESH_COUNT = 5;

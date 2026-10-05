@@ -25,7 +25,7 @@ import {RestrictedFile} from 'Components/messagesList/message/contentMessage/ass
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import type {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import type {FileAsset as FileAssetType} from 'Repositories/entity/message/fileAsset';
-import {TeamState} from 'Repositories/team/TeamState';
+import {TeamState} from 'Repositories/team/teamState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';

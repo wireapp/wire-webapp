@@ -21,8 +21,8 @@ import {renderHook, waitFor} from '@testing-library/react';
 import type {Virtualizer} from '@tanstack/react-virtual';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {Conversation} from 'Repositories/entity/conversation';
 import {Message} from 'Repositories/entity/message/message';
 import {
   createExecutingFireAndForgetInvokerForTest,

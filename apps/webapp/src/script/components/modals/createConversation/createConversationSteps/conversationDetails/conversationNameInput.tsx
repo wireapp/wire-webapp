@@ -20,7 +20,7 @@
 import {isEmptyString, isNonEmptyString} from '@sindresorhus/is';
 
 import {TextInput} from 'Components/TextInput';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleEnterDown} from 'Util/keyboardUtil';
 

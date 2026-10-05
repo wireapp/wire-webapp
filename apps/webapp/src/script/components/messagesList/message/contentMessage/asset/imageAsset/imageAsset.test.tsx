@@ -30,7 +30,7 @@ import type {GetAssetUrl, ImageLogger} from 'Components/image';
 import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
 import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {MediumImage} from 'Repositories/entity/message/mediumImage';
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {
   createExecutingFireAndForgetInvokerForTest,
   createRootContextValueForTest,

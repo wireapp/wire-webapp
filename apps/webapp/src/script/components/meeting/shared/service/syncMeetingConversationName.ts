@@ -21,8 +21,8 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {task, type Task} from 'true-myth';
 
 import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {isMeetingConversation} from 'Repositories/conversation/ConversationSelectors';
+import type {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {isMeetingConversation} from 'Repositories/conversation/conversationSelectors';
 
 export type SyncMeetingConversationNameParams = {
   qualifiedConversationId: QualifiedId;

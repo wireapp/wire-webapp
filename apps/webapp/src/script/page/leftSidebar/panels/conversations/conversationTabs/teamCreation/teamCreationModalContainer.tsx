@@ -19,8 +19,8 @@
 
 import {useState} from 'react';
 
-import {User} from 'Repositories/entity/User';
-import {TeamRepository} from 'Repositories/team/TeamRepository';
+import {User} from 'Repositories/entity/user';
+import {TeamRepository} from 'Repositories/team/teamRepository';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 

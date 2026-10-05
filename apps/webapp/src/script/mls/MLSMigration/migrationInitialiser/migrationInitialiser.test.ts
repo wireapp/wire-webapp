@@ -22,8 +22,8 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
-import {MixedConversation, ProteusConversation} from 'Repositories/conversation/ConversationSelectors';
-import {Conversation} from 'Repositories/entity/Conversation';
+import {MixedConversation, ProteusConversation} from 'Repositories/conversation/conversationSelectors';
+import {Conversation} from 'Repositories/entity/conversation';
 import {Core} from 'src/script/service/coreSingleton';
 import {TestFactory} from 'test/helper/TestFactory';
 import {createUuid} from 'Util/uuid';

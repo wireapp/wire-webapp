@@ -17,8 +17,8 @@
  *
  */
 
-import {User} from 'Repositories/entity/User';
-import type {TeamState} from 'Repositories/team/TeamState';
+import {User} from 'Repositories/entity/user';
+import type {TeamState} from 'Repositories/team/teamState';
 import type {UserState} from 'Repositories/user/userState';
 import {generateQualifiedIds} from 'src/script/auth/util/test/testUtil';
 import {translateForTest} from 'Util/test/translateForTest';

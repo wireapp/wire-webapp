@@ -21,17 +21,17 @@ import type {ComponentProps} from 'react';
 import {render} from '@testing-library/react';
 
 import en from 'I18n/en-US.json';
-import {ClientEntity} from 'Repositories/client/ClientEntity';
+import {ClientEntity} from 'Repositories/client/clientEntity';
 import type {ClientRepository} from 'Repositories/client';
-import type {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
-import {User} from 'Repositories/entity/User';
-import type {MessageRepository} from 'Repositories/conversation/MessageRepository';
+import type {CryptographyRepository} from 'Repositories/cryptography/cryptographyRepository';
+import {User} from 'Repositories/entity/user';
+import type {MessageRepository} from 'Repositories/conversation/messageRepository';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {ConversationState} from 'Repositories/conversation/conversationState';
 import {setStrings, translate} from 'Util/localizerUtil';
 import type {Logger} from 'Util/logger';
 import {translateForTest} from 'Util/test/translateForTest';

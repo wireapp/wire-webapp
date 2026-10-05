@@ -26,7 +26,7 @@ import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {FileAsset} from 'Repositories/entity/message/fileAsset';
-import {TeamState} from 'Repositories/team/TeamState';
+import {TeamState} from 'Repositories/team/teamState';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

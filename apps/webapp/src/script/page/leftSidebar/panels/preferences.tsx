@@ -31,8 +31,8 @@ import {
   ClientNotificationData,
   Notification,
   PreferenceNotificationRepository,
-} from 'Repositories/notification/PreferenceNotificationRepository';
-import {TeamRepository} from 'Repositories/team/TeamRepository';
+} from 'Repositories/notification/preferenceNotificationRepository';
+import {TeamRepository} from 'Repositories/team/teamRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {ListWrapper} from './listWrapper';

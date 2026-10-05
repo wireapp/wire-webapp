@@ -26,7 +26,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {UploadIcon} from '@wireapp/react-ui-kit';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import type {Conversation} from 'Repositories/entity/Conversation';
+import type {Conversation} from 'Repositories/entity/conversation';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 

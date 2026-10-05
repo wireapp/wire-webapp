@@ -17,7 +17,7 @@
  *
  */
 
-import {getLinkPreviewFromString} from '.';
+import {getLinkPreviewFromString} from './';
 import {assertNotNullOrUndefined} from '@sindresorhus/is';
 
 describe('linkPreviews', () => {

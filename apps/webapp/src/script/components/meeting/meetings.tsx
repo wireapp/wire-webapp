@@ -32,7 +32,7 @@ import {useMeetingPrepJoin} from 'Components/meeting/meetingPrep/useMeetingPrepJ
 import {useMeetingStore} from 'Components/meeting/meetingStore/meetingStoreProvider';
 import {MeetNowModal} from 'Components/meeting/meetNowModal/meetNowModal';
 import {ScheduleMeetingModal} from 'Components/meeting/scheduleMeetingModal';
-import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
+import {MediaStreamHandler} from 'Repositories/media/mediaStreamHandler';
 import {UserState} from 'Repositories/user/userState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 

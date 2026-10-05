@@ -38,15 +38,15 @@ import {SearchInput} from 'Components/SearchInput';
 import {TextInput} from 'Components/TextInput';
 import {InfoToggle} from 'Components/toggle/InfoToggle';
 import {UserSearchableList} from 'Components/UserSearchableList';
-import {ACCESS_STATE} from 'Repositories/conversation/AccessState';
+import {ACCESS_STATE} from 'Repositories/conversation/accessState';
 import {
   ACCESS_TYPES,
   teamPermissionsForAccessState,
   toggleFeature,
-} from 'Repositories/conversation/ConversationAccessPermission';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
+} from 'Repositories/conversation/conversationAccessPermission';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {User} from 'Repositories/entity/user';
+import {TeamState} from 'Repositories/team/teamState';
 import {UserState} from 'Repositories/user/userState';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {useApplicationContext} from 'src/script/page/rootProvider';

@@ -17,7 +17,7 @@
  *
  */
 
-import type {User} from 'Repositories/entity/User';
+import type {User} from 'Repositories/entity/user';
 
 import {getStackedAvatarDisplay} from './getStackedAvatarDisplay';
 import {ParticipantAvatarTooltip} from './participantAvatarTooltip';

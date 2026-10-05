@@ -19,7 +19,7 @@
 
 import {escape} from 'underscore';
 
-import type {User} from 'Repositories/entity/User';
+import type {User} from 'Repositories/entity/user';
 
 import {Declension} from './localizerUtil.types';
 import type {Translate} from './translationTypes';

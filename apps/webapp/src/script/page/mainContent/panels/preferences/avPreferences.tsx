@@ -22,11 +22,11 @@ import {memo} from 'react';
 import {container} from 'tsyringe';
 
 import {useInitializeMediaDevices} from 'Hooks/useInitializeMediaDevices';
-import type {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {MediaConstraintsHandler} from 'Repositories/media/MediaConstraintsHandler';
-import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
-import type {MediaDeviceType} from 'Repositories/media/MediaDeviceType';
-import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
+import type {CallingRepository} from 'Repositories/calling/callingRepository';
+import {MediaConstraintsHandler} from 'Repositories/media/mediaConstraintsHandler';
+import {MediaDevicesHandler} from 'Repositories/media/mediaDevicesHandler';
+import type {MediaDeviceType} from 'Repositories/media/mediaDeviceType';
+import {MediaStreamHandler} from 'Repositories/media/mediaStreamHandler';
 import type {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 

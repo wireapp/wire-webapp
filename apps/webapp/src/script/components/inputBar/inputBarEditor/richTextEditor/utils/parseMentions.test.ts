@@ -18,7 +18,7 @@
 
 import {$createParagraphNode, $createTextNode, $getRoot} from 'lexical';
 
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {translateForTest} from 'Util/test/translateForTest';
 
 import {

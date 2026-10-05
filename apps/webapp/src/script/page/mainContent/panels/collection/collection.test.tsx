@@ -22,14 +22,14 @@ import {noop} from 'noop-esm';
 import {container} from 'tsyringe';
 
 import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
+import {MessageRepository} from 'Repositories/conversation/messageRepository';
+import {Conversation} from 'Repositories/entity/conversation';
 import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {FileAsset} from 'Repositories/entity/message/fileAsset';
 import {LinkPreview} from 'Repositories/entity/message/linkPreview';
 import {MediumImage} from 'Repositories/entity/message/mediumImage';
 import {Text} from 'Repositories/entity/message/text';
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {withTheme} from 'src/script/auth/util/test/testUtil';
 import {MessageCategory} from 'src/script/message/messageCategory';
 import {

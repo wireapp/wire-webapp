@@ -17,7 +17,7 @@
  *
  */
 
-import {ClientEvent} from 'Repositories/event/Client';
+import {ClientEvent} from 'Repositories/event/client';
 import {Translate} from 'Util/localizerUtil';
 
 import {SystemMessage} from './systemMessage';

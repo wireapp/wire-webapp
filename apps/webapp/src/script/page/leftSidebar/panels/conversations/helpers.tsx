@@ -19,8 +19,8 @@
 
 import {isEmptyString, isNan, isNull} from '@sindresorhus/is';
 
-import {ConversationLabel} from 'Repositories/conversation/ConversationLabelRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
+import {ConversationLabel} from 'Repositories/conversation/conversationLabelRepository';
+import {Conversation} from 'Repositories/entity/conversation';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {replaceAccents} from 'Util/stringUtil';
 import {isConversationEntity} from 'Util/typePredicateUtil';

@@ -19,7 +19,7 @@
 
 import {Maybe} from 'true-myth';
 
-import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
+import {CALL_MESSAGE_TYPE} from './enum/callMessageType';
 import {isIncomingSetupOffer, shouldRejectStaleIncomingRing} from './incomingCallInvite';
 
 const lifetimeMs = 30_000;

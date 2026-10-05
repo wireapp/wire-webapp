@@ -22,7 +22,7 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
+import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/notificationHandlingState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {getLogger} from 'Util/logger';
 import {translateForTest} from 'Util/test/translateForTest';

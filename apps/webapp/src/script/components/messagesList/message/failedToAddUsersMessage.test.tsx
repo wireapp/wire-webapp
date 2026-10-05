@@ -26,7 +26,7 @@ import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 import de from 'I18n/de-DE.json';
 import en from 'I18n/en-US.json';
 import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from 'Repositories/entity/message/failedToAddUsersMessage';
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {UserState} from 'Repositories/user/userState';
 import {generateQualifiedIds} from 'src/script/auth/util/test/testUtil';
 import {

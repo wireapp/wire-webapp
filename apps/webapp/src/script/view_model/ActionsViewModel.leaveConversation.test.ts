@@ -25,12 +25,12 @@ import {useLeaveGroupAdminModalStore} from 'Components/modals/leaveGroupAdminMod
 import {PrimaryModal} from 'Components/modals/primaryModal';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConnectionRepository} from 'Repositories/connection/connectionRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {User} from 'Repositories/entity/User';
-import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
-import {SelfRepository} from 'Repositories/self/SelfRepository';
-import {TeamState} from 'Repositories/team/TeamState';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {MessageRepository} from 'Repositories/conversation/messageRepository';
+import {User} from 'Repositories/entity/user';
+import {IntegrationRepository} from 'Repositories/integration/integrationRepository';
+import {SelfRepository} from 'Repositories/self/selfRepository';
+import {TeamState} from 'Repositories/team/teamState';
 import {UserState} from 'Repositories/user/userState';
 import {generateConversation} from 'test/helper/ConversationGenerator';
 import type {Translate} from 'Util/localizerUtil';

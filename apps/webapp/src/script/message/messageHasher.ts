@@ -20,7 +20,7 @@
 import {isNonEmptyString, isTruthy} from '@sindresorhus/is';
 import Long from 'long';
 
-import {ClientEvent} from 'Repositories/event/Client';
+import {ClientEvent} from 'Repositories/event/client';
 import {LegacyEventRecord} from 'Repositories/storage/record/eventRecord';
 import {stringToUtf16BE, utf8ToUtf16BE} from 'Util/stringUtil';
 

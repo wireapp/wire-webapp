@@ -21,8 +21,8 @@ import {render} from '@testing-library/react';
 import {noop} from 'noop-esm';
 
 import * as Icon from 'Components/icon';
-import {createLabel, LabelType} from 'Repositories/conversation/ConversationLabelRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
+import {createLabel, LabelType} from 'Repositories/conversation/conversationLabelRepository';
+import {Conversation} from 'Repositories/entity/conversation';
 import {translateForTest} from 'Util/test/translateForTest';
 import {
   createRootContextValueForTest,

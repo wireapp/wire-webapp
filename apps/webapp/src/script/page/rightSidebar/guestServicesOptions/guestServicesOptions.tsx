@@ -21,11 +21,11 @@ import {FC, useState} from 'react';
 
 import {FadingScrollbar} from 'Components/fadingScrollbar';
 import {PrimaryModal} from 'Components/modals/primaryModal';
-import {toggleFeature} from 'Repositories/conversation/ConversationAccessPermission';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {TeamRepository} from 'Repositories/team/TeamRepository';
-import {TeamState} from 'Repositories/team/TeamState';
+import {toggleFeature} from 'Repositories/conversation/conversationAccessPermission';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {Conversation} from 'Repositories/entity/conversation';
+import {TeamRepository} from 'Repositories/team/teamRepository';
+import {TeamState} from 'Repositories/team/teamState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 

@@ -24,9 +24,9 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {act, fireEvent, render, waitFor} from '@testing-library/react';
 
 import {UserList} from 'Components/userList/userList';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
 import type {Translate} from 'Util/localizerUtil/translationTypes';
 import {translateForTest} from 'Util/test/translateForTest';
 import {

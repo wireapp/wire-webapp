@@ -28,15 +28,15 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {ConversationRepository} from 'src/script/repositories/conversation/ConversationRepository';
-import {Conversation} from 'src/script/repositories/entity/Conversation';
-import {User} from 'src/script/repositories/entity/User';
-import {IntegrationRepository} from 'src/script/repositories/integration/IntegrationRepository';
-import {ServiceEntity} from 'src/script/repositories/integration/ServiceEntity';
+import {ConversationRepository} from 'src/script/repositories/conversation/conversationRepository';
+import {Conversation} from 'src/script/repositories/entity/conversation';
+import {User} from 'src/script/repositories/entity/user';
+import {IntegrationRepository} from 'src/script/repositories/integration/integrationRepository';
+import {ServiceEntity} from 'src/script/repositories/integration/serviceEntity';
 import {SearchRepository} from 'src/script/repositories/search/searchRepository';
-import {TeamEntity} from 'src/script/repositories/team/TeamEntity';
-import {TeamRepository} from 'src/script/repositories/team/TeamRepository';
-import {TeamState} from 'src/script/repositories/team/TeamState';
+import {TeamEntity} from 'src/script/repositories/team/teamEntity';
+import {TeamRepository} from 'src/script/repositories/team/teamRepository';
+import {TeamState} from 'src/script/repositories/team/teamState';
 import {UserState} from 'src/script/repositories/user/userState';
 import {translateForTest} from 'Util/test/translateForTest';
 

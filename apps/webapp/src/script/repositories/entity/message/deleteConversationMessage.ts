@@ -25,7 +25,7 @@ import {type Translate} from 'Util/localizerUtil';
 import {SystemMessage} from './systemMessage';
 
 import {SystemMessageType} from '../../../message/systemMessageType';
-import type {Conversation} from '../Conversation';
+import type {Conversation} from '../conversation';
 
 export class DeleteConversationMessage extends SystemMessage {
   constructor(conversationEntity: Conversation, translate: Translate) {

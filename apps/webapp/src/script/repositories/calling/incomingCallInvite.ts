@@ -19,9 +19,9 @@
 
 import {Maybe} from 'true-myth';
 
-import {CallingEvent} from 'Repositories/event/CallingEvent';
+import {CallingEvent} from 'Repositories/event/callingEvent';
 
-import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
+import {CALL_MESSAGE_TYPE} from './enum/callMessageType';
 
 export const isIncomingSetupOffer = (content: CallingEvent['content']): boolean => {
   return content.type === CALL_MESSAGE_TYPE.SETUP && content.resp === false;

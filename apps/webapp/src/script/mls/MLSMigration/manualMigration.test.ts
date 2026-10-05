@@ -22,8 +22,8 @@ import {CONVERSATION_PROTOCOL, FEATURE_STATUS} from '@wireapp/api-client/lib/tea
 import {Maybe, task} from 'true-myth';
 import {asyncNoop, noop} from 'noop-esm';
 
-import {ConversationMapper} from 'Repositories/conversation/ConversationMapper';
-import {Conversation} from 'Repositories/entity/Conversation';
+import {ConversationMapper} from 'Repositories/conversation/conversationMapper';
+import {Conversation} from 'Repositories/entity/conversation';
 import {translateForTest} from 'Util/test/translateForTest';
 
 import {canManuallyMigrateConversation, manuallyMigrateConversation} from './manualMigration';

@@ -22,11 +22,11 @@ import {act, render, screen} from '@testing-library/react';
 import type {RenderResult} from '@testing-library/react';
 import type {ReactElement} from 'react';
 
-import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting';
-import {Conversation} from 'Repositories/entity/Conversation';
+import {NOTIFICATION_STATE} from 'Repositories/conversation/notificationSetting';
+import {Conversation} from 'Repositories/entity/conversation';
 import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {Text} from 'Repositories/entity/message/text';
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

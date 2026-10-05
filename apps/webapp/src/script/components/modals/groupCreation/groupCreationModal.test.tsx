@@ -1,10 +1,10 @@
 import {CONVERSATION_PROTOCOL, FEATURE_STATUS} from '@wireapp/api-client/lib/team';
-import {TeamState} from 'Repositories/team/TeamState';
+import {TeamState} from 'Repositories/team/teamState';
 import ko from 'knockout';
 import {GroupCreationModal} from 'Components/modals/groupCreation/groupCreationModal';
 import {act, getByRole} from '@testing-library/react';
 import {UserState} from 'Repositories/user/userState';
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {mountComponent} from '../../../auth/util/test/testUtil';

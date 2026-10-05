@@ -21,8 +21,8 @@ import {MutableRefObject, useEffect} from 'react';
 
 import {isUndefined} from '@sindresorhus/is';
 
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {Conversation} from 'Repositories/entity/conversation';
 import {Message as MessageEntity} from 'Repositories/entity/message/message';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 

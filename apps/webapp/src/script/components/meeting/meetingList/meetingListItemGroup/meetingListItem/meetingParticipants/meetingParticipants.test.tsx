@@ -23,9 +23,9 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {ThemeProvider} from '@wireapp/react-ui-kit';
 import {container} from 'tsyringe';
 
-import {User} from 'Repositories/entity/User';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {User} from 'Repositories/entity/user';
+import {Conversation} from 'Repositories/entity/conversation';
+import {ConversationState} from 'Repositories/conversation/conversationState';
 import {UserState} from 'Repositories/user/userState';
 import {setStrings, translate} from 'Util/localizerUtil';
 import en from 'I18n/en-US.json';

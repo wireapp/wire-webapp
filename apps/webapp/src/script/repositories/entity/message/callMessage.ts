@@ -19,7 +19,7 @@
 
 import ko from 'knockout';
 
-import type {TERMINATION_REASON} from 'Repositories/calling/enum/TerminationReason';
+import type {TERMINATION_REASON} from 'Repositories/calling/enum/terminationReason';
 import {type Translate} from 'Util/localizerUtil';
 
 import {Message} from './message';

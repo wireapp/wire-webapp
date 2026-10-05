@@ -22,7 +22,7 @@ import ko from 'knockout';
 
 import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {FileAsset} from 'Repositories/entity/message/fileAsset';
-import {TeamState} from 'Repositories/team/TeamState';
+import {TeamState} from 'Repositories/team/teamState';
 import {StatusType} from 'src/script/message/statusType';
 import {
   createRootContextValueForTest,

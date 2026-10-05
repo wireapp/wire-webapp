@@ -27,7 +27,7 @@ import {FadingScrollbar} from 'Components/fadingScrollbar';
 import * as Icon from 'Components/icon';
 import {RadioGroup} from 'Components/Radio';
 import {BackgroundEffectsQuality} from 'Repositories/media/useBackgroundEffectsStore';
-import type {BackgroundEffectSelection, BuiltinBackground} from 'Repositories/media/VideoBackgroundEffects';
+import type {BackgroundEffectSelection, BuiltinBackground} from 'Repositories/media/videoBackgroundEffects';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {

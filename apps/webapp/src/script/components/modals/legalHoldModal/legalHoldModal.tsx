@@ -31,12 +31,12 @@ import {UserDevicesState, UserDevices} from 'Components/userDevices';
 import {UserSearchableList} from 'Components/UserSearchableList';
 import {useUserDevicesHistory} from 'Hooks/useUserDevicesHistory';
 import {ClientRepository} from 'Repositories/client';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
-import {User} from 'Repositories/entity/User';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {MessageRepository} from 'Repositories/conversation/messageRepository';
+import {CryptographyRepository} from 'Repositories/cryptography/cryptographyRepository';
+import {User} from 'Repositories/entity/user';
 import {SearchRepository} from 'Repositories/search/searchRepository';
-import {TeamRepository} from 'Repositories/team/TeamRepository';
+import {TeamRepository} from 'Repositories/team/teamRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleEnterDown} from 'Util/keyboardUtil';
 import {

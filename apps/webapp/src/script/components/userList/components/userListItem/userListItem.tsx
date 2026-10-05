@@ -27,7 +27,7 @@ import {ParticipantItemContent} from 'Components/participantItemContent';
 import {listItem, listWrapper} from 'Components/participantItemContent/participantItem.styles';
 import {UserlistMode} from 'Components/userList';
 import {useUserName} from 'Components/UserName';
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {capitalizeFirstChar} from 'Util/stringUtil';

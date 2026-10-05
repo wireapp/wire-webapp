@@ -27,7 +27,7 @@ import {
   reactionsCountAlignment,
 } from 'Components/messagesList/message/contentMessage/messageActions/messageReactions/messageReactions.styles';
 import {UserList} from 'Components/userList';
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {ReactionMap} from 'Repositories/storage';
 import {getEmojiTitleFromEmojiUnicode, getEmojiUnicode} from 'Util/emojiUtil';
 import {capitalizeFirstChar} from 'Util/stringUtil';

@@ -19,9 +19,9 @@
 
 import {queryByRole, render} from '@testing-library/react';
 import {ServicesOptions} from './servicesOptions';
-import {TeamState} from 'Repositories/team/TeamState';
+import {TeamState} from 'Repositories/team/teamState';
 import ko from 'knockout';
-import {Conversation} from 'Repositories/entity/Conversation';
+import {Conversation} from 'Repositories/entity/conversation';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

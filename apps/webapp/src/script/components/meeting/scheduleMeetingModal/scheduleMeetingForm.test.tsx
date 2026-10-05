@@ -22,7 +22,7 @@ import userEvent from '@testing-library/user-event';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {Maybe, maybe} from 'true-myth';
 
-import type {User} from 'Repositories/entity/User';
+import type {User} from 'Repositories/entity/user';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {
   createRootContextValueForTest,

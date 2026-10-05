@@ -20,9 +20,9 @@
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {act, render, screen} from '@testing-library/react';
 
-import {Conversation} from 'Repositories/entity/Conversation';
+import {Conversation} from 'Repositories/entity/conversation';
 import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

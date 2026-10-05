@@ -32,9 +32,9 @@ import {
   MEETING_TITLE_MAX_LENGTH,
   meetingTitleErrorKeys,
 } from 'Components/meeting/shared/validation/meetingTitleValidation';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
+import {ConversationState} from 'Repositories/conversation/conversationState';
+import {User} from 'Repositories/entity/user';
+import {TeamState} from 'Repositories/team/teamState';
 import {UserState} from 'Repositories/user/userState';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {

@@ -33,8 +33,8 @@ import type {
   ScheduleMeetingCommand,
   UpdateMeetingCommand,
 } from 'Components/meeting/shared/types/meetingCommandTypes';
-import type {CallingRepository} from 'Repositories/calling/CallingRepository';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import type {CallingRepository} from 'Repositories/calling/callingRepository';
+import type {ConversationRepository} from 'Repositories/conversation/conversationRepository';
 import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
 
 export type MeetingStoreServiceTasks = {

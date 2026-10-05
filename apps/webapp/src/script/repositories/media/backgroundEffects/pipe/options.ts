@@ -20,7 +20,7 @@
 import {Runtime} from '@wireapp/commons';
 
 import {EffectMode, Metrics, QualityMode} from 'Repositories/media/backgroundEffects';
-import {BackgroundSource} from 'Repositories/media/VideoBackgroundEffects';
+import {BackgroundSource} from 'Repositories/media/videoBackgroundEffects';
 
 export type ProcessVideoTrackOptions = {
   // MediaPipe options.

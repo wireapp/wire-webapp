@@ -19,8 +19,8 @@
 
 import {renderHook, waitFor} from '@testing-library/react';
 
-import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
-import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
+import {MediaDevicesHandler} from 'Repositories/media/mediaDevicesHandler';
+import {MediaStreamHandler} from 'Repositories/media/mediaStreamHandler';
 
 import {useInitializeMediaDevices} from './useInitializeMediaDevices';
 

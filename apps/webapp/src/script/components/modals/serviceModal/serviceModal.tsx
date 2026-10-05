@@ -20,8 +20,8 @@
 import {Avatar, AVATAR_SIZE} from 'Components/avatar';
 import * as Icon from 'Components/icon';
 import {ModalComponent} from 'Components/modals/modalComponent';
-import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {IntegrationRepository} from 'Repositories/integration/integrationRepository';
+import {ServiceEntity} from 'Repositories/integration/serviceEntity';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {Translate} from 'Util/localizerUtil';

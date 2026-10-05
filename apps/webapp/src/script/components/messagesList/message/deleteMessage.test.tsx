@@ -20,7 +20,7 @@
 import {render} from '@testing-library/react';
 
 import {DeleteMessage as DeleteMessageEntity} from 'Repositories/entity/message/deleteMessage';
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {translateForTest} from 'Util/test/translateForTest';
 import {
   createRootContextValueForTest,

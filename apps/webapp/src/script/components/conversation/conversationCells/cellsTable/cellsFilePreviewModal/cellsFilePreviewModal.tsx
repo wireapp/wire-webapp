@@ -18,7 +18,7 @@
  */
 
 import {FileFullscreenModal} from 'Components/FileFullscreenModal/FileFullscreenModal';
-import type {Conversation} from 'Repositories/entity/Conversation';
+import type {Conversation} from 'Repositories/entity/conversation';
 import {getFileTypeFromExtension} from 'Util/getFileTypeFromExtension/getFileTypeFromExtension';
 
 import {sortTagsAlphabetically} from '../../common/sortTagsAlphabetically/sortTagsAlphabetically';

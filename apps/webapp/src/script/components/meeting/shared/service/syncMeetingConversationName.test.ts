@@ -22,8 +22,8 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {task} from 'true-myth';
 
 import {meetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
+import type {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {Conversation} from 'Repositories/entity/conversation';
 import {translateForTest} from 'Util/test/translateForTest';
 import {unwrapErr} from 'Util/test/resultTestSupport';
 

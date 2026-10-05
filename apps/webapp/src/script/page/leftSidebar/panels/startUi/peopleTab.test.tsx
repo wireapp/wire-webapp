@@ -26,12 +26,12 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {ConversationState} from 'src/script/repositories/conversation/ConversationState';
-import {User} from 'src/script/repositories/entity/User';
+import {ConversationState} from 'src/script/repositories/conversation/conversationState';
+import {User} from 'src/script/repositories/entity/user';
 import {SearchRepository} from 'src/script/repositories/search/searchRepository';
-import {TeamEntity} from 'src/script/repositories/team/TeamEntity';
-import {TeamRepository} from 'src/script/repositories/team/TeamRepository';
-import {TeamState} from 'src/script/repositories/team/TeamState';
+import {TeamEntity} from 'src/script/repositories/team/teamEntity';
+import {TeamRepository} from 'src/script/repositories/team/teamRepository';
+import {TeamState} from 'src/script/repositories/team/teamState';
 import {UserState} from 'src/script/repositories/user/userState';
 import {translateForTest} from 'Util/test/translateForTest';
 

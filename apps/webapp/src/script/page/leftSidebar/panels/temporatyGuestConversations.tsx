@@ -20,7 +20,7 @@
 import {CallingCell} from 'Components/calling/CallingCell';
 import * as Icon from 'Components/icon';
 import {PrimaryModal} from 'Components/modals/primaryModal';
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 

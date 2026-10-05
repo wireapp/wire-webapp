@@ -27,8 +27,8 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/icon';
 import {useCreateConversationModal} from 'Components/modals/createConversation/hooks/useCreateConversationModal';
-import {ConversationLabel} from 'Repositories/conversation/ConversationLabelRepository';
-import {User} from 'Repositories/entity/User';
+import {ConversationLabel} from 'Repositories/conversation/conversationLabelRepository';
+import {User} from 'Repositories/entity/user';
 import {generatePermissionHelpers} from 'Repositories/user/userPermission';
 import {SidebarTabs} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {useApplicationContext} from 'src/script/page/rootProvider';

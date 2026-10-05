@@ -34,7 +34,7 @@ import {
   IncompatibleBackupFormatError,
   InvalidPassword,
 } from 'Repositories/backup/error';
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {ContentState} from 'src/script/page/useAppState';
 import {checkBackupEncryption} from 'Util/backupUtil';

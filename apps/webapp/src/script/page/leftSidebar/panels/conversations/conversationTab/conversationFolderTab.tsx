@@ -23,9 +23,9 @@ import {isNan, isNonEmptyArray, isNonEmptyString} from '@sindresorhus/is';
 import cx from 'classnames';
 
 import * as Icons from 'Components/icon';
-import {createLabel, LabelType} from 'Repositories/conversation/ConversationLabelRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
+import {createLabel, LabelType} from 'Repositories/conversation/conversationLabelRepository';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {Conversation} from 'Repositories/entity/conversation';
 import {Config} from 'src/script/Config';
 import {useFolderStore} from 'src/script/page/leftSidebar/panels/conversations/useFoldersStore';
 import {

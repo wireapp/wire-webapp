@@ -19,7 +19,7 @@
 
 import {fireEvent, render, screen} from '@testing-library/react';
 
-import type {Conversation} from 'Repositories/entity/Conversation';
+import type {Conversation} from 'Repositories/entity/conversation';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

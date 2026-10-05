@@ -28,7 +28,7 @@ import {Message} from './message';
 
 import {SuperType} from '../../../message/superType';
 import {VerificationMessageType} from '../../../message/verificationMessageType';
-import type {User} from '../User';
+import type {User} from '../user';
 
 export class VerificationMessage extends Message {
   public readonly userEntities: ko.ObservableArray<User>;

@@ -34,8 +34,8 @@ import {
 } from 'Components/messagesList/message/contentMessage/messageActions/messageActions.styles';
 import {MessageReactions} from 'Components/messagesList/message/contentMessage/messageActions/messageReactions/messageReactions';
 import {ReplyButton} from 'Components/messagesList/message/contentMessage/messageActions/replyButton';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
+import {MessageRepository} from 'Repositories/conversation/messageRepository';
+import {Conversation} from 'Repositories/entity/conversation';
 import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isTabKey} from 'Util/keyboardUtil';

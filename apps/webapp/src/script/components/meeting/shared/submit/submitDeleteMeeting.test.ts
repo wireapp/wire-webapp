@@ -23,7 +23,7 @@ import {meetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
 import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
 import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
 import {PrimaryModal} from 'Components/modals/primaryModal';
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {translateForTest} from 'Util/test/translateForTest';
 
 import {

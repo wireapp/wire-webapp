@@ -27,7 +27,7 @@ import {render} from '@testing-library/react';
 import {PrimaryModal} from 'Components/modals/primaryModal';
 import {MessageContent} from 'Components/modals/primaryModal/content/messageContent';
 import en from 'I18n/en-US.json';
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {generateQualifiedIds} from 'src/script/auth/util/test/testUtil';
 import {
   createRootContextValueForTest,

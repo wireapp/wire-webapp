@@ -60,7 +60,7 @@ import {isMeetingInstanceVisibleInMeetingList} from 'Components/meeting/selector
 import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
 import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
 import {getDaySectionHeader} from 'Components/meeting/utils/getDaySectionHeader';
-import type {User} from 'Repositories/entity/User';
+import type {User} from 'Repositories/entity/user';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 

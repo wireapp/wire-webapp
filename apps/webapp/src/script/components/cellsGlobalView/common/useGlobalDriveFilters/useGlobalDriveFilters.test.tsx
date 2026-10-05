@@ -26,9 +26,9 @@ import type {
   PopoverFilterConfig,
 } from 'Components/conversation/conversationCells/common/cellsFiltersBar/filterConfig';
 import type {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {TeamState} from 'Repositories/team/TeamState';
+import {ConversationState} from 'Repositories/conversation/conversationState';
+import type {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {TeamState} from 'Repositories/team/teamState';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

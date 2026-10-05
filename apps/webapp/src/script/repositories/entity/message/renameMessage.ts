@@ -28,7 +28,7 @@ import {matchQualifiedIds} from 'Util/qualifiedId';
 import {SystemMessage} from './systemMessage';
 
 import {SystemMessageType} from '../../../message/systemMessageType';
-import {User} from '../User';
+import {User} from '../user';
 
 export class RenameMessage extends SystemMessage {
   public readonly name: string;

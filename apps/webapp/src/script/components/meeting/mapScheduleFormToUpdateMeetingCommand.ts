@@ -27,7 +27,7 @@ import type {
   ScheduleMeetingRecurrenceOption,
 } from 'Components/meeting/scheduleMeetingModal/scheduleMeetingTypes';
 import type {UpdateMeetingCommand} from 'Components/meeting/shared/types/meetingCommandTypes';
-import type {User} from 'Repositories/entity/User';
+import type {User} from 'Repositories/entity/user';
 
 export type MapScheduleFormToUpdateMeetingCommandParams = {
   formState: ScheduleMeetingFormState;

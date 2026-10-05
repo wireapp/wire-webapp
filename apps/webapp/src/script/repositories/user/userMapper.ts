@@ -21,7 +21,7 @@ import {isNan, isNonEmptyArray, isNonEmptyString, isNullOrUndefined, isUndefined
 import {UserType} from '@wireapp/api-client/lib/user';
 
 import {MappedAsset, mapProfileAssets, updateUserEntityAssets} from 'Repositories/assets/assetMapper';
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {UserRecord} from 'Repositories/storage';
 import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';

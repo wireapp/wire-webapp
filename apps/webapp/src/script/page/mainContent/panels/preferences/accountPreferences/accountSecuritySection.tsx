@@ -26,8 +26,8 @@ import {TabIndex, Link, LinkVariant} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/modals/primaryModal';
-import {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
+import {User} from 'Repositories/entity/user';
+import {TeamState} from 'Repositories/team/teamState';
 import {AppLockState} from 'Repositories/user/appLockState';
 import {FEATURES, hasAccessToFeature} from 'Repositories/user/userPermission';
 import {UserRepository} from 'Repositories/user/userRepository';

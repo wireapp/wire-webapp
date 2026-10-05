@@ -23,7 +23,7 @@ import cx from 'classnames';
 
 import * as Icon from 'Components/icon';
 import {useLegalHoldModalState} from 'Components/modals/legalHoldModal/legalHoldModal.state';
-import type {Conversation} from 'Repositories/entity/Conversation';
+import type {Conversation} from 'Repositories/entity/conversation';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 interface LegalHoldDotProps {

@@ -26,8 +26,8 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import en from 'I18n/en-US.json';
 import type {ClientRepository} from 'Repositories/client';
-import {User} from 'Repositories/entity/User/User';
-import {TeamState} from 'Repositories/team/TeamState';
+import {User} from 'Repositories/entity/user/user';
+import {TeamState} from 'Repositories/team/teamState';
 import {AppLockCrypto, AppLockRepository} from 'Repositories/user/appLockRepository';
 import {AppLockState} from 'Repositories/user/appLockState';
 import {UserState} from 'Repositories/user/userState';

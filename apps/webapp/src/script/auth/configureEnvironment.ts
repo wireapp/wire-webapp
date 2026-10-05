@@ -19,6 +19,6 @@
 
 import '../message/messageCategorization';
 import '../message/messageCategory';
-import '../repositories/event/Client';
+import '../repositories/event/client';
 import '../repositories/storage/storageSchemata';
 import '../service/backendEnvironment';

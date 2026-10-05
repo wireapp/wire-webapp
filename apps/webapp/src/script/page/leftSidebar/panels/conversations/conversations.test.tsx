@@ -28,11 +28,11 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {CallState} from 'Repositories/calling/CallState';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {CallState} from 'Repositories/calling/callState';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
+import {ConversationState} from 'Repositories/conversation/conversationState';
 import {SearchRepository} from 'Repositories/search/searchRepository';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {withTheme} from 'src/script/auth/util/test/testUtil';

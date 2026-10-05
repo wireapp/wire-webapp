@@ -29,9 +29,9 @@ import {
   MessageAddEvent,
   MultipartMessageAddEvent,
   ReactionEvent,
-} from 'Repositories/conversation/EventBuilder';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {CONVERSATION} from 'Repositories/event/Client';
+} from 'Repositories/conversation/eventBuilder';
+import {Conversation} from 'Repositories/entity/conversation';
+import {CONVERSATION} from 'Repositories/event/client';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {StatusType} from 'src/script/message/statusType';
 import {translate} from 'Util/localizerUtil';

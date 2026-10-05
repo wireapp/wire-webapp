@@ -29,8 +29,8 @@ import * as Icon from 'Components/icon';
 import {UserName} from 'Components/UserName';
 import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {DeleteMessage} from 'Repositories/entity/message/deleteMessage';
-import {User} from 'Repositories/entity/User';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {User} from 'Repositories/entity/user';
+import {ServiceEntity} from 'Repositories/integration/serviceEntity';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 

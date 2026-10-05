@@ -20,7 +20,7 @@
 import {isNonEmptyString} from '@sindresorhus/is';
 import getSlug from 'speakingurl';
 
-import type {User} from 'Repositories/entity/User';
+import type {User} from 'Repositories/entity/user';
 import {randomElement} from 'Util/arrayUtil';
 
 const obfuscationExtraCharacterRange = 10;

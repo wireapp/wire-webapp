@@ -21,10 +21,10 @@ import {isNonEmptyString} from '@sindresorhus/is';
 import {CONVERSATION_PROTOCOL, FEATURE_STATUS, type FeatureMLSMigration} from '@wireapp/api-client/lib/team';
 import {Maybe, Task, task} from 'true-myth';
 
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {isMixedConversation, isMLSConversation} from 'Repositories/conversation/ConversationSelectors';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {User} from 'Repositories/entity/User';
+import type {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {isMixedConversation, isMLSConversation} from 'Repositories/conversation/conversationSelectors';
+import type {Conversation} from 'Repositories/entity/conversation';
+import type {User} from 'Repositories/entity/user';
 
 import {mlsMigrationLogger} from './MLSMigrationLogger';
 import {useManualMigrationStore} from './useManualMigrationStore';

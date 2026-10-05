@@ -33,7 +33,7 @@ import {useDriveEnabledConversationFilterItems} from 'Components/conversation/co
 import {useDriveEnabledParticipantFilterItems} from 'Components/conversation/conversationCells/common/useDriveEnabledParticipantFilterItems/useDriveEnabledParticipantFilterItems';
 import {useGetAllTags} from 'Components/conversation/conversationCells/common/useGetAllTags/useGetAllTags';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
 import type {RootContextValue} from 'src/script/page/rootProvider';
 
 export const useGlobalDriveFilters = ({

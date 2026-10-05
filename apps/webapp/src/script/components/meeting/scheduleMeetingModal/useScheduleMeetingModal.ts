@@ -31,7 +31,7 @@ import {
 import {getMeetingPasswordErrors} from 'Components/meeting/shared/validation/meetingPasswordValidation';
 import {getMeetingTitleInputError} from 'Components/meeting/shared/validation/meetingTitleValidation';
 import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
-import type {User} from 'Repositories/entity/User';
+import type {User} from 'Repositories/entity/user';
 
 import {
   emptyScheduleMeetingFormErrors,

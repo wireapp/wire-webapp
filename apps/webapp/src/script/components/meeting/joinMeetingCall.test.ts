@@ -26,11 +26,11 @@ import {task} from 'true-myth';
 import {buildMediaDevicesHandler, createConversation, createSelfParticipant} from 'src/script/auth/util/test/testUtil';
 import {joinMeetingCall, joinMeetingCallErrors, type JoinMeetingCallDeps} from 'Components/meeting/joinMeetingCall';
 import {unwrapErr} from 'Util/test/resultTestSupport';
-import {Call} from 'Repositories/calling/Call';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import type {ConversationState} from 'Repositories/conversation/ConversationState';
-import type {CallingRepository} from 'Repositories/calling/CallingRepository';
+import {Call} from 'Repositories/calling/call';
+import type {Conversation} from 'Repositories/entity/conversation';
+import type {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import type {ConversationState} from 'Repositories/conversation/conversationState';
+import type {CallingRepository} from 'Repositories/calling/callingRepository';
 import type {CallingViewModel} from 'src/script/view_model/CallingViewModel';
 
 const qualifiedConversationId = {domain: 'example.com', id: 'meeting-conversation-id'};

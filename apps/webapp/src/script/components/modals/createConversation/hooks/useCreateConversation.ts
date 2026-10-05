@@ -28,14 +28,14 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {ACCESS_STATE} from 'Repositories/conversation/AccessState';
+import {ACCESS_STATE} from 'Repositories/conversation/accessState';
 import {
   toggleFeature,
   teamPermissionsForAccessState,
   ACCESS_TYPES,
   ACCESS_MODES,
-} from 'Repositories/conversation/ConversationAccessPermission';
-import {TeamState} from 'Repositories/team/TeamState';
+} from 'Repositories/conversation/conversationAccessPermission';
+import {TeamState} from 'Repositories/team/teamState';
 import {useSidebarStore, SidebarTabs} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';

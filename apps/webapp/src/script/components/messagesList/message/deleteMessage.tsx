@@ -20,8 +20,8 @@
 import {noop} from 'noop-esm';
 
 import {DeleteMessage as DeleteMessageEntity} from 'Repositories/entity/message/deleteMessage';
-import {User} from 'Repositories/entity/User';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {User} from 'Repositories/entity/user';
+import {ServiceEntity} from 'Repositories/integration/serviceEntity';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {formatTimeShort, fromUnixTime, TIME_IN_MILLIS} from 'Util/timeUtil';
 

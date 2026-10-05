@@ -29,7 +29,7 @@ import {customHistorySharingInputCss} from 'Components/modals/createConversation
 import {ChatHistory, HistorySharingUnit} from 'Components/modals/createConversation/types';
 import {getChatHistoryOptions, getChatHistorySharingUnitOptions} from 'Components/modals/createConversation/utils';
 import {RadioGroup} from 'Components/Radio';
-import {TeamState} from 'Repositories/team/TeamState';
+import {TeamState} from 'Repositories/team/teamState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {

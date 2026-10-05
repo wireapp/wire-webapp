@@ -21,8 +21,8 @@ import {isUndefined} from '@sindresorhus/is';
 import {create} from 'zustand';
 
 import {LegalHoldModalType} from 'Components/modals/legalHoldModal/legalHoldModal';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
 
 type LegalHoldModalState = {
   type: LegalHoldModalType | null;

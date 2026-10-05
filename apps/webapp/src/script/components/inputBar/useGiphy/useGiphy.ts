@@ -23,8 +23,8 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {MessageRepository, OutgoingQuote} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
+import {MessageRepository, OutgoingQuote} from 'Repositories/conversation/messageRepository';
+import {Conversation} from 'Repositories/entity/conversation';
 import {Config} from 'src/script/Config';
 
 interface UseGiphyProps {

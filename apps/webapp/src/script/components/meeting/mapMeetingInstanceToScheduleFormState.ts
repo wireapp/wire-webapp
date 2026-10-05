@@ -23,7 +23,7 @@ import {maybe} from 'true-myth';
 import type {ScheduleMeetingFormState} from 'Components/meeting/scheduleMeetingModal/scheduleMeetingTypes';
 import {getEditAnchorMeetingInstance} from 'Components/meeting/selectors/getMeetingInstancesInRange';
 import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
-import type {User} from 'Repositories/entity/User';
+import type {User} from 'Repositories/entity/user';
 
 /**
  * Builds edit-form state from the selected list row.

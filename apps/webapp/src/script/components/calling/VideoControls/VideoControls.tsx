@@ -41,21 +41,21 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import * as Icon from 'Components/icon';
 import {useActiveWindowMatchMedia} from 'Hooks/useActiveWindowMatchMedia';
 import {useUserPropertyValue} from 'Hooks/useUserProperty';
-import {Call} from 'Repositories/calling/Call';
-import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
-import {Participant} from 'Repositories/calling/Participant';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ElectronDesktopCapturerSource, MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
+import {Call} from 'Repositories/calling/call';
+import {CallingViewMode, CallState} from 'Repositories/calling/callState';
+import {Participant} from 'Repositories/calling/participant';
+import {Conversation} from 'Repositories/entity/conversation';
+import {ElectronDesktopCapturerSource, MediaDevicesHandler} from 'Repositories/media/mediaDevicesHandler';
 import {useBackgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
 import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {
   BackgroundEffectSelection,
   DEFAULT_BACKGROUND_EFFECT,
   DEFAULT_BUILTIN_BACKGROUND_ID,
-} from 'Repositories/media/VideoBackgroundEffects';
+} from 'Repositories/media/videoBackgroundEffects';
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
-import {TeamState} from 'Repositories/team/TeamState';
+import {TeamState} from 'Repositories/team/teamState';
 import {Config} from 'src/script/Config';
 import {isCallViewOption} from 'src/script/guards/CallView';
 import {isMediaDevice} from 'src/script/guards/MediaDevice';

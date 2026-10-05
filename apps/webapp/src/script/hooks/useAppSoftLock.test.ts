@@ -19,8 +19,8 @@
 
 import {renderHook, waitFor} from '@testing-library/react';
 
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {NotificationRepository} from 'Repositories/notification/NotificationRepository';
+import {CallingRepository} from 'Repositories/calling/callingRepository';
+import {NotificationRepository} from 'Repositories/notification/notificationRepository';
 
 import {useAppSoftLock} from './useAppSoftLock';
 

@@ -54,7 +54,7 @@ import {
   scheduleMeetingTitleInputStyles,
   scheduleMeetingTitleInputWrapperStyles,
 } from 'Components/meeting/shared/styles/meetingForm.styles';
-import type {User} from 'Repositories/entity/User';
+import type {User} from 'Repositories/entity/user';
 import {currentLanguage} from 'src/script/auth/localeConfig';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {getRegionalDateLocale} from 'src/script/util/timeUtil';

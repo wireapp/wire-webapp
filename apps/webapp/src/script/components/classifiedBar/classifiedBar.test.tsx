@@ -19,8 +19,8 @@
 
 import {render} from '@testing-library/react';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
 import {translateForTest} from 'Util/test/translateForTest';
 import {
   createRootContextValueForTest,

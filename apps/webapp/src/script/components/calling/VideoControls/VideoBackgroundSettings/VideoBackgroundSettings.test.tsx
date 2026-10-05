@@ -19,7 +19,7 @@
 
 import {fireEvent, render} from '@testing-library/react';
 
-import type {BuiltinBackground} from 'Repositories/media/VideoBackgroundEffects';
+import type {BuiltinBackground} from 'Repositories/media/videoBackgroundEffects';
 import {translateForTest} from 'Util/test/translateForTest';
 import {
   createRootContextValueForTest,

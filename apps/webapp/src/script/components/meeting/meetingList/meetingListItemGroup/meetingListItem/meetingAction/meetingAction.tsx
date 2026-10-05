@@ -31,7 +31,7 @@ import {useDeleteMeeting} from 'Components/meeting/useDeleteMeeting';
 import {useEditMeeting} from 'Components/meeting/useEditMeeting';
 import {canDeleteMeetingForAll, canDeleteMeetingForMe} from 'Components/meeting/utils/canDeleteMeeting';
 import {canEditMeeting} from 'Components/meeting/utils/canEditMeeting';
-import type {User} from 'Repositories/entity/User';
+import type {User} from 'Repositories/entity/user';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {showContextMenu} from '../../../../../../ui/contextMenu';

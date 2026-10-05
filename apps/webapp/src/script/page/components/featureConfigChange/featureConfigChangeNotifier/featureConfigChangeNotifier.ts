@@ -38,7 +38,7 @@ import type {
   PrimaryModalTranslatedTranslation,
   PrimaryModalTranslatedValue,
 } from 'Components/modals/primaryModal/primaryModalTypes';
-import {TeamState} from 'Repositories/team/TeamState';
+import {TeamState} from 'Repositories/team/teamState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {type TranslationKey} from 'Util/localizerUtil';

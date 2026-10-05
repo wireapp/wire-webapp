@@ -29,7 +29,7 @@ import {
 } from 'Components/meeting/meetingConversationTeardown';
 import type {MeetingServiceDeps} from 'Components/meeting/meetingStore/meetingStoreDeps';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
-import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/LeaveCallReason';
+import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/leaveCallReason';
 
 export type DeleteMeetingCommand = {
   meetingId: QualifiedId;

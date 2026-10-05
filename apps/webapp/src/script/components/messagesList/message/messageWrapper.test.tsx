@@ -21,9 +21,9 @@ import {render} from '@testing-library/react';
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-import {Conversation} from 'Repositories/entity/Conversation';
+import {Conversation} from 'Repositories/entity/conversation';
 import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/memberMessage';
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {withTheme} from 'src/script/auth/util/test/testUtil';
 import {SystemMessageType} from 'src/script/message/systemMessageType';
 import {translateForTest} from 'Util/test/translateForTest';

@@ -32,7 +32,7 @@ import {container} from 'tsyringe';
 import {Runtime} from '@wireapp/commons';
 
 import {AppContainer} from 'Components/appContainer/appContainer';
-import {doSimpleRedirect} from 'Repositories/LifeCycleRepository/LifeCycleRepository';
+import {doSimpleRedirect} from 'Repositories/lifeCycleRepository/lifeCycleRepository';
 import {StorageKey} from 'Repositories/storage';
 import {translate} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';

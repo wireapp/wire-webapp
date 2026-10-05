@@ -23,7 +23,7 @@ import {noop} from 'noop-esm';
 
 import {AccentColor} from '@wireapp/commons';
 
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {translateForTest} from 'Util/test/translateForTest';
 import {
   createRootContextValueForTest,

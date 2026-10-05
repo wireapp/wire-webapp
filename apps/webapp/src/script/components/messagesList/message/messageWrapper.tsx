@@ -28,12 +28,12 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {E2EIVerificationMessage} from 'Components/messagesList/message/e2eiVerificationMessage';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {OutgoingQuote} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
+import {OutgoingQuote} from 'Repositories/conversation/messageRepository';
+import {Conversation} from 'Repositories/entity/conversation';
 import {CompositeMessage} from 'Repositories/entity/message/compositeMessage';
 import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {Text} from 'Repositories/entity/message/text';
-import {TeamState} from 'Repositories/team/TeamState';
+import {TeamState} from 'Repositories/team/teamState';
 import {QuoteEntity} from 'src/script/message/quoteEntity';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';

@@ -26,7 +26,7 @@ import {useAppNotification} from 'Components/appNotification/index';
 import {MicOnIcon} from 'Components/icon';
 import {useActiveWindowState} from 'Hooks/useActiveWindow';
 import {useKeyPressAndHold} from 'Hooks/useKeyPressAndHold/useKeyPressAndHold';
-import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
+import {CallingViewMode, CallState} from 'Repositories/calling/callState';
 import {EventName} from 'Repositories/tracking/eventName';
 import {KEY} from 'Util/keyboardUtil';
 

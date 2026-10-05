@@ -40,8 +40,8 @@ import {
 import {useLoadMessages} from 'Components/messagesList/virtualizedMessagesList/useLoadMessages';
 import {useScrollMessages} from 'Components/messagesList/virtualizedMessagesList/useScrollMessages';
 import {useRoveFocus} from 'Hooks/useRoveFocus';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
+import {MessageRepository} from 'Repositories/conversation/messageRepository';
+import {Conversation} from 'Repositories/entity/conversation';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 

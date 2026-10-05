@@ -20,9 +20,9 @@
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {container} from 'tsyringe';
 
-import {Call} from 'Repositories/calling/Call';
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {CallingViewMode, CallState, DesktopScreenShareMenu} from 'Repositories/calling/CallState';
+import {Call} from 'Repositories/calling/call';
+import {CallingRepository} from 'Repositories/calling/callingRepository';
+import {CallingViewMode, CallState, DesktopScreenShareMenu} from 'Repositories/calling/callState';
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {UserState} from 'Repositories/user/userState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';

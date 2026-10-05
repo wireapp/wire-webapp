@@ -41,7 +41,7 @@ import type {
   ScheduleMeetingCommand,
   UpdateMeetingCommand,
 } from 'Components/meeting/shared/types/meetingCommandTypes';
-import type {User} from 'Repositories/entity/User';
+import type {User} from 'Repositories/entity/user';
 
 export type MeetingSubmitSuccess = {failedToAdd: AddUsersFailure[]};
 

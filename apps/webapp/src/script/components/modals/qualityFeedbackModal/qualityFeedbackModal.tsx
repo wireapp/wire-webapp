@@ -28,7 +28,7 @@ import {useAppNotification} from 'Components/appNotification/index';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {ModalComponent} from 'Components/modals/modalComponent';
 import {RatingListLabel} from 'Components/modals/qualityFeedbackModal/typings';
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
+import {CallingRepository} from 'Repositories/calling/callingRepository';
 import {trackCallQualityFeedback} from 'Repositories/tracking/helpers';
 import {UserState} from 'Repositories/user/userState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';

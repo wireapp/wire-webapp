@@ -28,7 +28,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {GifImage} from 'Components/giphy/gifImage';
 import * as Icon from 'Components/icon';
-import {Gif, GiphyRepository} from 'Repositories/extension/GiphyRepository';
+import {Gif, GiphyRepository} from 'Repositories/extension/giphyRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 const GIPHY_CLOSE_TIMEOUT = 350;

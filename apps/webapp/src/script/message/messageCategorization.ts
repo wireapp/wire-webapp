@@ -20,7 +20,7 @@
 import {isNonEmptyArray, isNumber, isTruthy} from '@sindresorhus/is';
 import {isObject} from 'underscore';
 
-import {ClientEvent} from 'Repositories/event/Client';
+import {ClientEvent} from 'Repositories/event/client';
 import {EventRecord} from 'Repositories/storage/record/eventRecord';
 
 import {MessageCategory} from './messageCategory';

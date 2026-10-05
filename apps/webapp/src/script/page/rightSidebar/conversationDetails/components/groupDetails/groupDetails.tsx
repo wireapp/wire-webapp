@@ -21,9 +21,9 @@ import {FC} from 'react';
 
 import {isNan, isNonEmptyArray, isNullOrUndefined} from '@sindresorhus/is';
 
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {User} from 'Repositories/entity/User';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {User} from 'Repositories/entity/user';
+import {ServiceEntity} from 'Repositories/integration/serviceEntity';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 interface GroupDetailsProps {

@@ -22,7 +22,7 @@ import React, {useEffect, useLayoutEffect, useRef} from 'react';
 import {isNonEmptyString} from '@sindresorhus/is';
 import cx from 'classnames';
 
-import type {User} from 'Repositories/entity/User';
+import type {User} from 'Repositories/entity/user';
 import {MAX_HANDLE_LENGTH} from 'Repositories/user/userHandleGenerator';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {isEnterKey} from 'Util/keyboardUtil';

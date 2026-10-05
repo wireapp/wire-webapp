@@ -1,0 +1,180 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {isUndefined} from '@sindresorhus/is';
+import {ConversationCode} from '@wireapp/api-client/lib/conversation/';
+import {ConversationAccessUpdateData} from '@wireapp/api-client/lib/conversation/data/';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+
+import {PrimaryModal} from 'Components/modals/primaryModal';
+import type {Conversation} from 'Repositories/entity/conversation';
+import {type Translate} from 'Util/localizerUtil';
+import type {TranslationKey} from 'Util/localizerUtil/translationTypes';
+import {isErrorWithCode} from 'Util/typePredicateUtil';
+
+import {AbstractConversationEventHandler, EventHandlingConfig} from './abstractConversationEventHandler';
+import {ACCESS_STATE} from './accessState';
+import {
+  ACCESS_MODES,
+  featureFromStateChange,
+  hasAccessToFeature,
+  updateAccessRights,
+} from './conversationAccessPermission';
+import {ConversationMapper} from './conversationMapper';
+import type {ConversationService} from './conversationService';
+import {ConversationEvent} from './eventBuilder';
+
+const ACCESS_FEATURE_TRANSLATION_KEYS: Record<
+  'Guest' | 'Service',
+  {allow: TranslationKey; disable: TranslationKey; toggle: TranslationKey}
+> = {
+  Guest: {
+    allow: 'modalConversationOptionsAllowGuestMessage',
+    disable: 'modalConversationOptionsDisableGuestMessage',
+    toggle: 'modalConversationOptionsToggleGuestMessage',
+  },
+  Service: {
+    allow: 'modalConversationOptionsAllowAppMessage',
+    disable: 'modalConversationOptionsDisableAppMessage',
+    toggle: 'modalConversationOptionsToggleAppMessage',
+  },
+};
+
+export class ConversationStateHandler extends AbstractConversationEventHandler {
+  private readonly conversationService: ConversationService;
+  private readonly translate: Translate;
+
+  constructor(conversationService: ConversationService, translate: Translate) {
+    super();
+    const eventHandlingConfig: EventHandlingConfig = {
+      [CONVERSATION_EVENT.ACCESS_UPDATE]: this._mapConversationAccessState.bind(this),
+      [CONVERSATION_EVENT.CODE_DELETE]: this._resetConversationAccessCode.bind(this),
+      [CONVERSATION_EVENT.CODE_UPDATE]: this._updateConversationAccessCode.bind(this),
+    };
+    this.setEventHandlingConfig(eventHandlingConfig);
+    this.conversationService = conversationService;
+    this.translate = translate;
+  }
+
+  async changeAccessState(conversationEntity: Conversation, accessState: ACCESS_STATE): Promise<void> {
+    const isConversationInTeam = conversationEntity.inTeam();
+    const isStateChange = conversationEntity.accessState() !== accessState;
+    const prevAccessState = conversationEntity.accessState();
+
+    if (isConversationInTeam) {
+      if (isStateChange) {
+        const {accessModes, accessRole} = updateAccessRights(accessState);
+        if (!isUndefined(accessModes) && !isUndefined(accessRole)) {
+          try {
+            const isLosingAccessCode =
+              hasAccessToFeature(ACCESS_MODES.CODE, prevAccessState) &&
+              !hasAccessToFeature(ACCESS_MODES.CODE, accessState);
+            if (isLosingAccessCode) {
+              conversationEntity.accessCode('');
+              await this.revokeAccessCode(conversationEntity);
+            }
+
+            const {domain, id} = conversationEntity;
+            const conversationId = {id, domain};
+
+            await this.conversationService.putConversationAccess(conversationId, accessModes, accessRole);
+
+            conversationEntity.accessState(accessState);
+          } catch {
+            const {featureName, ...featureInfo} = featureFromStateChange(prevAccessState, accessState);
+            if (!isUndefined(featureName)) {
+              const messageKey =
+                featureInfo.isAvailable === true
+                  ? ACCESS_FEATURE_TRANSLATION_KEYS[featureName].allow
+                  : ACCESS_FEATURE_TRANSLATION_KEYS[featureName].disable;
+              this._showModal(this.translate(messageKey));
+            }
+          }
+          return;
+        }
+      }
+    }
+    const {featureName} = featureFromStateChange(prevAccessState, accessState);
+    if (!isUndefined(featureName)) {
+      this._showModal(this.translate(ACCESS_FEATURE_TRANSLATION_KEYS[featureName].toggle));
+    }
+  }
+
+  async getAccessCode(conversationEntity: Conversation): Promise<void> {
+    try {
+      const response = await this.conversationService.getConversationCode(conversationEntity.id);
+      return ConversationMapper.mapAccessCode(conversationEntity, response);
+    } catch (error: unknown) {
+      const isNotFound = isErrorWithCode(error) && error.code === HTTP_STATUS.NOT_FOUND;
+      if (!isNotFound) {
+        this._showModal(this.translate('modalConversationGuestOptionsGetCodeMessage'));
+      }
+    }
+  }
+
+  async requestAccessCode(conversationEntity: Conversation, password?: string): Promise<void> {
+    try {
+      const response = await this.conversationService.postConversationCode(conversationEntity.id, password ?? '');
+      const accessCode = response?.data;
+      if (!isUndefined(accessCode)) {
+        ConversationMapper.mapAccessCode(conversationEntity, accessCode);
+      }
+    } catch {
+      return this._showModal(this.translate('modalConversationGuestOptionsRequestCodeMessage'));
+    }
+  }
+
+  async revokeAccessCode(conversationEntity: Conversation): Promise<void> {
+    try {
+      await this.conversationService.deleteConversationCode(conversationEntity.id);
+      conversationEntity.accessCode('');
+    } catch {
+      return this._showModal(this.translate('modalConversationGuestOptionsRevokeCodeMessage'));
+    }
+  }
+
+  private _mapConversationAccessState(
+    conversationEntity: Conversation,
+    eventJson: ConversationEvent<CONVERSATION_EVENT.ACCESS_UPDATE, ConversationAccessUpdateData>,
+  ): void {
+    const {access: accessModes, ...roles} = eventJson.data;
+    const accessRole = roles.access_role;
+    if (isUndefined(accessRole)) {
+      return;
+    }
+    ConversationMapper.mapAccessState(conversationEntity, accessModes, accessRole, roles.access_role_v2);
+  }
+
+  private _resetConversationAccessCode(conversationEntity: Conversation): void {
+    conversationEntity.accessCode('');
+  }
+
+  private _updateConversationAccessCode(
+    conversationEntity: Conversation,
+    eventJson: ConversationEvent<CONVERSATION_EVENT.CODE_UPDATE, ConversationCode>,
+  ): void {
+    ConversationMapper.mapAccessCode(conversationEntity, eventJson.data);
+  }
+
+  private _showModal(message: string): void {
+    const modalOptions = {text: {message}};
+    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, modalOptions, undefined, this.translate);
+  }
+}

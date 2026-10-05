@@ -22,7 +22,7 @@ import {ThemeProvider} from '@wireapp/react-ui-kit';
 import {container} from 'tsyringe';
 
 import en from 'I18n/en-US.json';
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {UserState} from 'Repositories/user/userState';
 import {useMeetingPrepModal} from 'Components/meeting/meetingPrep/useMeetingPrepModal';
 import {useJoinMeetingCall} from 'Components/meeting/useJoinMeetingCall';

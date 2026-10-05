@@ -22,8 +22,8 @@ import {amplify} from 'amplify';
 import {useLegalHoldModalState} from 'Components/modals/legalHoldModal/legalHoldModal.state';
 import {PrimaryModal} from 'Components/modals/primaryModal';
 import type {PrimaryModalTranslatedMessage} from 'Components/modals/primaryModal/primaryModalTypes';
-import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
-import type {Conversation} from 'Repositories/entity/Conversation';
+import {ConversationVerificationState} from 'Repositories/conversation/conversationVerificationState';
+import type {Conversation} from 'Repositories/entity/conversation';
 import type {Translate} from 'Util/localizerUtil';
 
 import {ConversationError} from '../error/conversationError';

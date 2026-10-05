@@ -25,12 +25,12 @@ import {Button, Popover} from 'react-aria-components';
 import {ChevronDownIcon, getOverlayPortalContainer, InputLabel, SearchIcon} from '@wireapp/react-ui-kit';
 
 import {UserSearchableList} from 'Components/UserSearchableList';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import type {ConversationState} from 'Repositories/conversation/ConversationState';
-import type {User} from 'Repositories/entity/User';
+import type {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import type {ConversationState} from 'Repositories/conversation/conversationState';
+import type {User} from 'Repositories/entity/user';
 import type {SearchRepository} from 'Repositories/search/searchRepository';
-import type {TeamRepository} from 'Repositories/team/TeamRepository';
-import type {TeamState} from 'Repositories/team/TeamState';
+import type {TeamRepository} from 'Repositories/team/teamRepository';
+import type {TeamState} from 'Repositories/team/teamState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {formatParticipantsFieldLabel} from './formatParticipantsFieldLabel';

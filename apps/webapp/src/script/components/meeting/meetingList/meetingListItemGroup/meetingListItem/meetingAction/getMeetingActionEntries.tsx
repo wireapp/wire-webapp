@@ -28,7 +28,7 @@ import {MEETING_ACTION_TRANSLATION_KEYS} from 'Components/meeting/meetingList/me
 import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
 import {canDeleteMeetingForAll, canDeleteMeetingForMe} from 'Components/meeting/utils/canDeleteMeeting';
 import {canEditMeeting} from 'Components/meeting/utils/canEditMeeting';
-import type {User} from 'Repositories/entity/User';
+import type {User} from 'Repositories/entity/user';
 import type {ContextMenuEntry} from 'src/script/ui/contextMenu';
 import type {Translate} from 'Util/localizerUtil';
 

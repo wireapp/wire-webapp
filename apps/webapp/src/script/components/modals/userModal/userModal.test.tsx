@@ -23,8 +23,8 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import en from 'I18n/en-US.json';
 import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
-import {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
+import {User} from 'Repositories/entity/user';
+import {TeamState} from 'Repositories/team/teamState';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {Config} from 'src/script/Config';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';

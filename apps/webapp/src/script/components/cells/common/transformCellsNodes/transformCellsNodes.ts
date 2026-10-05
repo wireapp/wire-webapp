@@ -23,8 +23,8 @@ import {RestNode} from 'cells-sdk-ts';
 import {Maybe, maybe} from 'true-myth';
 
 import {getSelfUserDriveRole} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';

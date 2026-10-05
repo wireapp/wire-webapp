@@ -20,7 +20,7 @@
 import type {Maybe} from 'true-myth';
 
 import type {MeetingPasswordErrorKey} from 'Components/meeting/shared/validation/meetingPasswordValidation';
-import type {User} from 'Repositories/entity/User';
+import type {User} from 'Repositories/entity/user';
 
 export const scheduleMeetingModes = {
   create: 'create',

@@ -26,10 +26,10 @@ import {
 } from 'Components/calling/CallingCell/CallingControls/CallingControls.styles';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import * as Icon from 'Components/icon';
-import {Call} from 'Repositories/calling/Call';
-import {DesktopScreenShareMenu} from 'Repositories/calling/CallState';
-import {Participant} from 'Repositories/calling/Participant';
-import {TeamState} from 'Repositories/team/TeamState';
+import {Call} from 'Repositories/calling/call';
+import {DesktopScreenShareMenu} from 'Repositories/calling/callState';
+import {Participant} from 'Repositories/calling/participant';
+import {TeamState} from 'Repositories/team/teamState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 

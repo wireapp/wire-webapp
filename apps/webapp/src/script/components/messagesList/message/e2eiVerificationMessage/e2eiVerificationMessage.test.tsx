@@ -23,9 +23,9 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {Maybe} from 'true-myth';
 
 import en from 'I18n/en-US.json';
-import {Conversation} from 'Repositories/entity/Conversation';
+import {Conversation} from 'Repositories/entity/conversation';
 import {E2EIVerificationMessage as VerificationMessageEntity} from 'Repositories/entity/message/e2eiVerificationMessage';
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {Config} from 'src/script/Config';
 import {E2EIVerificationMessageType} from 'src/script/message/e2eiVerificationMessageType';
 import {

@@ -22,7 +22,7 @@ import {MutableRefObject} from 'react';
 import {LexicalEditor} from 'lexical';
 
 import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 
 import {RichTextEditor} from './richTextEditor';
 

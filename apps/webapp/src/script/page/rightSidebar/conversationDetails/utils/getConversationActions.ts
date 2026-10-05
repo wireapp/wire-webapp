@@ -24,8 +24,8 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/icon';
 import {MenuItem} from 'Components/panel/panelActions';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {Conversation} from 'Repositories/entity/conversation';
 import * as UserPermission from 'Repositories/user/userPermission';
 import type {RootContextValue} from 'src/script/page/rootProvider';
 

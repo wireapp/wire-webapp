@@ -20,7 +20,7 @@
 import {container} from 'tsyringe';
 
 import {showWarningModal} from 'Components/modals/utils/showWarningModal';
-import {TeamState} from 'Repositories/team/TeamState';
+import {TeamState} from 'Repositories/team/teamState';
 import type {Translate} from 'Util/localizerUtil';
 
 /**

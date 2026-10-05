@@ -25,7 +25,7 @@ import {container} from 'tsyringe';
 import {joinPreparedMeeting} from 'Components/meeting/meetingPrep/joinPreparedMeeting';
 import {useNoInternetCallGuard} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard';
 import type {CallMediaChoice} from 'Repositories/calling/callMediaChoice';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {ConversationState} from 'Repositories/conversation/conversationState';
 import {useApplicationContext, useMainViewModel} from 'src/script/page/rootProvider';
 
 export const useMeetingPrepJoin = () => {

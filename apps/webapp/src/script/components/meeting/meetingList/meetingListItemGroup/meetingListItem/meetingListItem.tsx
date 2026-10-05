@@ -46,7 +46,7 @@ import {
   isAttendingMeetingInstance,
   isMeetingListItemOngoing,
 } from 'Components/meeting/utils/meetingStatusUtil';
-import type {User} from 'Repositories/entity/User';
+import type {User} from 'Repositories/entity/user';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {formatMeetingTimeRange} from './formatMeetingTimeRange';

@@ -19,7 +19,7 @@
 
 import React from 'react';
 
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {CSS_FILL_PARENT} from 'Util/cssMixin';
 
 import {AvatarBackground} from './avatarBackground';

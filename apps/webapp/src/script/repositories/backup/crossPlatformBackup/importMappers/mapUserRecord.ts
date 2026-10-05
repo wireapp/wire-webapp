@@ -21,7 +21,7 @@ import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 
 import {UserRecord} from 'Repositories/storage';
 
-import {BackupUser} from '../CPB.library';
+import {BackupUser} from '../cPB.library';
 
 export const mapUserRecord = ({id: qualifiedId, name, handle}: BackupUser): UserRecord | null => {
   if (isNullOrUndefined(qualifiedId) || !isNonEmptyString(name) || !isNonEmptyString(handle)) {

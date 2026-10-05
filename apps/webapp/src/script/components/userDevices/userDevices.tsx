@@ -24,9 +24,9 @@ import {ClientClassification} from '@wireapp/api-client/lib/client/';
 
 import {useUserIdentity} from 'Hooks/useDeviceIdentities';
 import {ClientRepository, ClientEntity} from 'Repositories/client';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
-import {User} from 'Repositories/entity/User';
+import {MessageRepository} from 'Repositories/conversation/messageRepository';
+import {CryptographyRepository} from 'Repositories/cryptography/cryptographyRepository';
+import {User} from 'Repositories/entity/user';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {partition} from 'Util/arrayUtil';
 import {getLogger} from 'Util/logger';

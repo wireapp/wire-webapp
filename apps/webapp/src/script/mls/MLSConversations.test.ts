@@ -26,12 +26,12 @@ import {randomUUID} from 'crypto';
 
 import {Account, MLSService} from '@wireapp/core';
 
-import {ConversationService} from 'Repositories/conversation/ConversationService';
-import {MLSConversation} from 'Repositories/conversation/ConversationSelectors';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {ConversationStatus} from 'Repositories/conversation/ConversationStatus';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import {ConversationService} from 'Repositories/conversation/conversationService';
+import {MLSConversation} from 'Repositories/conversation/conversationSelectors';
+import {ConversationState} from 'Repositories/conversation/conversationState';
+import {ConversationStatus} from 'Repositories/conversation/conversationStatus';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
 import {UserState} from 'Repositories/user/userState';
 import {Core} from 'src/script/service/coreSingleton';
 import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';

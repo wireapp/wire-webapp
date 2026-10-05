@@ -20,7 +20,7 @@
 import {create} from 'zustand';
 
 import {Message} from 'Repositories/entity/message/message';
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 
 import {PanelEntity, PanelState} from './rightSidebar';
 

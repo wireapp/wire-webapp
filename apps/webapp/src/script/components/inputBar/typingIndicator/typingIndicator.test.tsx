@@ -20,7 +20,7 @@
 import {render} from '@testing-library/react';
 import {act} from 'react';
 
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

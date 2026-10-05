@@ -36,8 +36,8 @@ import {
 import {PrimaryModal} from 'Components/modals/primaryModal';
 import {showCallNotEstablishedModal, useNoInternetCallGuard} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard';
 import type {CallMediaChoice} from 'Repositories/calling/callMediaChoice';
-import {CallState} from 'Repositories/calling/CallState';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {CallState} from 'Repositories/calling/callState';
+import {ConversationState} from 'Repositories/conversation/conversationState';
 import {Config} from 'src/script/Config';
 import {useApplicationContext, useMainViewModel} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';

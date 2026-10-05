@@ -31,7 +31,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import * as Icon from 'Components/icon';
 import {ModalComponent} from 'Components/modals/modalComponent';
 import {ClientRepository} from 'Repositories/client';
-import {ClientState} from 'Repositories/client/ClientState';
+import {ClientState} from 'Repositories/client/clientState';
 import {AppLockRepository} from 'Repositories/user/appLockRepository';
 import {AppLockState} from 'Repositories/user/appLockState';
 import {SIGN_OUT_REASON} from 'src/script/auth/signOutReason';

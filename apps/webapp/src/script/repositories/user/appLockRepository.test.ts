@@ -19,7 +19,7 @@
 
 import {removeCurrentModal} from 'Components/modals/primaryModal';
 import {usePrimaryModalState} from 'Components/modals/primaryModal/primaryModalState';
-import {User} from 'Repositories/entity/User/User';
+import {User} from 'Repositories/entity/user/user';
 import type {Translate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 import {createUuid} from 'Util/uuid';

@@ -24,12 +24,12 @@ import {container} from 'tsyringe';
 
 import {randomUUID} from 'crypto';
 
-import {ClientEntity} from 'Repositories/client/ClientEntity';
-import {ClientState} from 'Repositories/client/ClientState';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import {ClientEntity} from 'Repositories/client/clientEntity';
+import {ClientState} from 'Repositories/client/clientState';
+import {ConversationState} from 'Repositories/conversation/conversationState';
+import {CryptographyRepository} from 'Repositories/cryptography/cryptographyRepository';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
 import {withTheme} from 'src/script/auth/util/test/testUtil';
 import {
   createRootContextValueForTest,

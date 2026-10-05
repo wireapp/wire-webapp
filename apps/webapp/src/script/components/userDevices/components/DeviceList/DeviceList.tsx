@@ -19,8 +19,8 @@
 
 import cx from 'classnames';
 
-import type {ClientEntity} from 'Repositories/client/ClientEntity';
-import type {User} from 'Repositories/entity/User';
+import type {ClientEntity} from 'Repositories/client/clientEntity';
+import type {User} from 'Repositories/entity/user';
 import {WireIdentity} from 'src/script/e2eIdentity';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';

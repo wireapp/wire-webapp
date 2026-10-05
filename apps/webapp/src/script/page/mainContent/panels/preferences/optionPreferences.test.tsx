@@ -19,7 +19,7 @@
 import {render} from '@testing-library/react';
 
 import en from 'I18n/en-US.json';
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import type {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {

@@ -22,7 +22,7 @@ import {container} from 'tsyringe';
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {PrimaryModal} from 'Components/modals/primaryModal';
-import type {CallingRepository} from 'Repositories/calling/CallingRepository';
+import type {CallingRepository} from 'Repositories/calling/callingRepository';
 import {UserState} from 'Repositories/user/userState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {getCurrentDate} from 'Util/timeUtil';

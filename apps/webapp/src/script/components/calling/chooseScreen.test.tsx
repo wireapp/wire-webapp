@@ -20,7 +20,7 @@
 import {render, fireEvent} from '@testing-library/react';
 import {container} from 'tsyringe';
 
-import {CallState} from 'Repositories/calling/CallState';
+import {CallState} from 'Repositories/calling/callState';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

@@ -25,7 +25,7 @@ import {ChannelAvatar} from 'Components/avatar/channelAvatar';
 import {GroupAvatar} from 'Components/avatar/groupAvatar';
 import {listItem, listWrapper} from 'Components/participantItemContent/participantItem.styles';
 import {collapseButton, collapseIcon} from 'Components/userList/userList.styles';
-import type {Conversation} from 'Repositories/entity/Conversation';
+import type {Conversation} from 'Repositories/entity/conversation';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {conversationIconStyles, conversationListStyles} from './meetingParticipantsPicker.styles';

@@ -20,7 +20,7 @@
 import {render} from '@testing-library/react';
 import {noop} from 'noop-esm';
 
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {ServiceEntity} from 'Repositories/integration/serviceEntity';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

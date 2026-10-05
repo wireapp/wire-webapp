@@ -24,7 +24,7 @@ import {
   meetingConversationSyncErrors,
   type MeetingConversationSyncError,
 } from 'Components/meeting/meetingConversationSync';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import type {ConversationRepository} from 'Repositories/conversation/conversationRepository';
 
 export type LeaveMeetingConversationError =
   typeof meetingConversationSyncErrors.conversationNotFound | typeof meetingConversationSyncErrors.leaveFailed;

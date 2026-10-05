@@ -23,7 +23,7 @@ import ko from 'knockout';
 import {QualifiedUserId} from '@wireapp/protocol-messaging';
 
 import {VerificationMessage as VerificationMessageEntity} from 'Repositories/entity/message/verificationMessage';
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {withTheme} from 'src/script/auth/util/test/testUtil';
 import {VerificationMessageType} from 'src/script/message/verificationMessageType';
 

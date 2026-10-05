@@ -21,9 +21,9 @@ import {render} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ko from 'knockout';
 
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {ConversationLabelRepository} from 'Repositories/conversation/ConversationLabelRepository';
-import {User} from 'Repositories/entity/User';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {ConversationLabelRepository} from 'Repositories/conversation/conversationLabelRepository';
+import {User} from 'Repositories/entity/user';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {
   createRootContextValueForTest,

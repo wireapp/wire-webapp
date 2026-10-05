@@ -29,8 +29,8 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/modals/primaryModal';
 import {PrimaryModalType} from 'Components/modals/primaryModal/primaryModalTypes';
-import type {User} from 'Repositories/entity/User';
-import type {SelfService} from 'Repositories/self/SelfService';
+import type {User} from 'Repositories/entity/user';
+import type {SelfService} from 'Repositories/self/selfService';
 import {StorageKey} from 'Repositories/storage';
 import {isTelemetryEnabledAtCurrentEnvironment} from 'Repositories/tracking/telemetry.helpers';
 import {ConsentValue} from 'Repositories/user/consentValue';

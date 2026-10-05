@@ -21,7 +21,7 @@ import {isUndefined} from '@sindresorhus/is';
 
 import {GroupAvatar, ChannelAvatar} from 'Components/avatar';
 import {openConversation} from 'Components/cellsGlobalView/common/openConversation/openConversation';
-import {Conversation} from 'Repositories/entity/Conversation';
+import {Conversation} from 'Repositories/entity/conversation';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 

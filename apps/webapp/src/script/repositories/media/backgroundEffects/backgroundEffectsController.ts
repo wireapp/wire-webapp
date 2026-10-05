@@ -30,7 +30,7 @@ import {
 } from 'Repositories/media/backgroundEffects/quality/definitions';
 import {QUALITY_TIERS, QualityController} from 'Repositories/media/backgroundEffects/quality/qualityController';
 import {backgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
-import {BackgroundSource} from 'Repositories/media/VideoBackgroundEffects';
+import {BackgroundSource} from 'Repositories/media/videoBackgroundEffects';
 import {getLogger, Logger} from 'Util/logger';
 
 import {type CapabilityInfo, type EffectMode, type Metrics, Mode} from './backgroundEffectsWorkerTypes';

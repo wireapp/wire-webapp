@@ -27,7 +27,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {Theme} from 'Components/appContainer/hooks/useTheme';
 import {RadioGroup} from 'Components/Radio';
 import {RootFontSize, useRootFontSize} from 'Hooks/useRootFontSize';
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
 import {Config} from 'src/script/Config';

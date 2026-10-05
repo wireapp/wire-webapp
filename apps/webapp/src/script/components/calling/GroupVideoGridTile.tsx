@@ -37,7 +37,7 @@ import {
   groupVideoTileWrapper,
 } from 'Components/calling/GroupVideoGridTile.styles';
 import * as Icon from 'Components/icon';
-import type {Participant} from 'Repositories/calling/Participant';
+import type {Participant} from 'Repositories/calling/participant';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isEnterKey} from 'Util/keyboardUtil';

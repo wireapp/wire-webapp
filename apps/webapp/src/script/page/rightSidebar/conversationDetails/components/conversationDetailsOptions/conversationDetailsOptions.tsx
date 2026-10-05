@@ -34,12 +34,12 @@ import {
 import * as Icon from 'Components/icon';
 import {PanelActions} from 'Components/panel/panelActions';
 import {ReceiptModeToggle} from 'Components/toggle/ReceiptModeToggle';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {ConversationRoleRepository} from 'Repositories/conversation/ConversationRoleRepository';
-import {supportsReadReceipts} from 'Repositories/conversation/ConversationSelectors';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {ConversationRoleRepository} from 'Repositories/conversation/conversationRoleRepository';
+import {supportsReadReceipts} from 'Repositories/conversation/conversationSelectors';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
+import {TeamState} from 'Repositories/team/teamState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';

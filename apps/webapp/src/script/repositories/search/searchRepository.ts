@@ -21,7 +21,7 @@ import {isNonEmptyString} from '@sindresorhus/is';
 import type {QualifiedId, SearchResult} from '@wireapp/api-client/lib/user/';
 import {container} from 'tsyringe';
 
-import type {User} from 'Repositories/entity/User';
+import type {User} from 'Repositories/entity/user';
 import {validateHandle} from 'Repositories/user/userHandleGenerator';
 import type {UserRepository} from 'Repositories/user/userRepository';
 import {EMOJI_RANGES} from 'Util/emojiUtil';

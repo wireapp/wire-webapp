@@ -22,9 +22,9 @@ import {container} from 'tsyringe';
 
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import type {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
+import type {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import type {MessageRepository} from 'Repositories/conversation/messageRepository';
+import {Conversation} from 'Repositories/entity/conversation';
 import {UserState} from 'Repositories/user/userState';
 import type {UserRepository} from 'Repositories/user/userRepository';
 

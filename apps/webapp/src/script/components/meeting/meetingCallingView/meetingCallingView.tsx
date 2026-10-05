@@ -22,8 +22,8 @@ import {container} from 'tsyringe';
 import {CallingCell} from 'Components/calling/CallingCell';
 import {meetingCallingViewStyles} from 'Components/meeting/meetingCallingView/meetingCallingView.styles';
 import {useMeetingNotificationStore} from 'Components/meeting/meetingNotificationStore/meetingNotificationStore';
-import {CallState} from 'Repositories/calling/CallState';
-import {TeamState} from 'Repositories/team/TeamState';
+import {CallState} from 'Repositories/calling/callState';
+import {TeamState} from 'Repositories/team/teamState';
 import {useApplicationContext, useMainViewModel} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 

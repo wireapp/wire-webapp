@@ -23,7 +23,7 @@ import {Tooltip} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/avatar';
 import {useUserName} from 'Components/UserName';
-import type {User} from 'Repositories/entity/User';
+import type {User} from 'Repositories/entity/user';
 
 import {avatarItemStyles} from './stackedAvatars.styles';
 

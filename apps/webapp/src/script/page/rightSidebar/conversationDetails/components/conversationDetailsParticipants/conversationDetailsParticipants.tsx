@@ -22,10 +22,10 @@ import {isNonEmptyArray} from '@sindresorhus/is';
 import * as Icon from 'Components/icon';
 import {ServiceList} from 'Components/ServiceList';
 import {UserList} from 'Components/userList';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
+import {ServiceEntity} from 'Repositories/integration/serviceEntity';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 interface ConversationDetailsParticipantsProps {

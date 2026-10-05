@@ -19,8 +19,8 @@
 
 import {useCallback, useEffect, useState} from 'react';
 
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {NotificationRepository} from 'Repositories/notification/NotificationRepository';
+import {CallingRepository} from 'Repositories/calling/callingRepository';
+import {NotificationRepository} from 'Repositories/notification/notificationRepository';
 
 import {E2EIHandler, E2EIDeviceStatus} from '../e2eIdentity';
 

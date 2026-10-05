@@ -27,7 +27,7 @@ import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 import {hasActiveGlobalDriveFilters} from 'Components/conversation/conversationCells/common/driveFilters/driveFilters';
 import {useCellsSorting} from 'Components/conversation/conversationCells/common/useCellsSorting/useCellsSorting';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
 

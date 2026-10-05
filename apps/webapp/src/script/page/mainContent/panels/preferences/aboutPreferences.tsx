@@ -23,7 +23,7 @@ import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 
 import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {PreferencesPage} from './components/preferencesPage';

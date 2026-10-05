@@ -20,7 +20,7 @@
 import {FC, ReactNode, useEffect, useRef, useState} from 'react';
 
 import {LoadingBar} from 'Components/LoadingBar/LoadingBar';
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 
 import {styles} from './appLoader.styles';
 

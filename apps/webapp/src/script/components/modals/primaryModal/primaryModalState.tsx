@@ -22,7 +22,7 @@ import {isValid} from 'date-fns';
 import {escape} from 'underscore';
 import {create} from 'zustand';
 
-import {ClientNotificationData} from 'Repositories/notification/PreferenceNotificationRepository';
+import {ClientNotificationData} from 'Repositories/notification/preferenceNotificationRepository';
 import {getLogger} from 'Util/logger';
 import {formatLocale} from 'Util/timeUtil';
 import {noop} from 'Util/util';

@@ -17,7 +17,7 @@
  *
  */
 
-export * from './CPB.import';
-export * from './CPB.export';
-export * from './CPB.helper';
-export * from './CPB.library';
+export * from './cPB.import';
+export * from './cPB.export';
+export * from './cPB.helper';
+export * from './cPB.library';

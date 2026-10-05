@@ -21,7 +21,7 @@ import {render, waitFor} from '@testing-library/react';
 
 import {PrimaryModal, removeCurrentModal} from 'Components/modals/primaryModal';
 import {BackupRepository} from 'Repositories/backup/backupRepository';
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import * as RootProvider from 'src/script/page/rootProvider';
 import {RootContextValue} from 'src/script/page/rootProvider';
 import * as BackupUtil from 'Util/backupUtil';

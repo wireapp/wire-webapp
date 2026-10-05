@@ -37,12 +37,12 @@ import {WIDTH} from '@wireapp/react-ui-kit';
 
 import {ConversationListCell} from 'Components/conversationListCell';
 import type {RegisterConversationElement} from 'Hooks/useConversationFocus';
-import {Call} from 'Repositories/calling/Call';
-import {CallState} from 'Repositories/calling/CallState';
-import {ConversationLabel, ConversationLabelRepository} from 'Repositories/conversation/ConversationLabelRepository';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import {Call} from 'Repositories/calling/call';
+import {CallState} from 'Repositories/calling/callState';
+import {ConversationLabel, ConversationLabelRepository} from 'Repositories/conversation/conversationLabelRepository';
+import {ConversationState} from 'Repositories/conversation/conversationState';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
 import {useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';

@@ -30,7 +30,7 @@ import type {MeetingStoreState} from 'Components/meeting/meetingStore/createMeet
 import {MeetingStoreProvider} from 'Components/meeting/meetingStore/meetingStoreProvider';
 import {meetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
 import {PrimaryModal} from 'Components/modals/primaryModal';
-import {Conversation} from 'Repositories/entity/Conversation';
+import {Conversation} from 'Repositories/entity/conversation';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

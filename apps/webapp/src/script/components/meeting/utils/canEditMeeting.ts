@@ -19,7 +19,7 @@
 
 import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
 import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
-import type {User} from 'Repositories/entity/User';
+import type {User} from 'Repositories/entity/user';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
 export const isMeetingHost = (meetingSeries: MeetingSeries, selfUser: User): boolean => {

@@ -27,7 +27,7 @@ import * as ReactDOM from 'react-dom';
 
 import {FadingScrollbar} from 'Components/fadingScrollbar';
 import {IgnoreOutsideClickWrapper} from 'Components/inputBar/util/clickHandlers';
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 
 import {MentionSuggestionsItem} from './mentionSuggestionsItem';
 

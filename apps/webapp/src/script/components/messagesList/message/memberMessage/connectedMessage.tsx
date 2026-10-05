@@ -24,7 +24,7 @@ import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 import {Avatar, AVATAR_SIZE} from 'Components/avatar';
 import {UserClassifiedBar} from 'Components/classifiedBar/classifiedBar';
 import {UnverifiedUserWarning} from 'Components/modals/userModal';
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 

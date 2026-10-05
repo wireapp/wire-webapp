@@ -17,8 +17,8 @@
  *
  */
 
-import type {User} from 'Repositories/entity/User';
-import type {TeamState} from 'Repositories/team/TeamState';
+import type {User} from 'Repositories/entity/user';
+import type {TeamState} from 'Repositories/team/teamState';
 import type {UserState} from 'Repositories/user/userState';
 import {sortUsersByPriority} from 'Util/stringUtil';
 

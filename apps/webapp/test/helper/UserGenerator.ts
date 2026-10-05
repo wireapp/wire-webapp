@@ -20,7 +20,7 @@
 import {faker} from '@faker-js/faker';
 import {QualifiedId, UserAssetType, UserType} from '@wireapp/api-client/lib/user';
 import type {User as APIClientUser} from '@wireapp/api-client/lib/user';
-import type {User} from 'Repositories/entity/User';
+import type {User} from 'Repositories/entity/user';
 import type {UserRecord} from 'Repositories/storage';
 import {UserMapper} from 'Repositories/user/userMapper';
 import {translate} from 'Util/localizerUtil';

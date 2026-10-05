@@ -26,8 +26,8 @@ import {generateConversation} from 'test/helper/ConversationGenerator';
 import {TestFactory} from 'test/helper/TestFactory';
 import {generateAPIUser} from 'test/helper/UserGenerator';
 
-import {User} from 'Repositories/entity/User';
-import {ClientEvent} from 'Repositories/event/Client';
+import {User} from 'Repositories/entity/user';
+import {ClientEvent} from 'Repositories/event/client';
 import {StorageService} from 'Repositories/storage';
 import {StorageSchemata} from 'Repositories/storage/storageSchemata';
 import {noop} from 'Util/util';

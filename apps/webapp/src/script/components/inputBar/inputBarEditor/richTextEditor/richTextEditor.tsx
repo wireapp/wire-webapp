@@ -36,7 +36,7 @@ import {noop} from 'noop-esm';
 import {DraftState} from 'Components/inputBar/common/draftState/draftState';
 import {MessageContent} from 'Components/inputBar/common/messageContent/messageContent';
 import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 
 import {editorConfig} from './editorConfig';
 import {FormatToolbar} from './formatToolbar/formatToolbar';

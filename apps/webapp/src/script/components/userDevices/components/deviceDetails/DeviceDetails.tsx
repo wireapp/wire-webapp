@@ -27,11 +27,11 @@ import {container} from 'tsyringe';
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import type {ClientRepository, ClientEntity} from 'Repositories/client';
-import {isMLSConversation} from 'Repositories/conversation/ConversationSelectors';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import type {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import type {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
-import type {User} from 'Repositories/entity/User';
+import {isMLSConversation} from 'Repositories/conversation/conversationSelectors';
+import {ConversationState} from 'Repositories/conversation/conversationState';
+import type {MessageRepository} from 'Repositories/conversation/messageRepository';
+import type {CryptographyRepository} from 'Repositories/cryptography/cryptographyRepository';
+import type {User} from 'Repositories/entity/user';
 import {WireIdentity} from 'src/script/e2eIdentity';
 import {MLSDeviceDetails} from 'src/script/page/mainContent/panels/preferences/devicesPreferences/components/mlsDeviceDetails';
 import {useApplicationContext} from 'src/script/page/rootProvider';

@@ -26,7 +26,7 @@ import {
   getMeetingTitleError,
   getMeetingTitleInputError,
 } from 'Components/meeting/shared/validation/meetingTitleValidation';
-import type {User} from 'Repositories/entity/User';
+import type {User} from 'Repositories/entity/user';
 
 import {emptyMeetNowFormErrors, type MeetNowFormErrors, type MeetNowFormState} from './meetNowTypes';
 

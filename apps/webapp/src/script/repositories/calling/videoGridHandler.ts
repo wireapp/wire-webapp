@@ -21,8 +21,8 @@ import {Dispatch, SetStateAction, useEffect, useState} from 'react';
 
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
-import {Call} from './Call';
-import type {Participant} from './Participant';
+import {Call} from './call';
+import type {Participant} from './participant';
 
 const participantPairSize = 2;
 

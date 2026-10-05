@@ -20,7 +20,7 @@
 import {isNan, isNull} from '@sindresorhus/is';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 
-import {ConversationEphemeralHandler} from 'Repositories/conversation/ConversationEphemeralHandler';
+import {ConversationEphemeralHandler} from 'Repositories/conversation/conversationEphemeralHandler';
 import {type Translate} from 'Util/localizerUtil';
 import {formatDuration} from 'Util/timeUtil';
 

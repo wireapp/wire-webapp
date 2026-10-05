@@ -1,0 +1,234 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
+import type {ConversationMemberJoinEvent} from '@wireapp/api-client/lib/event/';
+import ko from 'knockout';
+import {container} from 'tsyringe';
+
+import type {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {ConversationState} from 'Repositories/conversation/conversationState';
+import {MemberLeaveEvent} from 'Repositories/conversation/eventBuilder';
+import type {Conversation} from 'Repositories/entity/conversation';
+import type {User} from 'Repositories/entity/user';
+import type {TeamRepository} from 'Repositories/team/teamRepository';
+import {TeamState} from 'Repositories/team/teamState';
+import {getLogger, Logger} from 'Util/logger';
+import {compareTransliteration, sortByPriority} from 'Util/stringUtil';
+import {toError} from 'Util/toError';
+
+import {IntegrationMapper} from './integrationMapper';
+import type {IntegrationService} from './integrationService';
+import {ProviderEntity} from './providerEntity';
+import {ServiceEntity} from './serviceEntity';
+
+export class IntegrationRepository {
+  private readonly logger: Logger;
+  public readonly isTeam: ko.PureComputed<boolean>;
+  public readonly services: ko.ObservableArray<ServiceEntity>;
+
+  /**
+   * Trim query string for search.
+   * @param query Service search string
+   * @returns Normalized service search query
+   */
+  static normalizeQuery(query: string): string {
+    if (typeof query === 'string') {
+      return query.trim().toLowerCase();
+    }
+    return '';
+  }
+
+  constructor(
+    private readonly integrationService: IntegrationService,
+    private readonly conversationRepository: ConversationRepository,
+    private readonly teamRepository: TeamRepository,
+    private readonly teamState = container.resolve(TeamState),
+    private readonly conversationState = container.resolve(ConversationState),
+  ) {
+    this.logger = getLogger('IntegrationRepository');
+
+    this.isTeam = this.teamState.isTeam;
+    this.services = ko.observableArray<ServiceEntity>([]);
+  }
+
+  /**
+   * Get provider name for entity.
+   * @param entity Service or user to add provider name to
+   */
+  async addProviderNameToParticipant(entity: ServiceEntity | User): Promise<ServiceEntity | User | ProviderEntity> {
+    if (isNonEmptyString(entity.providerId)) {
+      const providerEntity = await this.getProviderById(entity.providerId);
+
+      if (!isNullOrUndefined(providerEntity)) {
+        entity.providerName(providerEntity.name);
+      }
+    }
+
+    return entity;
+  }
+
+  /**
+   * Get ServiceEntity for entity.
+   * @param entity Service or user to resolve to ServiceEntity
+   */
+  async getServiceFromUser(entity: ServiceEntity | User): Promise<ServiceEntity | undefined> {
+    if (entity instanceof ServiceEntity) {
+      return entity;
+    }
+
+    const {providerId, serviceId} = entity;
+
+    if (!isNonEmptyString(providerId) || !isNonEmptyString(serviceId)) {
+      return undefined;
+    }
+
+    return this.getServiceById(providerId, serviceId, entity.qualifiedId.domain);
+  }
+
+  mapServiceFromUser(user: User): ServiceEntity {
+    return IntegrationMapper.mapServiceFromUser(user);
+  }
+
+  /**
+   * Add a service to an existing conversation.
+   *
+   * @param conversationEntity Conversation to add service to
+   * @param serviceEntity Service to be added to conversation
+   * @param method Method used to add service
+   */
+  addServiceToExistingConversation(
+    conversationEntity: Conversation,
+    serviceEntity: ServiceEntity,
+  ): Promise<ConversationMemberJoinEvent | void> {
+    const {id: serviceId, name, providerId} = serviceEntity;
+    this.logger.info(`Adding service '${name}' to conversation '${conversationEntity.id}'`);
+
+    return this.conversationRepository.addServiceToExistingConversation(conversationEntity, {providerId, serviceId});
+  }
+
+  /**
+   * Add service to conversation.
+   *
+   * @param serviceEntity Information about service to be added
+   * @returns Resolves when conversation with the integration was created
+   */
+  async create1to1ConversationWithService(serviceEntity: ServiceEntity): Promise<Conversation> {
+    const {id: serviceId, name, providerId} = serviceEntity;
+    this.logger.info(`Creating a conversation with a service '${name}'.'`);
+    return this.conversationRepository.create1to1ConversationWithService({providerId, serviceId});
+  }
+
+  /**
+   * Get conversation with a service.
+   * @param serviceEntity Service entity for whom to get the conversation
+   * @returns Resolves with the conversation with requested service
+   */
+  async get1To1ConversationWithService(serviceEntity: ServiceEntity): Promise<Conversation> {
+    const matchingConversationEntity = this.conversationState.conversations().find(conversationEntity => {
+      if (!conversationEntity.is1to1()) {
+        // Disregard conversations that are not 1:1
+        return false;
+      }
+
+      const isActiveConversation = !conversationEntity.isSelfUserRemoved();
+      if (!isActiveConversation) {
+        // Disregard conversations that self is no longer part of
+        return false;
+      }
+
+      const [userEntity] = conversationEntity.participating_user_ets();
+      if (isUndefined(userEntity)) {
+        // Disregard conversations with no user entities
+        return false;
+      }
+
+      if (!userEntity.isService) {
+        // Disregard conversations with users instead of services
+        return false;
+      }
+
+      const {serviceId, providerId} = userEntity;
+      const isExpectedServiceId = serviceEntity.id === serviceId;
+      const isExpectedProviderId = serviceEntity.providerId === providerId;
+      return isExpectedServiceId && isExpectedProviderId;
+    });
+
+    return matchingConversationEntity ?? this.create1to1ConversationWithService(serviceEntity);
+  }
+
+  async getProviderById(providerId: string): Promise<ProviderEntity | undefined> {
+    const providerData = await this.integrationService.getProvider(providerId);
+    return !isNullOrUndefined(providerData) ? IntegrationMapper.mapProviderFromObject(providerData) : undefined;
+  }
+
+  async getServiceById(providerId: string, serviceId: string, domain: string): Promise<ServiceEntity | undefined> {
+    const serviceData = await this.integrationService.getService(providerId, serviceId);
+    if (!isNullOrUndefined(serviceData)) {
+      return IntegrationMapper.mapServiceFromObject(serviceData, domain);
+    }
+    return undefined;
+  }
+
+  /**
+   * Remove service from conversation.
+   *
+   * @param conversationEntity Conversation to remove service from
+   * @param userEntity Service user to be removed from the conversation
+   */
+  removeService(conversationEntity: Conversation, userEntity: User): Promise<MemberLeaveEvent> {
+    const {id: userId, domain} = userEntity;
+    return this.conversationRepository.removeService(conversationEntity, {
+      domain,
+      id: userId,
+    });
+  }
+
+  async searchForServices(
+    query: string,
+    queryObservable?: ko.Observable<string>,
+  ): Promise<ServiceEntity[] | undefined> {
+    const normalizedQuery = IntegrationRepository.normalizeQuery(query);
+
+    const teamId = this.teamState.team().id;
+    if (!isNonEmptyString(teamId)) {
+      return undefined;
+    }
+    try {
+      let serviceEntities = await this.teamRepository.getWhitelistedServices(teamId, this.teamState.teamDomain() ?? '');
+      const isCurrentQuery =
+        isNullOrUndefined(queryObservable) ||
+        normalizedQuery === IntegrationRepository.normalizeQuery(queryObservable());
+      if (isCurrentQuery) {
+        serviceEntities = serviceEntities
+          .filter(serviceEntity => {
+            return compareTransliteration(serviceEntity.name(), normalizedQuery);
+          })
+          .toSorted((serviceA, serviceB) => {
+            return sortByPriority(serviceA.name(), serviceB.name(), normalizedQuery);
+          });
+        this.services(serviceEntities);
+        return serviceEntities;
+      }
+    } catch (error: unknown) {
+      this.logger.error(`Error searching for services: ${toError(error).message}`, error);
+    }
+    return undefined;
+  }
+}

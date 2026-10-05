@@ -32,7 +32,7 @@ import {
   BaseSelection,
 } from 'lexical';
 
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 
 import {$createMentionNode} from '../../nodes/mentionNode';
 

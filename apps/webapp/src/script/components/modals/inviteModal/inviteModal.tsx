@@ -25,7 +25,7 @@ import {Runtime} from '@wireapp/commons';
 
 import * as Icon from 'Components/icon';
 import {ModalComponent} from 'Components/modals/modalComponent';
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {Translate} from 'Util/localizerUtil';
 import {renderElement} from 'Util/renderElement';
 

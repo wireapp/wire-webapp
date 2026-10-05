@@ -22,7 +22,7 @@ import {act, renderHook} from '@testing-library/react';
 import {RestNode, RestNodeCollection} from 'cells-sdk-ts';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {createExecutingFireAndForgetInvokerForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import type {Logger} from 'Util/logger';

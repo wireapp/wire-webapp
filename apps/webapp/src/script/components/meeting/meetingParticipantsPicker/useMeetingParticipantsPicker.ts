@@ -21,9 +21,9 @@ import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {User} from 'Repositories/entity/User';
+import type {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import type {Conversation} from 'Repositories/entity/conversation';
+import type {User} from 'Repositories/entity/user';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import {

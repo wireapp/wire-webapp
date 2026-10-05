@@ -24,7 +24,7 @@ import ko from 'knockout';
 import {task} from 'true-myth';
 import {asyncNoop, noop} from 'noop-esm';
 
-import {Conversation} from 'Repositories/entity/Conversation';
+import {Conversation} from 'Repositories/entity/conversation';
 import {withTheme} from 'src/script/auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
@@ -32,7 +32,7 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {translateForTest} from 'Util/test/translateForTest';
 
-import {ConversationMapper} from 'Repositories/conversation/ConversationMapper';
+import {ConversationMapper} from 'Repositories/conversation/conversationMapper';
 
 import {ManualMigrationProtocolDetails} from './manualMigrationProtocolDetails';
 

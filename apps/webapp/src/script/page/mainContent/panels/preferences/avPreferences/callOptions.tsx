@@ -25,7 +25,7 @@ import {amplify} from 'amplify';
 import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import type {MediaConstraintsHandler} from 'Repositories/media/MediaConstraintsHandler';
+import type {MediaConstraintsHandler} from 'Repositories/media/mediaConstraintsHandler';
 import type {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
 import {useApplicationContext} from 'src/script/page/rootProvider';

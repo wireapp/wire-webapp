@@ -19,7 +19,7 @@
 
 import {task} from 'true-myth';
 
-import type {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
+import type {MediaStreamHandler} from 'Repositories/media/mediaStreamHandler';
 
 import {meetingPrepPreviewErrors, type RequestMeetingPrepPreview} from './meetingPrepTypes';
 

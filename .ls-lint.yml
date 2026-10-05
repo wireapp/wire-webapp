@@ -645,78 +645,221 @@ ls:
   apps/webapp/src/script/message:
     .dir: camelCase
     .ts: camelCase
-  apps/webapp/src/script/repositories/entity/message:
+  apps/webapp/src/script/repositories:
     .dir: camelCase
-    .ts: camelCase
+  apps/webapp/src/script/repositories/lifeCycleRepository:
+    .dir: camelCase
     .test.ts: camelCase
-  apps/webapp/src/script/components/badge:
-    .dir: camelCase
-  apps/webapp/src/script/components/userList:
-    .dir: camelCase
-  apps/webapp/src/script/components/participantItemContent:
-    .dir: camelCase
-  apps/webapp/src/script/components/titleBar:
-    .dir: camelCase
-  apps/webapp/src/script/components/conversationListCell:
-    .dir: camelCase
-  apps/webapp/src/script/page:
-    .dir: camelCase
     .ts: camelCase
-    .tsx: camelCase
-    .test.ts: camelCase
-    .test.tsx: camelCase
-    .styles.ts: camelCase
-  apps/webapp/src/script/repositories/media/backgroundEffects:
-    .dir: camelCase
-    .ts: camelCase
-    .tsx: camelCase
-    .test.tsx: camelCase
-    .types.ts: camelCase
   apps/webapp/src/script/repositories/assets:
     .dir: camelCase
-    .ts: camelCase
     .test.ts: camelCase
+    .ts: camelCase
   apps/webapp/src/script/repositories/audio:
     .dir: camelCase
-    .ts: camelCase
     .test.ts: camelCase
+    .ts: camelCase
   apps/webapp/src/script/repositories/backup:
     .dir: camelCase
-    .ts: camelCase
+    .helper.ts: camelCase
     .test.ts: camelCase
+    .test.tsx: camelCase
+    .ts: camelCase
+    .types.ts: camelCase
+  apps/webapp/src/script/repositories/backup/crossPlatformBackup:
+    .dir: camelCase
+    .export.ts: camelCase
+    .helper.ts: camelCase
+    .import.ts: camelCase
+    .library.ts: camelCase
+    .ts: camelCase
+    .types.ts: camelCase
+  apps/webapp/src/script/repositories/backup/crossPlatformBackup/importMappers:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
   apps/webapp/src/script/repositories/cache:
     .dir: camelCase
     .ts: camelCase
+  apps/webapp/src/script/repositories/calling:
+    .dir: camelCase
     .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/repositories/calling/enum:
+    .dir: camelCase
+    .ts: camelCase
   apps/webapp/src/script/repositories/cells:
     .dir: camelCase
-    .ts: camelCase
     .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/repositories/cells/upload:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/repositories/client:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
   apps/webapp/src/script/repositories/connection:
     .dir: camelCase
-    .ts: camelCase
     .test.ts: camelCase
-  apps/webapp/src/script/repositories/search:
+    .ts: camelCase
+  apps/webapp/src/script/repositories/conversation:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/repositories/conversation/conversationVerificationStateHandler:
     .dir: camelCase
     .ts: camelCase
+  apps/webapp/src/script/repositories/conversation/conversationVerificationStateHandler/mls:
+    .dir: camelCase
     .test.ts: camelCase
-  apps/webapp/src/script/repositories/tracking:
+    .ts: camelCase
+  apps/webapp/src/script/repositories/conversation/conversationVerificationStateHandler/proteus:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/repositories/conversation/conversationVerificationStateHandler/shared:
     .dir: camelCase
     .ts: camelCase
-    .helpers.ts: camelCase
+  apps/webapp/src/script/repositories/conversation/conversationVerificationStateHandler/shared/changeHandler:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/repositories/conversation/conversationVerificationStateHandler/shared/conversation:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/repositories/conversation/eventBuilder:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+    .types.ts: camelCase
+  apps/webapp/src/script/repositories/conversation/linkPreviews:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/repositories/cryptography:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/repositories/entity:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/repositories/entity/user:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/repositories/entity/message:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/repositories/event:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/repositories/event/preprocessor:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/repositories/event/preprocessor/eventStorageMiddleware:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/repositories/event/preprocessor/eventStorageMiddleware/eventHandlers:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/repositories/event/processor:
+    .dir: camelCase
+  apps/webapp/src/script/repositories/event/processor/federationEventProcessor:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/repositories/extension:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/repositories/integration:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/repositories/media:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/repositories/media/backgroundBlurrer:
+    .dir: camelCase
+    .glsl: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/repositories/media/backgroundEffects:
+    .dir: camelCase
+    .md: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/repositories/media/backgroundEffects/helper:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/repositories/media/backgroundEffects/pipe:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/repositories/media/backgroundEffects/quality:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/repositories/meetings:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/repositories/notification:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/repositories/permission:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+    .types.ts: camelCase
   apps/webapp/src/script/repositories/properties:
     .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/repositories/search:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/repositories/self:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/repositories/self/selfSupportedProtocols:
+    .dir: camelCase
+    .test.ts: camelCase
     .ts: camelCase
   apps/webapp/src/script/repositories/storage:
     .dir: camelCase
+    .test.ts: camelCase
     .ts: camelCase
   apps/webapp/src/script/repositories/storage/record:
     .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/repositories/team:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/repositories/team/teamFeatureConfigChangeDetector:
+    .dir: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/repositories/tracking:
+    .dir: camelCase
+    .helpers.ts: camelCase
     .ts: camelCase
   apps/webapp/src/script/repositories/user:
     .dir: camelCase
-    .ts: camelCase
     .test.ts: camelCase
+    .ts: camelCase
   apps/webapp/src/script/service:
     .dir: camelCase
     .ts: camelCase

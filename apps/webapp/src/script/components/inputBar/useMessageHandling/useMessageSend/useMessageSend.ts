@@ -30,12 +30,12 @@ import {MessageContent} from 'Components/inputBar/common/messageContent/messageC
 import {PrimaryModal} from 'Components/modals/primaryModal';
 import {showWarningModal} from 'Components/modals/utils/showWarningModal';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
-import {MessageRepository, OutgoingQuote} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {ConversationVerificationState} from 'Repositories/conversation/conversationVerificationState';
+import {MessageRepository, OutgoingQuote} from 'Repositories/conversation/messageRepository';
+import {Conversation} from 'Repositories/entity/conversation';
 import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {EventRepository} from 'Repositories/event/EventRepository';
+import {EventRepository} from 'Repositories/event/eventRepository';
 import {Config} from 'src/script/Config';
 import {ConversationError} from 'src/script/error/conversationError';
 import {MentionEntity} from 'src/script/message/mentionEntity';

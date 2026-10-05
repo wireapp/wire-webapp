@@ -22,7 +22,7 @@ import {createRef} from 'react';
 import userEvent from '@testing-library/user-event';
 import {render, screen} from '@testing-library/react';
 
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 import {

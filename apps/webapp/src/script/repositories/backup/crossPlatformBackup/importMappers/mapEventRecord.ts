@@ -19,12 +19,12 @@
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 
-import {ClientEvent} from 'Repositories/event/Client';
+import {ClientEvent} from 'Repositories/event/client';
 import {EventRecord} from 'Repositories/storage';
 import {MessageCategory} from 'src/script/message/messageCategory';
 
 import {CPBLogger} from '..';
-import {BackupMessageContent, BackupMessage} from '../CPB.library';
+import {BackupMessageContent, BackupMessage} from '../cPB.library';
 
 // Type definition for common message fields
 type CommonMessageFields = Required<

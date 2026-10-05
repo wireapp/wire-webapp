@@ -20,7 +20,7 @@
 import {render} from '@testing-library/react';
 import {noop} from 'noop-esm';
 
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {translateForTest} from 'Util/test/translateForTest';
 import {
   createRootContextValueForTest,

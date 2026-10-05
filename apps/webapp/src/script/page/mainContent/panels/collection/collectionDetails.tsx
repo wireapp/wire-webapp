@@ -20,7 +20,7 @@
 import {Fragment} from 'react';
 
 import {FadingScrollbar} from 'Components/fadingScrollbar';
-import {Conversation} from 'Repositories/entity/Conversation';
+import {Conversation} from 'Repositories/entity/conversation';
 import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';

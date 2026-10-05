@@ -21,7 +21,7 @@ import {render} from '@testing-library/react';
 
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 
-import {Conversation} from 'Repositories/entity/Conversation';
+import {Conversation} from 'Repositories/entity/conversation';
 import {Config} from 'src/script/Config';
 import {translateForTest} from 'Util/test/translateForTest';
 import {

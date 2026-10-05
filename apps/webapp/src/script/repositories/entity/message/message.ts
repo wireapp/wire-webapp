@@ -52,7 +52,7 @@ import {EphemeralStatusType} from '../../../message/ephemeralStatusType';
 import type {MessageCategory} from '../../../message/messageCategory';
 import {StatusType} from '../../../message/statusType';
 import {SuperType} from '../../../message/superType';
-import {User} from '../User';
+import {User} from '../user';
 
 export class Message {
   protected readonly translate: Translate;

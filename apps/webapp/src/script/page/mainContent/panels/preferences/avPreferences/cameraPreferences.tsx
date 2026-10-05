@@ -23,8 +23,8 @@ import type {ReactNode} from 'react';
 import {useDebouncedCallback} from 'use-debounce';
 
 import * as Icon from 'Components/icon';
-import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
-import {MediaType} from 'Repositories/media/MediaType';
+import {MediaStreamHandler} from 'Repositories/media/mediaStreamHandler';
+import {MediaType} from 'Repositories/media/mediaType';
 import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';

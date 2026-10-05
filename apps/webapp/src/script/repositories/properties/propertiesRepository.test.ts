@@ -17,8 +17,8 @@
  *
  */
 
-import {User} from 'Repositories/entity/User';
-import type {SelfService} from 'Repositories/self/SelfService';
+import {User} from 'Repositories/entity/user';
+import type {SelfService} from 'Repositories/self/selfService';
 import type {APIClient} from 'src/script/service/apiClientSingleton';
 import {translateForTest} from 'Util/test/translateForTest';
 

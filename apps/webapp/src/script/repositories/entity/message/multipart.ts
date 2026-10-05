@@ -25,7 +25,7 @@ import {IAttachment, ICellAsset} from '@wireapp/protocol-messaging';
 
 import {AssetType} from 'Repositories/assets/assetType';
 import {containsOnlyLink} from 'Repositories/conversation/linkPreviews/helpers';
-import {mediaParser} from 'Repositories/media/MediaParser';
+import {mediaParser} from 'Repositories/media/mediaParser';
 import {renderMessage} from 'Util/messageRenderer';
 
 import {Asset} from './asset';

@@ -31,8 +31,8 @@ import {
   MeetingNotificationKind,
   useMeetingNotificationStore,
 } from 'Components/meeting/meetingNotificationStore/meetingNotificationStore';
-import {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
+import {User} from 'Repositories/entity/user';
+import {TeamState} from 'Repositories/team/teamState';
 import {UserState} from 'Repositories/user/userState';
 import {Config} from 'src/script/Config';
 import {

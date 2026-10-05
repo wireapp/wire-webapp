@@ -25,8 +25,8 @@ import ko from 'knockout';
 import {UserBlockedBadge, UserVerificationBadges} from 'Components/badge';
 import * as Icon from 'Components/icon';
 import {UserInfo} from 'Components/UserInfo';
-import {User} from 'Repositories/entity/User';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {User} from 'Repositories/entity/user';
+import {ServiceEntity} from 'Repositories/integration/serviceEntity';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {

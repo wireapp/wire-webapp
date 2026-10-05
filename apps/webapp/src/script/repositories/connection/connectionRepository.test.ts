@@ -26,9 +26,9 @@ import {StatusCodes} from 'http-status-codes';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/modals/primaryModal';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {SelfService} from 'Repositories/self/SelfService';
-import {TeamService} from 'Repositories/team/TeamService';
+import {Conversation} from 'Repositories/entity/conversation';
+import {SelfService} from 'Repositories/self/selfService';
+import {TeamService} from 'Repositories/team/teamService';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {generateUser} from 'test/helper/UserGenerator';
 import type {Translate} from 'Util/localizerUtil';

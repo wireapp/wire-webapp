@@ -18,7 +18,7 @@
  */
 
 import {DeviceVerificationBadges} from 'Components/badge';
-import {ClientEntity} from 'Repositories/client/ClientEntity';
+import {ClientEntity} from 'Repositories/client/clientEntity';
 import {E2EIHandler, WireIdentity} from 'src/script/e2eIdentity';
 
 import {MLSDeviceDetails} from './mlsDeviceDetails';

@@ -21,7 +21,7 @@ import {UserAsset, UserAssetType} from '@wireapp/api-client/lib/user';
 
 import {Availability} from '@wireapp/protocol-messaging';
 
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {ACCENT_ID} from 'src/script/Config';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 import {entities, payload} from 'test/api/payloads';
