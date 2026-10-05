@@ -34,7 +34,9 @@ function setup(initialFeatures: FeatureList = disabled) {
   const reportError = jest.fn();
   const fireAndForgetInvoker = createFireAndForgetInvoker({reportError});
   let features = initialFeatures;
-  const getFeatures = () => features;
+  const getFeatures = () => {
+    return features;
+  };
   const observedAllowances: number[] = [];
   const refreshKeyPackages = jest.fn(async () => {
     observedAllowances.push(getMLSKeyPackageUploadAmount(getFeatures(), clock));

@@ -541,7 +541,12 @@ describe('MLSService', () => {
         jest.spyOn(Helper, 'getMLSDeviceStatus').mockReturnValueOnce(Helper.MLSDeviceStatus.FRESH);
         jest.spyOn(coreCrypto, 'clientPublicKey').mockResolvedValue(new Uint8Array());
 
-        await mlsService.initClient(mockUserId, mockClient, {...defaultMLSInitConfig, getNbKeyPackages: () => amount});
+        await mlsService.initClient(mockUserId, mockClient, {
+          ...defaultMLSInitConfig,
+          getNbKeyPackages: () => {
+            return amount;
+          },
+        });
 
         expect(transactionContext.mlsInit).toHaveBeenCalled();
         expect(apiClient.api.client.putClient).toHaveBeenCalledWith(mockClientId, expect.anything());
@@ -630,7 +635,9 @@ describe('MLSService', () => {
       [false, 501, false],
     ])('startup=%s, backend count=%s, uploads=%s', async (startup, count, uploads) => {
       const [mlsService, {apiClient, transactionContext, coreCrypto}] = await createMLSService();
-      mlsService.config.getNbKeyPackages = () => 1000;
+      mlsService.config.getNbKeyPackages = () => {
+        return 1000;
+      };
       jest.spyOn(apiClient.api.client, 'getMLSKeyPackageCount').mockResolvedValue(count);
       jest.spyOn(transactionContext, 'clientKeypackages').mockResolvedValue([new Uint8Array()]);
       const upload = jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages').mockResolvedValue(undefined);
@@ -640,7 +647,9 @@ describe('MLSService', () => {
         jest.spyOn(coreCrypto, 'clientPublicKey').mockResolvedValue(new Uint8Array());
         await mlsService.initClient(createUserId(), {id: 'client-1'} as RegisteredClient, {
           ...defaultMLSInitConfig,
-          getNbKeyPackages: () => 1000,
+          getNbKeyPackages: () => {
+            return 1000;
+          },
         });
       } else {
         await mlsService['verifyRemoteMLSKeyPackagesAmount']('client-1');
@@ -659,14 +668,20 @@ describe('MLSService', () => {
     it('uses the latest allowance on subsequent checks', async () => {
       const [mlsService, {apiClient, transactionContext}] = await createMLSService();
       let allowance = 1000;
-      mlsService.config.getNbKeyPackages = () => allowance;
+      mlsService.config.getNbKeyPackages = () => {
+        return allowance;
+      };
       jest.spyOn(apiClient.api.client, 'getMLSKeyPackageCount').mockResolvedValueOnce(999).mockResolvedValue(49);
       jest.spyOn(transactionContext, 'clientKeypackages').mockResolvedValue([new Uint8Array()]);
       jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages').mockResolvedValue(undefined);
       await mlsService.refreshKeyPackages('client-1');
       allowance = 100;
       await mlsService.refreshKeyPackages('client-1');
-      expect(transactionContext.clientKeypackages.mock.calls.map(call => call[2])).toEqual([1000, 100]);
+      expect(
+        transactionContext.clientKeypackages.mock.calls.map(call => {
+          return call[2];
+        }),
+      ).toEqual([1000, 100]);
     });
 
     it('checks enrolled E2EI clients at startup even when identity initialization is skipped', async () => {
@@ -680,7 +695,9 @@ describe('MLSService', () => {
 
       await mlsService.initClient(createUserId(), {id: 'client-1'} as RegisteredClient, {
         ...defaultMLSInitConfig,
-        getNbKeyPackages: () => 1000,
+        getNbKeyPackages: () => {
+          return 1000;
+        },
         skipInitIdentity: true,
       });
 

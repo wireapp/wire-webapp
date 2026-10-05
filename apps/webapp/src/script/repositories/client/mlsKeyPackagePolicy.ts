@@ -30,13 +30,19 @@ export const getMLSKeyPackageUploadAmount = (features: FeatureList, clock: Clock
     Just: feature => {
       const deadline = Maybe.of(feature.config.finaliseRegardlessAfter);
       const beforeDeadline = deadline.match({
-        Just: value => clock.currentUnixEpochMilliseconds < Date.parse(value),
-        Nothing: () => true,
+        Just: value => {
+          return clock.currentUnixEpochMilliseconds < Date.parse(value);
+        },
+        Nothing: () => {
+          return true;
+        },
       });
       return feature.status === FEATURE_STATUS.ENABLED && beforeDeadline
         ? MIGRATION_UPLOAD_AMOUNT
         : REGULAR_UPLOAD_AMOUNT;
     },
-    Nothing: () => REGULAR_UPLOAD_AMOUNT,
+    Nothing: () => {
+      return REGULAR_UPLOAD_AMOUNT;
+    },
   });
 };

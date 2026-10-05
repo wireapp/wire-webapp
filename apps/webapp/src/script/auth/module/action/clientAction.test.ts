@@ -68,8 +68,16 @@ describe('ClientAction', () => {
       ...clockParameters,
       actions: actionRoot,
       core: {
-        getLocalClient: async () => client,
-        service: {team: {getCommonFeatureConfig: async () => features}} as Account['service'],
+        getLocalClient: async () => {
+          return client;
+        },
+        service: {
+          team: {
+            getCommonFeatureConfig: async () => {
+              return features;
+            },
+          },
+        } as Account['service'],
         initClient,
       },
     })({});

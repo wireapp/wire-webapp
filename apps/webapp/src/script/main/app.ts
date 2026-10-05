@@ -581,7 +581,9 @@ export class App {
       try {
         await this.core.initClient(
           localClient,
-          getClientMLSConfig(teamFeatures, clock, () => teamFeatures),
+          getClientMLSConfig(teamFeatures, clock, () => {
+            return teamFeatures;
+          }),
         );
       } catch (error: unknown) {
         console.warn('Failed to initialize client', {error});
@@ -592,7 +594,9 @@ export class App {
         clock,
         teamRepository,
         fireAndForgetInvoker,
-        getFeatures: () => teamFeatures,
+        getFeatures: () => {
+          return teamFeatures;
+        },
         setFeatures: features => {
           teamFeatures = features;
         },
