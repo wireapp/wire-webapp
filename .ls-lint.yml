@@ -1019,6 +1019,7 @@ ls:
     .dir: camelCase
     .ts: camelCase
   libraries/core/src:
+    .dir: camelCase
     .ts: camelCase
     .test.ts: camelCase
   libraries/core/src/util:
@@ -1126,12 +1127,14 @@ ls:
     .dir: camelCase
     .tsx: camelCase
   libraries/react-ui-kit/src/dataDisplay:
+    .dir: camelCase | regex:^__snapshots__$
     .ts: camelCase
     .tsx: camelCase
     .styles.ts: camelCase
     .stories.tsx: camelCase
     .test.tsx: camelCase
   libraries/react-ui-kit/src/identity:
+    .dir: camelCase | regex:^__snapshots__$
     .ts: camelCase
     .tsx: camelCase
     .styles.ts: camelCase
@@ -1158,6 +1161,7 @@ ls:
     .stories.tsx: camelCase
     .test.tsx: camelCase
   libraries/react-ui-kit/src/typography:
+    .dir: camelCase | regex:^__snapshots__$
     .ts: camelCase
     .tsx: camelCase
     .style.ts: camelCase
@@ -1167,6 +1171,7 @@ ls:
     .ts: camelCase
     .tsx: camelCase
   libraries/react-ui-kit/src/inputs/{button,buttonGroup,buttonLink,buttonsGroup,checkbox,codeInput,comboboxSelect,datePickerField,dateTimePickerField,dropFileInput,errorMessage,form,iconButton,indicatorRangeInput,input,inputBlock,inputLabel,inputSubmitCombo,rangeInput,roundIconButton,secondaryButton,select,shakeBox,switch,textArea,timePickerField}:
+    .dir: camelCase | regex:^__snapshots__$
     .ts: camelCase
     .tsx: camelCase
     .styles.ts: camelCase
@@ -4041,3 +4046,96 @@ ls:
 
   libraries/webapp-events/tsconfig.json:
     .json: camelCase
+
+  libraries/react-ui-kit/src:
+    .dir: camelCase | regex:^__snapshots__$
+
+  libraries/react-ui-kit/src/dataDisplay/icon:
+    .dir: camelCase
+
+  libraries/react-ui-kit/src/inputs/select:
+    .dir: camelCase | regex:^__snapshots__$
+
+  libraries/api-client/jest.config.js:
+    .config.js: camelCase
+
+  libraries/api-client/package.json:
+    .json: camelCase
+
+  libraries/api-client/project.json:
+    .json: camelCase
+
+  libraries/api-client/tsconfig.json:
+    .json: camelCase
+
+  libraries/api-client/tsconfig.type-check.json:
+    .type-check.json: camelCase
+
+  libraries/core/jest.config.js:
+    .config.js: camelCase
+
+  libraries/core/jest.setup.ts:
+    .setup.ts: camelCase
+
+  libraries/core/package.json:
+    .json: camelCase
+
+  libraries/core/project.json:
+    .json: camelCase
+
+  libraries/core/tsconfig.json:
+    .json: camelCase
+
+  libraries/core/tsconfig.type-check.json:
+    .type-check.json: camelCase
+
+  libraries/core/webpack.config.js:
+    .config.js: camelCase
+
+  libraries/react-ui-kit/.storybook/main.ts:
+    .ts: camelCase
+
+  libraries/react-ui-kit/.storybook/preview.tsx:
+    .tsx: camelCase
+
+  libraries/react-ui-kit/adr/001-replace-styleguideist-with-storybook.md:
+    .md: kebab-case
+
+  libraries/react-ui-kit/adr/002-component-folder-structure-reorganization.md:
+    .md: kebab-case
+
+  libraries/react-ui-kit/babel.config.js:
+    .config.js: camelCase
+
+  libraries/react-ui-kit/emotion.d.ts:
+    .d.ts: camelCase
+
+  libraries/react-ui-kit/jest.config.js:
+    .config.js: camelCase
+
+  libraries/react-ui-kit/package.json:
+    .json: camelCase
+
+  libraries/react-ui-kit/project.json:
+    .json: camelCase
+
+  libraries/react-ui-kit/src/index.ts:
+    .ts: camelCase
+
+  libraries/react-ui-kit/src/inputs/index.ts:
+    .ts: camelCase
+
+  libraries/react-ui-kit/tsconfig.json:
+    .json: camelCase
+
+  libraries/react-ui-kit/tsconfig.type-check.json:
+    .type-check.json: camelCase
+
+  libraries/react-ui-kit/webpack.config.js:
+    .config.js: camelCase
+
+  libraries/store-engine/tsconfig.type-check.json:
+    .type-check.json: camelCase
+
+  libraries/telemetry/adr/001-initialize-library.md:
+    .md: kebab-case
