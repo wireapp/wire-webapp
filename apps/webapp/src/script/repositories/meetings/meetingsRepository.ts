@@ -22,14 +22,14 @@ import {Task, task} from 'true-myth';
 import type {MeetingsDataSource} from './meetingsDataSource';
 
 import type {CreateMeeting} from '../../apiClient/meetings/createMeeting';
-import type {Meeting, MeetingWithConversation} from '../../apiClient/meetings/meeting';
+import type {CreatedMeetingWithConversation, Meeting, MeetingWithConversation} from '../../apiClient/meetings/meeting';
 import type {UpdateMeeting} from '../../apiClient/meetings/updateMeeting';
 import type {QualifiedId} from '../../apiClient/user/qualifiedId';
 
 export class MeetingsRepository {
   constructor(private readonly dataSource: MeetingsDataSource) {}
 
-  createMeeting(payload: CreateMeeting): Task<MeetingWithConversation, unknown> {
+  createMeeting(payload: CreateMeeting): Task<CreatedMeetingWithConversation, unknown> {
     return task.tryOrElse(
       error => {
         return error;
@@ -69,6 +69,17 @@ export class MeetingsRepository {
       },
       () => {
         return this.dataSource.getMeetingsList();
+      },
+    );
+  }
+
+  rotateMeetingLink(meetingId: QualifiedId): Task<MeetingWithConversation, unknown> {
+    return task.tryOrElse(
+      error => {
+        return error;
+      },
+      () => {
+        return this.dataSource.rotateMeetingLink(meetingId);
       },
     );
   }

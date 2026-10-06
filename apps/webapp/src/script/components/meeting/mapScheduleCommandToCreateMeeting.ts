@@ -17,6 +17,8 @@
  *
  */
 
+import {isNonEmptyString} from '@sindresorhus/is';
+
 import type {DeviceTimeZone} from './deviceTimeZone';
 import {mapRecurrenceOptionToMeetingRecurrence} from './scheduleMeetingModal/scheduleMeetingRecurrence';
 import type {ScheduleMeetingCommand} from './shared/types/meetingCommandTypes';
@@ -36,5 +38,8 @@ export const mapScheduleCommandToCreateMeeting = (
     type: 'scheduled',
     tzid: deviceTimeZone.ianaTimeZoneId,
     ...(recurrence !== undefined && {recurrence}),
+    ...(isNonEmptyString(command.password?.trim()) && {
+      password: command.password,
+    }),
   };
 };
