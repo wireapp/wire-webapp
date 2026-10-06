@@ -21,6 +21,7 @@ import {act, fireEvent, render, waitFor} from '@testing-library/react';
 
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {FEATURE_STATUS} from '@wireapp/api-client/lib/team/feature/';
 
 import {FileWithPreview} from 'Components/conversation/useFilesUploadState/useFilesUploadState';
 import {InputBar} from 'Components/inputBar/index';
@@ -107,7 +108,6 @@ describe('InputBar', () => {
       searchRepository,
       storageRepository,
       isCellsEnabled: false,
-      isCellsUploadEnabled: false,
       teamState: new TeamState(),
       selfUser: new User('id', '', translateForTest),
       onShiftTab: jest.fn(),
@@ -141,7 +141,7 @@ describe('InputBar', () => {
   it('hides cells upload buttons for viewers', () => {
     const props = getDefaultProps();
     props.isCellsEnabled = true;
-    props.isCellsUploadEnabled = true;
+    props.teamState.teamFeatures({cells: {status: FEATURE_STATUS.ENABLED}});
     props.conversation.teamId = 'conversation-team';
     props.conversation.cellsState(CONVERSATION_CELLS_STATE.READY);
     props.selfUser.teamId = 'guest-team';
@@ -155,7 +155,7 @@ describe('InputBar', () => {
   it('shows cells upload buttons for editors', () => {
     const props = getDefaultProps();
     props.isCellsEnabled = true;
-    props.isCellsUploadEnabled = true;
+    props.teamState.teamFeatures({cells: {status: FEATURE_STATUS.ENABLED}});
     props.conversation.teamId = 'conversation-team';
     props.conversation.cellsState(CONVERSATION_CELLS_STATE.READY);
     props.selfUser.teamId = 'conversation-team';
@@ -166,10 +166,10 @@ describe('InputBar', () => {
     expect(container.querySelector('[data-uie-name="do-share-file"]')).toBeInTheDocument();
   });
 
-  it('hides Cells upload buttons when the team Cells feature is disabled', () => {
+  it('hides Cells upload buttons when the team feature is disabled and restores them when enabled', () => {
     const props = getDefaultProps();
     props.isCellsEnabled = true;
-    props.isCellsUploadEnabled = false;
+    props.teamState.teamFeatures({cells: {status: FEATURE_STATUS.DISABLED}});
     props.conversation.teamId = 'conversation-team';
     props.conversation.cellsState(CONVERSATION_CELLS_STATE.READY);
     props.selfUser.teamId = 'conversation-team';
@@ -178,6 +178,13 @@ describe('InputBar', () => {
 
     expect(container.querySelector('[data-uie-name="do-share-image"]')).not.toBeInTheDocument();
     expect(container.querySelector('[data-uie-name="do-share-file"]')).not.toBeInTheDocument();
+
+    act(() => {
+      props.teamState.teamFeatures({cells: {status: FEATURE_STATUS.ENABLED}});
+    });
+
+    expect(container.querySelector('[data-uie-name="do-share-image"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-uie-name="do-share-file"]')).toBeInTheDocument();
   });
 
   it('has passed value', async () => {

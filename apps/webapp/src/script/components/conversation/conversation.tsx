@@ -80,7 +80,7 @@ import {
 import {SharedDriveUploadStatusProvider} from './conversationCells/sharedDriveUploadStatusContext';
 import {SharedDriveUploadStatusPopupHost} from './conversationCells/sharedDriveUploadStatusPopupHost';
 import {ConversationFileDropzone} from './conversationFileDropzone/conversationFileDropzone';
-import {isConversationFileDropAllowed} from './conversationFileDropzone/isConversationFileDropAllowed/isConversationFileDropAllowed';
+import {isConversationFileUploadAllowed} from './conversationFileDropzone/isConversationFileUploadAllowed/isConversationFileUploadAllowed';
 import {ConversationMessagesWrapper} from './conversationMessagesWrapper/conversationMessagesWrapper';
 import {ConversationTabPanel} from './conversationTabPanel/conversationTabPanel';
 import {ConversationTabs} from './conversationTabs/conversationTabs';
@@ -677,15 +677,13 @@ function ConversationContent({
 
   const isCellsEnabled =
     Config.getConfig().FEATURE.ENABLE_CELLS && activeConversation?.cellsState() !== CONVERSATION_CELLS_STATE.DISABLED;
-  const isCellsUploadEnabled = isCellsEnabled && isCellsEnabledForTeam;
   const isSharedDriveDirectUploadFeatureEnabled = isFeatureToggleEnabled(sharedDriveDirectUploadFeatureToggleName);
-  const isFileDropAllowed =
-    isConversationFileDropAllowed({
-      conversationTeamId: activeConversation?.teamId,
-      selfUserTeamId: activeConversation?.selfUser()?.teamId,
-      isCellsEnabled,
-    }) &&
-    (!isCellsEnabled || isCellsUploadEnabled);
+  const isFileUploadAllowed = isConversationFileUploadAllowed({
+    conversationTeamId: activeConversation?.teamId,
+    selfUserTeamId: activeConversation?.selfUser()?.teamId,
+    isCellsEnabled,
+    isCellsEnabledForTeam,
+  });
 
   useEffect(() => {
     if (!isFileTabActive && isSharedDriveSearchViewOpen) {
@@ -700,7 +698,7 @@ function ConversationContent({
       conversation: activeConversation,
       isCellsEnabled: isCellsEnabled,
       isDisabled: isFileTabActive && !isSharedDriveDirectUploadFeatureEnabled,
-      isFileDropAllowed,
+      isFileDropAllowed: isFileUploadAllowed,
       translate,
     });
 
@@ -719,7 +717,7 @@ function ConversationContent({
     <CellsSelfUserDriveRoleProvider selfUserDriveRole={selfUserDriveRole}>
       <ConversationFileDropzone
         isDragAccept={isDragAccept}
-        isFileDropAllowed={isFileDropAllowed}
+        isFileDropAllowed={isFileUploadAllowed}
         isCellsEnabled={isCellsEnabled}
         isConversationFileDropzoneEnabled={!isFileTabActive}
         isConversationLoaded={isConversationLoaded}
@@ -786,7 +784,7 @@ function ConversationContent({
                         onCloseSearchView={() => {
                           return setIsSharedDriveSearchViewOpen(false);
                         }}
-                        isUploadFilesEnabled={isSharedDriveDirectUploadFeatureEnabled && isCellsUploadEnabled}
+                        isUploadFilesEnabled={isSharedDriveDirectUploadFeatureEnabled && isFileUploadAllowed}
                         showViewerPermission={showViewerPermission}
                       />
                     </SharedDriveUploadProvider>
@@ -866,7 +864,6 @@ function ConversationContent({
                     teamState={teamState}
                     selfUser={selfUser}
                     isCellsEnabled={isCellsEnabled}
-                    isCellsUploadEnabled={isCellsUploadEnabled}
                     onShiftTab={() => {
                       return setMsgElementsFocusable(false);
                     }}
