@@ -52,6 +52,7 @@ import {useMeetNowModal} from './useMeetNowModal';
 
 const qualifiedConversation = {id: 'conversation-id', domain: 'example.com'};
 const qualifiedMeetingId = {id: 'meeting-id', domain: 'example.com'};
+const meetingLink = 'https://wire.example/meeting';
 
 function createDeferred<T>(): PromiseWithResolvers<T> {
   return Promise.withResolvers<T>();
@@ -72,7 +73,7 @@ const createDeferredMeetNowMeeting = () => {
       ),
     ),
     resolveMeetNowMeeting: (
-      value: CreateMeetingSuccess = {failedToAdd: [], qualifiedConversation, qualifiedMeetingId},
+      value: CreateMeetingSuccess = {failedToAdd: [], qualifiedConversation, qualifiedMeetingId, link: meetingLink},
     ) => {
       deferred.resolve(value);
     },

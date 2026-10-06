@@ -17,6 +17,7 @@
  *
  */
 
+import {MeetingType} from '@wireapp/api-client/lib/meetings/createMeeting';
 import {MeetingsAPI} from '@wireapp/api-client/lib/meetings/meetingsApi';
 import {MeetingsApiDataSource} from './meetingsApiDataSource';
 
@@ -35,6 +36,7 @@ describe('MeetingsApiDataSource', () => {
       title: 'Weekly sync',
       start_time: '2026-06-16T10:00:00.000Z',
       end_time: '2026-06-16T11:00:00.000Z',
+      type: MeetingType.SCHEDULED,
       tzid: 'Europe/Berlin',
     });
     await dataSource.getMeetingsList();

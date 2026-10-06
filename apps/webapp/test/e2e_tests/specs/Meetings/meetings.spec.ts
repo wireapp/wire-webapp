@@ -33,7 +33,7 @@ test.describe.configure({mode: 'serial'});
 
 test.describe('Meetings', () => {
   test.describe('Schedule', () => {
-    test('creates a password-protected meeting join link', async ({createUser, createTeam, createPage}) => {
+    test('sends the meeting type and password when creating a meeting link', async ({createUser, createTeam, createPage}) => {
       const {owner} = await createMeetingsTeam(createUser, createTeam, 0);
       const [ownerPage] = await loginMeetingsUsers(createPage, [owner]);
       const meetings = PageManager.from(ownerPage).webapp.pages.meetings();
@@ -43,9 +43,9 @@ test.describe('Meetings', () => {
       await meetings.fillMeetingTitle('Password-protected meeting');
       await meetings.fillScheduleMeetingPassword('MeetingSecret1!');
 
-      const requestPromise = meetings.conversationCodeRequest();
+      const requestPromise = meetings.meetingCreateRequest();
       await meetings.submitScheduleMeetingModal();
-      await meetings.assertConversationCodeRequest(requestPromise, 'MeetingSecret1!');
+      await meetings.assertMeetingCreateRequest(requestPromise, 'MeetingSecret1!');
     });
 
     test('host sees a new meeting in the list', async ({createUser, createTeam, createPage}) => {

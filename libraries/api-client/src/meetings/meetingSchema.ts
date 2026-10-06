@@ -30,7 +30,7 @@ export type {ValidatedMeetingConversation} from '../conversation/conversationSch
 
 /**
  * Runtime validation schemas for the Wire meetings API according to
- * https://staging-nginz-https.zinfra.io/v17/api/swagger-ui/#/default/get_meetings_list
+ * https://staging-nginz-https.zinfra.io/v19/api/swagger-ui/#/default/get_meetings_list
  *
  * MeetingsAPI validates responses with parse() and throws on invalid data.
  */
@@ -49,6 +49,7 @@ const meetingFieldsSchema = {
   qualified_conversation: qualifiedIdSchema,
   qualified_creator: qualifiedIdSchema,
   qualified_id: qualifiedIdSchema,
+  link: z.string().url().optional(),
   recurrence: meetingRecurrenceSchema.optional(),
   start_time: utcTimeSchema,
   title: z.string().min(1).max(maximumMeetingTitleLength),
@@ -61,6 +62,10 @@ export const meetingSchema = z.object(meetingFieldsSchema);
 export const meetingWithConversationSchema = z.object({
   ...meetingFieldsSchema,
   conversation: meetingConversationSchema,
+});
+
+export const createdMeetingWithConversationSchema = meetingWithConversationSchema.extend({
+  link: z.string().url(),
 });
 
 export const meetingsListResponseSchema = z.array(meetingSchema);
