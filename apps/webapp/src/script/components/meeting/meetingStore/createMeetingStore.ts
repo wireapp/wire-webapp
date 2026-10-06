@@ -95,7 +95,6 @@ export type MeetingStoreState = {
   updateMeeting: (command: UpdateMeetingCommand) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
   deleteMeetingForMe: (meetingInstance: MeetingInstance) => Task<void, MeetingSubmitErrors>;
   deleteMeetingForAll: (meetingInstance: MeetingInstance) => Task<void, MeetingSubmitErrors>;
-  rotateMeetingLink?: (meetingId: QualifiedId) => Task<MeetingSeries, MeetingSubmitErrors>;
   removeMeetingByQualifiedId: (meetingId: QualifiedId) => void;
   syncMeetingByQualifiedId: (meetingId: QualifiedId) => Task<SyncMeetingResult, SyncMeetingError>;
   loadMeetingForEdit: (meetingInstance: MeetingInstance) => Task<EditMeetingData, MeetingSubmitErrors>;
@@ -163,23 +162,6 @@ export const createMeetingStore = (deps: MeetingStoreDeps, initialState?: Meetin
             .orElse(() => {
               return task.resolve(result);
             });
-        });
-      },
-      rotateMeetingLink: meetingId => {
-        return (
-          deps.serviceTasks.rotateMeetingLink?.(meetingId).mapRejected(() => {
-            return meetingSubmitErrors.refreshFailed;
-          }) ?? task.reject<MeetingWithConversation, MeetingSubmitErrors>(meetingSubmitErrors.refreshFailed)
-        ).andThen(refreshedMeeting => {
-          const mapResult = mapApiMeetingToSeries(refreshedMeeting);
-          if (mapResult.isErr) {
-            return task.reject<MeetingSeries, MeetingSubmitErrors>(meetingSubmitErrors.refreshFailed);
-          }
-          set(state => {
-            return {meetingSeries: upsertMeetingSeries(state.meetingSeries, mapResult.value)};
-          });
-          meetingStoreMutationVersion += 1;
-          return task.resolve(mapResult.value);
         });
       },
       updateMeeting: command => {
