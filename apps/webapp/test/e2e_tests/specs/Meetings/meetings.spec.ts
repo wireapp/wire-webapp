@@ -33,7 +33,11 @@ test.describe.configure({mode: 'serial'});
 
 test.describe('Meetings', () => {
   test.describe('Schedule', () => {
-    test('sends the meeting type and password when creating a meeting link', async ({createUser, createTeam, createPage}) => {
+    test('sends the meeting type and password when creating a meeting link', async ({
+      createUser,
+      createTeam,
+      createPage,
+    }) => {
       const {owner} = await createMeetingsTeam(createUser, createTeam, 0);
       const [ownerPage] = await loginMeetingsUsers(createPage, [owner]);
       const meetings = PageManager.from(ownerPage).webapp.pages.meetings();

@@ -40,10 +40,6 @@ export class MeetingsApiDataSource implements MeetingsDataSource {
     return this.meetingsApi.getMeetingsList(...args);
   }
 
-  rotateMeetingLink(...args: Parameters<MeetingsDataSource['rotateMeetingLink']>) {
-    return this.meetingsApi.rotateMeetingLink(...args);
-  }
-
   updateMeeting(...args: Parameters<MeetingsDataSource['updateMeeting']>) {
     return this.meetingsApi.updateMeeting(...args);
   }
