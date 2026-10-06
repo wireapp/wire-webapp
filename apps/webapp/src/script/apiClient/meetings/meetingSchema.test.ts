@@ -30,7 +30,12 @@ import {
 import type {ValidatedMeetingConversation} from '../conversation/conversationSchema';
 import {CONVERSATION_PROTOCOL} from '../team';
 import {MeetingRecurrenceFrequency} from './meetingRecurrence';
-import {meetingSchema, meetingWithConversationSchema, meetingsListResponseSchema} from './meetingSchema';
+import {
+  createdMeetingWithConversationSchema,
+  meetingSchema,
+  meetingWithConversationSchema,
+  meetingsListResponseSchema,
+} from './meetingSchema';
 
 describe('meetingSchema', () => {
   const validMeeting = {
@@ -42,6 +47,7 @@ describe('meetingSchema', () => {
     qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
     qualified_creator: {id: 'creator-id', domain: 'example.com'},
     qualified_id: {id: 'meeting-id', domain: 'example.com'},
+    link: 'https://wire.example/meeting/abc',
     tzid: 'Europe/Berlin',
   };
 
@@ -106,6 +112,12 @@ describe('meetingSchema', () => {
 
   it('accepts meeting create/update payloads with embedded conversation', () => {
     expect(meetingWithConversationSchema.safeParse(validMeetingWithConversation).success).toBe(true);
+  });
+
+  it('requires a link on meeting responses with an embedded conversation', () => {
+    const {link: _link, ...meetingWithoutLink} = validMeetingWithConversation;
+
+    expect(createdMeetingWithConversationSchema.safeParse(meetingWithoutLink).success).toBe(false);
   });
 
   it('accepts null add_permission on embedded meeting conversations', () => {

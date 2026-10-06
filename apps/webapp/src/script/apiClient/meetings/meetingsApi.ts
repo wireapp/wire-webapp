@@ -20,8 +20,13 @@
 import {AxiosRequestConfig} from 'axios';
 
 import {CreateMeeting} from './createMeeting';
-import {Meeting, MeetingWithConversation} from './meeting';
-import {meetingSchema, meetingWithConversationSchema, meetingsListResponseSchema} from './meetingSchema';
+import {CreatedMeetingWithConversation, Meeting, MeetingWithConversation} from './meeting';
+import {
+  createdMeetingWithConversationSchema,
+  meetingSchema,
+  meetingWithConversationSchema,
+  meetingsListResponseSchema,
+} from './meetingSchema';
 import {UpdateMeeting} from './updateMeeting';
 
 import {HttpClient} from '../http';
@@ -46,8 +51,16 @@ export class MeetingsAPI {
     return `${MeetingsAPI.URL.MEETINGS}/${meetingId.domain}/${meetingId.id}`;
   }
 
+  private generateMeetingLinkRefreshUrl(meetingId: QualifiedId): string {
+    return `${this.generateMeetingUrl(meetingId)}/link/refresh`;
+  }
+
   private parseMeetingResponse(data: unknown): Meeting {
     return meetingSchema.parse(data);
+  }
+
+  private parseCreatedMeetingWithConversationResponse(data: unknown): CreatedMeetingWithConversation {
+    return createdMeetingWithConversationSchema.parse(data);
   }
 
   private parseMeetingWithConversationResponse(data: unknown): MeetingWithConversation {
@@ -61,11 +74,23 @@ export class MeetingsAPI {
   /**
    * Create a new meeting.
    */
-  public async createMeeting(newMeeting: CreateMeeting): Promise<MeetingWithConversation> {
+  public async createMeeting(newMeeting: CreateMeeting): Promise<CreatedMeetingWithConversation> {
     const config: AxiosRequestConfig = {
       data: newMeeting,
       method: 'post',
       url: MeetingsAPI.URL.MEETINGS,
+      ...disableInfiniteNetworkRetries,
+    };
+
+    const response = await this.client.sendJSON<CreatedMeetingWithConversation>(config);
+    return this.parseCreatedMeetingWithConversationResponse(response.data);
+  }
+
+  /** Rotate the join link for a live meeting created by the authenticated user. */
+  public async rotateMeetingLink(meetingId: QualifiedId): Promise<MeetingWithConversation> {
+    const config: AxiosRequestConfig = {
+      method: 'post',
+      url: this.generateMeetingLinkRefreshUrl(meetingId),
       ...disableInfiniteNetworkRetries,
     };
 
@@ -75,7 +100,7 @@ export class MeetingsAPI {
 
   /**
    * List all meetings for the authenticated user.
-   * @see https://staging-nginz-https.zinfra.io/v17/api/swagger-ui/#/default/get_meetings_list
+   * @see https://staging-nginz-https.zinfra.io/v19/api/swagger-ui/#/default/get_meetings_list
    */
   public async getMeetingsList(): Promise<Meeting[]> {
     const config: AxiosRequestConfig = {
