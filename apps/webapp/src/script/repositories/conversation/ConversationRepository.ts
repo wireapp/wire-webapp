@@ -3424,7 +3424,10 @@ export class ConversationRepository {
     isoDate = this.serverTimeHandler.toServerTimestamp(),
   ) => {
     const userEntity = await this.userRepository.getUserById(userId);
-    const allConversations = this.conversationState.conversations();
+    // Keep the deleted participant in direct conversations so their history remains accessible and read-only.
+    const allConversations = this.conversationState.conversations().filter(conversation => {
+      return !conversation.is1to1() && !conversation.isRequest();
+    });
     const eventInjections = allConversations
       .filter(conversation => {
         const conversationInTeam = conversation.teamId === teamId;
@@ -3436,7 +3439,7 @@ export class ConversationRepository {
         await this.eventRepository.injectEvent(leaveEvent);
       });
 
-    // Clear user from all conversations they participate in
+    // Clear the user from the remaining conversations, including groups in other teams.
     const userCleanup = allConversations
       .filter(conversation => {
         return UserFilter.isParticipant(conversation, userId);
