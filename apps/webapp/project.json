@@ -116,7 +116,7 @@
       "executor": "nx:run-commands",
       "dependsOn": ["^build"],
       "options": {
-        "command": "tsc --project {projectRoot}/tsconfig.type-check.json --noEmit"
+        "command": "tsc --project {projectRoot}/tsconfig.typeCheck.json --noEmit"
       }
     },
     "check-circular": {
@@ -135,7 +135,7 @@
     "translate-merge": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "formatjs extract --format './bin/translations_extract_formatter.js' --out-file './src/i18n/en-US.json' 'src/**/*.{ts,tsx,js,jsx}' --ignore 'src/**/*.d.ts' --additional-function-names t",
+        "command": "formatjs extract --format './bin/translationsExtractFormatter.js' --out-file './src/i18n/en-US.json' 'src/**/*.{ts,tsx,js,jsx}' --ignore 'src/**/*.d.ts' --additional-function-names t",
         "cwd": "{projectRoot}"
       }
     },
@@ -150,7 +150,7 @@
       "executor": "nx:run-commands",
       "dependsOn": ["copy-config-lib:build"],
       "options": {
-        "command": "copy-config ./.copyconfigrc.js && ts-node ./bin/generate_react_icons.ts && tsc --project ./tsconfig.generated-icons.json --noEmit",
+        "command": "copy-config ./.copyconfigrc.js && ts-node ./bin/generateReactIcons.ts && tsc --project ./tsconfig.generatedIcons.json --noEmit",
         "cwd": "{projectRoot}"
       }
     }

@@ -40,7 +40,7 @@ Prerequisites:
 
 1. Run `./bin/yarn` (uses Yarn 4 workspaces)
    - This will install all dependencies and run `webapp:configure` (via root `postinstall`).
-   - `webapp:configure` uses `apps/webapp/app-config/package.json` to select a config repository version (`wire-web-config-wire` or `wire-web-config-default`), then copies:
+   - `webapp:configure` uses `apps/webapp/appConfig/package.json` to select a config repository version (`wire-web-config-wire` or `wire-web-config-default`), then copies:
      - config content into `apps/webapp/resource/`
      - `.env.defaults` into repository root
    - Runtime priority is: process environment (for example AWS) > `.env` > `.env.defaults` > code fallback.

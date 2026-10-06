@@ -22,7 +22,7 @@
 const child = require('child_process');
 const nodeFileSystem = require('fs');
 const path = require('path');
-const appConfigPkg = require('../../apps/webapp/app-config/package.json');
+const appConfigPkg = require('../../apps/webapp/appConfig/package.json');
 
 const shortenedCommitIdentifierLength = 7;
 
@@ -165,7 +165,7 @@ function runDockerPublication(
     }),
   ].join(' && ');
 
-  /** Defines which config version (listed in "app-config/package.json") is going to be used */
+  /** Defines which config version (listed in "appConfig/package.json") is going to be used */
   const configurationEntry = versionTag.includes('production')
     ? 'wire-web-config-default-master'
     : 'wire-web-config-default-staging';

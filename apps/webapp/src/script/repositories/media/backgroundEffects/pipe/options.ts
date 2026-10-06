@@ -73,8 +73,8 @@ export type WorkerProcessVideoTrackOptions = Omit<
   backgroundSource: WorkerBackgroundSource | null;
 };
 
-export const SELFIE_MULTICLASS_MODEL_PATH = '/assets/mediapipe-models/selfie_multiclass_256x256.tflite';
-export const SELFIE_SEGMENTER_MODEL_PATH = '/assets/mediapipe-models/selfie_segmenter_landscape.tflite';
+export const SELFIE_MULTICLASS_MODEL_PATH = '/assets/mediapipeModels/selfieMulticlass256x256.tflite';
+export const SELFIE_SEGMENTER_MODEL_PATH = '/assets/mediapipeModels/selfieSegmenterLandscape.tflite';
 
 /**
  * Configuration options for the virtual background.

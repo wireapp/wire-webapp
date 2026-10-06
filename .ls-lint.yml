@@ -1,4 +1,27 @@
 ls:
+  apps/webapp/appConfig:
+    .dir: camelCase
+    .json: camelCase
+  apps/webapp/assets:
+    .dir: camelCase
+  apps/webapp/assets/images/backgrounds:
+    .dir: camelCase
+    .png: camelCase
+  apps/webapp/assets/mediapipeModels:
+    .dir: camelCase
+    .tflite: camelCase
+  apps/webapp/bin:
+    .dir: camelCase
+    .js: camelCase
+    .test.ts: camelCase
+    .ts: camelCase
+  apps/webapp/src/types:
+    .d.ts: camelCase
+    .dir: camelCase
+  apps/webapp/tsconfig.generatedIcons.json:
+    .generatedIcons.json: camelCase
+  apps/webapp/tsconfig.typeCheck.json:
+    .typeCheck.json: camelCase
   libraries/config/src:
     .dir: camelCase
     .ts: camelCase
@@ -3799,8 +3822,8 @@ ls:
   libraries/bazinga64/tsconfig.json:
     .json: camelCase
 
-  libraries/bazinga64/tsconfig.type-check.json:
-    .type-check.json: camelCase
+  libraries/bazinga64/tsconfig.typeCheck.json:
+    .typeCheck.json: camelCase
 
   libraries/certificate-check/src:
     .dir: camelCase
@@ -3827,8 +3850,8 @@ ls:
   libraries/certificate-check/tsconfig.json:
     .json: camelCase
 
-  libraries/certificate-check/tsconfig.type-check.json:
-    .type-check.json: camelCase
+  libraries/certificate-check/tsconfig.typeCheck.json:
+    .typeCheck.json: camelCase
 
   libraries/commons/src:
     .dir: camelCase
@@ -3849,8 +3872,8 @@ ls:
   libraries/commons/tsconfig.json:
     .json: camelCase
 
-  libraries/commons/tsconfig.type-check.json:
-    .type-check.json: camelCase
+  libraries/commons/tsconfig.typeCheck.json:
+    .typeCheck.json: camelCase
 
   libraries/config/jest.config.js:
     .config.js: camelCase
@@ -3864,8 +3887,8 @@ ls:
   libraries/config/tsconfig.json:
     .json: camelCase
 
-  libraries/config/tsconfig.type-check.json:
-    .type-check.json: camelCase
+  libraries/config/tsconfig.typeCheck.json:
+    .typeCheck.json: camelCase
 
   libraries/copy-config/src:
     .dir: camelCase
@@ -3891,8 +3914,8 @@ ls:
   libraries/copy-config/tsconfig.json:
     .json: camelCase
 
-  libraries/copy-config/tsconfig.type-check.json:
-    .type-check.json: camelCase
+  libraries/copy-config/tsconfig.typeCheck.json:
+    .typeCheck.json: camelCase
 
   libraries/license-collector/src:
     .dir: camelCase
@@ -3942,8 +3965,8 @@ ls:
   libraries/priority-queue/tsconfig.json:
     .json: camelCase
 
-  libraries/priority-queue/tsconfig.type-check.json:
-    .type-check.json: camelCase
+  libraries/priority-queue/tsconfig.typeCheck.json:
+    .typeCheck.json: camelCase
 
   libraries/store-engine-dexie/src:
     .dir: camelCase
@@ -3965,8 +3988,8 @@ ls:
   libraries/store-engine-dexie/tsconfig.json:
     .json: camelCase
 
-  libraries/store-engine-dexie/tsconfig.type-check.json:
-    .type-check.json: camelCase
+  libraries/store-engine-dexie/tsconfig.typeCheck.json:
+    .typeCheck.json: camelCase
 
   libraries/store-engine-fs/src:
     .dir: camelCase
@@ -3985,8 +4008,8 @@ ls:
   libraries/store-engine-fs/tsconfig.json:
     .json: camelCase
 
-  libraries/store-engine-fs/tsconfig.type-check.json:
-    .type-check.json: camelCase
+  libraries/store-engine-fs/tsconfig.typeCheck.json:
+    .typeCheck.json: camelCase
 
   libraries/store-engine/src:
     .dir: camelCase
@@ -4064,8 +4087,8 @@ ls:
   libraries/api-client/tsconfig.json:
     .json: camelCase
 
-  libraries/api-client/tsconfig.type-check.json:
-    .type-check.json: camelCase
+  libraries/api-client/tsconfig.typeCheck.json:
+    .typeCheck.json: camelCase
 
   libraries/core/jest.config.js:
     .config.js: camelCase
@@ -4082,8 +4105,8 @@ ls:
   libraries/core/tsconfig.json:
     .json: camelCase
 
-  libraries/core/tsconfig.type-check.json:
-    .type-check.json: camelCase
+  libraries/core/tsconfig.typeCheck.json:
+    .typeCheck.json: camelCase
 
   libraries/core/webpack.config.js:
     .config.js: camelCase
@@ -4124,14 +4147,14 @@ ls:
   libraries/react-ui-kit/tsconfig.json:
     .json: camelCase
 
-  libraries/react-ui-kit/tsconfig.type-check.json:
-    .type-check.json: camelCase
+  libraries/react-ui-kit/tsconfig.typeCheck.json:
+    .typeCheck.json: camelCase
 
   libraries/react-ui-kit/webpack.config.js:
     .config.js: camelCase
 
-  libraries/store-engine/tsconfig.type-check.json:
-    .type-check.json: camelCase
+  libraries/store-engine/tsconfig.typeCheck.json:
+    .typeCheck.json: camelCase
 
   libraries/telemetry/adr/001-initialize-library.md:
     .md: kebab-case

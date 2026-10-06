@@ -111,19 +111,19 @@ const BUILTIN_BACKGROUND_DEFINITIONS: BuiltinBackgroundDefinition[] = [
   {
     id: DEFAULT_BUILTIN_BACKGROUND_ID,
     labelKey: 'videoCallBackgroundWire1',
-    imageUrl: '/assets/images/backgrounds/wire-1.png',
+    imageUrl: '/assets/images/backgrounds/wire1.png',
     previewColors: ['#1a1a1a', '#2d2d2d', '#4a4a4a'],
   },
   {
     id: 'office-1',
     labelKey: 'videoCallBackgroundOffice1',
-    imageUrl: '/assets/images/backgrounds/office-1.png',
+    imageUrl: '/assets/images/backgrounds/office1.png',
     previewColors: ['#4a5568', '#718096', '#cbd5e0'],
   },
   {
     id: 'office-2',
     labelKey: 'videoCallBackgroundOffice2',
-    imageUrl: '/assets/images/backgrounds/office-2.png',
+    imageUrl: '/assets/images/backgrounds/office2.png',
     previewColors: ['#2d3748', '#4a5568', '#718096'],
   },
 ];

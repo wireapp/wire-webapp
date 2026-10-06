@@ -17,7 +17,7 @@
       "dependencyDashboardApproval": true
     },
     {
-      "matchFileNames": ["apps/webapp/app-config/package.json"],
+      "matchFileNames": ["apps/webapp/appConfig/package.json"],
       "groupName": "webapp app configuration"
     },
     {
