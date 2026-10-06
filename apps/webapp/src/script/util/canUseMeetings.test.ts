@@ -24,7 +24,7 @@ import {canUseMeetings} from './canUseMeetings';
 describe('canUseMeetings', () => {
   const minSupportedApiVersion = Config.getConfig().MIN_MEETINGS_SUPPORTED_API_VERSION;
 
-  it('is enabled when the team feature is on and the API version is at least 17', () => {
+  it('is enabled when the team feature is on and the API version is at least 19', () => {
     expect(
       canUseMeetings({
         isTeamMeetingsFeatureEnabled: true,
@@ -33,7 +33,7 @@ describe('canUseMeetings', () => {
     ).toBe(true);
   });
 
-  it('is disabled when the negotiated API version is below 17', () => {
+  it('is disabled when the negotiated API version is below 19', () => {
     expect(
       canUseMeetings({
         isTeamMeetingsFeatureEnabled: true,
