@@ -500,6 +500,7 @@ export function createSimpleGitWebAppVersionSynchronizationClient(
   );
   const authenticatedGit = simpleGit({
     baseDir: options.repositoryPath,
+    allowEnvironment: Object.keys(authenticationEnvironment),
     unsafe: {
       allowUnsafeConfigEnvCount: true,
     },
