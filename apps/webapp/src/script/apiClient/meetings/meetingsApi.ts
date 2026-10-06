@@ -51,10 +51,6 @@ export class MeetingsAPI {
     return `${MeetingsAPI.URL.MEETINGS}/${meetingId.domain}/${meetingId.id}`;
   }
 
-  private generateMeetingLinkRefreshUrl(meetingId: QualifiedId): string {
-    return `${this.generateMeetingUrl(meetingId)}/link/refresh`;
-  }
-
   private parseMeetingResponse(data: unknown): Meeting {
     return meetingSchema.parse(data);
   }
@@ -84,18 +80,6 @@ export class MeetingsAPI {
 
     const response = await this.client.sendJSON<CreatedMeetingWithConversation>(config);
     return this.parseCreatedMeetingWithConversationResponse(response.data);
-  }
-
-  /** Rotate the join link for a live meeting created by the authenticated user. */
-  public async rotateMeetingLink(meetingId: QualifiedId): Promise<MeetingWithConversation> {
-    const config: AxiosRequestConfig = {
-      method: 'post',
-      url: this.generateMeetingLinkRefreshUrl(meetingId),
-      ...disableInfiniteNetworkRetries,
-    };
-
-    const response = await this.client.sendJSON<MeetingWithConversation>(config);
-    return this.parseMeetingWithConversationResponse(response.data);
   }
 
   /**
