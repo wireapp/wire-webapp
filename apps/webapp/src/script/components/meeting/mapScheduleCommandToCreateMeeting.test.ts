@@ -52,11 +52,25 @@ describe('mapScheduleCommandToCreateMeeting', () => {
 
   it('includes a non-empty password and omits whitespace-only passwords', () => {
     const withPassword = mapScheduleCommandToCreateMeeting(
-      {...{title: 'Weekly sync', start: futureStartDate, end: futureEndDate, recurrence: 'weekly', selectedUsers: []}, password: 'secret'},
+      {
+        title: 'Weekly sync',
+        start: futureStartDate,
+        end: futureEndDate,
+        recurrence: 'weekly',
+        selectedUsers: [],
+        password: 'secret',
+      },
       {ianaTimeZoneId: 'Pacific/Auckland'},
     );
     const withoutPassword = mapScheduleCommandToCreateMeeting(
-      {...{title: 'Weekly sync', start: futureStartDate, end: futureEndDate, recurrence: 'weekly', selectedUsers: []}, password: '  '},
+      {
+        title: 'Weekly sync',
+        start: futureStartDate,
+        end: futureEndDate,
+        recurrence: 'weekly',
+        selectedUsers: [],
+        password: '  ',
+      },
       {ianaTimeZoneId: 'Pacific/Auckland'},
     );
 
