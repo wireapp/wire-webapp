@@ -44,7 +44,7 @@ const createApiMeeting = (
     recurrence?: {frequency: MeetingRecurrenceFrequency; until?: string};
     tzid?: string;
   } = {},
-): CreateApiMeetingResult => {
+) => {
   return {
     created_at: '2026-06-15T09:00:00.000Z',
     updated_at: '2026-06-15T09:00:00.000Z',
