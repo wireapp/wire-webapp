@@ -18,6 +18,7 @@
  */
 
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
+import {MeetingType} from '@wireapp/api-client/lib/meetings/createMeeting';
 
 import {mapMeetNowCommandToCreateMeeting} from './mapMeetNowCommandToCreateMeeting';
 
@@ -39,7 +40,24 @@ describe('mapMeetNowCommandToCreateMeeting', () => {
       title: 'Standup',
       start_time: fixedNow.toISOString(),
       end_time: new Date(fixedNow.getTime() + 60 * 60 * 1000).toISOString(),
+      type: MeetingType.IMMEDIATE,
       tzid: 'Pacific/Auckland',
     });
+  });
+
+  it('includes a non-empty password and omits whitespace-only passwords', () => {
+    const withPassword = mapMeetNowCommandToCreateMeeting(
+      {title: 'Standup', selectedUsers: [], password: 'secret'},
+      clock,
+      {ianaTimeZoneId: 'Pacific/Auckland'},
+    );
+    const withoutPassword = mapMeetNowCommandToCreateMeeting(
+      {title: 'Standup', selectedUsers: [], password: '  '},
+      clock,
+      {ianaTimeZoneId: 'Pacific/Auckland'},
+    );
+
+    expect(withPassword.password).toBe('secret');
+    expect(withoutPassword).not.toHaveProperty('password');
   });
 });

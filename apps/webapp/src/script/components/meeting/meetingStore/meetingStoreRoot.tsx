@@ -42,6 +42,7 @@ import {
   useMeetingNotificationStore,
 } from '../meetingNotificationStore/meetingNotificationStore';
 import {useMeetingPrepModal} from '../meetingPrep/useMeetingPrepModal';
+import {meetingSubmitErrors} from '../meetingSubmitErrors';
 import {resolveCurrentMeetingReminderPayload} from '../resolveCurrentMeetingReminderPayload';
 import {deleteMeetingForAll, deleteMeetingForMe} from '../shared/service/deleteMeeting';
 import {meetNowMeeting, scheduleMeeting, updateMeeting} from '../shared/service/meetingService';
@@ -94,6 +95,11 @@ export const MeetingStoreRoot: FunctionComponent<MeetingStoreRootProps> = ({chil
         },
         deleteMeetingForAll: command => {
           return deleteMeetingForAll(command, meetingServiceDeps);
+        },
+        rotateMeetingLink: meetingId => {
+          return meetingsRepository.rotateMeetingLink(meetingId).mapRejected(() => {
+            return meetingSubmitErrors.refreshFailed;
+          });
         },
       },
     });
