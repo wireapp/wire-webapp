@@ -18,14 +18,19 @@
  */
 
 import type {CreateMeeting} from '@wireapp/api-client/lib/meetings/createMeeting';
-import type {Meeting, MeetingWithConversation} from '@wireapp/api-client/lib/meetings/meeting';
+import type {
+  CreatedMeetingWithConversation,
+  Meeting,
+  MeetingWithConversation,
+} from '@wireapp/api-client/lib/meetings/meeting';
 import type {UpdateMeeting} from '@wireapp/api-client/lib/meetings/updateMeeting';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
 export interface MeetingsDataSource {
-  createMeeting(payload: CreateMeeting): Promise<MeetingWithConversation>;
+  createMeeting(payload: CreateMeeting): Promise<CreatedMeetingWithConversation>;
   deleteMeeting(meetingId: QualifiedId): Promise<void>;
   getMeeting(meetingId: QualifiedId): Promise<Meeting>;
   getMeetingsList(): Promise<Meeting[]>;
+  rotateMeetingLink(meetingId: QualifiedId): Promise<MeetingWithConversation>;
   updateMeeting(meetingId: QualifiedId, payload: UpdateMeeting): Promise<MeetingWithConversation>;
 }
