@@ -19,10 +19,17 @@
 
 import {MeetingRecurrence} from './meetingRecurrence';
 
+export enum MeetingType {
+  IMMEDIATE = 'immediate',
+  SCHEDULED = 'scheduled',
+}
+
 export interface CreateMeeting {
   end_time: string;
+  password?: string;
   recurrence?: MeetingRecurrence;
   start_time: string;
   title: string;
+  type: MeetingType;
   tzid: string;
 }
