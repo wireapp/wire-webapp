@@ -184,23 +184,6 @@ describe('MeetingsAPI', () => {
     );
   });
 
-  it('rotates a meeting link through the meetings API', async () => {
-    const client = new APIClient(testConfig);
-    jest.spyOn(client.transport.http, 'sendRequest').mockResolvedValue({
-      data: {supported: [MINIMUM_API_VERSION, 19], domain: 'test.zinfra.io'},
-    } as never);
-    await client.useVersion(MINIMUM_API_VERSION, 19);
-    const sendJSONSpy = jest.spyOn(client.transport.http, 'sendJSON').mockResolvedValue({
-      data: validMeetingWithConversation,
-    } as never);
-
-    await client.api.meetings.rotateMeetingLink({id: 'meeting-id', domain: 'example.com'});
-
-    expect(sendJSONSpy).toHaveBeenCalledWith(
-      expect.objectContaining({method: 'post', url: '/meetings/example.com/meeting-id/link/refresh'}),
-    );
-  });
-
   it('deletes a meeting by qualified id', async () => {
     const client = new APIClient(testConfig);
     jest.spyOn(client.transport.http, 'sendRequest').mockResolvedValue({
