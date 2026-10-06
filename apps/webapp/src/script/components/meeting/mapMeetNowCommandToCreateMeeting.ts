@@ -18,12 +18,13 @@
  */
 
 import type {Clock} from '@enormora/clock/clock';
+import {isNonEmptyString} from '@sindresorhus/is';
 
 import type {DeviceTimeZone} from './deviceTimeZone';
 import {getMeetNowMeetingTimes} from './shared/defaults/meetingDateTimeDefaults';
 import type {MeetNowMeetingCommand} from './shared/types/meetingCommandTypes';
 
-import type {CreateMeeting} from '../../apiClient/meetings/createMeeting';
+import {type CreateMeeting, MeetingType} from '../../apiClient/meetings/createMeeting';
 
 export const mapMeetNowCommandToCreateMeeting = (
   command: MeetNowMeetingCommand,
@@ -36,6 +37,8 @@ export const mapMeetNowCommandToCreateMeeting = (
     title: command.title,
     start_time: start.toISOString(),
     end_time: end.toISOString(),
+    type: MeetingType.IMMEDIATE,
     tzid: deviceTimeZone.ianaTimeZoneId,
+    ...(isNonEmptyString(command.password?.trim()) && {password: command.password}),
   };
 };

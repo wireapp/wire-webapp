@@ -17,11 +17,13 @@
  *
  */
 
+import {isNonEmptyString} from '@sindresorhus/is';
+
 import type {DeviceTimeZone} from './deviceTimeZone';
 import {mapRecurrenceOptionToMeetingRecurrence} from './scheduleMeetingModal/scheduleMeetingRecurrence';
 import type {ScheduleMeetingCommand} from './shared/types/meetingCommandTypes';
 
-import type {CreateMeeting} from '../../apiClient/meetings/createMeeting';
+import {type CreateMeeting, MeetingType} from '../../apiClient/meetings/createMeeting';
 
 export const mapScheduleCommandToCreateMeeting = (
   command: ScheduleMeetingCommand,
@@ -33,7 +35,11 @@ export const mapScheduleCommandToCreateMeeting = (
     title: command.title,
     start_time: command.start.toISOString(),
     end_time: command.end.toISOString(),
+    type: MeetingType.SCHEDULED,
     tzid: deviceTimeZone.ianaTimeZoneId,
     ...(recurrence !== undefined && {recurrence}),
+    ...(isNonEmptyString(command.password?.trim()) && {
+      password: command.password,
+    }),
   };
 };

@@ -34,6 +34,7 @@ type CreateApiMeetingResult = {
   qualified_conversation: {id: string; domain: string};
   qualified_creator: {id: string; domain: string};
   qualified_id: {id: string; domain: string};
+  link: string;
 };
 const createApiMeeting = (
   overrides: {
@@ -53,6 +54,7 @@ const createApiMeeting = (
     qualified_conversation: {id: 'conv-id', domain: 'example.com'},
     qualified_creator: {id: 'creator-id', domain: 'example.com'},
     qualified_id: {id: 'meeting-id', domain: 'example.com'},
+    link: 'https://wire.example/meeting/abc',
     tzid: 'Europe/Berlin',
     ...overrides,
   };
@@ -74,6 +76,7 @@ describe('mapApiMeetingToSeries', () => {
       recurrence: 'weekly',
       qualified_id: {id: 'meeting-id', domain: 'example.com'},
       qualified_creator: {id: 'creator-id', domain: 'example.com'},
+      link: 'https://wire.example/meeting/abc',
       tzid: 'Europe/Berlin',
     });
   });

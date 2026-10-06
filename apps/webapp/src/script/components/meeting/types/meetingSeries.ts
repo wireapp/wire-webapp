@@ -30,6 +30,7 @@ export type MeetingSeries = {
   qualified_conversation: QualifiedId;
   qualified_id: QualifiedId;
   qualified_creator: QualifiedId;
+  link?: string;
   title: string;
   tzid: string;
 };

@@ -18,14 +18,15 @@
  */
 
 import type {CreateMeeting} from '../../apiClient/meetings/createMeeting';
-import type {Meeting, MeetingWithConversation} from '../../apiClient/meetings/meeting';
+import type {CreatedMeetingWithConversation, Meeting, MeetingWithConversation} from '../../apiClient/meetings/meeting';
 import type {UpdateMeeting} from '../../apiClient/meetings/updateMeeting';
 import type {QualifiedId} from '../../apiClient/user/qualifiedId';
 
 export interface MeetingsDataSource {
-  createMeeting(payload: CreateMeeting): Promise<MeetingWithConversation>;
+  createMeeting(payload: CreateMeeting): Promise<CreatedMeetingWithConversation>;
   deleteMeeting(meetingId: QualifiedId): Promise<void>;
   getMeeting(meetingId: QualifiedId): Promise<Meeting>;
   getMeetingsList(): Promise<Meeting[]>;
+  rotateMeetingLink(meetingId: QualifiedId): Promise<MeetingWithConversation>;
   updateMeeting(meetingId: QualifiedId, payload: UpdateMeeting): Promise<MeetingWithConversation>;
 }

@@ -38,7 +38,7 @@ import {mapScheduleFormToMeetingCommand} from '../mapScheduleFormToMeetingComman
 import {mapScheduleFormToUpdateMeetingCommand} from '../mapScheduleFormToUpdateMeetingCommand';
 import {useMeetingStore} from '../meetingStore/meetingStoreProvider';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from '../meetingSubmitErrors';
-import type {MeetingSubmitSuccess} from '../shared/service/meetingService';
+import type {MeetingSubmitSuccess, ScheduleMeetingSuccess} from '../shared/service/meetingService';
 import {syncMeetingConversationName} from '../shared/service/syncMeetingConversationName';
 import {getScheduleMeetingSubmitErrorTranslationKeys} from '../shared/submit/meetingSubmitErrorKeys';
 import {
@@ -61,7 +61,7 @@ type SubmitMeetingParams = {
   originalRecurrence: ScheduleMeetingFormState['recurrence'];
   originalSelectedUsers: User[];
   clock: Clock;
-  scheduleMeeting: (command: ScheduleMeetingCommand) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
+  scheduleMeeting: (command: ScheduleMeetingCommand) => Task<ScheduleMeetingSuccess, MeetingSubmitErrors>;
   updateMeeting: (command: UpdateMeetingCommand) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
 };
 

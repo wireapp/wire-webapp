@@ -28,6 +28,7 @@ export interface Meeting {
   qualified_conversation: QualifiedId;
   qualified_creator: QualifiedId;
   qualified_id: QualifiedId;
+  link?: string;
   recurrence?: MeetingRecurrence;
   start_time: string;
   title: string;
@@ -37,4 +38,8 @@ export interface Meeting {
 
 export interface MeetingWithConversation extends Meeting {
   conversation: ValidatedMeetingConversation;
+}
+
+export interface CreatedMeetingWithConversation extends MeetingWithConversation {
+  link: string;
 }

@@ -23,6 +23,7 @@ import {createStore, type StoreApi} from 'zustand/vanilla';
 import type {MeetingStoreDeps} from './meetingStoreDeps';
 
 import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
+import type {MeetingWithConversation} from '../../../apiClient/meetings/meeting';
 import type {User} from '../../../repositories/entity/User';
 import {getLogger} from '../../../util/logger';
 import {matchQualifiedIds} from '../../../util/qualifiedId';
@@ -32,7 +33,7 @@ import {mapMeetingInstanceToScheduleFormState} from '../mapMeetingInstanceToSche
 import {meetingSubmitErrors, type MeetingSubmitErrors} from '../meetingSubmitErrors';
 import type {ScheduleMeetingFormState} from '../scheduleMeetingModal/scheduleMeetingTypes';
 import type {DeleteMeetingCommand} from '../shared/service/deleteMeeting';
-import {type CreateMeetingSuccess, type MeetingSubmitSuccess} from '../shared/service/meetingService';
+import {type CreateMeetingSuccess, type MeetingSubmitSuccess, type ScheduleMeetingSuccess} from '../shared/service/meetingService';
 import type {
   MeetNowMeetingCommand,
   ScheduleMeetingCommand,
@@ -89,11 +90,12 @@ export type MeetingStoreState = {
   isLoading: boolean;
   hasLoadError: boolean;
   loadMeetings: () => Promise<void>;
-  scheduleMeeting: (command: ScheduleMeetingCommand) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
+  scheduleMeeting: (command: ScheduleMeetingCommand) => Task<ScheduleMeetingSuccess, MeetingSubmitErrors>;
   meetNowMeeting: (command: MeetNowMeetingCommand) => Task<CreateMeetingSuccess, MeetingSubmitErrors>;
   updateMeeting: (command: UpdateMeetingCommand) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
   deleteMeetingForMe: (meetingInstance: MeetingInstance) => Task<void, MeetingSubmitErrors>;
   deleteMeetingForAll: (meetingInstance: MeetingInstance) => Task<void, MeetingSubmitErrors>;
+  rotateMeetingLink?: (meetingId: QualifiedId) => Task<MeetingSeries, MeetingSubmitErrors>;
   removeMeetingByQualifiedId: (meetingId: QualifiedId) => void;
   syncMeetingByQualifiedId: (meetingId: QualifiedId) => Task<SyncMeetingResult, SyncMeetingError>;
   loadMeetingForEdit: (meetingInstance: MeetingInstance) => Task<EditMeetingData, MeetingSubmitErrors>;
@@ -144,10 +146,10 @@ export const createMeetingStore = (deps: MeetingStoreDeps, initialState?: Meetin
           return get()
             .syncMeetingByQualifiedId(result.qualifiedMeetingId)
             .map(() => {
-              return {failedToAdd: result.failedToAdd};
+              return result;
             })
             .orElse(() => {
-              return task.resolve({failedToAdd: result.failedToAdd});
+              return task.resolve(result);
             });
         });
       },
@@ -161,6 +163,23 @@ export const createMeetingStore = (deps: MeetingStoreDeps, initialState?: Meetin
             .orElse(() => {
               return task.resolve(result);
             });
+        });
+      },
+      rotateMeetingLink: meetingId => {
+        return (
+          deps.serviceTasks.rotateMeetingLink?.(meetingId).mapRejected(() => {
+            return meetingSubmitErrors.refreshFailed;
+          }) ?? task.reject<MeetingWithConversation, MeetingSubmitErrors>(meetingSubmitErrors.refreshFailed)
+        ).andThen(refreshedMeeting => {
+          const mapResult = mapApiMeetingToSeries(refreshedMeeting);
+          if (mapResult.isErr) {
+            return task.reject<MeetingSeries, MeetingSubmitErrors>(meetingSubmitErrors.refreshFailed);
+          }
+          set(state => {
+            return {meetingSeries: upsertMeetingSeries(state.meetingSeries, mapResult.value)};
+          });
+          meetingStoreMutationVersion += 1;
+          return task.resolve(mapResult.value);
         });
       },
       updateMeeting: command => {
