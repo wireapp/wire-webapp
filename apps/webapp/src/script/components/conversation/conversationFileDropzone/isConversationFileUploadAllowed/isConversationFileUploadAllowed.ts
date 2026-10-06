@@ -22,20 +22,25 @@ import {
   getSelfUserDriveRole,
 } from '../../conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 
-interface IsConversationFileDropAllowedParams {
+interface IsConversationFileUploadAllowedParams {
   conversationTeamId?: string;
   selfUserTeamId?: string;
   isCellsEnabled: boolean;
+  isCellsEnabledForTeam: boolean;
 }
 
-export const isConversationFileDropAllowed = ({
+export const isConversationFileUploadAllowed = ({
   conversationTeamId,
   selfUserTeamId,
   isCellsEnabled,
-}: IsConversationFileDropAllowedParams): boolean => {
+  isCellsEnabledForTeam,
+}: IsConversationFileUploadAllowedParams): boolean => {
   if (!isCellsEnabled) {
     return true;
   }
 
-  return getSelfUserDriveRole({conversationTeamId, selfUserTeamId}) === CELLS_SELF_USER_DRIVE_ROLE.EDITOR;
+  return (
+    isCellsEnabledForTeam &&
+    getSelfUserDriveRole({conversationTeamId, selfUserTeamId}) === CELLS_SELF_USER_DRIVE_ROLE.EDITOR
+  );
 };
