@@ -31,19 +31,21 @@ const createApiMeeting = (
     recurrence?: {frequency: MeetingRecurrenceFrequency; until?: string};
     tzid?: string;
   } = {},
-) => {return {
-  created_at: '2026-06-15T09:00:00.000Z',
-  updated_at: '2026-06-15T09:00:00.000Z',
-  start_time: '2026-06-15T10:00:00.000Z',
-  end_time: '2026-06-15T11:00:00.000Z',
-  title: 'Weekly sync',
-  qualified_conversation: {id: 'conv-id', domain: 'example.com'},
-  qualified_creator: {id: 'creator-id', domain: 'example.com'},
+) => {
+  return {
+    created_at: '2026-06-15T09:00:00.000Z',
+    updated_at: '2026-06-15T09:00:00.000Z',
+    start_time: '2026-06-15T10:00:00.000Z',
+    end_time: '2026-06-15T11:00:00.000Z',
+    title: 'Weekly sync',
+    qualified_conversation: {id: 'conv-id', domain: 'example.com'},
+    qualified_creator: {id: 'creator-id', domain: 'example.com'},
     qualified_id: {id: 'meeting-id', domain: 'example.com'},
     link: 'https://wire.example/meeting/abc',
-  tzid: 'Europe/Berlin',
-  ...overrides,
-}};
+    tzid: 'Europe/Berlin',
+    ...overrides,
+  };
+};
 
 describe('mapApiMeetingToSeries', () => {
   it('maps API meeting fields to meeting series shape', () => {
