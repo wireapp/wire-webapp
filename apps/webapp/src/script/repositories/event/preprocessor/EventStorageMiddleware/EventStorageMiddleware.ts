@@ -39,6 +39,17 @@ import {EventService} from '../../EventService';
 import {EventSource} from '../../EventSource';
 import {eventShouldBeStored} from '../../EventTypeHandling';
 
+const decodeConversationNameForStorage = (event: IncomingEvent, source: EventSource): IncomingEvent => {
+  if (
+    event.type === CONVERSATION_EVENT.RENAME &&
+    source === EventSource.WEBSOCKET &&
+    isNonEmptyString(event.data.name)
+  ) {
+    return {...event, data: {...event.data, name: fixWebsocketString(event.data.name)}};
+  }
+  return event;
+};
+
 export class EventStorageMiddleware implements EventMiddleware {
   constructor(
     private readonly eventService: EventService,
@@ -47,14 +58,7 @@ export class EventStorageMiddleware implements EventMiddleware {
   ) {}
 
   async processEvent(event: IncomingEvent, source: EventSource) {
-    // Decode before persistence so live messages and reloaded history use the same Unicode name.
-    if (
-      event.type === CONVERSATION_EVENT.RENAME &&
-      source === EventSource.WEBSOCKET &&
-      isNonEmptyString(event.data.name)
-    ) {
-      event = {...event, data: {...event.data, name: fixWebsocketString(event.data.name)}};
-    }
+    event = decodeConversationNameForStorage(event, source);
     if (!eventShouldBeStored(event)) {
       return event;
     }
