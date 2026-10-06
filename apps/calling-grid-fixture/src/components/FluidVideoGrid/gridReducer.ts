@@ -1,6 +1,6 @@
 import {
   AssignmentMap,
-  FractionDescriptor,
+  FractionalTileDescriptor,
   GridAction,
   GridConfig,
   GridLayout,
@@ -8,22 +8,14 @@ import {
   GridParticipant,
   GridState,
   isActiveTier,
+  OneOnOneLayout,
   PresenterModeLayout,
-  RowLayout,
   TIER_ORDER,
   TileDescriptor,
-  TileKind,
 } from './FluidVideoGrid.types';
 
-/** A fraction is at least half the height of a minimum-size full tile. */
-const MIN_FRACTION_HEIGHT_RATIO = 0.5;
-
-/**
- * A fractional tile is never split more finely than this per axis. Without it a tall
- * tile would "fit" dozens of minimum-size fractions and a single fractional tile would
- * swallow the whole call instead of spilling into a second one.
- */
-const MAX_FRACTIONS_PER_AXIS = 3;
+/** A fractional tile is at least half the height of a minimum-size full tile. */
+const MIN_FRACTIONAL_TILE_HEIGHT_RATIO = 0.5;
 
 /** How many avatars the overflow badge previews. */
 const OVERFLOW_AVATAR_COUNT = 3;
@@ -105,8 +97,6 @@ interface Invariants {
   maxRows: number;
   maxCols: number;
   maxTiles: number;
-  minFractionWidth: number;
-  minFractionHeight: number;
 }
 
 /**
@@ -130,362 +120,192 @@ function computeInvariants(
   const maxCols = Math.max(1, Math.floor((usableWidth + gap) / (minTileWidth + gap)));
   const maxRows = Math.max(1, Math.floor((usableHeight + gap) / (minTileHeight + gap)));
 
-  const minFractionHeight = minTileHeight * MIN_FRACTION_HEIGHT_RATIO;
-  const minFractionWidth = minFractionHeight * minAspectRatio;
-
   return {
     usableWidth,
     usableHeight,
     maxRows,
     maxCols,
     maxTiles: maxRows * maxCols,
-    minFractionWidth,
-    minFractionHeight,
   };
 }
 
 /**
- * The finest subdivision a tile of the given size allows — bounded both by the minimum
- * legible fraction size and by MAX_FRACTIONS_PER_AXIS.
+ * The fixed size of a single fractional tile — invariant for a given `tileHeight`, regardless
+ * of how many participants actually need to fit or which of the container's three layout
+ * modes is active. Two things make that true:
+ *
+ *  - Height is chosen by picking the row count whose *exact* division of `tileHeight` lands
+ *    closest to the target (half the configured minimum full-tile height), then always using
+ *    that exact per-row height — never a fallback/target value that differs depending on fill
+ *    level. A fixed `rows` and a fixed `fracHeight` is the whole point: there is exactly one
+ *    size for a given `tileHeight`, so a half-filled column and a completely full column use
+ *    identical cells (only the column count, decided by flex-wrap, responds to fill level).
+ *  - Width follows a *fixed* aspect ratio — the midpoint of the fractional tile's own
+ *    configured bounds — rather than the current full tile's aspect ratio. The full tile's own
+ *    shape varies a lot between grid layouts (a lone full tile clamps to the widest allowed
+ *    ratio; a packed multi-column grid is often much narrower), and inheriting it would make
+ *    fractional tiles balloon or shrink sideways purely because the *grid* reconfigured, not
+ *    because anything about the fractional tile itself changed.
+ *
+ * In a degenerate, very short container the per-row height shrinks below the target just
+ * enough to still fit the mandatory 2 rows.
  */
-function fractionBoundsFor(
-  tileWidth: number,
+function computeFractionalTileSize(
   tileHeight: number,
-  inv: Invariants,
-  gap: number,
-): {maxRows: number; maxCols: number; capacity: number} {
-  const maxCols = Math.min(
-    MAX_FRACTIONS_PER_AXIS,
-    Math.max(1, Math.floor((tileWidth + gap) / (inv.minFractionWidth + gap))),
-  );
-  const maxRows = Math.min(
-    MAX_FRACTIONS_PER_AXIS,
-    Math.max(1, Math.floor((tileHeight + gap) / (inv.minFractionHeight + gap))),
-  );
-  return {maxRows, maxCols, capacity: maxRows * maxCols};
+  config: GridConfig,
+): {rows: number; fracWidth: number; fracHeight: number} {
+  const {minTileHeight, minAspectRatio, maxAspectRatio, tileGap: gap} = config;
+  const minFracAspectRatio = config.minFractionalTileAspectRatio ?? minAspectRatio;
+  const maxFracAspectRatio = config.maxFractionalTileAspectRatio ?? maxAspectRatio;
+  const targetFracHeight = minTileHeight * MIN_FRACTIONAL_TILE_HEIGHT_RATIO;
+  const targetAspectRatio = (minFracAspectRatio + maxFracAspectRatio) / 2;
+
+  // A fractional tile can never be the size of a full tile — always at least a 2-way split —
+  // but beyond that, pick however many rows of the fixed target height land closest to exact.
+  const rows = Math.max(2, Math.round((tileHeight + gap) / (targetFracHeight + gap)));
+
+  // Exact division — zero leftover space across `rows` rows of `tileHeight`, always, so the
+  // size never has to vary between an under-filled and a fully-filled column.
+  const fracHeight = (tileHeight - gap * (rows - 1)) / rows;
+  const fracWidth = fracHeight * targetAspectRatio;
+
+  return {rows, fracWidth, fracHeight};
 }
 
 /**
- * Picks the fraction grid for a tile that must seat `needed` participants: the shape
- * with the fewest empty cells, preferring fractions whose aspect ratio stays in bounds.
+ * Builds the fractional tile list for a given `capacity`: everyone who fits, plus an
+ * overflow badge summarising the rest if they don't all fit. Returned in priority order —
+ * rendering relies on CSS flex-wrap to place them (column-major or row-major, depending on
+ * the container's mode), so no row/column index math happens here.
  */
-function chooseFractionShape(
-  needed: number,
-  tileWidth: number,
-  tileHeight: number,
-  inv: Invariants,
-  config: GridConfig,
-): {rows: number; cols: number; capacity: number} {
-  const {minAspectRatio, maxAspectRatio, tileGap: gap} = config;
-  const bounds = fractionBoundsFor(tileWidth, tileHeight, inv, gap);
-  const target = Math.max(1, Math.min(needed, bounds.capacity));
-  const tileAspectRatio = tileWidth / tileHeight;
+function buildFractionalTiles(
+  participants: GridParticipant[],
+  capacity: number,
+): {tiles: FractionalTileDescriptor[]; visibleCount: number; hasOverflow: boolean} {
+  const hasOverflow = participants.length > capacity;
+  const visibleCount = hasOverflow ? capacity - 1 : participants.length;
 
-  let best = {rows: bounds.maxRows, cols: bounds.maxCols, capacity: bounds.capacity};
-  let bestScore = Infinity;
+  const tiles: FractionalTileDescriptor[] = participants
+    .slice(0, visibleCount)
+    .map(participant => ({type: 'participant' as const, participant}));
 
-  for (let cols = 1; cols <= bounds.maxCols; cols++) {
-    const rows = Math.ceil(target / cols);
-    if (rows > bounds.maxRows) {
-      continue;
-    }
-    const width = (tileWidth - gap * (cols - 1)) / cols;
-    const height = (tileHeight - gap * (rows - 1)) / rows;
-    const aspectRatio = width / height;
-
-    const outOfBounds = aspectRatio < minAspectRatio || aspectRatio > maxAspectRatio ? 1e6 : 0;
-    const wastedCells = rows * cols - target;
-    const score = outOfBounds + wastedCells * 10 + Math.abs(aspectRatio - tileAspectRatio);
-
-    if (score < bestScore) {
-      bestScore = score;
-      best = {rows, cols, capacity: rows * cols};
-    }
+  if (hasOverflow) {
+    const hidden = participants.slice(visibleCount);
+    tiles.push({type: 'overflow', count: hidden.length, avatars: hidden.slice(0, OVERFLOW_AVATAR_COUNT)});
   }
 
-  return best;
-}
-
-/** Minimum fraction capacity tried first under `forcePassiveFractional`, before escalating. */
-const MIN_FRACTION_CAPACITY = 2;
-/** Fallback minimum when a 2-way split can't stay within the configured aspect bounds. */
-const ESCALATED_MIN_FRACTION_CAPACITY = 4;
-
-/**
- * Like `chooseFractionShape`, but never returns a shape below `minimumCapacity` — used by
- * `forcePassiveFractional` so a lightly-populated tile still renders as a visibly
- * subdivided tile rather than one large cell. Starting at a 2-way split, this escalates
- * to a 4-way (2×2) split if 2 cells can't be arranged within the aspect-ratio bounds.
- */
-function chooseFractionShapeWithFloor(
-  needed: number,
-  tileWidth: number,
-  tileHeight: number,
-  inv: Invariants,
-  config: GridConfig,
-  minimumCapacity: number,
-): {rows: number; cols: number; capacity: number} {
-  if (minimumCapacity <= 1) {
-    return chooseFractionShape(needed, tileWidth, tileHeight, inv, config);
-  }
-
-  const shape = chooseFractionShape(Math.max(minimumCapacity, needed), tileWidth, tileHeight, inv, config);
-  const {minAspectRatio, maxAspectRatio, tileGap: gap} = config;
-  const width = (tileWidth - gap * (shape.cols - 1)) / shape.cols;
-  const height = (tileHeight - gap * (shape.rows - 1)) / shape.rows;
-  const aspectRatio = width / height;
-  const withinBounds = aspectRatio >= minAspectRatio && aspectRatio <= maxAspectRatio;
-
-  if (!withinBounds && minimumCapacity < ESCALATED_MIN_FRACTION_CAPACITY) {
-    return chooseFractionShapeWithFloor(
-      needed,
-      tileWidth,
-      tileHeight,
-      inv,
-      config,
-      ESCALATED_MIN_FRACTION_CAPACITY,
-    );
-  }
-
-  return shape;
+  return {tiles, visibleCount, hasOverflow};
 }
 
 // ── Tile counts ───────────────────────────────────────────────────────────────
 
 export interface TileCounts {
-  total: number;
   full: number;
-  fractional: number;
+  needsFractionContainer: boolean;
 }
 
 /**
- * Decides how many tiles to render and how many of them are subdivided.
+ * Decides how many full tiles to render. Active participants earn full tiles; passive
+ * (silent, camera-off) participants never do — they always go into the fractional tile
+ * container, which exists whenever at least one passive participant is present, or when
+ * there are more active participants than full tiles can hold.
  *
- * Active participants earn full tiles; silent camera-off participants are compressed into
- * fractional tiles. `maxFractionalTilesRatio` caps the share of the grid that may
- * be fractional, which in turn caps the total once actives are few.
- *
- * `forcePassiveFractional` (experimental) hands full tiles to active participants only,
- * period — including the all-silent case, which normally gives everyone an equal full
- * tile since nobody has "earned" a bigger one yet.
+ * When active participants alone would saturate the entire grid (no partial last row and
+ * no room for another row), one full tile is sacrificed so the mandatory container still
+ * has somewhere to render — it then also absorbs the active participant bumped out.
  */
 export function computeTileCounts(
   activeCount: number,
-  silentCount: number,
-  maxTiles: number,
-  maxFractionsPerTile: number,
-  ratio: number,
-  forcePassiveFractional = false,
+  passiveCount: number,
+  inv: Invariants,
+  _config: GridConfig,
 ): TileCounts {
-  const participantCount = activeCount + silentCount;
-  if (participantCount === 0 || maxTiles === 0) {
-    return {total: 0, full: 0, fractional: 0};
+  const participantCount = activeCount + passiveCount;
+  if (participantCount === 0) {
+    return {full: 0, needsFractionContainer: false};
   }
 
-  if (activeCount === 0) {
-    if (forcePassiveFractional) {
-      const fractional = Math.min(Math.ceil(participantCount / maxFractionsPerTile), maxTiles);
-      return {total: fractional, full: 0, fractional};
-    }
-    // Nobody has spoken yet, so nobody has earned a bigger tile — everyone is equal.
-    // The ratio rule is meaningless here (it is expressed per active participant), so
-    // lay out plain full tiles; only when the grid runs out of room does the last tile
-    // become fractional to host the remainder and the overflow badge.
-    if (participantCount <= maxTiles) {
-      return {total: participantCount, full: participantCount, fractional: 0};
-    }
-    return {total: maxTiles, full: maxTiles - 1, fractional: 1};
+  let full = Math.min(activeCount, inv.maxTiles);
+  const needsFractionContainer = passiveCount > 0 || activeCount > full;
+
+  // A full tile is sacrificed only when the full tiles alone already saturate the entire grid
+  // (every slot the container could possibly hold, `maxRows * maxCols`) — the one case where
+  // there is truly nowhere left for the mandatory fraction container to go, not even a new row.
+  // Below that ceiling, `computeLayout` sizes tiles from `full + 1` units (the fraction
+  // container counts as one more unit, see `gridUnitCount`), and `chooseGridShape` always finds
+  // a shape with a leftover slot or an extra row for that `+1` on its own — e.g. 4 full tiles
+  // that would perfectly fill a 2×2 grid simply grow into a 3-column shape instead, with the
+  // 4th tile staying full-size rather than being demoted into the tiny fraction container.
+  if (needsFractionContainer && full >= inv.maxTiles) {
+    full -= 1;
   }
 
-  const requestedFractional = Math.ceil(silentCount / maxFractionsPerTile);
-
-  const total = Math.min(
-    activeCount + requestedFractional,
-    Math.ceil(activeCount / (1 - ratio)),
-    maxTiles,
-  );
-
-  let fractional = Math.min(requestedFractional, Math.ceil(ratio * total), total);
-  let full = total - fractional;
-
-  // Defensive: the formula above always keeps full <= activeCount in practice, but
-  // under this mode a passive must never occupy a full seat, so guarantee it explicitly
-  // rather than relying on that being true by construction.
-  if (forcePassiveFractional && full > activeCount) {
-    fractional += full - activeCount;
-    full = activeCount;
-  }
-
-  return {total: full + fractional, full, fractional};
+  return {full, needsFractionContainer};
 }
 
-// ── Sticky seat assignment ────────────────────────────────────────────────────
-
-interface Seat {
-  kind: TileKind;
-  /** Index of the tile this seat belongs to (full tiles first, then fractional). */
-  tileIndex: number;
-}
+// ── Full-tile seat assignment ─────────────────────────────────────────────────
 
 /**
- * Builds the flat list of seats the layout offers, in priority order: every full tile,
- * then every fraction of every fractional tile (each sized by its own entry in
- * `fractionCapacities`, so an under-full tile doesn't reserve capacity it won't use),
- * then overflow.
+ * Sticky assignment of the full-tile boundary only: whoever already holds a full tile
+ * keeps it as long as they're still active; new or promoted active participants fill
+ * whatever seats are left, highest priority first. The fractional tile container's
+ * internal membership is not sticky — see `splitFractionalTiles`.
  */
-function buildSeats(counts: TileCounts, fractionCapacities: number[], participantCount: number): Seat[] {
-  const seats: Seat[] = [];
-
-  for (let i = 0; i < counts.full; i++) {
-    seats.push({kind: 'full', tileIndex: i});
-  }
-
-  for (let f = 0; f < counts.fractional; f++) {
-    const tileIndex = counts.full + f;
-    for (let c = 0; c < fractionCapacities[f]; c++) {
-      seats.push({kind: 'fractional', tileIndex});
-    }
-  }
-
-  // Anyone beyond the visible seats is represented by the overflow badge, which
-  // consumes the final fraction of the last fractional tile.
-  if (participantCount > seats.length && counts.fractional > 0) {
-    seats.pop();
-    while (seats.length < participantCount) {
-      seats.push({kind: 'overflow', tileIndex: counts.full + counts.fractional - 1});
-    }
-  }
-
-  return seats;
-}
-
-/**
- * Two-pass assignment of participants to seats.
- *
- * Pass 1 lays out the tentative order (strict priority). Pass 2 walks the seats and
- * lets an incumbent keep their seat whenever the *kind* of seat they would receive is
- * unchanged — so toggling a camera or tier never shuffles someone who is already
- * sitting somewhere equivalent. Only seats left vacant are filled from the tentative order.
- */
-function assignSeats(
+function assignFullTiles(
   sorted: GridParticipant[],
-  seats: Seat[],
+  full: number,
   prevAssignment: AssignmentMap,
-  forcePassiveFractional = false,
-): {occupants: (GridParticipant | null)[]; assignmentMap: AssignmentMap} {
-  // Position-based fallback used only for participants whose tier's active-ness hasn't
-  // changed — see the eligibility check in pass 2a for why this isn't used universally.
-  const tentativeKind = new Map<string, TileKind>();
-  sorted.forEach((p, i) => {
-    const seat = seats[i];
-    if (seat) {
-      tentativeKind.set(p.id, seat.kind);
-    }
-  });
-
-  const occupants: (GridParticipant | null)[] = new Array(seats.length).fill(null);
+): {fullOccupants: GridParticipant[]; assignmentMap: AssignmentMap} {
+  const occupants: (GridParticipant | null)[] = new Array(full).fill(null);
   const assigned = new Set<string>();
 
-  // Pass 1 — self always takes the first seat of its own tier's kind outright, bypassing
-  // the exact-seat stickiness below entirely. Self's *rank* (front of its bucket) is
-  // computed correctly by updateSlotMap, but that rank can still land on the wrong side
-  // of the full/fractional boundary: an already-seated participant that gets promoted to
-  // active keeps its old (low) rank by design (see pass 2a), which can leave a gap ahead
-  // of it that self's rank alone doesn't account for. Deriving self's seat directly from
-  // its own tier sidesteps that entirely — self simply always gets the first seat that
-  // matches what it currently is.
+  // Self always takes the first full seat outright whenever active.
   const self = sorted.find(p => p.isSelf);
-  if (self) {
-    const hasFractionalRun = seats.some(seat => seat.kind === 'fractional');
-    const selfIsActive = isActiveTier(self.tier);
-    const selfKind: TileKind =
-      selfIsActive || (!forcePassiveFractional && !hasFractionalRun) ? 'full' : 'fractional';
-    const selfSeatIndex = seats.findIndex(seat => seat.kind === selfKind);
-    if (selfSeatIndex !== -1) {
-      occupants[selfSeatIndex] = self;
-      assigned.add(self.id);
-    }
+  if (self && full > 0 && isActiveTier(self.tier)) {
+    occupants[0] = self;
+    assigned.add(self.id);
   }
 
-  // Pass 2a — incumbents whose seat kind is unchanged stay exactly where they are.
-  //
-  // A full-tile holder is grandfathered unconditionally: going quiet doesn't cost you
-  // your tile, matching the "no capacity pressure, no eviction" rule tested elsewhere.
-  // But the reverse — someone who *wasn't* full and has just become active — must NOT
-  // sticky-match their old (lesser) kind. Without this, a participant promoted to active
-  // stays stuck in a fraction purely because their exact old seat index happens to still
-  // be a fraction after the layout reflows, even though they now qualify for a full tile;
-  // this exemption lets them compete fresh in pass 2b instead, alongside self's fix above.
-  //
-  // Under `forcePassiveFractional`, a passive is barred from re-matching a full seat at
-  // all — no grandfathering, no positional fallback — since the whole point of that mode
-  // is that a passive never occupies one, regardless of history.
-  const bySeatIndex = new Map<number, GridParticipant>();
+  // Incumbents keep their exact seat as long as they're still active.
   for (const p of sorted) {
-    if (assigned.has(p.id)) {
+    if (assigned.has(p.id) || !isActiveTier(p.tier)) {
       continue;
     }
     const prev = prevAssignment[p.id];
-    if (prev === undefined) {
+    if (prev === undefined || prev.kind !== 'full' || prev.seatIndex >= full) {
       continue;
     }
-    if (forcePassiveFractional && prev.kind === 'full' && !isActiveTier(p.tier)) {
+    if (occupants[prev.seatIndex] !== null) {
       continue;
     }
-    const seat = seats[prev.seatIndex];
-    if (!seat || occupants[prev.seatIndex] !== null || seat.kind !== prev.kind) {
-      continue;
-    }
-    const newlyEligibleForFull = prev.kind !== 'full' && isActiveTier(p.tier);
-    const keepsSeat = prev.kind === 'full' || tentativeKind.get(p.id) === prev.kind;
-    if (!newlyEligibleForFull && keepsSeat && !bySeatIndex.has(prev.seatIndex)) {
-      bySeatIndex.set(prev.seatIndex, p);
-    }
-  }
-  for (const [seatIndex, p] of bySeatIndex) {
-    occupants[seatIndex] = p;
+    occupants[prev.seatIndex] = p;
     assigned.add(p.id);
   }
 
-  // Pass 2b — fill the remaining seats from whoever's left, active participants first.
-  // Active-before-passive here (not raw slot order) is what lets a freshly-promoted
-  // participant claim a vacated full seat ahead of an incumbent passive with a lower
-  // slot number purely from having arrived earlier. Under `forcePassiveFractional`, a
-  // full seat is left empty rather than ever handed to a passive candidate — in practice
-  // this never triggers, since counts.full is capped at activeCount for that mode, but
-  // the guard makes the invariant explicit rather than incidental.
-  const remainingActive = sorted.filter(p => !assigned.has(p.id) && isActiveTier(p.tier));
-  const remainingPassive = sorted.filter(p => !assigned.has(p.id) && !isActiveTier(p.tier));
-  let activeCursor = 0;
-  let passiveCursor = 0;
-  for (let i = 0; i < seats.length; i++) {
+  // Fill whatever's left with the highest-priority active participants remaining.
+  const remaining = sorted.filter(p => !assigned.has(p.id) && isActiveTier(p.tier));
+  let cursor = 0;
+  for (let i = 0; i < full; i++) {
     if (occupants[i] !== null) {
       continue;
     }
-    if (activeCursor < remainingActive.length) {
-      occupants[i] = remainingActive[activeCursor];
-      assigned.add(remainingActive[activeCursor].id);
-      activeCursor++;
-      continue;
-    }
-    if (forcePassiveFractional && seats[i].kind === 'full') {
-      continue;
-    }
-    if (passiveCursor < remainingPassive.length) {
-      occupants[i] = remainingPassive[passiveCursor];
-      assigned.add(remainingPassive[passiveCursor].id);
-      passiveCursor++;
+    if (cursor < remaining.length) {
+      occupants[i] = remaining[cursor];
+      assigned.add(remaining[cursor].id);
+      cursor++;
     }
   }
 
   const assignmentMap: AssignmentMap = {};
+  const fullOccupants: GridParticipant[] = [];
   occupants.forEach((p, seatIndex) => {
     if (p !== null) {
-      assignmentMap[p.id] = {kind: seats[seatIndex].kind, seatIndex};
+      assignmentMap[p.id] = {kind: 'full', seatIndex};
+      fullOccupants.push(p);
     }
   });
 
-  return {occupants, assignmentMap};
+  return {fullOccupants, assignmentMap};
 }
 
 // ── Grid geometry ─────────────────────────────────────────────────────────────
@@ -552,20 +372,58 @@ function tileDimensionsFor(
 
 // ── Layout computation ────────────────────────────────────────────────────────
 
-function emptyGridLayout(inv: Invariants | null, maxFractionsPerTile = 0): GridModeLayout {
+function emptyGridLayout(inv: Invariants | null): GridModeLayout {
   return {
     mode: 'grid',
     maxRows: inv?.maxRows ?? 0,
     maxCols: inv?.maxCols ?? 0,
     maxTiles: inv?.maxTiles ?? 0,
-    maxFractionsPerTile,
-    rows: [],
+    maxFractionalTilesPerContainer: 0,
+    tiles: [],
     tileWidth: 0,
     tileHeight: 0,
     tileAspectRatio: 0,
-    fractionWidth: null,
-    fractionHeight: null,
-    fractionAspectRatio: null,
+    fractionalTileWidth: null,
+    fractionalTileHeight: null,
+    fractionalTileAspectRatio: null,
+    fractionalContainerWidth: null,
+    fractionalContainerHeight: null,
+  };
+}
+
+function soloLayout(participant: GridParticipant, inv: Invariants, config: GridConfig): GridModeLayout {
+  const {width, height} = tileDimensionsFor(1, inv, config);
+  return {
+    mode: 'grid',
+    maxRows: inv.maxRows,
+    maxCols: inv.maxCols,
+    maxTiles: inv.maxTiles,
+    maxFractionalTilesPerContainer: 0,
+    tiles: [{type: 'full', participant}],
+    tileWidth: width,
+    tileHeight: height,
+    tileAspectRatio: width / height,
+    fractionalTileWidth: null,
+    fractionalTileHeight: null,
+    fractionalTileAspectRatio: null,
+    fractionalContainerWidth: null,
+    fractionalContainerHeight: null,
+  };
+}
+
+function computeOneOnOneLayout(
+  self: GridParticipant,
+  other: GridParticipant,
+  inv: Invariants,
+): OneOnOneLayout {
+  return {
+    mode: 'one-on-one',
+    maxRows: inv.maxRows,
+    maxCols: inv.maxCols,
+    maxTiles: inv.maxTiles,
+    maxFractionalTilesPerContainer: 0,
+    main: {type: 'full', participant: other},
+    pip: self,
   };
 }
 
@@ -573,7 +431,6 @@ function computePresenterLayout(
   sorted: GridParticipant[],
   inv: Invariants,
   config: GridConfig,
-  maxFractionsPerTile: number,
 ): PresenterModeLayout {
   const {minTileHeight, minAspectRatio, maxAspectRatio, tileGap: gap} = config;
 
@@ -612,7 +469,7 @@ function computePresenterLayout(
     maxRows: inv.maxRows,
     maxCols: inv.maxCols,
     maxTiles: inv.maxTiles,
-    maxFractionsPerTile,
+    maxFractionalTilesPerContainer: 0,
     spotlight: spotlightParticipant ? {type: 'full', participant: spotlightParticipant} : null,
     strip,
     stripTileWidth,
@@ -636,132 +493,185 @@ function computeLayout(
   const sorted = [...participants].sort((a, b) => (slotMap[a.id] ?? 0) - (slotMap[b.id] ?? 0));
   const {tileGap: gap} = config;
 
-  // Fraction capacity depends on tile size, which depends on the tile count, which in
-  // turn depends on fraction capacity. Break the cycle with a provisional pass over
-  // the uncompressed tile count, then settle on the real numbers.
-  const provisional = tileDimensionsFor(Math.max(1, Math.min(sorted.length, inv.maxTiles)), inv, config);
-  const maxFractionsPerTile = fractionBoundsFor(provisional.width, provisional.height, inv, gap).capacity;
-
   if (presenterMode && sorted.length > 0) {
     return {
-      layout: computePresenterLayout(sorted, inv, config, maxFractionsPerTile),
+      layout: computePresenterLayout(sorted, inv, config),
       assignmentMap: prevAssignment,
     };
   }
 
   if (sorted.length === 0) {
-    return {layout: emptyGridLayout(inv, maxFractionsPerTile), assignmentMap: {}};
+    return {layout: emptyGridLayout(inv), assignmentMap: {}};
+  }
+
+  // A solo call is always one big tile, regardless of active/passive status — there's
+  // nobody else to compete with it for space. Still records the seat so a newcomer
+  // joining right after doesn't bump the incumbent out of the seat they already hold.
+  if (sorted.length === 1) {
+    return {
+      layout: soloLayout(sorted[0], inv, config),
+      assignmentMap: {[sorted[0].id]: {kind: 'full', seatIndex: 0}},
+    };
+  }
+
+  // Two people always use the one-on-one template: the other participant fills the
+  // stage, self overlays as a small thumbnail. Falls through to the general grid if
+  // neither participant is flagged as self (shouldn't happen in practice).
+  if (sorted.length === 2) {
+    const self = sorted.find(p => p.isSelf);
+    const other = sorted.find(p => p !== self);
+    if (self && other) {
+      return {
+        layout: computeOneOnOneLayout(self, other, inv),
+        assignmentMap: {...prevAssignment, [other.id]: {kind: 'full', seatIndex: 0}},
+      };
+    }
   }
 
   const activeCount = sorted.filter(p => isActiveTier(p.tier)).length;
-  const forcePassiveFractional = config.forcePassiveFractional ?? false;
+  const passiveCount = sorted.length - activeCount;
+  const {full, needsFractionContainer} = computeTileCounts(activeCount, passiveCount, inv, config);
 
-  const counts = computeTileCounts(
-    activeCount,
-    sorted.length - activeCount,
-    inv.maxTiles,
-    maxFractionsPerTile,
-    config.maxFractionalTilesRatio,
-    forcePassiveFractional,
-  );
+  const {fullOccupants, assignmentMap} = assignFullTiles(sorted, full, prevAssignment);
+  const fullIds = new Set(fullOccupants.map(p => p.id));
+  const fractionalParticipants = needsFractionContainer ? sorted.filter(p => !fullIds.has(p.id)) : [];
 
-  const {cols: gridCols, width: tileWidth, height: tileHeight} = tileDimensionsFor(
-    counts.total,
-    inv,
-    config,
-  );
+  // The fractional tile container competes for grid space exactly like one more full tile
+  // would — otherwise, e.g., a single full tile would claim the *entire* grid height for
+  // itself, leaving the container with nowhere to go but to overflow underneath it.
+  const gridUnitCount = Math.max(1, full + (fractionalParticipants.length > 0 ? 1 : 0));
+  const {cols: fullCols, width: tileWidth, height: tileHeight} = tileDimensionsFor(gridUnitCount, inv, config);
 
-  // Distribute the fraction-eligible participants across tiles by filling each one to
-  // capacity in turn, with the remainder in the last — the same split `counts.fractional`
-  // itself assumes. Each tile then gets a shape sized to what it actually holds, so an
-  // under-full tile renders as one (or a few) large cell rather than a few small ones
-  // floating in unused space. Under `forcePassiveFractional`, every tile's shape is
-  // additionally floored at a 2-way split (escalating to 4-way if 2 doesn't fit the
-  // aspect bounds), so even a single occupant still reads as a visibly subdivided tile.
-  const fractionTileShapes: {rows: number; cols: number; capacity: number}[] = [];
-  let unseated = sorted.length - counts.full;
-  for (let f = 0; f < counts.fractional; f++) {
-    const target = Math.max(1, Math.min(maxFractionsPerTile, unseated));
-    fractionTileShapes.push(
-      forcePassiveFractional
-        ? chooseFractionShapeWithFloor(target, tileWidth, tileHeight, inv, config, MIN_FRACTION_CAPACITY)
-        : chooseFractionShape(target, tileWidth, tileHeight, inv, config),
-    );
-    unseated -= target;
-  }
+  let fractionalTileWidth: number | null = null;
+  let fractionalTileHeight: number | null = null;
+  let fractionalTileAspectRatio: number | null = null;
+  let fractionalContainerWidth: number | null = null;
+  let fractionalContainerHeight: number | null = null;
+  let fractionalContainerTile: TileDescriptor | null = null;
+  let maxFractionalTilesPerContainer = 0;
 
-  const seats = buildSeats(counts, fractionTileShapes.map(shape => shape.capacity), sorted.length);
-  const {occupants, assignmentMap} = assignSeats(sorted, seats, prevAssignment, forcePassiveFractional);
+  if (fractionalParticipants.length > 0) {
+    const {rows: capRows, fracWidth: baseFracWidth, fracHeight: baseFracHeight} =
+      computeFractionalTileSize(tileHeight, config);
 
-  // ── Build tile descriptors from the seated occupants ──
-  const fullTiles: TileDescriptor[] = [];
-  for (let i = 0; i < counts.full; i++) {
-    const participant = occupants[i];
-    if (participant) {
-      fullTiles.push({type: 'full', participant});
-    }
-  }
+    const leftoverFullTiles = full === 0 ? 0 : full % fullCols;
+    const sharesRow = leftoverFullTiles > 0;
 
-  const fractionalTiles: TileDescriptor[] = [];
-  for (let f = 0; f < counts.fractional; f++) {
-    const tileIndex = counts.full + f;
-    const {rows: fractionRows, cols: fractionCols} = fractionTileShapes[f];
-    const fractions: FractionDescriptor[] = [];
+    if (sharesRow) {
+      // Modes 1 & 3 — the container is tucked beside leftover full tiles in their row, so it
+      // fills column-major (first column top-to-bottom, then the next). Capacity is bounded
+      // by the width actually left over in that row (not the full grid width) — otherwise it
+      // grows wider than the row it's in, CSS wraps it to a new line, and that line is still
+      // `tileHeight` tall, blowing out the total content height (see the regression test).
+      const remainingSlots = fullCols - leftoverFullTiles;
+      const availableWidth = remainingSlots * tileWidth + (remainingSlots - 1) * gap;
+      const maxCols = Math.max(1, Math.floor((availableWidth + gap) / (baseFracWidth + gap)));
+      const capacity = maxCols * capRows;
 
-    seats.forEach((seat, seatIndex) => {
-      if (seat.tileIndex !== tileIndex) {
-        return;
+      const {tiles, visibleCount} = buildFractionalTiles(fractionalParticipants, capacity);
+
+      // Cell height is the fixed, invariant size from computeFractionalTileSize — identical
+      // whether the column is half-full or completely full. The container's box is always
+      // `tileHeight` regardless of fill level — it must align with the full tile(s) it shares
+      // the row with either way.
+      fractionalTileHeight = baseFracHeight;
+
+      // Mode 1: this shared row is the *only* row (no full-tile-only rows above) — tightly
+      // packed beside the lone full tile, last column vertically centered. Mode 3: there are
+      // full-tile rows above it — top/left-aligned instead, consistent with tiles flowing
+      // top-to-bottom, left-to-right.
+      const isOnlyRow = full < fullCols;
+
+      // Width hugs its content whenever genuinely fewer than `maxCols` columns are in use —
+      // full tiles are fixed-size and never grow into space freed up by hugging, so there's no
+      // benefit to forcing the container wider than its content, only the visual cost of a gap
+      // that doesn't belong to any tile. The whole shared row (full tile(s) + this now
+      // content-sized container) is centered as a block by the outer grid regardless of mode.
+      // Because the hugged width is purely a function of `cols` (a function of participant
+      // count, not of whether the previous column *just* filled up), it doesn't change
+      // discontinuously as participants are added within the same column count, so the row
+      // doesn't visibly jump around.
+      //
+      // Once `cols` reaches `maxCols` though — as many columns as can possibly fit, whether or
+      // not the last one is completely full — hugging with the fixed target width would still
+      // leave a few leftover px (`maxCols` is a floor), and centering *that* leaves an
+      // inconsistent inset: a few px narrower than `availableWidth`, which itself is built from
+      // the same `tileWidth` the full tile(s) in this row already use. The result reads as a
+      // "kink" where this row's edges sit slightly inside the full tile rows' edges instead of
+      // lining up with them. So at `cols === maxCols`, the cell width instead divides
+      // `availableWidth` exactly (mirroring how cell height already divides `tileHeight`
+      // exactly), closing that gap — still invariant across fill level, since `maxCols` and
+      // `availableWidth` depend only on the grid shape, not on how many passives are seated.
+      const cols = Math.max(1, Math.ceil(visibleCount / capRows));
+      if (cols >= maxCols) {
+        fractionalTileWidth = (availableWidth - (maxCols - 1) * gap) / maxCols;
+        fractionalContainerWidth = availableWidth;
+      } else {
+        fractionalTileWidth = baseFracWidth;
+        fractionalContainerWidth = cols * fractionalTileWidth + (cols - 1) * gap;
       }
-      const participant = occupants[seatIndex];
-      if (seat.kind === 'fractional' && participant) {
-        fractions.push({type: 'participant', participant});
-      }
-    });
+      fractionalContainerHeight = tileHeight;
+      maxFractionalTilesPerContainer = capacity;
+      fractionalContainerTile = {
+        type: 'fractional',
+        fractionalTiles: tiles,
+        fillDirection: 'column',
+        align: isOnlyRow ? 'center' : 'start',
+      };
+    } else {
+      // Mode 2 — the container has a row entirely to itself, so it behaves like a miniature
+      // version of the main grid: fills row-major (left-to-right, then wraps down), last row
+      // centered horizontally. Width always claims exactly `fullCols * tileWidth + gaps` — the
+      // precise width any full-tile row in this grid spans (mode 2 only triggers when `full`
+      // divides evenly into `fullCols`, so every full-tile row is completely full, all sharing
+      // that same width) — rather than the grid's abstract usable width, which can be wider
+      // than what full tiles actually render at once they clamp to the max aspect ratio. Using
+      // the real full-tile-row width keeps left/right edges flush with the rows above/below
+      // instead of each row being independently centered to a different width by the outer
+      // flex-wrap (which reads as misalignment).
+      //
+      // `maxCols` must be floored against that *same* real container width (not the grid's
+      // abstract usable width — using that let `maxCols` overcount, understating how many
+      // columns the container can actually fit). And like mode 3, `maxCols * targetWidth` is
+      // generally a few px short of the container width; left uncorrected, `justifyContent:
+      // 'center'` (this mode's "last row centered horizontally" rule) splits that slack onto
+      // *both* edges even when every column is in use — a symmetric inset that never reaches
+      // either edge, instead of a flush fit. Stretching the cell width to exactly divide the
+      // container width (mirroring mode 3's fix) removes the slack for a fully-packed row, so
+      // centering only has a visible effect on a genuinely under-filled last row, as intended.
+      const containerWidth = fullCols * tileWidth + (fullCols - 1) * gap;
+      const maxCols = Math.max(1, Math.floor((containerWidth + gap) / (baseFracWidth + gap)));
+      const maxRows = Math.max(1, Math.floor((tileHeight + gap) / (baseFracHeight + gap)));
+      const capacity = maxCols * maxRows;
 
-    const hiddenParticipants = seats
-      .map((seat, seatIndex) => (seat.tileIndex === tileIndex && seat.kind === 'overflow' ? occupants[seatIndex] : null))
-      .filter((p): p is GridParticipant => p !== null);
+      const {tiles, visibleCount} = buildFractionalTiles(fractionalParticipants, capacity);
 
-    if (hiddenParticipants.length > 0) {
-      fractions.push({
-        type: 'overflow',
-        count: hiddenParticipants.length,
-        avatars: hiddenParticipants.slice(0, OVERFLOW_AVATAR_COUNT),
-      });
+      fractionalTileHeight = baseFracHeight;
+      fractionalTileWidth = (containerWidth - (maxCols - 1) * gap) / maxCols;
+
+      const rowsNeeded = Math.max(1, Math.ceil(visibleCount / maxCols));
+      fractionalContainerWidth = containerWidth;
+      fractionalContainerHeight = rowsNeeded * fractionalTileHeight + (rowsNeeded - 1) * gap;
+      maxFractionalTilesPerContainer = capacity;
+
+      fractionalContainerTile = {
+        type: 'fractional',
+        fractionalTiles: tiles,
+        fillDirection: 'row',
+        align: 'center',
+      };
     }
 
-    if (fractions.length > 0) {
-      fractionalTiles.push({type: 'fractional', fractionRows, fractionCols, fractions});
-    }
+    fractionalTileAspectRatio = fractionalTileWidth / fractionalTileHeight;
   }
 
-  // Lightly-populated tiles read as a single highlighted participant rather than a
-  // crowded grid, so they belong before the more tightly-packed ones.
-  fractionalTiles.sort((a, b) => {
-    const aLength = a.type === 'fractional' ? a.fractions.length : 0;
-    const bLength = b.type === 'fractional' ? b.fractions.length : 0;
-    return aLength - bLength;
-  });
-
-  const tiles: TileDescriptor[] = [...fullTiles, ...fractionalTiles];
-
-  // Representative subtile size for a fully-packed fraction tile — informational only;
-  // FractionalTile computes its own per-tile size from its own fractionRows/fractionCols.
-  const standardFractionShape =
-    counts.fractional > 0
-      ? chooseFractionShape(maxFractionsPerTile, tileWidth, tileHeight, inv, config)
-      : null;
-  const fractionWidth = standardFractionShape
-    ? (tileWidth - gap * (standardFractionShape.cols - 1)) / standardFractionShape.cols
-    : null;
-  const fractionHeight = standardFractionShape
-    ? (tileHeight - gap * (standardFractionShape.rows - 1)) / standardFractionShape.rows
-    : null;
-
-  const rows: RowLayout[] = [];
-  for (let i = 0; i < tiles.length; i += gridCols) {
-    rows.push({tiles: tiles.slice(i, i + gridCols)});
-  }
+  // Full tiles first (priority order), then the fractional container. A single flex-wrap
+  // container renders these — the browser decides row breaks and the fractional container's
+  // width, since only each tile's own fixed size is computed here, not row/column layout.
+  const tiles: TileDescriptor[] = [
+    ...fullOccupants.map(participant => ({type: 'full' as const, participant})),
+    ...(fractionalContainerTile ? [fractionalContainerTile] : []),
+  ];
 
   return {
     layout: {
@@ -769,15 +679,16 @@ function computeLayout(
       maxRows: inv.maxRows,
       maxCols: inv.maxCols,
       maxTiles: inv.maxTiles,
-      maxFractionsPerTile,
-      rows,
+      maxFractionalTilesPerContainer,
+      tiles,
       tileWidth,
       tileHeight,
       tileAspectRatio: tileWidth / tileHeight,
-      fractionWidth,
-      fractionHeight,
-      fractionAspectRatio:
-        fractionWidth !== null && fractionHeight !== null ? fractionWidth / fractionHeight : null,
+      fractionalTileWidth,
+      fractionalTileHeight,
+      fractionalTileAspectRatio,
+      fractionalContainerWidth,
+      fractionalContainerHeight,
     },
     assignmentMap,
   };
@@ -906,7 +817,12 @@ export function createGridReducer(config: GridConfig) {
   };
 }
 
-export {updateSlotMap as _updateSlotMap, computeInvariants as _computeInvariants};
+export {
+  updateSlotMap as _updateSlotMap,
+  computeInvariants as _computeInvariants,
+  computeFractionalTileSize as _computeFractionalTileSize,
+  tileDimensionsFor as _tileDimensionsFor,
+};
 
 /** Test seam: returns just the layout, matching the shape tests assert against. */
 export function _computeLayout(

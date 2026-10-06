@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useReducer, useState} from 'react';
+import {useEffect, useReducer, useState} from 'react';
 
 import {FluidVideoGrid, FluidVideoGridProvider, useFluidVideoGrid} from './components/FluidVideoGrid';
 import {GRID_CONFIG, VIEWPORT_CONFIGS} from './constants';
@@ -131,13 +131,6 @@ export function FixtureInstance({initialCount = 2}: FixtureInstanceProps) {
   const [vpIndex, setVpIndex] = useState(1); // default 1280×720
   const viewport = VIEWPORT_CONFIGS[vpIndex];
   const [panelOpen, setPanelOpen] = useState(true);
-  // Experimental: passive participants never get a full tile — always at least a 2-way
-  // (or 4-way) fraction. Remounts the provider on toggle so the layout recomputes clean.
-  const [forcePassiveFractional, setForcePassiveFractional] = useState(false);
-  const gridConfig = useMemo(
-    () => ({...GRID_CONFIG, forcePassiveFractional}),
-    [forcePassiveFractional],
-  );
 
   const {
     participants,
@@ -190,11 +183,7 @@ export function FixtureInstance({initialCount = 2}: FixtureInstanceProps) {
   };
 
   return (
-    <FluidVideoGridProvider
-      key={forcePassiveFractional ? 'force-passive-fractional' : 'default'}
-      participants={participants}
-      config={gridConfig}
-    >
+    <FluidVideoGridProvider participants={participants} config={GRID_CONFIG}>
     <div style={{display: 'flex', width: '100%', height: '100%', overflow: 'hidden'}}>
 
       {/* ── Left: stage area (non-scrollable, grid centered) ── */}
@@ -305,11 +294,6 @@ export function FixtureInstance({initialCount = 2}: FixtureInstanceProps) {
             </Field>
             <ToggleRow label="Simulate conversation" on={simulationEnabled} onToggle={toggleSimulation} />
             <PresenterModeToggleRow />
-            <ToggleRow
-              label="Force passive → fraction (experimental)"
-              on={forcePassiveFractional}
-              onToggle={() => setForcePassiveFractional(v => !v)}
-            />
           </div>
 
           {/* ── Timing logic group ── */}

@@ -33,26 +33,39 @@ export interface GridParticipant {
 // ── Layout types ────────────────────────────────────────────────────────────
 
 /**
- * One cell inside a fractional tile. A fractional tile is subdivided into
- * `fractionRows × fractionCols` fractions; the last one may show the overflow badge.
+ * One cell inside a `FractionalTileContainer`. The last one may show the overflow badge
+ * instead of a participant.
  */
-export type FractionDescriptor =
+export type FractionalTileDescriptor =
   | {type: 'participant'; participant: GridParticipant}
   | {type: 'overflow'; count: number; avatars: GridParticipant[]};
 
 /**
- * One grid slot. Either holds a single participant (full), is subdivided into
- * fractions holding several participants (fractional), or summarises the
- * participants that did not fit (overflow — used by the presenter-mode strip).
+ * One grid slot. Either holds a single participant (full), is a container subdivided into
+ * several participants' worth of fractional tiles, or summarises the participants that did
+ * not fit (overflow — used by the presenter-mode strip).
  */
 export type TileDescriptor =
   | {type: 'full'; participant: GridParticipant}
-  | {type: 'fractional'; fractionRows: number; fractionCols: number; fractions: FractionDescriptor[]}
+  | {
+      type: 'fractional';
+      fractionalTiles: FractionalTileDescriptor[];
+      /**
+       * `'column'` fills the first column top-to-bottom before starting the next (used
+       * whenever the container shares a row with full tiles, tucked beside them). `'row'`
+       * fills left-to-right before wrapping, same as the main grid (used when the container
+       * has a row entirely to itself).
+       */
+      fillDirection: 'row' | 'column';
+      /**
+       * `'center'` centers each line (so an under-filled last column/row sits centered
+       * within the container); `'start'` top/left-aligns instead — used when the container
+       * shares the last row of a multi-row grid, to read consistently with the full tiles
+       * flowing top-to-bottom, left-to-right above it.
+       */
+      align: 'center' | 'start';
+    }
   | {type: 'overflow'; count: number; avatars: GridParticipant[]};
-
-export interface RowLayout {
-  tiles: TileDescriptor[];
-}
 
 /** Capacity bounds derived from container size alone — independent of participants. */
 export interface LayoutInvariants {
@@ -61,22 +74,42 @@ export interface LayoutInvariants {
   maxCols: number;
   /** maxRows × maxCols — the ceiling on how many tiles may be rendered. */
   maxTiles: number;
-  /** How many fractions a single fractional tile can be subdivided into. */
-  maxFractionsPerTile: number;
+  /** How many fractional tiles the container can hold at the full container width. */
+  maxFractionalTilesPerContainer: number;
 }
 
 export interface GridModeLayout extends LayoutInvariants {
   mode: 'grid';
-  /** Row-based layout: each row is a list of tile descriptors. */
-  rows: RowLayout[];
-  /** Full tile pixel dimensions — shared by every tile in the grid. */
+  /**
+   * Every tile in this layout — full tiles in priority order, followed by the fractional
+   * tile container, if any. Rendered as flex items in a single flex-wrap container; the
+   * browser decides the actual row breaks, since only each tile's own fixed box size is
+   * computed here (see `fractionalContainerWidth`/`Height` for that box), not row/column
+   * layout.
+   */
+  tiles: TileDescriptor[];
+  /** Full tile pixel dimensions — shared by every full tile in the grid. */
   tileWidth: number;
   tileHeight: number;
   tileAspectRatio: number;
-  /** Fraction pixel dimensions — null when no fractional tile exists. */
-  fractionWidth: number | null;
-  fractionHeight: number | null;
-  fractionAspectRatio: number | null;
+  /**
+   * Single fractional-tile cell's fixed pixel dimensions — null when no container exists.
+   * Invariant for a given `tileHeight`: computed once from viewport/full-tile geometry via
+   * exact division (so a full column still reaches exactly `tileHeight` with no leftover
+   * gap), and never varies based on how many participants are currently visible.
+   */
+  fractionalTileWidth: number | null;
+  fractionalTileHeight: number | null;
+  fractionalTileAspectRatio: number | null;
+  /**
+   * The fractional tile container's own box. Height is `tileHeight` exactly whenever it
+   * shares a row with full tiles (it must align with them) or whenever its content fills at
+   * least one column; otherwise it hugs its (shorter) content. Width is `tileWidth` exactly
+   * when squeezed to a single leftover slot next to full tiles; otherwise it hugs its
+   * content. Null when no container exists.
+   */
+  fractionalContainerWidth: number | null;
+  fractionalContainerHeight: number | null;
 }
 
 export interface PresenterModeLayout extends LayoutInvariants {
@@ -90,7 +123,16 @@ export interface PresenterModeLayout extends LayoutInvariants {
   stripTileHeight: number;
 }
 
-export type GridLayout = GridModeLayout | PresenterModeLayout;
+/** Two-person call: the other participant fills the stage, self overlays as a small PiP thumbnail. */
+export interface OneOnOneLayout extends LayoutInvariants {
+  mode: 'one-on-one';
+  /** The non-self participant, full-bleed. */
+  main: TileDescriptor;
+  /** Self, rendered as a small overlay thumbnail. */
+  pip: GridParticipant;
+}
+
+export type GridLayout = GridModeLayout | PresenterModeLayout | OneOnOneLayout;
 
 // ── Tile assignment ──────────────────────────────────────────────────────────
 
@@ -137,14 +179,12 @@ export interface GridConfig {
   maxAspectRatio: number;
   /** Gap in px between tiles and between fractions */
   tileGap: number;
-  /** Upper bound on the share of tiles that may be fractional (e.g. 1/3). */
-  maxFractionalTilesRatio: number;
   /**
-   * Experimental. When true, a passive (silent, camera-off) participant is never given
-   * a full tile — always at least a 2-way fraction (4-way if 2 doesn't fit the aspect
-   * bounds), even when there's room to spare or nobody in the call is active.
+   * Aspect-ratio bounds for a single fractional tile inside the fractional tile container.
+   * Defaults to `minAspectRatio`/`maxAspectRatio` when omitted.
    */
-  forcePassiveFractional?: boolean;
+  minFractionalTileAspectRatio?: number;
+  maxFractionalTileAspectRatio?: number;
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────

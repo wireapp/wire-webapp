@@ -3,7 +3,7 @@ import {AnimatePresence, motion} from 'framer-motion';
 
 import {TileDescriptor} from './FluidVideoGrid.types';
 import {useFluidVideoGrid} from './FluidVideoGridContext';
-import {FractionalTile} from './FractionalTile';
+import {FractionalTileContainer} from './FractionalTileContainer';
 import {GridTile} from './GridTile';
 import {OverflowTile} from './OverflowTile';
 import {useContainerSize} from './useContainerSize';
@@ -30,8 +30,8 @@ function isActiveSpeaker(tile: Extract<TileDescriptor, {type: 'full'}>): boolean
 }
 
 /**
- * Stable identity for a tile. Full tiles key off their occupant; fractional tiles key
- * off their first occupant so they survive reflow without remounting.
+ * Stable identity for a tile. Full tiles key off their occupant; the fractional tile
+ * container keys off its first occupant so it survives reflow without remounting.
  */
 function tileKey(tile: TileDescriptor): string {
   if (tile.type === 'full') {
@@ -40,7 +40,7 @@ function tileKey(tile: TileDescriptor): string {
   if (tile.type === 'overflow') {
     return 'overflow';
   }
-  const first = tile.fractions.find(f => f.type === 'participant');
+  const first = tile.fractionalTiles.find(f => f.type === 'participant');
   return `fractional-${first && first.type === 'participant' ? first.participant.id : 'empty'}`;
 }
 
@@ -52,8 +52,9 @@ export function FluidVideoGrid() {
   useContainerSize(containerRef, setContainerSize);
 
   /**
-   * Single render path for every tile in both modes. `width`/`height` are undefined
-   * for the spotlight, which is flex-filled instead of explicitly sized.
+   * Render path for full and overflow tiles, shared across every mode. `width`/`height`
+   * are undefined for the spotlight / one-on-one main tile, which are flex-filled instead
+   * of explicitly sized.
    */
   const renderTile = (tile: TileDescriptor, width?: number, height?: number) => {
     const style =
@@ -69,25 +70,35 @@ export function FluidVideoGrid() {
       );
     }
 
-    if (tile.type === 'fractional') {
+    if (tile.type === 'overflow') {
       return (
         <motion.div key={tileKey(tile)} {...TILE_MOTION} style={style}>
-          <FractionalTile
-            fractionRows={tile.fractionRows}
-            fractionCols={tile.fractionCols}
-            fractions={tile.fractions}
-            gap={gap}
-          />
+          <OverflowTile count={tile.count} avatars={tile.avatars} />
         </motion.div>
       );
     }
 
-    return (
-      <motion.div key={tileKey(tile)} {...TILE_MOTION} style={style}>
-        <OverflowTile count={tile.count} avatars={tile.avatars} />
-      </motion.div>
-    );
+    return null;
   };
+
+  if (layout.mode === 'one-on-one') {
+    return (
+      <div ref={containerRef} style={{...CONTAINER_STYLE, padding: 0}}>
+        <div style={{position: 'absolute', inset: 0, display: 'flex'}}>{renderTile(layout.main)}</div>
+        <div
+          style={{
+            position: 'absolute',
+            right: 16,
+            bottom: 16,
+            width: '19%',
+            aspectRatio: '4 / 3',
+          }}
+        >
+          <GridTile participant={layout.pip} variant="pip" />
+        </div>
+      </div>
+    );
+  }
 
   if (layout.mode === 'presenter') {
     return (
@@ -113,28 +124,47 @@ export function FluidVideoGrid() {
     );
   }
 
+  // Grid mode: full tiles and the fractional tile container (if any) are all direct
+  // children of one flex-wrap container. Only each tile's own fixed size is computed —
+  // row breaks, centering, and the fractional container's width are left entirely to CSS.
   return (
     <div
       ref={containerRef}
       style={{
         ...CONTAINER_STYLE,
-        flexDirection: 'column',
+        flexWrap: 'wrap',
         gap,
         padding: gap,
-        alignItems: 'center',
         justifyContent: 'center',
+        alignContent: 'center',
       }}
     >
       <AnimatePresence mode="popLayout">
-        {layout.rows.map((row, rowIdx) => (
-          <motion.div
-            key={rowIdx}
-            layout
-            style={{display: 'flex', flexDirection: 'row', gap, flexShrink: 0}}
-          >
-            {row.tiles.map(tile => renderTile(tile, layout.tileWidth, layout.tileHeight))}
-          </motion.div>
-        ))}
+        {layout.tiles.map(tile => {
+          if (tile.type === 'fractional') {
+            const boxWidth = layout.fractionalContainerWidth ?? 0;
+            const boxHeight = layout.fractionalContainerHeight ?? 0;
+            return (
+              <motion.div
+                key={tileKey(tile)}
+                {...TILE_MOTION}
+                style={{width: boxWidth, height: boxHeight, flexShrink: 0}}
+              >
+                <FractionalTileContainer
+                  fractionalTiles={tile.fractionalTiles}
+                  tileWidth={layout.fractionalTileWidth ?? 0}
+                  tileHeight={layout.fractionalTileHeight ?? 0}
+                  boxWidth={boxWidth}
+                  boxHeight={boxHeight}
+                  fillDirection={tile.fillDirection}
+                  align={tile.align}
+                  gap={gap}
+                />
+              </motion.div>
+            );
+          }
+          return renderTile(tile, layout.tileWidth, layout.tileHeight);
+        })}
       </AnimatePresence>
     </div>
   );

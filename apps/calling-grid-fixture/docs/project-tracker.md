@@ -2,6 +2,8 @@
 
 > Status key: ✅ Done · 🔄 In progress · 🔲 Not started · ⏸ Deferred
 
+> **Spec update:** `docs/new-video-grid-specs.md` supersedes `docs/fluid-video-grid-spec.md`'s layout algorithm (kept as historical record). The `forcePassiveFractional` experimental toggle is gone — its behavior (passive participants always go to the fractional tile container) is now the only behavior. The fractional tile mechanism was also consolidated from "spawn more fractional tiles as one fills up" to a single hugging-width container with column-major fill, plus new solo and one-on-one special-case layouts. See Milestone 1c below.
+
 ---
 
 ## Milestone 1 — Fixture App & Core Component
@@ -40,6 +42,21 @@
 | 1b.7 | Permanent "You" participant in fixture (cannot be removed) | ✅ | Prepended to participants array; shown as distinct row in panel |
 | 1b.8 | `now?` action parameter for deterministic test timestamps | ✅ | Used in ADD_PARTICIPANT and UPDATE_PARTICIPANT |
 | 1b.9 | Test suite rewrite — 68 tests covering new layout semantics | ✅ | Replaces original 29 tests |
+
+---
+
+## Milestone 1c — New Spec Adoption (`new-video-grid-specs.md`)
+
+| # | Item | Status | Notes |
+|---|---|---|---|
+| 1c.1 | Solo call — single big tile regardless of active/passive status | ✅ | Bypasses tier logic entirely; see `soloLayout` |
+| 1c.2 | One-on-one call — other participant full-bleed, self as PiP thumbnail | ✅ | New `OneOnOneLayout` mode; bottom-right overlay, ~19% of stage width |
+| 1c.3 | Fractional tile container mandatory whenever ≥1 passive participant | ✅ | Was the `forcePassiveFractional` experimental flag; now the only behavior |
+| 1c.4 | Active overflow also spills into the fractional container | ✅ | `computeTileCounts` sacrifices one full tile when actives alone would saturate the grid |
+| 1c.5 | Single fractional container (not multiple), hugs its content width | ✅ | Replaces the old multi-tile-capacity-9 fallback |
+| 1c.6 | Column-major fraction fill (top-to-bottom, then next column) | ✅ | `placeFractions` + column-major read in `FractionalTile.tsx` |
+| 1c.7 | Fraction never the size of a full tile (always ≥ 2-way split) | ✅ | `computeFractionTileSize` floors at 2 rows |
+| 1c.8 | Independent fraction aspect-ratio config | ✅ | `minFractionAspectRatio`/`maxFractionAspectRatio`, defaults to main tile's bounds |
 
 ---
 
@@ -104,6 +121,7 @@ Reference: [Figma file](https://www.figma.com/design/wRATGU0AkeWGDIvBV961o8/Grid
 | # | Description | Priority |
 |---|---|---|
 | B1 | Screen-share tile and camera tile use the same `renderVideo` render-prop; no visual distinction in fixture | Low |
+| B2 | `chooseGridShape`/`tileDimensionsFor` can force tile width above what the row actually fits when `maxRows` collapses to 1 (e.g. many participants in a 640×480 or shorter container) — the aspect-ratio-driven minimum width wins over the available-width constraint, overflowing the row. Pre-existing in the tile-sizing math (not introduced by the new-video-grid-specs work); reproduced with 7+ active participants at 640×480. Needs a proper joint width/row optimization. | Medium |
 
 ---
 
@@ -122,3 +140,6 @@ Reference: [Figma file](https://www.figma.com/design/wRATGU0AkeWGDIvBV961o8/Grid
 | Post-hackathon | Fractional tile capacities restricted to {2, 3, 4, 6} | Clean set covers all subtile subdivisions while avoiding awkward 5-cell layouts; replaces the phase 2/3/4 system |
 | Post-hackathon | `activatedAt` for recency ordering within active tiers | Most recently promoted speaker should take the most visible slot; timestamp-based ordering is simpler and more predictable than `speakingDuration`-based eviction |
 | Post-hackathon | Permanent "You" participant in fixture (not removable) | Matches production semantics where the local user is always present in the grid |
+| New spec | `forcePassiveFractional` promoted from experimental toggle to the only behavior | `new-video-grid-specs.md` item 6 mandates a fractional container whenever ≥1 passive participant is present; no longer optional |
+| New spec | Consolidated multiple fractional tiles into one hugging-width container | Spec describes the fractional tile container in the singular, spanning exactly one row and growing to fit its contents |
+| New spec | Solo (1 participant) and one-on-one (2 participants) bypass the active/passive tiering entirely | Spec items 1-2 describe these as fixed templates, not special cases of the general algorithm |

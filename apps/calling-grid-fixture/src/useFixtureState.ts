@@ -255,7 +255,7 @@ export function useFixtureState(initialCount = 2): FixtureState {
   }, []);
 
   const setParticipantCount = useCallback((n: number) => {
-    const target = Math.max(1, Math.min(MOCK_PEOPLE.length, n));
+    const target = Math.max(0, Math.min(MOCK_PEOPLE.length, n));
     setRaw(prev => {
       if (target === prev.length) return prev;
       if (target < prev.length) {

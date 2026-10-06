@@ -9,8 +9,9 @@ export const MAX_ASPECT_RATIO = 1.78; // 16:9
 export const TILE_GAP = 4; // px
 export const TRANSITION_DURATION_MS = 250;
 
-/** At most a third of the rendered tiles may be fractional. */
-export const MAX_FRACTIONAL_TILES_RATIO = 1 / 3;
+/** Aspect-ratio bounds for a single fractional tile inside the fractional tile container. */
+export const MIN_FRACTIONAL_TILE_ASPECT_RATIO = 0.5;
+export const MAX_FRACTIONAL_TILE_ASPECT_RATIO = MAX_ASPECT_RATIO;
 
 // ── Speaker promotion / debounce ──────────────────────────────────────────────
 export const SPEAKING_DEBOUNCE_MS = 1500; // ms of continuous speech before promotion
@@ -22,7 +23,8 @@ export const GRID_CONFIG: GridConfig = {
   minAspectRatio: MIN_ASPECT_RATIO,
   maxAspectRatio: MAX_ASPECT_RATIO,
   tileGap: TILE_GAP,
-  maxFractionalTilesRatio: MAX_FRACTIONAL_TILES_RATIO,
+  minFractionalTileAspectRatio: MIN_FRACTIONAL_TILE_ASPECT_RATIO,
+  maxFractionalTileAspectRatio: MAX_FRACTIONAL_TILE_ASPECT_RATIO,
 };
 
 // ── Viewport configurations shown on the canvas ───────────────────────────────
