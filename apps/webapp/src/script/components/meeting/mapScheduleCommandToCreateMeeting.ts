@@ -17,7 +17,8 @@
  *
  */
 
-import type {CreateMeeting} from '@wireapp/api-client/lib/meetings/createMeeting';
+import {isNonEmptyString} from '@sindresorhus/is';
+import {type CreateMeeting, MeetingType} from '@wireapp/api-client/lib/meetings/createMeeting';
 
 import type {DeviceTimeZone} from 'Components/meeting/deviceTimeZone';
 import {mapRecurrenceOptionToMeetingRecurrence} from 'Components/meeting/scheduleMeetingModal/scheduleMeetingRecurrence';
@@ -33,7 +34,11 @@ export const mapScheduleCommandToCreateMeeting = (
     title: command.title,
     start_time: command.start.toISOString(),
     end_time: command.end.toISOString(),
+    type: MeetingType.SCHEDULED,
     tzid: deviceTimeZone.ianaTimeZoneId,
     ...(recurrence !== undefined && {recurrence}),
+    ...(isNonEmptyString(command.password?.trim()) && {
+      password: command.password,
+    }),
   };
 };

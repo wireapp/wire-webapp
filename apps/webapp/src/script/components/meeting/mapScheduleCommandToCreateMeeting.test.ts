@@ -18,6 +18,7 @@
  */
 
 import {MeetingRecurrenceFrequency} from '@wireapp/api-client/lib/meetings/meetingRecurrence';
+import {MeetingType} from '@wireapp/api-client/lib/meetings/createMeeting';
 
 import {mapScheduleCommandToCreateMeeting} from './mapScheduleCommandToCreateMeeting';
 
@@ -43,8 +44,23 @@ describe('mapScheduleCommandToCreateMeeting', () => {
       title: 'Weekly sync',
       start_time: futureStartIso,
       end_time: futureEndIso,
+      type: MeetingType.SCHEDULED,
       recurrence: {frequency: MeetingRecurrenceFrequency.WEEKLY},
       tzid: 'Pacific/Auckland',
     });
+  });
+
+  it('includes a non-empty password and omits whitespace-only passwords', () => {
+    const withPassword = mapScheduleCommandToCreateMeeting(
+      {...{title: 'Weekly sync', start: futureStartDate, end: futureEndDate, recurrence: 'weekly', selectedUsers: []}, password: 'secret'},
+      {ianaTimeZoneId: 'Pacific/Auckland'},
+    );
+    const withoutPassword = mapScheduleCommandToCreateMeeting(
+      {...{title: 'Weekly sync', start: futureStartDate, end: futureEndDate, recurrence: 'weekly', selectedUsers: []}, password: '  '},
+      {ianaTimeZoneId: 'Pacific/Auckland'},
+    );
+
+    expect(withPassword.password).toBe('secret');
+    expect(withoutPassword).not.toHaveProperty('password');
   });
 });
