@@ -17,7 +17,7 @@
  *
  */
 
-import {useMemo, useState} from 'react';
+import {Fragment, useMemo, useState} from 'react';
 import type {ReactNode} from 'react';
 
 import {isUndefined} from '@sindresorhus/is';
@@ -71,7 +71,41 @@ const reasonToMessageDataMap = {
     link: {url: config.URL.SUPPORT.MLS_LEARN_MORE, name: 'mls-learn-more'},
     translationLabel: 'NotMlsCapable',
   },
+  [AddUsersFailureReasons.KEY_PACKAGE_CLAIM_FAILED]: {
+    link: undefined,
+    translationLabel: undefined,
+  },
 } as const;
+
+type CreateLearnMoreLinkOptions = {
+  readonly link: (typeof reasonToMessageDataMap)[AddUsersFailureReasons]['link'];
+  readonly messageFocusedTabIndex: ReturnType<typeof useMessageFocusedTabIndex>;
+  readonly translate: Translate;
+};
+
+function createLearnMoreLink(options: CreateLearnMoreLinkOptions): ReactNode {
+  const {link, messageFocusedTabIndex, translate} = options;
+
+  if (isUndefined(link)) {
+    return null;
+  }
+
+  return (
+    <Fragment>
+      {' '}
+      <Link
+        tabIndex={messageFocusedTabIndex}
+        targetBlank
+        variant={LinkVariant.PRIMARY}
+        href={link.url}
+        data-uie-name={link.name}
+        css={backendErrorLink}
+      >
+        {translate('offlineBackendLearnMore')}
+      </Link>
+    </Fragment>
+  );
+}
 
 interface MessageDetailsProps {
   failure: AddUsersFailure;
@@ -85,6 +119,7 @@ const singularDetailsTranslationKeyByReason = {
   [AddUsersFailureReasons.UNREACHABLE_BACKENDS]: 'failedToAddParticipantsSingularDetailsOfflineBackend',
   [AddUsersFailureReasons.OFFLINE_FOR_TOO_LONG]: 'failedToAddParticipantsSingularDetailsOfflineForTooLong',
   [AddUsersFailureReasons.NOT_MLS_CAPABLE]: 'failedToAddParticipantsSingularDetailsNotMlsCapable',
+  [AddUsersFailureReasons.KEY_PACKAGE_CLAIM_FAILED]: 'failedToAddParticipantsSingularDetailsKeyPackageClaimFailed',
 } as const satisfies Record<AddUsersFailureReasons, TranslationKey>;
 
 const pluralDetailsTranslationKeyByReason = {
@@ -92,6 +127,7 @@ const pluralDetailsTranslationKeyByReason = {
   [AddUsersFailureReasons.UNREACHABLE_BACKENDS]: 'failedToAddParticipantsPluralDetailsOfflineBackend',
   [AddUsersFailureReasons.OFFLINE_FOR_TOO_LONG]: 'failedToAddParticipantsPluralDetailsOfflineForTooLong',
   [AddUsersFailureReasons.NOT_MLS_CAPABLE]: 'failedToAddParticipantsPluralDetailsNotMlsCapable',
+  [AddUsersFailureReasons.KEY_PACKAGE_CLAIM_FAILED]: 'failedToAddParticipantsPluralDetailsKeyPackageClaimFailed',
 } as const satisfies Record<AddUsersFailureReasons, TranslationKey>;
 
 const singularTranslationKeyByReason = {
@@ -99,6 +135,7 @@ const singularTranslationKeyByReason = {
   [AddUsersFailureReasons.UNREACHABLE_BACKENDS]: 'failedToAddParticipantSingularOfflineBackend',
   [AddUsersFailureReasons.OFFLINE_FOR_TOO_LONG]: 'failedToAddParticipantSingularOfflineForTooLong',
   [AddUsersFailureReasons.NOT_MLS_CAPABLE]: 'failedToAddParticipantSingularNotMlsCapable',
+  [AddUsersFailureReasons.KEY_PACKAGE_CLAIM_FAILED]: 'failedToAddParticipantSingularKeyPackageClaimFailed',
 } as const satisfies Record<AddUsersFailureReasons, TranslationKey>;
 
 type FailedToAddTranslationPlaceholder = 'name' | 'names' | 'domain' | 'total';
@@ -363,22 +400,6 @@ function MessageDetails({failure, isMessageFocused, allUsers, translate}: Messag
 
   const {link} = reasonToMessageDataMap[reason];
 
-  const learnMoreLink = (
-    <>
-      {' '}
-      <Link
-        tabIndex={messageFocusedTabIndex}
-        targetBlank
-        variant={LinkVariant.PRIMARY}
-        href={link.url}
-        data-uie-name={link.name}
-        css={backendErrorLink}
-      >
-        {translate('offlineBackendLearnMore')}
-      </Link>
-    </>
-  );
-
   return (
     <p data-uie-name="multi-user-not-added-details" data-uie-value={domainStr}>
       {renderFailedToAddDetailsTranslation({
@@ -387,7 +408,7 @@ function MessageDetails({failure, isMessageFocused, allUsers, translate}: Messag
         translate,
         users,
       })}
-      {learnMoreLink}
+      {createLearnMoreLink({link, messageFocusedTabIndex, translate})}
     </p>
   );
 }
@@ -423,22 +444,6 @@ function FailedToAddUsersMessage({
   });
   const {link} = reasonToMessageDataMap[failures[0].reason];
 
-  const learnMore = (
-    <>
-      {' '}
-      <Link
-        tabIndex={messageFocusedTabIndex}
-        targetBlank
-        variant={LinkVariant.PRIMARY}
-        href={link.url}
-        data-uie-name={link.name}
-        css={backendErrorLink}
-      >
-        {translate('offlineBackendLearnMore')}
-      </Link>
-    </>
-  );
-
   return (
     <>
       <div className="message-header">
@@ -455,7 +460,7 @@ function FailedToAddUsersMessage({
           {renderFailedToAddSingleUserSummary({
             failure: failures[0],
             firstUser,
-            learnMore,
+            learnMore: createLearnMoreLink({link, messageFocusedTabIndex, translate}),
             totalNumberOfUsers,
             translate,
           })}

@@ -98,6 +98,45 @@ describe('showMeetingPartialAddFailureModal', () => {
     );
   });
 
+  it('renders retry guidance when required encryption information could not be retrieved', () => {
+    const [qualifiedId] = generateQualifiedIds(1, 'participant.example');
+    const user = createUser(qualifiedId, 'Felix');
+
+    showMeetingPartialAddFailureModal({
+      failedToAdd: [
+        {
+          users: [qualifiedId],
+          reason: AddUsersFailureReasons.KEY_PACKAGE_CLAIM_FAILED,
+        },
+      ],
+      users: [user],
+      translate,
+    });
+
+    jest.runAllTimers();
+
+    const translatedMessage = showModalSpy.mock.calls[0][1].text?.translatedMessage;
+    expect(translatedMessage).toMatchObject({
+      kind: 'translation',
+      translationKey: 'failedToAddParticipantSingularKeyPackageClaimFailed',
+    });
+
+    const {container} = render(
+      createElement(MessageContent, {
+        message: null,
+        translatedMessage,
+        translate,
+      }),
+      {
+        wrapper: createRootProviderWrapperForTest(createRootContextValueForTest({translate})),
+      },
+    );
+
+    expect(container).toHaveTextContent(
+      'Felix could not be added because the required encryption information could not be retrieved. Please try again.',
+    );
+  });
+
   it('includes a React translation for every plural failure detail', () => {
     const qualifiedIds = generateQualifiedIds(8, 'backend.example');
     const users = [
