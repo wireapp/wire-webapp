@@ -53,6 +53,7 @@ import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 
 const qualifiedConversation = {id: 'conversation-id', domain: 'example.com'};
 const qualifiedMeetingId = {id: 'meeting-id', domain: 'example.com'};
+const meetingLink = 'https://wire.example/meeting';
 
 function createDeferred<T>(): PromiseWithResolvers<T> {
   return Promise.withResolvers<T>();
@@ -77,7 +78,7 @@ const createDeferredMeetNowMeeting = (): CreateDeferredMeetNowMeetingResult => {
       ),
     ),
     resolveMeetNowMeeting: (
-      value: CreateMeetingSuccess = {failedToAdd: [], qualifiedConversation, qualifiedMeetingId},
+      value: CreateMeetingSuccess = {failedToAdd: [], qualifiedConversation, qualifiedMeetingId, link: meetingLink},
     ) => {
       deferred.resolve(value);
     },
