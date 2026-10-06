@@ -48,6 +48,7 @@ import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ClientRepository, ClientService} from 'Repositories/client';
 import {getClientMLSConfig} from 'Repositories/client/clientMLSConfig';
+import {subscribeToMLSKeyPackageUpdates} from 'Repositories/client/subscribeToMLSKeyPackageUpdates';
 import {ConnectionRepository} from 'Repositories/connection/connectionRepository';
 import {ConnectionService} from 'Repositories/connection/connectionService';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
@@ -571,15 +572,38 @@ export class App {
         teamMembers = members;
       } else {
         const commonFeatures = (await this.core.service?.team.getCommonFeatureConfig()) ?? {};
-        teamFeatures = {mls: commonFeatures[FEATURE_KEY.MLS]};
+        teamFeatures = {
+          mls: commonFeatures[FEATURE_KEY.MLS],
+          mlsMigration: commonFeatures[FEATURE_KEY.MLS_MIGRATION],
+        };
       }
 
       try {
-        await this.core.initClient(localClient, getClientMLSConfig(teamFeatures));
+        await this.core.initClient(
+          localClient,
+          getClientMLSConfig(teamFeatures, clock, () => {
+            return teamFeatures;
+          }),
+        );
       } catch (error: unknown) {
         console.warn('Failed to initialize client', {error});
         this.showForceLogoutModal(SIGN_OUT_REASON.CLIENT_REMOVED);
       }
+
+      subscribeToMLSKeyPackageUpdates({
+        clock,
+        teamRepository,
+        fireAndForgetInvoker,
+        getFeatures: () => {
+          return teamFeatures;
+        },
+        setFeatures: features => {
+          teamFeatures = features;
+        },
+        refreshKeyPackages: async () => {
+          await this.core.service?.mls?.refreshKeyPackages(localClient.id);
+        },
+      });
 
       const e2eiHandler = await configureE2EI(teamFeatures, clock);
       configureDownloadPath(teamFeatures, this.translate);

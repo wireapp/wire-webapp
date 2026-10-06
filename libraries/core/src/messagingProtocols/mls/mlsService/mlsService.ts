@@ -100,6 +100,8 @@ interface MLSConfig {
    * number of key packages client should upload to the server (100 by default)
    */
   nbKeyPackages: number;
+  /** Resolve the current upload allowance, including time-dependent consumer policy. */
+  getNbKeyPackages?: () => number;
 }
 export type InitClientOptions = Optional<MLSConfig, 'keyingMaterialUpdateThreshold' | 'nbKeyPackages'> & {
   skipInitIdentity?: boolean;
@@ -143,6 +145,7 @@ export class MLSService extends TypedEventEmitter<Events> {
   private _config?: MLSConfig;
   private readonly textEncoder = new TextEncoder();
   private readonly textDecoder = new TextDecoder();
+  private initialKeyPackageUploadDeferred = false;
 
   constructor(
     private readonly apiClient: APIClient,
@@ -189,8 +192,20 @@ export class MLSService extends TypedEventEmitter<Events> {
     return this._config;
   }
 
+  private get keyPackageUploadAmount() {
+    return this.config.getNbKeyPackages?.() ?? this.config.nbKeyPackages;
+  }
+
   private get minRequiredKeyPackages() {
-    return Math.floor(this.config.nbKeyPackages / keyPackageReplenishmentDivisor);
+    return Math.floor(this.keyPackageUploadAmount / keyPackageReplenishmentDivisor);
+  }
+
+  /** Recheck after a consumer policy change, without reinitializing the MLS client. */
+  public async refreshKeyPackages(clientId: string) {
+    if (!this.isEnabled || this.initialKeyPackageUploadDeferred) {
+      return;
+    }
+    await this.verifyRemoteMLSKeyPackagesAmount(clientId, true);
   }
 
   /**
@@ -211,6 +226,7 @@ export class MLSService extends TypedEventEmitter<Events> {
       }),
     ) as typeof mlsConfig;
 
+    this.initialKeyPackageUploadDeferred = skipInitIdentity === true;
     this._config = {
       ...defaultConfig,
       ...filteredMLSConfig,
@@ -218,8 +234,11 @@ export class MLSService extends TypedEventEmitter<Events> {
 
     await this.coreCryptoClient.transaction(cx => {
       const clientId = new CoreCryptoClientId(generateMLSDeviceId(userId, client.id));
-      return cx.mlsInit(clientId, this.config.ciphersuites, this.config.nbKeyPackages);
+      return cx.mlsInit(clientId, this.config.ciphersuites, this.keyPackageUploadAmount);
     });
+
+    this.initialKeyPackageUploadDeferred =
+      skipInitIdentity === true && !(await this.coreCryptoClient.e2eiIsEnabled(this.config.defaultCiphersuite));
 
     try {
       const ccClientSignature = await this.getCCClientSignatureString();
@@ -227,8 +246,8 @@ export class MLSService extends TypedEventEmitter<Events> {
 
       switch (mlsDeviceStatus) {
         case MLSDeviceStatus.REGISTERED:
-          if (skipInitIdentity !== true) {
-            await this.verifyRemoteMLSKeyPackagesAmount(client.id);
+          if (!this.initialKeyPackageUploadDeferred) {
+            await this.verifyRemoteMLSKeyPackagesAmount(client.id, true);
           } else {
             this.logger.info(`Blocked initial key package upload for client ${client.id} as E2EI is enabled`);
           }
@@ -238,10 +257,10 @@ export class MLSService extends TypedEventEmitter<Events> {
           this.emit(MLSServiceEvents.MLS_CLIENT_MISMATCH);
           break;
         case MLSDeviceStatus.FRESH:
-          if (skipInitIdentity !== true) {
+          if (!this.initialKeyPackageUploadDeferred) {
             await this.uploadMLSPublicKeys(client);
             // Initial registration needs packages immediately, without triggering exhaustion recovery.
-            const keyPackages = await this.clientKeypackages(this.config.nbKeyPackages);
+            const keyPackages = await this.clientKeypackages(this.keyPackageUploadAmount);
             await this.uploadMLSKeyPackages(client.id, keyPackages);
           } else {
             this.logger.info(`Blocked initial key package upload for client ${client.id} as E2EI is enabled`);
@@ -989,19 +1008,25 @@ export class MLSService extends TypedEventEmitter<Events> {
     }
   }
 
-  private async verifyRemoteMLSKeyPackagesAmount(clientId: string) {
+  private async verifyRemoteMLSKeyPackagesAmount(clientId: string, requireFullIncreasedAllowance = false) {
+    const uploadAmount = this.keyPackageUploadAmount;
+    const increasedAllowance = uploadAmount > this.config.nbKeyPackages;
+    const threshold =
+      requireFullIncreasedAllowance && increasedAllowance
+        ? uploadAmount
+        : Math.floor(uploadAmount / keyPackageReplenishmentDivisor);
     const backendKeyPackagesCount = await this.getRemoteMLSKeyPackageCount(clientId);
     let isConversationRecoveryRequired = await this.isMLSConversationRecoveryRequired();
 
     // If we have enough keys uploaded on backend, there's no need to upload more.
-    if (backendKeyPackagesCount > this.minRequiredKeyPackages) {
+    if (increasedAllowance ? backendKeyPackagesCount >= threshold : backendKeyPackagesCount > threshold) {
       if (isConversationRecoveryRequired) {
         this.emit(MLSServiceEvents.MLS_CONVERSATION_RECOVERY_REQUIRED);
       }
       return;
     }
 
-    const keyPackages = await this.clientKeypackages(this.config.nbKeyPackages);
+    const keyPackages = await this.clientKeypackages(uploadAmount);
     await this.uploadMLSKeyPackages(clientId, keyPackages);
 
     // Mark recovery only after a successful upload, so the marker never outlives a failed refill attempt.
@@ -1326,7 +1351,7 @@ export class MLSService extends TypedEventEmitter<Events> {
       this.coreCryptoClient,
       this.apiClient,
       certificateTtl,
-      nbPrekeys,
+      this.config.getNbKeyPackages?.() ?? nbPrekeys,
       {user, clientId: client.id, discoveryUrl},
     );
 
@@ -1345,6 +1370,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     }
     // replace old key packages with new key packages with x509 certificate
     await this.replaceKeyPackages(client.id, keyPackages);
+    this.initialKeyPackageUploadDeferred = false;
     // Verify that we have enough key packages
     await this.verifyRemoteMLSKeyPackagesAmount(client.id);
   }

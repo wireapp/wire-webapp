@@ -17,20 +17,32 @@
  *
  */
 
+import type {Clock} from '@enormora/clock/clock';
 import {isUndefined} from '@sindresorhus/is';
 import {FeatureList} from '@wireapp/api-client/lib/team';
+
+import {getMLSKeyPackageUploadAmount} from './mlsKeyPackagePolicy';
 
 import {Config} from '../../Config';
 import {getE2EIConfig} from '../../page/components/featureConfigChange/featureConfigChangeHandler/features/e2eIdentity';
 import {getMLSConfig} from '../../page/components/featureConfigChange/featureConfigChangeHandler/features/mls';
 
-export function getClientMLSConfig(teamFeatures: FeatureList) {
+export function getClientMLSConfig(
+  teamFeatures: FeatureList,
+  clock: Clock,
+  getFeatures = () => {
+    return teamFeatures;
+  },
+) {
   const keyingMaterialUpdateThreshold = Config.getConfig().FEATURE.MLS_CONFIG_KEYING_MATERIAL_UPDATE_THRESHOLD;
   const mlsConfig = getMLSConfig(teamFeatures);
   const willEnrollE2ei = !isUndefined(getE2EIConfig(teamFeatures));
   return !isUndefined(mlsConfig)
     ? {
         keyingMaterialUpdateThreshold,
+        getNbKeyPackages: () => {
+          return getMLSKeyPackageUploadAmount(getFeatures(), clock);
+        },
         defaultCiphersuite: mlsConfig.config.defaultCipherSuite,
         ciphersuites: mlsConfig.config.allowedCipherSuites,
         skipInitIdentity: willEnrollE2ei,

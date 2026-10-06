@@ -67,6 +67,7 @@ try {
 }
 
 const store = configureStore({
+  clock,
   actions: actionRoot,
   apiClient,
   core,
