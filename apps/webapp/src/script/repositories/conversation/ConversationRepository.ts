@@ -182,8 +182,8 @@ import {Config} from '../../Config';
 import {BASE_ERROR_TYPE, BaseError} from '../../error/baseError';
 import {ConversationError} from '../../error/conversationError';
 import {isMemberMessage} from '../../guards/Message';
-import * as LegalHoldEvaluator from '../../legal-hold/LegalHoldEvaluator';
 import type {MappedEvent} from '../../legal-hold/LegalHoldEvaluator';
+import * as LegalHoldEvaluator from '../../legal-hold/LegalHoldEvaluator';
 import {MessageCategory} from '../../message/messageCategory';
 import {SystemMessageType} from '../../message/systemMessageType';
 import {ensureMLSGroupIsEstablished, initMLSGroupConversation} from '../../mls';
@@ -1467,17 +1467,6 @@ export class ConversationRepository {
           conversationEntity,
           ConversationMapper.getUpdatablePropertiesFromBackend(conversationData),
         );
-      },
-    );
-  }
-
-  requestMeetingConversationCode(conversationId: QualifiedId, password?: string): Task<void, unknown> {
-    return task.tryOrElse(
-      error => {
-        return error;
-      },
-      async () => {
-        await this.conversationService.postConversationCode(conversationId.id, password);
       },
     );
   }

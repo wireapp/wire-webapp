@@ -509,7 +509,7 @@ describe('MeetingStoreRoot', () => {
     expect(getMeetingsList).not.toHaveBeenCalled();
   });
 
-  it('does not load meeting data when the negotiated API version is below 17', async () => {
+  it('does not load meeting data when the negotiated API version is below 19', async () => {
     const {getMeetingsList} = renderMeetingStoreRoot({
       apiVersion: Config.getConfig().MIN_MEETINGS_SUPPORTED_API_VERSION - 1,
     });

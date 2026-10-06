@@ -18,7 +18,8 @@
  */
 
 import type {Clock} from '@enormora/clock/clock';
-import type {CreateMeeting} from '@wireapp/api-client/lib/meetings/createMeeting';
+import {isNonEmptyString} from '@sindresorhus/is';
+import {type CreateMeeting, MeetingType} from '@wireapp/api-client/lib/meetings/createMeeting';
 
 import type {DeviceTimeZone} from 'Components/meeting/deviceTimeZone';
 import {getMeetNowMeetingTimes} from 'Components/meeting/shared/defaults/meetingDateTimeDefaults';
@@ -35,6 +36,8 @@ export const mapMeetNowCommandToCreateMeeting = (
     title: command.title,
     start_time: start.toISOString(),
     end_time: end.toISOString(),
+    type: MeetingType.IMMEDIATE,
     tzid: deviceTimeZone.ianaTimeZoneId,
+    ...(isNonEmptyString(command.password?.trim()) && {password: command.password}),
   };
 };

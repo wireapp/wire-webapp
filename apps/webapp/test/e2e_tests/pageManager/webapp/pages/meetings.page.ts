@@ -362,20 +362,20 @@ export class MeetingsPage {
     await this.scheduleMeetingModal.getByTestId('guest-link-password-confirm').fill(password);
   }
 
-  conversationCodeRequest() {
+  meetingCreateRequest() {
     return this.page.waitForRequest(request => {
       const url = new URL(request.url());
-      return request.method() === 'POST' && /\/conversations\/[^/]+\/code$/.test(url.pathname);
+      return request.method() === 'POST' && /\/meetings$/.test(url.pathname);
     });
   }
 
-  async assertConversationCodeRequest(requestPromise: ReturnType<Page['waitForRequest']>, password: string) {
+  async assertMeetingCreateRequest(requestPromise: ReturnType<Page['waitForRequest']>, password: string) {
     const request = await requestPromise;
     expect(request.method()).toBe('POST');
-    expect(new URL(request.url()).pathname).toMatch(/\/conversations\/[^/]+\/code$/);
+    expect(new URL(request.url()).pathname).toMatch(/\/meetings$/);
     const postData = request.postDataBuffer();
     const body = postData === null ? {} : parseRequestBody(postData);
-    expect(body).toEqual({password});
+    expect(body).toEqual(expect.objectContaining({password, type: 'scheduled'}));
   }
 
   async openEditMeetingModal(title: string, occurrenceIndex = 0) {
