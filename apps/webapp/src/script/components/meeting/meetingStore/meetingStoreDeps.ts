@@ -18,8 +18,6 @@
  */
 
 import type {Clock} from '@enormora/clock/clock';
-import type {MeetingWithConversation} from '@wireapp/api-client/lib/meetings/meeting';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import type {Task} from 'true-myth';
 
 import type {DeviceTimeZone} from 'Components/meeting/deviceTimeZone';
@@ -45,7 +43,6 @@ export type MeetingStoreServiceTasks = {
   updateMeeting: (command: UpdateMeetingCommand) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
   deleteMeetingForMe: (command: DeleteMeetingCommand) => Task<void, MeetingSubmitErrors>;
   deleteMeetingForAll: (command: DeleteMeetingCommand) => Task<void, MeetingSubmitErrors>;
-  rotateMeetingLink?: (meetingId: QualifiedId) => Task<MeetingWithConversation, MeetingSubmitErrors>;
 };
 
 export type MeetingServiceDeps = {
