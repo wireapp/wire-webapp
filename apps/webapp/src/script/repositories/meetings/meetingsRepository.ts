@@ -76,17 +76,6 @@ export class MeetingsRepository {
     );
   }
 
-  rotateMeetingLink(meetingId: QualifiedId): Task<MeetingWithConversation, unknown> {
-    return task.tryOrElse(
-      error => {
-        return error;
-      },
-      () => {
-        return this.dataSource.rotateMeetingLink(meetingId);
-      },
-    );
-  }
-
   updateMeeting(meetingId: QualifiedId, payload: UpdateMeeting): Task<MeetingWithConversation, unknown> {
     return task.tryOrElse(
       error => {

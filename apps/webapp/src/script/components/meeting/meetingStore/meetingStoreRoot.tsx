@@ -32,7 +32,6 @@ import {
 import {useMeetingPrepModal} from 'Components/meeting/meetingPrep/useMeetingPrepModal';
 import {createMeetingStore} from 'Components/meeting/meetingStore/createMeetingStore';
 import {MeetingStoreProvider} from 'Components/meeting/meetingStore/meetingStoreProvider';
-import {meetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
 import {resolveCurrentMeetingReminderPayload} from 'Components/meeting/resolveCurrentMeetingReminderPayload';
 import {deleteMeetingForAll, deleteMeetingForMe} from 'Components/meeting/shared/service/deleteMeeting';
 import {meetNowMeeting, scheduleMeeting, updateMeeting} from 'Components/meeting/shared/service/meetingService';
@@ -95,11 +94,6 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
         },
         deleteMeetingForAll: command => {
           return deleteMeetingForAll(command, meetingServiceDeps);
-        },
-        rotateMeetingLink: meetingId => {
-          return meetingsRepository.rotateMeetingLink(meetingId).mapRejected(() => {
-            return meetingSubmitErrors.refreshFailed;
-          });
         },
       },
     });
