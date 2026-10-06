@@ -118,6 +118,7 @@ export enum AddUsersFailureReasons {
   UNREACHABLE_BACKENDS = 'UNREACHABLE_BACKENDS',
   OFFLINE_FOR_TOO_LONG = 'OFFLINE_FOR_TOO_LONG',
   NOT_MLS_CAPABLE = 'NOT_MLS_CAPABLE',
+  KEY_PACKAGE_CLAIM_FAILED = 'KEY_PACKAGE_CLAIM_FAILED',
 }
 
 /**
@@ -144,6 +145,10 @@ export type AddUsersFailure =
     }
   | {
       reason: AddUsersFailureReasons.NOT_MLS_CAPABLE;
+      users: QualifiedId[];
+    }
+  | {
+      reason: AddUsersFailureReasons.KEY_PACKAGE_CLAIM_FAILED;
       users: QualifiedId[];
     };
 

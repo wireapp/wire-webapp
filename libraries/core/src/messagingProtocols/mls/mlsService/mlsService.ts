@@ -17,6 +17,7 @@
  *
  */
 
+import {isNonEmptyArray} from '@sindresorhus/is';
 import type {ClaimedKeyPackages, MLSPublicKeyRecord, RegisteredClient} from '@wireapp/api-client/lib/client';
 import {
   MLSGroupOutOfSyncError,
@@ -427,7 +428,7 @@ export class MLSService extends TypedEventEmitter<Events> {
      * we want to add to the new MLS conversations,
      * includes self user too.
      */
-    const failedToFetchKeyPackages: QualifiedId[] = [];
+    const failedKeyPackageClaims: QualifiedId[] = [];
     const emptyKeyPackagesUsers: QualifiedId[] = [];
 
     const keyPackagesSettledResult = await Promise.allSettled(
@@ -451,19 +452,14 @@ export class MLSService extends TypedEventEmitter<Events> {
 
           return keys;
         } catch (error: unknown) {
-          failedToFetchKeyPackages.push({id, domain});
+          failedKeyPackageClaims.push({id, domain});
           // Throw the error so we don't get {status: 'fulfilled', value: undefined}
           throw error;
         }
       }),
     );
 
-    /**
-     * @note We are filtering failed requests for key packages
-     * this is required because on federation environments it is possible
-     * that due to a backend being offline we would not be able to fetch
-     * a specific user's key packages.
-     */
+    // Process successful claims even when another user's claim fails.
     const keyPackages = keyPackagesSettledResult
       .filter((result): result is PromiseFulfilledResult<ClaimedKeyPackages> => {
         return result.status === 'fulfilled';
@@ -495,13 +491,10 @@ export class MLSService extends TypedEventEmitter<Events> {
       failures.push({reason: AddUsersFailureReasons.NOT_MLS_CAPABLE, users: emptyKeyPackagesUsers});
     }
 
-    if (failedToFetchKeyPackages.length > 0) {
+    if (isNonEmptyArray(failedKeyPackageClaims)) {
       failures.push({
-        reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS,
-        users: failedToFetchKeyPackages,
-        backends: failedToFetchKeyPackages.map(({domain}) => {
-          return domain;
-        }),
+        reason: AddUsersFailureReasons.KEY_PACKAGE_CLAIM_FAILED,
+        users: failedKeyPackageClaims,
       });
     }
 
