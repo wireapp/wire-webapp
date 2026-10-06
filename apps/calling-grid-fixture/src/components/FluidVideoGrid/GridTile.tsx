@@ -24,7 +24,6 @@ export function GridTile({participant, isActiveSpeaker, variant = 'default'}: Gr
   const avatarSize = isPip ? 48 : 84;
   const avatarFontSize = isPip ? 16 : 28;
   const ringInset = isPip ? '2px' : '3px';
-  const ringOutset = isPip ? '4px' : '6px';
   const badgeSize = isPip ? 18 : 22;
   const badgeIconSize = isPip ? 11 : 14;
   const pillFontSize = isPip ? 10 : 11;
@@ -88,9 +87,7 @@ export function GridTile({participant, isActiveSpeaker, variant = 'default'}: Gr
           inset: 0,
           borderRadius,
           pointerEvents: 'none',
-          boxShadow: isActiveSpeaker
-            ? `inset 0 0 0 ${ringInset} ${RING_BLUE}, inset 0 0 0 ${ringOutset} #fff`
-            : 'none',
+          boxShadow: isActiveSpeaker ? `inset 0 0 0 ${ringInset} ${RING_BLUE}` : 'none',
           transition: 'box-shadow 0.3s ease',
         }}
       />

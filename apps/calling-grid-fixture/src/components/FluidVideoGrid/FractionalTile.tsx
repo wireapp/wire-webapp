@@ -71,9 +71,7 @@ export function FractionalTile({participant}: FractionalTileProps) {
           inset: 0,
           borderRadius: 4,
           pointerEvents: 'none',
-          boxShadow: isActiveSpeaker
-            ? `inset 0 0 0 2px ${RING_BLUE}, inset 0 0 0 4px #fff`
-            : 'none',
+          boxShadow: isActiveSpeaker ? `inset 0 0 0 2px ${RING_BLUE}` : 'none',
           transition: 'box-shadow 0.3s ease',
         }}
       />

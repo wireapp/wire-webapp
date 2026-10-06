@@ -27,7 +27,8 @@ function tierRank(tier: GridParticipant['tier']): number {
 // ── Stable slot assignment ────────────────────────────────────────────────────
 
 /**
- * Orders every participant except self.
+ * Orders every participant, self included — self carries no seating privilege and
+ * competes on the same tier/recency/stickiness rules as everyone else.
  *
  * Two rules, in order of precedence:
  *  1. Participants that already held a slot keep their *relative* order. Changing
@@ -36,12 +37,15 @@ function tierRank(tier: GridParticipant['tier']): number {
  *  2. Newcomers are inserted at the position their tier earns them, ahead of any
  *     lower-priority participant. Within a tier, the most recently activated goes first.
  */
-function orderOthers(others: GridParticipant[], prevSlotMap: Record<string, number>): GridParticipant[] {
-  const seated = others
+function orderParticipants(
+  participants: GridParticipant[],
+  prevSlotMap: Record<string, number>,
+): GridParticipant[] {
+  const seated = participants
     .filter(p => prevSlotMap[p.id] !== undefined)
     .sort((a, b) => prevSlotMap[a.id] - prevSlotMap[b.id]);
 
-  const newcomers = others
+  const newcomers = participants
     .filter(p => prevSlotMap[p.id] === undefined)
     .sort((a, b) => {
       const byTier = tierRank(a.tier) - tierRank(b.tier);
@@ -61,26 +65,12 @@ function orderOthers(others: GridParticipant[], prevSlotMap: Record<string, numb
   return ordered;
 }
 
-/**
- * Assigns a stable slot index to every participant.
- *
- * Self is always the leader of whichever bucket it belongs to: the first full tile
- * while active, or the first fraction while silent-camera-off. This is a fixed
- * position, not a competitive rank, so it never contends with — or gets displaced
- * by — anyone else's tier or recency inside that bucket.
- */
+/** Assigns a stable slot index to every participant, by tier priority and seating stickiness. */
 function updateSlotMap(
   participants: GridParticipant[],
   prevSlotMap: Record<string, number>,
 ): Record<string, number> {
-  const self = participants.find(p => p.isSelf);
-  const others = participants.filter(p => !p.isSelf);
-  const ordered = orderOthers(others, prevSlotMap);
-
-  if (self) {
-    const insertAt = isActiveTier(self.tier) ? 0 : ordered.findIndex(p => !isActiveTier(p.tier));
-    ordered.splice(insertAt === -1 ? ordered.length : insertAt, 0, self);
-  }
+  const ordered = orderParticipants(participants, prevSlotMap);
 
   const slotMap: Record<string, number> = {};
   ordered.forEach((p, index) => {
@@ -259,13 +249,6 @@ function assignFullTiles(
   const occupants: (GridParticipant | null)[] = new Array(full).fill(null);
   const assigned = new Set<string>();
 
-  // Self always takes the first full seat outright whenever active.
-  const self = sorted.find(p => p.isSelf);
-  if (self && full > 0 && isActiveTier(self.tier)) {
-    occupants[0] = self;
-    assigned.add(self.id);
-  }
-
   // Incumbents keep their exact seat as long as they're still active.
   for (const p of sorted) {
     if (assigned.has(p.id) || !isActiveTier(p.tier)) {
@@ -427,6 +410,38 @@ function computeOneOnOneLayout(
   };
 }
 
+/**
+ * The spotlight is a single prime seat, so — unlike full tiles, where stickiness prevents the
+ * whole grid from jittering as people come and go — it always tracks whoever is currently the
+ * single most-relevant participant, with no incumbency protection. Self competes on exactly
+ * the same terms as anyone else; there is no seating privilege for being the local user.
+ *
+ * Priority drops through three tiers, each one only considered when the tier(s) above it are
+ * completely empty:
+ *  1. Screen-sharing. With several simultaneous screen-shares, this is what gives the "stack"
+ *     behavior — whoever started sharing most recently holds the spotlight, and when they stop,
+ *     it falls back to whoever among the remaining sharers started next-most-recently (just a
+ *     side effect of always recomputing "most recent" fresh from whoever is left).
+ *  2. Speaking (camera on or off) — only matters once nobody is screen-sharing.
+ *  3. Camera on, silent — the fallback once nobody is sharing or speaking.
+ *
+ * Within whichever tier is in play, `activatedAt` (already debounce/hold-adjusted upstream,
+ * wherever tiers are assigned) picks the most recent one — the same recency signal that ranks
+ * everyone for full-tile assignment, just without the sticky-incumbent exception that makes
+ * sense for a grid of many tiles but not for a single always-tracks-the-latest spotlight.
+ */
+function selectSpotlight(participants: GridParticipant[]): GridParticipant | null {
+  if (participants.length === 0) {
+    return null;
+  }
+  const screenSharers = participants.filter(p => p.tier === 'screen-sharing');
+  const speakers = participants.filter(p => p.tier === 'speaking-camera' || p.tier === 'speaking-no-camera');
+  const camerasOn = participants.filter(p => p.tier === 'silent-camera');
+  const pool = screenSharers.length > 0 ? screenSharers : speakers.length > 0 ? speakers : camerasOn.length > 0 ? camerasOn : participants;
+
+  return pool.reduce((latest, p) => ((p.activatedAt ?? 0) > (latest.activatedAt ?? 0) ? p : latest));
+}
+
 function computePresenterLayout(
   sorted: GridParticipant[],
   inv: Invariants,
@@ -439,7 +454,7 @@ function computePresenterLayout(
   const minStripTileHeight = stripTileWidth / maxAspectRatio;
   const maxStripTileHeight = stripTileWidth / minAspectRatio;
 
-  const spotlightParticipant = sorted.find(p => !p.isSelf) ?? sorted[0] ?? null;
+  const spotlightParticipant = selectSpotlight(sorted);
   const stripParticipants = sorted.filter(p => p !== spotlightParticipant);
 
   const maxStripTiles = Math.max(1, Math.floor((inv.usableHeight + gap) / (minStripTileHeight + gap)));
@@ -703,6 +718,7 @@ export function createInitialState(containerSize: {width: number; height: number
     slotMap: {},
     assignmentMap: {},
     isPresenterModeActive: false,
+    presenterModeBeforeScreenShare: null,
     areAllParticipantsShown: false,
     layout: emptyGridLayout(null),
   };
@@ -714,15 +730,30 @@ function hasScreenShare(participants: GridParticipant[]): boolean {
 
 /**
  * Recomputes slots, seating and layout after the participant list changes.
- * Presenter mode auto-activates the first time a screen share appears.
+ *
+ * Presenter mode auto-activates the moment a screen share first appears (from zero sharers to
+ * one or more), snapshotting whatever the user had it set to beforehand. It stays
+ * user-toggleable for the rest of that screen-share session — manually switching it on/off
+ * while sharing is in progress works normally and isn't overridden here. Only once the very
+ * last screen share ends does it revert to the snapshotted pre-share setting, discarding
+ * whatever it was manually changed to in between (that's the "remembered setting", not a
+ * clean slate).
  */
-function reproject(
-  state: GridState,
-  participants: GridParticipant[],
-  config: GridConfig,
-  screenShareAppeared: boolean,
-): GridState {
-  const isPresenterModeActive = screenShareAppeared ? true : state.isPresenterModeActive;
+function reproject(state: GridState, participants: GridParticipant[], config: GridConfig): GridState {
+  const hadScreenShare = hasScreenShare(state.participants);
+  const hasScreenShareNow = hasScreenShare(participants);
+
+  let isPresenterModeActive = state.isPresenterModeActive;
+  let presenterModeBeforeScreenShare = state.presenterModeBeforeScreenShare;
+
+  if (!hadScreenShare && hasScreenShareNow) {
+    presenterModeBeforeScreenShare = state.isPresenterModeActive;
+    isPresenterModeActive = true;
+  } else if (hadScreenShare && !hasScreenShareNow) {
+    isPresenterModeActive = presenterModeBeforeScreenShare ?? false;
+    presenterModeBeforeScreenShare = null;
+  }
+
   const slotMap = updateSlotMap(participants, state.slotMap);
   const {layout, assignmentMap} = computeLayout(
     participants,
@@ -732,7 +763,15 @@ function reproject(
     isPresenterModeActive,
     state.assignmentMap,
   );
-  return {...state, participants, slotMap, assignmentMap, isPresenterModeActive, layout};
+  return {
+    ...state,
+    participants,
+    slotMap,
+    assignmentMap,
+    isPresenterModeActive,
+    presenterModeBeforeScreenShare,
+    layout,
+  };
 }
 
 /**
@@ -752,8 +791,7 @@ export function createGridReducer(config: GridConfig) {
           participant = {...participant, activatedAt: action.now ?? Date.now()};
         }
         const participants = [...state.participants, participant];
-        const appeared = !hasScreenShare(state.participants) && hasScreenShare(participants);
-        return reproject(state, participants, config, appeared);
+        return reproject(state, participants, config);
       }
 
       case 'REMOVE_PARTICIPANT': {
@@ -761,7 +799,7 @@ export function createGridReducer(config: GridConfig) {
         if (participants.length === state.participants.length) {
           return state;
         }
-        return reproject(state, participants, config, false);
+        return reproject(state, participants, config);
       }
 
       case 'UPDATE_PARTICIPANT': {
@@ -777,8 +815,7 @@ export function createGridReducer(config: GridConfig) {
         }
         const participants = [...state.participants];
         participants[index] = updated;
-        const appeared = !hasScreenShare(state.participants) && hasScreenShare(participants);
-        return reproject(state, participants, config, appeared);
+        return reproject(state, participants, config);
       }
 
       case 'SET_CONTAINER_SIZE': {

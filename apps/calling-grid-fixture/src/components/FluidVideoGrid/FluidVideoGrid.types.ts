@@ -159,6 +159,14 @@ export interface GridState {
   assignmentMap: AssignmentMap;
   /** True when the grid is showing a spotlight + strip instead of the tiled grid. */
   isPresenterModeActive: boolean;
+  /**
+   * Snapshot of `isPresenterModeActive` taken the moment screen sharing first appeared (from
+   * zero sharers to one or more), restored once the last screen share ends. `null` whenever
+   * nobody is currently screen-sharing, i.e. there is nothing to restore. This is what lets a
+   * manually-chosen presenter mode setting survive a screen-share session unaffected, even
+   * though the user is free to toggle presenter mode manually while sharing is in progress.
+   */
+  presenterModeBeforeScreenShare: boolean | null;
   /** True when the full participants list is on screen. */
   areAllParticipantsShown: boolean;
   layout: GridLayout;

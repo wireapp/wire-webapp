@@ -421,36 +421,38 @@ describe('tier priority', () => {
     expect(state.slotMap['a1']).toBeLessThan(state.slotMap['me']);
   });
 
-  it('an active self floats to the front of the active bucket, ahead of higher-tier peers', () => {
+  it('an active self ranks by tier like anyone else — it does not jump ahead of higher-tier peers', () => {
     const state = addAll(createInitialState(container1280x720), [
       makeParticipant('s1', 'screen-sharing'),
       makeSelf('me', 'speaking-camera'),
     ]);
-    expect(state.slotMap['me']).toBeLessThan(state.slotMap['s1']);
-    expect(state.slotMap['me']).toBe(0);
+    expect(state.slotMap['s1']).toBeLessThan(state.slotMap['me']);
   });
 
-  it('a passive self floats to the front of the passive bucket, ahead of earlier arrivals', () => {
+  it('a passive self is appended after existing peers in the same tier, like any newcomer', () => {
     let state = reducer(createInitialState(container1280x720), {
       type: 'ADD_PARTICIPANT',
       participant: makeParticipant('p1', 'silent-no-camera'),
       now: 100,
     });
     state = reducer(state, {type: 'ADD_PARTICIPANT', participant: makeSelf('me', 'silent-no-camera'), now: 200});
-    expect(state.slotMap['me']).toBeLessThan(state.slotMap['p1']);
+    expect(state.slotMap['p1']).toBeLessThan(state.slotMap['me']);
   });
 
-  it('self keeps leading its bucket as other participants come and go', () => {
+  it('self follows the same ordering rules as everyone else as participants come and go', () => {
     let state = addAll(createInitialState(container1280x720), [
       makeSelf('me', 'speaking-camera'),
-      makeParticipant('a1', 'screen-sharing'),
+      makeParticipant('a1', 'silent-no-camera'),
     ]);
-    expect(state.slotMap['me']).toBe(0);
+    expect(state.slotMap['me']).toBe(0); // the only active participant so far, naturally first
 
-    state = reducer(state, {type: 'ADD_PARTICIPANT', participant: makeParticipant('a2', 'screen-sharing'), now: 999});
-    expect(state.slotMap['me']).toBe(0);
+    // A higher-tier newcomer is free to rank ahead of self, same as it would for anyone else.
+    state = reducer(state, {type: 'ADD_PARTICIPANT', participant: makeParticipant('s1', 'screen-sharing'), now: 999});
+    expect(state.slotMap['s1']).toBeLessThan(state.slotMap['me']);
 
-    state = reducer(state, {type: 'REMOVE_PARTICIPANT', id: 'a1'});
+    // Removing that participant isn't self-specific either — self just moves back up because
+    // the list is shorter, exactly as it would for any other participant.
+    state = reducer(state, {type: 'REMOVE_PARTICIPANT', id: 's1'});
     expect(state.slotMap['me']).toBe(0);
   });
 
@@ -516,7 +518,7 @@ describe('tier priority', () => {
 // sticky — anyone not holding a full tile is simply re-sorted into it by priority.
 
 describe('full-tile seat stickiness', () => {
-  it('self is the first full tile whenever active', () => {
+  it('self competes for full tiles by the same priority order as everyone else', () => {
     const state = exitPresenter(
       addAll(createInitialState(container1280x720), [
         makeParticipant('s1', 'screen-sharing'),
@@ -524,7 +526,8 @@ describe('full-tile seat stickiness', () => {
         makeParticipant('filler', 'silent-no-camera'),
       ]),
     );
-    expect(fullTileIds(state)[0]).toBe('me');
+    expect(fullTileIds(state)[0]).toBe('s1');
+    expect(fullTileIds(state)).toContain('me');
   });
 
   it('upgrading a participant does not displace the existing full-tile holder', () => {
@@ -1211,7 +1214,7 @@ describe('presenter mode', () => {
     expect(state.layout.mode).toBe('grid');
   });
 
-  it('spotlights the highest-priority participant who is not you', () => {
+  it('spotlights the highest-priority tier — screen-sharing beats speaking beats everything else', () => {
     const state = addAll(createInitialState(container1280x720), [
       makeSelf('me'),
       makeParticipant('s1', 'screen-sharing'),
@@ -1220,6 +1223,48 @@ describe('presenter mode', () => {
     const spotlight = presenter(state).spotlight;
     expect(spotlight?.type).toBe('full');
     expect(spotlight && spotlight.type === 'full' && spotlight.participant.id).toBe('s1');
+  });
+
+  it('self takes the spotlight when self genuinely is the highest-priority participant — no seating privilege either way', () => {
+    const state = addAll(createInitialState(container1280x720), [
+      makeParticipant('a1', 'speaking-camera'),
+      makeSelf('me', 'screen-sharing'),
+    ]);
+    const spotlight = presenter(state).spotlight;
+    expect(spotlight && spotlight.type === 'full' && spotlight.participant.id).toBe('me');
+  });
+
+  it('with multiple screen-sharers, the most recently started one gets the spotlight ("stack" behavior)', () => {
+    let state = addAll(createInitialState(container1280x720), [makeParticipant('s1', 'screen-sharing')], 100);
+    state = reducer(state, {type: 'ADD_PARTICIPANT', participant: makeParticipant('s2', 'screen-sharing'), now: 200});
+    let spotlight = presenter(state).spotlight;
+    expect(spotlight && spotlight.type === 'full' && spotlight.participant.id).toBe('s2');
+
+    // s2 stops sharing — falls back to s1, the only screen-sharer left, not just the next
+    // participant in priority order.
+    state = reducer(state, {type: 'UPDATE_PARTICIPANT', id: 's2', changes: {tier: 'silent-no-camera'}, now: 300});
+    spotlight = presenter(state).spotlight;
+    expect(spotlight && spotlight.type === 'full' && spotlight.participant.id).toBe('s1');
+  });
+
+  it('falls back to the most recently active speaker once nobody is screen-sharing', () => {
+    let state = addAll(createInitialState(container1280x720), [makeParticipant('a1', 'speaking-camera')], 100);
+    state = reducer(state, {type: 'TOGGLE_PRESENTER_MODE'}); // no screen share yet — needs a manual enable
+    state = reducer(state, {
+      type: 'ADD_PARTICIPANT',
+      participant: makeParticipant('a2', 'speaking-no-camera'),
+      now: 200,
+    });
+    const spotlight = presenter(state).spotlight;
+    expect(spotlight && spotlight.type === 'full' && spotlight.participant.id).toBe('a2');
+  });
+
+  it('falls back to the most recently active camera-on participant once nobody is sharing or speaking', () => {
+    let state = addAll(createInitialState(container1280x720), [makeParticipant('c1', 'silent-camera')], 100);
+    state = reducer(state, {type: 'TOGGLE_PRESENTER_MODE'});
+    state = reducer(state, {type: 'ADD_PARTICIPANT', participant: makeParticipant('c2', 'silent-camera'), now: 200});
+    const spotlight = presenter(state).spotlight;
+    expect(spotlight && spotlight.type === 'full' && spotlight.participant.id).toBe('c2');
   });
 
   it('puts everyone except the spotlight into the strip', () => {
@@ -1251,6 +1296,74 @@ describe('presenter mode', () => {
     ]);
     const strip = presenter(state).strip;
     expect(strip[strip.length - 1].type).toBe('overflow');
+  });
+
+  // ── Remembers the pre-screen-share setting ────────────────────────────────────
+  //
+  // Auto-activation on screen share is a temporary override, not a new user preference: once
+  // the last screen share ends, presenter mode must return to whatever it was set to before
+  // anyone started sharing — discarding any manual toggles made during the session itself.
+
+  it('reverts to off once the only screen share ends, if presenter mode was off beforehand', () => {
+    let state = addAll(createInitialState(container1280x720), [makeParticipant('a1', 'speaking-camera')]);
+    expect(state.isPresenterModeActive).toBe(false);
+
+    state = reducer(state, {type: 'ADD_PARTICIPANT', participant: makeParticipant('s1', 'screen-sharing')});
+    expect(state.isPresenterModeActive).toBe(true);
+
+    state = reducer(state, {type: 'UPDATE_PARTICIPANT', id: 's1', changes: {tier: 'silent-no-camera'}});
+    expect(state.isPresenterModeActive).toBe(false);
+  });
+
+  it('stays on after the screen share ends, if presenter mode was manually on beforehand', () => {
+    let state = reducer(createInitialState(container1280x720), {type: 'TOGGLE_PRESENTER_MODE'});
+    expect(state.isPresenterModeActive).toBe(true);
+
+    state = reducer(state, {type: 'ADD_PARTICIPANT', participant: makeParticipant('s1', 'screen-sharing')});
+    expect(state.isPresenterModeActive).toBe(true);
+
+    // Removing the sharer entirely (not just changing their tier) must revert it too.
+    state = reducer(state, {type: 'REMOVE_PARTICIPANT', id: 's1'});
+    expect(state.isPresenterModeActive).toBe(true);
+  });
+
+  it('a manual toggle during the screen share takes effect immediately but is discarded once sharing ends', () => {
+    let state = addAll(createInitialState(container1280x720), [makeParticipant('a1', 'speaking-camera')]);
+    state = reducer(state, {type: 'ADD_PARTICIPANT', participant: makeParticipant('s1', 'screen-sharing')});
+    expect(state.isPresenterModeActive).toBe(true); // auto-activated
+
+    state = reducer(state, {type: 'TOGGLE_PRESENTER_MODE'});
+    expect(state.isPresenterModeActive).toBe(false); // manual override takes effect right away
+
+    state = reducer(state, {type: 'UPDATE_PARTICIPANT', id: 's1', changes: {tier: 'silent-no-camera'}});
+    // Reverts to the remembered pre-share setting (off), not the manual mid-share toggle.
+    expect(state.isPresenterModeActive).toBe(false);
+  });
+
+  it('does not re-snapshot the remembered setting when a second screen share starts during an existing one', () => {
+    // Presenter mode manually on before any sharing starts — this is the baseline that must
+    // eventually be restored.
+    let state = reducer(createInitialState(container1280x720), {type: 'TOGGLE_PRESENTER_MODE'});
+    expect(state.isPresenterModeActive).toBe(true);
+
+    state = reducer(state, {type: 'ADD_PARTICIPANT', participant: makeParticipant('s1', 'screen-sharing')});
+    expect(state.isPresenterModeActive).toBe(true); // already on, no visible change
+
+    // Manually turn it off while s1 is still sharing.
+    state = reducer(state, {type: 'TOGGLE_PRESENTER_MODE'});
+    expect(state.isPresenterModeActive).toBe(false);
+
+    // A second screen-share starting mid-session must not re-snapshot this (now-off) live
+    // value as a new baseline — the real baseline (on, from before s1 ever started) is already
+    // remembered.
+    state = reducer(state, {type: 'ADD_PARTICIPANT', participant: makeParticipant('s2', 'screen-sharing')});
+    expect(state.isPresenterModeActive).toBe(false); // still respects the manual override
+
+    state = reducer(state, {type: 'REMOVE_PARTICIPANT', id: 's1'});
+    expect(state.isPresenterModeActive).toBe(false); // s2 still sharing — no reversion yet
+
+    state = reducer(state, {type: 'REMOVE_PARTICIPANT', id: 's2'});
+    expect(state.isPresenterModeActive).toBe(true); // reverts to the original pre-share baseline
   });
 });
 
@@ -1371,12 +1484,12 @@ describe('_updateSlotMap', () => {
     expect(slotMap['active1']).toBeLessThan(slotMap['me']);
   });
 
-  it('self leads its bucket even when a peer would otherwise outrank it by tier', () => {
+  it('self ranks by tier like any other participant — a higher-tier peer still goes first', () => {
     const slotMap = _updateSlotMap(
       [makeParticipant('screen1', 'screen-sharing'), makeSelf('me', 'speaking-camera')],
       {},
     );
-    expect(slotMap['me']).toBeLessThan(slotMap['screen1']);
+    expect(slotMap['screen1']).toBeLessThan(slotMap['me']);
   });
 
   it('new passive participant is appended after existing peers in the same tier', () => {
