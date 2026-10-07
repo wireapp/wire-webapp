@@ -1,0 +1,53 @@
+---
+name: Pull request SemVer policy
+
+on:
+  pull_request:
+    branches: [main, release/*, maintenance/*]
+    types: [opened, reopened, synchronize, labeled, unlabeled, edited]
+  merge_group:
+    branches: [main, release/*, maintenance/*]
+
+permissions: {}
+
+concurrency:
+  group: pull-request-semver-policy-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  pull-request-semver-policy:
+    name: Pull request SemVer policy
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read # required for checkout; labels come from the event payload
+    steps:
+      - name: Record merge queue validation
+        if: ${{ github.event_name == 'merge_group' }}
+        run: echo 'PR-label validation is not applicable on merge queue; validation ran before queue entry.'
+
+      - name: Checkout repository
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+
+      - name: Setup Node.js
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Install policy tooling dependencies
+        if: ${{ github.event_name == 'pull_request' }}
+        env:
+          YARN_ENABLE_SCRIPTS: 'false'
+        # Production-only focus still executes the root postinstall, which requires Nx.
+        # Skip builds explicitly to avoid running workspace setup or building the WebApp.
+        run: ./bin/yarn install --immutable --mode=skip-build
+
+      - name: Validate pull request release impact
+        if: ${{ github.event_name == 'pull_request' }}
+        env:
+          TARGET_BRANCH: ${{ github.event.pull_request.base.ref }}
+          PULL_REQUEST_LABELS_JSON: ${{ toJSON(github.event.pull_request.labels.*.name) }}
+        run: node ./tools/release-cli/pullRequestSemverPolicy.mts
