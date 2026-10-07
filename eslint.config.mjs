@@ -380,7 +380,11 @@ const productionConfigs = [
     },
   },
   {
-    files: ['**/*.{ts,tsx}', 'tools/release-cli/webappVersionSynchronization.mts'],
+    files: [
+      '**/*.{ts,tsx}',
+      'tools/release-cli/webappVersionSynchronization.mts',
+      'tools/release-cli/pullRequestSemverPolicy.mts',
+    ],
     languageOptions: {
       parser: tsParser,
       parserOptions: {
