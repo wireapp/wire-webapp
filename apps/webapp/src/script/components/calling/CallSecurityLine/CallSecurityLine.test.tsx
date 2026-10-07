@@ -30,7 +30,11 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {translateForTest} from 'Util/test/translateForTest';
 
-import {CALL_SECURITY_INTRO_DURATION_IN_MILLISECONDS, CallSecurityLine} from './CallSecurityLine';
+import {
+  CALL_SECURITY_ANNOUNCEMENT_INTERVAL_IN_MILLISECONDS,
+  CALL_SECURITY_INTRO_DURATION_IN_MILLISECONDS,
+  CallSecurityLine,
+} from './CallSecurityLine';
 import {KEY_UPDATE_HOLD_IN_MILLISECONDS} from './keyUpdateQueue';
 
 const startOfCallInMilliseconds = 1_000_000;
@@ -195,5 +199,49 @@ describe('CallSecurityLine', () => {
     });
 
     expect(getByTestId('call-security-line').getAttribute('data-uie-value')).toBe('resting');
+  });
+
+  it('announces a key update to screen readers at most once per 30 s', () => {
+    const participants = [createParticipant('me', 'Me', true)];
+    const {getByTestId, rerender, clock} = renderLine(
+      CALL_STATE.MEDIA_ESTAB,
+      startOfCallInMilliseconds,
+      startOfCallInMilliseconds + 60_000,
+      participants,
+    );
+    const join = (id: string) => {
+      participants.push(createParticipant(id, id));
+      rerender(
+        <CallSecurityLine
+          callConnectionState={CALL_STATE.MEDIA_ESTAB}
+          participants={participants}
+          startedAt={startOfCallInMilliseconds}
+        />,
+      );
+    };
+    const announcement = () => {
+      return getByTestId('call-security-announcement').textContent;
+    };
+
+    join('alice');
+    expect(announcement()).toBe('callSecurityUpdatingKeys. callSecurityJoined');
+
+    act(() => {
+      clock.advanceByMilliseconds(KEY_UPDATE_HOLD_IN_MILLISECONDS);
+    });
+    expect(announcement()).toBe('');
+
+    join('bob');
+    expect(announcement()).toBe('');
+
+    act(() => {
+      clock.advanceByMilliseconds(KEY_UPDATE_HOLD_IN_MILLISECONDS);
+    });
+    act(() => {
+      clock.advanceByMilliseconds(CALL_SECURITY_ANNOUNCEMENT_INTERVAL_IN_MILLISECONDS);
+    });
+
+    join('carol');
+    expect(announcement()).toBe('callSecurityUpdatingKeys. callSecurityJoined');
   });
 });
