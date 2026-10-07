@@ -51,7 +51,7 @@ test.describe('Drive file uploads with direct upload disabled', () => {
     await expect(pages.cellsSharedDrive().newButton).toBeVisible();
   });
 
-  test('does not expose file upload', {tag: ['@functional']}, async () => {
+  test('does not expose file upload', {tag: ['@functional', '@crit-flow-web']}, async () => {
     const sharedDrive = pageManager.webapp.pages.cellsSharedDrive();
 
     await sharedDrive.newButton.click();
@@ -90,7 +90,7 @@ test.describe('Drive file uploads', () => {
     });
   });
 
-  test('I want to upload a single file to Drive', {tag: ['@TC-12131', '@functional']}, async () => {
+  test('I want to upload a single file to Drive', {tag: ['@TC-12131', '@functional', '@crit-flow-web']}, async () => {
     const {pages} = pageManager.webapp;
     const sharedDrive = pages.cellsSharedDrive();
 
@@ -108,7 +108,7 @@ test.describe('Drive file uploads', () => {
     });
   });
 
-  test('I want to upload multiple files to Drive', {tag: ['@TC-12133', '@functional']}, async () => {
+  test('I want to upload multiple files to Drive', {tag: ['@TC-12133', '@functional', '@crit-flow-web']}, async () => {
     const {pages} = pageManager.webapp;
     const sharedDrive = pages.cellsSharedDrive();
 
@@ -129,7 +129,7 @@ test.describe('Drive file uploads', () => {
 
   test(
     'I want to upload a file into a Shared Drive folder using New',
-    {tag: ['@TC-12135', '@functional']},
+    {tag: ['@TC-12135', '@functional', '@crit-flow-web']},
     async () => {
       const {pages} = pageManager.webapp;
       const sharedDrive = pages.cellsSharedDrive();
