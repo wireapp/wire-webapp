@@ -10430,7 +10430,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/semver@npm:^7.3.12, @types/semver@npm:^7.3.4":
+"@types/semver@npm:7.7.1, @types/semver@npm:^7.3.12, @types/semver@npm:^7.3.4":
   version: 7.7.1
   resolution: "@types/semver@npm:7.7.1"
   checksum: 10/8f09e7e6ca3ded67d78ba7a8f7535c8d9cf8ced83c52e7f3ac3c281fe8c689c3fe475d199d94390dc04fc681d51f2358b430bb7b2e21c62de24f2bee2c719068
@@ -32738,6 +32738,7 @@ __metadata:
     "@types/js-yaml": "npm:4.0.9"
     "@types/jsdom": "npm:28.0.3"
     "@types/node": "npm:24.13.4"
+    "@types/semver": "npm:7.7.1"
     "@types/tough-cookie": "npm:4.0.5"
     "@typescript-eslint/eslint-plugin": "npm:8.71.0"
     "@typescript-eslint/parser": "npm:8.71.0"
@@ -32785,6 +32786,7 @@ __metadata:
     playwright: "npm:1.63.0"
     prettier: "npm:3.9.9"
     rimraf: "npm:6.1.3"
+    semver: "npm:7.7.4"
     simple-git: "npm:4.0.2"
     stylelint: "npm:17.16.0"
     stylelint-config-idiomatic-order: "npm:10.0.0"
