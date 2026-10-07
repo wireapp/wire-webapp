@@ -20,12 +20,14 @@
 import {useCallback, useEffect, useId, useRef, useState} from 'react';
 
 import {STATE as CALL_STATE} from '@wireapp/avs';
-import {CloseIcon, InfoIcon, LockClosedIcon, ShieldIcon} from '@wireapp/react-ui-kit';
+import {CloseIcon, InfoIcon, LockClosedIcon, ReloadIcon, ShieldIcon} from '@wireapp/react-ui-kit';
 
+import type {Participant} from 'Repositories/calling/Participant';
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {isEscapeKey} from 'Util/keyboardUtil';
 
+import {CallPerson, diffCallPeople, getCallPeople} from './callPeople';
 import {
   callSecurityButtonStyles,
   callSecurityExplainerBodyStyles,
@@ -44,11 +46,14 @@ import {
   callSecurityRootStyles,
   callSecuritySeparatorStyles,
 } from './CallSecurityLine.styles';
+import {createKeyUpdateQueue, KeyUpdateMessage, KeyUpdateQueue} from './keyUpdateQueue';
 
 import {Duration} from '../Duration';
 
 /** How long the "Only people in this call…" sentence stays before the line settles. */
 export const CALL_SECURITY_INTRO_DURATION_IN_MILLISECONDS = 3000;
+/** Joins and leaves during the intro and this long after it do not show, so the intro is never cut short. */
+export const CALL_SECURITY_INTRO_ABSORB_IN_MILLISECONDS = 2000;
 
 type CallSecurityPhase = 'connecting' | 'intro' | 'resting';
 
@@ -66,6 +71,7 @@ const getCallSecurityPhase = (
 
 interface CallSecurityLineProps {
   callConnectionState: CALL_STATE;
+  participants: Participant[];
   startedAt?: number;
 }
 
@@ -76,13 +82,17 @@ interface CallSecurityLineProps {
  * - connecting: until the call media is established
  * - intro: for 3 s after the call is established (startedAt), so reopening the call view does not replay it
  * - resting: lock, "End-to-end encrypted", duration, info icon; the line is a button that opens the explainer
+ * - updating: "Updating encryption keys · {name} joined" when the set of people in the call changes (see keyUpdateQueue)
  */
-export const CallSecurityLine = ({callConnectionState, startedAt}: CallSecurityLineProps) => {
+export const CallSecurityLine = ({callConnectionState, participants, startedAt}: CallSecurityLineProps) => {
   const {translate, clock} = useApplicationContext();
   const [phase, setPhase] = useState<CallSecurityPhase>(() => {
     return getCallSecurityPhase(callConnectionState, startedAt, clock.currentUnixEpochMilliseconds);
   });
   const [isExplainerOpen, setIsExplainerOpen] = useState(false);
+  const [keyUpdate, setKeyUpdate] = useState<KeyUpdateMessage>();
+  const keyUpdateQueueRef = useRef<KeyUpdateQueue | undefined>(undefined);
+  const previousPeopleRef = useRef<ReadonlyMap<string, CallPerson> | undefined>(undefined);
   const rootRef = useRef<HTMLSpanElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const explainerId = useId();
@@ -108,6 +118,64 @@ export const CallSecurityLine = ({callConnectionState, startedAt}: CallSecurityL
       clock.clearTimeout(timeoutIdentifier);
     };
   }, [callConnectionState, startedAt, clock]);
+
+  useEffect(() => {
+    const keyUpdateQueue = createKeyUpdateQueue({clock, onMessageChange: setKeyUpdate});
+    keyUpdateQueueRef.current = keyUpdateQueue;
+
+    return () => {
+      keyUpdateQueue.dispose();
+      keyUpdateQueueRef.current = undefined;
+    };
+  }, [clock]);
+
+  useEffect(() => {
+    if (startedAt !== undefined) {
+      keyUpdateQueueRef.current?.absorbUntil(
+        startedAt + CALL_SECURITY_INTRO_DURATION_IN_MILLISECONDS + CALL_SECURITY_INTRO_ABSORB_IN_MILLISECONDS,
+      );
+    }
+  }, [startedAt, clock]);
+
+  // call.participants is mutated in place, so the array reference does not change on a join or leave.
+  // The signature does, and makes the effect below run.
+  const peopleSignature = [...getCallPeople(participants).keys()].toSorted().join(',');
+
+  useEffect(() => {
+    const nextPeople = getCallPeople(participants);
+    const previousPeople = previousPeopleRef.current;
+    previousPeopleRef.current = nextPeople;
+
+    // The first list, and the people already in the call while it connects, are the starting point, not changes.
+    if (previousPeople === undefined || phase === 'connecting') {
+      return;
+    }
+
+    keyUpdateQueueRef.current?.push(diffCallPeople(previousPeople, nextPeople));
+  }, [participants, peopleSignature, phase]);
+
+  const getKeyUpdateDetail = (message: KeyUpdateMessage): string => {
+    if (message.type === 'joined') {
+      return translate('callSecurityJoined', {name: message.name});
+    }
+
+    if (message.type === 'left') {
+      return translate('callSecurityLeft', {name: message.name});
+    }
+
+    if (message.leftCount === 0) {
+      return translate('callSecurityPeopleJoined', {count: message.joinedCount});
+    }
+
+    if (message.joinedCount === 0) {
+      return translate('callSecurityPeopleLeft', {count: message.leftCount});
+    }
+
+    return translate('callSecurityPeopleJoinedAndLeft', {
+      joinedCount: message.joinedCount,
+      leftCount: message.leftCount,
+    });
+  };
 
   const closeExplainer = useCallback(() => {
     setIsExplainerOpen(false);
@@ -179,14 +247,27 @@ export const CallSecurityLine = ({callConnectionState, startedAt}: CallSecurityL
           });
         }}
         data-uie-name="call-security-line"
-        data-uie-value="resting"
+        data-uie-value={keyUpdate === undefined ? 'resting' : 'updating'}
       >
-        <LockClosedIcon color="var(--success-color)" css={callSecurityIconStyles} aria-hidden="true" />
-        <span css={callSecurityLabelStyles}>{translate('callSecurityEncrypted')}</span>
-        <span css={callSecuritySeparatorStyles} aria-hidden="true">
-          ·
-        </span>
-        <Duration startedAt={startedAt} />
+        {keyUpdate === undefined ? (
+          <>
+            <LockClosedIcon color="var(--success-color)" css={callSecurityIconStyles} aria-hidden="true" />
+            <span css={callSecurityLabelStyles}>{translate('callSecurityEncrypted')}</span>
+            <span css={callSecuritySeparatorStyles} aria-hidden="true">
+              ·
+            </span>
+            <Duration startedAt={startedAt} />
+          </>
+        ) : (
+          <>
+            <ReloadIcon color="var(--success-color)" css={callSecurityIconStyles} aria-hidden="true" />
+            <span css={callSecurityLabelStyles}>{translate('callSecurityUpdatingKeys')}</span>
+            <span css={callSecuritySeparatorStyles} aria-hidden="true">
+              ·
+            </span>
+            <span>{getKeyUpdateDetail(keyUpdate)}</span>
+          </>
+        )}
         <InfoIcon color="var(--foreground-fade-56)" css={callSecurityInfoIconStyles} aria-hidden="true" />
       </button>
 
