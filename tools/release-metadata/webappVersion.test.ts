@@ -22,15 +22,24 @@ import assert from 'node:assert';
 import {isString} from '@sindresorhus/is';
 
 import {
+  compareWebAppVersions,
   createWebAppVersionSynchronizationMarker,
+  incrementWebAppVersion,
   parseWebAppVersionSynchronizationMarker,
   resolveNextWebAppVersion,
   updateWebAppPackageDocuments,
   validateMatchingWebAppPackageVersions,
   validateWebAppVersion,
 } from './webappVersion.ts';
+import type {WebAppVersionBump} from './webappVersion.ts';
 
 type TestPackageDocument = Readonly<Record<string, unknown>>;
+
+type WebAppVersionIncrementTestCase = {
+  readonly currentVersion: string;
+  readonly bump: WebAppVersionBump;
+  readonly expectedVersion: string;
+};
 
 function createTestPackageDocument(version?: string): TestPackageDocument {
   const packageDocument: Record<string, unknown> = {
@@ -54,9 +63,120 @@ function expectNextVersion(currentVersion: string, expectedVersion: string): voi
 }
 
 describe('WebApp version domain logic', () => {
+  it.each(['0.27.0', '1.0.0', '1.4.1', '2.10.27'])('accepts stable WebApp version %s unchanged', version => {
+    const actualVersionResult = validateWebAppVersion(version);
+
+    assert(actualVersionResult.isOk);
+    expect(actualVersionResult.value).toBe(version);
+  });
+
+  it.each<WebAppVersionIncrementTestCase>([
+    {currentVersion: '1.4.0', bump: 'patch', expectedVersion: '1.4.1'},
+    {currentVersion: '1.4.0', bump: 'minor', expectedVersion: '1.5.0'},
+    {currentVersion: '1.4.7', bump: 'minor', expectedVersion: '1.5.0'},
+    {currentVersion: '1.4.7', bump: 'major', expectedVersion: '2.0.0'},
+    {currentVersion: '2.9.8', bump: 'major', expectedVersion: '3.0.0'},
+    {currentVersion: '0.27.0', bump: 'patch', expectedVersion: '0.27.1'},
+    {currentVersion: '0.27.0', bump: 'minor', expectedVersion: '0.28.0'},
+    {currentVersion: '0.27.0', bump: 'major', expectedVersion: '1.0.0'},
+    {currentVersion: '9007199254740991.0.0', bump: 'patch', expectedVersion: '9007199254740991.0.1'},
+    {currentVersion: '1.9007199254740991.0', bump: 'patch', expectedVersion: '1.9007199254740991.1'},
+    {currentVersion: '1.0.9007199254740991', bump: 'minor', expectedVersion: '1.1.0'},
+  ])('increments $currentVersion by $bump to $expectedVersion', options => {
+    const {currentVersion, bump, expectedVersion} = options;
+    const actualVersionResult = incrementWebAppVersion(currentVersion, bump);
+
+    assert(actualVersionResult.isOk);
+    expect(actualVersionResult.value).toBe(expectedVersion);
+  });
+
+  it.each<{readonly currentVersion: string; readonly bump: WebAppVersionBump}>([
+    {currentVersion: '9007199254740991.0.0', bump: 'major'},
+    {currentVersion: '1.9007199254740991.0', bump: 'minor'},
+    {currentVersion: '1.0.9007199254740991', bump: 'patch'},
+  ])('rejects $bump increment beyond the supported numeric range', options => {
+    const actualVersionResult = incrementWebAppVersion(options.currentVersion, options.bump);
+
+    assert(actualVersionResult.isErr);
+    expect(actualVersionResult.error.message).toContain('Invalid WebApp version:');
+  });
+
+  it('accepts numeric components at the supported limit', () => {
+    const currentVersion = '9007199254740991.9007199254740991.9007199254740991';
+    const actualValidationResult = validateWebAppVersion(currentVersion);
+    const actualComparisonResult = compareWebAppVersions(currentVersion, currentVersion);
+
+    assert(actualValidationResult.isOk);
+    expect(actualValidationResult.value).toBe(currentVersion);
+    assert(actualComparisonResult.isOk);
+    expect(actualComparisonResult.value).toBe(0);
+  });
+
+  it('rejects synchronization when PATCH increment exceeds the supported numeric range', () => {
+    const actualResolutionResult = resolveNextWebAppVersion('1.0.9007199254740991');
+
+    assert(actualResolutionResult.isErr);
+  });
+
+  it.each([
+    ['1.0.9', '1.0.10', -1],
+    ['1.2.0', '1.10.0', -1],
+    ['1.0.0', '2.0.0', -1],
+    ['2.0.0', '1.999.999', 1],
+    ['1.2.3', '1.2.3', 0],
+  ])('compares %s with %s as %s', (leftVersion, rightVersion, expectedComparison) => {
+    const actualComparisonResult = compareWebAppVersions(leftVersion, rightVersion);
+
+    assert(actualComparisonResult.isOk);
+    expect(actualComparisonResult.value).toBe(expectedComparison);
+  });
+
+  it.each([
+    '1.0',
+    'v1.0.0',
+    '1.0.0-beta.1',
+    '1.0.0+build',
+    '01.0.0',
+    ' 1.0.0',
+    '1.0.0 ',
+    '1.0.0\n',
+    '=1.0.0',
+    '9007199254740992.0.0',
+    '0.9007199254740992.0',
+    '0.0.9007199254740992',
+    `${'1'.repeat(257)}.0.0`,
+  ])('rejects unsupported version %s in every stable version operation', invalidVersion => {
+    const actualValidationResult = validateWebAppVersion(invalidVersion);
+    const actualResolutionResult = resolveNextWebAppVersion(invalidVersion);
+    const actualMajorIncrementResult = incrementWebAppVersion(invalidVersion, 'major');
+    const actualMinorIncrementResult = incrementWebAppVersion(invalidVersion, 'minor');
+    const actualPatchIncrementResult = incrementWebAppVersion(invalidVersion, 'patch');
+    const actualLeftComparisonResult = compareWebAppVersions(invalidVersion, '1.0.0');
+    const actualRightComparisonResult = compareWebAppVersions('1.0.0', invalidVersion);
+
+    assert(actualValidationResult.isErr);
+    assert(actualResolutionResult.isErr);
+    assert(actualMajorIncrementResult.isErr);
+    assert(actualMinorIncrementResult.isErr);
+    assert(actualPatchIncrementResult.isErr);
+    assert(actualLeftComparisonResult.isErr);
+    assert(actualRightComparisonResult.isErr);
+
+    const expectedErrorMessage = `Invalid WebApp version: ${invalidVersion}`;
+
+    expect(actualValidationResult.error.message).toBe(expectedErrorMessage);
+    expect(actualResolutionResult.error.message).toBe(expectedErrorMessage);
+    expect(actualMajorIncrementResult.error.message).toBe(expectedErrorMessage);
+    expect(actualMinorIncrementResult.error.message).toBe(expectedErrorMessage);
+    expect(actualPatchIncrementResult.error.message).toBe(expectedErrorMessage);
+    expect(actualLeftComparisonResult.error.message).toBe(expectedErrorMessage);
+    expect(actualRightComparisonResult.error.message).toBe(expectedErrorMessage);
+  });
+
   it.each([
     ['0.27.0', '1.0.0'],
     ['0.99.999', '1.0.0'],
+    ['0.9007199254740991.9007199254740991', '1.0.0'],
     ['1.0.0', '1.0.1'],
     ['1.0.9', '1.0.10'],
     ['1.2.99', '1.2.100'],
