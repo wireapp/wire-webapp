@@ -181,6 +181,9 @@ export type Env = {
   /** Feature to enable in call hand raise */
   FEATURE_ENABLE_IN_CALL_HAND_RAISE: string;
 
+  /** Feature to show the end-to-end encryption line in the call header */
+  FEATURE_ENABLE_CALL_SECURITY_LINE: string;
+
   /** Feature to enable remove conversation locally */
   FEATURE_ENABLE_REMOVE_GROUP_CONVERSATION: string;
 
@@ -305,6 +308,9 @@ export type Env = {
   URL_SUPPORT_BUG_REPORT: string;
 
   URL_SUPPORT_CALLING: string;
+
+  /** Support article explaining how calls are end-to-end encrypted (call security line) */
+  URL_SUPPORT_CALL_ENCRYPTION: string;
 
   URL_SUPPORT_CAMERA_ACCESS_DENIED: string;
 
