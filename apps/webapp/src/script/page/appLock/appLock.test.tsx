@@ -186,6 +186,29 @@ describe('AppLock', () => {
     });
   });
 
+  it('does not erase a stored passphrase when enabled state changes outside a user action', async () => {
+    const appLockState = createAppLockState(new TeamState());
+    const appLockRepository = createAppLockRepository(appLockState);
+    await appLockRepository.setCode('ValidPassword123!');
+    appLockState.isActivatedInPreferences(true);
+
+    render(
+      withTheme(
+        <AppLock
+          appLockRepository={appLockRepository}
+          appLockState={appLockState}
+          clientRepository={clientRepository}
+        />,
+      ),
+    );
+
+    act(() => {
+      appLockState.isActivatedInPreferences(false);
+    });
+
+    expect(appLockRepository.getStoredPassphrase()).toBe('ValidPassword123!');
+  });
+
   describe('modal state', () => {
     it('shows locked state when it the passphrase is set and app lock is enabled', () => {
       const appLockState = createAppLockState();

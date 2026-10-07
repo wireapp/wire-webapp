@@ -130,6 +130,45 @@ describe('TeamRepository', () => {
     });
   });
 
+  describe('feature refresh', () => {
+    const appLock = {
+      status: FEATURE_STATUS.ENABLED,
+      config: {enforceAppLock: true, inactivityTimeoutSecs: 60},
+    };
+
+    it('keeps the last feature configuration when the response is undefined', async () => {
+      const [teamRepo, {teamService, teamState}] = buildConnectionRepository();
+      const previousFeatures = {appLock};
+      teamState.teamFeatures(previousFeatures);
+      jest.spyOn(teamService, 'getAllTeamFeatures').mockResolvedValue(undefined as unknown as FeatureList);
+
+      await teamRepo['updateFeatureConfig']();
+
+      expect(teamState.teamFeatures()).toBe(previousFeatures);
+    });
+
+    it('preserves the previous app lock setting when a response omits it', async () => {
+      const [teamRepo, {teamService, teamState}] = buildConnectionRepository();
+      teamState.teamFeatures({appLock});
+      jest.spyOn(teamService, 'getAllTeamFeatures').mockResolvedValue({});
+
+      await teamRepo['updateFeatureConfig']();
+
+      expect(teamState.teamFeatures()?.appLock).toEqual(appLock);
+    });
+
+    it('applies an explicit team disable', async () => {
+      const [teamRepo, {teamService, teamState}] = buildConnectionRepository();
+      teamState.teamFeatures({appLock});
+      const disabledAppLock = {...appLock, status: FEATURE_STATUS.DISABLED};
+      jest.spyOn(teamService, 'getAllTeamFeatures').mockResolvedValue({appLock: disabledAppLock});
+
+      await teamRepo['updateFeatureConfig']();
+
+      expect(teamState.teamFeatures()?.appLock).toEqual(disabledAppLock);
+    });
+  });
+
   describe('sendAccountInfo', () => {
     it('does not crash when there is no team logo', async () => {
       const [teamRepo] = buildConnectionRepository();

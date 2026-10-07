@@ -82,8 +82,12 @@ export class TeamService {
     return this.apiClient.api.teams.invitation.upgradePersonalToTeamUser(payload);
   }
 
-  getAllTeamFeatures(): Promise<FeatureList> {
+  getAllTeamFeatures(previousFeatures?: FeatureList): Promise<FeatureList> {
     return this.apiClient.api.teams.feature.getAllFeatures().catch(() => {
+      if (previousFeatures !== undefined) {
+        return previousFeatures;
+      }
+
       // The following code enables all default features to ensure that modern webapps work with legacy backends (backends that don't provide a "feature-configs" endpoint)
       const defaultFeatures: FeatureList = {
         [FEATURE_KEY.APPLOCK]: {

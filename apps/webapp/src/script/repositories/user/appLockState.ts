@@ -41,7 +41,7 @@ export class AppLockState {
 
   constructor(teamState = container.resolve(TeamState)) {
     this.isAppLockDisabledOnTeam = ko.pureComputed(() => {
-      return teamState.isTeam() && teamState.teamFeatures()?.appLock?.status !== FEATURE_STATUS.ENABLED;
+      return teamState.isTeam() && teamState.teamFeatures()?.appLock?.status === FEATURE_STATUS.DISABLED;
     });
 
     this.isAppLockAvailable = ko.pureComputed(() => {
@@ -70,10 +70,12 @@ export class AppLockState {
       const isMdmAppLockDisabled =
         Config.getConfig().FEATURE.ENABLE_MDM_CONFIG &&
         Config.getDesktopConfig()?.managedConfig?.applockOverride === true;
-      if (isMdmAppLockDisabled) {
+      if (isMdmAppLockDisabled || this.isAppLockDisabledOnTeam()) {
         return false;
       }
-      return this.isAppLockEnforced() || this.isActivatedInPreferences();
+      // A stored passphrase remains active until app lock is explicitly disabled.
+      const hasActiveTeamPassphrase = teamState.isTeam() && this.hasPassphrase();
+      return this.isAppLockEnforced() || this.isActivatedInPreferences() || hasActiveTeamPassphrase;
     });
   }
 }
