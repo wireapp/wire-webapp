@@ -21,6 +21,9 @@ import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {act, fireEvent, render} from '@testing-library/react';
 import {STATE as CALL_STATE} from '@wireapp/avs';
 
+import {Participant} from 'Repositories/calling/Participant';
+import {User} from 'Repositories/entity/User';
+
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
@@ -28,15 +31,29 @@ import {
 import {translateForTest} from 'Util/test/translateForTest';
 
 import {CALL_SECURITY_INTRO_DURATION_IN_MILLISECONDS, CallSecurityLine} from './CallSecurityLine';
+import {KEY_UPDATE_HOLD_IN_MILLISECONDS} from './keyUpdateQueue';
 
 const startOfCallInMilliseconds = 1_000_000;
 
-const renderLine = (callConnectionState: CALL_STATE, startedAt: number | undefined, nowInMilliseconds: number) => {
+const createParticipant = (id: string, name: string, isMe = false) => {
+  const user = new User(id, 'wire.test', translateForTest);
+  user.name(name);
+  user.isMe = isMe;
+  return new Participant(user, `${id}-device`);
+};
+
+const renderLine = (
+  callConnectionState: CALL_STATE,
+  startedAt: number | undefined,
+  nowInMilliseconds: number,
+  participants: Participant[] = [],
+) => {
   const clock = createDeterministicClock({initialUnixEpochMicroseconds: BigInt(nowInMilliseconds) * 1000n});
   const wrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest, clock}));
-  const result = render(<CallSecurityLine callConnectionState={callConnectionState} startedAt={startedAt} />, {
-    wrapper,
-  });
+  const result = render(
+    <CallSecurityLine callConnectionState={callConnectionState} participants={participants} startedAt={startedAt} />,
+    {wrapper},
+  );
 
   return {...result, clock};
 };
@@ -126,5 +143,57 @@ describe('CallSecurityLine', () => {
 
       expect(queryByTestId('call-security-explainer')).toBe(null);
     });
+  });
+
+  it('shows the key update when someone joins, then goes back to resting', () => {
+    const me = createParticipant('me', 'Me', true);
+    const participants = [me];
+    const {getByTestId, getByText, rerender, clock} = renderLine(
+      CALL_STATE.MEDIA_ESTAB,
+      startOfCallInMilliseconds,
+      startOfCallInMilliseconds + 60_000,
+      participants,
+    );
+
+    // The calling layer pushes into the same array; the line must still notice.
+    participants.push(createParticipant('alice', 'Alice'));
+    rerender(
+      <CallSecurityLine
+        callConnectionState={CALL_STATE.MEDIA_ESTAB}
+        participants={participants}
+        startedAt={startOfCallInMilliseconds}
+      />,
+    );
+
+    expect(getByTestId('call-security-line').getAttribute('data-uie-value')).toBe('updating');
+    expect(getByText('callSecurityUpdatingKeys')).not.toBe(null);
+
+    act(() => {
+      clock.advanceByMilliseconds(KEY_UPDATE_HOLD_IN_MILLISECONDS);
+    });
+
+    expect(getByTestId('call-security-line').getAttribute('data-uie-value')).toBe('resting');
+  });
+
+  it('does not show the people already in the call when it connects', () => {
+    const participants = [createParticipant('me', 'Me', true), createParticipant('alice', 'Alice')];
+    const {getByTestId, rerender, clock} = renderLine(CALL_STATE.ANSWERED, undefined, startOfCallInMilliseconds);
+
+    rerender(
+      <CallSecurityLine callConnectionState={CALL_STATE.ANSWERED} participants={participants} startedAt={undefined} />,
+    );
+    rerender(
+      <CallSecurityLine
+        callConnectionState={CALL_STATE.MEDIA_ESTAB}
+        participants={participants}
+        startedAt={startOfCallInMilliseconds}
+      />,
+    );
+
+    act(() => {
+      clock.advanceByMilliseconds(CALL_SECURITY_INTRO_DURATION_IN_MILLISECONDS);
+    });
+
+    expect(getByTestId('call-security-line').getAttribute('data-uie-value')).toBe('resting');
   });
 });

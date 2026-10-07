@@ -366,7 +366,11 @@ const FullscreenVideoCall = ({
 
               <div data-uie-name="video-timer" className="video-timer label-xs">
                 {isCallSecurityLineEnabled ? (
-                  <CallSecurityLine callConnectionState={callConnectionState} startedAt={startedAt} />
+                  <CallSecurityLine
+                    callConnectionState={callConnectionState}
+                    participants={participants}
+                    startedAt={startedAt}
+                  />
                 ) : (
                   <Duration startedAt={startedAt} />
                 )}
