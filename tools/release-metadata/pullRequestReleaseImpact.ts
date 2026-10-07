@@ -17,7 +17,7 @@
  *
  */
 
-import {isUndefined} from '@sindresorhus/is';
+import {isNonEmptyArray} from '@sindresorhus/is';
 import {Result} from 'true-myth';
 
 export type PullRequestReleaseImpact = 'major' | 'minor' | 'patch' | 'none';
@@ -53,7 +53,15 @@ export function resolvePullRequestReleaseImpact(labels: readonly string[]): Resu
       });
   });
 
-  if (matchingImpacts.length > 1) {
+  if (!isNonEmptyArray(matchingImpacts)) {
+    return Result.err(
+      new Error(`Pull request has no release-impact label. Apply exactly one of: ${supportedLabelsDiagnostic}`),
+    );
+  }
+
+  const [releaseImpact, ...remainingImpacts] = matchingImpacts;
+
+  if (isNonEmptyArray(remainingImpacts)) {
     const matchingLabels = matchingImpacts.map(impact => {
       return pullRequestReleaseImpactLabels[impact];
     });
@@ -62,14 +70,6 @@ export function resolvePullRequestReleaseImpact(labels: readonly string[]): Resu
       new Error(
         `Pull request has conflicting release-impact labels: ${matchingLabels.join(', ')}. Apply exactly one of: ${supportedLabelsDiagnostic}`,
       ),
-    );
-  }
-
-  const releaseImpact = matchingImpacts.at(0);
-
-  if (isUndefined(releaseImpact)) {
-    return Result.err(
-      new Error(`Pull request has no release-impact label. Apply exactly one of: ${supportedLabelsDiagnostic}`),
     );
   }
 
@@ -82,7 +82,7 @@ export function validatePullRequestReleaseImpact(
   const {targetBranch, labels} = options;
   const isPatchOnlyTarget = /^(?:release|maintenance)\/[^/]+$/.test(targetBranch);
 
-  if (targetBranch !== 'main' && isPatchOnlyTarget === false) {
+  if (targetBranch !== 'main' && !isPatchOnlyTarget) {
     return Result.err(
       new Error(
         `Unsupported pull request target branch: ${targetBranch}. Expected main, release/*, or maintenance/*. Supported release-impact labels: ${supportedLabelsDiagnostic}`,
@@ -90,21 +90,20 @@ export function validatePullRequestReleaseImpact(
     );
   }
 
-  const releaseImpactResult = resolvePullRequestReleaseImpact(labels);
+  return resolvePullRequestReleaseImpact(labels).match({
+    Err(error) {
+      return Result.err(new Error(`Target branch ${targetBranch}: ${error.message}`));
+    },
+    Ok(releaseImpact) {
+      if (isPatchOnlyTarget && (releaseImpact === 'major' || releaseImpact === 'minor')) {
+        return Result.err(
+          new Error(
+            `Pull request targeting ${targetBranch} cannot use ${pullRequestReleaseImpactLabels[releaseImpact]}. Release candidates and maintenance lines allow only ${pullRequestReleaseImpactLabels.patch} or ${pullRequestReleaseImpactLabels.none}; new functionality and breaking changes must target main.`,
+          ),
+        );
+      }
 
-  if (releaseImpactResult.isErr) {
-    return Result.err(new Error(`Target branch ${targetBranch}: ${releaseImpactResult.error.message}`));
-  }
-
-  const {value: releaseImpact} = releaseImpactResult;
-
-  if (isPatchOnlyTarget && (releaseImpact === 'major' || releaseImpact === 'minor')) {
-    return Result.err(
-      new Error(
-        `Pull request targeting ${targetBranch} cannot use ${pullRequestReleaseImpactLabels[releaseImpact]}. Release candidates and maintenance lines allow only ${pullRequestReleaseImpactLabels.patch} or ${pullRequestReleaseImpactLabels.none}; new functionality and breaking changes must target main.`,
-      ),
-    );
-  }
-
-  return releaseImpactResult;
+      return Result.ok(releaseImpact);
+    },
+  });
 }
