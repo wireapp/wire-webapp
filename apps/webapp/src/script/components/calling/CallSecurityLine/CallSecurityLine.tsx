@@ -20,7 +20,7 @@
 import {useCallback, useEffect, useId, useRef, useState} from 'react';
 
 import {STATE as CALL_STATE} from '@wireapp/avs';
-import {CloseIcon, InfoIcon, LockClosedIcon, ReloadIcon, ShieldIcon} from '@wireapp/react-ui-kit';
+import {CloseIcon, InfoIcon, LockClosedIcon, ShieldIcon, UpdateIcon} from '@wireapp/react-ui-kit';
 
 import type {Participant} from 'Repositories/calling/Participant';
 import {Config} from 'src/script/Config';
@@ -30,6 +30,7 @@ import {isEscapeKey} from 'Util/keyboardUtil';
 import {CallPerson, diffCallPeople, getCallPeople} from './callPeople';
 import {
   callSecurityButtonStyles,
+  callSecurityContentStyles,
   callSecurityExplainerBodyStyles,
   callSecurityExplainerCloseStyles,
   callSecurityExplainerHeadStyles,
@@ -37,6 +38,7 @@ import {
   callSecurityExplainerLinkStyles,
   callSecurityExplainerStyles,
   callSecurityExplainerTitleStyles,
+  callSecurityFadeInStyles,
   callSecurityIconStyles,
   callSecurityInfoIconStyles,
   callSecurityLabelStyles,
@@ -45,6 +47,7 @@ import {
   callSecurityMutedLabelStyles,
   callSecurityRootStyles,
   callSecuritySeparatorStyles,
+  callSecurityUpdateIconStyles,
 } from './CallSecurityLine.styles';
 import {createKeyUpdateQueue, KeyUpdateMessage, KeyUpdateQueue} from './keyUpdateQueue';
 
@@ -213,7 +216,12 @@ export const CallSecurityLine = ({callConnectionState, participants, startedAt}:
 
   if (phase === 'connecting') {
     return (
-      <span css={callSecurityLineStyles} data-uie-name="call-security-line" data-uie-value="connecting">
+      <span
+        key="connecting"
+        css={[callSecurityLineStyles, callSecurityFadeInStyles]}
+        data-uie-name="call-security-line"
+        data-uie-value="connecting"
+      >
         <span css={callSecurityMutedLabelStyles}>{translate('callSecurityConnecting')}</span>
       </span>
     );
@@ -222,7 +230,8 @@ export const CallSecurityLine = ({callConnectionState, participants, startedAt}:
   if (phase === 'intro') {
     return (
       <span
-        css={[callSecurityLineStyles, callSecurityLineTintedStyles]}
+        key="intro"
+        css={[callSecurityLineStyles, callSecurityLineTintedStyles, callSecurityFadeInStyles]}
         data-uie-name="call-security-line"
         data-uie-value="intro"
       >
@@ -233,7 +242,7 @@ export const CallSecurityLine = ({callConnectionState, participants, startedAt}:
   }
 
   return (
-    <span ref={rootRef} css={callSecurityRootStyles}>
+    <span key="resting" ref={rootRef} css={callSecurityRootStyles}>
       <button
         ref={triggerRef}
         type="button"
@@ -250,23 +259,24 @@ export const CallSecurityLine = ({callConnectionState, participants, startedAt}:
         data-uie-value={keyUpdate === undefined ? 'resting' : 'updating'}
       >
         {keyUpdate === undefined ? (
-          <>
+          <span key="encrypted" css={callSecurityContentStyles}>
             <LockClosedIcon color="var(--success-color)" css={callSecurityIconStyles} aria-hidden="true" />
             <span css={callSecurityLabelStyles}>{translate('callSecurityEncrypted')}</span>
             <span css={callSecuritySeparatorStyles} aria-hidden="true">
               ·
             </span>
             <Duration startedAt={startedAt} />
-          </>
+          </span>
         ) : (
-          <>
-            <ReloadIcon color="var(--success-color)" css={callSecurityIconStyles} aria-hidden="true" />
+          // A new key keeps the fade and the turn replaying when one update follows another.
+          <span key={getKeyUpdateDetail(keyUpdate)} css={callSecurityContentStyles}>
+            <UpdateIcon color="var(--success-color)" css={callSecurityUpdateIconStyles} aria-hidden="true" />
             <span css={callSecurityLabelStyles}>{translate('callSecurityUpdatingKeys')}</span>
             <span css={callSecuritySeparatorStyles} aria-hidden="true">
               ·
             </span>
             <span>{getKeyUpdateDetail(keyUpdate)}</span>
-          </>
+          </span>
         )}
         <InfoIcon color="var(--foreground-fade-56)" css={callSecurityInfoIconStyles} aria-hidden="true" />
       </button>

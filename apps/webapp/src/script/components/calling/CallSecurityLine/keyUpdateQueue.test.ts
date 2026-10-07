@@ -90,14 +90,31 @@ describe('createKeyUpdateQueue', () => {
     expect(current()).toEqual({type: 'joined', name: 'Alice'});
   });
 
-  it('does not show a rejoin within 60 s as a new join', () => {
+  it('shows the join again when the person comes back after their leave has shown', () => {
     const {clock, queue, messages} = setUp();
 
     queue.push({joined: [], left: [person('Bob')]});
+    clock.advanceByMilliseconds(KEY_UPDATE_HOLD_IN_MILLISECONDS);
     clock.advanceByMilliseconds(20_000);
     queue.push({joined: [person('Bob')], left: []});
 
-    expect(messages).toEqual([{type: 'left', name: 'Bob'}, undefined]);
+    expect(messages).toEqual([{type: 'left', name: 'Bob'}, undefined, {type: 'joined', name: 'Bob'}]);
+  });
+
+  it('drops a leave counted during the quiet period when the person comes back', () => {
+    const {clock, queue, current} = setUp();
+
+    queue.push({joined: [person('Alice')], left: []});
+    queue.push({joined: [person('Bob')], left: []});
+    queue.push({joined: [person('Carol')], left: []});
+    clock.advanceByMilliseconds(KEY_UPDATE_HOLD_IN_MILLISECONDS);
+    clock.advanceByMilliseconds(KEY_UPDATE_HOLD_IN_MILLISECONDS);
+
+    queue.push({joined: [], left: [person('Dan')]});
+    queue.push({joined: [person('Dan')], left: []});
+    clock.advanceByMilliseconds(KEY_UPDATE_QUIET_IN_MILLISECONDS);
+
+    expect(current()).toEqual({type: 'joined', name: 'Carol'});
   });
 
   it('ignores changes while absorbing, for the intro', () => {

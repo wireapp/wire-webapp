@@ -17,7 +17,19 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {CSSObject, keyframes} from '@emotion/react';
+
+const easeOutQuint = 'cubic-bezier(0.22, 1, 0.36, 1)';
+
+const fadeIn = keyframes({
+  from: {opacity: 0},
+  to: {opacity: 1},
+});
+
+const halfTurn = keyframes({
+  from: {transform: 'rotate(0deg)'},
+  to: {transform: 'rotate(-180deg)'},
+});
 
 export const callSecurityLineStyles: CSSObject = {
   display: 'inline-flex',
@@ -150,4 +162,26 @@ export const callSecurityExplainerLinkStyles: CSSObject = {
   fontSize: 13,
   fontWeight: 500,
   textDecoration: 'underline',
+};
+
+// Each state change fades its content in. With reduced motion on, the text simply changes.
+export const callSecurityFadeInStyles: CSSObject = {
+  '@media (prefers-reduced-motion: no-preference)': {
+    animation: `${fadeIn} 200ms ${easeOutQuint}`,
+  },
+};
+
+export const callSecurityContentStyles: CSSObject = {
+  ...callSecurityFadeInStyles,
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 4,
+};
+
+// The update icon turns half a revolution when the key update appears.
+export const callSecurityUpdateIconStyles: CSSObject = {
+  ...callSecurityIconStyles,
+  '@media (prefers-reduced-motion: no-preference)': {
+    animation: `${halfTurn} 340ms ${easeOutQuint}`,
+  },
 };

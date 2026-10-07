@@ -27,8 +27,6 @@ export const KEY_UPDATE_HOLD_IN_MILLISECONDS = 4000;
 export const KEY_UPDATE_MAX_IN_A_ROW_IN_MILLISECONDS = 8000;
 /** After the cap is hit, changes are only counted during this period, then shown as one summary. */
 export const KEY_UPDATE_QUIET_IN_MILLISECONDS = 30_000;
-/** A person who leaves and comes back within this window does not trigger a "joined" message. */
-export const KEY_UPDATE_REJOIN_WINDOW_IN_MILLISECONDS = 60_000;
 
 export type KeyUpdateMessage =
   | {readonly type: 'joined'; readonly name: string}
@@ -73,7 +71,8 @@ const toSummaryMessage = (events: KeyUpdateEvent[]): KeyUpdateMessage => {
  * - each change shows for 4 s; a second one waits its turn
  * - never more than 8 s in a row: any further change starts a 30 s quiet period where changes are only counted
  * - at the end of a quiet period, one summary, followed by another quiet period while changes keep coming
- * - a person who leaves and rejoins within 60 s does not show as joined again
+ * - a person who drops and comes back before their leave has shown shows nothing; once a leave has shown,
+ *   coming back shows as joined, because the keys are updated again
  */
 export const createKeyUpdateQueue = ({clock, onMessageChange}: KeyUpdateQueueOptions): KeyUpdateQueue => {
   let isShowing = false;
@@ -83,7 +82,6 @@ export const createKeyUpdateQueue = ({clock, onMessageChange}: KeyUpdateQueueOpt
   let countedEvents: KeyUpdateEvent[] = [];
   let absorbedUntil = 0;
   let timeoutIdentifier: TimeoutIdentifier | undefined;
-  const leftAtByPersonKey = new Map<string, number>();
 
   const schedule = (handler: () => void, delayInMilliseconds: number) => {
     timeoutIdentifier = clock.setTimeout(() => {
@@ -166,14 +164,25 @@ export const createKeyUpdateQueue = ({clock, onMessageChange}: KeyUpdateQueueOpt
     countedEvents.push(event);
   };
 
-  const forgetLeave = (personKey: string) => {
-    if (pendingEvent?.type === 'left' && pendingEvent.person.key === personKey) {
+  const isLeaveOf = (personKey: string) => {
+    return ({type, person}: KeyUpdateEvent) => {
+      return type === 'left' && person.key === personKey;
+    };
+  };
+
+  /** Drops a leave that has not shown yet. Returns whether there was one. */
+  const dropUnshownLeave = (personKey: string): boolean => {
+    if (pendingEvent !== undefined && isLeaveOf(personKey)(pendingEvent)) {
       pendingEvent = undefined;
+      return true;
     }
 
-    countedEvents = countedEvents.filter(({type, person}) => {
-      return type !== 'left' || person.key !== personKey;
+    const countedCount = countedEvents.length;
+    countedEvents = countedEvents.filter(event => {
+      return !isLeaveOf(personKey)(event);
     });
+
+    return countedEvents.length < countedCount;
   };
 
   return {
@@ -182,32 +191,17 @@ export const createKeyUpdateQueue = ({clock, onMessageChange}: KeyUpdateQueueOpt
     },
 
     push: ({joined, left}) => {
-      const now = clock.currentUnixEpochMilliseconds;
-      const isAbsorbing = now < absorbedUntil;
-
-      leftAtByPersonKey.forEach((leftAt, personKey) => {
-        if (now - leftAt >= KEY_UPDATE_REJOIN_WINDOW_IN_MILLISECONDS) {
-          leftAtByPersonKey.delete(personKey);
-        }
-      });
+      if (clock.currentUnixEpochMilliseconds < absorbedUntil) {
+        return;
+      }
 
       left.forEach(person => {
-        leftAtByPersonKey.set(person.key, now);
-
-        if (!isAbsorbing) {
-          enqueue({type: 'left', person});
-        }
+        enqueue({type: 'left', person});
       });
 
       joined.forEach(person => {
-        if (leftAtByPersonKey.has(person.key)) {
-          // Back within the rejoin window: no "joined" message, and drop the leave if it has not shown yet.
-          leftAtByPersonKey.delete(person.key);
-          forgetLeave(person.key);
-          return;
-        }
-
-        if (!isAbsorbing) {
+        // A quick drop and return that nobody saw: show neither the leave nor the join.
+        if (!dropUnshownLeave(person.key)) {
           enqueue({type: 'joined', person});
         }
       });
