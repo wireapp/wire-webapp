@@ -26,6 +26,7 @@ import type {Participant} from 'Repositories/calling/Participant';
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {isEscapeKey} from 'Util/keyboardUtil';
+import type {Translate} from 'Util/localizerUtil';
 
 import {CallPerson, diffCallPeople, getCallPeople} from './callPeople';
 import {
@@ -57,6 +58,8 @@ import {Duration} from '../Duration';
 export const CALL_SECURITY_INTRO_DURATION_IN_MILLISECONDS = 3000;
 /** Joins and leaves during the intro and this long after it do not show, so the intro is never cut short. */
 export const CALL_SECURITY_INTRO_ABSORB_IN_MILLISECONDS = 2000;
+/** Screen readers hear at most one key update in this period, so a busy call does not flood them. */
+export const CALL_SECURITY_ANNOUNCEMENT_INTERVAL_IN_MILLISECONDS = 30_000;
 
 type CallSecurityPhase = 'connecting' | 'intro' | 'resting';
 
@@ -70,6 +73,29 @@ const getCallSecurityPhase = (
   }
 
   return nowInMilliseconds - startedAt < CALL_SECURITY_INTRO_DURATION_IN_MILLISECONDS ? 'intro' : 'resting';
+};
+
+const getKeyUpdateDetail = (translate: Translate, message: KeyUpdateMessage): string => {
+  if (message.type === 'joined') {
+    return translate('callSecurityJoined', {name: message.name});
+  }
+
+  if (message.type === 'left') {
+    return translate('callSecurityLeft', {name: message.name});
+  }
+
+  if (message.leftCount === 0) {
+    return translate('callSecurityPeopleJoined', {count: message.joinedCount});
+  }
+
+  if (message.joinedCount === 0) {
+    return translate('callSecurityPeopleLeft', {count: message.leftCount});
+  }
+
+  return translate('callSecurityPeopleJoinedAndLeft', {
+    joinedCount: message.joinedCount,
+    leftCount: message.leftCount,
+  });
 };
 
 interface CallSecurityLineProps {
@@ -96,6 +122,8 @@ export const CallSecurityLine = ({callConnectionState, participants, startedAt}:
   const [keyUpdate, setKeyUpdate] = useState<KeyUpdateMessage>();
   const keyUpdateQueueRef = useRef<KeyUpdateQueue | undefined>(undefined);
   const previousPeopleRef = useRef<ReadonlyMap<string, CallPerson> | undefined>(undefined);
+  const [announcement, setAnnouncement] = useState('');
+  const lastAnnouncedAtRef = useRef<number | undefined>(undefined);
   const rootRef = useRef<HTMLSpanElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const explainerId = useId();
@@ -157,28 +185,23 @@ export const CallSecurityLine = ({callConnectionState, participants, startedAt}:
     keyUpdateQueueRef.current?.push(diffCallPeople(previousPeople, nextPeople));
   }, [participants, peopleSignature, phase]);
 
-  const getKeyUpdateDetail = (message: KeyUpdateMessage): string => {
-    if (message.type === 'joined') {
-      return translate('callSecurityJoined', {name: message.name});
+  useEffect(() => {
+    if (keyUpdate === undefined) {
+      // Cleared between updates, so the same sentence later is announced again.
+      setAnnouncement('');
+      return;
     }
 
-    if (message.type === 'left') {
-      return translate('callSecurityLeft', {name: message.name});
+    const now = clock.currentUnixEpochMilliseconds;
+    const lastAnnouncedAt = lastAnnouncedAtRef.current;
+
+    if (lastAnnouncedAt !== undefined && now - lastAnnouncedAt < CALL_SECURITY_ANNOUNCEMENT_INTERVAL_IN_MILLISECONDS) {
+      return;
     }
 
-    if (message.leftCount === 0) {
-      return translate('callSecurityPeopleJoined', {count: message.joinedCount});
-    }
-
-    if (message.joinedCount === 0) {
-      return translate('callSecurityPeopleLeft', {count: message.leftCount});
-    }
-
-    return translate('callSecurityPeopleJoinedAndLeft', {
-      joinedCount: message.joinedCount,
-      leftCount: message.leftCount,
-    });
-  };
+    lastAnnouncedAtRef.current = now;
+    setAnnouncement(`${translate('callSecurityUpdatingKeys')}. ${getKeyUpdateDetail(translate, keyUpdate)}`);
+  }, [keyUpdate, clock, translate]);
 
   const closeExplainer = useCallback(() => {
     setIsExplainerOpen(false);
@@ -243,6 +266,9 @@ export const CallSecurityLine = ({callConnectionState, participants, startedAt}:
 
   return (
     <span key="resting" ref={rootRef} css={callSecurityRootStyles}>
+      <span className="visually-hidden" aria-live="polite" data-uie-name="call-security-announcement">
+        {announcement}
+      </span>
       <button
         ref={triggerRef}
         type="button"
@@ -269,13 +295,13 @@ export const CallSecurityLine = ({callConnectionState, participants, startedAt}:
           </span>
         ) : (
           // A new key keeps the fade and the turn replaying when one update follows another.
-          <span key={getKeyUpdateDetail(keyUpdate)} css={callSecurityContentStyles}>
+          <span key={getKeyUpdateDetail(translate, keyUpdate)} css={callSecurityContentStyles}>
             <UpdateIcon color="var(--success-color)" css={callSecurityUpdateIconStyles} aria-hidden="true" />
             <span css={callSecurityLabelStyles}>{translate('callSecurityUpdatingKeys')}</span>
             <span css={callSecuritySeparatorStyles} aria-hidden="true">
               ·
             </span>
-            <span>{getKeyUpdateDetail(keyUpdate)}</span>
+            <span>{getKeyUpdateDetail(translate, keyUpdate)}</span>
           </span>
         )}
         <InfoIcon color="var(--foreground-fade-56)" css={callSecurityInfoIconStyles} aria-hidden="true" />
