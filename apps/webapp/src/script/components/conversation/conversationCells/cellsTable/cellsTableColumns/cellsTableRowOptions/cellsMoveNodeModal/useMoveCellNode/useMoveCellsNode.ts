@@ -51,7 +51,7 @@ export const useMoveCellsNode = ({
         targetPath,
       });
       setStatus('success');
-    } catch (error: unknown) {
+    } catch {
       setStatus('error');
     }
   };

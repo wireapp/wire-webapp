@@ -18,7 +18,6 @@
  */
 
 import {AssetType} from 'Repositories/assets/assetType';
-import {translate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 
 import {ContentMessage} from './contentMessage';

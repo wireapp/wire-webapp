@@ -246,13 +246,7 @@ export async function runSegmenter(
 
   let lastStatsTime = performance.now();
 
-  let totalMsSum = 0;
-  let segmentationMsSum = 0;
-  let gpuMsSum = 0;
-  let filterMsSum = 0;
-
   let frames = 0;
-  let totalFrames = 0;
 
   const droppedFrames = 0;
 
@@ -352,12 +346,7 @@ export async function runSegmenter(
         const totalMs = data.filterMs + data.segmentationMs + gpuMs;
 
         // 1. Increment statistics in the background
-        totalMsSum += totalMs;
-        segmentationMsSum += data.segmentationMs;
-        gpuMsSum += gpuMs;
-        filterMsSum += data.filterMs;
         frames++;
-        totalFrames++;
 
         // 2. Update your metrics (delayed until GPU was ready)
         updateMetrics(totalMs, data.segmentationMs, gpuMs);
@@ -372,10 +361,6 @@ export async function runSegmenter(
     if (now - lastStatsTime > statisticsReportingIntervalInMilliseconds) {
       // Only log/reset if data was present at all in the last 2 seconds
       if (frames > 0) {
-        totalMsSum = 0;
-        segmentationMsSum = 0;
-        gpuMsSum = 0;
-        filterMsSum = 0;
         frames = 0;
       }
 

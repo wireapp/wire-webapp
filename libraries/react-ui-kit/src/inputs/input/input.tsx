@@ -117,7 +117,7 @@ export const INPUT_CLASSNAME = 'wireinput';
 export const INPUT_GROUP = 'input-group';
 
 const filterInputProps = (props: InputProps) => {
-  return filterProps(props, ['markInvalid', 'placeholderTextTransform']);
+  return filterProps(props, ['className', 'markInvalid', 'placeholderTextTransform']);
 };
 
 const centerInputAction: CSSObject = {
@@ -129,18 +129,7 @@ const centerInputAction: CSSObject = {
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps<HTMLInputElement>>(
   (
-    {
-      type,
-      label,
-      error,
-      helperText,
-      startContent = null,
-      endContent = null,
-      inputCSS = {},
-      wrapperCSS = {},
-      className = '',
-      ...props
-    },
+    {type, label, error, helperText, startContent = null, endContent = null, inputCSS = {}, wrapperCSS = {}, ...props},
     ref,
   ) => {
     const [isPasswordVisible, setTogglePassword] = useState<boolean>(false);

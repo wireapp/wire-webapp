@@ -31,7 +31,6 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {translate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 import {createUuid} from 'Util/uuid';
 
@@ -53,7 +52,7 @@ const getDefaultParams = (showReactions: boolean = false) => {
     searchRepository,
     showReactions,
     teamRepository: {
-      conversationHasGuestLinkEnabled: async (conversationId: string) => {
+      conversationHasGuestLinkEnabled: async () => {
         return true;
       },
       isSelfConnectedTo: () => {

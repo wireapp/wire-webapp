@@ -165,7 +165,7 @@ describe('PriorityQueue', () => {
       queue = new PriorityQueue({maxRetries: 0});
       try {
         await queue.add(task);
-      } catch (error) {
+      } catch {
       } finally {
         expect(task).toHaveBeenCalledTimes(1);
       }
@@ -177,7 +177,7 @@ describe('PriorityQueue', () => {
       queue = new PriorityQueue({maxRetries: 1});
       try {
         await queue.add(task);
-      } catch (error) {
+      } catch {
       } finally {
         expect(task).toHaveBeenCalledTimes(2);
       }

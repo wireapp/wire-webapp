@@ -19,7 +19,6 @@
 
 import {act, render, waitFor} from '@testing-library/react';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import en from 'I18n/en-US.json';
 import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
@@ -124,7 +123,7 @@ describe('UserModal', () => {
 
   it('correctly fetches user from user repository', async () => {
     jest.useFakeTimers();
-    const refreshUser = jest.fn(async (id: QualifiedId) => {
+    const refreshUser = jest.fn(async () => {
       return new User('mock-id', 'test-domain.mock', translateForTest);
     });
 
@@ -147,7 +146,7 @@ describe('UserModal', () => {
 
   it('shows user not found when user is deleted', async () => {
     jest.useFakeTimers();
-    const refreshUser = jest.fn(async (id: QualifiedId) => {
+    const refreshUser = jest.fn(async () => {
       const user = new User('mock-id', 'test-domain.mock', translateForTest);
       user.isDeleted = true;
       return user;

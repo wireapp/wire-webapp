@@ -41,9 +41,6 @@ jest.mock('./AdminSearchInput', () => {
   };
 });
 
-const renderModal = () => {
-  return render(withTheme(<LeaveGroupAdminModal translate={translateForTest} />));
-};
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
 );

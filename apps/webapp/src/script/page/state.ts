@@ -60,7 +60,7 @@ type AppMainState = {
   };
 };
 
-const useAppMainState = create<AppMainState>((set, get) => {
+const useAppMainState = create<AppMainState>(set => {
   return {
     responsiveView: {
       currentView: ViewType.MOBILE_LEFT_SIDEBAR,

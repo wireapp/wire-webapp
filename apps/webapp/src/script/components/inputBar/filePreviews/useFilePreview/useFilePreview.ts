@@ -88,7 +88,7 @@ export const useFilePreview = ({file, cellsRepository, conversationId, conversat
         fileId: file.id,
         data: {remoteUuid: uuid, remoteVersionId: versionId, uploadStatus: 'success'},
       });
-    } catch (error: unknown) {
+    } catch {
       updateFile({conversationId, fileId: file.id, data: {uploadStatus: 'error'}});
     }
   };

@@ -46,15 +46,8 @@ interface TemporaryGuestAvatarProps extends React.HTMLProps<HTMLDivElement> {
   state: STATE;
 }
 
-const TemporaryGuestAvatar: React.FunctionComponent<TemporaryGuestAvatarProps> = ({
-  avatarSize,
-  noBadge,
-  onClick,
-  participant,
-  isResponsive = false,
-  state,
-  ...props
-}) => {
+const TemporaryGuestAvatar: React.FunctionComponent<TemporaryGuestAvatarProps> = options => {
+  const {avatarSize, noBadge, onClick, participant, isResponsive, state, ...props} = options;
   const borderScale = 0.9916;
   const finalBorderWidth = avatarSize === AVATAR_SIZE.X_LARGE ? extraLargeAvatarBorderWidthInPixels : 1;
   const remainingTime = participant.expirationRemaining();

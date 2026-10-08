@@ -286,7 +286,6 @@ export class BackupRepository {
       const legacyData = await importLegacyBackupToDatabase({
         backupService: this.backupService,
         fileData: files,
-        progressCallback,
         user,
       });
       fileDescriptors = legacyData.fileDescriptors;

@@ -19,7 +19,6 @@
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
 import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import {StatusCodes} from 'http-status-codes';
 
@@ -102,7 +101,7 @@ describe('ConnectionRepository', () => {
 
       connectionRepository.addConnectionEntity(requireValueForTest(user.connection()));
 
-      jest.spyOn(userRepository, 'refreshUser').mockImplementationOnce(async (uid: QualifiedId) => {
+      jest.spyOn(userRepository, 'refreshUser').mockImplementationOnce(async () => {
         user.isDeleted = true;
         return user;
       });
