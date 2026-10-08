@@ -23,6 +23,7 @@ import {NotificationSource} from '../../notification';
 import {MessageSendingState} from '../message';
 import {createId} from '../message/messageBuilder';
 import {PayloadBundle, PayloadBundleType} from '../message/payloadBundle';
+
 export class ConversationMapper {
   public static mapConversationEvent(event: ConversationEvent, source: NotificationSource): PayloadBundle {
     return {

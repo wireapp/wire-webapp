@@ -50,6 +50,7 @@ import {createFetchLatestBuildMetadata} from '../lifecycle/newVersionHandler';
 import {createApplicationObservabilityFromConfig} from '../observability/createApplicationObservabilityFromConfig';
 import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';
+
 const clock = createClock();
 const applicationBootstrapStartedAtMonotonicMicroseconds = clock.currentMonotonicMicroseconds;
 

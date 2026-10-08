@@ -18,4 +18,5 @@
  */
 
 import {ICleared} from '@wireapp/protocol-messaging';
+
 export {ICleared as ClearedContent};

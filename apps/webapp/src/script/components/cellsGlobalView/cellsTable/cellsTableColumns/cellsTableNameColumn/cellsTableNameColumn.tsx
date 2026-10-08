@@ -40,6 +40,7 @@ import {
 } from './cellsTableNameColumn.styles';
 
 import {useCellsFilePreviewModal} from '../../common/cellsFilePreviewModalContext/cellsFilePreviewModalContext';
+
 interface CellsTableNameColumnProps {
   node: CellNode;
 }

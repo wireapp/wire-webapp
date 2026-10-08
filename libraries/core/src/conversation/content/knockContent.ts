@@ -18,4 +18,5 @@
  */
 
 import {IKnock} from '@wireapp/protocol-messaging';
+
 export {IKnock as KnockContent};

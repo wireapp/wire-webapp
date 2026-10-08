@@ -18,4 +18,5 @@
  */
 
 import {IButtonActionConfirmation} from '@wireapp/protocol-messaging';
+
 export {IButtonActionConfirmation as ButtonActionConfirmationContent};

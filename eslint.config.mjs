@@ -7,8 +7,9 @@ import * as emotionPlugin from '@emotion/eslint-plugin';
 import stylisticPlugin from '@stylistic/eslint-plugin';
 import typescriptPlugin from '@typescript-eslint/eslint-plugin';
 import eslintConfigPrettier from 'eslint-config-prettier';
+import {createTypeScriptImportResolver} from 'eslint-import-resolver-typescript';
 import betterStyledComponentsPlugin from 'eslint-plugin-better-styled-components';
-import importPlugin from 'eslint-plugin-import';
+import importPlugin, {createNodeResolver} from 'eslint-plugin-import-x';
 import jestPlugin from 'eslint-plugin-jest';
 import jsxA11yPlugin from 'eslint-plugin-jsx-a11y';
 import noUnsanitizedPlugin from 'eslint-plugin-no-unsanitized';
@@ -102,15 +103,29 @@ const legacySettings = {
   react: {
     version: 'detect',
   },
-  'import/parsers': {
-    '@typescript-eslint/parser': ['.js', '.jsx', '.ts', '.tsx', '.mts'],
+};
+
+const importResolutionExtensions = ['.js', '.jsx', '.ts', '.tsx', '.mjs', '.cjs', '.mts', '.cts'];
+const typescriptImportResolutionExtensions = ['.ts', '.tsx', '.cts', '.mts', '.js', '.jsx', '.cjs', '.mjs'];
+const importTypeScriptResolver = createTypeScriptImportResolver({
+  alwaysTryTypes: true,
+});
+const importNodeResolver = createNodeResolver({extensions: importResolutionExtensions});
+const webappImportResolvers = [
+  importNodeResolver,
+  createTypeScriptImportResolver({
+    alwaysTryTypes: true,
+    project: './apps/webapp/tsconfig.json',
+  }),
+];
+
+const importSettings = {
+  'import-x/extensions': importResolutionExtensions,
+  'import-x/external-module-folders': ['node_modules', 'node_modules/@types'],
+  'import-x/parsers': {
+    '@typescript-eslint/parser': ['.ts', '.tsx', '.mts', '.cts'],
   },
-  'import/resolver': {
-    typescript: {
-      alwaysTryTypes: true,
-      paths: './tsconfig.json',
-    },
-  },
+  'import-x/resolver-next': [importNodeResolver, importTypeScriptResolver],
 };
 
 const legacyRules = {
@@ -177,7 +192,22 @@ const legacyRules = {
   strict: ['error', 'global'],
   'unused-imports/no-unused-imports': 'error',
   'import/no-unresolved': 'error',
+  'import/named': 'error',
+  'import/namespace': ['error', {allowComputed: true}],
+  'import/default': 'error',
+  'import/export': 'error',
+  'import/no-duplicates': 'error',
   'import/no-default-export': 'error',
+  'import/no-deprecated': 'error',
+  'import/no-dynamic-require': 'error',
+  'import/newline-after-import': 'error',
+  'import/first': 'error',
+  'import/no-absolute-path': 'error',
+  'import/no-webpack-loader-syntax': 'error',
+  'import/no-self-import': 'error',
+  'import/no-amd': 'error',
+  'import/no-mutable-exports': 'error',
+  'import/no-empty-named-blocks': 'error',
   'import/order': [
     'error',
     {
@@ -318,8 +348,6 @@ const productionConfigs = [
   jestRecommendedProductionConfig,
   jsxA11yPlugin.flatConfigs.recommended,
   typescriptPlugin.configs['flat/eslint-recommended'],
-  importPlugin.flatConfigs.recommended,
-  importPlugin.flatConfigs.typescript,
   reactPlugin.configs.flat.recommended,
   reactPlugin.configs.flat['jsx-runtime'],
   eslintConfigPrettier,
@@ -330,6 +358,15 @@ const productionConfigs = [
       ...legacyRules,
       'no-unsanitized/property': 'error',
       'no-unsanitized/method': 'error',
+    },
+  },
+  {
+    files: ['**/*.{ts,tsx,mts,cts}'],
+    settings: {
+      'import-x/extensions': typescriptImportResolutionExtensions,
+    },
+    rules: {
+      'import/named': 'off',
     },
   },
   {
@@ -469,14 +506,10 @@ const productionConfigs = [
       'no-empty': 'error',
     },
     settings: {
-      'import/resolver': {
-        typescript: {
-          alwaysTryTypes: true,
-        },
-        node: {
-          extensions: ['.js', '.jsx', '.ts', '.tsx'],
-        },
-      },
+      'import-x/resolver-next': [
+        createNodeResolver({extensions: typescriptImportResolutionExtensions}),
+        importTypeScriptResolver,
+      ],
     },
   },
   {
@@ -559,14 +592,6 @@ const productionConfigs = [
   },
   {
     files: ['apps/webapp/**/*.{ts,tsx}'],
-    settings: {
-      'import/resolver': {
-        typescript: {
-          alwaysTryTypes: true,
-          project: './apps/webapp/tsconfig.json',
-        },
-      },
-    },
     rules: {
       // Webapp path aliases (Util/*, Components/*, …) resolve to lowercase dirs on disk.
       'import/no-unresolved': ['error', {caseSensitive: false}],
@@ -800,7 +825,44 @@ const testLinterOptions = {
 const config = [
   {ignores},
   {linterOptions: repositoryLinterOptions},
+  {
+    files: ['**/*.{js,jsx,cjs,mjs,ts,tsx,mts,cts}'],
+    plugins: {
+      import: importPlugin,
+    },
+    settings: importSettings,
+    rules: {
+      'import/no-named-as-default-member': 'error',
+      'import/no-named-as-default': 'error',
+    },
+  },
   ...productionConfigs,
+  {
+    files: ['apps/webapp/**/*.{ts,tsx}'],
+    settings: {
+      'import-x/resolver-next': webappImportResolvers,
+    },
+  },
+  {
+    // These adapters intentionally consume legacy event and reaction shapes for stored-data compatibility.
+    files: [
+      'apps/webapp/src/script/message/messageHasher.ts',
+      'apps/webapp/src/script/repositories/conversation/EventBuilder/EventBuilder.ts',
+      'apps/webapp/src/script/repositories/conversation/EventMapper.ts',
+      'apps/webapp/src/script/repositories/event/EventService.ts',
+      'apps/webapp/src/script/util/reactionUtil.ts',
+    ],
+    rules: {
+      'import/no-deprecated': 'off',
+    },
+  },
+  {
+    // Webpack needs this computed require to include the selected locale JSON module.
+    files: ['apps/webapp/src/script/auth/page/root.tsx'],
+    rules: {
+      'import/no-dynamic-require': 'off',
+    },
+  },
   {
     files: ['**/*.{ts,tsx,mts,cts}'],
     rules: {
