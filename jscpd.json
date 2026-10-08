@@ -1,0 +1,10 @@
+{
+  "output": "./target/reports/duplication",
+  "minLines": 5,
+  "threshold": 6.11,
+  "reporters": ["console", "json", "html"],
+  "format": ["typescript"],
+  "absolute": false,
+  "gitignore": true,
+  "ignore": ["**/target/**", "**/node_modules/**", "**/dist/**", "**/build/**", "**/coverage/**", "**/script/components/icon.tsx"]
+}
