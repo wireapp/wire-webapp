@@ -452,7 +452,7 @@ const productionConfigs = [
           },
         },
       ],
-      'id-length': 'warn',
+      'id-length': ['error', {min: 2, properties: 'never'}],
       'no-restricted-syntax': restrictedSyntaxRule,
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/ban-ts-comment': 'off',

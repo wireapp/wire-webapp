@@ -39,8 +39,8 @@ export const useCellConversationPublicLink = ({
 }: UseCellConversationPublicLinkParams) => {
   const {getNodes, setPublicLink} = useCellsStore();
   const nodes = getNodes({conversationId});
-  const node = nodes.find(n => {
-    return n.id === uuid;
+  const node = nodes.find(cellNode => {
+    return cellNode.id === uuid;
   });
   return useCellPublicLink({
     uuid,

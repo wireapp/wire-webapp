@@ -165,9 +165,9 @@ export function updateAccessRights(accessState: ACCESS_STATE): UpdatedAccessRigh
     //reverse so that the index reflects the number of significant figures for finding the feature
     .toReversed()
     //find the name of the feature with the correct sigfigs
-    .map((bit: '1' | '0', i) => {
+    .map((bit: '1' | '0', bitIndex) => {
       return Object.entries(ACCESS).find(([, bitmask]) => {
-        return bitmask === +bit << i;
+        return bitmask === +bit << bitIndex;
       })?.[0];
     })
     .forEach(feature => {

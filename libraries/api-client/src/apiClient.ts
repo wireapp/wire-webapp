@@ -350,8 +350,8 @@ export class APIClient extends EventEmitter {
     const inRangeVersions = versions.filter(version => {
       return version >= min && version <= max;
     });
-    const [highestVersion] = inRangeVersions.toSorted((a, b) => {
-      return b - a;
+    const [highestVersion] = inRangeVersions.toSorted((firstVersion, secondVersion) => {
+      return secondVersion - firstVersion;
     });
     return highestVersion;
   }

@@ -209,8 +209,8 @@ export const splitFingerprint = (fingerprint: string): string[] => {
 // over the numeric values of the single characters of the received string.
 export const fixWebsocketString = (originalString: string): string => {
   const charArray = Uint8Array.from(
-    [...originalString].map(c => {
-      return c.charCodeAt(0);
+    [...originalString].map(character => {
+      return character.charCodeAt(0);
     }),
   );
   const decoder = new TextDecoder();
@@ -306,7 +306,7 @@ export const generateRandomPassword = (passwordLength: number = 8): string => {
   password += specialChars[getRandomIndex(specialChars.length)];
 
   // Add additional random characters to the password using all possible characters
-  for (let i = 0; i < additionalChars; i++) {
+  for (let characterIndex = 0; characterIndex < additionalChars; characterIndex++) {
     password += allChars[getRandomIndex(allChars.length)];
   }
 

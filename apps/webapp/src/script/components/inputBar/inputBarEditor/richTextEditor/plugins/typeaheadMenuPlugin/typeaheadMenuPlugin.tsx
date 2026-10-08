@@ -154,9 +154,9 @@ function getQueryTextForSearch(editor: LexicalEditor): string | null {
  */
 function getFullMatchOffset(documentText: string, entryText: string, offset: number): number {
   let triggerOffset = offset;
-  for (let i = triggerOffset; i <= entryText.length; i++) {
-    if (documentText.substr(-i) === entryText.substr(0, i)) {
-      triggerOffset = i;
+  for (let matchLength = triggerOffset; matchLength <= entryText.length; matchLength++) {
+    if (documentText.substr(-matchLength) === entryText.substr(0, matchLength)) {
+      triggerOffset = matchLength;
     }
   }
   return triggerOffset;

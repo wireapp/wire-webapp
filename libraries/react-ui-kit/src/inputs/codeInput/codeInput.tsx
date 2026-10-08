@@ -202,31 +202,31 @@ export const CodeInput = ({
           width: '100%',
         }}
       >
-        {Array.from({length: digits}, (_, index) => {
+        {Array.from({length: digits}, (arrayElement, digitIndex) => {
           return (
             <DigitInput
-              key={index}
+              key={digitIndex}
               onPaste={event => {
-                return handlePaste(index, event);
+                return handlePaste(digitIndex, event);
               }}
               onFocus={forceSelection}
               onMouseDown={forceSelectionPreventDefault}
               onTouchStart={forceSelectionPreventDefault}
               onKeyDown={event => {
-                return handleKeyDown(index, event);
+                return handleKeyDown(digitIndex, event);
               }}
               onKeyUp={forceSelection}
               markInvalid={markInvalid}
               ref={(node): void => {
-                inputs[index] = node;
+                inputs[digitIndex] = node;
               }}
-              value={values[index]}
+              value={values[digitIndex]}
               disabled={disabled}
-              id={`code-input-digit-${index}`}
+              id={`code-input-digit-${digitIndex}`}
               inputMode="numeric"
               pattern="[0-9]*"
               autoComplete="one-time-code"
-              aria-label={getDigitAriaLabel(values[index])}
+              aria-label={getDigitAriaLabel(values[digitIndex])}
               aria-describedby={labelId}
             />
           );

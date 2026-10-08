@@ -142,7 +142,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
 
     this.userMapper = new UserMapper(serverTimeHandler, this.translate);
 
-    this.getTeamMembersFromUsers = async (_: User[]) => {
+    this.getTeamMembersFromUsers = async (users: User[]) => {
       return undefined;
     };
 
