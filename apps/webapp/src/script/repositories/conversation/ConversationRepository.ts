@@ -286,7 +286,6 @@ export class ConversationRepository {
       const {missingClients, deletedClients, emptyUsers, missingUserIds} = extractClientDiff(
         filteredMismatch,
         conversation?.allUserEntities() ?? [],
-        domain,
       );
       const mismatchTimestamp = mismatch.time !== undefined ? new Date(mismatch.time).getTime() : Date.now();
 

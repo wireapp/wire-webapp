@@ -47,7 +47,6 @@ const DeviceSelect = ({
   icon: DeviceIcon,
   uieName,
   onChange,
-  title,
 }: DeviceSelectProps) => {
   const devicesList = devices.map(({deviceId, label}) => {
     return {

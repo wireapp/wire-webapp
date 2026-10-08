@@ -65,7 +65,7 @@ export function serializeArgs(args: any[]): any[] {
     } else if (typeof arg === 'object' && arg !== null) {
       try {
         result = safeJsonStringify(arg);
-      } catch (error) {
+      } catch {
         result = '[Unserializable Object]';
       }
     } else {

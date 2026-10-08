@@ -36,7 +36,6 @@ import {translateForTest} from 'Util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 const testFactory = new TestFactory();
-let conversationRepository: ConversationRepository;
 const rootContextValue = createRootContextValueForTest({translate: translateForTest});
 const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
@@ -50,7 +49,7 @@ const getDefaultParams = () => {
 
 describe('Notifications', () => {
   beforeAll(async () => {
-    conversationRepository = await testFactory.exposeConversationActors();
+    await testFactory.exposeConversationActors();
   });
 
   it('has the correct input checked', () => {

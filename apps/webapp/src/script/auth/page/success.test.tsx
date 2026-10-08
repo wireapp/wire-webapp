@@ -54,7 +54,7 @@ describe('Success', () => {
   };
 
   it('renders all expected elements', () => {
-    const {getByTestId, getByText} = renderComponent(<Success />);
+    const {getByText} = renderComponent(<Success />);
     expect(getByText('Great, your personal account is set up. Now you can connect with people.')).toBeInTheDocument();
     expect(getByText('What do you want to do next?')).toBeInTheDocument();
     expect(getByText('Download Wire')).toBeInTheDocument();

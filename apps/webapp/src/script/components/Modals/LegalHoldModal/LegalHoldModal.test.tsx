@@ -25,7 +25,6 @@ import en from 'I18n/en-US.json';
 import si from 'I18n/si-LK.json';
 import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {ClientRepository} from 'Repositories/client';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
@@ -50,7 +49,6 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 const userRepository = {} as UserRepository;
 const testFactory = new TestFactory();
-let callRepository: CallingRepository;
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
 );
@@ -101,13 +99,13 @@ const defaultProps = () => {
   return {
     clientRepository: {} as ClientRepository,
     conversationRepository: {
-      getAllUsersInConversation: (conversationId: QualifiedId): Promise<User[]> => {
+      getAllUsersInConversation: (_: QualifiedId): Promise<User[]> => {
         return Promise.resolve([]);
       },
     } as ConversationRepository,
     cryptographyRepository: new CryptographyRepository({} as any),
     messageRepository: {
-      updateAllClients: (conversation: Conversation, blockSystemMessage: boolean): Promise<void> => {
+      updateAllClients: (..._: [Conversation, boolean]): Promise<void> => {
         return Promise.resolve();
       },
     } as MessageRepository,
@@ -123,7 +121,7 @@ const defaultProps = () => {
 
 describe('LegalHoldModal', () => {
   beforeAll(async () => {
-    callRepository = await testFactory.exposeCallingActors();
+    await testFactory.exposeCallingActors();
   });
 
   it('is showRequestModal', (): void => {

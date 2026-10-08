@@ -58,7 +58,7 @@ describe('SingleSignOnForm', () => {
       },
     });
 
-    const doLogin = jasmine.createSpy().and.returnValue((code: string) => {
+    const doLogin = jasmine.createSpy().and.returnValue(() => {
       return Promise.resolve();
     });
     const initialCode = 'wire-cb6e4dfc-a4b0-4c59-a31d-303a7f5eb5ab';
@@ -93,7 +93,7 @@ describe('SingleSignOnForm', () => {
     });
 
     const historyPushSpy = spyOn(history, 'pushState');
-    const doLogin = jasmine.createSpy().and.returnValue((code: string) => {
+    const doLogin = jasmine.createSpy().and.returnValue(() => {
       return Promise.resolve();
     });
     const code = 'wire-cb6e4dfc-a4b0-4c59-a31d-303a7f5eb5ab';

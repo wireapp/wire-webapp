@@ -291,7 +291,7 @@ export const loadBackgroundSource = async (backgroundId: string): Promise<Backgr
       media: image,
       url: background.imageUrl,
     };
-  } catch (_error) {
+  } catch {
     return createGradientBitmap(background.previewColors).then(bitmap => {
       return {
         type: 'image',

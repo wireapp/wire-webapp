@@ -1519,7 +1519,7 @@ export class MessageRepository {
       });
       const messageEntity = await this.getMessageInConversationById(conversation, message.id);
       await this.eventService.updateEventSequentially({primary_key: messageEntity.primary_key, ...changes});
-    } catch (error: unknown) {
+    } catch {
       message.waitingButtonId(undefined);
       return message.setButtonError(buttonId, this.translate('buttonActionError'));
     }

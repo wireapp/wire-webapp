@@ -105,7 +105,7 @@ class FallbackProcessor implements MediaStreamTrackProcessor {
           controller.enqueue(
             new VideoFrame(canvas, {timestamp: Math.round(performance.now() * microsecondsPerMillisecond)}),
           ); // µs
-        } catch (error: unknown) {
+        } catch {
           running = false;
           close();
         }

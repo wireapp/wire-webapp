@@ -48,7 +48,6 @@ import {GenericMessage, Text} from '@wireapp/protocol-messaging';
 jest.mock('./conversation', () => {
   const actual = jest.requireActual('./conversation');
   class FakeConversationService {
-    constructor(..._args: any[]) {}
     // Return unhandled so NotificationService falls back to generic handling in tests
     handleEvent = jest.fn(async () => {
       return {status: 'unhandled' as const};

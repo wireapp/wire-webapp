@@ -209,6 +209,14 @@ function getEffectiveCallingConfig(callingConfig: CallConfigData, useRustSft: bo
   };
 }
 
+type SFTRequestCallback = (
+  requestContext: number,
+  requestUrl: string,
+  requestBody: string,
+  requestBodyLength: number,
+  sftRequestMetadata: number,
+) => number;
+
 export class CallingRepository {
   private readonly acceptVersionWarning: (conversationId: QualifiedId) => void;
   private readonly callLog: string[];
@@ -2594,13 +2602,7 @@ export class CallingRepository {
     void this.sendCallingMessage(conversationId, {type: CALL_MESSAGE_TYPE.REMOTE_KICK}, {nativePush: true, recipients});
   };
 
-  private readonly sendSFTRequest = (
-    context: number,
-    url: string,
-    data: string,
-    _dataLength: number,
-    __: number,
-  ): number => {
+  private readonly sendSFTRequest: SFTRequestCallback = (context, url, data) => {
     const _sendSFTRequest = async () => {
       if (!isAllowedSftUrl(url, this.allowedSftOrigins)) {
         throw new Error('SFT request destination is not allowed');
@@ -3029,7 +3031,7 @@ export class CallingRepository {
     }
   };
 
-  private readonly requestClients = async (wUser: number, convId: SerializedConversationId, __: number) => {
+  private readonly requestClients = async (wUser: number, convId: SerializedConversationId) => {
     const call = this.findCall(this.parseQualifiedId(convId));
     if (isUndefined(call)) {
       this.logger.warn(`Unable to find a call for the conversation id of ${convId}`);

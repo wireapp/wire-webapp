@@ -41,7 +41,7 @@ function createDependencies() {
   return {
     conversationQualifiedId,
     fireAndForgetInvoker,
-    isAcceptedFile: jest.fn((_file: File) => {
+    isAcceptedFile: jest.fn(() => {
       return true;
     }),
     isInRecycleBin: false,

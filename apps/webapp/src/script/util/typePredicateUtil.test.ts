@@ -21,7 +21,6 @@ import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import type {AxiosError} from 'axios';
 
 import {isAxiosError, isBackendError, isErrorWithCode, isErrorWithType} from 'Util/typePredicateUtil';
-import {toError} from 'Util/toError';
 
 describe('typePredicateUtil', () => {
   describe('isAxiosError', () => {

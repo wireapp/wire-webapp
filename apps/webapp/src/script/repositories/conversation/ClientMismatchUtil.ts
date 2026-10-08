@@ -50,7 +50,6 @@ type ClientDiff = {
 export function extractClientDiff(
   {deleted = {}, redundant = {}, missing = {}}: Partial<MessageSendingStatus>,
   users?: User[],
-  defaultDomain: string = '',
 ): ClientDiff {
   const allDeleted = {...deleted, ...redundant} as QualifiedUserClients;
   const deletedClients = flattenUserMap(allDeleted);

@@ -129,7 +129,7 @@ function tryToPositionRange(leadOffset: number, range: Range): boolean {
   try {
     range.setStart(anchorNode, startOffset);
     range.setEnd(anchorNode, endOffset);
-  } catch (error: unknown) {
+  } catch {
     return false;
   }
 

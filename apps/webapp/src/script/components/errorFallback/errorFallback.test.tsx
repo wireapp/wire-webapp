@@ -35,7 +35,7 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
 describe('ErrorFallback', () => {
   it('Correctly prints the error', () => {
     const action = jest.fn();
-    jest.spyOn(PrimaryModal, 'show').mockImplementation((_, payload) => {
+    jest.spyOn(PrimaryModal, 'show').mockImplementation(() => {
       return action();
     });
     const resetErrorBoundary = jest.fn();

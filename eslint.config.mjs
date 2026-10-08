@@ -149,12 +149,6 @@ const legacyRules = {
   'no-nested-ternary': 'error',
   'no-unneeded-ternary': 'error',
   'no-unused-expressions': 'error',
-  '@typescript-eslint/no-unused-vars': [
-    'error',
-    {
-      args: 'none',
-    },
-  ],
   'no-useless-return': 'error',
   'no-var': 'error',
   'one-var': ['error', 'never'],
@@ -459,13 +453,6 @@ const productionConfigs = [
       '@typescript-eslint/no-var-requires': 'off',
       '@typescript-eslint/no-non-null-assertion': 'error',
       '@typescript-eslint/no-floating-promises': 'warn',
-      '@typescript-eslint/no-unused-vars': [
-        'warn',
-        {
-          argsIgnorePattern: '^(_?err(or)?|error)$',
-          varsIgnorePattern: '^(_?err(or)?|error)$',
-        },
-      ],
       '@typescript-eslint/use-unknown-in-catch-callback-variable': 'error',
       '@typescript-eslint/array-type': [
         'error',
@@ -814,6 +801,23 @@ const config = [
   {ignores},
   {linterOptions: repositoryLinterOptions},
   ...productionConfigs,
+  {
+    files: ['**/*.{ts,tsx,mts,cts}'],
+    rules: {
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          vars: 'all',
+          args: 'after-used',
+          ignoreRestSiblings: true,
+          argsIgnorePattern: '^_$',
+          caughtErrors: 'all',
+          caughtErrorsIgnorePattern: '^_$',
+        },
+      ],
+    },
+  },
   {
     files: ['**/*.{ts,tsx,mts}'],
     rules: {

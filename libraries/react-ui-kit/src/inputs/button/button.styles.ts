@@ -229,23 +229,22 @@ const buttonSendStyles = <T>({backgroundColor, disabled, isActive}: ButtonProps<
   };
 };
 
-export const buttonStyle: <T>(theme: Theme, props: ButtonProps<T>) => CSSObject = (
-  theme,
-  {
+export const buttonStyle: <T>(theme: Theme, props: ButtonProps<T>) => CSSObject = (theme, buttonProperties) => {
+  const {
     variant = ButtonVariant.PRIMARY,
     block = false,
-    noCapital = false,
+    noCapital,
     bold = true,
     center = true,
-    color = COLOR.WHITE,
+    color,
     fontSize = theme.fontSizes.base,
     noWrap = true,
     textTransform = 'none',
     truncate = true,
     group = false,
     ...props
-  },
-) => {
+  } = buttonProperties;
+
   return {
     ...textStyle(theme, {
       block,
@@ -256,6 +255,7 @@ export const buttonStyle: <T>(theme: Theme, props: ButtonProps<T>) => CSSObject 
       textTransform,
       truncate,
       ...props,
+      color: theme.general.color,
     }),
     border: 0,
     cursor: props.disabled === true ? 'not-allowed' : 'pointer',

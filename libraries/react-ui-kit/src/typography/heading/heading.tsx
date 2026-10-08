@@ -41,10 +41,16 @@ export const Heading = ({level, ...props}: HeadingProps) => {
   }
 };
 
-export const h1Style: <T>(theme: Theme, props: HeadingProps<T>) => CSSObject = (
-  theme,
-  {block = true, color = theme.general.color, level = '1', noWrap = false, textTransform = 'none', ...props},
-) => {
+export const h1Style: <T>(theme: Theme, props: HeadingProps<T>) => CSSObject = (theme, headingProperties) => {
+  const {
+    block = true,
+    color = theme.general.color,
+    level,
+    noWrap = false,
+    textTransform = 'none',
+    ...props
+  } = headingProperties;
+
   return {
     ...textStyle(theme, {block, color, noWrap, textTransform, ...props}),
     fontSize: '3rem',
