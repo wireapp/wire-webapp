@@ -76,6 +76,8 @@ interface Props extends React.HTMLProps<HTMLDivElement> {
 export enum Scope {
   WRITE_CONVERSATIONS = 'write:conversations',
   WRITE_CONVERSATIONS_CODE = 'write:conversations_code',
+  ADMIN_MEETINGS = 'admin:meetings',
+  WRITE_MEETINGS = 'write:meetings',
   READ_SELF = 'read:self',
   READ_FEATURE_CONFIGS = 'read:feature_configs',
 }
