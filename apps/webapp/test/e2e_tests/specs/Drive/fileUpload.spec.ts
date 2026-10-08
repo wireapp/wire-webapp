@@ -108,6 +108,33 @@ test.describe('Drive file uploads', () => {
     });
   });
 
+  test(
+    'I want to upload a duplicate file to Drive and have it renamed',
+    {tag: ['@TC-12140', '@regression']},
+    async () => {
+      const {pages} = pageManager.webapp;
+      const sharedDrive = pages.cellsSharedDrive();
+      const renamedTextFileName = 'example-1.txt';
+
+      await test.step('User uploads the same file twice', async () => {
+        await sharedDrive.uploadFile(getTextFilePath());
+        await expect(sharedDrive.uploadStatusHeader).toContainText(`Uploaded ${TextFileName}`);
+
+        await sharedDrive.uploadFile(getTextFilePath());
+        await expect(sharedDrive.uploadStatusHeader).toContainText(`Uploaded ${TextFileName}`);
+      });
+
+      await test.step('Both files are available and the duplicate is renamed', async () => {
+        await expect(async () => {
+          await sharedDrive.refresh();
+          await expect(sharedDrive.getFile(TextFileName)).toBeVisible({timeout: 2_000});
+          await expect(sharedDrive.getFile(renamedTextFileName)).toBeVisible({timeout: 2_000});
+          await expect(sharedDrive.filesList.getByRole('button', {name: TextFileName, exact: true})).toHaveCount(1);
+        }).toPass({intervals: [1_000, 2_000, 5_000], timeout: 20_000});
+      });
+    },
+  );
+
   test('I want to upload multiple files to Drive', {tag: ['@TC-12133', '@functional', '@crit-flow-web']}, async () => {
     const {pages} = pageManager.webapp;
     const sharedDrive = pages.cellsSharedDrive();
