@@ -3,9 +3,6 @@ name: Notify Deployoholics
 description: Send a message to the Deployoholics Wire channel.
 
 inputs:
-  webhook-url:
-    description: Deployoholics Wire webhook URL.
-    required: true
   text:
     description: Wire message text.
     required: true
@@ -13,14 +10,23 @@ inputs:
     description: Wire notification status.
     required: false
     default: failure
+  webhook-url:
+    description: Wire webhook URL.
+    required: true
+  token:
+    description: GitHub Actions token.
+    required: true
 
 runs:
   using: composite
   steps:
     - name: Send Wire notification
-      uses: 8398a7/action-slack@293f8dc0f9731ac35321056641cdef895f4f65f8
-      env:
-        SLACK_WEBHOOK_URL: ${{ inputs.webhook-url }}
+      uses: 
+        wireapp/github-app/.github/actions/notify-wire@3a9c9d7e71d96d391951429c1d1bfbbee081ed8c
       with:
-        status: ${{ inputs.status }}
-        text: ${{ inputs.text }}
+        webhook-url: ${{ inputs.webhook-url }}
+        token: ${{ inputs.token }}
+        text: |-
+              ${{ inputs.status }}
+
+              ${{ inputs.text }}
