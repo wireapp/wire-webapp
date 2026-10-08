@@ -1,6 +1,6 @@
 ---
 name: Notify Deployoholics
-description: Send a message to the Deployoholics Wire channel.
+description: Send a message to the Deployoholics Wire channel using the Deployoholics webhook and token.
 
 inputs:
   text:
@@ -10,23 +10,22 @@ inputs:
     description: Wire notification status.
     required: false
     default: failure
-  webhook-url:
-    description: Wire webhook URL.
+  deployoholics-webhook-url:
+    description: Wire webhook URL to notify Deployoholics conversation.
     required: true
-  token:
-    description: GitHub Actions token.
+  deployoholics-token:
+    description: GitHub Actions token to notify Deployoholics conversation.
     required: true
 
 runs:
   using: composite
   steps:
     - name: Send Wire notification
-      uses: 
-        wireapp/github-app/.github/actions/notify-wire@3a9c9d7e71d96d391951429c1d1bfbbee081ed8c
+      uses: wireapp/github-app/.github/actions/notify-wire@3a9c9d7e71d96d391951429c1d1bfbbee081ed8c
       with:
-        webhook-url: ${{ inputs.webhook-url }}
-        token: ${{ inputs.token }}
+        webhook-url: ${{ inputs.deployoholics-webhook-url }}
+        token: ${{ inputs.deployoholics-token }}
         text: |-
-              ${{ inputs.status }}
+          ${{ inputs.status }}
 
-              ${{ inputs.text }}
+          ${{ inputs.text }}

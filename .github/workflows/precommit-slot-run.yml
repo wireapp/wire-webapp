@@ -43,9 +43,9 @@ on:
         required: true
       WEBTEAM_AWS_SECRET_ACCESS_KEY:
         required: true
-      WIRE_WEBHOOK_URL:
+      WIRE_DEPLOYOHOLICS_WEBHOOK_URL:
         required: false
-      WIRE_ACTIONS_TOKEN:
+      WIRE_DEPLOYOHOLICS_TOKEN:
         required: false
       TESTINY_API_KEY:
         required: false
@@ -217,8 +217,8 @@ jobs:
       - name: Announce failed critical flow
         uses: ./.github/actions/notify-deployoholics
         with:
-          webhook-url: ${{ secrets.WIRE_WEBHOOK_URL }}
-          token: ${{ secrets.WIRE_ACTIONS_TOKEN }}
+          deployoholics-webhook-url: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
+          deployoholics-token: ${{ secrets.WIRE_DEPLOYOHOLICS_TOKEN }}
           status: failure
           text: |
             ❌ Playwright Critical Flow failed ❌
