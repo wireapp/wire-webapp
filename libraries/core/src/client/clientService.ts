@@ -27,12 +27,12 @@ import {
   RegisteredClient,
 } from '@wireapp/api-client/lib/client';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import axios from 'axios';
+import {isAxiosError} from 'axios';
 import {StatusCodes} from 'http-status-codes';
 
 import {APIClient} from '@wireapp/api-client';
 import {LogFactory} from '@wireapp/commons';
-import {CRUDEngine} from '@wireapp/store-engine';
+import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
 
 import type {ProteusService} from '../messagingProtocols/proteus';
 import {InitialPrekeys} from '../messagingProtocols/proteus/proteusService/cryptoClient';
@@ -100,11 +100,20 @@ export class ClientService {
     return this.database.deleteLocalClient();
   }
 
+  /**
+   * Returns `undefined` only when the local client record is genuinely absent.
+   * Any other failure (closed/corrupt IndexedDB, quota or disk errors) is rethrown so that callers
+   * do not mistake an unreadable client for a deleted one and wipe the local history.
+   */
   private async getLocalClient(): Promise<MetaClient | undefined> {
     try {
       return await this.database.getLocalClient();
     } catch (error: unknown) {
-      return undefined;
+      if (error instanceof StoreEngineError.RecordNotFoundError) {
+        return undefined;
+      }
+      this.logger.error('Failed to read local client from database', error);
+      throw error;
     }
   }
 
@@ -125,9 +134,9 @@ export class ClientService {
 
     try {
       const remoteClient = await this.apiClient.api.client.getClient(loadedClient.id);
-      return this.database.updateLocalClient(remoteClient);
+      return await this.database.updateLocalClient(remoteClient);
     } catch (error: unknown) {
-      const notFoundOnBackend = axios.isAxiosError(error) ? error.response?.status === StatusCodes.NOT_FOUND : false;
+      const notFoundOnBackend = isAxiosError(error) ? error.response?.status === StatusCodes.NOT_FOUND : false;
       if (notFoundOnBackend && this.storeEngine !== undefined) {
         const shouldDeleteWholeDatabase = loadedClient.type === ClientType.TEMPORARY;
         await this.proteusService.wipe();
@@ -139,6 +148,12 @@ export class ClientService {
         }
         const log = `No valid client on backend, deleting identity (deleting content: ${shouldDeleteWholeDatabase ? 'yes' : 'no'})`;
         this.logger.warn(log);
+        return undefined;
+      }
+      if (!isAxiosError(error)) {
+        // Local write failure (e.g. disk full): the client still exists, keep using the stored record.
+        this.logger.warn('Failed to update local client in database, using stored client', error);
+        return loadedClient;
       }
     }
     return undefined;
