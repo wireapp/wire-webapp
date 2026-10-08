@@ -34,50 +34,97 @@ import {translateForTest} from 'Util/test/translateForTest';
 
 import {useLoadMessages} from './useLoadMessages';
 
+type UseLoadMessagesHookOptions = {
+  readonly itemsLength: number;
+  readonly shouldPullMessages: boolean;
+};
+
+type UseLoadMessagesTestSetup = {
+  readonly clock: ReturnType<typeof createDeterministicClock>;
+  readonly conversation: Conversation;
+  readonly newestMessage: Message;
+  readonly getPrecedingMessages: jest.MockedFunction<ConversationRepository['getPrecedingMessages']>;
+  readonly getSubsequentMessages: jest.MockedFunction<ConversationRepository['getSubsequentMessages']>;
+  readonly measure: jest.MockedFunction<Virtualizer<HTMLDivElement, Element>['measure']>;
+  readonly fireAndForgetInvoker: ReturnType<typeof createExecutingFireAndForgetInvokerForTest>;
+  readonly rerender: (options: UseLoadMessagesHookOptions) => void;
+  readonly unmount: () => void;
+};
+
+function renderUseLoadMessagesForTest(options: Partial<UseLoadMessagesHookOptions> = {}): UseLoadMessagesTestSetup {
+  const {itemsLength = 1, shouldPullMessages = false} = options;
+  const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+  const conversation = new Conversation('conversation', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+  const newestMessage = new Message('newest-loaded', undefined, translateForTest);
+  newestMessage.timestamp(1);
+  conversation.messages_unordered([newestMessage]);
+  conversation.last_event_timestamp(2);
+  const getPrecedingMessages = jest
+    .fn<
+      ReturnType<ConversationRepository['getPrecedingMessages']>,
+      Parameters<ConversationRepository['getPrecedingMessages']>
+    >()
+    .mockResolvedValue([]);
+  const getSubsequentMessages = jest
+    .fn<
+      ReturnType<ConversationRepository['getSubsequentMessages']>,
+      Parameters<ConversationRepository['getSubsequentMessages']>
+    >()
+    .mockResolvedValue([]);
+  const conversationRepository = {getPrecedingMessages, getSubsequentMessages} as unknown as ConversationRepository;
+  const parentElement = document.createElement('div');
+  const virtualItems = [{index: 0}];
+  const measure = jest.fn<void, []>();
+  const virtualizer = {
+    measure,
+    getVirtualItems: () => {
+      return virtualItems;
+    },
+    getTotalSize: () => {
+      return 0;
+    },
+  } as unknown as Virtualizer<HTMLDivElement, Element>;
+  const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
+  const {rerender, unmount} = renderHook(
+    (hookOptions: UseLoadMessagesHookOptions) => {
+      return useLoadMessages(virtualizer, {
+        conversation,
+        conversationRepository,
+        itemsLength: hookOptions.itemsLength,
+        shouldPullMessages: hookOptions.shouldPullMessages,
+        isConversationLoaded: true,
+        parentElement,
+      });
+    },
+    {
+      initialProps: {itemsLength, shouldPullMessages},
+      wrapper: createRootProviderWrapperForTest(
+        createRootContextValueForTest({
+          translate: translateForTest,
+          fireAndForgetInvoker,
+          clock,
+        }),
+      ),
+    },
+  );
+
+  return {
+    clock,
+    conversation,
+    newestMessage,
+    getPrecedingMessages,
+    getSubsequentMessages,
+    measure,
+    fireAndForgetInvoker,
+    rerender,
+    unmount,
+  };
+}
+
 describe('useLoadMessages', () => {
   it('loads following messages when the virtualized tail is at index zero', async () => {
-    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
-    const conversation = new Conversation('conversation', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
-    const newestMessage = new Message('newest-loaded', undefined, translateForTest);
-    newestMessage.timestamp(1);
-    conversation.messages_unordered([newestMessage]);
-    conversation.last_event_timestamp(2);
-    const getSubsequentMessages = jest.fn().mockResolvedValue([]);
-    const conversationRepository = {getSubsequentMessages} as unknown as ConversationRepository;
-    const parentElement = document.createElement('div');
-    const virtualItems = [{index: 0}];
-    const measure = jest.fn();
-    const virtualizer = {
-      measure,
-      getVirtualItems: () => {
-        return virtualItems;
-      },
-      getTotalSize: () => {
-        return 0;
-      },
-    } as unknown as Virtualizer<HTMLDivElement, Element>;
-    const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
-    const {unmount} = renderHook(
-      () => {
-        return useLoadMessages(virtualizer, {
-          conversation,
-          conversationRepository,
-          itemsLength: 1,
-          shouldPullMessages: false,
-          isConversationLoaded: true,
-          parentElement,
-        });
-      },
-      {
-        wrapper: createRootProviderWrapperForTest(
-          createRootContextValueForTest({
-            translate: translateForTest,
-            fireAndForgetInvoker,
-            clock,
-          }),
-        ),
-      },
-    );
+    const {clock, conversation, newestMessage, getSubsequentMessages, measure, fireAndForgetInvoker, unmount} =
+      renderUseLoadMessagesForTest();
 
     try {
       await act(async () => {
@@ -100,47 +147,7 @@ describe('useLoadMessages', () => {
   });
 
   it('does not load following messages when unmounted before the debounce expires', async () => {
-    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
-    const conversation = new Conversation('conversation', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
-    const newestMessage = new Message('newest-loaded', undefined, translateForTest);
-    newestMessage.timestamp(1);
-    conversation.messages_unordered([newestMessage]);
-    conversation.last_event_timestamp(2);
-    const getSubsequentMessages = jest.fn().mockResolvedValue([]);
-    const conversationRepository = {getSubsequentMessages} as unknown as ConversationRepository;
-    const parentElement = document.createElement('div');
-    const virtualItems = [{index: 0}];
-    const virtualizer = {
-      measure: jest.fn(),
-      getVirtualItems: () => {
-        return virtualItems;
-      },
-      getTotalSize: () => {
-        return 0;
-      },
-    } as unknown as Virtualizer<HTMLDivElement, Element>;
-    const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
-    const {unmount} = renderHook(
-      () => {
-        return useLoadMessages(virtualizer, {
-          conversation,
-          conversationRepository,
-          itemsLength: 1,
-          shouldPullMessages: false,
-          isConversationLoaded: true,
-          parentElement,
-        });
-      },
-      {
-        wrapper: createRootProviderWrapperForTest(
-          createRootContextValueForTest({
-            translate: translateForTest,
-            fireAndForgetInvoker,
-            clock,
-          }),
-        ),
-      },
-    );
+    const {clock, getSubsequentMessages, fireAndForgetInvoker, unmount} = renderUseLoadMessagesForTest();
 
     unmount();
 
@@ -150,5 +157,53 @@ describe('useLoadMessages', () => {
     });
 
     expect(getSubsequentMessages).not.toHaveBeenCalled();
+  });
+
+  it('does not restart preceding-message loading when the item count changes', async () => {
+    const {clock, getPrecedingMessages, fireAndForgetInvoker, rerender, unmount} = renderUseLoadMessagesForTest({
+      shouldPullMessages: true,
+    });
+
+    try {
+      await act(async () => {
+        clock.advanceByMilliseconds(99);
+        rerender({itemsLength: 2, shouldPullMessages: true});
+      });
+
+      expect(getPrecedingMessages).not.toHaveBeenCalled();
+
+      await act(async () => {
+        clock.advanceByMilliseconds(1);
+        await fireAndForgetInvoker.waitUntilAllSettled();
+      });
+
+      expect(getPrecedingMessages).toHaveBeenCalledTimes(1);
+    } finally {
+      unmount();
+    }
+  });
+
+  it('does not restart following-message loading when preceding-message intent changes', async () => {
+    const {clock, conversation, newestMessage, getSubsequentMessages, fireAndForgetInvoker, rerender, unmount} =
+      renderUseLoadMessagesForTest();
+
+    try {
+      await act(async () => {
+        clock.advanceByMilliseconds(50);
+        rerender({itemsLength: 1, shouldPullMessages: true});
+      });
+
+      expect(getSubsequentMessages).not.toHaveBeenCalled();
+
+      await act(async () => {
+        clock.advanceByMilliseconds(50);
+        await fireAndForgetInvoker.waitUntilAllSettled();
+      });
+
+      expect(getSubsequentMessages).toHaveBeenCalledTimes(1);
+      expect(getSubsequentMessages).toHaveBeenCalledWith(conversation, newestMessage);
+    } finally {
+      unmount();
+    }
   });
 });
