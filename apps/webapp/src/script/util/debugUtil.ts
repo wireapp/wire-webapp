@@ -202,8 +202,8 @@ export class DebugUtil {
       return;
     }
 
-    const participants = new Array(number).fill(0).map((_, i) => {
-      return new Participant(new User('', '', translate), `some-client-id-${i}`);
+    const participants = new Array(number).fill(0).map((initialValue, participantIndex) => {
+      return new Participant(new User('', '', translate), `some-client-id-${participantIndex}`);
     });
     participants.forEach(participant => {
       call.addParticipant(participant);

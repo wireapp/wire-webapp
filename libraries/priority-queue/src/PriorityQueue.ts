@@ -25,11 +25,11 @@ import {Priority} from './Priority';
 
 export class PriorityQueue {
   private readonly config: Config = {
-    comparator: (a: Item, b: Item): Priority => {
-      if (a.priority === b.priority) {
-        return a.timestamp - b.timestamp;
+    comparator: (firstItem: Item, secondItem: Item): Priority => {
+      if (firstItem.priority === secondItem.priority) {
+        return firstItem.timestamp - secondItem.timestamp;
       }
-      return b.priority - a.priority;
+      return secondItem.priority - firstItem.priority;
     },
     maxRetries: 0,
     maxRetryDelay: Number.MAX_SAFE_INTEGER,

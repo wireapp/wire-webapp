@@ -38,8 +38,8 @@ export function parseColor(color: string): [number, number, number, number] {
   el.style.color = color;
   const col = getComputedStyle(el).color;
   document.body.removeChild(el);
-  const [, r, g, b, a = 1] = /rgba?\((\d+), *(\d+), *(\d+),? *(\d*\.?\d*)?\)/.exec(col) ?? [0, 0, 0, 0, 1];
-  return [+r, +g, +b, +a];
+  const [, red, green, blue, alpha = 1] = /rgba?\((\d+), *(\d+), *(\d+),? *(\d*\.?\d*)?\)/.exec(col) ?? [0, 0, 0, 0, 1];
+  return [+red, +green, +blue, +alpha];
 }
 
 const fadeStep = (state: number, {step, goal}: {step: number; goal: number}) => {

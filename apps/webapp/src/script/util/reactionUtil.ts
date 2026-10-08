@@ -38,8 +38,8 @@ export function userReactionMapToReactionMap(userReactions: UserReactionMap | Re
   }
   return Object.entries(userReactions).reduce<ReactionMap>((acc, [userId, reactions]) => {
     reactions.split(',').forEach(reaction => {
-      const existingReaction = acc.find(([r]) => {
-        return r === reaction;
+      const existingReaction = acc.find(([existingReactionName]) => {
+        return existingReactionName === reaction;
       });
       const qualifiedId = {id: userId, domain: ''};
       if (!isUndefined(existingReaction)) {
@@ -70,8 +70,8 @@ export function addReaction(reactions: ReactionMap, reactionsStr: string, userId
       return isNonEmptyString(reaction);
     })
     .forEach(reaction => {
-      const existingEntry = filteredReactions.find(([r]) => {
-        return r === reaction;
+      const existingEntry = filteredReactions.find(([existingReactionName]) => {
+        return existingReactionName === reaction;
       });
       if (!isUndefined(existingEntry)) {
         existingEntry[1].push(userId);

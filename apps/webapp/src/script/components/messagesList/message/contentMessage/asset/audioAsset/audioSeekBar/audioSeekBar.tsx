@@ -90,9 +90,9 @@ const AudioSeekBar = ({asset, audioElement, disabled}: AudioSeekBarProps) => {
     const scaledLoudness = interpolate(loudness, numberOfLevelsFitOnScreen);
     const newPath = scaledLoudness
       .map((loudness, index) => {
-        const x = index * singleWidth;
-        const y = normalizedAmplitudeCenter - loudness / amplitudeCenterDivisor;
-        return `M${x},${y}h${barWidth}V${1 - y}H${x}z`;
+        const barXPosition = index * singleWidth;
+        const barYPosition = normalizedAmplitudeCenter - loudness / amplitudeCenterDivisor;
+        return `M${barXPosition},${barYPosition}h${barWidth}V${1 - barYPosition}H${barXPosition}z`;
       })
       .join('');
     setPath(newPath);

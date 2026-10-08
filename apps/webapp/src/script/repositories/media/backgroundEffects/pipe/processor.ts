@@ -84,8 +84,8 @@ class FallbackProcessor implements MediaStreamTrackProcessor {
         }
         const delta = performance.now() - timestamp;
         if (delta < frameDuration) {
-          await new Promise(r => {
-            return setTimeout(r, frameDuration - delta);
+          await new Promise(resolve => {
+            return setTimeout(resolve, frameDuration - delta);
           });
         }
         timestamp = performance.now();
@@ -105,7 +105,7 @@ class FallbackProcessor implements MediaStreamTrackProcessor {
           controller.enqueue(
             new VideoFrame(canvas, {timestamp: Math.round(performance.now() * microsecondsPerMillisecond)}),
           ); // µs
-        } catch (e: unknown) {
+        } catch (error: unknown) {
           running = false;
           close();
         }

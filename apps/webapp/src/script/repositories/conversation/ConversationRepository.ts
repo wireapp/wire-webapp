@@ -1998,8 +1998,8 @@ export class ConversationRepository {
 
     // In the event that multiple 1:1 Proteus conversations exist, we migrate the one with the lowest id
     // See https://wearezeta.atlassian.net/wiki/spaces/ENGINEERIN/pages/1344602120/Use+case+multiple+1+1+conversation+in+teams+Proteus
-    const proteusConversationToBeKept = proteusConversations.toSorted((a, b) => {
-      return a.qualifiedId.id.localeCompare(b.qualifiedId.id);
+    const proteusConversationToBeKept = proteusConversations.toSorted((firstConversation, secondConversation) => {
+      return firstConversation.qualifiedId.id.localeCompare(secondConversation.qualifiedId.id);
     })[0];
 
     // Before we delete the proteus 1:1 conversation, we need to make sure all the local properties are also migrated
@@ -2644,15 +2644,15 @@ export class ConversationRepository {
     });
 
     // Sort conversations so mls 1:1 conversations are initialised first
-    const sortedConverstions = team1To1Conversations.toSorted((a, b) => {
-      const aIsMLSConversation = isMLSConversation(a);
-      const bIsMLSConversation = isMLSConversation(b);
+    const sortedConverstions = team1To1Conversations.toSorted((firstConversation, secondConversation) => {
+      const firstIsMLSConversation = isMLSConversation(firstConversation);
+      const secondIsMLSConversation = isMLSConversation(secondConversation);
 
-      if (aIsMLSConversation && !bIsMLSConversation) {
+      if (firstIsMLSConversation && !secondIsMLSConversation) {
         return -1;
       }
 
-      if (!aIsMLSConversation && bIsMLSConversation) {
+      if (!firstIsMLSConversation && secondIsMLSConversation) {
         return 1;
       }
 

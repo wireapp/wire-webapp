@@ -33,9 +33,9 @@ export const checkBackupEncryption = async (data: ArrayBuffer | Blob): Promise<b
   const fileBytes = await getFileBytes(data);
   const encrptedFileFormat = new TextEncoder().encode(ENCRYPTED_BACKUP_FORMAT);
 
-  for (let i = 0; i < encrptedFileFormat.length; i++) {
-    const eachFileByte = fileBytes[i];
-    const encrptedFileByte = encrptedFileFormat[i];
+  for (let byteIndex = 0; byteIndex < encrptedFileFormat.length; byteIndex++) {
+    const eachFileByte = fileBytes[byteIndex];
+    const encrptedFileByte = encrptedFileFormat[byteIndex];
     if (eachFileByte !== encrptedFileByte) {
       // The number doesn't match, indicating the file is not encrypted
       return false;

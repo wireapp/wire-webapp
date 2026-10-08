@@ -80,7 +80,7 @@ export interface MobileStyledHeaderSubMenuProps<T = HTMLSpanElement> extends Rea
   open?: boolean;
 }
 
-const mobileStyledHeaderSubMenuStyle: (props: MobileStyledHeaderSubMenuProps) => CSSObject = _ => {
+const mobileStyledHeaderSubMenuStyle: (props: MobileStyledHeaderSubMenuProps) => CSSObject = () => {
   return {
     '*': {
       fontWeight: 200,

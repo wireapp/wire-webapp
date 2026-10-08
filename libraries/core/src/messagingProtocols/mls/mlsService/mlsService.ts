@@ -222,7 +222,7 @@ export class MLSService extends TypedEventEmitter<Events> {
   ): Promise<void> {
     // filter out undefined values from mlsConfig
     const filteredMLSConfig = Object.fromEntries(
-      Object.entries(mlsConfig).filter(([_, value]) => {
+      Object.entries(mlsConfig).filter(([, value]) => {
         return value !== undefined;
       }),
     ) as typeof mlsConfig;

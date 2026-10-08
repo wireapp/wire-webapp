@@ -21,33 +21,33 @@ import {MentionEntity} from '../../../../../message/mentionEntity';
 
 const mentionSegmentCycleLength = 2;
 
-const intoPairs = (xs: number[]) => {
-  return xs.slice(1).map((x, index) => {
-    return [xs[index], x];
+const intoPairs = (positions: number[]) => {
+  return positions.slice(1).map((endPosition, positionIndex) => {
+    return [positions[positionIndex], endPosition];
   });
 };
 
-const breakAt = (places: number[], str: string) => {
-  return intoPairs([0, ...places, str.length]).map(([a, b]) => {
-    return str.substring(a, b);
+const breakAt = (positions: number[], text: string) => {
+  return intoPairs([0, ...positions, text.length]).map(([startPosition, endPosition]) => {
+    return text.substring(startPosition, endPosition);
   });
 };
 
-const breakWhere = (words: MentionEntity[], str: string) => {
+const breakWhere = (words: MentionEntity[], text: string) => {
   return breakAt(
     words.reduce((accumulator: number[], {startIndex, length}) => {
       return [...accumulator, startIndex, startIndex + length];
     }, []),
-    str,
+    text,
   );
 };
 
-export const createNodes = (mentions: MentionEntity[], str: string) => {
+export const createNodes = (mentions: MentionEntity[], text: string) => {
   const sortedMentions = mentions.toSorted(({startIndex: o1}, {startIndex: o2}) => {
     return o1 - o2;
   });
 
-  return breakWhere(sortedMentions, str)
+  return breakWhere(sortedMentions, text)
     .map((string: string, index: number) => {
       return index % mentionSegmentCycleLength == 0 ? {data: string, type: 'text'} : {data: string, type: 'Mention'};
     })

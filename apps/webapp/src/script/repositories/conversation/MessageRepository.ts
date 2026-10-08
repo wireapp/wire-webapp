@@ -1171,8 +1171,8 @@ export class MessageRepository {
         return reaction;
       });
     const updatedReactions = userReactions.includes(reaction)
-      ? userReactions.filter(r => {
-          return r !== reaction;
+      ? userReactions.filter(existingReaction => {
+          return existingReaction !== reaction;
         })
       : [...userReactions, reaction];
     return updatedReactions.join(',');

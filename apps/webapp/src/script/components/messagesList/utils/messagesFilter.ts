@@ -49,8 +49,8 @@ const filterDuplicatedSystemMessages = (messages: MessageEntity[]) => {
           case ClientEvent.CONVERSATION.GROUP_CREATION:
             // Dont show duplicated group creation messages
             if (
-              uniqMemberMessages.some(m => {
-                return m.type === currentMessage.type;
+              uniqMemberMessages.some(message => {
+                return message.type === currentMessage.type;
               })
             ) {
               return uniqMessages;
