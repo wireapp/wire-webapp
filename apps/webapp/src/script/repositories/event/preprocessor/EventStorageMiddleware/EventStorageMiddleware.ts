@@ -17,7 +17,7 @@
  *
  */
 
-import {isTruthy, isUndefined} from '@sindresorhus/is';
+import {isNonEmptyString, isTruthy, isUndefined} from '@sindresorhus/is';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 import {container} from 'tsyringe';
 
@@ -26,6 +26,7 @@ import {User} from 'Repositories/entity/User';
 import type {EventRecord} from 'Repositories/storage';
 import {UserFilter} from 'Repositories/user/userFilter';
 import {matchQualifiedIds} from 'Util/qualifiedId';
+import {fixWebsocketString} from 'Util/stringUtil';
 
 import {handleLinkPreviewEvent, handleEditEvent, handleAssetEvent, handleReactionEvent} from './eventHandlers';
 import {EventValidationError} from './eventHandlers/EventValidationError';
@@ -38,6 +39,17 @@ import {EventService} from '../../EventService';
 import {EventSource} from '../../EventSource';
 import {eventShouldBeStored} from '../../EventTypeHandling';
 
+const decodeConversationNameForStorage = (event: IncomingEvent, source: EventSource): IncomingEvent => {
+  if (
+    event.type === CONVERSATION_EVENT.RENAME &&
+    source === EventSource.WEBSOCKET &&
+    isNonEmptyString(event.data.name)
+  ) {
+    return {...event, data: {...event.data, name: fixWebsocketString(event.data.name)}};
+  }
+  return event;
+};
+
 export class EventStorageMiddleware implements EventMiddleware {
   constructor(
     private readonly eventService: EventService,
@@ -46,8 +58,8 @@ export class EventStorageMiddleware implements EventMiddleware {
   ) {}
 
   async processEvent(event: IncomingEvent, source: EventSource) {
-    const shouldSaveEvent = eventShouldBeStored(event);
-    if (!shouldSaveEvent) {
+    event = decodeConversationNameForStorage(event, source);
+    if (!eventShouldBeStored(event)) {
       return event;
     }
     const eventId = 'id' in event && event.id;
