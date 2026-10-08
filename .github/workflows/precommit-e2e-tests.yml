@@ -102,7 +102,7 @@ jobs:
       WEBTEAM_AWS_ACCESS_KEY_ID: ${{ secrets.WEBTEAM_AWS_ACCESS_KEY_ID }}
       WEBTEAM_AWS_SECRET_ACCESS_KEY: ${{ secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY }}
       WIRE_WEBHOOK_URL: ${{ secrets.WIRE_WEBHOOK_URL }}
-      WIRE_ACTIONS_TOKEN: ${{ secrets.WIRE_ACTIONS_TOKEN }}
+      WIRE_ACTIONS_TOKEN: ${{ secrets.WIRE_DEPLOYOHOLICS_TOKEN }}
 
   run_e2e_tests:
     name: Playwright Critical Flow
