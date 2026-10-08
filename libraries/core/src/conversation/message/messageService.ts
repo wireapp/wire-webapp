@@ -25,8 +25,7 @@ import {proteus as ProtobufOTR} from '@wireapp/protocol-messaging/web/otr';
 import {AxiosError} from 'axios';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {merge} from 'lodash';
-// @ts-expect-error - long module has compatibility issues between versions
-import * as Long from 'long';
+import Long from 'long';
 
 import {APIClient} from '@wireapp/api-client';
 

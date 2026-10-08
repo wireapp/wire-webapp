@@ -17,7 +17,7 @@
  *
  */
 
-import Dexie, {DexieError, IndexableType} from 'dexie';
+import {Dexie, DexieError, IndexableType} from 'dexie';
 import logdown = require('logdown');
 
 import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';

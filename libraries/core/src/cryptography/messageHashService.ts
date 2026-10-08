@@ -18,8 +18,7 @@
  */
 
 import * as hash from 'hash.js';
-// @ts-expect-error - long module has compatibility issues between versions
-import * as Long from 'long';
+import Long from 'long';
 
 import {AssetContent, ContentType, ConversationContent, LocationContent, TextContent} from '../conversation/content';
 

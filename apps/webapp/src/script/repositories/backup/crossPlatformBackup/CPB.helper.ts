@@ -18,7 +18,7 @@
  */
 
 import {isNullOrUndefined} from '@sindresorhus/is';
-import Dexie from 'dexie';
+import {Dexie} from 'dexie';
 
 import {ClientEvent} from 'Repositories/event/Client';
 import {getLogger} from 'Util/logger';

@@ -52,7 +52,7 @@
         "@tony.ganchev/eslint-plugin-header",
         "eslint-import-resolver-typescript",
         "eslint-plugin-header",
-        "eslint-plugin-import",
+        "eslint-plugin-import-x",
         "eslint-plugin-jest",
         "eslint-plugin-jest-dom",
         "eslint-plugin-jsdoc",

@@ -26,7 +26,7 @@ import {readAllSpec} from '@wireapp/store-engine/lib/test/readAllSpec';
 import {readSpec} from '@wireapp/store-engine/lib/test/readSpec';
 import {updateOrCreateSpec} from '@wireapp/store-engine/lib/test/updateOrCreateSpec';
 import {updateSpec} from '@wireapp/store-engine/lib/test/updateSpec';
-import Dexie from 'dexie';
+import {Dexie} from 'dexie';
 import {v4 as uuidv4} from 'uuid';
 
 import {IndexedDBEngine} from './index';
