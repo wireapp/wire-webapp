@@ -96,7 +96,7 @@ export async function initializeDataDog(config: Configuration, user: {id?: strin
     trackResources: true,
     trackLongTasks: true,
     defaultPrivacyLevel: 'mask',
-    beforeSend(event, context) {
+    beforeSend(event) {
       delete event.view.referrer;
       event.view.url = '/';
       return true;

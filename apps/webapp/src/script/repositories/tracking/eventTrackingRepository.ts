@@ -109,7 +109,7 @@ export class EventTrackingRepository {
     this.logger.info('EventTrackingRepository initialized');
   }
 
-  public readonly onUserEvent = (eventJson: any, source: EventSource) => {
+  public readonly onUserEvent = (eventJson: any) => {
     const type = eventJson.type;
     if (type === ClientEvent.USER.DATA_TRANSFER && this.teamState.isTeam()) {
       this.telemetryLogger.info('Received data transfer event with new telemetry tracking id', eventJson.data);
@@ -186,7 +186,7 @@ export class EventTrackingRepository {
             EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_SYNCED_AT_LEAST_ONCE_LOCAL_STORAGE_KEY,
             true,
           );
-        } catch (error: unknown) {
+        } catch {
           storeValue(
             EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_SYNCED_AT_LEAST_ONCE_LOCAL_STORAGE_KEY,
             false,

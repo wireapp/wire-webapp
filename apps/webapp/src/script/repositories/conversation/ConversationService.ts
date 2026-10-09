@@ -508,8 +508,8 @@ export class ConversationService {
         .filter(record => {
           return record.time.toString() >= min_date.toISOString();
         })
-        .toSorted((a, b) => {
-          return a.time - b.time;
+        .toSorted((firstRecord, secondRecord) => {
+          return firstRecord.time - secondRecord.time;
         });
     }
 

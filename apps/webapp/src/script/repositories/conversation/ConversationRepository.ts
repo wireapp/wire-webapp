@@ -114,13 +114,7 @@ import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {removeClientFromUserClientMap} from 'Util/removeClientFromUserClientMap';
-import {
-  compareTransliteration,
-  fixWebsocketString,
-  sortByPriority,
-  sortUsersByPriority,
-  startsWith,
-} from 'Util/stringUtil';
+import {compareTransliteration, sortByPriority, sortUsersByPriority, startsWith} from 'Util/stringUtil';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 import {toError} from 'Util/toError';
 import {isBackendError, isErrorWithType} from 'Util/typePredicateUtil';
@@ -292,7 +286,6 @@ export class ConversationRepository {
       const {missingClients, deletedClients, emptyUsers, missingUserIds} = extractClientDiff(
         filteredMismatch,
         conversation?.allUserEntities() ?? [],
-        domain,
       );
       const mismatchTimestamp = mismatch.time !== undefined ? new Date(mismatch.time).getTime() : Date.now();
 
@@ -1998,8 +1991,8 @@ export class ConversationRepository {
 
     // In the event that multiple 1:1 Proteus conversations exist, we migrate the one with the lowest id
     // See https://wearezeta.atlassian.net/wiki/spaces/ENGINEERIN/pages/1344602120/Use+case+multiple+1+1+conversation+in+teams+Proteus
-    const proteusConversationToBeKept = proteusConversations.toSorted((a, b) => {
-      return a.qualifiedId.id.localeCompare(b.qualifiedId.id);
+    const proteusConversationToBeKept = proteusConversations.toSorted((firstConversation, secondConversation) => {
+      return firstConversation.qualifiedId.id.localeCompare(secondConversation.qualifiedId.id);
     })[0];
 
     // Before we delete the proteus 1:1 conversation, we need to make sure all the local properties are also migrated
@@ -2644,15 +2637,15 @@ export class ConversationRepository {
     });
 
     // Sort conversations so mls 1:1 conversations are initialised first
-    const sortedConverstions = team1To1Conversations.toSorted((a, b) => {
-      const aIsMLSConversation = isMLSConversation(a);
-      const bIsMLSConversation = isMLSConversation(b);
+    const sortedConverstions = team1To1Conversations.toSorted((firstConversation, secondConversation) => {
+      const firstIsMLSConversation = isMLSConversation(firstConversation);
+      const secondIsMLSConversation = isMLSConversation(secondConversation);
 
-      if (aIsMLSConversation && !bIsMLSConversation) {
+      if (firstIsMLSConversation && !secondIsMLSConversation) {
         return -1;
       }
 
-      if (!aIsMLSConversation && bIsMLSConversation) {
+      if (!firstIsMLSConversation && secondIsMLSConversation) {
         return 1;
       }
 
@@ -3424,7 +3417,10 @@ export class ConversationRepository {
     isoDate = this.serverTimeHandler.toServerTimestamp(),
   ) => {
     const userEntity = await this.userRepository.getUserById(userId);
-    const allConversations = this.conversationState.conversations();
+    // Keep the deleted participant in direct conversations so their history remains accessible and read-only.
+    const allConversations = this.conversationState.conversations().filter(conversation => {
+      return !conversation.is1to1() && !conversation.isRequest();
+    });
     const eventInjections = allConversations
       .filter(conversation => {
         const conversationInTeam = conversation.teamId === teamId;
@@ -3436,7 +3432,7 @@ export class ConversationRepository {
         await this.eventRepository.injectEvent(leaveEvent);
       });
 
-    // Clear user from all conversations they participate in
+    // Clear the user from the remaining conversations, including groups in other teams.
     const userCleanup = allConversations
       .filter(conversation => {
         return UserFilter.isParticipant(conversation, userId);
@@ -4097,7 +4093,7 @@ export class ConversationRepository {
         return this.onProtocolUpdate(conversationEntity, eventJson);
 
       case CONVERSATION_EVENT.RENAME:
-        return this.onRename(conversationEntity, eventJson, eventSource === EventRepository.SOURCE.WEB_SOCKET);
+        return this.onRename(conversationEntity, eventJson);
 
       case CONVERSATION_EVENT.MLS_WELCOME_MESSAGE:
         return this.onMLSWelcomeMessage(conversationEntity);
@@ -4881,10 +4877,7 @@ export class ConversationRepository {
    * @param eventJson JSON data of 'conversation.rename' event
    * @returns Resolves when the event was handled
    */
-  private async onRename(conversationEntity: Conversation, eventJson: ConversationRenameEvent, isWebSocket = false) {
-    if (isWebSocket && isNonEmptyString(eventJson.data?.name)) {
-      eventJson.data.name = fixWebsocketString(eventJson.data.name);
-    }
+  private async onRename(conversationEntity: Conversation, eventJson: ConversationRenameEvent) {
     const {messageEntity} = await this.addEventToConversation(conversationEntity, eventJson);
     ConversationMapper.updateProperties(conversationEntity, eventJson.data);
     return {conversationEntity, messageEntity};

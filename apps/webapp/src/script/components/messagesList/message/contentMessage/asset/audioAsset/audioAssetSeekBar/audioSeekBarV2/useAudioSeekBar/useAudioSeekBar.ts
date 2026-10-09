@@ -108,9 +108,9 @@ export const useAudioSeekBar = ({asset, audioElement, svgRef}: UseAudioSeekBarPr
 
     return scaledLoudness
       .map((level, index) => {
-        const x = index * singleWidth;
-        const y = normalizedAmplitudeCenter - level / amplitudeCenterDivisor;
-        return `M${x},${y}h${barWidth}V${1 - y}H${x}z`;
+        const barXPosition = index * singleWidth;
+        const barYPosition = normalizedAmplitudeCenter - level / amplitudeCenterDivisor;
+        return `M${barXPosition},${barYPosition}h${barWidth}V${1 - barYPosition}H${barXPosition}z`;
       })
       .join('');
   }, [svgWidth, loudness]);

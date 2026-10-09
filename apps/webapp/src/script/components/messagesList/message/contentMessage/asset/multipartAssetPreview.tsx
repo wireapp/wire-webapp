@@ -100,9 +100,9 @@ export const MultipartAssetPreview: FC<MultipartAssetPreviewProps> = ({
         style={{cursor: 'pointer'}}
         role="button"
         tabIndex={0}
-        onKeyDown={e => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
+        onKeyDown={event => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
             setIsModalOpen(true);
           }
         }}

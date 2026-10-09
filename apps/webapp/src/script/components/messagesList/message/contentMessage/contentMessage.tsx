@@ -261,7 +261,7 @@ export const ContentMessageComponent = ({
             {assets.map(asset => {
               return (
                 <ContentAsset
-                  key={asset.type}
+                  key={asset.id}
                   asset={asset}
                   message={message}
                   selfId={selfId}

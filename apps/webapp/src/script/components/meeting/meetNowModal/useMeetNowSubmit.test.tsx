@@ -189,7 +189,7 @@ describe('useMeetNowSubmit', () => {
     const loadMeetings = jest.fn().mockResolvedValue(undefined);
     const meetNowMeeting = jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.createFailed));
     const store = createMeetingStore({loadMeetings, meetNowMeeting});
-    const {conversationState, startAudio, mainViewModel} = createJoinTestMocks();
+    const {startAudio, mainViewModel} = createJoinTestMocks();
 
     const {result} = renderHook(
       () => {
@@ -215,7 +215,7 @@ describe('useMeetNowSubmit', () => {
     const loadMeetings = jest.fn().mockResolvedValue(undefined);
     const meetNowMeeting = jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.addParticipantsFailed));
     const store = createMeetingStore({loadMeetings, meetNowMeeting});
-    const {conversationState, startAudio, mainViewModel} = createJoinTestMocks();
+    const {startAudio, mainViewModel} = createJoinTestMocks();
 
     const {result} = renderHook(
       () => {
@@ -241,7 +241,7 @@ describe('useMeetNowSubmit', () => {
     const loadMeetings = jest.fn().mockResolvedValue(undefined);
     const meetNowMeeting = jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.conversationSetupFailed));
     const store = createMeetingStore({loadMeetings, meetNowMeeting});
-    const {conversationState, startAudio, mainViewModel} = createJoinTestMocks();
+    const {startAudio, mainViewModel} = createJoinTestMocks();
 
     const {result} = renderHook(
       () => {

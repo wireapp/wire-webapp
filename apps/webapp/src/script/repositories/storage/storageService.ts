@@ -18,7 +18,7 @@
  */
 
 import {isNan, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
-import Dexie, {Transaction} from 'dexie';
+import {Dexie, Transaction} from 'dexie';
 import {singleton} from 'tsyringe';
 
 import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';

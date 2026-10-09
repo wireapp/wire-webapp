@@ -18,6 +18,7 @@
  */
 
 import {isNonEmptyArray, isNull, isPlainObject, isString, isUndefined} from '@sindresorhus/is';
+import semver from 'semver';
 import {Result} from 'true-myth';
 
 import {createProductionTagName} from './releaseMetadata.ts';
@@ -29,6 +30,10 @@ const webappVersionCaptureIndex = 3;
 declare const webAppVersionBrand: unique symbol;
 
 export type WebAppVersion = string & {readonly [webAppVersionBrand]: 'WebAppVersion'};
+
+export type WebAppVersionBump = 'major' | 'minor' | 'patch';
+
+export type WebAppVersionComparison = -1 | 0 | 1;
 
 export type WebAppPackageDocument = Readonly<Record<string, unknown>>;
 
@@ -62,9 +67,7 @@ export type WebAppVersionSynchronizationMarker = {
 
 type ValidatedWebAppPackageDocuments = WebAppPackageDocuments & WebAppPackageVersions;
 
-const strictWebAppVersionPattern = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/;
 const releaseIdentifierPattern = String.raw`\d{4}-\d{2}-\d{2}\.[1-9]\d*`;
-const patchVersionIncrement = BigInt('1');
 const synchronizationMarkerPattern = new RegExp(
   String.raw`<!-- wire-webapp-version-sync release=(${releaseIdentifierPattern}) production-tag=(${releaseIdentifierPattern}-production) version=((?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)) -->`,
 );
@@ -192,16 +195,63 @@ function createWebAppVersionSynchronizationMarkerValue(
   });
 }
 
+function isInvalidStableWebAppVersion(version: string): boolean {
+  const parsedVersion = semver.parse(version, {loose: false});
+
+  return (
+    isNull(parsedVersion) ||
+    isNonEmptyArray(parsedVersion.prerelease) ||
+    isNonEmptyArray(parsedVersion.build) ||
+    version.startsWith('v') ||
+    parsedVersion.version !== version
+  );
+}
+
 export function validateWebAppVersion(version: unknown): Result<WebAppVersion, Error> {
   if (!isString(version)) {
     return Result.err(new Error('WebApp version must be a string'));
   }
 
-  if (!strictWebAppVersionPattern.test(version)) {
+  if (isInvalidStableWebAppVersion(version)) {
     return Result.err(new Error(`Invalid WebApp version: ${version}`));
   }
 
   return Result.ok(version as WebAppVersion);
+}
+
+export function incrementWebAppVersion(currentVersion: string, bump: WebAppVersionBump): Result<WebAppVersion, Error> {
+  const currentVersionResult = validateWebAppVersion(currentVersion);
+
+  if (currentVersionResult.isErr) {
+    return Result.err(currentVersionResult.error);
+  }
+
+  const incrementedVersion = semver.inc(currentVersionResult.value, bump);
+
+  if (isNull(incrementedVersion)) {
+    return Result.err(new Error(`Unable to increment WebApp version: ${currentVersion}`));
+  }
+
+  return validateWebAppVersion(incrementedVersion);
+}
+
+export function compareWebAppVersions(
+  leftVersion: string,
+  rightVersion: string,
+): Result<WebAppVersionComparison, Error> {
+  const leftVersionResult = validateWebAppVersion(leftVersion);
+
+  if (leftVersionResult.isErr) {
+    return Result.err(leftVersionResult.error);
+  }
+
+  const rightVersionResult = validateWebAppVersion(rightVersion);
+
+  if (rightVersionResult.isErr) {
+    return Result.err(rightVersionResult.error);
+  }
+
+  return Result.ok(semver.compare(leftVersionResult.value, rightVersionResult.value));
 }
 
 export function resolveNextWebAppVersion(currentVersion: string): Result<WebAppVersion, Error> {
@@ -212,13 +262,12 @@ export function resolveNextWebAppVersion(currentVersion: string): Result<WebAppV
   }
 
   const {value: validatedCurrentVersion} = currentVersionResult;
-  const [majorVersion, minorVersion, patchVersion] = validatedCurrentVersion.split('.');
 
-  if (majorVersion === '0') {
+  if (semver.major(validatedCurrentVersion) === 0) {
     return Result.ok('1.0.0' as WebAppVersion);
   }
 
-  return Result.ok(`${majorVersion}.${minorVersion}.${BigInt(patchVersion) + patchVersionIncrement}` as WebAppVersion);
+  return incrementWebAppVersion(validatedCurrentVersion, 'patch');
 }
 
 export function validateMatchingWebAppPackageVersions(

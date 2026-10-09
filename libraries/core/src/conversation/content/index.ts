@@ -17,10 +17,10 @@
  *
  */
 
+import * as ContentType from './contentType.guards';
+
 export {LegalHoldStatus} from '@wireapp/protocol-messaging';
 export {Connection as ConnectionContent} from '@wireapp/api-client/lib/connection';
-
-import * as ContentType from './contentType.guards';
 export {ContentType};
 
 export * from './assetContent';

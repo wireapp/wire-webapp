@@ -126,7 +126,7 @@ const markdownSanitizers: MarkdownSanitizer[] = [
   },
   {
     pattern: HEADER_PATTERN,
-    transform: (_match: string) => {
+    transform: () => {
       return '';
     },
   },
@@ -184,7 +184,7 @@ const markdownSanitizers: MarkdownSanitizer[] = [
   },
   {
     pattern: BLOCKQUOTE_PATTERN,
-    transform: (_match: string) => {
+    transform: () => {
       return '';
     },
   },
@@ -202,7 +202,7 @@ const markdownSanitizers: MarkdownSanitizer[] = [
   },
   {
     pattern: HORIZONTAL_RULE_PATTERN,
-    transform: (_match: string) => {
+    transform: () => {
       return '';
     },
   },

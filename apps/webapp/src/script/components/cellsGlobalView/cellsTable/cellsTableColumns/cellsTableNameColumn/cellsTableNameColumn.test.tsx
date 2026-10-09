@@ -17,7 +17,7 @@
  *
  */
 
-import {fireEvent, render} from '@testing-library/react';
+import {render} from '@testing-library/react';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 

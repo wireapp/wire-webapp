@@ -70,6 +70,36 @@ function buildEventStorageMiddleware() {
 
 describe('EventStorageMiddleware', () => {
   describe('processEvent', () => {
+    it.each([
+      [EventSource.WEBSOCKET, '😀 Team'],
+      [EventSource.WEBSOCKET, '👩🏽‍💻 Café'],
+      [EventSource.WEBSOCKET, ''],
+      [EventSource.BACKEND_RESPONSE, '👩🏽‍💻 Café'],
+      [EventSource.NOTIFICATION_STREAM, '👩🏽‍💻 Café'],
+    ])('persists the Unicode group name from %s for %s', async (source, name) => {
+      const [middleware, {eventService}] = buildEventStorageMiddleware();
+      const event = {
+        id: 'rename-event-id',
+        type: CONVERSATION_EVENT.RENAME as const,
+        conversation: 'conversation-id',
+        from: 'renaming-user-id',
+        time: '2026-10-05T09:00:00.000Z',
+        data: {
+          name: source === EventSource.WEBSOCKET ? String.fromCharCode(...new TextEncoder().encode(name)) : name,
+        },
+      };
+
+      const storedEvent = await middleware.processEvent(event, source);
+
+      expect(eventService.saveEvent).toHaveBeenCalledWith({...event, data: {name}});
+      const conversation = new Conversation('conversation-id', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+      const message = new EventMapper(undefined, translateForTest).mapJsonEvent(
+        JSON.parse(JSON.stringify(storedEvent)),
+        conversation,
+      );
+      expect(message).toMatchObject({name, system_message_type: SystemMessageType.CONVERSATION_RENAME});
+    });
+
     it('persists an empty event ID without querying for a duplicate', async () => {
       const [middleware, {eventService}] = buildEventStorageMiddleware();
       const event = createMessageAddEvent({overrides: {id: ''}});

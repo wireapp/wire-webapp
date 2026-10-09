@@ -250,7 +250,7 @@ describe('ReconnectingWebsocket', () => {
     activeConnections.forEach(rws => {
       try {
         rws.disconnect();
-      } catch (e: unknown) {
+      } catch {
         // Ignore errors during cleanup
       }
     });

@@ -112,7 +112,7 @@ export type MediaDevicesState = {
 };
 
 export const mediaDevicesStore = createStore<MediaDevicesState>()(
-  immer<MediaDevicesState>((set, get) => {
+  immer<MediaDevicesState>(set => {
     return {
       audio: {
         input: {devices: [], activeId: defaultAudioInputId, preferredId: defaultAudioInputId, supported: false},

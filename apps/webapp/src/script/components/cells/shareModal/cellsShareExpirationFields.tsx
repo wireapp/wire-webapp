@@ -131,8 +131,8 @@ export const getNextHourDateTime = (): Date => {
 };
 
 const buildTimeOptions = (): Option[] => {
-  return Array.from({length: 96}, (_, index) => {
-    const totalMinutes = index * timeOptionIntervalInMinutes;
+  return Array.from({length: 96}, (arrayElement, timeOptionIndex) => {
+    const totalMinutes = timeOptionIndex * timeOptionIntervalInMinutes;
     const hour24 = Math.floor(totalMinutes / minutesPerHour);
     const minutes = totalMinutes % minutesPerHour;
     const label = formatTimeLabel(hour24, minutes);

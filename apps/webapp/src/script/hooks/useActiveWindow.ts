@@ -26,7 +26,7 @@ export type ActiveWindowState = {
   setActiveWindow: (newWindow: Window) => void;
 };
 
-export const useActiveWindowState = create<ActiveWindowState>((set, get) => {
+export const useActiveWindowState = create<ActiveWindowState>(set => {
   return {
     activeWindow: window,
     setActiveWindow: (newWindow: Window) => {

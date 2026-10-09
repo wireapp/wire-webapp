@@ -141,8 +141,8 @@ const validateHash = async (event: LegacyEventRecord, hash: ArrayBuffer): Promis
   }
   const generatedHashBytes = new Uint8Array(generatedHash);
   const hashBytes = new Uint8Array(hash);
-  for (let i = 0; i !== generatedHash.byteLength; i++) {
-    if (generatedHashBytes[i] !== hashBytes[i]) {
+  for (let byteIndex = 0; byteIndex !== generatedHash.byteLength; byteIndex++) {
+    if (generatedHashBytes[byteIndex] !== hashBytes[byteIndex]) {
       return false;
     }
   }

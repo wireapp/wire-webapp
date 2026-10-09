@@ -32,7 +32,7 @@ import {CONVERSATION_PROTOCOL, FEATURE_KEY, FEATURE_STATUS} from '@wireapp/api-c
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {NotificationSource} from '@wireapp/core/lib/notification';
 import {DatabaseKeys} from '@wireapp/core/lib/notification/notificationDatabaseRepository';
-import Dexie from 'dexie';
+import {Dexie} from 'dexie';
 import keyboardjs from 'keyboardjs';
 import {$createTextNode, $getRoot, LexicalEditor} from 'lexical';
 import {noop} from 'noop-esm';
@@ -202,8 +202,8 @@ export class DebugUtil {
       return;
     }
 
-    const participants = new Array(number).fill(0).map((_, i) => {
-      return new Participant(new User('', '', translate), `some-client-id-${i}`);
+    const participants = new Array(number).fill(0).map((initialValue, participantIndex) => {
+      return new Participant(new User('', '', translate), `some-client-id-${participantIndex}`);
     });
     participants.forEach(participant => {
       call.addParticipant(participant);

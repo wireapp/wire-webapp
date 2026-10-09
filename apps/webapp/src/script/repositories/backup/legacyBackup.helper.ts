@@ -76,13 +76,11 @@ const verifyMetadata = async ({backupService, fileData, user}: VerifyMetaDataPar
 };
 
 interface ImportLegacyBackupToDatabaseParams {
-  progressCallback: ProgressCallback;
   user: User;
   fileData: FileData;
   backupService: BackupService;
 }
 export const importLegacyBackupToDatabase = async ({
-  progressCallback,
   user,
   fileData,
   backupService,

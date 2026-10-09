@@ -20,7 +20,7 @@
 import express, {Router} from 'express';
 import expressSitemapXml from 'express-sitemap-xml';
 import hbs from 'hbs';
-import helmet from 'helmet';
+import helmet, {contentSecurityPolicy, hsts, noSniff, referrerPolicy, xssFilter} from 'helmet';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import nocache from 'nocache';
 
@@ -144,17 +144,17 @@ class Server {
         frameguard: {action: 'deny'},
       }),
     );
-    this.app.use(helmet.noSniff());
-    this.app.use(helmet.xssFilter());
+    this.app.use(noSniff());
+    this.app.use(xssFilter());
     this.app.use(
-      helmet.hsts({
+      hsts({
         includeSubDomains: true,
         maxAge: 31536000,
         preload: true,
       }),
     );
     this.app.use((req, res, next) => {
-      helmet.contentSecurityPolicy({
+      contentSecurityPolicy({
         directives: this.config.ENABLE_DYNAMIC_HOSTNAME
           ? replaceHostnameInObject(this.config.CSP, req)
           : this.config.CSP,
@@ -162,7 +162,7 @@ class Server {
       })(req, res, next);
     });
     this.app.use(
-      helmet.referrerPolicy({
+      referrerPolicy({
         policy: 'same-origin',
       }),
     );

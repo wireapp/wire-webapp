@@ -125,8 +125,8 @@ export class PreferenceNotificationRepository {
       .map(([type, notification]) => {
         return {notification, type};
       })
-      .toSorted((a, b) => {
-        return prio(a) - prio(b);
+      .toSorted((firstNotification, secondNotification) => {
+        return prio(firstNotification) - prio(secondNotification);
       });
   }
 

@@ -28,7 +28,7 @@ import {Page} from './page';
 
 import {AccountRegistrationLayout} from '../component/accountRegistrationLayout';
 import {actionRoot as ROOT_ACTIONS} from '../module/action';
-import {RootState, bindActionCreators} from '../module/reducer';
+import {bindActionCreators} from '../module/reducer';
 import {ROUTE} from '../route';
 
 type Props = React.HTMLProps<HTMLDivElement>;
@@ -55,7 +55,7 @@ const SetEntropyPageComponent = ({pushEntropyData}: Props & ConnectedProps & Dis
 };
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
-const mapStateToProps = (state: RootState) => {
+const mapStateToProps = () => {
   return {};
 };
 

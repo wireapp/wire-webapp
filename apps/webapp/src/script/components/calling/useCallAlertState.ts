@@ -31,7 +31,7 @@ type CallAlertState = {
   setConversationId: (conversationId?: QualifiedId) => void;
 };
 
-const useCallAlertState = create<CallAlertState>((set, get) => {
+const useCallAlertState = create<CallAlertState>(set => {
   return {
     showAlert: false,
     isGroupCall: false,
@@ -52,7 +52,7 @@ const useCallAlertState = create<CallAlertState>((set, get) => {
         };
       });
     },
-    showStartedCallAlert: (isGroupCall = false, isVideoCall = false) => {
+    showStartedCallAlert: (isGroupCall = false) => {
       return set(state => {
         return {
           ...state,

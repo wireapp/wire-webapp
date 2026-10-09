@@ -29,34 +29,34 @@ interface EntropyFrame {
  * calculate shannon entropy over a set of uint8 values
  */
 export function shannonEntropy(entropyData: Uint8Array): number {
-  const len = entropyData.length;
-  const frequencies = entropyData.reduce((freq: Map<number, number>, c: number) => {
-    freq.set(c, (freq.get(c) ?? 0) + 1);
-    return freq;
+  const dataLength = entropyData.length;
+  const frequencies = entropyData.reduce((frequencyMap: Map<number, number>, byteValue: number) => {
+    frequencyMap.set(byteValue, (frequencyMap.get(byteValue) ?? 0) + 1);
+    return frequencyMap;
   }, new Map<number, number>());
   let sum = 0;
-  for (const f of frequencies.values()) {
-    sum -= (f / len) * Math.log2(f / len);
+  for (const frequencyCount of frequencies.values()) {
+    sum -= (frequencyCount / dataLength) * Math.log2(frequencyCount / dataLength);
   }
   return sum;
 }
 
 /**
- * calculate the difference between every n-th element in a flattened list
- * @param data The list of elements to calculate the differences on, containing a multipe of `n` elements
- * @param n The number of different elements representing one flattened object
+ * Calculates differences between corresponding values in consecutive flattened objects.
+ * @param data The flattened values to compare.
+ * @param componentCount The number of values in each flattened object.
  */
-export function calculateDeltaValues(data: Uint8Array, n: number): Uint8Array {
-  const prev = Array<number | null>(entropySampleComponentCount);
+export function calculateDeltaValues(data: Uint8Array, componentCount: number): Uint8Array {
+  const previousValues = Array<number | null>(entropySampleComponentCount);
   const result = new Array<number>();
 
   data.forEach((value, index) => {
-    const i = index % n;
-    const prevValue = prev[i];
-    if (prevValue != null) {
-      result.push(Math.abs(value - prevValue));
+    const componentIndex = index % componentCount;
+    const previousValue = previousValues[componentIndex];
+    if (previousValue != null) {
+      result.push(Math.abs(value - previousValue));
     }
-    prev[i] = value;
+    previousValues[componentIndex] = value;
   });
   return new Uint8Array(result);
 }

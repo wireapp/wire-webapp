@@ -77,7 +77,7 @@ export const customStyles = ({
         ...baseDropdownIndicatorStyles({theme, selectProps}),
       };
     },
-    container: (_, {options}) => {
+    container: (providedContainerStyles, {options}) => {
       return isGroup(options)
         ? {
             '& > div': {

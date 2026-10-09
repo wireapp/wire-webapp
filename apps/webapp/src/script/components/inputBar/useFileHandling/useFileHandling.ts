@@ -31,6 +31,7 @@ import {useFilePaste} from './useFilePaste/useFilePaste';
 interface UseFileHandlingProps {
   uploadDroppedFiles: (files: File[]) => void;
   uploadImages: (images: File[]) => void;
+  isFileUploadAllowed: boolean;
   isFileNameKept?: boolean;
   translate: Translate;
 }
@@ -38,6 +39,7 @@ interface UseFileHandlingProps {
 export const useFileHandling = ({
   uploadDroppedFiles,
   uploadImages,
+  isFileUploadAllowed,
   isFileNameKept,
   translate,
 }: UseFileHandlingProps) => {
@@ -45,7 +47,9 @@ export const useFileHandling = ({
 
   useFilePaste({
     onFilePasted: file => {
-      setPastedFile(file);
+      if (isFileUploadAllowed) {
+        setPastedFile(file);
+      }
     },
     isFileNameKept,
     translate,
@@ -56,7 +60,7 @@ export const useFileHandling = ({
   };
 
   const sendPastedFile = () => {
-    if (!isNull(pastedFile)) {
+    if (isFileUploadAllowed && !isNull(pastedFile)) {
       uploadDroppedFiles([pastedFile]);
       clearPastedFile();
     }
@@ -69,7 +73,7 @@ export const useFileHandling = ({
   };
 
   useEffect(() => {
-    if (isNull(pastedFile)) {
+    if (isNull(pastedFile) || !isFileUploadAllowed) {
       return () => {
         return undefined;
       };
@@ -80,15 +84,20 @@ export const useFileHandling = ({
     return () => {
       window.removeEventListener('keydown', sendImageOnEnterClick);
     };
-  }, [pastedFile]);
+  }, [pastedFile, isFileUploadAllowed]);
 
   useEffect(() => {
-    amplify.subscribe(WebAppEvents.CONVERSATION.IMAGE.SEND, uploadImages);
+    const uploadImagesIfAllowed = (images: File[]) => {
+      if (isFileUploadAllowed) {
+        uploadImages(images);
+      }
+    };
+    amplify.subscribe(WebAppEvents.CONVERSATION.IMAGE.SEND, uploadImagesIfAllowed);
 
     return () => {
-      amplify.unsubscribeAll(WebAppEvents.CONVERSATION.IMAGE.SEND);
+      amplify.unsubscribe(WebAppEvents.CONVERSATION.IMAGE.SEND, uploadImagesIfAllowed);
     };
-  }, []);
+  }, [isFileUploadAllowed, uploadImages]);
 
   return {
     pastedFile,

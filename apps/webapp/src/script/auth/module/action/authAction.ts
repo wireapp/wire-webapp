@@ -182,7 +182,7 @@ export class AuthAction {
   };
 
   doFinalizeSSOLogin = ({clientType}: {clientType: ClientType}): ThunkAction => {
-    return async (dispatch, getState, {getConfig, core, actions: {clientAction, selfAction, localStorageAction}}) => {
+    return async (dispatch, getState, {core, actions: {clientAction, selfAction, localStorageAction}}) => {
       dispatch(AuthActionCreator.startLogin());
       try {
         await core.init(clientType);
@@ -283,11 +283,7 @@ export class AuthAction {
   };
 
   doRegisterPersonal = (registration: RegisterData, entropyData?: Uint8Array): ThunkAction => {
-    return async (
-      dispatch,
-      getState,
-      {getConfig, core, actions: {authAction, clientAction, selfAction, localStorageAction}},
-    ) => {
+    return async (dispatch, getState, {core, actions: {authAction, clientAction, selfAction, localStorageAction}}) => {
       const clientType = ClientType.PERMANENT;
       registration.locale = currentLanguage();
       registration.name = registration.name.trim();
@@ -313,11 +309,7 @@ export class AuthAction {
     options = {shouldInitializeClient: true},
     entropyData?: Uint8Array,
   ): ThunkAction => {
-    return async (
-      dispatch,
-      getState,
-      {getConfig, core, actions: {authAction, clientAction, selfAction, localStorageAction}},
-    ) => {
+    return async (dispatch, getState, {core, actions: {authAction, clientAction, selfAction, localStorageAction}}) => {
       const clientType = options.shouldInitializeClient ? ClientType.TEMPORARY : ClientType.NONE;
       registrationData.locale = currentLanguage();
       registrationData.name = registrationData.name.trim();
@@ -387,7 +379,7 @@ export class AuthAction {
   };
 
   doLogout = (): ThunkAction => {
-    return async (dispatch, getState, {getConfig, core, actions: {localStorageAction}}) => {
+    return async (dispatch, getState, {core}) => {
       try {
         await core.logout();
         dispatch(AuthActionCreator.successfulLogout());
@@ -398,7 +390,7 @@ export class AuthAction {
   };
 
   doSilentLogout = (): ThunkAction => {
-    return async (dispatch, getState, {getConfig, core, actions: {localStorageAction}}) => {
+    return async (dispatch, getState, {core}) => {
       try {
         await core.logout();
         dispatch(AuthActionCreator.successfulSilentLogout());

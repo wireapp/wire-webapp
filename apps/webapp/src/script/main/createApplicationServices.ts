@@ -21,6 +21,7 @@ import type {Clock} from '@enormora/clock/clock';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 
 import type {ApplicationObservability} from '../observability/applicationObservability';
+
 export type ApplicationServices = {
   readonly applicationObservability: ApplicationObservability;
   readonly clock: Clock;

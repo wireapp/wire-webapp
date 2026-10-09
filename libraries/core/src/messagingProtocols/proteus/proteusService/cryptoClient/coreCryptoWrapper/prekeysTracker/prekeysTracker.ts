@@ -49,9 +49,9 @@ export class PrekeyTracker {
     this.prekeyState = new PrekeysTrackerStore();
   }
 
-  private async generatePrekeys(nb: number): Promise<PreKey[]> {
+  private async generatePrekeys(numberOfPrekeys: number): Promise<PreKey[]> {
     const prekeys: PreKey[] = [];
-    for (let i = 0; i < nb; i++) {
+    for (let prekeyIndex = 0; prekeyIndex < numberOfPrekeys; prekeyIndex++) {
       prekeys.push(await this.generator.newPrekey());
     }
     return prekeys;

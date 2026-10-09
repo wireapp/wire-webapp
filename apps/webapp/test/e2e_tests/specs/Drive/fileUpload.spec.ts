@@ -51,7 +51,7 @@ test.describe('Drive file uploads with direct upload disabled', () => {
     await expect(pages.cellsSharedDrive().newButton).toBeVisible();
   });
 
-  test('does not expose file upload', {tag: ['@functional']}, async () => {
+  test('does not expose file upload', {tag: ['@functional', '@crit-flow-web']}, async () => {
     const sharedDrive = pageManager.webapp.pages.cellsSharedDrive();
 
     await sharedDrive.newButton.click();
@@ -61,6 +61,8 @@ test.describe('Drive file uploads with direct upload disabled', () => {
 
 test.describe('Drive file uploads', () => {
   let pageManager: PageManager;
+  const targetFolderName = 'Temporary upload folder';
+  const conversationName = 'Drive upload conversation';
 
   test.beforeEach(async ({createTeam, createPage, createUser}) => {
     const teamMember = await createUser();
@@ -80,7 +82,6 @@ test.describe('Drive file uploads', () => {
     const {pages} = pageManager.webapp;
 
     await test.step('Preconditions: Create and open a conversation with Shared Drive enabled', async () => {
-      const conversationName = 'Drive upload conversation';
       await connectWithUser(pageManager, teamMember);
       await createGroup(pages, conversationName, [teamMember], {cells: true});
       await pages.conversationList().getConversation(conversationName).open();
@@ -89,7 +90,7 @@ test.describe('Drive file uploads', () => {
     });
   });
 
-  test('I want to upload a single file to Drive', {tag: ['@TC-12131', '@functional']}, async () => {
+  test('I want to upload a single file to Drive', {tag: ['@TC-12131', '@functional', '@crit-flow-web']}, async () => {
     const {pages} = pageManager.webapp;
     const sharedDrive = pages.cellsSharedDrive();
 
@@ -107,7 +108,34 @@ test.describe('Drive file uploads', () => {
     });
   });
 
-  test('I want to upload multiple files to Drive', {tag: ['@TC-12133', '@functional']}, async () => {
+  test(
+    'I want to upload a duplicate file to Drive and have it renamed',
+    {tag: ['@TC-12140', '@regression']},
+    async () => {
+      const {pages} = pageManager.webapp;
+      const sharedDrive = pages.cellsSharedDrive();
+      const renamedTextFileName = 'example-1.txt';
+
+      await test.step('User uploads the same file twice', async () => {
+        await sharedDrive.uploadFile(getTextFilePath());
+        await expect(sharedDrive.uploadStatusHeader).toContainText(`Uploaded ${TextFileName}`);
+
+        await sharedDrive.uploadFile(getTextFilePath());
+        await expect(sharedDrive.uploadStatusHeader).toContainText(`Uploaded ${TextFileName}`);
+      });
+
+      await test.step('Both files are available and the duplicate is renamed', async () => {
+        await expect(async () => {
+          await sharedDrive.refresh();
+          await expect(sharedDrive.getFile(TextFileName)).toBeVisible({timeout: 2_000});
+          await expect(sharedDrive.getFile(renamedTextFileName)).toBeVisible({timeout: 2_000});
+          await expect(sharedDrive.filesList.getByRole('button', {name: TextFileName, exact: true})).toHaveCount(1);
+        }).toPass({intervals: [1_000, 2_000, 5_000], timeout: 20_000});
+      });
+    },
+  );
+
+  test('I want to upload multiple files to Drive', {tag: ['@TC-12133', '@functional', '@crit-flow-web']}, async () => {
     const {pages} = pageManager.webapp;
     const sharedDrive = pages.cellsSharedDrive();
 
@@ -125,4 +153,51 @@ test.describe('Drive file uploads', () => {
       }).toPass({intervals: [1_000, 2_000, 5_000], timeout: 20_000});
     });
   });
+
+  test(
+    'I want to upload a file into a Shared Drive folder using New',
+    {tag: ['@TC-12135', '@functional', '@crit-flow-web']},
+    async () => {
+      const {pages} = pageManager.webapp;
+      const sharedDrive = pages.cellsSharedDrive();
+      const conversation = pages.conversation();
+      const initialMessageCount = await conversation.messages.count();
+
+      await test.step('User opens the temporary target folder', async () => {
+        await sharedDrive.createFolder(targetFolderName);
+
+        await expect(async () => {
+          await sharedDrive.refresh();
+          await expect(sharedDrive.getFolder(targetFolderName)).toBeVisible();
+        }).toPass({intervals: [1_000, 2_000, 5_000], timeout: 20_000});
+
+        await sharedDrive.openFolder(targetFolderName);
+        await expect(sharedDrive.newButton).toBeVisible();
+      });
+
+      await test.step('New menu contains Upload file and the file is selected', async () => {
+        await sharedDrive.openNewMenu();
+        await expect(sharedDrive.uploadFileMenuItem).toBeVisible();
+        await sharedDrive.uploadFileFromOpenMenu(getTextFilePath());
+      });
+
+      await test.step('File upload completes in the target folder', async () => {
+        await expect(sharedDrive.uploadStatusHeader).toContainText(`Uploaded ${TextFileName}`);
+        await expect(async () => {
+          await sharedDrive.refresh();
+          await expect(sharedDrive.getFile(TextFileName)).toBeVisible({timeout: 2_000});
+        }).toPass({intervals: [1_000, 2_000, 5_000], timeout: 20_000});
+      });
+
+      await test.step('File is not uploaded to the Shared Drive root or sent as a message', async () => {
+        await sharedDrive.openRoot(conversationName);
+        await expect(async () => {
+          await sharedDrive.refresh();
+          await expect(sharedDrive.getFile(TextFileName)).toHaveCount(0);
+        }).toPass({intervals: [1_000, 2_000, 5_000], timeout: 20_000});
+        await conversation.clickMessagesTab();
+        await expect(conversation.messages).toHaveCount(initialMessageCount);
+      });
+    },
+  );
 });

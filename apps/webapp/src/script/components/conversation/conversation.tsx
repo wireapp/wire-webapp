@@ -80,7 +80,7 @@ import {
 import {SharedDriveUploadStatusProvider} from './conversationCells/sharedDriveUploadStatusContext';
 import {SharedDriveUploadStatusPopupHost} from './conversationCells/sharedDriveUploadStatusPopupHost';
 import {ConversationFileDropzone} from './conversationFileDropzone/conversationFileDropzone';
-import {isConversationFileDropAllowed} from './conversationFileDropzone/isConversationFileDropAllowed/isConversationFileDropAllowed';
+import {isConversationFileUploadAllowed} from './conversationFileDropzone/isConversationFileUploadAllowed/isConversationFileUploadAllowed';
 import {ConversationMessagesWrapper} from './conversationMessagesWrapper/conversationMessagesWrapper';
 import {ConversationTabPanel} from './conversationTabPanel/conversationTabPanel';
 import {ConversationTabs} from './conversationTabs/conversationTabs';
@@ -167,9 +167,10 @@ function ConversationContent({
   const [isSharedDriveSearchViewOpen, setIsSharedDriveSearchViewOpen] = useState<boolean>(false);
 
   const callState = container.resolve(CallState);
-  const {classifiedDomains} = useKoSubscribableChildren(teamState, [
+  const {classifiedDomains, isCellsEnabled: isCellsEnabledForTeam} = useKoSubscribableChildren(teamState, [
     'classifiedDomains',
     'isFileSharingSendingEnabled',
+    'isCellsEnabled',
   ]);
 
   const {is1to1, isRequest, isReadOnlyConversation, isSelfUserRemoved} = useKoSubscribableChildren(activeConversation, [
@@ -677,10 +678,11 @@ function ConversationContent({
   const isCellsEnabled =
     Config.getConfig().FEATURE.ENABLE_CELLS && activeConversation?.cellsState() !== CONVERSATION_CELLS_STATE.DISABLED;
   const isSharedDriveDirectUploadFeatureEnabled = isFeatureToggleEnabled(sharedDriveDirectUploadFeatureToggleName);
-  const isFileDropAllowed = isConversationFileDropAllowed({
+  const isFileUploadAllowed = isConversationFileUploadAllowed({
     conversationTeamId: activeConversation?.teamId,
     selfUserTeamId: activeConversation?.selfUser()?.teamId,
     isCellsEnabled,
+    isCellsEnabledForTeam,
   });
 
   useEffect(() => {
@@ -696,7 +698,7 @@ function ConversationContent({
       conversation: activeConversation,
       isCellsEnabled: isCellsEnabled,
       isDisabled: isFileTabActive && !isSharedDriveDirectUploadFeatureEnabled,
-      isFileDropAllowed,
+      isFileDropAllowed: isFileUploadAllowed,
       translate,
     });
 
@@ -715,7 +717,7 @@ function ConversationContent({
     <CellsSelfUserDriveRoleProvider selfUserDriveRole={selfUserDriveRole}>
       <ConversationFileDropzone
         isDragAccept={isDragAccept}
-        isFileDropAllowed={isFileDropAllowed}
+        isFileDropAllowed={isFileUploadAllowed}
         isCellsEnabled={isCellsEnabled}
         isConversationFileDropzoneEnabled={!isFileTabActive}
         isConversationLoaded={isConversationLoaded}
@@ -782,7 +784,7 @@ function ConversationContent({
                         onCloseSearchView={() => {
                           return setIsSharedDriveSearchViewOpen(false);
                         }}
-                        isUploadFilesEnabled={isSharedDriveDirectUploadFeatureEnabled}
+                        isUploadFilesEnabled={isSharedDriveDirectUploadFeatureEnabled && isFileUploadAllowed}
                         showViewerPermission={showViewerPermission}
                       />
                     </SharedDriveUploadProvider>

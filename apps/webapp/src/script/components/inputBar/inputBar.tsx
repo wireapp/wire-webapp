@@ -29,7 +29,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Avatar, AVATAR_SIZE} from 'Components/avatar';
 import {ConversationClassifiedBar} from 'Components/classifiedBar/classifiedBar';
-import {isConversationFileDropAllowed} from 'Components/conversation/conversationFileDropzone/isConversationFileDropAllowed/isConversationFileDropAllowed';
+import {isConversationFileUploadAllowed} from 'Components/conversation/conversationFileDropzone/isConversationFileUploadAllowed/isConversationFileUploadAllowed';
 import {useFileUploadState} from 'Components/conversation/useFilesUploadState/useFilesUploadState';
 import {EmojiPicker} from 'Components/emojiPicker/emojiPicker';
 import {useUserPropertyValue} from 'Hooks/useUserProperty';
@@ -152,10 +152,17 @@ function InputBarContent({
   isIncomingRequest,
 }: InputBarContentProps): ReactElement {
   const {fireAndForgetInvoker, isFeatureToggleEnabled, translate} = useApplicationContext();
-  const {classifiedDomains, isSelfDeletingMessagesEnabled, isFileSharingSendingEnabled} = useKoSubscribableChildren(
-    teamState,
-    ['classifiedDomains', 'isSelfDeletingMessagesEnabled', 'isFileSharingSendingEnabled'],
-  );
+  const {
+    classifiedDomains,
+    isSelfDeletingMessagesEnabled,
+    isFileSharingSendingEnabled,
+    isCellsEnabled: isCellsEnabledForTeam,
+  } = useKoSubscribableChildren(teamState, [
+    'classifiedDomains',
+    'isSelfDeletingMessagesEnabled',
+    'isFileSharingSendingEnabled',
+    'isCellsEnabled',
+  ]);
   const {localMessageTimer, messageTimer, hasGlobalMessageTimer, isSelfUserRemoved, is1to1} = useKoSubscribableChildren(
     conversation,
     ['localMessageTimer', 'messageTimer', 'hasGlobalMessageTimer', 'isSelfUserRemoved', 'is1to1', 'cellsState'],
@@ -195,10 +202,11 @@ function InputBarContent({
       : translate('tooltipConversationInputPlaceholder');
 
   const isConnectionRequest = isOutgoingRequest || isIncomingRequest;
-  const isCellsUploadAllowed = isConversationFileDropAllowed({
+  const isFileUploadAllowed = isConversationFileUploadAllowed({
     conversationTeamId: conversation.teamId,
     selfUserTeamId: selfUser.teamId,
     isCellsEnabled,
+    isCellsEnabledForTeam,
   });
   const hasLocalEphemeralTimer =
     isSelfDeletingMessagesEnabled && isNumber(localMessageTimer) && localMessageTimer !== 0 && !hasGlobalMessageTimer;
@@ -241,6 +249,7 @@ function InputBarContent({
   const fileHandling = useFileHandling({
     uploadDroppedFiles,
     uploadImages,
+    isFileUploadAllowed,
     isFileNameKept: isCellsEnabled,
     translate,
   });
@@ -278,7 +287,7 @@ function InputBarContent({
     translate,
   });
 
-  if (!isNull(fileHandling.pastedFile) && !!isCellsEnabled) {
+  if (!isNull(fileHandling.pastedFile) && isCellsEnabled && isFileUploadAllowed) {
     uploadPastedFiles(fileHandling.pastedFile);
     fileHandling.clearPastedFile();
   }
@@ -385,7 +394,7 @@ function InputBarContent({
                   <InputBarControls
                     conversation={conversation}
                     isCellsFeatureEnabled={isCellsEnabled}
-                    isCellsUploadAllowed={isCellsUploadAllowed}
+                    isCellsUploadAllowed={isFileUploadAllowed}
                     isFileSharingSendingEnabled={isFileSharingSendingEnabled}
                     pingDisabled={ping.isPingDisabled}
                     messageContent={messageContent}

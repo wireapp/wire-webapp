@@ -18,6 +18,7 @@
  */
 
 import {IMultipart, IAttachment, ICellAsset, IAsset} from '@wireapp/protocol-messaging';
+
 export {IMultipart as MultiPartContent};
 export {IAttachment as MultiPartAttachment};
 export {ICellAsset as MultiPartCellAsset};

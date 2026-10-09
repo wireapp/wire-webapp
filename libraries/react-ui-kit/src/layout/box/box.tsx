@@ -25,7 +25,7 @@ import {COLOR} from '../../identity';
 
 export type BoxProps<T = HTMLDivElement> = React.HTMLProps<T>;
 
-export const boxStyle: <T>(props: BoxProps<T>) => CSSObject = _ => {
+export const boxStyle: <T>(props: BoxProps<T>) => CSSObject = () => {
   return {
     border: `2px solid ${COLOR.GRAY_LIGHTEN_72}`,
     borderRadius: '8px',

@@ -27,7 +27,7 @@ export interface MenuScrollableItemsProps<T = HTMLDivElement> extends React.HTML
   open?: boolean;
 }
 
-export const menuScrollableItemsStyle: <T>(props: MenuScrollableItemsProps<T>) => CSSObject = _ => {
+export const menuScrollableItemsStyle: <T>(props: MenuScrollableItemsProps<T>) => CSSObject = () => {
   return {
     alignItems: 'center',
     alignSelf: 'center',

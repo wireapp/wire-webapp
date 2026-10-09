@@ -31,7 +31,7 @@ export class HistoryInfoPage {
     try {
       await this.continueButton.waitFor({state: 'visible', timeout});
       return true;
-    } catch (err: unknown) {
+    } catch {
       return false;
     }
   }

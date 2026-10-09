@@ -96,7 +96,7 @@ export function GlobalEventsPlugin({onShiftTab, onArrowUp, onEscape, onBlur}: Gl
       ),
       editor.registerCommand(
         BLUR_COMMAND,
-        event => {
+        () => {
           onBlur();
           return false;
         },

@@ -18,7 +18,7 @@
  */
 
 import {isNullOrUndefined, isUndefined} from '@sindresorhus/is';
-import Dexie from 'dexie';
+import {Dexie} from 'dexie';
 import DexieBatch from 'dexie-batch';
 import {container} from 'tsyringe';
 

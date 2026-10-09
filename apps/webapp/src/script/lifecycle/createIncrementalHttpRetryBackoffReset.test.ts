@@ -45,13 +45,13 @@ function createConfigureIncrementalHttpRetryBackoffResetDependenciesForTest(): C
   const subscribeToApplicationSignal = jest.fn((signalName: 'visibilitychange', listener: () => void) => {
     applicationSignalListeners.set(signalName, listener);
   });
-  const unsubscribeFromApplicationSignal = jest.fn((signalName: 'visibilitychange', _listener: () => void) => {
+  const unsubscribeFromApplicationSignal = jest.fn((signalName: 'visibilitychange', _: () => void) => {
     applicationSignalListeners.delete(signalName);
   });
   const subscribeToRuntimeSignal = jest.fn((signalName: 'focus' | 'online' | 'unload', listener: () => void) => {
     runtimeSignalListeners.set(signalName, listener);
   });
-  const unsubscribeFromRuntimeSignal = jest.fn((signalName: 'focus' | 'online', _listener: () => void) => {
+  const unsubscribeFromRuntimeSignal = jest.fn((signalName: 'focus' | 'online', _: () => void) => {
     runtimeSignalListeners.delete(signalName);
   });
 

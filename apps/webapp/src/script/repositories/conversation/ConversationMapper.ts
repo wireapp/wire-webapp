@@ -570,13 +570,16 @@ export class ConversationMapper {
       conversationsMap.set(conversationId, localConversation);
     }
 
-    for (let i = 0; i < foundRemoteConversations.length; i++) {
-      const remoteConversation = foundRemoteConversations[i];
+    for (let conversationIndex = 0; conversationIndex < foundRemoteConversations.length; conversationIndex++) {
+      const remoteConversation = foundRemoteConversations[conversationIndex];
       const conversationId = remoteConversation.qualified_id?.id;
       const localConversation = conversationsMap.get(conversationId);
 
       if (localConversation !== undefined) {
-        conversationsMap.set(conversationId, this.mergeSingleConversation(localConversation, remoteConversation, i));
+        conversationsMap.set(
+          conversationId,
+          this.mergeSingleConversation(localConversation, remoteConversation, conversationIndex),
+        );
         continue;
       }
 
@@ -585,7 +588,10 @@ export class ConversationMapper {
         domain: '',
       }) as ConversationDatabaseData;
 
-      conversationsMap.set(conversationId, this.mergeSingleConversation(localConversationData, remoteConversation, i));
+      conversationsMap.set(
+        conversationId,
+        this.mergeSingleConversation(localConversationData, remoteConversation, conversationIndex),
+      );
     }
 
     return Array.from(conversationsMap.values());
