@@ -581,7 +581,6 @@ jobs:
         with:
           deployoholics-webhook-url: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
           deployoholics-token: ${{ secrets.WIRE_DEPLOYOHOLICS_TOKEN }}
-          status: success
           text: |
             ✅ WebApp Beta release successfully deployed ✅
 
@@ -825,7 +824,6 @@ jobs:
         with:
           deployoholics-webhook-url: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
           deployoholics-token: ${{ secrets.WIRE_DEPLOYOHOLICS_TOKEN }}
-          status: success
           text: |
             ✅ Release E2E system gate passed ✅
 
@@ -1343,7 +1341,6 @@ jobs:
         with:
           deployoholics-webhook-url: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
           deployoholics-token: ${{ secrets.WIRE_DEPLOYOHOLICS_TOKEN }}
-          status: success
           text: |
             ✅ WebApp Production release successfully completed ✅
 
@@ -1540,7 +1537,6 @@ jobs:
         with:
           deployoholics-webhook-url: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
           deployoholics-token: ${{ secrets.WIRE_DEPLOYOHOLICS_TOKEN }}
-          status: failure
           text: |
             ${{ env.POST_PRODUCTION_SYNCHRONIZATION_FAILURE == 'true' && '⚠️ Production release succeeded; WebApp version synchronization bookkeeping is incomplete ⚠️' || '❌ WebApp release failed ❌' }}
 

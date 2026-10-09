@@ -325,7 +325,6 @@ jobs:
         with:
           deployoholics-webhook-url: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
           deployoholics-token: ${{ secrets.WIRE_DEPLOYOHOLICS_TOKEN }}
-          status: failure
           text: |
             Production rollback failed for tag ${{ needs.validate_request.outputs.production_tag || inputs.production_tag }}
             Webapp version: ${{ needs.build_artifact.outputs.artifact_version || 'unavailable' }}

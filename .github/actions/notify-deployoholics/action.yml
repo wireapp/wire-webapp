@@ -6,10 +6,6 @@ inputs:
   text:
     description: Wire message text.
     required: true
-  status:
-    description: Wire notification status.
-    required: false
-    default: failure
   deployoholics-webhook-url:
     description: Wire webhook URL to notify Deployoholics conversation.
     required: true
@@ -26,6 +22,4 @@ runs:
         webhook-url: ${{ inputs.deployoholics-webhook-url }}
         token: ${{ inputs.deployoholics-token }}
         text: |-
-          ${{ inputs.status }}
-
           ${{ inputs.text }}

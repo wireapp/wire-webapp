@@ -240,7 +240,6 @@ jobs:
         with:
           deployoholics-webhook-url: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
           deployoholics-token: ${{ secrets.WIRE_DEPLOYOHOLICS_TOKEN }}
-          status: failure
           text: |
             ❌ Production redeploy failed for tag ${{ needs.validate_request.outputs.tag }} ❌
             **Triggered by:** ${{ github.actor }}
