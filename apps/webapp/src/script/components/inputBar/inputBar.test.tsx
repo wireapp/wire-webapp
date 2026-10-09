@@ -21,6 +21,7 @@ import {act, fireEvent, render, waitFor} from '@testing-library/react';
 
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {FEATURE_STATUS} from '@wireapp/api-client/lib/team/feature/';
 
 import {FileWithPreview} from 'Components/conversation/useFilesUploadState/useFilesUploadState';
 import {InputBar} from 'Components/inputBar/index';
@@ -140,27 +141,50 @@ describe('InputBar', () => {
   it('hides cells upload buttons for viewers', () => {
     const props = getDefaultProps();
     props.isCellsEnabled = true;
+    props.teamState.teamFeatures({cells: {status: FEATURE_STATUS.ENABLED}});
     props.conversation.teamId = 'conversation-team';
     props.conversation.cellsState(CONVERSATION_CELLS_STATE.READY);
     props.selfUser.teamId = 'guest-team';
 
-    const {queryByTitle} = renderInputBar(props);
+    const {container} = renderInputBar(props);
 
-    expect(queryByTitle('tooltipConversationAddImage')).toBe(null);
-    expect(queryByTitle('tooltipConversationFile')).toBe(null);
+    expect(container.querySelector('[data-uie-name="do-share-image"]')).not.toBeInTheDocument();
+    expect(container.querySelector('[data-uie-name="do-share-file"]')).not.toBeInTheDocument();
   });
 
   it('shows cells upload buttons for editors', () => {
     const props = getDefaultProps();
     props.isCellsEnabled = true;
+    props.teamState.teamFeatures({cells: {status: FEATURE_STATUS.ENABLED}});
     props.conversation.teamId = 'conversation-team';
     props.conversation.cellsState(CONVERSATION_CELLS_STATE.READY);
     props.selfUser.teamId = 'conversation-team';
 
-    const {getByTitle} = renderInputBar(props);
+    const {container} = renderInputBar(props);
 
-    expect(getByTitle('tooltipConversationAddImage')).not.toBe(null);
-    expect(getByTitle('tooltipConversationFile')).not.toBe(null);
+    expect(container.querySelector('[data-uie-name="do-share-image"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-uie-name="do-share-file"]')).toBeInTheDocument();
+  });
+
+  it('hides Cells upload buttons when the team feature is disabled and restores them when enabled', () => {
+    const props = getDefaultProps();
+    props.isCellsEnabled = true;
+    props.teamState.teamFeatures({cells: {status: FEATURE_STATUS.DISABLED}});
+    props.conversation.teamId = 'conversation-team';
+    props.conversation.cellsState(CONVERSATION_CELLS_STATE.READY);
+    props.selfUser.teamId = 'conversation-team';
+
+    const {container} = renderInputBar(props);
+
+    expect(container.querySelector('[data-uie-name="do-share-image"]')).not.toBeInTheDocument();
+    expect(container.querySelector('[data-uie-name="do-share-file"]')).not.toBeInTheDocument();
+
+    act(() => {
+      props.teamState.teamFeatures({cells: {status: FEATURE_STATUS.ENABLED}});
+    });
+
+    expect(container.querySelector('[data-uie-name="do-share-image"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-uie-name="do-share-file"]')).toBeInTheDocument();
   });
 
   it('has passed value', async () => {

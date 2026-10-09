@@ -261,46 +261,88 @@ describe('MLSService', () => {
   });
 
   describe('getKeyPackagesPayload', () => {
-    it('succesfully claims keys for all users', async () => {
+    it('returns decoded key packages from successful claims for all users', async () => {
       const [mlsService, {apiClient}] = await createMLSService();
       const users = [createUserId(), createUserId()];
 
       jest.spyOn(apiClient.api.client, 'claimMLSKeyPackages').mockImplementation(async userId => {
         return {
-          key_packages: [{client: 'client-1', domain: 'domain-1', key_package: '', key_package_ref: '', user: userId}],
+          key_packages: [
+            {client: 'client-1', domain: 'domain-1', key_package: 'AQID', key_package_ref: '', user: userId},
+          ],
         };
       });
 
       const {failures, keyPackages} = await mlsService.getKeyPackagesPayload(users);
 
       expect(failures).toEqual([]);
-      expect(keyPackages).toHaveLength(2);
+      expect(keyPackages).toEqual([new Uint8Array([1, 2, 3]), new Uint8Array([1, 2, 3])]);
     });
 
-    it('returns failure reasons list if it was not possible to claim user keys', async () => {
+    it('returns not-MLS-capable when a successful claim has no key packages', async () => {
       const [mlsService, {apiClient}] = await createMLSService();
-      const users = [createUserId(), createUserId(), createUserId()];
+      const user = createUserId();
 
-      jest.spyOn(apiClient.api.client, 'claimMLSKeyPackages').mockRejectedValueOnce(undefined);
+      jest.spyOn(apiClient.api.client, 'claimMLSKeyPackages').mockResolvedValue({key_packages: []});
 
-      jest.spyOn(apiClient.api.client, 'claimMLSKeyPackages').mockResolvedValueOnce({
-        key_packages: [],
-      });
+      const {failures, keyPackages} = await mlsService.getKeyPackagesPayload([user]);
 
-      jest.spyOn(apiClient.api.client, 'claimMLSKeyPackages').mockResolvedValueOnce({
-        key_packages: [
-          {client: 'client-1', domain: 'domain-1', key_package: '', key_package_ref: '', user: users[2].id},
-        ],
-      });
+      expect(failures).toEqual([{reason: AddUsersFailureReasons.NOT_MLS_CAPABLE, users: [user]}]);
+      expect(keyPackages).toEqual([]);
+    });
+
+    it('returns a generic failure when a key-package claim is rejected for another reason', async () => {
+      const [mlsService, {apiClient}] = await createMLSService();
+      const user = createUserId();
+
+      jest
+        .spyOn(apiClient.api.client, 'claimMLSKeyPackages')
+        .mockRejectedValue(new BackendError('claim failed', BackendErrorLabel.CLIENT_ERROR, StatusCode.BAD_REQUEST));
+
+      const {failures} = await mlsService.getKeyPackagesPayload([user]);
+
+      expect(failures).toEqual([{reason: AddUsersFailureReasons.KEY_PACKAGE_CLAIM_FAILED, users: [user]}]);
+      expect(failures).not.toContainEqual(
+        expect.objectContaining({reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS}),
+      );
+    });
+
+    it('groups multiple rejected claims under the generic failure reason', async () => {
+      const [mlsService, {apiClient}] = await createMLSService();
+      const users = [createUserId(), createUserId()];
+
+      jest.spyOn(apiClient.api.client, 'claimMLSKeyPackages').mockRejectedValue(new Error('claim failed'));
 
       const {failures, keyPackages} = await mlsService.getKeyPackagesPayload(users);
 
-      expect(failures).toEqual([
-        {reason: AddUsersFailureReasons.NOT_MLS_CAPABLE, users: [users[1]]},
-        {reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS, users: [users[0]], backends: [users[1].domain]},
-      ]);
+      expect(failures).toEqual([{reason: AddUsersFailureReasons.KEY_PACKAGE_CLAIM_FAILED, users}]);
+      expect(keyPackages).toEqual([]);
+    });
 
-      expect(keyPackages).toHaveLength(1);
+    it('processes successful claims when another user claim rejects', async () => {
+      const [mlsService, {apiClient}] = await createMLSService();
+      const failedUser = createUserId();
+      const successfulUser = createUserId();
+
+      jest
+        .spyOn(apiClient.api.client, 'claimMLSKeyPackages')
+        .mockRejectedValueOnce(new Error('claim failed'))
+        .mockResolvedValueOnce({
+          key_packages: [
+            {
+              client: 'client-1',
+              domain: successfulUser.domain,
+              key_package: 'AQID',
+              key_package_ref: '',
+              user: successfulUser.id,
+            },
+          ],
+        });
+
+      const {failures, keyPackages} = await mlsService.getKeyPackagesPayload([failedUser, successfulUser]);
+
+      expect(failures).toEqual([{reason: AddUsersFailureReasons.KEY_PACKAGE_CLAIM_FAILED, users: [failedUser]}]);
+      expect(keyPackages).toEqual([new Uint8Array([1, 2, 3])]);
     });
   });
 

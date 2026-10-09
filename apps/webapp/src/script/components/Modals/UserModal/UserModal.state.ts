@@ -30,7 +30,7 @@ type UserModalState = {
   updateUserId: (userId: QualifiedId | null) => void;
 };
 
-const useUserModalState = create<UserModalState>((set, get) => {
+const useUserModalState = create<UserModalState>(set => {
   return {
     onClose: noop,
     resetState: () => {

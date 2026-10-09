@@ -55,7 +55,7 @@ import {ConversationDetails} from './conversationDetails';
 import {TestFactory} from '../../../../../test/helper/TestFactory';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {MainViewModel} from '../../../view_model/MainViewModel';
-import {withTheme, withThemeAndRootContext} from '../../../auth/util/test/testUtil';
+import {withThemeAndRootContext} from '../../../auth/util/test/testUtil';
 import {PanelState} from '../rightSidebar';
 
 jest.mock('Components/panel/enrichedFields', () => {
@@ -164,10 +164,10 @@ const getDefaultParams = () => {
     isVisible: true,
     searchRepository,
     teamRepository: {
-      getRoleBadge: (userId: string) => {
+      getRoleBadge: () => {
         return '';
       },
-      updateTeamMembersByIds: (teamEntity: TeamEntity, memberIds?: string[], append?: boolean) => {
+      updateTeamMembersByIds: () => {
         return Promise.resolve();
       },
       isSelfConnectedTo: () => {
@@ -341,7 +341,7 @@ describe('ConversationDetails', () => {
       },
     ];
 
-    return tests.forEach(({expected, permission, conversationType}) => {
+    return tests.forEach(({expected, conversationType}) => {
       act(() => {
         conversation.type(conversationType);
       });

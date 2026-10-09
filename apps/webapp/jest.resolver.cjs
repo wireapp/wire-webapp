@@ -17,6 +17,8 @@
  *
  */
 
+'use strict';
+
 const nxResolver = require('@nx/jest/plugins/resolver');
 
 const commonJsExportConditions = ['node', 'node-addons', 'require', 'default'];

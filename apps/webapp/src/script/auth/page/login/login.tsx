@@ -84,6 +84,7 @@ import {getPrefixedSSOCode} from '../../util/urlUtil';
 import {EntropyContainer} from '../entropyContainer';
 import {Page} from '../page';
 import {styles} from '../verifyEmailCode.styles';
+
 type Props = React.HTMLProps<HTMLDivElement> & {
   embedded?: boolean;
 };

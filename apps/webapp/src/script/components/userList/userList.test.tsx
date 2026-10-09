@@ -61,7 +61,7 @@ describe('UserList', () => {
     });
     const props = {
       conversationRepository,
-      onSelectUser: (user: User) => {
+      onSelectUser: () => {
         return jest.fn();
       },
       selfUser: user,

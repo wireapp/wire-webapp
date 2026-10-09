@@ -52,7 +52,7 @@ function createDependencies() {
     isUploadFilesEnabled: true,
     isInRecycleBin: false,
     maxFileSize: 100,
-    isAcceptedFile: jest.fn((_file: File) => {
+    isAcceptedFile: jest.fn((_: File) => {
       return true;
     }),
   };

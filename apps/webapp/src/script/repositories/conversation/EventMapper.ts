@@ -1212,10 +1212,10 @@ export class EventMapper {
           protoMention.qualifiedUserId?.domain ?? undefined,
         );
       })
-      .filter((MentionEntity, _, allMentions): boolean => {
-        if (!isUndefined(MentionEntity)) {
+      .filter((mentionEntity, mentionIndex, allMentions): boolean => {
+        if (!isUndefined(mentionEntity)) {
           try {
-            return MentionEntity.validate(messageText, allMentions);
+            return mentionEntity.validate(messageText, allMentions);
           } catch (error: unknown) {
             this.logger.warn(`Removed invalid mention when mapping message: ${toError(error).message}`);
             return false;

@@ -61,7 +61,7 @@ export class Converter {
     const chunkSize = 32000;
     const array = Array.from(arrayBufferView);
     const chunkCount = Math.ceil(array.length / chunkSize);
-    return Array.from({length: chunkCount}, (_, index) => {
+    return Array.from({length: chunkCount}, (arrayElement, index) => {
       return String.fromCharCode.apply(null, array.slice(index * chunkSize, (index + 1) * chunkSize));
     }).join('');
   }
@@ -87,12 +87,12 @@ export class Converter {
     const arrayBuffer = new ArrayBuffer(array.length);
     const arrayBufferView = new Uint8Array(arrayBuffer);
 
-    for (let i = 0; i < arrayBufferView.length; i++) {
-      const value = array[i];
+    for (let byteIndex = 0; byteIndex < arrayBufferView.length; byteIndex++) {
+      const value = array[byteIndex];
       if (isUndefined(value)) {
-        throw new Error(`Missing value for byte index ${i}`);
+        throw new Error(`Missing value for byte index ${byteIndex}`);
       }
-      arrayBufferView[i] = value;
+      arrayBufferView[byteIndex] = value;
     }
 
     return arrayBufferView;
@@ -102,8 +102,8 @@ export class Converter {
     const arrayBuffer = new ArrayBuffer(data.length * utf16CodeUnitSizeInBytes);
     const arrayBufferView = new Uint16Array(arrayBuffer);
 
-    for (let i = 0, strLen = data.length; i < strLen; i++) {
-      arrayBufferView[i] = data.charCodeAt(i);
+    for (let characterIndex = 0, stringLength = data.length; characterIndex < stringLength; characterIndex++) {
+      arrayBufferView[characterIndex] = data.charCodeAt(characterIndex);
     }
 
     return arrayBufferView;
@@ -131,8 +131,8 @@ export class Converter {
   public static stringToArrayBufferViewUTF8(data: string): Uint8Array {
     const escapedString = encodeURIComponent(data);
 
-    const binaryString = escapedString.replace(/%([0-9A-F]{2})/g, (_, position) => {
-      const code = parseInt(`0x${position}`, 16);
+    const binaryString = escapedString.replace(/%([0-9A-F]{2})/g, (encodedEscapeSequence, hexadecimalByte) => {
+      const code = parseInt(`0x${hexadecimalByte}`, 16);
       return String.fromCharCode(code);
     });
 
@@ -152,15 +152,15 @@ export class Converter {
 
     const arrayBufferView = new Uint8Array(data.length / hexadecimalCharactersPerByte);
 
-    for (let i = 0; i < data.length; i += hexadecimalCharactersPerByte) {
-      const hexByte = data.substr(i, hexadecimalCharactersPerByte);
+    for (let byteOffset = 0; byteOffset < data.length; byteOffset += hexadecimalCharactersPerByte) {
+      const hexByte = data.substr(byteOffset, hexadecimalCharactersPerByte);
       const value = parseInt(hexByte, 16);
 
       if (isNaN(value)) {
-        throw new Error(`Invalid hexadecimal string at position ${i}: "${hexByte}"`);
+        throw new Error(`Invalid hexadecimal string at position ${byteOffset}: "${hexByte}"`);
       }
 
-      arrayBufferView[i / hexadecimalCharactersPerByte] = value;
+      arrayBufferView[byteOffset / hexadecimalCharactersPerByte] = value;
     }
 
     return arrayBufferView;

@@ -73,7 +73,7 @@ export const selectStyles = ({
         ...baseContainerStyles(containerCSS),
       };
     },
-    control: (_, {isDisabled, selectProps}) => {
+    control: (providedControlStyles, {isDisabled, selectProps}) => {
       return baseControlStyles({theme, isDisabled, markInvalid, selectProps, controlCSS});
     },
     dropdownIndicator: (provided, selectProps) => {

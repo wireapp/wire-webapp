@@ -61,8 +61,8 @@ const onIntersect: IntersectionObserverCallback = entries => {
 };
 
 const stepCount = 100;
-const thresholdSteps = Array.from({length: stepCount + 1}, (_, index) => {
-  return index / stepCount;
+const thresholdSteps = Array.from({length: stepCount + 1}, (arrayElement, thresholdIndex) => {
+  return thresholdIndex / stepCount;
 });
 
 const options: IntersectionObserverInit = {root: null, rootMargin: '0px', threshold: thresholdSteps};

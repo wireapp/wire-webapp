@@ -38,6 +38,7 @@ const singularTranslationKeyByReason = {
   [AddUsersFailureReasons.UNREACHABLE_BACKENDS]: 'failedToAddParticipantSingularOfflineBackend',
   [AddUsersFailureReasons.OFFLINE_FOR_TOO_LONG]: 'failedToAddParticipantSingularOfflineForTooLong',
   [AddUsersFailureReasons.NOT_MLS_CAPABLE]: 'failedToAddParticipantSingularNotMlsCapable',
+  [AddUsersFailureReasons.KEY_PACKAGE_CLAIM_FAILED]: 'failedToAddParticipantSingularKeyPackageClaimFailed',
 } as const satisfies Record<AddUsersFailureReasons, TranslationKey>;
 
 const singularDetailsTranslationKeyByReason = {
@@ -45,6 +46,7 @@ const singularDetailsTranslationKeyByReason = {
   [AddUsersFailureReasons.UNREACHABLE_BACKENDS]: 'failedToAddParticipantsSingularDetailsOfflineBackend',
   [AddUsersFailureReasons.OFFLINE_FOR_TOO_LONG]: 'failedToAddParticipantsSingularDetailsOfflineForTooLong',
   [AddUsersFailureReasons.NOT_MLS_CAPABLE]: 'failedToAddParticipantsSingularDetailsNotMlsCapable',
+  [AddUsersFailureReasons.KEY_PACKAGE_CLAIM_FAILED]: 'failedToAddParticipantsSingularDetailsKeyPackageClaimFailed',
 } as const satisfies Record<AddUsersFailureReasons, TranslationKey>;
 
 const pluralDetailsTranslationKeyByReason = {
@@ -52,6 +54,7 @@ const pluralDetailsTranslationKeyByReason = {
   [AddUsersFailureReasons.UNREACHABLE_BACKENDS]: 'failedToAddParticipantsPluralDetailsOfflineBackend',
   [AddUsersFailureReasons.OFFLINE_FOR_TOO_LONG]: 'failedToAddParticipantsPluralDetailsOfflineForTooLong',
   [AddUsersFailureReasons.NOT_MLS_CAPABLE]: 'failedToAddParticipantsPluralDetailsNotMlsCapable',
+  [AddUsersFailureReasons.KEY_PACKAGE_CLAIM_FAILED]: 'failedToAddParticipantsPluralDetailsKeyPackageClaimFailed',
 } as const satisfies Record<AddUsersFailureReasons, TranslationKey>;
 
 const findUser = (users: User[], qualifiedId: QualifiedId): User | undefined => {

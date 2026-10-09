@@ -49,7 +49,7 @@ const getDefaultParams = (isGuest: boolean = true) => {
     onBack: jest.fn(),
     onClose: jest.fn(),
     teamRepository: {
-      conversationHasGuestLinkEnabled: async (conversationId: string) => {
+      conversationHasGuestLinkEnabled: async (_: string) => {
         return true;
       },
     } as TeamRepository,

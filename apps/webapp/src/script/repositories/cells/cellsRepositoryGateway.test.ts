@@ -8,8 +8,6 @@
  * (at your option) any later version.
  */
 
-import {Task} from 'true-myth';
-
 import {createCellsRepositoryGateway} from './cellsRepositoryGateway';
 import type {DraftIdentity, UploadSource} from './upload/identity';
 import {createCellsUploadManager} from './upload/manager';

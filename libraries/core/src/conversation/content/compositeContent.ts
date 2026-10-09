@@ -18,4 +18,5 @@
  */
 
 import {IComposite} from '@wireapp/protocol-messaging';
+
 export {IComposite as CompositeContent};

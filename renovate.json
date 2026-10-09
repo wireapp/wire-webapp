@@ -1,7 +1,7 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended", ":semanticCommitsDisabled"],
-  "labels": ["renovate"],
+  "labels": ["renovate", "semver:patch"],
   "timezone": "Europe/Berlin",
   "dependencyDashboard": true,
   "rebaseWhen": "conflicted",
@@ -52,7 +52,7 @@
         "@tony.ganchev/eslint-plugin-header",
         "eslint-import-resolver-typescript",
         "eslint-plugin-header",
-        "eslint-plugin-import",
+        "eslint-plugin-import-x",
         "eslint-plugin-jest",
         "eslint-plugin-jest-dom",
         "eslint-plugin-jsdoc",

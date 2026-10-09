@@ -75,13 +75,13 @@ export const ActionLinkButton = forwardRef<HTMLAnchorElement | HTMLButtonElement
       const {href, target, onClick, ...anchorProps} = restProps;
       const linkProps = filterLinkProps(anchorProps as unknown as LinkProps);
 
-      const handleAnchorClick: React.MouseEventHandler<HTMLAnchorElement> = e => {
+      const handleAnchorClick: React.MouseEventHandler<HTMLAnchorElement> = event => {
         if (disabled === true) {
-          e.preventDefault();
-          e.stopPropagation();
+          event.preventDefault();
+          event.stopPropagation();
           return;
         }
-        onClick?.(e as any);
+        onClick?.(event);
       };
 
       return (

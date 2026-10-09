@@ -57,10 +57,6 @@ const defaultRichTextEditorTestOptions: RichTextEditorTestOptions = {
   showMarkdownPreview: true,
 };
 
-function throwEditorError(error: unknown): never {
-  throw error;
-}
-
 function createTestUser(userName: string): User {
   const user = new User(`${userName}-id`, '', translateForTest);
   user.name(userName);

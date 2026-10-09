@@ -25,14 +25,14 @@ import {LogFactory} from '@wireapp/commons';
 
 import {DomainMlsError, DomainMlsErrorType, MlsErrorMapper} from './mlsErrorMapper';
 
+import {BaseCreateConversationResponse} from '../../../conversation';
+
 /** Context captured when epoch-mismatch recovery is triggered, for structured debugging. */
 export type MlsEpochRecoveryTrigger = {
   operationName: OperationName;
   errorType: DomainMlsErrorType;
   groupId?: string;
 };
-
-import {BaseCreateConversationResponse} from '../../../conversation';
 
 /**
  * Coordinates recovery actions for MLS operations.

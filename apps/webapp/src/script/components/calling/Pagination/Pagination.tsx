@@ -76,8 +76,8 @@ export const Pagination = ({totalPages, currentPage, onChangePage, className}: P
     }
   };
 
-  const visibleRange = Array.from({length: visibleDots}, (_, index) => {
-    return currentStart + index;
+  const visibleRange = Array.from({length: visibleDots}, (arrayElement, visibleDotIndex) => {
+    return currentStart + visibleDotIndex;
   });
 
   return (

@@ -74,7 +74,7 @@ export const cleanURL = (url: string = ''): string => {
   try {
     const {hostname, port, pathname, search, hash} = new URL(url);
     return `${hostname.replace(/^www./, '')}${isNonEmptyString(port) ? `:${port}` : ''}${pathname.replace(/\/$/, '')}${search}${hash}`;
-  } catch (error: unknown) {
+  } catch {
     return '';
   }
 };

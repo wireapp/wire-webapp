@@ -209,6 +209,14 @@ function getEffectiveCallingConfig(callingConfig: CallConfigData, useRustSft: bo
   };
 }
 
+type SFTRequestCallback = (
+  requestContext: number,
+  requestUrl: string,
+  requestBody: string,
+  requestBodyLength: number,
+  sftRequestMetadata: number,
+) => number;
+
 export class CallingRepository {
   private readonly acceptVersionWarning: (conversationId: QualifiedId) => void;
   private readonly callLog: string[];
@@ -604,8 +612,8 @@ export class CallingRepository {
         if (userId !== 0 && !isNan(userId)) {
           try {
             wCall.setBackground(this.wUser, 0);
-          } catch (e: unknown) {
-            this.logger.warn(`Informed AVS about background mode failed. ${e}`);
+          } catch (error: unknown) {
+            this.logger.warn(`Informed AVS about background mode failed. ${error}`);
           }
         } else {
           this.logger.warn('Skipping AVS background notification because AVS user ID is not initialized.');
@@ -2043,11 +2051,17 @@ export class CallingRepository {
     this.logger.info(
       `Call Epoch Info: _cache_disable, user: ${userId}, conversation: ${this.serializeQualifiedId(call.conversation.qualifiedId)}`,
     );
-    call.epochCache.getEpochList().forEach((d: CallingEpochData) => {
+    call.epochCache.getEpochList().forEach((epochData: CallingEpochData) => {
       this.logger.info(
-        `Call Epoch Info: _cache_avs_set, epoch: ${d.epoch}, user: ${userId}, conversation: ${d.serializedConversationId}`,
+        `Call Epoch Info: _cache_avs_set, epoch: ${epochData.epoch}, user: ${userId}, conversation: ${epochData.serializedConversationId}`,
       );
-      this.wCall?.setEpochInfo(this.wUser, d.serializedConversationId, d.epoch, JSON.stringify(d.clients), d.secretKey);
+      this.wCall?.setEpochInfo(
+        this.wUser,
+        epochData.serializedConversationId,
+        epochData.epoch,
+        JSON.stringify(epochData.clients),
+        epochData.secretKey,
+      );
     });
     call.epochCache.clean();
   }
@@ -2112,8 +2126,8 @@ export class CallingRepository {
       return;
     }
     // Filter myself out and do not request my own stream.
-    const requestParticipants = participants.filter(p => {
-      return !this.isSelfUser(p);
+    const requestParticipants = participants.filter(participant => {
+      return !this.isSelfUser(participant);
     });
     if (requestParticipants.length === 0) {
       return;
@@ -2588,13 +2602,7 @@ export class CallingRepository {
     void this.sendCallingMessage(conversationId, {type: CALL_MESSAGE_TYPE.REMOTE_KICK}, {nativePush: true, recipients});
   };
 
-  private readonly sendSFTRequest = (
-    context: number,
-    url: string,
-    data: string,
-    _dataLength: number,
-    __: number,
-  ): number => {
+  private readonly sendSFTRequest: SFTRequestCallback = (context, url, data) => {
     const _sendSFTRequest = async () => {
       if (!isAllowedSftUrl(url, this.allowedSftOrigins)) {
         throw new Error('SFT request destination is not allowed');
@@ -3023,7 +3031,7 @@ export class CallingRepository {
     }
   };
 
-  private readonly requestClients = async (wUser: number, convId: SerializedConversationId, __: number) => {
+  private readonly requestClients = async (wUser: number, convId: SerializedConversationId) => {
     const call = this.findCall(this.parseQualifiedId(convId));
     if (isUndefined(call)) {
       this.logger.warn(`Unable to find a call for the conversation id of ${convId}`);
@@ -3235,7 +3243,7 @@ export class CallingRepository {
       });
   };
 
-  private readonly metricsReceived = (_: string, metrics: string) => {
+  private readonly metricsReceived = (metricName: string, metrics: string) => {
     this.logger.info('Calling metrics:', metrics);
   };
 

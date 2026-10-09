@@ -27,7 +27,7 @@ import {INPUT_SUBMIT_COMBO_CLASSNAME} from '../inputSubmitCombo';
 
 export type InputBlockProps<T = HTMLDivElement> = React.HTMLProps<T>;
 
-const inputBlockStyle: (props: InputBlockProps) => CSSObject = _ => {
+const inputBlockStyle: (props: InputBlockProps) => CSSObject = () => {
   return {
     backgroundColor: COLOR.GRAY_LIGHTEN_88,
     borderRadius: '4px',

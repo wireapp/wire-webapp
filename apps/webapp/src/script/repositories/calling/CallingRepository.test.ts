@@ -144,12 +144,7 @@ function createCallingRepositoryForTest({
   };
 }
 
-const translateWithPrefixForTest: Translate = (
-  translationKey,
-  _substitutions,
-  _dangerousSubstitutions,
-  _skipEscape,
-) => {
+const translateWithPrefixForTest: Translate = translationKey => {
   return `translated:${translationKey}`;
 };
 
@@ -1718,7 +1713,7 @@ describe('CallingRepository ISO', () => {
 
       expect(callingRepo['callState'].calls().length).toBe(0);
 
-      callingRepo.onIncomingCall(call => {
+      callingRepo.onIncomingCall(() => {
         expect(callingRepo['callState'].calls().length).toBe(1);
 
         return Promise.resolve();
@@ -1918,7 +1913,7 @@ describe.skip('E2E audio call', () => {
           );
         },
       );
-    return client.initAvs(user, 'device').then(({wCall: wCallInstance, wUser}) => {
+    return client.initAvs(user, 'device').then(({wCall: wCallInstance}) => {
       remoteWuser = createAutoAnsweringWuser(wCallInstance, client);
       wCall = wCallInstance;
     });
@@ -2074,7 +2069,7 @@ describe('init AVS state', () => {
   it('start polling', done => {
     const nowMock = jest.spyOn(Date, 'now');
     nowMock.mockReturnValue(0);
-    client.initAvs(user, 'device').then(({wCall: wCallInstance, wUser}) => {
+    client.initAvs(user, 'device').then(({wCall: wCallInstance}) => {
       createAutoAnsweringWuser(wCallInstance, client);
       jest.spyOn(wCallInstance, 'setBackground');
       jest.spyOn(wCallInstance, 'poll');
@@ -2090,7 +2085,7 @@ describe('init AVS state', () => {
   it('set info that app was in background to AVS', done => {
     const nowMock = jest.spyOn(Date, 'now');
     nowMock.mockReturnValue(0);
-    client.initAvs(user, 'device').then(({wCall: wCallInstance, wUser}) => {
+    client.initAvs(user, 'device').then(({wCall: wCallInstance}) => {
       createAutoAnsweringWuser(wCallInstance, client);
       jest.spyOn(wCallInstance, 'setBackground');
       jest.spyOn(wCallInstance, 'poll');
@@ -2106,7 +2101,7 @@ describe('init AVS state', () => {
   it('set info that app was in background to AVS fails', done => {
     const nowMock = jest.spyOn(Date, 'now');
     nowMock.mockReturnValue(0);
-    client.initAvs(user, 'device').then(({wCall: wCallInstance, wUser}) => {
+    client.initAvs(user, 'device').then(({wCall: wCallInstance}) => {
       createAutoAnsweringWuser(wCallInstance, client);
       jest.spyOn(wCallInstance, 'setBackground').mockImplementation(() => {
         throw new Error('AVS set background fails');

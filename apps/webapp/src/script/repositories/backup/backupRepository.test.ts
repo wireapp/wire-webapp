@@ -35,7 +35,7 @@ import {createUuid} from 'Util/uuid';
 import {WebWorker} from 'Util/worker';
 
 import {Filename} from './backup.types';
-import {BackUpHeader, DecodedHeader, ENCRYPTED_BACKUP_FORMAT, ENCRYPTED_BACKUP_VERSION} from './backUpHeader';
+import {BackUpHeader, ENCRYPTED_BACKUP_FORMAT, ENCRYPTED_BACKUP_VERSION} from './backUpHeader';
 import {BackupRepository} from './backupRepository';
 import {BackupService} from './backupService';
 import {CancelError, DifferentAccountError, IncompatiblePlatformError} from './error';
@@ -329,7 +329,7 @@ describe('BackupRepository', () => {
       const user = new User('user1', '', translateForTest);
       const mockHashedUserId = new Uint8Array(32);
       const mockEncodeHeader = jest.fn().mockResolvedValue(new Uint8Array(63));
-      const mockGenerateChaCha20Key = jest.fn().mockImplementation((header: DecodedHeader) => {
+      const mockGenerateChaCha20Key = jest.fn().mockImplementation(() => {
         return new Uint8Array(32);
       });
       const mockSalt = new Uint8Array(16);
@@ -378,7 +378,7 @@ describe('BackupRepository', () => {
       const clientId = 'ClientId';
       const user = new User('user1', '', translateForTest);
       const mockEncodeHeader = jest.fn().mockResolvedValue(new Uint8Array(63));
-      const mockGenerateChaCha20Key = jest.fn().mockImplementation(_header => {
+      const mockGenerateChaCha20Key = jest.fn().mockImplementation(() => {
         return new Uint8Array(32);
       });
 

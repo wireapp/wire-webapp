@@ -27,7 +27,7 @@ export function generateQualifiedId(domain: string) {
 
 export function generateQualifiedIds(nbUsers: number, domain: string) {
   const users: QualifiedId[] = [];
-  for (let i = 0; i < nbUsers; i++) {
+  for (let userIndex = 0; userIndex < nbUsers; userIndex++) {
     users.push(generateQualifiedId(domain));
   }
   return users;

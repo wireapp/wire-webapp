@@ -148,6 +148,67 @@ describe('FailedToAddUsersMessage', () => {
     expect(mainMessage.length).toBeGreaterThanOrEqual(1);
   });
 
+  it('explains that required encryption information could not be retrieved without suggesting an outage', () => {
+    const userState = new UserState();
+    const [qualifiedId] = generateQualifiedIds(1, 'test.domain');
+    const user = createUser(qualifiedId, 'Felix');
+    userState.users.push(user);
+
+    const message = createFailedToAddUsersMessages([
+      {
+        users: [qualifiedId],
+        reason: AddUsersFailureReasons.KEY_PACKAGE_CLAIM_FAILED,
+      },
+    ]);
+
+    const {getAllByText, queryByText} = render(
+      withTheme(<FailedToAddUsersMessage isMessageFocused message={message} userState={userState} />),
+    );
+
+    const failureMessage = getAllByText((_, element) => {
+      return (
+        element?.textContent ===
+        'Felix could not be added because the required encryption information could not be retrieved. Please try again.'
+      );
+    });
+
+    expect(failureMessage.length).toBeGreaterThanOrEqual(1);
+    expect(queryByText('Learn more')).toBeNull();
+  });
+
+  it('explains a generic key-package claim failure for multiple users', () => {
+    const userState = new UserState();
+    const [firstQualifiedId, secondQualifiedId] = generateQualifiedIds(2, 'test.domain');
+    const firstUser = createUser(firstQualifiedId, 'Felix');
+    const secondUser = createUser(secondQualifiedId, 'Maya');
+    userState.users([firstUser, secondUser]);
+
+    const message = createFailedToAddUsersMessages([
+      {
+        users: [firstQualifiedId, secondQualifiedId],
+        reason: AddUsersFailureReasons.KEY_PACKAGE_CLAIM_FAILED,
+      },
+    ]);
+
+    const {getByTestId, getAllByText, queryByText} = render(
+      withTheme(<FailedToAddUsersMessage isMessageFocused message={message} userState={userState} />),
+    );
+
+    act(() => {
+      getByTestId('toggle-failed-to-add-users').click();
+    });
+
+    const failureDetails = getAllByText((_, element) => {
+      return (
+        element?.textContent ===
+        'Maya and Felix could not be added because the required encryption information could not be retrieved. Please try again.'
+      );
+    });
+
+    expect(failureDetails.length).toBeGreaterThanOrEqual(1);
+    expect(queryByText('Learn more')).toBeNull();
+  });
+
   it('shows that multiple users could not be added', async () => {
     const userState = new UserState();
     const [qualifiedId1, qualifiedId2, qualifiedId3] = generateQualifiedIds(3, 'test.domain');

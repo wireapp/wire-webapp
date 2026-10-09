@@ -52,13 +52,13 @@ describe('InputLevel', () => {
             },
           } as AnalyserNode;
         },
-        createMediaStreamSource: (stream: MediaStream) => {
+        createMediaStreamSource: () => {
           return {connect: noop, disconnect: noop};
         },
       };
     });
 
-    jest.spyOn(global, 'setInterval').mockImplementation((callback: () => void, interval: any) => {
+    jest.spyOn(global, 'setInterval').mockImplementation((callback: () => void) => {
       callback();
       return 0 as any;
     });

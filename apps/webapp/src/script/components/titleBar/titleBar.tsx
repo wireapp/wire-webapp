@@ -69,20 +69,18 @@ interface TitleBarProps {
 }
 
 export const TitleBar = ({
-  repositories,
   conversation,
   callActions,
   selfUser,
   openRightSidebar,
   isRightSidebarOpen = false,
   callState = container.resolve(CallState),
-  teamState = container.resolve(TeamState),
   isReadOnlyConversation = false,
   withBottomDivider,
   isSharedDriveSearchViewOpen = false,
   onCloseSharedDriveSearchView,
 }: TitleBarProps) => {
-  const {isFeatureToggleEnabled, translate} = useApplicationContext();
+  const {translate} = useApplicationContext();
   const {
     is1to1,
     isRequest,
@@ -246,7 +244,7 @@ export const TitleBar = ({
         await callActions.startAudio(conversation);
         isStartingCallRef.current = false;
         showStartedCallAlert(isGroupOrChannel);
-      } catch (error: unknown) {
+      } catch {
         // Re-enable on error
         isStartingCallRef.current = false;
       }

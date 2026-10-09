@@ -66,9 +66,8 @@ const extensions: Record<Exclude<FileType, 'other'>, string[]> = {
 export const getFileTypeFromExtension = (extension: string): FileType => {
   const ext = extension.toLowerCase().replace(/^\./, '');
 
-  // eslint-disable-next-line id-length
-  const type = Object.entries(extensions).find(([_, exts]) => {
-    return exts.includes(ext);
+  const type = Object.entries(extensions).find(([, fileExtensions]) => {
+    return fileExtensions.includes(ext);
   })?.[0] as FileType | undefined;
 
   return type ?? 'other';

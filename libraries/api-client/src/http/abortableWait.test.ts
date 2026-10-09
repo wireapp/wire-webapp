@@ -37,7 +37,7 @@ function createAbortableWaitDependenciesForTest(
 
   const setTimeout = jest.fn(
     overrides.setTimeout ??
-      ((handler: () => void, _delayInMilliseconds: number) => {
+      ((handler: () => void) => {
         scheduledTimeoutHandler = handler;
 
         return 123 as unknown as ReturnType<typeof globalThis.setTimeout>;

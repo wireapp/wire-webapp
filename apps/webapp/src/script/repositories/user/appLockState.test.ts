@@ -19,7 +19,6 @@
 
 import {FEATURE_STATUS} from '@wireapp/api-client/lib/team/feature/';
 import {container} from 'tsyringe';
-import ko from 'knockout';
 
 import {TeamState} from 'Repositories/team/TeamState';
 import {Config} from 'src/script/Config';

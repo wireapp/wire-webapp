@@ -76,7 +76,7 @@ const redirectUnsupportedBrowser = (error: string): void => {
 };
 
 const supportsIndexDB = (): Promise<boolean> => {
-  return new Promise<boolean>((resolve, _reject) => {
+  return new Promise<boolean>(resolve => {
     if (!('indexedDB' in window)) {
       return resolve(false);
     }
@@ -90,7 +90,7 @@ const supportsIndexDB = (): Promise<boolean> => {
 
     try {
       dbOpenRequest = window.indexedDB.open('test');
-    } catch (error: unknown) {
+    } catch {
       return resolve(false);
     }
 
@@ -106,7 +106,7 @@ const supportsIndexDB = (): Promise<boolean> => {
       }
     };
 
-    dbOpenRequest.onsuccess = _event => {
+    dbOpenRequest.onsuccess = () => {
       clearTimeout(connectionTimeout);
       return resolve(true);
     };

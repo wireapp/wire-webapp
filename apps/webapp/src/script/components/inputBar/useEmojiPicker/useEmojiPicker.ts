@@ -35,7 +35,6 @@ export const useEmojiPicker = ({wrapperRef, onEmojiPicked}: EmojiPickerParams) =
 
   const emojiWrapperRef = useRef<HTMLDivElement>(null);
 
-  // eslint-disable-next-line id-length
   const emojiPickerPosition = useRef<{x: number; y: number}>({x: 0, y: 0});
 
   const handleClose = () => {
@@ -47,7 +46,6 @@ export const useEmojiPicker = ({wrapperRef, onEmojiPicked}: EmojiPickerParams) =
   const handleToggle = (event: MouseEvent<HTMLButtonElement>) => {
     const rect = event.currentTarget.getBoundingClientRect();
 
-    // eslint-disable-next-line id-length
     emojiPickerPosition.current = {x: rect.x + TRIGGER_WIDTH, y: rect.y - TRIGGER_HEIGHT - Y_OFFSET};
     setOpen(prev => {
       return !prev;

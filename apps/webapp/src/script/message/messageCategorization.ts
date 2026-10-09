@@ -102,7 +102,7 @@ export const categoryFromEvent = (event: Partial<EventRecord>): MessageCategory 
     }
 
     return category;
-  } catch (error: unknown) {
+  } catch {
     return MessageCategory.UNDEFINED;
   }
 };

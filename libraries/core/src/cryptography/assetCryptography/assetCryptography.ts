@@ -25,13 +25,13 @@ import {EncryptedAsset} from './encryptedAsset';
 const initializationVectorLengthInBytes = 16;
 const encryptionKeyLengthInBytes = 32;
 
-const isEqual = (a: Uint8Array, b: Uint8Array): boolean => {
-  const arrayA = new Uint32Array(a);
-  const arrayB = new Uint32Array(b);
+const isEqual = (firstBytes: Uint8Array, secondBytes: Uint8Array): boolean => {
+  const firstByteValues = new Uint32Array(firstBytes);
+  const secondByteValues = new Uint32Array(secondBytes);
 
-  const hasSameLength = arrayA.length === arrayB.length;
-  const hasSameValues = arrayA.every((value, index) => {
-    return value === arrayB[index];
+  const hasSameLength = firstByteValues.length === secondByteValues.length;
+  const hasSameValues = firstByteValues.every((value, index) => {
+    return value === secondByteValues[index];
   });
 
   return hasSameLength && hasSameValues;

@@ -19,7 +19,7 @@
 
 import type {Clock} from '@enormora/clock/clock';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
-import configureStore from 'redux-mock-store';
+import createMockStore from 'redux-mock-store';
 import {withExtraArgument} from 'redux-thunk';
 
 import {APIClient} from '@wireapp/api-client';
@@ -75,7 +75,7 @@ export const mockStoreFactory = (
   if (core) {
     (core as any).apiClient = apiClient;
   }
-  return configureStore<TypeUtil.RecursivePartial<RootState>, ThunkDispatch>([
+  return createMockStore<TypeUtil.RecursivePartial<RootState>, ThunkDispatch>([
     withExtraArgument({
       clock,
       actions,

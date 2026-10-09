@@ -1048,7 +1048,7 @@ rules: {
   '@emotion/no-vanilla': 'error',
   '@emotion/import-from-emotion': 'error',
   '@emotion/styled-import': 'error',
-  'id-length': 'warn',
+  'id-length': ['error', {min: 2, properties: 'never'}],
   '@typescript-eslint/explicit-module-boundary-types': 'off',
   '@typescript-eslint/ban-ts-comment': 'off',
   '@typescript-eslint/no-var-requires': 'off',

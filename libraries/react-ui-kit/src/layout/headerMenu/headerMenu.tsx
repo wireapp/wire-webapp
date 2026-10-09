@@ -48,9 +48,9 @@ export const HeaderMenu = ({children, logoElement = null, centerElement = null, 
     return setIsOpen(false);
   };
 
-  const onKeyDown: React.KeyboardEventHandler<HTMLDivElement> = e => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
+  const onKeyDown: React.KeyboardEventHandler<HTMLDivElement> = event => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
       toggleMenu();
     }
   };

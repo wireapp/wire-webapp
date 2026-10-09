@@ -143,8 +143,8 @@ export const DropFileInput = forwardRef<HTMLInputElement, DropFileInputProps<HTM
         ? filesArr.every(file => {
             return accept
               .split(',')
-              .map(v => {
-                return v.trim();
+              .map(acceptedFileExtension => {
+                return acceptedFileExtension.trim();
               })
               .includes(file.type);
           })

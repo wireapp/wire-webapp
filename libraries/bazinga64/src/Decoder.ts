@@ -48,8 +48,8 @@ export class Decoder {
       const rawLength = decoded.length;
       const arrayBufferView = new Uint8Array(new ArrayBuffer(rawLength));
 
-      for (let i = 0, len = arrayBufferView.length; i < len; i++) {
-        arrayBufferView[i] = decoded.charCodeAt(i);
+      for (let byteIndex = 0; byteIndex < arrayBufferView.length; byteIndex++) {
+        arrayBufferView[byteIndex] = decoded.charCodeAt(byteIndex);
       }
 
       return arrayBufferView;
