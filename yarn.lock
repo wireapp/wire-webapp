@@ -11805,7 +11805,7 @@ __metadata:
     commander: "npm:14.0.3"
     dotenv-defaults: "npm:5.0.2"
     hash.js: "npm:1.1.7"
-    idb: "npm:8.0.3"
+    idb: "npm:8.0.4"
     jest-websocket-mock: "npm:2.5.0"
     lodash: "npm:4.18.1"
     noop-esm: "npm:1.1.0"
@@ -19597,10 +19597,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"idb@npm:8.0.3":
-  version: 8.0.3
-  resolution: "idb@npm:8.0.3"
-  checksum: 10/e2beccb0be7c6af562a5e92b209363358571a770aecdc68e891d1141d994d8f1e8f34b79dafa309ed7467d0f4df2b7b4c15f67cfd0611100282bfc3d85f9c73c
+"idb@npm:8.0.4":
+  version: 8.0.4
+  resolution: "idb@npm:8.0.4"
+  checksum: 10/c7bc0fbfe2cb20a884f5415ff7e51b25c1b6acdf744d24a291bb43282477a04496a2fd471918083e5247271ead58653a8797a830b09b0ddda1b6aea9485870d5
   languageName: node
   linkType: hard
 
