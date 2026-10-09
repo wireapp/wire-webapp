@@ -238,8 +238,8 @@ jobs:
       - name: Announce production redeploy failure
         uses: ./.github/actions/notify-deployoholics
         with:
-          webhook-url: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
-          status: failure
+          deployoholics-webhook-url: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
+          deployoholics-token: ${{ secrets.WIRE_DEPLOYOHOLICS_TOKEN }}
           text: |
             ❌ Production redeploy failed for tag ${{ needs.validate_request.outputs.tag }} ❌
             **Triggered by:** ${{ github.actor }}
