@@ -21,6 +21,7 @@ import {FEATURE_STATUS} from '@wireapp/api-client/lib/team/feature/';
 import {container} from 'tsyringe';
 
 import {TeamState} from 'Repositories/team/TeamState';
+import {TeamEntity} from 'Repositories/team/TeamEntity';
 import {Config} from 'src/script/Config';
 import {AppLockState} from './appLockState';
 
@@ -52,6 +53,40 @@ describe('AppLockState', () => {
   });
 
   describe('isAppLockEnabled', () => {
+    it('keeps an existing team passphrase active while app lock configuration is unknown', () => {
+      const localTeamState = new TeamState();
+      localTeamState.team(new TeamEntity('team-id'));
+      const localAppLockState = new AppLockState(localTeamState);
+      localAppLockState.hasPassphrase(true);
+
+      expect(localAppLockState.isAppLockDisabledOnTeam()).toBe(false);
+      expect(localAppLockState.isAppLockEnabled()).toBe(true);
+
+      localTeamState.teamFeatures({});
+
+      expect(localAppLockState.isAppLockDisabledOnTeam()).toBe(false);
+      expect(localAppLockState.isAppLockEnabled()).toBe(true);
+
+      localTeamState.teamFeatures({
+        appLock: {
+          status: FEATURE_STATUS.ENABLED,
+          config: {enforceAppLock: false, inactivityTimeoutSecs: 60},
+        },
+      });
+
+      expect(localAppLockState.isAppLockEnabled()).toBe(true);
+
+      localTeamState.teamFeatures({
+        appLock: {
+          status: FEATURE_STATUS.DISABLED,
+          config: {enforceAppLock: false, inactivityTimeoutSecs: 60},
+        },
+      });
+
+      expect(localAppLockState.isAppLockDisabledOnTeam()).toBe(true);
+      expect(localAppLockState.isAppLockEnabled()).toBe(false);
+    });
+
     describe('when MDM config is disabled', () => {
       beforeEach(() => {
         configSpy.mockReturnValue(createConfigWithMdmEnabled(false));

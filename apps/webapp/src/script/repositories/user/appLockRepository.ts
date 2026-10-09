@@ -123,6 +123,9 @@ export class AppLockRepository {
   disableFeature = () => {
     this.appLockState.isActivatedInPreferences(false);
     window.localStorage.removeItem(this.getEnabledStorageKey());
+    if (!this.appLockState.isAppLockEnforced()) {
+      this.removeCode();
+    }
   };
 
   setEnabled = (enabled: boolean) => {

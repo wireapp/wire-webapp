@@ -146,7 +146,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
   ): Promise<{team: TeamEntity | undefined; features: FeatureList; members: QualifiedId[]}> {
     const team = await this.getTeam();
     // get the fresh feature config from backend
-    const newFeatureList = await this.teamService.getAllTeamFeatures();
+    const newFeatureList = await this.getSafeTeamFeatures();
 
     this.teamState.teamFeatures(newFeatureList);
 
@@ -185,7 +185,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
 
   private async updateFeatureConfig(): Promise<{newFeatureList: FeatureList; prevFeatureList?: FeatureList}> {
     const prevFeatureList = this.teamState.teamFeatures();
-    const newFeatureList = await this.teamService.getAllTeamFeatures();
+    const newFeatureList = await this.getSafeTeamFeatures();
 
     if (
       this.hasPersistedSupportedProtocols &&
@@ -220,6 +220,28 @@ export class TeamRepository extends TypedEventEmitter<Events> {
       newFeatureList,
       prevFeatureList,
     };
+  }
+
+  private async getSafeTeamFeatures(): Promise<FeatureList> {
+    const previousFeatures = this.teamState.teamFeatures();
+    const features = await this.teamService.getAllTeamFeatures(previousFeatures);
+
+    if (typeof features !== 'object' || features === null || Array.isArray(features)) {
+      this.logger.error('Ignoring invalid team feature configuration');
+      return previousFeatures ?? {};
+    }
+
+    // Only a recognized status can replace the last known app lock setting.
+    if (
+      this.teamState.isTeam() &&
+      previousFeatures?.appLock !== undefined &&
+      features.appLock?.status !== FEATURE_STATUS.ENABLED &&
+      features.appLock?.status !== FEATURE_STATUS.DISABLED
+    ) {
+      return {...features, appLock: previousFeatures.appLock};
+    }
+
+    return features;
   }
 
   private readonly scheduleTeamRefresh = async (): Promise<void> => {
