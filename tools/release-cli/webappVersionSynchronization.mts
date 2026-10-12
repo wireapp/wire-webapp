@@ -24,7 +24,7 @@ import {resolve} from 'node:path';
 import process from 'node:process';
 import {fileURLToPath} from 'node:url';
 
-import {createRuntimeKyHttpClient} from '../release-appearance/httpClient.ts';
+import {createRuntimeKyHttpClient} from '../release-github/githubHttpClient.ts';
 import {
   createWebAppVersionSynchronizationInspectionOutput,
   createWebAppVersionSynchronizationResultOutput,

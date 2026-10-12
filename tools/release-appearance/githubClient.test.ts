@@ -26,8 +26,8 @@ import {Maybe} from 'true-myth';
 
 import {createGitHubClient} from './githubClient.ts';
 import type {GitHubClient} from './githubClient.ts';
-import {createKyHttpClient} from './httpClient.ts';
-import type {HttpClient, HttpRequest, HttpRequestFailure} from './httpClient.ts';
+import {createKyHttpClient} from '../release-github/githubHttpClient.ts';
+import type {HttpClient, HttpRequest, HttpRequestFailure} from '../release-github/githubApi.ts';
 
 type GitHubPullRequestResponse = {
   readonly number: number;

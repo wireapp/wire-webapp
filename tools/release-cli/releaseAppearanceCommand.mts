@@ -29,7 +29,6 @@ import {fileURLToPath} from 'node:url';
 
 import {createDefaultGitHubActionsProgressReporter} from '../release-appearance/githubActionsProgressReporter.ts';
 import {createGitHubClient} from '../release-appearance/githubClient.ts';
-import {createRuntimeKyHttpClient} from '../release-appearance/httpClient.ts';
 import {
   createBetaCommand,
   createProductionCommand,
@@ -43,6 +42,7 @@ import type {
   ParsedCommand,
   ReleaseAppearanceCommandDependencies,
 } from '../release-appearance/releaseAppearanceCommand.ts';
+import {createRuntimeKyHttpClient} from '../release-github/githubHttpClient.ts';
 
 type CreateReleaseAppearanceCommandOptions = {
   readonly executeCommand: (command: ParsedCommand) => Promise<number> | number;

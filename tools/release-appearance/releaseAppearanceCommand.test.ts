@@ -44,7 +44,7 @@ import type {
   PullRequestRecord,
   UpdateIssueCommentOptions,
 } from './githubClient.ts';
-import type {HttpRequest} from './httpClient.ts';
+import type {HttpRequest} from '../release-github/githubApi.ts';
 import {createNoOpReleaseAppearanceProgressReporter} from './releaseAppearanceProgress.ts';
 import type {ReleaseAppearanceClock} from './releaseAppearanceProgress.ts';
 import type {ExecuteGitCommand} from './releaseHistory.ts';

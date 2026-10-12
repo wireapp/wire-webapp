@@ -22,7 +22,7 @@ import assert from 'node:assert';
 import {Maybe} from 'true-myth';
 
 import {createGitHubReleaseClient} from './githubReleaseClient.ts';
-import type {HttpRequest, HttpRequestFailure} from './httpClient.ts';
+import type {HttpRequest, HttpRequestFailure} from '../release-github/githubApi.ts';
 
 type FakeHttpClientOptions = {
   readonly responseForRequest: (request: HttpRequest) => unknown;
