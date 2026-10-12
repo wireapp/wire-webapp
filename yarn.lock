@@ -21735,74 +21735,74 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jscpd-darwin-arm64@npm:5.4.0":
-  version: 5.4.0
-  resolution: "jscpd-darwin-arm64@npm:5.4.0"
+"jscpd-darwin-arm64@npm:5.4.1":
+  version: 5.4.1
+  resolution: "jscpd-darwin-arm64@npm:5.4.1"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"jscpd-darwin-x64@npm:5.4.0":
-  version: 5.4.0
-  resolution: "jscpd-darwin-x64@npm:5.4.0"
+"jscpd-darwin-x64@npm:5.4.1":
+  version: 5.4.1
+  resolution: "jscpd-darwin-x64@npm:5.4.1"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"jscpd-linux-arm64-gnu@npm:5.4.0":
-  version: 5.4.0
-  resolution: "jscpd-linux-arm64-gnu@npm:5.4.0"
+"jscpd-linux-arm64-gnu@npm:5.4.1":
+  version: 5.4.1
+  resolution: "jscpd-linux-arm64-gnu@npm:5.4.1"
   conditions: os=linux & cpu=arm64 & libc=glibc
   languageName: node
   linkType: hard
 
-"jscpd-linux-arm64-musl@npm:5.4.0":
-  version: 5.4.0
-  resolution: "jscpd-linux-arm64-musl@npm:5.4.0"
+"jscpd-linux-arm64-musl@npm:5.4.1":
+  version: 5.4.1
+  resolution: "jscpd-linux-arm64-musl@npm:5.4.1"
   conditions: os=linux & cpu=arm64 & libc=musl
   languageName: node
   linkType: hard
 
-"jscpd-linux-x64-gnu@npm:5.4.0":
-  version: 5.4.0
-  resolution: "jscpd-linux-x64-gnu@npm:5.4.0"
+"jscpd-linux-x64-gnu@npm:5.4.1":
+  version: 5.4.1
+  resolution: "jscpd-linux-x64-gnu@npm:5.4.1"
   conditions: os=linux & cpu=x64 & libc=glibc
   languageName: node
   linkType: hard
 
-"jscpd-linux-x64-musl@npm:5.4.0":
-  version: 5.4.0
-  resolution: "jscpd-linux-x64-musl@npm:5.4.0"
+"jscpd-linux-x64-musl@npm:5.4.1":
+  version: 5.4.1
+  resolution: "jscpd-linux-x64-musl@npm:5.4.1"
   conditions: os=linux & cpu=x64 & libc=musl
   languageName: node
   linkType: hard
 
-"jscpd-windows-arm64-msvc@npm:5.4.0":
-  version: 5.4.0
-  resolution: "jscpd-windows-arm64-msvc@npm:5.4.0"
+"jscpd-windows-arm64-msvc@npm:5.4.1":
+  version: 5.4.1
+  resolution: "jscpd-windows-arm64-msvc@npm:5.4.1"
   conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
 
-"jscpd-windows-x64-msvc@npm:5.4.0":
-  version: 5.4.0
-  resolution: "jscpd-windows-x64-msvc@npm:5.4.0"
+"jscpd-windows-x64-msvc@npm:5.4.1":
+  version: 5.4.1
+  resolution: "jscpd-windows-x64-msvc@npm:5.4.1"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
 
-"jscpd@npm:5.4.0":
-  version: 5.4.0
-  resolution: "jscpd@npm:5.4.0"
+"jscpd@npm:5.4.1":
+  version: 5.4.1
+  resolution: "jscpd@npm:5.4.1"
   dependencies:
-    jscpd-darwin-arm64: "npm:5.4.0"
-    jscpd-darwin-x64: "npm:5.4.0"
-    jscpd-linux-arm64-gnu: "npm:5.4.0"
-    jscpd-linux-arm64-musl: "npm:5.4.0"
-    jscpd-linux-x64-gnu: "npm:5.4.0"
-    jscpd-linux-x64-musl: "npm:5.4.0"
-    jscpd-windows-arm64-msvc: "npm:5.4.0"
-    jscpd-windows-x64-msvc: "npm:5.4.0"
+    jscpd-darwin-arm64: "npm:5.4.1"
+    jscpd-darwin-x64: "npm:5.4.1"
+    jscpd-linux-arm64-gnu: "npm:5.4.1"
+    jscpd-linux-arm64-musl: "npm:5.4.1"
+    jscpd-linux-x64-gnu: "npm:5.4.1"
+    jscpd-linux-x64-musl: "npm:5.4.1"
+    jscpd-windows-arm64-msvc: "npm:5.4.1"
+    jscpd-windows-x64-msvc: "npm:5.4.1"
   dependenciesMeta:
     jscpd-darwin-arm64:
       optional: true
@@ -21822,7 +21822,7 @@ __metadata:
       optional: true
   bin:
     jscpd: run-jscpd.js
-  checksum: 10/4a9e230a59d75ea45eb31261f7f710a2bed9e2669ff03f2bd358c79f8ee6f1196fde94d8f7379521b37ca1c4a6510378fb559cdb6b54355293b797998c36ae20
+  checksum: 10/40c426ebe74de09302519f94519ab64a8783d83a369bc950ab23e287db7f3eeea20c6296d71356f7ee0d157d130b6bd2a7c1fe6b78a80d7de4bfa2ad5fe532da
   languageName: node
   linkType: hard
 
@@ -32858,7 +32858,7 @@ __metadata:
     jest: "npm:30.5.2"
     jest-environment-jsdom: "npm:30.5.2"
     js-yaml: "npm:4.3.2"
-    jscpd: "npm:5.4.0"
+    jscpd: "npm:5.4.1"
     jsdom: "npm:29.1.1"
     ky: "npm:2.0.2"
     logdown: "npm:3.3.1"
