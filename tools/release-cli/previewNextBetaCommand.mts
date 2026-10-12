@@ -28,13 +28,13 @@ import {promisify} from 'node:util';
 import {fileURLToPath} from 'node:url';
 
 import {createGitHubClient} from '../release-appearance/githubClient.ts';
-import {createRuntimeKyHttpClient} from '../release-appearance/httpClient.ts';
 import {executePreviewNextBetaCommand} from '../release-appearance/previewNextBetaCommand.ts';
 import {validateTargetMainCommit} from '../release-appearance/previewNextBetaCommand.ts';
 import type {PreviewNextBetaCommandDependencies} from '../release-appearance/previewNextBetaCommand.ts';
 import {planNextBetaPreviewHistory} from '../release-appearance/releaseHistory.ts';
 import {readCommandEnvironment, redactSecret} from '../release-appearance/releaseAppearanceCommand.ts';
 import type {CommandEnvironment} from '../release-appearance/releaseAppearanceCommand.ts';
+import {createRuntimeKyHttpClient} from '../release-github/githubHttpClient.ts';
 
 type CreatePreviewNextBetaCommandOptions = {
   readonly executeCommand: (targetMainCommit: string) => Promise<number> | number;

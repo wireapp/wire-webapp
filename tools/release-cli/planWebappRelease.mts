@@ -32,7 +32,7 @@ import {
   type WebAppReleasePlanCommandOptions,
 } from './webAppReleasePlanCli.ts';
 
-import {createRuntimeKyHttpClient} from '../release-appearance/httpClient.ts';
+import {createRuntimeKyHttpClient} from '../release-github/githubHttpClient.ts';
 import {readWebAppReleaseHistory} from '../release-metadata/webappReleaseHistoryGit.ts';
 import {planWebAppRelease} from '../release-metadata/webappReleasePlan.ts';
 import type {ReadFirstParentHistory} from '../release-metadata/webappReleasePlan.ts';

@@ -22,18 +22,17 @@ import type {KyInstance, Options} from 'ky';
 import {Maybe} from 'true-myth';
 import {z} from 'zod';
 
-import {createGitHubMutationPacer, githubMutationMinimumIntervalMilliseconds} from './githubMutationPacer.ts';
-import {calculateGitHubRateLimitRetryDecision, maximumGitHubRateLimitRetries} from './githubRateLimitPolicy.ts';
-import type {GitHubRateLimitResponseMetadata} from './githubRateLimitPolicy.ts';
-
-import {formatHttpRequestFailure, isHttpRequestFailure} from '../release-github/githubApi.ts';
+import {formatHttpRequestFailure, isHttpRequestFailure} from './githubApi.ts';
 import type {
   GitHubResponseFailureDetails,
   HttpClient,
   HttpMethod,
   HttpRequest,
   HttpRequestFailure,
-} from '../release-github/githubApi.ts';
+} from './githubApi.ts';
+import {createGitHubMutationPacer, githubMutationMinimumIntervalMilliseconds} from './githubMutationPacer.ts';
+import {calculateGitHubRateLimitRetryDecision, maximumGitHubRateLimitRetries} from './githubRateLimitPolicy.ts';
+import type {GitHubRateLimitResponseMetadata} from './githubRateLimitPolicy.ts';
 
 export {formatHttpRequestFailure, isHttpRequestFailure};
 export type {GitHubResponseFailureDetails, HttpClient, HttpMethod, HttpRequest, HttpRequestFailure};
