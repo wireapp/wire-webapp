@@ -19,10 +19,13 @@
 
 import {type ReactNode} from 'react';
 
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant, Input} from '@wireapp/react-ui-kit';
 
 import {CopyToClipboardButton} from 'Components/copyToClipboardButton';
-import {meetingLinkConfirmationStyles} from 'Components/meeting/meetingLinkConfirmation/meetingLinkConfirmation.styles';
+import {
+  meetingLinkConfirmationInputStyles,
+  meetingLinkConfirmationStyles,
+} from 'Components/meeting/meetingLinkConfirmation/meetingLinkConfirmation.styles';
 import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
 import type {Translate} from 'Util/localizerUtil';
 
@@ -45,7 +48,10 @@ type MeetingLinkConfirmationMessageProps = {
 export const MeetingLinkConfirmationMessage = ({link, translate}: MeetingLinkConfirmationMessageProps) => {
   return (
     <>
-      <p>{translate('meetings.meetingLink.description')}</p>
+      <p id="meeting-link-description">{translate('meetings.meetingLink.description')}</p>
+      <div css={meetingLinkConfirmationInputStyles}>
+        <Input aria-describedby="meeting-link-description" label="" readOnly type="text" value={link} />
+      </div>
       <div css={meetingLinkConfirmationStyles}>
         <CopyToClipboardButton
           textToCopy={link}
