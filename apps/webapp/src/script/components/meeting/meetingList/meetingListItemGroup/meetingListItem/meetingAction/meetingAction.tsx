@@ -19,8 +19,11 @@
 
 import {MouseEvent} from 'react';
 
+import {isNullOrUndefined} from '@sindresorhus/is';
+
 import {IconButton, MoreIcon} from '@wireapp/react-ui-kit';
 
+import {showMeetingLinkConfirmation} from 'Components/meeting/meetingLinkConfirmation/meetingLinkConfirmation';
 import {getMeetingActionEntries} from 'Components/meeting/meetingList/meetingListItemGroup/meetingListItem/meetingAction/getMeetingActionEntries';
 import {
   iconContainerStyle,
@@ -69,6 +72,13 @@ export const MeetingAction = ({meetingInstance, selfUser, joinMeeting, isJoinDis
             fireAndForgetInvoker.fireAndForget(() => {
               return editMeeting(meetingInstance);
             });
+          }
+        },
+        meetingLink: meetingInstance.meetingSeries.link,
+        onCopyMeetingLink: () => {
+          const meetingLink = meetingInstance.meetingSeries.link;
+          if (!isNullOrUndefined(meetingLink)) {
+            showMeetingLinkConfirmation({link: meetingLink, translate});
           }
         },
         onDeleteForAll: () => {

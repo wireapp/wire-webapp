@@ -23,13 +23,14 @@ import {act, renderHook} from '@testing-library/react';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {GROUP_CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
 import {maybe, task} from 'true-myth';
 import {createStore} from 'zustand/vanilla';
 
 import type {MeetingStoreState} from 'Components/meeting/meetingStore/createMeetingStore';
 import {MeetingStoreProvider} from 'Components/meeting/meetingStore/meetingStoreProvider';
 import {meetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal, removeCurrentModal, usePrimaryModalState} from 'Components/Modals/PrimaryModal';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {
   createRootContextValueForTest,
@@ -45,6 +46,7 @@ import {
   scheduleMeetingSubmitResults,
   wasScheduleMeetingPersisted,
 } from './scheduleMeetingTypes';
+import {isUndefined} from '@sindresorhus/is';
 
 const fixedNow = new Date('2026-06-16T09:00:00.000Z');
 const futureStartDate = new Date('2026-06-16T10:00:00.000Z');
@@ -109,7 +111,13 @@ const createMainViewModel = ({
 
 const createMeetingStore = ({
   loadMeetings = jest.fn().mockResolvedValue(undefined),
-  scheduleMeeting = jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
+  scheduleMeeting = jest.fn().mockReturnValue(
+    task.resolve({
+      failedToAdd: [],
+      qualifiedMeetingId: {id: 'meeting-id', domain: 'example.com'},
+      link: 'meeting-link',
+    }),
+  ),
   updateMeeting = jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
 }: Partial<Pick<MeetingStoreState, 'loadMeetings' | 'scheduleMeeting' | 'updateMeeting'>> = {}) => {
   return createStore<MeetingStoreState>(() => {
@@ -153,17 +161,19 @@ const createWrapper = (
 
 describe('useScheduleMeetingSubmit', () => {
   beforeEach(() => {
+    removeCurrentModal();
     useScheduleMeetingModal.getState().reset(clock);
-    jest.spyOn(PrimaryModal, 'show').mockImplementation(jest.fn());
-  });
-
-  afterEach(() => {
-    jest.restoreAllMocks();
   });
 
   it('does not refresh meetings after a successful submit', async () => {
     const loadMeetings = jest.fn().mockResolvedValue(undefined);
-    const scheduleMeeting = jest.fn().mockReturnValue(task.resolve({failedToAdd: []}));
+    const scheduleMeeting = jest.fn().mockReturnValue(
+      task.resolve({
+        failedToAdd: [],
+        qualifiedMeetingId: {id: 'meeting-id', domain: 'example.com'},
+        link: 'meeting-link',
+      }),
+    );
     const store = createMeetingStore({loadMeetings, scheduleMeeting});
 
     const {result} = renderHook(
@@ -181,6 +191,7 @@ describe('useScheduleMeetingSubmit', () => {
     expect(submitResult).toBe(scheduleMeetingSubmitResults.succeeded);
     expect(scheduleMeeting).toHaveBeenCalledWith(scheduleCommand);
     expect(loadMeetings).not.toHaveBeenCalled();
+    expect(usePrimaryModalState.getState().currentModalContent.titleText).toBe('meetings.meetingLink.title');
   });
 
   it('returns setupFailed and refreshes meetings after a partial create failure', async () => {
@@ -203,6 +214,32 @@ describe('useScheduleMeetingSubmit', () => {
     expect(submitResult).toBe(scheduleMeetingSubmitResults.setupFailed);
     expect(wasScheduleMeetingPersisted(submitResult)).toBe(true);
     expect(loadMeetings).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not show a link after a partial create success', async () => {
+    const scheduleMeeting = jest.fn().mockReturnValue(
+      task.resolve({
+        failedToAdd: [{users: [], backends: [], reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS}],
+        qualifiedMeetingId: {id: 'meeting-id', domain: 'example.com'},
+        link: 'meeting-link',
+      }),
+    );
+    const store = createMeetingStore({scheduleMeeting});
+
+    const {result} = renderHook(
+      () => {
+        return useScheduleMeetingSubmit();
+      },
+      {wrapper: createWrapper(store)},
+    );
+
+    let submitResult: ScheduleMeetingSubmitResult = scheduleMeetingSubmitResults.succeeded;
+    await act(async () => {
+      submitResult = await result.current.submit(formState);
+    });
+
+    expect(submitResult).toBe(scheduleMeetingSubmitResults.setupFailed);
+    expect(usePrimaryModalState.getState().currentModalContent.titleText).not.toBe('meetings.meetingLink.title');
   });
 
   it('returns setupFailed and refreshes meetings after a partial update failure', async () => {
@@ -341,6 +378,7 @@ describe('useScheduleMeetingSubmit', () => {
   });
 
   it('shows rename retry modal and refreshes meetings when conversation rename fails after update', async () => {
+    const primaryModalShow = jest.spyOn(PrimaryModal, 'show').mockImplementation(jest.fn());
     const loadMeetings = jest.fn().mockResolvedValue(undefined);
     const updateMeeting = jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.conversationRenameFailed));
     const store = createMeetingStore({loadMeetings, updateMeeting});
@@ -363,7 +401,7 @@ describe('useScheduleMeetingSubmit', () => {
     expect(wasScheduleMeetingPersisted(submitResult)).toBe(true);
     expect(loadMeetings).toHaveBeenCalledTimes(1);
     expect(updateMeeting).toHaveBeenCalledWith(updateCommand);
-    expect(PrimaryModal.show).toHaveBeenCalledWith(
+    expect(primaryModalShow).toHaveBeenCalledWith(
       PrimaryModal.type.CONFIRM,
       expect.objectContaining({
         text: {
@@ -374,9 +412,11 @@ describe('useScheduleMeetingSubmit', () => {
       undefined,
       translateForTest,
     );
+    primaryModalShow.mockRestore();
   });
 
   it('retries rename only from the confirm primary action without calling updateMeeting again', async () => {
+    const primaryModalShow = jest.spyOn(PrimaryModal, 'show').mockImplementation(jest.fn());
     const loadMeetings = jest.fn().mockResolvedValue(undefined);
     const updateMeeting = jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.conversationRenameFailed));
     const store = createMeetingStore({loadMeetings, updateMeeting});
@@ -411,13 +451,16 @@ describe('useScheduleMeetingSubmit', () => {
 
     expect(updateMeeting).toHaveBeenCalledTimes(1);
 
-    const modalOptions = (PrimaryModal.show as jest.Mock).mock.calls[0][1];
+    const modalOptions = primaryModalShow.mock.calls[0][1];
     await act(async () => {
-      await modalOptions.primaryAction.action();
+      if (!isUndefined(modalOptions.primaryAction) && !isUndefined(modalOptions.primaryAction.action)) {
+        await modalOptions.primaryAction.action();
+      }
     });
 
     expect(updateMeeting).toHaveBeenCalledTimes(1);
     expect(safeGetConversationById).toHaveBeenCalledWith({id: 'conversation-id', domain: 'example.com'});
     expect(renameConversation).toHaveBeenCalledWith(conversation, 'Weekly sync');
+    primaryModalShow.mockRestore();
   });
 });

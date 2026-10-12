@@ -25,9 +25,10 @@ import {type Maybe, task, type Task} from 'true-myth';
 
 import {mapScheduleFormToMeetingCommand} from 'Components/meeting/mapScheduleFormToMeetingCommand';
 import {mapScheduleFormToUpdateMeetingCommand} from 'Components/meeting/mapScheduleFormToUpdateMeetingCommand';
+import {showMeetingLinkConfirmation} from 'Components/meeting/meetingLinkConfirmation/meetingLinkConfirmation';
 import {useMeetingStore} from 'Components/meeting/meetingStore/meetingStoreProvider';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
-import type {ScheduleMeetingSuccess, MeetingSubmitSuccess} from 'Components/meeting/shared/service/meetingService';
+import type {MeetingSubmitSuccess, ScheduleMeetingSuccess} from 'Components/meeting/shared/service/meetingService';
 import {syncMeetingConversationName} from 'Components/meeting/shared/service/syncMeetingConversationName';
 import {getScheduleMeetingSubmitErrorTranslationKeys} from 'Components/meeting/shared/submit/meetingSubmitErrorKeys';
 import {
@@ -65,6 +66,8 @@ type SubmitMeetingParams = {
   updateMeeting: (command: UpdateMeetingCommand) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
 };
 
+type SubmitMeetingSuccess = ScheduleMeetingSuccess | MeetingSubmitSuccess;
+
 const submitMeeting = ({
   formState,
   mode,
@@ -78,7 +81,7 @@ const submitMeeting = ({
   clock,
   scheduleMeeting,
   updateMeeting,
-}: SubmitMeetingParams): Task<MeetingSubmitSuccess, MeetingSubmitErrors> => {
+}: SubmitMeetingParams): Task<SubmitMeetingSuccess, MeetingSubmitErrors> => {
   if (mode === scheduleMeetingModes.create) {
     const commandResult = mapScheduleFormToMeetingCommand(formState, clock);
 
@@ -207,6 +210,14 @@ export const useScheduleMeetingSubmit = () => {
           users: formState.selectedUsers,
           translate,
         });
+
+        setIsSubmitting(false);
+
+        return scheduleMeetingSubmitResults.setupFailed;
+      }
+
+      if (mode === scheduleMeetingModes.create && 'link' in submitResult.value) {
+        showMeetingLinkConfirmation({link: submitResult.value.link, translate});
       }
 
       setIsSubmitting(false);
