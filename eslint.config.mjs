@@ -522,6 +522,15 @@ const productionConfigs = [
     },
   },
   {
+    files: ['tools/release-cli/**/*.ts'],
+    languageOptions: {
+      parserOptions: {
+        project: './tsconfig.release-cli.json',
+        projectService: false,
+      },
+    },
+  },
+  {
     files: ['tools/build-artifact/**/*.mts', 'tools/runtime-verification/**/*.mts'],
     languageOptions: {
       parserOptions: {
