@@ -91,12 +91,14 @@ const SearchHarness = ({
 const renderSearch = (callbacks: Partial<Omit<SearchHarnessProps, 'clock'>> = {}) => {
   const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
   const onSearch = callbacks.onSearch ?? jest.fn();
-  const onEnter = callbacks.onEnter ??
+  const onEnter =
+    callbacks.onEnter ??
     jest.fn(() => {
       return false;
     });
   const onTab = callbacks.onTab ?? jest.fn();
-  const hasTabResult = callbacks.hasTabResult ??
+  const hasTabResult =
+    callbacks.hasTabResult ??
     jest.fn(() => {
       return true;
     });
