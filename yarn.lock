@@ -11663,7 +11663,7 @@ __metadata:
     axios-retry: "npm:4.5.0"
     browser-sync: "npm:3.0.4"
     cells-sdk-ts: "npm:0.1.1-alpha18"
-    concurrently: "npm:9.2.4"
+    concurrently: "npm:9.2.5"
     http-status-codes: "npm:2.3.0"
     jest: "npm:30.5.2"
     noop-esm: "npm:1.1.0"
@@ -14773,20 +14773,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"concurrently@npm:9.2.4":
-  version: 9.2.4
-  resolution: "concurrently@npm:9.2.4"
+"concurrently@npm:9.2.5":
+  version: 9.2.5
+  resolution: "concurrently@npm:9.2.5"
   dependencies:
     chalk: "npm:4.1.2"
     rxjs: "npm:7.8.2"
-    shell-quote: "npm:1.9.0"
+    shell-quote: "npm:1.12.0"
     supports-color: "npm:8.1.1"
     tree-kill: "npm:1.2.2"
     yargs: "npm:17.7.2"
   bin:
     conc: dist/bin/concurrently.js
     concurrently: dist/bin/concurrently.js
-  checksum: 10/72354357bb96837bd4d6942682483157981e3599dc2055b402aa7036f2815c44f240a03724bacac71c3a1acc29ace23b4ca1e00e689c62512984ed2cdb263017
+  checksum: 10/f8a0ce235ac781df0e6bfa7d95c747cbbdd7d2e1203882d1b43399a03dfd6820fba363a01a5103e9407523dec5b6fafbf2962cffcac4220e9006cb5e96f4e849
   languageName: node
   linkType: hard
 
@@ -28848,10 +28848,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"shell-quote@npm:1.9.0":
-  version: 1.9.0
-  resolution: "shell-quote@npm:1.9.0"
-  checksum: 10/c3bc91e74a469c4f96b6fd13b0c777fff16bcbda202692a4e5402d3d6b78fc6e02fe92fdf8dc0bddf992a9c6758e43207bfc5bdbefbf8a58190b1c885cbcc171
+"shell-quote@npm:1.12.0":
+  version: 1.12.0
+  resolution: "shell-quote@npm:1.12.0"
+  checksum: 10/18b3e382272804e79fd3187c18877cfd4e736b5afb576bf1ab66a561b0a0e26eada4b7c8eb45473d1f17268ffcf12d0aaa90b9235132123eb673df5d0a5df943
   languageName: node
   linkType: hard
 
