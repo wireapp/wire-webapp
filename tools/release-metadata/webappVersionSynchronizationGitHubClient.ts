@@ -17,14 +17,22 @@
  *
  */
 
-import {isError} from '@sindresorhus/is';
 import {Maybe, maybe, Result, Task, task} from 'true-myth';
 import {z} from 'zod';
 
 import type {WebAppVersionSynchronizationPullRequest} from './webappVersionSynchronization.ts';
 
-import {formatHttpRequestFailure, isHttpRequestFailure} from '../release-appearance/httpClient.ts';
-import type {HttpClient, HttpMethod, HttpRequest} from '../release-appearance/httpClient.ts';
+import {
+  createGitHubApiRoot,
+  createGitHubHeaders,
+  createGitHubHttpRequest,
+  createGitHubPageUrl,
+  encodeGitHubRepositoryName,
+  formatGitHubRequestError,
+  githubApiPageSize,
+  redactGitHubSecret,
+} from '../release-github/githubApi.ts';
+import type {HttpClient, HttpRequest} from '../release-github/githubApi.ts';
 
 export type CreateWebAppVersionSynchronizationPullRequestOptions = {
   readonly title: string;
@@ -82,9 +90,7 @@ type GetPullRequestOptions = {
   readonly githubToken: string;
 };
 
-const githubPageSize = 100;
 const githubSearchResultLimit = 1000;
-const githubApiVersion = '2022-11-28';
 const synchronizationMarkerSearchTerm = 'wire-webapp-version-sync';
 const synchronizationPullRequestTitleSearchTerm = 'Update WebApp version to';
 
@@ -120,78 +126,18 @@ const githubPullRequestSearchResponseSchema = z.object({
   items: z.array(githubPullRequestSearchItemResponseSchema),
 });
 
-function errorMessage(error: unknown): string {
-  if (isHttpRequestFailure(error)) {
-    return formatHttpRequestFailure(error);
-  }
-
-  if (isError(error)) {
-    return error.message;
-  }
-
-  return 'Unknown failure';
-}
-
-function redactSecret(message: string, secret: string): string {
-  if (secret.length === 0) {
-    return message;
-  }
-
-  return message.replaceAll(secret, '[REDACTED]');
-}
-
-function createGitHubApiRoot(githubApiUrl: URL): URL {
-  const githubApiUrlString = githubApiUrl.toString();
-
-  return new URL(githubApiUrlString.endsWith('/') ? githubApiUrlString : `${githubApiUrlString}/`);
-}
-
-function encodeRepositoryName(githubRepository: string): string {
-  return githubRepository
-    .split('/')
-    .map(repositoryPart => {
-      return encodeURIComponent(repositoryPart);
-    })
-    .join('/');
-}
-
-function createGitHubHeaders(githubToken: string, includesBody: boolean): Readonly<Record<string, string>> {
-  const headers: Record<string, string> = {
-    Accept: 'application/vnd.github+json',
-    Authorization: `Bearer ${githubToken}`,
-    'X-GitHub-Api-Version': githubApiVersion,
-  };
-
-  if (includesBody) {
-    headers['Content-Type'] = 'application/json';
-  }
-
-  return headers;
-}
-
 function createSearchPageUrl(endpoint: URL, searchQuery: string, page: number): URL {
   const pageUrl = new URL(endpoint);
 
   pageUrl.searchParams.set('q', searchQuery);
   pageUrl.searchParams.set('sort', 'created');
   pageUrl.searchParams.set('order', 'asc');
-  pageUrl.searchParams.set('per_page', githubPageSize.toString());
-  pageUrl.searchParams.set('page', page.toString());
 
-  return pageUrl;
+  return createGitHubPageUrl({endpoint: pageUrl, page});
 }
 
 function createPullRequestDetailUrl(endpoint: URL, pullRequestNumber: number): URL {
   return new URL(`${pullRequestNumber}`, `${endpoint.toString()}/`);
-}
-
-function createHttpRequest(
-  method: HttpMethod,
-  url: URL,
-  headers: Readonly<Record<string, string>>,
-  json: Maybe<NonNullable<unknown>>,
-): HttpRequest {
-  return {method, url, headers, json};
 }
 
 function parsePullRequest(githubResponse: unknown): Result<WebAppVersionSynchronizationPullRequest, Error> {
@@ -237,7 +183,9 @@ function parsePullRequestSearchPage(githubResponse: unknown): Result<ParsedPullR
 function requestGitHubJson(options: RequestGitHubJsonOptions): Task<unknown, Error> {
   return task.tryOrElse(
     (error: unknown): Error => {
-      return new Error(`${options.failureMessage}: ${redactSecret(errorMessage(error), options.githubToken)}`, {
+      const message = formatGitHubRequestError({error, fallbackMessage: 'Unknown failure'});
+
+      return new Error(`${options.failureMessage}: ${redactGitHubSecret(message, options.githubToken)}`, {
         cause: error,
       });
     },
@@ -272,12 +220,12 @@ function searchPullRequestsPage(
   options: SearchPullRequestsPageOptions,
   page: number,
 ): Task<ParsedPullRequestSearchPage, Error> {
-  const request = createHttpRequest(
-    'get',
-    createSearchPageUrl(options.endpoint, options.searchQuery, page),
-    options.headers,
-    Maybe.nothing<NonNullable<unknown>>(),
-  );
+  const request = createGitHubHttpRequest({
+    method: 'get',
+    url: createSearchPageUrl(options.endpoint, options.searchQuery, page),
+    headers: options.headers,
+    json: Maybe.nothing<NonNullable<unknown>>(),
+  });
   return requestGitHubJson({
     httpClient: options.httpClient,
     request,
@@ -308,7 +256,7 @@ function searchPullRequestNumbers(
       return Task.resolve<readonly number[], Error>(pullRequestNumbers);
     }
 
-    if (parsedSearchPage.rawItemCount !== githubPageSize) {
+    if (parsedSearchPage.rawItemCount !== githubApiPageSize) {
       return Task.reject<readonly number[], Error>(
         new Error('GitHub pull request search pagination ended before all results were retrieved'),
       );
@@ -333,12 +281,12 @@ function getPullRequest(
   options: GetPullRequestOptions,
   pullRequestNumber: number,
 ): Task<WebAppVersionSynchronizationPullRequest, Error> {
-  const request = createHttpRequest(
-    'get',
-    createPullRequestDetailUrl(options.endpoint, pullRequestNumber),
-    options.headers,
-    Maybe.nothing<NonNullable<unknown>>(),
-  );
+  const request = createGitHubHttpRequest({
+    method: 'get',
+    url: createPullRequestDetailUrl(options.endpoint, pullRequestNumber),
+    headers: options.headers,
+    json: Maybe.nothing<NonNullable<unknown>>(),
+  });
 
   return requestGitHubJson({
     httpClient: options.httpClient,
@@ -372,9 +320,9 @@ export function createWebAppVersionSynchronizationGitHubClient(
   options: CreateWebAppVersionSynchronizationGitHubClientOptions,
 ): WebAppVersionSynchronizationGitHubClient {
   const githubApiRoot = createGitHubApiRoot(options.githubApiUrl);
-  const encodedRepositoryName = encodeRepositoryName(options.githubRepository);
-  const readHeaders = createGitHubHeaders(options.githubToken, false);
-  const writeHeaders = createGitHubHeaders(options.githubToken, true);
+  const encodedRepositoryName = encodeGitHubRepositoryName(options.githubRepository);
+  const readHeaders = createGitHubHeaders({githubToken: options.githubToken, includesJsonBody: false});
+  const writeHeaders = createGitHubHeaders({githubToken: options.githubToken, includesJsonBody: true});
   const pullRequestsEndpoint = new URL(`repos/${encodedRepositoryName}/pulls`, githubApiRoot);
   const pullRequestSearchEndpoint = new URL('search/issues', githubApiRoot);
   const synchronizationMarkerSearchQuery = `repo:${options.githubRepository} is:pr in:body "${synchronizationMarkerSearchTerm}"`;
@@ -422,12 +370,12 @@ export function createWebAppVersionSynchronizationGitHubClient(
     },
 
     createPullRequest(createPullRequestOptions) {
-      const request = createHttpRequest(
-        'post',
-        pullRequestsEndpoint,
-        writeHeaders,
-        Maybe.just(createPullRequestRequestBody(createPullRequestOptions)),
-      );
+      const request = createGitHubHttpRequest({
+        method: 'post',
+        url: pullRequestsEndpoint,
+        headers: writeHeaders,
+        json: Maybe.just(createPullRequestRequestBody(createPullRequestOptions)),
+      });
       return requestGitHubJson({
         httpClient: options.httpClient,
         request,

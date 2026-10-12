@@ -17,12 +17,20 @@
  *
  */
 
-import {isError} from '@sindresorhus/is';
 import {Maybe, Result} from 'true-myth';
 import {z} from 'zod';
 
-import {formatHttpRequestFailure, isHttpRequestFailure} from './httpClient.ts';
-import type {HttpClient, HttpMethod, HttpRequest} from './httpClient.ts';
+import {
+  createGitHubApiRoot,
+  createGitHubHeaders,
+  createGitHubHttpRequest,
+  createGitHubPageUrl,
+  encodeGitHubRepositoryName,
+  formatGitHubRequestError,
+  githubApiPageSize,
+  redactGitHubSecret,
+} from '../release-github/githubApi.ts';
+import type {HttpClient} from '../release-github/githubApi.ts';
 
 export type PullRequestRecord = {
   readonly number: number;
@@ -77,9 +85,6 @@ type ParsedPullRequestPage = {
   readonly supportedMergedPullRequests: readonly PullRequestRecord[];
 };
 
-const githubPageSize = 100;
-const githubApiVersion = '2022-11-28';
-
 const githubPullRequestResponseSchema = z.object({
   number: z.number().int().positive(),
   title: z.string().min(1),
@@ -104,70 +109,6 @@ function createSuccess<valueType>(value: valueType): Result<valueType, Error> {
 
 function createFailure<valueType>(message: string): Result<valueType, Error> {
   return Result.err<valueType, Error>(new Error(message));
-}
-
-function errorMessage(error: unknown): string {
-  if (isHttpRequestFailure(error)) {
-    return formatHttpRequestFailure(error);
-  }
-
-  if (isError(error)) {
-    return error.message;
-  }
-
-  return 'Unknown failure';
-}
-
-function redactSecret(message: string, secret: string): string {
-  if (secret.length === 0) {
-    return message;
-  }
-
-  return message.replaceAll(secret, '[REDACTED]');
-}
-
-function createGitHubApiRoot(githubApiUrl: URL): URL {
-  const githubApiUrlString = githubApiUrl.toString();
-  return new URL(githubApiUrlString.endsWith('/') ? githubApiUrlString : `${githubApiUrlString}/`);
-}
-
-function encodeRepositoryName(githubRepository: string): string {
-  return githubRepository
-    .split('/')
-    .map(repositoryPart => {
-      return encodeURIComponent(repositoryPart);
-    })
-    .join('/');
-}
-
-function createGitHubHeaders(githubToken: string, includesBody: boolean): Readonly<Record<string, string>> {
-  const headers: Record<string, string> = {
-    Accept: 'application/vnd.github+json',
-    Authorization: `Bearer ${githubToken}`,
-    'X-GitHub-Api-Version': githubApiVersion,
-  };
-
-  if (includesBody) {
-    headers['Content-Type'] = 'application/json';
-  }
-
-  return headers;
-}
-
-function createPageUrl(endpoint: URL, page: number): URL {
-  const pageUrl = new URL(endpoint);
-  pageUrl.searchParams.set('per_page', githubPageSize.toString());
-  pageUrl.searchParams.set('page', page.toString());
-  return pageUrl;
-}
-
-function createHttpRequest(
-  method: HttpMethod,
-  url: URL,
-  headers: Readonly<Record<string, string>>,
-  json: Maybe<NonNullable<unknown>>,
-): HttpRequest {
-  return {method, url, headers, json};
 }
 
 function parsePullRequestPage(githubResponse: unknown): Result<ParsedPullRequestPage, Error> {
@@ -220,9 +161,9 @@ function parseIssueCommentMutation(githubResponse: unknown): Result<IssueComment
 export function createGitHubClient(createGitHubClientOptions: CreateGitHubClientOptions): GitHubClient {
   const {httpClient, githubApiUrl, githubRepository, githubToken} = createGitHubClientOptions;
   const githubApiRoot = createGitHubApiRoot(githubApiUrl);
-  const encodedRepositoryName = encodeRepositoryName(githubRepository);
-  const readHeaders = createGitHubHeaders(githubToken, false);
-  const writeHeaders = createGitHubHeaders(githubToken, true);
+  const encodedRepositoryName = encodeGitHubRepositoryName(githubRepository);
+  const readHeaders = createGitHubHeaders({githubToken, includesJsonBody: false});
+  const writeHeaders = createGitHubHeaders({githubToken, includesJsonBody: true});
 
   return {
     async listPullRequestsForCommit(options): Promise<Result<readonly PullRequestRecord[], Error>> {
@@ -236,12 +177,17 @@ export function createGitHubClient(createGitHubClientOptions: CreateGitHubClient
         let githubResponse: unknown;
         try {
           githubResponse = await httpClient.requestJson(
-            createHttpRequest('get', createPageUrl(endpoint, page), readHeaders, Maybe.nothing<NonNullable<unknown>>()),
+            createGitHubHttpRequest({
+              method: 'get',
+              url: createGitHubPageUrl({endpoint, page}),
+              headers: readHeaders,
+              json: Maybe.nothing<NonNullable<unknown>>(),
+            }),
           );
         } catch (error: unknown) {
           return createFailure(
-            `Unable to list pull requests for commit ${options.commitSha}: ${redactSecret(
-              errorMessage(error),
+            `Unable to list pull requests for commit ${options.commitSha}: ${redactGitHubSecret(
+              formatGitHubRequestError({error, fallbackMessage: 'Unknown failure'}),
               githubToken,
             )}`,
           );
@@ -253,7 +199,7 @@ export function createGitHubClient(createGitHubClientOptions: CreateGitHubClient
         }
 
         pullRequests.push(...pageResult.value.supportedMergedPullRequests);
-        if (pageResult.value.rawItemCount !== githubPageSize) {
+        if (pageResult.value.rawItemCount !== githubApiPageSize) {
           break;
         }
       }
@@ -272,12 +218,17 @@ export function createGitHubClient(createGitHubClientOptions: CreateGitHubClient
         let githubResponse: unknown;
         try {
           githubResponse = await httpClient.requestJson(
-            createHttpRequest('get', createPageUrl(endpoint, page), readHeaders, Maybe.nothing<NonNullable<unknown>>()),
+            createGitHubHttpRequest({
+              method: 'get',
+              url: createGitHubPageUrl({endpoint, page}),
+              headers: readHeaders,
+              json: Maybe.nothing<NonNullable<unknown>>(),
+            }),
           );
         } catch (error: unknown) {
           return createFailure(
-            `Unable to list issue comments for pull request #${options.pullRequestNumber}: ${redactSecret(
-              errorMessage(error),
+            `Unable to list issue comments for pull request #${options.pullRequestNumber}: ${redactGitHubSecret(
+              formatGitHubRequestError({error, fallbackMessage: 'Unknown failure'}),
               githubToken,
             )}`,
           );
@@ -289,7 +240,7 @@ export function createGitHubClient(createGitHubClientOptions: CreateGitHubClient
         }
 
         comments.push(...pageResult.value);
-        if (pageResult.value.length !== githubPageSize) {
+        if (pageResult.value.length !== githubApiPageSize) {
           break;
         }
       }
@@ -305,13 +256,18 @@ export function createGitHubClient(createGitHubClientOptions: CreateGitHubClient
 
       try {
         const githubResponse = await httpClient.requestJson(
-          createHttpRequest('post', endpoint, writeHeaders, Maybe.just({body: options.commentBody})),
+          createGitHubHttpRequest({
+            method: 'post',
+            url: endpoint,
+            headers: writeHeaders,
+            json: Maybe.just({body: options.commentBody}),
+          }),
         );
         return parseIssueCommentMutation(githubResponse);
       } catch (error: unknown) {
         return createFailure(
-          `Unable to create release-appearance comment for pull request #${options.pullRequestNumber}: ${redactSecret(
-            errorMessage(error),
+          `Unable to create release-appearance comment for pull request #${options.pullRequestNumber}: ${redactGitHubSecret(
+            formatGitHubRequestError({error, fallbackMessage: 'Unknown failure'}),
             githubToken,
           )}`,
         );
@@ -323,13 +279,18 @@ export function createGitHubClient(createGitHubClientOptions: CreateGitHubClient
 
       try {
         const githubResponse = await httpClient.requestJson(
-          createHttpRequest('patch', endpoint, writeHeaders, Maybe.just({body: options.commentBody})),
+          createGitHubHttpRequest({
+            method: 'patch',
+            url: endpoint,
+            headers: writeHeaders,
+            json: Maybe.just({body: options.commentBody}),
+          }),
         );
         return parseIssueCommentMutation(githubResponse);
       } catch (error: unknown) {
         return createFailure(
-          `Unable to update release-appearance comment #${options.commentId}: ${redactSecret(
-            errorMessage(error),
+          `Unable to update release-appearance comment #${options.commentId}: ${redactGitHubSecret(
+            formatGitHubRequestError({error, fallbackMessage: 'Unknown failure'}),
             githubToken,
           )}`,
         );

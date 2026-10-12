@@ -513,7 +513,25 @@ const productionConfigs = [
     },
   },
   {
+    files: ['tools/release-github/**/*.ts'],
+    languageOptions: {
+      parserOptions: {
+        project: './tsconfig.tools.json',
+        projectService: false,
+      },
+    },
+  },
+  {
     files: ['tools/release-cli/**/*.mts'],
+    languageOptions: {
+      parserOptions: {
+        project: './tsconfig.release-cli.json',
+        projectService: false,
+      },
+    },
+  },
+  {
+    files: ['tools/release-cli/**/*.ts'],
     languageOptions: {
       parserOptions: {
         project: './tsconfig.release-cli.json',
