@@ -17,12 +17,21 @@
  *
  */
 
-import {isError, isUndefined} from '@sindresorhus/is';
+import {isUndefined} from '@sindresorhus/is';
 import {Maybe, Result, Task, task} from 'true-myth';
 import {z} from 'zod';
 
-import {formatHttpRequestFailure, isHttpRequestFailure} from './httpClient.ts';
-import type {HttpClient, HttpMethod, HttpRequest} from './httpClient.ts';
+import {
+  createGitHubApiRoot,
+  createGitHubHeaders,
+  createGitHubHttpRequest,
+  createGitHubPageUrl,
+  encodeGitHubRepositoryName,
+  formatGitHubRequestError,
+  githubApiPageSize,
+  redactGitHubSecret,
+} from '../release-github/githubApi.ts';
+import type {HttpClient, HttpRequest} from '../release-github/githubApi.ts';
 
 export type GitHubReleaseRecord = {
   readonly tagName: string;
@@ -87,9 +96,6 @@ type RequestGitHubJsonOptions = {
   readonly githubToken: string;
 };
 
-const githubPageSize = 100;
-const githubApiVersion = '2022-11-28';
-
 const githubTagResponseSchema = z.object({
   name: z.string().min(1),
 });
@@ -115,70 +121,6 @@ function createSuccess<valueType>(value: valueType): Result<valueType, Error> {
 
 function createFailure<valueType>(message: string): Result<valueType, Error> {
   return Result.err<valueType, Error>(new Error(message));
-}
-
-function errorMessage(error: unknown): string {
-  if (isHttpRequestFailure(error)) {
-    return formatHttpRequestFailure(error);
-  }
-
-  if (isError(error)) {
-    return error.message;
-  }
-
-  return 'Unknown failure';
-}
-
-function redactSecret(message: string, secret: string): string {
-  if (secret.length === 0) {
-    return message;
-  }
-
-  return message.replaceAll(secret, '[REDACTED]');
-}
-
-function createGitHubApiRoot(githubApiUrl: URL): URL {
-  const githubApiUrlString = githubApiUrl.toString();
-  return new URL(githubApiUrlString.endsWith('/') ? githubApiUrlString : `${githubApiUrlString}/`);
-}
-
-function encodeRepositoryName(githubRepository: string): string {
-  return githubRepository
-    .split('/')
-    .map(repositoryPart => {
-      return encodeURIComponent(repositoryPart);
-    })
-    .join('/');
-}
-
-function createGitHubHeaders(githubToken: string, includesBody: boolean): Readonly<Record<string, string>> {
-  const headers: Record<string, string> = {
-    Accept: 'application/vnd.github+json',
-    Authorization: `Bearer ${githubToken}`,
-    'X-GitHub-Api-Version': githubApiVersion,
-  };
-
-  if (includesBody) {
-    headers['Content-Type'] = 'application/json';
-  }
-
-  return headers;
-}
-
-function createPageUrl(endpoint: URL, page: number): URL {
-  const pageUrl = new URL(endpoint);
-  pageUrl.searchParams.set('per_page', githubPageSize.toString());
-  pageUrl.searchParams.set('page', page.toString());
-  return pageUrl;
-}
-
-function createHttpRequest(
-  method: HttpMethod,
-  url: URL,
-  headers: Readonly<Record<string, string>>,
-  json: Maybe<NonNullable<unknown>>,
-): HttpRequest {
-  return {method, url, headers, json};
 }
 
 function parseGitHubTagPage(githubResponse: unknown): Result<ParsedGitHubTagPage, Error> {
@@ -251,7 +193,9 @@ function createDraftReleaseRequestBody(options: CreateDraftReleaseOptions): GitH
 function requestGitHubJson(options: RequestGitHubJsonOptions): Task<unknown, Error> {
   return task.tryOrElse(
     (error: unknown): Error => {
-      return new Error(`${options.failureMessage}: ${redactSecret(errorMessage(error), options.githubToken)}`, {
+      const message = formatGitHubRequestError({error, fallbackMessage: 'Unknown failure'});
+
+      return new Error(`${options.failureMessage}: ${redactGitHubSecret(message, options.githubToken)}`, {
         cause: error,
       });
     },
@@ -266,16 +210,21 @@ export function createGitHubReleaseClient(
 ): GitHubReleaseClient {
   const {httpClient, githubApiUrl, githubRepository, githubToken} = createGitHubReleaseClientOptions;
   const githubApiRoot = createGitHubApiRoot(githubApiUrl);
-  const encodedRepositoryName = encodeRepositoryName(githubRepository);
-  const readHeaders = createGitHubHeaders(githubToken, false);
-  const writeHeaders = createGitHubHeaders(githubToken, true);
+  const encodedRepositoryName = encodeGitHubRepositoryName(githubRepository);
+  const readHeaders = createGitHubHeaders({githubToken, includesJsonBody: false});
+  const writeHeaders = createGitHubHeaders({githubToken, includesJsonBody: true});
 
   return {
     listTagNames(): Task<readonly string[], Error> {
       const endpoint = new URL(`repos/${encodedRepositoryName}/tags`, githubApiRoot);
 
       function listTagNamesPage(page: number, accumulatedTagNames: readonly string[]): Task<readonly string[], Error> {
-        const request = createHttpRequest('get', createPageUrl(endpoint, page), readHeaders, Maybe.nothing());
+        const request = createGitHubHttpRequest({
+          method: 'get',
+          url: createGitHubPageUrl({endpoint, page}),
+          headers: readHeaders,
+          json: Maybe.nothing(),
+        });
 
         return requestGitHubJson({
           httpClient,
@@ -291,7 +240,7 @@ export function createGitHubReleaseClient(
 
           const tagNames = [...accumulatedTagNames, ...pageResult.value.tagNames];
 
-          if (pageResult.value.rawItemCount !== githubPageSize) {
+          if (pageResult.value.rawItemCount !== githubApiPageSize) {
             return Result.ok<readonly string[], Error>(tagNames);
           }
 
@@ -306,7 +255,12 @@ export function createGitHubReleaseClient(
       const endpoint = new URL(`repos/${encodedRepositoryName}/releases`, githubApiRoot);
 
       function findReleasePage(page: number): Task<Maybe<GitHubReleaseRecord>, Error> {
-        const request = createHttpRequest('get', createPageUrl(endpoint, page), readHeaders, Maybe.nothing());
+        const request = createGitHubHttpRequest({
+          method: 'get',
+          url: createGitHubPageUrl({endpoint, page}),
+          headers: readHeaders,
+          json: Maybe.nothing(),
+        });
 
         return requestGitHubJson({
           httpClient,
@@ -328,7 +282,7 @@ export function createGitHubReleaseClient(
             return Result.ok<Maybe<GitHubReleaseRecord>, Error>(Maybe.just(matchingRelease));
           }
 
-          if (pageResult.value.rawItemCount !== githubPageSize) {
+          if (pageResult.value.rawItemCount !== githubApiPageSize) {
             return Result.ok<Maybe<GitHubReleaseRecord>, Error>(Maybe.nothing<GitHubReleaseRecord>());
           }
 
@@ -341,15 +295,15 @@ export function createGitHubReleaseClient(
 
     generateReleaseNotes(options: GenerateReleaseNotesOptions): Task<GitHubGeneratedReleaseNotes, Error> {
       const endpoint = new URL(`repos/${encodedRepositoryName}/releases/generate-notes`, githubApiRoot);
-      const request = createHttpRequest(
-        'post',
-        endpoint,
-        writeHeaders,
-        Maybe.just({
+      const request = createGitHubHttpRequest({
+        method: 'post',
+        url: endpoint,
+        headers: writeHeaders,
+        json: Maybe.just({
           tag_name: options.productionTagName,
           previous_tag_name: options.precedingProductionTagName,
         }),
-      );
+      });
 
       return requestGitHubJson({
         httpClient,
@@ -369,12 +323,12 @@ export function createGitHubReleaseClient(
 
     createDraftRelease(options: CreateDraftReleaseOptions): Task<GitHubReleaseRecord, Error> {
       const endpoint = new URL(`repos/${encodedRepositoryName}/releases`, githubApiRoot);
-      const request = createHttpRequest(
-        'post',
-        endpoint,
-        writeHeaders,
-        Maybe.just(createDraftReleaseRequestBody(options)),
-      );
+      const request = createGitHubHttpRequest({
+        method: 'post',
+        url: endpoint,
+        headers: writeHeaders,
+        json: Maybe.just(createDraftReleaseRequestBody(options)),
+      });
 
       return requestGitHubJson({
         httpClient,

@@ -17,12 +17,20 @@
  *
  */
 
-import {isError} from '@sindresorhus/is';
 import {Maybe, Result} from 'true-myth';
 import {z} from 'zod';
 
-import {formatHttpRequestFailure, isHttpRequestFailure} from '../release-appearance/httpClient.ts';
-import type {HttpClient, HttpMethod, HttpRequest} from '../release-appearance/httpClient.ts';
+import {
+  createGitHubApiRoot,
+  createGitHubHeaders,
+  createGitHubHttpRequest,
+  createGitHubPageUrl,
+  encodeGitHubRepositoryName,
+  formatGitHubRequestError,
+  githubApiPageSize,
+  redactGitHubSecret,
+} from '../release-github/githubApi.ts';
+import type {HttpClient} from '../release-github/githubApi.ts';
 
 export type WebAppReleasePlanningPullRequest = {
   readonly number: number;
@@ -54,9 +62,6 @@ type ParsedPullRequestPage = {
   readonly pullRequests: readonly WebAppReleasePlanningPullRequest[];
 };
 
-const githubPageSize = 100;
-const githubApiVersion = '2022-11-28';
-
 const githubPullRequestResponseSchema = z.object({
   number: z.number().int().positive(),
   title: z.string().min(1),
@@ -79,60 +84,6 @@ function createSuccess<valueType>(value: valueType): Result<valueType, Error> {
 
 function createFailure<valueType>(message: string): Result<valueType, Error> {
   return Result.err<valueType, Error>(new Error(message));
-}
-
-function errorMessage(error: unknown): string {
-  if (isHttpRequestFailure(error)) {
-    return formatHttpRequestFailure(error);
-  }
-
-  return isError(error) ? error.message : 'Unknown GitHub request failure';
-}
-
-function redactSecret(message: string, secret: string): string {
-  return secret.length === 0 ? message : message.replaceAll(secret, '[REDACTED]');
-}
-
-function createGitHubApiRoot(githubApiUrl: URL): URL {
-  const githubApiUrlString = githubApiUrl.toString();
-
-  return new URL(githubApiUrlString.endsWith('/') ? githubApiUrlString : `${githubApiUrlString}/`);
-}
-
-function encodeRepositoryName(githubRepository: string): string {
-  return githubRepository
-    .split('/')
-    .map(repositoryPart => {
-      return encodeURIComponent(repositoryPart);
-    })
-    .join('/');
-}
-
-function createGitHubHeaders(githubToken: string): Readonly<Record<string, string>> {
-  return {
-    Accept: 'application/vnd.github+json',
-    Authorization: `Bearer ${githubToken}`,
-    'X-GitHub-Api-Version': githubApiVersion,
-  };
-}
-
-function createPageUrl(endpoint: URL, page: number): URL {
-  const pageUrl = new URL(endpoint);
-  pageUrl.searchParams.set('per_page', githubPageSize.toString());
-  pageUrl.searchParams.set('page', page.toString());
-
-  return pageUrl;
-}
-
-function createHttpRequest(url: URL, headers: Readonly<Record<string, string>>): HttpRequest {
-  const method: HttpMethod = 'get';
-
-  return {
-    method,
-    url,
-    headers,
-    json: Maybe.nothing<NonNullable<unknown>>(),
-  };
 }
 
 function parsePullRequestPage(githubResponse: unknown): Result<ParsedPullRequestPage, Error> {
@@ -163,8 +114,8 @@ export function createWebAppReleasePlanningGitHubClient(
   options: CreateWebAppReleasePlanningGitHubClientOptions,
 ): WebAppReleasePlanningGitHubClient {
   const githubApiRoot = createGitHubApiRoot(options.githubApiUrl);
-  const encodedRepositoryName = encodeRepositoryName(options.githubRepository);
-  const readHeaders = createGitHubHeaders(options.githubToken);
+  const encodedRepositoryName = encodeGitHubRepositoryName(options.githubRepository);
+  const readHeaders = createGitHubHeaders({githubToken: options.githubToken, includesJsonBody: false});
 
   return {
     async listPullRequestsForCommit(listOptions: ListWebAppReleasePlanningPullRequestsForCommitOptions) {
@@ -179,10 +130,18 @@ export function createWebAppReleasePlanningGitHubClient(
 
         try {
           githubResponse = await options.httpClient.requestJson(
-            createHttpRequest(createPageUrl(endpoint, page), readHeaders),
+            createGitHubHttpRequest({
+              method: 'get',
+              url: createGitHubPageUrl({endpoint, page}),
+              headers: readHeaders,
+              json: Maybe.nothing<NonNullable<unknown>>(),
+            }),
           );
         } catch (error: unknown) {
-          const failureMessage = redactSecret(errorMessage(error), options.githubToken);
+          const failureMessage = redactGitHubSecret(
+            formatGitHubRequestError({error, fallbackMessage: 'Unknown GitHub request failure'}),
+            options.githubToken,
+          );
 
           return createFailure(
             `Unable to list pull requests associated with commit ${listOptions.commitSha}: ${failureMessage}`,
@@ -195,7 +154,7 @@ export function createWebAppReleasePlanningGitHubClient(
         }
 
         pullRequests.push(...pageResult.value.pullRequests);
-        if (pageResult.value.rawItemCount !== githubPageSize) {
+        if (pageResult.value.rawItemCount !== githubApiPageSize) {
           break;
         }
       }

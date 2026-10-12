@@ -21,7 +21,7 @@ import assert from 'node:assert';
 
 import {Maybe} from 'true-myth';
 
-import type {HttpClient, HttpRequest} from '../release-appearance/httpClient.ts';
+import type {HttpClient, HttpRequest} from '../release-github/githubApi.ts';
 import {
   createWebAppReleasePlanningGitHubClient,
   type WebAppReleasePlanningGitHubClient,
