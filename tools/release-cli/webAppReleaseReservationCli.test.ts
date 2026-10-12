@@ -23,7 +23,6 @@ import {spawnSync} from 'node:child_process';
 import process from 'node:process';
 import {pathToFileURL} from 'node:url';
 
-import {noop} from 'noop-esm';
 import {Result} from 'true-myth';
 
 import type {WebAppReleaseReservation} from '../release-metadata/webappReleaseReservation.ts';
@@ -43,6 +42,10 @@ const runtimeEnvironment: NodeJS.ProcessEnv = {
   GITHUB_REPOSITORY: 'wireapp/wire-webapp',
   GITHUB_TOKEN: 'secret-token',
 };
+
+function ignoreOutput(message: string): void {
+  assert.equal(typeof message, 'string');
+}
 
 function createTestReservation(): WebAppReleaseReservation {
   const versionResult = validateWebAppVersion('1.1.0');
@@ -69,8 +72,8 @@ function createCommandOptions(
     async reserveWebAppRelease() {
       return Result.ok(createTestReservation());
     },
-    writeError: noop,
-    writeOutput: noop,
+    writeError: ignoreOutput,
+    writeOutput: ignoreOutput,
     ...overrides,
   };
 }

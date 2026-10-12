@@ -122,11 +122,11 @@ function createReservationResult(options: CreateWebAppReleaseReservationResultOp
 export function inspectActiveWebAppReleaseReservations(
   options: InspectActiveWebAppReleaseReservationsOptions,
 ): Result<readonly WebAppReleaseBranchRef[], Error> {
-  const stableWebAppTagNames = new Set(
-    options.stableReleases.map(stableRelease => {
-      return stableRelease.tagName;
-    }),
-  );
+  const stableWebAppReleasesByTagName = new Map<string, StableWebAppRelease>();
+  for (const stableRelease of options.stableReleases) {
+    stableWebAppReleasesByTagName.set(stableRelease.tagName, stableRelease);
+  }
+
   const activeReservations: WebAppReleaseBranchRef[] = [];
 
   for (const releaseBranch of options.releaseBranches) {
@@ -154,14 +154,29 @@ export function inspectActiveWebAppReleaseReservations(
       return Result.err(stableTagNameResult.error);
     }
 
-    if (stableWebAppTagNames.has(stableTagNameResult.value) === false) {
-      activeReservations.push(
-        Object.freeze({
-          releaseBranch: releaseBranch.releaseBranch,
-          releaseCommitSha: releaseBranch.releaseCommitSha.toLowerCase(),
-        }),
-      );
+    const matchingStableReleaseMaybe = Maybe.of(stableWebAppReleasesByTagName.get(stableTagNameResult.value));
+    if (matchingStableReleaseMaybe.isJust) {
+      const matchingStableRelease = matchingStableReleaseMaybe.value;
+      const releaseBranchCommitSha = releaseBranch.releaseCommitSha.toLowerCase();
+      const stableTagCommitSha = matchingStableRelease.commitSha.toLowerCase();
+
+      if (releaseBranchCommitSha !== stableTagCommitSha) {
+        return Result.err(
+          new Error(
+            `WebApp release reservation commit mismatch: ${releaseBranch.releaseBranch} points to ${releaseBranchCommitSha}, but ${matchingStableRelease.tagName} points to ${stableTagCommitSha}`,
+          ),
+        );
+      }
+
+      continue;
     }
+
+    activeReservations.push(
+      Object.freeze({
+        releaseBranch: releaseBranch.releaseBranch,
+        releaseCommitSha: releaseBranch.releaseCommitSha.toLowerCase(),
+      }),
+    );
   }
 
   return Result.ok(Object.freeze(activeReservations));

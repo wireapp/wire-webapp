@@ -276,7 +276,7 @@ describe('WebApp release reservation allocation', () => {
         createStableRelease({version: '1.0.0', tagName: 'v1.0.0', commitSha: stableCommit}),
         createStableRelease({version: '1.1.0', tagName: 'v1.1.0', commitSha: latestStableCommit}),
       ],
-      releaseBranches: [{releaseBranch: 'release/1.1.0', releaseCommitSha: targetCommit}],
+      releaseBranches: [{releaseBranch: 'release/1.1.0', releaseCommitSha: latestStableCommit}],
       planResult: Result.ok(createReleasePlan('1.2.0')),
     });
 
@@ -290,6 +290,32 @@ describe('WebApp release reservation allocation', () => {
     expect(testDependencies.plannerCalls).toEqual([
       {currentVersion: '1.1.0', baseCommit: latestStableCommit, targetCommit},
     ]);
+  });
+
+  it('fails when a stable release tag and its reservation branch point to different commits', async () => {
+    const stableTagCommit = 'd'.repeat(40);
+    const branchCommit = 'e'.repeat(40);
+    const testDependencies = createReservationTestDependencies({
+      stableReleases: [
+        createStableRelease({version: '1.0.0', tagName: 'v1.0.0', commitSha: stableCommit}),
+        createStableRelease({version: '1.1.0', tagName: 'v1.1.0', commitSha: stableTagCommit}),
+      ],
+      releaseBranches: [{releaseBranch: 'release/1.1.0', releaseCommitSha: branchCommit}],
+    });
+
+    const actualReservationResult = await reserveWebAppRelease({
+      targetCommit,
+      dependencies: testDependencies.dependencies,
+    });
+
+    assert(actualReservationResult.isErr);
+    expect(actualReservationResult.error.message).toContain('commit mismatch');
+    expect(actualReservationResult.error.message).toContain('release/1.1.0');
+    expect(actualReservationResult.error.message).toContain(branchCommit);
+    expect(actualReservationResult.error.message).toContain('v1.1.0');
+    expect(actualReservationResult.error.message).toContain(stableTagCommit);
+    expect(testDependencies.plannerCalls).toEqual([]);
+    expect(testDependencies.branchCreationCalls).toEqual([]);
   });
 
   it('rejects a stable base commit that is not an ancestor of the target', async () => {
