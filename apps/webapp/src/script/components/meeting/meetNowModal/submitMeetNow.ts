@@ -20,6 +20,7 @@
 import {task, type Task} from 'true-myth';
 
 import {mapMeetNowFormToMeetingCommand} from 'Components/meeting/mapMeetNowFormToMeetingCommand';
+import type {MeetingLinkConfirmationSession} from 'Components/meeting/meetingLinkConfirmation/meetingLinkConfirmation';
 import type {MeetingPrepSession} from 'Components/meeting/meetingPrep/useMeetingPrepModal';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
 import type {CreateMeetingSuccess} from 'Components/meeting/shared/service/meetingService';
@@ -42,6 +43,7 @@ export type SubmitMeetNowParams = {
   translate: Translate;
   meetingStartTime: string;
   openMeetingPrep: (session: MeetingPrepSession) => void;
+  onMeetingCreated: (session: MeetingLinkConfirmationSession) => void;
 };
 
 export const submitMeetNow = async ({
@@ -51,6 +53,7 @@ export const submitMeetNow = async ({
   translate,
   meetingStartTime,
   openMeetingPrep,
+  onMeetingCreated,
 }: SubmitMeetNowParams): Promise<MeetNowSubmitResult> => {
   const commandResult = mapMeetNowFormToMeetingCommand(formState);
 
@@ -80,13 +83,20 @@ export const submitMeetNow = async ({
       users: formState.selectedUsers,
       translate,
     });
+
+    return meetNowSubmitResults.setupFailed;
   }
 
-  openMeetingPrep({
-    meetingTitle: commandResult.value.title,
-    meetingStartTime,
-    qualifiedMeetingId: submitResult.value.qualifiedMeetingId,
-    qualifiedConversationId: submitResult.value.qualifiedConversation,
+  onMeetingCreated({
+    link: submitResult.value.link,
+    onClosed: () => {
+      openMeetingPrep({
+        meetingTitle: commandResult.value.title,
+        meetingStartTime,
+        qualifiedMeetingId: submitResult.value.qualifiedMeetingId,
+        qualifiedConversationId: submitResult.value.qualifiedConversation,
+      });
+    },
   });
 
   return meetNowSubmitResults.prepOpened;

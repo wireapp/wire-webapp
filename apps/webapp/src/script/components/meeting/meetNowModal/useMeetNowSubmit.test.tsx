@@ -19,10 +19,12 @@
 
 import type {ReactNode} from 'react';
 
-import {act, renderHook} from '@testing-library/react';
+import {act, renderHook, waitFor} from '@testing-library/react';
 import {task} from 'true-myth';
+import {AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
 import {createStore, type StoreApi} from 'zustand/vanilla';
 
+import {removeCurrentModal, usePrimaryModalState} from 'Components/Modals/PrimaryModal';
 import {useMeetingPrepModal} from 'Components/meeting/meetingPrep/useMeetingPrepModal';
 import type {MeetingStoreState} from 'Components/meeting/meetingStore/createMeetingStore';
 import {MeetingStoreProvider} from 'Components/meeting/meetingStore/meetingStoreProvider';
@@ -145,7 +147,6 @@ describe('useMeetNowSubmit', () => {
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
     act(() => {
       useWarningsState.setState({name: '', warnings: []});
       useMeetingPrepModal.getState().close();
@@ -159,6 +160,7 @@ describe('useMeetNowSubmit', () => {
         failedToAdd: [],
         qualifiedConversation,
         qualifiedMeetingId: {id: 'meeting-id', domain: 'example.com'},
+        link: 'meeting-link',
       }),
     );
     const store = createMeetingStore({loadMeetings, meetNowMeeting});
@@ -182,7 +184,16 @@ describe('useMeetNowSubmit', () => {
     expect(meetNowMeeting).toHaveBeenCalledWith(meetNowCommand);
     expect(loadMeetings).not.toHaveBeenCalled();
     expect(startAudio).not.toHaveBeenCalled();
-    expect(useMeetingPrepModal.getState().session.isJust).toBe(true);
+    expect(useMeetingPrepModal.getState().session.isNothing).toBe(true);
+    expect(usePrimaryModalState.getState().currentModalContent.titleText).toBe('meetings.meetingLink.title');
+
+    await act(async () => {
+      removeCurrentModal();
+    });
+
+    await waitFor(() => {
+      expect(useMeetingPrepModal.getState().session.isJust).toBe(true);
+    });
   });
 
   it('returns creationFailed when meeting creation fails', async () => {
@@ -209,6 +220,35 @@ describe('useMeetNowSubmit', () => {
     expect(wasMeetNowMeetingCreated(submitResult)).toBe(false);
     expect(loadMeetings).not.toHaveBeenCalled();
     expect(startAudio).not.toHaveBeenCalled();
+  });
+
+  it('does not open the link or prep modals when participants cannot all be added', async () => {
+    const meetNowMeeting = jest.fn().mockReturnValue(
+      task.resolve({
+        failedToAdd: [{users: [], backends: [], reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS}],
+        qualifiedConversation,
+        qualifiedMeetingId: {id: 'meeting-id', domain: 'example.com'},
+        link: 'meeting-link',
+      }),
+    );
+    const store = createMeetingStore({meetNowMeeting});
+    const {mainViewModel} = createJoinTestMocks();
+
+    const {result} = renderHook(
+      () => {
+        return useMeetNowSubmit();
+      },
+      {wrapper: createWrapper(store, mainViewModel)},
+    );
+
+    let submitResult: MeetNowSubmitResult = meetNowSubmitResults.prepOpened;
+    await act(async () => {
+      submitResult = await result.current.submit(formState);
+    });
+
+    expect(submitResult).toBe(meetNowSubmitResults.setupFailed);
+    expect(useMeetingPrepModal.getState().session.isNothing).toBe(true);
+    expect(usePrimaryModalState.getState().currentModalContent.titleText).not.toBe('meetings.meetingLink.title');
   });
 
   it('returns setupFailed and refreshes meetings after a partial create failure', async () => {

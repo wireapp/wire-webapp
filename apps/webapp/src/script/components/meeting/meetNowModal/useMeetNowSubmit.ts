@@ -19,6 +19,8 @@
 
 import {useState} from 'react';
 
+import {showMeetingLinkConfirmation} from 'Components/meeting/meetingLinkConfirmation/meetingLinkConfirmation';
+import type {MeetingLinkConfirmationSession} from 'Components/meeting/meetingLinkConfirmation/meetingLinkConfirmation';
 import {useMeetingPrepModal} from 'Components/meeting/meetingPrep/useMeetingPrepModal';
 import {useMeetingStore} from 'Components/meeting/meetingStore/meetingStoreProvider';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -42,6 +44,9 @@ export const useMeetNowSubmit = (): UseMeetNowSubmitResult => {
   const openMeetingPrep = useMeetingPrepModal(state => {
     return state.open;
   });
+  const onMeetingCreated = (session: MeetingLinkConfirmationSession) => {
+    showMeetingLinkConfirmation({...session, translate});
+  };
 
   const submit = async (formState: MeetNowFormState): Promise<MeetNowSubmitResult> => {
     setIsSubmitting(true);
@@ -54,6 +59,7 @@ export const useMeetNowSubmit = (): UseMeetNowSubmitResult => {
         translate,
         meetingStartTime: clock.currentDate.toISOString(),
         openMeetingPrep,
+        onMeetingCreated,
       });
     } finally {
       setIsSubmitting(false);

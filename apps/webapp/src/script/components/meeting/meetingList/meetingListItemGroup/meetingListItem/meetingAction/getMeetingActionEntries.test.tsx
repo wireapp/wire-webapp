@@ -97,6 +97,12 @@ const getJoinEntry = (entries: ReturnType<typeof getMeetingActionEntries>): Cont
   });
 };
 
+const getCopyMeetingLinkEntry = (entries: ReturnType<typeof getMeetingActionEntries>) => {
+  return entries.find(entry => {
+    return entry.label === MEETING_ACTION_TRANSLATION_KEYS.copyMeetingLink;
+  });
+};
+
 const getEntryLabels = (entries: ReturnType<typeof getMeetingActionEntries>): (string | undefined)[] => {
   return entries.map(entry => {
     return entry.label;
@@ -113,6 +119,7 @@ describe('getMeetingActionEntries', () => {
       onJoin: noop,
       isJoinDisabled: false,
       onEdit: jest.fn(),
+      onCopyMeetingLink: noop,
       onDeleteForAll: noop,
       onDeleteForMe: noop,
     });
@@ -137,6 +144,7 @@ describe('getMeetingActionEntries', () => {
         onJoin,
         isJoinDisabled: false,
         onEdit: noop,
+        onCopyMeetingLink: noop,
         onDeleteForAll: noop,
         onDeleteForMe: noop,
       });
@@ -157,6 +165,7 @@ describe('getMeetingActionEntries', () => {
       translate,
       onJoin: noop,
       onEdit: jest.fn(),
+      onCopyMeetingLink: noop,
       onDeleteForAll: noop,
       onDeleteForMe: noop,
     });
@@ -172,6 +181,7 @@ describe('getMeetingActionEntries', () => {
       translate,
       onJoin: noop,
       onEdit: jest.fn(),
+      onCopyMeetingLink: noop,
       onDeleteForAll: noop,
       onDeleteForMe: noop,
     });
@@ -187,6 +197,7 @@ describe('getMeetingActionEntries', () => {
       translate,
       onJoin: noop,
       onEdit: jest.fn(),
+      onCopyMeetingLink: noop,
       onDeleteForAll: noop,
       onDeleteForMe: noop,
     });
@@ -202,6 +213,7 @@ describe('getMeetingActionEntries', () => {
       translate,
       onJoin: noop,
       onEdit: jest.fn(),
+      onCopyMeetingLink: noop,
       onDeleteForAll: noop,
       onDeleteForMe: noop,
     });
@@ -225,6 +237,7 @@ describe('getMeetingActionEntries', () => {
       translate,
       onJoin: noop,
       onEdit: jest.fn(),
+      onCopyMeetingLink: noop,
       onDeleteForAll: noop,
       onDeleteForMe: noop,
     });
@@ -240,6 +253,7 @@ describe('getMeetingActionEntries', () => {
       translate,
       onJoin: noop,
       onEdit: jest.fn(),
+      onCopyMeetingLink: noop,
       onDeleteForAll: noop,
       onDeleteForMe: noop,
     });
@@ -256,6 +270,7 @@ describe('getMeetingActionEntries', () => {
       translate,
       onJoin: noop,
       onEdit: jest.fn(),
+      onCopyMeetingLink: noop,
       onDeleteForAll: noop,
       onDeleteForMe: noop,
     });
@@ -272,6 +287,7 @@ describe('getMeetingActionEntries', () => {
       translate,
       onJoin: noop,
       onEdit: jest.fn(),
+      onCopyMeetingLink: noop,
       onDeleteForAll: noop,
       onDeleteForMe: noop,
     });
@@ -288,6 +304,7 @@ describe('getMeetingActionEntries', () => {
       translate,
       onJoin: noop,
       onEdit: jest.fn(),
+      onCopyMeetingLink: noop,
       onDeleteForAll: noop,
       onDeleteForMe: noop,
     });
@@ -304,6 +321,7 @@ describe('getMeetingActionEntries', () => {
       translate,
       onJoin: noop,
       onEdit: jest.fn(),
+      onCopyMeetingLink: noop,
       onDeleteForAll: noop,
       onDeleteForMe: noop,
     });
@@ -321,6 +339,7 @@ describe('getMeetingActionEntries', () => {
       translate,
       onJoin: noop,
       onEdit: jest.fn(),
+      onCopyMeetingLink: noop,
       onDeleteForAll: noop,
       onDeleteForMe: noop,
     });
@@ -339,6 +358,7 @@ describe('getMeetingActionEntries', () => {
       onJoin: noop,
       isJoinDisabled: true,
       onEdit: noop,
+      onCopyMeetingLink: noop,
       onDeleteForAll: noop,
       onDeleteForMe: noop,
     });
@@ -346,5 +366,42 @@ describe('getMeetingActionEntries', () => {
     const joinEntry = getJoinEntry(entries);
     expect(joinEntry).toBeDefined();
     expect(joinEntry?.isDisabled).toBe(true);
+  });
+
+  it('includes Copy meeting link when a meeting link is available', () => {
+    const onCopyMeetingLink = jest.fn();
+    const entries = getMeetingActionEntries({
+      meetingInstance: createMeetingInstance(),
+      selfUser: createSelfUser(),
+      nowMilliseconds: futureNowMilliseconds,
+      translate,
+      onJoin: noop,
+      onEdit: noop,
+      onCopyMeetingLink,
+      meetingLink: 'https://wire.example/meeting-link',
+      onDeleteForAll: noop,
+      onDeleteForMe: noop,
+    });
+
+    const copyMeetingLinkEntry = getCopyMeetingLinkEntry(entries);
+    expect(copyMeetingLinkEntry).toBeDefined();
+    copyMeetingLinkEntry?.click?.();
+    expect(onCopyMeetingLink).toHaveBeenCalledTimes(1);
+  });
+
+  it('omits Copy meeting link when a meeting link is not available', () => {
+    const entries = getMeetingActionEntries({
+      meetingInstance: createMeetingInstance(),
+      selfUser: createSelfUser(),
+      nowMilliseconds: futureNowMilliseconds,
+      translate,
+      onJoin: noop,
+      onEdit: noop,
+      onCopyMeetingLink: noop,
+      onDeleteForAll: noop,
+      onDeleteForMe: noop,
+    });
+
+    expect(getCopyMeetingLinkEntry(entries)).toBeUndefined();
   });
 });
