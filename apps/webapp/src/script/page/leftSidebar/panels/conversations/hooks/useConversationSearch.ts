@@ -27,10 +27,10 @@ type PendingAction = {kind: 'enter' | 'tab'; event: SearchEvent; query: string};
 type ConversationSearchOptions = {
   clock: Clock;
   filter: string;
-  setFilter: (value: string) => void;
   onSearch: (value: string) => void;
   onEnter: (event: SearchEvent) => boolean;
   onTab: (event: SearchEvent) => void;
+  hasTabResult: (query: string) => boolean;
   onBeforeTab: () => void;
 };
 
@@ -39,10 +39,10 @@ const SEARCH_DELAY_IN_MILLISECONDS = 200;
 export const useConversationSearch = ({
   clock,
   filter,
-  setFilter,
   onSearch,
   onEnter,
   onTab,
+  hasTabResult,
   onBeforeTab,
 }: ConversationSearchOptions) => {
   const [inputValue, setInputValue] = useState(filter);
@@ -52,15 +52,19 @@ export const useConversationSearch = ({
       return;
     }
 
-    const timeout = clock.setTimeout(() => onSearch(inputValue), SEARCH_DELAY_IN_MILLISECONDS);
-    return () => clock.clearTimeout(timeout);
+    const timeout = clock.setTimeout(() => {
+      return onSearch(inputValue);
+    }, SEARCH_DELAY_IN_MILLISECONDS);
+    return () => {
+      return clock.clearTimeout(timeout);
+    };
   }, [clock, filter, inputValue, onSearch]);
 
   const clear = useCallback(() => {
     pendingAction.current = null;
     setInputValue('');
-    setFilter('');
-  }, [setFilter]);
+    onSearch('');
+  }, [onSearch]);
 
   const changeInput = useCallback(
     (value: string) => {
@@ -91,8 +95,13 @@ export const useConversationSearch = ({
 
   const tab = useCallback(
     (event: SearchEvent) => {
+      const hasPendingQuery = inputValue !== filter;
+      if (hasPendingQuery && hasTabResult(inputValue)) {
+        event.preventDefault();
+      }
+
       onBeforeTab();
-      if (inputValue !== filter) {
+      if (hasPendingQuery) {
         pendingAction.current = {kind: 'tab', event, query: inputValue};
         onSearch(inputValue);
         return;
@@ -100,7 +109,7 @@ export const useConversationSearch = ({
 
       onTab(event);
     },
-    [filter, inputValue, onBeforeTab, onSearch, onTab],
+    [filter, hasTabResult, inputValue, onBeforeTab, onSearch, onTab],
   );
 
   useEffect(() => {

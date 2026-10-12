@@ -236,32 +236,38 @@ export const Conversations = ({
   const allConversations = [...conversations, ...archivedConversations];
   const draftConversations = useDraftConversations(allConversations);
 
-  const {conversations: currentTabConversations, searchInputPlaceholder} = getTabConversations({
-    currentTab,
-    conversations,
-    conversationsFilter,
-    archivedConversations,
-    groupConversations,
-    directConversations,
-    favoriteConversations,
-    channelConversations,
-    isChannelsEnabled,
-    channelAndGroupConversations,
-    draftConversations,
-    searchInputPlaceholders: {
-      searchConversations: translate('searchConversations'),
-      searchGroupConversations: translate('searchGroupConversations'),
-      searchChannelConversations: translate('searchChannelConversations'),
-      searchDirectConversations: translate('searchDirectConversations'),
-      searchFavoriteConversations: translate('searchFavoriteConversations'),
-      searchArchivedConversations: translate('searchArchivedConversations'),
-      searchUnreadConversations: translate('searchUnreadConversations'),
-      searchMentionsConversations: translate('searchMentionsConversations'),
-      searchRepliesConversations: translate('searchRepliesConversations'),
-      searchDraftsConversations: translate('searchDraftsConversations'),
-      searchPingsConversations: translate('searchPingsConversations'),
-    },
-  });
+  const searchInputPlaceholders = {
+    searchConversations: translate('searchConversations'),
+    searchGroupConversations: translate('searchGroupConversations'),
+    searchChannelConversations: translate('searchChannelConversations'),
+    searchDirectConversations: translate('searchDirectConversations'),
+    searchFavoriteConversations: translate('searchFavoriteConversations'),
+    searchArchivedConversations: translate('searchArchivedConversations'),
+    searchUnreadConversations: translate('searchUnreadConversations'),
+    searchMentionsConversations: translate('searchMentionsConversations'),
+    searchRepliesConversations: translate('searchRepliesConversations'),
+    searchDraftsConversations: translate('searchDraftsConversations'),
+    searchPingsConversations: translate('searchPingsConversations'),
+  };
+
+  const getTabConversationsForFilter = (filter: string) => {
+    return getTabConversations({
+      currentTab,
+      conversations,
+      conversationsFilter: filter,
+      archivedConversations,
+      groupConversations,
+      directConversations,
+      favoriteConversations,
+      channelConversations,
+      isChannelsEnabled,
+      channelAndGroupConversations,
+      draftConversations,
+      searchInputPlaceholders,
+    });
+  };
+  const {conversations: currentTabConversations, searchInputPlaceholder} =
+    getTabConversationsForFilter(conversationsFilter);
 
   const currentFolder = labels
     .map(label => {
@@ -304,6 +310,35 @@ export const Conversations = ({
     groupParticipantsConversations,
     isGroupParticipantsVisible,
   ]);
+  const hasSearchTabResult = (query: string) => {
+    const queryConversations = getTabConversationsForFilter(query).conversations;
+    const queryGroupParticipants = getGroupParticipantsConversations({
+      currentTab,
+      conversationRepository,
+      searchRepository,
+      conversationsFilter: query,
+      favoriteConversations,
+      conversations: queryConversations,
+      currentFolder,
+      archivedConversations,
+    });
+    const isQueryGroupParticipantsVisible =
+      isNonEmptyString(query) &&
+      ![SidebarTabs.DIRECTS, SidebarTabs.GROUPS, SidebarTabs.FAVORITES].includes(currentTab) &&
+      queryGroupParticipants.length > 0;
+
+    return (
+      getConversationFocusCandidates({
+        conversations: queryConversations,
+        conversationsFilter: query,
+        currentFolder,
+        currentTab,
+        groupParticipantsConversations: queryGroupParticipants,
+        isGroupParticipantsVisible: isQueryGroupParticipantsVisible,
+      }).length > 0
+    );
+  };
+
   const {
     currentFocus,
     focusMountedConversation,
@@ -442,7 +477,9 @@ export const Conversations = ({
 
   const clearConversationFilter = useCallback(() => {
     setConversationsFilter('');
-    setSearchResetToken(previous => previous + 1);
+    setSearchResetToken(previous => {
+      return previous + 1;
+    });
   }, []);
 
   const switchList = listViewModel.switchList;
@@ -634,7 +671,10 @@ export const Conversations = ({
             searchInputPlaceholder={searchInputPlaceholder}
             onSearchEnterClick={activateSearchResult}
             onSearchTab={focusSearchResult}
-            onBeforeSearchTab={() => cancelPendingFocusRef.current?.()}
+            hasSearchTabResult={hasSearchTabResult}
+            onBeforeSearchTab={() => {
+              return cancelPendingFocusRef.current?.();
+            }}
             jumpToRecentSearch={jumpToRecentSearch}
             searchInputRef={searchInputRef}
             isListCollapsed={isConversationListCollapsed}

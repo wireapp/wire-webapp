@@ -24,17 +24,21 @@ import {getGroupParticipantsConversations} from './getGroupParticipantsConversat
 import {SidebarTabs} from './useSidebarStore';
 
 const getGroupsByName = jest.fn().mockReturnValue([]);
-const normalizeQuery = jest.fn((query: string) => ({query: query.trim().toLowerCase(), isHandleQuery: false}));
-
-const createParams = (conversationsFilter: string) => ({
-  currentTab: SidebarTabs.RECENT,
-  conversationRepository: {getGroupsByName} as unknown as ConversationRepository,
-  searchRepository: {normalizeQuery} as unknown as SearchRepository,
-  conversationsFilter,
-  favoriteConversations: [],
-  conversations: [],
-  archivedConversations: [],
+const normalizeQuery = jest.fn((query: string) => {
+  return {query: query.trim().toLowerCase(), isHandleQuery: false};
 });
+
+const createParams = (conversationsFilter: string) => {
+  return {
+    currentTab: SidebarTabs.RECENT,
+    conversationRepository: {getGroupsByName} as unknown as ConversationRepository,
+    searchRepository: {normalizeQuery} as unknown as SearchRepository,
+    conversationsFilter,
+    favoriteConversations: [],
+    conversations: [],
+    archivedConversations: [],
+  };
+};
 
 describe('getGroupParticipantsConversations', () => {
   beforeEach(() => {

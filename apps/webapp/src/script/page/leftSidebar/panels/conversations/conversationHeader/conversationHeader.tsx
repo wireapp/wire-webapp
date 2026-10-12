@@ -67,6 +67,7 @@ interface ConversationHeaderProps {
   currentFolder?: ConversationLabel;
   onSearchEnterClick: (event: KeyboardEvent<HTMLInputElement>) => boolean;
   onSearchTab: (event: KeyboardEvent<HTMLInputElement>) => void;
+  hasSearchTabResult: (query: string) => boolean;
   onBeforeSearchTab: () => void;
   jumpToRecentSearch: () => void;
   searchInputRef: MutableRefObject<HTMLInputElement | null>;
@@ -84,6 +85,7 @@ export const ConversationHeaderComponent = ({
   searchInputPlaceholder,
   onSearchEnterClick,
   onSearchTab,
+  hasSearchTabResult,
   onBeforeSearchTab,
   jumpToRecentSearch,
   searchInputRef,
@@ -94,10 +96,10 @@ export const ConversationHeaderComponent = ({
   const {inputValue, changeInput, clear, enter, tab} = useConversationSearch({
     clock,
     filter: searchValue,
-    setFilter: onSearchChange,
     onSearch: onSearchChange,
     onEnter: onSearchEnterClick,
     onTab: onSearchTab,
+    hasTabResult: hasSearchTabResult,
     onBeforeTab: onBeforeSearchTab,
   });
   const {canCreateGroupConversation} = generatePermissionHelpers(selfUser.teamRole());
@@ -120,7 +122,9 @@ export const ConversationHeaderComponent = ({
 
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     handleEscDown(event, clear);
-    handleEnterDown(event, () => enter(event));
+    handleEnterDown(event, () => {
+      return enter(event);
+    });
 
     if (!event.shiftKey && isTabKey(event)) {
       tab(event);
@@ -223,7 +227,9 @@ export const ConversationHeaderComponent = ({
           ref={searchInputRef}
           className="label-1"
           value={inputValue}
-          onChange={event => changeInput(event.currentTarget.value)}
+          onChange={event => {
+            return changeInput(event.currentTarget.value);
+          }}
           startContent={<SearchIcon width={14} height={14} css={searchIconStyles} />}
           endContent={
             inputValue.length > 0 ? (

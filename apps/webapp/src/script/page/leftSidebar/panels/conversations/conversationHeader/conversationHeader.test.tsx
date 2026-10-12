@@ -41,6 +41,9 @@ describe('ConversationHeader', () => {
     onSearchTab = jest.fn(),
     onSearchEnterClick = jest.fn(),
     onSearchChange = jest.fn(),
+    hasSearchTabResult = jest.fn(() => {
+      return true;
+    }),
     searchValue = 'search',
     clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
   } = {}) => {
@@ -59,6 +62,7 @@ describe('ConversationHeader', () => {
           currentFolder={undefined}
           onSearchEnterClick={onSearchEnterClick}
           onSearchTab={onSearchTab}
+          hasSearchTabResult={hasSearchTabResult}
           onBeforeSearchTab={jest.fn()}
           jumpToRecentSearch={jest.fn()}
           searchInputRef={createRef()}
@@ -79,7 +83,9 @@ describe('ConversationHeader', () => {
     expect(input).toHaveValue('searcha');
     expect(onSearchChange).not.toHaveBeenCalled();
 
-    act(() => clock.advanceByMilliseconds(200));
+    act(() => {
+      return clock.advanceByMilliseconds(200);
+    });
     expect(onSearchChange).toHaveBeenCalledWith('searcha');
   });
 

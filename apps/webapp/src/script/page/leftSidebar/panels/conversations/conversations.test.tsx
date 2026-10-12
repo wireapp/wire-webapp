@@ -148,7 +148,6 @@ describe('Conversations', () => {
     await act(async () => {
       searchInput.dispatchEvent(searchTabEvent);
     });
-    });
     expect(searchTabEvent.defaultPrevented).toBe(true);
     expect(firstResult).toHaveFocus();
 
@@ -244,27 +243,37 @@ describe('Conversations', () => {
     expect(queryByText('Bob')).toBeInTheDocument();
     expect(lookupGroups).not.toHaveBeenCalled();
 
-    act(() => wallClock.advanceByMilliseconds(199));
+    act(() => {
+      return wallClock.advanceByMilliseconds(199);
+    });
     await user.type(searchInput, 'ce');
-    act(() => wallClock.advanceByMilliseconds(1));
+    act(() => {
+      return wallClock.advanceByMilliseconds(1);
+    });
     expect(searchInput).toHaveValue('Alice');
     expect(queryByText('Bob')).toBeInTheDocument();
     expect(lookupGroups).not.toHaveBeenCalled();
 
     await user.clear(searchInput);
-    act(() => wallClock.advanceByMilliseconds(200));
+    act(() => {
+      return wallClock.advanceByMilliseconds(200);
+    });
     expect(searchInput).toHaveValue('');
     expect(lookupGroups).not.toHaveBeenCalled();
 
     await user.type(searchInput, 'Alice');
-    act(() => wallClock.advanceByMilliseconds(200));
+    act(() => {
+      return wallClock.advanceByMilliseconds(200);
+    });
     expect(lookupGroups).toHaveBeenCalledWith('alice', false);
     expect(queryByText('Bob')).not.toBeInTheDocument();
 
     await user.type(searchInput, 's');
     unmount();
     lookupGroups.mockClear();
-    act(() => wallClock.advanceByMilliseconds(200));
+    act(() => {
+      return wallClock.advanceByMilliseconds(200);
+    });
     expect(lookupGroups).not.toHaveBeenCalled();
   });
 
@@ -276,7 +285,9 @@ describe('Conversations', () => {
     const callState = {activeCalls: observable([]), joinableCalls: observable([])} as unknown as CallState;
     const wallClock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
     const rootContext = createRootContextValueForTest({translate: translateForTest, clock: wallClock});
-    const navigate = jest.spyOn(Router, 'navigate').mockImplementation(() => undefined);
+    const navigate = jest.spyOn(Router, 'navigate').mockImplementation(() => {
+      return undefined;
+    });
     window.HTMLElement.prototype.scrollTo = jest.fn();
     window.HTMLElement.prototype.scrollIntoView = jest.fn();
 
@@ -301,7 +312,9 @@ describe('Conversations', () => {
     expect(navigate).toHaveBeenCalledWith(expect.stringContaining(bob.id));
     expect(getByRole('textbox')).toHaveValue('');
     navigate.mockClear();
-    act(() => wallClock.advanceByMilliseconds(200));
+    act(() => {
+      return wallClock.advanceByMilliseconds(200);
+    });
     expect(navigate).not.toHaveBeenCalled();
     navigate.mockRestore();
   });
@@ -365,9 +378,15 @@ describe('Conversations', () => {
     const user = userEvent.setup();
 
     await user.type(getByRole('textbox'), 'Alice');
-    act(() => useSidebarStore.setState({currentTab: SidebarTabs.FAVORITES}));
-    act(() => useSidebarStore.setState({currentTab: SidebarTabs.RECENT}));
-    act(() => clock.advanceByMilliseconds(200));
+    act(() => {
+      return useSidebarStore.setState({currentTab: SidebarTabs.FAVORITES});
+    });
+    act(() => {
+      return useSidebarStore.setState({currentTab: SidebarTabs.RECENT});
+    });
+    act(() => {
+      return clock.advanceByMilliseconds(200);
+    });
 
     expect(getByRole('textbox')).toHaveValue('');
     expect(lookupGroups).not.toHaveBeenCalled();
@@ -398,7 +417,9 @@ describe('Conversations', () => {
 
     await user.type(getByRole('textbox'), 'Alice');
     await user.click(getByTitle('conversationLabelFavorites'));
-    act(() => wallClock.advanceByMilliseconds(200));
+    act(() => {
+      return wallClock.advanceByMilliseconds(200);
+    });
 
     expect(useSidebarStore.getState().currentTab).toBe(SidebarTabs.FAVORITES);
     expect(lookupGroups).not.toHaveBeenCalled();

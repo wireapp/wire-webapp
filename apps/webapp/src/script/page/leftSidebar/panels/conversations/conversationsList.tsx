@@ -106,14 +106,26 @@ const ConversationRow = React.memo(
         conversation={conversation}
         dataUieName="item-conversation"
         isFocused={isFocused}
-        isSelected={() => isActive}
+        isSelected={() => {
+          return isActive;
+        }}
         showJoinButton={showJoinButton}
         registerConversationElement={registerConversationElement}
-        handleArrowKeyDown={event => handlersRef.current.handleArrowKeyDown(conversation.id)(event)}
-        onClick={event => handlersRef.current.onConversationClick(conversation)(event)}
-        resetConversationFocus={() => handlersRef.current.resetConversationFocus()}
-        onJoinCall={conversation => handlersRef.current.answerCall(conversation)}
-        rightClick={(conversation, event) => handlersRef.current.openContextMenu(conversation, event)}
+        handleArrowKeyDown={event => {
+          return handlersRef.current.handleArrowKeyDown(conversation.id)(event);
+        }}
+        onClick={event => {
+          return handlersRef.current.onConversationClick(conversation)(event);
+        }}
+        resetConversationFocus={() => {
+          return handlersRef.current.resetConversationFocus();
+        }}
+        onJoinCall={conversation => {
+          return handlersRef.current.answerCall(conversation);
+        }}
+        rightClick={(conversation, event) => {
+          return handlersRef.current.openContextMenu(conversation, event);
+        }}
         listItemCss={virtualStart !== undefined ? virtualizationStyles : undefined}
         listItemStyle={
           virtualStart !== undefined && virtualSize !== undefined
@@ -435,14 +447,16 @@ export const ConversationsList = ({
     };
   });
 
-  const getCommonConversationRowProps = (conversation: Conversation) => ({
-    conversation,
-    isFocused: currentFocus === conversation.id,
-    isActive: isActiveConversation(conversation),
-    showJoinButton: hasJoinableCall(conversation),
-    handlersRef: rowHandlersRef,
-    registerConversationElement,
-  });
+  const getCommonConversationRowProps = (conversation: Conversation) => {
+    return {
+      conversation,
+      isFocused: currentFocus === conversation.id,
+      isActive: isActiveConversation(conversation),
+      showJoinButton: hasJoinableCall(conversation),
+      handlersRef: rowHandlersRef,
+      registerConversationElement,
+    };
+  };
 
   useEffect(() => {
     if (!isNonEmptyString(conversationsFilter) && isNonEmptyString(clickedFilteredConversationId)) {
@@ -478,9 +492,9 @@ export const ConversationsList = ({
           data-uie-name="group-participants-conversations-view"
           className="group-participants-conversations"
         >
-          {groupParticipantsConversations.map(conversation => (
-            <ConversationRow key={conversation.id} {...getCommonConversationRowProps(conversation)} />
-          ))}
+          {groupParticipantsConversations.map(conversation => {
+            return <ConversationRow key={conversation.id} {...getCommonConversationRowProps(conversation)} />;
+          })}
         </ul>
       </li>
     );

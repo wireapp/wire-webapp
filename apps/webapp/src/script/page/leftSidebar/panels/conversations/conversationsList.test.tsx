@@ -17,14 +17,23 @@
  *
  */
 
-jest.mock('@tanstack/react-virtual', () => ({
-  useVirtualizer: ({count}: {count: number}) => ({
-    getVirtualItems: () =>
-      Array.from({length: count}, (_, index) => ({index, key: index, size: 56, start: index * 56})),
-    getTotalSize: () => count * 56, // default estimated row size
-    scrollToIndex: jest.fn(),
-  }),
-}));
+jest.mock('@tanstack/react-virtual', () => {
+  return {
+    useVirtualizer: ({count}: {count: number}) => {
+      return {
+        getVirtualItems: () => {
+          return Array.from({length: count}, (_, index) => {
+            return {index, key: index, size: 56, start: index * 56};
+          });
+        },
+        getTotalSize: () => {
+          return count * 56;
+        }, // default estimated row size
+        scrollToIndex: jest.fn(),
+      };
+    },
+  };
+});
 
 import {createRef} from 'react';
 
@@ -120,36 +129,41 @@ describe('ConversationsList', () => {
     const conversations = ['Alice', 'Bob', 'Charlie'].map(create1to1Conversation);
     currentFocus = conversations[0].id;
 
-    const renderList = () => (
-      <ConversationsList
-        conversationLabelRepository={conversationLabelRepository}
-        conversations={conversations}
-        conversationFocusCandidates={conversations}
-        conversationsFilter=""
-        listViewModel={listViewModel}
-        connectRequests={connectRequests}
-        conversationState={conversationState}
-        callState={callState}
-        currentFocus={currentFocus}
-        currentFolder={currentFolder}
-        resetConversationFocus={resetConversationFocus}
-        handleArrowKeyDown={handleArrowKeyDown}
-        clearSearchFilter={clearSearchFilter}
-        groupParticipantsConversations={[]}
-        isGroupParticipantsVisible={false}
-        isEmpty={false}
-      />
-    );
+    const renderList = () => {
+      return (
+        <ConversationsList
+          conversationLabelRepository={conversationLabelRepository}
+          conversations={conversations}
+          conversationFocusCandidates={conversations}
+          conversationsFilter=""
+          listViewModel={listViewModel}
+          connectRequests={connectRequests}
+          conversationState={conversationState}
+          callState={callState}
+          currentFocus={currentFocus}
+          currentFolder={currentFolder}
+          resetConversationFocus={resetConversationFocus}
+          handleArrowKeyDown={handleArrowKeyDown}
+          clearSearchFilter={clearSearchFilter}
+          groupParticipantsConversations={[]}
+          isGroupParticipantsVisible={false}
+          isEmpty={false}
+        />
+      );
+    };
     const {container, rerender} = render(renderList(), {wrapper: rootProviderWrapper});
-    const buttonFor = (conversation: Conversation) =>
-      container.querySelector<HTMLElement>(
+    const buttonFor = (conversation: Conversation) => {
+      return container.querySelector<HTMLElement>(
         `[data-uie-uid="${conversation.id}"] [data-uie-name="go-open-conversation"]`,
       );
+    };
 
     expect(buttonFor(conversations[0])).toHaveAttribute('tabindex', '0');
 
     const previousArrowHandler = handleArrowKeyDown;
-    handleArrowKeyDown = jest.fn(() => jest.fn());
+    handleArrowKeyDown = jest.fn(() => {
+      return jest.fn();
+    });
     currentFocus = conversations[1].id;
     rerender(renderList());
 
