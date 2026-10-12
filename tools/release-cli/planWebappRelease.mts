@@ -18,6 +18,7 @@
  */
 
 import {isError, isString} from '@sindresorhus/is';
+import {Command, CommanderError} from 'commander';
 
 import {execFile} from 'node:child_process';
 import {resolve} from 'node:path';
@@ -25,8 +26,11 @@ import process from 'node:process';
 import {fileURLToPath} from 'node:url';
 import {promisify} from 'node:util';
 
-import type {PlanWebAppReleaseCommandOptions} from './webAppReleasePlanCli.ts';
-import {runWebAppReleasePlanCommand} from './webAppReleasePlanCli.ts';
+import {
+  runWebAppReleasePlanCommand,
+  type PlanWebAppReleaseCommandOptions,
+  type WebAppReleasePlanCommandOptions,
+} from './webAppReleasePlanCli.ts';
 
 import {createRuntimeKyHttpClient} from '../release-appearance/httpClient.ts';
 import {readWebAppReleaseHistory} from '../release-metadata/webappReleaseHistoryGit.ts';
@@ -35,7 +39,6 @@ import type {ReadFirstParentHistory} from '../release-metadata/webappReleasePlan
 import {createWebAppReleasePlanningGitHubClient} from '../release-metadata/webappReleasePlanningGitHubClient.ts';
 
 const executeFile = promisify(execFile);
-const runtimeCommandLineArgumentStartIndex = 2;
 
 async function executeRuntimeGitCommand(commandArguments: readonly string[]): Promise<string> {
   const commandResult = await executeFile('git', [...commandArguments], {encoding: 'utf8'});
@@ -81,13 +84,43 @@ async function executeRuntimePlan(
   });
 }
 
+function createCommand(commandOptions: WebAppReleasePlanCommandOptions): Command {
+  return new Command()
+    .name('planWebappRelease')
+    .description('Plan the next WebApp release from merged pull requests.')
+    .argument('<current-version>')
+    .argument('<base-commit>')
+    .argument('<target-commit>')
+    .configureOutput({
+      writeOut: commandOptions.writeOutput,
+      writeErr: commandOptions.writeError,
+    })
+    .exitOverride()
+    .action(async (currentVersion: string, baseCommit: string, targetCommit: string) => {
+      process.exitCode = await runWebAppReleasePlanCommand([currentVersion, baseCommit, targetCommit], commandOptions);
+    });
+}
+
 async function main(): Promise<void> {
-  process.exitCode = await runWebAppReleasePlanCommand(process.argv.slice(runtimeCommandLineArgumentStartIndex), {
+  const commandOptions: WebAppReleasePlanCommandOptions = {
     environment: process.env,
     planWebAppRelease: executeRuntimePlan,
     writeError: writeRuntimeError,
     writeOutput: writeRuntimeOutput,
-  });
+  };
+  const command = createCommand(commandOptions);
+
+  try {
+    await command.parseAsync(process.argv);
+  } catch (error: unknown) {
+    if (error instanceof CommanderError) {
+      process.exitCode = error.exitCode;
+
+      return;
+    }
+
+    throw error;
+  }
 }
 
 function isCurrentModuleEntrypoint(): boolean {

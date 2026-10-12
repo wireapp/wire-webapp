@@ -47,9 +47,19 @@ export type WebAppReleasePlanCommandOptions = {
 
 const fullCommitShaPattern = /^[0-9a-f]{40}$/i;
 const githubRepositoryPartCount = 2;
-const targetCommitArgumentIndex = 2;
-const releasePlanCommandArgumentCount = 3;
 const jsonIndentationSpaces = 2;
+export type WebAppReleasePlanCommandArguments = readonly [
+  currentVersion: string,
+  baseCommit: string,
+  targetCommit: string,
+];
+
+type ExecuteWebAppReleasePlanOptions = {
+  readonly currentVersion: string;
+  readonly baseCommit: string;
+  readonly targetCommit: string;
+  readonly commandOptions: WebAppReleasePlanCommandOptions;
+};
 
 function hasValidGitHubRepositoryFormat(githubRepository: string): boolean {
   const githubRepositoryParts = githubRepository.split('/');
@@ -153,72 +163,32 @@ export function serializeWebAppReleasePlan(plan: WebAppReleasePlan): string {
   );
 }
 
-export async function runWebAppReleasePlanCommand(
-  commandLineArguments: readonly string[],
-  options: WebAppReleasePlanCommandOptions,
-): Promise<number> {
-  const firstCommandLineArgument = commandLineArguments.at(0);
-  const helpWasRequested = firstCommandLineArgument === '--help' || firstCommandLineArgument === '-h';
-  if (commandLineArguments.length === 1 && helpWasRequested) {
-    options.writeOutput('Usage: planWebappRelease <current-version> <base-commit> <target-commit>\n');
-
-    return 0;
-  }
-
-  const currentVersion = commandLineArguments.at(0);
-  const baseCommit = commandLineArguments.at(1);
-  const targetCommit = commandLineArguments.at(targetCommitArgumentIndex);
-
-  if (currentVersion === undefined) {
-    options.writeError("Missing required argument 'current-version'\n");
-
-    return 1;
-  }
-
-  if (baseCommit === undefined) {
-    options.writeError("Missing required argument 'base-commit'\n");
-
-    return 1;
-  }
-
-  if (targetCommit === undefined) {
-    options.writeError("Missing required argument 'target-commit'\n");
-
-    return 1;
-  }
-
-  if (commandLineArguments.length > releasePlanCommandArgumentCount) {
-    options.writeError(
-      'Too many arguments. Usage: planWebappRelease <current-version> <base-commit> <target-commit>\n',
-    );
-
-    return 1;
-  }
-
+async function executeWebAppReleasePlan(options: ExecuteWebAppReleasePlanOptions): Promise<number> {
+  const {currentVersion, baseCommit, targetCommit, commandOptions} = options;
   const currentVersionResult = validateWebAppVersion(currentVersion);
   if (currentVersionResult.isErr) {
-    options.writeError(`${currentVersionResult.error.message}\n`);
+    commandOptions.writeError(`${currentVersionResult.error.message}\n`);
 
     return 1;
   }
 
   const baseCommitResult = validateCommitSha(baseCommit, 'base');
   if (baseCommitResult.isErr) {
-    options.writeError(`${baseCommitResult.error.message}\n`);
+    commandOptions.writeError(`${baseCommitResult.error.message}\n`);
 
     return 1;
   }
 
   const targetCommitResult = validateCommitSha(targetCommit, 'target');
   if (targetCommitResult.isErr) {
-    options.writeError(`${targetCommitResult.error.message}\n`);
+    commandOptions.writeError(`${targetCommitResult.error.message}\n`);
 
     return 1;
   }
 
-  const runtimeEnvironmentResult = readWebAppReleasePlanRuntimeEnvironment(options.environment);
+  const runtimeEnvironmentResult = readWebAppReleasePlanRuntimeEnvironment(commandOptions.environment);
   if (runtimeEnvironmentResult.isErr) {
-    options.writeError(`${runtimeEnvironmentResult.error.message}\n`);
+    commandOptions.writeError(`${runtimeEnvironmentResult.error.message}\n`);
 
     return 1;
   }
@@ -226,7 +196,7 @@ export async function runWebAppReleasePlanCommand(
   const {value: runtimeEnvironment} = runtimeEnvironmentResult;
 
   try {
-    const planResult = await options.planWebAppRelease({
+    const planResult = await commandOptions.planWebAppRelease({
       currentVersion: currentVersionResult.value,
       baseCommit: baseCommitResult.value,
       targetCommit: targetCommitResult.value,
@@ -236,18 +206,29 @@ export async function runWebAppReleasePlanCommand(
     });
 
     if (planResult.isErr) {
-      options.writeError(`${redactSecret(planResult.error.message, runtimeEnvironment.githubToken)}\n`);
+      commandOptions.writeError(`${redactSecret(planResult.error.message, runtimeEnvironment.githubToken)}\n`);
 
       return 1;
     }
 
-    options.writeOutput(`${serializeWebAppReleasePlan(planResult.value)}\n`);
+    commandOptions.writeOutput(`${serializeWebAppReleasePlan(planResult.value)}\n`);
 
     return 0;
   } catch (error: unknown) {
-    const githubToken = isString(options.environment.GITHUB_TOKEN) ? options.environment.GITHUB_TOKEN : '';
-    options.writeError(`${redactSecret(readErrorMessage(error), githubToken)}\n`);
+    const githubToken = isString(commandOptions.environment.GITHUB_TOKEN)
+      ? commandOptions.environment.GITHUB_TOKEN
+      : '';
+    commandOptions.writeError(`${redactSecret(readErrorMessage(error), githubToken)}\n`);
 
     return 1;
   }
+}
+
+export async function runWebAppReleasePlanCommand(
+  commandLineArguments: WebAppReleasePlanCommandArguments,
+  options: WebAppReleasePlanCommandOptions,
+): Promise<number> {
+  const [currentVersion, baseCommit, targetCommit] = commandLineArguments;
+
+  return executeWebAppReleasePlan({currentVersion, baseCommit, targetCommit, commandOptions: options});
 }

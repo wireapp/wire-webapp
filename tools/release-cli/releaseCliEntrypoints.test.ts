@@ -43,6 +43,7 @@ const webAppVersionSynchronizationEntrypointPath = join(
   process.cwd(),
   'tools/release-cli/webappVersionSynchronization.mts',
 );
+const webAppReleasePlanningEntrypointPath = join(process.cwd(), 'tools/release-cli/planWebappRelease.mts');
 const ensureProductionGitHubReleaseEntrypointPath = join(
   process.cwd(),
   'tools/release-cli/ensureProductionGitHubRelease.mts',
@@ -347,5 +348,23 @@ describe('preview next Beta CLI entrypoint', () => {
     expect(unknownOptionResult.standardError).toContain("error: unknown option '--unknown-option'");
     expect(missingArgumentResult.exitCode).toBe(1);
     expect(missingArgumentResult.standardError).toContain("error: missing required argument 'target-main-commit-sha'");
+  });
+});
+
+describe('WebApp release planning CLI entrypoint', () => {
+  it('writes help to standard output without requiring runtime credentials', () => {
+    const actualResult = runNativeCommand(webAppReleasePlanningEntrypointPath, ['--help']);
+
+    expect(actualResult.exitCode).toBe(0);
+    expect(actualResult.standardOutput).toContain(
+      'Usage: planWebappRelease [options] <current-version> <base-commit> <target-commit>',
+    );
+  });
+
+  it('rejects missing required arguments before release planning', () => {
+    const actualResult = runNativeCommand(webAppReleasePlanningEntrypointPath, ['1.0.0', 'a'.repeat(40)]);
+
+    expect(actualResult.exitCode).toBe(1);
+    expect(actualResult.standardError).toContain("error: missing required argument 'target-commit'");
   });
 });
