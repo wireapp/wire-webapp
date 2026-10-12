@@ -35,6 +35,7 @@ import type {QualifiedId} from '../../../apiClient/user/qualifiedId';
 import {useApplicationContext, useMainViewModel} from '../../../page/rootProvider';
 import type {User} from '../../../repositories/entity/User';
 import {mapScheduleFormToMeetingCommand} from '../mapScheduleFormToMeetingCommand';
+import {showMeetingLinkConfirmation} from '../meetingLinkConfirmation/meetingLinkConfirmation';
 import {mapScheduleFormToUpdateMeetingCommand} from '../mapScheduleFormToUpdateMeetingCommand';
 import {useMeetingStore} from '../meetingStore/meetingStoreProvider';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from '../meetingSubmitErrors';
@@ -65,6 +66,8 @@ type SubmitMeetingParams = {
   updateMeeting: (command: UpdateMeetingCommand) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
 };
 
+type SubmitMeetingSuccess = ScheduleMeetingSuccess | MeetingSubmitSuccess;
+
 const submitMeeting = ({
   formState,
   mode,
@@ -78,7 +81,7 @@ const submitMeeting = ({
   clock,
   scheduleMeeting,
   updateMeeting,
-}: SubmitMeetingParams): Task<MeetingSubmitSuccess, MeetingSubmitErrors> => {
+}: SubmitMeetingParams): Task<SubmitMeetingSuccess, MeetingSubmitErrors> => {
   if (mode === scheduleMeetingModes.create) {
     const commandResult = mapScheduleFormToMeetingCommand(formState, clock);
 
@@ -211,6 +214,14 @@ export const useScheduleMeetingSubmit = (): UseScheduleMeetingSubmitResult => {
           users: formState.selectedUsers,
           translate,
         });
+
+        setIsSubmitting(false);
+
+        return scheduleMeetingSubmitResults.setupFailed;
+      }
+
+      if (mode === scheduleMeetingModes.create && 'link' in submitResult.value) {
+        showMeetingLinkConfirmation({link: submitResult.value.link, translate});
       }
 
       setIsSubmitting(false);

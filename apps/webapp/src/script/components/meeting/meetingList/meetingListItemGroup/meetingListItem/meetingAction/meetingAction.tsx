@@ -18,6 +18,7 @@
  */
 
 import {MouseEvent, type FunctionComponent} from 'react';
+import {isNullOrUndefined} from '@sindresorhus/is';
 
 import {getMeetingActionEntries} from './getMeetingActionEntries';
 import {iconContainerStyle, iconStyles} from './meetingAction.styles';
@@ -32,6 +33,7 @@ import {useDeleteMeeting} from '../../../../useDeleteMeeting';
 import {useEditMeeting} from '../../../../useEditMeeting';
 import {canDeleteMeetingForAll, canDeleteMeetingForMe} from '../../../../utils/canDeleteMeeting';
 import {canEditMeeting} from '../../../../utils/canEditMeeting';
+import {showMeetingLinkConfirmation} from '../../../../meetingLinkConfirmation/meetingLinkConfirmation';
 
 interface MeetingActionProps {
   meetingInstance: MeetingInstance;
@@ -71,6 +73,13 @@ export const MeetingAction: FunctionComponent<MeetingActionProps> = ({
             fireAndForgetInvoker.fireAndForget(() => {
               return editMeeting(meetingInstance);
             });
+          }
+        },
+        meetingLink: meetingInstance.meetingSeries.link,
+        onCopyMeetingLink: () => {
+          const meetingLink = meetingInstance.meetingSeries.link;
+          if (!isNullOrUndefined(meetingLink)) {
+            showMeetingLinkConfirmation({link: meetingLink, translate});
           }
         },
         onDeleteForAll: () => {
