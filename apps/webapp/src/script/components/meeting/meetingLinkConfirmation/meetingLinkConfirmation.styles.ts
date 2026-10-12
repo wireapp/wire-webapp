@@ -24,3 +24,7 @@ export const meetingLinkConfirmationStyles = {
   marginTop: '32px',
   marginBottom: '-50px',
 };
+
+export const meetingLinkConfirmationInputStyles = {
+  marginTop: '16px',
+};
