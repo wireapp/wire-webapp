@@ -33,6 +33,11 @@ describe('MeetingLinkConfirmationMessage', () => {
     );
 
     expect(screen.getByText('meetings.meetingLink.description')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('https://wire.example/meeting-link')).toHaveAttribute(
+      'aria-describedby',
+      'meeting-link-description',
+    );
+    expect(screen.getByDisplayValue('https://wire.example/meeting-link')).toHaveAttribute('readonly');
     expect(screen.getByRole('button', {name: 'meetings.meetingLink.copyLink'})).toBeInTheDocument();
   });
 });
