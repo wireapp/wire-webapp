@@ -30,6 +30,7 @@ interface CopyToClipboardButtonProps {
   copySuccessText: string;
   onCopySuccess?: () => void;
   disabled?: boolean;
+  variant?: ButtonVariant;
 }
 
 const COPY_CONFIRM_DURATION = 1500;
@@ -40,6 +41,7 @@ export const CopyToClipboardButton = ({
   displayText,
   copySuccessText,
   onCopySuccess,
+  variant = ButtonVariant.TERTIARY,
 }: CopyToClipboardButtonProps) => {
   const [isCopying, setIsCopying] = useState<boolean>(false);
 
@@ -62,7 +64,7 @@ export const CopyToClipboardButton = ({
       type="button"
       disabled={disabled}
       onClick={copyToClipboard}
-      variant={ButtonVariant.TERTIARY}
+      variant={variant}
       data-uie-name="do-copy-to-clipboard"
     >
       <Icon.CopyIcon data-uie-name="copy-to-clipboard-icon" width="16" height="16" css={{marginRight: '10px'}} />
