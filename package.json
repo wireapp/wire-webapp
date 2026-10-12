@@ -156,6 +156,6 @@
       "built": true
     }
   },
-  "version": "0.27.0",
+  "version": "1.0.0",
   "packageManager": "yarn@4.18.1"
 }
