@@ -17,6 +17,11 @@
  *
  */
 
+import {isNullOrUndefined} from '@sindresorhus/is';
+
+import {LinkIcon} from '../../../../../icon';
+import {linkIconStyles} from './getMeetingActionEntries.styles';
+
 import {
   contextMenuDangerItemIconStyles,
   contextMenuDangerItemStyles,
@@ -42,6 +47,8 @@ type GetMeetingActionEntriesParams = {
   onJoin: () => void;
   isJoinDisabled?: boolean;
   onEdit: () => void;
+  onCopyMeetingLink: () => void;
+  meetingLink?: string;
   onDeleteForAll: () => void;
   onDeleteForMe: () => void;
 };
@@ -54,6 +61,8 @@ export const getMeetingActionEntries = ({
   onJoin,
   isJoinDisabled = false,
   onEdit,
+  onCopyMeetingLink,
+  meetingLink,
   onDeleteForAll,
   onDeleteForMe,
 }: GetMeetingActionEntriesParams): ContextMenuEntry[] => {
@@ -72,6 +81,14 @@ export const getMeetingActionEntries = ({
     },
     label: translate(MEETING_ACTION_TRANSLATION_KEYS.editMeeting),
     click: onEdit,
+  };
+
+  const copyMeetingLinkEntry: ContextMenuEntry = {
+    icon: () => {
+      return <LinkIcon css={linkIconStyles} />;
+    },
+    label: translate(MEETING_ACTION_TRANSLATION_KEYS.copyMeetingLink),
+    click: onCopyMeetingLink,
   };
 
   const deleteForMeEntry: ContextMenuEntry = {
@@ -98,6 +115,7 @@ export const getMeetingActionEntries = ({
   return [
     joinEntry,
     ...(canEditMeeting(meetingInstance, selfUser, nowMilliseconds) ? [editEntry] : []),
+    ...(isNullOrUndefined(meetingLink) ? [] : [copyMeetingLinkEntry]),
     ...(showDeleteForAll ? [deleteForAllEntry] : []),
     ...(showDeleteForMe ? [deleteForMeEntry] : []),
   ];
