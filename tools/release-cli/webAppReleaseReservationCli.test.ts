@@ -66,7 +66,7 @@ function createCommandOptions(
 ): WebAppReleaseReservationCommandOptions {
   return {
     environment: runtimeEnvironment,
-    reserveWebAppRelease: async () => {
+    async reserveWebAppRelease() {
       return Result.ok(createTestReservation());
     },
     writeError: noop,
@@ -96,12 +96,12 @@ describe('WebApp release reservation CLI behavior', () => {
     const outputMessages: string[] = [];
     let actualCommandOptions: Parameters<WebAppReleaseReservationCommandOptions['reserveWebAppRelease']>[0] | undefined;
     const commandOptions = createCommandOptions({
-      reserveWebAppRelease: async options => {
+      async reserveWebAppRelease(options) {
         actualCommandOptions = options;
 
         return Result.ok(createTestReservation());
       },
-      writeOutput: message => {
+      writeOutput(message) {
         outputMessages.push(message);
       },
     });
@@ -136,12 +136,12 @@ describe('WebApp release reservation CLI behavior', () => {
     let reservationWasCalled = false;
     const errorMessages: string[] = [];
     const commandOptions = createCommandOptions({
-      reserveWebAppRelease: async () => {
+      async reserveWebAppRelease() {
         reservationWasCalled = true;
 
         return Result.ok(createTestReservation());
       },
-      writeError: message => {
+      writeError(message) {
         errorMessages.push(message);
       },
     });
@@ -158,12 +158,12 @@ describe('WebApp release reservation CLI behavior', () => {
     const errorMessages: string[] = [];
     const commandOptions = createCommandOptions({
       environment: {},
-      reserveWebAppRelease: async () => {
+      async reserveWebAppRelease() {
         reservationWasCalled = true;
 
         return Result.ok(createTestReservation());
       },
-      writeError: message => {
+      writeError(message) {
         errorMessages.push(message);
       },
     });
@@ -179,13 +179,13 @@ describe('WebApp release reservation CLI behavior', () => {
     const errorMessages: string[] = [];
     const outputMessages: string[] = [];
     const commandOptions = createCommandOptions({
-      reserveWebAppRelease: async () => {
+      async reserveWebAppRelease() {
         return Result.err(new Error('GitHub request failed using secret-token'));
       },
-      writeError: message => {
+      writeError(message) {
         errorMessages.push(message);
       },
-      writeOutput: message => {
+      writeOutput(message) {
         outputMessages.push(message);
       },
     });
@@ -200,10 +200,10 @@ describe('WebApp release reservation CLI behavior', () => {
   it('redacts GitHub tokens from thrown reservation failures', async () => {
     const errorMessages: string[] = [];
     const commandOptions = createCommandOptions({
-      reserveWebAppRelease: async () => {
+      async reserveWebAppRelease() {
         throw new Error('Unexpected failure with secret-token');
       },
-      writeError: message => {
+      writeError(message) {
         errorMessages.push(message);
       },
     });

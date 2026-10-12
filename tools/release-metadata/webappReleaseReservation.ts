@@ -17,7 +17,7 @@
  *
  */
 
-import {Result} from 'true-myth';
+import {Maybe, Result} from 'true-myth';
 
 import {
   createStableWebAppTagName,
@@ -209,8 +209,9 @@ async function executeWebAppReleaseReservation(
     return Result.err(new Error(`Multiple unresolved WebApp release reservations exist: ${activeReservationBranches}`));
   }
 
-  const activeReservation = activeReservationsResult.value.at(0);
-  if (activeReservation !== undefined) {
+  const activeReservationMaybe = Maybe.of(activeReservationsResult.value.at(0));
+  if (activeReservationMaybe.isJust) {
+    const activeReservation = activeReservationMaybe.value;
     if (activeReservation.releaseCommitSha !== targetCommit) {
       return Result.err(
         new Error(

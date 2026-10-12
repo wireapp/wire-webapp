@@ -177,12 +177,12 @@ export async function discoverStableWebAppReleases(
 export function selectLatestStableWebAppRelease(
   options: SelectLatestStableWebAppReleaseOptions,
 ): Result<StableWebAppRelease, Error> {
-  const firstStableRelease = options.stableReleases.at(0);
-  if (firstStableRelease === undefined) {
+  const firstStableReleaseMaybe = Maybe.of(options.stableReleases.at(0));
+  if (firstStableReleaseMaybe.isNothing) {
     return Result.err(new Error('No stable WebApp SemVer tag exists; expected an annotated vMAJOR.MINOR.PATCH tag'));
   }
 
-  let latestStableRelease = firstStableRelease;
+  let latestStableRelease = firstStableReleaseMaybe.value;
   for (const stableRelease of options.stableReleases.slice(1)) {
     const versionComparisonResult = compareWebAppVersions(stableRelease.version, latestStableRelease.version);
     if (versionComparisonResult.isErr) {

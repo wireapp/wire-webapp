@@ -17,7 +17,7 @@
  *
  */
 
-import {Result} from 'true-myth';
+import {Maybe, Result} from 'true-myth';
 
 import {validateWebAppVersion} from './webappVersion.ts';
 import type {WebAppVersion} from './webappVersion.ts';
@@ -42,18 +42,23 @@ export function createStableWebAppTagName(version: string): Result<string, Error
 }
 
 export function parseStableWebAppTagName(tagName: string): Result<WebAppVersion, Error> {
-  const tagNameMatch = stableWebAppTagNamePattern.exec(tagName);
-  const versionText = tagNameMatch?.at(1);
-  if (versionText === undefined) {
-    return Result.err(new Error(`Invalid stable WebApp tag name: ${tagName}`));
-  }
+  return Maybe.of(stableWebAppTagNamePattern.exec(tagName))
+    .andThen(tagNameMatch => {
+      return Maybe.of(tagNameMatch.at(1));
+    })
+    .match({
+      Just(versionText) {
+        const versionResult = validateWebAppVersion(versionText);
+        if (versionResult.isErr) {
+          return Result.err(new Error(`Invalid stable WebApp tag name: ${tagName}`, {cause: versionResult.error}));
+        }
 
-  const versionResult = validateWebAppVersion(versionText);
-  if (versionResult.isErr) {
-    return Result.err(new Error(`Invalid stable WebApp tag name: ${tagName}`, {cause: versionResult.error}));
-  }
-
-  return versionResult;
+        return versionResult;
+      },
+      Nothing() {
+        return Result.err(new Error(`Invalid stable WebApp tag name: ${tagName}`));
+      },
+    });
 }
 
 export function createBetaWebAppTagName(version: string, candidateNumber: number): Result<string, Error> {
@@ -70,29 +75,38 @@ export function createBetaWebAppTagName(version: string, candidateNumber: number
 }
 
 export function parseBetaWebAppTagName(tagName: string): Result<ParsedBetaWebAppTagName, Error> {
-  const tagNameMatch = betaWebAppTagNamePattern.exec(tagName);
-  const versionText = tagNameMatch?.at(1);
-  const candidateNumberText = tagNameMatch?.at(betaTagCandidateCaptureIndex);
-  if (versionText === undefined || candidateNumberText === undefined) {
-    return Result.err(new Error(`Invalid WebApp Beta tag name: ${tagName}`));
-  }
+  return Maybe.of(betaWebAppTagNamePattern.exec(tagName))
+    .andThen(tagNameMatch => {
+      return Maybe.of(tagNameMatch.at(1)).andThen(versionText => {
+        return Maybe.of(tagNameMatch.at(betaTagCandidateCaptureIndex)).map(candidateNumberText => {
+          return {versionText, candidateNumberText};
+        });
+      });
+    })
+    .match({
+      Just(parsedBetaTag) {
+        const {versionText, candidateNumberText} = parsedBetaTag;
+        const versionResult = validateWebAppVersion(versionText);
+        if (versionResult.isErr) {
+          return Result.err(new Error(`Invalid WebApp Beta tag name: ${tagName}`, {cause: versionResult.error}));
+        }
 
-  const versionResult = validateWebAppVersion(versionText);
-  if (versionResult.isErr) {
-    return Result.err(new Error(`Invalid WebApp Beta tag name: ${tagName}`, {cause: versionResult.error}));
-  }
+        const candidateNumber = Number(candidateNumberText);
+        if (Number.isSafeInteger(candidateNumber) === false || candidateNumber < 1) {
+          return Result.err(new Error(`Invalid WebApp Beta candidate number in tag: ${tagName}`));
+        }
 
-  const candidateNumber = Number(candidateNumberText);
-  if (Number.isSafeInteger(candidateNumber) === false || candidateNumber < 1) {
-    return Result.err(new Error(`Invalid WebApp Beta candidate number in tag: ${tagName}`));
-  }
-
-  return Result.ok(
-    Object.freeze({
-      version: versionResult.value,
-      candidateNumber,
-    }),
-  );
+        return Result.ok(
+          Object.freeze({
+            version: versionResult.value,
+            candidateNumber,
+          }),
+        );
+      },
+      Nothing() {
+        return Result.err(new Error(`Invalid WebApp Beta tag name: ${tagName}`));
+      },
+    });
 }
 
 export function createWebAppReleaseBranchName(version: string): Result<string, Error> {
@@ -105,16 +119,23 @@ export function createWebAppReleaseBranchName(version: string): Result<string, E
 }
 
 export function parseWebAppReleaseBranchName(branchName: string): Result<WebAppVersion, Error> {
-  const branchNameMatch = webAppReleaseBranchNamePattern.exec(branchName);
-  const versionText = branchNameMatch?.at(1);
-  if (versionText === undefined) {
-    return Result.err(new Error(`Invalid WebApp release branch name: ${branchName}`));
-  }
+  return Maybe.of(webAppReleaseBranchNamePattern.exec(branchName))
+    .andThen(branchNameMatch => {
+      return Maybe.of(branchNameMatch.at(1));
+    })
+    .match({
+      Just(versionText) {
+        const versionResult = validateWebAppVersion(versionText);
+        if (versionResult.isErr) {
+          return Result.err(
+            new Error(`Invalid WebApp release branch name: ${branchName}`, {cause: versionResult.error}),
+          );
+        }
 
-  const versionResult = validateWebAppVersion(versionText);
-  if (versionResult.isErr) {
-    return Result.err(new Error(`Invalid WebApp release branch name: ${branchName}`, {cause: versionResult.error}));
-  }
-
-  return versionResult;
+        return versionResult;
+      },
+      Nothing() {
+        return Result.err(new Error(`Invalid WebApp release branch name: ${branchName}`));
+      },
+    });
 }

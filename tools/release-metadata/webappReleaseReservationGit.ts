@@ -56,6 +56,7 @@ type ParseRemoteReleaseBranchesOptions = {
 
 const fullCommitShaPattern = /^[0-9a-f]{40}$/i;
 const remoteReleaseBranchPrefix = 'refs/heads/release/';
+const remoteReleaseBranchReferenceFieldCount = 2;
 
 function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
@@ -82,17 +83,21 @@ function parseRemoteReleaseBranches(
   });
 
   for (const outputLine of outputLines) {
-    const [commitSha, gitReference, ...unexpectedFields] = outputLine.trim().split(/\s+/);
+    const outputFields = outputLine.trim().split(/\s+/);
+    const commitShaMaybe = Maybe.of(outputFields.at(0));
+    const gitReferenceMaybe = Maybe.of(outputFields.at(1));
     if (
-      commitSha === undefined ||
-      gitReference === undefined ||
-      unexpectedFields.length > 0 ||
-      fullCommitShaPattern.test(commitSha) === false ||
-      gitReference.startsWith(remoteReleaseBranchPrefix) === false
+      commitShaMaybe.isNothing ||
+      gitReferenceMaybe.isNothing ||
+      outputFields.length > remoteReleaseBranchReferenceFieldCount ||
+      fullCommitShaPattern.test(commitShaMaybe.value) === false ||
+      gitReferenceMaybe.value.startsWith(remoteReleaseBranchPrefix) === false
     ) {
       return Result.err(new Error(`Git returned a malformed remote release branch reference: ${outputLine}`));
     }
 
+    const commitSha = commitShaMaybe.value;
+    const gitReference = gitReferenceMaybe.value;
     if (options.expectedReference.length > 0 && gitReference !== options.expectedReference) {
       return Result.err(new Error(`Git returned an unexpected remote reference: ${gitReference}`));
     }
@@ -152,19 +157,20 @@ async function readRemoteWebAppReleaseBranch(
     return Result.err(releaseBranchResult.error);
   }
 
-  const releaseBranch = releaseBranchResult.value.at(0);
+  const releaseBranchMaybe = Maybe.of(releaseBranchResult.value.at(0));
 
-  return Result.ok(Maybe.of(releaseBranch));
+  return Result.ok(releaseBranchMaybe);
 }
 
 function parseCommitCountRange(commandOutput: string): Result<boolean, Error> {
-  const countMatch = /^(\d+)\s+(\d+)$/.exec(commandOutput.trim());
-  const baseOnlyCommitCount = countMatch?.at(1);
-  if (countMatch === null || baseOnlyCommitCount === undefined) {
+  const baseOnlyCommitCountMaybe = Maybe.of(/^(\d+)\s+(\d+)$/.exec(commandOutput.trim())).andThen(countMatch => {
+    return Maybe.of(countMatch.at(1));
+  });
+  if (baseOnlyCommitCountMaybe.isNothing) {
     return Result.err(new Error('Git returned an invalid ancestor check result'));
   }
 
-  return Result.ok(baseOnlyCommitCount === '0');
+  return Result.ok(baseOnlyCommitCountMaybe.value === '0');
 }
 
 export async function isWebAppReleaseCommitAncestor(
@@ -238,7 +244,7 @@ export async function createWebAppReleaseReservationBranch(
   }
 
   return remoteBranchResult.value.match({
-    Just: remoteBranch => {
+    Just(remoteBranch) {
       if (remoteBranch.releaseCommitSha === targetCommit) {
         return Result.ok('reused');
       }
@@ -249,7 +255,7 @@ export async function createWebAppReleaseReservationBranch(
         ),
       );
     },
-    Nothing: () => {
+    Nothing() {
       return Result.err(
         new Error(`Unable to create WebApp release reservation ${options.releaseBranch}: ${pushResult.error.message}`, {
           cause: pushResult.error,

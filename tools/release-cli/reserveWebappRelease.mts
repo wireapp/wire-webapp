@@ -17,8 +17,9 @@
  *
  */
 
-import {isError, isString} from '@sindresorhus/is';
+import {isError} from '@sindresorhus/is';
 import {Command, CommanderError} from 'commander';
+import {Maybe} from 'true-myth';
 
 import {execFile} from 'node:child_process';
 import {resolve} from 'node:path';
@@ -103,22 +104,22 @@ async function executeRuntimeReservation(
   return reserveWebAppRelease({
     targetCommit: options.targetCommit,
     dependencies: {
-      readStableWebAppReleases: async () => {
+      async readStableWebAppReleases() {
         return discoverStableWebAppReleases({executeGitCommand: executeRuntimeGitCommand});
       },
-      readRemoteReleaseBranches: async () => {
+      async readRemoteReleaseBranches() {
         return readRemoteWebAppReleaseBranches({
           executeGitCommand: executeRuntimeGitCommand,
           remoteName: githubRemoteName,
         });
       },
-      isCommitAncestor: async ancestorOptions => {
+      async isCommitAncestor(ancestorOptions) {
         return isWebAppReleaseCommitAncestor({
           ...ancestorOptions,
           executeGitCommand: executeRuntimeGitCommand,
         });
       },
-      planNextWebAppRelease: async planOptions => {
+      async planNextWebAppRelease(planOptions) {
         return planNextWebAppRelease({
           ...options,
           currentVersion: planOptions.currentVersion,
@@ -126,7 +127,7 @@ async function executeRuntimeReservation(
           targetCommit: planOptions.targetCommit,
         });
       },
-      createReleaseBranch: async branchOptions => {
+      async createReleaseBranch(branchOptions) {
         return createWebAppReleaseReservationBranch({
           ...branchOptions,
           executeGitCommand: executeRuntimeGitCommand,
@@ -175,9 +176,14 @@ async function main(): Promise<void> {
 }
 
 function isCurrentModuleEntrypoint(): boolean {
-  const entrypointPath = process.argv[1];
-
-  return isString(entrypointPath) && fileURLToPath(import.meta.url) === resolve(entrypointPath);
+  return Maybe.of(process.argv[1]).match({
+    Just(entrypointPath) {
+      return fileURLToPath(import.meta.url) === resolve(entrypointPath);
+    },
+    Nothing() {
+      return false;
+    },
+  });
 }
 
 function redactSecret(message: string, secret: string): string {
@@ -186,9 +192,16 @@ function redactSecret(message: string, secret: string): string {
 
 function crash(error: unknown): void {
   const message = isError(error) ? error.message : String(error);
-  const githubToken = isString(process.env.GITHUB_TOKEN) ? process.env.GITHUB_TOKEN : '';
+  const redactedMessage = Maybe.of(process.env.GITHUB_TOKEN).match({
+    Just(githubToken) {
+      return redactSecret(message, githubToken);
+    },
+    Nothing() {
+      return message;
+    },
+  });
 
-  writeRuntimeError(redactSecret(message, githubToken));
+  writeRuntimeError(redactedMessage);
   process.exitCode = 1;
 }
 

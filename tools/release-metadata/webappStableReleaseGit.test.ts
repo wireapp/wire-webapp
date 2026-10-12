@@ -68,7 +68,7 @@ function createTemporaryGitRepository(): TemporaryGitRepository {
 
   return {
     directoryPath,
-    executeGitCommand: async commandArguments => {
+    async executeGitCommand(commandArguments) {
       return runGitCommand({arguments: commandArguments, directoryPath});
     },
   };

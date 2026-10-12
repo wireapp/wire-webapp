@@ -23,14 +23,8 @@ import {Maybe, Result} from 'true-myth';
 
 import {planWebAppRelease} from './webappReleasePlan.ts';
 import type {WebAppReleasePlan} from './webappReleasePlan.ts';
-import {
-  inspectActiveWebAppReleaseReservations,
-  reserveWebAppRelease,
-} from './webappReleaseReservation.ts';
-import type {
-  WebAppReleaseBranchRef,
-  WebAppReleaseReservationDependencies,
-} from './webappReleaseReservation.ts';
+import {inspectActiveWebAppReleaseReservations, reserveWebAppRelease} from './webappReleaseReservation.ts';
+import type {WebAppReleaseBranchRef, WebAppReleaseReservationDependencies} from './webappReleaseReservation.ts';
 import type {StableWebAppRelease} from './webappStableReleaseGit.ts';
 import {validateWebAppVersion} from './webappVersion.ts';
 
@@ -83,9 +77,7 @@ function createReleasePlan(nextVersion: string): WebAppReleasePlan {
 
 function createReservationTestDependencies(options: ReservationTestOptions = {}): ReservationTestDependencies {
   const plannerCalls: Array<Parameters<WebAppReleaseReservationDependencies['planNextWebAppRelease']>[0]> = [];
-  const branchCreationCalls: Array<
-    Parameters<WebAppReleaseReservationDependencies['createReleaseBranch']>[0]
-  > = [];
+  const branchCreationCalls: Array<Parameters<WebAppReleaseReservationDependencies['createReleaseBranch']>[0]> = [];
   const stableReleases = options.stableReleases ?? [
     createStableRelease({version: '1.0.0', tagName: 'v1.0.0', commitSha: stableCommit}),
   ];
@@ -94,21 +86,21 @@ function createReservationTestDependencies(options: ReservationTestOptions = {})
     plannerCalls,
     branchCreationCalls,
     dependencies: {
-      readStableWebAppReleases: async () => {
+      async readStableWebAppReleases() {
         return Result.ok(stableReleases);
       },
-      readRemoteReleaseBranches: async () => {
+      async readRemoteReleaseBranches() {
         return Result.ok(options.releaseBranches ?? []);
       },
-      isCommitAncestor: async () => {
+      async isCommitAncestor() {
         return options.ancestorResult ?? Result.ok(true);
       },
-      planNextWebAppRelease: async planOptions => {
+      async planNextWebAppRelease(planOptions) {
         plannerCalls.push(planOptions);
 
         return options.planResult ?? Result.ok(createReleasePlan('1.1.0'));
       },
-      createReleaseBranch: async branchOptions => {
+      async createReleaseBranch(branchOptions) {
         branchCreationCalls.push(branchOptions);
 
         return Result.ok(options.branchAction ?? 'created');
@@ -151,9 +143,7 @@ describe('WebApp release reservation inspection', () => {
     });
 
     assert(actualReservationsResult.isOk);
-    expect(actualReservationsResult.value).toEqual([
-      {releaseBranch: 'release/1.1.0', releaseCommitSha: targetCommit},
-    ]);
+    expect(actualReservationsResult.value).toEqual([{releaseBranch: 'release/1.1.0', releaseCommitSha: targetCommit}]);
   });
 
   it('fails closed for a malformed SemVer-shaped release branch', () => {
@@ -186,12 +176,8 @@ describe('WebApp release reservation allocation', () => {
       stableBaseCommitSha: stableCommit,
       action: 'created',
     });
-    expect(testDependencies.plannerCalls).toEqual([
-      {currentVersion: '1.0.0', baseCommit: stableCommit, targetCommit},
-    ]);
-    expect(testDependencies.branchCreationCalls).toEqual([
-      {releaseBranch: 'release/1.1.0', targetCommit},
-    ]);
+    expect(testDependencies.plannerCalls).toEqual([{currentVersion: '1.0.0', baseCommit: stableCommit, targetCommit}]);
+    expect(testDependencies.branchCreationCalls).toEqual([{releaseBranch: 'release/1.1.0', targetCommit}]);
   });
 
   it('does not create a reservation when the release planner fails', async () => {
@@ -206,9 +192,7 @@ describe('WebApp release reservation allocation', () => {
 
     assert(actualReservationResult.isErr);
     expect(actualReservationResult.error.message).toBe('Release planning failed');
-    expect(testDependencies.plannerCalls).toEqual([
-      {currentVersion: '1.0.0', baseCommit: stableCommit, targetCommit},
-    ]);
+    expect(testDependencies.plannerCalls).toEqual([{currentVersion: '1.0.0', baseCommit: stableCommit, targetCommit}]);
     expect(testDependencies.branchCreationCalls).toEqual([]);
   });
 
@@ -327,20 +311,20 @@ describe('WebApp release reservation allocation', () => {
     const plannerCalls: Array<Parameters<WebAppReleaseReservationDependencies['planNextWebAppRelease']>[0]> = [];
     const dependencies: WebAppReleaseReservationDependencies = {
       ...testDependencies.dependencies,
-      planNextWebAppRelease: async planOptions => {
+      async planNextWebAppRelease(planOptions) {
         plannerCalls.push(planOptions);
 
         return planWebAppRelease({
           ...planOptions,
           dependencies: {
-            readFirstParentHistory: async () => {
+            async readFirstParentHistory() {
               return Result.ok({
                 baseCommit: stableCommit,
                 targetCommit,
                 commits: [otherCommit],
               });
             },
-            listPullRequestsForCommit: async () => {
+            async listPullRequestsForCommit() {
               return Result.ok([
                 {
                   number: 6789,

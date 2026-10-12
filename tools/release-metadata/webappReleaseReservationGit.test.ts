@@ -81,8 +81,14 @@ function createTemporaryRemoteRepository(): TemporaryRemoteRepository {
   const remoteDirectoryPath = join(temporaryDirectoryPath, 'remote.git');
   const workingDirectoryPath = join(temporaryDirectoryPath, 'working-copy');
 
-  runGitCommand({arguments: ['init', '--bare', '--quiet', remoteDirectoryPath], workingDirectoryPath: temporaryDirectoryPath});
-  runGitCommand({arguments: ['clone', '--quiet', remoteDirectoryPath, workingDirectoryPath], workingDirectoryPath: temporaryDirectoryPath});
+  runGitCommand({
+    arguments: ['init', '--bare', '--quiet', remoteDirectoryPath],
+    workingDirectoryPath: temporaryDirectoryPath,
+  });
+  runGitCommand({
+    arguments: ['clone', '--quiet', remoteDirectoryPath, workingDirectoryPath],
+    workingDirectoryPath: temporaryDirectoryPath,
+  });
   runGitCommand({arguments: ['checkout', '--quiet', '-b', 'main'], workingDirectoryPath});
   runGitCommand({arguments: ['config', 'user.name', 'Release Test'], workingDirectoryPath});
   runGitCommand({arguments: ['config', 'user.email', 'release-test@example.invalid'], workingDirectoryPath});
@@ -114,7 +120,7 @@ function createTemporaryRemoteRepository(): TemporaryRemoteRepository {
     stableCommit,
     targetCommit,
     laterCommit,
-    executeGitCommand: async commandArguments => {
+    async executeGitCommand(commandArguments) {
       return runGitCommand({arguments: commandArguments, workingDirectoryPath});
     },
   };
@@ -124,9 +130,11 @@ function createConcurrentGitExecutor(options: SimulateConcurrentPushOptions): Ex
   let concurrentPushCompleted = false;
 
   return async function executeGitCommand(commandArguments): Promise<string> {
-    const isReservationPush = commandArguments.at(0) === 'push' && commandArguments.some(commandArgument => {
-      return commandArgument.endsWith(`:refs/heads/${options.releaseBranch}`);
-    });
+    const isReservationPush =
+      commandArguments.at(0) === 'push' &&
+      commandArguments.some(commandArgument => {
+        return commandArgument.endsWith(`:refs/heads/${options.releaseBranch}`);
+      });
 
     if (isReservationPush && concurrentPushCompleted === false) {
       runGitCommand({
@@ -259,12 +267,7 @@ describe('WebApp release reservation Git adapter', () => {
 
     try {
       runGitCommand({
-        arguments: [
-          'push',
-          '--quiet',
-          'origin',
-          `${temporaryRepository.stableCommit}:refs/heads/release/1.1.0`,
-        ],
+        arguments: ['push', '--quiet', 'origin', `${temporaryRepository.stableCommit}:refs/heads/release/1.1.0`],
         workingDirectoryPath: temporaryRepository.workingDirectoryPath,
       });
 

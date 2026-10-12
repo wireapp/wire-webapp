@@ -17,8 +17,8 @@
  *
  */
 
-import {isError, isString} from '@sindresorhus/is';
-import {Result} from 'true-myth';
+import {isError} from '@sindresorhus/is';
+import {Maybe, Result} from 'true-myth';
 
 import {readWebAppReleasePlanRuntimeEnvironment} from './webAppReleasePlanCli.ts';
 import type {WebAppReleasePlanRuntimeEnvironment} from './webAppReleasePlanCli.ts';
@@ -110,10 +110,16 @@ async function executeWebAppReleaseReservationCommand(
 
     return 0;
   } catch (error: unknown) {
-    const githubToken = isString(commandOptions.environment.GITHUB_TOKEN)
-      ? commandOptions.environment.GITHUB_TOKEN
-      : '';
-    commandOptions.writeError(`${redactGitHubSecret(readErrorMessage(error), githubToken)}\n`);
+    const errorMessage = readErrorMessage(error);
+    const redactedErrorMessage = Maybe.of(commandOptions.environment.GITHUB_TOKEN).match({
+      Just(githubToken) {
+        return redactGitHubSecret(errorMessage, githubToken);
+      },
+      Nothing() {
+        return errorMessage;
+      },
+    });
+    commandOptions.writeError(`${redactedErrorMessage}\n`);
 
     return 1;
   }

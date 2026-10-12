@@ -47,18 +47,14 @@ describe('WebApp SemVer release identity', () => {
     expect(actualVersionResult.value).toBe('1.4.7');
   });
 
-  it.each([
-    '1.0.0',
-    'v1.0',
-    'v01.0.0',
-    'v1.0.0-beta.1',
-    'v1.0.0+build',
-    'v1.0.0-production',
-  ])('rejects invalid stable WebApp tag %s', tagName => {
-    const actualVersionResult = parseStableWebAppTagName(tagName);
+  it.each(['1.0.0', 'v1.0', 'v01.0.0', 'v1.0.0-beta.1', 'v1.0.0+build', 'v1.0.0-production'])(
+    'rejects invalid stable WebApp tag %s',
+    tagName => {
+      const actualVersionResult = parseStableWebAppTagName(tagName);
 
-    assert(actualVersionResult.isErr);
-  });
+      assert(actualVersionResult.isErr);
+    },
+  );
 
   it.each([
     {version: '1.4.0', candidateNumber: 1, expectedTagName: 'v1.4.0-beta.1'},
