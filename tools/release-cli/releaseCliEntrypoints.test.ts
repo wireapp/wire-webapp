@@ -44,6 +44,7 @@ const webAppVersionSynchronizationEntrypointPath = join(
   'tools/release-cli/webappVersionSynchronization.mts',
 );
 const webAppReleasePlanningEntrypointPath = join(process.cwd(), 'tools/release-cli/planWebappRelease.mts');
+const webAppReleaseReservationEntrypointPath = join(process.cwd(), 'tools/release-cli/reserveWebappRelease.mts');
 const ensureProductionGitHubReleaseEntrypointPath = join(
   process.cwd(),
   'tools/release-cli/ensureProductionGitHubRelease.mts',
@@ -366,5 +367,28 @@ describe('WebApp release planning CLI entrypoint', () => {
 
     expect(actualResult.exitCode).toBe(1);
     expect(actualResult.standardError).toContain("error: missing required argument 'target-commit'");
+  });
+});
+
+describe('WebApp release reservation CLI entrypoint', () => {
+  it('writes help to standard output without requiring runtime credentials', () => {
+    const actualResult = runNativeCommand(webAppReleaseReservationEntrypointPath, ['--help']);
+
+    expect(actualResult.exitCode).toBe(0);
+    expect(actualResult.standardOutput).toContain('Usage: reserveWebappRelease [options] <target-main-commit>');
+  });
+
+  it('rejects a missing target commit', () => {
+    const actualResult = runNativeCommand(webAppReleaseReservationEntrypointPath, []);
+
+    expect(actualResult.exitCode).toBe(1);
+    expect(actualResult.standardError).toContain("error: missing required argument 'target-main-commit'");
+  });
+
+  it('rejects a malformed target commit before reading runtime credentials', () => {
+    const actualResult = runNativeCommand(webAppReleaseReservationEntrypointPath, ['malformed-sha']);
+
+    expect(actualResult.exitCode).toBe(1);
+    expect(actualResult.standardError).toContain('Invalid target commit');
   });
 });
