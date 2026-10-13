@@ -75,7 +75,7 @@ export const MeetingAction = ({meetingInstance, selfUser, joinMeeting, isJoinDis
           }
         },
         meetingLink: meetingInstance.meetingSeries.link,
-        onCopyMeetingLink: () => {
+        onShowMeetingLink: () => {
           const meetingLink = meetingInstance.meetingSeries.link;
           if (!isNullOrUndefined(meetingLink)) {
             showMeetingLinkConfirmation({link: meetingLink, translate});

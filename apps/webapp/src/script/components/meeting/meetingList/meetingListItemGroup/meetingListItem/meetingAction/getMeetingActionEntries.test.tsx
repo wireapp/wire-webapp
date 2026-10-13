@@ -94,7 +94,7 @@ const getJoinEntry = (entries: ReturnType<typeof getMeetingActionEntries>) => {
   });
 };
 
-const getCopyMeetingLinkEntry = (
+const getShowMeetingLinkEntry = (
   entries: ReturnType<typeof getMeetingActionEntries>,
 ): MaybeType<ReturnType<typeof getMeetingActionEntries>[number]> => {
   return Maybe.find(entry => {
@@ -118,7 +118,7 @@ describe('getMeetingActionEntries', () => {
       onJoin: noop,
       isJoinDisabled: false,
       onEdit: jest.fn(),
-      onCopyMeetingLink: noop,
+      onShowMeetingLink: noop,
       onDeleteForAll: noop,
       onDeleteForMe: noop,
     });
@@ -143,7 +143,7 @@ describe('getMeetingActionEntries', () => {
         onJoin,
         isJoinDisabled: false,
         onEdit: noop,
-        onCopyMeetingLink: noop,
+        onShowMeetingLink: noop,
         onDeleteForAll: noop,
         onDeleteForMe: noop,
       });
@@ -164,7 +164,7 @@ describe('getMeetingActionEntries', () => {
       translate,
       onJoin: noop,
       onEdit: jest.fn(),
-      onCopyMeetingLink: noop,
+      onShowMeetingLink: noop,
       onDeleteForAll: noop,
       onDeleteForMe: noop,
     });
@@ -180,7 +180,7 @@ describe('getMeetingActionEntries', () => {
       translate,
       onJoin: noop,
       onEdit: jest.fn(),
-      onCopyMeetingLink: noop,
+      onShowMeetingLink: noop,
       onDeleteForAll: noop,
       onDeleteForMe: noop,
     });
@@ -196,7 +196,7 @@ describe('getMeetingActionEntries', () => {
       translate,
       onJoin: noop,
       onEdit: jest.fn(),
-      onCopyMeetingLink: noop,
+      onShowMeetingLink: noop,
       onDeleteForAll: noop,
       onDeleteForMe: noop,
     });
@@ -212,7 +212,7 @@ describe('getMeetingActionEntries', () => {
       translate,
       onJoin: noop,
       onEdit: jest.fn(),
-      onCopyMeetingLink: noop,
+      onShowMeetingLink: noop,
       onDeleteForAll: noop,
       onDeleteForMe: noop,
     });
@@ -236,7 +236,7 @@ describe('getMeetingActionEntries', () => {
       translate,
       onJoin: noop,
       onEdit: jest.fn(),
-      onCopyMeetingLink: noop,
+      onShowMeetingLink: noop,
       onDeleteForAll: noop,
       onDeleteForMe: noop,
     });
@@ -252,7 +252,7 @@ describe('getMeetingActionEntries', () => {
       translate,
       onJoin: noop,
       onEdit: jest.fn(),
-      onCopyMeetingLink: noop,
+      onShowMeetingLink: noop,
       onDeleteForAll: noop,
       onDeleteForMe: noop,
     });
@@ -269,7 +269,7 @@ describe('getMeetingActionEntries', () => {
       translate,
       onJoin: noop,
       onEdit: jest.fn(),
-      onCopyMeetingLink: noop,
+      onShowMeetingLink: noop,
       onDeleteForAll: noop,
       onDeleteForMe: noop,
     });
@@ -286,7 +286,7 @@ describe('getMeetingActionEntries', () => {
       translate,
       onJoin: noop,
       onEdit: jest.fn(),
-      onCopyMeetingLink: noop,
+      onShowMeetingLink: noop,
       onDeleteForAll: noop,
       onDeleteForMe: noop,
     });
@@ -303,7 +303,7 @@ describe('getMeetingActionEntries', () => {
       translate,
       onJoin: noop,
       onEdit: jest.fn(),
-      onCopyMeetingLink: noop,
+      onShowMeetingLink: noop,
       onDeleteForAll: noop,
       onDeleteForMe: noop,
     });
@@ -320,7 +320,7 @@ describe('getMeetingActionEntries', () => {
       translate,
       onJoin: noop,
       onEdit: jest.fn(),
-      onCopyMeetingLink: noop,
+      onShowMeetingLink: noop,
       onDeleteForAll: noop,
       onDeleteForMe: noop,
     });
@@ -338,7 +338,7 @@ describe('getMeetingActionEntries', () => {
       translate,
       onJoin: noop,
       onEdit: jest.fn(),
-      onCopyMeetingLink: noop,
+      onShowMeetingLink: noop,
       onDeleteForAll: noop,
       onDeleteForMe: noop,
     });
@@ -357,7 +357,7 @@ describe('getMeetingActionEntries', () => {
       onJoin: noop,
       isJoinDisabled: true,
       onEdit: noop,
-      onCopyMeetingLink: noop,
+      onShowMeetingLink: noop,
       onDeleteForAll: noop,
       onDeleteForMe: noop,
     });
@@ -367,8 +367,8 @@ describe('getMeetingActionEntries', () => {
     expect(joinEntry?.isDisabled).toBe(true);
   });
 
-  it('includes Copy meeting link when a meeting link is available', () => {
-    const onCopyMeetingLink = jest.fn();
+  it('includes Show meeting link when a meeting link is available', () => {
+    const onShowMeetingLink = jest.fn();
     const entries = getMeetingActionEntries({
       meetingInstance: createMeetingInstance(),
       selfUser: createSelfUser(),
@@ -376,24 +376,24 @@ describe('getMeetingActionEntries', () => {
       translate,
       onJoin: noop,
       onEdit: noop,
-      onCopyMeetingLink,
+      onShowMeetingLink,
       meetingLink: 'https://wire.example/meeting-link',
       onDeleteForAll: noop,
       onDeleteForMe: noop,
     });
 
-    const copyMeetingLinkEntry = getCopyMeetingLinkEntry(entries);
-    expect(copyMeetingLinkEntry.isJust).toBe(true);
-    copyMeetingLinkEntry.match({
+    const showMeetingLinkEntry = getShowMeetingLinkEntry(entries);
+    expect(showMeetingLinkEntry.isJust).toBe(true);
+    showMeetingLinkEntry.match({
       Just: entry => {
         entry.click?.();
       },
       Nothing: noop,
     });
-    expect(onCopyMeetingLink).toHaveBeenCalledTimes(1);
+    expect(onShowMeetingLink).toHaveBeenCalledTimes(1);
   });
 
-  it('omits Copy meeting link when a meeting link is not available', () => {
+  it('omits Show meeting link when a meeting link is not available', () => {
     const entries = getMeetingActionEntries({
       meetingInstance: createMeetingInstance(),
       selfUser: createSelfUser(),
@@ -401,11 +401,11 @@ describe('getMeetingActionEntries', () => {
       translate,
       onJoin: noop,
       onEdit: noop,
-      onCopyMeetingLink: noop,
+      onShowMeetingLink: noop,
       onDeleteForAll: noop,
       onDeleteForMe: noop,
     });
 
-    expect(getCopyMeetingLinkEntry(entries).isNothing).toBe(true);
+    expect(getShowMeetingLinkEntry(entries).isNothing).toBe(true);
   });
 });
