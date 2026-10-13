@@ -22,6 +22,8 @@ import {Maybe, Result} from 'true-myth';
 import {validateWebAppVersion} from './webappVersion.ts';
 import type {WebAppVersion} from './webappVersion.ts';
 
+export type StableWebAppTagName = `v${WebAppVersion}`;
+
 export type ParsedBetaWebAppTagName = {
   readonly version: WebAppVersion;
   readonly candidateNumber: number;
@@ -32,13 +34,13 @@ const betaWebAppTagNamePattern = /^v((?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\
 const webAppReleaseBranchNamePattern = /^release\/(.+)$/;
 const betaTagCandidateCaptureIndex = 2;
 
-export function createStableWebAppTagName(version: string): Result<string, Error> {
+export function createStableWebAppTagName(version: string): Result<StableWebAppTagName, Error> {
   const versionResult = validateWebAppVersion(version);
   if (versionResult.isErr) {
     return Result.err(new Error(`Cannot create stable WebApp tag: ${versionResult.error.message}`));
   }
 
-  return Result.ok(`v${versionResult.value}`);
+  return Result.ok(`v${versionResult.value}` as StableWebAppTagName);
 }
 
 export function parseStableWebAppTagName(tagName: string): Result<WebAppVersion, Error> {

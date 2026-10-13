@@ -83,6 +83,13 @@ export function createCommand(createCommandOptions: CreateReleaseMetadataCommand
     });
 
   command
+    .command('validate-webapp-production-tag')
+    .argument('<production-tag>')
+    .action(async (productionTag: string) => {
+      await createCommandOptions.executeCommand({kind: 'validate-webapp-production-tag', productionTag});
+    });
+
+  command
     .command('maintenance-branch')
     .argument('<maintenance-line-key>')
     .action(async (maintenanceLineKey: string) => {

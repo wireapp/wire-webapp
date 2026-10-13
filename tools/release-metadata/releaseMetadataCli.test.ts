@@ -131,6 +131,29 @@ describe('releaseMetadataCli', () => {
     });
   });
 
+  it('validates a stable SemVer WebApp Production tag name', () => {
+    const actualResult = runCommand({kind: 'validate-webapp-production-tag', productionTag: 'v1.1.0'});
+
+    expect(actualResult).toEqual({
+      errors: [],
+      exitCode: 0,
+      outputs: ['v1.1.0'],
+    });
+  });
+
+  it('does not broaden the WebApp Production tag validator to historical timestamp build references', () => {
+    const actualResult = runCommand({
+      kind: 'validate-webapp-production-tag',
+      productionTag: '2026-10-06-production.1',
+    });
+
+    expect(actualResult).toEqual({
+      errors: ['Invalid production tag name: 2026-10-06-production.1'],
+      exitCode: 1,
+      outputs: [],
+    });
+  });
+
   it('prints the ADR webapp build version', () => {
     const actualResult = runCommand({
       kind: 'webapp-build-version',
@@ -143,6 +166,21 @@ describe('releaseMetadataCli', () => {
       errors: [],
       exitCode: 0,
       outputs: ['2026-06-19.1'],
+    });
+  });
+
+  it('prints the WebApp version for a stable SemVer Production tag', () => {
+    const actualResult = runCommand({
+      kind: 'webapp-build-version',
+      buildReference: 'v1.1.0',
+      fullCommitSha: '025edc663787b3d2da366f21a5958013201e6cd4',
+      environmentName: 'production',
+    });
+
+    expect(actualResult).toEqual({
+      errors: [],
+      exitCode: 0,
+      outputs: ['1.1.0'],
     });
   });
 

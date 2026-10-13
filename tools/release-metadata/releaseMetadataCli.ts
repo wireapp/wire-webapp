@@ -26,11 +26,11 @@ import {
   createProductionTagName,
   createReleaseBranchName,
   extractReleaseIdentifierFromBranchName,
-  resolveWebappBuildVersion,
   validateMaintenanceSource,
   validateMaintenanceTagName,
   validateProductionTagName,
 } from './releaseMetadata.ts';
+import {resolveWebappBuildVersion, validateWebAppProductionTagName} from './webappProductionRelease.ts';
 
 export type ReleaseMetadataCliDependencies = {
   readonly writeError: (message: string) => void;
@@ -78,6 +78,10 @@ export type ReleaseMetadataCommand =
       readonly productionTag: string;
     }
   | {
+      readonly kind: 'validate-webapp-production-tag';
+      readonly productionTag: string;
+    }
+  | {
       readonly kind: 'webapp-build-version';
       readonly buildReference: string;
       readonly fullCommitSha: string;
@@ -95,7 +99,8 @@ function writeResult(
     | ReturnType<typeof resolveWebappBuildVersion>
     | ReturnType<typeof validateMaintenanceSource>
     | ReturnType<typeof validateMaintenanceTagName>
-    | ReturnType<typeof validateProductionTagName>,
+    | ReturnType<typeof validateProductionTagName>
+    | ReturnType<typeof validateWebAppProductionTagName>,
   dependencies: ReleaseMetadataCliDependencies,
 ): number {
   if (result.isErr) {
@@ -153,6 +158,12 @@ export function executeReleaseMetadataCommand(
     })
     .with({kind: 'validate-production-tag'}, validateProductionTagCommand => {
       return writeResult(validateProductionTagName(validateProductionTagCommand.productionTag), dependencies);
+    })
+    .with({kind: 'validate-webapp-production-tag'}, validateWebAppProductionTagCommand => {
+      return writeResult(
+        validateWebAppProductionTagName(validateWebAppProductionTagCommand.productionTag),
+        dependencies,
+      );
     })
     .with({kind: 'webapp-build-version'}, webappBuildVersionCommand => {
       return writeResult(
