@@ -17,7 +17,9 @@
  *
  */
 
-export const meetingLinkConfirmationStyles = {
+import type {CSSObject} from '@emotion/react';
+
+export const meetingLinkConfirmationStyles: CSSObject = {
   display: 'flex',
   gap: '8px',
   justifyContent: 'flex-end',
@@ -25,6 +27,6 @@ export const meetingLinkConfirmationStyles = {
   marginBottom: '-50px',
 };
 
-export const meetingLinkConfirmationInputStyles = {
+export const meetingLinkConfirmationInputStyles: CSSObject = {
   marginTop: '16px',
 };
