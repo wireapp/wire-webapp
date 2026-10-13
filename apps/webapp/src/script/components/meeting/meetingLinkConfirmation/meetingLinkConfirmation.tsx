@@ -49,10 +49,17 @@ export const MeetingLinkConfirmationMessage = ({link, translate}: MeetingLinkCon
   return (
     <>
       <p id="meeting-link-description">{translate('meetings.meetingLink.description')}</p>
-      <div css={meetingLinkConfirmationInputStyles}>
-        <Input aria-describedby="meeting-link-description" label="" readOnly type="text" value={link} />
-      </div>
-      <div css={meetingLinkConfirmationStyles}>
+      <Input
+        aria-label={translate('meetings.meetingLink.title')}
+        aria-describedby="meeting-link-description"
+        id="meeting-link"
+        label=""
+        readOnly
+        type="text"
+        value={link}
+        wrapperCSS={meetingLinkConfirmationInputStyles}
+      />
+      <footer css={meetingLinkConfirmationStyles}>
         <CopyToClipboardButton
           textToCopy={link}
           displayText={translate('meetings.meetingLink.copyLink')}
@@ -68,7 +75,7 @@ export const MeetingLinkConfirmationMessage = ({link, translate}: MeetingLinkCon
         >
           {translate('meetings.meetingLink.close')}
         </Button>
-      </div>
+      </footer>
     </>
   );
 };
