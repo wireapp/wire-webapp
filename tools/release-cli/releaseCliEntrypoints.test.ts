@@ -91,6 +91,19 @@ describe('release metadata CLI entrypoint', () => {
     expect(actualResult.standardOutput).toBe('2026-06-19.1-beta.3\n');
   });
 
+  it('supports generating the next WebApp SemVer Beta candidate', () => {
+    const actualResult = runNativeCommand(releaseMetadataEntrypointPath, [
+      'next-webapp-beta-tag',
+      '1.1.0',
+      'v1.1.0-beta.1',
+      'v1.1.0-beta.2',
+      '2026-06-19.1-beta.4',
+    ]);
+
+    expect(actualResult.exitCode).toBe(0);
+    expect(actualResult.standardOutput).toBe('v1.1.0-beta.3\n');
+  });
+
   it('preserves the variadic maintenance-tag contract', () => {
     const actualResult = runNativeCommand(releaseMetadataEntrypointPath, [
       'next-maintenance-tag',

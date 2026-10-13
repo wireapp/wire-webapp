@@ -18,7 +18,12 @@
  */
 
 import {Maybe, Result} from 'true-myth';
+import {match} from 'ts-pattern';
 import {z} from 'zod';
+
+import {parseWebAppProductionRelease} from '../release-metadata/webappProductionRelease.ts';
+import {parseBetaWebAppTagName} from '../release-metadata/webappReleaseIdentity.ts';
+import type {WebAppVersion} from '../release-metadata/webappVersion.ts';
 
 export type SerializedReleaseAppearanceState = {
   readonly beta?: string;
@@ -30,18 +35,27 @@ export type ReleaseAppearanceState = {
   readonly production: Maybe<string>;
 };
 
+export type ReleaseAppearanceIdentity =
+  | {
+      readonly kind: 'legacy';
+      readonly releaseIdentifier: string;
+    }
+  | {
+      readonly kind: 'semver';
+      readonly version: WebAppVersion;
+    };
+
 export type BetaCandidate = {
-  readonly releaseIdentifier: string;
+  readonly release: ReleaseAppearanceIdentity;
   readonly candidateNumber: bigint;
 };
 
 export type ProductionTag = {
-  readonly releaseIdentifier: string;
+  readonly release: ReleaseAppearanceIdentity;
 };
 
 const releaseIdentifierPattern = String.raw`\d{4}-\d{2}-\d{2}\.[1-9]\d*`;
 const betaCandidateTagPattern = new RegExp(String.raw`^(${releaseIdentifierPattern})-beta\.([1-9]\d*)$`);
-const productionTagPattern = new RegExp(`^(${releaseIdentifierPattern})-production$`);
 const markerPrefixPattern = /<!--\s*wire-webapp-release-appearance:/g;
 const markerHeaderPattern = /<!--\s*wire-webapp-release-appearance:v([^\s\r\n]+)\s*\n/g;
 const releaseIdentifierCaptureIndex = 1;
@@ -50,8 +64,18 @@ const markerVersionCaptureIndex = 1;
 
 const releaseAppearanceMarkerStateSchema = z
   .object({
-    beta: z.string().regex(betaCandidateTagPattern).optional(),
-    production: z.string().regex(productionTagPattern).optional(),
+    beta: z
+      .string()
+      .refine(betaCandidateTag => {
+        return parseBetaCandidateTag(betaCandidateTag).isOk;
+      })
+      .optional(),
+    production: z
+      .string()
+      .refine(productionTag => {
+        return parseProductionTag(productionTag).isOk;
+      })
+      .optional(),
   })
   .strict();
 
@@ -69,34 +93,45 @@ function readRegexCapture(regexMatch: RegExpExecArray, captureIndex: number): Ma
 
 export function parseBetaCandidateTag(betaCandidateTag: string): Result<BetaCandidate, Error> {
   const betaCandidateTagMatch = Maybe.of(betaCandidateTagPattern.exec(betaCandidateTag));
-  if (betaCandidateTagMatch.isNothing) {
-    return createFailure(`Invalid Beta candidate tag: ${betaCandidateTag}`);
+  if (betaCandidateTagMatch.isJust) {
+    const releaseIdentifier = readRegexCapture(betaCandidateTagMatch.value, releaseIdentifierCaptureIndex);
+    const candidateNumber = readRegexCapture(betaCandidateTagMatch.value, betaCandidateNumberCaptureIndex);
+    if (releaseIdentifier.isNothing || candidateNumber.isNothing) {
+      return createFailure(`Invalid Beta candidate tag: ${betaCandidateTag}`);
+    }
+
+    return createSuccess({
+      release: {kind: 'legacy', releaseIdentifier: releaseIdentifier.value},
+      candidateNumber: BigInt(candidateNumber.value),
+    });
   }
 
-  const releaseIdentifier = readRegexCapture(betaCandidateTagMatch.value, releaseIdentifierCaptureIndex);
-  const candidateNumber = readRegexCapture(betaCandidateTagMatch.value, betaCandidateNumberCaptureIndex);
-  if (releaseIdentifier.isNothing || candidateNumber.isNothing) {
-    return createFailure(`Invalid Beta candidate tag: ${betaCandidateTag}`);
+  const semverBetaCandidateResult = parseBetaWebAppTagName(betaCandidateTag);
+  if (semverBetaCandidateResult.isErr) {
+    return createFailure(`Invalid Beta candidate tag: ${betaCandidateTag}`, semverBetaCandidateResult.error);
   }
 
   return createSuccess({
-    releaseIdentifier: releaseIdentifier.value,
-    candidateNumber: BigInt(candidateNumber.value),
+    release: {kind: 'semver', version: semverBetaCandidateResult.value.version},
+    candidateNumber: BigInt(semverBetaCandidateResult.value.candidateNumber),
   });
 }
 
 export function parseProductionTag(productionTag: string): Result<ProductionTag, Error> {
-  const productionTagMatch = Maybe.of(productionTagPattern.exec(productionTag));
-  if (productionTagMatch.isNothing) {
-    return createFailure(`Invalid Production tag: ${productionTag}`);
+  const productionReleaseResult = parseWebAppProductionRelease(productionTag);
+  if (productionReleaseResult.isErr) {
+    return createFailure(`Invalid Production tag: ${productionTag}`, productionReleaseResult.error);
   }
 
-  const releaseIdentifier = readRegexCapture(productionTagMatch.value, releaseIdentifierCaptureIndex);
-  if (releaseIdentifier.isNothing) {
-    return createFailure(`Invalid Production tag: ${productionTag}`);
-  }
-
-  return createSuccess({releaseIdentifier: releaseIdentifier.value});
+  return match(productionReleaseResult.value)
+    .returnType<Result<ProductionTag, Error>>()
+    .with({kind: 'legacy'}, legacyRelease => {
+      return createSuccess({release: {kind: 'legacy', releaseIdentifier: legacyRelease.buildVersion}});
+    })
+    .with({kind: 'semver'}, semverRelease => {
+      return createSuccess({release: {kind: 'semver', version: semverRelease.version}});
+    })
+    .exhaustive();
 }
 
 export function compareBetaCandidates(leftCandidate: BetaCandidate, rightCandidate: BetaCandidate): number {
@@ -112,16 +147,45 @@ export function compareBetaCandidates(leftCandidate: BetaCandidate, rightCandida
 }
 
 export function validateSameReleaseIdentifier(
-  betaCandidate: Pick<BetaCandidate, 'releaseIdentifier'>,
-  productionTag: Pick<ProductionTag, 'releaseIdentifier'>,
-): Result<string, Error> {
-  if (betaCandidate.releaseIdentifier !== productionTag.releaseIdentifier) {
+  betaCandidate: Pick<BetaCandidate, 'release'>,
+  productionTag: Pick<ProductionTag, 'release'>,
+): Result<ReleaseAppearanceIdentity, Error> {
+  if (haveSameReleaseAppearanceIdentity(betaCandidate.release, productionTag.release) === false) {
     return createFailure(
-      `Beta candidate and Production tag belong to different releases: ${betaCandidate.releaseIdentifier} and ${productionTag.releaseIdentifier}`,
+      `Beta candidate and Production tag belong to different releases: ${describeReleaseAppearanceIdentity(betaCandidate.release)} and ${describeReleaseAppearanceIdentity(productionTag.release)}`,
     );
   }
 
-  return createSuccess(betaCandidate.releaseIdentifier);
+  return createSuccess(betaCandidate.release);
+}
+
+export function haveSameReleaseAppearanceIdentity(
+  leftRelease: ReleaseAppearanceIdentity,
+  rightRelease: ReleaseAppearanceIdentity,
+): boolean {
+  return match({leftRelease, rightRelease})
+    .with({leftRelease: {kind: 'legacy'}, rightRelease: {kind: 'legacy'}}, matchingLegacyReleases => {
+      return (
+        matchingLegacyReleases.leftRelease.releaseIdentifier === matchingLegacyReleases.rightRelease.releaseIdentifier
+      );
+    })
+    .with({leftRelease: {kind: 'semver'}, rightRelease: {kind: 'semver'}}, matchingSemverReleases => {
+      return matchingSemverReleases.leftRelease.version === matchingSemverReleases.rightRelease.version;
+    })
+    .otherwise(() => {
+      return false;
+    });
+}
+
+function describeReleaseAppearanceIdentity(releaseIdentity: ReleaseAppearanceIdentity): string {
+  return match(releaseIdentity)
+    .with({kind: 'legacy'}, legacyRelease => {
+      return legacyRelease.releaseIdentifier;
+    })
+    .with({kind: 'semver'}, semverRelease => {
+      return `v${semverRelease.version}`;
+    })
+    .exhaustive();
 }
 
 export function deserializeReleaseAppearanceState(

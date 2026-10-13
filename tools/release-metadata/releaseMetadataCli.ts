@@ -31,6 +31,8 @@ import {
   validateProductionTagName,
 } from './releaseMetadata.ts';
 import {resolveWebappBuildVersion, validateWebAppProductionTagName} from './webappProductionRelease.ts';
+import {createNextBetaWebAppTagName} from './webappReleaseIdentity.ts';
+import {validateWebAppVersion} from './webappVersion.ts';
 
 export type ReleaseMetadataCliDependencies = {
   readonly writeError: (message: string) => void;
@@ -49,6 +51,11 @@ export type ReleaseMetadataCommand =
   | {
       readonly kind: 'next-beta-tag';
       readonly releaseIdentifier: string;
+      readonly existingTagNames: readonly string[];
+    }
+  | {
+      readonly kind: 'next-webapp-beta-tag';
+      readonly version: string;
       readonly existingTagNames: readonly string[];
     }
   | {
@@ -93,6 +100,8 @@ function writeResult(
     | ReturnType<typeof extractReleaseIdentifierFromBranchName>
     | ReturnType<typeof createReleaseBranchName>
     | ReturnType<typeof createNextBetaTagName>
+    | ReturnType<typeof createNextBetaWebAppTagName>
+    | ReturnType<typeof validateWebAppVersion>
     | ReturnType<typeof createMaintenanceBranchName>
     | ReturnType<typeof createNextMaintenanceTagName>
     | ReturnType<typeof createProductionTagName>
@@ -126,6 +135,17 @@ export function executeReleaseMetadataCommand(
     .with({kind: 'next-beta-tag'}, nextBetaTagCommand => {
       return writeResult(
         createNextBetaTagName(nextBetaTagCommand.releaseIdentifier, nextBetaTagCommand.existingTagNames),
+        dependencies,
+      );
+    })
+    .with({kind: 'next-webapp-beta-tag'}, nextWebAppBetaTagCommand => {
+      const versionResult = validateWebAppVersion(nextWebAppBetaTagCommand.version);
+      if (versionResult.isErr) {
+        return writeResult(versionResult, dependencies);
+      }
+
+      return writeResult(
+        createNextBetaWebAppTagName(versionResult.value, nextWebAppBetaTagCommand.existingTagNames),
         dependencies,
       );
     })

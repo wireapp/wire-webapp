@@ -112,7 +112,7 @@ The release identifier uses the release branch name: `YYYY-MM-DD.N`. The full id
 
 The WebApp release process is:
 
-Release-appearance comments are informational and non-gating; release tags and runtime verification remain authoritative. Only new-format release tags participate, and legacy releases are intentionally not imported. The first new-format Production release establishes the bootstrap baseline and receives no comments.
+Release-appearance comments are informational and non-gating; release tags and runtime verification remain authoritative. Release-appearance tooling reads both existing date-based release tags and future SemVer release tags without rewriting existing marker values. The first Production release without a preceding supported Production baseline establishes the bootstrap baseline and receives no comments.
 
 Each Beta candidate processes only its delta. Production reconstructs candidate history through the explicitly promoted Beta tag and repairs missing Beta metadata. Beta and Production first appearances may belong to different releases, and recorded first-appearance values are immutable.
 
@@ -180,9 +180,9 @@ Each Beta candidate processes only its delta. Production reconstructs candidate 
 
 ### SemVer Production identity migration status
 
-The SemVer migration bootstrap is the annotated stable tag `v1.0.0`, pointing to commit `2dc009e706cae84dd7c32b40a80862ab252d6839`, which was previously released as `2026-10-06.1-production`. Future stable WebApp Production releases use `vMAJOR.MINOR.PATCH`; their BuildMetadata and distribution artifact version is the unprefixed WebApp version.
+The SemVer migration bootstrap is the annotated stable tag `v1.0.0`, pointing to commit `2dc009e706cae84dd7c32b40a80862ab252d6839`, which was previously released as `2026-10-06.1-production`. Future normal WebApp releases use `release/MAJOR.MINOR.PATCH` branches, Beta candidates use `vMAJOR.MINOR.PATCH-beta.N`, and stable Production releases use `vMAJOR.MINOR.PATCH`; their BuildMetadata and distribution artifact version is the unprefixed WebApp version.
 
-During migration, production-facing tag parsing, distribution validation, GitHub Release handoff, repair, rollback, and redeploy tooling accept both legacy date-based Production tags and stable SemVer WebApp tags. The active `Release WebApp` workflow remains date-based until a separate workflow cutover. Package synchronization remains on its existing legacy release-identifier model in this migration step.
+During migration, production-facing tag parsing, distribution validation, GitHub Release handoff, repair, rollback, and redeploy tooling accept both legacy date-based Production tags and stable SemVer WebApp tags. Release-appearance and release-history tooling accepts both legacy date-based releases and SemVer releases, using `v1.0.0` as the SemVer Production baseline and preserving the existing legacy ordering rules. The active `Release WebApp` workflow remains date-based until a separate workflow cutover. Package synchronization remains on its existing legacy release-identifier model in this migration step.
 
 ### WebApp package version synchronization
 

@@ -918,3 +918,481 @@ describe('next Beta preview history planning', () => {
     });
   });
 });
+
+describe('SemVer release history compatibility', () => {
+  it('uses v1.0.0 as the first SemVer Beta baseline, regardless of date history and tag timestamps', async () => {
+    await createTemporaryGitRepository(async (repositoryPath, executeGitCommand) => {
+      const historicalCommit = await createCommit({
+        repositoryPath,
+        fileName: 'historical-release.txt',
+        fileContents: 'historical release',
+        commitDate: '2026-01-01T00:00:00+0000',
+      });
+      await createAnnotatedTag({
+        repositoryPath,
+        tagName: 'v0.2.0',
+        commit: historicalCommit,
+        taggerDate: '2026-10-12T00:00:00+0000',
+      });
+      await createAnnotatedTag({
+        repositoryPath,
+        tagName: '2026-10-06.1-production',
+        commit: historicalCommit,
+        taggerDate: '2026-10-11T00:00:00+0000',
+      });
+      const bootstrapCommit = await createCommit({
+        repositoryPath,
+        fileName: 'semver-bootstrap.txt',
+        fileContents: 'SemVer bootstrap',
+        commitDate: '2026-01-02T00:00:00+0000',
+      });
+      await createAnnotatedTag({
+        repositoryPath,
+        tagName: 'v1.0.0',
+        commit: bootstrapCommit,
+        taggerDate: '2026-01-02T01:00:00+0000',
+      });
+      const betaCommit = await createCommit({
+        repositoryPath,
+        fileName: 'semver-beta-one.txt',
+        fileContents: 'SemVer Beta one',
+        commitDate: '2026-01-03T00:00:00+0000',
+      });
+      const betaTag = 'v1.1.0-beta.1';
+      await createAnnotatedTag({
+        repositoryPath,
+        tagName: betaTag,
+        commit: betaCommit,
+        taggerDate: '2026-10-13T00:00:00+0000',
+      });
+
+      const actualResult = await planBetaReleaseHistory({
+        executeGitCommand,
+        currentBetaTag: betaTag,
+        releaseCommit: betaCommit,
+      });
+
+      assert(actualResult.isOk);
+      expect(actualResult.value.kind).toBe('beta');
+      if (actualResult.value.kind !== 'beta') {
+        assert.fail('Expected a SemVer Beta history plan');
+      }
+      expect(actualResult.value.precedingProductionTag).toBe('v1.0.0');
+      expect(
+        actualResult.value.candidateRanges.map(candidateRange => {
+          return candidateRange.commitRange.startTag;
+        }),
+      ).toEqual(['v1.0.0']);
+
+      const wrongCommitResult = await planBetaReleaseHistory({
+        executeGitCommand,
+        currentBetaTag: betaTag,
+        releaseCommit: historicalCommit,
+      });
+
+      assert(wrongCommitResult.isErr);
+      expect(wrongCommitResult.error.message).toContain('Beta tag does not point to the release commit');
+    });
+  });
+
+  it('selects the highest lower stable SemVer tag and plans only the current version candidates', async () => {
+    await createTemporaryGitRepository(async (repositoryPath, executeGitCommand) => {
+      let stableCommit = await createCommit({
+        repositoryPath,
+        fileName: 'semver-one.txt',
+        fileContents: 'SemVer one',
+        commitDate: '2026-01-01T00:00:00+0000',
+      });
+      await createAnnotatedTag({
+        repositoryPath,
+        tagName: 'v1.0.0',
+        commit: stableCommit,
+        taggerDate: '2026-10-12T00:00:00+0000',
+      });
+      stableCommit = await createCommit({
+        repositoryPath,
+        fileName: 'semver-two.txt',
+        fileContents: 'SemVer two',
+        commitDate: '2026-01-02T00:00:00+0000',
+      });
+      await createAnnotatedTag({
+        repositoryPath,
+        tagName: 'v1.1.0',
+        commit: stableCommit,
+        taggerDate: '2026-10-11T00:00:00+0000',
+      });
+      stableCommit = await createCommit({
+        repositoryPath,
+        fileName: 'semver-three.txt',
+        fileContents: 'SemVer three',
+        commitDate: '2026-01-03T00:00:00+0000',
+      });
+      await createAnnotatedTag({
+        repositoryPath,
+        tagName: 'v1.2.0',
+        commit: stableCommit,
+        taggerDate: '2026-01-03T01:00:00+0000',
+      });
+      const betaOneCommit = await createCommit({
+        repositoryPath,
+        fileName: 'semver-four-beta-one.txt',
+        fileContents: 'SemVer four Beta one',
+        commitDate: '2026-01-04T00:00:00+0000',
+      });
+      await createAnnotatedTag({
+        repositoryPath,
+        tagName: 'v1.3.0-beta.1',
+        commit: betaOneCommit,
+        taggerDate: '2026-01-04T01:00:00+0000',
+      });
+      await createAnnotatedTag({
+        repositoryPath,
+        tagName: 'v1.4.0-beta.1',
+        commit: betaOneCommit,
+        taggerDate: '2026-01-04T02:00:00+0000',
+      });
+      const betaTwoCommit = await createCommit({
+        repositoryPath,
+        fileName: 'semver-four-beta-two.txt',
+        fileContents: 'SemVer four Beta two',
+        commitDate: '2026-01-05T00:00:00+0000',
+      });
+      const betaTwoTag = 'v1.3.0-beta.2';
+      await createAnnotatedTag({
+        repositoryPath,
+        tagName: betaTwoTag,
+        commit: betaTwoCommit,
+        taggerDate: '2026-01-05T01:00:00+0000',
+      });
+
+      const actualResult = await planBetaReleaseHistory({
+        executeGitCommand,
+        currentBetaTag: betaTwoTag,
+        releaseCommit: betaTwoCommit,
+      });
+
+      assert(actualResult.isOk);
+      expect(actualResult.value.kind).toBe('beta');
+      if (actualResult.value.kind !== 'beta') {
+        assert.fail('Expected a SemVer Beta history plan');
+      }
+      expect(actualResult.value.precedingProductionTag).toBe('v1.2.0');
+      expect(
+        actualResult.value.candidateRanges.map(candidateRange => {
+          return candidateRange.candidateTag;
+        }),
+      ).toEqual(['v1.3.0-beta.1', betaTwoTag]);
+      expect(
+        actualResult.value.candidateRanges.map(candidateRange => {
+          return candidateRange.commitRange.startTag;
+        }),
+      ).toEqual(['v1.2.0', 'v1.3.0-beta.1']);
+    });
+  });
+
+  it('rejects a missing SemVer Beta candidate in the current version sequence', async () => {
+    await createTemporaryGitRepository(async (repositoryPath, executeGitCommand) => {
+      const bootstrapCommit = await createCommit({
+        repositoryPath,
+        fileName: 'semver-bootstrap.txt',
+        fileContents: 'SemVer bootstrap',
+        commitDate: '2026-01-01T00:00:00+0000',
+      });
+      await createAnnotatedTag({
+        repositoryPath,
+        tagName: 'v1.0.0',
+        commit: bootstrapCommit,
+        taggerDate: '2026-01-01T01:00:00+0000',
+      });
+      const betaOneCommit = await createCommit({
+        repositoryPath,
+        fileName: 'semver-beta-one.txt',
+        fileContents: 'SemVer Beta one',
+        commitDate: '2026-01-02T00:00:00+0000',
+      });
+      await createAnnotatedTag({
+        repositoryPath,
+        tagName: 'v1.1.0-beta.1',
+        commit: betaOneCommit,
+        taggerDate: '2026-01-02T01:00:00+0000',
+      });
+      const betaThreeCommit = await createCommit({
+        repositoryPath,
+        fileName: 'semver-beta-three.txt',
+        fileContents: 'SemVer Beta three',
+        commitDate: '2026-01-03T00:00:00+0000',
+      });
+      const betaThreeTag = 'v1.1.0-beta.3';
+      await createAnnotatedTag({
+        repositoryPath,
+        tagName: betaThreeTag,
+        commit: betaThreeCommit,
+        taggerDate: '2026-01-03T01:00:00+0000',
+      });
+
+      const actualResult = await planBetaReleaseHistory({
+        executeGitCommand,
+        currentBetaTag: betaThreeTag,
+        releaseCommit: betaThreeCommit,
+      });
+
+      assert(actualResult.isErr);
+      expect(actualResult.error.message).toContain('Missing Beta candidate v1.1.0-beta.2');
+    });
+  });
+
+  it('reconstructs SemVer Production through the explicitly promoted Beta tag', async () => {
+    await createTemporaryGitRepository(async (repositoryPath, executeGitCommand) => {
+      const bootstrapCommit = await createCommit({
+        repositoryPath,
+        fileName: 'semver-bootstrap.txt',
+        fileContents: 'SemVer bootstrap',
+        commitDate: '2026-01-01T00:00:00+0000',
+      });
+      await createAnnotatedTag({
+        repositoryPath,
+        tagName: 'v1.0.0',
+        commit: bootstrapCommit,
+        taggerDate: '2026-10-12T00:00:00+0000',
+      });
+      const betaOneCommit = await createCommit({
+        repositoryPath,
+        fileName: 'semver-beta-one.txt',
+        fileContents: 'SemVer Beta one',
+        commitDate: '2026-01-02T00:00:00+0000',
+      });
+      await createAnnotatedTag({
+        repositoryPath,
+        tagName: 'v1.1.0-beta.1',
+        commit: betaOneCommit,
+        taggerDate: '2026-01-02T01:00:00+0000',
+      });
+      const promotedCommit = await createCommit({
+        repositoryPath,
+        fileName: 'semver-beta-two.txt',
+        fileContents: 'SemVer Beta two',
+        commitDate: '2026-01-03T00:00:00+0000',
+      });
+      const promotedBetaTag = 'v1.1.0-beta.2';
+      await createAnnotatedTag({
+        repositoryPath,
+        tagName: promotedBetaTag,
+        commit: promotedCommit,
+        taggerDate: '2026-01-03T01:00:00+0000',
+      });
+      const productionTag = 'v1.1.0';
+      await createAnnotatedTag({
+        repositoryPath,
+        tagName: productionTag,
+        commit: promotedCommit,
+        taggerDate: '2026-01-03T02:00:00+0000',
+      });
+      const laterBetaCommit = await createCommit({
+        repositoryPath,
+        fileName: 'semver-beta-three.txt',
+        fileContents: 'SemVer Beta three',
+        commitDate: '2026-01-04T00:00:00+0000',
+      });
+      await createAnnotatedTag({
+        repositoryPath,
+        tagName: 'v1.1.0-beta.3',
+        commit: laterBetaCommit,
+        taggerDate: '2026-01-04T01:00:00+0000',
+      });
+
+      const actualResult = await planProductionReleaseHistory({
+        executeGitCommand,
+        currentProductionTag: productionTag,
+        promotedBetaTag,
+        releaseCommit: promotedCommit,
+      });
+
+      assert(actualResult.isOk);
+      expect(actualResult.value.kind).toBe('production');
+      if (actualResult.value.kind !== 'production') {
+        assert.fail('Expected a SemVer Production history plan');
+      }
+      expect(actualResult.value.precedingProductionTag).toBe('v1.0.0');
+      expect(
+        actualResult.value.candidateRanges.map(candidateRange => {
+          return candidateRange.candidateTag;
+        }),
+      ).toEqual(['v1.1.0-beta.1', promotedBetaTag]);
+      expect(
+        actualResult.value.candidateRanges.some(candidateRange => {
+          return candidateRange.candidateTag === 'v1.1.0-beta.3';
+        }),
+      ).toBe(false);
+    });
+  });
+
+  it('rejects a promoted SemVer Beta tag from another release commit', async () => {
+    await createTemporaryGitRepository(async (repositoryPath, executeGitCommand) => {
+      const bootstrapCommit = await createCommit({
+        repositoryPath,
+        fileName: 'semver-bootstrap.txt',
+        fileContents: 'SemVer bootstrap',
+        commitDate: '2026-01-01T00:00:00+0000',
+      });
+      await createAnnotatedTag({
+        repositoryPath,
+        tagName: 'v1.0.0',
+        commit: bootstrapCommit,
+        taggerDate: '2026-01-01T01:00:00+0000',
+      });
+      const betaOneCommit = await createCommit({
+        repositoryPath,
+        fileName: 'semver-beta-one.txt',
+        fileContents: 'SemVer Beta one',
+        commitDate: '2026-01-02T00:00:00+0000',
+      });
+      const betaOneTag = 'v1.1.0-beta.1';
+      await createAnnotatedTag({
+        repositoryPath,
+        tagName: betaOneTag,
+        commit: betaOneCommit,
+        taggerDate: '2026-01-02T01:00:00+0000',
+      });
+      const releaseCommit = await createCommit({
+        repositoryPath,
+        fileName: 'semver-beta-two.txt',
+        fileContents: 'SemVer Beta two',
+        commitDate: '2026-01-03T00:00:00+0000',
+      });
+      const productionTag = 'v1.1.0';
+      await createAnnotatedTag({
+        repositoryPath,
+        tagName: productionTag,
+        commit: releaseCommit,
+        taggerDate: '2026-01-03T01:00:00+0000',
+      });
+
+      const actualResult = await planProductionReleaseHistory({
+        executeGitCommand,
+        currentProductionTag: productionTag,
+        promotedBetaTag: betaOneTag,
+        releaseCommit,
+      });
+
+      assert(actualResult.isErr);
+      expect(actualResult.error.message).toContain('Promoted Beta tag does not point to the release commit');
+    });
+  });
+
+  it('rejects a SemVer Production tag that points to another commit', async () => {
+    await createTemporaryGitRepository(async (repositoryPath, executeGitCommand) => {
+      const bootstrapCommit = await createCommit({
+        repositoryPath,
+        fileName: 'semver-bootstrap.txt',
+        fileContents: 'SemVer bootstrap',
+        commitDate: '2026-01-01T00:00:00+0000',
+      });
+      await createAnnotatedTag({
+        repositoryPath,
+        tagName: 'v1.0.0',
+        commit: bootstrapCommit,
+        taggerDate: '2026-01-01T01:00:00+0000',
+      });
+      const releaseCommit = await createCommit({
+        repositoryPath,
+        fileName: 'semver-beta-one.txt',
+        fileContents: 'SemVer Beta one',
+        commitDate: '2026-01-02T00:00:00+0000',
+      });
+      const promotedBetaTag = 'v1.1.0-beta.1';
+      await createAnnotatedTag({
+        repositoryPath,
+        tagName: promotedBetaTag,
+        commit: releaseCommit,
+        taggerDate: '2026-01-02T01:00:00+0000',
+      });
+      const productionTag = 'v1.1.0';
+      await createAnnotatedTag({
+        repositoryPath,
+        tagName: productionTag,
+        commit: bootstrapCommit,
+        taggerDate: '2026-01-02T02:00:00+0000',
+      });
+
+      const actualResult = await planProductionReleaseHistory({
+        executeGitCommand,
+        currentProductionTag: productionTag,
+        promotedBetaTag,
+        releaseCommit,
+      });
+
+      assert(actualResult.isErr);
+      expect(actualResult.error.message).toContain('Production tag does not point to the release commit');
+    });
+  });
+
+  it('rejects lightweight SemVer Beta and Production tags', async () => {
+    await createTemporaryGitRepository(async (repositoryPath, executeGitCommand) => {
+      const releaseCommit = await createCommit({
+        repositoryPath,
+        fileName: 'semver-release.txt',
+        fileContents: 'SemVer release',
+        commitDate: '2026-01-01T00:00:00+0000',
+      });
+      const lightweightBetaTag = 'v1.1.0-beta.1';
+      await createLightweightTag({repositoryPath, tagName: lightweightBetaTag, commit: releaseCommit});
+
+      const betaResult = await planBetaReleaseHistory({
+        executeGitCommand,
+        currentBetaTag: lightweightBetaTag,
+        releaseCommit,
+      });
+
+      assert(betaResult.isErr);
+      expect(betaResult.error.message).toContain('Release tag must be annotated');
+
+      const annotatedBetaTag = 'v1.1.0-beta.2';
+      await createAnnotatedTag({
+        repositoryPath,
+        tagName: annotatedBetaTag,
+        commit: releaseCommit,
+        taggerDate: '2026-01-01T01:00:00+0000',
+      });
+      const lightweightProductionTag = 'v1.1.0';
+      await createLightweightTag({repositoryPath, tagName: lightweightProductionTag, commit: releaseCommit});
+
+      const productionResult = await planProductionReleaseHistory({
+        executeGitCommand,
+        currentProductionTag: lightweightProductionTag,
+        promotedBetaTag: annotatedBetaTag,
+        releaseCommit,
+      });
+
+      assert(productionResult.isErr);
+      expect(productionResult.error.message).toContain('Release tag must be annotated');
+    });
+  });
+
+  it('prefers latest SemVer Beta history over legacy tags and tagger timestamps in previews', async () => {
+    await createTemporaryGitRepository(async (repositoryPath, executeGitCommand) => {
+      const commit = await createSelectionCommit(repositoryPath, '2026-08-01T00:00:00+0000');
+      await createAnnotatedTags({
+        repositoryPath,
+        commit,
+        tagDefinitions: [
+          {tagName: '2026-08-01.1-beta.9', taggerDate: '2026-12-01T00:00:00+0000'},
+          {tagName: 'v1.2.0-beta.3', taggerDate: '2026-12-02T00:00:00+0000'},
+          {tagName: 'v1.3.0-beta.1', taggerDate: '2026-01-01T00:00:00+0000'},
+          {tagName: 'v1.3.0-beta.2', taggerDate: '2025-01-01T00:00:00+0000'},
+        ],
+      });
+
+      const actualResult = await planNextBetaPreviewHistory({
+        executeGitCommand,
+        targetMainCommit: commit,
+      });
+
+      assert(actualResult.isOk);
+      expect(actualResult.value.kind).toBe('preview');
+      if (actualResult.value.kind !== 'preview') {
+        assert.fail('Expected a SemVer next Beta preview plan');
+      }
+      expect(actualResult.value.latestBetaReleaseTag.tagName).toBe('v1.3.0-beta.2');
+    });
+  });
+});

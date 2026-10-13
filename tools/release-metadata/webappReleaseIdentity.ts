@@ -17,7 +17,7 @@
  *
  */
 
-import {Maybe, Result} from 'true-myth';
+import {Maybe, maybe, Result} from 'true-myth';
 
 import {validateWebAppVersion} from './webappVersion.ts';
 import type {WebAppVersion} from './webappVersion.ts';
@@ -27,6 +27,11 @@ export type StableWebAppTagName = `v${WebAppVersion}`;
 export type ParsedBetaWebAppTagName = {
   readonly version: WebAppVersion;
   readonly candidateNumber: number;
+};
+
+type ParsedExistingBetaTag = {
+  readonly tagName: string;
+  readonly parseResult: Result<ParsedBetaWebAppTagName, Error>;
 };
 
 const stableWebAppTagNamePattern = /^v((?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*))$/;
@@ -109,6 +114,104 @@ export function parseBetaWebAppTagName(tagName: string): Result<ParsedBetaWebApp
         return Result.err(new Error(`Invalid WebApp Beta tag name: ${tagName}`));
       },
     });
+}
+
+function parseExistingBetaTag(tagName: string): ParsedExistingBetaTag {
+  return {tagName, parseResult: parseBetaWebAppTagName(tagName)};
+}
+
+function claimsBetaVersion(options: {readonly tagName: string; readonly betaTagPrefix: string}): boolean {
+  const {tagName, betaTagPrefix} = options;
+  return tagName === betaTagPrefix || tagName.startsWith(`${betaTagPrefix}.`);
+}
+
+function isMalformedBetaTagForVersion(options: {
+  readonly parsedBetaTag: ParsedExistingBetaTag;
+  readonly betaTagPrefix: string;
+}): boolean {
+  const {parsedBetaTag, betaTagPrefix} = options;
+  return parsedBetaTag.parseResult.isErr && claimsBetaVersion({tagName: parsedBetaTag.tagName, betaTagPrefix});
+}
+
+function findMalformedBetaTagError(options: {
+  readonly version: WebAppVersion;
+  readonly parsedExistingBetaTags: readonly ParsedExistingBetaTag[];
+}): Maybe<Error> {
+  const {version, parsedExistingBetaTags} = options;
+  const betaTagPrefix = `v${version}-beta`;
+  const malformedBetaTag = maybe.find(parsedBetaTag => {
+    return isMalformedBetaTagForVersion({parsedBetaTag, betaTagPrefix});
+  }, parsedExistingBetaTags);
+  if (malformedBetaTag.isNothing || malformedBetaTag.value.parseResult.isOk) {
+    return Maybe.nothing<Error>();
+  }
+
+  return Maybe.just(
+    new Error(`Invalid WebApp Beta tag for version ${version}: ${malformedBetaTag.value.tagName}`, {
+      cause: malformedBetaTag.value.parseResult.error,
+    }),
+  );
+}
+
+function findBetaCandidateNumberForVersion(options: {
+  readonly parsedBetaTag: ParsedExistingBetaTag;
+  readonly version: WebAppVersion;
+}): readonly number[] {
+  const {parsedBetaTag, version} = options;
+  if (parsedBetaTag.parseResult.isErr || parsedBetaTag.parseResult.value.version !== version) {
+    return [];
+  }
+
+  return [parsedBetaTag.parseResult.value.candidateNumber];
+}
+
+function findMissingBetaCandidateNumber(candidateNumbers: readonly number[]): Maybe<number> {
+  return candidateNumbers.reduce<Maybe<number>>((missingCandidateNumber, candidateNumber, candidateIndex) => {
+    if (missingCandidateNumber.isJust || candidateNumber === candidateIndex + 1) {
+      return missingCandidateNumber;
+    }
+
+    return Maybe.just(candidateIndex + 1);
+  }, Maybe.nothing<number>());
+}
+
+function findBetaCandidateSequenceError(options: {
+  readonly version: WebAppVersion;
+  readonly candidateNumbers: readonly number[];
+}): Maybe<Error> {
+  const {version, candidateNumbers} = options;
+  if (new Set(candidateNumbers).size !== candidateNumbers.length) {
+    return Maybe.just(new Error(`Duplicate WebApp Beta candidate for version ${version}`));
+  }
+
+  return findMissingBetaCandidateNumber(candidateNumbers).map(missingCandidateNumber => {
+    return new Error(`Missing WebApp Beta candidate v${version}-beta.${missingCandidateNumber}`);
+  });
+}
+
+export function createNextBetaWebAppTagName(
+  version: WebAppVersion,
+  existingTagNames: readonly string[],
+): Result<string, Error> {
+  const parsedExistingBetaTags = existingTagNames.map(parseExistingBetaTag);
+  const malformedBetaTagError = findMalformedBetaTagError({version, parsedExistingBetaTags});
+  if (malformedBetaTagError.isJust) {
+    return Result.err(malformedBetaTagError.value);
+  }
+
+  const candidateNumbers = parsedExistingBetaTags
+    .flatMap(parsedBetaTag => {
+      return findBetaCandidateNumberForVersion({parsedBetaTag, version});
+    })
+    .toSorted((leftCandidateNumber, rightCandidateNumber) => {
+      return leftCandidateNumber - rightCandidateNumber;
+    });
+  const candidateSequenceError = findBetaCandidateSequenceError({version, candidateNumbers});
+  if (candidateSequenceError.isJust) {
+    return Result.err(candidateSequenceError.value);
+  }
+
+  return createBetaWebAppTagName(version, candidateNumbers.length + 1);
 }
 
 export function createWebAppReleaseBranchName(version: string): Result<string, Error> {

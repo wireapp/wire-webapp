@@ -25,6 +25,8 @@ import {Maybe, Result} from 'true-myth';
 
 import {renderPersistentComment} from './releaseAppearance.ts';
 import {
+  createBetaCommand,
+  createProductionCommand,
   executeReleaseAppearanceCommand,
   prepareCommentOperation,
   readCommandEnvironment,
@@ -57,6 +59,38 @@ const betaTag = '2026-01-02.1-beta.1';
 const betaTwoTag = '2026-01-02.1-beta.2';
 const betaTwoCommit = 'f'.repeat(40);
 const productionTag = '2026-01-02.1-production';
+
+describe('release appearance command identities', () => {
+  it('accepts SemVer Beta and Production command arguments', () => {
+    const betaCommandResult = createBetaCommand({
+      betaTag: 'v1.1.0-beta.1',
+      releaseCommit,
+      executionMode: 'dry-run',
+    });
+    const productionCommandResult = createProductionCommand({
+      productionTag: 'v1.1.0',
+      promotedBetaTag: 'v1.1.0-beta.1',
+      releaseCommit,
+      executionMode: 'dry-run',
+    });
+
+    assert(betaCommandResult.isOk);
+    assert(productionCommandResult.isOk);
+    expect(betaCommandResult.value).toEqual({
+      stage: 'beta',
+      releaseTag: 'v1.1.0-beta.1',
+      releaseCommit,
+      executionMode: 'dry-run',
+    });
+    expect(productionCommandResult.value).toEqual({
+      stage: 'production',
+      releaseTag: 'v1.1.0',
+      promotedBetaTag: 'v1.1.0-beta.1',
+      releaseCommit,
+      executionMode: 'dry-run',
+    });
+  });
+});
 
 type CreateBetaTestCommandOptions = {
   readonly releaseTag: string;

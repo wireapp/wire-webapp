@@ -101,6 +101,40 @@ describe('releaseMetadataCli', () => {
     });
   });
 
+  it('prints the next WebApp SemVer Beta tag without changing legacy next-beta behavior', () => {
+    const actualResult = runCommand({
+      kind: 'next-webapp-beta-tag',
+      version: '1.1.0',
+      existingTagNames: ['v1.1.0-beta.1', 'v1.1.0-beta.2', 'v1.2.0-beta.9', '2026-06-19.1-beta.4'],
+    });
+
+    expect(actualResult).toEqual({errors: [], exitCode: 0, outputs: ['v1.1.0-beta.3']});
+  });
+
+  it('rejects malformed matching WebApp SemVer Beta history', () => {
+    const actualResult = runCommand({
+      kind: 'next-webapp-beta-tag',
+      version: '1.1.0',
+      existingTagNames: ['v1.1.0-beta.01'],
+    });
+
+    expect(actualResult.exitCode).toBe(1);
+    expect(actualResult.outputs).toEqual([]);
+    expect(actualResult.errors[0]).toContain('Invalid WebApp Beta tag for version 1.1.0');
+  });
+
+  it('rejects gaps in matching WebApp SemVer Beta history', () => {
+    const actualResult = runCommand({
+      kind: 'next-webapp-beta-tag',
+      version: '1.1.0',
+      existingTagNames: ['v1.1.0-beta.1', 'v1.1.0-beta.3'],
+    });
+
+    expect(actualResult.exitCode).toBe(1);
+    expect(actualResult.outputs).toEqual([]);
+    expect(actualResult.errors[0]).toContain('v1.1.0-beta.2');
+  });
+
   it('prints the production tag name for the release identifier', () => {
     const actualResult = runCommand({kind: 'production-tag', releaseIdentifier: '2026-06-19.1'});
 
