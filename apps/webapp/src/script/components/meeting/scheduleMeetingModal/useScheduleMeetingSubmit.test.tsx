@@ -46,7 +46,6 @@ import {
   scheduleMeetingSubmitResults,
   wasScheduleMeetingPersisted,
 } from './scheduleMeetingTypes';
-import {isUndefined} from '@sindresorhus/is';
 
 const fixedNow = new Date('2026-06-16T09:00:00.000Z');
 const futureStartDate = new Date('2026-06-16T10:00:00.000Z');
@@ -165,6 +164,10 @@ describe('useScheduleMeetingSubmit', () => {
   beforeEach(() => {
     removeCurrentModal();
     useScheduleMeetingModal.getState().reset(clock);
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   it('does not refresh meetings after a successful submit', async () => {
@@ -414,7 +417,6 @@ describe('useScheduleMeetingSubmit', () => {
       undefined,
       translateForTest,
     );
-    primaryModalShow.mockRestore();
   });
 
   it('retries rename only from the confirm primary action without calling updateMeeting again', async () => {
@@ -455,7 +457,7 @@ describe('useScheduleMeetingSubmit', () => {
 
     const modalOptions = primaryModalShow.mock.calls[0][1];
     await act(async () => {
-      if (!isUndefined(modalOptions.primaryAction) && !isUndefined(modalOptions.primaryAction.action)) {
+      if (modalOptions.primaryAction?.action) {
         await modalOptions.primaryAction.action();
       }
     });
@@ -463,6 +465,5 @@ describe('useScheduleMeetingSubmit', () => {
     expect(updateMeeting).toHaveBeenCalledTimes(1);
     expect(safeGetConversationById).toHaveBeenCalledWith({id: 'conversation-id', domain: 'example.com'});
     expect(renameConversation).toHaveBeenCalledWith(conversation, 'Weekly sync');
-    primaryModalShow.mockRestore();
   });
 });
