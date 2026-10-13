@@ -49,11 +49,43 @@ describe('release tag parsing', () => {
     assert(betaTenResult.isOk);
     assert(productionResult.isOk);
     expect(betaTenResult.value).toEqual({
-      releaseIdentifier: '2026-07-21.3',
+      release: {kind: 'legacy', releaseIdentifier: '2026-07-21.3'},
       candidateNumber: 10n,
     });
     expect(compareBetaCandidates(betaNineResult.value, betaTenResult.value)).toBe(-1);
     expect(validateSameReleaseIdentifier(betaTenResult.value, productionResult.value).isOk).toBe(true);
+  });
+
+  it('parses strict SemVer Beta and stable Production tags as one identity family', () => {
+    const betaCandidateResult = parseBetaCandidateTag('v1.1.0-beta.2');
+    const betaSeventeenResult = parseBetaCandidateTag('v2.0.0-beta.17');
+    const productionTagResult = parseProductionTag('v1.1.0');
+
+    assert(betaCandidateResult.isOk);
+    assert(betaSeventeenResult.isOk);
+    assert(productionTagResult.isOk);
+    expect(betaCandidateResult.value).toEqual({
+      release: {kind: 'semver', version: '1.1.0'},
+      candidateNumber: 2n,
+    });
+    expect(betaSeventeenResult.value).toEqual({
+      release: {kind: 'semver', version: '2.0.0'},
+      candidateNumber: 17n,
+    });
+    expect(productionTagResult.value).toEqual({release: {kind: 'semver', version: '1.1.0'}});
+    expect(validateSameReleaseIdentifier(betaCandidateResult.value, productionTagResult.value).isOk).toBe(true);
+  });
+
+  it('rejects mismatched SemVer versions and identity families', () => {
+    const betaCandidateResult = parseBetaCandidateTag('v1.4.0-beta.2');
+    const differentVersionResult = parseProductionTag('v1.5.0');
+    const legacyProductionResult = parseProductionTag('2026-10-06.1-production');
+
+    assert(betaCandidateResult.isOk);
+    assert(differentVersionResult.isOk);
+    assert(legacyProductionResult.isOk);
+    expect(validateSameReleaseIdentifier(betaCandidateResult.value, differentVersionResult.value).isErr).toBe(true);
+    expect(validateSameReleaseIdentifier(betaCandidateResult.value, legacyProductionResult.value).isErr).toBe(true);
   });
 
   it('rejects invalid release tags', () => {
@@ -63,12 +95,19 @@ describe('release tag parsing', () => {
       '2026-07-21.3-beta.01',
       'release/2026-07-21.3-beta.1',
       '2026-07-21.3-production',
+      'v1.1.0-beta.0',
+      'v1.1.0-beta.01',
+      'v1.1.0-alpha.1',
+      'v1.1.0-production',
+      'v1.1.0',
     ];
     const invalidProductionTags = [
       '2026-07-21-production.1',
       '2026-07-21.0-production',
       '2026-07-21.3-beta.1',
       'release/2026-07-21.3-production',
+      'v1.1.0-beta.1',
+      'v1.1.0-production',
     ];
 
     for (const invalidBetaTag of invalidBetaTags) {
@@ -113,6 +152,22 @@ describe('release appearance state', () => {
     assert(parsedState.production.isJust);
     expect(parsedState.beta.value).toBe('2026-08-01.1-beta.1');
     expect(parsedState.production.value).toBe('2026-08-08.1-production');
+  });
+
+  it('parses SemVer persistent marker values without rewriting the stored identities', () => {
+    const serializedState = {
+      beta: 'v1.1.0-beta.1',
+      production: 'v1.1.0',
+    };
+    const markerComment = `<!-- wire-webapp-release-appearance:v1\n${JSON.stringify(serializedState)}\n-->`;
+
+    const parsedStateResult = parsePersistentMarkerComment(markerComment);
+
+    assert(parsedStateResult.isOk);
+    assert(parsedStateResult.value.isJust);
+    expect(serializeReleaseAppearanceState(parsedStateResult.value.value)).toEqual(serializedState);
+    expect(renderPersistentComment(parsedStateResult.value.value)).toContain('v1.1.0-beta.1');
+    expect(renderPersistentComment(parsedStateResult.value.value)).toContain('v1.1.0');
   });
 
   it('preserves cross-release values during later Beta processing', () => {
