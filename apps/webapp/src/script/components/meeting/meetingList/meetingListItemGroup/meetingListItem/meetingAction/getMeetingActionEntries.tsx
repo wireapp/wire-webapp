@@ -44,7 +44,7 @@ type GetMeetingActionEntriesParams = {
   onJoin: () => void;
   isJoinDisabled?: boolean;
   onEdit: () => void;
-  onCopyMeetingLink: () => void;
+  onShowMeetingLink: () => void;
   meetingLink?: string;
   onDeleteForAll: () => void;
   onDeleteForMe: () => void;
@@ -58,7 +58,7 @@ export const getMeetingActionEntries = ({
   onJoin,
   isJoinDisabled = false,
   onEdit,
-  onCopyMeetingLink,
+  onShowMeetingLink,
   meetingLink,
   onDeleteForAll,
   onDeleteForMe,
@@ -85,7 +85,7 @@ export const getMeetingActionEntries = ({
       return <LinkIcon css={linkIconStyles} />;
     },
     label: translate(MEETING_ACTION_TRANSLATION_KEYS.showMeetingLink),
-    click: onCopyMeetingLink,
+    click: onShowMeetingLink,
   };
 
   const deleteForMeEntry: ContextMenuEntry = {
