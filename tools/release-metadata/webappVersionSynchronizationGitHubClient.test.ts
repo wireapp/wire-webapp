@@ -21,7 +21,10 @@ import assert from 'node:assert';
 
 import {isUndefined} from '@sindresorhus/is';
 
-import {resolveWebAppVersionSynchronizationState} from './webappVersionSynchronization.ts';
+import {
+  resolveSemVerWebAppVersionSynchronizationState,
+  resolveWebAppVersionSynchronizationState,
+} from './webappVersionSynchronization.ts';
 import {createWebAppVersionSynchronizationGitHubClient} from './webappVersionSynchronizationGitHubClient.ts';
 
 import type {HttpClient, HttpRequest} from '../release-github/githubApi.ts';
@@ -309,6 +312,32 @@ describe('WebApp version synchronization GitHub client', () => {
       '2026-09-09.1-production',
       actualResult.value,
     );
+
+    assert(synchronizationStateResult.isOk);
+    expect(synchronizationStateResult.value.kind).toBe('matching-open');
+  });
+
+  it('discovers a SemVer v2 synchronization pull request by its durable marker', async () => {
+    const fakeHttpClient = createFakeHttpClient([
+      createGitHubPullRequestSearchResponse([43]),
+      createGitHubPullRequestSearchResponse([]),
+      createGitHubPullRequestResponse({
+        number: 43,
+        title: 'Update WebApp version to 1.2.0',
+        body: '<!-- wire-webapp-version-sync:v2 production-tag=v1.2.0 version=1.2.0 -->',
+        headBranch: 'webapp-version-1.2.0',
+      }),
+    ]);
+    const githubClient = createGitHubClient(fakeHttpClient.client);
+
+    const actualResult = await githubClient.listPullRequests();
+
+    assert(actualResult.isOk);
+    expect(fakeHttpClient.requests[0]?.url.searchParams.get('q')).toBe(
+      'repo:wireapp/wire-webapp is:pr in:body "wire-webapp-version-sync"',
+    );
+
+    const synchronizationStateResult = resolveSemVerWebAppVersionSynchronizationState('v1.2.0', actualResult.value);
 
     assert(synchronizationStateResult.isOk);
     expect(synchronizationStateResult.value.kind).toBe('matching-open');

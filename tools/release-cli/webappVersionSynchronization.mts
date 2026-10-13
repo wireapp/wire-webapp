@@ -25,9 +25,13 @@ import process from 'node:process';
 import {fileURLToPath} from 'node:url';
 
 import {createRuntimeKyHttpClient} from '../release-github/githubHttpClient.ts';
+import {createSemVerWebAppVersionSynchronizationRequest} from '../release-metadata/webappVersionSynchronization.ts';
+import type {WebAppVersionSynchronizationRequest} from '../release-metadata/webappVersionSynchronization.ts';
 import {
   createWebAppVersionSynchronizationInspectionOutput,
   createWebAppVersionSynchronizationResultOutput,
+  createSemVerWebAppVersionSynchronizationInspectionOutput,
+  createSemVerWebAppVersionSynchronizationResultOutput,
   serializeWebAppVersionSynchronizationOutput,
 } from '../release-metadata/webappVersionSynchronizationCli.ts';
 import {
@@ -39,12 +43,19 @@ import type {WebAppVersionSynchronizationGitHubClient} from '../release-metadata
 import type {
   InspectWebAppVersionSynchronizationOptions,
   SynchronizeWebAppVersionOptions,
+  InspectSemVerWebAppVersionSynchronizationOptions,
+  SynchronizeSemVerWebAppVersionOptions,
 } from '../release-metadata/webappVersionSynchronizationOrchestration.ts';
 import {
+  inspectSemVerWebAppVersionSynchronization,
   inspectWebAppVersionSynchronization,
+  synchronizeSemVerWebAppVersion,
   synchronizeWebAppVersion,
 } from '../release-metadata/webappVersionSynchronizationOrchestration.ts';
-import {validateWebAppVersionSynchronizationPreflight} from '../release-metadata/webappVersionSynchronizationPreflight.ts';
+import {
+  validateSemVerWebAppVersionSynchronizationPreflight,
+  validateWebAppVersionSynchronizationPreflight,
+} from '../release-metadata/webappVersionSynchronizationPreflight.ts';
 import {
   readInspectionRuntimeEnvironment,
   readSynchronizationRuntimeEnvironment,
@@ -63,7 +74,18 @@ type SynchronizeCommand = {
   readonly productionTagName: string;
 };
 
-type WebAppVersionSynchronizationCommand = InspectCommand | SynchronizeCommand;
+type InspectSemVerCommand = {
+  readonly kind: 'inspect-semver';
+  readonly synchronizationRequest: Extract<WebAppVersionSynchronizationRequest, {readonly kind: 'semver'}>;
+};
+
+type SynchronizeSemVerCommand = {
+  readonly kind: 'synchronize-semver';
+  readonly synchronizationRequest: Extract<WebAppVersionSynchronizationRequest, {readonly kind: 'semver'}>;
+};
+
+type WebAppVersionSynchronizationCommand =
+  InspectCommand | SynchronizeCommand | InspectSemVerCommand | SynchronizeSemVerCommand;
 
 type CreateWebAppVersionSynchronizationCommandOptions = {
   readonly executeCommand: (command: WebAppVersionSynchronizationCommand) => Promise<void> | void;
@@ -156,6 +178,62 @@ async function executeSynchronizationCommand(
   writeOutput(serializeWebAppVersionSynchronizationOutput(output));
 }
 
+async function executeSemVerInspectionCommand(
+  command: InspectSemVerCommand,
+  githubClient: WebAppVersionSynchronizationGitHubClient,
+  writeOutput: (message: string) => void,
+): Promise<void> {
+  const inspectionOptions: InspectSemVerWebAppVersionSynchronizationOptions = {
+    synchronizationRequest: command.synchronizationRequest,
+    githubClient,
+  };
+  const inspectionResult = await inspectSemVerWebAppVersionSynchronization(inspectionOptions);
+
+  if (inspectionResult.isErr) {
+    throw inspectionResult.error;
+  }
+
+  const {value: inspection} = inspectionResult;
+  const output = createSemVerWebAppVersionSynchronizationInspectionOutput(inspection);
+
+  writeOutput(serializeWebAppVersionSynchronizationOutput(output));
+
+  const preflightResult = validateSemVerWebAppVersionSynchronizationPreflight(inspection);
+
+  if (preflightResult.isErr) {
+    throw preflightResult.error;
+  }
+}
+
+async function executeSemVerSynchronizationCommand(
+  command: SynchronizeSemVerCommand,
+  runtimeEnvironment: WebAppVersionSynchronizationSynchronizationRuntimeEnvironment,
+  githubClient: WebAppVersionSynchronizationGitHubClient,
+  writeOutput: (message: string) => void,
+): Promise<void> {
+  const gitClient = createSimpleGitWebAppVersionSynchronizationClient({
+    repositoryPath: runtimeEnvironment.repositoryPath,
+    fileSystem: createRuntimeWebAppVersionSynchronizationFileSystem(),
+    authentication: {githubToken: runtimeEnvironment.ottoTheBotGitHubToken},
+  });
+  const synchronizationOptions: SynchronizeSemVerWebAppVersionOptions = {
+    synchronizationRequest: command.synchronizationRequest,
+    commitAuthorName: ottoTheBotName,
+    commitAuthorEmail: ottoTheBotEmail,
+    dependencies: {githubClient, gitClient},
+  };
+  const synchronizationResult = await synchronizeSemVerWebAppVersion(synchronizationOptions);
+
+  if (synchronizationResult.isErr) {
+    throw synchronizationResult.error;
+  }
+
+  const {value: synchronization} = synchronizationResult;
+  const output = createSemVerWebAppVersionSynchronizationResultOutput(synchronization);
+
+  writeOutput(serializeWebAppVersionSynchronizationOutput(output));
+}
+
 export function createCommand(createCommandOptions: CreateWebAppVersionSynchronizationCommandOptions): Command {
   const command = new Command()
     .name('webappVersionSynchronization')
@@ -180,6 +258,38 @@ export function createCommand(createCommandOptions: CreateWebAppVersionSynchroni
     .argument('<production-tag>')
     .action(async (releaseIdentifier: string, productionTagName: string): Promise<void> => {
       await createCommandOptions.executeCommand({kind: 'synchronize', releaseIdentifier, productionTagName});
+    });
+
+  command
+    .command('inspect-semver')
+    .argument('<production-tag>')
+    .action(async (productionTagName: string): Promise<void> => {
+      const synchronizationRequestResult = createSemVerWebAppVersionSynchronizationRequest(productionTagName);
+
+      if (synchronizationRequestResult.isErr) {
+        throw synchronizationRequestResult.error;
+      }
+
+      await createCommandOptions.executeCommand({
+        kind: 'inspect-semver',
+        synchronizationRequest: synchronizationRequestResult.value,
+      });
+    });
+
+  command
+    .command('synchronize-semver')
+    .argument('<production-tag>')
+    .action(async (productionTagName: string): Promise<void> => {
+      const synchronizationRequestResult = createSemVerWebAppVersionSynchronizationRequest(productionTagName);
+
+      if (synchronizationRequestResult.isErr) {
+        throw synchronizationRequestResult.error;
+      }
+
+      await createCommandOptions.executeCommand({
+        kind: 'synchronize-semver',
+        synchronizationRequest: synchronizationRequestResult.value,
+      });
     });
 
   return command;
@@ -216,7 +326,7 @@ export async function runWebAppVersionSynchronizationCommand(
 }
 
 async function executeRuntimeCommand(command: WebAppVersionSynchronizationCommand): Promise<void> {
-  if (command.kind === 'inspect') {
+  if (command.kind === 'inspect' || command.kind === 'inspect-semver') {
     const runtimeEnvironmentResult = readInspectionRuntimeEnvironment(process.env);
 
     if (runtimeEnvironmentResult.isErr) {
@@ -230,7 +340,11 @@ async function executeRuntimeCommand(command: WebAppVersionSynchronizationComman
       githubToken: runtimeEnvironment.githubToken,
     });
 
-    await executeInspectionCommand(command, githubClient, writeRuntimeOutput);
+    if (command.kind === 'inspect') {
+      await executeInspectionCommand(command, githubClient, writeRuntimeOutput);
+    } else {
+      await executeSemVerInspectionCommand(command, githubClient, writeRuntimeOutput);
+    }
 
     return;
   }
@@ -248,7 +362,11 @@ async function executeRuntimeCommand(command: WebAppVersionSynchronizationComman
     githubToken: runtimeEnvironment.ottoTheBotGitHubToken,
   });
 
-  await executeSynchronizationCommand(command, runtimeEnvironment, githubClient, writeRuntimeOutput);
+  if (command.kind === 'synchronize') {
+    await executeSynchronizationCommand(command, runtimeEnvironment, githubClient, writeRuntimeOutput);
+  } else {
+    await executeSemVerSynchronizationCommand(command, runtimeEnvironment, githubClient, writeRuntimeOutput);
+  }
 }
 
 async function main(): Promise<void> {

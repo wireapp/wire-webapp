@@ -199,6 +199,8 @@ The synchronization marker in the pull request body is the authoritative mapping
 
 Version allocation is protected by an early release-start preflight, a fresh pre-Production preflight after the blocking E2E gate, a repository-wide non-cancellable synchronization lock, and fresh `main` and synchronization-history validation inside the post-Production orchestration. If a race still allows another release to reach Production first, its already deployed and verified Production artifact remains untouched while its bookkeeping fails closed until the unresolved synchronization is resolved.
 
+For future stable SemVer releases, the stable Production tag is authoritative for package synchronization. A tag such as `v1.2.0` reconciles `package.json` and `apps/webapp/package.json` to exactly `1.2.0`. Package metadata is reconciliation metadata and does not allocate release versions; synchronization may jump over package versions that were not synchronized earlier, and it must never downgrade package metadata. Only one unresolved synchronization pull request is allowed at a time to prevent competing package changes. After the separate `Release WebApp` workflow cutover, an unresolved synchronization pull request is bookkeeping and will not block a future WebApp release. Until that cutover pull request lands, the active `Release WebApp` workflow remains on the legacy release-identifier synchronization model and its existing synchronization preflights.
+
 Merging the synchronization PR is an ordinary `main` merge. It therefore continues through the normal `publish-main.yml` delivery path; no metadata-only exception or special CI bypass is introduced.
 
 Release workflows must be serialized:

@@ -25,8 +25,14 @@ import {
   createWebAppVersionSynchronizationBranchName,
   createWebAppVersionSynchronizationPullRequestBody,
   createWebAppVersionSynchronizationPullRequestTitle,
+  createSemVerWebAppVersionSynchronizationBranchName,
+  createSemVerWebAppVersionSynchronizationMarker,
+  createSemVerWebAppVersionSynchronizationRequest,
+  parseSemVerWebAppVersionSynchronizationMarker,
   parseWebAppVersionSynchronizationPullRequest,
+  resolveSemVerWebAppVersionSynchronizationState,
   resolveWebAppVersionSynchronizationState,
+  validateSemVerWebAppVersionSynchronizationBranchName,
   validateWebAppVersionSynchronizationBranchName,
 } from './webappVersionSynchronization.ts';
 import type {WebAppVersionSynchronizationPullRequest} from './webappVersionSynchronization.ts';
@@ -78,9 +84,27 @@ describe('WebApp version synchronization branch planning', () => {
 
     assert(validatedBranchNameResult.isOk);
     expect(validatedBranchNameResult.value).toEqual({
+      kind: 'legacy',
       branchName: 'webapp-version-2026-09-09.1-1.0.0',
       releaseIdentifier,
       webAppVersion: '1.0.0',
+    });
+  });
+
+  it('creates and validates a SemVer synchronization branch from its package target', () => {
+    const branchNameResult = createSemVerWebAppVersionSynchronizationBranchName('1.1.0');
+
+    assert(branchNameResult.isOk);
+    expect(branchNameResult.value).toBe('webapp-version-1.1.0');
+
+    const validatedBranchNameResult = validateSemVerWebAppVersionSynchronizationBranchName(branchNameResult.value);
+
+    assert(validatedBranchNameResult.isOk);
+    expect(validatedBranchNameResult.value).toEqual({
+      kind: 'semver',
+      branchName: 'webapp-version-1.1.0',
+      productionTagName: 'v1.1.0',
+      webAppVersion: '1.1.0',
     });
   });
 
@@ -166,6 +190,142 @@ describe('WebApp version synchronization pull request discovery', () => {
     const actualResult = parseWebAppVersionSynchronizationPullRequest(createPullRequest(options));
 
     assert(actualResult.isErr);
+  });
+});
+
+function createSemVerSynchronizationPullRequest(
+  options: {
+    readonly productionTagName?: string;
+    readonly number?: number;
+    readonly state?: 'open' | 'closed';
+    readonly mergedAt?: string | null;
+    readonly body?: string;
+    readonly headBranch?: string;
+  } = {},
+): WebAppVersionSynchronizationPullRequest {
+  const requestedProductionTagName = options.productionTagName ?? 'v1.1.0';
+  const requestResult = createSemVerWebAppVersionSynchronizationRequest(requestedProductionTagName);
+
+  assert(requestResult.isOk);
+
+  const branchNameResult = createSemVerWebAppVersionSynchronizationBranchName(requestResult.value.webAppVersion);
+  const markerResult = createSemVerWebAppVersionSynchronizationMarker(requestedProductionTagName);
+
+  assert(branchNameResult.isOk);
+  assert(markerResult.isOk);
+
+  return {
+    number: options.number ?? 10,
+    url: `https://github.com/wireapp/wire-webapp/pull/${options.number ?? 10}`,
+    title: `Update WebApp version to ${requestResult.value.webAppVersion}`,
+    body: options.body ?? markerResult.value,
+    state: options.state ?? 'open',
+    mergedAt: options.mergedAt ?? null,
+    baseBranch: 'main',
+    headBranch: options.headBranch ?? branchNameResult.value,
+  };
+}
+
+describe('SemVer WebApp version synchronization domain', () => {
+  it('parses the stable Production tag into the exact package version', () => {
+    const actualRequestResult = createSemVerWebAppVersionSynchronizationRequest('v1.1.0');
+
+    assert(actualRequestResult.isOk);
+    expect(actualRequestResult.value).toEqual({
+      kind: 'semver',
+      productionTagName: 'v1.1.0',
+      webAppVersion: '1.1.0',
+    });
+  });
+
+  it.each(['1.1.0', 'v1.1', 'v01.1.0', 'v1.1.0-beta.1', 'v1.1.0-production', 'v1.1.0+build'])(
+    'rejects non-stable or non-canonical Production tag %s',
+    productionTagName => {
+      const actualRequestResult = createSemVerWebAppVersionSynchronizationRequest(productionTagName);
+
+      assert(actualRequestResult.isErr);
+    },
+  );
+
+  it('creates an explicitly versioned v2 synchronization marker', () => {
+    const markerResult = createSemVerWebAppVersionSynchronizationMarker('v1.1.0');
+
+    assert(markerResult.isOk);
+    expect(markerResult.value).toBe('<!-- wire-webapp-version-sync:v2 production-tag=v1.1.0 version=1.1.0 -->');
+
+    const parsedMarkerResult = parseSemVerWebAppVersionSynchronizationMarker(markerResult.value);
+
+    assert(parsedMarkerResult.isOk);
+    expect(parsedMarkerResult.value).toEqual({productionTagName: 'v1.1.0', webAppVersion: '1.1.0'});
+  });
+
+  it('rejects malformed and mismatched SemVer synchronization markers', () => {
+    const mismatchedMarker = '<!-- wire-webapp-version-sync:v2 production-tag=v1.1.0 version=1.2.0 -->';
+    const malformedMarker = '<!-- wire-webapp-version-sync:v2 production-tag=v1.1.0 -->';
+
+    expect(parseSemVerWebAppVersionSynchronizationMarker(mismatchedMarker).isErr).toBe(true);
+    expect(parseSemVerWebAppVersionSynchronizationMarker(malformedMarker).isErr).toBe(true);
+  });
+
+  it('recognizes a matching merged SemVer synchronization record', () => {
+    const actualInspectionResult = resolveSemVerWebAppVersionSynchronizationState('v1.1.0', [
+      createSemVerSynchronizationPullRequest({state: 'closed', mergedAt: '2026-10-10T12:00:00Z'}),
+    ]);
+
+    assert(actualInspectionResult.isOk);
+    expect(actualInspectionResult.value).toMatchObject({kind: 'matching-merged', productionTagName: 'v1.1.0'});
+  });
+
+  it('recognizes a matching open SemVer synchronization record', () => {
+    const actualInspectionResult = resolveSemVerWebAppVersionSynchronizationState('v1.1.0', [
+      createSemVerSynchronizationPullRequest(),
+    ]);
+
+    assert(actualInspectionResult.isOk);
+    expect(actualInspectionResult.value).toMatchObject({kind: 'matching-open', webAppVersion: '1.1.0'});
+  });
+
+  it('fails closed on a malformed or duplicate SemVer synchronization record', () => {
+    const malformedPullRequest = createSemVerSynchronizationPullRequest({
+      body: '<!-- wire-webapp-version-sync:v2 production-tag=v1.1.0 version=1.2.0 -->',
+    });
+    const malformedInspectionResult = resolveSemVerWebAppVersionSynchronizationState('v1.1.0', [malformedPullRequest]);
+    const duplicateInspectionResult = resolveSemVerWebAppVersionSynchronizationState('v1.1.0', [
+      createSemVerSynchronizationPullRequest({number: 10}),
+      createSemVerSynchronizationPullRequest({number: 11}),
+    ]);
+
+    assert(malformedInspectionResult.isErr);
+    assert(duplicateInspectionResult.isOk);
+    expect(duplicateInspectionResult.value.kind).toBe('conflict');
+  });
+
+  it('blocks a different unresolved synchronization and rejects a closed unmerged record', () => {
+    const unresolvedDifferentTagResult = resolveSemVerWebAppVersionSynchronizationState('v1.2.0', [
+      createSemVerSynchronizationPullRequest(),
+    ]);
+    const closedUnmergedResult = resolveSemVerWebAppVersionSynchronizationState('v1.1.0', [
+      createSemVerSynchronizationPullRequest({state: 'closed'}),
+    ]);
+
+    assert(unresolvedDifferentTagResult.isOk);
+    expect(unresolvedDifferentTagResult.value).toMatchObject({
+      kind: 'blocked-by-previous-unresolved',
+      blockingProductionTagName: 'v1.1.0',
+    });
+    assert(closedUnmergedResult.isOk);
+    expect(closedUnmergedResult.value.kind).toBe('closed-without-merge');
+  });
+
+  it('blocks SemVer synchronization while a legacy synchronization remains unresolved', () => {
+    const actualInspectionResult = resolveSemVerWebAppVersionSynchronizationState('v1.2.0', [createPullRequest()]);
+
+    assert(actualInspectionResult.isOk);
+    expect(actualInspectionResult.value).toMatchObject({
+      kind: 'blocked-by-previous-unresolved',
+      blockingProductionTagName: '2026-09-09.1-production',
+      blockingWebAppVersion: '1.0.0',
+    });
   });
 });
 

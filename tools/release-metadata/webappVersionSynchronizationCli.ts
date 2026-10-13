@@ -17,8 +17,16 @@
  *
  */
 
-import type {WebAppVersionSynchronizationInspection} from './webappVersionSynchronization.ts';
-import type {WebAppVersionSynchronizationResult} from './webappVersionSynchronizationOrchestration.ts';
+import {match, P} from 'ts-pattern';
+
+import type {
+  SemVerWebAppVersionSynchronizationInspection,
+  WebAppVersionSynchronizationInspection,
+} from './webappVersionSynchronization.ts';
+import type {
+  SemVerWebAppVersionSynchronizationResult,
+  WebAppVersionSynchronizationResult,
+} from './webappVersionSynchronizationOrchestration.ts';
 
 export type WebAppVersionSynchronizationInspectionOutput =
   | {
@@ -64,69 +72,98 @@ export type WebAppVersionSynchronizationResultOutput = {
   readonly pull_request_url: string;
 };
 
+export type SemVerWebAppVersionSynchronizationInspectionOutput =
+  | {
+      readonly state: 'available';
+      readonly production_tag_name: string;
+      readonly webapp_version: string;
+    }
+  | {
+      readonly state: 'matching-open' | 'matching-merged' | 'closed-without-merge';
+      readonly production_tag_name: string;
+      readonly webapp_version: string;
+      readonly pull_request_number: number;
+      readonly pull_request_url: string;
+      readonly branch_name: string;
+    }
+  | {
+      readonly state: 'blocked-by-previous-unresolved';
+      readonly production_tag_name: string;
+      readonly webapp_version: string;
+      readonly blocking_production_tag_name: string;
+      readonly blocking_webapp_version: string;
+      readonly blocking_synchronization_state: 'open' | 'closed-without-merge';
+      readonly pull_request_number: number;
+      readonly pull_request_url: string;
+      readonly branch_name: string;
+    }
+  | {
+      readonly state: 'conflict';
+      readonly production_tag_name: string;
+      readonly webapp_version: string;
+      readonly reason: string;
+    };
+
+export type SemVerWebAppVersionSynchronizationResultOutput = {
+  readonly action: SemVerWebAppVersionSynchronizationResult['action'];
+  readonly production_tag_name: string;
+  readonly webapp_version: string;
+  readonly branch_name: string;
+  readonly pull_request_number: number;
+  readonly pull_request_url: string;
+};
+
 type WebAppVersionSynchronizationOutput =
-  WebAppVersionSynchronizationInspectionOutput | WebAppVersionSynchronizationResultOutput;
+  | WebAppVersionSynchronizationInspectionOutput
+  | WebAppVersionSynchronizationResultOutput
+  | SemVerWebAppVersionSynchronizationInspectionOutput
+  | SemVerWebAppVersionSynchronizationResultOutput;
 
 export function createWebAppVersionSynchronizationInspectionOutput(
   inspection: WebAppVersionSynchronizationInspection,
 ): WebAppVersionSynchronizationInspectionOutput {
-  if (inspection.kind === 'available') {
-    return {
-      state: inspection.kind,
-      release_identifier: inspection.releaseIdentifier,
-      production_tag_name: inspection.productionTagName,
-    };
-  }
-
-  if (inspection.kind === 'matching-open' || inspection.kind === 'matching-merged') {
-    return {
-      state: inspection.kind,
-      release_identifier: inspection.releaseIdentifier,
-      production_tag_name: inspection.productionTagName,
-      webapp_version: inspection.webAppVersion,
-      pull_request_number: inspection.pullRequestNumber,
-      pull_request_url: inspection.pullRequestUrl,
-      branch_name: inspection.branchName,
-    };
-  }
-
-  if (inspection.kind === 'closed-without-merge') {
-    return {
-      state: inspection.kind,
-      release_identifier: inspection.releaseIdentifier,
-      production_tag_name: inspection.productionTagName,
-      webapp_version: inspection.webAppVersion,
-      pull_request_number: inspection.pullRequestNumber,
-      pull_request_url: inspection.pullRequestUrl,
-      branch_name: inspection.branchName,
-    };
-  }
-
-  if (inspection.kind === 'blocked-by-previous-unresolved') {
-    return {
-      state: inspection.kind,
-      release_identifier: inspection.releaseIdentifier,
-      production_tag_name: inspection.productionTagName,
-      blocking_release_identifier: inspection.blockingReleaseIdentifier,
-      blocking_production_tag_name: inspection.blockingProductionTagName,
-      blocking_webapp_version: inspection.blockingWebAppVersion,
-      blocking_synchronization_state: inspection.blockingSynchronizationState,
-      pull_request_number: inspection.pullRequestNumber,
-      pull_request_url: inspection.pullRequestUrl,
-      branch_name: inspection.branchName,
-    };
-  }
-
-  if (inspection.kind === 'conflict') {
-    return {
-      state: inspection.kind,
-      release_identifier: inspection.releaseIdentifier,
-      production_tag_name: inspection.productionTagName,
-      reason: inspection.reason,
-    };
-  }
-
-  throw new Error('Unknown WebApp version synchronization inspection state');
+  return match(inspection)
+    .with({kind: 'available'}, availableInspection => {
+      return {
+        state: availableInspection.kind,
+        release_identifier: availableInspection.releaseIdentifier,
+        production_tag_name: availableInspection.productionTagName,
+      };
+    })
+    .with({kind: P.union('matching-open', 'matching-merged', 'closed-without-merge')}, existingInspection => {
+      return {
+        state: existingInspection.kind,
+        release_identifier: existingInspection.releaseIdentifier,
+        production_tag_name: existingInspection.productionTagName,
+        webapp_version: existingInspection.webAppVersion,
+        pull_request_number: existingInspection.pullRequestNumber,
+        pull_request_url: existingInspection.pullRequestUrl,
+        branch_name: existingInspection.branchName,
+      };
+    })
+    .with({kind: 'blocked-by-previous-unresolved'}, blockedInspection => {
+      return {
+        state: blockedInspection.kind,
+        release_identifier: blockedInspection.releaseIdentifier,
+        production_tag_name: blockedInspection.productionTagName,
+        blocking_release_identifier: blockedInspection.blockingReleaseIdentifier,
+        blocking_production_tag_name: blockedInspection.blockingProductionTagName,
+        blocking_webapp_version: blockedInspection.blockingWebAppVersion,
+        blocking_synchronization_state: blockedInspection.blockingSynchronizationState,
+        pull_request_number: blockedInspection.pullRequestNumber,
+        pull_request_url: blockedInspection.pullRequestUrl,
+        branch_name: blockedInspection.branchName,
+      };
+    })
+    .with({kind: 'conflict'}, conflictingInspection => {
+      return {
+        state: conflictingInspection.kind,
+        release_identifier: conflictingInspection.releaseIdentifier,
+        production_tag_name: conflictingInspection.productionTagName,
+        reason: conflictingInspection.reason,
+      };
+    })
+    .exhaustive();
 }
 
 export function createWebAppVersionSynchronizationResultOutput(
@@ -135,6 +172,64 @@ export function createWebAppVersionSynchronizationResultOutput(
   return {
     action: synchronizationResult.action,
     release_identifier: synchronizationResult.releaseIdentifier,
+    production_tag_name: synchronizationResult.productionTagName,
+    webapp_version: synchronizationResult.webAppVersion,
+    branch_name: synchronizationResult.branchName,
+    pull_request_number: synchronizationResult.pullRequestNumber,
+    pull_request_url: synchronizationResult.pullRequestUrl,
+  };
+}
+
+export function createSemVerWebAppVersionSynchronizationInspectionOutput(
+  inspection: SemVerWebAppVersionSynchronizationInspection,
+): SemVerWebAppVersionSynchronizationInspectionOutput {
+  return match(inspection)
+    .with({kind: 'available'}, availableInspection => {
+      return {
+        state: availableInspection.kind,
+        production_tag_name: availableInspection.productionTagName,
+        webapp_version: availableInspection.webAppVersion,
+      };
+    })
+    .with({kind: P.union('matching-open', 'matching-merged', 'closed-without-merge')}, existingInspection => {
+      return {
+        state: existingInspection.kind,
+        production_tag_name: existingInspection.productionTagName,
+        webapp_version: existingInspection.webAppVersion,
+        pull_request_number: existingInspection.pullRequestNumber,
+        pull_request_url: existingInspection.pullRequestUrl,
+        branch_name: existingInspection.branchName,
+      };
+    })
+    .with({kind: 'blocked-by-previous-unresolved'}, blockedInspection => {
+      return {
+        state: blockedInspection.kind,
+        production_tag_name: blockedInspection.productionTagName,
+        webapp_version: blockedInspection.webAppVersion,
+        blocking_production_tag_name: blockedInspection.blockingProductionTagName,
+        blocking_webapp_version: blockedInspection.blockingWebAppVersion,
+        blocking_synchronization_state: blockedInspection.blockingSynchronizationState,
+        pull_request_number: blockedInspection.pullRequestNumber,
+        pull_request_url: blockedInspection.pullRequestUrl,
+        branch_name: blockedInspection.branchName,
+      };
+    })
+    .with({kind: 'conflict'}, conflictingInspection => {
+      return {
+        state: conflictingInspection.kind,
+        production_tag_name: conflictingInspection.productionTagName,
+        webapp_version: conflictingInspection.webAppVersion,
+        reason: conflictingInspection.reason,
+      };
+    })
+    .exhaustive();
+}
+
+export function createSemVerWebAppVersionSynchronizationResultOutput(
+  synchronizationResult: SemVerWebAppVersionSynchronizationResult,
+): SemVerWebAppVersionSynchronizationResultOutput {
+  return {
+    action: synchronizationResult.action,
     production_tag_name: synchronizationResult.productionTagName,
     webapp_version: synchronizationResult.webAppVersion,
     branch_name: synchronizationResult.branchName,

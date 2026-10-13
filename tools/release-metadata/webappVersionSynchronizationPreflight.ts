@@ -20,7 +20,10 @@
 import {Result, Unit} from 'true-myth';
 import {match, P} from 'ts-pattern';
 
-import type {WebAppVersionSynchronizationInspection} from './webappVersionSynchronization.ts';
+import type {
+  SemVerWebAppVersionSynchronizationInspection,
+  WebAppVersionSynchronizationInspection,
+} from './webappVersionSynchronization.ts';
 
 export type WebAppVersionSynchronizationPreflightDecision =
   | {
@@ -30,6 +33,17 @@ export type WebAppVersionSynchronizationPreflightDecision =
   | {
       readonly state: 'blocked';
       readonly inspection: WebAppVersionSynchronizationInspection;
+      readonly diagnostic: string;
+    };
+
+export type SemVerWebAppVersionSynchronizationPreflightDecision =
+  | {
+      readonly state: 'allowed';
+      readonly inspection: SemVerWebAppVersionSynchronizationInspection;
+    }
+  | {
+      readonly state: 'blocked';
+      readonly inspection: SemVerWebAppVersionSynchronizationInspection;
       readonly diagnostic: string;
     };
 
@@ -73,6 +87,52 @@ export function validateWebAppVersionSynchronizationPreflight(
   inspection: WebAppVersionSynchronizationInspection,
 ): Result<Unit, Error> {
   return match(decideWebAppVersionSynchronizationPreflight(inspection))
+    .with({state: 'allowed'}, () => {
+      return Result.ok();
+    })
+    .with({state: 'blocked'}, blockedDecision => {
+      return Result.err(new Error(blockedDecision.diagnostic));
+    })
+    .exhaustive();
+}
+
+export function decideSemVerWebAppVersionSynchronizationPreflight(
+  inspection: SemVerWebAppVersionSynchronizationInspection,
+): SemVerWebAppVersionSynchronizationPreflightDecision {
+  return match(inspection)
+    .with({kind: P.union('available', 'matching-open', 'matching-merged')}, allowedInspection => {
+      return {state: 'allowed' as const, inspection: allowedInspection};
+    })
+    .with({kind: 'closed-without-merge'}, closedInspection => {
+      return {
+        state: 'blocked' as const,
+        inspection: closedInspection,
+        diagnostic: `Merge or resolve WebApp version synchronization pull request #${closedInspection.pullRequestNumber} for ${closedInspection.productionTagName}: ${closedInspection.pullRequestUrl}`,
+      };
+    })
+    .with({kind: 'blocked-by-previous-unresolved'}, blockedInspection => {
+      return {
+        state: 'blocked' as const,
+        inspection: blockedInspection,
+        diagnostic: `Merge or resolve the previous WebApp version synchronization pull request #${blockedInspection.pullRequestNumber} for ${blockedInspection.blockingProductionTagName}: ${blockedInspection.pullRequestUrl}`,
+      };
+    })
+    .with({kind: 'conflict'}, conflictingInspection => {
+      return {
+        state: 'blocked' as const,
+        inspection: conflictingInspection,
+        diagnostic: `WebApp version synchronization history is conflicting for ${conflictingInspection.productionTagName}: ${conflictingInspection.reason}`,
+      };
+    })
+    .exhaustive();
+}
+
+export function validateSemVerWebAppVersionSynchronizationPreflight(
+  inspection: SemVerWebAppVersionSynchronizationInspection,
+): Result<Unit, Error> {
+  const decision = decideSemVerWebAppVersionSynchronizationPreflight(inspection);
+
+  return match(decision)
     .with({state: 'allowed'}, () => {
       return Result.ok();
     })
