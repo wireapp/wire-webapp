@@ -162,6 +162,27 @@ describe('WebApp version synchronization CLI entrypoint', () => {
     expect(actualResult.exitCode).toBe(1);
     expect(actualResult.standardError).toContain("error: missing required argument 'release-identifier'");
   });
+
+  it.each([
+    {command: 'inspect-semver', tagName: '1.1.0'},
+    {command: 'synchronize-semver', tagName: 'v1.1.0-beta.1'},
+    {command: 'synchronize-semver', tagName: 'v01.1.0'},
+  ])('rejects invalid SemVer command arguments for $command before reading runtime credentials', testCase => {
+    const {command, tagName} = testCase;
+    const actualResult = runNativeCommand(webAppVersionSynchronizationEntrypointPath, [command, tagName]);
+
+    expect(actualResult.exitCode).toBe(1);
+    expect(actualResult.standardError).toContain('Invalid stable WebApp tag name');
+    expect(actualResult.standardError).not.toContain('OTTO_THE_BOT_GH_TOKEN');
+  });
+
+  it('exposes both SemVer synchronization commands in help output', () => {
+    const actualResult = runNativeCommand(webAppVersionSynchronizationEntrypointPath, ['--help']);
+
+    expect(actualResult.exitCode).toBe(0);
+    expect(actualResult.standardOutput).toContain('inspect-semver');
+    expect(actualResult.standardOutput).toContain('synchronize-semver');
+  });
 });
 
 describe('production distribution CLI entrypoint', () => {

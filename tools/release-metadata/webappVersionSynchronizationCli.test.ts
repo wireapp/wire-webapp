@@ -20,15 +20,26 @@
 import {
   createWebAppVersionSynchronizationInspectionOutput,
   createWebAppVersionSynchronizationResultOutput,
+  createSemVerWebAppVersionSynchronizationInspectionOutput,
+  createSemVerWebAppVersionSynchronizationResultOutput,
   serializeWebAppVersionSynchronizationOutput,
 } from './webappVersionSynchronizationCli.ts';
 import {validateWebAppVersion} from './webappVersion.ts';
-import type {WebAppVersionSynchronizationResult} from './webappVersionSynchronizationOrchestration.ts';
-import type {WebAppVersion} from './webappVersion.ts';
-import {createWebAppVersionSynchronizationBranchName} from './webappVersionSynchronization.ts';
 import type {
+  SemVerWebAppVersionSynchronizationResult,
+  WebAppVersionSynchronizationResult,
+} from './webappVersionSynchronizationOrchestration.ts';
+import type {WebAppVersion} from './webappVersion.ts';
+import {
+  createSemVerWebAppVersionSynchronizationBranchName,
+  createSemVerWebAppVersionSynchronizationRequest,
+  createWebAppVersionSynchronizationBranchName,
+} from './webappVersionSynchronization.ts';
+import type {
+  SemVerWebAppVersionSynchronizationInspection,
   WebAppVersionSynchronizationBranchName,
   WebAppVersionSynchronizationInspection,
+  WebAppVersionSynchronizationRequest,
 } from './webappVersionSynchronization.ts';
 
 const pullRequestDetails = {
@@ -58,6 +69,26 @@ function createSynchronizationBranchName(): WebAppVersionSynchronizationBranchNa
   const {value: branchName} = branchNameResult;
 
   return branchName;
+}
+
+function createSemVerSynchronizationBranchName(): WebAppVersionSynchronizationBranchName {
+  const branchNameResult = createSemVerWebAppVersionSynchronizationBranchName('1.2.0');
+
+  if (branchNameResult.isErr) {
+    throw branchNameResult.error;
+  }
+
+  return branchNameResult.value;
+}
+
+function createSemVerSynchronizationRequest(): Extract<WebAppVersionSynchronizationRequest, {readonly kind: 'semver'}> {
+  const requestResult = createSemVerWebAppVersionSynchronizationRequest('v1.2.0');
+
+  if (requestResult.isErr) {
+    throw requestResult.error;
+  }
+
+  return requestResult.value;
 }
 
 describe('WebApp version synchronization CLI output', () => {
@@ -185,5 +216,43 @@ describe('WebApp version synchronization CLI output', () => {
       release_identifier: '2026-09-09.1',
       production_tag_name: '2026-09-09.1-production',
     });
+  });
+
+  it('serializes SemVer inspection without a legacy release identifier', () => {
+    const inspection: SemVerWebAppVersionSynchronizationInspection = {
+      kind: 'available',
+      productionTagName: createSemVerSynchronizationRequest().productionTagName,
+      webAppVersion: createWebAppVersion('1.2.0'),
+    };
+    const actualOutput = createSemVerWebAppVersionSynchronizationInspectionOutput(inspection);
+
+    expect(actualOutput).toEqual({
+      state: 'available',
+      production_tag_name: 'v1.2.0',
+      webapp_version: '1.2.0',
+    });
+    expect('release_identifier' in actualOutput).toBe(false);
+  });
+
+  it('serializes SemVer synchronization result fields for workflow reporting', () => {
+    const synchronizationResult: SemVerWebAppVersionSynchronizationResult = {
+      action: 'created',
+      productionTagName: createSemVerSynchronizationRequest().productionTagName,
+      webAppVersion: createWebAppVersion('1.2.0'),
+      branchName: createSemVerSynchronizationBranchName(),
+      pullRequestNumber: 123,
+      pullRequestUrl: 'https://github.com/wireapp/wire-webapp/pull/123',
+    };
+    const actualOutput = createSemVerWebAppVersionSynchronizationResultOutput(synchronizationResult);
+
+    expect(actualOutput).toEqual({
+      action: 'created',
+      production_tag_name: 'v1.2.0',
+      webapp_version: '1.2.0',
+      branch_name: 'webapp-version-1.2.0',
+      pull_request_number: 123,
+      pull_request_url: 'https://github.com/wireapp/wire-webapp/pull/123',
+    });
+    expect('release_identifier' in actualOutput).toBe(false);
   });
 });

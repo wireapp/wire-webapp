@@ -21,7 +21,10 @@ import assert from 'node:assert';
 
 import {isUndefined} from '@sindresorhus/is';
 
-import {resolveWebAppVersionSynchronizationState} from './webappVersionSynchronization.ts';
+import {
+  resolveSemVerWebAppVersionSynchronizationState,
+  resolveWebAppVersionSynchronizationState,
+} from './webappVersionSynchronization.ts';
 import {createWebAppVersionSynchronizationGitHubClient} from './webappVersionSynchronizationGitHubClient.ts';
 
 import type {HttpClient, HttpRequest} from '../release-github/githubApi.ts';
@@ -123,6 +126,10 @@ function createFakeHttpClient(responses: readonly unknown[], failure?: Error): F
 
         const response = responses[responseIndex];
         responseIndex += 1;
+
+        if (response instanceof Error) {
+          throw response;
+        }
 
         return response;
       },
@@ -309,6 +316,32 @@ describe('WebApp version synchronization GitHub client', () => {
       '2026-09-09.1-production',
       actualResult.value,
     );
+
+    assert(synchronizationStateResult.isOk);
+    expect(synchronizationStateResult.value.kind).toBe('matching-open');
+  });
+
+  it('discovers a SemVer v2 synchronization pull request by its durable marker', async () => {
+    const fakeHttpClient = createFakeHttpClient([
+      createGitHubPullRequestSearchResponse([43]),
+      createGitHubPullRequestSearchResponse([]),
+      createGitHubPullRequestResponse({
+        number: 43,
+        title: 'Update WebApp version to 1.2.0',
+        body: '<!-- wire-webapp-version-sync:v2 production-tag=v1.2.0 version=1.2.0 -->',
+        headBranch: 'webapp-version-1.2.0',
+      }),
+    ]);
+    const githubClient = createGitHubClient(fakeHttpClient.client);
+
+    const actualResult = await githubClient.listPullRequests();
+
+    assert(actualResult.isOk);
+    expect(fakeHttpClient.requests[0]?.url.searchParams.get('q')).toBe(
+      'repo:wireapp/wire-webapp is:pr in:body "wire-webapp-version-sync"',
+    );
+
+    const synchronizationStateResult = resolveSemVerWebAppVersionSynchronizationState('v1.2.0', actualResult.value);
 
     assert(synchronizationStateResult.isOk);
     expect(synchronizationStateResult.value.kind).toBe('matching-open');
@@ -619,6 +652,142 @@ describe('WebApp version synchronization GitHub client', () => {
       base: 'main',
       body: 'created body',
     });
+  });
+
+  it('adds semver:none to an open pull request without changing its unrelated labels', async () => {
+    const fakeHttpClient = createFakeHttpClient([
+      [{name: 'Otto'}, {name: 'dependencies'}],
+      [{name: 'Otto'}, {name: 'dependencies'}, {name: 'semver:none'}],
+    ]);
+    const githubClient = createGitHubClient(fakeHttpClient.client);
+
+    const actualResult = await githubClient.ensurePullRequestSemVerNoneLabel(42);
+
+    assert(actualResult.isOk);
+    expect(fakeHttpClient.requests).toHaveLength(2);
+    expect(fakeHttpClient.requests[0].method).toBe('get');
+    expect(fakeHttpClient.requests[0].url.toString()).toBe(
+      'https://api.github.example/repos/wireapp/wire-webapp/issues/42/labels?per_page=100&page=1',
+    );
+    expect(fakeHttpClient.requests[1].method).toBe('post');
+    expect(fakeHttpClient.requests[1].url.toString()).toBe(
+      'https://api.github.example/repos/wireapp/wire-webapp/issues/42/labels',
+    );
+    expect(fakeHttpClient.requests[1].headers['Content-Type']).toBe('application/json');
+    assert(fakeHttpClient.requests[1].json.isJust);
+    expect(fakeHttpClient.requests[1].json.value).toEqual({labels: ['semver:none']});
+  });
+
+  it('does not mutate an open pull request that already has semver:none', async () => {
+    const fakeHttpClient = createFakeHttpClient([[{name: 'Otto'}, {name: 'dependencies'}, {name: 'semver:none'}]]);
+    const githubClient = createGitHubClient(fakeHttpClient.client);
+
+    const actualResult = await githubClient.ensurePullRequestSemVerNoneLabel(42);
+
+    assert(actualResult.isOk);
+    expect(fakeHttpClient.requests).toHaveLength(1);
+    expect(fakeHttpClient.requests[0].method).toBe('get');
+  });
+
+  it('checks every GitHub label page before deciding to add semver:none', async () => {
+    const firstPageLabels = Array.from({length: 100}, (_, labelIndex) => {
+      return {name: `custom-${labelIndex}`};
+    });
+    const fakeHttpClient = createFakeHttpClient([firstPageLabels, [{name: 'semver:none'}]]);
+    const githubClient = createGitHubClient(fakeHttpClient.client);
+
+    const actualResult = await githubClient.ensurePullRequestSemVerNoneLabel(42);
+
+    assert(actualResult.isOk);
+    expect(fakeHttpClient.requests).toHaveLength(2);
+    expect(fakeHttpClient.requests[0].url.searchParams.get('page')).toBe('1');
+    expect(fakeHttpClient.requests[1].url.searchParams.get('page')).toBe('2');
+    expect(
+      fakeHttpClient.requests.every(request => {
+        return request.method === 'get';
+      }),
+    ).toBe(true);
+  });
+
+  it.each([
+    {description: 'a product impact label', labels: [{name: 'semver:patch'}], expectedLabels: 'semver:patch'},
+    {
+      description: 'multiple impact labels including none',
+      labels: [{name: 'semver:none'}, {name: 'semver:patch'}],
+      expectedLabels: 'semver:none, semver:patch',
+    },
+  ])('fails without mutation when an open pull request has $description', async options => {
+    const fakeHttpClient = createFakeHttpClient([options.labels]);
+    const githubClient = createGitHubClient(fakeHttpClient.client);
+
+    const actualResult = await githubClient.ensurePullRequestSemVerNoneLabel(42);
+
+    assert(actualResult.isErr);
+    expect(actualResult.error.message).toContain('pull request #42');
+    expect(actualResult.error.message).toContain(options.expectedLabels);
+    expect(fakeHttpClient.requests).toHaveLength(1);
+    expect(fakeHttpClient.requests[0].method).toBe('get');
+  });
+
+  it.each([
+    {description: 'a non-array response', response: {labels: []}},
+    {description: 'a label without a name', response: [{}]},
+    {description: 'a non-string label name', response: [{name: 42}]},
+  ])('rejects $description when reading pull request labels', async options => {
+    const {response} = options;
+    const fakeHttpClient = createFakeHttpClient([response]);
+    const githubClient = createGitHubClient(fakeHttpClient.client);
+
+    const actualResult = await githubClient.ensurePullRequestSemVerNoneLabel(42);
+
+    assert(actualResult.isErr);
+    expect(actualResult.error.message).toBe('Malformed GitHub pull request labels response');
+    expect(fakeHttpClient.requests).toHaveLength(1);
+  });
+
+  it('rejects a malformed response from the add-label API', async () => {
+    const fakeHttpClient = createFakeHttpClient([[], {labels: ['semver:none']}]);
+    const githubClient = createGitHubClient(fakeHttpClient.client);
+
+    const actualResult = await githubClient.ensurePullRequestSemVerNoneLabel(42);
+
+    assert(actualResult.isErr);
+    expect(actualResult.error.message).toBe('Malformed GitHub pull request labels response');
+    expect(
+      fakeHttpClient.requests.map(request => {
+        return request.method;
+      }),
+    ).toEqual(['get', 'post']);
+  });
+
+  it('surfaces add-label API failures and redacts the GitHub token', async () => {
+    const fakeHttpClient = createFakeHttpClient([[], new Error(`GitHub rejected ${githubToken}`)]);
+    const githubClient = createGitHubClient(fakeHttpClient.client);
+
+    const actualResult = await githubClient.ensurePullRequestSemVerNoneLabel(42);
+
+    assert(actualResult.isErr);
+    expect(actualResult.error.message).toContain('Unable to add semver:none to GitHub pull request #42');
+    expect(actualResult.error.message).not.toContain(githubToken);
+    expect(actualResult.error.message).toContain('[REDACTED]');
+    expect(
+      fakeHttpClient.requests.map(request => {
+        return request.method;
+      }),
+    ).toEqual(['get', 'post']);
+  });
+
+  it('surfaces label API failures and redacts the GitHub token', async () => {
+    const fakeHttpClient = createFakeHttpClient([], new Error(`GitHub rejected ${githubToken}`));
+    const githubClient = createGitHubClient(fakeHttpClient.client);
+
+    const actualResult = await githubClient.ensurePullRequestSemVerNoneLabel(42);
+
+    assert(actualResult.isErr);
+    expect(actualResult.error.message).toContain('Unable to read labels for GitHub pull request #42');
+    expect(actualResult.error.message).not.toContain(githubToken);
+    expect(actualResult.error.message).toContain('[REDACTED]');
+    expect(fakeHttpClient.requests).toHaveLength(1);
   });
 
   it('redacts the GitHub token from transport failures', async () => {

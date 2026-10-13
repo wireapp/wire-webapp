@@ -28,10 +28,15 @@ import {readFile as readFileFromFileSystem, writeFile as writeFileToFileSystem} 
 import {resolve} from 'node:path';
 import {isDeepStrictEqual} from 'node:util';
 
-import {resolveNextWebAppVersion, validateMatchingWebAppPackageVersions} from './webappVersion.ts';
-import type {WebAppPackageDocument, WebAppPackageDocuments} from './webappVersion.ts';
+import {
+  compareWebAppVersions,
+  resolveNextWebAppVersion,
+  validateMatchingWebAppPackageVersions,
+} from './webappVersion.ts';
+import type {WebAppPackageDocument, WebAppPackageDocuments, WebAppPackageVersions} from './webappVersion.ts';
 import {
   createWebAppVersionSynchronizationBranchName,
+  validateSemVerWebAppVersionSynchronizationBranchName,
   validateWebAppVersionSynchronizationBranchName,
 } from './webappVersionSynchronization.ts';
 import type {WebAppVersionSynchronizationBranch} from './webappVersionSynchronization.ts';
@@ -60,6 +65,12 @@ export type WebAppVersionSynchronizationBranchInspection = {
 export type ValidateWebAppVersionSynchronizationBranchOptions = {
   readonly branchInspection: WebAppVersionSynchronizationBranchInspection;
   readonly expectedReleaseIdentifier: string;
+  readonly expectedWebAppVersion: string;
+};
+
+export type ValidateSemVerWebAppVersionSynchronizationBranchOptions = {
+  readonly branchInspection: WebAppVersionSynchronizationBranchInspection;
+  readonly expectedProductionTagName: string;
   readonly expectedWebAppVersion: string;
 };
 
@@ -151,6 +162,18 @@ const webAppPackageDocumentSchema = z.record(z.string(), z.unknown());
 const githubServerOrigin = 'https://github.com';
 const gitAuthenticationHeaderKey = `http.${githubServerOrigin}/.extraheader`;
 const gitAuthenticationHeaderPrefix = 'AUTHORIZATION: basic';
+
+function validateAnyWebAppVersionSynchronizationBranchName(
+  branchName: string,
+): Result<WebAppVersionSynchronizationBranch, Error> {
+  const legacyBranchNameResult = validateWebAppVersionSynchronizationBranchName(branchName);
+
+  if (legacyBranchNameResult.isOk) {
+    return legacyBranchNameResult;
+  }
+
+  return validateSemVerWebAppVersionSynchronizationBranchName(branchName);
+}
 
 function errorMessage(error: unknown): string {
   if (isError(error)) {
@@ -385,26 +408,9 @@ export function createRuntimeWebAppVersionSynchronizationFileSystem(): WebAppVer
   };
 }
 
-export function validateWebAppVersionSynchronizationBranch(
-  options: ValidateWebAppVersionSynchronizationBranchOptions,
-): Result<WebAppVersionSynchronizationBranch, Error> {
-  const {branchInspection} = options;
-  const branchNameResult = validateWebAppVersionSynchronizationBranchName(branchInspection.branchName);
-
-  if (branchNameResult.isErr) {
-    return Result.err(branchNameResult.error);
-  }
-
-  const {value: validatedBranchName} = branchNameResult;
-
-  if (validatedBranchName.releaseIdentifier !== options.expectedReleaseIdentifier) {
-    return Result.err(new Error('Synchronization branch belongs to a different release identifier'));
-  }
-
-  if (validatedBranchName.webAppVersion !== options.expectedWebAppVersion) {
-    return Result.err(new Error('Synchronization branch contains an unexpected WebApp version'));
-  }
-
+function validateSynchronizationBranchStructure(
+  branchInspection: WebAppVersionSynchronizationBranchInspection,
+): Result<WebAppPackageVersions, Error> {
   if (branchInspection.mainCommitSha.length === 0) {
     return Result.err(new Error('Synchronization branch has no validated main commit'));
   }
@@ -438,7 +444,78 @@ export function validateWebAppVersionSynchronizationBranch(
     return Result.err(new Error(`Synchronization branch base is invalid: ${basePackageVersionsResult.error.message}`));
   }
 
-  const {value: basePackageVersions} = basePackageVersionsResult;
+  return basePackageVersionsResult;
+}
+
+function validateSynchronizationBranchPackageDocuments(options: {
+  readonly branchInspection: WebAppVersionSynchronizationBranchInspection;
+  readonly expectedWebAppVersion: string;
+}): Result<Unit, Error> {
+  const branchPackageVersionsResult = validateMatchingWebAppPackageVersions(
+    options.branchInspection.branchRootPackageDocument,
+    options.branchInspection.branchWebAppPackageDocument,
+  );
+
+  if (branchPackageVersionsResult.isErr) {
+    return Result.err(
+      new Error(`Synchronization branch package files are invalid: ${branchPackageVersionsResult.error.message}`),
+    );
+  }
+
+  if (branchPackageVersionsResult.value.rootVersion !== options.expectedWebAppVersion) {
+    return Result.err(new Error('Synchronization branch package files contain an unexpected version'));
+  }
+
+  const rootPackageDocumentChangeResult = validatePackageDocumentVersionChange({
+    basePackageDocument: options.branchInspection.baseRootPackageDocument,
+    branchPackageDocument: options.branchInspection.branchRootPackageDocument,
+    packagePath: 'package.json',
+  });
+
+  if (rootPackageDocumentChangeResult.isErr) {
+    return Result.err(rootPackageDocumentChangeResult.error);
+  }
+
+  const webAppPackageDocumentChangeResult = validatePackageDocumentVersionChange({
+    basePackageDocument: options.branchInspection.baseWebAppPackageDocument,
+    branchPackageDocument: options.branchInspection.branchWebAppPackageDocument,
+    packagePath: 'apps/webapp/package.json',
+  });
+
+  if (webAppPackageDocumentChangeResult.isErr) {
+    return Result.err(webAppPackageDocumentChangeResult.error);
+  }
+
+  return Result.ok(Unit);
+}
+
+export function validateWebAppVersionSynchronizationBranch(
+  options: ValidateWebAppVersionSynchronizationBranchOptions,
+): Result<Extract<WebAppVersionSynchronizationBranch, {readonly kind: 'legacy'}>, Error> {
+  const {branchInspection} = options;
+  const branchNameResult = validateWebAppVersionSynchronizationBranchName(branchInspection.branchName);
+
+  if (branchNameResult.isErr) {
+    return Result.err(branchNameResult.error);
+  }
+
+  const {value: validatedBranchName} = branchNameResult;
+
+  if (validatedBranchName.releaseIdentifier !== options.expectedReleaseIdentifier) {
+    return Result.err(new Error('Synchronization branch belongs to a different release identifier'));
+  }
+
+  if (validatedBranchName.webAppVersion !== options.expectedWebAppVersion) {
+    return Result.err(new Error('Synchronization branch contains an unexpected WebApp version'));
+  }
+
+  const branchStructureResult = validateSynchronizationBranchStructure(branchInspection);
+
+  if (branchStructureResult.isErr) {
+    return Result.err(branchStructureResult.error);
+  }
+
+  const {value: basePackageVersions} = branchStructureResult;
   const expectedNextVersionResult = resolveNextWebAppVersion(basePackageVersions.rootVersion);
 
   if (expectedNextVersionResult.isErr) {
@@ -451,41 +528,64 @@ export function validateWebAppVersionSynchronizationBranch(
     return Result.err(new Error('Synchronization branch version does not follow its main base version'));
   }
 
-  const branchPackageVersionsResult = validateMatchingWebAppPackageVersions(
-    branchInspection.branchRootPackageDocument,
-    branchInspection.branchWebAppPackageDocument,
+  const branchPackageDocumentsResult = validateSynchronizationBranchPackageDocuments({
+    branchInspection,
+    expectedWebAppVersion: options.expectedWebAppVersion,
+  });
+
+  if (branchPackageDocumentsResult.isErr) {
+    return Result.err(branchPackageDocumentsResult.error);
+  }
+
+  return Result.ok(validatedBranchName);
+}
+
+export function validateSemVerWebAppVersionSynchronizationBranch(
+  options: ValidateSemVerWebAppVersionSynchronizationBranchOptions,
+): Result<Extract<WebAppVersionSynchronizationBranch, {readonly kind: 'semver'}>, Error> {
+  const {branchInspection} = options;
+  const branchNameResult = validateSemVerWebAppVersionSynchronizationBranchName(branchInspection.branchName);
+
+  if (branchNameResult.isErr) {
+    return Result.err(branchNameResult.error);
+  }
+
+  const {value: validatedBranchName} = branchNameResult;
+
+  if (validatedBranchName.productionTagName !== options.expectedProductionTagName) {
+    return Result.err(new Error('SemVer synchronization branch belongs to a different Production tag'));
+  }
+
+  if (validatedBranchName.webAppVersion !== options.expectedWebAppVersion) {
+    return Result.err(new Error('SemVer synchronization branch contains an unexpected WebApp version'));
+  }
+
+  const branchStructureResult = validateSynchronizationBranchStructure(branchInspection);
+
+  if (branchStructureResult.isErr) {
+    return Result.err(branchStructureResult.error);
+  }
+
+  const baseToTargetComparisonResult = compareWebAppVersions(
+    branchStructureResult.value.rootVersion,
+    options.expectedWebAppVersion,
   );
 
-  if (branchPackageVersionsResult.isErr) {
-    return Result.err(
-      new Error(`Synchronization branch package files are invalid: ${branchPackageVersionsResult.error.message}`),
-    );
+  if (baseToTargetComparisonResult.isErr) {
+    return Result.err(baseToTargetComparisonResult.error);
   }
 
-  const {value: branchPackageVersions} = branchPackageVersionsResult;
-
-  if (branchPackageVersions.rootVersion !== options.expectedWebAppVersion) {
-    return Result.err(new Error('Synchronization branch package files contain an unexpected version'));
+  if (baseToTargetComparisonResult.value >= 0) {
+    return Result.err(new Error('SemVer synchronization branch target must be higher than its main base version'));
   }
 
-  const rootPackageDocumentChangeResult = validatePackageDocumentVersionChange({
-    basePackageDocument: branchInspection.baseRootPackageDocument,
-    branchPackageDocument: branchInspection.branchRootPackageDocument,
-    packagePath: 'package.json',
+  const branchPackageDocumentsResult = validateSynchronizationBranchPackageDocuments({
+    branchInspection,
+    expectedWebAppVersion: options.expectedWebAppVersion,
   });
 
-  if (rootPackageDocumentChangeResult.isErr) {
-    return Result.err(rootPackageDocumentChangeResult.error);
-  }
-
-  const webAppPackageDocumentChangeResult = validatePackageDocumentVersionChange({
-    basePackageDocument: branchInspection.baseWebAppPackageDocument,
-    branchPackageDocument: branchInspection.branchWebAppPackageDocument,
-    packagePath: 'apps/webapp/package.json',
-  });
-
-  if (webAppPackageDocumentChangeResult.isErr) {
-    return Result.err(webAppPackageDocumentChangeResult.error);
+  if (branchPackageDocumentsResult.isErr) {
+    return Result.err(branchPackageDocumentsResult.error);
   }
 
   return Result.ok(validatedBranchName);
@@ -775,7 +875,7 @@ export function createSimpleGitWebAppVersionSynchronizationClient(
     },
 
     inspectBranch(inspectOptions) {
-      const branchNameResult = validateWebAppVersionSynchronizationBranchName(inspectOptions.branchName);
+      const branchNameResult = validateAnyWebAppVersionSynchronizationBranchName(inspectOptions.branchName);
 
       if (branchNameResult.isErr) {
         return Task.reject<WebAppVersionSynchronizationBranchInspection | undefined, Error>(branchNameResult.error);
@@ -785,7 +885,7 @@ export function createSimpleGitWebAppVersionSynchronizationClient(
     },
 
     createBranchFromMain(createBranchOptions) {
-      const branchNameResult = validateWebAppVersionSynchronizationBranchName(createBranchOptions.branchName);
+      const branchNameResult = validateAnyWebAppVersionSynchronizationBranchName(createBranchOptions.branchName);
 
       if (branchNameResult.isErr) {
         return Task.reject<Unit, Error>(branchNameResult.error);

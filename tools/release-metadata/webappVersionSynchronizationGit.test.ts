@@ -31,6 +31,7 @@ import {
   createSimpleGitWebAppVersionSynchronizationClient,
   redactWebAppVersionSynchronizationGitFailureMessage,
   parseWebAppVersionSynchronizationPackageDocument,
+  validateSemVerWebAppVersionSynchronizationBranch,
   validateWebAppVersionSynchronizationBranch,
   webAppVersionSynchronizationPackageFilePaths,
 } from './webappVersionSynchronizationGit.ts';
@@ -96,6 +97,20 @@ function createValidBranchInspection(): WebAppVersionSynchronizationBranchInspec
     baseWebAppPackageDocument: createPackageDocument('0.27.0'),
     branchRootPackageDocument: createPackageDocument('1.0.0'),
     branchWebAppPackageDocument: createPackageDocument('1.0.0'),
+  };
+}
+
+function createSemVerBranchInspection(
+  baseVersion: string,
+  targetVersion: string,
+): WebAppVersionSynchronizationBranchInspection {
+  return {
+    ...createValidBranchInspection(),
+    branchName: `webapp-version-${targetVersion}`,
+    baseRootPackageDocument: createPackageDocument(baseVersion),
+    baseWebAppPackageDocument: createPackageDocument(baseVersion),
+    branchRootPackageDocument: createPackageDocument(targetVersion),
+    branchWebAppPackageDocument: createPackageDocument(targetVersion),
   };
 }
 
@@ -200,6 +215,7 @@ describe('WebApp synchronization branch validation', () => {
 
     assert(actualResult.isOk);
     expect(actualResult.value).toEqual({
+      kind: 'legacy',
       branchName: synchronizationBranchName,
       releaseIdentifier,
       webAppVersion: '1.0.0',
@@ -322,6 +338,39 @@ describe('WebApp synchronization branch validation', () => {
   it('rejects an invalid synchronization branch name', () => {
     const actualResult = validateBranch({
       branchInspection: {...createValidBranchInspection(), branchName: 'webapp-version-invalid'},
+    });
+
+    assert(actualResult.isErr);
+  });
+});
+
+describe('SemVer WebApp synchronization branch validation', () => {
+  it('accepts a direct version jump from its main base', () => {
+    const branchInspection = createSemVerBranchInspection('1.0.0', '1.2.0');
+    const actualResult = validateSemVerWebAppVersionSynchronizationBranch({
+      branchInspection,
+      expectedProductionTagName: 'v1.2.0',
+      expectedWebAppVersion: '1.2.0',
+    });
+
+    assert(actualResult.isOk);
+    expect(actualResult.value).toMatchObject({
+      kind: 'semver',
+      branchName: 'webapp-version-1.2.0',
+      productionTagName: 'v1.2.0',
+      webAppVersion: '1.2.0',
+    });
+  });
+
+  it.each([
+    ['base version is higher than the target', '1.2.0', '1.1.0'],
+    ['base version already equals the target', '1.2.0', '1.2.0'],
+  ])('rejects recovery when %s', (_description, baseVersion, targetVersion) => {
+    const branchInspection = createSemVerBranchInspection(baseVersion, targetVersion);
+    const actualResult = validateSemVerWebAppVersionSynchronizationBranch({
+      branchInspection,
+      expectedProductionTagName: `v${targetVersion}`,
+      expectedWebAppVersion: targetVersion,
     });
 
     assert(actualResult.isErr);
