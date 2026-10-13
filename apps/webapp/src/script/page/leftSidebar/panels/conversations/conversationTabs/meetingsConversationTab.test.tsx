@@ -44,6 +44,7 @@ describe('MeetingsConversationTab', () => {
         loadMeetings,
         scheduleMeeting: jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
         meetNowMeeting: jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
+        rotateMeetingLink: jest.fn(),
         updateMeeting: jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
         deleteMeetingForMe: jest.fn().mockReturnValue(task.resolve(undefined)),
         deleteMeetingForAll: jest.fn().mockReturnValue(task.resolve(undefined)),

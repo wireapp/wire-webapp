@@ -19,8 +19,10 @@
 
 import {CSSObject} from '@emotion/react';
 
+import {narrowModalWrapperStyles} from 'Components/meeting/shared/styles/meetingModalShell.styles';
+
 export const meetNowModalWrapperStyles: CSSObject = {
-  maxWidth: '480px',
+  ...narrowModalWrapperStyles,
 };
 
 export const meetNowFormLayoutStyles: CSSObject = {

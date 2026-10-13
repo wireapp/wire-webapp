@@ -22,11 +22,12 @@ import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
 import {User} from 'Repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';
 
-import {canEditMeeting} from './canEditMeeting';
+import {canEditMeeting, canRotateMeetingLink} from './canEditMeeting';
 
 const FUTURE_MEETING_TIMESTAMP = Date.parse('2026-06-15T13:00:00.000Z');
 const ONGOING_MEETING_TIMESTAMP = Date.parse('2026-06-15T14:30:00.000Z');
 const PAST_MEETING_TIMESTAMP = Date.parse('2026-06-15T16:00:00.000Z');
+const BETWEEN_RECURRING_INSTANCES_TIMESTAMP = Date.parse('2026-06-10T14:30:00.000Z');
 
 const createSeries = (overrides: Partial<MeetingSeries> = {}): MeetingSeries => {
   return {
@@ -106,5 +107,29 @@ describe('canEditMeeting', () => {
     const selfUser = createSelfUser();
 
     expect(canEditMeeting(meetingInstance, selfUser, FUTURE_MEETING_TIMESTAMP)).toBe(true);
+  });
+});
+
+describe('canRotateMeetingLink', () => {
+  it('returns true for a host when a one-time meeting has not started', () => {
+    const meetingInstance = createMeetingInstance({recurrence: 'doesNotRepeat'});
+    const selfUser = createSelfUser();
+
+    expect(canRotateMeetingLink(meetingInstance, selfUser, FUTURE_MEETING_TIMESTAMP)).toBe(true);
+  });
+
+  it('returns true for a past recurring instance when another instance is upcoming', () => {
+    const meetingInstance = createMeetingInstance(
+      {
+        series_start_date: '2026-06-08T14:00:00.000Z',
+        series_end_date: '2026-06-08T15:00:00.000Z',
+        recurrence: 'weekly',
+      },
+      '2026-06-08T14:00:00.000Z',
+      '2026-06-08T15:00:00.000Z',
+    );
+    const selfUser = createSelfUser();
+
+    expect(canRotateMeetingLink(meetingInstance, selfUser, BETWEEN_RECURRING_INSTANCES_TIMESTAMP)).toBe(true);
   });
 });

@@ -118,6 +118,7 @@ const createMeetingStoreForTest = (): StoreApi<MeetingStoreState> => {
       loadMeetings: jest.fn(),
       scheduleMeeting: jest.fn(),
       meetNowMeeting: jest.fn(),
+      rotateMeetingLink: jest.fn(),
       updateMeeting: jest.fn(),
       deleteMeetingForMe: jest.fn(),
       deleteMeetingForAll: jest.fn(),

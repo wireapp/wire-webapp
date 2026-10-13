@@ -31,7 +31,7 @@ import {
 import {MEETING_ACTION_TRANSLATION_KEYS} from 'Components/meeting/meetingList/meetingListItemGroup/meetingListItem/meetingAction/meetingActionTranslationKeys';
 import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
 import {canDeleteMeetingForAll, canDeleteMeetingForMe} from 'Components/meeting/utils/canDeleteMeeting';
-import {canEditMeeting} from 'Components/meeting/utils/canEditMeeting';
+import {canEditMeeting, canRotateMeetingLink} from 'Components/meeting/utils/canEditMeeting';
 import type {User} from 'Repositories/entity/User';
 import type {ContextMenuEntry} from 'src/script/ui/contextMenu';
 import type {Translate} from 'Util/localizerUtil';
@@ -45,6 +45,7 @@ type GetMeetingActionEntriesParams = {
   isJoinDisabled?: boolean;
   onEdit: () => void;
   onShowMeetingLink: () => void;
+  onRotateMeetingLink: () => void;
   meetingLink?: string;
   onDeleteForAll: () => void;
   onDeleteForMe: () => void;
@@ -59,6 +60,7 @@ export const getMeetingActionEntries = ({
   isJoinDisabled = false,
   onEdit,
   onShowMeetingLink,
+  onRotateMeetingLink,
   meetingLink,
   onDeleteForAll,
   onDeleteForMe,
@@ -88,6 +90,14 @@ export const getMeetingActionEntries = ({
     click: onShowMeetingLink,
   };
 
+  const rotateMeetingLinkEntry: ContextMenuEntry = {
+    icon: () => {
+      return <LinkIcon css={linkIconStyles} />;
+    },
+    label: translate(MEETING_ACTION_TRANSLATION_KEYS.rotateMeetingLink),
+    click: onRotateMeetingLink,
+  };
+
   const deleteForMeEntry: ContextMenuEntry = {
     css: contextMenuDangerItemStyles,
     icon: () => {
@@ -113,6 +123,7 @@ export const getMeetingActionEntries = ({
     joinEntry,
     ...(canEditMeeting(meetingInstance, selfUser, nowMilliseconds) ? [editEntry] : []),
     ...(isNullOrUndefined(meetingLink) ? [] : [copyMeetingLinkEntry]),
+    ...(canRotateMeetingLink(meetingInstance, selfUser, nowMilliseconds) ? [rotateMeetingLinkEntry] : []),
     ...(showDeleteForAll ? [deleteForAllEntry] : []),
     ...(showDeleteForMe ? [deleteForMeEntry] : []),
   ];

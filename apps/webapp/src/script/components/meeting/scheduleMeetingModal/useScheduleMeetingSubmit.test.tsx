@@ -128,6 +128,7 @@ const createMeetingStore = ({
       hasLoadError: false,
       loadMeetings,
       scheduleMeeting,
+      rotateMeetingLink: jest.fn(),
       meetNowMeeting: jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
       updateMeeting,
       deleteMeetingForMe: jest.fn().mockReturnValue(task.resolve(undefined)),
