@@ -19,7 +19,7 @@
 
 import {isUndefined} from '@sindresorhus/is';
 import assert from 'node:assert';
-import {Result, Task} from 'true-myth';
+import {Result, Task, Unit} from 'true-myth';
 
 import {createProductionTagName} from './releaseMetadata.ts';
 import {
@@ -185,6 +185,9 @@ type FakeGitHubClientState = {
   readonly createPullRequestError: Error | undefined;
   listPullRequestsCallCount: number;
   createPullRequestOptions: CreateWebAppVersionSynchronizationPullRequestOptions[];
+  ensurePullRequestSemVerNoneLabelCallNumbers: number[];
+  ensurePullRequestSemVerNoneLabelCallCount: number;
+  ensurePullRequestSemVerNoneLabelErrors: readonly (Error | undefined)[];
 };
 
 type FakeGitHubClient = {
@@ -196,6 +199,7 @@ type CreateFakeGitHubClientOptions = {
   readonly pullRequestsByListCall?: readonly (readonly WebAppVersionSynchronizationPullRequest[])[];
   readonly createdPullRequest?: WebAppVersionSynchronizationPullRequest;
   readonly createPullRequestError?: Error;
+  readonly ensurePullRequestSemVerNoneLabelErrors?: readonly (Error | undefined)[];
 };
 
 function createFakeGitHubClient(options: CreateFakeGitHubClientOptions = {}): FakeGitHubClient {
@@ -205,6 +209,9 @@ function createFakeGitHubClient(options: CreateFakeGitHubClientOptions = {}): Fa
     createPullRequestError: options.createPullRequestError,
     listPullRequestsCallCount: 0,
     createPullRequestOptions: [],
+    ensurePullRequestSemVerNoneLabelCallNumbers: [],
+    ensurePullRequestSemVerNoneLabelCallCount: 0,
+    ensurePullRequestSemVerNoneLabelErrors: options.ensurePullRequestSemVerNoneLabelErrors ?? [],
   };
 
   const client: WebAppVersionSynchronizationGitHubClient = {
@@ -239,6 +246,18 @@ function createFakeGitHubClient(options: CreateFakeGitHubClientOptions = {}): Fa
             }));
 
       return Task.resolve(createdPullRequest);
+    },
+
+    ensurePullRequestSemVerNoneLabel(pullRequestNumber) {
+      state.ensurePullRequestSemVerNoneLabelCallNumbers.push(pullRequestNumber);
+      const error = state.ensurePullRequestSemVerNoneLabelErrors.at(state.ensurePullRequestSemVerNoneLabelCallCount);
+      state.ensurePullRequestSemVerNoneLabelCallCount += 1;
+
+      if (error !== undefined) {
+        return Task.reject(error);
+      }
+
+      return Task.resolve(Unit);
     },
   };
 
@@ -475,6 +494,7 @@ describe('WebApp version synchronization orchestration', () => {
     expect(fakeGitClient.state.pushBranchOptions).toEqual([{branchName: synchronizationBranchName}]);
     expect(fakeGitClient.state.verifyMainCommitArguments).toEqual([mainCommitSha, mainCommitSha]);
     expect(fakeGitHubClient.state.createPullRequestOptions).toHaveLength(1);
+    expect(fakeGitHubClient.state.ensurePullRequestSemVerNoneLabelCallNumbers).toEqual([1]);
     expect(fakeGitHubClient.state.createPullRequestOptions[0]).toMatchObject({
       title: 'Update WebApp version to 1.0.0',
       headBranch: synchronizationBranchName,
@@ -556,6 +576,7 @@ describe('WebApp version synchronization orchestration', () => {
     expect(synchronizationResult.webAppVersion).toBe('1.0.0');
     expect(fakeGitClient.state.prepareLatestMainCallCount).toBe(0);
     expect(fakeGitHubClient.state.createPullRequestOptions).toHaveLength(0);
+    expect(fakeGitHubClient.state.ensurePullRequestSemVerNoneLabelCallNumbers).toEqual([1]);
   });
 
   it('reuses a matching merged pull request even when main has advanced', async () => {
@@ -576,6 +597,29 @@ describe('WebApp version synchronization orchestration', () => {
     });
     expect(fakeGitClient.state.prepareLatestMainCallCount).toBe(0);
     expect(fakeGitHubClient.state.createPullRequestOptions).toHaveLength(0);
+    expect(fakeGitHubClient.state.ensurePullRequestSemVerNoneLabelCallNumbers).toEqual([]);
+  });
+
+  it('fails closed when an open synchronization pull request has a conflicting release-impact label', async () => {
+    const fakeGitHubClient = createFakeGitHubClient({
+      pullRequestsByListCall: [[createSynchronizationPullRequest()]],
+      ensurePullRequestSemVerNoneLabelErrors: [
+        new Error('GitHub pull request #1 has conflicting release-impact labels: semver:patch'),
+      ],
+    });
+    const fakeGitClient = createFakeGitClient();
+
+    const actualResult = await synchronizeWebAppVersion(
+      createSynchronizationOptions({
+        githubClient: fakeGitHubClient.client,
+        gitClient: fakeGitClient.client,
+      }),
+    );
+
+    assert(actualResult.isErr);
+    expect(actualResult.error.message).toContain('semver:patch');
+    expect(actualResult.error.message).toContain('#1');
+    expect(fakeGitHubClient.state.ensurePullRequestSemVerNoneLabelCallNumbers).toEqual([1]);
   });
 
   it('fails closed when a matching pull request was closed without merge', async () => {
@@ -746,6 +790,7 @@ describe('WebApp version synchronization orchestration', () => {
     expect(fakeGitClient.state.pushBranchOptions).toHaveLength(0);
     expect(fakeGitClient.state.verifyMainCommitArguments).toEqual([mainCommitSha]);
     expect(fakeGitHubClient.state.createPullRequestOptions).toHaveLength(1);
+    expect(fakeGitHubClient.state.ensurePullRequestSemVerNoneLabelCallNumbers).toEqual([1]);
   });
 
   it.each([
@@ -820,6 +865,7 @@ describe('WebApp version synchronization orchestration', () => {
     );
 
     expect(expectSynchronizationResult(actualResult).action).toBe('already-open');
+    expect(fakeGitHubClient.state.ensurePullRequestSemVerNoneLabelCallNumbers).toEqual([1]);
     expect(fakeGitClient.state.commitOptions).toHaveLength(0);
     expect(fakeGitClient.state.pushBranchOptions).toHaveLength(0);
     expect(fakeGitHubClient.state.createPullRequestOptions).toHaveLength(0);
@@ -840,6 +886,7 @@ describe('WebApp version synchronization orchestration', () => {
     );
 
     expect(expectSynchronizationResult(actualResult).action).toBe('already-open');
+    expect(fakeGitHubClient.state.ensurePullRequestSemVerNoneLabelCallNumbers).toEqual([1]);
     expect(fakeGitClient.state.commitOptions).toHaveLength(1);
     expect(fakeGitClient.state.pushBranchOptions).toHaveLength(1);
     expect(fakeGitHubClient.state.createPullRequestOptions).toHaveLength(0);
@@ -900,6 +947,7 @@ describe('SemVer WebApp version synchronization orchestration', () => {
     });
     expect(fakeGitHubClient.state.createPullRequestOptions[0]?.body).toContain(`Production tag: ${productionTagName}`);
     expect(fakeGitHubClient.state.createPullRequestOptions[0]?.body).toContain(`WebApp version: ${expectedVersion}`);
+    expect(fakeGitHubClient.state.ensurePullRequestSemVerNoneLabelCallNumbers).toEqual([11]);
   });
 
   it('refuses to downgrade package metadata when the main version is higher than the tag', async () => {
@@ -953,6 +1001,7 @@ describe('SemVer WebApp version synchronization orchestration', () => {
 
     expect(expectSemVerSynchronizationResult(actualResult).action).toBe('already-merged');
     expect(fakeGitClient.state.prepareLatestMainCallCount).toBe(0);
+    expect(fakeGitHubClient.state.ensurePullRequestSemVerNoneLabelCallNumbers).toEqual([]);
   });
 
   it('returns already-open for a matching open SemVer record', async () => {
@@ -970,6 +1019,55 @@ describe('SemVer WebApp version synchronization orchestration', () => {
 
     expect(expectSemVerSynchronizationResult(actualResult).action).toBe('already-open');
     expect(fakeGitClient.state.prepareLatestMainCallCount).toBe(0);
+    expect(fakeGitHubClient.state.ensurePullRequestSemVerNoneLabelCallNumbers).toEqual([11]);
+  });
+
+  it('fails closed when an open SemVer synchronization pull request has a conflicting impact label', async () => {
+    const fakeGitHubClient = createFakeGitHubClient({
+      pullRequestsByListCall: [[createSemVerSynchronizationPullRequest()]],
+      ensurePullRequestSemVerNoneLabelErrors: [
+        new Error('GitHub pull request #11 has conflicting release-impact labels: semver:patch'),
+      ],
+    });
+    const fakeGitClient = createFakeGitClient();
+    const actualResult = await synchronizeSemVerWebAppVersion(
+      createSemVerSynchronizationOptions({
+        productionTagName: 'v1.1.0',
+        githubClient: fakeGitHubClient.client,
+        gitClient: fakeGitClient.client,
+      }),
+    );
+
+    assert(actualResult.isErr);
+    expect(actualResult.error.message).toContain('semver:patch');
+    expect(actualResult.error.message).toContain('#11');
+    expect(fakeGitHubClient.state.ensurePullRequestSemVerNoneLabelCallNumbers).toEqual([11]);
+  });
+
+  it('retries label reconciliation for an already-open SemVer record after the first labeling attempt failed', async () => {
+    const matchingPullRequest = createSemVerSynchronizationPullRequest();
+    const fakeGitHubClient = createFakeGitHubClient({
+      pullRequestsByListCall: [[], [], [], [], [matchingPullRequest]],
+      ensurePullRequestSemVerNoneLabelErrors: [new Error('GitHub label update failed'), undefined],
+    });
+    const fakeGitClient = createFakeGitClient();
+    const synchronizationOptions = createSemVerSynchronizationOptions({
+      productionTagName: 'v1.1.0',
+      githubClient: fakeGitHubClient.client,
+      gitClient: fakeGitClient.client,
+    });
+
+    const firstResult = await synchronizeSemVerWebAppVersion(synchronizationOptions);
+
+    assert(firstResult.isErr);
+    expect(firstResult.error.message).toBe('GitHub label update failed');
+
+    const retryResult = await synchronizeSemVerWebAppVersion(synchronizationOptions);
+
+    expect(expectSemVerSynchronizationResult(retryResult).action).toBe('already-open');
+    expect(fakeGitHubClient.state.ensurePullRequestSemVerNoneLabelCallNumbers).toEqual([11, 11]);
+    expect(fakeGitHubClient.state.createPullRequestOptions).toHaveLength(1);
+    expect(fakeGitClient.state.createBranchOptions).toHaveLength(1);
   });
 
   it('fails for a matching closed-without-merge record', async () => {

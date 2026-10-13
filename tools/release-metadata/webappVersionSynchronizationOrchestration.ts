@@ -19,7 +19,7 @@
 
 import {isUndefined} from '@sindresorhus/is';
 import {Maybe, Result, Task, Unit} from 'true-myth';
-import {match} from 'ts-pattern';
+import {match, P} from 'ts-pattern';
 
 import type {StableWebAppTagName} from './webappReleaseIdentity.ts';
 import {
@@ -152,6 +152,22 @@ type ExistingSynchronizationDetails = {
   readonly branchName: WebAppVersionSynchronizationBranchName;
 };
 
+type SynchronizationResultWithPullRequest = {
+  readonly action: WebAppVersionSynchronizationAction;
+  readonly pullRequestNumber: number;
+};
+
+type EnsureSynchronizationResultLabelOptions<SynchronizationResult extends SynchronizationResultWithPullRequest> = {
+  readonly githubClient: WebAppVersionSynchronizationGitHubClient;
+  readonly synchronizationResult: SynchronizationResult;
+};
+
+type EnsureMaybeSynchronizationResultLabelOptions<SynchronizationResult extends SynchronizationResultWithPullRequest> =
+  {
+    readonly githubClient: WebAppVersionSynchronizationGitHubClient;
+    readonly synchronizationResultMaybe: Maybe<SynchronizationResult>;
+  };
+
 export function inspectWebAppVersionSynchronization(
   options: InspectWebAppVersionSynchronizationOptions,
 ): Task<WebAppVersionSynchronizationInspection, Error> {
@@ -214,6 +230,43 @@ function resolveInspectionOutcome(
     .exhaustive();
 }
 
+function ensureSemVerNoneLabelForSynchronizationResult<
+  SynchronizationResult extends SynchronizationResultWithPullRequest,
+>(options: EnsureSynchronizationResultLabelOptions<SynchronizationResult>): Task<SynchronizationResult, Error> {
+  return match(options.synchronizationResult.action)
+    .with(P.union('created', 'recovered', 'already-open'), () => {
+      return options.githubClient
+        .ensurePullRequestSemVerNoneLabel(options.synchronizationResult.pullRequestNumber)
+        .map(() => {
+          return options.synchronizationResult;
+        });
+    })
+    .with('already-merged', () => {
+      return Task.resolve(options.synchronizationResult);
+    })
+    .exhaustive();
+}
+
+function ensureSemVerNoneLabelForMaybeSynchronizationResult<
+  SynchronizationResult extends SynchronizationResultWithPullRequest,
+>(
+  options: EnsureMaybeSynchronizationResultLabelOptions<SynchronizationResult>,
+): Task<Maybe<SynchronizationResult>, Error> {
+  return options.synchronizationResultMaybe.match({
+    Just(synchronizationResult) {
+      return ensureSemVerNoneLabelForSynchronizationResult({
+        githubClient: options.githubClient,
+        synchronizationResult,
+      }).map(() => {
+        return Maybe.just<SynchronizationResult>(synchronizationResult);
+      });
+    },
+    Nothing() {
+      return Task.resolve(Maybe.nothing<SynchronizationResult>());
+    },
+  });
+}
+
 function resolveCurrentSynchronizationOutcome(
   options: SynchronizeWebAppVersionOptions,
 ): Task<Maybe<WebAppVersionSynchronizationResult>, Error> {
@@ -221,7 +274,14 @@ function resolveCurrentSynchronizationOutcome(
     releaseIdentifier: options.releaseIdentifier,
     productionTagName: options.productionTagName,
     githubClient: options.dependencies.githubClient,
-  }).andThen(resolveInspectionOutcome);
+  })
+    .andThen(resolveInspectionOutcome)
+    .andThen(synchronizationResultMaybe => {
+      return ensureSemVerNoneLabelForMaybeSynchronizationResult({
+        githubClient: options.dependencies.githubClient,
+        synchronizationResultMaybe,
+      });
+    });
 }
 
 function createSynchronizationRequestDetails(
@@ -405,6 +465,12 @@ function createPullRequestForBranch(
         branchName: validatedBranchName,
         pullRequestNumber: synchronizationRecord.pullRequest.number,
         pullRequestUrl: synchronizationRecord.pullRequest.url,
+      });
+    })
+    .andThen(synchronizationResult => {
+      return ensureSemVerNoneLabelForSynchronizationResult({
+        githubClient: options.synchronizationOptions.dependencies.githubClient,
+        synchronizationResult,
       });
     });
 }
@@ -681,9 +747,22 @@ function resolveCurrentSemVerSynchronizationOutcome(
   synchronizationRequest: SemVerSynchronizationRequest,
 ): Task<Maybe<SemVerWebAppVersionSynchronizationResult>, Error> {
   return synchronizationOptions.dependencies.githubClient.listPullRequests().andThen(pullRequests => {
-    return resolveSemVerWebAppVersionSynchronizationStateForRequest(synchronizationRequest, pullRequests).andThen(
-      resolveSemVerInspectionOutcome,
-    );
+    const inspectionOutcomeResult = resolveSemVerWebAppVersionSynchronizationStateForRequest(
+      synchronizationRequest,
+      pullRequests,
+    ).andThen(resolveSemVerInspectionOutcome);
+
+    return inspectionOutcomeResult.match({
+      Err(error) {
+        return Task.reject<Maybe<SemVerWebAppVersionSynchronizationResult>, Error>(error);
+      },
+      Ok(synchronizationResultMaybe) {
+        return ensureSemVerNoneLabelForMaybeSynchronizationResult({
+          githubClient: synchronizationOptions.dependencies.githubClient,
+          synchronizationResultMaybe,
+        });
+      },
+    });
   });
 }
 
@@ -744,6 +823,12 @@ function createSemVerPullRequestForBranch(
         branchName: options.branchName,
         pullRequestNumber: synchronizationRecord.pullRequest.number,
         pullRequestUrl: synchronizationRecord.pullRequest.url,
+      });
+    })
+    .andThen(synchronizationResult => {
+      return ensureSemVerNoneLabelForSynchronizationResult({
+        githubClient: options.synchronizationOptions.dependencies.githubClient,
+        synchronizationResult,
       });
     });
 }
