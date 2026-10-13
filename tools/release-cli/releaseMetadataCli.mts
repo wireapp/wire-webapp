@@ -69,6 +69,14 @@ export function createCommand(createCommandOptions: CreateReleaseMetadataCommand
     });
 
   command
+    .command('next-webapp-beta-tag')
+    .argument('<version>')
+    .argument('[existing-tag...]')
+    .action(async (version: string, existingTagNames: string[]) => {
+      await createCommandOptions.executeCommand({kind: 'next-webapp-beta-tag', version, existingTagNames});
+    });
+
+  command
     .command('production-tag')
     .argument('<release-identifier>')
     .action(async (releaseIdentifier: string) => {
