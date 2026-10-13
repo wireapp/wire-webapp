@@ -97,18 +97,20 @@ describe('createMeetingStore', () => {
   const createDeps = ({
     getMeetingsList = jest.fn().mockReturnValue(task.resolve([apiMeeting])),
     getMeeting = jest.fn().mockReturnValue(task.resolve(apiMeeting)),
+    rotateMeetingLink = jest.fn().mockReturnValue(task.resolve({...apiMeeting, link: 'https://wire.example/new-link'})),
     safeGetConversationById = jest.fn(),
     serviceTasks = createServiceTasks(),
     clock: clockOverride = clock,
   }: {
     getMeetingsList?: jest.Mock;
     getMeeting?: jest.Mock;
+    rotateMeetingLink?: jest.Mock;
     safeGetConversationById?: jest.Mock;
     serviceTasks?: MeetingStoreServiceTasks;
     clock?: typeof clock;
   } = {}): MeetingStoreDeps => {
     return {
-      meetingsRepository: {getMeetingsList, getMeeting} as unknown as MeetingsRepository,
+      meetingsRepository: {getMeetingsList, getMeeting, rotateMeetingLink} as unknown as MeetingsRepository,
       conversationRepository: {safeGetConversationById} as unknown as ConversationRepository,
       callingRepository: {findCall: jest.fn(), leaveCall: jest.fn()} as unknown as CallingRepository,
       clock: clockOverride,
@@ -131,6 +133,92 @@ describe('createMeetingStore', () => {
     expect(store.getState().meetingSeries).toHaveLength(1);
     expect(store.getState().meetingSeries[0]?.title).toBe('Weekly sync');
     expect(store.getState().meetingSeries[0]).toMatchObject(meetingSeriesEntry);
+  });
+
+  it('updates only the cached meeting link after a successful rotation', async () => {
+    const existingSeries = {...meetingSeriesEntry, link: 'https://wire.example/old-link', title: 'Keep this title'};
+    const rotateMeetingLink = jest
+      .fn()
+      .mockReturnValue(task.resolve({...apiMeeting, link: 'https://wire.example/new-link', title: 'Server title'}));
+    const store = createMeetingStore(createDeps({rotateMeetingLink}), {meetingSeries: [existingSeries]});
+
+    const result = await store.getState().rotateMeetingLink(apiMeeting.qualified_id);
+
+    expect(result.isOk).toBe(true);
+    expect(store.getState().meetingSeries).toEqual([{...existingSeries, link: 'https://wire.example/new-link'}]);
+  });
+
+  it('does not let an older meeting sync overwrite a rotated link', async () => {
+    let finishFetch: () => void = noop;
+    const fetchGate = new Promise<void>(resolve => {
+      finishFetch = resolve;
+    });
+    const getMeeting = jest.fn().mockReturnValue(
+      task.tryOrElse(
+        () => {
+          return new Error('fetch failed');
+        },
+        async () => {
+          await fetchGate;
+          return apiMeeting;
+        },
+      ),
+    );
+    const existingSeries = {...meetingSeriesEntry, link: 'https://wire.example/old-link'};
+    const store = createMeetingStore(createDeps({getMeeting}), {meetingSeries: [existingSeries]});
+
+    const pendingSync = store.getState().syncMeetingByQualifiedId(apiMeeting.qualified_id);
+    await store.getState().rotateMeetingLink(apiMeeting.qualified_id);
+    finishFetch();
+
+    const syncResult = await pendingSync;
+
+    expect(unwrap(syncResult)).toEqual({meeting: expect.anything(), applied: false});
+    expect(store.getState().meetingSeries).toEqual([{...existingSeries, link: 'https://wire.example/new-link'}]);
+  });
+
+  it('preserves the cached meeting after a failed rotation', async () => {
+    const existingSeries = {...meetingSeriesEntry, link: 'https://wire.example/old-link'};
+    const store = createMeetingStore(
+      createDeps({rotateMeetingLink: jest.fn().mockReturnValue(task.reject(new Error('rotation failed')))}),
+      {meetingSeries: [existingSeries]},
+    );
+
+    const result = await store.getState().rotateMeetingLink(apiMeeting.qualified_id);
+
+    expect(result.isErr).toBe(true);
+    expect(store.getState().meetingSeries).toEqual([existingSeries]);
+  });
+
+  it('maps a not-found rotation response to the domain error', async () => {
+    const existingSeries = {...meetingSeriesEntry, link: 'https://wire.example/old-link'};
+    const store = createMeetingStore(
+      createDeps({
+        rotateMeetingLink: jest.fn().mockReturnValue(task.reject({response: {status: 404}})),
+      }),
+      {meetingSeries: [existingSeries]},
+    );
+
+    const result = await store.getState().rotateMeetingLink(apiMeeting.qualified_id);
+
+    expect(result.isErr).toBe(true);
+    if (result.isErr) {
+      expect(result.error).toBe('notFound');
+    }
+    expect(store.getState().meetingSeries).toEqual([existingSeries]);
+  });
+
+  it('preserves the cached meeting when the rotation response is malformed', async () => {
+    const existingSeries = {...meetingSeriesEntry, link: 'https://wire.example/old-link'};
+    const store = createMeetingStore(
+      createDeps({rotateMeetingLink: jest.fn().mockReturnValue(task.resolve({...apiMeeting, end_time: 'invalid'}))}),
+      {meetingSeries: [existingSeries]},
+    );
+
+    const result = await store.getState().rotateMeetingLink(apiMeeting.qualified_id);
+
+    expect(result.isErr).toBe(true);
+    expect(store.getState().meetingSeries).toEqual([existingSeries]);
   });
 
   it('keeps the list visible while reloading meetings that are already shown', async () => {

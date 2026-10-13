@@ -17,6 +17,8 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {task, type Task} from 'true-myth';
 import {createStore, type StoreApi} from 'zustand/vanilla';
 
@@ -27,6 +29,7 @@ import type {MeetingWithConversation} from '../../../apiClient/meetings/meeting'
 import type {User} from '../../../repositories/entity/User';
 import {getLogger} from '../../../util/logger';
 import {matchQualifiedIds} from '../../../util/qualifiedId';
+import {isAxiosError} from '../../../util/typePredicateUtil';
 import {loadMeetingsList} from '../loadMeetingsList';
 import {mapApiMeetingToSeries} from '../mapApiMeetingToSeries';
 import {mapMeetingInstanceToScheduleFormState} from '../mapMeetingInstanceToScheduleFormState';
@@ -42,6 +45,7 @@ import type {
 import type {MeetingInstance} from '../types/meetingInstance';
 import type {MeetingSeries} from '../types/meetingSeries';
 import {toMeetingIdKey} from '../utils/toMeetingIdKey';
+import {rotateMeetingLinkErrors, type RotateMeetingLinkError} from './rotateMeetingLinkErrors';
 
 const logger = getLogger('createMeetingStore');
 
@@ -93,6 +97,7 @@ export type MeetingStoreState = {
   scheduleMeeting: (command: ScheduleMeetingCommand) => Task<ScheduleMeetingSuccess, MeetingSubmitErrors>;
   meetNowMeeting: (command: MeetNowMeetingCommand) => Task<CreateMeetingSuccess, MeetingSubmitErrors>;
   updateMeeting: (command: UpdateMeetingCommand) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
+  rotateMeetingLink: (meetingId: QualifiedId, password?: string) => Task<MeetingSeries, RotateMeetingLinkError>;
   deleteMeetingForMe: (meetingInstance: MeetingInstance) => Task<void, MeetingSubmitErrors>;
   deleteMeetingForAll: (meetingInstance: MeetingInstance) => Task<void, MeetingSubmitErrors>;
   removeMeetingByQualifiedId: (meetingId: QualifiedId) => void;
@@ -175,6 +180,38 @@ export const createMeetingStore = (deps: MeetingStoreDeps, initialState?: Meetin
               return task.resolve({failedToAdd: result.failedToAdd});
             });
         });
+      },
+      rotateMeetingLink: (meetingId, password) => {
+        return deps.meetingsRepository
+          .rotateMeetingLink(meetingId, password)
+          .mapRejected(error => {
+            return isAxiosError(error) && error.response?.status === HTTP_STATUS.NOT_FOUND
+              ? rotateMeetingLinkErrors.notFound
+              : rotateMeetingLinkErrors.requestFailed;
+          })
+          .andThen(apiMeeting => {
+            const mapResult = mapApiMeetingToSeries(apiMeeting);
+            if (mapResult.isErr) {
+              return task.reject<MeetingSeries, RotateMeetingLinkError>(rotateMeetingLinkErrors.invalidResponse);
+            }
+
+            if (isUndefined(mapResult.value.link)) {
+              return task.reject<MeetingSeries, RotateMeetingLinkError>(rotateMeetingLinkErrors.invalidResponse);
+            }
+
+            const existingSeries = get().meetingSeries.find(series => {
+              return matchQualifiedIds(series.qualified_id, meetingId);
+            });
+            const updatedSeries = isUndefined(existingSeries)
+              ? mapResult.value
+              : {...existingSeries, link: mapResult.value.link};
+
+            incrementMeetingMutationVersion(meetingId);
+            set(state => {
+              return {meetingSeries: upsertMeetingSeries(state.meetingSeries, updatedSeries)};
+            });
+            return task.resolve<MeetingSeries, RotateMeetingLinkError>(updatedSeries);
+          });
       },
       deleteMeetingForMe: meetingInstance => {
         return deps.serviceTasks.deleteMeetingForMe(toDeleteMeetingCommand(meetingInstance));
