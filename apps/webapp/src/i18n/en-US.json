@@ -1397,7 +1397,7 @@
   "meetings.meetingLink.close": "Close",
   "meetings.meetingLink.copyLink": "Copy link",
   "meetings.meetingLink.copyLinkDone": "Link copied!",
-  "meetings.meetingLink.description": "Anyone with the link can access the meeting. A password may be required.",
+  "meetings.meetingLink.description": "Share this link to invite others to the meeting. A password may be required to join.",
   "meetings.meetingLink.title": "Meeting link",
   "meetings.meetingStatus.endedAt": "Ended at {time}",
   "meetings.meetingStatus.endsAt": "Ends at {time}",
