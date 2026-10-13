@@ -29,7 +29,6 @@ import {
   isReleaseBranchName,
   productionTagExists,
   productionTagPointsToCommit,
-  resolveWebappBuildVersion,
   selectPrecedingProductionTag,
   validateMaintenanceBranchName,
   validateMaintenanceLineKey,
@@ -38,6 +37,7 @@ import {
   validateProductionTagName,
 } from './releaseMetadata';
 import type {CommitHash, ReleaseTagMetadata} from './releaseMetadata';
+import {resolveWebappBuildVersion} from './webappProductionRelease';
 
 function createCommitHash(commitHash: string): CommitHash {
   return commitHash as CommitHash;
@@ -348,6 +348,7 @@ describe('releaseMetadata', () => {
 
   it.each([
     ['2026-06-19.1-production', '2026-06-19.1'],
+    ['2026-10-06.1-production', '2026-10-06.1'],
     ['2026-06-19-production.1', '2026-06-19-production.1'],
   ])(
     'resolveWebappBuildVersion() preserves the version for production tag "%s"',

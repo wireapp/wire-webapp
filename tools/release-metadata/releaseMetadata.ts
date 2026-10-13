@@ -21,8 +21,6 @@ import {isUndefined} from '@sindresorhus/is';
 import {Maybe, maybe, Result} from 'true-myth';
 import type {NonEmptyString} from 'type-fest';
 
-const shortenedCommitIdentifierLength = 7;
-
 declare const commitHashBrand: unique symbol;
 
 type NonZeroDecimalDigit = '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9';
@@ -59,7 +57,6 @@ const releaseDatePattern = String.raw`\d{4}-\d{2}-\d{2}`;
 const releaseIdentifierPattern = String.raw`${releaseDatePattern}\.[1-9]\d*`;
 const releaseBranchNamePattern = new RegExp(`^release/(${releaseIdentifierPattern})$`);
 const productionTagNamePattern = new RegExp(`^(${releaseIdentifierPattern})-production$`);
-const legacyProductionTagNamePattern = new RegExp(String.raw`^${releaseDatePattern}-production\.\d+$`);
 const maintenanceLineKeyPattern = new RegExp(String.raw`^${releaseIdentifierPattern}-[a-z0-9]+(?:-[a-z0-9]+)*$`);
 const maintenanceBranchNamePattern = new RegExp(
   String.raw`^maintenance/${releaseIdentifierPattern}-[a-z0-9]+(?:-[a-z0-9]+)*$`,
@@ -70,10 +67,6 @@ const maintenanceTagNamePattern = new RegExp(
 const productionTagSuffix = '-production';
 const releaseDateLength = 10;
 const releaseSequenceStartIndex = 11;
-
-function isWebappBuildChannel(value: string): value is WebappBuildChannel {
-  return value === 'main' || value === 'development' || value === 'production';
-}
 
 function escapeRegularExpression(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
@@ -332,41 +325,6 @@ export function validateMaintenanceSource(
   }
 
   return Result.ok(sourceProductionTagResult.value);
-}
-
-export function resolveWebappBuildVersion(
-  buildReferenceName: string,
-  commitSha: string,
-  buildChannel: string,
-): Result<string, Error> {
-  if (!isWebappBuildChannel(buildChannel)) {
-    return Result.err(new Error(`Invalid webapp build channel: ${buildChannel}`));
-  }
-
-  if (buildReferenceName.length === 0) {
-    if (buildChannel === 'production') {
-      return Result.err(new Error('A production webapp build requires a production tag name'));
-    }
-
-    const versionPrefix = buildChannel === 'main' ? 'main' : 'dev';
-    return Result.ok(`${versionPrefix}-${commitSha.slice(0, shortenedCommitIdentifierLength) || 'unknown'}`);
-  }
-
-  const productionTagNameMatch = productionTagNamePattern.exec(buildReferenceName);
-
-  if (productionTagNameMatch !== null) {
-    return Result.ok(productionTagNameMatch[1]);
-  }
-
-  if (legacyProductionTagNamePattern.test(buildReferenceName)) {
-    return Result.ok(buildReferenceName);
-  }
-
-  if (buildChannel === 'production' || buildReferenceName.includes('production')) {
-    return Result.err(new Error(`Invalid production tag name: ${buildReferenceName}`));
-  }
-
-  return Result.ok(`dev-${commitSha.slice(0, shortenedCommitIdentifierLength) || 'unknown'}`);
 }
 
 export function createNextBetaTagName(
