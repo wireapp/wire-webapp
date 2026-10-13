@@ -21,7 +21,10 @@ import {Result, Task} from 'true-myth';
 
 import type {GitHubReleaseClient, GitHubReleaseRecord} from './githubReleaseClient.ts';
 
-import {selectPrecedingProductionTag, validateProductionTagName} from '../release-metadata/releaseMetadata.ts';
+import {
+  parseWebAppProductionRelease,
+  selectPrecedingWebAppProductionTag,
+} from '../release-metadata/webappProductionRelease.ts';
 
 export type ProductionGitHubReleaseAction = 'created' | 'already_draft' | 'already_published';
 export type ProductionGitHubReleaseState = 'draft' | 'published';
@@ -95,13 +98,13 @@ function createNewReleaseHandoff(
 export function ensureProductionGitHubRelease(
   options: EnsureProductionGitHubReleaseOptions,
 ): Task<ProductionGitHubReleaseHandoff, Error> {
-  const validatedProductionTagNameResult = validateProductionTagName(options.currentProductionTagName);
+  const currentProductionReleaseResult = parseWebAppProductionRelease(options.currentProductionTagName);
 
-  if (validatedProductionTagNameResult.isErr) {
-    return Task.reject<ProductionGitHubReleaseHandoff, Error>(validatedProductionTagNameResult.error);
+  if (currentProductionReleaseResult.isErr) {
+    return Task.reject<ProductionGitHubReleaseHandoff, Error>(currentProductionReleaseResult.error);
   }
 
-  const productionTagName = validatedProductionTagNameResult.value;
+  const productionTagName = currentProductionReleaseResult.value.tagName;
   return options.githubReleaseClient
     .findReleaseByTag({
       tagName: productionTagName,
@@ -112,7 +115,7 @@ export function ensureProductionGitHubRelease(
       }
 
       return options.githubReleaseClient.listTagNames().andThen(existingTagNames => {
-        const precedingProductionTagResult = selectPrecedingProductionTag(productionTagName, existingTagNames);
+        const precedingProductionTagResult = selectPrecedingWebAppProductionTag(productionTagName, existingTagNames);
 
         if (precedingProductionTagResult.isErr) {
           return Task.reject<ProductionGitHubReleaseHandoff, Error>(precedingProductionTagResult.error);

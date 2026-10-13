@@ -119,6 +119,46 @@ describe('ensureProductionGitHubRelease', () => {
     ]);
   });
 
+  it('selects the preceding SemVer Production tag by SemVer order', async (): Promise<void> => {
+    const fakeGitHubReleaseClient = createFakeGitHubReleaseClient({
+      existingRelease: Maybe.nothing(),
+      tagNames: ['v1.11.0', 'v1.9.0', 'some-library@99.0.0', 'v1.11.0-beta.1', 'v1.10.0', '2026-10-06.1-production'],
+    });
+
+    const actualResult = await ensureProductionGitHubRelease({
+      currentProductionTagName: 'v1.11.0',
+      githubReleaseClient: fakeGitHubReleaseClient.githubReleaseClient,
+    });
+
+    assert(actualResult.isOk);
+    expect(fakeGitHubReleaseClient.generateReleaseNotesOptions).toEqual([
+      {
+        productionTagName: 'v1.11.0',
+        precedingProductionTagName: 'v1.10.0',
+      },
+    ]);
+  });
+
+  it('preserves the bootstrap legacy Production preceding-tag selection', async (): Promise<void> => {
+    const fakeGitHubReleaseClient = createFakeGitHubReleaseClient({
+      existingRelease: Maybe.nothing(),
+      tagNames: ['2026-10-06.1-production', '2026-07-27.1-production', 'v1.0.0'],
+    });
+
+    const actualResult = await ensureProductionGitHubRelease({
+      currentProductionTagName: '2026-10-06.1-production',
+      githubReleaseClient: fakeGitHubReleaseClient.githubReleaseClient,
+    });
+
+    assert(actualResult.isOk);
+    expect(fakeGitHubReleaseClient.generateReleaseNotesOptions).toEqual([
+      {
+        productionTagName: '2026-10-06.1-production',
+        precedingProductionTagName: '2026-07-27.1-production',
+      },
+    ]);
+  });
+
   it('preserves an existing draft without listing tags or creating a Release', async (): Promise<void> => {
     const existingRelease = createExistingRelease(true);
     const fakeGitHubReleaseClient = createFakeGitHubReleaseClient({
