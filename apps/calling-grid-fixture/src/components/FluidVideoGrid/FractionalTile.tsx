@@ -14,8 +14,8 @@ interface FractionalTileProps {
 /** A single fractional tile inside a `FractionalTileContainer` — one participant's thumbnail. */
 export function FractionalTile({participant}: FractionalTileProps) {
   const {name, displayName, initials: initialsOverride, avatarUrl, hue = 200, renderVideo, isMuted} = participant;
-  const isActiveSpeaker =
-    participant.tier === 'speaking-camera' || participant.tier === 'speaking-no-camera';
+  // Live signal, not tier — tier is debounced/held for seat stability, the ring isn't.
+  const isActiveSpeaker = participant.isSpeakingNow ?? false;
   const initials = initialsOverride ?? name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
   const label = displayName ?? name;
 
@@ -71,7 +71,9 @@ export function FractionalTile({participant}: FractionalTileProps) {
           inset: 0,
           borderRadius: 4,
           pointerEvents: 'none',
-          boxShadow: isActiveSpeaker ? `inset 0 0 0 2px ${RING_BLUE}` : 'none',
+          // Same ring width as a full tile's default variant (GridTile.tsx) — only the pip
+          // overlay in one-on-one mode uses a thinner 2px ring.
+          boxShadow: isActiveSpeaker ? `inset 0 0 0 3px ${RING_BLUE}` : 'none',
           transition: 'box-shadow 0.3s ease',
         }}
       />

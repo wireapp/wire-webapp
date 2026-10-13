@@ -15,7 +15,7 @@ export const MAX_FRACTIONAL_TILE_ASPECT_RATIO = MAX_ASPECT_RATIO;
 
 // ── Speaker promotion / debounce ──────────────────────────────────────────────
 export const SPEAKING_DEBOUNCE_MS = 1500; // ms of continuous speech before promotion
-export const PRIME_HOLD_MS = 10_000; // ms a promoted speaker keeps their prime tile after stopping
+export const PRIME_HOLD_MS = 30_000; // ms a promoted speaker keeps their prime tile after stopping
 
 export const GRID_CONFIG: GridConfig = {
   minTileHeight: MIN_TILE_HEIGHT,

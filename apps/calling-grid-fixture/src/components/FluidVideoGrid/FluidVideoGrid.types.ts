@@ -28,6 +28,15 @@ export interface GridParticipant {
   speakingDuration: number;
   /** Timestamp (ms) when this participant last entered their current tier. Drives recency ordering within active tiers. */
   activatedAt?: number;
+  /**
+   * Live, undebounced "is this person making sound right now" signal — purely cosmetic, drives
+   * only the active-speaker ring/name-pill color. Deliberately separate from `tier`: `tier`
+   * (specifically the `speaking-*` tiers) is debounced and held, because it also decides seat
+   * assignment, and seat assignment must not jump around on every spoken word. The ring has no
+   * such constraint — it should light up and turn off exactly in sync with actual sound, which
+   * is why it reads this flag instead of `tier`. Defaults to `false` when absent.
+   */
+  isSpeakingNow?: boolean;
 }
 
 // ── Layout types ────────────────────────────────────────────────────────────

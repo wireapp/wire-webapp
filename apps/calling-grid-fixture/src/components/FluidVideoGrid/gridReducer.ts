@@ -236,10 +236,36 @@ export function computeTileCounts(
 // ── Full-tile seat assignment ─────────────────────────────────────────────────
 
 /**
- * Sticky assignment of the full-tile boundary only: whoever already holds a full tile
- * keeps it as long as they're still active; new or promoted active participants fill
- * whatever seats are left, highest priority first. The fractional tile container's
- * internal membership is not sticky — see `splitFractionalTiles`.
+ * A fresh, current-tier-aware priority ranking — lower is better (less likely to be evicted).
+ * Deliberately independent of `sorted`'s own order: `sorted` is sticky by design (an already-
+ * seated participant's position doesn't move just because their tier changed, so the grid
+ * doesn't jitter on every tier change — see `orderParticipants`), which is exactly wrong for
+ * deciding *who deserves a full tile right now*. A participant who just downgraded from
+ * screen-sharing to camera-on-only must be evaluated as camera-on-only here, even though their
+ * `sorted` position hasn't moved; the same goes for someone just promoted from passive to
+ * screen-sharing. `sortedIndex` is only a last-resort, deterministic tie-break for the (rare)
+ * case of two participants with the exact same tier and the exact same `activatedAt`.
+ */
+function evictionRank(p: GridParticipant, sortedIndex: Map<string, number>): [number, number, number] {
+  return [tierRank(p.tier), -(p.activatedAt ?? 0), sortedIndex.get(p.id) ?? 0];
+}
+
+function compareEvictionRank(a: [number, number, number], b: [number, number, number]): number {
+  return a[0] - b[0] || a[1] - b[1] || a[2] - b[2];
+}
+
+/**
+ * Assigns the full-tile boundary. Whoever already holds a full tile keeps it as long as
+ * they're still active — new or promoted active participants fill whatever seats are left
+ * first. Only once every seat is taken *and* someone still has nowhere to sit does rank
+ * matter for an existing holder: the worst-ranked occupant (current tier first — screen-sharing
+ * > speaking-camera > speaking-no-camera > silent-camera — then recency within a tier) is
+ * evicted in favor of the best-ranked participant still waiting, but only on a strict win — an
+ * exact tie always favors the incumbent, which is what keeps two similarly-ranked participants
+ * from trading the seat back and forth. The evicted participant isn't reassigned elsewhere
+ * here; they simply fall out of `fullOccupants` and are picked up by the fractional tile
+ * container the same way anyone else would be. The fractional tile container's internal
+ * membership is not sticky — see `splitFractionalTiles`.
  */
 function assignFullTiles(
   sorted: GridParticipant[],
@@ -266,7 +292,7 @@ function assignFullTiles(
   }
 
   // Fill whatever's left with the highest-priority active participants remaining.
-  const remaining = sorted.filter(p => !assigned.has(p.id) && isActiveTier(p.tier));
+  let remaining = sorted.filter(p => !assigned.has(p.id) && isActiveTier(p.tier));
   let cursor = 0;
   for (let i = 0; i < full; i++) {
     if (occupants[i] !== null) {
@@ -277,6 +303,41 @@ function assignFullTiles(
       assigned.add(remaining[cursor].id);
       cursor++;
     }
+  }
+  remaining = remaining.slice(cursor);
+
+  // Every seat is taken, but someone with nowhere to sit still outranks the worst-seated
+  // occupant by *current* tier and recency: swap them in, one for one.
+  const sortedIndex = new Map(sorted.map((p, index) => [p.id, index]));
+  while (remaining.length > 0 && occupants.every(o => o !== null)) {
+    let worstSeat = 0;
+    let worstRank = evictionRank(occupants[0]!, sortedIndex);
+    for (let i = 1; i < occupants.length; i++) {
+      const rank = evictionRank(occupants[i]!, sortedIndex);
+      if (compareEvictionRank(rank, worstRank) > 0) {
+        worstRank = rank;
+        worstSeat = i;
+      }
+    }
+
+    let bestChallengerIndex = 0;
+    let bestChallengerRank = evictionRank(remaining[0], sortedIndex);
+    for (let i = 1; i < remaining.length; i++) {
+      const rank = evictionRank(remaining[i], sortedIndex);
+      if (compareEvictionRank(rank, bestChallengerRank) < 0) {
+        bestChallengerRank = rank;
+        bestChallengerIndex = i;
+      }
+    }
+
+    if (compareEvictionRank(bestChallengerRank, worstRank) >= 0) {
+      break; // nobody left waiting still outranks the worst occupant — nothing left to swap
+    }
+    const challenger = remaining[bestChallengerIndex];
+    assigned.delete(occupants[worstSeat]!.id);
+    occupants[worstSeat] = challenger;
+    assigned.add(challenger.id);
+    remaining = remaining.filter((_, i) => i !== bestChallengerIndex);
   }
 
   const assignmentMap: AssignmentMap = {};

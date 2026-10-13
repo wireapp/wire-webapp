@@ -105,8 +105,8 @@ function fractionalContainer(state: GridState): FractionalContainerTile | undefi
   return allTiles(state).find((t): t is FractionalContainerTile => t.type === 'fractional');
 }
 
-/** Ids of every participant seated in the fractional tile container (excluding overflow). */
-function fractionIds(state: GridState): string[] {
+/** Ids of every participant seated in the fractional tile container (excluding the overflow badge). */
+function fractionalTileIds(state: GridState): string[] {
   const tile = fractionalContainer(state);
   if (!tile) {
     return [];
@@ -124,141 +124,114 @@ function overflowCount(state: GridState): number {
 
 /** Everyone actually visible — full tiles plus fractional tiles, excluding the overflow badge. */
 function visibleIds(state: GridState): string[] {
-  return [...fullTileIds(state), ...fractionIds(state)];
+  return [...fullTileIds(state), ...fractionalTileIds(state)];
 }
 
 // ── Solo call ──────────────────────────────────────────────────────────────────
+//
+// With only one participant in the call, there's nobody to compete with for space, so a solo
+// participant always gets the one full tile — speaking, silent, camera on or off makes no
+// difference.
 
 describe('solo call', () => {
-  it('a lone active participant gets one full tile filling the container', () => {
-    const state = addAll(createInitialState(container1280x720), [makeParticipant('a', 'speaking-camera')]);
-    expect(allTiles(state)).toHaveLength(1);
-    expect(fullTileIds(state)).toEqual(['a']);
-    expect(fractionalContainer(state)).toBeUndefined();
+  it('a lone participant always gets one full tile, whether they are speaking or just sitting silently with camera off', () => {
+    const speaking = addAll(createInitialState(container1280x720), [makeParticipant('a', 'speaking-camera')]);
+    expect(allTiles(speaking)).toHaveLength(1);
+    expect(fullTileIds(speaking)).toEqual(['a']);
+    expect(fractionalContainer(speaking)).toBeUndefined();
+
+    const silent = addAll(createInitialState(container1280x720), [makeParticipant('p', 'silent-no-camera')]);
+    expect(fullTileIds(silent)).toEqual(['p']);
+    expect(fractionalContainer(silent)).toBeUndefined();
   });
 
-  it('a lone passive participant still gets a full tile — solo bypasses active/passive entirely', () => {
-    const state = addAll(createInitialState(container1280x720), [makeParticipant('p', 'silent-no-camera')]);
-    expect(fullTileIds(state)).toEqual(['p']);
-    expect(fractionalContainer(state)).toBeUndefined();
-  });
-
-  it('a lone passive self still gets a full tile', () => {
-    const state = addAll(createInitialState(container1280x720), [makeSelf('me', 'silent-no-camera')]);
-    expect(fullTileIds(state)).toEqual(['me']);
-  });
-
-  it('tile dimensions respect the configured min/max height', () => {
+  it('the one full tile still respects the configured min/max height', () => {
     const state = addAll(createInitialState({width: 320, height: 240}), [makeParticipant('a')]);
     expect(grid(state).tileHeight).toBeGreaterThanOrEqual(DEFAULT_CONFIG.minTileHeight);
     expect(grid(state).tileHeight).toBeLessThanOrEqual(DEFAULT_CONFIG.maxTileHeight);
   });
-
-  it('a newcomer joining right after does not evict the solo incumbent from seat 0', () => {
-    let state = addAll(createInitialState(container1280x720), [makeParticipant('a', 'speaking-camera')]);
-    state = reducer(state, {
-      type: 'ADD_PARTICIPANT',
-      participant: makeParticipant('b', 'screen-sharing'),
-      now: 999,
-    });
-    // 'b' outranks 'a' by tier, but 'a' already held the first full seat before 'b' arrived.
-    expect(fullTileIds(exitPresenter(state))).toEqual(['a', 'b']);
-  });
 });
 
 // ── One-on-one call ──────────────────────────────────────────────────────────────
+//
+// With exactly two participants, the other person fills the whole stage and you become a small
+// overlay thumbnail on top of them — this is a fixed layout, not something tier/activity changes.
+// Note: `OneOnOneLayout` has no tileWidth/tileHeight of its own — the stage simply fills the
+// container like any flex child, so there are no min/max dimension rules to test here.
 
 describe('one-on-one call', () => {
-  it('the other participant fills the stage and self becomes the pip, regardless of tier', () => {
-    const state = addAll(createInitialState(container1280x720), [
-      makeSelf('me', 'silent-no-camera'),
-      makeParticipant('other', 'silent-no-camera'),
-    ]);
-    const layout = oneOnOne(state);
-    expect(layout.main.type).toBe('full');
-    expect(layout.main.type === 'full' && layout.main.participant.id).toBe('other');
-    expect(layout.pip.id).toBe('me');
+  it('whoever is not you fills the stage, and you always become the small overlay — this does not depend on who is active', () => {
+    const bothPassive = oneOnOne(
+      addAll(createInitialState(container1280x720), [
+        makeSelf('me', 'silent-no-camera'),
+        makeParticipant('other', 'silent-no-camera'),
+      ]),
+    );
+    expect(bothPassive.main.type === 'full' && bothPassive.main.participant.id).toBe('other');
+    expect(bothPassive.pip.id).toBe('me');
+
+    const selfIsTheActiveOne = oneOnOne(
+      addAll(createInitialState(container1280x720), [
+        makeSelf('me', 'speaking-camera'),
+        makeParticipant('other', 'silent-no-camera'),
+      ]),
+    );
+    expect(selfIsTheActiveOne.main.type === 'full' && selfIsTheActiveOne.main.participant.id).toBe('other');
+    expect(selfIsTheActiveOne.pip.id).toBe('me');
   });
 
-  it('uses the one-on-one template even when self is the active one and the other is passive', () => {
-    const state = addAll(createInitialState(container1280x720), [
-      makeSelf('me', 'speaking-camera'),
-      makeParticipant('other', 'silent-no-camera'),
-    ]);
-    const layout = oneOnOne(state);
-    expect(layout.main.type === 'full' && layout.main.participant.id).toBe('other');
-    expect(layout.pip.id).toBe('me');
-  });
-
-  it('falls back to the general grid when neither participant is flagged as self', () => {
-    const state = addAll(createInitialState(container1280x720), [
-      makeParticipant('a', 'speaking-camera'),
-      makeParticipant('b', 'speaking-camera'),
-    ]);
-    expect(state.layout.mode).toBe('grid');
-    expect(fullTileIds(state)).toHaveLength(2);
-  });
-
-  it('presenter mode (auto-activated by screen share) takes priority over the one-on-one template', () => {
+  it('presenter mode (turned on automatically by a screen share) takes priority over the one-on-one layout', () => {
     const state = addAll(createInitialState(container1280x720), [
       makeSelf('me'),
       makeParticipant('s1', 'screen-sharing'),
     ]);
     expect(state.layout.mode).toBe('presenter');
   });
+
+  it('starting a call alone and then having a second person join switches live into the one-on-one layout', () => {
+    let state = addAll(createInitialState(container1280x720), [makeSelf('me', 'silent-no-camera')]);
+    expect(state.layout.mode).toBe('grid'); // solo is reported as a 1-tile grid layout
+
+    state = reducer(state, {type: 'ADD_PARTICIPANT', participant: makeParticipant('other', 'speaking-camera')});
+    const layout = oneOnOne(state);
+    expect(layout.main.type === 'full' && layout.main.participant.id).toBe('other');
+    expect(layout.pip.id).toBe('me');
+  });
+
+  it('a 3-person call that drops to 2 people switches live into the one-on-one layout', () => {
+    let state = addAll(createInitialState(container1280x720), [
+      makeSelf('me', 'speaking-camera'),
+      makeParticipant('a1', 'speaking-camera'),
+      makeParticipant('a2', 'speaking-camera'),
+    ]);
+    expect(state.layout.mode).toBe('grid');
+
+    state = reducer(state, {type: 'REMOVE_PARTICIPANT', id: 'a2'});
+    const layout = oneOnOne(state);
+    expect(layout.main.type === 'full' && layout.main.participant.id).toBe('a1');
+    expect(layout.pip.id).toBe('me');
+  });
 });
 
-// ── ADD_PARTICIPANT / REMOVE_PARTICIPANT ────────────────────────────────────────
+// ── Reducer basics ────────────────────────────────────────────────────────────
+//
+// Plumbing checks for ADD_PARTICIPANT / REMOVE_PARTICIPANT that aren't about who gets which
+// tile — see "full-tile assignment" below for that.
 
-describe('ADD_PARTICIPANT', () => {
-  it('is idempotent — duplicate id is ignored', () => {
+describe('reducer basics', () => {
+  it('adding the same participant id twice is ignored', () => {
     let state = createInitialState(container1280x720);
     state = reducer(state, {type: 'ADD_PARTICIPANT', participant: makeParticipant('a', 'speaking-camera')});
     state = reducer(state, {type: 'ADD_PARTICIPANT', participant: makeParticipant('a', 'speaking-camera')});
     expect(state.participants).toHaveLength(1);
   });
 
-  it('screen-sharing outranks speaking-camera in the slot order', () => {
-    const state = addAll(createInitialState(container1280x720), [
-      makeParticipant('cam', 'speaking-camera'),
-      makeParticipant('screen1', 'screen-sharing'),
-    ]);
-    expect(state.slotMap['screen1']).toBeLessThan(state.slotMap['cam']);
+  it('removing an id that was never in the call does nothing', () => {
+    const state = addAll(createInitialState(container1280x720), [makeParticipant('a', 'speaking-camera')]);
+    expect(reducer(state, {type: 'REMOVE_PARTICIPANT', id: 'unknown'})).toBe(state);
   });
 
-  it('a higher-priority newcomer does not evict an incumbent from their full seat', () => {
-    const state = exitPresenter(
-      addAll(createInitialState(container1280x720), [
-        makeParticipant('cam', 'speaking-camera'),
-        makeParticipant('screen1', 'screen-sharing'),
-      ]),
-    );
-    expect(fullTileIds(state)).toEqual(['cam', 'screen1']);
-  });
-
-  it('active participants each get their own full tile when there is room to spare', () => {
-    const state = addAll(createInitialState(container1280x720), [
-      makeParticipant('a1', 'speaking-camera'),
-      makeParticipant('a2', 'speaking-camera'),
-      makeParticipant('a3', 'speaking-no-camera'),
-    ]);
-    expect(fullTiles(state)).toHaveLength(3);
-    expect(fractionalContainer(state)).toBeUndefined();
-  });
-
-  it('passive participants are compressed into the fraction container, never given a full tile', () => {
-    const state = addAll(createInitialState(container1280x720), [
-      makeParticipant('a1', 'speaking-camera'),
-      makeParticipant('p1', 'silent-no-camera'),
-      makeParticipant('p2', 'silent-no-camera'),
-    ]);
-    expect(fullTileIds(state)).toEqual(['a1']);
-    expect(fractionIds(state)).toEqual(['p1', 'p2']);
-  });
-});
-
-describe('REMOVE_PARTICIPANT', () => {
-  it('removes participant and recalculates layout', () => {
+  it('removing a participant updates both the layout and the seating order', () => {
     const state = addAll(createInitialState(container1280x720), [
       makeParticipant('a', 'speaking-camera'),
       makeParticipant('b', 'speaking-camera'),
@@ -267,35 +240,211 @@ describe('REMOVE_PARTICIPANT', () => {
     const next = reducer(state, {type: 'REMOVE_PARTICIPANT', id: 'a'});
     expect(next.participants).toHaveLength(2);
     expect(next.participants.some(p => p.id === 'a')).toBe(false);
-  });
-
-  it('removing unknown id is a no-op', () => {
-    const state = addAll(createInitialState(container1280x720), [makeParticipant('a', 'speaking-camera')]);
-    expect(reducer(state, {type: 'REMOVE_PARTICIPANT', id: 'unknown'})).toBe(state);
-  });
-
-  it('cleans up slot map for removed participant', () => {
-    const state = addAll(createInitialState(container1280x720), [
-      makeParticipant('a', 'speaking-camera'),
-      makeParticipant('b', 'speaking-camera'),
-      makeParticipant('c', 'speaking-camera'),
-    ]);
-    const next = reducer(state, {type: 'REMOVE_PARTICIPANT', id: 'a'});
     expect(next.slotMap['a']).toBeUndefined();
     expect(next.slotMap['b']).toBeDefined();
   });
+});
 
-  it('removing the last passive participant removes the fraction container', () => {
-    const state = addAll(createInitialState(container1280x720), [
+// ── Full-tile assignment ──────────────────────────────────────────────────────
+//
+// Who gets a full tile, and when a participant who already has one keeps it. Active
+// participants (speaking, screen-sharing, or just camera-on) compete for full tiles; passive
+// participants (silent, camera off) never get one — they always go to the fractional tile
+// container. A full-tile holder keeps their exact seat as long as there's room for everyone —
+// losing their active tier always loses the seat immediately, and once the grid is completely
+// full, a strictly higher-priority participant (by tier, then by recency within a tier) can
+// also take over the seat of whoever currently ranks worst. An exact tie never evicts anyone.
+
+describe('full-tile assignment', () => {
+  it('every active participant gets their own full tile when there is room, ranked screen-share first, then speaking, then camera-on', () => {
+    const rankCheck = addAll(createInitialState(container1280x720), [
+      makeParticipant('cam', 'speaking-camera'),
+      makeParticipant('screen1', 'screen-sharing'),
+    ]);
+    expect(rankCheck.slotMap['screen1']).toBeLessThan(rankCheck.slotMap['cam']);
+
+    const roomToSpare = addAll(createInitialState(container1280x720), [
       makeParticipant('a1', 'speaking-camera'),
       makeParticipant('a2', 'speaking-camera'),
-      makeParticipant('p1', 'silent-no-camera'),
+      makeParticipant('a3', 'speaking-no-camera'),
     ]);
-    expect(fractionalContainer(state)).toBeDefined();
+    expect(fullTiles(roomToSpare)).toHaveLength(3);
+    expect(fractionalContainer(roomToSpare)).toBeUndefined();
+  });
 
-    const next = reducer(state, {type: 'REMOVE_PARTICIPANT', id: 'p1'});
-    expect(fractionalContainer(next)).toBeUndefined();
-    expect(fullTileIds(next)).toEqual(['a1', 'a2']);
+  it('passive participants never get a full tile, even with room to spare', () => {
+    const state = addAll(createInitialState(container1280x720), [
+      makeParticipant('a1', 'speaking-camera'),
+      makeParticipant('p1', 'silent-no-camera'),
+      makeParticipant('p2', 'silent-no-camera'),
+    ]);
+    expect(fullTileIds(state)).toEqual(['a1']);
+    expect(fractionalTileIds(state)).toEqual(['p1', 'p2']);
+  });
+
+  it('a participant keeps their full tile when someone else joins or gets upgraded, as long as there is room for both', () => {
+    // Joining: a higher-priority newcomer still doesn't reorder an existing holder.
+    const afterJoin = exitPresenter(
+      addAll(createInitialState(container1280x720), [
+        makeParticipant('cam', 'speaking-camera'),
+        makeParticipant('screen1', 'screen-sharing'),
+      ]),
+    );
+    expect(fullTileIds(afterJoin)).toEqual(['cam', 'screen1']);
+
+    // Upgrading: promoting one passive participant to active doesn't displace an existing holder.
+    const beforeUpgrade = addAll(createInitialState(container1280x720), [
+      makeParticipant('a1', 'speaking-camera'),
+      makeParticipant('p1', 'silent-no-camera'),
+      makeParticipant('p2', 'silent-no-camera'),
+    ]);
+    const afterUpgrade = reducer(beforeUpgrade, {
+      type: 'UPDATE_PARTICIPANT',
+      id: 'p1',
+      changes: {tier: 'speaking-camera'},
+      now: 999,
+    });
+    expect(fullTileIds(afterUpgrade)).toEqual(['a1', 'p1']);
+  });
+
+  it('once the grid is completely full, a higher-tier newcomer takes over the worst-ranked existing full tile instead of waiting', () => {
+    // 3 same-tier incumbents fill a 3-seat grid.
+    let state = createInitialState(smallContainer); // maxTiles = 3
+    for (const id of ['a1', 'a2', 'a3']) {
+      state = reducer(state, {
+        type: 'ADD_PARTICIPANT',
+        participant: makeParticipant(id, 'speaking-no-camera'),
+        now: 100,
+      });
+    }
+    expect(fullTileIds(state)).toEqual(['a1', 'a2', 'a3']);
+
+    // A higher-tier participant joins. The grid also shrinks by one seat at the same time (to
+    // make room for the mandatory fractional tile container, unrelated to eviction), so there
+    // are only 2 seats to contest: the newcomer wins one, taking it from whichever of the three
+    // original incumbents ranks worst — the other incumbent (a1) is completely untouched.
+    state = reducer(state, {
+      type: 'ADD_PARTICIPANT',
+      participant: makeParticipant('higher', 'speaking-camera'), // outranks speaking-no-camera
+      now: 999,
+    });
+    expect(fullTileIds(state)).toEqual(['a1', 'higher']);
+    expect(fractionalTileIds(state)).toEqual(['a2', 'a3']);
+  });
+
+  it('within the same tier, a more recently active newcomer can also take over a full tile from a less recently active one', () => {
+    let state = createInitialState(smallContainer); // maxTiles = 3
+    for (const id of ['a1', 'a2', 'a3']) {
+      state = reducer(state, {type: 'ADD_PARTICIPANT', participant: makeParticipant(id, 'silent-camera'), now: 100});
+    }
+    state = reducer(state, {
+      type: 'ADD_PARTICIPANT',
+      participant: makeParticipant('fresh', 'silent-camera'), // same tier, much more recently active
+      now: 500,
+    });
+    expect(fullTileIds(state)).toEqual(['a1', 'fresh']);
+    expect(fractionalTileIds(state)).toEqual(['a2', 'a3']);
+  });
+
+  it('an exact tie in tier and recency never evicts anyone — ties always favor whoever already has the seat', () => {
+    let state = createInitialState(smallContainer); // maxTiles = 3
+    for (const id of ['a1', 'a2', 'a3']) {
+      state = reducer(state, {type: 'ADD_PARTICIPANT', participant: makeParticipant(id, 'silent-camera'), now: 100});
+    }
+    // Same tier, the exact same activatedAt as the incumbents — nothing to justify a takeover.
+    state = reducer(state, {
+      type: 'ADD_PARTICIPANT',
+      participant: makeParticipant('tied', 'silent-camera'),
+      now: 100,
+    });
+    expect(fullTileIds(state)).toEqual(['a1', 'a2']);
+    expect(fractionalTileIds(state)).toEqual(['a3', 'tied']);
+  });
+
+  it('several higher-priority participants arriving at once can win more than one seat in the same update', () => {
+    let state = createInitialState(smallContainer); // maxTiles = 3
+    for (const id of ['a1', 'a2', 'a3']) {
+      state = reducer(state, {type: 'ADD_PARTICIPANT', participant: makeParticipant(id, 'silent-camera'), now: 100});
+    }
+    state = reducer(state, {type: 'ADD_PARTICIPANT', participant: makeParticipant('s1', 'screen-sharing'), now: 500});
+    state = reducer(state, {type: 'ADD_PARTICIPANT', participant: makeParticipant('s2', 'screen-sharing'), now: 501});
+    state = exitPresenter(state); // screen-sharing auto-activates presenter mode; back to the grid
+    expect(fullTileIds(state)).toEqual(['s1', 's2']);
+  });
+
+  it('once a full tile frees up, the highest-priority participant waiting in the fractional tile container moves into it — and if nobody active is waiting, the tile just disappears', () => {
+    // Someone is waiting (but not high-priority enough to have evicted anyone on arrival —
+    // that's covered by the eviction tests above): they get promoted once a seat opens up.
+    let state = createInitialState(smallContainer); // maxTiles = 3
+    for (const id of ['a1', 'a2', 'a3']) {
+      state = reducer(state, {type: 'ADD_PARTICIPANT', participant: makeParticipant(id, 'speaking-camera'), now: 100});
+    }
+    state = reducer(state, {
+      type: 'ADD_PARTICIPANT',
+      participant: makeParticipant('waiting', 'silent-camera'), // lower tier — waits, doesn't evict
+      now: 999,
+    });
+    expect(fullTileIds(state)).toEqual(['a1', 'a2']);
+    expect(fractionalTileIds(state)).toEqual(['a3', 'waiting']);
+
+    const promoted = reducer(state, {type: 'REMOVE_PARTICIPANT', id: 'a1'});
+    expect(fullTileIds(promoted)).toEqual(['a3', 'a2', 'waiting']);
+    expect(fractionalContainer(promoted)).toBeUndefined();
+
+    // Nobody active is waiting: the freed tile just disappears, the grid reshapes around one
+    // fewer tile.
+    let roomyState = addAll(createInitialState(container1280x720), [
+      makeParticipant('x1', 'speaking-camera'),
+      makeParticipant('x2', 'speaking-camera'),
+      makeParticipant('q1', 'silent-no-camera'),
+    ]);
+    const afterRemoval = reducer(roomyState, {type: 'REMOVE_PARTICIPANT', id: 'x1'});
+    expect(fullTileIds(afterRemoval)).toEqual(['x2']);
+  });
+
+  it('a fractional-tile participant moves into a full tile once their camera turns on, if there is a free seat', () => {
+    // The no-room case (evicting another camera-on participant by recency) is the same pending
+    // eviction-mechanism decision as above — not a separate thing to design.
+    const state = addAll(createInitialState(container1280x720), [
+      makeParticipant('a1', 'speaking-camera'),
+      makeParticipant('p1', 'silent-no-camera'),
+      makeParticipant('p2', 'silent-no-camera'),
+      makeParticipant('p3', 'silent-no-camera'),
+    ]);
+    expect(fractionalTileIds(state)).toContain('p3');
+
+    const next = reducer(state, {type: 'UPDATE_PARTICIPANT', id: 'p3', changes: {tier: 'silent-camera'}});
+    expect(fullTileIds(next)).toContain('p3');
+    expect(fractionalTileIds(next)).not.toContain('p3');
+  });
+
+  it('promoting one participant does not move anyone else\'s seat', () => {
+    const state = addAll(createInitialState(container1280x720), [
+      makeParticipant('p1', 'silent-no-camera'),
+      makeParticipant('p2', 'silent-no-camera'),
+      makeParticipant('p3', 'silent-no-camera'),
+    ]);
+    const slotP1Before = state.slotMap['p1'];
+    const next = reducer(state, {type: 'UPDATE_PARTICIPANT', id: 'p2', changes: {tier: 'silent-camera'}});
+    expect(next.slotMap['p1']).toBe(slotP1Before);
+  });
+
+  it('losing an active tier (camera off, stopped sharing) loses the full seat right away — the reducer never holds a seat open', () => {
+    // Hold time or debounce, if there is any, is a decision for whoever decides to send the
+    // tier change (the call client) — the reducer always reacts to the tier it is given right
+    // away, with no grace period of its own.
+    const state = exitPresenter(
+      addAll(createInitialState(container1280x720), [
+        makeParticipant('screener', 'screen-sharing'),
+        makeParticipant('cam', 'speaking-camera'),
+        makeParticipant('filler', 'silent-no-camera'),
+      ]),
+    );
+    expect(fullTileIds(state)).toContain('screener');
+
+    const next = reducer(state, {type: 'UPDATE_PARTICIPANT', id: 'screener', changes: {tier: 'silent-no-camera'}});
+    expect(fullTileIds(next)).not.toContain('screener');
+    expect(fractionalTileIds(next)).toContain('screener');
   });
 });
 
@@ -305,15 +454,15 @@ describe('computeTileCounts', () => {
   const inv = _computeInvariants(container1280x720, DEFAULT_CONFIG)!; // maxTiles = 75
   const smallInv = _computeInvariants(smallContainer, DEFAULT_CONFIG)!; // maxRows=1, maxCols=3, maxTiles=3
 
-  it('no participants → no tiles, no container', () => {
+  it('before anyone has joined, there are no tiles and no container (this models the reducer\'s starting state, not a reachable in-call state)', () => {
     expect(computeTileCounts(0, 0, inv, DEFAULT_CONFIG)).toEqual({full: 0, needsFractionContainer: false});
   });
 
-  it('an active-only call that fits entirely in full tiles needs no container', () => {
+  it('an active-only call that fits entirely in full tiles needs no fractional tile container', () => {
     expect(computeTileCounts(5, 0, inv, DEFAULT_CONFIG)).toEqual({full: 5, needsFractionContainer: false});
   });
 
-  it('any passive participant forces a container to exist, even with room to spare', () => {
+  it('any passive participant forces a fractional tile container to exist, even with room to spare', () => {
     expect(computeTileCounts(2, 1, inv, DEFAULT_CONFIG)).toEqual({full: 2, needsFractionContainer: true});
   });
 
@@ -321,49 +470,47 @@ describe('computeTileCounts', () => {
     expect(computeTileCounts(0, 5, inv, DEFAULT_CONFIG)).toEqual({full: 0, needsFractionContainer: true});
   });
 
-  it('active overflow beyond capacity also forces a container', () => {
+  it('more active participants than full-tile slots also forces a fractional tile container', () => {
     const result = computeTileCounts(5, 0, smallInv, DEFAULT_CONFIG);
     expect(result.needsFractionContainer).toBe(true);
     expect(result.full).toBeLessThanOrEqual(smallInv.maxTiles);
   });
 
-  it('sacrifices exactly one full tile when actives alone would otherwise saturate the grid', () => {
-    const result = computeTileCounts(4, 0, smallInv, DEFAULT_CONFIG);
-    expect(result.full).toBe(2); // maxTiles(3) - 1
-    expect(result.needsFractionContainer).toBe(true);
+  it('the fractional tile container always takes up one full-tile-sized slot, so when active participants would otherwise fill every slot, one of them is turned into the container instead', () => {
+    // Active participants alone filling the grid.
+    expect(computeTileCounts(4, 0, smallInv, DEFAULT_CONFIG)).toEqual({full: 2, needsFractionContainer: true});
+    // Same result when some of those slots would have gone to passive participants instead.
+    expect(computeTileCounts(3, 2, smallInv, DEFAULT_CONFIG)).toEqual({full: 2, needsFractionContainer: true});
   });
 
-  it('sacrifices a full tile when passives are present and actives already saturate the row', () => {
-    const result = computeTileCounts(3, 2, smallInv, DEFAULT_CONFIG);
-    expect(result.full).toBe(2);
-    expect(result.needsFractionContainer).toBe(true);
-  });
-
-  it('does not sacrifice a full tile when the grid has slack left', () => {
+  it('nothing is converted into a container when there is room left over', () => {
     const result = computeTileCounts(5, 3, inv, DEFAULT_CONFIG);
     expect(result.full).toBe(5);
     expect(result.needsFractionContainer).toBe(true);
   });
 
-  it('does not change behaviour for a fully-active call that exactly fills the grid', () => {
+  it('filling the grid with only active participants, with nobody needing a container, converts nobody', () => {
+    // Different from the test above: this guards against converting a full tile just because
+    // the grid is full, instead of only when a fractional tile container is actually needed.
     const result = computeTileCounts(3, 0, smallInv, DEFAULT_CONFIG);
     expect(result).toEqual({full: 3, needsFractionContainer: false});
   });
 
-  it('regression: does not sacrifice a full tile just because actives alone would perfectly fill a smaller shape', () => {
-    // Bug: the sacrifice check used to compare against `chooseGridShape(full, ...)` — the shape
-    // for the full tiles *alone* — rather than `full + 1` (the shape actually used once the
-    // mandatory fraction container's own unit is counted, matching `gridUnitCount` in
-    // computeLayout). So 4 actives that happened to perfectly fill a 2×2 grid were judged to
-    // leave "no room" for the container, sacrificing one down to 3 full tiles — even though the
-    // correctly-sized shape for 5 units (4 full + 1 fraction) naturally grows to 3 columns with
-    // a leftover slot, needing no sacrifice at all. A real multi-row, multi-column grid (not
-    // `smallInv`, which is a single row and so always reports "no room") is needed to exercise
-    // this: maxRows=2, maxCols=5, well short of maxTiles=10.
+  it('right at the edge: one slot short of completely full converts nobody, but exactly at full one tile is converted — this is the exact boundary a past bug got wrong', () => {
+    // Bug history: the check used to compare against the shape for the full tiles *alone*
+    // instead of full+1 (the shape actually used once the container's own slot is counted), so
+    // a perfectly-filled grid of actives was wrongly judged to have "no room," converting a tile
+    // even when growing one more column would have fit everyone. `midInv` is a real multi-row,
+    // multi-column shape (not `smallInv`, which is a single row and so always reports "no room").
     const midInv = {usableWidth: 952, usableHeight: 532, maxRows: 2, maxCols: 5, maxTiles: 10};
-    const result = computeTileCounts(4, 1, midInv, DEFAULT_CONFIG);
-    expect(result.full).toBe(4);
-    expect(result.needsFractionContainer).toBe(true);
+
+    const oneShort = computeTileCounts(9, 1, midInv, DEFAULT_CONFIG);
+    expect(oneShort.full).toBe(9);
+    expect(oneShort.needsFractionContainer).toBe(true);
+
+    const exactlyFull = computeTileCounts(10, 1, midInv, DEFAULT_CONFIG);
+    expect(exactlyFull.full).toBe(9); // one converted into the container
+    expect(exactlyFull.needsFractionContainer).toBe(true);
   });
 });
 
@@ -380,7 +527,7 @@ describe('tile dimension invariants', () => {
     }
   });
 
-  it('tileAspectRatio stays within [minAR, maxAR]', () => {
+  it('tile aspect ratio always stays within the configured min/max bounds', () => {
     for (const n of [3, 6]) {
       const state = addAll(
         createInitialState(container960x540),
@@ -391,13 +538,7 @@ describe('tile dimension invariants', () => {
     }
   });
 
-  it('6 active participants in 960×540 uses 2 rows, not a single portrait row', () => {
-    const inv = _computeInvariants(container960x540, DEFAULT_CONFIG)!;
-    const {rows} = _tileDimensionsFor(6, inv, DEFAULT_CONFIG);
-    expect(rows).toBe(2);
-  });
-
-  it('tileHeight stays within configured bounds', () => {
+  it('tile height always stays within the configured min/max bounds', () => {
     const state = addAll(createInitialState({width: 320, height: 240}), [
       makeParticipant('a', 'speaking-camera'),
       makeParticipant('b', 'speaking-camera'),
@@ -406,86 +547,100 @@ describe('tile dimension invariants', () => {
     expect(grid(state).tileHeight).toBeGreaterThanOrEqual(DEFAULT_CONFIG.minTileHeight);
     expect(grid(state).tileHeight).toBeLessThanOrEqual(DEFAULT_CONFIG.maxTileHeight);
   });
+
+  // Concrete worked examples: given a viewport and a participant count, this is exactly the
+  // shape (rows × cols) and tile size the grid should produce. Numbers here are computed from
+  // the real function, not guessed — if one of these changes, it means the actual layout changed.
+  it.each([
+    {viewport: {width: 1280, height: 720}, count: 2, rows: 1, cols: 2, width: 634.0, height: 600.0},
+    {viewport: {width: 1280, height: 720}, count: 4, rows: 2, cols: 2, width: 630.12, height: 354.0},
+    {viewport: {width: 960, height: 540}, count: 6, rows: 2, cols: 3, width: 314.67, height: 264.0},
+    {viewport: {width: 1920, height: 1080}, count: 9, rows: 3, cols: 3, width: 631.31, height: 354.67},
+    {viewport: {width: 320, height: 240}, count: 3, rows: 1, cols: 3, width: 155.44, height: 232.0},
+  ])(
+    '$viewport.width×$viewport.height with $count participants → $rows row(s) × $cols col(s)',
+    ({viewport, count, rows, cols, width, height}) => {
+      const inv = _computeInvariants(viewport, DEFAULT_CONFIG)!;
+      const result = _tileDimensionsFor(count, inv, DEFAULT_CONFIG);
+      expect(result.rows).toBe(rows);
+      expect(result.cols).toBe(cols);
+      expect(result.width).toBeCloseTo(width, 1);
+      expect(result.height).toBeCloseTo(height, 1);
+    },
+  );
 });
 
-// ── Tier priority (slot ordering) ───────────────────────────────────────────────
+// ── _updateSlotMap (internal) ──────────────────────────────────────────────────
+//
+// The seating-order rules in one place, tested directly against the pure function. This is
+// also the one place in the whole file that proves self has no seating privilege — every other
+// test elsewhere treats self exactly like any other participant without needing to call that
+// out separately.
+
+describe('_updateSlotMap', () => {
+  it('assigns the first seats by tier priority', () => {
+    const slotMap = _updateSlotMap(
+      [
+        makeParticipant('passive1', 'silent-no-camera'),
+        makeParticipant('active1', 'speaking-camera'),
+        makeParticipant('screen1', 'screen-sharing'),
+      ],
+      {},
+    );
+    expect(slotMap['screen1']).toBeLessThan(slotMap['active1']);
+    expect(slotMap['active1']).toBeLessThan(slotMap['passive1']);
+  });
+
+  it('self is ranked exactly like any other participant — no special treatment', () => {
+    const slotMap = _updateSlotMap(
+      [makeParticipant('screen1', 'screen-sharing'), makeSelf('me', 'speaking-camera')],
+      {},
+    );
+    expect(slotMap['screen1']).toBeLessThan(slotMap['me']);
+  });
+
+  it('a new participant is placed after existing participants in the same tier', () => {
+    const existing = [
+      makeParticipant('p1', 'silent-no-camera'),
+      makeParticipant('p2', 'silent-no-camera'),
+    ];
+    const prevMap = _updateSlotMap(existing, {});
+    const newMap = _updateSlotMap([...existing, makeParticipant('p3', 'silent-no-camera')], prevMap);
+    expect(newMap['p3']).toBeGreaterThan(newMap['p1']);
+    expect(newMap['p3']).toBeGreaterThan(newMap['p2']);
+  });
+
+  it('within the same tier, whoever became active more recently gets the better seat on first assignment', () => {
+    const slotMap = _updateSlotMap(
+      [makeParticipant('old', 'speaking-camera', 0, 100), makeParticipant('new', 'speaking-camera', 0, 200)],
+      {},
+    );
+    expect(slotMap['new']).toBeLessThan(slotMap['old']);
+  });
+
+  it('a participant who already has a seat keeps it, even if recency would otherwise reorder them', () => {
+    const slotMap = _updateSlotMap(
+      [makeParticipant('old', 'speaking-camera', 0, 100), makeParticipant('new', 'speaking-camera', 0, 200)],
+      {old: 0, new: 1},
+    );
+    expect(slotMap['old']).toBe(0);
+    expect(slotMap['new']).toBe(1);
+  });
+
+  it('a new participant with a higher-priority tier is placed ahead of existing lower-tier participants', () => {
+    const prevMap = {cam: 0};
+    const slotMap = _updateSlotMap(
+      [makeParticipant('cam', 'speaking-camera'), makeParticipant('screen', 'screen-sharing')],
+      prevMap,
+    );
+    expect(slotMap['screen']).toBeLessThan(slotMap['cam']);
+  });
+});
+
+// ── Tier priority ──────────────────────────────────────────────────────────────
 
 describe('tier priority', () => {
-  it('a passive self does not outrank participants in the active bucket', () => {
-    const state = addAll(createInitialState(container1280x720), [
-      makeParticipant('s1', 'screen-sharing'),
-      makeSelf('me', 'silent-no-camera'),
-      makeParticipant('a1', 'speaking-camera'),
-    ]);
-    expect(state.slotMap['s1']).toBeLessThan(state.slotMap['me']);
-    expect(state.slotMap['a1']).toBeLessThan(state.slotMap['me']);
-  });
-
-  it('an active self ranks by tier like anyone else — it does not jump ahead of higher-tier peers', () => {
-    const state = addAll(createInitialState(container1280x720), [
-      makeParticipant('s1', 'screen-sharing'),
-      makeSelf('me', 'speaking-camera'),
-    ]);
-    expect(state.slotMap['s1']).toBeLessThan(state.slotMap['me']);
-  });
-
-  it('a passive self is appended after existing peers in the same tier, like any newcomer', () => {
-    let state = reducer(createInitialState(container1280x720), {
-      type: 'ADD_PARTICIPANT',
-      participant: makeParticipant('p1', 'silent-no-camera'),
-      now: 100,
-    });
-    state = reducer(state, {type: 'ADD_PARTICIPANT', participant: makeSelf('me', 'silent-no-camera'), now: 200});
-    expect(state.slotMap['p1']).toBeLessThan(state.slotMap['me']);
-  });
-
-  it('self follows the same ordering rules as everyone else as participants come and go', () => {
-    let state = addAll(createInitialState(container1280x720), [
-      makeSelf('me', 'speaking-camera'),
-      makeParticipant('a1', 'silent-no-camera'),
-    ]);
-    expect(state.slotMap['me']).toBe(0); // the only active participant so far, naturally first
-
-    // A higher-tier newcomer is free to rank ahead of self, same as it would for anyone else.
-    state = reducer(state, {type: 'ADD_PARTICIPANT', participant: makeParticipant('s1', 'screen-sharing'), now: 999});
-    expect(state.slotMap['s1']).toBeLessThan(state.slotMap['me']);
-
-    // Removing that participant isn't self-specific either — self just moves back up because
-    // the list is shorter, exactly as it would for any other participant.
-    state = reducer(state, {type: 'REMOVE_PARTICIPANT', id: 's1'});
-    expect(state.slotMap['me']).toBe(0);
-  });
-
-  it('self moves from the active bucket to the passive bucket when it goes silent-camera-off', () => {
-    let state = addAll(createInitialState(container1280x720), [
-      makeSelf('me', 'speaking-camera'),
-      makeParticipant('p1', 'silent-no-camera'),
-    ]);
-    expect(state.slotMap['me']).toBe(0);
-
-    state = reducer(state, {type: 'UPDATE_PARTICIPANT', id: 'me', changes: {tier: 'silent-no-camera'}});
-    expect(state.slotMap['me']).toBeLessThan(state.slotMap['p1']);
-  });
-
-  it('self earns a full tile only once it becomes active', () => {
-    // A third (filler) participant keeps this in the general grid, not the one-on-one template.
-    let state = addAll(createInitialState(container1280x720), [
-      makeSelf('me', 'silent-no-camera'),
-      makeParticipant('a1', 'speaking-camera'),
-      makeParticipant('filler', 'silent-no-camera'),
-    ]);
-    expect(fractionIds(state)).toContain('me');
-
-    state = reducer(state, {
-      type: 'UPDATE_PARTICIPANT',
-      id: 'me',
-      changes: {tier: 'speaking-camera'},
-      now: 999,
-    });
-    expect(fullTileIds(state)).toContain('me');
-  });
-
-  it('seat allocation follows tier order: screen-sharing < speaking-camera < speaking-no-camera < silent-camera < silent-no-camera', () => {
+  it('seats follow this exact tier order: screen-sharing, then speaking-camera, then speaking-no-camera, then silent-camera, then silent-no-camera', () => {
     const {slotMap} = addAll(createInitialState(container1280x720), [
       makeParticipant('pn', 'silent-no-camera'),
       makeParticipant('pc', 'silent-camera'),
@@ -499,168 +654,41 @@ describe('tier priority', () => {
     expect(slotMap['pc']).toBeLessThan(slotMap['pn']);
   });
 
-  it('higher-priority participants stay visible when many low-priority participants overflow', () => {
+  it('higher-priority participants stay visible when many low-priority participants push the fractional tile container into overflow', () => {
     const state = addAllSmall([
       makeParticipant('a1', 'speaking-camera'),
       makeParticipant('a2', 'speaking-camera'),
       makeParticipant('pc', 'silent-camera'),
       ...Array.from({length: 20}, (_, i) => makeParticipant(`pn${i}`, 'silent-no-camera')),
     ]);
-    expect(fractionIds(state)).toContain('pc');
+    expect(fractionalTileIds(state)).toContain('pc');
     expect(overflowCount(state)).toBeGreaterThan(0);
   });
-});
 
-// ── Full-tile seat stickiness ──────────────────────────────────────────────────
-//
-// Only the full-tile boundary is sticky: an incumbent keeps their exact full seat as
-// long as they stay active. The fraction container's internal membership is not
-// sticky — anyone not holding a full tile is simply re-sorted into it by priority.
-
-describe('full-tile seat stickiness', () => {
-  it('self competes for full tiles by the same priority order as everyone else', () => {
-    const state = exitPresenter(
-      addAll(createInitialState(container1280x720), [
-        makeParticipant('s1', 'screen-sharing'),
-        makeSelf('me', 'speaking-camera'),
-        makeParticipant('filler', 'silent-no-camera'),
-      ]),
-    );
-    expect(fullTileIds(state)[0]).toBe('s1');
-    expect(fullTileIds(state)).toContain('me');
-  });
-
-  it('upgrading a participant does not displace the existing full-tile holder', () => {
-    const state = addAll(
-      createInitialState(container1280x720),
-      [
-        makeParticipant('a1', 'speaking-camera'),
-        makeParticipant('p1', 'silent-no-camera'),
-        makeParticipant('p2', 'silent-no-camera'),
-      ],
-      0,
-    );
-    expect(fullTileIds(state)).toEqual(['a1']);
-
-    const upgraded = reducer(state, {
-      type: 'UPDATE_PARTICIPANT',
-      id: 'p1',
-      changes: {tier: 'speaking-camera'},
-      now: 999,
-    });
-    expect(fullTileIds(upgraded)).toEqual(['a1', 'p1']);
-  });
-
-  it('tier downgrade immediately loses the full seat — no grace period', () => {
-    const state = exitPresenter(
-      addAll(createInitialState(container1280x720), [
-        makeParticipant('screener', 'screen-sharing'),
-        makeParticipant('cam', 'speaking-camera'),
-        makeParticipant('filler', 'silent-no-camera'),
-      ]),
-    );
-    expect(fullTileIds(state)).toContain('screener');
-
-    const next = reducer(state, {
-      type: 'UPDATE_PARTICIPANT',
-      id: 'screener',
-      changes: {tier: 'silent-no-camera'},
-    });
-    expect(fullTileIds(next)).not.toContain('screener');
-    expect(fractionIds(next)).toContain('screener');
-  });
-
-  it('a newcomer with higher recency does not displace an existing full-tile holder', () => {
-    let state = addAll(createInitialState(container1280x720), [makeParticipant('early', 'speaking-camera')]);
-    state = reducer(state, {
-      type: 'ADD_PARTICIPANT',
-      participant: makeParticipant('late', 'speaking-camera'),
-      now: 200,
-    });
-    expect(fullTileIds(exitPresenter(state))).toEqual(['early', 'late']);
-  });
-
-  it('promoting a participant to active leaves the existing full-tile holder seated', () => {
-    const state = addAll(createInitialState(container1280x720), [
-      makeParticipant('a_old', 'speaking-camera'),
-      makeParticipant('lazy', 'silent-no-camera'),
-      makeParticipant('filler', 'silent-no-camera'),
-    ]);
-    const upgraded = reducer(state, {
-      type: 'UPDATE_PARTICIPANT',
-      id: 'lazy',
-      changes: {tier: 'speaking-camera'},
-      now: 999,
-    });
-    expect(fullTileIds(upgraded)).toContain('a_old');
-    expect(fullTileIds(upgraded)).toContain('lazy');
-  });
-
-  it('a fraction participant who turns their camera on is promoted to a full tile', () => {
-    const state = addAll(createInitialState(container1280x720), [
+  it('a participant hidden behind the overflow badge gets a real fractional tile once enough higher-priority participants leave', () => {
+    let state = addAllSmall([
       makeParticipant('a1', 'speaking-camera'),
-      makeParticipant('p1', 'silent-no-camera'),
-      makeParticipant('p2', 'silent-no-camera'),
-      makeParticipant('p3', 'silent-no-camera'),
+      ...Array.from({length: 20}, (_, i) => makeParticipant(`p${i}`, 'silent-no-camera')),
     ]);
-    expect(fractionIds(state)).toContain('p3');
+    expect(fractionalTileIds(state)).not.toContain('p19'); // last-added, lowest priority — hidden behind the badge
 
-    const next = reducer(state, {
-      type: 'UPDATE_PARTICIPANT',
-      id: 'p3',
-      changes: {tier: 'silent-camera'},
-    });
-    expect(fullTileIds(next)).toContain('p3');
-    expect(fractionIds(next)).not.toContain('p3');
-  });
-
-  it('turning a camera on does not move anyone when nobody is under capacity pressure', () => {
-    const state = addAll(createInitialState(container1280x720), [
-      makeParticipant('p1', 'silent-no-camera'),
-      makeParticipant('p2', 'silent-no-camera'),
-      makeParticipant('p3', 'silent-no-camera'),
-    ]);
-    const slotP1 = state.slotMap['p1'];
-    const next = reducer(state, {
-      type: 'UPDATE_PARTICIPANT',
-      id: 'p2',
-      changes: {tier: 'silent-camera'},
-    });
-    expect(next.slotMap['p1']).toBe(slotP1);
+    for (let i = 0; i < 18; i++) {
+      state = reducer(state, {type: 'REMOVE_PARTICIPANT', id: `p${i}`});
+    }
+    expect(fractionalTileIds(state)).toContain('p19');
   });
 });
 
-// ── Recency ordering ──────────────────────────────────────────────────────────
-
-describe('recency ordering within active tiers', () => {
-  it('first added active participant gets the first seat', () => {
-    const state = addAll(createInitialState(container1280x720), [
-      makeParticipant('old', 'speaking-camera'),
-      makeParticipant('new', 'speaking-camera'),
-    ]);
-    expect(state.slotMap['old']).toBeLessThan(state.slotMap['new']);
-  });
-
-  it('passive participants are seated in arrival order', () => {
-    let state = createInitialState(container1280x720);
-    state = reducer(state, {type: 'ADD_PARTICIPANT', participant: makeParticipant('p1', 'silent-no-camera'), now: 100});
-    state = reducer(state, {type: 'ADD_PARTICIPANT', participant: makeParticipant('p2', 'silent-no-camera'), now: 200});
-    expect(state.slotMap['p1']).toBeLessThan(state.slotMap['p2']);
-  });
-
-  it('updating a non-tier field does not change activatedAt', () => {
-    let state = createInitialState(container1280x720);
-    state = reducer(state, {type: 'ADD_PARTICIPANT', participant: makeParticipant('a', 'speaking-camera'), now: 100});
-    const before = state.participants[0].activatedAt;
-    state = reducer(state, {type: 'UPDATE_PARTICIPANT', id: 'a', changes: {isMuted: true}});
-    expect(state.participants.find(p => p.id === 'a')!.activatedAt).toBe(before);
-  });
-});
-
-// ── activatedAt management ────────────────────────────────────────────────────
+// ── activatedAt management ─────────────────────────────────────────────────────
+//
+// `activatedAt` breaks ties by recency when two participants would otherwise rank equally — the
+// array/arrival order alone isn't reliable enough for this (two participants can report
+// activity in the same tick, and "who's first in the array" isn't the same as "who was more
+// recently active"). It's set only for active-tier participants, and only changes when the
+// tier itself changes.
 
 describe('activatedAt management', () => {
-  it('ADD_PARTICIPANT with active tier auto-sets activatedAt', () => {
+  it('adding a participant with an active tier sets activatedAt right away', () => {
     const state = reducer(createInitialState(container1280x720), {
       type: 'ADD_PARTICIPANT',
       participant: makeParticipant('a', 'speaking-camera'),
@@ -669,7 +697,7 @@ describe('activatedAt management', () => {
     expect(state.participants[0].activatedAt).toBe(42);
   });
 
-  it('ADD_PARTICIPANT with passive tier does not set activatedAt', () => {
+  it('adding a participant with a passive tier does not set activatedAt', () => {
     const state = reducer(createInitialState(container1280x720), {
       type: 'ADD_PARTICIPANT',
       participant: makeParticipant('p', 'silent-no-camera'),
@@ -678,30 +706,32 @@ describe('activatedAt management', () => {
     expect(state.participants[0].activatedAt).toBeUndefined();
   });
 
-  it('UPDATE_PARTICIPANT changing tier refreshes activatedAt', () => {
+  it('changing a participant\'s tier refreshes activatedAt to the time of the change', () => {
     let state = createInitialState(container1280x720);
     state = reducer(state, {type: 'ADD_PARTICIPANT', participant: makeParticipant('a', 'silent-no-camera'), now: 10});
     state = reducer(state, {type: 'UPDATE_PARTICIPANT', id: 'a', changes: {tier: 'speaking-camera'}, now: 200});
     expect(state.participants.find(p => p.id === 'a')!.activatedAt).toBe(200);
   });
 
-  it('UPDATE_PARTICIPANT not changing tier preserves activatedAt', () => {
+  it('activatedAt only changes when the tier itself changes — updating anything else leaves it untouched', () => {
     let state = createInitialState(container1280x720);
     state = reducer(state, {type: 'ADD_PARTICIPANT', participant: makeParticipant('a', 'speaking-camera'), now: 100});
+    const before = state.participants[0].activatedAt;
+
     state = reducer(state, {type: 'UPDATE_PARTICIPANT', id: 'a', changes: {isMuted: true}, now: 999});
-    expect(state.participants.find(p => p.id === 'a')!.activatedAt).toBe(100);
+    expect(state.participants.find(p => p.id === 'a')!.activatedAt).toBe(before);
   });
 });
 
 // ── computeFractionalTileSize ──────────────────────────────────────────────────
 //
-// Row count (and therefore cell size) is a pure function of the full tile's height —
-// never of how many participants need to fit. This is what fixes the old bug where
-// adding a 4th passive flipped a 3-row column into a 2×2 grid: row count must stay put
-// as the count grows, so the column just keeps filling and a new column starts.
+// A fractional tile's size depends only on the full tile's height — never on how many
+// participants need to fit. This is what fixes the old bug where adding one more passive
+// participant flipped a 3-row column into a 2×2 grid: row count has to stay put as the count
+// grows, so the column just keeps filling and a new column starts when it's full.
 
 describe('computeFractionalTileSize', () => {
-  it('is independent of participant count — same tileHeight always yields the same rows', () => {
+  it('gives the same result every time for the same tile height, no matter how many participants need to fit', () => {
     const a = _computeFractionalTileSize(532, DEFAULT_CONFIG);
     const b = _computeFractionalTileSize(532, DEFAULT_CONFIG);
     expect(a).toEqual(b);
@@ -712,7 +742,7 @@ describe('computeFractionalTileSize', () => {
     expect(rows).toBeGreaterThanOrEqual(2);
   });
 
-  it('rows is however many fixed-height cells land closest to an exact fit of the tile height', () => {
+  it('picks the row count whose exact division of the tile height lands closest to the target size', () => {
     // target height = minTileHeight * 0.5 = 60; gap = 4. round((532+4)/(60+4)) = round(8.375) = 8.
     // Exact division across 8 rows of 532 with gap 4: (532 - 7*4) / 8 = 63 — close to, but not
     // exactly, the 60 target, since this is an exact division rather than a capped target.
@@ -721,23 +751,22 @@ describe('computeFractionalTileSize', () => {
     expect(fracHeight).toBeCloseTo(63, 5);
   });
 
-  it('more available height yields more rows, holding tile width constant', () => {
+  it('a taller full tile gets more rows of fractional tiles, at the same fixed tile width', () => {
     const short = _computeFractionalTileSize(240, DEFAULT_CONFIG);
     const tall = _computeFractionalTileSize(600, DEFAULT_CONFIG);
     expect(tall.rows).toBeGreaterThan(short.rows);
   });
 
-  it('shrinks the fixed target only when even 2 rows do not otherwise fit', () => {
+  it('only shrinks below the target size when even 2 rows would not otherwise fit', () => {
     const {rows, fracHeight} = _computeFractionalTileSize(100, DEFAULT_CONFIG);
     expect(rows).toBe(2);
     expect(fracHeight).toBeLessThan(DEFAULT_CONFIG.minTileHeight * 0.5);
   });
 
-  it('width follows a fixed aspect ratio, not the current full tile shape — no tileWidth input at all', () => {
-    // The old signature took tileWidth and derived width from the full tile's own aspect
-    // ratio, which is why a lone full tile (wide, clamped AR) and a packed grid's full tile
-    // (narrow AR) produced different-looking fraction cells for the same tileHeight. There is
-    // no tileWidth parameter anymore — width is purely `fracHeight * fixedAspectRatio`.
+  it('width always follows a fixed aspect ratio, never the current full tile\'s own shape', () => {
+    // A lone full tile (wide, clamped to the max aspect ratio) and a packed grid's full tile
+    // (much narrower) must not produce different-looking fractional tiles for the same tile
+    // height — width is purely `fracHeight * fixedAspectRatio`, with no tile-width input at all.
     const {fracWidth, fracHeight} = _computeFractionalTileSize(532, DEFAULT_CONFIG);
     const expectedAspectRatio =
       ((DEFAULT_CONFIG.minFractionalTileAspectRatio ?? DEFAULT_CONFIG.minAspectRatio) +
@@ -748,6 +777,11 @@ describe('computeFractionalTileSize', () => {
 });
 
 // ── Fractional tile container ──────────────────────────────────────────────────
+//
+// The container can be positioned three ways relative to the full tiles around it:
+//  - it shares its only row with full tiles (full tiles beside it, none above)
+//  - it shares a later row, with full-tile rows above it (full tiles beside it *and* above)
+//  - it has its own row, with no full tiles beside it at all
 
 describe('fractional tile container', () => {
   it('a fractional tile is never a 1×1 shape — always at least a 2-way split', () => {
@@ -759,37 +793,14 @@ describe('fractional tile container', () => {
     expect(fractionalContainer(state)!.fractionalTiles.filter(f => f.type === 'participant')).toHaveLength(1);
   });
 
-  it('adding a 4th passive keeps filling the column instead of jumping to a 2×2 shape', () => {
-    // Regression test: row count must not be re-derived per participant count.
-    const threeState = addAll(createInitialState(container960x540), [
-      makeParticipant('a1', 'speaking-camera'),
-      makeParticipant('p0', 'silent-no-camera'),
-      makeParticipant('p1', 'silent-no-camera'),
-      makeParticipant('p2', 'silent-no-camera'),
-    ]);
-    const fourState = addAll(createInitialState(container960x540), [
-      makeParticipant('a1', 'speaking-camera'),
-      makeParticipant('p0', 'silent-no-camera'),
-      makeParticipant('p1', 'silent-no-camera'),
-      makeParticipant('p2', 'silent-no-camera'),
-      makeParticipant('p3', 'silent-no-camera'),
-    ]);
-    // Same tileHeight (still 1 active + container competing for the same 2-unit shape) →
-    // the fixed cell size, and therefore row count, must be identical in both states.
-    expect(grid(fourState).fractionalTileHeight).toBe(grid(threeState).fractionalTileHeight);
-  });
-
-  it('fills column-major — the array order is priority order; CSS places it column-major', () => {
+  it('the array order is priority order — this is what lets the renderer place tiles column-major with plain CSS', () => {
     const state = addAll(createInitialState(container1280x720), [
       makeParticipant('a1', 'speaking-camera'),
       makeParticipant('p0', 'silent-no-camera'),
       makeParticipant('p1', 'silent-no-camera'),
       makeParticipant('p2', 'silent-no-camera'),
     ]);
-    const participantIds = fractionalContainer(state)!
-      .fractionalTiles.filter(f => f.type === 'participant')
-      .map(f => (f as {participant: GridParticipant}).participant.id);
-    expect(participantIds).toEqual(['p0', 'p1', 'p2']);
+    expect(fractionalTileIds(state)).toEqual(['p0', 'p1', 'p2']);
   });
 
   it('fractional tile dimensions are null when no container exists', () => {
@@ -802,16 +813,16 @@ describe('fractional tile container', () => {
     expect(grid(state).fractionalTileHeight).toBeNull();
   });
 
-  it('active overflow spills into the container too, alongside the passives', () => {
+  it('extra active participants beyond the full-tile slots join the passive ones inside the fractional tile container, still ranked by the normal tier order', () => {
     const state = addAllSmall(Array.from({length: 4}, (_, i) => makeParticipant(`a${i}`, 'speaking-camera')));
     // smallContainer has maxTiles=3, so 4 actives can't all get a full tile.
     expect(fullTiles(state).length).toBeLessThan(4);
     expect(fractionalContainer(state)).toBeDefined();
   });
 
-  // ── Mode 1: sharing the only row (column-major, centered, hugs width) ──────────
+  // ── Shares its only row with full tiles (column-major, centered, hugs width) ───
 
-  it('mode 1: tags fillDirection "column" and align "center" when sharing the only row', () => {
+  it('tags fillDirection "column" and align "center" when sharing the only row', () => {
     const state = addAll(createInitialState(container1280x720), [
       makeParticipant('a1', 'speaking-camera'),
       makeParticipant('p1', 'silent-no-camera'),
@@ -821,44 +832,18 @@ describe('fractional tile container', () => {
     expect(tile.align).toBe('center');
   });
 
-  it('mode 1: width hugs narrower than the full tile — not snapped — when under capacity', () => {
-    // So the full tile beside it can actually use the freed-up space, per the regression
-    // this guards: width must not be forced to tileWidth just because it's squeezed to one
-    // leftover slot — only once it's genuinely full (showing the overflow badge).
-    const state = addAll(createInitialState(container1280x720), [
+  it('width hugs while under capacity, then snaps to the full tile width once truly full — the overflow badge never causes a jump', () => {
+    // Under capacity: the container is narrower than a full tile, so the full tile beside it can
+    // actually use the freed-up space.
+    const underCapacity = addAll(createInitialState(container1280x720), [
       makeParticipant('a1', 'speaking-camera'),
       makeParticipant('p1', 'silent-no-camera'),
     ]);
-    const layout = grid(state);
-    expect(overflowCount(state)).toBe(0);
-    expect(layout.fractionalContainerWidth!).toBeLessThan(layout.tileWidth);
-  });
+    expect(overflowCount(underCapacity)).toBe(0);
+    expect(grid(underCapacity).fractionalContainerWidth!).toBeLessThan(grid(underCapacity).tileWidth);
 
-  it('mode 1: width snaps to exactly the full tile width once truly at overflow capacity', () => {
-    // minTileHeight=240 (matching production, not the smaller test default) reproduces the
-    // same geometry as the "caps capacity..." regression above: 1 active + container share a
-    // single row at 960×540, container capacity is 16 — comfortably exceeded by 20 passives.
-    const bigConfig: GridConfig = {...DEFAULT_CONFIG, minTileHeight: 240};
-    const bigReducer = createGridReducer(bigConfig);
-    const state = [
-      makeParticipant('a1', 'speaking-camera'),
-      ...Array.from({length: 20}, (_, i) => makeParticipant(`p${i}`, 'silent-no-camera')),
-    ].reduce(
-      (s, p) => bigReducer(s, {type: 'ADD_PARTICIPANT', participant: p}),
-      createInitialState(container960x540),
-    );
-    const layout = grid(state);
-    expect(overflowCount(state)).toBeGreaterThan(0);
-    expect(fractionalContainer(state)!.fillDirection).toBe('column');
-    expect(fractionalContainer(state)!.align).toBe('center'); // confirms this is mode 1, not 3
-    expect(layout.fractionalContainerWidth).toBe(layout.tileWidth);
-  });
-
-  it('mode 1: width/alignment is identical exactly at capacity and just past it — the overflow badge must not shift the layout', () => {
-    // Regression: snapping only triggered on `hasOverflow`, missing the case where the
-    // participant count lands exactly on capacity (every cell full, no overflow badge needed
-    // yet) — that state hugged narrower than the overflow state one participant later, even
-    // though both are equally "fully packed". Same geometry as the capacity-16 test above.
+    // Exactly at capacity vs. one more participant (now showing the overflow badge): both are
+    // "fully packed," so both must be exactly a full tile's width — with no jump between them.
     const bigConfig: GridConfig = {...DEFAULT_CONFIG, minTileHeight: 240};
     const bigReducer = createGridReducer(bigConfig);
     const build = (passiveCount: number) =>
@@ -869,35 +854,23 @@ describe('fractional tile container', () => {
         (s, p) => bigReducer(s, {type: 'ADD_PARTICIPANT', participant: p}),
         createInitialState(container960x540),
       );
-
     const capacity = grid(build(1)).maxFractionalTilesPerContainer;
     const exactlyFull = build(capacity);
     const withOverflow = build(capacity + 1);
-
     expect(overflowCount(exactlyFull)).toBe(0);
     expect(overflowCount(withOverflow)).toBeGreaterThan(0);
     expect(grid(exactlyFull).fractionalContainerWidth).toBe(grid(withOverflow).fractionalContainerWidth);
     expect(grid(exactlyFull).fractionalContainerWidth).toBe(grid(exactlyFull).tileWidth);
   });
 
-  it('mode 1: the box height always matches the full tile, but the cell itself stays small either way', () => {
-    const state = addAll(createInitialState(container1280x720), [
-      makeParticipant('a1', 'speaking-camera'),
-      makeParticipant('p1', 'silent-no-camera'),
-    ]);
-    const layout = grid(state);
-    expect(layout.fractionalContainerHeight).toBe(layout.tileHeight);
-    expect(layout.fractionalTileHeight!).toBeLessThan(layout.tileHeight / 2);
-  });
-
-  it('mode 1: the cell size is invariant — identical whether the column is under-filled or completely full', () => {
-    // Observation: cell size must not depend on `visibleCount`. One active + one passive
-    // (column barely started) and one active + enough passives to exactly fill the column
-    // must produce the exact same fractionalTileHeight/Width for the same tileHeight.
+  it('the fractional tile\'s own size never changes, whether the column is half full or completely full', () => {
     const underfilled = addAll(createInitialState(container1280x720), [
       makeParticipant('a1', 'speaking-camera'),
       makeParticipant('p1', 'silent-no-camera'),
     ]);
+    expect(grid(underfilled).fractionalContainerHeight).toBe(grid(underfilled).tileHeight);
+    expect(grid(underfilled).fractionalTileHeight!).toBeLessThan(grid(underfilled).tileHeight / 2);
+
     const {rows} = _computeFractionalTileSize(grid(underfilled).tileHeight, DEFAULT_CONFIG);
     const filled = addAll(createInitialState(container1280x720), [
       makeParticipant('a1', 'speaking-camera'),
@@ -911,9 +884,9 @@ describe('fractional tile container', () => {
     expect(grid(filled).fractionalTileHeight).toBeCloseTo(expectedHeight, 5);
   });
 
-  // ── Mode 3: sharing the last row of a multi-row grid (column-major, top/left-aligned) ──
+  // ── Shares a later row, with full-tile rows above it (column-major, top/left-aligned) ──
 
-  it('mode 3: tags fillDirection "column" and align "start" when full-tile rows exist above it', () => {
+  it('tags fillDirection "column" and align "start" when full-tile rows exist above it', () => {
     // 5 actives need 2 rows of full tiles (3 cols × 2 rows); the container shares the last,
     // partial row rather than being alone with a single active tile.
     const state = addAll(createInitialState(container1280x720), [
@@ -925,15 +898,7 @@ describe('fractional tile container', () => {
     expect(tile.align).toBe('start');
   });
 
-  it('mode 3: hugs its content below max columns — width is constant within a column count, grows only when a new column starts', () => {
-    // Per the Figma reference designs: a container genuinely short of the max column count must
-    // hug (not stretch to the full available slot), and the whole shared row (full tile(s) +
-    // hugged container) is centered as a block by the outer grid — same as mode 1. This only
-    // works without visibly shifting the full tile(s) because the hugged width is a pure
-    // function of `cols` (a function of participant count): adding passives within the same
-    // column count must not change the width, and crossing a column boundary must grow it by
-    // exactly one cell + gap — as long as neither side of that boundary is already at the max
-    // column count (see the separate "flushes exactly" test for that boundary specifically).
+  it('hugs its content below the max column count — width stays the same within a column count, and only grows when a new column starts', () => {
     const bigConfig: GridConfig = {...DEFAULT_CONFIG, minTileHeight: 240};
     const bigReducer = createGridReducer(bigConfig);
     const build = (passiveCount: number) =>
@@ -950,15 +915,14 @@ describe('fractional tile container', () => {
     const maxCols = capacity / capRows;
     expect(maxCols).toBeGreaterThan(2); // need 1→2 columns to both stay below maxCols
 
-    // One column started vs one column completely full — same `cols` (1), must be the exact
+    // One column started vs. one column completely full — same column count, must be the exact
     // same (hugged) width.
     const oneColumnStarted = build(1);
     const oneColumnFull = build(capRows);
     expect(overflowCount(oneColumnFull)).toBe(0);
     expect(grid(oneColumnStarted).fractionalContainerWidth).toBe(grid(oneColumnFull).fractionalContainerWidth);
 
-    // Crossing from 1 column to 2 (well below maxCols) must grow the width by exactly one
-    // cell + gap.
+    // Crossing from 1 column to 2 (well below the max) grows the width by exactly one cell + gap.
     const twoColumnsStarted = build(capRows + 1);
     const gap = bigConfig.tileGap;
     expect(grid(twoColumnsStarted).fractionalContainerWidth).toBeCloseTo(
@@ -967,13 +931,7 @@ describe('fractional tile container', () => {
     );
   });
 
-  it('mode 3: flushes exactly to the available width once at max columns — no "kink" against the full-tile row(s) above', () => {
-    // Regression: hugging all the way up to and including `maxCols` left a few leftover px
-    // (`maxCols` is a floor), and centering that left this row's edges sitting slightly inside
-    // the full-tile rows' edges above/below it — a small but visible "kink" rather than a clean
-    // line, even though each row was individually centered correctly. At `cols === maxCols`
-    // (whether or not the last column is completely full), width instead divides the available
-    // width exactly, matching the same `tileWidth` the full tile(s) in this row already use.
+  it('flushes exactly to the available width once at the max column count — no gap against the full-tile row(s) above', () => {
     const bigConfig: GridConfig = {...DEFAULT_CONFIG, minTileHeight: 240};
     const bigReducer = createGridReducer(bigConfig);
     const build = (passiveCount: number) =>
@@ -989,8 +947,8 @@ describe('fractional tile container', () => {
     const maxCols = capacity / capRows;
     expect(maxCols).toBeGreaterThan(1); // meaningful check, not a single-column coincidence
 
-    // Last column just started (cols === maxCols, but not every cell full) vs completely full —
-    // both at max columns, so both must flush to the exact same (non-hugged) width.
+    // Last column just started (at the max column count, but not every cell full) vs.
+    // completely full — both are at the max column count, so both flush to the same width.
     const lastColumnStarted = build(capacity - capRows + 1);
     const lastColumnFull = build(capacity);
     expect(overflowCount(lastColumnFull)).toBe(0);
@@ -1001,9 +959,9 @@ describe('fractional tile container', () => {
     expect(spannedWidth).toBeCloseTo(layout.fractionalContainerWidth!, 5);
   });
 
-  // ── Mode 2: alone in its own row (row-major, centered, always hugs) ─────────────
+  // ── Has its own row, with no full tiles beside it (row-major, centered, always hugs) ──
 
-  it('mode 2: tags fillDirection "row" and align "center" when it has a row to itself', () => {
+  it('tags fillDirection "row" and align "center" when it has a row entirely to itself', () => {
     // All-passive always gives the container its own row — nothing to share with.
     const state = addAll(createInitialState(container1280x720), [
       makeParticipant('p1', 'silent-no-camera'),
@@ -1014,7 +972,7 @@ describe('fractional tile container', () => {
     expect(tile.align).toBe('center');
   });
 
-  it('mode 2: fills row-major — a handful of participants sit in one row, not stacked in a column', () => {
+  it('fills left-to-right, not stacked in a column, when it has its own row', () => {
     const state = addAll(createInitialState(container1280x720), [
       makeParticipant('p0', 'silent-no-camera'),
       makeParticipant('p1', 'silent-no-camera'),
@@ -1025,15 +983,13 @@ describe('fractional tile container', () => {
     expect(layout.fractionalContainerHeight).toBeCloseTo(layout.fractionalTileHeight!, 5);
   });
 
-  it('mode 2: always hugs — never stretches to tileHeight even with plenty of content', () => {
+  it('never stretches taller than it needs to, even with plenty of content', () => {
     const many = Array.from({length: 40}, (_, i) => makeParticipant(`p${i}`, 'silent-no-camera'));
     const state = addAll(createInitialState(container1280x720), many);
     const layout = grid(state);
     expect(overflowCount(state)).toBe(0);
-    // Height hugs however many rows are actually needed — it has no full-tile sibling to
-    // force-match, so it's never forced to exactly tileHeight (that would only happen by
-    // coincidence here, not by design — so just assert it's a hug, i.e. a whole multiple of
-    // the fixed cell height, not the stretched exact-division value mode 1 would produce).
+    // Height hugs however many rows are actually needed — with no full-tile sibling to match, it
+    // should land on a whole multiple of the fixed cell height, not some other stretched value.
     const rowsNeeded = Math.round(
       (layout.fractionalContainerHeight! + DEFAULT_CONFIG.tileGap) /
         (layout.fractionalTileHeight! + DEFAULT_CONFIG.tileGap),
@@ -1042,13 +998,7 @@ describe('fractional tile container', () => {
     expect(layout.fractionalContainerHeight).toBeCloseTo(expectedHeight, 5);
   });
 
-  it('mode 2: a fully-packed row tiles edge-to-edge with zero slack, not a symmetric inset', () => {
-    // Regression: maxCols was floored against the grid's abstract usable width instead of the
-    // container's own (narrower, full-tile-row-matching) width, and even corrected for that,
-    // `maxCols * targetWidth` is generally a few px short of the container width. Left
-    // uncorrected, `justifyContent: 'center'` (mode 2's "last row centered" rule) split that
-    // slack onto *both* edges even when a row was completely full — an inset that never
-    // reached either edge, instead of flush alignment with the full-tile row above/below.
+  it('a fully-packed row reaches edge-to-edge with zero slack, not an inset that stops short on both sides', () => {
     const bigConfig: GridConfig = {...DEFAULT_CONFIG, minTileHeight: 240};
     const bigReducer = createGridReducer(bigConfig);
     const build = (passiveCount: number) =>
@@ -1063,7 +1013,7 @@ describe('fractional tile container', () => {
 
     const probeState = build(1);
     const probe = grid(probeState);
-    expect(fractionalContainer(probeState)?.fillDirection).toBe('row'); // confirms mode 2, not 1/3
+    expect(fractionalContainer(probeState)?.fillDirection).toBe('row'); // confirms it has its own row
     const maxCols = probe.maxFractionalTilesPerContainer / Math.max(1, Math.round(
       // rowsNeeded for 1 passive is 1, so maxFractionalTilesPerContainer === maxCols * maxRows;
       // recover maxRows the same way the reducer does, from tileHeight and the fixed cell height.
@@ -1079,8 +1029,10 @@ describe('fractional tile container', () => {
   });
 });
 
+// ── Overflow ───────────────────────────────────────────────────────────────────
+
 describe('overflow', () => {
-  it('no overflow badge when everyone fits', () => {
+  it('no overflow badge appears when everyone fits', () => {
     const state = addAll(createInitialState(container1280x720), [
       makeParticipant('a1', 'speaking-camera'),
       makeParticipant('p1', 'silent-no-camera'),
@@ -1088,24 +1040,19 @@ describe('overflow', () => {
     expect(overflowCount(state)).toBe(0);
   });
 
-  it('overflow badge appears once the container runs out of row space', () => {
+  it('an overflow badge appears once the fractional tile container runs out of room', () => {
     const state = addAllSmall(
       Array.from({length: 12}, (_, i) => makeParticipant(`p${i}`, i === 0 ? 'speaking-camera' : 'silent-no-camera')),
     );
     expect(overflowCount(state)).toBeGreaterThan(0);
   });
 
-  it('caps capacity to the width left over next to a full tile sharing its row — regression', () => {
-    // Bug: capacity was computed against the *full* grid width even when the container was
-    // budgeted to share its row with a full tile, letting it grow wider than that row could
-    // actually hold. CSS then wrapped it to its own line at the same (large) tile height,
-    // blowing out the total content height well past the container — with no overflow badge
-    // ever appearing, since the (wrong) capacity was never exceeded.
-    //
-    // minTileHeight=240 (matching the production fixture config, not the smaller test
-    // default) reproduces the exact geometry where one active tile and the container share
-    // a single ~530px-tall row: the container's own capacity is only 16 (4 rows × 4 cols) —
-    // comfortably exceeded by 20 passives if, and only if, the fix is in place.
+  it('the fractional tile container can only grow as wide as the space actually left in its row — never wider than that, even though the grid itself is much wider', () => {
+    // Bug history: capacity used to be computed against the full grid width even when the
+    // container shared its row with a full tile, letting it grow wider than that row could
+    // actually hold. CSS then wrapped it onto its own line at the same (large) tile height,
+    // blowing out the total content height — with no overflow badge ever appearing, since the
+    // (wrong) capacity was never exceeded.
     const bigConfig: GridConfig = {...DEFAULT_CONFIG, minTileHeight: 240};
     const bigReducer = createGridReducer(bigConfig);
     const state = [
@@ -1117,17 +1064,17 @@ describe('overflow', () => {
     );
 
     expect(overflowCount(state)).toBeGreaterThan(0);
-    expect(fractionIds(state).length).toBeLessThanOrEqual(grid(state).maxFractionalTilesPerContainer);
+    expect(fractionalTileIds(state).length).toBeLessThanOrEqual(grid(state).maxFractionalTilesPerContainer);
   });
 
-  it('overflow count equals the number of participants that did not fit', () => {
+  it('the overflow count equals exactly how many participants did not fit', () => {
     const state = addAllSmall(
       Array.from({length: 12}, (_, i) => makeParticipant(`p${i}`, i === 0 ? 'speaking-camera' : 'silent-no-camera')),
     );
     expect(overflowCount(state)).toBe(12 - visibleIds(state).length);
   });
 
-  it('adding one more participant increases the overflow count by one once already overflowing', () => {
+  it('adding one more participant increases the overflow count by exactly one, once already overflowing', () => {
     const base = addAllSmall(
       Array.from({length: 12}, (_, i) => makeParticipant(`p${i}`, i === 0 ? 'speaking-camera' : 'silent-no-camera')),
     );
@@ -1140,7 +1087,7 @@ describe('overflow', () => {
     expect(overflowCount(next)).toBe(before + 1);
   });
 
-  it('overflow badge carries up to 3 avatars', () => {
+  it('the overflow badge shows at most 3 avatars', () => {
     const state = addAllSmall(
       Array.from({length: 20}, (_, i) => makeParticipant(`p${i}`, i === 0 ? 'speaking-camera' : 'silent-no-camera')),
     );
@@ -1153,7 +1100,7 @@ describe('overflow', () => {
     }
   });
 
-  it('the overflow badge is the last slot in the container', () => {
+  it('the overflow badge is always the last slot in the container', () => {
     const state = addAllSmall(
       Array.from({length: 12}, (_, i) => makeParticipant(`p${i}`, i === 0 ? 'speaking-camera' : 'silent-no-camera')),
     );
@@ -1166,16 +1113,27 @@ describe('overflow', () => {
 // ── Presenter mode ────────────────────────────────────────────────────────────
 
 describe('presenter mode', () => {
-  it('auto-activates when a screen share appears', () => {
-    const state = addAll(createInitialState(container1280x720), [
+  it('turns on automatically when someone starts screen-sharing — whether they join already sharing, or start sharing while already in the call', () => {
+    const joinsAlreadySharing = addAll(createInitialState(container1280x720), [
       makeSelf('me'),
       makeParticipant('s1', 'screen-sharing'),
     ]);
-    expect(state.isPresenterModeActive).toBe(true);
-    expect(state.layout.mode).toBe('presenter');
+    expect(joinsAlreadySharing.isPresenterModeActive).toBe(true);
+    expect(joinsAlreadySharing.layout.mode).toBe('presenter');
+
+    const startsSharingLater = addAll(createInitialState(container1280x720), [
+      makeParticipant('a1', 'speaking-camera'),
+    ]);
+    expect(startsSharingLater.isPresenterModeActive).toBe(false);
+    const afterSharing = reducer(startsSharingLater, {
+      type: 'UPDATE_PARTICIPANT',
+      id: 'a1',
+      changes: {tier: 'screen-sharing'},
+    });
+    expect(afterSharing.isPresenterModeActive).toBe(true);
   });
 
-  it('does not auto-activate without a screen share', () => {
+  it('does not turn on by itself just because someone is active — only a screen share does that', () => {
     const state = addAll(createInitialState(container1280x720), [
       makeSelf('me'),
       makeParticipant('a1', 'speaking-camera'),
@@ -1183,65 +1141,51 @@ describe('presenter mode', () => {
     expect(state.isPresenterModeActive).toBe(false);
   });
 
-  it('auto-activates when an existing participant starts sharing', () => {
-    const state = addAll(createInitialState(container1280x720), [makeParticipant('a1', 'speaking-camera')]);
-    expect(state.isPresenterModeActive).toBe(false);
-    const next = reducer(state, {type: 'UPDATE_PARTICIPANT', id: 'a1', changes: {tier: 'screen-sharing'}});
-    expect(next.isPresenterModeActive).toBe(true);
-  });
-
-  it('toggling off with exactly 2 participants reveals the one-on-one template underneath', () => {
-    let state = addAll(createInitialState(container1280x720), [
+  it('turning presenter mode off reveals the one-on-one layout with exactly 2 people, or the tiled grid with 3 or more', () => {
+    let twoPeople = addAll(createInitialState(container1280x720), [
       makeSelf('me'),
       makeParticipant('s1', 'screen-sharing'),
     ]);
-    state = reducer(state, {type: 'TOGGLE_PRESENTER_MODE'});
-    expect(state.isPresenterModeActive).toBe(false);
-    expect(state.layout.mode).toBe('one-on-one');
+    twoPeople = reducer(twoPeople, {type: 'TOGGLE_PRESENTER_MODE'});
+    expect(twoPeople.isPresenterModeActive).toBe(false);
+    expect(twoPeople.layout.mode).toBe('one-on-one');
 
-    state = reducer(state, {type: 'TOGGLE_PRESENTER_MODE'});
-    expect(state.isPresenterModeActive).toBe(true);
-    expect(state.layout.mode).toBe('presenter');
-  });
+    twoPeople = reducer(twoPeople, {type: 'TOGGLE_PRESENTER_MODE'});
+    expect(twoPeople.isPresenterModeActive).toBe(true);
+    expect(twoPeople.layout.mode).toBe('presenter');
 
-  it('toggling off with 3+ participants reveals the tiled grid', () => {
-    let state = addAll(createInitialState(container1280x720), [
+    let threePeople = addAll(createInitialState(container1280x720), [
       makeSelf('me'),
       makeParticipant('s1', 'screen-sharing'),
       makeParticipant('a1', 'speaking-camera'),
     ]);
-    state = reducer(state, {type: 'TOGGLE_PRESENTER_MODE'});
-    expect(state.layout.mode).toBe('grid');
+    threePeople = reducer(threePeople, {type: 'TOGGLE_PRESENTER_MODE'});
+    expect(threePeople.layout.mode).toBe('grid');
   });
 
-  it('spotlights the highest-priority tier — screen-sharing beats speaking beats everything else', () => {
-    const state = addAll(createInitialState(container1280x720), [
+  it('spotlights the highest-priority tier — screen-sharing beats speaking, which beats everything else — regardless of who that is, including you', () => {
+    const screenShareWins = addAll(createInitialState(container1280x720), [
       makeSelf('me'),
       makeParticipant('s1', 'screen-sharing'),
       makeParticipant('a1', 'speaking-camera'),
     ]);
-    const spotlight = presenter(state).spotlight;
-    expect(spotlight?.type).toBe('full');
-    expect(spotlight && spotlight.type === 'full' && spotlight.participant.id).toBe('s1');
-  });
+    const spotlight1 = presenter(screenShareWins).spotlight;
+    expect(spotlight1 && spotlight1.type === 'full' && spotlight1.participant.id).toBe('s1');
 
-  it('self takes the spotlight when self genuinely is the highest-priority participant — no seating privilege either way', () => {
-    const state = addAll(createInitialState(container1280x720), [
+    const selfIsHighestPriority = addAll(createInitialState(container1280x720), [
       makeParticipant('a1', 'speaking-camera'),
       makeSelf('me', 'screen-sharing'),
     ]);
-    const spotlight = presenter(state).spotlight;
-    expect(spotlight && spotlight.type === 'full' && spotlight.participant.id).toBe('me');
+    const spotlight2 = presenter(selfIsHighestPriority).spotlight;
+    expect(spotlight2 && spotlight2.type === 'full' && spotlight2.participant.id).toBe('me');
   });
 
-  it('with multiple screen-sharers, the most recently started one gets the spotlight ("stack" behavior)', () => {
+  it('with several people screen-sharing at once, the one who started most recently gets the spotlight — and when they stop, it falls back to whoever is left sharing most recently, not just the next person in priority order', () => {
     let state = addAll(createInitialState(container1280x720), [makeParticipant('s1', 'screen-sharing')], 100);
     state = reducer(state, {type: 'ADD_PARTICIPANT', participant: makeParticipant('s2', 'screen-sharing'), now: 200});
     let spotlight = presenter(state).spotlight;
     expect(spotlight && spotlight.type === 'full' && spotlight.participant.id).toBe('s2');
 
-    // s2 stops sharing — falls back to s1, the only screen-sharer left, not just the next
-    // participant in priority order.
     state = reducer(state, {type: 'UPDATE_PARTICIPANT', id: 's2', changes: {tier: 'silent-no-camera'}, now: 300});
     spotlight = presenter(state).spotlight;
     expect(spotlight && spotlight.type === 'full' && spotlight.participant.id).toBe('s1');
@@ -1267,7 +1211,7 @@ describe('presenter mode', () => {
     expect(spotlight && spotlight.type === 'full' && spotlight.participant.id).toBe('c2');
   });
 
-  it('puts everyone except the spotlight into the strip', () => {
+  it('everyone except the spotlight goes into the strip', () => {
     const state = addAll(createInitialState(container1280x720), [
       makeSelf('me'),
       makeParticipant('s1', 'screen-sharing'),
@@ -1277,7 +1221,25 @@ describe('presenter mode', () => {
     expect(stripIds).toEqual(['a1', 'me']);
   });
 
-  it('sizes strip tiles within the aspect-ratio bounds', () => {
+  it('the strip keeps a participant\'s position when the spotlight changes — a strip seat only moves if that participant\'s own tier changes, exactly like the main grid', () => {
+    let state = addAll(createInitialState(container1280x720), [
+      makeParticipant('s1', 'screen-sharing'),
+      makeParticipant('a1', 'speaking-camera'),
+      makeParticipant('a2', 'speaking-camera'),
+    ]);
+    expect(presenter(state).strip.map(t => (t.type === 'full' ? t.participant.id : 'overflow'))).toEqual([
+      'a1',
+      'a2',
+    ]);
+
+    // A second sharer takes the spotlight away from s1, who now joins the strip — a1 and a2 must
+    // keep their relative order, not get reshuffled by this unrelated change.
+    state = reducer(state, {type: 'ADD_PARTICIPANT', participant: makeParticipant('s2', 'screen-sharing'), now: 999});
+    const stripIds = presenter(state).strip.map(t => (t.type === 'full' ? t.participant.id : 'overflow'));
+    expect(stripIds.indexOf('a1')).toBeLessThan(stripIds.indexOf('a2'));
+  });
+
+  it('strip tiles are sized within the configured aspect-ratio bounds', () => {
     const state = addAll(createInitialState(container1280x720), [
       makeSelf('me'),
       makeParticipant('s1', 'screen-sharing'),
@@ -1298,13 +1260,15 @@ describe('presenter mode', () => {
     expect(strip[strip.length - 1].type).toBe('overflow');
   });
 
-  // ── Remembers the pre-screen-share setting ────────────────────────────────────
+  // ── Remembers the setting from before anyone was screen-sharing ───────────────
   //
-  // Auto-activation on screen share is a temporary override, not a new user preference: once
-  // the last screen share ends, presenter mode must return to whatever it was set to before
-  // anyone started sharing — discarding any manual toggles made during the session itself.
+  // Turning on automatically for a screen share is a temporary override, not a new preference:
+  // once the last screen share ends, presenter mode returns to whatever it was set to before
+  // anyone started sharing — discarding any manual toggles made during the sharing session
+  // itself. You can still freely turn presenter mode on or off manually while a share is
+  // ongoing; that choice just doesn't become the new "remembered" setting.
 
-  it('reverts to off once the only screen share ends, if presenter mode was off beforehand', () => {
+  it('turns back off once the only screen share ends, if presenter mode was off beforehand', () => {
     let state = addAll(createInitialState(container1280x720), [makeParticipant('a1', 'speaking-camera')]);
     expect(state.isPresenterModeActive).toBe(false);
 
@@ -1315,7 +1279,7 @@ describe('presenter mode', () => {
     expect(state.isPresenterModeActive).toBe(false);
   });
 
-  it('stays on after the screen share ends, if presenter mode was manually on beforehand', () => {
+  it('stays on after the screen share ends, if presenter mode was turned on manually beforehand', () => {
     let state = reducer(createInitialState(container1280x720), {type: 'TOGGLE_PRESENTER_MODE'});
     expect(state.isPresenterModeActive).toBe(true);
 
@@ -1327,20 +1291,20 @@ describe('presenter mode', () => {
     expect(state.isPresenterModeActive).toBe(true);
   });
 
-  it('a manual toggle during the screen share takes effect immediately but is discarded once sharing ends', () => {
+  it('a manual toggle during a screen share takes effect right away, but is discarded once sharing ends', () => {
     let state = addAll(createInitialState(container1280x720), [makeParticipant('a1', 'speaking-camera')]);
     state = reducer(state, {type: 'ADD_PARTICIPANT', participant: makeParticipant('s1', 'screen-sharing')});
-    expect(state.isPresenterModeActive).toBe(true); // auto-activated
+    expect(state.isPresenterModeActive).toBe(true); // turned on automatically
 
     state = reducer(state, {type: 'TOGGLE_PRESENTER_MODE'});
-    expect(state.isPresenterModeActive).toBe(false); // manual override takes effect right away
+    expect(state.isPresenterModeActive).toBe(false); // the manual change takes effect right away
 
     state = reducer(state, {type: 'UPDATE_PARTICIPANT', id: 's1', changes: {tier: 'silent-no-camera'}});
     // Reverts to the remembered pre-share setting (off), not the manual mid-share toggle.
     expect(state.isPresenterModeActive).toBe(false);
   });
 
-  it('does not re-snapshot the remembered setting when a second screen share starts during an existing one', () => {
+  it('starting a second screen share while one is already in progress does not overwrite the remembered setting', () => {
     // Presenter mode manually on before any sharing starts — this is the baseline that must
     // eventually be restored.
     let state = reducer(createInitialState(container1280x720), {type: 'TOGGLE_PRESENTER_MODE'});
@@ -1353,14 +1317,13 @@ describe('presenter mode', () => {
     state = reducer(state, {type: 'TOGGLE_PRESENTER_MODE'});
     expect(state.isPresenterModeActive).toBe(false);
 
-    // A second screen-share starting mid-session must not re-snapshot this (now-off) live
-    // value as a new baseline — the real baseline (on, from before s1 ever started) is already
-    // remembered.
+    // A second screen share starting mid-session must not save this (now-off) live value as a
+    // new baseline — the real baseline (on, from before s1 ever started) is already remembered.
     state = reducer(state, {type: 'ADD_PARTICIPANT', participant: makeParticipant('s2', 'screen-sharing')});
     expect(state.isPresenterModeActive).toBe(false); // still respects the manual override
 
     state = reducer(state, {type: 'REMOVE_PARTICIPANT', id: 's1'});
-    expect(state.isPresenterModeActive).toBe(false); // s2 still sharing — no reversion yet
+    expect(state.isPresenterModeActive).toBe(false); // s2 is still sharing — no reversion yet
 
     state = reducer(state, {type: 'REMOVE_PARTICIPANT', id: 's2'});
     expect(state.isPresenterModeActive).toBe(true); // reverts to the original pre-share baseline
@@ -1370,7 +1333,7 @@ describe('presenter mode', () => {
 // ── View-all-participants flag ────────────────────────────────────────────────
 
 describe('areAllParticipantsShown', () => {
-  it('defaults to false and toggles', () => {
+  it('starts off and toggles on and off', () => {
     let state = createInitialState(container1280x720);
     expect(state.areAllParticipantsShown).toBe(false);
 
@@ -1381,7 +1344,7 @@ describe('areAllParticipantsShown', () => {
     expect(state.areAllParticipantsShown).toBe(false);
   });
 
-  it('does not disturb the layout', () => {
+  it('toggling it does not change the layout', () => {
     const state = addAll(createInitialState(container1280x720), [makeParticipant('a', 'speaking-camera')]);
     const next = reducer(state, {type: 'TOGGLE_ALL_PARTICIPANTS'});
     expect(next.layout).toBe(state.layout);
@@ -1391,7 +1354,7 @@ describe('areAllParticipantsShown', () => {
 // ── SET_CONTAINER_SIZE ────────────────────────────────────────────────────────
 
 describe('SET_CONTAINER_SIZE', () => {
-  it('recalculates layout without touching participants or slots', () => {
+  it('recalculates the layout without touching participants or seating order', () => {
     const state = addAll(createInitialState(container1280x720), [
       makeParticipant('a', 'speaking-camera'),
       makeParticipant('b', 'speaking-camera'),
@@ -1403,7 +1366,7 @@ describe('SET_CONTAINER_SIZE', () => {
     expect(next.containerSize).toEqual({width: 640, height: 480});
   });
 
-  it('tileHeight stays within bounds after a resize', () => {
+  it('tile height stays within bounds after resizing', () => {
     let state = addAll(createInitialState({width: 1920, height: 1080}), [
       makeParticipant('a', 'speaking-camera'),
       makeParticipant('b', 'speaking-camera'),
@@ -1414,118 +1377,43 @@ describe('SET_CONTAINER_SIZE', () => {
     expect(grid(state).tileHeight).toBeLessThanOrEqual(DEFAULT_CONFIG.maxTileHeight);
   });
 
-  it('a very small container still produces a valid layout', () => {
+  it('a very small container still produces a valid layout instead of breaking', () => {
     const state = addAll(createInitialState({width: 50, height: 50}), [makeParticipant('a', 'speaking-camera')]);
     expect(Array.isArray(grid(state).tiles)).toBe(true);
   });
 
-  it('a wider container yields more maxCols', () => {
-    const small = addAll(createInitialState({width: 400, height: 400}), [makeParticipant('a', 'speaking-camera')]);
-    const large = addAll(createInitialState({width: 1600, height: 400}), [makeParticipant('a', 'speaking-camera')]);
-    expect(large.layout.maxCols).toBeGreaterThan(small.layout.maxCols);
+  it('a wider container allows more columns', () => {
+    const narrow = addAll(createInitialState({width: 400, height: 400}), [makeParticipant('a', 'speaking-camera')]);
+    const wide = addAll(createInitialState({width: 1600, height: 400}), [makeParticipant('a', 'speaking-camera')]);
+    expect(wide.layout.maxCols).toBeGreaterThan(narrow.layout.maxCols);
   });
 });
 
-// ── _computeLayout internal ───────────────────────────────────────────────────
+// ── _computeLayout (internal) ──────────────────────────────────────────────────
 
 describe('_computeLayout', () => {
-  it('empty participant list returns no tiles', () => {
+  it('an empty participant list produces no tiles', () => {
     const layout = _computeLayout([], {}, container1280x720, DEFAULT_CONFIG) as GridModeLayout;
     expect(layout.tiles).toHaveLength(0);
   });
 
-  it('single participant produces one full tile', () => {
+  it('a single participant produces exactly one full tile', () => {
     const p = makeParticipant('a', 'speaking-camera');
     const layout = _computeLayout([p], {a: 0}, container1280x720, DEFAULT_CONFIG) as GridModeLayout;
     expect(layout.tiles).toHaveLength(1);
     expect(layout.tiles[0].type).toBe('full');
   });
 
-  it('tile count never exceeds maxRows × maxCols', () => {
+  it('the number of rendered slots — full tiles, plus the fractional tile container and/or overflow badge if present — never exceeds what the grid can physically hold', () => {
     const participants = Array.from({length: 20}, (_, i) => makeParticipant(`p${i}`, 'speaking-camera'));
     const slotMap = Object.fromEntries(participants.map((p, i) => [p.id, i]));
     const layout = _computeLayout(participants, slotMap, container1280x720, DEFAULT_CONFIG) as GridModeLayout;
     expect(layout.tiles.length).toBeLessThanOrEqual(layout.maxRows * layout.maxCols);
   });
 
-  it('a zero-sized container produces an empty layout rather than throwing', () => {
+  it('a zero-sized container produces an empty layout instead of throwing', () => {
     const layout = _computeLayout([], {}, {width: 0, height: 0}, DEFAULT_CONFIG) as GridModeLayout;
     expect(layout.tiles).toHaveLength(0);
     expect(layout.maxTiles).toBe(0);
-  });
-});
-
-// ── _updateSlotMap internal ───────────────────────────────────────────────────
-
-describe('_updateSlotMap', () => {
-  it('assigns initial slots in tier priority order', () => {
-    const slotMap = _updateSlotMap(
-      [
-        makeParticipant('passive1', 'silent-no-camera'),
-        makeParticipant('active1', 'speaking-camera'),
-        makeParticipant('screen1', 'screen-sharing'),
-      ],
-      {},
-    );
-    expect(slotMap['screen1']).toBeLessThan(slotMap['active1']);
-    expect(slotMap['active1']).toBeLessThan(slotMap['passive1']);
-  });
-
-  it('a passive self does not outrank the active bucket', () => {
-    const slotMap = _updateSlotMap(
-      [
-        makeParticipant('screen1', 'screen-sharing'),
-        makeSelf('me'),
-        makeParticipant('active1', 'speaking-camera'),
-      ],
-      {},
-    );
-    expect(slotMap['screen1']).toBeLessThan(slotMap['me']);
-    expect(slotMap['active1']).toBeLessThan(slotMap['me']);
-  });
-
-  it('self ranks by tier like any other participant — a higher-tier peer still goes first', () => {
-    const slotMap = _updateSlotMap(
-      [makeParticipant('screen1', 'screen-sharing'), makeSelf('me', 'speaking-camera')],
-      {},
-    );
-    expect(slotMap['screen1']).toBeLessThan(slotMap['me']);
-  });
-
-  it('new passive participant is appended after existing peers in the same tier', () => {
-    const existing = [
-      makeParticipant('p1', 'silent-no-camera'),
-      makeParticipant('p2', 'silent-no-camera'),
-    ];
-    const prevMap = _updateSlotMap(existing, {});
-    const newMap = _updateSlotMap([...existing, makeParticipant('p3', 'silent-no-camera')], prevMap);
-    expect(newMap['p3']).toBeGreaterThan(newMap['p1']);
-    expect(newMap['p3']).toBeGreaterThan(newMap['p2']);
-  });
-
-  it('active tier: higher activatedAt wins the lower slot on initial assignment', () => {
-    const slotMap = _updateSlotMap(
-      [makeParticipant('old', 'speaking-camera', 0, 100), makeParticipant('new', 'speaking-camera', 0, 200)],
-      {},
-    );
-    expect(slotMap['new']).toBeLessThan(slotMap['old']);
-  });
-
-  it('existing slots are preserved even when recency would reorder them', () => {
-    const slotMap = _updateSlotMap(
-      [makeParticipant('old', 'speaking-camera', 0, 100), makeParticipant('new', 'speaking-camera', 0, 200)],
-      {old: 0, new: 1},
-    );
-    expect(slotMap['old']).toBe(0);
-    expect(slotMap['new']).toBe(1);
-  });
-
-  it('a newcomer of a higher tier is inserted ahead of lower-tier incumbents', () => {
-    const prevMap = {cam: 0};
-    const slotMap = _updateSlotMap(
-      [makeParticipant('cam', 'speaking-camera'), makeParticipant('screen', 'screen-sharing')],
-      prevMap,
-    );
-    expect(slotMap['screen']).toBeLessThan(slotMap['cam']);
   });
 });

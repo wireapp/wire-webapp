@@ -78,6 +78,9 @@ function toGridParticipant(p: ParticipantState, promotedIds: Set<string>): GridP
     }),
     isMuted: p.isMuted,
     speakingDuration: p.speakingDuration,
+    // Raw, undebounced — unlike `tier` above, which only reflects speaking once the debounce
+    // has elapsed and keeps reflecting it through the hold. The ring reads this instead.
+    isSpeakingNow: p.isSpeaking,
   };
 }
 
@@ -302,6 +305,9 @@ export function useFixtureState(initialCount = 2): FixtureState {
       }),
       isMuted: youIsMuted,
       speakingDuration: 0,
+      // No debounce applies to you either way, but set explicitly for consistency with everyone
+      // else's ring logic rather than leaving it to fall back to tier.
+      isSpeakingNow: !youIsMuted,
     }),
     [youIsMuted, youHasCamera],
   );

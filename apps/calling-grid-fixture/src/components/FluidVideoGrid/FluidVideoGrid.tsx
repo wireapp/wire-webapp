@@ -26,7 +26,8 @@ const CONTAINER_STYLE = {
 } as const;
 
 function isActiveSpeaker(tile: Extract<TileDescriptor, {type: 'full'}>): boolean {
-  return tile.participant.tier === 'speaking-camera' || tile.participant.tier === 'speaking-no-camera';
+  // Live signal, not tier — tier is debounced/held for seat stability, the ring isn't.
+  return tile.participant.isSpeakingNow ?? false;
 }
 
 /**
