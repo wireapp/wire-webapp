@@ -17,6 +17,7 @@
  *
  */
 
+import {isNullOrUndefined} from '@sindresorhus/is';
 import {AxiosRequestConfig} from 'axios';
 
 import {CreateMeeting} from './createMeeting';
@@ -24,8 +25,9 @@ import {CreatedMeetingWithConversation, Meeting, MeetingWithConversation} from '
 import {
   createdMeetingWithConversationSchema,
   meetingSchema,
-  meetingWithConversationSchema,
   meetingsListResponseSchema,
+  meetingWithConversationSchema,
+  refreshMeetingLinkResponseSchema,
 } from './meetingSchema';
 import {UpdateMeeting} from './updateMeeting';
 
@@ -61,6 +63,10 @@ export class MeetingsAPI {
 
   private parseMeetingWithConversationResponse(data: unknown): MeetingWithConversation {
     return meetingWithConversationSchema.parse(data);
+  }
+
+  private parseRefreshMeetingLinkResponse(data: unknown): MeetingWithConversation {
+    return refreshMeetingLinkResponseSchema.parse(data);
   }
 
   private parseMeetingsListResponse(data: unknown): Meeting[] {
@@ -137,5 +143,18 @@ export class MeetingsAPI {
 
     const response = await this.client.sendJSON<MeetingWithConversation>(config);
     return this.parseMeetingWithConversationResponse(response.data);
+  }
+
+  /** Generate a new guest link for an existing meeting. */
+  public async rotateMeetingLink(meetingId: QualifiedId, password?: string): Promise<MeetingWithConversation> {
+    const config: AxiosRequestConfig = {
+      data: isNullOrUndefined(password) ? {} : {password},
+      method: 'post',
+      url: `${this.generateMeetingUrl(meetingId)}/link/refresh`,
+      ...disableInfiniteNetworkRetries,
+    };
+
+    const response = await this.client.sendJSON<MeetingWithConversation>(config);
+    return this.parseRefreshMeetingLinkResponse(response.data);
   }
 }

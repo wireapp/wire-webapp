@@ -27,6 +27,10 @@ export const modalWrapperStyles: CSSObject = {
   margin: '1rem',
 };
 
+export const narrowModalWrapperStyles: CSSObject = {
+  maxWidth: '480px',
+};
+
 export const wrapperStyles: CSSObject = {
   display: 'flex',
   flexDirection: 'column',
