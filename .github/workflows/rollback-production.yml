@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       production_tag:
-        description: 'Existing Production tag to roll back to, for example 2026-06-29.1-production or 2026-06-29-production.0'
+        description: 'Existing Production tag to roll back to, for example 2026-10-06.1-production, 2026-03-09-production.0, or v1.1.0'
         required: true
         type: string
       reason:
@@ -96,6 +96,20 @@ jobs:
           set -euo pipefail
 
           git ls-remote --exit-code --tags "https://github.com/${GITHUB_REPOSITORY}.git" "refs/tags/${PRODUCTION_TAG}" >/dev/null
+
+          if [[ "${PRODUCTION_TAG}" == v* ]]; then
+            git fetch --no-tags origin "refs/tags/${PRODUCTION_TAG}:refs/tags/${PRODUCTION_TAG}"
+
+            if [[ "$(git cat-file -t "refs/tags/${PRODUCTION_TAG}")" != 'tag' ]]; then
+              echo "SemVer Production tag ${PRODUCTION_TAG} is not annotated." >&2
+              exit 1
+            fi
+
+            if ! git rev-parse --verify "refs/tags/${PRODUCTION_TAG}^{commit}" >/dev/null; then
+              echo "SemVer Production tag ${PRODUCTION_TAG} does not resolve to a commit." >&2
+              exit 1
+            fi
+          fi
 
   build_artifact:
     name: Rebuild rollback artifact

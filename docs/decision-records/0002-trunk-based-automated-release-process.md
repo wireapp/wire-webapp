@@ -178,6 +178,12 @@ Each Beta candidate processes only its delta. Production reconstructs candidate 
 - If the current release branch commit already has the matching production tag, the release workflow must not redeploy that commit.
 - Production tags are immutable release history and are never moved or deleted.
 
+### SemVer Production identity migration status
+
+The SemVer migration bootstrap is the annotated stable tag `v1.0.0`, pointing to commit `2dc009e706cae84dd7c32b40a80862ab252d6839`, which was previously released as `2026-10-06.1-production`. Future stable WebApp Production releases use `vMAJOR.MINOR.PATCH`; their BuildMetadata and distribution artifact version is the unprefixed WebApp version.
+
+During migration, production-facing tag parsing, distribution validation, GitHub Release handoff, repair, rollback, and redeploy tooling accept both legacy date-based Production tags and stable SemVer WebApp tags. The active `Release WebApp` workflow remains date-based until a separate workflow cutover. Package synchronization remains on its existing legacy release-identifier model in this migration step.
+
 ### WebApp package version synchronization
 
 The release process has two separate version identities:
