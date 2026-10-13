@@ -29,6 +29,7 @@ import {MeetingList} from './meetingList/meetingList';
 import {useMeetingStore} from './meetingStore/meetingStoreProvider';
 import {MeetNowModal} from './meetNowModal/meetNowModal';
 import {ScheduleMeetingModal} from './scheduleMeetingModal';
+import {RotateMeetingLinkModal} from './rotateMeetingLinkModal/rotateMeetingLinkModal';
 
 import {useApplicationContext} from '../../page/rootProvider';
 import {UserState} from '../../repositories/user/userState';
@@ -74,6 +75,7 @@ export const Meetings: FunctionComponent = () => {
       <MeetingCallingView />
       <ScheduleMeetingModal />
       <MeetNowModal />
+      <RotateMeetingLinkModal />
     </div>
   );
 };

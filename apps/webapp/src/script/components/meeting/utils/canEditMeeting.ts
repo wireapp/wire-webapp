@@ -17,13 +17,29 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
+
 import type {User} from '../../../repositories/entity/User';
 import {matchQualifiedIds} from '../../../util/qualifiedId';
+import {getNextMeetingInstance} from '../selectors/getMeetingInstancesInRange';
 import type {MeetingInstance} from '../types/meetingInstance';
 import type {MeetingSeries} from '../types/meetingSeries';
 
 export const isMeetingHost = (meetingSeries: MeetingSeries, selfUser: User): boolean => {
   return matchQualifiedIds(meetingSeries.qualified_creator, selfUser.qualifiedId);
+};
+
+export const canRotateMeetingLink = (
+  meetingInstance: MeetingInstance,
+  selfUser: User,
+  nowMilliseconds: number,
+): boolean => {
+  const nextInstance = getNextMeetingInstance(meetingInstance);
+  const hasUpcomingInstance =
+    meetingInstance.start.getTime() > nowMilliseconds ||
+    (!isUndefined(nextInstance) && nextInstance.start.getTime() > nowMilliseconds);
+
+  return isMeetingHost(meetingInstance.meetingSeries, selfUser) && hasUpcomingInstance;
 };
 
 /**
