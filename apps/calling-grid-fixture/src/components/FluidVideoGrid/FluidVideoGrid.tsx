@@ -1,4 +1,4 @@
-import {useRef} from 'react';
+import {Ref, useRef} from 'react';
 import {CSSObject} from '@emotion/react';
 import {AnimatePresence, motion} from 'framer-motion';
 
@@ -37,13 +37,25 @@ function tileKey(tile: TileDescriptor): string {
   }
 }
 
-/**
- * `boxStyle` deliberately avoids the name `css` — Emotion's JSX transform intercepts a `css`
- * prop at the call site and turns it into a className, so it would never reach this component.
- */
-function AnimatedTile({tile, boxStyle}: {tile: TileDescriptor; boxStyle: CSSObject}) {
+interface AnimatedTileProps {
+  tile: TileDescriptor;
+  /**
+   * Deliberately not named `css` — Emotion's JSX transform intercepts a `css` prop at the call
+   * site and compiles it to a className, so it would never arrive here.
+   */
+  boxStyle: CSSObject;
+  /**
+   * Must reach the underlying DOM node: `AnimatePresence mode="popLayout"` measures each
+   * exiting child through a cloned ref so it can take it out of the layout flow. Drop this and
+   * exiting tiles keep occupying grid slots while they animate out, briefly reflowing the whole
+   * grid into an oversized layout.
+   */
+  ref?: Ref<HTMLDivElement>;
+}
+
+function AnimatedTile({tile, boxStyle, ref}: AnimatedTileProps) {
   return (
-    <motion.div key={tileKey(tile)} {...TILE_MOTION} css={boxStyle}>
+    <motion.div ref={ref} {...TILE_MOTION} css={boxStyle}>
       {tile.type === 'full' && <ParticipantTile participant={tile.participant} />}
       {tile.type === 'overflow' && <OverflowTile count={tile.count} avatars={tile.avatars} />}
     </motion.div>
