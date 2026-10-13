@@ -165,8 +165,28 @@ function findBetaCandidateNumberForVersion(options: {
   return [parsedBetaTag.parseResult.value.candidateNumber];
 }
 
-function selectLargerBetaCandidateNumber(currentNumber: number, candidateNumber: number): number {
-  return Math.max(currentNumber, candidateNumber);
+function findMissingBetaCandidateNumber(candidateNumbers: readonly number[]): Maybe<number> {
+  return candidateNumbers.reduce<Maybe<number>>((missingCandidateNumber, candidateNumber, candidateIndex) => {
+    if (missingCandidateNumber.isJust || candidateNumber === candidateIndex + 1) {
+      return missingCandidateNumber;
+    }
+
+    return Maybe.just(candidateIndex + 1);
+  }, Maybe.nothing<number>());
+}
+
+function findBetaCandidateSequenceError(options: {
+  readonly version: WebAppVersion;
+  readonly candidateNumbers: readonly number[];
+}): Maybe<Error> {
+  const {version, candidateNumbers} = options;
+  if (new Set(candidateNumbers).size !== candidateNumbers.length) {
+    return Maybe.just(new Error(`Duplicate WebApp Beta candidate for version ${version}`));
+  }
+
+  return findMissingBetaCandidateNumber(candidateNumbers).map(missingCandidateNumber => {
+    return new Error(`Missing WebApp Beta candidate v${version}-beta.${missingCandidateNumber}`);
+  });
 }
 
 export function createNextBetaWebAppTagName(
@@ -179,13 +199,19 @@ export function createNextBetaWebAppTagName(
     return Result.err(malformedBetaTagError.value);
   }
 
-  const latestCandidateNumber = parsedExistingBetaTags
+  const candidateNumbers = parsedExistingBetaTags
     .flatMap(parsedBetaTag => {
       return findBetaCandidateNumberForVersion({parsedBetaTag, version});
     })
-    .reduce(selectLargerBetaCandidateNumber, 0);
+    .toSorted((leftCandidateNumber, rightCandidateNumber) => {
+      return leftCandidateNumber - rightCandidateNumber;
+    });
+  const candidateSequenceError = findBetaCandidateSequenceError({version, candidateNumbers});
+  if (candidateSequenceError.isJust) {
+    return Result.err(candidateSequenceError.value);
+  }
 
-  return createBetaWebAppTagName(version, latestCandidateNumber + 1);
+  return createBetaWebAppTagName(version, candidateNumbers.length + 1);
 }
 
 export function createWebAppReleaseBranchName(version: string): Result<string, Error> {

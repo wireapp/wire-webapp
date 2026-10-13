@@ -76,6 +76,16 @@ describe('WebApp SemVer release identity', () => {
     expect(actualBetaTagResult.value).toEqual({version: '1.4.0', candidateNumber: 2});
   });
 
+  it('creates the first Beta candidate when no tags exist', () => {
+    const versionResult = validateWebAppVersion('1.1.0');
+    assert(versionResult.isOk);
+
+    const actualTagNameResult = createNextBetaWebAppTagName(versionResult.value, []);
+
+    assert(actualTagNameResult.isOk);
+    expect(actualTagNameResult.value).toBe('v1.1.0-beta.1');
+  });
+
   it('creates the first matching Beta candidate and ignores other release identities', () => {
     const versionResult = validateWebAppVersion('1.1.0');
     assert(versionResult.isOk);
@@ -90,7 +100,7 @@ describe('WebApp SemVer release identity', () => {
     expect(actualTagNameResult.value).toBe('v1.1.0-beta.1');
   });
 
-  it('increments the highest matching SemVer Beta candidate', () => {
+  it('increments contiguous matching SemVer Beta candidates and ignores unrelated tags', () => {
     const versionResult = validateWebAppVersion('1.1.0');
     assert(versionResult.isOk);
 
@@ -103,6 +113,36 @@ describe('WebApp SemVer release identity', () => {
 
     assert(actualTagNameResult.isOk);
     expect(actualTagNameResult.value).toBe('v1.1.0-beta.3');
+  });
+
+  it('rejects a gap in matching SemVer Beta candidates', () => {
+    const versionResult = validateWebAppVersion('1.1.0');
+    assert(versionResult.isOk);
+
+    const actualTagNameResult = createNextBetaWebAppTagName(versionResult.value, ['v1.1.0-beta.1', 'v1.1.0-beta.3']);
+
+    assert(actualTagNameResult.isErr);
+    expect(actualTagNameResult.error.message).toContain('v1.1.0-beta.2');
+  });
+
+  it('rejects matching SemVer Beta history when the first candidate is missing', () => {
+    const versionResult = validateWebAppVersion('1.1.0');
+    assert(versionResult.isOk);
+
+    const actualTagNameResult = createNextBetaWebAppTagName(versionResult.value, ['v1.1.0-beta.2']);
+
+    assert(actualTagNameResult.isErr);
+    expect(actualTagNameResult.error.message).toContain('v1.1.0-beta.1');
+  });
+
+  it('rejects duplicate matching SemVer Beta candidate identities', () => {
+    const versionResult = validateWebAppVersion('1.1.0');
+    assert(versionResult.isOk);
+
+    const actualTagNameResult = createNextBetaWebAppTagName(versionResult.value, ['v1.1.0-beta.2', 'v1.1.0-beta.2']);
+
+    assert(actualTagNameResult.isErr);
+    expect(actualTagNameResult.error.message).toContain('Duplicate WebApp Beta candidate');
   });
 
   it.each(['v1.1.0-beta.0', 'v1.1.0-beta.01', 'v1.1.0-beta.9007199254740992'])(

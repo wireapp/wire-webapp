@@ -123,6 +123,18 @@ describe('releaseMetadataCli', () => {
     expect(actualResult.errors[0]).toContain('Invalid WebApp Beta tag for version 1.1.0');
   });
 
+  it('rejects gaps in matching WebApp SemVer Beta history', () => {
+    const actualResult = runCommand({
+      kind: 'next-webapp-beta-tag',
+      version: '1.1.0',
+      existingTagNames: ['v1.1.0-beta.1', 'v1.1.0-beta.3'],
+    });
+
+    expect(actualResult.exitCode).toBe(1);
+    expect(actualResult.outputs).toEqual([]);
+    expect(actualResult.errors[0]).toContain('v1.1.0-beta.2');
+  });
+
   it('prints the production tag name for the release identifier', () => {
     const actualResult = runCommand({kind: 'production-tag', releaseIdentifier: '2026-06-19.1'});
 
