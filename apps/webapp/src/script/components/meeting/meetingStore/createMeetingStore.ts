@@ -17,7 +17,9 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {task, type Task} from 'true-myth';
 import {createStore, type StoreApi} from 'zustand/vanilla';
 
@@ -43,8 +45,10 @@ import {toMeetingIdKey} from 'Components/meeting/utils/toMeetingIdKey';
 import type {User} from 'Repositories/entity/User';
 import {getLogger} from 'Util/logger';
 import {matchQualifiedIds} from 'Util/qualifiedId';
+import {isAxiosError} from 'Util/typePredicateUtil';
 
 import type {MeetingStoreDeps} from './meetingStoreDeps';
+import {rotateMeetingLinkErrors, type RotateMeetingLinkError} from './rotateMeetingLinkErrors';
 
 const logger = getLogger('createMeetingStore');
 
@@ -96,6 +100,7 @@ export type MeetingStoreState = {
   scheduleMeeting: (command: ScheduleMeetingCommand) => Task<ScheduleMeetingSuccess, MeetingSubmitErrors>;
   meetNowMeeting: (command: MeetNowMeetingCommand) => Task<CreateMeetingSuccess, MeetingSubmitErrors>;
   updateMeeting: (command: UpdateMeetingCommand) => Task<MeetingSubmitSuccess, MeetingSubmitErrors>;
+  rotateMeetingLink: (meetingId: QualifiedId, password?: string) => Task<MeetingSeries, RotateMeetingLinkError>;
   deleteMeetingForMe: (meetingInstance: MeetingInstance) => Task<void, MeetingSubmitErrors>;
   deleteMeetingForAll: (meetingInstance: MeetingInstance) => Task<void, MeetingSubmitErrors>;
   removeMeetingByQualifiedId: (meetingId: QualifiedId) => void;
@@ -178,6 +183,38 @@ export const createMeetingStore = (deps: MeetingStoreDeps, initialState?: Meetin
               return task.resolve({failedToAdd: result.failedToAdd});
             });
         });
+      },
+      rotateMeetingLink: (meetingId, password) => {
+        return deps.meetingsRepository
+          .rotateMeetingLink(meetingId, password)
+          .mapRejected(error => {
+            return isAxiosError(error) && error.response?.status === HTTP_STATUS.NOT_FOUND
+              ? rotateMeetingLinkErrors.notFound
+              : rotateMeetingLinkErrors.requestFailed;
+          })
+          .andThen(apiMeeting => {
+            const mapResult = mapApiMeetingToSeries(apiMeeting);
+            if (mapResult.isErr) {
+              return task.reject<MeetingSeries, RotateMeetingLinkError>(rotateMeetingLinkErrors.invalidResponse);
+            }
+
+            if (isUndefined(mapResult.value.link)) {
+              return task.reject<MeetingSeries, RotateMeetingLinkError>(rotateMeetingLinkErrors.invalidResponse);
+            }
+
+            const existingSeries = get().meetingSeries.find(series => {
+              return matchQualifiedIds(series.qualified_id, meetingId);
+            });
+            const updatedSeries = isUndefined(existingSeries)
+              ? mapResult.value
+              : {...existingSeries, link: mapResult.value.link};
+
+            incrementMeetingMutationVersion(meetingId);
+            set(state => {
+              return {meetingSeries: upsertMeetingSeries(state.meetingSeries, updatedSeries)};
+            });
+            return task.resolve<MeetingSeries, RotateMeetingLinkError>(updatedSeries);
+          });
       },
       deleteMeetingForMe: meetingInstance => {
         return deps.serviceTasks.deleteMeetingForMe(toDeleteMeetingCommand(meetingInstance));

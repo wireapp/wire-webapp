@@ -86,4 +86,15 @@ export class MeetingsRepository {
       },
     );
   }
+
+  rotateMeetingLink(meetingId: QualifiedId, password?: string): Task<MeetingWithConversation, unknown> {
+    return task.tryOrElse(
+      error => {
+        return error;
+      },
+      () => {
+        return this.dataSource.rotateMeetingLink(meetingId, password);
+      },
+    );
+  }
 }

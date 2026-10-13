@@ -21,7 +21,7 @@ import {maybe as Maybe, type Maybe as MaybeType} from 'true-myth';
 
 import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
 import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
-import {getMeetingActionEntries} from 'Components/meeting/meetingList/meetingListItemGroup/meetingListItem/meetingAction/getMeetingActionEntries';
+import {getMeetingActionEntries as getMeetingActionEntriesImpl} from 'Components/meeting/meetingList/meetingListItemGroup/meetingListItem/meetingAction/getMeetingActionEntries';
 import {MEETING_ACTION_TRANSLATION_KEYS} from 'Components/meeting/meetingList/meetingListItemGroup/meetingListItem/meetingAction/meetingActionTranslationKeys';
 import {User} from 'Repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';
@@ -68,6 +68,14 @@ const translate = (key: string) => {
 
 const noop = () => {
   return undefined;
+};
+
+const getMeetingActionEntries = (
+  params: Omit<Parameters<typeof getMeetingActionEntriesImpl>[0], 'onRotateMeetingLink'> & {
+    onRotateMeetingLink?: () => void;
+  },
+) => {
+  return getMeetingActionEntriesImpl({onRotateMeetingLink: noop, ...params});
 };
 
 const getEditEntryLabel = (entries: ReturnType<typeof getMeetingActionEntries>) => {
@@ -126,6 +134,7 @@ describe('getMeetingActionEntries', () => {
     expect(getEntryLabels(entries)).toEqual([
       MEETING_ACTION_TRANSLATION_KEYS.joinNow,
       MEETING_ACTION_TRANSLATION_KEYS.editMeeting,
+      MEETING_ACTION_TRANSLATION_KEYS.rotateMeetingLink,
       MEETING_ACTION_TRANSLATION_KEYS.deleteMeetingForAll,
     ]);
     expect(getEntryLabels(entries)).not.toContain('meetings.action.startMeeting');
@@ -407,5 +416,82 @@ describe('getMeetingActionEntries', () => {
     });
 
     expect(getShowMeetingLinkEntry(entries).isNothing).toBe(true);
+  });
+
+  it.each([
+    ['with an existing link', 'https://wire.example/meeting-link'],
+    ['without an existing link', undefined],
+  ])('includes Generate new link for the organizer before the meeting starts %s', (_description, meetingLink) => {
+    const onRotateMeetingLink = jest.fn();
+    const entries = getMeetingActionEntries({
+      meetingInstance: createMeetingInstance(),
+      selfUser: createSelfUser(),
+      nowMilliseconds: futureNowMilliseconds,
+      translate,
+      onJoin: noop,
+      onEdit: noop,
+      onShowMeetingLink: noop,
+      onRotateMeetingLink,
+      meetingLink,
+      onDeleteForAll: noop,
+      onDeleteForMe: noop,
+    });
+
+    const rotateEntry = entries.find(entry => {
+      return entry.label === MEETING_ACTION_TRANSLATION_KEYS.rotateMeetingLink;
+    });
+    expect(rotateEntry).toBeDefined();
+    rotateEntry?.click?.();
+    expect(onRotateMeetingLink).toHaveBeenCalledTimes(1);
+  });
+
+  it.each([ongoingNowMilliseconds, pastNowMilliseconds])(
+    'does not include Generate new link once the meeting has started (%s)',
+    nowMilliseconds => {
+      const onRotateMeetingLink = jest.fn();
+      const entries = getMeetingActionEntries({
+        meetingInstance: createMeetingInstance({recurrence: 'doesNotRepeat'}),
+        selfUser: createSelfUser(),
+        nowMilliseconds,
+        translate,
+        onJoin: noop,
+        onEdit: noop,
+        onShowMeetingLink: noop,
+        onRotateMeetingLink,
+        onDeleteForAll: noop,
+        onDeleteForMe: noop,
+      });
+
+      expect(
+        entries.some(entry => {
+          return entry.label === MEETING_ACTION_TRANSLATION_KEYS.rotateMeetingLink;
+        }),
+      ).toBe(false);
+      expect(onRotateMeetingLink).not.toHaveBeenCalled();
+    },
+  );
+
+  it('does not include Generate new link for a participant', () => {
+    const onRotateMeetingLink = jest.fn();
+    const entries = getMeetingActionEntries({
+      meetingInstance: createMeetingInstance(),
+      selfUser: createSelfUser('invitee-id'),
+      nowMilliseconds: futureNowMilliseconds,
+      translate,
+      onJoin: noop,
+      onEdit: noop,
+      onShowMeetingLink: noop,
+      onRotateMeetingLink,
+      meetingLink: undefined,
+      onDeleteForAll: noop,
+      onDeleteForMe: noop,
+    });
+
+    expect(
+      entries.some(entry => {
+        return entry.label === MEETING_ACTION_TRANSLATION_KEYS.rotateMeetingLink;
+      }),
+    ).toBe(false);
+    expect(onRotateMeetingLink).not.toHaveBeenCalled();
   });
 });

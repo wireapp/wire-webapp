@@ -29,11 +29,12 @@ import {
   iconContainerStyle,
   iconStyles,
 } from 'Components/meeting/meetingList/meetingListItemGroup/meetingListItem/meetingAction/meetingAction.styles';
+import {useRotateMeetingLinkModal} from 'Components/meeting/rotateMeetingLinkModal/useRotateMeetingLinkModal';
 import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
 import {useDeleteMeeting} from 'Components/meeting/useDeleteMeeting';
 import {useEditMeeting} from 'Components/meeting/useEditMeeting';
 import {canDeleteMeetingForAll, canDeleteMeetingForMe} from 'Components/meeting/utils/canDeleteMeeting';
-import {canEditMeeting} from 'Components/meeting/utils/canEditMeeting';
+import {canEditMeeting, canRotateMeetingLink} from 'Components/meeting/utils/canEditMeeting';
 import type {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
@@ -50,6 +51,9 @@ export const MeetingAction = ({meetingInstance, selfUser, joinMeeting, isJoinDis
   const {translate, clock, fireAndForgetInvoker} = useApplicationContext();
   const {editMeeting} = useEditMeeting();
   const {openDeleteMeetingModal} = useDeleteMeeting();
+  const openRotateMeetingLink = useRotateMeetingLinkModal(state => {
+    return state.open;
+  });
 
   const handleActionButton = (event: MouseEvent<HTMLElement>) => {
     if (selfUser === undefined) {
@@ -79,6 +83,11 @@ export const MeetingAction = ({meetingInstance, selfUser, joinMeeting, isJoinDis
           const meetingLink = meetingInstance.meetingSeries.link;
           if (!isNullOrUndefined(meetingLink)) {
             showMeetingLinkConfirmation({link: meetingLink, translate});
+          }
+        },
+        onRotateMeetingLink: () => {
+          if (canRotateMeetingLink(meetingInstance, selfUser, clock.currentUnixEpochMilliseconds)) {
+            openRotateMeetingLink(meetingInstance.meetingSeries.qualified_id);
           }
         },
         onDeleteForAll: () => {

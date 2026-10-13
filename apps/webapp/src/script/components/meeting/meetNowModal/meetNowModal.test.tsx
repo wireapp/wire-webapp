@@ -138,6 +138,7 @@ const createMeetingStore = (meetNowMeeting: MeetingStoreState['meetNowMeeting'])
       loadMeetings: jest.fn().mockResolvedValue(undefined),
       scheduleMeeting: jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
       meetNowMeeting,
+      rotateMeetingLink: jest.fn(),
       updateMeeting: jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
       loadMeetingForEdit: jest.fn().mockReturnValue(task.reject(meetingSubmitErrors.updateFailed)),
       deleteMeetingForMe: jest.fn().mockReturnValue(task.resolve(undefined)),

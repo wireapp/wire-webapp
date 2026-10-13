@@ -184,6 +184,48 @@ describe('MeetingsAPI', () => {
     );
   });
 
+  it.each([
+    ['secret-password', {password: 'secret-password'}],
+    [undefined, {}],
+  ])('refreshes a meeting link with the requested password payload', async (password, expectedData) => {
+    const client = new APIClient(testConfig);
+    jest.spyOn(client.transport.http, 'sendRequest').mockResolvedValue({
+      data: {supported: [MINIMUM_API_VERSION, 19], domain: 'test.zinfra.io'},
+    } as never);
+
+    await client.useVersion(MINIMUM_API_VERSION, 19);
+    const sendJSONSpy = jest.spyOn(client.transport.http, 'sendJSON').mockResolvedValue({
+      data: validMeetingWithConversation,
+    } as never);
+
+    await expect(
+      client.api.meetings.rotateMeetingLink({id: 'meeting-id', domain: 'example.com'}, password),
+    ).resolves.toEqual(validMeetingWithConversation);
+    expect(sendJSONSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expectedData,
+        method: 'post',
+        url: '/meetings/example.com/meeting-id/link/refresh',
+      }),
+    );
+  });
+
+  it('rejects a refresh response without a meeting link', async () => {
+    const client = new APIClient(testConfig);
+    jest.spyOn(client.transport.http, 'sendRequest').mockResolvedValue({
+      data: {supported: [MINIMUM_API_VERSION, 19], domain: 'test.zinfra.io'},
+    } as never);
+
+    await client.useVersion(MINIMUM_API_VERSION, 19);
+    jest.spyOn(client.transport.http, 'sendJSON').mockResolvedValue({
+      data: {...validMeetingWithConversation, link: undefined},
+    } as never);
+
+    await expect(
+      client.api.meetings.rotateMeetingLink({id: 'meeting-id', domain: 'example.com'}),
+    ).rejects.toBeInstanceOf(ZodError);
+  });
+
   it('deletes a meeting by qualified id', async () => {
     const client = new APIClient(testConfig);
     jest.spyOn(client.transport.http, 'sendRequest').mockResolvedValue({
