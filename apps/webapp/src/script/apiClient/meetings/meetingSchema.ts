@@ -64,6 +64,10 @@ export const meetingWithConversationSchema = z.object({
   conversation: meetingConversationSchema,
 });
 
+export const refreshMeetingLinkResponseSchema = meetingWithConversationSchema.extend({
+  link: z.string().url(),
+});
+
 export const createdMeetingWithConversationSchema = meetingWithConversationSchema.extend({
   link: z.string().url(),
 });

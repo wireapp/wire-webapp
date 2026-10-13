@@ -32,6 +32,7 @@ import {useMeetingPrepJoin} from './meetingPrep/useMeetingPrepJoin';
 import {useMeetingStore} from './meetingStore/meetingStoreProvider';
 import {MeetNowModal} from './meetNowModal/meetNowModal';
 import {ScheduleMeetingModal} from './scheduleMeetingModal';
+import {RotateMeetingLinkModal} from './rotateMeetingLinkModal/rotateMeetingLinkModal';
 
 import {useApplicationContext} from '../../page/rootProvider';
 import {MediaStreamHandler} from '../../repositories/media/MediaStreamHandler';
@@ -82,6 +83,7 @@ export const Meetings: FunctionComponent = () => {
       <MeetingCallingView />
       <ScheduleMeetingModal />
       <MeetNowModal />
+      <RotateMeetingLinkModal />
       <MeetingPrepModal
         participant={selfUser}
         requestPreviewStream={preview.requestPreviewStream}
