@@ -180,7 +180,7 @@ describe('useMeetNowSubmit', () => {
       submitResult = await result.current.submit(formState);
     });
 
-    expect(submitResult).toBe(meetNowSubmitResults.prepOpened);
+    expect(submitResult).toBe(meetNowSubmitResults.linkConfirmationOpened);
     expect(meetNowMeeting).toHaveBeenCalledWith(meetNowCommand);
     expect(loadMeetings).not.toHaveBeenCalled();
     expect(startAudio).not.toHaveBeenCalled();
@@ -241,7 +241,7 @@ describe('useMeetNowSubmit', () => {
       {wrapper: createWrapper(store, mainViewModel)},
     );
 
-    let submitResult: MeetNowSubmitResult = meetNowSubmitResults.prepOpened;
+    let submitResult: MeetNowSubmitResult = meetNowSubmitResults.linkConfirmationOpened;
     await act(async () => {
       submitResult = await result.current.submit(formState);
     });
