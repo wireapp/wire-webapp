@@ -9,8 +9,10 @@ set -euo pipefail
 
 script_directory="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-if [[ ! "${PRODUCTION_TAG}" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}\.[1-9][0-9]*-production$ ]]; then
-  echo "Production tag does not match YYYY-MM-DD.N-production: ${PRODUCTION_TAG}" >&2
+if [[ "${PRODUCTION_TAG}" == v* ]]; then
+  node ./tools/release-cli/releaseMetadataCli.mts validate-webapp-production-tag "${PRODUCTION_TAG}" >/dev/null
+elif [[ ! "${PRODUCTION_TAG}" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}\.[1-9][0-9]*-production$ ]]; then
+  echo "Production tag must be YYYY-MM-DD.N-production or a stable WebApp SemVer tag: ${PRODUCTION_TAG}" >&2
   exit 1
 fi
 

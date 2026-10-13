@@ -54,6 +54,12 @@ function createUniqueImageTag({versionTag, configurationVersion, releaseCommitSh
   );
 }
 
+function selectWebAppConfigurationEntry(versionTag, productionTag) {
+  const isProductionRelease = versionTag.includes('production') || productionTag === versionTag;
+
+  return isProductionRelease ? 'wire-web-config-default-master' : 'wire-web-config-default-staging';
+}
+
 function runProcess(command, commandArguments, processOptions, spawnProcess = child.spawnSync) {
   const result = spawnProcess(command, commandArguments, {
     ...processOptions,
@@ -166,9 +172,7 @@ function runDockerPublication(
   ].join(' && ');
 
   /** Defines which config version (listed in "app-config/package.json") is going to be used */
-  const configurationEntry = versionTag.includes('production')
-    ? 'wire-web-config-default-master'
-    : 'wire-web-config-default-staging';
+  const configurationEntry = selectWebAppConfigurationEntry(versionTag, environment.PRODUCTION_TAG);
   const configurationVersion = appConfigPkg.dependencies[configurationEntry].split('#')[1];
   const uniqueImageTag = createUniqueImageTag({versionTag, configurationVersion, releaseCommitSha});
 
@@ -237,5 +241,6 @@ module.exports = {
   resolveDockerContextPath,
   runDockerPublication,
   runProcess,
+  selectWebAppConfigurationEntry,
   selectReleaseCommit,
 };

@@ -26,6 +26,7 @@ const {
   resolveDockerContextPath,
   runDockerPublication,
   runProcess,
+  selectWebAppConfigurationEntry,
   selectReleaseCommit,
 } = require('./push_docker');
 
@@ -43,6 +44,24 @@ type ProcessEvent =
     };
 
 describe('push_docker metadata', () => {
+  it('selects production configuration for a stable SemVer Production tag', () => {
+    const actualConfigurationEntry = selectWebAppConfigurationEntry('v1.1.0', 'v1.1.0');
+
+    expect(actualConfigurationEntry).toBe('wire-web-config-default-master');
+  });
+
+  it('preserves production configuration selection for legacy Production tags', () => {
+    const actualConfigurationEntry = selectWebAppConfigurationEntry('2026-10-06.1-production', undefined);
+
+    expect(actualConfigurationEntry).toBe('wire-web-config-default-master');
+  });
+
+  it('keeps Beta tags on staging configuration', () => {
+    const actualConfigurationEntry = selectWebAppConfigurationEntry('v1.1.0-beta.1', undefined);
+
+    expect(actualConfigurationEntry).toBe('wire-web-config-default-staging');
+  });
+
   it('prefers the explicit release environment over the caller SHA and argument', () => {
     const actualReleaseCommitSha = selectReleaseCommit({
       releaseCommitSha: 'release-commit-sha',
