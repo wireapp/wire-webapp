@@ -1,24 +1,58 @@
 import type {ReactNode} from 'react';
 
-export type ParticipantTier =
-  | 'screen-sharing'   // 0 — shares screen
-  | 'speaking-camera'    // 1 — speaking + camera on
-  | 'speaking-no-camera' // 2 — speaking + camera off
-  | 'silent-camera'   // 3 — silent + camera on
-  | 'silent-no-camera'; // 4 — silent + camera off
+/** Ordered by priority — earlier tiers win seats over later ones. */
+export const TIER_ORDER = [
+  'screen-sharing',
+  'speaking-camera',
+  'speaking-no-camera',
+  'silent-camera',
+  'silent-no-camera',
+] as const;
+
+export type ParticipantTier = (typeof TIER_ORDER)[number];
+
+/**
+ * Tiers that earn a full tile — anyone with something worth showing. Only a participant who is
+ * both silent and camera-off has nothing to render, so they alone are compressed into the
+ * fractional tile container.
+ */
+const ACTIVE_TIERS: ReadonlySet<ParticipantTier> = new Set<ParticipantTier>([
+  'screen-sharing',
+  'speaking-camera',
+  'speaking-no-camera',
+  'silent-camera',
+]);
+
+export function isActiveTier(tier: ParticipantTier): boolean {
+  return ACTIVE_TIERS.has(tier);
+}
+
+export function tierRank(tier: ParticipantTier): number {
+  return TIER_ORDER.indexOf(tier);
+}
+
+export function deriveParticipantTier(participant: {
+  isSharingScreen: boolean;
+  isSpeaking: boolean;
+  hasCamera: boolean;
+}): ParticipantTier {
+  if (participant.isSharingScreen) {
+    return 'screen-sharing';
+  }
+  if (participant.isSpeaking) {
+    return participant.hasCamera ? 'speaking-camera' : 'speaking-no-camera';
+  }
+  return participant.hasCamera ? 'silent-camera' : 'silent-no-camera';
+}
 
 export interface GridParticipant {
   id: string;
-  /**
-   * The local user. Identity only — it carries no seating privilege, so self is
-   * laid out like anyone else and only earns a full tile by becoming active.
-   */
-  isSelf?: boolean;
-  /** Raw name used for identity and fallback initials computation. */
   name: string;
-  /** Label shown in the name pill. Falls back to name when absent. */
+  /** Identity only — carries no seating privilege; self is laid out like anyone else. */
+  isSelf?: boolean;
+  /** Shown in the name label. Falls back to `name`. */
   displayName?: string;
-  /** Avatar placeholder text. Falls back to initials derived from name when absent. */
+  /** Avatar placeholder text. Falls back to initials derived from `name`. */
   initials?: string;
   avatarUrl?: string;
   hue?: number;
@@ -26,157 +60,123 @@ export interface GridParticipant {
   tier: ParticipantTier;
   isMuted: boolean;
   speakingDuration: number;
-  /** Timestamp (ms) when this participant last entered their current tier. Drives recency ordering within active tiers. */
+  /** When this participant last entered their current tier. Breaks ties within a tier. */
   activatedAt?: number;
   /**
-   * Live, undebounced "is this person making sound right now" signal — purely cosmetic, drives
-   * only the active-speaker ring/name-pill color. Deliberately separate from `tier`: `tier`
-   * (specifically the `speaking-*` tiers) is debounced and held, because it also decides seat
-   * assignment, and seat assignment must not jump around on every spoken word. The ring has no
-   * such constraint — it should light up and turn off exactly in sync with actual sound, which
-   * is why it reads this flag instead of `tier`. Defaults to `false` when absent.
+   * Live, undebounced speech. Drives only the active-speaker ring and name label color, which
+   * must track real sound — unlike `tier`, which is debounced so seat assignment stays stable.
    */
   isSpeakingNow?: boolean;
 }
 
-// ── Layout types ────────────────────────────────────────────────────────────
+// ── Layout output ────────────────────────────────────────────────────────────
 
-/**
- * One cell inside a `FractionalTileContainer`. The last one may show the overflow badge
- * instead of a participant.
- */
+/** `'column'` fills top-to-bottom then wraps right; `'row'` fills left-to-right then wraps down. */
+export type FractionalFillDirection = 'row' | 'column';
+
+/** `'center'` centers each line within the container; `'start'` top/left-aligns it. */
+export type FractionalAlign = 'center' | 'start';
+
 export type FractionalTileDescriptor =
   | {type: 'participant'; participant: GridParticipant}
   | {type: 'overflow'; count: number; avatars: GridParticipant[]};
 
-/**
- * One grid slot. Either holds a single participant (full), is a container subdivided into
- * several participants' worth of fractional tiles, or summarises the participants that did
- * not fit (overflow — used by the presenter-mode strip).
- */
-export type TileDescriptor =
-  | {type: 'full'; participant: GridParticipant}
-  | {
-      type: 'fractional';
-      fractionalTiles: FractionalTileDescriptor[];
-      /**
-       * `'column'` fills the first column top-to-bottom before starting the next (used
-       * whenever the container shares a row with full tiles, tucked beside them). `'row'`
-       * fills left-to-right before wrapping, same as the main grid (used when the container
-       * has a row entirely to itself).
-       */
-      fillDirection: 'row' | 'column';
-      /**
-       * `'center'` centers each line (so an under-filled last column/row sits centered
-       * within the container); `'start'` top/left-aligns instead — used when the container
-       * shares the last row of a multi-row grid, to read consistently with the full tiles
-       * flowing top-to-bottom, left-to-right above it.
-       */
-      align: 'center' | 'start';
-    }
-  | {type: 'overflow'; count: number; avatars: GridParticipant[]};
+export interface FullTile {
+  type: 'full';
+  participant: GridParticipant;
+}
 
-/** Capacity bounds derived from container size alone — independent of participants. */
+export interface FractionalContainerTile {
+  type: 'fractional';
+  fractionalTiles: FractionalTileDescriptor[];
+  fillDirection: FractionalFillDirection;
+  align: FractionalAlign;
+}
+
+export interface OverflowBadgeTile {
+  type: 'overflow';
+  count: number;
+  avatars: GridParticipant[];
+}
+
+export type TileDescriptor = FullTile | FractionalContainerTile | OverflowBadgeTile;
+
+/** Capacity bounds derived from container size alone — independent of who is in the call. */
 export interface LayoutInvariants {
-  /** Maximum rows/columns of full tiles the container can hold at minimum tile size. */
   maxRows: number;
   maxCols: number;
-  /** maxRows × maxCols — the ceiling on how many tiles may be rendered. */
   maxTiles: number;
-  /** How many fractional tiles the container can hold at the full container width. */
   maxFractionalTilesPerContainer: number;
 }
 
 export interface GridModeLayout extends LayoutInvariants {
   mode: 'grid';
-  /**
-   * Every tile in this layout — full tiles in priority order, followed by the fractional
-   * tile container, if any. Rendered as flex items in a single flex-wrap container; the
-   * browser decides the actual row breaks, since only each tile's own fixed box size is
-   * computed here (see `fractionalContainerWidth`/`Height` for that box), not row/column
-   * layout.
-   */
+  /** Full tiles in priority order, then the fractional container if one exists. */
   tiles: TileDescriptor[];
-  /** Full tile pixel dimensions — shared by every full tile in the grid. */
   tileWidth: number;
   tileHeight: number;
   tileAspectRatio: number;
-  /**
-   * Single fractional-tile cell's fixed pixel dimensions — null when no container exists.
-   * Invariant for a given `tileHeight`: computed once from viewport/full-tile geometry via
-   * exact division (so a full column still reaches exactly `tileHeight` with no leftover
-   * gap), and never varies based on how many participants are currently visible.
-   */
+  /** A single fractional cell. Invariant for a given `tileHeight`. Null with no container. */
   fractionalTileWidth: number | null;
   fractionalTileHeight: number | null;
   fractionalTileAspectRatio: number | null;
-  /**
-   * The fractional tile container's own box. Height is `tileHeight` exactly whenever it
-   * shares a row with full tiles (it must align with them) or whenever its content fills at
-   * least one column; otherwise it hugs its (shorter) content. Width is `tileWidth` exactly
-   * when squeezed to a single leftover slot next to full tiles; otherwise it hugs its
-   * content. Null when no container exists.
-   */
+  /** The container's own box, which may exceed its content. Null with no container. */
   fractionalContainerWidth: number | null;
   fractionalContainerHeight: number | null;
 }
 
 export interface PresenterModeLayout extends LayoutInvariants {
   mode: 'presenter';
-  /** Spotlighted tile — rendered flex-filled, so it carries no explicit size. */
+  /** Rendered flex-filled, so it carries no explicit size. */
   spotlight: TileDescriptor | null;
-  /** Fixed-width sidebar tiles beside the spotlight. */
   strip: TileDescriptor[];
-  /** Strip tile pixel dimensions — shared by every tile in the strip. */
   stripTileWidth: number;
   stripTileHeight: number;
 }
 
-/** Two-person call: the other participant fills the stage, self overlays as a small PiP thumbnail. */
+/** Two-person call: the other participant fills the stage, self overlays as a thumbnail. */
 export interface OneOnOneLayout extends LayoutInvariants {
   mode: 'one-on-one';
-  /** The non-self participant, full-bleed. */
   main: TileDescriptor;
-  /** Self, rendered as a small overlay thumbnail. */
   pip: GridParticipant;
 }
 
 export type GridLayout = GridModeLayout | PresenterModeLayout | OneOnOneLayout;
 
-// ── Tile assignment ──────────────────────────────────────────────────────────
+// ── Seat assignment ──────────────────────────────────────────────────────────
 
-/** Which kind of seat a participant currently occupies. */
 export type TileKind = 'full' | 'fractional' | 'overflow';
 
 export interface TileAssignment {
   kind: TileKind;
-  /** Index into the flat seat list (full tiles first, then each fraction, then overflow). */
   seatIndex: number;
 }
 
 /** participantId → the seat they currently occupy. Drives sticky assignment. */
 export type AssignmentMap = Record<string, TileAssignment>;
 
+/** participantId → stable render order (lower renders earlier). */
+export type SlotMap = Record<string, number>;
+
+export interface ContainerSize {
+  width: number;
+  height: number;
+}
+
 // ── Reducer state & actions ──────────────────────────────────────────────────
 
 export interface GridState {
   participants: GridParticipant[];
-  containerSize: {width: number; height: number};
-  /** participantId → stable slot index (lower = rendered earlier) */
-  slotMap: Record<string, number>;
-  /** participantId → the seat they occupied on the previous layout pass */
+  containerSize: ContainerSize;
+  slotMap: SlotMap;
   assignmentMap: AssignmentMap;
-  /** True when the grid is showing a spotlight + strip instead of the tiled grid. */
   isPresenterModeActive: boolean;
   /**
-   * Snapshot of `isPresenterModeActive` taken the moment screen sharing first appeared (from
-   * zero sharers to one or more), restored once the last screen share ends. `null` whenever
-   * nobody is currently screen-sharing, i.e. there is nothing to restore. This is what lets a
-   * manually-chosen presenter mode setting survive a screen-share session unaffected, even
-   * though the user is free to toggle presenter mode manually while sharing is in progress.
+   * `isPresenterModeActive` as it was before screen sharing began, restored once the last
+   * share ends. Null while nobody is sharing. Lets a manual setting survive a share session
+   * even though the user may also toggle presenter mode mid-share.
    */
   presenterModeBeforeScreenShare: boolean | null;
-  /** True when the full participants list is on screen. */
   areAllParticipantsShown: boolean;
   layout: GridLayout;
 }
@@ -194,55 +194,9 @@ export interface GridConfig {
   maxTileHeight: number;
   minAspectRatio: number;
   maxAspectRatio: number;
-  /** Gap in px between tiles and between fractions */
+  /** Gap in px between tiles, and between fractional cells. */
   tileGap: number;
-  /**
-   * Aspect-ratio bounds for a single fractional tile inside the fractional tile container.
-   * Defaults to `minAspectRatio`/`maxAspectRatio` when omitted.
-   */
+  /** Defaults to `minAspectRatio` / `maxAspectRatio` when omitted. */
   minFractionalTileAspectRatio?: number;
   maxFractionalTileAspectRatio?: number;
-}
-
-// ── Helpers ──────────────────────────────────────────────────────────────────
-
-/**
- * Tiers that earn a full tile. A participant is "active" whenever there is something
- * worth showing — a screen share, speech, or a live camera. Only someone who is both
- * silent and camera-off has nothing to render, so they are the only ones compressed
- * into fractions.
- */
-export const ACTIVE_TIERS: ReadonlySet<ParticipantTier> = new Set([
-  'screen-sharing',
-  'speaking-camera',
-  'speaking-no-camera',
-  'silent-camera',
-]);
-
-export const TIER_ORDER: ParticipantTier[] = [
-  'screen-sharing',
-  'speaking-camera',
-  'speaking-no-camera',
-  'silent-camera',
-  'silent-no-camera',
-];
-
-export function isActiveTier(tier: ParticipantTier): boolean {
-  return ACTIVE_TIERS.has(tier);
-}
-
-/**
- * Self is deliberately not special-cased here: the local user is tiered on the same
- * speaking/camera evidence as everyone else, and only reaches a full tile by being active.
- */
-export function deriveParticipantTier(p: {
-  isSharingScreen: boolean;
-  isSpeaking: boolean;
-  hasCamera: boolean;
-}): ParticipantTier {
-  if (p.isSharingScreen) return 'screen-sharing';
-  if (p.isSpeaking && p.hasCamera) return 'speaking-camera';
-  if (p.isSpeaking) return 'speaking-no-camera';
-  if (p.hasCamera) return 'silent-camera';
-  return 'silent-no-camera';
 }

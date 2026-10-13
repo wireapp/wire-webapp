@@ -8,16 +8,19 @@ import {
   PresenterModeLayout,
   TileDescriptor,
 } from './FluidVideoGrid.types';
+import {createGridReducer, createInitialState} from './gridReducer';
 import {
-  computeTileCounts,
-  createGridReducer,
-  createInitialState,
-  _computeFractionalTileSize,
-  _computeInvariants,
-  _computeLayout,
-  _tileDimensionsFor,
-  _updateSlotMap,
-} from './gridReducer';
+  computeFractionalTileSize,
+  computeLayoutCapacity,
+  computeTileDimensions,
+} from './gridGeometry';
+import {computeLayout, countFullTiles} from './gridLayout';
+import {assignSlotOrder} from './seatAssignment';
+
+/** Layout-only view of `computeLayout`, which also returns the seat assignment map. */
+function layoutOf(...args: Parameters<typeof computeLayout>) {
+  return computeLayout(...args).layout;
+}
 
 const DEFAULT_CONFIG: GridConfig = {
   minTileHeight: 120,
@@ -448,52 +451,52 @@ describe('full-tile assignment', () => {
   });
 });
 
-// ── computeTileCounts ────────────────────────────────────────────────────────────
+// ── countFullTiles ────────────────────────────────────────────────────────────
 
-describe('computeTileCounts', () => {
-  const inv = _computeInvariants(container1280x720, DEFAULT_CONFIG)!; // maxTiles = 75
-  const smallInv = _computeInvariants(smallContainer, DEFAULT_CONFIG)!; // maxRows=1, maxCols=3, maxTiles=3
+describe('countFullTiles', () => {
+  const inv = computeLayoutCapacity(container1280x720, DEFAULT_CONFIG)!; // maxTiles = 75
+  const smallInv = computeLayoutCapacity(smallContainer, DEFAULT_CONFIG)!; // maxRows=1, maxCols=3, maxTiles=3
 
   it('before anyone has joined, there are no tiles and no container (this models the reducer\'s starting state, not a reachable in-call state)', () => {
-    expect(computeTileCounts(0, 0, inv, DEFAULT_CONFIG)).toEqual({full: 0, needsFractionContainer: false});
+    expect(countFullTiles(0, 0, inv)).toEqual({fullTileCount: 0, needsFractionalContainer: false});
   });
 
   it('an active-only call that fits entirely in full tiles needs no fractional tile container', () => {
-    expect(computeTileCounts(5, 0, inv, DEFAULT_CONFIG)).toEqual({full: 5, needsFractionContainer: false});
+    expect(countFullTiles(5, 0, inv)).toEqual({fullTileCount: 5, needsFractionalContainer: false});
   });
 
   it('any passive participant forces a fractional tile container to exist, even with room to spare', () => {
-    expect(computeTileCounts(2, 1, inv, DEFAULT_CONFIG)).toEqual({full: 2, needsFractionContainer: true});
+    expect(countFullTiles(2, 1, inv)).toEqual({fullTileCount: 2, needsFractionalContainer: true});
   });
 
   it('an all-passive call gives nobody a full tile', () => {
-    expect(computeTileCounts(0, 5, inv, DEFAULT_CONFIG)).toEqual({full: 0, needsFractionContainer: true});
+    expect(countFullTiles(0, 5, inv)).toEqual({fullTileCount: 0, needsFractionalContainer: true});
   });
 
   it('more active participants than full-tile slots also forces a fractional tile container', () => {
-    const result = computeTileCounts(5, 0, smallInv, DEFAULT_CONFIG);
-    expect(result.needsFractionContainer).toBe(true);
-    expect(result.full).toBeLessThanOrEqual(smallInv.maxTiles);
+    const result = countFullTiles(5, 0, smallInv);
+    expect(result.needsFractionalContainer).toBe(true);
+    expect(result.fullTileCount).toBeLessThanOrEqual(smallInv.maxTiles);
   });
 
   it('the fractional tile container always takes up one full-tile-sized slot, so when active participants would otherwise fill every slot, one of them is turned into the container instead', () => {
     // Active participants alone filling the grid.
-    expect(computeTileCounts(4, 0, smallInv, DEFAULT_CONFIG)).toEqual({full: 2, needsFractionContainer: true});
+    expect(countFullTiles(4, 0, smallInv)).toEqual({fullTileCount: 2, needsFractionalContainer: true});
     // Same result when some of those slots would have gone to passive participants instead.
-    expect(computeTileCounts(3, 2, smallInv, DEFAULT_CONFIG)).toEqual({full: 2, needsFractionContainer: true});
+    expect(countFullTiles(3, 2, smallInv)).toEqual({fullTileCount: 2, needsFractionalContainer: true});
   });
 
   it('nothing is converted into a container when there is room left over', () => {
-    const result = computeTileCounts(5, 3, inv, DEFAULT_CONFIG);
-    expect(result.full).toBe(5);
-    expect(result.needsFractionContainer).toBe(true);
+    const result = countFullTiles(5, 3, inv);
+    expect(result.fullTileCount).toBe(5);
+    expect(result.needsFractionalContainer).toBe(true);
   });
 
   it('filling the grid with only active participants, with nobody needing a container, converts nobody', () => {
     // Different from the test above: this guards against converting a full tile just because
     // the grid is full, instead of only when a fractional tile container is actually needed.
-    const result = computeTileCounts(3, 0, smallInv, DEFAULT_CONFIG);
-    expect(result).toEqual({full: 3, needsFractionContainer: false});
+    const result = countFullTiles(3, 0, smallInv);
+    expect(result).toEqual({fullTileCount: 3, needsFractionalContainer: false});
   });
 
   it('right at the edge: one slot short of completely full converts nobody, but exactly at full one tile is converted — this is the exact boundary a past bug got wrong', () => {
@@ -504,13 +507,13 @@ describe('computeTileCounts', () => {
     // multi-column shape (not `smallInv`, which is a single row and so always reports "no room").
     const midInv = {usableWidth: 952, usableHeight: 532, maxRows: 2, maxCols: 5, maxTiles: 10};
 
-    const oneShort = computeTileCounts(9, 1, midInv, DEFAULT_CONFIG);
-    expect(oneShort.full).toBe(9);
-    expect(oneShort.needsFractionContainer).toBe(true);
+    const oneShort = countFullTiles(9, 1, midInv);
+    expect(oneShort.fullTileCount).toBe(9);
+    expect(oneShort.needsFractionalContainer).toBe(true);
 
-    const exactlyFull = computeTileCounts(10, 1, midInv, DEFAULT_CONFIG);
-    expect(exactlyFull.full).toBe(9); // one converted into the container
-    expect(exactlyFull.needsFractionContainer).toBe(true);
+    const exactlyFull = countFullTiles(10, 1, midInv);
+    expect(exactlyFull.fullTileCount).toBe(9); // one converted into the container
+    expect(exactlyFull.needsFractionalContainer).toBe(true);
   });
 });
 
@@ -520,9 +523,9 @@ describe('tile dimension invariants', () => {
   const gap = DEFAULT_CONFIG.tileGap;
 
   it('the chosen column count always fits within the usable container width', () => {
-    const inv = _computeInvariants(container1280x720, DEFAULT_CONFIG)!;
+    const inv = computeLayoutCapacity(container1280x720, DEFAULT_CONFIG)!;
     for (const n of [3, 5, 10, 20, 50]) {
-      const {cols, width} = _tileDimensionsFor(n, inv, DEFAULT_CONFIG);
+      const {cols, width} = computeTileDimensions(n, inv, DEFAULT_CONFIG);
       expect(cols * width + (cols - 1) * gap).toBeLessThanOrEqual(inv.usableWidth + 0.01);
     }
   });
@@ -560,8 +563,8 @@ describe('tile dimension invariants', () => {
   ])(
     '$viewport.width×$viewport.height with $count participants → $rows row(s) × $cols col(s)',
     ({viewport, count, rows, cols, width, height}) => {
-      const inv = _computeInvariants(viewport, DEFAULT_CONFIG)!;
-      const result = _tileDimensionsFor(count, inv, DEFAULT_CONFIG);
+      const inv = computeLayoutCapacity(viewport, DEFAULT_CONFIG)!;
+      const result = computeTileDimensions(count, inv, DEFAULT_CONFIG);
       expect(result.rows).toBe(rows);
       expect(result.cols).toBe(cols);
       expect(result.width).toBeCloseTo(width, 1);
@@ -570,16 +573,16 @@ describe('tile dimension invariants', () => {
   );
 });
 
-// ── _updateSlotMap (internal) ──────────────────────────────────────────────────
+// ── assignSlotOrder ──────────────────────────────────────────────────
 //
 // The seating-order rules in one place, tested directly against the pure function. This is
 // also the one place in the whole file that proves self has no seating privilege — every other
 // test elsewhere treats self exactly like any other participant without needing to call that
 // out separately.
 
-describe('_updateSlotMap', () => {
+describe('assignSlotOrder', () => {
   it('assigns the first seats by tier priority', () => {
-    const slotMap = _updateSlotMap(
+    const slotMap = assignSlotOrder(
       [
         makeParticipant('passive1', 'silent-no-camera'),
         makeParticipant('active1', 'speaking-camera'),
@@ -592,7 +595,7 @@ describe('_updateSlotMap', () => {
   });
 
   it('self is ranked exactly like any other participant — no special treatment', () => {
-    const slotMap = _updateSlotMap(
+    const slotMap = assignSlotOrder(
       [makeParticipant('screen1', 'screen-sharing'), makeSelf('me', 'speaking-camera')],
       {},
     );
@@ -604,14 +607,14 @@ describe('_updateSlotMap', () => {
       makeParticipant('p1', 'silent-no-camera'),
       makeParticipant('p2', 'silent-no-camera'),
     ];
-    const prevMap = _updateSlotMap(existing, {});
-    const newMap = _updateSlotMap([...existing, makeParticipant('p3', 'silent-no-camera')], prevMap);
+    const prevMap = assignSlotOrder(existing, {});
+    const newMap = assignSlotOrder([...existing, makeParticipant('p3', 'silent-no-camera')], prevMap);
     expect(newMap['p3']).toBeGreaterThan(newMap['p1']);
     expect(newMap['p3']).toBeGreaterThan(newMap['p2']);
   });
 
   it('within the same tier, whoever became active more recently gets the better seat on first assignment', () => {
-    const slotMap = _updateSlotMap(
+    const slotMap = assignSlotOrder(
       [makeParticipant('old', 'speaking-camera', 0, 100), makeParticipant('new', 'speaking-camera', 0, 200)],
       {},
     );
@@ -619,7 +622,7 @@ describe('_updateSlotMap', () => {
   });
 
   it('a participant who already has a seat keeps it, even if recency would otherwise reorder them', () => {
-    const slotMap = _updateSlotMap(
+    const slotMap = assignSlotOrder(
       [makeParticipant('old', 'speaking-camera', 0, 100), makeParticipant('new', 'speaking-camera', 0, 200)],
       {old: 0, new: 1},
     );
@@ -629,7 +632,7 @@ describe('_updateSlotMap', () => {
 
   it('a new participant with a higher-priority tier is placed ahead of existing lower-tier participants', () => {
     const prevMap = {cam: 0};
-    const slotMap = _updateSlotMap(
+    const slotMap = assignSlotOrder(
       [makeParticipant('cam', 'speaking-camera'), makeParticipant('screen', 'screen-sharing')],
       prevMap,
     );
@@ -732,47 +735,47 @@ describe('activatedAt management', () => {
 
 describe('computeFractionalTileSize', () => {
   it('gives the same result every time for the same tile height, no matter how many participants need to fit', () => {
-    const a = _computeFractionalTileSize(532, DEFAULT_CONFIG);
-    const b = _computeFractionalTileSize(532, DEFAULT_CONFIG);
+    const a = computeFractionalTileSize(532, DEFAULT_CONFIG);
+    const b = computeFractionalTileSize(532, DEFAULT_CONFIG);
     expect(a).toEqual(b);
   });
 
   it('never returns fewer than 2 rows — a fractional tile is never the size of a full tile', () => {
-    const {rows} = _computeFractionalTileSize(130, DEFAULT_CONFIG);
-    expect(rows).toBeGreaterThanOrEqual(2);
+    const {rowsPerContainer} = computeFractionalTileSize(130, DEFAULT_CONFIG);
+    expect(rowsPerContainer).toBeGreaterThanOrEqual(2);
   });
 
   it('picks the row count whose exact division of the tile height lands closest to the target size', () => {
     // target height = minTileHeight * 0.5 = 60; gap = 4. round((532+4)/(60+4)) = round(8.375) = 8.
     // Exact division across 8 rows of 532 with gap 4: (532 - 7*4) / 8 = 63 — close to, but not
     // exactly, the 60 target, since this is an exact division rather than a capped target.
-    const {rows, fracHeight} = _computeFractionalTileSize(532, DEFAULT_CONFIG);
-    expect(rows).toBe(8);
-    expect(fracHeight).toBeCloseTo(63, 5);
+    const {rowsPerContainer, height: cellHeight} = computeFractionalTileSize(532, DEFAULT_CONFIG);
+    expect(rowsPerContainer).toBe(8);
+    expect(cellHeight).toBeCloseTo(63, 5);
   });
 
   it('a taller full tile gets more rows of fractional tiles, at the same fixed tile width', () => {
-    const short = _computeFractionalTileSize(240, DEFAULT_CONFIG);
-    const tall = _computeFractionalTileSize(600, DEFAULT_CONFIG);
-    expect(tall.rows).toBeGreaterThan(short.rows);
+    const short = computeFractionalTileSize(240, DEFAULT_CONFIG);
+    const tall = computeFractionalTileSize(600, DEFAULT_CONFIG);
+    expect(tall.rowsPerContainer).toBeGreaterThan(short.rowsPerContainer);
   });
 
   it('only shrinks below the target size when even 2 rows would not otherwise fit', () => {
-    const {rows, fracHeight} = _computeFractionalTileSize(100, DEFAULT_CONFIG);
-    expect(rows).toBe(2);
-    expect(fracHeight).toBeLessThan(DEFAULT_CONFIG.minTileHeight * 0.5);
+    const {rowsPerContainer, height: cellHeight} = computeFractionalTileSize(100, DEFAULT_CONFIG);
+    expect(rowsPerContainer).toBe(2);
+    expect(cellHeight).toBeLessThan(DEFAULT_CONFIG.minTileHeight * 0.5);
   });
 
   it('width always follows a fixed aspect ratio, never the current full tile\'s own shape', () => {
     // A lone full tile (wide, clamped to the max aspect ratio) and a packed grid's full tile
     // (much narrower) must not produce different-looking fractional tiles for the same tile
-    // height — width is purely `fracHeight * fixedAspectRatio`, with no tile-width input at all.
-    const {fracWidth, fracHeight} = _computeFractionalTileSize(532, DEFAULT_CONFIG);
+    // height — width is purely `height * fixedAspectRatio`, with no tile-width input at all.
+    const {width: cellWidth, height: cellHeight} = computeFractionalTileSize(532, DEFAULT_CONFIG);
     const expectedAspectRatio =
       ((DEFAULT_CONFIG.minFractionalTileAspectRatio ?? DEFAULT_CONFIG.minAspectRatio) +
         (DEFAULT_CONFIG.maxFractionalTileAspectRatio ?? DEFAULT_CONFIG.maxAspectRatio)) /
       2;
-    expect(fracWidth).toBeCloseTo(fracHeight * expectedAspectRatio, 5);
+    expect(cellWidth).toBeCloseTo(cellHeight * expectedAspectRatio, 5);
   });
 });
 
@@ -871,16 +874,17 @@ describe('fractional tile container', () => {
     expect(grid(underfilled).fractionalContainerHeight).toBe(grid(underfilled).tileHeight);
     expect(grid(underfilled).fractionalTileHeight!).toBeLessThan(grid(underfilled).tileHeight / 2);
 
-    const {rows} = _computeFractionalTileSize(grid(underfilled).tileHeight, DEFAULT_CONFIG);
+    const {rowsPerContainer} = computeFractionalTileSize(grid(underfilled).tileHeight, DEFAULT_CONFIG);
     const filled = addAll(createInitialState(container1280x720), [
       makeParticipant('a1', 'speaking-camera'),
-      ...Array.from({length: rows}, (_, i) => makeParticipant(`p${i}`, 'silent-no-camera')),
+      ...Array.from({length: rowsPerContainer}, (_, i) => makeParticipant(`p${i}`, 'silent-no-camera')),
     ]);
     expect(overflowCount(filled)).toBe(0);
     expect(grid(filled).fractionalTileHeight).toBe(grid(underfilled).fractionalTileHeight);
     expect(grid(filled).fractionalTileWidth).toBe(grid(underfilled).fractionalTileWidth);
 
-    const expectedHeight = (grid(underfilled).tileHeight - DEFAULT_CONFIG.tileGap * (rows - 1)) / rows;
+    const expectedHeight =
+      (grid(underfilled).tileHeight - DEFAULT_CONFIG.tileGap * (rowsPerContainer - 1)) / rowsPerContainer;
     expect(grid(filled).fractionalTileHeight).toBeCloseTo(expectedHeight, 5);
   });
 
@@ -910,7 +914,7 @@ describe('fractional tile container', () => {
         createInitialState({width: 1920, height: 1080}),
       );
 
-    const {rows: capRows} = _computeFractionalTileSize(grid(build(1)).tileHeight, bigConfig);
+    const {rowsPerContainer: capRows} = computeFractionalTileSize(grid(build(1)).tileHeight, bigConfig);
     const capacity = grid(build(1)).maxFractionalTilesPerContainer;
     const maxCols = capacity / capRows;
     expect(maxCols).toBeGreaterThan(2); // need 1→2 columns to both stay below maxCols
@@ -943,7 +947,7 @@ describe('fractional tile container', () => {
         createInitialState(container960x540),
       );
     const capacity = grid(build(1)).maxFractionalTilesPerContainer;
-    const {rows: capRows} = _computeFractionalTileSize(grid(build(1)).tileHeight, bigConfig);
+    const {rowsPerContainer: capRows} = computeFractionalTileSize(grid(build(1)).tileHeight, bigConfig);
     const maxCols = capacity / capRows;
     expect(maxCols).toBeGreaterThan(1); // meaningful check, not a single-column coincidence
 
@@ -1389,17 +1393,17 @@ describe('SET_CONTAINER_SIZE', () => {
   });
 });
 
-// ── _computeLayout (internal) ──────────────────────────────────────────────────
+// ── computeLayout ──────────────────────────────────────────────────
 
-describe('_computeLayout', () => {
+describe('computeLayout', () => {
   it('an empty participant list produces no tiles', () => {
-    const layout = _computeLayout([], {}, container1280x720, DEFAULT_CONFIG) as GridModeLayout;
+    const layout = layoutOf([], {}, container1280x720, DEFAULT_CONFIG) as GridModeLayout;
     expect(layout.tiles).toHaveLength(0);
   });
 
   it('a single participant produces exactly one full tile', () => {
     const p = makeParticipant('a', 'speaking-camera');
-    const layout = _computeLayout([p], {a: 0}, container1280x720, DEFAULT_CONFIG) as GridModeLayout;
+    const layout = layoutOf([p], {a: 0}, container1280x720, DEFAULT_CONFIG) as GridModeLayout;
     expect(layout.tiles).toHaveLength(1);
     expect(layout.tiles[0].type).toBe('full');
   });
@@ -1407,12 +1411,12 @@ describe('_computeLayout', () => {
   it('the number of rendered slots — full tiles, plus the fractional tile container and/or overflow badge if present — never exceeds what the grid can physically hold', () => {
     const participants = Array.from({length: 20}, (_, i) => makeParticipant(`p${i}`, 'speaking-camera'));
     const slotMap = Object.fromEntries(participants.map((p, i) => [p.id, i]));
-    const layout = _computeLayout(participants, slotMap, container1280x720, DEFAULT_CONFIG) as GridModeLayout;
+    const layout = layoutOf(participants, slotMap, container1280x720, DEFAULT_CONFIG) as GridModeLayout;
     expect(layout.tiles.length).toBeLessThanOrEqual(layout.maxRows * layout.maxCols);
   });
 
   it('a zero-sized container produces an empty layout instead of throwing', () => {
-    const layout = _computeLayout([], {}, {width: 0, height: 0}, DEFAULT_CONFIG) as GridModeLayout;
+    const layout = layoutOf([], {}, {width: 0, height: 0}, DEFAULT_CONFIG) as GridModeLayout;
     expect(layout.tiles).toHaveLength(0);
     expect(layout.maxTiles).toBe(0);
   });

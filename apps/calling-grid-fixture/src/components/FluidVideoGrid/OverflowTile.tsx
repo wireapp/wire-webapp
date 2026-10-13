@@ -1,96 +1,45 @@
 import {GridParticipant} from './FluidVideoGrid.types';
 import {useFluidVideoGrid} from './FluidVideoGridContext';
+import * as styles from './OverflowTile.styles';
+import {initialsFromName} from './tokens';
 
-const TILE_BG = '#34373D';
-
-function avatarGrad(hue: number): string {
-  return `linear-gradient(135deg, hsl(${hue} 55% 56%), hsl(${(hue + 28) % 360} 58% 40%))`;
-}
+const MAX_STACKED_AVATARS = 3;
 
 interface OverflowTileProps {
   count: number;
   avatars: GridParticipant[];
 }
 
+/**
+ * Summarises the participants that did not fit. Clicking it raises the grid's
+ * "show all participants" intent, which the host app decides how to present.
+ */
 export function OverflowTile({count, avatars}: OverflowTileProps) {
   const {toggleAllParticipants} = useFluidVideoGrid();
-  const shown = avatars.slice(0, 3);
+  const stackedAvatars = avatars.slice(0, MAX_STACKED_AVATARS);
 
   return (
-    <button
-      onClick={toggleAllParticipants}
-      style={{
-        all: 'unset',
-        boxSizing: 'border-box',
-        cursor: 'pointer',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: '100%',
-        height: '100%',
-        backgroundColor: TILE_BG,
-        borderRadius: 4,
-        gap: 6,
-        transition: 'background 0.15s ease',
-      }}
-      onMouseEnter={e => {
-        (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#3d4046';
-      }}
-      onMouseLeave={e => {
-        (e.currentTarget as HTMLButtonElement).style.backgroundColor = TILE_BG;
-      }}
-    >
-      {/* Stacked overlapping avatars */}
-      <div style={{position: 'relative', height: 30, width: (shown.length - 1) * 18 + 30}}>
-        {shown.map((p, i) => (
+    <button onClick={toggleAllParticipants} css={styles.overflowButton}>
+      <div css={styles.avatarStack(stackedAvatars.length)}>
+        {stackedAvatars.map((participant, index) => (
           <div
-            key={p.id}
-            style={{
-              position: 'absolute',
-              left: i * 18,
-              width: 30,
-              height: 30,
-              borderRadius: '50%',
-              border: `2px solid ${TILE_BG}`,
-              overflow: 'hidden',
-              background: avatarGrad(p.hue ?? (i * 47) % 360),
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 10,
-              fontWeight: 700,
-              color: '#fff',
-            }}
+            key={participant.id}
+            css={styles.stackedAvatar(index, participant.hue ?? (index * 47) % 360)}
           >
-            {p.avatarUrl ? (
+            {participant.avatarUrl ? (
               <img
-                src={p.avatarUrl}
-                alt={p.name}
-                style={{width: '100%', height: '100%', objectFit: 'cover', display: 'block'}}
+                src={participant.avatarUrl}
+                alt={participant.name}
+                css={styles.stackedAvatarImage}
               />
             ) : (
-              p.name
-                .split(' ')
-                .map(w => w[0])
-                .join('')
-                .slice(0, 2)
-                .toUpperCase()
+              initialsFromName(participant.name)
             )}
           </div>
         ))}
       </div>
 
-      <span
-        style={{
-          color: '#fff',
-          fontSize: 11,
-          fontWeight: 600,
-          letterSpacing: 0.3,
-        }}
-      >
-        +{count} more
-      </span>
+      <span css={styles.overflowLabel}>+{count} more</span>
     </button>
   );
 }
