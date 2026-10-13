@@ -99,5 +99,5 @@ export const submitMeetNow = async ({
     },
   });
 
-  return meetNowSubmitResults.prepOpened;
+  return meetNowSubmitResults.linkConfirmationOpened;
 };
