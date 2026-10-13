@@ -32,4 +32,5 @@ export interface MeetingsDataSource {
   getMeeting(meetingId: QualifiedId): Promise<Meeting>;
   getMeetingsList(): Promise<Meeting[]>;
   updateMeeting(meetingId: QualifiedId, payload: UpdateMeeting): Promise<MeetingWithConversation>;
+  rotateMeetingLink(meetingId: QualifiedId, password?: string): Promise<MeetingWithConversation>;
 }
