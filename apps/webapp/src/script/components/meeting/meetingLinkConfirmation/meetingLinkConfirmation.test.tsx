@@ -33,6 +33,7 @@ describe('MeetingLinkConfirmationMessage', () => {
     );
 
     expect(screen.getByText('meetings.meetingLink.description')).toBeInTheDocument();
+    expect(screen.getByLabelText('meetings.meetingLink.title')).toHaveValue('https://wire.example/meeting-link');
     expect(screen.getByDisplayValue('https://wire.example/meeting-link')).toHaveAttribute(
       'aria-describedby',
       'meeting-link-description',
