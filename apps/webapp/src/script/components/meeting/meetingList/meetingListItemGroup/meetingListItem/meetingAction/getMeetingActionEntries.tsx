@@ -87,7 +87,7 @@ export const getMeetingActionEntries = ({
     icon: () => {
       return <LinkIcon css={linkIconStyles} />;
     },
-    label: translate(MEETING_ACTION_TRANSLATION_KEYS.copyMeetingLink),
+    label: translate(MEETING_ACTION_TRANSLATION_KEYS.showMeetingLink),
     click: onCopyMeetingLink,
   };
 
