@@ -17,6 +17,8 @@
  *
  */
 
+import {maybe as Maybe, type Maybe as MaybeType} from 'true-myth';
+
 import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
 import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
 import {getMeetingActionEntries} from 'Components/meeting/meetingList/meetingListItemGroup/meetingListItem/meetingAction/getMeetingActionEntries';
@@ -92,10 +94,12 @@ const getJoinEntry = (entries: ReturnType<typeof getMeetingActionEntries>) => {
   });
 };
 
-const getCopyMeetingLinkEntry = (entries: ReturnType<typeof getMeetingActionEntries>) => {
-  return entries.find(entry => {
-    return entry.label === MEETING_ACTION_TRANSLATION_KEYS.copyMeetingLink;
-  });
+const getCopyMeetingLinkEntry = (
+  entries: ReturnType<typeof getMeetingActionEntries>,
+): MaybeType<ReturnType<typeof getMeetingActionEntries>[number]> => {
+  return Maybe.find(entry => {
+    return entry.label === MEETING_ACTION_TRANSLATION_KEYS.showMeetingLink;
+  }, entries);
 };
 
 const getEntryLabels = (entries: ReturnType<typeof getMeetingActionEntries>) => {
@@ -379,8 +383,13 @@ describe('getMeetingActionEntries', () => {
     });
 
     const copyMeetingLinkEntry = getCopyMeetingLinkEntry(entries);
-    expect(copyMeetingLinkEntry).toBeDefined();
-    copyMeetingLinkEntry?.click?.();
+    expect(copyMeetingLinkEntry.isJust).toBe(true);
+    copyMeetingLinkEntry.match({
+      Just: entry => {
+        entry.click?.();
+      },
+      Nothing: noop,
+    });
     expect(onCopyMeetingLink).toHaveBeenCalledTimes(1);
   });
 
@@ -397,6 +406,6 @@ describe('getMeetingActionEntries', () => {
       onDeleteForMe: noop,
     });
 
-    expect(getCopyMeetingLinkEntry(entries)).toBeUndefined();
+    expect(getCopyMeetingLinkEntry(entries).isNothing).toBe(true);
   });
 });
