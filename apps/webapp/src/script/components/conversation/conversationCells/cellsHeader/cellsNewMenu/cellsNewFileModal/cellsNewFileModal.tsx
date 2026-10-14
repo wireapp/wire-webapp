@@ -62,7 +62,7 @@ export const CellsNewFileModal = ({
     validationCopy: {
       genericError: translate('cells.newItemMenuModalForm.genericError'),
       alreadyExistsError: translate('cells.newItemMenuModalForm.alreadyExistsError'),
-      invalidCharactersError: translate('cells.newItemMenuModalForm.invalidCharactersError'),
+      invalidCharactersError: translate('cells.nodeName.invalidCharactersError'),
       maxLengthError: translate('cells.newItemMenuModalForm.maxLengthError'),
       nameRequired: translate('cells.newItemMenuModalForm.nameRequired'),
     },

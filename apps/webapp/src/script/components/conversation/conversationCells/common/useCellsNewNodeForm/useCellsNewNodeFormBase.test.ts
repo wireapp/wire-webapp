@@ -34,7 +34,7 @@ describe('useCellsNewNodeFormBase', () => {
   const validationCopy = {
     genericError: 'cells.newItemMenuModalForm.genericError',
     alreadyExistsError: 'cells.newItemMenuModalForm.alreadyExistsError',
-    invalidCharactersError: 'cells.newItemMenuModalForm.invalidCharactersError',
+    invalidCharactersError: 'cells.nodeName.invalidCharactersError',
     maxLengthError: 'cells.newItemMenuModalForm.maxLengthError',
     nameRequired: 'cells.newItemMenuModalForm.nameRequired',
   };

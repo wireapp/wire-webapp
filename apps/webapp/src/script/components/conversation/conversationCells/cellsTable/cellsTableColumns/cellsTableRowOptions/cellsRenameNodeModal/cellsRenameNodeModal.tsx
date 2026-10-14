@@ -50,7 +50,7 @@ export const CellsRenameNodeModal = ({
     },
     renameNodeCopy: {
       error: translate('cells.renameNodeModal.error'),
-      invalidCharacters: translate('cells.renameNodeModal.invalidCharacters'),
+      invalidCharacters: translate('cells.nodeName.invalidCharactersError'),
       nameRequired: translate('cells.renameNodeModal.nameRequired'),
     },
   });
