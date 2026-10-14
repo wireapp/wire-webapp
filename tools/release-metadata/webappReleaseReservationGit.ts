@@ -17,7 +17,7 @@
  *
  */
 
-import {Maybe, Result} from 'true-myth';
+import {Maybe, Result, Task, Unit, task} from 'true-myth';
 
 import type {ExecuteWebAppReleaseGitCommand} from './webappReleaseHistoryGit.ts';
 import {parseWebAppReleaseBranchName} from './webappReleaseIdentity.ts';
@@ -39,6 +39,13 @@ export type ReadRemoteWebAppReleaseBranchOptions = ReadRemoteWebAppReleaseBranch
 
 export type VerifyWebAppReleaseCommitAncestorGitOptions = VerifyWebAppReleaseCommitAncestorOptions & {
   readonly executeGitCommand: ExecuteWebAppReleaseGitCommand;
+};
+
+export type PrepareRemoteWebAppReleaseBranchCommitGitOptions = {
+  readonly executeGitCommand: ExecuteWebAppReleaseGitCommand;
+  readonly expectedCommitSha: string;
+  readonly releaseBranch: string;
+  readonly remoteName: string;
 };
 
 export type CreateWebAppReleaseReservationBranchGitOptions = CreateWebAppReleaseReservationBranchOptions &
@@ -135,6 +142,70 @@ export async function readRemoteWebAppReleaseBranches(
   }
 
   return parseRemoteReleaseBranches({commandOutput: commandResult.value, expectedReference: ''});
+}
+
+async function executeRemoteWebAppReleaseBranchCommitPreparation(
+  options: PrepareRemoteWebAppReleaseBranchCommitGitOptions,
+): Promise<Unit> {
+  const releaseBranchVersionResult = parseWebAppReleaseBranchName(options.releaseBranch);
+  if (releaseBranchVersionResult.isErr) {
+    throw releaseBranchVersionResult.error;
+  }
+
+  if (fullCommitShaPattern.test(options.expectedCommitSha) === false) {
+    throw new Error('Invalid expected release commit: expected a full 40-character hexadecimal SHA');
+  }
+
+  const fetchResult = await executeGitCommand({
+    executeGitCommand: options.executeGitCommand,
+    commandArguments: ['fetch', '--no-tags', options.remoteName, `refs/heads/${options.releaseBranch}`],
+  });
+  if (fetchResult.isErr) {
+    throw new Error(
+      `Unable to fetch remote WebApp release branch ${options.releaseBranch}: ${fetchResult.error.message}`,
+      {
+        cause: fetchResult.error,
+      },
+    );
+  }
+
+  const fetchedCommitResult = await executeGitCommand({
+    executeGitCommand: options.executeGitCommand,
+    commandArguments: ['rev-parse', '--verify', '--end-of-options', 'FETCH_HEAD^{commit}'],
+  });
+  if (fetchedCommitResult.isErr) {
+    throw new Error(
+      `Unable to resolve fetched WebApp release branch ${options.releaseBranch} commit: ${fetchedCommitResult.error.message}`,
+      {cause: fetchedCommitResult.error},
+    );
+  }
+
+  const fetchedCommitSha = fetchedCommitResult.value.trim().toLowerCase();
+  if (fullCommitShaPattern.test(fetchedCommitSha) === false) {
+    throw new Error(`Unable to resolve fetched WebApp release branch ${options.releaseBranch} to a full commit SHA`);
+  }
+
+  const expectedCommitSha = options.expectedCommitSha.toLowerCase();
+  if (fetchedCommitSha !== expectedCommitSha) {
+    throw new Error(
+      `WebApp release branch changed during continuation: ${options.releaseBranch} was ${expectedCommitSha} when discovered, but fetch resolved ${fetchedCommitSha}; retry continuation`,
+    );
+  }
+
+  return Unit;
+}
+
+export function prepareRemoteWebAppReleaseBranchCommit(
+  options: PrepareRemoteWebAppReleaseBranchCommitGitOptions,
+): Task<Unit, Error> {
+  return task.tryOrElse(
+    (error: unknown): Error => {
+      return error instanceof Error ? error : new Error(String(error));
+    },
+    async (): Promise<Unit> => {
+      return executeRemoteWebAppReleaseBranchCommitPreparation(options);
+    },
+  );
 }
 
 async function readRemoteWebAppReleaseBranch(

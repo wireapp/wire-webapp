@@ -19,11 +19,12 @@
 
 import assert from 'node:assert';
 
-import {Result} from 'true-myth';
+import {Result, Task, Unit} from 'true-myth';
 
 import {continueActiveWebAppRelease} from './webappReleaseReservation.ts';
 import type {
   ContinueActiveWebAppReleaseDependencies,
+  PrepareRemoteReleaseBranchCommitOptions,
   VerifyWebAppReleaseCommitAncestorOptions,
   WebAppReleaseBranchRef,
 } from './webappReleaseReservation.ts';
@@ -39,6 +40,7 @@ type ContinuationTestOptions = {
 type ContinuationTestDependencies = {
   readonly dependencies: ContinueActiveWebAppReleaseDependencies;
   readonly ancestorCalls: Array<VerifyWebAppReleaseCommitAncestorOptions>;
+  readonly preparationCalls: Array<PrepareRemoteReleaseBranchCommitOptions>;
 };
 
 type CreateStableReleaseOptions = {
@@ -60,6 +62,7 @@ function createStableRelease(options: CreateStableReleaseOptions): StableWebAppR
 
 function createContinuationTestDependencies(options: ContinuationTestOptions = {}): ContinuationTestDependencies {
   const ancestorCalls: Array<VerifyWebAppReleaseCommitAncestorOptions> = [];
+  const preparationCalls: Array<PrepareRemoteReleaseBranchCommitOptions> = [];
   const stableReleases = options.stableReleases ?? [
     createStableRelease({version: '1.0.0', tagName: 'v1.0.0', commitSha: stableCommit}),
   ];
@@ -80,11 +83,21 @@ function createContinuationTestDependencies(options: ContinuationTestOptions = {
     return options.ancestorResult ?? Result.ok(true);
   }
 
+  function prepareRemoteReleaseBranchCommit(
+    preparationOptions: PrepareRemoteReleaseBranchCommitOptions,
+  ): Task<Unit, Error> {
+    preparationCalls.push(preparationOptions);
+
+    return Task.resolve(Unit);
+  }
+
   return {
     ancestorCalls,
+    preparationCalls,
     dependencies: {
       readStableWebAppReleases,
       readRemoteReleaseBranches,
+      prepareRemoteReleaseBranchCommit,
       isCommitAncestor,
     },
   };
@@ -109,6 +122,9 @@ describe('WebApp release continuation', () => {
       action: 'reused',
     });
     expect(testDependencies.ancestorCalls).toEqual([{baseCommit: stableCommit, targetCommit: activeReleaseCommit}]);
+    expect(testDependencies.preparationCalls).toEqual([
+      {releaseBranch: 'release/1.1.0', expectedCommitSha: activeReleaseCommit},
+    ]);
   });
 
   it('uses the latest stable SemVer release as the ancestry base', async () => {
@@ -142,6 +158,7 @@ describe('WebApp release continuation', () => {
     assert(actualContinuationResult.isErr);
     expect(actualContinuationResult.error.message).toBe('No active WebApp SemVer release exists');
     expect(testDependencies.ancestorCalls).toEqual([]);
+    expect(testDependencies.preparationCalls).toEqual([]);
   });
 
   it('fails closed when multiple SemVer releases are unresolved', async () => {
@@ -159,6 +176,7 @@ describe('WebApp release continuation', () => {
       'Multiple unresolved WebApp release reservations exist: release/1.1.0, release/1.2.0',
     );
     expect(testDependencies.ancestorCalls).toEqual([]);
+    expect(testDependencies.preparationCalls).toEqual([]);
   });
 
   it('fails closed when a stable tag and same-version release branch disagree', async () => {

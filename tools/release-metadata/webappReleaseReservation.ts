@@ -18,6 +18,7 @@
  */
 
 import {Maybe, Result} from 'true-myth';
+import type {Task, Unit} from 'true-myth';
 
 import {
   createStableWebAppTagName,
@@ -58,6 +59,11 @@ export type VerifyWebAppReleaseCommitAncestorOptions = {
   readonly targetCommit: string;
 };
 
+export type PrepareRemoteReleaseBranchCommitOptions = {
+  readonly releaseBranch: string;
+  readonly expectedCommitSha: string;
+};
+
 export type CreateWebAppReleaseReservationBranchOptions = {
   readonly releaseBranch: string;
   readonly targetCommit: string;
@@ -81,6 +87,7 @@ export type ReserveWebAppReleaseOptions = {
 export type ContinueActiveWebAppReleaseDependencies = {
   readonly readStableWebAppReleases: () => Promise<Result<readonly StableWebAppRelease[], Error>>;
   readonly readRemoteReleaseBranches: () => Promise<Result<readonly WebAppReleaseBranchRef[], Error>>;
+  readonly prepareRemoteReleaseBranchCommit: (options: PrepareRemoteReleaseBranchCommitOptions) => Task<Unit, Error>;
   readonly isCommitAncestor: (options: VerifyWebAppReleaseCommitAncestorOptions) => Promise<Result<boolean, Error>>;
 };
 
@@ -371,6 +378,16 @@ async function executeWebAppReleaseContinuation(
   const activeVersionResult = parseWebAppReleaseBranchName(activeReservation.releaseBranch);
   if (activeVersionResult.isErr) {
     return Result.err(activeVersionResult.error);
+  }
+
+  const preparedReleaseCommitResult = await options.dependencies
+    .prepareRemoteReleaseBranchCommit({
+      releaseBranch: activeReservation.releaseBranch,
+      expectedCommitSha: activeReservation.releaseCommitSha,
+    })
+    .toPromise();
+  if (preparedReleaseCommitResult.isErr) {
+    return Result.err(preparedReleaseCommitResult.error);
   }
 
   const stableBaseIsAncestorResult = await options.dependencies.isCommitAncestor({

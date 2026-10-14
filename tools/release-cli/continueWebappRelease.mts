@@ -32,11 +32,13 @@ import type {WebAppReleaseContinuationCommandOptions} from './webAppReleaseConti
 import {continueActiveWebAppRelease} from '../release-metadata/webappReleaseReservation.ts';
 import type {
   ContinueActiveWebAppReleaseDependencies,
+  PrepareRemoteReleaseBranchCommitOptions,
   VerifyWebAppReleaseCommitAncestorOptions,
 } from '../release-metadata/webappReleaseReservation.ts';
 import {
   readRemoteWebAppReleaseBranches,
   isWebAppReleaseCommitAncestor,
+  prepareRemoteWebAppReleaseBranchCommit,
 } from '../release-metadata/webappReleaseReservationGit.ts';
 import {discoverStableWebAppReleases} from '../release-metadata/webappStableReleaseGit.ts';
 
@@ -77,10 +79,21 @@ function verifyStableBaseAncestry(
   });
 }
 
+function prepareRemoteReleaseBranchCommit(
+  options: PrepareRemoteReleaseBranchCommitOptions,
+): ReturnType<typeof prepareRemoteWebAppReleaseBranchCommit> {
+  return prepareRemoteWebAppReleaseBranchCommit({
+    ...options,
+    executeGitCommand: executeRuntimeGitCommand,
+    remoteName: originRemoteName,
+  });
+}
+
 function createContinuationDependencies(): ContinueActiveWebAppReleaseDependencies {
   return {
     readStableWebAppReleases,
     readRemoteReleaseBranches,
+    prepareRemoteReleaseBranchCommit,
     isCommitAncestor: verifyStableBaseAncestry,
   };
 }
