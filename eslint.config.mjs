@@ -350,6 +350,13 @@ const productionConfigs = [
   typescriptPlugin.configs['flat/eslint-recommended'],
   reactPlugin.configs.flat.recommended,
   reactPlugin.configs.flat['jsx-runtime'],
+  {
+    files: ['apps/webapp/src/**/*.{jsx,tsx}', 'libraries/react-ui-kit/src/**/*.{jsx,tsx}'],
+    rules: {
+      'react/forbid-dom-props': ['warn', {forbid: ['data-testid']}],
+      'react/forbid-component-props': ['warn', {forbid: ['data-testid']}],
+    },
+  },
   eslintConfigPrettier,
   {
     plugins: productionPlugins,
