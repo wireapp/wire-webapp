@@ -481,9 +481,7 @@ describe('WebApp release reservation Git adapter', () => {
 
       const commandHistory: string[][] = [];
       let advancedCommit: string | undefined;
-      const executeGitCommand: ExecuteWebAppReleaseGitCommand = async function executeGitCommand(
-        commandArguments,
-      ): Promise<string> {
+      const executeGitCommand: ExecuteWebAppReleaseGitCommand = async (commandArguments): Promise<string> => {
         commandHistory.push([...commandArguments]);
 
         if (commandArguments.at(0) === 'fetch' && advancedCommit === undefined) {
