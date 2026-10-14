@@ -28,7 +28,7 @@ import {parseWebAppProductionRelease} from '../release-metadata/webappProduction
 
 export type ProductionDistributionManifest = {
   readonly productionTag: null;
-  readonly releaseIdentifier: string;
+  readonly releaseVersion: string;
   readonly releaseCommitSha: string;
   readonly artifactVersion: string;
   readonly cloudArtifactChecksum: string;
@@ -36,7 +36,7 @@ export type ProductionDistributionManifest = {
   readonly sourceRunAttempt: string;
 };
 
-export type DistributionManifestValidationParameters = {
+export type DistributionManifestValidationOptions = {
   readonly artifactMetadata: unknown;
   readonly manifest: unknown;
   readonly productionTag: string;
@@ -90,7 +90,7 @@ function validateProductionDistributionArtifactMetadata(
     }
 
     if (artifactMetadata.version !== productionBuildVersion) {
-      return Result.err(new Error('Distribution artifact version does not match the release identifier'));
+      return Result.err(new Error('Distribution artifact version does not match the release version'));
     }
 
     if (artifactMetadata.commit !== releaseCommitSha) {
@@ -124,49 +124,46 @@ function validateProductionDistributionArtifactMetadata(
 }
 
 export function validateProductionDistributionManifest(
-  parameters: DistributionManifestValidationParameters,
+  options: DistributionManifestValidationOptions,
 ): Result<ProductionDistributionManifest, Error> {
-  const productionReleaseResult = parseWebAppProductionRelease(parameters.productionTag);
+  const productionReleaseResult = parseWebAppProductionRelease(options.productionTag);
 
   if (productionReleaseResult.isErr) {
     return Result.err(productionReleaseResult.error);
   }
 
-  if (parameters.productionTagCommitSha.length === 0) {
+  if (options.productionTagCommitSha.length === 0) {
     return Result.err(new Error('Production tag commit SHA must not be empty'));
   }
 
-  if (parameters.expectedCommitSha !== undefined) {
-    if (
-      parameters.expectedCommitSha.length === 0 ||
-      parameters.expectedCommitSha !== parameters.productionTagCommitSha
-    ) {
+  if (options.expectedCommitSha !== undefined) {
+    if (options.expectedCommitSha.length === 0 || options.expectedCommitSha !== options.productionTagCommitSha) {
       return Result.err(new Error('Production tag commit does not match the expected commit SHA'));
     }
   }
 
-  if (!isRecord(parameters.manifest)) {
+  if (!isRecord(options.manifest)) {
     return Result.err(new Error('Distribution manifest must be a JSON object'));
   }
 
   const productionRelease = productionReleaseResult.value;
   const productionBuildVersion = productionRelease.buildVersion;
-  const manifestReleaseIdentifier = getNonEmptyString(parameters.manifest.releaseIdentifier);
-  const manifestReleaseCommitSha = getNonEmptyString(parameters.manifest.releaseCommitSha);
-  const artifactVersion = getNonEmptyString(parameters.manifest.artifactVersion);
-  const cloudArtifactChecksum = getNonEmptyString(parameters.manifest.cloudArtifactChecksum);
-  const sourceRunId = getNonEmptyString(parameters.manifest.sourceRunId);
-  const sourceRunAttempt = getNonEmptyString(parameters.manifest.sourceRunAttempt);
+  const manifestReleaseVersion = getNonEmptyString(options.manifest.releaseIdentifier);
+  const manifestReleaseCommitSha = getNonEmptyString(options.manifest.releaseCommitSha);
+  const artifactVersion = getNonEmptyString(options.manifest.artifactVersion);
+  const cloudArtifactChecksum = getNonEmptyString(options.manifest.cloudArtifactChecksum);
+  const sourceRunId = getNonEmptyString(options.manifest.sourceRunId);
+  const sourceRunAttempt = getNonEmptyString(options.manifest.sourceRunAttempt);
 
-  if (parameters.manifest.productionTag !== null) {
+  if (options.manifest.productionTag !== null) {
     return Result.err(new Error('Distribution manifest productionTag must be null before publication'));
   }
 
-  if (manifestReleaseIdentifier !== productionBuildVersion) {
-    return Result.err(new Error('Distribution manifest release identifier does not match the Production tag'));
+  if (manifestReleaseVersion !== productionBuildVersion) {
+    return Result.err(new Error('Distribution manifest release version does not match the Production tag'));
   }
 
-  if (manifestReleaseCommitSha !== parameters.productionTagCommitSha) {
+  if (manifestReleaseCommitSha !== options.productionTagCommitSha) {
     return Result.err(new Error('Distribution manifest release commit does not match the Production tag commit'));
   }
 
@@ -175,10 +172,10 @@ export function validateProductionDistributionManifest(
   }
 
   const artifactMetadataResult = validateProductionDistributionArtifactMetadata(
-    parameters.artifactMetadata,
+    options.artifactMetadata,
     artifactVersion,
     productionBuildVersion,
-    parameters.productionTagCommitSha,
+    options.productionTagCommitSha,
     productionRelease.kind === 'legacy',
   );
 
@@ -190,7 +187,7 @@ export function validateProductionDistributionManifest(
     return Result.err(new Error('Distribution manifest cloud artifact checksum must not be empty'));
   }
 
-  if (sourceRunId !== parameters.sourceRunId) {
+  if (sourceRunId !== options.sourceRunId) {
     return Result.err(new Error('Distribution manifest source run ID does not match the supplied source run ID'));
   }
 
@@ -200,8 +197,8 @@ export function validateProductionDistributionManifest(
 
   return Result.ok({
     productionTag: null,
-    releaseIdentifier: productionBuildVersion,
-    releaseCommitSha: parameters.productionTagCommitSha,
+    releaseVersion: productionBuildVersion,
+    releaseCommitSha: options.productionTagCommitSha,
     artifactVersion,
     cloudArtifactChecksum,
     sourceRunId,

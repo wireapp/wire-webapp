@@ -28,8 +28,9 @@ import type {WebappReleaseSummaryInput} from './renderWebappReleaseSummary.ts';
 
 const releaseCommitSha = '1234567890abcdef1234567890abcdef12345678';
 const sourceCommitSha = 'abcdef1234567890abcdef1234567890abcdef12';
-const betaTagName = '2026-07-17.1-beta.1';
-const productionTagName = '2026-07-17.1-production';
+const releaseVersion = '1.1.0';
+const betaTagName = 'v1.1.0-beta.1';
+const productionTagName = 'v1.1.0';
 const githubReleaseUrl = `https://github.com/wireapp/wire-webapp/releases/tag/${productionTagName}`;
 
 const baselineWebappReleaseSummaryInput: WebappReleaseSummaryInput = {
@@ -58,7 +59,7 @@ const baselineWebappReleaseSummaryInput: WebappReleaseSummaryInput = {
     result: Maybe.just('success'),
     runtimeBackendRest: Maybe.just('https://e2e-backend.example.com'),
     runtimeBackendWebSocket: Maybe.just('wss://e2e-backend.example.com'),
-    testinyRunName: Maybe.just('Release 2026-07-17.1 2026-07-17.1-beta.1'),
+    testinyRunName: Maybe.just('Release 1.1.0 v1.1.0-beta.1'),
     webappUrl: Maybe.just('https://e2e.example.com'),
   },
   github: {
@@ -77,6 +78,7 @@ const baselineWebappReleaseSummaryInput: WebappReleaseSummaryInput = {
   },
   preparation: {
     branchAction: Maybe.just('created'),
+    operation: Maybe.just('start'),
     sourceCommitSha: Maybe.just(sourceCommitSha),
     sourceRef: Maybe.just('main'),
   },
@@ -98,25 +100,17 @@ const baselineWebappReleaseSummaryInput: WebappReleaseSummaryInput = {
     webappUrl: Maybe.just('https://production.example.com'),
   },
   release: {
-    artifactAssetVersion: Maybe.just('2026-07-17.1-1234567'),
+    artifactAssetVersion: Maybe.just('1.1.0-1234567'),
     artifactBuiltAt: Maybe.just('2026-07-20T06:18:03.123Z'),
     artifactChecksum: Maybe.just('sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'),
-    artifactName: Maybe.just('wire-webapp-release-2026-07-17.1'),
-    artifactVersion: Maybe.just('2026-07-17.1'),
-    branch: Maybe.just('release/2026-07-17.1'),
+    artifactName: Maybe.just('wire-webapp-release-1.1.0'),
+    artifactVersion: Maybe.just(releaseVersion),
+    branch: Maybe.just('release/1.1.0'),
     commitSha: Maybe.just(releaseCommitSha),
-    identifier: Maybe.just('2026-07-17.1'),
+    version: Maybe.just(releaseVersion),
     manualReason: Maybe.nothing<string>(),
   },
   webAppVersionSynchronization: {
-    initialPreflightJobResult: Maybe.nothing(),
-    initialPreflightPullRequestNumber: Maybe.nothing<string>(),
-    initialPreflightPullRequestUrl: Maybe.nothing<string>(),
-    initialPreflightState: Maybe.nothing(),
-    productionPreflightJobResult: Maybe.nothing(),
-    productionPreflightPullRequestNumber: Maybe.nothing<string>(),
-    productionPreflightPullRequestUrl: Maybe.nothing<string>(),
-    productionPreflightState: Maybe.nothing(),
     synchronizationAction: Maybe.nothing(),
     synchronizationBranchName: Maybe.nothing<string>(),
     synchronizationJobResult: Maybe.nothing(),
@@ -179,10 +173,6 @@ function createCompletedProductionReleaseInput(
     },
     webAppVersionSynchronization: {
       ...baselineWebappReleaseSummaryInput.webAppVersionSynchronization,
-      initialPreflightJobResult: Maybe.just('success'),
-      initialPreflightState: Maybe.just('available'),
-      productionPreflightJobResult: Maybe.just('success'),
-      productionPreflightState: Maybe.just('available'),
       synchronizationJobResult: Maybe.just(synchronizationJobResult),
     },
   };
@@ -223,12 +213,13 @@ function assertMarkdownContract(summary: string, includesDistribution: boolean):
 function assertVisibleIdentity(summary: string): void {
   const visibleContent = visibleSummary(summary);
 
-  expect(visibleContent).toContain('- Release: `2026-07-17.1`');
-  expect(visibleContent).toContain('- Release branch: `release/2026-07-17.1`');
+  expect(visibleContent).toContain('- Operation: `start`');
+  expect(visibleContent).toContain('- Release: `1.1.0`');
+  expect(visibleContent).toContain('- Release branch: `release/1.1.0`');
   expect(visibleContent).toContain(
     `- Commit: [${releaseCommitSha}](https://github.com/wireapp/wire-webapp/commit/${releaseCommitSha})`,
   );
-  expect(visibleContent).toContain('- Webapp version: `2026-07-17.1`');
+  expect(visibleContent).toContain('- Webapp version: `1.1.0`');
   expect(visibleContent).toContain(
     '- Workflow run: [https://github.com/wireapp/wire-webapp/actions/runs/123456789](https://github.com/wireapp/wire-webapp/actions/runs/123456789)',
   );
@@ -286,6 +277,7 @@ describe('WebApp release summary renderer', () => {
       ...baselineWebappReleaseSummaryInput,
       preparation: {
         ...baselineWebappReleaseSummaryInput.preparation,
+        operation: Maybe.just('continue'),
         branchAction: Maybe.just('reused'),
         sourceCommitSha: Maybe.nothing<string>(),
         sourceRef: Maybe.nothing<string>(),
@@ -323,7 +315,7 @@ describe('WebApp release summary renderer', () => {
     expect(visibleContent).toContain('- Release distribution: not run');
     expect(detailsContent).toContain('- Production preflight result: skipped');
     expect(detailsContent).toContain('- Skip reason: Production preflight did not run');
-    expect(detailsContent).toContain('- Asset version: 2026-07-17.1-1234567');
+    expect(detailsContent).toContain('- Asset version: 1.1.0-1234567');
     expect(detailsContent).toContain('- Built at (UTC): 2026-07-20T06:18:03.123Z');
     expect(detailsContent).toContain(
       '- Artifact checksum: sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -378,16 +370,8 @@ describe('WebApp release summary renderer', () => {
         url: Maybe.just(githubReleaseUrl),
       },
       webAppVersionSynchronization: {
-        initialPreflightJobResult: Maybe.just('success'),
-        initialPreflightPullRequestNumber: Maybe.nothing<string>(),
-        initialPreflightPullRequestUrl: Maybe.nothing<string>(),
-        initialPreflightState: Maybe.just('available'),
-        productionPreflightJobResult: Maybe.just('success'),
-        productionPreflightPullRequestNumber: Maybe.nothing<string>(),
-        productionPreflightPullRequestUrl: Maybe.nothing<string>(),
-        productionPreflightState: Maybe.just('available'),
         synchronizationAction: Maybe.just('created'),
-        synchronizationBranchName: Maybe.just('webapp-version-2026-07-17.1-1.0.0'),
+        synchronizationBranchName: Maybe.just('webapp-version-1.1.0'),
         synchronizationJobResult: Maybe.just('success'),
         synchronizationPullRequestNumber: Maybe.just('123'),
         synchronizationPullRequestUrl: Maybe.just('https://github.com/wireapp/wire-webapp/pull/123'),
@@ -412,17 +396,15 @@ describe('WebApp release summary renderer', () => {
     expect(detailsContent).toContain('- Runtime verification result: verified successfully');
     expect(detailsContent).toContain('- Production approval result: approved');
     expect(detailsContent).toContain('- Production tag creation result: created successfully');
-    expect(detailsContent).toContain('- Docker image: quay.io/wire/webapp:2026-07-17.1-production-v0.34.9-0-1234567');
+    expect(detailsContent).toContain('- Docker image: quay.io/wire/webapp:v1.1.0-v0.34.9-0-1234567');
     expect(detailsContent).toContain('- Helm chart repository: https://charts.example.com/webapp');
     expect(visibleContent).toContain(
       `- GitHub Release handoff: completed successfully; action: new draft created; state: draft; URL: [GitHub Release](${githubReleaseUrl})`,
     );
     expect(visibleContent).toContain(
-      '- WebApp version synchronization: completed successfully; WebApp package version: `1.0.0`; Version synchronization action: PR created; Version synchronization PR: [#123](https://github.com/wireapp/wire-webapp/pull/123)',
+      '- Package synchronization: completed successfully; WebApp package version: `1.0.0`; Version synchronization action: PR created; Version synchronization PR: [#123](https://github.com/wireapp/wire-webapp/pull/123)',
     );
-    expect(detailsContent).toContain(
-      '- Initial preflight: job: completed successfully; state: available; PR: not available',
-    );
+    expect(detailsContent).toContain('### WebApp package synchronization');
     expect(detailsContent).toContain(
       '- Synchronization pull request: [#123](https://github.com/wireapp/wire-webapp/pull/123)',
     );
@@ -501,10 +483,6 @@ describe('WebApp release summary renderer', () => {
       },
       webAppVersionSynchronization: {
         ...baselineWebappReleaseSummaryInput.webAppVersionSynchronization,
-        initialPreflightJobResult: Maybe.just('success'),
-        initialPreflightState: Maybe.just('available'),
-        productionPreflightJobResult: Maybe.just('success'),
-        productionPreflightState: Maybe.just('available'),
         synchronizationJobResult: Maybe.just('failure'),
         webAppVersion: Maybe.just('1.0.0'),
       },
@@ -514,12 +492,14 @@ describe('WebApp release summary renderer', () => {
     const detailsContent = technicalEvidence(summary);
 
     expect(visibleContent).toContain(
-      '- Outcome: Production release completed successfully, but WebApp version synchronization bookkeeping is incomplete',
+      '- Outcome: Production release completed successfully; package synchronization bookkeeping requires follow-up',
     );
     expect(visibleContent).toContain('- Hosted Production: deployed, verified, and tagged successfully');
-    expect(visibleContent).toContain('- WebApp version synchronization: failed; release bookkeeping incomplete');
+    expect(visibleContent).toContain(
+      '- Package synchronization: failed; package synchronization bookkeeping incomplete',
+    );
     expect(detailsContent).toContain('- Synchronization job: failed');
-    expect(detailsContent).toContain('- WebApp package version: `1.0.0`');
+    expect(detailsContent).toContain('- Synchronized version: `1.0.0`');
   });
 
   const skippedSynchronizationAfterFailedReleaseScenarios: readonly ReleaseSummaryOutcomeScenario[] = [
@@ -607,7 +587,7 @@ describe('WebApp release summary renderer', () => {
       const visibleContent = visibleSummary(summary);
 
       expect(visibleContent).toContain(`- Outcome: ${expectedOutcome}`);
-      expect(visibleContent).toContain('- WebApp version synchronization: not run');
+      expect(visibleContent).toContain('- Package synchronization: not run');
       expect(visibleContent).not.toContain('bookkeeping incomplete');
     },
   );
@@ -616,17 +596,17 @@ describe('WebApp release summary renderer', () => {
     {
       name: 'failure',
       synchronizationJobResult: 'failure',
-      expectedStage: 'failed; release bookkeeping incomplete',
+      expectedStage: 'failed; package synchronization bookkeeping incomplete',
     },
     {
       name: 'cancellation',
       synchronizationJobResult: 'cancelled',
-      expectedStage: 'cancelled; release bookkeeping incomplete',
+      expectedStage: 'cancelled; package synchronization bookkeeping incomplete',
     },
     {
       name: 'unexpected skip',
       synchronizationJobResult: 'skipped',
-      expectedStage: 'not run; release bookkeeping incomplete',
+      expectedStage: 'not run; package synchronization bookkeeping incomplete',
     },
   ];
 
@@ -639,9 +619,9 @@ describe('WebApp release summary renderer', () => {
       const visibleContent = visibleSummary(summary);
 
       expect(visibleContent).toContain(
-        '- Outcome: Production release completed successfully, but WebApp version synchronization bookkeeping is incomplete',
+        '- Outcome: Production release completed successfully; package synchronization bookkeeping requires follow-up',
       );
-      expect(visibleContent).toContain(`- WebApp version synchronization: ${scenario.expectedStage}`);
+      expect(visibleContent).toContain(`- Package synchronization: ${scenario.expectedStage}`);
     },
   );
 
@@ -783,7 +763,7 @@ describe('WebApp release summary renderer', () => {
     expect(visibleContent).toContain(
       `- GitHub Release handoff: completed successfully; action: existing draft verified; state: draft; URL: [GitHub Release](${githubReleaseUrl})`,
     );
-    expect(detailsContent).toContain('- Production tag: [2026-07-17.1-production]');
+    expect(detailsContent).toContain('- Production tag: [v1.1.0]');
     expect(detailsContent).toContain('- Action: existing draft verified');
     expect(detailsContent).toContain('- Production tag creation result: not required; tag already exists');
     expect(summary).not.toContain('created-production-tag');
@@ -1232,6 +1212,7 @@ describe('WebApp release summary renderer', () => {
       },
       preparation: {
         branchAction: Maybe.nothing(),
+        operation: Maybe.nothing(),
         sourceCommitSha: Maybe.nothing<string>(),
         sourceRef: Maybe.nothing<string>(),
       },
@@ -1244,7 +1225,7 @@ describe('WebApp release summary renderer', () => {
         artifactVersion: Maybe.nothing<string>(),
         branch: Maybe.nothing<string>(),
         commitSha: Maybe.nothing<string>(),
-        identifier: Maybe.nothing<string>(),
+        version: Maybe.nothing<string>(),
       },
     };
     const finalSummary = renderWebappReleaseSummary(input);
@@ -1273,7 +1254,7 @@ describe('WebApp release summary renderer', () => {
 
   it('reads the Production deployment requirement from the workflow environment', () => {
     const input = readWebappReleaseSummaryInput({
-      ARTIFACT_ASSET_VERSION: '2026-07-17.1-1234567',
+      ARTIFACT_ASSET_VERSION: '1.1.0-1234567',
       ARTIFACT_BUILT_AT: '2026-07-20T06:18:03.123Z',
       GITHUB_RELEASE_ACTION: 'created',
       GITHUB_RELEASE_JOB_RESULT: 'success',
@@ -1285,24 +1266,24 @@ describe('WebApp release summary renderer', () => {
       PRODUCTION_CURRENT_BETA_VERIFICATION_RESULT: 'success',
       RELEASE_ACTOR: 'release-captain',
       RELEASE_BRANCH_ACTION: 'created',
+      RELEASE_OPERATION: 'start',
+      RELEASE_VERSION: releaseVersion,
       SOURCE_COMMIT_SHA: sourceCommitSha,
       SOURCE_REF: 'main',
       WEBAPP_VERSION: '1.0.0',
       WEBAPP_VERSION_SYNC_ACTION: 'created',
-      WEBAPP_VERSION_SYNC_BRANCH_NAME: 'webapp-version-2026-07-17.1-1.0.0',
-      WEBAPP_VERSION_SYNC_INITIAL_PREFLIGHT_JOB_RESULT: 'success',
-      WEBAPP_VERSION_SYNC_INITIAL_PREFLIGHT_STATE: 'available',
+      WEBAPP_VERSION_SYNC_BRANCH_NAME: 'webapp-version-1.1.0',
       WEBAPP_VERSION_SYNC_JOB_RESULT: 'success',
       WEBAPP_VERSION_SYNC_PR_NUMBER: '123',
       WEBAPP_VERSION_SYNC_PR_URL: 'https://github.com/wireapp/wire-webapp/pull/123',
-      WEBAPP_VERSION_SYNC_PRODUCTION_PREFLIGHT_JOB_RESULT: 'success',
-      WEBAPP_VERSION_SYNC_PRODUCTION_PREFLIGHT_STATE: 'available',
     });
 
-    expect(input.release.artifactAssetVersion.unwrapOr('not available')).toBe('2026-07-17.1-1234567');
+    expect(input.release.artifactAssetVersion.unwrapOr('not available')).toBe('1.1.0-1234567');
     expect(input.release.artifactBuiltAt.unwrapOr('not available')).toBe('2026-07-20T06:18:03.123Z');
     expect(input.github.actor.unwrapOr('not available')).toBe('release-captain');
     expect(input.preparation.branchAction.unwrapOr('reused')).toBe('created');
+    expect(input.preparation.operation.unwrapOr('continue')).toBe('start');
+    expect(input.release.version.unwrapOr('not available')).toBe(releaseVersion);
     expect(input.preparation.sourceCommitSha.unwrapOr('not available')).toBe(sourceCommitSha);
     expect(input.preparation.sourceRef.unwrapOr('not available')).toBe('main');
     expect(input.production.deploymentRequired.unwrapOr(false)).toBe(true);
@@ -1316,15 +1297,13 @@ describe('WebApp release summary renderer', () => {
     expect(input.webAppVersionSynchronization.webAppVersion.unwrapOr('not available')).toBe('1.0.0');
     expect(input.webAppVersionSynchronization.synchronizationAction.unwrapOr('already-merged')).toBe('created');
     expect(input.webAppVersionSynchronization.synchronizationBranchName.unwrapOr('not available')).toBe(
-      'webapp-version-2026-07-17.1-1.0.0',
+      'webapp-version-1.1.0',
     );
     expect(input.webAppVersionSynchronization.synchronizationJobResult.unwrapOr('failure')).toBe('success');
     expect(input.webAppVersionSynchronization.synchronizationPullRequestNumber.unwrapOr('not available')).toBe('123');
     expect(input.webAppVersionSynchronization.synchronizationPullRequestUrl.unwrapOr('not available')).toBe(
       'https://github.com/wireapp/wire-webapp/pull/123',
     );
-    expect(input.webAppVersionSynchronization.initialPreflightState.unwrapOr('conflict')).toBe('available');
-    expect(input.webAppVersionSynchronization.productionPreflightState.unwrapOr('conflict')).toBe('available');
   });
 
   it('does not create a link for an invalid E2E report URL', () => {

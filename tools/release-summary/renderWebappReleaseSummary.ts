@@ -32,7 +32,7 @@ export type ReleaseMetadata = {
   readonly artifactVersion: Maybe<string>;
   readonly branch: Maybe<string>;
   readonly commitSha: Maybe<string>;
-  readonly identifier: Maybe<string>;
+  readonly version: Maybe<string>;
   readonly manualReason: Maybe<string>;
 };
 
@@ -99,25 +99,9 @@ export type GitHubReleaseSummaryInput = {
   readonly url: Maybe<string>;
 };
 
-export type WebAppVersionSynchronizationPreflightState =
-  | 'available'
-  | 'matching-open'
-  | 'matching-merged'
-  | 'closed-without-merge'
-  | 'blocked-by-previous-unresolved'
-  | 'conflict';
-
 export type WebAppVersionSynchronizationAction = 'already-open' | 'already-merged' | 'created' | 'recovered';
 
 export type WebAppVersionSynchronizationSummaryInput = {
-  readonly initialPreflightJobResult: Maybe<WorkflowJobResult>;
-  readonly initialPreflightPullRequestNumber: Maybe<string>;
-  readonly initialPreflightPullRequestUrl: Maybe<string>;
-  readonly initialPreflightState: Maybe<WebAppVersionSynchronizationPreflightState>;
-  readonly productionPreflightJobResult: Maybe<WorkflowJobResult>;
-  readonly productionPreflightPullRequestNumber: Maybe<string>;
-  readonly productionPreflightPullRequestUrl: Maybe<string>;
-  readonly productionPreflightState: Maybe<WebAppVersionSynchronizationPreflightState>;
   readonly synchronizationAction: Maybe<WebAppVersionSynchronizationAction>;
   readonly synchronizationBranchName: Maybe<string>;
   readonly synchronizationJobResult: Maybe<WorkflowJobResult>;
@@ -134,8 +118,11 @@ export type GitHubLinkContext = {
   readonly wireBuildsRepository: Maybe<string>;
 };
 
+export type ReleaseOperation = 'start' | 'continue';
+
 export type ReleasePreparationSummaryInput = {
   readonly branchAction: Maybe<ReleaseBranchAction>;
+  readonly operation: Maybe<ReleaseOperation>;
   readonly sourceCommitSha: Maybe<string>;
   readonly sourceRef: Maybe<string>;
 };
@@ -152,7 +139,7 @@ export type WebappReleaseSummaryInput = {
   readonly webAppVersionSynchronization: WebAppVersionSynchronizationSummaryInput;
 };
 
-type RenderReleaseIdentityParameters = {
+type RenderReleaseIdentityOptions = {
   readonly title: string;
   readonly outcome: string;
   readonly input: WebappReleaseSummaryInput;
@@ -213,6 +200,20 @@ function readProductionPreflightResult(environment: NodeJS.ProcessEnv): Maybe<Pr
   });
 }
 
+function readReleaseOperation(environment: NodeJS.ProcessEnv): Maybe<ReleaseOperation> {
+  const environmentValue = readOptionalEnvironmentValue(environment, 'RELEASE_OPERATION');
+
+  return environmentValue.andThen(operation => {
+    return match(operation)
+      .with(P.union('start', 'continue'), validOperation => {
+        return Maybe.just(validOperation);
+      })
+      .otherwise(() => {
+        return Maybe.nothing<ReleaseOperation>();
+      });
+  });
+}
+
 function readReleaseBranchAction(environment: NodeJS.ProcessEnv): Maybe<ReleaseBranchAction> {
   const environmentValue = readOptionalEnvironmentValue(environment, 'RELEASE_BRANCH_ACTION');
 
@@ -251,33 +252,6 @@ function readGitHubReleaseState(environment: NodeJS.ProcessEnv): Maybe<GitHubRel
       })
       .otherwise(() => {
         return Maybe.nothing<GitHubReleaseState>();
-      });
-  });
-}
-
-function readWebAppVersionSynchronizationPreflightState(
-  environment: NodeJS.ProcessEnv,
-  variableName: string,
-): Maybe<WebAppVersionSynchronizationPreflightState> {
-  const environmentValue = readOptionalEnvironmentValue(environment, variableName);
-
-  return environmentValue.andThen(value => {
-    return match(value)
-      .with(
-        P.union(
-          'available',
-          'matching-open',
-          'matching-merged',
-          'closed-without-merge',
-          'blocked-by-previous-unresolved',
-          'conflict',
-        ),
-        validState => {
-          return Maybe.just(validState);
-        },
-      )
-      .otherwise(() => {
-        return Maybe.nothing<WebAppVersionSynchronizationPreflightState>();
       });
   });
 }
@@ -361,6 +335,7 @@ export function readWebappReleaseSummaryInput(environment: NodeJS.ProcessEnv): W
     },
     preparation: {
       branchAction: readReleaseBranchAction(environment),
+      operation: readReleaseOperation(environment),
       sourceCommitSha: readOptionalEnvironmentValue(environment, 'SOURCE_COMMIT_SHA'),
       sourceRef: readOptionalEnvironmentValue(environment, 'SOURCE_REF'),
     },
@@ -372,39 +347,10 @@ export function readWebappReleaseSummaryInput(environment: NodeJS.ProcessEnv): W
       artifactVersion: readOptionalEnvironmentValue(environment, 'ARTIFACT_VERSION'),
       branch: readOptionalEnvironmentValue(environment, 'RELEASE_BRANCH'),
       commitSha: readOptionalEnvironmentValue(environment, 'RELEASE_COMMIT_SHA'),
-      identifier: readOptionalEnvironmentValue(environment, 'RELEASE_IDENTIFIER'),
+      version: readOptionalEnvironmentValue(environment, 'RELEASE_VERSION'),
       manualReason: readOptionalEnvironmentValue(environment, 'RELEASE_REASON'),
     },
     webAppVersionSynchronization: {
-      initialPreflightJobResult: readWorkflowJobResult(environment, 'WEBAPP_VERSION_SYNC_INITIAL_PREFLIGHT_JOB_RESULT'),
-      initialPreflightPullRequestNumber: readOptionalEnvironmentValue(
-        environment,
-        'WEBAPP_VERSION_SYNC_INITIAL_PREFLIGHT_PR_NUMBER',
-      ),
-      initialPreflightPullRequestUrl: readOptionalEnvironmentValue(
-        environment,
-        'WEBAPP_VERSION_SYNC_INITIAL_PREFLIGHT_PR_URL',
-      ),
-      initialPreflightState: readWebAppVersionSynchronizationPreflightState(
-        environment,
-        'WEBAPP_VERSION_SYNC_INITIAL_PREFLIGHT_STATE',
-      ),
-      productionPreflightJobResult: readWorkflowJobResult(
-        environment,
-        'WEBAPP_VERSION_SYNC_PRODUCTION_PREFLIGHT_JOB_RESULT',
-      ),
-      productionPreflightPullRequestNumber: readOptionalEnvironmentValue(
-        environment,
-        'WEBAPP_VERSION_SYNC_PRODUCTION_PREFLIGHT_PR_NUMBER',
-      ),
-      productionPreflightPullRequestUrl: readOptionalEnvironmentValue(
-        environment,
-        'WEBAPP_VERSION_SYNC_PRODUCTION_PREFLIGHT_PR_URL',
-      ),
-      productionPreflightState: readWebAppVersionSynchronizationPreflightState(
-        environment,
-        'WEBAPP_VERSION_SYNC_PRODUCTION_PREFLIGHT_STATE',
-      ),
       synchronizationAction: readWebAppVersionSynchronizationAction(environment),
       synchronizationBranchName: readOptionalEnvironmentValue(environment, 'WEBAPP_VERSION_SYNC_BRANCH_NAME'),
       synchronizationJobResult: readWorkflowJobResult(environment, 'WEBAPP_VERSION_SYNC_JOB_RESULT'),
@@ -728,14 +674,6 @@ function formatGitHubReleaseStageOverview(input: WebappReleaseSummaryInput): str
   ].join('; ');
 }
 
-function formatWebAppVersionSynchronizationPreflightState(
-  state: Maybe<WebAppVersionSynchronizationPreflightState>,
-): string {
-  return state.mapOr('not available', actualState => {
-    return actualState;
-  });
-}
-
 function formatWebAppVersionSynchronizationAction(action: Maybe<WebAppVersionSynchronizationAction>): string {
   return action.mapOr('not available', actualAction => {
     return match(actualAction)
@@ -768,19 +706,6 @@ function formatWebAppVersionSynchronizationPullRequest(
     .unwrapOr('not available');
 }
 
-function formatWebAppVersionSynchronizationPreflight(
-  jobResult: Maybe<WorkflowJobResult>,
-  state: Maybe<WebAppVersionSynchronizationPreflightState>,
-  pullRequestNumber: Maybe<string>,
-  pullRequestUrl: Maybe<string>,
-): string {
-  return [
-    `job: ${formatWorkflowJobResult(jobResult)}`,
-    `state: ${formatWebAppVersionSynchronizationPreflightState(state)}`,
-    `PR: ${formatWebAppVersionSynchronizationPullRequest(pullRequestNumber, pullRequestUrl)}`,
-  ].join('; ');
-}
-
 function formatWebAppVersionSynchronizationStageOverview(input: WebappReleaseSummaryInput): string {
   const synchronizationJobResult = input.webAppVersionSynchronization.synchronizationJobResult;
   const bookkeepingIncomplete = isWebAppVersionSynchronizationBookkeepingIncomplete(input);
@@ -788,13 +713,13 @@ function formatWebAppVersionSynchronizationStageOverview(input: WebappReleaseSum
   return synchronizationJobResult.mapOr('not available', actualSynchronizationJobResult => {
     return match({actualSynchronizationJobResult, bookkeepingIncomplete})
       .with({actualSynchronizationJobResult: 'failure', bookkeepingIncomplete: true}, () => {
-        return 'failed; release bookkeeping incomplete';
+        return 'failed; package synchronization bookkeeping incomplete';
       })
       .with({actualSynchronizationJobResult: 'cancelled', bookkeepingIncomplete: true}, () => {
-        return 'cancelled; release bookkeeping incomplete';
+        return 'cancelled; package synchronization bookkeeping incomplete';
       })
       .with({actualSynchronizationJobResult: 'skipped', bookkeepingIncomplete: true}, () => {
-        return 'not run; release bookkeeping incomplete';
+        return 'not run; package synchronization bookkeeping incomplete';
       })
       .with({actualSynchronizationJobResult: 'failure'}, () => {
         return 'failed';
@@ -1559,7 +1484,7 @@ function formatFinalReleaseOutcome(input: WebappReleaseSummaryInput): string {
   }
 
   if (isWebAppVersionSynchronizationBookkeepingIncomplete(input)) {
-    return 'Production release completed successfully, but WebApp version synchronization bookkeeping is incomplete';
+    return 'Production release completed successfully; package synchronization bookkeeping requires follow-up';
   }
 
   if (
@@ -1691,12 +1616,15 @@ function formatDistributionPublicationEvidence(
   return evidence.join(', ');
 }
 
-function renderReleaseIdentity({title, outcome, input}: RenderReleaseIdentityParameters): string {
+function renderReleaseIdentity(options: RenderReleaseIdentityOptions): string {
+  const {title, outcome, input} = options;
+
   const identityLines = [
     title,
     '',
     `- Outcome: ${outcome}`,
-    `- Release: ${formatCodeValue(input.release.identifier)}`,
+    `- Operation: ${formatCodeValue(input.preparation.operation)}`,
+    `- Release: ${formatCodeValue(input.release.version)}`,
     `- Release branch: ${formatCodeValue(input.release.branch)}`,
     `- Commit: ${formatCommitLink(input.release.commitSha, input.github)}`,
     `- Webapp version: ${formatCodeValue(input.release.artifactVersion)}`,
@@ -1727,7 +1655,7 @@ function renderBetaSection(input: WebappReleaseSummaryInput): string {
 
 function renderE2ESection(input: WebappReleaseSummaryInput): string {
   const testinyRunName =
-    input.release.identifier.isJust && input.beta.tagName.isJust
+    input.release.version.isJust && input.beta.tagName.isJust
       ? formatValueOrFallback(input.e2e.testinyRunName)
       : 'not run';
 
@@ -1805,23 +1733,11 @@ function renderWebAppVersionSynchronizationSection(input: WebappReleaseSummaryIn
   const synchronization = input.webAppVersionSynchronization;
 
   return [
-    '### WebApp version synchronization',
+    '### WebApp package synchronization',
     '',
-    `- Initial preflight: ${formatWebAppVersionSynchronizationPreflight(
-      synchronization.initialPreflightJobResult,
-      synchronization.initialPreflightState,
-      synchronization.initialPreflightPullRequestNumber,
-      synchronization.initialPreflightPullRequestUrl,
-    )}`,
-    `- Production preflight: ${formatWebAppVersionSynchronizationPreflight(
-      synchronization.productionPreflightJobResult,
-      synchronization.productionPreflightState,
-      synchronization.productionPreflightPullRequestNumber,
-      synchronization.productionPreflightPullRequestUrl,
-    )}`,
     `- Synchronization job: ${formatWorkflowJobResult(synchronization.synchronizationJobResult)}`,
-    `- WebApp package version: ${formatCodeValue(synchronization.webAppVersion)}`,
-    `- Synchronization action: ${formatWebAppVersionSynchronizationAction(synchronization.synchronizationAction)}`,
+    `- Synchronized version: ${formatCodeValue(synchronization.webAppVersion)}`,
+    `- Action: ${formatWebAppVersionSynchronizationAction(synchronization.synchronizationAction)}`,
     `- Synchronization branch: ${formatValueOrFallback(synchronization.synchronizationBranchName)}`,
     `- Synchronization pull request: ${formatWebAppVersionSynchronizationPullRequest(
       synchronization.synchronizationPullRequestNumber,
@@ -1838,7 +1754,8 @@ function renderReleasePreparationSection(input: WebappReleaseSummaryInput): stri
   return [
     '### Release preparation',
     '',
-    `- Release identifier: ${formatValueOrFallback(input.release.identifier)}`,
+    `- Operation: ${formatValueOrFallback(input.preparation.operation)}`,
+    `- Release version: ${formatValueOrFallback(input.release.version)}`,
     `- Release branch: ${formatValueOrFallback(input.release.branch)}`,
     `- Branch action: ${formatReleaseBranchAction(input.preparation.branchAction)}`,
     `- Branch creation source: ${formatBranchCreationSource(input)}`,
@@ -1924,7 +1841,7 @@ export function renderWebappReleaseSummary(input: WebappReleaseSummaryInput): st
       `- Hosted Production: ${productionOverview}`,
       `- Release distribution: ${distributionOverview}`,
       `- GitHub Release handoff: ${formatGitHubReleaseStageOverview(input)}`,
-      `- WebApp version synchronization: ${formatWebAppVersionSynchronizationStageOverview(input)}`,
+      `- Package synchronization: ${formatWebAppVersionSynchronizationStageOverview(input)}`,
     ].join('\n'),
   ].join('\n\n');
 

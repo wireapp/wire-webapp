@@ -127,7 +127,7 @@ describe('production distribution decisions', () => {
     });
 
     assert(actualManifest.isOk);
-    expect(actualManifest.value.releaseIdentifier).toBe('1.1.0');
+    expect(actualManifest.value.releaseVersion).toBe('1.1.0');
     expect(actualManifest.value.artifactVersion).toBe('1.1.0');
   });
 
@@ -142,7 +142,7 @@ describe('production distribution decisions', () => {
     });
 
     assert(actualValidation.isErr);
-    expect(actualValidation.error.message).toBe('Distribution artifact version does not match the release identifier');
+    expect(actualValidation.error.message).toBe('Distribution artifact version does not match the release version');
   });
 
   it('rejects a legacy date artifact version for a SemVer Production tag', () => {
@@ -175,7 +175,7 @@ describe('production distribution decisions', () => {
     expect(actualManifest.value.cloudArtifactChecksum).toHaveLength(64);
   });
 
-  it('rejects a new artifact whose version differs from the release identifier', () => {
+  it('rejects a new artifact whose version differs from the release version', () => {
     const mismatchingVersion = '2026-07-15.2';
     const artifactMetadata = {
       ...createValidArtifactMetadata(),
@@ -194,7 +194,7 @@ describe('production distribution decisions', () => {
 
     assert(actualValidation.isErr);
 
-    expect(actualValidation.error.message).toBe('Distribution artifact version does not match the release identifier');
+    expect(actualValidation.error.message).toBe('Distribution artifact version does not match the release version');
   });
 
   it('rejects a new artifact whose commit differs from the Production tag', () => {

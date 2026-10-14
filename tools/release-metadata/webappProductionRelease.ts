@@ -17,13 +17,12 @@
  *
  */
 
-import {Maybe, Result} from 'true-myth';
+import {Result} from 'true-myth';
 
-import {selectPrecedingProductionTag, validateProductionTagName} from './releaseMetadata.ts';
+import {validateProductionTagName} from './releaseMetadata.ts';
 import type {ProductionTagName} from './releaseMetadata.ts';
 import {createStableWebAppTagName, parseStableWebAppTagName} from './webappReleaseIdentity.ts';
 import type {StableWebAppTagName} from './webappReleaseIdentity.ts';
-import {compareWebAppVersions} from './webappVersion.ts';
 import type {WebAppVersion} from './webappVersion.ts';
 
 export type LegacyProductionTagName = ProductionTagName;
@@ -42,11 +41,11 @@ export type WebAppProductionRelease =
       readonly buildVersion: WebAppVersion;
     };
 
-type StableSemVerProductionRelease = Extract<WebAppProductionRelease, {readonly kind: 'semver'}>;
-
 const shortenedCommitIdentifierLength = 7;
+// Historical timestamp tags remain readable only for artifact validation in recovery workflows.
 const historicalTimestampProductionTagPattern = /^\d{4}-\d{2}-\d{2}-production\.\d+$/;
 
+// Date-based Production tags are accepted only so immutable historical releases remain repairable.
 export function parseWebAppProductionRelease(tagName: string): Result<WebAppProductionRelease, Error> {
   const legacyProductionTagResult = validateProductionTagName(tagName);
   if (legacyProductionTagResult.isOk) {
@@ -126,112 +125,4 @@ export function resolveWebappBuildVersion(
   }
 
   return Result.ok(`dev-${commitSha.slice(0, shortenedCommitIdentifierLength) || 'unknown'}`);
-}
-
-export function selectPrecedingWebAppProductionTag(
-  currentProductionTagName: string,
-  existingTagNames: readonly string[],
-): Result<Maybe<WebAppProductionTagName>, Error> {
-  const currentProductionReleaseResult = parseWebAppProductionRelease(currentProductionTagName);
-  if (currentProductionReleaseResult.isErr) {
-    return Result.err(currentProductionReleaseResult.error);
-  }
-
-  const currentProductionRelease = currentProductionReleaseResult.value;
-  if (currentProductionRelease.kind === 'legacy') {
-    const precedingLegacyTagResult = selectPrecedingProductionTag(currentProductionRelease.tagName, existingTagNames);
-    if (precedingLegacyTagResult.isErr) {
-      return Result.err(precedingLegacyTagResult.error);
-    }
-
-    return Result.ok(
-      precedingLegacyTagResult.value.map(precedingLegacyTagName => {
-        return precedingLegacyTagName as WebAppProductionTagName;
-      }),
-    );
-  }
-
-  let precedingStableReleaseMaybe: Maybe<StableSemVerProductionRelease> = Maybe.nothing();
-  let newerStableReleaseMaybe: Maybe<StableSemVerProductionRelease> = Maybe.nothing();
-
-  for (const existingTagName of existingTagNames) {
-    const existingStableVersionResult = parseStableWebAppTagName(existingTagName);
-    if (existingStableVersionResult.isErr) {
-      continue;
-    }
-
-    const existingStableTagNameResult = createStableWebAppTagName(existingStableVersionResult.value);
-    if (existingStableTagNameResult.isErr) {
-      return Result.err(existingStableTagNameResult.error);
-    }
-
-    const existingStableRelease: StableSemVerProductionRelease = {
-      kind: 'semver',
-      tagName: existingStableTagNameResult.value,
-      version: existingStableVersionResult.value,
-      buildVersion: existingStableVersionResult.value,
-    };
-    const comparisonToCurrentResult = compareWebAppVersions(
-      existingStableRelease.version,
-      currentProductionRelease.version,
-    );
-
-    if (comparisonToCurrentResult.isErr) {
-      return Result.err(comparisonToCurrentResult.error);
-    }
-
-    if (comparisonToCurrentResult.value < 0) {
-      if (precedingStableReleaseMaybe.isNothing) {
-        precedingStableReleaseMaybe = Maybe.just(existingStableRelease);
-        continue;
-      }
-
-      const comparisonToPrecedingResult = compareWebAppVersions(
-        existingStableRelease.version,
-        precedingStableReleaseMaybe.value.version,
-      );
-      if (comparisonToPrecedingResult.isErr) {
-        return Result.err(comparisonToPrecedingResult.error);
-      }
-
-      if (comparisonToPrecedingResult.value > 0) {
-        precedingStableReleaseMaybe = Maybe.just(existingStableRelease);
-      }
-
-      continue;
-    }
-
-    if (comparisonToCurrentResult.value > 0) {
-      if (newerStableReleaseMaybe.isNothing) {
-        newerStableReleaseMaybe = Maybe.just(existingStableRelease);
-        continue;
-      }
-
-      const comparisonToNewerResult = compareWebAppVersions(
-        existingStableRelease.version,
-        newerStableReleaseMaybe.value.version,
-      );
-      if (comparisonToNewerResult.isErr) {
-        return Result.err(comparisonToNewerResult.error);
-      }
-
-      if (comparisonToNewerResult.value < 0) {
-        newerStableReleaseMaybe = Maybe.just(existingStableRelease);
-      }
-    }
-  }
-
-  if (newerStableReleaseMaybe.isJust) {
-    return Result.err(
-      new Error(
-        `Cannot select a preceding tag because a newer stable WebApp Production tag exists: ${newerStableReleaseMaybe.value.tagName}`,
-      ),
-    );
-  }
-
-  return Result.ok(
-    precedingStableReleaseMaybe.map(precedingStableRelease => {
-      return precedingStableRelease.tagName;
-    }),
-  );
 }
