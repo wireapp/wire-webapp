@@ -166,10 +166,11 @@ describe('SemVer release history planning', () => {
         throw new Error('Expected a Beta release history plan');
       }
 
-      expect(actualResult.value.candidateRanges.map(candidateRange => {return candidateRange.candidateTag})).toEqual([
-        'v1.1.0-beta.1',
-        'v1.1.0-beta.2',
-      ]);
+      expect(
+        actualResult.value.candidateRanges.map(candidateRange => {
+          return candidateRange.candidateTag;
+        }),
+      ).toEqual(['v1.1.0-beta.1', 'v1.1.0-beta.2']);
       expect(actualResult.value.candidateRanges[0]?.commitRange.baseCommit).toBe(stableCommitSha);
       expect(actualResult.value.candidateRanges[1]?.commitRange.baseCommit).toBe(firstBetaCommitSha);
     });

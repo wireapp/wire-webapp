@@ -134,7 +134,11 @@ describe('WebApp version synchronization GitHub client', () => {
 
     assert(actualResult.isOk);
     expect(actualResult.value).toBe(Unit);
-    expect(fakeHttpClient.requests.map(request => {return request.method})).toEqual(['get', 'post']);
+    expect(
+      fakeHttpClient.requests.map(request => {
+        return request.method;
+      }),
+    ).toEqual(['get', 'post']);
     expect(fakeHttpClient.requests[1]?.json).toEqual(Maybe.just({labels: ['semver:none']}));
   });
 
