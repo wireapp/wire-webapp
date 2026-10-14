@@ -50,4 +50,4 @@ jobs:
         env:
           TARGET_BRANCH: ${{ github.event.pull_request.base.ref }}
           PULL_REQUEST_LABELS_JSON: ${{ toJSON(github.event.pull_request.labels.*.name) }}
-        run: node ./tools/release-cli/pullRequestSemverPolicy.mts
+        run: node ./tools/releaseCli/pullRequestSemverPolicy.mts

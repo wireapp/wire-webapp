@@ -1,15 +1,7 @@
 ls:
-  tools/build-artifact/verifyPublicProductionBundle.ts:
-    .ts: camelCase
-  tools/build-artifact/verifyPublicProductionBundle.test.ts:
-    .test.ts: camelCase
-  tools/release-github:
-    .ts: camelCase
-    .test.ts: camelCase
-  tools/release-metadata:
-    .ts: camelCase
-    .test.ts: camelCase
-  tools/release-cli:
+  tools:
+    .dir: camelCase
+  tools/{buildArtifact,releaseCli,releaseGithub,releaseMetadata}:
     .ts: camelCase
     .test.ts: camelCase
     .mts: camelCase

@@ -413,8 +413,8 @@ const productionConfigs = [
   {
     files: [
       '**/*.{ts,tsx}',
-      'tools/release-cli/webappVersionSynchronization.mts',
-      'tools/release-cli/pullRequestSemverPolicy.mts',
+      'tools/releaseCli/webappVersionSynchronization.mts',
+      'tools/releaseCli/pullRequestSemverPolicy.mts',
     ],
     languageOptions: {
       parser: tsParser,
@@ -513,7 +513,7 @@ const productionConfigs = [
     },
   },
   {
-    files: ['tools/release-github/**/*.ts'],
+    files: ['tools/releaseGithub/**/*.ts'],
     languageOptions: {
       parserOptions: {
         project: './tsconfig.tools.json',
@@ -522,7 +522,7 @@ const productionConfigs = [
     },
   },
   {
-    files: ['tools/release-cli/**/*.mts'],
+    files: ['tools/releaseCli/**/*.mts'],
     languageOptions: {
       parserOptions: {
         project: './tsconfig.release-cli.json',
@@ -531,7 +531,7 @@ const productionConfigs = [
     },
   },
   {
-    files: ['tools/release-cli/**/*.ts'],
+    files: ['tools/releaseCli/**/*.ts'],
     languageOptions: {
       parserOptions: {
         project: './tsconfig.release-cli.json',
@@ -540,7 +540,7 @@ const productionConfigs = [
     },
   },
   {
-    files: ['tools/build-artifact/**/*.mts', 'tools/runtime-verification/**/*.mts'],
+    files: ['tools/buildArtifact/**/*.mts', 'tools/runtimeVerification/**/*.mts'],
     languageOptions: {
       parserOptions: {
         project: './tsconfig.tools.json',
