@@ -161,21 +161,19 @@ describe('handleSharedDriveUploadInput', () => {
     },
   );
 
-  it.each([
-    'Reports/.hidden/document.txt',
-    'Reports/invalid/name.txt',
-    'Reports/invalid\\name.txt',
-    'Reports/invalid"name.txt',
-  ])('rejects invalid folder path segments before dispatching upload: %s', relativePath => {
-    const file = new File(['content'], 'document.txt');
-    Object.defineProperty(file, 'webkitRelativePath', {value: relativePath});
-    const dependencies = createDependencies();
+  it.each(['Reports/.hidden/document.txt', 'Reports/invalid\\name.txt', 'Reports/invalid"name.txt'])(
+    'rejects invalid folder path segments before dispatching upload: %s',
+    relativePath => {
+      const file = new File(['content'], 'document.txt');
+      Object.defineProperty(file, 'webkitRelativePath', {value: relativePath});
+      const dependencies = createDependencies();
 
-    handleSharedDriveUploadInput(createEvent([file]), {...dependencies, uploadPath});
+      handleSharedDriveUploadInput(createEvent([file]), {...dependencies, uploadPath});
 
-    expect(dependencies.onReject).toHaveBeenCalledWith({reason: 'invalidName', invalidFiles: [file]});
-    expect(dependencies.fireAndForgetInvoker.fireAndForget).not.toHaveBeenCalled();
-  });
+      expect(dependencies.onReject).toHaveBeenCalledWith({reason: 'invalidName', invalidFiles: [file]});
+      expect(dependencies.fireAndForgetInvoker.fireAndForget).not.toHaveBeenCalled();
+    },
+  );
 
   it('rejects invalid selected files before dispatching upload', () => {
     const validFile = new File(['valid'], 'valid.txt');
