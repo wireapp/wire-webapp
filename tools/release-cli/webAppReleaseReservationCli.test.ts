@@ -64,17 +64,25 @@ function createTestReservation(): WebAppReleaseReservation {
   });
 }
 
+async function returnDefaultReservation(): Promise<Result<WebAppReleaseReservation, Error>> {
+  return Result.ok(createTestReservation());
+}
+
 function createCommandOptions(
-  overrides: Partial<WebAppReleaseReservationCommandOptions> = {},
+  options: Partial<WebAppReleaseReservationCommandOptions> = {},
 ): WebAppReleaseReservationCommandOptions {
+  const {
+    environment = runtimeEnvironment,
+    reserveWebAppRelease = returnDefaultReservation,
+    writeError = ignoreOutput,
+    writeOutput = ignoreOutput,
+  } = options;
+
   return {
-    environment: runtimeEnvironment,
-    async reserveWebAppRelease() {
-      return Result.ok(createTestReservation());
-    },
-    writeError: ignoreOutput,
-    writeOutput: ignoreOutput,
-    ...overrides,
+    environment,
+    reserveWebAppRelease,
+    writeError,
+    writeOutput,
   };
 }
 
@@ -84,7 +92,7 @@ function runCliImportWithoutEntrypoint(): CommandOutput {
   const childProcessResult = spawnSync(process.execPath, ['--input-type=module', '--eval', importStatement], {
     cwd: process.cwd(),
     encoding: 'utf8',
-    env: {...process.env, NODE_NO_WARNINGS: '1'},
+    env: Object.assign({}, process.env, {NODE_NO_WARNINGS: '1'}),
   });
 
   return {

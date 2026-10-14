@@ -59,17 +59,25 @@ function createTestPlan(): WebAppReleasePlan {
   };
 }
 
-function createCommandOptions(
-  overrides: Partial<WebAppReleasePlanCommandOptions> = {},
-): WebAppReleasePlanCommandOptions {
+async function returnDefaultPlan(): Promise<Result<WebAppReleasePlan, Error>> {
+  return Result.ok(createTestPlan());
+}
+
+function discardCommandOutput(): void {}
+
+function createCommandOptions(options: Partial<WebAppReleasePlanCommandOptions> = {}): WebAppReleasePlanCommandOptions {
+  const {
+    environment = planningEnvironment,
+    planWebAppRelease = returnDefaultPlan,
+    writeError = discardCommandOutput,
+    writeOutput = discardCommandOutput,
+  } = options;
+
   return {
-    environment: planningEnvironment,
-    async planWebAppRelease() {
-      return Result.ok(createTestPlan());
-    },
-    writeError() {},
-    writeOutput() {},
-    ...overrides,
+    environment,
+    planWebAppRelease,
+    writeError,
+    writeOutput,
   };
 }
 
@@ -79,7 +87,7 @@ function runImportWithoutEntrypoint(): CommandOutput {
   const childProcessResult = spawnSync(process.execPath, ['--input-type=module', '--eval', importStatement], {
     cwd: process.cwd(),
     encoding: 'utf8',
-    env: {...process.env, NODE_NO_WARNINGS: '1'},
+    env: Object.assign({}, process.env, {NODE_NO_WARNINGS: '1'}),
   });
 
   return {

@@ -84,7 +84,7 @@ function createCommit(directoryPath: string, fileName: string, fileContents: str
 }
 
 function createAnnotatedTag(options: GitTagOptions): void {
-  const commandEnvironment: NodeJS.ProcessEnv = {...process.env};
+  const commandEnvironment: NodeJS.ProcessEnv = Object.assign({}, process.env);
   if (options.taggerDate !== undefined) {
     commandEnvironment.GIT_COMMITTER_DATE = options.taggerDate;
   }

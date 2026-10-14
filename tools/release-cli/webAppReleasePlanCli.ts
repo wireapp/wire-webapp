@@ -164,31 +164,36 @@ export function serializeWebAppReleasePlan(plan: WebAppReleasePlan): string {
 }
 
 async function executeWebAppReleasePlan(options: ExecuteWebAppReleasePlanOptions): Promise<number> {
-  const {currentVersion, baseCommit, targetCommit, commandOptions} = options;
+  const {
+    currentVersion,
+    baseCommit,
+    targetCommit,
+    commandOptions: {environment, planWebAppRelease, writeOutput, writeError},
+  } = options;
   const currentVersionResult = validateWebAppVersion(currentVersion);
   if (currentVersionResult.isErr) {
-    commandOptions.writeError(`${currentVersionResult.error.message}\n`);
+    writeError(`${currentVersionResult.error.message}\n`);
 
     return 1;
   }
 
   const baseCommitResult = validateCommitSha(baseCommit, 'base');
   if (baseCommitResult.isErr) {
-    commandOptions.writeError(`${baseCommitResult.error.message}\n`);
+    writeError(`${baseCommitResult.error.message}\n`);
 
     return 1;
   }
 
   const targetCommitResult = validateCommitSha(targetCommit, 'target');
   if (targetCommitResult.isErr) {
-    commandOptions.writeError(`${targetCommitResult.error.message}\n`);
+    writeError(`${targetCommitResult.error.message}\n`);
 
     return 1;
   }
 
-  const runtimeEnvironmentResult = readWebAppReleasePlanRuntimeEnvironment(commandOptions.environment);
+  const runtimeEnvironmentResult = readWebAppReleasePlanRuntimeEnvironment(environment);
   if (runtimeEnvironmentResult.isErr) {
-    commandOptions.writeError(`${runtimeEnvironmentResult.error.message}\n`);
+    writeError(`${runtimeEnvironmentResult.error.message}\n`);
 
     return 1;
   }
@@ -196,7 +201,7 @@ async function executeWebAppReleasePlan(options: ExecuteWebAppReleasePlanOptions
   const {value: runtimeEnvironment} = runtimeEnvironmentResult;
 
   try {
-    const planResult = await commandOptions.planWebAppRelease({
+    const planResult = await planWebAppRelease({
       currentVersion: currentVersionResult.value,
       baseCommit: baseCommitResult.value,
       targetCommit: targetCommitResult.value,
@@ -206,19 +211,17 @@ async function executeWebAppReleasePlan(options: ExecuteWebAppReleasePlanOptions
     });
 
     if (planResult.isErr) {
-      commandOptions.writeError(`${redactSecret(planResult.error.message, runtimeEnvironment.githubToken)}\n`);
+      writeError(`${redactSecret(planResult.error.message, runtimeEnvironment.githubToken)}\n`);
 
       return 1;
     }
 
-    commandOptions.writeOutput(`${serializeWebAppReleasePlan(planResult.value)}\n`);
+    writeOutput(`${serializeWebAppReleasePlan(planResult.value)}\n`);
 
     return 0;
   } catch (error: unknown) {
-    const githubToken = isString(commandOptions.environment.GITHUB_TOKEN)
-      ? commandOptions.environment.GITHUB_TOKEN
-      : '';
-    commandOptions.writeError(`${redactSecret(readErrorMessage(error), githubToken)}\n`);
+    const githubToken = isString(environment.GITHUB_TOKEN) ? environment.GITHUB_TOKEN : '';
+    writeError(`${redactSecret(readErrorMessage(error), githubToken)}\n`);
 
     return 1;
   }
@@ -228,7 +231,13 @@ export async function runWebAppReleasePlanCommand(
   commandLineArguments: WebAppReleasePlanCommandArguments,
   options: WebAppReleasePlanCommandOptions,
 ): Promise<number> {
+  const {environment, planWebAppRelease, writeOutput, writeError} = options;
   const [currentVersion, baseCommit, targetCommit] = commandLineArguments;
 
-  return executeWebAppReleasePlan({currentVersion, baseCommit, targetCommit, commandOptions: options});
+  return executeWebAppReleasePlan({
+    currentVersion,
+    baseCommit,
+    targetCommit,
+    commandOptions: {environment, planWebAppRelease, writeOutput, writeError},
+  });
 }

@@ -27,12 +27,21 @@ import {join} from 'node:path';
 import {
   createWebAppReleaseReservationBranch,
   isWebAppReleaseCommitAncestor,
+  prepareRemoteWebAppReleaseBranchCommit,
   readRemoteWebAppReleaseBranches,
 } from './webappReleaseReservationGit.ts';
+import {continueActiveWebAppRelease} from './webappReleaseReservation.ts';
+import type {
+  ContinueActiveWebAppReleaseDependencies,
+  PrepareRemoteReleaseBranchCommitOptions,
+  VerifyWebAppReleaseCommitAncestorOptions,
+} from './webappReleaseReservation.ts';
+import {discoverStableWebAppReleases} from './webappStableReleaseGit.ts';
 import type {ExecuteWebAppReleaseGitCommand} from './webappReleaseHistoryGit.ts';
 
 type TemporaryRemoteRepository = {
   readonly temporaryDirectoryPath: string;
+  readonly remoteDirectoryPath: string;
   readonly workingDirectoryPath: string;
   readonly stableCommit: string;
   readonly targetCommit: string;
@@ -51,6 +60,21 @@ type CreateCommitOptions = {
   readonly workingDirectoryPath: string;
 };
 
+type CreateReviewedFixWorkingCopyOptions = {
+  readonly remoteDirectoryPath: string;
+  readonly temporaryDirectoryPath: string;
+};
+
+type CreateContinuationGitDependenciesOptions = {
+  readonly repository: TemporaryRemoteRepository;
+  readonly executeGitCommand?: ExecuteWebAppReleaseGitCommand;
+};
+
+type DoesGitCommitObjectExistOptions = {
+  readonly commitSha: string;
+  readonly workingDirectoryPath: string;
+};
+
 type SimulateConcurrentPushOptions = {
   readonly competingCommit: string;
   readonly releaseBranch: string;
@@ -58,22 +82,25 @@ type SimulateConcurrentPushOptions = {
 };
 
 function runGitCommand(options: GitCommandOptions): string {
-  return execFileSync('git', [...options.arguments], {
-    cwd: options.workingDirectoryPath,
+  const {arguments: commandArguments, workingDirectoryPath} = options;
+
+  return execFileSync('git', [...commandArguments], {
+    cwd: workingDirectoryPath,
     encoding: 'utf8',
     stdio: 'pipe',
   });
 }
 
 function createCommit(options: CreateCommitOptions): string {
-  writeFileSync(join(options.workingDirectoryPath, options.fileName), options.fileContents, 'utf8');
-  runGitCommand({arguments: ['add', options.fileName], workingDirectoryPath: options.workingDirectoryPath});
+  const {fileContents, fileName, workingDirectoryPath} = options;
+  writeFileSync(join(workingDirectoryPath, fileName), fileContents, 'utf8');
+  runGitCommand({arguments: ['add', fileName], workingDirectoryPath});
   runGitCommand({
-    arguments: ['commit', '--quiet', '-m', `Create ${options.fileName}`],
-    workingDirectoryPath: options.workingDirectoryPath,
+    arguments: ['commit', '--quiet', '-m', `Create ${fileName}`],
+    workingDirectoryPath,
   });
 
-  return runGitCommand({arguments: ['rev-parse', 'HEAD'], workingDirectoryPath: options.workingDirectoryPath}).trim();
+  return runGitCommand({arguments: ['rev-parse', 'HEAD'], workingDirectoryPath}).trim();
 }
 
 function createTemporaryRemoteRepository(): TemporaryRemoteRepository {
@@ -116,6 +143,7 @@ function createTemporaryRemoteRepository(): TemporaryRemoteRepository {
 
   return {
     temporaryDirectoryPath,
+    remoteDirectoryPath,
     workingDirectoryPath,
     stableCommit,
     targetCommit,
@@ -126,20 +154,54 @@ function createTemporaryRemoteRepository(): TemporaryRemoteRepository {
   };
 }
 
+function createReviewedFixWorkingCopy(options: CreateReviewedFixWorkingCopyOptions): string {
+  const {remoteDirectoryPath, temporaryDirectoryPath} = options;
+  const workingDirectoryPath = join(temporaryDirectoryPath, 'reviewed-fix-copy');
+  runGitCommand({
+    arguments: ['clone', '--quiet', remoteDirectoryPath, workingDirectoryPath],
+    workingDirectoryPath: temporaryDirectoryPath,
+  });
+  runGitCommand({arguments: ['config', 'user.name', 'Release Fix Author'], workingDirectoryPath});
+  runGitCommand({arguments: ['config', 'user.email', 'release-fix@example.invalid'], workingDirectoryPath});
+  runGitCommand({arguments: ['config', 'commit.gpgsign', 'false'], workingDirectoryPath});
+  runGitCommand({
+    arguments: ['checkout', '--quiet', '-b', 'reviewed-fix', 'origin/release/1.1.0'],
+    workingDirectoryPath,
+  });
+
+  return workingDirectoryPath;
+}
+
+function doesGitCommitObjectExist(options: DoesGitCommitObjectExistOptions): boolean {
+  const {commitSha, workingDirectoryPath} = options;
+
+  try {
+    runGitCommand({
+      arguments: ['cat-file', '-e', `${commitSha}^{commit}`],
+      workingDirectoryPath,
+    });
+
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function createConcurrentGitExecutor(options: SimulateConcurrentPushOptions): ExecuteWebAppReleaseGitCommand {
+  const {competingCommit, releaseBranch, repository} = options;
   let concurrentPushCompleted = false;
 
   return async function executeGitCommand(commandArguments): Promise<string> {
     const isReservationPush =
       commandArguments.at(0) === 'push' &&
       commandArguments.some(commandArgument => {
-        return commandArgument.endsWith(`:refs/heads/${options.releaseBranch}`);
+        return commandArgument.endsWith(`:refs/heads/${releaseBranch}`);
       });
 
     if (isReservationPush && concurrentPushCompleted === false) {
       runGitCommand({
-        arguments: ['push', '--porcelain', 'origin', `${options.competingCommit}:refs/heads/${options.releaseBranch}`],
-        workingDirectoryPath: options.repository.workingDirectoryPath,
+        arguments: ['push', '--porcelain', 'origin', `${competingCommit}:refs/heads/${releaseBranch}`],
+        workingDirectoryPath: repository.workingDirectoryPath,
       });
       concurrentPushCompleted = true;
 
@@ -148,8 +210,58 @@ function createConcurrentGitExecutor(options: SimulateConcurrentPushOptions): Ex
 
     return runGitCommand({
       arguments: commandArguments,
-      workingDirectoryPath: options.repository.workingDirectoryPath,
+      workingDirectoryPath: repository.workingDirectoryPath,
     });
+  };
+}
+
+function createContinuationGitDependencies(
+  options: CreateContinuationGitDependenciesOptions,
+): ContinueActiveWebAppReleaseDependencies {
+  const {repository, executeGitCommand: suppliedGitCommand} = options;
+  const executeGitCommand = suppliedGitCommand ?? repository.executeGitCommand;
+
+  function readStableWebAppReleases(): ReturnType<typeof discoverStableWebAppReleases> {
+    return discoverStableWebAppReleases({executeGitCommand});
+  }
+
+  function readRemoteReleaseBranches(): ReturnType<typeof readRemoteWebAppReleaseBranches> {
+    return readRemoteWebAppReleaseBranches({
+      executeGitCommand,
+      remoteName: 'origin',
+    });
+  }
+
+  function prepareRemoteReleaseBranchCommit(
+    preparationOptions: PrepareRemoteReleaseBranchCommitOptions,
+  ): ReturnType<typeof prepareRemoteWebAppReleaseBranchCommit> {
+    const {releaseBranch, expectedCommitSha} = preparationOptions;
+
+    return prepareRemoteWebAppReleaseBranchCommit({
+      releaseBranch,
+      expectedCommitSha,
+      executeGitCommand,
+      remoteName: 'origin',
+    });
+  }
+
+  function verifyStableBaseAncestry(
+    ancestorOptions: VerifyWebAppReleaseCommitAncestorOptions,
+  ): ReturnType<typeof isWebAppReleaseCommitAncestor> {
+    const {baseCommit, targetCommit} = ancestorOptions;
+
+    return isWebAppReleaseCommitAncestor({
+      baseCommit,
+      targetCommit,
+      executeGitCommand,
+    });
+  }
+
+  return {
+    readStableWebAppReleases,
+    readRemoteReleaseBranches,
+    prepareRemoteReleaseBranchCommit,
+    isCommitAncestor: verifyStableBaseAncestry,
   };
 }
 
@@ -289,6 +401,131 @@ describe('WebApp release reservation Git adapter', () => {
       expect(actualRemoteBranchesResult.value).toEqual([
         {releaseBranch: 'release/1.1.0', releaseCommitSha: temporaryRepository.stableCommit},
       ]);
+    } finally {
+      rmSync(temporaryRepository.temporaryDirectoryPath, {force: true, recursive: true});
+    }
+  });
+
+  it('fetches and continues a remote-only reviewed fix without mutating remote refs', async () => {
+    const temporaryRepository = createTemporaryRemoteRepository();
+
+    try {
+      runGitCommand({
+        arguments: ['push', '--quiet', 'origin', `${temporaryRepository.targetCommit}:refs/heads/release/1.1.0`],
+        workingDirectoryPath: temporaryRepository.workingDirectoryPath,
+      });
+
+      const reviewedFixWorkingDirectoryPath = createReviewedFixWorkingCopy({
+        remoteDirectoryPath: temporaryRepository.remoteDirectoryPath,
+        temporaryDirectoryPath: temporaryRepository.temporaryDirectoryPath,
+      });
+      const reviewedFixCommit = createCommit({
+        workingDirectoryPath: reviewedFixWorkingDirectoryPath,
+        fileName: 'reviewed-fix.txt',
+        fileContents: 'reviewed fix',
+      });
+      runGitCommand({
+        arguments: ['push', '--quiet', 'origin', `${reviewedFixCommit}:refs/heads/release/1.1.0`],
+        workingDirectoryPath: reviewedFixWorkingDirectoryPath,
+      });
+
+      const actualWorkerHasReviewedFixBeforeContinuation = doesGitCommitObjectExist({
+        commitSha: reviewedFixCommit,
+        workingDirectoryPath: temporaryRepository.workingDirectoryPath,
+      });
+      expect(actualWorkerHasReviewedFixBeforeContinuation).toBe(false);
+
+      const actualRemoteReferencesBeforeContinuation = runGitCommand({
+        arguments: ['ls-remote', '--heads', 'origin'],
+        workingDirectoryPath: temporaryRepository.workingDirectoryPath,
+      });
+
+      const dependencies = createContinuationGitDependencies({repository: temporaryRepository});
+      const actualContinuationResult = await continueActiveWebAppRelease(dependencies);
+
+      assert(actualContinuationResult.isOk);
+      expect(actualContinuationResult.value).toEqual({
+        version: '1.1.0',
+        releaseBranch: 'release/1.1.0',
+        releaseCommitSha: reviewedFixCommit,
+        stableBaseVersion: '1.0.0',
+        stableBaseTag: 'v1.0.0',
+        stableBaseCommitSha: temporaryRepository.stableCommit,
+        action: 'reused',
+      });
+
+      const actualWorkerHasReviewedFixAfterContinuation = doesGitCommitObjectExist({
+        commitSha: reviewedFixCommit,
+        workingDirectoryPath: temporaryRepository.workingDirectoryPath,
+      });
+      expect(actualWorkerHasReviewedFixAfterContinuation).toBe(true);
+
+      const actualRemoteReferencesAfterContinuation = runGitCommand({
+        arguments: ['ls-remote', '--heads', 'origin'],
+        workingDirectoryPath: temporaryRepository.workingDirectoryPath,
+      });
+      expect(actualRemoteReferencesAfterContinuation).toBe(actualRemoteReferencesBeforeContinuation);
+    } finally {
+      rmSync(temporaryRepository.temporaryDirectoryPath, {force: true, recursive: true});
+    }
+  });
+
+  it('fails when a release branch advances between remote discovery and fetch', async () => {
+    const temporaryRepository = createTemporaryRemoteRepository();
+
+    try {
+      runGitCommand({
+        arguments: ['push', '--quiet', 'origin', `${temporaryRepository.targetCommit}:refs/heads/release/1.1.0`],
+        workingDirectoryPath: temporaryRepository.workingDirectoryPath,
+      });
+
+      const reviewedFixWorkingDirectoryPath = createReviewedFixWorkingCopy({
+        remoteDirectoryPath: temporaryRepository.remoteDirectoryPath,
+        temporaryDirectoryPath: temporaryRepository.temporaryDirectoryPath,
+      });
+      const discoveredCommit = createCommit({
+        workingDirectoryPath: reviewedFixWorkingDirectoryPath,
+        fileName: 'first-reviewed-fix.txt',
+        fileContents: 'first reviewed fix',
+      });
+      runGitCommand({
+        arguments: ['push', '--quiet', 'origin', `${discoveredCommit}:refs/heads/release/1.1.0`],
+        workingDirectoryPath: reviewedFixWorkingDirectoryPath,
+      });
+
+      const commandHistory: string[][] = [];
+      let advancedCommit: string | undefined;
+      const executeGitCommand: ExecuteWebAppReleaseGitCommand = async (commandArguments): Promise<string> => {
+        commandHistory.push([...commandArguments]);
+
+        if (commandArguments.at(0) === 'fetch' && advancedCommit === undefined) {
+          advancedCommit = createCommit({
+            workingDirectoryPath: reviewedFixWorkingDirectoryPath,
+            fileName: 'racing-reviewed-fix.txt',
+            fileContents: 'racing reviewed fix',
+          });
+          runGitCommand({
+            arguments: ['push', '--quiet', 'origin', `${advancedCommit}:refs/heads/release/1.1.0`],
+            workingDirectoryPath: reviewedFixWorkingDirectoryPath,
+          });
+        }
+
+        return temporaryRepository.executeGitCommand(commandArguments);
+      };
+      const dependencies = createContinuationGitDependencies({repository: temporaryRepository, executeGitCommand});
+
+      const actualContinuationResult = await continueActiveWebAppRelease(dependencies);
+
+      assert(actualContinuationResult.isErr);
+      assert(advancedCommit !== undefined);
+      expect(actualContinuationResult.error.message).toBe(
+        `WebApp release branch changed during continuation: release/1.1.0 was ${discoveredCommit} when discovered, but fetch resolved ${advancedCommit}; retry continuation`,
+      );
+      expect(
+        commandHistory.some(commandArguments => {
+          return commandArguments.at(0) === 'rev-list';
+        }),
+      ).toBe(false);
     } finally {
       rmSync(temporaryRepository.temporaryDirectoryPath, {force: true, recursive: true});
     }

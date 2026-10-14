@@ -18,6 +18,7 @@
  */
 
 import {Maybe, Result} from 'true-myth';
+import type {Task, Unit} from 'true-myth';
 
 import {
   createStableWebAppTagName,
@@ -58,6 +59,11 @@ export type VerifyWebAppReleaseCommitAncestorOptions = {
   readonly targetCommit: string;
 };
 
+export type PrepareRemoteReleaseBranchCommitOptions = {
+  readonly releaseBranch: string;
+  readonly expectedCommitSha: string;
+};
+
 export type CreateWebAppReleaseReservationBranchOptions = {
   readonly releaseBranch: string;
   readonly targetCommit: string;
@@ -73,10 +79,18 @@ export type WebAppReleaseReservationDependencies = {
   ) => Promise<Result<WebAppReleaseReservationAction, Error>>;
 };
 
-export type ReserveWebAppReleaseOptions = {
+export type ReserveWebAppReleaseOptions = WebAppReleaseReservationDependencies & {
   readonly targetCommit: string;
-  readonly dependencies: WebAppReleaseReservationDependencies;
 };
+
+export type ContinueActiveWebAppReleaseDependencies = {
+  readonly readStableWebAppReleases: () => Promise<Result<readonly StableWebAppRelease[], Error>>;
+  readonly readRemoteReleaseBranches: () => Promise<Result<readonly WebAppReleaseBranchRef[], Error>>;
+  readonly prepareRemoteReleaseBranchCommit: (options: PrepareRemoteReleaseBranchCommitOptions) => Task<Unit, Error>;
+  readonly isCommitAncestor: (options: VerifyWebAppReleaseCommitAncestorOptions) => Promise<Result<boolean, Error>>;
+};
+
+export type ContinueActiveWebAppReleaseOptions = ContinueActiveWebAppReleaseDependencies;
 
 export type InspectActiveWebAppReleaseReservationsOptions = {
   readonly stableReleases: readonly StableWebAppRelease[];
@@ -108,28 +122,47 @@ function isLikelyWebAppSemVerReleaseBranchName(branchName: string): boolean {
 }
 
 function createReservationResult(options: CreateWebAppReleaseReservationResultOptions): WebAppReleaseReservation {
-  return Object.freeze({
-    version: options.version,
-    releaseBranch: options.releaseBranch,
-    releaseCommitSha: options.releaseCommitSha,
-    stableBaseVersion: options.stableBaseRelease.version,
-    stableBaseTag: options.stableBaseRelease.tagName,
-    stableBaseCommitSha: options.stableBaseRelease.commitSha,
-    action: options.action,
-  });
+  const {version, releaseBranch, releaseCommitSha, stableBaseRelease, action} = options;
+
+  return {
+    version,
+    releaseBranch,
+    releaseCommitSha,
+    stableBaseVersion: stableBaseRelease.version,
+    stableBaseTag: stableBaseRelease.tagName,
+    stableBaseCommitSha: stableBaseRelease.commitSha,
+    action,
+  };
+}
+
+function validateAtMostOneActiveWebAppReleaseReservation(
+  activeReservations: readonly WebAppReleaseBranchRef[],
+): Result<Unit, Error> {
+  if (activeReservations.length <= 1) {
+    return Result.ok();
+  }
+
+  const activeReservationBranches = activeReservations
+    .map(activeReservation => {
+      return activeReservation.releaseBranch;
+    })
+    .join(', ');
+
+  return Result.err(new Error(`Multiple unresolved WebApp release reservations exist: ${activeReservationBranches}`));
 }
 
 export function inspectActiveWebAppReleaseReservations(
   options: InspectActiveWebAppReleaseReservationsOptions,
 ): Result<readonly WebAppReleaseBranchRef[], Error> {
+  const {stableReleases, releaseBranches} = options;
   const stableWebAppReleasesByTagName = new Map<string, StableWebAppRelease>();
-  for (const stableRelease of options.stableReleases) {
+  for (const stableRelease of stableReleases) {
     stableWebAppReleasesByTagName.set(stableRelease.tagName, stableRelease);
   }
 
   const activeReservations: WebAppReleaseBranchRef[] = [];
 
-  for (const releaseBranch of options.releaseBranches) {
+  for (const releaseBranch of releaseBranches) {
     const releaseVersionResult = parseWebAppReleaseBranchName(releaseBranch.releaseBranch);
     if (releaseVersionResult.isErr) {
       if (isLegacyDateReleaseBranchName(releaseBranch.releaseBranch)) {
@@ -171,12 +204,10 @@ export function inspectActiveWebAppReleaseReservations(
       continue;
     }
 
-    activeReservations.push(
-      Object.freeze({
-        releaseBranch: releaseBranch.releaseBranch,
-        releaseCommitSha: releaseBranch.releaseCommitSha.toLowerCase(),
-      }),
-    );
+    activeReservations.push({
+      releaseBranch: releaseBranch.releaseBranch,
+      releaseCommitSha: releaseBranch.releaseCommitSha.toLowerCase(),
+    });
   }
 
   return Result.ok(Object.freeze(activeReservations));
@@ -185,12 +216,21 @@ export function inspectActiveWebAppReleaseReservations(
 async function executeWebAppReleaseReservation(
   options: ReserveWebAppReleaseOptions,
 ): Promise<Result<WebAppReleaseReservation, Error>> {
-  const targetCommit = options.targetCommit.toLowerCase();
-  if (fullCommitShaPattern.test(options.targetCommit) === false) {
+  const {
+    targetCommit: requestedTargetCommit,
+    readStableWebAppReleases,
+    readRemoteReleaseBranches,
+    isCommitAncestor,
+    planNextWebAppRelease,
+    createReleaseBranch,
+  } = options;
+
+  const targetCommit = requestedTargetCommit.toLowerCase();
+  if (fullCommitShaPattern.test(requestedTargetCommit) === false) {
     return Result.err(new Error('Invalid target commit: expected a full 40-character hexadecimal SHA'));
   }
 
-  const stableReleasesResult = await options.dependencies.readStableWebAppReleases();
+  const stableReleasesResult = await readStableWebAppReleases();
   if (stableReleasesResult.isErr) {
     return Result.err(stableReleasesResult.error);
   }
@@ -201,7 +241,7 @@ async function executeWebAppReleaseReservation(
   }
 
   const latestStableRelease = latestStableReleaseResult.value;
-  const releaseBranchesResult = await options.dependencies.readRemoteReleaseBranches();
+  const releaseBranchesResult = await readRemoteReleaseBranches();
   if (releaseBranchesResult.isErr) {
     return Result.err(releaseBranchesResult.error);
   }
@@ -214,14 +254,11 @@ async function executeWebAppReleaseReservation(
     return Result.err(activeReservationsResult.error);
   }
 
-  if (activeReservationsResult.value.length > 1) {
-    const activeReservationBranches = activeReservationsResult.value
-      .map(activeReservation => {
-        return activeReservation.releaseBranch;
-      })
-      .join(', ');
-
-    return Result.err(new Error(`Multiple unresolved WebApp release reservations exist: ${activeReservationBranches}`));
+  const activeReservationCountValidationResult = validateAtMostOneActiveWebAppReleaseReservation(
+    activeReservationsResult.value,
+  );
+  if (activeReservationCountValidationResult.isErr) {
+    return Result.err(activeReservationCountValidationResult.error);
   }
 
   const activeReservationMaybe = Maybe.of(activeReservationsResult.value.at(0));
@@ -251,7 +288,7 @@ async function executeWebAppReleaseReservation(
     );
   }
 
-  const stableBaseIsAncestorResult = await options.dependencies.isCommitAncestor({
+  const stableBaseIsAncestorResult = await isCommitAncestor({
     baseCommit: latestStableRelease.commitSha,
     targetCommit,
   });
@@ -267,7 +304,7 @@ async function executeWebAppReleaseReservation(
     );
   }
 
-  const releasePlanResult = await options.dependencies.planNextWebAppRelease({
+  const releasePlanResult = await planNextWebAppRelease({
     currentVersion: latestStableRelease.version,
     baseCommit: latestStableRelease.commitSha,
     targetCommit,
@@ -286,7 +323,7 @@ async function executeWebAppReleaseReservation(
     return Result.err(releaseBranchNameResult.error);
   }
 
-  const branchCreationResult = await options.dependencies.createReleaseBranch({
+  const branchCreationResult = await createReleaseBranch({
     releaseBranch: releaseBranchNameResult.value,
     targetCommit,
   });
@@ -305,12 +342,129 @@ async function executeWebAppReleaseReservation(
   );
 }
 
+async function executeWebAppReleaseContinuation(
+  options: ContinueActiveWebAppReleaseOptions,
+): Promise<Result<WebAppReleaseReservation, Error>> {
+  const {readStableWebAppReleases, readRemoteReleaseBranches, prepareRemoteReleaseBranchCommit, isCommitAncestor} =
+    options;
+
+  const stableReleasesResult = await readStableWebAppReleases();
+  if (stableReleasesResult.isErr) {
+    return Result.err(stableReleasesResult.error);
+  }
+
+  const latestStableReleaseResult = selectLatestStableWebAppRelease({stableReleases: stableReleasesResult.value});
+  if (latestStableReleaseResult.isErr) {
+    return Result.err(latestStableReleaseResult.error);
+  }
+
+  const latestStableRelease = latestStableReleaseResult.value;
+  const releaseBranchesResult = await readRemoteReleaseBranches();
+  if (releaseBranchesResult.isErr) {
+    return Result.err(releaseBranchesResult.error);
+  }
+
+  const activeReservationsResult = inspectActiveWebAppReleaseReservations({
+    stableReleases: stableReleasesResult.value,
+    releaseBranches: releaseBranchesResult.value,
+  });
+  if (activeReservationsResult.isErr) {
+    return Result.err(activeReservationsResult.error);
+  }
+
+  const activeReservationCountValidationResult = validateAtMostOneActiveWebAppReleaseReservation(
+    activeReservationsResult.value,
+  );
+  if (activeReservationCountValidationResult.isErr) {
+    return Result.err(activeReservationCountValidationResult.error);
+  }
+
+  const activeReservationMaybe = Maybe.of(activeReservationsResult.value.at(0));
+  if (activeReservationMaybe.isNothing) {
+    return Result.err(new Error('No active WebApp SemVer release exists'));
+  }
+
+  const activeReservation = activeReservationMaybe.value;
+  const activeVersionResult = parseWebAppReleaseBranchName(activeReservation.releaseBranch);
+  if (activeVersionResult.isErr) {
+    return Result.err(activeVersionResult.error);
+  }
+
+  const preparedReleaseCommitResult = await prepareRemoteReleaseBranchCommit({
+    releaseBranch: activeReservation.releaseBranch,
+    expectedCommitSha: activeReservation.releaseCommitSha,
+  }).toPromise();
+  if (preparedReleaseCommitResult.isErr) {
+    return Result.err(preparedReleaseCommitResult.error);
+  }
+
+  const stableBaseIsAncestorResult = await isCommitAncestor({
+    baseCommit: latestStableRelease.commitSha,
+    targetCommit: activeReservation.releaseCommitSha,
+  });
+  if (stableBaseIsAncestorResult.isErr) {
+    return Result.err(stableBaseIsAncestorResult.error);
+  }
+
+  if (stableBaseIsAncestorResult.value === false) {
+    return Result.err(
+      new Error(
+        `Stable WebApp release ${latestStableRelease.tagName} commit is not an ancestor of active release commit ${activeReservation.releaseCommitSha}`,
+      ),
+    );
+  }
+
+  return Result.ok(
+    createReservationResult({
+      version: activeVersionResult.value,
+      releaseBranch: activeReservation.releaseBranch,
+      releaseCommitSha: activeReservation.releaseCommitSha,
+      stableBaseRelease: latestStableRelease,
+      action: 'reused',
+    }),
+  );
+}
+
 export async function reserveWebAppRelease(
   options: ReserveWebAppReleaseOptions,
 ): Promise<Result<WebAppReleaseReservation, Error>> {
+  const {
+    targetCommit,
+    readStableWebAppReleases,
+    readRemoteReleaseBranches,
+    isCommitAncestor,
+    planNextWebAppRelease,
+    createReleaseBranch,
+  } = options;
+
   try {
-    return await executeWebAppReleaseReservation(options);
+    return await executeWebAppReleaseReservation({
+      targetCommit,
+      readStableWebAppReleases,
+      readRemoteReleaseBranches,
+      isCommitAncestor,
+      planNextWebAppRelease,
+      createReleaseBranch,
+    });
   } catch (error: unknown) {
     return Result.err(new Error(`Unable to reserve WebApp release: ${errorMessage(error)}`, {cause: error}));
+  }
+}
+
+export async function continueActiveWebAppRelease(
+  options: ContinueActiveWebAppReleaseOptions,
+): Promise<Result<WebAppReleaseReservation, Error>> {
+  const {readStableWebAppReleases, readRemoteReleaseBranches, prepareRemoteReleaseBranchCommit, isCommitAncestor} =
+    options;
+
+  try {
+    return await executeWebAppReleaseContinuation({
+      readStableWebAppReleases,
+      readRemoteReleaseBranches,
+      prepareRemoteReleaseBranchCommit,
+      isCommitAncestor,
+    });
+  } catch (error: unknown) {
+    return Result.err(new Error(`Unable to continue WebApp release: ${errorMessage(error)}`, {cause: error}));
   }
 }

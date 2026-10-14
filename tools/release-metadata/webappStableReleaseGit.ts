@@ -56,11 +56,13 @@ function errorMessage(error: unknown): string {
 }
 
 async function executeGitCommand(options: ExecuteGitCommandOptions): Promise<Result<string, Error>> {
+  const {executeGitCommand: runGitCommand, commandArguments} = options;
+
   try {
-    return Result.ok(await options.executeGitCommand(options.commandArguments));
+    return Result.ok(await runGitCommand(commandArguments));
   } catch (error: unknown) {
     return Result.err(
-      new Error(`Git command failed: git ${options.commandArguments.join(' ')}: ${errorMessage(error)}`, {
+      new Error(`Git command failed: git ${commandArguments.join(' ')}: ${errorMessage(error)}`, {
         cause: error,
       }),
     );
@@ -86,29 +88,30 @@ function classifyWebAppTagName(tagName: string): Result<Maybe<WebAppVersion>, Er
 }
 
 async function readStableWebAppTag(options: ReadStableWebAppTagOptions): Promise<Result<StableWebAppRelease, Error>> {
+  const {executeGitCommand: runGitCommand, tagName} = options;
   const tagObjectTypeResult = await executeGitCommand({
-    executeGitCommand: options.executeGitCommand,
-    commandArguments: ['cat-file', '-t', `refs/tags/${options.tagName}`],
+    executeGitCommand: runGitCommand,
+    commandArguments: ['cat-file', '-t', `refs/tags/${tagName}`],
   });
   if (tagObjectTypeResult.isErr) {
     return Result.err(
-      new Error(`Unable to inspect stable WebApp tag ${options.tagName}: ${tagObjectTypeResult.error.message}`, {
+      new Error(`Unable to inspect stable WebApp tag ${tagName}: ${tagObjectTypeResult.error.message}`, {
         cause: tagObjectTypeResult.error,
       }),
     );
   }
 
   if (tagObjectTypeResult.value.trim() !== 'tag') {
-    return Result.err(new Error(`Stable WebApp tag must be annotated: ${options.tagName}`));
+    return Result.err(new Error(`Stable WebApp tag must be annotated: ${tagName}`));
   }
 
   const commitShaResult = await executeGitCommand({
-    executeGitCommand: options.executeGitCommand,
-    commandArguments: ['rev-parse', '--verify', '--end-of-options', `refs/tags/${options.tagName}^{commit}`],
+    executeGitCommand: runGitCommand,
+    commandArguments: ['rev-parse', '--verify', '--end-of-options', `refs/tags/${tagName}^{commit}`],
   });
   if (commitShaResult.isErr) {
     return Result.err(
-      new Error(`Stable WebApp tag does not resolve to a commit: ${options.tagName}`, {
+      new Error(`Stable WebApp tag does not resolve to a commit: ${tagName}`, {
         cause: commitShaResult.error,
       }),
     );
@@ -116,10 +119,10 @@ async function readStableWebAppTag(options: ReadStableWebAppTagOptions): Promise
 
   const commitSha = commitShaResult.value.trim();
   if (fullCommitShaPattern.test(commitSha) === false) {
-    return Result.err(new Error(`Stable WebApp tag did not resolve to a commit SHA: ${options.tagName}`));
+    return Result.err(new Error(`Stable WebApp tag did not resolve to a commit SHA: ${tagName}`));
   }
 
-  const versionResult = parseStableWebAppTagName(options.tagName);
+  const versionResult = parseStableWebAppTagName(tagName);
   if (versionResult.isErr) {
     return Result.err(versionResult.error);
   }
@@ -127,7 +130,7 @@ async function readStableWebAppTag(options: ReadStableWebAppTagOptions): Promise
   return Result.ok(
     Object.freeze({
       version: versionResult.value,
-      tagName: options.tagName,
+      tagName,
       commitSha: commitSha.toLowerCase(),
     }),
   );
@@ -136,8 +139,9 @@ async function readStableWebAppTag(options: ReadStableWebAppTagOptions): Promise
 export async function discoverStableWebAppReleases(
   options: DiscoverStableWebAppReleasesOptions,
 ): Promise<Result<readonly StableWebAppRelease[], Error>> {
+  const {executeGitCommand: runGitCommand} = options;
   const tagNamesResult = await executeGitCommand({
-    executeGitCommand: options.executeGitCommand,
+    executeGitCommand: runGitCommand,
     commandArguments: ['tag', '--list'],
   });
   if (tagNamesResult.isErr) {
@@ -161,7 +165,7 @@ export async function discoverStableWebAppReleases(
     }
 
     const stableWebAppTagResult = await readStableWebAppTag({
-      executeGitCommand: options.executeGitCommand,
+      executeGitCommand: runGitCommand,
       tagName,
     });
     if (stableWebAppTagResult.isErr) {
@@ -177,13 +181,14 @@ export async function discoverStableWebAppReleases(
 export function selectLatestStableWebAppRelease(
   options: SelectLatestStableWebAppReleaseOptions,
 ): Result<StableWebAppRelease, Error> {
-  const firstStableReleaseMaybe = Maybe.of(options.stableReleases.at(0));
+  const {stableReleases} = options;
+  const firstStableReleaseMaybe = Maybe.of(stableReleases.at(0));
   if (firstStableReleaseMaybe.isNothing) {
     return Result.err(new Error('No stable WebApp SemVer tag exists; expected an annotated vMAJOR.MINOR.PATCH tag'));
   }
 
   let latestStableRelease = firstStableReleaseMaybe.value;
-  for (const stableRelease of options.stableReleases.slice(1)) {
+  for (const stableRelease of stableReleases.slice(1)) {
     const versionComparisonResult = compareWebAppVersions(stableRelease.version, latestStableRelease.version);
     if (versionComparisonResult.isErr) {
       return Result.err(versionComparisonResult.error);

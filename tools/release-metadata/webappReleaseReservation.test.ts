@@ -24,7 +24,11 @@ import {Maybe, Result} from 'true-myth';
 import {planWebAppRelease} from './webappReleasePlan.ts';
 import type {WebAppReleasePlan} from './webappReleasePlan.ts';
 import {inspectActiveWebAppReleaseReservations, reserveWebAppRelease} from './webappReleaseReservation.ts';
-import type {WebAppReleaseBranchRef, WebAppReleaseReservationDependencies} from './webappReleaseReservation.ts';
+import type {
+  ReserveWebAppReleaseOptions,
+  WebAppReleaseBranchRef,
+  WebAppReleaseReservationDependencies,
+} from './webappReleaseReservation.ts';
 import type {StableWebAppRelease} from './webappStableReleaseGit.ts';
 import {validateWebAppVersion} from './webappVersion.ts';
 
@@ -53,10 +57,11 @@ const targetCommit = 'b'.repeat(40);
 const otherCommit = 'c'.repeat(40);
 
 function createStableRelease(options: CreateStableReleaseOptions): StableWebAppRelease {
-  const versionResult = validateWebAppVersion(options.version);
+  const {version, tagName, commitSha} = options;
+  const versionResult = validateWebAppVersion(version);
   assert(versionResult.isOk);
 
-  return Object.freeze({version: versionResult.value, tagName: options.tagName, commitSha: options.commitSha});
+  return Object.freeze({version: versionResult.value, tagName, commitSha});
 }
 
 function createReleasePlan(nextVersion: string): WebAppReleasePlan {
@@ -76,9 +81,10 @@ function createReleasePlan(nextVersion: string): WebAppReleasePlan {
 }
 
 function createReservationTestDependencies(options: ReservationTestOptions = {}): ReservationTestDependencies {
+  const {stableReleases: configuredStableReleases, releaseBranches, ancestorResult, planResult, branchAction} = options;
   const plannerCalls: Array<Parameters<WebAppReleaseReservationDependencies['planNextWebAppRelease']>[0]> = [];
   const branchCreationCalls: Array<Parameters<WebAppReleaseReservationDependencies['createReleaseBranch']>[0]> = [];
-  const stableReleases = options.stableReleases ?? [
+  const stableReleases = configuredStableReleases ?? [
     createStableRelease({version: '1.0.0', tagName: 'v1.0.0', commitSha: stableCommit}),
   ];
 
@@ -90,22 +96,44 @@ function createReservationTestDependencies(options: ReservationTestOptions = {})
         return Result.ok(stableReleases);
       },
       async readRemoteReleaseBranches() {
-        return Result.ok(options.releaseBranches ?? []);
+        return Result.ok(releaseBranches ?? []);
       },
       async isCommitAncestor() {
-        return options.ancestorResult ?? Result.ok(true);
+        return ancestorResult ?? Result.ok(true);
       },
       async planNextWebAppRelease(planOptions) {
         plannerCalls.push(planOptions);
 
-        return options.planResult ?? Result.ok(createReleasePlan('1.1.0'));
+        return planResult ?? Result.ok(createReleasePlan('1.1.0'));
       },
       async createReleaseBranch(branchOptions) {
         branchCreationCalls.push(branchOptions);
 
-        return Result.ok(options.branchAction ?? 'created');
+        return Result.ok(branchAction ?? 'created');
       },
     },
+  };
+}
+
+function createWebAppReleaseReservationOptions(
+  targetCommit: string,
+  dependencies: WebAppReleaseReservationDependencies,
+): ReserveWebAppReleaseOptions {
+  const {
+    readStableWebAppReleases,
+    readRemoteReleaseBranches,
+    isCommitAncestor,
+    planNextWebAppRelease,
+    createReleaseBranch,
+  } = dependencies;
+
+  return {
+    targetCommit,
+    readStableWebAppReleases,
+    readRemoteReleaseBranches,
+    isCommitAncestor,
+    planNextWebAppRelease,
+    createReleaseBranch,
   };
 }
 
@@ -161,10 +189,9 @@ describe('WebApp release reservation allocation', () => {
   it('uses the release planner and creates the planned branch at the exact target commit', async () => {
     const testDependencies = createReservationTestDependencies();
 
-    const actualReservationResult = await reserveWebAppRelease({
-      targetCommit,
-      dependencies: testDependencies.dependencies,
-    });
+    const actualReservationResult = await reserveWebAppRelease(
+      createWebAppReleaseReservationOptions(targetCommit, testDependencies.dependencies),
+    );
 
     assert(actualReservationResult.isOk);
     expect(actualReservationResult.value).toEqual({
@@ -185,10 +212,9 @@ describe('WebApp release reservation allocation', () => {
       planResult: Result.err(new Error('Release planning failed')),
     });
 
-    const actualReservationResult = await reserveWebAppRelease({
-      targetCommit,
-      dependencies: testDependencies.dependencies,
-    });
+    const actualReservationResult = await reserveWebAppRelease(
+      createWebAppReleaseReservationOptions(targetCommit, testDependencies.dependencies),
+    );
 
     assert(actualReservationResult.isErr);
     expect(actualReservationResult.error.message).toBe('Release planning failed');
@@ -202,10 +228,9 @@ describe('WebApp release reservation allocation', () => {
       planResult: Result.err(new Error('PR labels must not be recalculated')),
     });
 
-    const actualReservationResult = await reserveWebAppRelease({
-      targetCommit,
-      dependencies: testDependencies.dependencies,
-    });
+    const actualReservationResult = await reserveWebAppRelease(
+      createWebAppReleaseReservationOptions(targetCommit, testDependencies.dependencies),
+    );
 
     assert(actualReservationResult.isOk);
     expect(actualReservationResult.value).toEqual({
@@ -221,18 +246,19 @@ describe('WebApp release reservation allocation', () => {
     expect(testDependencies.branchCreationCalls).toEqual([]);
   });
 
-  it('fails when an active reservation points to a different target commit', async () => {
+  it('rejects a main target that differs from the current active branch commit', async () => {
     const testDependencies = createReservationTestDependencies({
       releaseBranches: [{releaseBranch: 'release/1.4.0', releaseCommitSha: otherCommit}],
     });
 
-    const actualReservationResult = await reserveWebAppRelease({
-      targetCommit,
-      dependencies: testDependencies.dependencies,
-    });
+    const actualReservationResult = await reserveWebAppRelease(
+      createWebAppReleaseReservationOptions(targetCommit, testDependencies.dependencies),
+    );
 
     assert(actualReservationResult.isErr);
-    expect(actualReservationResult.error.message).toContain('WebApp release reservation conflict');
+    expect(actualReservationResult.error.message).toBe(
+      `WebApp release reservation conflict: release/1.4.0 points to ${otherCommit}, requested target is ${targetCommit}`,
+    );
     expect(testDependencies.plannerCalls).toEqual([]);
     expect(testDependencies.branchCreationCalls).toEqual([]);
   });
@@ -245,10 +271,9 @@ describe('WebApp release reservation allocation', () => {
       ],
     });
 
-    const actualReservationResult = await reserveWebAppRelease({
-      targetCommit,
-      dependencies: testDependencies.dependencies,
-    });
+    const actualReservationResult = await reserveWebAppRelease(
+      createWebAppReleaseReservationOptions(targetCommit, testDependencies.dependencies),
+    );
 
     assert(actualReservationResult.isErr);
     expect(actualReservationResult.error.message).toContain('Multiple unresolved WebApp release reservations');
@@ -258,10 +283,9 @@ describe('WebApp release reservation allocation', () => {
   it('fails explicitly when no stable release exists', async () => {
     const testDependencies = createReservationTestDependencies({stableReleases: []});
 
-    const actualReservationResult = await reserveWebAppRelease({
-      targetCommit,
-      dependencies: testDependencies.dependencies,
-    });
+    const actualReservationResult = await reserveWebAppRelease(
+      createWebAppReleaseReservationOptions(targetCommit, testDependencies.dependencies),
+    );
 
     assert(actualReservationResult.isErr);
     expect(actualReservationResult.error.message).toContain('No stable WebApp SemVer tag exists');
@@ -280,10 +304,9 @@ describe('WebApp release reservation allocation', () => {
       planResult: Result.ok(createReleasePlan('1.2.0')),
     });
 
-    const actualReservationResult = await reserveWebAppRelease({
-      targetCommit,
-      dependencies: testDependencies.dependencies,
-    });
+    const actualReservationResult = await reserveWebAppRelease(
+      createWebAppReleaseReservationOptions(targetCommit, testDependencies.dependencies),
+    );
 
     assert(actualReservationResult.isOk);
     expect(actualReservationResult.value.version).toBe('1.2.0');
@@ -303,10 +326,9 @@ describe('WebApp release reservation allocation', () => {
       releaseBranches: [{releaseBranch: 'release/1.1.0', releaseCommitSha: branchCommit}],
     });
 
-    const actualReservationResult = await reserveWebAppRelease({
-      targetCommit,
-      dependencies: testDependencies.dependencies,
-    });
+    const actualReservationResult = await reserveWebAppRelease(
+      createWebAppReleaseReservationOptions(targetCommit, testDependencies.dependencies),
+    );
 
     assert(actualReservationResult.isErr);
     expect(actualReservationResult.error.message).toContain('commit mismatch');
@@ -321,10 +343,9 @@ describe('WebApp release reservation allocation', () => {
   it('rejects a stable base commit that is not an ancestor of the target', async () => {
     const testDependencies = createReservationTestDependencies({ancestorResult: Result.ok(false)});
 
-    const actualReservationResult = await reserveWebAppRelease({
-      targetCommit,
-      dependencies: testDependencies.dependencies,
-    });
+    const actualReservationResult = await reserveWebAppRelease(
+      createWebAppReleaseReservationOptions(targetCommit, testDependencies.dependencies),
+    );
 
     assert(actualReservationResult.isErr);
     expect(actualReservationResult.error.message).toContain('is not an ancestor of target commit');
@@ -335,13 +356,20 @@ describe('WebApp release reservation allocation', () => {
   it('does not create a branch when all merged pull requests are semver:none', async () => {
     const testDependencies = createReservationTestDependencies();
     const plannerCalls: Array<Parameters<WebAppReleaseReservationDependencies['planNextWebAppRelease']>[0]> = [];
+    const {readStableWebAppReleases, readRemoteReleaseBranches, isCommitAncestor, createReleaseBranch} =
+      testDependencies.dependencies;
     const dependencies: WebAppReleaseReservationDependencies = {
-      ...testDependencies.dependencies,
+      readStableWebAppReleases,
+      readRemoteReleaseBranches,
+      isCommitAncestor,
       async planNextWebAppRelease(planOptions) {
+        const {currentVersion, baseCommit, targetCommit: plannedTargetCommit} = planOptions;
         plannerCalls.push(planOptions);
 
         return planWebAppRelease({
-          ...planOptions,
+          currentVersion,
+          baseCommit,
+          targetCommit: plannedTargetCommit,
           dependencies: {
             async readFirstParentHistory() {
               return Result.ok({
@@ -364,12 +392,12 @@ describe('WebApp release reservation allocation', () => {
           },
         });
       },
+      createReleaseBranch,
     };
 
-    const actualReservationResult = await reserveWebAppRelease({
-      targetCommit,
-      dependencies,
-    });
+    const actualReservationResult = await reserveWebAppRelease(
+      createWebAppReleaseReservationOptions(targetCommit, dependencies),
+    );
 
     assert(actualReservationResult.isErr);
     expect(actualReservationResult.error.message).toBe('No release-impacting WebApp changes are present');
@@ -380,10 +408,9 @@ describe('WebApp release reservation allocation', () => {
   it('returns reused when a concurrent creator reports the same reservation', async () => {
     const testDependencies = createReservationTestDependencies({branchAction: 'reused'});
 
-    const actualReservationResult = await reserveWebAppRelease({
-      targetCommit,
-      dependencies: testDependencies.dependencies,
-    });
+    const actualReservationResult = await reserveWebAppRelease(
+      createWebAppReleaseReservationOptions(targetCommit, testDependencies.dependencies),
+    );
 
     assert(actualReservationResult.isOk);
     expect(actualReservationResult.value.action).toBe('reused');
@@ -392,10 +419,9 @@ describe('WebApp release reservation allocation', () => {
   it('rejects malformed target commits before reading Git state', async () => {
     const testDependencies = createReservationTestDependencies();
 
-    const actualReservationResult = await reserveWebAppRelease({
-      targetCommit: 'bad-sha',
-      dependencies: testDependencies.dependencies,
-    });
+    const actualReservationResult = await reserveWebAppRelease(
+      createWebAppReleaseReservationOptions('bad-sha', testDependencies.dependencies),
+    );
 
     assert(actualReservationResult.isErr);
     expect(actualReservationResult.error.message).toContain('Invalid target commit');
