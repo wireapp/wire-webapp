@@ -109,8 +109,7 @@ type PullRequestReleaseImpactLabelState =
   | {readonly kind: 'conflict'; readonly conflictingLabels: readonly string[]};
 
 const githubSearchResultLimit = 1000;
-const synchronizationMarkerSearchTerm = 'wire-webapp-version-sync';
-const synchronizationPullRequestTitleSearchTerm = 'Update WebApp version to';
+const synchronizationMarkerSearchTerm = 'wire-webapp-version-sync:semver';
 
 const githubPullRequestResponseSchema = z.object({
   number: z.number().int().positive(),
@@ -290,17 +289,6 @@ function searchPullRequestNumbers(
 
     return searchPullRequestNumbers(options, page + 1, pullRequestNumbers);
   });
-}
-
-function combinePullRequestNumbers(
-  bodySearchPullRequestNumbers: readonly number[],
-  titleSearchPullRequestNumbers: readonly number[],
-): readonly number[] {
-  return [...new Set([...bodySearchPullRequestNumbers, ...titleSearchPullRequestNumbers])].toSorted(
-    (firstPullRequestNumber, secondPullRequestNumber) => {
-      return firstPullRequestNumber - secondPullRequestNumber;
-    },
-  );
 }
 
 function getPullRequest(
@@ -499,21 +487,12 @@ export function createWebAppVersionSynchronizationGitHubClient(
   const issuesEndpoint = new URL(`repos/${encodedRepositoryName}/issues`, githubApiRoot);
   const pullRequestSearchEndpoint = new URL('search/issues', githubApiRoot);
   const synchronizationMarkerSearchQuery = `repo:${options.githubRepository} is:pr in:body "${synchronizationMarkerSearchTerm}"`;
-  const synchronizationTitleSearchQuery = `repo:${options.githubRepository} is:pr in:title "${synchronizationPullRequestTitleSearchTerm}"`;
 
   const synchronizationMarkerSearchOptions = {
     httpClient: options.httpClient,
     endpoint: pullRequestSearchEndpoint,
     headers: readHeaders,
     searchQuery: synchronizationMarkerSearchQuery,
-    githubToken: options.githubToken,
-  };
-
-  const synchronizationTitleSearchOptions = {
-    httpClient: options.httpClient,
-    endpoint: pullRequestSearchEndpoint,
-    headers: readHeaders,
-    searchQuery: synchronizationTitleSearchQuery,
     githubToken: options.githubToken,
   };
 
@@ -526,20 +505,9 @@ export function createWebAppVersionSynchronizationGitHubClient(
 
   return {
     listPullRequests() {
-      return searchPullRequestNumbers(synchronizationMarkerSearchOptions, 1, []).andThen(
-        synchronizationMarkerPullRequestNumbers => {
-          return searchPullRequestNumbers(synchronizationTitleSearchOptions, 1, []).andThen(
-            synchronizationTitlePullRequestNumbers => {
-              const pullRequestNumbers = combinePullRequestNumbers(
-                synchronizationMarkerPullRequestNumbers,
-                synchronizationTitlePullRequestNumbers,
-              );
-
-              return getPullRequests(getPullRequestOptions, pullRequestNumbers, []);
-            },
-          );
-        },
-      );
+      return searchPullRequestNumbers(synchronizationMarkerSearchOptions, 1, []).andThen(pullRequestNumbers => {
+        return getPullRequests(getPullRequestOptions, pullRequestNumbers, []);
+      });
     },
 
     createPullRequest(createPullRequestOptions) {

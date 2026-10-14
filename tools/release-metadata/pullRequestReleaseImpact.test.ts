@@ -94,7 +94,7 @@ describe('pull request target-branch release-impact policy', () => {
     expect(actualResult.value).toBe(options.impact);
   });
 
-  describe.each(['release/2026-10-06.1', 'maintenance/2026-07-27.1-airgap-a'])('%s', targetBranch => {
+  describe.each(['release/1.1.0', 'maintenance/2026-07-27.1-airgap-a'])('%s', targetBranch => {
     it.each([
       {label: 'semver:patch', impact: 'patch'},
       {label: 'semver:none', impact: 'none'},
@@ -115,7 +115,7 @@ describe('pull request target-branch release-impact policy', () => {
     });
   });
 
-  it.each(['main', 'release/2026-10-06.1', 'maintenance/2026-07-27.1-airgap-a'])(
+  it.each(['main', 'release/1.1.0', 'maintenance/2026-07-27.1-airgap-a'])(
     'requires exactly one label targeting %s',
     targetBranch => {
       for (const labels of [[], ['semver:patch', 'semver:none']]) {

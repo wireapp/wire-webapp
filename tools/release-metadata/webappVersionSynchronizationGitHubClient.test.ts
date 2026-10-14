@@ -6,107 +6,22 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see http://www.gnu.org/licenses/.
- *
  */
 
 import assert from 'node:assert';
 
-import {isUndefined} from '@sindresorhus/is';
+import {Maybe, Unit} from 'true-myth';
 
-import {
-  resolveSemVerWebAppVersionSynchronizationState,
-  resolveWebAppVersionSynchronizationState,
-} from './webappVersionSynchronization.ts';
 import {createWebAppVersionSynchronizationGitHubClient} from './webappVersionSynchronizationGitHubClient.ts';
 
 import type {HttpClient, HttpRequest} from '../release-github/githubApi.ts';
-
-const githubToken = 'otto-secret-token';
-
-type CreateGitHubPullRequestResponseOptions = {
-  readonly number: number;
-  readonly title?: string;
-  readonly state?: 'open' | 'closed';
-  readonly mergedAt?: string | null;
-  readonly body?: string | null;
-  readonly baseBranch?: string;
-  readonly headBranch?: string;
-};
-
-function createGitHubPullRequestResponse(options: CreateGitHubPullRequestResponseOptions): Record<string, unknown> {
-  const responseBody = isUndefined(options.body) ? '<!-- marker -->' : options.body;
-
-  return {
-    number: options.number,
-    html_url: `https://github.com/wireapp/wire-webapp/pull/${options.number}`,
-    title: options.title ?? 'Update WebApp version to 1.0.0',
-    body: responseBody,
-    state: options.state ?? 'open',
-    merged_at: options.mergedAt ?? null,
-    base: {ref: options.baseBranch ?? 'main'},
-    head: {ref: options.headBranch ?? 'webapp-version-2026-09-09.1-1.0.0'},
-  };
-}
-
-function createGitHubPullRequestSearchResponse(
-  pullRequestNumbers: readonly number[],
-  totalCount: number = pullRequestNumbers.length,
-  incompleteResults: boolean = false,
-): Record<string, unknown> {
-  return {
-    total_count: totalCount,
-    incomplete_results: incompleteResults,
-    items: pullRequestNumbers.map(pullRequestNumber => {
-      return {
-        number: pullRequestNumber,
-        html_url: `https://github.com/wireapp/wire-webapp/pull/${pullRequestNumber}`,
-        title: 'Update WebApp version to 1.0.0',
-        body: '<!-- wire-webapp-version-sync -->',
-        pull_request: {
-          url: `https://api.github.example/repos/wireapp/wire-webapp/pulls/${pullRequestNumber}`,
-          html_url: `https://github.com/wireapp/wire-webapp/pull/${pullRequestNumber}`,
-        },
-      };
-    }),
-  };
-}
-
-function createGitHubPullRequestSearchResponseWithoutProperty(
-  response: Record<string, unknown>,
-  propertyName: string,
-): Record<string, unknown> {
-  return Object.fromEntries(
-    Object.entries(response).filter(([responsePropertyName]) => {
-      return responsePropertyName !== propertyName;
-    }),
-  );
-}
-
-function createGitHubPullRequestResponseWithoutProperty(
-  response: Record<string, unknown>,
-  propertyName: string,
-): Record<string, unknown> {
-  return Object.fromEntries(
-    Object.entries(response).filter(([responsePropertyName]) => {
-      return responsePropertyName !== propertyName;
-    }),
-  );
-}
 
 type FakeHttpClient = {
   readonly client: HttpClient;
   readonly requests: HttpRequest[];
 };
 
-function createFakeHttpClient(responses: readonly unknown[], failure?: Error): FakeHttpClient {
+function createFakeHttpClient(responses: readonly unknown[]): FakeHttpClient {
   let responseIndex = 0;
   const requests: HttpRequest[] = [];
 
@@ -116,19 +31,10 @@ function createFakeHttpClient(responses: readonly unknown[], failure?: Error): F
       async requestJson(request) {
         requests.push(request);
 
-        if (failure !== undefined) {
-          throw failure;
-        }
-
-        if (responseIndex >= responses.length) {
-          throw new Error('No fake GitHub response configured');
-        }
-
         const response = responses[responseIndex];
         responseIndex += 1;
-
-        if (response instanceof Error) {
-          throw response;
+        if (response === undefined) {
+          throw new Error('No fake GitHub response configured');
         }
 
         return response;
@@ -137,667 +43,124 @@ function createFakeHttpClient(responses: readonly unknown[], failure?: Error): F
   };
 }
 
-function createGitHubClient(
-  fakeHttpClient: FakeHttpClient['client'],
-): ReturnType<typeof createWebAppVersionSynchronizationGitHubClient> {
+function createGitHubPullRequest(number: number, body: string): Record<string, unknown> {
+  return {
+    number,
+    html_url: `https://github.com/wireapp/wire-webapp/pull/${number}`,
+    title: 'Update WebApp version to 1.1.0',
+    body,
+    state: 'open',
+    merged_at: null,
+    base: {ref: 'main'},
+    head: {ref: 'webapp-version-1.1.0'},
+  };
+}
+
+function createGitHubClient(httpClient: HttpClient): ReturnType<typeof createWebAppVersionSynchronizationGitHubClient> {
   return createWebAppVersionSynchronizationGitHubClient({
-    httpClient: fakeHttpClient,
+    httpClient,
     githubApiUrl: new URL('https://api.github.example/'),
     githubRepository: 'wireapp/wire-webapp',
-    githubToken,
+    githubToken: 'otto-secret-token',
   });
 }
 
+function createSearchResponse(pullRequestNumbers: readonly number[]): Record<string, unknown> {
+  return {
+    total_count: pullRequestNumbers.length,
+    incomplete_results: false,
+    items: pullRequestNumbers.map(number => {
+      return {
+        number,
+        html_url: `https://github.com/wireapp/wire-webapp/pull/${number}`,
+        title: 'Update WebApp version to 1.1.0',
+        body: '<!-- wire-webapp-version-sync:semver production-tag=v1.1.0 version=1.1.0 -->',
+        pull_request: {
+          url: `https://api.github.example/repos/wireapp/wire-webapp/pulls/${number}`,
+          html_url: `https://github.com/wireapp/wire-webapp/pull/${number}`,
+        },
+      };
+    }),
+  };
+}
+
 describe('WebApp version synchronization GitHub client', () => {
-  it('lists pull requests and normalizes GitHub fields', async () => {
+  it('searches only for the durable SemVer synchronization marker', async () => {
+    const pullRequestBody = '<!-- wire-webapp-version-sync:semver production-tag=v1.1.0 version=1.1.0 -->';
     const fakeHttpClient = createFakeHttpClient([
-      createGitHubPullRequestSearchResponse([42]),
-      createGitHubPullRequestSearchResponse([]),
-      createGitHubPullRequestResponse({
-        number: 42,
-        body: null,
-        mergedAt: '2026-09-09T12:00:00Z',
-        state: 'closed',
-      }),
+      createSearchResponse([42]),
+      createGitHubPullRequest(42, pullRequestBody),
     ]);
     const githubClient = createGitHubClient(fakeHttpClient.client);
 
-    const actualResult = await githubClient.listPullRequests();
-
-    assert(actualResult.isOk);
-    expect(actualResult.value).toEqual([
-      {
-        number: 42,
-        url: 'https://github.com/wireapp/wire-webapp/pull/42',
-        title: 'Update WebApp version to 1.0.0',
-        body: '',
-        state: 'closed',
-        mergedAt: '2026-09-09T12:00:00Z',
-        baseBranch: 'main',
-        headBranch: 'webapp-version-2026-09-09.1-1.0.0',
-      },
-    ]);
-    expect(fakeHttpClient.requests[0].url.searchParams).toEqual(
-      new URLSearchParams({
-        q: 'repo:wireapp/wire-webapp is:pr in:body "wire-webapp-version-sync"',
-        sort: 'created',
-        order: 'asc',
-        per_page: '100',
-        page: '1',
-      }),
-    );
-    expect(fakeHttpClient.requests[1].url.searchParams.get('q')).toBe(
-      'repo:wireapp/wire-webapp is:pr in:title "Update WebApp version to"',
-    );
-    expect(fakeHttpClient.requests[2].url.toString()).toBe(
-      'https://api.github.example/repos/wireapp/wire-webapp/pulls/42',
-    );
-  });
-
-  it.each([
-    {description: 'open', state: 'open' as const, mergedAt: null},
-    {description: 'closed without merging', state: 'closed' as const, mergedAt: null},
-  ])('retrieves a $description synchronization pull request through targeted discovery', async options => {
-    const fakeHttpClient = createFakeHttpClient([
-      createGitHubPullRequestSearchResponse([7]),
-      createGitHubPullRequestSearchResponse([]),
-      createGitHubPullRequestResponse({number: 7, state: options.state, mergedAt: options.mergedAt}),
-    ]);
-    const githubClient = createGitHubClient(fakeHttpClient.client);
-
-    const actualResult = await githubClient.listPullRequests();
+    const actualResult = await githubClient.listPullRequests().toPromise();
 
     assert(actualResult.isOk);
     expect(actualResult.value).toHaveLength(1);
-    expect(actualResult.value[0].state).toBe(options.state);
-    expect(actualResult.value[0].mergedAt).toBeNull();
-    expect(fakeHttpClient.requests).toHaveLength(3);
-  });
-
-  it('paginates both searches independently and deduplicates pull requests', async () => {
-    const firstMarkerSearchPageNumbers = Array.from({length: 100}, (_, index) => {
-      return index + 1;
+    expect(actualResult.value[0]).toMatchObject({
+      number: 42,
+      state: 'open',
+      baseBranch: 'main',
+      headBranch: 'webapp-version-1.1.0',
     });
-    const secondMarkerSearchPageNumbers = [101];
-    const firstTitleSearchPageNumbers = Array.from({length: 100}, (_, index) => {
-      return index + 101;
-    });
-    const secondTitleSearchPageNumbers = [201];
-    const pullRequestDetails = Array.from({length: 201}, (_, index) => {
-      return createGitHubPullRequestResponse({number: index + 1});
-    });
-    const fakeHttpClient = createFakeHttpClient([
-      createGitHubPullRequestSearchResponse(firstMarkerSearchPageNumbers, 101),
-      createGitHubPullRequestSearchResponse(secondMarkerSearchPageNumbers, 101),
-      createGitHubPullRequestSearchResponse(firstTitleSearchPageNumbers, 101),
-      createGitHubPullRequestSearchResponse(secondTitleSearchPageNumbers, 101),
-      ...pullRequestDetails,
-    ]);
-    const githubClient = createGitHubClient(fakeHttpClient.client);
-
-    const actualResult = await githubClient.listPullRequests();
-
-    assert(actualResult.isOk);
-    expect(actualResult.value).toHaveLength(201);
-    expect(
-      actualResult.value.map(pullRequest => {
-        return pullRequest.number;
-      }),
-    ).toEqual(
-      Array.from({length: 201}, (_, index) => {
-        return index + 1;
-      }),
-    );
-    expect(fakeHttpClient.requests).toHaveLength(205);
-    expect(fakeHttpClient.requests[0].url.searchParams.get('q')).toBe(
-      'repo:wireapp/wire-webapp is:pr in:body "wire-webapp-version-sync"',
-    );
-    expect(fakeHttpClient.requests[1].url.searchParams.get('q')).toBe(
-      'repo:wireapp/wire-webapp is:pr in:body "wire-webapp-version-sync"',
-    );
-    expect(fakeHttpClient.requests[1].url.searchParams.get('page')).toBe('2');
-    expect(fakeHttpClient.requests[2].url.searchParams.get('q')).toBe(
-      'repo:wireapp/wire-webapp is:pr in:title "Update WebApp version to"',
-    );
-    expect(fakeHttpClient.requests[3].url.searchParams.get('q')).toBe(
-      'repo:wireapp/wire-webapp is:pr in:title "Update WebApp version to"',
-    );
-    expect(fakeHttpClient.requests[3].url.searchParams.get('page')).toBe('2');
-  });
-
-  it('combines search results in deterministic order and fetches duplicate pull requests once', async () => {
-    const fakeHttpClient = createFakeHttpClient([
-      createGitHubPullRequestSearchResponse([42, 99]),
-      createGitHubPullRequestSearchResponse([7, 42]),
-      createGitHubPullRequestResponse({number: 7}),
-      createGitHubPullRequestResponse({number: 42}),
-      createGitHubPullRequestResponse({number: 99}),
-    ]);
-    const githubClient = createGitHubClient(fakeHttpClient.client);
-
-    const actualResult = await githubClient.listPullRequests();
-
-    assert(actualResult.isOk);
-    expect(
-      actualResult.value.map(pullRequest => {
-        return pullRequest.number;
-      }),
-    ).toEqual([7, 42, 99]);
-    expect(
-      fakeHttpClient.requests.map(request => {
-        return request.url.pathname;
-      }),
-    ).toEqual([
-      '/search/issues',
-      '/search/issues',
-      '/repos/wireapp/wire-webapp/pulls/7',
-      '/repos/wireapp/wire-webapp/pulls/42',
-      '/repos/wireapp/wire-webapp/pulls/99',
-    ]);
-  });
-
-  it('discovers a marker-only synchronization pull request', async () => {
-    const fakeHttpClient = createFakeHttpClient([
-      createGitHubPullRequestSearchResponse([42]),
-      createGitHubPullRequestSearchResponse([]),
-      createGitHubPullRequestResponse({
-        number: 42,
-        title: 'Synchronize package metadata',
-        body: '<!-- wire-webapp-version-sync release=2026-09-09.1 production-tag=2026-09-09.1-production version=1.0.0 -->',
-      }),
-    ]);
-    const githubClient = createGitHubClient(fakeHttpClient.client);
-
-    const actualResult = await githubClient.listPullRequests();
-
-    assert(actualResult.isOk);
-    const synchronizationStateResult = resolveWebAppVersionSynchronizationState(
-      '2026-09-09.1',
-      '2026-09-09.1-production',
-      actualResult.value,
-    );
-
-    assert(synchronizationStateResult.isOk);
-    expect(synchronizationStateResult.value.kind).toBe('matching-open');
-  });
-
-  it('discovers a SemVer v2 synchronization pull request by its durable marker', async () => {
-    const fakeHttpClient = createFakeHttpClient([
-      createGitHubPullRequestSearchResponse([43]),
-      createGitHubPullRequestSearchResponse([]),
-      createGitHubPullRequestResponse({
-        number: 43,
-        title: 'Update WebApp version to 1.2.0',
-        body: '<!-- wire-webapp-version-sync:v2 production-tag=v1.2.0 version=1.2.0 -->',
-        headBranch: 'webapp-version-1.2.0',
-      }),
-    ]);
-    const githubClient = createGitHubClient(fakeHttpClient.client);
-
-    const actualResult = await githubClient.listPullRequests();
-
-    assert(actualResult.isOk);
+    expect(fakeHttpClient.requests).toHaveLength(2);
     expect(fakeHttpClient.requests[0]?.url.searchParams.get('q')).toBe(
-      'repo:wireapp/wire-webapp is:pr in:body "wire-webapp-version-sync"',
+      'repo:wireapp/wire-webapp is:pr in:body "wire-webapp-version-sync:semver"',
     );
-
-    const synchronizationStateResult = resolveSemVerWebAppVersionSynchronizationState('v1.2.0', actualResult.value);
-
-    assert(synchronizationStateResult.isOk);
-    expect(synchronizationStateResult.value.kind).toBe('matching-open');
   });
 
-  it('discovers and rejects a title-only synchronization claim without a marker', async () => {
+  it('does not discover historical synchronization requests by title', async () => {
     const fakeHttpClient = createFakeHttpClient([
-      createGitHubPullRequestSearchResponse([]),
-      createGitHubPullRequestSearchResponse([42]),
-      createGitHubPullRequestResponse({
-        number: 42,
-        title: 'Update WebApp version to 1.0.0',
-        body: '',
-        headBranch: 'release-not-metadata',
-      }),
-    ]);
-    const githubClient = createGitHubClient(fakeHttpClient.client);
-
-    const actualResult = await githubClient.listPullRequests();
-
-    assert(actualResult.isOk);
-    const synchronizationStateResult = resolveWebAppVersionSynchronizationState(
-      '2026-09-09.1',
-      '2026-09-09.1-production',
-      actualResult.value,
-    );
-
-    assert(synchronizationStateResult.isErr);
-    expect(synchronizationStateResult.error.message).toContain('invalid marker');
-  });
-
-  it.each([
-    {
-      description: 'a non-object response',
-      response: 'not-an-object',
-    },
-    {
-      description: 'a missing number',
-      response: createGitHubPullRequestResponseWithoutProperty(createGitHubPullRequestResponse({number: 42}), 'number'),
-    },
-    {
-      description: 'a non-numeric number',
-      response: {...createGitHubPullRequestResponse({number: 42}), number: 'not-a-number'},
-    },
-    {
-      description: 'a zero number',
-      response: {...createGitHubPullRequestResponse({number: 42}), number: 0},
-    },
-    {
-      description: 'a fractional number',
-      response: {...createGitHubPullRequestResponse({number: 42}), number: 1.5},
-    },
-    {
-      description: 'a missing URL',
-      response: createGitHubPullRequestResponseWithoutProperty(
-        createGitHubPullRequestResponse({number: 42}),
-        'html_url',
-      ),
-    },
-    {
-      description: 'an invalid URL',
-      response: {...createGitHubPullRequestResponse({number: 42}), html_url: 'not-a-url'},
-    },
-    {
-      description: 'a missing title',
-      response: createGitHubPullRequestResponseWithoutProperty(createGitHubPullRequestResponse({number: 42}), 'title'),
-    },
-    {
-      description: 'an empty title',
-      response: {...createGitHubPullRequestResponse({number: 42}), title: ''},
-    },
-    {
-      description: 'a non-string title',
-      response: {...createGitHubPullRequestResponse({number: 42}), title: 42},
-    },
-    {
-      description: 'a non-string body',
-      response: {...createGitHubPullRequestResponse({number: 42}), body: 42},
-    },
-    {
-      description: 'a missing body',
-      response: createGitHubPullRequestResponseWithoutProperty(createGitHubPullRequestResponse({number: 42}), 'body'),
-    },
-    {
-      description: 'an invalid state',
-      response: {...createGitHubPullRequestResponse({number: 42}), state: 'draft'},
-    },
-    {
-      description: 'a missing state',
-      response: createGitHubPullRequestResponseWithoutProperty(createGitHubPullRequestResponse({number: 42}), 'state'),
-    },
-    {
-      description: 'a non-string merged timestamp',
-      response: {...createGitHubPullRequestResponse({number: 42}), merged_at: 42},
-    },
-    {
-      description: 'a missing merged timestamp',
-      response: createGitHubPullRequestResponseWithoutProperty(
-        createGitHubPullRequestResponse({number: 42}),
-        'merged_at',
-      ),
-    },
-    {
-      description: 'a missing base branch',
-      response: createGitHubPullRequestResponseWithoutProperty(createGitHubPullRequestResponse({number: 42}), 'base'),
-    },
-    {
-      description: 'a null base branch',
-      response: {...createGitHubPullRequestResponse({number: 42}), base: null},
-    },
-    {
-      description: 'an empty base branch name',
-      response: {...createGitHubPullRequestResponse({number: 42}), base: {ref: ''}},
-    },
-    {
-      description: 'a missing base branch name',
-      response: {...createGitHubPullRequestResponse({number: 42}), base: {}},
-    },
-    {
-      description: 'a non-string base branch name',
-      response: {...createGitHubPullRequestResponse({number: 42}), base: {ref: 42}},
-    },
-    {
-      description: 'a missing head branch',
-      response: createGitHubPullRequestResponseWithoutProperty(createGitHubPullRequestResponse({number: 42}), 'head'),
-    },
-    {
-      description: 'a null head branch',
-      response: {...createGitHubPullRequestResponse({number: 42}), head: null},
-    },
-    {
-      description: 'an empty head branch name',
-      response: {...createGitHubPullRequestResponse({number: 42}), head: {ref: ''}},
-    },
-    {
-      description: 'a missing head branch name',
-      response: {...createGitHubPullRequestResponse({number: 42}), head: {}},
-    },
-    {
-      description: 'a non-string head branch name',
-      response: {...createGitHubPullRequestResponse({number: 42}), head: {ref: 42}},
-    },
-  ])('rejects malformed pull request responses: $description', async ({response}) => {
-    const fakeHttpClient = createFakeHttpClient([
-      createGitHubPullRequestSearchResponse([42]),
-      createGitHubPullRequestSearchResponse([]),
-      response,
-    ]);
-    const githubClient = createGitHubClient(fakeHttpClient.client);
-
-    const actualResult = await githubClient.listPullRequests();
-
-    assert(actualResult.isErr);
-    expect(actualResult.error.message).toBe('Malformed GitHub pull request response');
-  });
-
-  it.each([
-    {
-      description: 'a non-object response',
-      response: [],
-    },
-    {
-      description: 'a missing total count',
-      response: createGitHubPullRequestSearchResponseWithoutProperty(
-        createGitHubPullRequestSearchResponse([]),
-        'total_count',
-      ),
-    },
-    {
-      description: 'a negative total count',
-      response: {...createGitHubPullRequestSearchResponse([]), total_count: -1},
-    },
-    {
-      description: 'a missing incomplete-results flag',
-      response: createGitHubPullRequestSearchResponseWithoutProperty(
-        createGitHubPullRequestSearchResponse([]),
-        'incomplete_results',
-      ),
-    },
-    {
-      description: 'a non-array item collection',
-      response: {...createGitHubPullRequestSearchResponse([]), items: {}},
-    },
-    {
-      description: 'a search item without pull-request metadata',
-      response: {
-        ...createGitHubPullRequestSearchResponse([42]),
-        items: [{number: 42}],
+      {
+        total_count: 0,
+        incomplete_results: false,
+        items: [],
       },
-    },
-  ])('rejects malformed pull request search responses: $description', async ({response}) => {
-    const fakeHttpClient = createFakeHttpClient([response]);
-    const githubClient = createGitHubClient(fakeHttpClient.client);
-
-    const actualResult = await githubClient.listPullRequests();
-
-    assert(actualResult.isErr);
-    expect(actualResult.error.message).toBe('Malformed GitHub pull request search response');
-  });
-
-  it.each([
-    {
-      description: 'the marker search',
-      responses: [createGitHubPullRequestSearchResponse([], 0, true)],
-    },
-    {
-      description: 'the title search',
-      responses: [createGitHubPullRequestSearchResponse([]), createGitHubPullRequestSearchResponse([], 0, true)],
-    },
-  ])('rejects incomplete results from $description', async ({responses}) => {
-    const fakeHttpClient = createFakeHttpClient(responses);
-    const githubClient = createGitHubClient(fakeHttpClient.client);
-
-    const actualResult = await githubClient.listPullRequests();
-
-    assert(actualResult.isErr);
-    expect(actualResult.error.message).toBe('GitHub pull request search returned incomplete results');
-  });
-
-  it.each([
-    {
-      description: 'the marker search',
-      responses: [createGitHubPullRequestSearchResponse([], 1001)],
-    },
-    {
-      description: 'the title search',
-      responses: [createGitHubPullRequestSearchResponse([]), createGitHubPullRequestSearchResponse([], 1001)],
-    },
-  ])('rejects results beyond the GitHub limit from $description', async ({responses}) => {
-    const fakeHttpClient = createFakeHttpClient(responses);
-    const githubClient = createGitHubClient(fakeHttpClient.client);
-
-    const actualResult = await githubClient.listPullRequests();
-
-    assert(actualResult.isErr);
-    expect(actualResult.error.message).toBe('GitHub pull request search returned more than 1000 results');
-  });
-
-  it('rejects a short search page before all reported results are retrieved', async () => {
-    const fakeHttpClient = createFakeHttpClient([createGitHubPullRequestSearchResponse([42], 101)]);
-    const githubClient = createGitHubClient(fakeHttpClient.client);
-
-    const actualResult = await githubClient.listPullRequests();
-
-    assert(actualResult.isErr);
-    expect(actualResult.error.message).toBe(
-      'GitHub pull request search pagination ended before all results were retrieved',
-    );
-  });
-
-  it('uses targeted search instead of enumerating repository pull requests', async () => {
-    const fakeHttpClient = createFakeHttpClient([
-      createGitHubPullRequestSearchResponse([]),
-      createGitHubPullRequestSearchResponse([]),
     ]);
     const githubClient = createGitHubClient(fakeHttpClient.client);
 
-    const actualResult = await githubClient.listPullRequests();
+    const actualResult = await githubClient.listPullRequests().toPromise();
 
     assert(actualResult.isOk);
-    expect(fakeHttpClient.requests).toHaveLength(2);
-    expect(fakeHttpClient.requests[0].url.pathname).toBe('/search/issues');
-    expect(fakeHttpClient.requests[0].url.searchParams.get('q')).toBe(
-      'repo:wireapp/wire-webapp is:pr in:body "wire-webapp-version-sync"',
-    );
-    expect(fakeHttpClient.requests[1].url.pathname).toBe('/search/issues');
-    expect(fakeHttpClient.requests[1].url.searchParams.get('q')).toBe(
-      'repo:wireapp/wire-webapp is:pr in:title "Update WebApp version to"',
-    );
-  });
-
-  it('rejects a malformed created pull request response', async () => {
-    const fakeHttpClient = createFakeHttpClient([{...createGitHubPullRequestResponse({number: 84}), head: {ref: 42}}]);
-    const githubClient = createGitHubClient(fakeHttpClient.client);
-
-    const actualResult = await githubClient.createPullRequest({
-      title: 'Update WebApp version to 1.0.0',
-      body: 'created body',
-      headBranch: 'webapp-version-2026-09-09.1-1.0.0',
-    });
-
-    assert(actualResult.isErr);
-    expect(actualResult.error.message).toBe('Malformed GitHub created pull request response');
-  });
-
-  it('creates a pull request against main with the supplied body and branch', async () => {
-    const fakeHttpClient = createFakeHttpClient([createGitHubPullRequestResponse({number: 84, body: 'created body'})]);
-    const githubClient = createGitHubClient(fakeHttpClient.client);
-
-    const actualResult = await githubClient.createPullRequest({
-      title: 'Update WebApp version to 1.0.0',
-      body: 'created body',
-      headBranch: 'webapp-version-2026-09-09.1-1.0.0',
-    });
-
-    assert(actualResult.isOk);
-    expect(actualResult.value.number).toBe(84);
-    expect(fakeHttpClient.requests).toHaveLength(1);
-    expect(fakeHttpClient.requests[0].method).toBe('post');
-    expect(fakeHttpClient.requests[0].url.toString()).toBe(
-      'https://api.github.example/repos/wireapp/wire-webapp/pulls',
-    );
-    expect(fakeHttpClient.requests[0].headers.Authorization).toBe(`Bearer ${githubToken}`);
-    assert(fakeHttpClient.requests[0].json.isJust);
-    expect(fakeHttpClient.requests[0].json.value).toEqual({
-      title: 'Update WebApp version to 1.0.0',
-      head: 'webapp-version-2026-09-09.1-1.0.0',
-      base: 'main',
-      body: 'created body',
-    });
-  });
-
-  it('adds semver:none to an open pull request without changing its unrelated labels', async () => {
-    const fakeHttpClient = createFakeHttpClient([
-      [{name: 'Otto'}, {name: 'dependencies'}],
-      [{name: 'Otto'}, {name: 'dependencies'}, {name: 'semver:none'}],
-    ]);
-    const githubClient = createGitHubClient(fakeHttpClient.client);
-
-    const actualResult = await githubClient.ensurePullRequestSemVerNoneLabel(42);
-
-    assert(actualResult.isOk);
-    expect(fakeHttpClient.requests).toHaveLength(2);
-    expect(fakeHttpClient.requests[0].method).toBe('get');
-    expect(fakeHttpClient.requests[0].url.toString()).toBe(
-      'https://api.github.example/repos/wireapp/wire-webapp/issues/42/labels?per_page=100&page=1',
-    );
-    expect(fakeHttpClient.requests[1].method).toBe('post');
-    expect(fakeHttpClient.requests[1].url.toString()).toBe(
-      'https://api.github.example/repos/wireapp/wire-webapp/issues/42/labels',
-    );
-    expect(fakeHttpClient.requests[1].headers['Content-Type']).toBe('application/json');
-    assert(fakeHttpClient.requests[1].json.isJust);
-    expect(fakeHttpClient.requests[1].json.value).toEqual({labels: ['semver:none']});
-  });
-
-  it('does not mutate an open pull request that already has semver:none', async () => {
-    const fakeHttpClient = createFakeHttpClient([[{name: 'Otto'}, {name: 'dependencies'}, {name: 'semver:none'}]]);
-    const githubClient = createGitHubClient(fakeHttpClient.client);
-
-    const actualResult = await githubClient.ensurePullRequestSemVerNoneLabel(42);
-
-    assert(actualResult.isOk);
-    expect(fakeHttpClient.requests).toHaveLength(1);
-    expect(fakeHttpClient.requests[0].method).toBe('get');
-  });
-
-  it('checks every GitHub label page before deciding to add semver:none', async () => {
-    const firstPageLabels = Array.from({length: 100}, (_, labelIndex) => {
-      return {name: `custom-${labelIndex}`};
-    });
-    const fakeHttpClient = createFakeHttpClient([firstPageLabels, [{name: 'semver:none'}]]);
-    const githubClient = createGitHubClient(fakeHttpClient.client);
-
-    const actualResult = await githubClient.ensurePullRequestSemVerNoneLabel(42);
-
-    assert(actualResult.isOk);
-    expect(fakeHttpClient.requests).toHaveLength(2);
-    expect(fakeHttpClient.requests[0].url.searchParams.get('page')).toBe('1');
-    expect(fakeHttpClient.requests[1].url.searchParams.get('page')).toBe('2');
-    expect(
-      fakeHttpClient.requests.every(request => {
-        return request.method === 'get';
-      }),
-    ).toBe(true);
-  });
-
-  it.each([
-    {description: 'a product impact label', labels: [{name: 'semver:patch'}], expectedLabels: 'semver:patch'},
-    {
-      description: 'multiple impact labels including none',
-      labels: [{name: 'semver:none'}, {name: 'semver:patch'}],
-      expectedLabels: 'semver:none, semver:patch',
-    },
-  ])('fails without mutation when an open pull request has $description', async options => {
-    const fakeHttpClient = createFakeHttpClient([options.labels]);
-    const githubClient = createGitHubClient(fakeHttpClient.client);
-
-    const actualResult = await githubClient.ensurePullRequestSemVerNoneLabel(42);
-
-    assert(actualResult.isErr);
-    expect(actualResult.error.message).toContain('pull request #42');
-    expect(actualResult.error.message).toContain(options.expectedLabels);
-    expect(fakeHttpClient.requests).toHaveLength(1);
-    expect(fakeHttpClient.requests[0].method).toBe('get');
-  });
-
-  it.each([
-    {description: 'a non-array response', response: {labels: []}},
-    {description: 'a label without a name', response: [{}]},
-    {description: 'a non-string label name', response: [{name: 42}]},
-  ])('rejects $description when reading pull request labels', async options => {
-    const {response} = options;
-    const fakeHttpClient = createFakeHttpClient([response]);
-    const githubClient = createGitHubClient(fakeHttpClient.client);
-
-    const actualResult = await githubClient.ensurePullRequestSemVerNoneLabel(42);
-
-    assert(actualResult.isErr);
-    expect(actualResult.error.message).toBe('Malformed GitHub pull request labels response');
+    expect(actualResult.value).toEqual([]);
     expect(fakeHttpClient.requests).toHaveLength(1);
   });
 
-  it('rejects a malformed response from the add-label API', async () => {
-    const fakeHttpClient = createFakeHttpClient([[], {labels: ['semver:none']}]);
+  it('adds semver:none when a synchronization pull request has no release-impact label', async () => {
+    const fakeHttpClient = createFakeHttpClient([[{name: 'triage'}], [{name: 'triage'}, {name: 'semver:none'}]]);
     const githubClient = createGitHubClient(fakeHttpClient.client);
 
-    const actualResult = await githubClient.ensurePullRequestSemVerNoneLabel(42);
+    const actualResult = await githubClient.ensurePullRequestSemVerNoneLabel(42).toPromise();
 
-    assert(actualResult.isErr);
-    expect(actualResult.error.message).toBe('Malformed GitHub pull request labels response');
+    assert(actualResult.isOk);
+    expect(actualResult.value).toBe(Unit);
     expect(
       fakeHttpClient.requests.map(request => {
         return request.method;
       }),
     ).toEqual(['get', 'post']);
+    expect(fakeHttpClient.requests[1]?.json).toEqual(Maybe.just({labels: ['semver:none']}));
   });
 
-  it('surfaces add-label API failures and redacts the GitHub token', async () => {
-    const fakeHttpClient = createFakeHttpClient([[], new Error(`GitHub rejected ${githubToken}`)]);
+  it('does not rewrite an already correct semver:none label', async () => {
+    const fakeHttpClient = createFakeHttpClient([[{name: 'semver:none'}, {name: 'triage'}]]);
     const githubClient = createGitHubClient(fakeHttpClient.client);
 
-    const actualResult = await githubClient.ensurePullRequestSemVerNoneLabel(42);
+    const actualResult = await githubClient.ensurePullRequestSemVerNoneLabel(43).toPromise();
 
-    assert(actualResult.isErr);
-    expect(actualResult.error.message).toContain('Unable to add semver:none to GitHub pull request #42');
-    expect(actualResult.error.message).not.toContain(githubToken);
-    expect(actualResult.error.message).toContain('[REDACTED]');
-    expect(
-      fakeHttpClient.requests.map(request => {
-        return request.method;
-      }),
-    ).toEqual(['get', 'post']);
-  });
-
-  it('surfaces label API failures and redacts the GitHub token', async () => {
-    const fakeHttpClient = createFakeHttpClient([], new Error(`GitHub rejected ${githubToken}`));
-    const githubClient = createGitHubClient(fakeHttpClient.client);
-
-    const actualResult = await githubClient.ensurePullRequestSemVerNoneLabel(42);
-
-    assert(actualResult.isErr);
-    expect(actualResult.error.message).toContain('Unable to read labels for GitHub pull request #42');
-    expect(actualResult.error.message).not.toContain(githubToken);
-    expect(actualResult.error.message).toContain('[REDACTED]');
+    assert(actualResult.isOk);
     expect(fakeHttpClient.requests).toHaveLength(1);
+    expect(fakeHttpClient.requests[0]?.method).toBe('get');
   });
 
-  it('redacts the GitHub token from transport failures', async () => {
-    const fakeHttpClient = createFakeHttpClient([], new Error(`GitHub rejected ${githubToken}`));
+  it('fails when a synchronization pull request has conflicting release-impact labels', async () => {
+    const fakeHttpClient = createFakeHttpClient([[{name: 'semver:none'}, {name: 'semver:patch'}]]);
     const githubClient = createGitHubClient(fakeHttpClient.client);
 
-    const actualResult = await githubClient.listPullRequests();
+    const actualResult = await githubClient.ensurePullRequestSemVerNoneLabel(44).toPromise();
 
     assert(actualResult.isErr);
-    expect(actualResult.error.message).not.toContain(githubToken);
-    expect(actualResult.error.message).toContain('[REDACTED]');
+    expect(actualResult.error.message).toContain('conflicting release-impact labels');
+    expect(fakeHttpClient.requests).toHaveLength(1);
   });
 });

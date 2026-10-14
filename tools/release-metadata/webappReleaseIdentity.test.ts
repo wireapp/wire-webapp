@@ -27,6 +27,7 @@ import {
   parseBetaWebAppTagName,
   parseStableWebAppTagName,
   parseWebAppReleaseBranchName,
+  validateBetaWebAppTagVersion,
 } from './webappReleaseIdentity.ts';
 import {validateWebAppVersion} from './webappVersion.ts';
 
@@ -74,6 +75,20 @@ describe('WebApp SemVer release identity', () => {
 
     assert(actualBetaTagResult.isOk);
     expect(actualBetaTagResult.value).toEqual({version: '1.4.0', candidateNumber: 2});
+  });
+
+  it('validates a Beta tag belongs to the requested release version', () => {
+    const actualTagResult = validateBetaWebAppTagVersion({tagName: 'v1.1.0-beta.2', expectedVersion: '1.1.0'});
+
+    assert(actualTagResult.isOk);
+    expect(actualTagResult.value).toBe('v1.1.0-beta.2');
+  });
+
+  it('rejects a Beta tag from another release version', () => {
+    const actualTagResult = validateBetaWebAppTagVersion({tagName: 'v1.2.0-beta.2', expectedVersion: '1.1.0'});
+
+    assert(actualTagResult.isErr);
+    expect(actualTagResult.error.message).toContain('belongs to 1.2.0, expected 1.1.0');
   });
 
   it('creates the first Beta candidate when no tags exist', () => {

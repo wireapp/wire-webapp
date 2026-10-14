@@ -31,14 +31,12 @@ import {
   createSimpleGitWebAppVersionSynchronizationClient,
   redactWebAppVersionSynchronizationGitFailureMessage,
   parseWebAppVersionSynchronizationPackageDocument,
-  validateSemVerWebAppVersionSynchronizationBranch,
   validateWebAppVersionSynchronizationBranch,
   webAppVersionSynchronizationPackageFilePaths,
 } from './webappVersionSynchronizationGit.ts';
 import type {WebAppVersionSynchronizationBranchInspection} from './webappVersionSynchronizationGit.ts';
 
-const releaseIdentifier = '2026-09-09.1';
-const synchronizationBranchName = 'webapp-version-2026-09-09.1-1.0.0';
+const synchronizationBranchName = 'webapp-version-1.0.0';
 const mainCommitSha = 'a'.repeat(40);
 const branchTipCommitSha = 'b'.repeat(40);
 
@@ -100,7 +98,7 @@ function createValidBranchInspection(): WebAppVersionSynchronizationBranchInspec
   };
 }
 
-function createSemVerBranchInspection(
+function createVersionJumpBranchInspection(
   baseVersion: string,
   targetVersion: string,
 ): WebAppVersionSynchronizationBranchInspection {
@@ -116,7 +114,7 @@ function createSemVerBranchInspection(
 
 type ValidateBranchOptions = {
   readonly branchInspection?: WebAppVersionSynchronizationBranchInspection;
-  readonly expectedReleaseIdentifier?: string;
+  readonly expectedProductionTagName?: string;
   readonly expectedWebAppVersion?: string;
 };
 
@@ -125,7 +123,7 @@ function validateBranch(
 ): ReturnType<typeof validateWebAppVersionSynchronizationBranch> {
   return validateWebAppVersionSynchronizationBranch({
     branchInspection: options.branchInspection ?? createValidBranchInspection(),
-    expectedReleaseIdentifier: options.expectedReleaseIdentifier ?? releaseIdentifier,
+    expectedProductionTagName: options.expectedProductionTagName ?? 'v1.0.0',
     expectedWebAppVersion: options.expectedWebAppVersion ?? '1.0.0',
   });
 }
@@ -209,60 +207,59 @@ describe('WebApp synchronization Git authentication', () => {
   });
 });
 
-describe('WebApp synchronization branch validation', () => {
+describe('WebApp version synchronization branch validation', () => {
   it('accepts a branch with one safe synchronization commit', () => {
     const actualResult = validateBranch();
 
     assert(actualResult.isOk);
     expect(actualResult.value).toEqual({
-      kind: 'legacy',
       branchName: synchronizationBranchName,
-      releaseIdentifier,
+      productionTagName: 'v1.0.0',
       webAppVersion: '1.0.0',
     });
   });
 
   it.each([
     {
-      description: 'a different release identifier',
+      description: 'a different stable tag',
       branchInspection: createValidBranchInspection(),
-      expectedReleaseIdentifier: '2026-09-16.1',
+      expectedProductionTagName: 'v1.1.0',
       expectedWebAppVersion: '1.0.0',
     },
     {
       description: 'a different branch version',
       branchInspection: createValidBranchInspection(),
-      expectedReleaseIdentifier: releaseIdentifier,
+      expectedProductionTagName: 'v1.0.0',
       expectedWebAppVersion: '1.0.1',
     },
     {
       description: 'an empty main commit',
       branchInspection: {...createValidBranchInspection(), mainCommitSha: ''},
-      expectedReleaseIdentifier: releaseIdentifier,
+      expectedProductionTagName: 'v1.0.0',
       expectedWebAppVersion: '1.0.0',
     },
     {
       description: 'a branch tip equal to its base',
       branchInspection: {...createValidBranchInspection(), branchTipCommitSha: mainCommitSha},
-      expectedReleaseIdentifier: releaseIdentifier,
+      expectedProductionTagName: 'v1.0.0',
       expectedWebAppVersion: '1.0.0',
     },
     {
       description: 'multiple commits',
       branchInspection: {...createValidBranchInspection(), commitParentCount: 2},
-      expectedReleaseIdentifier: releaseIdentifier,
+      expectedProductionTagName: 'v1.0.0',
       expectedWebAppVersion: '1.0.0',
     },
     {
       description: 'a non-normal commit',
       branchInspection: {...createValidBranchInspection(), isNormalCommit: false},
-      expectedReleaseIdentifier: releaseIdentifier,
+      expectedProductionTagName: 'v1.0.0',
       expectedWebAppVersion: '1.0.0',
     },
     {
       description: 'a base outside main history',
       branchInspection: {...createValidBranchInspection(), isBasedOnMainHistory: false},
-      expectedReleaseIdentifier: releaseIdentifier,
+      expectedProductionTagName: 'v1.0.0',
       expectedWebAppVersion: '1.0.0',
     },
     {
@@ -271,19 +268,19 @@ describe('WebApp synchronization branch validation', () => {
         ...createValidBranchInspection(),
         changedFilePaths: [...webAppVersionSynchronizationPackageFilePaths, 'README.md'],
       },
-      expectedReleaseIdentifier: releaseIdentifier,
+      expectedProductionTagName: 'v1.0.0',
       expectedWebAppVersion: '1.0.0',
     },
     {
       description: 'a missing package file change',
       branchInspection: {...createValidBranchInspection(), changedFilePaths: ['package.json']},
-      expectedReleaseIdentifier: releaseIdentifier,
+      expectedProductionTagName: 'v1.0.0',
       expectedWebAppVersion: '1.0.0',
     },
     {
       description: 'a malformed base package document',
       branchInspection: {...createValidBranchInspection(), baseRootPackageDocument: []},
-      expectedReleaseIdentifier: releaseIdentifier,
+      expectedProductionTagName: 'v1.0.0',
       expectedWebAppVersion: '1.0.0',
     },
     {
@@ -292,19 +289,19 @@ describe('WebApp synchronization branch validation', () => {
         ...createValidBranchInspection(),
         baseWebAppPackageDocument: createPackageDocument('0.27.1'),
       },
-      expectedReleaseIdentifier: releaseIdentifier,
+      expectedProductionTagName: 'v1.0.0',
       expectedWebAppVersion: '1.0.0',
     },
     {
       description: 'a branch version that does not follow its base version',
       branchInspection: createValidBranchInspection(),
-      expectedReleaseIdentifier: releaseIdentifier,
+      expectedProductionTagName: 'v1.0.0',
       expectedWebAppVersion: '1.0.1',
     },
     {
       description: 'a malformed branch package document',
       branchInspection: {...createValidBranchInspection(), branchRootPackageDocument: 'not-an-object'},
-      expectedReleaseIdentifier: releaseIdentifier,
+      expectedProductionTagName: 'v1.0.0',
       expectedWebAppVersion: '1.0.0',
     },
     {
@@ -313,7 +310,7 @@ describe('WebApp synchronization branch validation', () => {
         ...createValidBranchInspection(),
         branchWebAppPackageDocument: createPackageDocument('1.0.1'),
       },
-      expectedReleaseIdentifier: releaseIdentifier,
+      expectedProductionTagName: 'v1.0.0',
       expectedWebAppVersion: '1.0.0',
     },
     {
@@ -322,13 +319,13 @@ describe('WebApp synchronization branch validation', () => {
         ...createValidBranchInspection(),
         branchRootPackageDocument: {...createPackageDocument('1.0.0'), description: 'unexpected'},
       },
-      expectedReleaseIdentifier: releaseIdentifier,
+      expectedProductionTagName: 'v1.0.0',
       expectedWebAppVersion: '1.0.0',
     },
-  ])('rejects %s', ({branchInspection, expectedReleaseIdentifier, expectedWebAppVersion}) => {
+  ])('rejects %s', ({branchInspection, expectedProductionTagName, expectedWebAppVersion}) => {
     const actualResult = validateBranch({
       branchInspection,
-      expectedReleaseIdentifier,
+      expectedProductionTagName,
       expectedWebAppVersion,
     });
 
@@ -344,10 +341,10 @@ describe('WebApp synchronization branch validation', () => {
   });
 });
 
-describe('SemVer WebApp synchronization branch validation', () => {
+describe('WebApp synchronization branch version ordering', () => {
   it('accepts a direct version jump from its main base', () => {
-    const branchInspection = createSemVerBranchInspection('1.0.0', '1.2.0');
-    const actualResult = validateSemVerWebAppVersionSynchronizationBranch({
+    const branchInspection = createVersionJumpBranchInspection('1.0.0', '1.2.0');
+    const actualResult = validateWebAppVersionSynchronizationBranch({
       branchInspection,
       expectedProductionTagName: 'v1.2.0',
       expectedWebAppVersion: '1.2.0',
@@ -355,7 +352,6 @@ describe('SemVer WebApp synchronization branch validation', () => {
 
     assert(actualResult.isOk);
     expect(actualResult.value).toMatchObject({
-      kind: 'semver',
       branchName: 'webapp-version-1.2.0',
       productionTagName: 'v1.2.0',
       webAppVersion: '1.2.0',
@@ -366,8 +362,8 @@ describe('SemVer WebApp synchronization branch validation', () => {
     ['base version is higher than the target', '1.2.0', '1.1.0'],
     ['base version already equals the target', '1.2.0', '1.2.0'],
   ])('rejects recovery when %s', (_description, baseVersion, targetVersion) => {
-    const branchInspection = createSemVerBranchInspection(baseVersion, targetVersion);
-    const actualResult = validateSemVerWebAppVersionSynchronizationBranch({
+    const branchInspection = createVersionJumpBranchInspection(baseVersion, targetVersion);
+    const actualResult = validateWebAppVersionSynchronizationBranch({
       branchInspection,
       expectedProductionTagName: `v${targetVersion}`,
       expectedWebAppVersion: targetVersion,

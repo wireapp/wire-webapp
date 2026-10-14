@@ -17,7 +17,7 @@
  *
  */
 
-import {Result} from 'true-myth';
+import {Result, Task} from 'true-myth';
 
 import {validatePullRequestReleaseImpact} from './pullRequestReleaseImpact.ts';
 import type {PullRequestReleaseImpact} from './pullRequestReleaseImpact.ts';
@@ -45,9 +45,7 @@ export type WebAppReleasePlan = {
   readonly pullRequests: readonly WebAppReleasePullRequest[];
 };
 
-export type ReadFirstParentHistory = (
-  options: Pick<ReadWebAppReleaseHistoryOptions, 'baseCommit' | 'targetCommit'>,
-) => Promise<Result<WebAppReleaseHistory, Error>>;
+export type ReadFirstParentHistory = (options: ReadWebAppReleaseHistoryOptions) => Task<WebAppReleaseHistory, Error>;
 
 export type WebAppReleasePlanDependencies = {
   readonly readFirstParentHistory: ReadFirstParentHistory;
@@ -58,11 +56,15 @@ export type PlanWebAppReleaseOptions = {
   readonly currentVersion: string;
   readonly baseCommit: string;
   readonly targetCommit: string;
-  readonly dependencies: WebAppReleasePlanDependencies;
 };
+
+export type PlanWebAppReleaseDependencies = WebAppReleasePlanDependencies;
 
 export type DiscoverWebAppReleasePullRequestsOptions = {
   readonly commits: readonly string[];
+};
+
+export type DiscoverWebAppReleasePullRequestsDependencies = {
   readonly listPullRequestsForCommit: WebAppReleasePlanningGitHubClient['listPullRequestsForCommit'];
 };
 
@@ -71,65 +73,98 @@ type PullRequestReleaseImpactRecord = {
   readonly releaseImpact: PullRequestReleaseImpact;
 };
 
-export async function discoverWebAppReleasePullRequests(
-  options: DiscoverWebAppReleasePullRequestsOptions,
-): Promise<Result<readonly WebAppReleasePlanningPullRequest[], Error>> {
-  const {commits, listPullRequestsForCommit} = options;
-  const discoveredPullRequests: WebAppReleasePlanningPullRequest[] = [];
-  const discoveredPullRequestNumbers = new Set<number>();
+type DiscoverPullRequestsForCommitsOptions = {
+  readonly commitIndex: number;
+  readonly commits: readonly string[];
+  readonly discoveredPullRequests: readonly WebAppReleasePlanningPullRequest[];
+  readonly discoveredPullRequestNumbers: ReadonlySet<number>;
+};
 
-  for (const commitSha of commits) {
-    const associatedPullRequestsResult = await listPullRequestsForCommit({commitSha});
-    if (associatedPullRequestsResult.isErr) {
-      return Result.err(
-        new Error(
-          `Unable to discover pull requests for commit ${commitSha}: ${associatedPullRequestsResult.error.message}`,
-          {cause: associatedPullRequestsResult.error},
-        ),
-      );
-    }
-
-    const mergedMainPullRequests = [
-      ...new Map(
-        associatedPullRequestsResult.value
-          .filter(pullRequest => {
-            return pullRequest.baseBranch === 'main' && pullRequest.mergedAt.isJust;
-          })
-          .map(pullRequest => {
-            return [pullRequest.number, pullRequest] as const;
-          }),
-      ).values(),
-    ];
-    if (mergedMainPullRequests.length === 0) {
-      return Result.err(new Error(`No merged pull request targeting main is associated with commit ${commitSha}`));
-    }
-
-    if (mergedMainPullRequests.length > 1) {
-      const pullRequestNumbers = mergedMainPullRequests
-        .map(pullRequest => {
-          return `#${pullRequest.number}`;
-        })
-        .join(', ');
-
-      return Result.err(
-        new Error(
-          `More than one merged pull request targeting main is associated with commit ${commitSha}: ${pullRequestNumbers}`,
-        ),
-      );
-    }
-
-    const matchingPullRequest = mergedMainPullRequests.at(0);
-    if (matchingPullRequest === undefined) {
-      return Result.err(new Error(`Unable to select a merged pull request for commit ${commitSha}`));
-    }
-
-    if (discoveredPullRequestNumbers.has(matchingPullRequest.number) === false) {
-      discoveredPullRequests.push(matchingPullRequest);
-      discoveredPullRequestNumbers.add(matchingPullRequest.number);
-    }
+function discoverPullRequestsForCommits(
+  options: DiscoverPullRequestsForCommitsOptions,
+  dependencies: DiscoverWebAppReleasePullRequestsDependencies,
+): Task<readonly WebAppReleasePlanningPullRequest[], Error> {
+  const commitSha = options.commits.at(options.commitIndex);
+  if (commitSha === undefined) {
+    return Task.resolve(options.discoveredPullRequests);
   }
 
-  return Result.ok(discoveredPullRequests);
+  return dependencies
+    .listPullRequestsForCommit({commitSha})
+    .mapRejected(error => {
+      return new Error(`Unable to discover pull requests for commit ${commitSha}: ${error.message}`, {cause: error});
+    })
+    .andThen(associatedPullRequests => {
+      const mergedMainPullRequests = [
+        ...new Map(
+          associatedPullRequests
+            .filter(pullRequest => {
+              return pullRequest.baseBranch === 'main' && pullRequest.mergedAt.isJust;
+            })
+            .map(pullRequest => {
+              return [pullRequest.number, pullRequest] as const;
+            }),
+        ).values(),
+      ];
+
+      if (mergedMainPullRequests.length === 0) {
+        return Task.reject<readonly WebAppReleasePlanningPullRequest[], Error>(
+          new Error(`No merged pull request targeting main is associated with commit ${commitSha}`),
+        );
+      }
+
+      if (mergedMainPullRequests.length > 1) {
+        const pullRequestNumbers = mergedMainPullRequests
+          .map(pullRequest => {
+            return `#${pullRequest.number}`;
+          })
+          .join(', ');
+
+        return Task.reject<readonly WebAppReleasePlanningPullRequest[], Error>(
+          new Error(
+            `More than one merged pull request targeting main is associated with commit ${commitSha}: ${pullRequestNumbers}`,
+          ),
+        );
+      }
+
+      const matchingPullRequest = mergedMainPullRequests.at(0);
+      if (matchingPullRequest === undefined) {
+        return Task.reject<readonly WebAppReleasePlanningPullRequest[], Error>(
+          new Error(`Unable to select a merged pull request for commit ${commitSha}`),
+        );
+      }
+
+      const discoveredPullRequests = options.discoveredPullRequestNumbers.has(matchingPullRequest.number)
+        ? options.discoveredPullRequests
+        : [...options.discoveredPullRequests, matchingPullRequest];
+      const discoveredPullRequestNumbers = new Set(options.discoveredPullRequestNumbers);
+      discoveredPullRequestNumbers.add(matchingPullRequest.number);
+
+      return discoverPullRequestsForCommits(
+        {
+          commitIndex: options.commitIndex + 1,
+          commits: options.commits,
+          discoveredPullRequests,
+          discoveredPullRequestNumbers,
+        },
+        dependencies,
+      );
+    });
+}
+
+export function discoverWebAppReleasePullRequests(
+  options: DiscoverWebAppReleasePullRequestsOptions,
+  dependencies: DiscoverWebAppReleasePullRequestsDependencies,
+): Task<readonly WebAppReleasePlanningPullRequest[], Error> {
+  return discoverPullRequestsForCommits(
+    {
+      commitIndex: 0,
+      commits: options.commits,
+      discoveredPullRequests: [],
+      discoveredPullRequestNumbers: new Set(),
+    },
+    dependencies,
+  );
 }
 
 function validatePullRequestImpacts(
@@ -168,55 +203,48 @@ function createReleasePlanPullRequests(
   });
 }
 
-export async function planWebAppRelease(options: PlanWebAppReleaseOptions): Promise<Result<WebAppReleasePlan, Error>> {
-  const {currentVersion, baseCommit, targetCommit, dependencies} = options;
+export function planWebAppRelease(
+  options: PlanWebAppReleaseOptions,
+  dependencies: PlanWebAppReleaseDependencies,
+): Task<WebAppReleasePlan, Error> {
+  const {currentVersion, baseCommit, targetCommit} = options;
   const currentVersionResult = validateWebAppVersion(currentVersion);
   if (currentVersionResult.isErr) {
-    return Result.err(currentVersionResult.error);
+    return Task.reject(currentVersionResult.error);
   }
 
-  const historyResult = await dependencies.readFirstParentHistory({
-    baseCommit,
-    targetCommit,
-  });
-  if (historyResult.isErr) {
-    return Result.err(historyResult.error);
-  }
+  return dependencies.readFirstParentHistory({baseCommit, targetCommit}).andThen(history => {
+    return discoverWebAppReleasePullRequests(
+      {commits: history.commits},
+      {listPullRequestsForCommit: dependencies.listPullRequestsForCommit},
+    ).andThen(pullRequests => {
+      const pullRequestImpactsResult = validatePullRequestImpacts(pullRequests);
+      if (pullRequestImpactsResult.isErr) {
+        return Task.reject<WebAppReleasePlan, Error>(pullRequestImpactsResult.error);
+      }
 
-  const {value: history} = historyResult;
-  const pullRequestsResult = await discoverWebAppReleasePullRequests({
-    commits: history.commits,
-    listPullRequestsForCommit: dependencies.listPullRequestsForCommit,
-  });
-  if (pullRequestsResult.isErr) {
-    return Result.err(pullRequestsResult.error);
-  }
+      const pullRequestImpacts = pullRequestImpactsResult.value;
+      const releaseImpacts = pullRequestImpacts.map(pullRequestImpact => {
+        return pullRequestImpact.releaseImpact;
+      });
+      const versionBumpResult = resolveWebAppVersionBump(releaseImpacts);
+      if (versionBumpResult.isErr) {
+        return Task.reject<WebAppReleasePlan, Error>(versionBumpResult.error);
+      }
 
-  const pullRequestImpactsResult = validatePullRequestImpacts(pullRequestsResult.value);
-  if (pullRequestImpactsResult.isErr) {
-    return Result.err(pullRequestImpactsResult.error);
-  }
+      const nextVersionResult = resolveNextWebAppReleaseVersion(currentVersionResult.value, releaseImpacts);
+      if (nextVersionResult.isErr) {
+        return Task.reject<WebAppReleasePlan, Error>(nextVersionResult.error);
+      }
 
-  const pullRequestImpacts = pullRequestImpactsResult.value;
-  const releaseImpacts = pullRequestImpacts.map(pullRequestImpact => {
-    return pullRequestImpact.releaseImpact;
-  });
-  const versionBumpResult = resolveWebAppVersionBump(releaseImpacts);
-  if (versionBumpResult.isErr) {
-    return Result.err(versionBumpResult.error);
-  }
-
-  const nextVersionResult = resolveNextWebAppReleaseVersion(currentVersion, releaseImpacts);
-  if (nextVersionResult.isErr) {
-    return Result.err(nextVersionResult.error);
-  }
-
-  return Result.ok({
-    baseCommit: history.baseCommit,
-    targetCommit: history.targetCommit,
-    currentVersion: currentVersionResult.value,
-    versionBump: versionBumpResult.value,
-    nextVersion: nextVersionResult.value,
-    pullRequests: createReleasePlanPullRequests(pullRequestImpacts),
+      return Task.resolve({
+        baseCommit: history.baseCommit,
+        targetCommit: history.targetCommit,
+        currentVersion: currentVersionResult.value,
+        versionBump: versionBumpResult.value,
+        nextVersion: nextVersionResult.value,
+        pullRequests: createReleasePlanPullRequests(pullRequestImpacts),
+      });
+    });
   });
 }

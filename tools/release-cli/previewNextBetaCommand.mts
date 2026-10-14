@@ -20,20 +20,19 @@
 import {isError, isString} from '@sindresorhus/is';
 import {Command, CommanderError} from 'commander';
 
-import process from 'node:process';
-import {appendFile} from 'node:fs/promises';
 import {execFile} from 'node:child_process';
+import {appendFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
-import {promisify} from 'node:util';
+import process from 'node:process';
 import {fileURLToPath} from 'node:url';
+import {promisify} from 'node:util';
 
 import {createGitHubClient} from '../release-appearance/githubClient.ts';
-import {executePreviewNextBetaCommand} from '../release-appearance/previewNextBetaCommand.ts';
-import {validateTargetMainCommit} from '../release-appearance/previewNextBetaCommand.ts';
+import {executePreviewNextBetaCommand, validateTargetMainCommit} from '../release-appearance/previewNextBetaCommand.ts';
 import type {PreviewNextBetaCommandDependencies} from '../release-appearance/previewNextBetaCommand.ts';
-import {planNextBetaPreviewHistory} from '../release-appearance/releaseHistory.ts';
 import {readCommandEnvironment, redactSecret} from '../release-appearance/releaseAppearanceCommand.ts';
 import type {CommandEnvironment} from '../release-appearance/releaseAppearanceCommand.ts';
+import {planNextBetaPreviewHistory} from '../release-appearance/releaseHistory.ts';
 import {createRuntimeKyHttpClient} from '../release-github/githubHttpClient.ts';
 
 type CreatePreviewNextBetaCommandOptions = {
@@ -146,11 +145,13 @@ async function executeRuntimeCommand(targetMainCommit: string): Promise<number> 
     throw commandEnvironmentResult.error;
   }
 
-  const commandResult = await executePreviewNextBetaCommand({
-    targetMainCommit,
-    environment: process.env,
-    dependencies: createRuntimeDependencies(commandEnvironmentResult.value),
-  });
+  const commandResult = await executePreviewNextBetaCommand(
+    {
+      targetMainCommit,
+      environment: process.env,
+    },
+    createRuntimeDependencies(commandEnvironmentResult.value),
+  );
 
   return commandResult.exitCode;
 }

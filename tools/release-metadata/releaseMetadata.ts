@@ -17,45 +17,22 @@
  *
  */
 
-import {isUndefined} from '@sindresorhus/is';
-import {Maybe, maybe, Result} from 'true-myth';
+import {Result} from 'true-myth';
 import type {NonEmptyString} from 'type-fest';
-
-declare const commitHashBrand: unique symbol;
 
 type NonZeroDecimalDigit = '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9';
 
+// Retained for maintenance lines and immutable historical Production tags.
 export type ReleaseIdentifier =
   NonEmptyString<`${number}${number}${number}${number}-${number}${number}-${number}${number}.${NonZeroDecimalDigit}${string}`>;
-export type ReleaseBranchName = NonEmptyString<`release/${ReleaseIdentifier}`>;
-export type BetaTagName = NonEmptyString<`${ReleaseIdentifier}-beta.${number}`>;
 export type ProductionTagName = NonEmptyString<`${ReleaseIdentifier}-production`>;
 export type MaintenanceLineKey = NonEmptyString<`${ReleaseIdentifier}-${string}`>;
 export type MaintenanceBranchName = NonEmptyString<`maintenance/${MaintenanceLineKey}`>;
 export type MaintenanceTagName = NonEmptyString<`${MaintenanceLineKey}-maintenance.${number}`>;
-export type ReleaseTagName = BetaTagName | ProductionTagName;
-export type CommitHash = string & {readonly [commitHashBrand]: 'CommitHash'};
 export type WebappBuildChannel = 'main' | 'development' | 'production';
-
-export type ReleaseTagMetadata = {
-  readonly commitHash: CommitHash;
-  readonly tagName: ReleaseTagName;
-};
-
-export type ProductionTagPointsToCommitParameters = {
-  readonly currentCommitHash: CommitHash;
-  readonly releaseIdentifier: ReleaseIdentifier;
-  readonly releaseTagMetadata: readonly ReleaseTagMetadata[];
-};
-
-type ParsedProductionTag = {
-  readonly tagName: ProductionTagName;
-  readonly releaseIdentifier: ReleaseIdentifier;
-};
 
 const releaseDatePattern = String.raw`\d{4}-\d{2}-\d{2}`;
 const releaseIdentifierPattern = String.raw`${releaseDatePattern}\.[1-9]\d*`;
-const releaseBranchNamePattern = new RegExp(`^release/(${releaseIdentifierPattern})$`);
 const productionTagNamePattern = new RegExp(`^(${releaseIdentifierPattern})-production$`);
 const maintenanceLineKeyPattern = new RegExp(String.raw`^${releaseIdentifierPattern}-[a-z0-9]+(?:-[a-z0-9]+)*$`);
 const maintenanceBranchNamePattern = new RegExp(
@@ -64,23 +41,7 @@ const maintenanceBranchNamePattern = new RegExp(
 const maintenanceTagNamePattern = new RegExp(
   String.raw`^${releaseIdentifierPattern}-[a-z0-9]+(?:-[a-z0-9]+)*-maintenance\.[1-9]\d*$`,
 );
-const productionTagSuffix = '-production';
-const releaseDateLength = 10;
-const releaseSequenceStartIndex = 11;
-
-function escapeRegularExpression(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
-}
-
-function validateReleaseIdentifier(releaseIdentifier: string): Result<ReleaseIdentifier, Error> {
-  const releaseIdentifierMatches = new RegExp(`^${releaseIdentifierPattern}$`).test(releaseIdentifier);
-
-  if (!releaseIdentifierMatches) {
-    return Result.err(new Error(`Invalid release identifier: ${releaseIdentifier}`));
-  }
-
-  return Result.ok(releaseIdentifier as ReleaseIdentifier);
-}
+const maintenanceTagNumberPattern = /^[1-9]\d*$/;
 
 function isMaintenanceLineKey(value: string): value is MaintenanceLineKey {
   return maintenanceLineKeyPattern.test(value);
@@ -94,40 +55,6 @@ function isMaintenanceTagName(value: string): value is MaintenanceTagName {
   return maintenanceTagNamePattern.test(value);
 }
 
-export function isReleaseBranchName(branchName: string): boolean {
-  return releaseBranchNamePattern.test(branchName);
-}
-
-export function extractReleaseIdentifierFromBranchName(branchName: string): Result<ReleaseIdentifier, Error> {
-  const branchNameMatch = releaseBranchNamePattern.exec(branchName);
-
-  if (branchNameMatch === null) {
-    return Result.err(new Error(`Invalid release branch name: ${branchName}`));
-  }
-
-  return Result.ok(branchNameMatch[1] as ReleaseIdentifier);
-}
-
-export function createReleaseBranchName(releaseIdentifier: string): Result<ReleaseBranchName, Error> {
-  const releaseIdentifierResult = validateReleaseIdentifier(releaseIdentifier);
-
-  if (releaseIdentifierResult.isErr) {
-    return Result.err(releaseIdentifierResult.error);
-  }
-
-  return Result.ok(`release/${releaseIdentifierResult.value}` as ReleaseBranchName);
-}
-
-export function createProductionTagName(releaseIdentifier: string): Result<ProductionTagName, Error> {
-  const releaseIdentifierResult = validateReleaseIdentifier(releaseIdentifier);
-
-  if (releaseIdentifierResult.isErr) {
-    return Result.err(releaseIdentifierResult.error);
-  }
-
-  return Result.ok(`${releaseIdentifierResult.value}-production` as ProductionTagName);
-}
-
 export function validateProductionTagName(productionTagName: string): Result<ProductionTagName, Error> {
   const productionTagNameMatches = productionTagNamePattern.test(productionTagName);
 
@@ -136,99 +63,6 @@ export function validateProductionTagName(productionTagName: string): Result<Pro
   }
 
   return Result.ok(productionTagName as ProductionTagName);
-}
-
-function parseProductionTag(productionTagName: string): Result<ParsedProductionTag, Error> {
-  const validatedProductionTagNameResult = validateProductionTagName(productionTagName);
-
-  if (validatedProductionTagNameResult.isErr) {
-    return Result.err(validatedProductionTagNameResult.error);
-  }
-
-  const validatedProductionTagName = validatedProductionTagNameResult.value;
-
-  return Result.ok({
-    tagName: validatedProductionTagName,
-    releaseIdentifier: validatedProductionTagName.slice(0, -productionTagSuffix.length) as ReleaseIdentifier,
-  });
-}
-
-function compareReleaseIdentifiers(leftReleaseIdentifier: string, rightReleaseIdentifier: string): number {
-  const leftReleaseDate = leftReleaseIdentifier.slice(0, releaseDateLength);
-  const rightReleaseDate = rightReleaseIdentifier.slice(0, releaseDateLength);
-
-  if (leftReleaseDate < rightReleaseDate) {
-    return -1;
-  }
-
-  if (leftReleaseDate > rightReleaseDate) {
-    return 1;
-  }
-
-  const leftReleaseSequence = BigInt(leftReleaseIdentifier.slice(releaseSequenceStartIndex));
-  const rightReleaseSequence = BigInt(rightReleaseIdentifier.slice(releaseSequenceStartIndex));
-
-  if (leftReleaseSequence < rightReleaseSequence) {
-    return -1;
-  }
-
-  if (leftReleaseSequence > rightReleaseSequence) {
-    return 1;
-  }
-
-  return 0;
-}
-
-export function selectPrecedingProductionTag(
-  currentProductionTagName: string,
-  existingTagNames: readonly string[],
-): Result<Maybe<ProductionTagName>, Error> {
-  const currentProductionTagResult = parseProductionTag(currentProductionTagName);
-
-  if (currentProductionTagResult.isErr) {
-    return Result.err(currentProductionTagResult.error);
-  }
-
-  const currentProductionTag = currentProductionTagResult.value;
-  const validProductionTags = existingTagNames.flatMap(existingTagName => {
-    const parsedProductionTagResult = parseProductionTag(existingTagName);
-
-    if (parsedProductionTagResult.isErr) {
-      return [];
-    }
-
-    return [parsedProductionTagResult.value];
-  });
-  const laterProductionTags = validProductionTags
-    .filter(productionTag => {
-      return compareReleaseIdentifiers(productionTag.releaseIdentifier, currentProductionTag.releaseIdentifier) > 0;
-    })
-    .toSorted((leftProductionTag, rightProductionTag) => {
-      return compareReleaseIdentifiers(leftProductionTag.releaseIdentifier, rightProductionTag.releaseIdentifier);
-    });
-
-  const laterProductionTag = laterProductionTags[0];
-
-  if (!isUndefined(laterProductionTag)) {
-    return Result.err(
-      new Error(
-        `Cannot select a preceding Production tag because a newer ADR Production tag exists: ${laterProductionTag.tagName}`,
-      ),
-    );
-  }
-
-  const precedingProductionTags = validProductionTags.filter(productionTag => {
-    return compareReleaseIdentifiers(productionTag.releaseIdentifier, currentProductionTag.releaseIdentifier) < 0;
-  });
-  const precedingProductionTag = precedingProductionTags.toSorted((leftProductionTag, rightProductionTag) => {
-    return compareReleaseIdentifiers(leftProductionTag.releaseIdentifier, rightProductionTag.releaseIdentifier);
-  })[precedingProductionTags.length - 1];
-
-  if (isUndefined(precedingProductionTag)) {
-    return Result.ok(Maybe.nothing<ProductionTagName>());
-  }
-
-  return Result.ok(Maybe.just(precedingProductionTag.tagName));
 }
 
 export function validateMaintenanceLineKey(maintenanceLineKey: string): Result<MaintenanceLineKey, Error> {
@@ -275,16 +109,19 @@ export function createNextMaintenanceTagName(
     return Result.err(maintenanceLineKeyResult.error);
   }
 
-  const escapedMaintenanceLineKey = escapeRegularExpression(maintenanceLineKeyResult.value);
-  const maintenanceTagPattern = new RegExp(String.raw`^${escapedMaintenanceLineKey}-maintenance\.([1-9]\d*)$`);
+  const maintenanceTagPrefix = `${maintenanceLineKeyResult.value}-maintenance.`;
   const existingMaintenanceTagNumbers = existingTagNames.flatMap(existingTagName => {
-    const existingTagNameMatch = maintenanceTagPattern.exec(existingTagName);
-
-    if (existingTagNameMatch === null) {
+    if (existingTagName.startsWith(maintenanceTagPrefix) === false) {
       return [];
     }
 
-    return [Number(existingTagNameMatch[1])];
+    const maintenanceTagNumberText = existingTagName.slice(maintenanceTagPrefix.length);
+
+    if (maintenanceTagNumberPattern.test(maintenanceTagNumberText) === false) {
+      return [];
+    }
+
+    return [Number(maintenanceTagNumberText)];
   });
   const latestMaintenanceTagNumber =
     existingMaintenanceTagNumbers.length > 0 ? Math.max(...existingMaintenanceTagNumbers) : 0;
@@ -325,62 +162,4 @@ export function validateMaintenanceSource(
   }
 
   return Result.ok(sourceProductionTagResult.value);
-}
-
-export function createNextBetaTagName(
-  releaseIdentifier: string,
-  existingTagNames: readonly string[],
-): Result<BetaTagName, Error> {
-  const releaseIdentifierResult = validateReleaseIdentifier(releaseIdentifier);
-
-  if (releaseIdentifierResult.isErr) {
-    return Result.err(releaseIdentifierResult.error);
-  }
-
-  const escapedReleaseIdentifier = escapeRegularExpression(releaseIdentifierResult.value);
-  const betaTagNamePattern = new RegExp(String.raw`^${escapedReleaseIdentifier}-beta\.(\d+)$`);
-  const existingBetaTagNumbers = existingTagNames.flatMap(existingTagName => {
-    const existingTagNameMatch = betaTagNamePattern.exec(existingTagName);
-
-    if (existingTagNameMatch === null) {
-      return [];
-    }
-
-    return [Number(existingTagNameMatch[1])];
-  });
-  const latestBetaTagNumber = existingBetaTagNumbers.length > 0 ? Math.max(...existingBetaTagNumbers) : 0;
-  const nextBetaTagNumber = latestBetaTagNumber + 1;
-
-  return Result.ok(`${releaseIdentifierResult.value}-beta.${nextBetaTagNumber}` as BetaTagName);
-}
-
-export function productionTagExists(
-  releaseIdentifier: string,
-  existingTagNames: readonly string[],
-): Result<boolean, Error> {
-  const productionTagNameResult = createProductionTagName(releaseIdentifier);
-
-  if (productionTagNameResult.isErr) {
-    return Result.err(productionTagNameResult.error);
-  }
-
-  return Result.ok(existingTagNames.includes(productionTagNameResult.value));
-}
-
-export function productionTagPointsToCommit(parameters: ProductionTagPointsToCommitParameters): Result<boolean, Error> {
-  const productionTagNameResult = createProductionTagName(parameters.releaseIdentifier);
-
-  if (productionTagNameResult.isErr) {
-    return Result.err(productionTagNameResult.error);
-  }
-
-  const productionTagMetadata = maybe.find(tagMetadata => {
-    return tagMetadata.tagName === productionTagNameResult.value;
-  }, parameters.releaseTagMetadata);
-
-  if (productionTagMetadata.isNothing) {
-    return Result.ok(false);
-  }
-
-  return Result.ok(productionTagMetadata.value.commitHash === parameters.currentCommitHash);
 }

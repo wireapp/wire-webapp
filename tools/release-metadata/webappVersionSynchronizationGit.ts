@@ -28,17 +28,9 @@ import {readFile as readFileFromFileSystem, writeFile as writeFileToFileSystem} 
 import {resolve} from 'node:path';
 import {isDeepStrictEqual} from 'node:util';
 
-import {
-  compareWebAppVersions,
-  resolveNextWebAppVersion,
-  validateMatchingWebAppPackageVersions,
-} from './webappVersion.ts';
+import {compareWebAppVersions, validateMatchingWebAppPackageVersions} from './webappVersion.ts';
 import type {WebAppPackageDocument, WebAppPackageDocuments, WebAppPackageVersions} from './webappVersion.ts';
-import {
-  createWebAppVersionSynchronizationBranchName,
-  validateSemVerWebAppVersionSynchronizationBranchName,
-  validateWebAppVersionSynchronizationBranchName,
-} from './webappVersionSynchronization.ts';
+import {validateWebAppVersionSynchronizationBranchName} from './webappVersionSynchronization.ts';
 import type {WebAppVersionSynchronizationBranch} from './webappVersionSynchronization.ts';
 
 export type WebAppVersionSynchronizationMainSnapshot = {
@@ -64,19 +56,12 @@ export type WebAppVersionSynchronizationBranchInspection = {
 
 export type ValidateWebAppVersionSynchronizationBranchOptions = {
   readonly branchInspection: WebAppVersionSynchronizationBranchInspection;
-  readonly expectedReleaseIdentifier: string;
-  readonly expectedWebAppVersion: string;
-};
-
-export type ValidateSemVerWebAppVersionSynchronizationBranchOptions = {
-  readonly branchInspection: WebAppVersionSynchronizationBranchInspection;
   readonly expectedProductionTagName: string;
   readonly expectedWebAppVersion: string;
 };
 
 export type WebAppVersionSynchronizationGitClient = {
   readonly prepareLatestMain: () => Task<WebAppVersionSynchronizationMainSnapshot, Error>;
-  readonly listExistingBranchNames: (releaseIdentifier: string) => Task<readonly string[], Error>;
   readonly inspectBranch: (
     options: InspectWebAppVersionSynchronizationBranchOptions,
   ) => Task<WebAppVersionSynchronizationBranchInspection | undefined, Error>;
@@ -162,18 +147,6 @@ const webAppPackageDocumentSchema = z.record(z.string(), z.unknown());
 const githubServerOrigin = 'https://github.com';
 const gitAuthenticationHeaderKey = `http.${githubServerOrigin}/.extraheader`;
 const gitAuthenticationHeaderPrefix = 'AUTHORIZATION: basic';
-
-function validateAnyWebAppVersionSynchronizationBranchName(
-  branchName: string,
-): Result<WebAppVersionSynchronizationBranch, Error> {
-  const legacyBranchNameResult = validateWebAppVersionSynchronizationBranchName(branchName);
-
-  if (legacyBranchNameResult.isOk) {
-    return legacyBranchNameResult;
-  }
-
-  return validateSemVerWebAppVersionSynchronizationBranchName(branchName);
-}
 
 function errorMessage(error: unknown): string {
   if (isError(error)) {
@@ -491,7 +464,7 @@ function validateSynchronizationBranchPackageDocuments(options: {
 
 export function validateWebAppVersionSynchronizationBranch(
   options: ValidateWebAppVersionSynchronizationBranchOptions,
-): Result<Extract<WebAppVersionSynchronizationBranch, {readonly kind: 'legacy'}>, Error> {
+): Result<WebAppVersionSynchronizationBranch, Error> {
   const {branchInspection} = options;
   const branchNameResult = validateWebAppVersionSynchronizationBranchName(branchInspection.branchName);
 
@@ -501,63 +474,12 @@ export function validateWebAppVersionSynchronizationBranch(
 
   const {value: validatedBranchName} = branchNameResult;
 
-  if (validatedBranchName.releaseIdentifier !== options.expectedReleaseIdentifier) {
-    return Result.err(new Error('Synchronization branch belongs to a different release identifier'));
+  if (validatedBranchName.productionTagName !== options.expectedProductionTagName) {
+    return Result.err(new Error('Synchronization branch belongs to a different Production tag'));
   }
 
   if (validatedBranchName.webAppVersion !== options.expectedWebAppVersion) {
     return Result.err(new Error('Synchronization branch contains an unexpected WebApp version'));
-  }
-
-  const branchStructureResult = validateSynchronizationBranchStructure(branchInspection);
-
-  if (branchStructureResult.isErr) {
-    return Result.err(branchStructureResult.error);
-  }
-
-  const {value: basePackageVersions} = branchStructureResult;
-  const expectedNextVersionResult = resolveNextWebAppVersion(basePackageVersions.rootVersion);
-
-  if (expectedNextVersionResult.isErr) {
-    return Result.err(expectedNextVersionResult.error);
-  }
-
-  const {value: expectedNextVersion} = expectedNextVersionResult;
-
-  if (expectedNextVersion !== options.expectedWebAppVersion) {
-    return Result.err(new Error('Synchronization branch version does not follow its main base version'));
-  }
-
-  const branchPackageDocumentsResult = validateSynchronizationBranchPackageDocuments({
-    branchInspection,
-    expectedWebAppVersion: options.expectedWebAppVersion,
-  });
-
-  if (branchPackageDocumentsResult.isErr) {
-    return Result.err(branchPackageDocumentsResult.error);
-  }
-
-  return Result.ok(validatedBranchName);
-}
-
-export function validateSemVerWebAppVersionSynchronizationBranch(
-  options: ValidateSemVerWebAppVersionSynchronizationBranchOptions,
-): Result<Extract<WebAppVersionSynchronizationBranch, {readonly kind: 'semver'}>, Error> {
-  const {branchInspection} = options;
-  const branchNameResult = validateSemVerWebAppVersionSynchronizationBranchName(branchInspection.branchName);
-
-  if (branchNameResult.isErr) {
-    return Result.err(branchNameResult.error);
-  }
-
-  const {value: validatedBranchName} = branchNameResult;
-
-  if (validatedBranchName.productionTagName !== options.expectedProductionTagName) {
-    return Result.err(new Error('SemVer synchronization branch belongs to a different Production tag'));
-  }
-
-  if (validatedBranchName.webAppVersion !== options.expectedWebAppVersion) {
-    return Result.err(new Error('SemVer synchronization branch contains an unexpected WebApp version'));
   }
 
   const branchStructureResult = validateSynchronizationBranchStructure(branchInspection);
@@ -576,7 +498,7 @@ export function validateSemVerWebAppVersionSynchronizationBranch(
   }
 
   if (baseToTargetComparisonResult.value >= 0) {
-    return Result.err(new Error('SemVer synchronization branch target must be higher than its main base version'));
+    return Result.err(new Error('Synchronization branch target must be higher than its main base version'));
   }
 
   const branchPackageDocumentsResult = validateSynchronizationBranchPackageDocuments({
@@ -616,17 +538,6 @@ export function createSimpleGitWebAppVersionSynchronizationClient(
       },
     }).andThen(commitOutput => {
       return parseCommitSha(commitOutput, 'origin/main');
-    });
-  }
-
-  function readBranchNamesFromRemote(branchPrefix: string): Task<readonly string[], Error> {
-    return runGitOperation({
-      description: 'Unable to list remote WebApp version synchronization branches',
-      async execute() {
-        return git.raw(['ls-remote', '--heads', 'origin']);
-      },
-    }).map(remoteBranchesOutput => {
-      return [...parseRemoteBranchNames(remoteBranchesOutput, branchPrefix)].toSorted();
     });
   }
 
@@ -848,34 +759,8 @@ export function createSimpleGitWebAppVersionSynchronizationClient(
         });
     },
 
-    listExistingBranchNames(releaseIdentifier) {
-      const branchNameResult = createWebAppVersionSynchronizationBranchName(releaseIdentifier, '1.0.0');
-
-      if (branchNameResult.isErr) {
-        return Task.reject<readonly string[], Error>(branchNameResult.error);
-      }
-
-      const {value: bootstrapBranchName} = branchNameResult;
-      const branchPrefix = bootstrapBranchName.slice(0, -'1.0.0'.length);
-
-      return readBranchNamesFromRemote(branchPrefix).andThen(remoteBranchNames => {
-        return runGitOperation({
-          description: 'Unable to inspect local synchronization branches',
-          async execute() {
-            return git.branchLocal();
-          },
-        }).map(localBranches => {
-          const localBranchNames = localBranches.all.filter(branchName => {
-            return branchName.startsWith(branchPrefix);
-          });
-
-          return [...new Set([...remoteBranchNames, ...localBranchNames])].toSorted();
-        });
-      });
-    },
-
     inspectBranch(inspectOptions) {
-      const branchNameResult = validateAnyWebAppVersionSynchronizationBranchName(inspectOptions.branchName);
+      const branchNameResult = validateWebAppVersionSynchronizationBranchName(inspectOptions.branchName);
 
       if (branchNameResult.isErr) {
         return Task.reject<WebAppVersionSynchronizationBranchInspection | undefined, Error>(branchNameResult.error);
@@ -885,7 +770,7 @@ export function createSimpleGitWebAppVersionSynchronizationClient(
     },
 
     createBranchFromMain(createBranchOptions) {
-      const branchNameResult = validateAnyWebAppVersionSynchronizationBranchName(createBranchOptions.branchName);
+      const branchNameResult = validateWebAppVersionSynchronizationBranchName(createBranchOptions.branchName);
 
       if (branchNameResult.isErr) {
         return Task.reject<Unit, Error>(branchNameResult.error);

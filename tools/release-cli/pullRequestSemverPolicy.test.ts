@@ -55,7 +55,7 @@ function runPolicyCommand(environment: PolicyCommandEnvironment): PolicyCommandR
 describe('pull request SemVer policy CLI', () => {
   it.each([
     {targetBranch: 'main', labels: ['feature', 'semver:minor'], impact: 'minor'},
-    {targetBranch: 'release/2026-10-06.1', labels: ['semver:patch'], impact: 'patch'},
+    {targetBranch: 'release/1.1.0', labels: ['semver:patch'], impact: 'patch'},
     {targetBranch: 'maintenance/2026-07-27.1-airgap-a', labels: ['semver:patch'], impact: 'patch'},
     {targetBranch: 'main', labels: ['semver:none'], impact: 'none'},
   ])('accepts $impact targeting $targetBranch', options => {
@@ -72,7 +72,7 @@ describe('pull request SemVer policy CLI', () => {
   it.each([
     {targetBranch: 'main', labels: [], diagnostic: 'no release-impact label'},
     {targetBranch: 'main', labels: ['semver:patch', 'semver:minor'], diagnostic: 'conflicting'},
-    {targetBranch: 'release/2026-10-06.1', labels: ['semver:minor'], diagnostic: 'allow only'},
+    {targetBranch: 'release/1.1.0', labels: ['semver:minor'], diagnostic: 'allow only'},
     {targetBranch: 'maintenance/2026-07-27.1-airgap-a', labels: ['semver:major'], diagnostic: 'allow only'},
     {targetBranch: 'feature/example', labels: ['semver:patch'], diagnostic: 'Unsupported'},
   ])('rejects $labels targeting $targetBranch', options => {

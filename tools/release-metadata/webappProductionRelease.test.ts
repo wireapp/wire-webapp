@@ -19,11 +19,7 @@
 
 import assert from 'node:assert';
 
-import {
-  parseWebAppProductionRelease,
-  resolveWebappBuildVersion,
-  selectPrecedingWebAppProductionTag,
-} from './webappProductionRelease.ts';
+import {parseWebAppProductionRelease, resolveWebappBuildVersion} from './webappProductionRelease.ts';
 
 describe('WebApp Production release tags', () => {
   it.each([
@@ -89,50 +85,5 @@ describe('WebApp Production build version resolution', () => {
 
     assert(actualBuildVersionResult.isOk);
     expect(actualBuildVersionResult.value).toBe(historicalBuildVersion);
-  });
-});
-
-describe('preceding WebApp Production tag selection', () => {
-  it('selects the highest preceding stable SemVer tag by version, independent of input order', () => {
-    const actualProductionTagResult = selectPrecedingWebAppProductionTag('v1.11.0', [
-      'v1.10.0',
-      'v1.9.0',
-      'v1.11.0',
-      'v1.11.0-beta.1',
-      'some-library@99.0.0',
-      '2026-10-06.1-production',
-    ]);
-
-    assert(actualProductionTagResult.isOk);
-    assert(actualProductionTagResult.value.isJust);
-    expect(actualProductionTagResult.value.value).toBe('v1.10.0');
-  });
-
-  it('uses the existing legacy date ordering without mixing in SemVer tags', () => {
-    const actualProductionTagResult = selectPrecedingWebAppProductionTag('2026-10-06.1-production', [
-      'v1.0.0',
-      '2026-07-27.1-production',
-      '2026-10-06.1-production',
-    ]);
-
-    assert(actualProductionTagResult.isOk);
-    assert(actualProductionTagResult.value.isJust);
-    expect(actualProductionTagResult.value.value).toBe('2026-07-27.1-production');
-  });
-
-  it('fails closed when a newer stable SemVer Production tag exists', () => {
-    const actualProductionTagResult = selectPrecedingWebAppProductionTag('v1.10.0', ['v1.9.0', 'v1.11.0']);
-
-    assert(actualProductionTagResult.isErr);
-    expect(actualProductionTagResult.error.message).toContain('newer stable WebApp Production tag exists');
-    expect(actualProductionTagResult.error.message).toContain('v1.11.0');
-  });
-
-  it('selects historical v0.2.0 before bootstrap v1.0.0 using SemVer ordering', () => {
-    const actualProductionTagResult = selectPrecedingWebAppProductionTag('v1.0.0', ['v1.0.0', 'v0.2.0']);
-
-    assert(actualProductionTagResult.isOk);
-    assert(actualProductionTagResult.value.isJust);
-    expect(actualProductionTagResult.value.value).toBe('v0.2.0');
   });
 });

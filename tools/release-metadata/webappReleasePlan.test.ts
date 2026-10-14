@@ -19,7 +19,7 @@
 
 import assert from 'node:assert';
 
-import {Maybe, Result} from 'true-myth';
+import {Maybe, Task} from 'true-myth';
 
 import {pullRequestReleaseImpactLabels} from './pullRequestReleaseImpact.ts';
 import type {PullRequestReleaseImpact} from './pullRequestReleaseImpact.ts';
@@ -65,11 +65,11 @@ function createPlanningTestDependencies(options: PlanningTestOptions): WebAppRel
   };
 
   return {
-    async readFirstParentHistory() {
-      return Result.ok(history);
+    readFirstParentHistory() {
+      return Task.resolve(history);
     },
-    async listPullRequestsForCommit(listOptions) {
-      return Result.ok(options.pullRequestsByCommit.get(listOptions.commitSha) ?? []);
+    listPullRequestsForCommit(listOptions) {
+      return Task.resolve(options.pullRequestsByCommit.get(listOptions.commitSha) ?? []);
     },
   };
 }
@@ -84,12 +84,14 @@ function createImpactPullRequest(
 describe('WebApp release pull request discovery', () => {
   it('maps one first-parent commit to one merged main pull request', async () => {
     const pullRequest = createImpactPullRequest(101, 'minor');
-    const actualPullRequestsResult = await discoverWebAppReleasePullRequests({
-      commits: [firstCommit],
-      async listPullRequestsForCommit() {
-        return Result.ok([pullRequest]);
+    const actualPullRequestsResult = await discoverWebAppReleasePullRequests(
+      {commits: [firstCommit]},
+      {
+        listPullRequestsForCommit() {
+          return Task.resolve([pullRequest]);
+        },
       },
-    });
+    ).toPromise();
 
     assert(actualPullRequestsResult.isOk);
     expect(actualPullRequestsResult.value).toEqual([pullRequest]);
@@ -97,12 +99,14 @@ describe('WebApp release pull request discovery', () => {
 
   it('deduplicates a pull request associated with several first-parent commits', async () => {
     const pullRequest = createImpactPullRequest(102, 'patch');
-    const actualPullRequestsResult = await discoverWebAppReleasePullRequests({
-      commits: [firstCommit, secondCommit],
-      async listPullRequestsForCommit() {
-        return Result.ok([pullRequest]);
+    const actualPullRequestsResult = await discoverWebAppReleasePullRequests(
+      {commits: [firstCommit, secondCommit]},
+      {
+        listPullRequestsForCommit() {
+          return Task.resolve([pullRequest]);
+        },
       },
-    });
+    ).toPromise();
 
     assert(actualPullRequestsResult.isOk);
     expect(actualPullRequestsResult.value).toEqual([pullRequest]);
@@ -118,12 +122,14 @@ describe('WebApp release pull request discovery', () => {
       [thirdCommit, [thirdPullRequest]],
     ]);
 
-    const actualPullRequestsResult = await discoverWebAppReleasePullRequests({
-      commits: [firstCommit, secondCommit, thirdCommit],
-      async listPullRequestsForCommit(listOptions) {
-        return Result.ok(pullRequestsByCommit.get(listOptions.commitSha) ?? []);
+    const actualPullRequestsResult = await discoverWebAppReleasePullRequests(
+      {commits: [firstCommit, secondCommit, thirdCommit]},
+      {
+        listPullRequestsForCommit(listOptions) {
+          return Task.resolve(pullRequestsByCommit.get(listOptions.commitSha) ?? []);
+        },
       },
-    });
+    ).toPromise();
 
     assert(actualPullRequestsResult.isOk);
     expect(actualPullRequestsResult.value).toEqual([firstPullRequest, secondPullRequest, thirdPullRequest]);
@@ -141,24 +147,28 @@ describe('WebApp release pull request discovery', () => {
       labels: [pullRequestReleaseImpactLabels.patch],
     });
     const mainPullRequest = createImpactPullRequest(108, 'minor');
-    const actualPullRequestsResult = await discoverWebAppReleasePullRequests({
-      commits: [firstCommit],
-      async listPullRequestsForCommit() {
-        return Result.ok([unrelatedPullRequest, unmergedPullRequest, mainPullRequest]);
+    const actualPullRequestsResult = await discoverWebAppReleasePullRequests(
+      {commits: [firstCommit]},
+      {
+        listPullRequestsForCommit() {
+          return Task.resolve([unrelatedPullRequest, unmergedPullRequest, mainPullRequest]);
+        },
       },
-    });
+    ).toPromise();
 
     assert(actualPullRequestsResult.isOk);
     expect(actualPullRequestsResult.value).toEqual([mainPullRequest]);
   });
 
   it('fails with the commit SHA when a commit has no merged main pull request', async () => {
-    const actualPullRequestsResult = await discoverWebAppReleasePullRequests({
-      commits: [firstCommit],
-      async listPullRequestsForCommit() {
-        return Result.ok([]);
+    const actualPullRequestsResult = await discoverWebAppReleasePullRequests(
+      {commits: [firstCommit]},
+      {
+        listPullRequestsForCommit() {
+          return Task.resolve([]);
+        },
       },
-    });
+    ).toPromise();
 
     assert(actualPullRequestsResult.isErr);
     expect(actualPullRequestsResult.error.message).toContain(firstCommit);
@@ -167,12 +177,14 @@ describe('WebApp release pull request discovery', () => {
   it('fails when more than one merged main pull request is associated with a commit', async () => {
     const firstPullRequest = createImpactPullRequest(109, 'minor');
     const secondPullRequest = createImpactPullRequest(110, 'patch');
-    const actualPullRequestsResult = await discoverWebAppReleasePullRequests({
-      commits: [firstCommit],
-      async listPullRequestsForCommit() {
-        return Result.ok([firstPullRequest, secondPullRequest]);
+    const actualPullRequestsResult = await discoverWebAppReleasePullRequests(
+      {commits: [firstCommit]},
+      {
+        listPullRequestsForCommit() {
+          return Task.resolve([firstPullRequest, secondPullRequest]);
+        },
       },
-    });
+    ).toPromise();
 
     assert(actualPullRequestsResult.isErr);
     expect(actualPullRequestsResult.error.message).toContain(firstCommit);
@@ -201,12 +213,10 @@ describe('WebApp release plan', () => {
       commitOrder: [...pullRequestsByCommit.keys()],
     });
 
-    const actualPlanResult = await planWebAppRelease({
-      baseCommit,
-      targetCommit,
-      currentVersion: '1.0.0',
+    const actualPlanResult = await planWebAppRelease(
+      {baseCommit, targetCommit, currentVersion: '1.0.0'},
       dependencies,
-    });
+    ).toPromise();
 
     assert(actualPlanResult.isOk);
     expect(actualPlanResult.value.versionBump).toBe(options.expectedVersionBump);
@@ -219,12 +229,10 @@ describe('WebApp release plan', () => {
       commitOrder: [firstCommit],
     });
 
-    const actualPlanResult = await planWebAppRelease({
-      baseCommit,
-      targetCommit,
-      currentVersion: '1.0.0',
+    const actualPlanResult = await planWebAppRelease(
+      {baseCommit, targetCommit, currentVersion: '1.0.0'},
       dependencies,
-    });
+    ).toPromise();
 
     assert(actualPlanResult.isErr);
     expect(actualPlanResult.error.message).toBe('No release-impacting WebApp changes are present');
@@ -236,12 +244,10 @@ describe('WebApp release plan', () => {
       commitOrder: [firstCommit],
     });
 
-    const actualPlanResult = await planWebAppRelease({
-      baseCommit,
-      targetCommit,
-      currentVersion: '1.0.0',
+    const actualPlanResult = await planWebAppRelease(
+      {baseCommit, targetCommit, currentVersion: '1.0.0'},
       dependencies,
-    });
+    ).toPromise();
 
     assert(actualPlanResult.isErr);
     expect(actualPlanResult.error.message).toContain('Pull request #131');
@@ -264,12 +270,10 @@ describe('WebApp release plan', () => {
       commitOrder: [firstCommit],
     });
 
-    const actualPlanResult = await planWebAppRelease({
-      baseCommit,
-      targetCommit,
-      currentVersion: '1.0.0',
+    const actualPlanResult = await planWebAppRelease(
+      {baseCommit, targetCommit, currentVersion: '1.0.0'},
       dependencies,
-    });
+    ).toPromise();
 
     assert(actualPlanResult.isErr);
     expect(actualPlanResult.error.message).toContain('Pull request #132');
