@@ -149,6 +149,24 @@ describe('releaseMetadata', () => {
     expect(actualNextMaintenanceTagName.value).toBe('2026-07-27.1-airgap-a-maintenance.10');
   });
 
+  it('createNextMaintenanceTagName() ignores malformed and different-line maintenance tags', () => {
+    const maintenanceLineKey = '2026-07-27.1-airgap-a';
+    const existingTagNames = [
+      '2026-07-27.1-airgap-ab-maintenance.99',
+      '2026-07-27.1-airgap-a-maintenance.0',
+      '2026-07-27.1-airgap-a-maintenance.01',
+      '2026-07-27.1-airgap-a-maintenance.x',
+      '2026-07-27.1-airgap-a-maintenance.2-extra',
+      '2026-07-27.1-airgap-a-maintenance.2',
+    ];
+
+    const actualNextMaintenanceTagName = createNextMaintenanceTagName(maintenanceLineKey, existingTagNames);
+
+    assert(actualNextMaintenanceTagName.isOk);
+
+    expect(actualNextMaintenanceTagName.value).toBe('2026-07-27.1-airgap-a-maintenance.3');
+  });
+
   it('createNextMaintenanceTagName() ignores unrelated tags', () => {
     const actualNextMaintenanceTagName = createNextMaintenanceTagName('2026-07-27.1-airgap-a', [
       '2026-07-27.1-airgap-b-maintenance.9',

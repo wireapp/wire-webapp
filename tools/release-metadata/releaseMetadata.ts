@@ -41,9 +41,7 @@ const maintenanceBranchNamePattern = new RegExp(
 const maintenanceTagNamePattern = new RegExp(
   String.raw`^${releaseIdentifierPattern}-[a-z0-9]+(?:-[a-z0-9]+)*-maintenance\.[1-9]\d*$`,
 );
-function escapeRegularExpression(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
-}
+const maintenanceTagNumberPattern = /^[1-9]\d*$/;
 
 function isMaintenanceLineKey(value: string): value is MaintenanceLineKey {
   return maintenanceLineKeyPattern.test(value);
@@ -111,16 +109,19 @@ export function createNextMaintenanceTagName(
     return Result.err(maintenanceLineKeyResult.error);
   }
 
-  const escapedMaintenanceLineKey = escapeRegularExpression(maintenanceLineKeyResult.value);
-  const maintenanceTagPattern = new RegExp(String.raw`^${escapedMaintenanceLineKey}-maintenance\.([1-9]\d*)$`);
+  const maintenanceTagPrefix = `${maintenanceLineKeyResult.value}-maintenance.`;
   const existingMaintenanceTagNumbers = existingTagNames.flatMap(existingTagName => {
-    const existingTagNameMatch = maintenanceTagPattern.exec(existingTagName);
-
-    if (existingTagNameMatch === null) {
+    if (existingTagName.startsWith(maintenanceTagPrefix) === false) {
       return [];
     }
 
-    return [Number(existingTagNameMatch[1])];
+    const maintenanceTagNumberText = existingTagName.slice(maintenanceTagPrefix.length);
+
+    if (maintenanceTagNumberPattern.test(maintenanceTagNumberText) === false) {
+      return [];
+    }
+
+    return [Number(maintenanceTagNumberText)];
   });
   const latestMaintenanceTagNumber =
     existingMaintenanceTagNumbers.length > 0 ? Math.max(...existingMaintenanceTagNumbers) : 0;
