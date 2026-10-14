@@ -19,7 +19,10 @@
 
 import {Result} from 'true-myth';
 
-export type SharedDriveUploadRejectionReason = 'empty' | 'notAccepted' | 'notAllowed' | 'recycleBin' | 'tooLarge';
+import {isValidCellsNodeName} from './common/cellsNodeNameValidator';
+
+export type SharedDriveUploadRejectionReason =
+  'empty' | 'invalidName' | 'notAccepted' | 'notAllowed' | 'recycleBin' | 'tooLarge';
 
 export interface SharedDriveUploadRejection {
   readonly reason: SharedDriveUploadRejectionReason;
@@ -36,6 +39,11 @@ export const filterSharedDriveUploadFiles = (files: readonly File[]): File[] => 
   return files.filter(file => {
     return !isUploadMetadataFile(file);
   });
+};
+
+const hasValidUploadName = (file: File): boolean => {
+  const relativePathSegments = file.webkitRelativePath.split('/');
+  return [file.name, ...relativePathSegments].every(isValidCellsNodeName);
 };
 
 interface SharedDriveUploadValidationOptions {
@@ -59,6 +67,13 @@ export const validateSharedDriveUploadFiles = (
 
   if (files.length === 0) {
     return Result.err({reason: 'empty', invalidFiles: []});
+  }
+
+  const invalidNameFiles = files.filter(file => {
+    return !hasValidUploadName(file);
+  });
+  if (invalidNameFiles.length > 0) {
+    return Result.err({reason: 'invalidName', invalidFiles: invalidNameFiles});
   }
 
   const invalidTypeFiles = files.filter(file => {
