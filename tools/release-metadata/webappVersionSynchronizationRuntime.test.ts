@@ -19,10 +19,7 @@
 
 import assert from 'node:assert';
 
-import {
-  readInspectionRuntimeEnvironment,
-  readSynchronizationRuntimeEnvironment,
-} from './webappVersionSynchronizationRuntime.ts';
+import {readSynchronizationRuntimeEnvironment} from './webappVersionSynchronizationRuntime.ts';
 
 function createRuntimeEnvironment(overrides: NodeJS.ProcessEnv = {}): NodeJS.ProcessEnv {
   return {
@@ -34,22 +31,6 @@ function createRuntimeEnvironment(overrides: NodeJS.ProcessEnv = {}): NodeJS.Pro
 }
 
 describe('WebApp version synchronization runtime environment', () => {
-  it('allows inspection with GITHUB_TOKEN without an Otto token', () => {
-    const actualResult = readInspectionRuntimeEnvironment(
-      createRuntimeEnvironment({GITHUB_TOKEN: 'github-read-token'}),
-    );
-
-    assert(actualResult.isOk);
-    expect(actualResult.value.githubToken).toBe('github-read-token');
-  });
-
-  it('requires GITHUB_TOKEN for inspection', () => {
-    const actualResult = readInspectionRuntimeEnvironment(createRuntimeEnvironment());
-
-    assert(actualResult.isErr);
-    expect(actualResult.error.message).toContain('GITHUB_TOKEN');
-  });
-
   it('allows synchronization with the Otto token without GITHUB_TOKEN', () => {
     const actualResult = readSynchronizationRuntimeEnvironment(
       createRuntimeEnvironment({OTTO_THE_BOT_GH_TOKEN: 'otto-write-token'}),
@@ -67,12 +48,11 @@ describe('WebApp version synchronization runtime environment', () => {
   });
 
   it('does not include credentials in validation failures', () => {
-    const actualResult = readInspectionRuntimeEnvironment(
-      createRuntimeEnvironment({GITHUB_API_URL: 'not-a-url', GITHUB_TOKEN: 'github-read-token'}),
+    const actualResult = readSynchronizationRuntimeEnvironment(
+      createRuntimeEnvironment({GITHUB_API_URL: 'not-a-url', OTTO_THE_BOT_GH_TOKEN: 'otto-write-token'}),
     );
 
     assert(actualResult.isErr);
-    expect(actualResult.error.message).not.toContain('github-read-token');
     expect(actualResult.error.message).not.toContain('otto-write-token');
   });
 });

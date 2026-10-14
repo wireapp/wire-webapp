@@ -17,21 +17,14 @@
  *
  */
 
-import {isError, isString} from '@sindresorhus/is';
+import {isError} from '@sindresorhus/is';
 import {Command, CommanderError} from 'commander';
 
-import {resolve} from 'node:path';
 import process from 'node:process';
-import {fileURLToPath} from 'node:url';
 
 import {createRuntimeKyHttpClient} from '../release-github/githubHttpClient.ts';
-import {createSemVerWebAppVersionSynchronizationRequest} from '../release-metadata/webappVersionSynchronization.ts';
-import type {WebAppVersionSynchronizationRequest} from '../release-metadata/webappVersionSynchronization.ts';
 import {
-  createWebAppVersionSynchronizationInspectionOutput,
-  createWebAppVersionSynchronizationResultOutput,
-  createSemVerWebAppVersionSynchronizationInspectionOutput,
-  createSemVerWebAppVersionSynchronizationResultOutput,
+  createWebAppVersionSynchronizationOutput,
   serializeWebAppVersionSynchronizationOutput,
 } from '../release-metadata/webappVersionSynchronizationCli.ts';
 import {
@@ -40,57 +33,25 @@ import {
 } from '../release-metadata/webappVersionSynchronizationGit.ts';
 import {createWebAppVersionSynchronizationGitHubClient} from '../release-metadata/webappVersionSynchronizationGitHubClient.ts';
 import type {WebAppVersionSynchronizationGitHubClient} from '../release-metadata/webappVersionSynchronizationGitHubClient.ts';
+import {synchronizeWebAppVersion} from '../release-metadata/webappVersionSynchronizationOrchestration.ts';
 import type {
-  InspectWebAppVersionSynchronizationOptions,
-  SynchronizeWebAppVersionOptions,
-  InspectSemVerWebAppVersionSynchronizationOptions,
-  SynchronizeSemVerWebAppVersionOptions,
+  WebAppVersionSynchronizationDependencies,
+  WebAppVersionSynchronizationOptions,
 } from '../release-metadata/webappVersionSynchronizationOrchestration.ts';
-import {
-  inspectSemVerWebAppVersionSynchronization,
-  inspectWebAppVersionSynchronization,
-  synchronizeSemVerWebAppVersion,
-  synchronizeWebAppVersion,
-} from '../release-metadata/webappVersionSynchronizationOrchestration.ts';
-import {
-  validateSemVerWebAppVersionSynchronizationPreflight,
-  validateWebAppVersionSynchronizationPreflight,
-} from '../release-metadata/webappVersionSynchronizationPreflight.ts';
-import {
-  readInspectionRuntimeEnvironment,
-  readSynchronizationRuntimeEnvironment,
-} from '../release-metadata/webappVersionSynchronizationRuntime.ts';
-import type {WebAppVersionSynchronizationSynchronizationRuntimeEnvironment} from '../release-metadata/webappVersionSynchronizationRuntime.ts';
-
-type InspectCommand = {
-  readonly kind: 'inspect';
-  readonly releaseIdentifier: string;
-  readonly productionTagName: string;
-};
+import {readSynchronizationRuntimeEnvironment} from '../release-metadata/webappVersionSynchronizationRuntime.ts';
 
 type SynchronizeCommand = {
-  readonly kind: 'synchronize';
-  readonly releaseIdentifier: string;
   readonly productionTagName: string;
 };
 
-type InspectSemVerCommand = {
-  readonly kind: 'inspect-semver';
-  readonly synchronizationRequest: Extract<WebAppVersionSynchronizationRequest, {readonly kind: 'semver'}>;
-};
-
-type SynchronizeSemVerCommand = {
-  readonly kind: 'synchronize-semver';
-  readonly synchronizationRequest: Extract<WebAppVersionSynchronizationRequest, {readonly kind: 'semver'}>;
-};
-
-type WebAppVersionSynchronizationCommand =
-  InspectCommand | SynchronizeCommand | InspectSemVerCommand | SynchronizeSemVerCommand;
-
 type CreateWebAppVersionSynchronizationCommandOptions = {
-  readonly executeCommand: (command: WebAppVersionSynchronizationCommand) => Promise<void> | void;
+  readonly executeCommand: (command: SynchronizeCommand) => Promise<void> | void;
   readonly writeOutput: (message: string) => void;
   readonly writeError: (message: string) => void;
+};
+
+type RunWebAppVersionSynchronizationCommandOptions = {
+  readonly commandLineArguments: readonly string[];
 };
 
 const ottoTheBotName = 'otto-the-bot';
@@ -120,124 +81,10 @@ function createRuntimeGitHubClient(options: RuntimeGitHubClientOptions): WebAppV
   });
 }
 
-async function executeInspectionCommand(
-  command: InspectCommand,
-  githubClient: WebAppVersionSynchronizationGitHubClient,
-  writeOutput: (message: string) => void,
-): Promise<void> {
-  const inspectionOptions: InspectWebAppVersionSynchronizationOptions = {
-    releaseIdentifier: command.releaseIdentifier,
-    productionTagName: command.productionTagName,
-    githubClient,
-  };
-  const inspectionResult = await inspectWebAppVersionSynchronization(inspectionOptions);
-
-  if (inspectionResult.isErr) {
-    throw inspectionResult.error;
-  }
-
-  const {value: inspection} = inspectionResult;
-  const output = createWebAppVersionSynchronizationInspectionOutput(inspection);
-
-  writeOutput(serializeWebAppVersionSynchronizationOutput(output));
-
-  const preflightResult = validateWebAppVersionSynchronizationPreflight(inspection);
-
-  if (preflightResult.isErr) {
-    throw preflightResult.error;
-  }
-}
-
-async function executeSynchronizationCommand(
-  command: SynchronizeCommand,
-  runtimeEnvironment: WebAppVersionSynchronizationSynchronizationRuntimeEnvironment,
-  githubClient: WebAppVersionSynchronizationGitHubClient,
-  writeOutput: (message: string) => void,
-): Promise<void> {
-  const gitClient = createSimpleGitWebAppVersionSynchronizationClient({
-    repositoryPath: runtimeEnvironment.repositoryPath,
-    fileSystem: createRuntimeWebAppVersionSynchronizationFileSystem(),
-    authentication: {githubToken: runtimeEnvironment.ottoTheBotGitHubToken},
-  });
-  const synchronizationOptions: SynchronizeWebAppVersionOptions = {
-    releaseIdentifier: command.releaseIdentifier,
-    productionTagName: command.productionTagName,
-    commitAuthorName: ottoTheBotName,
-    commitAuthorEmail: ottoTheBotEmail,
-    dependencies: {githubClient, gitClient},
-  };
-  const synchronizationResult = await synchronizeWebAppVersion(synchronizationOptions);
-
-  if (synchronizationResult.isErr) {
-    throw synchronizationResult.error;
-  }
-
-  const {value: synchronization} = synchronizationResult;
-  const output = createWebAppVersionSynchronizationResultOutput(synchronization);
-
-  writeOutput(serializeWebAppVersionSynchronizationOutput(output));
-}
-
-async function executeSemVerInspectionCommand(
-  command: InspectSemVerCommand,
-  githubClient: WebAppVersionSynchronizationGitHubClient,
-  writeOutput: (message: string) => void,
-): Promise<void> {
-  const inspectionOptions: InspectSemVerWebAppVersionSynchronizationOptions = {
-    synchronizationRequest: command.synchronizationRequest,
-    githubClient,
-  };
-  const inspectionResult = await inspectSemVerWebAppVersionSynchronization(inspectionOptions);
-
-  if (inspectionResult.isErr) {
-    throw inspectionResult.error;
-  }
-
-  const {value: inspection} = inspectionResult;
-  const output = createSemVerWebAppVersionSynchronizationInspectionOutput(inspection);
-
-  writeOutput(serializeWebAppVersionSynchronizationOutput(output));
-
-  const preflightResult = validateSemVerWebAppVersionSynchronizationPreflight(inspection);
-
-  if (preflightResult.isErr) {
-    throw preflightResult.error;
-  }
-}
-
-async function executeSemVerSynchronizationCommand(
-  command: SynchronizeSemVerCommand,
-  runtimeEnvironment: WebAppVersionSynchronizationSynchronizationRuntimeEnvironment,
-  githubClient: WebAppVersionSynchronizationGitHubClient,
-  writeOutput: (message: string) => void,
-): Promise<void> {
-  const gitClient = createSimpleGitWebAppVersionSynchronizationClient({
-    repositoryPath: runtimeEnvironment.repositoryPath,
-    fileSystem: createRuntimeWebAppVersionSynchronizationFileSystem(),
-    authentication: {githubToken: runtimeEnvironment.ottoTheBotGitHubToken},
-  });
-  const synchronizationOptions: SynchronizeSemVerWebAppVersionOptions = {
-    synchronizationRequest: command.synchronizationRequest,
-    commitAuthorName: ottoTheBotName,
-    commitAuthorEmail: ottoTheBotEmail,
-    dependencies: {githubClient, gitClient},
-  };
-  const synchronizationResult = await synchronizeSemVerWebAppVersion(synchronizationOptions);
-
-  if (synchronizationResult.isErr) {
-    throw synchronizationResult.error;
-  }
-
-  const {value: synchronization} = synchronizationResult;
-  const output = createSemVerWebAppVersionSynchronizationResultOutput(synchronization);
-
-  writeOutput(serializeWebAppVersionSynchronizationOutput(output));
-}
-
-export function createCommand(createCommandOptions: CreateWebAppVersionSynchronizationCommandOptions): Command {
+function createCommand(createCommandOptions: CreateWebAppVersionSynchronizationCommandOptions): Command {
   const command = new Command()
     .name('webappVersionSynchronization')
-    .description('Inspect or synchronize WebApp Production package metadata.')
+    .description('Synchronize WebApp package versions to a stable Production tag.')
     .configureOutput({
       writeOut: createCommandOptions.writeOutput,
       writeErr: createCommandOptions.writeError,
@@ -245,133 +92,74 @@ export function createCommand(createCommandOptions: CreateWebAppVersionSynchroni
     .exitOverride();
 
   command
-    .command('inspect')
-    .argument('<release-identifier>')
-    .argument('<production-tag>')
-    .action(async (releaseIdentifier: string, productionTagName: string): Promise<void> => {
-      await createCommandOptions.executeCommand({kind: 'inspect', releaseIdentifier, productionTagName});
-    });
-
-  command
     .command('synchronize')
-    .argument('<release-identifier>')
-    .argument('<production-tag>')
-    .action(async (releaseIdentifier: string, productionTagName: string): Promise<void> => {
-      await createCommandOptions.executeCommand({kind: 'synchronize', releaseIdentifier, productionTagName});
-    });
-
-  command
-    .command('inspect-semver')
     .argument('<production-tag>')
     .action(async (productionTagName: string): Promise<void> => {
-      const synchronizationRequestResult = createSemVerWebAppVersionSynchronizationRequest(productionTagName);
-
-      if (synchronizationRequestResult.isErr) {
-        throw synchronizationRequestResult.error;
-      }
-
-      await createCommandOptions.executeCommand({
-        kind: 'inspect-semver',
-        synchronizationRequest: synchronizationRequestResult.value,
-      });
-    });
-
-  command
-    .command('synchronize-semver')
-    .argument('<production-tag>')
-    .action(async (productionTagName: string): Promise<void> => {
-      const synchronizationRequestResult = createSemVerWebAppVersionSynchronizationRequest(productionTagName);
-
-      if (synchronizationRequestResult.isErr) {
-        throw synchronizationRequestResult.error;
-      }
-
-      await createCommandOptions.executeCommand({
-        kind: 'synchronize-semver',
-        synchronizationRequest: synchronizationRequestResult.value,
-      });
+      await createCommandOptions.executeCommand({productionTagName});
     });
 
   return command;
 }
 
 export async function runWebAppVersionSynchronizationCommand(
-  commandLineArguments: readonly string[],
-  createCommandOptions: CreateWebAppVersionSynchronizationCommandOptions,
+  options: RunWebAppVersionSynchronizationCommandOptions,
+  dependencies: CreateWebAppVersionSynchronizationCommandOptions,
 ): Promise<number> {
-  let executionExitCode = 0;
-  const command = createCommand({
-    ...createCommandOptions,
-    async executeCommand(applicationCommand: WebAppVersionSynchronizationCommand): Promise<void> {
-      await createCommandOptions.executeCommand(applicationCommand);
-      executionExitCode = 0;
-    },
-  });
+  const {commandLineArguments} = options;
+  const command = createCommand(dependencies);
 
   try {
     await command.parseAsync(['node', 'webappVersionSynchronization', ...commandLineArguments]);
 
-    return executionExitCode;
+    return 0;
   } catch (error: unknown) {
     if (error instanceof CommanderError) {
       return error.exitCode;
     }
 
     const errorMessage = isError(error) ? error.message : String(error);
-
-    createCommandOptions.writeError(`${errorMessage}\n`);
+    dependencies.writeError(`${errorMessage}\n`);
 
     return 1;
   }
 }
 
-async function executeRuntimeCommand(command: WebAppVersionSynchronizationCommand): Promise<void> {
-  if (command.kind === 'inspect' || command.kind === 'inspect-semver') {
-    const runtimeEnvironmentResult = readInspectionRuntimeEnvironment(process.env);
-
-    if (runtimeEnvironmentResult.isErr) {
-      throw runtimeEnvironmentResult.error;
-    }
-
-    const {value: runtimeEnvironment} = runtimeEnvironmentResult;
-    const githubClient = createRuntimeGitHubClient({
-      githubApiUrl: runtimeEnvironment.githubApiUrl,
-      githubRepository: runtimeEnvironment.githubRepository,
-      githubToken: runtimeEnvironment.githubToken,
-    });
-
-    if (command.kind === 'inspect') {
-      await executeInspectionCommand(command, githubClient, writeRuntimeOutput);
-    } else {
-      await executeSemVerInspectionCommand(command, githubClient, writeRuntimeOutput);
-    }
-
-    return;
-  }
-
+async function executeRuntimeCommand(command: SynchronizeCommand): Promise<void> {
   const runtimeEnvironmentResult = readSynchronizationRuntimeEnvironment(process.env);
-
   if (runtimeEnvironmentResult.isErr) {
     throw runtimeEnvironmentResult.error;
   }
 
-  const {value: runtimeEnvironment} = runtimeEnvironmentResult;
+  const runtimeEnvironment = runtimeEnvironmentResult.value;
   const githubClient = createRuntimeGitHubClient({
     githubApiUrl: runtimeEnvironment.githubApiUrl,
     githubRepository: runtimeEnvironment.githubRepository,
     githubToken: runtimeEnvironment.ottoTheBotGitHubToken,
   });
+  const gitClient = createSimpleGitWebAppVersionSynchronizationClient({
+    repositoryPath: runtimeEnvironment.repositoryPath,
+    fileSystem: createRuntimeWebAppVersionSynchronizationFileSystem(),
+    authentication: {githubToken: runtimeEnvironment.ottoTheBotGitHubToken},
+  });
+  const synchronizationOptions: WebAppVersionSynchronizationOptions = {
+    productionTagName: command.productionTagName,
+    commitAuthorName: ottoTheBotName,
+    commitAuthorEmail: ottoTheBotEmail,
+  };
+  const dependencies: WebAppVersionSynchronizationDependencies = {githubClient, gitClient};
+  const synchronizationResult = await synchronizeWebAppVersion(synchronizationOptions, dependencies).toPromise();
 
-  if (command.kind === 'synchronize') {
-    await executeSynchronizationCommand(command, runtimeEnvironment, githubClient, writeRuntimeOutput);
-  } else {
-    await executeSemVerSynchronizationCommand(command, runtimeEnvironment, githubClient, writeRuntimeOutput);
+  if (synchronizationResult.isErr) {
+    throw synchronizationResult.error;
   }
+
+  const output = createWebAppVersionSynchronizationOutput(synchronizationResult.value);
+  writeRuntimeOutput(serializeWebAppVersionSynchronizationOutput(output));
 }
 
 async function main(): Promise<void> {
   process.exitCode = await runWebAppVersionSynchronizationCommand(
-    process.argv.slice(runtimeCommandLineArgumentStartIndex),
+    {commandLineArguments: process.argv.slice(runtimeCommandLineArgumentStartIndex)},
     {
       executeCommand: executeRuntimeCommand,
       writeError: writeRuntimeError,
@@ -380,23 +168,6 @@ async function main(): Promise<void> {
   );
 }
 
-function isCurrentModuleEntrypoint(): boolean {
-  const entrypointPath = process.argv[1];
-
-  return isString(entrypointPath) && fileURLToPath(import.meta.url) === resolve(entrypointPath);
-}
-
-function crash(error: unknown): void {
-  const errorMessage = isError(error) ? error.message : String(error);
-
-  writeRuntimeError(errorMessage);
-  process.exitCode = 1;
-}
-
-if (isCurrentModuleEntrypoint()) {
-  try {
-    await main();
-  } catch (error: unknown) {
-    crash(error);
-  }
+if (process.argv[1]?.endsWith('webappVersionSynchronization.mts') === true) {
+  void main();
 }
