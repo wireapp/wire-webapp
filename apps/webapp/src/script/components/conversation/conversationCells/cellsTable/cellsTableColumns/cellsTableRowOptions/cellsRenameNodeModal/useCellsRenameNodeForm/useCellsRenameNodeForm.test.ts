@@ -139,7 +139,7 @@ describe('useCellsRenameForm', () => {
     expect(onSuccess).not.toHaveBeenCalled();
   });
 
-  it('shows error when name contains invalid character "."', async () => {
+  it('allows dots when they are not at the beginning of the name', async () => {
     const node = createNode();
     const {result} = renderHook(() => {
       return useCellsRenameForm({node, cellsRepository: mockCellsRepository, onSuccess, renameNodeCopy});
@@ -147,6 +147,28 @@ describe('useCellsRenameForm', () => {
 
     act(() => {
       result.current.handleNameChange({currentTarget: {value: 'New.Folder'}} as ChangeEvent<HTMLInputElement>);
+    });
+
+    await act(async () => {
+      await result.current.handleRename(createEvent());
+    });
+
+    expect(result.current.error).toBeNull();
+    expect(mockCellsRepository.renameNode).toHaveBeenCalledWith({
+      currentPath: '/Folder',
+      newName: 'New.Folder',
+    });
+    expect(onSuccess).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows error when the name starts with a dot', async () => {
+    const node = createNode();
+    const {result} = renderHook(() => {
+      return useCellsRenameForm({node, cellsRepository: mockCellsRepository, onSuccess, renameNodeCopy});
+    });
+
+    act(() => {
+      result.current.handleNameChange({currentTarget: {value: '.hidden'}} as ChangeEvent<HTMLInputElement>);
     });
 
     await act(async () => {

@@ -25,6 +25,8 @@ import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {CellNode} from 'src/script/types/cellNode';
 import {getFileExtension, trimFileExtension} from 'Util/util';
 
+import {isValidCellsNodeName} from '../../../../../common/cellsNodeNameValidator';
+
 interface UseCellsRenameFormProps {
   node: CellNode;
   cellsRepository: CellsRepository;
@@ -36,8 +38,6 @@ interface UseCellsRenameFormProps {
   };
 }
 
-const INVALID_CHARACTERS = ['/', '.'];
-
 export const useCellsRenameForm = ({node, cellsRepository, onSuccess, renameNodeCopy}: UseCellsRenameFormProps) => {
   const [name, setName] = useState(trimFileExtension(node.name));
   const [error, setError] = useState<string | null>(null);
@@ -45,9 +45,7 @@ export const useCellsRenameForm = ({node, cellsRepository, onSuccess, renameNode
 
   const originalBaseName = trimFileExtension(node.name);
   const normalizedName = name.trim();
-  const hasInvalidCharacters = INVALID_CHARACTERS.some(char => {
-    return normalizedName.includes(char);
-  });
+  const hasInvalidCharacters = !isValidCellsNodeName(normalizedName);
   const isDisabled = isSubmitting || normalizedName === originalBaseName || normalizedName.length === 0;
 
   const buildNewName = (baseName: string) => {

@@ -21,10 +21,10 @@ import {Maybe} from 'true-myth';
 
 import {isAxiosError} from 'Util/typePredicateUtil';
 
+import {isValidCellsNodeName} from '../cellsNodeNameValidator';
+
 export const ITEM_ALREADY_EXISTS_ERROR = 409;
 export const NODE_NAME_MAX_LENGTH = 64;
-
-const INVALID_NODE_NAME_PATTERN = /[\\/"]/u;
 
 export type CellsNewNodeFormValidationCopy = {
   readonly genericError: string;
@@ -55,7 +55,7 @@ export const getClientSideNodeNameError = (
     return Maybe.just(validationCopy.maxLengthError);
   }
 
-  if (name.startsWith('.') || INVALID_NODE_NAME_PATTERN.test(name)) {
+  if (!isValidCellsNodeName(name)) {
     return Maybe.just(validationCopy.invalidCharactersError);
   }
 
