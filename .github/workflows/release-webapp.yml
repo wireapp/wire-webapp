@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       operation:
-        description: 'Start the next SemVer release or continue the active release'
+        description: 'start = calculate next SemVer from this exact main commit and create release/X.Y.Z; continue = require active release/X.Y.Z and use its current HEAD for another candidate without re-planning'
         required: true
         type: choice
         options:
@@ -18,10 +18,6 @@ on:
         required: true
         default: false
         type: boolean
-      reason:
-        description: 'Optional reason for this WebApp release operation'
-        required: false
-        type: string
 
 concurrency:
   group: release-webapp
@@ -577,7 +573,6 @@ jobs:
           RELEASE_BRANCH_ACTION: ${{ needs.build_artifact.outputs.release_branch_action }}
           RELEASE_COMMIT_SHA: ${{ needs.build_artifact.outputs.release_commit_sha }}
           RELEASE_VERSION: ${{ needs.build_artifact.outputs.release_version }}
-          RELEASE_REASON: ${{ inputs.reason }}
         run: node tools/release-summary/renderWebappReleaseSummary.ts --beta-release >> "$GITHUB_STEP_SUMMARY"
 
   # WebApp release owns release-specific success and failure notifications.
@@ -1330,7 +1325,6 @@ jobs:
           RELEASE_BRANCH_ACTION: ${{ needs.build_artifact.outputs.release_branch_action }}
           RELEASE_COMMIT_SHA: ${{ needs.build_artifact.outputs.release_commit_sha }}
           RELEASE_VERSION: ${{ needs.build_artifact.outputs.release_version }}
-          RELEASE_REASON: ${{ inputs.reason }}
           TESTINY_RUN_NAME: Release ${{ needs.build_artifact.outputs.release_version }} ${{ needs.create_beta_tag.outputs.beta_tag_name }}
         run: node tools/release-summary/renderWebappReleaseSummary.ts >> "$GITHUB_STEP_SUMMARY"
 

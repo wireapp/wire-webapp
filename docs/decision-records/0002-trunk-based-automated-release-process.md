@@ -111,7 +111,7 @@ The WebApp release process uses `release/X.Y.Z`, Beta tags `vX.Y.Z-beta.N`, and 
 
 Each Beta candidate processes only its delta. Production reconstructs candidate history through the explicitly promoted Beta tag and repairs missing Beta metadata. Beta and Production first appearances may belong to different releases, and recorded first-appearance values are immutable.
 
-- `Release WebApp` is the single user-facing normal-release entrypoint. It must be started with GitHub's `Use workflow from: main` selector and offers two actions: `start` and `continue`. The operator confirms the release and may provide a reason; the workflow allocates the version.
+- `Release WebApp` is the single user-facing normal-release entrypoint. It must be started with GitHub's `Use workflow from: main` selector. Its operator inputs are `operation: start | continue` and `confirm_release`. `start` plans the next version from the selected main commit; `continue` reuses the active release version and current branch head.
 - `start` plans the next SemVer version from merged PR release-impact labels since the latest stable WebApp tag. It creates `release/X.Y.Z` at the exact dispatch `GITHUB_SHA` using a create-only ref update, then verifies the remote head.
 - `continue` requires exactly one active SemVer release branch, reuses its current verified remote HEAD, and does not re-plan the version or mutate the branch. Reviewed fixes may advance the branch before another Beta candidate.
 - Repeated `continue` operations build the same `X.Y.Z` release version and allocate the next contiguous `vX.Y.Z-beta.N` tag.
@@ -155,7 +155,7 @@ Each Beta candidate processes only its delta. Production reconstructs candidate 
 - The production workflow promotes the beta-tested artifact and does not rebuild from source.
 - Live deployment verification uses `/version` to identify the deployed artifact with its complete authoritative `BuildMetadata` object (`version`, `assetVersion`, `commit`, and `builtAt`), and `/config.js` to verify the active environment-specific REST and WebSocket backend configuration.
 - `version` remains the logical application version, `assetVersion` identifies browser assets for the exact source revision, `commit` is the full Git SHA, and `builtAt` is the artifact assembly time in UTC. `/commit` remains a plain-text compatibility endpoint for existing consumers.
-- Deployment context such as the result, Git reference, target environment, service URLs, Docker image, Helm chart, `wire-builds` commit, workflow run URL, and manual-dispatch reason belongs in GitHub Actions summaries rather than `/version`.
+- Deployment context such as the result, Git reference, target environment, service URLs, Docker image, Helm chart, `wire-builds` commit, and workflow run URL belongs in GitHub Actions summaries rather than `/version`.
 - Backend configuration is runtime state and is not inferred from build identity. Beta, precommit, and Production must each satisfy their expected combination of build version, source commit, REST backend, and WebSocket backend.
 - A successful deployment operation alone does not create a Production tag. The workflow creates the stable tag `vX.Y.Z` only after all Production runtime assertions pass, so the tag represents a successfully deployed and verified runtime.
 - The hosted-deployment EBS artifact is built once and promoted unchanged through hosted Beta, E2E, and hosted Production.

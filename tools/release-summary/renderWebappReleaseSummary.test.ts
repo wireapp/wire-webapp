@@ -108,7 +108,6 @@ const baselineWebappReleaseSummaryInput: WebappReleaseSummaryInput = {
     branch: Maybe.just('release/1.1.0'),
     commitSha: Maybe.just(releaseCommitSha),
     version: Maybe.just(releaseVersion),
-    manualReason: Maybe.nothing<string>(),
   },
   webAppVersionSynchronization: {
     synchronizationAction: Maybe.nothing(),
@@ -1238,18 +1237,12 @@ describe('WebApp release summary renderer', () => {
     expect(technicalEvidence(finalSummary)).toContain('- Commit used to create the release branch: not available');
   });
 
-  it('keeps an optional manual reason in Release preparation evidence only', () => {
-    const input: WebappReleaseSummaryInput = {
-      ...baselineWebappReleaseSummaryInput,
-      release: {
-        ...baselineWebappReleaseSummaryInput.release,
-        manualReason: Maybe.just('manual release for validation'),
-      },
-    };
-    const finalSummary = renderWebappReleaseSummary(input);
+  it('does not include a manual release reason', () => {
+    const betaSummary = renderWebappBetaReleaseSummary(baselineWebappReleaseSummaryInput);
+    const finalSummary = renderWebappReleaseSummary(baselineWebappReleaseSummaryInput);
 
-    expect(technicalEvidence(finalSummary)).toContain('- Manual reason: manual release for validation');
-    expect(visibleSummary(finalSummary)).not.toContain('Manual reason');
+    expect(technicalEvidence(betaSummary)).not.toContain('- Manual reason:');
+    expect(technicalEvidence(finalSummary)).not.toContain('- Manual reason:');
   });
 
   it('reads the Production deployment requirement from the workflow environment', () => {

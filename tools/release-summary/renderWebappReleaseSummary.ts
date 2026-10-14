@@ -33,7 +33,6 @@ export type ReleaseMetadata = {
   readonly branch: Maybe<string>;
   readonly commitSha: Maybe<string>;
   readonly version: Maybe<string>;
-  readonly manualReason: Maybe<string>;
 };
 
 export type BetaSummaryInput = {
@@ -348,7 +347,6 @@ export function readWebappReleaseSummaryInput(environment: NodeJS.ProcessEnv): W
       branch: readOptionalEnvironmentValue(environment, 'RELEASE_BRANCH'),
       commitSha: readOptionalEnvironmentValue(environment, 'RELEASE_COMMIT_SHA'),
       version: readOptionalEnvironmentValue(environment, 'RELEASE_VERSION'),
-      manualReason: readOptionalEnvironmentValue(environment, 'RELEASE_REASON'),
     },
     webAppVersionSynchronization: {
       synchronizationAction: readWebAppVersionSynchronizationAction(environment),
@@ -1769,11 +1767,6 @@ function renderReleasePreparationSection(input: WebappReleaseSummaryInput): stri
     `- Artifact name: ${formatValueOrFallback(input.release.artifactName)}`,
     `- Artifact checksum: ${formatValueOrFallback(input.release.artifactChecksum)}`,
     `- Workflow run URL: ${workflowRunLink}`,
-    ...input.release.manualReason
-      .map(reason => {
-        return [`- Manual reason: ${reason}`];
-      })
-      .unwrapOr([]),
   ].join('\n');
 }
 
