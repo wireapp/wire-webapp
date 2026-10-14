@@ -351,7 +351,7 @@ jobs:
 
       - name: Verify Beta runtime
         id: verify_beta_runtime
-        uses: ./.github/actions/verify-webapp-runtime
+        uses: $/.github/actions/verify-webapp-runtime
         with:
           environment-label: Beta
           webapp-url: ${{ env.BETA_WEBAPP_URL }}
@@ -454,7 +454,7 @@ jobs:
           fetch-depth: 1
 
       - name: Announce successful Beta release
-        uses: ./.github/actions/notify-deployoholics
+        uses: $/.github/actions/notify-deployoholics
         with:
           deployoholics-webhook-url: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
           deployoholics-token: ${{ secrets.WIRE_DEPLOYOHOLICS_TOKEN }}
@@ -583,7 +583,7 @@ jobs:
     needs: [build_artifact, create_beta_tag]
     permissions:
       contents: read
-    uses: ./.github/workflows/precommit-slot-run.yml
+    uses: $/.github/workflows/precommit-slot-run.yml
     with:
       env_name: wire-webapp-precommit-3
       teamManagementUrl: https://teams.wire.com/login/
@@ -626,7 +626,7 @@ jobs:
           fetch-depth: 1
 
       - name: Announce successful release E2E gate
-        uses: ./.github/actions/notify-deployoholics
+        uses: $/.github/actions/notify-deployoholics
         with:
           deployoholics-webhook-url: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
           deployoholics-token: ${{ secrets.WIRE_DEPLOYOHOLICS_TOKEN }}
@@ -790,7 +790,7 @@ jobs:
 
       - name: Verify current Beta runtime
         id: verify_current_beta
-        uses: ./.github/actions/verify-webapp-runtime
+        uses: $/.github/actions/verify-webapp-runtime
         with:
           environment-label: Current Beta before Production promotion
           webapp-url: ${{ env.BETA_WEBAPP_URL }}
@@ -849,7 +849,7 @@ jobs:
           node-version-file: '.nvmrc'
 
       - name: Verify Production runtime
-        uses: ./.github/actions/verify-webapp-runtime
+        uses: $/.github/actions/verify-webapp-runtime
         with:
           environment-label: Production
           webapp-url: ${{ env.PRODUCTION_WEBAPP_URL }}
@@ -997,7 +997,7 @@ jobs:
     permissions:
       actions: read # Download the exact source release artifact.
       contents: read # Fetch the immutable Production tag for validation.
-    uses: ./.github/workflows/publish-production-distribution.yml
+    uses: $/.github/workflows/publish-production-distribution.yml
     with:
       production_tag: ${{ needs.create_production_tag.outputs.production_tag_name }}
       expected_commit_sha: ${{ needs.build_artifact.outputs.release_commit_sha }}
@@ -1189,7 +1189,7 @@ jobs:
           fetch-depth: 1
 
       - name: Announce successful Production release
-        uses: ./.github/actions/notify-deployoholics
+        uses: $/.github/actions/notify-deployoholics
         with:
           deployoholics-webhook-url: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
           deployoholics-token: ${{ secrets.WIRE_DEPLOYOHOLICS_TOKEN }}
@@ -1358,7 +1358,7 @@ jobs:
           fetch-depth: 1
 
       - name: Announce release failure
-        uses: ./.github/actions/notify-deployoholics
+        uses: $/.github/actions/notify-deployoholics
         with:
           deployoholics-webhook-url: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
           deployoholics-token: ${{ secrets.WIRE_DEPLOYOHOLICS_TOKEN }}
