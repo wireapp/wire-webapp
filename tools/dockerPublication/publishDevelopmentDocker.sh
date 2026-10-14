@@ -11,7 +11,7 @@ set -euo pipefail
 
 script_directory="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-expected_image_tag="$(node "${script_directory}/push_docker.js" dev --print-image-tag)"
+expected_image_tag="$(node "${script_directory}/pushDocker.js" dev --print-image-tag)"
 immutable_image_reference="${DOCKER_REPOSITORY}:${expected_image_tag}"
 stable_image_reference="${DOCKER_REPOSITORY}:dev"
 
@@ -27,7 +27,7 @@ if docker manifest inspect "${immutable_image_reference}" >/dev/null 2>&1; then
 else
   echo "Building immutable image ${immutable_image_reference} from the exact downloaded context."
   rm -f "${DOCKER_IMAGE_TAG_OUTPUT_PATH}"
-  node "${script_directory}/push_docker.js" dev "${DOCKER_IMAGE_TAG_OUTPUT_PATH}"
+  node "${script_directory}/pushDocker.js" dev "${DOCKER_IMAGE_TAG_OUTPUT_PATH}"
   captured_image_tag="$(<"${DOCKER_IMAGE_TAG_OUTPUT_PATH}")"
 
   if [[ "${captured_image_tag}" != "${expected_image_tag}" ]]; then

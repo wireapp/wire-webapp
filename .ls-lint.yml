@@ -5,6 +5,10 @@ ls:
     .ts: camelCase
     .test.ts: camelCase
     .mts: camelCase
+  tools/dockerPublication:
+    .js: camelCase
+    .test.ts: camelCase
+    .sh: camelCase
   libraries/config/src:
     .dir: camelCase
     .ts: camelCase

@@ -28,7 +28,7 @@ const {
   runProcess,
   selectWebAppConfigurationEntry,
   selectReleaseCommit,
-} = require('./push_docker');
+} = require('./pushDocker');
 
 type ProcessEvent =
   | {
@@ -43,7 +43,7 @@ type ProcessEvent =
       fileContents: string;
     };
 
-describe('push_docker metadata', () => {
+describe('pushDocker metadata', () => {
   it('selects production configuration for a stable SemVer Production tag', () => {
     const actualConfigurationEntry = selectWebAppConfigurationEntry('v1.1.0', 'v1.1.0');
 

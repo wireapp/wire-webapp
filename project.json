@@ -5,7 +5,7 @@
     "docker": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "node ./tools/dockerPublication/push_docker.js"
+        "command": "node ./tools/dockerPublication/pushDocker.js"
       }
     },
     "clean-jest": {
