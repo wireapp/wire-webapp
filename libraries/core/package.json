@@ -39,7 +39,7 @@
     "idb": "8.0.4",
     "lodash": "4.18.1",
     "noop-esm": "1.1.0",
-    "p-queue": "9.3.4",
+    "p-queue": "9.3.5",
     "true-myth": "9.4.0"
   },
   "devDependencies": {
