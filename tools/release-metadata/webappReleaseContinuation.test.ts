@@ -54,16 +54,18 @@ const activeReleaseCommit = 'b'.repeat(40);
 const otherReleaseCommit = 'c'.repeat(40);
 
 function createStableRelease(options: CreateStableReleaseOptions): StableWebAppRelease {
-  const versionResult = validateWebAppVersion(options.version);
+  const {version, tagName, commitSha} = options;
+  const versionResult = validateWebAppVersion(version);
   assert(versionResult.isOk);
 
-  return Object.freeze({version: versionResult.value, tagName: options.tagName, commitSha: options.commitSha});
+  return Object.freeze({version: versionResult.value, tagName, commitSha});
 }
 
 function createContinuationTestDependencies(options: ContinuationTestOptions = {}): ContinuationTestDependencies {
+  const {stableReleases: configuredStableReleases, releaseBranches, ancestorResult} = options;
   const ancestorCalls: Array<VerifyWebAppReleaseCommitAncestorOptions> = [];
   const preparationCalls: Array<PrepareRemoteReleaseBranchCommitOptions> = [];
-  const stableReleases = options.stableReleases ?? [
+  const stableReleases = configuredStableReleases ?? [
     createStableRelease({version: '1.0.0', tagName: 'v1.0.0', commitSha: stableCommit}),
   ];
 
@@ -72,21 +74,23 @@ function createContinuationTestDependencies(options: ContinuationTestOptions = {
   }
 
   async function readRemoteReleaseBranches(): Promise<Result<readonly WebAppReleaseBranchRef[], Error>> {
-    return Result.ok(options.releaseBranches ?? []);
+    return Result.ok(releaseBranches ?? []);
   }
 
   async function isCommitAncestor(
     ancestorOptions: VerifyWebAppReleaseCommitAncestorOptions,
   ): Promise<Result<boolean, Error>> {
-    ancestorCalls.push(ancestorOptions);
+    const {baseCommit, targetCommit} = ancestorOptions;
+    ancestorCalls.push({baseCommit, targetCommit});
 
-    return options.ancestorResult ?? Result.ok(true);
+    return ancestorResult ?? Result.ok(true);
   }
 
   function prepareRemoteReleaseBranchCommit(
     preparationOptions: PrepareRemoteReleaseBranchCommitOptions,
   ): Task<Unit, Error> {
-    preparationCalls.push(preparationOptions);
+    const {releaseBranch, expectedCommitSha} = preparationOptions;
+    preparationCalls.push({releaseBranch, expectedCommitSha});
 
     return Task.resolve(Unit);
   }
@@ -109,7 +113,7 @@ describe('WebApp release continuation', () => {
       releaseBranches: [{releaseBranch: 'release/1.1.0', releaseCommitSha: activeReleaseCommit}],
     });
 
-    const actualContinuationResult = await continueActiveWebAppRelease({dependencies: testDependencies.dependencies});
+    const actualContinuationResult = await continueActiveWebAppRelease(testDependencies.dependencies);
 
     assert(actualContinuationResult.isOk);
     expect(actualContinuationResult.value).toEqual({
@@ -137,7 +141,7 @@ describe('WebApp release continuation', () => {
       releaseBranches: [{releaseBranch: 'release/1.2.0', releaseCommitSha: activeReleaseCommit}],
     });
 
-    const actualContinuationResult = await continueActiveWebAppRelease({dependencies: testDependencies.dependencies});
+    const actualContinuationResult = await continueActiveWebAppRelease(testDependencies.dependencies);
 
     assert(actualContinuationResult.isOk);
     expect(actualContinuationResult.value.stableBaseVersion).toBe('1.1.0');
@@ -153,7 +157,7 @@ describe('WebApp release continuation', () => {
       releaseBranches: [{releaseBranch: 'release/1.0.0', releaseCommitSha: stableCommit}],
     });
 
-    const actualContinuationResult = await continueActiveWebAppRelease({dependencies: testDependencies.dependencies});
+    const actualContinuationResult = await continueActiveWebAppRelease(testDependencies.dependencies);
 
     assert(actualContinuationResult.isErr);
     expect(actualContinuationResult.error.message).toBe('No active WebApp SemVer release exists');
@@ -169,7 +173,7 @@ describe('WebApp release continuation', () => {
       ],
     });
 
-    const actualContinuationResult = await continueActiveWebAppRelease({dependencies: testDependencies.dependencies});
+    const actualContinuationResult = await continueActiveWebAppRelease(testDependencies.dependencies);
 
     assert(actualContinuationResult.isErr);
     expect(actualContinuationResult.error.message).toBe(
@@ -189,7 +193,7 @@ describe('WebApp release continuation', () => {
       releaseBranches: [{releaseBranch: 'release/1.1.0', releaseCommitSha: activeReleaseCommit}],
     });
 
-    const actualContinuationResult = await continueActiveWebAppRelease({dependencies: testDependencies.dependencies});
+    const actualContinuationResult = await continueActiveWebAppRelease(testDependencies.dependencies);
 
     assert(actualContinuationResult.isErr);
     expect(actualContinuationResult.error.message).toContain('WebApp release reservation commit mismatch');
@@ -202,7 +206,7 @@ describe('WebApp release continuation', () => {
       ancestorResult: Result.ok(false),
     });
 
-    const actualContinuationResult = await continueActiveWebAppRelease({dependencies: testDependencies.dependencies});
+    const actualContinuationResult = await continueActiveWebAppRelease(testDependencies.dependencies);
 
     assert(actualContinuationResult.isErr);
     expect(actualContinuationResult.error.message).toBe(
@@ -219,7 +223,7 @@ describe('WebApp release continuation', () => {
       ],
     });
 
-    const actualContinuationResult = await continueActiveWebAppRelease({dependencies: testDependencies.dependencies});
+    const actualContinuationResult = await continueActiveWebAppRelease(testDependencies.dependencies);
 
     assert(actualContinuationResult.isOk);
     expect(actualContinuationResult.value.releaseBranch).toBe('release/1.1.0');
@@ -231,7 +235,7 @@ describe('WebApp release continuation', () => {
       releaseBranches: [{releaseBranch: 'release/1.1', releaseCommitSha: activeReleaseCommit}],
     });
 
-    const actualContinuationResult = await continueActiveWebAppRelease({dependencies: testDependencies.dependencies});
+    const actualContinuationResult = await continueActiveWebAppRelease(testDependencies.dependencies);
 
     assert(actualContinuationResult.isErr);
     expect(actualContinuationResult.error.message).toContain('Malformed SemVer WebApp release branch');

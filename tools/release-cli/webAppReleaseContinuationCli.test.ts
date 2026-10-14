@@ -41,6 +41,7 @@ const activeReleaseCommit = 'b'.repeat(40);
 const stableCommit = 'a'.repeat(40);
 
 function createTestReservation(options: CreateTestReservationOptions): WebAppReleaseReservation {
+  const {releaseCommitSha} = options;
   const versionResult = validateWebAppVersion('1.1.0');
   const stableBaseVersionResult = validateWebAppVersion('1.0.0');
   assert(versionResult.isOk);
@@ -49,7 +50,7 @@ function createTestReservation(options: CreateTestReservationOptions): WebAppRel
   return Object.freeze({
     version: versionResult.value,
     releaseBranch: 'release/1.1.0',
-    releaseCommitSha: options.releaseCommitSha,
+    releaseCommitSha,
     stableBaseVersion: stableBaseVersionResult.value,
     stableBaseTag: 'v1.0.0',
     stableBaseCommitSha: stableCommit,
@@ -66,11 +67,12 @@ function discardCommandMessage(commandMessage: string): void {
 }
 
 function createCommandOptions(options: CreateCommandOptions = {}): WebAppReleaseContinuationCommandOptions {
+  const {continueActiveWebAppRelease, writeOutput, writeError} = options;
+
   return {
-    continueActiveWebAppRelease: continueWithTestReservation,
-    writeError: discardCommandMessage,
-    writeOutput: discardCommandMessage,
-    ...options,
+    continueActiveWebAppRelease: continueActiveWebAppRelease ?? continueWithTestReservation,
+    writeError: writeError ?? discardCommandMessage,
+    writeOutput: writeOutput ?? discardCommandMessage,
   };
 }
 

@@ -61,16 +61,19 @@ function readErrorMessage(error: unknown): string {
 async function executeWebAppReleaseReservationCommand(
   options: ExecuteWebAppReleaseReservationOptions,
 ): Promise<number> {
-  const {targetCommit, commandOptions} = options;
+  const {
+    targetCommit,
+    commandOptions: {environment, reserveWebAppRelease, writeOutput, writeError},
+  } = options;
   if (fullCommitShaPattern.test(targetCommit) === false) {
-    commandOptions.writeError('Invalid target commit: expected a full 40-character hexadecimal SHA\n');
+    writeError('Invalid target commit: expected a full 40-character hexadecimal SHA\n');
 
     return 1;
   }
 
-  const runtimeEnvironmentResult = readWebAppReleasePlanRuntimeEnvironment(commandOptions.environment);
+  const runtimeEnvironmentResult = readWebAppReleasePlanRuntimeEnvironment(environment);
   if (runtimeEnvironmentResult.isErr) {
-    commandOptions.writeError(`${runtimeEnvironmentResult.error.message}\n`);
+    writeError(`${runtimeEnvironmentResult.error.message}\n`);
 
     return 1;
   }
@@ -78,26 +81,24 @@ async function executeWebAppReleaseReservationCommand(
   const runtimeEnvironment: WebAppReleasePlanRuntimeEnvironment = runtimeEnvironmentResult.value;
 
   try {
-    const reservationResult = await commandOptions.reserveWebAppRelease({
+    const reservationResult = await reserveWebAppRelease({
       targetCommit: targetCommit.toLowerCase(),
       githubApiUrl: runtimeEnvironment.githubApiUrl,
       githubRepository: runtimeEnvironment.githubRepository,
       githubToken: runtimeEnvironment.githubToken,
     });
     if (reservationResult.isErr) {
-      commandOptions.writeError(
-        `${redactGitHubSecret(reservationResult.error.message, runtimeEnvironment.githubToken)}\n`,
-      );
+      writeError(`${redactGitHubSecret(reservationResult.error.message, runtimeEnvironment.githubToken)}\n`);
 
       return 1;
     }
 
-    commandOptions.writeOutput(`${serializeWebAppReleaseReservation(reservationResult.value)}\n`);
+    writeOutput(`${serializeWebAppReleaseReservation(reservationResult.value)}\n`);
 
     return 0;
   } catch (error: unknown) {
     const errorMessage = readErrorMessage(error);
-    const redactedErrorMessage = Maybe.of(commandOptions.environment.GITHUB_TOKEN).match({
+    const redactedErrorMessage = Maybe.of(environment.GITHUB_TOKEN).match({
       Just(githubToken) {
         return redactGitHubSecret(errorMessage, githubToken);
       },
@@ -105,7 +106,7 @@ async function executeWebAppReleaseReservationCommand(
         return errorMessage;
       },
     });
-    commandOptions.writeError(`${redactedErrorMessage}\n`);
+    writeError(`${redactedErrorMessage}\n`);
 
     return 1;
   }
@@ -115,7 +116,11 @@ export async function runWebAppReleaseReservationCommand(
   commandLineArguments: WebAppReleaseReservationCommandArguments,
   options: WebAppReleaseReservationCommandOptions,
 ): Promise<number> {
+  const {environment, reserveWebAppRelease, writeOutput, writeError} = options;
   const [targetCommit] = commandLineArguments;
 
-  return executeWebAppReleaseReservationCommand({targetCommit, commandOptions: options});
+  return executeWebAppReleaseReservationCommand({
+    targetCommit,
+    commandOptions: {environment, reserveWebAppRelease, writeOutput, writeError},
+  });
 }

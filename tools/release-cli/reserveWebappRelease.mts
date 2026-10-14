@@ -70,27 +70,31 @@ function writeRuntimeOutput(message: string): void {
 async function planNextWebAppRelease(
   options: PlanReservedWebAppReleaseOptions,
 ): Promise<Awaited<ReturnType<typeof planWebAppRelease>>> {
+  const {githubApiUrl, githubRepository, githubToken, currentVersion, baseCommit, targetCommit} = options;
   const httpClient = createRuntimeKyHttpClient({reportRateLimitWait: writeRuntimeError});
   const githubClient = createWebAppReleasePlanningGitHubClient({
     httpClient,
-    githubApiUrl: options.githubApiUrl,
-    githubRepository: options.githubRepository,
-    githubToken: options.githubToken,
+    githubApiUrl,
+    githubRepository,
+    githubToken,
   });
 
   function readFirstParentHistory(
     historyOptions: Parameters<ReadFirstParentHistory>[0],
   ): ReturnType<ReadFirstParentHistory> {
+    const {baseCommit: historyBaseCommit, targetCommit: historyTargetCommit} = historyOptions;
+
     return readWebAppReleaseHistory({
-      ...historyOptions,
+      baseCommit: historyBaseCommit,
+      targetCommit: historyTargetCommit,
       executeGitCommand: executeRuntimeGitCommand,
     });
   }
 
   return planWebAppRelease({
-    currentVersion: options.currentVersion,
-    baseCommit: options.baseCommit,
-    targetCommit: options.targetCommit,
+    currentVersion,
+    baseCommit,
+    targetCommit,
     dependencies: {
       readFirstParentHistory,
       listPullRequestsForCommit: githubClient.listPullRequestsForCommit,
@@ -101,51 +105,63 @@ async function planNextWebAppRelease(
 async function executeRuntimeReservation(
   options: ReserveWebAppReleaseCommandOptions,
 ): Promise<Awaited<ReturnType<typeof reserveWebAppRelease>>> {
+  const {targetCommit, githubApiUrl, githubRepository, githubToken} = options;
+
   return reserveWebAppRelease({
-    targetCommit: options.targetCommit,
-    dependencies: {
-      async readStableWebAppReleases() {
-        return discoverStableWebAppReleases({executeGitCommand: executeRuntimeGitCommand});
-      },
-      async readRemoteReleaseBranches() {
-        return readRemoteWebAppReleaseBranches({
-          executeGitCommand: executeRuntimeGitCommand,
-          remoteName: githubRemoteName,
-        });
-      },
-      async isCommitAncestor(ancestorOptions) {
-        return isWebAppReleaseCommitAncestor({
-          ...ancestorOptions,
-          executeGitCommand: executeRuntimeGitCommand,
-        });
-      },
-      async planNextWebAppRelease(planOptions) {
-        return planNextWebAppRelease({
-          ...options,
-          currentVersion: planOptions.currentVersion,
-          baseCommit: planOptions.baseCommit,
-          targetCommit: planOptions.targetCommit,
-        });
-      },
-      async createReleaseBranch(branchOptions) {
-        return createWebAppReleaseReservationBranch({
-          ...branchOptions,
-          executeGitCommand: executeRuntimeGitCommand,
-          remoteName: githubRemoteName,
-        });
-      },
+    targetCommit,
+    async readStableWebAppReleases() {
+      return discoverStableWebAppReleases({executeGitCommand: executeRuntimeGitCommand});
+    },
+    async readRemoteReleaseBranches() {
+      return readRemoteWebAppReleaseBranches({
+        executeGitCommand: executeRuntimeGitCommand,
+        remoteName: githubRemoteName,
+      });
+    },
+    async isCommitAncestor(ancestorOptions) {
+      const {baseCommit: ancestorBaseCommit, targetCommit: ancestorTargetCommit} = ancestorOptions;
+
+      return isWebAppReleaseCommitAncestor({
+        baseCommit: ancestorBaseCommit,
+        targetCommit: ancestorTargetCommit,
+        executeGitCommand: executeRuntimeGitCommand,
+      });
+    },
+    async planNextWebAppRelease(planOptions) {
+      const {currentVersion, baseCommit, targetCommit} = planOptions;
+
+      return planNextWebAppRelease({
+        githubApiUrl,
+        githubRepository,
+        githubToken,
+        currentVersion,
+        baseCommit,
+        targetCommit,
+      });
+    },
+    async createReleaseBranch(branchOptions) {
+      const {releaseBranch, targetCommit} = branchOptions;
+
+      return createWebAppReleaseReservationBranch({
+        releaseBranch,
+        targetCommit,
+        executeGitCommand: executeRuntimeGitCommand,
+        remoteName: githubRemoteName,
+      });
     },
   });
 }
 
 function createCommand(commandOptions: WebAppReleaseReservationCommandOptions): Command {
+  const {writeOutput, writeError} = commandOptions;
+
   return new Command()
     .name('reserveWebappRelease')
     .description('Plan and reserve the next WebApp SemVer release for a target main commit.')
     .argument('<target-main-commit>')
     .configureOutput({
-      writeOut: commandOptions.writeOutput,
-      writeErr: commandOptions.writeError,
+      writeOut: writeOutput,
+      writeErr: writeError,
     })
     .exitOverride()
     .action(async (targetCommit: string) => {

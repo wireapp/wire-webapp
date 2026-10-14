@@ -37,19 +37,21 @@ function readErrorMessage(error: unknown): string {
 export async function runWebAppReleaseContinuationCommand(
   options: WebAppReleaseContinuationCommandOptions,
 ): Promise<number> {
+  const {continueActiveWebAppRelease, writeOutput, writeError} = options;
+
   try {
-    const continuationResult = await options.continueActiveWebAppRelease();
+    const continuationResult = await continueActiveWebAppRelease();
     if (continuationResult.isErr) {
-      options.writeError(`${continuationResult.error.message}\n`);
+      writeError(`${continuationResult.error.message}\n`);
 
       return 1;
     }
 
-    options.writeOutput(`${serializeWebAppReleaseReservation(continuationResult.value)}\n`);
+    writeOutput(`${serializeWebAppReleaseReservation(continuationResult.value)}\n`);
 
     return 0;
   } catch (error: unknown) {
-    options.writeError(`${readErrorMessage(error)}\n`);
+    writeError(`${readErrorMessage(error)}\n`);
 
     return 1;
   }

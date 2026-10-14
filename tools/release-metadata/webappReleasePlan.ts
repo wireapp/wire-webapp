@@ -74,11 +74,12 @@ type PullRequestReleaseImpactRecord = {
 export async function discoverWebAppReleasePullRequests(
   options: DiscoverWebAppReleasePullRequestsOptions,
 ): Promise<Result<readonly WebAppReleasePlanningPullRequest[], Error>> {
+  const {commits, listPullRequestsForCommit} = options;
   const discoveredPullRequests: WebAppReleasePlanningPullRequest[] = [];
   const discoveredPullRequestNumbers = new Set<number>();
 
-  for (const commitSha of options.commits) {
-    const associatedPullRequestsResult = await options.listPullRequestsForCommit({commitSha});
+  for (const commitSha of commits) {
+    const associatedPullRequestsResult = await listPullRequestsForCommit({commitSha});
     if (associatedPullRequestsResult.isErr) {
       return Result.err(
         new Error(
@@ -168,14 +169,15 @@ function createReleasePlanPullRequests(
 }
 
 export async function planWebAppRelease(options: PlanWebAppReleaseOptions): Promise<Result<WebAppReleasePlan, Error>> {
-  const currentVersionResult = validateWebAppVersion(options.currentVersion);
+  const {currentVersion, baseCommit, targetCommit, dependencies} = options;
+  const currentVersionResult = validateWebAppVersion(currentVersion);
   if (currentVersionResult.isErr) {
     return Result.err(currentVersionResult.error);
   }
 
-  const historyResult = await options.dependencies.readFirstParentHistory({
-    baseCommit: options.baseCommit,
-    targetCommit: options.targetCommit,
+  const historyResult = await dependencies.readFirstParentHistory({
+    baseCommit,
+    targetCommit,
   });
   if (historyResult.isErr) {
     return Result.err(historyResult.error);
@@ -184,7 +186,7 @@ export async function planWebAppRelease(options: PlanWebAppReleaseOptions): Prom
   const {value: history} = historyResult;
   const pullRequestsResult = await discoverWebAppReleasePullRequests({
     commits: history.commits,
-    listPullRequestsForCommit: options.dependencies.listPullRequestsForCommit,
+    listPullRequestsForCommit: dependencies.listPullRequestsForCommit,
   });
   if (pullRequestsResult.isErr) {
     return Result.err(pullRequestsResult.error);
@@ -204,7 +206,7 @@ export async function planWebAppRelease(options: PlanWebAppReleaseOptions): Prom
     return Result.err(versionBumpResult.error);
   }
 
-  const nextVersionResult = resolveNextWebAppReleaseVersion(options.currentVersion, releaseImpacts);
+  const nextVersionResult = resolveNextWebAppReleaseVersion(currentVersion, releaseImpacts);
   if (nextVersionResult.isErr) {
     return Result.err(nextVersionResult.error);
   }

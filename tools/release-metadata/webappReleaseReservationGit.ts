@@ -70,11 +70,13 @@ function errorMessage(error: unknown): string {
 }
 
 async function executeGitCommand(options: ExecuteGitCommandOptions): Promise<Result<string, Error>> {
+  const {executeGitCommand: runGitCommand, commandArguments} = options;
+
   try {
-    return Result.ok(await options.executeGitCommand(options.commandArguments));
+    return Result.ok(await runGitCommand(commandArguments));
   } catch (error: unknown) {
     return Result.err(
-      new Error(`Git command failed: git ${options.commandArguments.join(' ')}: ${errorMessage(error)}`, {
+      new Error(`Git command failed: git ${commandArguments.join(' ')}: ${errorMessage(error)}`, {
         cause: error,
       }),
     );
@@ -84,8 +86,9 @@ async function executeGitCommand(options: ExecuteGitCommandOptions): Promise<Res
 function parseRemoteReleaseBranches(
   options: ParseRemoteReleaseBranchesOptions,
 ): Result<readonly WebAppReleaseBranchRef[], Error> {
+  const {commandOutput, expectedReference} = options;
   const releaseBranches: WebAppReleaseBranchRef[] = [];
-  const outputLines = options.commandOutput.split(/\r?\n/).filter(outputLine => {
+  const outputLines = commandOutput.split(/\r?\n/).filter(outputLine => {
     return outputLine.length > 0;
   });
 
@@ -105,7 +108,7 @@ function parseRemoteReleaseBranches(
 
     const commitSha = commitShaMaybe.value;
     const gitReference = gitReferenceMaybe.value;
-    if (options.expectedReference.length > 0 && gitReference !== options.expectedReference) {
+    if (expectedReference.length > 0 && gitReference !== expectedReference) {
       return Result.err(new Error(`Git returned an unexpected remote reference: ${gitReference}`));
     }
 
@@ -133,9 +136,10 @@ function parseRemoteReleaseBranches(
 export async function readRemoteWebAppReleaseBranches(
   options: ReadRemoteWebAppReleaseBranchesOptions,
 ): Promise<Result<readonly WebAppReleaseBranchRef[], Error>> {
+  const {executeGitCommand: runGitCommand, remoteName} = options;
   const commandResult = await executeGitCommand({
-    executeGitCommand: options.executeGitCommand,
-    commandArguments: ['ls-remote', '--heads', options.remoteName, `${remoteReleaseBranchPrefix}*`],
+    executeGitCommand: runGitCommand,
+    commandArguments: ['ls-remote', '--heads', remoteName, `${remoteReleaseBranchPrefix}*`],
   });
   if (commandResult.isErr) {
     return Result.err(commandResult.error);
@@ -147,48 +151,46 @@ export async function readRemoteWebAppReleaseBranches(
 async function executeRemoteWebAppReleaseBranchCommitPreparation(
   options: PrepareRemoteWebAppReleaseBranchCommitGitOptions,
 ): Promise<Unit> {
-  const releaseBranchVersionResult = parseWebAppReleaseBranchName(options.releaseBranch);
+  const {executeGitCommand: runGitCommand, expectedCommitSha, releaseBranch, remoteName} = options;
+  const releaseBranchVersionResult = parseWebAppReleaseBranchName(releaseBranch);
   if (releaseBranchVersionResult.isErr) {
     throw releaseBranchVersionResult.error;
   }
 
-  if (fullCommitShaPattern.test(options.expectedCommitSha) === false) {
+  if (fullCommitShaPattern.test(expectedCommitSha) === false) {
     throw new Error('Invalid expected release commit: expected a full 40-character hexadecimal SHA');
   }
 
   const fetchResult = await executeGitCommand({
-    executeGitCommand: options.executeGitCommand,
-    commandArguments: ['fetch', '--no-tags', options.remoteName, `refs/heads/${options.releaseBranch}`],
+    executeGitCommand: runGitCommand,
+    commandArguments: ['fetch', '--no-tags', remoteName, `refs/heads/${releaseBranch}`],
   });
   if (fetchResult.isErr) {
-    throw new Error(
-      `Unable to fetch remote WebApp release branch ${options.releaseBranch}: ${fetchResult.error.message}`,
-      {
-        cause: fetchResult.error,
-      },
-    );
+    throw new Error(`Unable to fetch remote WebApp release branch ${releaseBranch}: ${fetchResult.error.message}`, {
+      cause: fetchResult.error,
+    });
   }
 
   const fetchedCommitResult = await executeGitCommand({
-    executeGitCommand: options.executeGitCommand,
+    executeGitCommand: runGitCommand,
     commandArguments: ['rev-parse', '--verify', '--end-of-options', 'FETCH_HEAD^{commit}'],
   });
   if (fetchedCommitResult.isErr) {
     throw new Error(
-      `Unable to resolve fetched WebApp release branch ${options.releaseBranch} commit: ${fetchedCommitResult.error.message}`,
+      `Unable to resolve fetched WebApp release branch ${releaseBranch} commit: ${fetchedCommitResult.error.message}`,
       {cause: fetchedCommitResult.error},
     );
   }
 
   const fetchedCommitSha = fetchedCommitResult.value.trim().toLowerCase();
   if (fullCommitShaPattern.test(fetchedCommitSha) === false) {
-    throw new Error(`Unable to resolve fetched WebApp release branch ${options.releaseBranch} to a full commit SHA`);
+    throw new Error(`Unable to resolve fetched WebApp release branch ${releaseBranch} to a full commit SHA`);
   }
 
-  const expectedCommitSha = options.expectedCommitSha.toLowerCase();
-  if (fetchedCommitSha !== expectedCommitSha) {
+  const normalizedExpectedCommitSha = expectedCommitSha.toLowerCase();
+  if (fetchedCommitSha !== normalizedExpectedCommitSha) {
     throw new Error(
-      `WebApp release branch changed during continuation: ${options.releaseBranch} was ${expectedCommitSha} when discovered, but fetch resolved ${fetchedCommitSha}; retry continuation`,
+      `WebApp release branch changed during continuation: ${releaseBranch} was ${normalizedExpectedCommitSha} when discovered, but fetch resolved ${fetchedCommitSha}; retry continuation`,
     );
   }
 
@@ -198,12 +200,19 @@ async function executeRemoteWebAppReleaseBranchCommitPreparation(
 export function prepareRemoteWebAppReleaseBranchCommit(
   options: PrepareRemoteWebAppReleaseBranchCommitGitOptions,
 ): Task<Unit, Error> {
+  const {executeGitCommand: runGitCommand, expectedCommitSha, releaseBranch, remoteName} = options;
+
   return task.tryOrElse(
     (error: unknown): Error => {
       return error instanceof Error ? error : new Error(String(error));
     },
     async (): Promise<Unit> => {
-      return executeRemoteWebAppReleaseBranchCommitPreparation(options);
+      return executeRemoteWebAppReleaseBranchCommitPreparation({
+        executeGitCommand: runGitCommand,
+        expectedCommitSha,
+        releaseBranch,
+        remoteName,
+      });
     },
   );
 }
@@ -211,10 +220,11 @@ export function prepareRemoteWebAppReleaseBranchCommit(
 async function readRemoteWebAppReleaseBranch(
   options: ReadRemoteWebAppReleaseBranchOptions,
 ): Promise<Result<Maybe<WebAppReleaseBranchRef>, Error>> {
-  const expectedReference = `refs/heads/${options.releaseBranch}`;
+  const {executeGitCommand: runGitCommand, remoteName, releaseBranch} = options;
+  const expectedReference = `refs/heads/${releaseBranch}`;
   const commandResult = await executeGitCommand({
-    executeGitCommand: options.executeGitCommand,
-    commandArguments: ['ls-remote', '--heads', options.remoteName, expectedReference],
+    executeGitCommand: runGitCommand,
+    commandArguments: ['ls-remote', '--heads', remoteName, expectedReference],
   });
   if (commandResult.isErr) {
     return Result.err(commandResult.error);
@@ -247,21 +257,22 @@ function parseCommitCountRange(commandOutput: string): Result<boolean, Error> {
 export async function isWebAppReleaseCommitAncestor(
   options: VerifyWebAppReleaseCommitAncestorGitOptions,
 ): Promise<Result<boolean, Error>> {
-  if (fullCommitShaPattern.test(options.baseCommit) === false) {
+  const {executeGitCommand: runGitCommand, baseCommit, targetCommit} = options;
+  if (fullCommitShaPattern.test(baseCommit) === false) {
     return Result.err(new Error('Invalid base commit: expected a full 40-character hexadecimal SHA'));
   }
 
-  if (fullCommitShaPattern.test(options.targetCommit) === false) {
+  if (fullCommitShaPattern.test(targetCommit) === false) {
     return Result.err(new Error('Invalid target commit: expected a full 40-character hexadecimal SHA'));
   }
 
   const commandResult = await executeGitCommand({
-    executeGitCommand: options.executeGitCommand,
+    executeGitCommand: runGitCommand,
     commandArguments: [
       'rev-list',
       '--left-right',
       '--count',
-      `${options.baseCommit.toLowerCase()}...${options.targetCommit.toLowerCase()}`,
+      `${baseCommit.toLowerCase()}...${targetCommit.toLowerCase()}`,
     ],
   });
   if (commandResult.isErr) {
@@ -274,25 +285,26 @@ export async function isWebAppReleaseCommitAncestor(
 export async function createWebAppReleaseReservationBranch(
   options: CreateWebAppReleaseReservationBranchGitOptions,
 ): Promise<Result<WebAppReleaseReservationAction, Error>> {
-  const releaseBranchVersionResult = parseWebAppReleaseBranchName(options.releaseBranch);
+  const {executeGitCommand: runGitCommand, remoteName, releaseBranch, targetCommit: requestedTargetCommit} = options;
+  const releaseBranchVersionResult = parseWebAppReleaseBranchName(releaseBranch);
   if (releaseBranchVersionResult.isErr) {
     return Result.err(releaseBranchVersionResult.error);
   }
 
-  if (fullCommitShaPattern.test(options.targetCommit) === false) {
+  if (fullCommitShaPattern.test(requestedTargetCommit) === false) {
     return Result.err(new Error('Invalid target commit: expected a full 40-character hexadecimal SHA'));
   }
 
-  const branchReference = `refs/heads/${options.releaseBranch}`;
-  const targetCommit = options.targetCommit.toLowerCase();
+  const branchReference = `refs/heads/${releaseBranch}`;
+  const targetCommit = requestedTargetCommit.toLowerCase();
   // An empty lease allows creation only while this ref is absent; it cannot move an existing reservation.
   const pushResult = await executeGitCommand({
-    executeGitCommand: options.executeGitCommand,
+    executeGitCommand: runGitCommand,
     commandArguments: [
       'push',
       '--porcelain',
       `--force-with-lease=${branchReference}:`,
-      options.remoteName,
+      remoteName,
       `${targetCommit}:${branchReference}`,
     ],
   });
@@ -301,14 +313,14 @@ export async function createWebAppReleaseReservationBranch(
   }
 
   const remoteBranchResult = await readRemoteWebAppReleaseBranch({
-    executeGitCommand: options.executeGitCommand,
-    remoteName: options.remoteName,
-    releaseBranch: options.releaseBranch,
+    executeGitCommand: runGitCommand,
+    remoteName,
+    releaseBranch,
   });
   if (remoteBranchResult.isErr) {
     return Result.err(
       new Error(
-        `Unable to verify failed release reservation push for ${options.releaseBranch}: ${remoteBranchResult.error.message}`,
+        `Unable to verify failed release reservation push for ${releaseBranch}: ${remoteBranchResult.error.message}`,
         {cause: remoteBranchResult.error},
       ),
     );
@@ -322,13 +334,13 @@ export async function createWebAppReleaseReservationBranch(
 
       return Result.err(
         new Error(
-          `WebApp release reservation conflict: ${options.releaseBranch} points to ${remoteBranch.releaseCommitSha}, requested target is ${targetCommit}`,
+          `WebApp release reservation conflict: ${releaseBranch} points to ${remoteBranch.releaseCommitSha}, requested target is ${targetCommit}`,
         ),
       );
     },
     Nothing() {
       return Result.err(
-        new Error(`Unable to create WebApp release reservation ${options.releaseBranch}: ${pushResult.error.message}`, {
+        new Error(`Unable to create WebApp release reservation ${releaseBranch}: ${pushResult.error.message}`, {
           cause: pushResult.error,
         }),
       );

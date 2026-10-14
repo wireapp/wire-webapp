@@ -57,26 +57,30 @@ function writeRuntimeOutput(message: string): void {
 async function executeRuntimePlan(
   options: PlanWebAppReleaseCommandOptions,
 ): Promise<Awaited<ReturnType<typeof planWebAppRelease>>> {
+  const {githubApiUrl, githubRepository, githubToken, currentVersion, baseCommit, targetCommit} = options;
   const httpClient = createRuntimeKyHttpClient({reportRateLimitWait: writeRuntimeError});
   const githubClient = createWebAppReleasePlanningGitHubClient({
     httpClient,
-    githubApiUrl: options.githubApiUrl,
-    githubRepository: options.githubRepository,
-    githubToken: options.githubToken,
+    githubApiUrl,
+    githubRepository,
+    githubToken,
   });
   function readFirstParentHistory(
     historyOptions: Parameters<ReadFirstParentHistory>[0],
   ): ReturnType<ReadFirstParentHistory> {
+    const {baseCommit: historyBaseCommit, targetCommit: historyTargetCommit} = historyOptions;
+
     return readWebAppReleaseHistory({
-      ...historyOptions,
+      baseCommit: historyBaseCommit,
+      targetCommit: historyTargetCommit,
       executeGitCommand: executeRuntimeGitCommand,
     });
   }
 
   return planWebAppRelease({
-    currentVersion: options.currentVersion,
-    baseCommit: options.baseCommit,
-    targetCommit: options.targetCommit,
+    currentVersion,
+    baseCommit,
+    targetCommit,
     dependencies: {
       readFirstParentHistory,
       listPullRequestsForCommit: githubClient.listPullRequestsForCommit,
@@ -85,6 +89,8 @@ async function executeRuntimePlan(
 }
 
 function createCommand(commandOptions: WebAppReleasePlanCommandOptions): Command {
+  const {writeOutput, writeError} = commandOptions;
+
   return new Command()
     .name('planWebappRelease')
     .description('Plan the next WebApp release from merged pull requests.')
@@ -92,8 +98,8 @@ function createCommand(commandOptions: WebAppReleasePlanCommandOptions): Command
     .argument('<base-commit>')
     .argument('<target-commit>')
     .configureOutput({
-      writeOut: commandOptions.writeOutput,
-      writeErr: commandOptions.writeError,
+      writeOut: writeOutput,
+      writeErr: writeError,
     })
     .exitOverride()
     .action(async (currentVersion: string, baseCommit: string, targetCommit: string) => {

@@ -113,15 +113,17 @@ function parsePullRequestPage(githubResponse: unknown): Result<ParsedPullRequest
 export function createWebAppReleasePlanningGitHubClient(
   options: CreateWebAppReleasePlanningGitHubClientOptions,
 ): WebAppReleasePlanningGitHubClient {
-  const githubApiRoot = createGitHubApiRoot(options.githubApiUrl);
-  const encodedRepositoryName = encodeGitHubRepositoryName(options.githubRepository);
-  const readHeaders = createGitHubHeaders({githubToken: options.githubToken, includesJsonBody: false});
+  const {httpClient, githubApiUrl, githubRepository, githubToken} = options;
+  const githubApiRoot = createGitHubApiRoot(githubApiUrl);
+  const encodedRepositoryName = encodeGitHubRepositoryName(githubRepository);
+  const readHeaders = createGitHubHeaders({githubToken, includesJsonBody: false});
 
   return {
     async listPullRequestsForCommit(listOptions: ListWebAppReleasePlanningPullRequestsForCommitOptions) {
+      const {commitSha} = listOptions;
       const pullRequests: WebAppReleasePlanningPullRequest[] = [];
       const endpoint = new URL(
-        `repos/${encodedRepositoryName}/commits/${encodeURIComponent(listOptions.commitSha)}/pulls`,
+        `repos/${encodedRepositoryName}/commits/${encodeURIComponent(commitSha)}/pulls`,
         githubApiRoot,
       );
 
@@ -129,7 +131,7 @@ export function createWebAppReleasePlanningGitHubClient(
         let githubResponse: unknown;
 
         try {
-          githubResponse = await options.httpClient.requestJson(
+          githubResponse = await httpClient.requestJson(
             createGitHubHttpRequest({
               method: 'get',
               url: createGitHubPageUrl({endpoint, page}),
@@ -140,12 +142,10 @@ export function createWebAppReleasePlanningGitHubClient(
         } catch (error: unknown) {
           const failureMessage = redactGitHubSecret(
             formatGitHubRequestError({error, fallbackMessage: 'Unknown GitHub request failure'}),
-            options.githubToken,
+            githubToken,
           );
 
-          return createFailure(
-            `Unable to list pull requests associated with commit ${listOptions.commitSha}: ${failureMessage}`,
-          );
+          return createFailure(`Unable to list pull requests associated with commit ${commitSha}: ${failureMessage}`);
         }
 
         const pageResult = parsePullRequestPage(githubResponse);

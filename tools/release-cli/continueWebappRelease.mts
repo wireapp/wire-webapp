@@ -73,8 +73,11 @@ function readRemoteReleaseBranches(): ReturnType<typeof readRemoteWebAppReleaseB
 function verifyStableBaseAncestry(
   options: VerifyWebAppReleaseCommitAncestorOptions,
 ): ReturnType<typeof isWebAppReleaseCommitAncestor> {
+  const {baseCommit, targetCommit} = options;
+
   return isWebAppReleaseCommitAncestor({
-    ...options,
+    baseCommit,
+    targetCommit,
     executeGitCommand: executeRuntimeGitCommand,
   });
 }
@@ -82,8 +85,11 @@ function verifyStableBaseAncestry(
 function prepareRemoteReleaseBranchCommit(
   options: PrepareRemoteReleaseBranchCommitOptions,
 ): ReturnType<typeof prepareRemoteWebAppReleaseBranchCommit> {
+  const {releaseBranch, expectedCommitSha} = options;
+
   return prepareRemoteWebAppReleaseBranchCommit({
-    ...options,
+    releaseBranch,
+    expectedCommitSha,
     executeGitCommand: executeRuntimeGitCommand,
     remoteName: originRemoteName,
   });
@@ -99,16 +105,18 @@ function createContinuationDependencies(): ContinueActiveWebAppReleaseDependenci
 }
 
 async function executeRuntimeContinuation(): ReturnType<typeof continueActiveWebAppRelease> {
-  return continueActiveWebAppRelease({dependencies: createContinuationDependencies()});
+  return continueActiveWebAppRelease(createContinuationDependencies());
 }
 
 function createCommand(commandOptions: WebAppReleaseContinuationCommandOptions): Command {
+  const {writeOutput, writeError} = commandOptions;
+
   return new Command()
     .name('continueWebappRelease')
     .description('Continue the one active WebApp SemVer release at its current remote branch head.')
     .configureOutput({
-      writeOut: commandOptions.writeOutput,
-      writeErr: commandOptions.writeError,
+      writeOut: writeOutput,
+      writeErr: writeError,
     })
     .exitOverride()
     .action(async () => {

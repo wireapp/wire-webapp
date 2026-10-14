@@ -52,37 +52,38 @@ function errorMessage(error: unknown): string {
 }
 
 async function executeGitCommand(options: ExecuteGitCommandOptions): Promise<Result<string, Error>> {
+  const {executeGitCommand: runGitCommand, commandArguments} = options;
+
   try {
-    const commandOutput = await options.executeGitCommand(options.commandArguments);
+    const commandOutput = await runGitCommand(commandArguments);
 
     return Result.ok(commandOutput);
   } catch (error: unknown) {
-    const gitCommand = `git ${options.commandArguments.join(' ')}`;
+    const gitCommand = `git ${commandArguments.join(' ')}`;
 
     return Result.err(new Error(`Git command failed: ${gitCommand}: ${errorMessage(error)}`, {cause: error}));
   }
 }
 
 async function resolveGitCommit(options: ResolveGitCommitOptions): Promise<Result<string, Error>> {
+  const {executeGitCommand: runGitCommand, commitReference, commitName} = options;
+
   const commandResult = await executeGitCommand({
-    executeGitCommand: options.executeGitCommand,
-    commandArguments: ['rev-parse', '--verify', '--end-of-options', `${options.commitReference}^{commit}`],
+    executeGitCommand: runGitCommand,
+    commandArguments: ['rev-parse', '--verify', '--end-of-options', `${commitReference}^{commit}`],
   });
 
   if (commandResult.isErr) {
     return Result.err(
-      new Error(
-        `Unable to resolve ${options.commitName} commit ${options.commitReference}: ${commandResult.error.message}`,
-        {cause: commandResult.error},
-      ),
+      new Error(`Unable to resolve ${commitName} commit ${commitReference}: ${commandResult.error.message}`, {
+        cause: commandResult.error,
+      }),
     );
   }
 
   const resolvedCommitSha = commandResult.value.trim();
   if (!fullCommitShaPattern.test(resolvedCommitSha)) {
-    return Result.err(
-      new Error(`Unable to resolve ${options.commitName} commit ${options.commitReference} to a commit SHA`),
-    );
+    return Result.err(new Error(`Unable to resolve ${commitName} commit ${commitReference} to a commit SHA`));
   }
 
   return Result.ok(resolvedCommitSha.toLowerCase());
