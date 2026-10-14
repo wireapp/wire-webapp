@@ -107,6 +107,29 @@ describe('useCellsRenameForm', () => {
     });
   });
 
+  it('shows the full dotted folder name and preserves its suffix when renamed', async () => {
+    const node = createNode({name: 'folder.E', path: '/folder.E'});
+    const {result} = renderHook(() => {
+      return useCellsRenameForm({node, cellsRepository: mockCellsRepository, onSuccess, renameNodeCopy});
+    });
+
+    expect(result.current.name).toBe('folder.E');
+    expect(result.current.isDisabled).toBe(true);
+
+    act(() => {
+      result.current.handleNameChange({currentTarget: {value: 'renamed.E'}} as ChangeEvent<HTMLInputElement>);
+    });
+
+    await act(async () => {
+      await result.current.handleRename(createEvent());
+    });
+
+    expect(mockCellsRepository.renameNode).toHaveBeenCalledWith({
+      currentPath: '/folder.E',
+      newName: 'renamed.E',
+    });
+  });
+
   it('disables saving when the trimmed name matches the original', () => {
     const node = createNode({name: 'Folder'});
     const {result} = renderHook(() => {
