@@ -19,6 +19,8 @@
 
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 
+import {translateForTest} from 'Util/test/translateForTest';
+
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
 import {getSharedDriveDropRejectionFeedback, handleSharedDriveDroppedFiles} from './sharedDriveDrop';
 import {validateSharedDriveUploadFiles} from './sharedDriveUploadValidation';
@@ -171,20 +173,25 @@ describe('handleSharedDriveDroppedFiles', () => {
     expect(dependencies.fireAndForgetInvoker.fireAndForget).not.toHaveBeenCalled();
   });
 
-  it('preserves intentional dotfiles when uploading dropped files', async () => {
+  it('rejects files starting with a dot before dispatching upload', () => {
     const dotFile = new File(['one'], '.env');
     const dependencies = createDependencies();
 
     handleSharedDriveDroppedFiles([dotFile], dependencies);
 
-    const uploadAction = jest.mocked(dependencies.fireAndForgetInvoker.fireAndForget).mock.calls[0][0];
-    await uploadAction();
-    expect(dependencies.sharedDriveUploadController.upload).toHaveBeenCalledWith(
-      [dotFile],
-      rootUploadPath,
-      dependencies.onRefresh,
-      conversationQualifiedId,
-    );
+    expect(dependencies.onReject).toHaveBeenCalledWith({reason: 'invalidName', invalidFiles: [dotFile]});
+    expect(dependencies.fireAndForgetInvoker.fireAndForget).not.toHaveBeenCalled();
+  });
+
+  it('rejects invalid folder segments before dispatching upload', () => {
+    const file = new File(['one'], 'one.txt');
+    Object.defineProperty(file, 'webkitRelativePath', {value: 'Reports/./one.txt'});
+    const dependencies = createDependencies();
+
+    handleSharedDriveDroppedFiles([file], dependencies);
+
+    expect(dependencies.onReject).toHaveBeenCalledWith({reason: 'invalidName', invalidFiles: [file]});
+    expect(dependencies.fireAndForgetInvoker.fireAndForget).not.toHaveBeenCalled();
   });
 
   it('rejects the whole batch when any dropped file is invalid', () => {
@@ -242,16 +249,29 @@ describe('validateSharedDriveUploadFiles', () => {
 
 describe('getSharedDriveDropRejectionFeedback', () => {
   it('maps rejection reasons to user-facing feedback', () => {
-    const translate = jest.fn((key: string, replacements?: Record<string, string | number>) => {
-      return replacements ? `${key}:${JSON.stringify(replacements)}` : key;
-    });
     const file = new File(['content'], 'document.txt');
 
     expect(
-      getSharedDriveDropRejectionFeedback({reason: 'notAccepted', invalidFiles: [file]}, translate, maxFileSize),
+      getSharedDriveDropRejectionFeedback({reason: 'notAccepted', invalidFiles: [file]}, translateForTest, maxFileSize),
     ).toEqual({
       title: 'conversationFileUploadFailedHeading',
       message: 'sharedDriveDropUnsupportedFileMessage',
+      invalidFiles: [file],
+    });
+  });
+
+  it('maps invalid names to user-facing feedback', () => {
+    const file = new File(['content'], '.env');
+
+    expect(
+      getSharedDriveDropRejectionFeedback(
+        {reason: 'invalidName', invalidFiles: [file]},
+        translateForTest,
+        maxFileSize,
+      ),
+    ).toEqual({
+      title: 'conversationFileUploadFailedHeading',
+      message: 'sharedDriveDropInvalidNameMessage',
       invalidFiles: [file],
     });
   });

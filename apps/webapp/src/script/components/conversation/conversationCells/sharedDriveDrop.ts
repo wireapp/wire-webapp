@@ -118,6 +118,14 @@ export const getSharedDriveDropRejectionFeedback = (
     };
   }
 
+  if (reason === 'invalidName') {
+    return {
+      title: translate('conversationFileUploadFailedHeading'),
+      message: translate('sharedDriveDropInvalidNameMessage'),
+      invalidFiles: [...invalidFiles],
+    };
+  }
+
   if (reason === 'recycleBin') {
     return {
       title: translate('conversationFileUploadFailedHeading'),
