@@ -204,12 +204,10 @@ export function inspectActiveWebAppReleaseReservations(
       continue;
     }
 
-    activeReservations.push(
-      Object.freeze({
-        releaseBranch: releaseBranch.releaseBranch,
-        releaseCommitSha: releaseBranch.releaseCommitSha.toLowerCase(),
-      }),
-    );
+    activeReservations.push({
+      releaseBranch: releaseBranch.releaseBranch,
+      releaseCommitSha: releaseBranch.releaseCommitSha.toLowerCase(),
+    });
   }
 
   return Result.ok(Object.freeze(activeReservations));
