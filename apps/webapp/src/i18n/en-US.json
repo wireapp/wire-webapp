@@ -465,7 +465,6 @@
   "cells.newItemMenuModalForm.genericError": "Something went wrong",
   "cells.newItemMenuModalForm.maxLengthError": "Use a name shorter than 64 characters",
   "cells.newItemMenuModalForm.nameRequired": "Name is required",
-  "cells.nodeName.invalidCharactersError": "Don't start with a . and don't use /\\ \"",
   "cells.noNodes.description": "You'll find all files and folders shared in this conversation here.",
   "cells.noNodes.global.description": "For conversations that use file collaboration, you'll find shared files here.",
   "cells.noNodes.global.heading": "There are no files yet",
