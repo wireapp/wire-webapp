@@ -68,7 +68,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          node ./tools/release-cli/releaseMetadataCli.mts validate-stable-webapp-tag "${PRODUCTION_TAG_NAME}" > /dev/null
+          node ./tools/releaseCli/releaseMetadataCli.mts validate-stable-webapp-tag "${PRODUCTION_TAG_NAME}" > /dev/null
           git_authentication_header="AUTHORIZATION: basic $(printf 'x-access-token:%s' "${GITHUB_TOKEN}" | base64 --wrap=0)"
           GIT_CONFIG_COUNT=1 \
           GIT_CONFIG_KEY_0='http.https://github.com/.extraheader' \
@@ -90,7 +90,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          synchronization_output="$(node ./tools/release-cli/webappVersionSynchronization.mts synchronize "${PRODUCTION_TAG_NAME}")"
+          synchronization_output="$(node ./tools/releaseCli/webappVersionSynchronization.mts synchronize "${PRODUCTION_TAG_NAME}")"
           synchronized_version="$(jq --raw-output '.version' <<< "${synchronization_output}")"
           pull_request_url="$(jq --raw-output '.pull_request_url' <<< "${synchronization_output}")"
 

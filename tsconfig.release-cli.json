@@ -10,6 +10,6 @@
     "allowImportingTsExtensions": true,
     "erasableSyntaxOnly": true
   },
-  "include": ["tools/release-cli/**/*.mts", "tools/release-cli/**/*.ts"],
+  "include": ["tools/releaseCli/**/*.mts", "tools/releaseCli/**/*.ts"],
   "exclude": ["node_modules", "dist", "tmp"]
 }

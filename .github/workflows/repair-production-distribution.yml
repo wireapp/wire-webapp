@@ -84,7 +84,7 @@ jobs:
             exit 1
           fi
 
-          node ./tools/release-cli/releaseMetadataCli.mts validate-webapp-production-tag "${PRODUCTION_TAG}" >/dev/null
+          node ./tools/releaseCli/releaseMetadataCli.mts validate-webapp-production-tag "${PRODUCTION_TAG}" >/dev/null
 
           git ls-remote --exit-code --tags origin "refs/tags/${PRODUCTION_TAG}" >/dev/null
           git fetch --no-tags origin "refs/tags/${PRODUCTION_TAG}:refs/tags/${PRODUCTION_TAG}"

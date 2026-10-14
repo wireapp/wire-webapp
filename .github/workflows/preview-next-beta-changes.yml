@@ -56,7 +56,7 @@ jobs:
         run: |
           set -euo pipefail
           node \
-            tools/release-cli/previewNextBetaCommand.mts \
+            tools/releaseCli/previewNextBetaCommand.mts \
             "${TARGET_MAIN_COMMIT}"
 
       - name: Confirm read-only permissions
