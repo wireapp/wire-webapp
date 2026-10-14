@@ -125,7 +125,7 @@ function isLikelyWebAppSemVerReleaseBranchName(branchName: string): boolean {
 }
 
 function createReservationResult(options: CreateWebAppReleaseReservationResultOptions): WebAppReleaseReservation {
-  return Object.freeze({
+  return {
     version: options.version,
     releaseBranch: options.releaseBranch,
     releaseCommitSha: options.releaseCommitSha,
@@ -133,7 +133,7 @@ function createReservationResult(options: CreateWebAppReleaseReservationResultOp
     stableBaseTag: options.stableBaseRelease.tagName,
     stableBaseCommitSha: options.stableBaseRelease.commitSha,
     action: options.action,
-  });
+  };
 }
 
 function findMultipleActiveWebAppReleaseReservationsError(
