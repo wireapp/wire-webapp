@@ -45,6 +45,7 @@ const webAppVersionSynchronizationEntrypointPath = join(
 );
 const webAppReleasePlanningEntrypointPath = join(process.cwd(), 'tools/release-cli/planWebappRelease.mts');
 const webAppReleaseReservationEntrypointPath = join(process.cwd(), 'tools/release-cli/reserveWebappRelease.mts');
+const webAppReleaseContinuationEntrypointPath = join(process.cwd(), 'tools/release-cli/continueWebappRelease.mts');
 const ensureProductionGitHubReleaseEntrypointPath = join(
   process.cwd(),
   'tools/release-cli/ensureProductionGitHubRelease.mts',
@@ -424,5 +425,22 @@ describe('WebApp release reservation CLI entrypoint', () => {
 
     expect(actualResult.exitCode).toBe(1);
     expect(actualResult.standardError).toContain('Invalid target commit');
+  });
+});
+
+describe('WebApp release continuation CLI entrypoint', () => {
+  it('writes help without requiring runtime credentials', () => {
+    const actualResult = runNativeCommand(webAppReleaseContinuationEntrypointPath, ['--help']);
+
+    expect(actualResult.exitCode).toBe(0);
+    expect(actualResult.standardOutput).toContain('Usage: continueWebappRelease [options]');
+  });
+
+  it('rejects caller-supplied versions and commits', () => {
+    const actualResult = runNativeCommand(webAppReleaseContinuationEntrypointPath, ['1.1.0']);
+
+    expect(actualResult.exitCode).toBe(1);
+    expect(actualResult.standardError).toContain('error:');
+    expect(actualResult.standardError).not.toContain('GITHUB_TOKEN');
   });
 });

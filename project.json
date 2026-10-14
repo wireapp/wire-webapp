@@ -31,7 +31,7 @@
       "executor": "nx:run-commands",
       "dependsOn": [],
       "options": {
-        "command": "eslint --config eslint.config.mjs --max-warnings=0 tools/i18n tools/release-appearance tools/release-metadata tools/release-github tools/release-cli/webappVersionSynchronization.mts tools/release-cli/pullRequestSemverPolicy.mts tools/release-cli/planWebappRelease.mts tools/release-cli/reserveWebappRelease.mts tools/release-cli/webAppReleasePlanCli.ts tools/release-cli/webAppReleaseReservationCli.ts 'tools/**/*.test.ts'"
+        "command": "eslint --config eslint.config.mjs --max-warnings=0 tools/i18n tools/release-appearance tools/release-metadata tools/release-github tools/release-cli/webappVersionSynchronization.mts tools/release-cli/pullRequestSemverPolicy.mts tools/release-cli/planWebappRelease.mts tools/release-cli/reserveWebappRelease.mts tools/release-cli/continueWebappRelease.mts tools/release-cli/webAppReleasePlanCli.ts tools/release-cli/webAppReleaseReservationCli.ts tools/release-cli/webAppReleaseContinuationCli.ts tools/release-cli/webAppReleaseReservationSerializer.ts 'tools/**/*.test.ts'"
       }
     },
     "e2e": {

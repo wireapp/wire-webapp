@@ -22,9 +22,12 @@ import {Maybe, Result} from 'true-myth';
 
 import {readWebAppReleasePlanRuntimeEnvironment} from './webAppReleasePlanCli.ts';
 import type {WebAppReleasePlanRuntimeEnvironment} from './webAppReleasePlanCli.ts';
+import {serializeWebAppReleaseReservation} from './webAppReleaseReservationSerializer.ts';
 
 import {redactGitHubSecret} from '../release-github/githubApi.ts';
 import type {WebAppReleaseReservation} from '../release-metadata/webappReleaseReservation.ts';
+
+export {serializeWebAppReleaseReservation} from './webAppReleaseReservationSerializer.ts';
 
 export type ReserveWebAppReleaseCommandOptions = {
   readonly targetCommit: string;
@@ -50,26 +53,9 @@ type ExecuteWebAppReleaseReservationOptions = {
 };
 
 const fullCommitShaPattern = /^[0-9a-f]{40}$/i;
-const jsonIndentationSpaces = 2;
 
 function readErrorMessage(error: unknown): string {
   return isError(error) ? error.message : String(error);
-}
-
-export function serializeWebAppReleaseReservation(reservation: WebAppReleaseReservation): string {
-  return JSON.stringify(
-    {
-      version: reservation.version,
-      release_branch: reservation.releaseBranch,
-      release_commit: reservation.releaseCommitSha,
-      stable_base_version: reservation.stableBaseVersion,
-      stable_base_tag: reservation.stableBaseTag,
-      stable_base_commit: reservation.stableBaseCommitSha,
-      action: reservation.action,
-    },
-    null,
-    jsonIndentationSpaces,
-  );
 }
 
 async function executeWebAppReleaseReservationCommand(
