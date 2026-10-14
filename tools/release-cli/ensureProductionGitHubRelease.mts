@@ -17,18 +17,18 @@
  *
  */
 
-import process from 'node:process';
-import {resolve} from 'node:path';
-import {fileURLToPath} from 'node:url';
-
 import {isError, isNonEmptyStringAndNotWhitespace, isString} from '@sindresorhus/is';
 import {Command, CommanderError} from 'commander';
 import {Result} from 'true-myth';
 
+import {resolve} from 'node:path';
+import process from 'node:process';
+import {fileURLToPath} from 'node:url';
+
 import {ensureProductionGitHubRelease} from '../release-appearance/ensureProductionGitHubRelease.ts';
-import {createGitHubReleaseClient} from '../release-appearance/githubReleaseClient.ts';
 import type {ProductionGitHubReleaseHandoff} from '../release-appearance/ensureProductionGitHubRelease.ts';
-import {createRuntimeKyHttpClient} from '../release-appearance/httpClient.ts';
+import {createGitHubReleaseClient} from '../release-appearance/githubReleaseClient.ts';
+import {createRuntimeKyHttpClient} from '../release-github/githubHttpClient.ts';
 
 type CreateEnsureProductionGitHubReleaseCommandOptions = {
   readonly executeCommand: (productionTagName: string) => Promise<void> | void;
@@ -164,10 +164,7 @@ async function executeRuntimeCommand(productionTagName: string): Promise<void> {
     githubRepository: runtimeEnvironment.githubRepository,
     githubToken: runtimeEnvironment.githubToken,
   });
-  const handoffResult = await ensureProductionGitHubRelease({
-    currentProductionTagName: productionTagName,
-    githubReleaseClient,
-  });
+  const handoffResult = await ensureProductionGitHubRelease({productionTagName}, {githubReleaseClient}).toPromise();
 
   if (handoffResult.isErr) {
     throw handoffResult.error;

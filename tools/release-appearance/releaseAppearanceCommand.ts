@@ -19,7 +19,7 @@
 
 import {isError, isNonEmptyStringAndNotWhitespace} from '@sindresorhus/is';
 import pMap from 'p-map';
-import {Maybe, Result, Unit} from 'true-myth';
+import {Maybe, Result, Task, Unit} from 'true-myth';
 import {match} from 'ts-pattern';
 
 import type {GitHubClient, IssueCommentRecord, PullRequestRecord} from './githubClient.ts';
@@ -78,7 +78,6 @@ export type ReleaseAppearanceCommandDependencies = {
 export type ExecuteReleaseAppearanceCommandOptions = {
   readonly command: ParsedCommand;
   readonly environment: NodeJS.ProcessEnv;
-  readonly dependencies: ReleaseAppearanceCommandDependencies;
 };
 
 export type ReleaseAppearanceCommandResult = {
@@ -181,6 +180,11 @@ type ProcessSinglePullRequestOptions = {
   readonly executionMode: ExecutionMode;
   readonly githubClient: GitHubClient;
   readonly githubToken: string;
+};
+
+type WritePullRequestCommentOptions = {
+  readonly pullRequestNumber: number;
+  readonly operation: Exclude<CommentOperation, {readonly kind: 'unchanged'}>;
 };
 
 type CreateCommentProgressOptions = {
@@ -493,7 +497,7 @@ async function resolveCommitDiscoveryOutcome(
   githubClient: GitHubClient,
   githubToken: string,
 ): Promise<CommitDiscoveryOutcome> {
-  const pullRequestsResult = await githubClient.listPullRequestsForCommit({commitSha: workItem.commitSha});
+  const pullRequestsResult = await githubClient.listPullRequestsForCommit({commitSha: workItem.commitSha}).toPromise();
   if (pullRequestsResult.isErr) {
     return {
       kind: 'failure',
@@ -702,26 +706,25 @@ function createDesiredReleaseState(
     .exhaustive();
 }
 
-async function writePullRequestComment(
-  pullRequestNumber: number,
-  operation: Exclude<CommentOperation, {readonly kind: 'unchanged'}>,
-  githubClient: GitHubClient,
-): Promise<Result<Unit, Error>> {
-  const writeResult = await match(operation)
+function writePullRequestComment(
+  options: WritePullRequestCommentOptions,
+  dependencies: {readonly githubClient: GitHubClient},
+): Task<Unit, Error> {
+  const writeTask = match(options.operation)
     .with({kind: 'create'}, createOperation => {
-      return githubClient.createIssueComment({
-        pullRequestNumber,
+      return dependencies.githubClient.createIssueComment({
+        pullRequestNumber: options.pullRequestNumber,
         commentBody: createOperation.commentBody,
       });
     })
     .with({kind: 'update'}, updateOperation => {
-      return githubClient.updateIssueComment({
+      return dependencies.githubClient.updateIssueComment({
         commentId: updateOperation.commentId,
         commentBody: updateOperation.commentBody,
       });
     })
     .exhaustive();
-  return writeResult.map(() => {
+  return writeTask.map(() => {
     return Unit;
   });
 }
@@ -782,7 +785,7 @@ async function processSinglePullRequest(
 ): Promise<PullRequestProcessingOutcome> {
   const {executionMode, githubClient, githubToken, pullRequest, releaseTag, stage} = processPullRequestOptions;
   let plannedCommentOperation: Maybe<PlannedCommentOperation> = Maybe.nothing<PlannedCommentOperation>();
-  const commentsResult = await githubClient.listIssueComments({pullRequestNumber: pullRequest.number});
+  const commentsResult = await githubClient.listIssueComments({pullRequestNumber: pullRequest.number}).toPromise();
   if (commentsResult.isErr) {
     return createProcessingFailure(
       pullRequest.number,
@@ -819,7 +822,13 @@ async function processSinglePullRequest(
       : {kind: 'planned-update', pullRequestNumber: pullRequest.number, plannedCommentOperation: plannedOperation};
   }
 
-  const writeResult = await writePullRequestComment(pullRequest.number, operationResult.value, githubClient);
+  const writeResult = await writePullRequestComment(
+    {
+      pullRequestNumber: pullRequest.number,
+      operation: operationResult.value,
+    },
+    {githubClient},
+  ).toPromise();
   if (writeResult.isErr) {
     return createProcessingFailure(pullRequest.number, writeResult.error.message, githubToken, plannedCommentOperation);
   }
@@ -1077,7 +1086,9 @@ function createWriteSummary(summaryOptions: SummaryOptions): string {
     `- Workflow/tooling commit: \`${summaryOptions.workflowToolingCommitSha}\``,
     `- Release tag: \`${summaryOptions.releaseTag}\``,
     `- Release commit: \`${summaryOptions.releaseCommit}\``,
-    ...(summaryOptions.bootstrap ? ['- Bootstrap: yes', '- No preceding new-format Production release exists.'] : []),
+    ...(summaryOptions.bootstrap
+      ? ['- Bootstrap: yes', '- No preceding stable WebApp Production release exists.']
+      : []),
     `- Preceding Production tag: ${summaryOptions.precedingProductionTag}`,
     `- Candidate ranges: ${formatCandidateRanges(summaryOptions.candidateRanges)}`,
     ...formatExecutionMetrics(summaryOptions),
@@ -1116,7 +1127,9 @@ function createDryRunSummary(summaryOptions: SummaryOptions): string {
     `- Workflow/tooling commit: \`${summaryOptions.workflowToolingCommitSha}\``,
     `- Release tag: \`${summaryOptions.releaseTag}\``,
     `- Release commit: \`${summaryOptions.releaseCommit}\``,
-    ...(summaryOptions.bootstrap ? ['- Bootstrap: yes', '- No preceding new-format Production release exists.'] : []),
+    ...(summaryOptions.bootstrap
+      ? ['- Bootstrap: yes', '- No preceding stable WebApp Production release exists.']
+      : []),
     `- Preceding Production tag: ${summaryOptions.precedingProductionTag}`,
     `- Candidate ranges: ${formatCandidateRanges(summaryOptions.candidateRanges)}`,
     ...formatExecutionMetrics(summaryOptions),
@@ -1137,7 +1150,7 @@ function createDryRunLogOutput(summaryOptions: SummaryOptions): string {
     return [
       ...releaseDetails,
       'Bootstrap: yes',
-      'No preceding new-format Production release exists.',
+      'No preceding stable WebApp Production release exists.',
       'No commit range was inspected.',
       'No pull request comment operations were planned.',
       'No GitHub comments were created or updated.',
@@ -1224,33 +1237,45 @@ async function finalizeSummary(
   return {exitCode: dryRunLogOutputWriteFailure.isJust ? 1 : exitCode, summary};
 }
 
-async function planReleaseHistory(
-  parsedCommand: ParsedCommand,
-  executeGitCommand: ExecuteGitCommand,
-): Promise<Result<ReleaseHistoryPlan, Error>> {
-  return match(parsedCommand)
+type PlanReleaseHistoryOptions = {
+  readonly command: ParsedCommand;
+};
+
+function planReleaseHistory(
+  options: PlanReleaseHistoryOptions,
+  dependencies: Pick<ReleaseAppearanceCommandDependencies, 'executeGitCommand'>,
+): Task<ReleaseHistoryPlan, Error> {
+  const {command} = options;
+  const {executeGitCommand} = dependencies;
+
+  return match(command)
     .with({stage: 'beta'}, betaCommand => {
-      return planBetaReleaseHistory({
-        executeGitCommand,
-        currentBetaTag: betaCommand.releaseTag,
-        releaseCommit: betaCommand.releaseCommit,
-      });
+      return planBetaReleaseHistory(
+        {
+          currentBetaTag: betaCommand.releaseTag,
+          releaseCommit: betaCommand.releaseCommit,
+        },
+        {executeGitCommand},
+      );
     })
     .with({stage: 'production'}, productionCommand => {
-      return planProductionReleaseHistory({
-        executeGitCommand,
-        currentProductionTag: productionCommand.releaseTag,
-        promotedBetaTag: productionCommand.promotedBetaTag,
-        releaseCommit: productionCommand.releaseCommit,
-      });
+      return planProductionReleaseHistory(
+        {
+          currentProductionTag: productionCommand.releaseTag,
+          promotedBetaTag: productionCommand.promotedBetaTag,
+          releaseCommit: productionCommand.releaseCommit,
+        },
+        {executeGitCommand},
+      );
     })
     .exhaustive();
 }
 
 export async function executeReleaseAppearanceCommand(
-  executeReleaseAppearanceCommandOptions: ExecuteReleaseAppearanceCommandOptions,
+  options: ExecuteReleaseAppearanceCommandOptions,
+  dependencies: ReleaseAppearanceCommandDependencies,
 ): Promise<ReleaseAppearanceCommandResult> {
-  const {command, environment, dependencies} = executeReleaseAppearanceCommandOptions;
+  const {command, environment} = options;
   const commandStartedAtMilliseconds = dependencies.now();
   const githubToken = Maybe.of(environment.GITHUB_TOKEN).unwrapOr('');
 
@@ -1264,15 +1289,10 @@ export async function executeReleaseAppearanceCommand(
   }
 
   const releaseHistoryPlanningStartedAtMilliseconds = dependencies.now();
-  let historyPlanResult: Result<ReleaseHistoryPlan, Error>;
-  try {
-    historyPlanResult = await planReleaseHistory(command, dependencies.executeGitCommand);
-  } catch (error: unknown) {
-    historyPlanResult = createFailure(
-      `Unable to plan release history: ${redactSecret(errorMessage(error), githubToken)}`,
-      error,
-    );
-  }
+  const historyPlanResult = await planReleaseHistory(
+    {command},
+    {executeGitCommand: dependencies.executeGitCommand},
+  ).toPromise();
   const releaseHistoryPlanningDurationMilliseconds = dependencies.now() - releaseHistoryPlanningStartedAtMilliseconds;
 
   let summaryOptions = createEmptySummaryOptions(command, commandEnvironmentResult.value.workflowToolingCommitSha);
@@ -1280,7 +1300,7 @@ export async function executeReleaseAppearanceCommand(
   if (historyPlanResult.isErr) {
     const historyFailureMessage = createGeneralFailureMessage(
       'Release history',
-      historyPlanResult.error.message,
+      redactSecret(historyPlanResult.error.message, githubToken),
       githubToken,
     );
     summaryOptions = {

@@ -6,22 +6,21 @@ on:
   # the complete release lifecycle are one auditable workflow operation.
   workflow_dispatch:
     inputs:
-      release_identifier:
-        description: 'Release identifier in YYYY-MM-DD.N format, for example 2026-07-18.1'
+      operation:
+        description: 'start = calculate next SemVer from this exact main commit and create release/X.Y.Z; continue = require active release/X.Y.Z and use its current HEAD for another candidate without re-planning'
         required: true
-        type: string
+        type: choice
+        options:
+          - start
+          - continue
       confirm_release:
         description: 'I understand that this creates or reuses the release branch, automatically deploys and verifies Beta, runs the blocking E2E gate, and then waits for separate Production approval before deploying Production and creating a draft GitHub Release for manual changelog completion and publication'
         required: true
         default: false
         type: boolean
-      reason:
-        description: 'Optional reason for starting this WebApp release'
-        required: false
-        type: string
 
 concurrency:
-  group: release-webapp-${{ inputs.release_identifier }}
+  group: release-webapp
   cancel-in-progress: false
   queue: max
 
@@ -52,24 +51,34 @@ env:
   WIRE_BUILDS_REPOSITORY: wireapp/wire-builds
 
 jobs:
-  validate_request:
-    name: Validate release request
+  prepare_release:
+    name: Prepare SemVer release
     runs-on: ubuntu-24.04
     permissions:
-      contents: read
+      contents: write # Create the create-only SemVer release branch reservation.
+      pull-requests: read # Read merged PR labels used to calculate the version.
     outputs:
-      release_identifier: ${{ steps.validate_request.outputs.release_identifier }}
-      release_branch: ${{ steps.validate_request.outputs.release_branch }}
-      production_tag_name: ${{ steps.validate_request.outputs.production_tag_name }}
+      operation: ${{ steps.prepare.outputs.operation }}
+      release_version: ${{ steps.prepare.outputs.release_version }}
+      release_branch: ${{ steps.prepare.outputs.release_branch }}
+      release_commit_sha: ${{ steps.prepare.outputs.release_commit_sha }}
+      release_branch_action: ${{ steps.prepare.outputs.release_branch_action }}
+      stable_base_version: ${{ steps.prepare.outputs.stable_base_version }}
+      stable_base_tag: ${{ steps.prepare.outputs.stable_base_tag }}
+      stable_base_commit_sha: ${{ steps.prepare.outputs.stable_base_commit_sha }}
 
     steps:
-      - name: Checkout workflow tools
+      - name: Checkout release planning history
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
-          persist-credentials: false
-          fetch-depth: 1
+          persist-credentials: true
+          fetch-depth: 0
+          fetch-tags: true
+          ref: ${{ github.sha }}
 
-      - name: Validate workflow ref
+      - name: Validate release request
+        env:
+          CONFIRM_RELEASE: ${{ inputs.confirm_release }}
         run: |
           set -euo pipefail
 
@@ -79,61 +88,10 @@ jobs:
             exit 1
           fi
 
-      - name: Add repository Yarn wrapper to PATH
-        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
-
-      - name: Setup Node.js
-        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
-        with:
-          node-version-file: '.nvmrc'
-          cache: 'yarn'
-
-      - name: Install dependencies
-        env:
-          YARN_ENABLE_SCRIPTS: 'false'
-        run: ./bin/yarn install --immutable --mode=skip-build
-
-      - name: Validate release request
-        id: validate_request
-        env:
-          CONFIRM_RELEASE: ${{ inputs.confirm_release }}
-          RELEASE_IDENTIFIER: ${{ inputs.release_identifier }}
-        run: |
-          set -euo pipefail
-
           if [[ "${CONFIRM_RELEASE}" != 'true' ]]; then
-            echo 'confirm_release must be true to start the WebApp release.' >&2
+            echo 'confirm_release must be true to start or continue a WebApp release.' >&2
             exit 1
           fi
-
-          release_branch="$(node ./tools/release-cli/releaseMetadataCli.mts release-branch "${RELEASE_IDENTIFIER}")"
-          production_tag_name="$(node ./tools/release-cli/releaseMetadataCli.mts production-tag "${RELEASE_IDENTIFIER}")"
-
-          {
-            echo "release_identifier=${RELEASE_IDENTIFIER}"
-            echo "release_branch=${release_branch}"
-            echo "production_tag_name=${production_tag_name}"
-          } >> "$GITHUB_OUTPUT"
-
-  webapp_version_synchronization_preflight:
-    name: WebApp version synchronization preflight
-    runs-on: ubuntu-24.04
-    needs: validate_request
-    permissions:
-      contents: read
-      pull-requests: read
-    outputs:
-      state: ${{ steps.inspect.outputs.state }}
-      pull_request_number: ${{ steps.inspect.outputs.pull_request_number }}
-      pull_request_url: ${{ steps.inspect.outputs.pull_request_url }}
-
-    steps:
-      - name: Checkout workflow tools
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          persist-credentials: false
-          fetch-depth: 1
-          ref: ${{ github.sha }}
 
       - name: Add repository Yarn wrapper to PATH
         run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
@@ -144,139 +102,45 @@ jobs:
           node-version-file: '.nvmrc'
           cache: 'yarn'
 
-      - name: Install synchronization tooling dependencies
+      - name: Install release tooling dependencies
         env:
           YARN_ENABLE_SCRIPTS: 'false'
         run: ./bin/yarn install --immutable --mode=skip-build
 
-      - name: Inspect WebApp version synchronization
-        id: inspect
-        continue-on-error: true
+      - name: Prepare release branch and version
+        id: prepare
         env:
+          GITHUB_API_URL: ${{ github.api_url }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
           GITHUB_TOKEN: ${{ github.token }}
-          PRODUCTION_TAG_NAME: ${{ needs.validate_request.outputs.production_tag_name }}
-          RELEASE_IDENTIFIER: ${{ needs.validate_request.outputs.release_identifier }}
+          RELEASE_OPERATION: ${{ inputs.operation }}
         run: |
           set -euo pipefail
 
-          inspection_output=''
-          set +e
-          inspection_output="$(node ./tools/release-cli/webappVersionSynchronization.mts inspect "${RELEASE_IDENTIFIER}" "${PRODUCTION_TAG_NAME}")"
-          inspection_exit_code="$?"
-          set -e
-
-          if [[ -n "${inspection_output}" ]]; then
-            {
-              echo "state=$(jq --raw-output '.state // empty' <<< "${inspection_output}")"
-              echo "pull_request_number=$(jq --raw-output '.pull_request_number // empty' <<< "${inspection_output}")"
-              echo "pull_request_url=$(jq --raw-output '.pull_request_url // empty' <<< "${inspection_output}")"
-            } >> "$GITHUB_OUTPUT"
-          fi
-
-          if [[ "${inspection_exit_code}" -ne 0 ]]; then
-            exit "${inspection_exit_code}"
-          fi
-
-      - name: Enforce WebApp version synchronization preflight
-        if: ${{ steps.inspect.outcome == 'failure' }}
-        run: |
-          echo 'WebApp version synchronization preflight failed. See the inspection error above.' >&2
-          exit 1
-
-  prepare_release_branch:
-    name: Prepare release branch
-    runs-on: ubuntu-24.04
-    needs: [validate_request, webapp_version_synchronization_preflight]
-    permissions:
-      contents: write
-    concurrency:
-      group: prepare-release-branch-${{ inputs.release_identifier }}
-      cancel-in-progress: false
-      queue: max
-    outputs:
-      release_identifier: ${{ steps.prepare_release_branch.outputs.release_identifier }}
-      release_branch: ${{ steps.prepare_release_branch.outputs.release_branch }}
-      release_commit_sha: ${{ steps.prepare_release_branch.outputs.release_commit_sha }}
-      release_branch_action: ${{ steps.prepare_release_branch.outputs.release_branch_action }}
-      source_ref: ${{ steps.prepare_release_branch.outputs.source_ref }}
-      source_commit_sha: ${{ steps.prepare_release_branch.outputs.source_commit_sha }}
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          persist-credentials: true
-          fetch-depth: 1
-          ref: ${{ github.sha }}
-
-      - name: Prepare release branch
-        id: prepare_release_branch
-        env:
-          RELEASE_BRANCH: ${{ needs.validate_request.outputs.release_branch }}
-          RELEASE_IDENTIFIER: ${{ needs.validate_request.outputs.release_identifier }}
-        run: |
-          set -euo pipefail
-
-          release_branch_remote_ref="refs/remotes/origin/${RELEASE_BRANCH}"
-          release_branch_action=''
-          source_ref=''
-          source_commit_sha=''
-
-          if git ls-remote --exit-code --heads origin "${RELEASE_BRANCH}" > /dev/null; then
-            release_branch_action='reused'
+          if [[ "${RELEASE_OPERATION}" == 'start' ]]; then
+            preparation_output="$(node ./tools/release-cli/webappRelease.mts start "${GITHUB_SHA}")"
+          elif [[ "${RELEASE_OPERATION}" == 'continue' ]]; then
+            preparation_output="$(node ./tools/release-cli/webappRelease.mts continue)"
           else
-            ls_remote_exit_code="$?"
-
-            if [[ "${ls_remote_exit_code}" -ne 2 ]]; then
-              echo "Unable to check whether release branch exists on origin: ${RELEASE_BRANCH}" >&2
-              exit "${ls_remote_exit_code}"
-            fi
-
-            source_ref='main'
-            source_commit_sha="${GITHUB_SHA}"
-
-            if ! git rev-parse --verify "${source_commit_sha}^{commit}" > /dev/null; then
-              echo "The workflow dispatch commit is not available in the local repository: ${source_commit_sha}" >&2
-              exit 1
-            fi
-
-            if git push origin "${source_commit_sha}:refs/heads/${RELEASE_BRANCH}"; then
-              release_branch_action='created'
-            else
-              push_exit_code="$?"
-
-              if ! git ls-remote --exit-code --heads origin "${RELEASE_BRANCH}" > /dev/null; then
-                echo "Unable to resolve the release branch after an unsuccessful push: ${RELEASE_BRANCH}" >&2
-                exit "${push_exit_code}"
-              fi
-
-              release_branch_action='reused'
-              source_ref=''
-              source_commit_sha=''
-            fi
-          fi
-
-          git fetch --no-tags origin "+refs/heads/${RELEASE_BRANCH}:${release_branch_remote_ref}"
-          release_commit_sha="$(git rev-parse "${release_branch_remote_ref}^{commit}")"
-
-          if [[ "${release_branch_action}" == 'created' && "${release_commit_sha}" != "${source_commit_sha}" ]]; then
-            echo "Release branch ${RELEASE_BRANCH} resolved to ${release_commit_sha}, expected ${source_commit_sha}." >&2
+            echo "Unknown release operation: ${RELEASE_OPERATION}" >&2
             exit 1
           fi
 
           {
-            echo "release_identifier=${RELEASE_IDENTIFIER}"
-            echo "release_branch=${RELEASE_BRANCH}"
-            echo "release_commit_sha=${release_commit_sha}"
-            echo "release_branch_action=${release_branch_action}"
-            echo "source_ref=${source_ref}"
-            echo "source_commit_sha=${source_commit_sha}"
+            echo "operation=$(jq --raw-output '.operation' <<< "${preparation_output}")"
+            echo "release_version=$(jq --raw-output '.version' <<< "${preparation_output}")"
+            echo "release_branch=$(jq --raw-output '.release_branch' <<< "${preparation_output}")"
+            echo "release_commit_sha=$(jq --raw-output '.release_commit' <<< "${preparation_output}")"
+            echo "release_branch_action=$(jq --raw-output '.release_branch_action' <<< "${preparation_output}")"
+            echo "stable_base_version=$(jq --raw-output '.stable_base_version' <<< "${preparation_output}")"
+            echo "stable_base_tag=$(jq --raw-output '.stable_base_tag' <<< "${preparation_output}")"
+            echo "stable_base_commit_sha=$(jq --raw-output '.stable_base_commit' <<< "${preparation_output}")"
           } >> "$GITHUB_OUTPUT"
 
   build_artifact:
     name: Build release artifact
     runs-on: ubuntu-24.04
-    needs: prepare_release_branch
+    needs: prepare_release
     env:
       WIRE_WEBAPP_CONFIGURATION: production
     permissions:
@@ -290,11 +154,13 @@ jobs:
       artifact_built_at: ${{ steps.validate_artifact_metadata.outputs.artifact_built_at }}
       distribution_artifact_name: ${{ steps.distribution_artifact.outputs.distribution_artifact_name }}
       release_branch: ${{ steps.release_metadata.outputs.release_branch }}
-      release_branch_action: ${{ needs.prepare_release_branch.outputs.release_branch_action }}
+      operation: ${{ needs.prepare_release.outputs.operation }}
+      release_branch_action: ${{ needs.prepare_release.outputs.release_branch_action }}
       release_commit_sha: ${{ steps.release_metadata.outputs.release_commit_sha }}
-      release_identifier: ${{ steps.release_metadata.outputs.release_identifier }}
-      source_commit_sha: ${{ needs.prepare_release_branch.outputs.source_commit_sha }}
-      source_ref: ${{ needs.prepare_release_branch.outputs.source_ref }}
+      release_version: ${{ steps.release_metadata.outputs.release_version }}
+      stable_base_version: ${{ needs.prepare_release.outputs.stable_base_version }}
+      stable_base_tag: ${{ needs.prepare_release.outputs.stable_base_tag }}
+      stable_base_commit_sha: ${{ needs.prepare_release.outputs.stable_base_commit_sha }}
 
     steps:
       - name: Checkout prepared release commit
@@ -302,7 +168,7 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
-          ref: ${{ needs.prepare_release_branch.outputs.release_commit_sha }}
+          ref: ${{ needs.prepare_release.outputs.release_commit_sha }}
 
       - name: Add repository Yarn wrapper to PATH
         run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
@@ -319,9 +185,9 @@ jobs:
       - name: Verify prepared release commit
         id: release_metadata
         env:
-          EXPECTED_RELEASE_COMMIT_SHA: ${{ needs.prepare_release_branch.outputs.release_commit_sha }}
-          RELEASE_BRANCH: ${{ needs.prepare_release_branch.outputs.release_branch }}
-          RELEASE_IDENTIFIER: ${{ needs.prepare_release_branch.outputs.release_identifier }}
+          EXPECTED_RELEASE_COMMIT_SHA: ${{ needs.prepare_release.outputs.release_commit_sha }}
+          RELEASE_BRANCH: ${{ needs.prepare_release.outputs.release_branch }}
+          RELEASE_VERSION: ${{ needs.prepare_release.outputs.release_version }}
         run: |
           set -euo pipefail
 
@@ -334,7 +200,7 @@ jobs:
 
           {
             echo "release_branch=${RELEASE_BRANCH}"
-            echo "release_identifier=${RELEASE_IDENTIFIER}"
+            echo "release_version=${RELEASE_VERSION}"
             echo "release_commit_sha=${EXPECTED_RELEASE_COMMIT_SHA}"
           } >> "$GITHUB_OUTPUT"
 
@@ -344,7 +210,7 @@ jobs:
       - name: Build and package public production
         env:
           WIRE_WEBAPP_BUILD_COMMIT: ${{ steps.release_metadata.outputs.release_commit_sha }}
-          WIRE_WEBAPP_BUILD_VERSION: ${{ steps.release_metadata.outputs.release_identifier }}
+          WIRE_WEBAPP_BUILD_VERSION: ${{ steps.release_metadata.outputs.release_version }}
         run: ./bin/yarn build:prod:public
 
       - name: Validate release artifact metadata
@@ -352,17 +218,17 @@ jobs:
         env:
           BUILD_ARTIFACT_PATH: ${{ env.ARTIFACT_PATH }}
           EXPECTED_COMMIT: ${{ steps.release_metadata.outputs.release_commit_sha }}
-          EXPECTED_VERSION: ${{ steps.release_metadata.outputs.release_identifier }}
+          EXPECTED_VERSION: ${{ steps.release_metadata.outputs.release_version }}
         run: node ./tools/build-artifact/validateBuildArtifact.mts
 
       - name: Compute artifact metadata
         id: artifact_metadata
         env:
-          RELEASE_IDENTIFIER: ${{ steps.release_metadata.outputs.release_identifier }}
+          RELEASE_VERSION: ${{ steps.release_metadata.outputs.release_version }}
         run: |
           set -euo pipefail
 
-          artifact_name="${BETA_ARTIFACT_NAME_PREFIX}-${RELEASE_IDENTIFIER}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          artifact_name="${BETA_ARTIFACT_NAME_PREFIX}-${RELEASE_VERSION}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           artifact_checksum="$(sha256sum "${ARTIFACT_PATH}" | awk '{print $1}')"
 
           {
@@ -376,12 +242,12 @@ jobs:
           ARTIFACT_CHECKSUM: ${{ steps.artifact_metadata.outputs.artifact_checksum }}
           ARTIFACT_VERSION: ${{ steps.validate_artifact_metadata.outputs.artifact_version }}
           RELEASE_COMMIT_SHA: ${{ steps.release_metadata.outputs.release_commit_sha }}
-          RELEASE_IDENTIFIER: ${{ steps.release_metadata.outputs.release_identifier }}
+          RELEASE_VERSION: ${{ steps.release_metadata.outputs.release_version }}
         run: |
           set -euo pipefail
 
           # Retain this legacy artifact prefix so previous release runs remain repairable.
-          distribution_artifact_name="release-cloud-distribution-context-${RELEASE_IDENTIFIER}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          distribution_artifact_name="release-cloud-distribution-context-${RELEASE_VERSION}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           distribution_context_directory="${RUNNER_TEMP}/${distribution_artifact_name}"
           mkdir -p \
             "${distribution_context_directory}/apps/server" \
@@ -396,7 +262,7 @@ jobs:
           cp -a libraries/config/package.json libraries/config/lib "${distribution_context_directory}/libraries/config/"
 
           jq -n \
-            --arg release_identifier "${RELEASE_IDENTIFIER}" \
+            --arg release_version "${RELEASE_VERSION}" \
             --arg release_commit_sha "${RELEASE_COMMIT_SHA}" \
             --arg artifact_version "${ARTIFACT_VERSION}" \
             --arg cloud_artifact_checksum "${ARTIFACT_CHECKSUM}" \
@@ -404,7 +270,7 @@ jobs:
             --arg source_run_attempt "${GITHUB_RUN_ATTEMPT}" \
             '{
               productionTag: null,
-              releaseIdentifier: $release_identifier,
+              releaseIdentifier: $release_version,
               releaseCommitSha: $release_commit_sha,
               artifactVersion: $artifact_version,
               cloudArtifactChecksum: $cloud_artifact_checksum,
@@ -476,7 +342,7 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
           application-name: Webapp
           environment-name: ${{ env.BETA_ELASTIC_BEANSTALK_ENVIRONMENT_NAME }}
-          version-label: ${{ needs.build_artifact.outputs.release_identifier }}-${{ github.run_id }}-${{ github.run_attempt }}-beta
+          version-label: ${{ needs.build_artifact.outputs.release_version }}-${{ github.run_id }}-${{ github.run_attempt }}-beta
           deployment-package-path: ebs.zip
           wait-for-deployment: true
           wait-for-environment-recovery: true
@@ -485,7 +351,7 @@ jobs:
 
       - name: Verify Beta runtime
         id: verify_beta_runtime
-        uses: ./.github/actions/verify-webapp-runtime
+        uses: $/.github/actions/verify-webapp-runtime
         with:
           environment-label: Beta
           webapp-url: ${{ env.BETA_WEBAPP_URL }}
@@ -501,7 +367,7 @@ jobs:
     runs-on: ubuntu-24.04
     needs: [build_artifact, deploy_to_beta]
     permissions:
-      contents: write
+      contents: write # Create the immutable annotated Beta tag.
     outputs:
       beta_tag_name: ${{ steps.beta_tag.outputs.beta_tag_name }}
 
@@ -509,6 +375,7 @@ jobs:
       - name: Checkout release commit
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
+          persist-credentials: false
           fetch-depth: 1
           fetch-tags: false
           ref: ${{ needs.build_artifact.outputs.release_commit_sha }}
@@ -530,28 +397,38 @@ jobs:
       - name: Create and push Beta tag
         id: beta_tag
         env:
+          GITHUB_TOKEN: ${{ github.token }}
           RELEASE_COMMIT_SHA: ${{ needs.build_artifact.outputs.release_commit_sha }}
-          RELEASE_IDENTIFIER: ${{ needs.build_artifact.outputs.release_identifier }}
+          RELEASE_VERSION: ${{ needs.build_artifact.outputs.release_version }}
         run: |
           set -euo pipefail
 
+          git_authentication_header="AUTHORIZATION: basic $(printf 'x-access-token:%s' "${GITHUB_TOKEN}" | base64 --wrap=0)"
+          run_authenticated_git() {
+            GIT_CONFIG_COUNT=1 \
+            GIT_CONFIG_KEY_0='http.https://github.com/.extraheader' \
+            GIT_CONFIG_VALUE_0="${git_authentication_header}" \
+              git "$@"
+          }
+
           mapfile -t existing_beta_tag_names < <(
-            git ls-remote \
+            run_authenticated_git ls-remote \
               --tags \
               --refs \
               origin \
-              "${RELEASE_IDENTIFIER}-beta.*" |
+              "v${RELEASE_VERSION}-beta.*" |
               awk '{
                 sub("^refs/tags/", "", $2);
                 print $2;
               }'
           )
-          beta_tag_name="$(node ./tools/release-cli/releaseMetadataCli.mts next-beta-tag "${RELEASE_IDENTIFIER}" "${existing_beta_tag_names[@]}")"
+          beta_tag_name="$(node ./tools/release-cli/releaseMetadataCli.mts next-beta-tag "${RELEASE_VERSION}" "${existing_beta_tag_names[@]}")"
 
           git config user.email "zebot@users.noreply.github.com"
           git config user.name "Zebot"
           git tag --annotate "$beta_tag_name" --message "Release $beta_tag_name" "$RELEASE_COMMIT_SHA"
-          git push origin "refs/tags/$beta_tag_name"
+          run_authenticated_git push origin "refs/tags/$beta_tag_name"
+          unset git_authentication_header
 
           echo "beta_tag_name=${beta_tag_name}" >> "$GITHUB_OUTPUT"
 
@@ -577,14 +454,14 @@ jobs:
           fetch-depth: 1
 
       - name: Announce successful Beta release
-        uses: ./.github/actions/notify-deployoholics
+        uses: $/.github/actions/notify-deployoholics
         with:
           deployoholics-webhook-url: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
           deployoholics-token: ${{ secrets.WIRE_DEPLOYOHOLICS_TOKEN }}
           text: |
             ✅ WebApp Beta release successfully deployed ✅
 
-            Release: ${{ needs.build_artifact.outputs.release_identifier }}
+            Release: ${{ needs.build_artifact.outputs.release_version }}
             Branch: ${{ needs.build_artifact.outputs.release_branch }}
             Release commit SHA: ${{ needs.build_artifact.outputs.release_commit_sha }}
             Beta tag: ${{ needs.create_beta_tag.outputs.beta_tag_name }}
@@ -690,14 +567,12 @@ jobs:
           BETA_TAG_CREATION_RESULT: ${{ needs.create_beta_tag.result }}
           BETA_TAG_NAME: ${{ needs.create_beta_tag.outputs.beta_tag_name }}
           BETA_WEBAPP_URL: ${{ env.BETA_WEBAPP_URL }}
+          RELEASE_OPERATION: ${{ needs.build_artifact.outputs.operation }}
           RELEASE_BRANCH: ${{ needs.build_artifact.outputs.release_branch }}
           RELEASE_ACTOR: ${{ github.actor }}
           RELEASE_BRANCH_ACTION: ${{ needs.build_artifact.outputs.release_branch_action }}
           RELEASE_COMMIT_SHA: ${{ needs.build_artifact.outputs.release_commit_sha }}
-          RELEASE_IDENTIFIER: ${{ needs.build_artifact.outputs.release_identifier }}
-          RELEASE_REASON: ${{ inputs.reason }}
-          SOURCE_COMMIT_SHA: ${{ needs.build_artifact.outputs.source_commit_sha }}
-          SOURCE_REF: ${{ needs.build_artifact.outputs.source_ref }}
+          RELEASE_VERSION: ${{ needs.build_artifact.outputs.release_version }}
         run: node tools/release-summary/renderWebappReleaseSummary.ts --beta-release >> "$GITHUB_STEP_SUMMARY"
 
   # WebApp release owns release-specific success and failure notifications.
@@ -708,7 +583,7 @@ jobs:
     needs: [build_artifact, create_beta_tag]
     permissions:
       contents: read
-    uses: ./.github/workflows/precommit-slot-run.yml
+    uses: $/.github/workflows/precommit-slot-run.yml
     with:
       env_name: wire-webapp-precommit-3
       teamManagementUrl: https://teams.wire.com/login/
@@ -718,81 +593,12 @@ jobs:
       expectedVersion: ${{ needs.build_artifact.outputs.artifact_version }}
       expectedCommit: ${{ needs.build_artifact.outputs.artifact_commit }}
       grep: '@regression|@crit-flow-web'
-      testinyRunName: Release ${{ needs.build_artifact.outputs.release_identifier }} ${{ needs.create_beta_tag.outputs.beta_tag_name }}
+      testinyRunName: Release ${{ needs.build_artifact.outputs.release_version }} ${{ needs.create_beta_tag.outputs.beta_tag_name }}
     secrets:
       OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
       WEBTEAM_AWS_ACCESS_KEY_ID: ${{ secrets.WEBTEAM_AWS_ACCESS_KEY_ID }}
       WEBTEAM_AWS_SECRET_ACCESS_KEY: ${{ secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY }}
       TESTINY_API_KEY: ${{ secrets.TESTINY_API_KEY }}
-
-  webapp_version_synchronization_production_preflight:
-    name: WebApp version synchronization Production preflight
-    runs-on: ubuntu-24.04
-    needs: [build_artifact, create_beta_tag, run_e2e]
-    if: ${{ needs.run_e2e.result == 'success' }}
-    permissions:
-      contents: read
-      pull-requests: read
-    outputs:
-      state: ${{ steps.inspect.outputs.state }}
-      pull_request_number: ${{ steps.inspect.outputs.pull_request_number }}
-      pull_request_url: ${{ steps.inspect.outputs.pull_request_url }}
-
-    steps:
-      - name: Checkout workflow tools
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          persist-credentials: false
-          fetch-depth: 1
-          ref: ${{ github.sha }}
-
-      - name: Add repository Yarn wrapper to PATH
-        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
-
-      - name: Setup Node.js
-        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
-        with:
-          node-version-file: '.nvmrc'
-          cache: 'yarn'
-
-      - name: Install synchronization tooling dependencies
-        env:
-          YARN_ENABLE_SCRIPTS: 'false'
-        run: ./bin/yarn install --immutable --mode=skip-build
-
-      - name: Inspect WebApp version synchronization before Production approval
-        id: inspect
-        continue-on-error: true
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-          PRODUCTION_TAG_NAME: ${{ needs.build_artifact.outputs.release_identifier }}-production
-          RELEASE_IDENTIFIER: ${{ needs.build_artifact.outputs.release_identifier }}
-        run: |
-          set -euo pipefail
-
-          inspection_output=''
-          set +e
-          inspection_output="$(node ./tools/release-cli/webappVersionSynchronization.mts inspect "${RELEASE_IDENTIFIER}" "${PRODUCTION_TAG_NAME}")"
-          inspection_exit_code="$?"
-          set -e
-
-          if [[ -n "${inspection_output}" ]]; then
-            {
-              echo "state=$(jq --raw-output '.state // empty' <<< "${inspection_output}")"
-              echo "pull_request_number=$(jq --raw-output '.pull_request_number // empty' <<< "${inspection_output}")"
-              echo "pull_request_url=$(jq --raw-output '.pull_request_url // empty' <<< "${inspection_output}")"
-            } >> "$GITHUB_OUTPUT"
-          fi
-
-          if [[ "${inspection_exit_code}" -ne 0 ]]; then
-            exit "${inspection_exit_code}"
-          fi
-
-      - name: Enforce WebApp version synchronization preflight before Production approval
-        if: ${{ steps.inspect.outcome == 'failure' }}
-        run: |
-          echo 'WebApp version synchronization preflight before Production approval failed. See the inspection error above.' >&2
-          exit 1
 
   notify_e2e_success:
     name: Notify successful release E2E gate
@@ -820,14 +626,14 @@ jobs:
           fetch-depth: 1
 
       - name: Announce successful release E2E gate
-        uses: ./.github/actions/notify-deployoholics
+        uses: $/.github/actions/notify-deployoholics
         with:
           deployoholics-webhook-url: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
           deployoholics-token: ${{ secrets.WIRE_DEPLOYOHOLICS_TOKEN }}
           text: |
             ✅ Release E2E system gate passed ✅
 
-            Release: ${{ needs.build_artifact.outputs.release_identifier }}
+            Release: ${{ needs.build_artifact.outputs.release_version }}
             Branch: ${{ needs.build_artifact.outputs.release_branch }}
             Commit: ${{ needs.build_artifact.outputs.release_commit_sha }}
             Beta tag: ${{ needs.create_beta_tag.outputs.beta_tag_name }}
@@ -849,7 +655,7 @@ jobs:
   production_preflight:
     name: Production preflight
     runs-on: ubuntu-24.04
-    needs: [build_artifact, create_beta_tag, run_e2e, webapp_version_synchronization_production_preflight]
+    needs: [build_artifact, create_beta_tag, run_e2e]
     permissions:
       contents: read
     outputs:
@@ -885,13 +691,21 @@ jobs:
         env:
           BETA_TAG_NAME: ${{ needs.create_beta_tag.outputs.beta_tag_name }}
           RELEASE_COMMIT_SHA: ${{ needs.build_artifact.outputs.release_commit_sha }}
-          RELEASE_IDENTIFIER: ${{ needs.build_artifact.outputs.release_identifier }}
+          RELEASE_VERSION: ${{ needs.build_artifact.outputs.release_version }}
         run: |
           set -euo pipefail
 
           git fetch --tags origin
 
-          production_tag_name="$(node ./tools/release-cli/releaseMetadataCli.mts production-tag "${RELEASE_IDENTIFIER}")"
+          production_tag_name="v${RELEASE_VERSION}"
+          node ./tools/release-cli/releaseMetadataCli.mts validate-webapp-beta-tag "${BETA_TAG_NAME}" "${RELEASE_VERSION}" > /dev/null
+          node ./tools/release-cli/releaseMetadataCli.mts validate-stable-webapp-tag "${production_tag_name}" > /dev/null
+
+          if [[ "$(git cat-file -t "refs/tags/${BETA_TAG_NAME}")" != 'tag' ]]; then
+            echo "Beta tag ${BETA_TAG_NAME} must be annotated." >&2
+            exit 1
+          fi
+
           beta_tag_commit_sha="$(git rev-parse "${BETA_TAG_NAME}^{commit}")"
 
           if [[ "${beta_tag_commit_sha}" != "${RELEASE_COMMIT_SHA}" ]]; then
@@ -900,6 +714,11 @@ jobs:
           fi
 
           if git rev-parse --quiet --verify "refs/tags/${production_tag_name}" >/dev/null; then
+            if [[ "$(git cat-file -t "refs/tags/${production_tag_name}")" != 'tag' ]]; then
+              echo "Production tag ${production_tag_name} must be annotated." >&2
+              exit 1
+            fi
+
             production_tag_commit_sha="$(git rev-parse "${production_tag_name}^{commit}")"
 
             if [[ "${production_tag_commit_sha}" != "${RELEASE_COMMIT_SHA}" ]]; then
@@ -971,7 +790,7 @@ jobs:
 
       - name: Verify current Beta runtime
         id: verify_current_beta
-        uses: ./.github/actions/verify-webapp-runtime
+        uses: $/.github/actions/verify-webapp-runtime
         with:
           environment-label: Current Beta before Production promotion
           webapp-url: ${{ env.BETA_WEBAPP_URL }}
@@ -1001,7 +820,7 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
           application-name: Webapp
           environment-name: ${{ env.PRODUCTION_ENVIRONMENT_NAME }}
-          version-label: ${{ needs.build_artifact.outputs.release_identifier }}-${{ github.run_id }}-${{ github.run_attempt }}-production
+          version-label: ${{ needs.build_artifact.outputs.release_version }}-${{ github.run_id }}-${{ github.run_attempt }}-prod
           deployment-package-path: ebs.zip
           wait-for-deployment: true
           wait-for-environment-recovery: true
@@ -1030,7 +849,7 @@ jobs:
           node-version-file: '.nvmrc'
 
       - name: Verify Production runtime
-        uses: ./.github/actions/verify-webapp-runtime
+        uses: $/.github/actions/verify-webapp-runtime
         with:
           environment-label: Production
           webapp-url: ${{ env.PRODUCTION_WEBAPP_URL }}
@@ -1047,50 +866,81 @@ jobs:
     needs: [build_artifact, production_preflight, deploy_to_production, verify_production_runtime]
     if: ${{ needs.production_preflight.outputs.should_deploy == 'true' && needs.deploy_to_production.result == 'success' && needs.verify_production_runtime.result == 'success' }}
     permissions:
-      contents: write
+      contents: write # Create the immutable stable Production tag.
     outputs:
       production_tag_name: ${{ steps.production_tag.outputs.production_tag_name }}
+      production_tag_action: ${{ steps.production_tag.outputs.production_tag_action }}
 
     steps:
       - name: Checkout release commit
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
+          persist-credentials: false
           fetch-depth: 1
           ref: ${{ needs.build_artifact.outputs.release_commit_sha }}
 
       - name: Create and push Production tag
         id: production_tag
         env:
+          GITHUB_TOKEN: ${{ github.token }}
           PRODUCTION_TAG_NAME: ${{ needs.production_preflight.outputs.production_tag_name }}
           RELEASE_COMMIT_SHA: ${{ needs.build_artifact.outputs.release_commit_sha }}
         run: |
           set -euo pipefail
 
+          git_authentication_header="AUTHORIZATION: basic $(printf 'x-access-token:%s' "${GITHUB_TOKEN}" | base64 --wrap=0)"
+          run_authenticated_git() {
+            GIT_CONFIG_COUNT=1 \
+            GIT_CONFIG_KEY_0='http.https://github.com/.extraheader' \
+            GIT_CONFIG_VALUE_0="${git_authentication_header}" \
+              git "$@"
+          }
+
           existing_production_tag_ref="$(
-            git ls-remote \
+            run_authenticated_git ls-remote \
               --tags \
               origin \
               "refs/tags/${PRODUCTION_TAG_NAME}"
           )"
 
           if [[ -n "${existing_production_tag_ref}" ]]; then
-            git fetch \
+            run_authenticated_git fetch \
               --no-tags \
               --depth=1 \
               origin \
               "refs/tags/${PRODUCTION_TAG_NAME}:refs/tags/${PRODUCTION_TAG_NAME}"
 
+            if [[ "$(git cat-file -t "refs/tags/${PRODUCTION_TAG_NAME}")" != 'tag' ]]; then
+              echo "Production tag ${PRODUCTION_TAG_NAME} must be annotated." >&2
+              exit 1
+            fi
+
             existing_production_tag_commit_sha="$(git rev-parse "${PRODUCTION_TAG_NAME}^{commit}")"
-            echo "Production tag ${PRODUCTION_TAG_NAME} already exists at ${existing_production_tag_commit_sha}." >&2
-            exit 1
+            if [[ "${existing_production_tag_commit_sha}" != "${RELEASE_COMMIT_SHA}" ]]; then
+              echo "Production tag ${PRODUCTION_TAG_NAME} points to ${existing_production_tag_commit_sha}, expected ${RELEASE_COMMIT_SHA}." >&2
+              exit 1
+            fi
+
+            {
+              echo "production_tag_name=${PRODUCTION_TAG_NAME}"
+              echo 'production_tag_action=already_tagged'
+            } >> "$GITHUB_OUTPUT"
+
+            unset git_authentication_header
+
+            exit 0
           fi
 
           git config user.email "zebot@users.noreply.github.com"
           git config user.name "Zebot"
           git tag --annotate "$PRODUCTION_TAG_NAME" --message "Release $PRODUCTION_TAG_NAME" "$RELEASE_COMMIT_SHA"
-          git push origin "refs/tags/$PRODUCTION_TAG_NAME"
+          run_authenticated_git push origin "refs/tags/$PRODUCTION_TAG_NAME"
+          unset git_authentication_header
 
-          echo "production_tag_name=${PRODUCTION_TAG_NAME}" >> "$GITHUB_OUTPUT"
+          {
+            echo "production_tag_name=${PRODUCTION_TAG_NAME}"
+            echo 'production_tag_action=created'
+          } >> "$GITHUB_OUTPUT"
 
   comment_production_release_appearances:
     name: Comment Production release appearances
@@ -1145,9 +995,9 @@ jobs:
     needs: [build_artifact, create_production_tag]
     if: ${{ needs.create_production_tag.result == 'success' }}
     permissions:
-      actions: read
-      contents: read
-    uses: ./.github/workflows/publish-production-distribution.yml
+      actions: read # Download the exact source release artifact.
+      contents: read # Fetch the immutable Production tag for validation.
+    uses: $/.github/workflows/publish-production-distribution.yml
     with:
       production_tag: ${{ needs.create_production_tag.outputs.production_tag_name }}
       expected_commit_sha: ${{ needs.build_artifact.outputs.release_commit_sha }}
@@ -1177,7 +1027,7 @@ jobs:
         )
       }}
     permissions:
-      contents: write
+      contents: write # Create and update the draft for the stable Production tag.
     outputs:
       production_tag_name: ${{ steps.ensure_github_release.outputs.production_tag_name }}
       github_release_action: ${{ steps.ensure_github_release.outputs.github_release_action }}
@@ -1216,6 +1066,7 @@ jobs:
   synchronize_webapp_version:
     name: Synchronize WebApp version
     runs-on: ubuntu-24.04
+    continue-on-error: true
     needs:
       [
         build_artifact,
@@ -1244,7 +1095,8 @@ jobs:
       cancel-in-progress: false
       queue: max
     outputs:
-      webapp_version: ${{ steps.synchronize.outputs.webapp_version }}
+      bookkeeping_result: ${{ steps.synchronize.outcome }}
+      webapp_version: ${{ steps.synchronize.outputs.version }}
       version_sync_action: ${{ steps.synchronize.outputs.action }}
       version_sync_pr_number: ${{ steps.synchronize.outputs.pull_request_number }}
       version_sync_pr_url: ${{ steps.synchronize.outputs.pull_request_url }}
@@ -1274,26 +1126,26 @@ jobs:
 
       - name: Synchronize WebApp version with Production
         id: synchronize
+        continue-on-error: true
         env:
           OTTO_THE_BOT_GH_TOKEN: ${{ secrets.OTTO_THE_BOT_GH_TOKEN }}
-          PRODUCTION_TAG_NAME: ${{ needs.create_production_tag.outputs.production_tag_name }}
-          RELEASE_IDENTIFIER: ${{ needs.build_artifact.outputs.release_identifier }}
+          PRODUCTION_TAG_NAME: ${{ needs.create_production_tag.outputs.production_tag_name || needs.production_preflight.outputs.production_tag_name }}
         run: |
           set -euo pipefail
 
-          synchronization_output="$(node ./tools/release-cli/webappVersionSynchronization.mts synchronize "${RELEASE_IDENTIFIER}" "${PRODUCTION_TAG_NAME}")"
+          synchronization_output="$(node ./tools/release-cli/webappVersionSynchronization.mts synchronize "${PRODUCTION_TAG_NAME}")"
 
           jq -e '
             type == "object" and
             (.action | type == "string") and
-            (.webapp_version | type == "string") and
+            (.version | type == "string") and
             (.branch_name | type == "string") and
             (.pull_request_number | type == "number") and
             (.pull_request_url | type == "string")
           ' <<< "${synchronization_output}" > /dev/null
 
           {
-            echo "webapp_version=$(jq --raw-output '.webapp_version' <<< "${synchronization_output}")"
+            echo "version=$(jq --raw-output '.version' <<< "${synchronization_output}")"
             echo "action=$(jq --raw-output '.action' <<< "${synchronization_output}")"
             echo "pull_request_number=$(jq --raw-output '.pull_request_number' <<< "${synchronization_output}")"
             echo "pull_request_url=$(jq --raw-output '.pull_request_url' <<< "${synchronization_output}")"
@@ -1323,7 +1175,7 @@ jobs:
         needs.create_production_tag.result == 'success' &&
         needs.publish_production_distribution.result == 'success' &&
         needs.ensure_github_release.result == 'success' &&
-        needs.synchronize_webapp_version.result == 'success'
+        needs.create_production_tag.outputs.production_tag_name != ''
       }}
     continue-on-error: true
     permissions:
@@ -1337,14 +1189,14 @@ jobs:
           fetch-depth: 1
 
       - name: Announce successful Production release
-        uses: ./.github/actions/notify-deployoholics
+        uses: $/.github/actions/notify-deployoholics
         with:
           deployoholics-webhook-url: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
           deployoholics-token: ${{ secrets.WIRE_DEPLOYOHOLICS_TOKEN }}
           text: |
             ✅ WebApp Production release successfully completed ✅
 
-            Release: ${{ needs.build_artifact.outputs.release_identifier }}
+            Release: ${{ needs.build_artifact.outputs.release_version }}
             Branch: ${{ needs.build_artifact.outputs.release_branch }}
             Release commit SHA: ${{ needs.build_artifact.outputs.release_commit_sha }}
             Promoted Beta tag: ${{ needs.create_beta_tag.outputs.beta_tag_name }}
@@ -1362,9 +1214,10 @@ jobs:
             GitHub Release URL: ${{ needs.ensure_github_release.outputs.github_release_url }}
             GitHub Release handoff: ${{ needs.ensure_github_release.outputs.github_release_action }}
             ${{ needs.ensure_github_release.outputs.github_release_state == 'draft' && 'The GitHub Release is a draft. Review or edit the generated customer-facing changelog and publish it manually.' || 'The existing published GitHub Release was preserved.' }}
-            WebApp package version: ${{ needs.synchronize_webapp_version.outputs.webapp_version }}
-            Version synchronization action: ${{ needs.synchronize_webapp_version.outputs.version_sync_action }}
-            Version synchronization PR: ${{ needs.synchronize_webapp_version.outputs.version_sync_pr_url }}
+            Package synchronization: ${{ needs.synchronize_webapp_version.outputs.bookkeeping_result == 'success' && 'success' || 'requires follow-up' }}
+            Synchronized package version: ${{ needs.synchronize_webapp_version.outputs.webapp_version || 'unavailable' }}
+            Synchronization action: ${{ needs.synchronize_webapp_version.outputs.version_sync_action || 'unavailable' }}
+            Synchronization PR: ${{ needs.synchronize_webapp_version.outputs.version_sync_pr_url || 'unavailable' }}
             Triggering actor: ${{ github.actor }}
             Workflow-run URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
@@ -1384,8 +1237,6 @@ jobs:
         create_production_tag,
         publish_production_distribution,
         ensure_github_release,
-        webapp_version_synchronization_preflight,
-        webapp_version_synchronization_production_preflight,
         synchronize_webapp_version,
       ]
     if: ${{ always() }}
@@ -1447,17 +1298,9 @@ jobs:
           GITHUB_RELEASE_STATE: ${{ needs.ensure_github_release.outputs.github_release_state }}
           GITHUB_RELEASE_TAG_NAME: ${{ needs.ensure_github_release.outputs.production_tag_name }}
           GITHUB_RELEASE_URL: ${{ needs.ensure_github_release.outputs.github_release_url }}
-          WEBAPP_VERSION_SYNC_INITIAL_PREFLIGHT_JOB_RESULT: ${{ needs.webapp_version_synchronization_preflight.result }}
-          WEBAPP_VERSION_SYNC_INITIAL_PREFLIGHT_PR_NUMBER: ${{ needs.webapp_version_synchronization_preflight.outputs.pull_request_number }}
-          WEBAPP_VERSION_SYNC_INITIAL_PREFLIGHT_PR_URL: ${{ needs.webapp_version_synchronization_preflight.outputs.pull_request_url }}
-          WEBAPP_VERSION_SYNC_INITIAL_PREFLIGHT_STATE: ${{ needs.webapp_version_synchronization_preflight.outputs.state }}
-          WEBAPP_VERSION_SYNC_PRODUCTION_PREFLIGHT_JOB_RESULT: ${{ needs.webapp_version_synchronization_production_preflight.result }}
-          WEBAPP_VERSION_SYNC_PRODUCTION_PREFLIGHT_PR_NUMBER: ${{ needs.webapp_version_synchronization_production_preflight.outputs.pull_request_number }}
-          WEBAPP_VERSION_SYNC_PRODUCTION_PREFLIGHT_PR_URL: ${{ needs.webapp_version_synchronization_production_preflight.outputs.pull_request_url }}
-          WEBAPP_VERSION_SYNC_PRODUCTION_PREFLIGHT_STATE: ${{ needs.webapp_version_synchronization_production_preflight.outputs.state }}
           WEBAPP_VERSION_SYNC_ACTION: ${{ needs.synchronize_webapp_version.outputs.version_sync_action }}
           WEBAPP_VERSION_SYNC_BRANCH_NAME: ${{ needs.synchronize_webapp_version.outputs.version_sync_branch_name }}
-          WEBAPP_VERSION_SYNC_JOB_RESULT: ${{ needs.synchronize_webapp_version.result }}
+          WEBAPP_VERSION_SYNC_JOB_RESULT: ${{ needs.synchronize_webapp_version.outputs.bookkeeping_result }}
           WEBAPP_VERSION_SYNC_PR_NUMBER: ${{ needs.synchronize_webapp_version.outputs.version_sync_pr_number }}
           WEBAPP_VERSION_SYNC_PR_URL: ${{ needs.synchronize_webapp_version.outputs.version_sync_pr_url }}
           WEBAPP_VERSION: ${{ needs.synchronize_webapp_version.outputs.webapp_version }}
@@ -1478,13 +1321,11 @@ jobs:
           PRODUCTION_WIRE_BUILDS_COMMIT_SHA: ${{ needs.publish_production_distribution.outputs.wire_builds_commit_sha }}
           RELEASE_BRANCH: ${{ needs.build_artifact.outputs.release_branch }}
           RELEASE_ACTOR: ${{ github.actor }}
+          RELEASE_OPERATION: ${{ needs.build_artifact.outputs.operation }}
           RELEASE_BRANCH_ACTION: ${{ needs.build_artifact.outputs.release_branch_action }}
           RELEASE_COMMIT_SHA: ${{ needs.build_artifact.outputs.release_commit_sha }}
-          RELEASE_IDENTIFIER: ${{ needs.build_artifact.outputs.release_identifier }}
-          RELEASE_REASON: ${{ inputs.reason }}
-          SOURCE_COMMIT_SHA: ${{ needs.build_artifact.outputs.source_commit_sha }}
-          SOURCE_REF: ${{ needs.build_artifact.outputs.source_ref }}
-          TESTINY_RUN_NAME: Release ${{ needs.build_artifact.outputs.release_identifier }} ${{ needs.create_beta_tag.outputs.beta_tag_name }}
+          RELEASE_VERSION: ${{ needs.build_artifact.outputs.release_version }}
+          TESTINY_RUN_NAME: Release ${{ needs.build_artifact.outputs.release_version }} ${{ needs.create_beta_tag.outputs.beta_tag_name }}
         run: node tools/release-summary/renderWebappReleaseSummary.ts >> "$GITHUB_STEP_SUMMARY"
 
   notify_release_failure:
@@ -1492,8 +1333,7 @@ jobs:
     runs-on: ubuntu-24.04
     needs:
       [
-        validate_request,
-        prepare_release_branch,
+        prepare_release,
         build_artifact,
         deploy_to_beta,
         create_beta_tag,
@@ -1505,23 +1345,8 @@ jobs:
         create_production_tag,
         publish_production_distribution,
         ensure_github_release,
-        webapp_version_synchronization_preflight,
-        webapp_version_synchronization_production_preflight,
-        synchronize_webapp_version,
       ]
     if: ${{ always() && contains(join(needs.*.result, ','), 'failure') }}
-    env:
-      POST_PRODUCTION_SYNCHRONIZATION_FAILURE: >-
-        ${{
-          needs.synchronize_webapp_version.result == 'failure' &&
-          needs.deploy_to_production.result == 'success' &&
-          needs.verify_production_runtime.result == 'success' &&
-          needs.create_production_tag.result == 'success' &&
-          needs.publish_production_distribution.result == 'success' &&
-          needs.ensure_github_release.result == 'success' &&
-          'true' ||
-          'false'
-        }}
     permissions:
       contents: read
 
@@ -1533,23 +1358,18 @@ jobs:
           fetch-depth: 1
 
       - name: Announce release failure
-        uses: ./.github/actions/notify-deployoholics
+        uses: $/.github/actions/notify-deployoholics
         with:
           deployoholics-webhook-url: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
           deployoholics-token: ${{ secrets.WIRE_DEPLOYOHOLICS_TOKEN }}
           text: |
-            ${{ env.POST_PRODUCTION_SYNCHRONIZATION_FAILURE == 'true' && '⚠️ Production release succeeded; WebApp version synchronization bookkeeping is incomplete ⚠️' || '❌ WebApp release failed ❌' }}
+            ❌ WebApp release failed ❌
 
-            Release: ${{ needs.build_artifact.outputs.release_identifier || 'unavailable' }}
-            Branch: ${{ needs.build_artifact.outputs.release_branch || needs.validate_request.outputs.release_branch || 'unavailable' }}
+            Release: ${{ needs.build_artifact.outputs.release_version || 'unavailable' }}
+            Branch: ${{ needs.build_artifact.outputs.release_branch || needs.prepare_release.outputs.release_branch || 'unavailable' }}
             Triggered by: ${{ github.actor }}
 
-            ${{ env.POST_PRODUCTION_SYNCHRONIZATION_FAILURE == 'true' && 'Production deployment, runtime verification, immutable tagging, distribution, and GitHub Release handoff succeeded.' || '' }}
-            ${{ env.POST_PRODUCTION_SYNCHRONIZATION_FAILURE == 'true' && 'WebApp version synchronization bookkeeping failed.' || '' }}
-            ${{ env.POST_PRODUCTION_SYNCHRONIZATION_FAILURE == 'true' && 'Release bookkeeping: incomplete.' || '' }}
-            ${{ env.POST_PRODUCTION_SYNCHRONIZATION_FAILURE == 'true' && 'Production must not be rolled back. Resolve the synchronization problem and rerun the failed bookkeeping operation.' || '' }}
-
-            Request validation: ${{ needs.validate_request.result }}
+            Release preparation: ${{ needs.prepare_release.result }}
             Build: ${{ needs.build_artifact.result }}
             Beta deployment: ${{ needs.deploy_to_beta.result }}
             Beta tag: ${{ needs.create_beta_tag.result }}
@@ -1566,13 +1386,6 @@ jobs:
             GitHub Release URL: ${{ needs.ensure_github_release.outputs.github_release_url || 'unavailable' }}
             GitHub Release state: ${{ needs.ensure_github_release.outputs.github_release_state || 'unavailable' }}
             GitHub Release action: ${{ needs.ensure_github_release.outputs.github_release_action || 'unavailable' }}
-            WebApp synchronization preflight: ${{ needs.webapp_version_synchronization_preflight.result }}
-            WebApp synchronization Production preflight: ${{ needs.webapp_version_synchronization_production_preflight.result }}
-            WebApp version synchronization: ${{ needs.synchronize_webapp_version.result }}
-            WebApp package version: ${{ needs.synchronize_webapp_version.outputs.webapp_version || 'unavailable' }}
-            Version synchronization action: ${{ needs.synchronize_webapp_version.outputs.version_sync_action || 'unavailable' }}
-            Version synchronization PR: ${{ needs.synchronize_webapp_version.outputs.version_sync_pr_url || 'unavailable' }}
-
             Production runtime verification result: ${{ needs.verify_production_runtime.result }}
             Expected Production webapp version: ${{ needs.build_artifact.outputs.artifact_version || 'unavailable' }}
             Expected Production release commit: ${{ needs.build_artifact.outputs.release_commit_sha || 'unavailable' }}
@@ -1584,8 +1397,8 @@ jobs:
             Playwright report: ${{ needs.run_e2e.outputs.reportUrl || 'unavailable' }}
             Source workflow URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
-            ${{ env.POST_PRODUCTION_SYNCHRONIZATION_FAILURE == 'true' && 'Production lifecycle succeeded.' || needs.production_preflight.outputs.production_preflight_result == 'already_tagged' && needs.ensure_github_release.result == 'failure' && 'Production was already tagged; deployment was not repeated.' || needs.create_production_tag.result == 'success' && (needs.publish_production_distribution.result == 'failure' || needs.ensure_github_release.result == 'failure') && 'Hosted Production deployment and verification succeeded.' || 'Production was blocked because a release gate failed.' }}
-            ${{ env.POST_PRODUCTION_SYNCHRONIZATION_FAILURE == 'true' && 'The immutable Production tag remains unchanged.' || needs.production_preflight.outputs.production_preflight_result == 'already_tagged' && needs.ensure_github_release.result == 'failure' && 'The existing Production tag remains unchanged.' || needs.create_production_tag.result == 'success' && (needs.publish_production_distribution.result == 'failure' || needs.ensure_github_release.result == 'failure') && 'The Production tag exists.' || 'Production tag creation was blocked by the failed release gate.' }}
+            ${{ needs.production_preflight.outputs.production_preflight_result == 'already_tagged' && needs.ensure_github_release.result == 'failure' && 'Production was already tagged; deployment was not repeated.' || needs.create_production_tag.result == 'success' && (needs.publish_production_distribution.result == 'failure' || needs.ensure_github_release.result == 'failure') && 'Hosted Production deployment and verification succeeded.' || 'Production was blocked because a release gate failed.' }}
+            ${{ needs.production_preflight.outputs.production_preflight_result == 'already_tagged' && needs.ensure_github_release.result == 'failure' && 'The existing Production tag remains unchanged.' || needs.create_production_tag.result == 'success' && (needs.publish_production_distribution.result == 'failure' || needs.ensure_github_release.result == 'failure') && 'The Production tag exists.' || 'Production tag creation was blocked by the failed release gate.' }}
             ${{ needs.publish_production_distribution.result == 'failure' && needs.create_production_tag.result == 'success' && 'Docker, Helm, or wire-builds publication failed.' || needs.ensure_github_release.result == 'failure' && (needs.create_production_tag.result == 'success' || needs.production_preflight.outputs.production_preflight_result == 'already_tagged') && 'GitHub Release draft creation or verification failed.' || '' }}
             ${{ needs.publish_production_distribution.result == 'failure' && needs.create_production_tag.result == 'success' && 'The release is incomplete for on-premises distribution.' || needs.ensure_github_release.result == 'failure' && (needs.create_production_tag.result == 'success' || needs.production_preflight.outputs.production_preflight_result == 'already_tagged') && 'The automated release lifecycle is incomplete until the GitHub Release handoff succeeds.' || '' }}
             ${{ needs.create_production_tag.result == 'success' && (needs.publish_production_distribution.result == 'failure' || needs.ensure_github_release.result == 'failure') && 'No Production tag was moved or deleted.' || '' }}

@@ -24,11 +24,11 @@ import {isBuildMetadata} from '@wireapp/config';
 import type {BuildMetadata} from '@wireapp/config';
 
 import {isLegacyTimestampBuildVersion} from '../build-artifact/legacyBuildMetadata.ts';
-import {validateProductionTagName} from '../release-metadata/releaseMetadata.ts';
+import {parseWebAppProductionRelease} from '../release-metadata/webappProductionRelease.ts';
 
 export type ProductionDistributionManifest = {
   readonly productionTag: null;
-  readonly releaseIdentifier: string;
+  readonly releaseVersion: string;
   readonly releaseCommitSha: string;
   readonly artifactVersion: string;
   readonly cloudArtifactChecksum: string;
@@ -36,7 +36,7 @@ export type ProductionDistributionManifest = {
   readonly sourceRunAttempt: string;
 };
 
-export type DistributionManifestValidationParameters = {
+export type DistributionManifestValidationOptions = {
   readonly artifactMetadata: unknown;
   readonly manifest: unknown;
   readonly productionTag: string;
@@ -80,16 +80,17 @@ type LegacyProductionDistributionArtifactMetadata = {
 function validateProductionDistributionArtifactMetadata(
   artifactMetadata: unknown,
   artifactVersion: string,
-  releaseIdentifier: string,
+  productionBuildVersion: string,
   releaseCommitSha: string,
+  acceptsLegacyTimestampBuildMetadata: boolean,
 ): Result<BuildMetadata | LegacyProductionDistributionArtifactMetadata, Error> {
   if (isBuildMetadata(artifactMetadata)) {
     if (artifactMetadata.version !== artifactVersion) {
       return Result.err(new Error('Distribution artifact version does not match the manifest'));
     }
 
-    if (artifactMetadata.version !== releaseIdentifier) {
-      return Result.err(new Error('Distribution artifact version does not match the release identifier'));
+    if (artifactMetadata.version !== productionBuildVersion) {
+      return Result.err(new Error('Distribution artifact version does not match the release version'));
     }
 
     if (artifactMetadata.commit !== releaseCommitSha) {
@@ -100,6 +101,7 @@ function validateProductionDistributionArtifactMetadata(
   }
 
   if (
+    acceptsLegacyTimestampBuildMetadata &&
     isRecord(artifactMetadata) &&
     isNonEmptyString(artifactMetadata.version) &&
     isLegacyTimestampBuildVersion(artifactMetadata.version) &&
@@ -122,48 +124,46 @@ function validateProductionDistributionArtifactMetadata(
 }
 
 export function validateProductionDistributionManifest(
-  parameters: DistributionManifestValidationParameters,
+  options: DistributionManifestValidationOptions,
 ): Result<ProductionDistributionManifest, Error> {
-  const productionTagResult = validateProductionTagName(parameters.productionTag);
+  const productionReleaseResult = parseWebAppProductionRelease(options.productionTag);
 
-  if (productionTagResult.isErr) {
-    return Result.err(productionTagResult.error);
+  if (productionReleaseResult.isErr) {
+    return Result.err(productionReleaseResult.error);
   }
 
-  if (parameters.productionTagCommitSha.length === 0) {
+  if (options.productionTagCommitSha.length === 0) {
     return Result.err(new Error('Production tag commit SHA must not be empty'));
   }
 
-  if (parameters.expectedCommitSha !== undefined) {
-    if (
-      parameters.expectedCommitSha.length === 0 ||
-      parameters.expectedCommitSha !== parameters.productionTagCommitSha
-    ) {
+  if (options.expectedCommitSha !== undefined) {
+    if (options.expectedCommitSha.length === 0 || options.expectedCommitSha !== options.productionTagCommitSha) {
       return Result.err(new Error('Production tag commit does not match the expected commit SHA'));
     }
   }
 
-  if (!isRecord(parameters.manifest)) {
+  if (!isRecord(options.manifest)) {
     return Result.err(new Error('Distribution manifest must be a JSON object'));
   }
 
-  const releaseIdentifier = productionTagResult.value.replace(/-production$/, '');
-  const manifestReleaseIdentifier = getNonEmptyString(parameters.manifest.releaseIdentifier);
-  const manifestReleaseCommitSha = getNonEmptyString(parameters.manifest.releaseCommitSha);
-  const artifactVersion = getNonEmptyString(parameters.manifest.artifactVersion);
-  const cloudArtifactChecksum = getNonEmptyString(parameters.manifest.cloudArtifactChecksum);
-  const sourceRunId = getNonEmptyString(parameters.manifest.sourceRunId);
-  const sourceRunAttempt = getNonEmptyString(parameters.manifest.sourceRunAttempt);
+  const productionRelease = productionReleaseResult.value;
+  const productionBuildVersion = productionRelease.buildVersion;
+  const manifestReleaseVersion = getNonEmptyString(options.manifest.releaseIdentifier);
+  const manifestReleaseCommitSha = getNonEmptyString(options.manifest.releaseCommitSha);
+  const artifactVersion = getNonEmptyString(options.manifest.artifactVersion);
+  const cloudArtifactChecksum = getNonEmptyString(options.manifest.cloudArtifactChecksum);
+  const sourceRunId = getNonEmptyString(options.manifest.sourceRunId);
+  const sourceRunAttempt = getNonEmptyString(options.manifest.sourceRunAttempt);
 
-  if (parameters.manifest.productionTag !== null) {
+  if (options.manifest.productionTag !== null) {
     return Result.err(new Error('Distribution manifest productionTag must be null before publication'));
   }
 
-  if (manifestReleaseIdentifier !== releaseIdentifier) {
-    return Result.err(new Error('Distribution manifest release identifier does not match the Production tag'));
+  if (manifestReleaseVersion !== productionBuildVersion) {
+    return Result.err(new Error('Distribution manifest release version does not match the Production tag'));
   }
 
-  if (manifestReleaseCommitSha !== parameters.productionTagCommitSha) {
+  if (manifestReleaseCommitSha !== options.productionTagCommitSha) {
     return Result.err(new Error('Distribution manifest release commit does not match the Production tag commit'));
   }
 
@@ -172,10 +172,11 @@ export function validateProductionDistributionManifest(
   }
 
   const artifactMetadataResult = validateProductionDistributionArtifactMetadata(
-    parameters.artifactMetadata,
+    options.artifactMetadata,
     artifactVersion,
-    releaseIdentifier,
-    parameters.productionTagCommitSha,
+    productionBuildVersion,
+    options.productionTagCommitSha,
+    productionRelease.kind === 'legacy',
   );
 
   if (artifactMetadataResult.isErr) {
@@ -186,7 +187,7 @@ export function validateProductionDistributionManifest(
     return Result.err(new Error('Distribution manifest cloud artifact checksum must not be empty'));
   }
 
-  if (sourceRunId !== parameters.sourceRunId) {
+  if (sourceRunId !== options.sourceRunId) {
     return Result.err(new Error('Distribution manifest source run ID does not match the supplied source run ID'));
   }
 
@@ -196,8 +197,8 @@ export function validateProductionDistributionManifest(
 
   return Result.ok({
     productionTag: null,
-    releaseIdentifier,
-    releaseCommitSha: parameters.productionTagCommitSha,
+    releaseVersion: productionBuildVersion,
+    releaseCommitSha: options.productionTagCommitSha,
     artifactVersion,
     cloudArtifactChecksum,
     sourceRunId,

@@ -19,29 +19,29 @@
 
 import {isUndefined} from '@sindresorhus/is';
 import {Maybe, Result, Task, Unit} from 'true-myth';
+import {match, P} from 'ts-pattern';
 
 import {
-  resolveNextWebAppVersion,
+  compareWebAppVersions,
   updateWebAppPackageDocuments,
   validateMatchingWebAppPackageVersions,
 } from './webappVersion.ts';
 import type {WebAppVersion} from './webappVersion.ts';
 import {
+  createWebAppVersionSynchronizationRequest,
   createWebAppVersionSynchronizationBranchName,
   createWebAppVersionSynchronizationPullRequestBody,
   createWebAppVersionSynchronizationPullRequestTitle,
-  parseWebAppVersionSynchronizationPullRequest,
+  parseWebAppVersionSynchronizationRecord,
   resolveWebAppVersionSynchronizationState,
-  validateWebAppVersionSynchronizationBranchName,
 } from './webappVersionSynchronization.ts';
 import type {
-  WebAppVersionSynchronizationBranchName,
   WebAppVersionSynchronizationInspection,
+  WebAppVersionSynchronizationBranchName,
+  WebAppVersionSynchronizationPullRequest,
+  WebAppVersionSynchronizationRequest,
 } from './webappVersionSynchronization.ts';
-import {
-  validateWebAppVersionSynchronizationBranch,
-  webAppVersionSynchronizationPackageFilePaths,
-} from './webappVersionSynchronizationGit.ts';
+import {validateWebAppVersionSynchronizationBranch} from './webappVersionSynchronizationGit.ts';
 import type {
   CommitWebAppVersionSynchronizationOptions,
   WebAppVersionSynchronizationBranchInspection,
@@ -50,30 +50,21 @@ import type {
 } from './webappVersionSynchronizationGit.ts';
 import type {WebAppVersionSynchronizationGitHubClient} from './webappVersionSynchronizationGitHubClient.ts';
 
-export type InspectWebAppVersionSynchronizationOptions = {
-  readonly releaseIdentifier: string;
-  readonly productionTagName: string;
-  readonly githubClient: WebAppVersionSynchronizationGitHubClient;
-};
-
 export type WebAppVersionSynchronizationDependencies = {
   readonly githubClient: WebAppVersionSynchronizationGitHubClient;
   readonly gitClient: WebAppVersionSynchronizationGitClient;
 };
 
-export type SynchronizeWebAppVersionOptions = {
-  readonly releaseIdentifier: string;
+export type WebAppVersionSynchronizationOptions = {
   readonly productionTagName: string;
   readonly commitAuthorName: string;
   readonly commitAuthorEmail: string;
-  readonly dependencies: WebAppVersionSynchronizationDependencies;
 };
 
 export type WebAppVersionSynchronizationAction = 'created' | 'already-open' | 'already-merged' | 'recovered';
 
 export type WebAppVersionSynchronizationResult = {
   readonly action: WebAppVersionSynchronizationAction;
-  readonly releaseIdentifier: string;
   readonly productionTagName: string;
   readonly webAppVersion: WebAppVersion;
   readonly branchName: WebAppVersionSynchronizationBranchName;
@@ -81,50 +72,96 @@ export type WebAppVersionSynchronizationResult = {
   readonly pullRequestUrl: string;
 };
 
-type SynchronizationRequestDetails = {
-  readonly title: string;
-  readonly body: string;
+type SynchronizationResultWithPullRequest = {
+  readonly action: WebAppVersionSynchronizationAction;
+  readonly pullRequestNumber: number;
 };
 
-type AllocateWebAppVersionOptions = {
-  readonly synchronizationOptions: SynchronizeWebAppVersionOptions;
+type SynchronizeBranchOptions = {
+  readonly request: WebAppVersionSynchronizationRequest;
   readonly mainSnapshot: WebAppVersionSynchronizationMainSnapshot;
+  readonly branchName: WebAppVersionSynchronizationBranchName;
 };
 
-type SynchronizeBranchOptions = AllocateWebAppVersionOptions & {
-  readonly branchName: WebAppVersionSynchronizationBranchName;
+type PrepareSynchronizationCommitOptions = {
+  readonly mainSnapshot: WebAppVersionSynchronizationMainSnapshot;
   readonly webAppVersion: WebAppVersion;
 };
 
-type CreatePullRequestOptions = SynchronizeBranchOptions & {
+type PrepareSynchronizationCommitDependencies = {
+  readonly gitClient: WebAppVersionSynchronizationGitClient;
+};
+
+type CommitAndPushSynchronizationBranchOptions = Omit<PrepareSynchronizationCommitOptions, 'mainSnapshot'> & {
+  readonly mainSnapshot: WebAppVersionSynchronizationMainSnapshot;
+  readonly branchName: WebAppVersionSynchronizationBranchName;
+  readonly commitAuthorName: string;
+  readonly commitAuthorEmail: string;
+};
+
+type CreateSynchronizationPullRequestOptions = SynchronizeBranchOptions & {
   readonly action: 'created' | 'recovered';
 };
 
-type ExistingSynchronizationDetails = {
-  readonly releaseIdentifier: string;
-  readonly productionTagName: string;
-  readonly webAppVersion: WebAppVersion;
-  readonly pullRequestNumber: number;
-  readonly pullRequestUrl: string;
-  readonly branchName: WebAppVersionSynchronizationBranchName;
+type CreateSynchronizationResultFromPullRequestOptions = {
+  readonly synchronizationPullRequestOptions: CreateSynchronizationPullRequestOptions;
+  readonly pullRequest: WebAppVersionSynchronizationPullRequest;
 };
 
-export function inspectWebAppVersionSynchronization(
-  options: InspectWebAppVersionSynchronizationOptions,
-): Task<WebAppVersionSynchronizationInspection, Error> {
-  return options.githubClient.listPullRequests().andThen(pullRequests => {
-    return resolveWebAppVersionSynchronizationState(options.releaseIdentifier, options.productionTagName, pullRequests);
-  });
-}
+type EnsureSynchronizationLabelOptions<ResultType extends SynchronizationResultWithPullRequest> = {
+  readonly synchronizationResult: ResultType;
+};
 
-function createResultFromExistingInspection(
+type EnsureSynchronizationLabelDependencies = {
+  readonly githubClient: WebAppVersionSynchronizationGitHubClient;
+};
+
+type EnsureSynchronizationLabelForMaybeResultOptions = {
+  readonly synchronizationResultMaybe: Maybe<WebAppVersionSynchronizationResult>;
+};
+
+type ResolveInspectionOptions = {
+  readonly inspection: WebAppVersionSynchronizationInspection;
+  readonly request: WebAppVersionSynchronizationRequest;
+};
+
+type MatchingWebAppVersionSynchronizationInspection = Extract<
+  WebAppVersionSynchronizationInspection,
+  {readonly kind: 'matching-open' | 'matching-merged'}
+>;
+
+type ResolveCurrentOutcomeOptions = {
+  readonly request: WebAppVersionSynchronizationRequest;
+};
+
+type RecoverSynchronizationBranchOptions = SynchronizeBranchOptions & {
+  readonly branchInspection: WebAppVersionSynchronizationBranchInspection;
+};
+
+type CreateSynchronizationBranchOptions = SynchronizeBranchOptions & {
+  readonly commitAuthorName: string;
+  readonly commitAuthorEmail: string;
+};
+
+type CreateSynchronizationPullRequestDependencies = {
+  readonly githubClient: WebAppVersionSynchronizationGitHubClient;
+};
+
+type RecoverSynchronizationBranchDependencies = WebAppVersionSynchronizationDependencies;
+
+type CreateSynchronizationBranchDependencies = WebAppVersionSynchronizationDependencies;
+
+type ReconcileAndSynchronizeWebAppVersionOptions = Omit<CreateSynchronizationBranchOptions, 'branchName'>;
+
+const synchronizationPackageFilePaths = ['apps/webapp/package.json', 'package.json'] as const;
+
+function createExistingSynchronizationResult(
   action: 'already-open' | 'already-merged',
-  inspection: ExistingSynchronizationDetails,
+  inspection: MatchingWebAppVersionSynchronizationInspection,
 ): Result<Maybe<WebAppVersionSynchronizationResult>, Error> {
   return Result.ok(
     Maybe.just({
       action,
-      releaseIdentifier: inspection.releaseIdentifier,
       productionTagName: inspection.productionTagName,
       webAppVersion: inspection.webAppVersion,
       branchName: inspection.branchName,
@@ -135,414 +172,418 @@ function createResultFromExistingInspection(
 }
 
 function resolveInspectionOutcome(
-  inspection: WebAppVersionSynchronizationInspection,
+  options: ResolveInspectionOptions,
 ): Result<Maybe<WebAppVersionSynchronizationResult>, Error> {
-  if (inspection.kind === 'available') {
-    return Result.ok(Maybe.nothing<WebAppVersionSynchronizationResult>());
-  }
+  const {inspection, request} = options;
 
-  if (inspection.kind === 'matching-open') {
-    return createResultFromExistingInspection('already-open', inspection);
-  }
+  return match(inspection)
+    .with({kind: 'available'}, () => {
+      return Result.ok(Maybe.nothing<WebAppVersionSynchronizationResult>());
+    })
+    .with({kind: 'matching-open'}, matchingInspection => {
+      return createExistingSynchronizationResult('already-open', matchingInspection);
+    })
+    .with({kind: 'matching-merged'}, matchingInspection => {
+      return createExistingSynchronizationResult('already-merged', matchingInspection);
+    })
+    .with({kind: 'closed-without-merge'}, closedInspection => {
+      return Result.err(
+        new Error(
+          `WebApp version synchronization pull request #${closedInspection.pullRequestNumber} for ${request.productionTagName} was closed without merging: ${closedInspection.pullRequestUrl}`,
+        ),
+      );
+    })
+    .with({kind: 'blocked-by-previous-unresolved'}, blockedInspection => {
+      return Result.err(
+        new Error(
+          `WebApp version synchronization is blocked by ${blockedInspection.blockingSynchronizationState} pull request #${blockedInspection.pullRequestNumber} for ${blockedInspection.blockingProductionTagName}: ${blockedInspection.pullRequestUrl}`,
+        ),
+      );
+    })
+    .with({kind: 'conflict'}, conflictingInspection => {
+      return Result.err(
+        new Error(
+          `WebApp version synchronization conflict for ${conflictingInspection.productionTagName}: ${conflictingInspection.reason}`,
+        ),
+      );
+    })
+    .exhaustive();
+}
 
-  if (inspection.kind === 'matching-merged') {
-    return createResultFromExistingInspection('already-merged', inspection);
-  }
+function ensureSynchronizationLabel<ResultType extends SynchronizationResultWithPullRequest>(
+  options: EnsureSynchronizationLabelOptions<ResultType>,
+  dependencies: EnsureSynchronizationLabelDependencies,
+): Task<ResultType, Error> {
+  const {synchronizationResult} = options;
 
-  if (inspection.kind === 'closed-without-merge') {
-    return Result.err(
-      new Error(
-        `WebApp version synchronization pull request #${inspection.pullRequestNumber} for ${inspection.releaseIdentifier} was closed without merging: ${inspection.pullRequestUrl}`,
-      ),
-    );
-  }
+  return match(synchronizationResult.action)
+    .with('already-merged', () => {
+      return Task.resolve(synchronizationResult);
+    })
+    .with(P.union('created', 'recovered', 'already-open'), () => {
+      return dependencies.githubClient
+        .ensurePullRequestSemVerNoneLabel(synchronizationResult.pullRequestNumber)
+        .map(() => {
+          return synchronizationResult;
+        });
+    })
+    .exhaustive();
+}
 
-  if (inspection.kind === 'blocked-by-previous-unresolved') {
-    return Result.err(
-      new Error(
-        `WebApp version synchronization is blocked by ${inspection.blockingSynchronizationState} pull request #${inspection.pullRequestNumber} for ${inspection.blockingReleaseIdentifier}: ${inspection.pullRequestUrl}`,
-      ),
-    );
-  }
-
-  if (inspection.kind === 'conflict') {
-    return Result.err(
-      new Error(`WebApp version synchronization conflict for ${inspection.releaseIdentifier}: ${inspection.reason}`),
-    );
-  }
-
-  return Result.err(new Error('Unknown WebApp version synchronization state'));
+function ensureSynchronizationLabelForMaybeResult(
+  options: EnsureSynchronizationLabelForMaybeResultOptions,
+  dependencies: EnsureSynchronizationLabelDependencies,
+): Task<Maybe<WebAppVersionSynchronizationResult>, Error> {
+  return options.synchronizationResultMaybe.match({
+    Just(synchronizationResult) {
+      return ensureSynchronizationLabel({synchronizationResult}, dependencies).map(() => {
+        return Maybe.just(synchronizationResult);
+      });
+    },
+    Nothing() {
+      return Task.resolve(Maybe.nothing<WebAppVersionSynchronizationResult>());
+    },
+  });
 }
 
 function resolveCurrentSynchronizationOutcome(
-  options: SynchronizeWebAppVersionOptions,
+  options: ResolveCurrentOutcomeOptions,
+  dependencies: WebAppVersionSynchronizationDependencies,
 ): Task<Maybe<WebAppVersionSynchronizationResult>, Error> {
-  return inspectWebAppVersionSynchronization({
-    releaseIdentifier: options.releaseIdentifier,
-    productionTagName: options.productionTagName,
-    githubClient: options.dependencies.githubClient,
-  }).andThen(resolveInspectionOutcome);
-}
+  const {request} = options;
 
-function createSynchronizationRequestDetails(
-  releaseIdentifier: string,
-  productionTagName: string,
-  webAppVersion: WebAppVersion,
-): Result<SynchronizationRequestDetails, Error> {
-  const titleResult = createWebAppVersionSynchronizationPullRequestTitle(webAppVersion);
+  return dependencies.githubClient.listPullRequests().andThen(pullRequests => {
+    const inspectionResult = resolveWebAppVersionSynchronizationState({request, pullRequests});
+    if (inspectionResult.isErr) {
+      return Task.reject(inspectionResult.error);
+    }
 
-  if (titleResult.isErr) {
-    return Result.err(titleResult.error);
-  }
+    const outcomeResult = resolveInspectionOutcome({inspection: inspectionResult.value, request});
+    if (outcomeResult.isErr) {
+      return Task.reject(outcomeResult.error);
+    }
 
-  const {value: title} = titleResult;
-
-  const bodyResult = createWebAppVersionSynchronizationPullRequestBody({
-    releaseIdentifier,
-    productionTagName,
-    webAppVersion,
+    return ensureSynchronizationLabelForMaybeResult(
+      {synchronizationResultMaybe: outcomeResult.value},
+      {githubClient: dependencies.githubClient},
+    );
   });
-
-  if (bodyResult.isErr) {
-    return Result.err(bodyResult.error);
-  }
-
-  const {value: body} = bodyResult;
-
-  return Result.ok({title, body});
 }
 
-function validateExpectedWorkingTreeChanges(changedFilePaths: readonly string[]): Result<Unit, Error> {
-  const sortedChangedFilePaths = changedFilePaths.toSorted();
-  const expectedChangedFilePaths = webAppVersionSynchronizationPackageFilePaths.toSorted();
-
-  if (sortedChangedFilePaths.join('\n') !== expectedChangedFilePaths.join('\n')) {
+function validateExpectedPackageFileChanges(changedFilePaths: readonly string[]): Result<Unit, Error> {
+  const actualChangedFilePaths = changedFilePaths.toSorted();
+  const expectedChangedFilePaths = [...synchronizationPackageFilePaths].toSorted();
+  if (actualChangedFilePaths.join('\n') !== expectedChangedFilePaths.join('\n')) {
     return Result.err(
       new Error(
-        `WebApp version synchronization changes unexpected files: ${sortedChangedFilePaths.join(', ') || 'none'}`,
+        `WebApp version synchronization changes unexpected files: ${actualChangedFilePaths.join(', ') || 'none'}`,
       ),
     );
   }
 
-  return Result.ok();
+  return Result.ok(Unit);
 }
 
-function prepareSynchronizationCommit(options: SynchronizeBranchOptions): Task<Unit, Error> {
-  const updateResult = updateWebAppPackageDocuments({
+function prepareSynchronizationCommit(
+  options: PrepareSynchronizationCommitOptions,
+  dependencies: PrepareSynchronizationCommitDependencies,
+): Task<Unit, Error> {
+  const packageDocumentsResult = updateWebAppPackageDocuments({
     rootPackageDocument: options.mainSnapshot.rootPackageDocument,
     webAppPackageDocument: options.mainSnapshot.webAppPackageDocument,
     targetVersion: options.webAppVersion,
   });
-
-  if (updateResult.isErr) {
-    return Task.reject<Unit, Error>(updateResult.error);
+  if (packageDocumentsResult.isErr) {
+    return Task.reject(packageDocumentsResult.error);
   }
 
-  const {value: updatedPackageDocuments} = updateResult;
-
-  const gitClient = options.synchronizationOptions.dependencies.gitClient;
-
-  return gitClient
-    .writePackageDocuments(updatedPackageDocuments)
+  return dependencies.gitClient
+    .writePackageDocuments(packageDocumentsResult.value)
     .andThen(() => {
-      return gitClient.readWorkingTreePackageDocuments();
+      return dependencies.gitClient.readWorkingTreePackageDocuments();
     })
-    .andThen(workingTreePackageDocuments => {
+    .andThen(packageDocuments => {
       const packageVersionsResult = validateMatchingWebAppPackageVersions(
-        workingTreePackageDocuments.rootPackageDocument,
-        workingTreePackageDocuments.webAppPackageDocument,
+        packageDocuments.rootPackageDocument,
+        packageDocuments.webAppPackageDocument,
       );
-
       if (packageVersionsResult.isErr) {
-        return Task.reject<readonly string[], Error>(packageVersionsResult.error);
+        return Task.reject(packageVersionsResult.error);
       }
 
-      const {value: packageVersions} = packageVersionsResult;
-
-      if (packageVersions.rootVersion !== options.webAppVersion) {
-        return Task.reject<readonly string[], Error>(
-          new Error('Working tree package documents contain an unexpected WebApp version'),
-        );
+      if (packageVersionsResult.value.rootVersion !== options.webAppVersion) {
+        return Task.reject(new Error('Working tree package documents contain an unexpected WebApp version'));
       }
 
-      return gitClient.getWorkingTreeChangedFilePaths();
+      return dependencies.gitClient.getWorkingTreeChangedFilePaths();
     })
-    .andThen(validateExpectedWorkingTreeChanges);
+    .andThen(validateExpectedPackageFileChanges);
 }
 
-function createPullRequestForBranch(
-  options: CreatePullRequestOptions,
-): Task<WebAppVersionSynchronizationResult, Error> {
-  const requestDetailsResult = createSynchronizationRequestDetails(
-    options.synchronizationOptions.releaseIdentifier,
-    options.synchronizationOptions.productionTagName,
-    options.webAppVersion,
-  );
+function commitAndPushSynchronizationBranch(
+  options: CommitAndPushSynchronizationBranchOptions,
+  dependencies: PrepareSynchronizationCommitDependencies,
+): Task<Unit, Error> {
+  const commitOptions: CommitWebAppVersionSynchronizationOptions = {
+    message: `Update WebApp version to ${options.webAppVersion}`,
+    authorName: options.commitAuthorName,
+    authorEmail: options.commitAuthorEmail,
+  };
 
-  if (requestDetailsResult.isErr) {
-    return Task.reject<WebAppVersionSynchronizationResult, Error>(requestDetailsResult.error);
-  }
-
-  const {value: requestDetails} = requestDetailsResult;
-
-  return options.synchronizationOptions.dependencies.githubClient
-    .createPullRequest({
-      title: requestDetails.title,
-      body: requestDetails.body,
-      headBranch: options.branchName,
+  return dependencies.gitClient
+    .commit(commitOptions)
+    .andThen(() => {
+      return dependencies.gitClient.verifyMainCommit(options.mainSnapshot.commitSha);
     })
-    .andThen(pullRequest => {
-      const synchronizationRecordResult = parseWebAppVersionSynchronizationPullRequest(pullRequest);
-
-      if (synchronizationRecordResult.isErr) {
-        return Task.reject<WebAppVersionSynchronizationResult, Error>(synchronizationRecordResult.error);
-      }
-
-      const {value: synchronizationRecordMaybe} = synchronizationRecordResult;
-
-      if (synchronizationRecordMaybe.isNothing) {
-        return Task.reject<WebAppVersionSynchronizationResult, Error>(
-          new Error('Created WebApp version synchronization pull request has no synchronization marker'),
-        );
-      }
-
-      const {value: synchronizationRecord} = synchronizationRecordMaybe;
-
-      if (
-        synchronizationRecord.marker.releaseIdentifier !== options.synchronizationOptions.releaseIdentifier ||
-        synchronizationRecord.marker.productionTagName !== options.synchronizationOptions.productionTagName ||
-        synchronizationRecord.marker.webAppVersion !== options.webAppVersion ||
-        synchronizationRecord.pullRequest.state !== 'open'
-      ) {
-        return Task.reject<WebAppVersionSynchronizationResult, Error>(
-          new Error('Created pull request does not match the requested WebApp synchronization'),
-        );
-      }
-
-      const branchNameResult = createWebAppVersionSynchronizationBranchName(
-        synchronizationRecord.marker.releaseIdentifier,
-        synchronizationRecord.marker.webAppVersion,
-      );
-
-      if (branchNameResult.isErr) {
-        return Task.reject<WebAppVersionSynchronizationResult, Error>(branchNameResult.error);
-      }
-
-      const {value: validatedBranchName} = branchNameResult;
-
-      if (validatedBranchName !== options.branchName) {
-        return Task.reject<WebAppVersionSynchronizationResult, Error>(
-          new Error('Created pull request uses an unexpected synchronization branch'),
-        );
-      }
-
-      return Result.ok({
-        action: options.action,
-        releaseIdentifier: synchronizationRecord.marker.releaseIdentifier,
-        productionTagName: synchronizationRecord.marker.productionTagName,
-        webAppVersion: synchronizationRecord.marker.webAppVersion,
-        branchName: validatedBranchName,
-        pullRequestNumber: synchronizationRecord.pullRequest.number,
-        pullRequestUrl: synchronizationRecord.pullRequest.url,
-      });
+    .andThen(() => {
+      return dependencies.gitClient.pushBranch({branchName: options.branchName});
+    })
+    .andThen(() => {
+      return dependencies.gitClient.verifyMainCommit(options.mainSnapshot.commitSha);
+    })
+    .map(() => {
+      return Unit;
     });
 }
 
-function recoverExistingBranch(
-  options: SynchronizeBranchOptions,
-  branchInspection: WebAppVersionSynchronizationBranchInspection,
+function createSynchronizationResultFromPullRequest(
+  options: CreateSynchronizationResultFromPullRequestOptions,
+  dependencies: CreateSynchronizationPullRequestDependencies,
+): Task<WebAppVersionSynchronizationResult, Error> {
+  const {synchronizationPullRequestOptions, pullRequest} = options;
+  const recordResult = parseWebAppVersionSynchronizationRecord(pullRequest);
+  if (recordResult.isErr) {
+    return Task.reject(recordResult.error);
+  }
+
+  if (recordResult.value.isNothing) {
+    return Task.reject(new Error('Created WebApp version synchronization pull request has no valid marker'));
+  }
+
+  const record = recordResult.value.value;
+  if (
+    record.marker.productionTagName !== synchronizationPullRequestOptions.request.productionTagName ||
+    record.marker.webAppVersion !== synchronizationPullRequestOptions.request.webAppVersion ||
+    record.pullRequest.state !== 'open' ||
+    record.pullRequest.headBranch !== synchronizationPullRequestOptions.branchName
+  ) {
+    return Task.reject(new Error('Created pull request does not match the requested WebApp version synchronization'));
+  }
+
+  const synchronizationResult: WebAppVersionSynchronizationResult = {
+    action: synchronizationPullRequestOptions.action,
+    productionTagName: record.marker.productionTagName,
+    webAppVersion: record.marker.webAppVersion,
+    branchName: synchronizationPullRequestOptions.branchName,
+    pullRequestNumber: record.pullRequest.number,
+    pullRequestUrl: record.pullRequest.url,
+  };
+
+  return ensureSynchronizationLabel({synchronizationResult}, {githubClient: dependencies.githubClient});
+}
+
+function createSynchronizationPullRequest(
+  options: CreateSynchronizationPullRequestOptions,
+  dependencies: CreateSynchronizationPullRequestDependencies,
+): Task<WebAppVersionSynchronizationResult, Error> {
+  const titleResult = createWebAppVersionSynchronizationPullRequestTitle(options.request.webAppVersion);
+  if (titleResult.isErr) {
+    return Task.reject(titleResult.error);
+  }
+
+  const bodyResult = createWebAppVersionSynchronizationPullRequestBody(options.request.productionTagName);
+  if (bodyResult.isErr) {
+    return Task.reject(bodyResult.error);
+  }
+
+  return dependencies.githubClient
+    .createPullRequest({title: titleResult.value, body: bodyResult.value, headBranch: options.branchName})
+    .andThen(pullRequest => {
+      return createSynchronizationResultFromPullRequest(
+        {synchronizationPullRequestOptions: options, pullRequest},
+        dependencies,
+      );
+    });
+}
+
+function recoverExistingSynchronizationBranch(
+  options: RecoverSynchronizationBranchOptions,
+  dependencies: RecoverSynchronizationBranchDependencies,
 ): Task<WebAppVersionSynchronizationResult, Error> {
   const branchValidationResult = validateWebAppVersionSynchronizationBranch({
-    branchInspection,
-    expectedReleaseIdentifier: options.synchronizationOptions.releaseIdentifier,
-    expectedWebAppVersion: options.webAppVersion,
+    branchInspection: options.branchInspection,
+    expectedProductionTagName: options.request.productionTagName,
+    expectedWebAppVersion: options.request.webAppVersion,
   });
-
   if (branchValidationResult.isErr) {
-    return Task.reject<WebAppVersionSynchronizationResult, Error>(branchValidationResult.error);
+    return Task.reject(branchValidationResult.error);
   }
 
-  const gitClient = options.synchronizationOptions.dependencies.gitClient;
-
-  return gitClient
+  return dependencies.gitClient
     .verifyMainCommit(options.mainSnapshot.commitSha)
     .andThen(() => {
-      return resolveCurrentSynchronizationOutcome(options.synchronizationOptions);
+      return resolveCurrentSynchronizationOutcome({request: options.request}, dependencies);
     })
-    .andThen(currentSynchronizationOutcome => {
-      if (currentSynchronizationOutcome.isJust) {
-        const {value: synchronizationResult} = currentSynchronizationOutcome;
-
-        return Result.ok(synchronizationResult);
+    .andThen(currentSynchronizationResultMaybe => {
+      if (currentSynchronizationResultMaybe.isJust) {
+        return Result.ok(currentSynchronizationResultMaybe.value);
       }
 
-      return createPullRequestForBranch({...options, action: 'recovered'});
+      return createSynchronizationPullRequest(
+        {...options, action: 'recovered'},
+        {githubClient: dependencies.githubClient},
+      );
     });
 }
 
-function createNewSynchronizationBranch(
-  options: SynchronizeBranchOptions,
+function createSynchronizationBranch(
+  options: CreateSynchronizationBranchOptions,
+  dependencies: CreateSynchronizationBranchDependencies,
 ): Task<WebAppVersionSynchronizationResult, Error> {
-  const gitClient = options.synchronizationOptions.dependencies.gitClient;
+  const {mainSnapshot, request, branchName} = options;
+  const gitClient = dependencies.gitClient;
 
   return gitClient
-    .createBranchFromMain({
-      branchName: options.branchName,
-      mainCommitSha: options.mainSnapshot.commitSha,
+    .createBranchFromMain({branchName, mainCommitSha: mainSnapshot.commitSha})
+    .andThen(() => {
+      return prepareSynchronizationCommit({mainSnapshot, webAppVersion: request.webAppVersion}, {gitClient});
     })
     .andThen(() => {
-      return prepareSynchronizationCommit(options);
+      return resolveCurrentSynchronizationOutcome({request}, dependencies);
     })
-    .andThen(() => {
-      return resolveCurrentSynchronizationOutcome(options.synchronizationOptions);
-    })
-    .andThen(currentSynchronizationOutcome => {
-      if (currentSynchronizationOutcome.isJust) {
-        const {value: synchronizationResult} = currentSynchronizationOutcome;
-
-        return Task.resolve<WebAppVersionSynchronizationResult, Error>(synchronizationResult);
+    .andThen(existingResultMaybe => {
+      if (existingResultMaybe.isJust) {
+        return Result.ok(existingResultMaybe.value);
       }
 
-      const commitOptions: CommitWebAppVersionSynchronizationOptions = {
-        message: `Update WebApp version to ${options.webAppVersion}`,
-        authorName: options.synchronizationOptions.commitAuthorName,
-        authorEmail: options.synchronizationOptions.commitAuthorEmail,
-      };
-
-      return gitClient
-        .commit(commitOptions)
+      return commitAndPushSynchronizationBranch(
+        {
+          mainSnapshot,
+          webAppVersion: request.webAppVersion,
+          branchName,
+          commitAuthorName: options.commitAuthorName,
+          commitAuthorEmail: options.commitAuthorEmail,
+        },
+        {gitClient},
+      )
         .andThen(() => {
-          return gitClient.verifyMainCommit(options.mainSnapshot.commitSha);
+          return resolveCurrentSynchronizationOutcome({request}, dependencies);
         })
-        .andThen(() => {
-          return gitClient.pushBranch({branchName: options.branchName});
-        })
-        .andThen(() => {
-          return gitClient.verifyMainCommit(options.mainSnapshot.commitSha);
-        })
-        .andThen(() => {
-          return resolveCurrentSynchronizationOutcome(options.synchronizationOptions);
-        })
-        .andThen(latestSynchronizationOutcome => {
-          if (latestSynchronizationOutcome.isJust) {
-            const {value: synchronizationResult} = latestSynchronizationOutcome;
-
-            return Result.ok(synchronizationResult);
+        .andThen(latestResultMaybe => {
+          if (latestResultMaybe.isJust) {
+            return Result.ok(latestResultMaybe.value);
           }
 
-          return createPullRequestForBranch({...options, action: 'created'});
+          return createSynchronizationPullRequest(
+            {...options, action: 'created'},
+            {githubClient: dependencies.githubClient},
+          );
         });
     });
 }
 
-function allocateAndSynchronizeWebAppVersion(
-  options: AllocateWebAppVersionOptions,
+function reconcileAndSynchronizeWebAppVersion(
+  options: ReconcileAndSynchronizeWebAppVersionOptions,
+  dependencies: WebAppVersionSynchronizationDependencies,
 ): Task<WebAppVersionSynchronizationResult, Error> {
   const packageVersionsResult = validateMatchingWebAppPackageVersions(
     options.mainSnapshot.rootPackageDocument,
     options.mainSnapshot.webAppPackageDocument,
   );
-
   if (packageVersionsResult.isErr) {
-    return Task.reject<WebAppVersionSynchronizationResult, Error>(packageVersionsResult.error);
+    return Task.reject(packageVersionsResult.error);
   }
 
-  const {value: packageVersions} = packageVersionsResult;
-
-  const webAppVersionResult = resolveNextWebAppVersion(packageVersions.rootVersion);
-
-  if (webAppVersionResult.isErr) {
-    return Task.reject<WebAppVersionSynchronizationResult, Error>(webAppVersionResult.error);
-  }
-
-  const {value: webAppVersion} = webAppVersionResult;
-
-  const expectedBranchNameResult = createWebAppVersionSynchronizationBranchName(
-    options.synchronizationOptions.releaseIdentifier,
-    webAppVersion,
+  const comparisonResult = compareWebAppVersions(
+    packageVersionsResult.value.rootVersion,
+    options.request.webAppVersion,
   );
-
-  if (expectedBranchNameResult.isErr) {
-    return Task.reject<WebAppVersionSynchronizationResult, Error>(expectedBranchNameResult.error);
+  if (comparisonResult.isErr) {
+    return Task.reject(comparisonResult.error);
   }
 
-  const {value: expectedBranchName} = expectedBranchNameResult;
+  if (comparisonResult.value === 0) {
+    return Task.reject(
+      new Error(
+        `WebApp package metadata already equals ${options.request.webAppVersion} but no matching synchronization record exists`,
+      ),
+    );
+  }
 
-  return options.synchronizationOptions.dependencies.gitClient
-    .listExistingBranchNames(options.synchronizationOptions.releaseIdentifier)
-    .andThen(existingBranchNames => {
-      if (existingBranchNames.length > 1) {
-        return Task.reject<SynchronizeBranchOptions, Error>(
-          new Error(
-            `Multiple WebApp version synchronization branches exist for ${options.synchronizationOptions.releaseIdentifier}`,
-          ),
-        );
+  if (comparisonResult.value > 0) {
+    return Task.reject(
+      new Error(
+        `Refusing to downgrade WebApp package metadata from ${packageVersionsResult.value.rootVersion} to ${options.request.webAppVersion}`,
+      ),
+    );
+  }
+
+  const branchNameResult = createWebAppVersionSynchronizationBranchName(options.request.webAppVersion);
+  if (branchNameResult.isErr) {
+    return Task.reject(branchNameResult.error);
+  }
+
+  const branchName = branchNameResult.value;
+  const branchOptions: SynchronizeBranchOptions = {...options, branchName};
+
+  return dependencies.gitClient
+    .inspectBranch({branchName, mainCommitSha: options.mainSnapshot.commitSha})
+    .andThen(branchInspection => {
+      if (!isUndefined(branchInspection)) {
+        return recoverExistingSynchronizationBranch({...branchOptions, branchInspection}, dependencies);
       }
 
-      const existingBranchName = existingBranchNames.at(0);
-      const branchName = existingBranchName ?? expectedBranchName;
-      const branchNameResult = validateWebAppVersionSynchronizationBranchName(branchName);
-
-      if (branchNameResult.isErr) {
-        return Task.reject<SynchronizeBranchOptions, Error>(branchNameResult.error);
-      }
-
-      const {value: validatedBranchName} = branchNameResult;
-
-      if (validatedBranchName.releaseIdentifier !== options.synchronizationOptions.releaseIdentifier) {
-        return Task.reject<SynchronizeBranchOptions, Error>(
-          new Error('Existing synchronization branch belongs to a different release identifier'),
-        );
-      }
-
-      if (validatedBranchName.webAppVersion !== webAppVersion) {
-        return Task.reject<SynchronizeBranchOptions, Error>(
-          new Error('Existing synchronization branch contains an unexpected WebApp version'),
-        );
-      }
-
-      return Result.ok({
-        ...options,
-        branchName: validatedBranchName.branchName,
-        webAppVersion,
-      });
-    })
-    .andThen(branchOptions => {
-      return options.synchronizationOptions.dependencies.gitClient
-        .inspectBranch({
-          branchName: branchOptions.branchName,
-          mainCommitSha: options.mainSnapshot.commitSha,
-        })
-        .andThen(branchInspection => {
-          if (!isUndefined(branchInspection)) {
-            return recoverExistingBranch(branchOptions, branchInspection);
-          }
-
-          return createNewSynchronizationBranch(branchOptions);
-        });
+      return createSynchronizationBranch(
+        {
+          ...branchOptions,
+          commitAuthorName: options.commitAuthorName,
+          commitAuthorEmail: options.commitAuthorEmail,
+        },
+        dependencies,
+      );
     });
 }
 
-export function synchronizeWebAppVersion(
-  options: SynchronizeWebAppVersionOptions,
+function synchronizeAgainstLatestMain(
+  options: WebAppVersionSynchronizationOptions & {readonly request: WebAppVersionSynchronizationRequest},
+  dependencies: WebAppVersionSynchronizationDependencies,
 ): Task<WebAppVersionSynchronizationResult, Error> {
-  return resolveCurrentSynchronizationOutcome(options).andThen(initialSynchronizationOutcome => {
-    if (initialSynchronizationOutcome.isJust) {
-      const {value: synchronizationResult} = initialSynchronizationOutcome;
+  const {request} = options;
 
-      return Task.resolve<WebAppVersionSynchronizationResult, Error>(synchronizationResult);
+  return dependencies.gitClient.prepareLatestMain().andThen(mainSnapshot => {
+    return resolveCurrentSynchronizationOutcome({request}, dependencies).andThen(existingResultMaybe => {
+      if (existingResultMaybe.isJust) {
+        return Result.ok(existingResultMaybe.value);
+      }
+
+      return reconcileAndSynchronizeWebAppVersion(
+        {
+          request,
+          mainSnapshot,
+          commitAuthorName: options.commitAuthorName,
+          commitAuthorEmail: options.commitAuthorEmail,
+        },
+        dependencies,
+      );
+    });
+  });
+}
+
+export function synchronizeWebAppVersion(
+  options: WebAppVersionSynchronizationOptions,
+  dependencies: WebAppVersionSynchronizationDependencies,
+): Task<WebAppVersionSynchronizationResult, Error> {
+  const requestResult = createWebAppVersionSynchronizationRequest(options.productionTagName);
+  if (requestResult.isErr) {
+    return Task.reject(requestResult.error);
+  }
+
+  const request = requestResult.value;
+  return resolveCurrentSynchronizationOutcome({request}, dependencies).andThen(existingResultMaybe => {
+    if (existingResultMaybe.isJust) {
+      return Task.resolve(existingResultMaybe.value);
     }
 
-    return options.dependencies.gitClient.prepareLatestMain().andThen(mainSnapshot => {
-      return resolveCurrentSynchronizationOutcome(options).andThen(postPreparationSynchronizationOutcome => {
-        if (postPreparationSynchronizationOutcome.isJust) {
-          const {value: synchronizationResult} = postPreparationSynchronizationOutcome;
-
-          return Result.ok(synchronizationResult);
-        }
-
-        return allocateAndSynchronizeWebAppVersion({synchronizationOptions: options, mainSnapshot});
-      });
-    });
+    return synchronizeAgainstLatestMain({...options, request}, dependencies);
   });
 }

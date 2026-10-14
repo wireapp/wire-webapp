@@ -42,83 +42,42 @@ function runCommand(command: ReleaseMetadataCommand): ReleaseMetadataCliTestResu
 }
 
 describe('releaseMetadataCli', () => {
-  it('prints the release identifier from a valid release branch name', () => {
-    const actualResult = runCommand({kind: 'release-identifier-from-branch', releaseBranch: 'release/2026-06-19.1'});
-
-    expect(actualResult).toEqual({
-      errors: [],
-      exitCode: 0,
-      outputs: ['2026-06-19.1'],
-    });
-  });
-
-  it('rejects an invalid release branch name', () => {
-    const actualResult = runCommand({kind: 'release-identifier-from-branch', releaseBranch: 'release/2026-06-19.0'});
-
-    expect(actualResult).toEqual({
-      errors: ['Invalid release branch name: release/2026-06-19.0'],
-      exitCode: 1,
-      outputs: [],
-    });
-  });
-
-  it('prints the release branch name for the release identifier', () => {
-    const actualResult = runCommand({kind: 'release-branch', releaseIdentifier: '2026-06-19.1'});
-
-    expect(actualResult).toEqual({
-      errors: [],
-      exitCode: 0,
-      outputs: ['release/2026-06-19.1'],
-    });
-  });
-
-  it('rejects an invalid release branch release identifier', () => {
-    const actualResult = runCommand({kind: 'release-branch', releaseIdentifier: 'release/2026-06-19.1'});
-
-    expect(actualResult).toEqual({
-      errors: ['Invalid release identifier: release/2026-06-19.1'],
-      exitCode: 1,
-      outputs: [],
-    });
-  });
-
-  it('prints the next beta tag name for the release identifier', () => {
+  it('prints the next SemVer Beta tag name', () => {
     const actualResult = runCommand({
       kind: 'next-beta-tag',
-      releaseIdentifier: '2026-06-19.1',
-      existingTagNames: [
-        '2026-06-18.1-beta.9',
-        '2026-06-19.1-beta.1',
-        '2026-06-19.1-beta.2',
-        '2026-06-19.1-production',
-      ],
+      version: '1.1.0',
+      existingTagNames: ['v1.1.0-beta.1', 'v1.1.0-beta.2', 'v1.2.0-beta.9', '2026-06-19.1-beta.4'],
     });
 
     expect(actualResult).toEqual({
       errors: [],
       exitCode: 0,
-      outputs: ['2026-06-19.1-beta.3'],
+      outputs: ['v1.1.0-beta.3'],
     });
   });
 
-  it('prints the production tag name for the release identifier', () => {
-    const actualResult = runCommand({kind: 'production-tag', releaseIdentifier: '2026-06-19.1'});
-
-    expect(actualResult).toEqual({
-      errors: [],
-      exitCode: 0,
-      outputs: ['2026-06-19.1-production'],
+  it('rejects malformed matching WebApp SemVer Beta history', () => {
+    const actualResult = runCommand({
+      kind: 'next-beta-tag',
+      version: '1.1.0',
+      existingTagNames: ['v1.1.0-beta.01'],
     });
+
+    expect(actualResult.exitCode).toBe(1);
+    expect(actualResult.outputs).toEqual([]);
+    expect(actualResult.errors[0]).toContain('Invalid WebApp Beta tag for version 1.1.0');
   });
 
-  it('rejects an invalid production tag release identifier', () => {
-    const actualResult = runCommand({kind: 'production-tag', releaseIdentifier: '2026-06-19'});
-
-    expect(actualResult).toEqual({
-      errors: ['Invalid release identifier: 2026-06-19'],
-      exitCode: 1,
-      outputs: [],
+  it('rejects gaps in matching WebApp SemVer Beta history', () => {
+    const actualResult = runCommand({
+      kind: 'next-beta-tag',
+      version: '1.1.0',
+      existingTagNames: ['v1.1.0-beta.1', 'v1.1.0-beta.3'],
     });
+
+    expect(actualResult.exitCode).toBe(1);
+    expect(actualResult.outputs).toEqual([]);
+    expect(actualResult.errors[0]).toContain('v1.1.0-beta.2');
   });
 
   it('validates a production tag name', () => {
@@ -128,6 +87,50 @@ describe('releaseMetadataCli', () => {
       errors: [],
       exitCode: 0,
       outputs: ['2026-06-19.1-production'],
+    });
+  });
+
+  it('validates a stable SemVer WebApp Production tag name', () => {
+    const actualResult = runCommand({kind: 'validate-webapp-production-tag', productionTag: 'v1.1.0'});
+
+    expect(actualResult).toEqual({
+      errors: [],
+      exitCode: 0,
+      outputs: ['v1.1.0'],
+    });
+  });
+
+  it('strictly validates an active stable WebApp tag', () => {
+    const actualResult = runCommand({kind: 'validate-stable-webapp-tag', stableTagName: 'v1.1.0'});
+
+    expect(actualResult).toEqual({
+      errors: [],
+      exitCode: 0,
+      outputs: ['1.1.0'],
+    });
+  });
+
+  it('rejects a historical Production tag in the stable WebApp tag validator', () => {
+    const actualResult = runCommand({
+      kind: 'validate-stable-webapp-tag',
+      stableTagName: '2026-10-06.1-production',
+    });
+
+    expect(actualResult.exitCode).toBe(1);
+    expect(actualResult.outputs).toEqual([]);
+    expect(actualResult.errors[0]).toContain('Invalid stable WebApp tag name');
+  });
+
+  it('does not broaden the WebApp Production tag validator to historical timestamp build references', () => {
+    const actualResult = runCommand({
+      kind: 'validate-webapp-production-tag',
+      productionTag: '2026-10-06-production.1',
+    });
+
+    expect(actualResult).toEqual({
+      errors: ['Invalid production tag name: 2026-10-06-production.1'],
+      exitCode: 1,
+      outputs: [],
     });
   });
 
@@ -143,6 +146,21 @@ describe('releaseMetadataCli', () => {
       errors: [],
       exitCode: 0,
       outputs: ['2026-06-19.1'],
+    });
+  });
+
+  it('prints the WebApp version for a stable SemVer Production tag', () => {
+    const actualResult = runCommand({
+      kind: 'webapp-build-version',
+      buildReference: 'v1.1.0',
+      fullCommitSha: '025edc663787b3d2da366f21a5958013201e6cd4',
+      environmentName: 'production',
+    });
+
+    expect(actualResult).toEqual({
+      errors: [],
+      exitCode: 0,
+      outputs: ['1.1.0'],
     });
   });
 

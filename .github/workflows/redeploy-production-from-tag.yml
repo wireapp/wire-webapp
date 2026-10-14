@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Existing production release tag to redeploy (for example 2026-03-09.1-production or 2026-03-09-production.0)'
+        description: 'Existing production release tag to redeploy (for example 2026-10-06.1-production, 2026-03-09-production.0, or v1.1.0)'
         required: true
         type: string
       confirm_production_redeploy:
@@ -64,6 +64,26 @@ jobs:
             echo "webapp_build_version=${webapp_build_version}"
             echo "tag=${TAG}"
           } >> "$GITHUB_OUTPUT"
+
+      - name: Verify SemVer Production tag is annotated
+        env:
+          TAG: ${{ steps.validate.outputs.tag }}
+        run: |
+          set -euo pipefail
+
+          if [[ "${TAG}" == v* ]]; then
+            git fetch --no-tags origin "refs/tags/${TAG}:refs/tags/${TAG}"
+
+            if [[ "$(git cat-file -t "refs/tags/${TAG}")" != 'tag' ]]; then
+              echo "SemVer Production tag ${TAG} is not annotated." >&2
+              exit 1
+            fi
+
+            if ! git rev-parse --verify "refs/tags/${TAG}^{commit}" >/dev/null; then
+              echo "SemVer Production tag ${TAG} does not resolve to a commit." >&2
+              exit 1
+            fi
+          fi
 
   build_artifact:
     name: Rebuild tagged release artifact

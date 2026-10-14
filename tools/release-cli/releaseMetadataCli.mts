@@ -17,12 +17,12 @@
  *
  */
 
-import process from 'node:process';
-import {resolve} from 'node:path';
-import {fileURLToPath} from 'node:url';
-
 import {isError, isString} from '@sindresorhus/is';
 import {Command, CommanderError} from 'commander';
+
+import {resolve} from 'node:path';
+import process from 'node:process';
+import {fileURLToPath} from 'node:url';
 
 import {
   executeReleaseMetadataCommand,
@@ -36,6 +36,10 @@ type CreateReleaseMetadataCommandOptions = {
   readonly writeError: (message: string) => void;
 };
 
+type RunReleaseMetadataCommandOptions = {
+  readonly commandLineArguments: readonly string[];
+};
+
 export function createCommand(createCommandOptions: CreateReleaseMetadataCommandOptions): Command {
   const command = new Command()
     .name('releaseMetadataCli')
@@ -47,32 +51,19 @@ export function createCommand(createCommandOptions: CreateReleaseMetadataCommand
     .exitOverride();
 
   command
-    .command('release-identifier-from-branch')
-    .argument('<release-branch>')
-    .action(async (releaseBranch: string) => {
-      await createCommandOptions.executeCommand({kind: 'release-identifier-from-branch', releaseBranch});
-    });
-
-  command
-    .command('release-branch')
-    .argument('<release-identifier>')
-    .action(async (releaseIdentifier: string) => {
-      await createCommandOptions.executeCommand({kind: 'release-branch', releaseIdentifier});
-    });
-
-  command
     .command('next-beta-tag')
-    .argument('<release-identifier>')
+    .argument('<version>')
     .argument('[existing-tag...]')
-    .action(async (releaseIdentifier: string, existingTagNames: string[]) => {
-      await createCommandOptions.executeCommand({kind: 'next-beta-tag', releaseIdentifier, existingTagNames});
+    .action(async (version: string, existingTagNames: string[]) => {
+      await createCommandOptions.executeCommand({kind: 'next-beta-tag', version, existingTagNames});
     });
 
   command
-    .command('production-tag')
-    .argument('<release-identifier>')
-    .action(async (releaseIdentifier: string) => {
-      await createCommandOptions.executeCommand({kind: 'production-tag', releaseIdentifier});
+    .command('validate-webapp-beta-tag')
+    .argument('<beta-tag>')
+    .argument('<release-version>')
+    .action(async (betaTag: string, releaseVersion: string) => {
+      await createCommandOptions.executeCommand({kind: 'validate-webapp-beta-tag', betaTag, releaseVersion});
     });
 
   command
@@ -80,6 +71,20 @@ export function createCommand(createCommandOptions: CreateReleaseMetadataCommand
     .argument('<production-tag>')
     .action(async (productionTag: string) => {
       await createCommandOptions.executeCommand({kind: 'validate-production-tag', productionTag});
+    });
+
+  command
+    .command('validate-webapp-production-tag')
+    .argument('<production-tag>')
+    .action(async (productionTag: string) => {
+      await createCommandOptions.executeCommand({kind: 'validate-webapp-production-tag', productionTag});
+    });
+
+  command
+    .command('validate-stable-webapp-tag')
+    .argument('<stable-tag>')
+    .action(async (stableTagName: string) => {
+      await createCommandOptions.executeCommand({kind: 'validate-stable-webapp-tag', stableTagName});
     });
 
   command
@@ -134,14 +139,15 @@ export function createCommand(createCommandOptions: CreateReleaseMetadataCommand
 }
 
 export async function runReleaseMetadataCommand(
-  commandLineArguments: readonly string[],
-  createCommandOptions: CreateReleaseMetadataCommandOptions,
+  options: RunReleaseMetadataCommandOptions,
+  dependencies: CreateReleaseMetadataCommandOptions,
 ): Promise<number> {
+  const {commandLineArguments} = options;
   let executionExitCode = 0;
   const command = createCommand({
-    ...createCommandOptions,
+    ...dependencies,
     async executeCommand(applicationCommand: ReleaseMetadataCommand): Promise<number> {
-      executionExitCode = await createCommandOptions.executeCommand(applicationCommand);
+      executionExitCode = await dependencies.executeCommand(applicationCommand);
 
       return executionExitCode;
     },
@@ -157,7 +163,7 @@ export async function runReleaseMetadataCommand(
     }
 
     const errorMessage = isError(error) ? error.message : String(error);
-    createCommandOptions.writeError(`${errorMessage}\n`);
+    dependencies.writeError(`${errorMessage}\n`);
 
     return 1;
   }
@@ -184,13 +190,16 @@ function createRuntimeDependencies(): ReleaseMetadataCliDependencies {
 
 async function main(): Promise<void> {
   const runtimeArgumentPrefixLength = 2;
-  process.exitCode = await runReleaseMetadataCommand(process.argv.slice(runtimeArgumentPrefixLength), {
-    executeCommand(command: ReleaseMetadataCommand): number {
-      return executeReleaseMetadataCommand(command, createRuntimeDependencies());
+  process.exitCode = await runReleaseMetadataCommand(
+    {commandLineArguments: process.argv.slice(runtimeArgumentPrefixLength)},
+    {
+      executeCommand(command: ReleaseMetadataCommand): number {
+        return executeReleaseMetadataCommand(command, createRuntimeDependencies());
+      },
+      writeError: writeRuntimeError,
+      writeOutput: writeRuntimeCommandOutput,
     },
-    writeError: writeRuntimeError,
-    writeOutput: writeRuntimeCommandOutput,
-  });
+  );
 }
 
 function isCurrentModuleEntrypoint(): boolean {

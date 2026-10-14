@@ -11,11 +11,11 @@ on:
           - beta
           - production
       release_tag:
-        description: 'Existing immutable release tag appropriate for the selected stage'
+        description: 'Existing immutable SemVer tag: vX.Y.Z-beta.N for Beta or vX.Y.Z for Production'
         required: true
         type: string
       promoted_beta_tag:
-        description: 'Existing promoted Beta tag; required only for Production'
+        description: 'Existing vX.Y.Z-beta.N tag from the same release; required only for Production'
         required: false
         default: ''
         type: string

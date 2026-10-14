@@ -78,8 +78,8 @@ function createFakeGitHubReleaseClient(
 
 function createExistingRelease(isDraft: boolean): GitHubReleaseRecord {
   return {
-    tagName: '2026-08-28.1-production',
-    htmlUrl: 'https://github.com/wireapp/wire-webapp/releases/tag/2026-08-28.1-production',
+    tagName: 'v1.1.0',
+    htmlUrl: 'https://github.com/wireapp/wire-webapp/releases/tag/v1.1.0',
     isDraft,
   };
 }
@@ -88,33 +88,53 @@ describe('ensureProductionGitHubRelease', () => {
   it('creates a new draft with the preceding Production tag when no Release exists', async (): Promise<void> => {
     const fakeGitHubReleaseClient = createFakeGitHubReleaseClient({
       existingRelease: Maybe.nothing(),
-      tagNames: ['2026-08-07.1-production', '2026-08-28.1-beta.1', '2026-08-28-staging.0', '2026-08-28-production.0'],
+      tagNames: ['v1.9.0', 'v1.10.0', 'v1.11.0-beta.1', 'v1.11.0'],
     });
 
-    const actualResult = await ensureProductionGitHubRelease({
-      currentProductionTagName: '2026-08-28.1-production',
-      githubReleaseClient: fakeGitHubReleaseClient.githubReleaseClient,
-    });
+    const actualResult = await ensureProductionGitHubRelease(
+      {productionTagName: 'v1.11.0'},
+      {githubReleaseClient: fakeGitHubReleaseClient.githubReleaseClient},
+    ).toPromise();
 
     assert(actualResult.isOk);
     expect(actualResult.value).toEqual({
       action: 'created',
       state: 'draft',
-      tagName: '2026-08-28.1-production',
-      url: 'https://github.com/wireapp/wire-webapp/releases/tag/2026-08-28.1-production',
+      tagName: 'v1.11.0',
+      url: 'https://github.com/wireapp/wire-webapp/releases/tag/v1.11.0',
     });
-    expect(fakeGitHubReleaseClient.findReleaseTagNames).toEqual(['2026-08-28.1-production']);
+    expect(fakeGitHubReleaseClient.findReleaseTagNames).toEqual(['v1.11.0']);
     expect(fakeGitHubReleaseClient.listTagNamesCallCount).toHaveLength(1);
     expect(fakeGitHubReleaseClient.generateReleaseNotesOptions).toEqual([
       {
-        productionTagName: '2026-08-28.1-production',
-        precedingProductionTagName: '2026-08-07.1-production',
+        productionTagName: 'v1.11.0',
+        precedingProductionTagName: 'v1.10.0',
       },
     ]);
     expect(fakeGitHubReleaseClient.createDraftReleaseOptions).toEqual([
       {
-        productionTagName: '2026-08-28.1-production',
+        productionTagName: 'v1.11.0',
         body: generatedReleaseNotesBody,
+      },
+    ]);
+  });
+
+  it('selects the preceding SemVer Production tag by SemVer order', async (): Promise<void> => {
+    const fakeGitHubReleaseClient = createFakeGitHubReleaseClient({
+      existingRelease: Maybe.nothing(),
+      tagNames: ['v1.11.0', 'v1.9.0', 'some-library@99.0.0', 'v1.11.0-beta.1', 'v1.10.0', '2026-10-06.1-production'],
+    });
+
+    const actualResult = await ensureProductionGitHubRelease(
+      {productionTagName: 'v1.11.0'},
+      {githubReleaseClient: fakeGitHubReleaseClient.githubReleaseClient},
+    ).toPromise();
+
+    assert(actualResult.isOk);
+    expect(fakeGitHubReleaseClient.generateReleaseNotesOptions).toEqual([
+      {
+        productionTagName: 'v1.11.0',
+        precedingProductionTagName: 'v1.10.0',
       },
     ]);
   });
@@ -126,10 +146,10 @@ describe('ensureProductionGitHubRelease', () => {
       tagNames: [],
     });
 
-    const actualResult = await ensureProductionGitHubRelease({
-      currentProductionTagName: '2026-08-28.1-production',
-      githubReleaseClient: fakeGitHubReleaseClient.githubReleaseClient,
-    });
+    const actualResult = await ensureProductionGitHubRelease(
+      {productionTagName: 'v1.1.0'},
+      {githubReleaseClient: fakeGitHubReleaseClient.githubReleaseClient},
+    ).toPromise();
 
     assert(actualResult.isOk);
     expect(actualResult.value).toEqual({
@@ -150,10 +170,10 @@ describe('ensureProductionGitHubRelease', () => {
       tagNames: [],
     });
 
-    const actualResult = await ensureProductionGitHubRelease({
-      currentProductionTagName: '2026-08-28.1-production',
-      githubReleaseClient: fakeGitHubReleaseClient.githubReleaseClient,
-    });
+    const actualResult = await ensureProductionGitHubRelease(
+      {productionTagName: 'v1.1.0'},
+      {githubReleaseClient: fakeGitHubReleaseClient.githubReleaseClient},
+    ).toPromise();
 
     assert(actualResult.isOk);
     expect(actualResult.value.action).toBe('already_published');
@@ -166,20 +186,20 @@ describe('ensureProductionGitHubRelease', () => {
   it('creates a bootstrap draft without using the entire tag history as release notes', async (): Promise<void> => {
     const fakeGitHubReleaseClient = createFakeGitHubReleaseClient({
       existingRelease: Maybe.nothing(),
-      tagNames: ['2026-07-27.1-beta.1', '2026-07-27-staging.0', '2026-07-27-production.0'],
+      tagNames: ['v1.1.0-beta.1', 'v1.0.0'],
     });
 
-    const actualResult = await ensureProductionGitHubRelease({
-      currentProductionTagName: '2026-07-27.1-production',
-      githubReleaseClient: fakeGitHubReleaseClient.githubReleaseClient,
-    });
+    const actualResult = await ensureProductionGitHubRelease(
+      {productionTagName: 'v1.0.0'},
+      {githubReleaseClient: fakeGitHubReleaseClient.githubReleaseClient},
+    ).toPromise();
 
     assert(actualResult.isOk);
     expect(fakeGitHubReleaseClient.generateReleaseNotesOptions).toHaveLength(0);
     expect(fakeGitHubReleaseClient.createDraftReleaseOptions).toEqual([
       {
-        productionTagName: '2026-07-27.1-production',
-        body: 'No preceding ADR Production release was found. Add the customer-facing changelog manually before publication.',
+        productionTagName: 'v1.0.0',
+        body: 'No preceding stable WebApp Production release was found. Add the customer-facing changelog manually before publication.',
       },
     ]);
   });
@@ -190,16 +210,32 @@ describe('ensureProductionGitHubRelease', () => {
       tagNames: [],
     });
 
-    const actualResult = await ensureProductionGitHubRelease({
-      currentProductionTagName: '2026-08-28.1-beta.1',
-      githubReleaseClient: fakeGitHubReleaseClient.githubReleaseClient,
-    });
+    const actualResult = await ensureProductionGitHubRelease(
+      {productionTagName: 'v1.1.0-beta.1'},
+      {githubReleaseClient: fakeGitHubReleaseClient.githubReleaseClient},
+    ).toPromise();
 
     assert(actualResult.isErr);
-    expect(actualResult.error.message).toBe('Invalid production tag name: 2026-08-28.1-beta.1');
+    expect(actualResult.error.message).toBe('Invalid stable WebApp Production tag: v1.1.0-beta.1');
     expect(fakeGitHubReleaseClient.findReleaseTagNames).toHaveLength(0);
     expect(fakeGitHubReleaseClient.listTagNamesCallCount).toHaveLength(0);
     expect(fakeGitHubReleaseClient.generateReleaseNotesOptions).toHaveLength(0);
     expect(fakeGitHubReleaseClient.createDraftReleaseOptions).toHaveLength(0);
+  });
+
+  it('rejects a historical date-based Production tag on the active handoff path', async (): Promise<void> => {
+    const fakeGitHubReleaseClient = createFakeGitHubReleaseClient({
+      existingRelease: Maybe.nothing(),
+      tagNames: [],
+    });
+
+    const actualResult = await ensureProductionGitHubRelease(
+      {productionTagName: '2026-08-28.1-production'},
+      {githubReleaseClient: fakeGitHubReleaseClient.githubReleaseClient},
+    ).toPromise();
+
+    assert(actualResult.isErr);
+    expect(fakeGitHubReleaseClient.findReleaseTagNames).toHaveLength(0);
+    expect(fakeGitHubReleaseClient.listTagNamesCallCount).toHaveLength(0);
   });
 });

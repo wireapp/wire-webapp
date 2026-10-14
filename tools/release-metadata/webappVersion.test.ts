@@ -23,10 +23,7 @@ import {isString} from '@sindresorhus/is';
 
 import {
   compareWebAppVersions,
-  createWebAppVersionSynchronizationMarker,
   incrementWebAppVersion,
-  parseWebAppVersionSynchronizationMarker,
-  resolveNextWebAppVersion,
   updateWebAppPackageDocuments,
   validateMatchingWebAppPackageVersions,
   validateWebAppVersion,
@@ -53,13 +50,6 @@ function createTestPackageDocument(version?: string): TestPackageDocument {
   }
 
   return packageDocument;
-}
-
-function expectNextVersion(currentVersion: string, expectedVersion: string): void {
-  const actualVersionResult = resolveNextWebAppVersion(currentVersion);
-
-  assert(actualVersionResult.isOk);
-  expect(actualVersionResult.value).toBe(expectedVersion);
 }
 
 describe('WebApp version domain logic', () => {
@@ -112,12 +102,6 @@ describe('WebApp version domain logic', () => {
     expect(actualComparisonResult.value).toBe(0);
   });
 
-  it('rejects synchronization when PATCH increment exceeds the supported numeric range', () => {
-    const actualResolutionResult = resolveNextWebAppVersion('1.0.9007199254740991');
-
-    assert(actualResolutionResult.isErr);
-  });
-
   it.each([
     ['1.0.9', '1.0.10', -1],
     ['1.2.0', '1.10.0', -1],
@@ -147,7 +131,6 @@ describe('WebApp version domain logic', () => {
     `${'1'.repeat(257)}.0.0`,
   ])('rejects unsupported version %s in every stable version operation', invalidVersion => {
     const actualValidationResult = validateWebAppVersion(invalidVersion);
-    const actualResolutionResult = resolveNextWebAppVersion(invalidVersion);
     const actualMajorIncrementResult = incrementWebAppVersion(invalidVersion, 'major');
     const actualMinorIncrementResult = incrementWebAppVersion(invalidVersion, 'minor');
     const actualPatchIncrementResult = incrementWebAppVersion(invalidVersion, 'patch');
@@ -155,7 +138,6 @@ describe('WebApp version domain logic', () => {
     const actualRightComparisonResult = compareWebAppVersions('1.0.0', invalidVersion);
 
     assert(actualValidationResult.isErr);
-    assert(actualResolutionResult.isErr);
     assert(actualMajorIncrementResult.isErr);
     assert(actualMinorIncrementResult.isErr);
     assert(actualPatchIncrementResult.isErr);
@@ -165,24 +147,11 @@ describe('WebApp version domain logic', () => {
     const expectedErrorMessage = `Invalid WebApp version: ${invalidVersion}`;
 
     expect(actualValidationResult.error.message).toBe(expectedErrorMessage);
-    expect(actualResolutionResult.error.message).toBe(expectedErrorMessage);
     expect(actualMajorIncrementResult.error.message).toBe(expectedErrorMessage);
     expect(actualMinorIncrementResult.error.message).toBe(expectedErrorMessage);
     expect(actualPatchIncrementResult.error.message).toBe(expectedErrorMessage);
     expect(actualLeftComparisonResult.error.message).toBe(expectedErrorMessage);
     expect(actualRightComparisonResult.error.message).toBe(expectedErrorMessage);
-  });
-
-  it.each([
-    ['0.27.0', '1.0.0'],
-    ['0.99.999', '1.0.0'],
-    ['0.9007199254740991.9007199254740991', '1.0.0'],
-    ['1.0.0', '1.0.1'],
-    ['1.0.9', '1.0.10'],
-    ['1.2.99', '1.2.100'],
-    ['2.4.7', '2.4.8'],
-  ])('resolves %s to %s', (currentVersion, expectedVersion) => {
-    expectNextVersion(currentVersion, expectedVersion);
   });
 
   it.each([undefined, null, '', '1.0', '1.0.0-beta.1', '1.0.0+abc', '-1.0.0', '1.-1.0', 'one.0.0', '01.0.0'])(
@@ -259,74 +228,5 @@ describe('WebApp version domain logic', () => {
 
     assert(actualUpdateResult.isErr);
     expect(actualUpdateResult.error.message).toContain('WebApp package versions disagree');
-  });
-});
-
-describe('WebApp version synchronization marker', () => {
-  const markerOptions = {
-    releaseIdentifier: '2026-09-09.1',
-    productionTagName: '2026-09-09.1-production',
-    webAppVersion: '1.0.0',
-  };
-
-  it('round-trips a synchronization marker', () => {
-    const actualMarkerResult = createWebAppVersionSynchronizationMarker(markerOptions);
-
-    assert(actualMarkerResult.isOk);
-
-    const actualParsedMarkerResult = parseWebAppVersionSynchronizationMarker(actualMarkerResult.value);
-
-    assert(actualParsedMarkerResult.isOk);
-    expect(actualParsedMarkerResult.value).toEqual({
-      releaseIdentifier: '2026-09-09.1',
-      productionTagName: '2026-09-09.1-production',
-      webAppVersion: '1.0.0',
-    });
-  });
-
-  it('parses a marker embedded in a pull request body', () => {
-    const markerResult = createWebAppVersionSynchronizationMarker(markerOptions);
-
-    assert(markerResult.isOk);
-
-    const actualMarkerResult = parseWebAppVersionSynchronizationMarker(
-      `Synchronize deployed metadata.\n\n${markerResult.value}\n`,
-    );
-
-    assert(actualMarkerResult.isOk);
-    expect(actualMarkerResult.value.webAppVersion).toBe('1.0.0');
-  });
-
-  it.each([
-    '<!-- wire-webapp-version-sync release=2026-09-09.1 production-tag=2026-09-09.1-production -->',
-    '<!-- wire-webapp-version-sync release=2026-09-09.1 version=1.0.0 -->',
-    '<!-- wire-webapp-version-sync release=2026-09-09.1 production-tag=2026-09-09.1-production version=1.0.0',
-    '<!-- wire-webapp-version-sync release=2026-09-09.1 production-tag=2026-09-09.1-production version=1.0.0-beta.1 -->',
-    '<!-- wire-webapp-version-sync release=2026-09-09.1 production-tag=2026-09-10.1-production version=1.0.0 -->',
-  ])('rejects malformed or incomplete marker %s', invalidMarker => {
-    const actualMarkerResult = parseWebAppVersionSynchronizationMarker(invalidMarker);
-
-    assert(actualMarkerResult.isErr);
-  });
-
-  it('rejects duplicate synchronization markers', () => {
-    const markerResult = createWebAppVersionSynchronizationMarker(markerOptions);
-
-    assert(markerResult.isOk);
-
-    const actualMarkerResult = parseWebAppVersionSynchronizationMarker(`${markerResult.value}\n${markerResult.value}`);
-
-    assert(actualMarkerResult.isErr);
-    expect(actualMarkerResult.error.message).toBe('WebApp version synchronization marker must occur exactly once');
-  });
-
-  it('rejects a marker with an invalid release identifier', () => {
-    const actualMarkerResult = createWebAppVersionSynchronizationMarker({
-      ...markerOptions,
-      releaseIdentifier: '2026-09-09.0',
-      productionTagName: '2026-09-09.0-production',
-    });
-
-    assert(actualMarkerResult.isErr);
   });
 });

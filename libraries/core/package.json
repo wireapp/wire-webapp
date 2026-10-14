@@ -39,13 +39,13 @@
     "idb": "8.0.4",
     "lodash": "4.18.1",
     "noop-esm": "1.1.0",
-    "p-queue": "9.3.3",
+    "p-queue": "9.3.4",
     "true-myth": "9.4.0"
   },
   "devDependencies": {
-    "@swc/core": "1.16.13",
+    "@swc/core": "1.16.18",
     "@swc/jest": "0.2.39",
-    "@types/lodash": "4.17.25",
+    "@types/lodash": "4.17.26",
     "commander": "14.0.3",
     "dotenv-defaults": "5.0.2",
     "jest-websocket-mock": "2.5.0"

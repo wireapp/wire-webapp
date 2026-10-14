@@ -1,0 +1,103 @@
+name: Synchronize WebApp version
+
+on:
+  workflow_dispatch:
+    inputs:
+      production_tag:
+        description: 'Stable WebApp Production tag to synchronize, for example v1.1.0'
+        required: true
+        type: string
+      confirm:
+        description: 'I understand this updates package-version bookkeeping only'
+        required: true
+        default: false
+        type: boolean
+
+concurrency:
+  group: webapp-version-synchronization
+  cancel-in-progress: false
+  queue: max
+
+permissions: {}
+
+jobs:
+  synchronize:
+    name: Synchronize stable package version
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - name: Require explicit confirmation
+        env:
+          CONFIRM_SYNCHRONIZATION: ${{ inputs.confirm }}
+        run: |
+          set -euo pipefail
+
+          if [[ "${CONFIRM_SYNCHRONIZATION}" != 'true' ]]; then
+            echo 'confirm must be true to synchronize WebApp package versions.' >&2
+            exit 1
+          fi
+
+      - name: Checkout synchronization tooling and tags
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+          fetch-tags: true
+          ref: refs/heads/main
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install synchronization dependencies
+        env:
+          YARN_ENABLE_SCRIPTS: 'false'
+        run: ./bin/yarn install --immutable --mode=skip-build
+
+      - name: Validate annotated stable Production tag
+        id: production_tag
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PRODUCTION_TAG_NAME: ${{ inputs.production_tag }}
+        run: |
+          set -euo pipefail
+
+          node ./tools/release-cli/releaseMetadataCli.mts validate-stable-webapp-tag "${PRODUCTION_TAG_NAME}" > /dev/null
+          git_authentication_header="AUTHORIZATION: basic $(printf 'x-access-token:%s' "${GITHUB_TOKEN}" | base64 --wrap=0)"
+          GIT_CONFIG_COUNT=1 \
+          GIT_CONFIG_KEY_0='http.https://github.com/.extraheader' \
+          GIT_CONFIG_VALUE_0="${git_authentication_header}" \
+            git fetch origin "refs/tags/${PRODUCTION_TAG_NAME}:refs/tags/${PRODUCTION_TAG_NAME}"
+          unset git_authentication_header
+
+          if [[ "$(git cat-file -t "refs/tags/${PRODUCTION_TAG_NAME}")" != 'tag' ]]; then
+            echo "Stable WebApp Production tag must be annotated: ${PRODUCTION_TAG_NAME}" >&2
+            exit 1
+          fi
+
+          echo "production_tag_name=${PRODUCTION_TAG_NAME}" >> "$GITHUB_OUTPUT"
+
+      - name: Synchronize package versions
+        env:
+          OTTO_THE_BOT_GH_TOKEN: ${{ secrets.OTTO_THE_BOT_GH_TOKEN }}
+          PRODUCTION_TAG_NAME: ${{ steps.production_tag.outputs.production_tag_name }}
+        run: |
+          set -euo pipefail
+
+          synchronization_output="$(node ./tools/release-cli/webappVersionSynchronization.mts synchronize "${PRODUCTION_TAG_NAME}")"
+          synchronized_version="$(jq --raw-output '.version' <<< "${synchronization_output}")"
+          pull_request_url="$(jq --raw-output '.pull_request_url' <<< "${synchronization_output}")"
+
+          {
+            echo '## WebApp package synchronization'
+            echo
+            echo "- Production tag: ${PRODUCTION_TAG_NAME}"
+            echo "- Synchronized version: ${synchronized_version}"
+            echo "- Pull request: ${pull_request_url}"
+          } >> "$GITHUB_STEP_SUMMARY"

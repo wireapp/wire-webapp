@@ -1,6 +1,5 @@
 import {isError} from '@sindresorhus/is';
-import {Maybe, Result, task} from 'true-myth';
-import type {Task} from 'true-myth';
+import {Maybe, Result, Task, task} from 'true-myth';
 
 import {executePreviewNextBetaCommand} from './previewNextBetaCommand.ts';
 import type {
@@ -20,7 +19,7 @@ const mergeBaseCommit = 'c'.repeat(40);
 const firstMainCommit = 'd'.repeat(40);
 const secondMainCommit = 'e'.repeat(40);
 const thirdMainCommit = 'f'.repeat(40);
-const latestBetaTag = '2026-07-27.1-beta.1';
+const latestBetaTag = 'v1.1.0-beta.1';
 const githubToken = 'github-token';
 
 const commandEnvironment: NodeJS.ProcessEnv = {
@@ -122,28 +121,28 @@ function createFakeGitHubClient(fakeGitHubClientOptions: FakeGitHubClientOptions
   return {
     state,
     githubClient: {
-      async listPullRequestsForCommit(options): Promise<Result<readonly PullRequestRecord[], Error>> {
+      listPullRequestsForCommit(options): Task<readonly PullRequestRecord[], Error> {
         state.listedCommits.push(options.commitSha);
         const rejectedMessage = Maybe.of(fakeGitHubClientOptions.rejectedMessageByCommit?.get(options.commitSha));
         if (rejectedMessage.isJust) {
-          throw new Error(rejectedMessage.value);
+          return Task.reject(new Error(rejectedMessage.value));
         }
 
         const failureMessage = Maybe.of(fakeGitHubClientOptions.failureMessageByCommit?.get(options.commitSha));
         if (failureMessage.isJust) {
-          return Result.err(new Error(failureMessage.value));
+          return Task.reject(new Error(failureMessage.value));
         }
 
-        return Result.ok(fakeGitHubClientOptions.pullRequestsByCommit?.get(options.commitSha) ?? []);
+        return Task.resolve(fakeGitHubClientOptions.pullRequestsByCommit?.get(options.commitSha) ?? []);
       },
-      async listIssueComments(): Promise<Result<readonly IssueCommentRecord[], Error>> {
-        throw new Error('Preview attempted to list issue comments');
+      listIssueComments(): Task<readonly IssueCommentRecord[], Error> {
+        return Task.reject(new Error('Preview attempted to list issue comments'));
       },
-      async createIssueComment(): Promise<Result<IssueCommentRecord, Error>> {
-        throw new Error('Preview attempted to create an issue comment');
+      createIssueComment(): Task<IssueCommentRecord, Error> {
+        return Task.reject(new Error('Preview attempted to create an issue comment'));
       },
-      async updateIssueComment(): Promise<Result<IssueCommentRecord, Error>> {
-        throw new Error('Preview attempted to update an issue comment');
+      updateIssueComment(): Task<IssueCommentRecord, Error> {
+        return Task.reject(new Error('Preview attempted to update an issue comment'));
       },
     },
   };
@@ -218,9 +217,8 @@ async function runCommand(runCommandOptions: RunCommandOptions): Promise<Command
   const options: ExecutePreviewNextBetaCommandOptions = {
     targetMainCommit,
     environment: commandEnvironment,
-    dependencies,
   };
-  const result = await executePreviewNextBetaCommand(options);
+  const result = await executePreviewNextBetaCommand(options, dependencies);
 
   return {result, historyPlannerState: historyPlannerFixture.state, writerState};
 }
@@ -256,9 +254,7 @@ describe('executePreviewNextBetaCommand', () => {
 
     expect(commandRun.result.exitCode).toBe(0);
     expect(githubClientFixture.state.listedCommits).toEqual([]);
-    expect(commandRun.result.summary).toContain(
-      'The preview is unavailable because no new-format Beta tag exists yet.',
-    );
+    expect(commandRun.result.summary).toContain('The preview is unavailable because no SemVer Beta tag exists yet.');
   });
 
   it('does not discover pull requests when history planning fails', async () => {
@@ -284,12 +280,12 @@ describe('executePreviewNextBetaCommand', () => {
           firstMainCommit,
           [
             createPullRequest({number: 22052, title: 'Add next Beta change preview [WPB-26469]'}),
-            createPullRequest({number: 22040, baseBranch: 'release/2026-07-27'}),
+            createPullRequest({number: 22040, baseBranch: 'release/1.1.0'}),
             createPullRequest({number: 22041, merged: false}),
           ],
         ],
         [secondMainCommit, [createPullRequest({number: 22052, title: 'A duplicate title that must be ignored'})]],
-        [thirdMainCommit, [createPullRequest({number: 22051, baseBranch: 'release/2026-07-27'})]],
+        [thirdMainCommit, [createPullRequest({number: 22051, baseBranch: 'release/1.1.0'})]],
       ]),
     });
 

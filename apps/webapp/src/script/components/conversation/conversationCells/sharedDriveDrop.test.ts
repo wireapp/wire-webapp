@@ -264,11 +264,7 @@ describe('getSharedDriveDropRejectionFeedback', () => {
     const file = new File(['content'], '.env');
 
     expect(
-      getSharedDriveDropRejectionFeedback(
-        {reason: 'invalidName', invalidFiles: [file]},
-        translateForTest,
-        maxFileSize,
-      ),
+      getSharedDriveDropRejectionFeedback({reason: 'invalidName', invalidFiles: [file]}, translateForTest, maxFileSize),
     ).toEqual({
       title: 'conversationFileUploadFailedHeading',
       message: 'cells.nodeName.invalidCharactersError',

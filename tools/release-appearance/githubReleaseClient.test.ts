@@ -22,7 +22,7 @@ import assert from 'node:assert';
 import {Maybe} from 'true-myth';
 
 import {createGitHubReleaseClient} from './githubReleaseClient.ts';
-import type {HttpRequest, HttpRequestFailure} from './httpClient.ts';
+import type {HttpRequest, HttpRequestFailure} from '../release-github/githubApi.ts';
 
 type FakeHttpClientOptions = {
   readonly responseForRequest: (request: HttpRequest) => unknown;
@@ -126,7 +126,7 @@ describe('GitHub Release client', () => {
   });
 
   it('finds an existing draft GitHub Release in the releases collection', async () => {
-    const productionTagName = '2026-08-28.1-production';
+    const productionTagName = 'v1.1.0';
     const existingRelease = createReleaseResponse(productionTagName, true);
     const fakeHttpClient = createFakeHttpClient({
       responseForRequest() {
@@ -151,7 +151,7 @@ describe('GitHub Release client', () => {
   });
 
   it('finds an existing published GitHub Release in the releases collection', async () => {
-    const productionTagName = '2026-08-28.1-production';
+    const productionTagName = 'v1.1.0';
     const existingRelease = createReleaseResponse(productionTagName, false);
     const fakeHttpClient = createFakeHttpClient({
       responseForRequest() {
@@ -173,7 +173,7 @@ describe('GitHub Release client', () => {
   });
 
   it('finds a matching release on a later page and stops fetching after the match', async () => {
-    const productionTagName = '2026-08-28.1-production';
+    const productionTagName = 'v1.1.0';
     const firstPage = Array.from({length: 100}, (_, releaseIndex) => {
       return createReleaseResponse(`release-${releaseIndex + 1}`, false);
     });
@@ -224,7 +224,7 @@ describe('GitHub Release client', () => {
     });
     const githubReleaseClient = createClient(fakeHttpClient.httpClient);
 
-    const actualResult = await githubReleaseClient.findReleaseByTag({tagName: '2026-08-28.1-production'});
+    const actualResult = await githubReleaseClient.findReleaseByTag({tagName: 'v1.1.0'});
 
     assert(actualResult.isOk);
     expect(actualResult.value.isNothing).toBe(true);
@@ -248,8 +248,8 @@ describe('GitHub Release client', () => {
     const githubReleaseClient = createClient(fakeHttpClient.httpClient);
 
     const actualResult = await githubReleaseClient.generateReleaseNotes({
-      productionTagName: '2026-08-28.1-production',
-      precedingProductionTagName: '2026-08-07.1-production',
+      productionTagName: 'v1.1.0',
+      precedingProductionTagName: 'v1.0.0',
     });
 
     assert(actualResult.isOk);
@@ -258,14 +258,14 @@ describe('GitHub Release client', () => {
     assert(request.isJust);
     expect(request.value.json).toEqual(
       Maybe.just({
-        tag_name: '2026-08-28.1-production',
-        previous_tag_name: '2026-08-07.1-production',
+        tag_name: 'v1.1.0',
+        previous_tag_name: 'v1.0.0',
       }),
     );
   });
 
   it('passes the supplied generated body to draft release creation', async () => {
-    const productionTagName = '2026-08-28.1-production';
+    const productionTagName = 'v1.1.0';
     const generatedBody = '## Changes\n\n- Generated change';
     const fakeHttpClient = createFakeHttpClient({
       responseForRequest() {
@@ -295,12 +295,12 @@ describe('GitHub Release client', () => {
   it('rejects malformed GitHub Release collection responses at the API boundary', async () => {
     const fakeHttpClient = createFakeHttpClient({
       responseForRequest() {
-        return [{tag_name: '2026-08-28.1-production', draft: true}];
+        return [{tag_name: 'v1.1.0', draft: true}];
       },
     });
     const githubReleaseClient = createClient(fakeHttpClient.httpClient);
 
-    const actualResult = await githubReleaseClient.findReleaseByTag({tagName: '2026-08-28.1-production'});
+    const actualResult = await githubReleaseClient.findReleaseByTag({tagName: 'v1.1.0'});
 
     assert(actualResult.isErr);
     expect(actualResult.error.message).toBe('Malformed GitHub Release collection response');
@@ -315,8 +315,8 @@ describe('GitHub Release client', () => {
     const githubReleaseClient = createClient(fakeHttpClient.httpClient);
 
     const actualResult = await githubReleaseClient.generateReleaseNotes({
-      productionTagName: '2026-08-28.1-production',
-      precedingProductionTagName: '2026-08-07.1-production',
+      productionTagName: 'v1.1.0',
+      precedingProductionTagName: 'v1.0.0',
     });
 
     assert(actualResult.isErr);
@@ -339,9 +339,9 @@ describe('GitHub Release client', () => {
       }).httpClient,
     );
 
-    const apiFailureResult = await apiFailureClient.findReleaseByTag({tagName: '2026-08-28.1-production'});
+    const apiFailureResult = await apiFailureClient.findReleaseByTag({tagName: 'v1.1.0'});
     const transportFailureResult = await transportFailureClient.findReleaseByTag({
-      tagName: '2026-08-28.1-production',
+      tagName: 'v1.1.0',
     });
 
     assert(apiFailureResult.isErr);

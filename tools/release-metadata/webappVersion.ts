@@ -21,12 +21,6 @@ import {isNonEmptyArray, isNull, isPlainObject, isString, isUndefined} from '@si
 import semver from 'semver';
 import {Result} from 'true-myth';
 
-import {createProductionTagName} from './releaseMetadata.ts';
-import type {ProductionTagName, ReleaseIdentifier} from './releaseMetadata.ts';
-
-const productionTagCaptureIndex = 2;
-const webappVersionCaptureIndex = 3;
-
 declare const webAppVersionBrand: unique symbol;
 
 export type WebAppVersion = string & {readonly [webAppVersionBrand]: 'WebAppVersion'};
@@ -53,25 +47,7 @@ export type UpdateWebAppPackageDocumentsOptions = {
   readonly targetVersion: string;
 };
 
-export type CreateWebAppVersionSynchronizationMarkerOptions = {
-  readonly releaseIdentifier: string;
-  readonly productionTagName: string;
-  readonly webAppVersion: string;
-};
-
-export type WebAppVersionSynchronizationMarker = {
-  readonly releaseIdentifier: ReleaseIdentifier;
-  readonly productionTagName: ProductionTagName;
-  readonly webAppVersion: WebAppVersion;
-};
-
 type ValidatedWebAppPackageDocuments = WebAppPackageDocuments & WebAppPackageVersions;
-
-const releaseIdentifierPattern = String.raw`\d{4}-\d{2}-\d{2}\.[1-9]\d*`;
-const synchronizationMarkerPattern = new RegExp(
-  String.raw`<!-- wire-webapp-version-sync release=(${releaseIdentifierPattern}) production-tag=(${releaseIdentifierPattern}-production) version=((?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)) -->`,
-);
-const synchronizationMarkerSearchPattern = new RegExp(synchronizationMarkerPattern.source, 'g');
 
 function validateWebAppPackageDocument(
   packageDocument: unknown,
@@ -161,40 +137,6 @@ function validateWebAppPackageDocuments(
   });
 }
 
-function createWebAppVersionSynchronizationMarkerValue(
-  options: CreateWebAppVersionSynchronizationMarkerOptions,
-): Result<WebAppVersionSynchronizationMarker, Error> {
-  const productionTagResult = createProductionTagName(options.releaseIdentifier);
-
-  if (productionTagResult.isErr) {
-    return Result.err(new Error(productionTagResult.error.message));
-  }
-
-  const {value: validatedProductionTagName} = productionTagResult;
-
-  if (validatedProductionTagName !== options.productionTagName) {
-    return Result.err(
-      new Error(
-        `Production tag ${options.productionTagName} does not match release identifier ${options.releaseIdentifier}`,
-      ),
-    );
-  }
-
-  const webAppVersionResult = validateWebAppVersion(options.webAppVersion);
-
-  if (webAppVersionResult.isErr) {
-    return Result.err(new Error(webAppVersionResult.error.message));
-  }
-
-  const {value: validatedWebAppVersion} = webAppVersionResult;
-
-  return Result.ok({
-    releaseIdentifier: options.releaseIdentifier as ReleaseIdentifier,
-    productionTagName: validatedProductionTagName,
-    webAppVersion: validatedWebAppVersion,
-  });
-}
-
 function isInvalidStableWebAppVersion(version: string): boolean {
   const parsedVersion = semver.parse(version, {loose: false});
 
@@ -254,22 +196,6 @@ export function compareWebAppVersions(
   return Result.ok(semver.compare(leftVersionResult.value, rightVersionResult.value));
 }
 
-export function resolveNextWebAppVersion(currentVersion: string): Result<WebAppVersion, Error> {
-  const currentVersionResult = validateWebAppVersion(currentVersion);
-
-  if (currentVersionResult.isErr) {
-    return Result.err(new Error(currentVersionResult.error.message));
-  }
-
-  const {value: validatedCurrentVersion} = currentVersionResult;
-
-  if (semver.major(validatedCurrentVersion) === 0) {
-    return Result.ok('1.0.0' as WebAppVersion);
-  }
-
-  return incrementWebAppVersion(validatedCurrentVersion, 'patch');
-}
-
 export function validateMatchingWebAppPackageVersions(
   rootPackageDocument: unknown,
   webAppPackageDocument: unknown,
@@ -314,65 +240,5 @@ export function updateWebAppPackageDocuments(
   return Result.ok({
     rootPackageDocument: {...rootPackageDocument, version: targetVersion},
     webAppPackageDocument: {...webAppPackageDocument, version: targetVersion},
-  });
-}
-
-export function createWebAppVersionSynchronizationMarker(
-  options: CreateWebAppVersionSynchronizationMarkerOptions,
-): Result<string, Error> {
-  const markerValueResult = createWebAppVersionSynchronizationMarkerValue(options);
-
-  if (markerValueResult.isErr) {
-    return Result.err(new Error(markerValueResult.error.message));
-  }
-
-  const {value: marker} = markerValueResult;
-
-  return Result.ok(
-    `<!-- wire-webapp-version-sync release=${marker.releaseIdentifier} production-tag=${marker.productionTagName} version=${marker.webAppVersion} -->`,
-  );
-}
-
-export function parseWebAppVersionSynchronizationMarker(
-  value: unknown,
-): Result<WebAppVersionSynchronizationMarker, Error> {
-  if (!isString(value)) {
-    return Result.err(new Error('WebApp version synchronization marker must be a string'));
-  }
-
-  const markerMatches = value.match(synchronizationMarkerSearchPattern);
-
-  if (!isNonEmptyArray(markerMatches)) {
-    return Result.err(new Error('Malformed WebApp version synchronization marker'));
-  }
-
-  if (markerMatches.length > 1) {
-    return Result.err(new Error('WebApp version synchronization marker must occur exactly once'));
-  }
-
-  const firstMarker = markerMatches.at(0);
-
-  if (!isString(firstMarker)) {
-    return Result.err(new Error('Malformed WebApp version synchronization marker'));
-  }
-
-  const markerMatch = synchronizationMarkerPattern.exec(firstMarker);
-
-  if (isNull(markerMatch)) {
-    return Result.err(new Error('Malformed WebApp version synchronization marker'));
-  }
-
-  const releaseIdentifier = markerMatch[1];
-  const productionTagName = markerMatch[productionTagCaptureIndex];
-  const webAppVersion = markerMatch[webappVersionCaptureIndex];
-
-  if (!isString(releaseIdentifier) || !isString(productionTagName) || !isString(webAppVersion)) {
-    return Result.err(new Error('Malformed WebApp version synchronization marker'));
-  }
-
-  return createWebAppVersionSynchronizationMarkerValue({
-    releaseIdentifier,
-    productionTagName,
-    webAppVersion,
   });
 }

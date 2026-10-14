@@ -43,6 +43,7 @@ const webAppVersionSynchronizationEntrypointPath = join(
   process.cwd(),
   'tools/release-cli/webappVersionSynchronization.mts',
 );
+const webAppReleaseEntrypointPath = join(process.cwd(), 'tools/release-cli/webappRelease.mts');
 const ensureProductionGitHubReleaseEntrypointPath = join(
   process.cwd(),
   'tools/release-cli/ensureProductionGitHubRelease.mts',
@@ -77,16 +78,30 @@ describe('release metadata CLI entrypoint', () => {
     expect(actualResult.standardOutput).toContain('Usage: releaseMetadataCli');
   });
 
-  it('preserves the variadic existing-tag contract', () => {
+  it('allocates the next contiguous SemVer Beta tag', () => {
     const actualResult = runNativeCommand(releaseMetadataEntrypointPath, [
       'next-beta-tag',
-      '2026-06-19.1',
-      '2026-06-19.1-beta.1',
-      '2026-06-19.1-beta.2',
+      '1.1.0',
+      'v1.1.0-beta.1',
+      'v1.1.0-beta.2',
+      '2026-06-19.1-beta.4',
     ]);
 
     expect(actualResult.exitCode).toBe(0);
-    expect(actualResult.standardOutput).toBe('2026-06-19.1-beta.3\n');
+    expect(actualResult.standardOutput).toBe('v1.1.0-beta.3\n');
+  });
+
+  it('validates stable WebApp tags without accepting historical Production tags', () => {
+    const stableTagResult = runNativeCommand(releaseMetadataEntrypointPath, ['validate-stable-webapp-tag', 'v1.1.0']);
+    const historicalTagResult = runNativeCommand(releaseMetadataEntrypointPath, [
+      'validate-stable-webapp-tag',
+      '2026-10-06.1-production',
+    ]);
+
+    expect(stableTagResult.exitCode).toBe(0);
+    expect(stableTagResult.standardOutput).toBe('1.1.0\n');
+    expect(historicalTagResult.exitCode).toBe(1);
+    expect(historicalTagResult.standardError).toContain('Invalid stable WebApp tag name');
   });
 
   it('preserves the variadic maintenance-tag contract', () => {
@@ -108,13 +123,6 @@ describe('release metadata CLI entrypoint', () => {
     expect(actualResult.exitCode).toBe(1);
     expect(actualResult.standardError).toContain("error: unknown command 'unknown-command'");
   });
-
-  it('rejects missing required positional arguments with a non-zero exit code', () => {
-    const actualResult = runNativeCommand(releaseMetadataEntrypointPath, ['release-branch']);
-
-    expect(actualResult.exitCode).toBe(1);
-    expect(actualResult.standardError).toContain("error: missing required argument 'release-identifier'");
-  });
 });
 
 describe('ensure Production GitHub Release CLI entrypoint', () => {
@@ -132,6 +140,15 @@ describe('ensure Production GitHub Release CLI entrypoint', () => {
     expect(actualResult.standardError).toContain("error: missing required argument 'production-tag'");
   });
 });
+describe('WebApp release preparation CLI entrypoint', () => {
+  it('documents the start and continue operations in help output', () => {
+    const actualResult = runNativeCommand(webAppReleaseEntrypointPath, ['--help']);
+
+    expect(actualResult.exitCode).toBe(0);
+    expect(actualResult.standardOutput).toContain('Usage: webappRelease [options] <operation> [target-main-sha]');
+    expect(actualResult.standardOutput).toContain('start or continue');
+  });
+});
 
 describe('WebApp version synchronization CLI entrypoint', () => {
   it('writes help to standard output without requiring runtime credentials', () => {
@@ -142,10 +159,17 @@ describe('WebApp version synchronization CLI entrypoint', () => {
   });
 
   it('rejects a missing synchronization command without contacting GitHub', () => {
-    const actualResult = runNativeCommand(webAppVersionSynchronizationEntrypointPath, ['inspect']);
+    const actualResult = runNativeCommand(webAppVersionSynchronizationEntrypointPath, ['synchronize']);
 
     expect(actualResult.exitCode).toBe(1);
-    expect(actualResult.standardError).toContain("error: missing required argument 'release-identifier'");
+    expect(actualResult.standardError).toContain("error: missing required argument 'production-tag'");
+  });
+
+  it('exposes the single synchronization command in help output', () => {
+    const actualResult = runNativeCommand(webAppVersionSynchronizationEntrypointPath, ['--help']);
+
+    expect(actualResult.exitCode).toBe(0);
+    expect(actualResult.standardOutput).toContain('synchronize');
   });
 });
 
@@ -271,26 +295,26 @@ describe('release appearance CLI entrypoint', () => {
   it('supports every release-appearance workflow command shape', () => {
     const betaWriteResult = runNativeCommand(releaseAppearanceEntrypointPath, [
       'beta',
-      '2026-06-19.1-beta.1',
+      'v1.1.0-beta.1',
       'a'.repeat(40),
     ]);
     const betaDryRunResult = runNativeCommand(releaseAppearanceEntrypointPath, [
       'beta',
-      '2026-06-19.1-beta.1',
+      'v1.1.0-beta.1',
       'a'.repeat(40),
       '--dry-run',
     ]);
     const productionWriteResult = runNativeCommand(releaseAppearanceEntrypointPath, [
       'production',
-      '2026-06-19.1-production',
+      'v1.1.0',
       'a'.repeat(40),
-      '2026-06-19.1-beta.1',
+      'v1.1.0-beta.1',
     ]);
     const productionDryRunResult = runNativeCommand(releaseAppearanceEntrypointPath, [
       'production',
-      '2026-06-19.1-production',
+      'v1.1.0',
       'a'.repeat(40),
-      '2026-06-19.1-beta.1',
+      'v1.1.0-beta.1',
       '--dry-run',
     ]);
 
@@ -305,7 +329,7 @@ describe('release appearance CLI entrypoint', () => {
   });
 
   it('preserves domain validation for malformed complete commit SHAs', () => {
-    const actualResult = runNativeCommand(releaseAppearanceEntrypointPath, ['beta', '2026-06-19.1-beta.1', 'abcdef0']);
+    const actualResult = runNativeCommand(releaseAppearanceEntrypointPath, ['beta', 'v1.1.0-beta.1', 'abcdef0']);
 
     expect(actualResult.exitCode).toBe(1);
     expect(actualResult.standardError).toContain('Release commit SHA must contain exactly 40 hexadecimal characters');

@@ -3,6 +3,16 @@ ls:
     .ts: camelCase
   tools/build-artifact/verifyPublicProductionBundle.test.ts:
     .test.ts: camelCase
+  tools/release-github:
+    .ts: camelCase
+    .test.ts: camelCase
+  tools/release-metadata:
+    .ts: camelCase
+    .test.ts: camelCase
+  tools/release-cli:
+    .ts: camelCase
+    .test.ts: camelCase
+    .mts: camelCase
   libraries/config/src:
     .dir: camelCase
     .ts: camelCase

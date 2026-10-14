@@ -17,54 +17,25 @@
  *
  */
 
-import {isObject, isString} from '@sindresorhus/is';
 import ky, {isHTTPError} from 'ky';
 import type {KyInstance, Options} from 'ky';
 import {Maybe} from 'true-myth';
-import {match} from 'ts-pattern';
 import {z} from 'zod';
 
+import {formatHttpRequestFailure, isHttpRequestFailure} from './githubApi.ts';
+import type {
+  GitHubResponseFailureDetails,
+  HttpClient,
+  HttpMethod,
+  HttpRequest,
+  HttpRequestFailure,
+} from './githubApi.ts';
 import {createGitHubMutationPacer, githubMutationMinimumIntervalMilliseconds} from './githubMutationPacer.ts';
 import {calculateGitHubRateLimitRetryDecision, maximumGitHubRateLimitRetries} from './githubRateLimitPolicy.ts';
 import type {GitHubRateLimitResponseMetadata} from './githubRateLimitPolicy.ts';
 
-export type HttpMethod = 'get' | 'post' | 'patch';
-
-export type HttpRequest = {
-  readonly method: HttpMethod;
-  readonly url: URL;
-  readonly headers: Readonly<Record<string, string>>;
-  readonly json: Maybe<NonNullable<unknown>>;
-};
-
-export type HttpClient = {
-  readonly requestJson: (request: HttpRequest) => Promise<unknown>;
-};
-
-export type GitHubResponseFailureDetails = {
-  readonly statusCode: number;
-  readonly githubMessage: Maybe<string>;
-  readonly documentationUrl: Maybe<string>;
-  readonly githubRequestId: Maybe<string>;
-  readonly acceptedGithubPermissions: Maybe<string>;
-  readonly retryAfter: Maybe<string>;
-  readonly rateLimitRemaining: Maybe<string>;
-  readonly rateLimitReset: Maybe<string>;
-};
-
-export type HttpRequestFailure =
-  | {
-      readonly kind: 'http-response-failure';
-      readonly method: HttpMethod;
-      readonly url: URL;
-      readonly response: GitHubResponseFailureDetails;
-    }
-  | {
-      readonly kind: 'http-transport-failure';
-      readonly method: HttpMethod;
-      readonly url: URL;
-      readonly transportMessage: string;
-    };
+export {formatHttpRequestFailure, isHttpRequestFailure};
+export type {GitHubResponseFailureDetails, HttpClient, HttpMethod, HttpRequest, HttpRequestFailure};
 
 export type CreateKyHttpClientOptions = {
   readonly kyInstance: KyInstance;
@@ -200,91 +171,6 @@ function createHttpRequestFailure(
     url: request.url,
     transportMessage: 'No HTTP response was received',
   };
-}
-
-export function isHttpRequestFailure(error: unknown): error is HttpRequestFailure {
-  if (!isObject(error) || !('kind' in error) || !isString(error.kind)) {
-    return false;
-  }
-
-  return error.kind === 'http-response-failure' || error.kind === 'http-transport-failure';
-}
-
-export function formatHttpRequestFailure(failure: HttpRequestFailure): string {
-  return match(failure)
-    .with({kind: 'http-transport-failure'}, transportFailure => {
-      return [
-        'GitHub API request failed',
-        `Request: ${transportFailure.method.toUpperCase()} ${transportFailure.url.toString()}`,
-        transportFailure.transportMessage,
-      ].join('; ');
-    })
-    .with({kind: 'http-response-failure'}, responseFailure => {
-      const diagnosticParts = [
-        'GitHub API request failed',
-        `HTTP status: ${responseFailure.response.statusCode}`,
-        `Request: ${responseFailure.method.toUpperCase()} ${responseFailure.url.toString()}`,
-        ...responseFailure.response.githubMessage.match({
-          Just(githubMessage) {
-            return [`GitHub message: ${githubMessage}`];
-          },
-          Nothing() {
-            return [];
-          },
-        }),
-        ...responseFailure.response.documentationUrl.match({
-          Just(documentationUrl) {
-            return [`Documentation URL: ${documentationUrl}`];
-          },
-          Nothing() {
-            return [];
-          },
-        }),
-        ...responseFailure.response.githubRequestId.match({
-          Just(githubRequestId) {
-            return [`GitHub request ID: ${githubRequestId}`];
-          },
-          Nothing() {
-            return [];
-          },
-        }),
-        ...responseFailure.response.acceptedGithubPermissions.match({
-          Just(acceptedGithubPermissions) {
-            return [`Accepted GitHub permissions: ${acceptedGithubPermissions}`];
-          },
-          Nothing() {
-            return [];
-          },
-        }),
-        ...responseFailure.response.retryAfter.match({
-          Just(retryAfter) {
-            return [`Retry-After: ${retryAfter}`];
-          },
-          Nothing() {
-            return [];
-          },
-        }),
-        ...responseFailure.response.rateLimitRemaining.match({
-          Just(rateLimitRemaining) {
-            return [`Rate-limit remaining: ${rateLimitRemaining}`];
-          },
-          Nothing() {
-            return [];
-          },
-        }),
-        ...responseFailure.response.rateLimitReset.match({
-          Just(rateLimitReset) {
-            return [`Rate-limit reset: ${rateLimitReset}`];
-          },
-          Nothing() {
-            return [];
-          },
-        }),
-      ];
-
-      return diagnosticParts.join('; ');
-    })
-    .exhaustive();
 }
 
 function createGitHubRateLimitResponseMetadata(

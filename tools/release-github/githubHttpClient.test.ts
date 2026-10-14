@@ -23,8 +23,8 @@ import ky from 'ky';
 import type {KyInstance} from 'ky';
 import {Maybe} from 'true-myth';
 
-import {createKyHttpClient, formatHttpRequestFailure, isHttpRequestFailure} from './httpClient.ts';
-import type {HttpClient, HttpMethod, HttpRequest, HttpRequestFailure} from './httpClient.ts';
+import {createKyHttpClient, formatHttpRequestFailure, isHttpRequestFailure} from './githubHttpClient.ts';
+import type {HttpClient, HttpMethod, HttpRequest, HttpRequestFailure} from './githubHttpClient.ts';
 
 function createCommentRequest(): HttpRequest {
   return {

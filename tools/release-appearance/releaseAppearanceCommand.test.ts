@@ -21,10 +21,12 @@ import assert from 'node:assert';
 import {spawn} from 'node:child_process';
 
 import {createFactory} from '@enormora/objectory';
-import {Maybe, Result} from 'true-myth';
+import {Maybe, Task, task} from 'true-myth';
 
 import {renderPersistentComment} from './releaseAppearance.ts';
 import {
+  createBetaCommand,
+  createProductionCommand,
   executeReleaseAppearanceCommand,
   prepareCommentOperation,
   readCommandEnvironment,
@@ -44,7 +46,7 @@ import type {
   PullRequestRecord,
   UpdateIssueCommentOptions,
 } from './githubClient.ts';
-import type {HttpRequest} from './httpClient.ts';
+import type {HttpRequest} from '../release-github/githubApi.ts';
 import {createNoOpReleaseAppearanceProgressReporter} from './releaseAppearanceProgress.ts';
 import type {ReleaseAppearanceClock} from './releaseAppearanceProgress.ts';
 import type {ExecuteGitCommand} from './releaseHistory.ts';
@@ -52,11 +54,43 @@ import type {ExecuteGitCommand} from './releaseHistory.ts';
 const releaseCommit = 'a'.repeat(40);
 const previousProductionCommit = 'b'.repeat(40);
 const betaCommit = 'c'.repeat(40);
-const previousProductionTag = '2026-01-01.1-production';
-const betaTag = '2026-01-02.1-beta.1';
-const betaTwoTag = '2026-01-02.1-beta.2';
+const previousProductionTag = 'v1.0.0';
+const betaTag = 'v1.1.0-beta.1';
+const betaTwoTag = 'v1.1.0-beta.2';
 const betaTwoCommit = 'f'.repeat(40);
-const productionTag = '2026-01-02.1-production';
+const productionTag = 'v1.1.0';
+
+describe('release appearance command identities', () => {
+  it('accepts SemVer Beta and Production command arguments', () => {
+    const betaCommandResult = createBetaCommand({
+      betaTag: 'v1.1.0-beta.1',
+      releaseCommit,
+      executionMode: 'dry-run',
+    });
+    const productionCommandResult = createProductionCommand({
+      productionTag: 'v1.1.0',
+      promotedBetaTag: 'v1.1.0-beta.1',
+      releaseCommit,
+      executionMode: 'dry-run',
+    });
+
+    assert(betaCommandResult.isOk);
+    assert(productionCommandResult.isOk);
+    expect(betaCommandResult.value).toEqual({
+      stage: 'beta',
+      releaseTag: 'v1.1.0-beta.1',
+      releaseCommit,
+      executionMode: 'dry-run',
+    });
+    expect(productionCommandResult.value).toEqual({
+      stage: 'production',
+      releaseTag: 'v1.1.0',
+      promotedBetaTag: 'v1.1.0-beta.1',
+      releaseCommit,
+      executionMode: 'dry-run',
+    });
+  });
+});
 
 type CreateBetaTestCommandOptions = {
   readonly releaseTag: string;
@@ -98,12 +132,10 @@ type FakeGitHubClientOptions = {
   readonly pullRequestFailuresByCommit?: ReadonlyMap<string, string>;
   readonly listPullRequestsForCommit?: (
     options: ListPullRequestsForCommitOptions,
-  ) => Promise<Result<readonly PullRequestRecord[], Error>>;
+  ) => Task<readonly PullRequestRecord[], Error>;
   readonly commentsByPullRequest?: ReadonlyMap<number, readonly IssueCommentRecord[]>;
   readonly commentListFailuresByPullRequest?: ReadonlyMap<number, string>;
-  readonly listIssueComments?: (
-    options: ListIssueCommentsOptions,
-  ) => Promise<Result<readonly IssueCommentRecord[], Error>>;
+  readonly listIssueComments?: (options: ListIssueCommentsOptions) => Task<readonly IssueCommentRecord[], Error>;
   readonly createFailuresByPullRequest?: ReadonlyMap<number, string>;
   readonly updateFailuresByCommentId?: ReadonlyMap<number, string>;
 };
@@ -168,14 +200,6 @@ const issueCommentRecordFactory = createFactory<IssueCommentRecord>(
   },
 );
 
-function createSuccess<valueType>(value: valueType): Result<valueType, Error> {
-  return Result.ok<valueType, Error>(value);
-}
-
-function createFailure<valueType>(message: string): Result<valueType, Error> {
-  return Result.err<valueType, Error>(new Error(message));
-}
-
 function createDeferredValue<valueType>(): DeferredValue<valueType> {
   const {promise, resolve} = Promise.withResolvers<valueType>();
   return {
@@ -209,6 +233,17 @@ function createPullRequest(number: number): PullRequestRecord {
   };
 }
 
+function promiseToTask<valueType>(operation: () => Promise<valueType>): Task<valueType, Error> {
+  return task.tryOrElse(
+    (error: unknown): Error => {
+      return error instanceof Error ? error : new Error('Fake GitHub client operation failed');
+    },
+    (): Promise<valueType> => {
+      return operation();
+    },
+  );
+}
+
 function createFakeGitHubClient(fakeGitHubClientOptions: FakeGitHubClientOptions = {}): FakeGitHubClientFixture {
   const state: FakeGitHubClientState = {
     pullRequestCommits: [],
@@ -220,7 +255,7 @@ function createFakeGitHubClient(fakeGitHubClientOptions: FakeGitHubClientOptions
   return {
     state,
     githubClient: {
-      async listPullRequestsForCommit(options): Promise<Result<readonly PullRequestRecord[], Error>> {
+      listPullRequestsForCommit(options): Task<readonly PullRequestRecord[], Error> {
         state.pullRequestCommits.push(options.commitSha);
         const pullRequestHandler = fakeGitHubClientOptions.listPullRequestsForCommit;
         if (pullRequestHandler !== undefined) {
@@ -228,13 +263,13 @@ function createFakeGitHubClient(fakeGitHubClientOptions: FakeGitHubClientOptions
         }
         const failureMessage = Maybe.of(fakeGitHubClientOptions.pullRequestFailuresByCommit?.get(options.commitSha));
         if (failureMessage.isJust) {
-          return createFailure(failureMessage.value);
+          return Task.reject(new Error(failureMessage.value));
         }
-        return createSuccess(
+        return Task.resolve(
           Maybe.of(fakeGitHubClientOptions.pullRequestsByCommit?.get(options.commitSha)).unwrapOr([]),
         );
       },
-      async listIssueComments(options): Promise<Result<readonly IssueCommentRecord[], Error>> {
+      listIssueComments(options): Task<readonly IssueCommentRecord[], Error> {
         state.commentPullRequests.push(options.pullRequestNumber);
         const commentHandler = fakeGitHubClientOptions.listIssueComments;
         if (commentHandler !== undefined) {
@@ -244,31 +279,31 @@ function createFakeGitHubClient(fakeGitHubClientOptions: FakeGitHubClientOptions
           fakeGitHubClientOptions.commentListFailuresByPullRequest?.get(options.pullRequestNumber),
         );
         if (failureMessage.isJust) {
-          return createFailure(failureMessage.value);
+          return Task.reject(new Error(failureMessage.value));
         }
-        return createSuccess(
+        return Task.resolve(
           Maybe.of(fakeGitHubClientOptions.commentsByPullRequest?.get(options.pullRequestNumber)).unwrapOr([]),
         );
       },
-      async createIssueComment(options): Promise<Result<IssueCommentRecord, Error>> {
+      createIssueComment(options): Task<IssueCommentRecord, Error> {
         const failureMessage = Maybe.of(
           fakeGitHubClientOptions.createFailuresByPullRequest?.get(options.pullRequestNumber),
         );
         if (failureMessage.isJust) {
-          return createFailure(failureMessage.value);
+          return Task.reject(new Error(failureMessage.value));
         }
         state.createdComments.push(options);
-        return createSuccess(
+        return Task.resolve(
           issueCommentRecordFactory.build({id: options.pullRequestNumber, body: options.commentBody}),
         );
       },
-      async updateIssueComment(options): Promise<Result<IssueCommentRecord, Error>> {
+      updateIssueComment(options): Task<IssueCommentRecord, Error> {
         const failureMessage = Maybe.of(fakeGitHubClientOptions.updateFailuresByCommentId?.get(options.commentId));
         if (failureMessage.isJust) {
-          return createFailure(failureMessage.value);
+          return Task.reject(new Error(failureMessage.value));
         }
         state.updatedComments.push(options);
-        return createSuccess(issueCommentRecordFactory.build({id: options.commentId, body: options.commentBody}));
+        return Task.resolve(issueCommentRecordFactory.build({id: options.commentId, body: options.commentBody}));
       },
     },
   };
@@ -281,7 +316,7 @@ function createFakeGitCommand(fakeGitCommandOptions: FakeGitCommandOptions = {})
 
   return async function executeFakeGitCommand(commandArguments: readonly string[]): Promise<string> {
     const command = commandArguments.join(' ');
-    if (command === 'tag --list -- *-production') {
+    if (command === 'tag --list -- v*') {
       return bootstrap ? '' : `${previousProductionTag}\n`;
     }
     if (command === 'tag --list -- *-beta.*') {
@@ -382,19 +417,19 @@ async function runCommand(runCommandOptions: RunCommandOptions): Promise<{
   const options: ExecuteReleaseAppearanceCommandOptions = {
     command: runCommandOptions.command,
     environment: commandEnvironment,
-    dependencies: createDependencies({
-      executeGitCommand: runCommandOptions.executeGitCommand,
-      failureMessages,
-      githubClient: runCommandOptions.githubClient,
-      informationMessages,
-      informationWriteAttempts,
-      informationWriteFailure: runCommandOptions.informationWriteFailure,
-      now: runCommandOptions.now,
-      summaries,
-      summaryWriteFailure: runCommandOptions.summaryWriteFailure,
-    }),
   };
-  const result = await executeReleaseAppearanceCommand(options);
+  const dependencies = createDependencies({
+    executeGitCommand: runCommandOptions.executeGitCommand,
+    failureMessages,
+    githubClient: runCommandOptions.githubClient,
+    informationMessages,
+    informationWriteAttempts,
+    informationWriteFailure: runCommandOptions.informationWriteFailure,
+    now: runCommandOptions.now,
+    summaries,
+    summaryWriteFailure: runCommandOptions.summaryWriteFailure,
+  });
+  const result = await executeReleaseAppearanceCommand(options, dependencies);
   return {result, failureMessages, informationMessages, informationWriteAttempts, summaries};
 }
 
@@ -414,7 +449,7 @@ describe('readCommandEnvironment', () => {
 });
 
 describe('prepareCommentOperation', () => {
-  it('prepares an update while preserving cross-release first appearances', () => {
+  it('preserves immutable historical first appearances when preparing a comment update', () => {
     const existingComment = renderPersistentComment({
       beta: Maybe.just('2026-08-01.1-beta.1'),
       production: Maybe.just('2026-08-08.1-production'),
@@ -435,21 +470,23 @@ describe('executeReleaseAppearanceCommand', () => {
     const commitShas = Array.from({length: 253}, (_, commitIndex) => {
       return `commit-${commitIndex}`;
     });
-    const deferredLookups = new Map<string, DeferredValue<Result<readonly PullRequestRecord[], Error>>>();
+    const deferredLookups = new Map<string, DeferredValue<readonly PullRequestRecord[]>>();
     const resolvedCommitShas = new Set<string>();
     let activeLookups = 0;
     let maximumActiveLookups = 0;
     const fakeGitHubClient = createFakeGitHubClient({
-      listPullRequestsForCommit: async options => {
+      listPullRequestsForCommit: options => {
         activeLookups += 1;
         maximumActiveLookups = Math.max(maximumActiveLookups, activeLookups);
-        const deferredLookup = createDeferredValue<Result<readonly PullRequestRecord[], Error>>();
+        const deferredLookup = createDeferredValue<readonly PullRequestRecord[]>();
         deferredLookups.set(options.commitSha, deferredLookup);
-        try {
-          return await deferredLookup.promise;
-        } finally {
-          activeLookups -= 1;
-        }
+        return promiseToTask(async () => {
+          try {
+            return await deferredLookup.promise;
+          } finally {
+            activeLookups -= 1;
+          }
+        });
       },
     });
     const commandPromise = runCommand({
@@ -465,7 +502,7 @@ describe('executeReleaseAppearanceCommand', () => {
           continue;
         }
         resolvedCommitShas.add(commitSha);
-        deferredLookup.resolve(createSuccess([]));
+        deferredLookup.resolve([]);
       }
     };
     resolveAvailableLookups();
@@ -508,17 +545,18 @@ describe('executeReleaseAppearanceCommand', () => {
         return [commitSha, createPullRequest(commitIndex + 1)] as const;
       }),
     );
-    const deferredLookups = new Map<string, DeferredValue<Result<readonly PullRequestRecord[], Error>>>();
+    const deferredLookups = new Map<string, DeferredValue<readonly PullRequestRecord[]>>();
     const resolvedCommitShas = new Set<string>();
     const fakeGitHubClient = createFakeGitHubClient({
-      listPullRequestsForCommit: async options => {
-        const deferredLookup = createDeferredValue<Result<readonly PullRequestRecord[], Error>>();
+      listPullRequestsForCommit: options => {
+        const deferredLookup = createDeferredValue<readonly PullRequestRecord[]>();
         deferredLookups.set(options.commitSha, deferredLookup);
-        const result = await deferredLookup.promise;
-        return result;
+        return promiseToTask(() => {
+          return deferredLookup.promise;
+        });
       },
-      listIssueComments: async () => {
-        return createSuccess([]);
+      listIssueComments: () => {
+        return Task.resolve([]);
       },
     });
     const commandPromise = runCommand({
@@ -537,7 +575,7 @@ describe('executeReleaseAppearanceCommand', () => {
         resolvedCommitShas.add(commitSha);
         const pullRequest = Maybe.of(pullRequestByCommit.get(commitSha));
         assert(pullRequest.isJust);
-        deferredLookup.resolve(createSuccess([pullRequest.value]));
+        deferredLookup.resolve([pullRequest.value]);
       }
     };
     while (resolvedCommitShas.size < commitShas.length) {
@@ -557,22 +595,24 @@ describe('executeReleaseAppearanceCommand', () => {
     const pullRequests = Array.from({length: 80}, (_, pullRequestIndex) => {
       return createPullRequest(pullRequestIndex + 1);
     });
-    const deferredReads = new Map<number, DeferredValue<Result<readonly IssueCommentRecord[], Error>>>();
+    const deferredReads = new Map<number, DeferredValue<readonly IssueCommentRecord[]>>();
     const resolvedPullRequestNumbers = new Set<number>();
     let activeReads = 0;
     let maximumActiveReads = 0;
     const fakeGitHubClient = createFakeGitHubClient({
       pullRequestsByCommit: new Map([[betaCommit, pullRequests]]),
-      listIssueComments: async options => {
+      listIssueComments: options => {
         activeReads += 1;
         maximumActiveReads = Math.max(maximumActiveReads, activeReads);
-        const deferredRead = createDeferredValue<Result<readonly IssueCommentRecord[], Error>>();
+        const deferredRead = createDeferredValue<readonly IssueCommentRecord[]>();
         deferredReads.set(options.pullRequestNumber, deferredRead);
-        try {
-          return await deferredRead.promise;
-        } finally {
-          activeReads -= 1;
-        }
+        return promiseToTask(async () => {
+          try {
+            return await deferredRead.promise;
+          } finally {
+            activeReads -= 1;
+          }
+        });
       },
     });
     const commandPromise = runCommand({
@@ -588,11 +628,15 @@ describe('executeReleaseAppearanceCommand', () => {
           continue;
         }
         resolvedPullRequestNumbers.add(pullRequestNumber);
-        deferredRead.resolve(createSuccess([]));
+        deferredRead.resolve([]);
       }
     };
     while (resolvedPullRequestNumbers.size < pullRequests.length) {
-      await Promise.resolve();
+      const nextBatchSize = Math.min(pullRequests.length, resolvedPullRequestNumbers.size + 4);
+      while (deferredReads.size < nextBatchSize) {
+        await Promise.resolve();
+      }
+
       resolveAvailableReads();
     }
 
@@ -624,7 +668,7 @@ describe('executeReleaseAppearanceCommand', () => {
     const summary = Maybe.of(commandRun.summaries[0]);
     assert(createdComment.isJust);
     assert(summary.isJust);
-    expect(createdComment.value.commentBody).toMatch(/2026-01-02\.1-beta\.1/);
+    expect(createdComment.value.commentBody).toMatch(/v1\.1\.0-beta\.1/);
     expect(summary.value).toMatch(/Pull requests discovered: 2/);
     expect(summary.value).not.toContain('#8, #9');
     expect(commandRun.informationMessages).toEqual([]);
@@ -1193,7 +1237,7 @@ describe('executeReleaseAppearanceCommand', () => {
     const summary = Maybe.of(commandRun.summaries[0]);
     assert(summary.isJust);
     expect(summary.value).toMatch(/Bootstrap: yes/);
-    expect(summary.value).toContain('No preceding new-format Production release exists.');
+    expect(summary.value).toContain('No preceding stable WebApp Production release exists.');
     expect(summary.value).toContain('No GitHub comments would be created or updated.');
     expect(summary.value).not.toContain('### Planned changes');
     expect(summary.value).not.toContain('### Failures');
@@ -1205,7 +1249,7 @@ describe('executeReleaseAppearanceCommand', () => {
         `Release tag: ${betaTag}`,
         `Release commit: ${releaseCommit}`,
         'Bootstrap: yes',
-        'No preceding new-format Production release exists.',
+        'No preceding stable WebApp Production release exists.',
         'No commit range was inspected.',
         'No pull request comment operations were planned.',
         'No GitHub comments were created or updated.',

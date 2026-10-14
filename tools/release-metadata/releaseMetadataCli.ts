@@ -22,15 +22,17 @@ import {match} from 'ts-pattern';
 import {
   createMaintenanceBranchName,
   createNextMaintenanceTagName,
-  createNextBetaTagName,
-  createProductionTagName,
-  createReleaseBranchName,
-  extractReleaseIdentifierFromBranchName,
-  resolveWebappBuildVersion,
   validateMaintenanceSource,
   validateMaintenanceTagName,
   validateProductionTagName,
 } from './releaseMetadata.ts';
+import {resolveWebappBuildVersion, validateWebAppProductionTagName} from './webappProductionRelease.ts';
+import {
+  createNextBetaWebAppTagName,
+  parseStableWebAppTagName,
+  validateBetaWebAppTagVersion,
+} from './webappReleaseIdentity.ts';
+import {validateWebAppVersion} from './webappVersion.ts';
 
 export type ReleaseMetadataCliDependencies = {
   readonly writeError: (message: string) => void;
@@ -39,17 +41,14 @@ export type ReleaseMetadataCliDependencies = {
 
 export type ReleaseMetadataCommand =
   | {
-      readonly kind: 'release-identifier-from-branch';
-      readonly releaseBranch: string;
-    }
-  | {
-      readonly kind: 'release-branch';
-      readonly releaseIdentifier: string;
-    }
-  | {
       readonly kind: 'next-beta-tag';
-      readonly releaseIdentifier: string;
+      readonly version: string;
       readonly existingTagNames: readonly string[];
+    }
+  | {
+      readonly kind: 'validate-webapp-beta-tag';
+      readonly betaTag: string;
+      readonly releaseVersion: string;
     }
   | {
       readonly kind: 'maintenance-branch';
@@ -70,12 +69,16 @@ export type ReleaseMetadataCommand =
       readonly sourceProductionTag: string;
     }
   | {
-      readonly kind: 'production-tag';
-      readonly releaseIdentifier: string;
-    }
-  | {
       readonly kind: 'validate-production-tag';
       readonly productionTag: string;
+    }
+  | {
+      readonly kind: 'validate-webapp-production-tag';
+      readonly productionTag: string;
+    }
+  | {
+      readonly kind: 'validate-stable-webapp-tag';
+      readonly stableTagName: string;
     }
   | {
       readonly kind: 'webapp-build-version';
@@ -86,16 +89,17 @@ export type ReleaseMetadataCommand =
 
 function writeResult(
   result:
-    | ReturnType<typeof extractReleaseIdentifierFromBranchName>
-    | ReturnType<typeof createReleaseBranchName>
-    | ReturnType<typeof createNextBetaTagName>
+    | ReturnType<typeof createNextBetaWebAppTagName>
+    | ReturnType<typeof validateBetaWebAppTagVersion>
+    | ReturnType<typeof validateWebAppVersion>
     | ReturnType<typeof createMaintenanceBranchName>
     | ReturnType<typeof createNextMaintenanceTagName>
-    | ReturnType<typeof createProductionTagName>
     | ReturnType<typeof resolveWebappBuildVersion>
     | ReturnType<typeof validateMaintenanceSource>
     | ReturnType<typeof validateMaintenanceTagName>
-    | ReturnType<typeof validateProductionTagName>,
+    | ReturnType<typeof validateProductionTagName>
+    | ReturnType<typeof validateWebAppProductionTagName>
+    | ReturnType<typeof parseStableWebAppTagName>,
   dependencies: ReleaseMetadataCliDependencies,
 ): number {
   if (result.isErr) {
@@ -108,19 +112,24 @@ function writeResult(
 }
 
 export function executeReleaseMetadataCommand(
-  command: ReleaseMetadataCommand,
+  options: ReleaseMetadataCommand,
   dependencies: ReleaseMetadataCliDependencies,
 ): number {
-  return match(command)
-    .with({kind: 'release-identifier-from-branch'}, releaseIdentifierCommand => {
-      return writeResult(extractReleaseIdentifierFromBranchName(releaseIdentifierCommand.releaseBranch), dependencies);
-    })
-    .with({kind: 'release-branch'}, releaseBranchCommand => {
-      return writeResult(createReleaseBranchName(releaseBranchCommand.releaseIdentifier), dependencies);
-    })
+  return match(options)
     .with({kind: 'next-beta-tag'}, nextBetaTagCommand => {
+      const versionResult = validateWebAppVersion(nextBetaTagCommand.version);
+      if (versionResult.isErr) {
+        return writeResult(versionResult, dependencies);
+      }
+
       return writeResult(
-        createNextBetaTagName(nextBetaTagCommand.releaseIdentifier, nextBetaTagCommand.existingTagNames),
+        createNextBetaWebAppTagName(versionResult.value, nextBetaTagCommand.existingTagNames),
+        dependencies,
+      );
+    })
+    .with({kind: 'validate-webapp-beta-tag'}, betaTagCommand => {
+      return writeResult(
+        validateBetaWebAppTagVersion({tagName: betaTagCommand.betaTag, expectedVersion: betaTagCommand.releaseVersion}),
         dependencies,
       );
     })
@@ -148,11 +157,17 @@ export function executeReleaseMetadataCommand(
         dependencies,
       );
     })
-    .with({kind: 'production-tag'}, productionTagCommand => {
-      return writeResult(createProductionTagName(productionTagCommand.releaseIdentifier), dependencies);
-    })
     .with({kind: 'validate-production-tag'}, validateProductionTagCommand => {
       return writeResult(validateProductionTagName(validateProductionTagCommand.productionTag), dependencies);
+    })
+    .with({kind: 'validate-webapp-production-tag'}, validateWebAppProductionTagCommand => {
+      return writeResult(
+        validateWebAppProductionTagName(validateWebAppProductionTagCommand.productionTag),
+        dependencies,
+      );
+    })
+    .with({kind: 'validate-stable-webapp-tag'}, validateStableWebAppTagCommand => {
+      return writeResult(parseStableWebAppTagName(validateStableWebAppTagCommand.stableTagName), dependencies);
     })
     .with({kind: 'webapp-build-version'}, webappBuildVersionCommand => {
       return writeResult(

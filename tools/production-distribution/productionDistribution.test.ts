@@ -65,6 +65,27 @@ function createValidLegacyArtifactMetadata(): Record<string, string> {
   };
 }
 
+function createValidSemVerDistributionManifest(artifactVersion = '1.1.0'): Record<string, unknown> {
+  return {
+    productionTag: null,
+    releaseIdentifier: '1.1.0',
+    releaseCommitSha: expectedReleaseCommitSha,
+    artifactVersion,
+    cloudArtifactChecksum: 'a'.repeat(64),
+    sourceRunId: '12345',
+    sourceRunAttempt: '1',
+  };
+}
+
+function createValidSemVerArtifactMetadata(version = '1.1.0'): Record<string, string> {
+  return {
+    version,
+    assetVersion: `${version}-1234567`,
+    commit: expectedReleaseCommitSha,
+    builtAt: '2026-10-06T06:18:03.123Z',
+  };
+}
+
 function getUnrelatedWireBuildsState(buildJson: Record<string, unknown>): string {
   return execFileSync('jq', ['-S', '-c', 'del(.version, .helmCharts.webapp)'], {
     encoding: 'utf8',
@@ -73,6 +94,71 @@ function getUnrelatedWireBuildsState(buildJson: Record<string, unknown>): string
 }
 
 describe('production distribution decisions', () => {
+  it('accepts the bootstrap legacy Production tag and matching artifact version', () => {
+    const bootstrapReleaseVersion = '2026-10-06.1';
+    const actualManifest = validateProductionDistributionManifest({
+      artifactMetadata: {
+        ...createValidArtifactMetadata(),
+        version: bootstrapReleaseVersion,
+        assetVersion: `${bootstrapReleaseVersion}-1234567`,
+      },
+      manifest: {
+        ...createValidDistributionManifest(),
+        releaseIdentifier: bootstrapReleaseVersion,
+        artifactVersion: bootstrapReleaseVersion,
+      },
+      productionTag: `${bootstrapReleaseVersion}-production`,
+      productionTagCommitSha: expectedReleaseCommitSha,
+      sourceRunId: '12345',
+    });
+
+    assert(actualManifest.isOk);
+    expect(actualManifest.value.artifactVersion).toBe(bootstrapReleaseVersion);
+  });
+
+  it('accepts a SemVer Production tag when the artifact version matches', () => {
+    const actualManifest = validateProductionDistributionManifest({
+      artifactMetadata: createValidSemVerArtifactMetadata(),
+      manifest: createValidSemVerDistributionManifest(),
+      productionTag: 'v1.1.0',
+      productionTagCommitSha: expectedReleaseCommitSha,
+      expectedCommitSha: expectedReleaseCommitSha,
+      sourceRunId: '12345',
+    });
+
+    assert(actualManifest.isOk);
+    expect(actualManifest.value.releaseVersion).toBe('1.1.0');
+    expect(actualManifest.value.artifactVersion).toBe('1.1.0');
+  });
+
+  it('rejects a SemVer Production tag when the artifact version is a different WebApp version', () => {
+    const mismatchingVersion = '1.1.1';
+    const actualValidation = validateProductionDistributionManifest({
+      artifactMetadata: createValidSemVerArtifactMetadata(mismatchingVersion),
+      manifest: createValidSemVerDistributionManifest(mismatchingVersion),
+      productionTag: 'v1.1.0',
+      productionTagCommitSha: expectedReleaseCommitSha,
+      sourceRunId: '12345',
+    });
+
+    assert(actualValidation.isErr);
+    expect(actualValidation.error.message).toBe('Distribution artifact version does not match the release version');
+  });
+
+  it('rejects a legacy date artifact version for a SemVer Production tag', () => {
+    const legacyArtifactVersion = '2026.10.06.06.18.03';
+    const actualValidation = validateProductionDistributionManifest({
+      artifactMetadata: createValidLegacyArtifactMetadata(),
+      manifest: createValidSemVerDistributionManifest(legacyArtifactVersion),
+      productionTag: 'v1.1.0',
+      productionTagCommitSha: expectedReleaseCommitSha,
+      sourceRunId: '12345',
+    });
+
+    assert(actualValidation.isErr);
+    expect(actualValidation.error.message).toBe('Distribution artifact metadata is invalid');
+  });
+
   it('validates the Production identity and distribution manifest together', () => {
     const actualManifest = validateProductionDistributionManifest({
       artifactMetadata: createValidArtifactMetadata(),
@@ -89,7 +175,7 @@ describe('production distribution decisions', () => {
     expect(actualManifest.value.cloudArtifactChecksum).toHaveLength(64);
   });
 
-  it('rejects a new artifact whose version differs from the release identifier', () => {
+  it('rejects a new artifact whose version differs from the release version', () => {
     const mismatchingVersion = '2026-07-15.2';
     const artifactMetadata = {
       ...createValidArtifactMetadata(),
@@ -108,7 +194,7 @@ describe('production distribution decisions', () => {
 
     assert(actualValidation.isErr);
 
-    expect(actualValidation.error.message).toBe('Distribution artifact version does not match the release identifier');
+    expect(actualValidation.error.message).toBe('Distribution artifact version does not match the release version');
   });
 
   it('rejects a new artifact whose commit differs from the Production tag', () => {

@@ -20,6 +20,9 @@
 import {Maybe, Result} from 'true-myth';
 import {z} from 'zod';
 
+import {parseBetaWebAppTagName, parseStableWebAppTagName} from '../release-metadata/webappReleaseIdentity.ts';
+import type {WebAppVersion} from '../release-metadata/webappVersion.ts';
+
 export type SerializedReleaseAppearanceState = {
   readonly beta?: string;
   readonly production?: string;
@@ -30,28 +33,28 @@ export type ReleaseAppearanceState = {
   readonly production: Maybe<string>;
 };
 
+export type ReleaseAppearanceIdentity = {
+  readonly version: WebAppVersion;
+};
+
 export type BetaCandidate = {
-  readonly releaseIdentifier: string;
+  readonly release: ReleaseAppearanceIdentity;
   readonly candidateNumber: bigint;
 };
 
 export type ProductionTag = {
-  readonly releaseIdentifier: string;
+  readonly release: ReleaseAppearanceIdentity;
 };
 
-const releaseIdentifierPattern = String.raw`\d{4}-\d{2}-\d{2}\.[1-9]\d*`;
-const betaCandidateTagPattern = new RegExp(String.raw`^(${releaseIdentifierPattern})-beta\.([1-9]\d*)$`);
-const productionTagPattern = new RegExp(`^(${releaseIdentifierPattern})-production$`);
 const markerPrefixPattern = /<!--\s*wire-webapp-release-appearance:/g;
 const markerHeaderPattern = /<!--\s*wire-webapp-release-appearance:v([^\s\r\n]+)\s*\n/g;
-const releaseIdentifierCaptureIndex = 1;
-const betaCandidateNumberCaptureIndex = 2;
 const markerVersionCaptureIndex = 1;
 
 const releaseAppearanceMarkerStateSchema = z
   .object({
-    beta: z.string().regex(betaCandidateTagPattern).optional(),
-    production: z.string().regex(productionTagPattern).optional(),
+    // Existing comments can contain immutable historical tags; rendering preserves them as display-only values.
+    beta: z.string().min(1).optional(),
+    production: z.string().min(1).optional(),
   })
   .strict();
 
@@ -68,35 +71,24 @@ function readRegexCapture(regexMatch: RegExpExecArray, captureIndex: number): Ma
 }
 
 export function parseBetaCandidateTag(betaCandidateTag: string): Result<BetaCandidate, Error> {
-  const betaCandidateTagMatch = Maybe.of(betaCandidateTagPattern.exec(betaCandidateTag));
-  if (betaCandidateTagMatch.isNothing) {
-    return createFailure(`Invalid Beta candidate tag: ${betaCandidateTag}`);
-  }
-
-  const releaseIdentifier = readRegexCapture(betaCandidateTagMatch.value, releaseIdentifierCaptureIndex);
-  const candidateNumber = readRegexCapture(betaCandidateTagMatch.value, betaCandidateNumberCaptureIndex);
-  if (releaseIdentifier.isNothing || candidateNumber.isNothing) {
-    return createFailure(`Invalid Beta candidate tag: ${betaCandidateTag}`);
+  const betaCandidateTagResult = parseBetaWebAppTagName(betaCandidateTag);
+  if (betaCandidateTagResult.isErr) {
+    return createFailure(`Invalid Beta candidate tag: ${betaCandidateTag}`, betaCandidateTagResult.error);
   }
 
   return createSuccess({
-    releaseIdentifier: releaseIdentifier.value,
-    candidateNumber: BigInt(candidateNumber.value),
+    release: {version: betaCandidateTagResult.value.version},
+    candidateNumber: BigInt(betaCandidateTagResult.value.candidateNumber),
   });
 }
 
 export function parseProductionTag(productionTag: string): Result<ProductionTag, Error> {
-  const productionTagMatch = Maybe.of(productionTagPattern.exec(productionTag));
-  if (productionTagMatch.isNothing) {
-    return createFailure(`Invalid Production tag: ${productionTag}`);
+  const versionResult = parseStableWebAppTagName(productionTag);
+  if (versionResult.isErr) {
+    return createFailure(`Invalid Production tag: ${productionTag}`, versionResult.error);
   }
 
-  const releaseIdentifier = readRegexCapture(productionTagMatch.value, releaseIdentifierCaptureIndex);
-  if (releaseIdentifier.isNothing) {
-    return createFailure(`Invalid Production tag: ${productionTag}`);
-  }
-
-  return createSuccess({releaseIdentifier: releaseIdentifier.value});
+  return createSuccess({release: {version: versionResult.value}});
 }
 
 export function compareBetaCandidates(leftCandidate: BetaCandidate, rightCandidate: BetaCandidate): number {
@@ -111,17 +103,28 @@ export function compareBetaCandidates(leftCandidate: BetaCandidate, rightCandida
   return 0;
 }
 
-export function validateSameReleaseIdentifier(
-  betaCandidate: Pick<BetaCandidate, 'releaseIdentifier'>,
-  productionTag: Pick<ProductionTag, 'releaseIdentifier'>,
-): Result<string, Error> {
-  if (betaCandidate.releaseIdentifier !== productionTag.releaseIdentifier) {
+export function validateSameReleaseVersion(
+  betaCandidate: Pick<BetaCandidate, 'release'>,
+  productionTag: Pick<ProductionTag, 'release'>,
+): Result<ReleaseAppearanceIdentity, Error> {
+  if (haveSameReleaseAppearanceIdentity(betaCandidate.release, productionTag.release) === false) {
     return createFailure(
-      `Beta candidate and Production tag belong to different releases: ${betaCandidate.releaseIdentifier} and ${productionTag.releaseIdentifier}`,
+      `Beta candidate and Production tag belong to different releases: ${describeReleaseAppearanceIdentity(betaCandidate.release)} and ${describeReleaseAppearanceIdentity(productionTag.release)}`,
     );
   }
 
-  return createSuccess(betaCandidate.releaseIdentifier);
+  return createSuccess(betaCandidate.release);
+}
+
+export function haveSameReleaseAppearanceIdentity(
+  leftRelease: ReleaseAppearanceIdentity,
+  rightRelease: ReleaseAppearanceIdentity,
+): boolean {
+  return leftRelease.version === rightRelease.version;
+}
+
+function describeReleaseAppearanceIdentity(releaseIdentity: ReleaseAppearanceIdentity): string {
+  return `v${releaseIdentity.version}`;
 }
 
 export function deserializeReleaseAppearanceState(

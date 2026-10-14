@@ -17,14 +17,24 @@
  *
  */
 
-import {isError} from '@sindresorhus/is';
-import {Maybe, maybe, Result, Task, task} from 'true-myth';
+import {Maybe, maybe, Result, Task, Unit, task} from 'true-myth';
+import {match} from 'ts-pattern';
 import {z} from 'zod';
 
+import {pullRequestReleaseImpactLabels} from './pullRequestReleaseImpact.ts';
 import type {WebAppVersionSynchronizationPullRequest} from './webappVersionSynchronization.ts';
 
-import {formatHttpRequestFailure, isHttpRequestFailure} from '../release-appearance/httpClient.ts';
-import type {HttpClient, HttpMethod, HttpRequest} from '../release-appearance/httpClient.ts';
+import {
+  createGitHubApiRoot,
+  createGitHubHeaders,
+  createGitHubHttpRequest,
+  createGitHubPageUrl,
+  encodeGitHubRepositoryName,
+  formatGitHubRequestError,
+  githubApiPageSize,
+  redactGitHubSecret,
+} from '../release-github/githubApi.ts';
+import type {HttpClient, HttpRequest} from '../release-github/githubApi.ts';
 
 export type CreateWebAppVersionSynchronizationPullRequestOptions = {
   readonly title: string;
@@ -37,6 +47,7 @@ export type WebAppVersionSynchronizationGitHubClient = {
   readonly createPullRequest: (
     options: CreateWebAppVersionSynchronizationPullRequestOptions,
   ) => Task<WebAppVersionSynchronizationPullRequest, Error>;
+  readonly ensurePullRequestSemVerNoneLabel: (pullRequestNumber: number) => Task<Unit, Error>;
 };
 
 export type CreateWebAppVersionSynchronizationGitHubClientOptions = {
@@ -82,11 +93,23 @@ type GetPullRequestOptions = {
   readonly githubToken: string;
 };
 
-const githubPageSize = 100;
+type GetPullRequestLabelsOptions = GetPullRequestOptions;
+
+type EnsurePullRequestSemVerNoneLabelOptions = GetPullRequestLabelsOptions & {
+  readonly writeHeaders: Readonly<Record<string, string>>;
+};
+
+type AddPullRequestLabelOptions = GetPullRequestOptions & {
+  readonly pullRequestNumber: number;
+};
+
+type PullRequestReleaseImpactLabelState =
+  | {readonly kind: 'missing'}
+  | {readonly kind: 'correct'}
+  | {readonly kind: 'conflict'; readonly conflictingLabels: readonly string[]};
+
 const githubSearchResultLimit = 1000;
-const githubApiVersion = '2022-11-28';
-const synchronizationMarkerSearchTerm = 'wire-webapp-version-sync';
-const synchronizationPullRequestTitleSearchTerm = 'Update WebApp version to';
+const synchronizationMarkerSearchTerm = 'wire-webapp-version-sync:semver';
 
 const githubPullRequestResponseSchema = z.object({
   number: z.number().int().positive(),
@@ -120,54 +143,13 @@ const githubPullRequestSearchResponseSchema = z.object({
   items: z.array(githubPullRequestSearchItemResponseSchema),
 });
 
-function errorMessage(error: unknown): string {
-  if (isHttpRequestFailure(error)) {
-    return formatHttpRequestFailure(error);
-  }
+const githubIssueLabelsResponseSchema = z.array(
+  z.object({
+    name: z.string().min(1),
+  }),
+);
 
-  if (isError(error)) {
-    return error.message;
-  }
-
-  return 'Unknown failure';
-}
-
-function redactSecret(message: string, secret: string): string {
-  if (secret.length === 0) {
-    return message;
-  }
-
-  return message.replaceAll(secret, '[REDACTED]');
-}
-
-function createGitHubApiRoot(githubApiUrl: URL): URL {
-  const githubApiUrlString = githubApiUrl.toString();
-
-  return new URL(githubApiUrlString.endsWith('/') ? githubApiUrlString : `${githubApiUrlString}/`);
-}
-
-function encodeRepositoryName(githubRepository: string): string {
-  return githubRepository
-    .split('/')
-    .map(repositoryPart => {
-      return encodeURIComponent(repositoryPart);
-    })
-    .join('/');
-}
-
-function createGitHubHeaders(githubToken: string, includesBody: boolean): Readonly<Record<string, string>> {
-  const headers: Record<string, string> = {
-    Accept: 'application/vnd.github+json',
-    Authorization: `Bearer ${githubToken}`,
-    'X-GitHub-Api-Version': githubApiVersion,
-  };
-
-  if (includesBody) {
-    headers['Content-Type'] = 'application/json';
-  }
-
-  return headers;
-}
+const supportedPullRequestReleaseImpactLabels: readonly string[] = Object.values(pullRequestReleaseImpactLabels);
 
 function createSearchPageUrl(endpoint: URL, searchQuery: string, page: number): URL {
   const pageUrl = new URL(endpoint);
@@ -175,23 +157,12 @@ function createSearchPageUrl(endpoint: URL, searchQuery: string, page: number): 
   pageUrl.searchParams.set('q', searchQuery);
   pageUrl.searchParams.set('sort', 'created');
   pageUrl.searchParams.set('order', 'asc');
-  pageUrl.searchParams.set('per_page', githubPageSize.toString());
-  pageUrl.searchParams.set('page', page.toString());
 
-  return pageUrl;
+  return createGitHubPageUrl({endpoint: pageUrl, page});
 }
 
 function createPullRequestDetailUrl(endpoint: URL, pullRequestNumber: number): URL {
   return new URL(`${pullRequestNumber}`, `${endpoint.toString()}/`);
-}
-
-function createHttpRequest(
-  method: HttpMethod,
-  url: URL,
-  headers: Readonly<Record<string, string>>,
-  json: Maybe<NonNullable<unknown>>,
-): HttpRequest {
-  return {method, url, headers, json};
 }
 
 function parsePullRequest(githubResponse: unknown): Result<WebAppVersionSynchronizationPullRequest, Error> {
@@ -237,7 +208,9 @@ function parsePullRequestSearchPage(githubResponse: unknown): Result<ParsedPullR
 function requestGitHubJson(options: RequestGitHubJsonOptions): Task<unknown, Error> {
   return task.tryOrElse(
     (error: unknown): Error => {
-      return new Error(`${options.failureMessage}: ${redactSecret(errorMessage(error), options.githubToken)}`, {
+      const message = formatGitHubRequestError({error, fallbackMessage: 'Unknown failure'});
+
+      return new Error(`${options.failureMessage}: ${redactGitHubSecret(message, options.githubToken)}`, {
         cause: error,
       });
     },
@@ -272,12 +245,12 @@ function searchPullRequestsPage(
   options: SearchPullRequestsPageOptions,
   page: number,
 ): Task<ParsedPullRequestSearchPage, Error> {
-  const request = createHttpRequest(
-    'get',
-    createSearchPageUrl(options.endpoint, options.searchQuery, page),
-    options.headers,
-    Maybe.nothing<NonNullable<unknown>>(),
-  );
+  const request = createGitHubHttpRequest({
+    method: 'get',
+    url: createSearchPageUrl(options.endpoint, options.searchQuery, page),
+    headers: options.headers,
+    json: Maybe.nothing<NonNullable<unknown>>(),
+  });
   return requestGitHubJson({
     httpClient: options.httpClient,
     request,
@@ -308,7 +281,7 @@ function searchPullRequestNumbers(
       return Task.resolve<readonly number[], Error>(pullRequestNumbers);
     }
 
-    if (parsedSearchPage.rawItemCount !== githubPageSize) {
+    if (parsedSearchPage.rawItemCount !== githubApiPageSize) {
       return Task.reject<readonly number[], Error>(
         new Error('GitHub pull request search pagination ended before all results were retrieved'),
       );
@@ -318,27 +291,16 @@ function searchPullRequestNumbers(
   });
 }
 
-function combinePullRequestNumbers(
-  bodySearchPullRequestNumbers: readonly number[],
-  titleSearchPullRequestNumbers: readonly number[],
-): readonly number[] {
-  return [...new Set([...bodySearchPullRequestNumbers, ...titleSearchPullRequestNumbers])].toSorted(
-    (firstPullRequestNumber, secondPullRequestNumber) => {
-      return firstPullRequestNumber - secondPullRequestNumber;
-    },
-  );
-}
-
 function getPullRequest(
   options: GetPullRequestOptions,
   pullRequestNumber: number,
 ): Task<WebAppVersionSynchronizationPullRequest, Error> {
-  const request = createHttpRequest(
-    'get',
-    createPullRequestDetailUrl(options.endpoint, pullRequestNumber),
-    options.headers,
-    Maybe.nothing<NonNullable<unknown>>(),
-  );
+  const request = createGitHubHttpRequest({
+    method: 'get',
+    url: createPullRequestDetailUrl(options.endpoint, pullRequestNumber),
+    headers: options.headers,
+    json: Maybe.nothing<NonNullable<unknown>>(),
+  });
 
   return requestGitHubJson({
     httpClient: options.httpClient,
@@ -346,6 +308,152 @@ function getPullRequest(
     failureMessage: `Unable to read GitHub pull request #${pullRequestNumber}`,
     githubToken: options.githubToken,
   }).andThen(parsePullRequest);
+}
+
+function createPullRequestLabelsUrl(endpoint: URL, pullRequestNumber: number): URL {
+  return new URL(`${pullRequestNumber}/labels`, `${endpoint.toString()}/`);
+}
+
+function parsePullRequestLabels(githubResponse: unknown): Result<readonly string[], Error> {
+  const validationResult = githubIssueLabelsResponseSchema.safeParse(githubResponse);
+
+  if (!validationResult.success) {
+    return Result.err(new Error('Malformed GitHub pull request labels response'));
+  }
+
+  return Result.ok(
+    validationResult.data.map(label => {
+      return label.name;
+    }),
+  );
+}
+
+function getPullRequestLabelsPage(
+  options: GetPullRequestLabelsOptions,
+  pullRequestNumber: number,
+  page: number,
+): Task<readonly string[], Error> {
+  const labelsUrl = createGitHubPageUrl({
+    endpoint: createPullRequestLabelsUrl(options.endpoint, pullRequestNumber),
+    page,
+  });
+  const request = createGitHubHttpRequest({
+    method: 'get',
+    url: labelsUrl,
+    headers: options.headers,
+    json: Maybe.nothing<NonNullable<unknown>>(),
+  });
+
+  return requestGitHubJson({
+    httpClient: options.httpClient,
+    request,
+    failureMessage: `Unable to read labels for GitHub pull request #${pullRequestNumber}`,
+    githubToken: options.githubToken,
+  }).andThen(parsePullRequestLabels);
+}
+
+function getAllPullRequestLabels(
+  options: GetPullRequestLabelsOptions,
+  pullRequestNumber: number,
+  page: number,
+  accumulatedLabels: readonly string[],
+): Task<readonly string[], Error> {
+  return getPullRequestLabelsPage(options, pullRequestNumber, page).andThen(pageLabels => {
+    const labels = [...accumulatedLabels, ...pageLabels];
+
+    if (pageLabels.length < githubApiPageSize) {
+      return Task.resolve(labels);
+    }
+
+    return getAllPullRequestLabels(options, pullRequestNumber, page + 1, labels);
+  });
+}
+
+function resolvePullRequestReleaseImpactLabelState(labels: readonly string[]): PullRequestReleaseImpactLabelState {
+  const releaseImpactLabels = labels.filter(label => {
+    return supportedPullRequestReleaseImpactLabels.includes(label);
+  });
+
+  return match(releaseImpactLabels)
+    .with([], () => {
+      return {kind: 'missing' as const};
+    })
+    .with([pullRequestReleaseImpactLabels.none], () => {
+      return {kind: 'correct' as const};
+    })
+    .otherwise(conflictingLabels => {
+      return {kind: 'conflict' as const, conflictingLabels};
+    });
+}
+
+function addPullRequestSemVerNoneLabel(options: AddPullRequestLabelOptions): Task<Unit, Error> {
+  const labelsUrl = createPullRequestLabelsUrl(options.endpoint, options.pullRequestNumber);
+  const request = createGitHubHttpRequest({
+    method: 'post',
+    url: labelsUrl,
+    headers: options.headers,
+    json: Maybe.just({labels: [pullRequestReleaseImpactLabels.none]}),
+  });
+
+  return requestGitHubJson({
+    httpClient: options.httpClient,
+    request,
+    failureMessage: `Unable to add ${pullRequestReleaseImpactLabels.none} to GitHub pull request #${options.pullRequestNumber}`,
+    githubToken: options.githubToken,
+  }).andThen(githubResponse => {
+    const labelsResult = parsePullRequestLabels(githubResponse);
+
+    if (labelsResult.isErr) {
+      return Result.err(labelsResult.error);
+    }
+
+    return match(resolvePullRequestReleaseImpactLabelState(labelsResult.value))
+      .with({kind: 'correct'}, () => {
+        return Result.ok(Unit);
+      })
+      .with({kind: 'missing'}, () => {
+        return Result.err(
+          new Error(
+            `GitHub did not apply ${pullRequestReleaseImpactLabels.none} to pull request #${options.pullRequestNumber}`,
+          ),
+        );
+      })
+      .with({kind: 'conflict'}, labelState => {
+        return Result.err(
+          new Error(
+            `GitHub applied conflicting release-impact labels to pull request #${options.pullRequestNumber}: ${labelState.conflictingLabels.join(', ')}`,
+          ),
+        );
+      })
+      .exhaustive();
+  });
+}
+
+function ensurePullRequestSemVerNoneLabel(
+  options: EnsurePullRequestSemVerNoneLabelOptions,
+  pullRequestNumber: number,
+): Task<Unit, Error> {
+  return getAllPullRequestLabels(options, pullRequestNumber, 1, []).andThen(labels => {
+    return match(resolvePullRequestReleaseImpactLabelState(labels))
+      .with({kind: 'correct'}, () => {
+        return Task.resolve(Unit);
+      })
+      .with({kind: 'conflict'}, labelState => {
+        return Task.reject(
+          new Error(
+            `GitHub pull request #${pullRequestNumber} has conflicting release-impact labels: ${labelState.conflictingLabels.join(', ')}`,
+          ),
+        );
+      })
+      .with({kind: 'missing'}, () => {
+        return addPullRequestSemVerNoneLabel({
+          ...options,
+          headers: options.writeHeaders,
+          pullRequestNumber,
+        });
+      })
+      .exhaustive();
+  });
 }
 
 function getPullRequests(
@@ -372,27 +480,19 @@ export function createWebAppVersionSynchronizationGitHubClient(
   options: CreateWebAppVersionSynchronizationGitHubClientOptions,
 ): WebAppVersionSynchronizationGitHubClient {
   const githubApiRoot = createGitHubApiRoot(options.githubApiUrl);
-  const encodedRepositoryName = encodeRepositoryName(options.githubRepository);
-  const readHeaders = createGitHubHeaders(options.githubToken, false);
-  const writeHeaders = createGitHubHeaders(options.githubToken, true);
+  const encodedRepositoryName = encodeGitHubRepositoryName(options.githubRepository);
+  const readHeaders = createGitHubHeaders({githubToken: options.githubToken, includesJsonBody: false});
+  const writeHeaders = createGitHubHeaders({githubToken: options.githubToken, includesJsonBody: true});
   const pullRequestsEndpoint = new URL(`repos/${encodedRepositoryName}/pulls`, githubApiRoot);
+  const issuesEndpoint = new URL(`repos/${encodedRepositoryName}/issues`, githubApiRoot);
   const pullRequestSearchEndpoint = new URL('search/issues', githubApiRoot);
   const synchronizationMarkerSearchQuery = `repo:${options.githubRepository} is:pr in:body "${synchronizationMarkerSearchTerm}"`;
-  const synchronizationTitleSearchQuery = `repo:${options.githubRepository} is:pr in:title "${synchronizationPullRequestTitleSearchTerm}"`;
 
   const synchronizationMarkerSearchOptions = {
     httpClient: options.httpClient,
     endpoint: pullRequestSearchEndpoint,
     headers: readHeaders,
     searchQuery: synchronizationMarkerSearchQuery,
-    githubToken: options.githubToken,
-  };
-
-  const synchronizationTitleSearchOptions = {
-    httpClient: options.httpClient,
-    endpoint: pullRequestSearchEndpoint,
-    headers: readHeaders,
-    searchQuery: synchronizationTitleSearchQuery,
     githubToken: options.githubToken,
   };
 
@@ -405,35 +505,37 @@ export function createWebAppVersionSynchronizationGitHubClient(
 
   return {
     listPullRequests() {
-      return searchPullRequestNumbers(synchronizationMarkerSearchOptions, 1, []).andThen(
-        synchronizationMarkerPullRequestNumbers => {
-          return searchPullRequestNumbers(synchronizationTitleSearchOptions, 1, []).andThen(
-            synchronizationTitlePullRequestNumbers => {
-              const pullRequestNumbers = combinePullRequestNumbers(
-                synchronizationMarkerPullRequestNumbers,
-                synchronizationTitlePullRequestNumbers,
-              );
-
-              return getPullRequests(getPullRequestOptions, pullRequestNumbers, []);
-            },
-          );
-        },
-      );
+      return searchPullRequestNumbers(synchronizationMarkerSearchOptions, 1, []).andThen(pullRequestNumbers => {
+        return getPullRequests(getPullRequestOptions, pullRequestNumbers, []);
+      });
     },
 
     createPullRequest(createPullRequestOptions) {
-      const request = createHttpRequest(
-        'post',
-        pullRequestsEndpoint,
-        writeHeaders,
-        Maybe.just(createPullRequestRequestBody(createPullRequestOptions)),
-      );
+      const request = createGitHubHttpRequest({
+        method: 'post',
+        url: pullRequestsEndpoint,
+        headers: writeHeaders,
+        json: Maybe.just(createPullRequestRequestBody(createPullRequestOptions)),
+      });
       return requestGitHubJson({
         httpClient: options.httpClient,
         request,
         failureMessage: 'Unable to create WebApp version synchronization pull request',
         githubToken: options.githubToken,
       }).andThen(parseCreatedPullRequest);
+    },
+
+    ensurePullRequestSemVerNoneLabel(pullRequestNumber) {
+      return ensurePullRequestSemVerNoneLabel(
+        {
+          httpClient: options.httpClient,
+          endpoint: issuesEndpoint,
+          headers: readHeaders,
+          writeHeaders,
+          githubToken: options.githubToken,
+        },
+        pullRequestNumber,
+      );
     },
   };
 }

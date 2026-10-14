@@ -22,14 +22,7 @@ import {Result} from 'true-myth';
 
 import process from 'node:process';
 
-export type WebAppVersionSynchronizationInspectionRuntimeEnvironment = {
-  readonly githubApiUrl: URL;
-  readonly githubRepository: string;
-  readonly githubToken: string;
-  readonly repositoryPath: string;
-};
-
-export type WebAppVersionSynchronizationSynchronizationRuntimeEnvironment = {
+export type WebAppVersionSynchronizationRuntimeEnvironment = {
   readonly githubApiUrl: URL;
   readonly githubRepository: string;
   readonly ottoTheBotGitHubToken: string;
@@ -88,33 +81,9 @@ function readCommonRuntimeEnvironment(environment: NodeJS.ProcessEnv): Result<Co
   });
 }
 
-export function readInspectionRuntimeEnvironment(
-  environment: NodeJS.ProcessEnv,
-): Result<WebAppVersionSynchronizationInspectionRuntimeEnvironment, Error> {
-  const commonRuntimeEnvironmentResult = readCommonRuntimeEnvironment(environment);
-
-  if (commonRuntimeEnvironmentResult.isErr) {
-    return Result.err(commonRuntimeEnvironmentResult.error);
-  }
-
-  const githubTokenResult = readRequiredEnvironmentValue(environment, 'GITHUB_TOKEN');
-
-  if (githubTokenResult.isErr) {
-    return Result.err(githubTokenResult.error);
-  }
-
-  const {value: commonRuntimeEnvironment} = commonRuntimeEnvironmentResult;
-  const {value: githubToken} = githubTokenResult;
-
-  return Result.ok({
-    ...commonRuntimeEnvironment,
-    githubToken,
-  });
-}
-
 export function readSynchronizationRuntimeEnvironment(
   environment: NodeJS.ProcessEnv,
-): Result<WebAppVersionSynchronizationSynchronizationRuntimeEnvironment, Error> {
+): Result<WebAppVersionSynchronizationRuntimeEnvironment, Error> {
   const commonRuntimeEnvironmentResult = readCommonRuntimeEnvironment(environment);
 
   if (commonRuntimeEnvironmentResult.isErr) {
