@@ -42,6 +42,7 @@ export class MeetingsPage {
   readonly scheduleMeetingButton: Locator;
   readonly scheduleMeetingModal: Locator;
   readonly meetNowModal: Locator;
+  readonly meetingPrepModal: Locator;
   readonly notificationHost: Locator;
 
   constructor(page: Page) {
@@ -54,6 +55,7 @@ export class MeetingsPage {
     this.scheduleMeetingButton = page.locator('header').getByTestId('schedule-meeting');
     this.scheduleMeetingModal = page.getByTestId('schedule-meeting-modal');
     this.meetNowModal = page.getByTestId('meet-now-modal');
+    this.meetingPrepModal = page.getByTestId('meeting-prep-modal');
     this.notificationHost = page.getByTestId('meeting-notification-host');
   }
 
