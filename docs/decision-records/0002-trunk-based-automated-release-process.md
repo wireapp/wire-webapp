@@ -184,6 +184,13 @@ The SemVer migration bootstrap is the annotated stable tag `v1.0.0`, pointing to
 
 During migration, production-facing tag parsing, distribution validation, GitHub Release handoff, repair, rollback, and redeploy tooling accept both legacy date-based Production tags and stable SemVer WebApp tags. Release-appearance and release-history tooling accepts both legacy date-based releases and SemVer releases, using `v1.0.0` as the SemVer Production baseline and preserving the existing legacy ordering rules. The active `Release WebApp` workflow remains date-based until a separate workflow cutover. Package synchronization remains on its existing legacy release-identifier model in this migration step.
 
+Future SemVer normal releases have two explicit operations:
+
+- Starting a release uses the exact `main` commit selected for the workflow dispatch, plans the next SemVer version from release impact, and creates `release/MAJOR.MINOR.PATCH` as a create-only reservation.
+- Continuing an active release is an explicit operator action. It requires exactly one active SemVer release, reuses its `release/MAJOR.MINOR.PATCH` branch at its current remote HEAD, and does not re-plan release impact or allocate another version.
+
+Reviewed fixes may advance an active release branch before a later Beta candidate. The active `Release WebApp` workflow has not yet been cut over in this prerequisite change; its workflow inputs, release tags, and package synchronization remain unchanged until the separate cutover pull request.
+
 ### WebApp package version synchronization
 
 The release process has two separate version identities:
