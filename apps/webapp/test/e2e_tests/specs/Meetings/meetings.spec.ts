@@ -490,7 +490,7 @@ test.describe('Meetings', () => {
   });
 
   test.describe('Call', () => {
-    test('host can start a large Meet now call without a confirmation dialog', async ({
+    test('host can start a large Meet now call through the prep modal without an extra confirmation dialog', async ({
       createUser,
       createTeam,
       createPage,
@@ -508,6 +508,13 @@ test.describe('Meetings', () => {
         }),
       );
 
+      await expect(meetings.meetingPrepModal).toBeVisible();
+      await expect(
+        meetings.meetingPrepModal.getByRole('heading', {name: LARGE_MEETING_TITLE, exact: true}),
+      ).toBeVisible();
+      await expect(ownerPages.calling().callCell).toBeHidden();
+      await meetings.meetingPrepModal.getByRole('button', {name: 'Join', exact: true}).click();
+      await expect(meetings.meetingPrepModal).toBeHidden();
       await expect(ownerModals.withoutTitle().modal).toBeHidden();
       await expect(ownerPages.calling().callCell).toBeVisible();
     });
