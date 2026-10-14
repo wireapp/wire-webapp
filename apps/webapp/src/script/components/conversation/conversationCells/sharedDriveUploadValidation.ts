@@ -42,7 +42,7 @@ export const filterSharedDriveUploadFiles = (files: readonly File[]): File[] => 
 };
 
 const hasValidUploadName = (file: File): boolean => {
-  const relativePathSegments = file.webkitRelativePath.split('/');
+  const relativePathSegments = file.webkitRelativePath.length > 0 ? file.webkitRelativePath.split('/') : [];
   return [file.name, ...relativePathSegments].every(isValidCellsNodeName);
 };
 
