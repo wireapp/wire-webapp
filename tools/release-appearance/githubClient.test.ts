@@ -138,7 +138,7 @@ describe('GitHub client', () => {
     });
     const githubClient = createClient(fakeHttpClient.httpClient);
 
-    const actualResult = await githubClient.listPullRequestsForCommit({commitSha: 'commit-sha'});
+    const actualResult = await githubClient.listPullRequestsForCommit({commitSha: 'commit-sha'}).toPromise();
 
     assert(actualResult.isOk);
     expect(actualResult.value).toHaveLength(1);
@@ -175,7 +175,7 @@ describe('GitHub client', () => {
     });
     const githubClient = createClient(fakeHttpClient.httpClient);
 
-    const actualResult = await githubClient.listPullRequestsForCommit({commitSha: 'commit-sha'});
+    const actualResult = await githubClient.listPullRequestsForCommit({commitSha: 'commit-sha'}).toPromise();
 
     assert(actualResult.isOk);
     expect(
@@ -218,7 +218,7 @@ describe('GitHub client', () => {
     });
     const githubClient = createClient(fakeHttpClient.httpClient);
 
-    const actualResult = await githubClient.listIssueComments({pullRequestNumber: 9});
+    const actualResult = await githubClient.listIssueComments({pullRequestNumber: 9}).toPromise();
 
     assert(actualResult.isOk);
     expect(actualResult.value).toHaveLength(101);
@@ -237,14 +237,18 @@ describe('GitHub client', () => {
     });
     const githubClient = createClient(fakeHttpClient.httpClient);
 
-    const createResult = await githubClient.createIssueComment({
-      pullRequestNumber: 5,
-      commentBody: 'created',
-    });
-    const updateResult = await githubClient.updateIssueComment({
-      commentId: 11,
-      commentBody: 'updated',
-    });
+    const createResult = await githubClient
+      .createIssueComment({
+        pullRequestNumber: 5,
+        commentBody: 'created',
+      })
+      .toPromise();
+    const updateResult = await githubClient
+      .updateIssueComment({
+        commentId: 11,
+        commentBody: 'updated',
+      })
+      .toPromise();
 
     assert(createResult.isOk);
     expect(createResult.value).toEqual({id: 11, body: 'created'});
@@ -283,10 +287,12 @@ describe('GitHub client', () => {
     };
     const githubClient = createClient(fakeHttpClient);
 
-    const actualResult = await githubClient.createIssueComment({
-      pullRequestNumber: 5,
-      commentBody: 'release comment',
-    });
+    const actualResult = await githubClient
+      .createIssueComment({
+        pullRequestNumber: 5,
+        commentBody: 'release comment',
+      })
+      .toPromise();
 
     assert(actualResult.isErr);
     expect(actualResult.error.message).toContain('HTTP status: 403');
@@ -304,7 +310,7 @@ describe('GitHub client', () => {
     });
     const githubClient = createClient(fakeHttpClient.httpClient);
 
-    const actualResult = await githubClient.listPullRequestsForCommit({commitSha: 'commit-sha'});
+    const actualResult = await githubClient.listPullRequestsForCommit({commitSha: 'commit-sha'}).toPromise();
 
     assert(actualResult.isErr);
     expect(actualResult.error.message).toBe('Malformed GitHub pull request response');
@@ -318,7 +324,7 @@ describe('GitHub client', () => {
     });
     const githubClient = createClient(fakeHttpClient.httpClient);
 
-    const actualResult = await githubClient.listPullRequestsForCommit({commitSha: 'commit-sha'});
+    const actualResult = await githubClient.listPullRequestsForCommit({commitSha: 'commit-sha'}).toPromise();
 
     assert(actualResult.isErr);
     expect(actualResult.error.message).toBe('Malformed GitHub pull request response');
@@ -332,7 +338,7 @@ describe('GitHub client', () => {
     });
     const githubClient = createClient(fakeHttpClient.httpClient);
 
-    const actualResult = await githubClient.listPullRequestsForCommit({commitSha: 'commit-sha'});
+    const actualResult = await githubClient.listPullRequestsForCommit({commitSha: 'commit-sha'}).toPromise();
 
     assert(actualResult.isErr);
     expect(actualResult.error.message).toBe('Malformed GitHub pull request response');
@@ -346,7 +352,7 @@ describe('GitHub client', () => {
     });
     const githubClient = createClient(fakeHttpClient.httpClient);
 
-    const actualResult = await githubClient.listPullRequestsForCommit({commitSha: 'commit-sha'});
+    const actualResult = await githubClient.listPullRequestsForCommit({commitSha: 'commit-sha'}).toPromise();
 
     assert(actualResult.isErr);
     expect(actualResult.error.message).toBe('Malformed GitHub pull request response');
@@ -376,7 +382,7 @@ describe('GitHub client', () => {
     };
     const githubClient = createClient(fakeHttpClient, githubToken);
 
-    const actualResult = await githubClient.listPullRequestsForCommit({commitSha: 'commit-sha'});
+    const actualResult = await githubClient.listPullRequestsForCommit({commitSha: 'commit-sha'}).toPromise();
 
     assert(actualResult.isErr);
     expect(actualResult.error.message).not.toMatch(new RegExp(githubToken));

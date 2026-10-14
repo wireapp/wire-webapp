@@ -21,11 +21,11 @@ import * as actionsCore from '@actions/core';
 import {isError, isString} from '@sindresorhus/is';
 import {Command, CommanderError} from 'commander';
 
-import process from 'node:process';
 import {execFile} from 'node:child_process';
 import {resolve} from 'node:path';
-import {promisify} from 'node:util';
+import process from 'node:process';
 import {fileURLToPath} from 'node:url';
+import {promisify} from 'node:util';
 
 import {createDefaultGitHubActionsProgressReporter} from '../release-appearance/githubActionsProgressReporter.ts';
 import {createGitHubClient} from '../release-appearance/githubClient.ts';
@@ -204,11 +204,10 @@ async function executeRuntimeCommand(command: ParsedCommand): Promise<number> {
     throw commandEnvironmentResult.error;
   }
 
-  const commandResult = await executeReleaseAppearanceCommand({
-    command,
-    environment: process.env,
-    dependencies: createRuntimeDependencies(commandEnvironmentResult.value),
-  });
+  const commandResult = await executeReleaseAppearanceCommand(
+    {command, environment: process.env},
+    createRuntimeDependencies(commandEnvironmentResult.value),
+  );
 
   return commandResult.exitCode;
 }

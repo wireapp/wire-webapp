@@ -18,11 +18,9 @@
  */
 
 import {Maybe, Result} from 'true-myth';
-import {match} from 'ts-pattern';
 import {z} from 'zod';
 
-import {parseWebAppProductionRelease} from '../release-metadata/webappProductionRelease.ts';
-import {parseBetaWebAppTagName} from '../release-metadata/webappReleaseIdentity.ts';
+import {parseBetaWebAppTagName, parseStableWebAppTagName} from '../release-metadata/webappReleaseIdentity.ts';
 import type {WebAppVersion} from '../release-metadata/webappVersion.ts';
 
 export type SerializedReleaseAppearanceState = {
@@ -35,15 +33,9 @@ export type ReleaseAppearanceState = {
   readonly production: Maybe<string>;
 };
 
-export type ReleaseAppearanceIdentity =
-  | {
-      readonly kind: 'legacy';
-      readonly releaseIdentifier: string;
-    }
-  | {
-      readonly kind: 'semver';
-      readonly version: WebAppVersion;
-    };
+export type ReleaseAppearanceIdentity = {
+  readonly version: WebAppVersion;
+};
 
 export type BetaCandidate = {
   readonly release: ReleaseAppearanceIdentity;
@@ -54,28 +46,15 @@ export type ProductionTag = {
   readonly release: ReleaseAppearanceIdentity;
 };
 
-const releaseIdentifierPattern = String.raw`\d{4}-\d{2}-\d{2}\.[1-9]\d*`;
-const betaCandidateTagPattern = new RegExp(String.raw`^(${releaseIdentifierPattern})-beta\.([1-9]\d*)$`);
 const markerPrefixPattern = /<!--\s*wire-webapp-release-appearance:/g;
 const markerHeaderPattern = /<!--\s*wire-webapp-release-appearance:v([^\s\r\n]+)\s*\n/g;
-const releaseIdentifierCaptureIndex = 1;
-const betaCandidateNumberCaptureIndex = 2;
 const markerVersionCaptureIndex = 1;
 
 const releaseAppearanceMarkerStateSchema = z
   .object({
-    beta: z
-      .string()
-      .refine(betaCandidateTag => {
-        return parseBetaCandidateTag(betaCandidateTag).isOk;
-      })
-      .optional(),
-    production: z
-      .string()
-      .refine(productionTag => {
-        return parseProductionTag(productionTag).isOk;
-      })
-      .optional(),
+    // Existing comments can contain immutable historical tags; rendering preserves them as display-only values.
+    beta: z.string().min(1).optional(),
+    production: z.string().min(1).optional(),
   })
   .strict();
 
@@ -92,46 +71,24 @@ function readRegexCapture(regexMatch: RegExpExecArray, captureIndex: number): Ma
 }
 
 export function parseBetaCandidateTag(betaCandidateTag: string): Result<BetaCandidate, Error> {
-  const betaCandidateTagMatch = Maybe.of(betaCandidateTagPattern.exec(betaCandidateTag));
-  if (betaCandidateTagMatch.isJust) {
-    const releaseIdentifier = readRegexCapture(betaCandidateTagMatch.value, releaseIdentifierCaptureIndex);
-    const candidateNumber = readRegexCapture(betaCandidateTagMatch.value, betaCandidateNumberCaptureIndex);
-    if (releaseIdentifier.isNothing || candidateNumber.isNothing) {
-      return createFailure(`Invalid Beta candidate tag: ${betaCandidateTag}`);
-    }
-
-    return createSuccess({
-      release: {kind: 'legacy', releaseIdentifier: releaseIdentifier.value},
-      candidateNumber: BigInt(candidateNumber.value),
-    });
-  }
-
-  const semverBetaCandidateResult = parseBetaWebAppTagName(betaCandidateTag);
-  if (semverBetaCandidateResult.isErr) {
-    return createFailure(`Invalid Beta candidate tag: ${betaCandidateTag}`, semverBetaCandidateResult.error);
+  const betaCandidateTagResult = parseBetaWebAppTagName(betaCandidateTag);
+  if (betaCandidateTagResult.isErr) {
+    return createFailure(`Invalid Beta candidate tag: ${betaCandidateTag}`, betaCandidateTagResult.error);
   }
 
   return createSuccess({
-    release: {kind: 'semver', version: semverBetaCandidateResult.value.version},
-    candidateNumber: BigInt(semverBetaCandidateResult.value.candidateNumber),
+    release: {version: betaCandidateTagResult.value.version},
+    candidateNumber: BigInt(betaCandidateTagResult.value.candidateNumber),
   });
 }
 
 export function parseProductionTag(productionTag: string): Result<ProductionTag, Error> {
-  const productionReleaseResult = parseWebAppProductionRelease(productionTag);
-  if (productionReleaseResult.isErr) {
-    return createFailure(`Invalid Production tag: ${productionTag}`, productionReleaseResult.error);
+  const versionResult = parseStableWebAppTagName(productionTag);
+  if (versionResult.isErr) {
+    return createFailure(`Invalid Production tag: ${productionTag}`, versionResult.error);
   }
 
-  return match(productionReleaseResult.value)
-    .returnType<Result<ProductionTag, Error>>()
-    .with({kind: 'legacy'}, legacyRelease => {
-      return createSuccess({release: {kind: 'legacy', releaseIdentifier: legacyRelease.buildVersion}});
-    })
-    .with({kind: 'semver'}, semverRelease => {
-      return createSuccess({release: {kind: 'semver', version: semverRelease.version}});
-    })
-    .exhaustive();
+  return createSuccess({release: {version: versionResult.value}});
 }
 
 export function compareBetaCandidates(leftCandidate: BetaCandidate, rightCandidate: BetaCandidate): number {
@@ -146,7 +103,7 @@ export function compareBetaCandidates(leftCandidate: BetaCandidate, rightCandida
   return 0;
 }
 
-export function validateSameReleaseIdentifier(
+export function validateSameReleaseVersion(
   betaCandidate: Pick<BetaCandidate, 'release'>,
   productionTag: Pick<ProductionTag, 'release'>,
 ): Result<ReleaseAppearanceIdentity, Error> {
@@ -163,29 +120,11 @@ export function haveSameReleaseAppearanceIdentity(
   leftRelease: ReleaseAppearanceIdentity,
   rightRelease: ReleaseAppearanceIdentity,
 ): boolean {
-  return match({leftRelease, rightRelease})
-    .with({leftRelease: {kind: 'legacy'}, rightRelease: {kind: 'legacy'}}, matchingLegacyReleases => {
-      return (
-        matchingLegacyReleases.leftRelease.releaseIdentifier === matchingLegacyReleases.rightRelease.releaseIdentifier
-      );
-    })
-    .with({leftRelease: {kind: 'semver'}, rightRelease: {kind: 'semver'}}, matchingSemverReleases => {
-      return matchingSemverReleases.leftRelease.version === matchingSemverReleases.rightRelease.version;
-    })
-    .otherwise(() => {
-      return false;
-    });
+  return leftRelease.version === rightRelease.version;
 }
 
 function describeReleaseAppearanceIdentity(releaseIdentity: ReleaseAppearanceIdentity): string {
-  return match(releaseIdentity)
-    .with({kind: 'legacy'}, legacyRelease => {
-      return legacyRelease.releaseIdentifier;
-    })
-    .with({kind: 'semver'}, semverRelease => {
-      return `v${semverRelease.version}`;
-    })
-    .exhaustive();
+  return `v${releaseIdentity.version}`;
 }
 
 export function deserializeReleaseAppearanceState(

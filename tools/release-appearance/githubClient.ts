@@ -17,7 +17,7 @@
  *
  */
 
-import {Maybe, Result} from 'true-myth';
+import {Maybe, Result, Task, task} from 'true-myth';
 import {z} from 'zod';
 
 import {
@@ -65,12 +65,10 @@ export type UpdateIssueCommentOptions = {
 export type GitHubClient = {
   readonly listPullRequestsForCommit: (
     options: ListPullRequestsForCommitOptions,
-  ) => Promise<Result<readonly PullRequestRecord[], Error>>;
-  readonly listIssueComments: (
-    options: ListIssueCommentsOptions,
-  ) => Promise<Result<readonly IssueCommentRecord[], Error>>;
-  readonly createIssueComment: (options: CreateIssueCommentOptions) => Promise<Result<IssueCommentRecord, Error>>;
-  readonly updateIssueComment: (options: UpdateIssueCommentOptions) => Promise<Result<IssueCommentRecord, Error>>;
+  ) => Task<readonly PullRequestRecord[], Error>;
+  readonly listIssueComments: (options: ListIssueCommentsOptions) => Task<readonly IssueCommentRecord[], Error>;
+  readonly createIssueComment: (options: CreateIssueCommentOptions) => Task<IssueCommentRecord, Error>;
+  readonly updateIssueComment: (options: UpdateIssueCommentOptions) => Task<IssueCommentRecord, Error>;
 };
 
 export type CreateGitHubClientOptions = {
@@ -83,6 +81,13 @@ export type CreateGitHubClientOptions = {
 type ParsedPullRequestPage = {
   readonly rawItemCount: number;
   readonly supportedMergedPullRequests: readonly PullRequestRecord[];
+};
+
+type RequestGitHubJsonOptions = {
+  readonly httpClient: HttpClient;
+  readonly request: ReturnType<typeof createGitHubHttpRequest>;
+  readonly failureMessage: string;
+  readonly githubToken: string;
 };
 
 const githubPullRequestResponseSchema = z.object({
@@ -158,6 +163,31 @@ function parseIssueCommentMutation(githubResponse: unknown): Result<IssueComment
   return createSuccess({id: validationResult.data.id, body: validationResult.data.body});
 }
 
+function requestGitHubJson(options: RequestGitHubJsonOptions): Task<unknown, Error> {
+  return task.tryOrElse(
+    (error: unknown): Error => {
+      return new Error(
+        `${options.failureMessage}: ${redactGitHubSecret(
+          formatGitHubRequestError({error, fallbackMessage: 'Unknown failure'}),
+          options.githubToken,
+        )}`,
+        {cause: error},
+      );
+    },
+    (): Promise<unknown> => {
+      return options.httpClient.requestJson(options.request);
+    },
+  );
+}
+
+function resultToTask<valueType>(result: Result<valueType, Error>): Task<valueType, Error> {
+  if (result.isErr) {
+    return Task.reject(result.error);
+  }
+
+  return Task.resolve(result.value);
+}
+
 export function createGitHubClient(createGitHubClientOptions: CreateGitHubClientOptions): GitHubClient {
   const {httpClient, githubApiUrl, githubRepository, githubToken} = createGitHubClientOptions;
   const githubApiRoot = createGitHubApiRoot(githubApiUrl);
@@ -166,135 +196,126 @@ export function createGitHubClient(createGitHubClientOptions: CreateGitHubClient
   const writeHeaders = createGitHubHeaders({githubToken, includesJsonBody: true});
 
   return {
-    async listPullRequestsForCommit(options): Promise<Result<readonly PullRequestRecord[], Error>> {
-      const pullRequests: PullRequestRecord[] = [];
+    listPullRequestsForCommit(options): Task<readonly PullRequestRecord[], Error> {
       const endpoint = new URL(
         `repos/${encodedRepositoryName}/commits/${encodeURIComponent(options.commitSha)}/pulls`,
         githubApiRoot,
       );
 
-      for (let page = 1; ; page += 1) {
-        let githubResponse: unknown;
-        try {
-          githubResponse = await httpClient.requestJson(
-            createGitHubHttpRequest({
-              method: 'get',
-              url: createGitHubPageUrl({endpoint, page}),
-              headers: readHeaders,
-              json: Maybe.nothing<NonNullable<unknown>>(),
-            }),
-          );
-        } catch (error: unknown) {
-          return createFailure(
-            `Unable to list pull requests for commit ${options.commitSha}: ${redactGitHubSecret(
-              formatGitHubRequestError({error, fallbackMessage: 'Unknown failure'}),
-              githubToken,
-            )}`,
-          );
-        }
+      function listPullRequestsPage(
+        page: number,
+        accumulatedPullRequests: readonly PullRequestRecord[],
+      ): Task<readonly PullRequestRecord[], Error> {
+        const request = createGitHubHttpRequest({
+          method: 'get',
+          url: createGitHubPageUrl({endpoint, page}),
+          headers: readHeaders,
+          json: Maybe.nothing<NonNullable<unknown>>(),
+        });
 
-        const pageResult = parsePullRequestPage(githubResponse);
-        if (pageResult.isErr) {
-          return createFailure(pageResult.error.message);
-        }
+        return requestGitHubJson({
+          httpClient,
+          request,
+          failureMessage: `Unable to list pull requests for commit ${options.commitSha}`,
+          githubToken,
+        }).andThen(githubResponse => {
+          const pageResult = parsePullRequestPage(githubResponse);
+          if (pageResult.isErr) {
+            return Task.reject(pageResult.error);
+          }
 
-        pullRequests.push(...pageResult.value.supportedMergedPullRequests);
-        if (pageResult.value.rawItemCount !== githubApiPageSize) {
-          break;
-        }
+          const pullRequests = [...accumulatedPullRequests, ...pageResult.value.supportedMergedPullRequests];
+          if (pageResult.value.rawItemCount !== githubApiPageSize) {
+            return Task.resolve(pullRequests);
+          }
+
+          return listPullRequestsPage(page + 1, pullRequests);
+        });
       }
 
-      return createSuccess(pullRequests);
+      return listPullRequestsPage(1, []);
     },
 
-    async listIssueComments(options): Promise<Result<readonly IssueCommentRecord[], Error>> {
-      const comments: IssueCommentRecord[] = [];
+    listIssueComments(options): Task<readonly IssueCommentRecord[], Error> {
       const endpoint = new URL(
         `repos/${encodedRepositoryName}/issues/${options.pullRequestNumber}/comments`,
         githubApiRoot,
       );
 
-      for (let page = 1; ; page += 1) {
-        let githubResponse: unknown;
-        try {
-          githubResponse = await httpClient.requestJson(
-            createGitHubHttpRequest({
-              method: 'get',
-              url: createGitHubPageUrl({endpoint, page}),
-              headers: readHeaders,
-              json: Maybe.nothing<NonNullable<unknown>>(),
-            }),
-          );
-        } catch (error: unknown) {
-          return createFailure(
-            `Unable to list issue comments for pull request #${options.pullRequestNumber}: ${redactGitHubSecret(
-              formatGitHubRequestError({error, fallbackMessage: 'Unknown failure'}),
-              githubToken,
-            )}`,
-          );
-        }
+      function listIssueCommentsPage(
+        page: number,
+        accumulatedComments: readonly IssueCommentRecord[],
+      ): Task<readonly IssueCommentRecord[], Error> {
+        const request = createGitHubHttpRequest({
+          method: 'get',
+          url: createGitHubPageUrl({endpoint, page}),
+          headers: readHeaders,
+          json: Maybe.nothing<NonNullable<unknown>>(),
+        });
 
-        const pageResult = parseIssueCommentPage(githubResponse);
-        if (pageResult.isErr) {
-          return pageResult;
-        }
+        return requestGitHubJson({
+          httpClient,
+          request,
+          failureMessage: `Unable to list issue comments for pull request #${options.pullRequestNumber}`,
+          githubToken,
+        }).andThen(githubResponse => {
+          const pageResult = parseIssueCommentPage(githubResponse);
+          if (pageResult.isErr) {
+            return Task.reject(pageResult.error);
+          }
 
-        comments.push(...pageResult.value);
-        if (pageResult.value.length !== githubApiPageSize) {
-          break;
-        }
+          const comments = [...accumulatedComments, ...pageResult.value];
+          if (pageResult.value.length !== githubApiPageSize) {
+            return Task.resolve(comments);
+          }
+
+          return listIssueCommentsPage(page + 1, comments);
+        });
       }
 
-      return createSuccess(comments);
+      return listIssueCommentsPage(1, []);
     },
 
-    async createIssueComment(options): Promise<Result<IssueCommentRecord, Error>> {
+    createIssueComment(options): Task<IssueCommentRecord, Error> {
       const endpoint = new URL(
         `repos/${encodedRepositoryName}/issues/${options.pullRequestNumber}/comments`,
         githubApiRoot,
       );
 
-      try {
-        const githubResponse = await httpClient.requestJson(
-          createGitHubHttpRequest({
-            method: 'post',
-            url: endpoint,
-            headers: writeHeaders,
-            json: Maybe.just({body: options.commentBody}),
-          }),
-        );
-        return parseIssueCommentMutation(githubResponse);
-      } catch (error: unknown) {
-        return createFailure(
-          `Unable to create release-appearance comment for pull request #${options.pullRequestNumber}: ${redactGitHubSecret(
-            formatGitHubRequestError({error, fallbackMessage: 'Unknown failure'}),
-            githubToken,
-          )}`,
-        );
-      }
+      const request = createGitHubHttpRequest({
+        method: 'post',
+        url: endpoint,
+        headers: writeHeaders,
+        json: Maybe.just({body: options.commentBody}),
+      });
+
+      return requestGitHubJson({
+        httpClient,
+        request,
+        failureMessage: `Unable to create release-appearance comment for pull request #${options.pullRequestNumber}`,
+        githubToken,
+      }).andThen(githubResponse => {
+        return resultToTask(parseIssueCommentMutation(githubResponse));
+      });
     },
 
-    async updateIssueComment(options): Promise<Result<IssueCommentRecord, Error>> {
+    updateIssueComment(options): Task<IssueCommentRecord, Error> {
       const endpoint = new URL(`repos/${encodedRepositoryName}/issues/comments/${options.commentId}`, githubApiRoot);
+      const request = createGitHubHttpRequest({
+        method: 'patch',
+        url: endpoint,
+        headers: writeHeaders,
+        json: Maybe.just({body: options.commentBody}),
+      });
 
-      try {
-        const githubResponse = await httpClient.requestJson(
-          createGitHubHttpRequest({
-            method: 'patch',
-            url: endpoint,
-            headers: writeHeaders,
-            json: Maybe.just({body: options.commentBody}),
-          }),
-        );
-        return parseIssueCommentMutation(githubResponse);
-      } catch (error: unknown) {
-        return createFailure(
-          `Unable to update release-appearance comment #${options.commentId}: ${redactGitHubSecret(
-            formatGitHubRequestError({error, fallbackMessage: 'Unknown failure'}),
-            githubToken,
-          )}`,
-        );
-      }
+      return requestGitHubJson({
+        httpClient,
+        request,
+        failureMessage: `Unable to update release-appearance comment #${options.commentId}`,
+        githubToken,
+      }).andThen(githubResponse => {
+        return resultToTask(parseIssueCommentMutation(githubResponse));
+      });
     },
   };
 }

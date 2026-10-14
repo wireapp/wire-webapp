@@ -17,14 +17,12 @@
  *
  */
 
-import {Result, Task} from 'true-myth';
+import {Maybe, Result, Task} from 'true-myth';
 
 import type {GitHubReleaseClient, GitHubReleaseRecord} from './githubReleaseClient.ts';
 
-import {
-  parseWebAppProductionRelease,
-  selectPrecedingWebAppProductionTag,
-} from '../release-metadata/webappProductionRelease.ts';
+import {compareWebAppVersions, validateWebAppVersion} from '../release-metadata/webappVersion.ts';
+import type {WebAppVersion} from '../release-metadata/webappVersion.ts';
 
 export type ProductionGitHubReleaseAction = 'created' | 'already_draft' | 'already_published';
 export type ProductionGitHubReleaseState = 'draft' | 'published';
@@ -37,22 +35,85 @@ export type ProductionGitHubReleaseHandoff = {
 };
 
 export type EnsureProductionGitHubReleaseOptions = {
-  readonly currentProductionTagName: string;
+  readonly productionTagName: string;
+};
+
+export type EnsureProductionGitHubReleaseDependencies = {
   readonly githubReleaseClient: GitHubReleaseClient;
 };
 
+type StableProductionTag = {
+  readonly tagName: string;
+  readonly version: WebAppVersion;
+};
+
 const noPrecedingProductionReleaseNotes =
-  'No preceding ADR Production release was found. Add the customer-facing changelog manually before publication.';
+  'No preceding stable WebApp Production release was found. Add the customer-facing changelog manually before publication.';
+
+function parseStableProductionTag(productionTagName: string): Result<StableProductionTag, Error> {
+  if (productionTagName.startsWith('v') === false) {
+    return Result.err(new Error(`Invalid stable WebApp Production tag: ${productionTagName}`));
+  }
+
+  const versionResult = validateWebAppVersion(productionTagName.slice(1));
+  if (versionResult.isErr) {
+    return Result.err(
+      new Error(`Invalid stable WebApp Production tag: ${productionTagName}`, {cause: versionResult.error}),
+    );
+  }
+
+  if (productionTagName !== `v${versionResult.value}`) {
+    return Result.err(new Error(`Invalid stable WebApp Production tag: ${productionTagName}`));
+  }
+
+  return Result.ok({tagName: productionTagName, version: versionResult.value});
+}
+
+function selectPrecedingStableProductionTag(
+  productionTagNames: readonly string[],
+  currentProductionTag: StableProductionTag,
+): Maybe<StableProductionTag> {
+  let precedingProductionTag: Maybe<StableProductionTag> = Maybe.nothing<StableProductionTag>();
+
+  for (const productionTagName of productionTagNames) {
+    const productionTagResult = parseStableProductionTag(productionTagName);
+    if (productionTagResult.isErr) {
+      continue;
+    }
+
+    const candidateProductionTag = productionTagResult.value;
+    const currentVersionComparison = compareWebAppVersions(
+      candidateProductionTag.version,
+      currentProductionTag.version,
+    );
+    if (currentVersionComparison.isErr || currentVersionComparison.value >= 0) {
+      continue;
+    }
+
+    if (precedingProductionTag.isNothing) {
+      precedingProductionTag = Maybe.just(candidateProductionTag);
+      continue;
+    }
+
+    const candidateComparison = compareWebAppVersions(
+      candidateProductionTag.version,
+      precedingProductionTag.value.version,
+    );
+    if (candidateComparison.isOk && candidateComparison.value > 0) {
+      precedingProductionTag = Maybe.just(candidateProductionTag);
+    }
+  }
+
+  return precedingProductionTag;
+}
 
 function createExistingReleaseHandoff(
-  currentProductionTagName: string,
+  productionTagName: string,
   existingRelease: GitHubReleaseRecord,
 ): Result<ProductionGitHubReleaseHandoff, Error> {
-  if (existingRelease.tagName !== currentProductionTagName) {
+  if (existingRelease.tagName !== productionTagName) {
     return Result.err(
-      new Error(
-        `The GitHub Release lookup returned tag ${existingRelease.tagName} instead of ${currentProductionTagName}.`,
-      ),
+      new Error(`The GitHub Release lookup returned tag ${existingRelease.tagName} instead of ${productionTagName}.`),
     );
   }
 
@@ -83,69 +144,52 @@ function createNewReleaseHandoff(
     );
   }
 
-  if (!createdRelease.isDraft) {
+  if (createdRelease.isDraft === false) {
     return Result.err(new Error(`The GitHub Release for ${productionTagName} was not created as a draft.`));
   }
 
-  return Result.ok({
-    action: 'created',
-    state: 'draft',
-    tagName: createdRelease.tagName,
-    url: createdRelease.htmlUrl,
-  });
+  return Result.ok({action: 'created', state: 'draft', tagName: createdRelease.tagName, url: createdRelease.htmlUrl});
 }
 
 export function ensureProductionGitHubRelease(
   options: EnsureProductionGitHubReleaseOptions,
+  dependencies: EnsureProductionGitHubReleaseDependencies,
 ): Task<ProductionGitHubReleaseHandoff, Error> {
-  const currentProductionReleaseResult = parseWebAppProductionRelease(options.currentProductionTagName);
-
-  if (currentProductionReleaseResult.isErr) {
-    return Task.reject<ProductionGitHubReleaseHandoff, Error>(currentProductionReleaseResult.error);
+  const productionTagResult = parseStableProductionTag(options.productionTagName);
+  if (productionTagResult.isErr) {
+    return Task.reject(productionTagResult.error);
   }
 
-  const productionTagName = currentProductionReleaseResult.value.tagName;
-  return options.githubReleaseClient
-    .findReleaseByTag({
-      tagName: productionTagName,
-    })
-    .andThen(existingRelease => {
-      if (existingRelease.isJust) {
-        return createExistingReleaseHandoff(productionTagName, existingRelease.value);
-      }
+  const productionTagName = productionTagResult.value.tagName;
+  return dependencies.githubReleaseClient.findReleaseByTag({tagName: productionTagName}).andThen(existingRelease => {
+    if (existingRelease.isJust) {
+      return createExistingReleaseHandoff(productionTagName, existingRelease.value);
+    }
 
-      return options.githubReleaseClient.listTagNames().andThen(existingTagNames => {
-        const precedingProductionTagResult = selectPrecedingWebAppProductionTag(productionTagName, existingTagNames);
-
-        if (precedingProductionTagResult.isErr) {
-          return Task.reject<ProductionGitHubReleaseHandoff, Error>(precedingProductionTagResult.error);
-        }
-
-        if (precedingProductionTagResult.value.isJust) {
-          return options.githubReleaseClient
-            .generateReleaseNotes({
-              productionTagName,
-              precedingProductionTagName: precedingProductionTagResult.value.value,
-            })
-            .andThen(generatedReleaseNotes => {
-              return options.githubReleaseClient.createDraftRelease({
-                productionTagName,
-                body: generatedReleaseNotes.body,
-              });
-            })
-            .andThen(createdRelease => {
-              return createNewReleaseHandoff(productionTagName, createdRelease);
-            });
-        }
-
-        return options.githubReleaseClient
-          .createDraftRelease({
-            productionTagName,
-            body: noPrecedingProductionReleaseNotes,
-          })
+    return dependencies.githubReleaseClient.listTagNames().andThen(productionTagNames => {
+      const precedingProductionTag = selectPrecedingStableProductionTag(productionTagNames, productionTagResult.value);
+      if (precedingProductionTag.isNothing) {
+        return dependencies.githubReleaseClient
+          .createDraftRelease({productionTagName, body: noPrecedingProductionReleaseNotes})
           .andThen(createdRelease => {
             return createNewReleaseHandoff(productionTagName, createdRelease);
           });
-      });
+      }
+
+      return dependencies.githubReleaseClient
+        .generateReleaseNotes({
+          productionTagName,
+          precedingProductionTagName: precedingProductionTag.value.tagName,
+        })
+        .andThen(generatedReleaseNotes => {
+          return dependencies.githubReleaseClient.createDraftRelease({
+            productionTagName,
+            body: generatedReleaseNotes.body,
+          });
+        })
+        .andThen(createdRelease => {
+          return createNewReleaseHandoff(productionTagName, createdRelease);
+        });
     });
+  });
 }

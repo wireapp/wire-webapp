@@ -17,13 +17,13 @@
  *
  */
 
-import {readFileSync} from 'node:fs';
-import process from 'node:process';
-import {resolve} from 'node:path';
-import {fileURLToPath} from 'node:url';
-
 import {isError, isString} from '@sindresorhus/is';
 import {Command, CommanderError} from 'commander';
+
+import {readFileSync} from 'node:fs';
+import {resolve} from 'node:path';
+import process from 'node:process';
+import {fileURLToPath} from 'node:url';
 
 import {
   executeProductionDistributionCommand,

@@ -28,6 +28,7 @@ import type {
   ExecuteGitCommand,
   NextBetaPreviewHistoryPlan,
   PlanNextBetaPreviewHistoryOptions,
+  ReleaseHistoryDependencies,
 } from './releaseHistory.ts';
 
 export type PreviewNextBetaCommandDependencies = {
@@ -35,6 +36,7 @@ export type PreviewNextBetaCommandDependencies = {
   readonly githubClient: GitHubClient;
   readonly planNextBetaPreviewHistory: (
     options: PlanNextBetaPreviewHistoryOptions,
+    dependencies: ReleaseHistoryDependencies,
   ) => Task<NextBetaPreviewHistoryPlan, Error>;
   readonly writeFailure: (message: string) => Promise<void>;
   readonly writeInformation: (message: string) => Promise<void>;
@@ -44,7 +46,6 @@ export type PreviewNextBetaCommandDependencies = {
 export type ExecutePreviewNextBetaCommandOptions = {
   readonly targetMainCommit: string;
   readonly environment: NodeJS.ProcessEnv;
-  readonly dependencies: PreviewNextBetaCommandDependencies;
 };
 
 export type PreviewNextBetaCommandResult = {
@@ -81,12 +82,16 @@ type DiscoverPullRequestsResult = {
 
 type CreatePreviewStateOptions = {
   readonly targetMainCommit: string;
+  readonly githubToken: string;
+};
+
+type CreatePreviewStateDependencies = {
   readonly executeGitCommand: ExecuteGitCommand;
   readonly planNextBetaPreviewHistory: (
     options: PlanNextBetaPreviewHistoryOptions,
+    dependencies: ReleaseHistoryDependencies,
   ) => Task<NextBetaPreviewHistoryPlan, Error>;
   readonly githubClient: GitHubClient;
-  readonly githubToken: string;
 };
 
 type CreateReportOptions = {
@@ -241,10 +246,14 @@ function createUnavailableState(
   };
 }
 
-async function createPreviewState(createPreviewStateOptions: CreatePreviewStateOptions): Promise<PreviewNextBetaState> {
-  const {targetMainCommit, executeGitCommand, planNextBetaPreviewHistory, githubClient, githubToken} =
-    createPreviewStateOptions;
-  const historyPlanResult = await planNextBetaPreviewHistory({executeGitCommand, targetMainCommit});
+async function createPreviewState(
+  options: CreatePreviewStateOptions,
+  dependencies: CreatePreviewStateDependencies,
+): Promise<PreviewNextBetaState> {
+  const {targetMainCommit, githubToken} = options;
+  const historyPlanResult = await dependencies
+    .planNextBetaPreviewHistory({targetMainCommit}, {executeGitCommand: dependencies.executeGitCommand})
+    .toPromise();
   if (historyPlanResult.isErr) {
     return createUnavailableState(targetMainCommit, [
       redactSecret(`Git history: ${historyPlanResult.error.message}`, githubToken),
@@ -264,7 +273,7 @@ async function createPreviewState(createPreviewStateOptions: CreatePreviewStateO
 
   const discoveryResult = await discoverPullRequests({
     commits,
-    githubClient,
+    githubClient: dependencies.githubClient,
     githubToken,
   });
 
@@ -360,7 +369,7 @@ function createReport(createReportOptions: CreateReportOptions): string {
   if (state.latestBetaReleaseTag.isNothing) {
     unavailableMessage = 'The preview is unavailable because the latest Beta history could not be evaluated.';
     if (isEmptyArray(state.failureMessages)) {
-      unavailableMessage = 'The preview is unavailable because no new-format Beta tag exists yet.';
+      unavailableMessage = 'The preview is unavailable because no SemVer Beta tag exists yet.';
     }
   }
   const failureLines = state.failureMessages.map(failureMessage => {
@@ -404,9 +413,10 @@ function createReport(createReportOptions: CreateReportOptions): string {
 }
 
 export async function executePreviewNextBetaCommand(
-  executePreviewNextBetaCommandOptions: ExecutePreviewNextBetaCommandOptions,
+  options: ExecutePreviewNextBetaCommandOptions,
+  dependencies: PreviewNextBetaCommandDependencies,
 ): Promise<PreviewNextBetaCommandResult> {
-  const {targetMainCommit, environment, dependencies} = executePreviewNextBetaCommandOptions;
+  const {targetMainCommit, environment} = options;
   const githubToken = Maybe.of(environment.GITHUB_TOKEN).unwrapOr('');
   const targetMainCommitResult = validateTargetMainCommit(targetMainCommit);
   if (targetMainCommitResult.isErr) {
@@ -427,13 +437,14 @@ export async function executePreviewNextBetaCommand(
 
   let previewState: PreviewNextBetaState;
   try {
-    previewState = await createPreviewState({
-      targetMainCommit,
-      executeGitCommand: dependencies.executeGitCommand,
-      planNextBetaPreviewHistory: dependencies.planNextBetaPreviewHistory,
-      githubClient: dependencies.githubClient,
-      githubToken: commandEnvironmentResult.value.githubToken,
-    });
+    previewState = await createPreviewState(
+      {targetMainCommit, githubToken: commandEnvironmentResult.value.githubToken},
+      {
+        executeGitCommand: dependencies.executeGitCommand,
+        planNextBetaPreviewHistory: dependencies.planNextBetaPreviewHistory,
+        githubClient: dependencies.githubClient,
+      },
+    );
   } catch (error: unknown) {
     previewState = createUnavailableState(targetMainCommit, [
       redactSecret(

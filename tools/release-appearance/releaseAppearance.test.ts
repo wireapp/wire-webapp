@@ -22,7 +22,6 @@ import assert from 'node:assert';
 import {Maybe} from 'true-myth';
 
 import {
-  compareBetaCandidates,
   deserializeReleaseAppearanceState,
   mergeReleaseAppearanceComments,
   mergeReleaseAppearanceState,
@@ -31,7 +30,7 @@ import {
   parseProductionTag,
   renderPersistentComment,
   serializeReleaseAppearanceState,
-  validateSameReleaseIdentifier,
+  validateSameReleaseVersion,
 } from './releaseAppearance.ts';
 import type {ReleaseAppearanceState} from './releaseAppearance.ts';
 
@@ -40,23 +39,7 @@ function createReleaseAppearanceState(betaTag: Maybe<string>, productionTag: May
 }
 
 describe('release tag parsing', () => {
-  it('parses and compares valid release tags', () => {
-    const betaNineResult = parseBetaCandidateTag('2026-07-21.3-beta.9');
-    const betaTenResult = parseBetaCandidateTag('2026-07-21.3-beta.10');
-    const productionResult = parseProductionTag('2026-07-21.3-production');
-
-    assert(betaNineResult.isOk);
-    assert(betaTenResult.isOk);
-    assert(productionResult.isOk);
-    expect(betaTenResult.value).toEqual({
-      release: {kind: 'legacy', releaseIdentifier: '2026-07-21.3'},
-      candidateNumber: 10n,
-    });
-    expect(compareBetaCandidates(betaNineResult.value, betaTenResult.value)).toBe(-1);
-    expect(validateSameReleaseIdentifier(betaTenResult.value, productionResult.value).isOk).toBe(true);
-  });
-
-  it('parses strict SemVer Beta and stable Production tags as one identity family', () => {
+  it('parses strict SemVer Beta and stable Production tags', () => {
     const betaCandidateResult = parseBetaCandidateTag('v1.1.0-beta.2');
     const betaSeventeenResult = parseBetaCandidateTag('v2.0.0-beta.17');
     const productionTagResult = parseProductionTag('v1.1.0');
@@ -65,27 +48,24 @@ describe('release tag parsing', () => {
     assert(betaSeventeenResult.isOk);
     assert(productionTagResult.isOk);
     expect(betaCandidateResult.value).toEqual({
-      release: {kind: 'semver', version: '1.1.0'},
+      release: {version: '1.1.0'},
       candidateNumber: 2n,
     });
     expect(betaSeventeenResult.value).toEqual({
-      release: {kind: 'semver', version: '2.0.0'},
+      release: {version: '2.0.0'},
       candidateNumber: 17n,
     });
-    expect(productionTagResult.value).toEqual({release: {kind: 'semver', version: '1.1.0'}});
-    expect(validateSameReleaseIdentifier(betaCandidateResult.value, productionTagResult.value).isOk).toBe(true);
+    expect(productionTagResult.value).toEqual({release: {version: '1.1.0'}});
+    expect(validateSameReleaseVersion(betaCandidateResult.value, productionTagResult.value).isOk).toBe(true);
   });
 
-  it('rejects mismatched SemVer versions and identity families', () => {
+  it('rejects mismatched SemVer versions', () => {
     const betaCandidateResult = parseBetaCandidateTag('v1.4.0-beta.2');
     const differentVersionResult = parseProductionTag('v1.5.0');
-    const legacyProductionResult = parseProductionTag('2026-10-06.1-production');
 
     assert(betaCandidateResult.isOk);
     assert(differentVersionResult.isOk);
-    assert(legacyProductionResult.isOk);
-    expect(validateSameReleaseIdentifier(betaCandidateResult.value, differentVersionResult.value).isErr).toBe(true);
-    expect(validateSameReleaseIdentifier(betaCandidateResult.value, legacyProductionResult.value).isErr).toBe(true);
+    expect(validateSameReleaseVersion(betaCandidateResult.value, differentVersionResult.value).isErr).toBe(true);
   });
 
   it('rejects invalid release tags', () => {
@@ -123,8 +103,8 @@ describe('release tag parsing', () => {
 describe('release appearance state', () => {
   it('converts between serialized optional fields and domain Maybe values', () => {
     const serializedState = {
-      beta: '2026-08-01.1-beta.1',
-      production: '2026-08-08.1-production',
+      beta: 'v1.1.0-beta.1',
+      production: 'v1.0.0',
     };
 
     const domainState = deserializeReleaseAppearanceState(serializedState);
@@ -137,10 +117,7 @@ describe('release appearance state', () => {
   });
 
   it('serializes and parses first appearances from different releases', () => {
-    const state = createReleaseAppearanceState(
-      Maybe.just('2026-08-01.1-beta.1'),
-      Maybe.just('2026-08-08.1-production'),
-    );
+    const state = createReleaseAppearanceState(Maybe.just('v1.1.0-beta.1'), Maybe.just('v1.0.0'));
     const renderedComment = renderPersistentComment(state);
 
     const parsedStateResult = parsePersistentMarkerComment(renderedComment);
@@ -150,8 +127,8 @@ describe('release appearance state', () => {
     const parsedState = parsedStateResult.value.value;
     assert(parsedState.beta.isJust);
     assert(parsedState.production.isJust);
-    expect(parsedState.beta.value).toBe('2026-08-01.1-beta.1');
-    expect(parsedState.production.value).toBe('2026-08-08.1-production');
+    expect(parsedState.beta.value).toBe('v1.1.0-beta.1');
+    expect(parsedState.production.value).toBe('v1.0.0');
   });
 
   it('parses SemVer persistent marker values without rewriting the stored identities', () => {
@@ -170,12 +147,23 @@ describe('release appearance state', () => {
     expect(renderPersistentComment(parsedStateResult.value.value)).toContain('v1.1.0');
   });
 
+  it('preserves immutable historical tag values in existing appearance comments', () => {
+    const historicalState = {
+      beta: '2026-08-01.1-beta.1',
+      production: '2026-08-08.1-production',
+    };
+    const markerComment = `<!-- wire-webapp-release-appearance:v1\n${JSON.stringify(historicalState)}\n-->`;
+
+    const parsedStateResult = parsePersistentMarkerComment(markerComment);
+
+    assert(parsedStateResult.isOk);
+    assert(parsedStateResult.value.isJust);
+    expect(serializeReleaseAppearanceState(parsedStateResult.value.value)).toEqual(historicalState);
+  });
+
   it('preserves cross-release values during later Beta processing', () => {
-    const existingState = createReleaseAppearanceState(
-      Maybe.just('2026-08-01.1-beta.1'),
-      Maybe.just('2026-08-08.1-production'),
-    );
-    const desiredState = createReleaseAppearanceState(Maybe.just('2026-08-15.1-beta.1'), Maybe.nothing<string>());
+    const existingState = createReleaseAppearanceState(Maybe.just('v1.0.0-beta.1'), Maybe.just('v1.0.0'));
+    const desiredState = createReleaseAppearanceState(Maybe.just('v1.1.0-beta.1'), Maybe.nothing<string>());
 
     const mergedState = mergeReleaseAppearanceState(existingState, desiredState);
 
@@ -183,14 +171,8 @@ describe('release appearance state', () => {
   });
 
   it('preserves cross-release values during later Production processing', () => {
-    const existingState = createReleaseAppearanceState(
-      Maybe.just('2026-08-01.1-beta.1'),
-      Maybe.just('2026-08-08.1-production'),
-    );
-    const desiredState = createReleaseAppearanceState(
-      Maybe.just('2026-08-15.1-beta.1'),
-      Maybe.just('2026-08-15.1-production'),
-    );
+    const existingState = createReleaseAppearanceState(Maybe.just('v1.0.0-beta.1'), Maybe.just('v1.0.0'));
+    const desiredState = createReleaseAppearanceState(Maybe.just('v1.1.0-beta.1'), Maybe.just('v1.1.0'));
 
     const mergedState = mergeReleaseAppearanceState(existingState, desiredState);
 
@@ -198,29 +180,23 @@ describe('release appearance state', () => {
   });
 
   it('fills only missing first-appearance values', () => {
-    const existingState = createReleaseAppearanceState(Maybe.just('2026-07-21.3-beta.1'), Maybe.nothing<string>());
-    const desiredState = createReleaseAppearanceState(
-      Maybe.just('2026-07-21.3-beta.2'),
-      Maybe.just('2026-07-21.3-production'),
-    );
+    const existingState = createReleaseAppearanceState(Maybe.just('v1.1.0-beta.1'), Maybe.nothing<string>());
+    const desiredState = createReleaseAppearanceState(Maybe.just('v1.1.0-beta.2'), Maybe.just('v1.1.0'));
 
     const mergedState = mergeReleaseAppearanceState(existingState, desiredState);
 
     assert(mergedState.beta.isJust);
     assert(mergedState.production.isJust);
-    expect(mergedState.beta.value).toBe('2026-07-21.3-beta.1');
-    expect(mergedState.production.value).toBe('2026-07-21.3-production');
+    expect(mergedState.beta.value).toBe('v1.1.0-beta.1');
+    expect(mergedState.production.value).toBe('v1.1.0');
   });
 });
 
 describe('persistent release appearance comments', () => {
   it('creates and updates persistent comments without changing unrelated comments', () => {
     const unrelatedComment = 'Unrelated discussion';
-    const betaState = createReleaseAppearanceState(Maybe.just('2026-07-21.3-beta.1'), Maybe.nothing<string>());
-    const productionState = createReleaseAppearanceState(
-      Maybe.nothing<string>(),
-      Maybe.just('2026-07-28.1-production'),
-    );
+    const betaState = createReleaseAppearanceState(Maybe.just('v1.1.0-beta.1'), Maybe.nothing<string>());
+    const productionState = createReleaseAppearanceState(Maybe.nothing<string>(), Maybe.just('v1.1.0'));
     const existingComments = [unrelatedComment, renderPersistentComment(betaState)];
 
     const mergedCommentsResult = mergeReleaseAppearanceComments(existingComments, productionState);
@@ -229,14 +205,14 @@ describe('persistent release appearance comments', () => {
     expect(mergedCommentsResult.value[0]).toBe(unrelatedComment);
     const mergedMarkerComment = Maybe.of(mergedCommentsResult.value[1]);
     assert(mergedMarkerComment.isJust);
-    expect(mergedMarkerComment.value).toMatch(/2026-07-21\.3-beta\.1/);
-    expect(mergedMarkerComment.value).toMatch(/2026-07-28\.1-production/);
+    expect(mergedMarkerComment.value).toMatch(/v1\.1\.0-beta\.1/);
+    expect(mergedMarkerComment.value).toMatch(/v1\.1\.0/);
   });
 
   it('rejects malformed and unknown persistent marker state', () => {
     const malformedComments = [
       '<!-- wire-webapp-release-appearance:v1\n{"beta":}\n-->',
-      '<!-- wire-webapp-release-appearance:v1\n{"beta":"invalid"}\n-->',
+      '<!-- wire-webapp-release-appearance:v1\n{"beta":""}\n-->',
       '<!-- wire-webapp-release-appearance:v1\n{"edge":"2026-07-21.3"}\n-->',
       '<!-- wire-webapp-release-appearance:v2\n{"beta":"2026-07-21.3-beta.1"}\n-->',
     ];
@@ -247,7 +223,7 @@ describe('persistent release appearance comments', () => {
   });
 
   it('rejects duplicate persistent marker comments', () => {
-    const betaState = createReleaseAppearanceState(Maybe.just('2026-07-21.3-beta.1'), Maybe.nothing<string>());
+    const betaState = createReleaseAppearanceState(Maybe.just('v1.1.0-beta.1'), Maybe.nothing<string>());
     const markerComment = renderPersistentComment(betaState);
 
     const mergeResult = mergeReleaseAppearanceComments([markerComment, markerComment], betaState);
