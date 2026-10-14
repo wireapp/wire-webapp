@@ -136,11 +136,11 @@ function createReservationResult(options: CreateWebAppReleaseReservationResultOp
   };
 }
 
-function findMultipleActiveWebAppReleaseReservationsError(
+function validateAtMostOneActiveWebAppReleaseReservation(
   activeReservations: readonly WebAppReleaseBranchRef[],
-): Maybe<Error> {
+): Result<Unit, Error> {
   if (activeReservations.length <= 1) {
-    return Maybe.nothing<Error>();
+    return Result.ok();
   }
 
   const activeReservationBranches = activeReservations
@@ -149,7 +149,7 @@ function findMultipleActiveWebAppReleaseReservationsError(
     })
     .join(', ');
 
-  return Maybe.just(new Error(`Multiple unresolved WebApp release reservations exist: ${activeReservationBranches}`));
+  return Result.err(new Error(`Multiple unresolved WebApp release reservations exist: ${activeReservationBranches}`));
 }
 
 export function inspectActiveWebAppReleaseReservations(
@@ -247,11 +247,11 @@ async function executeWebAppReleaseReservation(
     return Result.err(activeReservationsResult.error);
   }
 
-  const multipleActiveReservationsError = findMultipleActiveWebAppReleaseReservationsError(
+  const activeReservationCountValidationResult = validateAtMostOneActiveWebAppReleaseReservation(
     activeReservationsResult.value,
   );
-  if (multipleActiveReservationsError.isJust) {
-    return Result.err(multipleActiveReservationsError.value);
+  if (activeReservationCountValidationResult.isErr) {
+    return Result.err(activeReservationCountValidationResult.error);
   }
 
   const activeReservationMaybe = Maybe.of(activeReservationsResult.value.at(0));
@@ -362,11 +362,11 @@ async function executeWebAppReleaseContinuation(
     return Result.err(activeReservationsResult.error);
   }
 
-  const multipleActiveReservationsError = findMultipleActiveWebAppReleaseReservationsError(
+  const activeReservationCountValidationResult = validateAtMostOneActiveWebAppReleaseReservation(
     activeReservationsResult.value,
   );
-  if (multipleActiveReservationsError.isJust) {
-    return Result.err(multipleActiveReservationsError.value);
+  if (activeReservationCountValidationResult.isErr) {
+    return Result.err(activeReservationCountValidationResult.error);
   }
 
   const activeReservationMaybe = Maybe.of(activeReservationsResult.value.at(0));
