@@ -271,7 +271,7 @@ describe('getSharedDriveDropRejectionFeedback', () => {
       ),
     ).toEqual({
       title: 'conversationFileUploadFailedHeading',
-      message: 'sharedDriveDropInvalidNameMessage',
+      message: 'cells.nodeName.invalidCharactersError',
       invalidFiles: [file],
     });
   });

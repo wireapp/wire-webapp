@@ -121,7 +121,7 @@ export const getSharedDriveDropRejectionFeedback = (
   if (reason === 'invalidName') {
     return {
       title: translate('conversationFileUploadFailedHeading'),
-      message: translate('sharedDriveDropInvalidNameMessage'),
+      message: translate('cells.nodeName.invalidCharactersError'),
       invalidFiles: [...invalidFiles],
     };
   }

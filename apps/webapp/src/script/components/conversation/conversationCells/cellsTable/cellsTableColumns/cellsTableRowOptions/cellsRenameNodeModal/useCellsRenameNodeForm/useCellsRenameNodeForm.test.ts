@@ -29,7 +29,7 @@ import {useCellsRenameForm} from './useCellsRenameNodeForm';
 describe('useCellsRenameForm', () => {
   const renameNodeCopy = {
     error: 'cells.renameNodeModal.error',
-    invalidCharacters: 'cells.renameNodeModal.invalidCharacters',
+    invalidCharacters: 'cells.nodeName.invalidCharactersError',
     nameRequired: 'cells.renameNodeModal.nameRequired',
   };
   let mockCellsRepository: jest.Mocked<CellsRepository>;
