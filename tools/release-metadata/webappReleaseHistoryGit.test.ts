@@ -92,11 +92,10 @@ describe('WebApp release Git history adapter', () => {
   it('resolves an ancestor range in deterministic first-parent order', async () => {
     const fakeGitExecution = createFakeGitExecution({baseCommit, targetCommit, commits: [firstCommit, secondCommit]});
 
-    const actualHistoryResult = await readWebAppReleaseHistory({
-      baseCommit,
-      targetCommit,
-      executeGitCommand: fakeGitExecution.executeGitCommand,
-    });
+    const actualHistoryResult = await readWebAppReleaseHistory(
+      {baseCommit, targetCommit},
+      {executeGitCommand: fakeGitExecution.executeGitCommand},
+    ).toPromise();
 
     assert(actualHistoryResult.isOk);
     const actualHistory = actualHistoryResult.value;
@@ -113,11 +112,10 @@ describe('WebApp release Git history adapter', () => {
   it('accepts an empty ancestor range', async () => {
     const fakeGitExecution = createFakeGitExecution({baseCommit, targetCommit, commits: []});
 
-    const actualHistoryResult = await readWebAppReleaseHistory({
-      baseCommit,
-      targetCommit,
-      executeGitCommand: fakeGitExecution.executeGitCommand,
-    });
+    const actualHistoryResult = await readWebAppReleaseHistory(
+      {baseCommit, targetCommit},
+      {executeGitCommand: fakeGitExecution.executeGitCommand},
+    ).toPromise();
 
     assert(actualHistoryResult.isOk);
     expect(actualHistoryResult.value.commits).toEqual([]);
@@ -126,11 +124,10 @@ describe('WebApp release Git history adapter', () => {
   it('rejects a malformed base commit before executing Git', async () => {
     const fakeGitExecution = createFakeGitExecution({baseCommit, targetCommit, commits: []});
 
-    const actualHistoryResult = await readWebAppReleaseHistory({
-      baseCommit: 'not-a-commit',
-      targetCommit,
-      executeGitCommand: fakeGitExecution.executeGitCommand,
-    });
+    const actualHistoryResult = await readWebAppReleaseHistory(
+      {baseCommit: 'not-a-commit', targetCommit},
+      {executeGitCommand: fakeGitExecution.executeGitCommand},
+    ).toPromise();
 
     assert(actualHistoryResult.isErr);
     expect(actualHistoryResult.error.message).toContain('Invalid base commit');
@@ -145,11 +142,10 @@ describe('WebApp release Git history adapter', () => {
       failingCommand: 'base-resolution',
     });
 
-    const actualHistoryResult = await readWebAppReleaseHistory({
-      baseCommit,
-      targetCommit,
-      executeGitCommand: fakeGitExecution.executeGitCommand,
-    });
+    const actualHistoryResult = await readWebAppReleaseHistory(
+      {baseCommit, targetCommit},
+      {executeGitCommand: fakeGitExecution.executeGitCommand},
+    ).toPromise();
 
     assert(actualHistoryResult.isErr);
     expect(actualHistoryResult.error.message).toContain('Unable to resolve base commit');
@@ -163,11 +159,10 @@ describe('WebApp release Git history adapter', () => {
       failingCommand: 'target-resolution',
     });
 
-    const actualHistoryResult = await readWebAppReleaseHistory({
-      baseCommit,
-      targetCommit,
-      executeGitCommand: fakeGitExecution.executeGitCommand,
-    });
+    const actualHistoryResult = await readWebAppReleaseHistory(
+      {baseCommit, targetCommit},
+      {executeGitCommand: fakeGitExecution.executeGitCommand},
+    ).toPromise();
 
     assert(actualHistoryResult.isErr);
     expect(actualHistoryResult.error.message).toContain('Unable to resolve target commit');
@@ -181,11 +176,10 @@ describe('WebApp release Git history adapter', () => {
       unrelatedCommitCount: 1,
     });
 
-    const actualHistoryResult = await readWebAppReleaseHistory({
-      baseCommit,
-      targetCommit,
-      executeGitCommand: fakeGitExecution.executeGitCommand,
-    });
+    const actualHistoryResult = await readWebAppReleaseHistory(
+      {baseCommit, targetCommit},
+      {executeGitCommand: fakeGitExecution.executeGitCommand},
+    ).toPromise();
 
     assert(actualHistoryResult.isErr);
     expect(actualHistoryResult.error.message).toBe('Base commit is not an ancestor of target commit');
@@ -199,11 +193,10 @@ describe('WebApp release Git history adapter', () => {
       failingCommand: 'commit-list',
     });
 
-    const actualHistoryResult = await readWebAppReleaseHistory({
-      baseCommit,
-      targetCommit,
-      executeGitCommand: fakeGitExecution.executeGitCommand,
-    });
+    const actualHistoryResult = await readWebAppReleaseHistory(
+      {baseCommit, targetCommit},
+      {executeGitCommand: fakeGitExecution.executeGitCommand},
+    ).toPromise();
 
     assert(actualHistoryResult.isErr);
     expect(actualHistoryResult.error.message).toContain('Git command failed');

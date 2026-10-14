@@ -18,7 +18,7 @@
  */
 
 import {isError} from '@sindresorhus/is';
-import {maybe, Result} from 'true-myth';
+import {maybe, Result, Task, task} from 'true-myth';
 
 export type ExecuteWebAppReleaseGitCommand = (commandArguments: readonly string[]) => Promise<string>;
 
@@ -31,6 +31,9 @@ export type WebAppReleaseHistory = {
 export type ReadWebAppReleaseHistoryOptions = {
   readonly baseCommit: string;
   readonly targetCommit: string;
+};
+
+export type ReadWebAppReleaseHistoryDependencies = {
   readonly executeGitCommand: ExecuteWebAppReleaseGitCommand;
 };
 
@@ -51,42 +54,41 @@ function errorMessage(error: unknown): string {
   return isError(error) ? error.message : String(error);
 }
 
-async function executeGitCommand(options: ExecuteGitCommandOptions): Promise<Result<string, Error>> {
+function executeGitCommand(options: ExecuteGitCommandOptions): Task<string, Error> {
   const {executeGitCommand: runGitCommand, commandArguments} = options;
 
-  try {
-    const commandOutput = await runGitCommand(commandArguments);
+  return task.tryOrElse(
+    (error: unknown): Error => {
+      const gitCommand = `git ${commandArguments.join(' ')}`;
 
-    return Result.ok(commandOutput);
-  } catch (error: unknown) {
-    const gitCommand = `git ${commandArguments.join(' ')}`;
-
-    return Result.err(new Error(`Git command failed: ${gitCommand}: ${errorMessage(error)}`, {cause: error}));
-  }
+      return new Error(`Git command failed: ${gitCommand}: ${errorMessage(error)}`, {cause: error});
+    },
+    async (): Promise<string> => {
+      return runGitCommand(commandArguments);
+    },
+  );
 }
 
-async function resolveGitCommit(options: ResolveGitCommitOptions): Promise<Result<string, Error>> {
+function resolveGitCommit(options: ResolveGitCommitOptions): Task<string, Error> {
   const {executeGitCommand: runGitCommand, commitReference, commitName} = options;
 
-  const commandResult = await executeGitCommand({
+  return executeGitCommand({
     executeGitCommand: runGitCommand,
     commandArguments: ['rev-parse', '--verify', '--end-of-options', `${commitReference}^{commit}`],
-  });
+  })
+    .mapRejected(error => {
+      return new Error(`Unable to resolve ${commitName} commit ${commitReference}: ${error.message}`, {cause: error});
+    })
+    .andThen(commandOutput => {
+      const resolvedCommitSha = commandOutput.trim();
+      if (!fullCommitShaPattern.test(resolvedCommitSha)) {
+        return Task.reject<string, Error>(
+          new Error(`Unable to resolve ${commitName} commit ${commitReference} to a commit SHA`),
+        );
+      }
 
-  if (commandResult.isErr) {
-    return Result.err(
-      new Error(`Unable to resolve ${commitName} commit ${commitReference}: ${commandResult.error.message}`, {
-        cause: commandResult.error,
-      }),
-    );
-  }
-
-  const resolvedCommitSha = commandResult.value.trim();
-  if (!fullCommitShaPattern.test(resolvedCommitSha)) {
-    return Result.err(new Error(`Unable to resolve ${commitName} commit ${commitReference} to a commit SHA`));
-  }
-
-  return Result.ok(resolvedCommitSha.toLowerCase());
+      return Task.resolve(resolvedCommitSha.toLowerCase());
+    });
 }
 
 function parseCommitCountRange(commandOutput: string): Result<boolean, Error> {
@@ -133,72 +135,65 @@ function parseFirstParentCommitList(commandOutput: string): Result<readonly stri
   );
 }
 
-export async function readWebAppReleaseHistory(
+export function readWebAppReleaseHistory(
   options: ReadWebAppReleaseHistoryOptions,
-): Promise<Result<WebAppReleaseHistory, Error>> {
-  const {baseCommit, targetCommit, executeGitCommand: executeGit} = options;
+  dependencies: ReadWebAppReleaseHistoryDependencies,
+): Task<WebAppReleaseHistory, Error> {
+  const {baseCommit, targetCommit} = options;
+  const {executeGitCommand: executeGit} = dependencies;
 
   if (!fullCommitShaPattern.test(baseCommit)) {
-    return Result.err(new Error('Invalid base commit: expected a full 40-character hexadecimal SHA'));
+    return Task.reject(new Error('Invalid base commit: expected a full 40-character hexadecimal SHA'));
   }
 
   if (!fullCommitShaPattern.test(targetCommit)) {
-    return Result.err(new Error('Invalid target commit: expected a full 40-character hexadecimal SHA'));
+    return Task.reject(new Error('Invalid target commit: expected a full 40-character hexadecimal SHA'));
   }
 
-  const resolvedBaseCommitResult = await resolveGitCommit({
+  return resolveGitCommit({
     executeGitCommand: executeGit,
     commitReference: baseCommit,
     commitName: 'base',
-  });
-  if (resolvedBaseCommitResult.isErr) {
-    return Result.err(resolvedBaseCommitResult.error);
-  }
+  }).andThen(resolvedBaseCommit => {
+    return resolveGitCommit({
+      executeGitCommand: executeGit,
+      commitReference: targetCommit,
+      commitName: 'target',
+    }).andThen(resolvedTargetCommit => {
+      return executeGitCommand({
+        executeGitCommand: executeGit,
+        commandArguments: ['rev-list', '--left-right', '--count', `${resolvedBaseCommit}...${resolvedTargetCommit}`],
+      }).andThen(ancestorCheckOutput => {
+        const baseAncestorResult = parseCommitCountRange(ancestorCheckOutput);
+        if (baseAncestorResult.isErr) {
+          return Task.reject<WebAppReleaseHistory, Error>(baseAncestorResult.error);
+        }
 
-  const resolvedTargetCommitResult = await resolveGitCommit({
-    executeGitCommand: executeGit,
-    commitReference: targetCommit,
-    commitName: 'target',
-  });
-  if (resolvedTargetCommitResult.isErr) {
-    return Result.err(resolvedTargetCommitResult.error);
-  }
+        if (!baseAncestorResult.value) {
+          return Task.reject<WebAppReleaseHistory, Error>(new Error('Base commit is not an ancestor of target commit'));
+        }
 
-  const resolvedBaseCommit = resolvedBaseCommitResult.value;
-  const resolvedTargetCommit = resolvedTargetCommitResult.value;
-  const ancestorCheckResult = await executeGitCommand({
-    executeGitCommand: executeGit,
-    commandArguments: ['rev-list', '--left-right', '--count', `${resolvedBaseCommit}...${resolvedTargetCommit}`],
-  });
-  if (ancestorCheckResult.isErr) {
-    return Result.err(ancestorCheckResult.error);
-  }
+        return executeGitCommand({
+          executeGitCommand: executeGit,
+          commandArguments: [
+            'rev-list',
+            '--reverse',
+            '--first-parent',
+            `${resolvedBaseCommit}..${resolvedTargetCommit}`,
+          ],
+        }).andThen(commitListOutput => {
+          const commitsResult = parseFirstParentCommitList(commitListOutput);
+          if (commitsResult.isErr) {
+            return Task.reject<WebAppReleaseHistory, Error>(commitsResult.error);
+          }
 
-  const baseAncestorResult = parseCommitCountRange(ancestorCheckResult.value);
-  if (baseAncestorResult.isErr) {
-    return Result.err(baseAncestorResult.error);
-  }
-
-  if (!baseAncestorResult.value) {
-    return Result.err(new Error('Base commit is not an ancestor of target commit'));
-  }
-
-  const commitListResult = await executeGitCommand({
-    executeGitCommand: executeGit,
-    commandArguments: ['rev-list', '--reverse', '--first-parent', `${resolvedBaseCommit}..${resolvedTargetCommit}`],
-  });
-  if (commitListResult.isErr) {
-    return Result.err(commitListResult.error);
-  }
-
-  const commitsResult = parseFirstParentCommitList(commitListResult.value);
-  if (commitsResult.isErr) {
-    return Result.err(commitsResult.error);
-  }
-
-  return Result.ok({
-    baseCommit: resolvedBaseCommit,
-    targetCommit: resolvedTargetCommit,
-    commits: commitsResult.value,
+          return Task.resolve({
+            baseCommit: resolvedBaseCommit,
+            targetCommit: resolvedTargetCommit,
+            commits: commitsResult.value,
+          });
+        });
+      });
+    });
   });
 }

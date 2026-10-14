@@ -29,6 +29,11 @@ export type ParsedBetaWebAppTagName = {
   readonly candidateNumber: number;
 };
 
+export type ValidateBetaWebAppTagVersionOptions = {
+  readonly tagName: string;
+  readonly expectedVersion: string;
+};
+
 type ParsedExistingBetaTag = {
   readonly tagName: string;
   readonly parseResult: Result<ParsedBetaWebAppTagName, Error>;
@@ -114,6 +119,29 @@ export function parseBetaWebAppTagName(tagName: string): Result<ParsedBetaWebApp
         return Result.err(new Error(`Invalid WebApp Beta tag name: ${tagName}`));
       },
     });
+}
+
+export function validateBetaWebAppTagVersion(options: ValidateBetaWebAppTagVersionOptions): Result<string, Error> {
+  const {tagName, expectedVersion} = options;
+  const betaTagResult = parseBetaWebAppTagName(tagName);
+  if (betaTagResult.isErr) {
+    return Result.err(betaTagResult.error);
+  }
+
+  const expectedVersionResult = validateWebAppVersion(expectedVersion);
+  if (expectedVersionResult.isErr) {
+    return Result.err(expectedVersionResult.error);
+  }
+
+  if (betaTagResult.value.version !== expectedVersionResult.value) {
+    return Result.err(
+      new Error(
+        `WebApp Beta tag ${tagName} belongs to ${betaTagResult.value.version}, expected ${expectedVersionResult.value}`,
+      ),
+    );
+  }
+
+  return Result.ok(tagName);
 }
 
 function parseExistingBetaTag(tagName: string): ParsedExistingBetaTag {

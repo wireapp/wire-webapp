@@ -17,7 +17,7 @@
  *
  */
 
-import {Maybe, Result} from 'true-myth';
+import {Maybe, Result, Task, task} from 'true-myth';
 
 import type {ExecuteWebAppReleaseGitCommand} from './webappReleaseHistoryGit.ts';
 import {parseBetaWebAppTagName, parseStableWebAppTagName} from './webappReleaseIdentity.ts';
@@ -55,18 +55,19 @@ function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
 
-async function executeGitCommand(options: ExecuteGitCommandOptions): Promise<Result<string, Error>> {
+function executeGitCommand(options: ExecuteGitCommandOptions): Task<string, Error> {
   const {executeGitCommand: runGitCommand, commandArguments} = options;
 
-  try {
-    return Result.ok(await runGitCommand(commandArguments));
-  } catch (error: unknown) {
-    return Result.err(
-      new Error(`Git command failed: git ${commandArguments.join(' ')}: ${errorMessage(error)}`, {
+  return task.tryOrElse(
+    (error: unknown): Error => {
+      return new Error(`Git command failed: git ${commandArguments.join(' ')}: ${errorMessage(error)}`, {
         cause: error,
-      }),
-    );
-  }
+      });
+    },
+    async (): Promise<string> => {
+      return runGitCommand(commandArguments);
+    },
+  );
 }
 
 function classifyWebAppTagName(tagName: string): Result<Maybe<WebAppVersion>, Error> {
@@ -87,95 +88,103 @@ function classifyWebAppTagName(tagName: string): Result<Maybe<WebAppVersion>, Er
   return Result.ok(Maybe.nothing<WebAppVersion>());
 }
 
-async function readStableWebAppTag(options: ReadStableWebAppTagOptions): Promise<Result<StableWebAppRelease, Error>> {
+function readStableWebAppTag(options: ReadStableWebAppTagOptions): Task<StableWebAppRelease, Error> {
   const {executeGitCommand: runGitCommand, tagName} = options;
-  const tagObjectTypeResult = await executeGitCommand({
+  return executeGitCommand({
     executeGitCommand: runGitCommand,
     commandArguments: ['cat-file', '-t', `refs/tags/${tagName}`],
-  });
-  if (tagObjectTypeResult.isErr) {
-    return Result.err(
-      new Error(`Unable to inspect stable WebApp tag ${tagName}: ${tagObjectTypeResult.error.message}`, {
-        cause: tagObjectTypeResult.error,
-      }),
-    );
-  }
+  })
+    .mapRejected(error => {
+      return new Error(`Unable to inspect stable WebApp tag ${tagName}: ${error.message}`, {cause: error});
+    })
+    .andThen(tagObjectType => {
+      if (tagObjectType.trim() !== 'tag') {
+        return Task.reject<StableWebAppRelease, Error>(new Error(`Stable WebApp tag must be annotated: ${tagName}`));
+      }
 
-  if (tagObjectTypeResult.value.trim() !== 'tag') {
-    return Result.err(new Error(`Stable WebApp tag must be annotated: ${tagName}`));
-  }
+      return executeGitCommand({
+        executeGitCommand: runGitCommand,
+        commandArguments: ['rev-parse', '--verify', '--end-of-options', `refs/tags/${tagName}^{commit}`],
+      })
+        .mapRejected(error => {
+          return new Error(`Stable WebApp tag does not resolve to a commit: ${tagName}`, {cause: error});
+        })
+        .andThen(commitOutput => {
+          const commitSha = commitOutput.trim();
+          if (fullCommitShaPattern.test(commitSha) === false) {
+            return Task.reject<StableWebAppRelease, Error>(
+              new Error(`Stable WebApp tag did not resolve to a commit SHA: ${tagName}`),
+            );
+          }
 
-  const commitShaResult = await executeGitCommand({
-    executeGitCommand: runGitCommand,
-    commandArguments: ['rev-parse', '--verify', '--end-of-options', `refs/tags/${tagName}^{commit}`],
-  });
-  if (commitShaResult.isErr) {
-    return Result.err(
-      new Error(`Stable WebApp tag does not resolve to a commit: ${tagName}`, {
-        cause: commitShaResult.error,
-      }),
-    );
-  }
+          const versionResult = parseStableWebAppTagName(tagName);
+          if (versionResult.isErr) {
+            return Task.reject<StableWebAppRelease, Error>(versionResult.error);
+          }
 
-  const commitSha = commitShaResult.value.trim();
-  if (fullCommitShaPattern.test(commitSha) === false) {
-    return Result.err(new Error(`Stable WebApp tag did not resolve to a commit SHA: ${tagName}`));
-  }
-
-  const versionResult = parseStableWebAppTagName(tagName);
-  if (versionResult.isErr) {
-    return Result.err(versionResult.error);
-  }
-
-  return Result.ok(
-    Object.freeze({
-      version: versionResult.value,
-      tagName,
-      commitSha: commitSha.toLowerCase(),
-    }),
-  );
+          return Task.resolve(
+            Object.freeze({
+              version: versionResult.value,
+              tagName,
+              commitSha: commitSha.toLowerCase(),
+            }),
+          );
+        });
+    });
 }
 
-export async function discoverStableWebAppReleases(
+type ReadStableWebAppReleasesFromTagsOptions = {
+  readonly tagNames: readonly string[];
+  readonly tagIndex: number;
+  readonly stableReleases: readonly StableWebAppRelease[];
+  readonly executeGitCommand: ExecuteWebAppReleaseGitCommand;
+};
+
+function readStableWebAppReleasesFromTags(
+  options: ReadStableWebAppReleasesFromTagsOptions,
+): Task<readonly StableWebAppRelease[], Error> {
+  const tagName = options.tagNames.at(options.tagIndex);
+  if (tagName === undefined) {
+    return Task.resolve(Object.freeze(options.stableReleases));
+  }
+
+  const classificationResult = classifyWebAppTagName(tagName);
+  if (classificationResult.isErr) {
+    return Task.reject(classificationResult.error);
+  }
+
+  if (classificationResult.value.isNothing) {
+    return readStableWebAppReleasesFromTags({...options, tagIndex: options.tagIndex + 1});
+  }
+
+  return readStableWebAppTag({executeGitCommand: options.executeGitCommand, tagName}).andThen(stableRelease => {
+    return readStableWebAppReleasesFromTags({
+      ...options,
+      tagIndex: options.tagIndex + 1,
+      stableReleases: [...options.stableReleases, stableRelease],
+    });
+  });
+}
+
+export function discoverStableWebAppReleases(
   options: DiscoverStableWebAppReleasesOptions,
-): Promise<Result<readonly StableWebAppRelease[], Error>> {
+): Task<readonly StableWebAppRelease[], Error> {
   const {executeGitCommand: runGitCommand} = options;
-  const tagNamesResult = await executeGitCommand({
+  return executeGitCommand({
     executeGitCommand: runGitCommand,
     commandArguments: ['tag', '--list'],
-  });
-  if (tagNamesResult.isErr) {
-    return Result.err(tagNamesResult.error);
-  }
-
-  const stableReleases: StableWebAppRelease[] = [];
-  const tagNames = tagNamesResult.value.split(/\r?\n/).filter(tagName => {
-    return tagName.length > 0;
-  });
-
-  for (const tagName of tagNames) {
-    const classificationResult = classifyWebAppTagName(tagName);
-    if (classificationResult.isErr) {
-      return Result.err(classificationResult.error);
-    }
-
-    const versionMaybe = classificationResult.value;
-    if (versionMaybe.isNothing) {
-      continue;
-    }
-
-    const stableWebAppTagResult = await readStableWebAppTag({
-      executeGitCommand: runGitCommand,
-      tagName,
+  }).andThen(tagNamesOutput => {
+    const tagNames = tagNamesOutput.split(/\r?\n/).filter(tagName => {
+      return tagName.length > 0;
     });
-    if (stableWebAppTagResult.isErr) {
-      return Result.err(stableWebAppTagResult.error);
-    }
 
-    stableReleases.push(stableWebAppTagResult.value);
-  }
-
-  return Result.ok(Object.freeze(stableReleases));
+    return readStableWebAppReleasesFromTags({
+      tagNames,
+      tagIndex: 0,
+      stableReleases: [],
+      executeGitCommand: runGitCommand,
+    });
+  });
 }
 
 export function selectLatestStableWebAppRelease(

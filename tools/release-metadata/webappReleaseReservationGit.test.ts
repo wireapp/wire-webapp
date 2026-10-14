@@ -19,6 +19,8 @@
 
 import assert from 'node:assert';
 
+import {Task} from 'true-myth';
+
 import {execFileSync} from 'node:child_process';
 import {mkdtempSync, rmSync, writeFileSync} from 'node:fs';
 import {tmpdir} from 'node:os';
@@ -30,9 +32,9 @@ import {
   prepareRemoteWebAppReleaseBranchCommit,
   readRemoteWebAppReleaseBranches,
 } from './webappReleaseReservationGit.ts';
-import {continueActiveWebAppRelease} from './webappReleaseReservation.ts';
+import {prepareWebAppRelease} from './webappReleaseReservation.ts';
 import type {
-  ContinueActiveWebAppReleaseDependencies,
+  PrepareWebAppReleaseDependencies,
   PrepareRemoteReleaseBranchCommitOptions,
   VerifyWebAppReleaseCommitAncestorOptions,
 } from './webappReleaseReservation.ts';
@@ -215,9 +217,9 @@ function createConcurrentGitExecutor(options: SimulateConcurrentPushOptions): Ex
   };
 }
 
-function createContinuationGitDependencies(
+function createReleasePreparationGitDependencies(
   options: CreateContinuationGitDependenciesOptions,
-): ContinueActiveWebAppReleaseDependencies {
+): PrepareWebAppReleaseDependencies {
   const {repository, executeGitCommand: suppliedGitCommand} = options;
   const executeGitCommand = suppliedGitCommand ?? repository.executeGitCommand;
 
@@ -262,6 +264,12 @@ function createContinuationGitDependencies(
     readRemoteReleaseBranches,
     prepareRemoteReleaseBranchCommit,
     isCommitAncestor: verifyStableBaseAncestry,
+    planNextWebAppRelease() {
+      return Task.reject(new Error('Continue must not plan a release'));
+    },
+    createReleaseBranch() {
+      return Task.reject(new Error('Continue must not create a release branch'));
+    },
   };
 }
 
@@ -440,11 +448,12 @@ describe('WebApp release reservation Git adapter', () => {
         workingDirectoryPath: temporaryRepository.workingDirectoryPath,
       });
 
-      const dependencies = createContinuationGitDependencies({repository: temporaryRepository});
-      const actualContinuationResult = await continueActiveWebAppRelease(dependencies);
+      const dependencies = createReleasePreparationGitDependencies({repository: temporaryRepository});
+      const actualContinuationResult = await prepareWebAppRelease({operation: 'continue'}, dependencies).toPromise();
 
       assert(actualContinuationResult.isOk);
       expect(actualContinuationResult.value).toEqual({
+        operation: 'continue',
         version: '1.1.0',
         releaseBranch: 'release/1.1.0',
         releaseCommitSha: reviewedFixCommit,
@@ -512,14 +521,17 @@ describe('WebApp release reservation Git adapter', () => {
 
         return temporaryRepository.executeGitCommand(commandArguments);
       };
-      const dependencies = createContinuationGitDependencies({repository: temporaryRepository, executeGitCommand});
+      const dependencies = createReleasePreparationGitDependencies({
+        repository: temporaryRepository,
+        executeGitCommand,
+      });
 
-      const actualContinuationResult = await continueActiveWebAppRelease(dependencies);
+      const actualContinuationResult = await prepareWebAppRelease({operation: 'continue'}, dependencies).toPromise();
 
       assert(actualContinuationResult.isErr);
       assert(advancedCommit !== undefined);
       expect(actualContinuationResult.error.message).toBe(
-        `WebApp release branch changed during continuation: release/1.1.0 was ${discoveredCommit} when discovered, but fetch resolved ${advancedCommit}; retry continuation`,
+        `Unable to continue WebApp release: WebApp release branch changed during continuation: release/1.1.0 was ${discoveredCommit} when discovered, but fetch resolved ${advancedCommit}; retry continuation`,
       );
       expect(
         commandHistory.some(commandArguments => {

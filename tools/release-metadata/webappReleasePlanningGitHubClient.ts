@@ -17,7 +17,7 @@
  *
  */
 
-import {Maybe, Result} from 'true-myth';
+import {Maybe, Result, Task, task} from 'true-myth';
 import {z} from 'zod';
 
 import {
@@ -47,7 +47,7 @@ export type ListWebAppReleasePlanningPullRequestsForCommitOptions = {
 export type WebAppReleasePlanningGitHubClient = {
   readonly listPullRequestsForCommit: (
     options: ListWebAppReleasePlanningPullRequestsForCommitOptions,
-  ) => Promise<Result<readonly WebAppReleasePlanningPullRequest[], Error>>;
+  ) => Task<readonly WebAppReleasePlanningPullRequest[], Error>;
 };
 
 export type CreateWebAppReleasePlanningGitHubClientOptions = {
@@ -119,47 +119,57 @@ export function createWebAppReleasePlanningGitHubClient(
   const readHeaders = createGitHubHeaders({githubToken, includesJsonBody: false});
 
   return {
-    async listPullRequestsForCommit(listOptions: ListWebAppReleasePlanningPullRequestsForCommitOptions) {
+    listPullRequestsForCommit(listOptions: ListWebAppReleasePlanningPullRequestsForCommitOptions) {
       const {commitSha} = listOptions;
-      const pullRequests: WebAppReleasePlanningPullRequest[] = [];
       const endpoint = new URL(
         `repos/${encodedRepositoryName}/commits/${encodeURIComponent(commitSha)}/pulls`,
         githubApiRoot,
       );
 
-      for (let page = 1; ; page += 1) {
-        let githubResponse: unknown;
+      return task.tryOrElse(
+        (error: unknown): Error => {
+          return error instanceof Error ? error : new Error(String(error));
+        },
+        async (): Promise<readonly WebAppReleasePlanningPullRequest[]> => {
+          const pullRequests: WebAppReleasePlanningPullRequest[] = [];
 
-        try {
-          githubResponse = await httpClient.requestJson(
-            createGitHubHttpRequest({
-              method: 'get',
-              url: createGitHubPageUrl({endpoint, page}),
-              headers: readHeaders,
-              json: Maybe.nothing<NonNullable<unknown>>(),
-            }),
-          );
-        } catch (error: unknown) {
-          const failureMessage = redactGitHubSecret(
-            formatGitHubRequestError({error, fallbackMessage: 'Unknown GitHub request failure'}),
-            githubToken,
-          );
+          for (let page = 1; ; page += 1) {
+            let githubResponse: unknown;
 
-          return createFailure(`Unable to list pull requests associated with commit ${commitSha}: ${failureMessage}`);
-        }
+            try {
+              githubResponse = await httpClient.requestJson(
+                createGitHubHttpRequest({
+                  method: 'get',
+                  url: createGitHubPageUrl({endpoint, page}),
+                  headers: readHeaders,
+                  json: Maybe.nothing<NonNullable<unknown>>(),
+                }),
+              );
+            } catch (error: unknown) {
+              const failureMessage = redactGitHubSecret(
+                formatGitHubRequestError({error, fallbackMessage: 'Unknown GitHub request failure'}),
+                githubToken,
+              );
 
-        const pageResult = parsePullRequestPage(githubResponse);
-        if (pageResult.isErr) {
-          return createFailure(pageResult.error.message);
-        }
+              throw new Error(`Unable to list pull requests associated with commit ${commitSha}: ${failureMessage}`, {
+                cause: error,
+              });
+            }
 
-        pullRequests.push(...pageResult.value.pullRequests);
-        if (pageResult.value.rawItemCount !== githubApiPageSize) {
-          break;
-        }
-      }
+            const pageResult = parsePullRequestPage(githubResponse);
+            if (pageResult.isErr) {
+              throw pageResult.error;
+            }
 
-      return createSuccess(pullRequests);
+            pullRequests.push(...pageResult.value.pullRequests);
+            if (pageResult.value.rawItemCount !== githubApiPageSize) {
+              break;
+            }
+          }
+
+          return pullRequests;
+        },
+      );
     },
   };
 }
