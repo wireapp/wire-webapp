@@ -29,6 +29,12 @@ import {
   isWebAppReleaseCommitAncestor,
   readRemoteWebAppReleaseBranches,
 } from './webappReleaseReservationGit.ts';
+import {continueActiveWebAppRelease} from './webappReleaseReservation.ts';
+import type {
+  ContinueActiveWebAppReleaseDependencies,
+  VerifyWebAppReleaseCommitAncestorOptions,
+} from './webappReleaseReservation.ts';
+import {discoverStableWebAppReleases} from './webappStableReleaseGit.ts';
 import type {ExecuteWebAppReleaseGitCommand} from './webappReleaseHistoryGit.ts';
 
 type TemporaryRemoteRepository = {
@@ -150,6 +156,36 @@ function createConcurrentGitExecutor(options: SimulateConcurrentPushOptions): Ex
       arguments: commandArguments,
       workingDirectoryPath: options.repository.workingDirectoryPath,
     });
+  };
+}
+
+function createContinuationGitDependencies(
+  temporaryRepository: TemporaryRemoteRepository,
+): ContinueActiveWebAppReleaseDependencies {
+  function readStableWebAppReleases(): ReturnType<typeof discoverStableWebAppReleases> {
+    return discoverStableWebAppReleases({executeGitCommand: temporaryRepository.executeGitCommand});
+  }
+
+  function readRemoteReleaseBranches(): ReturnType<typeof readRemoteWebAppReleaseBranches> {
+    return readRemoteWebAppReleaseBranches({
+      executeGitCommand: temporaryRepository.executeGitCommand,
+      remoteName: 'origin',
+    });
+  }
+
+  function verifyStableBaseAncestry(
+    ancestorOptions: VerifyWebAppReleaseCommitAncestorOptions,
+  ): ReturnType<typeof isWebAppReleaseCommitAncestor> {
+    return isWebAppReleaseCommitAncestor({
+      ...ancestorOptions,
+      executeGitCommand: temporaryRepository.executeGitCommand,
+    });
+  }
+
+  return {
+    readStableWebAppReleases,
+    readRemoteReleaseBranches,
+    isCommitAncestor: verifyStableBaseAncestry,
   };
 }
 
@@ -289,6 +325,63 @@ describe('WebApp release reservation Git adapter', () => {
       expect(actualRemoteBranchesResult.value).toEqual([
         {releaseBranch: 'release/1.1.0', releaseCommitSha: temporaryRepository.stableCommit},
       ]);
+    } finally {
+      rmSync(temporaryRepository.temporaryDirectoryPath, {force: true, recursive: true});
+    }
+  });
+
+  it('continues the current remote release head after a reviewed fix advances it without mutating Git refs', async () => {
+    const temporaryRepository = createTemporaryRemoteRepository();
+
+    try {
+      runGitCommand({
+        arguments: ['push', '--quiet', 'origin', `${temporaryRepository.targetCommit}:refs/heads/release/1.1.0`],
+        workingDirectoryPath: temporaryRepository.workingDirectoryPath,
+      });
+
+      const dependencies = createContinuationGitDependencies(temporaryRepository);
+
+      const actualInitialContinuationResult = await continueActiveWebAppRelease({dependencies});
+      assert(actualInitialContinuationResult.isOk);
+      expect(actualInitialContinuationResult.value.releaseCommitSha).toBe(temporaryRepository.targetCommit);
+
+      runGitCommand({
+        arguments: ['push', '--quiet', 'origin', `${temporaryRepository.laterCommit}:refs/heads/release/1.1.0`],
+        workingDirectoryPath: temporaryRepository.workingDirectoryPath,
+      });
+
+      const actualLocalReferencesBeforeContinuation = runGitCommand({
+        arguments: ['show-ref', '--head'],
+        workingDirectoryPath: temporaryRepository.workingDirectoryPath,
+      });
+      const actualRemoteReferencesBeforeContinuation = runGitCommand({
+        arguments: ['ls-remote', '--heads', 'origin'],
+        workingDirectoryPath: temporaryRepository.workingDirectoryPath,
+      });
+
+      const actualAdvancedContinuationResult = await continueActiveWebAppRelease({dependencies});
+
+      assert(actualAdvancedContinuationResult.isOk);
+      expect(actualAdvancedContinuationResult.value).toEqual({
+        version: '1.1.0',
+        releaseBranch: 'release/1.1.0',
+        releaseCommitSha: temporaryRepository.laterCommit,
+        stableBaseVersion: '1.0.0',
+        stableBaseTag: 'v1.0.0',
+        stableBaseCommitSha: temporaryRepository.stableCommit,
+        action: 'reused',
+      });
+
+      const actualLocalReferencesAfterContinuation = runGitCommand({
+        arguments: ['show-ref', '--head'],
+        workingDirectoryPath: temporaryRepository.workingDirectoryPath,
+      });
+      const actualRemoteReferencesAfterContinuation = runGitCommand({
+        arguments: ['ls-remote', '--heads', 'origin'],
+        workingDirectoryPath: temporaryRepository.workingDirectoryPath,
+      });
+      expect(actualLocalReferencesAfterContinuation).toBe(actualLocalReferencesBeforeContinuation);
+      expect(actualRemoteReferencesAfterContinuation).toBe(actualRemoteReferencesBeforeContinuation);
     } finally {
       rmSync(temporaryRepository.temporaryDirectoryPath, {force: true, recursive: true});
     }

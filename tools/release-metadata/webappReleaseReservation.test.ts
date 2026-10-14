@@ -221,7 +221,7 @@ describe('WebApp release reservation allocation', () => {
     expect(testDependencies.branchCreationCalls).toEqual([]);
   });
 
-  it('fails when an active reservation points to a different target commit', async () => {
+  it('rejects a main target that differs from the current active branch commit', async () => {
     const testDependencies = createReservationTestDependencies({
       releaseBranches: [{releaseBranch: 'release/1.4.0', releaseCommitSha: otherCommit}],
     });
@@ -232,7 +232,9 @@ describe('WebApp release reservation allocation', () => {
     });
 
     assert(actualReservationResult.isErr);
-    expect(actualReservationResult.error.message).toContain('WebApp release reservation conflict');
+    expect(actualReservationResult.error.message).toBe(
+      `WebApp release reservation conflict: release/1.4.0 points to ${otherCommit}, requested target is ${targetCommit}`,
+    );
     expect(testDependencies.plannerCalls).toEqual([]);
     expect(testDependencies.branchCreationCalls).toEqual([]);
   });

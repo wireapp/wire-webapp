@@ -78,6 +78,16 @@ export type ReserveWebAppReleaseOptions = {
   readonly dependencies: WebAppReleaseReservationDependencies;
 };
 
+export type ContinueActiveWebAppReleaseDependencies = {
+  readonly readStableWebAppReleases: () => Promise<Result<readonly StableWebAppRelease[], Error>>;
+  readonly readRemoteReleaseBranches: () => Promise<Result<readonly WebAppReleaseBranchRef[], Error>>;
+  readonly isCommitAncestor: (options: VerifyWebAppReleaseCommitAncestorOptions) => Promise<Result<boolean, Error>>;
+};
+
+export type ContinueActiveWebAppReleaseOptions = {
+  readonly dependencies: ContinueActiveWebAppReleaseDependencies;
+};
+
 export type InspectActiveWebAppReleaseReservationsOptions = {
   readonly stableReleases: readonly StableWebAppRelease[];
   readonly releaseBranches: readonly WebAppReleaseBranchRef[];
@@ -117,6 +127,22 @@ function createReservationResult(options: CreateWebAppReleaseReservationResultOp
     stableBaseCommitSha: options.stableBaseRelease.commitSha,
     action: options.action,
   });
+}
+
+function findMultipleActiveWebAppReleaseReservationsError(
+  activeReservations: readonly WebAppReleaseBranchRef[],
+): Maybe<Error> {
+  if (activeReservations.length <= 1) {
+    return Maybe.nothing<Error>();
+  }
+
+  const activeReservationBranches = activeReservations
+    .map(activeReservation => {
+      return activeReservation.releaseBranch;
+    })
+    .join(', ');
+
+  return Maybe.just(new Error(`Multiple unresolved WebApp release reservations exist: ${activeReservationBranches}`));
 }
 
 export function inspectActiveWebAppReleaseReservations(
@@ -214,14 +240,11 @@ async function executeWebAppReleaseReservation(
     return Result.err(activeReservationsResult.error);
   }
 
-  if (activeReservationsResult.value.length > 1) {
-    const activeReservationBranches = activeReservationsResult.value
-      .map(activeReservation => {
-        return activeReservation.releaseBranch;
-      })
-      .join(', ');
-
-    return Result.err(new Error(`Multiple unresolved WebApp release reservations exist: ${activeReservationBranches}`));
+  const multipleActiveReservationsError = findMultipleActiveWebAppReleaseReservationsError(
+    activeReservationsResult.value,
+  );
+  if (multipleActiveReservationsError.isJust) {
+    return Result.err(multipleActiveReservationsError.value);
   }
 
   const activeReservationMaybe = Maybe.of(activeReservationsResult.value.at(0));
@@ -305,6 +328,78 @@ async function executeWebAppReleaseReservation(
   );
 }
 
+async function executeWebAppReleaseContinuation(
+  options: ContinueActiveWebAppReleaseOptions,
+): Promise<Result<WebAppReleaseReservation, Error>> {
+  const stableReleasesResult = await options.dependencies.readStableWebAppReleases();
+  if (stableReleasesResult.isErr) {
+    return Result.err(stableReleasesResult.error);
+  }
+
+  const latestStableReleaseResult = selectLatestStableWebAppRelease({stableReleases: stableReleasesResult.value});
+  if (latestStableReleaseResult.isErr) {
+    return Result.err(latestStableReleaseResult.error);
+  }
+
+  const latestStableRelease = latestStableReleaseResult.value;
+  const releaseBranchesResult = await options.dependencies.readRemoteReleaseBranches();
+  if (releaseBranchesResult.isErr) {
+    return Result.err(releaseBranchesResult.error);
+  }
+
+  const activeReservationsResult = inspectActiveWebAppReleaseReservations({
+    stableReleases: stableReleasesResult.value,
+    releaseBranches: releaseBranchesResult.value,
+  });
+  if (activeReservationsResult.isErr) {
+    return Result.err(activeReservationsResult.error);
+  }
+
+  const multipleActiveReservationsError = findMultipleActiveWebAppReleaseReservationsError(
+    activeReservationsResult.value,
+  );
+  if (multipleActiveReservationsError.isJust) {
+    return Result.err(multipleActiveReservationsError.value);
+  }
+
+  const activeReservationMaybe = Maybe.of(activeReservationsResult.value.at(0));
+  if (activeReservationMaybe.isNothing) {
+    return Result.err(new Error('No active WebApp SemVer release exists'));
+  }
+
+  const activeReservation = activeReservationMaybe.value;
+  const activeVersionResult = parseWebAppReleaseBranchName(activeReservation.releaseBranch);
+  if (activeVersionResult.isErr) {
+    return Result.err(activeVersionResult.error);
+  }
+
+  const stableBaseIsAncestorResult = await options.dependencies.isCommitAncestor({
+    baseCommit: latestStableRelease.commitSha,
+    targetCommit: activeReservation.releaseCommitSha,
+  });
+  if (stableBaseIsAncestorResult.isErr) {
+    return Result.err(stableBaseIsAncestorResult.error);
+  }
+
+  if (stableBaseIsAncestorResult.value === false) {
+    return Result.err(
+      new Error(
+        `Stable WebApp release ${latestStableRelease.tagName} commit is not an ancestor of active release commit ${activeReservation.releaseCommitSha}`,
+      ),
+    );
+  }
+
+  return Result.ok(
+    createReservationResult({
+      version: activeVersionResult.value,
+      releaseBranch: activeReservation.releaseBranch,
+      releaseCommitSha: activeReservation.releaseCommitSha,
+      stableBaseRelease: latestStableRelease,
+      action: 'reused',
+    }),
+  );
+}
+
 export async function reserveWebAppRelease(
   options: ReserveWebAppReleaseOptions,
 ): Promise<Result<WebAppReleaseReservation, Error>> {
@@ -312,5 +407,15 @@ export async function reserveWebAppRelease(
     return await executeWebAppReleaseReservation(options);
   } catch (error: unknown) {
     return Result.err(new Error(`Unable to reserve WebApp release: ${errorMessage(error)}`, {cause: error}));
+  }
+}
+
+export async function continueActiveWebAppRelease(
+  options: ContinueActiveWebAppReleaseOptions,
+): Promise<Result<WebAppReleaseReservation, Error>> {
+  try {
+    return await executeWebAppReleaseContinuation(options);
+  } catch (error: unknown) {
+    return Result.err(new Error(`Unable to continue WebApp release: ${errorMessage(error)}`, {cause: error}));
   }
 }
