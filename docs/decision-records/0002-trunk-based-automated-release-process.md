@@ -29,15 +29,15 @@ flowchart LR
   developmentDistribution[Publish dev Docker image and Helm chart<br/>Update wire-builds/dev]
   runReleaseWebApp[Run Release WebApp]
   prepareReleaseBranch[Prepare release branch<br/>Create from dispatch commit or reuse current head]
-  releaseBranch[release/YYYY-MM-DD.N]
+  releaseBranch[release/X.Y.Z]
   releaseArtifact[Release artifact]
   betaEnvironment[Beta company validation<br/>Production backend]
   e2eEnvironment[E2E validation slot<br/>Staging backend]
   productionApproval[Quality assurance approval]
-  betaTag[YYYY-MM-DD.N-beta.M]
+  betaTag[vX.Y.Z-beta.N]
   productionEnvironment[Production]
   productionRuntimeVerification[Verify live Production runtime<br/>Artifact version and Production backends]
-  productionTag[YYYY-MM-DD.N-production]
+  productionTag[vX.Y.Z]
   productionDistribution[Publish Docker image and Helm chart<br/>Update wire-builds/main]
   githubReleaseHandoff[GitHub Release handoff]
   webAppVersionSynchronization[Create WebApp version synchronization PR<br/>against current main]
@@ -52,7 +52,7 @@ flowchart LR
   runReleaseWebApp --> prepareReleaseBranch --> releaseBranch
   releaseBranch -->|Build once| releaseArtifact
   releaseArtifact -->|Deploy| betaEnvironment
-  betaEnvironment -->|Verify Production runtime| betaTag
+  betaEnvironment -->|Verify Beta runtime| betaTag
   betaTag -->|Deploy same artifact| e2eEnvironment
   e2eEnvironment -->|E2E and Testiny succeed| productionApproval
   productionApproval -->|Approve candidate| productionEnvironment
@@ -103,23 +103,18 @@ After successful Hosted Beta and E2E validation, every normal WebApp release adv
 The branch model is:
 
 - `main` is the only long-lived development branch, the single trunk branch, and the source for Edge and hosted Dev deployments.
-- During the migration, `main` was established from the active `dev` history because `dev` contained the current development history at cutover time.
-- `dev` and `master` are obsolete Git branches. They are not normal development targets; Phase 10 is complete only after the cleanup pull request is merged and both remote branches are deleted.
-- `Release WebApp` creates a missing `release/YYYY-MM-DD.N` branch from one exact source commit or reuses the existing branch head without moving it.
+- `dev` and `master` are obsolete Git branches and are not normal development targets.
+- Normal WebApp releases use SemVer release branches named `release/X.Y.Z`.
 - On-premises maintenance branches are created only when a customer-managed release line needs maintenance after the original production release.
 
-The release identifier uses the release branch name: `YYYY-MM-DD.N`. The full identifier is anchored to the release branch, not to the later deployment date. For example, updates to `release/2026-05-05.1` always create tags in the `2026-05-05.1` family, even if a hotfix is added on a later day.
-
-The WebApp release process is:
-
-Release-appearance comments are informational and non-gating; release tags and runtime verification remain authoritative. Release-appearance tooling reads both existing date-based release tags and future SemVer release tags without rewriting existing marker values. The first Production release without a preceding supported Production baseline establishes the bootstrap baseline and receives no comments.
+The WebApp release process uses `release/X.Y.Z`, Beta tags `vX.Y.Z-beta.N`, and stable Production tags `vX.Y.Z`. Version allocation follows merged PR release-impact labels. The annotated stable tag `v1.0.0` is the SemVer baseline. Release-appearance comments are informational and non-gating; stable tags and runtime verification remain authoritative.
 
 Each Beta candidate processes only its delta. Production reconstructs candidate history through the explicitly promoted Beta tag and repairs missing Beta metadata. Beta and Production first appearances may belong to different releases, and recorded first-appearance values are immutable.
 
-- `Release WebApp` is the single user-facing normal-release entrypoint and must be manually started with GitHub's `Use workflow from: main` selector. Its dispatch form has no configurable source-branch input; the release captain supplies only a release identifier in `YYYY-MM-DD.N` format, release confirmation, and an optional reason. The workflow derives `release/YYYY-MM-DD.N` and performs branch preparation, hosted deployment, validation, approval, and release distribution.
-- When the derived release branch does not exist, `Release WebApp` creates it from the exact `GITHUB_SHA` selected for that manual workflow run on `main`, without force-pushing, refetches it, and verifies the resulting remote head. The workflow does not resolve a later moving `main` head, so the branch remains based on the dispatch commit even if `main` advances while the run waits or is rerun. If another run wins the creation race, the workflow resolves and reuses the actual remote branch.
-- When the derived release branch already exists, its current remote head is authoritative. The workflow reuses that branch without merging, resetting, rebasing, force-pushing, or otherwise applying the selected `main` commit. Reviewed fixes may therefore update an active release branch through reviewed pull requests targeting that release branch before a later candidate run.
-- Repeated dispatches with the same identifier reuse the release branch's current head and build it exactly as it exists, producing subsequent Beta candidates such as `YYYY-MM-DD.N-beta.2`. A new identifier is required to release a newer state of `main`.
+- `Release WebApp` is the single user-facing normal-release entrypoint. It must be started with GitHub's `Use workflow from: main` selector and offers two actions: `start` and `continue`. The operator confirms the release and may provide a reason; the workflow allocates the version.
+- `start` plans the next SemVer version from merged PR release-impact labels since the latest stable WebApp tag. It creates `release/X.Y.Z` at the exact dispatch `GITHUB_SHA` using a create-only ref update, then verifies the remote head.
+- `continue` requires exactly one active SemVer release branch, reuses its current verified remote HEAD, and does not re-plan the version or mutate the branch. Reviewed fixes may advance the branch before another Beta candidate.
+- Repeated `continue` operations build the same `X.Y.Z` release version and allocate the next contiguous `vX.Y.Z-beta.N` tag.
 - Every confirmed normal release follows the complete release path: Beta deployment and runtime verification, Beta tagging, the blocking E2E deployment/runtime gate and Testiny reporting, Production preflight and explicit Production Environment approval, Production deployment and runtime verification, Production tagging, and Docker, Helm, and `wire-builds/main` distribution.
 - Hosted Beta and hosted Production are deployment stages operated by Wire. E2E remains a blocking release gate, and Production approval remains explicit through the `wire-webapp-prod` GitHub Environment.
 - Docker, Helm, and `wire-builds/main` form the release distribution consumed by hosted and customer-managed deployments. Release distribution is part of the complete WebApp release lifecycle, not merely a hosted deployment detail.
@@ -129,8 +124,7 @@ Each Beta candidate processes only its delta. Production reconstructs candidate 
 - The development distribution retains the external channel name `dev`: it publishes the Docker image and a matching prerelease Helm chart, then updates `wire-builds/dev`.
 - `wire-builds/dev` remains the development distribution consumed by downstream internal integration environments; it is separate from the hosted Dev frontend deployment.
 - The legacy tag-driven `publish-and-deploy-webapp.yml` workflow has been deleted. Its obsolete `dev`, `master`, staging-tag, Production-tag, and maintenance publication paths are not restored.
-- The arbitrary manual release-artifact workflow and local staging and Production tag commands have been deleted. `q1-2024` and `q2-2025` publication handling was retired rather than migrated; recovery from existing historical Production tags remains available, and maintenance-release automation remains separate from the normal cloud release path.
-- The legacy path was retired before the first complete Production run of the final workflow. The final workflow was subsequently proven by release `2026-07-27.1`.
+- The arbitrary manual release-artifact workflow and local staging and Production tag commands have been deleted. Historical Production tag recovery remains available, and maintenance-release automation remains separate from the normal cloud release path.
 - `wire-builds/main` remains Production-only and is never updated by an ordinary `main` push.
 - Development and Production distributions share the same Helm repository and prerelease version namespace. Their Docker, Helm, and `wire-builds` publications use one shared, non-cancellable distribution lock.
 - Edge verifies that its artifact still belongs to the current `main` commit after acquiring the deployment slot; stale Edge builds skip instead of moving Edge backwards.
@@ -138,8 +132,8 @@ Each Beta candidate processes only its delta. Production reconstructs candidate 
 - Development and verified Production distributions share one non-cancellable queued publication group with `queue: max`.
 - Every merge to `main` deploys continuously to Edge without an approval gate. A newer `main` commit may supersede an in-progress Edge deployment.
 - A stale queued main publication checks the current `main` commit after acquiring the shared distribution lock and skips before external publication instead of regressing the shared `dev` channel.
-- `Release WebApp` deploys the exact prepared release commit and artifact to hosted Beta, creates a beta tag such as `YYYY-MM-DD.N-beta.1`, and deploys that same artifact to the dedicated E2E validation environment connected to Staging backend services.
-- Beta tag numbers are derived from existing beta tags for the release identifier. If concurrent workflows try to create the same tag for different commits, the later workflow must fail and be rerun after fetching the latest tags.
+- `Release WebApp` deploys the exact prepared release commit and artifact to hosted Beta, creates a beta tag such as `vX.Y.Z-beta.1`, and deploys that same artifact to the dedicated E2E validation environment connected to Staging backend services.
+- Beta tag numbers are derived from contiguous existing candidates for that exact SemVer version. If concurrent workflows try to create the same tag for different commits, the later workflow fails and must be retried after fetching tags.
 - The workflow runs E2E there and reports the result to Testiny.
 - The complete selected release E2E suite is a blocking full-system Production gate. The suite is not split into blocking and advisory tests, and no selected release E2E test uses `continue-on-error` or a flaky-test quarantine.
 - This gate intentionally validates the complete Wire system: frontend, backend, infrastructure, and integration failures may all block Production because customers consume the whole system.
@@ -150,7 +144,7 @@ Each Beta candidate processes only its delta. Production reconstructs candidate 
 - Deployoholics receives separate informational notifications for four release milestones: each verified new Beta candidate after its new Beta tag is created; a candidate that passes the blocking E2E gate and reaches Production approval readiness; each new Production release after hosted deployment, runtime verification, immutable tagging, and Docker, Helm, and `wire-builds/main` distribution; and any failed release gate.
 - The Beta success notification depends on successful hosted Beta deployment/runtime verification and successful creation of the new Beta tag, so it is sent before E2E, Production approval, or later release stages. Repeated runs that create `beta.2`, `beta.3`, and later tags each produce one Beta notification.
 - The E2E success notification remains a separate milestone notification and reports that the candidate passed the blocking gate and is ready for Production approval, or that Production is unnecessary because the release is already tagged.
-- The Production success notification is sent only after the normal release creates a new Production tag and `publish_production_distribution` completes successfully. It is not sent for an already-tagged Production rerun or for a distribution repair workflow.
+- The Production success notification is sent only after hosted Production verification, stable tagging, distribution, and GitHub Release handoff succeed. Post-release package synchronization is reported separately and does not change the release outcome.
 - Failed release gates use the WebApp release failure notification with stage evidence and Playwright report links when available, including failures after hosted Production and Production tag creation when Docker, Helm, or `wire-builds/main` distribution is incomplete.
 - All Deployoholics notifications are informational and non-gating; notification delivery failures do not change the release result. The reusable precommit workflow's optional failure notification remains disabled to prevent duplicate failure messages.
 - The Production approval job waits for GitHub Environment approval on the production environment. The separate `Deploy to Production` job is the actual Production operation boundary.
@@ -163,7 +157,7 @@ Each Beta candidate processes only its delta. Production reconstructs candidate 
 - `version` remains the logical application version, `assetVersion` identifies browser assets for the exact source revision, `commit` is the full Git SHA, and `builtAt` is the artifact assembly time in UTC. `/commit` remains a plain-text compatibility endpoint for existing consumers.
 - Deployment context such as the result, Git reference, target environment, service URLs, Docker image, Helm chart, `wire-builds` commit, workflow run URL, and manual-dispatch reason belongs in GitHub Actions summaries rather than `/version`.
 - Backend configuration is runtime state and is not inferred from build identity. Beta, precommit, and Production must each satisfy their expected combination of build version, source commit, REST backend, and WebSocket backend.
-- A successful deployment operation alone does not create a Production tag. The workflow creates the production tag `YYYY-MM-DD.N-production` only after all Production runtime assertions pass, so the tag represents a successfully deployed and verified runtime.
+- A successful deployment operation alone does not create a Production tag. The workflow creates the stable tag `vX.Y.Z` only after all Production runtime assertions pass, so the tag represents a successfully deployed and verified runtime.
 - The hosted-deployment EBS artifact is built once and promoted unchanged through hosted Beta, E2E, and hosted Production.
 - Every normal WebApp release preserves the exact public build outputs needed by the Dockerfile. The public Docker image is built from those outputs, from the same release commit, without rebuilding the application.
 - Docker and Helm publication starts only after Production deployment and runtime verification succeed and the immutable Production tag has been created.
@@ -178,48 +172,28 @@ Each Beta candidate processes only its delta. Production reconstructs candidate 
 - If the current release branch commit already has the matching production tag, the release workflow must not redeploy that commit.
 - Production tags are immutable release history and are never moved or deleted.
 
-### SemVer Production identity migration status
-
-The SemVer migration bootstrap is the annotated stable tag `v1.0.0`, pointing to commit `2dc009e706cae84dd7c32b40a80862ab252d6839`, which was previously released as `2026-10-06.1-production`. Future normal WebApp releases use `release/MAJOR.MINOR.PATCH` branches, Beta candidates use `vMAJOR.MINOR.PATCH-beta.N`, and stable Production releases use `vMAJOR.MINOR.PATCH`; their BuildMetadata and distribution artifact version is the unprefixed WebApp version.
-
-During migration, production-facing tag parsing, distribution validation, GitHub Release handoff, repair, rollback, and redeploy tooling accept both legacy date-based Production tags and stable SemVer WebApp tags. Release-appearance and release-history tooling accepts both legacy date-based releases and SemVer releases, using `v1.0.0` as the SemVer Production baseline and preserving the existing legacy ordering rules. The active `Release WebApp` workflow remains date-based until a separate workflow cutover. Package synchronization remains on its existing legacy release-identifier model in this migration step.
-
-Future SemVer normal releases have two explicit operations:
-
-- Starting a release uses the exact `main` commit selected for the workflow dispatch, plans the next SemVer version from release impact, and creates `release/MAJOR.MINOR.PATCH` as a create-only reservation.
-- Continuing an active release is an explicit operator action. It requires exactly one active SemVer release, reuses its `release/MAJOR.MINOR.PATCH` branch at its current remote HEAD, and does not re-plan release impact or allocate another version.
-
-Reviewed fixes may advance an active release branch before a later Beta candidate. The active `Release WebApp` workflow has not yet been cut over in this prerequisite change; its workflow inputs, release tags, and package synchronization remain unchanged until the separate cutover pull request.
+Historical date-based Production tags and artifacts remain readable only at documented distribution-repair, rollback, redeploy, and maintenance compatibility boundaries. `Release WebApp` cannot create a date-based normal release.
 
 ### WebApp package version synchronization
 
-The release process has two separate version identities:
+The `version` fields in root `package.json` and `apps/webapp/package.json` represent the latest synchronized stable Production WebApp version. They are repository metadata and do not allocate releases; `apps/server/package.json` is unrelated.
 
-- The operational release identity is `YYYY-MM-DD.N`, with Beta and Production tags such as `YYYY-MM-DD.N-beta.M` and `YYYY-MM-DD.N-production`. This identity remains authoritative for release branches, artifacts, Docker and Helm versions, `wire-builds`, runtime `BuildMetadata`, and release verification.
-- The WebApp package SemVer is repository metadata. The `version` fields in `package.json` and `apps/webapp/package.json` on `main` represent the latest successfully synchronized Production WebApp version, not the next development version. `apps/server/package.json` is unrelated.
+After Hosted Production is runtime-verified, the immutable `vX.Y.Z` tag exists, distribution succeeds, and the GitHub Release handoff completes, the workflow attempts package synchronization as post-release bookkeeping. It updates both package versions to exactly `X.Y.Z` and opens or reuses an Otto pull request on `webapp-version-X.Y.Z`. The PR follows normal `main` review and CI requirements; the workflow does not wait for it to merge.
 
-The existing legacy `0.x.y` package state bootstraps to `1.0.0` on the first successful Production synchronization under this process. Each subsequent normal Production synchronization increments only the patch component: `1.0.0` becomes `1.0.1`, then `1.0.2`, and so on. The package files remain unchanged on the release branch and on the immutable Production-tagged commit; the Production source commit may therefore still contain the previous package SemVer.
-
-After a new Production release has completed deployment, runtime verification, immutable Production tag creation, Docker, Helm, and `wire-builds/main` distribution, and GitHub Release handoff, the workflow performs repository bookkeeping. It checks out the current `main`, creates a dedicated branch, and opens an Otto pull request that changes only the two WebApp package `version` fields. The synchronization PR is not auto-merged and must pass normal `main` review, CI, branch protection, and merge-queue requirements. The workflow does not wait for that PR to merge.
-
-The synchronization marker in the pull request body is the authoritative mapping from ADR release identifier and immutable Production tag to WebApp package SemVer. Rerunning the same Production release reuses its recorded version forever, even after later releases advance `main`; it never allocates another patch version. A new or different Production release must not proceed while a previous synchronization is open or closed without merge. Conflicting or ambiguous synchronization history fails closed.
-
-Version allocation is protected by an early release-start preflight, a fresh pre-Production preflight after the blocking E2E gate, a repository-wide non-cancellable synchronization lock, and fresh `main` and synchronization-history validation inside the post-Production orchestration. If a race still allows another release to reach Production first, its already deployed and verified Production artifact remains untouched while its bookkeeping fails closed until the unresolved synchronization is resolved.
-
-For future stable SemVer releases, the stable Production tag is authoritative for package synchronization. A tag such as `v1.2.0` reconciles `package.json` and `apps/webapp/package.json` to exactly `1.2.0`. Package metadata is reconciliation metadata and does not allocate release versions; synchronization may jump over package versions that were not synchronized earlier, and it must never downgrade package metadata. Only one unresolved synchronization pull request is allowed at a time to prevent competing package changes. After the separate `Release WebApp` workflow cutover, an unresolved synchronization pull request is bookkeeping and will not block a future WebApp release. Until that cutover pull request lands, the active `Release WebApp` workflow remains on the legacy release-identifier synchronization model and its existing synchronization preflights.
+The synchronization marker is the durable mapping from the stable Production tag to the package version. Repeating the same synchronization is idempotent. A synchronization PR reconciles the `semver:none` impact label when it is open. Synchronization failure does not change the completed Production release, block later releases, or move the stable tag; the independent synchronization workflow retries it after the underlying issue is resolved. Synchronization may catch up across missed package versions, but it cannot downgrade package metadata.
 
 Merging the synchronization PR is an ordinary `main` merge. It therefore continues through the normal `publish-main.yml` delivery path; no metadata-only exception or special CI bypass is introduced.
 
 Release workflows must be serialized:
 
-- Only one Beta deployment may run at a time for a given release branch.
-- A newer Beta run for the same release branch may cancel an older in-progress Beta run before deployment starts.
+- Only one normal `Release WebApp` orchestration runs at a time across the repository. Runs are queued and are not cancelled automatically.
+- Production deployment and shared distribution publication retain separate non-cancellable locks so rollback, repair, and publication operations cannot overlap unsafely.
 - Only one Production deployment may run at a time for the repository.
 - Production deployments must not be cancelled automatically.
 - A successfully deployed, runtime-verified, and tagged Beta candidate is the one current promotable candidate. It implicitly supersedes older candidates, while historical Beta tags remain immutable.
 - Older workflow runs and pending approvals may remain visible. Immediately before Production mutation, the non-cancellable Production operation verifies that the live Beta still matches the exact artifact being promoted; a stale candidate therefore stops before Production is modified. No automatic cancellation of complete Release WebApp workflows is required.
-- The repository-wide Production lock covers deployment, runtime verification, Production tag creation, Docker publication, Helm publication, and the `wire-builds/main` update. Manual distribution repairs use the same lock.
-- WebApp releases, Production rollbacks, and Production distribution repairs use the same non-cancellable concurrency group with `queue: max` so pending Production operations are preserved rather than replaced.
+- Release WebApp's repository-wide orchestration lock serializes the full normal release workflow. The `deploy-webapp-production` lock also serializes hosted Production deployments across release, rollback, and redeploy workflows; the shared `publish-webapp-distribution` lock serializes Docker, Helm, and `wire-builds/main` publication.
+- The Production deployment and shared distribution locks are non-cancellable and use `queue: max` so pending operations are preserved rather than replaced. Distribution repair also has its own workflow-level lock while it validates and hands off repair requests.
 
 - Release workflow failures and stalled approvals are monitored by the engineering release captain and announced in Wire.
 
@@ -228,11 +202,12 @@ flowchart TD
   mergeToMain[Merge to main]
   deployToEdge[Deploy to Edge]
   runReleaseWebApp[Run Release WebApp]
-  prepareReleaseBranch[Prepare release branch<br/>Create or reuse release/YYYY-MM-DD.N]
+  startOrContinueRelease[Choose start or continue]
+  prepareReleaseBranch[Prepare release branch<br/>Create or reuse release/X.Y.Z]
   buildArtifact[Build release artifact once]
   deployToBeta[Deploy artifact to Beta<br/>Production backend]
   verifyBetaRuntime[Verify Beta runtime<br/>Build version, source commit, and Production backends]
-  createBetaTag[Create YYYY-MM-DD.N-beta.M]
+  createBetaTag[Create vX.Y.Z-beta.N]
   deployToE2E[Deploy same artifact to E2E slot<br/>Staging backend]
   verifyE2ERuntime[Verify E2E runtime<br/>Build version, source commit, and Staging backends]
   runEndToEndTests[Run end-to-end tests against E2E slot]
@@ -240,7 +215,8 @@ flowchart TD
   productionApproval[GitHub Environment approval<br/>Production]
   deployToProduction[Deploy promoted beta artifact to Production]
   verifyProductionRuntime[Verify live Production runtime<br/>Build version, source commit, and Production backends]
-  createProductionTag[Create YYYY-MM-DD.N-production]
+  createProductionTag[Create vX.Y.Z]
+  githubReleaseHandoff[GitHub Release handoff]
   publishDocker[Publish or reuse immutable Docker image]
   publishHelm[Publish or reuse Helm chart<br/>Verify appVersion]
   updateWireBuilds[Update or reuse wire-builds/main<br/>Verify exact WebApp fields]
@@ -250,10 +226,13 @@ flowchart TD
   deployKnownGoodArtifact[Deploy previous known-good production artifact]
 
   mergeToMain --> deployToEdge
-  runReleaseWebApp --> prepareReleaseBranch --> buildArtifact --> deployToBeta --> verifyBetaRuntime --> createBetaTag
+  runReleaseWebApp --> startOrContinueRelease --> prepareReleaseBranch --> buildArtifact --> deployToBeta --> verifyBetaRuntime --> createBetaTag
   createBetaTag --> deployToE2E --> verifyE2ERuntime --> runEndToEndTests --> reportToTestiny
   reportToTestiny --> productionApproval --> deployToProduction --> verifyProductionRuntime --> createProductionTag
   createProductionTag --> publishDocker --> publishHelm --> updateWireBuilds
+  createProductionTag --> githubReleaseHandoff
+  updateWireBuilds -->|after GitHub Release handoff| packageSynchronization[Post-release package synchronization<br/>Bookkeeping; non-gating]
+  githubReleaseHandoff --> packageSynchronization
   repairDistribution -->|same reusable distribution workflow| publishDocker
   updateWireBuilds -.-> distributionFailure
   publishDocker -.-> distributionFailure
@@ -277,16 +256,6 @@ On-premises maintenance releases replace the previous "long-term-support release
 - The webapp team produces the branch, artifact, and tags; customer deployment is handled outside this workflow by the integration or customer deployment process.
 - Maintenance branches do not implicitly deploy to the normal Beta or Production environments.
 - Maintenance validation happens in a dedicated maintenance validation path before a maintenance artifact is handed off.
-
-The final normal cloud workflow was proven with the following release:
-
-```text
-Release identifier: 2026-07-27.1
-Workflow run: 30271304258
-Beta tag: 2026-07-27.1-beta.1
-Production tag: 2026-07-27.1-production
-Commit: 770c6a14cdd2e10c8e32b251b16fab106cec0e1c
-```
 
 Phase 11 creates a missing maintenance branch and stops; an existing branch still pointing to its source Production commit also stops. Build, validation, and tagging begin only after a reviewed fix advances the branch, and the first patched artifact receives `<maintenance-line-key>-maintenance.1` through `wire-webapp-precommit`. Orchestration tooling comes from the dispatch commit on `main`, while the artifact comes from the maintenance branch; hosted Beta and Production, `wire-builds`, Docker, Helm, and customer deployment remain outside this workflow.
 
