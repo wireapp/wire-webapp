@@ -19,33 +19,37 @@
 
 import {type ReactNode} from 'react';
 
-import {Button, ButtonVariant, Input} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant, Input, ShieldIcon} from '@wireapp/react-ui-kit';
 
 import {CopyToClipboardButton} from 'Components/copyToClipboardButton';
 import {
   meetingLinkConfirmationInputStyles,
   meetingLinkConfirmationStyles,
+  meetingLinkConfirmationStatusStyles,
 } from 'Components/meeting/meetingLinkConfirmation/meetingLinkConfirmation.styles';
 import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
 import type {Translate} from 'Util/localizerUtil';
 
 type ShowMeetingLinkConfirmationParams = {
   link: string;
+  hasPassword: boolean;
   translate: Translate;
   onClosed?: () => void;
 };
 
 export type MeetingLinkConfirmationSession = {
   link: string;
+  hasPassword: boolean;
   onClosed: () => void;
 };
 
 type MeetingLinkConfirmationMessageProps = {
   link: string;
+  hasPassword: boolean;
   translate: Translate;
 };
 
-export const MeetingLinkConfirmationMessage = ({link, translate}: MeetingLinkConfirmationMessageProps) => {
+export const MeetingLinkConfirmationMessage = ({link, hasPassword, translate}: MeetingLinkConfirmationMessageProps) => {
   return (
     <>
       <p id="meeting-link-description">{translate('meetings.meetingLink.description')}</p>
@@ -59,6 +63,11 @@ export const MeetingLinkConfirmationMessage = ({link, translate}: MeetingLinkCon
         value={link}
         wrapperCSS={meetingLinkConfirmationInputStyles}
       />
+      {hasPassword ? (
+        <p css={meetingLinkConfirmationStatusStyles} role="note">
+          <ShieldIcon aria-hidden="true" /> {translate('guestOptionsInfoPasswordSecured')}
+        </p>
+      ) : null}
       <footer css={meetingLinkConfirmationStyles}>
         <CopyToClipboardButton
           textToCopy={link}
@@ -80,8 +89,15 @@ export const MeetingLinkConfirmationMessage = ({link, translate}: MeetingLinkCon
   );
 };
 
-export const showMeetingLinkConfirmation = ({link, translate, onClosed}: ShowMeetingLinkConfirmationParams): void => {
-  const message: ReactNode = <MeetingLinkConfirmationMessage link={link} translate={translate} />;
+export const showMeetingLinkConfirmation = ({
+  link,
+  hasPassword,
+  translate,
+  onClosed,
+}: ShowMeetingLinkConfirmationParams): void => {
+  const message: ReactNode = (
+    <MeetingLinkConfirmationMessage link={link} hasPassword={hasPassword} translate={translate} />
+  );
 
   PrimaryModal.show(
     PrimaryModal.type.CONFIRM,

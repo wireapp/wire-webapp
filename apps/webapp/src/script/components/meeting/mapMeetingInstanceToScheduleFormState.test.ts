@@ -52,6 +52,7 @@ const createMeetingInstance = (
       qualified_id: {id: 'meeting-id', domain: 'example.com'},
       qualified_creator: {id: 'creator-id', domain: 'example.com'},
       tzid: 'Europe/Berlin',
+      has_password: false,
       ...seriesOverrides,
     },
     start: new Date(start),

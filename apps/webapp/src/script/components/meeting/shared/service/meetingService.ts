@@ -46,9 +46,14 @@ export type CreateMeetingSuccess = MeetingSubmitSuccess & {
   qualifiedConversation: QualifiedId;
   qualifiedMeetingId: QualifiedId;
   link: string;
+  hasPassword: boolean;
 };
 
-export type ScheduleMeetingSuccess = MeetingSubmitSuccess & {qualifiedMeetingId: QualifiedId; link: string};
+export type ScheduleMeetingSuccess = MeetingSubmitSuccess & {
+  qualifiedMeetingId: QualifiedId;
+  link: string;
+  hasPassword: boolean;
+};
 
 const mapSyncErrorToSubmitError = (error: MeetingConversationSyncError): MeetingSubmitErrors => {
   switch (error) {
@@ -107,6 +112,7 @@ const createMeetingAndSyncParticipants = (
               qualifiedConversation: createdMeeting.qualified_conversation,
               qualifiedMeetingId: createdMeeting.qualified_id,
               link: createdMeeting.link,
+              hasPassword: createdMeeting.has_password,
             };
           });
       });
@@ -124,11 +130,12 @@ export const scheduleMeeting = (
     mapScheduleCommandToCreateMeeting(command, deps.deviceTimeZone),
     command.selectedUsers,
     deps,
-  ).map(({failedToAdd, qualifiedMeetingId, link}) => {
+  ).map(({failedToAdd, qualifiedMeetingId, link, hasPassword}) => {
     return {
       failedToAdd,
       qualifiedMeetingId,
       link,
+      hasPassword,
     };
   });
 };

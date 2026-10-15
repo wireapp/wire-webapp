@@ -54,12 +54,16 @@ const meeting: MeetingSeries = {
   link: rotatedLink,
   title: 'Weekly sync',
   tzid: 'Europe/Berlin',
+  has_password: false,
 };
 
-const createMeetingStore = (rotateMeetingLink: MeetingStoreState['rotateMeetingLink']) => {
+const createMeetingStore = (
+  rotateMeetingLink: MeetingStoreState['rotateMeetingLink'],
+  meetingSeries: MeetingSeries[] = [],
+) => {
   return createStore<MeetingStoreState>(() => {
     return {
-      meetingSeries: [],
+      meetingSeries,
       isLoading: false,
       hasLoadError: false,
       loadMeetings: jest.fn().mockResolvedValue(undefined),
@@ -76,9 +80,12 @@ const createMeetingStore = (rotateMeetingLink: MeetingStoreState['rotateMeetingL
   });
 };
 
-const renderModal = (rotateMeetingLink: MeetingStoreState['rotateMeetingLink']) => {
+const renderModal = (
+  rotateMeetingLink: MeetingStoreState['rotateMeetingLink'],
+  meetingSeries: MeetingSeries[] = [meeting],
+) => {
   const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
-  const store = createMeetingStore(rotateMeetingLink);
+  const store = createMeetingStore(rotateMeetingLink, meetingSeries);
 
   const rootContextWrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({translate: translateForTest, fireAndForgetInvoker}),
@@ -115,6 +122,56 @@ describe('RotateMeetingLinkModal', () => {
       useRotateMeetingLinkModal.getState().reset();
       removeCurrentModal();
     });
+  });
+
+  it('shows the password warning before rotating a password-protected meeting without a new password', () => {
+    const rotateMeetingLink = jest.fn().mockReturnValue(task.resolve(meeting));
+    renderModal(rotateMeetingLink, [{...meeting, has_password: true}]);
+
+    fireEvent.click(screen.getByRole('button', {name: 'meetings.rotateLink.submit'}));
+
+    expect(screen.getByText('meetings.rotateLink.generateLinkWithoutPasswordWarning')).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', {name: 'meetings.rotateLink.generateLinkWithoutPasswordConfirm'}),
+    ).toBeInTheDocument();
+    expect(rotateMeetingLink).not.toHaveBeenCalled();
+  });
+
+  it('shows the password warning when the meeting is missing from the store', () => {
+    const rotateMeetingLink = jest.fn().mockReturnValue(task.resolve(meeting));
+    renderModal(rotateMeetingLink, []);
+
+    fireEvent.click(screen.getByRole('button', {name: 'meetings.rotateLink.submit'}));
+
+    expect(screen.getByText('meetings.rotateLink.generateLinkWithoutPasswordWarning')).toBeInTheDocument();
+    expect(rotateMeetingLink).not.toHaveBeenCalled();
+  });
+
+  it('keeps the rotation form open when the password warning is cancelled', async () => {
+    const rotateMeetingLink = jest.fn().mockReturnValue(task.resolve(meeting));
+    renderModal(rotateMeetingLink, [{...meeting, has_password: true}]);
+
+    fireEvent.click(screen.getByRole('button', {name: 'meetings.rotateLink.submit'}));
+    fireEvent.click(screen.getByRole('button', {name: 'meetings.rotateLink.cancel'}));
+
+    await waitFor(() => {
+      expect(screen.queryByText('meetings.rotateLink.generateLinkWithoutPasswordWarning')).not.toBeInTheDocument();
+    });
+    expect(useRotateMeetingLinkModal.getState().isOpen).toBe(true);
+    expect(rotateMeetingLink).not.toHaveBeenCalled();
+  });
+
+  it('rotates without a password after confirming the warning', async () => {
+    const rotateMeetingLink = jest.fn().mockReturnValue(task.resolve(meeting));
+    const {fireAndForgetInvoker} = renderModal(rotateMeetingLink, [{...meeting, has_password: true}]);
+
+    fireEvent.click(screen.getByRole('button', {name: 'meetings.rotateLink.submit'}));
+    fireEvent.click(screen.getByRole('button', {name: 'meetings.rotateLink.generateLinkWithoutPasswordConfirm'}));
+    await act(async () => {
+      await fireAndForgetInvoker.waitUntilAllSettled();
+    });
+
+    expect(rotateMeetingLink).toHaveBeenCalledWith(meetingId, undefined);
   });
 
   it('closes and shows the new link before the rotation modal unmounts', async () => {
@@ -166,9 +223,7 @@ describe('RotateMeetingLinkModal', () => {
   });
 
   it('shows the not-found error for a 404 rotation failure', async () => {
-    const rotateMeetingLink = jest.fn().mockReturnValue(
-      task.reject(rotateMeetingLinkErrors.notFound),
-    );
+    const rotateMeetingLink = jest.fn().mockReturnValue(task.reject(rotateMeetingLinkErrors.notFound));
     const {fireAndForgetInvoker} = renderModal(rotateMeetingLink);
 
     fireEvent.click(screen.getByRole('button', {name: 'meetings.rotateLink.submit'}));
