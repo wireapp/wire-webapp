@@ -32,9 +32,10 @@ import {Maybe} from 'true-myth';
 import {
   captureRspackRuntimeDiagnostics,
   createRspackRuntimeDiagnostics,
+  getRspackRuntimeCompatibilityIssues,
   installRspackBuildRoutes,
 } from './utils/rspackBuildRouting';
-import type {RspackBuildRouteState, RspackRuntimeDiagnostics} from './utils/rspackBuildRouting';
+import type {RspackRuntimeDiagnostics, RspackRuntimeVerificationContext} from './utils/rspackBuildRouting';
 
 export type PagePlugin = (page: Page) => void | Promise<void>;
 
@@ -90,11 +91,9 @@ export const test = baseTest.extend<Fixtures>({
   createPage: async (fixtureOptions, use, testInfo) => {
     const {browser} = fixtureOptions;
     const contexts: BrowserContext[] = [];
-    const rspackContexts: {
+    const rspackContexts: (RspackRuntimeVerificationContext & {
       readonly context: BrowserContext;
-      readonly routeState: RspackBuildRouteState;
-      readonly diagnostics: RspackRuntimeDiagnostics;
-    }[] = [];
+    })[] = [];
     const rspackDiagnosticsByContext = new WeakMap<BrowserContext, RspackRuntimeDiagnostics>();
     const rspackBuildVariant = process.env.WIRE_RSPACK_BUILD_VARIANT;
     const isRspackBuildSelected = rspackBuildVariant === 'internal' || rspackBuildVariant === 'public';
@@ -112,7 +111,7 @@ export const test = baseTest.extend<Fixtures>({
 
       const diagnostics = createRspackRuntimeDiagnostics();
       const buildDirectoryPath = resolve(__dirname, `../../dist/rspack-${rspackBuildVariant}`);
-      const routeState = installRspackBuildRoutes(context, {
+      const routeState = await installRspackBuildRoutes(context, {
         applicationOrigin,
         buildDirectoryPath,
       });
@@ -161,27 +160,12 @@ export const test = baseTest.extend<Fixtures>({
     });
 
     const testAlreadyFailed = testInfo.status !== testInfo.expectedStatus;
-    const successfulRspackScriptPaths = new Set<string>();
-    const runtimeCompatibilityIssues: string[] = [];
-
-    for (const rspackContext of rspackContexts) {
-      rspackContext.diagnostics.successfulRspackScriptPaths.forEach(scriptPath => {
-        successfulRspackScriptPaths.add(scriptPath);
-      });
-      runtimeCompatibilityIssues.push(...rspackContext.routeState.missingAssetPaths);
-      runtimeCompatibilityIssues.push(...rspackContext.diagnostics.uncaughtJavascriptExceptions);
-      runtimeCompatibilityIssues.push(...rspackContext.diagnostics.failedRspackAssetRequests);
-      runtimeCompatibilityIssues.push(...rspackContext.diagnostics.failedRspackAssetResponses);
-      runtimeCompatibilityIssues.push(...rspackContext.diagnostics.bundlerRuntimeConsoleErrors);
-    }
-
-    if (isRspackBuildSelected) {
-      for (const requiredEntryScriptPath of ['/min/auth.js', '/min/app.js']) {
-        if (!successfulRspackScriptPaths.has(requiredEntryScriptPath)) {
-          runtimeCompatibilityIssues.push(`Rspack entry script was not loaded: ${requiredEntryScriptPath}`);
-        }
-      }
-    }
+    const runtimeCompatibilityIssues = isRspackBuildSelected
+      ? getRspackRuntimeCompatibilityIssues({
+          requiredEntryScriptPaths: ['/min/auth.js', '/min/app.js'],
+          rspackContexts,
+        })
+      : [];
 
     const shouldKeepRspackDiagnostics =
       isRspackBuildSelected && (testAlreadyFailed || runtimeCompatibilityIssues.length > 0);

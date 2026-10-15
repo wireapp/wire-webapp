@@ -60,16 +60,16 @@ export function isRspackStaticAssetPath(requestPathname: string): boolean {
   return isNonEmptyString(firstPathSegment) && rspackAssetRouteNames.includes(firstPathSegment);
 }
 
-export function installRspackBuildRoutes(
+export async function installRspackBuildRoutes(
   browserContext: BrowserContext,
   options: RspackBuildRouteOptions,
-): RspackBuildRouteState {
+): Promise<RspackBuildRouteState> {
   const routeState: RspackBuildRouteState = {
     missingAssetPaths: [],
     servedAssetPaths: new Set(),
   };
 
-  browserContext.route('**/*', async route => {
+  await browserContext.route('**/*', async route => {
     const requestUrl = new URL(route.request().url());
     if (requestUrl.origin !== options.applicationOrigin || !isRspackStaticAssetPath(requestUrl.pathname)) {
       await route.continue();
@@ -92,11 +92,11 @@ export function installRspackBuildRoutes(
           return;
         }
 
-        routeState.servedAssetPaths.add(requestUrl.pathname);
         await route.fulfill({
           headers: rspackAssetResponseHeaders,
           path: assetPath,
         });
+        routeState.servedAssetPaths.add(requestUrl.pathname);
       },
       Err: async () => {
         routeState.missingAssetPaths.push(requestUrl.pathname);
@@ -121,6 +121,54 @@ export type RspackRuntimeDiagnostics = {
   readonly successfulRspackScriptPaths: Set<string>;
   readonly successfulRspackWasmPaths: Set<string>;
 };
+
+export type RspackRuntimeVerificationContext = {
+  readonly routeState: RspackBuildRouteState;
+  readonly diagnostics: RspackRuntimeDiagnostics;
+};
+
+export type GetRspackRuntimeCompatibilityIssuesOptions = {
+  readonly rspackContexts: readonly RspackRuntimeVerificationContext[];
+  readonly requiredEntryScriptPaths: readonly string[];
+};
+
+export function getRspackRuntimeCompatibilityIssues(options: GetRspackRuntimeCompatibilityIssuesOptions): string[] {
+  const {rspackContexts, requiredEntryScriptPaths} = options;
+  if (rspackContexts.length === 0) {
+    return ['No browser context was configured for Rspack runtime verification.'];
+  }
+
+  return rspackContexts.flatMap((rspackContext, contextIndex) => {
+    const {diagnostics, routeState} = rspackContext;
+    const contextCompatibilityIssues = [
+      ...routeState.missingAssetPaths.map(assetPath => {
+        return `Local Rspack asset is missing: ${assetPath}`;
+      }),
+      ...diagnostics.uncaughtJavascriptExceptions,
+      ...diagnostics.failedRspackAssetRequests,
+      ...diagnostics.failedRspackAssetResponses,
+      ...diagnostics.bundlerRuntimeConsoleErrors,
+    ];
+
+    for (const entryScriptPath of requiredEntryScriptPaths) {
+      if (!routeState.servedAssetPaths.has(entryScriptPath)) {
+        contextCompatibilityIssues.push(
+          `Required entry script was not served from the local Rspack build: ${entryScriptPath}`,
+        );
+      }
+
+      if (!diagnostics.successfulRspackScriptPaths.has(entryScriptPath)) {
+        contextCompatibilityIssues.push(
+          `Required entry script did not receive a successful browser response: ${entryScriptPath}`,
+        );
+      }
+    }
+
+    return contextCompatibilityIssues.map(issue => {
+      return `Browser context ${contextIndex + 1}: ${issue}`;
+    });
+  });
+}
 
 export type CaptureRspackRuntimeDiagnosticsOptions = {
   readonly page: import('@playwright/test').Page;
