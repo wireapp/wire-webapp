@@ -55,6 +55,7 @@ const ignores = [
   '**/*.config.*',
   'apps/webapp/*.config.*',
   '!apps/webapp/rspack.config.mts',
+  '!apps/webapp/rspack.config.public.mts',
   '!**/*.config.test.*',
   '!**/*.config.spec.*',
   'apps/webapp/src/sw.js',
@@ -416,7 +417,7 @@ const productionConfigs = [
     },
   },
   {
-    files: ['apps/webapp/rspack.config.mts'],
+    files: ['apps/webapp/rspack.config.mts', 'apps/webapp/rspack.config.public.mts'],
     languageOptions: {
       parser: tsParser,
       parserOptions: {
@@ -432,7 +433,7 @@ const productionConfigs = [
       },
     },
     rules: {
-      // Rspack's config loader requires a default export for this configuration file.
+      // Rspack's config loader requires default exports for these configuration files.
       'import/no-default-export': 'off',
     },
   },
