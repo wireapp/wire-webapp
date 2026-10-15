@@ -22,7 +22,7 @@ import {ChangeEvent, FormEvent, MouseEvent, useState} from 'react';
 import {isNonEmptyString} from '@sindresorhus/is';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {CellNode} from 'src/script/types/cellNode';
+import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 import {getFileExtension, trimFileExtension} from 'Util/util';
 
 import {isValidCellsNodeName} from '../../../../../common/cellsNodeNameValidator';
@@ -39,16 +39,20 @@ interface UseCellsRenameFormProps {
 }
 
 export const useCellsRenameForm = ({node, cellsRepository, onSuccess, renameNodeCopy}: UseCellsRenameFormProps) => {
-  const [name, setName] = useState(trimFileExtension(node.name));
+  const originalName = node.type === CellNodeType.FILE ? trimFileExtension(node.name) : node.name;
+  const [name, setName] = useState(originalName);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const originalBaseName = trimFileExtension(node.name);
   const normalizedName = name.trim();
   const hasInvalidCharacters = !isValidCellsNodeName(normalizedName);
-  const isDisabled = isSubmitting || normalizedName === originalBaseName || normalizedName.length === 0;
+  const isDisabled = isSubmitting || normalizedName === originalName || normalizedName.length === 0;
 
   const buildNewName = (baseName: string) => {
+    if (node.type === CellNodeType.FOLDER) {
+      return baseName;
+    }
+
     const extension = getFileExtension(node.name);
     return isNonEmptyString(extension) ? `${baseName}.${extension}` : baseName;
   };
