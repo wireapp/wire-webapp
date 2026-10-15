@@ -40,7 +40,16 @@ const datadogReferencePattern = /@datadog\/browser-logs|@datadog\/browser-rum|da
 const publicProductionArtifactDirectory = 'apps/server/dist/static';
 
 function isScannedPublicProductionArtifactFile(filePath: string): boolean {
-  return filePath.endsWith('.js') || filePath.endsWith('.js.map');
+  return (
+    filePath.endsWith('.js') ||
+    filePath.endsWith('.js.map') ||
+    filePath.endsWith('.mjs') ||
+    filePath.endsWith('.mjs.map')
+  );
+}
+
+function isJavaScriptArtifactFile(filePath: string): boolean {
+  return filePath.endsWith('.js') || filePath.endsWith('.mjs');
 }
 
 export function getPublicProductionArtifactFilePaths(artifactDirectory: string): readonly string[] {
@@ -85,8 +94,9 @@ export function getDatadogReferencesInFile(filePath: string): readonly DatadogRe
 
 export function verifyPublicProductionBundle(artifactDirectory: string): VerificationResult {
   const artifactFilePaths = getPublicProductionArtifactFilePaths(artifactDirectory);
+  const javascriptArtifactFilePaths = artifactFilePaths.filter(isJavaScriptArtifactFile);
 
-  if (artifactFilePaths.length === 0) {
+  if (javascriptArtifactFilePaths.length === 0) {
     throw new Error(`No public production JavaScript artifact files found in ${artifactDirectory}.`);
   }
 
@@ -123,9 +133,9 @@ function printVerificationResult(result: VerificationResult): void {
   process.exitCode = 1;
 }
 
-function main(): void {
+function main(artifactDirectory: string = process.argv[2] ?? publicProductionArtifactDirectory): void {
   try {
-    const result = verifyPublicProductionBundle(publicProductionArtifactDirectory);
+    const result = verifyPublicProductionBundle(artifactDirectory);
     printVerificationResult(result);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);

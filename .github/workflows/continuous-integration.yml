@@ -166,8 +166,14 @@ jobs:
       - name: Install dependencies
         run: ./bin/yarn --immutable
 
-      - name: Build webapp with Rspack
+      - name: Build internal webapp with Rspack
         run: ./bin/yarn nx run webapp:build-rspack
+
+      - name: Build public webapp with Rspack
+        run: ./bin/yarn nx run webapp:build-rspack-public
+
+      - name: Verify public Rspack bundle excludes Datadog
+        run: ./bin/yarn verify:bundle:prod:public apps/webapp/dist/rspack-public
 
   type-check:
     runs-on: ubuntu-24.04

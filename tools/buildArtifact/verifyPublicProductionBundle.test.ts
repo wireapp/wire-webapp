@@ -17,6 +17,7 @@
  *
  */
 
+import {spawnSync} from 'node:child_process';
 import {mkdtempSync, mkdirSync, rmSync, writeFileSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
@@ -41,12 +42,16 @@ describe('verifyPublicProductionBundle', (): void => {
       writeFileSync(join(temporaryDirectory, 'index.html'), 'ignored html file');
       writeFileSync(join(temporaryDirectory, 'min', 'app.js'), 'console.log("app");');
       writeFileSync(join(nestedDirectory, 'chunk.js.map'), '{"sources":["chunk.ts"]}');
+      writeFileSync(join(nestedDirectory, 'worker.mjs'), 'export {};');
+      writeFileSync(join(nestedDirectory, 'worker.mjs.map'), '{"sources":["worker.ts"]}');
 
       const actualFilePaths = getPublicProductionArtifactFilePaths(temporaryDirectory);
 
       expect(actualFilePaths).toEqual([
         join(temporaryDirectory, 'min', 'app.js'),
         join(nestedDirectory, 'chunk.js.map'),
+        join(nestedDirectory, 'worker.mjs'),
+        join(nestedDirectory, 'worker.mjs.map'),
       ]);
     } finally {
       rmSync(temporaryDirectory, {force: true, recursive: true});
@@ -78,20 +83,60 @@ describe('verifyPublicProductionBundle', (): void => {
     const temporaryDirectory = createTemporaryDirectory();
 
     try {
-      writeFileSync(join(temporaryDirectory, 'app.js'), 'fetch("https://browser-intake-datadoghq.eu");');
+      writeFileSync(join(temporaryDirectory, 'app.mjs'), 'fetch("https://browser-intake-datadoghq.eu");');
+      writeFileSync(join(temporaryDirectory, 'app.mjs.map'), '{"sources":["@datadog/browser-rum/index.js"]}');
 
       const actualResult = verifyPublicProductionBundle(temporaryDirectory);
 
       expect(actualResult).toEqual({
         references: [
           {
-            filePath: join(temporaryDirectory, 'app.js'),
+            filePath: join(temporaryDirectory, 'app.mjs'),
             lineNumber: 1,
             matchedText: 'datadoghq.eu',
+          },
+          {
+            filePath: join(temporaryDirectory, 'app.mjs.map'),
+            lineNumber: 1,
+            matchedText: '@datadog/browser-rum',
           },
         ],
         status: 'failed',
       });
+    } finally {
+      rmSync(temporaryDirectory, {force: true, recursive: true});
+    }
+  });
+
+  it('fails verification when no JavaScript artifacts are present', (): void => {
+    const temporaryDirectory = createTemporaryDirectory();
+
+    try {
+      writeFileSync(join(temporaryDirectory, 'app.js.map'), '{"sources":[]}');
+
+      expect((): void => {
+        verifyPublicProductionBundle(temporaryDirectory);
+      }).toThrow(`No public production JavaScript artifact files found in ${temporaryDirectory}.`);
+    } finally {
+      rmSync(temporaryDirectory, {force: true, recursive: true});
+    }
+  });
+
+  it('uses a custom artifact directory provided to the CLI', (): void => {
+    const temporaryDirectory = createTemporaryDirectory();
+
+    try {
+      writeFileSync(join(temporaryDirectory, 'app.js'), 'console.log("public app");');
+
+      const cliResult = spawnSync(
+        process.execPath,
+        [join(__dirname, 'verifyPublicProductionBundle.ts'), temporaryDirectory],
+        {encoding: 'utf8'},
+      );
+
+      expect(cliResult.error).toBeUndefined();
+      expect(cliResult.status).toBe(0);
+      expect(cliResult.stdout).toContain('No Datadog SDK references found in 1 public production artifact files.');
     } finally {
       rmSync(temporaryDirectory, {force: true, recursive: true});
     }

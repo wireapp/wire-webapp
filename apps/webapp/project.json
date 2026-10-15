@@ -26,6 +26,17 @@
         "cwd": "{projectRoot}"
       }
     },
+    "build-rspack-public": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "outputs": ["{projectRoot}/dist/rspack-public"],
+      "dependsOn": ["^build", "server:generate-build-metadata"],
+      "inputs": ["production", "webappBuildMetadata", "{workspaceRoot}/apps/server/build/metadata/version.json"],
+      "options": {
+        "command": "WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/rspack-public yarn build:rspack:public",
+        "cwd": "{projectRoot}"
+      }
+    },
     "build-development": {
       "executor": "nx:run-commands",
       "cache": false,

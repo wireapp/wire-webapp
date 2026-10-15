@@ -3,9 +3,10 @@
   "compilerOptions": {
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
+    "allowImportingTsExtensions": true,
     "noEmit": true,
     "types": ["node"]
   },
-  "include": ["rspack.config.mts"],
+  "include": ["rspack.config.mts", "rspack.config.public.mts"],
   "exclude": ["node_modules"]
 }
