@@ -141,6 +141,34 @@ jobs:
       - name: Build libraries
         run: ./bin/yarn nx run-many -t build --projects=tag:type:lib
 
+  rspack-build:
+    runs-on: ubuntu-24.04
+    name: Rspack production build
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: ./bin/yarn --immutable
+
+      - name: Build webapp with Rspack
+        run: ./bin/yarn nx run webapp:build-rspack
+
   type-check:
     runs-on: ubuntu-24.04
     name: type check
