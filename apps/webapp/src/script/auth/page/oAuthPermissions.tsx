@@ -76,6 +76,8 @@ interface Props extends React.HTMLProps<HTMLDivElement> {
 export enum Scope {
   WRITE_CONVERSATIONS = 'write:conversations',
   WRITE_CONVERSATIONS_CODE = 'write:conversations_code',
+  ADMIN_MEETINGS = 'admin:meetings',
+  WRITE_MEETINGS = 'write:meetings',
   READ_SELF = 'read:self',
   READ_FEATURE_CONFIGS = 'read:feature_configs',
 }
@@ -98,6 +100,8 @@ const OAuthPermissionsComponent = ({
   const scopeText: Record<Scope, string> = {
     [Scope.WRITE_CONVERSATIONS]: translate('oauth.scope.write_conversations'),
     [Scope.WRITE_CONVERSATIONS_CODE]: translate('oauth.scope.write_conversations_code'),
+    [Scope.ADMIN_MEETINGS]: translate('oauth.scope.admin_meetings'),
+    [Scope.WRITE_MEETINGS]: translate('oauth.scope.write_meetings'),
     [Scope.READ_SELF]: translate('oauth.scope.read_self'),
     [Scope.READ_FEATURE_CONFIGS]: translate('oauth.scope.read_feature_configs'),
   };
