@@ -55,14 +55,6 @@ describe('startupFeatureToggles', function () {
     expect(startupFeatureToggles.isFeatureToggleEnabled(driveBulkActionsFeatureToggleName)).toBe(false);
   });
 
-  it('enables Drive bulk actions by default on Edge', () => {
-    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch('', [
-      driveBulkActionsFeatureToggleName,
-    ]);
-
-    expect(startupFeatureToggles.isFeatureToggleEnabled(driveBulkActionsFeatureToggleName)).toBe(true);
-  });
-
   it('enables Drive bulk actions when selected in developer settings', () => {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
       `?${startupFeatureToggleQueryParameterName}=${driveBulkActionsFeatureToggleName}`,

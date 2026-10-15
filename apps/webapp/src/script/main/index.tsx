@@ -34,7 +34,6 @@ import {Runtime} from '@wireapp/commons';
 import {AppContainer} from 'Components/appContainer/appContainer';
 import {doSimpleRedirect} from 'Repositories/LifeCycleRepository/LifeCycleRepository';
 import {StorageKey} from 'Repositories/storage';
-import {getWebEnvironment} from 'Util/environment';
 import {translate} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 import {enableLogging} from 'Util/loggerUtil';
@@ -45,8 +44,6 @@ import {createApplicationServices} from './createApplicationServices';
 
 import {SIGN_OUT_REASON} from '../auth/signOutReason';
 import {Config} from '../Config';
-import {driveBulkActionsFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
-import type {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
 import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
 import {createIncrementalHttpRetryBackoffReset} from '../lifecycle/createIncrementalHttpRetryBackoffReset';
 import {createFetchLatestBuildMetadata} from '../lifecycle/newVersionHandler';
@@ -90,13 +87,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     return doSimpleRedirect(SIGN_OUT_REASON.NOT_SIGNED_IN);
   }
 
-  const defaultEnabledFeatureToggleNames: readonly StartupFeatureToggleName[] = getWebEnvironment().isEdge
-    ? [driveBulkActionsFeatureToggleName]
-    : [];
-  const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
-    globalThis.location.search,
-    defaultEnabledFeatureToggleNames,
-  );
+  const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(globalThis.location.search);
   const fireAndForgetInvokerLogger = getLogger('FireAndForgetInvoker');
   const applicationServices = createApplicationServices({
     createApplicationObservability() {
