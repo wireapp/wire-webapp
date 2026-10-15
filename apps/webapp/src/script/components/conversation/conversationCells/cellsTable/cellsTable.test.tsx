@@ -220,17 +220,27 @@ describe('CellsTable selection keyboard access', () => {
 
     expect(checkbox).toBeChecked();
     expect(screen.getByText('1 selected')).toBeInTheDocument();
+
+    const checkboxAfterSelection = screen.getByRole('checkbox', {name: 'Select Marketing images'});
+    checkboxAfterSelection.focus();
+    await user.keyboard(' ');
+
+    expect(screen.getByRole('checkbox', {name: 'Select Marketing images'})).not.toBeChecked();
+    expect(screen.queryByText('1 selected')).not.toBeInTheDocument();
   });
 });
 
 describe('CellsTable selection interactions', () => {
-  it('keeps row options independent from checkbox selection', () => {
+  it('preserves selection when opening row options', () => {
     renderCellsTable();
     const checkbox = screen.getAllByRole('checkbox')[0];
+    fireEvent.click(checkbox);
+    expect(screen.getByText('1 selected')).toBeInTheDocument();
+
     fireEvent.click(screen.getAllByRole('button', {name: 'cells.options.label'})[0]);
 
-    expect(checkbox).not.toBeChecked();
-    expect(screen.queryByRole('button', {name: 'cells.selection.clear'})).not.toBeInTheDocument();
+    expect(checkbox).toBeChecked();
+    expect(screen.getByText('1 selected')).toBeInTheDocument();
   });
 });
 
@@ -244,6 +254,14 @@ describe('CellsTable selection scope', () => {
     rerenderWithSelectionScope('conversation:/files/subfolder');
 
     expect(screen.queryByRole('button', {name: 'cells.selection.clear'})).not.toBeInTheDocument();
+    expect(screen.getAllByRole('checkbox')[0]).not.toBeChecked();
+
+    fireEvent.click(screen.getAllByRole('checkbox')[0]);
+    expect(screen.getByText('1 selected')).toBeInTheDocument();
+
+    rerenderWithSelectionScope('conversation:/bin');
+
+    expect(screen.queryByText('1 selected')).not.toBeInTheDocument();
     expect(screen.getAllByRole('checkbox')[0]).not.toBeChecked();
   });
 
