@@ -15,6 +15,17 @@
         "cwd": "{projectRoot}"
       }
     },
+    "build-rspack": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "outputs": ["{projectRoot}/dist/rspack-internal"],
+      "dependsOn": ["^build", "server:generate-build-metadata"],
+      "inputs": ["production", "webappBuildMetadata", "{workspaceRoot}/apps/server/build/metadata/version.json"],
+      "options": {
+        "command": "WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/rspack-internal yarn build:rspack",
+        "cwd": "{projectRoot}"
+      }
+    },
     "build-development": {
       "executor": "nx:run-commands",
       "cache": false,
@@ -95,7 +106,7 @@
       "executor": "nx:run-commands",
       "dependsOn": [],
       "options": {
-        "command": "eslint --config eslint.config.mjs --max-warnings=267 --cache --cache-location node_modules/.cache/eslint/webapp --ext .js,.jsx,.ts,.tsx,.cjs,.mjs {projectRoot}"
+        "command": "eslint --config eslint.config.mjs --max-warnings=267 --cache --cache-location node_modules/.cache/eslint/webapp --ext .js,.jsx,.ts,.tsx,.cjs,.mjs,.mts {projectRoot}"
       }
     },
     "lint:full": {
@@ -114,9 +125,16 @@
     },
     "type-check": {
       "executor": "nx:run-commands",
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "rspack-config-type-check"],
       "options": {
         "command": "tsc --project {projectRoot}/tsconfig.type-check.json --noEmit"
+      }
+    },
+    "rspack-config-type-check": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["^build"],
+      "options": {
+        "command": "tsc --project {projectRoot}/tsconfig.rspack.json --noEmit"
       }
     },
     "check-circular": {

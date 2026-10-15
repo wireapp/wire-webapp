@@ -54,6 +54,7 @@ const ignores = [
   'apps/webapp/resource/',
   '**/*.config.*',
   'apps/webapp/*.config.*',
+  '!apps/webapp/rspack.config.mts',
   '!**/*.config.test.*',
   '!**/*.config.spec.*',
   'apps/webapp/src/sw.js',
@@ -412,6 +413,27 @@ const productionConfigs = [
         ...runtimeGlobals,
         NodeJS: 'readonly',
       },
+    },
+  },
+  {
+    files: ['apps/webapp/rspack.config.mts'],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        project: './apps/webapp/tsconfig.rspack.json',
+        projectService: false,
+        tsconfigRootDir: repositoryRootDirectory,
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+      },
+      globals: {
+        ...runtimeGlobals,
+        NodeJS: 'readonly',
+      },
+    },
+    rules: {
+      // Rspack's config loader requires a default export for this configuration file.
+      'import/no-default-export': 'off',
     },
   },
   {
