@@ -469,7 +469,7 @@
   "cells.noNodes.global.description": "Bei Unterhaltungen mit Dateiverwaltung finden Sie hier die geteilten Dateien.",
   "cells.noNodes.global.heading": "Es gibt noch keine Dateien",
   "cells.noNodes.heading": "Es gibt noch keine Dateien oder Ordner",
-  "cells.nodeName.invalidCharactersError": "Don't start with a . and don't use /\\ \"",
+  "cells.nodeName.invalidCharactersError": "Nicht mit einem . beginnen und kein /\\ \" verwenden",
   "cells.options.delete": "Löschen",
   "cells.options.deletePermanently": "Endgültig löschen",
   "cells.options.download": "Herunterladen",
