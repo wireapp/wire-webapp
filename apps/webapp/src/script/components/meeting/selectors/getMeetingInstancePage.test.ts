@@ -33,6 +33,7 @@ const createMeetingSeries = (overrides: Partial<MeetingSeries> = {}): MeetingSer
     qualified_creator: {id: 'creator-id', domain: 'example.com'},
     title: 'Meeting',
     tzid: 'Europe/Berlin',
+    has_password: false,
     ...overrides,
   };
 };
