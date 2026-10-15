@@ -87,7 +87,11 @@ export const MeetingAction: FunctionComponent<MeetingActionProps> = ({
         onShowMeetingLink: () => {
           const meetingLink = meetingInstance.meetingSeries.link;
           if (!isNullOrUndefined(meetingLink)) {
-            showMeetingLinkConfirmation({link: meetingLink, translate});
+            showMeetingLinkConfirmation({
+              link: meetingLink,
+              hasPassword: meetingInstance.meetingSeries.has_password,
+              translate,
+            });
           }
         },
         onRotateMeetingLink: () => {
