@@ -20,15 +20,21 @@
 import {CSSObject} from '@emotion/react';
 
 export const selectionBarStyles: CSSObject = {
+  position: 'absolute',
+  zIndex: 2,
+  top: '4px',
+  right: '8px',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  minHeight: '48px',
-  padding: '8px 16px',
-  marginBottom: '16px',
+  minHeight: '36px',
+  maxWidth: 'min(220px, calc(100% - 16px))',
+  padding: '4px 8px',
+  border: '1px solid var(--border-color)',
   borderRadius: '8px',
   backgroundColor: 'var(--accent-color-fade-16)',
   color: 'var(--main-color)',
+  pointerEvents: 'none',
 };
 
 export const selectionCountStyles: CSSObject = {
@@ -36,6 +42,7 @@ export const selectionCountStyles: CSSObject = {
 };
 
 export const clearButtonStyles: CSSObject = {
+  pointerEvents: 'auto',
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
