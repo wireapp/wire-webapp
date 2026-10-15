@@ -22,15 +22,14 @@ import {CSSObject} from '@emotion/react';
 export const selectionBarStyles: CSSObject = {
   position: 'absolute',
   zIndex: 2,
-  top: '4px',
+  top: 0,
   right: '8px',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  minHeight: '36px',
+  minHeight: '32px',
   maxWidth: 'min(220px, calc(100% - 16px))',
-  padding: '4px 8px',
-  border: '1px solid var(--border-color)',
+  padding: '0 8px',
   borderRadius: '8px',
   backgroundColor: 'var(--accent-color-fade-16)',
   color: 'var(--main-color)',
@@ -38,7 +37,11 @@ export const selectionBarStyles: CSSObject = {
 };
 
 export const selectionCountStyles: CSSObject = {
+  minWidth: 0,
+  overflow: 'hidden',
   fontWeight: 'var(--font-weight-semibold)',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
 };
 
 export const clearButtonStyles: CSSObject = {
