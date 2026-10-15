@@ -69,21 +69,6 @@
       "options": {
         "command": "tsc --project {projectRoot}/tsconfig.type-check.json --noEmit"
       }
-    },
-    "storybook": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "storybook dev -p 6006",
-        "cwd": "{projectRoot}"
-      }
-    },
-    "build-storybook": {
-      "executor": "nx:run-commands",
-      "outputs": ["{projectRoot}/storybook-static"],
-      "options": {
-        "command": "storybook build",
-        "cwd": "{projectRoot}"
-      }
     }
   },
   "tags": ["type:lib", "scope:react-ui-kit"]

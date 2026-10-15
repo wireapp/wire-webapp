@@ -1042,39 +1042,33 @@ ls:
     .ts: camelCase
     .tsx: camelCase
     .styles.ts: camelCase
-    .stories.tsx: camelCase
     .test.tsx: camelCase
   libraries/react-ui-kit/src/identity:
     .ts: camelCase
     .tsx: camelCase
     .styles.ts: camelCase
-    .stories.tsx: camelCase
     .test.tsx: camelCase
   libraries/react-ui-kit/src/navigation:
     .dir: camelCase
     .ts: camelCase
     .tsx: camelCase
     .styles.ts: camelCase
-    .stories.tsx: camelCase
     .test.tsx: camelCase
   libraries/react-ui-kit/src/surface:
     .dir: camelCase
     .ts: camelCase
     .tsx: camelCase
     .styles.ts: camelCase
-    .stories.tsx: camelCase
     .test.tsx: camelCase
   libraries/react-ui-kit/src/layout:
     .dir: camelCase
     .ts: camelCase
     .tsx: camelCase
-    .stories.tsx: camelCase
     .test.tsx: camelCase
   libraries/react-ui-kit/src/typography:
     .ts: camelCase
     .tsx: camelCase
     .style.ts: camelCase
-    .stories.tsx: camelCase
     .test.tsx: camelCase
   libraries/react-ui-kit/src/utils:
     .ts: camelCase
@@ -1083,7 +1077,6 @@ ls:
     .ts: camelCase
     .tsx: camelCase
     .styles.ts: camelCase
-    .stories.tsx: camelCase
     .test.tsx: camelCase
 
   apps/webapp/src/script/components/messagesList:
