@@ -70,6 +70,7 @@ describe('subscribeToMeetingConversationEvents', () => {
             series_start_date: '2026-06-01T10:00:00.000Z',
             title: 'Weekly sync',
             tzid: 'Europe/Berlin',
+            has_password: false,
           },
         ];
       },
@@ -105,6 +106,7 @@ describe('subscribeToMeetingConversationEvents', () => {
             series_start_date: '2026-06-01T10:00:00.000Z',
             title: 'Weekly sync',
             tzid: 'Europe/Berlin',
+            has_password: false,
           },
         ];
       },
