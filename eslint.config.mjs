@@ -54,6 +54,7 @@ const ignores = [
   'apps/webapp/resource/',
   '**/*.config.*',
   'apps/webapp/*.config.*',
+  '!tools/buildExperiments/rspack.config.cjs',
   '!**/*.config.test.*',
   '!**/*.config.spec.*',
   'apps/webapp/src/sw.js',
@@ -544,12 +545,30 @@ const productionConfigs = [
     },
   },
   {
-    files: ['tools/buildArtifact/**/*.mts', 'tools/runtimeVerification/**/*.mts'],
+    files: ['tools/buildArtifact/**/*.{ts,mts}', 'tools/runtimeVerification/**/*.mts'],
     languageOptions: {
       parserOptions: {
         project: './tsconfig.tools.json',
         projectService: false,
       },
+    },
+  },
+  {
+    files: ['tools/buildExperiments/**/*.{ts,tsx}'],
+    languageOptions: {
+      parserOptions: {
+        project: './tools/buildExperiments/tsconfig.emit.json',
+        projectService: false,
+      },
+    },
+    settings: {
+      'import-x/resolver-next': [
+        createNodeResolver({extensions: typescriptImportResolutionExtensions}),
+        createTypeScriptImportResolver({
+          alwaysTryTypes: true,
+          project: './tools/buildExperiments/tsconfig.emit.json',
+        }),
+      ],
     },
   },
   {

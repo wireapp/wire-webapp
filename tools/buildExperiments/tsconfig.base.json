@@ -1,0 +1,26 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "allowJs": true,
+    "baseUrl": "../..",
+    "declaration": false,
+    "emitDecoratorMetadata": false,
+    "experimentalDecorators": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "@emotion/react",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "noEmitOnError": true,
+    "rootDir": "../..",
+    "sourceMap": true,
+    "target": "esnext",
+    "types": ["node"],
+    "paths": {
+      "@sindresorhus/is": ["node_modules/@sindresorhus/is/distribution/index.d.ts"],
+      "@wireapp/commons": ["libraries/commons/src/index.ts"],
+      "Components/*": ["tools/buildExperiments/fixtures/components/*"]
+    }
+  },
+  "include": ["fixtures/**/*"],
+  "exclude": ["../../node_modules", "../../dist"]
+}

@@ -199,6 +199,26 @@ describe('build artifact metadata validation', () => {
     expect(validationResult.isErr).toBe(true);
   });
 
+  it('rejects metadata that is missing a required artifact field', () => {
+    const incompleteMetadata = {
+      version: mainBuildMetadata.version,
+      commit: mainBuildMetadata.commit,
+      builtAt: mainBuildMetadata.builtAt,
+    };
+    const validationResult = validateBuildArtifactMetadata({
+      expectedCommit: mainBuildMetadata.commit,
+      expectedVersion: mainBuildMetadata.version,
+      htmlDocuments: [createHtmlDocument(mainBuildMetadata)],
+      metadata: incompleteMetadata,
+    });
+
+    expect(validationResult.isErr).toBe(true);
+
+    if (validationResult.isErr) {
+      expect(validationResult.error.message).toBe('Build artifact metadata is invalid');
+    }
+  });
+
   it('rejects generated HTML that uses the logical version as its cache key', () => {
     const releaseMetadata = {
       ...mainBuildMetadata,

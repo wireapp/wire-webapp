@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "incremental": true,
+    "noEmit": true,
+    "tsBuildInfoFile": "../../dist/build-experiments/swc/tsconfig.tsbuildinfo"
+  }
+}

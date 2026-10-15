@@ -129,6 +129,9 @@
     "e2e-ui": "nx e2e webapp --ui",
     "build:prod": "nx run server:package",
     "build:prod:public": "nx run server:package-public",
+    "build:experiment:tsc-rspack": "nx run commons-lib:build && tsc -p tools/buildExperiments/tsconfig.emit.json && WIRE_BUILD_EXPERIMENT_ARCHITECTURE=tsc-emitted yarn workspace @wireapp/webapp exec rspack build --config ../../tools/buildExperiments/rspack.config.cjs",
+    "build:experiment:swc-rspack": "nx run commons-lib:build && tsc -p tools/buildExperiments/tsconfig.type-check.json && WIRE_BUILD_EXPERIMENT_ARCHITECTURE=swc yarn workspace @wireapp/webapp exec rspack build --config ../../tools/buildExperiments/rspack.config.cjs",
+    "clean:build-experiments": "rimraf dist/build-experiments",
     "verify:bundle:prod:public": "node tools/buildArtifact/verifyPublicProductionBundle.ts",
     "test": "nx run-many -t test --all",
     "type-check": "nx run-many -t type-check --all"

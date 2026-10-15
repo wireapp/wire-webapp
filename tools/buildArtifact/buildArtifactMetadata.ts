@@ -38,7 +38,7 @@ export type BuildArtifactMetadataValidationInput = {
 const localStaticAssetDirectoryNames = ['assets', 'audio', 'ext', 'font', 'image', 'min', 'proto', 'style', 'worker'];
 const htmlResourceAttributePattern = /\b(?:src|href)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'`=<>]+))/giu;
 
-function readHtmlResourceAttributeValues(htmlContents: string): readonly string[] {
+export function readHtmlResourceAttributeValues(htmlContents: string): readonly string[] {
   return [...htmlContents.matchAll(htmlResourceAttributePattern)].flatMap(attributeMatch => {
     const attributeValueCaptures = attributeMatch.slice(1, 4);
 
