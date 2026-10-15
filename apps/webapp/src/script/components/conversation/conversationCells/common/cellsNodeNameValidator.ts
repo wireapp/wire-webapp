@@ -26,3 +26,13 @@ const INVALID_CELLS_NODE_NAME_CHARACTERS = /[\\/"]/u;
 export const isValidCellsNodeName = (name: string): boolean => {
   return !name.startsWith('.') && !INVALID_CELLS_NODE_NAME_CHARACTERS.test(name);
 };
+
+/**
+ * Checks a file name and every segment of its relative path.
+ * Browser folder uploads expose the relative path through webkitRelativePath.
+ */
+export const isValidCellsNodePath = (name: string, relativePath?: string | null): boolean => {
+  const normalizedRelativePath = relativePath ?? '';
+  const relativePathSegments = normalizedRelativePath.length > 0 ? normalizedRelativePath.split('/') : [];
+  return [name, ...relativePathSegments].every(isValidCellsNodeName);
+};
