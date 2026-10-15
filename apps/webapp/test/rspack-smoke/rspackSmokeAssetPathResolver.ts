@@ -20,9 +20,7 @@ import path from 'node:path';
 import {match, P} from 'ts-pattern';
 import {Result} from 'true-myth';
 
-export type RspackSmokeAssetPathError =
-  | {readonly kind: 'malformedEncoding'}
-  | {readonly kind: 'outsideBuildDirectory'};
+export type RspackSmokeAssetPathError = {readonly kind: 'malformedEncoding'} | {readonly kind: 'outsideBuildDirectory'};
 
 export function resolveRspackSmokeAssetPath(
   requestPathname: string,

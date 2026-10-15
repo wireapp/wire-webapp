@@ -27,8 +27,7 @@ export type RspackSmokeServerOptions = {
 };
 
 export type RspackSmokeServerArgumentsError =
-  | {readonly kind: 'unknownOption'; readonly optionName: string}
-  | {readonly kind: 'invalidArguments'};
+  {readonly kind: 'unknownOption'; readonly optionName: string} | {readonly kind: 'invalidArguments'};
 
 type ParsedRspackSmokeServerArguments = {
   readonly buildVariant: Maybe<string>;

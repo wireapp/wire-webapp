@@ -108,16 +108,21 @@ async function expectSuccessfulScripts(options: SuccessfulScriptsOptions): Promi
 
   for (const scriptPath of requiredScriptPaths) {
     await expect
-      .poll(() => {
-        return Maybe.of(diagnostics.localScriptResponses.get(scriptPath));
-      }, {
-        message: `${buildProjectName} should load ${scriptPath}`,
-      })
+      .poll(
+        () => {
+          return Maybe.of(diagnostics.localScriptResponses.get(scriptPath));
+        },
+        {
+          message: `${buildProjectName} should load ${scriptPath}`,
+        },
+      )
       .toEqual(Maybe.just(200));
   }
 }
 
-test('loads the application entry points and redirects an unauthenticated visitor to authentication', async ({page}, testInfo) => {
+test('loads the application entry points and redirects an unauthenticated visitor to authentication', async ({
+  page,
+}, testInfo) => {
   const baseUrl = Maybe.of(testInfo.project.use.baseURL).match({
     Just: projectBaseUrl => {
       return projectBaseUrl;

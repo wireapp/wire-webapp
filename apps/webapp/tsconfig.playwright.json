@@ -27,7 +27,7 @@
     "test/e2e_tests/playwright-globals.d.ts",
     "test/e2e_tests/**/*.ts",
     "test/e2e_tests/**/*.tsx",
-    "test/rspack-smoke/rspack-smoke.spec.ts",
+    "test/rspack-smoke/browser-smoke.ts",
     "test/rspack-smoke/rspackSmokeAssetPathResolver.ts",
     "test/rspack-smoke/server.ts"
   ],

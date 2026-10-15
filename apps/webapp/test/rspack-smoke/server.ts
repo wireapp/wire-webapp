@@ -194,7 +194,7 @@ function respondToGetRequest(options: RequestHandlerOptions): void {
         return pathname.endsWith('/sso/settings');
       }),
       () => {
-      respondWithText(response, statusOk, 'application/json; charset=utf-8', JSON.stringify({default_sso_code: ''}));
+        respondWithText(response, statusOk, 'application/json; charset=utf-8', JSON.stringify({default_sso_code: ''}));
       },
     )
     .otherwise(pathname => {
@@ -214,7 +214,12 @@ function respondToGetRequest(options: RequestHandlerOptions): void {
             })
             .exhaustive();
 
-          respondWithText(response, statusBadRequest, 'text/plain; charset=utf-8', `Invalid asset path: ${errorMessage}`);
+          respondWithText(
+            response,
+            statusBadRequest,
+            'text/plain; charset=utf-8',
+            `Invalid asset path: ${errorMessage}`,
+          );
         },
       });
     });

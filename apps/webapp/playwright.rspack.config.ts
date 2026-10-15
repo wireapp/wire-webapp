@@ -47,14 +47,11 @@ function createBuildProjectOptions(buildVariant: 'internal' | 'public', port: nu
 
 export default defineConfig({
   testDir: smokeTestDirectory,
-  testMatch: '**/*.spec.ts',
+  testMatch: '**/browser-smoke.ts',
   tsconfig: resolve(__dirname, 'tsconfig.playwright.json'),
   fullyParallel: true,
   forbidOnly: process.env.CI === 'true',
-  reporter: [
-    ['list'],
-    ['html', {outputFolder: smokeReportDirectory, open: 'never'}],
-  ],
+  reporter: [['list'], ['html', {outputFolder: smokeReportDirectory, open: 'never'}]],
   outputDir: smokeTestOutputDirectory,
   timeout: 30_000,
   expect: {
