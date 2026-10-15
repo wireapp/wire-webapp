@@ -20,6 +20,7 @@
 import {createColumnHelper} from '@tanstack/react-table';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
+import {CellsSelectionCheckbox} from 'Components/cells/common/cellsSelectionCheckbox/cellsSelectionCheckbox';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {CellNode} from 'src/script/types/cellNode';
 
@@ -67,6 +68,9 @@ export const getCellsTableColumns = ({
   getDirectionFor,
   isSortingEnabled,
   onToggleSort,
+  selectedNodeIds,
+  onToggleSelection,
+  selectionEnabled,
 }: {
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
@@ -77,8 +81,32 @@ export const getCellsTableColumns = ({
   getDirectionFor: (field: CellsSortField) => CellsSortDirection | undefined;
   isSortingEnabled: boolean;
   onToggleSort: (field: CellsSortField) => void;
+  selectedNodeIds: Set<string>;
+  onToggleSelection: (nodeId: string, isSelected: boolean) => void;
+  selectionEnabled: boolean;
 }) => {
   return [
+    ...(selectionEnabled
+      ? [
+          columnHelper.display({
+            id: 'selection',
+            size: 40,
+            cell: info => {
+              const node = info.row.original;
+              return (
+                <CellsSelectionCheckbox
+                  id={node.id}
+                  name={node.name}
+                  isChecked={selectedNodeIds.has(node.id)}
+                  onChange={isSelected => {
+                    onToggleSelection(node.id, isSelected);
+                  }}
+                />
+              );
+            },
+          }),
+        ]
+      : []),
     columnHelper.accessor('name', {
       header: isSortingEnabled
         ? () => {

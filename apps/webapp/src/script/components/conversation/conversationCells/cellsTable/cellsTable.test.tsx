@@ -18,6 +18,7 @@
  */
 
 import {fireEvent, render, screen, waitFor} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 import {ThemeProvider} from '@wireapp/react-ui-kit';
 
@@ -28,11 +29,25 @@ import {
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
+import type {Translate} from 'Util/localizerUtil/translationTypes';
 import {translateForTest} from 'Util/test/translateForTest';
 
 import {CellsTable} from './cellsTable';
 
 import {CELLS_SELF_USER_DRIVE_ROLE} from '../common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
+
+const translateSelectionForTest: Translate = (key, substitutions) => {
+  if (key === 'cells.selection.selectedCount') {
+    return `${substitutions?.count} selected`;
+  }
+  if (key === 'cells.selection.selectItem') {
+    return `Select ${substitutions?.name}`;
+  }
+  if (key === 'cells.selection.clear') {
+    return 'Clear selection';
+  }
+  return translateForTest(key);
+};
 
 const conversationQualifiedId = {id: 'conversation-id', domain: 'example.com'};
 
@@ -69,14 +84,20 @@ const renderCellsTable = ({
   onDropReadError = jest.fn(),
   onFolderDropTargetChange = jest.fn(),
   folderDropResetKey,
+  selectionEnabled = true,
+  selectionScopeKey = 'conversation:/files',
 }: {
   readonly folderPath?: string;
   readonly onDropFilesToFolder?: (files: readonly File[], uploadPath: string) => void;
   readonly onDropReadError?: () => void;
   readonly onFolderDropTargetChange?: (folderName: string | null) => void;
   readonly folderDropResetKey?: number;
+  readonly selectionEnabled?: boolean;
+  readonly selectionScopeKey?: string;
 } = {}) => {
-  const wrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
+  const wrapper = createRootProviderWrapperForTest(
+    createRootContextValueForTest({translate: translateSelectionForTest}),
+  );
   const folder = createNode({id: 'folder-id', name: 'Marketing images', path: folderPath});
   const file = createNode({
     id: 'file-id',
@@ -86,11 +107,16 @@ const renderCellsTable = ({
     extension: 'pdf',
   });
 
-  const renderTable = (resetKey = folderDropResetKey) => {
+  const renderTable = (
+    resetKey = folderDropResetKey,
+    scopeKey = selectionScopeKey,
+    isSelectionEnabled = selectionEnabled,
+    nodes = [folder, file],
+  ) => {
     return (
       <ThemeProvider>
         <CellsTable
-          nodes={[folder, file]}
+          nodes={nodes}
           cellsRepository={{} as CellsRepository}
           conversation={{} as Conversation}
           conversationQualifiedId={conversationQualifiedId}
@@ -105,6 +131,8 @@ const renderCellsTable = ({
           }}
           isSortingEnabled
           onToggleSort={jest.fn()}
+          selectionEnabled={isSelectionEnabled}
+          selectionScopeKey={scopeKey}
         />
       </ThemeProvider>
     );
@@ -121,8 +149,98 @@ const renderCellsTable = ({
     rerenderWithResetKey: (resetKey: number) => {
       return rerender(renderTable(resetKey));
     },
+    rerenderWithSelectionScope: (scopeKey: string, isSelectionEnabled = selectionEnabled) => {
+      return rerender(renderTable(folderDropResetKey, scopeKey, isSelectionEnabled));
+    },
+    rerenderWithNodes: (nodes: CellNode[]) => {
+      return rerender(renderTable(folderDropResetKey, selectionScopeKey, selectionEnabled, nodes));
+    },
   };
 };
+
+describe('CellsTable selection', () => {
+  it('selects files and folders and clears the selection', () => {
+    renderCellsTable();
+
+    const checkboxes = screen.getAllByRole('checkbox');
+    expect(checkboxes).toHaveLength(2);
+    expect(checkboxes[0]).toHaveAccessibleName('Select Marketing images');
+
+    fireEvent.click(checkboxes[0]);
+    expect(screen.getByText('1 selected')).toBeInTheDocument();
+    expect(screen.getByRole('row', {name: /Marketing images/})).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('button', {name: 'Clear selection'})).toBeInTheDocument();
+
+    fireEvent.click(screen.getAllByRole('checkbox')[1]);
+    expect(screen.getByText('2 selected')).toBeInTheDocument();
+    expect(screen.getAllByRole('checkbox')[0]).toBeChecked();
+    expect(screen.getAllByRole('checkbox')[1]).toBeChecked();
+
+    fireEvent.click(screen.getByRole('button', {name: 'Clear selection'}));
+    expect(screen.queryByRole('button', {name: 'Clear selection'})).not.toBeInTheDocument();
+    expect(
+      screen.getAllByRole('checkbox').every(checkbox => {
+        return !(checkbox as HTMLInputElement).checked;
+      }),
+    ).toBe(true);
+  });
+});
+
+describe('CellsTable selection keyboard access', () => {
+  it('toggles a named checkbox with the keyboard', async () => {
+    const user = userEvent.setup();
+    renderCellsTable();
+    const checkbox = screen.getByRole('checkbox', {name: 'Select Marketing images'});
+
+    checkbox.focus();
+    await user.keyboard(' ');
+
+    expect(checkbox).toBeChecked();
+    expect(screen.getByText('1 selected')).toBeInTheDocument();
+  });
+});
+
+describe('CellsTable selection interactions', () => {
+  it('keeps row options independent from checkbox selection', () => {
+    renderCellsTable();
+    const checkbox = screen.getAllByRole('checkbox')[0];
+    fireEvent.click(screen.getAllByRole('button', {name: 'cells.options.label'})[0]);
+
+    expect(checkbox).not.toBeChecked();
+    expect(screen.queryByRole('button', {name: 'cells.selection.clear'})).not.toBeInTheDocument();
+  });
+});
+
+describe('CellsTable selection scope', () => {
+  it('clears selected nodes when the folder/view scope changes', () => {
+    const {rerenderWithSelectionScope} = renderCellsTable();
+    const checkbox = screen.getAllByRole('checkbox')[0];
+    fireEvent.click(checkbox);
+    expect(checkbox).toBeChecked();
+
+    rerenderWithSelectionScope('conversation:/files/subfolder');
+
+    expect(screen.queryByRole('button', {name: 'cells.selection.clear'})).not.toBeInTheDocument();
+    expect(screen.getAllByRole('checkbox')[0]).not.toBeChecked();
+  });
+
+  it('removes selected items and count when a refresh removes nodes', () => {
+    const {file, rerenderWithNodes} = renderCellsTable();
+    fireEvent.click(screen.getAllByRole('checkbox')[0]);
+    expect(screen.getByText('1 selected')).toBeInTheDocument();
+
+    rerenderWithNodes([file]);
+
+    expect(screen.queryByText('1 selected')).not.toBeInTheDocument();
+    expect(screen.getByRole('checkbox')).not.toBeChecked();
+  });
+
+  it('hides selection controls when selection is out of scope', () => {
+    renderCellsTable({selectionEnabled: false});
+
+    expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
+  });
+});
 
 describe('CellsTable folder row drop target', () => {
   it('highlights a folder row and drops files into that folder path', async () => {

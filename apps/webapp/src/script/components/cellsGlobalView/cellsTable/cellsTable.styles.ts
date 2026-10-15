@@ -92,6 +92,16 @@ export const tableActionsCellStyles: CSSObject = {
   },
 };
 
+export const selectedTableCellRowStyles: CSSObject = {
+  backgroundColor: 'var(--accent-color-fade-16)',
+  '&[aria-selected="true"]:hover': {
+    backgroundColor: 'var(--accent-color-fade-16)',
+  },
+  'body.theme-dark &[aria-selected="true"]:hover': {
+    backgroundColor: 'var(--accent-color-fade-16)',
+  },
+};
+
 export const tableCellRow: CSSObject = {
   display: 'block',
   border: '1px solid var(--border-color)',
