@@ -17,7 +17,9 @@
  *
  */
 
-import {test as baseTest, type BrowserContext, type Page} from '@playwright/test';
+import {expect as playwrightExpect, test as baseTest, type BrowserContext, type Page} from '@playwright/test';
+import {isFunction, isUndefined} from '@sindresorhus/is';
+import {resolve} from 'node:path';
 
 import {ApiManagerE2E} from './backend/apiManager.e2e';
 import {getUser, User} from './data/user';
@@ -26,6 +28,13 @@ import {mockAudioAndVideoDevices} from './utils/mockVideoDevice.util';
 import {Role} from '@wireapp/api-client/lib/team';
 import {FEATURE_KEY} from '@wireapp/api-client/lib/team/feature';
 import {BrigRepositoryE2E} from './backend/brigRepository.e2e';
+import {Maybe} from 'true-myth';
+import {
+  captureRspackRuntimeDiagnostics,
+  createRspackRuntimeDiagnostics,
+  installRspackBuildRoutes,
+} from './utils/rspackBuildRouting';
+import type {RspackBuildRouteState, RspackRuntimeDiagnostics} from './utils/rspackBuildRouting';
 
 export type PagePlugin = (page: Page) => void | Promise<void>;
 
@@ -67,10 +76,10 @@ export const test = baseTest.extend<Fixtures>({
   // Create a new instance of ApiManager for each test
   api: async ({}, use) => {
     const backendUrl = process.env.BACKEND_URL;
-    if (backendUrl === undefined) throw new Error('Missing environment variable BACKEND_URL');
+    if (isUndefined(backendUrl)) throw new Error('Missing environment variable BACKEND_URL');
 
     const basicAuth = process.env.BASIC_AUTH;
-    if (basicAuth === undefined) throw new Error('Missing environment variable BASIC_AUTH');
+    if (isUndefined(basicAuth)) throw new Error('Missing environment variable BASIC_AUTH');
 
     await use(new ApiManagerE2E({backendUrl, basicAuth}));
   },
@@ -78,8 +87,41 @@ export const test = baseTest.extend<Fixtures>({
     // Create a new instance of PageManager for each test
     await use(new PageManager(page));
   },
-  createPage: async ({browser}, use) => {
+  createPage: async (fixtureOptions, use, testInfo) => {
+    const {browser} = fixtureOptions;
     const contexts: BrowserContext[] = [];
+    const rspackContexts: {
+      readonly context: BrowserContext;
+      readonly routeState: RspackBuildRouteState;
+      readonly diagnostics: RspackRuntimeDiagnostics;
+    }[] = [];
+    const rspackDiagnosticsByContext = new WeakMap<BrowserContext, RspackRuntimeDiagnostics>();
+    const rspackBuildVariant = process.env.WIRE_RSPACK_BUILD_VARIANT;
+    const isRspackBuildSelected = rspackBuildVariant === 'internal' || rspackBuildVariant === 'public';
+    const applicationOrigin = isRspackBuildSelected ? new URL(process.env.WEBAPP_URL ?? '').origin : '';
+
+    async function configureRspackContext(context: BrowserContext): Promise<Maybe<RspackRuntimeDiagnostics>> {
+      if (!isRspackBuildSelected) {
+        return Maybe.nothing();
+      }
+
+      const existingDiagnostics = Maybe.of(rspackDiagnosticsByContext.get(context));
+      if (existingDiagnostics.isJust) {
+        return existingDiagnostics;
+      }
+
+      const diagnostics = createRspackRuntimeDiagnostics();
+      const buildDirectoryPath = resolve(__dirname, `../../dist/rspack-${rspackBuildVariant}`);
+      const routeState = installRspackBuildRoutes(context, {
+        applicationOrigin,
+        buildDirectoryPath,
+      });
+      rspackDiagnosticsByContext.set(context, diagnostics);
+      rspackContexts.push({context, diagnostics, routeState});
+      await context.tracing.start({screenshots: true, snapshots: true, sources: true});
+
+      return Maybe.just(diagnostics);
+    }
 
     // Due to the function overload firstParam can be either a PagePlugin or a BrowserContext to reuse
     await use(async (firstParam, ...plugins) => {
@@ -87,22 +129,30 @@ export const test = baseTest.extend<Fixtures>({
       let setupFns: PagePlugin[];
 
       // Check if firstParam is a browser context or PagePlugin
-      if (typeof firstParam === 'function' || firstParam === undefined) {
+      if (isFunction(firstParam) || isUndefined(firstParam)) {
         // Create a new context, add it to the created contexts and treat firstParam as page plugin
-        context = await browser.newContext();
+        context = isRspackBuildSelected
+          ? await browser.newContext({serviceWorkers: 'block'})
+          : await browser.newContext();
         contexts.push(context);
         // The type assertion is necessary because the type check is done using `strict: false` which will not narrow the type correctly
-        setupFns = !!firstParam ? [firstParam as PagePlugin, ...plugins] : plugins;
+        setupFns = isFunction(firstParam) ? [firstParam as PagePlugin, ...plugins] : plugins;
       } else {
         // Otherwise reuse existing context if provided
         context = firstParam;
         setupFns = plugins;
       }
 
+      const diagnostics = await configureRspackContext(context);
+
       // Add mocked Audio and Video devices (Hardware is treated as part of the test setup)
       await context.addInitScript(mockAudioAndVideoDevices);
 
       const page = await context.newPage();
+      if (diagnostics.isJust) {
+        captureRspackRuntimeDiagnostics({page, applicationOrigin, diagnostics: diagnostics.value});
+      }
+
       for (const setupFn of setupFns) {
         await setupFn(page);
       }
@@ -110,12 +160,90 @@ export const test = baseTest.extend<Fixtures>({
       return page;
     });
 
-    // Close all contexts created throughout the tests (will automatically close all pages associated with each context)
+    const testAlreadyFailed = testInfo.status !== testInfo.expectedStatus;
+    const successfulRspackScriptPaths = new Set<string>();
+    const runtimeCompatibilityIssues: string[] = [];
+
+    for (const rspackContext of rspackContexts) {
+      rspackContext.diagnostics.successfulRspackScriptPaths.forEach(scriptPath => {
+        successfulRspackScriptPaths.add(scriptPath);
+      });
+      runtimeCompatibilityIssues.push(...rspackContext.routeState.missingAssetPaths);
+      runtimeCompatibilityIssues.push(...rspackContext.diagnostics.uncaughtJavascriptExceptions);
+      runtimeCompatibilityIssues.push(...rspackContext.diagnostics.failedRspackAssetRequests);
+      runtimeCompatibilityIssues.push(...rspackContext.diagnostics.failedRspackAssetResponses);
+      runtimeCompatibilityIssues.push(...rspackContext.diagnostics.bundlerRuntimeConsoleErrors);
+    }
+
+    if (isRspackBuildSelected) {
+      for (const requiredEntryScriptPath of ['/min/auth.js', '/min/app.js']) {
+        if (!successfulRspackScriptPaths.has(requiredEntryScriptPath)) {
+          runtimeCompatibilityIssues.push(`Rspack entry script was not loaded: ${requiredEntryScriptPath}`);
+        }
+      }
+    }
+
+    const shouldKeepRspackDiagnostics =
+      isRspackBuildSelected && (testAlreadyFailed || runtimeCompatibilityIssues.length > 0);
+    if (shouldKeepRspackDiagnostics) {
+      const serializedRuntimeDiagnostics = JSON.stringify(
+        {
+          buildVariant: rspackBuildVariant,
+          missingRspackAssetPaths: rspackContexts.flatMap(rspackContext => {
+            return rspackContext.routeState.missingAssetPaths;
+          }),
+          runtimeCompatibilityIssues,
+          contexts: rspackContexts.map((rspackContext, contextIndex) => {
+            return {
+              contextNumber: contextIndex + 1,
+              ...rspackContext.diagnostics,
+              successfulRspackScriptPaths: [...rspackContext.diagnostics.successfulRspackScriptPaths],
+              successfulRspackWasmPaths: [...rspackContext.diagnostics.successfulRspackWasmPaths],
+              servedRspackAssetPaths: [...rspackContext.routeState.servedAssetPaths],
+            };
+          }),
+        },
+        null,
+        2,
+      );
+      await testInfo.attach('rspack-runtime-diagnostics', {
+        body: Buffer.from(serializedRuntimeDiagnostics),
+        contentType: 'application/json',
+      });
+    }
+
+    for (const [contextIndex, rspackContext] of rspackContexts.entries()) {
+      if (shouldKeepRspackDiagnostics) {
+        const tracePath = testInfo.outputPath(`rspack-context-${contextIndex + 1}.zip`);
+        await rspackContext.context.tracing.stop({path: tracePath});
+        await testInfo.attach(`rspack-context-${contextIndex + 1}-trace`, {
+          contentType: 'application/zip',
+          path: tracePath,
+        });
+
+        for (const [pageIndex, page] of rspackContext.context.pages().entries()) {
+          const screenshotPath = testInfo.outputPath(`rspack-context-${contextIndex + 1}-page-${pageIndex + 1}.png`);
+          await page.screenshot({fullPage: true, path: screenshotPath});
+          await testInfo.attach(`rspack-context-${contextIndex + 1}-page-${pageIndex + 1}`, {
+            contentType: 'image/png',
+            path: screenshotPath,
+          });
+        }
+      } else {
+        await rspackContext.context.tracing.stop();
+      }
+    }
+
+    // Close all contexts created throughout the tests (will automatically close all pages associated with each context).
     await Promise.all(
-      contexts.map(ctx => {
-        return ctx.close();
+      contexts.map(browserContext => {
+        return browserContext.close();
       }),
     );
+
+    if (isRspackBuildSelected && !testAlreadyFailed) {
+      playwrightExpect(runtimeCompatibilityIssues, 'Rspack browser runtime compatibility issues').toEqual([]);
+    }
   },
   createUser: async ({api}, use) => {
     const users: User[] = [];

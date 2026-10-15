@@ -24,6 +24,7 @@
   "include": [
     "playwright.config.ts",
     "playwright.rspack.config.ts",
+    "playwright.rspack-authenticated.config.ts",
     "test/e2e_tests/playwright-globals.d.ts",
     "test/e2e_tests/**/*.ts",
     "test/e2e_tests/**/*.tsx",

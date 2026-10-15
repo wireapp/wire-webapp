@@ -122,6 +122,24 @@
         "cwd": "{workspaceRoot}"
       }
     },
+    "e2e-rspack": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "outputs": ["{projectRoot}/playwright-report/rspack-authenticated", "{projectRoot}/test-results/rspack-authenticated"],
+      "options": {
+        "command": "WIRE_RSPACK_BUILD_VARIANT=internal playwright test --config {projectRoot}/playwright.rspack-authenticated.config.ts",
+        "cwd": "{workspaceRoot}"
+      },
+      "configurations": {
+        "internal": {
+          "command": "WIRE_RSPACK_BUILD_VARIANT=internal playwright test --config {projectRoot}/playwright.rspack-authenticated.config.ts"
+        },
+        "public": {
+          "command": "WIRE_RSPACK_BUILD_VARIANT=public playwright test --config {projectRoot}/playwright.rspack-authenticated.config.ts"
+        }
+      },
+      "defaultConfiguration": "internal"
+    },
     "lint": {
       "executor": "nx:run-commands",
       "dependsOn": [],
