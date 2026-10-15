@@ -17,7 +17,7 @@
  *
  */
 
-/** Matches react-aria overlay z-index (100000) with headroom for nested Storybook story layers. */
+/** Matches react-aria overlay z-index (100000) with headroom for nested overlays. */
 export const overlayPortalZIndex = 10000020;
 
 export const OVERLAY_PORTAL_ROOT_ID = 'wire-react-ui-kit-overlay-root';

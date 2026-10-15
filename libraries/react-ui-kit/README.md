@@ -14,12 +14,6 @@ For licensing information, see the attached LICENSE file and the list of third-p
 yarn
 ```
 
-### Start Storybook
-
-```bash
-yarn start
-```
-
 ### Creating New Components
 
 When creating a new component, follow these guidelines:
@@ -36,62 +30,57 @@ When creating a new component, follow these guidelines:
      - `typography/`: For text-related components
      - `utils/`: For utility components
 
-2. **Component Structure** Create a new folder for your component with the following files:
+2. **Component Structure** Create a folder for your component with the files it needs:
 
    ```
-   Category/
-   └── ComponentName/
-       ├── ComponentName.tsx       # Main component file
-       ├── ComponentName.stories.tsx  # Storybook stories
-       └── index.ts               # Export file
+   src/
+   └── inputs/
+       └── button/
+           ├── button.tsx
+           ├── button.styles.ts  # When styles need their own file
+           ├── button.test.tsx   # For behavior that needs coverage
+           └── index.ts
    ```
 
-3. **Component File (ComponentName.tsx)**
+3. **Component File (componentName.tsx)**
 
    - Use TypeScript
    - Include proper type definitions
-   - Add JSDoc comments for documentation
+   - Document public props and non-obvious behavior
    - Follow the existing component patterns
 
-4. **Stories File (ComponentName.stories.tsx)**
+4. **Styles and Tests**
 
-   - Create stories for all component variants
-   - Include proper documentation
-   - Add controls for interactive props
-   - Follow the existing story patterns
+   - Keep styles in a separate file when that matches the component's organization
+   - Add focused Jest tests for observable behavior and important variants
 
 5. **Index File (index.ts)**
    - Export the component
-   - Export any types or utilities specific to the component
+   - Export its public types and utilities
+   - Re-export it from the relevant category and package entry points when it belongs in the public API
 
 Example:
 
 ```tsx
-// Button.tsx
-export interface ButtonProps {
-  variant: 'primary' | 'secondary';
-  // ... other props
+// button.tsx
+import type {JSX} from 'react';
+
+export type ButtonProps = {
+  readonly label: string;
+};
+
+export function Button(options: ButtonProps): JSX.Element {
+  return <button>{options.label}</button>;
 }
 
-export const Button = ({variant, ...props}: ButtonProps) => {
-  // Component implementation
-};
-
-// Button.stories.tsx
-export default {
-  title: 'inputs/Button',
-  component: Button,
-  // ... story configuration
-};
-
 // index.ts
-export * from './Button';
+export {Button} from './button';
+export type {ButtonProps} from './button';
 ```
 
 Remember to:
 
 - Follow the existing naming conventions
 - Add proper TypeScript types
-- Include comprehensive stories
-- Document your component thoroughly
-- Test your component thoroughly
+- Export only the component API that consumers need
+- Cover behavior with focused tests

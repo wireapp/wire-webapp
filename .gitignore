@@ -44,6 +44,5 @@ apps/server/build/
 dist/
 *.tsbuildinfo
 lib/
-storybook-static/
 
 plans/
