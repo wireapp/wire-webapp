@@ -17,7 +17,7 @@
  *
  */
 
-import {forwardRef, ReactNode, MouseEvent} from 'react';
+import {forwardRef, MouseEvent, ReactNode} from 'react';
 
 import cx from 'classnames';
 

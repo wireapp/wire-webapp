@@ -75,7 +75,13 @@ const createDeferredMeetNowMeeting = (): CreateDeferredMeetNowMeetingResult => {
       ),
     ),
     resolveMeetNowMeeting: (
-      value: CreateMeetingSuccess = {failedToAdd: [], qualifiedConversation, qualifiedMeetingId, link: meetingLink},
+      value: CreateMeetingSuccess = {
+        failedToAdd: [],
+        qualifiedConversation,
+        qualifiedMeetingId,
+        link: meetingLink,
+        hasPassword: false,
+      },
     ) => {
       deferred.resolve(value);
     },

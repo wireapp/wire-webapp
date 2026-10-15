@@ -163,6 +163,7 @@ describe('useMeetNowSubmit', () => {
         qualifiedConversation,
         qualifiedMeetingId: {id: 'meeting-id', domain: 'example.com'},
         link: 'meeting-link',
+        hasPassword: false,
       }),
     );
     const store = createMeetingStore({loadMeetings, meetNowMeeting});
@@ -231,6 +232,7 @@ describe('useMeetNowSubmit', () => {
         qualifiedConversation,
         qualifiedMeetingId: {id: 'meeting-id', domain: 'example.com'},
         link: 'meeting-link',
+        hasPassword: false,
       }),
     );
     const store = createMeetingStore({meetNowMeeting});

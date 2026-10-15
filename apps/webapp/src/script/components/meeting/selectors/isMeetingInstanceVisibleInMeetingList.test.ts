@@ -34,6 +34,7 @@ const createMeetingSeries = (overrides: Partial<MeetingSeries> = {}): MeetingSer
     qualified_creator: {id: 'host-id', domain: 'example.com'},
     qualified_conversation: {id: 'conv-id', domain: 'example.com'},
     tzid: 'Europe/Berlin',
+    has_password: false,
     ...overrides,
   };
 };

@@ -50,6 +50,7 @@ describe('createMeetingStore', () => {
     qualified_creator: {id: 'creator-id', domain: 'example.com'},
     qualified_id: {id: 'meeting-id', domain: 'example.com'},
     tzid: 'Europe/Berlin',
+    has_password: false,
   };
 
   const meetingSeriesEntry = {
@@ -63,6 +64,7 @@ describe('createMeetingStore', () => {
     qualified_creator: {id: 'creator-id', domain: 'example.com'},
     recurrence: 'doesNotRepeat' as const,
     tzid: 'Europe/Berlin',
+    has_password: false,
   };
 
   const listMeetingInstance = {
@@ -139,13 +141,17 @@ describe('createMeetingStore', () => {
     const existingSeries = {...meetingSeriesEntry, link: 'https://wire.example/old-link', title: 'Keep this title'};
     const rotateMeetingLink = jest
       .fn()
-      .mockReturnValue(task.resolve({...apiMeeting, link: 'https://wire.example/new-link', title: 'Server title'}));
+      .mockReturnValue(
+        task.resolve({...apiMeeting, link: 'https://wire.example/new-link', title: 'Server title', has_password: true}),
+      );
     const store = createMeetingStore(createDeps({rotateMeetingLink}), {meetingSeries: [existingSeries]});
 
     const result = await store.getState().rotateMeetingLink(apiMeeting.qualified_id);
 
     expect(result.isOk).toBe(true);
-    expect(store.getState().meetingSeries).toEqual([{...existingSeries, link: 'https://wire.example/new-link'}]);
+    expect(store.getState().meetingSeries).toEqual([
+      {...existingSeries, link: 'https://wire.example/new-link', has_password: true},
+    ]);
   });
 
   it('does not let an older meeting sync overwrite a rotated link', async () => {

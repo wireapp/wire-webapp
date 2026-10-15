@@ -17,14 +17,16 @@
  *
  */
 
-import {type FormEvent, useRef} from 'react';
+import {type FormEvent, useCallback, useRef} from 'react';
 
 import {isEmptyString, isUndefined} from '@sindresorhus/is';
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {Button, ButtonVariant, CloseIcon, ErrorMessage} from '@wireapp/react-ui-kit';
 
 import {showMeetingLinkConfirmation} from 'Components/meeting/meetingLinkConfirmation/meetingLinkConfirmation';
 import {rotateMeetingLinkDescription} from 'Components/meeting/rotateMeetingLinkModal/rotateMeetingLinkModal.styles';
+import {RotateMeetingLinkWarningModal} from 'Components/meeting/rotateMeetingLinkModal/rotateMeetingLinkWarningModal';
 import {MeetingLinkForm} from 'Components/meeting/shared/meetingLinkForm/meetingLinkForm';
 import {
   bodyStyles,
@@ -41,6 +43,7 @@ import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleEscDown} from 'Util/keyboardUtil';
 import {getLogger} from 'Util/logger';
+import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import {hasRotateMeetingLinkFormErrors, useRotateMeetingLinkModal} from './useRotateMeetingLinkModal';
 
@@ -55,6 +58,11 @@ export const RotateMeetingLinkModal = () => {
     return state.rotateMeetingLink;
   });
   const state = useRotateMeetingLinkModal();
+  const existingMeeting = useMeetingStore(currentState => {
+    return currentState.meetingSeries.find(meeting => {
+      return !isUndefined(state.meetingId) && matchQualifiedIds(meeting.qualified_id, state.meetingId);
+    });
+  });
   const passwordInputRef = useRef<HTMLInputElement>(null);
   const submissionInProgressRef = useRef(false);
 
@@ -64,6 +72,44 @@ export const RotateMeetingLinkModal = () => {
     }
     state.close();
     state.reset();
+  };
+
+  const rotate = useCallback(
+    (meetingId: QualifiedId, password?: string) => {
+      submissionInProgressRef.current = true;
+      state.startSubmitting();
+      fireAndForgetInvoker.fireAndForget(async () => {
+        const result = await rotateMeetingLink(meetingId, password);
+        result.match({
+          Ok: meeting => {
+            const link = meeting.link;
+            submissionInProgressRef.current = false;
+            state.close();
+            state.reset();
+            if (!isUndefined(link)) {
+              showMeetingLinkConfirmation({link, hasPassword: meeting.has_password, translate});
+            }
+          },
+          Err: error => {
+            logger.warn('Failed to rotate meeting link', {error, meetingId});
+            submissionInProgressRef.current = false;
+            state.setFailure(
+              error === rotateMeetingLinkErrors.notFound
+                ? translate('meetings.rotateLink.notFoundError')
+                : translate('meetings.rotateLink.requestError'),
+            );
+          },
+        });
+      });
+    },
+    [fireAndForgetInvoker, rotateMeetingLink, state, translate],
+  );
+
+  const handleWarningConfirm = () => {
+    const meetingId = state.confirmWarning();
+    if (!isUndefined(meetingId)) {
+      rotate(meetingId);
+    }
   };
 
   const handleRotate = () => {
@@ -79,31 +125,15 @@ export const RotateMeetingLinkModal = () => {
       return;
     }
 
-    submissionInProgressRef.current = true;
-    state.startSubmitting();
-    fireAndForgetInvoker.fireAndForget(async () => {
-      const result = await rotateMeetingLink(meetingId, isEmptyString(state.password) ? undefined : state.password);
-      result.match({
-        Ok: meeting => {
-          const link = meeting.link;
-          submissionInProgressRef.current = false;
-          state.close();
-          state.reset();
-          if (!isUndefined(link)) {
-            showMeetingLinkConfirmation({link, translate});
-          }
-        },
-        Err: error => {
-          logger.warn('Failed to rotate meeting link', {error, meetingId});
-          submissionInProgressRef.current = false;
-          state.setFailure(
-            error === rotateMeetingLinkErrors.notFound
-              ? translate('meetings.rotateLink.notFoundError')
-              : translate('meetings.rotateLink.requestError'),
-          );
-        },
-      });
-    });
+    const trimmedPassword = state.password.trim();
+    const password = isEmptyString(trimmedPassword) ? undefined : trimmedPassword;
+
+    if ((existingMeeting?.has_password === true || isUndefined(existingMeeting)) && isUndefined(password)) {
+      state.showWarning(meetingId);
+      return;
+    }
+
+    rotate(meetingId, password);
   };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -174,6 +204,11 @@ export const RotateMeetingLinkModal = () => {
           </Button>
         </footer>
       </div>
+      <RotateMeetingLinkWarningModal
+        isShown={state.isWarningShown}
+        onCancel={state.cancelWarning}
+        onConfirm={handleWarningConfirm}
+      />
     </ModalComponent>
   );
 };

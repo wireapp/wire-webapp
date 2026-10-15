@@ -43,6 +43,7 @@ describe('meetingSchema', () => {
     updated_at: '2026-06-15T09:00:00.000Z',
     start_time: '2026-06-16T10:00:00.000Z',
     end_time: '2026-06-16T11:00:00.000Z',
+    has_password: false,
     title: 'Weekly sync',
     qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
     qualified_creator: {id: 'creator-id', domain: 'example.com'},

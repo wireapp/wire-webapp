@@ -46,6 +46,7 @@ const meetingRecurrenceSchema = z.object({
 const meetingFieldsSchema = {
   created_at: utcTimeSchema,
   end_time: utcTimeSchema,
+  has_password: z.boolean(),
   qualified_conversation: qualifiedIdSchema,
   qualified_creator: qualifiedIdSchema,
   qualified_id: qualifiedIdSchema,

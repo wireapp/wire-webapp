@@ -195,16 +195,16 @@ export const createMeetingStore = (deps: MeetingStoreDeps, initialState?: Meetin
               return task.reject<MeetingSeries, RotateMeetingLinkError>(rotateMeetingLinkErrors.invalidResponse);
             }
 
-            if (isUndefined(mapResult.value.link)) {
-              return task.reject<MeetingSeries, RotateMeetingLinkError>(rotateMeetingLinkErrors.invalidResponse);
-            }
-
             const existingSeries = get().meetingSeries.find(series => {
               return matchQualifiedIds(series.qualified_id, meetingId);
             });
             const updatedSeries = isUndefined(existingSeries)
               ? mapResult.value
-              : {...existingSeries, link: mapResult.value.link};
+              : {
+                  ...existingSeries,
+                  ...(isUndefined(mapResult.value.link) ? {} : {link: mapResult.value.link}),
+                  has_password: mapResult.value.has_password,
+                };
 
             incrementMeetingMutationVersion(meetingId);
             set(state => {
