@@ -50,6 +50,7 @@ const series: MeetingSeries = {
   qualified_creator: {id: 'host-id', domain: 'example.com'},
   qualified_conversation: {id: 'conversation-id', domain: 'example.com'},
   tzid: 'Europe/Berlin',
+    has_password: false,
 };
 const meetingInstance: MeetingInstance = {meetingSeries: series, start, end};
 const selfUser = new User('host-id', 'example.com', translateForTest);
