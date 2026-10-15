@@ -75,7 +75,13 @@ describe('AppLockState', () => {
         },
       });
 
+      expect(localAppLockState.isAppLockEnabled()).toBe(false);
+      expect(localAppLockState.hasPassphrase()).toBe(true);
+
+      localTeamState.isTeamFeatureConfigFallback(true);
       expect(localAppLockState.isAppLockEnabled()).toBe(true);
+      localTeamState.isTeamFeatureConfigFallback(false);
+      expect(localAppLockState.isAppLockEnabled()).toBe(false);
 
       localTeamState.teamFeatures({
         appLock: {

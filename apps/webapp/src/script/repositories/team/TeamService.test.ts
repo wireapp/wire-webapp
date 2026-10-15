@@ -23,17 +23,19 @@ import {APIClient} from '../../service/apiClientSingleton';
 import {TeamService} from './TeamService';
 
 describe('TeamService', () => {
-  it('keeps the last known features when a refresh request fails', async () => {
+  it('rejects when fetching team features fails', async () => {
     const getAllFeatures = jest.fn().mockRejectedValue(new Error('Backend unavailable'));
     const apiClient = {api: {teams: {feature: {getAllFeatures}}}} as unknown as APIClient;
     const service = new TeamService(apiClient);
-    const previousFeatures = {
-      appLock: {
-        status: FEATURE_STATUS.ENABLED,
-        config: {enforceAppLock: true, inactivityTimeoutSecs: 60},
-      },
-    };
+    await expect(service.getAllTeamFeatures()).rejects.toThrow('Backend unavailable');
+  });
 
-    await expect(service.getAllTeamFeatures(previousFeatures)).resolves.toBe(previousFeatures);
+  it('provides compatibility defaults for initial loading', () => {
+    const service = new TeamService({} as APIClient);
+
+    expect(service.getDefaultTeamFeatures().appLock).toEqual({
+      status: FEATURE_STATUS.ENABLED,
+      config: {enforceAppLock: false, inactivityTimeoutSecs: 60},
+    });
   });
 });

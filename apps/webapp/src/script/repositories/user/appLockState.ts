@@ -73,9 +73,13 @@ export class AppLockState {
       if (isMdmAppLockDisabled || this.isAppLockDisabledOnTeam()) {
         return false;
       }
-      // A stored passphrase remains active until app lock is explicitly disabled.
-      const hasActiveTeamPassphrase = teamState.isTeam() && this.hasPassphrase();
-      return this.isAppLockEnforced() || this.isActivatedInPreferences() || hasActiveTeamPassphrase;
+      const appLockStatus = teamState.teamFeatures()?.appLock?.status;
+      const hasPassphraseWhileConfigIsUnknown =
+        teamState.isTeam() &&
+        (teamState.isTeamFeatureConfigFallback() ||
+          (appLockStatus !== FEATURE_STATUS.ENABLED && appLockStatus !== FEATURE_STATUS.DISABLED)) &&
+        this.hasPassphrase();
+      return this.isAppLockEnforced() || this.isActivatedInPreferences() || hasPassphraseWhileConfigIsUnknown;
     });
   }
 }
