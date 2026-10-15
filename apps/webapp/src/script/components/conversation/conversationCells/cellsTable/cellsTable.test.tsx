@@ -231,14 +231,17 @@ describe('CellsTable selection keyboard access', () => {
 });
 
 describe('CellsTable selection interactions', () => {
-  it('preserves selection when opening row options', () => {
+  it('preserves selection when opening a file from row options', async () => {
+    const user = userEvent.setup();
     renderCellsTable();
     const checkbox = screen.getAllByRole('checkbox')[0];
     fireEvent.click(checkbox);
     expect(screen.getByText('1 selected')).toBeInTheDocument();
 
-    fireEvent.click(screen.getAllByRole('button', {name: 'cells.options.label'})[0]);
+    await user.click(screen.getAllByRole('button', {name: 'cells.options.label'})[1]);
+    await user.click(screen.getByRole('menuitem', {name: 'cells.options.open'}));
 
+    expect(await screen.findByRole('dialog')).toBeInTheDocument();
     expect(checkbox).toBeChecked();
     expect(screen.getByText('1 selected')).toBeInTheDocument();
   });

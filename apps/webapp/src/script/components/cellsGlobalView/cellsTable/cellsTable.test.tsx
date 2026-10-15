@@ -18,6 +18,7 @@
  */
 
 import {fireEvent, render, screen} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 import {ThemeProvider} from '@wireapp/react-ui-kit';
 
@@ -138,15 +139,18 @@ describe('CellsTable selection', () => {
     expect(clearedCheckboxes[1]).not.toBeChecked();
   });
 
-  it('preserves selection when opening row options', () => {
+  it('preserves selection when opening a file from row options', async () => {
+    const user = userEvent.setup();
     renderCellsTable();
     const checkbox = screen.getAllByRole('checkbox')[0];
     fireEvent.click(checkbox);
     expect(screen.getByText('1 selected')).toBeInTheDocument();
 
-    fireEvent.click(screen.getAllByRole('button', {name: 'cells.options.label'})[0]);
+    await user.click(screen.getAllByRole('button', {name: 'cells.options.label'})[1]);
+    await user.click(screen.getByRole('menuitem', {name: 'cells.options.open'}));
 
-    expect(checkbox).toBeChecked();
+    expect(await screen.findByRole('dialog')).toBeInTheDocument();
+    expect(screen.getAllByRole('checkbox')[0]).toBeChecked();
     expect(screen.getByText('1 selected')).toBeInTheDocument();
   });
 
