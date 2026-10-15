@@ -34,6 +34,7 @@ const createMeetingSeries = (title: string): MeetingSeries => {
     qualified_creator: {id: 'creator-id', domain: 'example.com'},
     title,
     tzid: 'Europe/Berlin',
+    has_password: false,
   };
 };
 

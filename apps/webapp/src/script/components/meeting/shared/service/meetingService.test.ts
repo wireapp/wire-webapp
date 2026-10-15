@@ -132,6 +132,7 @@ describe('scheduleMeeting', () => {
         qualified_conversation: qualifiedConversation,
         qualified_id: meetingId,
         link: meetingLink,
+        has_password: false,
         conversation: meetingConversationResponse,
       }),
     ),
@@ -196,6 +197,7 @@ describe('scheduleMeeting', () => {
       failedToAdd: [],
       qualifiedMeetingId: meetingId,
       link: meetingLink,
+      hasPassword: false,
     });
     expect(createMeetingMock).toHaveBeenCalledWith({
       title: 'Weekly sync',
@@ -274,6 +276,7 @@ describe('meetNowMeeting', () => {
         qualified_conversation: qualifiedConversation,
         qualified_id: meetingId,
         link: meetingLink,
+        has_password: false,
         conversation: meetingConversationResponse,
       }),
     ),
@@ -339,6 +342,7 @@ describe('meetNowMeeting', () => {
       qualifiedConversation,
       qualifiedMeetingId: meetingId,
       link: meetingLink,
+      hasPassword: false,
     });
     expect(createMeetingMock).toHaveBeenCalledWith({
       title: 'Standup',

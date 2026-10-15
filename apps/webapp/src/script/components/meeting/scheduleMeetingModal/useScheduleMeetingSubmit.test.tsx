@@ -115,6 +115,7 @@ const createMeetingStore = ({
       failedToAdd: [],
       qualifiedMeetingId: {id: 'meeting-id', domain: 'example.com'},
       link: 'meeting-link',
+      hasPassword: false,
     }),
   ),
   updateMeeting = jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
@@ -176,6 +177,7 @@ describe('useScheduleMeetingSubmit', () => {
         failedToAdd: [],
         qualifiedMeetingId: {id: 'meeting-id', domain: 'example.com'},
         link: 'meeting-link',
+        hasPassword: false,
       }),
     );
     const store = createMeetingStore({loadMeetings, scheduleMeeting});
@@ -226,6 +228,7 @@ describe('useScheduleMeetingSubmit', () => {
         failedToAdd: [{users: [], backends: [], reason: AddUsersFailureReasons.UNREACHABLE_BACKENDS}],
         qualifiedMeetingId: {id: 'meeting-id', domain: 'example.com'},
         link: 'meeting-link',
+        hasPassword: false,
       }),
     );
     const store = createMeetingStore({scheduleMeeting});
@@ -263,6 +266,7 @@ describe('useScheduleMeetingSubmit', () => {
         recurrence: 'doesNotRepeat',
         conversation_id: 'conversation-id',
         tzid: 'Europe/Berlin',
+        has_password: false,
       },
       formState,
       {id: 'conversation-id', domain: 'example.com'},
@@ -351,6 +355,7 @@ describe('useScheduleMeetingSubmit', () => {
         recurrence: 'doesNotRepeat',
         conversation_id: 'conversation-id',
         tzid: 'Europe/Berlin',
+        has_password: false,
       },
       formState,
       {id: 'conversation-id', domain: 'example.com'},

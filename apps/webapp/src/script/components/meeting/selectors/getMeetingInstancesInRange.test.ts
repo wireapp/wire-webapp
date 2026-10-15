@@ -38,6 +38,7 @@ const createMeetingSeries = (overrides: Partial<MeetingSeries> & Pick<MeetingSer
     qualified_creator: {id: 'creator-id', domain: 'example.com'},
     title: 'Weekly sync',
     tzid: 'UTC',
+    has_password: false,
     ...overrides,
   };
 };
