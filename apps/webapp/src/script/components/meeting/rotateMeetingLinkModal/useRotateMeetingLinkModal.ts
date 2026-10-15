@@ -34,6 +34,8 @@ type RotateMeetingLinkModalState = {
   errors: MeetingPasswordErrors;
   isSubmitting: boolean;
   error?: string;
+  isWarningShown: boolean;
+  warningMeetingId?: QualifiedId;
   open: (meetingId: QualifiedId) => void;
   close: () => void;
   reset: () => void;
@@ -41,6 +43,9 @@ type RotateMeetingLinkModalState = {
   setPasswordConfirmation: (passwordConfirmation: string) => void;
   startSubmitting: () => void;
   setFailure: (error: string) => void;
+  showWarning: (meetingId: QualifiedId) => void;
+  cancelWarning: () => void;
+  confirmWarning: () => QualifiedId | undefined;
 };
 
 const emptyErrors = (): MeetingPasswordErrors => {
@@ -55,6 +60,8 @@ const initialState = {
   errors: emptyErrors(),
   isSubmitting: false,
   error: undefined,
+  isWarningShown: false,
+  warningMeetingId: undefined,
 };
 
 export const useRotateMeetingLinkModal = create<RotateMeetingLinkModalState>((set, get) => {
@@ -80,6 +87,17 @@ export const useRotateMeetingLinkModal = create<RotateMeetingLinkModalState>((se
     },
     setFailure: error => {
       return set({isSubmitting: false, error});
+    },
+    showWarning: meetingId => {
+      return set({isWarningShown: true, warningMeetingId: meetingId});
+    },
+    cancelWarning: () => {
+      return set({isWarningShown: false, warningMeetingId: undefined});
+    },
+    confirmWarning: () => {
+      const meetingId = get().warningMeetingId;
+      set({isWarningShown: false, warningMeetingId: undefined});
+      return meetingId;
     },
   };
 });
