@@ -2,6 +2,7 @@
   "extends": "./tsconfig.build.json",
   "compilerOptions": {
     "noEmit": true,
+    "allowImportingTsExtensions": true,
     "noUnusedLocals": false,
     "noUncheckedIndexedAccess": false,
     "paths": {

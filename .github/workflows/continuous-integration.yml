@@ -175,6 +175,23 @@ jobs:
       - name: Verify public Rspack bundle excludes Datadog
         run: ./bin/yarn verify:bundle:prod:public apps/webapp/dist/rspack-public
 
+      - name: Install Chromium for Rspack smoke tests
+        run: ./bin/yarn playwright install --only-shell --with-deps chromium
+
+      - name: Run Rspack browser smoke tests
+        run: ./bin/yarn nx run webapp:smoke-rspack
+
+      - name: Upload Rspack smoke diagnostics
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: rspack-browser-smoke-diagnostics
+          path: |
+            apps/webapp/playwright-report/rspack-smoke/
+            apps/webapp/test-results/rspack-smoke/
+          if-no-files-found: ignore
+          retention-days: 3
+
   type-check:
     runs-on: ubuntu-24.04
     name: type check

@@ -113,6 +113,15 @@
         "command": "playwright test --config {projectRoot}/playwright.config.ts"
       }
     },
+    "smoke-rspack": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "outputs": ["{projectRoot}/playwright-report/rspack-smoke", "{projectRoot}/test-results/rspack-smoke"],
+      "options": {
+        "command": "playwright test --config {projectRoot}/playwright.rspack.config.ts",
+        "cwd": "{workspaceRoot}"
+      }
+    },
     "lint": {
       "executor": "nx:run-commands",
       "dependsOn": [],
