@@ -30,3 +30,10 @@ export const meetingLinkConfirmationStyles: CSSObject = {
 export const meetingLinkConfirmationInputStyles: CSSObject = {
   marginTop: '16px',
 };
+
+export const meetingLinkConfirmationStatusStyles: CSSObject = {
+  alignItems: 'center',
+  display: 'flex',
+  gap: '4px',
+  marginTop: '12px',
+};

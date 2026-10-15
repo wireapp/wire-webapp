@@ -217,7 +217,11 @@ export const useScheduleMeetingSubmit = () => {
       }
 
       if (mode === scheduleMeetingModes.create && 'link' in submitResult.value) {
-        showMeetingLinkConfirmation({link: submitResult.value.link, translate});
+        showMeetingLinkConfirmation({
+          link: submitResult.value.link,
+          hasPassword: submitResult.value.hasPassword,
+          translate,
+        });
       }
 
       setIsSubmitting(false);

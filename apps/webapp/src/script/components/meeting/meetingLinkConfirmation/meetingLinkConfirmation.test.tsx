@@ -28,7 +28,11 @@ describe('MeetingLinkConfirmationMessage', () => {
   it('shows the existing copy-to-clipboard action', () => {
     render(
       <ThemeProvider>
-        <MeetingLinkConfirmationMessage link="https://wire.example/meeting-link" translate={translateForTest} />
+        <MeetingLinkConfirmationMessage
+          link="https://wire.example/meeting-link"
+          hasPassword={false}
+          translate={translateForTest}
+        />
       </ThemeProvider>,
     );
 
@@ -40,5 +44,28 @@ describe('MeetingLinkConfirmationMessage', () => {
     );
     expect(screen.getByDisplayValue('https://wire.example/meeting-link')).toHaveAttribute('readonly');
     expect(screen.getByRole('button', {name: 'meetings.meetingLink.copyLink'})).toBeInTheDocument();
+  });
+
+  it('shows password protection only for secured links', () => {
+    const {rerender} = render(
+      <ThemeProvider>
+        <MeetingLinkConfirmationMessage
+          link="https://wire.example/meeting-link"
+          hasPassword={false}
+          translate={translateForTest}
+        />
+      </ThemeProvider>,
+    );
+    expect(screen.queryByText('guestOptionsInfoPasswordSecured')).not.toBeInTheDocument();
+    rerender(
+      <ThemeProvider>
+        <MeetingLinkConfirmationMessage
+          link="https://wire.example/meeting-link"
+          hasPassword
+          translate={translateForTest}
+        />
+      </ThemeProvider>,
+    );
+    expect(screen.getByText('guestOptionsInfoPasswordSecured')).toBeInTheDocument();
   });
 });
