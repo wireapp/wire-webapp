@@ -90,9 +90,7 @@ export const test = baseTest.extend<Fixtures>({
   },
   createPage: async ({browser}, use, testInfo) => {
     const contexts: BrowserContext[] = [];
-    const rspackContexts: (RspackRuntimeVerificationContext & {
-      readonly context: BrowserContext;
-    })[] = [];
+    const rspackContexts: RspackRuntimeVerificationContext[] = [];
     const rspackDiagnosticsByContext = new WeakMap<BrowserContext, RspackRuntimeDiagnostics>();
     const rspackBuildVariant = process.env.WIRE_RSPACK_BUILD_VARIANT;
     const isRspackBuildSelected = rspackBuildVariant === 'internal' || rspackBuildVariant === 'public';
@@ -115,8 +113,7 @@ export const test = baseTest.extend<Fixtures>({
         buildDirectoryPath,
       });
       rspackDiagnosticsByContext.set(context, diagnostics);
-      rspackContexts.push({context, diagnostics, routeState});
-      await context.tracing.start({screenshots: true, snapshots: true, sources: true});
+      rspackContexts.push({diagnostics, routeState});
 
       return Maybe.just(diagnostics);
     }
@@ -193,28 +190,6 @@ export const test = baseTest.extend<Fixtures>({
         body: Buffer.from(serializedRuntimeDiagnostics),
         contentType: 'application/json',
       });
-    }
-
-    for (const [contextIndex, rspackContext] of rspackContexts.entries()) {
-      if (shouldKeepRspackDiagnostics) {
-        const tracePath = testInfo.outputPath(`rspack-context-${contextIndex + 1}.zip`);
-        await rspackContext.context.tracing.stop({path: tracePath});
-        await testInfo.attach(`rspack-context-${contextIndex + 1}-trace`, {
-          contentType: 'application/zip',
-          path: tracePath,
-        });
-
-        for (const [pageIndex, page] of rspackContext.context.pages().entries()) {
-          const screenshotPath = testInfo.outputPath(`rspack-context-${contextIndex + 1}-page-${pageIndex + 1}.png`);
-          await page.screenshot({fullPage: true, path: screenshotPath});
-          await testInfo.attach(`rspack-context-${contextIndex + 1}-page-${pageIndex + 1}`, {
-            contentType: 'image/png',
-            path: screenshotPath,
-          });
-        }
-      } else {
-        await rspackContext.context.tracing.stop();
-      }
     }
 
     // Close all contexts created throughout the tests (will automatically close all pages associated with each context).
