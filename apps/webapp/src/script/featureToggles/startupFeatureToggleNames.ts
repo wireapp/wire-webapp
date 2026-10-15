@@ -22,6 +22,7 @@ export const conversationListCollapseFeatureToggleName = 'conversation-list-coll
 export const forTestsOnlyFeatureToggleName = 'for-tests-only';
 export const disableMessagePreprocessingFeatureToggleName = 'disable-message-preprocessing';
 export const sharedDriveDirectUploadFeatureToggleName = 'shared-drive-direct-upload';
+export const driveBulkActionsFeatureToggleName = 'drive-bulk-actions';
 
 export const startupFeatureToggleNames = [
   applockRefactoredFeatureToggleName,
@@ -29,6 +30,7 @@ export const startupFeatureToggleNames = [
   forTestsOnlyFeatureToggleName,
   disableMessagePreprocessingFeatureToggleName,
   sharedDriveDirectUploadFeatureToggleName,
+  driveBulkActionsFeatureToggleName,
 ] as const;
 
 export type StartupFeatureToggleName = (typeof startupFeatureToggleNames)[number];

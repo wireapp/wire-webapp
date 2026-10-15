@@ -63,10 +63,14 @@ function readEnabledFeatureToggleNameListFromLocationSearch(
   return Maybe.of(enabledFeatureTogglesParameterValue).map(toEnabledFeatureToggleNameList).unwrapOr([]);
 }
 
-export function createStartupFeatureTogglesFromLocationSearch(locationSearch: string): StartupFeatureToggles {
-  const enabledFeatureToggleNameSet = new Set<StartupFeatureToggleName>(
-    readEnabledFeatureToggleNameListFromLocationSearch(locationSearch),
-  );
+export function createStartupFeatureTogglesFromLocationSearch(
+  locationSearch: string,
+  defaultEnabledFeatureToggleNames: readonly StartupFeatureToggleName[] = [],
+): StartupFeatureToggles {
+  const enabledFeatureToggleNameSet = new Set<StartupFeatureToggleName>([
+    ...defaultEnabledFeatureToggleNames,
+    ...readEnabledFeatureToggleNameListFromLocationSearch(locationSearch),
+  ]);
 
   return {
     isFeatureToggleEnabled(featureToggleName) {
