@@ -88,8 +88,7 @@ export const test = baseTest.extend<Fixtures>({
     // Create a new instance of PageManager for each test
     await use(new PageManager(page));
   },
-  createPage: async (fixtureOptions, use, testInfo) => {
-    const {browser} = fixtureOptions;
+  createPage: async ({browser}, use, testInfo) => {
     const contexts: BrowserContext[] = [];
     const rspackContexts: (RspackRuntimeVerificationContext & {
       readonly context: BrowserContext;

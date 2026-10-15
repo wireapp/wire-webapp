@@ -19,7 +19,6 @@
 import {existsSync} from 'node:fs';
 import {resolve} from 'node:path';
 
-import {isNonEmptyString, isString} from '@sindresorhus/is';
 import {defineConfig, devices} from '@playwright/test';
 import {config} from 'dotenv';
 
@@ -37,11 +36,15 @@ if (!existsSync(e2eEnvironmentPath)) {
 config({path: e2eEnvironmentPath, quiet: true});
 
 function isRspackBuildVariant(value: unknown): value is RspackBuildVariant {
-  return isString(value) && (value === 'internal' || value === 'public');
+  return typeof value === 'string' && (value === 'internal' || value === 'public');
+}
+
+function isNonEmptyString(value: unknown): value is string {
+  return typeof value === 'string' && value.trim().length > 0;
 }
 
 function hasResolvedEnvironmentValue(environmentValue: unknown): boolean {
-  if (!isString(environmentValue) || !isNonEmptyString(environmentValue.trim())) {
+  if (!isNonEmptyString(environmentValue)) {
     return false;
   }
 
