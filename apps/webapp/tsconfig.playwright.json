@@ -4,6 +4,7 @@
     "baseUrl": ".",
     "module": "ESNext",
     "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
     "target": "ESNext",
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "noEmit": true,
@@ -20,6 +21,15 @@
       "I18n/*": ["./src/i18n/*"]
     }
   },
-  "include": ["playwright.config.ts", "test/e2e_tests/playwright-globals.d.ts", "test/e2e_tests/**/*.ts", "test/e2e_tests/**/*.tsx"],
+  "include": [
+    "playwright.config.ts",
+    "playwright.rspack.config.ts",
+    "test/e2e_tests/playwright-globals.d.ts",
+    "test/e2e_tests/**/*.ts",
+    "test/e2e_tests/**/*.tsx",
+    "test/rspack-smoke/rspack-smoke.spec.ts",
+    "test/rspack-smoke/rspackSmokeAssetPathResolver.ts",
+    "test/rspack-smoke/server.ts"
+  ],
   "exclude": ["node_modules"]
 }
