@@ -28,6 +28,7 @@ import {UploadIcon} from '@wireapp/react-ui-kit';
 import {CellsSelectionBar} from 'Components/cells/common/cellsSelectionBar/cellsSelectionBar';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import type {Conversation} from 'Repositories/entity/Conversation';
+import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 
@@ -123,14 +124,15 @@ export const CellsTable = ({
   selectionEnabled,
   selectionScopeKey,
 }: CellsTableProps) => {
-  const {translate} = useApplicationContext();
+  const {translate, isFeatureToggleEnabled} = useApplicationContext();
+  const isSelectionEnabled = selectionEnabled && isFeatureToggleEnabled(driveBulkActionsFeatureToggleName);
   const [selectedNodeIds, setSelectedNodeIds] = useState<Set<string>>(() => {
     return new Set();
   });
 
   useEffect(() => {
     setSelectedNodeIds(new Set());
-  }, [selectionScopeKey, selectionEnabled]);
+  }, [selectionScopeKey, isSelectionEnabled]);
 
   useEffect(() => {
     const currentNodeIds = new Set<string>();
@@ -186,7 +188,7 @@ export const CellsTable = ({
       onToggleSort,
       selectedNodeIds,
       onToggleSelection: handleToggleSelection,
-      selectionEnabled,
+      selectionEnabled: isSelectionEnabled,
     }),
     getCoreRowModel: getCoreRowModel(),
   });
@@ -270,7 +272,7 @@ export const CellsTable = ({
   return (
     <CellsFilePreviewModalProvider>
       <div css={tableWrapperStyles}>
-        {selectionEnabled && (
+        {isSelectionEnabled && (
           <CellsSelectionBar
             selectedCount={selectedNodeIds.size}
             onClear={() => {
@@ -315,7 +317,7 @@ export const CellsTable = ({
                 const node = row.original;
                 const rowStyles = [
                   tableCellRow,
-                  ...(selectedNodeIds.has(node.id) ? [selectedTableCellRowStyles] : []),
+                  ...(isSelectionEnabled && selectedNodeIds.has(node.id) ? [selectedTableCellRowStyles] : []),
                   ...(activeFolderDropTargetId === node.id ? [folderDropTargetRowStyles] : []),
                 ];
 
@@ -324,7 +326,7 @@ export const CellsTable = ({
                     key={row.id}
                     css={rowStyles}
                     data-folder-drop-active={activeFolderDropTargetId === node.id || undefined}
-                    aria-selected={selectedNodeIds.has(node.id)}
+                    aria-selected={isSelectionEnabled && selectedNodeIds.has(node.id)}
                     data-uie-name="cells-table-row"
                     {...getFolderDropHandlers(node)}
                   >

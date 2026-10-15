@@ -28,6 +28,7 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
+import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 import type {Translate} from 'Util/localizerUtil/translationTypes';
 import {translateForTest} from 'Util/test/translateForTest';
@@ -86,6 +87,7 @@ const renderCellsTable = ({
   folderDropResetKey,
   selectionEnabled = true,
   selectionScopeKey = 'conversation:/files',
+  isBulkActionsEnabled = true,
 }: {
   readonly folderPath?: string;
   readonly onDropFilesToFolder?: (files: readonly File[], uploadPath: string) => void;
@@ -94,9 +96,15 @@ const renderCellsTable = ({
   readonly folderDropResetKey?: number;
   readonly selectionEnabled?: boolean;
   readonly selectionScopeKey?: string;
+  readonly isBulkActionsEnabled?: boolean;
 } = {}) => {
   const wrapper = createRootProviderWrapperForTest(
-    createRootContextValueForTest({translate: translateSelectionForTest}),
+    createRootContextValueForTest({
+      translate: translateSelectionForTest,
+      isFeatureToggleEnabled: featureToggleName => {
+        return isBulkActionsEnabled && featureToggleName === driveBulkActionsFeatureToggleName;
+      },
+    }),
   );
   const folder = createNode({id: 'folder-id', name: 'Marketing images', path: folderPath});
   const file = createNode({
@@ -183,6 +191,21 @@ describe('CellsTable selection', () => {
         return !(checkbox as HTMLInputElement).checked;
       }),
     ).toBe(true);
+  });
+
+  it('keeps selection available while browsing the recycle bin', () => {
+    renderCellsTable({selectionScopeKey: 'conversation:/bin'});
+
+    fireEvent.click(screen.getAllByRole('checkbox')[0]);
+
+    expect(screen.getByText('1 selected')).toBeInTheDocument();
+  });
+
+  it('hides selection controls when the Drive bulk actions feature flag is off', () => {
+    renderCellsTable({isBulkActionsEnabled: false});
+
+    expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'Clear selection'})).not.toBeInTheDocument();
   });
 });
 

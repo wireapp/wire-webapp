@@ -38,7 +38,6 @@ import {CellsStateInfo} from './cellsStateInfo/cellsStateInfo';
 import {CellsTable} from './cellsTable/cellsTable';
 import {useCellsStore} from './common/useCellsStore/useCellsStore';
 import {useGlobalDriveFilters} from './common/useGlobalDriveFilters/useGlobalDriveFilters';
-import {getGlobalDriveSelectionProps} from './getGlobalDriveSelectionProps';
 import {useOnPresignedUrlExpired} from './useOnPresignedUrlExpired/useOnPresignedUrlExpired';
 import {useSearchCellsNodes} from './useSearchCellsNodes/useSearchCellsNodes';
 
@@ -123,7 +122,6 @@ export const CellsGlobalView = (properties: CellsGlobalViewProps): ReactElement 
           getDirectionFor={getDirectionFor}
           isSortingEnabled
           onToggleSort={toggleSort}
-          {...getGlobalDriveSelectionProps(searchValue, filterState)}
         />
       )}
       {showNoFiles && (
