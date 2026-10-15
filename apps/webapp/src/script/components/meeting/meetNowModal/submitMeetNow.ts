@@ -89,6 +89,7 @@ export const submitMeetNow = async ({
 
   onMeetingCreated({
     link: submitResult.value.link,
+    hasPassword: submitResult.value.hasPassword,
     onClosed: () => {
       openMeetingPrep({
         meetingTitle: commandResult.value.title,

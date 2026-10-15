@@ -44,6 +44,7 @@ const meetingSeries: MeetingSeries = {
   qualified_creator: {id: 'creator-id', domain: 'example.com'},
   recurrence: 'doesNotRepeat',
   tzid: 'Europe/Berlin',
+  has_password: false,
 };
 
 type Deferred = {
