@@ -169,11 +169,56 @@ jobs:
       - name: Build internal webapp
         run: ./bin/yarn nx run webapp:build
 
-      - name: Build public webapp with Rspack
-        run: ./bin/yarn nx run webapp:build-rspack-public
+      - name: Build and package public webapp with Rspack
+        id: public_rspack_package
+        env:
+          WIRE_WEBAPP_BUILD_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          short_commit_sha="${WIRE_WEBAPP_BUILD_COMMIT::7}"
+          expected_version="dev-${short_commit_sha}"
+          WIRE_WEBAPP_BUILD_VERSION="${expected_version}" \
+            ./bin/yarn nx run server:package-rspack-public
+          echo "expected_version=${expected_version}" >> "$GITHUB_OUTPUT"
 
-      - name: Verify public Rspack bundle excludes Datadog
-        run: ./bin/yarn verify:bundle:prod:public apps/webapp/dist/rspack-public
+      - name: Verify public Rspack deployment package
+        env:
+          BUILD_ARTIFACT_PATH: apps/server/dist/s3/ebs.zip
+          EXPECTED_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+          EXPECTED_VERSION: ${{ steps.public_rspack_package.outputs.expected_version }}
+        run: |
+          set -euo pipefail
+
+          test -f "$BUILD_ARTIFACT_PATH"
+          unzip -tq "$BUILD_ARTIFACT_PATH"
+          node ./tools/buildArtifact/validateBuildArtifact.mts
+
+          archive_entries="$(unzip -Z1 "$BUILD_ARTIFACT_PATH")"
+          required_entry_scripts=(
+            static/min/app.js
+            static/min/auth.js
+            static/min/checkBrowser.js
+            static/min/runtime.js
+            static/min/vendor.js
+            static/min/dexie.js
+          )
+
+          for entry_script_path in "${required_entry_scripts[@]}"; do
+            if ! grep -Fqx -- "$entry_script_path" <<< "$archive_entries"; then
+              echo "Public Rspack deployment package is missing required entry script: $entry_script_path" >&2
+              exit 1
+            fi
+          done
+
+          public_rspack_runtime="$(unzip -p "$BUILD_ARTIFACT_PATH" static/min/runtime.js)"
+          if ! grep -Fq 'rspackChunk_wireapp_webapp' <<< "$public_rspack_runtime"; then
+            echo "Public deployment package does not contain the Rspack runtime fingerprint." >&2
+            exit 1
+          fi
+
+          if grep -Fq 'webpackChunk_wireapp_webapp' <<< "$public_rspack_runtime"; then
+            echo "Public deployment package contains the Webpack runtime fingerprint." >&2
+            exit 1
+          fi
 
       - name: Install Chromium for Rspack smoke tests
         run: ./bin/yarn playwright install --only-shell --with-deps chromium
