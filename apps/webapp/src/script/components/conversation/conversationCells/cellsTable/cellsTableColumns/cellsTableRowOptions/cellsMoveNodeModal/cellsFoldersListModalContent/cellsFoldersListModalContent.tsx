@@ -37,6 +37,10 @@ interface CellsFoldersListModalContentProps {
   currentPath: string;
   onPathChange: (path: string) => void;
   onChangeModalContent: (content: 'move' | 'create') => void;
+  onSelectDestination?: (path: string) => void;
+  selectedDestinationPath?: string;
+  disabledDestinationPaths?: readonly string[];
+  disabledDestinationLabels?: Readonly<Record<string, string>>;
 }
 
 export const CellsFoldersListModalContent = ({
@@ -47,6 +51,10 @@ export const CellsFoldersListModalContent = ({
   currentPath,
   onPathChange,
   onChangeModalContent,
+  onSelectDestination,
+  selectedDestinationPath,
+  disabledDestinationPaths,
+  disabledDestinationLabels,
 }: CellsFoldersListModalContentProps) => {
   const {translate} = useApplicationContext();
   const breadcrumbs = getBreadcrumbsFromPath({
@@ -86,7 +94,16 @@ export const CellsFoldersListModalContent = ({
           ))}
         {status === 'error' && <p role="alert">{translate('cells.newItemMenuModalForm.genericError')}</p>}
         {shouldDisplayEmptyItems && <CellsFolderListEmpty />}
-        {shouldDisplayFolders && <CellsFolderList items={items} onNavigate={handleFolderNavigate} />}
+        {shouldDisplayFolders && (
+          <CellsFolderList
+            items={items}
+            onNavigate={handleFolderNavigate}
+            onSelectDestination={onSelectDestination}
+            selectedDestinationPath={selectedDestinationPath}
+            disabledDestinationPaths={disabledDestinationPaths}
+            disabledDestinationLabels={disabledDestinationLabels}
+          />
+        )}
       </div>
       <CellsCreateNewFolderHint
         onCreate={() => {

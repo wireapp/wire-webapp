@@ -147,6 +147,60 @@ describe('useGetCellsFolders', () => {
     expect(result.current.shouldShowLoadingSpinner).toBe(false);
   });
 
+  it('ignores stale folder responses when refreshes resolve out of order', async () => {
+    const {result} = renderUseGetCellsFolders();
+
+    await waitFor(() => {
+      expect(result.current.status).toBe('success');
+    });
+
+    const staleFolder = {
+      Type: 'COLLECTION',
+      Uuid: 'stale-folder',
+      Path: 'wire-cells-web/stale',
+    } as RestNode;
+    const latestFolder = {
+      Type: 'COLLECTION',
+      Uuid: 'latest-folder',
+      Path: 'wire-cells-web/latest',
+    } as RestNode;
+    let resolveStale: (response: {Nodes: RestNode[]}) => void = noop;
+    let resolveLatest: (response: {Nodes: RestNode[]}) => void = noop;
+    cellsRepository.getAllNodes
+      .mockReturnValueOnce(
+        new Promise(resolve => {
+          resolveStale = resolve;
+        }),
+      )
+      .mockReturnValueOnce(
+        new Promise(resolve => {
+          resolveLatest = resolve;
+        }),
+      );
+
+    let staleRequest: Promise<void> = Promise.resolve();
+    let latestRequest: Promise<void> = Promise.resolve();
+    act(() => {
+      staleRequest = result.current.refresh();
+    });
+    act(() => {
+      latestRequest = result.current.refresh();
+    });
+
+    await act(async () => {
+      resolveLatest({Nodes: [latestFolder]});
+      await latestRequest;
+    });
+    expect(result.current.folders).toEqual([{id: 'latest-folder', name: 'latest', path: 'wire-cells-web/latest'}]);
+
+    await act(async () => {
+      resolveStale({Nodes: [staleFolder]});
+      await staleRequest;
+    });
+    expect(result.current.status).toBe('success');
+    expect(result.current.folders).toEqual([{id: 'latest-folder', name: 'latest', path: 'wire-cells-web/latest'}]);
+  });
+
   it('reports a load error without exposing stale folders', async () => {
     cellsRepository.getAllNodes.mockRejectedValue(new Error('folder load failed'));
     const {result} = renderUseGetCellsFolders();

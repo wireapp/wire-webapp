@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 
 import type {Clock} from '@enormora/clock/clock';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
@@ -61,12 +61,15 @@ export const useGetCellsFolders = ({
   const [folders, setFolders] = useState<Folder[]>([]);
   const [status, setStatus] = useState<Status>('idle');
   const [shouldShowLoadingSpinner, setShouldShowLoadingSpinner] = useState(true);
+  const latestRequestId = useRef(0);
 
   const fetchFolders = useCallback(async () => {
     if (!enabled) {
+      latestRequestId.current += 1;
       return;
     }
 
+    const requestId = ++latestRequestId.current;
     setStatus('loading');
 
     const foldersResult = await task.tryOrElse(
@@ -80,6 +83,10 @@ export const useGetCellsFolders = ({
         });
       },
     );
+
+    if (requestId !== latestRequestId.current) {
+      return;
+    }
 
     if (foldersResult.isErr) {
       setFolders([]);

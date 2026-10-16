@@ -26,7 +26,6 @@ import {noop} from 'noop-esm';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
-import {getCellsFilesPath} from 'Components/conversation/conversationCells/common/getCellsFilesPath/getCellsFilesPath';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {
   createExecutingFireAndForgetInvokerForTest,
@@ -65,7 +64,7 @@ describe('CellsMoveNodeModal', () => {
     navigateToPath = jest.fn();
   });
 
-  const renderMoveModal = (clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n})) => {
+  const renderMoveModal = (clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n}), isOpen = true) => {
     const rootContext = createRootContextValueForTest({
       translate: translateForTest,
       fireAndForgetInvoker: createExecutingFireAndForgetInvokerForTest(),
@@ -73,10 +72,10 @@ describe('CellsMoveNodeModal', () => {
     });
     const wrapper = createRootProviderWrapperForTest(rootContext);
 
-    return render(
-      withTheme(
+    const createModal = (isOpen: boolean) => {
+      return withTheme(
         <CellsMoveNodeModal
-          isOpen
+          isOpen={isOpen}
           onClose={onClose}
           cellsRepository={cellsRepository}
           conversationQualifiedId={conversationQualifiedId}
@@ -84,25 +83,41 @@ describe('CellsMoveNodeModal', () => {
           nodeToMove={nodeToMove}
           navigateToPath={navigateToPath}
         />,
-      ),
-      {wrapper},
-    );
+      );
+    };
+    const rendered = render(createModal(isOpen), {wrapper});
+
+    return {
+      ...rendered,
+      setIsOpen: (nextIsOpen: boolean) => {
+        rendered.rerender(createModal(nextIsOpen));
+      },
+    };
   };
 
-  it('navigates and closes after the existing single-item move succeeds', async () => {
+  it('moves to the chosen folder and closes after the single-item move succeeds', async () => {
+    cellsRepository.getAllNodes.mockResolvedValueOnce({Nodes: [destinationFolder]}).mockResolvedValueOnce({Nodes: []});
     renderMoveModal();
-    const moveButton = await screen.findByRole('button', {name: 'cells.moveNodeModal.moveButton'});
+
+    fireEvent.click(await screen.findByRole('button', {name: 'destination'}));
+    await waitFor(() => {
+      expect(cellsRepository.getAllNodes).toHaveBeenCalledTimes(2);
+    });
+
+    const moveButton = screen.getByRole('button', {name: 'cells.moveNodeModal.moveButton'});
     await waitFor(() => {
       expect(moveButton).toBeEnabled();
     });
-
     fireEvent.click(moveButton);
 
     await waitFor(() => {
       expect(onClose).toHaveBeenCalledTimes(1);
     });
-    expect(navigateToPath).toHaveBeenCalledWith({conversationQualifiedId, path: getCellsFilesPath()});
-    expect(cellsRepository.moveNode).toHaveBeenCalledTimes(1);
+    expect(cellsRepository.moveNode).toHaveBeenCalledWith({
+      currentPath: nodeToMove.path,
+      targetPath: 'conversation-id@wire.com/destination',
+    });
+    expect(navigateToPath).toHaveBeenCalledWith({conversationQualifiedId, path: 'destination'});
   });
 
   it('keeps the modal open and shows an error when the single-item move fails', async () => {
@@ -118,6 +133,25 @@ describe('CellsMoveNodeModal', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('cells.newItemMenuModalForm.genericError');
     expect(onClose).not.toHaveBeenCalled();
     expect(navigateToPath).not.toHaveBeenCalled();
+  });
+
+  it('resets a stale move error when the modal is reopened', async () => {
+    cellsRepository.moveNode.mockRejectedValue(new Error('move failed'));
+    const {setIsOpen} = renderMoveModal();
+    const moveButton = await screen.findByRole('button', {name: 'cells.moveNodeModal.moveButton'});
+    await waitFor(() => {
+      expect(moveButton).toBeEnabled();
+    });
+
+    fireEvent.click(moveButton);
+    expect(await screen.findByRole('alert')).toHaveTextContent('cells.newItemMenuModalForm.genericError');
+
+    setIsOpen(false);
+    setIsOpen(true);
+
+    await waitFor(() => {
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    });
   });
 
   it('shows loading and disables Move while destination folders reload', async () => {
@@ -156,7 +190,10 @@ describe('CellsMoveNodeModal', () => {
     });
   });
 
-  it('returns to the folder picker and refreshes folders after creating a folder', async () => {
+  it('returns to the picker and shows the created folder after refreshing the list', async () => {
+    cellsRepository.getAllNodes
+      .mockResolvedValueOnce({Nodes: []})
+      .mockResolvedValueOnce({Nodes: [{...destinationFolder, Uuid: 'reports', Path: 'wire-cells-web/Reports'}]});
     renderMoveModal();
     fireEvent.click(await screen.findByRole('button', {name: 'cells.moveNodeModal.createFolder.hintButton'}));
 
@@ -172,6 +209,7 @@ describe('CellsMoveNodeModal', () => {
       path: 'conversation-id@wire.com',
       name: 'Reports',
     });
+    expect(await screen.findByRole('button', {name: 'Reports'})).toBeInTheDocument();
     expect(screen.getByRole('button', {name: 'cells.moveNodeModal.moveButton'})).toBeInTheDocument();
     expect(onClose).not.toHaveBeenCalled();
     expect(navigateToPath).not.toHaveBeenCalled();
