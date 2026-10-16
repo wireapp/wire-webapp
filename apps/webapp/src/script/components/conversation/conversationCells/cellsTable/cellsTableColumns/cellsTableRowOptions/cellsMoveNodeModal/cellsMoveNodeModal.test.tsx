@@ -19,7 +19,10 @@
 
 import {ReactNode} from 'react';
 
-import {fireEvent, render, screen, waitFor} from '@testing-library/react';
+import {act, fireEvent, render, screen, waitFor} from '@testing-library/react';
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
+import {RestNode} from 'cells-sdk-ts';
+import {noop} from 'noop-esm';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
@@ -42,6 +45,11 @@ const withTheme = (component: ReactNode) => {
 describe('CellsMoveNodeModal', () => {
   const conversationQualifiedId = {id: 'conversation-id', domain: 'wire.com'};
   const nodeToMove = {path: 'wire-cells-web/source/file.txt'} as CellNode;
+  const destinationFolder = {
+    Type: 'COLLECTION',
+    Uuid: 'destination-folder',
+    Path: 'wire-cells-web/destination',
+  } as RestNode;
   let cellsRepository: jest.Mocked<CellsRepository>;
   let onClose: jest.Mock;
   let navigateToPath: jest.Mock;
@@ -57,10 +65,11 @@ describe('CellsMoveNodeModal', () => {
     navigateToPath = jest.fn();
   });
 
-  const renderMoveModal = () => {
+  const renderMoveModal = (clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n})) => {
     const rootContext = createRootContextValueForTest({
       translate: translateForTest,
       fireAndForgetInvoker: createExecutingFireAndForgetInvokerForTest(),
+      clock,
     });
     const wrapper = createRootProviderWrapperForTest(rootContext);
 
@@ -109,6 +118,42 @@ describe('CellsMoveNodeModal', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('cells.newItemMenuModalForm.genericError');
     expect(onClose).not.toHaveBeenCalled();
     expect(navigateToPath).not.toHaveBeenCalled();
+  });
+
+  it('shows loading and disables Move while destination folders reload', async () => {
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    cellsRepository.getAllNodes.mockResolvedValueOnce({Nodes: [destinationFolder]});
+    let resolveReload: (response: {Nodes: RestNode[]}) => void = noop;
+    cellsRepository.getAllNodes.mockReturnValueOnce(
+      new Promise(resolve => {
+        resolveReload = resolve;
+      }),
+    );
+    renderMoveModal(clock);
+    const destinationButton = await screen.findByRole('button', {name: 'destination'});
+    const moveButton = await screen.findByRole('button', {name: 'cells.moveNodeModal.moveButton'});
+    await waitFor(() => {
+      expect(moveButton).toBeEnabled();
+    });
+
+    fireEvent.click(destinationButton);
+    await waitFor(() => {
+      expect(cellsRepository.getAllNodes).toHaveBeenCalledTimes(2);
+    });
+
+    act(() => {
+      clock.advanceByMilliseconds(999);
+    });
+    expect(screen.getByRole('status')).toHaveTextContent('Loading folders…');
+    expect(moveButton).toBeDisabled();
+    expect(cellsRepository.moveNode).not.toHaveBeenCalled();
+
+    await act(async () => {
+      resolveReload({Nodes: []});
+    });
+    await waitFor(() => {
+      expect(moveButton).toBeEnabled();
+    });
   });
 
   it('returns to the folder picker and refreshes folders after creating a folder', async () => {

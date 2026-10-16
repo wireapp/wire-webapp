@@ -439,6 +439,7 @@
   "cells.moveNodeModal.createFolder.hintText": "No suitable folder?",
   "cells.moveNodeModal.createTitle": "Create Folder",
   "cells.moveNodeModal.emptyList": "There are no subfolders in this folder.",
+  "cells.moveNodeModal.loading": "Loading folders…",
   "cells.moveNodeModal.moveButton": "Move 1 Item Here",
   "cells.moveNodeModal.moveTitle": "Move to folder",
   "cells.moveToRecycleBinModal.button": "Delete",

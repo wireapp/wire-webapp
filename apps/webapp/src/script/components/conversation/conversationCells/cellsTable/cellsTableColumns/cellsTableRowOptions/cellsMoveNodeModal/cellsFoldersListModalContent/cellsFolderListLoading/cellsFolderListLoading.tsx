@@ -21,7 +21,7 @@ import {spinnerStyles, wrapperStyles} from './cellsFolderListLoading.styles';
 
 export const CellsFolderListLoading = () => {
   return (
-    <div css={wrapperStyles}>
+    <div css={wrapperStyles} role="status">
       <div className="icon-spinner spin" css={spinnerStyles} />
     </div>
   );
