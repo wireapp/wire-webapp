@@ -221,8 +221,6 @@ const AppLock = ({
   useEffect(() => {
     if (isAppLockEnabled) {
       showAppLock();
-    } else if (appLockState.hasPassphrase()) {
-      appLockRepository.removeCode();
     }
   }, [isAppLockEnabled]);
 
