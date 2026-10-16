@@ -36,7 +36,7 @@ interface CellsFoldersListModalContentProps {
   conversationName: string;
   currentPath: string;
   onPathChange: (path: string) => void;
-  onChangeModalContent: (content: 'move' | 'create') => void;
+  onChangeModalContent?: (content: 'move' | 'create') => void;
   onSelectDestination?: (path: string) => void;
   selectedDestinationPath?: string;
   disabledDestinationPaths?: readonly string[];
@@ -105,11 +105,13 @@ export const CellsFoldersListModalContent = ({
           />
         )}
       </div>
-      <CellsCreateNewFolderHint
-        onCreate={() => {
-          return onChangeModalContent('create');
-        }}
-      />
+      {onChangeModalContent !== undefined && (
+        <CellsCreateNewFolderHint
+          onCreate={() => {
+            return onChangeModalContent('create');
+          }}
+        />
+      )}
     </>
   );
 };
