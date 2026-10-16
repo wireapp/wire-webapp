@@ -57,21 +57,6 @@ export const selectionCountStyles: CSSObject = {
   whiteSpace: 'nowrap',
 };
 
-export const moveButtonStyles: CSSObject = {
-  flexShrink: 0,
-  minHeight: '28px',
-  padding: '0 12px',
-  border: '1px solid var(--border-color)',
-  borderRadius: '16px',
-  background: 'var(--modal-bg)',
-  color: 'var(--main-color)',
-  cursor: 'pointer',
-
-  '&:hover, &:focus-visible': {
-    backgroundColor: 'var(--foreground-fade-8)',
-  },
-};
-
 export const clearButtonStyles: CSSObject = {
   flexShrink: 0,
   display: 'inline-flex',
