@@ -247,7 +247,7 @@ function respondToRequest(options: RequestHandlerOptions): void {
 function startSmokeServer(options: RspackSmokeServerOptions): void {
   const buildDirectoryName = match(options.buildVariant)
     .with('internal', () => {
-      return 'rspack-internal';
+      return 'internal';
     })
     .with('public', () => {
       return 'rspack-public';

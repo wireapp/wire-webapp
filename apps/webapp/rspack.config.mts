@@ -54,7 +54,7 @@ const buildMetadataPath = path.resolve(
 );
 const outputPath = path.resolve(
   rootPath,
-  process.env.WIRE_WEBAPP_BUILD_OUTPUT_PATH ?? path.resolve(configDirectoryPath, 'dist/rspack-internal'),
+  process.env.WIRE_WEBAPP_BUILD_OUTPUT_PATH ?? path.resolve(configDirectoryPath, 'dist/internal'),
 );
 
 function readBuildMetadata(): BuildMetadata {

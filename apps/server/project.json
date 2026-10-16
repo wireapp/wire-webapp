@@ -53,13 +53,13 @@
         "command": "node {projectRoot}/bin/assembleBuild.mts internal artifact"
       }
     },
-    "assemble-rspack": {
+    "assemble-webpack": {
       "executor": "nx:run-commands",
-      "dependsOn": ["build", {"projects": "webapp", "target": "build-rspack"}, "generate-build-metadata"],
+      "dependsOn": ["build", {"projects": "webapp", "target": "build-webpack"}, "generate-build-metadata"],
       "outputs": ["{projectRoot}/dist"],
       "cache": false,
       "options": {
-        "command": "node {projectRoot}/bin/assembleBuild.mts rspack-internal artifact"
+        "command": "node {projectRoot}/bin/assembleBuild.mts webpack-internal artifact"
       }
     },
     "assemble-public": {
@@ -108,9 +108,9 @@
         "parallel": false
       }
     },
-    "package-rspack": {
+    "package-webpack": {
       "executor": "nx:run-commands",
-      "dependsOn": ["assemble-rspack"],
+      "dependsOn": ["assemble-webpack"],
       "inputs": ["production", "webappBuildMetadata"],
       "cache": false,
       "options": {

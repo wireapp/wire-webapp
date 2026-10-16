@@ -11,10 +11,6 @@ on:
       grep:
         type: string
         description: Define which tests to run, the given value will be passed to the `--grep` flag of playwright
-      useRspack:
-        type: boolean
-        description: Build with Rspack and deploy to the manual precommit environment for validation
-        default: false
   pull_request:
     types: [labeled, opened, synchronize, reopened]
   schedule:
@@ -69,26 +65,19 @@ jobs:
       - id: package
         env:
           WIRE_WEBAPP_BUILD_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
-          USE_RSPACK: ${{ github.event_name == 'workflow_dispatch' && inputs.useRspack }}
         run: |
           short_commit_sha="${WIRE_WEBAPP_BUILD_COMMIT::7}"
           expected_version="dev-${short_commit_sha}"
 
-          if [[ "${USE_RSPACK}" == "true" ]]; then
-            WIRE_WEBAPP_BUILD_VERSION="${expected_version}" \
-              ./bin/yarn nx run server:package-rspack
-          else
-            WIRE_WEBAPP_BUILD_VERSION="${expected_version}" \
-              ./bin/yarn build:prod
-          fi
+          WIRE_WEBAPP_BUILD_VERSION="${expected_version}" \
+            ./bin/yarn build:prod
 
           {
             echo "expected_version=${expected_version}"
             echo "expected_commit=${WIRE_WEBAPP_BUILD_COMMIT}"
           } >> "$GITHUB_OUTPUT"
 
-      - name: Validate Rspack deployment package
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.useRspack }}
+      - name: Validate internal deployment package
         env:
           BUILD_ARTIFACT_PATH: ${{ env.BUILD_DIR }}${{ env.BUILD_ARTIFACT }}
           EXPECTED_COMMIT: ${{ steps.package.outputs.expected_commit }}
@@ -101,7 +90,7 @@ jobs:
           node ./tools/buildArtifact/validateBuildArtifact.mts
 
           archive_entries="$(unzip -Z1 "$BUILD_ARTIFACT_PATH")"
-          required_rspack_entry_scripts=(
+          required_entry_scripts=(
             static/min/app.js
             static/min/auth.js
             static/min/checkBrowser.js
@@ -110,21 +99,21 @@ jobs:
             static/min/dexie.js
           )
 
-          for entry_script_path in "${required_rspack_entry_scripts[@]}"; do
+          for entry_script_path in "${required_entry_scripts[@]}"; do
             if ! grep -Fqx -- "$entry_script_path" <<< "$archive_entries"; then
-              echo "Rspack deployment package is missing required entry script: $entry_script_path" >&2
+              echo "Internal deployment package is missing required entry script: $entry_script_path" >&2
               exit 1
             fi
           done
 
-          rspack_runtime="$(unzip -p "$BUILD_ARTIFACT_PATH" static/min/runtime.js)"
-          if ! grep -Fq 'rspackChunk_wireapp_webapp' <<< "$rspack_runtime"; then
-            echo "Deployment package does not contain the Rspack runtime fingerprint." >&2
+          internal_runtime="$(unzip -p "$BUILD_ARTIFACT_PATH" static/min/runtime.js)"
+          if ! grep -Fq 'rspackChunk_wireapp_webapp' <<< "$internal_runtime"; then
+            echo "Internal deployment package does not contain the Rspack runtime fingerprint." >&2
             exit 1
           fi
 
-          if grep -Fq 'webpackChunk_wireapp_webapp' <<< "$rspack_runtime"; then
-            echo "Deployment package contains the Webpack runtime fingerprint." >&2
+          if grep -Fq 'webpackChunk_wireapp_webapp' <<< "$internal_runtime"; then
+            echo "Internal deployment package contains the Webpack runtime fingerprint." >&2
             exit 1
           fi
 
@@ -166,10 +155,10 @@ jobs:
       env_name: ${{ needs.build.outputs.env_name }}
       teamManagementUrl: https://wire-teams-staging.zinfra.io/login/
       grep: ${{ github.event_name == 'workflow_dispatch' && inputs.grep || '' }}
-      expectedVersion: ${{ github.event_name == 'workflow_dispatch' && inputs.useRspack && needs.build.outputs.expected_version || '' }}
-      expectedCommit: ${{ github.event_name == 'workflow_dispatch' && inputs.useRspack && needs.build.outputs.expected_commit || '' }}
-      expectedBackendRest: ${{ github.event_name == 'workflow_dispatch' && inputs.useRspack && 'https://staging-nginz-https.zinfra.io/' || '' }}
-      expectedBackendWs: ${{ github.event_name == 'workflow_dispatch' && inputs.useRspack && 'wss://staging-nginz-ssl.zinfra.io/' || '' }}
+      expectedVersion: ${{ needs.build.outputs.expected_version }}
+      expectedCommit: ${{ needs.build.outputs.expected_commit }}
+      expectedBackendRest: https://staging-nginz-https.zinfra.io/
+      expectedBackendWs: wss://staging-nginz-ssl.zinfra.io/
       notify_deployoholics_on_failure: ${{ github.event_name == 'schedule' }}
     secrets:
       OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}

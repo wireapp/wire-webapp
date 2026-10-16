@@ -15,14 +15,14 @@
         "cwd": "{projectRoot}"
       }
     },
-    "build-rspack": {
+    "build-webpack": {
       "executor": "nx:run-commands",
       "cache": false,
-      "outputs": ["{projectRoot}/dist/rspack-internal"],
+      "outputs": ["{projectRoot}/dist/webpack-internal"],
       "dependsOn": ["^build", "server:generate-build-metadata"],
       "inputs": ["production", "webappBuildMetadata", "{workspaceRoot}/apps/server/build/metadata/version.json"],
       "options": {
-        "command": "WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/rspack-internal yarn build:rspack",
+        "command": "WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/webpack-internal yarn build:prod:webpack",
         "cwd": "{projectRoot}"
       }
     },
