@@ -71,6 +71,15 @@
         "command": "node {projectRoot}/bin/assembleBuild.mts public artifact"
       }
     },
+    "assemble-rspack-public": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["build", {"projects": "webapp", "target": "build-rspack-public"}, "generate-build-metadata"],
+      "outputs": ["{projectRoot}/dist"],
+      "cache": false,
+      "options": {
+        "command": "node {projectRoot}/bin/assembleBuild.mts rspack-public artifact"
+      }
+    },
     "assemble-webapp": {
       "executor": "nx:run-commands",
       "dependsOn": [{"projects": "webapp", "target": "build"}, "generate-build-metadata"],
@@ -121,6 +130,16 @@
     "package-public": {
       "executor": "nx:run-commands",
       "dependsOn": ["assemble-public"],
+      "inputs": ["production", "webappBuildMetadata"],
+      "cache": false,
+      "options": {
+        "commands": ["yarn verify:bundle:prod:public", "node tools/serverPackaging/zip.js"],
+        "parallel": false
+      }
+    },
+    "package-rspack-public": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["assemble-rspack-public"],
       "inputs": ["production", "webappBuildMetadata"],
       "cache": false,
       "options": {
