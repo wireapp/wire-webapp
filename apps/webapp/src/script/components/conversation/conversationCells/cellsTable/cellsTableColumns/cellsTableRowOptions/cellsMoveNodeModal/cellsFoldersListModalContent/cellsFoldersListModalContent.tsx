@@ -56,6 +56,8 @@ export const CellsFoldersListModalContent = ({
   });
 
   const shouldDisplayEmptyItems = status === 'success' && !isNonEmptyArray(items);
+  const shouldDisplayFolders = status === 'success' && isNonEmptyArray(items);
+  const shouldDisplayLoading = shouldShowLoadingSpinner && ['idle', 'loading'].includes(status);
 
   const handleFolderNavigate = (path: string) => {
     const newPath = path.split('/').slice(1).join('/');
@@ -76,11 +78,10 @@ export const CellsFoldersListModalContent = ({
         <CellsBreadcrumbs items={breadcrumbs} maxNotCombinedItems={3} onItemClick={handleBreadcrumbClick} />
       </div>
       <div css={listWrapperStyles}>
-        {shouldShowLoadingSpinner && <CellsFolderListLoading />}
+        {shouldDisplayLoading && <CellsFolderListLoading />}
+        {status === 'error' && <p role="alert">{translate('cells.newItemMenuModalForm.genericError')}</p>}
         {shouldDisplayEmptyItems && <CellsFolderListEmpty />}
-        {!shouldShowLoadingSpinner && !shouldDisplayEmptyItems && (
-          <CellsFolderList items={items} onNavigate={handleFolderNavigate} />
-        )}
+        {shouldDisplayFolders && <CellsFolderList items={items} onNavigate={handleFolderNavigate} />}
       </div>
       <CellsCreateNewFolderHint
         onCreate={() => {

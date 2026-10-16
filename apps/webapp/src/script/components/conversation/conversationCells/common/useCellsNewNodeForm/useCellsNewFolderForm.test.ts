@@ -77,6 +77,22 @@ describe('useCellsNewFolderForm', () => {
     expect(onSuccess).toHaveBeenCalledTimes(1);
   });
 
+  it('shows an error and does not call onSuccess when folder creation fails', async () => {
+    mockCellsRepository.createFolder.mockRejectedValue(new Error('create failed'));
+    const {result} = renderUseCellsNewFolderForm();
+
+    act(() => {
+      result.current.handleChange({currentTarget: {value: 'New folder'}} as ChangeEvent<HTMLInputElement>);
+    });
+
+    await act(async () => {
+      await result.current.handleSubmit(createEvent());
+    });
+
+    expect(result.current.error).toBe(validationCopy.genericError);
+    expect(onSuccess).not.toHaveBeenCalled();
+  });
+
   it('preserves provided folder name and does not append file metadata', async () => {
     const {result} = renderUseCellsNewFolderForm();
 

@@ -20,9 +20,9 @@
 import {useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {Result, result, task} from 'true-myth';
 
 import {getCellsApiPath} from 'Components/conversation/conversationCells/common/getCellsApiPath/getCellsApiPath';
-import {openBreadcrumb} from 'Components/conversation/conversationCells/common/openBreadcrumb/openBreadcrumb';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {CellNode} from 'src/script/types/cellNode';
 
@@ -31,7 +31,6 @@ interface UseMoveCellsNodeProps {
   nodeToMove: CellNode;
   conversationQualifiedId: QualifiedId;
   currentPath: string;
-  onClose: () => void;
 }
 
 export const useMoveCellsNode = ({
@@ -39,36 +38,43 @@ export const useMoveCellsNode = ({
   nodeToMove,
   conversationQualifiedId,
   currentPath,
-  onClose,
 }: UseMoveCellsNodeProps) => {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
-  const moveNode = async ({currentPath, targetPath}: {currentPath: string; targetPath: string}) => {
+  const moveNode = async ({
+    currentPath,
+    targetPath,
+  }: {
+    currentPath: string;
+    targetPath: string;
+  }): Promise<Result<void, unknown>> => {
     setStatus('loading');
-    try {
-      await cellsRepository.moveNode({
-        currentPath,
-        targetPath,
-      });
-      setStatus('success');
-    } catch {
+    const moveResult = await task.tryOrElse(
+      error => {
+        return error;
+      },
+      () => {
+        return cellsRepository.moveNode({currentPath, targetPath});
+      },
+    );
+
+    if (moveResult.isErr) {
       setStatus('error');
+      return result.err(moveResult.error);
     }
+
+    setStatus('success');
+    return result.ok(undefined);
   };
 
   const nodeToMoveParent = nodeToMove.path.split('/').slice(0, -1).join('/');
   const targetPath = getCellsApiPath({conversationQualifiedId, currentPath});
   const movingDisabled = nodeToMoveParent === targetPath;
 
-  const handleMove = async () => {
-    await moveNode({
+  const handleMove = () => {
+    return moveNode({
       currentPath: nodeToMove.path,
       targetPath,
-    });
-    onClose();
-    openBreadcrumb({
-      conversationQualifiedId,
-      path: currentPath,
     });
   };
 
