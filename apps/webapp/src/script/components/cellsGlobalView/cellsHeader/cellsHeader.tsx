@@ -17,8 +17,10 @@
  *
  */
 
+import {selectionBarAnchorStyles} from 'Components/cells/common/cellsSelectionBar/cellsSelectionBar.styles';
 import {CellsFiltersBar} from 'Components/conversation/conversationCells/common/cellsFiltersBar/cellsFiltersBar';
 import type {FilterConfig} from 'Components/conversation/conversationCells/common/cellsFiltersBar/filterConfig';
+import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {contentStyles, headingStyles, titleRowStyles, wrapperStyles} from './cellsHeader.styles';
@@ -34,6 +36,7 @@ interface CellsHeaderProps {
   onRefresh: () => void;
   searchStatus: 'idle' | 'loading' | 'fetchingMore' | 'success' | 'error';
   filters: FilterConfig[];
+  onSelectionBarAnchorChange?: (anchor: HTMLDivElement | null) => void;
 }
 
 export const CellsHeader = ({
@@ -43,8 +46,10 @@ export const CellsHeader = ({
   onRefresh,
   searchStatus,
   filters,
+  onSelectionBarAnchorChange,
 }: CellsHeaderProps) => {
-  const {translate} = useApplicationContext();
+  const {translate, isFeatureToggleEnabled} = useApplicationContext();
+  const isSelectionBarEnabled = isFeatureToggleEnabled(driveBulkActionsFeatureToggleName) && searchValue.length === 0;
 
   return (
     <header css={wrapperStyles}>
@@ -58,6 +63,7 @@ export const CellsHeader = ({
         {searchStatus === 'loading' && <CellsTableLoader />}
         {searchStatus === 'error' && <p>{translate('cells.search.failed')}</p>}
       </div>
+      {isSelectionBarEnabled && <div css={selectionBarAnchorStyles} ref={onSelectionBarAnchorChange} />}
     </header>
   );
 };

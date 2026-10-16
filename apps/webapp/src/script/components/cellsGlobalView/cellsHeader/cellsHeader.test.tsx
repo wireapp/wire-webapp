@@ -1,0 +1,84 @@
+/*
+ * Wire
+ * Copyright (C) 2025 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {render, screen} from '@testing-library/react';
+
+import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
+
+import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
+import {translateForTest} from 'Util/test/translateForTest';
+
+import {CellsHeader} from './cellsHeader';
+
+const renderCellsHeader = (isBulkActionsEnabled: boolean, onSelectionBarAnchorChange: jest.Mock, searchValue = '') => {
+  const wrapper = createRootProviderWrapperForTest(
+    createRootContextValueForTest({
+      translate: translateForTest,
+      isFeatureToggleEnabled: featureToggleName => {
+        return isBulkActionsEnabled && featureToggleName === driveBulkActionsFeatureToggleName;
+      },
+    }),
+  );
+
+  return render(
+    <StyledApp themeId={THEME_ID.DEFAULT}>
+      <CellsHeader
+        searchValue={searchValue}
+        onSearch={jest.fn()}
+        onClearSearch={jest.fn()}
+        onRefresh={jest.fn()}
+        searchStatus="idle"
+        filters={[]}
+        onSelectionBarAnchorChange={onSelectionBarAnchorChange}
+      />
+    </StyledApp>,
+    {wrapper},
+  );
+};
+
+describe('CellsHeader', () => {
+  it('keeps a full-width selection overlay anchor after the Files toolbar when enabled', () => {
+    const onSelectionBarAnchorChange = jest.fn();
+    renderCellsHeader(true, onSelectionBarAnchorChange);
+
+    const anchor = onSelectionBarAnchorChange.mock.calls.find(([element]) => {
+      return element !== null;
+    })?.[0];
+
+    expect(anchor?.parentElement).toBe(screen.getByRole('heading', {name: 'cells.heading'}).closest('header'));
+  });
+
+  it('does not render a selection overlay anchor when the feature flag is off', () => {
+    const onSelectionBarAnchorChange = jest.fn();
+    renderCellsHeader(false, onSelectionBarAnchorChange);
+
+    expect(onSelectionBarAnchorChange).not.toHaveBeenCalled();
+  });
+
+  it('does not render a selection overlay anchor in search results', () => {
+    const onSelectionBarAnchorChange = jest.fn();
+    renderCellsHeader(true, onSelectionBarAnchorChange, 'file name');
+
+    expect(onSelectionBarAnchorChange).not.toHaveBeenCalled();
+  });
+});

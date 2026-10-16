@@ -98,6 +98,7 @@ export const ConversationCells = memo(
     const folderUploadInput = useRef<HTMLInputElement>(null);
     const [activeFolderDropTargetName, setActiveFolderDropTargetName] = useState<string | null>(null);
     const [folderDropResetKey, setFolderDropResetKey] = useState(0);
+    const [selectionBarAnchor, setSelectionBarAnchor] = useState<HTMLDivElement | null>(null);
     const onUploadFiles = () => {
       return uploadInput.current?.click();
     };
@@ -358,6 +359,7 @@ export const ConversationCells = memo(
               isUploadFilesEnabled={isUploadFilesEnabled}
               filters={filters}
               showViewerPermission={showViewerPermission}
+              onSelectionBarAnchorChange={setSelectionBarAnchor}
             />
             {isTableVisible && (
               <CellsTable
@@ -374,6 +376,9 @@ export const ConversationCells = memo(
                 getDirectionFor={getDirectionFor}
                 isSortingEnabled={!isInRecycleBin}
                 onToggleSort={toggleSort}
+                selectionEnabled={!isSearchMode}
+                selectionScopeKey={`${conversationId}:${getCellsFilesPath()}:${isInRecycleBin ? 'bin' : 'files'}`}
+                selectionBarAnchor={selectionBarAnchor}
                 onFolderDropTargetChange={setActiveFolderDropTargetName}
                 onDropFilesToFolder={!isInRecycleBin && canUploadToSharedDrive ? handleDropFilesToFolder : undefined}
                 onDropReadError={handleSharedDriveDropReadError}

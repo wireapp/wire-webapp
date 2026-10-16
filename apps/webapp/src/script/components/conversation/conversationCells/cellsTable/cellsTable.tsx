@@ -22,11 +22,14 @@ import {DragEvent, useEffect, useState} from 'react';
 import {isNonEmptyString} from '@sindresorhus/is';
 import {flexRender, getCoreRowModel, type Header, useReactTable} from '@tanstack/react-table';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
+import {createPortal} from 'react-dom';
 
 import {UploadIcon} from '@wireapp/react-ui-kit';
 
+import {CellsSelectionBar} from 'Components/cells/common/cellsSelectionBar/cellsSelectionBar';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import type {Conversation} from 'Repositories/entity/Conversation';
+import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 
@@ -41,6 +44,7 @@ import {
   tableActionsCellStyles,
   tableCellRow,
   tableCellStyles,
+  selectedTableCellRowStyles,
   tableStyles,
   wrapperWithRowsStyles,
   wrapperStyles,
@@ -67,6 +71,9 @@ interface CellsTableProps {
   getDirectionFor: (field: CellsSortField) => CellsSortDirection | undefined;
   isSortingEnabled: boolean;
   onToggleSort: (field: CellsSortField) => void;
+  selectionEnabled: boolean;
+  selectionScopeKey: string;
+  selectionBarAnchor: HTMLElement | null;
 }
 
 interface CellsTableHeaderCellProps {
@@ -116,8 +123,47 @@ export const CellsTable = ({
   getDirectionFor,
   isSortingEnabled,
   onToggleSort,
+  selectionEnabled,
+  selectionScopeKey,
+  selectionBarAnchor,
 }: CellsTableProps) => {
-  const {translate} = useApplicationContext();
+  const {translate, isFeatureToggleEnabled} = useApplicationContext();
+  const isSelectionEnabled = selectionEnabled && isFeatureToggleEnabled(driveBulkActionsFeatureToggleName);
+  const [selectedNodeIds, setSelectedNodeIds] = useState<Set<string>>(() => {
+    return new Set();
+  });
+
+  useEffect(() => {
+    setSelectedNodeIds(new Set());
+  }, [selectionScopeKey, isSelectionEnabled]);
+
+  useEffect(() => {
+    const currentNodeIds = new Set<string>();
+    for (const node of nodes) {
+      currentNodeIds.add(node.id);
+    }
+    setSelectedNodeIds(currentSelection => {
+      const nextSelection = new Set(currentSelection);
+      for (const nodeId of currentSelection) {
+        if (!currentNodeIds.has(nodeId)) {
+          nextSelection.delete(nodeId);
+        }
+      }
+      return nextSelection.size === currentSelection.size ? currentSelection : nextSelection;
+    });
+  }, [nodes]);
+
+  const handleToggleSelection = (nodeId: string, isSelected: boolean): void => {
+    setSelectedNodeIds(currentSelection => {
+      const nextSelection = new Set(currentSelection);
+      if (isSelected) {
+        nextSelection.add(nodeId);
+      } else {
+        nextSelection.delete(nodeId);
+      }
+      return nextSelection;
+    });
+  };
   const [activeFolderDropTargetId, setActiveFolderDropTargetId] = useState<string | null>(null);
   const [activeFolderDropTargetName, setActiveFolderDropTargetName] = useState<string | null>(null);
   const labels = {
@@ -143,6 +189,9 @@ export const CellsTable = ({
       getDirectionFor,
       isSortingEnabled,
       onToggleSort,
+      selectedNodeIds,
+      onToggleSelection: handleToggleSelection,
+      selectionEnabled: isSelectionEnabled,
     }),
     getCoreRowModel: getCoreRowModel(),
   });
@@ -226,6 +275,17 @@ export const CellsTable = ({
   return (
     <CellsFilePreviewModalProvider>
       <div css={tableWrapperStyles}>
+        {isSelectionEnabled &&
+          selectionBarAnchor !== null &&
+          createPortal(
+            <CellsSelectionBar
+              selectedCount={selectedNodeIds.size}
+              onClear={() => {
+                return setSelectedNodeIds(new Set());
+              }}
+            />,
+            selectionBarAnchor,
+          )}
         {activeFolderDropTargetName !== null && (
           <div css={folderDropOverlayStyles} role="status">
             <UploadIcon width={24} height={24} aria-hidden="true" />
@@ -261,14 +321,18 @@ export const CellsTable = ({
             <tbody>
               {rows.map(row => {
                 const node = row.original;
-                const rowStyles =
-                  activeFolderDropTargetId === node.id ? [tableCellRow, folderDropTargetRowStyles] : tableCellRow;
+                const rowStyles = [
+                  tableCellRow,
+                  ...(isSelectionEnabled && selectedNodeIds.has(node.id) ? [selectedTableCellRowStyles] : []),
+                  ...(activeFolderDropTargetId === node.id ? [folderDropTargetRowStyles] : []),
+                ];
 
                 return (
                   <tr
                     key={row.id}
                     css={rowStyles}
                     data-folder-drop-active={activeFolderDropTargetId === node.id || undefined}
+                    aria-selected={isSelectionEnabled && selectedNodeIds.has(node.id)}
                     data-uie-name="cells-table-row"
                     {...getFolderDropHandlers(node)}
                   >

@@ -19,6 +19,7 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
+import {selectionBarBreadcrumbAnchorStyles} from 'Components/cells/common/cellsSelectionBar/cellsSelectionBar.styles';
 import {CellsSearchInput} from 'Components/cellsSearchInput/cellsSearchInput';
 import {
   CELLS_ACTION,
@@ -26,6 +27,7 @@ import {
 } from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {CellsViewerAccessLabel} from 'Components/conversation/conversationCells/common/cellsViewerAccessLabel';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {
@@ -64,6 +66,7 @@ interface CellsHeaderProps {
   isUploadFilesEnabled: boolean;
   filters: FilterConfig[];
   showViewerPermission: boolean;
+  onSelectionBarAnchorChange?: (anchor: HTMLDivElement | null) => void;
 }
 
 export const CellsHeader = ({
@@ -82,8 +85,10 @@ export const CellsHeader = ({
   isUploadFilesEnabled,
   filters,
   showViewerPermission,
+  onSelectionBarAnchorChange,
 }: CellsHeaderProps) => {
-  const {translate} = useApplicationContext();
+  const {translate, isFeatureToggleEnabled} = useApplicationContext();
+  const isSelectionBarEnabled = isFeatureToggleEnabled(driveBulkActionsFeatureToggleName);
   const canPerformCellsAction = useCellsActionPermissions();
   const breadcrumbs = getBreadcrumbsFromPath({
     baseCrumb: translate('cells.breadcrumb.files', {conversationName}),
@@ -134,7 +139,7 @@ export const CellsHeader = ({
       </div>
 
       {!isSearchViewOpen && (
-        <div css={breadcrumbsRowStyles}>
+        <div css={breadcrumbsRowStyles} data-uie-name="cells-selection-overlay-row">
           {isRootLevel ? (
             <CellsRootHomeIcon />
           ) : (
@@ -151,6 +156,7 @@ export const CellsHeader = ({
               }}
             />
           )}
+          {isSelectionBarEnabled && <div css={selectionBarBreadcrumbAnchorStyles} ref={onSelectionBarAnchorChange} />}
         </div>
       )}
 

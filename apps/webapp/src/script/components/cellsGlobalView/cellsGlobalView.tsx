@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactElement} from 'react';
+import {ReactElement, useState} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 import {container} from 'tsyringe';
@@ -38,6 +38,7 @@ import {CellsStateInfo} from './cellsStateInfo/cellsStateInfo';
 import {CellsTable} from './cellsTable/cellsTable';
 import {useCellsStore} from './common/useCellsStore/useCellsStore';
 import {useGlobalDriveFilters} from './common/useGlobalDriveFilters/useGlobalDriveFilters';
+import {getGlobalDriveSelectionProps} from './getGlobalDriveSelectionProps';
 import {useOnPresignedUrlExpired} from './useOnPresignedUrlExpired/useOnPresignedUrlExpired';
 import {useSearchCellsNodes} from './useSearchCellsNodes/useSearchCellsNodes';
 
@@ -59,6 +60,7 @@ export const CellsGlobalView = (properties: CellsGlobalViewProps): ReactElement 
     userState = container.resolve(UserState),
   } = properties;
   const {fireAndForgetInvoker, translate} = useApplicationContext();
+  const [selectionBarAnchor, setSelectionBarAnchor] = useState<HTMLDivElement | null>(null);
   const {nodes, status: nodesStatus, pagination} = useCellsStore();
 
   const {filters, filterState} = useGlobalDriveFilters({cellsRepository, conversationRepository, translate});
@@ -107,6 +109,7 @@ export const CellsGlobalView = (properties: CellsGlobalViewProps): ReactElement 
         onRefresh={handleReload}
         searchStatus={nodesStatus}
         filters={filters}
+        onSelectionBarAnchorChange={setSelectionBarAnchor}
       />
       {emptySearchResults && (
         <CellsStateInfo
@@ -122,6 +125,8 @@ export const CellsGlobalView = (properties: CellsGlobalViewProps): ReactElement 
           getDirectionFor={getDirectionFor}
           isSortingEnabled
           onToggleSort={toggleSort}
+          {...getGlobalDriveSelectionProps(searchValue, filterState)}
+          selectionBarAnchor={selectionBarAnchor}
         />
       )}
       {showNoFiles && (
