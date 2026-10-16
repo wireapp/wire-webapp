@@ -105,6 +105,7 @@ export * from './timedIcon';
 export * from './trashIcon';
 export * from './trashCrossIcon';
 export * from './triangleIcon';
+export * from './updateIcon';
 export * from './uploadIcon';
 export * from './verificationShieldIcon';
 export * from './viewerAccessIcon';

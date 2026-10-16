@@ -56,6 +56,7 @@ import type {BackgroundEffectSelection} from 'Repositories/media/VideoBackground
 import {BUILTIN_BACKGROUNDS} from 'Repositories/media/VideoBackgroundEffects';
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {TeamState} from 'Repositories/team/TeamState';
+import {Config} from 'src/script/Config';
 import {useActiveWindowMatchMedia} from 'src/script/hooks/useActiveWindowMatchMedia';
 import {useToggleState} from 'src/script/hooks/useToggleState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -66,6 +67,7 @@ import {handleKeyDown, isTabKey, KEY} from 'Util/keyboardUtil';
 import {preventFocusOutside} from 'Util/util';
 
 import {CallingParticipantList} from './CallingCell/CallIngParticipantList';
+import {CallSecurityLine} from './CallSecurityLine/CallSecurityLine';
 import {Duration} from './Duration';
 import {
   classifiedBarStyles,
@@ -167,6 +169,7 @@ const FullscreenVideoCall = ({
     startedAt,
     participants,
     handRaisedParticipants,
+    state: callConnectionState,
   } = useKoSubscribableChildren(call, [
     'activeSpeakers',
     'currentPage',
@@ -174,9 +177,11 @@ const FullscreenVideoCall = ({
     'startedAt',
     'participants',
     'handRaisedParticipants',
+    'state',
   ]);
   const {display_name: conversationName} = useKoSubscribableChildren(conversation, ['display_name']);
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
+  const {ENABLE_CALL_SECURITY_LINE: isCallSecurityLineEnabled} = Config.getConfig().FEATURE;
 
   const {selfUser, roles} = useKoSubscribableChildren(conversation, ['selfUser', 'roles']);
   const {emojis, viewMode, detachedWindow, isScreenSharingSourceFromDetachedWindow} = useKoSubscribableChildren(
@@ -360,7 +365,15 @@ const FullscreenVideoCall = ({
               <h2 className="video-remote-title">{conversationName}</h2>
 
               <div data-uie-name="video-timer" className="video-timer label-xs">
-                <Duration startedAt={startedAt} />
+                {isCallSecurityLineEnabled ? (
+                  <CallSecurityLine
+                    callConnectionState={callConnectionState}
+                    participants={participants}
+                    startedAt={startedAt}
+                  />
+                ) : (
+                  <Duration startedAt={startedAt} />
+                )}
               </div>
             </div>
           </div>
