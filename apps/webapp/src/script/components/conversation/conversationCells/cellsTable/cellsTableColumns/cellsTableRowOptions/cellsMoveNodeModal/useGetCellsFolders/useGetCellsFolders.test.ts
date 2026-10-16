@@ -18,6 +18,7 @@
  */
 
 import {act, renderHook, waitFor} from '@testing-library/react';
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {RestNode} from 'cells-sdk-ts';
 import {noop} from 'noop-esm';
 
@@ -35,6 +36,7 @@ describe('useGetCellsFolders', () => {
     Path: 'wire-cells-web/destination',
   } as RestNode;
   let cellsRepository: {getAllNodes: jest.Mock};
+  let clock: ReturnType<typeof createDeterministicClock>;
   const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
 
   beforeEach(() => {
@@ -42,6 +44,7 @@ describe('useGetCellsFolders', () => {
     cellsRepository = {
       getAllNodes: jest.fn().mockResolvedValue({Nodes: [folderNode]}),
     };
+    clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
   });
 
   const renderUseGetCellsFolders = () => {
@@ -53,6 +56,7 @@ describe('useGetCellsFolders', () => {
         currentPath: 'wire-cells-web',
         enabled: true,
         fireAndForgetInvoker,
+        clock,
       });
     });
   };
@@ -95,6 +99,51 @@ describe('useGetCellsFolders', () => {
     });
 
     expect(result.current.folders).toEqual([]);
+    expect(result.current.shouldShowLoadingSpinner).toBe(false);
+  });
+
+  it('shows the spinner only after a refresh stays loading for the configured delay', async () => {
+    const {result} = renderUseGetCellsFolders();
+
+    await waitFor(() => {
+      expect(result.current.status).toBe('success');
+    });
+    expect(result.current.shouldShowLoadingSpinner).toBe(false);
+
+    act(() => {
+      clock.advanceByMilliseconds(1000);
+    });
+    expect(result.current.shouldShowLoadingSpinner).toBe(false);
+
+    let resolveRequest: (response: {Nodes: RestNode[]}) => void = noop;
+    cellsRepository.getAllNodes.mockReturnValueOnce(
+      new Promise(resolve => {
+        resolveRequest = resolve;
+      }),
+    );
+    let refreshPromise: Promise<void> = Promise.resolve();
+    act(() => {
+      refreshPromise = result.current.refresh();
+    });
+
+    expect(result.current.status).toBe('loading');
+    expect(result.current.shouldShowLoadingSpinner).toBe(false);
+
+    act(() => {
+      clock.advanceByMilliseconds(999);
+    });
+    expect(result.current.shouldShowLoadingSpinner).toBe(false);
+
+    act(() => {
+      clock.advanceByMilliseconds(1);
+    });
+    expect(result.current.shouldShowLoadingSpinner).toBe(true);
+
+    await act(async () => {
+      resolveRequest({Nodes: []});
+      await refreshPromise;
+    });
+    expect(result.current.status).toBe('success');
     expect(result.current.shouldShowLoadingSpinner).toBe(false);
   });
 
