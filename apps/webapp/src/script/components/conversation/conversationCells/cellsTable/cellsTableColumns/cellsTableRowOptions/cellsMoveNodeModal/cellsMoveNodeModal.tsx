@@ -27,10 +27,12 @@ import {getCellsFilesPath} from 'Components/conversation/conversationCells/commo
 import {openBreadcrumb} from 'Components/conversation/conversationCells/common/openBreadcrumb/openBreadcrumb';
 import {useCellsNewFolderForm} from 'Components/conversation/conversationCells/common/useCellsNewNodeForm/useCellsNewFolderForm';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CellNode} from 'src/script/types/cellNode';
 
 import {CellsFoldersListModalContent} from './cellsFoldersListModalContent/cellsFoldersListModalContent';
+import {LegacyCellsMoveNodeModal} from './legacy/legacyCellsMoveNodeModal';
 import {useGetCellsFolders} from './useGetCellsFolders/useGetCellsFolders';
 import {useMoveCellsNode} from './useMoveCellNode/useMoveCellsNode';
 
@@ -44,7 +46,7 @@ interface CellsMoveNodeModalProps {
   navigateToPath?: (params: {conversationQualifiedId: QualifiedId; path: string}) => void;
 }
 
-export const CellsMoveNodeModal = ({
+const FlaggedCellsMoveNodeModal = ({
   nodeToMove,
   isOpen,
   onClose,
@@ -184,4 +186,14 @@ export const CellsMoveNodeModal = ({
       )}
     </CellsModal>
   );
+};
+
+export const CellsMoveNodeModal = (props: CellsMoveNodeModalProps) => {
+  const {isFeatureToggleEnabled} = useApplicationContext();
+
+  if (!isFeatureToggleEnabled(driveBulkActionsFeatureToggleName)) {
+    return <LegacyCellsMoveNodeModal {...props} />;
+  }
+
+  return <FlaggedCellsMoveNodeModal {...props} />;
 };
