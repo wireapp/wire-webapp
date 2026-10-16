@@ -21,6 +21,7 @@ import {useCallback, useEffect, useState} from 'react';
 
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
+import {task} from 'true-myth';
 
 import {getCellsApiPath} from 'Components/conversation/conversationCells/common/getCellsApiPath/getCellsApiPath';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
@@ -63,32 +64,40 @@ export const useGetCellsFolders = ({
       return;
     }
 
-    try {
-      setStatus('loading');
+    setStatus('loading');
 
-      const result = await cellsRepository.getAllNodes({
-        path: getCellsApiPath({conversationQualifiedId, currentPath}),
-        type: 'folder',
-      });
+    const foldersResult = await task.tryOrElse(
+      error => {
+        return error;
+      },
+      () => {
+        return cellsRepository.getAllNodes({
+          path: getCellsApiPath({conversationQualifiedId, currentPath}),
+          type: 'folder',
+        });
+      },
+    );
 
-      if (result.Nodes === undefined || result.Nodes.length === 0) {
-        setStatus('success');
-        setFolders([]);
-        return;
-      }
-
-      const transformedFolders = transformNodesToCellsFolders(result.Nodes);
-      const filteredFolders = transformedFolders.filter(folder => {
-        return folder.path !== nodeToMove.path;
-      });
-
-      setFolders(filteredFolders);
-      setStatus('success');
-    } catch (error: unknown) {
+    if (foldersResult.isErr) {
       setFolders([]);
       setStatus('error');
-      throw error;
+      return;
     }
+
+    const nodes = foldersResult.value.Nodes;
+    if (nodes === undefined || nodes.length === 0) {
+      setStatus('success');
+      setFolders([]);
+      return;
+    }
+
+    const transformedFolders = transformNodesToCellsFolders(nodes);
+    const filteredFolders = transformedFolders.filter(folder => {
+      return folder.path !== nodeToMove.path;
+    });
+
+    setFolders(filteredFolders);
+    setStatus('success');
     // cellsRepository is not a dependency because it's a singleton
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setFolders, setStatus, conversationQualifiedId, enabled, currentPath, nodeToMove]);
