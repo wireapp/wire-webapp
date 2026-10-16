@@ -84,7 +84,7 @@ const validateFileNames = ({files, translate}: ValidateFileNamesParams): Validat
         title: translate('conversationFileUploadFailedHeading'),
         message: translate('cells.nodeName.invalidCharactersError'),
       },
-      invalidFiles,
+      invalidFiles: [],
     };
   }
 

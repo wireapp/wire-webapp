@@ -43,7 +43,7 @@ describe('validateFiles', () => {
           title: 'conversationFileUploadFailedHeading',
           message: 'cells.nodeName.invalidCharactersError',
         },
-        invalidFiles: [file],
+        invalidFiles: [],
       });
     },
   );
@@ -63,7 +63,7 @@ describe('validateFiles', () => {
     ).toEqual(
       expect.objectContaining({
         isValid: false,
-        invalidFiles: [file],
+        invalidFiles: [],
       }),
     );
   });
