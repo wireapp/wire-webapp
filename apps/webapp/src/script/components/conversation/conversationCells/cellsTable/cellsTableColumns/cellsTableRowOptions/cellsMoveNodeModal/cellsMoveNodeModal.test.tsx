@@ -26,12 +26,14 @@ import {noop} from 'noop-esm';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
+import {getCellsFilesPath} from 'Components/conversation/conversationCells/common/getCellsFilesPath/getCellsFilesPath';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {
   createExecutingFireAndForgetInvokerForTest,
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
+import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {CellNode} from 'src/script/types/cellNode';
 import {translateForTest} from 'Util/test/translateForTest';
 
@@ -64,8 +66,15 @@ describe('CellsMoveNodeModal', () => {
     navigateToPath = jest.fn();
   });
 
-  const renderMoveModal = (clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n}), isOpen = true) => {
+  const renderMoveModal = (
+    clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
+    isOpen = true,
+    isBulkActionsEnabled = true,
+  ) => {
     const rootContext = createRootContextValueForTest({
+      isFeatureToggleEnabled: featureToggleName => {
+        return isBulkActionsEnabled && featureToggleName === driveBulkActionsFeatureToggleName;
+      },
       translate: translateForTest,
       fireAndForgetInvoker: createExecutingFireAndForgetInvokerForTest(),
       clock,
@@ -118,6 +127,43 @@ describe('CellsMoveNodeModal', () => {
       targetPath: 'conversation-id@wire.com/destination',
     });
     expect(navigateToPath).toHaveBeenCalledWith({conversationQualifiedId, path: 'destination'});
+  });
+
+  it('keeps the flag-off folder load behavior', async () => {
+    cellsRepository.getAllNodes.mockRejectedValue(new Error('folder load failed'));
+    renderMoveModal(createDeterministicClock({initialUnixEpochMicroseconds: 0n}), true, false);
+    const moveButton = screen.getByRole('button', {name: 'cells.moveNodeModal.moveButton'});
+
+    await waitFor(() => {
+      expect(moveButton).toBeEnabled();
+    });
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+  });
+
+  it('shows the folder load error and disables Move when the flag is on', async () => {
+    cellsRepository.getAllNodes.mockRejectedValue(new Error('folder load failed'));
+    renderMoveModal();
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('cells.newItemMenuModalForm.genericError');
+    expect(screen.getByRole('button', {name: 'cells.moveNodeModal.moveButton'})).toBeDisabled();
+  });
+
+  it('keeps the flag-off move behavior when the operation fails', async () => {
+    cellsRepository.moveNode.mockRejectedValue(new Error('move failed'));
+    renderMoveModal(createDeterministicClock({initialUnixEpochMicroseconds: 0n}), true, false);
+    const moveButton = await screen.findByRole('button', {name: 'cells.moveNodeModal.moveButton'});
+    await waitFor(() => {
+      expect(moveButton).toBeEnabled();
+    });
+
+    fireEvent.click(moveButton);
+
+    await waitFor(() => {
+      expect(onClose).toHaveBeenCalledTimes(1);
+    });
+    expect(navigateToPath).toHaveBeenCalledWith({conversationQualifiedId, path: getCellsFilesPath()});
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 
   it('keeps the modal open and shows an error when the single-item move fails', async () => {
