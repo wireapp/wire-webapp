@@ -17,7 +17,7 @@
  *
  */
 
-import {Result} from 'true-myth';
+import {Maybe, Result} from 'true-myth';
 
 import {isValidCellsNodePath} from './common/cellsNodeNameValidator';
 
@@ -65,7 +65,7 @@ export const validateSharedDriveUploadFiles = (
   }
 
   const invalidNameFiles = files.filter(file => {
-    return !isValidCellsNodePath(file.name, file.webkitRelativePath);
+    return !isValidCellsNodePath(file.name, Maybe.of(file.webkitRelativePath));
   });
   if (invalidNameFiles.length > 0) {
     return Result.err({reason: 'invalidName', invalidFiles: invalidNameFiles});

@@ -18,6 +18,7 @@
  */
 
 import {isUndefined} from '@sindresorhus/is';
+import {Maybe} from 'true-myth';
 
 import {Config} from 'src/script/Config';
 import type {RootContextValue} from 'src/script/page/rootProvider';
@@ -74,7 +75,7 @@ interface ValidateFileNamesParams {
 
 const validateFileNames = ({files, translate}: ValidateFileNamesParams): ValidationResult => {
   const invalidFiles = files.filter(file => {
-    return !isValidCellsNodePath(file.name, file.webkitRelativePath);
+    return !isValidCellsNodePath(file.name, Maybe.of(file.webkitRelativePath));
   });
 
   if (invalidFiles.length > 0) {

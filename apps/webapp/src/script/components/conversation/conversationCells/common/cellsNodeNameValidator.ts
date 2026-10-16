@@ -17,6 +17,8 @@
  *
  */
 
+import {Maybe} from 'true-myth';
+
 const INVALID_CELLS_NODE_NAME_CHARACTERS = /[\\/"]/u;
 
 /**
@@ -32,7 +34,7 @@ export const isValidCellsNodeName = (name: string): boolean => {
  * Browser folder uploads expose the relative path through webkitRelativePath.
  */
 export const isValidCellsNodePath = (name: string, relativePath: Maybe<string>): boolean => {
-  const normalizedRelativePath = relativePath ?? '';
+  const normalizedRelativePath = relativePath.unwrapOr('');
   const relativePathSegments = normalizedRelativePath.length > 0 ? normalizedRelativePath.split('/') : [];
   return [name, ...relativePathSegments].every(isValidCellsNodeName);
 };
