@@ -21,20 +21,14 @@ import {CloseIcon} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {
-  clearButtonStyles,
-  moveButtonStyles,
-  selectionBarStyles,
-  selectionCountStyles,
-} from './cellsSelectionBar.styles';
+import {clearButtonStyles, selectionBarStyles, selectionCountStyles} from './cellsSelectionBar.styles';
 
 interface CellsSelectionBarProps {
   selectedCount: number;
   onClear: () => void;
-  onMove?: () => void;
 }
 
-export const CellsSelectionBar = ({selectedCount, onClear, onMove}: CellsSelectionBarProps) => {
+export const CellsSelectionBar = ({selectedCount, onClear}: CellsSelectionBarProps) => {
   const {translate} = useApplicationContext();
 
   if (selectedCount === 0) {
@@ -47,11 +41,6 @@ export const CellsSelectionBar = ({selectedCount, onClear, onMove}: CellsSelecti
         <CloseIcon aria-hidden="true" />
       </button>
       <span css={selectionCountStyles}>{translate('cells.selection.selectedCount', {count: selectedCount})}</span>
-      {onMove !== undefined && (
-        <button css={moveButtonStyles} type="button" aria-haspopup="dialog" onClick={onMove}>
-          {translate('cells.selection.move')}
-        </button>
-      )}
     </div>
   );
 };

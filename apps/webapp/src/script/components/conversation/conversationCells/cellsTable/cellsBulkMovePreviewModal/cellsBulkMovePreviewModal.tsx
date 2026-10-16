@@ -51,6 +51,18 @@ export const CellsBulkMovePreviewModal = ({
   const rootPath = getCellsFilesPath();
   const [currentPath, setCurrentPath] = useState(rootPath);
   const [selectedDestinationPath, setSelectedDestinationPath] = useState(rootPath);
+  const handlePathChange = (path: string): void => {
+    setCurrentPath(path);
+
+    const normalizedRootPath = rootPath.replace(/\/+$/, '');
+    const normalizedPath = path.replace(/^\/+/, '');
+    let destinationPath = normalizedPath;
+    if (normalizedRootPath.length > 0 && !normalizedPath.startsWith(`${normalizedRootPath}/`)) {
+      destinationPath = [normalizedRootPath, normalizedPath].filter(Boolean).join('/');
+    }
+
+    setSelectedDestinationPath(destinationPath);
+  };
   const {folders, status, shouldShowLoadingSpinner} = useGetCellsFolders({
     cellsRepository,
     conversationQualifiedId,
@@ -81,10 +93,19 @@ export const CellsBulkMovePreviewModal = ({
     ]);
   }, [selectedFolderPaths, currentPath, translate]);
 
+  const driveLabel = translate('cells.bulkMove.drive');
+  const normalizedRootPath = rootPath.replace(/\/+$/, '');
+  const normalizedDestinationPath = selectedDestinationPath.replace(/^\/+|\/+$/g, '');
+  let relativeDestinationPath = normalizedDestinationPath;
+  if (normalizedDestinationPath === normalizedRootPath) {
+    relativeDestinationPath = '';
+  } else if (normalizedRootPath.length > 0 && normalizedDestinationPath.startsWith(`${normalizedRootPath}/`)) {
+    relativeDestinationPath = normalizedDestinationPath.slice(normalizedRootPath.length + 1);
+  }
   const currentDestination =
-    selectedDestinationPath === rootPath
-      ? translate('cells.bulkMove.drive')
-      : (selectedDestinationPath.split('/').filter(Boolean).at(-1) ?? translate('cells.bulkMove.drive'));
+    relativeDestinationPath.length > 0
+      ? `${driveLabel} / ${relativeDestinationPath.split('/').filter(Boolean).join(' / ')}`
+      : driveLabel;
 
   return (
     <CellsModal isOpen={isOpen} onClose={onClose} size="large">
@@ -105,7 +126,7 @@ export const CellsBulkMovePreviewModal = ({
         shouldShowLoadingSpinner={shouldShowLoadingSpinner}
         conversationName={conversationName}
         currentPath={currentPath}
-        onPathChange={setCurrentPath}
+        onPathChange={handlePathChange}
         onSelectDestination={setSelectedDestinationPath}
         selectedDestinationPath={selectedDestinationPath}
         disabledDestinationPaths={disabledDestinationPaths}

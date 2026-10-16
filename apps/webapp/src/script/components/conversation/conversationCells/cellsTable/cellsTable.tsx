@@ -36,6 +36,7 @@ import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 
 import {CellsFilePreviewModal} from './cellsFilePreviewModal/cellsFilePreviewModal';
 import {
+  bulkMoveButtonStyles,
   folderDropOverlayDescriptionStyles,
   folderDropOverlayFolderNameStyles,
   folderDropOverlayStyles,
@@ -46,6 +47,7 @@ import {
   tableCellRow,
   tableCellStyles,
   selectedTableCellRowStyles,
+  selectionBarContainerStyles,
   tableStyles,
   wrapperWithRowsStyles,
   wrapperStyles,
@@ -284,15 +286,26 @@ export const CellsTable = ({
         {isSelectionEnabled &&
           selectionBarAnchor !== null &&
           createPortal(
-            <CellsSelectionBar
-              selectedCount={selectedNodeIds.size}
-              onClear={() => {
-                return setSelectedNodeIds(new Set());
-              }}
-              onMove={() => {
-                return setIsBulkMovePreviewOpen(true);
-              }}
-            />,
+            <div css={selectionBarContainerStyles}>
+              <CellsSelectionBar
+                selectedCount={selectedNodeIds.size}
+                onClear={() => {
+                  return setSelectedNodeIds(new Set());
+                }}
+              />
+              {selectedNodeIds.size > 0 && (
+                <button
+                  css={bulkMoveButtonStyles}
+                  type="button"
+                  aria-haspopup="dialog"
+                  onClick={() => {
+                    return setIsBulkMovePreviewOpen(true);
+                  }}
+                >
+                  {translate('cells.selection.move')}
+                </button>
+              )}
+            </div>,
             selectionBarAnchor,
           )}
         {isBulkMovePreviewOpen && (
