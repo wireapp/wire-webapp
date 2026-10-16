@@ -18,6 +18,7 @@
  */
 
 import {isNonEmptyArray} from '@sindresorhus/is';
+import {FormattedMessage} from 'react-intl';
 
 import {CellsBreadcrumbs} from 'Components/conversation/conversationCells/common/cellsBreadcrumbs/cellsBreadcrumbs';
 import {getBreadcrumbsFromPath} from 'Components/conversation/conversationCells/common/getBreadcrumbsFromPath/getBreadcrumbsFromPath';
@@ -57,7 +58,7 @@ export const CellsFoldersListModalContent = ({
 
   const shouldDisplayEmptyItems = status === 'success' && !isNonEmptyArray(items);
   const shouldDisplayFolders = status === 'success' && isNonEmptyArray(items);
-  const shouldDisplayLoading = shouldShowLoadingSpinner && ['idle', 'loading'].includes(status);
+  const shouldDisplayLoading = ['idle', 'loading'].includes(status);
 
   const handleFolderNavigate = (path: string) => {
     const newPath = path.split('/').slice(1).join('/');
@@ -77,8 +78,15 @@ export const CellsFoldersListModalContent = ({
       <div css={breadcrumbsWrapperStyles}>
         <CellsBreadcrumbs items={breadcrumbs} maxNotCombinedItems={3} onItemClick={handleBreadcrumbClick} />
       </div>
-      <div css={listWrapperStyles}>
-        {shouldDisplayLoading && <CellsFolderListLoading />}
+      <div css={listWrapperStyles} aria-busy={status === 'loading'}>
+        {shouldDisplayLoading &&
+          (shouldShowLoadingSpinner ? (
+            <CellsFolderListLoading />
+          ) : (
+            <p role="status">
+              <FormattedMessage id="cells.moveNodeModal.loading" defaultMessage="Loading folders…" />
+            </p>
+          ))}
         {status === 'error' && <p role="alert">{translate('cells.newItemMenuModalForm.genericError')}</p>}
         {shouldDisplayEmptyItems && <CellsFolderListEmpty />}
         {shouldDisplayFolders && <CellsFolderList items={items} onNavigate={handleFolderNavigate} />}

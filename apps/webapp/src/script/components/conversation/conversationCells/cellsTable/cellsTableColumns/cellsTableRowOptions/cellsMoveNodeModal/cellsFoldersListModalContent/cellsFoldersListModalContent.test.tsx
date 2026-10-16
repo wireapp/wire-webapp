@@ -32,6 +32,7 @@ import {CellsFoldersListModalContent} from './cellsFoldersListModalContent';
 const renderContent = (
   status: 'idle' | 'loading' | 'success' | 'error',
   items: {id: string; name: string; path: string}[],
+  shouldShowLoadingSpinner = status === 'loading',
 ) => {
   const wrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
 
@@ -40,7 +41,7 @@ const renderContent = (
       <CellsFoldersListModalContent
         items={items}
         status={status}
-        shouldShowLoadingSpinner={status === 'loading'}
+        shouldShowLoadingSpinner={shouldShowLoadingSpinner}
         conversationName="Engineering"
         currentPath="wire-cells-web"
         onPathChange={jest.fn()}
@@ -56,6 +57,15 @@ describe('CellsFoldersListModalContent', () => {
     const {container} = renderContent('loading', []);
 
     expect(container.querySelector('.icon-spinner')).not.toBeNull();
+    expect(screen.queryByText('cells.moveNodeModal.emptyList')).not.toBeInTheDocument();
+  });
+
+  it('shows a visible loading status before the delayed spinner appears', () => {
+    renderContent('loading', [], false);
+
+    const loadingStatus = screen.getByRole('status');
+    expect(loadingStatus).toHaveTextContent('Loading folders…');
+    expect(loadingStatus.closest('[aria-busy="true"]')).toBeInTheDocument();
     expect(screen.queryByText('cells.moveNodeModal.emptyList')).not.toBeInTheDocument();
   });
 
@@ -76,6 +86,8 @@ describe('CellsFoldersListModalContent', () => {
   it('shows loaded folders after a successful non-empty folder load', () => {
     renderContent('success', [{id: 'folder-id', name: 'Documents', path: 'wire-cells-web/Documents'}]);
 
-    expect(screen.getByRole('button', {name: 'Documents'})).toBeInTheDocument();
+    const folderButton = screen.getByRole('button', {name: 'Documents'});
+    expect(folderButton).toBeInTheDocument();
+    expect(folderButton.closest('[aria-busy="false"]')).toBeInTheDocument();
   });
 });
