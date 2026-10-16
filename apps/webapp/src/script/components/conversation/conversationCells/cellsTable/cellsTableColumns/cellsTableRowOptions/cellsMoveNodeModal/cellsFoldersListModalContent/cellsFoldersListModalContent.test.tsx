@@ -64,7 +64,7 @@ describe('CellsFoldersListModalContent', () => {
     renderContent('loading', [], false);
 
     const loadingStatus = screen.getByRole('status');
-    expect(loadingStatus).toHaveTextContent('Loading folders…');
+    expect(loadingStatus).toHaveTextContent('cells.moveNodeModal.loading');
     expect(loadingStatus.closest('[aria-busy="true"]')).toBeInTheDocument();
     expect(screen.queryByText('cells.moveNodeModal.emptyList')).not.toBeInTheDocument();
   });

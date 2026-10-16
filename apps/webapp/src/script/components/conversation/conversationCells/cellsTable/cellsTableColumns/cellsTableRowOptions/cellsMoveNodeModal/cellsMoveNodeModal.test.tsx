@@ -144,7 +144,7 @@ describe('CellsMoveNodeModal', () => {
     act(() => {
       clock.advanceByMilliseconds(999);
     });
-    expect(screen.getByRole('status')).toHaveTextContent('Loading folders…');
+    expect(screen.getByRole('status')).toHaveTextContent('cells.moveNodeModal.loading');
     expect(moveButton).toBeDisabled();
     expect(cellsRepository.moveNode).not.toHaveBeenCalled();
 

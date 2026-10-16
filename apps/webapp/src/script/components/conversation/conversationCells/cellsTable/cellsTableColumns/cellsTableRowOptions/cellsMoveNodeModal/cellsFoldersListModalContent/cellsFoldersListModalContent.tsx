@@ -18,7 +18,6 @@
  */
 
 import {isNonEmptyArray} from '@sindresorhus/is';
-import {FormattedMessage} from 'react-intl';
 
 import {CellsBreadcrumbs} from 'Components/conversation/conversationCells/common/cellsBreadcrumbs/cellsBreadcrumbs';
 import {getBreadcrumbsFromPath} from 'Components/conversation/conversationCells/common/getBreadcrumbsFromPath/getBreadcrumbsFromPath';
@@ -83,9 +82,7 @@ export const CellsFoldersListModalContent = ({
           (shouldShowLoadingSpinner ? (
             <CellsFolderListLoading />
           ) : (
-            <p role="status">
-              <FormattedMessage id="cells.moveNodeModal.loading" defaultMessage="Loading folders…" />
-            </p>
+            <p role="status">{translate('cells.moveNodeModal.loading')}</p>
           ))}
         {status === 'error' && <p role="alert">{translate('cells.newItemMenuModalForm.genericError')}</p>}
         {shouldDisplayEmptyItems && <CellsFolderListEmpty />}
