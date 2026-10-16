@@ -356,7 +356,7 @@ export const MeetingPrepSurface = ({
                 type="button"
                 css={meetingPrepMenuButtonStyles}
                 aria-expanded={cameraMenuOpen}
-                aria-label={translate('videoCallOverlayOpenCameraOptions')}
+                aria-label={translate('videoCallMenuMoreCameraSettings')}
                 onClick={() => {
                   setMicrophoneMenuOpen(false);
                   setCameraMenuOpen(open => {

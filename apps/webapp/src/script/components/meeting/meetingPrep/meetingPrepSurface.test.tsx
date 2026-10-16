@@ -187,7 +187,7 @@ describe('MeetingPrepSurface', () => {
     renderSurface();
 
     fireEvent.click(screen.getByRole('button', {name: 'videoCallOverlayOpenMicrophoneAndSpeakerOptions'}));
-    fireEvent.click(screen.getByRole('button', {name: 'videoCallOverlayOpenCameraOptions'}));
+    fireEvent.click(screen.getByRole('button', {name: 'videoCallMenuMoreCameraSettings'}));
 
     expect(screen.queryByRole('button', {name: 'Mic 2'})).not.toBeInTheDocument();
     expect(screen.getByRole('button', {name: 'Camera 1'})).toBeInTheDocument();
