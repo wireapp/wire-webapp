@@ -91,8 +91,7 @@ test.describe('Group Conversation', () => {
     },
   );
 
-  // Skipped due to WPB-25900 -> Group conversations are only deleted locally but not for the other members
-  test.skip(
+  test(
     'I want to delete a group as the Group Creator',
     {tag: ['@TC-1089', '@regression']},
     async ({createPage}) => {
@@ -130,8 +129,7 @@ test.describe('Group Conversation', () => {
     },
   );
 
-  // Skipped due to WPB-25900 -> Group conversations are only deleted locally but not for the other members
-  test.skip(
+  test(
     'I want to be notified about the group deletion when app is in background',
     {tag: ['@TC-1093', '@regression']},
     async ({createPage}) => {
@@ -173,8 +171,7 @@ test.describe('Group Conversation', () => {
     },
   );
 
-  // Skipped due to WPB-25900 -> Group conversations are only deleted locally but not for the other members
-  test.skip(
+  test(
     'I should not be able to search for deleted group',
     {tag: ['@TC-1095', '@regression']},
     async ({createPage}) => {
