@@ -31,7 +31,7 @@ export const isValidCellsNodeName = (name: string): boolean => {
  * Checks a file name and every segment of its relative path.
  * Browser folder uploads expose the relative path through webkitRelativePath.
  */
-export const isValidCellsNodePath = (name: string, relativePath?: string | null): boolean => {
+export const isValidCellsNodePath = (name: string, relativePath: Maybe<string>): boolean => {
   const normalizedRelativePath = relativePath ?? '';
   const relativePathSegments = normalizedRelativePath.length > 0 ? normalizedRelativePath.split('/') : [];
   return [name, ...relativePathSegments].every(isValidCellsNodeName);
