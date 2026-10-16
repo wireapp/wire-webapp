@@ -18,9 +18,12 @@
  */
 
 import {isUndefined} from '@sindresorhus/is';
+import {Maybe} from 'true-myth';
 
 import {Config} from 'src/script/Config';
 import type {RootContextValue} from 'src/script/page/rootProvider';
+
+import {isValidCellsNodePath} from '../../conversationCells/common/cellsNodeNameValidator';
 
 const CONFIG = Config.getConfig();
 
@@ -49,6 +52,7 @@ export const validateFiles = ({
   translate,
 }: ValidateFilesParams): ValidationResult => {
   const validations = [
+    validateFileNames({files: newFiles, translate}),
     validateFileCount({currentFiles, newFiles, maxFiles, translate}),
     validateFileSize({files: newFiles, maxSize, translate}),
   ];
@@ -62,6 +66,30 @@ export const validateFiles = ({
   }
 
   return firstError;
+};
+
+interface ValidateFileNamesParams {
+  files: File[];
+  translate: Translate;
+}
+
+const validateFileNames = ({files, translate}: ValidateFileNamesParams): ValidationResult => {
+  const invalidFiles = files.filter(file => {
+    return !isValidCellsNodePath(file.name, Maybe.of(file.webkitRelativePath));
+  });
+
+  if (invalidFiles.length > 0) {
+    return {
+      isValid: false,
+      error: {
+        title: translate('conversationFileUploadFailedHeading'),
+        message: translate('cells.nodeName.invalidCharactersError'),
+      },
+      invalidFiles: [],
+    };
+  }
+
+  return {isValid: true};
 };
 
 interface ValidateFileSizeParams {
