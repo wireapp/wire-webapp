@@ -17,7 +17,7 @@
  *
  */
 
-import {useMemo, useState} from 'react';
+import {type ReactNode, useMemo, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
@@ -39,39 +39,51 @@ interface CellsBulkMovePreviewModalProps {
   conversationName: string;
 }
 
-export const CellsBulkMovePreviewModal = ({
+interface UseBulkMoveDestinationSelectionProps {
+  isOpen: boolean;
+  selectedNodes: CellNode[];
+  cellsRepository: CellsRepository;
+  conversationQualifiedId: QualifiedId;
+}
+
+interface BulkMovePreviewPresentationProps {
+  isOpen: boolean;
+  onClose: () => void;
+  selectedNodes: CellNode[];
+  currentDestination: string;
+  children: ReactNode;
+}
+
+const normalizeDestinationPath = (path: string, rootPath: string): string => {
+  const normalizedRootPath = rootPath.replace(/\/+$/, '');
+  const normalizedPath = path.replace(/^\/+|\/+$/g, '');
+  if (normalizedPath === normalizedRootPath) {
+    return '';
+  }
+
+  if (normalizedRootPath.length > 0 && normalizedPath.startsWith(`${normalizedRootPath}/`)) {
+    return normalizedPath.slice(normalizedRootPath.length + 1);
+  }
+
+  return normalizedPath;
+};
+
+const getDestinationPath = (path: string, rootPath: string): string => {
+  const normalizedRootPath = rootPath.replace(/\/+$/, '');
+  const relativePath = normalizeDestinationPath(path, rootPath);
+  return relativePath.length > 0 ? [normalizedRootPath, relativePath].filter(Boolean).join('/') : rootPath;
+};
+
+const useBulkMoveDestinationSelection = ({
   isOpen,
-  onClose,
   selectedNodes,
   cellsRepository,
   conversationQualifiedId,
-  conversationName,
-}: CellsBulkMovePreviewModalProps) => {
+}: UseBulkMoveDestinationSelectionProps) => {
   const {clock, fireAndForgetInvoker, translate} = useApplicationContext();
   const rootPath = getCellsFilesPath();
-  const normalizedRootPath = rootPath.replace(/\/+$/, '');
-  const normalizeDestinationPath = (path: string): string => {
-    const normalizedPath = path.replace(/^\/+|\/+$/g, '');
-    if (normalizedPath === normalizedRootPath) {
-      return '';
-    }
-
-    if (normalizedRootPath.length > 0 && normalizedPath.startsWith(`${normalizedRootPath}/`)) {
-      return normalizedPath.slice(normalizedRootPath.length + 1);
-    }
-
-    return normalizedPath;
-  };
-  const getDestinationPath = (path: string): string => {
-    const relativePath = normalizeDestinationPath(path);
-    return relativePath.length > 0 ? [normalizedRootPath, relativePath].filter(Boolean).join('/') : rootPath;
-  };
   const [currentPath, setCurrentPath] = useState(rootPath);
   const [selectedDestinationPath, setSelectedDestinationPath] = useState(rootPath);
-  const handlePathChange = (path: string): void => {
-    setCurrentPath(path);
-    setSelectedDestinationPath(getDestinationPath(path));
-  };
   const {folders, status, shouldShowLoadingSpinner} = useGetCellsFolders({
     cellsRepository,
     conversationQualifiedId,
@@ -102,12 +114,43 @@ export const CellsBulkMovePreviewModal = ({
     ]);
   }, [selectedFolderPaths, currentPath, translate]);
 
+  const handlePathChange = (path: string): void => {
+    setCurrentPath(path);
+    setSelectedDestinationPath(getDestinationPath(path, rootPath));
+  };
+  const handleDestinationSelect = (path: string): void => {
+    setSelectedDestinationPath(getDestinationPath(path, rootPath));
+  };
+
   const driveLabel = translate('cells.bulkMove.drive');
-  const relativeDestinationPath = normalizeDestinationPath(selectedDestinationPath);
+  const relativeDestinationPath = normalizeDestinationPath(selectedDestinationPath, rootPath);
   const currentDestination =
     relativeDestinationPath.length > 0
       ? `${driveLabel} / ${relativeDestinationPath.split('/').filter(Boolean).join(' / ')}`
       : driveLabel;
+
+  return {
+    currentDestination,
+    currentPath,
+    disabledDestinationLabels,
+    disabledDestinationPaths,
+    folders,
+    handleDestinationSelect,
+    handlePathChange,
+    selectedDestinationPath,
+    shouldShowLoadingSpinner,
+    status,
+  };
+};
+
+const BulkMovePreviewPresentation = ({
+  isOpen,
+  onClose,
+  selectedNodes,
+  currentDestination,
+  children,
+}: BulkMovePreviewPresentationProps) => {
+  const {translate} = useApplicationContext();
 
   return (
     <CellsModal isOpen={isOpen} onClose={onClose} size="large">
@@ -122,25 +165,50 @@ export const CellsBulkMovePreviewModal = ({
         </ul>
       </section>
       <p aria-live="polite">{translate('cells.bulkMove.currentDestination', {destination: currentDestination})}</p>
-      <CellsFoldersListModalContent
-        items={folders}
-        status={status}
-        shouldShowLoadingSpinner={shouldShowLoadingSpinner}
-        conversationName={conversationName}
-        currentPath={currentPath}
-        onPathChange={handlePathChange}
-        onSelectDestination={path => {
-          return setSelectedDestinationPath(getDestinationPath(path));
-        }}
-        selectedDestinationPath={selectedDestinationPath}
-        disabledDestinationPaths={disabledDestinationPaths}
-        disabledDestinationLabels={disabledDestinationLabels}
-      />
+      {children}
       <CellsModal.Actions>
         <CellsModal.SecondaryButton onClick={onClose}>
           {translate('cells.moveNodeModal.cancelButton')}
         </CellsModal.SecondaryButton>
       </CellsModal.Actions>
     </CellsModal>
+  );
+};
+
+export const CellsBulkMovePreviewModal = ({
+  isOpen,
+  onClose,
+  selectedNodes,
+  cellsRepository,
+  conversationQualifiedId,
+  conversationName,
+}: CellsBulkMovePreviewModalProps) => {
+  const destination = useBulkMoveDestinationSelection({
+    isOpen,
+    selectedNodes,
+    cellsRepository,
+    conversationQualifiedId,
+  });
+
+  return (
+    <BulkMovePreviewPresentation
+      isOpen={isOpen}
+      onClose={onClose}
+      selectedNodes={selectedNodes}
+      currentDestination={destination.currentDestination}
+    >
+      <CellsFoldersListModalContent
+        items={destination.folders}
+        status={destination.status}
+        shouldShowLoadingSpinner={destination.shouldShowLoadingSpinner}
+        conversationName={conversationName}
+        currentPath={destination.currentPath}
+        onPathChange={destination.handlePathChange}
+        onSelectDestination={destination.handleDestinationSelect}
+        selectedDestinationPath={destination.selectedDestinationPath}
+        disabledDestinationPaths={destination.disabledDestinationPaths}
+        disabledDestinationLabels={destination.disabledDestinationLabels}
+      />
+    </BulkMovePreviewPresentation>
   );
 };
