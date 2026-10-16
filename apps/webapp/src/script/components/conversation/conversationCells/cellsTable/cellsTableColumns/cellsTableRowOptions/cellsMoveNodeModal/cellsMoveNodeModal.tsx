@@ -53,7 +53,7 @@ export const CellsMoveNodeModal = ({
   conversationName,
   navigateToPath = openBreadcrumb,
 }: CellsMoveNodeModalProps) => {
-  const {fireAndForgetInvoker, translate} = useApplicationContext();
+  const {clock, fireAndForgetInvoker, translate} = useApplicationContext();
   const [currentPath, setCurrentPath] = useState(() => {
     return getCellsFilesPath();
   });
@@ -66,6 +66,7 @@ export const CellsMoveNodeModal = ({
     currentPath,
     enabled: isOpen,
     fireAndForgetInvoker,
+    clock,
   });
 
   const {
