@@ -51,6 +51,7 @@ jobs:
           localization_branch_name: 'translations'
           pull_request_base_branch_name: 'main'
           pull_request_title: 'Update translations'
+          pull_request_labels: 'semver:patch'
           commit_message: 'Update translations'
           github_user_name: otto-the-bot
           github_user_email: webapp+otto@wire.com
