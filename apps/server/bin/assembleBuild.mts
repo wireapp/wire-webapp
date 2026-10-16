@@ -25,7 +25,7 @@ import {fileURLToPath} from 'node:url';
 
 const FIRST_USER_ARGUMENT_INDEX = 2;
 
-type BuildVariant = 'development' | 'internal' | 'public';
+type BuildVariant = 'development' | 'internal' | 'public' | 'rspack-internal';
 type AssemblyScope = 'artifact' | 'webapp';
 
 const workspaceRootPath = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
@@ -34,7 +34,7 @@ const buildMetadataFilePath = path.resolve(workspaceRootPath, 'apps/server/build
 const artifactOutputPath = path.resolve(workspaceRootPath, 'apps/server/dist');
 
 function isBuildVariant(value: unknown): value is BuildVariant {
-  return value === 'development' || value === 'internal' || value === 'public';
+  return value === 'development' || value === 'internal' || value === 'public' || value === 'rspack-internal';
 }
 
 function isAssemblyScope(value: unknown): value is AssemblyScope {
@@ -42,7 +42,7 @@ function isAssemblyScope(value: unknown): value is AssemblyScope {
 }
 
 function resolveWebappBuildOutputPath(buildVariant: BuildVariant): string {
-  return path.resolve(workspaceRootPath, `apps/webapp/dist/${buildVariant}`);
+  return path.resolve(workspaceRootPath, 'apps/webapp/dist', buildVariant);
 }
 
 function assertPathExists(requiredPath: string): void {
@@ -90,7 +90,7 @@ function run(): void {
   const [buildVariant, assemblyScope] = process.argv.slice(FIRST_USER_ARGUMENT_INDEX);
 
   if (!isBuildVariant(buildVariant) || !isAssemblyScope(assemblyScope)) {
-    console.error('Usage: assembleBuild.mts <development|internal|public> <artifact|webapp>');
+    console.error('Usage: assembleBuild.mts <development|internal|public|rspack-internal> <artifact|webapp>');
     process.exitCode = 1;
     return;
   }
