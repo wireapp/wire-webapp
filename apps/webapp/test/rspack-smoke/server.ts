@@ -35,7 +35,6 @@ import {fileURLToPath} from 'node:url';
 import {resolveRspackSmokeAssetPath} from './rspackSmokeAssetPathResolver.ts';
 import {parseRspackSmokeServerOptions} from './rspackSmokeServerOptions.ts';
 import type {RspackSmokeServerOptions} from './rspackSmokeServerOptions.ts';
-
 type RuntimeConfiguration = ReturnType<typeof generateClientConfig>;
 
 type RequestHandlerOptions = {
@@ -109,13 +108,13 @@ function readRuntimeConfiguration(serverOrigin: string, websocketOrigin: string)
     {
       assetVersion: buildMetadata.assetVersion,
       commit: buildMetadata.commit,
+      version: buildMetadata.version,
       env: 'production',
       urls: {
         api: serverOrigin,
         base: serverOrigin,
         ws: websocketOrigin,
       },
-      version: buildMetadata.version,
     },
     smokeEnvironment,
   );

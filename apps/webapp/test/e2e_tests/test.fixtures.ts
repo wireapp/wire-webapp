@@ -19,6 +19,10 @@
 
 import {expect as playwrightExpect, test as baseTest, type BrowserContext, type Page} from '@playwright/test';
 import {isFunction, isUndefined} from '@sindresorhus/is';
+import {parseBuildMetadata} from '@wireapp/config';
+import type {ClientConfig, Env} from '@wireapp/config';
+import dotenv from 'dotenv-extended';
+import {readFileSync} from 'node:fs';
 import {resolve} from 'node:path';
 
 import {ApiManagerE2E} from './backend/apiManager.e2e';
@@ -32,12 +36,40 @@ import {Maybe} from 'true-myth';
 import {
   captureRspackRuntimeDiagnostics,
   createRspackRuntimeDiagnostics,
+  generateRspackRuntimeConfiguration,
   getRspackRuntimeCompatibilityIssues,
   installRspackBuildRoutes,
 } from './utils/rspackBuildRouting';
 import type {RspackRuntimeDiagnostics, RspackRuntimeVerificationContext} from './utils/rspackBuildRouting';
 
 export type PagePlugin = (page: Page) => void | Promise<void>;
+
+function readGeneratedRspackRuntimeConfiguration(): ClientConfig {
+  const workspaceRootPath = resolve(__dirname, '../../../..');
+  const buildMetadataPath = resolve(workspaceRootPath, 'apps/server/build/metadata/version.json');
+  const parsedBuildMetadata = parseBuildMetadata(readFileSync(buildMetadataPath, 'utf8'));
+  const buildMetadata = parsedBuildMetadata.match({
+    Just: metadata => {
+      return metadata;
+    },
+    Nothing: () => {
+      throw new Error(`Invalid build metadata at '${buildMetadataPath}'`);
+    },
+  });
+
+  const environmentDefaultsPath = resolve(workspaceRootPath, '.env.defaults');
+  const environment = dotenv.load({path: environmentDefaultsPath, includeProcessEnv: false}) as Env;
+
+  return generateRspackRuntimeConfiguration({
+    buildMetadata,
+    environment,
+    urls: {
+      api: environment.BACKEND_REST,
+      base: environment.APP_BASE,
+      ws: environment.BACKEND_WS,
+    },
+  });
+}
 
 // Define custom test type with axios fixture
 type Fixtures = {
@@ -111,6 +143,7 @@ export const test = baseTest.extend<Fixtures>({
       const routeState = await installRspackBuildRoutes(context, {
         applicationOrigin,
         buildDirectoryPath,
+        generatedRuntimeConfiguration: readGeneratedRspackRuntimeConfiguration(),
       });
       rspackDiagnosticsByContext.set(context, diagnostics);
       rspackContexts.push({diagnostics, routeState});
@@ -177,9 +210,11 @@ export const test = baseTest.extend<Fixtures>({
             return {
               contextNumber: contextIndex + 1,
               ...rspackContext.diagnostics,
+              generatedRuntimeConfigurationServed: rspackContext.routeState.generatedRuntimeConfigurationServed,
               successfulRspackScriptPaths: [...rspackContext.diagnostics.successfulRspackScriptPaths],
               successfulRspackWasmPaths: [...rspackContext.diagnostics.successfulRspackWasmPaths],
               servedRspackAssetPaths: [...rspackContext.routeState.servedAssetPaths],
+              runtimeConfigurationIssues: [...rspackContext.routeState.runtimeConfigurationIssues],
             };
           }),
         },
