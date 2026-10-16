@@ -18,6 +18,7 @@
  */
 
 import {ReactNode, useMemo} from 'react';
+import type {CSSObject} from '@emotion/react';
 
 import {Maybe} from 'true-myth';
 import {container} from 'tsyringe';
@@ -35,7 +36,12 @@ import {
 import {UserState} from 'Repositories/user/userState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {confirmationMessageStyles, mockNoticeStyles, reportStyles} from './sendCallLogs.styles';
+import {
+  callLogsModalBodyStyles,
+  confirmationMessageStyles,
+  mockNoticeStyles,
+  reportStyles,
+} from './sendCallLogs.styles';
 
 import {Config} from '../../../../../Config';
 import {PreferencesSection} from '../components/preferencesSection';
@@ -71,8 +77,8 @@ const SendCallLogs = ({
   }, [clock]);
   const service = callLogsService ?? mockService;
 
-  const showMessage = (title: string, message: ReactNode) => {
-    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {text: {title, message}}, undefined, translate);
+  const showMessage = (title: string, message: ReactNode, bodyCSS: CSSObject = {}) => {
+    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {bodyCSS, text: {title, message}}, undefined, translate);
   };
 
   const showReport = (report: CallLogsReport) => {
@@ -104,6 +110,7 @@ const SendCallLogs = ({
         </dl>
         {report.improvised_span_ids !== 0 && <p role="alert">{translate('modalCallLogsSpanWarning')}</p>}
       </div>,
+      callLogsModalBodyStyles,
     );
   };
 
@@ -118,6 +125,7 @@ const SendCallLogs = ({
       PrimaryModal.type.OPTION,
       {
         closeOnConfirm: false,
+        bodyCSS: callLogsModalBodyStyles,
         optionPosition: 'after-actions',
         optionVariant: 'warning',
         primaryAction: {

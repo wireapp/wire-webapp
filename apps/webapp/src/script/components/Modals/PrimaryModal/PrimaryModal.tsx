@@ -102,6 +102,7 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
     allButtonsFullWidth = false,
     primaryBtnFirst = false,
     size = 'small',
+    bodyCSS = {},
     optionPosition = 'before-actions',
     optionVariant = 'default',
     container,
@@ -355,7 +356,7 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
         hideCloseBtn={hideCloseBtn}
         closeAction={closeAction}
       />
-      <FadingScrollbar className="modal__body">
+      <FadingScrollbar className="modal__body" css={bodyCSS}>
         <MessageContent message={message} translatedMessage={translatedMessage} translate={translate} />
 
         {isGuestLinkPassword && (

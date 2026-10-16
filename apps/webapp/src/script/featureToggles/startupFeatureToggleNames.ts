@@ -24,6 +24,8 @@ export const disableMessagePreprocessingFeatureToggleName = 'disable-message-pre
 export const sharedDriveDirectUploadFeatureToggleName = 'shared-drive-direct-upload';
 export const driveBulkActionsFeatureToggleName = 'drive-bulk-actions';
 
+export const sendCallLogsFeatureToggleName = 'send-call-logs';
+
 export const startupFeatureToggleNames = [
   applockRefactoredFeatureToggleName,
   conversationListCollapseFeatureToggleName,
@@ -31,6 +33,7 @@ export const startupFeatureToggleNames = [
   disableMessagePreprocessingFeatureToggleName,
   sharedDriveDirectUploadFeatureToggleName,
   driveBulkActionsFeatureToggleName,
+  sendCallLogsFeatureToggleName,
 ] as const;
 
 export type StartupFeatureToggleName = (typeof startupFeatureToggleNames)[number];

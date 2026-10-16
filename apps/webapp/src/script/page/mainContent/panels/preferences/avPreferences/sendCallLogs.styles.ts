@@ -65,3 +65,7 @@ export const mockNoticeStyles: CSSObject = {
     color: 'var(--gray-40)',
   },
 };
+
+export const callLogsModalBodyStyles: CSSObject = {
+  paddingBottom: '16px',
+};

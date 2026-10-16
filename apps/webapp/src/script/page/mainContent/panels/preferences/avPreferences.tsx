@@ -28,6 +28,7 @@ import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import type {MediaDeviceType} from 'Repositories/media/MediaDeviceType';
 import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import type {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
+import {sendCallLogsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {AudioOutPreferences} from './avPreferences/audioOutPreferences';
@@ -39,9 +40,6 @@ import {SendCallLogs} from './avPreferences/sendCallLogs';
 import {PreferencesPage} from './components/preferencesPage';
 import {useCameraReloadOnCallEnd} from './useCameraReloadOnCallEnd';
 
-// Switch to false to offer the local call log download instead.
-const SEND_CALL_LOGS_ENABLED = true;
-
 interface AVPreferencesProps {
   callingRepository: CallingRepository;
   propertiesRepository: PropertiesRepository;
@@ -52,7 +50,7 @@ interface AVPreferencesProps {
 }
 
 const AVPreferencesComponent = ({propertiesRepository, callingRepository, deviceSupport}: AVPreferencesProps) => {
-  const {translate} = useApplicationContext();
+  const {translate, isFeatureToggleEnabled} = useApplicationContext();
   const devicesHandler = container.resolve(MediaDevicesHandler);
   const constraintsHandler = container.resolve(MediaConstraintsHandler);
   const streamHandler = container.resolve(MediaStreamHandler);
@@ -101,7 +99,7 @@ const AVPreferencesComponent = ({propertiesRepository, callingRepository, device
         }}
       />
       {callingRepository.supportsCalling &&
-        (SEND_CALL_LOGS_ENABLED ? (
+        (isFeatureToggleEnabled(sendCallLogsFeatureToggleName) ? (
           <SendCallLogs callingRepository={callingRepository} />
         ) : (
           <SaveCallLogs callingRepository={callingRepository} />
