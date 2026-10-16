@@ -24,6 +24,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {CellsModal} from 'Components/conversation/conversationCells/common/cellsModal/cellsModal';
 import {CellsNewNodeForm} from 'Components/conversation/conversationCells/common/cellsNewNodeForm/cellsNewNodeForm';
 import {getCellsFilesPath} from 'Components/conversation/conversationCells/common/getCellsFilesPath/getCellsFilesPath';
+import {openBreadcrumb} from 'Components/conversation/conversationCells/common/openBreadcrumb/openBreadcrumb';
 import {useCellsNewFolderForm} from 'Components/conversation/conversationCells/common/useCellsNewNodeForm/useCellsNewFolderForm';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -40,6 +41,7 @@ interface CellsMoveNodeModalProps {
   conversationQualifiedId: QualifiedId;
   conversationName: string;
   nodeToMove: CellNode;
+  navigateToPath?: (params: {conversationQualifiedId: QualifiedId; path: string}) => void;
 }
 
 export const CellsMoveNodeModal = ({
@@ -49,6 +51,7 @@ export const CellsMoveNodeModal = ({
   cellsRepository,
   conversationQualifiedId,
   conversationName,
+  navigateToPath = openBreadcrumb,
 }: CellsMoveNodeModalProps) => {
   const {fireAndForgetInvoker, translate} = useApplicationContext();
   const [currentPath, setCurrentPath] = useState(() => {
@@ -66,7 +69,7 @@ export const CellsMoveNodeModal = ({
   });
 
   const {
-    handleMove,
+    handleMove: handleMoveOperation,
     movingDisabled,
     status: moveNodeStatus,
   } = useMoveCellsNode({
@@ -74,7 +77,6 @@ export const CellsMoveNodeModal = ({
     nodeToMove,
     conversationQualifiedId,
     currentPath,
-    onClose,
   });
 
   const {
@@ -110,6 +112,16 @@ export const CellsMoveNodeModal = ({
 
   const isMoveLoading = moveNodeStatus === 'loading';
 
+  const handleMove = async () => {
+    const moveResult = await handleMoveOperation();
+    if (moveResult.isErr) {
+      return;
+    }
+
+    navigateToPath({conversationQualifiedId, path: currentPath});
+    onClose();
+  };
+
   return (
     <CellsModal isOpen={isOpen} onClose={onClose} size="large">
       <CellsModal.Header>
@@ -128,6 +140,7 @@ export const CellsMoveNodeModal = ({
             onPathChange={setCurrentPath}
             onChangeModalContent={setActiveModalContent}
           />
+          {moveNodeStatus === 'error' && <p role="alert">{translate('cells.newItemMenuModalForm.genericError')}</p>}
           <CellsModal.Actions>
             <CellsModal.SecondaryButton onClick={onClose}>
               {translate('cells.moveNodeModal.cancelButton')}
