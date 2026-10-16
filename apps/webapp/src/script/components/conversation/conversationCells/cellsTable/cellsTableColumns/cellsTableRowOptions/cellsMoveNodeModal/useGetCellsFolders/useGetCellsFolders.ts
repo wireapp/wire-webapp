@@ -19,6 +19,7 @@
 
 import {useCallback, useEffect, useState} from 'react';
 
+import type {Clock} from '@enormora/clock/clock';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {task} from 'true-myth';
@@ -36,6 +37,7 @@ interface UseGetCellsFoldersProps {
   conversationQualifiedId: QualifiedId;
   enabled: boolean;
   fireAndForgetInvoker: FireAndForgetInvoker;
+  clock: Clock;
 }
 
 type Status = 'idle' | 'loading' | 'success' | 'error';
@@ -54,6 +56,7 @@ export const useGetCellsFolders = ({
   currentPath,
   enabled,
   fireAndForgetInvoker,
+  clock,
 }: UseGetCellsFoldersProps) => {
   const [folders, setFolders] = useState<Folder[]>([]);
   const [status, setStatus] = useState<Status>('idle');
@@ -112,14 +115,14 @@ export const useGetCellsFolders = ({
       return undefined;
     }
 
-    const timeout = setTimeout(() => {
+    const timeout = clock.setTimeout(() => {
       setShouldShowLoadingSpinner(true);
     }, SHOW_LOADING_SPINNER_DELAY_MS);
 
     return () => {
-      return clearTimeout(timeout);
+      clock.clearTimeout(timeout);
     };
-  }, [status]);
+  }, [status, clock]);
 
   return {
     refresh: fetchFolders,
