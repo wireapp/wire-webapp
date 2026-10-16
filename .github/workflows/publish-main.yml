@@ -125,7 +125,7 @@ jobs:
           WIRE_WEBAPP_BUILD_COMMIT: ${{ steps.build_metadata_inputs.outputs.commit }}
           WIRE_WEBAPP_BUILD_VERSION: ${{ steps.build_metadata_inputs.outputs.version }}
         run: |
-          ./bin/yarn build:prod
+          ./bin/yarn nx run server:package-rspack
 
       - name: Validate main artifact metadata
         id: validate_artifact_metadata
