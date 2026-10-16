@@ -17,7 +17,7 @@
  *
  */
 
-import {fireEvent, render, screen, waitFor} from '@testing-library/react';
+import {fireEvent, render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import {ThemeProvider} from '@wireapp/react-ui-kit';
@@ -25,6 +25,7 @@ import {ThemeProvider} from '@wireapp/react-ui-kit';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {
+  createExecutingFireAndForgetInvokerForTest,
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
@@ -46,6 +47,33 @@ const translateSelectionForTest: Translate = (key, substitutions) => {
   }
   if (key === 'cells.selection.clear') {
     return 'Clear selection';
+  }
+  if (key === 'cells.selection.move') {
+    return 'Move';
+  }
+  if (key === 'cells.bulkMove.previewTitle') {
+    return `Preview move of ${substitutions?.count} items`;
+  }
+  if (key === 'cells.bulkMove.previewDescription') {
+    return 'Preview only. No items will be moved. Destinations stay within this conversation’s Drive.';
+  }
+  if (key === 'cells.bulkMove.selectedItems') {
+    return 'Selected items';
+  }
+  if (key === 'cells.bulkMove.currentDestination') {
+    return `Current destination: ${substitutions?.destination}`;
+  }
+  if (key === 'cells.bulkMove.drive') {
+    return 'Drive';
+  }
+  if (key === 'cells.bulkMove.selected') {
+    return 'Selected';
+  }
+  if (key === 'cells.bulkMove.currentLocation') {
+    return 'Current location';
+  }
+  if (key === 'cells.moveNodeModal.openFolder') {
+    return `Open ${substitutions?.folderName}`;
   }
   return translateForTest(key);
 };
@@ -88,6 +116,7 @@ const renderCellsTable = ({
   selectionEnabled = true,
   selectionScopeKey = 'conversation:/files',
   isBulkActionsEnabled = true,
+  cellsRepository = {} as CellsRepository,
 }: {
   readonly folderPath?: string;
   readonly onDropFilesToFolder?: (files: readonly File[], uploadPath: string) => void;
@@ -97,10 +126,12 @@ const renderCellsTable = ({
   readonly selectionEnabled?: boolean;
   readonly selectionScopeKey?: string;
   readonly isBulkActionsEnabled?: boolean;
+  readonly cellsRepository?: CellsRepository;
 } = {}) => {
   const wrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({
       translate: translateSelectionForTest,
+      fireAndForgetInvoker: createExecutingFireAndForgetInvokerForTest(),
       isFeatureToggleEnabled: featureToggleName => {
         return isBulkActionsEnabled && featureToggleName === driveBulkActionsFeatureToggleName;
       },
@@ -125,7 +156,7 @@ const renderCellsTable = ({
       <ThemeProvider>
         <CellsTable
           nodes={nodes}
-          cellsRepository={{} as CellsRepository}
+          cellsRepository={cellsRepository}
           conversation={{} as Conversation}
           conversationQualifiedId={conversationQualifiedId}
           conversationName="Conversation"
@@ -173,9 +204,11 @@ describe('CellsTable selection', () => {
 
     const checkboxes = screen.getAllByRole('checkbox');
     expect(checkboxes).toHaveLength(2);
+    expect(screen.queryByRole('button', {name: 'Move'})).not.toBeInTheDocument();
     expect(checkboxes[0]).toHaveAccessibleName('Select Marketing images');
 
     fireEvent.click(checkboxes[0]);
+    expect(screen.getByRole('button', {name: 'Move'})).toBeInTheDocument();
     expect(screen.getByText('1 selected')).toBeInTheDocument();
     expect(screen.getByRole('row', {name: /Marketing images/})).toHaveAttribute('aria-selected', 'true');
     expect(screen.getByRole('button', {name: 'Clear selection'})).toBeInTheDocument();
@@ -207,6 +240,87 @@ describe('CellsTable selection', () => {
 
     expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', {name: 'Clear selection'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'Move'})).not.toBeInTheDocument();
+  });
+
+  it('previews every selected item and browses destinations without moving or clearing selection', async () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files/wire-cells-web';
+    const user = userEvent.setup();
+    const repository = {
+      getAllNodes: jest
+        .fn()
+        .mockResolvedValueOnce({
+          Nodes: [
+            {Type: 'COLLECTION', Uuid: 'source-folder', Path: 'wire-cells-web/Marketing images'},
+            {Type: 'COLLECTION', Uuid: 'design-reviews', Path: 'wire-cells-web/Design reviews'},
+            {Type: 'COLLECTION', Uuid: 'legal', Path: 'wire-cells-web/Legal'},
+          ],
+        })
+        .mockResolvedValueOnce({
+          Nodes: [
+            {Type: 'COLLECTION', Uuid: 'quarterly-reviews', Path: 'wire-cells-web/Design reviews/Quarterly reviews'},
+          ],
+        })
+        .mockResolvedValue({Nodes: []}),
+      moveNode: jest.fn(),
+    } as unknown as CellsRepository;
+    renderCellsTable({cellsRepository: repository, folderPath: 'wire-cells-web/Marketing images'});
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+    await user.click(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'}));
+    await user.click(screen.getByRole('button', {name: 'Move'}));
+
+    const preview = await screen.findByRole('dialog');
+    expect(within(preview).getByText('Preview move of 2 items')).toBeInTheDocument();
+    expect(
+      within(preview).getByText(
+        'Preview only. No items will be moved. Destinations stay within this conversation’s Drive.',
+      ),
+    ).toBeInTheDocument();
+    const selectedItems = within(preview).getByRole('region', {name: 'Selected items'});
+    expect(within(selectedItems).getByRole('heading', {name: 'Selected items'})).toBeInTheDocument();
+    expect(within(selectedItems).getByText('Marketing images')).toBeInTheDocument();
+    expect(within(selectedItems).getByText('Wire logs.pdf')).toBeInTheDocument();
+    expect(within(preview).getByText('Current destination: Drive')).toBeInTheDocument();
+    expect(within(preview).queryByRole('button', {name: 'Move'})).not.toBeInTheDocument();
+
+    const selectedSourceFolder = await within(preview).findByRole('button', {name: 'Marketing images Selected'});
+    expect(selectedSourceFolder).toBeDisabled();
+    await user.click(await within(preview).findByRole('button', {name: 'Design reviews'}));
+    expect(within(preview).getByText('Current destination: Drive / Design reviews')).toBeInTheDocument();
+
+    await user.click(within(preview).getByRole('button', {name: 'Open Design reviews'}));
+    expect(await within(preview).findByText('Current destination: Drive / Design reviews')).toBeInTheDocument();
+    await user.click(await within(preview).findByRole('button', {name: 'Open Quarterly reviews'}));
+    expect(
+      await within(preview).findByText('Current destination: Drive / Design reviews / Quarterly reviews'),
+    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(repository.getAllNodes).toHaveBeenCalledTimes(3);
+    });
+    expect(repository.moveNode).not.toHaveBeenCalled();
+
+    await user.click(within(preview).getByRole('button', {name: 'cells.moveNodeModal.cancelButton'}));
+
+    expect(screen.getByText('2 selected')).toBeInTheDocument();
+    expect(
+      screen.getAllByRole('checkbox').every(checkbox => {
+        return (checkbox as HTMLInputElement).checked;
+      }),
+    ).toBe(true);
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+    await user.click(screen.getByRole('button', {name: 'Move'}));
+    const reopenedPreview = await screen.findByRole('dialog');
+    expect(within(reopenedPreview).getByText('Current destination: Drive')).toBeInTheDocument();
+    const reopenedSelectedItems = within(reopenedPreview).getByRole('region', {name: 'Selected items'});
+    expect(within(reopenedSelectedItems).getByText('Wire logs.pdf')).toBeInTheDocument();
+    expect(within(reopenedSelectedItems).queryByText('Marketing images')).not.toBeInTheDocument();
+    await user.click(within(reopenedPreview).getByRole('button', {name: 'cells.moveNodeModal.cancelButton'}));
+
+    expect(repository.moveNode).not.toHaveBeenCalled();
+    window.location.hash = originalHash;
   });
 });
 

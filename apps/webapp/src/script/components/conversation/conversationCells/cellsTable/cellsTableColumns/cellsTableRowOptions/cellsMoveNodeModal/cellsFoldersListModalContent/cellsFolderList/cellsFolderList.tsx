@@ -20,6 +20,7 @@
 import {FolderIcon} from '@wireapp/react-ui-kit';
 
 import {ChevronRight} from 'Components/icon';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {
   arrowIconStyles,
@@ -28,14 +29,28 @@ import {
   listStyles,
   nameStyles,
   nameWrapperStyles,
+  navigateButtonStyles,
 } from './cellsFolderList.styles';
 
 interface CellsFolderListProps {
   items: {id: string; name: string; path: string}[];
   onNavigate: (path: string) => void;
+  onSelectDestination?: (path: string) => void;
+  selectedDestinationPath?: string;
+  disabledDestinationPaths?: readonly string[];
+  disabledDestinationLabels?: Readonly<Record<string, string>>;
 }
 
-export const CellsFolderList = ({items, onNavigate}: CellsFolderListProps) => {
+export const CellsFolderList = ({
+  items,
+  onNavigate,
+  onSelectDestination,
+  selectedDestinationPath,
+  disabledDestinationPaths = [],
+  disabledDestinationLabels = {},
+}: CellsFolderListProps) => {
+  const {translate} = useApplicationContext();
+
   return (
     <ul css={listStyles}>
       {items.map(item => {
@@ -44,7 +59,13 @@ export const CellsFolderList = ({items, onNavigate}: CellsFolderListProps) => {
             <button
               type="button"
               css={buttonStyles}
+              disabled={disabledDestinationPaths.includes(item.path)}
+              aria-pressed={onSelectDestination !== undefined ? selectedDestinationPath === item.path : undefined}
               onClick={() => {
+                if (onSelectDestination !== undefined) {
+                  return onSelectDestination(item.path);
+                }
+
                 return onNavigate(item.path);
               }}
             >
@@ -52,8 +73,24 @@ export const CellsFolderList = ({items, onNavigate}: CellsFolderListProps) => {
                 <FolderIcon width={24} height={24} />
                 <span css={nameStyles}>{item.name}</span>
               </div>
-              <ChevronRight width={16} height={16} css={arrowIconStyles} />
+              {disabledDestinationLabels[item.path] !== undefined && (
+                <span>{disabledDestinationLabels[item.path]}</span>
+              )}
+              {onSelectDestination === undefined && <ChevronRight width={16} height={16} css={arrowIconStyles} />}
             </button>
+            {onSelectDestination !== undefined && (
+              <button
+                type="button"
+                css={navigateButtonStyles}
+                aria-label={translate('cells.moveNodeModal.openFolder', {folderName: item.name})}
+                disabled={disabledDestinationPaths.includes(item.path)}
+                onClick={() => {
+                  return onNavigate(item.path);
+                }}
+              >
+                <ChevronRight width={16} height={16} css={arrowIconStyles} />
+              </button>
+            )}
           </li>
         );
       })}

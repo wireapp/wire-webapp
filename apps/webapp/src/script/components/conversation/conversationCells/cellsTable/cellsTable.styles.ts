@@ -32,6 +32,34 @@ export const wrapperWithRowsStyles: CSSObject = {
   marginBottom: 'auto',
 };
 
+export const selectionBarContainerStyles: CSSObject = {
+  position: 'relative',
+  width: '100%',
+  height: '32px',
+
+  '& > div': {
+    paddingRight: '88px',
+  },
+};
+
+export const bulkMoveButtonStyles: CSSObject = {
+  position: 'absolute',
+  zIndex: 2,
+  top: '2px',
+  right: '8px',
+  minHeight: '28px',
+  padding: '0 12px',
+  border: '1px solid var(--border-color)',
+  borderRadius: '16px',
+  background: 'var(--modal-bg)',
+  color: 'var(--main-color)',
+  cursor: 'pointer',
+
+  '&:hover, &:focus-visible': {
+    backgroundColor: 'var(--foreground-fade-8)',
+  },
+};
+
 export const tableStyles: CSSObject = {
   width: '100%',
   borderCollapse: 'collapse',

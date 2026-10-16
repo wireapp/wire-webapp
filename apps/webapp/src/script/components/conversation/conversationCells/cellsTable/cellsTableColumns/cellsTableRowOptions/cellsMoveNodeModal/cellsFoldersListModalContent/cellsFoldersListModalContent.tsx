@@ -36,7 +36,11 @@ interface CellsFoldersListModalContentProps {
   conversationName: string;
   currentPath: string;
   onPathChange: (path: string) => void;
-  onChangeModalContent: (content: 'move' | 'create') => void;
+  onChangeModalContent?: (content: 'move' | 'create') => void;
+  onSelectDestination?: (path: string) => void;
+  selectedDestinationPath?: string;
+  disabledDestinationPaths?: readonly string[];
+  disabledDestinationLabels?: Readonly<Record<string, string>>;
 }
 
 export const CellsFoldersListModalContent = ({
@@ -47,6 +51,10 @@ export const CellsFoldersListModalContent = ({
   currentPath,
   onPathChange,
   onChangeModalContent,
+  onSelectDestination,
+  selectedDestinationPath,
+  disabledDestinationPaths,
+  disabledDestinationLabels,
 }: CellsFoldersListModalContentProps) => {
   const {translate} = useApplicationContext();
   const breadcrumbs = getBreadcrumbsFromPath({
@@ -56,6 +64,8 @@ export const CellsFoldersListModalContent = ({
   });
 
   const shouldDisplayEmptyItems = status === 'success' && !isNonEmptyArray(items);
+  const shouldDisplayFolders = status === 'success' && isNonEmptyArray(items);
+  const shouldDisplayLoading = ['idle', 'loading'].includes(status);
 
   const handleFolderNavigate = (path: string) => {
     const newPath = path.split('/').slice(1).join('/');
@@ -75,18 +85,33 @@ export const CellsFoldersListModalContent = ({
       <div css={breadcrumbsWrapperStyles}>
         <CellsBreadcrumbs items={breadcrumbs} maxNotCombinedItems={3} onItemClick={handleBreadcrumbClick} />
       </div>
-      <div css={listWrapperStyles}>
-        {shouldShowLoadingSpinner && <CellsFolderListLoading />}
+      <div css={listWrapperStyles} aria-busy={status === 'loading'}>
+        {shouldDisplayLoading &&
+          (shouldShowLoadingSpinner ? (
+            <CellsFolderListLoading />
+          ) : (
+            <p role="status">{translate('cells.moveNodeModal.loading')}</p>
+          ))}
+        {status === 'error' && <p role="alert">{translate('cells.newItemMenuModalForm.genericError')}</p>}
         {shouldDisplayEmptyItems && <CellsFolderListEmpty />}
-        {!shouldShowLoadingSpinner && !shouldDisplayEmptyItems && (
-          <CellsFolderList items={items} onNavigate={handleFolderNavigate} />
+        {shouldDisplayFolders && (
+          <CellsFolderList
+            items={items}
+            onNavigate={handleFolderNavigate}
+            onSelectDestination={onSelectDestination}
+            selectedDestinationPath={selectedDestinationPath}
+            disabledDestinationPaths={disabledDestinationPaths}
+            disabledDestinationLabels={disabledDestinationLabels}
+          />
         )}
       </div>
-      <CellsCreateNewFolderHint
-        onCreate={() => {
-          return onChangeModalContent('create');
-        }}
-      />
+      {onChangeModalContent !== undefined && (
+        <CellsCreateNewFolderHint
+          onCreate={() => {
+            return onChangeModalContent('create');
+          }}
+        />
+      )}
     </>
   );
 };
