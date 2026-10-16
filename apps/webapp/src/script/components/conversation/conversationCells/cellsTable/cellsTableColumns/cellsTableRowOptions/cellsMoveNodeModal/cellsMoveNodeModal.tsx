@@ -148,7 +148,7 @@ export const CellsMoveNodeModal = ({
             </CellsModal.SecondaryButton>
             <CellsModal.PrimaryButton
               onClick={handleMove}
-              isDisabled={movingDisabled || shouldShowLoadingSpinner || isMoveLoading}
+              isDisabled={status !== 'success' || movingDisabled || isMoveLoading}
               isLoading={isMoveLoading}
             >
               {translate('cells.moveNodeModal.moveButton')}
