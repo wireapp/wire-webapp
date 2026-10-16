@@ -20,7 +20,7 @@
   },
   "devDependencies": {
     "@emotion/eslint-plugin": "11.12.0",
-    "@enormora/objectory": "0.0.22",
+    "@enormora/objectory": "0.0.23",
     "@faker-js/faker": "10.6.0",
     "@inquirer/prompts": "8.7.3",
     "@ls-lint/ls-lint": "2.3.1",
