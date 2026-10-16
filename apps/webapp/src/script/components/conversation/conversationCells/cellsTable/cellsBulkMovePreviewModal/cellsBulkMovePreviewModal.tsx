@@ -49,19 +49,28 @@ export const CellsBulkMovePreviewModal = ({
 }: CellsBulkMovePreviewModalProps) => {
   const {clock, fireAndForgetInvoker, translate} = useApplicationContext();
   const rootPath = getCellsFilesPath();
+  const normalizedRootPath = rootPath.replace(/\/+$/, '');
+  const normalizeDestinationPath = (path: string): string => {
+    const normalizedPath = path.replace(/^\/+|\/+$/g, '');
+    if (normalizedPath === normalizedRootPath) {
+      return '';
+    }
+
+    if (normalizedRootPath.length > 0 && normalizedPath.startsWith(`${normalizedRootPath}/`)) {
+      return normalizedPath.slice(normalizedRootPath.length + 1);
+    }
+
+    return normalizedPath;
+  };
+  const getDestinationPath = (path: string): string => {
+    const relativePath = normalizeDestinationPath(path);
+    return relativePath.length > 0 ? [normalizedRootPath, relativePath].filter(Boolean).join('/') : rootPath;
+  };
   const [currentPath, setCurrentPath] = useState(rootPath);
   const [selectedDestinationPath, setSelectedDestinationPath] = useState(rootPath);
   const handlePathChange = (path: string): void => {
     setCurrentPath(path);
-
-    const normalizedRootPath = rootPath.replace(/\/+$/, '');
-    const normalizedPath = path.replace(/^\/+/, '');
-    let destinationPath = normalizedPath;
-    if (normalizedRootPath.length > 0 && !normalizedPath.startsWith(`${normalizedRootPath}/`)) {
-      destinationPath = [normalizedRootPath, normalizedPath].filter(Boolean).join('/');
-    }
-
-    setSelectedDestinationPath(destinationPath);
+    setSelectedDestinationPath(getDestinationPath(path));
   };
   const {folders, status, shouldShowLoadingSpinner} = useGetCellsFolders({
     cellsRepository,
@@ -94,14 +103,7 @@ export const CellsBulkMovePreviewModal = ({
   }, [selectedFolderPaths, currentPath, translate]);
 
   const driveLabel = translate('cells.bulkMove.drive');
-  const normalizedRootPath = rootPath.replace(/\/+$/, '');
-  const normalizedDestinationPath = selectedDestinationPath.replace(/^\/+|\/+$/g, '');
-  let relativeDestinationPath = normalizedDestinationPath;
-  if (normalizedDestinationPath === normalizedRootPath) {
-    relativeDestinationPath = '';
-  } else if (normalizedRootPath.length > 0 && normalizedDestinationPath.startsWith(`${normalizedRootPath}/`)) {
-    relativeDestinationPath = normalizedDestinationPath.slice(normalizedRootPath.length + 1);
-  }
+  const relativeDestinationPath = normalizeDestinationPath(selectedDestinationPath);
   const currentDestination =
     relativeDestinationPath.length > 0
       ? `${driveLabel} / ${relativeDestinationPath.split('/').filter(Boolean).join(' / ')}`
@@ -127,7 +129,9 @@ export const CellsBulkMovePreviewModal = ({
         conversationName={conversationName}
         currentPath={currentPath}
         onPathChange={handlePathChange}
-        onSelectDestination={setSelectedDestinationPath}
+        onSelectDestination={path => {
+          return setSelectedDestinationPath(getDestinationPath(path));
+        }}
         selectedDestinationPath={selectedDestinationPath}
         disabledDestinationPaths={disabledDestinationPaths}
         disabledDestinationLabels={disabledDestinationLabels}
