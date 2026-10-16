@@ -52,10 +52,10 @@ const translateSelectionForTest: Translate = (key, substitutions) => {
     return 'Move';
   }
   if (key === 'cells.bulkMove.previewTitle') {
-    return `Move ${substitutions?.count} items`;
+    return `Preview move of ${substitutions?.count} items`;
   }
   if (key === 'cells.bulkMove.previewDescription') {
-    return 'Moves stay within this conversation’s Drive.';
+    return 'Preview only. No items will be moved. Destinations stay within this conversation’s Drive.';
   }
   if (key === 'cells.bulkMove.selectedItems') {
     return 'Selected items';
@@ -270,8 +270,12 @@ describe('CellsTable selection', () => {
     await user.click(screen.getByRole('button', {name: 'Move'}));
 
     const preview = await screen.findByRole('dialog');
-    expect(within(preview).getByText('Move 2 items')).toBeInTheDocument();
-    expect(within(preview).getByText('Moves stay within this conversation’s Drive.')).toBeInTheDocument();
+    expect(within(preview).getByText('Preview move of 2 items')).toBeInTheDocument();
+    expect(
+      within(preview).getByText(
+        'Preview only. No items will be moved. Destinations stay within this conversation’s Drive.',
+      ),
+    ).toBeInTheDocument();
     const selectedItems = within(preview).getByRole('region', {name: 'Selected items'});
     expect(within(selectedItems).getByRole('heading', {name: 'Selected items'})).toBeInTheDocument();
     expect(within(selectedItems).getByText('Marketing images')).toBeInTheDocument();
