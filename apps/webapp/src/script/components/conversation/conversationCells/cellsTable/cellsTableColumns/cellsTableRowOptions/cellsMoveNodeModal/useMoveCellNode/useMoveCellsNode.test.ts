@@ -43,6 +43,7 @@ describe('useMoveCellsNode', () => {
         nodeToMove,
         conversationQualifiedId,
         currentPath: 'wire-cells-web/destination',
+        isOpen: true,
       });
     });
 
@@ -68,6 +69,7 @@ describe('useMoveCellsNode', () => {
         nodeToMove,
         conversationQualifiedId,
         currentPath: 'wire-cells-web/destination',
+        isOpen: true,
       });
     });
 

@@ -78,6 +78,7 @@ export const CellsMoveNodeModal = ({
     nodeToMove,
     conversationQualifiedId,
     currentPath,
+    isOpen,
   });
 
   const {
