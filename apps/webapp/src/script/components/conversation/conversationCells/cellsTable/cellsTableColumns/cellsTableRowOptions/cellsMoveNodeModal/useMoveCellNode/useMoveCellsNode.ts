@@ -17,7 +17,7 @@
  *
  */
 
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Result, result, task} from 'true-myth';
@@ -31,6 +31,7 @@ interface UseMoveCellsNodeProps {
   nodeToMove: CellNode;
   conversationQualifiedId: QualifiedId;
   currentPath: string;
+  isOpen: boolean;
 }
 
 export const useMoveCellsNode = ({
@@ -38,8 +39,15 @@ export const useMoveCellsNode = ({
   nodeToMove,
   conversationQualifiedId,
   currentPath,
+  isOpen,
 }: UseMoveCellsNodeProps) => {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+
+  useEffect(() => {
+    if (isOpen) {
+      setStatus('idle');
+    }
+  }, [isOpen]);
 
   const moveNode = async ({
     currentPath,

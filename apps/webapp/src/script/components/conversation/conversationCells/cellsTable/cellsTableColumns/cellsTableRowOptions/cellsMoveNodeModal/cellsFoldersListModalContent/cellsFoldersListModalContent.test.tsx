@@ -17,7 +17,7 @@
  *
  */
 
-import {render, screen} from '@testing-library/react';
+import {fireEvent, render, screen} from '@testing-library/react';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
@@ -33,6 +33,12 @@ const renderContent = (
   status: 'idle' | 'loading' | 'success' | 'error',
   items: {id: string; name: string; path: string}[],
   shouldShowLoadingSpinner = status === 'loading',
+  destinationSelection?: {
+    onSelectDestination: (path: string) => void;
+    selectedDestinationPath: string;
+    disabledDestinationPaths: string[];
+    disabledDestinationLabels: Record<string, string>;
+  },
 ) => {
   const wrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
 
@@ -46,6 +52,7 @@ const renderContent = (
         currentPath="wire-cells-web"
         onPathChange={jest.fn()}
         onChangeModalContent={jest.fn()}
+        {...destinationSelection}
       />
     </StyledApp>,
     {wrapper},
@@ -89,5 +96,38 @@ describe('CellsFoldersListModalContent', () => {
     const folderButton = screen.getByRole('button', {name: 'Documents'});
     expect(folderButton).toBeInTheDocument();
     expect(folderButton.closest('[aria-busy="false"]')).toBeInTheDocument();
+  });
+
+  it('supports destination selection while keeping source and current folders disabled', () => {
+    const onSelectDestination = jest.fn();
+    renderContent(
+      'success',
+      [
+        {id: 'source', name: 'Selected source', path: 'conversation/source'},
+        {id: 'current', name: 'Current folder', path: 'conversation/current'},
+        {id: 'destination', name: 'Design reviews', path: 'conversation/design-reviews'},
+      ],
+      false,
+      {
+        onSelectDestination,
+        selectedDestinationPath: 'conversation/design-reviews',
+        disabledDestinationPaths: ['conversation/source', 'conversation/current'],
+        disabledDestinationLabels: {
+          'conversation/source': 'Selected',
+          'conversation/current': 'Current location',
+        },
+      },
+    );
+
+    const selectedSource = screen.getByRole('button', {name: 'Selected source Selected'});
+    const currentFolder = screen.getByRole('button', {name: 'Current folder Current location'});
+    const destination = screen.getByRole('button', {name: 'Design reviews'});
+
+    expect(selectedSource).toBeDisabled();
+    expect(currentFolder).toBeDisabled();
+    expect(destination).toHaveAttribute('aria-pressed', 'true');
+    fireEvent.click(destination);
+
+    expect(onSelectDestination).toHaveBeenCalledWith('conversation/design-reviews');
   });
 });
