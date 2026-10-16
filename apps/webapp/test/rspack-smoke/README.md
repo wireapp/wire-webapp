@@ -1,13 +1,13 @@
 # Rspack browser smoke tests
 
-These tests serve the generated `dist/rspack-internal` and `dist/rspack-public` files directly over HTTP. They do not use the Webpack development server or require credentials or backend services.
+These tests serve the generated default internal Rspack build in `dist/internal` and the alternative public Rspack build in `dist/rspack-public` directly over HTTP. They do not use the Webpack development server or require credentials or backend services.
 
 ## Run locally
 
 Build both variants and install Chromium once:
 
 ```bash
-yarn nx run webapp:build-rspack
+yarn nx run webapp:build
 yarn nx run webapp:build-rspack-public
 yarn playwright install chromium
 yarn nx run webapp:smoke-rspack

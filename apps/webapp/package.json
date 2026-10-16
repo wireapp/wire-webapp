@@ -7,8 +7,8 @@
   "scripts": {
     "build": "nx build webapp",
     "build:dev": "webpack --config webpack.config.dev.js --progress",
-    "build:prod": "webpack --config webpack.config.js",
-    "build:rspack": "rspack build --config rspack.config.mts",
+    "build:prod": "rspack build --config rspack.config.mts",
+    "build:prod:webpack": "webpack --config webpack.config.js",
     "build:rspack:public": "rspack build --config rspack.config.public.mts",
     "build:prod:public": "webpack --config webpack.config.public.js",
     "test": "nx test webapp",

@@ -166,8 +166,8 @@ jobs:
       - name: Install dependencies
         run: ./bin/yarn --immutable
 
-      - name: Build internal webapp with Rspack
-        run: ./bin/yarn nx run webapp:build-rspack
+      - name: Build internal webapp
+        run: ./bin/yarn nx run webapp:build
 
       - name: Build public webapp with Rspack
         run: ./bin/yarn nx run webapp:build-rspack-public
