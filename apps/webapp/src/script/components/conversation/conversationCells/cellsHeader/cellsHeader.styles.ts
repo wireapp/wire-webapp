@@ -38,6 +38,7 @@ export const contentStyles: CSSObject = {
 };
 
 export const breadcrumbsRowStyles: CSSObject = {
+  position: 'relative',
   display: 'flex',
   width: '100%',
   height: '24px',

@@ -49,13 +49,12 @@ export const CellsHeader = ({
   onSelectionBarAnchorChange,
 }: CellsHeaderProps) => {
   const {translate, isFeatureToggleEnabled} = useApplicationContext();
-  const isSelectionBarEnabled = isFeatureToggleEnabled(driveBulkActionsFeatureToggleName);
+  const isSelectionBarEnabled = isFeatureToggleEnabled(driveBulkActionsFeatureToggleName) && searchValue.length === 0;
 
   return (
     <header css={wrapperStyles}>
       <div css={titleRowStyles}>
         <h2 css={headingStyles}>{translate('cells.heading')}</h2>
-        {isSelectionBarEnabled && <div css={selectionBarAnchorStyles} ref={onSelectionBarAnchorChange} />}
         <CellsRefresh onRefresh={onRefresh} />
       </div>
       <div css={contentStyles}>
@@ -64,6 +63,7 @@ export const CellsHeader = ({
         {searchStatus === 'loading' && <CellsTableLoader />}
         {searchStatus === 'error' && <p>{translate('cells.search.failed')}</p>}
       </div>
+      {isSelectionBarEnabled && <div css={selectionBarAnchorStyles} ref={onSelectionBarAnchorChange} />}
     </header>
   );
 };

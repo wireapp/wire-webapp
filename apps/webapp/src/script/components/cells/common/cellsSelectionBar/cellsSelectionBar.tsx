@@ -37,10 +37,10 @@ export const CellsSelectionBar = ({selectedCount, onClear}: CellsSelectionBarPro
 
   return (
     <div css={selectionBarStyles} role="status" aria-live="polite">
-      <span css={selectionCountStyles}>{translate('cells.selection.selectedCount', {count: selectedCount})}</span>
       <button css={clearButtonStyles} type="button" aria-label={translate('cells.selection.clear')} onClick={onClear}>
         <CloseIcon aria-hidden="true" />
       </button>
+      <span css={selectionCountStyles}>{translate('cells.selection.selectedCount', {count: selectedCount})}</span>
     </div>
   );
 };

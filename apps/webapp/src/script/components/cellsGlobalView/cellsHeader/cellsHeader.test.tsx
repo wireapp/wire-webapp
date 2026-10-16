@@ -30,7 +30,7 @@ import {translateForTest} from 'Util/test/translateForTest';
 
 import {CellsHeader} from './cellsHeader';
 
-const renderCellsHeader = (isBulkActionsEnabled: boolean, onSelectionBarAnchorChange: jest.Mock) => {
+const renderCellsHeader = (isBulkActionsEnabled: boolean, onSelectionBarAnchorChange: jest.Mock, searchValue = '') => {
   const wrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({
       translate: translateForTest,
@@ -43,7 +43,7 @@ const renderCellsHeader = (isBulkActionsEnabled: boolean, onSelectionBarAnchorCh
   return render(
     <StyledApp themeId={THEME_ID.DEFAULT}>
       <CellsHeader
-        searchValue=""
+        searchValue={searchValue}
         onSearch={jest.fn()}
         onClearSearch={jest.fn()}
         onRefresh={jest.fn()}
@@ -57,7 +57,7 @@ const renderCellsHeader = (isBulkActionsEnabled: boolean, onSelectionBarAnchorCh
 };
 
 describe('CellsHeader', () => {
-  it('keeps the selection overlay anchor between the title and refresh action when enabled', () => {
+  it('keeps a full-width selection overlay anchor after the Files toolbar when enabled', () => {
     const onSelectionBarAnchorChange = jest.fn();
     renderCellsHeader(true, onSelectionBarAnchorChange);
 
@@ -65,12 +65,19 @@ describe('CellsHeader', () => {
       return element !== null;
     })?.[0];
 
-    expect(anchor?.parentElement).toBe(screen.getByRole('heading', {name: 'cells.heading'}).parentElement);
+    expect(anchor?.parentElement).toBe(screen.getByRole('heading', {name: 'cells.heading'}).closest('header'));
   });
 
   it('does not render a selection overlay anchor when the feature flag is off', () => {
     const onSelectionBarAnchorChange = jest.fn();
     renderCellsHeader(false, onSelectionBarAnchorChange);
+
+    expect(onSelectionBarAnchorChange).not.toHaveBeenCalled();
+  });
+
+  it('does not render a selection overlay anchor in search results', () => {
+    const onSelectionBarAnchorChange = jest.fn();
+    renderCellsHeader(true, onSelectionBarAnchorChange, 'file name');
 
     expect(onSelectionBarAnchorChange).not.toHaveBeenCalled();
   });

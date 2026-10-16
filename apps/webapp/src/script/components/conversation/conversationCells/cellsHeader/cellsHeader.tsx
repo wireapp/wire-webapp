@@ -19,7 +19,7 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {selectionBarAnchorStyles} from 'Components/cells/common/cellsSelectionBar/cellsSelectionBar.styles';
+import {selectionBarBreadcrumbAnchorStyles} from 'Components/cells/common/cellsSelectionBar/cellsSelectionBar.styles';
 import {CellsSearchInput} from 'Components/cellsSearchInput/cellsSearchInput';
 import {
   CELLS_ACTION,
@@ -156,7 +156,7 @@ export const CellsHeader = ({
               }}
             />
           )}
-          {isSelectionBarEnabled && <div css={selectionBarAnchorStyles} ref={onSelectionBarAnchorChange} />}
+          {isSelectionBarEnabled && <div css={selectionBarBreadcrumbAnchorStyles} ref={onSelectionBarAnchorChange} />}
         </div>
       )}
 

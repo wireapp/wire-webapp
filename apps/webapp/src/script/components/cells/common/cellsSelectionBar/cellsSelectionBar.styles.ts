@@ -21,22 +21,28 @@ import {CSSObject} from '@emotion/react';
 
 export const selectionBarAnchorStyles: CSSObject = {
   position: 'relative',
-  alignSelf: 'flex-start',
-  flex: '1 1 auto',
-  minWidth: '96px',
+  width: '100%',
+  height: '32px',
+};
+
+export const selectionBarBreadcrumbAnchorStyles: CSSObject = {
+  position: 'absolute',
+  zIndex: 1,
+  top: 0,
+  right: 0,
+  left: 0,
   height: '32px',
 };
 
 export const selectionBarStyles: CSSObject = {
   position: 'absolute',
   zIndex: 1,
-  top: 0,
-  right: 0,
+  inset: 0,
   display: 'flex',
+  width: '100%',
   alignItems: 'center',
-  justifyContent: 'space-between',
+  gap: '8px',
   minHeight: '32px',
-  maxWidth: 'min(220px, 100%)',
   padding: '0 8px',
   borderRadius: '8px',
   backgroundColor: 'var(--accent-color-fade-16)',
