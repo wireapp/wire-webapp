@@ -21,6 +21,7 @@ import {render, screen} from '@testing-library/react';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
+import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
@@ -29,30 +30,48 @@ import {translateForTest} from 'Util/test/translateForTest';
 
 import {CellsHeader} from './cellsHeader';
 
-describe('CellsHeader', () => {
-  it('keeps the selection overlay anchor between the title and refresh action', () => {
-    const onSelectionBarAnchorChange = jest.fn();
-    const wrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
+const renderCellsHeader = (isBulkActionsEnabled: boolean, onSelectionBarAnchorChange: jest.Mock) => {
+  const wrapper = createRootProviderWrapperForTest(
+    createRootContextValueForTest({
+      translate: translateForTest,
+      isFeatureToggleEnabled: featureToggleName => {
+        return isBulkActionsEnabled && featureToggleName === driveBulkActionsFeatureToggleName;
+      },
+    }),
+  );
 
-    render(
-      <StyledApp themeId={THEME_ID.DEFAULT}>
-        <CellsHeader
-          searchValue=""
-          onSearch={jest.fn()}
-          onClearSearch={jest.fn()}
-          onRefresh={jest.fn()}
-          searchStatus="idle"
-          filters={[]}
-          onSelectionBarAnchorChange={onSelectionBarAnchorChange}
-        />
-      </StyledApp>,
-      {wrapper},
-    );
+  return render(
+    <StyledApp themeId={THEME_ID.DEFAULT}>
+      <CellsHeader
+        searchValue=""
+        onSearch={jest.fn()}
+        onClearSearch={jest.fn()}
+        onRefresh={jest.fn()}
+        searchStatus="idle"
+        filters={[]}
+        onSelectionBarAnchorChange={onSelectionBarAnchorChange}
+      />
+    </StyledApp>,
+    {wrapper},
+  );
+};
+
+describe('CellsHeader', () => {
+  it('keeps the selection overlay anchor between the title and refresh action when enabled', () => {
+    const onSelectionBarAnchorChange = jest.fn();
+    renderCellsHeader(true, onSelectionBarAnchorChange);
 
     const anchor = onSelectionBarAnchorChange.mock.calls.find(([element]) => {
       return element !== null;
     })?.[0];
 
     expect(anchor?.parentElement).toBe(screen.getByRole('heading', {name: 'cells.heading'}).parentElement);
+  });
+
+  it('does not render a selection overlay anchor when the feature flag is off', () => {
+    const onSelectionBarAnchorChange = jest.fn();
+    renderCellsHeader(false, onSelectionBarAnchorChange);
+
+    expect(onSelectionBarAnchorChange).not.toHaveBeenCalled();
   });
 });

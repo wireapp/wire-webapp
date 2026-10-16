@@ -21,6 +21,7 @@ import {CSSObject} from '@emotion/react';
 
 export const selectionBarAnchorStyles: CSSObject = {
   position: 'relative',
+  alignSelf: 'flex-start',
   flex: '1 1 auto',
   minWidth: '96px',
   height: '32px',

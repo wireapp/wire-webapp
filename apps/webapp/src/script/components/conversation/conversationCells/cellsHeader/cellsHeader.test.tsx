@@ -23,6 +23,7 @@ import userEvent from '@testing-library/user-event';
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
 import type {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
@@ -32,10 +33,6 @@ import {translateForTest} from 'Util/test/translateForTest';
 import {CellsHeader} from './cellsHeader';
 
 const cellsNewItemButtonLabel = 'cells.newItemMenu.button';
-const rootProviderWrapper = createRootProviderWrapperForTest(
-  createRootContextValueForTest({translate: translateForTest}),
-);
-
 const filter = {
   type: 'toggle' as const,
   id: 'sharedViaLink' as const,
@@ -66,12 +63,22 @@ const renderCellsHeader = (
   properties: Partial<typeof defaultProperties> & {
     onSelectionBarAnchorChange?: (anchor: HTMLDivElement | null) => void;
   } = {},
+  isBulkActionsEnabled = true,
 ) => {
+  const wrapper = createRootProviderWrapperForTest(
+    createRootContextValueForTest({
+      translate: translateForTest,
+      isFeatureToggleEnabled: featureToggleName => {
+        return isBulkActionsEnabled && featureToggleName === driveBulkActionsFeatureToggleName;
+      },
+    }),
+  );
+
   return render(
     <StyledApp themeId={THEME_ID.DEFAULT}>
       <CellsHeader {...defaultProperties} {...properties} />
     </StyledApp>,
-    {wrapper: rootProviderWrapper},
+    {wrapper},
   );
 };
 
@@ -85,6 +92,13 @@ describe('CellsHeader', () => {
     })?.[0];
 
     expect(anchor?.parentElement).toBe(container.querySelector('[data-uie-name="cells-selection-overlay-row"]'));
+  });
+
+  it('does not render a selection overlay anchor when the feature flag is off', () => {
+    const onSelectionBarAnchorChange = jest.fn();
+    renderCellsHeader({isSearchViewOpen: false, onSelectionBarAnchorChange}, false);
+
+    expect(onSelectionBarAnchorChange).not.toHaveBeenCalled();
   });
 
   it('hides search and filters while viewing the recycle bin', () => {

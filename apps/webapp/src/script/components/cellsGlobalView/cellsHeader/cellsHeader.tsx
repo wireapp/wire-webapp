@@ -20,6 +20,7 @@
 import {selectionBarAnchorStyles} from 'Components/cells/common/cellsSelectionBar/cellsSelectionBar.styles';
 import {CellsFiltersBar} from 'Components/conversation/conversationCells/common/cellsFiltersBar/cellsFiltersBar';
 import type {FilterConfig} from 'Components/conversation/conversationCells/common/cellsFiltersBar/filterConfig';
+import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {contentStyles, headingStyles, titleRowStyles, wrapperStyles} from './cellsHeader.styles';
@@ -47,13 +48,14 @@ export const CellsHeader = ({
   filters,
   onSelectionBarAnchorChange,
 }: CellsHeaderProps) => {
-  const {translate} = useApplicationContext();
+  const {translate, isFeatureToggleEnabled} = useApplicationContext();
+  const isSelectionBarEnabled = isFeatureToggleEnabled(driveBulkActionsFeatureToggleName);
 
   return (
     <header css={wrapperStyles}>
       <div css={titleRowStyles}>
         <h2 css={headingStyles}>{translate('cells.heading')}</h2>
-        <div css={selectionBarAnchorStyles} ref={onSelectionBarAnchorChange} />
+        {isSelectionBarEnabled && <div css={selectionBarAnchorStyles} ref={onSelectionBarAnchorChange} />}
         <CellsRefresh onRefresh={onRefresh} />
       </div>
       <div css={contentStyles}>

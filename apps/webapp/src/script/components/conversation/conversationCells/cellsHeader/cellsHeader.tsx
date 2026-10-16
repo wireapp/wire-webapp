@@ -27,6 +27,7 @@ import {
 } from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {CellsViewerAccessLabel} from 'Components/conversation/conversationCells/common/cellsViewerAccessLabel';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {
@@ -86,7 +87,8 @@ export const CellsHeader = ({
   showViewerPermission,
   onSelectionBarAnchorChange,
 }: CellsHeaderProps) => {
-  const {translate} = useApplicationContext();
+  const {translate, isFeatureToggleEnabled} = useApplicationContext();
+  const isSelectionBarEnabled = isFeatureToggleEnabled(driveBulkActionsFeatureToggleName);
   const canPerformCellsAction = useCellsActionPermissions();
   const breadcrumbs = getBreadcrumbsFromPath({
     baseCrumb: translate('cells.breadcrumb.files', {conversationName}),
@@ -154,7 +156,7 @@ export const CellsHeader = ({
               }}
             />
           )}
-          <div css={selectionBarAnchorStyles} ref={onSelectionBarAnchorChange} />
+          {isSelectionBarEnabled && <div css={selectionBarAnchorStyles} ref={onSelectionBarAnchorChange} />}
         </div>
       )}
 
