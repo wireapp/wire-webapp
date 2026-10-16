@@ -75,6 +75,8 @@ export interface ModalOptions {
   allButtonsFullWidth?: boolean;
   primaryBtnFirst?: boolean;
   size?: ModalSize;
+  optionPosition?: 'before-actions' | 'after-actions';
+  optionVariant?: 'default' | 'warning';
   /** DOM element where modal should be rendered for detached windows */
   container?: Element | DocumentFragment;
 }
@@ -117,6 +119,8 @@ export interface ModalContent {
   allButtonsFullWidth?: boolean;
   primaryBtnFirst?: boolean;
   size?: ModalSize;
+  optionPosition?: 'before-actions' | 'after-actions';
+  optionVariant?: 'default' | 'warning';
   container?: Element | DocumentFragment;
 }
 

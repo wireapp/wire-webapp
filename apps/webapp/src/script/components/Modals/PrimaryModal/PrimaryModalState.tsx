@@ -188,6 +188,8 @@ const updateCurrentModalContent = (
     primaryBtnFirst = false,
     closeOnSecondaryAction = true,
     size = 'small',
+    optionPosition = 'before-actions',
+    optionVariant = 'default',
     container,
   } = options;
 
@@ -213,6 +215,8 @@ const updateCurrentModalContent = (
     primaryBtnFirst,
     closeOnSecondaryAction,
     size,
+    optionPosition,
+    optionVariant,
     container,
   };
 
@@ -319,6 +323,13 @@ const updateCurrentModalContent = (
   updateCurrentModalId(id ?? null);
 };
 
+const replaceCurrentModal = (type: PrimaryModalType, options: ModalOptions, translate: Translate): void => {
+  const {currentModalId} = usePrimaryModalState.getState();
+  if (!isNullOrUndefined(currentModalId)) {
+    updateCurrentModalContent(type, options, currentModalId, translate);
+  }
+};
+
 const removeCurrentModal = (): void => {
   const {currentModalContent, updateCurrentModalId} = usePrimaryModalState.getState();
 
@@ -326,4 +337,11 @@ const removeCurrentModal = (): void => {
   updateCurrentModalId(null);
 };
 
-export {usePrimaryModalState, defaultContent, addNewModalToQueue, showNextModalInQueue, removeCurrentModal};
+export {
+  usePrimaryModalState,
+  defaultContent,
+  addNewModalToQueue,
+  showNextModalInQueue,
+  removeCurrentModal,
+  replaceCurrentModal,
+};

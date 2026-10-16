@@ -35,8 +35,12 @@ import {CallOptions} from './avPreferences/callOptions';
 import {CameraPreferences} from './avPreferences/cameraPreferences';
 import {MicrophonePreferences} from './avPreferences/microphonePreferences';
 import {SaveCallLogs} from './avPreferences/saveCallLogs';
+import {SendCallLogs} from './avPreferences/sendCallLogs';
 import {PreferencesPage} from './components/preferencesPage';
 import {useCameraReloadOnCallEnd} from './useCameraReloadOnCallEnd';
+
+// Switch to false to offer the local call log download instead.
+const SEND_CALL_LOGS_ENABLED = true;
 
 interface AVPreferencesProps {
   callingRepository: CallingRepository;
@@ -96,7 +100,12 @@ const AVPreferencesComponent = ({propertiesRepository, callingRepository, device
           return callingRepository.refreshAudioInput();
         }}
       />
-      {callingRepository.supportsCalling && <SaveCallLogs {...{callingRepository}} />}
+      {callingRepository.supportsCalling &&
+        (SEND_CALL_LOGS_ENABLED ? (
+          <SendCallLogs callingRepository={callingRepository} />
+        ) : (
+          <SaveCallLogs callingRepository={callingRepository} />
+        ))}
     </PreferencesPage>
   );
 };
