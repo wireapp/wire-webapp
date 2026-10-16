@@ -22,6 +22,7 @@ import {DragEvent, useEffect, useState} from 'react';
 import {isNonEmptyString} from '@sindresorhus/is';
 import {flexRender, getCoreRowModel, type Header, useReactTable} from '@tanstack/react-table';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
+import {createPortal} from 'react-dom';
 
 import {UploadIcon} from '@wireapp/react-ui-kit';
 
@@ -72,6 +73,7 @@ interface CellsTableProps {
   onToggleSort: (field: CellsSortField) => void;
   selectionEnabled: boolean;
   selectionScopeKey: string;
+  selectionBarAnchor: HTMLElement | null;
 }
 
 interface CellsTableHeaderCellProps {
@@ -123,6 +125,7 @@ export const CellsTable = ({
   onToggleSort,
   selectionEnabled,
   selectionScopeKey,
+  selectionBarAnchor,
 }: CellsTableProps) => {
   const {translate, isFeatureToggleEnabled} = useApplicationContext();
   const isSelectionEnabled = selectionEnabled && isFeatureToggleEnabled(driveBulkActionsFeatureToggleName);
@@ -272,14 +275,17 @@ export const CellsTable = ({
   return (
     <CellsFilePreviewModalProvider>
       <div css={tableWrapperStyles}>
-        {isSelectionEnabled && (
-          <CellsSelectionBar
-            selectedCount={selectedNodeIds.size}
-            onClear={() => {
-              return setSelectedNodeIds(new Set());
-            }}
-          />
-        )}
+        {isSelectionEnabled &&
+          selectionBarAnchor !== null &&
+          createPortal(
+            <CellsSelectionBar
+              selectedCount={selectedNodeIds.size}
+              onClear={() => {
+                return setSelectedNodeIds(new Set());
+              }}
+            />,
+            selectionBarAnchor,
+          )}
         {activeFolderDropTargetName !== null && (
           <div css={folderDropOverlayStyles} role="status">
             <UploadIcon width={24} height={24} aria-hidden="true" />

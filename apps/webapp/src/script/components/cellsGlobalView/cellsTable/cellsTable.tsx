@@ -21,6 +21,7 @@ import {useEffect, useState} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 import {flexRender, getCoreRowModel, type Header, useReactTable} from '@tanstack/react-table';
+import {createPortal} from 'react-dom';
 
 import {CellsSelectionBar} from 'Components/cells/common/cellsSelectionBar/cellsSelectionBar';
 import {CellsSortDirection} from 'Components/conversation/conversationCells/common/cellsSortIcon/cellsSortIcon';
@@ -56,6 +57,7 @@ interface CellsTableProps {
   onToggleSort: (field: CellsSortField) => void;
   selectionEnabled: boolean;
   selectionScopeKey: string;
+  selectionBarAnchor: HTMLElement | null;
 }
 
 interface CellsTableHeaderCellProps {
@@ -90,6 +92,7 @@ export const CellsTable = ({
   onToggleSort,
   selectionEnabled,
   selectionScopeKey,
+  selectionBarAnchor,
 }: CellsTableProps) => {
   const {translate, isFeatureToggleEnabled} = useApplicationContext();
   const isSelectionEnabled = selectionEnabled && isFeatureToggleEnabled(driveBulkActionsFeatureToggleName);
@@ -151,14 +154,17 @@ export const CellsTable = ({
   return (
     <FilePreviewProvider>
       <div css={tableWrapperStyles}>
-        {isSelectionEnabled && (
-          <CellsSelectionBar
-            selectedCount={selectedNodeIds.size}
-            onClear={() => {
-              return setSelectedNodeIds(new Set());
-            }}
-          />
-        )}
+        {isSelectionEnabled &&
+          selectionBarAnchor !== null &&
+          createPortal(
+            <CellsSelectionBar
+              selectedCount={selectedNodeIds.size}
+              onClear={() => {
+                return setSelectedNodeIds(new Set());
+              }}
+            />,
+            selectionBarAnchor,
+          )}
         <table css={tableStyles}>
           <thead>
             {table.getHeaderGroups().map(headerGroup => {

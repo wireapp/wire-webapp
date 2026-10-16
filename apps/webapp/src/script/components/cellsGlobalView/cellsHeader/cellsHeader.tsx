@@ -17,6 +17,7 @@
  *
  */
 
+import {selectionBarAnchorStyles} from 'Components/cells/common/cellsSelectionBar/cellsSelectionBar.styles';
 import {CellsFiltersBar} from 'Components/conversation/conversationCells/common/cellsFiltersBar/cellsFiltersBar';
 import type {FilterConfig} from 'Components/conversation/conversationCells/common/cellsFiltersBar/filterConfig';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -34,6 +35,7 @@ interface CellsHeaderProps {
   onRefresh: () => void;
   searchStatus: 'idle' | 'loading' | 'fetchingMore' | 'success' | 'error';
   filters: FilterConfig[];
+  onSelectionBarAnchorChange?: (anchor: HTMLDivElement | null) => void;
 }
 
 export const CellsHeader = ({
@@ -43,6 +45,7 @@ export const CellsHeader = ({
   onRefresh,
   searchStatus,
   filters,
+  onSelectionBarAnchorChange,
 }: CellsHeaderProps) => {
   const {translate} = useApplicationContext();
 
@@ -50,6 +53,7 @@ export const CellsHeader = ({
     <header css={wrapperStyles}>
       <div css={titleRowStyles}>
         <h2 css={headingStyles}>{translate('cells.heading')}</h2>
+        <div css={selectionBarAnchorStyles} ref={onSelectionBarAnchorChange} />
         <CellsRefresh onRefresh={onRefresh} />
       </div>
       <div css={contentStyles}>

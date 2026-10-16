@@ -89,6 +89,7 @@ const renderCellsTable = (selectionEnabled = true, selectionScopeKey = 'filters:
           onToggleSort={jest.fn()}
           selectionEnabled={selectionEnabled}
           selectionScopeKey={scopeKey}
+          selectionBarAnchor={document.body}
         />
       </ThemeProvider>
     );

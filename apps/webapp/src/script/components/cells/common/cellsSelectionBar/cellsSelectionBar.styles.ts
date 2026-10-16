@@ -19,21 +19,27 @@
 
 import {CSSObject} from '@emotion/react';
 
+export const selectionBarAnchorStyles: CSSObject = {
+  position: 'relative',
+  flex: '1 1 auto',
+  minWidth: '96px',
+  height: '32px',
+};
+
 export const selectionBarStyles: CSSObject = {
   position: 'absolute',
-  zIndex: 2,
+  zIndex: 1,
   top: 0,
-  right: '8px',
+  right: 0,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
   minHeight: '32px',
-  maxWidth: 'min(220px, calc(100% - 16px))',
+  maxWidth: 'min(220px, 100%)',
   padding: '0 8px',
   borderRadius: '8px',
   backgroundColor: 'var(--accent-color-fade-16)',
   color: 'var(--main-color)',
-  pointerEvents: 'none',
 };
 
 export const selectionCountStyles: CSSObject = {
@@ -45,7 +51,7 @@ export const selectionCountStyles: CSSObject = {
 };
 
 export const clearButtonStyles: CSSObject = {
-  pointerEvents: 'auto',
+  flexShrink: 0,
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',

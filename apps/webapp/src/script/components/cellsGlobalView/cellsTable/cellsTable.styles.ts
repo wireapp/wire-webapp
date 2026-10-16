@@ -22,7 +22,6 @@ import {CSSObject} from '@emotion/react';
 import {styleBreakpoint} from '../common/styleBreakpoint/styleBreakpoint';
 
 export const wrapperStyles: CSSObject = {
-  position: 'relative',
   maxWidth: '100%',
   overflowX: 'auto',
 };

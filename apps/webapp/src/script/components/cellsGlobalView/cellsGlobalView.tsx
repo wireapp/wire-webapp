@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactElement} from 'react';
+import {ReactElement, useState} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 import {container} from 'tsyringe';
@@ -60,6 +60,7 @@ export const CellsGlobalView = (properties: CellsGlobalViewProps): ReactElement 
     userState = container.resolve(UserState),
   } = properties;
   const {fireAndForgetInvoker, translate} = useApplicationContext();
+  const [selectionBarAnchor, setSelectionBarAnchor] = useState<HTMLDivElement | null>(null);
   const {nodes, status: nodesStatus, pagination} = useCellsStore();
 
   const {filters, filterState} = useGlobalDriveFilters({cellsRepository, conversationRepository, translate});
@@ -108,6 +109,7 @@ export const CellsGlobalView = (properties: CellsGlobalViewProps): ReactElement 
         onRefresh={handleReload}
         searchStatus={nodesStatus}
         filters={filters}
+        onSelectionBarAnchorChange={setSelectionBarAnchor}
       />
       {emptySearchResults && (
         <CellsStateInfo
@@ -124,6 +126,7 @@ export const CellsGlobalView = (properties: CellsGlobalViewProps): ReactElement 
           isSortingEnabled
           onToggleSort={toggleSort}
           {...getGlobalDriveSelectionProps(searchValue, filterState)}
+          selectionBarAnchor={selectionBarAnchor}
         />
       )}
       {showNoFiles && (

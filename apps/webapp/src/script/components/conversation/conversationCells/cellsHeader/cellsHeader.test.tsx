@@ -62,7 +62,11 @@ const defaultProperties = {
   showViewerPermission: false,
 };
 
-const renderCellsHeader = (properties: Partial<typeof defaultProperties> = {}) => {
+const renderCellsHeader = (
+  properties: Partial<typeof defaultProperties> & {
+    onSelectionBarAnchorChange?: (anchor: HTMLDivElement | null) => void;
+  } = {},
+) => {
   return render(
     <StyledApp themeId={THEME_ID.DEFAULT}>
       <CellsHeader {...defaultProperties} {...properties} />
@@ -72,6 +76,17 @@ const renderCellsHeader = (properties: Partial<typeof defaultProperties> = {}) =
 };
 
 describe('CellsHeader', () => {
+  it('provides the selection overlay anchor in the breadcrumb strip', () => {
+    const onSelectionBarAnchorChange = jest.fn();
+    const {container} = renderCellsHeader({isSearchViewOpen: false, onSelectionBarAnchorChange});
+
+    const anchor = onSelectionBarAnchorChange.mock.calls.find(([element]) => {
+      return element !== null;
+    })?.[0];
+
+    expect(anchor?.parentElement).toBe(container.querySelector('[data-uie-name="cells-selection-overlay-row"]'));
+  });
+
   it('hides search and filters while viewing the recycle bin', () => {
     renderCellsHeader({isInRecycleBin: true});
 

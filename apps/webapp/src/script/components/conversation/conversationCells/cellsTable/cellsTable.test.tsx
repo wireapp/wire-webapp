@@ -141,6 +141,7 @@ const renderCellsTable = ({
           onToggleSort={jest.fn()}
           selectionEnabled={isSelectionEnabled}
           selectionScopeKey={scopeKey}
+          selectionBarAnchor={document.body}
         />
       </ThemeProvider>
     );

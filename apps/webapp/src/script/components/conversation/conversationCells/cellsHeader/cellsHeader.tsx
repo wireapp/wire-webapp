@@ -19,6 +19,7 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
+import {selectionBarAnchorStyles} from 'Components/cells/common/cellsSelectionBar/cellsSelectionBar.styles';
 import {CellsSearchInput} from 'Components/cellsSearchInput/cellsSearchInput';
 import {
   CELLS_ACTION,
@@ -64,6 +65,7 @@ interface CellsHeaderProps {
   isUploadFilesEnabled: boolean;
   filters: FilterConfig[];
   showViewerPermission: boolean;
+  onSelectionBarAnchorChange?: (anchor: HTMLDivElement | null) => void;
 }
 
 export const CellsHeader = ({
@@ -82,6 +84,7 @@ export const CellsHeader = ({
   isUploadFilesEnabled,
   filters,
   showViewerPermission,
+  onSelectionBarAnchorChange,
 }: CellsHeaderProps) => {
   const {translate} = useApplicationContext();
   const canPerformCellsAction = useCellsActionPermissions();
@@ -134,7 +137,7 @@ export const CellsHeader = ({
       </div>
 
       {!isSearchViewOpen && (
-        <div css={breadcrumbsRowStyles}>
+        <div css={breadcrumbsRowStyles} data-uie-name="cells-selection-overlay-row">
           {isRootLevel ? (
             <CellsRootHomeIcon />
           ) : (
@@ -151,6 +154,7 @@ export const CellsHeader = ({
               }}
             />
           )}
+          <div css={selectionBarAnchorStyles} ref={onSelectionBarAnchorChange} />
         </div>
       )}
 
