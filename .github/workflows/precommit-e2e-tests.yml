@@ -11,6 +11,10 @@ on:
       grep:
         type: string
         description: Define which tests to run, the given value will be passed to the `--grep` flag of playwright
+      usePublicRspack:
+        type: boolean
+        description: Package the public Rspack build for this manual precommit run
+        default: false
   pull_request:
     types: [labeled, opened, synchronize, reopened]
   schedule:
@@ -64,20 +68,27 @@ jobs:
       - run: ./bin/yarn nx run webapp:configure
       - id: package
         env:
+          EVENT_NAME: ${{ github.event_name }}
+          USE_PUBLIC_RSPACK: ${{ inputs.usePublicRspack }}
           WIRE_WEBAPP_BUILD_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
           short_commit_sha="${WIRE_WEBAPP_BUILD_COMMIT::7}"
           expected_version="dev-${short_commit_sha}"
 
-          WIRE_WEBAPP_BUILD_VERSION="${expected_version}" \
-            ./bin/yarn build:prod
+          if [[ "${EVENT_NAME}" == "workflow_dispatch" && "${USE_PUBLIC_RSPACK}" == "true" ]]; then
+            WIRE_WEBAPP_BUILD_VERSION="${expected_version}" \
+              ./bin/yarn nx run server:package-rspack-public
+          else
+            WIRE_WEBAPP_BUILD_VERSION="${expected_version}" \
+              ./bin/yarn build:prod
+          fi
 
           {
             echo "expected_version=${expected_version}"
             echo "expected_commit=${WIRE_WEBAPP_BUILD_COMMIT}"
           } >> "$GITHUB_OUTPUT"
 
-      - name: Validate internal deployment package
+      - name: Validate deployment package
         env:
           BUILD_ARTIFACT_PATH: ${{ env.BUILD_DIR }}${{ env.BUILD_ARTIFACT }}
           EXPECTED_COMMIT: ${{ steps.package.outputs.expected_commit }}
