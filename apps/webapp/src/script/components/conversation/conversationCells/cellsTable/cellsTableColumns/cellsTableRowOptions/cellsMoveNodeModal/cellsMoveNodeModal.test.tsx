@@ -110,4 +110,41 @@ describe('CellsMoveNodeModal', () => {
     expect(onClose).not.toHaveBeenCalled();
     expect(navigateToPath).not.toHaveBeenCalled();
   });
+
+  it('returns to the folder picker and refreshes folders after creating a folder', async () => {
+    renderMoveModal();
+    fireEvent.click(await screen.findByRole('button', {name: 'cells.moveNodeModal.createFolder.hintButton'}));
+
+    fireEvent.change(screen.getByLabelText('cells.newItemMenuModal.labelFolder'), {
+      target: {value: 'Reports'},
+    });
+    fireEvent.click(screen.getByRole('button', {name: 'cells.newItemMenuModal.primaryAction'}));
+    await waitFor(() => {
+      expect(cellsRepository.getAllNodes).toHaveBeenCalledTimes(2);
+    });
+
+    expect(cellsRepository.createFolder).toHaveBeenCalledWith({
+      path: 'conversation-id@wire.com',
+      name: 'Reports',
+    });
+    expect(screen.getByRole('button', {name: 'cells.moveNodeModal.moveButton'})).toBeInTheDocument();
+    expect(onClose).not.toHaveBeenCalled();
+    expect(navigateToPath).not.toHaveBeenCalled();
+  });
+
+  it('keeps the folder form open and shows an error when folder creation fails', async () => {
+    cellsRepository.createFolder.mockRejectedValue(new Error('folder creation failed'));
+    renderMoveModal();
+    fireEvent.click(await screen.findByRole('button', {name: 'cells.moveNodeModal.createFolder.hintButton'}));
+
+    fireEvent.change(screen.getByLabelText('cells.newItemMenuModal.labelFolder'), {
+      target: {value: 'Reports'},
+    });
+    fireEvent.click(screen.getByRole('button', {name: 'cells.newItemMenuModal.primaryAction'}));
+
+    expect(await screen.findByText('cells.newItemMenuModalForm.genericError')).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'cells.newItemMenuModal.primaryAction'})).toBeInTheDocument();
+    expect(onClose).not.toHaveBeenCalled();
+    expect(navigateToPath).not.toHaveBeenCalled();
+  });
 });
