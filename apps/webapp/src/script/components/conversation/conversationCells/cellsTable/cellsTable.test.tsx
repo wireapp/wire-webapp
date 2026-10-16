@@ -244,6 +244,8 @@ describe('CellsTable selection', () => {
   });
 
   it('previews every selected item and browses destinations without moving or clearing selection', async () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files/wire-cells-web';
     const user = userEvent.setup();
     const repository = {
       getAllNodes: jest
@@ -285,8 +287,8 @@ describe('CellsTable selection', () => {
 
     const selectedSourceFolder = await within(preview).findByRole('button', {name: 'Marketing images Selected'});
     expect(selectedSourceFolder).toBeDisabled();
-    await user.click(await within(preview).findByRole('button', {name: 'Legal'}));
-    expect(within(preview).getByText('Current destination: Drive / wire-cells-web / Legal')).toBeInTheDocument();
+    await user.click(await within(preview).findByRole('button', {name: 'Design reviews'}));
+    expect(within(preview).getByText('Current destination: Drive / Design reviews')).toBeInTheDocument();
 
     await user.click(within(preview).getByRole('button', {name: 'Open Design reviews'}));
     expect(await within(preview).findByText('Current destination: Drive / Design reviews')).toBeInTheDocument();
@@ -318,6 +320,7 @@ describe('CellsTable selection', () => {
     await user.click(within(reopenedPreview).getByRole('button', {name: 'cells.moveNodeModal.cancelButton'}));
 
     expect(repository.moveNode).not.toHaveBeenCalled();
+    window.location.hash = originalHash;
   });
 });
 
