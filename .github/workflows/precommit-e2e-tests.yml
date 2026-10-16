@@ -11,6 +11,10 @@ on:
       grep:
         type: string
         description: Define which tests to run, the given value will be passed to the `--grep` flag of playwright
+      useRspack:
+        type: boolean
+        description: Build with Rspack and deploy to the manual precommit environment for validation
+        default: false
   pull_request:
     types: [labeled, opened, synchronize, reopened]
   schedule:
@@ -23,15 +27,22 @@ concurrency:
   group: precommit-crit-flows-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions: {}
+
 jobs:
   build:
-    if: ${{ github.repository == 'wireapp/wire-webapp' && (github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'run-e2e')) }}
+    name: Build and package Webapp
+    if: ${{ github.repository == 'wireapp/wire-webapp' && (github.event_name != 'pull_request' || (github.event.pull_request.head.repo.full_name == github.repository && contains(github.event.pull_request.labels.*.name, 'run-e2e'))) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 20
+    permissions:
+      contents: read
 
     outputs:
       build_artifact: ${{ env.BUILD_ARTIFACT }}
       env_name: ${{ steps.slot.outputs.env_name }}
+      expected_version: ${{ steps.package.outputs.expected_version }}
+      expected_commit: ${{ steps.package.outputs.expected_commit }}
 
     env:
       BUILD_DIR: apps/server/dist/s3/
@@ -55,20 +66,77 @@ jobs:
 
       - run: ./bin/yarn --immutable
       - run: ./bin/yarn nx run webapp:configure
-      - env:
+      - id: package
+        env:
           WIRE_WEBAPP_BUILD_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+          USE_RSPACK: ${{ github.event_name == 'workflow_dispatch' && inputs.useRspack }}
         run: |
           short_commit_sha="${WIRE_WEBAPP_BUILD_COMMIT::7}"
-          WIRE_WEBAPP_BUILD_VERSION="dev-${short_commit_sha}" \
-          ./bin/yarn build:prod
+          expected_version="dev-${short_commit_sha}"
+
+          if [[ "${USE_RSPACK}" == "true" ]]; then
+            WIRE_WEBAPP_BUILD_VERSION="${expected_version}" \
+              ./bin/yarn nx run server:package-rspack
+          else
+            WIRE_WEBAPP_BUILD_VERSION="${expected_version}" \
+              ./bin/yarn build:prod
+          fi
+
+          {
+            echo "expected_version=${expected_version}"
+            echo "expected_commit=${WIRE_WEBAPP_BUILD_COMMIT}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Validate Rspack deployment package
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.useRspack }}
+        env:
+          BUILD_ARTIFACT_PATH: ${{ env.BUILD_DIR }}${{ env.BUILD_ARTIFACT }}
+          EXPECTED_COMMIT: ${{ steps.package.outputs.expected_commit }}
+          EXPECTED_VERSION: ${{ steps.package.outputs.expected_version }}
+        run: |
+          set -euo pipefail
+
+          test -f "$BUILD_ARTIFACT_PATH"
+          unzip -tq "$BUILD_ARTIFACT_PATH"
+          node ./tools/buildArtifact/validateBuildArtifact.mts
+
+          archive_entries="$(unzip -Z1 "$BUILD_ARTIFACT_PATH")"
+          required_rspack_entry_scripts=(
+            static/min/app.js
+            static/min/auth.js
+            static/min/checkBrowser.js
+            static/min/runtime.js
+            static/min/vendor.js
+            static/min/dexie.js
+          )
+
+          for entry_script_path in "${required_rspack_entry_scripts[@]}"; do
+            if ! grep -Fqx -- "$entry_script_path" <<< "$archive_entries"; then
+              echo "Rspack deployment package is missing required entry script: $entry_script_path" >&2
+              exit 1
+            fi
+          done
+
+          rspack_runtime="$(unzip -p "$BUILD_ARTIFACT_PATH" static/min/runtime.js)"
+          if ! grep -Fq 'rspackChunk_wireapp_webapp' <<< "$rspack_runtime"; then
+            echo "Deployment package does not contain the Rspack runtime fingerprint." >&2
+            exit 1
+          fi
+
+          if grep -Fq 'webpackChunk_wireapp_webapp' <<< "$rspack_runtime"; then
+            echo "Deployment package contains the Webpack runtime fingerprint." >&2
+            exit 1
+          fi
 
       - name: Compute target EB environment
         id: slot
+        env:
+          EVENT_NAME: ${{ github.event_name }}
         run: |
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+          if [[ "$EVENT_NAME" == "pull_request" ]]; then
             # If the PR was labelled with "run-e2e" execute the workflow against a third environment
             echo "env_name=wire-webapp-precommit-3" >> "$GITHUB_OUTPUT"
-          elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+          elif [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
             # Keep manual runs away from the scheduled critical-flow slot.
             echo "env_name=wire-webapp-precommit-2" >> "$GITHUB_OUTPUT"
           else
@@ -89,13 +157,19 @@ jobs:
 
   deploy_and_run_e2e:
     name: Deploy to precommit and run E2E
-    if: ${{ success() && github.repository == 'wireapp/wire-webapp' }}
+    if: ${{ success() && github.repository == 'wireapp/wire-webapp' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
     needs: [build]
-    uses: ./.github/workflows/precommit-slot-run.yml
+    permissions:
+      contents: read
+    uses: $/.github/workflows/precommit-slot-run.yml
     with:
       env_name: ${{ needs.build.outputs.env_name }}
       teamManagementUrl: https://wire-teams-staging.zinfra.io/login/
-      grep: ''
+      grep: ${{ github.event_name == 'workflow_dispatch' && inputs.grep || '' }}
+      expectedVersion: ${{ github.event_name == 'workflow_dispatch' && inputs.useRspack && needs.build.outputs.expected_version || '' }}
+      expectedCommit: ${{ github.event_name == 'workflow_dispatch' && inputs.useRspack && needs.build.outputs.expected_commit || '' }}
+      expectedBackendRest: ${{ github.event_name == 'workflow_dispatch' && inputs.useRspack && 'https://staging-nginz-https.zinfra.io/' || '' }}
+      expectedBackendWs: ${{ github.event_name == 'workflow_dispatch' && inputs.useRspack && 'wss://staging-nginz-ssl.zinfra.io/' || '' }}
       notify_deployoholics_on_failure: ${{ github.event_name == 'schedule' }}
     secrets:
       OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
@@ -106,10 +180,11 @@ jobs:
 
   run_e2e_tests:
     name: Playwright Critical Flow
-    if: ${{ always() && github.repository == 'wireapp/wire-webapp' && (github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'run-e2e')) }}
+    if: ${{ always() && github.repository == 'wireapp/wire-webapp' && (github.event_name != 'pull_request' || (github.event.pull_request.head.repo.full_name == github.repository && contains(github.event.pull_request.labels.*.name, 'run-e2e'))) }}
     needs: [deploy_and_run_e2e]
     runs-on: ubuntu-24.04
     timeout-minutes: 5
+    permissions: {}
     steps:
       - name: Report Status
         env:
@@ -128,6 +203,7 @@ jobs:
     if: ${{ always() && github.repository == 'wireapp/wire-webapp' && (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') }}
     runs-on: ubuntu-24.04
     timeout-minutes: 10
+    permissions: {}
     steps:
       - name: Download report
         if: ${{ needs.deploy_and_run_e2e.outputs.reportArtifactId != '' }}
