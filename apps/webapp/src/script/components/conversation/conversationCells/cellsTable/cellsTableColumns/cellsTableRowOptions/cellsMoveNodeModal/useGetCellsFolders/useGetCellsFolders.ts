@@ -32,7 +32,7 @@ import {transformNodesToCellsFolders} from './transformNodesToCellsFolders';
 
 interface UseGetCellsFoldersProps {
   currentPath: string;
-  nodeToMove: CellNode;
+  nodeToMove?: CellNode;
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
   enabled: boolean;
@@ -103,7 +103,7 @@ export const useGetCellsFolders = ({
 
     const transformedFolders = transformNodesToCellsFolders(nodes);
     const filteredFolders = transformedFolders.filter(folder => {
-      return folder.path !== nodeToMove.path;
+      return folder.path !== nodeToMove?.path;
     });
 
     setFolders(filteredFolders);
