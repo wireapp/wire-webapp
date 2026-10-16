@@ -252,9 +252,15 @@ describe('CellsTable selection', () => {
           Nodes: [
             {Type: 'COLLECTION', Uuid: 'source-folder', Path: 'wire-cells-web/Marketing images'},
             {Type: 'COLLECTION', Uuid: 'design-reviews', Path: 'wire-cells-web/Design reviews'},
+            {Type: 'COLLECTION', Uuid: 'legal', Path: 'wire-cells-web/Legal'},
           ],
         })
-        .mockResolvedValueOnce({Nodes: []}),
+        .mockResolvedValueOnce({
+          Nodes: [
+            {Type: 'COLLECTION', Uuid: 'quarterly-reviews', Path: 'wire-cells-web/Design reviews/Quarterly reviews'},
+          ],
+        })
+        .mockResolvedValue({Nodes: []}),
       moveNode: jest.fn(),
     } as unknown as CellsRepository;
     renderCellsTable({cellsRepository: repository, folderPath: 'wire-cells-web/Marketing images'});
@@ -275,14 +281,18 @@ describe('CellsTable selection', () => {
 
     const selectedSourceFolder = await within(preview).findByRole('button', {name: 'Marketing images Selected'});
     expect(selectedSourceFolder).toBeDisabled();
-    await user.click(await within(preview).findByRole('button', {name: 'Design reviews'}));
-    expect(await within(preview).findByText('Current destination: Design reviews')).toBeInTheDocument();
+    await user.click(await within(preview).findByRole('button', {name: 'Legal'}));
+    expect(within(preview).getByText('Current destination: Drive / wire-cells-web / Legal')).toBeInTheDocument();
 
     await user.click(within(preview).getByRole('button', {name: 'Open Design reviews'}));
+    expect(await within(preview).findByText('Current destination: Drive / Design reviews')).toBeInTheDocument();
+    await user.click(await within(preview).findByRole('button', {name: 'Open Quarterly reviews'}));
+    expect(
+      await within(preview).findByText('Current destination: Drive / Design reviews / Quarterly reviews'),
+    ).toBeInTheDocument();
     await waitFor(() => {
-      expect(repository.getAllNodes).toHaveBeenCalledTimes(2);
+      expect(repository.getAllNodes).toHaveBeenCalledTimes(3);
     });
-    expect(within(preview).getByText('Current destination: Design reviews')).toBeInTheDocument();
     expect(repository.moveNode).not.toHaveBeenCalled();
 
     await user.click(within(preview).getByRole('button', {name: 'cells.moveNodeModal.cancelButton'}));
@@ -293,6 +303,16 @@ describe('CellsTable selection', () => {
         return (checkbox as HTMLInputElement).checked;
       }),
     ).toBe(true);
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+    await user.click(screen.getByRole('button', {name: 'Move'}));
+    const reopenedPreview = await screen.findByRole('dialog');
+    expect(within(reopenedPreview).getByText('Current destination: Drive')).toBeInTheDocument();
+    const reopenedSelectedItems = within(reopenedPreview).getByRole('region', {name: 'Selected items'});
+    expect(within(reopenedSelectedItems).getByText('Wire logs.pdf')).toBeInTheDocument();
+    expect(within(reopenedSelectedItems).queryByText('Marketing images')).not.toBeInTheDocument();
+    await user.click(within(reopenedPreview).getByRole('button', {name: 'cells.moveNodeModal.cancelButton'}));
+
     expect(repository.moveNode).not.toHaveBeenCalled();
   });
 });
