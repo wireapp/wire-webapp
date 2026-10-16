@@ -25,6 +25,7 @@ import {ThemeProvider} from '@wireapp/react-ui-kit';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {
+  createExecutingFireAndForgetInvokerForTest,
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
@@ -130,6 +131,7 @@ const renderCellsTable = ({
   const wrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({
       translate: translateSelectionForTest,
+      fireAndForgetInvoker: createExecutingFireAndForgetInvokerForTest(),
       isFeatureToggleEnabled: featureToggleName => {
         return isBulkActionsEnabled && featureToggleName === driveBulkActionsFeatureToggleName;
       },
@@ -264,15 +266,16 @@ describe('CellsTable selection', () => {
     const preview = await screen.findByRole('dialog');
     expect(within(preview).getByText('Move 2 items')).toBeInTheDocument();
     expect(within(preview).getByText('Moves stay within this conversation’s Drive.')).toBeInTheDocument();
-    expect(within(preview).getByRole('heading', {name: 'Selected items'})).toBeInTheDocument();
-    expect(within(preview).getByText('Marketing images')).toBeInTheDocument();
-    expect(within(preview).getByText('Wire logs.pdf')).toBeInTheDocument();
+    const selectedItems = within(preview).getByRole('region', {name: 'Selected items'});
+    expect(within(selectedItems).getByRole('heading', {name: 'Selected items'})).toBeInTheDocument();
+    expect(within(selectedItems).getByText('Marketing images')).toBeInTheDocument();
+    expect(within(selectedItems).getByText('Wire logs.pdf')).toBeInTheDocument();
     expect(within(preview).getByText('Current destination: Drive')).toBeInTheDocument();
     expect(within(preview).queryByRole('button', {name: 'Move'})).not.toBeInTheDocument();
 
-    const selectedSourceFolder = within(preview).getByRole('button', {name: 'Marketing images Selected'});
+    const selectedSourceFolder = await within(preview).findByRole('button', {name: 'Marketing images Selected'});
     expect(selectedSourceFolder).toBeDisabled();
-    await user.click(within(preview).getByRole('button', {name: 'Design reviews'}));
+    await user.click(await within(preview).findByRole('button', {name: 'Design reviews'}));
     expect(await within(preview).findByText('Current destination: Design reviews')).toBeInTheDocument();
 
     await user.click(within(preview).getByRole('button', {name: 'Open Design reviews'}));
