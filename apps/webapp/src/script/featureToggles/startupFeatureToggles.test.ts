@@ -26,6 +26,7 @@ import {
   applockRefactoredFeatureToggleName,
   conversationListCollapseFeatureToggleName,
   disableMessagePreprocessingFeatureToggleName,
+  driveBulkActionsFeatureToggleName,
   sharedDriveDirectUploadFeatureToggleName,
   startupFeatureToggleNames,
   forTestsOnlyFeatureToggleName,
@@ -37,6 +38,7 @@ const featureToggleNamesWithDedicatedExistenceTests = [
   forTestsOnlyFeatureToggleName,
   disableMessagePreprocessingFeatureToggleName,
   sharedDriveDirectUploadFeatureToggleName,
+  driveBulkActionsFeatureToggleName,
 ] as const;
 
 describe('startupFeatureToggles', function () {
@@ -45,6 +47,20 @@ describe('startupFeatureToggles', function () {
 
     expect(startupFeatureToggles.isFeatureToggleEnabled(applockRefactoredFeatureToggleName)).toBe(false);
     expect(startupFeatureToggles.enabledFeatureToggleNames).toEqual([]);
+  });
+
+  it('keeps Drive bulk actions disabled by default', () => {
+    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch('');
+
+    expect(startupFeatureToggles.isFeatureToggleEnabled(driveBulkActionsFeatureToggleName)).toBe(false);
+  });
+
+  it('enables Drive bulk actions when selected in developer settings', () => {
+    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
+      `?${startupFeatureToggleQueryParameterName}=${driveBulkActionsFeatureToggleName}`,
+    );
+
+    expect(startupFeatureToggles.isFeatureToggleEnabled(driveBulkActionsFeatureToggleName)).toBe(true);
   });
 
   it('enables a whitelisted feature toggle when present in the query parameter', () => {
@@ -173,6 +189,7 @@ describe('startupFeatureToggles', function () {
       forTestsOnlyFeatureToggleName,
       disableMessagePreprocessingFeatureToggleName,
       sharedDriveDirectUploadFeatureToggleName,
+      driveBulkActionsFeatureToggleName,
     ]);
   });
 
