@@ -20,6 +20,7 @@
 import {FolderIcon} from '@wireapp/react-ui-kit';
 
 import {ChevronRight} from 'Components/icon';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {
   arrowIconStyles,
@@ -28,6 +29,7 @@ import {
   listStyles,
   nameStyles,
   nameWrapperStyles,
+  navigateButtonStyles,
 } from './cellsFolderList.styles';
 
 interface CellsFolderListProps {
@@ -47,6 +49,8 @@ export const CellsFolderList = ({
   disabledDestinationPaths = [],
   disabledDestinationLabels = {},
 }: CellsFolderListProps) => {
+  const {translate} = useApplicationContext();
+
   return (
     <ul css={listStyles}>
       {items.map(item => {
@@ -72,8 +76,21 @@ export const CellsFolderList = ({
               {disabledDestinationLabels[item.path] !== undefined && (
                 <span>{disabledDestinationLabels[item.path]}</span>
               )}
-              {onSelectDestination !== undefined ? null : <ChevronRight width={16} height={16} css={arrowIconStyles} />}
+              {onSelectDestination === undefined && <ChevronRight width={16} height={16} css={arrowIconStyles} />}
             </button>
+            {onSelectDestination !== undefined && (
+              <button
+                type="button"
+                css={navigateButtonStyles}
+                aria-label={translate('cells.moveNodeModal.openFolder', {folderName: item.name})}
+                disabled={disabledDestinationPaths.includes(item.path)}
+                onClick={() => {
+                  return onNavigate(item.path);
+                }}
+              >
+                <ChevronRight width={16} height={16} css={arrowIconStyles} />
+              </button>
+            )}
           </li>
         );
       })}

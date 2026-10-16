@@ -27,6 +27,7 @@ import {createPortal} from 'react-dom';
 import {UploadIcon} from '@wireapp/react-ui-kit';
 
 import {CellsSelectionBar} from 'Components/cells/common/cellsSelectionBar/cellsSelectionBar';
+import {CellsBulkMovePreviewModal} from 'Components/conversation/conversationCells/cellsTable/cellsBulkMovePreviewModal/cellsBulkMovePreviewModal';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
@@ -132,9 +133,11 @@ export const CellsTable = ({
   const [selectedNodeIds, setSelectedNodeIds] = useState<Set<string>>(() => {
     return new Set();
   });
+  const [isBulkMovePreviewOpen, setIsBulkMovePreviewOpen] = useState(false);
 
   useEffect(() => {
     setSelectedNodeIds(new Set());
+    setIsBulkMovePreviewOpen(false);
   }, [selectionScopeKey, isSelectionEnabled]);
 
   useEffect(() => {
@@ -197,6 +200,9 @@ export const CellsTable = ({
   });
 
   const rows = table.getRowModel().rows;
+  const selectedNodes = nodes.filter(node => {
+    return selectedNodeIds.has(node.id);
+  });
   const tableWrapperStyles = rows.length > 0 ? [wrapperStyles, wrapperWithRowsStyles] : wrapperStyles;
 
   useEffect(() => {
@@ -283,9 +289,24 @@ export const CellsTable = ({
               onClear={() => {
                 return setSelectedNodeIds(new Set());
               }}
+              onMove={() => {
+                return setIsBulkMovePreviewOpen(true);
+              }}
             />,
             selectionBarAnchor,
           )}
+        {isBulkMovePreviewOpen && (
+          <CellsBulkMovePreviewModal
+            isOpen
+            onClose={() => {
+              return setIsBulkMovePreviewOpen(false);
+            }}
+            selectedNodes={selectedNodes}
+            cellsRepository={cellsRepository}
+            conversationQualifiedId={conversationQualifiedId}
+            conversationName={conversationName}
+          />
+        )}
         {activeFolderDropTargetName !== null && (
           <div css={folderDropOverlayStyles} role="status">
             <UploadIcon width={24} height={24} aria-hidden="true" />
