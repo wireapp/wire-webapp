@@ -21,6 +21,7 @@ import type {Page, Response} from '@playwright/test';
 import {noop} from 'noop-esm';
 import {match} from 'ts-pattern';
 import {Maybe} from 'true-myth';
+import {hideServiceWorkerApiInRspackContext} from '../rspackTestSupport';
 
 type RuntimeDiagnostics = {
   readonly uncaughtPageErrors: string[];
@@ -199,4 +200,35 @@ test('initializes authentication and navigates to an interactive login form', as
   await passwordInput.fill('rspack-smoke-password');
   await expect(page.getByRole('button', {name: 'Log in'})).toBeEnabled();
   expectNoRuntimeFailures({diagnostics, buildProjectName: testInfo.project.name});
+});
+
+test('loads authentication with blocked service workers when the Service Worker API is unavailable', async ({
+  browser,
+}, testInfo) => {
+  const baseUrl = Maybe.of(testInfo.project.use.baseURL).match({
+    Just: projectBaseUrl => {
+      return projectBaseUrl;
+    },
+    Nothing: () => {
+      throw new Error(`Playwright project '${testInfo.project.name}' must define a base URL`);
+    },
+  });
+  const context = await browser.newContext({serviceWorkers: 'block'});
+
+  try {
+    await hideServiceWorkerApiInRspackContext(context);
+    const page = await context.newPage();
+    const diagnostics = captureRuntimeDiagnostics({page, baseUrl});
+    await page.goto(new URL('/auth', baseUrl).toString());
+
+    await expect(page.getByRole('button', {name: 'Log in'})).toBeVisible();
+    const serviceWorkerApiType = await page.evaluate(() => {
+      return typeof navigator.serviceWorker;
+    });
+
+    expect(serviceWorkerApiType).toBe('undefined');
+    expectNoRuntimeFailures({diagnostics, buildProjectName: testInfo.project.name});
+  } finally {
+    await context.close();
+  }
 });

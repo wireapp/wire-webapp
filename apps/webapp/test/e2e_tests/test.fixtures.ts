@@ -33,6 +33,7 @@ import {Role} from '@wireapp/api-client/lib/team';
 import {FEATURE_KEY} from '@wireapp/api-client/lib/team/feature';
 import {BrigRepositoryE2E} from './backend/brigRepository.e2e';
 import {Maybe} from 'true-myth';
+import {hideServiceWorkerApiInRspackContext} from '../rspackTestSupport';
 import {
   captureRspackRuntimeDiagnostics,
   createRspackRuntimeDiagnostics,
@@ -145,6 +146,7 @@ export const test = baseTest.extend<Fixtures>({
         buildDirectoryPath,
         generatedRuntimeConfiguration: readGeneratedRspackRuntimeConfiguration(),
       });
+      await hideServiceWorkerApiInRspackContext(context);
       rspackDiagnosticsByContext.set(context, diagnostics);
       rspackContexts.push({diagnostics, routeState});
 
