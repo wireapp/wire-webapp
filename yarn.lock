@@ -29794,10 +29794,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ts-pattern@npm:5.9.1":
-  version: 5.9.1
-  resolution: "ts-pattern@npm:5.9.1"
-  checksum: 10/7d6905e06a988dfe8a12c335b6b21fbafdfdfcc3664b3c38388c1f75784f8d7c34accfd1a65d4eae9146dbd17c7bff3a0e61d776b2dc666a47d855364bbe8b07
+"ts-pattern@npm:5.9.2":
+  version: 5.9.2
+  resolution: "ts-pattern@npm:5.9.2"
+  checksum: 10/e889fbe8248ac72c4f6916a0c954357a44ec0d29b99cecccc2e839566888febba56b75b3f6cb6ab81b0aec637e26d45bb7d84a00c4714adf1b88cd5a0011aed6
   languageName: node
   linkType: hard
 
@@ -31759,7 +31759,7 @@ __metadata:
     stylelint-config-idiomatic-order: "npm:10.0.0"
     true-myth: "npm:9.4.0"
     ts-node: "npm:10.9.2"
-    ts-pattern: "npm:5.9.1"
+    ts-pattern: "npm:5.9.2"
     tsc-watch: "npm:7.2.1"
     tslib: "npm:2.8.1"
     type-fest: "npm:5.10.0"
