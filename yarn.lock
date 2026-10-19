@@ -8891,15 +8891,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tanstack/react-virtual@npm:3.14.20":
-  version: 3.14.20
-  resolution: "@tanstack/react-virtual@npm:3.14.20"
+"@tanstack/react-virtual@npm:3.14.21":
+  version: 3.14.21
+  resolution: "@tanstack/react-virtual@npm:3.14.21"
   dependencies:
-    "@tanstack/virtual-core": "npm:3.19.5"
+    "@tanstack/virtual-core": "npm:3.19.6"
   peerDependencies:
     react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
     react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-  checksum: 10/194f2fde8304dffe7402aadfb2ef65b4407c81ef24a6dc16749d73db9832c842b523808729cce2eea2d3ffdc114b84086ad7a7b9dbb53ccb255e4a4c1122900b
+  checksum: 10/9459f9f14121a532c2b3e87de6b4c31cc8888ab36a72c63b5505e84ac0b5e8a3519ad31c2f15c4302cadca2960c147dee5127f207cc7f73125b3937b59ee5a5a
   languageName: node
   linkType: hard
 
@@ -8910,10 +8910,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tanstack/virtual-core@npm:3.19.5":
-  version: 3.19.5
-  resolution: "@tanstack/virtual-core@npm:3.19.5"
-  checksum: 10/be8b09a893ccb0a98de3fd28c7a21264685a8b104bc2cb97a78845b5e87c7580cd34426c26ae61a2d98fa47b22415106d861c432d76f82d057c7edd4d44dbd5a
+"@tanstack/virtual-core@npm:3.19.6":
+  version: 3.19.6
+  resolution: "@tanstack/virtual-core@npm:3.19.6"
+  checksum: 10/d52f638754554a01f96818075d0b888f43e89c8bb3d4902ff40507e39e2e8af67415577fc6056433a0e499944da4c085e722cbdde3ab1e9e9e895be576f42bae
   languageName: node
   linkType: hard
 
@@ -11381,7 +11381,7 @@ __metadata:
     "@sindresorhus/is": "npm:8.1.0"
     "@swc/plugin-emotion": "npm:15.0.0"
     "@tanstack/react-table": "npm:8.21.3"
-    "@tanstack/react-virtual": "npm:3.14.20"
+    "@tanstack/react-virtual": "npm:3.14.21"
     "@testing-library/dom": "npm:10.4.2"
     "@testing-library/jest-dom": "npm:6.9.1"
     "@testing-library/react": "npm:16.3.3"
