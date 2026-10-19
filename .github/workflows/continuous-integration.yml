@@ -177,7 +177,7 @@ jobs:
           short_commit_sha="${WIRE_WEBAPP_BUILD_COMMIT::7}"
           expected_version="dev-${short_commit_sha}"
           WIRE_WEBAPP_BUILD_VERSION="${expected_version}" \
-            ./bin/yarn nx run server:package-rspack-public
+            ./bin/yarn nx run server:package-public
           echo "expected_version=${expected_version}" >> "$GITHUB_OUTPUT"
 
       - name: Verify public Rspack deployment package
@@ -200,6 +200,9 @@ jobs:
             static/min/runtime.js
             static/min/vendor.js
             static/min/dexie.js
+            static/min/pdf.worker.mjs
+            static/min/worker.js
+            static/sw.js
           )
 
           for entry_script_path in "${required_entry_scripts[@]}"; do
@@ -221,7 +224,7 @@ jobs:
           fi
 
       - name: Install Chromium for Rspack smoke tests
-        run: ./bin/yarn playwright install --only-shell --with-deps chromium
+        run: node_modules/.bin/playwright install --only-shell --with-deps chromium
 
       - name: Run Rspack browser smoke tests
         run: ./bin/yarn nx run webapp:smoke-rspack
