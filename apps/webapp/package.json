@@ -6,7 +6,7 @@
   "main": "src/script/main/index.tsx",
   "scripts": {
     "build": "nx build webapp",
-    "build:dev": "webpack --config webpack.config.dev.js --progress",
+    "build:dev": "rspack build --config rspack.config.dev.mts",
     "build:prod": "rspack build --config rspack.config.mts",
     "build:prod:webpack": "webpack --config webpack.config.js",
     "build:prod:public": "rspack build --config rspack.config.public.mts",
@@ -117,6 +117,8 @@
     "@roamhq/wrtc": "0.10.0",
     "@rspack/cli": "2.2.9",
     "@rspack/core": "2.2.9",
+    "@rspack/dev-server": "2.2.1",
+    "@rspack/plugin-react-refresh": "2.0.2",
     "@swc/plugin-emotion": "15.0.0",
     "@testing-library/dom": "10.4.2",
     "@testing-library/jest-dom": "6.9.1",
@@ -138,7 +140,6 @@
     "@types/speakingurl": "13.0.6",
     "@types/underscore": "1.13.0",
     "@types/webpack-bundle-analyzer": "4.7.0",
-    "@types/webpack-env": "1.18.8",
     "@types/wicg-file-system-access": "2023.10.7",
     "@wireapp/store-engine": "workspace:^",
     "autoprefixer": "10.6.1",
@@ -170,6 +171,7 @@
     "postcss-scss": "4.0.9",
     "qrcode-reader": "1.0.4",
     "raw-loader": "4.0.2",
+    "react-refresh": "0.19.0",
     "redux-mock-store": "1.5.5",
     "seedrandom": "3.0.5",
     "sinon": "21.1.2",
@@ -178,8 +180,6 @@
     "webpack": "5.112.0",
     "webpack-bundle-analyzer": "4.10.2",
     "webpack-cli": "6.0.1",
-    "webpack-dev-middleware": "7.4.6",
-    "webpack-hot-middleware": "2.26.1",
     "worker-timers": "8.0.34"
   }
 }

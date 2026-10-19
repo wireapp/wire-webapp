@@ -1559,9 +1559,9 @@ This runs `nx serve server`, which:
 
 1. Builds each upstream library once before its watcher starts (`watch` → `dependsOn: ["build"]` in `nx.json`)
 2. Starts `watch` on every upstream library in the webapp dependency graph (`webapp:watch-deps` → `^watch` — `tsc --watch` or `vite build --watch`)
-3. Starts the Express server with webpack-dev-middleware in watch mode (`server:build-dev` — server only, no `^build` or `webapp:build`)
+3. Starts the Express server with the Rspack development server in watch mode (`server:build-dev` — server only, no `^build` or `webapp:build`)
 
-Library changes flow: `libraries/*/src` → `watch` recompiles `lib/` → webpack detects `@wireapp/*` changes → full page reload (`webpack-hot-middleware/client?reload=true`).
+Library changes flow: `libraries/*/src` → `watch` recompiles `lib/` → Rspack detects `@wireapp/*` changes → HMR updates the browser, with a full reload when an update cannot be applied.
 
 Only libraries reachable from the server/webapp dependency graph are watched (e.g. `core`, `api-client`, `commons`, `store-engine*`). Config-only packages (`eslint-config`, `prettier-config`) are excluded — they are not part of the webapp bundle.
 
@@ -1607,7 +1607,7 @@ In [`apps/webapp/package.json`](apps/webapp/package.json):
 The `workspace:^` protocol ensures:
 - Local workspace packages are linked via Yarn workspaces
 - Version is automatically resolved to the local workspace version
-- Webpack consumes compiled `lib/` output; `watch` targets keep `lib/` in sync during dev
+- Rspack consumes compiled `lib/` output; `watch` targets keep `lib/` in sync during development
 
 ### Nx Daemon for Fast Rebuilds
 

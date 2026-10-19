@@ -8408,10 +8408,50 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@rspack/dev-middleware@npm:^2.0.3":
+  version: 2.0.5
+  resolution: "@rspack/dev-middleware@npm:2.0.5"
+  peerDependencies:
+    "@rspack/core": ^2.0.0
+  peerDependenciesMeta:
+    "@rspack/core":
+      optional: true
+  checksum: 10/67925e588849c618703dc53cedd812fd84d750300239049dd610d424da5acdf33fafcfae0eda0f522b7ca3d29ab533df509e7b2964b6362fb0e95a21da437b10
+  languageName: node
+  linkType: hard
+
+"@rspack/dev-server@npm:2.2.1":
+  version: 2.2.1
+  resolution: "@rspack/dev-server@npm:2.2.1"
+  dependencies:
+    "@rspack/dev-middleware": "npm:^2.0.3"
+  peerDependencies:
+    "@rspack/core": ^2.0.0
+    selfsigned: ^5.0.0
+  peerDependenciesMeta:
+    selfsigned:
+      optional: true
+  checksum: 10/4ae7a1a5e3ce1dc03c3fa43832fb01f9153a0674474445051917de6d3bf874a10377b4eb95ec9df33ad817a92110c2fa5eeb791d75bcf8130c1d57309f2a29db
+  languageName: node
+  linkType: hard
+
 "@rspack/lite-tapable@npm:^1.1.5":
   version: 1.3.0
   resolution: "@rspack/lite-tapable@npm:1.3.0"
   checksum: 10/ffaea3bb4cfe6e811ee58c0d7f4b15eb1acc27070f93d46e66d2226bd3ff7ef677dee7ed21f21f4130b360c35be0f57b792c59157282e6a01a5a6fcb81c783b8
+  languageName: node
+  linkType: hard
+
+"@rspack/plugin-react-refresh@npm:2.0.2":
+  version: 2.0.2
+  resolution: "@rspack/plugin-react-refresh@npm:2.0.2"
+  peerDependencies:
+    "@rspack/core": ^2.0.0
+    react-refresh: ">=0.10.0 <1.0.0"
+  peerDependenciesMeta:
+    "@rspack/core":
+      optional: true
+  checksum: 10/bf1b129e4834a6ef61bfb170fb6a68b1e928dcc0c254756f8a892d331c0d33a311179fead3e30faad45b21402e4ff21ece2f0f7d887edfa542999427e6f0d45a
   languageName: node
   linkType: hard
 
@@ -9909,13 +9949,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/webpack-env@npm:1.18.8":
-  version: 1.18.8
-  resolution: "@types/webpack-env@npm:1.18.8"
-  checksum: 10/f3932f3d6c2530f644cfc898eda1ab8182d6ae57f555c2f0179d813549b639078671b71e4041831fc306c5ebe61f5cdac794fe4ceae281fce8bf67e23661a488
-  languageName: node
-  linkType: hard
-
 "@types/wicg-file-system-access@npm:2023.10.7":
   version: 2023.10.7
   resolution: "@types/wicg-file-system-access@npm:2023.10.7"
@@ -11378,6 +11411,8 @@ __metadata:
     "@roamhq/wrtc": "npm:0.10.0"
     "@rspack/cli": "npm:2.2.9"
     "@rspack/core": "npm:2.2.9"
+    "@rspack/dev-server": "npm:2.2.1"
+    "@rspack/plugin-react-refresh": "npm:2.0.2"
     "@sindresorhus/is": "npm:8.1.0"
     "@swc/plugin-emotion": "npm:15.0.0"
     "@tanstack/react-table": "npm:8.21.3"
@@ -11402,7 +11437,6 @@ __metadata:
     "@types/speakingurl": "npm:13.0.6"
     "@types/underscore": "npm:1.13.0"
     "@types/webpack-bundle-analyzer": "npm:4.7.0"
-    "@types/webpack-env": "npm:1.18.8"
     "@types/wicg-file-system-access": "npm:2023.10.7"
     "@wireapp/avs": "npm:10.5.19"
     "@wireapp/avs-debugger": "npm:0.0.7"
@@ -11483,6 +11517,7 @@ __metadata:
     react-intl: "npm:7.1.14"
     react-pdf: "npm:9.2.1"
     react-redux: "npm:9.3.0"
+    react-refresh: "npm:0.19.0"
     react-router: "npm:7.18.4"
     react-transition-group: "npm:4.4.5"
     redux: "npm:5.0.1"
@@ -11502,8 +11537,6 @@ __metadata:
     webpack: "npm:5.112.0"
     webpack-bundle-analyzer: "npm:4.10.2"
     webpack-cli: "npm:6.0.1"
-    webpack-dev-middleware: "npm:7.4.6"
-    webpack-hot-middleware: "npm:2.26.1"
     webrtc-adapter: "npm:9.0.6"
     worker-timers: "npm:8.0.34"
     zustand: "npm:4.5.7"
@@ -11869,7 +11902,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ansi-html-community@npm:0.0.8, ansi-html-community@npm:^0.0.8":
+"ansi-html-community@npm:^0.0.8":
   version: 0.0.8
   resolution: "ansi-html-community@npm:0.0.8"
   bin:
@@ -18164,7 +18197,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"html-entities@npm:^2.1.0, html-entities@npm:^2.6.0":
+"html-entities@npm:^2.6.0":
   version: 2.6.0
   resolution: "html-entities@npm:2.6.0"
   checksum: 10/06d4e7a3ba6243bba558af176e56f85e09894b26d911bc1ef7b2b9b3f18b46604360805b32636f080e954778e9a34313d1982479a05a5aa49791afd6a4229346
@@ -25814,6 +25847,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-refresh@npm:0.19.0":
+  version: 0.19.0
+  resolution: "react-refresh@npm:0.19.0"
+  checksum: 10/ec21ca69561017d555a9a1d194f1372e83b82ed0fb33180f2a082501b64c016a43453b1dde2c04bcacdef5c61133339395b79f072a490d90af48fb86b0cc2913
+  languageName: node
+  linkType: hard
+
 "react-remove-scroll-bar@npm:^2.3.7":
   version: 2.3.8
   resolution: "react-remove-scroll-bar@npm:2.3.8"
@@ -30534,25 +30574,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack-dev-middleware@npm:7.4.6":
-  version: 7.4.6
-  resolution: "webpack-dev-middleware@npm:7.4.6"
-  dependencies:
-    colorette: "npm:^2.0.10"
-    memfs: "npm:^4.43.1"
-    mime-types: "npm:^3.0.1"
-    on-finished: "npm:^2.4.1"
-    range-parser: "npm:^1.2.1"
-    schema-utils: "npm:^4.0.0"
-  peerDependencies:
-    webpack: ^5.0.0
-  peerDependenciesMeta:
-    webpack:
-      optional: true
-  checksum: 10/fd82b8338d93b99bdc3169b4d2d35201a0a9a50b8c403c142b56d643d822e3c5f7295785388de0158879f5769c13207d35ff2b2c3739848e4ac8c01ef81528df
-  languageName: node
-  linkType: hard
-
 "webpack-dev-middleware@npm:^7.4.2":
   version: 7.4.5
   resolution: "webpack-dev-middleware@npm:7.4.5"
@@ -30614,17 +30635,6 @@ __metadata:
   bin:
     webpack-dev-server: bin/webpack-dev-server.js
   checksum: 10/2bd8e03615c32ecac53e783e2be5670ccac051d051ef4ed7fe944df8fd8745b508c8ebc63bfecfdccd23c2200ca4c373b22ea2da76ce4e1c0a6f58d900c11ecb
-  languageName: node
-  linkType: hard
-
-"webpack-hot-middleware@npm:2.26.1":
-  version: 2.26.1
-  resolution: "webpack-hot-middleware@npm:2.26.1"
-  dependencies:
-    ansi-html-community: "npm:0.0.8"
-    html-entities: "npm:^2.1.0"
-    strip-ansi: "npm:^6.0.0"
-  checksum: 10/69fa1a25284eeba386c99b0b159d61b0cf800d21379ae7b03203c52e5d58d9082d96ca9f98ebbd8436165cd105de496a0356a8191064b277abff4d3c56825843
   languageName: node
   linkType: hard
 

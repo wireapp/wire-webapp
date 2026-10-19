@@ -47,11 +47,6 @@ const buildMetadataPath = path.resolve(
   rootPath,
   process.env.WIRE_WEBAPP_BUILD_METADATA_PATH ?? path.resolve(rootPath, 'apps/server/dist/version.json'),
 );
-const outputPath = path.resolve(
-  rootPath,
-  process.env.WIRE_WEBAPP_BUILD_OUTPUT_PATH ?? path.resolve(configDirectoryPath, 'dist/internal'),
-);
-
 function readBuildMetadata(): BuildMetadata {
   const parsedBuildMetadata = parseBuildMetadata(readFileSync(buildMetadataPath, 'utf8'));
 
@@ -113,220 +108,242 @@ function createEnvironmentUrls(environment: Env): EnvironmentUrls {
 
 const templateParameters = createTemplateParameters();
 
-const rspackConfiguration: Configuration = {
-  cache: {
-    type: 'persistent',
-    buildDependencies: [
-      configFilePath,
-      path.resolve(configDirectoryPath, 'package.json'),
-      path.resolve(rootPath, '.browserslistrc'),
-      buildMetadataPath,
-    ],
-    storage: {
-      type: 'filesystem',
-      directory: path.resolve(rootPath, 'node_modules/.cache/rspack-webapp'),
+function createRspackConfiguration(mode: 'development' | 'production' = 'production'): Configuration {
+  const isDevelopment = mode === 'development';
+  const outputPath = path.resolve(
+    rootPath,
+    process.env.WIRE_WEBAPP_BUILD_OUTPUT_PATH ??
+      path.resolve(configDirectoryPath, isDevelopment ? 'dist/development' : 'dist/internal'),
+  );
+
+  return {
+    cache: {
+      type: 'persistent',
+      buildDependencies: [
+        configFilePath,
+        path.resolve(configDirectoryPath, 'package.json'),
+        path.resolve(rootPath, '.browserslistrc'),
+        buildMetadataPath,
+      ],
+      storage: {
+        type: 'filesystem',
+        directory: path.resolve(rootPath, 'node_modules/.cache/rspack-webapp'),
+      },
     },
-  },
-  devtool: 'source-map',
-  entry: {
-    app: path.resolve(scriptPath, 'main/index.tsx'),
-    auth: path.resolve(authPath, 'main.tsx'),
-    checkBrowser: path.resolve(browserCheckPath, 'checkBrowser.ts'),
-  },
-  externals: {
-    'fs-extra': '{}',
-    worker_threads: '{}',
-  },
-  mode: 'production',
-  module: {
-    rules: [
-      {
-        test: /\.[jt]sx?$/,
-        include: scriptPath,
-        exclude: /node_modules/,
-        use: {
-          loader: 'builtin:swc-loader',
-          options: {
-            detectSyntax: 'auto',
-            env: {
-              coreJs: '3.50.0',
-              mode: 'usage',
-              targets: browserslist(undefined, {path: configDirectoryPath}),
+    devtool: 'source-map',
+    entry: {
+      app: path.resolve(scriptPath, 'main/index.tsx'),
+      auth: path.resolve(authPath, 'main.tsx'),
+      checkBrowser: path.resolve(browserCheckPath, 'checkBrowser.ts'),
+    },
+    externals: {
+      'fs-extra': '{}',
+      worker_threads: '{}',
+    },
+    mode,
+    module: {
+      rules: [
+        {
+          test: /\.[jt]sx?$/,
+          include: scriptPath,
+          exclude: /node_modules/,
+          use: {
+            loader: 'builtin:swc-loader',
+            options: {
+              detectSyntax: 'auto',
+              env: {
+                coreJs: '3.50.0',
+                mode: 'usage',
+                targets: browserslist(undefined, {path: configDirectoryPath}),
+              },
+              isModule: 'unknown',
+              jsc: {
+                experimental: {
+                  cacheRoot: path.resolve(rootPath, 'node_modules/.cache/swc-webapp'),
+                  plugins: [['@swc/plugin-emotion', {autoLabel: 'dev-only'}]],
+                },
+                parser: {
+                  decorators: true,
+                },
+                transform: {
+                  legacyDecorator: true,
+                  // The existing Babel pipeline transforms legacy decorators but does not emit TypeScript metadata.
+                  decoratorMetadata: false,
+                  react: {
+                    development: isDevelopment,
+                    importSource: '@emotion/react',
+                    refresh: isDevelopment,
+                    runtime: 'automatic',
+                  },
+                },
+              },
+              sourceMaps: true,
             },
-            isModule: 'unknown',
-            jsc: {
-              experimental: {
-                cacheRoot: path.resolve(rootPath, 'node_modules/.cache/swc-webapp'),
-                plugins: [['@swc/plugin-emotion', {autoLabel: 'dev-only'}]],
-              },
-              parser: {
-                decorators: true,
-              },
-              transform: {
-                legacyDecorator: true,
-                // The existing Babel pipeline transforms legacy decorators but does not emit TypeScript metadata.
-                decoratorMetadata: false,
-                react: {
-                  importSource: '@emotion/react',
-                  runtime: 'automatic',
+          },
+        },
+        {
+          test: /\.svg$/,
+          loader: 'svg-inline-loader',
+          options: {
+            removeSVGTagAttrs: false,
+          },
+        },
+        {
+          test: /\.(glsl|vert|frag)$/,
+          loader: 'raw-loader',
+        },
+        {
+          test: /\.less$/i,
+          use: [
+            'style-loader',
+            {loader: 'css-loader', options: {url: false}},
+            {
+              loader: 'postcss-loader',
+              options: {
+                postcssOptions: {
+                  plugins: isDevelopment ? [['autoprefixer']] : [['autoprefixer'], [cssnano()]],
                 },
               },
             },
-            sourceMaps: true,
-          },
-        },
-      },
-      {
-        test: /\.svg$/,
-        loader: 'svg-inline-loader',
-        options: {
-          removeSVGTagAttrs: false,
-        },
-      },
-      {
-        test: /\.(glsl|vert|frag)$/,
-        loader: 'raw-loader',
-      },
-      {
-        test: /\.less$/i,
-        use: [
-          'style-loader',
-          {loader: 'css-loader', options: {url: false}},
-          {
-            loader: 'postcss-loader',
-            options: {
-              postcssOptions: {
-                plugins: [['autoprefixer'], [cssnano()]],
-              },
-            },
-          },
-          'less-loader',
-        ],
-      },
-      {
-        test: /\.css$/i,
-        use: ['style-loader', {loader: 'css-loader', options: {url: false}}],
-      },
-    ],
-  },
-  optimization: {
-    minimize: true,
-    minimizer: [
-      new rspack.SwcJsMinimizerRspackPlugin({
-        extractComments: true,
-      }),
-    ],
-    moduleIds: 'named',
-    runtimeChunk: 'single',
-    splitChunks: {
-      cacheGroups: {
-        dexie: {
-          chunks: 'initial',
-          enforce: true,
-          name: 'dexie',
-          priority: 2,
-          test: /dexie/,
-        },
-        vendor: {
-          chunks: 'initial',
-          minChunks: 2,
-          name: 'vendor',
-          priority: 1,
-          test: /node_modules/,
-        },
-      },
-    },
-  },
-  output: {
-    chunkFilename: 'min/[name].js',
-    clean: true,
-    filename: 'min/[name].js',
-    path: outputPath,
-    publicPath: '/',
-  },
-  plugins: [
-    new rspack.ProvidePlugin({
-      Buffer: ['buffer', 'Buffer'],
-    }),
-    new rspack.DefinePlugin({
-      'process.env': {
-        NODE_ENV: '"production"',
-      },
-    }),
-    new rspack.CopyRspackPlugin({
-      patterns: [
-        {
-          context: path.resolve(rootPath, 'node_modules/@mediapipe/tasks-vision/wasm'),
-          from: '*',
-          to: 'min/mediapipe/wasm',
+            'less-loader',
+          ],
         },
         {
-          context: path.resolve(configDirectoryPath, 'resource'),
-          from: '**/*',
-          to: '.',
-        },
-        {
-          context: path.resolve(configDirectoryPath, 'assets'),
-          from: '**/*',
-          to: 'assets',
-        },
-        {from: path.resolve(srcPath, 'page/basicBrowserFeatureCheck.js'), to: 'min/'},
-        {from: path.resolve(srcPath, 'page/loader.js'), to: 'min/'},
-        {
-          from: path.resolve(
-            path.dirname(fileURLToPath(import.meta.resolve('pdfjs-dist/package.json'))),
-            'build/pdf.worker.mjs',
-          ),
-          to: 'min/pdf.worker.mjs',
-          info: {minimized: true},
-        },
-        {
-          context: path.resolve(rootPath, 'node_modules/@wireapp/core-crypto/src'),
-          from: '**/*',
-          to: 'min/[name][ext]',
+          test: /\.css$/i,
+          use: ['style-loader', {loader: 'css-loader', options: {url: false}}],
         },
       ],
-    }),
-    new rspack.IgnorePlugin({resourceRegExp: /.*\.wasm/}),
-    new HtmlRspackPlugin({
-      inject: false,
-      template: path.resolve(srcPath, 'page/index.ejs'),
-      templateParameters,
-    }),
-    new HtmlRspackPlugin({
-      inject: false,
-      filename: 'auth/index.html',
-      template: path.resolve(srcPath, 'page/auth.ejs'),
-      templateParameters,
-    }),
-    new HtmlRspackPlugin({
-      inject: false,
-      filename: 'unsupported/index.html',
-      template: path.resolve(srcPath, 'page/unsupported.ejs'),
-      templateParameters,
-    }),
-  ],
-  resolve: {
-    alias: {
-      '@enormora/fire-and-forget$': path.resolve(rootPath, 'node_modules/@enormora/fire-and-forget/index.js'),
-      Components: path.resolve(scriptPath, 'components'),
-      Hooks: path.resolve(scriptPath, 'hooks'),
-      Repositories: path.resolve(scriptPath, 'repositories'),
-      I18n: path.resolve(srcPath, 'i18n'),
-      Resource: path.resolve(configDirectoryPath, 'resource'),
-      Util: path.resolve(scriptPath, 'util'),
-      src: path.resolve(configDirectoryPath, 'src'),
-      test: path.resolve(configDirectoryPath, 'test'),
     },
-    extensions: ['.js', '.jsx', '.ts', '.tsx', '.svg'],
-    fallback: {
-      crypto: false,
-      fs: false,
-      os: fileURLToPath(import.meta.resolve('os-browserify')),
-      path: fileURLToPath(import.meta.resolve('path-browserify')),
+    optimization: {
+      minimize: !isDevelopment,
+      minimizer: isDevelopment
+        ? []
+        : [
+            new rspack.SwcJsMinimizerRspackPlugin({
+              extractComments: true,
+            }),
+          ],
+      moduleIds: 'named',
+      runtimeChunk: 'single',
+      splitChunks: {
+        cacheGroups: {
+          dexie: {
+            chunks: 'initial',
+            enforce: true,
+            name: 'dexie',
+            priority: 2,
+            test: /dexie/,
+          },
+          vendor: {
+            chunks: 'initial',
+            minChunks: 2,
+            name: 'vendor',
+            priority: 1,
+            test: /node_modules/,
+          },
+        },
+      },
     },
-    modules: [authPath, 'node_modules'],
-  },
-};
+    output: {
+      chunkFilename: 'min/[name].js',
+      clean: true,
+      filename: 'min/[name].js',
+      path: outputPath,
+      publicPath: '/',
+    },
+    plugins: [
+      new rspack.ProvidePlugin({
+        Buffer: ['buffer', 'Buffer'],
+      }),
+      new rspack.DefinePlugin({
+        'process.env': {
+          NODE_ENV: JSON.stringify(mode),
+        },
+      }),
+      new rspack.CopyRspackPlugin({
+        patterns: [
+          {
+            context: path.resolve(rootPath, 'node_modules/@mediapipe/tasks-vision/wasm'),
+            from: '*',
+            to: 'min/mediapipe/wasm',
+          },
+          {
+            context: path.resolve(configDirectoryPath, 'resource'),
+            from: '**/*',
+            to: '.',
+          },
+          {
+            context: path.resolve(configDirectoryPath, 'assets'),
+            from: '**/*',
+            to: 'assets',
+          },
+          {from: path.resolve(srcPath, 'page/basicBrowserFeatureCheck.js'), to: 'min/'},
+          {from: path.resolve(srcPath, 'page/loader.js'), to: 'min/'},
+          {
+            from: path.resolve(
+              path.dirname(fileURLToPath(import.meta.resolve('pdfjs-dist/package.json'))),
+              'build/pdf.worker.mjs',
+            ),
+            to: 'min/pdf.worker.mjs',
+            info: {minimized: true},
+          },
+          {
+            context: path.resolve(rootPath, 'node_modules/@wireapp/core-crypto/src'),
+            from: '**/*',
+            to: 'min/[name][ext]',
+          },
+        ],
+      }),
+      new rspack.IgnorePlugin({resourceRegExp: /.*\.wasm/}),
+      new HtmlRspackPlugin({
+        inject: false,
+        template: path.resolve(srcPath, 'page/index.ejs'),
+        templateParameters,
+      }),
+      new HtmlRspackPlugin({
+        inject: false,
+        filename: 'auth/index.html',
+        template: path.resolve(srcPath, 'page/auth.ejs'),
+        templateParameters,
+      }),
+      new HtmlRspackPlugin({
+        inject: false,
+        filename: 'unsupported/index.html',
+        template: path.resolve(srcPath, 'page/unsupported.ejs'),
+        templateParameters,
+      }),
+    ],
+    resolve: {
+      alias: {
+        '@enormora/fire-and-forget$': path.resolve(rootPath, 'node_modules/@enormora/fire-and-forget/index.js'),
+        Components: path.resolve(scriptPath, 'components'),
+        Hooks: path.resolve(scriptPath, 'hooks'),
+        Repositories: path.resolve(scriptPath, 'repositories'),
+        I18n: path.resolve(srcPath, 'i18n'),
+        Resource: path.resolve(configDirectoryPath, 'resource'),
+        Util: path.resolve(scriptPath, 'util'),
+        src: path.resolve(configDirectoryPath, 'src'),
+        test: path.resolve(configDirectoryPath, 'test'),
+      },
+      extensions: ['.js', '.jsx', '.ts', '.tsx', '.svg'],
+      fallback: {
+        crypto: false,
+        fs: false,
+        os: fileURLToPath(import.meta.resolve('os-browserify')),
+        path: fileURLToPath(import.meta.resolve('path-browserify')),
+      },
+      modules: [authPath, 'node_modules'],
+    },
+    ...(isDevelopment
+      ? {
+          snapshot: {
+            managedPaths: [/^(.+?[\\/]node_modules[\\/](?!@wireapp))/],
+            immutablePaths: [],
+          },
+        }
+      : {}),
+  };
+}
 
-export default rspackConfiguration;
+export {createRspackConfiguration};
+export default createRspackConfiguration();
