@@ -36,6 +36,7 @@ import {CompositeMessage} from 'Repositories/entity/message/compositeMessage';
 import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {Text} from 'Repositories/entity/message/text';
 import {TeamState} from 'Repositories/team/TeamState';
+import {Config} from 'src/script/Config';
 import {QuoteEntity} from 'src/script/message/quoteEntity';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
@@ -184,6 +185,15 @@ export const MessageWrapper: FunctionComponent<MessageParams> = ({
           return onClickDetails(message);
         },
         label: translate('conversationContextMenuDetails'),
+      });
+    }
+
+    if (Config.getConfig().FEATURE.ENABLE_MARK_AS_UNREAD && !conversation.isSelfUserRemoved()) {
+      entries.push({
+        click: () => {
+          return conversation.markUnreadFrom(message);
+        },
+        label: translate('conversationContextMenuMarkUnread'),
       });
     }
 

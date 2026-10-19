@@ -363,6 +363,24 @@ describe('ConversationMapper', () => {
       expect(updatedConversationEntity.last_event_timestamp()).toBe(timestamp);
     });
 
+    it('keeps the manual unread marker when applied together with the last read timestamp', () => {
+      const selfStatus: Partial<SelfStatusUpdateDatabaseData> = {
+        is_marked_unread: true,
+        last_read_timestamp: Date.now(),
+      };
+      const updatedConversationEntity = ConversationMapper.updateSelfStatus(conversationEntity, selfStatus);
+
+      expect(updatedConversationEntity.isMarkedUnread()).toBe(true);
+    });
+
+    it('does not touch the manual unread marker when the status has no marker', () => {
+      conversationEntity.isMarkedUnread(true);
+      const selfStatus: Partial<SelfStatusUpdateDatabaseData> = {last_event_timestamp: Date.now()};
+      const updatedConversationEntity = ConversationMapper.updateSelfStatus(conversationEntity, selfStatus);
+
+      expect(updatedConversationEntity.isMarkedUnread()).toBe(true);
+    });
+
     it('can update the self status using otr_archived', () => {
       const timestamp = Date.now();
       conversationEntity.last_event_timestamp(timestamp);

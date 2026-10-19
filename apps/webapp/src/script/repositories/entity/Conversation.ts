@@ -172,6 +172,10 @@ export class Conversation {
   public readonly isTeamOnly: ko.PureComputed<boolean>;
   public readonly last_event_timestamp: ko.Observable<number>;
   public readonly last_read_timestamp: ko.Observable<number>;
+  /** Set when the user manually marked the conversation as unread from a given message (local to this device) */
+  public readonly isMarkedUnread: ko.Observable<boolean>;
+  /** While true, viewing messages does not advance the read marker (in-memory only) */
+  public readonly isAutoReadSuppressed: ko.Observable<boolean>;
   public readonly legalHoldStatus: ko.Observable<LegalHoldStatus>;
   public readonly localMessageTimer: ko.Observable<number>;
   public readonly messages_unordered: ko.ObservableArray<Message>;
@@ -407,6 +411,8 @@ export class Conversation {
     this.cleared_timestamp = ko.observable(0);
     this.last_event_timestamp = ko.observable(0);
     this.last_read_timestamp = ko.observable(0);
+    this.isMarkedUnread = ko.observable(false);
+    this.isAutoReadSuppressed = ko.observable(false);
     this.last_server_timestamp = ko.observable(0);
     this.mutedTimestamp = ko.observable(0);
     this.initialMessage = ko.observable();
@@ -591,12 +597,17 @@ export class Conversation {
       for (let index = messages.length - 1; index >= 0; index--) {
         const messageEntity = messages[index];
         if (messageEntity.visible()) {
+          const isOwnContentMessage = messageEntity.user().isMe && !messageEntity.isSystem();
           const isReadMessage =
-            messageEntity.timestamp() <= this.last_read_timestamp() ||
-            (messageEntity.user().isMe && !messageEntity.isSystem());
+            messageEntity.timestamp() <= this.last_read_timestamp() || (isOwnContentMessage && !this.isMarkedUnread());
 
           if (isReadMessage) {
             break;
+          }
+
+          if (isOwnContentMessage) {
+            // Manually marked as unread: own messages are not counted but do not end the unread range
+            continue;
           }
 
           const isMissedCall = messageEntity.isCall() && !messageEntity.wasCompleted();
@@ -767,6 +778,7 @@ export class Conversation {
       this.isGhostGroup,
       this.last_event_timestamp,
       this.last_read_timestamp,
+      this.isMarkedUnread,
       this.last_server_timestamp,
       this.mutedState,
       this.mutedTimestamp,
@@ -797,6 +809,9 @@ export class Conversation {
    * If there are any incoming messages, they will be moved to the regular messages.
    */
   release(): void {
+    // Leaving the conversation resumes auto-read, a manual unread marker stays until the user reads again
+    this.isAutoReadSuppressed(false);
+
     // If there are no unread messages, we can remove all messages from memory (we will keep the unread messages)
     if (isEmptyArray(this.unreadState().allEvents)) {
       this.removeMessages();
@@ -860,9 +875,25 @@ export class Conversation {
 
     if (updatedTimestamp !== false) {
       entityTimestamp(updatedTimestamp);
+
+      if (type === TIMESTAMP_TYPE.LAST_READ && !forceUpdate) {
+        // The read marker moved forward, so any manual "unread" marker is obsolete
+        this.isMarkedUnread(false);
+        this.isAutoReadSuppressed(false);
+      }
     }
 
     return updatedTimestamp;
+  }
+
+  /**
+   * Mark the conversation as unread starting at (and including) the given message.
+   * The state is local to this device and auto-read is paused until the read marker is moved forward explicitly.
+   */
+  markUnreadFrom(message: Message): void {
+    this.setTimestamp(message.timestamp() - 1, TIMESTAMP_TYPE.LAST_READ, true);
+    this.isMarkedUnread(true);
+    this.isAutoReadSuppressed(true);
   }
 
   /**
@@ -941,7 +972,10 @@ export class Conversation {
     for (let counter = message_ets.length - 1; counter >= 0; counter--) {
       const message_et = message_ets[counter];
       if (message_et?.user()?.isMe) {
-        this.updateTimestamps(message_et);
+        // Loading history must not clear a manual "unread" marker by moving the read timestamp forward
+        if (!this.isMarkedUnread()) {
+          this.updateTimestamps(message_et);
+        }
         break;
       }
     }
@@ -1268,6 +1302,7 @@ export class Conversation {
       id: this.id,
       is_guest: this.isGuest(),
       is_ghost_group: this.isGhostGroup(),
+      is_marked_unread: this.isMarkedUnread(),
       last_event_timestamp: this.last_event_timestamp(),
       last_read_timestamp: this.last_read_timestamp(),
       last_server_timestamp: this.last_server_timestamp(),

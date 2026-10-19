@@ -57,6 +57,7 @@ export interface ConversationRecord {
   id: string;
   initial_protocol?: CONVERSATION_PROTOCOL;
   is_guest: boolean;
+  is_marked_unread?: boolean;
   last_event_timestamp: number;
   last_read_timestamp: number;
   last_server_timestamp: number;

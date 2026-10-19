@@ -269,6 +269,8 @@ export const MessagesList: FC<MessagesListParams> = ({
 
   const jumpToLastMessage = (): void => {
     if (conversation !== undefined) {
+      // jumping to the latest message is an explicit "read" action, resume auto-read
+      conversation.isAutoReadSuppressed(false);
       // clean up anything like search result
       setHighlightedMessage(undefined);
       conversation.initialMessage(undefined);

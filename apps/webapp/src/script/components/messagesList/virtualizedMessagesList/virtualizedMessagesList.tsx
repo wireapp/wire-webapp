@@ -287,6 +287,8 @@ export const VirtualizedMessagesList: FunctionComponent<Props> = ({
   }, [groupedMessages, highlightedMessage]);
 
   const onJumpToLastMessageClick = async (): Promise<void> => {
+    // jumping to the latest message is an explicit "read" action, resume auto-read
+    conversation.isAutoReadSuppressed(false);
     setHighlightedMessage(undefined);
     conversation.initialMessage(undefined);
 
