@@ -23,8 +23,8 @@
     "translate:merge": "nx translate-merge webapp"
   },
   "dependencies": {
-    "@datadog/browser-logs": "7.15.0",
-    "@datadog/browser-rum": "7.15.0",
+    "@datadog/browser-logs": "7.16.0",
+    "@datadog/browser-rum": "7.16.0",
     "@date-fns/tz": "1.5.0",
     "@emotion/react": "11.14.0",
     "@enormora/clock": "0.0.3",
