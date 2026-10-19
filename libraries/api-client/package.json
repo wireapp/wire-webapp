@@ -51,8 +51,8 @@
     "concurrently": "9.2.5",
     "jest": "30.5.2",
     "noop-esm": "1.1.0",
-    "react": "19.3.0",
-    "react-dom": "19.3.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
     "ts-node": "10.9.2",
     "webpack": "5.111.1",
     "ws": "8.22.0"
