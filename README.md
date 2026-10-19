@@ -21,7 +21,7 @@ No license is granted to the Wire trademark and its associated logos, all of whi
 
 # Monorepo Layout
 
-- `apps/webapp/`: React client (Rspack internal production; Webpack fallback, development, and public releases), plus E2E tests and i18n files
+- `apps/webapp/`: React client (Rspack internal and public production; Webpack fallback and development), plus E2E tests and i18n files
 - `apps/server/`: node/express wrapper that serves the built webapp and handles proxying
 - `libraries/config/`: `@wireapp/config` package - centralized environment configuration management with type-safe configuration loading and validation
 - `libraries/core/`: `@wireapp/core` package - Wire's communication core library handling authentication, WebSocket connections, and protocol messaging
@@ -104,7 +104,8 @@ After updating the environment variables, the app will be available at the corre
 1. Build and package the default internal Rspack release: `./bin/yarn build:prod` (or `./bin/yarn nx run server:package`)
    - This builds both the server and webapp (in production mode) and creates the deployment package at `apps/server/dist/s3/ebs.zip`
 1. Build and package the internal Webpack fallback: `./bin/yarn nx run server:package-webpack`
-1. Build and package the public Webpack release: `./bin/yarn build:prod:public`
+1. Build and package the default public Rspack release: `./bin/yarn build:prod:public`
+1. Build and package the public Webpack fallback: `./bin/yarn nx run server:package-webpack-public`
 1. Start the server output from `apps/server/dist` (or build a Docker image with `./bin/yarn docker <tag>`)
 
 **Note:** The `./bin/yarn zip` command has been deprecated. Packaging is now integrated into the build process via `./bin/yarn build:prod` or `./bin/yarn nx run server:package`.

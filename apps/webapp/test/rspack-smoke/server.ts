@@ -249,7 +249,7 @@ function startSmokeServer(options: RspackSmokeServerOptions): void {
       return 'internal';
     })
     .with('public', () => {
-      return 'rspack-public';
+      return 'public';
     })
     .exhaustive();
   const buildDirectoryPath = path.resolve(webappDirectoryPath, 'dist', buildDirectoryName);

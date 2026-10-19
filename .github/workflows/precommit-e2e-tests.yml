@@ -77,7 +77,7 @@ jobs:
 
           if [[ "${EVENT_NAME}" == "workflow_dispatch" && "${USE_PUBLIC_RSPACK}" == "true" ]]; then
             WIRE_WEBAPP_BUILD_VERSION="${expected_version}" \
-              ./bin/yarn nx run server:package-rspack-public
+              ./bin/yarn nx run server:package-public
           else
             WIRE_WEBAPP_BUILD_VERSION="${expected_version}" \
               ./bin/yarn build:prod
@@ -112,19 +112,19 @@ jobs:
 
           for entry_script_path in "${required_entry_scripts[@]}"; do
             if ! grep -Fqx -- "$entry_script_path" <<< "$archive_entries"; then
-              echo "Internal deployment package is missing required entry script: $entry_script_path" >&2
+              echo "Deployment package is missing required entry script: $entry_script_path" >&2
               exit 1
             fi
           done
 
-          internal_runtime="$(unzip -p "$BUILD_ARTIFACT_PATH" static/min/runtime.js)"
-          if ! grep -Fq 'rspackChunk_wireapp_webapp' <<< "$internal_runtime"; then
-            echo "Internal deployment package does not contain the Rspack runtime fingerprint." >&2
+          deployment_runtime="$(unzip -p "$BUILD_ARTIFACT_PATH" static/min/runtime.js)"
+          if ! grep -Fq 'rspackChunk_wireapp_webapp' <<< "$deployment_runtime"; then
+            echo "Deployment package does not contain the Rspack runtime fingerprint." >&2
             exit 1
           fi
 
-          if grep -Fq 'webpackChunk_wireapp_webapp' <<< "$internal_runtime"; then
-            echo "Internal deployment package contains the Webpack runtime fingerprint." >&2
+          if grep -Fq 'webpackChunk_wireapp_webapp' <<< "$deployment_runtime"; then
+            echo "Deployment package contains the Webpack runtime fingerprint." >&2
             exit 1
           fi
 
