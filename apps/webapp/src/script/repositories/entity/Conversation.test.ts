@@ -960,6 +960,103 @@ describe('Conversation', () => {
     });
   });
 
+  describe('manual unread marker', () => {
+    const createContentMessage = (timestamp: number, user: User) => {
+      const message = new ContentMessage(createUuid(), translateForTest);
+      message.timestamp(timestamp);
+      message.user(user);
+      message.addAsset(new Text(createUuid(), 'text'));
+      return message;
+    };
+
+    const setupConversation = () => {
+      const otherFirst = createContentMessage(first_timestamp, other_user);
+      const ownSecond = createContentMessage(second_timestamp, self_user);
+      const otherThird = createContentMessage(third_timestamp, other_user);
+      conversation_et.selfUser(self_user);
+      conversation_et.last_server_timestamp(third_timestamp);
+      conversation_et.last_event_timestamp(third_timestamp);
+      conversation_et.last_read_timestamp(third_timestamp);
+      conversation_et.messages_unordered.push(otherFirst, ownSecond, otherThird);
+      return {otherFirst, ownSecond, otherThird};
+    };
+
+    it('moves the read timestamp right before the message and sets both flags', () => {
+      const {otherFirst} = setupConversation();
+
+      conversation_et.markUnreadFrom(otherFirst);
+
+      expect(conversation_et.last_read_timestamp()).toBe(first_timestamp - 1);
+      expect(conversation_et.isMarkedUnread()).toBe(true);
+      expect(conversation_et.isAutoReadSuppressed()).toBe(true);
+    });
+
+    it('counts messages after the marker but ignores own messages without ending the range', () => {
+      const {otherFirst, otherThird} = setupConversation();
+
+      conversation_et.markUnreadFrom(otherFirst);
+
+      expect(conversation_et.unreadState().allMessages).toEqual([otherThird, otherFirst]);
+      expect(conversation_et.hasUnread()).toBe(true);
+    });
+
+    it('stops at the own message boundary when not marked as unread', () => {
+      const {otherFirst, otherThird} = setupConversation();
+      conversation_et.last_read_timestamp(first_timestamp - 1);
+
+      expect(conversation_et.unreadState().allMessages).toEqual([otherThird]);
+      expect(conversation_et.unreadState().allMessages).not.toContain(otherFirst);
+    });
+
+    it('is cleared when the read timestamp moves forward', () => {
+      const {otherFirst} = setupConversation();
+      conversation_et.markUnreadFrom(otherFirst);
+
+      conversation_et.setTimestamp(third_timestamp, Conversation.TIMESTAMP_TYPE.LAST_READ);
+
+      expect(conversation_et.isMarkedUnread()).toBe(false);
+      expect(conversation_et.isAutoReadSuppressed()).toBe(false);
+      expect(conversation_et.hasUnread()).toBe(false);
+    });
+
+    it('is not cleared by a forced timestamp update', () => {
+      const {otherFirst} = setupConversation();
+      conversation_et.markUnreadFrom(otherFirst);
+
+      conversation_et.setTimestamp(first_timestamp - 5, Conversation.TIMESTAMP_TYPE.LAST_READ, true);
+
+      expect(conversation_et.isMarkedUnread()).toBe(true);
+    });
+
+    it('is not cleared when history containing own messages is loaded', () => {
+      const {otherFirst} = setupConversation();
+      conversation_et.markUnreadFrom(otherFirst);
+
+      conversation_et.addMessages([createContentMessage(third_timestamp, self_user)]);
+
+      expect(conversation_et.isMarkedUnread()).toBe(true);
+      expect(conversation_et.last_read_timestamp()).toBe(first_timestamp - 1);
+    });
+
+    it('resumes auto-read but keeps the marker when the conversation is released', () => {
+      const {otherFirst} = setupConversation();
+      conversation_et.markUnreadFrom(otherFirst);
+
+      conversation_et.release();
+
+      expect(conversation_et.isAutoReadSuppressed()).toBe(false);
+      expect(conversation_et.isMarkedUnread()).toBe(true);
+      expect(conversation_et.messages().length).toBe(3);
+    });
+
+    it('is persisted when serializing the conversation', () => {
+      const {otherFirst} = setupConversation();
+      conversation_et.markUnreadFrom(otherFirst);
+
+      expect(conversation_et.serialize().is_marked_unread).toBe(true);
+    });
+  });
+
   describe('_incrementTimeOnly', () => {
     it('should update only to newer timestamps', () => {
       //@ts-ignore

@@ -17,14 +17,17 @@
  *
  */
 
-import {render} from '@testing-library/react';
+import {fireEvent, render} from '@testing-library/react';
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {Conversation} from 'Repositories/entity/Conversation';
+import {ContentMessage as ContentMessageEntity} from 'Repositories/entity/message/contentMessage';
 import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/memberMessage';
+import {Text} from 'Repositories/entity/message/text';
 import {User} from 'Repositories/entity/User';
 import {withTheme} from 'src/script/auth/util/test/testUtil';
+import {Config} from 'src/script/Config';
 import {SystemMessageType} from 'src/script/message/systemMessageType';
 import {translateForTest} from 'Util/test/translateForTest';
 import {
@@ -60,7 +63,7 @@ function createMemberMessage(systemType: SystemMessageType, users?: User[]) {
   return message;
 }
 
-const createBaseProps = (conversation: Conversation, message: MemberMessageEntity) => {
+const createBaseProps = (conversation: Conversation, message: MemberMessageEntity | ContentMessageEntity) => {
   return {
     conversation,
     message,
@@ -247,6 +250,54 @@ describe('MessageWrapper', () => {
 
       expect(getByTitle('conversationCellsConversationEnabledEditor')).toBeInTheDocument();
       expect(getByText('conversationDetailsActionTimedMessagesDisabled')).toBeInTheDocument();
+    });
+  });
+
+  describe('Mark as unread context menu entry', () => {
+    const setMarkAsUnreadFeature = (enabled: boolean) => {
+      const config = Config.getConfig();
+      jest
+        .spyOn(Config, 'getConfig')
+        .mockReturnValue({...config, FEATURE: {...config.FEATURE, ENABLE_MARK_AS_UNREAD: enabled}});
+    };
+
+    const renderContentMessage = () => {
+      const conversation = new Conversation(
+        createUuid(),
+        'test.wire.link',
+        CONVERSATION_PROTOCOL.PROTEUS,
+        translateForTest,
+      );
+      const message = new ContentMessageEntity(createUuid(), translateForTest);
+      message.timestamp(1_000);
+      message.user(generateUser());
+      message.addAsset(new Text(createUuid(), 'hello'));
+      const markUnreadFrom = jest.spyOn(conversation, 'markUnreadFrom');
+      const props = {...createBaseProps(conversation, message), isFocused: true};
+
+      const view = render(withTheme(<MessageWrapper {...props} />), {wrapper: rootProviderWrapper});
+      fireEvent.click(view.getByLabelText('accessibility.conversationContextMenuOpenLabel'));
+      return {...view, markUnreadFrom, message};
+    };
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    it('marks the conversation as unread from the message when the entry is clicked', () => {
+      setMarkAsUnreadFeature(true);
+      const {getByText, markUnreadFrom, message} = renderContentMessage();
+
+      fireEvent.click(getByText('conversationContextMenuMarkUnread'));
+
+      expect(markUnreadFrom).toHaveBeenCalledWith(message);
+    });
+
+    it('does not offer the entry when the feature is disabled', () => {
+      setMarkAsUnreadFeature(false);
+      const {queryByText} = renderContentMessage();
+
+      expect(queryByText('conversationContextMenuMarkUnread')).not.toBeInTheDocument();
     });
   });
 });
