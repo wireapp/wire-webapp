@@ -25,7 +25,7 @@ import {fileURLToPath} from 'node:url';
 
 const FIRST_USER_ARGUMENT_INDEX = 2;
 
-type BuildVariant = 'development' | 'internal' | 'public' | 'rspack-public' | 'webpack-internal';
+type BuildVariant = 'development' | 'internal' | 'public' | 'webpack-internal' | 'webpack-public';
 type AssemblyScope = 'artifact' | 'webapp';
 
 const workspaceRootPath = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
@@ -38,8 +38,8 @@ function isBuildVariant(value: unknown): value is BuildVariant {
     value === 'development' ||
     value === 'internal' ||
     value === 'public' ||
-    value === 'rspack-public' ||
-    value === 'webpack-internal'
+    value === 'webpack-internal' ||
+    value === 'webpack-public'
   );
 }
 
@@ -97,7 +97,7 @@ function run(): void {
 
   if (!isBuildVariant(buildVariant) || !isAssemblyScope(assemblyScope)) {
     console.error(
-      'Usage: assembleBuild.mts <development|internal|public|rspack-public|webpack-internal> <artifact|webapp>',
+      'Usage: assembleBuild.mts <development|internal|public|webpack-internal|webpack-public> <artifact|webapp>',
     );
     process.exitCode = 1;
     return;
