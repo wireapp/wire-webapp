@@ -99,8 +99,6 @@
       "matchPackageNames": [
         "webpack",
         "webpack-cli",
-        "webpack-dev-middleware",
-        "webpack-hot-middleware",
         "webpack-bundle-analyzer",
         "copy-webpack-plugin",
         "html-webpack-plugin",

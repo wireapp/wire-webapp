@@ -19,7 +19,7 @@
 
 import {createClock} from '@enormora/clock/clock';
 import type {Clock} from '@enormora/clock/clock';
-import {isNull, isUndefined} from '@sindresorhus/is';
+import {isNull} from '@sindresorhus/is';
 // Polyfill "Object.entries" & "Object.values"
 import 'core-js/full/object';
 import 'core-js/full/reflect';
@@ -99,24 +99,11 @@ const render = (Component: FC<{translate: Translate; clock: Clock}>): void => {
 
 const config = Config.getConfig();
 
-type HotReloadCapableModule = NodeJS.Module & {
-  hot?: {
-    accept: (dependencyPath: string, callback: () => void) => void;
-  };
-};
-
 async function runApp() {
   const {domain} = await updateApiVersion();
   await initializeDataDog(config, {domain: domain});
-  const hotReloadCapableModule = module as HotReloadCapableModule;
-
   render(Root);
   setAppLocale();
-  if (!isUndefined(hotReloadCapableModule.hot)) {
-    hotReloadCapableModule.hot.accept('./page/Root', () => {
-      render(require('./page/root').Root);
-    });
-  }
 }
 
 enableLogging(config);
