@@ -1919,6 +1919,8 @@
   "modalCallLogsError422": "Die Datei konnte nicht als Log gelesen werden (422). Korrigieren Sie die Datei vor erneutem Senden.",
   "modalCallLogsError502": "Der Collector hat den Export abgelehnt (502). Er wurde nicht registriert. Sie können die Datei gefahrlos erneut senden.",
   "modalCallLogsError500": "Die Logs wurden exportiert, der Export konnte jedoch nicht registriert werden (500). Senden Sie nicht erneut: Dies würde Duplikate erzeugen.",
+  "modalCallLogsErrorResponse": "Die Serverantwort konnte nicht bestätigt werden. Die Logs könnten bereits exportiert worden sein. Fragen Sie vor erneutem Senden beim Support nach.",
+  "modalCallLogsServerDestination": "Upload-Ziel: {serverAddress}",
   "modalCallLogsErrorNetwork": "Das Upload-Ergebnis konnte wegen eines Verbindungsfehlers nicht bestätigt werden. Der Export könnte erfolgt sein. Fragen Sie vor erneutem Senden beim Support nach.",
   "modalCallLogsSendTitle": "Anrufprotokolle senden",
   "modalCallLogsSendMessage": "Möchten Sie die aktuelle Log-Datei an {brandName} schicken?",

@@ -18,7 +18,9 @@
  */
 
 import type {Clock} from '@enormora/clock/clock';
+import {StatusCodes} from 'http-status-codes';
 import {Task, task} from 'true-myth';
+import {z} from 'zod';
 
 export type CallLogsReport = {
   status: 'exported';
@@ -33,7 +35,7 @@ export type CallLogsReport = {
   improvised_span_ids: number;
 };
 
-export type CallLogsErrorStatus = 400 | 409 | 413 | 422 | 502 | 500 | 'network';
+export type CallLogsErrorStatus = 400 | 409 | 413 | 422 | 502 | 500 | 'network' | 'response';
 export type CallLogsError = {status: CallLogsErrorStatus};
 export type CallLogsRequest = {
   method: 'POST';
@@ -92,6 +94,70 @@ export const createMockCallLogsService = (clock: Clock): CallLogsService => {
           duration_ms: MOCK_UPLOAD_DELAY_MILLISECONDS,
           improvised_span_ids: 0,
         });
+      });
+  });
+};
+
+const reportSchema = z.object({
+  status: z.literal('exported'),
+  file_name: z.string(),
+  bytes: z.number().int().nonnegative(),
+  participant_id: z.string(),
+  format: z.enum(['avs', 'android-logcat', 'ios-client']),
+  entries_exported: z.number().int().nonnegative(),
+  log_records_exported: z.number().int().nonnegative(),
+  participants_hashed: z.number().int().nonnegative(),
+  duration_ms: z.number().nonnegative(),
+  improvised_span_ids: z.number().int().nonnegative(),
+});
+
+export const createHttpCallLogsService = (
+  serverAddress: string,
+  fetchRequest: typeof fetch = fetch,
+): CallLogsService => {
+  return createCallLogsService(request => {
+    return task
+      .tryOrElse(
+        (): CallLogsError => {
+          return {status: 'network'};
+        },
+        () => {
+          return fetchRequest(new URL(request.url, serverAddress).toString(), {
+            method: request.method,
+            body: request.body,
+            credentials: 'omit',
+            redirect: 'error',
+          });
+        },
+      )
+      .andThen(response => {
+        switch (response.status) {
+          case StatusCodes.OK:
+            return task
+              .tryOrElse(
+                (): CallLogsError => {
+                  return {status: 'response'};
+                },
+                (): Promise<unknown> => {
+                  return response.json();
+                },
+              )
+              .andThen(body => {
+                const parsed = reportSchema.safeParse(body);
+                return parsed.success
+                  ? task.resolve<CallLogsReport, CallLogsError>(parsed.data)
+                  : task.reject<CallLogsReport, CallLogsError>({status: 'response'});
+              });
+          case StatusCodes.BAD_REQUEST:
+          case StatusCodes.CONFLICT:
+          case StatusCodes.REQUEST_TOO_LONG:
+          case StatusCodes.UNPROCESSABLE_ENTITY:
+          case StatusCodes.INTERNAL_SERVER_ERROR:
+          case StatusCodes.BAD_GATEWAY:
+            return task.reject<CallLogsReport, CallLogsError>({status: response.status});
+          default:
+            return task.reject<CallLogsReport, CallLogsError>({status: 'response'});
+        }
       });
   });
 };

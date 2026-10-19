@@ -18,8 +18,8 @@
  */
 
 import {ReactNode, useMemo} from 'react';
-import type {CSSObject} from '@emotion/react';
 
+import type {CSSObject} from '@emotion/react';
 import {Maybe} from 'true-myth';
 import {container} from 'tsyringe';
 
@@ -32,7 +32,9 @@ import {
   CallLogsErrorStatus,
   CallLogsService,
   createMockCallLogsService,
+  createHttpCallLogsService,
 } from 'Repositories/calling/callLogsService';
+import {useCallLogsUploadSettings} from 'Repositories/calling/callLogsUploadSettings';
 import {UserState} from 'Repositories/user/userState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
@@ -63,6 +65,7 @@ const callLogsErrorTranslationKeys = {
   502: 'modalCallLogsError502',
   500: 'modalCallLogsError500',
   network: 'modalCallLogsErrorNetwork',
+  response: 'modalCallLogsErrorResponse',
 } as const satisfies Record<CallLogsErrorStatus, string>;
 
 const SendCallLogs = ({
@@ -75,7 +78,10 @@ const SendCallLogs = ({
   const mockService = useMemo(() => {
     return createMockCallLogsService(clock);
   }, [clock]);
-  const service = callLogsService ?? mockService;
+  const {mode, serverAddress} = useCallLogsUploadSettings();
+  const service = useMemo(() => {
+    return callLogsService ?? (mode === 'server' ? createHttpCallLogsService(serverAddress) : mockService);
+  }, [callLogsService, mode, serverAddress, mockService]);
 
   const showMessage = (title: string, message: ReactNode, bodyCSS: CSSObject = {}) => {
     PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {bodyCSS, text: {title, message}}, undefined, translate);
@@ -86,7 +92,7 @@ const SendCallLogs = ({
       translate('modalCallLogsSuccessTitle'),
       <div>
         <p>{translate('modalCallLogsSuccessMessage', {bytes: report.bytes.toLocaleString(), brandName})}</p>
-        <p css={mockNoticeStyles}>{translate('modalCallLogsMockNotice')}</p>
+        {mode === 'mock' && <p css={mockNoticeStyles}>{translate('modalCallLogsMockNotice')}</p>}
         <dl css={reportStyles}>
           {(
             [
@@ -171,7 +177,14 @@ const SendCallLogs = ({
         text: {
           title: translate('modalCallLogsSendTitle'),
           option: translate('modalCallLogsForceOption'),
-          message: <p css={confirmationMessageStyles}>{translate('modalCallLogsSendMessage', {brandName})}</p>,
+          message: (
+            <div>
+              <p css={confirmationMessageStyles}>{translate('modalCallLogsSendMessage', {brandName})}</p>
+              {mode === 'server' && (
+                <p css={mockNoticeStyles}>{translate('modalCallLogsServerDestination', {serverAddress})}</p>
+              )}
+            </div>
+          ),
         },
       },
       undefined,

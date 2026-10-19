@@ -24,6 +24,7 @@ import {fireEvent, render, screen} from '@testing-library/react';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {CallingRepository} from 'Repositories/calling/CallingRepository';
+import {useCallLogsUploadSettings} from 'Repositories/calling/callLogsUploadSettings';
 import {CallLogsErrorStatus, createMockCallLogsService} from 'Repositories/calling/callLogsService';
 import {
   createRootContextValueForTest,
@@ -44,6 +45,7 @@ const userState = {
 
 describe('SendCallLogs', () => {
   beforeEach(() => {
+    useCallLogsUploadSettings.setState({mode: 'mock'});
     const config = Config.getConfig();
     jest.spyOn(Config, 'getConfig').mockReturnValue({...config, BRAND_NAME: 'Wire'});
   });
@@ -51,7 +53,8 @@ describe('SendCallLogs', () => {
     jest.restoreAllMocks();
   });
 
-  it('requires confirmation before starting the upload and blocks dismissal while sending', async () => {
+  it.each(['mock', 'server'] as const)('requires confirmation and shows the correct report in %s mode', async mode => {
+    useCallLogsUploadSettings.setState({mode});
     const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
     const service = createMockCallLogsService(clock);
     const send = jest.spyOn(service, 'sendCallLogs');
@@ -88,7 +91,7 @@ describe('SendCallLogs', () => {
     expect(show.mock.calls[1][0]).toBe(PrimaryModal.type.ACKNOWLEDGE);
     expect(show.mock.calls[1][1].text?.title).toBe(translateForTest('modalCallLogsSuccessTitle'));
     render(<>{show.mock.calls[1][1].text?.message}</>);
-    expect(screen.getByText(translateForTest('modalCallLogsMockNotice'))).toBeDefined();
+    expect(screen.queryByText(translateForTest('modalCallLogsMockNotice')) !== null).toBe(mode === 'mock');
     expect(screen.getByText('mock-client@mock-domain')).toBeDefined();
   });
 
@@ -118,6 +121,7 @@ describe('SendCallLogs', () => {
     [502, 'modalCallLogsError502'],
     [500, 'modalCallLogsError500'],
     ['network', 'modalCallLogsErrorNetwork'],
+    ['response', 'modalCallLogsErrorResponse'],
   ] as const)('shows the appropriate retry guidance for %s', async (status, key) => {
     const show = jest.spyOn(PrimaryModal, 'show').mockReturnValue(undefined);
     const wrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
