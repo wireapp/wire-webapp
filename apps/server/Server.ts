@@ -64,8 +64,10 @@ class Server {
     }
 
     this.app = express();
+    this.app.disable('x-powered-by');
     this.staticAssetsApp = express();
     this.routesApp = express();
+    this.routesApp.disable('x-powered-by');
     this.init();
   }
 
@@ -310,7 +312,10 @@ class Server {
         ...rspackConfiguration.devServer,
         allowedHosts: [appBaseHostname, 'localhost', '127.0.0.1'],
         app: async () => {
-          return express();
+          const application = express();
+          application.disable('x-powered-by');
+
+          return application;
         },
         host: '0.0.0.0',
         port: this.config.PORT_HTTP,
