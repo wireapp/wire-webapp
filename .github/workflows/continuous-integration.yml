@@ -202,7 +202,6 @@ jobs:
             static/min/dexie.js
             static/min/pdf.worker.mjs
             static/min/worker.js
-            static/sw.js
           )
 
           for entry_script_path in "${required_entry_scripts[@]}"; do

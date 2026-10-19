@@ -245,7 +245,6 @@ export class App {
     }
 
     this._subscribeToEvents();
-    this.initServiceWorker();
   }
 
   //##############################################################################
@@ -854,17 +853,6 @@ export class App {
       return reportStartupFailure(error, {
         handleBaseError,
         reportStartup,
-      });
-    }
-  }
-
-  /**
-   * Initialize ServiceWorker if supported.
-   */
-  private async initServiceWorker() {
-    if (isTruthy(navigator.serviceWorker)) {
-      await navigator.serviceWorker.register(`/sw.js?${Environment.version(false)}`).then(({scope}) => {
-        return this.logger.debug(`ServiceWorker registration successful with scope: ${scope}`);
       });
     }
   }

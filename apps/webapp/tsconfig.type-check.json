@@ -18,5 +18,5 @@
       "apps/*": ["apps/*"]
     }
   },
-  "exclude": ["node_modules", "../server/", "src/sw.js", "src/worker/"]
+  "exclude": ["node_modules", "../server/", "src/worker/"]
 }

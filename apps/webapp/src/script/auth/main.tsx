@@ -29,6 +29,7 @@ import {FC} from 'react';
 
 import {createRoot} from 'react-dom/client';
 import {Provider} from 'react-redux';
+import {Maybe} from 'true-myth';
 import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
@@ -45,10 +46,19 @@ import {actionRoot} from './module/action';
 import {Root} from './page/root';
 
 import {Config} from '../Config';
+import {retireLegacyServiceWorker} from '../lifecycle/retireLegacyServiceWorker';
 import {updateApiVersion} from '../lifecycle/updateRemoteConfigs';
 import {setAppLocale} from '../localization/Localizer';
 import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';
+
+retireLegacyServiceWorker({
+  serviceWorkerContainer: Maybe.of(navigator.serviceWorker),
+  cacheStorage: Maybe.of(window.caches),
+  origin: window.location.origin,
+}).catch((error: unknown) => {
+  console.warn('Legacy service worker cleanup failed; continuing application startup.', error);
+});
 
 exposeWrapperGlobals();
 

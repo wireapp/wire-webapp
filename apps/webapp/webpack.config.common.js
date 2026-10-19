@@ -20,7 +20,6 @@
 const CopyPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpack = require('webpack');
-const WorkboxPlugin = require('workbox-webpack-plugin');
 const dotenv = require('dotenv-extended');
 const {readFileSync} = require('fs');
 
@@ -218,11 +217,6 @@ module.exports = {
   plugins: [
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer'],
-    }),
-    new WorkboxPlugin.InjectManifest({
-      maximumFileSizeToCacheInBytes: process.env.NODE_ENV !== 'production' ? 10 * 1024 * 1024 : undefined,
-      swDest: path.resolve(dist, 'sw.js'),
-      swSrc: path.resolve(SRC_PATH, 'sw.js'),
     }),
     /* All wasm files will be ignored from webpack and copied over to the destination folder, they don't need any webpack processing */
     new CopyPlugin({
