@@ -93,24 +93,6 @@ describe('AssetAPI', () => {
       );
     });
 
-    it('should include forceCaching parameter when true', async () => {
-      mockSendRequest.mockResolvedValue({
-        data: mockArrayBuffer,
-        headers: {},
-        status: StatusCode.OK,
-        statusText: 'OK',
-        config: {},
-      });
-
-      await assetAPI.getAsset(validAssetId, validDomain, null, true).response;
-
-      expect(mockSendRequest).toHaveBeenCalledWith(
-        expect.objectContaining({
-          params: expect.objectContaining({forceCaching: true}),
-        }),
-      );
-    });
-
     it('should throw TypeError for invalid asset ID', () => {
       expect(() => {
         return assetAPI.getAsset('invalid id!', validDomain);
@@ -133,24 +115,23 @@ describe('AssetAPI', () => {
       await expect(request.response).rejects.toThrow('Asset download got cancelled.');
     });
 
-    it('should handle progress callback', async () => {
+    it('passes the progress callback as the final argument', async () => {
       const progressCallback = jest.fn();
-      mockSendRequest.mockResolvedValue({
-        data: mockArrayBuffer,
-        headers: {},
-        status: StatusCode.OK,
-        statusText: 'OK',
-        config: {},
+      mockSendRequest.mockImplementation(async requestConfig => {
+        requestConfig.onDownloadProgress({loaded: 1, total: 2});
+
+        return {
+          data: mockArrayBuffer,
+          headers: {},
+          status: StatusCode.OK,
+          statusText: 'OK',
+          config: {},
+        };
       });
 
-      await assetAPI.getAsset(validAssetId, validDomain, null, false, progressCallback).response;
+      await assetAPI.getAsset(validAssetId, validDomain, null, progressCallback).response;
 
-      expect(mockSendRequest).toHaveBeenCalledWith(
-        expect.objectContaining({
-          onDownloadProgress: expect.any(Function),
-          onUploadProgress: expect.any(Function),
-        }),
-      );
+      expect(progressCallback).toHaveBeenCalledWith(0.5);
     });
   });
 

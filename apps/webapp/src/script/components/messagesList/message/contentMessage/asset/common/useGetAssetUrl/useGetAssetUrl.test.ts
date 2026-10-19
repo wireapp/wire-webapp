@@ -54,7 +54,6 @@ describe('useGetAssetUrl', () => {
         assetKey: 'mock-asset-key',
         assetDomain: 'mock-asset-domain',
         assetToken: 'mock-asset-token',
-        forceCaching: true,
       }),
     ),
   } as unknown as FileAsset;
