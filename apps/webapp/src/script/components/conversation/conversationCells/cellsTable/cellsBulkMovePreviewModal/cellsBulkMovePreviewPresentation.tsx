@@ -17,6 +17,9 @@
  *
  */
 
+import type {RestPerformActionResponse} from 'cells-sdk-ts';
+import type {Result} from 'true-myth';
+
 import {CellsModal} from 'Components/conversation/conversationCells/common/cellsModal/cellsModal';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CellNode} from 'src/script/types/cellNode';
@@ -31,6 +34,9 @@ interface CellsBulkMovePreviewPresentationProps {
   selectedNodes: CellNode[];
   conversationName: string;
   destination: BulkMoveDestinationSelection;
+  onMove: () => Promise<Result<RestPerformActionResponse, unknown>>;
+  isMoveDisabled: boolean;
+  isMoveLoading: boolean;
 }
 
 export const CellsBulkMovePreviewPresentation = ({
@@ -39,8 +45,18 @@ export const CellsBulkMovePreviewPresentation = ({
   selectedNodes,
   conversationName,
   destination,
+  onMove,
+  isMoveDisabled,
+  isMoveLoading,
 }: CellsBulkMovePreviewPresentationProps) => {
   const {translate} = useApplicationContext();
+
+  const handleMove = async (): Promise<void> => {
+    const moveResult = await onMove();
+    if (moveResult.isOk) {
+      onClose();
+    }
+  };
 
   return (
     <CellsModal isOpen={isOpen} onClose={onClose} size="large">
@@ -73,6 +89,9 @@ export const CellsBulkMovePreviewPresentation = ({
         <CellsModal.SecondaryButton onClick={onClose}>
           {translate('cells.moveNodeModal.cancelButton')}
         </CellsModal.SecondaryButton>
+        <CellsModal.PrimaryButton onClick={handleMove} isDisabled={isMoveDisabled}>
+          {translate(isMoveLoading ? 'cells.bulkMove.movingButton' : 'cells.bulkMove.moveButton')}
+        </CellsModal.PrimaryButton>
       </CellsModal.Actions>
     </CellsModal>
   );
