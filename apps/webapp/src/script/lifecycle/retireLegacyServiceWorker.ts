@@ -28,28 +28,6 @@ type RetireLegacyServiceWorkerOptions = {
 
 const legacyAssetCacheNames = new Set(['asset-cache-v3', 'asset-cache-v2', "asset: 'asset-cache-v2"]);
 
-export async function retireLegacyServiceWorker(options: RetireLegacyServiceWorkerOptions): Promise<void> {
-  const {serviceWorkerContainer, cacheStorage, origin} = options;
-  const unregisterPromise = serviceWorkerContainer.match({
-    Just: availableServiceWorkerContainer => {
-      return unregisterLegacyServiceWorker(availableServiceWorkerContainer, origin);
-    },
-    Nothing: () => {
-      return Promise.resolve();
-    },
-  });
-  const deleteCachesPromise = cacheStorage.match({
-    Just: availableCacheStorage => {
-      return deleteLegacyAssetCaches(availableCacheStorage);
-    },
-    Nothing: () => {
-      return Promise.resolve();
-    },
-  });
-
-  await Promise.all([unregisterPromise, deleteCachesPromise]);
-}
-
 async function unregisterLegacyServiceWorker(
   serviceWorkerContainer: Pick<ServiceWorkerContainer, 'getRegistrations'>,
   origin: string,
@@ -93,4 +71,26 @@ function isLegacyWireRegistration(registration: ServiceWorkerRegistration, origi
 
     return workerUrl.origin === origin && workerUrl.pathname === '/sw.js';
   });
+}
+
+export async function retireLegacyServiceWorker(options: RetireLegacyServiceWorkerOptions): Promise<void> {
+  const {serviceWorkerContainer, cacheStorage, origin} = options;
+  const unregisterPromise = serviceWorkerContainer.match({
+    Just: availableServiceWorkerContainer => {
+      return unregisterLegacyServiceWorker(availableServiceWorkerContainer, origin);
+    },
+    Nothing: () => {
+      return Promise.resolve();
+    },
+  });
+  const deleteCachesPromise = cacheStorage.match({
+    Just: availableCacheStorage => {
+      return deleteLegacyAssetCaches(availableCacheStorage);
+    },
+    Nothing: () => {
+      return Promise.resolve();
+    },
+  });
+
+  await Promise.all([unregisterPromise, deleteCachesPromise]);
 }
