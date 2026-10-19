@@ -22,6 +22,7 @@ import {DragEvent, useEffect, useState} from 'react';
 import {isNonEmptyString} from '@sindresorhus/is';
 import {flexRender, getCoreRowModel, type Header, useReactTable} from '@tanstack/react-table';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
+import type {RestPerformActionResponse} from 'cells-sdk-ts';
 import {createPortal} from 'react-dom';
 
 import {UploadIcon} from '@wireapp/react-ui-kit';
@@ -77,6 +78,7 @@ interface CellsTableProps {
   selectionEnabled: boolean;
   selectionScopeKey: string;
   selectionBarAnchor: HTMLElement | null;
+  onBulkMoveResult?: (response: RestPerformActionResponse) => void;
 }
 
 interface CellsTableHeaderCellProps {
@@ -129,6 +131,7 @@ export const CellsTable = ({
   selectionEnabled,
   selectionScopeKey,
   selectionBarAnchor,
+  onBulkMoveResult,
 }: CellsTableProps) => {
   const {translate, isFeatureToggleEnabled} = useApplicationContext();
   const isSelectionEnabled = selectionEnabled && isFeatureToggleEnabled(driveBulkActionsFeatureToggleName);
@@ -318,6 +321,9 @@ export const CellsTable = ({
             cellsRepository={cellsRepository}
             conversationQualifiedId={conversationQualifiedId}
             conversationName={conversationName}
+            onMoveResult={response => {
+              onBulkMoveResult?.(response);
+            }}
           />
         )}
         {activeFolderDropTargetName !== null && (

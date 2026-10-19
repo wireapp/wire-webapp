@@ -22,6 +22,7 @@ import userEvent from '@testing-library/user-event';
 import {noop} from 'noop-esm';
 
 import {ThemeProvider} from '@wireapp/react-ui-kit';
+import type {RestPerformActionResponse} from 'cells-sdk-ts';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import type {Conversation} from 'Repositories/entity/Conversation';
@@ -125,6 +126,7 @@ const renderCellsTable = ({
   isBulkActionsEnabled = true,
   cellsRepository = {} as CellsRepository,
   initialNodes,
+  onBulkMoveResult,
 }: {
   readonly folderPath?: string;
   readonly onDropFilesToFolder?: (files: readonly File[], uploadPath: string) => void;
@@ -136,6 +138,7 @@ const renderCellsTable = ({
   readonly isBulkActionsEnabled?: boolean;
   readonly cellsRepository?: CellsRepository;
   readonly initialNodes?: CellNode[];
+  readonly onBulkMoveResult?: (response: RestPerformActionResponse) => void;
 } = {}) => {
   const wrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({
@@ -182,6 +185,7 @@ const renderCellsTable = ({
           selectionEnabled={isSelectionEnabled}
           selectionScopeKey={scopeKey}
           selectionBarAnchor={document.body}
+          onBulkMoveResult={onBulkMoveResult}
         />
       </ThemeProvider>
     );
@@ -336,7 +340,7 @@ describe('CellsTable selection', () => {
     const user = userEvent.setup();
     const repository = {
       getAllNodes: jest.fn().mockResolvedValue({Nodes: []}),
-      moveNodes: jest.fn().mockResolvedValue({BackgroundActions: [{JobUuid: 'move-job', Name: 'move'}]}),
+      moveNodes: jest.fn().mockResolvedValue({Status: 'Performed'}),
     } as unknown as CellsRepository;
     renderCellsTable({cellsRepository: repository, folderPath: 'wire-cells-web/Marketing images'});
 
@@ -362,6 +366,34 @@ describe('CellsTable selection', () => {
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
     expect(screen.getByText('2 selected')).toBeInTheDocument();
+    window.location.hash = originalHash;
+  });
+
+  it('propagates a background result without closing the preview as completed', async () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files/wire-cells-web';
+    const user = userEvent.setup();
+    const onBulkMoveResult = jest.fn();
+    const backgroundResponse = {Status: 'Background', BackgroundActions: [{JobUuid: 'move-job', Name: 'move'}]};
+    const repository = {
+      getAllNodes: jest.fn().mockResolvedValue({Nodes: []}),
+      moveNodes: jest.fn().mockResolvedValue(backgroundResponse),
+    } as unknown as CellsRepository;
+    renderCellsTable({
+      cellsRepository: repository,
+      folderPath: 'wire-cells-web/Marketing images',
+      onBulkMoveResult,
+    });
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+    await user.click(screen.getByRole('button', {name: 'Move'}));
+    const dialog = await screen.findByRole('dialog');
+    await user.click(within(dialog).getByRole('button', {name: 'Move'}));
+
+    await waitFor(() => {
+      expect(onBulkMoveResult).toHaveBeenCalledWith(backgroundResponse);
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+    });
     window.location.hash = originalHash;
   });
 
@@ -397,7 +429,7 @@ describe('CellsTable selection', () => {
     expect(repository.moveNodes).toHaveBeenCalledTimes(1);
     await user.click(within(dialog).getByRole('button', {name: 'cells.moveNodeModal.cancelButton'}));
     expect(dialog).toBeInTheDocument();
-    resolveMove({BackgroundActions: [{JobUuid: 'move-job', Name: 'move'}]});
+    resolveMove({Status: 'Performed'});
     await waitFor(() => {
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });

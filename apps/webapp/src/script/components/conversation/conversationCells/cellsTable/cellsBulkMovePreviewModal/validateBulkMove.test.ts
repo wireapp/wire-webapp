@@ -81,6 +81,16 @@ describe('isBulkMoveValid', () => {
     );
   });
 
+  it('rejects destinations qualified to a different conversation', () => {
+    expect(
+      isBulkMoveValid({
+        conversationQualifiedId,
+        selectedNodes: [createNode('Drive/file.txt', CellNodeType.FILE)],
+        destinationPath: 'other@example.com/Drive/Archive',
+      }),
+    ).toBe(false);
+  });
+
   it('allows moving to the drive root', () => {
     expect(
       isBulkMoveValid({
