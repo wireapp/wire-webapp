@@ -224,7 +224,7 @@ jobs:
           fi
 
       - name: Install Chromium for Rspack smoke tests
-        run: node_modules/.bin/playwright install --only-shell --with-deps chromium
+        run: ./bin/yarn exec playwright install --only-shell --with-deps chromium
 
       - name: Run Rspack browser smoke tests
         run: ./bin/yarn nx run webapp:smoke-rspack

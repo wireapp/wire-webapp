@@ -9,7 +9,7 @@ Build both variants and install Chromium once:
 ```bash
 yarn nx run webapp:build
 yarn nx run webapp:build-production-public
-node_modules/.bin/playwright install chromium
+./bin/yarn exec playwright install chromium
 yarn nx run webapp:smoke-rspack
 ```
 
