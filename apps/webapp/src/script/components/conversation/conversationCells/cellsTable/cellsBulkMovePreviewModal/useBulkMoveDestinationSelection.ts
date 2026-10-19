@@ -48,6 +48,14 @@ export interface BulkMoveDestinationSelection {
   status: 'idle' | 'loading' | 'success' | 'error';
 }
 
+const getDriveRootPath = (currentPath: string): string => {
+  return currentPath.split('/').filter(Boolean)[0] ?? '';
+};
+
+const getParentPath = (path: string): string => {
+  return path.split('/').slice(0, -1).join('/');
+};
+
 const normalizeDestinationPath = (path: string, rootPath: string): string => {
   const normalizedRootPath = rootPath.replace(/\/+$/, '');
   const normalizedPath = path.replace(/^\/+|\/+$/g, '');
@@ -75,8 +83,9 @@ export const useBulkMoveDestinationSelection = ({
   conversationQualifiedId,
 }: UseBulkMoveDestinationSelectionProps): BulkMoveDestinationSelection => {
   const {clock, fireAndForgetInvoker, translate} = useApplicationContext();
-  const rootPath = getCellsFilesPath();
-  const [currentPath, setCurrentPath] = useState(rootPath);
+  const currentRoutePath = getCellsFilesPath();
+  const rootPath = getDriveRootPath(currentRoutePath);
+  const [currentPath, setCurrentPath] = useState(currentRoutePath);
   const [selectedDestinationPath, setSelectedDestinationPath] = useState(rootPath);
   const {folders, status, shouldShowLoadingSpinner} = useGetCellsFolders({
     cellsRepository,
@@ -96,17 +105,27 @@ export const useBulkMoveDestinationSelection = ({
         return node.path;
       });
   }, [selectedNodes]);
+  const selectedParentPath = useMemo(() => {
+    const parentPaths = selectedNodes.map(node => {
+      return getParentPath(node.path);
+    });
+    return parentPaths.every(path => {
+      return path === parentPaths[0];
+    })
+      ? parentPaths[0]
+      : null;
+  }, [selectedNodes]);
   const disabledDestinationPaths = useMemo(() => {
-    return [...selectedFolderPaths, currentPath];
-  }, [selectedFolderPaths, currentPath]);
+    return selectedParentPath === null ? selectedFolderPaths : [...selectedFolderPaths, selectedParentPath];
+  }, [selectedFolderPaths, selectedParentPath]);
   const disabledDestinationLabels = useMemo(() => {
     return Object.fromEntries([
       ...selectedFolderPaths.map(path => {
         return [path, translate('cells.bulkMove.selected')];
       }),
-      [currentPath, translate('cells.bulkMove.currentLocation')],
+      ...(selectedParentPath === null ? [] : [[selectedParentPath, translate('cells.bulkMove.currentLocation')]]),
     ]);
-  }, [selectedFolderPaths, currentPath, translate]);
+  }, [selectedFolderPaths, selectedParentPath, translate]);
 
   const handlePathChange = (path: string): void => {
     setCurrentPath(path);

@@ -41,6 +41,10 @@ const isSameOrDescendantPath = (path: string, parentPath: string): boolean => {
   return path === parentPath || path.startsWith(`${parentPath}/`);
 };
 
+const getParentPath = (path: string): string => {
+  return path.split('/').slice(0, -1).join('/');
+};
+
 export const isBulkMoveValid = ({
   conversationQualifiedId,
   destinationPath,
@@ -72,6 +76,14 @@ export const isBulkMoveValid = ({
   }
 
   if (new Set(selectedPaths).size !== selectedPaths.length) {
+    return false;
+  }
+
+  if (
+    selectedPaths.every(path => {
+      return getParentPath(path) === destination;
+    })
+  ) {
     return false;
   }
 

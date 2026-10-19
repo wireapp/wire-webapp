@@ -35,7 +35,7 @@ interface CellsBulkMovePreviewPresentationProps {
   conversationName: string;
   destination: BulkMoveDestinationSelection;
   onMove: () => Promise<Result<RestPerformActionResponse, unknown>>;
-  onMoveResult: (response: RestPerformActionResponse) => void;
+  onMovePerformed: () => void;
   isMoveDisabled: boolean;
   isMoveLoading: boolean;
 }
@@ -47,7 +47,7 @@ export const CellsBulkMovePreviewPresentation = ({
   conversationName,
   destination,
   onMove,
-  onMoveResult,
+  onMovePerformed,
   isMoveDisabled,
   isMoveLoading,
 }: CellsBulkMovePreviewPresentationProps) => {
@@ -56,8 +56,8 @@ export const CellsBulkMovePreviewPresentation = ({
   const handleMove = async (): Promise<void> => {
     const moveResult = await onMove();
     if (moveResult.isOk) {
-      onMoveResult(moveResult.value);
       if (moveResult.value.Status === RestActionStatus.Performed) {
+        onMovePerformed();
         onClose();
       }
     }

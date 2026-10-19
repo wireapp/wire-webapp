@@ -91,6 +91,16 @@ describe('isBulkMoveValid', () => {
     ).toBe(false);
   });
 
+  it('rejects moving selected items to their current parent from a nested route', () => {
+    expect(
+      isBulkMoveValid({
+        conversationQualifiedId,
+        selectedNodes: [createNode('wire-cells-web/Marketing images/file.txt', CellNodeType.FILE)],
+        destinationPath: 'wire-cells-web/Marketing images',
+      }),
+    ).toBe(false);
+  });
+
   it('allows moving to the drive root', () => {
     expect(
       isBulkMoveValid({
