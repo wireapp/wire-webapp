@@ -16,7 +16,6 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  */
 
-import {InjectManifest} from '@aaroon/workbox-rspack-plugin';
 import {rspack} from '@rspack/core';
 import type {Configuration} from '@rspack/core';
 import browserslist from 'browserslist';
@@ -36,10 +35,6 @@ type EnvironmentUrls = {
   readonly api: string;
   readonly ws: string;
 };
-
-const maximumPrecacheFileSizeMegabytes = 10;
-const bytesPerKilobyte = 1024;
-const bytesPerMegabyte = bytesPerKilobyte * bytesPerKilobyte;
 
 const configFilePath = fileURLToPath(import.meta.url);
 const configDirectoryPath = path.dirname(configFilePath);
@@ -257,12 +252,6 @@ const rspackConfiguration: Configuration = {
       'process.env': {
         NODE_ENV: '"production"',
       },
-    }),
-    new InjectManifest({
-      maximumFileSizeToCacheInBytes:
-        process.env.NODE_ENV !== 'production' ? maximumPrecacheFileSizeMegabytes * bytesPerMegabyte : undefined,
-      swDest: path.resolve(outputPath, 'sw.js'),
-      swSrc: path.resolve(srcPath, 'sw.js'),
     }),
     new rspack.CopyRspackPlugin({
       patterns: [

@@ -106,7 +106,6 @@
     "zustand": "4.5.7"
   },
   "devDependencies": {
-    "@aaroon/workbox-rspack-plugin": "1.0.1",
     "@babel/core": "7.29.7",
     "@babel/plugin-proposal-decorators": "7.29.7",
     "@babel/preset-env": "7.29.7",
@@ -181,7 +180,6 @@
     "webpack-cli": "6.0.1",
     "webpack-dev-middleware": "7.4.6",
     "webpack-hot-middleware": "2.26.1",
-    "workbox-webpack-plugin": "7.4.1",
     "worker-timers": "8.0.34"
   }
 }

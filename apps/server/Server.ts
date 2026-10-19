@@ -198,11 +198,6 @@ class Server {
     this.app.get('/favicon.ico', (_req, res) => {
       return res.sendFile(path.join(__dirname, 'static/image/favicon.ico'));
     });
-    if (!this.config.DEVELOPMENT) {
-      this.app.get('/sw.js', (_req, res) => {
-        return res.sendFile(path.join(__dirname, 'static/sw.js'));
-      });
-    }
   }
 
   public initLatestBrowserRequired() {
