@@ -853,9 +853,15 @@ const testLinterOptions = {
 const explicitFunctionReturnTypeFilePatterns = [
   'libraries/bazinga64/**/*.{ts,tsx,mts,cts}',
   'libraries/certificate-check/**/*.{ts,tsx,mts,cts}',
+  'libraries/commons/**/*.{ts,tsx,mts,cts}',
   'libraries/config/**/*.{ts,tsx,mts,cts}',
   'libraries/copy-config/**/*.{ts,tsx,mts,cts}',
   'libraries/priority-queue/**/*.{ts,tsx,mts,cts}',
+  'libraries/store-engine/**/*.{ts,tsx,mts,cts}',
+  'libraries/store-engine-dexie/**/*.{ts,tsx,mts,cts}',
+  'libraries/store-engine-fs/**/*.{ts,tsx,mts,cts}',
+  'libraries/telemetry/**/*.{ts,tsx,mts,cts}',
+  'libraries/webapp-events/**/*.{ts,tsx,mts,cts}',
 ];
 
 const config = [
