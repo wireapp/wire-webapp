@@ -47,7 +47,8 @@ export const isBulkMoveValid = ({
   selectedNodes,
 }: ValidateBulkMoveParams): boolean => {
   const destination = normalizePath(destinationPath);
-  if (selectedNodes.length === 0 || hasUnsafePathSegment(destination)) {
+  const hasQualifiedConversationPrefix = /^[^/]+@[^/]+(?:\/|$)/.test(destination);
+  if (selectedNodes.length === 0 || hasUnsafePathSegment(destination) || hasQualifiedConversationPrefix) {
     return false;
   }
 
