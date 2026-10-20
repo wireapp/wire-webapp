@@ -389,7 +389,7 @@ describe('CellsTable selection', () => {
     window.location.hash = originalHash;
   });
 
-  it('does not refresh or close the preview for a background result', async () => {
+  it('keeps a background outcome locked across navigation and action toggles', async () => {
     const originalHash = window.location.hash;
     window.location.hash = '#/conversation/conversation-id@example.com/files/wire-cells-web';
     const user = userEvent.setup();
@@ -419,11 +419,22 @@ describe('CellsTable selection', () => {
     expect(within(dialog).getByRole('button', {name: 'Move'})).toBeDisabled();
     expect(screen.getAllByText(/Move status is unresolved/)).toHaveLength(2);
 
+    await user.click(within(dialog).getByRole('button', {name: 'cells.moveNodeModal.cancelButton'}));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
     rerenderWithSelectionScope('conversation:/subfolder');
+    rerenderWithSelectionScope('conversation:/files');
+    rerenderWithSelectionScope('conversation:/files', false);
+    rerenderWithSelectionScope('conversation:/files', true);
     expect(screen.getByText(/Move status is unresolved/)).toBeInTheDocument();
-    rerenderWithSelectionScope('conversation:/subfolder', false);
-    rerenderWithSelectionScope('conversation:/subfolder', true);
-    expect(screen.getByText(/Move status is unresolved/)).toBeInTheDocument();
+
+    fireEvent.click(screen.getAllByRole('checkbox')[0]);
+    expect(screen.getByText('1 selected')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', {name: 'Move'}));
+    const reopenedDialog = await screen.findByRole('dialog');
+    expect(within(reopenedDialog).getByRole('button', {name: 'Move'})).toBeDisabled();
+    expect(repository.moveNodes).toHaveBeenCalledTimes(1);
+    expect(onRefresh).not.toHaveBeenCalled();
     window.location.hash = originalHash;
   });
 
