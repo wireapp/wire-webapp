@@ -95,7 +95,7 @@ export async function extractAsync(zipFile: string, destination: string): Promis
   );
 }
 
-export const isFile = (path: string) => {
+export const isFile = (path: string): boolean => {
   return /\w\.\w+$/.test(path);
 };
 export const rimrafAsync = rimraf;

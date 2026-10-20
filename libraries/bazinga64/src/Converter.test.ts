@@ -236,7 +236,7 @@ describe('toArrayBufferView', () => {
   });
 
   it('throws an error on unexpected inputs', () => {
-    const test = () => {
+    const test = (): void => {
       bazinga64.Converter.toArrayBufferView(new Error() as any);
     };
 
@@ -272,7 +272,7 @@ describe('toString', () => {
   });
 
   it('throws an error on unexpected inputs', () => {
-    const test = () => {
+    const test = (): void => {
       bazinga64.Converter.toArrayBufferView(new Error() as any);
     };
 

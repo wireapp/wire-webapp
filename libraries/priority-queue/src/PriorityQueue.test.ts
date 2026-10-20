@@ -66,7 +66,7 @@ describe('PriorityQueue', () => {
     });
 
     it('works with thunked functions', async () => {
-      function happyFn() {
+      function happyFn(): string {
         return 'happy';
       }
 
@@ -103,7 +103,7 @@ describe('PriorityQueue', () => {
     });
 
     it('catches throwing thunked functions', async () => {
-      function notHappyFn() {
+      function notHappyFn(): never {
         throw Error('not so happy');
       }
 
