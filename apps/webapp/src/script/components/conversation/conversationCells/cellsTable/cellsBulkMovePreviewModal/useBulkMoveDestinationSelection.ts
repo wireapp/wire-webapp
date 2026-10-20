@@ -70,10 +70,14 @@ const normalizeDestinationPath = (path: string, rootPath: string): string => {
   return normalizedPath;
 };
 
-const getDestinationPath = (path: string, rootPath: string): string => {
-  const normalizedRootPath = rootPath.replace(/\/+$/, '');
-  const relativePath = normalizeDestinationPath(path, rootPath);
-  return relativePath.length > 0 ? [normalizedRootPath, relativePath].filter(Boolean).join('/') : rootPath;
+const getDestinationPath = (path: string, drivePathPrefix: string): string => {
+  if (path.length === 0) {
+    return '';
+  }
+
+  const normalizedPrefix = drivePathPrefix.replace(/\/+$/, '');
+  const relativePath = normalizeDestinationPath(path, drivePathPrefix);
+  return relativePath.length > 0 ? [normalizedPrefix, relativePath].filter(Boolean).join('/') : normalizedPrefix;
 };
 
 export const useBulkMoveDestinationSelection = ({
@@ -84,9 +88,9 @@ export const useBulkMoveDestinationSelection = ({
 }: UseBulkMoveDestinationSelectionProps): BulkMoveDestinationSelection => {
   const {clock, fireAndForgetInvoker, translate} = useApplicationContext();
   const currentRoutePath = getCellsFilesPath();
-  const rootPath = getDriveRootPath(currentRoutePath);
+  const drivePathPrefix = getDriveRootPath(selectedNodes[0]?.path ?? currentRoutePath);
   const [currentPath, setCurrentPath] = useState(currentRoutePath);
-  const [selectedDestinationPath, setSelectedDestinationPath] = useState(rootPath);
+  const [selectedDestinationPath, setSelectedDestinationPath] = useState('');
   const {folders, status, shouldShowLoadingSpinner} = useGetCellsFolders({
     cellsRepository,
     conversationQualifiedId,
@@ -129,14 +133,14 @@ export const useBulkMoveDestinationSelection = ({
 
   const handlePathChange = (path: string): void => {
     setCurrentPath(path);
-    setSelectedDestinationPath(getDestinationPath(path, rootPath));
+    setSelectedDestinationPath(getDestinationPath(path, drivePathPrefix));
   };
   const handleDestinationSelect = (path: string): void => {
-    setSelectedDestinationPath(getDestinationPath(path, rootPath));
+    setSelectedDestinationPath(getDestinationPath(path, drivePathPrefix));
   };
 
   const driveLabel = translate('cells.bulkMove.drive');
-  const relativeDestinationPath = normalizeDestinationPath(selectedDestinationPath, rootPath);
+  const relativeDestinationPath = normalizeDestinationPath(selectedDestinationPath, drivePathPrefix);
   const currentDestination =
     relativeDestinationPath.length > 0
       ? `${driveLabel} / ${relativeDestinationPath.split('/').filter(Boolean).join(' / ')}`

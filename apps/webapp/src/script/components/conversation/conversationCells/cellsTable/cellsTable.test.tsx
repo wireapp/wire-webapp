@@ -371,7 +371,7 @@ describe('CellsTable selection', () => {
     });
     expect(repository.moveNodes).toHaveBeenCalledWith({
       currentPaths: ['wire-cells-web/Marketing images/Images', 'wire-cells-web/Marketing images/Wire logs.pdf'],
-      targetPath: 'conversation-id@example.com/wire-cells-web',
+      targetPath: 'conversation-id@example.com',
     });
     expect(onRefresh).toHaveBeenCalledTimes(1);
     await waitFor(() => {
@@ -406,6 +406,46 @@ describe('CellsTable selection', () => {
       expect(onRefresh).not.toHaveBeenCalled();
       expect(screen.getByRole('dialog')).toBeInTheDocument();
     });
+    window.location.hash = originalHash;
+  });
+
+  it('moves a nested file to the Drive root selected from the breadcrumb', async () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files/wire-cells-web/folder';
+    const user = userEvent.setup();
+    const onRefresh = jest.fn();
+    const repository = {
+      getAllNodes: jest.fn().mockResolvedValue({Nodes: []}),
+      moveNodes: jest.fn().mockResolvedValue({Status: 'Performed'}),
+    } as unknown as CellsRepository;
+    renderCellsTable({
+      cellsRepository: repository,
+      initialNodes: [
+        createNode({
+          id: 'nested-file',
+          name: 'aaaa-1.docx',
+          path: 'wire-cells-web/folder/aaaa-1.docx',
+          type: CellNodeType.FILE,
+          extension: 'docx',
+        }),
+      ],
+      onRefresh,
+    });
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select aaaa-1.docx'}));
+    await user.click(screen.getByRole('button', {name: 'Move'}));
+    const preview = await screen.findByRole('dialog');
+    await user.click(within(preview).getByRole('button', {name: 'cells.breadcrumb.files'}));
+    expect(within(preview).getByText('Current destination: Drive')).toBeInTheDocument();
+    await user.click(within(preview).getByRole('button', {name: 'Move'}));
+
+    await waitFor(() => {
+      expect(repository.moveNodes).toHaveBeenCalledWith({
+        currentPaths: ['wire-cells-web/folder/aaaa-1.docx'],
+        targetPath: 'conversation-id@example.com',
+      });
+    });
+    expect(onRefresh).toHaveBeenCalledTimes(1);
     window.location.hash = originalHash;
   });
 
