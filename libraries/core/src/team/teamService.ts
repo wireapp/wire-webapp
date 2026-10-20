@@ -73,7 +73,7 @@ export class TeamService {
   private commonConfig: FeatureList | null = null;
   private commonConfigFetchedAt: number | null = null;
   private readonly CACHE_DURATION_MS = teamCacheDurationInMilliseconds; // 24 hours
-  public async getCommonFeatureConfig() {
+  public async getCommonFeatureConfig(): Promise<FeatureList> {
     const now = Date.now();
 
     if (

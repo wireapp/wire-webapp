@@ -22,7 +22,7 @@ import {Decoder} from 'bazinga64';
 
 import {APIClient} from '@wireapp/api-client';
 import {LogFactory} from '@wireapp/commons';
-import {ConversationId} from '@wireapp/core-crypto';
+import {ConversationId, NewCrlDistributionPoints} from '@wireapp/core-crypto';
 
 import {AcmeService} from './connection/acmeServer';
 import {AcmeDirectory, Ciphersuite, CoreCrypto, CredentialType, E2eiEnrollment} from './e2eiService.types';
@@ -38,6 +38,8 @@ import {EnrollmentFlowData, InitialData, UnidentifiedEnrollmentFlowData} from '.
 
 import {CoreDatabase} from '../../../storage/coreDb';
 import {toBufferSource} from '../../../util/bufferUtils';
+
+type CertificateGenerationResult = {newCrlDistributionPoints: NewCrlDistributionPoints; keyPackages: Uint8Array[]};
 
 export type getTokenCallback = (challengesData?: {challenge: any; keyAuth: string}) => Promise<string | undefined>;
 
@@ -75,7 +77,7 @@ export class E2EIServiceInternal {
     refresh: boolean,
     getAllConversations: getAllConversationsCallback,
     ciphersuite: Ciphersuite,
-  ) {
+  ): Promise<CertificateGenerationResult> {
     const stashedEnrollmentData = await this.enrollmentStorage.getPendingEnrollmentData();
 
     if (!isUndefined(stashedEnrollmentData)) {
@@ -117,7 +119,7 @@ export class E2EIServiceInternal {
     enrollmentData: EnrollmentFlowData,
     getAllConversations: getAllConversationsCallback,
     cipherSuite: Ciphersuite,
-  ) {
+  ): Promise<CertificateGenerationResult> {
     const handle = enrollmentData.handle;
     const identity = await this.coreCryptoClient.transaction(cx => {
       return cx.e2eiEnrollmentStashPop(handle);
@@ -127,7 +129,7 @@ export class E2EIServiceInternal {
 
   // ############ Internal Functions ############
 
-  private async initIdentity(hasActiveCertificate: boolean, ciphersuite: Ciphersuite) {
+  private async initIdentity(hasActiveCertificate: boolean, ciphersuite: Ciphersuite): Promise<E2eiEnrollment> {
     const {user} = this.initialData;
 
     return hasActiveCertificate
@@ -175,7 +177,7 @@ export class E2EIServiceInternal {
    *
    * @returns authData
    */
-  private async getEnrollmentChallenges(identity: E2eiEnrollment) {
+  private async getEnrollmentChallenges(identity: E2eiEnrollment): Promise<UnidentifiedEnrollmentFlowData> {
     // Get the directory
     const {acmeService: acmeService} = this;
     const directory = await this.getDirectory(identity, acmeService);
@@ -230,7 +232,7 @@ export class E2EIServiceInternal {
     enrollmentData: UnidentifiedEnrollmentFlowData,
     getAllConversations: getAllConversationsCallback,
     cipherSuite: Ciphersuite,
-  ) {
+  ): Promise<CertificateGenerationResult> {
     // Step 7: Do OIDC client challenge
     const oidcData = await doWireOidcChallenge({
       oAuthIdToken,

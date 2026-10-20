@@ -23,9 +23,16 @@ import {ErrorType, ProteusErrorType} from '@wireapp/core-crypto';
 
 import {DecryptionError} from '../../../../errors/decryptionError';
 
+type StructuredProteusError = Error & {
+  name: string;
+  errorStack: never[];
+  type: ErrorType;
+  context: {type: ProteusErrorType; context: {errorCode?: undefined} | {errorCode: number}};
+};
+
 const basePayload = {userId: {id: 'user1', domain: 'domain'}, clientId: 'client1'};
 
-const createStructuredProteusError = (errorCode?: number) => {
+const createStructuredProteusError = (errorCode?: number): StructuredProteusError => {
   return Object.assign(new Error('proteus decryption error'), {
     name: 'ProteusErrorOther',
     errorStack: [],

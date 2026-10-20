@@ -21,7 +21,10 @@ import {Converter} from 'bazinga64';
 
 import {DoWireDpopChallengeParams, GetClientNonceParams} from './dpopChallenge.types';
 
-const getClientNonce = async ({apiClient, clientId}: GetClientNonceParams) => {
+import type {PostJoseRequestReturnValue} from '../../connection/acmeServer/acmeService.types';
+import type {DpopChallengeResponseData} from '../../connection/acmeServer/schema';
+
+const getClientNonce = async ({apiClient, clientId}: GetClientNonceParams): Promise<string> => {
   try {
     const nonce = await apiClient.api.client.getNonce(clientId);
     if (nonce.length > 0) {
@@ -41,7 +44,7 @@ export const doWireDpopChallenge = async ({
   nonce,
   connection,
   expirySecs,
-}: DoWireDpopChallengeParams) => {
+}: DoWireDpopChallengeParams): Promise<PostJoseRequestReturnValue<DpopChallengeResponseData>> => {
   const {dpopChallenge} = authData.authorization;
   if (dpopChallenge === undefined) {
     throw new Error('No wireDpopChallenge defined');

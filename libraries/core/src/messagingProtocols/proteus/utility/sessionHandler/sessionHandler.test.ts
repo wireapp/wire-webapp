@@ -26,7 +26,10 @@ import {constructSessionId, initSession, initSessions} from './sessionHandler';
 
 import {CryptoClient} from '../../proteusService/cryptoClient';
 
-function generatePrekeys(recipients: QualifiedUserClients) {
+function generatePrekeys(recipients: QualifiedUserClients): Promise<{
+  qualified_user_client_prekeys: QualifiedUserPreKeyBundleMap;
+  failed_to_list: QualifiedId[];
+}> {
   const prekeys: QualifiedUserPreKeyBundleMap = {};
   const failed: QualifiedId[] = [];
 

@@ -58,7 +58,7 @@ export const buildProteusService = async (): Promise<
   return [proteusService, {apiClient, cryptoClient}];
 };
 
-export const cleanupProteusServiceMocks = () => {
+export const cleanupProteusServiceMocks = (): void => {
   createdApiClients.forEach(client => {
     client.disconnect();
   });

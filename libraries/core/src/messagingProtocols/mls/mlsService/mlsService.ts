@@ -62,6 +62,7 @@ import {
 } from './coreCryptoMlsError';
 
 import {AddUsersFailure, AddUsersFailureReasons, KeyPackageClaimUser} from '../../../conversation';
+import type {HandledEventPayload} from '../../../notification';
 import {CoreDatabase} from '../../../storage/coreDb';
 import {parseFullQualifiedClientId} from '../../../util/fullyQualifiedClientIdUtils';
 import {numberToHex} from '../../../util/numberToHex';
@@ -182,27 +183,27 @@ export class MLSService extends TypedEventEmitter<Events> {
   /**
    * return true if the MLS service if configured and ready to be used
    */
-  get isEnabled() {
+  get isEnabled(): boolean {
     return this._config !== undefined;
   }
 
-  get config() {
+  get config(): MLSConfig {
     if (this._config === undefined) {
       throw new Error('mls config is not set, did you forget to call initClient?');
     }
     return this._config;
   }
 
-  private get keyPackageUploadAmount() {
+  private get keyPackageUploadAmount(): number {
     return this.config.getNbKeyPackages?.() ?? this.config.nbKeyPackages;
   }
 
-  private get minRequiredKeyPackages() {
+  private get minRequiredKeyPackages(): number {
     return Math.floor(this.keyPackageUploadAmount / keyPackageReplenishmentDivisor);
   }
 
   /** Recheck after a consumer policy change, without reinitializing the MLS client. */
-  public async refreshKeyPackages(clientId: string) {
+  public async refreshKeyPackages(clientId: string): Promise<void> {
     if (!this.isEnabled || this.initialKeyPackageUploadDeferred) {
       return;
     }
@@ -278,11 +279,11 @@ export class MLSService extends TypedEventEmitter<Events> {
    * returns true if the client has a valid MLS identity in regard of the default ciphersuite set
    * @param client the client to check
    */
-  public isInitializedMLSClient = (client: RegisteredClient) => {
+  public isInitializedMLSClient = (client: RegisteredClient): boolean => {
     return isMLSDevice(client, this.config.defaultCiphersuite);
   };
 
-  private async getCredentialType() {
+  private async getCredentialType(): Promise<CredentialType> {
     return (await this.coreCryptoClient.e2eiIsEnabled(this.config.defaultCiphersuite))
       ? CredentialType.X509
       : CredentialType.Basic;
@@ -368,7 +369,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     groupId: string,
     keyPackages: Uint8Array[],
     coreCryptoTransactionContext?: CoreCryptoContext,
-  ) {
+  ): Promise<void> {
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
 
     if (keyPackages.length < 1) {
@@ -403,7 +404,7 @@ export class MLSService extends TypedEventEmitter<Events> {
    * @param groupId - the group id of the MLS group
    * @returns list of client ids
    */
-  public async getClientIdsInGroup(groupId: string) {
+  public async getClientIdsInGroup(groupId: string): Promise<string[]> {
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
     const currentClientIdsInGroup = [];
 
@@ -422,7 +423,10 @@ export class MLSService extends TypedEventEmitter<Events> {
     return currentClientIdsInGroup;
   }
 
-  public async getKeyPackagesPayload(qualifiedUsers: KeyPackageClaimUser[], skipClientIds: string[] = []) {
+  public async getKeyPackagesPayload(
+    qualifiedUsers: KeyPackageClaimUser[],
+    skipClientIds: string[] = [],
+  ): Promise<{keyPackages: Uint8Array[]; failures: AddUsersFailure[]}> {
     /**
      * @note We need to fetch key packages for all the users
      * we want to add to the new MLS conversations,
@@ -504,7 +508,7 @@ export class MLSService extends TypedEventEmitter<Events> {
   /**
    * @deprecated Use `getSafeEpoch` to receive a `Task` with explicit error handling.
    */
-  public getEpoch(groupId: string | Uint8Array) {
+  public getEpoch(groupId: string | Uint8Array): Promise<number> {
     const groupIdBytes = typeof groupId === 'string' ? Decoder.fromBase64(groupId).asBytes : groupId;
     return this.coreCryptoClient.conversationEpoch(new ConversationId(groupIdBytes));
   }
@@ -531,7 +535,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     );
   }
 
-  public async joinByExternalCommit(getGroupInfo: () => Promise<Uint8Array>) {
+  public async joinByExternalCommit(getGroupInfo: () => Promise<Uint8Array>): Promise<void> {
     try {
       this.logger.info('Trying to join MLS group via external commit');
       const credentialType = await this.getCredentialType();
@@ -569,7 +573,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     return Encoder.toBase64(key).asString;
   }
 
-  private dispatchNewCrlDistributionPoints(crlNewDistributionPoints: NewCrlDistributionPoints) {
+  private dispatchNewCrlDistributionPoints(crlNewDistributionPoints: NewCrlDistributionPoints): void {
     if (crlNewDistributionPoints !== undefined && crlNewDistributionPoints.length > 0) {
       this.emit(MLSServiceEvents.NEW_CRL_DISTRIBUTION_POINTS, crlNewDistributionPoints);
     }
@@ -645,7 +649,7 @@ export class MLSService extends TypedEventEmitter<Events> {
    * rejected identically. Recovering requires re-syncing the epoch first, which only the call site
    * can do through the MLS recovery orchestrator.
    */
-  private async updateKeyingMaterial(groupId: string, context: CoreCryptoContext) {
+  private async updateKeyingMaterial(groupId: string, context: CoreCryptoContext): Promise<void> {
     try {
       const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
       await context.updateKeyingMaterial(new ConversationId(groupIdBytes));
@@ -655,7 +659,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     }
   }
 
-  public async updateKeyingMaterialForConversation(groupId: string) {
+  public async updateKeyingMaterialForConversation(groupId: string): Promise<void> {
     await this.coreCryptoClient.transaction(context => {
       return this.updateKeyingMaterial(groupId, context);
     });
@@ -861,7 +865,7 @@ export class MLSService extends TypedEventEmitter<Events> {
    * @param groupId groupId of the conversation
    * @param clientIds the list of **qualified** ids of the clients we want to remove from the group
    */
-  public removeClientsFromConversation(groupId: string, clientIds: ClientId[]) {
+  public removeClientsFromConversation(groupId: string, clientIds: ClientId[]): Promise<void> {
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
 
     return this.coreCryptoClient.transaction(cx => {
@@ -912,7 +916,7 @@ export class MLSService extends TypedEventEmitter<Events> {
    *
    * @param groupId groupId of the conversation
    */
-  public async renewKeyMaterial(groupId: string) {
+  public async renewKeyMaterial(groupId: string): Promise<void> {
     try {
       await this.coreCryptoClient.transaction(async coreCryptoContext => {
         const groupConversationExists = await this.conversationExists(groupId);
@@ -931,7 +935,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     }
   }
 
-  private createKeyMaterialUpdateTaskSchedulerId(groupId: string) {
+  private createKeyMaterialUpdateTaskSchedulerId(groupId: string): `renew-key-material-update-${string}` {
     return `renew-key-material-update-${groupId}` as const;
   }
 
@@ -939,7 +943,7 @@ export class MLSService extends TypedEventEmitter<Events> {
    * Will reset the renewal to the threshold given as config
    * @param groupId The group that should have its key material updated
    */
-  public async resetKeyMaterialRenewal(groupId: string) {
+  public async resetKeyMaterialRenewal(groupId: string): Promise<void> {
     await this.cancelKeyMaterialRenewal(groupId);
     await this.scheduleKeyMaterialRenewal(groupId);
   }
@@ -948,7 +952,7 @@ export class MLSService extends TypedEventEmitter<Events> {
    * Will cancel the renewal of the key material for a given groupId
    * @param groupId The group that should stop having its key material updated
    */
-  private cancelKeyMaterialRenewal(groupId: string) {
+  private cancelKeyMaterialRenewal(groupId: string): Promise<void> {
     return this.recurringTaskScheduler.cancelTask(this.createKeyMaterialUpdateTaskSchedulerId(groupId));
   }
 
@@ -956,7 +960,7 @@ export class MLSService extends TypedEventEmitter<Events> {
    * Will schedule a task to update the key material of the conversation according to the threshold given as config
    * @param groupId
    */
-  public scheduleKeyMaterialRenewal(groupId: string) {
+  public scheduleKeyMaterialRenewal(groupId: string): Promise<void> {
     const key = this.createKeyMaterialUpdateTaskSchedulerId(groupId);
 
     return this.recurringTaskScheduler.registerTask({
@@ -973,8 +977,8 @@ export class MLSService extends TypedEventEmitter<Events> {
    * Function must only be called once, after application start
    * @param clientId id of the client
    */
-  public schedulePeriodicKeyPackagesBackendSync(clientId: string) {
-    const task = async () => {
+  public schedulePeriodicKeyPackagesBackendSync(clientId: string): Promise<void> {
+    const task = async (): Promise<void> => {
       this.logger.log('Executed Periodic check for key packages');
       await this.verifyRemoteMLSKeyPackagesAmount(clientId);
     };
@@ -993,7 +997,7 @@ export class MLSService extends TypedEventEmitter<Events> {
    * checks the number of keys available on backend and (if needed) generates new keys and uploads them.
    * @param clientId id of the client
    */
-  private async verifyLocalMLSKeyPackagesAmount(clientId: string) {
+  private async verifyLocalMLSKeyPackagesAmount(clientId: string): Promise<void> {
     const keyPackagesCount = await this.clientValidKeypackagesCount();
 
     if (keyPackagesCount <= this.minRequiredKeyPackages) {
@@ -1001,7 +1005,10 @@ export class MLSService extends TypedEventEmitter<Events> {
     }
   }
 
-  private async verifyRemoteMLSKeyPackagesAmount(clientId: string, requireFullIncreasedAllowance = false) {
+  private async verifyRemoteMLSKeyPackagesAmount(
+    clientId: string,
+    requireFullIncreasedAllowance = false,
+  ): Promise<void> {
     const uploadAmount = this.keyPackageUploadAmount;
     const increasedAllowance = uploadAmount > this.config.nbKeyPackages;
     const threshold =
@@ -1071,7 +1078,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     }
   }
 
-  private async getRemoteMLSKeyPackageCount(clientId: string) {
+  private async getRemoteMLSKeyPackageCount(clientId: string): Promise<number> {
     return this.apiClient.api.client.getMLSKeyPackageCount(clientId, numberToHex(this.config.defaultCiphersuite));
   }
 
@@ -1090,7 +1097,7 @@ export class MLSService extends TypedEventEmitter<Events> {
    * @param mlsClient Intance of the coreCrypto that represents the mls client
    * @param client Backend client data
    */
-  private async uploadMLSPublicKeys(client: RegisteredClient) {
+  private async uploadMLSPublicKeys(client: RegisteredClient): Promise<void> {
     // If we've already updated a client with its public key, there's no need to do it again.
     try {
       const clientSignature = await this.getCCClientSignatureString();
@@ -1105,7 +1112,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     }
   }
 
-  private async replaceKeyPackages(clientId: string, keyPackages: Uint8Array[]) {
+  private async replaceKeyPackages(clientId: string, keyPackages: Uint8Array[]): Promise<void> {
     return this.apiClient.api.client.replaceMLSKeyPackages(
       clientId,
       keyPackages.map(keyPackage => {
@@ -1115,7 +1122,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     );
   }
 
-  private async uploadMLSKeyPackages(clientId: string, keyPackages: Uint8Array[]) {
+  private async uploadMLSKeyPackages(clientId: string, keyPackages: Uint8Array[]): Promise<void> {
     return this.apiClient.api.client.uploadMLSKeyPackages(
       clientId,
       keyPackages.map(keyPackage => {
@@ -1148,7 +1155,7 @@ export class MLSService extends TypedEventEmitter<Events> {
    * @param delayInMs delay in ms before processing proposals
    * @param eventTime time of the event that had the proposals
    */
-  public async handlePendingProposals({delayInMs, groupId, eventTime}: HandlePendingProposalsParams) {
+  public async handlePendingProposals({delayInMs, groupId, eventTime}: HandlePendingProposalsParams): Promise<void> {
     if (delayInMs > 0) {
       const eventDate = new Date(eventTime);
       const firingDate = eventDate.setTime(eventDate.getTime() + delayInMs);
@@ -1160,7 +1167,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     }
   }
 
-  private async schedulePendingProposalsTask(groupId: string, firingDate: number) {
+  private async schedulePendingProposalsTask(groupId: string, firingDate: number): Promise<void> {
     await this.coreDatabase.put('pendingProposals', {groupId, firingDate}, groupId);
 
     TaskScheduler.addTask({
@@ -1173,12 +1180,12 @@ export class MLSService extends TypedEventEmitter<Events> {
     });
   }
 
-  private async cancelPendingProposalsTask(groupId: string) {
+  private async cancelPendingProposalsTask(groupId: string): Promise<void> {
     TaskScheduler.cancelTask(this.createPendingProposalsTaskKey(groupId));
     await this.coreDatabase.delete('pendingProposals', groupId);
   }
 
-  private createPendingProposalsTaskKey(groupId: string) {
+  private createPendingProposalsTaskKey(groupId: string): `pending-proposals-${string}` {
     return `pending-proposals-${groupId}` as const;
   }
 
@@ -1235,7 +1242,7 @@ export class MLSService extends TypedEventEmitter<Events> {
    * {@link Account} invokes this at most once per logged-in session (via lodash `once`), on the first catch-up → LIVE
    * transition (not during app startup), so timers are not armed while the notification backlog is replaying.
    */
-  public async initialisePendingProposalsTasks() {
+  public async initialisePendingProposalsTasks(): Promise<void> {
     try {
       const pendingProposals = await this.coreDatabase.getAll('pendingProposals');
       if (pendingProposals.length > 0) {
@@ -1289,7 +1296,7 @@ export class MLSService extends TypedEventEmitter<Events> {
       conversationId: QualifiedId,
       subconversationId?: SUBCONVERSATION_ID,
     ) => Promise<string | undefined>,
-  ) {
+  ): Promise<HandledEventPayload | null> {
     const qualifiedConversationId = event.qualified_conversation ?? {id: event.conversation, domain: ''};
 
     const groupId = await groupIdFromConversationId(qualifiedConversationId, event.subconv);
@@ -1306,7 +1313,10 @@ export class MLSService extends TypedEventEmitter<Events> {
     return handleMLSMessageAdd({event, mlsService: this, groupId, qualifiedConversationId});
   }
 
-  public async handleMLSWelcomeMessageEvent(event: ConversationMLSWelcomeEvent, clientId: string) {
+  public async handleMLSWelcomeMessageEvent(
+    event: ConversationMLSWelcomeEvent,
+    clientId: string,
+  ): Promise<HandledEventPayload> {
     // Every time we've received a welcome message, it means that our key package was consumed,
     // we need to verify if we need to upload new ones.
     // Note that this has to be done before we even process the welcome message (even if it fails),

@@ -19,7 +19,9 @@
 
 import {noop} from 'noop-esm';
 
-function getLocalStorage() {
+type MigrationStorage = Storage | {setItem: typeof noop; getItem: typeof noop; removeItem: typeof noop};
+
+function getLocalStorage(): MigrationStorage {
   try {
     return window.localStorage;
   } catch {
@@ -29,7 +31,7 @@ function getLocalStorage() {
 
 const MIGRATION_READY_STATE = '1';
 
-const getQualifiedSessionsReadyKey = (dbName: string) => {
+const getQualifiedSessionsReadyKey = (dbName: string): `${string}-qualified-sessions-ready` => {
   return `${dbName}-qualified-sessions-ready` as const;
 };
 
