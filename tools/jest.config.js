@@ -21,6 +21,7 @@ module.exports = {
   rootDir: '..',
   testEnvironment: 'node',
   testMatch: ['<rootDir>/tools/**/*.test.ts'],
+  modulePathIgnorePatterns: ['<rootDir>/.gwt/'],
   moduleNameMapper: {
     '^@enormora/objectory$': '<rootDir>/node_modules/@enormora/objectory/main.js',
   },
