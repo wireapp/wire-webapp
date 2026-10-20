@@ -43,6 +43,7 @@ interface CellsFoldersListModalContentProps {
     disabledDestinationPaths?: readonly string[];
     disabledDestinationLabels?: Readonly<Record<string, string>>;
   };
+  getCurrentPathFromFolder?: (path: string) => string;
 }
 
 export const CellsFoldersListModalContent = ({
@@ -59,6 +60,7 @@ export const CellsFoldersListModalContent = ({
     disabledDestinationPaths,
     disabledDestinationLabels,
   },
+  getCurrentPathFromFolder,
 }: CellsFoldersListModalContentProps) => {
   const {translate} = useApplicationContext();
   const breadcrumbs = getBreadcrumbsFromPath({
@@ -72,7 +74,7 @@ export const CellsFoldersListModalContent = ({
   const shouldDisplayLoading = ['idle', 'loading'].includes(status);
 
   const handleFolderNavigate = (path: string) => {
-    const newPath = path.split('/').slice(1).join('/');
+    const newPath = getCurrentPathFromFolder?.(path) ?? path.split('/').slice(1).join('/');
     onPathChange(newPath);
   };
 
