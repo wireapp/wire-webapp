@@ -98,6 +98,9 @@ export const CellsBulkMovePreviewPresentation = ({
         conversationName={conversationName}
         currentPath={destination.currentPath}
         onPathChange={destination.handlePathChange}
+        getCurrentPathFromFolder={path => {
+          return path;
+        }}
         onSelectDestination={destination.handleDestinationSelect}
         selectedDestinationPath={destination.selectedDestinationPath}
         disabledDestinationPaths={destination.disabledDestinationPaths}

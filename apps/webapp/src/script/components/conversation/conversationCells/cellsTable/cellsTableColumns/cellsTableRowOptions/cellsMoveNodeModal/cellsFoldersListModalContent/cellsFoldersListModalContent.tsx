@@ -36,6 +36,7 @@ interface CellsFoldersListModalContentProps {
   conversationName: string;
   currentPath: string;
   onPathChange: (path: string) => void;
+  getCurrentPathFromFolder?: (path: string) => string;
   onChangeModalContent?: (content: 'move' | 'create') => void;
   onSelectDestination?: (path: string) => void;
   selectedDestinationPath?: string;
@@ -50,6 +51,7 @@ export const CellsFoldersListModalContent = ({
   conversationName,
   currentPath,
   onPathChange,
+  getCurrentPathFromFolder,
   onChangeModalContent,
   onSelectDestination,
   selectedDestinationPath,
@@ -68,7 +70,7 @@ export const CellsFoldersListModalContent = ({
   const shouldDisplayLoading = ['idle', 'loading'].includes(status);
 
   const handleFolderNavigate = (path: string) => {
-    const newPath = path.split('/').slice(1).join('/');
+    const newPath = getCurrentPathFromFolder?.(path) ?? path.split('/').slice(1).join('/');
     onPathChange(newPath);
   };
 

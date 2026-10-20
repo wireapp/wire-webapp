@@ -104,25 +104,33 @@ export const useBulkMoveDestinationSelection = ({
     clock,
   });
 
+  const normalizedFolders = useMemo(() => {
+    return folders.map(folder => {
+      return {
+        ...folder,
+        path: getDestinationPath(folder.path, drivePathPrefix, conversationQualifiedId),
+      };
+    });
+  }, [folders, drivePathPrefix, conversationQualifiedId]);
   const selectedFolderPaths = useMemo(() => {
     return selectedNodes
       .filter(node => {
         return node.type === CellNodeType.FOLDER;
       })
       .map(node => {
-        return node.path;
+        return getDestinationPath(node.path, drivePathPrefix, conversationQualifiedId);
       });
-  }, [selectedNodes]);
+  }, [selectedNodes, drivePathPrefix, conversationQualifiedId]);
   const selectedParentPath = useMemo(() => {
     const parentPaths = selectedNodes.map(node => {
-      return getParentPath(node.path);
+      return getParentPath(normalizeCellsPath(node.path, conversationQualifiedId));
     });
     return parentPaths.every(path => {
       return path === parentPaths[0];
     })
       ? parentPaths[0]
       : null;
-  }, [selectedNodes]);
+  }, [selectedNodes, conversationQualifiedId]);
   const disabledDestinationPaths = useMemo(() => {
     return selectedParentPath === null ? selectedFolderPaths : [...selectedFolderPaths, selectedParentPath];
   }, [selectedFolderPaths, selectedParentPath]);
@@ -156,7 +164,7 @@ export const useBulkMoveDestinationSelection = ({
     currentPath,
     disabledDestinationLabels,
     disabledDestinationPaths,
-    folders,
+    folders: normalizedFolders,
     handleDestinationSelect,
     handlePathChange,
     selectedDestinationPath,

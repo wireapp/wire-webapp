@@ -342,9 +342,12 @@ describe('CellsTable selection', () => {
     const user = userEvent.setup();
     const onRefresh = jest.fn();
     const repository = {
-      getAllNodes: jest.fn().mockResolvedValue({
-        Nodes: [{Type: 'COLLECTION', Uuid: 'destination-folder', Path: 'conversation-id@example.com/folder'}],
-      }),
+      getAllNodes: jest
+        .fn()
+        .mockResolvedValueOnce({
+          Nodes: [{Type: 'COLLECTION', Uuid: 'destination-folder', Path: 'conversation-id@example.com/folder'}],
+        })
+        .mockResolvedValueOnce({Nodes: []}),
       moveNodes: jest.fn().mockResolvedValue({Status: 'Performed'}),
     } as unknown as CellsRepository;
     renderCellsTable({
@@ -378,8 +381,20 @@ describe('CellsTable selection', () => {
     await user.click(screen.getByRole('checkbox', {name: 'Select test.docx'}));
     await user.click(screen.getByRole('button', {name: 'Move'}));
     const preview = await screen.findByRole('dialog');
-    await user.click(await within(preview).findByRole('button', {name: 'folder'}));
+    const folderDestination = await within(preview).findByRole('button', {name: 'folder'});
+    await user.click(folderDestination);
 
+    expect(within(preview).getByText('Current destination: Drive / folder')).toBeInTheDocument();
+    expect(folderDestination).toHaveAttribute('aria-pressed', 'true');
+
+    await user.click(within(preview).getByRole('button', {name: 'Open folder'}));
+    await waitFor(() => {
+      expect(repository.getAllNodes).toHaveBeenCalledTimes(2);
+    });
+    expect(repository.getAllNodes).toHaveBeenLastCalledWith({
+      path: 'conversation-id@example.com/folder',
+      type: 'folder',
+    });
     expect(within(preview).getByText('Current destination: Drive / folder')).toBeInTheDocument();
     const moveButton = within(preview).getByRole('button', {name: 'Move'});
     expect(moveButton).toBeEnabled();
@@ -396,6 +411,31 @@ describe('CellsTable selection', () => {
       });
     });
     expect(onRefresh).toHaveBeenCalledTimes(1);
+    window.location.hash = originalHash;
+  });
+
+  it('disables a selected qualified folder as a move destination', async () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files';
+    const user = userEvent.setup();
+    const repository = {
+      getAllNodes: jest.fn().mockResolvedValue({
+        Nodes: [{Type: 'COLLECTION', Uuid: 'selected-folder', Path: 'conversation-id@example.com/folder'}],
+      }),
+      moveNodes: jest.fn(),
+    } as unknown as CellsRepository;
+    renderCellsTable({
+      cellsRepository: repository,
+      initialNodes: [createNode({id: 'selected-folder', name: 'folder', path: 'conversation-id@example.com/folder'})],
+    });
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select folder'}));
+    await user.click(screen.getByRole('button', {name: 'Move'}));
+    const preview = await screen.findByRole('dialog');
+
+    expect(await within(preview).findByRole('button', {name: 'folder Selected'})).toBeDisabled();
+    expect(within(preview).getByRole('button', {name: 'Move'})).toBeDisabled();
+    expect(repository.moveNodes).not.toHaveBeenCalled();
     window.location.hash = originalHash;
   });
 
@@ -517,9 +557,9 @@ describe('CellsTable selection', () => {
     window.location.hash = originalHash;
   });
 
-  it('allows moving a file to its immediate parent but blocks its current parent', async () => {
+  it('allows moving a qualified file to its immediate parent but blocks its current parent', async () => {
     const originalHash = window.location.hash;
-    window.location.hash = '#/conversation/conversation-id@example.com/files/wire-cells-web/A/B';
+    window.location.hash = '#/conversation/conversation-id@example.com/files/A/B';
     const user = userEvent.setup();
     const onRefresh = jest.fn();
     const repository = {
@@ -527,7 +567,7 @@ describe('CellsTable selection', () => {
         .fn()
         .mockResolvedValueOnce({Nodes: []})
         .mockResolvedValueOnce({
-          Nodes: [{Type: 'COLLECTION', Uuid: 'folder-b', Path: 'wire-cells-web/A/B'}],
+          Nodes: [{Type: 'COLLECTION', Uuid: 'folder-b', Path: 'conversation-id@example.com/A/B'}],
         }),
       moveNodes: jest.fn().mockResolvedValue({Status: 'Performed'}),
     } as unknown as CellsRepository;
@@ -537,7 +577,7 @@ describe('CellsTable selection', () => {
         createNode({
           id: 'report-file',
           name: 'Report.pdf',
-          path: 'wire-cells-web/A/B/Report.pdf',
+          path: 'conversation-id@example.com/A/B/Report.pdf',
           type: CellNodeType.FILE,
           extension: 'pdf',
         }),
@@ -557,8 +597,8 @@ describe('CellsTable selection', () => {
     await user.click(within(preview).getByRole('button', {name: 'Move'}));
     await waitFor(() => {
       expect(repository.moveNodes).toHaveBeenCalledWith({
-        currentPaths: ['wire-cells-web/A/B/Report.pdf'],
-        targetPath: 'conversation-id@example.com/wire-cells-web/A',
+        currentPaths: ['conversation-id@example.com/A/B/Report.pdf'],
+        targetPath: 'conversation-id@example.com/A',
       });
     });
     window.location.hash = originalHash;
