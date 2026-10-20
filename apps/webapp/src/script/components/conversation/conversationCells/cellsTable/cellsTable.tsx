@@ -22,7 +22,7 @@ import {DragEvent, useEffect, useState, type FunctionComponent} from 'react';
 import {isNonEmptyString} from '@sindresorhus/is';
 import {flexRender, getCoreRowModel, type Header, useReactTable} from '@tanstack/react-table';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
-import type {RestPerformActionResponse} from 'cells-sdk-ts';
+import {RestActionStatus, type RestPerformActionResponse} from 'cells-sdk-ts';
 import {createPortal} from 'react-dom';
 
 import {UploadIcon} from '@wireapp/react-ui-kit';
@@ -84,7 +84,6 @@ interface CellsTableProps {
   selectionEnabled: boolean;
   selectionScopeKey: string;
   selectionBarAnchor: HTMLElement | null;
-  onBulkMoveResult?: (response: RestPerformActionResponse) => void;
 }
 
 interface CellsTableHeaderCellProps {
@@ -141,7 +140,6 @@ export const CellsTable: FunctionComponent<CellsTableProps> = ({
   selectionEnabled,
   selectionScopeKey,
   selectionBarAnchor,
-  onBulkMoveResult,
 }: CellsTableProps) => {
   const {translate, isFeatureToggleEnabled} = useApplicationContext();
   const canPerformCurrentDriveAction = useCellsActionPermissions();
@@ -150,11 +148,32 @@ export const CellsTable: FunctionComponent<CellsTableProps> = ({
     return new Set();
   });
   const [isBulkMovePreviewOpen, setIsBulkMovePreviewOpen] = useState(false);
+  const [isBulkMoveOutcomeUnresolved, setIsBulkMoveOutcomeUnresolved] = useState(false);
+  const [isBulkMoveRequestError, setIsBulkMoveRequestError] = useState(false);
 
   useEffect(() => {
     setSelectedNodeIds(new Set());
     setIsBulkMovePreviewOpen(false);
+    setIsBulkMoveOutcomeUnresolved(false);
+    setIsBulkMoveRequestError(false);
   }, [selectionScopeKey, isSelectionEnabled]);
+
+  const handleBulkMoveResult = (response: RestPerformActionResponse): void => {
+    if (response.Status === RestActionStatus.Performed) {
+      setIsBulkMoveOutcomeUnresolved(false);
+      setIsBulkMoveRequestError(false);
+      onRefresh();
+      return;
+    }
+
+    setIsBulkMoveOutcomeUnresolved(true);
+    setIsBulkMoveRequestError(false);
+  };
+
+  const handleBulkMoveRequestError = (): void => {
+    setIsBulkMoveOutcomeUnresolved(true);
+    setIsBulkMoveRequestError(true);
+  };
 
   useEffect(() => {
     const currentNodeIds = new Set<string>();
@@ -316,6 +335,13 @@ export const CellsTable: FunctionComponent<CellsTableProps> = ({
           selectionBarAnchor !== null &&
           createPortal(
             <div css={selectionBarContainerStyles}>
+              {isBulkMoveOutcomeUnresolved && (
+                <p role="status">
+                  {isBulkMoveRequestError
+                    ? translate('cells.newItemMenuModalForm.genericError')
+                    : translate('cells.bulkMove.outcomeUnresolved')}
+                </p>
+              )}
               <CellsSelectionBar
                 selectedCount={selectedNodeIds.size}
                 onClear={() => {
@@ -347,9 +373,10 @@ export const CellsTable: FunctionComponent<CellsTableProps> = ({
             cellsRepository={cellsRepository}
             conversationQualifiedId={conversationQualifiedId}
             conversationName={conversationName}
-            onMoveResult={response => {
-              onBulkMoveResult?.(response);
-            }}
+            isMoveOutcomeUnresolved={isBulkMoveOutcomeUnresolved}
+            isMoveRequestError={isBulkMoveRequestError}
+            onMoveResult={handleBulkMoveResult}
+            onMoveError={handleBulkMoveRequestError}
           />
         )}
         {activeFolderDropTargetName !== null && (

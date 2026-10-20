@@ -22,8 +22,6 @@ import userEvent from '@testing-library/user-event';
 import {noop} from 'noop-esm';
 
 import {ThemeProvider} from '@wireapp/react-ui-kit';
-import type {RestPerformActionResponse} from 'cells-sdk-ts';
-
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {
@@ -51,6 +49,7 @@ const selectionTranslations: Partial<Record<TranslationKey, string>> = {
   'cells.bulkMove.previewDescription':
     'Choose a destination in this conversation’s Drive, then move the selected items.',
   'cells.bulkMove.selectedItems': 'Selected items',
+  'cells.bulkMove.outcomeUnresolved': 'Move status is unresolved. Verify the Drive before trying again.',
   'cells.bulkMove.drive': 'Drive',
   'cells.bulkMove.selected': 'Selected',
   'cells.bulkMove.currentLocation': 'Current location',
@@ -137,6 +136,7 @@ const renderCellsTable = ({
   onDropFilesToFolder = jest.fn(),
   onDropReadError = jest.fn(),
   onFolderDropTargetChange = jest.fn(),
+  onRefresh = jest.fn(),
   folderDropResetKey,
   selectionEnabled = true,
   selectionScopeKey = 'conversation:/files',
@@ -144,12 +144,12 @@ const renderCellsTable = ({
   cellsRepository = {} as CellsRepository,
   selfUserDriveRole = CELLS_SELF_USER_DRIVE_ROLE.EDITOR,
   initialNodes,
-  onBulkMoveResult,
 }: {
   readonly folderPath?: string;
   readonly onDropFilesToFolder?: (files: readonly File[], uploadPath: string) => void;
   readonly onDropReadError?: () => void;
   readonly onFolderDropTargetChange?: (folderName: string | null) => void;
+  readonly onRefresh?: () => void;
   readonly folderDropResetKey?: number;
   readonly selectionEnabled?: boolean;
   readonly selectionScopeKey?: string;
@@ -192,7 +192,7 @@ const renderCellsTable = ({
             conversation={{} as Conversation}
             conversationQualifiedId={conversationQualifiedId}
             conversationName="Conversation"
-            onRefresh={jest.fn()}
+            onRefresh={onRefresh}
             onFolderDropTargetChange={onFolderDropTargetChange}
             onDropFilesToFolder={onDropFilesToFolder}
             onDropReadError={onDropReadError}
@@ -205,7 +205,6 @@ const renderCellsTable = ({
             selectionEnabled={isSelectionEnabled}
             selectionScopeKey={scopeKey}
             selectionBarAnchor={document.body}
-            onBulkMoveResult={onBulkMoveResult}
           />
         </CellsSelfUserDriveRoleProvider>
       </ThemeProvider>
@@ -402,11 +401,12 @@ describe('CellsTable selection', () => {
     const originalHash = window.location.hash;
     window.location.hash = '#/conversation/conversation-id@example.com/files/wire-cells-web';
     const user = userEvent.setup();
+    const onRefresh = jest.fn();
     const repository = {
       getAllNodes: jest.fn().mockResolvedValue({Nodes: []}),
       moveNodes: jest.fn().mockResolvedValue({Status: 'Performed'}),
     } as unknown as CellsRepository;
-    renderCellsTable({cellsRepository: repository, folderPath: 'wire-cells-web/Marketing images'});
+    renderCellsTable({cellsRepository: repository, folderPath: 'wire-cells-web/Marketing images', onRefresh});
 
     await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
     await user.click(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'}));
@@ -430,23 +430,24 @@ describe('CellsTable selection', () => {
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
     expect(screen.getByText('2 selected')).toBeInTheDocument();
+    expect(onRefresh).toHaveBeenCalledTimes(1);
     window.location.hash = originalHash;
   });
 
-  it('propagates a background result without closing the preview as completed', async () => {
+  it('locks unresolved background moves across close, reopen, and list refresh', async () => {
     const originalHash = window.location.hash;
     window.location.hash = '#/conversation/conversation-id@example.com/files/wire-cells-web';
     const user = userEvent.setup();
-    const onBulkMoveResult = jest.fn();
+    const onRefresh = jest.fn();
     const backgroundResponse = {Status: 'Background', BackgroundActions: [{JobUuid: 'move-job', Name: 'move'}]};
     const repository = {
       getAllNodes: jest.fn().mockResolvedValue({Nodes: []}),
       moveNodes: jest.fn().mockResolvedValue(backgroundResponse),
     } as unknown as CellsRepository;
-    renderCellsTable({
+    const {rerenderWithNodes} = renderCellsTable({
       cellsRepository: repository,
       folderPath: 'wire-cells-web/Marketing images',
-      onBulkMoveResult,
+      onRefresh,
     });
 
     await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
@@ -455,9 +456,59 @@ describe('CellsTable selection', () => {
     await user.click(within(dialog).getByRole('button', {name: 'Move'}));
 
     await waitFor(() => {
-      expect(onBulkMoveResult).toHaveBeenCalledWith(backgroundResponse);
       expect(screen.getByRole('dialog')).toBeInTheDocument();
+      expect(within(dialog).getByRole('button', {name: 'Move'})).toBeDisabled();
+      expect(within(dialog).getByRole('alert')).toHaveTextContent('Move status is unresolved');
     });
+    expect(repository.moveNodes).toHaveBeenCalledTimes(1);
+    expect(onRefresh).not.toHaveBeenCalled();
+
+    await user.click(within(dialog).getByRole('button', {name: 'cells.moveNodeModal.cancelButton'}));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    rerenderWithNodes([
+      createNode({id: 'folder-id', name: 'Marketing images', path: 'wire-cells-web/Marketing images'}),
+      createNode({id: 'file-id', name: 'Wire logs.pdf', path: 'Wire logs.pdf', type: CellNodeType.FILE}),
+    ]);
+    expect(screen.getByText(/Move status is unresolved/)).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', {name: 'Move'}));
+    const reopenedDialog = await screen.findByRole('dialog');
+    expect(within(reopenedDialog).getByRole('button', {name: 'Move'})).toBeDisabled();
+    expect(within(reopenedDialog).getByRole('alert')).toHaveTextContent('Move status is unresolved');
+    expect(repository.moveNodes).toHaveBeenCalledTimes(1);
+    window.location.hash = originalHash;
+  });
+
+  it('locks and reports a rejected move request across close and reopen', async () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files/wire-cells-web';
+    const user = userEvent.setup();
+    const onRefresh = jest.fn();
+    const repository = {
+      getAllNodes: jest.fn().mockResolvedValue({Nodes: []}),
+      moveNodes: jest.fn().mockRejectedValue(new Error('Move failed')),
+    } as unknown as CellsRepository;
+    renderCellsTable({cellsRepository: repository, folderPath: 'wire-cells-web/Marketing images', onRefresh});
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+    await user.click(screen.getByRole('button', {name: 'Move'}));
+    const dialog = await screen.findByRole('dialog');
+    await user.click(within(dialog).getByRole('button', {name: 'Move'}));
+
+    await waitFor(() => {
+      expect(within(dialog).getByRole('alert')).toHaveTextContent('cells.newItemMenuModalForm.genericError');
+      expect(within(dialog).getByRole('button', {name: 'Move'})).toBeDisabled();
+    });
+    expect(onRefresh).not.toHaveBeenCalled();
+    expect(repository.moveNodes).toHaveBeenCalledTimes(1);
+
+    await user.click(within(dialog).getByRole('button', {name: 'cells.moveNodeModal.cancelButton'}));
+    expect(screen.getByText('cells.newItemMenuModalForm.genericError')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', {name: 'Move'}));
+    const reopenedDialog = await screen.findByRole('dialog');
+    expect(within(reopenedDialog).getByRole('button', {name: 'Move'})).toBeDisabled();
+    expect(within(reopenedDialog).getByRole('alert')).toHaveTextContent('cells.newItemMenuModalForm.genericError');
+    expect(repository.moveNodes).toHaveBeenCalledTimes(1);
     window.location.hash = originalHash;
   });
 
@@ -525,35 +576,6 @@ describe('CellsTable selection', () => {
     const dialog = await screen.findByRole('dialog');
     expect(within(dialog).getByRole('button', {name: 'Move'})).toBeDisabled();
     expect(repository.moveNodes).not.toHaveBeenCalled();
-    window.location.hash = originalHash;
-  });
-
-  it('keeps a failed move explicit without adding failure UI', async () => {
-    const originalHash = window.location.hash;
-    window.location.hash = '#/conversation/conversation-id@example.com/files/wire-cells-web';
-    const user = userEvent.setup();
-    const repository = {
-      getAllNodes: jest.fn().mockResolvedValue({Nodes: []}),
-      moveNodes: jest.fn().mockRejectedValue(new Error('Move failed')),
-    } as unknown as CellsRepository;
-    renderCellsTable({cellsRepository: repository, folderPath: 'wire-cells-web/Marketing images'});
-
-    await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
-    await user.click(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'}));
-    await user.click(screen.getByRole('button', {name: 'Move'}));
-
-    const dialog = await screen.findByRole('dialog');
-    const submitButton = within(dialog).getByRole('button', {name: 'Move'});
-    await waitFor(() => {
-      expect(submitButton).toBeEnabled();
-    });
-    await user.click(submitButton);
-
-    await waitFor(() => {
-      expect(repository.moveNodes).toHaveBeenCalledTimes(1);
-    });
-    expect(await screen.findByRole('dialog')).toBeInTheDocument();
-    expect(within(dialog).queryByRole('alert')).not.toBeInTheDocument();
     window.location.hash = originalHash;
   });
 });

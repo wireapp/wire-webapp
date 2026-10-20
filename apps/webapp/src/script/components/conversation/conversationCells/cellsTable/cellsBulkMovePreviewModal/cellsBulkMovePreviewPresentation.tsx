@@ -37,6 +37,9 @@ interface CellsBulkMovePreviewPresentationProps {
   destination: BulkMoveDestinationSelection;
   onMove: () => Promise<Result<RestPerformActionResponse, unknown>>;
   onMoveResult: (response: RestPerformActionResponse) => void;
+  onMoveError: () => void;
+  isMoveOutcomeUnresolved: boolean;
+  isMoveRequestError: boolean;
   isMoveDisabled: boolean;
   isMoveLoading: boolean;
 }
@@ -49,6 +52,9 @@ export const CellsBulkMovePreviewPresentation: FunctionComponent<CellsBulkMovePr
   destination,
   onMove,
   onMoveResult,
+  onMoveError,
+  isMoveOutcomeUnresolved,
+  isMoveRequestError,
   isMoveDisabled,
   isMoveLoading,
 }: CellsBulkMovePreviewPresentationProps) => {
@@ -56,6 +62,11 @@ export const CellsBulkMovePreviewPresentation: FunctionComponent<CellsBulkMovePr
 
   const handleMove = async (): Promise<void> => {
     const moveResult = await onMove();
+    if (moveResult.isErr) {
+      onMoveError();
+      return;
+    }
+
     if (moveResult.isOk) {
       onMoveResult(moveResult.value);
       if (moveResult.value.Status === RestActionStatus.Performed) {
@@ -90,6 +101,15 @@ export const CellsBulkMovePreviewPresentation: FunctionComponent<CellsBulkMovePr
           return path;
         }}
       />
+      {isMoveOutcomeUnresolved && (
+        <div role="alert">
+          <p>
+            {isMoveRequestError
+              ? translate('cells.newItemMenuModalForm.genericError')
+              : translate('cells.bulkMove.outcomeUnresolved')}
+          </p>
+        </div>
+      )}
       <CellsModal.Actions>
         <CellsModal.SecondaryButton onClick={onClose}>
           {translate('cells.moveNodeModal.cancelButton')}
