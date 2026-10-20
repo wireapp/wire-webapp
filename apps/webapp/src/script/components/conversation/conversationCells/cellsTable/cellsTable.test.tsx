@@ -19,6 +19,7 @@
 
 import {fireEvent, render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import {noop} from 'noop-esm';
 
 import {ThemeProvider} from '@wireapp/react-ui-kit';
 
@@ -47,7 +48,7 @@ const selectionTranslations: Partial<Record<TranslationKey, string>> = {
   'cells.selection.clear': 'Clear selection',
   'cells.selection.move': 'Move',
   'cells.bulkMove.previewDescription':
-    'Preview only. No items will be moved. Destinations stay within this conversation’s Drive.',
+    'Choose a destination in this conversation’s Drive, then move the selected items.',
   'cells.bulkMove.selectedItems': 'Selected items',
   'cells.bulkMove.drive': 'Drive',
   'cells.bulkMove.selected': 'Selected',
@@ -69,6 +70,18 @@ const translateSelectionForTest: Translate = (key, substitutions) => {
   }
   if (key === 'cells.bulkMove.previewTitle') {
     return `Preview move of ${substitutions?.count} items`;
+  }
+  if (key === 'cells.bulkMove.previewDescription') {
+    return 'Choose a destination in this conversation’s Drive, then move the selected items.';
+  }
+  if (key === 'cells.bulkMove.moveButton') {
+    return 'Move';
+  }
+  if (key === 'cells.bulkMove.movingButton') {
+    return 'Moving';
+  }
+  if (key === 'cells.bulkMove.selectedItems') {
+    return 'Selected items';
   }
   if (key === 'cells.bulkMove.currentDestination') {
     return `Current destination: ${substitutions?.destination}`;
@@ -129,6 +142,7 @@ const renderCellsTable = ({
   isBulkActionsEnabled = true,
   cellsRepository = {} as CellsRepository,
   selfUserDriveRole = CELLS_SELF_USER_DRIVE_ROLE.EDITOR,
+  initialNodes,
 }: {
   readonly folderPath?: string;
   readonly onDropFilesToFolder?: (files: readonly File[], uploadPath: string) => void;
@@ -140,6 +154,7 @@ const renderCellsTable = ({
   readonly isBulkActionsEnabled?: boolean;
   readonly cellsRepository?: CellsRepository;
   readonly selfUserDriveRole?: CellsSelfUserDriveRole;
+  readonly initialNodes?: CellNode[];
 } = {}): RenderCellsTableResult => {
   const wrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({
@@ -163,7 +178,7 @@ const renderCellsTable = ({
     resetKey = folderDropResetKey,
     scopeKey = selectionScopeKey,
     isSelectionEnabled = selectionEnabled,
-    nodes = [folder, file],
+    nodes = initialNodes ?? [folder, file],
   ): JSX.Element => {
     return (
       <ThemeProvider>
@@ -313,7 +328,7 @@ describe('CellsTable selection', () => {
         }
         return Promise.reject(new Error(`Unexpected folder path: ${path}`));
       }),
-      moveNode: jest.fn(),
+      moveNodes: jest.fn(),
     } as unknown as CellsRepository;
     renderCellsTable({cellsRepository: repository, folderPath: 'conversation-id@example.com/Reports/Marketing images'});
 
@@ -324,16 +339,14 @@ describe('CellsTable selection', () => {
     const preview = await screen.findByRole('dialog');
     expect(within(preview).getByText('Preview move of 2 items')).toBeInTheDocument();
     expect(
-      within(preview).getByText(
-        'Preview only. No items will be moved. Destinations stay within this conversation’s Drive.',
-      ),
+      within(preview).getByText('Choose a destination in this conversation’s Drive, then move the selected items.'),
     ).toBeInTheDocument();
     const selectedItems = within(preview).getByRole('region', {name: 'Selected items'});
     expect(within(selectedItems).getByRole('heading', {name: 'Selected items'})).toBeInTheDocument();
     expect(within(selectedItems).getByText('Marketing images')).toBeInTheDocument();
     expect(within(selectedItems).getByText('Wire logs.pdf')).toBeInTheDocument();
     expect(within(preview).getByText('Current destination: Drive')).toBeInTheDocument();
-    expect(within(preview).queryByRole('button', {name: 'Move'})).not.toBeInTheDocument();
+    expect(within(preview).getByRole('button', {name: 'Move'})).toBeEnabled();
 
     const selectedSourceFolder = await within(preview).findByRole('button', {name: 'Marketing images Selected'});
     expect(selectedSourceFolder).toBeDisabled();
@@ -356,7 +369,7 @@ describe('CellsTable selection', () => {
         type: 'folder',
       });
     });
-    expect(repository.moveNode).not.toHaveBeenCalled();
+    expect(repository.moveNodes).not.toHaveBeenCalled();
 
     await user.click(within(preview).getByRole('button', {name: 'cells.moveNodeModal.cancelButton'}));
 
@@ -377,7 +390,138 @@ describe('CellsTable selection', () => {
     expect(within(reopenedSelectedItems).queryByText('Marketing images')).not.toBeInTheDocument();
     await user.click(within(reopenedPreview).getByRole('button', {name: 'cells.moveNodeModal.cancelButton'}));
 
-    expect(repository.moveNode).not.toHaveBeenCalled();
+    expect(repository.moveNodes).not.toHaveBeenCalled();
+    window.location.hash = originalHash;
+  });
+
+  it('moves every eligible selected item in one request and closes after receiving the result', async () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files/wire-cells-web';
+    const user = userEvent.setup();
+    const repository = {
+      getAllNodes: jest.fn().mockResolvedValue({Nodes: []}),
+      moveNodes: jest.fn().mockResolvedValue({BackgroundActions: [{JobUuid: 'move-job', Name: 'move'}]}),
+    } as unknown as CellsRepository;
+    renderCellsTable({cellsRepository: repository, folderPath: 'wire-cells-web/Marketing images'});
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+    await user.click(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'}));
+    await user.click(screen.getByRole('button', {name: 'Move'}));
+
+    const dialog = await screen.findByRole('dialog');
+    const submitButton = within(dialog).getByRole('button', {name: 'Move'});
+    await waitFor(() => {
+      expect(submitButton).toBeEnabled();
+    });
+    await user.click(submitButton);
+
+    await waitFor(() => {
+      expect(repository.moveNodes).toHaveBeenCalledTimes(1);
+    });
+    expect(repository.moveNodes).toHaveBeenCalledWith({
+      currentPaths: ['wire-cells-web/Marketing images', 'Wire logs.pdf'],
+      targetPath: 'conversation-id@example.com',
+    });
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+    expect(screen.getByText('2 selected')).toBeInTheDocument();
+    window.location.hash = originalHash;
+  });
+
+  it('prevents duplicate submissions while a move request is pending', async () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files/wire-cells-web';
+    const user = userEvent.setup();
+    let resolveMove: (response: object) => void = noop;
+    const pendingMove = new Promise<object>(resolve => {
+      resolveMove = resolve;
+    });
+    const repository = {
+      getAllNodes: jest.fn().mockResolvedValue({Nodes: []}),
+      moveNodes: jest.fn().mockReturnValue(pendingMove),
+    } as unknown as CellsRepository;
+    renderCellsTable({cellsRepository: repository, folderPath: 'wire-cells-web/Marketing images'});
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+    await user.click(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'}));
+    await user.click(screen.getByRole('button', {name: 'Move'}));
+    const dialog = await screen.findByRole('dialog');
+    const submitButton = within(dialog).getByRole('button', {name: 'Move'});
+    await waitFor(() => {
+      expect(submitButton).toBeEnabled();
+    });
+
+    await user.click(submitButton);
+    await waitFor(() => {
+      expect(repository.moveNodes).toHaveBeenCalledTimes(1);
+    });
+    expect(submitButton).toBeDisabled();
+    await user.click(submitButton);
+    expect(repository.moveNodes).toHaveBeenCalledTimes(1);
+    await user.click(within(dialog).getByRole('button', {name: 'cells.moveNodeModal.cancelButton'}));
+    expect(dialog).toBeInTheDocument();
+    resolveMove({BackgroundActions: [{JobUuid: 'move-job', Name: 'move'}]});
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+    window.location.hash = originalHash;
+  });
+
+  it('disables submission for a folder and its selected child without sending a request', async () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files/Drive';
+    const user = userEvent.setup();
+    const folder = createNode({id: 'folder', name: 'Folder', path: 'Drive/Folder', type: CellNodeType.FOLDER});
+    const child = createNode({
+      id: 'child',
+      name: 'Child file',
+      path: 'Drive/Folder/child.txt',
+      type: CellNodeType.FILE,
+      extension: 'txt',
+    });
+    const repository = {
+      getAllNodes: jest.fn().mockResolvedValue({Nodes: []}),
+      moveNodes: jest.fn(),
+    } as unknown as CellsRepository;
+    renderCellsTable({cellsRepository: repository, initialNodes: [folder, child]});
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Folder'}));
+    await user.click(screen.getByRole('checkbox', {name: 'Select Child file'}));
+    await user.click(screen.getByRole('button', {name: 'Move'}));
+
+    const dialog = await screen.findByRole('dialog');
+    expect(within(dialog).getByRole('button', {name: 'Move'})).toBeDisabled();
+    expect(repository.moveNodes).not.toHaveBeenCalled();
+    window.location.hash = originalHash;
+  });
+
+  it('keeps a failed move explicit without adding failure UI', async () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files/wire-cells-web';
+    const user = userEvent.setup();
+    const repository = {
+      getAllNodes: jest.fn().mockResolvedValue({Nodes: []}),
+      moveNodes: jest.fn().mockRejectedValue(new Error('Move failed')),
+    } as unknown as CellsRepository;
+    renderCellsTable({cellsRepository: repository, folderPath: 'wire-cells-web/Marketing images'});
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+    await user.click(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'}));
+    await user.click(screen.getByRole('button', {name: 'Move'}));
+
+    const dialog = await screen.findByRole('dialog');
+    const submitButton = within(dialog).getByRole('button', {name: 'Move'});
+    await waitFor(() => {
+      expect(submitButton).toBeEnabled();
+    });
+    await user.click(submitButton);
+
+    await waitFor(() => {
+      expect(repository.moveNodes).toHaveBeenCalledTimes(1);
+    });
+    expect(await screen.findByRole('dialog')).toBeInTheDocument();
+    expect(within(dialog).queryByRole('alert')).not.toBeInTheDocument();
     window.location.hash = originalHash;
   });
 });
