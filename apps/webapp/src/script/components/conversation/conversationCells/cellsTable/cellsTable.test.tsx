@@ -336,34 +336,39 @@ describe('CellsTable selection', () => {
     window.location.hash = originalHash;
   });
 
-  it('allows moving root files into a Drive folder', async () => {
+  it('allows moving root files into a Drive folder with qualified API paths', async () => {
     const originalHash = window.location.hash;
-    window.location.hash = '#/conversation/conversation-id@example.com/files/wire-cells-web';
+    window.location.hash = '#/conversation/conversation-id@example.com/files';
     const user = userEvent.setup();
     const onRefresh = jest.fn();
     const repository = {
       getAllNodes: jest.fn().mockResolvedValue({
-        Nodes: [{Type: 'COLLECTION', Uuid: 'destination-folder', Path: 'wire-cells-web/folder'}],
+        Nodes: [{Type: 'COLLECTION', Uuid: 'destination-folder', Path: 'conversation-id@example.com/folder'}],
       }),
       moveNodes: jest.fn().mockResolvedValue({Status: 'Performed'}),
     } as unknown as CellsRepository;
     renderCellsTable({
       cellsRepository: repository,
       initialNodes: [
-        createNode({id: 'destination-folder', name: 'folder', path: 'wire-cells-web/folder'}),
+        createNode({id: 'destination-folder', name: 'folder', path: 'conversation-id@example.com/folder'}),
         createNode({
           id: 'recording-one',
           name: 'Recording one.mov',
-          path: 'wire-cells-web/Recording one.mov',
+          path: 'conversation-id@example.com/Recording one.mov',
           type: CellNodeType.FILE,
         }),
         createNode({
           id: 'recording-two',
           name: 'Recording two.mov',
-          path: 'wire-cells-web/Recording two.mov',
+          path: 'conversation-id@example.com/Recording two.mov',
           type: CellNodeType.FILE,
         }),
-        createNode({id: 'test-docx', name: 'test.docx', path: 'wire-cells-web/test.docx', type: CellNodeType.FILE}),
+        createNode({
+          id: 'test-docx',
+          name: 'test.docx',
+          path: 'conversation-id@example.com/test.docx',
+          type: CellNodeType.FILE,
+        }),
       ],
       onRefresh,
     });
@@ -383,11 +388,11 @@ describe('CellsTable selection', () => {
     await waitFor(() => {
       expect(repository.moveNodes).toHaveBeenCalledWith({
         currentPaths: [
-          'wire-cells-web/Recording one.mov',
-          'wire-cells-web/Recording two.mov',
-          'wire-cells-web/test.docx',
+          'conversation-id@example.com/Recording one.mov',
+          'conversation-id@example.com/Recording two.mov',
+          'conversation-id@example.com/test.docx',
         ],
-        targetPath: 'conversation-id@example.com/wire-cells-web/folder',
+        targetPath: 'conversation-id@example.com/folder',
       });
     });
     expect(onRefresh).toHaveBeenCalledTimes(1);

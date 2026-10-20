@@ -26,6 +26,8 @@ import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 
+import {normalizeCellsPath} from './normalizeCellsPath';
+
 import {useGetCellsFolders} from '../cellsTableColumns/cellsTableRowOptions/cellsMoveNodeModal/useGetCellsFolders/useGetCellsFolders';
 
 interface UseBulkMoveDestinationSelectionProps {
@@ -48,8 +50,9 @@ export interface BulkMoveDestinationSelection {
   status: 'idle' | 'loading' | 'success' | 'error';
 }
 
-const getDriveRootPath = (currentPath: string): string => {
-  return currentPath.split('/').filter(Boolean)[0] ?? '';
+const getDriveRootPath = (currentPath: string, conversationQualifiedId: QualifiedId): string => {
+  const rootPath = currentPath.split('/').filter(Boolean)[0] ?? '';
+  return rootPath === `${conversationQualifiedId.id}@${conversationQualifiedId.domain}` ? '' : rootPath;
 };
 
 const getParentPath = (path: string): string => {
@@ -70,13 +73,14 @@ const normalizeDestinationPath = (path: string, rootPath: string): string => {
   return normalizedPath;
 };
 
-const getDestinationPath = (path: string, drivePathPrefix: string): string => {
-  if (path.length === 0) {
+const getDestinationPath = (path: string, drivePathPrefix: string, conversationQualifiedId: QualifiedId): string => {
+  const normalizedPath = normalizeCellsPath(path, conversationQualifiedId);
+  if (normalizedPath.length === 0) {
     return '';
   }
 
   const normalizedPrefix = drivePathPrefix.replace(/\/+$/, '');
-  const relativePath = normalizeDestinationPath(path, drivePathPrefix);
+  const relativePath = normalizeDestinationPath(normalizedPath, drivePathPrefix);
   return relativePath.length > 0 ? [normalizedPrefix, relativePath].filter(Boolean).join('/') : normalizedPrefix;
 };
 
@@ -88,7 +92,7 @@ export const useBulkMoveDestinationSelection = ({
 }: UseBulkMoveDestinationSelectionProps): BulkMoveDestinationSelection => {
   const {clock, fireAndForgetInvoker, translate} = useApplicationContext();
   const currentRoutePath = getCellsFilesPath();
-  const drivePathPrefix = getDriveRootPath(selectedNodes[0]?.path ?? currentRoutePath);
+  const drivePathPrefix = getDriveRootPath(selectedNodes[0]?.path ?? currentRoutePath, conversationQualifiedId);
   const [currentPath, setCurrentPath] = useState(currentRoutePath);
   const [selectedDestinationPath, setSelectedDestinationPath] = useState('');
   const {folders, status, shouldShowLoadingSpinner} = useGetCellsFolders({
@@ -132,11 +136,12 @@ export const useBulkMoveDestinationSelection = ({
   }, [selectedFolderPaths, selectedParentPath, translate]);
 
   const handlePathChange = (path: string): void => {
-    setCurrentPath(path);
-    setSelectedDestinationPath(getDestinationPath(path, drivePathPrefix));
+    const destinationPath = getDestinationPath(path, drivePathPrefix, conversationQualifiedId);
+    setCurrentPath(destinationPath);
+    setSelectedDestinationPath(destinationPath);
   };
   const handleDestinationSelect = (path: string): void => {
-    setSelectedDestinationPath(getDestinationPath(path, drivePathPrefix));
+    setSelectedDestinationPath(getDestinationPath(path, drivePathPrefix, conversationQualifiedId));
   };
 
   const driveLabel = translate('cells.bulkMove.drive');

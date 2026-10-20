@@ -101,6 +101,29 @@ describe('isBulkMoveValid', () => {
     ).toBe(false);
   });
 
+  it('allows moving qualified root files into a folder', () => {
+    expect(
+      isBulkMoveValid({
+        conversationQualifiedId,
+        selectedNodes: [
+          createNode('conversation-id@example.com/one.txt', CellNodeType.FILE),
+          createNode('conversation-id@example.com/two.txt', CellNodeType.FILE),
+        ],
+        destinationPath: 'folder',
+      }),
+    ).toBe(true);
+  });
+
+  it('rejects moving qualified root files to their current root', () => {
+    expect(
+      isBulkMoveValid({
+        conversationQualifiedId,
+        selectedNodes: [createNode('conversation-id@example.com/file.txt', CellNodeType.FILE)],
+        destinationPath: '',
+      }),
+    ).toBe(false);
+  });
+
   it('allows moving to the drive root', () => {
     expect(
       isBulkMoveValid({

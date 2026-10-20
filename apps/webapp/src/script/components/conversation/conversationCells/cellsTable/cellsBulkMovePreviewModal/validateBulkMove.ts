@@ -21,6 +21,8 @@ import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 
+import {normalizeCellsPath} from './normalizeCellsPath';
+
 interface ValidateBulkMoveParams {
   conversationQualifiedId: QualifiedId;
   destinationPath: string;
@@ -37,6 +39,10 @@ const hasUnsafePathSegment = (path: string): boolean => {
   });
 };
 
+const hasQualifiedConversationPrefix = (path: string): boolean => {
+  return /^[^/]+@[^/]+(?:\/|$)/.test(path);
+};
+
 const isSameOrDescendantPath = (path: string, parentPath: string): boolean => {
   return path === parentPath || path.startsWith(`${parentPath}/`);
 };
@@ -51,17 +57,17 @@ export const isBulkMoveValid = ({
   selectedNodes,
 }: ValidateBulkMoveParams): boolean => {
   const destination = normalizePath(destinationPath);
-  const hasQualifiedConversationPrefix = /^[^/]+@[^/]+(?:\/|$)/.test(destination);
-  if (selectedNodes.length === 0 || hasUnsafePathSegment(destination) || hasQualifiedConversationPrefix) {
+  const destinationHasQualifiedConversationPrefix = hasQualifiedConversationPrefix(destination);
+  if (selectedNodes.length === 0 || hasUnsafePathSegment(destination) || destinationHasQualifiedConversationPrefix) {
     return false;
   }
 
   const selectedPaths = selectedNodes.map(node => {
-    return normalizePath(node.path);
+    return normalizeCellsPath(node.path, conversationQualifiedId);
   });
   if (
     selectedPaths.some(path => {
-      return path.length === 0 || hasUnsafePathSegment(path);
+      return path.length === 0 || hasUnsafePathSegment(path) || hasQualifiedConversationPrefix(path);
     }) ||
     selectedNodes.some(node => {
       const nodeConversationId = node.conversation?.qualifiedId;
