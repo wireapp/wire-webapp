@@ -34,7 +34,10 @@ interface CellsBulkMovePreviewModalProps {
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
   conversationName: string;
+  isMoveOutcomeUnresolved: boolean;
+  isMoveRequestError: boolean;
   onMoveResult: (response: RestPerformActionResponse) => void;
+  onMoveError: () => void;
 }
 
 export const CellsBulkMovePreviewModal = ({
@@ -44,7 +47,10 @@ export const CellsBulkMovePreviewModal = ({
   cellsRepository,
   conversationQualifiedId,
   conversationName,
+  isMoveOutcomeUnresolved,
+  isMoveRequestError,
   onMoveResult,
+  onMoveError,
 }: CellsBulkMovePreviewModalProps) => {
   const destination = useBulkMoveDestinationSelection({
     isOpen,
@@ -75,7 +81,10 @@ export const CellsBulkMovePreviewModal = ({
       destination={destination}
       onMove={move.submitMove}
       onMoveResult={onMoveResult}
-      isMoveDisabled={!move.isValid || move.isSubmitting || destination.status !== 'success'}
+      onMoveError={onMoveError}
+      isMoveOutcomeUnresolved={isMoveOutcomeUnresolved}
+      isMoveRequestError={isMoveRequestError}
+      isMoveDisabled={!move.isValid || move.isSubmitting || isMoveOutcomeUnresolved || destination.status !== 'success'}
       isMoveLoading={move.isSubmitting}
     />
   );
