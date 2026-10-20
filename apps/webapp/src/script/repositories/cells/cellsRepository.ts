@@ -160,6 +160,10 @@ export class CellsRepository {
     return this.apiClient.api.cells.moveNodes({currentPaths, targetPath});
   }
 
+  async getBackgroundMoveInfo({jobUuid}: {jobUuid: string}) {
+    return this.apiClient.api.cells.getBackgroundActionInfo({name: 'move', jobUuid});
+  }
+
   async getAllNodes({
     path,
     limit = DEFAULT_MAX_FILES_LIMIT,

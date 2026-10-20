@@ -18,6 +18,7 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
+import type {RestPerformActionResponse} from 'cells-sdk-ts';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {CellNode} from 'src/script/types/cellNode';
@@ -34,6 +35,14 @@ interface CellsBulkMovePreviewModalProps {
   conversationQualifiedId: QualifiedId;
   conversationName: string;
   onMovePerformed: () => void;
+  onMoveResult: (response: RestPerformActionResponse) => void;
+  isBackgroundMovePending: boolean;
+  isBackgroundMoveError: boolean;
+  isBackgroundMoveRetryBlocked: boolean;
+  isBackgroundMoveStatusUnknown: boolean;
+  canRetryBackgroundMoveStatus: boolean;
+  onRetryBackgroundMoveStatus: () => void;
+  onRefresh: () => void;
 }
 
 export const CellsBulkMovePreviewModal = ({
@@ -44,6 +53,14 @@ export const CellsBulkMovePreviewModal = ({
   conversationQualifiedId,
   conversationName,
   onMovePerformed,
+  onMoveResult,
+  isBackgroundMovePending,
+  isBackgroundMoveError,
+  isBackgroundMoveRetryBlocked,
+  isBackgroundMoveStatusUnknown,
+  canRetryBackgroundMoveStatus,
+  onRetryBackgroundMoveStatus,
+  onRefresh,
 }: CellsBulkMovePreviewModalProps) => {
   const destination = useBulkMoveDestinationSelection({
     isOpen,
@@ -74,8 +91,21 @@ export const CellsBulkMovePreviewModal = ({
       destination={destination}
       onMove={move.submitMove}
       onMovePerformed={onMovePerformed}
-      isMoveDisabled={!move.isValid || move.isSubmitting || destination.status !== 'success'}
+      onMoveResult={onMoveResult}
+      isMoveDisabled={
+        !move.isValid ||
+        move.isSubmitting ||
+        isBackgroundMovePending ||
+        isBackgroundMoveRetryBlocked ||
+        isBackgroundMoveStatusUnknown ||
+        destination.status !== 'success'
+      }
       isMoveLoading={move.isSubmitting}
+      isBackgroundMoveError={isBackgroundMoveError}
+      isBackgroundMoveStatusUnknown={isBackgroundMoveStatusUnknown}
+      canRetryBackgroundMoveStatus={canRetryBackgroundMoveStatus}
+      onRetryBackgroundMoveStatus={onRetryBackgroundMoveStatus}
+      onRefresh={onRefresh}
     />
   );
 };
