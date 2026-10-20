@@ -331,7 +331,10 @@ describe('WebSocketClient', () => {
 
     it('passes the socket-open reconnect context to "onConnect"', async () => {
       const onConnectResult = jest.fn().mockReturnValue(Promise.resolve());
-      const onConnect = (_abortHandler: AbortController, reconnectContext: WebSocketReconnectContext) => {
+      const onConnect = (
+        _abortHandler: AbortController,
+        reconnectContext: WebSocketReconnectContext,
+      ): Promise<void> => {
         return onConnectResult(reconnectContext);
       };
       const websocketClient = createWebSocketClientWithTestWallClock(testWebSocketBaseUrl, fakeHttpClient);

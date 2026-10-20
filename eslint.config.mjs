@@ -851,6 +851,7 @@ const testLinterOptions = {
 };
 
 const explicitFunctionReturnTypeFilePatterns = [
+  'libraries/api-client/**/*.{ts,tsx,mts,cts}',
   'libraries/bazinga64/**/*.{ts,tsx,mts,cts}',
   'libraries/certificate-check/**/*.{ts,tsx,mts,cts}',
   'libraries/commons/**/*.{ts,tsx,mts,cts}',

@@ -175,7 +175,7 @@ export class HttpClient extends EventEmitter {
     return this.enableGzip;
   }
 
-  public getBaseUrl() {
+  public getBaseUrl(): string {
     return `${this.config.urls.rest}${this.versionPrefix}`;
   }
 
@@ -253,7 +253,7 @@ export class HttpClient extends EventEmitter {
 
       return response;
     } catch (error: unknown) {
-      const retryWithTokenRefresh = async () => {
+      const retryWithTokenRefresh = async (): Promise<AxiosResponse<T>> => {
         this.logger.warn(`Access token refresh triggered for "${config.method}" request to "${config.url}".`);
         await this.refreshAccessToken();
         config['axios-retry'] = {

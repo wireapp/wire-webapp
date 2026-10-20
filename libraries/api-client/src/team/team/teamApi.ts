@@ -105,7 +105,7 @@ export class TeamAPI {
       url: `${TeamAPI.URL.TEAMS}/${teamId}/${TeamAPI.URL.SIZE}`,
     };
 
-    const handleRequest = async () => {
+    const handleRequest = async (): Promise<TeamSizeData> => {
       try {
         const response = await this.client.sendJSON<TeamSizeData>(config);
         return response.data;
