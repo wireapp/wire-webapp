@@ -254,6 +254,15 @@ test.describe('Authentication', () => {
         components: device2Components,
       } = PageManager.from(await createPage(withLogin(user, {confirmNewHistory: true}))).webapp;
 
+      // Keeps device 1's logout running longer than the one second single-instance check interval, so a check
+      // always lands while logout is in progress instead of only on slow runs.
+      await device1Page.route('**/clients/*', async route => {
+        if (route.request().method() === 'DELETE') {
+          await device1Page.waitForTimeout(2_000);
+        }
+        await route.continue();
+      });
+
       await device2Components.conversationSidebar().clickPreferencesButton();
       await device2Pages.settings().devicesButton.click();
       await device2Pages.devices().activeDevices.getByRole('button', {name: 'Remove Device'}).click();
