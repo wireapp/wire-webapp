@@ -27,7 +27,6 @@ module.exports = {
     'util/**/*.{js,ts}',
     '!**/*.d.ts',
     '!**/*.test.{js,ts}',
-    '!babel.config.js',
     '!jest.config.js',
     '!dist/**',
     '!bin/**',
@@ -49,8 +48,4 @@ module.exports = {
   testEnvironment: 'node',
   testPathIgnorePatterns: ['<rootDir>/dist'],
   transformIgnorePatterns: ['/node_modules/(?!(true-myth|@sindresorhus/is|@enormora/objectory)/)'],
-  transform: {
-    '^.+\\.(ts|tsx)$': 'babel-jest',
-    '^.+\\.(js|jsx)$': 'babel-jest',
-  },
 };

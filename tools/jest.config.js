@@ -25,7 +25,7 @@ module.exports = {
     '^@enormora/objectory$': '<rootDir>/node_modules/@enormora/objectory/main.js',
   },
   transform: {
-    '^.+\\.(js|jsx|ts|tsx)$': ['babel-jest', {configFile: './apps/server/babel.config.js'}],
+    '^.+\\.(js|jsx|ts|tsx)$': '@swc/jest',
   },
   transformIgnorePatterns: ['/node_modules/(?!(true-myth|ky|p-map|@enormora/objectory|@sindresorhus/is)/)'],
 };
