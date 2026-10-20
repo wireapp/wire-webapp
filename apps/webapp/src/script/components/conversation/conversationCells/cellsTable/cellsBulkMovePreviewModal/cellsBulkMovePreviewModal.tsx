@@ -20,6 +20,7 @@
 import type {FunctionComponent} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
+import type {RestPerformActionResponse} from 'cells-sdk-ts';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {CellNode} from 'src/script/types/cellNode';
@@ -35,6 +36,7 @@ interface CellsBulkMovePreviewModalProps {
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
   conversationName: string;
+  onMoveResult: (response: RestPerformActionResponse) => void;
 }
 
 export const CellsBulkMovePreviewModal: FunctionComponent<CellsBulkMovePreviewModalProps> = ({
@@ -44,6 +46,7 @@ export const CellsBulkMovePreviewModal: FunctionComponent<CellsBulkMovePreviewMo
   cellsRepository,
   conversationQualifiedId,
   conversationName,
+  onMoveResult,
 }: CellsBulkMovePreviewModalProps) => {
   const destination = useBulkMoveDestinationSelection({
     isOpen,
@@ -73,6 +76,7 @@ export const CellsBulkMovePreviewModal: FunctionComponent<CellsBulkMovePreviewMo
       conversationName={conversationName}
       destination={destination}
       onMove={move.submitMove}
+      onMoveResult={onMoveResult}
       isMoveDisabled={!move.isValid || move.isSubmitting || destination.status !== 'success'}
       isMoveLoading={move.isSubmitting}
     />

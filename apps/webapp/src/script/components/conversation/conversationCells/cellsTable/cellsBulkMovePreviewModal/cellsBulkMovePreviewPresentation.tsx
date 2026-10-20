@@ -17,7 +17,7 @@
  *
  */
 
-import type {RestPerformActionResponse} from 'cells-sdk-ts';
+import {RestActionStatus, type RestPerformActionResponse} from 'cells-sdk-ts';
 import type {FunctionComponent} from 'react';
 import type {Result} from 'true-myth';
 
@@ -36,6 +36,7 @@ interface CellsBulkMovePreviewPresentationProps {
   conversationName: string;
   destination: BulkMoveDestinationSelection;
   onMove: () => Promise<Result<RestPerformActionResponse, unknown>>;
+  onMoveResult: (response: RestPerformActionResponse) => void;
   isMoveDisabled: boolean;
   isMoveLoading: boolean;
 }
@@ -47,6 +48,7 @@ export const CellsBulkMovePreviewPresentation: FunctionComponent<CellsBulkMovePr
   conversationName,
   destination,
   onMove,
+  onMoveResult,
   isMoveDisabled,
   isMoveLoading,
 }: CellsBulkMovePreviewPresentationProps) => {
@@ -55,7 +57,10 @@ export const CellsBulkMovePreviewPresentation: FunctionComponent<CellsBulkMovePr
   const handleMove = async (): Promise<void> => {
     const moveResult = await onMove();
     if (moveResult.isOk) {
-      onClose();
+      onMoveResult(moveResult.value);
+      if (moveResult.value.Status === RestActionStatus.Performed) {
+        onClose();
+      }
     }
   };
 
