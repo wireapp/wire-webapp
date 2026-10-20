@@ -850,6 +850,8 @@ const testLinterOptions = {
   reportUnusedInlineConfigs: 'error',
 };
 
+const explicitFunctionReturnTypeFilePatterns = ['libraries/config/**/*.{ts,tsx,mts,cts}'];
+
 const config = [
   {ignores},
   {linterOptions: repositoryLinterOptions},
@@ -865,6 +867,21 @@ const config = [
     },
   },
   ...productionConfigs,
+  {
+    files: explicitFunctionReturnTypeFilePatterns,
+    plugins: {
+      '@typescript-eslint': typescriptPlugin,
+    },
+    rules: {
+      '@typescript-eslint/explicit-function-return-type': [
+        'error',
+        {
+          allowExpressions: true,
+          allowTypedFunctionExpressions: true,
+        },
+      ],
+    },
+  },
   {
     files: ['apps/webapp/**/*.{ts,tsx}'],
     settings: {
