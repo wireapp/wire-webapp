@@ -17,9 +17,11 @@
  *
  */
 
+import type {MemoryEngine as MemoryStoreEngine} from '@wireapp/store-engine';
+
 const {MemoryEngine} = require('@wireapp/store-engine');
 
-export async function createMemoryEngine(storeName = `temp-${Date.now()}`) {
+export async function createMemoryEngine(storeName = `temp-${Date.now()}`): Promise<MemoryStoreEngine> {
   const engine = new MemoryEngine();
   await engine.init(storeName);
   return engine;

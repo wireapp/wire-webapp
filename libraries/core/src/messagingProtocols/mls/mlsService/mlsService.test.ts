@@ -26,7 +26,7 @@ import {
 import {BackendError, BackendErrorLabel, StatusCode} from '@wireapp/api-client/lib/http';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 
-import {randomUUID} from 'crypto';
+import {randomUUID, UUID} from 'crypto';
 import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
 
 import {APIClient} from '@wireapp/api-client';
@@ -44,10 +44,21 @@ import {CORE_CRYPTO_ERROR_NAMES} from './coreCryptoMlsError';
 import {InitClientOptions, MLSService, MLSServiceEvents} from './mlsService';
 
 import {AddUsersFailure, AddUsersFailureReasons} from '../../../conversation';
-import {openDB} from '../../../storage/coreDb';
+import {openDB, CoreDatabase} from '../../../storage/coreDb';
 import {RecurringTaskScheduler} from '../../../util/recurringTaskScheduler';
 import {TaskScheduler} from '../../../util/taskScheduler';
 import * as Helper from '../e2eIdentityService/helper';
+
+type MLSServiceTestSetup = readonly [
+  MLSService,
+  {
+    readonly apiClient: APIClient;
+    readonly coreCrypto: jest.Mocked<CoreCrypto>;
+    readonly recurringTaskScheduler: RecurringTaskScheduler;
+    readonly transactionContext: jest.Mocked<CoreCryptoContext>;
+    readonly coreDatabase: CoreDatabase;
+  },
+];
 
 jest.mock('../e2eIdentityService/helper', () => {
   return {
@@ -58,7 +69,7 @@ jest.mock('../e2eIdentityService/helper', () => {
 
 jest.createMockFromModule('@wireapp/api-client');
 
-function createUserId() {
+function createUserId(): {id: UUID; domain: string} {
   return {id: randomUUID(), domain: ''};
 }
 
@@ -73,7 +84,7 @@ const mockedMLSWelcomeEventData = '';
 
 const apiClients: APIClient[] = [];
 
-const createMLSService = async () => {
+const createMLSService = async (): Promise<MLSServiceTestSetup> => {
   const apiClient = new APIClient();
   apiClients.push(apiClient);
   const transactionContext = {
@@ -979,7 +990,7 @@ describe('MLSService', () => {
       const mockGroupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm3OQFc=';
       const mockedNewEpoch = 3;
 
-      const getGroupIdFromConversationId = () => {
+      const getGroupIdFromConversationId = (): Promise<string> => {
         return Promise.resolve(mockGroupId);
       };
 
@@ -1012,7 +1023,7 @@ describe('MLSService', () => {
       const mockedNewEpoch = 3;
       const commitDelay = 1000;
 
-      const getGroupIdFromConversationId = () => {
+      const getGroupIdFromConversationId = (): Promise<string> => {
         return Promise.resolve(mockGroupId);
       };
 
@@ -1046,7 +1057,7 @@ describe('MLSService', () => {
       const [mlsService, {transactionContext}] = await createMLSService();
 
       const mockGroupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm3OQFc=';
-      const getGroupIdFromConversationId = () => {
+      const getGroupIdFromConversationId = (): Promise<string> => {
         return Promise.resolve(mockGroupId);
       };
       jest

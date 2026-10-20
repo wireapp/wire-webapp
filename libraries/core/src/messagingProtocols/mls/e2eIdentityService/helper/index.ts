@@ -58,7 +58,7 @@ export const getSignatureAlgorithmForCiphersuite = (ciphersuite: Ciphersuite): M
   return ciphersuiteSignatureAlgorithmMap[ciphersuite];
 };
 
-export const isMLSDevice = ({mls_public_keys}: RegisteredClient, ciphersuite: Ciphersuite) => {
+export const isMLSDevice = ({mls_public_keys}: RegisteredClient, ciphersuite: Ciphersuite): boolean => {
   const signatureAlogrithm = getSignatureAlgorithmForCiphersuite(ciphersuite);
   const signature = mls_public_keys[signatureAlogrithm];
   return typeof signature === 'string' && signature.length > 0;
@@ -91,6 +91,6 @@ export const getMLSDeviceStatus = (
   return MLSDeviceStatus.REGISTERED;
 };
 
-export const isResponseStatusValid = (status: string | undefined) => {
+export const isResponseStatusValid = (status: string | undefined): boolean => {
   return status !== undefined && status.length > 0 && status === 'valid';
 };

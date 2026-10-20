@@ -23,11 +23,11 @@ import {constructFullyQualifiedClientId} from '../../../util/fullyQualifiedClien
 
 const textEncoder = new TextEncoder();
 
-export function generateMLSUserId({id, domain}: QualifiedId) {
+export function generateMLSUserId({id, domain}: QualifiedId): Uint8Array<ArrayBuffer> {
   return textEncoder.encode(`${id}@${domain}`);
 }
 
-export function generateMLSDeviceId({id, domain}: QualifiedId, clientId: string) {
+export function generateMLSDeviceId({id, domain}: QualifiedId, clientId: string): Uint8Array<ArrayBuffer> {
   const fullyQualifiedClientId = constructFullyQualifiedClientId(id, clientId, domain);
   return textEncoder.encode(fullyQualifiedClientId);
 }

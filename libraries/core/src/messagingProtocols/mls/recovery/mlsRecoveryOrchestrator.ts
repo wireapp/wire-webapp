@@ -259,7 +259,7 @@ export class MlsRecoveryOrchestratorImpl implements MlsRecoveryOrchestrator {
     err: DomainMlsError,
     policy: RecoveryPolicy,
     recoveryKey: string,
-  ) {
+  ): Promise<void> {
     const id = context.qualifiedConversationId;
     if (id === undefined) {
       const errorMessage = `Missing conversationId for recovery action ${policy.action}`;

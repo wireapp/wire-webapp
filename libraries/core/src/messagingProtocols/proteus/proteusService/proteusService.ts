@@ -32,7 +32,7 @@ import type {QualifiedId, QualifiedUserPreKeyBundleMap} from '@wireapp/api-clien
 import {LogFactory} from '@wireapp/commons';
 import {CRUDEngine} from '@wireapp/store-engine';
 
-import {CryptoClient} from './cryptoClient';
+import {CryptoClient, InitialPrekeys} from './cryptoClient';
 import {cryptoMigrationStore} from './cryptoMigrationStateStore';
 import {generateDecryptionError} from './decryptionErrorGenerator';
 import {deleteIdentity} from './identityClearer';
@@ -96,7 +96,7 @@ export class ProteusService {
     });
   }
 
-  public async initClient(context: Context) {
+  public async initClient(context: Context): Promise<void> {
     if (context.domain !== undefined && context.domain.length > 0) {
       // We want sessions to be fully qualified from now on
       if (!cryptoMigrationStore.qualifiedSessions.isReady(this.dbName)) {
@@ -112,14 +112,14 @@ export class ProteusService {
     return this.cryptoClient.init(totalUsableBackedPrekeys);
   }
 
-  public createClient(entropy?: Uint8Array) {
+  public createClient(entropy?: Uint8Array): Promise<InitialPrekeys> {
     return this.cryptoClient.create(this.config.nbPrekeys, entropy);
   }
 
   /**
    * Get the fingerprint of the local client.
    */
-  public getLocalFingerprint() {
+  public getLocalFingerprint(): Promise<string> {
     return this.cryptoClient.getFingerprint();
   }
 
@@ -134,7 +134,7 @@ export class ProteusService {
    * @param prekey A prekey can be given to create a session if it doesn't already exist.
    *   If not provided and the session doesn't exists it will fetch a new prekey from the backend
    */
-  public async getRemoteFingerprint(userId: QualifiedId, clientId: string, prekey?: PreKey) {
+  public async getRemoteFingerprint(userId: QualifiedId, clientId: string, prekey?: PreKey): Promise<string> {
     const sessionId = await initSession(
       {userId, clientId, initialPrekey: prekey},
       {cryptoClient: this.cryptoClient, apiClient: this.apiClient},
@@ -295,7 +295,7 @@ export class ProteusService {
     };
   }
 
-  public async decrypt(encryptedText: Uint8Array, userId: QualifiedId, clientId: string) {
+  public async decrypt(encryptedText: Uint8Array, userId: QualifiedId, clientId: string): Promise<Uint8Array> {
     const sessionId = this.constructSessionId(userId, clientId);
     const sessionExists = await this.cryptoClient.sessionExists(sessionId);
 
@@ -322,7 +322,7 @@ export class ProteusService {
     return this.cryptoClient.consumePrekey();
   }
 
-  public deleteSession(userId: QualifiedId, clientId: string) {
+  public deleteSession(userId: QualifiedId, clientId: string): Promise<void> {
     return deleteSession({
       userId,
       clientId,
@@ -350,7 +350,7 @@ export class ProteusService {
     };
   }
 
-  async wipe() {
+  async wipe(): Promise<void> {
     await deleteIdentity(this.storeEngine);
   }
 }

@@ -20,6 +20,8 @@
 import {Converter} from 'bazinga64';
 
 import {AcmeService} from '../connection/acmeServer/acmeService';
+import type {PostJoseRequestReturnValue} from '../connection/acmeServer/acmeService.types';
+import type {OidcChallengeResponseData} from '../connection/acmeServer/schema';
 import {E2eiEnrollment, Nonce} from '../e2eiService.types';
 import {UnidentifiedEnrollmentFlowData} from '../storage/e2eiStorage.schema';
 
@@ -37,7 +39,7 @@ export const doWireOidcChallenge = async ({
   identity,
   nonce,
   oAuthIdToken,
-}: DoWireOidcChallengeParams) => {
+}: DoWireOidcChallengeParams): Promise<PostJoseRequestReturnValue<OidcChallengeResponseData>> => {
   const {oidcChallenge} = authData.authorization;
   if (oidcChallenge === undefined) {
     throw new Error('No wireOIDCChallenge defined');

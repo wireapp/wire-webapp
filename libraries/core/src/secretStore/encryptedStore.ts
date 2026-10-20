@@ -57,12 +57,12 @@ export class EncryptedStore<EncryptedPayload = unknown> {
     this.#decrypt = decrypt;
   }
 
-  async saveSecretValue(primaryKey: string, value: Uint8Array) {
+  async saveSecretValue(primaryKey: string, value: Uint8Array): Promise<void> {
     const encrypted = await this.#encrypt(value);
     await this.db.put('secrets', encrypted, primaryKey);
   }
 
-  async getSecretValue(primaryKey: string) {
+  async getSecretValue(primaryKey: string): Promise<Uint8Array | undefined> {
     const result = await this.db.get('secrets', primaryKey);
     if (result === undefined) {
       return undefined;
@@ -70,23 +70,23 @@ export class EncryptedStore<EncryptedPayload = unknown> {
     return this.#decrypt(result);
   }
 
-  async deleteSecretValue(primaryKey: string) {
+  async deleteSecretValue(primaryKey: string): Promise<void> {
     const instance = await openDB(this.db.name, this.db.version);
     await instance.delete('secrets', primaryKey);
     instance.close();
   }
 
-  close() {
+  close(): void {
     this.db.close();
   }
 
-  async wipe() {
+  async wipe(): Promise<void> {
     this.close();
     await deleteDB(this.db.name);
   }
 }
 
-async function generateKey() {
+async function generateKey(): Promise<CryptoKey> {
   return crypto.subtle.generateKey(
     {name: 'AES-GCM', length: 256},
     false, //whether the key is extractable (i.e. can be used in exportKey)

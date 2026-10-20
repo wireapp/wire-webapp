@@ -66,7 +66,7 @@ export class SelfService {
    * Update self user's list of supported-protocols
    * @param supportedProtocols The list of supported protocols
    */
-  public async putSupportedProtocols(supportedProtocols: CONVERSATION_PROTOCOL[]) {
+  public async putSupportedProtocols(supportedProtocols: CONVERSATION_PROTOCOL[]): Promise<void> {
     if (!this.apiClient.backendFeatures.supportsMLS) {
       this.logger.warn('Self supported protocols were not updated, because endpoint is not supported by backend');
       return;

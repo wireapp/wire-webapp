@@ -67,16 +67,16 @@ export class CoreCrypto {
   proteusDecrypt = jest.fn().mockResolvedValue(Uint8Array.from([]));
   proteusSessionFromMessage = jest.fn().mockResolvedValue(Uint8Array.from([]));
 
-  static deferredInit() {
+  static deferredInit(): CoreCrypto {
     return new CoreCrypto();
   }
 
-  static version() {
+  static version(): string {
     return '1.0.0';
   }
 }
 
-export function version() {
+export function version(): string {
   return '1.0.0';
 }
 
@@ -145,22 +145,22 @@ export const isProteusError = <E extends ProteusErrorType>(
   return isCoreCryptoError(error, ErrorType.Proteus) && (error as any).context?.type === errorType;
 };
 
-export const isProteusSessionNotFoundError = (error: unknown) => {
+export const isProteusSessionNotFoundError = (error: unknown): boolean => {
   return isProteusError(error, ProteusErrorType.SessionNotFound);
 };
-export const isProteusDuplicateMessageError = (error: unknown) => {
+export const isProteusDuplicateMessageError = (error: unknown): boolean => {
   return isProteusError(error, ProteusErrorType.DuplicateMessage);
 };
-export const isProteusRemoteIdentityChangedError = (error: unknown) => {
+export const isProteusRemoteIdentityChangedError = (error: unknown): boolean => {
   return isProteusError(error, ProteusErrorType.RemoteIdentityChanged);
 };
 
-export const isMlsOrphanWelcomeError = (error: unknown) => {
+export const isMlsOrphanWelcomeError = (error: unknown): boolean => {
   return isCoreCryptoError(error, ErrorType.Mls) && (error as any).context?.type === MlsErrorType.OrphanWelcome;
 };
 
 // Added to support tests that rely on the core-crypto guard for ConversationAlreadyExists classification
-export const isMlsConversationAlreadyExistsError = (error: unknown) => {
+export const isMlsConversationAlreadyExistsError = (error: unknown): boolean => {
   return (
     isCoreCryptoError(error, ErrorType.Mls) &&
     error.context?.type === MlsErrorType.ConversationAlreadyExists &&
@@ -168,6 +168,6 @@ export const isMlsConversationAlreadyExistsError = (error: unknown) => {
   );
 };
 
-export const isMlsMessageRejectedError = (error: unknown) => {
+export const isMlsMessageRejectedError = (error: unknown): boolean => {
   return isCoreCryptoError(error, ErrorType.Mls) && error.context?.type === MlsErrorType.MessageRejected;
 };

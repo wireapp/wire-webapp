@@ -22,7 +22,7 @@ import 'fake-indexeddb/auto';
 import nodeCrypto from 'crypto';
 
 // Storage Mock
-function storageMock() {
+function storageMock(): Storage {
   let storage: any = {};
 
   return {
