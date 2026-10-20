@@ -21,6 +21,7 @@ import {useMemo, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
+import {getCellsApiPath} from 'Components/conversation/conversationCells/common/getCellsApiPath/getCellsApiPath';
 import {getCellsFilesPath} from 'Components/conversation/conversationCells/common/getCellsFilesPath/getCellsFilesPath';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -48,24 +49,16 @@ export interface BulkMoveDestinationSelection {
   status: 'idle' | 'loading' | 'success' | 'error';
 }
 
-const normalizeDestinationPath = (path: string, rootPath: string): string => {
-  const normalizedRootPath = rootPath.replace(/\/+$/, '');
-  const normalizedPath = path.replace(/^\/+|\/+$/g, '');
-  if (normalizedPath === normalizedRootPath) {
+const getRelativeDestinationPath = (path: string, driveRootPath: string): string => {
+  if (path === driveRootPath) {
     return '';
   }
 
-  if (normalizedRootPath.length > 0 && normalizedPath.startsWith(`${normalizedRootPath}/`)) {
-    return normalizedPath.slice(normalizedRootPath.length + 1);
+  if (path.startsWith(`${driveRootPath}/`)) {
+    return path.slice(driveRootPath.length + 1);
   }
 
-  return normalizedPath;
-};
-
-const getDestinationPath = (path: string, rootPath: string): string => {
-  const normalizedRootPath = rootPath.replace(/\/+$/, '');
-  const relativePath = normalizeDestinationPath(path, rootPath);
-  return relativePath.length > 0 ? [normalizedRootPath, relativePath].filter(Boolean).join('/') : rootPath;
+  return path;
 };
 
 export const useBulkMoveDestinationSelection = ({
@@ -75,9 +68,13 @@ export const useBulkMoveDestinationSelection = ({
   conversationQualifiedId,
 }: UseBulkMoveDestinationSelectionProps): BulkMoveDestinationSelection => {
   const {clock, fireAndForgetInvoker, translate} = useApplicationContext();
-  const rootPath = getCellsFilesPath();
-  const [currentPath, setCurrentPath] = useState(rootPath);
-  const [selectedDestinationPath, setSelectedDestinationPath] = useState(rootPath);
+  const initialPath = getCellsFilesPath();
+  const driveRootPath = getCellsApiPath({conversationQualifiedId, currentPath: ''});
+  const [currentPath, setCurrentPath] = useState(initialPath);
+  const [selectedDestinationPath, setSelectedDestinationPath] = useState(() => {
+    return getCellsApiPath({conversationQualifiedId, currentPath: initialPath});
+  });
+  const currentFolderPath = getCellsApiPath({conversationQualifiedId, currentPath});
   const {folders, status, shouldShowLoadingSpinner} = useGetCellsFolders({
     cellsRepository,
     conversationQualifiedId,
@@ -97,27 +94,27 @@ export const useBulkMoveDestinationSelection = ({
       });
   }, [selectedNodes]);
   const disabledDestinationPaths = useMemo(() => {
-    return [...selectedFolderPaths, currentPath];
-  }, [selectedFolderPaths, currentPath]);
+    return [...selectedFolderPaths, currentFolderPath];
+  }, [selectedFolderPaths, currentFolderPath]);
   const disabledDestinationLabels = useMemo(() => {
     return Object.fromEntries([
       ...selectedFolderPaths.map(path => {
         return [path, translate('cells.bulkMove.selected')];
       }),
-      [currentPath, translate('cells.bulkMove.currentLocation')],
+      [currentFolderPath, translate('cells.bulkMove.currentLocation')],
     ]);
-  }, [selectedFolderPaths, currentPath, translate]);
+  }, [selectedFolderPaths, currentFolderPath, translate]);
 
   const handlePathChange = (path: string): void => {
     setCurrentPath(path);
-    setSelectedDestinationPath(getDestinationPath(path, rootPath));
+    setSelectedDestinationPath(getCellsApiPath({conversationQualifiedId, currentPath: path}));
   };
   const handleDestinationSelect = (path: string): void => {
-    setSelectedDestinationPath(getDestinationPath(path, rootPath));
+    setSelectedDestinationPath(path);
   };
 
   const driveLabel = translate('cells.bulkMove.drive');
-  const relativeDestinationPath = normalizeDestinationPath(selectedDestinationPath, rootPath);
+  const relativeDestinationPath = getRelativeDestinationPath(selectedDestinationPath, driveRootPath);
   const currentDestination =
     relativeDestinationPath.length > 0
       ? `${driveLabel} / ${relativeDestinationPath.split('/').filter(Boolean).join(' / ')}`
