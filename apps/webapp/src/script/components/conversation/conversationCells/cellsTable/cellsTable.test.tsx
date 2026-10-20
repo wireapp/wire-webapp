@@ -1114,7 +1114,7 @@ describe('CellsTable selection', () => {
     window.location.hash = originalHash;
   });
 
-  it('keeps a failed move explicit without adding failure UI', async () => {
+  it('shows an error when the move request fails and keeps the preview open', async () => {
     const originalHash = window.location.hash;
     window.location.hash = '#/conversation/conversation-id@example.com/files/wire-cells-web';
     const user = userEvent.setup();
@@ -1139,7 +1139,7 @@ describe('CellsTable selection', () => {
       expect(repository.moveNodes).toHaveBeenCalledTimes(1);
     });
     expect(await screen.findByRole('dialog')).toBeInTheDocument();
-    expect(within(dialog).queryByRole('alert')).not.toBeInTheDocument();
+    expect(within(dialog).getByRole('alert')).toHaveTextContent('cells.newItemMenuModalForm.genericError');
     window.location.hash = originalHash;
   });
 });

@@ -17,6 +17,8 @@
  *
  */
 
+import {useState} from 'react';
+
 import {RestActionStatus, type RestPerformActionResponse} from 'cells-sdk-ts';
 import type {Result} from 'true-myth';
 
@@ -64,9 +66,16 @@ export const CellsBulkMovePreviewPresentation = ({
   onRefresh,
 }: CellsBulkMovePreviewPresentationProps) => {
   const {translate} = useApplicationContext();
+  const [isMoveError, setIsMoveError] = useState(false);
 
   const handleMove = async (): Promise<void> => {
+    setIsMoveError(false);
     const moveResult = await onMove();
+    if (moveResult.isErr) {
+      setIsMoveError(true);
+      return;
+    }
+
     if (moveResult.isOk) {
       onMoveResult(moveResult.value);
       if (moveResult.value.Status === RestActionStatus.Performed) {
@@ -102,6 +111,7 @@ export const CellsBulkMovePreviewPresentation = ({
           return path;
         }}
       />
+      {isMoveError && <p role="alert">{translate('cells.newItemMenuModalForm.genericError')}</p>}
       {isBackgroundMoveError && (
         <div role="alert">
           <p>{translate('cells.bulkMove.moveNeedsReview')}</p>
