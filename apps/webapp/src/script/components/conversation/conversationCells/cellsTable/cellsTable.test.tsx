@@ -321,7 +321,7 @@ describe('CellsTable selection', () => {
     expect(within(selectedItems).getByRole('heading', {name: 'Selected items'})).toBeInTheDocument();
     expect(within(selectedItems).getByText('Marketing images')).toBeInTheDocument();
     expect(within(selectedItems).getByText('Wire logs.pdf')).toBeInTheDocument();
-    expect(within(preview).getByText('Current destination: Drive / Reports')).toBeInTheDocument();
+    expect(within(preview).getByText('Current destination: Drive')).toBeInTheDocument();
     expect(within(preview).queryByRole('button', {name: 'Move'})).not.toBeInTheDocument();
 
     const selectedSourceFolder = await within(preview).findByRole('button', {name: 'Marketing images Selected'});
@@ -359,7 +359,7 @@ describe('CellsTable selection', () => {
     await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
     await user.click(screen.getByRole('button', {name: 'Move'}));
     const reopenedPreview = await screen.findByRole('dialog');
-    expect(within(reopenedPreview).getByText('Current destination: Drive / Reports')).toBeInTheDocument();
+    expect(within(reopenedPreview).getByText('Current destination: Drive')).toBeInTheDocument();
     expect(within(reopenedPreview).getByText('Preview move of 1 item')).toBeInTheDocument();
     const reopenedSelectedItems = within(reopenedPreview).getByRole('region', {name: 'Selected items'});
     expect(within(reopenedSelectedItems).getByText('Wire logs.pdf')).toBeInTheDocument();
