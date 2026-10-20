@@ -37,7 +37,11 @@ import {translateForTest} from 'Util/test/translateForTest';
 
 import {CellsTable} from './cellsTable';
 
-import {CELLS_SELF_USER_DRIVE_ROLE} from '../common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
+import {
+  CELLS_SELF_USER_DRIVE_ROLE,
+  CellsSelfUserDriveRoleProvider,
+  CellsSelfUserDriveRole,
+} from '../common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 
 const translateSelectionForTest: Translate = (key, substitutions) => {
   if (key === 'cells.selection.selectedCount') {
@@ -128,6 +132,7 @@ const renderCellsTable = ({
   isBulkActionsEnabled = true,
   cellsRepository = {} as CellsRepository,
   initialNodes,
+  selfUserDriveRole = CELLS_SELF_USER_DRIVE_ROLE.EDITOR,
   onRefresh = jest.fn(),
   clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
 }: {
@@ -141,6 +146,7 @@ const renderCellsTable = ({
   readonly isBulkActionsEnabled?: boolean;
   readonly cellsRepository?: CellsRepository;
   readonly initialNodes?: CellNode[];
+  readonly selfUserDriveRole?: CellsSelfUserDriveRole;
   readonly onRefresh?: () => void;
   readonly clock?: ReturnType<typeof createDeterministicClock>;
 } = {}) => {
@@ -171,26 +177,28 @@ const renderCellsTable = ({
   ) => {
     return (
       <ThemeProvider>
-        <CellsTable
-          nodes={nodes}
-          cellsRepository={cellsRepository}
-          conversation={{} as Conversation}
-          conversationQualifiedId={conversationQualifiedId}
-          conversationName="Conversation"
-          onRefresh={onRefresh}
-          onFolderDropTargetChange={onFolderDropTargetChange}
-          onDropFilesToFolder={onDropFilesToFolder}
-          onDropReadError={onDropReadError}
-          folderDropResetKey={resetKey}
-          getDirectionFor={() => {
-            return undefined;
-          }}
-          isSortingEnabled
-          onToggleSort={jest.fn()}
-          selectionEnabled={isSelectionEnabled}
-          selectionScopeKey={scopeKey}
-          selectionBarAnchor={document.body}
-        />
+        <CellsSelfUserDriveRoleProvider selfUserDriveRole={selfUserDriveRole}>
+          <CellsTable
+            nodes={nodes}
+            cellsRepository={cellsRepository}
+            conversation={{} as Conversation}
+            conversationQualifiedId={conversationQualifiedId}
+            conversationName="Conversation"
+            onRefresh={onRefresh}
+            onFolderDropTargetChange={onFolderDropTargetChange}
+            onDropFilesToFolder={onDropFilesToFolder}
+            onDropReadError={onDropReadError}
+            folderDropResetKey={resetKey}
+            getDirectionFor={() => {
+              return undefined;
+            }}
+            isSortingEnabled
+            onToggleSort={jest.fn()}
+            selectionEnabled={isSelectionEnabled}
+            selectionScopeKey={scopeKey}
+            selectionBarAnchor={document.body}
+          />
+        </CellsSelfUserDriveRoleProvider>
       </ThemeProvider>
     );
   };
@@ -245,12 +253,26 @@ describe('CellsTable selection', () => {
     ).toBe(true);
   });
 
-  it('keeps selection available while browsing the recycle bin', () => {
-    renderCellsTable({selectionScopeKey: 'conversation:/bin'});
+  it('keeps selection but hides Move in the recycle bin', () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files/recycle_bin';
+    try {
+      renderCellsTable({selectionScopeKey: 'conversation:/bin'});
+      fireEvent.click(screen.getAllByRole('checkbox')[0]);
 
+      expect(screen.getByText('1 selected')).toBeInTheDocument();
+      expect(screen.queryByRole('button', {name: 'Move'})).not.toBeInTheDocument();
+    } finally {
+      window.location.hash = originalHash;
+    }
+  });
+
+  it('hides Move for viewers while keeping selection available', () => {
+    renderCellsTable({selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER});
     fireEvent.click(screen.getAllByRole('checkbox')[0]);
 
     expect(screen.getByText('1 selected')).toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'Move'})).not.toBeInTheDocument();
   });
 
   it('hides selection controls when the Drive bulk actions feature flag is off', () => {
@@ -974,32 +996,34 @@ describe('CellsTable selection', () => {
     window.location.hash = originalHash;
   });
 
-  it('disables submission when any selected node is not movable', async () => {
+  it('hides bulk Move when any selected node is not movable', async () => {
     const originalHash = window.location.hash;
     window.location.hash = '#/conversation/conversation-id@example.com/files/Drive';
-    const user = userEvent.setup();
-    const folder = createNode({id: 'folder', name: 'Folder', path: 'Drive/Folder'});
-    const viewerFile = createNode({
-      id: 'viewer-file',
-      name: 'Viewer file',
-      path: 'Drive/viewer.txt',
-      type: CellNodeType.FILE,
-      selfUserDriveRole: 'viewer',
-    });
-    const repository = {
-      getAllNodes: jest.fn().mockResolvedValue({Nodes: []}),
-      moveNodes: jest.fn(),
-    } as unknown as CellsRepository;
-    renderCellsTable({cellsRepository: repository, initialNodes: [folder, viewerFile]});
+    try {
+      const user = userEvent.setup();
+      const folder = createNode({id: 'folder', name: 'Folder', path: 'Drive/Folder'});
+      const viewerFile = createNode({
+        id: 'viewer-file',
+        name: 'Viewer file',
+        path: 'Drive/viewer.txt',
+        type: CellNodeType.FILE,
+        selfUserDriveRole: 'viewer',
+      });
+      const repository = {
+        getAllNodes: jest.fn().mockResolvedValue({Nodes: []}),
+        moveNodes: jest.fn(),
+      } as unknown as CellsRepository;
+      renderCellsTable({cellsRepository: repository, initialNodes: [folder, viewerFile]});
 
-    await user.click(screen.getByRole('checkbox', {name: 'Select Folder'}));
-    await user.click(screen.getByRole('checkbox', {name: 'Select Viewer file'}));
-    await user.click(screen.getByRole('button', {name: 'Move'}));
+      await user.click(screen.getByRole('checkbox', {name: 'Select Folder'}));
+      await user.click(screen.getByRole('checkbox', {name: 'Select Viewer file'}));
 
-    const dialog = await screen.findByRole('dialog');
-    expect(within(dialog).getByRole('button', {name: 'Move'})).toBeDisabled();
-    expect(repository.moveNodes).not.toHaveBeenCalled();
-    window.location.hash = originalHash;
+      expect(screen.getByText('2 selected')).toBeInTheDocument();
+      expect(screen.queryByRole('button', {name: 'Move'})).not.toBeInTheDocument();
+      expect(repository.moveNodes).not.toHaveBeenCalled();
+    } finally {
+      window.location.hash = originalHash;
+    }
   });
 
   it('shows an error when the move request fails and keeps the preview open', async () => {
