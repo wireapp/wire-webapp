@@ -25,12 +25,13 @@ import {Avatar, AVATAR_SIZE} from 'Components/avatar';
 import {UserStatusBadges} from 'Components/badge';
 import {ParticipantItemContent} from 'Components/participantItemContent';
 import {listItem, listWrapper} from 'Components/participantItemContent/participantItem.styles';
-import {UserlistMode} from 'Components/userList';
 import {useUserName} from 'Components/UserName';
 import {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {capitalizeFirstChar} from 'Util/stringUtil';
+
+import {UserlistMode} from '../../userList';
 
 export interface UserListItemProps {
   groupId?: string;

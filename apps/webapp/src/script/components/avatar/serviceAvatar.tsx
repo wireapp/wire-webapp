@@ -25,12 +25,11 @@ import * as Icon from 'Components/icon';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {CSS_FILL_PARENT} from 'Util/cssMixin';
 
+import {AVATAR_SIZE} from './avatar';
 import {AvatarBackground} from './avatarBackground';
 import {AvatarBorder} from './avatarBorder';
 import {AvatarImage} from './avatarImage';
 import {AvatarWrapper} from './avatarWrapper';
-
-import {AVATAR_SIZE} from '.';
 
 interface ServiceAvatarProps extends React.HTMLProps<HTMLDivElement> {
   avatarSize: AVATAR_SIZE;

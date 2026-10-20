@@ -19,10 +19,9 @@
 
 import React from 'react';
 
-import {AVATAR_SIZE, DIAMETER} from 'Components/avatar';
-
 import {DefaultAvatarImageSmall, DefaultAvatarImageLarge} from './defaultAvatarImage';
 
+import {AVATAR_SIZE, DIAMETER} from '../avatar';
 import {AvatarWrapper} from '../avatarWrapper';
 
 interface PlaceholderAvatarProps extends React.HTMLProps<HTMLDivElement> {

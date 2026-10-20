@@ -23,7 +23,7 @@ import {isNonEmptyString} from '@sindresorhus/is';
 
 import {CSS_FILL_PARENT, CSS_FLEX_CENTER, CSS_ICON} from 'Util/cssMixin';
 
-import {STATE} from '.';
+import {STATE} from './avatar';
 
 interface AvatarBadgeProps {
   state: STATE;

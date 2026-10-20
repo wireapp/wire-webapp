@@ -29,7 +29,7 @@ import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {CSS_FILL_PARENT} from 'Util/cssMixin';
 
-import {AVATAR_SIZE} from '.';
+import {AVATAR_SIZE} from './avatar';
 
 const completedDownloadPercentage = 100;
 const avatarTransitionDurationInMilliseconds = 700;

@@ -23,7 +23,7 @@ import {User} from 'Repositories/entity/User';
 
 import {TemporaryGuestAvatar} from './temporaryGuestAvatar';
 
-import {AVATAR_SIZE, STATE} from '.';
+import {AVATAR_SIZE, STATE} from './avatar';
 import {translateForTest} from 'Util/test/translateForTest';
 
 describe('TemporaryGuestAvatar', () => {
