@@ -39,8 +39,17 @@ export type ValidatePullRequestReleaseImpactOptions = {
   readonly labels: readonly string[];
 };
 
+type ValidateReleaseBranchImpactOptions = {
+  readonly targetBranch: string;
+  readonly releaseImpact: PullRequestReleaseImpact;
+};
+
 const pullRequestReleaseImpacts: readonly PullRequestReleaseImpact[] = ['major', 'minor', 'patch', 'none'];
 const supportedLabelsDiagnostic = Object.values(pullRequestReleaseImpactLabels).join(', ');
+
+function isPatchOnlyTargetBranch(targetBranch: string): boolean {
+  return /^(?:release|maintenance)\/[^/]+$/.test(targetBranch);
+}
 
 export function resolvePullRequestReleaseImpact(labels: readonly string[]): Result<PullRequestReleaseImpact, Error> {
   const matchingImpacts = pullRequestReleaseImpacts.flatMap(impact => {
@@ -76,13 +85,43 @@ export function resolvePullRequestReleaseImpact(labels: readonly string[]): Resu
   return Result.ok(releaseImpact);
 }
 
+function validateReleaseBranchImpactRestrictions(
+  options: ValidateReleaseBranchImpactOptions,
+): Result<PullRequestReleaseImpact, Error> {
+  const {targetBranch, releaseImpact} = options;
+
+  if (isPatchOnlyTargetBranch(targetBranch) && (releaseImpact === 'major' || releaseImpact === 'minor')) {
+    return Result.err(
+      new Error(
+        `Pull request targeting ${targetBranch} cannot use ${pullRequestReleaseImpactLabels[releaseImpact]}. Release candidates and maintenance lines allow only ${pullRequestReleaseImpactLabels.patch} or ${pullRequestReleaseImpactLabels.none}; new functionality and breaking changes must target main.`,
+      ),
+    );
+  }
+
+  return Result.ok(releaseImpact);
+}
+
+export function validatePullRequestSemverPolicy(
+  options: ValidatePullRequestReleaseImpactOptions,
+): Result<PullRequestReleaseImpact, Error> {
+  const {targetBranch, labels} = options;
+
+  return resolvePullRequestReleaseImpact(labels).match({
+    Err(error) {
+      return Result.err(new Error(`Target branch ${targetBranch}: ${error.message}`));
+    },
+    Ok(releaseImpact) {
+      return validateReleaseBranchImpactRestrictions({targetBranch, releaseImpact});
+    },
+  });
+}
+
 export function validatePullRequestReleaseImpact(
   options: ValidatePullRequestReleaseImpactOptions,
 ): Result<PullRequestReleaseImpact, Error> {
   const {targetBranch, labels} = options;
-  const isPatchOnlyTarget = /^(?:release|maintenance)\/[^/]+$/.test(targetBranch);
 
-  if (targetBranch !== 'main' && !isPatchOnlyTarget) {
+  if (targetBranch !== 'main' && !isPatchOnlyTargetBranch(targetBranch)) {
     return Result.err(
       new Error(
         `Unsupported pull request target branch: ${targetBranch}. Expected main, release/*, or maintenance/*. Supported release-impact labels: ${supportedLabelsDiagnostic}`,
@@ -95,15 +134,7 @@ export function validatePullRequestReleaseImpact(
       return Result.err(new Error(`Target branch ${targetBranch}: ${error.message}`));
     },
     Ok(releaseImpact) {
-      if (isPatchOnlyTarget && (releaseImpact === 'major' || releaseImpact === 'minor')) {
-        return Result.err(
-          new Error(
-            `Pull request targeting ${targetBranch} cannot use ${pullRequestReleaseImpactLabels[releaseImpact]}. Release candidates and maintenance lines allow only ${pullRequestReleaseImpactLabels.patch} or ${pullRequestReleaseImpactLabels.none}; new functionality and breaking changes must target main.`,
-          ),
-        );
-      }
-
-      return Result.ok(releaseImpact);
+      return validateReleaseBranchImpactRestrictions({targetBranch, releaseImpact});
     },
   });
 }
