@@ -18,7 +18,7 @@
  */
 
 import {advanceJestTimersWithPromise} from '@wireapp/commons/lib/util/testUtils';
-import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
+import {createFireAndForgetInvoker, type FireAndForgetInvoker} from '@enormora/fire-and-forget';
 
 import {TimeUtil} from '@wireapp/commons';
 
@@ -41,7 +41,7 @@ const mockedStore = {
 };
 
 const createRecurringTaskSchedulerForTest = (): {
-  fireAndForgetInvoker: ReturnType<typeof createFireAndForgetInvoker>;
+  fireAndForgetInvoker: FireAndForgetInvoker;
   recurringTaskScheduler: RecurringTaskScheduler;
 } => {
   const fireAndForgetInvoker = createFireAndForgetInvoker({reportError: jest.fn<void, [unknown]>()});
@@ -141,7 +141,7 @@ describe('RecurringTaskScheduler', () => {
 
   describe('window focus tasks', () => {
     let focusTaskScheduler: RecurringTaskScheduler;
-    let fireAndForgetInvoker: ReturnType<typeof createFireAndForgetInvoker>;
+    let fireAndForgetInvoker: FireAndForgetInvoker;
     let addEventListenerSpy: jest.Mock;
     let removeEventListenerSpy: jest.Mock;
     let originalWindow: typeof globalThis.window | undefined;
