@@ -161,7 +161,7 @@ export const LegacyCellsMoveNodeModal = ({
           <CellsModal.Actions>
             <CellsModal.SecondaryButton
               onClick={() => {
-                return setActiveModalContent('move');
+                setActiveModalContent('move');
               }}
             >
               {translate('cells.newItemMenuModal.secondaryAction')}
