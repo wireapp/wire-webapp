@@ -43,7 +43,14 @@ export const buttonStyles: CSSObject = {
   border: 'none',
   borderBottom: '1px solid var(--border-color)',
 
-  '&:hover': {
+  '&:hover:not(:disabled)': {
+    background: 'var(--foreground-fade-8)',
+  },
+  '&:disabled': {
+    cursor: 'not-allowed',
+    opacity: 0.6,
+  },
+  '&[aria-pressed="true"]': {
     background: 'var(--foreground-fade-8)',
   },
 };
