@@ -53,15 +53,6 @@
         "command": "node {projectRoot}/bin/assembleBuild.mts internal artifact"
       }
     },
-    "assemble-webpack": {
-      "executor": "nx:run-commands",
-      "dependsOn": ["build", {"projects": "webapp", "target": "build-webpack"}, "generate-build-metadata"],
-      "outputs": ["{projectRoot}/dist"],
-      "cache": false,
-      "options": {
-        "command": "node {projectRoot}/bin/assembleBuild.mts webpack-internal artifact"
-      }
-    },
     "assemble-public": {
       "executor": "nx:run-commands",
       "dependsOn": ["build", {"projects": "webapp", "target": "build-production-public"}, "generate-build-metadata"],
@@ -69,15 +60,6 @@
       "cache": false,
       "options": {
         "command": "node {projectRoot}/bin/assembleBuild.mts public artifact"
-      }
-    },
-    "assemble-webpack-public": {
-      "executor": "nx:run-commands",
-      "dependsOn": ["build", {"projects": "webapp", "target": "build-webpack-public"}, "generate-build-metadata"],
-      "outputs": ["{projectRoot}/dist"],
-      "cache": false,
-      "options": {
-        "command": "node {projectRoot}/bin/assembleBuild.mts webpack-public artifact"
       }
     },
     "assemble-webapp": {
@@ -117,29 +99,9 @@
         "parallel": false
       }
     },
-    "package-webpack": {
-      "executor": "nx:run-commands",
-      "dependsOn": ["assemble-webpack"],
-      "inputs": ["production", "webappBuildMetadata"],
-      "cache": false,
-      "options": {
-        "commands": ["node tools/serverPackaging/zip.js"],
-        "parallel": false
-      }
-    },
     "package-public": {
       "executor": "nx:run-commands",
       "dependsOn": ["assemble-public"],
-      "inputs": ["production", "webappBuildMetadata"],
-      "cache": false,
-      "options": {
-        "commands": ["yarn verify:bundle:prod:public", "node tools/serverPackaging/zip.js"],
-        "parallel": false
-      }
-    },
-    "package-webpack-public": {
-      "executor": "nx:run-commands",
-      "dependsOn": ["assemble-webpack-public"],
       "inputs": ["production", "webappBuildMetadata"],
       "cache": false,
       "options": {

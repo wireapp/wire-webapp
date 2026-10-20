@@ -25,7 +25,7 @@ import {fileURLToPath} from 'node:url';
 
 const FIRST_USER_ARGUMENT_INDEX = 2;
 
-type BuildVariant = 'development' | 'internal' | 'public' | 'webpack-internal' | 'webpack-public';
+type BuildVariant = 'development' | 'internal' | 'public';
 type AssemblyScope = 'artifact' | 'webapp';
 
 const workspaceRootPath = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
@@ -34,13 +34,7 @@ const buildMetadataFilePath = path.resolve(workspaceRootPath, 'apps/server/build
 const artifactOutputPath = path.resolve(workspaceRootPath, 'apps/server/dist');
 
 function isBuildVariant(value: unknown): value is BuildVariant {
-  return (
-    value === 'development' ||
-    value === 'internal' ||
-    value === 'public' ||
-    value === 'webpack-internal' ||
-    value === 'webpack-public'
-  );
+  return value === 'development' || value === 'internal' || value === 'public';
 }
 
 function isAssemblyScope(value: unknown): value is AssemblyScope {
@@ -96,9 +90,7 @@ function run(): void {
   const [buildVariant, assemblyScope] = process.argv.slice(FIRST_USER_ARGUMENT_INDEX);
 
   if (!isBuildVariant(buildVariant) || !isAssemblyScope(assemblyScope)) {
-    console.error(
-      'Usage: assembleBuild.mts <development|internal|public|webpack-internal|webpack-public> <artifact|webapp>',
-    );
+    console.error('Usage: assembleBuild.mts <development|internal|public> <artifact|webapp>');
     process.exitCode = 1;
     return;
   }
