@@ -15,17 +15,6 @@
         "cwd": "{projectRoot}"
       }
     },
-    "build-webpack": {
-      "executor": "nx:run-commands",
-      "cache": false,
-      "outputs": ["{projectRoot}/dist/webpack-internal"],
-      "dependsOn": ["^build", "server:generate-build-metadata"],
-      "inputs": ["production", "webappBuildMetadata", "{workspaceRoot}/apps/server/build/metadata/version.json"],
-      "options": {
-        "command": "WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/webpack-internal yarn build:prod:webpack",
-        "cwd": "{projectRoot}"
-      }
-    },
     "build-development": {
       "executor": "nx:run-commands",
       "cache": false,
@@ -48,17 +37,6 @@
         "cwd": "{projectRoot}"
       }
     },
-    "build-webpack-public": {
-      "executor": "nx:run-commands",
-      "cache": false,
-      "outputs": ["{projectRoot}/dist/webpack-public"],
-      "dependsOn": ["^build", "server:generate-build-metadata"],
-      "inputs": ["production", "webappBuildMetadata", "{workspaceRoot}/apps/server/build/metadata/version.json"],
-      "options": {
-        "command": "WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/webpack-public yarn build:prod:webpack:public",
-        "cwd": "{projectRoot}"
-      }
-    },
     "watch-deps": {
       "continuous": true,
       "dependsOn": ["^watch"],
@@ -78,6 +56,7 @@
     },
     "watch-deps-dynamic": {
       "continuous": true,
+      "dependsOn": ["build-libs"],
       "executor": "nx:run-commands",
       "options": {
         "command": "[ -n \"$WATCH_LIBS\" ] && nx run-many -t watch --projects=$WATCH_LIBS || tail -f /dev/null",

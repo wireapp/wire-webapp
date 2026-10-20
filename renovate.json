@@ -97,12 +97,6 @@
     },
     {
       "matchPackageNames": [
-        "webpack",
-        "webpack-cli",
-        "webpack-bundle-analyzer",
-        "copy-webpack-plugin",
-        "html-webpack-plugin",
-        "babel-loader",
         "css-loader",
         "less-loader",
         "postcss",
@@ -115,8 +109,7 @@
         "cssnano",
         "style-loader",
         "raw-loader",
-        "svg-inline-loader",
-        "@nx/webpack"
+        "svg-inline-loader"
       ],
       "groupName": "webapp build tooling"
     },
