@@ -40,7 +40,10 @@ const mockedStore = {
   },
 };
 
-const createRecurringTaskSchedulerForTest = () => {
+const createRecurringTaskSchedulerForTest = (): {
+  fireAndForgetInvoker: ReturnType<typeof createFireAndForgetInvoker>;
+  recurringTaskScheduler: RecurringTaskScheduler;
+} => {
   const fireAndForgetInvoker = createFireAndForgetInvoker({reportError: jest.fn<void, [unknown]>()});
 
   return {

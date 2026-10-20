@@ -37,7 +37,7 @@ interface CancelLowPrecisionTaskParams {
 const logger = LogFactory.getLogger('@wireapp/core/TaskScheduler');
 const intervals: Record<number, {timeoutId: NodeJS.Timeout; tasks: Record<string, IntervalTask>}> = {};
 
-const addTask = ({key, firingDate, task, intervalDelay}: ScheduleLowPrecisionTaskParams) => {
+const addTask = ({key, firingDate, task, intervalDelay}: ScheduleLowPrecisionTaskParams): void => {
   const existingIntervalId = intervals[intervalDelay]?.timeoutId;
   if (existingIntervalId !== undefined) {
     clearInterval(existingIntervalId);
@@ -81,7 +81,7 @@ interface CancelLowPrecisionTaskParams {
   intervalDelay: number;
 }
 
-const cancelTask = ({intervalDelay, key}: CancelLowPrecisionTaskParams) => {
+const cancelTask = ({intervalDelay, key}: CancelLowPrecisionTaskParams): void => {
   if (intervals[intervalDelay] !== undefined) {
     const tasks = intervals[intervalDelay].tasks ?? {};
 
