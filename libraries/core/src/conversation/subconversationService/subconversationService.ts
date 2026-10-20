@@ -264,7 +264,7 @@ export class SubconversationService extends TypedEventEmitter<Events> {
       parentConversationGroupId,
     );
 
-    const forwardNewEpoch = async ({groupId}: {groupId: string; epoch: number}) => {
+    const forwardNewEpoch = async ({groupId}: {groupId: string; epoch: number}): Promise<void> => {
       this.logger.debug('Received MLS NEW_EPOCH event', {eventGroupId: groupId, subconversationGroupId});
       if (groupId !== subconversationGroupId) {
         // if the epoch update did not happen in the subconversation directly, check if it happened in the parent conversation
@@ -386,7 +386,10 @@ export class SubconversationService extends TypedEventEmitter<Events> {
     }
   }
 
-  private async joinSubconversationByExternalCommit(conversationId: QualifiedId, subconversation: SUBCONVERSATION_ID) {
+  private async joinSubconversationByExternalCommit(
+    conversationId: QualifiedId,
+    subconversation: SUBCONVERSATION_ID,
+  ): Promise<void> {
     try {
       this.logger.info('Joining subconversation by external commit', {conversationId, subconversation});
       await this.mlsService.joinByExternalCommit(() => {
@@ -505,7 +508,7 @@ export class SubconversationService extends TypedEventEmitter<Events> {
     parentConversationId: QualifiedId,
     subconversationId: SUBCONVERSATION_ID,
     groupId: string,
-  ) => {
+  ): Promise<string> => {
     this.logger.debug('Saving subconversation groupId mapping', {
       parentConversationId,
       subconversationId,
@@ -521,7 +524,7 @@ export class SubconversationService extends TypedEventEmitter<Events> {
   public clearSubconversationGroupId = async (
     parentConversationId: QualifiedId,
     subconversationId: SUBCONVERSATION_ID,
-  ) => {
+  ): Promise<void> => {
     this.logger.debug('Clearing subconversation groupId mapping', {
       parentConversationId,
       subconversationId,

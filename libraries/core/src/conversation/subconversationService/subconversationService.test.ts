@@ -26,8 +26,13 @@ import {APIClient} from '@wireapp/api-client';
 import {SubconversationService} from './subconversationService';
 
 import {MLSService, MLSServiceEvents} from '../../messagingProtocols/mls';
-import {openDB} from '../../storage/coreDb';
+import {CoreDatabase, openDB} from '../../storage/coreDb';
 import {constructFullyQualifiedClientId} from '../../util/fullyQualifiedClientIdUtils';
+
+type SubconversationServiceTestSetup = readonly [
+  SubconversationService,
+  {readonly apiClient: APIClient; readonly mlsService: MLSService; readonly coreDatabase: CoreDatabase},
+];
 
 interface SubconversationMember {
   client_id: string;
@@ -63,7 +68,7 @@ const getSubconversationResponse = ({
 
 const apiClients: APIClient[] = [];
 
-const buildSubconversationService = async (isFederated = false) => {
+const buildSubconversationService = async (isFederated = false): Promise<SubconversationServiceTestSetup> => {
   const apiClient = new APIClient({urls: APIClient.BACKEND.STAGING});
   apiClients.push(apiClient);
   apiClient.backendFeatures.isFederated = isFederated;
@@ -531,7 +536,7 @@ describe('SubconversationService', () => {
         .mockResolvedValue({epoch: mockedInitialEpoch, groupId: subconversationGroupId});
       jest.spyOn(mlsService, 'getEpoch').mockResolvedValue(mockedInitialEpoch);
 
-      const findConversationByGroupId = (groupId: string) => {
+      const findConversationByGroupId = (groupId: string): QualifiedId | undefined => {
         if (groupId === parentConversationGroupId) {
           return parentConversationId;
         }

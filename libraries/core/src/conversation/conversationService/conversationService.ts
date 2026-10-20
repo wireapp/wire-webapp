@@ -26,6 +26,7 @@ import {
   QualifiedUserClients,
   RemoteConversations,
   MLSConversation,
+  MLS1to1Conversation,
   SUBCONVERSATION_ID,
   Subconversation,
   isMLS1to1Conversation,
@@ -53,6 +54,8 @@ import {
   AddUsersParams,
   BaseCreateConversationResponse,
   KeyPackageClaimUser,
+  ProteusAddUsersResponse,
+  ProteusCreateConversationResponse,
   SendMlsMessageParams,
   SendResult,
 } from './conversationService.types';
@@ -215,7 +218,9 @@ export class ConversationService extends TypedEventEmitter<Events> {
    * @param conversationData Payload object for group creation
    * @returns Resolves when the conversation was created
    */
-  public async createProteusConversation(conversationData: NewConversation) {
+  public async createProteusConversation(
+    conversationData: NewConversation,
+  ): Promise<ProteusCreateConversationResponse> {
     return this.proteusService.createConversation(conversationData);
   }
 
@@ -235,7 +240,9 @@ export class ConversationService extends TypedEventEmitter<Events> {
     return this.apiClient.api.conversation.getConversationsByQualifiedIds(conversationIds);
   }
 
-  public async addUsersToProteusConversation(params: AddUsersToProteusConversationParams) {
+  public async addUsersToProteusConversation(
+    params: AddUsersToProteusConversationParams,
+  ): Promise<ProteusAddUsersResponse> {
     return this.proteusService.addUsersToConversation(params);
   }
 
@@ -684,7 +691,13 @@ export class ConversationService extends TypedEventEmitter<Events> {
    * The original error is forwarded to the orchestrator under the 'keyMaterialUpdate' operation
    * so it can map and apply the configured recovery policy. Unrecoverable errors are logged.
    */
-  private reactToKeyMaterialUpdateFailure = async ({error, groupId}: {error: unknown; groupId: string}) => {
+  private reactToKeyMaterialUpdateFailure = async ({
+    error,
+    groupId,
+  }: {
+    error: unknown;
+    groupId: string;
+  }): Promise<void> => {
     this.logger.info(`Reacting to key material update failure for group ${groupId}`);
 
     const conversation = await this.getConversationByGroupId(groupId);
@@ -806,7 +819,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
    * Will check if mls group exists locally.
    * @param groupId groupId of the conversation
    */
-  public async mlsGroupExistsLocally(groupId: string) {
+  public async mlsGroupExistsLocally(groupId: string): Promise<boolean> {
     return this.mlsService.conversationExists(groupId);
   }
 
@@ -815,7 +828,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
    * Group is established after the first commit was sent in the group and epoch number is at least 1.
    * @param groupId groupId of the conversation
    */
-  public async isMLSGroupEstablishedLocally(groupId: string) {
+  public async isMLSGroupEstablishedLocally(groupId: string): Promise<boolean> {
     return this.mlsService.isConversationEstablished(groupId);
   }
 
@@ -854,7 +867,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
     }
   }
 
-  public async handleConversationsEpochMismatch() {
+  public async handleConversationsEpochMismatch(): Promise<void> {
     this.logger.warn(`There were some missed messages, handling possible epoch mismatch in MLS conversations.`);
 
     //fetch all the mls conversations from backend
@@ -873,7 +886,10 @@ export class ConversationService extends TypedEventEmitter<Events> {
    * Handles epoch mismatch in a subconversation.
    * @param subconversation - subconversation
    */
-  private async handleSubconversationEpochMismatch(subconversation: Subconversation, parentGroupId: string) {
+  private async handleSubconversationEpochMismatch(
+    subconversation: Subconversation,
+    parentGroupId: string,
+  ): Promise<void> {
     const {
       parent_qualified_id: parentConversationId,
       group_id: groupId,
@@ -908,7 +924,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
     remoteMlsConversation: MLSConversation,
     onSuccessfulRejoin?: () => void,
     trigger?: MlsEpochRecoveryTrigger,
-  ) {
+  ): Promise<void> {
     const {qualified_id: qualifiedId, group_id: groupId, epoch: backendEpoch} = remoteMlsConversation;
     const hasEpochMismatch = await this.hasEpochMismatch(groupId, backendEpoch, trigger?.operationName);
     if (!hasEpochMismatch) {
@@ -1017,7 +1033,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
    * Get a MLS 1:1-conversation with a given user.
    * @param userId - qualified user id
    */
-  async getMLS1to1Conversation(userId: QualifiedId) {
+  async getMLS1to1Conversation(userId: QualifiedId): Promise<MLS1to1Conversation> {
     const conversation = await this.apiClient.api.conversation.getMLS1to1Conversation(userId);
 
     if (isMLS1to1Conversation(conversation)) {
@@ -1239,7 +1255,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
     subconversationId?: SUBCONVERSATION_ID,
     trigger?: MlsEpochRecoveryTrigger,
     options: {isForced: boolean} = {isForced: false},
-  ) {
+  ): Promise<void> {
     if (!options.isForced && this.shouldDeferEpochRecovery(trigger)) {
       this.deferEpochRecovery(conversationId, subconversationId, trigger);
     }
@@ -1299,7 +1315,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
     return null;
   }
 
-  private async handleOtrMessageAddEvent(event: ConversationOtrMessageAddEvent) {
+  private async handleOtrMessageAddEvent(event: ConversationOtrMessageAddEvent): Promise<HandledEventPayload> {
     return this.proteusService.handleOtrMessageAddEvent(event);
   }
 

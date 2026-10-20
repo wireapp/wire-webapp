@@ -59,6 +59,29 @@ import * as PayloadHelper from '../../test/payloadHelper';
 import * as MessageBuilder from '../message/messageBuilder';
 import {SubconversationService} from '../subconversationService/subconversationService';
 
+type ConversationServiceTestSetup = readonly [
+  ConversationService,
+  {
+    readonly apiClient: APIClient;
+    readonly mlsService: MLSService;
+    readonly subconversationService: SubconversationService;
+  },
+];
+
+type KeyMaterialFailureCallback = (payload: {error: unknown; groupId: string}) => Promise<void>;
+
+type ImageMessageFixture = {
+  image: {data: Buffer<ArrayBuffer>; height: number; type: string; width: number};
+  asset: {
+    cipherText: Buffer<ArrayBuffer>;
+    key: string;
+    keyBytes: Buffer<ArrayBuffer>;
+    sha256: Buffer<ArrayBuffer>;
+    token: string;
+    domain: string;
+  };
+};
+
 const createMLSMessageAddEventMock = (
   conversationId: QualifiedId,
   subconversationId?: SUBCONVERSATION_ID,
@@ -123,7 +146,7 @@ describe('ConversationService', () => {
     });
   });
 
-  async function buildConversationService(coreDatabase?: CoreDatabase) {
+  async function buildConversationService(coreDatabase?: CoreDatabase): Promise<ConversationServiceTestSetup> {
     const client = new APIClient({urls: APIClient.BACKEND.STAGING});
     apiClients.push(client);
     jest.spyOn(client.api.conversation, 'postMlsMessage').mockReturnValue(
@@ -483,7 +506,7 @@ describe('ConversationService', () => {
       jest.clearAllMocks();
     });
 
-    const createConversation = (epoch: number, conversationId?: string) => {
+    const createConversation = (epoch: number, conversationId?: string): Conversation => {
       return {
         group_id: 'group-id',
         qualified_id: {id: conversationId || 'conversation-id', domain: 'staging.zinfra.io'},
@@ -1358,13 +1381,13 @@ describe('ConversationService', () => {
   });
 
   describe('reactToKeyMaterialUpdateFailure', () => {
-    function getKeyMaterialFailureHandler(mlsService: MLSService) {
+    function getKeyMaterialFailureHandler(mlsService: MLSService): KeyMaterialFailureCallback {
       const onMock = mlsService.on as jest.Mock;
       const call = onMock.mock.calls.find(([event]) => {
         return event === MLSServiceEvents.KEY_MATERIAL_UPDATE_FAILURE;
       });
       expect(call).toBeTruthy();
-      return call[1] as (payload: {error: unknown; groupId: string}) => Promise<void>;
+      return call[1] as KeyMaterialFailureCallback;
     }
 
     it('resets a broken MLS conversation', async () => {
@@ -1587,7 +1610,7 @@ describe('ConversationService', () => {
   });
 });
 
-function generateImage() {
+function generateImage(): ImageMessageFixture {
   const image = {
     data: Buffer.from([]),
     height: 123,
