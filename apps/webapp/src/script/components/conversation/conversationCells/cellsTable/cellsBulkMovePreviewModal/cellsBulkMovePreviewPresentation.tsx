@@ -17,6 +17,8 @@
  *
  */
 
+import {useState} from 'react';
+
 import {RestActionStatus, type RestPerformActionResponse} from 'cells-sdk-ts';
 import type {Result} from 'true-myth';
 
@@ -35,9 +37,15 @@ interface CellsBulkMovePreviewPresentationProps {
   conversationName: string;
   destination: BulkMoveDestinationSelection;
   onMove: () => Promise<Result<RestPerformActionResponse, unknown>>;
+  onMovePerformed: () => void;
   onMoveResult: (response: RestPerformActionResponse) => void;
   isMoveDisabled: boolean;
   isMoveLoading: boolean;
+  isBackgroundMoveError: boolean;
+  isBackgroundMoveStatusUnknown: boolean;
+  canRetryBackgroundMoveStatus: boolean;
+  onRetryBackgroundMoveStatus: () => void;
+  onRefresh: () => void;
 }
 
 export const CellsBulkMovePreviewPresentation = ({
@@ -47,17 +55,31 @@ export const CellsBulkMovePreviewPresentation = ({
   conversationName,
   destination,
   onMove,
+  onMovePerformed,
   onMoveResult,
   isMoveDisabled,
   isMoveLoading,
+  isBackgroundMoveError,
+  isBackgroundMoveStatusUnknown,
+  canRetryBackgroundMoveStatus,
+  onRetryBackgroundMoveStatus,
+  onRefresh,
 }: CellsBulkMovePreviewPresentationProps) => {
   const {translate} = useApplicationContext();
+  const [isMoveError, setIsMoveError] = useState(false);
 
   const handleMove = async (): Promise<void> => {
+    setIsMoveError(false);
     const moveResult = await onMove();
+    if (moveResult.isErr) {
+      setIsMoveError(true);
+      return;
+    }
+
     if (moveResult.isOk) {
       onMoveResult(moveResult.value);
       if (moveResult.value.Status === RestActionStatus.Performed) {
+        onMovePerformed();
         onClose();
       }
     }
@@ -65,11 +87,7 @@ export const CellsBulkMovePreviewPresentation = ({
 
   return (
     <CellsModal isOpen={isOpen} onClose={onClose} size="large">
-      <CellsModal.Header>
-        {selectedNodes.length === 1
-          ? translate('cells.bulkMove.previewTitleSingular')
-          : translate('cells.bulkMove.previewTitle', {count: selectedNodes.length})}
-      </CellsModal.Header>
+      <CellsModal.Header>{translate('cells.bulkMove.previewTitle', {count: selectedNodes.length})}</CellsModal.Header>
       <p>{translate('cells.bulkMove.previewDescription')}</p>
       <section aria-labelledby="bulk-move-selected-items-heading">
         <h3 id="bulk-move-selected-items-heading">{translate('cells.bulkMove.selectedItems')}</h3>
@@ -89,6 +107,28 @@ export const CellsBulkMovePreviewPresentation = ({
           return path;
         }}
       />
+      {isMoveError && <p role="alert">{translate('cells.newItemMenuModalForm.genericError')}</p>}
+      {isBackgroundMoveError && (
+        <div role="alert">
+          <p>{translate('cells.bulkMove.moveNeedsReview')}</p>
+          <button type="button" onClick={onRefresh}>
+            {translate('cells.bulkMove.refreshDrive')}
+          </button>
+        </div>
+      )}
+      {isBackgroundMoveStatusUnknown && (
+        <div role="alert">
+          <p>{translate('cells.bulkMove.statusUnknown')}</p>
+          {canRetryBackgroundMoveStatus && (
+            <button type="button" onClick={onRetryBackgroundMoveStatus}>
+              {translate('cells.bulkMove.checkStatus')}
+            </button>
+          )}
+          <button type="button" onClick={onRefresh}>
+            {translate('cells.bulkMove.refreshDrive')}
+          </button>
+        </div>
+      )}
       <CellsModal.Actions>
         <CellsModal.SecondaryButton onClick={onClose}>
           {translate('cells.moveNodeModal.cancelButton')}

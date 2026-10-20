@@ -100,6 +100,21 @@ describe('CellsRepository upload cancellation', () => {
 });
 
 describe('CellsRepository bulk moves', () => {
+  it('retrieves background status for a move job', async () => {
+    const response = {JobUuid: 'move-job', Name: 'move', Status: 'Running'};
+    const apiClient = {
+      api: {
+        cells: {
+          getBackgroundActionInfo: jest.fn().mockResolvedValue(response),
+        },
+      },
+    };
+    const repository = new CellsRepository(apiClient as never);
+
+    await expect(repository.getBackgroundMoveInfo({jobUuid: 'move-job'})).resolves.toBe(response);
+    expect(apiClient.api.cells.getBackgroundActionInfo).toHaveBeenCalledWith({name: 'move', jobUuid: 'move-job'});
+  });
+
   it('forwards all selected paths in one request and returns the Cells result', async () => {
     const response = {BackgroundActions: [{JobUuid: 'move-job', Name: 'move'}]};
     const apiClient = {

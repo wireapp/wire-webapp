@@ -34,7 +34,15 @@ interface CellsBulkMovePreviewModalProps {
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
   conversationName: string;
+  onMovePerformed: () => void;
   onMoveResult: (response: RestPerformActionResponse) => void;
+  isBackgroundMovePending: boolean;
+  isBackgroundMoveError: boolean;
+  isBackgroundMoveRetryBlocked: boolean;
+  isBackgroundMoveStatusUnknown: boolean;
+  canRetryBackgroundMoveStatus: boolean;
+  onRetryBackgroundMoveStatus: () => void;
+  onRefresh: () => void;
 }
 
 export const CellsBulkMovePreviewModal = ({
@@ -44,7 +52,15 @@ export const CellsBulkMovePreviewModal = ({
   cellsRepository,
   conversationQualifiedId,
   conversationName,
+  onMovePerformed,
   onMoveResult,
+  isBackgroundMovePending,
+  isBackgroundMoveError,
+  isBackgroundMoveRetryBlocked,
+  isBackgroundMoveStatusUnknown,
+  canRetryBackgroundMoveStatus,
+  onRetryBackgroundMoveStatus,
+  onRefresh,
 }: CellsBulkMovePreviewModalProps) => {
   const destination = useBulkMoveDestinationSelection({
     isOpen,
@@ -74,9 +90,22 @@ export const CellsBulkMovePreviewModal = ({
       conversationName={conversationName}
       destination={destination}
       onMove={move.submitMove}
+      onMovePerformed={onMovePerformed}
       onMoveResult={onMoveResult}
-      isMoveDisabled={!move.isValid || move.isSubmitting || destination.status !== 'success'}
+      isMoveDisabled={
+        !move.isValid ||
+        move.isSubmitting ||
+        isBackgroundMovePending ||
+        isBackgroundMoveRetryBlocked ||
+        isBackgroundMoveStatusUnknown ||
+        destination.status !== 'success'
+      }
       isMoveLoading={move.isSubmitting}
+      isBackgroundMoveError={isBackgroundMoveError}
+      isBackgroundMoveStatusUnknown={isBackgroundMoveStatusUnknown}
+      canRetryBackgroundMoveStatus={canRetryBackgroundMoveStatus}
+      onRetryBackgroundMoveStatus={onRetryBackgroundMoveStatus}
+      onRefresh={onRefresh}
     />
   );
 };
