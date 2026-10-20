@@ -914,7 +914,7 @@ const config = [
     },
   },
   {
-    // Webpack needs this computed require to include the selected locale JSON module.
+    // Keep this computed require so the bundler includes the selected locale JSON module.
     files: ['apps/webapp/src/script/auth/page/root.tsx'],
     rules: {
       'import/no-dynamic-require': 'off',

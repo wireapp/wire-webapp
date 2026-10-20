@@ -891,9 +891,9 @@ The deployment process uses a dual build chain:
    - Copies server assets and pre-bundles workspace libraries
 
 2. **Webapp Build Chain:**
-   - `webapp:build:production` depends on `^build` (all libraries)
-   - Builds React webapp with webpack
-   - Outputs to `apps/server/dist/static/` (served by server)
+   - `webapp:build` depends on `^build` (all libraries)
+   - Builds the React webapp with Rspack
+   - Outputs to `apps/webapp/dist/internal/`, then assembly copies assets to `apps/server/dist/static/`
 
 Both build chains share the same library dependencies, ensuring consistency.
 
@@ -908,7 +908,7 @@ Nx automatically handles the build order for libraries based on their dependency
 
 **Production vs Development:**
 
-The deployment always uses `webapp:build:production` to ensure optimized assets are deployed. Development builds are not included in the deployment bundle.
+The `server:package` target uses `webapp:build` to ensure optimized assets are deployed. Development builds are not included in the deployment bundle.
 
 **Environment Configuration:**
 
@@ -940,8 +940,8 @@ If deployment fails due to version issues:
 **Asset Copy Failures:**
 
 If static assets are missing:
-1. Verify `webapp:build:production` outputs to `apps/server/dist/static/`
-2. Check the webpack output configuration in [`apps/webapp/webpack.config.js`](apps/webapp/webpack.config.js)
+1. Verify `webapp:build` outputs to `apps/webapp/dist/internal/` before assembly
+2. Check the Rspack output configuration in [`apps/webapp/rspack.config.mts`](apps/webapp/rspack.config.mts)
 3. Ensure the build completes successfully before packaging
 
 **Deployment Bundle Size:**
@@ -1131,10 +1131,10 @@ Nx will:
 3. Build libraries in the correct order (based on their own dependencies)
 4. Only then build the webapp
 
-**What happens when you run webpack directly:**
+**What happens when you run Rspack directly instead of Nx:**
 
 ```bash
-cd apps/webapp && ../../bin/yarn build
+cd apps/webapp && ../../bin/yarn rspack build --config rspack.config.mts
 ```
 
 You might get:
@@ -1268,7 +1268,7 @@ Nx runs a daemon process that maintains the project graph in memory for faster o
 
 ### 7. Avoiding Direct Tool Usage
 
-Running underlying tools directly (webpack, jest, tsc, eslint) can cause several issues:
+Running underlying tools directly (Rspack, Jest, TypeScript, ESLint) can cause several issues:
 
 | Issue | Running with Nx | Running Directly |
 |--------|----------------|-----------------|
@@ -1669,7 +1669,7 @@ nx run-many -t test --projects=tag:lib
 
 ## Key Takeaways for Developers
 
-1. **Always use Nx commands** - Don't run webpack, jest, or tsc directly
+1. **Always use Nx commands** - Don't run Rspack, Jest, or TypeScript directly
 2. **Understand `dependsOn`** - Dependencies are automatically built first
 3. **Cache is your friend** - Nx cache saves time, but remember `nx reset` when needed
 4. **Add projects to [`tsconfig.json`](tsconfig.json)** - Project references are required
