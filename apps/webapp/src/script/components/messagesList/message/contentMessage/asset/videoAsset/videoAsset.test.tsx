@@ -65,7 +65,6 @@ describe('VideoAsset', () => {
     assetKey: 'asset-key',
     assetDomain: 'test-domain.wire.com',
     assetToken: 'asset-token',
-    forceCaching: false,
   });
 
   const createVideoMessage = (): ContentMessage => {

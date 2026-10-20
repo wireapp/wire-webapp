@@ -91,7 +91,6 @@ export class AssetAPI {
   private getAssetShared(
     assetUrl: string,
     token?: string | null,
-    forceCaching: boolean = false,
     progressCallback?: ProgressCallback,
   ): RequestCancelable<AssetResponse> {
     if (token !== null && token !== undefined && token.length > 0 && !isValidToken(token)) {
@@ -114,10 +113,6 @@ export class AssetAPI {
 
     if (token !== null && token !== undefined && token.length > 0) {
       config.params.asset_token = token;
-    }
-
-    if (forceCaching) {
-      config.params.forceCaching = forceCaching;
     }
 
     const handleRequest = async (): Promise<AssetResponse> => {
@@ -226,13 +221,7 @@ export class AssetAPI {
     };
   }
 
-  getAsset(
-    assetId: string,
-    assetDomain: string,
-    token?: string | null,
-    forceCaching: boolean = false,
-    progressCallback?: ProgressCallback,
-  ) {
+  getAsset(assetId: string, assetDomain: string, token?: string | null, progressCallback?: ProgressCallback) {
     if (!isValidUUID(assetId)) {
       throw new TypeError(`Expected asset ID "${assetId}" to only contain alphanumeric values and dashes.`);
     }
@@ -245,21 +234,17 @@ export class AssetAPI {
       throw new TypeError(`Invalid asset domain ${assetDomain}`);
     }
 
-    return this.getAssetShared(`/assets/${assetDomain}/${assetId}`, token, forceCaching, progressCallback);
+    return this.getAssetShared(`/assets/${assetDomain}/${assetId}`, token, progressCallback);
   }
 
-  getServiceAsset(
-    assetId: string,
-    token?: string | null,
-    forceCaching: boolean = false,
-    progressCallback?: ProgressCallback,
-  ) {
+  getServiceAsset(assetId: string, token?: string | null, progressCallback?: ProgressCallback) {
     if (!isValidUUID(assetId)) {
       throw new TypeError(`Expected asset ID "${assetId}" to only contain alphanumeric values and dashes.`);
     }
 
     const assetBaseUrl = `/bot/assets/${assetId}`;
-    return this.getAssetShared(assetBaseUrl, token, forceCaching, progressCallback);
+
+    return this.getAssetShared(assetBaseUrl, token, progressCallback);
   }
 
   /**

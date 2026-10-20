@@ -17,6 +17,9 @@
  *
  */
 
+import type {Configuration} from '@rspack/core';
+import type {RspackDevServer} from '@rspack/dev-server';
+import {isNullOrUndefined, isObject, isString, isTruthy} from '@sindresorhus/is';
 import express, {Router} from 'express';
 import expressSitemapXml from 'express-sitemap-xml';
 import hbs from 'hbs';
@@ -27,6 +30,7 @@ import nocache from 'nocache';
 import fs from 'fs';
 import http from 'http';
 import https from 'https';
+import {createRequire} from 'node:module';
 import path from 'path';
 
 import type {BuildMetadata, ClientConfig, ServerConfig} from '@wireapp/config';
@@ -43,7 +47,10 @@ import {replaceHostnameInObject} from './util/hostnameReplacer';
 
 class Server {
   private readonly app: express.Express;
+  private readonly staticAssetsApp: express.Express;
+  private readonly routesApp: express.Express;
   private server?: http.Server | https.Server;
+  private developmentServer?: RspackDevServer;
 
   constructor(
     private readonly config: ServerConfig,
@@ -57,58 +64,52 @@ class Server {
     }
 
     this.app = express();
+    this.app.disable('x-powered-by');
+    this.staticAssetsApp = express();
+    this.routesApp = express();
+    this.routesApp.disable('x-powered-by');
     this.init();
   }
 
   private init(): void {
     // The order is important here, please don't sort!
-    this.initTemplateEngine();
-    this.initCaching();
-    this.initForceSSL();
-    this.initSecurityHeaders();
+    this.routesApp.enable('trust proxy');
+    this.initTemplateEngine(this.routesApp);
+    this.initCaching(this.staticAssetsApp);
+    this.initForceSSL(this.staticAssetsApp);
+    this.initSecurityHeaders(this.staticAssetsApp);
     this.initLatestBrowserRequired();
-    this.initStaticRoutes();
-    this.initWebpack();
-    this.initSiteMap(this.config);
+    this.initStaticRoutes(this.staticAssetsApp);
+    this.initSiteMap(this.routesApp, this.config);
 
-    this.app.use('/libs', express.static(path.join(__dirname, 'libs')));
-    this.app.use(Root());
-    this.app.use(HealthCheckRoute());
-    this.app.use(ConfigRoute(this.config, this.clientConfig));
-    this.app.use(GoogleWebmasterRoute(this.config));
-    this.app.use(AppleAssociationRoute());
+    this.routesApp.use('/libs', express.static(path.join(__dirname, 'libs')));
+    this.routesApp.use(Root());
+    this.routesApp.use(HealthCheckRoute());
+    this.routesApp.use(ConfigRoute(this.config, this.clientConfig));
+    this.routesApp.use(GoogleWebmasterRoute(this.config));
+    this.routesApp.use(AppleAssociationRoute());
 
-    this.app.use(
+    this.routesApp.use(
       createClientVersionCheckRoute({
         router: Router(),
         deployedAssetVersion: this.buildMetadata.assetVersion,
         isClientVersionEnforcementEnabled: this.config.ENABLE_CLIENT_VERSION_ENFORCEMENT,
       }),
     );
-    this.app.use(NotFoundRoute());
-    this.app.use(InternalErrorRoute());
+    this.routesApp.use(NotFoundRoute());
+    this.routesApp.use(InternalErrorRoute());
+
+    this.app.use(this.staticAssetsApp);
+    this.app.use(this.routesApp);
   }
 
-  private initWebpack() {
-    if (!this.config.DEVELOPMENT) {
-      return;
-    }
-
-    const webpackCompiler = require('webpack')(require('../../webapp/webpack.config.dev'));
-    const webpackDevMiddleware = require('webpack-dev-middleware');
-    const webpackHotMiddleware = require('webpack-hot-middleware');
-
-    this.app.use(webpackDevMiddleware(webpackCompiler));
-    this.app.use(webpackHotMiddleware(webpackCompiler));
-  }
-
-  private initCaching() {
+  private initCaching(application: express.Express): void {
     if (this.config.DEVELOPMENT) {
-      this.app.use(nocache());
+      application.use(nocache());
     } else {
-      this.app.use((req, res, next) => {
+      application.use((req, res, next) => {
         // If the user agent adds a v param, it means that its requesting a particular version of the file and that could be cached forever since the file will never change.
-        const hasCacheVersionParam = typeof req.query.v === 'string';
+        const hasCacheVersionParam = isString(req.query.v);
         const oneYear = 31536000;
         const maxAge = hasCacheVersionParam ? oneYear : this.config.CACHE_DURATION_SECONDS;
         const milliSeconds = 1000;
@@ -119,9 +120,9 @@ class Server {
     }
   }
 
-  private initForceSSL(): void {
+  private initForceSSL(application: express.Express): void {
     const SSLMiddleware: express.RequestHandler = (req, res, next) => {
-      const shouldEnforceHTTPS = !this.config.ENFORCE_HTTPS || req.url.match(/_health\/?/) !== null;
+      const shouldEnforceHTTPS = !this.config.ENFORCE_HTTPS || isTruthy(req.url.match(/_health\/?/));
       const isInsecure = !req.secure || req.get('X-Forwarded-Proto') !== 'https';
 
       if (isInsecure && !shouldEnforceHTTPS) {
@@ -131,37 +132,47 @@ class Server {
       next();
     };
 
-    this.app.enable('trust proxy');
-    this.app.use(SSLMiddleware);
+    application.enable('trust proxy');
+    application.use(SSLMiddleware);
   }
 
-  private initSecurityHeaders() {
-    this.app.disable('x-powered-by');
-    this.app.use(
+  private initSecurityHeaders(application: express.Express): void {
+    application.disable('x-powered-by');
+    application.use(
       helmet({
         crossOriginEmbedderPolicy: false,
         crossOriginOpenerPolicy: false,
         frameguard: {action: 'deny'},
       }),
     );
-    this.app.use(noSniff());
-    this.app.use(xssFilter());
-    this.app.use(
+    application.use(noSniff());
+    application.use(xssFilter());
+    application.use(
       hsts({
         includeSubDomains: true,
         maxAge: 31536000,
         preload: true,
       }),
     );
-    this.app.use((req, res, next) => {
-      contentSecurityPolicy({
-        directives: this.config.ENABLE_DYNAMIC_HOSTNAME
-          ? replaceHostnameInObject(this.config.CSP, req)
-          : this.config.CSP,
-        reportOnly: false,
-      })(req, res, next);
+    application.use((req, res, next) => {
+      const contentSecurityPolicyDirectives = this.config.ENABLE_DYNAMIC_HOSTNAME
+        ? replaceHostnameInObject(this.config.CSP, req)
+        : this.config.CSP;
+      const requestHost = req.get('host');
+      const directives =
+        this.config.DEVELOPMENT && isString(requestHost)
+          ? {
+              ...contentSecurityPolicyDirectives,
+              connectSrc: [
+                ...(contentSecurityPolicyDirectives.connectSrc ?? []),
+                `${req.secure ? 'wss' : 'ws'}://${requestHost}`,
+              ],
+            }
+          : contentSecurityPolicyDirectives;
+
+      contentSecurityPolicy({directives, reportOnly: false})(req, res, next);
     });
-    this.app.use(
+    application.use(
       referrerPolicy({
         policy: 'same-origin',
       }),
@@ -169,7 +180,7 @@ class Server {
     // With helmet v4 the X-XSS-Protection header is set to `0` by default.
     // After discussing this with @franziskuskiefer we want to keep this enabled for old browsers.
     // https://github.com/helmetjs/helmet/issues/230
-    this.app.use((_req, res, next) => {
+    application.use((_req, res, next) => {
       res.setHeader('X-XSS-Protection', '1; mode=block');
       next();
     });
@@ -177,7 +188,7 @@ class Server {
     // Falls back to self-only when CELLS_PYDIO_URL is not configured.
     const collaboraOrigin = this.clientConfig.CELLS_PYDIO_URL;
     const clipboardAllowlist = Boolean(collaboraOrigin) ? `(self "${collaboraOrigin}")` : '(self)';
-    this.app.use((_req, res, next) => {
+    application.use((_req, res, next) => {
       res.setHeader(
         'Permissions-Policy',
         `clipboard-read=${clipboardAllowlist}, clipboard-write=${clipboardAllowlist}`,
@@ -186,27 +197,22 @@ class Server {
     });
   }
 
-  private initStaticRoutes() {
-    this.app.use(RedirectRoutes(this.config, this.buildMetadata));
+  private initStaticRoutes(application: express.Express): void {
+    application.use(RedirectRoutes(this.config, this.buildMetadata));
 
     const staticRoutes = ['audio', 'ext', 'font', 'image', 'min', 'proto', 'style', 'worker', 'assets'];
 
     staticRoutes.forEach(route => {
-      this.app.use(`/${route}`, express.static(path.join(__dirname, `static/${route}`)));
+      application.use(`/${route}`, express.static(path.join(__dirname, `static/${route}`)));
     });
 
-    this.app.get('/favicon.ico', (_req, res) => {
+    application.get('/favicon.ico', (_req, res) => {
       return res.sendFile(path.join(__dirname, 'static/image/favicon.ico'));
     });
-    if (!this.config.DEVELOPMENT) {
-      this.app.get('/sw.js', (_req, res) => {
-        return res.sendFile(path.join(__dirname, 'static/sw.js'));
-      });
-    }
   }
 
-  public initLatestBrowserRequired() {
-    this.app.use((req, res, next) => {
+  public initLatestBrowserRequired(): void {
+    this.staticAssetsApp.use((req, res, next) => {
       const fileExtensionRegx = /\.[^/]+$/;
       const ignoredPath =
         fileExtensionRegx.test(req.path) ||
@@ -227,19 +233,19 @@ class Server {
     });
   }
 
-  private initTemplateEngine() {
-    this.app.set('view engine', 'html');
-    this.app.engine('html', hbs.__express);
-    this.app.set('views', [path.resolve(__dirname, 'static'), path.resolve(__dirname, 'templates')]);
-    hbs.localsAsTemplateData(this.app);
-    this.app.locals.config = {
+  private initTemplateEngine(application: express.Express): void {
+    application.set('view engine', 'html');
+    application.engine('html', hbs.__express);
+    application.set('views', [path.resolve(__dirname, 'static'), path.resolve(__dirname, 'templates')]);
+    hbs.localsAsTemplateData(application);
+    application.locals.config = {
       APP_BASE: this.config.APP_BASE,
       OPEN_GRAPH: this.config.OPEN_GRAPH,
       VERSION: this.config.VERSION,
     };
   }
 
-  private initSiteMap(config: ServerConfig) {
+  private initSiteMap(application: express.Express, config: ServerConfig): void {
     if (Boolean(config.APP_BASE)) {
       const pages = () => {
         return [
@@ -253,41 +259,130 @@ class Server {
           },
         ];
       };
-      this.app.use(expressSitemapXml(pages, config.APP_BASE) as unknown as express.RequestHandler);
+      application.use(expressSitemapXml(pages, config.APP_BASE) as unknown as express.RequestHandler);
     }
   }
 
-  start(): Promise<number> {
+  async start(): Promise<number> {
+    if (isTruthy(this.server) || isTruthy(this.developmentServer)) {
+      throw new Error('Server is already running.');
+    }
+
+    if (this.config.PORT_HTTP < 0 || (!this.config.DEVELOPMENT && this.config.PORT_HTTP === 0)) {
+      throw new Error('Server port not specified.');
+    }
+
+    if (this.config.DEVELOPMENT) {
+      return this.startRspackDevelopmentServer();
+    }
+
     return new Promise((resolve, reject) => {
-      if (this.server !== undefined) {
-        reject('Server is already running.');
-      } else if (Boolean(this.config.PORT_HTTP)) {
-        if (this.config.DEVELOPMENT && this.config.DEVELOPMENT_ENABLE_TLS) {
-          const options = {
-            cert: fs.readFileSync(this.config.SSL_CERTIFICATE_PATH),
-            key: fs.readFileSync(this.config.SSL_CERTIFICATE_KEY_PATH),
-          };
-          this.server = https.createServer(options, this.app).listen(this.config.PORT_HTTP, '0.0.0.0', () => {
-            return resolve(this.config.PORT_HTTP);
-          });
-        } else {
-          this.server = this.app.listen(this.config.PORT_HTTP, '0.0.0.0', () => {
-            return resolve(this.config.PORT_HTTP);
-          });
-        }
-      } else {
-        reject('Server port not specified.');
-      }
+      this.server = this.app.listen(this.config.PORT_HTTP, '0.0.0.0', () => {
+        resolve(this.config.PORT_HTTP);
+      });
+      this.server.once('error', reject);
     });
   }
 
+  private async startRspackDevelopmentServer(): Promise<number> {
+    const rspackConfigurationPath = path.resolve(process.cwd(), 'apps/webapp/rspack.config.dev.mts');
+    const nativeRequire = createRequire(__filename);
+    const rspackCore = nativeRequire('@rspack/core') as typeof import('@rspack/core');
+    const rspackDevServer = nativeRequire('@rspack/dev-server') as typeof import('@rspack/dev-server');
+    const configurationModule = nativeRequire(rspackConfigurationPath) as {readonly default: Configuration};
+    const rspackConfiguration = configurationModule.default;
+
+    if (!isObject(rspackConfiguration.devServer)) {
+      throw new Error('The Rspack development configuration must define devServer options.');
+    }
+
+    const appBaseHostname = new URL(this.config.APP_BASE).hostname;
+    const serverOptions = this.config.DEVELOPMENT_ENABLE_TLS
+      ? {
+          type: 'https' as const,
+          options: {
+            cert: fs.readFileSync(this.config.SSL_CERTIFICATE_PATH),
+            key: fs.readFileSync(this.config.SSL_CERTIFICATE_KEY_PATH),
+          },
+        }
+      : {type: 'http' as const};
+    const compiler = rspackCore.rspack(rspackConfiguration);
+    const developmentServer = new rspackDevServer.RspackDevServer(
+      {
+        ...rspackConfiguration.devServer,
+        allowedHosts: [appBaseHostname, 'localhost', '127.0.0.1'],
+        app: async () => {
+          const application = express();
+          application.disable('x-powered-by');
+
+          return application;
+        },
+        host: '0.0.0.0',
+        port: this.config.PORT_HTTP,
+        server: serverOptions,
+        setupMiddlewares: middlewares => {
+          const rspackDevMiddlewareIndex = middlewares.findIndex(middleware => {
+            return isObject(middleware) && middleware.name === '@rspack/dev-middleware';
+          });
+
+          if (rspackDevMiddlewareIndex < 0) {
+            throw new Error('Rspack development middleware was not registered by the development server.');
+          }
+
+          return [
+            ...middlewares.slice(0, rspackDevMiddlewareIndex),
+            {name: 'wire-server-static-assets-and-security', middleware: this.staticAssetsApp},
+            ...middlewares.slice(rspackDevMiddlewareIndex),
+            {name: 'wire-server-routes', middleware: this.routesApp},
+          ];
+        },
+      },
+      compiler,
+    );
+    this.developmentServer = developmentServer;
+
+    try {
+      await developmentServer.start();
+    } catch (error: unknown) {
+      await developmentServer.stop();
+      this.developmentServer = undefined;
+      throw error;
+    }
+
+    const address = developmentServer.server?.address();
+
+    if (isNullOrUndefined(address) || isString(address)) {
+      return this.config.PORT_HTTP;
+    }
+
+    return address.port;
+  }
+
   async stop(): Promise<void> {
-    if (this.server !== undefined) {
-      this.server.close();
-      this.server = undefined;
-    } else {
+    if (isTruthy(this.developmentServer)) {
+      const developmentServer = this.developmentServer;
+      await developmentServer.stop();
+      this.developmentServer = undefined;
+
+      return;
+    }
+
+    if (!isTruthy(this.server)) {
       throw new Error('Server is not running.');
     }
+
+    const httpServer = this.server;
+    await new Promise<void>((resolve, reject) => {
+      httpServer.close(error => {
+        if (isTruthy(error)) {
+          reject(error);
+          return;
+        }
+
+        resolve();
+      });
+    });
+    this.server = undefined;
   }
 }
 

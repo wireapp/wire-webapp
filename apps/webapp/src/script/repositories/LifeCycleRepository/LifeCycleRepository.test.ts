@@ -229,7 +229,6 @@ describe('LifeCycleRepository', () => {
     beforeEach(() => {
       jest.spyOn(lifeCycleRepository, 'redirectToLogin').mockImplementation();
       jest.spyOn(CacheRepository, 'clearLocalStorage').mockReturnValue(['key1', 'key2']);
-      jest.spyOn(CacheRepository, 'clearCacheStorage').mockImplementation();
 
       (useTypingIndicatorState as any).getState = jest.fn().mockReturnValue({
         clearTypingUsers: jest.fn(),
@@ -470,19 +469,7 @@ describe('LifeCycleRepository', () => {
         });
       });
 
-      describe('cache and database deletion', () => {
-        it('should clear cache storage when clearing data', async () => {
-          await lifeCycleRepository.logout(SIGN_OUT_REASON.USER_REQUESTED, true);
-
-          expect(CacheRepository.clearCacheStorage).toHaveBeenCalled();
-        });
-
-        it('should not clear cache storage when not clearing data', async () => {
-          await lifeCycleRepository.logout(SIGN_OUT_REASON.USER_REQUESTED, false);
-
-          expect(CacheRepository.clearCacheStorage).not.toHaveBeenCalled();
-        });
-
+      describe('database deletion', () => {
         it('should delete database when clearing data', async () => {
           (mockDependencies.storageRepository.deleteDatabase as jest.Mock).mockResolvedValue(undefined);
 

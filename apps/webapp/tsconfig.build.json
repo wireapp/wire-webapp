@@ -19,7 +19,6 @@
   "exclude": [
     "node_modules",
     "../server/",
-    "src/sw.js",
     "src/worker/",
     "src/**/*.mocks.ts",
     "src/**/test/**",

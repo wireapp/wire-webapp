@@ -127,7 +127,6 @@ describe('image-asset', () => {
         assetKey: 'remote',
         assetDomain: 'test-domain.wire.com',
         assetToken: '',
-        forceCaching: false,
       }),
     );
 
@@ -174,7 +173,6 @@ describe('image-asset', () => {
           assetKey: 'remote',
           assetDomain: 'test-domain.wire.com',
           assetToken: '',
-          forceCaching: false,
         }),
       );
     });
@@ -192,7 +190,6 @@ describe('image-asset', () => {
         assetKey: 'remote',
         assetDomain: 'test-domain.wire.com',
         assetToken: '',
-        forceCaching: false,
       }),
     );
 
@@ -221,7 +218,6 @@ describe('image-asset', () => {
         assetKey: 'remote',
         assetDomain: 'test-domain.wire.com',
         assetToken: '',
-        forceCaching: false,
       }),
     );
 
@@ -346,7 +342,6 @@ describe('image-asset', () => {
         assetKey: 'remote',
         assetDomain: 'test-domain.wire.com',
         assetToken: '',
-        forceCaching: false,
       }),
     );
 
@@ -388,7 +383,6 @@ describe('image-asset', () => {
         assetKey: 'remote',
         assetDomain: 'test-domain.wire.com',
         assetToken: '',
-        forceCaching: false,
       }),
     );
 
@@ -428,7 +422,6 @@ describe('image-asset', () => {
         assetKey: 'remote',
         assetDomain: 'test-domain.wire.com',
         assetToken: '',
-        forceCaching: false,
       }),
     );
 
@@ -455,7 +448,6 @@ describe('image-asset', () => {
         assetKey: 'remote',
         assetDomain: 'test-domain.wire.com',
         assetToken: '',
-        forceCaching: false,
       }),
     );
 
@@ -483,7 +475,6 @@ describe('image-asset', () => {
         assetKey: 'remote',
         assetDomain: 'test-domain.wire.com',
         assetToken: '',
-        forceCaching: false,
       }),
     );
 
@@ -511,7 +502,6 @@ describe('image-asset', () => {
         assetKey: 'remote',
         assetDomain: 'test-domain.wire.com',
         assetToken: '',
-        forceCaching: false,
       }),
     );
 

@@ -21,7 +21,7 @@ No license is granted to the Wire trademark and its associated logos, all of whi
 
 # Monorepo Layout
 
-- `apps/webapp/`: client (Webpack/React) plus E2E tests and i18n files
+- `apps/webapp/`: React client (Rspack internal, public production, and development; Webpack production fallback), plus E2E tests and i18n files
 - `apps/server/`: node/express wrapper that serves the built webapp and handles proxying
 - `libraries/config/`: `@wireapp/config` package - centralized environment configuration management with type-safe configuration loading and validation
 - `libraries/core/`: `@wireapp/core` package - Wire's communication core library handling authentication, WebSocket connections, and protocol messaging
@@ -53,8 +53,8 @@ Prerequisites:
 1. Add the following entries to your hosts file (macOS / Linux: `/etc/hosts`, Windows 10: `%WINDIR%\system32\drivers\etc\hosts`):
    - `127.0.0.1 local.zinfra.io` (to connect with the staging backend)
    - `127.0.0.1 local.imai.wire.link` (to connect with the imai backend)
-1. Run `./bin/yarn nx build webapp --configuration=development` to build static assets
-1. Run `./bin/yarn start` (runs `nx serve server`); the app will be available at https://local.zinfra.io:8081/auth/
+1. Run `./bin/yarn start` (runs `nx serve server`); Rspack compiles the WebApp in memory and serves the app at https://local.zinfra.io:8081/auth/ with React Fast Refresh.
+1. To rebuild selected libraries while developing, run `./bin/yarn start:watch` and choose the libraries to watch; Rspack picks up their compiled `@wireapp/*` modules.
 1. In case you're facing a CORS issue after login when the app tries to fetch `self/consent` from the backend, append
    `FEATURE_CHECK_CONSENT="false"` to the env file
 
@@ -100,8 +100,14 @@ After updating the environment variables, the app will be available at the corre
 
 ### Production
 
-1. Build and package for production: `./bin/yarn nx run server:package` (or `./bin/yarn build:prod`)
+Rspack is the default for internal and public production builds and for local development. Webpack remains available through the explicitly named production fallback targets; Jest still uses Babel.
+
+1. Build only the internal Rspack WebApp assets: `./bin/yarn nx run webapp:build` (or assemble them with `./bin/yarn bundle:prod`)
+1. Build and package the default internal Rspack release: `./bin/yarn build:prod` (or `./bin/yarn nx run server:package`)
    - This builds both the server and webapp (in production mode) and creates the deployment package at `apps/server/dist/s3/ebs.zip`
+1. Build and package the internal Webpack fallback: `./bin/yarn nx run server:package-webpack`
+1. Build and package the default public Rspack release: `./bin/yarn build:prod:public`
+1. Build and package the public Webpack fallback: `./bin/yarn nx run server:package-webpack-public`
 1. Start the server output from `apps/server/dist` (or build a Docker image with `./bin/yarn docker <tag>`)
 
 **Note:** The `./bin/yarn zip` command has been deprecated. Packaging is now integrated into the build process via `./bin/yarn build:prod` or `./bin/yarn nx run server:package`.

@@ -23,16 +23,6 @@ import {StorageKey} from 'Repositories/storage/storageKey';
 import {resetStoreValue} from 'Util/storageUtil';
 
 export class CacheRepository {
-  public static CACHE_KEY = {
-    // Redefine name from "sw"
-    ASSETS: `asset-cache-v3`,
-  };
-
-  // Caution! When refactoring this code, make sure that it works in an "beforeunload" scenario!
-  static async clearCacheStorage(): Promise<boolean> {
-    return window.caches.delete(CacheRepository.CACHE_KEY.ASSETS);
-  }
-
   /**
    * Deletes cached data.
    *

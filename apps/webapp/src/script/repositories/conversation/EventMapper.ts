@@ -237,7 +237,6 @@ export class EventMapper {
           otrKey: preview_otr_key,
           sha256: preview_sha256,
           assetToken: preview_token,
-          forceCaching: true,
         });
         (asset as FileAsset).preview_resource(assetRemoteData);
       }
@@ -1051,7 +1050,6 @@ export class EventMapper {
         otrKey: preview_otr_key,
         sha256: preview_sha256,
         assetToken: preview_token,
-        forceCaching: true,
       });
       assetEntity.preview_resource(assetRemoteData);
     }
@@ -1107,7 +1105,6 @@ export class EventMapper {
       otrKey: otr_key,
       sha256,
       assetToken: token,
-      forceCaching: true,
     });
 
     assetEntity.resource(assetRemoteData);
@@ -1159,7 +1156,6 @@ export class EventMapper {
             otrKey,
             sha256,
             assetToken,
-            forceCaching: true,
           });
           linkPreviewData.image = remoteData;
         }

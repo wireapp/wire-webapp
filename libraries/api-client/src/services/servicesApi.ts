@@ -188,13 +188,8 @@ export class ServicesAPI {
   /**
    * Download an asset.
    */
-  public getAsset(
-    assetId: string,
-    token?: string | null,
-    forceCaching: boolean = false,
-    progressCallback?: ProgressCallback,
-  ) {
-    return this.assetAPI.getServiceAsset(assetId, token, forceCaching, progressCallback);
+  public getAsset(assetId: string, token?: string | null, progressCallback?: ProgressCallback) {
+    return this.assetAPI.getServiceAsset(assetId, token, progressCallback);
   }
 
   /**
