@@ -460,10 +460,16 @@ describe('CellsTable selection', () => {
     expect(screen.getByText(/Move status is unresolved/)).toBeInTheDocument();
 
     rerenderWithSelectionScope('conversation:/subfolder');
+    rerenderWithSelectionScope('conversation:/files');
+    rerenderWithSelectionScope('conversation:/files', false);
+    rerenderWithSelectionScope('conversation:/files', true);
     expect(screen.getByText(/Move status is unresolved/)).toBeInTheDocument();
-    rerenderWithSelectionScope('conversation:/subfolder', false);
-    rerenderWithSelectionScope('conversation:/subfolder', true);
-    expect(screen.getByText(/Move status is unresolved/)).toBeInTheDocument();
+
+    fireEvent.click(screen.getAllByRole('checkbox')[0]);
+    expect(screen.getByText('1 selected')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', {name: 'Move'}));
+    const navigatedDialog = await screen.findByRole('dialog');
+    expect(within(navigatedDialog).getByRole('button', {name: 'Move'})).toBeDisabled();
     expect(repository.moveNodes).toHaveBeenCalledTimes(1);
     window.location.hash = originalHash;
   });
