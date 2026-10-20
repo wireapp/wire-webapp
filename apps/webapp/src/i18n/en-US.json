@@ -395,6 +395,7 @@
   "cells.bulkMove.moveButton": "Move",
   "cells.bulkMove.moveNeedsReview": "The move ended with errors. Check each item’s actual location before reloading the page to start another move. Move stays disabled in this view.",
   "cells.bulkMove.movingButton": "Moving",
+  "cells.bulkMove.outcomeUnresolved": "Move status is unresolved. Verify the Drive before trying again.",
   "cells.bulkMove.previewDescription": "Choose a destination in this conversation’s Drive, then move the selected items.",
   "cells.bulkMove.previewTitle": "Preview move of {count} items",
   "cells.bulkMove.refreshDrive": "Refresh Drive",

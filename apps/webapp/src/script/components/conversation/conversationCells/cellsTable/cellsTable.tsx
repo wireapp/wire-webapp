@@ -148,11 +148,20 @@ export const CellsTable = ({
   const [isBackgroundMoveStatusUnknown, setIsBackgroundMoveStatusUnknown] = useState(false);
   const [backgroundMoveJobUuids, setBackgroundMoveJobUuids] = useState<string[]>([]);
   const [backgroundMoveStatusCheckId, setBackgroundMoveStatusCheckId] = useState(0);
+  const [isBulkMoveOutcomeUnresolved, setIsBulkMoveOutcomeUnresolved] = useState(false);
+  const [isBulkMoveRequestError, setIsBulkMoveRequestError] = useState(false);
 
   useEffect(() => {
     setSelectedNodeIds(new Set());
     setIsBulkMovePreviewOpen(false);
+    setIsBulkMoveOutcomeUnresolved(false);
+    setIsBulkMoveRequestError(false);
   }, [selectionScopeKey, isSelectionEnabled]);
+
+  const handleBulkMoveRequestError = (): void => {
+    setIsBulkMoveOutcomeUnresolved(true);
+    setIsBulkMoveRequestError(true);
+  };
 
   useEffect(() => {
     if (backgroundMoveJobUuids.length === 0) {
@@ -215,6 +224,8 @@ export const CellsTable = ({
         setBackgroundMoveJobUuids([]);
         setIsBackgroundMovePending(false);
         setIsBackgroundMoveError(false);
+        setIsBulkMoveOutcomeUnresolved(false);
+        setIsBulkMoveRequestError(false);
         onRefresh();
         setIsBulkMovePreviewOpen(false);
         return;
@@ -269,9 +280,14 @@ export const CellsTable = ({
     setIsBackgroundMoveRetryBlocked(false);
     setIsBackgroundMoveStatusUnknown(false);
     if (response.Status === RestActionStatus.Performed) {
+      setIsBulkMoveOutcomeUnresolved(false);
+      setIsBulkMoveRequestError(false);
+      onRefresh();
       return;
     }
 
+    setIsBulkMoveOutcomeUnresolved(true);
+    setIsBulkMoveRequestError(false);
     setIsBackgroundMovePending(true);
     const moveJobUuids = response.BackgroundActions?.filter(action => {
       return action.Name === 'move' && isNonEmptyString(action.JobUuid);
@@ -427,6 +443,13 @@ export const CellsTable = ({
           selectionBarAnchor !== null &&
           createPortal(
             <div css={selectionBarContainerStyles}>
+              {isBulkMoveOutcomeUnresolved && (
+                <p role="status">
+                  {isBulkMoveRequestError
+                    ? translate('cells.newItemMenuModalForm.genericError')
+                    : translate('cells.bulkMove.outcomeUnresolved')}
+                </p>
+              )}
               <CellsSelectionBar
                 selectedCount={selectedNodeIds.size}
                 onClear={() => {
@@ -458,8 +481,10 @@ export const CellsTable = ({
             cellsRepository={cellsRepository}
             conversationQualifiedId={conversationQualifiedId}
             conversationName={conversationName}
-            onMovePerformed={onRefresh}
+            isMoveOutcomeUnresolved={isBulkMoveOutcomeUnresolved}
+            isMoveRequestError={isBulkMoveRequestError}
             onMoveResult={handleBulkMoveResult}
+            onMoveError={handleBulkMoveRequestError}
             isBackgroundMovePending={isBackgroundMovePending}
             isBackgroundMoveError={isBackgroundMoveError}
             isBackgroundMoveRetryBlocked={isBackgroundMoveRetryBlocked}

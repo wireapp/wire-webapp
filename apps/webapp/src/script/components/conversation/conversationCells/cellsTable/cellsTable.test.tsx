@@ -67,6 +67,9 @@ const translateSelectionForTest: Translate = (key, substitutions) => {
   if (key === 'cells.bulkMove.selectedItems') {
     return 'Selected items';
   }
+  if (key === 'cells.bulkMove.outcomeUnresolved') {
+    return 'Move status is unresolved. Verify the Drive before trying again.';
+  }
   if (key === 'cells.bulkMove.currentDestination') {
     return `Current destination: ${substitutions?.destination}`;
   }
@@ -764,6 +767,11 @@ describe('CellsTable selection', () => {
       expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(1);
     });
     await user.click(within(dialog).getByRole('button', {name: 'cells.moveNodeModal.cancelButton'}));
+    expect(screen.getByText(/Move status is unresolved/)).toBeInTheDocument();
+    await user.click(screen.getByRole('button', {name: 'Move'}));
+    const reopenedDialog = await screen.findByRole('dialog');
+    expect(within(reopenedDialog).getByRole('button', {name: 'Move'})).toBeDisabled();
+    await user.click(within(reopenedDialog).getByRole('button', {name: 'cells.moveNodeModal.cancelButton'}));
 
     await act(async () => {
       clock.advanceByMilliseconds(1000);
@@ -967,11 +975,12 @@ describe('CellsTable selection', () => {
     const originalHash = window.location.hash;
     window.location.hash = '#/conversation/conversation-id@example.com/files/wire-cells-web';
     const user = userEvent.setup();
+    const onRefresh = jest.fn();
     const repository = {
       getAllNodes: jest.fn().mockResolvedValue({Nodes: []}),
       moveNodes: jest.fn().mockRejectedValue(new Error('Move failed')),
     } as unknown as CellsRepository;
-    renderCellsTable({cellsRepository: repository, folderPath: 'wire-cells-web/Marketing images'});
+    renderCellsTable({cellsRepository: repository, folderPath: 'wire-cells-web/Marketing images', onRefresh});
 
     await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
     await user.click(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'}));
@@ -989,6 +998,15 @@ describe('CellsTable selection', () => {
     });
     expect(await screen.findByRole('dialog')).toBeInTheDocument();
     expect(within(dialog).getByRole('alert')).toHaveTextContent('cells.newItemMenuModalForm.genericError');
+    expect(submitButton).toBeDisabled();
+    expect(onRefresh).not.toHaveBeenCalled();
+
+    await user.click(within(dialog).getByRole('button', {name: 'cells.moveNodeModal.cancelButton'}));
+    expect(screen.getByText('cells.newItemMenuModalForm.genericError')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', {name: 'Move'}));
+    const reopenedDialog = await screen.findByRole('dialog');
+    expect(within(reopenedDialog).getByRole('button', {name: 'Move'})).toBeDisabled();
+    expect(repository.moveNodes).toHaveBeenCalledTimes(1);
     window.location.hash = originalHash;
   });
 });

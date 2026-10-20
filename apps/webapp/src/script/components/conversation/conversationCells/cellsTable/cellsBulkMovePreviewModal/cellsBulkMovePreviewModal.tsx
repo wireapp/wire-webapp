@@ -34,8 +34,10 @@ interface CellsBulkMovePreviewModalProps {
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
   conversationName: string;
-  onMovePerformed: () => void;
+  isMoveOutcomeUnresolved: boolean;
+  isMoveRequestError: boolean;
   onMoveResult: (response: RestPerformActionResponse) => void;
+  onMoveError: () => void;
   isBackgroundMovePending: boolean;
   isBackgroundMoveError: boolean;
   isBackgroundMoveRetryBlocked: boolean;
@@ -52,8 +54,10 @@ export const CellsBulkMovePreviewModal = ({
   cellsRepository,
   conversationQualifiedId,
   conversationName,
-  onMovePerformed,
+  isMoveOutcomeUnresolved,
+  isMoveRequestError,
   onMoveResult,
+  onMoveError,
   isBackgroundMovePending,
   isBackgroundMoveError,
   isBackgroundMoveRetryBlocked,
@@ -90,11 +94,14 @@ export const CellsBulkMovePreviewModal = ({
       conversationName={conversationName}
       destination={destination}
       onMove={move.submitMove}
-      onMovePerformed={onMovePerformed}
       onMoveResult={onMoveResult}
+      onMoveError={onMoveError}
+      isMoveOutcomeUnresolved={isMoveOutcomeUnresolved}
+      isMoveRequestError={isMoveRequestError}
       isMoveDisabled={
         !move.isValid ||
         move.isSubmitting ||
+        isMoveOutcomeUnresolved ||
         isBackgroundMovePending ||
         isBackgroundMoveRetryBlocked ||
         isBackgroundMoveStatusUnknown ||

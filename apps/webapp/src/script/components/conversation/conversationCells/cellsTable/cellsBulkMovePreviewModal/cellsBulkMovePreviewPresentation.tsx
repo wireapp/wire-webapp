@@ -17,8 +17,6 @@
  *
  */
 
-import {useState} from 'react';
-
 import {RestActionStatus, type RestPerformActionResponse} from 'cells-sdk-ts';
 import type {Result} from 'true-myth';
 
@@ -37,8 +35,10 @@ interface CellsBulkMovePreviewPresentationProps {
   conversationName: string;
   destination: BulkMoveDestinationSelection;
   onMove: () => Promise<Result<RestPerformActionResponse, unknown>>;
-  onMovePerformed: () => void;
   onMoveResult: (response: RestPerformActionResponse) => void;
+  onMoveError: () => void;
+  isMoveOutcomeUnresolved: boolean;
+  isMoveRequestError: boolean;
   isMoveDisabled: boolean;
   isMoveLoading: boolean;
   isBackgroundMoveError: boolean;
@@ -55,8 +55,10 @@ export const CellsBulkMovePreviewPresentation = ({
   conversationName,
   destination,
   onMove,
-  onMovePerformed,
   onMoveResult,
+  onMoveError,
+  isMoveOutcomeUnresolved,
+  isMoveRequestError,
   isMoveDisabled,
   isMoveLoading,
   isBackgroundMoveError,
@@ -66,20 +68,17 @@ export const CellsBulkMovePreviewPresentation = ({
   onRefresh,
 }: CellsBulkMovePreviewPresentationProps) => {
   const {translate} = useApplicationContext();
-  const [isMoveError, setIsMoveError] = useState(false);
 
   const handleMove = async (): Promise<void> => {
-    setIsMoveError(false);
     const moveResult = await onMove();
     if (moveResult.isErr) {
-      setIsMoveError(true);
+      onMoveError();
       return;
     }
 
     if (moveResult.isOk) {
       onMoveResult(moveResult.value);
       if (moveResult.value.Status === RestActionStatus.Performed) {
-        onMovePerformed();
         onClose();
       }
     }
@@ -107,7 +106,15 @@ export const CellsBulkMovePreviewPresentation = ({
           return path;
         }}
       />
-      {isMoveError && <p role="alert">{translate('cells.newItemMenuModalForm.genericError')}</p>}
+      {isMoveOutcomeUnresolved && !isBackgroundMoveError && !isBackgroundMoveStatusUnknown && (
+        <div role="alert">
+          <p>
+            {isMoveRequestError
+              ? translate('cells.newItemMenuModalForm.genericError')
+              : translate('cells.bulkMove.outcomeUnresolved')}
+          </p>
+        </div>
+      )}
       {isBackgroundMoveError && (
         <div role="alert">
           <p>{translate('cells.bulkMove.moveNeedsReview')}</p>
