@@ -8736,6 +8736,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@swc-contrib/mut-cjs-exports@npm:15.0.0":
+  version: 15.0.0
+  resolution: "@swc-contrib/mut-cjs-exports@npm:15.0.0"
+  peerDependencies:
+    "@swc/core": ^1.16.0
+    "@swc/jest": ^0.2.37
+  checksum: 10/bd1d11b43fa6c2c987e1de7748b5ab05725a4cdb4dbdfce4a9da18d15750f2fc3d3e93ab7c3558aab15b24fb8ce470c27dbaabcbb7f2db63f51427f8a0f8b55e
+  languageName: node
+  linkType: hard
+
 "@swc/core-darwin-arm64@npm:1.16.18":
   version: 1.16.18
   resolution: "@swc/core-darwin-arm64@npm:1.16.18"
@@ -11414,6 +11424,9 @@ __metadata:
     "@rspack/dev-server": "npm:2.2.1"
     "@rspack/plugin-react-refresh": "npm:2.0.2"
     "@sindresorhus/is": "npm:8.1.0"
+    "@swc-contrib/mut-cjs-exports": "npm:15.0.0"
+    "@swc/core": "npm:1.16.18"
+    "@swc/jest": "npm:0.2.39"
     "@swc/plugin-emotion": "npm:15.0.0"
     "@tanstack/react-table": "npm:8.21.3"
     "@tanstack/react-virtual": "npm:3.14.21"

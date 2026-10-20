@@ -18,12 +18,14 @@
  */
 
 import type {Config} from 'jest';
+import browserslist from 'browserslist';
 import {fileURLToPath} from 'url';
 import {dirname} from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const isContinuousIntegrationEnvironment = process.env.CI === 'true';
+const browserslistTargets = browserslist(undefined, {path: __dirname});
 
 process.env.TZ = 'UTC';
 
@@ -83,9 +85,46 @@ const config: Config = {
   // Some dependencies are ESM and/or expose only package.json exports import conditions.
   // Jest still needs help resolving and transforming them in this CommonJS-ish test setup.
   transformIgnorePatterns: [`/node_modules/(?!(${esmPackagesToTransform.join('|')})/)`],
-  // Override transform to use babel-jest for webapp (uses React automatic runtime with Emotion)
+  // Jest executes in CommonJS mode; @swc/jest also hoists jest.mock calls.
   transform: {
-    '^.+\\.[tj]sx?$': 'babel-jest',
+    '^.+\\.[tj]sx?$': [
+      '@swc/jest',
+      {
+        env: {
+          coreJs: '3.50.0',
+          mode: 'usage',
+          targets: browserslistTargets,
+        },
+        jsc: {
+          experimental: {
+            plugins: [
+              ['@swc/plugin-emotion', {autoLabel: 'dev-only'}],
+              ['@swc-contrib/mut-cjs-exports', {}],
+            ],
+          },
+          parser: {
+            decorators: true,
+            dynamicImport: true,
+            importMeta: true,
+            syntax: 'typescript',
+            tsx: true,
+          },
+          transform: {
+            legacyDecorator: true,
+            decoratorMetadata: false,
+            react: {
+              importSource: '@emotion/react',
+              runtime: 'automatic',
+            },
+          },
+        },
+        module: {
+          importInterop: 'swc',
+          type: 'commonjs',
+        },
+        sourceMaps: true,
+      },
+    ],
   },
 };
 
