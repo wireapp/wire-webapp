@@ -57,18 +57,7 @@ export const CellsBulkMovePreviewPresentation = ({
       <p aria-live="polite">
         {translate('cells.bulkMove.currentDestination', {destination: destination.currentDestination})}
       </p>
-      <CellsFoldersListModalContent
-        items={destination.folders}
-        status={destination.status}
-        shouldShowLoadingSpinner={destination.shouldShowLoadingSpinner}
-        conversationName={conversationName}
-        currentPath={destination.currentPath}
-        onPathChange={destination.handlePathChange}
-        onSelectDestination={destination.handleDestinationSelect}
-        selectedDestinationPath={destination.selectedDestinationPath}
-        disabledDestinationPaths={destination.disabledDestinationPaths}
-        disabledDestinationLabels={destination.disabledDestinationLabels}
-      />
+      <CellsFoldersListModalContent conversationName={conversationName} destination={destination} />
       <CellsModal.Actions>
         <CellsModal.SecondaryButton onClick={onClose}>
           {translate('cells.moveNodeModal.cancelButton')}

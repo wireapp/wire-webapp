@@ -31,46 +31,41 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
-import type {Translate} from 'Util/localizerUtil/translationTypes';
+import type {Translate, TranslationKey} from 'Util/localizerUtil/translationTypes';
 import {translateForTest} from 'Util/test/translateForTest';
 
 import {CellsTable} from './cellsTable';
 
 import {CELLS_SELF_USER_DRIVE_ROLE} from '../common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 
+const selectionTranslations: Partial<Record<TranslationKey, string>> = {
+  'cells.selection.clear': 'Clear selection',
+  'cells.selection.move': 'Move',
+  'cells.bulkMove.previewDescription':
+    'Preview only. No items will be moved. Destinations stay within this conversation’s Drive.',
+  'cells.bulkMove.selectedItems': 'Selected items',
+  'cells.bulkMove.drive': 'Drive',
+  'cells.bulkMove.selected': 'Selected',
+  'cells.bulkMove.currentLocation': 'Current location',
+};
+
 const translateSelectionForTest: Translate = (key, substitutions) => {
+  const text = selectionTranslations[key];
+  if (text !== undefined) {
+    return text;
+  }
+
   if (key === 'cells.selection.selectedCount') {
     return `${substitutions?.count} selected`;
   }
   if (key === 'cells.selection.selectItem') {
     return `Select ${substitutions?.name}`;
   }
-  if (key === 'cells.selection.clear') {
-    return 'Clear selection';
-  }
-  if (key === 'cells.selection.move') {
-    return 'Move';
-  }
   if (key === 'cells.bulkMove.previewTitle') {
     return `Preview move of ${substitutions?.count} items`;
   }
-  if (key === 'cells.bulkMove.previewDescription') {
-    return 'Preview only. No items will be moved. Destinations stay within this conversation’s Drive.';
-  }
-  if (key === 'cells.bulkMove.selectedItems') {
-    return 'Selected items';
-  }
   if (key === 'cells.bulkMove.currentDestination') {
     return `Current destination: ${substitutions?.destination}`;
-  }
-  if (key === 'cells.bulkMove.drive') {
-    return 'Drive';
-  }
-  if (key === 'cells.bulkMove.selected') {
-    return 'Selected';
-  }
-  if (key === 'cells.bulkMove.currentLocation') {
-    return 'Current location';
   }
   if (key === 'cells.moveNodeModal.openFolder') {
     return `Open ${substitutions?.folderName}`;
