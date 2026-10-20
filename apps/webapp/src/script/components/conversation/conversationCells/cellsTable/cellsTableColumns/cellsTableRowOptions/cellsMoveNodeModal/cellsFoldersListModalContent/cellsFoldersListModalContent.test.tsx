@@ -34,7 +34,7 @@ const renderContent = (
   items: {id: string; name: string; path: string}[],
   shouldShowLoadingSpinner = status === 'loading',
   destinationSelection?: {
-    onSelectDestination: (path: string) => void;
+    handleDestinationSelect: (path: string) => void;
     selectedDestinationPath: string;
     disabledDestinationPaths: string[];
     disabledDestinationLabels: Record<string, string>;
@@ -45,14 +45,16 @@ const renderContent = (
   return render(
     <StyledApp themeId={THEME_ID.DEFAULT}>
       <CellsFoldersListModalContent
-        items={items}
-        status={status}
-        shouldShowLoadingSpinner={shouldShowLoadingSpinner}
         conversationName="Engineering"
-        currentPath="wire-cells-web"
-        onPathChange={jest.fn()}
-        onChangeModalContent={jest.fn()}
-        {...destinationSelection}
+        destination={{
+          folders: items,
+          status,
+          shouldShowLoadingSpinner,
+          currentPath: 'wire-cells-web',
+          handlePathChange: jest.fn(),
+          onChangeModalContent: jest.fn(),
+          ...destinationSelection,
+        }}
       />
     </StyledApp>,
     {wrapper},
@@ -109,7 +111,7 @@ describe('CellsFoldersListModalContent', () => {
       ],
       false,
       {
-        onSelectDestination,
+        handleDestinationSelect: onSelectDestination,
         selectedDestinationPath: 'conversation/design-reviews',
         disabledDestinationPaths: ['conversation/source', 'conversation/current'],
         disabledDestinationLabels: {
