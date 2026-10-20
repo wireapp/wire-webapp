@@ -17,7 +17,7 @@
  *
  */
 
-import {AssetOptions, AssetResponse} from '@wireapp/api-client/lib/asset';
+import {AssetOptions, AssetResponse, AssetUploadData} from '@wireapp/api-client/lib/asset';
 import {ProgressCallback, RequestCancelable} from '@wireapp/api-client/lib/http';
 
 import {APIClient} from '@wireapp/api-client';
@@ -45,7 +45,10 @@ export class AssetService {
    * @param progressCallback?
    * @return Resolves when the asset has been uploaded
    */
-  public downloadRawAsset(assetData: AssetUrlData, progressCallback?: ProgressCallback) {
+  public downloadRawAsset(
+    assetData: AssetUrlData,
+    progressCallback?: ProgressCallback,
+  ): RequestCancelable<AssetResponse> {
     return this.apiClient.api.asset.getAsset(
       assetData.assetKey,
       assetData.assetDomain,
@@ -62,7 +65,11 @@ export class AssetService {
    * @param progressCallback?
    * @return cancellable request that resolves with the uploaded image
    */
-  public uploadRawAsset(asset: Buffer | Uint8Array, options?: AssetOptions, progressCallback?: ProgressCallback) {
+  public uploadRawAsset(
+    asset: Buffer | Uint8Array,
+    options?: AssetOptions,
+    progressCallback?: ProgressCallback,
+  ): RequestCancelable<AssetUploadData> {
     return this.apiClient.api.asset.postAsset(new Uint8Array(asset), options, progressCallback);
   }
 
@@ -103,7 +110,7 @@ export class AssetService {
     };
   }
 
-  public decryptAsset(asset: EncryptedAsset) {
+  public decryptAsset(asset: EncryptedAsset): Promise<Uint8Array> {
     return decryptAsset(asset);
   }
 

@@ -31,6 +31,7 @@ import {GenericMessage, Text} from '@wireapp/protocol-messaging';
 
 import {MessageService} from './messageService';
 
+import type {ProteusService} from '../../messagingProtocols/proteus';
 import {
   buildProteusService,
   cleanupProteusServiceMocks,
@@ -91,7 +92,9 @@ function fakeEncrypt(_: unknown, recipients: QualifiedUserClients): Promise<{pay
 
 const apiClients: APIClient[] = [];
 
-const buildMessageService = async () => {
+const buildMessageService = async (): Promise<
+  readonly [MessageService, {readonly apiClient: APIClient; readonly proteusService: ProteusService}]
+> => {
   const apiClient = new APIClient();
   apiClients.push(apiClient);
   const [proteusService] = await buildProteusService();
@@ -123,7 +126,7 @@ describe('MessageService', () => {
 
     const clientId = 'sendingClient';
     const conversationId = {id: 'conv1', domain: ''};
-    const createMessage = (content: string) => {
+    const createMessage = (content: string): Uint8Array => {
       const customTextMessage = GenericMessage.create({
         messageId: getUUID(),
         text: Text.create({content}),

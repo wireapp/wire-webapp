@@ -70,7 +70,7 @@ import {AssetTransferState} from '../assetTransferState';
 import {MultiPartContent, TextContent} from '../content';
 import {GenericMessageType} from '../genericMessageType';
 
-export function createId() {
+export function createId(): string {
   return uuidv4();
 }
 
@@ -212,7 +212,7 @@ export function buildFileAbortMessage(
   return genericMessage;
 }
 
-export function buildLastReadMessage(conversationId: QualifiedId, lastReadTimestamp: number) {
+export function buildLastReadMessage(conversationId: QualifiedId, lastReadTimestamp: number): GenericMessage {
   const lastRead = new LastRead({
     conversationId: conversationId.id,
     lastReadTimestamp,
@@ -225,7 +225,7 @@ export function buildLastReadMessage(conversationId: QualifiedId, lastReadTimest
   });
 }
 
-export function buildDataTransferMessage(identifier: string) {
+export function buildDataTransferMessage(identifier: string): GenericMessage {
   const dataTransfer = new DataTransfer({
     trackingIdentifier: {
       identifier,
@@ -238,7 +238,7 @@ export function buildDataTransferMessage(identifier: string) {
   });
 }
 
-export function buildClearedMessage(conversationId: QualifiedId, timestamp: number = Date.now()) {
+export function buildClearedMessage(conversationId: QualifiedId, timestamp: number = Date.now()): GenericMessage {
   const clearedMessage = Cleared.create({
     clearedTimestamp: timestamp,
     conversationId: conversationId.id,

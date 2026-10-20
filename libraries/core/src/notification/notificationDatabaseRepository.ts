@@ -38,39 +38,39 @@ const STORES = {
 export class NotificationDatabaseRepository {
   constructor(private readonly storeEngine: CRUDEngine) {}
 
-  public getNotificationEventList() {
+  public getNotificationEventList(): Promise<BackendEvent[]> {
     return this.storeEngine.readAll<BackendEvent>(DatabaseStores.EVENTS);
   }
 
-  public async getLastEventDate() {
+  public async getLastEventDate(): Promise<Date> {
     const {value} = await this.storeEngine.read<{
       value: string;
     }>(STORES.AMPLIFY, DatabaseKeys.PRIMARY_KEY_LAST_EVENT);
     return new Date(value);
   }
 
-  public async updateLastEventDate(eventDate: Date) {
+  public async updateLastEventDate(eventDate: Date): Promise<Date> {
     await this.storeEngine.update(STORES.AMPLIFY, DatabaseKeys.PRIMARY_KEY_LAST_EVENT, {
       value: eventDate.toISOString(),
     });
     return eventDate;
   }
 
-  public async createLastEventDate(eventDate: Date) {
+  public async createLastEventDate(eventDate: Date): Promise<Date> {
     await this.storeEngine.create(STORES.AMPLIFY, DatabaseKeys.PRIMARY_KEY_LAST_EVENT, {
       value: eventDate.toISOString(),
     });
     return eventDate;
   }
 
-  public async getLastNotificationId() {
+  public async getLastNotificationId(): Promise<string> {
     const {value} = await this.storeEngine.read<{
       value: string;
     }>(STORES.AMPLIFY, DatabaseKeys.PRIMARY_KEY_LAST_NOTIFICATION);
     return value;
   }
 
-  public async updateLastNotificationId(lastNotification: Notification) {
+  public async updateLastNotificationId(lastNotification: Notification): Promise<string> {
     await this.storeEngine.updateOrCreate(STORES.AMPLIFY, DatabaseKeys.PRIMARY_KEY_LAST_NOTIFICATION, {
       value: lastNotification.id,
     });

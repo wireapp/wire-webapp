@@ -37,7 +37,7 @@ export class TextContentBuilder<T extends TextContent | EditedTextContent> {
     return this.content;
   }
 
-  withLinkPreviews(linkPreviews?: LinkPreviewUploadedContent[]) {
+  withLinkPreviews(linkPreviews?: LinkPreviewUploadedContent[]): this {
     if (linkPreviews !== undefined && linkPreviews.length > 0) {
       this.content.linkPreviews = linkPreviews;
     }
@@ -45,7 +45,7 @@ export class TextContentBuilder<T extends TextContent | EditedTextContent> {
     return this;
   }
 
-  withMentions(mentions?: MentionContent[]) {
+  withMentions(mentions?: MentionContent[]): this {
     if (mentions !== undefined && mentions.length > 0) {
       this.content.mentions = mentions;
     }
@@ -53,7 +53,7 @@ export class TextContentBuilder<T extends TextContent | EditedTextContent> {
     return this;
   }
 
-  withQuote(quote?: QuoteContent) {
+  withQuote(quote?: QuoteContent): this {
     if (quote !== undefined) {
       this.content.quote = quote as QuoteContent;
     }
@@ -61,14 +61,14 @@ export class TextContentBuilder<T extends TextContent | EditedTextContent> {
     return this;
   }
 
-  withReadConfirmation(expectsReadConfirmation = false) {
+  withReadConfirmation(expectsReadConfirmation = false): this {
     if (typeof expectsReadConfirmation !== 'undefined') {
       this.content.expectsReadConfirmation = expectsReadConfirmation;
     }
     return this;
   }
 
-  withLegalHoldStatus(legalHoldStatus = LegalHoldStatus.UNKNOWN) {
+  withLegalHoldStatus(legalHoldStatus = LegalHoldStatus.UNKNOWN): this {
     if (typeof legalHoldStatus !== 'undefined') {
       this.content.legalHoldStatus = legalHoldStatus;
     }
