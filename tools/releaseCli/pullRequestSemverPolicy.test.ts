@@ -54,10 +54,18 @@ function runPolicyCommand(environment: PolicyCommandEnvironment): PolicyCommandR
 
 describe('pull request SemVer policy CLI', () => {
   it.each([
+    {targetBranch: 'main', labels: ['semver:major'], impact: 'major'},
     {targetBranch: 'main', labels: ['feature', 'semver:minor'], impact: 'minor'},
-    {targetBranch: 'release/1.1.0', labels: ['semver:patch'], impact: 'patch'},
-    {targetBranch: 'maintenance/2026-07-27.1-airgap-a', labels: ['semver:patch'], impact: 'patch'},
+    {targetBranch: 'main', labels: ['semver:patch'], impact: 'patch'},
     {targetBranch: 'main', labels: ['semver:none'], impact: 'none'},
+    {targetBranch: 'release/1.1.0', labels: ['semver:patch'], impact: 'patch'},
+    {targetBranch: 'release/1.1.0', labels: ['semver:none'], impact: 'none'},
+    {targetBranch: 'maintenance/2026-07-27.1-airgap-a', labels: ['semver:patch'], impact: 'patch'},
+    {targetBranch: 'maintenance/2026-07-27.1-airgap-a', labels: ['semver:none'], impact: 'none'},
+    {targetBranch: 'WPB-29385-picker-foundation', labels: ['semver:major'], impact: 'major'},
+    {targetBranch: 'WPB-29385-picker-foundation', labels: ['semver:minor'], impact: 'minor'},
+    {targetBranch: 'WPB-29385-picker-foundation', labels: ['semver:patch'], impact: 'patch'},
+    {targetBranch: 'WPB-29385-picker-foundation', labels: ['semver:none'], impact: 'none'},
   ])('accepts $impact targeting $targetBranch', options => {
     const actualResult = runPolicyCommand({
       TARGET_BRANCH: options.targetBranch,
@@ -72,9 +80,16 @@ describe('pull request SemVer policy CLI', () => {
   it.each([
     {targetBranch: 'main', labels: [], diagnostic: 'no release-impact label'},
     {targetBranch: 'main', labels: ['semver:patch', 'semver:minor'], diagnostic: 'conflicting'},
+    {targetBranch: 'WPB-29385-picker-foundation', labels: [], diagnostic: 'no release-impact label'},
+    {
+      targetBranch: 'WPB-29385-picker-foundation',
+      labels: ['semver:patch', 'semver:minor'],
+      diagnostic: 'conflicting',
+    },
+    {targetBranch: 'release/1.1.0', labels: ['semver:major'], diagnostic: 'allow only'},
     {targetBranch: 'release/1.1.0', labels: ['semver:minor'], diagnostic: 'allow only'},
     {targetBranch: 'maintenance/2026-07-27.1-airgap-a', labels: ['semver:major'], diagnostic: 'allow only'},
-    {targetBranch: 'feature/example', labels: ['semver:patch'], diagnostic: 'Unsupported'},
+    {targetBranch: 'maintenance/2026-07-27.1-airgap-a', labels: ['semver:minor'], diagnostic: 'allow only'},
   ])('rejects $labels targeting $targetBranch', options => {
     const actualResult = runPolicyCommand({
       TARGET_BRANCH: options.targetBranch,
@@ -84,6 +99,22 @@ describe('pull request SemVer policy CLI', () => {
     expect(actualResult.exitCode).toBe(1);
     expect(actualResult.standardError).toContain(options.diagnostic);
     expect(actualResult.standardOutput).toBe('');
+  });
+
+  it('applies release-branch restrictions after an intermediate PR is retargeted', () => {
+    const intermediateResult = runPolicyCommand({
+      TARGET_BRANCH: 'WPB-29385-picker-foundation',
+      PULL_REQUEST_LABELS_JSON: JSON.stringify(['semver:minor']),
+    });
+    const releaseBranchResult = runPolicyCommand({
+      TARGET_BRANCH: 'release/1.1.0',
+      PULL_REQUEST_LABELS_JSON: JSON.stringify(['semver:minor']),
+    });
+
+    expect(intermediateResult.exitCode).toBe(0);
+    expect(intermediateResult.standardError).toBe('');
+    expect(releaseBranchResult.exitCode).toBe(1);
+    expect(releaseBranchResult.standardError).toContain('allow only semver:patch or semver:none');
   });
 
   it.each<PolicyCommandEnvironment>([

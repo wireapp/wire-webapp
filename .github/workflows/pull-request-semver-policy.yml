@@ -3,7 +3,6 @@ name: Pull request SemVer policy
 
 on:
   pull_request:
-    branches: [main, release/*, maintenance/*]
     types: [opened, reopened, synchronize, labeled, unlabeled, edited]
   merge_group:
     branches: [main, release/*, maintenance/*]
