@@ -86,7 +86,9 @@ function captureRuntimeDiagnostics(options: RuntimeDiagnosticsOptions): RuntimeD
           .with(false, () => {
             diagnostics.failedLocalResponses.push(`${response.status()} ${resourceType} ${responseUrl.pathname}`);
           })
-          .with(true, noop)
+          .with(true, () => {
+            return undefined;
+          })
           .exhaustive();
       })
       .otherwise(noop);

@@ -53,13 +53,13 @@
         "command": "node {projectRoot}/bin/assembleBuild.mts internal artifact"
       }
     },
-    "assemble-rspack": {
+    "assemble-webpack": {
       "executor": "nx:run-commands",
-      "dependsOn": ["build", {"projects": "webapp", "target": "build-rspack"}, "generate-build-metadata"],
+      "dependsOn": ["build", {"projects": "webapp", "target": "build-webpack"}, "generate-build-metadata"],
       "outputs": ["{projectRoot}/dist"],
       "cache": false,
       "options": {
-        "command": "node {projectRoot}/bin/assembleBuild.mts rspack-internal artifact"
+        "command": "node {projectRoot}/bin/assembleBuild.mts webpack-internal artifact"
       }
     },
     "assemble-public": {
@@ -69,6 +69,15 @@
       "cache": false,
       "options": {
         "command": "node {projectRoot}/bin/assembleBuild.mts public artifact"
+      }
+    },
+    "assemble-webpack-public": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["build", {"projects": "webapp", "target": "build-webpack-public"}, "generate-build-metadata"],
+      "outputs": ["{projectRoot}/dist"],
+      "cache": false,
+      "options": {
+        "command": "node {projectRoot}/bin/assembleBuild.mts webpack-public artifact"
       }
     },
     "assemble-webapp": {
@@ -108,9 +117,9 @@
         "parallel": false
       }
     },
-    "package-rspack": {
+    "package-webpack": {
       "executor": "nx:run-commands",
-      "dependsOn": ["assemble-rspack"],
+      "dependsOn": ["assemble-webpack"],
       "inputs": ["production", "webappBuildMetadata"],
       "cache": false,
       "options": {
@@ -121,6 +130,16 @@
     "package-public": {
       "executor": "nx:run-commands",
       "dependsOn": ["assemble-public"],
+      "inputs": ["production", "webappBuildMetadata"],
+      "cache": false,
+      "options": {
+        "commands": ["yarn verify:bundle:prod:public", "node tools/serverPackaging/zip.js"],
+        "parallel": false
+      }
+    },
+    "package-webpack-public": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["assemble-webpack-public"],
       "inputs": ["production", "webappBuildMetadata"],
       "cache": false,
       "options": {

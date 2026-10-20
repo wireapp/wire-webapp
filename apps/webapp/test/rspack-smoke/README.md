@@ -1,15 +1,15 @@
 # Rspack browser smoke tests
 
-These tests serve the generated `dist/rspack-internal` and `dist/rspack-public` files directly over HTTP. They do not use the Webpack development server or require credentials or backend services.
+These tests serve the generated default internal Rspack build in `dist/internal` and the canonical public Rspack build in `dist/public` directly over HTTP. They do not use the Rspack development server or require credentials or backend services.
 
 ## Run locally
 
 Build both variants and install Chromium once:
 
 ```bash
-yarn nx run webapp:build-rspack
-yarn nx run webapp:build-rspack-public
-yarn playwright install chromium
+yarn nx run webapp:build
+yarn nx run webapp:build-production-public
+./bin/yarn exec playwright install chromium
 yarn nx run webapp:smoke-rspack
 ```
 
@@ -19,4 +19,4 @@ The smoke target expects both builds, `apps/server/build/metadata/version.json`,
 
 For each build, Chromium verifies the root HTML and its required entry scripts load, the application executes its unauthenticated redirect to `/auth`, the authentication application renders its login and account creation actions, and clicking Log in opens a usable email/password form. The tests fail on uncaught page errors and failed local requests or responses, including missing JavaScript chunks.
 
-This is an unauthenticated browser smoke test. It does not exercise full authentication, MLS/Core Crypto WASM initialization, AVS calling, MediaPipe runtime behavior, service worker caching, or Electron integration.
+This is an unauthenticated browser smoke test. It does not exercise full authentication, MLS/Core Crypto WASM initialization, AVS calling, MediaPipe runtime behavior, or Electron integration.

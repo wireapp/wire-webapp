@@ -15,25 +15,14 @@
         "cwd": "{projectRoot}"
       }
     },
-    "build-rspack": {
+    "build-webpack": {
       "executor": "nx:run-commands",
       "cache": false,
-      "outputs": ["{projectRoot}/dist/rspack-internal"],
+      "outputs": ["{projectRoot}/dist/webpack-internal"],
       "dependsOn": ["^build", "server:generate-build-metadata"],
       "inputs": ["production", "webappBuildMetadata", "{workspaceRoot}/apps/server/build/metadata/version.json"],
       "options": {
-        "command": "WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/rspack-internal yarn build:rspack",
-        "cwd": "{projectRoot}"
-      }
-    },
-    "build-rspack-public": {
-      "executor": "nx:run-commands",
-      "cache": false,
-      "outputs": ["{projectRoot}/dist/rspack-public"],
-      "dependsOn": ["^build", "server:generate-build-metadata"],
-      "inputs": ["production", "webappBuildMetadata", "{workspaceRoot}/apps/server/build/metadata/version.json"],
-      "options": {
-        "command": "WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/rspack-public yarn build:rspack:public",
+        "command": "WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/webpack-internal yarn build:prod:webpack",
         "cwd": "{projectRoot}"
       }
     },
@@ -56,6 +45,17 @@
       "inputs": ["production", "webappBuildMetadata", "{workspaceRoot}/apps/server/build/metadata/version.json"],
       "options": {
         "command": "WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/public yarn build:prod:public",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "build-webpack-public": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "outputs": ["{projectRoot}/dist/webpack-public"],
+      "dependsOn": ["^build", "server:generate-build-metadata"],
+      "inputs": ["production", "webappBuildMetadata", "{workspaceRoot}/apps/server/build/metadata/version.json"],
+      "options": {
+        "command": "WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/webpack-public yarn build:prod:webpack:public",
         "cwd": "{projectRoot}"
       }
     },
@@ -88,7 +88,7 @@
       "executor": "nx:run-commands",
       "defaultConfiguration": "development",
       "options": {
-        "command": "echo 'Use yarn start from the root to run the dev server with webpack-dev-middleware'"
+        "command": "echo 'Use yarn start from the root to run the Rspack development server'"
       }
     },
     "test": {

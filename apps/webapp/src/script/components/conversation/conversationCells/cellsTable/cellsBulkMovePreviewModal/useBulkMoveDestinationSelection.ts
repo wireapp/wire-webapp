@@ -128,9 +128,9 @@ export const useBulkMoveDestinationSelection = ({
     return parentPaths.every(path => {
       return path === parentPaths[0];
     })
-      ? parentPaths[0]
+      ? getDestinationPath(parentPaths[0], drivePathPrefix, conversationQualifiedId)
       : null;
-  }, [selectedNodes, conversationQualifiedId]);
+  }, [selectedNodes, drivePathPrefix, conversationQualifiedId]);
   const disabledDestinationPaths = useMemo(() => {
     return selectedParentPath === null ? selectedFolderPaths : [...selectedFolderPaths, selectedParentPath];
   }, [selectedFolderPaths, selectedParentPath]);

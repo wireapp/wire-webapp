@@ -24,13 +24,13 @@ import {LOGGER_NAMESPACE} from 'Util/logger';
 
 import {reducers} from './module/reducer';
 
-const reduxLogdown = require('redux-logdown');
-
 type HotReloadCapableModule = NodeJS.Module & {
-  hot?: {
-    accept: (dependencyPath: string, callback: () => void) => void;
+  readonly hot?: {
+    accept(dependencyPath: string, callback: () => void): void;
   };
 };
+
+const reduxLogdown = require('redux-logdown');
 
 const configureStore = (thunkArguments: object = {}) => {
   const store = createStore(combineReducers(reducers), undefined, createMiddleware(thunkArguments));

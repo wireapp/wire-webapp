@@ -78,7 +78,11 @@ export const CellsBulkMovePreviewPresentation = ({
 
   return (
     <CellsModal isOpen={isOpen} onClose={onClose} size="large">
-      <CellsModal.Header>{translate('cells.bulkMove.previewTitle', {count: selectedNodes.length})}</CellsModal.Header>
+      <CellsModal.Header>
+        {selectedNodes.length === 1
+          ? translate('cells.bulkMove.previewTitleSingular')
+          : translate('cells.bulkMove.previewTitle', {count: selectedNodes.length})}
+      </CellsModal.Header>
       <p>{translate('cells.bulkMove.previewDescription')}</p>
       <section aria-labelledby="bulk-move-selected-items-heading">
         <h3 id="bulk-move-selected-items-heading">{translate('cells.bulkMove.selectedItems')}</h3>
@@ -92,19 +96,11 @@ export const CellsBulkMovePreviewPresentation = ({
         {translate('cells.bulkMove.currentDestination', {destination: destination.currentDestination})}
       </p>
       <CellsFoldersListModalContent
-        items={destination.folders}
-        status={destination.status}
-        shouldShowLoadingSpinner={destination.shouldShowLoadingSpinner}
         conversationName={conversationName}
-        currentPath={destination.currentPath}
-        onPathChange={destination.handlePathChange}
+        destination={destination}
         getCurrentPathFromFolder={path => {
           return path;
         }}
-        onSelectDestination={destination.handleDestinationSelect}
-        selectedDestinationPath={destination.selectedDestinationPath}
-        disabledDestinationPaths={destination.disabledDestinationPaths}
-        disabledDestinationLabels={destination.disabledDestinationLabels}
       />
       {isBackgroundMoveError && (
         <div role="alert">

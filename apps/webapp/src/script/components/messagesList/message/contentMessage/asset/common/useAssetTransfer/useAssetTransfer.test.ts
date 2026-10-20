@@ -47,7 +47,6 @@ describe('useAssetTransfer', () => {
     assetKey: 'assetKey',
     assetDomain: 'domain',
     assetToken: 'assetToken',
-    forceCaching: false,
   });
 
   beforeEach(() => {

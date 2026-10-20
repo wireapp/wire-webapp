@@ -56,9 +56,11 @@ export const isBulkMoveValid = ({
   destinationPath,
   selectedNodes,
 }: ValidateBulkMoveParams): boolean => {
-  const destination = normalizePath(destinationPath);
-  const destinationHasQualifiedConversationPrefix = hasQualifiedConversationPrefix(destination);
-  if (selectedNodes.length === 0 || hasUnsafePathSegment(destination) || destinationHasQualifiedConversationPrefix) {
+  const normalizedDestinationPath = normalizePath(destinationPath);
+  const destination = normalizePath(normalizeCellsPath(normalizedDestinationPath, conversationQualifiedId));
+  const hasForeignConversationPrefix =
+    destination === normalizedDestinationPath && hasQualifiedConversationPrefix(destination);
+  if (selectedNodes.length === 0 || hasUnsafePathSegment(destination) || hasForeignConversationPrefix) {
     return false;
   }
 

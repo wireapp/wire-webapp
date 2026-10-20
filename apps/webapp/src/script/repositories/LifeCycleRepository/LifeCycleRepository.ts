@@ -343,17 +343,14 @@ export class LifeCycleRepository {
   };
 
   /**
-   * Cleans up persistent storage (cache and database) when user requests complete data removal.
+   * Cleans up persistent database storage when user requests complete data removal.
    */
   private readonly cleanupPersistentStorage = async (shouldClearAllData: boolean): Promise<void> => {
     if (!shouldClearAllData) {
       this.logger.debug('Persistent storage cleanup skipped: full data removal not requested.');
       return;
     }
-    this.logger.info('Initiating persistent storage cleanup: clearing cache and deleting database.');
-
-    // Clear cache storage, not a blocking operation therefore not awaited
-    void CacheRepository.clearCacheStorage();
+    this.logger.info('Initiating persistent storage cleanup: deleting database.');
 
     // Delete database with error handling
     try {

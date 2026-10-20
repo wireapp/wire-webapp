@@ -27,6 +27,7 @@ import 'core-js/full/reflect';
 import {ClientType} from '@wireapp/api-client/lib/client/';
 
 import {createRoot} from 'react-dom/client';
+import {Maybe} from 'true-myth';
 import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
@@ -47,9 +48,18 @@ import {Config} from '../Config';
 import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
 import {createIncrementalHttpRetryBackoffReset} from '../lifecycle/createIncrementalHttpRetryBackoffReset';
 import {createFetchLatestBuildMetadata} from '../lifecycle/newVersionHandler';
+import {retireLegacyServiceWorker} from '../lifecycle/retireLegacyServiceWorker';
 import {createApplicationObservabilityFromConfig} from '../observability/createApplicationObservabilityFromConfig';
 import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';
+
+retireLegacyServiceWorker({
+  serviceWorkerContainer: Maybe.of(navigator.serviceWorker),
+  cacheStorage: Maybe.of(window.caches),
+  origin: window.location.origin,
+}).catch((error: unknown) => {
+  console.warn('Legacy service worker cleanup failed; continuing application startup.', error);
+});
 
 const clock = createClock();
 const applicationBootstrapStartedAtMonotonicMicroseconds = clock.currentMonotonicMicroseconds;

@@ -22,7 +22,6 @@ import {generateClientConfig, parseBuildMetadata} from '@wireapp/config';
 import type {Env} from '@wireapp/config';
 import {isError} from '@sindresorhus/is';
 import dotenv from 'dotenv-extended';
-import {noop} from 'noop-esm';
 import {match, P} from 'ts-pattern';
 import {Maybe} from 'true-myth';
 
@@ -247,10 +246,10 @@ function respondToRequest(options: RequestHandlerOptions): void {
 function startSmokeServer(options: RspackSmokeServerOptions): void {
   const buildDirectoryName = match(options.buildVariant)
     .with('internal', () => {
-      return 'rspack-internal';
+      return 'internal';
     })
     .with('public', () => {
-      return 'rspack-public';
+      return 'public';
     })
     .exhaustive();
   const buildDirectoryPath = path.resolve(webappDirectoryPath, 'dist', buildDirectoryName);
@@ -258,7 +257,9 @@ function startSmokeServer(options: RspackSmokeServerOptions): void {
   const websocketOrigin = `ws://127.0.0.1:${options.port}`;
   const applicationIndexPath = path.resolve(buildDirectoryPath, 'index.html');
   match(existsSync(applicationIndexPath))
-    .with(true, noop)
+    .with(true, () => {
+      return undefined;
+    })
     .with(false, () => {
       throw new Error(
         `Rspack ${options.buildVariant} build is missing at '${buildDirectoryPath}'. Build it before running smoke tests.`,

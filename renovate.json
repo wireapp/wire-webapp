@@ -99,10 +99,7 @@
       "matchPackageNames": [
         "webpack",
         "webpack-cli",
-        "webpack-dev-middleware",
-        "webpack-hot-middleware",
         "webpack-bundle-analyzer",
-        "workbox-webpack-plugin",
         "copy-webpack-plugin",
         "html-webpack-plugin",
         "babel-loader",

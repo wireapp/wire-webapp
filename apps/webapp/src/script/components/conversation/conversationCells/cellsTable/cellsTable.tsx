@@ -30,6 +30,12 @@ import {UploadIcon} from '@wireapp/react-ui-kit';
 
 import {CellsSelectionBar} from 'Components/cells/common/cellsSelectionBar/cellsSelectionBar';
 import {CellsBulkMovePreviewModal} from 'Components/conversation/conversationCells/cellsTable/cellsBulkMovePreviewModal/cellsBulkMovePreviewModal';
+import {
+  CELLS_ACTION,
+  canPerformCellsAction,
+  useCellsActionPermissions,
+} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
+import {isInRecycleBin} from 'Components/conversation/conversationCells/common/recycleBin/recycleBin';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
@@ -137,6 +143,7 @@ export const CellsTable = ({
   selectionBarAnchor,
 }: CellsTableProps) => {
   const {clock, translate, isFeatureToggleEnabled} = useApplicationContext();
+  const canPerformCurrentDriveAction = useCellsActionPermissions();
   const isSelectionEnabled = selectionEnabled && isFeatureToggleEnabled(driveBulkActionsFeatureToggleName);
   const [selectedNodeIds, setSelectedNodeIds] = useState<Set<string>>(() => {
     return new Set();
@@ -345,6 +352,13 @@ export const CellsTable = ({
   const selectedNodes = nodes.filter(node => {
     return selectedNodeIds.has(node.id);
   });
+  const canMoveSelection =
+    selectedNodes.length > 0 &&
+    !isInRecycleBin() &&
+    canPerformCurrentDriveAction(CELLS_ACTION.MOVE) &&
+    selectedNodes.every(node => {
+      return canPerformCellsAction({action: CELLS_ACTION.MOVE, selfUserDriveRole: node.selfUserDriveRole});
+    });
   const tableWrapperStyles = rows.length > 0 ? [wrapperStyles, wrapperWithRowsStyles] : wrapperStyles;
 
   useEffect(() => {
@@ -433,7 +447,7 @@ export const CellsTable = ({
                   return setSelectedNodeIds(new Set());
                 }}
               />
-              {selectedNodeIds.size > 0 && (
+              {canMoveSelection && (
                 <button
                   css={bulkMoveButtonStyles}
                   type="button"
@@ -448,7 +462,7 @@ export const CellsTable = ({
             </div>,
             selectionBarAnchor,
           )}
-        {isBulkMovePreviewOpen && (
+        {isBulkMovePreviewOpen && canMoveSelection && (
           <CellsBulkMovePreviewModal
             isOpen
             onClose={() => {

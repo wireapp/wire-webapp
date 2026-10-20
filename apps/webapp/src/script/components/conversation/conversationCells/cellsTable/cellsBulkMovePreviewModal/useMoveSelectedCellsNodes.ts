@@ -32,6 +32,7 @@ import {getCellsApiPath} from 'Components/conversation/conversationCells/common/
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {CellNode} from 'src/script/types/cellNode';
 
+import {normalizeCellsPath} from './normalizeCellsPath';
 import {isBulkMoveValid} from './validateBulkMove';
 
 interface UseMoveSelectedCellsNodesProps {
@@ -77,7 +78,10 @@ export const useMoveSelectedCellsNodes = ({
           currentPaths: selectedNodes.map(node => {
             return node.path;
           }),
-          targetPath: getCellsApiPath({conversationQualifiedId, currentPath: destinationPath}),
+          targetPath: getCellsApiPath({
+            conversationQualifiedId,
+            currentPath: normalizeCellsPath(destinationPath, conversationQualifiedId),
+          }),
         });
       },
     );

@@ -25,6 +25,34 @@ import {APIClient} from '@wireapp/api-client';
 import {AssetService} from './assetService';
 
 describe('AssetService', () => {
+  describe('downloadRawAsset', () => {
+    it('downloads remote assets and passes the progress callback as the final argument', () => {
+      const apiClient = new APIClient();
+      const assetService = new AssetService(apiClient);
+      const progressCallback = jest.fn();
+      const request = {
+        cancel: noop,
+        response: Promise.resolve({buffer: new ArrayBuffer(0)}),
+      };
+      const getAssetSpy = jest.spyOn(apiClient.api.asset, 'getAsset').mockReturnValue(request);
+      const assetData = {
+        assetKey: uuidv4(),
+        assetDomain: 'asset-server.test.wire.com',
+        assetToken: 'asset-token',
+      };
+
+      assetService.downloadRawAsset(assetData, progressCallback);
+
+      expect(getAssetSpy).toHaveBeenCalledWith(
+        assetData.assetKey,
+        assetData.assetDomain,
+        assetData.assetToken,
+        progressCallback,
+      );
+      apiClient.disconnect();
+    });
+  });
+
   describe('"uploadAsset"', () => {
     let apiClient: APIClient;
 

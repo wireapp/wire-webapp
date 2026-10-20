@@ -30,33 +30,37 @@ import {CellsFolderListLoading} from './cellsFolderListLoading/cellsFolderListLo
 import {breadcrumbsWrapperStyles, listWrapperStyles} from './cellsFoldersListModalContent.styles';
 
 interface CellsFoldersListModalContentProps {
-  items: {id: string; name: string; path: string}[];
-  status: 'idle' | 'loading' | 'success' | 'error';
-  shouldShowLoadingSpinner: boolean;
   conversationName: string;
-  currentPath: string;
-  onPathChange: (path: string) => void;
+  destination: {
+    folders: {id: string; name: string; path: string}[];
+    status: 'idle' | 'loading' | 'success' | 'error';
+    shouldShowLoadingSpinner: boolean;
+    currentPath: string;
+    handlePathChange: (path: string) => void;
+    onChangeModalContent?: (content: 'move' | 'create') => void;
+    handleDestinationSelect?: (path: string) => void;
+    selectedDestinationPath?: string;
+    disabledDestinationPaths?: readonly string[];
+    disabledDestinationLabels?: Readonly<Record<string, string>>;
+  };
   getCurrentPathFromFolder?: (path: string) => string;
-  onChangeModalContent?: (content: 'move' | 'create') => void;
-  onSelectDestination?: (path: string) => void;
-  selectedDestinationPath?: string;
-  disabledDestinationPaths?: readonly string[];
-  disabledDestinationLabels?: Readonly<Record<string, string>>;
 }
 
 export const CellsFoldersListModalContent = ({
-  items,
-  status,
-  shouldShowLoadingSpinner,
   conversationName,
-  currentPath,
-  onPathChange,
+  destination: {
+    folders: items,
+    status,
+    shouldShowLoadingSpinner,
+    currentPath,
+    handlePathChange: onPathChange,
+    onChangeModalContent,
+    handleDestinationSelect: onSelectDestination,
+    selectedDestinationPath,
+    disabledDestinationPaths,
+    disabledDestinationLabels,
+  },
   getCurrentPathFromFolder,
-  onChangeModalContent,
-  onSelectDestination,
-  selectedDestinationPath,
-  disabledDestinationPaths,
-  disabledDestinationLabels,
 }: CellsFoldersListModalContentProps) => {
   const {translate} = useApplicationContext();
   const breadcrumbs = getBreadcrumbsFromPath({
