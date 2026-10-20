@@ -336,6 +336,64 @@ describe('CellsTable selection', () => {
     window.location.hash = originalHash;
   });
 
+  it('allows moving root files into a Drive folder', async () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files/wire-cells-web';
+    const user = userEvent.setup();
+    const onRefresh = jest.fn();
+    const repository = {
+      getAllNodes: jest.fn().mockResolvedValue({
+        Nodes: [{Type: 'COLLECTION', Uuid: 'destination-folder', Path: 'wire-cells-web/folder'}],
+      }),
+      moveNodes: jest.fn().mockResolvedValue({Status: 'Performed'}),
+    } as unknown as CellsRepository;
+    renderCellsTable({
+      cellsRepository: repository,
+      initialNodes: [
+        createNode({id: 'destination-folder', name: 'folder', path: 'wire-cells-web/folder'}),
+        createNode({
+          id: 'recording-one',
+          name: 'Recording one.mov',
+          path: 'wire-cells-web/Recording one.mov',
+          type: CellNodeType.FILE,
+        }),
+        createNode({
+          id: 'recording-two',
+          name: 'Recording two.mov',
+          path: 'wire-cells-web/Recording two.mov',
+          type: CellNodeType.FILE,
+        }),
+        createNode({id: 'test-docx', name: 'test.docx', path: 'wire-cells-web/test.docx', type: CellNodeType.FILE}),
+      ],
+      onRefresh,
+    });
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Recording one.mov'}));
+    await user.click(screen.getByRole('checkbox', {name: 'Select Recording two.mov'}));
+    await user.click(screen.getByRole('checkbox', {name: 'Select test.docx'}));
+    await user.click(screen.getByRole('button', {name: 'Move'}));
+    const preview = await screen.findByRole('dialog');
+    await user.click(await within(preview).findByRole('button', {name: 'folder'}));
+
+    expect(within(preview).getByText('Current destination: Drive / folder')).toBeInTheDocument();
+    const moveButton = within(preview).getByRole('button', {name: 'Move'});
+    expect(moveButton).toBeEnabled();
+
+    await user.click(moveButton);
+    await waitFor(() => {
+      expect(repository.moveNodes).toHaveBeenCalledWith({
+        currentPaths: [
+          'wire-cells-web/Recording one.mov',
+          'wire-cells-web/Recording two.mov',
+          'wire-cells-web/test.docx',
+        ],
+        targetPath: 'conversation-id@example.com/wire-cells-web/folder',
+      });
+    });
+    expect(onRefresh).toHaveBeenCalledTimes(1);
+    window.location.hash = originalHash;
+  });
+
   it('moves to the drive root from a nested route, refreshes after Performed, and closes the preview', async () => {
     const originalHash = window.location.hash;
     window.location.hash = '#/conversation/conversation-id@example.com/files/wire-cells-web/Marketing images';
