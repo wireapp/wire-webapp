@@ -30,31 +30,35 @@ import {CellsFolderListLoading} from './cellsFolderListLoading/cellsFolderListLo
 import {breadcrumbsWrapperStyles, listWrapperStyles} from './cellsFoldersListModalContent.styles';
 
 interface CellsFoldersListModalContentProps {
-  items: {id: string; name: string; path: string}[];
-  status: 'idle' | 'loading' | 'success' | 'error';
-  shouldShowLoadingSpinner: boolean;
   conversationName: string;
-  currentPath: string;
-  onPathChange: (path: string) => void;
-  onChangeModalContent: (content: 'move' | 'create') => void;
-  onSelectDestination?: (path: string) => void;
-  selectedDestinationPath?: string;
-  disabledDestinationPaths?: readonly string[];
-  disabledDestinationLabels?: Readonly<Record<string, string>>;
+  destination: {
+    folders: {id: string; name: string; path: string}[];
+    status: 'idle' | 'loading' | 'success' | 'error';
+    shouldShowLoadingSpinner: boolean;
+    currentPath: string;
+    handlePathChange: (path: string) => void;
+    onChangeModalContent?: (content: 'move' | 'create') => void;
+    handleDestinationSelect?: (path: string) => void;
+    selectedDestinationPath?: string;
+    disabledDestinationPaths?: readonly string[];
+    disabledDestinationLabels?: Readonly<Record<string, string>>;
+  };
 }
 
 export const CellsFoldersListModalContent = ({
-  items,
-  status,
-  shouldShowLoadingSpinner,
   conversationName,
-  currentPath,
-  onPathChange,
-  onChangeModalContent,
-  onSelectDestination,
-  selectedDestinationPath,
-  disabledDestinationPaths,
-  disabledDestinationLabels,
+  destination: {
+    folders: items,
+    status,
+    shouldShowLoadingSpinner,
+    currentPath,
+    handlePathChange: onPathChange,
+    onChangeModalContent,
+    handleDestinationSelect: onSelectDestination,
+    selectedDestinationPath,
+    disabledDestinationPaths,
+    disabledDestinationLabels,
+  },
 }: CellsFoldersListModalContentProps) => {
   const {translate} = useApplicationContext();
   const breadcrumbs = getBreadcrumbsFromPath({
@@ -105,11 +109,13 @@ export const CellsFoldersListModalContent = ({
           />
         )}
       </div>
-      <CellsCreateNewFolderHint
-        onCreate={() => {
-          return onChangeModalContent('create');
-        }}
-      />
+      {onChangeModalContent !== undefined && (
+        <CellsCreateNewFolderHint
+          onCreate={() => {
+            return onChangeModalContent('create');
+          }}
+        />
+      )}
     </>
   );
 };

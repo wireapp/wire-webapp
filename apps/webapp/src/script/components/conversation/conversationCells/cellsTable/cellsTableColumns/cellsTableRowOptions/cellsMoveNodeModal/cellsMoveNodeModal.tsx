@@ -136,13 +136,15 @@ const FlaggedCellsMoveNodeModal = ({
       {activeModalContent === 'move' ? (
         <>
           <CellsFoldersListModalContent
-            items={folders}
-            status={status}
-            shouldShowLoadingSpinner={shouldShowLoadingSpinner}
             conversationName={conversationName}
-            currentPath={currentPath}
-            onPathChange={setCurrentPath}
-            onChangeModalContent={setActiveModalContent}
+            destination={{
+              folders,
+              status,
+              shouldShowLoadingSpinner,
+              currentPath,
+              handlePathChange: setCurrentPath,
+              onChangeModalContent: setActiveModalContent,
+            }}
           />
           {moveNodeStatus === 'error' && <p role="alert">{translate('cells.newItemMenuModalForm.genericError')}</p>}
           <CellsModal.Actions>
