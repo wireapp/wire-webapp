@@ -128,7 +128,9 @@ const preventAdminLessGroupsConfigSchema = z.object({
  * Helper to create a feature schema that includes both base fields
  * (status, lockStatus, ttl) and a feature-specific config object.
  */
-const createFeatureSchemaWithConfig = <TConfig extends z.ZodTypeAny>(featureSpecificConfigSchema: TConfig) => {
+const createFeatureSchemaWithConfig = <TConfig extends z.ZodTypeAny>(
+  featureSpecificConfigSchema: TConfig,
+): z.ZodObject<typeof baseFeatureWithoutConfigSchema.shape & {config: TConfig}, 'strip'> => {
   return baseFeatureWithoutConfigSchema.extend({
     config: featureSpecificConfigSchema,
   });

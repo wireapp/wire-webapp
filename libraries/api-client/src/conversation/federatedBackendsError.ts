@@ -50,7 +50,7 @@ export function isFederatedBackendsError(error: unknown): error is FederatedBack
   return isString(error.name) && error.name === 'FederatedBackendsError';
 }
 
-export function handleFederationErrors(error: AxiosError<any>) {
+export function handleFederationErrors(error: AxiosError<any>): void {
   switch (error.response?.status) {
     case FederatedBackendsErrorCode.UNREACHABLE: {
       throw new FederatedBackendsError(

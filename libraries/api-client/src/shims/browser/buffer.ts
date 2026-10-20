@@ -37,10 +37,10 @@ export const bufferToString = (buffer: ArrayBuffer): string => {
   return binaryString;
 };
 
-export const base64MD5FromBuffer = (buffer: ArrayBuffer) => {
+export const base64MD5FromBuffer = (buffer: ArrayBuffer): string => {
   return window.btoa(SparkMD5.ArrayBuffer.hash(buffer, true));
 };
 
-export const concatToBuffer = (...items: any[]) => {
+export const concatToBuffer = (...items: any[]): Blob => {
   return new Blob(items);
 };

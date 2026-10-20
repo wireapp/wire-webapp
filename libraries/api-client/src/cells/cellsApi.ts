@@ -121,7 +121,7 @@ export class CellsAPI {
     cellsConfig: CellsConfig;
     httpClient?: HttpClient;
     storageService?: CellsStorage;
-  }) {
+  }): void {
     const http = httpClient !== undefined ? httpClient : this.getHttpClient({cellsConfig});
 
     this.storageService =
@@ -134,7 +134,7 @@ export class CellsAPI {
     this.client = new NodeServiceApi(undefined, undefined, http.client);
   }
 
-  private getHttpClient({cellsConfig}: {cellsConfig: CellsConfig}) {
+  private getHttpClient({cellsConfig}: {cellsConfig: CellsConfig}): HttpClient {
     const baseHttpClientConfig = {
       ...this.httpClientConfig,
       urls: {...this.httpClientConfig.urls, rest: cellsConfig.pydio.url + cellsConfig.pydio.segment},

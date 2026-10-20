@@ -55,7 +55,7 @@ const conversationApi = new ConversationAPI(client, {
   supportsMLS: true,
 });
 
-const generateQualifiedId = () => {
+const generateQualifiedId = (): {domain: string; id: ReturnType<typeof randomUUID>} => {
   return {domain, id: randomUUID()};
 };
 

@@ -156,7 +156,7 @@ export function createPartysocketCompatibleWebSocketConstructor(
         return;
       }
 
-      const wrappedListener = (event: Event) => {
+      const wrappedListener = (event: Event): void => {
         listener(normalizeMessageEventForPartysocket(event));
       };
       wrappedMessageListeners.set(listener as WebSocketEventListener, wrappedListener);
@@ -279,7 +279,7 @@ export class ReconnectingWebsocket {
     });
   };
 
-  private readonly internalOnError = (error: ErrorEvent) => {
+  private readonly internalOnError = (error: ErrorEvent): void => {
     const reconnectContext = this.getReconnectContext();
     const errorEvent = error as ErrorEvent & {readonly error?: unknown; readonly message?: unknown};
     let errorCandidate: unknown = errorEvent;
@@ -297,7 +297,7 @@ export class ReconnectingWebsocket {
     }
   };
 
-  private readonly internalOnMessage = (event: MessageEvent) => {
+  private readonly internalOnMessage = (event: MessageEvent): void => {
     const data = buffer.bufferToString(event.data);
 
     if (data === PingMessage.PONG) {
@@ -318,7 +318,7 @@ export class ReconnectingWebsocket {
     this.onMessage?.(data);
   };
 
-  private readonly internalOnOpen = (event: Event) => {
+  private readonly internalOnOpen = (event: Event): void => {
     const reconnectContext = this.getReconnectContext();
     const durationInMilliseconds = this.getActiveAttemptDurationInMilliseconds();
     this.logger.info(
@@ -381,7 +381,7 @@ export class ReconnectingWebsocket {
     return websocketUrl;
   };
 
-  private readonly internalOnClose = (event: CloseEvent) => {
+  private readonly internalOnClose = (event: CloseEvent): void => {
     const reason = Boolean(event?.reason) ? StringUtil.formatSafeLogValue(event.reason) : 'none';
     this.logger.info(
       `[WebSocketLifecycle] event=socket-close ${this.getActiveLifecycleContext()} state=${getWebSocketStateName(this.getState())} code=${event?.code ?? 'unknown'} wasClean=${event?.wasClean ?? 'unknown'} durationMs=${this.getActiveAttemptDurationInMilliseconds()} reason=${reason}`,
@@ -635,7 +635,7 @@ export class ReconnectingWebsocket {
         resolve(false);
       }, timeoutMs);
 
-      const resolveHealthCheck = (isHealthy: boolean) => {
+      const resolveHealthCheck = (isHealthy: boolean): void => {
         this.options.wallClock.clearTimeout(timeoutId);
         resolve(isHealthy);
       };
@@ -693,7 +693,7 @@ export class ReconnectingWebsocket {
     });
   }
 
-  private resolvePendingHealthChecks(isHealthy: boolean) {
+  private resolvePendingHealthChecks(isHealthy: boolean): void {
     this.pendingHealthChecks.forEach(resolve => {
       resolve(isHealthy);
     });

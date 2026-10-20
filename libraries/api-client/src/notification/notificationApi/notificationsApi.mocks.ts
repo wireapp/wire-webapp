@@ -82,7 +82,7 @@ const client = new HttpClient(testConfig, mockedAccessTokenStore as AccessTokenS
 
 const notificationAPI = new NotificationAPI(client);
 
-const getAllNotificationsResult = () => {
+const getAllNotificationsResult = (): ReturnType<NotificationAPI['getAllNotifications']> => {
   return notificationAPI.getAllNotifications(mockedClientId, mockedNotificationId);
 };
 

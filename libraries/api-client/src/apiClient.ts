@@ -216,7 +216,7 @@ export class APIClient extends EventEmitter {
       wallClock: this.config.wallClock,
     });
 
-    const onInvalidCredentials = async (error: InvalidTokenError | MissingCookieError) => {
+    const onInvalidCredentials = async (error: InvalidTokenError | MissingCookieError): Promise<void> => {
       try {
         await this.logout({skipLogoutRequest: true});
       } finally {
