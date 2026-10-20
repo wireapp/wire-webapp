@@ -23,7 +23,7 @@ import {Encoder} from 'bazinga64';
 
 import {ErrorType, MlsErrorType} from '@wireapp/core-crypto';
 
-import {createDefaultMlsErrorMapper} from './mlsErrorMapper';
+import {createDefaultMlsErrorMapper, DomainMlsError} from './mlsErrorMapper';
 
 import {
   CORE_CRYPTO_ERROR_NAMES,
@@ -36,7 +36,7 @@ const id: QualifiedId = {id: 'conv-id', domain: 'wire.test'};
 const groupIdBase64 = Encoder.toBase64(new Uint8Array([1, 2, 3, 4])).asString;
 
 const mapper = createDefaultMlsErrorMapper();
-function map(error: unknown, extra?: {groupId?: string}) {
+function map(error: unknown, extra?: {groupId?: string}): DomainMlsError {
   return mapper.map(error, {qualifiedConversationId: id, groupId: extra?.groupId});
 }
 

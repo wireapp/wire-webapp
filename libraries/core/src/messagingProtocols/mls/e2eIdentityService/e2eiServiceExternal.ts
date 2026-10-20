@@ -76,7 +76,7 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     return data !== undefined;
   }
 
-  public clearAllProgress() {
+  public clearAllProgress(): Promise<void> {
     return this.enrollmentStorage.deletePendingEnrollmentData();
   }
 
@@ -322,7 +322,7 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     const INTERMEDIATE_CA_KEY = 'update-intermediate-certificates';
     const hasPendingTask = await this.recurringTaskScheduler.hasTask(INTERMEDIATE_CA_KEY);
 
-    const task = () => {
+    const task = (): Promise<void> => {
       return this.registerCrossSignedCertificates(this.acmeService);
     };
 

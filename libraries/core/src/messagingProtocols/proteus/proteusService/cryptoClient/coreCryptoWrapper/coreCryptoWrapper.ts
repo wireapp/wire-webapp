@@ -38,7 +38,7 @@ import {PrekeyTracker} from './prekeysTracker';
 
 import {CorruptedKeyError, GeneratedKey} from '../../../../../secretStore/secretKeyGenerator';
 import {CoreCryptoConfig} from '../../../../common.types';
-import {CryptoClient} from '../cryptoClient.types';
+import {CryptoClient, InitialPrekeys} from '../cryptoClient.types';
 
 type SecretKeySizeInBytes = 16 | 32;
 const legacySecretKeySizeInBytes = 16;
@@ -75,7 +75,7 @@ const getKey = async (
   generateSecretKey: Config['generateSecretKey'],
   keyName: string,
   keySize: SecretKeySizeInBytes,
-) => {
+): Promise<GeneratedKey> => {
   return await generateSecretKey(keyName, keySize);
 };
 
@@ -197,23 +197,23 @@ export class CoreCryptoWrapper implements CryptoClient {
     this.prekeyTracker = new PrekeyTracker(this, config);
   }
 
-  getNativeClient() {
+  getNativeClient(): CoreCrypto {
     return this.coreCrypto;
   }
 
-  encrypt(sessions: string[], plainText: Uint8Array) {
+  encrypt(sessions: string[], plainText: Uint8Array): Promise<Map<string, Uint8Array>> {
     return this.coreCrypto.transaction(cx => {
       return cx.proteusEncryptBatched(sessions, plainText);
     });
   }
 
-  decrypt(sessionId: string, message: Uint8Array) {
+  decrypt(sessionId: string, message: Uint8Array): Promise<Uint8Array> {
     return this.coreCrypto.transaction(cx => {
       return cx.proteusDecrypt(sessionId, message);
     });
   }
 
-  init(nbInitialPrekeys?: number) {
+  init(nbInitialPrekeys?: number): Promise<void> {
     if (nbInitialPrekeys !== undefined) {
       this.prekeyTracker.setInitialState(nbInitialPrekeys);
     }
@@ -222,7 +222,7 @@ export class CoreCryptoWrapper implements CryptoClient {
     });
   }
 
-  async create(nbPrekeys: number, entropy?: Uint8Array) {
+  async create(nbPrekeys: number, entropy?: Uint8Array): Promise<InitialPrekeys> {
     if (entropy !== undefined) {
       await this.coreCrypto.reseedRng(entropy);
     }
@@ -245,59 +245,59 @@ export class CoreCryptoWrapper implements CryptoClient {
     };
   }
 
-  public setMaxLogLevel(level: CoreCryptoLogLevel) {
+  public setMaxLogLevel(level: CoreCryptoLogLevel): void {
     setMaxLogLevel(level);
   }
 
-  getFingerprint() {
+  getFingerprint(): Promise<string> {
     return this.coreCrypto.proteusFingerprint();
   }
 
-  getRemoteFingerprint(sessionId: string) {
+  getRemoteFingerprint(sessionId: string): Promise<string> {
     return this.coreCrypto.proteusFingerprintRemote(sessionId);
   }
 
-  async sessionFromMessage(sessionId: string, message: Uint8Array) {
+  async sessionFromMessage(sessionId: string, message: Uint8Array): Promise<Uint8Array> {
     await this.consumePrekey(); // we need to mark a prekey as consumed since if we create a session from a message, it means the sender has consumed one of our prekeys
     return this.coreCrypto.transaction(cx => {
       return cx.proteusSessionFromMessage(sessionId, message);
     });
   }
 
-  sessionFromPrekey(sessionId: string, prekey: Uint8Array) {
+  sessionFromPrekey(sessionId: string, prekey: Uint8Array): Promise<void> {
     return this.coreCrypto.transaction(cx => {
       return cx.proteusSessionFromPrekey(sessionId, prekey);
     });
   }
 
-  sessionExists(sessionId: string) {
+  sessionExists(sessionId: string): Promise<boolean> {
     return this.coreCrypto.proteusSessionExists(sessionId);
   }
 
-  saveSession(sessionId: string) {
+  saveSession(sessionId: string): Promise<void> {
     return this.coreCrypto.transaction(cx => {
       return cx.proteusSessionSave(sessionId);
     });
   }
 
-  deleteSession(sessionId: string) {
+  deleteSession(sessionId: string): Promise<void> {
     return this.coreCrypto.transaction(cx => {
       return cx.proteusSessionDelete(sessionId);
     });
   }
 
-  consumePrekey() {
+  consumePrekey(): Promise<void> {
     return this.prekeyTracker.consumePrekey();
   }
 
-  async newPrekey() {
+  async newPrekey(): Promise<PreKey> {
     const {id, pkb} = await this.coreCrypto.transaction(cx => {
       return cx.proteusNewPrekeyAuto();
     });
     return {id, key: Encoder.toBase64(pkb).asString};
   }
 
-  async debugBreakSession(sessionId: string) {
+  async debugBreakSession(sessionId: string): Promise<void> {
     /* eslint-disable @typescript-eslint/no-magic-numbers -- Encoded prekey bytes are clearer as an exact wire-format sequence. */
     const fakePrekey = [
       165, 0, 1, 1, 24, 57, 2, 161, 0, 88, 32, 212, 202, 30, 83, 242, 93, 67, 164, 202, 137, 214, 167, 166, 183, 236,

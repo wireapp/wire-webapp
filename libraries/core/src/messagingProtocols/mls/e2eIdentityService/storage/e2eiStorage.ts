@@ -21,10 +21,16 @@ import {EnrollmentFlowData} from './e2eiStorage.schema';
 
 import {CoreDatabase} from '../../../../storage/coreDb';
 
+type E2EIEnrollmentStorage = {
+  getPendingEnrollmentData(): Promise<EnrollmentFlowData | undefined>;
+  savePendingEnrollmentData(data: EnrollmentFlowData): Promise<void>;
+  deletePendingEnrollmentData(): Promise<void>;
+};
+
 const PENDING_ENROLLMENT_TABLE = 'pendingEnrollmentData';
 const STORAGE_KEY = 'data';
 
-export function createE2EIEnrollmentStorage(coreDB: CoreDatabase) {
+export function createE2EIEnrollmentStorage(coreDB: CoreDatabase): E2EIEnrollmentStorage {
   return {
     async getPendingEnrollmentData(): Promise<EnrollmentFlowData | undefined> {
       return coreDB.get(PENDING_ENROLLMENT_TABLE, STORAGE_KEY);
