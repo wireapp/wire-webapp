@@ -767,7 +767,7 @@ describe('CellsTable selection', () => {
         .mockResolvedValueOnce({Status: 'Running'})
         .mockResolvedValueOnce({Status: 'Finished'}),
     } as unknown as CellsRepository;
-    renderCellsTable({cellsRepository: repository, onRefresh, clock});
+    const {rerenderWithSelectionScope} = renderCellsTable({cellsRepository: repository, onRefresh, clock});
 
     await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
     await user.click(screen.getByRole('button', {name: 'Move'}));
@@ -778,9 +778,19 @@ describe('CellsTable selection', () => {
     });
     await user.click(within(dialog).getByRole('button', {name: 'cells.moveNodeModal.cancelButton'}));
     expect(screen.getByText(/Move status is unresolved/)).toBeInTheDocument();
+
+    rerenderWithSelectionScope('conversation:/files/subfolder');
+    rerenderWithSelectionScope('conversation:/files');
+    rerenderWithSelectionScope('conversation:/files', false);
+    rerenderWithSelectionScope('conversation:/files', true);
+    expect(screen.getByText(/Move status is unresolved/)).toBeInTheDocument();
+
+    fireEvent.click(screen.getAllByRole('checkbox')[0]);
+    expect(screen.getByText('1 selected')).toBeInTheDocument();
     await user.click(screen.getByRole('button', {name: 'Move'}));
     const reopenedDialog = await screen.findByRole('dialog');
     expect(within(reopenedDialog).getByRole('button', {name: 'Move'})).toBeDisabled();
+    expect(repository.moveNodes).toHaveBeenCalledTimes(1);
     await user.click(within(reopenedDialog).getByRole('button', {name: 'cells.moveNodeModal.cancelButton'}));
 
     await act(async () => {
