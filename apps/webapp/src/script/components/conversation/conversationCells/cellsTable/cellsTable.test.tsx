@@ -473,6 +473,9 @@ describe('CellsTable selection', () => {
 
     rerenderWithSelectionScope('conversation:/subfolder');
     expect(screen.getByText(/Move status is unresolved/)).toBeInTheDocument();
+    rerenderWithSelectionScope('conversation:/subfolder', false);
+    rerenderWithSelectionScope('conversation:/subfolder', true);
+    expect(screen.getByText(/Move status is unresolved/)).toBeInTheDocument();
     expect(repository.moveNodes).toHaveBeenCalledTimes(1);
     window.location.hash = originalHash;
   });
