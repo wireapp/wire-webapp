@@ -179,6 +179,10 @@ export class CellsRepository {
     return this.apiClient.api.cells.moveNode({currentPath, targetPath});
   }
 
+  async moveNodes({currentPaths, targetPath}: {currentPaths: string[]; targetPath: string}) {
+    return this.apiClient.api.cells.moveNodes({currentPaths, targetPath});
+  }
+
   async getAllNodes({
     path,
     limit = DEFAULT_MAX_FILES_LIMIT,

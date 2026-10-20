@@ -24,6 +24,7 @@ import {CellNode} from 'src/script/types/cellNode';
 
 import {CellsBulkMovePreviewPresentation} from './cellsBulkMovePreviewPresentation';
 import {useBulkMoveDestinationSelection} from './useBulkMoveDestinationSelection';
+import {useMoveSelectedCellsNodes} from './useMoveSelectedCellsNodes';
 
 interface CellsBulkMovePreviewModalProps {
   isOpen: boolean;
@@ -48,14 +49,30 @@ export const CellsBulkMovePreviewModal = ({
     cellsRepository,
     conversationQualifiedId,
   });
+  const move = useMoveSelectedCellsNodes({
+    conversationQualifiedId,
+    destinationPath: destination.selectedDestinationPath,
+    selectedNodes,
+    cellsRepository,
+  });
+  const handleClose = (): void => {
+    if (move.isSubmitting) {
+      return;
+    }
+
+    onClose();
+  };
 
   return (
     <CellsBulkMovePreviewPresentation
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={handleClose}
       selectedNodes={selectedNodes}
       conversationName={conversationName}
       destination={destination}
+      onMove={move.submitMove}
+      isMoveDisabled={!move.isValid || move.isSubmitting || destination.status !== 'success'}
+      isMoveLoading={move.isSubmitting}
     />
   );
 };
