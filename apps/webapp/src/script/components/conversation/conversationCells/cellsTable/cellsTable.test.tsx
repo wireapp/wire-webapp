@@ -399,7 +399,7 @@ describe('CellsTable selection', () => {
       getAllNodes: jest.fn().mockResolvedValue({Nodes: []}),
       moveNodes: jest.fn().mockResolvedValue(backgroundResponse),
     } as unknown as CellsRepository;
-    renderCellsTable({
+    const {rerenderWithSelectionScope} = renderCellsTable({
       cellsRepository: repository,
       folderPath: 'wire-cells-web/Marketing images',
       onRefresh,
@@ -414,6 +414,16 @@ describe('CellsTable selection', () => {
       expect(onRefresh).not.toHaveBeenCalled();
       expect(screen.getByRole('dialog')).toBeInTheDocument();
     });
+    expect(repository.moveNodes).toHaveBeenCalledTimes(1);
+    expect(onRefresh).not.toHaveBeenCalled();
+    expect(within(dialog).getByRole('button', {name: 'Move'})).toBeDisabled();
+    expect(screen.getAllByText(/Move status is unresolved/)).toHaveLength(2);
+
+    rerenderWithSelectionScope('conversation:/subfolder');
+    expect(screen.getByText(/Move status is unresolved/)).toBeInTheDocument();
+    rerenderWithSelectionScope('conversation:/subfolder', false);
+    rerenderWithSelectionScope('conversation:/subfolder', true);
+    expect(screen.getByText(/Move status is unresolved/)).toBeInTheDocument();
     window.location.hash = originalHash;
   });
 

@@ -154,8 +154,6 @@ export const CellsTable = ({
   useEffect(() => {
     setSelectedNodeIds(new Set());
     setIsBulkMovePreviewOpen(false);
-    setIsBulkMoveOutcomeUnresolved(false);
-    setIsBulkMoveRequestError(false);
   }, [selectionScopeKey, isSelectionEnabled]);
 
   const handleBulkMoveRequestError = (): void => {
