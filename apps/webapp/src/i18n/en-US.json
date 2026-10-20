@@ -393,6 +393,7 @@
   "cells.bulkMove.drive": "Drive",
   "cells.bulkMove.moveButton": "Move",
   "cells.bulkMove.movingButton": "Moving",
+  "cells.bulkMove.outcomeUnresolved": "Move status is unresolved. Verify the Drive before trying again.",
   "cells.bulkMove.previewDescription": "Choose a destination in this conversation’s Drive, then move the selected items.",
   "cells.bulkMove.previewTitle": "Preview move of {count} items",
   "cells.bulkMove.previewTitleSingular": "Preview move of 1 item",
