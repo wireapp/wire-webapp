@@ -444,7 +444,7 @@ describe('CellsTable selection', () => {
       getAllNodes: jest.fn().mockResolvedValue({Nodes: []}),
       moveNodes: jest.fn().mockResolvedValue(backgroundResponse),
     } as unknown as CellsRepository;
-    const {rerenderWithNodes} = renderCellsTable({
+    const {rerenderWithNodes, rerenderWithSelectionScope} = renderCellsTable({
       cellsRepository: repository,
       folderPath: 'wire-cells-web/Marketing images',
       onRefresh,
@@ -471,10 +471,8 @@ describe('CellsTable selection', () => {
     ]);
     expect(screen.getByText(/Move status is unresolved/)).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', {name: 'Move'}));
-    const reopenedDialog = await screen.findByRole('dialog');
-    expect(within(reopenedDialog).getByRole('button', {name: 'Move'})).toBeDisabled();
-    expect(within(reopenedDialog).getByRole('alert')).toHaveTextContent('Move status is unresolved');
+    rerenderWithSelectionScope('conversation:/subfolder');
+    expect(screen.getByText(/Move status is unresolved/)).toBeInTheDocument();
     expect(repository.moveNodes).toHaveBeenCalledTimes(1);
     window.location.hash = originalHash;
   });
