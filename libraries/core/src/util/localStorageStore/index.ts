@@ -17,11 +17,18 @@
  *
  */
 
-const prependKey = (key: string, pKey: string) => {
+const prependKey = (key: string, pKey: string): string => {
   return `${pKey}_${key}`;
 };
 
-export const LocalStorageStore = <T = string>(pKey: string) => {
+export const LocalStorageStore = <T = string>(
+  pKey: string,
+): {
+  get: (key: string) => T | undefined;
+  add: (key: string, value: T) => void;
+  remove: (key: string) => void;
+  has: (key: string) => boolean;
+} => {
   return {
     get: (key: string): T | undefined => {
       const value = localStorage.getItem(prependKey(key, pKey));

@@ -39,7 +39,7 @@ const activeTimeouts: Record<string, NodeJS.Timeout> = {};
  * @param firingDate execution date
  * @param key unique key for the task
  */
-const addTask = ({task, firingDate, key, persist = false}: ScheduleTaskParams) => {
+const addTask = ({task, firingDate, key, persist = false}: ScheduleTaskParams): void => {
   const now = Date.now();
   const execute = new Date(firingDate);
   const delay = execute.getTime() - now;
@@ -75,7 +75,7 @@ const addTask = ({task, firingDate, key, persist = false}: ScheduleTaskParams) =
  *
  * @param key unique key for the task
  */
-const cancelTask = (key: string) => {
+const cancelTask = (key: string): void => {
   const timeout = activeTimeouts[key];
   if (timeout !== undefined) {
     clearTimeout(timeout);
@@ -89,14 +89,14 @@ const cancelTask = (key: string) => {
  * @param task function to be executed
  * @param key unique key for the task
  */
-const continueTask = ({key, task}: Omit<ScheduleTaskParams, 'firingDate' | 'persist'>) => {
+const continueTask = ({key, task}: Omit<ScheduleTaskParams, 'firingDate' | 'persist'>): void => {
   const activeTaskEndTime = TaskSchedulerStore.get(key);
   if (activeTaskEndTime !== undefined) {
     addTask({task, firingDate: activeTaskEndTime, key, persist: true});
   }
 };
 
-const hasActiveTask = (key: string) => {
+const hasActiveTask = (key: string): boolean => {
   return activeTimeouts[key] !== undefined;
 };
 

@@ -66,7 +66,7 @@ export class RecurringTaskScheduler {
     const firingDate = (await this.storage.get(key)) ?? Date.now() + every;
     await this.storage.set(key, firingDate);
 
-    const executeTask = async () => {
+    const executeTask = async (): Promise<void> => {
       if (this.executingTaskKeys.has(key)) {
         return;
       }
@@ -105,7 +105,7 @@ export class RecurringTaskScheduler {
     if (this.windowFocusTaskKeys.has(key) && typeof window !== 'undefined') {
       this.removeWindowFocusListener(key);
 
-      const focusHandler = () => {
+      const focusHandler = (): void => {
         if (this.executingTaskKeys.has(key)) {
           return;
         }
