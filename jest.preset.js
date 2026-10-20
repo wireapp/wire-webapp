@@ -10,7 +10,7 @@ module.exports = {
   ],
   transform: {
     '^.+\\.(ts|tsx)$': '@swc/jest',
-    '^.+\\.(js|jsx)$': 'babel-jest',
+    '^.+\\.(js|jsx)$': '@swc/jest',
   },
   transformIgnorePatterns: ['/node_modules/(?!(true-myth|p-timeout|p-cancelable|@sindresorhus/is)/)'],
   moduleFileExtensions: ['js', 'json', 'ts', 'tsx'],
