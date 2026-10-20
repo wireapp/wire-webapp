@@ -137,7 +137,7 @@ export class CopyConfig {
       return true;
     };
 
-    const isGlob = (path: string) => {
+    const isGlob = (path: string): boolean => {
       return /\*$/.test(path);
     };
 

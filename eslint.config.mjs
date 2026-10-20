@@ -850,7 +850,13 @@ const testLinterOptions = {
   reportUnusedInlineConfigs: 'error',
 };
 
-const explicitFunctionReturnTypeFilePatterns = ['libraries/config/**/*.{ts,tsx,mts,cts}'];
+const explicitFunctionReturnTypeFilePatterns = [
+  'libraries/bazinga64/**/*.{ts,tsx,mts,cts}',
+  'libraries/certificate-check/**/*.{ts,tsx,mts,cts}',
+  'libraries/config/**/*.{ts,tsx,mts,cts}',
+  'libraries/copy-config/**/*.{ts,tsx,mts,cts}',
+  'libraries/priority-queue/**/*.{ts,tsx,mts,cts}',
+];
 
 const config = [
   {ignores},
