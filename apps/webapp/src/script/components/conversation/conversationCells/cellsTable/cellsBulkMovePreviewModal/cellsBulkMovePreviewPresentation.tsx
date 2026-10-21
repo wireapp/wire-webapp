@@ -61,7 +61,13 @@ export const CellsBulkMovePreviewPresentation = ({
       <p aria-live="polite">
         {translate('cells.bulkMove.currentDestination', {destination: destination.currentDestination})}
       </p>
-      <CellsFoldersListModalContent conversationName={conversationName} destination={destination} />
+      <CellsFoldersListModalContent
+        conversationName={conversationName}
+        destination={destination}
+        getCurrentPathFromFolder={path => {
+          return path;
+        }}
+      />
       <CellsModal.Actions>
         <CellsModal.SecondaryButton onClick={onClose}>
           {translate('cells.moveNodeModal.cancelButton')}
