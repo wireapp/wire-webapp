@@ -19,14 +19,14 @@
  *
  */
 
-import {appendFileSync} from 'node:fs';
-
 import {Maybe} from 'true-myth';
 
+import {appendFileSync} from 'node:fs';
+
 import {readBuildArtifactHtmlDocuments, readBuildArtifactMetadata} from './buildArtifactArchive.ts';
-import {formatRecoverableBuildArtifactMetadataOutputs} from './recoveryBuildArtifactMetadataOutput.ts';
-import {validateRecoveryBuildArtifactMetadata} from './recoveryBuildArtifactMetadata.ts';
 import type {RecoverableBuildMetadata} from './recoveryBuildArtifactMetadata.ts';
+import {validateRecoveryBuildArtifactMetadata} from './recoveryBuildArtifactMetadata.ts';
+import {formatRecoverableBuildArtifactMetadataOutputs} from './recoveryBuildArtifactMetadataOutput.ts';
 
 function readRequiredEnvironmentValue(environmentVariableName: string): string {
   const environmentValue = Maybe.of<string>(process.env[environmentVariableName]).andThen(value => {
@@ -83,7 +83,7 @@ function run(): void {
     const metadata = validateArtifact();
 
     writeMetadataOutputs(metadata);
-    console.log(JSON.stringify(metadata.metadata));
+    console.info(JSON.stringify(metadata.metadata));
   } catch (error: unknown) {
     console.error(error);
     process.exitCode = 1;
