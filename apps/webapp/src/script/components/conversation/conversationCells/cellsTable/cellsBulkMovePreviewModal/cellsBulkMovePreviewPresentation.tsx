@@ -43,6 +43,11 @@ interface CellsBulkMovePreviewPresentationProps {
   isMoveRequestError: boolean;
   isMoveDisabled: boolean;
   isMoveLoading: boolean;
+  isBackgroundMoveError: boolean;
+  isBackgroundMoveStatusUnknown: boolean;
+  canRetryBackgroundMoveStatus: boolean;
+  onRetryBackgroundMoveStatus: () => void;
+  onRefresh: () => void;
 }
 
 export const CellsBulkMovePreviewPresentation: FunctionComponent<CellsBulkMovePreviewPresentationProps> = ({
@@ -58,6 +63,11 @@ export const CellsBulkMovePreviewPresentation: FunctionComponent<CellsBulkMovePr
   isMoveRequestError,
   isMoveDisabled,
   isMoveLoading,
+  isBackgroundMoveError,
+  isBackgroundMoveStatusUnknown,
+  canRetryBackgroundMoveStatus,
+  onRetryBackgroundMoveStatus,
+  onRefresh,
 }: CellsBulkMovePreviewPresentationProps) => {
   const {translate} = useApplicationContext();
   const isCurrentDialog = useRef(true);
@@ -114,13 +124,34 @@ export const CellsBulkMovePreviewPresentation: FunctionComponent<CellsBulkMovePr
           return path;
         }}
       />
-      {isMoveOutcomeUnresolved && (
+      {isMoveOutcomeUnresolved && !isBackgroundMoveError && !isBackgroundMoveStatusUnknown && (
         <div role="alert">
           <p>
             {isMoveRequestError
               ? translate('cells.newItemMenuModalForm.genericError')
               : translate('cells.bulkMove.outcomeUnresolved')}
           </p>
+        </div>
+      )}
+      {isBackgroundMoveError && (
+        <div role="alert">
+          <p>{translate('cells.bulkMove.moveNeedsReview')}</p>
+          <button type="button" onClick={onRefresh}>
+            {translate('cells.bulkMove.refreshDrive')}
+          </button>
+        </div>
+      )}
+      {isBackgroundMoveStatusUnknown && (
+        <div role="alert">
+          <p>{translate('cells.bulkMove.statusUnknown')}</p>
+          {canRetryBackgroundMoveStatus && (
+            <button type="button" onClick={onRetryBackgroundMoveStatus}>
+              {translate('cells.bulkMove.checkStatus')}
+            </button>
+          )}
+          <button type="button" onClick={onRefresh}>
+            {translate('cells.bulkMove.refreshDrive')}
+          </button>
         </div>
       )}
       <CellsModal.Actions>

@@ -22,8 +22,9 @@ import {DragEvent, useEffect, useState, type FunctionComponent} from 'react';
 import {isNonEmptyString} from '@sindresorhus/is';
 import {flexRender, getCoreRowModel, type Header, useReactTable} from '@tanstack/react-table';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
-import {RestActionStatus, type RestPerformActionResponse} from 'cells-sdk-ts';
+import {JobsTaskStatus, RestActionStatus, type RestPerformActionResponse} from 'cells-sdk-ts';
 import {createPortal} from 'react-dom';
+import {task} from 'true-myth';
 
 import {UploadIcon} from '@wireapp/react-ui-kit';
 
@@ -84,6 +85,7 @@ interface CellsTableProps {
   selectionEnabled: boolean;
   selectionScopeKey: string;
   selectionBarAnchor: HTMLElement | null;
+  random?: () => number;
 }
 
 interface CellsTableHeaderCellProps {
@@ -122,7 +124,13 @@ const preventDefaultFileDrop = (event: DragEvent<HTMLElement>): void => {
   event.stopPropagation();
 };
 
-export const CellsTable: FunctionComponent<CellsTableProps> = ({
+const BACKGROUND_MOVE_STATUS_POLL_INTERVAL_MS = 1000;
+const BACKGROUND_MOVE_STATUS_RETRY_BACKOFF_FACTOR = 2;
+const BACKGROUND_MOVE_STATUS_RETRY_MIN_JITTER_FACTOR = 0.75;
+const BACKGROUND_MOVE_STATUS_RETRY_MAX_JITTER_FACTOR = 1.25;
+const MAX_BACKGROUND_MOVE_STATUS_RETRIES = 5;
+
+export const CellsTable = ({
   nodes,
   cellsRepository,
   conversation,
@@ -140,14 +148,21 @@ export const CellsTable: FunctionComponent<CellsTableProps> = ({
   selectionEnabled,
   selectionScopeKey,
   selectionBarAnchor,
-}: CellsTableProps) => {
-  const {translate, isFeatureToggleEnabled} = useApplicationContext();
+  random = Math.random,
+}: CellsTableProps): ReturnType<FunctionComponent<CellsTableProps>> => {
+  const {clock, translate, isFeatureToggleEnabled} = useApplicationContext();
   const canPerformCurrentDriveAction = useCellsActionPermissions();
   const isSelectionEnabled = selectionEnabled && isFeatureToggleEnabled(driveBulkActionsFeatureToggleName);
   const [selectedNodeIds, setSelectedNodeIds] = useState<Set<string>>(() => {
     return new Set();
   });
   const [isBulkMovePreviewOpen, setIsBulkMovePreviewOpen] = useState(false);
+  const [isBackgroundMovePending, setIsBackgroundMovePending] = useState(false);
+  const [isBackgroundMoveError, setIsBackgroundMoveError] = useState(false);
+  const [isBackgroundMoveRetryBlocked, setIsBackgroundMoveRetryBlocked] = useState(false);
+  const [isBackgroundMoveStatusUnknown, setIsBackgroundMoveStatusUnknown] = useState(false);
+  const [backgroundMoveJobUuids, setBackgroundMoveJobUuids] = useState<string[]>([]);
+  const [backgroundMoveStatusCheckId, setBackgroundMoveStatusCheckId] = useState(0);
   const [isBulkMoveOutcomeUnresolved, setIsBulkMoveOutcomeUnresolved] = useState(false);
   const [isBulkMoveRequestError, setIsBulkMoveRequestError] = useState(false);
 
@@ -156,23 +171,109 @@ export const CellsTable: FunctionComponent<CellsTableProps> = ({
     setIsBulkMovePreviewOpen(false);
   }, [selectionScopeKey, isSelectionEnabled]);
 
-  const handleBulkMoveResult = (response: RestPerformActionResponse): void => {
-    if (response.Status === RestActionStatus.Performed) {
-      setIsBulkMoveOutcomeUnresolved(false);
-      setIsBulkMoveRequestError(false);
-      setSelectedNodeIds(new Set());
-      onRefresh();
-      return;
-    }
-
-    setIsBulkMoveOutcomeUnresolved(true);
-    setIsBulkMoveRequestError(false);
-  };
-
   const handleBulkMoveRequestError = (): void => {
     setIsBulkMoveOutcomeUnresolved(true);
     setIsBulkMoveRequestError(true);
   };
+
+  useEffect(() => {
+    if (backgroundMoveJobUuids.length === 0) {
+      return undefined;
+    }
+
+    let isActive = true;
+    let timeout: ReturnType<typeof clock.setTimeout> | undefined;
+    let retryCount = 0;
+    const scheduleNextCheck = (delay: number): void => {
+      timeout = clock.setTimeout(() => {
+        void checkBackgroundMoveStatus();
+      }, delay);
+    };
+    const handleUnknownStatus = (): void => {
+      if (retryCount >= MAX_BACKGROUND_MOVE_STATUS_RETRIES) {
+        setIsBackgroundMovePending(false);
+        setIsBackgroundMoveStatusUnknown(true);
+        return;
+      }
+
+      const retryDelay =
+        BACKGROUND_MOVE_STATUS_POLL_INTERVAL_MS *
+        BACKGROUND_MOVE_STATUS_RETRY_BACKOFF_FACTOR ** retryCount *
+        (BACKGROUND_MOVE_STATUS_RETRY_MIN_JITTER_FACTOR +
+          random() * (BACKGROUND_MOVE_STATUS_RETRY_MAX_JITTER_FACTOR - BACKGROUND_MOVE_STATUS_RETRY_MIN_JITTER_FACTOR));
+      retryCount += 1;
+      scheduleNextCheck(retryDelay);
+    };
+    const checkBackgroundMoveStatus = async (): Promise<void> => {
+      const statusResults = await Promise.all(
+        backgroundMoveJobUuids.map(jobUuid => {
+          return task.tryOrElse(
+            error => {
+              return error;
+            },
+            () => {
+              return cellsRepository.getBackgroundMoveInfo({jobUuid});
+            },
+          );
+        }),
+      );
+      if (!isActive) {
+        return;
+      }
+
+      const statuses = statusResults.map(statusResult => {
+        return statusResult.isOk ? statusResult.value.Status : undefined;
+      });
+      if (
+        statuses.some(status => {
+          return status === undefined || status === JobsTaskStatus.Unknown;
+        })
+      ) {
+        handleUnknownStatus();
+        return;
+      }
+      retryCount = 0;
+      const areAllJobsFinished = statuses.every(status => {
+        return status === JobsTaskStatus.Finished;
+      });
+      if (areAllJobsFinished) {
+        setBackgroundMoveJobUuids([]);
+        setIsBackgroundMovePending(false);
+        setIsBackgroundMoveError(false);
+        setIsBulkMoveOutcomeUnresolved(false);
+        setIsBulkMoveRequestError(false);
+        onRefresh();
+        setIsBulkMovePreviewOpen(false);
+        return;
+      }
+
+      const hasNonTerminalJob = statuses.some(status => {
+        return (
+          status !== JobsTaskStatus.Finished && status !== JobsTaskStatus.Error && status !== JobsTaskStatus.Interrupted
+        );
+      });
+      if (hasNonTerminalJob) {
+        scheduleNextCheck(BACKGROUND_MOVE_STATUS_POLL_INTERVAL_MS);
+        return;
+      }
+
+      setBackgroundMoveJobUuids([]);
+      setIsBackgroundMovePending(false);
+      setIsBackgroundMoveRetryBlocked(true);
+      setIsBackgroundMoveStatusUnknown(false);
+      setIsBackgroundMoveError(true);
+      onRefresh();
+    };
+
+    void checkBackgroundMoveStatus();
+
+    return () => {
+      isActive = false;
+      if (timeout !== undefined) {
+        clock.clearTimeout(timeout);
+      }
+    };
+  }, [backgroundMoveJobUuids, backgroundMoveStatusCheckId, cellsRepository, clock, onRefresh, random]);
 
   useEffect(() => {
     const currentNodeIds = new Set<string>();
@@ -189,6 +290,45 @@ export const CellsTable: FunctionComponent<CellsTableProps> = ({
       return nextSelection.size === currentSelection.size ? currentSelection : nextSelection;
     });
   }, [nodes]);
+
+  const handleBulkMoveResult = (response: RestPerformActionResponse): void => {
+    setIsBackgroundMoveError(false);
+    setIsBackgroundMoveRetryBlocked(false);
+    setIsBackgroundMoveStatusUnknown(false);
+    if (response.Status === RestActionStatus.Performed) {
+      setIsBulkMoveOutcomeUnresolved(false);
+      setIsBulkMoveRequestError(false);
+      onRefresh();
+      return;
+    }
+
+    setIsBulkMoveOutcomeUnresolved(true);
+    setIsBulkMoveRequestError(false);
+    setIsBackgroundMovePending(true);
+    const moveJobUuids = response.BackgroundActions?.filter(action => {
+      return action.Name === 'move' && isNonEmptyString(action.JobUuid);
+    }).map(action => {
+      return action.JobUuid;
+    });
+    const uniqueMoveJobUuids = [...new Set(moveJobUuids ?? [])];
+    setBackgroundMoveJobUuids(uniqueMoveJobUuids);
+    if (uniqueMoveJobUuids.length === 0) {
+      setIsBackgroundMovePending(false);
+      setIsBackgroundMoveStatusUnknown(true);
+    }
+  };
+
+  const handleRetryBackgroundMoveStatus = (): void => {
+    if (backgroundMoveJobUuids.length === 0) {
+      return;
+    }
+
+    setIsBackgroundMoveStatusUnknown(false);
+    setIsBackgroundMovePending(true);
+    setBackgroundMoveStatusCheckId(currentCheckId => {
+      return currentCheckId + 1;
+    });
+  };
 
   const handleToggleSelection = (nodeId: string, isSelected: boolean): void => {
     setSelectedNodeIds(currentSelection => {
@@ -376,6 +516,13 @@ export const CellsTable: FunctionComponent<CellsTableProps> = ({
             isMoveRequestError={isBulkMoveRequestError}
             onMoveResult={handleBulkMoveResult}
             onMoveError={handleBulkMoveRequestError}
+            isBackgroundMovePending={isBackgroundMovePending}
+            isBackgroundMoveError={isBackgroundMoveError}
+            isBackgroundMoveRetryBlocked={isBackgroundMoveRetryBlocked}
+            isBackgroundMoveStatusUnknown={isBackgroundMoveStatusUnknown}
+            canRetryBackgroundMoveStatus={backgroundMoveJobUuids.length > 0}
+            onRetryBackgroundMoveStatus={handleRetryBackgroundMoveStatus}
+            onRefresh={onRefresh}
           />
         )}
         {activeFolderDropTargetName !== null && (

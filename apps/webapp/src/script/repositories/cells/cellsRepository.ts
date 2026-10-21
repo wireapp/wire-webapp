@@ -21,6 +21,7 @@ import {isNonEmptyString, isNullOrUndefined, isTruthy} from '@sindresorhus/is';
 import {NodeFlags, RestShareLink} from '@wireapp/api-client/lib/cells';
 import type {Node as CellsNode, NodeVersions} from '@wireapp/api-client/lib/cells/cellsApi.schema';
 import type {
+  RestBackgroundAction,
   RestDeleteVersionResponse,
   RestNamespaceValuesResponse,
   RestNode,
@@ -187,6 +188,10 @@ export class CellsRepository {
     targetPath: string;
   }): Promise<RestPerformActionResponse> {
     return this.apiClient.api.cells.moveNodes({currentPaths, targetPath});
+  }
+
+  async getBackgroundMoveInfo({jobUuid}: {jobUuid: string}): Promise<RestBackgroundAction> {
+    return this.apiClient.api.cells.getBackgroundActionInfo({name: 'move', jobUuid});
   }
 
   async getAllNodes({
