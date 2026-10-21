@@ -180,7 +180,7 @@ export class CellsRepository {
     return this.apiClient.api.cells.moveNode({currentPath, targetPath});
   }
 
-  async moveNodes({currentPaths, targetPath}: {currentPaths: string[]; targetPath: string}) {
+  async moveNodes({currentPaths, targetPath}: {currentPaths: string[]; targetPath: string}): Promise<RestPerformActionResponse> {
     return this.apiClient.api.cells.moveNodes({currentPaths, targetPath});
   }
 
