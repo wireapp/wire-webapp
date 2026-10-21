@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {isNan, isNonEmptyString} from '@sindresorhus/is';
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -45,7 +47,7 @@ interface FileAssetProps {
 
 const uploadProgressCompletePercentage = 100;
 
-const FileAsset = ({
+const FileAsset: FunctionComponent<FileAssetProps> = ({
   message,
   hasHeader = false,
   teamState = container.resolve(TeamState),
@@ -84,7 +86,7 @@ const FileAsset = ({
   const isFailedDownloadingHash = assetStatus === AssetTransferState.DOWNLOAD_FAILED_HASH;
   const isUploading = assetStatus === AssetTransferState.UPLOADING;
 
-  const onDownloadAsset = async () => {
+  const onDownloadAsset = async (): Promise<void> => {
     if (isUploadedOrCancelled) {
       await downloadAsset(asset);
     }

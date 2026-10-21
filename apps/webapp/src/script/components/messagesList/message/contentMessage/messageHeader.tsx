@@ -19,6 +19,7 @@
 
 import {type ReactElement} from 'react';
 
+import type {JSX} from '@emotion/react/jsx-runtime';
 import {isNonEmptyString} from '@sindresorhus/is';
 
 import {Tooltip} from '@wireapp/react-ui-kit';
@@ -48,7 +49,7 @@ type MessageHeaderParams = {
   children?: React.ReactNode;
 };
 
-function BadgeSection({sender}: {sender: User}) {
+function BadgeSection({sender}: {sender: User}): JSX.Element {
   const {translate} = useApplicationContext();
 
   return (

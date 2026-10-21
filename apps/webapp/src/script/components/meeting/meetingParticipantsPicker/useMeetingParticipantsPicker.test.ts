@@ -23,6 +23,7 @@ import {User} from 'Repositories/entity/User';
 import type {Conversation} from 'Repositories/entity/Conversation';
 
 import {useMeetingParticipantsPicker} from './useMeetingParticipantsPicker';
+import type {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
 
 const createUser = (id: string, name: string): User => {
   const user = new User(id, 'example.com', key => {
@@ -37,7 +38,7 @@ const createConversation = (
   name: string,
   members: User[],
   {removed = false, archived = false, cleared = false}: {removed?: boolean; archived?: boolean; cleared?: boolean} = {},
-) => {
+): Conversation => {
   return {
     display_name: () => {
       return name;
@@ -58,7 +59,17 @@ const createConversation = (
   } as unknown as Conversation;
 };
 
-const createOptions = (overrides: Partial<Parameters<typeof useMeetingParticipantsPicker>[0]> = {}) => {
+type CreateOptionsResult = {
+  disabled: boolean;
+  filter: string;
+  selectedUsers: User[];
+  onSelectedUsersChange: jest.Mock<any, any, any> | ((users: User[]) => void);
+  onFilterChange: jest.Mock<any, any, any> | ((filter: string) => void);
+  conversationRepository?: Pick<ConversationRepository, 'getAllGroupConversations'> | undefined;
+};
+const createOptions = (
+  overrides: Partial<Parameters<typeof useMeetingParticipantsPicker>[0]> = {},
+): CreateOptionsResult => {
   return {
     disabled: false,
     filter: '',

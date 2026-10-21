@@ -34,7 +34,7 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
 );
 
-const createPingMessage = (partialPingMessage: Partial<PingMessageEntity>) => {
+const createPingMessage = (partialPingMessage: Partial<PingMessageEntity>): PingMessageEntity => {
   const callMessage: Partial<PingMessageEntity> = {
     caption: ko.pureComputed(() => {
       return '';

@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode, useRef} from 'react';
+import {ReactNode, useRef, type FunctionComponent} from 'react';
 
 import {$convertToMarkdownString} from '@lexical/markdown';
 import {ClearEditorPlugin} from '@lexical/react/LexicalClearEditorPlugin';
@@ -85,7 +85,7 @@ interface RichTextEditorProps {
   onSetup?: (editor: LexicalEditor) => void;
 }
 
-export const RichTextEditor = ({
+export const RichTextEditor: FunctionComponent<RichTextEditorProps> = ({
   placeholder,
   children,
   hasLocalEphemeralTimer,
@@ -116,7 +116,7 @@ export const RichTextEditor = ({
     disableMessagePreprocessing,
   });
 
-  const handleChange = (editorState: EditorState) => {
+  const handleChange = (editorState: EditorState): void => {
     editorState.read(() => {
       if (isNull(editorRef.current)) {
         return;

@@ -26,7 +26,7 @@ interface UseOutsideInputClickParams {
   callback: () => void;
 }
 
-export const useOutsideInputClick = ({isEditing, callback}: UseOutsideInputClickParams) => {
+export const useOutsideInputClick = ({isEditing, callback}: UseOutsideInputClickParams): void => {
   useEffect(() => {
     const onWindowClick = (event: Event): void => {
       return handleClickOutsideOfInputBar(event, () => {

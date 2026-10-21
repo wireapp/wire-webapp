@@ -35,19 +35,19 @@ export class HistoryExportPage {
     this.cancelButton = page.getByTestId('do-cancel-history-export');
   }
 
-  async isVisible() {
+  async isVisible(): Promise<boolean> {
     await this.exportSuccessHeadline.waitFor({state: 'visible'});
     return await this.exportSuccessHeadline.isVisible();
   }
 
-  async clickSaveFileButton() {
+  async clickSaveFileButton(): Promise<void> {
     await this.saveFileButton.click();
   }
-  async clickCancelButton() {
+  async clickCancelButton(): Promise<void> {
     await this.cancelButton.click();
   }
 
-  async downloadFile(outputDir: string) {
+  async downloadFile(outputDir: string): Promise<string> {
     return await downloadAssetAndGetFilePath(this.page, this.saveFileButton, outputDir);
   }
 }

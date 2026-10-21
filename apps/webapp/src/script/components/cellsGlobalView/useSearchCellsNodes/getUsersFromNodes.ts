@@ -24,13 +24,15 @@ import {RestNode} from 'cells-sdk-ts';
 import {getUserQualifiedIdFromNode} from 'Components/cells/common/getUserQualifiedIdFromNode/getUserQualifiedIdFromNode';
 import {UserRepository} from 'Repositories/user/userRepository';
 
+import type {User} from '../../../repositories/entity/User';
+
 export const getUsersFromNodes = async ({
   nodes,
   userRepository,
 }: {
   nodes: RestNode[];
   userRepository: UserRepository;
-}) => {
+}): Promise<User[]> => {
   if (!isNonEmptyArray(nodes)) {
     return [];
   }

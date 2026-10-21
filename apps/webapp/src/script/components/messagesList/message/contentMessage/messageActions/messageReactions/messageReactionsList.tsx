@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {User} from 'Repositories/entity/User';
@@ -41,7 +43,10 @@ export interface MessageReactionsListProps {
   loadUsersByIdsFromDb: (userIds: QualifiedId[]) => Promise<User[]>;
 }
 
-const MessageReactionsList = ({reactions, ...props}: MessageReactionsListProps) => {
+const MessageReactionsList: FunctionComponent<MessageReactionsListProps> = ({
+  reactions,
+  ...props
+}: MessageReactionsListProps) => {
   const {selfUserId, users: conversationUsers, ...emojiPillProps} = props;
 
   return (

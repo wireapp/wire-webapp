@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import * as Icon from 'Components/icon';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
@@ -24,7 +26,7 @@ interface GiphyButtonProps {
   onGifClick: () => void;
 }
 
-export const GiphyButton = ({onGifClick}: GiphyButtonProps) => {
+export const GiphyButton: FunctionComponent<GiphyButtonProps> = ({onGifClick}: GiphyButtonProps) => {
   const {translate} = useApplicationContext();
 
   return (

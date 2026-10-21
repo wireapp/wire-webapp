@@ -17,7 +17,7 @@
  *
  */
 
-import {ChangeEvent, useEffect, useRef, useState} from 'react';
+import {ChangeEvent, useEffect, useRef, useState, type FunctionComponent} from 'react';
 
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isNullOrUndefined} from '@sindresorhus/is';
@@ -117,7 +117,7 @@ export interface FullscreenVideoCallProps {
 
 const LOCAL_STORAGE_KEY_FOR_SCREEN_SHARING_CONFIRM_MODAL = 'DO_NOT_ASK_AGAIN_FOR_SCREEN_SHARING_CONFIRM_MODAL';
 
-const FullscreenVideoCall = ({
+const FullscreenVideoCall: FunctionComponent<FullscreenVideoCallProps> = ({
   call,
   canShareScreen,
   conversation,
@@ -184,7 +184,7 @@ const FullscreenVideoCall = ({
     ['emojis', 'viewMode', 'detachedWindow', 'isScreenSharingSourceFromDetachedWindow'],
   );
 
-  const minimize = () => {
+  const minimize = (): void => {
     const isSharingScreen = call?.getSelfParticipant().sharesScreen();
 
     const hasAlreadyConfirmed = localStorage.getItem(LOCAL_STORAGE_KEY_FOR_SCREEN_SHARING_CONFIRM_MODAL) === 'true';
@@ -198,7 +198,7 @@ const FullscreenVideoCall = ({
 
     callingRepository.setViewModeMinimized();
   };
-  const openPopup = () => {
+  const openPopup = (): Promise<void> => {
     return callingRepository.setViewModeDetached();
   };
 
@@ -221,13 +221,13 @@ const FullscreenVideoCall = ({
   const callNotification = useAppNotification({activeWindow});
 
   useEffect(() => {
-    const handRaisedHandler = (event: Event) => {
+    const handRaisedHandler = (event: Event): void => {
       callNotification.show({
         message: (event as CustomEvent<{notificationMessage: string}>).detail.notificationMessage,
       });
     };
 
-    const remoteMutedHandler = (event: Event) => {
+    const remoteMutedHandler = (event: Event): void => {
       callNotification.show({
         message: (event as CustomEvent<{notificationMessage: string}>).detail.notificationMessage,
       });
@@ -242,7 +242,7 @@ const FullscreenVideoCall = ({
     };
   }, [callNotification]);
 
-  function toggleIsHandRaised(currentIsHandRaised: boolean) {
+  function toggleIsHandRaised(currentIsHandRaised: boolean): void {
     selfParticipant.handRaisedAt(new Date().getTime());
     sendHandRaised(!currentIsHandRaised, call);
   }
@@ -319,13 +319,13 @@ const FullscreenVideoCall = ({
     return state.effectiveQualityTier;
   });
 
-  const handleBackgroundSidebarSelect = (effect: BackgroundEffectSelection) => {
+  const handleBackgroundSidebarSelect = (effect: BackgroundEffectSelection): void => {
     fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
       await switchVideoBackgroundEffect(effect);
     });
   };
 
-  const handleBackgroundEffectsQualityChange = (quality: BackgroundEffectsQuality) => {
+  const handleBackgroundEffectsQualityChange = (quality: BackgroundEffectsQuality): void => {
     callingRepository.setBackgroundEffectsQualityTier(quality);
   };
 

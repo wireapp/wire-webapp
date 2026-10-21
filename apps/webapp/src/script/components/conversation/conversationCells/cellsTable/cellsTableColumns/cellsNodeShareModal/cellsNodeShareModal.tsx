@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useRef, useState, type FunctionComponent} from 'react';
 
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isUndefined} from '@sindresorhus/is';
@@ -75,7 +75,7 @@ export const showShareModal = ({
   cellsRepository,
   fireAndForgetInvoker,
   translate,
-}: ShareModalParams) => {
+}: ShareModalParams): void => {
   const modalId = createUuid();
   PrimaryModal.show(
     PrimaryModal.type.CONFIRM,
@@ -113,7 +113,7 @@ export const showShareModal = ({
   );
 };
 
-export const CellShareModalContent = ({
+export const CellShareModalContent: FunctionComponent<ShareModalParams & {modalId: string}> = ({
   type,
   uuid,
   conversationId,
@@ -152,7 +152,7 @@ export const CellShareModalContent = ({
 
   const hasExistingPassword = Boolean(linkData?.PasswordRequired);
 
-  const handlePasswordToggle = () => {
+  const handlePasswordToggle = (): void => {
     if (isPasswordEnabled) {
       setWasPasswordDisabled(true);
       setIsEditingPassword(false);
@@ -168,7 +168,7 @@ export const CellShareModalContent = ({
     togglePassword();
   };
 
-  const handleChangePasswordClick = () => {
+  const handleChangePasswordClick = (): void => {
     setIsEditingPassword(true);
     setPasswordValue('');
   };

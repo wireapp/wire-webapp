@@ -46,7 +46,7 @@ const renderScheduleMeetingForm = ({
   onEndChange?: jest.Mock;
   onStartChange?: jest.Mock;
   start?: Maybe<Date>;
-}) => {
+}): void => {
   const mainViewModel = {
     content: {
       repositories: {

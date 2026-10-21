@@ -17,8 +17,7 @@
  *
  */
 
-import {memo, useCallback, useEffect, useRef, useState} from 'react';
-import type {ReactNode} from 'react';
+import {memo, useCallback, useEffect, useRef, useState, type FunctionComponent, ReactNode} from 'react';
 
 import {useDebouncedCallback} from 'use-debounce';
 
@@ -103,7 +102,11 @@ function renderNoCameraMessage(options: RenderNoCameraMessageOptions): ReactNode
   );
 }
 
-const CameraPreferencesComponent = ({streamHandler, refreshStream, hasActiveCameraStream}: CameraPreferencesProps) => {
+const CameraPreferencesComponent: FunctionComponent<CameraPreferencesProps> = ({
+  streamHandler,
+  refreshStream,
+  hasActiveCameraStream,
+}: CameraPreferencesProps) => {
   const {translate} = useApplicationContext();
   const [isRequesting, setIsRequesting] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
@@ -149,7 +152,7 @@ const CameraPreferencesComponent = ({streamHandler, refreshStream, hasActiveCame
   // Debounce to handle rapid device changes (removeAllDevices + enumerateDevices)
   const debouncedRequestStream = useDebouncedCallback(requestStream, DEBOUNCE_TIMEOUT);
 
-  const cleanUpVideoSrc = () => {
+  const cleanUpVideoSrc = (): void => {
     if (videoElement.current !== null) {
       videoElement.current.srcObject = null;
     }

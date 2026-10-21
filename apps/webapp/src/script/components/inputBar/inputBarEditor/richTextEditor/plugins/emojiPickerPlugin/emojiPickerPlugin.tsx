@@ -119,7 +119,7 @@ export function EmojiPickerPlugin({openStateRef}: Props): ReactElement {
     }
   };
 
-  const checkForEmojiPickerMatch = (text: string) => {
+  const checkForEmojiPickerMatch = (text: string): MenuTextMatch | null => {
     const info = getSelectionInfo([TRIGGER]);
 
     if (info === undefined || (info.isTextNode && info.wordCharAfterCursor)) {
@@ -154,7 +154,7 @@ export function EmojiPickerPlugin({openStateRef}: Props): ReactElement {
       .slice(0, MAX_EMOJI_SUGGESTION_COUNT);
   }, [queryString]);
 
-  const insertEmoji = (selectedOption: EmojiOption, nodeToRemove: TextNode | null, closeMenu: () => void) => {
+  const insertEmoji = (selectedOption: EmojiOption, nodeToRemove: TextNode | null, closeMenu: () => void): void => {
     lexicalEditor.update(() => {
       nodeToRemove?.replace($createTextNode(selectedOption.emoji));
     });
@@ -164,7 +164,8 @@ export function EmojiPickerPlugin({openStateRef}: Props): ReactElement {
 
   const rootElement = lexicalEditor.getRootElement();
 
-  const getPosition = () => {
+  type GetPositionResult = {bottom: number; left: number};
+  const getPosition = (): GetPositionResult => {
     const nativeSelection = window.getSelection();
 
     if (isNullOrUndefined(rootElement) || isNullOrUndefined(nativeSelection)) {

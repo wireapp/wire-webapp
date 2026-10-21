@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode} from 'react';
+import {ReactNode, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
@@ -29,7 +29,13 @@ interface PreferencesSectionProps {
   children: ReactNode;
 }
 
-const PreferencesSection = ({title, className = '', uieName, hasSeparator, children}: PreferencesSectionProps) => {
+const PreferencesSection: FunctionComponent<PreferencesSectionProps> = ({
+  title,
+  className = '',
+  uieName,
+  hasSeparator,
+  children,
+}: PreferencesSectionProps) => {
   return (
     <>
       {hasSeparator === true && <hr className="preferences-separator" />}

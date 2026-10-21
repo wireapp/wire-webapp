@@ -17,7 +17,7 @@
  *
  */
 
-import {useState, useEffect} from 'react';
+import {useState, useEffect, type FunctionComponent} from 'react';
 
 import {formatSeconds} from 'Util/timeUtil';
 
@@ -27,13 +27,13 @@ interface DurationProps {
   startedAt?: number;
 }
 
-const Duration = ({startedAt}: DurationProps) => {
+const Duration: FunctionComponent<DurationProps> = ({startedAt}: DurationProps) => {
   const [duration, setDuration] = useState('');
 
   useEffect(() => {
     let durationUpdateInterval: number;
     if (startedAt != null) {
-      const updateTimer = () => {
+      const updateTimer = (): void => {
         const time = Math.floor((Date.now() - startedAt) / millisecondsPerSecond);
         setDuration(formatSeconds(time));
       };

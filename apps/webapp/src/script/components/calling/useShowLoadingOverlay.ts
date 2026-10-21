@@ -26,11 +26,12 @@ type ProcessedVideoStream = {
   release: () => void;
 };
 
+type UseShowLoadingOverlayResult = {onVideoCanPlay: () => void; showLoadingOverlay: boolean};
 const useShowLoadingOverlay = (
   isSelfParticipant: boolean,
   hasActiveVideo: boolean,
   processedVideoStream?: ProcessedVideoStream,
-) => {
+): UseShowLoadingOverlayResult => {
   const isBackgroundEffectInitializing = useBackgroundEffectsStore(state => {
     return state.isInitializing;
   });

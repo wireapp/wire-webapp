@@ -17,7 +17,7 @@
  *
  */
 
-import {FormEvent, useState} from 'react';
+import {FormEvent, useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 import cx from 'classnames';
@@ -44,7 +44,12 @@ interface UsernameInputProps {
   userRepository: UserRepository;
 }
 
-const UsernameInput = ({username, domain, userRepository, canEditProfile}: UsernameInputProps) => {
+const UsernameInput: FunctionComponent<UsernameInputProps> = ({
+  username,
+  domain,
+  userRepository,
+  canEditProfile,
+}: UsernameInputProps) => {
   const {translate} = useApplicationContext();
   const [errorState, setErrorState] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState<boolean>(false);

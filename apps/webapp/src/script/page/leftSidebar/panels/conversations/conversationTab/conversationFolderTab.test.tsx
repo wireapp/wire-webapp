@@ -34,8 +34,24 @@ import {ConversationFolderTab} from './conversationFolderTab';
 
 import {SidebarTabs} from '../useSidebarStore';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import type {JSX} from '@emotion/react/jsx-runtime';
+import type {ConversationRepository} from '../../../../../repositories/conversation/ConversationRepository';
 
-const getProps = async (conversations: Conversation[] = []) => {
+type GetPropsResult = Promise<{
+  props: {
+    title: string;
+    label: string;
+    type: SidebarTabs;
+    conversationTabIndex: number;
+    onChangeTab: (..._args: unknown[]) => void;
+    Icon: JSX.Element;
+    conversationRepository: ConversationRepository;
+    unreadConversations: Conversation[];
+    dataUieName: string;
+  };
+  conversationRepository: ConversationRepository;
+}>;
+const getProps = async (conversations: Conversation[] = []): GetPropsResult => {
   const testFactory = new TestFactory();
   const conversationRepository = await testFactory.exposeConversationActors();
 

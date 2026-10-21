@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {isNullOrUndefined} from '@sindresorhus/is';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
@@ -37,7 +39,7 @@ interface ConnectedMessageProps {
   user: User;
 }
 
-export const ConnectedMessage = ({
+export const ConnectedMessage: FunctionComponent<ConnectedMessageProps> = ({
   user,
   onClickCancelRequest,
   showServicesWarning = false,

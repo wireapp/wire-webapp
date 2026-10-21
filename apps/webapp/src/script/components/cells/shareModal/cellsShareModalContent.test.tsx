@@ -30,8 +30,9 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {CellsShareModalContent} from './cellsShareModalContent';
+import type {JSX} from '@emotion/react/jsx-runtime';
 
-const withTheme = (component: ReactNode) => {
+const withTheme = (component: ReactNode): JSX.Element => {
   return <StyledApp themeId={THEME_ID.DEFAULT}>{component}</StyledApp>;
 };
 const rootProviderWrapper = createRootProviderWrapperForTest(

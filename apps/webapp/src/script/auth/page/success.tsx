@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect} from 'react';
+import {useEffect, type FunctionComponent} from 'react';
 
 import {SuccessShield} from '@wireapp/react-ui-kit/lib/images/successShield';
 
@@ -35,9 +35,9 @@ import {EXTERNAL_ROUTE} from '../externalRoute';
 import {PageView, resetTelemetrySession, trackTelemetryPageView} from '../util/trackingUtil';
 import {pathWithParams} from '../util/urlUtil';
 
-export const Success = () => {
+export const Success: FunctionComponent = () => {
   const {translate} = useApplicationContext();
-  const secureOpen = (url: string) => {
+  const secureOpen = (url: string): void => {
     replaceBrowserLocation(url);
   };
 

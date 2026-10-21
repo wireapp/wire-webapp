@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {useEffect, useState, type FunctionComponent} from 'react';
 
 import * as Icon from 'Components/icon';
 
@@ -33,7 +33,7 @@ type SettingsTabProps = {
   showNotificationsBadge: boolean;
 };
 
-export const SettingsTab = ({
+export const SettingsTab: FunctionComponent<SettingsTabProps> = ({
   isActive,
   isDebugEnabled,
   onOpenDeveloperMenu,
@@ -50,10 +50,10 @@ export const SettingsTab = ({
       return;
     }
 
-    const updateAltKeyPressed = (event: KeyboardEvent) => {
+    const updateAltKeyPressed = (event: KeyboardEvent): void => {
       return setIsAltKeyPressed(event.altKey);
     };
-    const resetAltKeyPressed = () => {
+    const resetAltKeyPressed = (): void => {
       return setIsAltKeyPressed(false);
     };
 

@@ -23,6 +23,7 @@ import {getMeetingActionEntries} from 'Components/meeting/meetingList/meetingLis
 import {MEETING_ACTION_TRANSLATION_KEYS} from 'Components/meeting/meetingList/meetingListItemGroup/meetingListItem/meetingAction/meetingActionTranslationKeys';
 import {User} from 'Repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';
+import type {ContextMenuEntry} from '../../../../../../ui/contextMenu';
 
 const futureNowMilliseconds = Date.parse('2026-06-15T13:00:00.000Z');
 const ongoingNowMilliseconds = Date.parse('2026-06-15T14:30:00.000Z');
@@ -54,45 +55,49 @@ const createMeetingInstance = (overrides: Partial<MeetingSeries> = {}): MeetingI
   };
 };
 
-const createSelfUser = (id = 'host-id') => {
+const createSelfUser = (id = 'host-id'): User => {
   const user = new User(id, 'example.com', translateForTest);
   user.name('Host');
   return user;
 };
 
-const translate = (key: string) => {
+const translate = (key: string): string => {
   return key;
 };
 
-const noop = () => {
+const noop = (): undefined => {
   return undefined;
 };
 
-const getEditEntryLabel = (entries: ReturnType<typeof getMeetingActionEntries>) => {
+const getEditEntryLabel = (entries: ReturnType<typeof getMeetingActionEntries>): ContextMenuEntry | undefined => {
   return entries.find(entry => {
     return entry.label === MEETING_ACTION_TRANSLATION_KEYS.editMeeting;
   });
 };
 
-const getDeleteForMeEntryLabel = (entries: ReturnType<typeof getMeetingActionEntries>) => {
+const getDeleteForMeEntryLabel = (
+  entries: ReturnType<typeof getMeetingActionEntries>,
+): ContextMenuEntry | undefined => {
   return entries.find(entry => {
     return entry.label === MEETING_ACTION_TRANSLATION_KEYS.deleteMeetingForMe;
   });
 };
 
-const getDeleteForAllEntryLabel = (entries: ReturnType<typeof getMeetingActionEntries>) => {
+const getDeleteForAllEntryLabel = (
+  entries: ReturnType<typeof getMeetingActionEntries>,
+): ContextMenuEntry | undefined => {
   return entries.find(entry => {
     return entry.label === MEETING_ACTION_TRANSLATION_KEYS.deleteMeetingForAll;
   });
 };
 
-const getJoinEntry = (entries: ReturnType<typeof getMeetingActionEntries>) => {
+const getJoinEntry = (entries: ReturnType<typeof getMeetingActionEntries>): ContextMenuEntry | undefined => {
   return entries.find(entry => {
     return entry.label === MEETING_ACTION_TRANSLATION_KEYS.joinNow;
   });
 };
 
-const getEntryLabels = (entries: ReturnType<typeof getMeetingActionEntries>) => {
+const getEntryLabels = (entries: ReturnType<typeof getMeetingActionEntries>): (string | undefined)[] => {
   return entries.map(entry => {
     return entry.label;
   });

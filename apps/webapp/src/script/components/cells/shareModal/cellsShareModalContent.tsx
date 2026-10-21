@@ -17,7 +17,7 @@
  *
  */
 
-import {ComponentProps} from 'react';
+import {ComponentProps, type FunctionComponent} from 'react';
 
 import {CSSObject} from '@emotion/react';
 import {isNonEmptyString} from '@sindresorhus/is';
@@ -178,7 +178,7 @@ const getDefaultLabels = (translate: RootContextValue['translate']): CellsShareM
   };
 };
 
-export const CellsShareModalContent = ({
+export const CellsShareModalContent: FunctionComponent<CellsShareModalContentProps> = ({
   translate,
   publicLinkDescription,
   labels,

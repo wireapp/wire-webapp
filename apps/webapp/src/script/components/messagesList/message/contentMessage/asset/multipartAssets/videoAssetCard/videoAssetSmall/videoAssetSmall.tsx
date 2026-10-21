@@ -17,7 +17,7 @@
  *
  */
 
-import {useState} from 'react';
+import {useState, type FunctionComponent} from 'react';
 
 import {FileFullscreenModal} from 'Components/FileFullscreenModal/FileFullscreenModal';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -39,7 +39,7 @@ interface VideoAssetSmallProps {
   id: string;
 }
 
-export const VideoAssetSmall = ({
+export const VideoAssetSmall: FunctionComponent<VideoAssetSmallProps> = ({
   src,
   isLoading,
   isError,

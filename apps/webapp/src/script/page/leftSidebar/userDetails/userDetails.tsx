@@ -17,7 +17,7 @@
  *
  */
 
-import {memo} from 'react';
+import {memo, type FunctionComponent} from 'react';
 
 import cx from 'classnames';
 
@@ -40,7 +40,7 @@ interface AvailabilityStateButtonWrapperProps {
   showAvailabilityContextMenu: (event: MouseEvent) => void;
 }
 
-const AvailabilityStateButtonWrapper = ({
+const AvailabilityStateButtonWrapper: FunctionComponent<AvailabilityStateButtonWrapperProps> = ({
   children,
   isTeam = false,
   showAvailabilityContextMenu,
@@ -66,7 +66,12 @@ interface UserDetailsProps {
   isSideBarOpen?: boolean;
 }
 
-const UserDetailsComponent = ({user, isTeam = false, groupId, isSideBarOpen = false}: UserDetailsProps) => {
+const UserDetailsComponent: FunctionComponent<UserDetailsProps> = ({
+  user,
+  isTeam = false,
+  groupId,
+  isSideBarOpen = false,
+}: UserDetailsProps) => {
   const {translate} = useApplicationContext();
   const {
     name: userName,
@@ -77,7 +82,7 @@ const UserDetailsComponent = ({user, isTeam = false, groupId, isSideBarOpen = fa
 
   const showLegalHold = isOnLegalHold || hasPendingLegalHold;
 
-  const showAvailabilityContextMenu = (event: MouseEvent) => {
+  const showAvailabilityContextMenu = (event: MouseEvent): void => {
     AvailabilityContextMenu.show(event, 'left-list-availability-menu', {
       none: translate('userAvailabilityNone'),
       available: translate('userAvailabilityAvailable'),

@@ -17,7 +17,7 @@
  *
  */
 
-import {useRef} from 'react';
+import {useRef, type FunctionComponent} from 'react';
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {maybe} from 'true-myth';
@@ -38,7 +38,7 @@ export type MeetingPrepModalProps = {
   joinMeeting: (qualifiedConversationId: QualifiedId, media: CallMediaChoice) => Promise<boolean>;
 };
 
-export const MeetingPrepModal = ({
+export const MeetingPrepModal: FunctionComponent<MeetingPrepModalProps> = ({
   participantName,
   requestPreviewStream,
   releasePreviewStream,
@@ -52,7 +52,7 @@ export const MeetingPrepModal = ({
   });
   const isJoiningRef = useRef(false);
 
-  const requestClose = () => {
+  const requestClose = (): void => {
     if (isJoiningRef.current) {
       return;
     }

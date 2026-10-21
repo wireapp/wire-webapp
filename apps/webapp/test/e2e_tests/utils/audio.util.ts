@@ -26,7 +26,7 @@ import {AudioType} from 'Repositories/audio/audioType';
  * @param page the page to check if audio is playing on
  * @param type the sound which is currently playing
  */
-export const isPlayingAudio = async (page: Page, type: AudioType) => {
+export const isPlayingAudio = async (page: Page, type: AudioType): Promise<boolean> => {
   const audioTag = page.locator(`#audio-elements>audio[src*="${type}"]`);
   return await audioTag.evaluate((el: HTMLAudioElement) => {
     return !el.paused;

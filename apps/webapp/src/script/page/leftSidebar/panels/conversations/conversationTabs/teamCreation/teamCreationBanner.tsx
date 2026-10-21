@@ -17,7 +17,7 @@
  *
  */
 
-import {useState} from 'react';
+import {useState, type FunctionComponent} from 'react';
 
 import {amplify} from 'amplify';
 
@@ -43,7 +43,7 @@ import {useTeamCreationModal} from './useTeamCreationModal';
 
 import {SidebarStatus, useSidebarStore} from '../../useSidebarStore';
 
-const Banner = ({onClick}: {onClick: () => void}) => {
+const Banner: FunctionComponent<{onClick: () => void}> = ({onClick}: {onClick: () => void}) => {
   const {translate} = useApplicationContext();
 
   return (
@@ -68,7 +68,7 @@ const PADDING_Y = 34;
 const INITIAL_POSITION_X = 0;
 const INITIAL_POSITION_Y = 0;
 
-export const TeamCreationBanner = () => {
+export const TeamCreationBanner: FunctionComponent = () => {
   const {showModal} = useTeamCreationModal();
   const [isBannerVisible, setIsBannerVisible] = useState(false);
   const [position, setPosition] = useState<{positionX: number; positionY: number}>({
@@ -76,14 +76,14 @@ export const TeamCreationBanner = () => {
     positionY: INITIAL_POSITION_Y,
   });
   const {status: sidebarStatus} = useSidebarStore();
-  const openHandler = (event: React.MouseEvent<HTMLButtonElement> | React.MouseEvent<HTMLDivElement>) => {
+  const openHandler = (event: React.MouseEvent<HTMLButtonElement> | React.MouseEvent<HTMLDivElement>): void => {
     setIsBannerVisible(true);
     const rect = event.currentTarget.getBoundingClientRect();
     setPosition({positionX: rect.x, positionY: rect.y});
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.UI.CLICKED.SETTINGS_MIGRATION);
   };
 
-  const bannerBtnClickHandler = () => {
+  const bannerBtnClickHandler = (): void => {
     setIsBannerVisible(false);
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.UI.CLICKED.PERSONAL_MIGRATION_CTA, {
       step: Segmentation.TEAM_CREATION_STEP.CLICKED_CREATE_TEAM,
@@ -91,7 +91,7 @@ export const TeamCreationBanner = () => {
     showModal();
   };
 
-  const portalCloseHandler = () => {
+  const portalCloseHandler = (): void => {
     setIsBannerVisible(false);
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.UI.CLICKED.PERSONAL_MIGRATION_CTA, {
       step: Segmentation.TEAM_CREATION_STEP.CLICKED_DISMISS_CTA,

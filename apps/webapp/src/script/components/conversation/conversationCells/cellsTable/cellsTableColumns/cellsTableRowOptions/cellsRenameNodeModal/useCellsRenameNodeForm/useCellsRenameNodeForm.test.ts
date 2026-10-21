@@ -54,7 +54,7 @@ describe('useCellsRenameForm', () => {
     };
   };
 
-  const createEvent = () => {
+  const createEvent = (): FormEvent<HTMLFormElement> => {
     return {preventDefault: jest.fn()} as unknown as FormEvent<HTMLFormElement>;
   };
 

@@ -17,7 +17,7 @@
  *
  */
 
-import {useMemo} from 'react';
+import {useMemo, type FunctionComponent} from 'react';
 
 import {amplify} from 'amplify';
 
@@ -37,7 +37,7 @@ interface VerificationMessageProps {
   message: VerificationMessageEntity;
 }
 
-const VerificationMessage = ({message}: VerificationMessageProps) => {
+const VerificationMessage: FunctionComponent<VerificationMessageProps> = ({message}: VerificationMessageProps) => {
   const {translate} = useApplicationContext();
   const {
     userIds,

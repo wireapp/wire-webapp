@@ -39,7 +39,12 @@ const testFactory = new TestFactory();
 const rootContextValue = createRootContextValueForTest({translate: translateForTest});
 const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
-const getDefaultParams = () => {
+type GetDefaultParamsResult = {
+  onClose: jest.Mock<any, any, any>;
+  onGoBack: jest.Mock<any, any, any>;
+  repositories: ViewModelRepositories;
+};
+const getDefaultParams = (): GetDefaultParamsResult => {
   return {
     onClose: jest.fn(),
     onGoBack: jest.fn(),

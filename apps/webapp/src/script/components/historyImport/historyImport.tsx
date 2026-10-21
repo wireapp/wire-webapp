@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
@@ -64,7 +64,12 @@ interface HistoryImportProps {
   user: User;
 }
 
-const HistoryImport = ({user, backupRepository, file, switchContent}: HistoryImportProps) => {
+const HistoryImport: FunctionComponent<HistoryImportProps> = ({
+  user,
+  backupRepository,
+  file,
+  switchContent,
+}: HistoryImportProps) => {
   const {translate} = useApplicationContext();
 
   const [historyImportState, setHistoryImportState] = useState(HistoryImportState.PREPARING);
@@ -93,7 +98,7 @@ const HistoryImport = ({user, backupRepository, file, switchContent}: HistoryImp
 
   const loadingMessage = historyImportMessages[historyImportState] ?? '';
 
-  const onCancel = () => {
+  const onCancel = (): void => {
     return backupRepository.cancelAction();
   };
 
@@ -228,7 +233,7 @@ const HistoryImport = ({user, backupRepository, file, switchContent}: HistoryImp
     void importHistory(file);
   }, [file, importHistory]);
 
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
     const file = event.target.files?.[0];
     if (file !== undefined) {
       setError(null);

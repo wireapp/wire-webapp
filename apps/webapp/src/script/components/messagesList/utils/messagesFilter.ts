@@ -33,7 +33,7 @@ import {isMemberMessage} from '../../../guards/Message';
  * @param messages - messages to filter
  * @returns filtered messages
  */
-const filterDuplicatedSystemMessages = (messages: MessageEntity[]) => {
+const filterDuplicatedSystemMessages = (messages: MessageEntity[]): MessageEntity[] => {
   return messages.reduce<MessageEntity[]>((uniqMessages, currentMessage) => {
     if (isMemberMessage(currentMessage)) {
       const typesToFilter = [
@@ -103,12 +103,12 @@ const filterDuplicatedSystemMessages = (messages: MessageEntity[]) => {
   }, []);
 };
 
-const filterHiddenMessages = (messages: MessageEntity[]) => {
+const filterHiddenMessages = (messages: MessageEntity[]): MessageEntity[] => {
   return messages.filter(message => {
     return message.visible();
   });
 };
 
-export const filterMessages = (messages: MessageEntity[]) => {
+export const filterMessages = (messages: MessageEntity[]): MessageEntity[] => {
   return filterHiddenMessages(filterDuplicatedSystemMessages(messages));
 };

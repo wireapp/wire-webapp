@@ -17,7 +17,7 @@
  *
  */
 
-import {UIEvent, useRef} from 'react';
+import {UIEvent, useRef, type FunctionComponent} from 'react';
 
 import {isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
@@ -45,7 +45,11 @@ interface LinkPreviewAssetProps {
 
 const maximumTweetAuthorLength = 20;
 
-const LinkPreviewAsset = ({header = false, message, isFocusable = true}: LinkPreviewAssetProps) => {
+const LinkPreviewAsset: FunctionComponent<LinkPreviewAssetProps> = ({
+  header = false,
+  message,
+  isFocusable = true,
+}: LinkPreviewAssetProps) => {
   const {translate} = useApplicationContext();
   const {
     previews: [preview],
@@ -60,7 +64,7 @@ const LinkPreviewAsset = ({header = false, message, isFocusable = true}: LinkPre
 
   const linkRef = useRef<HTMLAnchorElement>(null);
 
-  const onClick = ({target}: UIEvent) => {
+  const onClick = ({target}: UIEvent): void => {
     // Clicking on the link directly will already open the link, so we don't want to open it manually
     const wasLinkClicked = target === linkRef.current;
 

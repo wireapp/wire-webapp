@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode} from 'react';
+import {ReactNode, type FunctionComponent, type ReactElement} from 'react';
 
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {handleEscDown} from 'Util/keyboardUtil';
@@ -38,7 +38,15 @@ interface CellsModalProps {
   children: ReactNode;
 }
 
-export const CellsModal = ({size = 'small', isOpen, onClose, children}: CellsModalProps) => {
+type CellsModalComponent = FunctionComponent<CellsModalProps> & {
+  Header: typeof CellsModalHeader;
+  Actions: typeof CellsModalActions;
+  SecondaryButton: typeof CellsModalSecondaryButton;
+  PrimaryButton: typeof CellsModalPrimaryButton;
+};
+
+function CellsModal(options: CellsModalProps): ReactElement {
+  const {size = 'small', isOpen, onClose, children} = options;
   return (
     <ModalComponent
       isShown={isOpen}
@@ -54,9 +62,13 @@ export const CellsModal = ({size = 'small', isOpen, onClose, children}: CellsMod
       </CellsModalProvider>
     </ModalComponent>
   );
-};
+}
 
-CellsModal.Header = CellsModalHeader;
-CellsModal.Actions = CellsModalActions;
-CellsModal.SecondaryButton = CellsModalSecondaryButton;
-CellsModal.PrimaryButton = CellsModalPrimaryButton;
+const CellsModalWithSubcomponents: CellsModalComponent = Object.assign(CellsModal, {
+  Header: CellsModalHeader,
+  Actions: CellsModalActions,
+  SecondaryButton: CellsModalSecondaryButton,
+  PrimaryButton: CellsModalPrimaryButton,
+});
+
+export {CellsModalWithSubcomponents as CellsModal};

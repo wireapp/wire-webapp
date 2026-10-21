@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
 
 import {
@@ -38,7 +40,13 @@ interface FileAssetOptionsProps {
   id: string;
 }
 
-export const FileAssetOptions = ({id, onOpen, src, name, extension}: FileAssetOptionsProps) => {
+export const FileAssetOptions: FunctionComponent<FileAssetOptionsProps> = ({
+  id,
+  onOpen,
+  src,
+  name,
+  extension,
+}: FileAssetOptionsProps) => {
   const {translate} = useApplicationContext();
   const canPerformCellsAction = useCellsActionPermissions();
   const fileNameWithExtension = getFileNameWithExtension(name, extension);

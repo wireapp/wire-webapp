@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {DropdownMenu, IconButton, IconButtonVariant, MoreIcon, TrashIcon} from '@wireapp/react-ui-kit';
@@ -32,7 +34,7 @@ interface CellsMoreMenuProps {
   conversationQualifiedId: QualifiedId;
 }
 
-export const CellsMoreMenu = ({conversationQualifiedId}: CellsMoreMenuProps) => {
+export const CellsMoreMenu: FunctionComponent<CellsMoreMenuProps> = ({conversationQualifiedId}: CellsMoreMenuProps) => {
   const {translate} = useApplicationContext();
   return (
     <DropdownMenu>

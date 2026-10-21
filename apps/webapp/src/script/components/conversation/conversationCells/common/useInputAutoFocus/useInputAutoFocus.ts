@@ -17,9 +17,16 @@
  *
  */
 
-import {useEffect, useRef} from 'react';
+import {useEffect, useRef, type RefObject} from 'react';
 
-export const useInputAutoFocus = ({enabled = true, delayMs = 1}: {enabled?: boolean; delayMs?: number}) => {
+type UseInputAutoFocusResult = {inputRef: RefObject<HTMLInputElement | null>};
+export const useInputAutoFocus = ({
+  enabled = true,
+  delayMs = 1,
+}: {
+  enabled?: boolean;
+  delayMs?: number;
+}): UseInputAutoFocusResult => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {

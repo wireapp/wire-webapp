@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useLayoutEffect, useRef, useEffect} from 'react';
+import React, {useLayoutEffect, useRef, useEffect, type FunctionComponent} from 'react';
 
 import {isNull} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
@@ -83,7 +83,7 @@ interface MessageParams extends MessageActions {
   index?: number;
 }
 
-export const Message = (props: MessageParams) => {
+export const Message: FunctionComponent<MessageParams> = (props: MessageParams) => {
   const {
     message,
     isHighlighted,
@@ -110,7 +110,7 @@ export const Message = (props: MessageParams) => {
     }
   }, [isHighlighted]);
 
-  const handleDivKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+  const handleDivKeyDown = (event: React.KeyboardEvent<HTMLDivElement>): void => {
     // when a message is focused set its elements focusable
     if (!event.shiftKey && isTabKey(event)) {
       if (isNull(messageElementRef.current)) {

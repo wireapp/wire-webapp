@@ -33,7 +33,7 @@ interface OpenFolderParams {
   conversationQualifiedId?: QualifiedId;
 }
 
-export const openFolder = ({path, event, onBeforeNavigate, conversationQualifiedId}: OpenFolderParams) => {
+export const openFolder = ({path, event, onBeforeNavigate, conversationQualifiedId}: OpenFolderParams): void => {
   const stripped = path.startsWith('/') ? path.slice(1) : path;
   const [firstSegment, ...rest] = stripped.split('/');
 

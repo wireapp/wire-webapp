@@ -34,7 +34,7 @@ export const showRestoreNestedNodeModal = ({
   onRestoreNode: () => void;
   parentNodeName: string;
   translate: RootContextValue['translate'];
-}) => {
+}): void => {
   PrimaryModal.show(
     PrimaryModal.type.CONFIRM,
     {

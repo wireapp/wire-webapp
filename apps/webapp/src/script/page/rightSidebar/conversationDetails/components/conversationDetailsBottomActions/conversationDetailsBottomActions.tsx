@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import * as Icon from 'Components/icon';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
@@ -28,7 +30,7 @@ interface ConversationDetailsBottomActionsProps {
   notificationStatusText?: string;
 }
 
-const ConversationDetailsBottomActions = ({
+const ConversationDetailsBottomActions: FunctionComponent<ConversationDetailsBottomActionsProps> = ({
   isDeviceActionEnabled = false,
   showDevices,
   showNotifications,

@@ -33,16 +33,16 @@ export class CellsFileDetailViewModal {
     this.image = page.locator("[role='dialog'][aria-modal='true'] img");
   }
 
-  async isImageVisible() {
+  async isImageVisible(): Promise<boolean> {
     await this.image.waitFor({state: 'visible'});
     return await this.image.isVisible();
   }
 
-  async closeModal() {
+  async closeModal(): Promise<void> {
     await this.closeButton.click();
   }
 
-  async downloadAsset(outputDir: string) {
+  async downloadAsset(outputDir: string): Promise<string> {
     await this.downloadButton.waitFor({state: 'visible'});
     return await downloadAssetAndGetFilePath(this.page, this.downloadButton, outputDir);
   }

@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useState, type FunctionComponent} from 'react';
 
 import {isNull} from '@sindresorhus/is';
 import {Maybe, maybe} from 'true-myth';
@@ -74,7 +74,7 @@ const getRowStatusLabel = (
   return translate(statusLabelKey[row.kind], {size: formatBytes(row.fileSize)});
 };
 
-export const SharedDriveUploadStatusPopupHost = ({
+export const SharedDriveUploadStatusPopupHost: FunctionComponent<SharedDriveUploadStatusPopupHostProps> = ({
   controller,
   conversationQualifiedId,
   isEnabled,
@@ -183,7 +183,7 @@ export const SharedDriveUploadStatusPopupHost = ({
       setCancellingUploadIds(current => {
         return new Set([...current, ...pendingIds]);
       });
-      const finishCancellation = (uploadId: string) => {
+      const finishCancellation = (uploadId: string): void => {
         return setCancellingUploadIds(current => {
           const next = new Set(current);
           next.delete(uploadId);
@@ -246,7 +246,7 @@ export const SharedDriveUploadStatusPopupHost = ({
           }),
         ]);
       });
-      const finishRetry = (id: string) => {
+      const finishRetry = (id: string): void => {
         return setRetryingUploadIds(current => {
           const next = new Set(current);
           next.delete(id);
@@ -269,7 +269,7 @@ export const SharedDriveUploadStatusPopupHost = ({
   );
 
   useEffect(() => {
-    const updateStatus = () => {
+    const updateStatus = (): void => {
       return setUploadSnapshot({conversationQualifiedId, uploads: readStatuses()});
     };
     updateStatus();

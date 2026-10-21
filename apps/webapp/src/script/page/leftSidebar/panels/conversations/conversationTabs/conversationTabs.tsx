@@ -17,7 +17,7 @@
  *
  */
 
-import type {ReactNode} from 'react';
+import type {ReactNode, FunctionComponent} from 'react';
 
 import {container} from 'tsyringe';
 
@@ -177,7 +177,7 @@ interface ConversationTabsProps {
   selfUser: User;
 }
 
-export const ConversationTabs = ({
+export const ConversationTabs: FunctionComponent<ConversationTabsProps> = ({
   unreadConversations,
   favoriteConversations,
   archivedConversations,
@@ -211,7 +211,7 @@ export const ConversationTabs = ({
     return conversation.hasUnread();
   }).length;
 
-  const filterUnreadAndArchivedConversations = (conversation: Conversation) => {
+  const filterUnreadAndArchivedConversations = (conversation: Conversation): boolean => {
     return conversationFilters.notArchived(conversation) && conversationFilters.hasUnread(conversation);
   };
 

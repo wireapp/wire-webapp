@@ -227,7 +227,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
   const manageServicesUrl = getManageServicesUrl('client_landing');
   const isSearching = searchInput.length > ENABLE_IS_SEARCHING_LENGTH;
 
-  const onAddPeople = () => {
+  const onAddPeople = (): void => {
     return setCurrentState(PARTICIPANTS_STATE.ADD_PEOPLE);
   };
 
@@ -239,29 +239,29 @@ const AddParticipants: FC<AddParticipantsProps> = ({
     [integrationRepository],
   );
 
-  const onAddServices = async () => {
+  const onAddServices = async (): Promise<void> => {
     setCurrentState(PARTICIPANTS_STATE.ADD_SERVICE);
 
     await searchServices(searchInput);
   };
 
-  const openManageServices = () => {
+  const openManageServices = (): void => {
     if (isNonEmptyString(manageServicesUrl)) {
       safeWindowOpen(manageServicesUrl);
     }
   };
 
-  const onServiceSelect = (entity: ServiceEntity) => {
+  const onServiceSelect = (entity: ServiceEntity): void => {
     return togglePanel(PanelState.GROUP_PARTICIPANT_SERVICE, entity, true);
   };
 
-  const addUsers = async () => {
+  const addUsers = async (): Promise<void> => {
     const userEntities = selectedContacts.slice();
 
     await conversationRepository.addUsers(activeConversation, userEntities);
   };
 
-  const onAddParticipants = async () => {
+  const onAddParticipants = async (): Promise<void> => {
     await addUsers();
     onBack();
   };

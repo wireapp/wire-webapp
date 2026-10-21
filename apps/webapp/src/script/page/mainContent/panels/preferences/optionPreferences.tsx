@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, type FunctionComponent} from 'react';
 
 import {amplify} from 'amplify';
 
@@ -96,7 +96,10 @@ function renderEmojiReplaceDetail(options: RenderEmojiReplaceDetailOptions): Rea
   );
 }
 
-const OptionPreferences = ({propertiesRepository, selfUser}: OptionPreferencesProps) => {
+const OptionPreferences: FunctionComponent<OptionPreferencesProps> = ({
+  propertiesRepository,
+  selfUser,
+}: OptionPreferencesProps) => {
   const {translate} = useApplicationContext();
   const {isActivatedAccount} = useKoSubscribableChildren(selfUser, ['isActivatedAccount']);
   const {
@@ -121,7 +124,7 @@ const OptionPreferences = ({propertiesRepository, selfUser}: OptionPreferencesPr
       setOptionMarkdownPreview(settings.interface.markdown_preview);
     };
 
-    const updateDarkMode = (newDarkMode: boolean) => {
+    const updateDarkMode = (newDarkMode: boolean): void => {
       return setOptionDarkMode(newDarkMode);
     };
 
@@ -134,45 +137,45 @@ const OptionPreferences = ({propertiesRepository, selfUser}: OptionPreferencesPr
     };
   }, []);
 
-  const saveOptionAudioPreference = (audioPreference: AudioPreferenceValue) => {
+  const saveOptionAudioPreference = (audioPreference: AudioPreferenceValue): void => {
     propertiesRepository.savePreference(PROPERTIES_TYPE.SOUND_ALERTS, audioPreference);
     setOptionAudio(audioPreference);
   };
 
-  const saveOptionEmojiPreference = (emojiPreference: boolean) => {
+  const saveOptionEmojiPreference = (emojiPreference: boolean): void => {
     propertiesRepository.savePreference(PROPERTIES_TYPE.EMOJI.REPLACE_INLINE, emojiPreference);
     setOptionReplaceInlineEmoji(emojiPreference);
   };
 
-  const saveOptionNotificationsPreference = (notificationsPreference: NotificationPreferenceValue) => {
+  const saveOptionNotificationsPreference = (notificationsPreference: NotificationPreferenceValue): void => {
     propertiesRepository.savePreference(PROPERTIES_TYPE.NOTIFICATIONS, notificationsPreference);
     setOptionNotifications(notificationsPreference);
   };
 
-  const saveMarkdownPreviewPreference = (markdownPreviewPreference: boolean) => {
+  const saveMarkdownPreviewPreference = (markdownPreviewPreference: boolean): void => {
     propertiesRepository.savePreference(PROPERTIES_TYPE.INTERFACE.MARKDOWN_PREVIEW, markdownPreviewPreference);
     setOptionMarkdownPreview(markdownPreviewPreference);
   };
 
-  const saveOptionSendPreviewsPreference = (sendPreviewsPreference: boolean) => {
+  const saveOptionSendPreviewsPreference = (sendPreviewsPreference: boolean): void => {
     propertiesRepository.savePreference(PROPERTIES_TYPE.PREVIEWS.SEND, sendPreviewsPreference);
     setOptionSendPreviews(sendPreviewsPreference);
   };
 
-  const saveOptionNewTheme = (useDarkMode: boolean) => {
+  const saveOptionNewTheme = (useDarkMode: boolean): void => {
     const newTheme: Theme = useDarkMode ? 'dark' : 'default';
     propertiesRepository.savePreference(PROPERTIES_TYPE.INTERFACE.THEME, newTheme);
     setOptionDarkMode(useDarkMode);
   };
 
-  const saveOptionFontSize = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const saveOptionFontSize = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const index = parseInt(event.target.value);
     const fontSize = fontSizes[index];
     setSliderValue(index);
     setCurrentRootFontSize(fontSize);
   };
 
-  const handleOptionClick = (value: number) => {
+  const handleOptionClick = (value: number): void => {
     const fontSize = fontSizes[value];
     setSliderValue(value);
     setCurrentRootFontSize(fontSize);

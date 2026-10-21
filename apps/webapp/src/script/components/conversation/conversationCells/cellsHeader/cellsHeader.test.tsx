@@ -17,7 +17,7 @@
  *
  */
 
-import {render, screen} from '@testing-library/react';
+import {render, screen, type RenderResult} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
@@ -64,7 +64,7 @@ const renderCellsHeader = (
     onSelectionBarAnchorChange?: (anchor: HTMLDivElement | null) => void;
   } = {},
   isBulkActionsEnabled = true,
-) => {
+): RenderResult => {
   const wrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({
       translate: translateForTest,

@@ -190,7 +190,7 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
     }
   }, [isRequest, onClose]);
 
-  const onBackClick = () => {
+  const onBackClick = (): void => {
     if (!showDeviceList) {
       return userDevicesHistory.goBack();
     }
@@ -198,13 +198,13 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
     setUserDevices(undefined);
   };
 
-  const closeRequest = () => {
+  const closeRequest = (): void => {
     if (isRequest) {
       closeRequestModal();
     }
   };
 
-  const acceptRequest = async () => {
+  const acceptRequest = async (): Promise<void> => {
     if (disableSubmit) {
       return;
     }
@@ -250,7 +250,7 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
   };
 
   const showRequestModal = useCallback(async () => {
-    const setModalParams = (value: boolean) => {
+    const setModalParams = (value: boolean): void => {
       setIsModalOpen(value);
       setIsLoading(value);
 

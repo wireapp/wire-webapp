@@ -19,6 +19,8 @@
 
 import React from 'react';
 
+import type {JSX} from '@emotion/react/jsx-runtime';
+
 import {AVATAR_SIZE, DIAMETER} from 'Components/avatar';
 
 import {DefaultAvatarImageSmall, DefaultAvatarImageLarge} from './defaultAvatarImage';
@@ -30,7 +32,7 @@ interface PlaceholderAvatarProps extends React.HTMLProps<HTMLDivElement> {
   onClick?: () => void;
 }
 
-export function PlaceholderAvatar({avatarSize: size, onClick, ...props}: PlaceholderAvatarProps) {
+export function PlaceholderAvatar({avatarSize: size, onClick, ...props}: PlaceholderAvatarProps): JSX.Element {
   const diameter = DIAMETER[size];
   const ImageComponent = diameter >= DIAMETER[AVATAR_SIZE.LARGE] ? DefaultAvatarImageLarge : DefaultAvatarImageSmall;
   return (

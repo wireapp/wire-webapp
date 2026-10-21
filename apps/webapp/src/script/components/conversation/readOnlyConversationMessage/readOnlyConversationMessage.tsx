@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, ReactNode} from 'react';
+import {FC, ReactNode, type FunctionComponent} from 'react';
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 import ko from 'knockout';
@@ -132,7 +132,11 @@ export const ReadOnlyConversationMessage: FC<ReadOnlyConversationMessageProps> =
   return null;
 };
 
-const ReadOnlyConversationMessageBase = ({children}: {children: ReactNode}) => {
+const ReadOnlyConversationMessageBase: FunctionComponent<{children: ReactNode}> = ({
+  children,
+}: {
+  children: ReactNode;
+}) => {
   return (
     <div className="readonly-message-header readonly-message-container">
       <div className="readonly-message-header-icon readonly-message-header-icon--svg">

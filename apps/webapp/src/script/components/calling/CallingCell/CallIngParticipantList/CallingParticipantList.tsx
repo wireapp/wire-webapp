@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import React, {type FunctionComponent} from 'react';
 
 import cx from 'classnames';
 
@@ -52,7 +52,7 @@ interface CallingParticipantListProps {
   onClose: () => void;
 }
 
-export const CallingParticipantList = ({
+export const CallingParticipantList: FunctionComponent<CallingParticipantListProps> = ({
   callingRepository,
   conversation,
   isModerator,
@@ -64,7 +64,7 @@ export const CallingParticipantList = ({
 }: CallingParticipantListProps) => {
   const {translate} = useApplicationContext();
 
-  const getParticipantContext = (event: React.MouseEvent<HTMLDivElement>, participant: Participant) => {
+  const getParticipantContext = (event: React.MouseEvent<HTMLDivElement>, participant: Participant): void => {
     event.preventDefault();
 
     const muteParticipant = {

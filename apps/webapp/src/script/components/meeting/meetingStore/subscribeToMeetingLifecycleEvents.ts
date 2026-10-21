@@ -47,11 +47,11 @@ export const subscribeToMeetingLifecycleEvents = ({
   notifyUpdate,
   onMeetingCancelled,
 }: SubscribeToMeetingLifecycleEventsDependencies): (() => void) => {
-  const onMeetingCreated = (meetingId: QualifiedId) => {
+  const onMeetingCreated = (meetingId: QualifiedId): void => {
     dispatcher.enqueueMeetingSync(meetingId);
   };
 
-  const onMeetingUpdated = (meetingId: QualifiedId, actorId: QualifiedId) => {
+  const onMeetingUpdated = (meetingId: QualifiedId, actorId: QualifiedId): void => {
     if (matchQualifiedIds(actorId, getSelfUserQualifiedId())) {
       dispatcher.enqueueMeetingSync(meetingId);
       return;
@@ -60,7 +60,7 @@ export const subscribeToMeetingLifecycleEvents = ({
     dispatcher.enqueueMeetingSync(meetingId, notifyUpdate);
   };
 
-  const onMeetingMemberAdded = (meetingId: QualifiedId, actorId: QualifiedId) => {
+  const onMeetingMemberAdded = (meetingId: QualifiedId, actorId: QualifiedId): void => {
     if (matchQualifiedIds(actorId, getSelfUserQualifiedId())) {
       dispatcher.enqueueMeetingSync(meetingId);
       return;
@@ -69,7 +69,7 @@ export const subscribeToMeetingLifecycleEvents = ({
     dispatcher.enqueueMeetingSync(meetingId, notifyMeetingChange);
   };
 
-  const onMeetingDeleted = (meetingId: QualifiedId, actorId: QualifiedId) => {
+  const onMeetingDeleted = (meetingId: QualifiedId, actorId: QualifiedId): void => {
     onMeetingCancelled(meetingId, {
       notify: !matchQualifiedIds(actorId, getSelfUserQualifiedId()),
     });
@@ -77,7 +77,7 @@ export const subscribeToMeetingLifecycleEvents = ({
     dispatcher.enqueueMeetingRemoval(meetingId);
   };
 
-  const onMissedEvents = () => {
+  const onMissedEvents = (): void => {
     dispatcher.enqueueInitialLoad();
   };
 

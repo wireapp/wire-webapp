@@ -30,19 +30,19 @@ interface UserNameProps {
  * will return the name of the user, if available, otherwise a string indicating that the user is unavailable
  * @param user the user to get the name for
  */
-export function useUserName(user: User) {
+export function useUserName(user: User): string {
   const {translate} = useApplicationContext();
   const {isAvailable, name} = useKoSubscribableChildren(user, ['isAvailable', 'name']);
   return isAvailable ? name : translate('unavailableUser');
 }
 
-export function getUserNameWithTranslate(user: User, translate: Translate) {
+export function getUserNameWithTranslate(user: User, translate: Translate): string {
   return user.isAvailable() ? user.name() : translate('unavailableUser');
 }
 
 /**
  * component that will display the username, if available, otherwise a string indicating that the user is unavailable
  */
-export function UserName({user}: UserNameProps) {
+export function UserName({user}: UserNameProps): string {
   return useUserName(user);
 }

@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, type FunctionComponent} from 'react';
 
 import {Button, CheckRoundIcon, ContainerSM, H1, Muted, Text} from '@wireapp/react-ui-kit';
 
@@ -38,7 +38,7 @@ interface Props extends React.HTMLProps<HTMLDivElement> {
   containerSize?: number;
 }
 
-const EntropyContainer = ({onSetEntropy, containerSize = 400}: Props) => {
+const EntropyContainer: FunctionComponent<Props> = ({onSetEntropy, containerSize = 400}: Props) => {
   const {translate} = useApplicationContext();
   const [entropy, setEntropy] = useState<EntropyData>(new EntropyData());
   const [pause, setPause] = useState<boolean | undefined>(undefined);
@@ -60,13 +60,13 @@ const EntropyContainer = ({onSetEntropy, containerSize = 400}: Props) => {
     setProgressAnnouncement(translate('setEntropy.progressAnnouncement', {percent: milestone}));
   }, [lastAnnouncedMilestone, percent, translate]);
 
-  const onProgress = (entropyData: EntropyData, percentage: number, pause: boolean) => {
+  const onProgress = (entropyData: EntropyData, percentage: number, pause: boolean): void => {
     setEntropy(entropyData);
     setPause(pause);
     setPercent(percentage);
   };
 
-  const forwardEntropy = async (entropy: Uint8Array) => {
+  const forwardEntropy = async (entropy: Uint8Array): Promise<void> => {
     // we want to hash the entire entropy array to get a 256 bit (32 bytes) array
     const hashedValue = await window.crypto.subtle.digest('SHA-256', Uint8Array.from(entropy));
     onSetEntropy(new Uint8Array(hashedValue));

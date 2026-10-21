@@ -28,7 +28,12 @@ import {
 
 import {MeetingMultiActionButton, MeetingMultiActionButtonProps} from './meetingMultiActionButton';
 
-const createTestProps = () => {
+type CreateTestPropsResult = {
+  props: MeetingMultiActionButtonProps;
+  handleMeetNow: jest.Mock<any, any, any>;
+  handleScheduleMeeting: jest.Mock<any, any, any>;
+};
+const createTestProps = (): CreateTestPropsResult => {
   const handleMeetNow = jest.fn();
   const handleScheduleMeeting = jest.fn();
 

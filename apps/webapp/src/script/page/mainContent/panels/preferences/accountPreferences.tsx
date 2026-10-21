@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {isNonEmptyString} from '@sindresorhus/is';
 import {ErrorBoundary} from 'react-error-boundary';
 import {container} from 'tsyringe';
@@ -79,7 +81,7 @@ interface AccountPreferencesProps {
 
 const logger = getLogger('AccountPreferences');
 
-export const AccountPreferences = ({
+export const AccountPreferences: FunctionComponent<AccountPreferencesProps> = ({
   appLockRepository,
   importFile,
   clientRepository,

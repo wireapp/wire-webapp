@@ -100,7 +100,18 @@ const viewerPermissionRootProviderWrapper = createRootProviderWrapperForTest(
   }),
 );
 
-const getDefaultParams = () => {
+type GetDefaultParamsResult = {
+  actionsViewModel: ActionsViewModel;
+  conversationRepository: ConversationRepository;
+  integrationRepository: IntegrationRepository;
+  isFederated: boolean;
+  isVisible: boolean;
+  searchRepository: SearchRepository;
+  teamRepository: TeamRepository;
+  teamState: TeamState;
+  selfUser: User;
+};
+const getDefaultParams = (): GetDefaultParamsResult => {
   const conversationRoleRepository: Partial<ConversationRoleRepository> = {
     canAddParticipants: () => {
       return true;

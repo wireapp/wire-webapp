@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {useEffect, useState, type FunctionComponent} from 'react';
 
 import {useDebouncedCallback} from 'use-debounce';
 
@@ -46,7 +46,11 @@ interface MicrophonePreferencesProps {
 
 const DEBOUNCE_TIMEOUT = 100;
 
-const MicrophonePreferences = ({streamHandler, refreshStream, hasActiveCall}: MicrophonePreferencesProps) => {
+const MicrophonePreferences: FunctionComponent<MicrophonePreferencesProps> = ({
+  streamHandler,
+  refreshStream,
+  hasActiveCall,
+}: MicrophonePreferencesProps) => {
   const {translate} = useApplicationContext();
   const [isRequesting, setIsRequesting] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
@@ -61,7 +65,7 @@ const MicrophonePreferences = ({streamHandler, refreshStream, hasActiveCall}: Mi
 
   const {URL: urls} = Config.getConfig();
 
-  const requestStream = async () => {
+  const requestStream = async (): Promise<void> => {
     setIsRequesting(true);
     try {
       setStream(await refreshStream());

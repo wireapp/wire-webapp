@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {isNullOrUndefined} from '@sindresorhus/is';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
@@ -42,11 +44,15 @@ interface MeetingParticipantsContentProps {
   isOngoing: boolean;
 }
 
-const MeetingParticipantsContent = ({conversation, qualifiedCreator, isOngoing}: MeetingParticipantsContentProps) => {
+const MeetingParticipantsContent: FunctionComponent<MeetingParticipantsContentProps> = ({
+  conversation,
+  qualifiedCreator,
+  isOngoing,
+}: MeetingParticipantsContentProps) => {
   const {translate} = useApplicationContext();
   const participants = useMeetingParticipants(conversation, qualifiedCreator);
   const avatarRingColor = isOngoing ? 'var(--accent-color-highlight)' : 'var(--text-input-background)';
-  const getParticipantLabel = (participant: User, name: string) => {
+  const getParticipantLabel = (participant: User, name: string): string => {
     return matchQualifiedIds(participant.qualifiedId, qualifiedCreator)
       ? translate(
           'meetings.participant.nameWithOrganizer',
@@ -76,7 +82,7 @@ const MeetingParticipantsContent = ({conversation, qualifiedCreator, isOngoing}:
   );
 };
 
-export const MeetingParticipants = ({
+export const MeetingParticipants: FunctionComponent<MeetingParticipantsProps> = ({
   qualifiedConversation,
   qualifiedCreator,
   isOngoing = false,

@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useRef, useState, type FunctionComponent} from 'react';
 
 import {Node} from '@wireapp/api-client/lib/cells';
 import {Maybe, result} from 'true-myth';
@@ -41,7 +41,7 @@ interface FileEditorProps {
   id: string;
 }
 
-export const FileEditor = ({id}: FileEditorProps) => {
+export const FileEditor: FunctionComponent<FileEditorProps> = ({id}: FileEditorProps) => {
   const cellsRepository = container.resolve(CellsRepository);
   const {fireAndForgetInvoker, translate} = useApplicationContext();
   const [node, setNode] = useState<Node | null>(null);

@@ -17,7 +17,7 @@
  *
  */
 
-import {useMemo, useState} from 'react';
+import {useMemo, useState, type FunctionComponent} from 'react';
 
 import {isUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
@@ -37,7 +37,7 @@ import {useCreateConversation} from '../hooks/useCreateConversation';
 import {useCreateConversationModal} from '../hooks/useCreateConversationModal';
 import {getNonFederatingParticipantsModalCopy} from '../utils';
 
-export const ParticipantsSelection = () => {
+export const ParticipantsSelection: FunctionComponent = () => {
   const {mainViewModel, translate} = useApplicationContext();
   const userState = container.resolve(UserState);
   const teamState = container.resolve(TeamState);

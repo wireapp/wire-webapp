@@ -17,7 +17,7 @@
  *
  */
 
-import {fireEvent, render, screen} from '@testing-library/react';
+import {fireEvent, render, screen, type RenderResult} from '@testing-library/react';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
@@ -39,7 +39,7 @@ const renderContent = (
     disabledDestinationPaths: string[];
     disabledDestinationLabels: Record<string, string>;
   },
-) => {
+): RenderResult => {
   const wrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
 
   return render(

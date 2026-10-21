@@ -208,9 +208,10 @@ async function appendCiDescription(runId: number): Promise<void> {
   }
 }
 
-function validateArgs() {
+type ValidateArgsResult = {reportAbsPath: string; runName: string};
+function validateArgs(): ValidateArgsResult {
   const args = process.argv.slice(2);
-  const get = (flag: string) => {
+  const get = (flag: string): string | undefined => {
     const i = args.indexOf(flag);
     return i === -1 ? undefined : args[i + 1];
   };
@@ -234,7 +235,13 @@ function validateArgs() {
   return {reportAbsPath, runName};
 }
 
-async function resolveTestCases(allTests: FlatTest[], runId: number) {
+type ResolveTestCasesResult = Promise<{
+  pending: Result[];
+  skippedNoTag: number;
+  skippedNotFound: number;
+  resolveErrors: number;
+}>;
+async function resolveTestCases(allTests: FlatTest[], runId: number): ResolveTestCasesResult {
   const pending: Result[] = [];
   let skippedNoTag = 0,
     skippedNotFound = 0,

@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import * as Icon from 'Components/icon';
@@ -32,13 +34,15 @@ interface ProtocolUpdateMessageProps {
   message: ProtocolUpdateMessageEntity;
 }
 
-const createSystemMessage = (caption: string, translate: Translate) => {
+const createSystemMessage = (caption: string, translate: Translate): SystemMessage => {
   const message = new SystemMessage(translate);
   message.caption = caption;
   return message;
 };
 
-export const ProtocolUpdateMessage = ({message}: ProtocolUpdateMessageProps) => {
+export const ProtocolUpdateMessage: FunctionComponent<ProtocolUpdateMessageProps> = ({
+  message,
+}: ProtocolUpdateMessageProps) => {
   const {translate} = useApplicationContext();
   if (message.protocol === CONVERSATION_PROTOCOL.MIXED) {
     const messages = [

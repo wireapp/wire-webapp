@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import React, {type FunctionComponent} from 'react';
 
 import {CSSObject} from '@emotion/react';
 import cx from 'classnames';
@@ -45,7 +45,7 @@ const buttonCommonStyles: CSSObject = {
   textTransform: 'uppercase',
 };
 
-export const UserInfo = ({
+export const UserInfo: FunctionComponent<UserInfoProps> = ({
   user,
   className,
   dataUieName,
@@ -57,7 +57,7 @@ export const UserInfo = ({
 }: UserInfoProps) => {
   const {name} = useKoSubscribableChildren(user, ['name']);
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>): void => {
     const {key} = event;
     if (key === KEY.ENTER || key === KEY.SPACE) {
       const {top, left, height} = (event.target as Element).getBoundingClientRect();

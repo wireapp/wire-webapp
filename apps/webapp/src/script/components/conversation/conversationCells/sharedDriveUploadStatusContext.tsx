@@ -17,7 +17,7 @@
  *
  */
 
-import {createContext, type ReactNode, useCallback, useContext, useState} from 'react';
+import {createContext, type ReactNode, useCallback, useContext, useState, type FunctionComponent} from 'react';
 
 import {Maybe} from 'true-myth';
 
@@ -42,7 +42,7 @@ interface SharedDriveUploadStatusProviderProps {
   readonly initialDismissedUpload?: Maybe<DismissedUpload>;
 }
 
-export const SharedDriveUploadStatusProvider = ({
+export const SharedDriveUploadStatusProvider: FunctionComponent<SharedDriveUploadStatusProviderProps> = ({
   children,
   initialDismissedUpload = Maybe.nothing(),
 }: SharedDriveUploadStatusProviderProps) => {

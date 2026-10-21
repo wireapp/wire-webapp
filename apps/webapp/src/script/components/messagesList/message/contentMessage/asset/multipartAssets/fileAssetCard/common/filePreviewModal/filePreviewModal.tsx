@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {FileFullscreenModal} from 'Components/FileFullscreenModal/FileFullscreenModal';
 
 interface FilePreviewModalProps {
@@ -35,7 +37,7 @@ interface FilePreviewModalProps {
   isEditMode?: boolean;
 }
 
-export const FilePreviewModal = ({
+export const FilePreviewModal: FunctionComponent<FilePreviewModalProps> = ({
   id,
   fileUrl,
   fileName,
@@ -50,7 +52,7 @@ export const FilePreviewModal = ({
   isError,
   isEditMode,
 }: FilePreviewModalProps) => {
-  const getFileUrl = () => {
+  const getFileUrl = (): string | undefined => {
     if (fileExtension === 'pdf') {
       return fileUrl;
     }
@@ -58,7 +60,7 @@ export const FilePreviewModal = ({
     return filePdfPreviewUrl ?? fileImagePreviewUrl;
   };
 
-  const getStatus = () => {
+  const getStatus = (): 'loading' | 'unavailable' | 'success' => {
     if (isLoading) {
       return 'loading';
     }

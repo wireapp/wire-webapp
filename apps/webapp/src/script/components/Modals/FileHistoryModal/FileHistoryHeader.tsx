@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {isNullOrUndefined} from '@sindresorhus/is';
 
 import {FileTypeIcon} from 'Components/conversation/common/fileTypeIcon/fileTypeIcon';
@@ -34,7 +36,7 @@ import {
 import {useFileHistoryModal} from './hooks/useFileHistoryModal';
 import {FileInfo} from './types';
 
-export const FileHistoryHeader = ({file}: {file?: FileInfo}) => {
+export const FileHistoryHeader: FunctionComponent<{file?: FileInfo}> = ({file}: {file?: FileInfo}) => {
   const {translate} = useApplicationContext();
   const {hideModal} = useFileHistoryModal();
 

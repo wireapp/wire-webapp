@@ -30,12 +30,12 @@ export class SingleSignOnPage {
     this.header = page.locator('#sso-login-heading-text');
   }
 
-  async enterEmailOnSSOPage(email: string) {
+  async enterEmailOnSSOPage(email: string): Promise<void> {
     await this.ssoCodeEmailInput.fill(email);
     await this.ssoSignInButton.click();
   }
 
-  async isSSOPageVisible() {
+  async isSSOPageVisible(): Promise<void> {
     // The SSO page can take a while to finish booting on slower or restricted networks.
     return this.ssoCodeEmailInput.waitFor({state: 'visible', timeout: 120_000});
   }

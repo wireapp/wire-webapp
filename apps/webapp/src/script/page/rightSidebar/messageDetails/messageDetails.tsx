@@ -56,7 +56,7 @@ const sortUsers = (userA: User, userB: User): number => {
   return userA.name().localeCompare(userB.name(), undefined, {sensitivity: 'base'});
 };
 
-const formatTime = (time: string | number | Date) => {
+const formatTime = (time: string | number | Date): string => {
   return formatLocale(time, 'P, p');
 };
 
@@ -160,15 +160,15 @@ const MessageDetails: FC<MessageDetailsProps> = ({
       ? formatTime(editedTimestamp)
       : '';
 
-  const onReceipts = () => {
+  const onReceipts = (): void => {
     return setIsReceiptsOpen(true);
   };
 
-  const onReactions = () => {
+  const onReactions = (): void => {
     return setIsReceiptsOpen(false);
   };
 
-  const onParticipantClick = (userEntity: User) => {
+  const onParticipantClick = (userEntity: User): void => {
     return togglePanel(PanelState.GROUP_PARTICIPANT_USER, userEntity);
   };
 

@@ -17,7 +17,7 @@
  *
  */
 
-import {useState} from 'react';
+import {useState, type FunctionComponent} from 'react';
 
 import {Document, Page} from 'react-pdf';
 
@@ -33,7 +33,7 @@ interface PDFViewerProps {
   src?: string;
 }
 
-export const PDFViewer = ({src}: PDFViewerProps) => {
+export const PDFViewer: FunctionComponent<PDFViewerProps> = ({src}: PDFViewerProps) => {
   const [pagesCount, setPagesCount] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(true);
 

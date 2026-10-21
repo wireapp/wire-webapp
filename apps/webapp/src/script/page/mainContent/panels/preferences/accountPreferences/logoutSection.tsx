@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {TabIndex, Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import type {ClientRepository} from 'Repositories/client';
@@ -26,7 +28,7 @@ interface LogoutSectionProps {
   clientRepository: ClientRepository;
 }
 
-const LogoutSection = ({clientRepository}: LogoutSectionProps) => {
+const LogoutSection: FunctionComponent<LogoutSectionProps> = ({clientRepository}: LogoutSectionProps) => {
   const {translate} = useApplicationContext();
 
   return (

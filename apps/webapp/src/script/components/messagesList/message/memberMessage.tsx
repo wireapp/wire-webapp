@@ -17,7 +17,7 @@
  *
  */
 
-import type {ReactElement, ReactNode} from 'react';
+import type {ReactElement, ReactNode, FunctionComponent} from 'react';
 
 import {Button, ButtonVariant, CollectionIcon, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
@@ -97,7 +97,7 @@ interface MemberMessageProps {
   isSelfGuest: boolean;
 }
 
-export const MemberMessage = ({
+export const MemberMessage: FunctionComponent<MemberMessageProps> = ({
   message,
   shouldShowInvitePeople,
   isSelfTemporaryGuest,

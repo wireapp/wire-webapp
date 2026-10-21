@@ -52,7 +52,7 @@ const useUserModalState = create<UserModalState>(set => {
   };
 });
 
-const showUserModal = (userId: QualifiedId, onClose = noop) => {
+const showUserModal = (userId: QualifiedId, onClose = noop): void => {
   const {updateOnClose, updateUserId} = useUserModalState.getState();
   updateUserId(userId);
   updateOnClose(onClose);

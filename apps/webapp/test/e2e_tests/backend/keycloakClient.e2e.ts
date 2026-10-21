@@ -40,12 +40,12 @@ export class KeycloakClientE2E {
     this.keycloakPassword = process.env.KEYCLOAK_PASSWORD || '';
   }
 
-  async getMetaData() {
+  async getMetaData(): Promise<any> {
     const response = await this.axiosInstance.get(`realms/${this.keycloakRealm}/protocol/saml/descriptor`);
     return response.data;
   }
 
-  async createSamlClient(user: User) {
+  async createSamlClient(user: User): Promise<any> {
     if (!this.backendUrl) {
       throw new Error('BACKEND_URL is not defined');
     }
@@ -88,7 +88,7 @@ export class KeycloakClientE2E {
     return response.headers['location'].split('/').pop();
   }
 
-  async createUser(user: User) {
+  async createUser(user: User): Promise<any> {
     const response = await this.axiosInstance.post(
       `admin/realms/${this.keycloakRealm}/users`,
       {
@@ -111,7 +111,7 @@ export class KeycloakClientE2E {
     return response.headers['location'].split('/').pop();
   }
 
-  async cleanUp(clientId?: string, userIds?: string[]) {
+  async cleanUp(clientId?: string, userIds?: string[]): Promise<void> {
     if (clientId) {
       await this.deleteSamlClient(clientId);
     }
@@ -137,7 +137,7 @@ export class KeycloakClientE2E {
     return response.data.access_token;
   }
 
-  private async deleteSamlClient(clientId: string) {
+  private async deleteSamlClient(clientId: string): Promise<void> {
     await this.axiosInstance.delete(`admin/realms/${this.keycloakRealm}/clients/${clientId}`, {
       headers: {
         Authorization: `Bearer ${await this.authorize()}`,
@@ -146,7 +146,7 @@ export class KeycloakClientE2E {
     });
   }
 
-  private async deleteUser(userId: string) {
+  private async deleteUser(userId: string): Promise<void> {
     await this.axiosInstance.delete(`admin/realms/${this.keycloakRealm}/users/${userId}`, {
       headers: {
         Authorization: `Bearer ${await this.authorize()}`,

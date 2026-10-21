@@ -44,44 +44,44 @@ export class CellsSharedDrivePage {
     this.uploadStatusHeader = page.getByTestId('shared-drive-upload-status-header');
   }
 
-  getFile(fileName: string) {
+  getFile(fileName: string): Locator {
     return this.filesList.getByRole('button', {name: fileName, exact: true});
   }
 
-  getFolder(folderName: string) {
+  getFolder(folderName: string): Locator {
     return this.getFile(folderName);
   }
 
-  async createFolder(folderName: string) {
+  async createFolder(folderName: string): Promise<void> {
     await this.newButton.click();
     await this.createFolderMenuItem.click();
     await this.folderNameInput.fill(folderName);
     await this.createFolderButton.click();
   }
 
-  async openFolder(folderName: string) {
+  async openFolder(folderName: string): Promise<void> {
     await this.getFolder(folderName).click();
   }
 
-  async openRoot(conversationName: string) {
+  async openRoot(conversationName: string): Promise<void> {
     await this.page.getByRole('button', {name: `${conversationName} files`, exact: true}).click();
   }
 
-  async uploadFile(filePath: string | readonly string[]) {
+  async uploadFile(filePath: string | readonly string[]): Promise<void> {
     await this.openNewMenu();
     await this.uploadFileFromOpenMenu(filePath);
   }
 
-  async openNewMenu() {
+  async openNewMenu(): Promise<void> {
     await this.newButton.click();
     await this.uploadFileMenuItem.waitFor({state: 'visible'});
   }
 
-  async uploadFileFromOpenMenu(filePath: string | readonly string[]) {
+  async uploadFileFromOpenMenu(filePath: string | readonly string[]): Promise<void> {
     await shareAssetHelper(filePath, this.page, this.uploadFileMenuItem);
   }
 
-  async refresh() {
+  async refresh(): Promise<void> {
     await this.refreshButton.click();
   }
 }

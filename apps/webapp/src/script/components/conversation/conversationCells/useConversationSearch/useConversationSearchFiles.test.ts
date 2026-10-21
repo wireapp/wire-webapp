@@ -31,6 +31,7 @@ import {useConversationSearchFiles} from './useConversationSearchFiles';
 import type {ConversationDriveFiltersState} from '../common/driveFilters/driveFilters';
 import type {CellsSort} from '../common/useCellsSorting/useCellsSorting';
 import {useCellsStore} from '../common/useCellsStore/useCellsStore';
+import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 
 const CONV_ID = 'conv-abc';
 const DOMAIN = 'staging.zinfra.io';
@@ -78,6 +79,27 @@ function createDeferred<T>(): PromiseWithResolvers<T> {
   return Promise.withResolvers<T>();
 }
 
+type RenderSearchHookResult = {
+  rerender: (props?: unknown) => void;
+  result: {
+    current: {
+      searchValue: string;
+      handleSearch: (value: string) => void;
+      handleReload: () => Promise<void>;
+      handleClearSearch: ({
+        preserveFilters,
+        preserveInputValue,
+      }?: {
+        preserveFilters?: boolean;
+        preserveInputValue?: boolean;
+      }) => void;
+      loadMore: (offset: number) => Promise<void>;
+    };
+  };
+  unmount: () => void;
+  fireAndForgetInvoker: FireAndForgetInvoker;
+  onClear: () => void;
+};
 function renderSearchHook({
   cellsRepository = createFakeCellsRepository(),
   userRepository = createFakeUserRepository(),
@@ -94,7 +116,7 @@ function renderSearchHook({
   fireAndForgetInvoker?: ReturnType<typeof createExecutingFireAndForgetInvokerForTest>;
   filters?: ConversationDriveFiltersState;
   sort?: CellsSort | null;
-} = {}) {
+} = {}): RenderSearchHookResult {
   return {
     fireAndForgetInvoker,
     onClear,

@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {Button, ButtonVariant, FlexBox, Text} from '@wireapp/react-ui-kit';
 
 import {ModalComponent} from 'Components/Modals/ModalComponent';
@@ -38,7 +40,10 @@ interface ConfirmDiscardModalProps {
   onSubmit: () => void;
 }
 
-export const ConfirmDiscardModal = ({onCancel, onSubmit}: ConfirmDiscardModalProps) => {
+export const ConfirmDiscardModal: FunctionComponent<ConfirmDiscardModalProps> = ({
+  onCancel,
+  onSubmit,
+}: ConfirmDiscardModalProps) => {
   const {translate} = useApplicationContext();
   const {isConfirmDiscardModalOpen} = useCreateConversationModal();
 

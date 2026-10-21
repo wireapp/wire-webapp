@@ -41,7 +41,7 @@ interface NotificationsProps {
 const Notifications: FC<NotificationsProps> = ({activeConversation, onGoBack, onClose, repositories}) => {
   const {translate} = useApplicationContext();
   const {notificationState} = useKoSubscribableChildren(activeConversation, ['notificationState']);
-  const saveOptionNotificationPreference = (value: number) => {
+  const saveOptionNotificationPreference = (value: number): void => {
     void repositories.conversation.setNotificationState(activeConversation, value);
   };
 

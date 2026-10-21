@@ -117,7 +117,7 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
 
   const isPasswordRequired = hasPasswordWithRules || isGuestLinkPassword;
 
-  const onModalHidden = () => {
+  const onModalHidden = (): void => {
     updateCurrentModalContent(defaultContent);
     updateInputValue('');
     setPasswordValue('');
@@ -130,7 +130,7 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
     setIsFormSubmitted(false);
   };
 
-  const isPasswordOptional = () => {
+  const isPasswordOptional = (): boolean => {
     const skipValidation = passwordOptional && passwordInput.trim().length === 0;
     if (skipValidation) {
       return true;
@@ -156,7 +156,7 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
   const passwordGuestLinkActionEnabled =
     (!isGuestLinkPassword || passwordValue.trim().length > 0) && areGuestLinkPasswordsValid;
 
-  const isPrimaryActionDisabled = (disabled: boolean | undefined) => {
+  const isPrimaryActionDisabled = (disabled: boolean | undefined): boolean => {
     if (disabled === true) {
       return true;
     }
@@ -197,7 +197,7 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
     };
   };
 
-  const confirm = () => {
+  const confirm = (): void => {
     const action = content?.primaryAction?.action;
     if (isNullOrUndefined(action)) {
       return;
@@ -230,7 +230,7 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
     action();
   };
 
-  const onOptionChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const onOptionChange = (event: ChangeEvent<HTMLInputElement>): void => {
     updateOptionChecked(event.target.checked);
     if (primaryActionButtonRef.current !== null) {
       primaryActionButtonRef.current.focus();

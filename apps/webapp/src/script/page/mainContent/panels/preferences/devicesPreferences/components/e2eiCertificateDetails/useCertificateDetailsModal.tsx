@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState, type FunctionComponent} from 'react';
 
 import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
 import {ModalOptions} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
@@ -29,7 +29,7 @@ const DOWNLOAD_CERTIFICATE_TIMEOUT = 500;
 const CERTIFICATE_NAME = 'certificate.pem';
 const CERTIFICATE_TYPE = 'application/x-pem-file';
 
-const ModalMessageWrapper = ({message}: {message: string}) => {
+const ModalMessageWrapper: FunctionComponent<{message: string}> = ({message}: {message: string}) => {
   return (
     <div
       css={{

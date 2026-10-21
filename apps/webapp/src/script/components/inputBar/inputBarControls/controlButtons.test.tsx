@@ -17,7 +17,7 @@
  *
  */
 
-import {render} from '@testing-library/react';
+import {render, type RenderResult} from '@testing-library/react';
 
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 
@@ -115,7 +115,7 @@ describe('ControlButtons', () => {
     expect(queryByTitle('tooltipConversationFile')).toBe(null);
   });
 
-  const renderCellsControls = (cellsState: CONVERSATION_CELLS_STATE) => {
+  const renderCellsControls = (cellsState: CONVERSATION_CELLS_STATE): RenderResult => {
     spyOn(Config, 'getConfig').and.returnValue({
       FEATURE: {ALLOWED_FILE_UPLOAD_EXTENSIONS: ['*'], ENABLE_CELLS: true},
     });

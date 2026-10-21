@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
@@ -64,7 +64,11 @@ interface HistoryExportProps {
   readonly clientState?: ClientState;
 }
 
-const HistoryExport = ({switchContent, user, clientState = container.resolve(ClientState)}: HistoryExportProps) => {
+const HistoryExport: FunctionComponent<HistoryExportProps> = ({
+  switchContent,
+  user,
+  clientState = container.resolve(ClientState),
+}: HistoryExportProps) => {
   const {mainViewModel, translate} = useApplicationContext();
 
   const [historyState, setHistoryState] = useState<ExportState>(ExportState.PREPARING);
@@ -130,7 +134,7 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
     [dismissExport],
   );
 
-  const downloadArchiveFile = () => {
+  const downloadArchiveFile = (): void => {
     const {
       FEATURE: {ENABLE_CROSS_PLATFORM_BACKUP_EXPORT},
     } = Config.getConfig();
@@ -148,7 +152,7 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
     }
   };
 
-  const onCancel = () => {
+  const onCancel = (): void => {
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.HISTORY.BACKUP_CANCELLED, {
       [Segmentation.GENERAL.STEP]: Segmentation.BACKUP_CREATION.CANCELLATION_STEP.DURING_BACKUP,
     });

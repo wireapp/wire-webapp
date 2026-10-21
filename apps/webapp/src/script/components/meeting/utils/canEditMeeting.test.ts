@@ -58,7 +58,7 @@ const createMeetingInstance = (
   };
 };
 
-const createSelfUser = (id = 'host-id') => {
+const createSelfUser = (id = 'host-id'): User => {
   const user = new User(id, 'example.com', translateForTest);
   user.name('Host');
   return user;

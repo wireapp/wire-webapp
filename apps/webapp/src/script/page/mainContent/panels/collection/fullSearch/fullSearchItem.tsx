@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {isOddInteger} from '@sindresorhus/is';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
@@ -34,7 +36,11 @@ interface FullSearchItemProps {
   onClick: () => void;
 }
 
-const FullSearchItem = ({message, onClick, formatText}: FullSearchItemProps) => {
+const FullSearchItem: FunctionComponent<FullSearchItemProps> = ({
+  message,
+  onClick,
+  formatText,
+}: FullSearchItemProps) => {
   const {user, timestamp} = useKoSubscribableChildren(message, ['user', 'timestamp']);
   const {name} = useKoSubscribableChildren(user, ['name']);
   const {parts, matches} = formatText((message.getFirstAsset() as Text).text);

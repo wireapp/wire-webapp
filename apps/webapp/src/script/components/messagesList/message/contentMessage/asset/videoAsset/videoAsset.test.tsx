@@ -17,7 +17,7 @@
  *
  */
 
-import {act, fireEvent, render, screen, waitFor} from '@testing-library/react';
+import {act, fireEvent, render, screen, waitFor, type RenderResult} from '@testing-library/react';
 import ko from 'knockout';
 import {noop} from 'noop-esm';
 
@@ -97,7 +97,7 @@ describe('VideoAsset', () => {
       .mockReturnValueOnce('blob:mock-video-src');
   };
 
-  const renderVideoAsset = (message: ContentMessage) => {
+  const renderVideoAsset = (message: ContentMessage): RenderResult => {
     return render(<VideoAsset message={message} teamState={teamState} assetRepository={assetRepository} />, {
       wrapper: rootProviderWrapper,
     });

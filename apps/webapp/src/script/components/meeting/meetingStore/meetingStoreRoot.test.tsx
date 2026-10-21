@@ -21,7 +21,18 @@ import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {FEATURE_STATUS, type FeatureList} from '@wireapp/api-client/lib/team/feature/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {act, render, screen, waitFor} from '@testing-library/react';
+import {
+  act,
+  render,
+  screen,
+  waitFor,
+  type Matcher,
+  type SelectorMatcherOptions,
+  type waitForOptions,
+  type MatcherOptions,
+  type ByRoleMatcher,
+  type ByRoleOptions,
+} from '@testing-library/react';
 import {amplify} from 'amplify';
 import {task} from 'true-myth';
 import {container} from 'tsyringe';
@@ -45,13 +56,27 @@ import {translateForTest} from 'Util/test/translateForTest';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {MeetingStoreRoot} from './meetingStoreRoot';
+import type {FunctionComponent} from 'react';
+import type {Container} from 'react-dom/client';
+import type {OptionsReceived} from '@testing-library/dom/node_modules/pretty-format';
 
 const meetingId: QualifiedId = {id: 'meeting-id', domain: 'example.com'};
 const selfUserId: QualifiedId = {id: 'self-user-id', domain: 'example.com'};
 const otherUserId: QualifiedId = {id: 'other-user-id', domain: 'example.com'};
 const conversationId: QualifiedId = {id: 'conversation-id', domain: 'example.com'};
 
-const createApiMeeting = (title: string, qualifiedId: QualifiedId = meetingId) => {
+type CreateApiMeetingResult = {
+  created_at: string;
+  updated_at: string;
+  start_time: string;
+  end_time: string;
+  title: string;
+  qualified_conversation: {id: string; domain: string};
+  qualified_creator: {id: string; domain: string};
+  qualified_id: {domain: string; id: string};
+  tzid: string;
+};
+const createApiMeeting = (title: string, qualifiedId: QualifiedId = meetingId): CreateApiMeetingResult => {
   return {
     created_at: '2026-06-15T09:00:00.000Z',
     updated_at: '2026-06-15T09:00:00.000Z',
@@ -67,17 +92,17 @@ const createApiMeeting = (title: string, qualifiedId: QualifiedId = meetingId) =
 
 const meetingTitlesTestId = 'meeting-titles';
 
-const setMeetingsTeamFeature = (status: FEATURE_STATUS) => {
+const setMeetingsTeamFeature = (status: FEATURE_STATUS): void => {
   act(() => {
     container.resolve(TeamState).teamFeatures({meetings: {status}} as FeatureList);
   });
 };
 
-const setNegotiatedApiVersion = (apiVersion: number) => {
+const setNegotiatedApiVersion = (apiVersion: number): void => {
   container.resolve(Core).backendFeatures.version = apiVersion;
 };
 
-const MeetingTitlesProbe = () => {
+const MeetingTitlesProbe: FunctionComponent = () => {
   const meetingSeries = useMeetingStore(state => {
     return state.meetingSeries;
   });
@@ -101,6 +126,132 @@ type RenderParameters = {
   readonly clock?: ReturnType<typeof createDeterministicClock>;
 };
 
+type RenderMeetingStoreRootResult = {
+  getMeetingsList: jest.Mock<any, any, any>;
+  getMeeting: jest.Mock<any, any, any>;
+  container: HTMLElement;
+  baseElement: HTMLElement;
+  debug: (
+    baseElement?: Container | (Element | Document) | Array<Container | (Element | Document)> | undefined,
+    maxLength?: number | undefined,
+    options?: OptionsReceived | undefined,
+  ) => void;
+  rerender: (ui: React.ReactNode) => void;
+  unmount: () => void;
+  asFragment: () => DocumentFragment;
+  getByLabelText: (id: Matcher, options?: SelectorMatcherOptions | undefined) => HTMLElement;
+  getAllByLabelText: (id: Matcher, options?: SelectorMatcherOptions | undefined) => HTMLElement[];
+  queryByLabelText: (id: Matcher, options?: SelectorMatcherOptions | undefined) => HTMLElement | null;
+  queryAllByLabelText: (id: Matcher, options?: SelectorMatcherOptions | undefined) => HTMLElement[];
+  findByLabelText: (
+    id: Matcher,
+    options?: SelectorMatcherOptions | undefined,
+    waitForElementOptions?: waitForOptions | undefined,
+  ) => Promise<HTMLElement>;
+  findAllByLabelText: (
+    id: Matcher,
+    options?: SelectorMatcherOptions | undefined,
+    waitForElementOptions?: waitForOptions | undefined,
+  ) => Promise<HTMLElement[]>;
+  getByPlaceholderText: (id: Matcher, options?: MatcherOptions | undefined) => HTMLElement;
+  getAllByPlaceholderText: (id: Matcher, options?: MatcherOptions | undefined) => HTMLElement[];
+  queryByPlaceholderText: (id: Matcher, options?: MatcherOptions | undefined) => HTMLElement | null;
+  queryAllByPlaceholderText: (id: Matcher, options?: MatcherOptions | undefined) => HTMLElement[];
+  findByPlaceholderText: (
+    id: Matcher,
+    options?: MatcherOptions | undefined,
+    waitForElementOptions?: waitForOptions | undefined,
+  ) => Promise<HTMLElement>;
+  findAllByPlaceholderText: (
+    id: Matcher,
+    options?: MatcherOptions | undefined,
+    waitForElementOptions?: waitForOptions | undefined,
+  ) => Promise<HTMLElement[]>;
+  getByText: (id: Matcher, options?: SelectorMatcherOptions | undefined) => HTMLElement;
+  getAllByText: (id: Matcher, options?: SelectorMatcherOptions | undefined) => HTMLElement[];
+  queryByText: (id: Matcher, options?: SelectorMatcherOptions | undefined) => HTMLElement | null;
+  queryAllByText: (id: Matcher, options?: SelectorMatcherOptions | undefined) => HTMLElement[];
+  findByText: (
+    id: Matcher,
+    options?: SelectorMatcherOptions | undefined,
+    waitForElementOptions?: waitForOptions | undefined,
+  ) => Promise<HTMLElement>;
+  findAllByText: (
+    id: Matcher,
+    options?: SelectorMatcherOptions | undefined,
+    waitForElementOptions?: waitForOptions | undefined,
+  ) => Promise<HTMLElement[]>;
+  getByAltText: (id: Matcher, options?: MatcherOptions | undefined) => HTMLElement;
+  getAllByAltText: (id: Matcher, options?: MatcherOptions | undefined) => HTMLElement[];
+  queryByAltText: (id: Matcher, options?: MatcherOptions | undefined) => HTMLElement | null;
+  queryAllByAltText: (id: Matcher, options?: MatcherOptions | undefined) => HTMLElement[];
+  findByAltText: (
+    id: Matcher,
+    options?: MatcherOptions | undefined,
+    waitForElementOptions?: waitForOptions | undefined,
+  ) => Promise<HTMLElement>;
+  findAllByAltText: (
+    id: Matcher,
+    options?: MatcherOptions | undefined,
+    waitForElementOptions?: waitForOptions | undefined,
+  ) => Promise<HTMLElement[]>;
+  getByTitle: (id: Matcher, options?: MatcherOptions | undefined) => HTMLElement;
+  getAllByTitle: (id: Matcher, options?: MatcherOptions | undefined) => HTMLElement[];
+  queryByTitle: (id: Matcher, options?: MatcherOptions | undefined) => HTMLElement | null;
+  queryAllByTitle: (id: Matcher, options?: MatcherOptions | undefined) => HTMLElement[];
+  findByTitle: (
+    id: Matcher,
+    options?: MatcherOptions | undefined,
+    waitForElementOptions?: waitForOptions | undefined,
+  ) => Promise<HTMLElement>;
+  findAllByTitle: (
+    id: Matcher,
+    options?: MatcherOptions | undefined,
+    waitForElementOptions?: waitForOptions | undefined,
+  ) => Promise<HTMLElement[]>;
+  getByDisplayValue: (id: Matcher, options?: MatcherOptions | undefined) => HTMLElement;
+  getAllByDisplayValue: (id: Matcher, options?: MatcherOptions | undefined) => HTMLElement[];
+  queryByDisplayValue: (id: Matcher, options?: MatcherOptions | undefined) => HTMLElement | null;
+  queryAllByDisplayValue: (id: Matcher, options?: MatcherOptions | undefined) => HTMLElement[];
+  findByDisplayValue: (
+    id: Matcher,
+    options?: MatcherOptions | undefined,
+    waitForElementOptions?: waitForOptions | undefined,
+  ) => Promise<HTMLElement>;
+  findAllByDisplayValue: (
+    id: Matcher,
+    options?: MatcherOptions | undefined,
+    waitForElementOptions?: waitForOptions | undefined,
+  ) => Promise<HTMLElement[]>;
+  getByRole: (role: ByRoleMatcher, options?: ByRoleOptions | undefined) => HTMLElement;
+  getAllByRole: (role: ByRoleMatcher, options?: ByRoleOptions | undefined) => HTMLElement[];
+  queryByRole: (role: ByRoleMatcher, options?: ByRoleOptions | undefined) => HTMLElement | null;
+  queryAllByRole: (role: ByRoleMatcher, options?: ByRoleOptions | undefined) => HTMLElement[];
+  findByRole: (
+    role: ByRoleMatcher,
+    options?: ByRoleOptions | undefined,
+    waitForElementOptions?: waitForOptions | undefined,
+  ) => Promise<HTMLElement>;
+  findAllByRole: (
+    role: ByRoleMatcher,
+    options?: ByRoleOptions | undefined,
+    waitForElementOptions?: waitForOptions | undefined,
+  ) => Promise<HTMLElement[]>;
+  getByTestId: (id: Matcher, options?: MatcherOptions | undefined) => HTMLElement;
+  getAllByTestId: (id: Matcher, options?: MatcherOptions | undefined) => HTMLElement[];
+  queryByTestId: (id: Matcher, options?: MatcherOptions | undefined) => HTMLElement | null;
+  queryAllByTestId: (id: Matcher, options?: MatcherOptions | undefined) => HTMLElement[];
+  findByTestId: (
+    id: Matcher,
+    options?: MatcherOptions | undefined,
+    waitForElementOptions?: waitForOptions | undefined,
+  ) => Promise<HTMLElement>;
+  findAllByTestId: (
+    id: Matcher,
+    options?: MatcherOptions | undefined,
+    waitForElementOptions?: waitForOptions | undefined,
+  ) => Promise<HTMLElement[]>;
+};
 const renderMeetingStoreRoot = ({
   getMeetingsList = jest.fn(() => {
     return task.resolve([createApiMeeting('Weekly sync')]);
@@ -111,7 +262,7 @@ const renderMeetingStoreRoot = ({
   isMeetingsFeatureEnabled = true,
   apiVersion = Config.getConfig().MIN_MEETINGS_SUPPORTED_API_VERSION,
   clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
-}: RenderParameters = {}) => {
+}: RenderParameters = {}): RenderMeetingStoreRootResult => {
   setMeetingsTeamFeature(isMeetingsFeatureEnabled ? FEATURE_STATUS.ENABLED : FEATURE_STATUS.DISABLED);
   setNegotiatedApiVersion(apiVersion);
   container.resolve(UserState).self(new User(selfUserId.id, selfUserId.domain, translateForTest));
@@ -144,7 +295,7 @@ const renderMeetingStoreRoot = ({
   return {...renderResult, getMeetingsList, getMeeting};
 };
 
-const getRenderedMeetingTitles = () => {
+const getRenderedMeetingTitles = (): string => {
   return screen.getByTestId(meetingTitlesTestId).textContent;
 };
 

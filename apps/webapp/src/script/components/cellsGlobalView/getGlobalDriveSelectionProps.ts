@@ -21,7 +21,11 @@ import {isNonEmptyString} from '@sindresorhus/is';
 
 import type {GlobalDriveFiltersState} from 'Components/conversation/conversationCells/common/driveFilters/driveFilters';
 
-export const getGlobalDriveSelectionProps = (searchValue: string, filterState: GlobalDriveFiltersState) => {
+type GetGlobalDriveSelectionPropsResult = {selectionEnabled: boolean; selectionScopeKey: string};
+export const getGlobalDriveSelectionProps = (
+  searchValue: string,
+  filterState: GlobalDriveFiltersState,
+): GetGlobalDriveSelectionPropsResult => {
   return {
     selectionEnabled: !isNonEmptyString(searchValue),
     selectionScopeKey: JSON.stringify(filterState),

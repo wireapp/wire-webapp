@@ -18,6 +18,7 @@
  */
 
 import {render} from '@testing-library/react';
+import type {ComponentProps} from 'react';
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
@@ -40,7 +41,7 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
 );
 
-function createMemberMessage(systemType: SystemMessageType, users?: User[]) {
+function createMemberMessage(systemType: SystemMessageType, users?: User[]): MemberMessageEntity {
   const message = new MemberMessageEntity(translateForTest);
   message.memberMessageType = systemType;
   const actor = generateUser();
@@ -60,7 +61,10 @@ function createMemberMessage(systemType: SystemMessageType, users?: User[]) {
   return message;
 }
 
-const createBaseProps = (conversation: Conversation, message: MemberMessageEntity) => {
+type CreateBasePropsResult = Omit<ComponentProps<typeof MessageWrapper>, 'message'> & {
+  message: MemberMessageEntity;
+};
+const createBaseProps = (conversation: Conversation, message: MemberMessageEntity): CreateBasePropsResult => {
   return {
     conversation,
     message,

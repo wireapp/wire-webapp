@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {AlertIcon, UnavailableFileIcon} from '@wireapp/react-ui-kit';
 
 import {FileTypeIcon} from 'Components/conversation/common/fileTypeIcon/fileTypeIcon';
@@ -29,7 +31,7 @@ interface FileCardIconProps {
   type?: 'file' | 'error' | 'unavailable';
 }
 
-export const FileCardIcon = ({type = 'file'}: FileCardIconProps) => {
+export const FileCardIcon: FunctionComponent<FileCardIconProps> = ({type = 'file'}: FileCardIconProps) => {
   const {extension} = useFileCardContext();
 
   if (type === 'error') {

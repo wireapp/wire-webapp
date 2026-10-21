@@ -17,13 +17,14 @@
  *
  */
 
-import axios, {AxiosInstance} from 'axios';
+import axios, {AxiosInstance, type AxiosResponse} from 'axios';
 
 const CALLING_SERVICE_URL = process.env.CALLING_SERVICE_URL;
 const CALLING_SERVICE_BASIC_AUTH = process.env.CALLING_SERVICE_BASIC_AUTH;
 const CALLING_SERVICE_BACKEND = process.env.CALLING_SERVICE_BACKEND;
 const CALLING_SERVICE_INSTANCE_VERSION = process.env.CALLING_SERVICE_INSTANCE_VERSION;
 
+type SetAcceptNextCallResult = Promise<AxiosResponse<any, {conversationId: string; timeout: number}, {}, any>>;
 export class CallingServiceClientE2E {
   private readonly axiosInstance: AxiosInstance;
 
@@ -38,7 +39,7 @@ export class CallingServiceClientE2E {
     });
   }
 
-  async createInstance(password: string, email: string) {
+  async createInstance(password: string, email: string): Promise<any> {
     const response = await this.axiosInstance.post('/api/v1/instance/create', {
       email,
       password,
@@ -87,19 +88,19 @@ export class CallingServiceClientE2E {
     return response.data;
   }
 
-  async setAcceptNextCall(instanceId: string, timeout: number = 7200000) {
+  async setAcceptNextCall(instanceId: string, timeout: number = 7200000): SetAcceptNextCallResult {
     return await this.axiosInstance.post(`/api/v1/instance/${instanceId}/call/acceptNext`, {
       conversationId: '',
       timeout,
     });
   }
 
-  async getFlows(instanceId: string) {
+  async getFlows(instanceId: string): Promise<Flow> {
     const response = await this.axiosInstance.get(`/api/v1/instance/${instanceId}/flows`);
     return response.data[0] as Flow;
   }
 
-  async verifyAudioIsBeingReceived(instanceId: string) {
+  async verifyAudioIsBeingReceived(instanceId: string): Promise<boolean> {
     return this.verifyFlowChange(
       instanceId,
       false, // checkAudioSent
@@ -109,7 +110,7 @@ export class CallingServiceClientE2E {
     );
   }
 
-  async verifyVideoIsBeingReceived(instanceId: string) {
+  async verifyVideoIsBeingReceived(instanceId: string): Promise<boolean> {
     return this.verifyFlowChange(
       instanceId,
       false, // checkAudioSent
@@ -125,7 +126,7 @@ export class CallingServiceClientE2E {
     checkAudioRecv: boolean,
     checkVideoSent: boolean,
     checkVideoRecv: boolean,
-  ) {
+  ): Promise<boolean> {
     const flowBefore = await this.getFlows(instanceId);
 
     const timeout = 30_000;

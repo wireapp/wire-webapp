@@ -22,7 +22,7 @@ import {createRef} from 'react';
 import userEvent from '@testing-library/user-event';
 import {act, render, screen} from '@testing-library/react';
 
-import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
+import {createDeterministicClock, type DeterministicClock} from '@enormora/clock/deterministic-clock';
 
 import {User} from 'Repositories/entity/User';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
@@ -37,6 +37,12 @@ import {ConversationHeaderComponent} from './conversationHeader';
 import {SidebarTabs} from '../useSidebarStore';
 
 describe('ConversationHeader', () => {
+  type RenderHeaderResult = {
+    onSearchTab: jest.Mock<any, any, any>;
+    onSearchEnterClick: jest.Mock<any, any, any>;
+    onSearchChange: jest.Mock<any, any, any>;
+    clock: DeterministicClock;
+  };
   const renderHeader = ({
     onSearchTab = jest.fn(),
     onSearchEnterClick = jest.fn(),
@@ -46,7 +52,7 @@ describe('ConversationHeader', () => {
     }),
     searchValue = 'search',
     clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
-  } = {}) => {
+  } = {}): RenderHeaderResult => {
     const wrapper = createRootProviderWrapperForTest(
       createRootContextValueForTest({translate: translateForTest, clock}),
     );

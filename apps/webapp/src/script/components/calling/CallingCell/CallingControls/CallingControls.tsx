@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
@@ -56,7 +58,7 @@ interface CallingControlsProps {
   isAnswerButtonDisabled?: boolean;
 }
 
-export const CallingControls = ({
+export const CallingControls: FunctionComponent<CallingControlsProps> = ({
   answerCall,
   call,
   callActions,

@@ -30,7 +30,7 @@ export const showDeletePermanentlyModal = ({
   node: CellNode;
   onDeletePermanently: (uuid: string) => void;
   translate: RootContextValue['translate'];
-}) => {
+}): void => {
   PrimaryModal.show(
     PrimaryModal.type.CONFIRM,
     {

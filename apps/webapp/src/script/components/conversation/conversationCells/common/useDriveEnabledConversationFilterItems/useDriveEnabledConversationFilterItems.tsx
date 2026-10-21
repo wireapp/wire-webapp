@@ -17,6 +17,7 @@
  *
  */
 
+import type {JSX} from '@emotion/react/jsx-runtime';
 import {CONVERSATION_ACCESS} from '@wireapp/api-client/lib/conversation/';
 import {stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 
@@ -36,7 +37,7 @@ export const getDriveEnabledConversations = (conversationRepository: Conversatio
   });
 };
 
-const getConversationFilterStartContent = (conversation: Conversation, isChannelsEnabled: boolean) => {
+const getConversationFilterStartContent = (conversation: Conversation, isChannelsEnabled: boolean): JSX.Element => {
   return conversation.isChannel() && isChannelsEnabled ? (
     <ChannelAvatar
       conversationID={conversation.id}

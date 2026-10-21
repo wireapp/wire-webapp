@@ -19,6 +19,7 @@
 
 import {ReactNode} from 'react';
 
+import type {JSX} from '@emotion/react/jsx-runtime';
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
@@ -44,12 +45,12 @@ function generateNames(
   translate: RootContextValue['translate'],
   declension = Declension.ACCUSATIVE,
   hasExtra = false,
-) {
+): string {
   const visibleUsers = hasExtra ? getVisibleUsers(users) : users;
   return joinNames(visibleUsers, translate, declension, hasExtra, true);
 }
 
-function getVisibleUsers(users: User[]) {
+function getVisibleUsers(users: User[]): User[] {
   return users.slice(0, CONFIG.REDUCED_USERS_COUNT);
 }
 
@@ -229,7 +230,7 @@ export function MessageContent({
 }: {
   message: MemberMessageEntity;
   onClickParticipants: (participants: User[]) => void;
-}) {
+}): JSX.Element {
   const {translate} = useApplicationContext();
   const htmlCaption = getContent(message, translate);
   const content = replaceReactComponents(htmlCaption, [

@@ -36,7 +36,7 @@ const generateConversation = (
   readOnlyState: CONVERSATION_READONLY_STATE | null = null,
   is1To1WithBlockedUser = false,
   userName = 'John Doe',
-) => {
+): Conversation => {
   const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
   conversation.type(CONVERSATION_TYPE.ONE_TO_ONE);
   conversation.readOnlyState(readOnlyState);

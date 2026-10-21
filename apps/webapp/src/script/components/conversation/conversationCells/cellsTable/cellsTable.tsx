@@ -17,7 +17,7 @@
  *
  */
 
-import {DragEvent, useEffect, useState} from 'react';
+import {DragEvent, useEffect, useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 import {flexRender, getCoreRowModel, type Header, useReactTable} from '@tanstack/react-table';
@@ -91,7 +91,11 @@ interface CellsTableHeaderCellProps {
   isSortingEnabled: boolean;
 }
 
-const CellsTableHeaderCell = ({header, getDirectionFor, isSortingEnabled}: CellsTableHeaderCellProps) => {
+const CellsTableHeaderCell: FunctionComponent<CellsTableHeaderCellProps> = ({
+  header,
+  getDirectionFor,
+  isSortingEnabled,
+}: CellsTableHeaderCellProps) => {
   const sortField = SORTABLE_COLUMN_FIELD[header.column.id];
   const ariaSort = isSortingEnabled && isNonEmptyString(sortField) ? toAriaSort(getDirectionFor(sortField)) : undefined;
 
@@ -117,7 +121,7 @@ const preventDefaultFileDrop = (event: DragEvent<HTMLElement>): void => {
   event.stopPropagation();
 };
 
-export const CellsTable = ({
+export const CellsTable: FunctionComponent<CellsTableProps> = ({
   nodes,
   cellsRepository,
   conversation,
@@ -238,7 +242,15 @@ export const CellsTable = ({
     onFolderDropTargetChange?.(node?.name ?? null);
   };
 
-  const getFolderDropHandlers = (node: CellNode) => {
+  type GetFolderDropHandlersResult =
+    | {onDragEnter?: undefined; onDragOver?: undefined; onDragLeave?: undefined; onDrop?: undefined}
+    | {
+        onDragEnter: (event: DragEvent<HTMLTableRowElement>) => void;
+        onDragOver: (event: DragEvent<HTMLTableRowElement>) => void;
+        onDragLeave: (event: DragEvent<HTMLTableRowElement>) => void;
+        onDrop: (event: DragEvent<HTMLTableRowElement>) => void;
+      };
+  const getFolderDropHandlers = (node: CellNode): GetFolderDropHandlersResult => {
     if (node.type !== CellNodeType.FOLDER || onDropFilesToFolder === undefined) {
       return {};
     }

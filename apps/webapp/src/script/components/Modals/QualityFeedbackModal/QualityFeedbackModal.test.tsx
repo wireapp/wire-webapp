@@ -17,7 +17,7 @@
  *
  */
 
-import {render, fireEvent, act} from '@testing-library/react';
+import {render, fireEvent, act, type RenderResult} from '@testing-library/react';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
@@ -104,7 +104,7 @@ describe('QualityFeedbackModal', () => {
     });
   });
 
-  const renderQualityFeedbackModal = () => {
+  const renderQualityFeedbackModal = (): RenderResult => {
     return render(
       withTheme(
         withIntl(

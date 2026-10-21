@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {amplify} from 'amplify';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
@@ -41,17 +43,17 @@ interface Props {
   onLeave: () => void;
 }
 
-export const ConfirmLeaveModal = ({isShown, onClose, onLeave}: Props) => {
+export const ConfirmLeaveModal: FunctionComponent<Props> = ({isShown, onClose, onLeave}: Props) => {
   const {translate} = useApplicationContext();
 
-  const closeHandler = () => {
+  const closeHandler = (): void => {
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.USER.PERSONAL_TEAM_CREATION.FLOW_CANCELLED, {
       step: Segmentation.TEAM_CREATION_STEP.MODAL_CONTINUE_CLICKED,
     });
     onClose();
   };
 
-  const leaveHandler = () => {
+  const leaveHandler = (): void => {
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.USER.PERSONAL_TEAM_CREATION.FLOW_CANCELLED, {
       step: Segmentation.TEAM_CREATION_STEP.MODAL_LEAVE_CLICKED,
     });

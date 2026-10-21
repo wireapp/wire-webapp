@@ -17,7 +17,7 @@
  *
  */
 
-import {render, screen} from '@testing-library/react';
+import {render, screen, type RenderResult} from '@testing-library/react';
 
 import {User} from 'Repositories/entity/User';
 import {
@@ -28,13 +28,13 @@ import {translateForTest} from 'Util/test/translateForTest';
 
 import {StackedAvatars} from './stackedAvatars';
 
-const createUser = (id: string, name: string) => {
+const createUser = (id: string, name: string): User => {
   const user = new User(id, 'example.com', translateForTest);
   user.name(name);
   return user;
 };
 
-const renderStackedAvatars = (participants: User[], organizer?: User) => {
+const renderStackedAvatars = (participants: User[], organizer?: User): RenderResult => {
   const rootProviderWrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({translate: translateForTest}),
   );

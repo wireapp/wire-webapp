@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useId, useRef, useState} from 'react';
+import {useEffect, useId, useRef, useState, type FunctionComponent} from 'react';
 
 import {Maybe} from 'true-myth';
 
@@ -74,7 +74,12 @@ interface Props {
   >;
 }
 
-export const ManualMigrationProtocolDetails = ({conversation, selfUser, teamState, repository}: Props) => {
+export const ManualMigrationProtocolDetails: FunctionComponent<Props> = ({
+  conversation,
+  selfUser,
+  teamState,
+  repository,
+}: Props) => {
   const {translate} = useApplicationContext();
   const [dialogState, setDialogState] = useState<MigrationDialogState>({phase: 'closed'});
   const isPending = useManualMigrationStore(state => {
@@ -117,14 +122,14 @@ export const ManualMigrationProtocolDetails = ({conversation, selfUser, teamStat
     previousPhaseRef.current = dialogState.phase;
   }, [dialogState.phase]);
 
-  const dismiss = () => {
+  const dismiss = (): void => {
     if (!isBusy) {
       reset();
       setDialogState({phase: 'closed'});
     }
   };
 
-  const confirm = async () => {
+  const confirm = async (): Promise<void> => {
     if (useManualMigrationStore.getState().pendingConversationIds.has(conversation.qualifiedId.id)) {
       return;
     }

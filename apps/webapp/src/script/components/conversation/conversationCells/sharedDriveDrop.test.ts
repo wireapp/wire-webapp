@@ -22,7 +22,11 @@ import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {translateForTest} from 'Util/test/translateForTest';
 
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
-import {getSharedDriveDropRejectionFeedback, handleSharedDriveDroppedFiles} from './sharedDriveDrop';
+import {
+  getSharedDriveDropRejectionFeedback,
+  handleSharedDriveDroppedFiles,
+  type SharedDriveDropRejection,
+} from './sharedDriveDrop';
 import {validateSharedDriveUploadFiles} from './sharedDriveUploadValidation';
 
 const rootUploadPath = 'conversation-id@example.com';
@@ -30,7 +34,21 @@ const nestedUploadPath = 'conversation-id@example.com/Marketing/Briefs';
 const conversationQualifiedId = 'conversation-id@example.com';
 const maxFileSize = 100;
 
-function createDependencies(options: Partial<Parameters<typeof handleSharedDriveDroppedFiles>[1]> = {}) {
+type CreateDependenciesResult = {
+  fireAndForgetInvoker: FireAndForgetInvoker;
+  sharedDriveUploadController: SharedDriveUploadController;
+  conversationQualifiedId: string;
+  uploadPath: string;
+  onRefresh: jest.Mock<any, any, any> | (() => void);
+  onReject: jest.Mock<any, any, any> | ((rejection: SharedDriveDropRejection) => void);
+  isUploadFilesEnabled: boolean;
+  isInRecycleBin: boolean;
+  maxFileSize: number;
+  isAcceptedFile: (file: File) => boolean;
+};
+function createDependencies(
+  options: Partial<Parameters<typeof handleSharedDriveDroppedFiles>[1]> = {},
+): CreateDependenciesResult {
   const fireAndForgetInvoker: FireAndForgetInvoker = {
     fireAndForget: jest.fn(),
     waitUntilAllSettled: jest.fn().mockResolvedValue(undefined),

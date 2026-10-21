@@ -17,10 +17,13 @@
  *
  */
 
-import React, {useState} from 'react';
+import React, {useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyString, isNull, isNullOrUndefined} from '@sindresorhus/is';
+import type {OAuthBody} from '@wireapp/api-client/lib/oauth/oAuthBody';
 import {OAuthClient} from '@wireapp/api-client/lib/oauth/oAuthClient';
+import type {Self} from '@wireapp/api-client/lib/self';
+import type {TeamData} from '@wireapp/api-client/lib/team';
 import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
 import {container} from 'tsyringe';
@@ -82,7 +85,7 @@ export enum Scope {
   READ_FEATURE_CONFIGS = 'read:feature_configs',
 }
 
-const OAuthPermissionsComponent = ({
+const OAuthPermissionsComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> = ({
   doLogout,
   getOAuthApp,
   selfUser,
@@ -109,7 +112,7 @@ const OAuthPermissionsComponent = ({
   const oauthScope = oAuthScope(oauthParams);
   const cleanedScopes = oAuthScopesToString(oauthScope);
 
-  const onContinue = async () => {
+  const onContinue = async (): Promise<void> => {
     try {
       const url = await postOauthCode({...oauthParams, scope: cleanedScopes});
       window.location.replace(url);
@@ -118,12 +121,12 @@ const OAuthPermissionsComponent = ({
     }
   };
 
-  const onCancel = () => {
+  const onCancel = (): void => {
     window.location.replace(`${oauthParams.redirect_uri}?error=access_denied`);
   };
 
   React.useEffect(() => {
-    const getUserData = async () => {
+    const getUserData = async (): Promise<void> => {
       await getSelf();
       if (isNonEmptyString(selfTeamId)) {
         const team = await getTeam(selfTeamId);
@@ -273,7 +276,8 @@ const OAuthPermissionsComponent = ({
 };
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
-const mapStateToProps = (state: RootState) => {
+type MapStateToPropsResult = {selfUser: Self; selfTeamId: string | undefined};
+const mapStateToProps = (state: RootState): MapStateToPropsResult => {
   return {
     selfUser: SelfSelector.getSelf(state),
     selfTeamId: SelfSelector.getSelfTeamId(state),
@@ -281,7 +285,14 @@ const mapStateToProps = (state: RootState) => {
 };
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: ThunkDispatch) => {
+type MapDispatchToPropsResult = {
+  getSelf: () => Promise<Self>;
+  getOAuthApp: (applicationId: string) => Promise<OAuthClient>;
+  doLogout: () => Promise<void>;
+  getTeam: (teamId: string) => Promise<TeamData>;
+  postOauthCode: (oauthBody: OAuthBody) => Promise<string>;
+};
+const mapDispatchToProps = (dispatch: ThunkDispatch): MapDispatchToPropsResult => {
   return {
     getSelf: (...args: Parameters<typeof actionRoot.selfAction.fetchSelf>) => {
       return dispatch(actionRoot.selfAction.fetchSelf(...args));

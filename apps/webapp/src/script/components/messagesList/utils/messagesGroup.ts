@@ -90,7 +90,7 @@ function shouldGroupMessagesByTimestamp(
   firstMessageTimestamp: number,
   previousMessageTimestamp: number,
   currentMessageTimestamp: number,
-) {
+): boolean {
   // Interval in seconds, within which messages are grouped together
   const GROUPED_MESSAGE_INTERVAL = groupedMessageIntervalInSeconds * TIME_IN_MILLIS.SECOND;
 

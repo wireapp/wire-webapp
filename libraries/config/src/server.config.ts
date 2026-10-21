@@ -103,10 +103,16 @@ function mergedCSP({urls}: ConfigGeneratorParams, env: Env): Record<string, Iter
     workerSrc: [...defaultCSP.workerSrc, ...parseCommaSeparatedList(env.CSP_EXTRA_WORKER_SRC)],
   };
   return Object.entries(csp)
-    .filter(([key, value]) => !!Array.from(value).length)
-    .reduce((accumulator, [key, value]) => ({...accumulator, [key]: value}), {});
+    .filter(entry => {
+      return Array.from(entry[1]).length > 0;
+    })
+    .reduce((accumulator, entry) => {
+      return {...accumulator, [entry[0]]: entry[1]};
+    }, {});
 }
 
+// The configuration contract is intentionally inferred and exposed through ReturnType<typeof generateConfig>.
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export function generateConfig(params: ConfigGeneratorParams, env: Env) {
   const {commit, version, urls, env: nodeEnv} = params;
   const baseUrl = urls.base ?? '';

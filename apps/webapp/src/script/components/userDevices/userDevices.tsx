@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useMemo, useState} from 'react';
+import {useEffect, useMemo, useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {ClientClassification} from '@wireapp/api-client/lib/client/';
@@ -61,7 +61,7 @@ interface UserDevicesProps {
   groupId?: string;
 }
 
-export const UserDevices = ({
+export const UserDevices: FunctionComponent<UserDevicesProps> = ({
   noPadding = false,
   current,
   user,
@@ -101,7 +101,7 @@ export const UserDevices = ({
     })();
   }, [clientRepository, logger, user]);
 
-  const clickOnDevice = (clientEntity: ClientEntity) => {
+  const clickOnDevice = (clientEntity: ClientEntity): void => {
     setSelectedClient(clientEntity);
     const headline = user.isMe
       ? (clientEntity.label ?? clientEntity.model ?? '')
@@ -109,7 +109,7 @@ export const UserDevices = ({
     goTo(UserDevicesState.DEVICE_DETAILS, headline !== '' ? headline : '');
   };
 
-  const clickToShowSelfFingerprint = () => {
+  const clickToShowSelfFingerprint = (): void => {
     goTo(UserDevicesState.SELF_FINGERPRINT, translate('participantDevicesSelfFingerprint'));
   };
 

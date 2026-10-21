@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {REASON} from '@wireapp/avs';
 
 import * as Icon from 'Components/icon';
@@ -30,7 +32,7 @@ interface CallTimeoutMessageProps {
   message: CallingTimeoutMessage;
 }
 
-const CallTimeoutMessage = ({message}: CallTimeoutMessageProps) => {
+const CallTimeoutMessage: FunctionComponent<CallTimeoutMessageProps> = ({message}: CallTimeoutMessageProps) => {
   const {translate} = useApplicationContext();
   const reason = message.reason;
   const {timestamp} = useKoSubscribableChildren(message, ['timestamp']);

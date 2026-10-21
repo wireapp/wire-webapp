@@ -28,7 +28,19 @@ import {SharedDriveUploadInput} from './sharedDriveUploadInput';
 const uploadPath = 'conversation-id@example.com/files';
 const conversationQualifiedId = 'conversation-id@example.com';
 
-function createDependencies() {
+type CreateDependenciesResult = {
+  conversationQualifiedId: string;
+  fireAndForgetInvoker: FireAndForgetInvoker;
+  isAcceptedFile: jest.Mock<boolean, [], any>;
+  isInRecycleBin: boolean;
+  isUploadFilesEnabled: boolean;
+  maxFileSize: number;
+  onRefresh: jest.Mock<any, any, any>;
+  onReject: jest.Mock<any, any, any>;
+  sharedDriveUploadController: SharedDriveUploadController;
+  uploadPath: string;
+};
+function createDependencies(): CreateDependenciesResult {
   const fireAndForgetInvoker: FireAndForgetInvoker = {
     fireAndForget: jest.fn(),
     waitUntilAllSettled: jest.fn().mockResolvedValue(undefined),
@@ -54,7 +66,7 @@ function createDependencies() {
   };
 }
 
-function getUploadAction(fireAndForgetInvoker: FireAndForgetInvoker) {
+function getUploadAction(fireAndForgetInvoker: FireAndForgetInvoker): () => Promise<unknown> {
   return jest.mocked(fireAndForgetInvoker.fireAndForget).mock.calls[0][0];
 }
 

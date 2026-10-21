@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {Button, ButtonVariant, FlexBox} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -36,7 +38,11 @@ interface SingleActionProps {
   oneButtonPerRow?: boolean;
 }
 
-const SingleAction = ({item, onCancel, oneButtonPerRow = false}: SingleActionProps) => {
+const SingleAction: FunctionComponent<SingleActionProps> = ({
+  item,
+  onCancel,
+  oneButtonPerRow = false,
+}: SingleActionProps) => {
   const {translate} = useApplicationContext();
   return (
     <FlexBox

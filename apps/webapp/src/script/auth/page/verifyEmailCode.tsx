@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect} from 'react';
+import React, {useEffect, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 import type {RegisterData} from '@wireapp/api-client/lib/auth/';
@@ -37,7 +37,8 @@ import {styles} from './verifyEmailCode.styles';
 import {AccountRegistrationLayout} from '../component/accountRegistrationLayout';
 import {BackButton} from '../component/backButton';
 import {actionRoot as ROOT_ACTIONS} from '../module/action';
-import {RootState, bindActionCreators} from '../module/reducer';
+import {RootState, bindActionCreators, type ThunkAction} from '../module/reducer';
+import type {RegistrationDataState} from '../module/reducer/authReducer';
 import * as AuthSelector from '../module/selector/authSelector';
 import {ROUTE} from '../route';
 import {parseError} from '../util/errorUtil';
@@ -45,7 +46,7 @@ import {PageView, trackTelemetryPageView} from '../util/trackingUtil';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
-const VerifyEmailCodeComponent = ({
+const VerifyEmailCodeComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> = ({
   account,
   authError,
   entropyData,
@@ -56,7 +57,7 @@ const VerifyEmailCodeComponent = ({
   const navigate = useNavigate();
 
   const logger = getLogger('VerifyEmailCode');
-  const createAccount = async (email_code?: string) => {
+  const createAccount = async (email_code?: string): Promise<void> => {
     try {
       const validAccount: RegisterData = {
         ...account,
@@ -70,7 +71,7 @@ const VerifyEmailCodeComponent = ({
     }
   };
 
-  const resendCode = async (event: React.MouseEvent) => {
+  const resendCode = async (event: React.MouseEvent): Promise<void> => {
     event.preventDefault();
     if (!isNonEmptyString(account.email)) {
       return;
@@ -122,7 +123,12 @@ const VerifyEmailCodeComponent = ({
 };
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
-const mapStateToProps = (state: RootState) => {
+type MapStateToPropsResult = {
+  account: RegistrationDataState;
+  authError: Error | null;
+  entropyData: Uint8Array<ArrayBufferLike> | undefined;
+};
+const mapStateToProps = (state: RootState): MapStateToPropsResult => {
   return {
     account: AuthSelector.getAccount(state),
     authError: AuthSelector.getError(state),
@@ -131,7 +137,11 @@ const mapStateToProps = (state: RootState) => {
 };
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => {
+type MapDispatchToPropsResult = {
+  doRegisterPersonal: (registration: RegisterData, entropyData?: Uint8Array) => ThunkAction;
+  doSendActivationCode: (email: string) => ThunkAction;
+};
+const mapDispatchToProps = (dispatch: Dispatch<AnyAction>): MapDispatchToPropsResult => {
   return bindActionCreators(
     {
       doRegisterPersonal: ROOT_ACTIONS.authAction.doRegisterPersonal,

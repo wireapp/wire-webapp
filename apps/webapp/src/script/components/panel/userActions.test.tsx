@@ -17,7 +17,7 @@
  *
  */
 
-import {act, fireEvent, render} from '@testing-library/react';
+import {act, fireEvent, render, type RenderResult} from '@testing-library/react';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
@@ -53,7 +53,7 @@ const actionsViewModel = {
   saveConversation: jest.fn(),
 } as unknown as ActionsViewModel;
 
-const getAllActions = (queryFunction: (id: string) => HTMLElement | null) => {
+const getAllActions = (queryFunction: (id: string) => HTMLElement | null): HTMLElement[] => {
   return Object.values(ActionIdentifier)
     .map(action => {
       return queryFunction(action);
@@ -67,7 +67,7 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
 );
 
-function renderWithRootProvider(node: React.ReactElement) {
+function renderWithRootProvider(node: React.ReactElement): RenderResult {
   return render(node, {wrapper: rootProviderWrapper});
 }
 

@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect} from 'react';
+import {useEffect, type FunctionComponent} from 'react';
 
 import {isUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
@@ -35,7 +35,7 @@ import {useCreateConversationModal} from '../hooks/useCreateConversationModal';
 import {ConversationCreationStep, ConversationType} from '../types';
 import {getConversationTypeOptions} from '../utils';
 
-export const ConversationTypeContainer = () => {
+export const ConversationTypeContainer: FunctionComponent = () => {
   const {translate} = useApplicationContext();
   const teamState = container.resolve(TeamState);
   const userState = container.resolve(UserState);
@@ -62,7 +62,7 @@ export const ConversationTypeContainer = () => {
     }
   }, [isInTeam, setConversationType]);
 
-  const onConversationTypeChange = (conversationType: ConversationType) => {
+  const onConversationTypeChange = (conversationType: ConversationType): void => {
     if (
       conversationType === ConversationType.Group &&
       conversationCreationStep === ConversationCreationStep.Preference

@@ -27,13 +27,13 @@ async function openParticipantDetailsFromGroup(
   pages: PageManager['webapp']['pages'],
   groupName: string,
   participantName: string,
-) {
+): Promise<void> {
   await pages.conversationList().getConversation(groupName).open();
   await pages.conversation().clickConversationInfoButton();
   await pages.conversationDetails().getParticipant(participantName).openDetails();
 }
 
-async function acceptConnectionRequest(pages: PageManager['webapp']['pages']) {
+async function acceptConnectionRequest(pages: PageManager['webapp']['pages']): Promise<void> {
   await pages.conversationList().openPendingConnectionRequest();
   await pages.connectRequest().clickConnectButton();
 }

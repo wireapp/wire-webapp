@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, CSSProperties} from 'react';
+import {useEffect, CSSProperties, type FunctionComponent} from 'react';
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
@@ -45,7 +45,7 @@ interface UserDetailsProps {
   avatarStyles?: CSSProperties;
 }
 
-const UserDetailsComponent = ({
+const UserDetailsComponent: FunctionComponent<UserDetailsProps> = ({
   badge,
   participant,
   groupId,
@@ -137,7 +137,7 @@ const UserDetailsComponent = ({
   );
 };
 
-export const UserDetails = (props: UserDetailsProps) => {
+export const UserDetails: FunctionComponent<UserDetailsProps> = (props: UserDetailsProps) => {
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
       <UserDetailsComponent {...props} />

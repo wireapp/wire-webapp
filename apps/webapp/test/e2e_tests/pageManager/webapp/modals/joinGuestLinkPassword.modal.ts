@@ -35,7 +35,7 @@ export class JoinGuestLinkPasswordModal extends BaseModal {
     this.joinForm = this.modal.getByTestId('guest-password-join-form');
   }
 
-  async joinConversation(password: string) {
+  async joinConversation(password: string): Promise<void> {
     await this.passwordInput.fill(password);
     await this.submitButton.click();
   }

@@ -35,7 +35,7 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
   }),
 );
 
-const createConversation = (id: string, name: string, channel = false) => {
+const createConversation = (id: string, name: string, channel = false): Conversation => {
   return {
     display_name: () => {
       return name;

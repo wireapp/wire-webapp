@@ -145,22 +145,22 @@ const RightSidebar: FC<RightSidebarProps> = ({
   const messageEntity = !isNullOrUndefined(currentEntity) && isReadableMessage(currentEntity) ? currentEntity : null;
   const serviceEntity = !isNullOrUndefined(currentEntity) && isAppOrServiceEntity(currentEntity) ? currentEntity : null;
 
-  const goToRoot = () => {
+  const goToRoot = (): void => {
     return rightSidebar.goToRoot(isNullOrUndefined(activeConversation) ? null : activeConversation);
   };
 
-  const closePanel = () => {
+  const closePanel = (): void => {
     return rightSidebar.close();
   };
 
-  const togglePanel = (newState: PanelState, entity: PanelEntity | null, isAddMode: boolean = false) => {
+  const togglePanel = (newState: PanelState, entity: PanelEntity | null, isAddMode: boolean = false): void => {
     setAnimatePanelToLeft(true);
     rightSidebar.goTo(newState, {entity, isAddMode});
   };
 
   const onBackClick = (
     entity: PanelEntity | null = isNullOrUndefined(activeConversation) ? null : activeConversation,
-  ) => {
+  ): void => {
     const previousHistory = rightSidebar.history.slice(0, -1);
     const hasPreviousHistory = isNonEmptyArray(previousHistory);
     setAnimatePanelToLeft(false);
@@ -180,12 +180,12 @@ const RightSidebar: FC<RightSidebarProps> = ({
     rightSidebar.goTo(PanelState.CONVERSATION_DETAILS, {entity});
   };
 
-  const showDevices = (entity: User) => {
+  const showDevices = (entity: User): void => {
     rightSidebar.goTo(PanelState.PARTICIPANT_DEVICES, {entity});
     setAnimatePanelToLeft(true);
   };
 
-  const switchContent = (newContentState: string) => {
+  const switchContent = (newContentState: string): void => {
     const isCollectionState = newContentState === ContentState.COLLECTION;
 
     if (isCollectionState && isNonEmptyString(currentState)) {

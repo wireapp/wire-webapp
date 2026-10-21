@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {ChevronIcon, FlexBox, Option} from '@wireapp/react-ui-kit';
 
 import {
@@ -34,7 +36,10 @@ interface ChatHistorySharingOptionProps {
   isPremiumUser: boolean;
 }
 
-export const CustomHistorySharingOption = ({option, isPremiumUser}: ChatHistorySharingOptionProps) => {
+export const CustomHistorySharingOption: FunctionComponent<ChatHistorySharingOptionProps> = ({
+  option,
+  isPremiumUser,
+}: ChatHistorySharingOptionProps) => {
   const {chatHistory} = useCreateConversationModal();
 
   return (

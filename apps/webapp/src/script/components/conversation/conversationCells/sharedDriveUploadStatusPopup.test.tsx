@@ -17,7 +17,7 @@
  *
  */
 
-import {render, screen, within} from '@testing-library/react';
+import {render, screen, within, type RenderResult} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {ThemeProvider} from '@wireapp/react-ui-kit';
 
@@ -42,7 +42,7 @@ const renderPopup = (
   isExpanded = false,
   isRetrying = false,
   fileName = upload.fileName,
-) => {
+): RenderResult => {
   return render(
     <ThemeProvider>
       <SharedDriveUploadStatusPopup

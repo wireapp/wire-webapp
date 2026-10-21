@@ -17,7 +17,7 @@
  *
  */
 
-import {render, screen} from '@testing-library/react';
+import {render, screen, type RenderResult} from '@testing-library/react';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
@@ -33,7 +33,7 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
 );
 
-const renderOverlay = (mode: 'upload' | 'restricted') => {
+const renderOverlay = (mode: 'upload' | 'restricted'): RenderResult => {
   return render(
     <StyledApp themeId={THEME_ID.DEFAULT}>
       <FileDropzoneOverlay isActive mode={mode} />

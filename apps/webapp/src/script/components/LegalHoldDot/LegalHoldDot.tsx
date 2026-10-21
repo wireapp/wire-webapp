@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import React, {type FunctionComponent} from 'react';
 
 import cx from 'classnames';
 
@@ -37,7 +37,7 @@ interface LegalHoldDotProps {
   showText?: boolean;
 }
 
-export const LegalHoldDot = ({
+export const LegalHoldDot: FunctionComponent<LegalHoldDotProps> = ({
   isInteractive = false,
   conversation,
   isPending,
@@ -52,7 +52,7 @@ export const LegalHoldDot = ({
     return state;
   });
 
-  const onClick = (event: React.MouseEvent) => {
+  const onClick = (event: React.MouseEvent): void => {
     event.stopPropagation();
 
     if (isPending === true) {

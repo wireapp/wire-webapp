@@ -33,6 +33,11 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
 );
 
+type RenderConversationFileDropzoneResult = {
+  conversation: Element;
+  onDragEnter: jest.Mock<any, any, any>;
+  onFileDropped: jest.Mock<any, any, any>;
+};
 const renderConversationFileDropzone = ({
   isCellsEnabled = true,
   isConversationFileDropzoneEnabled = true,
@@ -43,7 +48,7 @@ const renderConversationFileDropzone = ({
   isConversationFileDropzoneEnabled?: boolean;
   onDragEnter?: jest.Mock;
   onFileDropped?: jest.Mock;
-} = {}) => {
+} = {}): RenderConversationFileDropzoneResult => {
   const result = render(
     <StyledApp themeId={THEME_ID.DEFAULT}>
       <ConversationFileDropzone

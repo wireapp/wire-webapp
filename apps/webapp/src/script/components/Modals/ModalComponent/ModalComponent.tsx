@@ -70,7 +70,7 @@ const ModalComponent = ({
   children,
   onKeyDown,
   ...rest
-}: ModalComponentProps) => {
+}: ModalComponentProps): React.ReactPortal | null => {
   const [displayNone, setDisplayNone] = useState<boolean>(!isShown);
   const hasVisibleClass = isShown && !displayNone;
   const isMounting = useRef<boolean>(true);
@@ -82,7 +82,7 @@ const ModalComponent = ({
       ? ((container as HTMLElement).ownerDocument ?? document)
       : document;
 
-    const trapFocus = (event: KeyboardEvent) => {
+    const trapFocus = (event: KeyboardEvent): void => {
       return preventFocusOutside(event, trapId, targetDocument);
     };
 

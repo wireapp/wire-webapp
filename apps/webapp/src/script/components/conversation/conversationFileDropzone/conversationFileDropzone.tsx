@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode} from 'react';
+import {ReactNode, type FunctionComponent} from 'react';
 
 import cx from 'classnames';
 import {DropzoneInputProps, DropzoneRootProps} from 'react-dropzone';
@@ -40,7 +40,7 @@ interface ConversationFileDropzoneProps {
   children: ReactNode;
 }
 
-export const ConversationFileDropzone = ({
+export const ConversationFileDropzone: FunctionComponent<ConversationFileDropzoneProps> = ({
   isCellsEnabled,
   isConversationFileDropzoneEnabled,
   isConversationLoaded,

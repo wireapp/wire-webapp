@@ -17,11 +17,13 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {actionsStyles, headingStyles, wrapperStyles} from 'Components/meeting/meetingHeader/meetingHeader.styles';
 import {MeetingMultiActionButton} from 'Components/meeting/meetingMultiActionButton/meetingMultiActionButton';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-export const MeetingHeader = () => {
+export const MeetingHeader: FunctionComponent = () => {
   const {translate} = useApplicationContext();
 
   return (

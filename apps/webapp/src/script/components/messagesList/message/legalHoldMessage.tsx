@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {container} from 'tsyringe';
 
 import {LegalHoldDot} from 'Components/LegalHoldDot';
@@ -30,7 +32,7 @@ interface LegalHoldMessageProps {
   message: LegalHoldMessageEntity;
 }
 
-const LegalHoldMessage = ({
+const LegalHoldMessage: FunctionComponent<LegalHoldMessageProps> = ({
   message,
   conversationState = container.resolve(ConversationState),
 }: LegalHoldMessageProps) => {
@@ -38,7 +40,7 @@ const LegalHoldMessage = ({
   const {showUsers} = useLegalHoldModalState(state => {
     return state;
   });
-  const showLegalHold = () => {
+  const showLegalHold = (): void => {
     return showUsers(false, conversationState.activeConversation());
   };
 

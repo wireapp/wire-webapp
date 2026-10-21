@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {isEmptyString, isUndefined} from '@sindresorhus/is';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
@@ -52,7 +54,7 @@ interface VideoAssetPlayerProps {
  */
 const VIDEO_ROOT_MARGIN = '0px';
 
-export const VideoAssetPlayer = ({
+export const VideoAssetPlayer: FunctionComponent<VideoAssetPlayerProps> = ({
   isFocusable = true,
   isFileShareRestricted,
   name,

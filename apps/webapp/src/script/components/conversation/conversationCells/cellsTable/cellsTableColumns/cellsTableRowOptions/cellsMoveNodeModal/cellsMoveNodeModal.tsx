@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {useEffect, useState, type FunctionComponent} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
@@ -46,7 +46,7 @@ interface CellsMoveNodeModalProps {
   navigateToPath?: (params: {conversationQualifiedId: QualifiedId; path: string}) => void;
 }
 
-const FlaggedCellsMoveNodeModal = ({
+const FlaggedCellsMoveNodeModal: FunctionComponent<CellsMoveNodeModalProps> = ({
   nodeToMove,
   isOpen,
   onClose,
@@ -116,7 +116,7 @@ const FlaggedCellsMoveNodeModal = ({
 
   const isMoveLoading = moveNodeStatus === 'loading';
 
-  const handleMove = async () => {
+  const handleMove = async (): Promise<void> => {
     const moveResult = await handleMoveOperation();
     if (moveResult.isErr) {
       return;
@@ -190,7 +190,7 @@ const FlaggedCellsMoveNodeModal = ({
   );
 };
 
-export const CellsMoveNodeModal = (props: CellsMoveNodeModalProps) => {
+export const CellsMoveNodeModal: FunctionComponent<CellsMoveNodeModalProps> = (props: CellsMoveNodeModalProps) => {
   const {isFeatureToggleEnabled} = useApplicationContext();
 
   if (!isFeatureToggleEnabled(driveBulkActionsFeatureToggleName)) {

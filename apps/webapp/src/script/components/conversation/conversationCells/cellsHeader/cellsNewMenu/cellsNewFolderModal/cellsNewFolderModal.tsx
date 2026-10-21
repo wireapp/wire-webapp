@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {CellsNewNodeForm} from 'Components/conversation/conversationCells/common/cellsNewNodeForm/cellsNewNodeForm';
@@ -37,7 +39,7 @@ interface CellsNewFolderModalProps {
   currentPath: string;
 }
 
-export const CellsNewFolderModal = ({
+export const CellsNewFolderModal: FunctionComponent<CellsNewFolderModalProps> = ({
   isOpen,
   onClose,
   cellsRepository,

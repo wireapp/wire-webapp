@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {keyframes} from '@emotion/react';
 
 import {MicOnIcon} from 'Components/icon';
@@ -32,7 +34,7 @@ interface ParticipantMicOnIconProps {
   isActive?: boolean;
 }
 
-const ParticipantMicOnIcon = ({
+const ParticipantMicOnIcon: FunctionComponent<ParticipantMicOnIconProps> = ({
   className,
   isActive = false,
   color = isActive ? 'var(--accent-color)' : 'currentColor',

@@ -21,7 +21,7 @@ import type {ReactNode} from 'react';
 
 import {act, renderHook} from '@testing-library/react';
 import {task} from 'true-myth';
-import {createStore} from 'zustand/vanilla';
+import {createStore, type StoreApi} from 'zustand/vanilla';
 
 import {useMeetingPrepModal} from 'Components/meeting/meetingPrep/useMeetingPrepModal';
 import type {MeetingStoreState} from 'Components/meeting/meetingStore/createMeetingStore';
@@ -103,7 +103,7 @@ const createJoinTestMocks = ({
 const createMeetingStore = ({
   loadMeetings = jest.fn().mockResolvedValue(undefined),
   meetNowMeeting = jest.fn().mockReturnValue(task.resolve({failedToAdd: [], qualifiedConversation})),
-}: Partial<Pick<MeetingStoreState, 'loadMeetings' | 'meetNowMeeting'>> = {}) => {
+}: Partial<Pick<MeetingStoreState, 'loadMeetings' | 'meetNowMeeting'>> = {}): StoreApi<MeetingStoreState> => {
   return createStore<MeetingStoreState>(() => {
     return {
       meetingSeries: [],

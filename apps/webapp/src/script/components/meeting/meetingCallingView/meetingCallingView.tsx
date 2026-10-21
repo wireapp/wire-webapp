@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {container} from 'tsyringe';
 
 import {CallingCell} from 'Components/calling/CallingCell';
@@ -27,7 +29,7 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {useApplicationContext, useMainViewModel} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
-export const MeetingCallingView = () => {
+export const MeetingCallingView: FunctionComponent = () => {
   const {mainViewModel} = useApplicationContext();
   const {calling: callingViewModel} = useMainViewModel();
   const {properties: propertiesRepository} = mainViewModel.content.repositories;

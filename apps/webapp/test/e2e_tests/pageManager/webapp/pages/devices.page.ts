@@ -19,6 +19,7 @@
 
 import {Locator, Page} from '@playwright/test';
 
+type EnhanceDeviceLocatorResult = Locator & {removeButton: Locator; detailsButton: Locator};
 export class DevicesPage {
   readonly proteusId: Locator;
   readonly activeDevices: Locator;
@@ -28,7 +29,7 @@ export class DevicesPage {
     this.activeDevices = page.getByRole('group', {name: 'Active'}).getByRole('button', {name: /device details/});
   }
 
-  enhanceDeviceLocator(deviceLocator: Locator) {
+  enhanceDeviceLocator(deviceLocator: Locator): EnhanceDeviceLocatorResult {
     return Object.assign(deviceLocator, {
       removeButton: deviceLocator.getByRole('button', {name: 'Remove Device'}),
       detailsButton: deviceLocator.getByTestId('go-device-details'),

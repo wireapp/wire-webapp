@@ -45,7 +45,15 @@ let searchRepository: SearchRepository;
 const rootContextValue = createRootContextValueForTest({translate: translateForTest});
 const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
-const getDefaultParams = (showReactions: boolean = false) => {
+type GetDefaultParamsResult = {
+  conversationRepository: ConversationRepository;
+  onClose: jest.Mock<any, any, any>;
+  searchRepository: SearchRepository;
+  showReactions: boolean;
+  teamRepository: TeamRepository;
+  updateEntity: jest.Mock<any, any, any>;
+};
+const getDefaultParams = (showReactions: boolean = false): GetDefaultParamsResult => {
   return {
     conversationRepository,
     onClose: jest.fn(),

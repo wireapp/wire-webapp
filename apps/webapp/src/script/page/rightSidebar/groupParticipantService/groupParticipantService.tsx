@@ -88,16 +88,16 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
 
   const showActions = isActiveParticipant && serviceUser !== undefined && inTeam;
 
-  const onOpen = () => {
+  const onOpen = (): void => {
     void actionsViewModel.open1to1ConversationWithService(serviceEntity);
   };
 
-  const onRemove = (user: User) => {
+  const onRemove = (user: User): void => {
     void actionsViewModel.removeFromConversation(activeConversation, user);
     onBack();
   };
 
-  const onAdd = () => {
+  const onAdd = (): void => {
     if (serviceEntity.isService) {
       void integrationRepository.addServiceToExistingConversation(activeConversation, serviceEntity);
     } else if (serviceEntity.qualifiedId !== undefined) {

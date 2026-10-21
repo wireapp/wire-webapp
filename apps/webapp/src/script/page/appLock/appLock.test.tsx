@@ -83,7 +83,7 @@ const createTeamState = ({
   enforceAppLock?: boolean;
   inactivityTimeoutSecs?: number;
   status?: string;
-} = {}) => {
+} = {}): TeamState => {
   const teamState = new TeamState();
   jest.spyOn(teamState, 'isTeam').mockImplementation(
     ko.pureComputed(() => {
@@ -103,13 +103,13 @@ const createTeamState = ({
   return teamState;
 };
 
-const createAppLockState = (teamState?: TeamState) => {
+const createAppLockState = (teamState?: TeamState): AppLockState => {
   teamState = teamState ?? createTeamState();
   const appLockState = new AppLockState(teamState);
   return appLockState;
 };
 
-const createAppLockRepository = (appLockState?: AppLockState) => {
+const createAppLockRepository = (appLockState?: AppLockState): AppLockRepository => {
   const userState = new UserState();
   appLockState = appLockState ?? createAppLockState();
   userState.self(new User(createUuid(), '', translateForTest));

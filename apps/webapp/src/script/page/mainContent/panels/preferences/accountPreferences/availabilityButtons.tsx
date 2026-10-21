@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {CSSObject} from '@emotion/serialize';
 import {amplify} from 'amplify';
 import cx from 'classnames';
@@ -40,7 +42,7 @@ const headerStyles: CSSObject = {
   textAlign: 'center',
 };
 
-const AvailabilityButtons = ({availability}: AvailabilityInputProps) => {
+const AvailabilityButtons: FunctionComponent<AvailabilityInputProps> = ({availability}: AvailabilityInputProps) => {
   const {translate} = useApplicationContext();
   const entries: ContextMenuEntry[] = [
     {

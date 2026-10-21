@@ -19,7 +19,7 @@
 
 import {validateFiles} from './fileValidation';
 
-const translate = (key: string) => {
+const translate = (key: string): string => {
   return key;
 };
 

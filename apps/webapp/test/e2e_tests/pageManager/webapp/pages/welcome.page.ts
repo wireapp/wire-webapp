@@ -40,19 +40,19 @@ export class WelcomePage {
     this.ssoCode = page.locator('[data-uie-name="status-logout-reason"]');
   }
 
-  async getLogoutReasonText() {
+  async getLogoutReasonText(): Promise<string> {
     return (await this.logoutReasonText.textContent()) ?? '';
   }
 
-  async clickCreateAccountButton() {
+  async clickCreateAccountButton(): Promise<void> {
     await this.createAccountButton.click();
   }
 
-  async clickCreatePersonalAccountButton() {
+  async clickCreatePersonalAccountButton(): Promise<void> {
     await this.createPersonalAccountButton.click();
   }
 
-  async clickLogin() {
+  async clickLogin(): Promise<void> {
     await this.loginButton.click();
   }
 }

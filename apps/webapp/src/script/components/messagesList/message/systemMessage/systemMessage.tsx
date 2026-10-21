@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {ConversationSettingsIcon, MLSVerified} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
@@ -46,7 +48,7 @@ interface SystemMessageProps {
   message: SystemMessageEntity;
 }
 
-export const SystemMessage = ({message}: SystemMessageProps) => {
+export const SystemMessage: FunctionComponent<SystemMessageProps> = ({message}: SystemMessageProps) => {
   const {user} = useKoSubscribableChildren(message, ['user']);
   if (message.system_message_type === SystemMessageType.SESSION_RESET) {
     return <SystemMessageBase message={message} isSenderNameVisible={!user.isMe} icon={<Icon.InfoIcon />} />;

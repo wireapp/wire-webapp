@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import cx from 'classnames';
 
 import {ServiceListItem} from 'Components/ServiceList/components/ServiceListItem';
@@ -36,7 +38,7 @@ interface ServiceListProps {
   dataUieName?: string;
 }
 
-export const ServiceList = ({
+export const ServiceList: FunctionComponent<ServiceListProps> = ({
   onServiceClick,
   isSearching = false,
   mode = MODE.DEFAULT,

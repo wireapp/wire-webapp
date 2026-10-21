@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactElement, useMemo} from 'react';
+import {ReactElement, useMemo, type FunctionComponent} from 'react';
 
 import {isNan, isNonEmptyArray, isNonEmptyString} from '@sindresorhus/is';
 import cx from 'classnames';
@@ -52,7 +52,7 @@ interface ConversationFolderTabProps {
 
 const CONTEXT_MENU_OFFSET_PIXELS = 4;
 
-export const ConversationFolderTab = ({
+export const ConversationFolderTab: FunctionComponent<ConversationFolderTabProps> = ({
   title,
   label,
   type,
@@ -69,7 +69,7 @@ export const ConversationFolderTab = ({
   const {conversationLabelRepository} = conversationRepository;
   const isSideBarOpen = sidebarStatus === SidebarStatus.OPEN;
 
-  function toggleFolder(folderId: string) {
+  function toggleFolder(folderId: string): void {
     openFolder(folderId);
     onChangeTab(type, folderId);
   }
@@ -98,7 +98,7 @@ export const ConversationFolderTab = ({
     );
   }, [translate]);
 
-  function openFoldersContextMenu(event: React.MouseEvent<HTMLButtonElement>) {
+  function openFoldersContextMenu(event: React.MouseEvent<HTMLButtonElement>): void {
     const entries: ContextMenuEntry[] = folders.map(folder => {
       return {
         click: () => {
@@ -118,7 +118,7 @@ export const ConversationFolderTab = ({
     showContextMenu({event, entries, identifier: 'navigation-folders-menu', placeholder});
   }
 
-  function handleToggleFoldersTab(event: React.MouseEvent<HTMLButtonElement>) {
+  function handleToggleFoldersTab(event: React.MouseEvent<HTMLButtonElement>): void {
     if (isSideBarOpen) {
       toggleFoldersTab();
       return;
@@ -127,7 +127,7 @@ export const ConversationFolderTab = ({
     openFoldersContextMenu(event);
   }
 
-  function getTotalUnreadConversationMessages(conversations: Conversation[]) {
+  function getTotalUnreadConversationMessages(conversations: Conversation[]): number {
     let total = 0;
 
     conversations.forEach(conversation => {

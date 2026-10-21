@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useRef, useState, type FunctionComponent} from 'react';
 
 import {Maybe, maybe} from 'true-myth';
 
@@ -117,7 +117,12 @@ const usePreviewStream = (
   return stream;
 };
 
-const MeetingPrepDeviceList = ({
+const MeetingPrepDeviceList: FunctionComponent<{
+  label: string;
+  devices: readonly DeviceOption[];
+  selectedId: string;
+  onSelect: (deviceId: string) => void;
+}> = ({
   label,
   devices,
   selectedId,
@@ -150,7 +155,7 @@ const MeetingPrepDeviceList = ({
   );
 };
 
-export const MeetingPrepSurface = ({
+export const MeetingPrepSurface: FunctionComponent<MeetingPrepSurfaceProps> = ({
   meetingTitle,
   meetingStartTime,
   participantName,
@@ -212,7 +217,7 @@ export const MeetingPrepSurface = ({
       return undefined;
     }
 
-    const closeOnOutsidePointer = (event: PointerEvent) => {
+    const closeOnOutsidePointer = (event: PointerEvent): void => {
       const target = event.target;
       if (!(target instanceof Node)) {
         return;
@@ -241,7 +246,7 @@ export const MeetingPrepSurface = ({
     videoElement.srcObject = maybe.isJust(videoPreview) ? videoPreview.value : null;
   }, [videoPreview]);
 
-  const join = () => {
+  const join = (): void => {
     if (isJoiningRef.current) {
       return;
     }

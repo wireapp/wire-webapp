@@ -54,8 +54,14 @@ const ignores = [
   'apps/webapp/resource/',
   '**/*.config.*',
   'apps/webapp/*.config.*',
+  '!apps/webapp/jest.config.ts',
+  '!apps/webapp/playwright.config.ts',
+  '!apps/webapp/playwright.rspack.config.ts',
   '!apps/webapp/rspack.config.mts',
+  '!apps/webapp/rspack.config.dev.mts',
   '!apps/webapp/rspack.config.public.mts',
+  '!libraries/config/src/client.config.ts',
+  '!libraries/config/src/server.config.ts',
   '!**/*.config.test.*',
   '!**/*.config.spec.*',
   'apps/server/bin/copy_server_assets.js',
@@ -87,6 +93,12 @@ const productionFileIgnorePatterns = [
   '**/*.spec.*',
   '**/jest.setup.*',
   'apps/webapp/.copyconfigrc.js',
+  'apps/webapp/jest.config.ts',
+  'apps/webapp/playwright.config.ts',
+  'apps/webapp/playwright.rspack.config.ts',
+  'apps/webapp/rspack.config*.mts',
+  'libraries/config/src/client.config.ts',
+  'libraries/config/src/server.config.ts',
   'libraries/react-ui-kit/emotion.d.ts',
 ];
 
@@ -416,7 +428,11 @@ const productionConfigs = [
     },
   },
   {
-    files: ['apps/webapp/rspack.config.mts', 'apps/webapp/rspack.config.public.mts'],
+    files: [
+      'apps/webapp/rspack.config.mts',
+      'apps/webapp/rspack.config.dev.mts',
+      'apps/webapp/rspack.config.public.mts',
+    ],
     languageOptions: {
       parser: tsParser,
       parserOptions: {
@@ -536,6 +552,25 @@ const productionConfigs = [
         createNodeResolver({extensions: typescriptImportResolutionExtensions}),
         importTypeScriptResolver,
       ],
+    },
+  },
+  {
+    files: ['apps/webapp/jest.config.ts'],
+    languageOptions: {
+      parserOptions: {
+        projectService: {
+          allowDefaultProject: ['apps/webapp/jest.config.ts'],
+        },
+      },
+    },
+  },
+  {
+    files: ['apps/webapp/playwright.config.ts', 'apps/webapp/playwright.rspack.config.ts'],
+    languageOptions: {
+      parserOptions: {
+        project: './apps/webapp/tsconfig.playwright.json',
+        projectService: false,
+      },
     },
   },
   {
@@ -866,31 +901,6 @@ const testLinterOptions = {
   reportUnusedInlineConfigs: 'error',
 };
 
-const explicitFunctionReturnTypeFilePatterns = [
-  'libraries/**/*.{ts,tsx,mts,cts}',
-  'apps/server/**/*.{ts,tsx,mts,cts}',
-  'tools/**/*.{ts,tsx,mts,cts}',
-  'apps/webapp/src/script/auth/*.{ts,tsx,mts,cts}',
-  'apps/webapp/src/script/auth/hooks/**/*.{ts,tsx,mts,cts}',
-  'apps/webapp/src/script/auth/module/**/*.{ts,tsx,mts,cts}',
-  'apps/webapp/src/script/auth/util/**/*.{ts,tsx,mts,cts}',
-  'apps/webapp/src/script/browser/**/*.{ts,tsx,mts,cts}',
-  'apps/webapp/src/script/e2eIdentity/**/*.{ts,tsx,mts,cts}',
-  'apps/webapp/src/script/hooks/**/*.{ts,tsx,mts,cts}',
-  'apps/webapp/src/script/legal-hold/**/*.{ts,tsx,mts,cts}',
-  'apps/webapp/src/script/lifecycle/**/*.{ts,tsx,mts,cts}',
-  'apps/webapp/src/script/main/**/*.{ts,tsx,mts,cts}',
-  'apps/webapp/src/script/message/**/*.{ts,tsx,mts,cts}',
-  'apps/webapp/src/script/mls/**/*.{ts,tsx,mts,cts}',
-  'apps/webapp/src/script/repositories/**/*.{ts,tsx,mts,cts}',
-  'apps/webapp/src/script/router/**/*.{ts,tsx,mts,cts}',
-  'apps/webapp/src/script/service/**/*.{ts,tsx,mts,cts}',
-  'apps/webapp/src/script/telemetry/**/*.{ts,tsx,mts,cts}',
-  'apps/webapp/src/script/util/**/*.{ts,tsx,mts,cts}',
-  'apps/webapp/src/script/view_model/**/*.{ts,tsx,mts,cts}',
-  'apps/webapp/src/script/externalRoute.ts',
-];
-
 const config = [
   {ignores},
   {linterOptions: repositoryLinterOptions},
@@ -907,7 +917,82 @@ const config = [
   },
   ...productionConfigs,
   {
-    files: explicitFunctionReturnTypeFilePatterns,
+    files: ['apps/webapp/jest.config.ts'],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        project: './apps/webapp/tsconfig.eslint.json',
+        projectService: false,
+        tsconfigRootDir: repositoryRootDirectory,
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+      },
+      globals: {
+        ...runtimeGlobals,
+        NodeJS: 'readonly',
+      },
+    },
+  },
+  {
+    files: ['apps/webapp/playwright.config.ts', 'apps/webapp/playwright.rspack.config.ts'],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        project: './apps/webapp/tsconfig.playwright.json',
+        projectService: false,
+        tsconfigRootDir: repositoryRootDirectory,
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+      },
+      globals: {
+        ...runtimeGlobals,
+        NodeJS: 'readonly',
+      },
+    },
+  },
+  {
+    files: [
+      'apps/webapp/rspack.config.mts',
+      'apps/webapp/rspack.config.dev.mts',
+      'apps/webapp/rspack.config.public.mts',
+    ],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        project: './apps/webapp/tsconfig.rspack.json',
+        projectService: false,
+        tsconfigRootDir: repositoryRootDirectory,
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+      },
+      globals: {
+        ...runtimeGlobals,
+        NodeJS: 'readonly',
+      },
+    },
+    rules: {
+      // Rspack's config loader requires default exports for these configuration files.
+      'import/no-default-export': 'off',
+    },
+  },
+  {
+    files: ['libraries/config/src/client.config.ts', 'libraries/config/src/server.config.ts'],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: repositoryRootDirectory,
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+      },
+      globals: {
+        ...runtimeGlobals,
+        NodeJS: 'readonly',
+      },
+    },
+  },
+  {
+    files: ['**/*.{ts,tsx,mts,cts}'],
     plugins: {
       '@typescript-eslint': typescriptPlugin,
     },

@@ -32,6 +32,7 @@ import {useSearchCellsNodes} from './useSearchCellsNodes';
 import type {GlobalDriveFiltersState} from '../../conversation/conversationCells/common/driveFilters/driveFilters';
 import type {CellsSort} from '../../conversation/conversationCells/common/useCellsSorting/useCellsSorting';
 import {useCellsStore} from '../common/useCellsStore/useCellsStore';
+import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 
 const emptyFilters: GlobalDriveFiltersState = {
   selectedTagIds: [],
@@ -83,13 +84,18 @@ function buildRestNodeStub(name: string, uuid = name): RestNode {
   };
 }
 
-async function flushMicrotasks() {
+async function flushMicrotasks(): Promise<void> {
   await Promise.resolve();
   await Promise.resolve();
   await Promise.resolve();
 }
 
-function createControllableDebouncedSearchStub() {
+type CreateControllableDebouncedSearchStubResult = {
+  create: (search: (value: string) => Promise<void>) => ((value: string) => Promise<void>) & {cancel: () => void};
+  flush: () => Promise<void>;
+  startPendingSearch: () => Promise<void> | undefined;
+};
+function createControllableDebouncedSearchStub(): CreateControllableDebouncedSearchStubResult {
   let pendingSearch: (() => Promise<void>) | undefined;
 
   return {
@@ -116,6 +122,22 @@ function createControllableDebouncedSearchStub() {
   };
 }
 
+type RenderSearchHookResult = {
+  rerender: (props?: unknown) => void;
+  result: {
+    current: {
+      searchValue: string;
+      pageSize: number;
+      increasePageSize: () => Promise<void>;
+      setPageSize: (pageSize: number) => void;
+      handleSearch: (value: string) => void;
+      handleReload: () => Promise<void>;
+      handleClearSearch: () => Promise<void>;
+    };
+  };
+  unmount: () => void;
+  fireAndForgetInvoker: FireAndForgetInvoker;
+};
 function renderSearchHook({
   cellsRepository = buildCellsRepositoryMock(),
   userRepository = buildUserRepositoryMock(),
@@ -136,7 +158,7 @@ function renderSearchHook({
     search: (value: string) => Promise<void>,
   ) => ((value: string) => Promise<void>) & {cancel: () => void};
   logger?: LoggerMock;
-} = {}) {
+} = {}): RenderSearchHookResult {
   return {
     fireAndForgetInvoker,
     ...renderHook(() => {

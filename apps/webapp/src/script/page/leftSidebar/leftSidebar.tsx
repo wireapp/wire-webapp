@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect} from 'react';
+import {useEffect, type FunctionComponent} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
@@ -43,7 +43,11 @@ type LeftSidebarProps = {
   isActivatedAccount: boolean;
 };
 
-export const LeftSidebar = ({listViewModel, selfUser, isActivatedAccount}: LeftSidebarProps) => {
+export const LeftSidebar: FunctionComponent<LeftSidebarProps> = ({
+  listViewModel,
+  selfUser,
+  isActivatedAccount,
+}: LeftSidebarProps) => {
   const {conversationRepository, propertiesRepository} = listViewModel;
   const repositories = listViewModel.contentViewModel.repositories;
 
@@ -63,7 +67,7 @@ export const LeftSidebar = ({listViewModel, selfUser, isActivatedAccount}: LeftS
   const isStandalone = currentTab === SidebarTabs.CELLS || currentTab === SidebarTabs.MEETINGS;
 
   useEffect(() => {
-    function openCreateGroupModal() {
+    function openCreateGroupModal(): void {
       amplify.publish(WebAppEvents.CONVERSATION.CREATE_GROUP, 'conversation_details');
     }
 

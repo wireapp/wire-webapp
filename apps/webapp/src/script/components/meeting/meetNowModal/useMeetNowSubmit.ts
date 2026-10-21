@@ -26,7 +26,11 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 import type {MeetNowFormState, MeetNowSubmitResult} from './meetNowTypes';
 import {submitMeetNow} from './submitMeetNow';
 
-export const useMeetNowSubmit = () => {
+type UseMeetNowSubmitResult = {
+  isSubmitting: boolean;
+  submit: (formState: MeetNowFormState) => Promise<MeetNowSubmitResult>;
+};
+export const useMeetNowSubmit = (): UseMeetNowSubmitResult => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const {translate, clock} = useApplicationContext();
   const meetNowMeeting = useMeetingStore(state => {

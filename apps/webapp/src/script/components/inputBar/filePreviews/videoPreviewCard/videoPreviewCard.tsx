@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {videoStyles, iconWrapperStyles} from './videoPreviewCard.styles';
@@ -32,7 +34,13 @@ interface VideoPreviewCardProps {
   uploadProgress: number;
 }
 
-export const VideoPreviewCard = ({src, onDelete, onRetry, isError, uploadProgress}: VideoPreviewCardProps) => {
+export const VideoPreviewCard: FunctionComponent<VideoPreviewCardProps> = ({
+  src,
+  onDelete,
+  onRetry,
+  isError,
+  uploadProgress,
+}: VideoPreviewCardProps) => {
   const {translate} = useApplicationContext();
 
   return (

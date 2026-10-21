@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
@@ -37,7 +39,9 @@ interface AdminlessDeleteReminderMessageProps {
   message: AdminlessDeleteReminderMessageEntity;
 }
 
-export const AdminlessDeleteReminderMessage = ({message}: AdminlessDeleteReminderMessageProps) => {
+export const AdminlessDeleteReminderMessage: FunctionComponent<AdminlessDeleteReminderMessageProps> = ({
+  message,
+}: AdminlessDeleteReminderMessageProps) => {
   const {translate} = useApplicationContext();
 
   const caption = translate(

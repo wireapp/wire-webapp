@@ -110,11 +110,11 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
     [giphyRepository, isErrorState],
   );
 
-  const onGridClick = async () => {
+  const onGridClick = async (): Promise<void> => {
     return getGifs(currentQuery);
   };
 
-  const onBackClick = () => {
+  const onBackClick = (): void => {
     if (currentGif !== null) {
       setGifs([currentGif]);
       setSelectedGif(currentGif);
@@ -122,7 +122,7 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
     }
   };
 
-  const onCloseClick = () => {
+  const onCloseClick = (): void => {
     requestAnimationFrame(() => {
       return setPlayAnimation(false);
     });
@@ -141,7 +141,7 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
     [getGifs],
   );
 
-  const getRandomGif = async () => {
+  const getRandomGif = async (): Promise<void> => {
     if (isErrorState) {
       return;
     }
@@ -159,7 +159,7 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
     }
   };
 
-  const onSend = () => {
+  const onSend = (): void => {
     if (selectedGif !== null) {
       amplify.publish(WebAppEvents.EXTENSIONS.GIPHY.SEND, selectedGif.animated, currentQuery);
       setSelectedGif(null);

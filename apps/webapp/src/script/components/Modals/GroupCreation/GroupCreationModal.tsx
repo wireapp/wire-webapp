@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState, type FunctionComponent} from 'react';
 
 import {isTruthy, isUndefined} from '@sindresorhus/is';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/conversationReceiptModeUpdateData';
@@ -72,7 +72,7 @@ enum GroupCreationModalState {
   PREFERENCES = 'GroupCreationModal.STATE.PREFERENCES',
 }
 
-const GroupCreationModal = ({
+const GroupCreationModal: FunctionComponent<GroupCreationModalProps> = ({
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
 }: GroupCreationModalProps) => {
@@ -151,7 +151,7 @@ const GroupCreationModal = ({
   );
 
   useEffect(() => {
-    const showCreateGroup = (_eventName: string, userEntity?: User) => {
+    const showCreateGroup = (_eventName: string, userEntity?: User): void => {
       setEnableReadReceipts(isTeam);
       setIsShown(true);
       setGroupCreationState(GroupCreationModalState.PREFERENCES);
@@ -243,11 +243,11 @@ const GroupCreationModal = ({
   const maxNameLength = ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
   const maxSize = ConversationRepository.CONFIG.GROUP.MAX_SIZE;
 
-  const onOpen = () => {
+  const onOpen = (): void => {
     setAccessState(isAppsFeatureAvailable ? ACCESS_STATE.TEAM.GUESTS_SERVICES : ACCESS_STATE.TEAM.GUEST_ROOM);
   };
 
-  const onClose = () => {
+  const onClose = (): void => {
     setIsCreatingConversation(false);
     setNameError('');
     setGroupName('');
@@ -349,7 +349,7 @@ const GroupCreationModal = ({
     }
   };
 
-  const onGroupNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onGroupNameChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const {value} = event.target;
 
     const trimmedNameInput = value.trim();
@@ -367,7 +367,7 @@ const GroupCreationModal = ({
     setNameError('');
   };
 
-  const onProtocolChange = (option: Option | null) => {
+  const onProtocolChange = (option: Option | null): void => {
     if (!isProtocolOption(option)) {
       return;
     }
@@ -398,10 +398,10 @@ const GroupCreationModal = ({
     const newAccessState = toggleFeature(feature, accessState);
     setAccessState(newAccessState);
   };
-  const clickOnToggleServicesMode = () => {
+  const clickOnToggleServicesMode = (): void => {
     return clickOnToggle(ACCESS_TYPES.SERVICE);
   };
-  const clickOnToggleGuestMode = () => {
+  const clickOnToggleGuestMode = (): void => {
     return clickOnToggle(teamPermissionsForAccessState(ACCESS_STATE.TEAM.GUEST_FEATURES));
   };
   const clickOnBack = (): void => {

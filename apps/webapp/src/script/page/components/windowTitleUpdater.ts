@@ -41,7 +41,7 @@ const windowTitleLogger = getLogger('WindowTitlesViewModel');
 const MIN_UNREAD_COUNT = 0;
 const MIN_CONNECTION_REQUEST_COUNT = 1;
 
-const useWindowTitle = (translate: Translate) => {
+const useWindowTitle = (translate: Translate): void => {
   const userState = container.resolve(UserState);
   const conversationState = container.resolve(ConversationState);
 

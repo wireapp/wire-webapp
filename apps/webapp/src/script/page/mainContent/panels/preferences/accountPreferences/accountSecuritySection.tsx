@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {isNonEmptyString} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
@@ -44,7 +46,7 @@ interface AccountSecuritySectionProps {
   userRepository: UserRepository;
 }
 
-const AccountSecuritySection = ({
+const AccountSecuritySection: FunctionComponent<AccountSecuritySectionProps> = ({
   selfUser,
   userRepository,
   appLockState = container.resolve(AppLockState),
@@ -58,7 +60,7 @@ const AccountSecuritySection = ({
   const {isTeam} = useKoSubscribableChildren(teamState, ['isTeam']);
   const isMacOsWrapper = Runtime.isDesktopApp() && Runtime.isMacOS();
 
-  const onClickDeleteAccount = () => {
+  const onClickDeleteAccount = (): void => {
     return PrimaryModal.show(
       PrimaryModal.type.CONFIRM,
       {

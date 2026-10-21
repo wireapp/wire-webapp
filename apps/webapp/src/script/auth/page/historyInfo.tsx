@@ -17,9 +17,10 @@
  *
  */
 
-import React, {useEffect} from 'react';
+import React, {useEffect, type FunctionComponent} from 'react';
 
 import {ClientType} from '@wireapp/api-client/lib/client/index';
+import type {RegisteredClient} from '@wireapp/api-client/lib/client/registeredClient';
 import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
 import {Navigate, useNavigate} from 'react-router';
@@ -34,14 +35,14 @@ import {Page} from './page';
 
 import {Config} from '../../Config';
 import {actionRoot} from '../module/action/';
-import {bindActionCreators, RootState} from '../module/reducer';
+import {bindActionCreators, RootState, type ThunkAction} from '../module/reducer';
 import * as ClientSelector from '../module/selector/clientSelector';
 import {ROUTE} from '../route';
 import {getEnterpriseLoginV2FF} from '../util/helpers';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
-const HistoryInfoComponent = ({
+const HistoryInfoComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> = ({
   clients,
   currentSelfClient,
   hasLoadedClients,
@@ -52,7 +53,7 @@ const HistoryInfoComponent = ({
   const navigate = useNavigate();
   const shouldLoadClients = !hasLoadedClients && isNewCurrentSelfClient;
   const isEnterpriseLoginV2Enabled = getEnterpriseLoginV2FF();
-  const onContinue = () => {
+  const onContinue = (): void => {
     return navigate(ROUTE.SET_EMAIL);
   };
 
@@ -113,7 +114,14 @@ const HistoryInfoComponent = ({
 };
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
-const mapStateToProps = (state: RootState) => {
+type MapStateToPropsResult = {
+  clients: RegisteredClient[];
+  isFeching: boolean;
+  currentSelfClient: RegisteredClient | null;
+  hasLoadedClients: boolean;
+  isNewCurrentSelfClient: boolean;
+};
+const mapStateToProps = (state: RootState): MapStateToPropsResult => {
   return {
     clients: ClientSelector.getClients(state),
     isFeching: ClientSelector.isFetching(state),
@@ -124,7 +132,8 @@ const mapStateToProps = (state: RootState) => {
 };
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => {
+type MapDispatchToPropsResult = {doGetAllClients: () => ThunkAction<Promise<RegisteredClient[]>>};
+const mapDispatchToProps = (dispatch: Dispatch<AnyAction>): MapDispatchToPropsResult => {
   return bindActionCreators(
     {
       doGetAllClients: actionRoot.clientAction.doGetAllClients,

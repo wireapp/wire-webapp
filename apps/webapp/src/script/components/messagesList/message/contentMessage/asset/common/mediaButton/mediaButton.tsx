@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {useEffect, useState, type FunctionComponent} from 'react';
 
 import {isUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
@@ -43,7 +43,7 @@ export interface MediaButtonProps {
   isFocusable?: boolean;
 }
 
-const MediaButton = ({
+const MediaButton: FunctionComponent<MediaButtonProps> = ({
   mediaElement,
   large,
   asset,
@@ -56,10 +56,10 @@ const MediaButton = ({
 }: MediaButtonProps) => {
   const {translate} = useApplicationContext();
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const onPlay = () => {
+  const onPlay = (): void => {
     return setIsPlaying(true);
   };
-  const onPause = () => {
+  const onPause = (): void => {
     return setIsPlaying(false);
   };
   const unwrappedAsset = useKoSubscribableChildren(asset, ['downloadProgress']);

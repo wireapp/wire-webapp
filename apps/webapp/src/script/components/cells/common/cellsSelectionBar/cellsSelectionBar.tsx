@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {CloseIcon} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -28,7 +30,10 @@ interface CellsSelectionBarProps {
   onClear: () => void;
 }
 
-export const CellsSelectionBar = ({selectedCount, onClear}: CellsSelectionBarProps) => {
+export const CellsSelectionBar: FunctionComponent<CellsSelectionBarProps> = ({
+  selectedCount,
+  onClear,
+}: CellsSelectionBarProps) => {
   const {translate} = useApplicationContext();
 
   if (selectedCount === 0) {

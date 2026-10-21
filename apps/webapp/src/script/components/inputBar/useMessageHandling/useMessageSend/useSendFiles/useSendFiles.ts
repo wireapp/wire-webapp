@@ -35,13 +35,14 @@ interface UseSendFilesProps {
   sendFilesErrorMessage: string;
 }
 
+type UseSendFilesResult = {sendFiles: () => Promise<void>; clearFiles: () => void; isLoading: boolean};
 export const useSendFiles = ({
   files,
   clearAllFiles,
   cellsRepository,
   conversationId,
   sendFilesErrorMessage,
-}: UseSendFilesProps) => {
+}: UseSendFilesProps): UseSendFilesResult => {
   const [status, setStatus] = useState<SendFilesStatus>('idle');
 
   const errorNotification = useAppNotification({

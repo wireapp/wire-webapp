@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {Button, Text} from '@wireapp/react-ui-kit';
 
 import {ModalComponent} from 'Components/Modals/ModalComponent';
@@ -36,15 +38,15 @@ import {
 
 import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';
 
-export const UpgradePlanModal = () => {
+export const UpgradePlanModal: FunctionComponent = () => {
   const {translate} = useApplicationContext();
   const {isUpgradeTeamModalOpen, setIsUpgradeTeamModalOpen} = useCreateConversationModal();
 
-  const onCancel = () => {
+  const onCancel = (): void => {
     setIsUpgradeTeamModalOpen(false);
   };
 
-  const onSubmit = () => {
+  const onSubmit = (): void => {
     setIsUpgradeTeamModalOpen(false);
     safeWindowOpen(Config.getConfig().URL.TEAMS_BASE);
   };

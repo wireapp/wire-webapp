@@ -46,7 +46,7 @@ export const getGroupParticipantsConversations = ({
   conversations,
   currentFolder,
   archivedConversations,
-}: GetGroupParticipantsConversationsParams) => {
+}: GetGroupParticipantsConversationsParams): Conversation[] => {
   const isFavoritesView = currentTab === SidebarTabs.FAVORITES;
   const isArchivesView = currentTab === SidebarTabs.ARCHIVES;
   const isFolderView = currentTab === SidebarTabs.FOLDER;

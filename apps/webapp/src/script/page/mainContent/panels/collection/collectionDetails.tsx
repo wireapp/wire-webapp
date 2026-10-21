@@ -17,7 +17,7 @@
  *
  */
 
-import {Fragment} from 'react';
+import {Fragment, type FunctionComponent} from 'react';
 
 import {FadingScrollbar} from 'Components/fadingScrollbar';
 import {Conversation} from 'Repositories/entity/Conversation';
@@ -38,7 +38,10 @@ interface CollectionDetailsProps {
 
 type GroupedCollection = [string, ContentMessage[]][];
 
-const getTitleForHeader = (timestamp: number, translate: ReturnType<typeof useApplicationContext>['translate']) => {
+const getTitleForHeader = (
+  timestamp: number,
+  translate: ReturnType<typeof useApplicationContext>['translate'],
+): string => {
   if (isToday(timestamp)) {
     return translate('conversationToday');
   }
@@ -59,7 +62,12 @@ const groupByDate = (
   );
 };
 
-const CollectionDetails = ({conversation, messages, onClose = noop, onImageClick}: CollectionDetailsProps) => {
+const CollectionDetails: FunctionComponent<CollectionDetailsProps> = ({
+  conversation,
+  messages,
+  onClose = noop,
+  onImageClick,
+}: CollectionDetailsProps) => {
   const {translate} = useApplicationContext();
   const {display_name} = useKoSubscribableChildren(conversation, ['display_name']);
 

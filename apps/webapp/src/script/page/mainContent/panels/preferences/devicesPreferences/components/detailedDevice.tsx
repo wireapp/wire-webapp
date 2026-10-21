@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {DeviceVerificationBadges} from 'Components/badge';
 import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {E2EIHandler, WireIdentity} from 'src/script/e2eIdentity';
@@ -32,7 +34,7 @@ export interface DeviceProps {
   isProteusVerified?: boolean;
 }
 
-export const DetailedDevice = ({
+export const DetailedDevice: FunctionComponent<DeviceProps> = ({
   device,
   fingerprint,
   isCurrentDevice,
@@ -40,7 +42,7 @@ export const DetailedDevice = ({
   isProteusVerified,
 }: DeviceProps) => {
   const isE2eiEnabled = E2EIHandler.getInstance().isE2EIEnabled();
-  const getIdentity = () => {
+  const getIdentity = (): WireIdentity | undefined => {
     return getDeviceIdentity?.(device.id);
   };
 

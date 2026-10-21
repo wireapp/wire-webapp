@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {Button} from '@wireapp/react-ui-kit';
 
 import {
@@ -34,7 +36,11 @@ interface NoPreviewAvailableProps {
   fileUrl?: string;
 }
 
-export const NoPreviewAvailable = ({fileUrl, fileName, fileExtension}: NoPreviewAvailableProps) => {
+export const NoPreviewAvailable: FunctionComponent<NoPreviewAvailableProps> = ({
+  fileUrl,
+  fileName,
+  fileExtension,
+}: NoPreviewAvailableProps) => {
   const {translate} = useApplicationContext();
   const canPerformCellsAction = useCellsActionPermissions();
   const fileNameWithExtension = getFileNameWithExtension(fileName, fileExtension);

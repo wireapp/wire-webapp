@@ -29,7 +29,7 @@ import {connectWithUser, createGroup, sendConnectionRequest} from '../../utils/u
  * @param pageManager PageManager of the blocking user
  * @param userToBlock User object of the user to be blocked
  */
-export async function blockUserFromConversationList(pageManager: PageManager, userToBlock: User) {
+export async function blockUserFromConversationList(pageManager: PageManager, userToBlock: User): Promise<void> {
   const {pages, modals} = pageManager.webapp;
 
   const conversation = await pages.conversationList().getConversation(userToBlock.fullName).open();
@@ -43,7 +43,7 @@ export async function blockUserFromConversationList(pageManager: PageManager, us
  * @param pageManager PageManager of the blocking user
  * @param userToBlock User object of the user to be blocked
  */
-export async function blockUserFromProfileView(pageManager: PageManager) {
+export async function blockUserFromProfileView(pageManager: PageManager): Promise<void> {
   const {pages, modals} = pageManager.webapp;
   await pages.conversation().clickConversationInfoButton();
   await pages.participantDetails().blockUser();
@@ -56,7 +56,7 @@ export async function blockUserFromProfileView(pageManager: PageManager) {
  * @param pageManager PageManager of the blocking user
  * @param userToBlock User object of the user to be blocked
  */
-export async function blockUserFromOpenGroupProfileView(pageManager: PageManager, userToBlock: User) {
+export async function blockUserFromOpenGroupProfileView(pageManager: PageManager, userToBlock: User): Promise<void> {
   const {pages, modals} = pageManager.webapp;
   await pages.conversation().clickConversationTitle();
   await pages.conversationDetails().getParticipant(userToBlock.fullName).openDetails();
