@@ -24,6 +24,7 @@ import {
   MessageAddEvent,
   MultipartMessageAddEvent,
 } from 'Repositories/conversation/EventBuilder';
+import type {IdentifiedUpdatePayload} from 'Repositories/event/EventService';
 import {StoredEvent} from 'Repositories/storage';
 import {EventError} from 'src/script/error/eventError';
 
@@ -37,6 +38,7 @@ function throwValidationError(message: string): never {
 }
 
 export type EditableEvent = MessageAddEvent | MultipartMessageAddEvent | CompositeMessageAddEvent;
+type UpdatedEditableEvent = EditableEvent & Pick<IdentifiedUpdatePayload, 'primary_key'>;
 
 function validateEditEvent(
   originalEvent: HandledEvents | undefined,
@@ -73,7 +75,7 @@ function getUpdatesForEditMessage(originalEvent: StoredEvent<EditableEvent>, new
   return {...newEvent, ...commonUpdates, edited_time: newEvent.time, reactions: {}};
 }
 
-function computeEventUpdates(originalEvent: StoredEvent<EditableEvent>, newEvent: EditableEvent) {
+function computeEventUpdates(originalEvent: StoredEvent<EditableEvent>, newEvent: EditableEvent): UpdatedEditableEvent {
   const primaryKeyUpdate = {primary_key: originalEvent.primary_key};
   const updates = getUpdatesForEditMessage(originalEvent, newEvent);
 

@@ -65,6 +65,7 @@ import {ProtocolUpdateMessage} from 'Repositories/entity/message/protocolUpdateM
 import {ReceiptModeUpdateMessage} from 'Repositories/entity/message/receiptModeUpdateMessage';
 import {RenameMessage} from 'Repositories/entity/message/renameMessage';
 import {createSessionResetMessage} from 'Repositories/entity/message/sessionResetMessage';
+import type {SystemMessage} from 'Repositories/entity/message/systemMessage';
 import type {Text as TextAsset} from 'Repositories/entity/message/text';
 import {Text} from 'Repositories/entity/message/text';
 import {VerificationMessage} from 'Repositories/entity/message/verificationMessage';
@@ -101,6 +102,22 @@ import {StatusType} from '../../message/statusType';
 import {SystemMessageType} from '../../message/systemMessageType';
 import {APIClient} from '../../service/apiClientSingleton';
 
+type MappedMessage =
+  | ContentMessage
+  | SystemMessage
+  | DeleteMessage
+  | DecryptErrorMessage
+  | PingMessage
+  | CallingTimeoutMessage
+  | FailedToAddUsersMessage
+  | FederationStopMessage
+  | LegalHoldMessage
+  | MissedMessage
+  | VerificationMessage
+  | CallMessage
+  | FileTypeRestrictedMessage
+  | undefined;
+
 // Event Mapper to convert all server side JSON events into core entities.
 export class EventMapper {
   logger: Logger;
@@ -115,7 +132,7 @@ export class EventMapper {
     this.logger = getLogger('EventMapper');
   }
 
-  private get fallbackDomain() {
+  private get fallbackDomain(): string | undefined {
     return this.apiClient.context?.domain;
   }
 
@@ -154,7 +171,7 @@ export class EventMapper {
    * @param conversationEntity Conversation entity the event belong to
    * @returns Resolves with the mapped message entity
    */
-  mapJsonEvent(event: ConversationEvent | ClientConversationEvent, conversationEntity: Conversation) {
+  mapJsonEvent(event: ConversationEvent | ClientConversationEvent, conversationEntity: Conversation): MappedMessage {
     try {
       return this._mapJsonEvent(event, conversationEntity);
     } catch (error: unknown) {
@@ -281,7 +298,7 @@ export class EventMapper {
    * @param conversationEntity Conversation entity the event belong to
    * @returns Mapped message entity
    */
-  _mapJsonEvent(event: ConversationEvent | ClientConversationEvent, conversationEntity: Conversation) {
+  _mapJsonEvent(event: ConversationEvent | ClientConversationEvent, conversationEntity: Conversation): MappedMessage {
     let messageEntity;
 
     switch (event.type) {
@@ -544,7 +561,7 @@ export class EventMapper {
    * @param eventData Message data
    * @returns Member message entity
    */
-  private _mapEvent1to1Creation({data: eventData}: LegacyEventRecord) {
+  private _mapEvent1to1Creation({data: eventData}: LegacyEventRecord): MemberMessage {
     const {has_service: hasService, userIds} = eventData;
     const messageEntity = new MemberMessage(this.translate);
     messageEntity.memberMessageType = SystemMessageType.CONNECTION_ACCEPTED;
@@ -563,7 +580,7 @@ export class EventMapper {
    * @param event Message data
    * @returns Content message entity
    */
-  private _mapEventAssetAdd(event: LegacyEventRecord) {
+  private _mapEventAssetAdd(event: LegacyEventRecord): ContentMessage {
     const messageEntity = new ContentMessage(undefined, this.translate);
 
     const assetEntity = this._mapAsset(event);
@@ -581,7 +598,7 @@ export class EventMapper {
    * @param eventData Message data
    * @returns Delete message entity
    */
-  private _mapEventDeleteEverywhere({data: eventData}: LegacyEventRecord) {
+  private _mapEventDeleteEverywhere({data: eventData}: LegacyEventRecord): DeleteMessage {
     const messageEntity = new DeleteMessage(this.translate);
     messageEntity.deleted_timestamp = new Date(eventData.deleted_time).getTime();
     return messageEntity;
@@ -593,7 +610,7 @@ export class EventMapper {
    * @param eventData Message data
    * @returns Member message entity
    */
-  private _mapEventGroupCreation({data: eventData}: LegacyEventRecord) {
+  private _mapEventGroupCreation({data: eventData}: LegacyEventRecord): MemberMessage {
     const messageEntity = new MemberMessage(this.translate);
     messageEntity.memberMessageType = SystemMessageType.CONVERSATION_CREATE;
     messageEntity.name(eventData.name ?? '');
@@ -602,19 +619,19 @@ export class EventMapper {
     return messageEntity;
   }
 
-  _mapEventCallingTimeout({data, time}: LegacyEventRecord) {
+  _mapEventCallingTimeout({data, time}: LegacyEventRecord): CallingTimeoutMessage {
     return new CallingTimeoutMessage(data.reason, parseInt(time, 10), this.translate);
   }
 
-  _mapEventFailedToAddUsers({data, time}: FailedToAddUsersMessageEvent) {
+  _mapEventFailedToAddUsers({data, time}: FailedToAddUsersMessageEvent): FailedToAddUsersMessage {
     return new FailedToAddUsersMessage(data, parseInt(time, 10), this.translate);
   }
 
-  _mapEventFederationStop({data, time}: FederationStopEvent) {
+  _mapEventFederationStop({data, time}: FederationStopEvent): FederationStopMessage {
     return new FederationStopMessage(data.domains, parseInt(time, 10), this.translate);
   }
 
-  _mapEventLegalHoldUpdate({data, timestamp}: LegacyEventRecord) {
+  _mapEventLegalHoldUpdate({data, timestamp}: LegacyEventRecord): LegalHoldMessage {
     return new LegalHoldMessage(data.legal_hold_status, timestamp ?? 0, this.translate);
   }
 
@@ -624,7 +641,7 @@ export class EventMapper {
    * @param eventData Message data
    * @returns Location message entity
    */
-  private _mapEventLocation({data: eventData}: LegacyEventRecord) {
+  private _mapEventLocation({data: eventData}: LegacyEventRecord): ContentMessage {
     const location = eventData.location;
     const messageEntity = new ContentMessage(undefined, this.translate);
     const assetEntity = new Location();
@@ -649,7 +666,7 @@ export class EventMapper {
   private _mapEventMemberJoin(
     event: MemberJoinEvent & {data?: {has_service?: boolean}},
     conversationEntity: Conversation,
-  ) {
+  ): MemberMessage {
     const {data: eventData, from: sender} = event;
     const {has_service: hasService} = eventData;
     const userIds = isTruthy(eventData.qualified_user_ids)
@@ -692,7 +709,7 @@ export class EventMapper {
    * @param eventData Message data
    * @returns Member message entity
    */
-  private _mapEventMemberLeave({data: eventData}: MemberLeaveEvent | TeamMemberLeaveEvent) {
+  private _mapEventMemberLeave({data: eventData}: MemberLeaveEvent | TeamMemberLeaveEvent): MemberMessage {
     const messageEntity = new MemberMessage(this.translate);
     const userIds = isTruthy(eventData.qualified_user_ids)
       ? eventData.qualified_user_ids
@@ -710,7 +727,7 @@ export class EventMapper {
    * @param event Message data
    * @returns Content message entity
    */
-  private _mapEventMessageAdd(event: MessageAddEvent) {
+  private _mapEventMessageAdd(event: MessageAddEvent): ContentMessage {
     const {data: eventData, edited_time: editedTime} = event;
     const messageEntity = new ContentMessage(undefined, this.translate);
 
@@ -735,7 +752,7 @@ export class EventMapper {
    * @param event Message data
    * @returns Content message entity
    */
-  private _mapEventMultipartAdd(event: MultipartMessageAddEvent) {
+  private _mapEventMultipartAdd(event: MultipartMessageAddEvent): ContentMessage {
     const {data: eventData, edited_time: editedTime} = event;
     const messageEntity = new ContentMessage(undefined, this.translate);
 
@@ -754,7 +771,7 @@ export class EventMapper {
     return messageEntity;
   }
 
-  private _mapAssetMultipart(eventData: MultipartMessageAddEvent['data']) {
+  private _mapAssetMultipart(eventData: MultipartMessageAddEvent['data']): Multipart {
     const {text, attachments} = eventData;
 
     const assetEntity = new Multipart({id: '', text: isTruthy(text?.content) ? text.content : '', attachments});
@@ -769,7 +786,7 @@ export class EventMapper {
     return assetEntity;
   }
 
-  private _mapAssetComposite(eventData: CompositeMessageAddEvent['data']) {
+  private _mapAssetComposite(eventData: CompositeMessageAddEvent['data']): Button[] {
     return eventData.items.flatMap(item => {
       if (isTruthy(item.button)) {
         return [new Button(item.button.id, item.button.text)];
@@ -781,7 +798,7 @@ export class EventMapper {
     });
   }
 
-  private _mapEventCompositeMessageAdd(event: CompositeMessageAddEvent) {
+  private _mapEventCompositeMessageAdd(event: CompositeMessageAddEvent): CompositeMessage {
     const {data: eventData} = event;
     const messageEntity = new CompositeMessage(undefined, this.translate);
     const assets = this._mapAssetComposite(eventData);
@@ -867,7 +884,7 @@ export class EventMapper {
    * @param eventData Message data
    * @returns Rename message entity
    */
-  private _mapEventRename({data: eventData, from, qualified_from}: LegacyEventRecord) {
+  private _mapEventRename({data: eventData, from, qualified_from}: LegacyEventRecord): RenameMessage {
     return new RenameMessage(eventData.name, from, qualified_from?.domain, this.translate);
   }
 
@@ -876,7 +893,7 @@ export class EventMapper {
    *
    * @returns Member role update message entity
    */
-  private _mapEventMemberRoleUpdate() {
+  private _mapEventMemberRoleUpdate(): MemberRoleUpdateMessage {
     return new MemberRoleUpdateMessage(this.translate);
   }
 
@@ -886,7 +903,7 @@ export class EventMapper {
    * @param eventData Message data
    * @returns receipt mode update message entity
    */
-  private _mapEventReceiptModeUpdate({data: eventData}: LegacyEventRecord) {
+  private _mapEventReceiptModeUpdate({data: eventData}: LegacyEventRecord): ReceiptModeUpdateMessage {
     return new ReceiptModeUpdateMessage(isTruthy(eventData.receipt_mode), this.translate);
   }
 
@@ -896,7 +913,7 @@ export class EventMapper {
    * @param eventData Message data
    * @returns message timer update message entity
    */
-  private _mapEventMessageTimerUpdate({data: eventData}: LegacyEventRecord) {
+  private _mapEventMessageTimerUpdate({data: eventData}: LegacyEventRecord): MessageTimerUpdateMessage {
     return new MessageTimerUpdateMessage(eventData.message_timer, this.translate);
   }
 
@@ -906,7 +923,7 @@ export class EventMapper {
    * @param event Message data
    * @returns Member message entity
    */
-  private _mapEventTeamMemberLeave(event: TeamMemberLeaveEvent) {
+  private _mapEventTeamMemberLeave(event: TeamMemberLeaveEvent): MemberMessage {
     const messageEntity = this._mapEventMemberLeave(event);
     const eventData = event.data;
     messageEntity.name(isTruthy(eventData.name) ? eventData.name : this.translate('conversationSomeone'));
@@ -919,7 +936,7 @@ export class EventMapper {
    * @param error_code Error data received as JSON
    * @returns Decrypt error message entity
    */
-  private _mapEventUnableToDecrypt({error_code: errorCode, error}: ErrorEvent) {
+  private _mapEventUnableToDecrypt({error_code: errorCode, error}: ErrorEvent): DecryptErrorMessage {
     const code = typeof errorCode === 'string' ? parseInt(errorCode.split(' ')[0], 10) : errorCode;
     const clientId = error.replace(/\n/g, '').replace(/^.*\(([\w\d]+)\)$/g, '$1');
     return new DecryptErrorMessage(clientId, code, this.translate);
@@ -931,7 +948,7 @@ export class EventMapper {
    * @param eventData Message data
    * @returns Verification message entity
    */
-  private _mapEventVerification({data: eventData}: LegacyEventRecord) {
+  private _mapEventVerification({data: eventData}: LegacyEventRecord): VerificationMessage {
     const messageEntity = new VerificationMessage(this.translate);
     // Database can contain non-camelCased naming. For backwards compatibility reasons we handle both.
     messageEntity.userIds(isTruthy(eventData.userIds) ? eventData.userIds : eventData.user_ids);
@@ -951,7 +968,7 @@ export class EventMapper {
    * Maps JSON data of conversation.voice-channel-activate message into message entity.
    * @returns Call message entity
    */
-  private _mapEventVoiceChannelActivate() {
+  private _mapEventVoiceChannelActivate(): CallMessage {
     const messageEntity = new CallMessage(CALL_MESSAGE_TYPE.ACTIVATED, undefined, 0, this.translate);
     messageEntity.visible(false);
     return messageEntity;
@@ -963,7 +980,7 @@ export class EventMapper {
    * @param eventData Message data
    * @returns Call message entity
    */
-  private _mapEventVoiceChannelDeactivate({data: eventData}: LegacyEventRecord) {
+  private _mapEventVoiceChannelDeactivate({data: eventData}: LegacyEventRecord): CallMessage {
     const messageEntity = new CallMessage(
       CALL_MESSAGE_TYPE.DEACTIVATED,
       eventData.reason,
@@ -986,7 +1003,7 @@ export class EventMapper {
   // Asset mappers
   //##############################################################################
 
-  _mapAsset(event: LegacyEventRecord) {
+  _mapAsset(event: LegacyEventRecord): FileAsset | undefined {
     const eventData = event.data;
     const category = event.category;
     const isFile = category === MessageCategory.FILE;
@@ -1001,7 +1018,7 @@ export class EventMapper {
    * @param event Asset data received as JSON
    * @returns FileAsset entity
    */
-  private _mapAssetFile(event: LegacyEventRecord) {
+  private _mapAssetFile(event: LegacyEventRecord): FileAsset {
     const {conversation: conversationId, qualified_conversation, data: eventData} = event;
     const {content_length, content_type, id, info, meta, status} = eventData;
 
@@ -1171,7 +1188,7 @@ export class EventMapper {
    * @param linkPreviews Link previews as base64 encoded proto messages
    * @returns Array of mapped link previews
    */
-  private _mapAssetLinkPreviews(linkPreviews: string[]) {
+  private _mapAssetLinkPreviews(linkPreviews: string[]): (void | LinkPreviewEntity)[] {
     const encodedLinkPreviews = linkPreviews.map(base64 => {
       return base64ToArray(base64);
     });
@@ -1194,7 +1211,7 @@ export class EventMapper {
    * @param messageText Text of message
    * @returns Array of mapped mentions
    */
-  private _mapAssetMentions(mentions: string[], messageText: string) {
+  private _mapAssetMentions(mentions: string[], messageText: string): MentionEntity[] {
     const encodedMentions = mentions.map(base64 => {
       return base64ToArray(base64);
     });
@@ -1228,7 +1245,7 @@ export class EventMapper {
    * @param eventData Asset data received as JSON
    * @returns Text asset entity
    */
-  private _mapAssetText(eventData: MessageAddEvent['data']) {
+  private _mapAssetText(eventData: MessageAddEvent['data']): TextAsset {
     const {id, content, mentions, message, previews} = eventData;
     const messageText = content ?? message ?? '';
     const assetEntity = new Text(id, messageText);
@@ -1245,7 +1262,7 @@ export class EventMapper {
     return assetEntity;
   }
 
-  _mapFileTypeRestricted(event: LegacyEventRecord) {
+  _mapFileTypeRestricted(event: LegacyEventRecord): FileTypeRestrictedMessage {
     const {
       data: {isIncoming, name, fileExt},
       time,

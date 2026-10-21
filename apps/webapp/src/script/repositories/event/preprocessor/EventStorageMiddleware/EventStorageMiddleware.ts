@@ -57,7 +57,7 @@ export class EventStorageMiddleware implements EventMiddleware {
     private readonly conversationState: ConversationState = container.resolve(ConversationState),
   ) {}
 
-  async processEvent(event: IncomingEvent, source: EventSource) {
+  async processEvent(event: IncomingEvent, source: EventSource): Promise<IncomingEvent | EventRecord> {
     event = decodeConversationNameForStorage(event, source);
     if (!eventShouldBeStored(event)) {
       return event;
@@ -100,7 +100,7 @@ export class EventStorageMiddleware implements EventMiddleware {
     return {type: 'insert', event};
   }
 
-  private validateEvent(event: HandledEvents, source: EventSource, duplicateEvent?: EventRecord) {
+  private validateEvent(event: HandledEvents, source: EventSource, duplicateEvent?: EventRecord): void {
     if (event.type === CONVERSATION_EVENT.MEMBER_LEAVE && source !== EventSource.NOTIFICATION_STREAM) {
       /*
         When we receive a `member-leave` event that is not from the notification stream
@@ -157,7 +157,7 @@ export class EventStorageMiddleware implements EventMiddleware {
     }
   }
 
-  private async execDBOperation(operation: DBOperation, conversationId: string) {
+  private async execDBOperation(operation: DBOperation, conversationId: string): Promise<HandledEvents | EventRecord> {
     switch (operation.type) {
       case 'insert':
         return this.eventService.saveEvent(operation.event);

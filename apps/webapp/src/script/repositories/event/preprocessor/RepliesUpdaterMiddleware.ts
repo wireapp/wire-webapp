@@ -20,13 +20,18 @@
 import {isTruthy} from '@sindresorhus/is';
 
 import {DeleteEvent, MessageAddEvent, MultipartMessageAddEvent} from 'Repositories/conversation/EventBuilder';
-import {StoredEvent} from 'Repositories/storage/record/eventRecord';
+import type {EventRecord} from 'Repositories/storage/record/eventRecord';
 import {getLogger, Logger} from 'Util/logger';
 
 import {QuoteEntity} from '../../../message/quoteEntity';
 import {ClientEvent} from '../Client';
 import {EventMiddleware, IncomingEvent} from '../EventProcessor';
 import type {EventService} from '../EventService';
+
+type RepliesToMessage = {
+  originalEvent?: MessageAddEvent | MultipartMessageAddEvent;
+  replies: EventRecord[];
+};
 
 export class RepliesUpdaterMiddleware implements EventMiddleware {
   private readonly logger: Logger;
@@ -82,10 +87,7 @@ export class RepliesUpdaterMiddleware implements EventMiddleware {
   /**
    * Updates replies to point to the new message ID after an edit
    */
-  private async updateRepliesToEditedMessage(
-    replies: StoredEvent<MessageAddEvent | MultipartMessageAddEvent>[],
-    newMessageId: string,
-  ): Promise<void> {
+  private async updateRepliesToEditedMessage(replies: EventRecord[], newMessageId: string): Promise<void> {
     await Promise.all(
       replies.map(async reply => {
         if (reply.type === ClientEvent.CONVERSATION.MESSAGE_ADD) {
@@ -107,7 +109,7 @@ export class RepliesUpdaterMiddleware implements EventMiddleware {
   /**
    * will update the message ID of all the replies to an edited message
    */
-  private async handleEditEvent(event: MessageAddEvent, originalMessageId: string) {
+  private async handleEditEvent(event: MessageAddEvent, originalMessageId: string): Promise<MessageAddEvent> {
     const {originalEvent, replies} = await this.findRepliesToMessage(event.conversation, originalMessageId, event.id);
     if (!isTruthy(originalEvent) || !isTruthy(event.id)) {
       return event;
@@ -121,7 +123,10 @@ export class RepliesUpdaterMiddleware implements EventMiddleware {
   /**
    * will update the message ID of all the replies to an edited multipart message
    */
-  private async handleMultipartEditEvent(event: MultipartMessageAddEvent, originalMessageId: string) {
+  private async handleMultipartEditEvent(
+    event: MultipartMessageAddEvent,
+    originalMessageId: string,
+  ): Promise<MultipartMessageAddEvent> {
     const {originalEvent, replies} = await this.findRepliesToMessage(event.conversation, originalMessageId, event.id);
     if (!isTruthy(originalEvent) || !isTruthy(event.id)) {
       return event;
@@ -137,10 +142,7 @@ export class RepliesUpdaterMiddleware implements EventMiddleware {
     messageId: string,
     /** in case the message was edited, we need to query the DB using the old event ID */
     previousMessageId?: string,
-  ): Promise<{
-    originalEvent?: MessageAddEvent | MultipartMessageAddEvent;
-    replies: StoredEvent<MessageAddEvent | MultipartMessageAddEvent>[];
-  }> {
+  ): Promise<RepliesToMessage> {
     const originalEvent = await this.eventService.loadEvent(conversationId, previousMessageId ?? messageId);
 
     if (

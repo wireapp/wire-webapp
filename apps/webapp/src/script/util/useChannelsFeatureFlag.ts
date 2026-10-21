@@ -19,6 +19,7 @@
 
 import {isString, isUndefined} from '@sindresorhus/is';
 import {ACCESS_TYPE, FEATURE_KEY, FEATURE_STATUS, Role} from '@wireapp/api-client/lib/team';
+import type {FeatureList} from '@wireapp/api-client/lib/team';
 import {container} from 'tsyringe';
 
 import {Config} from 'src/script/Config';
@@ -28,6 +29,15 @@ import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {Core} from '../service/coreSingleton';
 
+type ChannelsFeatureFlagState = {
+  canCreateChannels: boolean;
+  isChannelsEnabled: boolean;
+  isChannelsFeatureEnabled: boolean;
+  isChannelsHistorySharingEnabled: boolean;
+  isPublicChannelsEnabled: boolean;
+  shouldShowChannelTab: boolean;
+};
+
 const getAccessTypeRoleMap = (): Partial<Record<string, Role[]>> => {
   return {
     [ACCESS_TYPE.ADMINS]: [Role.ADMIN, Role.OWNER],
@@ -36,15 +46,17 @@ const getAccessTypeRoleMap = (): Partial<Record<string, Role[]>> => {
   };
 };
 
-const useChannelFeature = () => {
+type ChannelFeature = FeatureList[FEATURE_KEY.CHANNELS];
+
+const useChannelFeature = (): ChannelFeature | null => {
   const teamState = container.resolve(TeamState);
   const {teamFeatures} = useKoSubscribableChildren(teamState as any, ['teamFeatures']) as {
-    teamFeatures?: Record<string, any>;
+    teamFeatures?: FeatureList;
   };
   return !isUndefined(teamFeatures) ? teamFeatures[FEATURE_KEY.CHANNELS] : null;
 };
 
-const useCanCreateChannels = () => {
+const useCanCreateChannels = (): boolean => {
   const teamState = container.resolve(TeamState);
   const {selfRole} = useKoSubscribableChildren(teamState, ['selfRole']);
   const channelFeature = useChannelFeature();
@@ -63,7 +75,7 @@ const useCanCreateChannels = () => {
   return false;
 };
 
-const useCanCreatePublicChannels = () => {
+const useCanCreatePublicChannels = (): boolean => {
   const teamState = container.resolve(TeamState);
   const {selfRole} = useKoSubscribableChildren(teamState, ['selfRole']);
   const channelFeature = useChannelFeature();
@@ -82,7 +94,7 @@ const useCanCreatePublicChannels = () => {
   return false;
 };
 
-export const useChannelsFeatureFlag = () => {
+export const useChannelsFeatureFlag = (): ChannelsFeatureFlagState => {
   const canCreatePublicChannels = useCanCreatePublicChannels();
   const channelFeature = useChannelFeature();
   const core = container.resolve(Core);

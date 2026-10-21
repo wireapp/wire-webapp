@@ -54,7 +54,7 @@ export const initialiseMLSMigrationFlow = async ({
   conversationRepository,
   getTeamMLSMigrationStatus,
   refreshAllKnownUsers,
-}: InitialiseMLSMigrationFlowParams) => {
+}: InitialiseMLSMigrationFlowParams): Promise<void> => {
   const core = container.resolve(CoreSingleton);
 
   return periodicallyCheckMigrationConfig(
@@ -78,8 +78,8 @@ const periodicallyCheckMigrationConfig = async (
   getTeamMLSMigrationStatus: () => MLSMigrationStatus,
   onMigrationStartTimeArrived: () => Promise<void>,
   core: Account,
-) => {
-  const checkMigrationConfigTask = () => {
+): Promise<void> => {
+  const checkMigrationConfigTask = (): Promise<void> => {
     return checkMigrationConfig(selfUser, getTeamMLSMigrationStatus, onMigrationStartTimeArrived);
   };
 
@@ -97,7 +97,7 @@ const checkMigrationConfig = async (
   selfUser: User,
   getTeamMLSMigrationStatus: () => MLSMigrationStatus,
   onMigrationStartTimeArrived: () => Promise<void>,
-) => {
+): Promise<void> => {
   const isMLSSupportedByEnv = await isMLSSupportedByEnvironment();
   if (!isMLSSupportedByEnv) {
     return;
@@ -147,7 +147,7 @@ const migrateConversationsToMLS = async ({
   conversationRepository,
   refreshAllKnownUsers,
   getTeamMLSMigrationStatus,
-}: MigrateConversationsToMLSParams) => {
+}: MigrateConversationsToMLSParams): Promise<void> => {
   //refetch all known users so we have the latest lists of the protocols they support
   await refreshAllKnownUsers();
 

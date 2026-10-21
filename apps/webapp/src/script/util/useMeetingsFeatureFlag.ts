@@ -26,7 +26,9 @@ import {canUseMeetings} from './canUseMeetings';
 
 import {Core} from '../service/coreSingleton';
 
-export const useMeetingsFeatureFlag = () => {
+type MeetingsFeatureFlagState = {isMeetingsEnabled: boolean};
+
+export const useMeetingsFeatureFlag = (): MeetingsFeatureFlagState => {
   const teamState = container.resolve(TeamState);
   const core = container.resolve(Core);
   const {isMeetingsEnabled: isTeamMeetingsFeatureEnabled} = useKoSubscribableChildren(teamState, ['isMeetingsEnabled']);

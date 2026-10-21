@@ -18,8 +18,15 @@
  */
 
 import {TextDecoder, TextEncoder} from 'node:util';
+import type {EncodeIntoResult} from 'util';
 
-function BrowserTextEncoder() {
+type BrowserTextEncoderResult = {
+  readonly encoding: string;
+  encode(input?: string): Uint8Array<ArrayBuffer>;
+  encodeInto(source: string, destination: Uint8Array): EncodeIntoResult;
+};
+
+function BrowserTextEncoder(): BrowserTextEncoderResult {
   const textEncoder = new TextEncoder();
 
   return {

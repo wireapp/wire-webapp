@@ -37,11 +37,19 @@ import {createUuid} from 'Util/uuid';
 
 import {ConnectionEntity} from './connectionEntity';
 import {ConnectionRepository} from './connectionRepository';
+import type {User} from '../entity/User';
 import {ConnectionService} from './connectionService';
 import {ConnectionState} from './connectionState';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-function buildConnectionRepository(translate: Translate) {
+function buildConnectionRepository(translate: Translate): readonly [
+  ConnectionRepository,
+  {
+    readonly connectionState: ConnectionState;
+    readonly userRepository: UserRepository;
+    readonly connectionService: ConnectionService;
+  },
+] {
   const connectionState = new ConnectionState();
   const connectionService = new ConnectionService();
   const selfService = new SelfService();
@@ -53,7 +61,7 @@ function buildConnectionRepository(translate: Translate) {
   ] as const;
 }
 
-function createConnection() {
+function createConnection(): User {
   const user = generateUser();
   const connection = new ConnectionEntity();
   connection.userId = user.qualifiedId;

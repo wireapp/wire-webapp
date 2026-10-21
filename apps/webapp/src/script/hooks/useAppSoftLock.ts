@@ -24,7 +24,12 @@ import {NotificationRepository} from 'Repositories/notification/NotificationRepo
 
 import {E2EIHandler, E2EIDeviceStatus} from '../e2eIdentity';
 
-export function useAppSoftLock(callingRepository: CallingRepository, notificationRepository: NotificationRepository) {
+type AppSoftLockState = {softLockEnabled: boolean};
+
+export function useAppSoftLock(
+  callingRepository: CallingRepository,
+  notificationRepository: NotificationRepository,
+): AppSoftLockState {
   const [softLockEnabled, setSoftLockEnabled] = useState(false);
 
   const handleDeviceStatusChange = useCallback(

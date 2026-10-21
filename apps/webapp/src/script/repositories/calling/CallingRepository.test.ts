@@ -90,6 +90,12 @@ type AudioFlowStat = {
   kind?: string;
   mediaType?: string;
 };
+type CallingRepositoryTestSetup = {
+  callState: CallState;
+  conversationState: ConversationState;
+  repository: CallingRepository;
+};
+type AudioStatsResult = {bytesFlowing: number; id: string | undefined};
 
 function createCallingRepositoryForTest({
   backgroundEffectsHandler = {} as BackgroundEffectsHandler,
@@ -121,7 +127,7 @@ function createCallingRepositoryForTest({
   userRepository?: UserRepository;
   apiClient?: APIClient;
   sftHttpClient?: Pick<typeof axios, 'post'>;
-} = {}) {
+} = {}): CallingRepositoryTestSetup {
   return {
     callState,
     conversationState,
@@ -1236,7 +1242,7 @@ describe('CallingRepository', () => {
     const userId = 'user-id';
     const remoteClientId = 'client-id';
 
-    const qualityInfo = (quality: NetworkQuality) => {
+    const qualityInfo = (quality: NetworkQuality): string => {
       return JSON.stringify({
         quality,
         rtt: 80,
@@ -1721,7 +1727,17 @@ describe('CallingRepository ISO', () => {
       await callingRepo.onCallEvent(event, '');
     });
 
-    const setupIncomingCallContext = async () => {
+    type IncomingCallContext = {
+      callingRepo: CallingRepository;
+      conversation: Conversation;
+      incomingCallCallback: jest.Mock;
+      rejectSpy: jest.SpyInstance;
+      sendIncomingSetup: (setupReceivedAt: number) => Promise<void>;
+      setCurrentTimestamp: (timestamp: number) => void;
+      triggerIncomingh: (shouldRing: 0 | 1) => void;
+    };
+
+    const setupIncomingCallContext = async (): Promise<IncomingCallContext> => {
       let currentTimestamp = 1_700_000_000_000;
       const selfUser = new User(createUuid(), '', translateForTest);
       selfUser.isMe = true;
@@ -2118,7 +2134,7 @@ describe('init AVS state', () => {
   });
 });
 
-const createLinkInsideDetachedWindow = (detachedWindow: Window, target = '_blank') => {
+const createLinkInsideDetachedWindow = (detachedWindow: Window, target = '_blank'): HTMLAnchorElement => {
   detachedWindow.document.body.innerHTML = `<a href="https://wire.com" target="${target}">Wire</a>`;
 
   return requireValueForTest(detachedWindow.document.querySelector('a'));
@@ -3476,8 +3492,8 @@ describe('set background effect', () => {
   });
 });
 
-function extractAudioStats(stats: {stats: RTCStatsReport}[]) {
-  const audioStats: {bytesFlowing: number; id: string | undefined}[] = [];
+function extractAudioStats(stats: {stats: RTCStatsReport}[]): AudioStatsResult[] {
+  const audioStats: AudioStatsResult[] = [];
   stats.forEach(userStats => {
     userStats.stats.forEach(data => {
       const audioStat = data as AudioFlowStat;
@@ -3492,7 +3508,7 @@ function extractAudioStats(stats: {stats: RTCStatsReport}[]) {
   return audioStats;
 }
 
-function createAutoAnsweringWuser(wCall: Wcall, remoteCallingRepository: CallingRepository) {
+function createAutoAnsweringWuser(wCall: Wcall, remoteCallingRepository: CallingRepository): number {
   const selfUserId = createUuid();
   const selfClientId = createUuid();
   const sendMsg = (
@@ -3503,7 +3519,7 @@ function createAutoAnsweringWuser(wCall: Wcall, remoteCallingRepository: Calling
     targets: string | null,
     _unused: string | null,
     payload: string,
-  ) => {
+  ): number => {
     const event: CallingEvent = {
       content: JSON.parse(payload) as CallingEvent['content'],
       conversation: conversationId,
@@ -3516,11 +3532,11 @@ function createAutoAnsweringWuser(wCall: Wcall, remoteCallingRepository: Calling
     return 0;
   };
 
-  const incoming = (conversationId: string) => {
+  const incoming = (conversationId: string): number => {
     return wCall.answer(wUser, conversationId, CALL_TYPE.NORMAL, 0);
   };
 
-  const requestConfig = () => {
+  const requestConfig = (): number => {
     setTimeout(() => {
       wCall.configUpdate(wUser, 0, JSON.stringify({ice_servers: []}));
     });

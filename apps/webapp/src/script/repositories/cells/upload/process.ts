@@ -126,7 +126,7 @@ export const createCellsUploadProcess = (
   const safeGateway = <T>(
     operation: CellsUploadGatewayError['operation'],
     call: () => PromiseLike<Result<T, CellsUploadGatewayError>>,
-  ) => {
+  ): task.Task<T, CellsUploadGatewayError> => {
     return task.tryOrElse(
       reason => {
         return isGatewayError(reason, operation) ? reason : {kind: 'gatewayError' as const, operation, cause: reason};

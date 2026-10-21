@@ -23,6 +23,7 @@ import {result, task} from 'true-myth';
 import {container} from 'tsyringe';
 
 import {ConversationDatabaseData, ConversationMapper} from 'Repositories/conversation/ConversationMapper';
+import type {Conversation as ConversationEntity} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {Core} from 'src/script/service/coreSingleton';
 import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
@@ -112,7 +113,7 @@ const createConversation = (
   type: CONVERSATION_TYPE,
   selfUser: User,
   groupId?: string,
-) => {
+): ConversationEntity => {
   const conversationRecord = createMockedDBConversationEntry(id, domain, initialProtocol, protocol, type);
 
   const [conversation] = ConversationMapper.mapConversations([conversationRecord], 1, translate);
@@ -127,7 +128,7 @@ const createConversation = (
   return conversation;
 };
 
-const mockSafeEpoch = (core: Core) => {
+const mockSafeEpoch = (core: Core): void => {
   (core.service?.mls as unknown as {getSafeEpoch: jest.Mock}).getSafeEpoch = jest
     .fn()
     .mockResolvedValue(task.resolve(1));

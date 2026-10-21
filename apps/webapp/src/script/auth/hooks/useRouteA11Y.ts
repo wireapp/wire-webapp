@@ -22,7 +22,7 @@ import {useEffect} from 'react';
 import {isNull} from '@sindresorhus/is';
 import {useLocation} from 'react-router';
 
-export function useRouteA11y(screenKey?: string) {
+export function useRouteA11y(screenKey?: string): void {
   const location = useLocation();
 
   useEffect(() => {
@@ -44,7 +44,7 @@ export function useRouteA11y(screenKey?: string) {
     element.focus({preventScroll: true});
 
     // remove tabindex after blur
-    const handleBlur = () => {
+    const handleBlur = (): void => {
       element.classList.remove('sr-only-focus');
       element.removeAttribute('tabindex');
       element.removeEventListener('blur', handleBlur);

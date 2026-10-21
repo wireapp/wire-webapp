@@ -82,7 +82,7 @@ export function hasAccessToFeature(feature: number, state: ACCESS_STATE): boolea
   return (feature & permissions) !== 0;
 }
 
-export function isGettingAccessToFeature(feature: number, prevState: ACCESS_STATE, current: ACCESS_STATE) {
+export function isGettingAccessToFeature(feature: number, prevState: ACCESS_STATE, current: ACCESS_STATE): boolean {
   return !hasAccessToFeature(feature, prevState) && hasAccessToFeature(feature, current);
 }
 

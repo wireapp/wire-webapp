@@ -86,6 +86,14 @@ type UpdateFavoriteListOptions = {
   readonly currentActiveId: string;
   readonly previousActiveId: string;
 };
+type DefaultMediaDeviceIds = {
+  audioinput: string;
+  audiooutput: string;
+  screeninput: string;
+  videoinput: string;
+  windowinput: string;
+};
+type MediaDevicesHandlerConfig = {DEFAULT_DEVICE: DefaultMediaDeviceIds};
 
 function loadStoredDeviceId(storageKey: string, defaultId: string): string {
   const storedId = loadValue<unknown>(storageKey);
@@ -110,7 +118,7 @@ export class MediaDevicesHandler {
   private onMediaDevicesRefresh?: () => void;
   private devicesAreInit = false;
 
-  static get CONFIG() {
+  static get CONFIG(): MediaDevicesHandlerConfig {
     return {
       DEFAULT_DEVICE: {
         audioinput: 'default',
@@ -215,7 +223,7 @@ export class MediaDevicesHandler {
     });
   }
 
-  public setOnMediaDevicesRefreshHandler(handler: () => void) {
+  public setOnMediaDevicesRefreshHandler(handler: () => void): void {
     this.onMediaDevicesRefresh = handler;
   }
 
@@ -224,7 +232,7 @@ export class MediaDevicesHandler {
    * @camera: boolean, Only when the camera is queried can the entire device list be accessed.
    * @refreshMediaStreams: boolean, Only when the refreshMediaStreams is true entire media streams are recreated.
    */
-  public async initializeMediaDevices(camera = false, refreshMediaStreams = false) {
+  public async initializeMediaDevices(camera = false, refreshMediaStreams = false): Promise<void> {
     if (!Runtime.isSupportingUserMedia() || this.devicesAreInit) {
       return;
     }
@@ -258,7 +266,7 @@ export class MediaDevicesHandler {
   /**
    * Subscribe to MediaDevices updates if available.
    */
-  private subscribeToDevices() {
+  private subscribeToDevices(): void {
     navigator.mediaDevices.ondevicechange = () => {
       this.logger.info('List of available MediaDevices has changed');
       this.refreshMediaDevices();
@@ -284,7 +292,7 @@ export class MediaDevicesHandler {
    * @param [refreshMediaStreams=false] If `refreshMediaStreams=true`, a video track is also created when the device list is read.
    * This ensures that the video device labels can also be read. This is necessary for initializing the entire device list.
    */
-  public async refreshMediaDevices(refreshMediaStreams = true) {
+  public async refreshMediaDevices(refreshMediaStreams = true): Promise<MediaDeviceInfo[]> {
     try {
       this.removeAllDevices();
       const mediaDevices = await window.navigator.mediaDevices.enumerateDevices();
@@ -348,7 +356,7 @@ export class MediaDevicesHandler {
     }
   }
 
-  public async getScreenSources() {
+  public async getScreenSources(): Promise<ElectronDesktopCapturerSource[]> {
     const options: ElectronGetSourcesOptions = {
       thumbnailSize: {
         height: 176,
@@ -400,7 +408,7 @@ export class MediaDevicesHandler {
   /**
    * Remove all known MediaDevices from the lists.
    */
-  private removeAllDevices() {
+  private removeAllDevices(): void {
     mediaDevicesStore.getState().resetDevices();
   }
 
@@ -433,7 +441,7 @@ export class MediaDevicesHandler {
     storeValue(this.favoriteKeyFor(deviceType), updatedFavoriteIds);
   }
 
-  private favoriteKeyFor(type: MediaDeviceType) {
+  private favoriteKeyFor(type: MediaDeviceType): string {
     switch (type) {
       case MediaDeviceType.AUDIO_INPUT:
         return FavoriteDeviceTypes.AUDIO_INPUT;

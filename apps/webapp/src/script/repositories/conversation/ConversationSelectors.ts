@@ -146,11 +146,15 @@ const is1to1ConversationWithUser = <Protocol extends CONVERSATION_PROTOCOL.PROTE
   };
 };
 
-export const isProteus1to1ConversationWithUser = (userId: QualifiedId) => {
+export const isProteus1to1ConversationWithUser = (
+  userId: QualifiedId,
+): ((conversation: Conversation) => conversation is ProtocolToConversationType[CONVERSATION_PROTOCOL.PROTEUS]) => {
   return is1to1ConversationWithUser(userId, CONVERSATION_PROTOCOL.PROTEUS);
 };
 
-export const isMLS1to1ConversationWithUser = (userId: QualifiedId) => {
+export const isMLS1to1ConversationWithUser = (
+  userId: QualifiedId,
+): ((conversation: Conversation) => conversation is ProtocolToConversationType[CONVERSATION_PROTOCOL.MLS]) => {
   return is1to1ConversationWithUser(userId, CONVERSATION_PROTOCOL.MLS);
 };
 

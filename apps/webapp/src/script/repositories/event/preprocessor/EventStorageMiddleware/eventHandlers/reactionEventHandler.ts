@@ -28,7 +28,13 @@ import {EventValidationError} from './EventValidationError';
 import {CONVERSATION} from '../../../Client';
 import {EventHandler} from '../types';
 
-function computeEventUpdates(target: StoredEvent<MessageAddEvent>, reactionEvent: ReactionEvent) {
+type ReactionEventUpdates = {
+  primary_key: string;
+  reactions: ReturnType<typeof addReaction>;
+  version: number;
+};
+
+function computeEventUpdates(target: StoredEvent<MessageAddEvent>, reactionEvent: ReactionEvent): ReactionEventUpdates {
   const version = (target.version ?? 1) + 1;
   const {
     data: {reaction},

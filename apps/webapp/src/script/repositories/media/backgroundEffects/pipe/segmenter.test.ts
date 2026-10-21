@@ -621,7 +621,7 @@ describe('segmenter tests', () => {
 
         await runSegmenter(canvas, readable, options, jest.fn(), jest.fn());
 
-        const createFrame = (timestamp: number) => {
+        const createFrame = (timestamp: number): VideoFrame => {
           return {
             codedWidth: 640,
             codedHeight: 480,

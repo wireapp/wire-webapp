@@ -18,7 +18,12 @@
  */
 
 import {isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
+import type {NonEmptyString} from '@sindresorhus/is/distribution/types';
 import {AssetAuditData, AssetOptions, AssetRetentionPolicy} from '@wireapp/api-client/lib/asset/';
+import type {AssetResponse} from '@wireapp/api-client/lib/asset/assetApi';
+import type {RequestCancelable} from '@wireapp/api-client/lib/http';
+import type {AssetService} from '@wireapp/core/lib/conversation';
+import type {EncryptedAssetUploaded} from '@wireapp/core/lib/cryptography';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
@@ -43,6 +48,9 @@ import {getAssetUrl, setAssetUrl} from './assetUrlCache';
 import {Core} from '../../service/coreSingleton';
 
 const percentageScale = 100;
+type AssetUrlCacheKey = {domain: string | undefined; key: NonEmptyString};
+type ProfileImageAssetKey = {domain?: string; key: string};
+type ProfileImageUploadResult = {mediumImageKey: ProfileImageAssetKey; previewImageKey: ProfileImageAssetKey};
 
 interface CompressedImage {
   compressedBytes: Uint8Array;
@@ -75,7 +83,7 @@ export class AssetRepository {
     this.logger = getLogger('AssetRepository');
   }
 
-  get assetCoreService() {
+  get assetCoreService(): AssetService {
     const coreServices = this.core.service;
     if (isUndefined(coreServices)) {
       throw new Error('Core services are not initialized');
@@ -84,11 +92,11 @@ export class AssetRepository {
     return coreServices.asset;
   }
 
-  public addToProcessQueue(message: GenericMessage, conversationId: string) {
+  public addToProcessQueue(message: GenericMessage, conversationId: string): void {
     this.processQueue.push({message, conversationId});
   }
 
-  public removeFromProcessQueue(messageId: string) {
+  public removeFromProcessQueue(messageId: string): void {
     this.processQueue(
       this.processQueue().filter(queueItem => {
         return queueItem.message.messageId !== messageId;
@@ -135,8 +143,8 @@ export class AssetRepository {
     }
   }
 
-  private loadBuffer(asset: AssetRemoteData) {
-    const progressCallback = (fraction: number) => {
+  private loadBuffer(asset: AssetRemoteData): RequestCancelable<AssetResponse> {
+    const progressCallback = (fraction: number): void => {
       asset.updateProgress(fraction * percentageScale);
     };
 
@@ -149,7 +157,7 @@ export class AssetRepository {
     return this.assetCoreService.downloadAsset(asset.urlData, otrKey, sha256, progressCallback);
   }
 
-  public async download(asset: AssetRemoteData, fileName: string) {
+  public async download(asset: AssetRemoteData, fileName: string): Promise<number | void> {
     try {
       const blob = await this.load(asset);
       if (isUndefined(blob)) {
@@ -161,7 +169,7 @@ export class AssetRepository {
     }
   }
 
-  public async downloadFile(asset: FileAsset) {
+  public async downloadFile(asset: FileAsset): Promise<number | void> {
     try {
       asset.status(AssetTransferState.DOWNLOADING);
       const blob = await this.load(asset.original_resource());
@@ -184,10 +192,7 @@ export class AssetRepository {
     }
   }
 
-  async uploadProfileImage(image: File): Promise<{
-    mediumImageKey: {domain?: string; key: string};
-    previewImageKey: {domain?: string; key: string};
-  }> {
+  async uploadProfileImage(image: File): Promise<ProfileImageUploadResult> {
     const strippedImage = await stripImageExifData(image);
 
     const [{compressedBytes: previewImage}, {compressedBytes: mediumImage}] = await Promise.all([
@@ -214,7 +219,7 @@ export class AssetRepository {
       this.assetCoreService.uploadRawAsset(mediumImage, options).response,
     ]);
 
-    const toAssetImageKey = (uploadedAsset: {domain?: string; key?: string}) => {
+    const toAssetImageKey = (uploadedAsset: {domain?: string; key?: string}): AssetUrlCacheKey => {
       if (!isNonEmptyString(uploadedAsset.key)) {
         throw new Error('Asset upload response is missing the asset key.');
       }
@@ -272,7 +277,7 @@ export class AssetRepository {
     options: AssetUploadOptions,
     isAuditLogEnabled: boolean,
     onCancel?: () => void,
-  ) {
+  ): Promise<EncryptedAssetUploaded> {
     const bytes = await loadFileBuffer(file);
     const progressObservable = ko.observable(0);
     this.uploadProgressQueue.push({messageId, progress: progressObservable});

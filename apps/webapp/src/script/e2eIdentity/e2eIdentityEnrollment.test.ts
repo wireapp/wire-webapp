@@ -62,7 +62,7 @@ jest.mock('./oidcService', () => {
   };
 });
 
-function wait(ms: number) {
+function wait(ms: number): Promise<unknown> {
   return new Promise(resolve => {
     return setTimeout(resolve, ms);
   });

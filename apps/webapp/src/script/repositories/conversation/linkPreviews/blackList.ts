@@ -46,6 +46,6 @@ const BLACKLIST = [
   'vimeo.com/(channels/[^/]+/|video/)?[0-9]+',
 ];
 
-export const isBlacklisted = (url: string) => {
+export const isBlacklisted = (url: string): boolean => {
   return new RegExp(BLACKLIST.join('|')).test(url);
 };

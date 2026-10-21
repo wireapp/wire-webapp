@@ -19,6 +19,17 @@
 
 import {isNonEmptyString, isNullOrUndefined, isTruthy} from '@sindresorhus/is';
 import {NodeFlags, RestShareLink} from '@wireapp/api-client/lib/cells';
+import type {Node as CellsNode, NodeVersions} from '@wireapp/api-client/lib/cells/cellsApi.schema';
+import type {
+  RestBackgroundAction,
+  RestDeleteVersionResponse,
+  RestNamespaceValuesResponse,
+  RestNode,
+  RestNodeCollection,
+  RestPerformActionResponse,
+  RestPromoteVersionResponse,
+  RestPublicLinkDeleteSuccess,
+} from 'cells-sdk-ts';
 import {container, singleton} from 'tsyringe';
 
 import {createUuid} from 'Util/uuid';
@@ -44,6 +55,7 @@ interface CellsConfig {
 // The "(string & {})" indicates that all strings are valid, but we get autocomplete for the union values.
 type SortBy = 'mtime' | (string & {});
 type SortDirection = 'asc' | 'desc';
+type UploadedNodeVersion = {uuid: string; versionId: string};
 
 const DEFAULT_MAX_FILES_LIMIT = 100;
 
@@ -55,7 +67,7 @@ export class CellsRepository {
 
   constructor(private readonly apiClient = container.resolve(APIClient)) {}
 
-  initialize(config: CellsConfig) {
+  initialize(config: CellsConfig): void {
     if (this.isInitialized) {
       return;
     }
@@ -78,7 +90,7 @@ export class CellsRepository {
     versionId?: string;
     progressCallback?: (progress: number) => void;
     abortController?: AbortController;
-  }): Promise<{uuid: string; versionId: string}> {
+  }): Promise<UploadedNodeVersion> {
     const uploadFilePath = isNonEmptyString(file.webkitRelativePath) ? file.webkitRelativePath : file.name;
     const filePath = `${isNonEmptyString(path) ? path : this.basePath}/${uploadFilePath}`;
 
@@ -108,7 +120,7 @@ export class CellsRepository {
     versionId?: string;
     progressCallback?: (progress: number) => void;
     abortController?: AbortController;
-  }): Promise<{uuid: string; versionId: string}> {
+  }): Promise<UploadedNodeVersion> {
     const uploadFilePath = isNonEmptyString(file.webkitRelativePath) ? file.webkitRelativePath : file.name;
     const filePath = `${isNonEmptyString(path) ? path : this.basePath}/${uploadFilePath}`;
     const controller = abortController ?? new AbortController();
@@ -138,21 +150,33 @@ export class CellsRepository {
     this.uploadControllers.get(uuid)?.abort();
   }
 
-  async deleteNodeDraft({uuid, versionId}: {uuid: string; versionId: string}) {
+  async deleteNodeDraft({uuid, versionId}: {uuid: string; versionId: string}): Promise<RestDeleteVersionResponse> {
     return this.apiClient.api.cells.deleteNodeDraft({uuid, versionId});
   }
 
-  async deleteNode({uuid, permanently = false}: {uuid: string; permanently?: boolean}) {
+  async deleteNode({
+    uuid,
+    permanently = false,
+  }: {
+    uuid: string;
+    permanently?: boolean;
+  }): Promise<RestPerformActionResponse> {
     return this.apiClient.api.cells.deleteNode({uuid, permanently});
   }
 
-  async deleteNodes({uuids, permanently = false}: {uuids: string[]; permanently?: boolean}) {
+  async deleteNodes({uuids, permanently = false}: {uuids: string[]; permanently?: boolean}): Promise<void> {
     uuids.forEach(async uuid => {
       await this.deleteNode({uuid, permanently});
     });
   }
 
-  async moveNode({currentPath, targetPath}: {currentPath: string; targetPath: string}) {
+  async moveNode({
+    currentPath,
+    targetPath,
+  }: {
+    currentPath: string;
+    targetPath: string;
+  }): Promise<RestPerformActionResponse> {
     return this.apiClient.api.cells.moveNode({currentPath, targetPath});
   }
 
@@ -160,7 +184,7 @@ export class CellsRepository {
     return this.apiClient.api.cells.moveNodes({currentPaths, targetPath});
   }
 
-  async getBackgroundMoveInfo({jobUuid}: {jobUuid: string}) {
+  async getBackgroundMoveInfo({jobUuid}: {jobUuid: string}): Promise<RestBackgroundAction> {
     return this.apiClient.api.cells.getBackgroundActionInfo({name: 'move', jobUuid});
   }
 
@@ -180,7 +204,7 @@ export class CellsRepository {
     sortBy?: SortBy;
     sortDirection?: SortDirection;
     deleted?: boolean;
-  }) {
+  }): Promise<RestNodeCollection> {
     return this.apiClient.api.cells.getAllNodes({
       path: isNonEmptyString(path) ? path : this.basePath,
       limit,
@@ -192,26 +216,34 @@ export class CellsRepository {
     });
   }
 
-  async getNode({uuid, flags}: {uuid: string; flags?: NodeFlags[]}) {
+  async getNode({uuid, flags}: {uuid: string; flags?: NodeFlags[]}): Promise<CellsNode> {
     return this.apiClient.api.cells.getNode({id: uuid, flags});
   }
 
-  async getNodeVersions({uuid, flags}: {uuid: string; flags?: NodeFlags[]}) {
+  async getNodeVersions({uuid, flags}: {uuid: string; flags?: NodeFlags[]}): Promise<NodeVersions> {
     return this.apiClient.api.cells.getNodeVersions({uuid, flags});
   }
 
-  async lookupNodeByPath({path}: {path: string}) {
+  async lookupNodeByPath({path}: {path: string}): Promise<RestNode | undefined> {
     return this.apiClient.api.cells.lookupNodeByPath({path});
   }
 
-  async createFolder({path, name}: {path: string; name: string}) {
+  async createFolder({path, name}: {path: string; name: string}): Promise<RestNodeCollection> {
     const filePath = `${isNonEmptyString(path) ? path : this.basePath}/${name}`;
     const uuid = createUuid();
 
     return this.apiClient.api.cells.createFolder({path: filePath, uuid});
   }
 
-  async createFile({path, name, templateUuid}: {path: string; name: string; templateUuid?: string}) {
+  async createFile({
+    path,
+    name,
+    templateUuid,
+  }: {
+    path: string;
+    name: string;
+    templateUuid?: string;
+  }): Promise<RestNodeCollection> {
     const filePath = `${isNonEmptyString(path) ? path : this.basePath}/${name}`;
     const uuid = createUuid();
     const versionId = createUuid();
@@ -242,7 +274,7 @@ export class CellsRepository {
     link: RestShareLink;
     createPassword?: string;
     passwordEnabled?: boolean;
-  }) {
+  }): Promise<RestShareLink> {
     return this.apiClient.api.cells.createNodePublicLink({
       uuid,
       link,
@@ -251,11 +283,11 @@ export class CellsRepository {
     });
   }
 
-  async getPublicLink({uuid}: {uuid: string}) {
+  async getPublicLink({uuid}: {uuid: string}): Promise<RestShareLink> {
     return this.apiClient.api.cells.getNodePublicLink({uuid});
   }
 
-  async deletePublicLink({uuid}: {uuid: string}) {
+  async deletePublicLink({uuid}: {uuid: string}): Promise<RestPublicLinkDeleteSuccess> {
     return this.apiClient.api.cells.deleteNodePublicLink({uuid});
   }
 
@@ -271,7 +303,7 @@ export class CellsRepository {
     createPassword?: string;
     updatePassword?: string;
     passwordEnabled?: boolean;
-  }) {
+  }): Promise<RestShareLink> {
     return this.apiClient.api.cells.updateNodePublicLink({
       linkUuid,
       link,
@@ -309,7 +341,7 @@ export class CellsRepository {
     sortBy?: SortBy;
     sortDirection?: SortDirection;
     deleted?: boolean;
-  }) {
+  }): Promise<RestNodeCollection> {
     return this.apiClient.api.cells.searchNodes({
       phrase: query,
       recursive,
@@ -327,23 +359,23 @@ export class CellsRepository {
     });
   }
 
-  async promoteNodeDraft({uuid, versionId}: {uuid: string; versionId: string}) {
+  async promoteNodeDraft({uuid, versionId}: {uuid: string; versionId: string}): Promise<RestPromoteVersionResponse> {
     return this.apiClient.api.cells.promoteNodeDraft({uuid, versionId});
   }
 
-  async restoreNode({uuid}: {uuid: string}) {
+  async restoreNode({uuid}: {uuid: string}): Promise<RestPerformActionResponse> {
     return this.apiClient.api.cells.restoreNode({uuid});
   }
 
-  async renameNode({currentPath, newName}: {currentPath: string; newName: string}) {
+  async renameNode({currentPath, newName}: {currentPath: string; newName: string}): Promise<RestPerformActionResponse> {
     return this.apiClient.api.cells.renameNode({currentPath, newName});
   }
 
-  async getAllTags() {
+  async getAllTags(): Promise<RestNamespaceValuesResponse> {
     return this.apiClient.api.cells.getAllTags();
   }
 
-  async setNodeTags({uuid, tags}: {uuid: string; tags: string[]}) {
+  async setNodeTags({uuid, tags}: {uuid: string; tags: string[]}): Promise<RestNode> {
     return this.apiClient.api.cells.setNodeTags({uuid, tags});
   }
 }

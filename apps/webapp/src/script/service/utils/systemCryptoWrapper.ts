@@ -31,8 +31,12 @@ type SystemCryptoV1 = {
 };
 
 export type SystemCrypto = SystemCryptoV0 | SystemCryptoV1;
+type WrappedSystemCrypto = {
+  encrypt: (value: Uint8Array) => Promise<Uint8Array<ArrayBufferLike>>;
+  decrypt: (value: Uint8Array) => Promise<Uint8Array<ArrayBufferLike>>;
+};
 
-export function wrapSystemCrypto(baseCrypto: SystemCrypto) {
+export function wrapSystemCrypto(baseCrypto: SystemCrypto): WrappedSystemCrypto {
   const isBase64 = /^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?$/;
   return {
     encrypt: (value: Uint8Array) => {

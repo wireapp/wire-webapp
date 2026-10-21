@@ -26,8 +26,10 @@ type UploadCall = {
   readonly resolve: () => void;
   readonly reject: (error: unknown) => void;
 };
+type CellsRepositoryTestSetup = {repository: CellsRepository; calls: UploadCall[]};
+type UploadedNodeVersion = {uuid: string; versionId: string};
 
-const createRepository = () => {
+const createRepository = (): CellsRepositoryTestSetup => {
   const calls: UploadCall[] = [];
   const apiClient = {
     api: {
@@ -44,7 +46,10 @@ const createRepository = () => {
   return {repository: new CellsRepository(apiClient as unknown as APIClient), calls};
 };
 
-const upload = (repository: CellsRepository, options?: {uuid?: string; abortController?: AbortController}) => {
+const upload = (
+  repository: CellsRepository,
+  options?: {uuid?: string; abortController?: AbortController},
+): Promise<UploadedNodeVersion> => {
   return repository.uploadNodeDraft({
     uuid: options?.uuid ?? 'upload-id',
     file: new File(['content'], 'document.txt', {type: 'text/plain'}),
@@ -100,7 +105,7 @@ describe('CellsRepository upload cancellation', () => {
 });
 
 describe('CellsRepository bulk moves', () => {
-  it('retrieves background status for a move job', async () => {
+  it('retrieves status for a background move job', async () => {
     const response = {JobUuid: 'move-job', Name: 'move', Status: 'Running'};
     const apiClient = {
       api: {
@@ -136,7 +141,16 @@ describe('CellsRepository bulk moves', () => {
 describe('CellsRepository upload paths', () => {
   const uploadPath = 'conversation-id@example.com/direct-upload';
 
-  const createApiClient = () => {
+  type CellsRepositoryUploadApiClient = {
+    api: {
+      cells: {
+        uploadNode: jest.Mock;
+        uploadNodeDraft: jest.Mock;
+      };
+    };
+  };
+
+  const createApiClient = (): CellsRepositoryUploadApiClient => {
     return {
       api: {
         cells: {

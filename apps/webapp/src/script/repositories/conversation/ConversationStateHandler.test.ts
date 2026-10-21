@@ -29,7 +29,13 @@ import type {ConversationService} from './ConversationService';
 
 import {Conversation} from '../entity/Conversation';
 
-function buildHandler() {
+type ConversationStateHandlerTestSetup = {
+  conversationService: jest.Mocked<Pick<ConversationService, 'deleteConversationCode' | 'putConversationAccess'>>;
+  translate: Translate;
+  handler: ConversationStateHandler;
+};
+
+function buildHandler(): ConversationStateHandlerTestSetup {
   const conversationService: jest.Mocked<
     Pick<ConversationService, 'deleteConversationCode' | 'putConversationAccess'>
   > = {
@@ -44,7 +50,7 @@ function buildHandler() {
   return {conversationService, translate, handler};
 }
 
-function buildConversation(inTeam: boolean) {
+function buildConversation(inTeam: boolean): Conversation {
   const conversation = new Conversation('conversation-id', 'wire.com', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
   (conversation as any).inTeam = jest.fn(() => {
     return inTeam;

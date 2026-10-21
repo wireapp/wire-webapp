@@ -40,6 +40,7 @@ import {BackgroundEffectsQuality, backgroundEffectsStore, RenderMetrics} from '.
 const millisecondsPerSecond = 1000;
 const percentageScale = 100;
 const maximumDisplayedUtilizationPercentage = 999;
+type BackgroundEffectApplicationResult = {applied: boolean; media: ReleasableMediaStream};
 
 export const TARGET_FPS = 15;
 export const DEBOUNCE_TIMER = 500;
@@ -52,7 +53,7 @@ const isVirtualEffect = (effect: BackgroundEffectSelection): boolean => {
   return effect.type === 'virtual' || effect.type === 'custom';
 };
 
-const getBlurStrength = (effect: BackgroundEffectSelection) => {
+const getBlurStrength = (effect: BackgroundEffectSelection): number => {
   return effect.type === 'blur' ? BLUR_STRENGTHS[effect.level] : BLUR_STRENGTHS.high;
 };
 
@@ -134,9 +135,7 @@ export class BackgroundEffectsHandler {
     });
   }
 
-  public async applyBackgroundEffect(
-    originalVideoStream: MediaStream,
-  ): Promise<{applied: boolean; media: ReleasableMediaStream}> {
+  public async applyBackgroundEffect(originalVideoStream: MediaStream): Promise<BackgroundEffectApplicationResult> {
     const {preferredEffect} = backgroundEffectsStore.getState();
 
     if (preferredEffect.type === 'none') {
@@ -359,7 +358,7 @@ export class BackgroundEffectsHandler {
     }
   }
 
-  private prefetch(url: string) {
+  private prefetch(url: string): void {
     const existingPrefetchLink = document.head.querySelector<HTMLLinkElement>(`link[rel="prefetch"][href="${url}"]`);
 
     if (existingPrefetchLink !== null) {

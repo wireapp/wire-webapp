@@ -19,7 +19,7 @@
 
 import React from 'react';
 
-import {render} from '@testing-library/react';
+import {render, type RenderResult} from '@testing-library/react';
 import {CONVERSATION_TYPE, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
@@ -33,6 +33,7 @@ import {MockStoreEnhanced} from 'redux-mock-store';
 import {ThunkDispatch} from 'redux-thunk';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
+import type {JSX} from '@emotion/react/jsx-runtime';
 
 import cs from 'I18n/cs-CZ.json';
 import da from 'I18n/da-DK.json';
@@ -104,7 +105,7 @@ const internalizationStrings = {
 const withStore = (
   children: React.ReactNode,
   store: MockStoreEnhanced<RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
-) => {
+): JSX.Element => {
   return <Provider store={store}>{children}</Provider>;
 };
 
@@ -115,11 +116,11 @@ function withRouter(component: React.ReactNode): React.ReactElement {
 const rootContextValue = createRootContextValueForTest({translate});
 const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
-const loadLanguage = (language: string) => {
+const loadLanguage = (language: string): typeof en => {
   return require(`I18n/${mapLanguage(language)}.json`);
 };
 
-export const withIntl = (component: React.ReactNode) => {
+export const withIntl = (component: React.ReactNode): JSX.Element => {
   setStrings(internalizationStrings);
 
   return (
@@ -143,18 +144,18 @@ export function withThemeAndRootContext(
 const wrapComponent = (
   component: React.ReactNode,
   store: MockStoreEnhanced<RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
-) => {
+): React.ReactElement => {
   return withRouter(withTheme(withStore(withIntl(component), store)));
 };
 
 export const mountComponent = (
   component: React.ReactNode,
   store: MockStoreEnhanced<RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
-) => {
+): RenderResult => {
   return render(wrapComponent(component, store));
 };
 
-export function generateUsers(nbUsers: number, domain: string) {
+export function generateUsers(nbUsers: number, domain: string): User[] {
   const users: User[] = [];
   for (let i = 0; i < nbUsers; i++) {
     const user = new User(createUuid(), domain, translateForTest);
@@ -174,7 +175,7 @@ export function generateUserClients(users: User[]): QualifiedUserClients {
   return userClients;
 }
 
-export function generateQualifiedIds(nbUsers: number, domain: string) {
+export function generateQualifiedIds(nbUsers: number, domain: string): QualifiedId[] {
   const users: QualifiedId[] = [];
   for (let i = 0; i < nbUsers; i++) {
     users.push({id: createUuid(), domain});
@@ -187,7 +188,7 @@ export const createConversation = (
   protocol: CONVERSATION_PROTOCOL = CONVERSATION_PROTOCOL.PROTEUS,
   conversationId: QualifiedId = {id: createUuid(), domain: ''},
   groupId = 'group-id',
-) => {
+): Conversation => {
   const conversation = new Conversation(conversationId.id, conversationId.domain, protocol, translateForTest);
   conversation.participating_user_ets.push(new User(createUuid(), '', translateForTest));
   conversation.type(type);
@@ -197,7 +198,7 @@ export const createConversation = (
   return conversation;
 };
 
-export const createSelfParticipant = () => {
+export const createSelfParticipant = (): Participant => {
   const selfUser = new User('', '', translateForTest);
   selfUser.isMe = true;
   return new Participant(selfUser, 'client1');
@@ -218,14 +219,14 @@ const mediaDevices = {
   }),
 };
 
-export const buildMediaDevicesHandler = () => {
+export const buildMediaDevicesHandler = (): MediaDevicesHandler => {
   return {
     currentAvailableDeviceId: mediaDevices,
     setOnMediaDevicesRefreshHandler: jest.fn(),
   } as unknown as MediaDevicesHandler;
 };
 
-export const buildCallingRepository = () => {
+export const buildCallingRepository = (): CallingRepository => {
   const controller: BackgroundEffectsController = {
     getQuality: jest.fn(),
     getCapabilityInfo: jest.fn(),

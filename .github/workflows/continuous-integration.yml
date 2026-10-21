@@ -146,6 +146,12 @@ jobs:
     name: Rspack production build
     permissions:
       contents: read
+    container:
+      image: quay.io/wire/mirror-images/playwright:v1.64.1-noble@sha256:7852dc5a7d72f5fe458a597d690f6c42fbc8e9e26ddfa95f8e6ef552558d9bbf
+      options: --ipc=host
+    defaults:
+      run:
+        shell: bash
 
     steps:
       - name: Checkout repository
@@ -179,6 +185,12 @@ jobs:
           WIRE_WEBAPP_BUILD_VERSION="${expected_version}" \
             ./bin/yarn nx run server:package-public
           echo "expected_version=${expected_version}" >> "$GITHUB_OUTPUT"
+
+      - name: Install unzip for artifact verification
+        run: |
+          apt-get update
+          apt-get install --yes --no-install-recommends unzip
+          rm -rf /var/lib/apt/lists/*
 
       - name: Verify public Rspack deployment package
         env:
@@ -221,9 +233,6 @@ jobs:
             echo "Public deployment package contains the Webpack runtime fingerprint." >&2
             exit 1
           fi
-
-      - name: Install Chromium for Rspack smoke tests
-        run: ./bin/yarn exec playwright install --only-shell --with-deps chromium
 
       - name: Run Rspack browser smoke tests
         run: ./bin/yarn nx run webapp:smoke-rspack

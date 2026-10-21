@@ -275,7 +275,7 @@ export class VideoFilter {
     this.quadBuffers = {positionBuffer, texCoordBuffer};
   }
 
-  private ensureTextures(width: number, height: number) {
+  private ensureTextures(width: number, height: number): void {
     if (this.currentWidth === width && this.currentHeight === height) {
       return;
     }
@@ -466,7 +466,7 @@ export class VideoFilter {
     return currentTexture;
   }
 
-  public destroy() {
+  public destroy(): void {
     const gl = this.gl;
     if (!isNullOrUndefined(this.blurProgram)) {
       gl.deleteProgram(this.blurProgram);
@@ -494,7 +494,13 @@ export class VideoFilter {
     }
   }
 
-  public render(videoFrame: VideoFrame, blur: number, brightness: number = 0, contrast: number = 1, gamma: number = 1) {
+  public render(
+    videoFrame: VideoFrame,
+    blur: number,
+    brightness: number = 0,
+    contrast: number = 1,
+    gamma: number = 1,
+  ): void {
     const {canvas, gl} = this;
     const frameWidth = videoFrame.codedWidth;
     const frameHeight = videoFrame.codedHeight;

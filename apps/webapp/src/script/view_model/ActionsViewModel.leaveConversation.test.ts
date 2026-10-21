@@ -19,7 +19,7 @@
 
 import ko from 'knockout';
 import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation';
-import {FEATURE_KEY, FEATURE_STATUS} from '@wireapp/api-client/lib/team';
+import {FEATURE_KEY, FEATURE_STATUS, type FeatureList} from '@wireapp/api-client/lib/team';
 
 import {useLeaveGroupAdminModalStore} from 'Components/Modals/LeaveGroupAdminModal/useLeaveGroupAdminModalStore';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
@@ -43,6 +43,19 @@ import {UserType} from '@wireapp/api-client/lib/user';
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 
+type ActionsViewModelTestFixture = {
+  readonly vm: ActionsViewModel;
+  readonly setMemberConversationRole: jest.Mock;
+  readonly leaveConversationMock: jest.Mock;
+};
+type BuildActionsViewModelOptions = {
+  selfUser?: User;
+  teamFeatures?: FeatureList;
+  setMemberConversationRole?: jest.Mock;
+  leaveConversationMock?: jest.Mock;
+  translate: Translate;
+};
+
 /** Create a User that passes every eligibility criterion in leaveConversation. */
 function makeEligibleUser(id = createUuid()): User {
   const user = new User(id, 'example.com', translateForTest);
@@ -59,19 +72,14 @@ const featureWithPreventAdminLessGroups = {
   [FEATURE_KEY.PREVENT_ADMIN_LESS_GROUPS]: {status: FEATURE_STATUS.ENABLED},
 } as any;
 
-function buildActionsViewModel({
-  selfUser = new User('self-id', 'example.com', translateForTest),
-  teamFeatures = undefined as any,
-  setMemberConversationRole = jest.fn().mockResolvedValue(undefined),
-  leaveConversationMock = jest.fn().mockResolvedValue(undefined),
-  translate,
-}: {
-  selfUser?: User;
-  teamFeatures?: any;
-  setMemberConversationRole?: jest.Mock;
-  leaveConversationMock?: jest.Mock;
-  translate: Translate;
-}) {
+function buildActionsViewModel(options: BuildActionsViewModelOptions): ActionsViewModelTestFixture {
+  const {
+    selfUser = new User('self-id', 'example.com', translateForTest),
+    teamFeatures,
+    setMemberConversationRole = jest.fn().mockResolvedValue(undefined),
+    leaveConversationMock = jest.fn().mockResolvedValue(undefined),
+    translate,
+  } = options;
   const mockUserState = {self: ko.observable(selfUser)} as unknown as UserState;
   const mockTeamState = {teamFeatures: ko.observable(teamFeatures)} as unknown as TeamState;
 

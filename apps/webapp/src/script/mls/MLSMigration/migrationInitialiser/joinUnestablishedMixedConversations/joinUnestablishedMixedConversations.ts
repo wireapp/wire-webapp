@@ -37,7 +37,7 @@ export const joinUnestablishedMixedConversations = async (
   conversationRepository: ConversationRepository,
   selfUserId: QualifiedId,
   {core}: JoinUnestablishedMixedConversationsParams,
-) => {
+): Promise<void> => {
   const mixedConversations = conversations.filter(isMixedConversation);
   mlsMigrationLogger.info(`Found ${mixedConversations.length} "mixed" conversations, joining unestablished ones...`);
 
@@ -54,7 +54,7 @@ export const joinUnestablishedMixedConversation = async (
   selfUserId: QualifiedId,
   {core}: JoinUnestablishedMixedConversationsParams,
   shouldRetry = true,
-) => {
+): Promise<void> => {
   if (mixedConversation.epoch > 0) {
     return initMLSGroupConversation(mixedConversation, conversationRepository, {
       core,

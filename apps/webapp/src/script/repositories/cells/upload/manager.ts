@@ -33,6 +33,8 @@ export type CellsUploadManagerError =
   | UploadProcessError
   | {readonly kind: 'unknownUpload'; readonly uploadId: string}
   | {readonly kind: 'duplicateUpload'; readonly uploadId: string};
+type CellsUploadManagerCommandName =
+  'start' | 'cancel' | 'retryUpload' | 'publish' | 'retryPublish' | 'discard' | 'retryDiscard';
 
 export type CellsUploadManager = {
   readonly register: (uploadId: string, source: UploadSource, path: string) => Result<void, CellsUploadManagerError>;
@@ -62,8 +64,8 @@ export const createCellsUploadManager = (dependencies: CellsUploadProcessDepende
   };
   const command = (
     uploadId: string,
-    name: 'start' | 'cancel' | 'retryUpload' | 'publish' | 'retryPublish' | 'discard' | 'retryDiscard',
-  ) => {
+    name: CellsUploadManagerCommandName,
+  ): Promise<Result<void, CellsUploadManagerError>> => {
     const process = processFor(uploadId);
     return process.isErr ? Promise.resolve(Result.err(process.error)) : process.value[name]();
   };

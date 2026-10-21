@@ -103,6 +103,13 @@ type NotificationEntry = {
 
 type PresentationState =
   {kind: 'pending'; entry?: NotificationEntry} | {kind: 'shown'; entry?: NotificationEntry} | {kind: 'closed'};
+type NotificationRepositoryConfig = {
+  BODY_LENGTH: number;
+  ICON_URL: string;
+  TIMEOUT: number;
+  TITLE_LENGTH: number;
+  TITLE_MAX_LENGTH: number;
+};
 
 /**
  * Notification repository to trigger browser and audio notifications.
@@ -120,7 +127,7 @@ export class NotificationRepository {
   private readonly assetRepository: AssetRepository;
   private isSoftLock = false;
 
-  static get CONFIG() {
+  static get CONFIG(): NotificationRepositoryConfig {
     return {
       BODY_LENGTH: 80,
       ICON_URL: '/image/logo/notification.png',
@@ -189,7 +196,7 @@ export class NotificationRepository {
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.NOTIFICATIONS, this.updatedNotificationsProperty);
   }
 
-  setSoftLock(value: boolean) {
+  setSoftLock(value: boolean): void {
     this.isSoftLock = value;
   }
 
@@ -520,7 +527,7 @@ export class NotificationRepository {
    * @returns Notification message body
    */
   private createBodySystem(messageEntity: Message): string | void {
-    const createBodyMessageTimerUpdate = () => {
+    const createBodyMessageTimerUpdate = (): string => {
       const messageTimer = ConversationEphemeralHandler.validateTimer(
         (messageEntity as MessageTimerUpdateMessage).message_timer,
       );
@@ -533,7 +540,7 @@ export class NotificationRepository {
       return this.translate('notificationConversationMessageTimerReset', {user: messageEntity.user().name()}, {}, true);
     };
 
-    const createBodyRename = () => {
+    const createBodyRename = (): string => {
       const substitutions = {name: (messageEntity as RenameMessage).name, user: messageEntity.user().name()};
       return this.translate('notificationConversationRename', substitutions, {}, true);
     };
@@ -667,7 +674,7 @@ export class NotificationRepository {
   /**
    Calculate the length of the opposite title section string and return the extra length
   */
-  private calculatedTitleLength = (sectionString: string) => {
+  private calculatedTitleLength = (sectionString: string): number => {
     const maxSectionLength = NotificationRepository.CONFIG.TITLE_LENGTH;
     const length = maxSectionLength - sectionString.length + maxSectionLength;
 
@@ -941,7 +948,7 @@ export class NotificationRepository {
       : `'${messageType}' message`;
     let presentationState: PresentationState = {kind: 'pending'};
 
-    const scheduleTimeout = () => {
+    const scheduleTimeout = (): void => {
       if (presentationState.kind !== 'shown' || isUndefined(presentationState.entry)) {
         return;
       }
@@ -960,7 +967,7 @@ export class NotificationRepository {
       }, notificationContent.timeout);
     };
 
-    const onClick = () => {
+    const onClick = (): void => {
       void this.callingRepository.setViewModeMinimized();
       notificationContent.trigger();
 

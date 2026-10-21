@@ -62,13 +62,13 @@ const mockMediaDevicesHandler = {
 
 export const callState = new CallState();
 
-export function buildCall(conversation: Conversation, convType = CONV_TYPE.ONEONONE) {
+export function buildCall(conversation: Conversation, convType = CONV_TYPE.ONEONONE): Call {
   return new Call({id: 'user1', domain: ''}, conversation, convType, {} as any, CALL_TYPE.NORMAL, {
     currentAvailableDeviceId: {audiooutput: ko.observable()},
   } as any);
 }
 
-export function buildCallingViewModel(translate: Translate) {
+export function buildCallingViewModel(translate: Translate): readonly [CallingViewModel, {readonly core: Core}] {
   const mockCore = container.resolve(Core);
   const callingViewModel = new CallingViewModel(
     mockCallingRepository,

@@ -48,9 +48,22 @@ const mergeWebappProperties = createDeepmerge();
 const nestedPreferencePathDepth = 2;
 const deeplyNestedPreferencePathDepth = 3;
 
+type PropertiesRepositoryConfig = {
+  WEBAPP_ACCOUNT_SETTINGS: string;
+  WIRE_MARKETING_CONSENT: {defaultValue: boolean; key: string};
+  WIRE_RECEIPT_MODE: {defaultValue: RECEIPT_MODE; key: string};
+  WIRE_TYPING_INDICATOR_MODE: {defaultValue: CONVERSATION_TYPING_INDICATOR_MODE; key: string};
+};
+type UserConsentStatusDetails = {
+  userConsentStatus: UserConsentStatus;
+  isMarketingConsentGiven: boolean;
+  isTelemetryConsentGiven: boolean;
+  isTelemetryEnabledAtCurrentEnvironment: boolean;
+};
+
 export class PropertiesRepository {
   // Value names are specified by the protocol but key names can be changed.
-  static get CONFIG() {
+  static get CONFIG(): PropertiesRepositoryConfig {
     return {
       WEBAPP_ACCOUNT_SETTINGS: 'webapp',
       WIRE_MARKETING_CONSENT: {
@@ -125,7 +138,7 @@ export class PropertiesRepository {
     /** @type {ko.Observable<ConsentValue | boolean>} */
   }
 
-  public getUserConsentStatus() {
+  public getUserConsentStatus(): UserConsentStatusDetails {
     const marketingConsent: ConsentValue | boolean | undefined = this.properties.settings.privacy.marketing_consent;
     const telemetryConsent: ConsentValue | boolean | undefined =
       this.properties.settings.privacy.telemetry_data_sharing;
@@ -165,7 +178,7 @@ export class PropertiesRepository {
       return;
     }
 
-    const toggleTelemetrySharing = (value: boolean) => {
+    const toggleTelemetrySharing = (value: boolean): void => {
       this.savePreference(PROPERTIES_TYPE.PRIVACY.TELEMETRY_SHARING, value);
       this.publishProperties();
     };

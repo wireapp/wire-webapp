@@ -37,6 +37,7 @@ export interface GuestAttributes {
   is_allow_guests: boolean;
   user_type: UserType;
 }
+type ParticipantTypes = {guests: number; temporaryGuests: number; users: number};
 
 /**
  * Get corresponding tracking attribute for conversation type.
@@ -54,7 +55,7 @@ export function getGuestAttributes(conversationEntity: Conversation): GuestAttri
   const isTeamConversation = isNonEmptyString(conversationEntity.teamId);
   if (isTeamConversation) {
     const isAllowGuests = !conversationEntity.isTeamOnly();
-    const _getUserType = (_conversationEntity: Conversation) => {
+    const _getUserType = (_conversationEntity: Conversation): UserType => {
       const selfUser = _conversationEntity.selfUser();
       if (selfUser !== undefined && selfUser.isTemporaryGuest()) {
         return UserType.TEMPORARY_GUEST;
@@ -75,10 +76,7 @@ export function getGuestAttributes(conversationEntity: Conversation): GuestAttri
   };
 }
 
-export function getParticipantTypes(
-  userEntities: User[],
-  countSelf?: boolean,
-): {guests: number; temporaryGuests: number; users: number} {
+export function getParticipantTypes(userEntities: User[], countSelf?: boolean): ParticipantTypes {
   const initialValue = {guests: 0, temporaryGuests: 0, users: countSelf === true ? 1 : 0};
   return userEntities.reduce((accumulator, userEntity) => {
     if (userEntity.isTemporaryGuest()) {
@@ -108,7 +106,15 @@ export function getPlatform(): PlatformType {
   return Runtime.isMacOS() ? PlatformType.DESKTOP_MACOS : PlatformType.DESKTOP_LINUX;
 }
 
-export function trackCallQualityFeedback({call, score, label}: {call?: Call; score?: number; label: RatingListLabel}) {
+export function trackCallQualityFeedback({
+  call,
+  score,
+  label,
+}: {
+  call?: Call;
+  score?: number;
+  label: RatingListLabel;
+}): void {
   if (isUndefined(call)) {
     return;
   }

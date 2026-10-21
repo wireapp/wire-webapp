@@ -58,6 +58,9 @@ import {ListViewModel} from './ListViewModel';
 import {Core} from '../service/coreSingleton';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 
+type MainViewModelPanelConfig = {BREAKPOINT: number; WIDTH: number};
+type MainViewModelConfig = {PANEL: MainViewModelPanelConfig};
+
 export interface ViewModelRepositories {
   asset: AssetRepository;
   audio: AudioRepository;
@@ -94,7 +97,7 @@ export class MainViewModel {
   private readonly core = container.resolve(Core);
   readonly translate: Translate;
 
-  static get CONFIG() {
+  static get CONFIG(): MainViewModelConfig {
     return {
       PANEL: {
         BREAKPOINT: 1000,
@@ -103,7 +106,7 @@ export class MainViewModel {
     };
   }
 
-  get isFederated() {
+  get isFederated(): boolean {
     return this.core.backendFeatures.isFederated;
   }
 

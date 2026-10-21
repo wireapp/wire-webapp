@@ -33,13 +33,13 @@ import {Participant} from './Participant';
 import {TestFactory} from '../../../../test/helper/TestFactory';
 import {translateForTest} from 'Util/test/translateForTest';
 
-const createSelfParticipant = () => {
+const createSelfParticipant = (): Participant => {
   const selfUser = new User('', '', translateForTest);
   selfUser.isMe = true;
   return new Participant(selfUser, 'client1');
 };
 
-const createParticipant = (name: string) => {
+const createParticipant = (name: string): Participant => {
   const user = new User('', '', translateForTest);
   user.name(name);
   return new Participant(user, `client-${name}`);
@@ -60,7 +60,7 @@ const mediaDevices = {
   }),
 };
 
-const buildMediaDevicesHandler = () => {
+const buildMediaDevicesHandler = (): MediaDevicesHandler => {
   return {
     currentAvailableDeviceId: mediaDevices,
     setOnMediaDevicesRefreshHandler: jest.fn(),

@@ -132,6 +132,11 @@ export enum ModalType {
   DOWNLOAD_PATH_CHANGED = 'download_path_changed',
 }
 
+type GetModalOptionsResult = {
+  modalOptions: ModalOptions;
+  modalType: PrimaryModalType.ACKNOWLEDGE | PrimaryModalType.CONFIRM | PrimaryModalType.LOADING;
+};
+
 interface GetModalOptions {
   type: ModalType;
   primaryActionFn?: () => void;
@@ -161,7 +166,7 @@ export const getModalOptions = (
     extraParams,
   }: GetModalOptions,
   translate: Translate,
-) => {
+): GetModalOptionsResult => {
   if (isUndefined(secondaryActionFn)) {
     hideSecondary = true;
   }

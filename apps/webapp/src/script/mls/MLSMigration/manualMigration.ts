@@ -87,7 +87,10 @@ export const manuallyMigrateConversation = ({
       cause: Maybe.of(cause),
     };
   };
-  const update = (current: Conversation, protocol: CONVERSATION_PROTOCOL.MIXED | CONVERSATION_PROTOCOL.MLS) => {
+  const update = (
+    current: Conversation,
+    protocol: CONVERSATION_PROTOCOL.MIXED | CONVERSATION_PROTOCOL.MLS,
+  ): Task<Conversation, ManualMigrationFailure> => {
     return task.tryOrElse(
       cause => {
         return failure(protocol === CONVERSATION_PROTOCOL.MIXED ? 'initialise' : 'finalise', cause);

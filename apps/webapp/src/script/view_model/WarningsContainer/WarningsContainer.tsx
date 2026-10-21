@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode, useEffect} from 'react';
+import {FunctionComponent, ReactNode, useEffect} from 'react';
 
 import cx from 'classnames';
 
@@ -80,7 +80,7 @@ function renderPermissionRequestWarningMessage(options: RenderPermissionRequestT
   );
 }
 
-const WarningsContainer = ({onRefresh}: WarningProps) => {
+const WarningsContainer: FunctionComponent<WarningProps> = ({onRefresh}) => {
   const {translate} = useApplicationContext();
   const name = useWarningsState(state => {
     return state.name;

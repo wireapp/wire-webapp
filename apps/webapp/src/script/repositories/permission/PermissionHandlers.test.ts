@@ -32,31 +32,33 @@ import {PermissionType} from 'Repositories/permission/PermissionType';
 
 import {permissionsStore} from './Permissions.store';
 
+type MockPermissionStatus = {state: BrowserPermissionStatus; onchange: (() => void) | null};
+
 describe('Permission Handlers', () => {
   // Test utilities and constants
   const DEFAULT_TIMEOUT = 10;
   const ALL_PERMISSION_TYPES = Object.values(PermissionType);
 
-  const resetPermissionsToDefault = () => {
+  const resetPermissionsToDefault = (): void => {
     ALL_PERMISSION_TYPES.forEach(type => {
       permissionsStore.getState().setPermissionState(type, BrowserPermissionStatus.PROMPT);
     });
   };
 
-  const waitForAsync = (ms = DEFAULT_TIMEOUT) => {
+  const waitForAsync = (ms = DEFAULT_TIMEOUT): Promise<unknown> => {
     return new Promise(resolve => {
       return setTimeout(resolve, ms);
     });
   };
 
-  const createMockPermissionStatus = (state: BrowserPermissionStatus) => {
+  const createMockPermissionStatus = (state: BrowserPermissionStatus): MockPermissionStatus => {
     return {
       state,
-      onchange: null as any,
+      onchange: null,
     };
   };
 
-  const mockNavigatorPermissions = (queryResponse: any) => {
+  const mockNavigatorPermissions = (queryResponse: any): jasmine.Spy => {
     return spyOn(navigator.permissions, 'query').and.returnValue(queryResponse);
   };
 

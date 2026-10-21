@@ -71,7 +71,7 @@ export const exportCPBHistoryFromDatabase = async ({
   const [conversationTable, eventsTable, usersTable] = backupService.getTables();
   const backupExporter = new CPBackupExporter(new BackupQualifiedId(user.id, user.domain));
 
-  const checkIfCancelled = () => {
+  const checkIfCancelled = (): void => {
     if (checkCancelStatus()) {
       throw new CancelError();
     }

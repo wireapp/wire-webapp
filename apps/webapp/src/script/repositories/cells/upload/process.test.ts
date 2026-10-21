@@ -23,7 +23,7 @@ import type {Result} from 'true-myth';
 
 import type {CellsUploadGateway, CellsUploadGatewayError, UploadDraftRequest} from './gateway';
 import type {DraftIdentity, UploadSource} from './identity';
-import {createCellsUploadProcess, type CellsUploadProcessDependencies} from './process';
+import {createCellsUploadProcess, type CellsUploadProcess, type CellsUploadProcessDependencies} from './process';
 
 const source: UploadSource = {blob: new Blob(['data']), name: 'file.txt', contentType: 'text/plain', size: 4};
 const path = 'wire-cells-web/conversation-1';
@@ -42,6 +42,16 @@ type DeferredTask<Value, Failure> = {
   readonly value: Task<Value, Failure>;
   readonly resolve: (value?: Value) => void;
   readonly reject: (error: Failure) => void;
+};
+
+type CellsUploadProcessTestSetup = {
+  readonly process: CellsUploadProcess;
+  readonly uploads: UploadDraftRequest[];
+  readonly uploadTasks: DeferredTask<DraftIdentity, CellsUploadGatewayError<'upload'>>[];
+  readonly aborts: AbortController[];
+  readonly published: string[];
+  readonly discarded: string[];
+  readonly setFailure: (mode?: 'publish' | 'discard') => void;
 };
 
 function createDeferredTask<Value, Failure>(defaultValue: Value): DeferredTask<Value, Failure> {
@@ -71,7 +81,7 @@ const setup = (
   failure?: 'publish' | 'discard' | 'mismatch',
   duplicateAttemptIds = false,
   remoteIdentity: DraftIdentity = {uploadId: 'upload-1', resourceUuid: 'resource-1', versionId: 'version-1'},
-) => {
+): CellsUploadProcessTestSetup => {
   const uploads: UploadDraftRequest[] = [];
   const uploadTasks: DeferredTask<DraftIdentity, CellsUploadGatewayError<'upload'>>[] = [];
   const aborts: AbortController[] = [];
@@ -146,7 +156,9 @@ const setup = (
   };
 };
 
-const unwrap = async <T, E>(promise: PromiseLike<{isOk: boolean; value?: T; error?: E}>) => {
+type UploadTaskResult<T, E> = {isOk: boolean; value?: T; error?: E};
+
+const unwrap = async <T, E>(promise: PromiseLike<UploadTaskResult<T, E>>): Promise<UploadTaskResult<T, E>> => {
   const result = await promise;
   expect(result.isOk).toBe(true);
   return result;

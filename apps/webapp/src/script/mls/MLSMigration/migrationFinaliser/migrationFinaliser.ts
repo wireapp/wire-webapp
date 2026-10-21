@@ -38,7 +38,7 @@ export const finaliseMigrationOfMixedConversations = async (
   conversations: Conversation[],
   updateConversationProtocol: UpdateConversationProtocol,
   getTeamMLSMigrationStatus: () => MLSMigrationStatus,
-) => {
+): Promise<void> => {
   const mixedConversatons = conversations.filter(isMixedConversation);
   mlsMigrationLogger.info(
     `There are ${mixedConversatons.length} mixed conversations, checking if they are ready to be finalised...`,
@@ -55,7 +55,7 @@ const checkFinalisationCriteria = async (
   mixedConversation: MixedConversation,
   getTeamMLSMigrationStatus: () => MLSMigrationStatus,
   onReadyToFinalise: (mixedConversation: MixedConversation) => Promise<void>,
-) => {
+): Promise<void> => {
   const migrationStatus = getTeamMLSMigrationStatus();
   const isMigrationFinalised = migrationStatus === MLSMigrationStatus.FINALISED;
 
@@ -74,7 +74,7 @@ const doAllConversationParticipantsSupportMLS = (mixedConversation: MixedConvers
 const finaliseMigrationOfMixedConversation = async (
   mixedConversation: MixedConversation,
   updateConversationProtocol: UpdateConversationProtocol,
-) => {
+): Promise<void> => {
   mlsMigrationLogger.info(`Finalising migration of mixed conversation ${mixedConversation.id}...`);
   try {
     // Update conversation protocol from "mixed" to "mls".
