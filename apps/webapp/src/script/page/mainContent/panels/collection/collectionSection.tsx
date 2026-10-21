@@ -17,14 +17,22 @@
  *
  */
 
-import React from 'react';
+import React, {type FunctionComponent} from 'react';
 
 import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {CollectionItem} from './collectionItem';
 
-const CollectionSection = ({
+const CollectionSection: FunctionComponent<{
+  children: React.ReactNode;
+  label: string;
+  limit: number;
+  messages: ContentMessage[];
+  onSelect: () => void;
+  uieName: string;
+  onImageClick?: (message: ContentMessage) => void;
+}> = ({
   messages,
   limit,
   uieName,

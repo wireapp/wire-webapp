@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {ChevronIcon, IconButton} from '@wireapp/react-ui-kit';
 
 import {
@@ -29,7 +31,9 @@ interface VirtualizedJumpToLastMessageButtonProps {
   onGoToLastMessage: () => void;
 }
 
-export const VirtualizedJumpToLastMessageButton = ({onGoToLastMessage}: VirtualizedJumpToLastMessageButtonProps) => {
+export const VirtualizedJumpToLastMessageButton: FunctionComponent<VirtualizedJumpToLastMessageButtonProps> = ({
+  onGoToLastMessage,
+}: VirtualizedJumpToLastMessageButtonProps) => {
   const {translate} = useApplicationContext();
   return (
     <IconButton

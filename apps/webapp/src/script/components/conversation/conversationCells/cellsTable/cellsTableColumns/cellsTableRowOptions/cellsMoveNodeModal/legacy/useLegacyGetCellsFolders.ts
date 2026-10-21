@@ -49,6 +49,12 @@ interface Folder {
 
 const SHOW_LOADING_SPINNER_DELAY_MS = 1000;
 
+type UseLegacyGetCellsFoldersResult = {
+  refresh: () => Promise<void>;
+  folders: Folder[];
+  status: Status;
+  shouldShowLoadingSpinner: boolean;
+};
 export const useLegacyGetCellsFolders = ({
   nodeToMove,
   cellsRepository,
@@ -57,7 +63,7 @@ export const useLegacyGetCellsFolders = ({
   enabled,
   fireAndForgetInvoker,
   clock,
-}: UseLegacyGetCellsFoldersProps) => {
+}: UseLegacyGetCellsFoldersProps): UseLegacyGetCellsFoldersResult => {
   const [folders, setFolders] = useState<Folder[]>([]);
   const [status, setStatus] = useState<Status>('idle');
   const [shouldShowLoadingSpinner, setShouldShowLoadingSpinner] = useState(true);

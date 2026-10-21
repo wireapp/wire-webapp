@@ -51,7 +51,7 @@ import {ConversationError} from '../../../../error/conversationError';
 import {QuoteEntity} from '../../../../message/quoteEntity';
 import {useMessageFocusedTabIndex} from '../util';
 
-function createPlaceholderMessage(translate: Translate) {
+function createPlaceholderMessage(translate: Translate): ContentMessage {
   const message = new ContentMessage(undefined, translate);
   const user = new User('', '', translate);
   user.name(' ');
@@ -89,14 +89,14 @@ export const Quote: FC<QuoteProps> = ({
   const {translate} = useApplicationContext();
 
   useEffect(() => {
-    const handleQuoteDeleted = (messageId: string) => {
+    const handleQuoteDeleted = (messageId: string): void => {
       if (quotedMessage?.id === messageId) {
         setError(QuoteEntity.ERROR.MESSAGE_NOT_FOUND);
         setQuotedMessage(undefined);
       }
     };
 
-    const handleQuoteUpdated = (originalMessageId: string, messageEntity: ContentMessage) => {
+    const handleQuoteUpdated = (originalMessageId: string, messageEntity: ContentMessage): void => {
       if (quotedMessage?.id === originalMessageId) {
         setQuotedMessage(messageEntity);
       }

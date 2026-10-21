@@ -21,7 +21,8 @@ import {fireEvent, render} from '@testing-library/react';
 
 import {DropFileArea} from './dropFileArea';
 
-const getDefaultProps = () => {
+type GetDefaultPropsResult = {onFileDropped: jest.Mock<any, any, any>};
+const getDefaultProps = (): GetDefaultPropsResult => {
   return {
     onFileDropped: jest.fn(),
   };

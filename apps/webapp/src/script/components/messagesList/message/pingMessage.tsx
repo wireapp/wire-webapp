@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import cx from 'classnames';
 
 import {OutlineCheck} from '@wireapp/react-ui-kit';
@@ -35,7 +37,7 @@ interface PingMessageProps {
   onClickDetails: (message: Message) => void;
 }
 
-export const PingMessage = ({
+export const PingMessage: FunctionComponent<PingMessageProps> = ({
   message,
   is1to1Conversation,
   isLastDeliveredMessage,

@@ -25,14 +25,14 @@ import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSu
 
 import * as ActiveWindowMod from '../hooks/useActiveWindow';
 
-const px = (n: number) => {
+const px = (n: number): string => {
   return `${n}px`;
 };
-const queryMenu = () => {
+const queryMenu = (): HTMLUListElement | null => {
   return document.querySelector('ul.ctx-menu') as HTMLUListElement | null;
 };
 
-const setMenuOffsetSize = (width: number, height: number) => {
+const setMenuOffsetSize = (width: number, height: number): void => {
   Object.defineProperty(HTMLElement.prototype, 'offsetWidth', {
     configurable: true,
     get() {
@@ -47,7 +47,7 @@ const setMenuOffsetSize = (width: number, height: number) => {
   });
 };
 
-const openMenu = async (args: Parameters<typeof showContextMenu>[0]) => {
+const openMenu = async (args: Parameters<typeof showContextMenu>[0]): Promise<void> => {
   await act(async () => {
     showContextMenu(args);
   });
@@ -56,7 +56,7 @@ const openMenu = async (args: Parameters<typeof showContextMenu>[0]) => {
   });
 };
 
-const closeMenu = async () => {
+const closeMenu = async (): Promise<void> => {
   if (!queryMenu()) {
     return;
   }

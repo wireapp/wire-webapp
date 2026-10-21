@@ -46,7 +46,7 @@ export const usePressSpaceToUnmute = ({
   isMuted,
   enabled,
   notificationMessage,
-}: UsePressSpaceToUnmuteParams) => {
+}: UsePressSpaceToUnmuteParams): void => {
   const isInCallAndViewMode = checkUserInCallAndViewMode(callState);
 
   const {detachedWindow, viewMode} = callState;

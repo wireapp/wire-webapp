@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useRef, useState, type FunctionComponent} from 'react';
 
 import EmojiPicker, {EmojiClickData, EmojiStyle} from 'emoji-picker-react';
 
@@ -39,14 +39,18 @@ type EmojiPickerLocalStorageItem = {unified: string; original: string; count: nu
 const EMOJI_PICKER_LOCAL_STORAGE_KEY = 'epr_suggested';
 const MAX_RECENT_TOP_EMOJIS = 8;
 
-export const EmojisBar = ({onEmojiClick, onPickerEmojiClick, targetWindow}: EmojisBarProps) => {
+export const EmojisBar: FunctionComponent<EmojisBarProps> = ({
+  onEmojiClick,
+  onPickerEmojiClick,
+  targetWindow,
+}: EmojisBarProps) => {
   const {translate} = useApplicationContext();
   const emojisBarRef = useRef<HTMLDivElement>(null);
 
   const [disabledEmojis, setDisabledEmojis] = useState<string[]>([]);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
-  const handleEmojiClick = (selectedEmoji: string) => {
+  const handleEmojiClick = (selectedEmoji: string): void => {
     setDisabledEmojis(prev => {
       return [...prev, selectedEmoji];
     });
@@ -62,7 +66,7 @@ export const EmojisBar = ({onEmojiClick, onPickerEmojiClick, targetWindow}: Emoj
     }, CallingRepository.EMOJI_TIME_OUT_DURATION);
   };
 
-  const handlePickerEmojiClick = (emojiData: EmojiClickData) => {
+  const handlePickerEmojiClick = (emojiData: EmojiClickData): void => {
     onEmojiClick(emojiData.emoji);
     onPickerEmojiClick();
   };

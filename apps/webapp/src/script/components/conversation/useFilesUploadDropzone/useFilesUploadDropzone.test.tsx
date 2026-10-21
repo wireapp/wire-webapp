@@ -16,7 +16,12 @@ const conversation = {
 };
 const wrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
 
-const createRepository = () => {
+type CreateRepositoryResult = {
+  uploadNodeDraft: jest.Mock<any, any, any>;
+  cancelUpload: jest.Mock<any, any, any>;
+  deleteNodeDraft: jest.Mock<any, any, any>;
+};
+const createRepository = (): CreateRepositoryResult => {
   return {
     uploadNodeDraft: jest.fn(),
     cancelUpload: jest.fn(),

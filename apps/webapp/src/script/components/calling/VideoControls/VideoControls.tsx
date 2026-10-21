@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState, type FunctionComponent} from 'react';
 
 import {isNan, isNullOrUndefined} from '@sindresorhus/is';
 import classNames from 'classnames';
@@ -115,10 +115,13 @@ const mapEffectToValue = (effect: BackgroundEffectSelection): BackgroundOptionVa
 /**
  * Maps video input devices to select options.
  */
+type MapVideoInputDevicesResult =
+  | {label: string; value: string; dataUieName: string; id: string}[]
+  | {label: string; value: string; dataUieName: string; id: string; isDisabled: boolean}[];
 const mapVideoInputDevices = (
   devices: (MediaDeviceInfo | ElectronDesktopCapturerSource)[],
   translate: ReturnType<typeof useApplicationContext>['translate'],
-) => {
+): MapVideoInputDevicesResult => {
   if (devices.length === 0) {
     return [
       {
@@ -179,7 +182,7 @@ interface VideoControlsProps {
   isWebGLAvailable: boolean;
 }
 
-export const VideoControls = ({
+export const VideoControls: FunctionComponent<VideoControlsProps> = ({
   activeCallViewTab,
   call,
   propertiesRepository,
@@ -359,7 +362,7 @@ export const VideoControls = ({
     setSelectedAudioOptions(getSelectedAudioOptions());
   }, [getSelectedAudioOptions]);
 
-  const updateAudioOptions = (selectedOption: string, input: boolean) => {
+  const updateAudioOptions = (selectedOption: string, input: boolean): void => {
     const [selectedMicrophone, selectedSpeaker] = selectedAudioOptions;
     const microphone = input
       ? (allMicrophones.options.find(({value}) => {
@@ -400,7 +403,7 @@ export const VideoControls = ({
    *
    * @param selectedOption - Selected option value (device ID).
    */
-  const updateCameraOptions = (selectedOption: string) => {
+  const updateCameraOptions = (selectedOption: string): void => {
     const camera =
       cameraOptions[0].options.find(({value}) => {
         return value === selectedOption;
@@ -500,7 +503,7 @@ export const VideoControls = ({
     if (!videoOptionsOpen) {
       return undefined;
     }
-    const handlePointerDown = (event: MouseEvent) => {
+    const handlePointerDown = (event: MouseEvent): void => {
       const target = event.target as Node;
       if (
         videoOptionsMenuRef.current?.contains(target) === true ||
@@ -510,7 +513,7 @@ export const VideoControls = ({
       }
       setVideoOptionsOpen(false);
     };
-    const handleKeyDown = (event: KeyboardEvent) => {
+    const handleKeyDown = (event: KeyboardEvent): void => {
       if (isEscapeKey(event)) {
         setVideoOptionsOpen(false);
       }
@@ -524,11 +527,11 @@ export const VideoControls = ({
     };
   }, [activeWindow, videoOptionsOpen]);
 
-  const handleEmojiClick = (selectedEmoji: string) => {
+  const handleEmojiClick = (selectedEmoji: string): void => {
     return sendEmoji(selectedEmoji, call);
   };
 
-  const onMoreInteractionsMenuClick = (event: React.MouseEvent) => {
+  const onMoreInteractionsMenuClick = (event: React.MouseEvent): void => {
     const mobileEntires: ContextMenuEntry[] = isMobile
       ? [
           {

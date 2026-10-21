@@ -109,7 +109,7 @@ describe('PrimaryModal', () => {
     });
 
     it('uses the provided translate function for default secondary action copy', async () => {
-      const translate = (translationKey: string) => {
+      const translate = (translationKey: string): string => {
         return `translated:${translationKey}`;
       };
       const {getSecondaryActionButton} = renderPrimaryModal({
@@ -234,7 +234,7 @@ describe('PrimaryModal', () => {
 
   describe('SessionReset', () => {
     it('uses the provided translate function for generated modal content', async () => {
-      const translate = (translationKey: string) => {
+      const translate = (translationKey: string): string => {
         return `translated:${translationKey}`;
       };
       const {getByText} = render(withTheme(<PrimaryModalComponent translate={translateForTest} />), {
@@ -260,6 +260,16 @@ type RenderPrimaryModalParameters = {
   type: PrimaryModalType;
 };
 
+type RenderPrimaryModalResult = {
+  getPrimaryActionButton: () => HTMLElement;
+  getSecondaryActionButton: () => HTMLElement;
+  getCloseButton: () => HTMLElement | null;
+  getErrorMessages: () => HTMLElement[];
+  getPasswordInput: () => HTMLElement;
+  getInput: () => HTMLElement;
+  getGeneratePasswordButton: () => HTMLElement;
+  getConfirmPasswordInput: () => HTMLElement;
+};
 const renderPrimaryModal = ({
   hideCloseButton,
   primaryAction,
@@ -267,7 +277,7 @@ const renderPrimaryModal = ({
   secondaryActionText,
   translate,
   type,
-}: RenderPrimaryModalParameters) => {
+}: RenderPrimaryModalParameters): RenderPrimaryModalResult => {
   const {getByTestId, getAllByTestId, queryByTestId, getByLabelText} = render(
     withTheme(<PrimaryModalComponent translate={translateForTest} />),
     {

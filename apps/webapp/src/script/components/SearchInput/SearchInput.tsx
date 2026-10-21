@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useLayoutEffect, useRef} from 'react';
+import React, {useEffect, useLayoutEffect, useRef, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 import cx from 'classnames';
@@ -39,7 +39,7 @@ interface SearchInputProps {
   setInput: (input: string) => void;
 }
 
-export const SearchInput = ({
+export const SearchInput: FunctionComponent<SearchInputProps> = ({
   onEnter,
   input,
   selectedUsers = [],

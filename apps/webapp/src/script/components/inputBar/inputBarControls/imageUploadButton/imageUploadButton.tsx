@@ -17,7 +17,7 @@
  *
  */
 
-import {useRef} from 'react';
+import {useRef, type FunctionComponent} from 'react';
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 
@@ -31,12 +31,15 @@ interface ImageUploadButtonProps {
   acceptedImageTypes: readonly string[];
 }
 
-export const ImageUploadButton = ({onSelectImages, acceptedImageTypes}: ImageUploadButtonProps) => {
+export const ImageUploadButton: FunctionComponent<ImageUploadButtonProps> = ({
+  onSelectImages,
+  acceptedImageTypes,
+}: ImageUploadButtonProps) => {
   const {translate} = useApplicationContext();
   const imageRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
-  const handleImageFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageFileChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const {files} = event.target;
 
     if (isNullOrUndefined(files)) {

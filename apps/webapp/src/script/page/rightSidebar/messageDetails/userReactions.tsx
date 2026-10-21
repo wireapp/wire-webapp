@@ -19,6 +19,7 @@
 
 import {Fragment} from 'react';
 
+import type {JSX} from '@emotion/react/jsx-runtime';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {EmojiChar} from 'Components/messagesList/message/contentMessage/messageActions/messageReactions/emojiChar';
@@ -41,7 +42,12 @@ interface UsersReactionsProps {
   onParticipantClick: (user: User) => void;
 }
 
-export function UsersReactions({reactions, selfUser, findUsers, onParticipantClick}: UsersReactionsProps) {
+export function UsersReactions({
+  reactions,
+  selfUser,
+  findUsers,
+  onParticipantClick,
+}: UsersReactionsProps): JSX.Element[] {
   return reactions.map(reaction => {
     const [reactionKey, userIds] = reaction;
     const emojiUnicode = getEmojiUnicode(reactionKey);

@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {isNonEmptyArray} from '@sindresorhus/is';
 
 import {FileTypeIcon} from 'Components/conversation/common/fileTypeIcon/fileTypeIcon';
@@ -38,7 +40,7 @@ export const showFileDropzoneErrorModal = ({
   message,
   invalidFiles,
   translate,
-}: ShowFileDropzoneErrorModalParams) => {
+}: ShowFileDropzoneErrorModalParams): void => {
   // Timeout needed to display a modal
   setTimeout(() => {
     PrimaryModal.show(
@@ -60,7 +62,7 @@ export const showFileDropzoneErrorModal = ({
   }, 0);
 };
 
-const InvalidFilesList = ({invalidFiles}: {invalidFiles: File[]}) => {
+const InvalidFilesList: FunctionComponent<{invalidFiles: File[]}> = ({invalidFiles}: {invalidFiles: File[]}) => {
   return (
     <ul css={listStyles}>
       {invalidFiles.map(file => {

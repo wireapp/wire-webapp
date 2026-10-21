@@ -17,7 +17,7 @@
  *
  */
 
-import {useState, useRef} from 'react';
+import {useState, useRef, type FunctionComponent} from 'react';
 
 import cx from 'classnames';
 
@@ -48,7 +48,7 @@ interface AvatarInputProps {
 const FILE_TYPES = ['image/bmp', 'image/jpeg', 'image/jpg', 'image/png', '.jpg-large'];
 const logger = getLogger('AvatarInput');
 
-export const AvatarInput = ({
+export const AvatarInput: FunctionComponent<AvatarInputProps> = ({
   selfUser,
   isActivatedAccount,
   userRepository,
@@ -108,11 +108,11 @@ export const AvatarInput = ({
     }
   };
 
-  const inputClick = () => {
+  const inputClick = (): void => {
     inputRef.current?.click();
   };
 
-  const onFileInputChange = (files: FileList) => {
+  const onFileInputChange = (files: FileList): void => {
     if (isUploading) {
       return;
     }

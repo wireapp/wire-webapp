@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import cx from 'classnames';
 
 import * as Icon from 'Components/icon';
@@ -28,7 +30,11 @@ interface RestrictedImageProps {
   className?: string;
 }
 
-const RestrictedImage = ({showMessage = true, isSmall = false, className}: RestrictedImageProps) => {
+const RestrictedImage: FunctionComponent<RestrictedImageProps> = ({
+  showMessage = true,
+  isSmall = false,
+  className,
+}: RestrictedImageProps) => {
   const {translate} = useApplicationContext();
 
   return (

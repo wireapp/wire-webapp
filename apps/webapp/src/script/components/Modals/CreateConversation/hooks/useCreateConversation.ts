@@ -28,7 +28,7 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {ACCESS_STATE} from 'Repositories/conversation/AccessState';
+import {ACCESS_STATE, type TEAM as TEAMType2} from 'Repositories/conversation/AccessState';
 import {
   toggleFeature,
   teamPermissionsForAccessState,
@@ -48,7 +48,15 @@ import {useCreateConversationModal} from '../hooks/useCreateConversationModal';
 import {ConversationAccess, ConversationCreationStep, ConversationType} from '../types';
 import {NonFederatingParticipantsModalCopy} from '../utils';
 
-export const useCreateConversation = (nonFederatingParticipantsModalCopy: NonFederatingParticipantsModalCopy) => {
+type UseCreateConversationResult = {
+  isLoading: boolean;
+  onSubmit: (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent> | React.KeyboardEvent<HTMLInputElement>,
+  ) => Promise<void>;
+};
+export const useCreateConversation = (
+  nonFederatingParticipantsModalCopy: NonFederatingParticipantsModalCopy,
+): UseCreateConversationResult => {
   const [isLoading, setIsLoading] = useState(false);
   const {mainViewModel, translate} = useApplicationContext();
   const {
@@ -80,7 +88,7 @@ export const useCreateConversation = (nonFederatingParticipantsModalCopy: NonFed
   // Read receipts are temorarily disabled for MLS groups and channels until it is supported
   const isGroupWithReadReceiptsEnabled = defaultProtocol !== CONVERSATION_PROTOCOL.MLS && isReadReceiptsEnabled;
 
-  const getAccessState = () => {
+  const getAccessState = (): TEAMType2 => {
     let access = ACCESS_STATE.TEAM.TEAM_ONLY;
     if (isGuestsEnabled) {
       access = toggleFeature(teamPermissionsForAccessState(ACCESS_STATE.TEAM.GUEST_FEATURES), access);
@@ -97,7 +105,7 @@ export const useCreateConversation = (nonFederatingParticipantsModalCopy: NonFed
     return access;
   };
 
-  const showParticipantsListEditModal = (conversationName: string, backendString: string) => {
+  const showParticipantsListEditModal = (conversationName: string, backendString: string): void => {
     PrimaryModal.show(
       PrimaryModal.type.MULTI_ACTIONS,
       {
@@ -127,7 +135,7 @@ export const useCreateConversation = (nonFederatingParticipantsModalCopy: NonFed
     );
   };
 
-  const handleException = (error: Error, conversationName: string) => {
+  const handleException = (error: Error, conversationName: string): void => {
     if (isNonFederatingBackendsError(error)) {
       hideModal();
 

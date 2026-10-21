@@ -17,7 +17,7 @@
  *
  */
 
-import {memo, useMemo} from 'react';
+import {memo, useMemo, type FunctionComponent} from 'react';
 
 import {CalendarIcon} from '@wireapp/react-ui-kit';
 
@@ -59,7 +59,7 @@ interface MeetingListItemProps {
   isLastInDay?: boolean;
 }
 
-const MeetingListItemComponent = ({
+const MeetingListItemComponent: FunctionComponent<MeetingListItemProps> = ({
   meetingInstance,
   selfUser,
   nowMilliseconds: providedNowMilliseconds,
@@ -83,7 +83,7 @@ const MeetingListItemComponent = ({
   }, [now, start, end]);
   const isCallActive = isAttendingMeetingInstance(isConversationCallActive, temporalStatus);
 
-  const openPrep = () => {
+  const openPrep = (): void => {
     useMeetingPrepModal.getState().open({
       meetingTitle: title,
       meetingStartTime: start.toISOString(),

@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode} from 'react';
+import {ReactNode, type FunctionComponent} from 'react';
 
 import {AlertIcon} from '@wireapp/react-ui-kit';
 
@@ -43,7 +43,7 @@ interface MediaFilePreviewCardProps {
   uploadProgress: number;
 }
 
-export const MediaFilePreviewCard = ({
+export const MediaFilePreviewCard: FunctionComponent<MediaFilePreviewCardProps> = ({
   label,
   onDelete,
   onRetry,

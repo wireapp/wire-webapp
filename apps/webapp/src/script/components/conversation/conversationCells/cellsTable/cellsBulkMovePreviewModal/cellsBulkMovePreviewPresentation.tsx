@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {CellsModal} from 'Components/conversation/conversationCells/common/cellsModal/cellsModal';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CellNode} from 'src/script/types/cellNode';
@@ -33,7 +35,7 @@ interface CellsBulkMovePreviewPresentationProps {
   destination: BulkMoveDestinationSelection;
 }
 
-export const CellsBulkMovePreviewPresentation = ({
+export const CellsBulkMovePreviewPresentation: FunctionComponent<CellsBulkMovePreviewPresentationProps> = ({
   isOpen,
   onClose,
   selectedNodes,

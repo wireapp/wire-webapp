@@ -17,9 +17,9 @@
  *
  */
 
-import {fireEvent, render} from '@testing-library/react';
+import {fireEvent, render, type RenderResult} from '@testing-library/react';
+import type {ComponentProps} from 'react';
 
-import {User} from 'Repositories/entity/User';
 import * as Router from 'src/script/router/Router';
 import {
   createRootContextValueForTest,
@@ -37,7 +37,8 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
 );
 
-const createProps = (overrides: Partial<React.ComponentProps<typeof CallingHeader>> = {}) => {
+type CreatePropsResult = ComponentProps<typeof CallingHeader>;
+const createProps = (overrides: Partial<ComponentProps<typeof CallingHeader>> = {}): CreatePropsResult => {
   return {
     isMeeting: false,
     isOngoing: false,
@@ -50,7 +51,7 @@ const createProps = (overrides: Partial<React.ComponentProps<typeof CallingHeade
     callStartedAlert: 'Call started',
     ongoingCallAlert: 'Ongoing call',
     isTemporaryUser: false,
-    conversationParticipants: [] as User[],
+    conversationParticipants: [],
     conversationName: 'Conversation',
     currentCallStatus: null,
     isCbrEnabled: false,
@@ -61,7 +62,7 @@ const createProps = (overrides: Partial<React.ComponentProps<typeof CallingHeade
   };
 };
 
-const renderHeader = (overrides: Partial<React.ComponentProps<typeof CallingHeader>> = {}) => {
+const renderHeader = (overrides: Partial<ComponentProps<typeof CallingHeader>> = {}): RenderResult => {
   return render(<CallingHeader {...createProps(overrides)} />, {wrapper: rootProviderWrapper});
 };
 

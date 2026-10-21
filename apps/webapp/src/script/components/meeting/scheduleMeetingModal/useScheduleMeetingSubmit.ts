@@ -115,7 +115,11 @@ const submitMeeting = ({
   return updateMeeting(commandResult.value);
 };
 
-export const useScheduleMeetingSubmit = () => {
+type UseScheduleMeetingSubmitResult = {
+  isSubmitting: boolean;
+  submit: (formState: ScheduleMeetingFormState) => Promise<ScheduleMeetingSubmitResult>;
+};
+export const useScheduleMeetingSubmit = (): UseScheduleMeetingSubmitResult => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const {translate, clock} = useApplicationContext();
   const {content} = useMainViewModel();

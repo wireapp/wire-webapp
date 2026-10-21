@@ -65,7 +65,7 @@ export function getInitialScrollPosition(
 export const useScrollToLastUnreadMessage = (
   virtualizer: Virtualizer<HTMLDivElement, Element>,
   {isConversationLoaded, groupedMessages, conversationLastReadTimestamp}: Props,
-) => {
+): void => {
   const hasScrolledToInitialPosition = useRef(false);
 
   useLayoutEffect(() => {

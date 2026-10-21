@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {isNan} from '@sindresorhus/is';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
@@ -31,7 +33,7 @@ interface EphemeralTimerProps {
   message: Message;
 }
 
-const EphemeralTimer = ({message}: EphemeralTimerProps) => {
+const EphemeralTimer: FunctionComponent<EphemeralTimerProps> = ({message}: EphemeralTimerProps) => {
   const {translate} = useApplicationContext();
   const {
     ephemeral_remaining: remaining,

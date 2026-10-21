@@ -17,7 +17,7 @@
  *
  */
 
-import {useMemo, useState, useEffect, useRef} from 'react';
+import {useMemo, useState, useEffect, useRef, type FunctionComponent} from 'react';
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
@@ -78,7 +78,7 @@ export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetS
   loadUsersByIdsFromDb: (userIds: QualifiedId[]) => Promise<User[]>;
 }
 
-export const ContentMessageComponent = ({
+export const ContentMessageComponent: FunctionComponent<ContentMessageProps> = ({
   conversation,
   message,
   findMessage,
@@ -160,7 +160,7 @@ export const ContentMessageComponent = ({
 
   const isConversationReadonly = conversation.readOnlyState() !== null;
 
-  const contentMessageWrapperRef = (element: HTMLDivElement | null) => {
+  const contentMessageWrapperRef = (element: HTMLDivElement | null): void => {
     messageRef.current = element;
 
     setTimeout(() => {
@@ -180,7 +180,7 @@ export const ContentMessageComponent = ({
   const isAssetMessage = isFileMessage || isAudioMessage || isVideoMessage || isImageMessage;
   const isEphemeralMessage = ephemeral_status === EphemeralStatusType.ACTIVE;
 
-  const hideActionMenuVisibility = () => {
+  const hideActionMenuVisibility = (): void => {
     if (isFocused) {
       setActionMenuVisibility(false);
     }

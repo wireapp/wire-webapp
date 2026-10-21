@@ -35,7 +35,7 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
 );
 
-const createUser = ({id, name, teamId}: {id: string; name: string; teamId: string}) => {
+const createUser = ({id, name, teamId}: {id: string; name: string; teamId: string}): User => {
   const user = new User(id, '', translateForTest);
   user.name(name);
   user.teamId = teamId;

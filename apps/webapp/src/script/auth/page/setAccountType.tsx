@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {Navigate, useNavigate} from 'react-router';
 
 import {Runtime} from '@wireapp/commons';
@@ -33,15 +35,15 @@ import {EXTERNAL_ROUTE} from '../externalRoute';
 import {ROUTE} from '../route';
 import {pathWithParams} from '../util/urlUtil';
 
-export const SetAccountType = () => {
+export const SetAccountType: FunctionComponent = () => {
   const {translate} = useApplicationContext();
   const navigate = useNavigate();
 
-  const onCreatePersonalAccount = () => {
+  const onCreatePersonalAccount = (): void => {
     navigate(ROUTE.CREATE_ACCOUNT);
   };
 
-  const onCreateTeamAccount = () => {
+  const onCreateTeamAccount = (): void => {
     window.open(EXTERNAL_ROUTE.WIRE_TEAMS_SIGNUP, '_blank');
   };
 
@@ -115,7 +117,14 @@ interface AccountTypeOptionProps {
   isPrimary?: boolean;
 }
 
-const AccountTypeOption = ({action, buttonText, description, heading, features, isPrimary}: AccountTypeOptionProps) => {
+const AccountTypeOption: FunctionComponent<AccountTypeOptionProps> = ({
+  action,
+  buttonText,
+  description,
+  heading,
+  features,
+  isPrimary,
+}: AccountTypeOptionProps) => {
   return (
     <FlexBox data-uie-name="account-type-option" css={styles.optionContainer(isPrimary)}>
       <div css={styles.option}>

@@ -8,7 +8,7 @@
  * (at your option) any later version.
  */
 
-import {render, screen} from '@testing-library/react';
+import {render, screen, type RenderResult} from '@testing-library/react';
 import {container} from 'tsyringe';
 
 import {
@@ -37,7 +37,7 @@ const defaultProps = {
   isError: false,
 };
 
-const renderFilePreviewModal = () => {
+const renderFilePreviewModal = (): RenderResult => {
   const rootProviderWrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({
       translate: key => {

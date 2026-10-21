@@ -33,7 +33,8 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
 );
 
-const createDataTransfer = (files: File[]) => {
+type CreateDataTransferResult = {files: File[]; types: string[]; dropEffect: string};
+const createDataTransfer = (files: File[]): CreateDataTransferResult => {
   return {
     files,
     types: ['Files'],
@@ -41,6 +42,11 @@ const createDataTransfer = (files: File[]) => {
   };
 };
 
+type RenderDropzoneResult = {
+  dropzone: Element;
+  onDropFiles: jest.Mock<any, any, any>;
+  onDropReadError: jest.Mock<any, any, any>;
+};
 const renderDropzone = ({
   isEnabled = true,
   isFileDropAllowed = true,
@@ -53,7 +59,7 @@ const renderDropzone = ({
   onDragStateReset?: () => void;
   onDropFiles?: jest.Mock;
   onDropReadError?: jest.Mock;
-} = {}) => {
+} = {}): RenderDropzoneResult => {
   const result = render(
     <StyledApp themeId={THEME_ID.DEFAULT}>
       <SharedDriveDropzone

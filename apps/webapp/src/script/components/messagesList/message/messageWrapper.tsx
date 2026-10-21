@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {isUndefined} from '@sindresorhus/is';
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {ReactionType} from '@wireapp/core/lib/conversation';
@@ -61,7 +63,7 @@ const isOutgoingQuote = (QuoteEntity: QuoteEntity): QuoteEntity is OutgoingQuote
   return QuoteEntity.hash !== undefined;
 };
 
-export const MessageWrapper = ({
+export const MessageWrapper: FunctionComponent<MessageParams> = ({
   message,
   conversation,
   selfId,
@@ -88,20 +90,21 @@ export const MessageWrapper = ({
   isMsgElementsFocusable,
 }: MessageParams) => {
   const {fireAndForgetInvoker, translate} = useApplicationContext();
-  const findMessage = async (conversation: Conversation, messageId: string) => {
+  type FindMessageResult = Promise<ContentMessage & {primary_key: string}>;
+  const findMessage = async (conversation: Conversation, messageId: string): FindMessageResult => {
     const eventFromId = await messageRepository.getMessageInConversationById(conversation, messageId);
     const event =
       eventFromId ?? (await messageRepository.getMessageInConversationByReplacementId(conversation, messageId));
     return messageRepository.ensureMessageSender(event);
   };
-  const clickButton = async (message: CompositeMessage, buttonId: string) => {
+  const clickButton = async (message: CompositeMessage, buttonId: string): Promise<void> => {
     if (message.selectedButtonId() !== buttonId && message.waitingButtonId() !== buttonId) {
       message.waitingButtonId(buttonId);
       await messageRepository.sendButtonAction(conversation, message, buttonId);
     }
   };
 
-  const onRetry = async (message: ContentMessage) => {
+  const onRetry = async (message: ContentMessage): Promise<void> => {
     const firstAsset = message.getFirstAsset();
     const file = message.fileData();
 

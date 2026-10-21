@@ -17,7 +17,7 @@
  *
  */
 
-import {ElementType} from 'react';
+import {ElementType, type FunctionComponent} from 'react';
 
 import cx from 'classnames';
 
@@ -29,7 +29,13 @@ interface FormatButtonProps {
   isEditing: boolean;
 }
 
-export const FormatButton = ({label, icon: Icon, active, onClick, isEditing}: FormatButtonProps) => {
+export const FormatButton: FunctionComponent<FormatButtonProps> = ({
+  label,
+  icon: Icon,
+  active,
+  onClick,
+  isEditing,
+}: FormatButtonProps) => {
   return (
     <button
       title={label}

@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useRef, useState, type FunctionComponent} from 'react';
 
 import {isUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
@@ -52,7 +52,7 @@ interface VideoAssetProps {
 
 const hideControlsDelayMilliseconds = 2000;
 
-const VideoAsset = ({
+const VideoAsset: FunctionComponent<VideoAssetProps> = ({
   message,
   isQuote,
   teamState = container.resolve(TeamState),
@@ -242,7 +242,7 @@ const VideoAsset = ({
     }
   }, [videoElement, videoSrc]);
 
-  const syncVideoTimeRest = () => {
+  const syncVideoTimeRest = (): void => {
     if (!isUndefined(videoElement)) {
       setVideoTimeRest(videoElement.duration - videoElement.currentTime);
     }

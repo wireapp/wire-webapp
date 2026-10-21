@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import type {User} from 'Repositories/entity/User';
 
 import {getStackedAvatarDisplay} from './getStackedAvatarDisplay';
@@ -34,7 +36,7 @@ interface StackedAvatarsProps {
   dataUieName?: string;
 }
 
-export const StackedAvatars = ({
+export const StackedAvatars: FunctionComponent<StackedAvatarsProps> = ({
   participants,
   getParticipantLabel,
   avatarSize = AVATAR_SIZE.X_SMALL,

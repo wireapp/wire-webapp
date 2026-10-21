@@ -60,7 +60,7 @@ jest.mock('./collectionItem', () => {
   };
 });
 
-const createImageMessage = (timestamp: number = Date.now()) => {
+const createImageMessage = (timestamp: number = Date.now()): ContentMessage => {
   const message = new ContentMessage(createUuid(), translateForTest);
   message.timestamp(timestamp);
   const image = new MediumImage(createUuid());
@@ -69,7 +69,7 @@ const createImageMessage = (timestamp: number = Date.now()) => {
   return message;
 };
 
-const createFileMessage = () => {
+const createFileMessage = (): ContentMessage => {
   const message = new ContentMessage(createUuid(), translateForTest);
   const file = new FileAsset(createUuid());
   message.assets.push(file);
@@ -77,7 +77,7 @@ const createFileMessage = () => {
   return message;
 };
 
-const createLinkMessage = () => {
+const createLinkMessage = (): ContentMessage => {
   const message = new ContentMessage(createUuid(), translateForTest);
   const link = new Text(createUuid(), 'term');
   link.previews.push(new LinkPreview({}));
@@ -86,14 +86,14 @@ const createLinkMessage = () => {
   return message;
 };
 
-function createTextMessage(text: string) {
+function createTextMessage(text: string): ContentMessage {
   const message = new ContentMessage(createUuid(), translateForTest);
   message.assets.push(new Text(createUuid(), text));
   message.category = MessageCategory.TEXT;
   return message;
 }
 
-const createAudioMessage = () => {
+const createAudioMessage = (): ContentMessage => {
   const message = new ContentMessage(createUuid(), translateForTest);
   const audio = new FileAsset(createUuid());
   audio.isAudio = () => {

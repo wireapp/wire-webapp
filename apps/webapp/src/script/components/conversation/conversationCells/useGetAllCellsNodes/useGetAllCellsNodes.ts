@@ -49,6 +49,7 @@ interface CellsQueryState {
   sort: CellsSort | null;
 }
 
+type UseGetAllCellsNodesResult = {refresh: () => Promise<void>; setOffset: (nextOffset: number) => void};
 export const useGetAllCellsNodes = ({
   cellsRepository,
   userRepository,
@@ -56,7 +57,7 @@ export const useGetAllCellsNodes = ({
   enabled,
   fireAndForgetInvoker,
   sort,
-}: UseGetAllCellsNodesProps) => {
+}: UseGetAllCellsNodesProps): UseGetAllCellsNodesResult => {
   const {setNodes, pageSize, setStatus, setPagination, setError, clearAll} = useCellsStore();
   const [queryState, setQueryState] = useState<CellsQueryState>({offset: 0, sort});
 

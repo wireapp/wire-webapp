@@ -31,6 +31,7 @@ import {
   resetInFlightDeleteMeetingsForTest,
   submitDeleteMeeting,
 } from './submitDeleteMeeting';
+import type {Translate} from '../../../../util/localizerUtil';
 
 const meetingId = {id: 'meeting-id', domain: 'example.com'};
 
@@ -60,7 +61,7 @@ const createMeetingInstance = (overrides: Partial<MeetingSeries> = {}): MeetingI
   };
 };
 
-const createSelfUser = (id = 'host-id') => {
+const createSelfUser = (id = 'host-id'): User => {
   const user = new User(id, 'example.com', translateForTest);
   user.name('Host');
   return user;
@@ -80,6 +81,16 @@ describe('submitDeleteMeeting', () => {
     resetInFlightDeleteMeetingsForTest();
   });
 
+  type CreateSubmitDepsResult = {
+    meetingInstance: MeetingInstance;
+    mode: 'forAll';
+    selfUser: User | undefined;
+    translate: (translationKey: Parameters<Translate>[0]) => string;
+    deleteMeetingForMe: jest.Mock<any, any, any>;
+    deleteMeetingForAll: jest.Mock<any, any, any>;
+    removeMeetingByQualifiedId: jest.Mock<any, any, any>;
+    loadMeetings: jest.Mock<any, any, any>;
+  };
   const createSubmitDeps = (
     overrides: {
       deleteMeetingForAll?: jest.Mock;
@@ -88,7 +99,7 @@ describe('submitDeleteMeeting', () => {
       loadMeetings?: jest.Mock;
       selfUser?: User | undefined;
     } = {},
-  ) => {
+  ): CreateSubmitDepsResult => {
     return {
       meetingInstance: createMeetingInstance(),
       mode: 'forAll' as const,

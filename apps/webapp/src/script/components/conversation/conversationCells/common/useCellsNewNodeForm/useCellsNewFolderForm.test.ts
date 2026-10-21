@@ -17,8 +17,8 @@
  *
  */
 
-import {ChangeEvent, FormEvent} from 'react';
-import {act, renderHook} from '@testing-library/react';
+import {ChangeEvent, FormEvent, type MouseEvent} from 'react';
+import {act, renderHook, type RenderHookResult} from '@testing-library/react';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 
@@ -35,7 +35,7 @@ describe('useCellsNewFolderForm', () => {
   let mockCellsRepository: jest.Mocked<CellsRepository>;
   let onSuccess: jest.Mock;
 
-  const createEvent = () => {
+  const createEvent = (): FormEvent<HTMLFormElement> => {
     return {preventDefault: jest.fn()} as unknown as FormEvent<HTMLFormElement>;
   };
 
@@ -48,7 +48,18 @@ describe('useCellsNewFolderForm', () => {
     onSuccess = jest.fn();
   });
 
-  const renderUseCellsNewFolderForm = () => {
+  type RenderUseCellsNewFolderFormResult = RenderHookResult<
+    {
+      name: string;
+      error: string | null;
+      isSubmitting: boolean;
+      handleSubmit: (formEvent: FormEvent<HTMLFormElement> | MouseEvent<HTMLButtonElement>) => Promise<void>;
+      handleChange: (event: ChangeEvent<HTMLInputElement>) => void;
+      handleClear: () => void;
+    },
+    unknown
+  >;
+  const renderUseCellsNewFolderForm = (): RenderUseCellsNewFolderFormResult => {
     return renderHook(() => {
       return useCellsNewFolderForm({
         cellsRepository: mockCellsRepository,

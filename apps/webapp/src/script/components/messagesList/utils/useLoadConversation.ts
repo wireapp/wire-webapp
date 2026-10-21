@@ -33,12 +33,13 @@ interface Props {
   onLoading: (isLoading: boolean) => void;
 }
 
+type UseLoadConversationResult = {loadConversation: (conversationToLoad: Conversation) => Promise<MessageEntity[]>};
 export const useLoadConversation = ({
   conversation,
   conversationRepository,
   conversationLastReadTimestamp,
   onLoading,
-}: Props) => {
+}: Props): UseLoadConversationResult => {
   const {fireAndForgetInvoker} = useApplicationContext();
   const loadConversation = async (conversationToLoad: Conversation): Promise<MessageEntity[]> => {
     onLoading(true);

@@ -36,7 +36,7 @@ describe('FadingScrollbar', () => {
     jest.clearAllTimers();
   });
 
-  const getAlpha = (element: HTMLElement) => {
+  const getAlpha = (element: HTMLElement): number => {
     const [, , , a] = parseColor(element.style.getPropertyValue('--scrollbar-color'));
     return a;
   };

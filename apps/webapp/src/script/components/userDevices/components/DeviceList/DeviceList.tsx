@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import cx from 'classnames';
 
 import type {ClientEntity} from 'Repositories/client/ClientEntity';
@@ -36,7 +38,13 @@ interface DeviceListProps {
   user: User;
 }
 
-export const DeviceList = ({user, getDeviceIdentity, noPadding, clients, clickOnDevice}: DeviceListProps) => {
+export const DeviceList: FunctionComponent<DeviceListProps> = ({
+  user,
+  getDeviceIdentity,
+  noPadding,
+  clients,
+  clickOnDevice,
+}: DeviceListProps) => {
   const {translate} = useApplicationContext();
   const {name: userName} = useKoSubscribableChildren(user, ['name']);
 

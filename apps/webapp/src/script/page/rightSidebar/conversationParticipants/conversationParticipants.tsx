@@ -66,7 +66,7 @@ const ConversationParticipants: FC<ConversationParticipantsProps> = ({
     selfUser,
   } = useKoSubscribableChildren(activeConversation, ['participating_user_ets', 'isSelfUserRemoved', 'selfUser']);
 
-  const showUser = (userEntity: User) => {
+  const showUser = (userEntity: User): void => {
     return togglePanel(PanelState.GROUP_PARTICIPANT_USER, userEntity);
   };
 

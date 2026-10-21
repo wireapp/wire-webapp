@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useState} from 'react';
+import React, {useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
@@ -54,7 +54,7 @@ interface Props {
   translate: Translate;
 }
 
-export const QualityFeedbackModal = ({callingRepository, translate}: Props) => {
+export const QualityFeedbackModal: FunctionComponent<Props> = ({callingRepository, translate}: Props) => {
   const userState = container.resolve(UserState);
   const {conversationId} = useCallAlertState();
   const call = !isNullOrUndefined(conversationId) ? callingRepository.findCall(conversationId) : undefined;
@@ -76,7 +76,7 @@ export const QualityFeedbackModal = ({callingRepository, translate}: Props) => {
     return null;
   }
 
-  const handleCloseModal = ({skipNotification = false} = {}) => {
+  const handleCloseModal = ({skipNotification = false} = {}): void => {
     try {
       const qualityFeedbackStorage = localStorage.getItem(CALL_QUALITY_FEEDBACK_KEY);
       const currentStorageData =
@@ -98,13 +98,13 @@ export const QualityFeedbackModal = ({callingRepository, translate}: Props) => {
     }
   };
 
-  const sendQualityFeedback = (score: number) => {
+  const sendQualityFeedback = (score: number): void => {
     trackCallQualityFeedback({call, score, label: RatingListLabel.ANSWERED});
 
     handleCloseModal();
   };
 
-  const skipQualityFeedback = () => {
+  const skipQualityFeedback = (): void => {
     trackCallQualityFeedback({call, label: RatingListLabel.DISMISSED});
     handleCloseModal({skipNotification: true});
   };

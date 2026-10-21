@@ -19,10 +19,11 @@
 
 import {Locator, Page} from '@playwright/test';
 
-export const ParticipantDevicesPage = (page: Page) => {
+type ParticipantDevicesPageResult = {activeDevices: Locator; getVerifiedBadge: (device: Locator) => Locator};
+export const ParticipantDevicesPage = (page: Page): ParticipantDevicesPageResult => {
   const activeDevices = page.getByTestId('device-card');
 
-  const getVerifiedBadge = (device: Locator) => {
+  const getVerifiedBadge = (device: Locator): Locator => {
     return device.getByTestId('proteus-verified');
   };
 

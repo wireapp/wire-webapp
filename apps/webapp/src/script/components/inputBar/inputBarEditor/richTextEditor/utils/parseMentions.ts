@@ -25,7 +25,7 @@ import {MentionEntity} from 'src/script/message/mentionEntity';
 
 import {MentionNode} from '../nodes/mentionNode';
 
-export const parseMentions = (editor: LexicalEditor, textValue: string, mentions: User[]) => {
+export const parseMentions = (editor: LexicalEditor, textValue: string, mentions: User[]): MentionEntity[] => {
   const editorMentions = editor.getEditorState().read(() => {
     return (
       $nodesOfType(MentionNode)

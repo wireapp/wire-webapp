@@ -17,7 +17,7 @@
  *
  */
 
-import {useState, useEffect} from 'react';
+import {useState, useEffect, type FunctionComponent} from 'react';
 
 import {isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {useDebouncedCallback} from 'use-debounce';
@@ -35,7 +35,12 @@ import {getManageServicesUrl} from '../../../../externalRoute';
 
 const SEARCH_DEBOUNCE_MILLISECONDS = 300;
 
-export const ServicesTab = ({
+export const ServicesTab: FunctionComponent<{
+  canManageServices: boolean;
+  integrationRepository: IntegrationRepository;
+  onClickService: (service: ServiceEntity) => void;
+  searchQuery: string;
+}> = ({
   searchQuery,
   canManageServices,
   integrationRepository,
@@ -51,7 +56,7 @@ export const ServicesTab = ({
   const [services, setServices] = useState<ServiceEntity[]>(integrationRepository.services());
   const manageServicesUrl = getManageServicesUrl('client_landing');
 
-  const openManageServices = () => {
+  const openManageServices = (): void => {
     if (isUndefined(manageServicesUrl)) {
       throw new Error('The manage services URL is not configured');
     }

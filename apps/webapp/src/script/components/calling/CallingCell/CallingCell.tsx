@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useCallback, useEffect, useRef} from 'react';
+import React, {useCallback, useEffect, useRef, type FunctionComponent} from 'react';
 
 import {isUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
@@ -80,7 +80,7 @@ export type CallingCellProps = VideoCallProps & AnsweringControlsProps;
 
 export type CallLabel = {dataUieName: string; text: string};
 
-export const CallingCell = ({
+export const CallingCell: FunctionComponent<CallingCellProps> = ({
   classifiedDomains,
   isTemporaryUser,
   call,
@@ -235,7 +235,7 @@ export const CallingCell = ({
   });
 
   useEffect(() => {
-    const screenSharingEndedHandler = () => {
+    const screenSharingEndedHandler = (): void => {
       screenSharingEndedNotification.show();
     };
 
@@ -297,7 +297,7 @@ export const CallingCell = ({
       const answerCallShortcut = !event.shiftKey && event.ctrlKey && isEnterKey(event);
       const hangUpCallShortcut = event.ctrlKey && event.shiftKey && isEnterKey(event);
 
-      const removeEventListener = () => {
+      const removeEventListener = (): void => {
         return window.removeEventListener('keydown', answerOrRejectCall);
       };
 
@@ -362,7 +362,7 @@ export const CallingCell = ({
     cameraStatus: translate(selfSharesCamera ? 'cameraStatusOn' : 'cameraStatusOff'),
   });
 
-  const toggleDetachedWindow = () => {
+  const toggleDetachedWindow = (): void => {
     if (isDetachedWindow) {
       fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
         await callingRepository.setViewModeMinimized();

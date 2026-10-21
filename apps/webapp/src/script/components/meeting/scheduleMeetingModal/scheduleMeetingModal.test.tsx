@@ -22,7 +22,7 @@ import {act, fireEvent, render, screen, waitFor} from '@testing-library/react';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 import {maybe, task} from 'true-myth';
-import {createStore} from 'zustand/vanilla';
+import {createStore, type StoreApi} from 'zustand/vanilla';
 
 import type {MeetingStoreState} from 'Components/meeting/meetingStore/createMeetingStore';
 import {MeetingStoreProvider} from 'Components/meeting/meetingStore/meetingStoreProvider';
@@ -42,6 +42,7 @@ import {translateForTest} from 'Util/test/translateForTest';
 
 import {ScheduleMeetingModal} from './scheduleMeetingModal';
 import {useScheduleMeetingModal} from './useScheduleMeetingModal';
+import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 
 const clock = createDeterministicClock({
   initialUnixEpochMicroseconds: BigInt(Date.parse('2026-08-12T10:00:00Z')) * 1_000n,
@@ -51,7 +52,7 @@ function createDeferred<T>(): PromiseWithResolvers<T> {
   return Promise.withResolvers<T>();
 }
 
-const createMeetingStore = (scheduleMeeting: MeetingStoreState['scheduleMeeting']) => {
+const createMeetingStore = (scheduleMeeting: MeetingStoreState['scheduleMeeting']): StoreApi<MeetingStoreState> => {
   return createStore<MeetingStoreState>(() => {
     return {
       meetingSeries: [],
@@ -70,7 +71,7 @@ const createMeetingStore = (scheduleMeeting: MeetingStoreState['scheduleMeeting'
   });
 };
 
-const setupContainerMocks = () => {
+const setupContainerMocks = (): void => {
   const selfUser = new User('self-id', 'example.com', translateForTest);
   const conversationState = {findConversation: jest.fn().mockReturnValue(undefined)} as unknown as ConversationState;
   const userState = {
@@ -96,7 +97,10 @@ const setupContainerMocks = () => {
   });
 };
 
-const renderModal = (scheduleMeeting = jest.fn().mockReturnValue(task.resolve({failedToAdd: []}))) => {
+type RenderModalResult = {fireAndForgetInvoker: FireAndForgetInvoker};
+const renderModal = (
+  scheduleMeeting = jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
+): RenderModalResult => {
   setupContainerMocks();
   const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
   const store = createMeetingStore(scheduleMeeting);

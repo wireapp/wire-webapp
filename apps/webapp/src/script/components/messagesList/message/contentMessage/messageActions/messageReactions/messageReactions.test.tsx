@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import React, {type FunctionComponent} from 'react';
 
 import {render, act, fireEvent, waitFor} from '@testing-library/react';
 
@@ -56,7 +56,7 @@ describe('MessageReactions', () => {
   it('outside click should close the emoji picker', async () => {
     let currentMsgActionName = defaultProps.currentMsgActionName; // preserve initial value
 
-    const MessageReactionsComponent = (props: MessageReactionsProps) => {
+    const MessageReactionsComponent: FunctionComponent<MessageReactionsProps> = (props: MessageReactionsProps) => {
       return (
         <div ref={wrapperRef}>
           <MessageReactions {...props} />

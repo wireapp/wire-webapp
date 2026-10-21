@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {BadgesWithTooltip} from '@wireapp/react-ui-kit';
 
 import {wrapperStyles} from './cellsTableTagsColumn.styles';
@@ -27,7 +29,9 @@ interface CellsTableTagsColumnProps {
   tags: string[];
 }
 
-export const CellsTableTagsColumn = ({tags}: CellsTableTagsColumnProps) => {
+export const CellsTableTagsColumn: FunctionComponent<CellsTableTagsColumnProps> = ({
+  tags,
+}: CellsTableTagsColumnProps) => {
   if (tags.length === 0) {
     return null;
   }

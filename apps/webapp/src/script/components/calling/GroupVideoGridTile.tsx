@@ -17,7 +17,7 @@
  *
  */
 
-import {KeyboardEvent} from 'react';
+import {KeyboardEvent, type FunctionComponent} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
@@ -54,7 +54,7 @@ interface GroupVideoGridTileProps {
   selfParticipant: Participant;
 }
 
-const GroupVideoGridTile = ({
+const GroupVideoGridTile: FunctionComponent<GroupVideoGridTileProps> = ({
   minimized,
   participant,
   selfParticipant,
@@ -98,11 +98,11 @@ const GroupVideoGridTile = ({
     processedVideoStream,
   );
 
-  const handleTileClick = () => {
+  const handleTileClick = (): void => {
     return onTileDoubleClick(participant?.user.qualifiedId, participant?.clientId);
   };
 
-  const handleEnterTileClick = (keyboardEvent: KeyboardEvent) => {
+  const handleEnterTileClick = (keyboardEvent: KeyboardEvent): void => {
     if (isEnterKey(keyboardEvent)) {
       handleTileClick();
     }

@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {sortableHeaderStyles} from './cellsTableSortableHeader.styles';
 
 import {CellsSortDirection, CellsSortIcon} from '../cellsSortIcon/cellsSortIcon';
@@ -27,7 +29,11 @@ interface CellsTableSortableHeaderProps {
   onClick: () => void;
 }
 
-export const CellsTableSortableHeader = ({label, direction, onClick}: CellsTableSortableHeaderProps) => {
+export const CellsTableSortableHeader: FunctionComponent<CellsTableSortableHeaderProps> = ({
+  label,
+  direction,
+  onClick,
+}: CellsTableSortableHeaderProps) => {
   const isActive = direction !== undefined;
 
   return (

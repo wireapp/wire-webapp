@@ -17,10 +17,13 @@
  *
  */
 
-import {useEffect, useState, useRef, FormEvent} from 'react';
+import {useEffect, useState, useRef, FormEvent, type FunctionComponent} from 'react';
 
 import {isNan, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import type {RegisterData} from '@wireapp/api-client/lib/auth';
+import type {RegisteredClient} from '@wireapp/api-client/lib/client';
+import type {ConversationJoinData} from '@wireapp/api-client/lib/conversation/data';
+import type {ConversationEvent} from '@wireapp/api-client/lib/event';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {connect} from 'react-redux';
 import {Navigate} from 'react-router';
@@ -55,7 +58,7 @@ import * as AccentColor from '../util/accentColor';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
-const ConversationJoinComponent = ({
+const ConversationJoinComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> = ({
   doCheckConversationCode,
   doJoinConversationByCode,
   doInit,
@@ -123,7 +126,7 @@ const ConversationJoinComponent = ({
       });
   }, [doCheckConversationCode, doGetAllClients, doGetConversationInfoByCode, doInit]);
 
-  const routeToApp = (conversation: string = '', domain: string = '') => {
+  const routeToApp = (conversation: string = '', domain: string = ''): void => {
     const conversationPath = isNonEmptyString(conversation)
       ? `#/conversation/${conversation}${isNonEmptyString(domain) ? `/${domain}` : ''}`
       : '';
@@ -131,7 +134,7 @@ const ConversationJoinComponent = ({
     window.location.replace(redirectLocation);
   };
 
-  const getConversationInfoAndJoin = async (password?: string) => {
+  const getConversationInfoAndJoin = async (password?: string): Promise<void> => {
     if (!isJoinGuestLinkPasswordModalOpen && conversationHasPassword === true) {
       setIsJoinGuestLinkPasswordModalOpen(true);
       return;
@@ -159,7 +162,7 @@ const ConversationJoinComponent = ({
     }
   };
 
-  const handleSubmit = async (entropyData?: Uint8Array, password?: string) => {
+  const handleSubmit = async (entropyData?: Uint8Array, password?: string): Promise<void> => {
     if (!isJoinGuestLinkPasswordModalOpen && conversationHasPassword === true) {
       setIsJoinGuestLinkPasswordModalOpen(true);
       return;
@@ -209,7 +212,7 @@ const ConversationJoinComponent = ({
     }
   };
 
-  const checkNameValidity = async (event: FormEvent) => {
+  const checkNameValidity = async (event: FormEvent): Promise<void> => {
     setIsTemporaryGuest(true);
     event.preventDefault();
     if (nameInput.current === null) {
@@ -226,12 +229,12 @@ const ConversationJoinComponent = ({
     }
   };
 
-  const resetErrors = () => {
+  const resetErrors = (): void => {
     setError(null);
     setIsValidName(true);
   };
 
-  const onNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onNameChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     resetErrors();
     setEnteredName(event.target.value);
   };
@@ -243,7 +246,7 @@ const ConversationJoinComponent = ({
   const isFullConversation =
     !isNullOrUndefined(conversationError) && conversationError.label === BackendErrorLabel.TOO_MANY_MEMBERS;
 
-  const submitJoinCodeWithPassword = async (password: string) => {
+  const submitJoinCodeWithPassword = async (password: string): Promise<void> => {
     await handleSubmit(undefined, password);
   };
 
@@ -316,7 +319,18 @@ const ConversationJoinComponent = ({
 };
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
-const mapStateToProps = (state: RootState) => {
+type MapStateToPropsResult = {
+  isFetchingAuth: boolean;
+  hasLoadedClients: boolean;
+  isFetchingConversation: boolean;
+  isTemporaryGuest: boolean;
+  selfName: string | false | undefined;
+  conversationError: (Error & {label?: string; code?: number; message?: string}) | null;
+  conversationInfo: ConversationJoinData | null;
+  conversationInfoFetching: boolean;
+  generalError: Error | null;
+};
+const mapStateToProps = (state: RootState): MapStateToPropsResult => {
   return {
     isFetchingAuth: AuthSelector.isFetching(state),
     hasLoadedClients: ClientSelector.hasLoadedClients(state),
@@ -331,7 +345,26 @@ const mapStateToProps = (state: RootState) => {
 };
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: ThunkDispatch) => {
+type MapDispatchToPropsResult = {
+  doGetAllClients: () => Promise<RegisteredClient[]>;
+  doCheckConversationCode: (key: string, code: string, uri?: string | undefined) => Promise<void>;
+  doGetConversationInfoByCode: (key: string, code: string) => Promise<ConversationJoinData | undefined>;
+  doInit: (options?: {isImmediateLogin: boolean; shouldValidateLocalClient: boolean} | undefined) => Promise<void>;
+  doJoinConversationByCode: (
+    key: string,
+    code: string,
+    uri?: string | undefined,
+    password?: string | undefined,
+  ) => Promise<ConversationEvent>;
+  doLogout: () => Promise<void>;
+  doRegisterWireless: (
+    registrationData: RegisterData,
+    options?: {shouldInitializeClient: boolean} | undefined,
+    entropyData?: Uint8Array<ArrayBufferLike> | undefined,
+  ) => Promise<void>;
+  setLastEventDate: (lastEventDate: Date) => Promise<void>;
+};
+const mapDispatchToProps = (dispatch: ThunkDispatch): MapDispatchToPropsResult => {
   return {
     doGetAllClients: (...args: Parameters<typeof ROOT_ACTIONS.clientAction.doGetAllClients>) => {
       return dispatch(ROOT_ACTIONS.clientAction.doGetAllClients(...args));

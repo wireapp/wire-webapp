@@ -31,8 +31,9 @@ import {CELLS_SELF_USER_DRIVE_ROLE} from '../../../common/cellsSelfUserDriveRole
 import {CellShareModalContent} from './cellsNodeShareModal';
 
 import {useCellsStore} from '../../../common/useCellsStore/useCellsStore';
+import type {JSX} from '@emotion/react/jsx-runtime';
 
-const withTheme = (component: ReactNode) => {
+const withTheme = (component: ReactNode): JSX.Element => {
   return <StyledApp themeId={THEME_ID.DEFAULT}>{component}</StyledApp>;
 };
 

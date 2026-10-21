@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import cx from 'classnames';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -27,7 +29,11 @@ interface RestrictedVideoProps {
   className?: string;
 }
 
-const RestrictedVideo = ({showMessage = true, isSmall = false, className}: RestrictedVideoProps) => {
+const RestrictedVideo: FunctionComponent<RestrictedVideoProps> = ({
+  showMessage = true,
+  isSmall = false,
+  className,
+}: RestrictedVideoProps) => {
   const {translate} = useApplicationContext();
 
   return (

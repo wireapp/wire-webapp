@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {amplify} from 'amplify';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
@@ -33,9 +35,9 @@ import {listCss, modalButtonsCss, successStepSubHeaderCss} from './teamCreationS
 
 import {buttonCss} from '../teamCreation.styles';
 
-export const Success = ({onSuccess, teamName, userName}: StepProps) => {
+export const Success: FunctionComponent<StepProps> = ({onSuccess, teamName, userName}: StepProps) => {
   const {translate} = useApplicationContext();
-  const handleOpenTeamsClick = () => {
+  const handleOpenTeamsClick = (): void => {
     safeWindowOpen(Config.getConfig().URL.TEAMS_BASE);
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.USER.PERSONAL_TEAM_CREATION.FLOW_COMPLETED, {
       step: Segmentation.TEAM_CREATION_STEP.MODAL_OPEN_TM_CLICKED,
@@ -43,7 +45,7 @@ export const Success = ({onSuccess, teamName, userName}: StepProps) => {
     onSuccess();
   };
 
-  const successHandler = () => {
+  const successHandler = (): void => {
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.USER.PERSONAL_TEAM_CREATION.FLOW_COMPLETED, {
       step: Segmentation.TEAM_CREATION_STEP.MODAL_BACK_TO_WIRE_CLICKED,
     });

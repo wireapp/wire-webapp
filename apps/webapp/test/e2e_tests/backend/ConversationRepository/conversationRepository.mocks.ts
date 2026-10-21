@@ -28,7 +28,20 @@ export interface createGroupConversationDataParams {
     teamid: string;
   };
 }
-export const createGroupConversationData = (data: createGroupConversationDataParams) => {
+type CreateGroupConversationDataResult = {
+  access: string[];
+  add_permission: string;
+  access_role_v2: string[];
+  conversation_role: string;
+  name: string;
+  protocol: 'proteus' | 'mls';
+  qualified_users: {domain: string; id: string}[];
+  users: string[];
+  team: {managed: boolean; teamid: string};
+};
+export const createGroupConversationData = (
+  data: createGroupConversationDataParams,
+): CreateGroupConversationDataResult => {
   return {
     access: ['invite', 'code'],
     add_permission: 'admins',

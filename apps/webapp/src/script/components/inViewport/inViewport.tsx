@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect, useRef, type FunctionComponent} from 'react';
 
 import {overlayedObserver} from 'Util/DOM/overlayedObserver';
 import {viewportObserver} from 'Util/DOM/viewportObserver';
@@ -32,7 +32,7 @@ interface InViewportParams {
   checkOverlay?: boolean;
 }
 
-export const InViewport = ({
+export const InViewport: FunctionComponent<InViewportParams & React.HTMLProps<HTMLDivElement>> = ({
   children,
   onVisible,
   onVisibilityLost,
@@ -56,14 +56,14 @@ export const InViewport = ({
     let onVisibleTriggered = false;
     let onVisibilityLostTriggered = false;
 
-    const releaseTrackers = () => {
+    const releaseTrackers = (): void => {
       if (checkOverlay) {
         overlayedObserver.removeElement(element);
       }
       viewportObserver.removeElement(element);
     };
 
-    const triggerCallbackIfVisible = () => {
+    const triggerCallbackIfVisible = (): void => {
       if (inViewport && visible) {
         if (!onVisibleTriggered) {
           onVisible();

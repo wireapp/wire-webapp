@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useRef, useState} from 'react';
+import React, {useRef, useState, type FunctionComponent} from 'react';
 
 import {isEmptyString, isNull} from '@sindresorhus/is';
 import {connect} from 'react-redux';
@@ -34,13 +34,13 @@ import {Page} from './page';
 import {Exception} from '../component/exception';
 import {actionRoot} from '../module/action';
 import {ValidationError} from '../module/action/validationError';
-import {RootState, bindActionCreators} from '../module/reducer';
+import {RootState, bindActionCreators, type ThunkAction} from '../module/reducer';
 import * as SelfSelector from '../module/selector/selfSelector';
 import {ROUTE} from '../route';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
-const SetEmailComponent = ({
+const SetEmailComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> = ({
   hasSelfEmail,
   isSelfSSOUser,
   doSetEmail,
@@ -130,7 +130,8 @@ const SetEmailComponent = ({
 };
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
-const mapStateToProps = (state: RootState) => {
+type MapStateToPropsResult = {hasSelfEmail: boolean; isFetching: boolean; isSelfSSOUser: boolean};
+const mapStateToProps = (state: RootState): MapStateToPropsResult => {
   return {
     hasSelfEmail: SelfSelector.hasSelfEmail(state),
     isFetching: SelfSelector.isFetching(state),
@@ -139,7 +140,8 @@ const mapStateToProps = (state: RootState) => {
 };
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => {
+type MapDispatchToPropsResult = {doSetEmail: (email: string) => ThunkAction};
+const mapDispatchToProps = (dispatch: Dispatch<AnyAction>): MapDispatchToPropsResult => {
   return bindActionCreators(
     {
       doSetEmail: actionRoot.selfAction.doSetEmail,

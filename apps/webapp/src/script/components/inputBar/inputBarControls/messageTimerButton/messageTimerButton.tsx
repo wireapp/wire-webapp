@@ -17,7 +17,7 @@
  *
  */
 
-import {MouseEvent, KeyboardEvent} from 'react';
+import {MouseEvent, KeyboardEvent, type FunctionComponent} from 'react';
 
 import {isNan, isNullOrUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
@@ -28,7 +28,7 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {TeamState} from 'Repositories/team/TeamState';
 import {EphemeralTimings} from 'src/script/ephemeral/EphemeralTimings';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {showContextMenu} from 'src/script/ui/contextMenu';
+import {showContextMenu, type ContextMenuEntry} from 'src/script/ui/contextMenu';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isSpaceOrEnterKey} from 'Util/keyboardUtil';
 import {DurationUnit, formatDuration} from 'Util/timeUtil';
@@ -39,7 +39,10 @@ interface MessageTimerButtonProps {
   teamState?: TeamState;
 }
 
-const MessageTimerButton = ({conversation, teamState = container.resolve(TeamState)}: MessageTimerButtonProps) => {
+const MessageTimerButton: FunctionComponent<MessageTimerButtonProps> = ({
+  conversation,
+  teamState = container.resolve(TeamState),
+}: MessageTimerButtonProps) => {
   const {translate} = useApplicationContext();
   const {messageTimer, hasGlobalMessageTimer} = useKoSubscribableChildren(conversation, [
     'messageTimer',
@@ -53,7 +56,7 @@ const MessageTimerButton = ({conversation, teamState = container.resolve(TeamSta
   const isTimerDisabled = isSelfDeletingMessagesEnforced || hasGlobalMessageTimer;
   const duration = hasMessageTimer ? formatDuration(messageTimer, translate) : ({} as DurationUnit);
 
-  const setEntries = () => {
+  const setEntries = (): ContextMenuEntry[] => {
     return [
       {
         click: () => {
@@ -85,7 +88,7 @@ const MessageTimerButton = ({conversation, teamState = container.resolve(TeamSta
     return null;
   }
 
-  const handleContextKeyDown = (event: KeyboardEvent) => {
+  const handleContextKeyDown = (event: KeyboardEvent): void => {
     if (isSpaceOrEnterKey(event.key)) {
       const newEvent = setContextMenuPosition(event);
       const entries = setEntries();

@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {isNonEmptyArray, isNonEmptyString} from '@sindresorhus/is';
 
 import * as Icon from 'Components/icon';
@@ -33,7 +35,7 @@ interface ReadIndicatorProps {
   onClick?: (message: Message) => void;
 }
 
-export const ReadIndicator = ({
+export const ReadIndicator: FunctionComponent<ReadIndicatorProps> = ({
   message,
   is1to1Conversation = false,
   showIconOnly = false,

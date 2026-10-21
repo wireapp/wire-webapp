@@ -195,7 +195,7 @@ export const createDirectSharedDriveUploadStrategy = ({
   const requestsByUploadId = new Map<string, SharedDriveUploadRequest>();
   const abortControllersByUploadId = new Map<string, AbortController>();
   const listeners = new Set<SharedDriveUploadSnapshotListener>();
-  const notify = () => {
+  const notify = (): void => {
     return listeners.forEach(listener => {
       listener();
     });
@@ -292,7 +292,29 @@ export const createDirectSharedDriveUploadStrategy = ({
   };
 };
 
-export const createSharedDriveUploadController = ({createUploadId, createSource, uploadStrategy}: Dependencies) => {
+type CreateSharedDriveUploadControllerResult = {
+  upload: (
+    files: readonly File[],
+    path: string,
+    onRefresh: () => void,
+    conversationQualifiedId: string,
+  ) => Promise<void>;
+  updateRefresh: (conversationQualifiedId: string, onRefresh: () => void) => void;
+  snapshots: (conversationQualifiedId: string) => readonly UploadState[];
+  subscribe: (listener: () => void) => () => boolean;
+  cancel: (id: string) => Promise<void>;
+  retryUpload: (id: string) => Promise<void>;
+  retryPublish: (uploadId: string) => Promise<void>;
+  discard: (uploadId: string) => Promise<void>;
+  retryDiscard: (uploadId: string) => Promise<void>;
+  dismiss: (conversationQualifiedId: string, uploadId: string) => void;
+  isDismissed: (conversationQualifiedId: string, uploadId: string) => boolean;
+};
+export const createSharedDriveUploadController = ({
+  createUploadId,
+  createSource,
+  uploadStrategy,
+}: Dependencies): CreateSharedDriveUploadControllerResult => {
   const ids: string[] = [];
   const conversationByUploadId = new Map<string, string>();
   const requestsByUploadId = new Map<string, SharedDriveUploadRequest>();
@@ -303,7 +325,7 @@ export const createSharedDriveUploadController = ({createUploadId, createSource,
   const dismissedUploadIdsByConversation = new Map<string, Set<string>>();
   const queuedWork: UploadWork[] = [];
   let activeWorkCount = 0;
-  const notify = () => {
+  const notify = (): void => {
     return listeners.forEach(listener => {
       listener();
     });

@@ -25,7 +25,7 @@ import {test, withLogin, expect, Team, LOGIN_TIMEOUT} from 'test/e2e_tests/test.
 import {isPlayingAudio} from 'test/e2e_tests/utils/audio.util';
 import {connectWithUser, createGroup, sendConnectionRequest} from 'test/e2e_tests/utils/userActions';
 
-async function joinCall(userPages: PageManager['webapp']['pages']) {
+async function joinCall(userPages: PageManager['webapp']['pages']): Promise<void> {
   await expect(userPages.calling().callCell).toBeVisible();
   await userPages.calling().clickAcceptCallButton();
   await expect(userPages.calling().goFullScreen).toBeVisible();

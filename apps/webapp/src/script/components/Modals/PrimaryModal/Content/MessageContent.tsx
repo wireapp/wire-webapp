@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {isNullOrUndefined, isString, isUndefined} from '@sindresorhus/is';
 
 import type {Translate} from 'Util/localizerUtil';
@@ -31,7 +33,11 @@ interface MessageContentProps {
   translate: Translate;
 }
 
-export const MessageContent = ({message, translatedMessage, translate}: MessageContentProps) => {
+export const MessageContent: FunctionComponent<MessageContentProps> = ({
+  message,
+  translatedMessage,
+  translate,
+}: MessageContentProps) => {
   const hasMessage = !isNullOrUndefined(message);
   const hasTranslatedMessage = !isUndefined(translatedMessage);
 

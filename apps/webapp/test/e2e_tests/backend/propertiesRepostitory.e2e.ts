@@ -25,7 +25,7 @@ import {BackendClientE2E} from './backendClient.e2e';
 
 export class PropertiesRepositoryE2E extends BackendClientE2E {
   /** Update a property of a user, e.g. to decline sharing telemetry */
-  async putProperty(data: TypeUtil.RecursivePartial<WebappProperties>, token: string) {
+  async putProperty(data: TypeUtil.RecursivePartial<WebappProperties>, token: string): Promise<void> {
     await this.axiosInstance.put('properties/webapp', data, {
       headers: {
         Authorization: `Bearer ${token}`,

@@ -17,7 +17,7 @@
  *
  */
 
-import {type ReactNode, useEffect, useMemo} from 'react';
+import {type ReactNode, useEffect, useMemo, type FunctionComponent} from 'react';
 
 import {container} from 'tsyringe';
 
@@ -56,7 +56,7 @@ type MeetingStoreRootProps = {
  * Owns the single meeting store of a signed-in session and keeps it in sync with the
  * meeting lifecycle events, independently of whether the meetings view is currently rendered.
  */
-export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
+export const MeetingStoreRoot: FunctionComponent<MeetingStoreRootProps> = ({children}: MeetingStoreRootProps) => {
   const {mainViewModel, clock, translate} = useApplicationContext();
   const {isMeetingsEnabled} = useMeetingsFeatureFlag();
   const {
@@ -161,7 +161,8 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
       },
     });
 
-    const getSelfUserQualifiedId = () => {
+    type GetSelfUserQualifiedIdResult = {domain: string; id: string};
+    const getSelfUserQualifiedId = (): GetSelfUserQualifiedIdResult => {
       return container.resolve(UserState).self().qualifiedId;
     };
 

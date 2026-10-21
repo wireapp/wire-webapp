@@ -17,7 +17,7 @@
  *
  */
 
-import {act, fireEvent, render, waitFor} from '@testing-library/react';
+import {act, fireEvent, render, waitFor, type RenderResult} from '@testing-library/react';
 
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
@@ -50,6 +50,7 @@ import {createUuid} from 'Util/uuid';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
 import {translateForTest} from 'Util/test/translateForTest';
+import type {ReactNode} from 'react';
 
 jest.mock('Components/avatar', () => {
   return {
@@ -83,7 +84,8 @@ describe('InputBar', () => {
   });
 
   let propertiesRepository: PropertiesRepository;
-  const createRootProviderWrapper = () => {
+  type CreateRootProviderWrapperResult = (properties: {readonly children: ReactNode}) => ReactNode;
+  const createRootProviderWrapper = (): CreateRootProviderWrapperResult => {
     return createRootProviderWrapperForTest(
       createRootContextValueForTest({
         translate: translateForTest,
@@ -91,7 +93,30 @@ describe('InputBar', () => {
     );
   };
 
-  const getDefaultProps = () => {
+  type GetDefaultPropsResult = {
+    assetRepository: AssetRepository;
+    conversation: Conversation;
+    cellsRepository: CellsRepository;
+    files: FileWithPreview[];
+    conversationRepository: ConversationRepository;
+    eventRepository: EventRepository;
+    messageRepository: MessageRepository;
+    openGiphy: jest.Mock<any, any, any>;
+    propertiesRepository: PropertiesRepository;
+    searchRepository: SearchRepository;
+    storageRepository: StorageRepository;
+    isCellsEnabled: boolean;
+    teamState: TeamState;
+    selfUser: User;
+    onShiftTab: jest.Mock<any, any, any>;
+    uploadDroppedFiles: jest.Mock<any, any, any>;
+    uploadImages: jest.Mock<any, any, any>;
+    uploadPastedFiles: jest.Mock<any, any, any>;
+    uploadFiles: jest.Mock<any, any, any>;
+    onCellImageUpload: jest.Mock<any, any, any>;
+    onCellAssetUpload: jest.Mock<any, any, any>;
+  };
+  const getDefaultProps = (): GetDefaultPropsResult => {
     return {
       assetRepository: new AssetRepository(),
       conversation: new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest),
@@ -211,7 +236,7 @@ describe('InputBar', () => {
       FEATURE: {...defaultConfig.FEATURE, ENABLE_MESSAGE_FORMAT_BUTTONS: true},
     });
 
-    const renderWithMessagePreprocessingDisabled = (isDisabled: boolean) => {
+    const renderWithMessagePreprocessingDisabled = (isDisabled: boolean): RenderResult => {
       const featureToggleRootContextValue = createRootContextValueForTest({
         isFeatureToggleEnabled: (featureToggleName: string) => {
           return featureToggleName === disableMessagePreprocessingFeatureToggleName && isDisabled;

@@ -17,7 +17,7 @@
  *
  */
 
-import {CSSProperties} from 'react';
+import {CSSProperties, type FunctionComponent} from 'react';
 
 import {primaryStyles, secondaryStyles, textStyles} from './fileCardName.styles';
 
@@ -32,7 +32,10 @@ interface FileCardNameProps {
   variant?: 'primary' | 'secondary';
 }
 
-export const FileCardName = ({truncateAfterLines = 1, variant = 'primary'}: FileCardNameProps) => {
+export const FileCardName: FunctionComponent<FileCardNameProps> = ({
+  truncateAfterLines = 1,
+  variant = 'primary',
+}: FileCardNameProps) => {
   const {name} = useFileCardContext();
 
   return (

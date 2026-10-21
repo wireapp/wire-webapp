@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
@@ -34,7 +36,7 @@ interface CellsBulkMovePreviewModalProps {
   conversationName: string;
 }
 
-export const CellsBulkMovePreviewModal = ({
+export const CellsBulkMovePreviewModal: FunctionComponent<CellsBulkMovePreviewModalProps> = ({
   isOpen,
   onClose,
   selectedNodes,

@@ -99,10 +99,10 @@ export const ConversationCells = memo(
     const [activeFolderDropTargetName, setActiveFolderDropTargetName] = useState<string | null>(null);
     const [folderDropResetKey, setFolderDropResetKey] = useState(0);
     const [selectionBarAnchor, setSelectionBarAnchor] = useState<HTMLDivElement | null>(null);
-    const onUploadFiles = () => {
+    const onUploadFiles = (): void | undefined => {
       return uploadInput.current?.click();
     };
-    const onUploadFolder = () => {
+    const onUploadFolder = (): void | undefined => {
       return folderUploadInput.current?.click();
     };
     const {

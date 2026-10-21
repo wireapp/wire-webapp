@@ -19,7 +19,7 @@
 
 import {act, render, screen} from '@testing-library/react';
 import {task} from 'true-myth';
-import {createStore} from 'zustand/vanilla';
+import {createStore, type StoreApi} from 'zustand/vanilla';
 
 import type {MeetingStoreState} from 'Components/meeting/meetingStore/createMeetingStore';
 import {MeetingStoreProvider} from 'Components/meeting/meetingStore/meetingStoreProvider';
@@ -35,7 +35,7 @@ import {MeetingsConversationTab} from './meetingsConversationTab';
 import {SidebarTabs} from '../useSidebarStore';
 
 describe('MeetingsConversationTab', () => {
-  const createMeetingStoreForTest = (loadMeetings: jest.Mock) => {
+  const createMeetingStoreForTest = (loadMeetings: jest.Mock): StoreApi<MeetingStoreState> => {
     return createStore<MeetingStoreState>(() => {
       return {
         meetingSeries: [],

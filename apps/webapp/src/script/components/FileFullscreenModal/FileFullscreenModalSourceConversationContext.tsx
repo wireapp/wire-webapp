@@ -17,7 +17,7 @@
  *
  */
 
-import {createContext, ReactNode, useContext} from 'react';
+import {createContext, ReactNode, useContext, type FunctionComponent} from 'react';
 
 import type {Conversation} from 'Repositories/entity/Conversation';
 
@@ -28,10 +28,9 @@ interface FileFullscreenModalSourceConversationProviderProps {
   sourceConversation?: Conversation;
 }
 
-export const FileFullscreenModalSourceConversationProvider = ({
-  children,
-  sourceConversation,
-}: FileFullscreenModalSourceConversationProviderProps) => {
+export const FileFullscreenModalSourceConversationProvider: FunctionComponent<
+  FileFullscreenModalSourceConversationProviderProps
+> = ({children, sourceConversation}: FileFullscreenModalSourceConversationProviderProps) => {
   return (
     <FileFullscreenModalSourceConversationContext.Provider value={sourceConversation}>
       {children}
@@ -39,6 +38,6 @@ export const FileFullscreenModalSourceConversationProvider = ({
   );
 };
 
-export const useFileFullscreenModalSourceConversation = () => {
+export const useFileFullscreenModalSourceConversation = (): Conversation | undefined => {
   return useContext(FileFullscreenModalSourceConversationContext);
 };

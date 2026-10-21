@@ -19,6 +19,7 @@
 
 import {type ReactElement, MutableRefObject, useCallback, useState} from 'react';
 
+import type {JSX} from '@emotion/react/jsx-runtime';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {MenuOption as _MenuOption, MenuRenderFn, MenuTextMatch} from '@lexical/react/LexicalTypeaheadMenuPlugin';
 import {isEmptyArray, isNullOrUndefined} from '@sindresorhus/is';
@@ -88,7 +89,7 @@ function MentionMenu({
   selectedIndex: number | null;
   selectOptionAndCleanUp: (option: MenuOption) => void;
   setHighlightedIndex: (index: number) => void;
-}) {
+}): JSX.Element {
   const {bottom, left} = getPosition();
 
   return (
@@ -159,7 +160,8 @@ export function MentionsPlugin({onSearch, openStateRef}: MentionsPluginProps): R
 
   const rootElement = editor.getRootElement();
 
-  const getPosition = () => {
+  type GetPositionResult = {bottom: number; left: number};
+  const getPosition = (): GetPositionResult => {
     if (isNullOrUndefined(rootElement)) {
       return {bottom: 0, left: 0};
     }

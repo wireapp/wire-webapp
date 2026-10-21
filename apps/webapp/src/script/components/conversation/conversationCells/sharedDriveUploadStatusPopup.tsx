@@ -17,7 +17,7 @@
  *
  */
 
-import type {ReactNode} from 'react';
+import type {ReactNode, FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
@@ -183,7 +183,7 @@ const renderProgress = (upload: SharedDriveUploadStatus, isExpanded: boolean): R
   return null;
 };
 
-export const SharedDriveUploadStatusPopup = ({
+export const SharedDriveUploadStatusPopup: FunctionComponent<SharedDriveUploadStatusPopupProps> = ({
   upload,
   uploads = [upload],
   aggregateKind = upload.kind,

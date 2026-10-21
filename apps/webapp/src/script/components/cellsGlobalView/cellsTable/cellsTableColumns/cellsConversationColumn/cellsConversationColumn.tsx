@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {isUndefined} from '@sindresorhus/is';
 
 import {GroupAvatar, ChannelAvatar} from 'Components/avatar';
@@ -32,7 +34,10 @@ interface CellsConversationColumnProps {
   name: string;
 }
 
-export const CellsConversationColumn = ({conversation, name}: CellsConversationColumnProps) => {
+export const CellsConversationColumn: FunctionComponent<CellsConversationColumnProps> = ({
+  conversation,
+  name,
+}: CellsConversationColumnProps) => {
   if (isUndefined(conversation)) {
     return <span css={textStyles}>{name}</span>;
   }
@@ -40,7 +45,11 @@ export const CellsConversationColumn = ({conversation, name}: CellsConversationC
   return <ConversationAvatar conversation={conversation} />;
 };
 
-const ConversationAvatar = ({conversation}: {conversation: Conversation}) => {
+const ConversationAvatar: FunctionComponent<{conversation: Conversation}> = ({
+  conversation,
+}: {
+  conversation: Conversation;
+}) => {
   const {isChannel, display_name: displayName} = useKoSubscribableChildren(conversation, ['isChannel', 'display_name']);
   const {isChannelsEnabled} = useChannelsFeatureFlag();
 

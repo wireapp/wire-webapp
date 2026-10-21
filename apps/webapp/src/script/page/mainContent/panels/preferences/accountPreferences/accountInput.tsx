@@ -50,11 +50,12 @@ interface AccountInputProps extends InputHTMLAttributes<HTMLInputElement> {
   valueUie?: string;
 }
 
-export const useInputDone = () => {
+type UseInputDoneResult = {done: () => void; isDone: boolean};
+export const useInputDone = (): UseInputDoneResult => {
   const [isDone, setIsDone] = useState(false);
   const isMounted = useIsMounted();
 
-  const done = () => {
+  const done = (): void => {
     if (isMounted()) {
       setIsDone(true);
     }
@@ -95,7 +96,7 @@ const AccountInput: FC<AccountInputProps> = ({
   }, [value]);
 
   useEffect(() => {
-    const handleClickOutside = (event: any) => {
+    const handleClickOutside = (event: any): void => {
       if (inputWrapperRef.current !== null && !inputWrapperRef.current.contains(event.target)) {
         setInput(value);
         setIsEditingExternal?.(false);
@@ -110,7 +111,7 @@ const AccountInput: FC<AccountInputProps> = ({
     };
   }, []);
 
-  const updateInput = (value: string) => {
+  const updateInput = (value: string): void => {
     if (isNonEmptyString(allowedChars)) {
       value = value.replace(new RegExp(`[^${allowedChars}]`, 'g'), '');
     }

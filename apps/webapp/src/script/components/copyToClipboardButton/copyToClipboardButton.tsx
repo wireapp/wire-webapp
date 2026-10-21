@@ -17,7 +17,7 @@
  *
  */
 
-import {useState} from 'react';
+import {useState, type FunctionComponent} from 'react';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
@@ -34,7 +34,7 @@ interface CopyToClipboardButtonProps {
 
 const COPY_CONFIRM_DURATION = 1500;
 
-export const CopyToClipboardButton = ({
+export const CopyToClipboardButton: FunctionComponent<CopyToClipboardButtonProps> = ({
   disabled,
   textToCopy,
   displayText,
@@ -43,7 +43,7 @@ export const CopyToClipboardButton = ({
 }: CopyToClipboardButtonProps) => {
   const [isCopying, setIsCopying] = useState<boolean>(false);
 
-  const copyToClipboard = async () => {
+  const copyToClipboard = async (): Promise<void> => {
     if (disabled === true) {
       return;
     }

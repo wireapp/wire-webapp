@@ -17,8 +17,7 @@
  *
  */
 
-import {useEffect, useMemo, useState} from 'react';
-import type {ReactNode} from 'react';
+import {useEffect, useMemo, useState, type FunctionComponent, ReactNode} from 'react';
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
@@ -123,7 +122,7 @@ function renderDeviceDetailsHeadline(options: RenderDeviceDetailsHeadlineOptions
   );
 }
 
-export const DeviceDetails = ({
+export const DeviceDetails: FunctionComponent<DeviceDetailsProps> = ({
   device,
   cryptographyRepository,
   user,
@@ -153,15 +152,15 @@ export const DeviceDetails = ({
     });
   }, [cryptographyRepository, device, user.qualifiedId]);
 
-  const clickToToggleDeviceVerification = () => {
+  const clickToToggleDeviceVerification = (): void => {
     const toggleVerified = !isVerified;
     clientRepository.verifyClient(user.qualifiedId, device, toggleVerified).catch((error: unknown) => {
       return logger.warn(`Failed to toggle client verification: ${toError(error).message}`);
     });
   };
 
-  const clickToResetSession = () => {
-    const _resetProgress = () => {
+  const clickToResetSession = (): void => {
+    const _resetProgress = (): number => {
       return window.setTimeout(() => {
         return setIsResettingSession(false);
       }, MotionDuration.LONG);

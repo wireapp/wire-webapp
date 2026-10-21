@@ -25,7 +25,7 @@
  * This will add 3 devices for audio in- and output as well as 3 cameras.
  * No matter which of the devices is selected the default input is returned. (The default input is mocked via launchArgs in the playwright config)
  */
-export const mockAudioAndVideoDevices = () => {
+export const mockAudioAndVideoDevices = (): void => {
   // If media devices aren't defined on the current device there's nothing to mock
   if (!navigator.mediaDevices) return;
 

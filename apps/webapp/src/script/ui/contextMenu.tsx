@@ -17,7 +17,17 @@
  *
  */
 
-import {ComponentType, CSSProperties, ReactNode, SVGProps, useEffect, useMemo, useRef, useState} from 'react';
+import {
+  ComponentType,
+  CSSProperties,
+  ReactNode,
+  SVGProps,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type FunctionComponent,
+} from 'react';
 
 import {CSSObject} from '@emotion/react';
 import {isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
@@ -67,7 +77,7 @@ let previouslyFocused: HTMLElement;
 let reactRoot: Root;
 
 // Unmount and remove the container from DOM
-const cleanUp = () => {
+const cleanUp = (): void => {
   const {activeWindow} = useActiveWindowState.getState();
 
   if (container !== undefined) {
@@ -77,12 +87,12 @@ const cleanUp = () => {
   }
 };
 
-export const closeContextMenu = () => {
+export const closeContextMenu = (): void => {
   return queueMicrotask(cleanUp);
 };
 
 // Clamping the value between min and max
-const clampValue = (value: number, min: number, max: number) => {
+const clampValue = (value: number, min: number, max: number): number => {
   return Math.max(min, Math.min(value, max));
 };
 
@@ -120,7 +130,7 @@ const getButtonId = (label: string | undefined): string => {
 const contextMenuClassName = 'ctx-menu';
 const msgMenuIdentifier = 'message-options-menu';
 
-const ContextMenu = ({
+const ContextMenu: FunctionComponent<ContextMenuProps> = ({
   entries,
   defaultIdentifier = `${contextMenuClassName}-item`,
   posX,
@@ -188,7 +198,7 @@ const ContextMenu = ({
   }, [selected]);
 
   useEffect(() => {
-    const onWheel = (event: MouseEvent) => {
+    const onWheel = (event: MouseEvent): void => {
       return event.preventDefault();
     };
 
@@ -252,7 +262,7 @@ const ContextMenu = ({
   }, [activeElement, selected, activeWindow]);
 
   const {handleMenuOpen} = useMessageActionsState();
-  const resetMsgMenuStates = (isOutsideClick = false) => {
+  const resetMsgMenuStates = (isOutsideClick = false): void => {
     if (defaultIdentifier === msgMenuIdentifier) {
       handleMenuOpen?.(false);
 
@@ -351,7 +361,7 @@ export const showContextMenu = ({
   anchor?: HTMLElement | undefined;
   placement?: Placement;
   offset?: number;
-}) => {
+}): void => {
   const {activeWindow} = useActiveWindowState.getState();
   event.preventDefault();
   event.stopPropagation();

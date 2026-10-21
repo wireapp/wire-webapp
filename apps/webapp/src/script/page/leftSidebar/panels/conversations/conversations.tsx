@@ -17,7 +17,15 @@
  *
  */
 
-import {KeyboardEvent as ReactKeyBoardEvent, useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {
+  KeyboardEvent as ReactKeyBoardEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type FunctionComponent,
+} from 'react';
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
@@ -106,7 +114,7 @@ type ConversationsProps = {
   isConversationListCollapseEnabled: boolean;
 };
 
-export const Conversations = ({
+export const Conversations: FunctionComponent<ConversationsProps> = ({
   integrationRepository,
   searchRepository,
   teamRepository,
@@ -250,7 +258,8 @@ export const Conversations = ({
     searchPingsConversations: translate('searchPingsConversations'),
   };
 
-  const getTabConversationsForFilter = (filter: string) => {
+  type GetTabConversationsForFilterResult = {conversations: Conversation[]; searchInputPlaceholder: string};
+  const getTabConversationsForFilter = (filter: string): GetTabConversationsForFilterResult => {
     return getTabConversations({
       currentTab,
       conversations,
@@ -310,7 +319,7 @@ export const Conversations = ({
     groupParticipantsConversations,
     isGroupParticipantsVisible,
   ]);
-  const hasSearchTabResult = (query: string) => {
+  const hasSearchTabResult = (query: string): boolean => {
     const queryConversations = getTabConversationsForFilter(query).conversations;
     const queryGroupParticipants = getGroupParticipantsConversations({
       currentTab,
@@ -379,7 +388,7 @@ export const Conversations = ({
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.UI.CONVERSATION_LIST_UNCOLLAPSE);
   }, [isConversationListCollapsed, setConversationListStatus]);
 
-  const toggleConversationList = () => {
+  const toggleConversationList = (): void => {
     const willCollapse = conversationListStatus === ConversationListStatus.EXPANDED;
     setConversationListStatus(willCollapse ? ConversationListStatus.COLLAPSED : ConversationListStatus.EXPANDED);
     amplify.publish(
@@ -389,7 +398,7 @@ export const Conversations = ({
   };
 
   useEffect(() => {
-    const handleConversationShow = (conversation?: Conversation) => {
+    const handleConversationShow = (conversation?: Conversation): void => {
       if (isNullOrUndefined(conversation)) {
         return;
       }
@@ -546,7 +555,7 @@ export const Conversations = ({
   );
 
   useEffect(() => {
-    const openFavorites = () => {
+    const openFavorites = (): void => {
       return changeTab(SidebarTabs.FAVORITES);
     };
     conversationLabelRepository.addEventListener('conversation-favorited', openFavorites);

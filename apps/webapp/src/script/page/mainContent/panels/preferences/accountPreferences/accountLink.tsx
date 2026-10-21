@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
@@ -29,7 +31,7 @@ interface AccountLinkProps {
   value: string;
 }
 
-const AccountLink = ({label, value, ...rest}: AccountLinkProps) => {
+const AccountLink: FunctionComponent<AccountLinkProps> = ({label, value, ...rest}: AccountLinkProps) => {
   const {translate} = useApplicationContext();
 
   return (

@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useLayoutEffect, useRef, useEffect} from 'react';
+import React, {useLayoutEffect, useRef, useEffect, type FunctionComponent} from 'react';
 
 import {isFunction, isNull} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
@@ -85,7 +85,9 @@ export interface MessageParams extends MessageActions {
   setMsgElementsFocusable: (isMsgElementsFocusable: boolean) => void;
 }
 
-export const Message = (props: MessageParams & {scrollTo?: ScrollToElement}) => {
+export const Message: FunctionComponent<MessageParams & {scrollTo?: ScrollToElement}> = (
+  props: MessageParams & {scrollTo?: ScrollToElement},
+) => {
   const {
     message,
     isHighlighted,
@@ -114,7 +116,7 @@ export const Message = (props: MessageParams & {scrollTo?: ScrollToElement}) => 
     }
   }, [isHighlighted]);
 
-  const handleDivKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+  const handleDivKeyDown = (event: React.KeyboardEvent<HTMLDivElement>): void => {
     // when a message is focused set its elements focusable
     if (!event.shiftKey && isTabKey(event)) {
       if (isNull(messageElementRef.current)) {

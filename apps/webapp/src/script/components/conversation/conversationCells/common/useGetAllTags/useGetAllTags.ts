@@ -24,7 +24,8 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {useAllCellsTagsStore} from '../useAllCellsTagsStore/useAllCellsTagsStore';
 
-export const useGetAllTags = ({cellsRepository}: {cellsRepository: CellsRepository}) => {
+type UseGetAllTagsResult = {tags: string[]; isLoading: boolean; error: Error | null};
+export const useGetAllTags = ({cellsRepository}: {cellsRepository: CellsRepository}): UseGetAllTagsResult => {
   const {fireAndForgetInvoker} = useApplicationContext();
   const tags = useAllCellsTagsStore(state => {
     return state.tags;

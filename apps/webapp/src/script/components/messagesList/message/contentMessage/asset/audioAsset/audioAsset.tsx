@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {useEffect, useState, type FunctionComponent} from 'react';
 
 import {isUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
@@ -52,7 +52,7 @@ interface AudioAssetProps {
   isFocusable?: boolean;
 }
 
-export const AudioAsset = ({
+export const AudioAsset: FunctionComponent<AudioAssetProps> = ({
   message,
   className,
   hasHeader = false,
@@ -66,17 +66,17 @@ export const AudioAsset = ({
   const {transferState, uploadProgress, cancelUpload, getAssetUrl} = useAssetTransfer(message);
   const [audioTime, setAudioTime] = useState<number>(asset?.meta?.duration ?? 0);
   const [audioSrc, setAudioSrc] = useState<AssetUrl>();
-  const onTimeupdate = () => {
+  const onTimeupdate = (): void => {
     if (!isUndefined(audioElement)) {
       setAudioTime(audioElement.currentTime);
     }
   };
   const showLoudnessPreview = (asset.meta?.loudness?.length ?? 0) > 0;
-  const onPauseButtonClicked = () => {
+  const onPauseButtonClicked = (): void | undefined => {
     return audioElement?.pause();
   };
 
-  const onPlayButtonClicked = async () => {
+  const onPlayButtonClicked = async (): Promise<void> => {
     if (!isUndefined(audioSrc)) {
       audioElement?.play();
     } else {

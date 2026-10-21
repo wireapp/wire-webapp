@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {CopyToClipboardButton} from 'Components/copyToClipboardButton';
 import {PasswordFields, type PasswordFieldsProps} from 'Components/PasswordFields/PasswordFields';
 import {PasswordGeneratorButton} from 'Components/PasswordGeneratorButton';
@@ -34,7 +36,7 @@ interface MeetingLinkFormProps extends Omit<PasswordFieldsProps, 'translate'> {
   onGeneratePassword: (password: string) => void;
 }
 
-export const MeetingLinkForm = ({
+export const MeetingLinkForm: FunctionComponent<MeetingLinkFormProps> = ({
   translate,
   onGeneratePassword,
   copyDisabled,

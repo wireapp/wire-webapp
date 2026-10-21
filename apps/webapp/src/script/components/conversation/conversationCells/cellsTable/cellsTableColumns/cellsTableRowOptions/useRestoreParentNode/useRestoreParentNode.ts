@@ -37,12 +37,13 @@ interface UseRestoreParentNodeProps {
   onError: () => void;
 }
 
+type UseRestoreParentNodeResult = {restoreParentNode: () => Promise<void>; rootParentName: string};
 export const useRestoreParentNode = ({
   childNode,
   conversationQualifiedId,
   cellsRepository,
   onError,
-}: UseRestoreParentNodeProps) => {
+}: UseRestoreParentNodeProps): UseRestoreParentNodeResult => {
   const {removeNode} = useCellsStore();
   const rootParentName = getNodeRootParentPath({nodePath: childNode.path});
   const path = getCellsApiPath({

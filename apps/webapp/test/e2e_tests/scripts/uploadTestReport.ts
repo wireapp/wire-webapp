@@ -78,7 +78,7 @@ async function createTestRun(options?: {testPlanId?: number; description?: strin
   return await res.json();
 }
 
-async function closeTestRun(testRun: TestRun) {
+async function closeTestRun(testRun: TestRun): Promise<void> {
   const res = await fetch(`https://app.testiny.io/api/v1/testrun/${testRun.id}`, {
     method: 'PUT',
     headers: {
@@ -93,7 +93,7 @@ async function closeTestRun(testRun: TestRun) {
   }
 }
 
-async function deleteTestRun(runId: number) {
+async function deleteTestRun(runId: number): Promise<void> {
   const res = await fetch(`https://app.testiny.io/api/v1/testrun/${runId}`, {
     method: 'DELETE',
     headers: {
@@ -112,7 +112,7 @@ type TestinyTestCaseMapping = {
   mapped: {assigned_to: 'ANY'; result_status: 'NOTRUN' | 'PASSED' | 'FAILED' | 'BLOCKED' | 'SKIPPED'};
 };
 
-function transformReportToTestinyMappings(report: JSONReport, runId: number) {
+function transformReportToTestinyMappings(report: JSONReport, runId: number): TestinyTestCaseMapping[] {
   // Mapping from playwrights status to the result expected by Testiny
   const resultMap: Record<JSONReportTest['status'], TestinyTestCaseMapping['mapped']['result_status']> = {
     expected: 'PASSED',
@@ -146,7 +146,7 @@ function transformReportToTestinyMappings(report: JSONReport, runId: number) {
     }, []);
 }
 
-async function addTestResultsToRun(testCaseMappings: TestinyTestCaseMapping[]) {
+async function addTestResultsToRun(testCaseMappings: TestinyTestCaseMapping[]): Promise<void> {
   const res = await fetch('https://app.testiny.io/api/v1/testrun/mapping/bulk/testcase:testrun?op=add', {
     method: 'POST',
     headers: {
@@ -161,7 +161,7 @@ async function addTestResultsToRun(testCaseMappings: TestinyTestCaseMapping[]) {
   }
 }
 
-async function main() {
+async function main(): Promise<void> {
   if (args.testinyApiKey === undefined) throw new Error('Missing required arg testinyApiKey');
   if (args.reportPath === undefined) throw new Error('Missing required arg reportPath');
   if (args.runName === undefined) throw new Error('Missing required arg runName');

@@ -87,7 +87,8 @@ export const loadDraftState = async (
 
   let messageReply = null;
 
-  const loadMessage = async (messageId: string) => {
+  type LoadMessageResult = Promise<ContentMessage & {primary_key: string}>;
+  const loadMessage = async (messageId: string): LoadMessageResult => {
     const messageFromId = await messageRepository.getMessageInConversationById(conversation, messageId);
     const message =
       messageFromId ?? (await messageRepository.getMessageInConversationByReplacementId(conversation, messageId));

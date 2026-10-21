@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {selectionBarBreadcrumbAnchorStyles} from 'Components/cells/common/cellsSelectionBar/cellsSelectionBar.styles';
@@ -69,7 +71,7 @@ interface CellsHeaderProps {
   onSelectionBarAnchorChange?: (anchor: HTMLDivElement | null) => void;
 }
 
-export const CellsHeader = ({
+export const CellsHeader: FunctionComponent<CellsHeaderProps> = ({
   onRefresh,
   conversationName,
   conversationQualifiedId,

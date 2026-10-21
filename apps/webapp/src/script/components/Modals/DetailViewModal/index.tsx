@@ -17,7 +17,7 @@
  *
  */
 
-import {KeyboardEvent as ReactKeyboardEvent, useEffect, useRef, useState} from 'react';
+import {KeyboardEvent as ReactKeyboardEvent, useEffect, useRef, useState, type FunctionComponent} from 'react';
 
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isNullOrUndefined} from '@sindresorhus/is';
@@ -60,7 +60,7 @@ interface DetailViewModalProps {
   translate: Translate;
 }
 
-export const DetailViewModal = ({
+export const DetailViewModal: FunctionComponent<DetailViewModalProps> = ({
   assetRepository,
   conversationRepository,
   fireAndForgetInvoker,
@@ -79,7 +79,7 @@ export const DetailViewModal = ({
   const [isImageVisible, setIsImageVisible] = useState(false);
   const [imageSrc, setImageSrc] = useState<string>('');
 
-  const onCloseClick = () => {
+  const onCloseClick = (): void => {
     document.removeEventListener('keydown', onKeyDownLightBox);
 
     setIsImageVisible(false);
@@ -92,7 +92,7 @@ export const DetailViewModal = ({
     }, detailModalScrollDelayInMilliseconds);
   };
 
-  const handleOnClosePress = (event: KeyboardEvent | ReactKeyboardEvent<HTMLButtonElement>) => {
+  const handleOnClosePress = (event: KeyboardEvent | ReactKeyboardEvent<HTMLButtonElement>): void => {
     handleKeyDown({
       event,
       callback: onCloseClick,
@@ -100,7 +100,7 @@ export const DetailViewModal = ({
     });
   };
 
-  const onReplyClick = async (conversation: Conversation, message: ContentMessage) => {
+  const onReplyClick = async (conversation: Conversation, message: ContentMessage): Promise<void> => {
     amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversation, {});
 
     // The event above will make react to render the conversation view,
@@ -115,11 +115,11 @@ export const DetailViewModal = ({
     onCloseClick();
   };
 
-  const onDownloadClick = (message: ContentMessage) => {
+  const onDownloadClick = (message: ContentMessage): void => {
     return message.download(assetRepository);
   };
 
-  const loadImage = (contentMessage: ContentMessage) => {
+  const loadImage = (contentMessage: ContentMessage): void => {
     setIsImageVisible(false);
 
     assetRepository.load((contentMessage.getFirstAsset() as MediumImage).resource()).then(blob => {
@@ -130,7 +130,7 @@ export const DetailViewModal = ({
     });
   };
 
-  const iterateImage = (reverse = false) => {
+  const iterateImage = (reverse = false): void => {
     const currentIndex = items.findIndex(item => {
       return item.id === currentMessageEntityId.current;
     });
@@ -155,17 +155,17 @@ export const DetailViewModal = ({
     setMessageEntity(newMessageEntity);
   };
 
-  const clickOnShowNext = (event: MouseEvent | KeyboardEvent) => {
+  const clickOnShowNext = (event: MouseEvent | KeyboardEvent): void => {
     event.stopPropagation();
     iterateImage(true);
   };
 
-  const clickOnShowPrevious = (event: MouseEvent | KeyboardEvent) => {
+  const clickOnShowPrevious = (event: MouseEvent | KeyboardEvent): void => {
     event.stopPropagation();
     iterateImage();
   };
 
-  const onKeyDownLightBox = async (keyboardEvent: KeyboardEvent) => {
+  const onKeyDownLightBox = async (keyboardEvent: KeyboardEvent): Promise<void> => {
     switch (keyboardEvent.key) {
       case KEY.ESC: {
         onCloseClick();
@@ -188,7 +188,7 @@ export const DetailViewModal = ({
     }
   };
 
-  const messageRemoved = (messageId: string, conversationId: string) => {
+  const messageRemoved = (messageId: string, conversationId: string): void => {
     if (conversationEntity?.id === conversationId) {
       if (currentMessageEntity.id === messageId) {
         onCloseClick();
@@ -204,7 +204,7 @@ export const DetailViewModal = ({
     }
   };
 
-  const messageAdded = (message: ContentMessage) => {
+  const messageAdded = (message: ContentMessage): void => {
     const isCurrentConversation = conversationEntity?.id === message.conversation_id;
     const isImage = isOfCategory('images', message) === true;
 
@@ -215,11 +215,11 @@ export const DetailViewModal = ({
     }
   };
 
-  const messageExpired = (message: ContentMessage) => {
+  const messageExpired = (message: ContentMessage): void => {
     return messageRemoved(message.id, message.conversation_id);
   };
 
-  const getAllImages = async (conversation: Conversation) => {
+  const getAllImages = async (conversation: Conversation): Promise<void> => {
     const conversationItems = await conversationRepository.getEventsForCategory(conversation, MessageCategory.IMAGE);
     const filteredImages = conversationItems.filter(message => {
       return isContentMessage(message) && isOfCategory('images', message) === true;

@@ -94,14 +94,14 @@ export function getTabConversations({
   draftConversations,
   searchInputPlaceholders,
 }: GetTabConversationsProps): GetTabConversations {
-  const conversationSearchFilter = (conversation: Conversation) => {
+  const conversationSearchFilter = (conversation: Conversation): boolean => {
     const filterWord = replaceAccents(conversationsFilter.toLowerCase());
     const conversationDisplayName = replaceAccents(conversation.display_name().toLowerCase());
 
     return conversationDisplayName.includes(filterWord);
   };
 
-  const conversationArchivedFilter = (conversation: Conversation) => {
+  const conversationArchivedFilter = (conversation: Conversation): boolean => {
     return !archivedConversations.includes(conversation);
   };
 
@@ -276,12 +276,13 @@ type ConversationListDisplayParams = {
   currentTab: SidebarTabs;
 };
 
+type GetConversationsToDisplayResult = (Conversation | {isHeader: boolean; heading: string})[];
 export const getConversationsToDisplay = ({
   conversations,
   conversationsFilter,
   currentFolder,
   currentTab,
-}: ConversationListDisplayParams) => {
+}: ConversationListDisplayParams): GetConversationsToDisplayResult => {
   const isFolderView = currentTab === SidebarTabs.FOLDER;
   const filteredConversations =
     isFolderView && currentFolder !== undefined
@@ -305,7 +306,7 @@ export const getConversationFocusCandidates = ({
   currentTab,
   groupParticipantsConversations,
   isGroupParticipantsVisible,
-}: ConversationFocusCandidatesParams) => {
+}: ConversationFocusCandidatesParams): Conversation[] => {
   const conversationsToDisplay = getConversationsToDisplay({
     conversations,
     conversationsFilter,
@@ -328,7 +329,7 @@ export const getConversationFocusCandidates = ({
   });
 };
 
-export const scrollToConversation = (conversationId: string) => {
+export const scrollToConversation = (conversationId: string): void => {
   const element = document.querySelector<HTMLElement>(`.conversation-list-cell[data-uie-uid="${conversationId}"]`);
 
   if (isNull(element)) {
@@ -352,11 +353,12 @@ export const scrollToConversation = (conversationId: string) => {
   }
 };
 
+type GetConversationsWithHeadingsResult = (Conversation | {isHeader: boolean; heading: string})[];
 export const getConversationsWithHeadings = (
   currentConversations: Conversation[],
   conversationsFilter: string,
   currentTab: SidebarTabs,
-) => {
+): GetConversationsWithHeadingsResult => {
   if (isEmptyString(conversationsFilter) || currentTab !== SidebarTabs.RECENT) {
     return currentConversations;
   }

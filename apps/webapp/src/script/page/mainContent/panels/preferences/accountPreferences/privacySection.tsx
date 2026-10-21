@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import React, {type FunctionComponent} from 'react';
 
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {container} from 'tsyringe';
@@ -41,7 +41,7 @@ interface PrivacySectionProps {
   propertiesRepository: PropertiesRepository;
 }
 
-const PrivacySection = ({
+const PrivacySection: FunctionComponent<PrivacySectionProps> = ({
   propertiesRepository,
   appLockRepository,
   appLockState = container.resolve(AppLockState),
@@ -64,7 +64,7 @@ const PrivacySection = ({
     'typingIndicatorMode',
   ]);
 
-  const changeReceiptMode = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const changeReceiptMode = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const isChecked = event.target.checked;
 
     void propertiesRepository.updateProperty(
@@ -73,7 +73,7 @@ const PrivacySection = ({
     );
   };
 
-  const handleTypingModeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleTypingModeChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const isChecked = event.target.checked;
 
     void propertiesRepository.updateProperty(

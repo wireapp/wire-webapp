@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {Avatar, AVATAR_SIZE} from 'Components/avatar';
 import * as Icon from 'Components/icon';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -40,7 +42,7 @@ export interface TypingIndicatorProps {
   conversationId: string;
 }
 
-export const TypingIndicator = ({conversationId}: TypingIndicatorProps) => {
+export const TypingIndicator: FunctionComponent<TypingIndicatorProps> = ({conversationId}: TypingIndicatorProps) => {
   const {translate} = useApplicationContext();
   const users = useTypingIndicatorState(state => {
     return state.getTypingUsersInConversation(conversationId);

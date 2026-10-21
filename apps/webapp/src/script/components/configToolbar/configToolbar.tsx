@@ -19,6 +19,7 @@
 
 import {useEffect, useRef, useState} from 'react';
 
+import type {JSX} from '@emotion/react/jsx-runtime';
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import keyboardjs from 'keyboardjs';
 import {noop} from 'noop-esm';
@@ -53,7 +54,7 @@ function getStartOfToday(): Date {
 }
 
 function toDateInputValue(date: Date): string {
-  const pad = (value: number) => {
+  const pad = (value: number): string => {
     return String(value).padStart(timeComponentDigitCount, '0');
   };
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
@@ -65,7 +66,7 @@ function getEndOfDate(dateInputValue: string): Date {
   return new Date(`${dateInputValue}T23:59:59.999`);
 }
 
-export function ConfigToolbar() {
+export function ConfigToolbar(): JSX.Element | null {
   const {fireAndForgetInvoker, applicationNavigation, isFeatureToggleEnabled} = useApplicationContext();
   const alphabeticallySortedStartupFeatureToggleNames = startupFeatureToggleNames.toSorted();
   const [showConfig, setShowConfig] = useState(false);
@@ -96,7 +97,7 @@ export function ConfigToolbar() {
   const [isDownloadingNotifications, setIsDownloadingNotifications] = useState(false);
 
   useEffect(() => {
-    const openToolbar = () => {
+    const openToolbar = (): void => {
       return setShowConfig(true);
     };
     window.addEventListener(openDebugToolbarEventName, openToolbar);
@@ -108,7 +109,7 @@ export function ConfigToolbar() {
 
   // Toggle config tool on 'cmd/ctrl + shift + 2'
   useEffect(() => {
-    const handleKeyDown = () => {
+    const handleKeyDown = (): void => {
       setShowConfig(prev => {
         return !prev;
       });
@@ -174,18 +175,18 @@ export function ConfigToolbar() {
     };
   }, [fireAndForgetInvoker, isMessageSendingActive, prefix, messageDelaySec]);
 
-  const startSendingMessages = () => {
+  const startSendingMessages = (): void => {
     messageCountRef.current = 0;
     setIsMessageSendingActive(true);
   };
 
-  const stopSendingMessages = () => {
+  const stopSendingMessages = (): void => {
     setIsMessageSendingActive(false);
     messageCountRef.current = 0;
   };
 
   // Update the config state when form input changes
-  const handleChange = (path: string, value: string | boolean | string[]) => {
+  const handleChange = (path: string, value: string | boolean | string[]): void => {
     const updateConfig = (obj: any, keys: string[]): void => {
       if (keys.length === 1) {
         obj[keys[0]] = value;
@@ -200,7 +201,10 @@ export function ConfigToolbar() {
     Config._dangerouslySetConfigFeaturesForDebug(updatedConfig);
   };
 
-  const renderInput = (value: string | boolean | string[] | number | object | null, path: string) => {
+  const renderInput = (
+    value: string | boolean | string[] | number | object | null,
+    path: string,
+  ): JSX.Element | JSX.Element[] => {
     if (typeof value === 'boolean') {
       return (
         <Switch
@@ -244,7 +248,7 @@ export function ConfigToolbar() {
     );
   };
 
-  const renderConfig = (configObj: object, parentPath: string = '') => {
+  const renderConfig = (configObj: object, parentPath: string = ''): JSX.Element[] => {
     const entries = Object.entries(configObj);
 
     return entries.map(([key, value]) => {
@@ -262,11 +266,11 @@ export function ConfigToolbar() {
     return setShowConfig(false);
   });
 
-  const handleAvsEnable = (isChecked: boolean) => {
+  const handleAvsEnable = (isChecked: boolean): void => {
     setAvsDebuggerEnabled(window.wire?.app?.debug?.enableAvsDebugger(isChecked) === true);
   };
 
-  const renderAvsSwitch = () => {
+  const renderAvsSwitch = (): JSX.Element => {
     return (
       <div style={{marginBottom: '10px'}}>
         <label htmlFor="avs-debugger-checkbox" style={{display: 'block', fontWeight: 'bold'}}>
@@ -283,10 +287,10 @@ export function ConfigToolbar() {
     );
   };
 
-  const handleAvsRustSftEnable = (isChecked: boolean) => {
+  const handleAvsRustSftEnable = (isChecked: boolean): void => {
     setAvsRustSftEnabled(window.wire?.app?.debug?.enableAvsRustSFT(isChecked) === true);
   };
-  const renderAvsRustSftSwitch = () => {
+  const renderAvsRustSftSwitch = (): JSX.Element => {
     return (
       <div style={{marginBottom: '10px'}}>
         <label htmlFor="avs-rust-sft-checkbox" style={{display: 'block', fontWeight: 'bold'}}>
@@ -303,10 +307,10 @@ export function ConfigToolbar() {
     );
   };
 
-  const handlePerformancePanel = (isChecked: boolean) => {
+  const handlePerformancePanel = (isChecked: boolean): void => {
     setIsPerformancePanelEnabled(window.wire?.app?.debug?.enablePerformancePanel(isChecked) === true);
   };
-  const renderBackgroundEffectsFeatureSelect = () => {
+  const renderBackgroundEffectsFeatureSelect = (): JSX.Element => {
     return (
       <div style={{marginBottom: '10px'}}>
         <label
@@ -326,7 +330,7 @@ export function ConfigToolbar() {
     );
   };
 
-  const renderGzipSwitch = () => {
+  const renderGzipSwitch = (): JSX.Element => {
     return (
       <div style={{marginBottom: '10px'}}>
         <label htmlFor="gzip-checkbox" style={{display: 'block', fontWeight: 'bold'}}>
@@ -346,7 +350,7 @@ export function ConfigToolbar() {
     );
   };
 
-  const renderCoreCryptoLogLevelSelect = () => {
+  const renderCoreCryptoLogLevelSelect = (): JSX.Element => {
     const options: {label: string; value: CoreCryptoLogLevel}[] = [
       {label: 'Off', value: CoreCryptoLogLevel.Off},
       {label: 'Trace', value: CoreCryptoLogLevel.Trace},
@@ -402,7 +406,7 @@ export function ConfigToolbar() {
     applicationNavigation.navigateTo(nextLocationUrl);
   }
 
-  function renderStartupFeatureToggleCheckboxList() {
+  function renderStartupFeatureToggleCheckboxList(): JSX.Element {
     return (
       <fieldset style={{margin: 0, border: 0, padding: 0}}>
         <legend style={{fontWeight: 'bold', marginBottom: '8px'}}>Startup Feature Toggles</legend>
@@ -431,7 +435,7 @@ export function ConfigToolbar() {
     );
   }
 
-  const resetMLSConversation = async () => {
+  const resetMLSConversation = async (): Promise<void> => {
     setIsResettingMLSConversation(true);
     try {
       await window.wire?.app?.debug?.resetMLSConversation();
@@ -442,7 +446,7 @@ export function ConfigToolbar() {
     }
   };
 
-  const advanceEpoch = async () => {
+  const advanceEpoch = async (): Promise<void> => {
     setIsAdvancingEpoch(true);
     try {
       await window.wire?.app?.debug?.updateActiveConversationKeyPackages();
@@ -453,7 +457,7 @@ export function ConfigToolbar() {
     }
   };
 
-  const downloadNotificationsDump = async () => {
+  const downloadNotificationsDump = async (): Promise<void> => {
     setIsDownloadingNotifications(true);
     try {
       const from = new Date(`${notificationDumpFrom}T00:00:00`);
@@ -479,7 +483,7 @@ export function ConfigToolbar() {
     }
   };
 
-  const renderNotificationDumpSection = () => {
+  const renderNotificationDumpSection = (): JSX.Element => {
     return (
       <>
         <h3>Notification Dump</h3>

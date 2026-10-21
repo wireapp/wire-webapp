@@ -17,7 +17,7 @@
  *
  */
 
-import {Fragment, ReactElement} from 'react';
+import {Fragment, ReactElement, type FunctionComponent} from 'react';
 
 import {isBoolean, isDate, isNonEmptyString, isNumber, isObject, isString} from '@sindresorhus/is';
 import {FormattedMessage} from 'react-intl';
@@ -57,7 +57,7 @@ const toMessageInterpolationValues = (value: unknown): MessageInterpolationValue
   return entries.length > 0 ? Object.fromEntries(entries) : undefined;
 };
 
-const Exception = ({errors = []}: ExceptionProps) => {
+const Exception: FunctionComponent<ExceptionProps> = ({errors = []}: ExceptionProps) => {
   return (
     <Fragment>
       {errors.map(error => {

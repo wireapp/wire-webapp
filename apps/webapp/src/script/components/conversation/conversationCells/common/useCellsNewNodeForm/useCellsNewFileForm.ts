@@ -17,6 +17,8 @@
  *
  */
 
+import type {FormEvent, MouseEvent, ChangeEvent} from 'react';
+
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
@@ -45,7 +47,8 @@ const getTemplateUuidByType = (fileType: CellsFileType): string => {
   return FILE_TEMPLATE_ID_BY_TYPE[fileType];
 };
 
-const createAlreadyExistsError = () => {
+type CreateAlreadyExistsErrorResult = Error & {response: {status: number}};
+const createAlreadyExistsError = (): CreateAlreadyExistsErrorResult => {
   const error = new Error('File already exists') as Error & {response: {status: number}};
   error.response = {status: ITEM_ALREADY_EXISTS_ERROR};
   return error;
@@ -65,6 +68,14 @@ interface UseCellsNewFileFormProps {
   validationCopy: CellsNewNodeFormValidationCopy;
 }
 
+type UseCellsNewFileFormResult = {
+  name: string;
+  error: string | null;
+  isSubmitting: boolean;
+  handleSubmit: (formEvent: FormEvent<HTMLFormElement> | MouseEvent<HTMLButtonElement>) => Promise<void>;
+  handleChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  handleClear: () => void;
+};
 export const useCellsNewFileForm = ({
   fileType,
   cellsRepository,
@@ -73,13 +84,13 @@ export const useCellsNewFileForm = ({
   currentPath,
   isOpen,
   validationCopy,
-}: UseCellsNewFileFormProps) => {
+}: UseCellsNewFileFormProps): UseCellsNewFileFormResult => {
   const normalizeNameForCreation = (rawName: string): string => {
     const extension = getFileExtensionByType(fileType);
     return `${rawName}.${extension}`;
   };
 
-  const createFile = async (name: string) => {
+  const createFile = async (name: string): Promise<void> => {
     const path = getCellsApiPath({conversationQualifiedId, currentPath});
     const templateUuid = getTemplateUuidByType(fileType);
     const fileAlreadyExists = await cellsRepository.checkFileAlreadyExists({path, name});

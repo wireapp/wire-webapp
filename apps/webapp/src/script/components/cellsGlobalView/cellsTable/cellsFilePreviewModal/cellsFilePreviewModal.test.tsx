@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode} from 'react';
+import {ReactNode, type FunctionComponent} from 'react';
 
 import {act, render, screen} from '@testing-library/react';
 import {container} from 'tsyringe';
@@ -37,8 +37,9 @@ import {
   CellsFilePreviewModalContext,
   CellsFilePreviewModalContextValue,
 } from '../common/cellsFilePreviewModalContext/cellsFilePreviewModalContext';
+import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 
-const translate = (key: string) => {
+const translate = (key: string): string => {
   return (
     {
       'cells.imageFullScreenModal.closeButton': 'Close',
@@ -50,11 +51,12 @@ const translate = (key: string) => {
   );
 };
 
+type CreateRootProviderWrapperResult = (properties: {readonly children: ReactNode}) => ReactNode;
 const createRootProviderWrapper = ({
   fireAndForgetInvoker,
 }: {
   fireAndForgetInvoker: ReturnType<typeof createExecutingFireAndForgetInvokerForTest>;
-}) => {
+}): CreateRootProviderWrapperResult => {
   return createRootProviderWrapperForTest(
     createRootContextValueForTest({
       fireAndForgetInvoker,
@@ -82,7 +84,11 @@ const file: CellFile = {
   selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER,
 };
 
-const FakeFilePreviewProvider = ({
+const FakeFilePreviewProvider: FunctionComponent<{
+  children: ReactNode;
+  selfUserDriveRole: CellFile['selfUserDriveRole'];
+  selectedFile?: CellFile;
+}> = ({
   children,
   selfUserDriveRole,
   selectedFile = file,
@@ -121,13 +127,14 @@ describe('CellsFilePreviewModal', () => {
     container.reset();
   });
 
+  type RenderModalResult = {fireAndForgetInvoker: FireAndForgetInvoker};
   const renderModal = ({
     selfUserDriveRole,
     selectedFile,
   }: {
     selfUserDriveRole: CellFile['selfUserDriveRole'];
     selectedFile?: CellFile;
-  }) => {
+  }): RenderModalResult => {
     const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
 
     render(

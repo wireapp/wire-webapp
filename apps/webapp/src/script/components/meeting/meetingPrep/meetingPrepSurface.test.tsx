@@ -58,12 +58,17 @@ const pendingPreview: RequestMeetingPrepPreview = () => {
   );
 };
 
+type RenderSurfaceResult = {
+  onCancel: (() => void) | jest.Mock<any, any, any>;
+  onJoin:
+    jest.Mock<any, any, any> | ((choice: {cameraEnabled: boolean; microphoneEnabled: boolean}) => void | Promise<void>);
+};
 const renderSurface = (
   overrides: Partial<{
     onCancel: () => void;
     onJoin: (choice: {cameraEnabled: boolean; microphoneEnabled: boolean}) => void | Promise<void>;
   }> = {},
-) => {
+): RenderSurfaceResult => {
   const onCancel = overrides.onCancel ?? jest.fn();
   const onJoin = overrides.onJoin ?? jest.fn();
 

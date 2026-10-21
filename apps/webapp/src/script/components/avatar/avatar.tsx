@@ -17,7 +17,12 @@
  *
  */
 
-import {HTMLProps, MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent} from 'react';
+import {
+  HTMLProps,
+  MouseEvent as ReactMouseEvent,
+  KeyboardEvent as ReactKeyBoardEvent,
+  type FunctionComponent,
+} from 'react';
 
 import {User} from 'Repositories/entity/User';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
@@ -83,7 +88,7 @@ interface AvatarProps extends HTMLProps<HTMLDivElement> {
   hideProfilePicture?: boolean;
 }
 
-const Avatar = ({
+const Avatar: FunctionComponent<AvatarProps> = ({
   avatarSize = AVATAR_SIZE.LARGE,
   noBadge = false,
   noFilter = false,
@@ -94,7 +99,7 @@ const Avatar = ({
 }: AvatarProps) => {
   const handleAvatarInteraction = (
     event: ReactMouseEvent<HTMLDivElement, MouseEvent> | ReactKeyBoardEvent<HTMLDivElement>,
-  ) => {
+  ): void => {
     const parentNode = event.currentTarget.parentNode;
     if (parentNode !== null) {
       if (isKeyboardEvent(event)) {

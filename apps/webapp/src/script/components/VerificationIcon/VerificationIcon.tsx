@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {VerifiedIcon, NotVerifiedIcon} from '../icon';
 
 interface VerificationIconProps {
@@ -25,7 +27,11 @@ interface VerificationIconProps {
   isVerified: boolean;
 }
 
-export const VerificationIcon = ({isVerified, dataUieName, className}: VerificationIconProps) => {
+export const VerificationIcon: FunctionComponent<VerificationIconProps> = ({
+  isVerified,
+  dataUieName,
+  className,
+}: VerificationIconProps) => {
   return isVerified ? (
     <VerifiedIcon className={className ?? 'verified-icon'} data-uie-name={dataUieName ?? 'user-device-verified'} />
   ) : (

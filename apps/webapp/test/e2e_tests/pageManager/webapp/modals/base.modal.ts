@@ -34,11 +34,11 @@ export abstract class BaseModal {
     this.cancelButton = this.modal.getByTestId('do-secondary');
   }
 
-  async clickCancel() {
+  async clickCancel(): Promise<void> {
     await this.cancelButton.click();
   }
 
-  async clickAction() {
+  async clickAction(): Promise<void> {
     await this.actionButton.click();
   }
 }

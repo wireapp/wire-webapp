@@ -36,13 +36,24 @@ interface UseTagsManagementProps {
   commaValidationError: string;
 }
 
+type UseTagsManagementResult = {
+  allTags: ComboboxSelectOption[];
+  selectedTags: ComboboxSelectOption[];
+  isUpdatingTags: boolean;
+  isLoadingAllTags: boolean;
+  apiError: Error | null;
+  validationError: string | null;
+  handleCreateOption: (inputValue: string) => void;
+  handleChange: (value: ComboboxSelectOption | ComboboxSelectOption[]) => void;
+  handleUpdateTags: (uuid: string) => Promise<void>;
+};
 export const useTagsManagement = ({
   cellsRepository,
   fetchTagsEnabled,
   initialSelectedTags,
   onSuccess,
   commaValidationError,
-}: UseTagsManagementProps) => {
+}: UseTagsManagementProps): UseTagsManagementResult => {
   const {fireAndForgetInvoker} = useApplicationContext();
   const tagNames = useAllCellsTagsStore(state => {
     return state.tags;
@@ -87,7 +98,7 @@ export const useTagsManagement = ({
     return uniqueTagNames.map(transformTagToSelectOption);
   }, [createdTags, tagNames]);
 
-  const handleCreateOption = (inputValue: string) => {
+  const handleCreateOption = (inputValue: string): void => {
     if (inputValue.trim() === '') {
       return;
     }
@@ -108,12 +119,12 @@ export const useTagsManagement = ({
     });
   };
 
-  const handleChange = (value: ComboboxSelectOption | ComboboxSelectOption[]) => {
+  const handleChange = (value: ComboboxSelectOption | ComboboxSelectOption[]): void => {
     setSelectedTags(Array.isArray(value) ? value : [value]);
     setValidationError(null);
   };
 
-  const handleUpdateTags = async (uuid: string) => {
+  const handleUpdateTags = async (uuid: string): Promise<void> => {
     setIsUpdatingTags(true);
     await cellsRepository.setNodeTags({
       uuid,

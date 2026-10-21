@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {Button, Text} from '@wireapp/react-ui-kit';
 
 import {Config} from 'src/script/Config';
@@ -31,9 +33,9 @@ import {
   teamCreationWrapperCss,
 } from './conversationHistory.styles';
 
-export const TeamCreationBanner = () => {
+export const TeamCreationBanner: FunctionComponent = () => {
   const {translate} = useApplicationContext();
-  const navigateToUpgradePlan = () => {
+  const navigateToUpgradePlan = (): void => {
     safeWindowOpen(Config.getConfig().URL.TEAMS_BASE);
   };
 

@@ -40,7 +40,7 @@ import {showMeetingPartialAddFailureModal} from './showMeetingPartialAddFailureM
 
 setStrings({en});
 
-const createUser = (qualifiedId: {id: string; domain: string}, name: string) => {
+const createUser = (qualifiedId: {id: string; domain: string}, name: string): User => {
   const user = new User(qualifiedId.id, qualifiedId.domain, translateForTest);
   user.name(name);
   return user;

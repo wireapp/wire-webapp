@@ -32,11 +32,12 @@ export const loginWithMeetingsEnabled = (user: Pick<User, 'email' | 'password'>)
   };
 };
 
+type CreateMeetingsTeamResult = Promise<{team: Team; members: User[]; owner: User}>;
 export const createMeetingsTeam = async (
   createUser: () => Promise<User>,
   createTeam: (name: string, options: {users: User[]; features: {meetings: true; mls: true}}) => Promise<Team>,
   memberCount: number,
-) => {
+): CreateMeetingsTeamResult => {
   const members = await Promise.all(
     Array.from({length: memberCount}, () => {
       return createUser();
@@ -48,9 +49,9 @@ export const createMeetingsTeam = async (
 };
 
 export const loginMeetingsUsers = async (
-  createPage: (setup: ReturnType<typeof loginWithMeetingsEnabled>) => Promise<import('@playwright/test').Page>,
+  createPage: (setup: ReturnType<typeof loginWithMeetingsEnabled>) => Promise<Page>,
   users: Pick<User, 'email' | 'password'>[],
-) => {
+): Promise<Page[]> => {
   return Promise.all(
     users.map(user => {
       return createPage(loginWithMeetingsEnabled(user));

@@ -39,6 +39,11 @@ interface UseDraftStateProps {
   replyMessageEntityId?: string;
 }
 
+type UseDraftStateResult = {
+  reset: () => void;
+  load: () => Promise<DraftState>;
+  save: (editorState: string, text: string, replyId?: string) => Promise<void>;
+};
 export const useDraftState = ({
   conversation,
   storageRepository,
@@ -47,7 +52,7 @@ export const useDraftState = ({
   onLoad,
   editedMessageId,
   replyMessageEntityId,
-}: UseDraftStateProps) => {
+}: UseDraftStateProps): UseDraftStateResult => {
   const {fireAndForgetInvoker} = useApplicationContext();
 
   const reset = useCallback(() => {
@@ -60,7 +65,7 @@ export const useDraftState = ({
     return draftState;
   }, [conversation, messageRepository, onLoad, storageRepository]);
 
-  const save = async (editorState: string, text: string, replyId = '') => {
+  const save = async (editorState: string, text: string, replyId = ''): Promise<void> => {
     fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
       await saveDraftState({
         storageRepository,

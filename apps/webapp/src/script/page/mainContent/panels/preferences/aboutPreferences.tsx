@@ -17,7 +17,7 @@
  *
  */
 
-import {useMemo} from 'react';
+import {useMemo, type FunctionComponent} from 'react';
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 
@@ -36,7 +36,7 @@ interface AboutPreferencesProps {
   selfUser: User;
 }
 
-const AboutPreferences = ({selfUser}: AboutPreferencesProps) => {
+const AboutPreferences: FunctionComponent<AboutPreferencesProps> = ({selfUser}: AboutPreferencesProps) => {
   const {translate} = useApplicationContext();
   const config = Config.getConfig();
 

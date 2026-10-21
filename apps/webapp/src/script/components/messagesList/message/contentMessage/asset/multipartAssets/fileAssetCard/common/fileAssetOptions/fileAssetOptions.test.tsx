@@ -19,7 +19,7 @@
 
 import type {ComponentProps} from 'react';
 
-import {render, screen} from '@testing-library/react';
+import {render, screen, type RenderResult} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import {
@@ -36,7 +36,10 @@ import {isFileEditable} from 'Util/fileTypeUtil';
 
 import {FileAssetOptions} from './fileAssetOptions';
 
-const renderFileAssetOptions = (properties: ComponentProps<typeof FileAssetOptions>, {isViewer = false} = {}) => {
+const renderFileAssetOptions = (
+  properties: ComponentProps<typeof FileAssetOptions>,
+  {isViewer = false} = {},
+): RenderResult => {
   const wrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({
       translate: key => {

@@ -20,6 +20,7 @@
 import {Locator, Page} from '@playwright/test';
 
 /** POM for the "collection". This page is accessible by searching for a message within a conversation. */
+type GetSectionResult = Locator & {showAllButton: Locator};
 export class CollectionPage {
   private readonly page: Page;
   readonly component: Locator;
@@ -31,30 +32,30 @@ export class CollectionPage {
     this.searchResults = this.component.getByTestId('full-search-item');
   }
 
-  get searchInput() {
+  get searchInput(): Locator {
     return this.component.getByRole('textbox', {name: 'Search text messages'});
   }
 
-  get searchItems() {
+  get searchItems(): Locator {
     return this.component.getByTestId('full-search-item');
   }
 
-  async searchForMessages(search: string) {
+  async searchForMessages(search: string): Promise<void> {
     await this.searchInput.fill(search);
   }
 
-  getSection(type: 'Images' | 'Audio' | 'Files') {
+  getSection(type: 'Images' | 'Audio' | 'Files'): GetSectionResult {
     const section = this.component.locator('section').filter({has: this.page.locator('header', {hasText: type})});
     return Object.assign(section, {
       showAllButton: section.getByRole('button', {name: 'Show all'}),
     });
   }
 
-  get searchBar() {
+  get searchBar(): Locator {
     return this.component.getByRole('textbox', {name: 'Search text messages'});
   }
 
-  get noResultsMessage() {
+  get noResultsMessage(): Locator {
     return this.component.getByText('No results.', {exact: true});
   }
 }

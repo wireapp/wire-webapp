@@ -17,7 +17,7 @@
  *
  */
 
-import type {FormEvent} from 'react';
+import type {FormEvent, FunctionComponent} from 'react';
 
 import {Form} from '@wireapp/react-ui-kit';
 
@@ -40,7 +40,7 @@ interface GuestLinkPasswordFormProps {
   isPasswordConfirmationMarkInvalid: boolean;
 }
 
-export const GuestLinkPasswordForm = ({
+export const GuestLinkPasswordForm: FunctionComponent<GuestLinkPasswordFormProps> = ({
   translate,
   onSubmit,
   onGeneratePassword,

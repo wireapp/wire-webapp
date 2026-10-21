@@ -22,13 +22,15 @@ import {RestNode} from 'cells-sdk-ts';
 
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 
+import type {Conversation} from '../../../repositories/entity/Conversation';
+
 export const getConversationsFromNodes = async ({
   nodes,
   conversationRepository,
 }: {
   nodes?: RestNode[];
   conversationRepository: ConversationRepository;
-}) => {
+}): Promise<Conversation[]> => {
   if (nodes === undefined || nodes.length === 0) {
     return [];
   }

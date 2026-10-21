@@ -3,6 +3,6 @@
   "compilerOptions": {
     "composite": false
   },
-  "include": ["src/**/*", "test/**/*", "../server/**/*.ts"],
+  "include": ["src/**/*", "test/**/*", "../server/**/*.ts", "jest.config.ts"],
   "exclude": ["node_modules", "dist", "../server/node_modules", "../server/dist"]
 }

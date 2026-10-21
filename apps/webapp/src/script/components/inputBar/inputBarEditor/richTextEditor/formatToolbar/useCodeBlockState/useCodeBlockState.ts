@@ -24,10 +24,11 @@ import {$getSelection, $isRangeSelection, $createParagraphNode} from 'lexical';
 
 import {isCodeBlockNode} from '../common/isCodeBlockNode/isCodeBlockNode';
 
-export const useCodeBlockState = () => {
+type UseCodeBlockStateResult = {formatCodeBlock: () => void};
+export const useCodeBlockState = (): UseCodeBlockStateResult => {
   const [editor] = useLexicalComposerContext();
 
-  const formatCodeBlock = () => {
+  const formatCodeBlock = (): void => {
     editor.update(() => {
       const selection = $getSelection();
 

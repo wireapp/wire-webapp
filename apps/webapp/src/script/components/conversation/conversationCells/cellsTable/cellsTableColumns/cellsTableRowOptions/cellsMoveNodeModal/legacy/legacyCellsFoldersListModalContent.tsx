@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {isNonEmptyArray} from '@sindresorhus/is';
 
 import {CellsBreadcrumbs} from 'Components/conversation/conversationCells/common/cellsBreadcrumbs/cellsBreadcrumbs';
@@ -42,7 +44,7 @@ interface LegacyCellsFoldersListModalContentProps {
   onChangeModalContent: (content: 'move' | 'create') => void;
 }
 
-export const LegacyCellsFoldersListModalContent = ({
+export const LegacyCellsFoldersListModalContent: FunctionComponent<LegacyCellsFoldersListModalContentProps> = ({
   items,
   status,
   shouldShowLoadingSpinner,
@@ -60,12 +62,12 @@ export const LegacyCellsFoldersListModalContent = ({
 
   const shouldDisplayEmptyItems = status === 'success' && !isNonEmptyArray(items);
 
-  const handleFolderNavigate = (path: string) => {
+  const handleFolderNavigate = (path: string): void => {
     const newPath = path.split('/').slice(1).join('/');
     onPathChange(newPath);
   };
 
-  const handleBreadcrumbClick = (item: {name: string}) => {
+  const handleBreadcrumbClick = (item: {name: string}): void => {
     const path =
       breadcrumbs.find(crumb => {
         return crumb.name === item.name;

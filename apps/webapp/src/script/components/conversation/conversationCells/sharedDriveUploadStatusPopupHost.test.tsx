@@ -17,7 +17,7 @@
  *
  */
 
-import {act, render, screen, waitFor, within} from '@testing-library/react';
+import {act, render, screen, waitFor, within, type RenderResult} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {noop} from 'noop-esm';
 import type {UploadState} from 'Repositories/cells/upload';
@@ -108,7 +108,7 @@ const renderHost = (
   isEnabled = true,
   isFileTabActive = true,
   translate = translateForTest,
-) => {
+): RenderResult => {
   return render(
     <SharedDriveUploadStatusPopupHost
       controller={controller}
@@ -720,7 +720,7 @@ describe('SharedDriveUploadStatusPopupHost', () => {
   it('formats the source size in the expanded status copy', async () => {
     const user = userEvent.setup();
     const controller = createController();
-    const translate = (key: string, substitutions?: Record<string, string | number>) => {
+    const translate = (key: string, substitutions?: Record<string, string | number>): string => {
       return substitutions?.size ? `${key} ${substitutions.size}` : key;
     };
 
@@ -733,7 +733,7 @@ describe('SharedDriveUploadStatusPopupHost', () => {
   it('uses queued copy for queued uploads', async () => {
     const user = userEvent.setup();
     const controller = createController(queuedState);
-    const translate = (key: string, substitutions?: Record<string, string | number>) => {
+    const translate = (key: string, substitutions?: Record<string, string | number>): string => {
       if (substitutions?.name) {
         return `${key} ${substitutions.name}`;
       }

@@ -21,7 +21,7 @@ import {User} from '../data/user';
 import {BackendClientE2E} from './backendClient.e2e';
 
 export class IdentityProvidersRepositoryE2E extends BackendClientE2E {
-  async createIdentityProviderV2(user: User, metadata: string) {
+  async createIdentityProviderV2(user: User, metadata: string): Promise<any> {
     const response = await this.axiosInstance.post('identity-providers?api_version=v2', metadata, {
       headers: {
         Authorization: `Bearer ${user.token}`,

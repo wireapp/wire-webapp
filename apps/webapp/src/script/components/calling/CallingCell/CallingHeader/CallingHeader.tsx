@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {TabIndex, IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE, ChannelAvatar, GroupAvatar} from 'Components/avatar';
@@ -61,7 +63,7 @@ interface CallingHeaderProps {
   conversationID: string;
 }
 
-export const CallingHeader = ({
+export const CallingHeader: FunctionComponent<CallingHeaderProps> = ({
   isMeeting,
   isGroupCall,
   isChannel,

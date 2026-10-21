@@ -30,7 +30,8 @@ import {
 import {Giphy, GiphyState} from '.';
 
 const inputValue = 'Yammy yammy';
-const getDefaultProps = () => {
+type GetDefaultPropsResult = {giphyRepository: GiphyRepository; inputValue: string; onClose: jest.Mock<any, any, any>};
+const getDefaultProps = (): GetDefaultPropsResult => {
   return {
     giphyRepository: {getGifs: jest.fn().mockResolvedValue([]), resetOffset: jest.fn()} as unknown as GiphyRepository,
     inputValue,

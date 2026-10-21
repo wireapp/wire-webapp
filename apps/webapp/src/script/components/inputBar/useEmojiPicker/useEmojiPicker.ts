@@ -17,7 +17,7 @@
  *
  */
 
-import {MouseEvent, useRef, useState} from 'react';
+import {MouseEvent, useRef, useState, type RefObject} from 'react';
 
 import {useClickOutside} from 'Hooks/useClickOutside';
 
@@ -30,20 +30,28 @@ const TRIGGER_WIDTH = 40;
 const TRIGGER_HEIGHT = 32;
 const Y_OFFSET = 8;
 
-export const useEmojiPicker = ({wrapperRef, onEmojiPicked}: EmojiPickerParams) => {
+type UseEmojiPickerResult = {
+  open: boolean;
+  position: {x: number; y: number};
+  handleToggle: (event: MouseEvent<HTMLButtonElement>) => void;
+  handleClose: () => void;
+  handlePick: (emoji: string) => void;
+  ref: RefObject<HTMLDivElement | null>;
+};
+export const useEmojiPicker = ({wrapperRef, onEmojiPicked}: EmojiPickerParams): UseEmojiPickerResult => {
   const [open, setOpen] = useState(false);
 
   const emojiWrapperRef = useRef<HTMLDivElement>(null);
 
   const emojiPickerPosition = useRef<{x: number; y: number}>({x: 0, y: 0});
 
-  const handleClose = () => {
+  const handleClose = (): void => {
     if (open) {
       setOpen(false);
     }
   };
 
-  const handleToggle = (event: MouseEvent<HTMLButtonElement>) => {
+  const handleToggle = (event: MouseEvent<HTMLButtonElement>): void => {
     const rect = event.currentTarget.getBoundingClientRect();
 
     emojiPickerPosition.current = {x: rect.x + TRIGGER_WIDTH, y: rect.y - TRIGGER_HEIGHT - Y_OFFSET};

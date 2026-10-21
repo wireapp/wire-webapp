@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode} from 'react';
+import {ReactNode, type FunctionComponent} from 'react';
 
 import {Availability as AvailabilityProp} from '@wireapp/protocol-messaging';
 
@@ -69,7 +69,10 @@ interface AvailabilityIconProps {
   avatarSize: AVATAR_SIZE;
 }
 
-export const AvailabilityIcon = ({availability, avatarSize}: AvailabilityIconProps) => {
+export const AvailabilityIcon: FunctionComponent<AvailabilityIconProps> = ({
+  availability,
+  avatarSize,
+}: AvailabilityIconProps) => {
   return (
     <div css={styles.AvailabilityIcon} data-uie-name="status-availability" data-uie-value={availability}>
       {availabilityIconRenderer[availability](avatarSize)}

@@ -32,7 +32,7 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
 );
 
-const createLegalHoldMessage = (partialLegalHoldMessage: Partial<LegalHoldMessageEntity>) => {
+const createLegalHoldMessage = (partialLegalHoldMessage: Partial<LegalHoldMessageEntity>): LegalHoldMessageEntity => {
   const legalHoldMessage: Partial<LegalHoldMessageEntity> = {
     isActivationMessage: false,
     ...partialLegalHoldMessage,

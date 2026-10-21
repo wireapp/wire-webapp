@@ -34,14 +34,15 @@ interface UsePingProps {
   is1to1: boolean;
 }
 
-export const usePing = ({conversation, messageRepository, is1to1}: UsePingProps) => {
+type UsePingResult = {isPingDisabled: boolean; handlePing: () => void};
+export const usePing = ({conversation, messageRepository, is1to1}: UsePingProps): UsePingResult => {
   const {fireAndForgetInvoker, translate} = useApplicationContext();
   const [isPingDisabled, setIsPingDisabled] = useState(false);
 
   const maxUsersWithoutAlert = Config.getConfig().FEATURE.MAX_USERS_TO_PING_WITHOUT_ALERT;
   const enablePingConfirmation = Config.getConfig().FEATURE.ENABLE_PING_CONFIRMATION;
 
-  const pingConversation = () => {
+  const pingConversation = (): void => {
     setIsPingDisabled(true);
     fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
       await messageRepository.sendPing(conversation);
@@ -51,7 +52,7 @@ export const usePing = ({conversation, messageRepository, is1to1}: UsePingProps)
     });
   };
 
-  const handlePing = () => {
+  const handlePing = (): void => {
     if (isPingDisabled) {
       return;
     }

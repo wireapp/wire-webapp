@@ -27,7 +27,8 @@ import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-export const useEditMeeting = () => {
+type UseEditMeetingResult = {editMeeting: (meetingInstance: MeetingInstance) => Promise<void>};
+export const useEditMeeting = (): UseEditMeetingResult => {
   const {translate} = useApplicationContext();
   const loadMeetingForEdit = useMeetingStore(state => {
     return state.loadMeetingForEdit;

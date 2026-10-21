@@ -133,7 +133,7 @@ describe('image-asset', () => {
     return image;
   }
 
-  const createDefaultMessage = () => {
+  const createDefaultMessage = (): ContentMessage => {
     const message = new ContentMessage(undefined, translateForTest);
     mockUser.name('Test User');
     message.user(mockUser);

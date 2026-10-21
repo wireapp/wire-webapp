@@ -17,7 +17,7 @@
  *
  */
 
-import {createContext, type ReactNode, useContext} from 'react';
+import {createContext, type ReactNode, useContext, type FunctionComponent} from 'react';
 
 import {isNull} from '@sindresorhus/is';
 
@@ -30,7 +30,10 @@ interface SharedDriveUploadProviderProps {
   readonly controller: SharedDriveUploadController;
 }
 
-export const SharedDriveUploadProvider = ({children, controller}: SharedDriveUploadProviderProps) => {
+export const SharedDriveUploadProvider: FunctionComponent<SharedDriveUploadProviderProps> = ({
+  children,
+  controller,
+}: SharedDriveUploadProviderProps) => {
   return <SharedDriveUploadContext.Provider value={controller}>{children}</SharedDriveUploadContext.Provider>;
 };
 

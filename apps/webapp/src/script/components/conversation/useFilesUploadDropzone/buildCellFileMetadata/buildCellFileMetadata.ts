@@ -26,7 +26,17 @@ import {
   buildMetadataAudio,
 } from 'Repositories/assets/assetMetaDataBuilder';
 
-export const buildCellFileMetadata = async (file: File) => {
+type BuildCellFileMetadataResult = Promise<
+  | void
+  | {image: {width: number; height: number}; video?: undefined; audio?: undefined}
+  | {video: {width: number; height: number; durationInMillis: number}; image?: undefined; audio?: undefined}
+  | {
+      audio: {durationInMillis: number; normalizedLoudness: Uint8Array<ArrayBufferLike>};
+      image?: undefined;
+      video?: undefined;
+    }
+>;
+export const buildCellFileMetadata = async (file: File): BuildCellFileMetadataResult => {
   if (isImage(file)) {
     const imageMetadata = await buildMetadataImage(file);
     return {

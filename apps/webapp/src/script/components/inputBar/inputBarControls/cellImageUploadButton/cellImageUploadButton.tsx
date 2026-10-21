@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import * as Icon from 'Components/icon';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
@@ -24,7 +26,9 @@ interface CellImageUploadButtonProps {
   onClick: () => void;
 }
 
-export const CellImageUploadButton = ({onClick}: CellImageUploadButtonProps) => {
+export const CellImageUploadButton: FunctionComponent<CellImageUploadButtonProps> = ({
+  onClick,
+}: CellImageUploadButtonProps) => {
   const {translate} = useApplicationContext();
 
   return (

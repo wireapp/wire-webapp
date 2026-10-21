@@ -17,7 +17,7 @@
  *
  */
 
-import {useState, useEffect} from 'react';
+import {useState, useEffect, type FunctionComponent} from 'react';
 
 import {CSSObject} from '@emotion/react';
 
@@ -36,10 +36,15 @@ interface PaginationProps {
 
 const DEFAULT_VISIBLE_DOTS = 5;
 
-export const Pagination = ({totalPages, currentPage, onChangePage, className}: PaginationProps) => {
+export const Pagination: FunctionComponent<PaginationProps> = ({
+  totalPages,
+  currentPage,
+  onChangePage,
+  className,
+}: PaginationProps) => {
   const visibleDots = Math.min(DEFAULT_VISIBLE_DOTS, totalPages);
 
-  const calculateStartPosition = (page: number) => {
+  const calculateStartPosition = (page: number): number => {
     return Math.min(
       Math.max(0, page - Math.floor(visibleDots / visibleDotsCenterDivisor)),
       Math.max(0, totalPages - visibleDots),
@@ -57,20 +62,20 @@ export const Pagination = ({totalPages, currentPage, onChangePage, className}: P
   const isFirstPage = currentPage === 0;
   const isLastPage = currentPage === totalPages - 1;
 
-  const handlePageChange = (newPage: number) => {
+  const handlePageChange = (newPage: number): void => {
     if (newPage === currentPage) {
       return;
     }
     onChangePage(newPage);
   };
 
-  const handlePreviousPage = () => {
+  const handlePreviousPage = (): void => {
     if (!isFirstPage) {
       handlePageChange(currentPage - 1);
     }
   };
 
-  const handleNextPage = () => {
+  const handleNextPage = (): void => {
     if (!isLastPage) {
       handlePageChange(currentPage + 1);
     }

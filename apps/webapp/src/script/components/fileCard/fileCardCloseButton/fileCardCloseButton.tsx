@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {CloseIcon} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -28,7 +30,10 @@ interface FileCardCloseButtonProps {
   onClose: () => void;
 }
 
-export const FileCardCloseButton = ({label, onClose}: FileCardCloseButtonProps) => {
+export const FileCardCloseButton: FunctionComponent<FileCardCloseButtonProps> = ({
+  label,
+  onClose,
+}: FileCardCloseButtonProps) => {
   const {translate} = useApplicationContext();
   const closeButtonLabel = label ?? translate('fileCardDefaultCloseButtonLabel');
 

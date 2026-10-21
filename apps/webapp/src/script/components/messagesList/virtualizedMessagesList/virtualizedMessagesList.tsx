@@ -17,7 +17,16 @@
  *
  */
 
-import {MutableRefObject, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
+import {
+  MutableRefObject,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type FunctionComponent,
+} from 'react';
 
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isNonEmptyArray, isNumber, isUndefined} from '@sindresorhus/is';
@@ -83,7 +92,7 @@ async function loadMessagesForTimestampSelection(options: LoadMessagesForTimesta
   });
 }
 
-export const VirtualizedMessagesList = ({
+export const VirtualizedMessagesList: FunctionComponent<Props> = ({
   conversation,
   parentElement,
   assetRepository,
@@ -277,7 +286,7 @@ export const VirtualizedMessagesList = ({
     }
   }, [groupedMessages, highlightedMessage]);
 
-  const onJumpToLastMessageClick = async () => {
+  const onJumpToLastMessageClick = async (): Promise<void> => {
     setHighlightedMessage(undefined);
     conversation.initialMessage(undefined);
 

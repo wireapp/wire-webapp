@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {isNonEmptyString} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
@@ -36,7 +38,11 @@ interface EmptyConversationListProps {
   searchValue?: string;
 }
 
-export const EmptyConversationList = ({currentTab, onChangeTab, searchValue = ''}: EmptyConversationListProps) => {
+export const EmptyConversationList: FunctionComponent<EmptyConversationListProps> = ({
+  currentTab,
+  onChangeTab,
+  searchValue = '',
+}: EmptyConversationListProps) => {
   const {translate} = useApplicationContext();
 
   if (currentTab === SidebarTabs.RECENT || currentTab === SidebarTabs.FOLDER) {
@@ -194,7 +200,9 @@ type ConnectWithNewUsersButtonProps = {
   onClick: () => void;
 };
 
-const ConnectWithNewUsersButton = ({onClick}: ConnectWithNewUsersButtonProps) => {
+const ConnectWithNewUsersButton: FunctionComponent<ConnectWithNewUsersButtonProps> = ({
+  onClick,
+}: ConnectWithNewUsersButtonProps) => {
   const {translate} = useApplicationContext();
 
   return (

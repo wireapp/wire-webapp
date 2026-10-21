@@ -29,7 +29,7 @@ import {translateForTest} from 'Util/test/translateForTest';
 
 import {mapMeetingInstanceToScheduleFormState} from './mapMeetingInstanceToScheduleFormState';
 
-const createUser = (id: string) => {
+const createUser = (id: string): User => {
   const user = new User(id, 'example.com', translateForTest);
   user.name(`User ${id}`);
   return user;

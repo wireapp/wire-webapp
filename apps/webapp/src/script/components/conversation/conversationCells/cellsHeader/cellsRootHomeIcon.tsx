@@ -17,9 +17,11 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {rootHomeIconStyles} from './cellsHeader.styles';
 
-export const CellsRootHomeIcon = () => {
+export const CellsRootHomeIcon: FunctionComponent = () => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

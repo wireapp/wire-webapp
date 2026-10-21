@@ -17,9 +17,10 @@
  *
  */
 
-import React, {useRef, useState} from 'react';
+import React, {useRef, useState, type FunctionComponent} from 'react';
 
 import {isEmptyString, isNull} from '@sindresorhus/is';
+import type {ChangePassword} from '@wireapp/api-client/lib/self';
 import {connect} from 'react-redux';
 import {Navigate, useNavigate} from 'react-router';
 import {AnyAction, Dispatch} from 'redux';
@@ -36,13 +37,13 @@ import {Config} from '../../Config';
 import {Exception} from '../component/exception';
 import {actionRoot} from '../module/action';
 import {ValidationError} from '../module/action/validationError';
-import {RootState, bindActionCreators} from '../module/reducer';
+import {RootState, bindActionCreators, type ThunkAction} from '../module/reducer';
 import * as SelfSelector from '../module/selector/selfSelector';
 import {ROUTE} from '../route';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
-const SetPasswordComponent = ({
+const SetPasswordComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> = ({
   isSelfSSOUser,
   hasSelfPassword,
   doSetPassword,
@@ -145,7 +146,8 @@ const SetPasswordComponent = ({
 };
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
-const mapStateToProps = (state: RootState) => {
+type MapStateToPropsResult = {hasSelfPassword: boolean; isFetching: boolean; isSelfSSOUser: boolean};
+const mapStateToProps = (state: RootState): MapStateToPropsResult => {
   return {
     hasSelfPassword: SelfSelector.hasSelfPassword(state),
     isFetching: SelfSelector.isFetching(state),
@@ -154,7 +156,8 @@ const mapStateToProps = (state: RootState) => {
 };
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => {
+type MapDispatchToPropsResult = {doSetPassword: (changePassword: ChangePassword) => ThunkAction};
+const mapDispatchToProps = (dispatch: Dispatch<AnyAction>): MapDispatchToPropsResult => {
   return bindActionCreators(
     {
       doSetPassword: actionRoot.selfAction.doSetPassword,

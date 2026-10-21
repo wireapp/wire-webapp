@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {useAutoAnimate} from '@formkit/auto-animate/react';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {container} from 'tsyringe';
@@ -39,7 +41,11 @@ interface FilePreviewsProps {
   conversationQualifiedId: QualifiedId;
 }
 
-export const FilePreviews = ({files, conversationId, conversationQualifiedId}: FilePreviewsProps) => {
+export const FilePreviews: FunctionComponent<FilePreviewsProps> = ({
+  files,
+  conversationId,
+  conversationQualifiedId,
+}: FilePreviewsProps) => {
   const [wrapperRef] = useAutoAnimate();
 
   return (
@@ -65,7 +71,7 @@ interface FilePreviewProps {
   conversationQualifiedId: QualifiedId;
 }
 
-const FilePreview = ({
+const FilePreview: FunctionComponent<FilePreviewProps> = ({
   file,
   cellsRepository = container.resolve(CellsRepository),
   conversationId,

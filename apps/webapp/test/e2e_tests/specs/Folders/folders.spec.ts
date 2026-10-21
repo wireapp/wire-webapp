@@ -29,7 +29,11 @@ import {connectWithUser, createGroup} from 'test/e2e_tests/utils/userActions';
  * @param conversationName Name of the conversation to move into the folder
  * @param folderName Name of the new folder to create
  */
-async function createCustomFolder(pageManager: PageManager, conversationName: string, folderName: string) {
+async function createCustomFolder(
+  pageManager: PageManager,
+  conversationName: string,
+  folderName: string,
+): Promise<void> {
   const {pages, modals} = pageManager.webapp;
   const contextMenu = await pages.conversationList().getConversation(conversationName).openContextMenu();
   await contextMenu.moveToButton.click();
@@ -45,7 +49,11 @@ async function createCustomFolder(pageManager: PageManager, conversationName: st
  * @param conversationName Name of the conversation to move into existing folder
  * @param folderName Name of the folder to move to
  */
-async function moveConversationToFolder(pageManager: PageManager, conversationName: string, folderName: string) {
+async function moveConversationToFolder(
+  pageManager: PageManager,
+  conversationName: string,
+  folderName: string,
+): Promise<void> {
   const pages = pageManager.webapp.pages;
   const contextMenu = await pages.conversationList().getConversation(conversationName).openContextMenu();
   await contextMenu.moveToButton.click();

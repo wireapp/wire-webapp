@@ -17,7 +17,7 @@
  *
  */
 
-import type {ReactNode} from 'react';
+import type {ReactNode, FunctionComponent} from 'react';
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Maybe} from 'true-myth';
@@ -49,7 +49,7 @@ interface LinkTextProps {
   label: string;
 }
 
-const LinkText = ({dataUieName, onClick, label}: LinkTextProps) => {
+const LinkText: FunctionComponent<LinkTextProps> = ({dataUieName, onClick, label}: LinkTextProps) => {
   return (
     <Link
       variant={LinkVariant.PRIMARY}
@@ -145,7 +145,10 @@ function renderE2EITranslation(options: RenderE2EITranslationOptions): ReactNode
   );
 }
 
-export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificationMessageProps) => {
+export const E2EIVerificationMessage: FunctionComponent<E2EIVerificationMessageProps> = ({
+  message,
+  conversation,
+}: E2EIVerificationMessageProps) => {
   const {translate} = useApplicationContext();
   const {messageType, userIds = []} = message;
 
@@ -182,7 +185,7 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
   const isRevoked = messageType === E2EIVerificationMessageType.REVOKED;
   const isNoLongerVerified = messageType === E2EIVerificationMessageType.NO_LONGER_VERIFIED;
 
-  const getCertificate = async () => {
+  const getCertificate = async (): Promise<void> => {
     try {
       await E2EIHandler.getInstance().enroll({resetTimers: true});
     } catch (error: unknown) {

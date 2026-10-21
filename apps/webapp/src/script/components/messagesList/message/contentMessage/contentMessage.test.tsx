@@ -97,7 +97,7 @@ describe('message', () => {
     const quoteAsset = new Text('', textValue);
     spyOn(quoteAsset, 'render').and.returnValue(`<span>${quoteText}</span>`);
     quotedMessage.assets.push(quoteAsset);
-    const findMessage = () => {
+    const findMessage = (): Promise<ContentMessage> => {
       return Promise.resolve(quotedMessage);
     };
 

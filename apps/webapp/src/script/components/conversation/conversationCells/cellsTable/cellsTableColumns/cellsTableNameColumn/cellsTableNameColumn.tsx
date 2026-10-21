@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {FolderIcon, PlayIcon} from '@wireapp/react-ui-kit';
 
 import {FileTypeIcon} from 'Components/conversation/common/fileTypeIcon/fileTypeIcon';
@@ -40,7 +42,10 @@ interface CellsTableNameColumnProps {
   onCloseSearchView?: () => void;
 }
 
-export const CellsTableNameColumn = ({node, onCloseSearchView}: CellsTableNameColumnProps) => {
+export const CellsTableNameColumn: FunctionComponent<CellsTableNameColumnProps> = ({
+  node,
+  onCloseSearchView,
+}: CellsTableNameColumnProps) => {
   return (
     <>
       <span css={mobileNameStyles}>{node.name}</span>
@@ -55,7 +60,7 @@ export const CellsTableNameColumn = ({node, onCloseSearchView}: CellsTableNameCo
   );
 };
 
-const FileNameColumn = ({file}: {file: CellFile}) => {
+const FileNameColumn: FunctionComponent<{file: CellFile}> = ({file}: {file: CellFile}) => {
   const {id, handleOpenFile, selectedFile} = useCellsFilePreviewModal();
 
   const isImage = file.mimeType?.startsWith('image') === true;
@@ -91,15 +96,11 @@ const FileNameColumn = ({file}: {file: CellFile}) => {
   );
 };
 
-const FolderNameColumn = ({
-  name,
-  path,
-  onCloseSearchView,
-}: {
+const FolderNameColumn: FunctionComponent<{
   name: string;
   path: string;
   onCloseSearchView?: () => void;
-}) => {
+}> = ({name, path, onCloseSearchView}: {name: string; path: string; onCloseSearchView?: () => void}) => {
   return (
     <>
       <FolderIcon width={24} height={24} />

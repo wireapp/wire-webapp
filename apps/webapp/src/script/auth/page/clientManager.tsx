@@ -17,9 +17,10 @@
  *
  */
 
-import React, {useEffect} from 'react';
+import React, {useEffect, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
+import type {RegisteredClient} from '@wireapp/api-client/lib/client';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 
@@ -33,13 +34,16 @@ import {Page} from './page';
 import {Config} from '../../Config';
 import {ClientList} from '../component/clientList';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
-import {RootState, bindActionCreators} from '../module/reducer';
+import {RootState, bindActionCreators, type ThunkAction} from '../module/reducer';
 import {QUERY_KEY} from '../route';
 import {getEnterpriseLoginV2FF} from '../util/helpers';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
-const ClientManagerComponent = ({doGetAllClients, doLogout}: Props & ConnectedProps & DispatchProps) => {
+const ClientManagerComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> = ({
+  doGetAllClients,
+  doLogout,
+}: Props & ConnectedProps & DispatchProps) => {
   const {translate} = useApplicationContext();
   const SFAcode = localStorage.getItem(QUERY_KEY.CONVERSATION_CODE);
   const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE);
@@ -67,7 +71,7 @@ const ClientManagerComponent = ({doGetAllClients, doLogout}: Props & ConnectedPr
     }
   }, [SFAcode, doGetAllClients, startTimeout]);
 
-  const logout = async () => {
+  const logout = async (): Promise<void> => {
     try {
       await doLogout();
     } catch {
@@ -122,7 +126,11 @@ const mapStateToProps = (): RootState extends never ? never : {} => {
 };
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => {
+type MapDispatchToPropsResult = {
+  doGetAllClients: () => ThunkAction<Promise<RegisteredClient[]>>;
+  doLogout: () => ThunkAction;
+};
+const mapDispatchToProps = (dispatch: Dispatch<AnyAction>): MapDispatchToPropsResult => {
   return bindActionCreators(
     {
       doGetAllClients: ROOT_ACTIONS.clientAction.doGetAllClients,

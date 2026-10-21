@@ -17,9 +17,11 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {wrapperStyles, errorStyles} from './fileCardError.styles';
 
-export const FileCardError = () => {
+export const FileCardError: FunctionComponent = () => {
   return (
     <div css={wrapperStyles}>
       <div css={errorStyles} />

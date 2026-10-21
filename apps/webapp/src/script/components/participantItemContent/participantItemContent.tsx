@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import React, {type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 import ko from 'knockout';
@@ -56,7 +56,7 @@ interface ParticipantItemContentProps {
 
 const servicePlaceholder = {isBlocked: ko.observable(false)};
 
-export const ParticipantItemContent = ({
+export const ParticipantItemContent: FunctionComponent<ParticipantItemContentProps> = ({
   groupId,
   participant,
   shortDescription = '',

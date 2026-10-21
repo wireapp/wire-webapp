@@ -17,7 +17,7 @@
  *
  */
 
-import type {ReactElement, ChangeEvent, FormEvent} from 'react';
+import type {ReactElement, ChangeEvent, FormEvent, FunctionComponent} from 'react';
 
 import {Input} from '@wireapp/react-ui-kit';
 
@@ -34,7 +34,7 @@ interface PasswordAdvancedSecurityFormProps {
   error?: ReactElement;
 }
 
-export const PasswordAdvancedSecurityForm = ({
+export const PasswordAdvancedSecurityForm: FunctionComponent<PasswordAdvancedSecurityFormProps> = ({
   translate,
   onSubmit,
   inputValue,

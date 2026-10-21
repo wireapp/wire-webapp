@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
@@ -35,12 +37,12 @@ interface EmailInputProps {
 
 const logger = getLogger('EmailInput');
 
-const EmailInput = ({email, canEditProfile, userRepository}: EmailInputProps) => {
+const EmailInput: FunctionComponent<EmailInputProps> = ({email, canEditProfile, userRepository}: EmailInputProps) => {
   const emailInputDone = useInputDone();
   const {translate} = useApplicationContext();
 
   const changeEmail = async (enteredEmail: string): Promise<void> => {
-    const showWarning = (title: string, message: string) => {
+    const showWarning = (title: string, message: string): void => {
       PrimaryModal.show(
         PrimaryModal.type.ACKNOWLEDGE,
         {

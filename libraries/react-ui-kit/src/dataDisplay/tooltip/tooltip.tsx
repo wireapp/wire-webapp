@@ -17,7 +17,16 @@
  *
  */
 
-import {HTMLProps, MouseEvent, FocusEvent, ReactNode, useRef, useState, type FunctionComponent} from 'react';
+import {
+  HTMLProps,
+  MouseEvent,
+  FocusEvent,
+  ReactNode,
+  ReactPortal,
+  useRef,
+  useState,
+  type FunctionComponent,
+} from 'react';
 
 import {CSSObject} from '@emotion/react';
 import {isNullOrUndefined} from '@sindresorhus/is';
@@ -122,11 +131,7 @@ interface PortalProps {
   selector?: string;
 }
 
-const PortalComponent = ({
-  children,
-  wrapperRect,
-  selector = '#wire-app',
-}: PortalProps): import('react').ReactPortal | null => {
+const PortalComponent = ({children, wrapperRect, selector = '#wire-app'}: PortalProps): ReactPortal | null => {
   const [isTouchingTop, setIsTouchingTop] = useState(false);
   const targetElement = document.querySelector(selector);
 

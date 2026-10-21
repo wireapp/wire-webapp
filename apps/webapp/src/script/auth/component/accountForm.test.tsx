@@ -29,13 +29,13 @@ import {mountComponent} from '../util/test/testUtil';
 describe('when entering account data', () => {
   let wrapper: RenderResult;
 
-  const nameInput = () => {
+  const nameInput = (): HTMLInputElement => {
     return wrapper.getByTestId('enter-name') as HTMLInputElement;
   };
-  const doNextButton = () => {
+  const doNextButton = (): HTMLButtonElement => {
     return wrapper.getByTestId('do-next') as HTMLButtonElement;
   };
-  const validationErrorMessage = () => {
+  const validationErrorMessage = (): HTMLElement => {
     return wrapper.getByTestId('error-message');
   };
 

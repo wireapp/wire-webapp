@@ -17,9 +17,11 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {loaderIconStyles, wrapperStyles} from './FileLoader.styles';
 
-export const FileLoader = () => {
+export const FileLoader: FunctionComponent = () => {
   return (
     <div css={wrapperStyles}>
       <div className="icon-spinner spin" css={loaderIconStyles} />

@@ -28,11 +28,11 @@ export class OptionsPage {
     this.notificationsRadioGroup = page.getByRole('group', {name: 'Notifications'}).getByRole('radiogroup');
   }
 
-  async setSoundAlerts(option: 'All' | 'Some' | 'None') {
+  async setSoundAlerts(option: 'All' | 'Some' | 'None'): Promise<void> {
     await this.soundAlertsRadioGroup.locator('label', {hasText: option}).click();
   }
 
-  async setNotifications(option: 'Show sender and message' | 'Show sender' | 'Hide details' | 'Off') {
+  async setNotifications(option: 'Show sender and message' | 'Show sender' | 'Hide details' | 'Off'): Promise<void> {
     // Radio groups in Wire are not a11y compliant so we need to click them since checking doesn't work
     await this.notificationsRadioGroup.locator('label', {hasText: new RegExp(`^${option}$`)}).click();
   }

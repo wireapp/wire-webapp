@@ -30,14 +30,15 @@ import {isHeadingNode} from '../common/isHeadingNode/isHeadingNode';
 
 const INSERT_HEADING_COMMAND = createCommand();
 
-export const useHeadingState = () => {
+type UseHeadingStateResult = {formatHeading: () => void};
+export const useHeadingState = (): UseHeadingStateResult => {
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {
     return editor.registerCommand(INSERT_HEADING_COMMAND, headingCommand, 0);
   }, [editor]);
 
-  const formatHeading = () => {
+  const formatHeading = (): void => {
     editor.update(() => {
       const selection = $getSelection();
 

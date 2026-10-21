@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {isNonEmptyString} from '@sindresorhus/is';
 
 import {Tooltip} from '@wireapp/react-ui-kit';
@@ -35,7 +37,7 @@ interface ParticipantAvatarTooltipProps {
   avatarRingColor?: string;
 }
 
-export const ParticipantAvatarTooltip = ({
+export const ParticipantAvatarTooltip: FunctionComponent<ParticipantAvatarTooltipProps> = ({
   participant,
   getLabel,
   index = 0,

@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {Button, Column, Columns, Container, H3, Modal, Text} from '@wireapp/react-ui-kit';
 
 import {useSingleInstance} from 'src/script/hooks/useSingleInstance';
@@ -27,7 +29,7 @@ import {Config} from '../../Config';
 interface AppAlreadyOpenProps {
   fullscreen?: boolean;
 }
-export const AppAlreadyOpen = ({fullscreen}: AppAlreadyOpenProps) => {
+export const AppAlreadyOpen: FunctionComponent<AppAlreadyOpenProps> = ({fullscreen}: AppAlreadyOpenProps) => {
   const {clock, translate} = useApplicationContext();
   const {hasOtherInstance, killRunningInstance} = useSingleInstance(clock);
   if (!hasOtherInstance) {

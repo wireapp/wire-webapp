@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {container} from 'tsyringe';
 
@@ -41,7 +43,7 @@ interface DetachedCallingCellProps {
   userState?: UserState;
 }
 
-export const DetachedCallingCell = ({
+export const DetachedCallingCell: FunctionComponent<DetachedCallingCellProps> = ({
   propertiesRepository,
   callingRepository,
   fireAndForgetInvoker,

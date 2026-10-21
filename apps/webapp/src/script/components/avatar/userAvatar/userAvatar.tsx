@@ -17,7 +17,7 @@
  *
  */
 
-import {MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent} from 'react';
+import {MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 import {container} from 'tsyringe';
@@ -70,7 +70,7 @@ const getIconSize = (size: AVATAR_SIZE): string => {
   return '16px';
 };
 
-export const UserAvatar = ({
+export const UserAvatar: FunctionComponent<UserAvatarProps> = ({
   participant,
   avatarSize,
   avatarAlt = '',

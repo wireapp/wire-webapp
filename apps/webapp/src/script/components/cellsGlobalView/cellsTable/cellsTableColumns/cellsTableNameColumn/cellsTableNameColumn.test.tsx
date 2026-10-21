@@ -17,7 +17,7 @@
  *
  */
 
-import {render} from '@testing-library/react';
+import {render, type RenderResult} from '@testing-library/react';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
@@ -58,7 +58,7 @@ const renderNameColumn = ({
   selfUserDriveRole = CELLS_SELF_USER_DRIVE_ROLE.VIEWER,
 }: {
   selfUserDriveRole?: CellFile['selfUserDriveRole'];
-} = {}) => {
+} = {}): RenderResult => {
   const portalRoot = document.createElement('div');
   portalRoot.id = 'wire-app';
   document.body.append(portalRoot);

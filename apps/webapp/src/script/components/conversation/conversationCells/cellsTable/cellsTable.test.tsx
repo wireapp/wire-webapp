@@ -41,6 +41,7 @@ import {
   CellsSelfUserDriveRoleProvider,
   CellsSelfUserDriveRole,
 } from '../common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
+import type {JSX} from '@emotion/react/jsx-runtime';
 
 const selectionTranslations: Partial<Record<TranslationKey, string>> = {
   'cells.selection.clear': 'Clear selection',
@@ -107,6 +108,16 @@ const createDataTransfer = (files: readonly File[]): DataTransfer => {
   } as unknown as DataTransfer;
 };
 
+type RenderCellsTableResult = {
+  file: CellNode;
+  folder: CellNode;
+  onDropFilesToFolder: (files: readonly File[], uploadPath: string) => void;
+  onDropReadError: () => void;
+  onFolderDropTargetChange: (folderName: string | null) => void;
+  rerenderWithResetKey: (resetKey: number) => void;
+  rerenderWithSelectionScope: (scopeKey: string, isSelectionEnabled?: boolean) => void;
+  rerenderWithNodes: (nodes: CellNode[]) => void;
+};
 const renderCellsTable = ({
   folderPath = 'conversation-id@example.com/Marketing/images',
   onDropFilesToFolder = jest.fn(),
@@ -129,7 +140,7 @@ const renderCellsTable = ({
   readonly isBulkActionsEnabled?: boolean;
   readonly cellsRepository?: CellsRepository;
   readonly selfUserDriveRole?: CellsSelfUserDriveRole;
-} = {}) => {
+} = {}): RenderCellsTableResult => {
   const wrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({
       translate: translateSelectionForTest,
@@ -153,7 +164,7 @@ const renderCellsTable = ({
     scopeKey = selectionScopeKey,
     isSelectionEnabled = selectionEnabled,
     nodes = [folder, file],
-  ) => {
+  ): JSX.Element => {
     return (
       <ThemeProvider>
         <CellsSelfUserDriveRoleProvider selfUserDriveRole={selfUserDriveRole}>

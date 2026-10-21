@@ -57,23 +57,23 @@ export class ParticipantDetails {
     this.devicesButton = this.page.getByRole('button', {name: 'Show Devices'});
   }
 
-  async blockUser() {
+  async blockUser(): Promise<void> {
     await this.block.click();
   }
 
-  getUserEmailLocator(email: string) {
+  getUserEmailLocator(email: string): Locator {
     return this.page.getByTestId('item-enriched-value').and(this.page.locator(`[data-uie-value="${email}"]`));
   }
 
-  async closeParticipantDetails() {
+  async closeParticipantDetails(): Promise<void> {
     await this.closeButton.click();
   }
 
-  async sendConnectRequest() {
+  async sendConnectRequest(): Promise<void> {
     await this.connectButton.click();
   }
 
-  async removeFromGroup() {
+  async removeFromGroup(): Promise<void> {
     await this.removeFromGroupButton.click();
     await new ConfirmModal(this.page).actionButton.click();
   }

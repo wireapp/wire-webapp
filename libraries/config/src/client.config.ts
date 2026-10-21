@@ -20,6 +20,8 @@
 import {ConfigGeneratorParams} from './config.types';
 import {Env} from './env';
 
+// The configuration contract is intentionally inferred and exposed through ReturnType<typeof generateConfig>.
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export function generateConfig(params: ConfigGeneratorParams, env: Env) {
   const {assetVersion, urls, version, env: nodeEnv} = params;
   return {
@@ -47,9 +49,9 @@ export function generateConfig(params: ConfigGeneratorParams, env: Env) {
     MAX_API_VERSION: Number(env.MAX_API_VERSION) || 17,
     ENVIRONMENT: nodeEnv,
     FEATURE: {
-      ALLOWED_FILE_UPLOAD_EXTENSIONS: (env.FEATURE_ALLOWED_FILE_UPLOAD_EXTENSIONS || '*')
-        .split(',')
-        .map(extension => extension.trim()),
+      ALLOWED_FILE_UPLOAD_EXTENSIONS: (env.FEATURE_ALLOWED_FILE_UPLOAD_EXTENSIONS || '*').split(',').map(extension => {
+        return extension.trim();
+      }),
       ALLOW_LINK_PREVIEWS: env.FEATURE_ALLOW_LINK_PREVIEWS == 'true',
       APPLOCK_SCHEDULED_TIMEOUT: env.FEATURE_APPLOCK_SCHEDULED_TIMEOUT
         ? Number(env.FEATURE_APPLOCK_SCHEDULED_TIMEOUT)

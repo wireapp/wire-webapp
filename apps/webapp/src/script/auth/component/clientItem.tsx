@@ -28,6 +28,7 @@ import {
   useState,
   MouseEvent,
   KeyboardEvent,
+  type FunctionComponent,
 } from 'react';
 
 import {isNonEmptyString, isNull, isUndefined} from '@sindresorhus/is';
@@ -65,7 +66,14 @@ interface Props extends HTMLProps<HTMLDivElement> {
   clientError?: Error;
 }
 
-const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, requirePassword}: Props) => {
+const ClientItem: FunctionComponent<Props> = ({
+  selected,
+  onClientRemoval,
+  onClick,
+  client,
+  clientError,
+  requirePassword,
+}: Props) => {
   const {translate} = useApplicationContext();
   const passwordInput = useRef<HTMLInputElement>(null);
 
@@ -88,7 +96,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
   const [validationError, setValidationError] = useState<ValidationError | null>(null);
   const [isOpen, setIsOpen] = useState(requirePassword && (isSelected || isAnimating));
 
-  const formatId = (id = '?') => {
+  const formatId = (id = '?'): string => {
     return splitFingerprint(id).join(' ');
   };
 
@@ -165,7 +173,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
     return '?';
   };
 
-  const resetState = () => {
+  const resetState = (): void => {
     setAnimationStep(selected ? animationSteps : 0);
     setIsAnimating(false);
   };
@@ -175,7 +183,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
     onClick(event);
   };
 
-  const onWrapperEnter = (event: KeyboardEvent) => {
+  const onWrapperEnter = (event: KeyboardEvent): void => {
     if (!isEnterKey(event)) {
       return;
     }
@@ -238,7 +246,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
       });
   };
 
-  const onPasswordChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const onPasswordChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setPassword(event.target.value);
     setIsValidPassword(true);
   };

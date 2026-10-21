@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import * as Icon from 'Components/icon';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
@@ -25,7 +27,7 @@ interface PingButtonProps {
   isDisabled: boolean;
 }
 
-export const PingButton = ({isDisabled, onClick}: PingButtonProps) => {
+export const PingButton: FunctionComponent<PingButtonProps> = ({isDisabled, onClick}: PingButtonProps) => {
   const {translate} = useApplicationContext();
 
   return (

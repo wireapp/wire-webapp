@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, type FunctionComponent} from 'react';
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
 
@@ -33,7 +33,7 @@ interface TopContactProps {
   user: User;
 }
 
-const TopContact = ({user, clickOnUser}: TopContactProps) => {
+const TopContact: FunctionComponent<TopContactProps> = ({user, clickOnUser}: TopContactProps) => {
   const {name, connection} = useKoSubscribableChildren(user, ['name', 'connection']);
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>();
 

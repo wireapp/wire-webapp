@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useRef} from 'react';
+import {useEffect, useRef, type FunctionComponent} from 'react';
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {createRoot, Root} from 'react-dom/client';
@@ -78,7 +78,8 @@ let roots: Record<string, Root> = {};
  * ```
  *
  */
-export const useAppNotification = (props?: AppNotificationOptions) => {
+type UseAppNotificationResult = {show: (options?: Pick<AppNotificationOptions, 'message'>) => void; close: () => void};
+export const useAppNotification = (props?: AppNotificationOptions): UseAppNotificationResult => {
   const notificationId = useRef<string | number | null>(null);
 
   const activeWindow = !isNullOrUndefined(props?.activeWindow) ? props.activeWindow : window;
@@ -130,7 +131,7 @@ export const useAppNotification = (props?: AppNotificationOptions) => {
   };
 };
 
-const injectToaster = (activeWindow: Window) => {
+const injectToaster = (activeWindow: Window): void => {
   const windowKey = isNonEmptyString(activeWindow.name) ? activeWindow.name : 'default';
 
   if (roots[windowKey] !== undefined) {
@@ -153,7 +154,7 @@ const injectToaster = (activeWindow: Window) => {
 // Clear all roots to prevent memory leaks.
 // Necessary, when the activeWindow changes (e.g. switching from the main window to the detached call window).
 // Without cleaning the roots (unmounting) the <Toaster /> from the DOM note, would be rendered in both windows.
-const clearRoots = () => {
+const clearRoots = (): void => {
   Object.entries(roots).forEach(([, rootEntry]) => {
     rootEntry.unmount();
   });
@@ -164,7 +165,12 @@ interface AppNotificationProps extends Pick<AppNotificationOptions, 'message' | 
   onClose?: () => void;
 }
 
-const AppNotification = ({message, icon: Icon, withCloseButton, onClose}: AppNotificationProps) => {
+const AppNotification: FunctionComponent<AppNotificationProps> = ({
+  message,
+  icon: Icon,
+  withCloseButton,
+  onClose,
+}: AppNotificationProps) => {
   return (
     <div className="app-notification">
       {Icon !== undefined && <Icon className="app-notification__icon" />}

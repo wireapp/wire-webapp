@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect} from 'react';
+import React, {useEffect, type FunctionComponent} from 'react';
 
 import {amplify} from 'amplify';
 
@@ -58,7 +58,7 @@ const showNotification = (
   type: string,
   aggregatedNotifications: Notification[],
   translate: ReturnType<typeof useApplicationContext>['translate'],
-) => {
+): void => {
   switch (type) {
     case PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT: {
       PrimaryModal.show(
@@ -97,7 +97,13 @@ const showNotification = (
 
 const NEW_DEVICE_NOTIFICATION_STATES = [ContentState.PREFERENCES_ACCOUNT, ContentState.PREFERENCES_DEVICES];
 
-const PreferenceItem = ({onSelect, isSelected, label, uieName, IconComponent}: PreferencesItemProps) => {
+const PreferenceItem: FunctionComponent<PreferencesItemProps> = ({
+  onSelect,
+  isSelected,
+  label,
+  uieName,
+  IconComponent,
+}: PreferencesItemProps) => {
   return (
     <li
       role="tab"
@@ -121,7 +127,7 @@ const PreferenceItem = ({onSelect, isSelected, label, uieName, IconComponent}: P
   );
 };
 
-const Preferences = ({
+const Preferences: FunctionComponent<PreferencesProps> = ({
   teamRepository,
   preferenceNotificationRepository,
   onPreferenceItemClick,

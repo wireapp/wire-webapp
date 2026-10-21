@@ -17,7 +17,7 @@
  *
  */
 
-import {fireEvent, render} from '@testing-library/react';
+import {fireEvent, render, type RenderResult} from '@testing-library/react';
 
 import {VIDEO_STATE} from '@wireapp/avs';
 
@@ -39,14 +39,14 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
 );
 
-const createParticipant = (name: string) => {
+const createParticipant = (name: string): Participant => {
   const user = new User(createUuid(), '', translateForTest);
   user.name(name);
 
   return new Participant(user, `client-${name}`);
 };
 
-const createMediaStream = () => {
+const createMediaStream = (): MediaStream => {
   return {
     getVideoTracks: jest.fn(() => {
       return [];
@@ -54,7 +54,8 @@ const createMediaStream = () => {
   } as unknown as MediaStream;
 };
 
-const createProcessedVideoStream = (stream: MediaStream) => {
+type CreateProcessedVideoStreamResult = {stream: MediaStream; release: jest.Mock<any, any, any>};
+const createProcessedVideoStream = (stream: MediaStream): CreateProcessedVideoStreamResult => {
   return {
     stream,
     release: jest.fn(),
@@ -67,7 +68,7 @@ const renderComponent = ({
 }: {
   participant?: Participant;
   selfParticipant?: Participant;
-} = {}) => {
+} = {}): RenderResult => {
   return render(
     <GroupVideoGridTile
       minimized={false}

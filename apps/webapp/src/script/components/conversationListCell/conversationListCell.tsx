@@ -24,6 +24,7 @@ import React, {
   useCallback,
   useRef,
   useState,
+  type FunctionComponent,
 } from 'react';
 
 import {CSSObject} from '@emotion/react';
@@ -67,7 +68,7 @@ interface ConversationListCellProps {
   registerConversationElement?: RegisterConversationElement;
 }
 
-export const ConversationListCell = ({
+export const ConversationListCell: FunctionComponent<ConversationListCellProps> = ({
   showJoinButton,
   conversation,
   onJoinCall,
@@ -172,13 +173,13 @@ export const ConversationListCell = ({
   // Button is disabled if either local state or call state indicates joining
   const isButtonDisabled = isJoiningCallRef.current || isCallConnecting;
 
-  const openContextMenu = (event: MouseEvent | React.MouseEvent<Element, MouseEvent>) => {
+  const openContextMenu = (event: MouseEvent | React.MouseEvent<Element, MouseEvent>): void => {
     event.stopPropagation();
     event.preventDefault();
     rightClick(conversation, event);
   };
 
-  const handleJoinCall = async (event: React.MouseEvent) => {
+  const handleJoinCall = async (event: React.MouseEvent): Promise<void> => {
     event.preventDefault();
 
     // Check ref first for immediate synchronous protection
@@ -200,7 +201,7 @@ export const ConversationListCell = ({
     }
   };
 
-  const handleDivKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+  const handleDivKeyDown = (event: React.KeyboardEvent<HTMLDivElement>): void => {
     if (event.key === KEY.SPACE || event.key === KEY.ENTER) {
       onClick(event);
     } else if (isKey(event, KEY.ARROW_RIGHT)) {
@@ -213,7 +214,7 @@ export const ConversationListCell = ({
     handleArrowKeyDown(event);
   };
 
-  const handleContextKeyDown = (event: React.KeyboardEvent) => {
+  const handleContextKeyDown = (event: React.KeyboardEvent): void => {
     if (event.key === KEY.SPACE || event.key === KEY.ENTER) {
       const newEvent = setContextMenuPosition(event);
       rightClick(conversation, newEvent);

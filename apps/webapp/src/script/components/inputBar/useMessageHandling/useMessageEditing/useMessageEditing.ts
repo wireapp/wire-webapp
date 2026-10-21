@@ -26,7 +26,13 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 
-export const useMessageEditing = () => {
+type UseMessageEditingResult = {
+  editedMessage: ContentMessage | undefined;
+  editMessage: (messageEntity: ContentMessage) => void;
+  isEditing: boolean;
+  cancelMessageEditing: (callback?: () => void) => void;
+};
+export const useMessageEditing = (): UseMessageEditingResult => {
   const [editedMessage, setEditedMessage] = useState<ContentMessage | undefined>();
 
   const cancelMessageEditing = useCallback((callback?: () => void) => {

@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import React, {type FunctionComponent} from 'react';
 
 import {User} from 'Repositories/entity/User';
 
@@ -31,7 +31,7 @@ interface TopPeopleProps {
   users: User[];
 }
 
-const TopPeople = ({clickOnUser, max, users}: TopPeopleProps) => {
+const TopPeople: FunctionComponent<TopPeopleProps> = ({clickOnUser, max, users}: TopPeopleProps) => {
   max ??= defaultTopPeopleLimit;
   const displayedUsers = users.slice(0, max);
   const searchListItems = displayedUsers.map(user => {

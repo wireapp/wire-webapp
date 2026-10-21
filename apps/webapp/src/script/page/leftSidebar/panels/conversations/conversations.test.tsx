@@ -52,7 +52,7 @@ import {translateForTest} from 'Util/test/translateForTest';
 
 type ConversationsProps = React.ComponentProps<typeof Conversations>;
 
-const create1to1Conversation = (userName: string) => {
+const create1to1Conversation = (userName: string): Conversation => {
   const conversation = new Conversation(userName, 'domain', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
   const user = new User(`${userName}-id`, 'domain', translateForTest);
   user.name(userName);
