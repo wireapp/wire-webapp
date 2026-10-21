@@ -107,14 +107,6 @@ export const CellsBulkMovePreviewPresentation: FunctionComponent<CellsBulkMovePr
           : translate('cells.bulkMove.previewTitle', {count: selectedNodes.length})}
       </CellsModal.Header>
       <p>{translate('cells.bulkMove.previewDescription')}</p>
-      <section aria-labelledby="bulk-move-selected-items-heading">
-        <h3 id="bulk-move-selected-items-heading">{translate('cells.bulkMove.selectedItems')}</h3>
-        <ul>
-          {selectedNodes.map(node => {
-            return <li key={node.id}>{node.name}</li>;
-          })}
-        </ul>
-      </section>
       <p aria-live="polite">
         {translate('cells.bulkMove.currentDestination', {destination: destination.currentDestination})}
       </p>

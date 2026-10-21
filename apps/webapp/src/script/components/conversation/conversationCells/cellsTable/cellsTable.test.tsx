@@ -72,9 +72,6 @@ const translateSelectionForTest: Translate = (key, substitutions) => {
   if (key === 'cells.bulkMove.movingButton') {
     return 'Moving';
   }
-  if (key === 'cells.bulkMove.selectedItems') {
-    return 'Selected items';
-  }
   if (key === 'cells.bulkMove.outcomeUnresolved') {
     return 'Move status is unresolved. Verify the Drive before trying again.';
   }
@@ -303,7 +300,7 @@ describe('CellsTable selection', () => {
     expect(screen.queryByRole('button', {name: 'Move'})).not.toBeInTheDocument();
   });
 
-  it('previews every selected item and browses destinations without moving or clearing selection', async () => {
+  it('browses destinations without listing selected items, moving, or clearing selection', async () => {
     const originalHash = window.location.hash;
     window.location.hash = '#/conversation/conversation-id@example.com/files/wire-cells-web';
     const user = userEvent.setup();
@@ -336,10 +333,8 @@ describe('CellsTable selection', () => {
     expect(
       within(preview).getByText('Choose a destination in this conversation’s Drive, then move the selected items.'),
     ).toBeInTheDocument();
-    const selectedItems = within(preview).getByRole('region', {name: 'Selected items'});
-    expect(within(selectedItems).getByRole('heading', {name: 'Selected items'})).toBeInTheDocument();
-    expect(within(selectedItems).getByText('Marketing images')).toBeInTheDocument();
-    expect(within(selectedItems).getByText('Wire logs.pdf')).toBeInTheDocument();
+    expect(within(preview).queryByRole('region', {name: 'Selected items'})).not.toBeInTheDocument();
+    expect(within(preview).queryByText('Wire logs.pdf')).not.toBeInTheDocument();
     expect(within(preview).getByText('Current destination: Drive')).toBeInTheDocument();
     expect(within(preview).getByRole('button', {name: 'Move'})).toBeEnabled();
 
@@ -379,9 +374,8 @@ describe('CellsTable selection', () => {
     const reopenedPreview = await screen.findByRole('dialog');
     expect(within(reopenedPreview).getByText('Current destination: Drive')).toBeInTheDocument();
     expect(within(reopenedPreview).getByText('Preview move of 1 item')).toBeInTheDocument();
-    const reopenedSelectedItems = within(reopenedPreview).getByRole('region', {name: 'Selected items'});
-    expect(within(reopenedSelectedItems).getByText('Wire logs.pdf')).toBeInTheDocument();
-    expect(within(reopenedSelectedItems).queryByText('Marketing images')).not.toBeInTheDocument();
+    expect(within(reopenedPreview).queryByRole('region', {name: 'Selected items'})).not.toBeInTheDocument();
+    expect(within(reopenedPreview).queryByText('Wire logs.pdf')).not.toBeInTheDocument();
     await user.click(within(reopenedPreview).getByRole('button', {name: 'cells.moveNodeModal.cancelButton'}));
 
     expect(repository.moveNodes).not.toHaveBeenCalled();
