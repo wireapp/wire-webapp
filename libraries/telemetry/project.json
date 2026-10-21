@@ -16,7 +16,7 @@
       "outputs": ["{projectRoot}/lib"],
       "dependsOn": ["clean"],
       "options": {
-        "command": "vite build",
+        "command": "node bin/copyAssets.mts && tsc --build tsconfig.json tsconfig.commonjs.json",
         "cwd": "{projectRoot}"
       }
     },
@@ -29,10 +29,12 @@
     },
     "test": {
       "executor": "@nx/jest:jest",
+      "dependsOn": ["^build", "build", "config-lib:build"],
+      "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js", "{workspaceRoot}/apps/server/bin/copy_server_assets.js", "{workspaceRoot}/apps/server/package.json"],
       "outputs": ["{workspaceRoot}/coverage/libraries/telemetry"],
       "options": {
         "jestConfig": "{projectRoot}/jest.config.js",
-        "passWithNoTests": true
+        "passWithNoTests": false
       },
       "configurations": {
         "ci": {
@@ -44,10 +46,12 @@
     },
     "test:coverage": {
       "executor": "@nx/jest:jest",
+      "dependsOn": ["^build", "build", "config-lib:build"],
+      "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js", "{workspaceRoot}/apps/server/bin/copy_server_assets.js", "{workspaceRoot}/apps/server/package.json"],
       "outputs": ["{workspaceRoot}/coverage/libraries/telemetry"],
       "options": {
         "jestConfig": "{projectRoot}/jest.config.js",
-        "passWithNoTests": true,
+        "passWithNoTests": false,
         "coverage": true
       }
     },
@@ -55,14 +59,20 @@
       "executor": "nx:run-commands",
       "outputs": ["{projectRoot}/lib"],
       "options": {
-        "command": "vite build --watch",
+        "command": "node bin/copyAssets.mts && tsc --build tsconfig.json tsconfig.commonjs.json --watch --preserveWatchOutput",
         "cwd": "{projectRoot}"
+      }
+    },
+    "type-check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --project {projectRoot}/tsconfig.json --noEmit && tsc --project {projectRoot}/tsconfig.commonjs.json --noEmit && tsc --project {projectRoot}/tsconfig.type-check.json"
       }
     },
     "lint": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "eslint --config eslint.config.mjs --max-warnings=0 --cache --cache-location node_modules/.cache/eslint/telemetry --ext .js,.jsx,.ts,.tsx,.cjs,.mjs {projectRoot}"
+        "command": "eslint --config eslint.config.mjs --max-warnings=0 --cache --cache-location node_modules/.cache/eslint/telemetry --ext .js,.jsx,.ts,.tsx,.cjs,.mjs,.mts {projectRoot}"
       }
     }
   },

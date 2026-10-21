@@ -12,6 +12,46 @@ The Telemetry package provides utilities for tracking and logging various events
 
 Under the hood uses [Countly](https://countly.com/).
 
+### Build and watch
+
+Run from the repository root:
+
+```bash
+yarn nx run telemetry-lib:build
+yarn nx run telemetry-lib:test
+yarn nx run telemetry-lib:watch
+```
+
+TypeScript compiles the library without bundling. The build first copies the original
+`countly-sdk-web/lib/countly.min.js` byte for byte to `lib/embed.js` and writes module
+format markers for the generated directories. The SDK must remain a standalone browser
+script: loading it creates `window.Countly`, and `telemetry.initialize` configures it
+before explicitly calling `Countly.init()`.
+
+| Output | Purpose |
+| --- | --- |
+| `lib/index.js` | ESM package entry point |
+| `lib/index.d.ts` | ESM declarations and legacy TypeScript `types` entry |
+| `lib/commonjs/index.js` | CommonJS `require`, default export condition, and legacy `main` entry |
+| `lib/commonjs/index.d.ts` | CommonJS declarations |
+| `lib/embed.js` | Unmodified Countly browser SDK served by the server |
+
+Each format also includes the compiled telemetry modules, declarations, and source maps.
+Generated `package.json` files scope ESM to `lib` and CommonJS to `lib/commonjs`.
+Both advertised module formats therefore work with Node and application bundlers.
+The previous CommonJS export pointed to a nonexistent `lib/index.cjs`; it now points to
+the generated CommonJS entry above.
+
+Builds clean `lib` before compiling. Watch mode copies assets once, then incrementally
+compiles both formats without cleaning the output directory. Its build information lives
+inside `lib`, so cleaning also resets incremental state. There is no TypeScript embed
+source that could overwrite the SDK. `yarn start:watch` can select `telemetry` through
+the existing library watcher.
+
+Both server build targets depend on the telemetry build. The server's asset-copy step
+copies `lib/embed.js` to `libs/wire/telemetry/embed.js` in development and production
+output, including the assembled deployment archive.
+
 ### Installation
 
 ```bash
@@ -32,7 +72,7 @@ The current library implementation uses Countly as a provider. Countly provides 
 
 To initialize the library code you have to include the `embed.js` script on you HTML page.
 
-One way to do it is to diretcly copy telemetry package, and store it in the client build directory.
+One way to do it is to directly copy the telemetry script into the client build directory.
 
 `copy_server_assets.js`:
 
