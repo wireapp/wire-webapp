@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import type {RestPerformActionResponse} from 'cells-sdk-ts';
 
@@ -47,7 +49,7 @@ interface CellsBulkMovePreviewModalProps {
   onRefresh: () => void;
 }
 
-export const CellsBulkMovePreviewModal = ({
+export const CellsBulkMovePreviewModal: FunctionComponent<CellsBulkMovePreviewModalProps> = ({
   isOpen,
   onClose,
   selectedNodes,

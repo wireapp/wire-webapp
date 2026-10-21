@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {useEffect, useState, type FunctionComponent} from 'react';
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
@@ -40,7 +40,7 @@ interface SelfFingerprintProps {
   noPadding: boolean;
 }
 
-export const SelfFingerprint = ({
+export const SelfFingerprint: FunctionComponent<SelfFingerprintProps> = ({
   cryptographyRepository,
   noPadding,
   clientState = container.resolve(ClientState),

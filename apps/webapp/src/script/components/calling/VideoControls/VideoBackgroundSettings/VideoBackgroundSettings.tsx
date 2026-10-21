@@ -17,7 +17,7 @@
  *
  */
 
-import {CSSProperties, ReactNode, useEffect, useId, useRef} from 'react';
+import {CSSProperties, ReactNode, useEffect, useId, useRef, type FunctionComponent} from 'react';
 
 import {match} from 'ts-pattern';
 
@@ -109,7 +109,7 @@ interface BackgroundTileProps {
   disabled?: boolean;
 }
 
-const BackgroundTile = ({
+const BackgroundTile: FunctionComponent<BackgroundTileProps> = ({
   effect,
   selectedEffect,
   onSelectEffect,
@@ -139,7 +139,7 @@ const BackgroundTile = ({
   );
 };
 
-const WebGLNotAvailableHint = ({translate}: {translate: Translate}) => {
+const WebGLNotAvailableHint: FunctionComponent<{translate: Translate}> = ({translate}: {translate: Translate}) => {
   return (
     <p css={backgroundEffectPanelHintStyles}>
       {translate('videoCallBackgroundNoWebGLHint')}{' '}
@@ -150,7 +150,7 @@ const WebGLNotAvailableHint = ({translate}: {translate: Translate}) => {
   );
 };
 
-export const VideoBackgroundSettings = ({
+export const VideoBackgroundSettings: FunctionComponent<VideoBackgroundSettingsProps> = ({
   selectedEffect,
   backgrounds,
   onSelectEffect,

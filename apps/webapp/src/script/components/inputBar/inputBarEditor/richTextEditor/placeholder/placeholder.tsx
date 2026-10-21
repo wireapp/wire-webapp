@@ -17,9 +17,17 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import cx from 'classnames';
 
-export const Placeholder = ({text, hasLocalEphemeralTimer}: {text: string; hasLocalEphemeralTimer: boolean}) => {
+export const Placeholder: FunctionComponent<{text: string; hasLocalEphemeralTimer: boolean}> = ({
+  text,
+  hasLocalEphemeralTimer,
+}: {
+  text: string;
+  hasLocalEphemeralTimer: boolean;
+}) => {
   return (
     <div
       className={cx('editor-placeholder', {

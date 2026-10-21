@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import cx from 'classnames';
 
 import type {User} from 'Repositories/entity/User';
@@ -28,7 +30,7 @@ interface NoDevicesFoundProps {
   user: User;
 }
 
-export const NoDevicesFound = ({user, noPadding}: NoDevicesFoundProps) => {
+export const NoDevicesFound: FunctionComponent<NoDevicesFoundProps> = ({user, noPadding}: NoDevicesFoundProps) => {
   const {translate} = useApplicationContext();
   const {name: userName} = useKoSubscribableChildren(user, ['name']);
 

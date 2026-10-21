@@ -17,7 +17,7 @@
  *
  */
 
-import {useState} from 'react';
+import {useState, type FunctionComponent} from 'react';
 
 import {isNan, isNullOrUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
@@ -46,7 +46,7 @@ export interface AccessProps {
   onGoBack: () => void;
 }
 
-export const ConversationHistory = ({onGoBack, onClose}: AccessProps) => {
+export const ConversationHistory: FunctionComponent<AccessProps> = ({onGoBack, onClose}: AccessProps) => {
   const {translate} = useApplicationContext();
   const [chatHistory, setChatHistory] = useState<ChatHistory>(ChatHistory.OneDay);
   const [historySharingQuantity, setHistorySharingQuantity] = useState(1);

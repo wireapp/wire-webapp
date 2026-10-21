@@ -172,46 +172,47 @@ function ConversationDetailsOptionsContent({
   const canEditTimeout = roleRepository.canToggleTimeout(activeConversation) && !isCellsConversation;
   const canEditReadReceipts = roleRepository.canToggleReadReceipts(activeConversation);
 
-  const openNotificationsPanel = () => {
+  const openNotificationsPanel = (): void => {
     return togglePanel(PanelState.NOTIFICATIONS, activeConversation);
   };
 
-  const openTimedMessagePanel = () => {
+  const openTimedMessagePanel = (): void => {
     return togglePanel(PanelState.TIMED_MESSAGES, activeConversation);
   };
 
-  const openSharedDrivePanel = () => {
+  const openSharedDrivePanel = (): void => {
     return togglePanel(PanelState.SHARED_DRIVE, activeConversation);
   };
 
-  const openGuestPanel = () => {
+  const openGuestPanel = (): void => {
     return togglePanel(PanelState.GUEST_OPTIONS, activeConversation);
   };
 
-  const openServicePanel = () => {
+  const openServicePanel = (): void => {
     return togglePanel(PanelState.SERVICES_OPTIONS, activeConversation);
   };
 
-  const showNotifications = () => {
+  const showNotifications = (): void => {
     return togglePanel(PanelState.NOTIFICATIONS, activeConversation);
   };
 
-  const openAccessPanel = () => {
+  const openAccessPanel = (): void => {
     return togglePanel(PanelState.ACCESS, activeConversation);
   };
 
-  const openConversationHistoryPanel = () => {
+  const openConversationHistoryPanel = (): void => {
     return togglePanel(PanelState.CONVERSATION_HISTORY, activeConversation);
   };
 
-  const openParticipantDevices = () => {
+  const openParticipantDevices = (): void => {
     if (isUndefined(firstParticipant)) {
       throw new Error('Cannot open participant devices without a participant');
     }
     togglePanel(PanelState.PARTICIPANT_DEVICES, firstParticipant, false, 'left');
   };
 
-  const getSharedDriveStatusTranslationKey = () => {
+  const getSharedDriveStatusTranslationKey = ():
+    'cells.sharedDriveAccess.editorAccess' | 'cells.sharedDriveAccess.viewerAccess' => {
     return selfUserDriveRole === CELLS_SELF_USER_DRIVE_ROLE.EDITOR
       ? 'cells.sharedDriveAccess.editorAccess'
       : 'cells.sharedDriveAccess.viewerAccess';

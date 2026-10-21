@@ -70,11 +70,11 @@ const GuestServicesOptions: FC<GuestServicesOptionsProps> = ({
 
   const isToggleDisabled = isRequestOngoing || !inTeam;
 
-  const toggleAccessState = async (feature: number, message: string, willAffectMembers: boolean) => {
+  const toggleAccessState = async (feature: number, message: string, willAffectMembers: boolean): Promise<void> => {
     if (inTeam) {
       const newAccessState = toggleFeature(feature, accessState);
 
-      const changeAccessState = async () => {
+      const changeAccessState = async (): Promise<void> => {
         if (!isRequestOngoing) {
           setIsRequestOngoing(true);
           await conversationRepository.stateHandler.changeAccessState(activeConversation, newAccessState);

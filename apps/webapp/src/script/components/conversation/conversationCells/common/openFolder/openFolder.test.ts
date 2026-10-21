@@ -52,7 +52,7 @@ describe('openFolder', () => {
 
     it('calls onBeforeNavigate before changing the URL', () => {
       const hashBeforeNavigate: string[] = [];
-      const onBeforeNavigate = () => {
+      const onBeforeNavigate = (): number => {
         return hashBeforeNavigate.push(currentHash());
       };
 

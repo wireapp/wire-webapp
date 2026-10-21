@@ -17,7 +17,7 @@
  *
  */
 
-import {useRef, useState} from 'react';
+import {useRef, useState, type FunctionComponent} from 'react';
 
 import {FileAsset} from 'Repositories/entity/message/fileAsset';
 import {createUuid} from 'Util/uuid';
@@ -31,7 +31,11 @@ interface AudioSeekBarNewProps {
   disabled?: boolean;
 }
 
-export const AudioSeekBarNew = ({asset, audioElement, disabled = false}: AudioSeekBarNewProps) => {
+export const AudioSeekBarNew: FunctionComponent<AudioSeekBarNewProps> = ({
+  asset,
+  audioElement,
+  disabled = false,
+}: AudioSeekBarNewProps) => {
   const svgNode = useRef<SVGSVGElement>(null);
   const [clipId] = useState(`clip-${createUuid()}`);
 

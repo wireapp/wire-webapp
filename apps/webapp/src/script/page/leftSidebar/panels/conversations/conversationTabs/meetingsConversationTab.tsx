@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {CallIcon} from '@wireapp/react-ui-kit';
 
 import {useMeetingStore} from 'Components/meeting/meetingStore/meetingStoreProvider';
@@ -31,7 +33,7 @@ type MeetingsConversationTabProps = {
   onChangeTab: (tab: SidebarTabs) => void;
 };
 
-export const MeetingsConversationTab = ({
+export const MeetingsConversationTab: FunctionComponent<MeetingsConversationTabProps> = ({
   conversationTabIndex,
   isActive,
   onChangeTab,
@@ -41,7 +43,7 @@ export const MeetingsConversationTab = ({
     return state.loadMeetings;
   });
 
-  const openMeetings = () => {
+  const openMeetings = (): void => {
     onChangeTab(SidebarTabs.MEETINGS);
 
     if (!isActive) {

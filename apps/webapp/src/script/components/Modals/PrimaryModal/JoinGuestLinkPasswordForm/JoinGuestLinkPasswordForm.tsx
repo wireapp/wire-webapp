@@ -17,7 +17,7 @@
  *
  */
 
-import type {FormEvent} from 'react';
+import type {FormEvent, FunctionComponent} from 'react';
 
 import {COLOR, Form, Link, Text} from '@wireapp/react-ui-kit';
 
@@ -33,7 +33,7 @@ interface JoinGuestLinkPasswordFormProps {
   onInputChange: (value: string) => void;
 }
 
-export const JoinGuestLinkPasswordForm = ({
+export const JoinGuestLinkPasswordForm: FunctionComponent<JoinGuestLinkPasswordFormProps> = ({
   translate,
   onSubmit,
   inputValue,

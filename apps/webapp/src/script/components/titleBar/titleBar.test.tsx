@@ -91,7 +91,29 @@ const callActions = {
   toggleScreenshare: jest.fn(),
 };
 
-const getDefaultProps = (callingRepository: CallingRepository, conversation: Conversation) => {
+type GetDefaultPropsResult = {
+  callActions: {
+    answer: jest.Mock<any, any, any>;
+    changePage: jest.Mock<any, any, any>;
+    leave: jest.Mock<any, any, any>;
+    reject: jest.Mock<any, any, any>;
+    startAudio: jest.Mock<any, any, any>;
+    startVideo: jest.Mock<any, any, any>;
+    switchCameraInput: jest.Mock<any, any, any>;
+    switchScreenInput: jest.Mock<any, any, any>;
+    toggleCamera: jest.Mock<any, any, any>;
+    toggleMute: jest.Mock<any, any, any>;
+    toggleScreenshare: jest.Mock<any, any, any>;
+  };
+  callState: CallState;
+  conversation: Conversation;
+  openRightSidebar: jest.Mock<any, any, any>;
+  repositories: ViewModelRepositories;
+  teamState: TeamState;
+  selfUser: User;
+  withBottomDivider: boolean;
+};
+const getDefaultProps = (callingRepository: CallingRepository, conversation: Conversation): GetDefaultPropsResult => {
   return {
     callActions,
     callState: new CallState(),
@@ -507,18 +529,18 @@ describe('TitleBar', () => {
   );
 });
 
-function createUser(activated: boolean = true) {
+function createUser(activated: boolean = true): User {
   const user = new User('', '', translateForTest);
   user.isTemporaryGuest(!activated);
   return user;
 }
 
-function createTeamState(team?: Partial<TeamState>) {
+function createTeamState(team?: Partial<TeamState>): TeamState {
   const teamState = new TeamState();
   return Object.assign(teamState, team) as TeamState;
 }
 
-function createConversationEntity(conversation?: Partial<Conversation>) {
+function createConversationEntity(conversation?: Partial<Conversation>): Conversation {
   const conversationEntity = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
   return Object.assign(conversationEntity, conversation) as Conversation;
 }

@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {FolderIcon} from '@wireapp/react-ui-kit';
 
 import {ChevronRight} from 'Components/icon';
@@ -41,7 +43,7 @@ interface CellsFolderListProps {
   disabledDestinationLabels?: Readonly<Record<string, string>>;
 }
 
-export const CellsFolderList = ({
+export const CellsFolderList: FunctionComponent<CellsFolderListProps> = ({
   items,
   onNavigate,
   onSelectDestination,

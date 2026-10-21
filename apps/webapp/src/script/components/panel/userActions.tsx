@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
@@ -92,7 +94,7 @@ function createPlaceholder1to1Conversation(
   user: User,
   selfUser: User,
   translate: ReturnType<typeof useApplicationContext>['translate'],
-) {
+): Conversation {
   const userConnection = user.connection();
 
   if (isNullOrUndefined(userConnection)) {
@@ -112,7 +114,7 @@ function createPlaceholder1to1Conversation(
   return conversation;
 }
 
-const UserActions = ({
+const UserActions: FunctionComponent<UserActionsProps> = ({
   actionsViewModel,
   isSelfActivated,
   user,

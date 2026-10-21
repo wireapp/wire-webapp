@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useRef, useState} from 'react';
+import React, {useRef, useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyArray, isNonEmptyString, isNull, isUndefined} from '@sindresorhus/is';
 import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
@@ -38,7 +38,8 @@ import {Exception} from './exception';
 import {Config} from '../../Config';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {ValidationError} from '../module/action/validationError';
-import {RootState, bindActionCreators} from '../module/reducer';
+import {RootState, bindActionCreators, type ThunkAction} from '../module/reducer';
+import type {RegistrationDataState} from '../module/reducer/authReducer';
 import * as AuthSelector from '../module/selector/authSelector';
 import * as AccentColor from '../util/accentColor';
 import {
@@ -57,7 +58,7 @@ interface Props {
   onSubmit: () => void;
 }
 
-const AccountFormComponent = ({
+const AccountFormComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> = ({
   account,
   authError,
   doSendActivationCode,
@@ -99,7 +100,7 @@ const AccountFormComponent = ({
     privacyPolicy: useRef<HTMLInputElement | null>(null),
   };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
     const errors: Error[] | ValidationError[] = [];
     const newValidInputs: Record<string, boolean> = {};
@@ -382,7 +383,8 @@ const AccountFormComponent = ({
 };
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
-const mapStateToProps = (state: RootState) => {
+type MapStateToPropsResult = {account: RegistrationDataState; authError: Error | null; isFetching: boolean};
+const mapStateToProps = (state: RootState): MapStateToPropsResult => {
   return {
     account: AuthSelector.getAccount(state),
     authError: AuthSelector.getError(state),
@@ -391,7 +393,11 @@ const mapStateToProps = (state: RootState) => {
 };
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => {
+type MapDispatchToPropsResult = {
+  doSendActivationCode: (email: string) => ThunkAction;
+  pushAccountRegistrationData: (registration: Partial<RegistrationDataState>) => ThunkAction;
+};
+const mapDispatchToProps = (dispatch: Dispatch<AnyAction>): MapDispatchToPropsResult => {
   return bindActionCreators(
     {
       doSendActivationCode: ROOT_ACTIONS.userAction.doSendActivationCode,

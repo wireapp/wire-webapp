@@ -22,9 +22,11 @@ import {act, renderHook, waitFor} from '@testing-library/react';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {CELLS_SELF_USER_DRIVE_ROLE} from 'src/script/components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {createExecutingFireAndForgetInvokerForTest} from 'src/script/page/testSupport/rootContextTestSupport';
-import {CellNode, CellNodeType} from 'src/script/types/cellNode';
+import {CellNode, CellNodeType, type CellFile} from 'src/script/types/cellNode';
 
 import {useCellPublicLink} from './useCellPublicLink';
+import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
+import type {RestShareLink} from 'cells-sdk-ts';
 
 jest.mock('src/script/Config', () => {
   return {
@@ -64,12 +66,51 @@ describe('useCellPublicLink', () => {
     };
   };
 
+  type RenderPublicLinkHookResult = {
+    rerenderWith: (
+      props: Partial<{
+        node: CellFile | undefined;
+        refreshLinkDataAfterUpdate: boolean;
+        setStatusOnPublicLinkUrl: boolean;
+        fireAndForgetInvoker: FireAndForgetInvoker;
+      }>,
+    ) => void;
+    rerender: (
+      props?:
+        | {
+            node: CellFile | undefined;
+            refreshLinkDataAfterUpdate: boolean;
+            setStatusOnPublicLinkUrl: boolean;
+            fireAndForgetInvoker: FireAndForgetInvoker;
+          }
+        | undefined,
+    ) => void;
+    result: {
+      current: {
+        status: 'error' | 'idle' | 'loading' | 'success';
+        link: string | undefined;
+        linkData: RestShareLink | null;
+        isEnabled: boolean;
+        togglePublicLink: () => void;
+        updatePublicLink: ({
+          password,
+          passwordEnabled,
+          accessEnd,
+        }: {
+          password?: string;
+          passwordEnabled?: boolean;
+          accessEnd?: string | null;
+        }) => Promise<void>;
+      };
+    };
+    unmount: () => void;
+  };
   const renderPublicLinkHook = (options?: {
     node?: CellNode;
     refreshLinkDataAfterUpdate?: boolean;
     setStatusOnPublicLinkUrl?: boolean;
     fireAndForgetInvoker?: typeof defaultFireAndForgetInvoker;
-  }) => {
+  }): RenderPublicLinkHookResult => {
     const initialProps = {
       node: options?.node ?? mockNode,
       refreshLinkDataAfterUpdate: options?.refreshLinkDataAfterUpdate ?? false,
@@ -92,7 +133,7 @@ describe('useCellPublicLink', () => {
       {initialProps},
     );
 
-    const rerenderWith = (props: Partial<typeof initialProps>) => {
+    const rerenderWith = (props: Partial<typeof initialProps>): void => {
       return hook.rerender({
         node: props.node ?? initialProps.node,
         refreshLinkDataAfterUpdate: props.refreshLinkDataAfterUpdate ?? initialProps.refreshLinkDataAfterUpdate,

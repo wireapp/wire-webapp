@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState, type FunctionComponent} from 'react';
 
 import {isEmptyArray, isNonEmptyString} from '@sindresorhus/is';
 import {QualifiedId, UserType} from '@wireapp/api-client/lib/user';
@@ -64,7 +64,7 @@ export type UserListProps = Omit<React.ComponentProps<typeof UserList>, 'convers
 
 const SEARCH_MEMBERS_DEBOUNCE_MILLISECONDS = 300;
 
-export const UserSearchableList = ({
+export const UserSearchableList: FunctionComponent<UserListProps> = ({
   onUpdateSelectedUsers,
   filterRemoteTeamUsers = false,
   showAllProvidedUsers = false,
@@ -140,7 +140,7 @@ export const UserSearchableList = ({
   // Filter all list items if a filter is provided
 
   useEffect(() => {
-    const setUsers = async (users: User[]) => {
+    const setUsers = async (users: User[]): Promise<void> => {
       setFilteredUsers(filterRemoteTeamUsers ? await teamRepository.filterRemoteDomainUsers(users) : users);
     };
 
@@ -194,7 +194,7 @@ export const UserSearchableList = ({
     users,
   ]);
 
-  const foundUserEntities = () => {
+  const foundUserEntities = (): User[] => {
     if (remoteTeamMembersFilter.current !== filter || isEmptyArray(remoteTeamMembers)) {
       return filteredUsers;
     }

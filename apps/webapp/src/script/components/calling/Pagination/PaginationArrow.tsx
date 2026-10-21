@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {ChevronIcon, IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -31,7 +33,12 @@ interface PaginationArrowProps {
   'data-uie-name': string;
 }
 
-export const PaginationArrow = ({onClick, disabled, direction, 'data-uie-name': uieName}: PaginationArrowProps) => {
+export const PaginationArrow: FunctionComponent<PaginationArrowProps> = ({
+  onClick,
+  disabled,
+  direction,
+  'data-uie-name': uieName,
+}: PaginationArrowProps) => {
   const {translate} = useApplicationContext();
   const ariaLabel =
     direction === 'left' ? translate('paginationLeftArrowAriaLabel') : translate('paginationRightArrowAriaLabel');

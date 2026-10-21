@@ -35,7 +35,7 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
 );
 
-const createReadReceiptMessage = (partialReadReceiptStatus: Partial<MessageEntity>) => {
+const createReadReceiptMessage = (partialReadReceiptStatus: Partial<MessageEntity>): MessageEntity => {
   const readReceiptMessage: Partial<MessageEntity> = {
     expectsReadConfirmation: true,
     readReceipts: ko.observableArray([] as ReadReceipt[]),

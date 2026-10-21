@@ -30,12 +30,13 @@ interface UseRestoreNestedNodeProps {
   onError: () => void;
 }
 
+type UseRestoreNestedNodeResult = {restoreNestedNode: () => Promise<void>};
 export const useRestoreNestedNode = ({
   node,
   conversationQualifiedId,
   cellsRepository,
   onError,
-}: UseRestoreNestedNodeProps) => {
+}: UseRestoreNestedNodeProps): UseRestoreNestedNodeResult => {
   const {removeNode} = useCellsStore();
 
   return {

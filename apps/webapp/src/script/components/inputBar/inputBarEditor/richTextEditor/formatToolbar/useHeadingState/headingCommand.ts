@@ -21,7 +21,7 @@ import {$createHeadingNode} from '@lexical/rich-text';
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {$getSelection, $isRangeSelection} from 'lexical';
 
-export const headingCommand = () => {
+export const headingCommand = (): boolean => {
   const selection = $getSelection();
 
   if ($isRangeSelection(selection)) {

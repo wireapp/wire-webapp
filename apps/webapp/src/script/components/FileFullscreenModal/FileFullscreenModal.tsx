@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {useEffect, useState, type FunctionComponent} from 'react';
 
 import {Maybe} from 'true-myth';
 
@@ -61,7 +61,7 @@ interface FileFullscreenModalProps {
   checkIsInRecycleBin?: () => boolean;
 }
 
-export const FileFullscreenModal = ({
+export const FileFullscreenModal: FunctionComponent<FileFullscreenModalProps> = ({
   id,
   isOpen,
   onClose,
@@ -87,13 +87,13 @@ export const FileFullscreenModal = ({
   const [refreshKey, setRefreshKey] = useState(0);
   const isEditable = isFileEditable(fileExtension);
 
-  const refreshModalContent = () => {
+  const refreshModalContent = (): void => {
     setRefreshKey(prev => {
       return prev + 1;
     });
   };
 
-  const onCloseModal = () => {
+  const onCloseModal = (): void => {
     setIsInEditMode(false);
     onClose();
   };
@@ -149,7 +149,7 @@ interface ModalContentProps {
   fileUrl?: string;
 }
 
-const ModalContent = ({
+const ModalContent: FunctionComponent<ModalContentProps> = ({
   fileExtension,
   filePreviewUrl,
   fileName,

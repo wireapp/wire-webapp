@@ -17,7 +17,7 @@
  *
  */
 
-import {useRef} from 'react';
+import {useRef, type FunctionComponent} from 'react';
 
 import {TabIndex, Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
@@ -32,7 +32,7 @@ interface BackupFileUploadProps {
   cssClassName?: string;
 }
 
-const BackupFileUpload = ({
+const BackupFileUpload: FunctionComponent<BackupFileUploadProps> = ({
   onFileChange,
   backupImportHeadLine,
   variant,
@@ -41,7 +41,7 @@ const BackupFileUpload = ({
   const {translate} = useApplicationContext();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const fileInputClick = () => {
+  const fileInputClick = (): void | undefined => {
     return fileInputRef.current?.click();
   };
 

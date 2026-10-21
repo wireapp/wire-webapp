@@ -34,13 +34,18 @@ interface UseMoveCellsNodeProps {
   isOpen: boolean;
 }
 
+type UseMoveCellsNodeResult = {
+  handleMove: () => Promise<Result<void, unknown>>;
+  movingDisabled: boolean;
+  status: 'idle' | 'loading' | 'success' | 'error';
+};
 export const useMoveCellsNode = ({
   cellsRepository,
   nodeToMove,
   conversationQualifiedId,
   currentPath,
   isOpen,
-}: UseMoveCellsNodeProps) => {
+}: UseMoveCellsNodeProps): UseMoveCellsNodeResult => {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
   useEffect(() => {
@@ -79,7 +84,7 @@ export const useMoveCellsNode = ({
   const targetPath = getCellsApiPath({conversationQualifiedId, currentPath});
   const movingDisabled = nodeToMoveParent === targetPath;
 
-  const handleMove = () => {
+  const handleMove = (): Promise<Result<void, unknown>> => {
     return moveNode({
       currentPath: nodeToMove.path,
       targetPath,

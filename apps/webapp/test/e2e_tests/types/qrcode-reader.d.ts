@@ -26,7 +26,7 @@ declare module 'qrcode-reader' {
   }
 
   interface DecodeCallback {
-    (err: Error | null, result: QRCode | null): void;
+    (err: Error | null | undefined, result: QRCode | null | undefined): void;
   }
 
   class QrCode extends EventEmitter {

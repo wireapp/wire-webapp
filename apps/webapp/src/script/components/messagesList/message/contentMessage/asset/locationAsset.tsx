@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import type {Location} from 'Repositories/entity/message/location';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {getMapsUrl} from 'Util/locationUtil';
@@ -25,7 +27,7 @@ interface LocationAssetProps {
   asset: Location;
 }
 
-const LocationAsset = ({asset}: LocationAssetProps) => {
+const LocationAsset: FunctionComponent<LocationAssetProps> = ({asset}: LocationAssetProps) => {
   const {translate} = useApplicationContext();
   const {latitude, longitude, name, zoom} = asset;
   const mapsUrl = getMapsUrl(parseFloat(latitude), parseFloat(longitude), name, zoom);

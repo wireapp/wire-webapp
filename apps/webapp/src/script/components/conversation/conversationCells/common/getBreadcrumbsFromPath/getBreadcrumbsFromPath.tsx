@@ -17,10 +17,15 @@
  *
  */
 
+import type {JSX} from '@emotion/react/jsx-runtime';
+
 import {TrashIcon} from '@wireapp/react-ui-kit';
 
 import {RECYCLE_BIN_PATH} from '../recycleBin/recycleBin';
 
+type GetBreadcrumbsFromPathResult = (
+  {name: string; path: string; icon: JSX.Element | undefined} | {name: string; path: string}
+)[];
 export const getBreadcrumbsFromPath = ({
   baseCrumb,
   currentPath,
@@ -29,7 +34,7 @@ export const getBreadcrumbsFromPath = ({
   baseCrumb: string;
   currentPath: string;
   recycleBinLabel: string;
-}) => {
+}): GetBreadcrumbsFromPathResult => {
   const segments = currentPath.split('/').filter(Boolean);
 
   return [

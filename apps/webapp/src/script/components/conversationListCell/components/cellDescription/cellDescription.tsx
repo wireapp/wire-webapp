@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import cx from 'classnames';
 
 import * as Icon from 'Components/icon';
@@ -37,7 +39,7 @@ interface Props {
   isGhostGroup: boolean;
 }
 
-export const CellDescription = ({conversation, isActive}: Props) => {
+export const CellDescription: FunctionComponent<Props> = ({conversation, isActive}: Props) => {
   const {translate} = useApplicationContext();
 
   const cellState = generateCellState(conversation, translate);

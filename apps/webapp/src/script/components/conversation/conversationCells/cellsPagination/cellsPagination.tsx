@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback} from 'react';
+import {useCallback, type FunctionComponent} from 'react';
 
 import {FlexBox, IconButton} from '@wireapp/react-ui-kit';
 
@@ -50,7 +50,7 @@ interface CellsPaginationProps {
   setPageSize: (page: number) => void;
 }
 
-export const CellsPagination = ({
+export const CellsPagination: FunctionComponent<CellsPaginationProps> = ({
   currentPage = 0,
   numberOfPages = 1,
   goToPage,

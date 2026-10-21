@@ -17,7 +17,7 @@
  *
  */
 
-import {useMemo} from 'react';
+import {useMemo, type FunctionComponent} from 'react';
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {UserType} from '@wireapp/api-client/lib/user';
@@ -62,7 +62,7 @@ interface SharedDriveProps {
   onClose: () => void;
 }
 
-const SharedDrive = ({activeConversation, onBack, onClose}: SharedDriveProps) => {
+const SharedDrive: FunctionComponent<SharedDriveProps> = ({activeConversation, onBack, onClose}: SharedDriveProps) => {
   const {translate} = useApplicationContext();
   const {
     isSelfUserRemoved,

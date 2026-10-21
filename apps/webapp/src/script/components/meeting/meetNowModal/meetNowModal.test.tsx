@@ -22,7 +22,7 @@ import userEvent from '@testing-library/user-event';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 import {task} from 'true-myth';
-import {createStore} from 'zustand/vanilla';
+import {createStore, type StoreApi} from 'zustand/vanilla';
 
 import type {CreateMeetingSuccess} from 'Components/meeting/shared/service/meetingService';
 import type {MeetingStoreState} from 'Components/meeting/meetingStore/createMeetingStore';
@@ -49,6 +49,7 @@ import {translateForTest} from 'Util/test/translateForTest';
 
 import {MeetNowModal} from './meetNowModal';
 import {useMeetNowModal} from './useMeetNowModal';
+import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 
 const qualifiedConversation = {id: 'conversation-id', domain: 'example.com'};
 const qualifiedMeetingId = {id: 'meeting-id', domain: 'example.com'};
@@ -57,7 +58,11 @@ function createDeferred<T>(): PromiseWithResolvers<T> {
   return Promise.withResolvers<T>();
 }
 
-const createDeferredMeetNowMeeting = () => {
+type CreateDeferredMeetNowMeetingResult = {
+  meetNowMeeting: jest.Mock<any, any, any>;
+  resolveMeetNowMeeting: (value?: CreateMeetingSuccess) => void;
+};
+const createDeferredMeetNowMeeting = (): CreateDeferredMeetNowMeetingResult => {
   const deferred = createDeferred<CreateMeetingSuccess>();
 
   return {
@@ -128,7 +133,7 @@ const createMainViewModel = (): MainViewModel => {
   } as unknown as MainViewModel;
 };
 
-const createMeetingStore = (meetNowMeeting: MeetingStoreState['meetNowMeeting']) => {
+const createMeetingStore = (meetNowMeeting: MeetingStoreState['meetNowMeeting']): StoreApi<MeetingStoreState> => {
   return createStore<MeetingStoreState>(() => {
     return {
       meetingSeries: [],
@@ -147,7 +152,8 @@ const createMeetingStore = (meetNowMeeting: MeetingStoreState['meetNowMeeting'])
   });
 };
 
-const setupContainerMocks = () => {
+type SetupContainerMocksResult = {conversationState: ConversationState};
+const setupContainerMocks = (): SetupContainerMocksResult => {
   const selfUser = new User('self-id', 'example.com', translateForTest);
   const conversationState = {
     findConversation: jest.fn().mockReturnValue(undefined),
@@ -190,7 +196,11 @@ type RenderMeetNowModalOptions = {
   meetNowMeeting?: MeetingStoreState['meetNowMeeting'];
 };
 
-const renderMeetNowModal = ({meetNowMeeting}: RenderMeetNowModalOptions = {}) => {
+type RenderMeetNowModalResult = {
+  fireAndForgetInvoker: FireAndForgetInvoker;
+  resolveMeetNowMeeting: (value?: CreateMeetingSuccess) => void;
+};
+const renderMeetNowModal = ({meetNowMeeting}: RenderMeetNowModalOptions = {}): RenderMeetNowModalResult => {
   const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
   const deferredMeetNowMeeting = createDeferredMeetNowMeeting();
   const store = createMeetingStore(meetNowMeeting ?? deferredMeetNowMeeting.meetNowMeeting);
@@ -217,7 +227,7 @@ const renderMeetNowModal = ({meetNowMeeting}: RenderMeetNowModalOptions = {}) =>
   };
 };
 
-const openModalWithTitle = async (title: string) => {
+const openModalWithTitle = async (title: string): Promise<void> => {
   act(() => {
     useMeetNowModal.getState().open();
   });
@@ -225,15 +235,15 @@ const openModalWithTitle = async (title: string) => {
   await userEvent.type(screen.getByTestId('meet-now-title'), title);
 };
 
-const submitForm = async () => {
+const submitForm = async (): Promise<void> => {
   await userEvent.click(screen.getByRole('button', {name: 'meetings.meetNowModal.startMeeting'}));
 };
 
-const getModalOverlay = () => {
+const getModalOverlay = (): HTMLElement => {
   return screen.getByRole('dialog');
 };
 
-const getModalContent = () => {
+const getModalContent = (): Element => {
   const overlay = getModalOverlay();
   const content = overlay.firstElementChild;
 

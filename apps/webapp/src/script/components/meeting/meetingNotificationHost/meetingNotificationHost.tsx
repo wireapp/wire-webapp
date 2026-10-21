@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useRef} from 'react';
+import {useEffect, useRef, type FunctionComponent} from 'react';
 
 import {ChevronIcon} from '@wireapp/react-ui-kit';
 
@@ -41,7 +41,9 @@ type MeetingNotificationHostProps = {
   isStandalone: boolean;
 };
 
-export const MeetingNotificationHost = ({isStandalone}: MeetingNotificationHostProps) => {
+export const MeetingNotificationHost: FunctionComponent<MeetingNotificationHostProps> = ({
+  isStandalone,
+}: MeetingNotificationHostProps) => {
   const {translate} = useApplicationContext();
   const notifications = useMeetingNotificationStore(state => {
     return state.notifications;
@@ -56,7 +58,7 @@ export const MeetingNotificationHost = ({isStandalone}: MeetingNotificationHostP
       return;
     }
 
-    const collapseWhenClickedOutside = (event: MouseEvent) => {
+    const collapseWhenClickedOutside = (event: MouseEvent): void => {
       const target = event.target;
       const isInsideNotificationHost =
         target instanceof Node &&

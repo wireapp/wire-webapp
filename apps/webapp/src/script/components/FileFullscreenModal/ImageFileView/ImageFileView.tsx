@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {ZoomableImage} from 'Components/ZoomableImage/ZoomableImage';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
@@ -28,7 +30,11 @@ interface ImageFileViewProps {
   timestamp: number;
 }
 
-export const ImageFileView = ({src, senderName, timestamp}: ImageFileViewProps) => {
+export const ImageFileView: FunctionComponent<ImageFileViewProps> = ({
+  src,
+  senderName,
+  timestamp,
+}: ImageFileViewProps) => {
   const {translate} = useApplicationContext();
 
   return (

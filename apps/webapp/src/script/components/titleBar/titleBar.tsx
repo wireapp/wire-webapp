@@ -17,7 +17,7 @@
  *
  */
 
-import type {ReactNode} from 'react';
+import type {ReactNode, FunctionComponent} from 'react';
 import {useCallback, useEffect, useMemo, useRef} from 'react';
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
@@ -68,7 +68,7 @@ interface TitleBarProps {
   onCloseSharedDriveSearchView?: () => void;
 }
 
-export const TitleBar = ({
+export const TitleBar: FunctionComponent<TitleBarProps> = ({
   conversation,
   callActions,
   selfUser,
@@ -173,7 +173,7 @@ export const TitleBar = ({
     return state.responsiveView;
   });
 
-  const setLeftSidebar = () => {
+  const setLeftSidebar = (): void => {
     setView(ViewType.MOBILE_LEFT_SIDEBAR);
     closeRightSidebar();
   };
@@ -224,15 +224,15 @@ export const TitleBar = ({
     };
   }, [isActivatedAccount, showAddParticipant, showDetails]);
 
-  const onClickCollectionButton = () => {
+  const onClickCollectionButton = (): boolean => {
     return amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentState.COLLECTION);
   };
 
-  const onClickDetails = () => {
+  const onClickDetails = (): void => {
     return showDetails(false);
   };
 
-  const startCallAndShowAlert = () => {
+  const startCallAndShowAlert = (): void => {
     if (isStartingCallRef.current || isCallButtonDisabled) {
       return;
     }
@@ -251,7 +251,7 @@ export const TitleBar = ({
     });
   };
 
-  const onClickStartAudio = () => {
+  const onClickStartAudio = (): void => {
     startCallAndShowAlert();
 
     if (smBreakpoint) {

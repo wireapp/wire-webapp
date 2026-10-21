@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {isNull} from '@sindresorhus/is';
 
 import {Avatar, AVATAR_SIZE} from 'Components/avatar';
@@ -30,7 +32,10 @@ interface CellsTableOwnerColumnProps {
   user: User | null;
 }
 
-export const CellsTableOwnerColumn = ({owner, user}: CellsTableOwnerColumnProps) => {
+export const CellsTableOwnerColumn: FunctionComponent<CellsTableOwnerColumnProps> = ({
+  owner,
+  user,
+}: CellsTableOwnerColumnProps) => {
   if (isNull(user)) {
     return <span css={textStyles}>{owner}</span>;
   }

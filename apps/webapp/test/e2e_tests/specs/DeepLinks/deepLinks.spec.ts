@@ -34,7 +34,11 @@ type ProfileModalOptions = {
   showOpenProfileButton?: boolean;
 };
 
-async function verifyUserProfileModal(profileModal: UserProfileModal, user: User, options: ProfileModalOptions) {
+async function verifyUserProfileModal(
+  profileModal: UserProfileModal,
+  user: User,
+  options: ProfileModalOptions,
+): Promise<void> {
   await test.step(`Verify user profile modal for ${user.fullName}`, async () => {
     await expect(profileModal.modal).toBeVisible();
     await expect(profileModal.participantFullname).toContainText(user.fullName);

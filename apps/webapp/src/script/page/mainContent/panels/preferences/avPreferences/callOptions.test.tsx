@@ -52,7 +52,11 @@ function createPropertiesRepositoryForTest(): PropertiesRepository {
   } as unknown as PropertiesRepository;
 }
 
-function renderCallOptions(parameters: RenderCallOptionsParameters = {}) {
+type RenderCallOptionsResult = {
+  constraintsHandler: MediaConstraintsHandler;
+  refreshAudioInput: jest.Mock<Promise<MediaStream>, any, any>;
+};
+function renderCallOptions(parameters: RenderCallOptionsParameters = {}): RenderCallOptionsResult {
   const {hasActiveCall = false, agcPreference = false} = parameters;
   const constraintsHandler = {
     getAgcPreference: jest.fn(() => {

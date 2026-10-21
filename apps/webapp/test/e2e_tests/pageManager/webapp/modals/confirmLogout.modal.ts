@@ -32,15 +32,15 @@ export class ConfirmLogoutModal extends OptionModal {
     this.deleteDeviceLabel = this.modal.getByText('Delete all your personal information');
   }
 
-  async toggleModalCheck() {
+  async toggleModalCheck(): Promise<void> {
     await this.deleteDeviceLabel.click();
   }
 
-  async clickCancel() {
+  async clickCancel(): Promise<void> {
     await this.cancelButton.click();
   }
 
-  async clickConfirm() {
+  async clickConfirm(): Promise<void> {
     await this.clickAction();
   }
 }

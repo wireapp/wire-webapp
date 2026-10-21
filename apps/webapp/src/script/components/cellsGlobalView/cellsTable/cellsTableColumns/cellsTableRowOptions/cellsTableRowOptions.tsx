@@ -50,7 +50,9 @@ export const CellsTableRowOptions = (properties: CellsTableRowOptionsProps): Rea
   const shouldDisableRestrictedActions = useShouldRestrictGlobalDriveNodeActions(node);
   // DropdownMenu.Item disabled state is visual/ARIA only for native onClick handlers.
   // Keep restricted actions without a handler so viewer access cannot activate them.
-  const restrictedActionClickHandler = <ClickHandler extends () => void>(clickHandler: ClickHandler) => {
+  const restrictedActionClickHandler = <ClickHandler extends () => void>(
+    clickHandler: ClickHandler,
+  ): ClickHandler | undefined => {
     return shouldDisableRestrictedActions ? undefined : clickHandler;
   };
 

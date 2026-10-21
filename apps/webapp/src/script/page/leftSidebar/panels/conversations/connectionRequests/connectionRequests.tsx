@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import cx from 'classnames';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
@@ -33,7 +35,10 @@ interface ConnectionRequestsProps {
   onConnectionRequestClick: () => void;
 }
 
-export const ConnectionRequests = ({connectionRequests, onConnectionRequestClick}: ConnectionRequestsProps) => {
+export const ConnectionRequests: FunctionComponent<ConnectionRequestsProps> = ({
+  connectionRequests,
+  onConnectionRequestClick,
+}: ConnectionRequestsProps) => {
   const {translate} = useApplicationContext();
   const contentState = useAppState(state => {
     return state.contentState;

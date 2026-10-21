@@ -69,7 +69,7 @@ export const createMeetingNotificationEventHandlers = ({
   dismissNotificationsForMeeting,
   logger,
 }: MeetingNotificationEventHandlersDependencies): MeetingNotificationEventHandlers => {
-  const getMeeting = (meetingId: QualifiedId) => {
+  const getMeeting = (meetingId: QualifiedId): MeetingSeries | undefined => {
     return getMeetingSeries().find(meeting => {
       return matchQualifiedIds(meeting.qualified_id, meetingId);
     });
@@ -80,7 +80,7 @@ export const createMeetingNotificationEventHandlers = ({
   const notifiedMeetings = new Set<string>();
   const cancelledMeetings = new Set<string>();
 
-  const notifyForMeeting = (kind: MeetingNotificationKind, meeting: MeetingSeries) => {
+  const notifyForMeeting = (kind: MeetingNotificationKind, meeting: MeetingSeries): void => {
     const notificationBase = {
       meetingTitle: meeting.title,
       meetingStartTime: meeting.series_start_date,
@@ -137,7 +137,7 @@ export const createMeetingNotificationEventHandlers = ({
     addCancellationNotificationForMeeting(meetingId);
   };
 
-  const retryPendingNotifications = () => {
+  const retryPendingNotifications = (): void => {
     for (const [key, meetingId] of pending) {
       const meeting = getMeeting(meetingId);
       if (isUndefined(meeting)) {

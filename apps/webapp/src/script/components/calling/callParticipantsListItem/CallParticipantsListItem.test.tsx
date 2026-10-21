@@ -53,7 +53,7 @@ const createMockParticipant = ({
   isFederated?: boolean;
   isExternal?: boolean;
   isAudioEstablished?: boolean;
-}) => {
+}): Participant => {
   const user = new User(createUuid(), '', translateForTest);
   user.name('user');
   user.isMe = isSelfUser;

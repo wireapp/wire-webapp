@@ -22,7 +22,7 @@ import {useEffect, RefObject, useCallback} from 'react';
 import {$convertToMarkdownString} from '@lexical/markdown';
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {LexicalEditor} from 'lexical';
-import {useDebouncedCallback} from 'use-debounce';
+import {useDebouncedCallback, type DebouncedState} from 'use-debounce';
 
 import {markdownTransformers} from './markdownTransformers';
 import {getRawMessageText, transformMessage} from './transformMessage';
@@ -36,12 +36,13 @@ interface UseEditorDraftStateProps {
   disableMessagePreprocessing: boolean;
 }
 
+type UseEditorDraftStateResult = {saveDraft: DebouncedState<() => void>};
 export const useEditorDraftState = ({
   editorRef,
   saveDraftState,
   replaceEmojis,
   disableMessagePreprocessing,
-}: UseEditorDraftStateProps) => {
+}: UseEditorDraftStateProps): UseEditorDraftStateResult => {
   const saveDraft = useCallback(() => {
     const editor = editorRef.current;
     if (isNullOrUndefined(editor)) {

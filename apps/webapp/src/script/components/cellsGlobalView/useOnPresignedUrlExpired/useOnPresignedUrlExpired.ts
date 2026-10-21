@@ -24,7 +24,7 @@ import {useCellsStore} from '../common/useCellsStore/useCellsStore';
 // Every node has a url to its destination, which expires after some time.
 // When the url expires, we need to refresh the nodes to get the new url.
 // If we don't refresh the nodes, the user will see a broken image.
-export const useOnPresignedUrlExpired = ({refreshCallback}: {refreshCallback: () => void}) => {
+export const useOnPresignedUrlExpired = ({refreshCallback}: {refreshCallback: () => void}): void => {
   const {nodes} = useCellsStore();
 
   const nodesAvailable = nodes.length > 0;

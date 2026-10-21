@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {useEffect, useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 import {connect} from 'react-redux';
@@ -38,7 +38,10 @@ import {getEnterpriseLoginV2FF} from '../util/helpers';
 
 const REDIRECT_DELAY = 5000;
 const REDIRECTION_CIRCLE_CIRCUMFERENCE = 377;
-const CustomEnvironmentRedirectComponent = ({doNavigate, doSendNavigationEvent}: DispatchProps) => {
+const CustomEnvironmentRedirectComponent: FunctionComponent<DispatchProps> = ({
+  doNavigate,
+  doSendNavigationEvent,
+}: DispatchProps) => {
   const {translate} = useApplicationContext();
   const [destinationUrl, setDestinationUrl] = useState<string | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -131,7 +134,11 @@ const CustomEnvironmentRedirectComponent = ({doNavigate, doSendNavigationEvent}:
 };
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: ThunkDispatch) => {
+type MapDispatchToPropsResult = {
+  doNavigate: (url: string) => void;
+  doSendNavigationEvent: (url: string) => Promise<void>;
+};
+const mapDispatchToProps = (dispatch: ThunkDispatch): MapDispatchToPropsResult => {
   return {
     doNavigate: (...args: Parameters<typeof actionRoot.navigationAction.doNavigate>) => {
       return dispatch(actionRoot.navigationAction.doNavigate(...args));

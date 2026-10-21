@@ -69,7 +69,7 @@ jest.mock('Components/messagesList/message/contentMessage/asset/linkPreviewAsset
   };
 });
 
-const createImageMessage = (timestamp: number = Date.now()) => {
+const createImageMessage = (timestamp: number = Date.now()): ContentMessage => {
   const message = new ContentMessage(createUuid(), translateForTest);
   message.timestamp(timestamp);
   const image = new MediumImage(createUuid());
@@ -79,7 +79,7 @@ const createImageMessage = (timestamp: number = Date.now()) => {
   return message;
 };
 
-const createFileMessage = () => {
+const createFileMessage = (): ContentMessage => {
   const message = new ContentMessage(createUuid(), translateForTest);
   const file = new FileAsset(createUuid());
   message.assets.push(file);
@@ -87,7 +87,7 @@ const createFileMessage = () => {
   return message;
 };
 
-const createLinkMessage = () => {
+const createLinkMessage = (): ContentMessage => {
   const message = new ContentMessage(createUuid(), translateForTest);
   const link = new Text(createUuid());
   link.previews.push(new LinkPreview({}));
@@ -96,7 +96,7 @@ const createLinkMessage = () => {
   return message;
 };
 
-const createAudioMessage = () => {
+const createAudioMessage = (): ContentMessage => {
   const message = new ContentMessage(createUuid(), translateForTest);
   const audio = new FileAsset(createUuid());
   spyOn(audio, 'isAudio').and.returnValue(true);

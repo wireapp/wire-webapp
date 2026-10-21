@@ -64,6 +64,19 @@ const normalizeSearchQuery = (query: string): string => {
   return isNonEmptyStringAndNotWhitespace(query) ? query.trim() : '';
 };
 
+type UseConversationSearchFilesResult = {
+  searchValue: string;
+  handleSearch: (value: string) => void;
+  handleReload: () => Promise<void>;
+  handleClearSearch: ({
+    preserveFilters,
+    preserveInputValue,
+  }?: {
+    preserveFilters?: boolean;
+    preserveInputValue?: boolean;
+  }) => void;
+  loadMore: (offset: number) => Promise<void>;
+};
 export const useConversationSearchFiles = ({
   cellsRepository,
   userRepository,
@@ -73,7 +86,7 @@ export const useConversationSearchFiles = ({
   filters,
   onClear,
   sort,
-}: UseConversationSearchFilesProps) => {
+}: UseConversationSearchFilesProps): UseConversationSearchFilesResult => {
   const {setNodes, appendNodes, setStatus, setPagination, setError, clearAll} = useCellsStore();
 
   const [searchValue, setSearchValue] = useState('');
@@ -258,7 +271,7 @@ export const useConversationSearchFiles = ({
   const handleClearSearch = ({
     preserveFilters = true,
     preserveInputValue = false,
-  }: {preserveFilters?: boolean; preserveInputValue?: boolean} = {}) => {
+  }: {preserveFilters?: boolean; preserveInputValue?: boolean} = {}): void => {
     searchNodesDebounced.cancel();
     requestVersionGate.current.invalidate();
     if (!preserveInputValue) {

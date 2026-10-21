@@ -31,7 +31,7 @@
       "executor": "nx:run-commands",
       "dependsOn": [],
       "options": {
-        "command": "eslint --config eslint.config.mjs --max-warnings=0 tools/i18n tools/releaseAppearance tools/releaseMetadata tools/releaseGithub tools/releaseCli 'tools/**/*.test.ts'"
+        "command": "eslint --config eslint.config.mjs --max-warnings=0 --ext .js,.jsx,.ts,.tsx,.cjs,.mjs,.mts,.cts tools"
       }
     },
     "e2e": {

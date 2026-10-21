@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode, useEffect, useRef, useState} from 'react';
+import {ReactNode, useEffect, useRef, useState, type FunctionComponent} from 'react';
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
@@ -58,7 +58,7 @@ import {ContentState, useAppState} from '../useAppState';
 
 export const ANIMATED_PAGE_TRANSITION_DURATION = 500;
 
-const Animated = ({children, ...rest}: {children: ReactNode}) => {
+const Animated: FunctionComponent<{children: ReactNode}> = ({children, ...rest}: {children: ReactNode}) => {
   const nodeRef = useRef<HTMLDivElement>(null);
 
   return (
@@ -84,7 +84,7 @@ interface MainContentProps {
   reloadApp: () => void;
 }
 
-const MainContent = ({
+const MainContent: FunctionComponent<MainContentProps> = ({
   appLockRepository,
   openRightSidebar,
   isRightSidebarOpen = false,
@@ -156,7 +156,7 @@ const MainContent = ({
 
   const title = statesTitle[contentState];
 
-  const onFileUpload = (file: File) => {
+  const onFileUpload = (file: File): void => {
     switchContent(ContentState.HISTORY_IMPORT);
     setUploadedFile(file);
   };

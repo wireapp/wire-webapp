@@ -17,7 +17,7 @@
  *
  */
 
-import {useRef} from 'react';
+import {useRef, type FunctionComponent} from 'react';
 
 import {isNull} from '@sindresorhus/is';
 import cx from 'classnames';
@@ -29,7 +29,7 @@ import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {MessagesListParams} from './messageList.types';
 
-export const VirtualizedMessageListWrapper = ({
+export const VirtualizedMessageListWrapper: FunctionComponent<MessagesListParams> = ({
   assetRepository,
   conversation,
   selfUser,

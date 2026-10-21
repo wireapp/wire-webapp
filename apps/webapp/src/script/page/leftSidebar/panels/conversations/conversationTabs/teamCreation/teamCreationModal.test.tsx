@@ -19,7 +19,7 @@
 
 import {act} from 'react';
 
-import {fireEvent, render, waitFor} from '@testing-library/react';
+import {fireEvent, render, waitFor, type RenderResult} from '@testing-library/react';
 
 import {withTheme} from 'src/script/auth/util/test/testUtil';
 import {
@@ -51,7 +51,7 @@ describe('TeamCreationModal', () => {
   const rootContextValue = createRootContextValueForTest({translate: translateForTest});
   const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
-  const renderTeamCreationModal = () => {
+  const renderTeamCreationModal = (): RenderResult => {
     useTeamCreationModal.setState({isModalOpen: true});
     return render(
       withTheme(<TeamCreationModal onClose={onCloseMock} onSuccess={onSuccessMock} userName={userName} />),

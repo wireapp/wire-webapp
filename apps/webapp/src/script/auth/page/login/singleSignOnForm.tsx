@@ -17,10 +17,13 @@
  *
  */
 
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState, type FunctionComponent} from 'react';
 
 import {isError, isNonEmptyString, isUndefined} from '@sindresorhus/is';
+import type {DomainData} from '@wireapp/api-client/lib/account/domainData';
 import {ClientType} from '@wireapp/api-client/lib/client/index';
+import type {ConversationJoinData} from '@wireapp/api-client/lib/conversation/data';
+import type {ConversationEvent} from '@wireapp/api-client/lib/event';
 import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {isValidEmail, PATTERN} from '@wireapp/commons/lib/util/ValidationUtil';
 import {FormattedMessage} from 'react-intl';
@@ -42,6 +45,7 @@ import {JoinGuestLinkPasswordModal} from '../../component/joinGuestLinkPasswordM
 import {actionRoot as ROOT_ACTIONS} from '../../module/action';
 import {ValidationError} from '../../module/action/validationError';
 import {RootState, ThunkDispatch} from '../../module/reducer';
+import type {RegistrationDataState} from '../../module/reducer/authReducer';
 import * as AuthSelector from '../../module/selector/authSelector';
 import * as ConversationSelector from '../../module/selector/conversationSelector';
 import {QUERY_KEY, ROUTE} from '../../route';
@@ -55,9 +59,11 @@ interface SingleSignOnFormProps {
   initialCode?: string;
 }
 
+type RenderStatusMessageResult = ReturnType<typeof parseError> | ReturnType<typeof parseValidationErrors>;
+
 const SSO_CODE_PREFIX_REGEX = '[wW][iI][rR][eE]-';
 
-const SingleSignOnFormComponent = ({
+const SingleSignOnFormComponent: FunctionComponent<SingleSignOnFormProps & ConnectedProps & DispatchProps> = ({
   initialCode,
   isFetching,
   authError,
@@ -189,7 +195,7 @@ const SingleSignOnFormComponent = ({
     }
   }, [codeOrMail, initialCode]);
 
-  const onCodeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onCodeChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     setCodeOrMail(event.target.value);
     setIsCodeOrMailInputValid(true);
   };
@@ -291,7 +297,7 @@ const SingleSignOnFormComponent = ({
     }
   }, [codeOrMail, handleSubmit, initialCode, shouldAutoLogin]);
 
-  const stripPrefix = (prefixedCode: string) => {
+  const stripPrefix = (prefixedCode: string): string => {
     return prefixedCode.trim().toLowerCase().replace(SSO_CODE_PREFIX, '');
   };
 
@@ -309,11 +315,11 @@ const SingleSignOnFormComponent = ({
     ? `(${SSO_CODE_PREFIX_REGEX}${PATTERN.UUID_V4}|${PATTERN.EMAIL})`
     : `${SSO_CODE_PREFIX_REGEX}${PATTERN.UUID_V4}`;
 
-  const submitJoinCodeWithPassword = async (password?: string) => {
+  const submitJoinCodeWithPassword = async (password?: string): Promise<void> => {
     await handleSubmit(undefined, password);
   };
 
-  const renderStatusMessage = () => {
+  const renderStatusMessage = (): RenderStatusMessageResult => {
     if (validationError !== null && validationError !== undefined) {
       return parseValidationErrors([validationError]);
     }
@@ -409,7 +415,15 @@ const SingleSignOnFormComponent = ({
 };
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
-const mapStateToProps = (state: RootState) => {
+type MapStateToPropsResult = {
+  isFetching: boolean;
+  account: RegistrationDataState;
+  authError: Error | null;
+  conversationError: (Error & {label?: string; code?: number; message?: string}) | null;
+  conversationInfo: ConversationJoinData | null;
+  conversationInfoFetching: boolean;
+};
+const mapStateToProps = (state: RootState): MapStateToPropsResult => {
   return {
     isFetching: AuthSelector.isFetching(state),
     account: AuthSelector.getAccount(state),
@@ -421,7 +435,23 @@ const mapStateToProps = (state: RootState) => {
 };
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: ThunkDispatch) => {
+type MapDispatchToPropsResult = {
+  doCheckConversationCode: (key: string, code: string, uri?: string | undefined) => Promise<void>;
+  doFinalizeSSOLogin: (args_0: {clientType: ClientType}) => Promise<void>;
+  doGetDomainInfo: (domain: string) => Promise<DomainData>;
+  doJoinConversationByCode: (
+    key: string,
+    code: string,
+    uri?: string | undefined,
+    password?: string | undefined,
+  ) => Promise<ConversationEvent>;
+  doGetConversationInfoByCode: (key: string, code: string) => Promise<ConversationJoinData | undefined>;
+  doNavigate: (url: string) => void;
+  resetAuthError: () => Promise<void>;
+  validateSSOCode: (code: string) => Promise<void>;
+  pushAccountRegistrationData: (registration: Partial<RegistrationDataState>) => Promise<void>;
+};
+const mapDispatchToProps = (dispatch: ThunkDispatch): MapDispatchToPropsResult => {
   return {
     doCheckConversationCode: (...args: Parameters<typeof ROOT_ACTIONS.conversationAction.doCheckConversationCode>) => {
       return dispatch(ROOT_ACTIONS.conversationAction.doCheckConversationCode(...args));

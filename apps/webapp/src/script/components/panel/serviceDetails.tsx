@@ -17,7 +17,7 @@
  *
  */
 
-import {useId} from 'react';
+import {useId, type FunctionComponent} from 'react';
 
 import {Avatar, AVATAR_SIZE} from 'Components/avatar';
 import {authorLabel, description, header, panel} from 'Components/panel/serviceDetails.styles';
@@ -29,7 +29,7 @@ interface ServiceDetailsProps {
   service: ServiceEntity;
 }
 
-const ServiceDetails = ({service}: ServiceDetailsProps) => {
+const ServiceDetails: FunctionComponent<ServiceDetailsProps> = ({service}: ServiceDetailsProps) => {
   const {translate} = useApplicationContext();
   const {providerName, name, author} = useKoSubscribableChildren(service, ['providerName', 'name', 'author']);
 

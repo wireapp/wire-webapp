@@ -17,7 +17,7 @@
  *
  */
 
-import {FormEvent, useState} from 'react';
+import {FormEvent, useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
@@ -36,7 +36,7 @@ export interface JoinGuestLinkPasswordModalProps {
   onClose: () => void;
 }
 
-const JoinGuestLinkPasswordModal = ({
+const JoinGuestLinkPasswordModal: FunctionComponent<JoinGuestLinkPasswordModalProps> = ({
   error,
   onClose,
   isLoading,
@@ -46,12 +46,12 @@ const JoinGuestLinkPasswordModal = ({
   const {translate} = useApplicationContext();
   const [passwordValue, setPasswordValue] = useState<string>('');
 
-  const onSubmit = (event: FormEvent<HTMLFormElement | HTMLButtonElement>) => {
+  const onSubmit = (event: FormEvent<HTMLFormElement | HTMLButtonElement>): void => {
     event.preventDefault();
     onSubmitPassword(passwordValue);
   };
 
-  const Error = () => {
+  const Error: FunctionComponent = () => {
     if (error?.code === HTTP_STATUS.FORBIDDEN || error?.code === HTTP_STATUS.BAD_REQUEST) {
       return <ErrorMessage>{translate('guestLinkPasswordModal.passwordIncorrect')}</ErrorMessage>;
     }

@@ -13,7 +13,11 @@ import userEvent from '@testing-library/user-event';
 
 import {SettingsTab} from './settingsTab';
 
-function renderSettingsTab({isDebugEnabled = true}: {isDebugEnabled?: boolean} = {}) {
+type RenderSettingsTabResult = {
+  onOpenDeveloperMenu: jest.Mock<any, any, any>;
+  onOpenPreferences: jest.Mock<any, any, any>;
+};
+function renderSettingsTab({isDebugEnabled = true}: {isDebugEnabled?: boolean} = {}): RenderSettingsTabResult {
   const onOpenDeveloperMenu = jest.fn();
   const onOpenPreferences = jest.fn();
 

@@ -52,41 +52,41 @@ export class BrigRepositoryE2E {
     return invitationCodeResponse.data.code;
   }
 
-  public async unlockConferenceCallingFeature(teamId: string) {
+  public async unlockConferenceCallingFeature(teamId: string): Promise<void> {
     await this.axiosInstance.put(`i/teams/${teamId}/features/conferenceCalling/unlocked`, {});
   }
 
-  public async enableConferenceCallingBackdoorViaBackdoorTeam(teamId: string) {
+  public async enableConferenceCallingBackdoorViaBackdoorTeam(teamId: string): Promise<void> {
     await this.axiosInstance.patch(`i/teams/${teamId}/features/conferenceCalling`, {
       status: 'enabled',
     });
   }
 
-  public async unlockChannelFeature(teamId: string) {
+  public async unlockChannelFeature(teamId: string): Promise<void> {
     await this.axiosInstance.put(`i/teams/${teamId}/features/channels/unlocked`, {});
   }
 
-  public async unlockSndFactorPasswordChallenge(teamId: string) {
+  public async unlockSndFactorPasswordChallenge(teamId: string): Promise<void> {
     await this.axiosInstance.put(`i/teams/${teamId}/features/sndFactorPasswordChallenge/unlocked`, {});
   }
 
-  public async unlockAppLock(teamId: string) {
+  public async unlockAppLock(teamId: string): Promise<void> {
     await this.axiosInstance.put(`i/teams/${teamId}/features/appLock/unlocked`, {});
   }
 
-  public async enableChannelsFeature(teamId: string) {
+  public async enableChannelsFeature(teamId: string): Promise<void> {
     await this.axiosInstance.patch(`i/teams/${teamId}/features/channels`, {
       status: 'enabled',
     });
   }
 
-  public async enableMeetingsFeature(teamId: string) {
+  public async enableMeetingsFeature(teamId: string): Promise<void> {
     await this.axiosInstance.patch(`i/teams/${teamId}/features/meetings`, {
       status: 'enabled',
     });
   }
 
-  public async unlockMeetingsFeature(teamId: string) {
+  public async unlockMeetingsFeature(teamId: string): Promise<void> {
     await this.axiosInstance.put(`i/teams/${teamId}/features/meetings/unlocked`, {});
   }
 
@@ -97,7 +97,7 @@ export class BrigRepositoryE2E {
       defaultProtocol: 'mls' | 'proteus';
       supportedProtocols: ('mls' | 'proteus')[];
     },
-  ) {
+  ): Promise<void> {
     await this.axiosInstance.patch(`i/teams/${teamId}/features/mls`, {
       status: config.status ?? 'enabled',
       config: {
@@ -110,7 +110,11 @@ export class BrigRepositoryE2E {
     });
   }
 
-  public async toggleAppLock(teamId: string, status: 'enabled' | 'disabled', enforceAppLock: boolean = true) {
+  public async toggleAppLock(
+    teamId: string,
+    status: 'enabled' | 'disabled',
+    enforceAppLock: boolean = true,
+  ): Promise<void> {
     await this.axiosInstance.patch(`i/teams/${teamId}/features/appLock`, {
       status: status,
       config: {
@@ -120,11 +124,11 @@ export class BrigRepositoryE2E {
     });
   }
 
-  public async unlockCellsFeature(teamId: string) {
+  public async unlockCellsFeature(teamId: string): Promise<void> {
     await this.axiosInstance.put(`i/teams/${teamId}/features/cells/unlocked`, {});
   }
 
-  public async enableCells(teamId: string) {
+  public async enableCells(teamId: string): Promise<void> {
     await this.axiosInstance.put(`i/teams/${teamId}/features/cells`, {
       config: {
         channels: {
@@ -175,7 +179,7 @@ export class BrigRepositoryE2E {
     });
   }
 
-  public async claimDomain(domain: string, federation: {webappUrl: string; backendUrl: string}) {
+  public async claimDomain(domain: string, federation: {webappUrl: string; backendUrl: string}): Promise<void> {
     await this.axiosInstance.put(`i/domain-registration/${domain}`, {
       backend: {
         config_url: new URL('deeplink.json', federation.backendUrl),
@@ -186,11 +190,11 @@ export class BrigRepositoryE2E {
     });
   }
 
-  public async deleteDomainClaim(domain: string) {
+  public async deleteDomainClaim(domain: string): Promise<void> {
     await this.axiosInstance.delete(`i/domain-registration/${domain}`);
   }
 
-  public async enableSSOFeature(teamId: string) {
+  public async enableSSOFeature(teamId: string): Promise<void> {
     await this.axiosInstance.patch(`i/teams/${teamId}/features/sso`, {
       status: 'enabled',
     });

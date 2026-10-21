@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useRef, useState} from 'react';
+import React, {useRef, useState, type FunctionComponent} from 'react';
 
 import {isNull, isObject, isString, isUndefined} from '@sindresorhus/is';
 import {BackendError, SyntheticErrorLabel} from '@wireapp/api-client/lib/http';
@@ -66,7 +66,9 @@ type Props = React.HTMLAttributes<HTMLDivElement>;
 
 const logger = getLogger('SingleSignOn');
 
-const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
+const SingleSignOnComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> = ({
+  hasDefaultSSOCode,
+}: Props & ConnectedProps & DispatchProps) => {
   const {translate} = useApplicationContext();
   const ssoWindowRef = useRef<Window | null>(null);
   const params = useParams<{code?: string}>();
@@ -84,7 +86,7 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
       let onReceiveChildWindowMessage: ((event: MessageEvent) => void) | undefined = undefined;
       let onParentWindowClose: ((event: Event) => void) | undefined = undefined;
 
-      const onChildWindowClose = () => {
+      const onChildWindowClose = (): void => {
         clearInterval(timerId);
         if (!isUndefined(onReceiveChildWindowMessage)) {
           window.removeEventListener('message', onReceiveChildWindowMessage);
@@ -162,7 +164,7 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
 
       setIsOverlayOpen(true);
 
-      const closeSSOWindow = () => {
+      const closeSSOWindow = (): void => {
         amplify.publish(WebAppEvents.LIFECYCLE.SSO_WINDOW_CLOSE);
         ssoWindowRef.current?.close();
       };
@@ -191,7 +193,7 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
     });
   };
 
-  const focusChildWindow = () => {
+  const focusChildWindow = (): void => {
     amplify.publish(WebAppEvents.LIFECYCLE.SSO_WINDOW_FOCUS);
     ssoWindowRef.current?.focus();
   };
@@ -327,14 +329,16 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
 };
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
-const mapStateToProps = (state: RootState) => {
+type MapStateToPropsResult = {hasDefaultSSOCode: boolean};
+const mapStateToProps = (state: RootState): MapStateToPropsResult => {
   return {
     hasDefaultSSOCode: AuthSelector.hasDefaultSSOCode(state),
   };
 };
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => {
+type MapDispatchToPropsResult = {};
+const mapDispatchToProps = (dispatch: Dispatch<AnyAction>): MapDispatchToPropsResult => {
   return bindActionCreators({}, dispatch);
 };
 

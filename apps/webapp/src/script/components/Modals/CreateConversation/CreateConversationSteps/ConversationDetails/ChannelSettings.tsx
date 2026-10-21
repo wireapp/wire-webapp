@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {ADD_PERMISSION} from '@wireapp/api-client/lib/conversation';
 import {container} from 'tsyringe';
 
@@ -34,7 +36,7 @@ import {useCreateConversationModal} from '../../hooks/useCreateConversationModal
 import {ChatHistory, ConversationAccess} from '../../types';
 import {getConversationAccessOptions, getChatHistoryOptions, getConversationManagerOptions} from '../../utils';
 
-export const ChannelSettings = () => {
+export const ChannelSettings: FunctionComponent = () => {
   const {translate} = useApplicationContext();
   const teamState = container.resolve(TeamState);
   const {
@@ -58,7 +60,7 @@ export const ChannelSettings = () => {
     historySharingUnit,
     true,
   );
-  const onChatHistoryChange = (option?: Option | null) => {
+  const onChatHistoryChange = (option?: Option | null): void => {
     if (option?.value === ChatHistory.Custom) {
       if (!isPremiumUser) {
         setIsUpgradeTeamModalOpen(true);

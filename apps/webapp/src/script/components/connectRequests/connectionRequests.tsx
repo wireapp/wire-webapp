@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useRef} from 'react';
+import {useEffect, useRef, type FunctionComponent} from 'react';
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
@@ -41,7 +41,7 @@ interface ConnectRequestsProps {
   readonly teamState: TeamState;
 }
 
-export const ConnectRequests = ({
+export const ConnectRequests: FunctionComponent<ConnectRequestsProps> = ({
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
 }: ConnectRequestsProps) => {
@@ -70,7 +70,7 @@ export const ConnectRequests = ({
 
   const {setCurrentTab: setCurrentSidebarTab} = useSidebarStore();
 
-  const scrollToBottom = (behavior: ScrollBehavior = 'auto') => {
+  const scrollToBottom = (behavior: ScrollBehavior = 'auto'): void => {
     if (!isNullOrUndefined(connectRequestsRefEnd.current)) {
       connectRequestsRefEnd.current.scrollIntoView({behavior});
     }
@@ -94,7 +94,7 @@ export const ConnectRequests = ({
     void actionsViewModel.ignoreConnectionRequest(userEntity);
   };
 
-  const onAcceptClick = async (userEntity: User) => {
+  const onAcceptClick = async (userEntity: User): Promise<void> => {
     await actionsViewModel.acceptConnectionRequest(userEntity);
 
     const conversationEntity = await actionsViewModel.getOrCreate1to1Conversation(userEntity);

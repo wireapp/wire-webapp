@@ -33,7 +33,7 @@ export const isInRecycleBin = (): boolean => {
   return isPathInRecycleBin(getCellsFilesPath());
 };
 
-export const getNodeRootParentPath = ({nodePath}: {nodePath: string}) => {
+export const getNodeRootParentPath = ({nodePath}: {nodePath: string}): string => {
   const segments = nodePath.split('/');
   const recycleBinIndex = segments.indexOf(RECYCLE_BIN_PATH);
   const rootParentPath = segments[recycleBinIndex + 1];

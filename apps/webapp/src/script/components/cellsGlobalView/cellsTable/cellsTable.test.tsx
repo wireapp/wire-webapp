@@ -35,6 +35,7 @@ import {translateForTest} from 'Util/test/translateForTest';
 import {CellsTable} from './cellsTable';
 
 import {CELLS_SELF_USER_DRIVE_ROLE} from '../../conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
+import type {JSX} from '@emotion/react/jsx-runtime';
 
 const translateSelectionForTest: Translate = (key, substitutions) => {
   if (key === 'cells.selection.selectedCount') {
@@ -67,7 +68,15 @@ const createNode = (id: string, type: CellNodeType): CellNode => {
   };
 };
 
-const renderCellsTable = (selectionEnabled = true, selectionScopeKey = 'filters:none', isBulkActionsEnabled = true) => {
+type RenderCellsTableResult = {
+  rerenderWithNodes: (nodes: CellNode[]) => void;
+  rerenderWithScope: (scopeKey: string) => void;
+};
+const renderCellsTable = (
+  selectionEnabled = true,
+  selectionScopeKey = 'filters:none',
+  isBulkActionsEnabled = true,
+): RenderCellsTableResult => {
   const wrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({
       translate: translateSelectionForTest,
@@ -76,7 +85,7 @@ const renderCellsTable = (selectionEnabled = true, selectionScopeKey = 'filters:
       },
     }),
   );
-  const renderTable = (nodes: CellNode[], scopeKey = selectionScopeKey) => {
+  const renderTable = (nodes: CellNode[], scopeKey = selectionScopeKey): JSX.Element => {
     return (
       <ThemeProvider>
         <CellsTable

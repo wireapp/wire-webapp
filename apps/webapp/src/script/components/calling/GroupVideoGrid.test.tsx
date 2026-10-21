@@ -56,7 +56,7 @@ const createMockParticipant = (
   userId: string,
   clientId: string,
   {isMuted = false, isAudioEstablished = true}: {isMuted?: boolean; isAudioEstablished?: boolean},
-) => {
+): Participant => {
   const user = new User(userId, '', translateForTest);
 
   const participant = new Participant(user, clientId);
@@ -66,7 +66,7 @@ const createMockParticipant = (
   return participant;
 };
 
-const createMockCall = () => {
+const createMockCall = (): Call => {
   return new Call(
     {domain: '', id: ''},
     new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest),
@@ -77,7 +77,7 @@ const createMockCall = () => {
   );
 };
 
-const createMediaStream = () => {
+const createMediaStream = (): MediaStream => {
   return {
     getVideoTracks: jest.fn(() => {
       return [];

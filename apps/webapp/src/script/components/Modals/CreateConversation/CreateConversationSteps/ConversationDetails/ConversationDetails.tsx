@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {container} from 'tsyringe';
 
 import {UserState} from 'Repositories/user/userState';
@@ -30,7 +32,7 @@ import {useCreateConversationModal} from '../../hooks/useCreateConversationModal
 import {ConversationType} from '../../types';
 import {Preference} from '../Preference';
 
-export const ConversationDetails = () => {
+export const ConversationDetails: FunctionComponent = () => {
   const {translate} = useApplicationContext();
   const {conversationType} = useCreateConversationModal();
   const userState = container.resolve(UserState);

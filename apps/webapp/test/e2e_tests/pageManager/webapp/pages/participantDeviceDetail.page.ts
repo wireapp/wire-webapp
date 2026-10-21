@@ -19,11 +19,12 @@
 
 import {Page} from '@playwright/test';
 
-export const ParticipantDeviceDetailsPage = (page: Page) => {
+type ParticipantDeviceDetailsPageResult = {toggleDeviceVerification: () => Promise<void>};
+export const ParticipantDeviceDetailsPage = (page: Page): ParticipantDeviceDetailsPageResult => {
   const verificationToggleLabel = page.getByTestId('do-toggle-verified').getByText('Verified');
   const returnButton = page.getByRole('button', {name: 'Go back to device details'});
 
-  const toggleDeviceVerification = async () => {
+  const toggleDeviceVerification = async (): Promise<void> => {
     await verificationToggleLabel.click();
     await returnButton.click();
   };

@@ -17,7 +17,7 @@
  *
  */
 
-import {act, renderHook, waitFor} from '@testing-library/react';
+import {act, renderHook, waitFor, type RenderHookResult} from '@testing-library/react';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {RestNode} from 'cells-sdk-ts';
 import {noop} from 'noop-esm';
@@ -47,9 +47,20 @@ describe('useGetCellsFolders', () => {
     clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
   });
 
-  const renderUseGetCellsFolders = (qualifiedId = conversationQualifiedId) => {
+  type RenderUseGetCellsFoldersOptions = {
+    conversationQualifiedId: typeof conversationQualifiedId;
+  };
+  type RenderUseGetCellsFoldersResult = RenderHookResult<
+    ReturnType<typeof useGetCellsFolders>,
+    RenderUseGetCellsFoldersOptions
+  >;
+  const renderUseGetCellsFolders = (
+    qualifiedId: RenderUseGetCellsFoldersOptions['conversationQualifiedId'] = conversationQualifiedId,
+  ): RenderUseGetCellsFoldersResult => {
     return renderHook(
-      ({conversationQualifiedId}: {conversationQualifiedId: typeof qualifiedId}) => {
+      (options: RenderUseGetCellsFoldersOptions) => {
+        const {conversationQualifiedId} = options;
+
         return useGetCellsFolders({
           nodeToMove,
           cellsRepository: cellsRepository as never,

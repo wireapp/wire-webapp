@@ -19,6 +19,7 @@
 
 import {Fragment, useCallback, useEffect, useRef} from 'react';
 
+import type {JSX} from '@emotion/react/jsx-runtime';
 import {container} from 'tsyringe';
 
 import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
@@ -33,7 +34,7 @@ interface ChooseScreenProps {
   callState?: CallState;
 }
 
-function ChooseScreen({choose, callState = container.resolve(CallState)}: ChooseScreenProps) {
+function ChooseScreen({choose, callState = container.resolve(CallState)}: ChooseScreenProps): JSX.Element {
   const {translate} = useApplicationContext();
   const {selectableScreens, selectableWindows} = useKoSubscribableChildren(callState, [
     'selectableScreens',
@@ -78,7 +79,7 @@ function ChooseScreen({choose, callState = container.resolve(CallState)}: Choose
     restoreFocusRef.current = focusContext.createFocusRestorationCallback();
 
     // Get all focusable elements
-    const getFocusableElements = () => {
+    const getFocusableElements = (): HTMLElement[] => {
       return Array.from(dialog.querySelectorAll<HTMLElement>('button:not([disabled])'));
     };
 
@@ -115,7 +116,7 @@ function ChooseScreen({choose, callState = container.resolve(CallState)}: Choose
     };
 
     // Prevent focus from getting out of the dialog
-    const handleFocusOut = (event: FocusEvent) => {
+    const handleFocusOut = (event: FocusEvent): void => {
       const relatedTarget = event.relatedTarget as HTMLElement | null;
       if (relatedTarget === null || !dialog.contains(relatedTarget)) {
         event.preventDefault();
@@ -133,7 +134,7 @@ function ChooseScreen({choose, callState = container.resolve(CallState)}: Choose
     };
   }, [selectableScreens, selectableWindows, cancel, callState, restoreFocusRef]);
 
-  const renderPreviews = (list: ElectronDesktopCapturerSource[], uieName: string) => {
+  const renderPreviews = (list: ElectronDesktopCapturerSource[], uieName: string): JSX.Element[] => {
     return list.map(({id, name, thumbnail}) => {
       return (
         <button

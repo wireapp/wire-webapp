@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode} from 'react';
+import {ReactNode, type FunctionComponent} from 'react';
 
 import cx from 'classnames';
 
@@ -26,7 +26,10 @@ interface PrimaryModalButtonsProps {
   children: ReactNode;
 }
 
-export const PrimaryModalButtons = ({isColumn, children}: PrimaryModalButtonsProps) => {
+export const PrimaryModalButtons: FunctionComponent<PrimaryModalButtonsProps> = ({
+  isColumn,
+  children,
+}: PrimaryModalButtonsProps) => {
   return (
     <div
       className={cx('modal__buttons', {

@@ -17,11 +17,13 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {wrapperStyles} from './cellsLoader.styles';
 
 import {CellsTableLoader} from '../common/cellsTableLoader/cellsTableLoader';
 
-export const CellsLoader = () => {
+export const CellsLoader: FunctionComponent = () => {
   return (
     <div css={wrapperStyles}>
       <CellsTableLoader />

@@ -19,7 +19,8 @@
 
 import {CSSObject} from '@emotion/react';
 
-export function getWrapperStyles(interactive: boolean) {
+type GetWrapperStylesResult = {cursor: string; width: string};
+export function getWrapperStyles(interactive: boolean): GetWrapperStylesResult {
   return {
     cursor: interactive ? 'pointer' : 'default',
     width: '100%',

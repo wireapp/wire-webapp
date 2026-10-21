@@ -17,8 +17,20 @@
  *
  */
 
-import axios, {AxiosInstance} from 'axios';
+import axios, {AxiosInstance, type AxiosResponse} from 'axios';
 
+type SendTextResult = Promise<
+  AxiosResponse<any, {legalHoldStatus: number; conversationId: string; text: string}, {}, any>
+>;
+
+type SendLocationResult = Promise<
+  AxiosResponse<
+    any,
+    {locationName: string; latitude: number; longitude: number; zoom: number; conversationId: string},
+    {},
+    any
+  >
+>;
 export class TestServiceClientE2E {
   private readonly axiosInstance: AxiosInstance;
 
@@ -32,7 +44,12 @@ export class TestServiceClientE2E {
     });
   }
 
-  async createInstance(password: string, email: string, deviceName: string, developmentApiEnabled: boolean) {
+  async createInstance(
+    password: string,
+    email: string,
+    deviceName: string,
+    developmentApiEnabled: boolean,
+  ): Promise<any> {
     const response = await this.axiosInstance.put('/api/v1/instance', {
       password,
       name: 'Generic Test Name',
@@ -44,7 +61,7 @@ export class TestServiceClientE2E {
     return response.data;
   }
 
-  async sendText(instanceId: string, conversationId: string, text: string) {
+  async sendText(instanceId: string, conversationId: string, text: string): SendTextResult {
     return await this.axiosInstance.post(`/api/v1/instance/${instanceId}/sendText`, {
       legalHoldStatus: 1,
       conversationId,
@@ -56,7 +73,7 @@ export class TestServiceClientE2E {
     instanceId: string,
     conversationId: string,
     message: {locationName: string; latitude: number; longitude: number; zoom: number},
-  ) {
+  ): SendLocationResult {
     return await this.axiosInstance.post(`/api/v1/instance/${instanceId}/sendLocation`, {
       conversationId,
       ...message,

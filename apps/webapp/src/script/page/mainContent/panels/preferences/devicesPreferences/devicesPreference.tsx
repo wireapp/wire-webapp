@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {useEffect, useState, type FunctionComponent} from 'react';
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
@@ -49,7 +49,7 @@ interface DevicesPreferencesProps {
   verifyDevice: (userId: QualifiedId, device: ClientEntity, isVerified: boolean) => void;
 }
 
-export const DevicesPreferences = ({
+export const DevicesPreferences: FunctionComponent<DevicesPreferencesProps> = ({
   clientState = container.resolve(ClientState),
   conversationState = container.resolve(ConversationState),
   cryptographyRepository,
@@ -71,7 +71,7 @@ export const DevicesPreferences = ({
   const currentClient = clientState.currentClient;
 
   const isSSO = selfUser.isNoPasswordSSO;
-  const getFingerprint = (device: ClientEntity) => {
+  const getFingerprint = (device: ClientEntity): Promise<string> => {
     return cryptographyRepository.getRemoteFingerprint(selfUser.qualifiedId, device.id);
   };
 

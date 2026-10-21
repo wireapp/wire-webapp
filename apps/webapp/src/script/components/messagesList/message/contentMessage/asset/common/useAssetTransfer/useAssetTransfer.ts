@@ -35,7 +35,21 @@ export type AssetUrl = {
   dispose: () => void;
 };
 
-export const useAssetTransfer = (message?: ContentMessage, assetRepository = container.resolve(AssetRepository)) => {
+type UseAssetTransferResult = {
+  cancelUpload: () => void;
+  downloadAsset: (fileAsset: FileAsset) => Promise<number | void>;
+  isDownloading: boolean;
+  isPendingUpload: boolean;
+  isUploaded: boolean;
+  isUploading: boolean;
+  getAssetUrl: (resource: AssetRemoteData, acceptedMimeTypes?: string[]) => Promise<AssetUrl>;
+  transferState: AssetTransferState;
+  uploadProgress: number;
+};
+export const useAssetTransfer = (
+  message?: ContentMessage,
+  assetRepository = container.resolve(AssetRepository),
+): UseAssetTransferResult => {
   const asset = message?.getFirstAsset() as FileAsset;
   const [uploadProgress, setUploadProgress] = useState<number>(0);
 

@@ -17,7 +17,7 @@
  *
  */
 
-import type {CSSProperties} from 'react';
+import type {CSSProperties, FunctionComponent} from 'react';
 
 const percentageScale = 100;
 
@@ -29,7 +29,13 @@ interface ProgressProps {
   style?: CSSProperties;
 }
 
-export const ProgressBar = ({ariaLabel, width, percent, error, style}: ProgressProps) => {
+export const ProgressBar: FunctionComponent<ProgressProps> = ({
+  ariaLabel,
+  width,
+  percent,
+  error,
+  style,
+}: ProgressProps) => {
   const normalizedPercent = Math.min(percentageScale, Math.max(0, Math.floor(percent)));
   const progress = (percent / percentageScale) * width;
 

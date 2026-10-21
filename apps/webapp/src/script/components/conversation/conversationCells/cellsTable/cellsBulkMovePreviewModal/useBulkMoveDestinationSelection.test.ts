@@ -46,7 +46,9 @@ const destinationFolder = {
 } as RestNode;
 const selectedNodes = [selectedFolder];
 
-const createHookWrapper = () => {
+type CreateHookWrapperResult = ReturnType<typeof createRootProviderWrapperForTest>;
+
+const createHookWrapper = (): CreateHookWrapperResult => {
   return createRootProviderWrapperForTest(
     createRootContextValueForTest({
       clock: createDeterministicClock({initialUnixEpochMicroseconds: 0n}),

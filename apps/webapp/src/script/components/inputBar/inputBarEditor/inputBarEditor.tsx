@@ -17,7 +17,7 @@
  *
  */
 
-import {MutableRefObject} from 'react';
+import {MutableRefObject, type FunctionComponent} from 'react';
 
 import {LexicalEditor} from 'lexical';
 
@@ -54,7 +54,7 @@ interface InputBarEditorProps {
   children: React.ReactNode;
 }
 
-export const InputBarEditor = ({
+export const InputBarEditor: FunctionComponent<InputBarEditorProps> = ({
   editorRef,
   editedMessage,
   inputPlaceholder,

@@ -17,7 +17,13 @@
  *
  */
 
-import {createColumnHelper} from '@tanstack/react-table';
+import {
+  createColumnHelper,
+  type ColumnDefBase,
+  type StringHeaderIdentifier,
+  type IdIdentifier,
+  type AccessorKeyColumnDefBase,
+} from '@tanstack/react-table';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {CellsSelectionCheckbox} from 'Components/cells/common/cellsSelectionCheckbox/cellsSelectionCheckbox';
@@ -58,6 +64,15 @@ export const getCellsTableDataCellLabels = (labels: CellsTableLabels): Record<st
   };
 };
 
+type GetCellsTableColumnsResult = (
+  | (ColumnDefBase<CellNode, unknown> & StringHeaderIdentifier)
+  | (ColumnDefBase<CellNode, unknown> & IdIdentifier<CellNode, unknown>)
+  | (AccessorKeyColumnDefBase<CellNode, string> & Partial<IdIdentifier<CellNode, string>>)
+  | (AccessorKeyColumnDefBase<CellNode, string[]> & Partial<IdIdentifier<CellNode, string[]>>)
+  | (AccessorKeyColumnDefBase<CellNode, number> & Partial<IdIdentifier<CellNode, number>>)
+  | (AccessorKeyColumnDefBase<CellNode, {alreadyShared: boolean; uuid?: string; url?: string} | undefined> &
+      Partial<IdIdentifier<CellNode, {alreadyShared: boolean; uuid?: string; url?: string} | undefined>>)
+)[];
 export const getCellsTableColumns = ({
   cellsRepository,
   conversationQualifiedId,
@@ -84,7 +99,7 @@ export const getCellsTableColumns = ({
   selectedNodeIds: Set<string>;
   onToggleSelection: (nodeId: string, isSelected: boolean) => void;
   selectionEnabled: boolean;
-}) => {
+}): GetCellsTableColumnsResult => {
   return [
     ...(selectionEnabled
       ? [

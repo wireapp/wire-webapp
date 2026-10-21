@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import React, {type FunctionComponent} from 'react';
 
 import {Select} from '@wireapp/react-ui-kit';
 
@@ -69,7 +69,7 @@ type VideoOptionLabelProps = {
   };
 };
 
-const VideoOptionLabel = ({option}: VideoOptionLabelProps) => {
+const VideoOptionLabel: FunctionComponent<VideoOptionLabelProps> = ({option}: VideoOptionLabelProps) => {
   if (option.icon == null) {
     return <>{option.label}</>;
   }
@@ -82,7 +82,7 @@ const VideoOptionLabel = ({option}: VideoOptionLabelProps) => {
   );
 };
 
-export const VideoControlsSelect = ({
+export const VideoControlsSelect: FunctionComponent<VideoControlsSelectProps> = ({
   value,
   id,
   dataUieName,

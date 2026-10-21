@@ -17,7 +17,7 @@
  *
  */
 
-import type {MouseEvent} from 'react';
+import type {MouseEvent, FunctionComponent} from 'react';
 
 import cx from 'classnames';
 
@@ -30,7 +30,11 @@ interface FormatTextButtonProps {
   onClick: (event: MouseEvent<HTMLButtonElement>) => void;
 }
 
-export const FormatTextButton = ({isActive, isEditing = false, onClick}: FormatTextButtonProps) => {
+export const FormatTextButton: FunctionComponent<FormatTextButtonProps> = ({
+  isActive,
+  isEditing = false,
+  onClick,
+}: FormatTextButtonProps) => {
   const {translate} = useApplicationContext();
 
   return (

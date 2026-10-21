@@ -67,7 +67,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
   const [clientY, setPOSY] = useState(INITIAL_CLIENT_Y_POS);
   const emojiButtonRef = useRef<HTMLButtonElement>(null);
 
-  const handleEmojiSelectionWithKeyboard = () => {
+  const handleEmojiSelectionWithKeyboard = (): void => {
     if (showEmojis) {
       handleMenuOpen(false);
       setShowEmojis(false);
@@ -77,19 +77,19 @@ const MessageReactions: FC<MessageReactionsProps> = ({
     }
   };
 
-  const handleOutsideClick = () => {
+  const handleOutsideClick = (): void => {
     resetActionMenuStates();
     setShowEmojis(false);
   };
 
-  const handleReactionCurrentState = (actionName = '') => {
+  const handleReactionCurrentState = (actionName = ''): void => {
     const isActive = actionName !== '';
     handleCurrentMsgAction(actionName);
     handleMenuOpen(isActive);
     setShowEmojis(isActive);
   };
 
-  const handleEmojiBtnClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleEmojiBtnClick = (event: React.MouseEvent<HTMLButtonElement>): void => {
     event.stopPropagation();
     const selectedMsgActionName = event.currentTarget.dataset.uieName;
     if (currentMsgActionName === selectedMsgActionName) {
@@ -101,7 +101,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
     }
   };
 
-  const handleEmojiKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
+  const handleEmojiKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>): void => {
     event.stopPropagation();
     const selectedMsgActionName = event.currentTarget.dataset.uieName;
     handleKeyDown(event);
@@ -116,12 +116,12 @@ const MessageReactions: FC<MessageReactionsProps> = ({
     }
   };
 
-  const showReactions = (rect: DOMRect) => {
+  const showReactions = (rect: DOMRect): void => {
     setPOSX(rect.x);
     setPOSY(rect.y);
   };
 
-  const handleMsgActionClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleMsgActionClick = (event: React.MouseEvent<HTMLButtonElement>): void => {
     event.stopPropagation();
     const actionType = event.currentTarget.dataset.uieName;
     switch (actionType) {
@@ -139,7 +139,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
     }
   };
 
-  const handleMsgActionKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
+  const handleMsgActionKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>): void => {
     event.stopPropagation();
     const actionType = event.currentTarget.dataset.uieName;
     switch (actionType) {

@@ -17,7 +17,7 @@
  *
  */
 
-import {ComponentType, CSSProperties} from 'react';
+import {ComponentType, CSSProperties, type FunctionComponent} from 'react';
 
 import {
   SVGIconProps,
@@ -44,7 +44,7 @@ interface FileTypeIconProps {
   size?: number;
 }
 
-export const FileTypeIcon = ({extension, size = 16}: FileTypeIconProps) => {
+export const FileTypeIcon: FunctionComponent<FileTypeIconProps> = ({extension, size = 16}: FileTypeIconProps) => {
   const type = getFileTypeFromExtension(extension);
   const Icon = fileIcons[type];
 

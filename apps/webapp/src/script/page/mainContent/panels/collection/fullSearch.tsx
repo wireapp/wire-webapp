@@ -20,6 +20,7 @@
 import {useEffect, useMemo, useRef} from 'react';
 
 import {CSSObject} from '@emotion/react';
+import type {JSX} from '@emotion/react/jsx-runtime';
 import {isNonEmptyArray, isNonEmptyString, isNull, isNumber} from '@sindresorhus/is';
 
 import {CloseIcon, Input, InputSubmitCombo, SearchIcon} from '@wireapp/react-ui-kit';
@@ -68,7 +69,7 @@ type FullSearchProps = {
   searchProvider: FullSearchProvider;
 };
 
-function FullSearch(props: FullSearchProps) {
+function FullSearch(props: FullSearchProps): JSX.Element {
   const {searchProvider, click = noop, change = noop} = props;
   const {translate} = useApplicationContext();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -83,7 +84,7 @@ function FullSearch(props: FullSearchProps) {
 
   useEffect(() => {
     const parent = element?.closest('.collection-list') as HTMLDivElement;
-    const onScroll = () => {
+    const onScroll = (): void => {
       const showAdditionalMessages = isScrolledBottom(parent) && isNonEmptyArray(messages);
       if (showAdditionalMessages) {
         setMessageCount(currentCount => {

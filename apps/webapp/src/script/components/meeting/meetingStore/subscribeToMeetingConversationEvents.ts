@@ -45,7 +45,7 @@ export const subscribeToMeetingConversationEvents = ({
   const onSelfRemovedFromConversation = ({
     qualifiedConversationId,
     initiatedBySelf,
-  }: ConversationSelfRemovedPayload) => {
+  }: ConversationSelfRemovedPayload): void => {
     const meeting = findMeetingSeriesByQualifiedConversation(getMeetingSeries(), qualifiedConversationId);
     if (meeting.isNothing) {
       return;

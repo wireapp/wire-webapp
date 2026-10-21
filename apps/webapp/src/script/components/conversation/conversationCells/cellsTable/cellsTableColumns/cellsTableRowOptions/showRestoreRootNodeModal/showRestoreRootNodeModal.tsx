@@ -30,7 +30,7 @@ export const showRestoreRootNodeModal = ({
   node: CellNode;
   onRestoreNode: () => void;
   translate: RootContextValue['translate'];
-}) => {
+}): void => {
   PrimaryModal.show(
     PrimaryModal.type.CONFIRM,
     {

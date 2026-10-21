@@ -17,12 +17,12 @@
  *
  */
 
-import {render, screen} from '@testing-library/react';
+import {render, screen, type RenderResult} from '@testing-library/react';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {ThemeProvider} from '@wireapp/react-ui-kit';
 
 import {MeetingStoreProvider} from 'Components/meeting/meetingStore/meetingStoreProvider';
-import {createMeetingStore} from 'Components/meeting/meetingStore/createMeetingStore';
+import {createMeetingStore, type MeetingStore} from 'Components/meeting/meetingStore/createMeetingStore';
 import type {MeetingStoreServiceTasks} from 'Components/meeting/meetingStore/meetingStoreDeps';
 import {MeetingAction} from './meetingAction';
 import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
@@ -54,7 +54,7 @@ const series: MeetingSeries = {
 const meetingInstance: MeetingInstance = {meetingSeries: series, start, end};
 const selfUser = new User('host-id', 'example.com', translateForTest);
 
-const createMeetingStoreForTest = () => {
+const createMeetingStoreForTest = (): MeetingStore => {
   return createMeetingStore({
     meetingsRepository: {} as MeetingsRepository,
     conversationRepository: {} as ConversationRepository,
@@ -75,7 +75,7 @@ const renderAction = (
   now: string,
   user = selfUser,
   clock = createDeterministicClock({initialUnixEpochMicroseconds: BigInt(Date.parse(now)) * 1_000n}),
-) => {
+): RenderResult => {
   return render(
     <MeetingStoreProvider store={createMeetingStoreForTest()}>
       <ThemeProvider>

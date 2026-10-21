@@ -29,7 +29,7 @@ interface CreateLinkParams {
   text?: string;
 }
 
-export const createNewLink = ({selection, url, text}: CreateLinkParams) => {
+export const createNewLink = ({selection, url, text}: CreateLinkParams): void => {
   const selectedText = selection.getTextContent();
   let textContent: string;
   if (isNonEmptyString(text)) {

@@ -32,7 +32,7 @@ const futureStartDate = new Date('2026-06-23T16:00:00.000Z');
 const futureEndDate = new Date('2026-06-23T17:00:00.000Z');
 const clock = createDeterministicClock({initialUnixEpochMicroseconds: BigInt(fixedNow.getTime()) * 1_000n});
 
-const createUser = (id: string) => {
+const createUser = (id: string): User => {
   const user = new User(id, 'example.com', translateForTest);
   user.name(`User ${id}`);
   return user;

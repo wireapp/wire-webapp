@@ -17,7 +17,7 @@
  *
  */
 
-import {useMemo} from 'react';
+import {useMemo, type FunctionComponent} from 'react';
 
 import {MessageTime} from 'Components/messagesList/message/messageTime';
 import {createRelativeTimestampFormatter, useRelativeTimestamp} from 'Hooks/useRelativeTimestamp';
@@ -27,7 +27,9 @@ interface CellsTableDateColumnProps {
   timestamp: number;
 }
 
-export const CellsTableDateColumn = ({timestamp}: CellsTableDateColumnProps) => {
+export const CellsTableDateColumn: FunctionComponent<CellsTableDateColumnProps> = ({
+  timestamp,
+}: CellsTableDateColumnProps) => {
   const {translate} = useApplicationContext();
   const relativeTimestampFormatter = useMemo(() => {
     return createRelativeTimestampFormatter({

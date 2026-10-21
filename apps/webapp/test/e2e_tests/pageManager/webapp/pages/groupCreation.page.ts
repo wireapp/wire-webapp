@@ -52,44 +52,44 @@ export class GroupCreationPage {
     this.errorGroupName = page.getByTestId('error-group-name');
   }
 
-  async setGroupName(name: string) {
+  async setGroupName(name: string): Promise<void> {
     await this.groupNameInput.fill(name);
     await this.nextButton.click();
   }
 
-  async clickNextButton() {
+  async clickNextButton(): Promise<void> {
     await this.nextButton.click();
   }
 
-  async clickCreateGroupButton() {
+  async clickCreateGroupButton(): Promise<void> {
     await this.createGroupButton.click();
   }
 
-  async clickAddMembers() {
+  async clickAddMembers(): Promise<void> {
     await this.addMembersButton.click();
   }
 
-  async enableFilesCheckbox() {
+  async enableFilesCheckbox(): Promise<void> {
     await this.sharedDriveToggle.click();
   }
 
-  async isFilesCheckboxChecked() {
+  async isFilesCheckboxChecked(): Promise<boolean> {
     const value = await this.sharedDriveToggle.getAttribute('data-uie-value');
     return value === 'checked';
   }
 
-  async waitForModalClose() {
+  async waitForModalClose(): Promise<void> {
     await this.groupCreationModal.waitFor({state: 'detached'});
   }
 
-  async selectGroupMembers(...usernames: string[]) {
+  async selectGroupMembers(...usernames: string[]): Promise<void> {
     for (const username of usernames) {
       await this.searchPeopleInput.fill(username);
       await this.searchPeopleResults.filter({hasText: username}).click();
     }
   }
 
-  async deselectGroupMember(username: string) {
+  async deselectGroupMember(username: string): Promise<void> {
     await this.groupCreationModal.getByTestId('do-toggle-selected-search-list').click();
     await this.selectedMembers.filter({hasText: username}).click();
   }

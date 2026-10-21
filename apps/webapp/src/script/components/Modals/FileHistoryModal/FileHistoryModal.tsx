@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {FileLoader} from 'Components/FileFullscreenModal/FileLoader/FileLoader';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleEscDown} from 'Util/keyboardUtil';
@@ -30,7 +32,7 @@ import {useFileVersions} from './hooks/useFileVersions';
 
 import {ModalComponent} from '../ModalComponent';
 
-export const FileHistoryModal = () => {
+export const FileHistoryModal: FunctionComponent = () => {
   const {translate} = useApplicationContext();
   const {isOpen, hideModal, nodeUuid, onRestore} = useFileHistoryModal();
   const {

@@ -127,7 +127,7 @@ const GuestOptions: FC<GuestOptionsProps> = ({
     ? translate('guestLinkDisabled')
     : translate('guestLinkDisabledByOtherTeam');
 
-  const toggleGuestAccess = async () => {
+  const toggleGuestAccess = async (): Promise<void> => {
     await toggleAccessState(
       teamPermissionsForAccessState(ACCESS_STATE.TEAM.GUEST_FEATURES),
       translate('modalConversationRemoveGuestsMessage'),
@@ -135,7 +135,7 @@ const GuestOptions: FC<GuestOptionsProps> = ({
     );
   };
 
-  const copyLink = async () => {
+  const copyLink = async (): Promise<void> => {
     if (!isLinkCopied) {
       await copyText(accessCode);
       setIsLinkCopied(true);
@@ -145,7 +145,7 @@ const GuestOptions: FC<GuestOptionsProps> = ({
     }
   };
 
-  const revokeAccessCode = () => {
+  const revokeAccessCode = (): void => {
     PrimaryModal.show(
       PrimaryModal.type.CONFIRM,
       {
@@ -170,7 +170,7 @@ const GuestOptions: FC<GuestOptionsProps> = ({
     );
   };
 
-  const openForcePasswordCopyModal = async (password: string) => {
+  const openForcePasswordCopyModal = async (password: string): Promise<void> => {
     PrimaryModal.show(
       PrimaryModal.type.CONFIRM,
       {
@@ -193,8 +193,8 @@ const GuestOptions: FC<GuestOptionsProps> = ({
     );
   };
 
-  const createGuestLinkWithPassword = async () => {
-    const onCreate = async (password: string, didCopyPassword: boolean) => {
+  const createGuestLinkWithPassword = async (): Promise<void> => {
+    const onCreate = async (password: string, didCopyPassword: boolean): Promise<void> => {
       if (!didCopyPassword) {
         await openForcePasswordCopyModal(password);
         return;
@@ -234,7 +234,7 @@ const GuestOptions: FC<GuestOptionsProps> = ({
     );
   };
 
-  const requestAccessCode = async (password?: string) => {
+  const requestAccessCode = async (password?: string): Promise<void> => {
     if (!isGuestEnabled && !isServicesEnabled) {
       await conversationRepository.stateHandler.changeAccessState(activeConversation, ACCESS_STATE.TEAM.GUEST_ROOM);
     }
@@ -246,7 +246,7 @@ const GuestOptions: FC<GuestOptionsProps> = ({
     }
   };
 
-  const createLink = async () => {
+  const createLink = async (): Promise<void> => {
     if (optionPasswordSecured === PasswordPreference.PASSWORD_SECURED) {
       await createGuestLinkWithPassword();
       return;
@@ -287,7 +287,7 @@ const GuestOptions: FC<GuestOptionsProps> = ({
     void initializeOptions();
   }, [initializeOptions]);
 
-  const saveOptionPasswordSecured = (preference: PasswordPreference) => {
+  const saveOptionPasswordSecured = (preference: PasswordPreference): void => {
     setOptionPasswordSecured(preference);
   };
 

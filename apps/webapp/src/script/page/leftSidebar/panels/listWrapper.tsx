@@ -117,7 +117,7 @@ const ListWrapper = memo(
       });
     }, BORDER_RECALCULATION_THROTTLE_MILLISECONDS);
 
-    function initBorderedScroll(element: HTMLElement | null) {
+    function initBorderedScroll(element: HTMLElement | null): void {
       if (element === null) {
         return;
       }

@@ -21,19 +21,19 @@ import {MentionEntity} from '../../../../../message/mentionEntity';
 
 const mentionSegmentCycleLength = 2;
 
-const intoPairs = (positions: number[]) => {
+const intoPairs = (positions: number[]): number[][] => {
   return positions.slice(1).map((endPosition, positionIndex) => {
     return [positions[positionIndex], endPosition];
   });
 };
 
-const breakAt = (positions: number[], text: string) => {
+const breakAt = (positions: number[], text: string): string[] => {
   return intoPairs([0, ...positions, text.length]).map(([startPosition, endPosition]) => {
     return text.substring(startPosition, endPosition);
   });
 };
 
-const breakWhere = (words: MentionEntity[], text: string) => {
+const breakWhere = (words: MentionEntity[], text: string): string[] => {
   return breakAt(
     words.reduce((accumulator: number[], {startIndex, length}) => {
       return [...accumulator, startIndex, startIndex + length];
@@ -42,7 +42,8 @@ const breakWhere = (words: MentionEntity[], text: string) => {
   );
 };
 
-export const createNodes = (mentions: MentionEntity[], text: string) => {
+type CreateNodesResult = {data: string; type: string}[];
+export const createNodes = (mentions: MentionEntity[], text: string): CreateNodesResult => {
   const sortedMentions = mentions.toSorted(({startIndex: o1}, {startIndex: o2}) => {
     return o1 - o2;
   });

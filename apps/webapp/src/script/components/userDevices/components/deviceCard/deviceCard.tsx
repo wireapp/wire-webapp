@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {ClientClassification} from '@wireapp/api-client/lib/client';
 import cx from 'classnames';
 
@@ -40,7 +42,12 @@ interface DeviceCardProps {
   showVerified?: boolean;
 }
 
-const DeviceCard = ({click, getDeviceIdentity, device: clientEntity, showIcon = false}: DeviceCardProps) => {
+const DeviceCard: FunctionComponent<DeviceCardProps> = ({
+  click,
+  getDeviceIdentity,
+  device: clientEntity,
+  showIcon = false,
+}: DeviceCardProps) => {
   const {translate} = useApplicationContext();
   const messageFocusedTabIndex = useMessageFocusedTabIndex(click !== undefined);
   const {class: deviceClass = '?', id = '', label = '?'} = clientEntity;
@@ -51,7 +58,7 @@ const DeviceCard = ({click, getDeviceIdentity, device: clientEntity, showIcon = 
 
   const showLegalHoldIcon = showIcon && deviceClass === ClientClassification.LEGAL_HOLD;
 
-  const clickOnDevice = () => {
+  const clickOnDevice = (): void => {
     if (clickable) {
       click(clientEntity);
     }

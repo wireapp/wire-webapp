@@ -17,7 +17,7 @@
  *
  */
 
-import type {ReactNode} from 'react';
+import type {ReactNode, FunctionComponent} from 'react';
 
 import {FileTypeRestrictedMessage as FileTypeRestrictedMessageEntity} from 'Repositories/entity/message/fileTypeRestrictedMessage';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -118,7 +118,9 @@ function renderFileTypeRestrictedMessage(options: RenderFileTypeRestrictedMessag
   );
 }
 
-const FileTypeRestrictedMessage = ({message}: FileTypeRestrictedMessageProps) => {
+const FileTypeRestrictedMessage: FunctionComponent<FileTypeRestrictedMessageProps> = ({
+  message,
+}: FileTypeRestrictedMessageProps) => {
   const {translate} = useApplicationContext();
   const translation = message.isIncoming
     ? {kind: 'incoming' as const, name: message.name}

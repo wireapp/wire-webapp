@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {clearAllButtonStyles, filterGroupStyles, toggleFilterButtonStyles} from './cellsFiltersBar.styles';
@@ -40,10 +42,10 @@ const clearFilter = (filter: FilterConfig): void => {
   }
 };
 
-export const CellsFiltersBar = ({filters}: CellsFiltersBarProps) => {
+export const CellsFiltersBar: FunctionComponent<CellsFiltersBarProps> = ({filters}: CellsFiltersBarProps) => {
   const {translate} = useApplicationContext();
   const hasActiveFilters = filters.some(isFilterActive);
-  const clearAll = () => {
+  const clearAll = (): void => {
     return filters.forEach(clearFilter);
   };
 

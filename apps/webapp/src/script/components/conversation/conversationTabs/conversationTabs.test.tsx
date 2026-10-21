@@ -17,7 +17,7 @@
  *
  */
 
-import {act, render} from '@testing-library/react';
+import {act, render, type RenderResult} from '@testing-library/react';
 import {ThemeProvider} from '@wireapp/react-ui-kit';
 import {Maybe} from 'true-myth';
 
@@ -65,7 +65,8 @@ type TestController = SharedDriveUploadController & {
   subscribe: jest.MockedFunction<SharedDriveUploadController['subscribe']>;
 };
 
-const createController = (state: UploadState | null = null) => {
+type CreateControllerResult = {controller: TestController; setState: (nextState: UploadState | null) => void};
+const createController = (state: UploadState | null = null): CreateControllerResult => {
   let currentState = state;
   let notify: () => void = () => {
     return undefined;
@@ -100,7 +101,7 @@ const renderTabs = (
   controller: SharedDriveUploadController,
   isUploadStatusIndicatorEnabled = true,
   dismissedUpload: Maybe<DismissedUpload> = Maybe.nothing<DismissedUpload>(),
-) => {
+): RenderResult => {
   return render(
     <ThemeProvider>
       <SharedDriveUploadStatusProvider initialDismissedUpload={dismissedUpload}>

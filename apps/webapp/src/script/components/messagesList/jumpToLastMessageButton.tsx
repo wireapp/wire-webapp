@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {useEffect, useState, type FunctionComponent} from 'react';
 
 import {useDebouncedCallback} from 'use-debounce';
 
@@ -37,7 +37,10 @@ interface JumpToLastMessageButtonProps {
 
 const LAST_MESSAGE_VISIBILITY_DEBOUNCE_MILLISECONDS = 200;
 
-export const JumpToLastMessageButton = ({onGoToLastMessage, conversation}: JumpToLastMessageButtonProps) => {
+export const JumpToLastMessageButton: FunctionComponent<JumpToLastMessageButtonProps> = ({
+  onGoToLastMessage,
+  conversation,
+}: JumpToLastMessageButtonProps) => {
   const {translate} = useApplicationContext();
   const [isLastMessageVisible, setIsLastMessageVisible] = useState(conversation.isLastMessageVisible());
 

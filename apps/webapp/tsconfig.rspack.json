@@ -7,6 +7,6 @@
     "noEmit": true,
     "types": ["node"]
   },
-  "include": ["rspack.config.mts", "rspack.config.public.mts"],
+  "include": ["rspack.config.mts", "rspack.config.dev.mts", "rspack.config.public.mts"],
   "exclude": ["node_modules"]
 }

@@ -24,7 +24,7 @@ import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {GROUP_CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {maybe, task} from 'true-myth';
-import {createStore} from 'zustand/vanilla';
+import {createStore, type StoreApi} from 'zustand/vanilla';
 
 import type {MeetingStoreState} from 'Components/meeting/meetingStore/createMeetingStore';
 import {MeetingStoreProvider} from 'Components/meeting/meetingStore/meetingStoreProvider';
@@ -94,7 +94,7 @@ const createMainViewModel = ({
 }: {
   renameConversation?: jest.Mock;
   safeGetConversationById?: jest.Mock;
-} = {}) => {
+} = {}): MainViewModel => {
   return {
     content: {
       repositories: {
@@ -111,7 +111,9 @@ const createMeetingStore = ({
   loadMeetings = jest.fn().mockResolvedValue(undefined),
   scheduleMeeting = jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
   updateMeeting = jest.fn().mockReturnValue(task.resolve({failedToAdd: []})),
-}: Partial<Pick<MeetingStoreState, 'loadMeetings' | 'scheduleMeeting' | 'updateMeeting'>> = {}) => {
+}: Partial<
+  Pick<MeetingStoreState, 'loadMeetings' | 'scheduleMeeting' | 'updateMeeting'>
+> = {}): StoreApi<MeetingStoreState> => {
   return createStore<MeetingStoreState>(() => {
     return {
       meetingSeries: [],
@@ -297,7 +299,7 @@ describe('useScheduleMeetingSubmit', () => {
   }: {
     seriesStartDate?: string;
     seriesEndDate?: string;
-  } = {}) => {
+  } = {}): void => {
     useScheduleMeetingModal.getState().openEdit(
       {
         title: formState.title,

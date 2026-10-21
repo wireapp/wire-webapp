@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import cx from 'classnames';
 
 import * as Icon from 'Components/icon';
@@ -27,7 +29,10 @@ interface CancelEditButtonProps {
   onClick: () => void;
 }
 
-export const CancelEditButton = ({isEditing, onClick}: CancelEditButtonProps) => {
+export const CancelEditButton: FunctionComponent<CancelEditButtonProps> = ({
+  isEditing,
+  onClick,
+}: CancelEditButtonProps) => {
   const {translate} = useApplicationContext();
 
   return (

@@ -25,7 +25,7 @@ import {useSidebarStore, SidebarTabs} from 'src/script/page/leftSidebar/panels/c
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate} from 'src/script/router/routerBindings';
 
-export const openFolder = ({path, event}: {path: string; event?: ReactMouseEvent<HTMLButtonElement>}) => {
+export const openFolder = ({path, event}: {path: string; event?: ReactMouseEvent<HTMLButtonElement>}): void => {
   const [idWithDomain, ...filePathParts] = path.split('/');
   const {id, domain} = parseQualifiedId(idWithDomain);
   const filePath = `files/${filePathParts.join('/')}`;

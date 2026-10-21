@@ -24,6 +24,7 @@ import {BackendClientE2E} from './backendClient.e2e';
 
 import {User} from '../data/user';
 
+type UpgradeUserToTeamOwnerResult = Promise<{teamId: any; teamName: any}>;
 export class AuthRepositoryE2E extends BackendClientE2E {
   public async registerUser(user: User, invitationCode?: string): Promise<AxiosResponse> {
     const response = await this.axiosInstance.post('register', {
@@ -62,7 +63,7 @@ export class AuthRepositoryE2E extends BackendClientE2E {
     });
   }
 
-  async upgradeUserToTeamOwner(user: User, teamName: string) {
+  async upgradeUserToTeamOwner(user: User, teamName: string): UpgradeUserToTeamOwnerResult {
     const res = this.axiosInstance.post(
       'upgrade-personal-to-team',
       {
@@ -79,7 +80,7 @@ export class AuthRepositoryE2E extends BackendClientE2E {
     return {teamId: data.team_id, teamName: data.team_name};
   }
 
-  public async activateAccount(email: string, code: string) {
+  public async activateAccount(email: string, code: string): Promise<void> {
     await this.axiosInstance.post('activate', {
       code,
       dryrun: false,
@@ -87,7 +88,7 @@ export class AuthRepositoryE2E extends BackendClientE2E {
     });
   }
 
-  public async bookEmail(email: string) {
+  public async bookEmail(email: string): Promise<void> {
     await this.axiosInstance.post('activate/send', {
       email: email,
     });

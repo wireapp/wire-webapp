@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import React, {type FunctionComponent} from 'react';
 
 import {connect} from 'react-redux';
 import {useNavigate} from 'react-router';
@@ -28,12 +28,14 @@ import {Page} from './page';
 
 import {AccountRegistrationLayout} from '../component/accountRegistrationLayout';
 import {actionRoot as ROOT_ACTIONS} from '../module/action';
-import {bindActionCreators} from '../module/reducer';
+import {bindActionCreators, type ThunkAction} from '../module/reducer';
 import {ROUTE} from '../route';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
-const SetEntropyPageComponent = ({pushEntropyData}: Props & ConnectedProps & DispatchProps) => {
+const SetEntropyPageComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> = ({
+  pushEntropyData,
+}: Props & ConnectedProps & DispatchProps) => {
   const navigate = useNavigate();
 
   const onSetEntropy = async (entropyData: Uint8Array): Promise<void> => {
@@ -55,12 +57,14 @@ const SetEntropyPageComponent = ({pushEntropyData}: Props & ConnectedProps & Dis
 };
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
-const mapStateToProps = () => {
+type MapStateToPropsResult = {};
+const mapStateToProps = (): MapStateToPropsResult => {
   return {};
 };
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => {
+type MapDispatchToPropsResult = {pushEntropyData: (entropy: Uint8Array) => ThunkAction};
+const mapDispatchToProps = (dispatch: Dispatch<AnyAction>): MapDispatchToPropsResult => {
   return bindActionCreators(
     {
       pushEntropyData: ROOT_ACTIONS.authAction.pushEntropyData,

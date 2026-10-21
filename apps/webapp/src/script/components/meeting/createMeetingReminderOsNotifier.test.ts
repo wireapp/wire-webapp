@@ -39,6 +39,7 @@ import {
   createMeetingReminderOsNotifier,
   type CreateMeetingReminderOsNotifierDependencies,
   toMeetingReminderNotificationTag,
+  type MeetingReminderOsNotifier,
 } from './createMeetingReminderOsNotifier';
 
 /** Keeps the "a notification was requested" invariant visible instead of trusting an index. */
@@ -72,12 +73,20 @@ const formatMeetingTime = (meetingStartTime: string): string => {
   return meetingStartTime === '2026-06-01T10:00:00.000Z' ? '12:00 PM' : meetingStartTime;
 };
 
+type CreateNotifierWithFakeNotificationApiResult = {
+  requests: SystemNotificationRequest[];
+  closedTags: string[];
+  logger: {info: jest.Mock<any, any, any>; warn: jest.Mock<any, any, any>};
+  openMeetingsList: jest.Mock<any, any, any>;
+  openMeetingPrep: jest.Mock<any, any, any>;
+  notifier: MeetingReminderOsNotifier;
+};
 const createNotifierWithFakeNotificationApi = (
   apiOverrides: Partial<SystemNotificationApi> = {},
   currentReminderPayload: CreateMeetingReminderOsNotifierDependencies['currentReminderPayload'] = payload => {
     return Maybe.just(payload);
   },
-) => {
+): CreateNotifierWithFakeNotificationApiResult => {
   const requests: SystemNotificationRequest[] = [];
   const closedTags: string[] = [];
   const logger = {info: jest.fn(), warn: jest.fn()};

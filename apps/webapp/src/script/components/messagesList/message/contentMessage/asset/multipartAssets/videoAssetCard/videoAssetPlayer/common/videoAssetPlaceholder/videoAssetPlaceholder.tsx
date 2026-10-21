@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode} from 'react';
+import {ReactNode, type FunctionComponent} from 'react';
 
 import {wrapperStyles} from './videoAssetPlaceholder.styles';
 
@@ -25,6 +25,8 @@ interface VideoAssetPlaceholderProps {
   children: ReactNode;
 }
 
-export const VideoAssetPlaceholder = ({children}: VideoAssetPlaceholderProps) => {
+export const VideoAssetPlaceholder: FunctionComponent<VideoAssetPlaceholderProps> = ({
+  children,
+}: VideoAssetPlaceholderProps) => {
   return <div css={wrapperStyles}>{children}</div>;
 };

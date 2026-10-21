@@ -29,7 +29,9 @@ import {VerificationMessageType} from 'src/script/message/verificationMessageTyp
 
 import {VerificationMessage} from './verificationMessage';
 
-const createVerificationMessage = (partialVerificationMessage: Partial<VerificationMessageEntity>) => {
+const createVerificationMessage = (
+  partialVerificationMessage: Partial<VerificationMessageEntity>,
+): VerificationMessageEntity => {
   const verificationMessage: Partial<VerificationMessageEntity> = {
     isSelfClient: ko.pureComputed(() => {
       return false;

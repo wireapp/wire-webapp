@@ -17,7 +17,7 @@
  *
  */
 
-import {type RefObject, useCallback, useEffect, useMemo, useState} from 'react';
+import {type RefObject, useCallback, useEffect, useMemo, useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyArray} from '@sindresorhus/is';
 import {isSameDay, startOfDay} from 'date-fns';
@@ -140,7 +140,7 @@ export const isMeetingListItemLastInDay = ({
   return !isSameDay(currentDay, nextPendingOccurrenceStart);
 };
 
-export const MeetingList = ({
+export const MeetingList: FunctionComponent<MeetingListProps> = ({
   meetingSeries,
   isLoading,
   hasLoadError,

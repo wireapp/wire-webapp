@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {formatSeconds} from 'Util/timeUtil';
 
 import {wrapperStyles, playButtonWrapperStyles, seekbarStyles, timeStyles} from './videoControls.styles';
@@ -32,7 +34,13 @@ interface VideoControlsProps {
   handlePause: () => void;
 }
 
-export const VideoControls = ({videoElement, isPlaying, isFocusable, handlePlay, handlePause}: VideoControlsProps) => {
+export const VideoControls: FunctionComponent<VideoControlsProps> = ({
+  videoElement,
+  isPlaying,
+  isFocusable,
+  handlePlay,
+  handlePause,
+}: VideoControlsProps) => {
   const currentTime = formatSeconds(videoElement.currentTime);
   const duration = formatSeconds(videoElement.duration);
 

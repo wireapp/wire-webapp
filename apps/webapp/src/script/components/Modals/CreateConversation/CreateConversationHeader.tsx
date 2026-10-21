@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {isEmptyString, isNonEmptyString} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
@@ -31,7 +33,7 @@ import {CreateConversationSubmit} from './CreateConversationSubmit';
 import {useCreateConversationModal} from './hooks/useCreateConversationModal';
 import {ConversationType, ConversationCreationStep} from './types';
 
-export const CreateConversationHeader = () => {
+export const CreateConversationHeader: FunctionComponent = () => {
   const {translate} = useApplicationContext();
   const {
     error,
@@ -49,7 +51,7 @@ export const CreateConversationHeader = () => {
   const userState = container.resolve(UserState);
   const selfUser = userState.self();
 
-  const onNextClick = () => {
+  const onNextClick = (): void => {
     if (conversationType === ConversationType.Group) {
       gotoLastStep();
       return;
@@ -58,7 +60,7 @@ export const CreateConversationHeader = () => {
     gotoNextStep();
   };
 
-  const onBackClick = () => {
+  const onBackClick = (): void => {
     if (conversationType === ConversationType.Group) {
       gotoFirstStep();
       return;
@@ -67,7 +69,7 @@ export const CreateConversationHeader = () => {
     gotoPreviousStep();
   };
 
-  const onModalClose = () => {
+  const onModalClose = (): void => {
     if (conversationCreationStep !== ConversationCreationStep.ConversationDetails) {
       setDiscardTrigger('modalClose');
       setIsConfirmDiscardModalOpen(true);

@@ -30,7 +30,7 @@ interface UseFilePasteParams {
   translate: Translate;
 }
 
-export const useFilePaste = ({onFilePasted, isFileNameKept, translate}: UseFilePasteParams) => {
+export const useFilePaste = ({onFilePasted, isFileNameKept, translate}: UseFilePasteParams): void => {
   const processClipboardFiles = useCallback(
     (files: FileList | File[]): void => {
       const pastedFile = Array.isArray(files) ? files[0] : files.item(0);

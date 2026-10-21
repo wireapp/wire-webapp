@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {isNonEmptyArray} from '@sindresorhus/is';
 
 import {CellsBreadcrumbs} from 'Components/conversation/conversationCells/common/cellsBreadcrumbs/cellsBreadcrumbs';
@@ -46,7 +48,7 @@ interface CellsFoldersListModalContentProps {
   getCurrentPathFromFolder?: (path: string) => string;
 }
 
-export const CellsFoldersListModalContent = ({
+export const CellsFoldersListModalContent: FunctionComponent<CellsFoldersListModalContentProps> = ({
   conversationName,
   destination: {
     folders: items,
@@ -73,12 +75,12 @@ export const CellsFoldersListModalContent = ({
   const shouldDisplayFolders = status === 'success' && isNonEmptyArray(items);
   const shouldDisplayLoading = ['idle', 'loading'].includes(status);
 
-  const handleFolderNavigate = (path: string) => {
+  const handleFolderNavigate = (path: string): void => {
     const newPath = getCurrentPathFromFolder?.(path) ?? path.split('/').slice(1).join('/');
     onPathChange(newPath);
   };
 
-  const handleBreadcrumbClick = (item: {name: string}) => {
+  const handleBreadcrumbClick = (item: {name: string}): void => {
     const path =
       breadcrumbs.find(crumb => {
         return crumb.name === item.name;

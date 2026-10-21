@@ -67,6 +67,13 @@ interface UseMessageSendProps {
   translate: RootContextValue['translate'];
 }
 
+type UseMessageSendResult = {
+  sendMessage: () => Promise<void>;
+  generateQuote: () => Promise<OutgoingQuote | undefined>;
+  isSending: boolean;
+  isSendingDisabled: boolean;
+};
+
 export const useMessageSend = ({
   replyMessageEntity,
   eventRepository,
@@ -84,7 +91,7 @@ export const useMessageSend = ({
   sendPastedFile,
   messageContent,
   translate,
-}: UseMessageSendProps) => {
+}: UseMessageSendProps): UseMessageSendResult => {
   const {getFiles, clearAll} = useFileUploadState();
   const files = getFiles({conversationId: conversation.id});
 

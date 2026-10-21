@@ -17,7 +17,7 @@
  *
  */
 
-import {useId} from 'react';
+import {useId, type FunctionComponent} from 'react';
 
 import {VerificationBadges} from 'Components/badge';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -32,7 +32,11 @@ interface ProteusDeviceDetailsProps extends Omit<DeviceProps, 'getDeviceIdentity
   showVerificationStatus?: boolean;
 }
 
-export const ProteusDeviceDetails = ({device, fingerprint, isProteusVerified}: ProteusDeviceDetailsProps) => {
+export const ProteusDeviceDetails: FunctionComponent<ProteusDeviceDetailsProps> = ({
+  device,
+  fingerprint,
+  isProteusVerified,
+}: ProteusDeviceDetailsProps) => {
   const {translate} = useApplicationContext();
   const proteusLabelId = useId();
 

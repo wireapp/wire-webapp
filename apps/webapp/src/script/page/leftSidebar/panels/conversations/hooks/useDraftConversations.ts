@@ -84,19 +84,19 @@ export const useDraftConversations = (conversations: Conversation[]): Conversati
     checkForDrafts();
 
     // Listen for draft changes in the current tab
-    const handleDraftChange = () => {
+    const handleDraftChange = (): void => {
       debouncedCheck();
     };
 
     // Listen for storage changes from other tabs
-    const handleStorageChange = (event: StorageEvent) => {
+    const handleStorageChange = (event: StorageEvent): void => {
       if (event.key?.includes(StorageKey.CONVERSATION.INPUT) === true) {
         debouncedCheck();
       }
     };
 
     // Listen for visibility changes to check when tab becomes active
-    const handleVisibilityChange = () => {
+    const handleVisibilityChange = (): void => {
       if (document.visibilityState === 'visible') {
         checkForDrafts();
       }

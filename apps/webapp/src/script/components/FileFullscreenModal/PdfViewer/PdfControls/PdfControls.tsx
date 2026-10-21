@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {
   ButtonsGroup,
   ChevronDownIcon,
@@ -46,7 +48,7 @@ interface PdfControlsProps {
 const MIN_ZOOM_SCALE = 1;
 const MAX_ZOOM_SCALE = 2;
 
-export const PdfControls = ({
+export const PdfControls: FunctionComponent<PdfControlsProps> = ({
   sidebarOpen,
   onToggleSidebar,
   scale,

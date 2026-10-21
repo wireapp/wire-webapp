@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {Breadcrumbs} from '@wireapp/react-ui-kit';
 
 interface CellsBreadcrumbsProps {
@@ -25,6 +27,10 @@ interface CellsBreadcrumbsProps {
   onItemClick: (item: {name: string}) => void;
 }
 
-export const CellsBreadcrumbs = ({maxNotCombinedItems, items, onItemClick}: CellsBreadcrumbsProps) => {
+export const CellsBreadcrumbs: FunctionComponent<CellsBreadcrumbsProps> = ({
+  maxNotCombinedItems,
+  items,
+  onItemClick,
+}: CellsBreadcrumbsProps) => {
   return <Breadcrumbs items={items} maxNotCombinedItems={maxNotCombinedItems} onItemClick={onItemClick} />;
 };

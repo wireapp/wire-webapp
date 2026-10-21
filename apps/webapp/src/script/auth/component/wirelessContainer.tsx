@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import React, {type FunctionComponent} from 'react';
 
 import {FormattedMessage} from 'react-intl';
 
@@ -35,7 +35,11 @@ interface WirelessContainerProps {
   showCookiePolicyBanner?: boolean;
 }
 
-const WirelessContainer = ({showCookiePolicyBanner, onCookiePolicyBannerClose, children}: WirelessContainerProps) => {
+const WirelessContainer: FunctionComponent<WirelessContainerProps> = ({
+  showCookiePolicyBanner,
+  onCookiePolicyBannerClose,
+  children,
+}: WirelessContainerProps) => {
   const {translate} = useApplicationContext();
   return (
     <div

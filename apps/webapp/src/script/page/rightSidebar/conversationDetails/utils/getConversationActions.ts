@@ -63,7 +63,7 @@ const getConversationActions = ({
   const isSingleUser = is1to1Action || conversationEntity.isRequest();
   const userEntity = conversationEntity.firstUserEntity();
 
-  const getNextConversation = () => {
+  const getNextConversation = (): Conversation | undefined => {
     return conversationRepository.getNextConversation(conversationEntity);
   };
   const userPermissions = UserPermission.generatePermissionHelpers(teamRole);

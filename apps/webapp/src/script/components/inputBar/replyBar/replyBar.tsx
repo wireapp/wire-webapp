@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {RestrictedVideo} from 'Components/asset/RestrictedVideo';
@@ -34,7 +36,7 @@ interface ReplyBarProps {
   onCancel: () => void;
 }
 
-export const ReplyBar = ({replyMessageEntity, onCancel}: ReplyBarProps) => {
+export const ReplyBar: FunctionComponent<ReplyBarProps> = ({replyMessageEntity, onCancel}: ReplyBarProps) => {
   const {translate} = useApplicationContext();
   const {
     assets,

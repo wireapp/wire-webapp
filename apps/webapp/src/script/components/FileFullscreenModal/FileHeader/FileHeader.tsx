@@ -17,7 +17,7 @@
  *
  */
 
-import {useMemo} from 'react';
+import {useMemo, type FunctionComponent} from 'react';
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
@@ -99,7 +99,7 @@ export const getConversationIconType = ({
   return isChannel && isChannelsEnabled ? 'channel' : 'group';
 };
 
-export const FileHeader = ({
+export const FileHeader: FunctionComponent<FileHeaderProps> = ({
   id,
   onClose,
   fileUrl,
@@ -131,7 +131,7 @@ export const FileHeader = ({
   const cellsRepository = container.resolve(CellsRepository);
   const {showModal} = useFileHistoryModal();
 
-  const handleFileDownload = async () => {
+  const handleFileDownload = async (): Promise<void> => {
     if (fileUrl !== undefined && fileUrl.length > 0) {
       const node = await cellsRepository.getNode({uuid: id});
       const resolvedDownloadUrl = node.PreSignedGET?.Url ?? fileUrl;
@@ -244,7 +244,13 @@ export const FileHeader = ({
   );
 };
 
-const ConversationLabel = ({conversation, fallbackName}: {conversation?: Conversation; fallbackName: string}) => {
+const ConversationLabel: FunctionComponent<{conversation?: Conversation; fallbackName: string}> = ({
+  conversation,
+  fallbackName,
+}: {
+  conversation?: Conversation;
+  fallbackName: string;
+}) => {
   if (conversation === undefined) {
     return <FallbackConversationLabel fallbackName={fallbackName} />;
   }
@@ -252,7 +258,11 @@ const ConversationLabel = ({conversation, fallbackName}: {conversation?: Convers
   return <ConversationEntityLabel conversation={conversation} fallbackName={fallbackName} />;
 };
 
-const FallbackConversationLabel = ({fallbackName}: {fallbackName: string}) => {
+const FallbackConversationLabel: FunctionComponent<{fallbackName: string}> = ({
+  fallbackName,
+}: {
+  fallbackName: string;
+}) => {
   return (
     <span css={sourceConversationMetadataStyles}>
       <span css={sourceConversationIconStyles} aria-hidden="true">
@@ -263,7 +273,13 @@ const FallbackConversationLabel = ({fallbackName}: {fallbackName: string}) => {
   );
 };
 
-const ConversationEntityLabel = ({conversation, fallbackName}: {conversation: Conversation; fallbackName: string}) => {
+const ConversationEntityLabel: FunctionComponent<{conversation: Conversation; fallbackName: string}> = ({
+  conversation,
+  fallbackName,
+}: {
+  conversation: Conversation;
+  fallbackName: string;
+}) => {
   const {isChannelsEnabled} = useChannelsFeatureFlag();
   const {isChannel, display_name: displayName} = useKoSubscribableChildren(conversation, ['isChannel', 'display_name']);
   const name = isNonEmptyString(displayName) ? displayName : fallbackName;

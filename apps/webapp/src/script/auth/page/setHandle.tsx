@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 import {BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http/';
@@ -52,7 +52,7 @@ const minimumHandleLength = 2;
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
-const SetHandleComponent = ({
+const SetHandleComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> = ({
   doGetConsents,
   doSetConsent,
   doSetHandle,
@@ -119,17 +119,17 @@ const SetHandleComponent = ({
     }
   };
 
-  const onHandleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onHandleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     setError(null);
     setHandle(event.target.value);
   };
 
-  const handleAcceptNewletterConsent = () => {
+  const handleAcceptNewletterConsent = (): void => {
     void updateConsent(ConsentType.MARKETING, 1);
     storeValue(StorageKey.INITIAL_MAKRETING_CONSENT_ACCEPTED, true);
   };
 
-  const handleDeclineNewletterConsent = () => {
+  const handleDeclineNewletterConsent = (): void => {
     void updateConsent(ConsentType.MARKETING, 0);
     storeValue(StorageKey.INITIAL_MAKRETING_CONSENT_ACCEPTED, false);
   };
@@ -185,7 +185,13 @@ const SetHandleComponent = ({
 };
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
-const mapStateToProps = (state: RootState) => {
+type MapStateToPropsResult = {
+  hasSelfHandle: boolean;
+  hasUnsetMarketingConsent: boolean;
+  isFetching: boolean;
+  name: string | undefined;
+};
+const mapStateToProps = (state: RootState): MapStateToPropsResult => {
   return {
     hasSelfHandle: SelfSelector.hasSelfHandle(state),
     hasUnsetMarketingConsent: SelfSelector.hasUnsetConsent(state, ConsentType.MARKETING) ?? false,
@@ -195,7 +201,14 @@ const mapStateToProps = (state: RootState) => {
 };
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: ThunkDispatch) => {
+type MapDispatchToPropsResult = {
+  checkHandles: (handles: string[]) => Promise<string>;
+  doGetConsents: () => Promise<void>;
+  doSetConsent: (consentType: ConsentType, value: number) => Promise<void>;
+  doSetHandle: (handle: string) => Promise<void>;
+  removeLocalStorage: (key: string) => Promise<void>;
+};
+const mapDispatchToProps = (dispatch: ThunkDispatch): MapDispatchToPropsResult => {
   return {
     checkHandles: (...args: Parameters<typeof ROOT_ACTIONS.userAction.checkHandles>) => {
       return dispatch(ROOT_ACTIONS.userAction.checkHandles(...args));

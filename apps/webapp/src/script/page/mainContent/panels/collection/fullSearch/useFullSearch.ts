@@ -46,7 +46,7 @@ type UseFullSearchResult = {
   updateSearchValue: (value: string) => void;
 };
 
-function isAbortError(error: unknown) {
+function isAbortError(error: unknown): boolean {
   if (!isError(error)) {
     return false;
   }

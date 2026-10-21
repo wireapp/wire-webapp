@@ -36,21 +36,21 @@ export class AudioVideoSettingsPage {
     this.variableBitrateCheckbox = page.getByText('Variable Bit Rate Encoding');
   }
 
-  async selectMicrophone(microphoneName: string) {
+  async selectMicrophone(microphoneName: string): Promise<void> {
     // The Select component doesn't implement the disabled state correctly so we need to use this workaround
     await this.microphoneDropdown.getByRole('combobox').isEditable();
     await this.microphoneDropdown.click();
     await this.page.getByRole('listbox').getByRole('option', {name: microphoneName}).click();
   }
 
-  async selectSpeaker(speakerName: string) {
+  async selectSpeaker(speakerName: string): Promise<void> {
     // The Select component doesn't implement the disabled state correctly so we need to use this workaround
     await this.speakerDropdown.getByRole('combobox').isEditable();
     await this.speakerDropdown.click();
     await this.page.getByRole('listbox').getByRole('option', {name: speakerName}).click();
   }
 
-  async selectCamera(cameraName: string) {
+  async selectCamera(cameraName: string): Promise<void> {
     // The Select component doesn't implement the disabled state correctly so we need to use this workaround
     await this.cameraDropdown.getByRole('combobox').isEditable();
     await this.cameraDropdown.click();

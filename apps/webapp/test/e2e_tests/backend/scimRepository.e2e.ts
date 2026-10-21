@@ -21,7 +21,7 @@ import {BackendClientE2E} from './backendClient.e2e';
 import {User} from '../data/user';
 
 export class ScimRepositoryE2E extends BackendClientE2E {
-  async createSCIMAccessToken(user: User, identityProviderId: string) {
+  async createSCIMAccessToken(user: User, identityProviderId: string): Promise<any> {
     const response = await this.axiosInstance.post(
       'scim/auth-tokens',
       {
@@ -42,7 +42,7 @@ export class ScimRepositoryE2E extends BackendClientE2E {
     return response.data.token;
   }
 
-  async createSCIMUser(user: User, scimToken: string) {
+  async createSCIMUser(user: User, scimToken: string): Promise<any> {
     const scimUsername = user.email.replace(/[^A-Za-z0-9]/g, '').substring(0, 21);
 
     const response = await this.axiosInstance.post(

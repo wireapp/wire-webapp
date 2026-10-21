@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useState} from 'react';
+import React, {useState, type FunctionComponent} from 'react';
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 
@@ -61,9 +61,9 @@ interface GuestLoginColumnProps {
   error: any;
 }
 
-const Separator = () => {
+const Separator: FunctionComponent = () => {
   const isMobile = useMatchMedia(QUERY.mobile);
-  const Line = () => {
+  const Line: FunctionComponent = () => {
     return (
       <div
         style={{
@@ -91,7 +91,11 @@ const Separator = () => {
   );
 };
 
-const IsLoggedInColumn = ({handleLogout, handleSubmit, selfName}: IsLoggedInColumnProps) => {
+const IsLoggedInColumn: FunctionComponent<IsLoggedInColumnProps> = ({
+  handleLogout,
+  handleSubmit,
+  selfName,
+}: IsLoggedInColumnProps) => {
   const {translate} = useApplicationContext();
   return (
     <Container centerText verticalCenter style={{width: '100%', display: 'flex'}}>
@@ -142,7 +146,7 @@ const IsLoggedInColumn = ({handleLogout, handleSubmit, selfName}: IsLoggedInColu
   );
 };
 
-const GuestLoginColumn = ({
+const GuestLoginColumn: FunctionComponent<GuestLoginColumnProps> = ({
   enteredName,
   nameInput,
   onNameChange,

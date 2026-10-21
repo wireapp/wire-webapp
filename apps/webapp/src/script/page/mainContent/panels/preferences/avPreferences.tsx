@@ -17,7 +17,7 @@
  *
  */
 
-import {memo} from 'react';
+import {memo, type FunctionComponent} from 'react';
 
 import {container} from 'tsyringe';
 
@@ -47,7 +47,11 @@ interface AVPreferencesProps {
   >;
 }
 
-const AVPreferencesComponent = ({propertiesRepository, callingRepository, deviceSupport}: AVPreferencesProps) => {
+const AVPreferencesComponent: FunctionComponent<AVPreferencesProps> = ({
+  propertiesRepository,
+  callingRepository,
+  deviceSupport,
+}: AVPreferencesProps) => {
   const {translate} = useApplicationContext();
   const devicesHandler = container.resolve(MediaDevicesHandler);
   const constraintsHandler = container.resolve(MediaConstraintsHandler);

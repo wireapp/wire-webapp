@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {CircleCloseIcon, SearchIcon} from '@wireapp/react-ui-kit';
 
 import {
@@ -37,7 +39,7 @@ interface CellsSearchInputProps {
   uieName?: string;
 }
 
-export const CellsSearchInput = ({
+export const CellsSearchInput: FunctionComponent<CellsSearchInputProps> = ({
   value,
   placeholder,
   onChange,

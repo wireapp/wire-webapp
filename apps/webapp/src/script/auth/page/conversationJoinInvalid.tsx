@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import React, {type FunctionComponent} from 'react';
 
 import {FormattedMessage} from 'react-intl';
 
@@ -30,7 +30,7 @@ import {WirelessContainer} from '../component/wirelessContainer';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
-const ConversationJoinInvalid = ({}: Props) => {
+const ConversationJoinInvalid: FunctionComponent<Props> = ({}: Props) => {
   const {translate} = useApplicationContext();
   return (
     <WirelessContainer>
@@ -51,7 +51,7 @@ const ConversationJoinInvalid = ({}: Props) => {
   );
 };
 
-const ConversationJoinFull = ({}: Props) => {
+const ConversationJoinFull: FunctionComponent<Props> = ({}: Props) => {
   const {translate} = useApplicationContext();
   return (
     <WirelessContainer>

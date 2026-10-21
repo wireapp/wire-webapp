@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {ComboboxSelect, ErrorMessage} from '@wireapp/react-ui-kit';
 
 import {CellsModal} from 'Components/conversation/conversationCells/common/cellsModal/cellsModal';
@@ -35,7 +37,7 @@ interface CellsTagsModalProps {
   onRefresh: () => void;
 }
 
-export const CellsTagsModal = ({
+export const CellsTagsModal: FunctionComponent<CellsTagsModalProps> = ({
   uuid,
   isOpen,
   onClose,
@@ -65,7 +67,7 @@ export const CellsTagsModal = ({
     commaValidationError: translate('cells.tagsModal.validationError.comma'),
   });
 
-  const handleSave = async () => {
+  const handleSave = async (): Promise<void> => {
     await handleUpdateTags(uuid);
   };
 

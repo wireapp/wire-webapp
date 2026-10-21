@@ -45,7 +45,8 @@ interface AudioState {
 const LEVELS_PER_WIDTH = 3;
 const NORMALIZED_LOUDNESS = 256;
 
-export const useAudioSeekBar = ({asset, audioElement, svgRef}: UseAudioSeekBarProps) => {
+type UseAudioSeekBarResult = {path: string; position: number; onLevelClick: (event: MouseEvent<SVGSVGElement>) => void};
+export const useAudioSeekBar = ({asset, audioElement, svgRef}: UseAudioSeekBarProps): UseAudioSeekBarResult => {
   const [{svgWidth, position, loudness}, setState] = useState<AudioState>({
     svgWidth: 0,
     position: 0,

@@ -36,13 +36,14 @@ interface UseFileHandlingProps {
   translate: Translate;
 }
 
+type UseFileHandlingResult = {pastedFile: File | null; clearPastedFile: () => void; sendPastedFile: () => void};
 export const useFileHandling = ({
   uploadDroppedFiles,
   uploadImages,
   isFileUploadAllowed,
   isFileNameKept,
   translate,
-}: UseFileHandlingProps) => {
+}: UseFileHandlingProps): UseFileHandlingResult => {
   const [pastedFile, setPastedFile] = useState<File | null>(null);
 
   useFilePaste({
@@ -55,18 +56,18 @@ export const useFileHandling = ({
     translate,
   });
 
-  const clearPastedFile = () => {
+  const clearPastedFile = (): void => {
     return setPastedFile(null);
   };
 
-  const sendPastedFile = () => {
+  const sendPastedFile = (): void => {
     if (isFileUploadAllowed && !isNull(pastedFile)) {
       uploadDroppedFiles([pastedFile]);
       clearPastedFile();
     }
   };
 
-  const sendImageOnEnterClick = (event: KeyboardEvent) => {
+  const sendImageOnEnterClick = (event: KeyboardEvent): void => {
     if (event.key === 'Enter' && !event.shiftKey && !event.altKey && !event.metaKey) {
       sendPastedFile();
     }
@@ -87,7 +88,7 @@ export const useFileHandling = ({
   }, [pastedFile, isFileUploadAllowed]);
 
   useEffect(() => {
-    const uploadImagesIfAllowed = (images: File[]) => {
+    const uploadImagesIfAllowed = (images: File[]): void => {
       if (isFileUploadAllowed) {
         uploadImages(images);
       }

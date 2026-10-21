@@ -17,7 +17,7 @@
  *
  */
 
-import {type FormEvent, useMemo, useRef} from 'react';
+import {type FormEvent, useMemo, useRef, type FunctionComponent} from 'react';
 
 import {isUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
@@ -46,7 +46,7 @@ import {wasMeetNowMeetingCreated} from './meetNowTypes';
 import {hasMeetNowFormErrors, useMeetNowModal} from './useMeetNowModal';
 import {useMeetNowSubmit} from './useMeetNowSubmit';
 
-export const MeetNowModal = () => {
+export const MeetNowModal: FunctionComponent = () => {
   const {fireAndForgetInvoker, translate} = useApplicationContext();
   const {
     isOpen,
@@ -75,12 +75,12 @@ export const MeetNowModal = () => {
     return isUndefined(errors.passwordConfirmation) ? undefined : translate(errors.passwordConfirmation);
   }, [errors.passwordConfirmation, translate]);
 
-  const dismissModal = () => {
+  const dismissModal = (): void => {
     close();
     reset();
   };
 
-  const handleClose = () => {
+  const handleClose = (): void => {
     if (isSubmitting) {
       return;
     }
@@ -89,7 +89,7 @@ export const MeetNowModal = () => {
     dismissModal();
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
 
     const validationErrors = validate();

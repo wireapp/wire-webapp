@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
@@ -30,7 +32,7 @@ import {
 } from './teamCreation.styles';
 import {useTeamCreationModal} from './useTeamCreationModal';
 
-export const TeamCreationAccountHeader = () => {
+export const TeamCreationAccountHeader: FunctionComponent = () => {
   const {translate} = useApplicationContext();
   const {showModal} = useTeamCreationModal();
 

@@ -37,7 +37,7 @@ const createConversation = ({
 }: {
   name?: string;
   groupConversationType?: GROUP_CONVERSATION_TYPE;
-} = {}) => {
+} = {}): Conversation => {
   const conversation = new Conversation(
     qualifiedConversationId.id,
     qualifiedConversationId.domain,

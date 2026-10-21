@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {useEffect, useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
@@ -51,7 +51,7 @@ enum SessionResetState {
 
 const RESET_CONFIRMATION_TIMEOUT_MILLISECONDS = 5000;
 
-export const DeviceDetailsPreferences = ({
+export const DeviceDetailsPreferences: FunctionComponent<DevicesPreferencesProps> = ({
   device,
   getFingerprint,
   getDeviceIdentity,
@@ -66,7 +66,7 @@ export const DeviceDetailsPreferences = ({
   const [fingerprint, setFingerprint] = useState<string | undefined>();
   const brandName = Config.getConfig().BRAND_NAME;
 
-  const resetSession = async () => {
+  const resetSession = async (): Promise<void> => {
     setResetState(SessionResetState.ONGOING);
     await onResetSession(device);
     setTimeout(() => {

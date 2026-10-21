@@ -17,7 +17,7 @@
  *
  */
 
-import {useState} from 'react';
+import {useState, type ReactNode, type FunctionComponent} from 'react';
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import type {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
@@ -91,20 +91,25 @@ function generateNamedUsers(
   );
 }
 
-function generateUnreachableUsers(users: QualifiedId[]) {
+type GenerateUnreachableUsersResult = {count: number; domain: string}[];
+function generateUnreachableUsers(users: QualifiedId[]): GenerateUnreachableUsersResult {
   const userCountByDomain = countBy(users, 'domain');
   return map(userCountByDomain, (count, domain) => {
     return {count, domain};
   });
 }
 
-function joinWith(elements: React.ReactNode[], separator: string) {
+function joinWith(elements: React.ReactNode[], separator: string): ReactNode[] {
   return elements.reduce<React.ReactNode[]>((prev, element) => {
     return prev.length === 0 ? [element] : [...prev, separator, element];
   }, []);
 }
 
-export const PartialFailureToSendWarning = ({failedToSend, isMessageFocused, knownUsers}: Props) => {
+export const PartialFailureToSendWarning: FunctionComponent<Props> = ({
+  failedToSend,
+  isMessageFocused,
+  knownUsers,
+}: Props) => {
   const {translate} = useApplicationContext();
   const [isOpen, setIsOpen] = useState(false);
   const {queued = {}, failed = []} = failedToSend;

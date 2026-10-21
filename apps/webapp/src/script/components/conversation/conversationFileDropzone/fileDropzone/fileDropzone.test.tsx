@@ -33,7 +33,7 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
 );
 
-const renderFileDropzone = (isFileDropAllowed: boolean) => {
+const renderFileDropzone = (isFileDropAllowed: boolean): void => {
   const result = render(
     <StyledApp themeId={THEME_ID.DEFAULT}>
       <FileDropzone isDragAccept isFileDropAllowed={isFileDropAllowed} rootProps={{}} inputProps={{}}>

@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode, useEffect, useState} from 'react';
+import {ReactNode, useEffect, useState, type FunctionComponent} from 'react';
 
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -110,7 +110,7 @@ interface UserModalUserActionsSectionProps {
   translate: Translate;
 }
 
-const UserModalUserActionsSection = ({
+const UserModalUserActionsSection: FunctionComponent<UserModalUserActionsSectionProps> = ({
   user,
   onAction,
   isSelfActivated,
@@ -153,7 +153,7 @@ interface UserModalWarningMessageProps {
   href: string;
 }
 
-const UserModalWarningMessage = ({
+const UserModalWarningMessage: FunctionComponent<UserModalWarningMessageProps> = ({
   content,
   href,
   linkText,
@@ -175,7 +175,9 @@ const UserModalWarningMessage = ({
   );
 };
 
-export const UnverifiedUserWarning = ({user}: UnverifiedUserWarningProps) => {
+export const UnverifiedUserWarning: FunctionComponent<UnverifiedUserWarningProps> = ({
+  user,
+}: UnverifiedUserWarningProps) => {
   const {translate} = useApplicationContext();
   const learnMoreHref = Config.getConfig().URL.SUPPORT.PRIVACY_UNVERIFIED_USERS;
 
@@ -210,7 +212,7 @@ export const UnverifiedUserWarning = ({user}: UnverifiedUserWarningProps) => {
   );
 };
 
-const UserModal = ({
+const UserModal: FunctionComponent<UserModalProps> = ({
   userRepository,
   selfUser,
   core = container.resolve(Core),
@@ -231,10 +233,10 @@ const UserModal = ({
   const [isShown, setIsShown] = useState<boolean>(false);
   const [userNotFound, setUserNotFound] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
-  const hide = () => {
+  const hide = (): void => {
     return setIsShown(false);
   };
-  const onModalClosed = () => {
+  const onModalClosed = (): void => {
     setUser(null);
     setUserNotFound(false);
     onClose?.();

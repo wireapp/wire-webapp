@@ -52,14 +52,14 @@ const pendingPreview: RequestMeetingPrepPreview = () => {
   );
 };
 
-const expectClosed = async () => {
+const expectClosed = async (): Promise<void> => {
   expect(screen.queryByRole('heading', {name: 'Design review'})).not.toBeInTheDocument();
   await waitFor(() => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 };
 
-const renderModal = (joinMeeting: jest.Mock = jest.fn().mockResolvedValue(true)) => {
+const renderModal = (joinMeeting: jest.Mock = jest.fn().mockResolvedValue(true)): void => {
   const rootProviderWrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({translate: translateForTest}),
   );

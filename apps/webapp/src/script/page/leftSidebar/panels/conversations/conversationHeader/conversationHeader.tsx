@@ -17,7 +17,7 @@
  *
  */
 
-import {KeyboardEvent, MutableRefObject, useEffect} from 'react';
+import {KeyboardEvent, MutableRefObject, useEffect, type FunctionComponent} from 'react';
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
@@ -51,7 +51,7 @@ import {
 
 export const conversationsPanelHeadingId = 'conversations-heading';
 
-const focusSearchInputRef = (searchInputRef: MutableRefObject<HTMLInputElement | null>) => {
+const focusSearchInputRef = (searchInputRef: MutableRefObject<HTMLInputElement | null>): void => {
   requestAnimationFrame(() => {
     searchInputRef.current?.focus();
   });
@@ -75,7 +75,7 @@ interface ConversationHeaderProps {
   onExpandList?: () => void;
 }
 
-export const ConversationHeaderComponent = ({
+export const ConversationHeaderComponent: FunctionComponent<ConversationHeaderProps> = ({
   currentTab,
   selfUser,
   showSearchInput = false,
@@ -120,7 +120,7 @@ export const ConversationHeaderComponent = ({
     [SidebarTabs.MEETINGS]: translate('meetings.navigation.title'),
   };
 
-  const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+  const onKeyDown = (event: KeyboardEvent<HTMLInputElement>): void => {
     handleEscDown(event, clear);
     handleEnterDown(event, () => {
       return enter(event);
@@ -132,7 +132,7 @@ export const ConversationHeaderComponent = ({
   };
 
   useEffect(() => {
-    const onSearchShortcut = () => {
+    const onSearchShortcut = (): void => {
       onExpandList?.();
       jumpToRecentSearch();
       focusSearchInputRef(searchInputRef);
@@ -145,7 +145,7 @@ export const ConversationHeaderComponent = ({
     };
   }, [jumpToRecentSearch, onExpandList, searchInputRef]);
 
-  const showCreateConversationModal = () => {
+  const showCreateConversationModal = (): void => {
     if (isChannelsEnabled && canCreateChannels) {
       showModal();
     } else {
@@ -153,7 +153,7 @@ export const ConversationHeaderComponent = ({
     }
   };
 
-  const handleCollapsedSearchClick = () => {
+  const handleCollapsedSearchClick = (): void => {
     onExpandList?.();
     focusSearchInputRef(searchInputRef);
   };

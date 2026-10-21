@@ -17,7 +17,7 @@
  *
  */
 
-import {ChangeEvent, FormEvent} from 'react';
+import {ChangeEvent, FormEvent, type FunctionComponent} from 'react';
 
 import {CircleCloseIcon, ErrorMessage, Input, Label} from '@wireapp/react-ui-kit';
 
@@ -35,7 +35,14 @@ interface CellsRenameFormProps {
   onClearName: () => void;
 }
 
-export const CellsRenameForm = ({isOpen, onSubmit, name, onChangeName, onClearName, error}: CellsRenameFormProps) => {
+export const CellsRenameForm: FunctionComponent<CellsRenameFormProps> = ({
+  isOpen,
+  onSubmit,
+  name,
+  onChangeName,
+  onClearName,
+  error,
+}: CellsRenameFormProps) => {
   const {translate} = useApplicationContext();
   const {inputRef} = useInputAutoFocus({enabled: isOpen});
 

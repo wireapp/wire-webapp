@@ -71,7 +71,10 @@ function withTranslationStrings(
   };
 }
 
-function createMemberMessage({systemType, type}: {systemType?: SystemMessageType; type?: string}, users?: User[]) {
+function createMemberMessage(
+  {systemType, type}: {systemType?: SystemMessageType; type?: string},
+  users?: User[],
+): MemberMessageEntity {
   const message = new MemberMessageEntity(translate);
   if (systemType !== undefined) {
     message.memberMessageType = systemType;

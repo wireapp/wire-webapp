@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {Checkbox} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -28,7 +30,12 @@ interface CellsSelectionCheckboxProps {
   onChange: (isChecked: boolean) => void;
 }
 
-export const CellsSelectionCheckbox = ({id, name, isChecked, onChange}: CellsSelectionCheckboxProps) => {
+export const CellsSelectionCheckbox: FunctionComponent<CellsSelectionCheckboxProps> = ({
+  id,
+  name,
+  isChecked,
+  onChange,
+}: CellsSelectionCheckboxProps) => {
   const {translate} = useApplicationContext();
 
   return (

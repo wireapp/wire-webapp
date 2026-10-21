@@ -17,7 +17,7 @@
  *
  */
 
-import {act, render} from '@testing-library/react';
+import {act, render, type RenderResult} from '@testing-library/react';
 import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -75,7 +75,7 @@ describe('WindowTitleUpdater', () => {
   let connectionRequests: unknown[];
   let unreadConversations: unknown[];
 
-  const renderWindowTitleUpdater = () => {
+  const renderWindowTitleUpdater = (): RenderResult => {
     return render(<WindowTitleUpdater translate={translateForTest} />);
   };
 
@@ -86,7 +86,7 @@ describe('WindowTitleUpdater', () => {
     return latestSubscribeCall[1];
   };
 
-  const publishNotificationState = (notificationState: NOTIFICATION_HANDLING_STATE) => {
+  const publishNotificationState = (notificationState: NOTIFICATION_HANDLING_STATE): void => {
     act(() => {
       activeNotificationStateHandlers.forEach(notificationStateHandler => {
         notificationStateHandler(notificationState);

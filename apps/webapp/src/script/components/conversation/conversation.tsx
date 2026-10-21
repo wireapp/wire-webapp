@@ -142,7 +142,8 @@ function ConversationContent({
   const {content: contentViewModel} = mainViewModel;
   const {conversationRepository, repositories} = contentViewModel;
   const sharedDriveUploadController = useMemo(() => {
-    const createSource = (file: File) => {
+    type CreateSourceResult = {blob: File; name: string; contentType: string; size: number};
+    const createSource = (file: File): CreateSourceResult => {
       return {blob: file, name: file.name, contentType: file.type, size: file.size};
     };
     const uploadManager = createCellsUploadManager({
@@ -313,12 +314,12 @@ function ConversationContent({
     [repositories.asset, translate, uploadFiles, uploadImages],
   );
 
-  const openGiphy = (text: string) => {
+  const openGiphy = (text: string): void => {
     setInputValue(text);
     setIsGiphyModalOpen(true);
   };
 
-  const closeGiphy = () => {
+  const closeGiphy = (): void => {
     return setIsGiphyModalOpen(false);
   };
 
@@ -335,7 +336,7 @@ function ConversationContent({
     }
   };
 
-  const showUserDetails = async (userEntity: User | ServiceEntity) => {
+  const showUserDetails = async (userEntity: User | ServiceEntity): Promise<void> => {
     const isSingleModeConversation = is1to1 || isRequest;
 
     const isUserEntity = !isServiceEntity(userEntity);
@@ -359,23 +360,23 @@ function ConversationContent({
     openRightSidebar(panelId, {entity: serviceEntity ?? userEntity}, true);
   };
 
-  const showParticipants = (participants: User[]) => {
+  const showParticipants = (participants: User[]): void => {
     if (!isNullOrUndefined(activeConversation)) {
       openRightSidebar(PanelState.CONVERSATION_PARTICIPANTS, {entity: activeConversation, highlighted: participants});
     }
   };
 
-  const showMessageDetails = (message: Message, showReactions = false) => {
+  const showMessageDetails = (message: Message, showReactions = false): void => {
     if (!is1to1) {
       openRightSidebar(PanelState.MESSAGE_DETAILS, {entity: message, showReactions}, true);
     }
   };
 
-  const showMessageReactions = (message: Message, showReactions = true) => {
+  const showMessageReactions = (message: Message, showReactions = true): void => {
     openRightSidebar(PanelState.MESSAGE_DETAILS, {entity: message, showReactions}, true);
   };
 
-  const handleEmailClick = (event: Event, messageDetails: MessageDetails) => {
+  const handleEmailClick = (event: Event, messageDetails: MessageDetails): boolean => {
     if (isUndefined(messageDetails.href)) {
       event.preventDefault();
 
@@ -386,7 +387,7 @@ function ConversationContent({
     return false;
   };
 
-  const openUserProfile = async (id: string, domain?: string) => {
+  const openUserProfile = async (id: string, domain?: string): Promise<void> => {
     if (!teamState.isProfileLinkEnabled()) {
       PrimaryModal.show(
         PrimaryModal.type.ACKNOWLEDGE,
@@ -418,7 +419,7 @@ function ConversationContent({
     }
   };
 
-  const handleMarkdownLinkClick = (event: MouseEvent | KeyboardEvent, messageDetails: MessageDetails) => {
+  const handleMarkdownLinkClick = (event: MouseEvent | KeyboardEvent, messageDetails: MessageDetails): boolean => {
     if (isUndefined(messageDetails.href)) {
       event.preventDefault();
 
@@ -484,7 +485,7 @@ function ConversationContent({
     return false;
   };
 
-  const userMentionClick = (messageDetails: MessageDetails) => {
+  const userMentionClick = (messageDetails: MessageDetails): void => {
     const userId = messageDetails.userId;
     const domain = messageDetails.userDomain;
 
@@ -510,7 +511,7 @@ function ConversationContent({
       userId: '',
       userDomain: '',
     },
-  ) => {
+  ): boolean => {
     if (isMouseRightClickEvent(event) || isAuxRightClickEvent(event)) {
       // Default browser behavior on right click
       return true;
@@ -549,7 +550,7 @@ function ConversationContent({
   };
 
   const onSessionResetClick = async (messageEntity: DecryptErrorMessage): Promise<void> => {
-    const resetProgress = () => {
+    const resetProgress = (): void => {
       setTimeout(() => {
         PrimaryModal.show(PrimaryModal.type.SESSION_RESET, {}, undefined, translate);
       }, MotionDuration.LONG);
@@ -599,11 +600,11 @@ function ConversationContent({
         }
       }
 
-      const updateLastRead = () => {
+      const updateLastRead = (): void => {
         conversationEntity.setTimestamp(messageEntity.timestamp(), ConversationEntity.TIMESTAMP_TYPE.LAST_READ);
       };
 
-      const startTimer = async () => {
+      const startTimer = async (): Promise<void> => {
         if (messageEntity.conversation_id === conversationEntity.id) {
           repositories.conversation.checkMessageTimer(messageEntity as ContentMessage);
         }
@@ -647,7 +648,7 @@ function ConversationContent({
       }
 
       return () => {
-        const trigger = () => {
+        const trigger = (): void => {
           return callbacks.forEach(callback => {
             callback();
           });

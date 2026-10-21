@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect, useRef, useState, Fragment, FormEvent, ReactNode} from 'react';
+import {useCallback, useEffect, useRef, useState, Fragment, FormEvent, ReactNode, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 import {amplify} from 'amplify';
@@ -146,7 +146,7 @@ interface AppLockProps {
   clientState?: ClientState;
 }
 
-const AppLock = ({
+const AppLock: FunctionComponent<AppLockProps> = ({
   clientRepository,
   clientState = container.resolve(ClientState),
   appLockState = container.resolve(AppLockState),
@@ -190,17 +190,17 @@ const AppLock = ({
     }),
   );
 
-  const getInactivityAppLockTimeoutInSeconds = () => {
+  const getInactivityAppLockTimeoutInSeconds = (): number => {
     const backendTimeout = appLockState.appLockInactivityTimeoutSecs();
     return Number.isFinite(backendTimeout) ? backendTimeout : DEFAULT_INACTIVITY_APP_LOCK_TIMEOUT_IN_SEC;
   };
 
-  const getScheduledAppLockTimeoutInSeconds = () => {
+  const getScheduledAppLockTimeoutInSeconds = (): number | null => {
     const configTimeout = Config.getConfig().FEATURE?.APPLOCK_SCHEDULED_TIMEOUT;
     return Number.isFinite(configTimeout) ? configTimeout : null;
   };
 
-  const isScheduledAppLockEnabled = () => {
+  const isScheduledAppLockEnabled = (): boolean => {
     return getScheduledAppLockTimeoutInSeconds() !== null;
   };
 
@@ -261,12 +261,12 @@ const AppLock = ({
     };
   }, [localAppLockState, isVisible]);
 
-  const showAppLock = () => {
+  const showAppLock = (): void => {
     setLocalAppLockState(appLockState.hasPassphrase() ? APPLOCK_STATE.LOCKED : APPLOCK_STATE.SETUP);
     setIsVisible(true);
   };
 
-  const onUnlock = async (event: FormEvent) => {
+  const onUnlock = async (event: FormEvent): Promise<void> => {
     event.preventDefault();
     const target = event.target as HTMLFormElement & {password: HTMLInputElement};
     const isCorrectCode = await appLockRepository.checkCode(target.password.value);
@@ -278,7 +278,7 @@ const AppLock = ({
     setUnlockError(translate('modalAppLockLockedError'));
   };
 
-  const startScheduledTimeout = () => {
+  const startScheduledTimeout = (): void => {
     if (isScheduledAppLockEnabled()) {
       window.clearTimeout(scheduledTimeoutId);
       const scheduledAppLockTimeoutInSeconds = getScheduledAppLockTimeoutInSeconds();
@@ -289,19 +289,19 @@ const AppLock = ({
     }
   };
 
-  const onSetCode = async (event: FormEvent) => {
+  const onSetCode = async (event: FormEvent): Promise<void> => {
     event.preventDefault();
     await appLockRepository.setCode(setupPassphrase);
     setIsVisible(false);
     startScheduledTimeout();
   };
 
-  const onLogout = (clearData: boolean) => {
+  const onLogout = (clearData: boolean): void => {
     appLockRepository.removeCode();
     amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, clearData);
   };
 
-  const changePassphrase = () => {
+  const changePassphrase = (): void => {
     setLocalAppLockState(APPLOCK_STATE.SETUP);
     setIsVisible(true);
   };
@@ -313,32 +313,32 @@ const AppLock = ({
   const isSetupPassphraseLength = passwordRegexLength.test(setupPassphrase);
   const isSetupPassphraseSpecial = passwordRegexSpecial.test(setupPassphrase);
 
-  const clearUnlockError = () => {
+  const clearUnlockError = (): void => {
     return setUnlockError('');
   };
-  const onGoBack = () => {
+  const onGoBack = (): void => {
     return setLocalAppLockState(APPLOCK_STATE.LOCKED);
   };
-  const onClickForgot = () => {
+  const onClickForgot = (): void => {
     return setLocalAppLockState(APPLOCK_STATE.FORGOT);
   };
-  const onClickLogout = async () => {
+  const onClickLogout = async (): Promise<void> => {
     if (isTemporaryClient === true) {
       await clientRepository.logoutClient();
     } else {
       setLocalAppLockState(APPLOCK_STATE.LOGOUT);
     }
   };
-  const onClosed = () => {
+  const onClosed = (): void => {
     setLocalAppLockState(APPLOCK_STATE.NONE);
     setSetupPassphrase('');
   };
-  const onCancelAppLock = () => {
+  const onCancelAppLock = (): void => {
     appLockRepository.setEnabled(false);
     setIsVisible(false);
   };
 
-  const headerText = () => {
+  const headerText = (): string => {
     switch (localAppLockState) {
       case APPLOCK_STATE.SETUP_CHANGE:
         return translate('modalAppLockSetupChangeTitle', {brandName: Config.getConfig().BRAND_NAME});
@@ -618,7 +618,7 @@ const AppLock = ({
   );
 };
 
-const ErrorMessage = ({message}: {message: string}) => {
+const ErrorMessage: FunctionComponent<{message: string}> = ({message}: {message: string}) => {
   return (
     <p className="modal__input__error" data-uie-name="label-applock-unlock-error">
       {message}

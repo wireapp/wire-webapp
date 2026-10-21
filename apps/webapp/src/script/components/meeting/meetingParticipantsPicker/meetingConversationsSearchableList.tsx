@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {isNonEmptyString} from '@sindresorhus/is';
 
 import {Checkbox, CheckboxLabel, ChevronDownIcon} from '@wireapp/react-ui-kit';
@@ -42,7 +44,7 @@ type MeetingConversationsSearchableListProps = {
   dataUieName?: string;
 };
 
-export const MeetingConversationsSearchableList = ({
+export const MeetingConversationsSearchableList: FunctionComponent<MeetingConversationsSearchableListProps> = ({
   id,
   conversations,
   selectedConversationIds,

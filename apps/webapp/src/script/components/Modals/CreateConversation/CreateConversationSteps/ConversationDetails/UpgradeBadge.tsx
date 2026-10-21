@@ -17,11 +17,13 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {upgradeBadgeCss} from './ConversationDetails.styles';
 
-export const UpgradeBadge = () => {
+export const UpgradeBadge: FunctionComponent = () => {
   const {translate} = useApplicationContext();
 
   return <div css={upgradeBadgeCss}>{translate('createConversationUpgradeBadge')}</div>;

@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {CellsSearchInput} from 'Components/cellsSearchInput/cellsSearchInput';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
@@ -28,7 +30,11 @@ interface CellsSearchProps {
   onClearSearch: () => void;
 }
 
-export const CellsSearch = ({searchValue, onSearch, onClearSearch}: CellsSearchProps) => {
+export const CellsSearch: FunctionComponent<CellsSearchProps> = ({
+  searchValue,
+  onSearch,
+  onClearSearch,
+}: CellsSearchProps) => {
   const {translate} = useApplicationContext();
 
   return (

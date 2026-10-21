@@ -17,7 +17,7 @@
  *
  */
 
-import type {MouseEvent} from 'react';
+import type {MouseEvent, FunctionComponent} from 'react';
 
 import cx from 'classnames';
 
@@ -31,7 +31,11 @@ interface EmojiButtonProps {
   onClick: (event: MouseEvent<HTMLButtonElement>) => void;
 }
 
-export const EmojiButton = ({isActive, isEditing = false, onClick}: EmojiButtonProps) => {
+export const EmojiButton: FunctionComponent<EmojiButtonProps> = ({
+  isActive,
+  isEditing = false,
+  onClick,
+}: EmojiButtonProps) => {
   const {translate} = useApplicationContext();
 
   return (

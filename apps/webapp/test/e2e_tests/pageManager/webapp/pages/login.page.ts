@@ -37,7 +37,7 @@ export class LoginPage {
     this.header = page.getByRole('heading');
   }
 
-  async login(user: Pick<User, 'email' | 'password'>, options?: {publicComputer?: boolean}) {
+  async login(user: Pick<User, 'email' | 'password'>, options?: {publicComputer?: boolean}): Promise<void> {
     await this.emailInput.fill(user.email);
     await this.passwordInput.fill(user.password);
 

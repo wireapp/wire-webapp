@@ -40,7 +40,25 @@ const createFile = (
   });
 };
 
-const createProps = (overrides: Record<string, unknown> = {}) => {
+type CreatePropsResult = {
+  replyMessageEntity: null;
+  eventRepository: never;
+  messageRepository: never;
+  conversation: never;
+  conversationRepository: never;
+  cellsRepository: never;
+  draftState: {reset: jest.Mock<any, any, any>};
+  cancelMessageEditing: jest.Mock<any, any, any>;
+  cancelMessageReply: jest.Mock<any, any, any>;
+  editedMessage: undefined;
+  replyMessageCallback: jest.Mock<any, any, any>;
+  editorRef: {current: null};
+  pastedFile: null;
+  sendPastedFile: jest.Mock<any, any, any>;
+  messageContent: {text: string; mentions: never[]};
+  translate: never;
+};
+const createProps = (overrides: Record<string, unknown> = {}): CreatePropsResult => {
   return {
     replyMessageEntity: null,
     eventRepository: {eventService: {loadEvent: jest.fn()}} as never,

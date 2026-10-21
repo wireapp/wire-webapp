@@ -29,7 +29,14 @@ import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
 import type {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-export const useDeleteMeeting = () => {
+type UseDeleteMeetingResult = {
+  openDeleteMeetingModal: (
+    meetingInstance: MeetingInstance,
+    mode: DeleteMeetingModalMode,
+    selfUser: User | undefined,
+  ) => void;
+};
+export const useDeleteMeeting = (): UseDeleteMeetingResult => {
   const {translate, fireAndForgetInvoker} = useApplicationContext();
   const deleteMeetingForMe = useMeetingStore(state => {
     return state.deleteMeetingForMe;

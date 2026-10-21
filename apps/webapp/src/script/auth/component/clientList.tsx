@@ -17,10 +17,11 @@
  *
  */
 
-import {HTMLProps, useEffect, useState} from 'react';
+import {HTMLProps, useEffect, useState, type FunctionComponent} from 'react';
 
 import {isBoolean, isString} from '@sindresorhus/is';
 import {ClientType} from '@wireapp/api-client/lib/client/index';
+import type {RegisteredClient} from '@wireapp/api-client/lib/client/registeredClient';
 import {connect} from 'react-redux';
 import {useNavigate} from 'react-router';
 
@@ -42,7 +43,7 @@ import {QUERY_KEY, ROUTE} from '../route';
 const logger = getLogger('ClientList');
 
 type Props = HTMLProps<HTMLDivElement>;
-const ClientListComponent = ({
+const ClientListComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> = ({
   clientError,
   isFetching,
   isNoPasswordSSO,
@@ -69,7 +70,7 @@ const ClientListComponent = ({
     );
   }, [permanentClients]);
 
-  const setSelectedClient = (clientId: string) => {
+  const setSelectedClient = (clientId: string): void => {
     const isSelectedClient = currentlySelectedClient === clientId;
 
     const selectedClientId = isSelectedClient ? null : clientId;
@@ -78,7 +79,7 @@ const ClientListComponent = ({
     resetClientError();
   };
 
-  const removeClient = async (clientId: string, password?: string) => {
+  const removeClient = async (clientId: string, password?: string): Promise<void> => {
     try {
       const SFAcode = (await getLocalStorage(QUERY_KEY.CONVERSATION_CODE)) ?? undefined;
       setShowLoading(true);
@@ -101,7 +102,7 @@ const ClientListComponent = ({
     }
   };
 
-  const isSelectedClient = (clientId: string) => {
+  const isSelectedClient = (clientId: string): boolean => {
     return clientId === currentlySelectedClient;
   };
 
@@ -137,7 +138,14 @@ const ClientListComponent = ({
 };
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
-const mapStateToProps = (state: RootState) => {
+type MapStateToPropsResult = {
+  clientError: Error | null;
+  entropy: Uint8Array<ArrayBufferLike> | undefined;
+  isFetching: boolean;
+  isNoPasswordSSO: boolean;
+  permanentClients: RegisteredClient[];
+};
+const mapStateToProps = (state: RootState): MapStateToPropsResult => {
   return {
     clientError: ClientSelector.getError(state),
     entropy: getEntropy(state),
@@ -148,7 +156,24 @@ const mapStateToProps = (state: RootState) => {
 };
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: ThunkDispatch) => {
+type MapDispatchToPropsResult = {
+  doInitializeClient: (
+    clientType: ClientType,
+    password?: string | undefined,
+    verificationCode?: string | undefined,
+    entropyData?: Uint8Array<ArrayBufferLike> | undefined,
+  ) => Promise<void>;
+  doRemoveClient: (clientId: string, password?: string | undefined) => Promise<void>;
+  getLocalStorage: ClientListLocalStorageReader;
+  removeLocalStorage: (key: string) => Promise<void>;
+  resetAuthError: () => Promise<void>;
+  resetClientError: () => Promise<void>;
+};
+type ClientListLocalStorageReader = {
+  (key: typeof QUERY_KEY.CONVERSATION_CODE): Promise<string | undefined>;
+  (key: typeof LocalStorageAction.LocalStorageKey.AUTH.PERSIST): Promise<boolean | string | undefined>;
+};
+const mapDispatchToProps = (dispatch: ThunkDispatch): MapDispatchToPropsResult => {
   return {
     doInitializeClient: (...args: Parameters<typeof ROOT_ACTIONS.clientAction.doInitializeClient>) => {
       return dispatch(ROOT_ACTIONS.clientAction.doInitializeClient(...args));

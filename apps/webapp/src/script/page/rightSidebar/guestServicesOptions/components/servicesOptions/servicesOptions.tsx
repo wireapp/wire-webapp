@@ -60,7 +60,7 @@ const ServicesOptions: FC<ServicesOptionsProps> = ({
 
   const displayAppsToggle = isAppsFeatureEnabled || isServicesEnabled;
 
-  const toggleServicesAccessState = () => {
+  const toggleServicesAccessState = (): void => {
     toggleAccessState(ACCESS_TYPES.SERVICE, translate('modalConversationRemoveAppsMessage'), hasService);
   };
 

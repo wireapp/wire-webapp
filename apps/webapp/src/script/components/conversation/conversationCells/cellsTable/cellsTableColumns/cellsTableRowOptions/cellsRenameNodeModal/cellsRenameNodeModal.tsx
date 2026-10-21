@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {CellsModal} from 'Components/conversation/conversationCells/common/cellsModal/cellsModal';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -33,7 +35,7 @@ interface CellsRenameNodeModalProps {
   onRefresh: () => void;
 }
 
-export const CellsRenameNodeModal = ({
+export const CellsRenameNodeModal: FunctionComponent<CellsRenameNodeModalProps> = ({
   isOpen,
   onClose,
   node,

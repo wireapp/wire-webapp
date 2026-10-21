@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode} from 'react';
+import {ReactNode, type FunctionComponent} from 'react';
 
 import {contentStyles, descriptionStyles, titleStyles, wrapperStyles} from './FilePlaceholder.styles';
 
@@ -27,7 +27,11 @@ interface FilePlaceholderProps {
   callToAction?: ReactNode;
 }
 
-export const FilePlaceholder = ({title, description, callToAction}: FilePlaceholderProps) => {
+export const FilePlaceholder: FunctionComponent<FilePlaceholderProps> = ({
+  title,
+  description,
+  callToAction,
+}: FilePlaceholderProps) => {
   return (
     <section css={wrapperStyles}>
       <div css={contentStyles}>

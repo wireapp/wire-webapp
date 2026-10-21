@@ -20,7 +20,7 @@
 import {User} from '../data/user';
 import {PageManager} from '../pageManager';
 
-export const goToPersonalRegistration = async (pageManager: PageManager, email: string) => {
+export const goToPersonalRegistration = async (pageManager: PageManager, email: string): Promise<void> => {
   const {pages} = pageManager.webapp;
   await pages.singleSignOn().isSSOPageVisible();
   await pages.singleSignOn().enterEmailOnSSOPage(email);
@@ -33,7 +33,7 @@ export const completeRegistrationForm = async (
   user: User,
   input: string | null = null,
   inputType = 'email',
-) => {
+): Promise<void> => {
   const registration = pageManager.webapp.pages.registration();
   await registration.fillInUserInfo(user);
   if (input) {

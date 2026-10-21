@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {getGroupAvatarColors} from 'Util/avatarUtil';
 import {CSS_SQUARE} from 'Util/cssMixin';
 
@@ -38,7 +40,11 @@ const BORDER_WIDTH: Record<GroupAvatarSize, number> = {small: 0.5, medium: 1, la
 const SVG_WIDTH: Record<GroupAvatarSize, number> = {small: 12, medium: 16, large: 20};
 const SVG_HEIGHT: Record<GroupAvatarSize, number | 'auto'> = {small: 'auto', medium: 24, large: 28};
 
-export const GroupAvatar = ({conversationID, className, size = 'large'}: GroupAvatarProps) => {
+export const GroupAvatar: FunctionComponent<GroupAvatarProps> = ({
+  conversationID,
+  className,
+  size = 'large',
+}: GroupAvatarProps) => {
   const colors = getGroupAvatarColors(conversationID);
 
   return (

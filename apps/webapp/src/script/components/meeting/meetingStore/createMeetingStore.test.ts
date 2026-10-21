@@ -420,7 +420,7 @@ describe('createMeetingStore', () => {
 
   it('removes a meeting when meeting.delete is distributed with its qualified_id', async () => {
     const store = createMeetingStore(createDeps(), {meetingSeries: [meetingSeriesEntry]});
-    const onMeetingDeleted = (meetingId: {id: string; domain: string}) => {
+    const onMeetingDeleted = (meetingId: {id: string; domain: string}): void => {
       store.getState().removeMeetingByQualifiedId(meetingId);
     };
 

@@ -19,7 +19,19 @@
 
 import {ReactNode} from 'react';
 
-import {act, fireEvent, render, screen, waitFor} from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  type Matcher,
+  type SelectorMatcherOptions,
+  type waitForOptions,
+  type MatcherOptions,
+  type ByRoleMatcher,
+  type ByRoleOptions,
+} from '@testing-library/react';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {RestNode} from 'cells-sdk-ts';
 import {noop} from 'noop-esm';
@@ -38,8 +50,11 @@ import {CellNode} from 'src/script/types/cellNode';
 import {translateForTest} from 'Util/test/translateForTest';
 
 import {CellsMoveNodeModal} from './cellsMoveNodeModal';
+import type {JSX} from '@emotion/react/jsx-runtime';
+import type {Container} from 'react-dom/client';
+import type {OptionsReceived} from '@testing-library/dom/node_modules/pretty-format';
 
-const withTheme = (component: ReactNode) => {
+const withTheme = (component: ReactNode): JSX.Element => {
   return <StyledApp themeId={THEME_ID.DEFAULT}>{component}</StyledApp>;
 };
 
@@ -66,11 +81,136 @@ describe('CellsMoveNodeModal', () => {
     navigateToPath = jest.fn();
   });
 
+  type RenderMoveModalResult = {
+    setIsOpen: (nextIsOpen: boolean) => void;
+    container: HTMLElement;
+    baseElement: HTMLElement;
+    debug: (
+      baseElement?: Container | (Element | Document) | Array<Container | (Element | Document)> | undefined,
+      maxLength?: number | undefined,
+      options?: OptionsReceived | undefined,
+    ) => void;
+    rerender: (ui: React.ReactNode) => void;
+    unmount: () => void;
+    asFragment: () => DocumentFragment;
+    getByLabelText: (id: Matcher, options?: SelectorMatcherOptions | undefined) => HTMLElement;
+    getAllByLabelText: (id: Matcher, options?: SelectorMatcherOptions | undefined) => HTMLElement[];
+    queryByLabelText: (id: Matcher, options?: SelectorMatcherOptions | undefined) => HTMLElement | null;
+    queryAllByLabelText: (id: Matcher, options?: SelectorMatcherOptions | undefined) => HTMLElement[];
+    findByLabelText: (
+      id: Matcher,
+      options?: SelectorMatcherOptions | undefined,
+      waitForElementOptions?: waitForOptions | undefined,
+    ) => Promise<HTMLElement>;
+    findAllByLabelText: (
+      id: Matcher,
+      options?: SelectorMatcherOptions | undefined,
+      waitForElementOptions?: waitForOptions | undefined,
+    ) => Promise<HTMLElement[]>;
+    getByPlaceholderText: (id: Matcher, options?: MatcherOptions | undefined) => HTMLElement;
+    getAllByPlaceholderText: (id: Matcher, options?: MatcherOptions | undefined) => HTMLElement[];
+    queryByPlaceholderText: (id: Matcher, options?: MatcherOptions | undefined) => HTMLElement | null;
+    queryAllByPlaceholderText: (id: Matcher, options?: MatcherOptions | undefined) => HTMLElement[];
+    findByPlaceholderText: (
+      id: Matcher,
+      options?: MatcherOptions | undefined,
+      waitForElementOptions?: waitForOptions | undefined,
+    ) => Promise<HTMLElement>;
+    findAllByPlaceholderText: (
+      id: Matcher,
+      options?: MatcherOptions | undefined,
+      waitForElementOptions?: waitForOptions | undefined,
+    ) => Promise<HTMLElement[]>;
+    getByText: (id: Matcher, options?: SelectorMatcherOptions | undefined) => HTMLElement;
+    getAllByText: (id: Matcher, options?: SelectorMatcherOptions | undefined) => HTMLElement[];
+    queryByText: (id: Matcher, options?: SelectorMatcherOptions | undefined) => HTMLElement | null;
+    queryAllByText: (id: Matcher, options?: SelectorMatcherOptions | undefined) => HTMLElement[];
+    findByText: (
+      id: Matcher,
+      options?: SelectorMatcherOptions | undefined,
+      waitForElementOptions?: waitForOptions | undefined,
+    ) => Promise<HTMLElement>;
+    findAllByText: (
+      id: Matcher,
+      options?: SelectorMatcherOptions | undefined,
+      waitForElementOptions?: waitForOptions | undefined,
+    ) => Promise<HTMLElement[]>;
+    getByAltText: (id: Matcher, options?: MatcherOptions | undefined) => HTMLElement;
+    getAllByAltText: (id: Matcher, options?: MatcherOptions | undefined) => HTMLElement[];
+    queryByAltText: (id: Matcher, options?: MatcherOptions | undefined) => HTMLElement | null;
+    queryAllByAltText: (id: Matcher, options?: MatcherOptions | undefined) => HTMLElement[];
+    findByAltText: (
+      id: Matcher,
+      options?: MatcherOptions | undefined,
+      waitForElementOptions?: waitForOptions | undefined,
+    ) => Promise<HTMLElement>;
+    findAllByAltText: (
+      id: Matcher,
+      options?: MatcherOptions | undefined,
+      waitForElementOptions?: waitForOptions | undefined,
+    ) => Promise<HTMLElement[]>;
+    getByTitle: (id: Matcher, options?: MatcherOptions | undefined) => HTMLElement;
+    getAllByTitle: (id: Matcher, options?: MatcherOptions | undefined) => HTMLElement[];
+    queryByTitle: (id: Matcher, options?: MatcherOptions | undefined) => HTMLElement | null;
+    queryAllByTitle: (id: Matcher, options?: MatcherOptions | undefined) => HTMLElement[];
+    findByTitle: (
+      id: Matcher,
+      options?: MatcherOptions | undefined,
+      waitForElementOptions?: waitForOptions | undefined,
+    ) => Promise<HTMLElement>;
+    findAllByTitle: (
+      id: Matcher,
+      options?: MatcherOptions | undefined,
+      waitForElementOptions?: waitForOptions | undefined,
+    ) => Promise<HTMLElement[]>;
+    getByDisplayValue: (id: Matcher, options?: MatcherOptions | undefined) => HTMLElement;
+    getAllByDisplayValue: (id: Matcher, options?: MatcherOptions | undefined) => HTMLElement[];
+    queryByDisplayValue: (id: Matcher, options?: MatcherOptions | undefined) => HTMLElement | null;
+    queryAllByDisplayValue: (id: Matcher, options?: MatcherOptions | undefined) => HTMLElement[];
+    findByDisplayValue: (
+      id: Matcher,
+      options?: MatcherOptions | undefined,
+      waitForElementOptions?: waitForOptions | undefined,
+    ) => Promise<HTMLElement>;
+    findAllByDisplayValue: (
+      id: Matcher,
+      options?: MatcherOptions | undefined,
+      waitForElementOptions?: waitForOptions | undefined,
+    ) => Promise<HTMLElement[]>;
+    getByRole: (role: ByRoleMatcher, options?: ByRoleOptions | undefined) => HTMLElement;
+    getAllByRole: (role: ByRoleMatcher, options?: ByRoleOptions | undefined) => HTMLElement[];
+    queryByRole: (role: ByRoleMatcher, options?: ByRoleOptions | undefined) => HTMLElement | null;
+    queryAllByRole: (role: ByRoleMatcher, options?: ByRoleOptions | undefined) => HTMLElement[];
+    findByRole: (
+      role: ByRoleMatcher,
+      options?: ByRoleOptions | undefined,
+      waitForElementOptions?: waitForOptions | undefined,
+    ) => Promise<HTMLElement>;
+    findAllByRole: (
+      role: ByRoleMatcher,
+      options?: ByRoleOptions | undefined,
+      waitForElementOptions?: waitForOptions | undefined,
+    ) => Promise<HTMLElement[]>;
+    getByTestId: (id: Matcher, options?: MatcherOptions | undefined) => HTMLElement;
+    getAllByTestId: (id: Matcher, options?: MatcherOptions | undefined) => HTMLElement[];
+    queryByTestId: (id: Matcher, options?: MatcherOptions | undefined) => HTMLElement | null;
+    queryAllByTestId: (id: Matcher, options?: MatcherOptions | undefined) => HTMLElement[];
+    findByTestId: (
+      id: Matcher,
+      options?: MatcherOptions | undefined,
+      waitForElementOptions?: waitForOptions | undefined,
+    ) => Promise<HTMLElement>;
+    findAllByTestId: (
+      id: Matcher,
+      options?: MatcherOptions | undefined,
+      waitForElementOptions?: waitForOptions | undefined,
+    ) => Promise<HTMLElement[]>;
+  };
   const renderMoveModal = (
     clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
     isOpen = true,
     isBulkActionsEnabled = true,
-  ) => {
+  ): RenderMoveModalResult => {
     const rootContext = createRootContextValueForTest({
       isFeatureToggleEnabled: featureToggleName => {
         return isBulkActionsEnabled && featureToggleName === driveBulkActionsFeatureToggleName;
@@ -81,7 +221,7 @@ describe('CellsMoveNodeModal', () => {
     });
     const wrapper = createRootProviderWrapperForTest(rootContext);
 
-    const createModal = (isOpen: boolean) => {
+    const createModal = (isOpen: boolean): JSX.Element => {
       return withTheme(
         <CellsMoveNodeModal
           isOpen={isOpen}

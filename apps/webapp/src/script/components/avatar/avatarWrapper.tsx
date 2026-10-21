@@ -17,7 +17,7 @@
  *
  */
 
-import type {ReactNode, MouseEvent, KeyboardEvent} from 'react';
+import type {ReactNode, MouseEvent, KeyboardEvent, FunctionComponent} from 'react';
 
 import {CSS_SQUARE} from 'Util/cssMixin';
 
@@ -35,7 +35,12 @@ interface AvatarWrapperProps {
   title?: string;
 }
 
-const AvatarWrapper = ({color, avatarSize, isResponsive = false, ...props}: AvatarWrapperProps) => {
+const AvatarWrapper: FunctionComponent<AvatarWrapperProps> = ({
+  color,
+  avatarSize,
+  isResponsive = false,
+  ...props
+}: AvatarWrapperProps) => {
   const avatarDiameter = isResponsive ? `${DIAMETER[avatarSize] / pixelsPerRem}rem` : DIAMETER[avatarSize];
   return (
     <div

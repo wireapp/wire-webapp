@@ -63,39 +63,39 @@ export class ConversationSidebar {
     this.folderList = page.getByTestId('folder-list');
   }
 
-  async clickPreferencesButton() {
+  async clickPreferencesButton(): Promise<void> {
     await this.preferencesButton.click();
   }
 
-  async clickAllConversationsButton() {
+  async clickAllConversationsButton(): Promise<void> {
     await this.allConversationsButton.click();
   }
 
-  async clickConnectButton() {
+  async clickConnectButton(): Promise<void> {
     await this.connectButton.click();
   }
 
-  async clickCellsButton() {
+  async clickCellsButton(): Promise<void> {
     await this.cellsButton.click();
   }
 
-  async clickMeetingsButton() {
+  async clickMeetingsButton(): Promise<void> {
     await this.meetingsButton.click();
   }
 
-  async clickArchive() {
+  async clickArchive(): Promise<void> {
     await this.archiveButton.click();
   }
 
-  tab(testId: string) {
+  tab(testId: string): Locator {
     return this.page.getByTestId(testId);
   }
 
-  async openStatusMenu(userFullName: string) {
+  async openStatusMenu(userFullName: string): Promise<void> {
     await this.navigation.getByRole('button', {name: userFullName}).click();
   }
 
-  async setStatus(status: 'None' | 'Available' | 'Busy' | 'Away') {
+  async setStatus(status: 'None' | 'Available' | 'Busy' | 'Away'): Promise<void> {
     await this.page.getByRole('menu').getByRole('menuitem', {name: status}).click();
   }
 }

@@ -20,7 +20,7 @@
 import type {ComponentProps} from 'react';
 
 import {render} from '@testing-library/react';
-import type {Virtualizer} from '@tanstack/react-virtual';
+import type {useVirtualizer as useVirtualizerFunction, Virtualizer} from '@tanstack/react-virtual';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import ko from 'knockout';
 import {noop} from 'noop-esm';
@@ -38,6 +38,8 @@ import {
 import {translateForTest} from 'Util/test/translateForTest';
 
 import {VirtualizedMessagesList} from './virtualizedMessagesList';
+
+type VirtualizerModule = {readonly useVirtualizer: typeof useVirtualizerFunction};
 
 function createMessageListProperties(): ComponentProps<typeof VirtualizedMessagesList> {
   return {
@@ -82,7 +84,7 @@ describe('VirtualizedMessagesList', () => {
     {cachedHeightPixels: 1, expectedHeightPixels: 1},
   ])('preserves cached measurement fallback for $cachedHeightPixels pixels', options => {
     const {cachedHeightPixels, expectedHeightPixels} = options;
-    const virtualizerModule = jest.requireActual<typeof import('@tanstack/react-virtual')>('@tanstack/react-virtual');
+    const virtualizerModule = jest.requireActual<VirtualizerModule>('@tanstack/react-virtual');
     const useVirtualizer = jest.spyOn(virtualizerModule, 'useVirtualizer');
     const properties = createMessageListProperties();
     const renderedList = render(<VirtualizedMessagesList {...properties} />, {

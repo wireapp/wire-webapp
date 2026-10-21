@@ -17,8 +17,7 @@
  *
  */
 
-import {ChangeEvent, Fragment, useCallback, useId, useMemo, useState} from 'react';
-import type {ReactNode} from 'react';
+import {ChangeEvent, Fragment, useCallback, useId, useMemo, useState, type FunctionComponent, ReactNode} from 'react';
 
 import {isEmptyArray, isNonEmptyArray, isUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
@@ -73,7 +72,7 @@ interface UserListProps {
   onContactsOpenChange?: (isOpen: boolean) => void;
 }
 
-export const UserList = ({
+export const UserList: FunctionComponent<UserListProps> = ({
   onClick,
   conversationRepository,
   users,
@@ -222,7 +221,7 @@ export const UserList = ({
     const hasSelectedUsers = selectedUsersCount > 0;
 
     const isContactsOpen = controlledContactsOpen ?? internalContactsOpen;
-    const handleContactsOpenChange = (open: boolean) => {
+    const handleContactsOpenChange = (open: boolean): void => {
       if (controlledContactsOpen === undefined) {
         setInternalContactsOpen(open);
       }
