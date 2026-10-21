@@ -17,8 +17,9 @@
  *
  */
 
-import {RestActionStatus, type RestPerformActionResponse} from 'cells-sdk-ts';
 import type {FunctionComponent} from 'react';
+
+import {RestActionStatus, type RestPerformActionResponse} from 'cells-sdk-ts';
 import type {Result} from 'true-myth';
 
 import {CellsModal} from 'Components/conversation/conversationCells/common/cellsModal/cellsModal';
