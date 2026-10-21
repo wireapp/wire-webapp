@@ -53,7 +53,7 @@ const InternalErrorRoute = (): express.ErrorRequestHandler => {
   };
 };
 
-const NotFoundRoute = () => {
+const NotFoundRoute = (): express.Router => {
   return router.get('*', (req, res) => {
     const error = {
       code: HTTP_STATUS.NOT_FOUND,

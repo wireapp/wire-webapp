@@ -17,7 +17,7 @@
  *
  */
 
-import type {ReactNode, MouseEvent} from 'react';
+import type {ReactNode, MouseEvent, FunctionComponent} from 'react';
 
 import {styles} from './secondaryButton.style';
 
@@ -29,7 +29,13 @@ interface SecondaryButtonProps {
   uieName?: string;
 }
 
-export const SecondaryButton = ({onClick, disabled = false, fullWidth, uieName, children}: SecondaryButtonProps) => {
+export const SecondaryButton: FunctionComponent<SecondaryButtonProps> = ({
+  onClick,
+  disabled = false,
+  fullWidth,
+  uieName,
+  children,
+}) => {
   return (
     <button
       type="button"

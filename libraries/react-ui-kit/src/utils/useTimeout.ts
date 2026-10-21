@@ -21,22 +21,27 @@ import {useEffect, useRef} from 'react';
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 
-const useTimeout = (onTimeoutStop: () => void, duration: number) => {
+type TimeoutControls = {
+  removeTimeout: () => void;
+  startTimeout: () => void;
+};
+
+const useTimeout = (onTimeoutStop: () => void, duration: number): TimeoutControls => {
   const timerRef = useRef<number | null>(null);
 
-  const removeTimeout = () => {
+  const removeTimeout = (): void => {
     if (!isNullOrUndefined(timerRef.current)) {
       window.clearTimeout(timerRef.current);
       timerRef.current = null;
     }
   };
 
-  const start = () => {
+  const start = (): void => {
     removeTimeout();
     timerRef.current = window.setTimeout(onStop, duration);
   };
 
-  const onStop = () => {
+  const onStop = (): void => {
     removeTimeout();
     onTimeoutStop();
   };

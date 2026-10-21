@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {CSSObject} from '@emotion/react';
 
 import {SVGIcon, SVGIconProps} from '../../dataDisplay/icon/svgIcon';
@@ -46,7 +48,7 @@ const logoStyle: <T>(theme: Theme, props: LogoProps<T>) => CSSObject = (
   };
 };
 
-export const Logo = ({hover, ariaLabel, ...props}: LogoProps) => {
+export const Logo: FunctionComponent<LogoProps> = ({hover, ariaLabel, ...props}) => {
   return (
     <SVGIcon
       realWidth={57}

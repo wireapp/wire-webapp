@@ -17,9 +17,11 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
-export const ViewerAccessIcon = (props: SVGIconProps) => {
+export const ViewerAccessIcon: FunctionComponent<SVGIconProps> = props => {
   return (
     <SVGIcon realWidth={16} realHeight={16} viewBox="20 8 16 16" {...props}>
       <path

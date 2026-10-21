@@ -17,9 +17,11 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
-export const ErrorIcon = (props: SVGIconProps) => {
+export const ErrorIcon: FunctionComponent<SVGIconProps> = props => {
   return (
     <SVGIcon realWidth={13} realHeight={12} {...props}>
       <g transform="translate(.5 .333)" fill="none" fillRule="evenodd">

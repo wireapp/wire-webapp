@@ -20,7 +20,7 @@
 import {Router} from 'express';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
-export const HealthCheckRoute = () => {
+export const HealthCheckRoute = (): Router => {
   return Router().get('/_health/?', (req, res) => {
     return res.sendStatus(HTTP_STATUS.OK);
   });

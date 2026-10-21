@@ -40,7 +40,10 @@ const matchingHtmlDocuments: readonly BuildArtifactHtmlDocument[] = [
 
 const expectedCommit = releaseBuildMetadata.commit;
 
-function validateMetadata(metadata: unknown, expectedVersion: string) {
+function validateMetadata(
+  metadata: unknown,
+  expectedVersion: string,
+): ReturnType<typeof validateRecoveryBuildArtifactMetadata> {
   return validateRecoveryBuildArtifactMetadata({
     expectedCommit,
     expectedVersion,

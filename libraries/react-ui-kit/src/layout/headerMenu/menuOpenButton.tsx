@@ -18,6 +18,7 @@
  */
 
 import * as React from 'react';
+import {type FunctionComponent} from 'react';
 
 import {CSSObject} from '@emotion/react';
 
@@ -70,18 +71,18 @@ export const menuOpenButtonStyle: <T>(theme: Theme, props: MenuOpenButtonProps<T
   };
 };
 
-const filterMenuOpenButtonProps = (props: MenuOpenButtonProps) => {
+const filterMenuOpenButtonProps = (props: MenuOpenButtonProps): Object => {
   return filterProps(props, ['open']);
 };
 
-export const MenuOpenButton = ({
+export const MenuOpenButton: FunctionComponent<MenuOpenButtonProps> = ({
   open,
   onClick,
   onKeyDown,
   openMenuLabel,
   closeMenuLabel,
   ...menuBtnProps
-}: MenuOpenButtonProps) => {
+}) => {
   return (
     <div
       role="button"

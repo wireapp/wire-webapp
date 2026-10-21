@@ -17,7 +17,7 @@
  *
  */
 
-import {useMemo} from 'react';
+import {useMemo, type FunctionComponent} from 'react';
 
 import {CSSObject} from '@emotion/react';
 import {DateValue} from '@internationalized/date';
@@ -93,7 +93,7 @@ export interface DatePickerFieldProps {
   wrapperCSS?: CSSObject;
 }
 
-export const DatePickerField = ({
+export const DatePickerField: FunctionComponent<DatePickerFieldProps> = ({
   value,
   onChange,
   dataUieName,
@@ -109,7 +109,7 @@ export const DatePickerField = ({
   minValue,
   maxValue,
   wrapperCSS = {},
-}: DatePickerFieldProps) => {
+}) => {
   const labelId = isNonEmptyString(id) ? `${id}-label` : undefined;
   const portalContainer = popoverPortalContainer ?? getOverlayPortalContainer();
   const getDateGroupStyles = useMemo(() => {

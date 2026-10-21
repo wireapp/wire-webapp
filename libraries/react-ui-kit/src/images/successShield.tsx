@@ -17,7 +17,9 @@
  *
  */
 
-export const SuccessShield = () => {
+import type {FunctionComponent} from 'react';
+
+export const SuccessShield: FunctionComponent = () => {
   return (
     <svg
       width="240"

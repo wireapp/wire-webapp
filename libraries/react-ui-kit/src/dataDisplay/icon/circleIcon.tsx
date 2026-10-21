@@ -17,9 +17,11 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
-export const CircleIcon = (props: SVGIconProps) => {
+export const CircleIcon: FunctionComponent<SVGIconProps> = props => {
   return (
     <SVGIcon realWidth={16} realHeight={16} {...props}>
       <circle cx="8" cy="8" r="7.2" stroke="currentColor" strokeWidth="1.6" fill="none" />

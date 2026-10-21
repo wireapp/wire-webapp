@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {fireEvent, render} from '@testing-library/react';
 
 import {DropFileInput, DropFileInputProps} from './dropFileInput';
@@ -32,7 +34,7 @@ interface GetDefaultPropsType {
   multiple?: boolean;
 }
 
-const getDefaultProps = ({accept, multiple}: GetDefaultPropsType) => {
+const getDefaultProps = ({accept, multiple}: GetDefaultPropsType): DropFileInputProps => {
   return {
     accept,
     multiple,
@@ -44,7 +46,7 @@ const getDefaultProps = ({accept, multiple}: GetDefaultPropsType) => {
   };
 };
 
-const ThemedDropFileInput = (props: DropFileInputProps) => {
+const ThemedDropFileInput: FunctionComponent<DropFileInputProps> = props => {
   return (
     <StyledApp themeId={THEME_ID.LIGHT}>
       <DropFileInput {...props} />

@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {CSSObject} from '@emotion/react';
 
 import {Theme} from '../../identity/theme';
@@ -27,7 +29,7 @@ export interface HeadingProps<T = HTMLHeadingElement> extends TextProps<T> {
   level?: string;
 }
 
-export const Heading = ({level, ...props}: HeadingProps) => {
+export const Heading: FunctionComponent<HeadingProps> = ({level, ...props}) => {
   switch (level) {
     case '2':
       return <H2 {...props} />;
@@ -66,7 +68,7 @@ export const h1Style: <T>(theme: Theme, props: HeadingProps<T>) => CSSObject = (
   };
 };
 
-export const H1 = ({children, ...props}: HeadingProps) => {
+export const H1: FunctionComponent<HeadingProps> = ({children, ...props}) => {
   return (
     <h1
       css={(theme: Theme) => {
@@ -99,7 +101,7 @@ export const h2Style: <T>(theme: Theme, props: HeadingProps<T>) => CSSObject = (
   };
 };
 
-export const H2 = ({children, ...props}: HeadingProps) => {
+export const H2: FunctionComponent<HeadingProps> = ({children, ...props}) => {
   return (
     <h2
       css={(theme: Theme) => {
@@ -124,7 +126,7 @@ export const h3Style: <T>(theme: Theme, props: HeadingProps<T>) => CSSObject = (
   };
 };
 
-export const H3 = ({children, ...props}: HeadingProps) => {
+export const H3: FunctionComponent<HeadingProps> = ({children, ...props}) => {
   return (
     <h3
       css={(theme: Theme) => {
@@ -150,7 +152,7 @@ export const h4Style: <T>(theme: Theme, props: HeadingProps<T>) => CSSObject = (
   };
 };
 
-export const H4 = ({children, ...props}: HeadingProps) => {
+export const H4: FunctionComponent<HeadingProps> = ({children, ...props}) => {
   return (
     <h3
       css={(theme: Theme) => {

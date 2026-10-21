@@ -31,7 +31,7 @@ type ClientVersionCheckRouteDependencies = {
   readonly isClientVersionEnforcementEnabled: boolean;
 };
 
-export function createClientVersionCheckRoute(dependencies: ClientVersionCheckRouteDependencies) {
+export function createClientVersionCheckRoute(dependencies: ClientVersionCheckRouteDependencies): Router {
   const {router, deployedAssetVersion, isClientVersionEnforcementEnabled} = dependencies;
 
   return router.get('/client-version-check', (request, response) => {

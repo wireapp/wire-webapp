@@ -18,6 +18,7 @@
  */
 
 import * as React from 'react';
+import {type FunctionComponent} from 'react';
 
 import {CSSObject} from '@emotion/react';
 
@@ -37,11 +38,11 @@ const tabBarStyle: <T>(props: TabBarProps<T>) => CSSObject = ({}) => {
   };
 };
 
-const filteredTabBarProps = (props: TabBarProps) => {
+const filteredTabBarProps = (props: TabBarProps): Object => {
   return filterProps(props, []);
 };
 
-export const TabBar = ({children = null, ...props}: TabBarProps) => {
+export const TabBar: FunctionComponent<TabBarProps> = ({children = null, ...props}) => {
   return (
     <div css={tabBarStyle(props)} {...filteredTabBarProps(props)}>
       {children}
@@ -78,7 +79,7 @@ const tabBarItemStyle: <T>(theme: Theme, props: TabBarItemProps<T>) => CSSObject
   };
 };
 
-export const TabBarItem = ({children = null, ...props}: TabBarItemProps) => {
+export const TabBarItem: FunctionComponent<TabBarItemProps> = ({children = null, ...props}) => {
   return (
     <span
       css={(theme: Theme) => {

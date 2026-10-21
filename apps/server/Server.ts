@@ -45,6 +45,11 @@ import {RedirectRoutes} from './routes/redirectRoutes';
 import {Root} from './routes/root';
 import {replaceHostnameInObject} from './util/hostnameReplacer';
 
+type SitemapPage = {
+  changeFreq: string;
+  url: string;
+};
+
 class Server {
   private readonly app: express.Express;
   private readonly staticAssetsApp: express.Express;
@@ -247,7 +252,7 @@ class Server {
 
   private initSiteMap(application: express.Express, config: ServerConfig): void {
     if (Boolean(config.APP_BASE)) {
-      const pages = () => {
+      const pages = (): SitemapPage[] => {
         return [
           {
             changeFreq: 'weekly',

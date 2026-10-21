@@ -539,6 +539,22 @@ const productionConfigs = [
     },
   },
   {
+    files: [
+      'tools/buildArtifact/**/*.ts',
+      'tools/development/**/*.ts',
+      'tools/productionDistribution/**/*.ts',
+      'tools/releaseSummary/**/*.ts',
+      'tools/runtimeVerification/**/*.ts',
+      'tools/testReporting/**/*.ts',
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: './tsconfig.tools.json',
+        projectService: false,
+      },
+    },
+  },
+  {
     files: ['tools/releaseGithub/**/*.ts'],
     languageOptions: {
       parserOptions: {
@@ -851,19 +867,9 @@ const testLinterOptions = {
 };
 
 const explicitFunctionReturnTypeFilePatterns = [
-  'libraries/api-client/**/*.{ts,tsx,mts,cts}',
-  'libraries/bazinga64/**/*.{ts,tsx,mts,cts}',
-  'libraries/certificate-check/**/*.{ts,tsx,mts,cts}',
-  'libraries/commons/**/*.{ts,tsx,mts,cts}',
-  'libraries/config/**/*.{ts,tsx,mts,cts}',
-  'libraries/copy-config/**/*.{ts,tsx,mts,cts}',
-  'libraries/core/**/*.{ts,tsx,mts,cts}',
-  'libraries/priority-queue/**/*.{ts,tsx,mts,cts}',
-  'libraries/store-engine/**/*.{ts,tsx,mts,cts}',
-  'libraries/store-engine-dexie/**/*.{ts,tsx,mts,cts}',
-  'libraries/store-engine-fs/**/*.{ts,tsx,mts,cts}',
-  'libraries/telemetry/**/*.{ts,tsx,mts,cts}',
-  'libraries/webapp-events/**/*.{ts,tsx,mts,cts}',
+  'libraries/**/*.{ts,tsx,mts,cts}',
+  'apps/server/**/*.{ts,tsx,mts,cts}',
+  'tools/**/*.{ts,tsx,mts,cts}',
 ];
 
 const config = [

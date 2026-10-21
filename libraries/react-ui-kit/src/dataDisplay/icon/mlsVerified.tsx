@@ -17,11 +17,13 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
 import {Theme} from '../../identity';
 
-export const MLSVerified = (props: SVGIconProps) => {
+export const MLSVerified: FunctionComponent<SVGIconProps> = props => {
   return (
     <SVGIcon realWidth={16} realHeight={16} {...props}>
       <path

@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {CSSObject} from '@emotion/react';
 
 import {Loading} from '../../dataDisplay';
@@ -34,7 +36,7 @@ export const buttonLinkStyle: (theme: Theme, props: ButtonProps<HTMLAnchorElemen
   };
 };
 
-const filterButtonLinkProps = (props: ButtonProps<HTMLAnchorElement>) => {
+const filterButtonLinkProps = (props: ButtonProps<HTMLAnchorElement>): Object => {
   return filterProps(filterTextProps(props) as ButtonProps<HTMLAnchorElement>, [
     'backgroundColor',
     'disabled',
@@ -42,12 +44,12 @@ const filterButtonLinkProps = (props: ButtonProps<HTMLAnchorElement>) => {
   ]);
 };
 
-export const ButtonLink = ({
+export const ButtonLink: FunctionComponent<ButtonProps<HTMLAnchorElement>> = ({
   children,
   showLoading,
   loadingColor = COLOR.WHITE,
   ...props
-}: ButtonProps<HTMLAnchorElement>) => {
+}) => {
   return (
     <a
       css={(theme: Theme) => {

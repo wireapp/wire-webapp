@@ -198,7 +198,7 @@ export class LicenseCollector {
           packageJson.devDependencies !== undefined ? packageJson.devDependencies : {},
         ).filter(Boolean);
 
-        const plural = (length: number) => {
+        const plural = (length: number): 'y' | 'ies' => {
           return length === 1 ? 'y' : 'ies';
         };
         const packageFileName = packageFile.replace(new RegExp(cloneDir, 'gm'), '');

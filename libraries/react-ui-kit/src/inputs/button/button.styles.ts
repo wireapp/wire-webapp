@@ -33,7 +33,7 @@ const getButtonTheme = (theme: Theme): NonNullable<Theme['Button']> => {
   return theme.Button;
 };
 
-const buttonPrimaryStyles = <T>(theme: Theme, {backgroundColor, disabled, isActive}: ButtonProps<T>) => {
+const buttonPrimaryStyles = <T>(theme: Theme, {backgroundColor, disabled, isActive}: ButtonProps<T>): CSSObject => {
   const button = getButtonTheme(theme);
   const activeStyles = {
     backgroundColor: button.primaryActiveBg,
@@ -64,7 +64,7 @@ const buttonPrimaryStyles = <T>(theme: Theme, {backgroundColor, disabled, isActi
   };
 };
 
-const buttonSecondaryStyles = <T>(theme: Theme, {backgroundColor, disabled, isActive}: ButtonProps<T>) => {
+const buttonSecondaryStyles = <T>(theme: Theme, {backgroundColor, disabled, isActive}: ButtonProps<T>): CSSObject => {
   const button = getButtonTheme(theme);
   const activeStyles = {
     backgroundColor: button.secondaryActiveBg,
@@ -99,7 +99,7 @@ const buttonSecondaryStyles = <T>(theme: Theme, {backgroundColor, disabled, isAc
   };
 };
 
-const buttonTertiaryStyles = <T>(theme: Theme, {backgroundColor, disabled, isActive}: ButtonProps<T>) => {
+const buttonTertiaryStyles = <T>(theme: Theme, {backgroundColor, disabled, isActive}: ButtonProps<T>): CSSObject => {
   const button = getButtonTheme(theme);
   const activeStyles = {
     backgroundColor: button.tertiaryActiveBg,
@@ -143,7 +143,7 @@ const buttonTertiaryStyles = <T>(theme: Theme, {backgroundColor, disabled, isAct
   };
 };
 
-const buttonQuaternaryStyles = <T>({backgroundColor, disabled, isActive}: ButtonProps<T>) => {
+const buttonQuaternaryStyles = <T>({backgroundColor, disabled, isActive}: ButtonProps<T>): CSSObject => {
   const activeStyles = {
     backgroundColor: COLOR_V2.GREEN_LIGHT_700,
   };
@@ -172,7 +172,7 @@ const buttonQuaternaryStyles = <T>({backgroundColor, disabled, isActive}: Button
   };
 };
 
-const buttonCancelStyles = <T>({backgroundColor, disabled, isActive}: ButtonProps<T>) => {
+const buttonCancelStyles = <T>({backgroundColor, disabled, isActive}: ButtonProps<T>): CSSObject => {
   const activeStyles = {
     backgroundColor: COLOR_V2.RED_LIGHT_700,
   };
@@ -201,7 +201,7 @@ const buttonCancelStyles = <T>({backgroundColor, disabled, isActive}: ButtonProp
   };
 };
 
-const buttonSendStyles = <T>({backgroundColor, disabled, isActive}: ButtonProps<T>) => {
+const buttonSendStyles = <T>({backgroundColor, disabled, isActive}: ButtonProps<T>): CSSObject => {
   const activeStyles = {
     backgroundColor: COLOR_V2.BLUE_LIGHT_700,
   };

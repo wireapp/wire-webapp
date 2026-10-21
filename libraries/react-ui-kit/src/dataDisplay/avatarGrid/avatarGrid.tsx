@@ -18,6 +18,7 @@
  */
 
 import * as React from 'react';
+import {type FunctionComponent} from 'react';
 
 import {CSSObject} from '@emotion/react';
 import {isNullOrUndefined} from '@sindresorhus/is';
@@ -62,13 +63,19 @@ const avatarGridStyle: <T>(props: Props<T>) => CSSObject = ({
   };
 };
 
-const filteredAvatarGridProps = (props: Props) => {
+const filteredAvatarGridProps = (props: Props): Object => {
   return filterProps(props, ['backgroundColor', 'borderColor', 'items', 'size', 'borderWidth']);
 };
 
 type AvatarGridItem = Props['items'][number] | null;
 
-export const AvatarGrid = ({borderWidth = 1, size = DEFAULT_AVATAR_SIZE, items, fetchImages, ...props}: Props) => {
+export const AvatarGrid: FunctionComponent<Props> = ({
+  borderWidth = 1,
+  size = DEFAULT_AVATAR_SIZE,
+  items,
+  fetchImages,
+  ...props
+}) => {
   const allProps = {borderWidth, items, size, ...props};
   const slicedItems: AvatarGridItem[] = items.slice(0, maximumAvatarGridItems);
   const missing = maximumAvatarGridItems - slicedItems.length;

@@ -17,7 +17,7 @@
  *
  */
 
-import {useId} from 'react';
+import {useId, type FunctionComponent} from 'react';
 import * as React from 'react';
 
 import {Theme} from '../../identity/theme';
@@ -33,14 +33,14 @@ export interface StyledLabelProps<T = HTMLLabelElement> extends React.HTMLProps<
   labelBeforeCheckbox?: boolean;
 }
 
-const StyledLabel = ({
+const StyledLabel: FunctionComponent<StyledLabelProps> = ({
   disabled,
   markInvalid,
   aligncenter = false,
   labelBeforeCheckbox = false,
   children,
   ...props
-}: StyledLabelProps) => {
+}) => {
   return (
     <label
       css={(theme: Theme) => {
@@ -193,7 +193,7 @@ Checkbox.displayName = 'Checkbox';
 
 export type CheckboxLabelProps<T = HTMLSpanElement> = TextProps<T>;
 
-export const CheckboxLabel = ({...props}: CheckboxLabelProps) => {
+export const CheckboxLabel: FunctionComponent<CheckboxLabelProps> = ({...props}) => {
   return (
     <Text
       css={(theme: Theme) => {

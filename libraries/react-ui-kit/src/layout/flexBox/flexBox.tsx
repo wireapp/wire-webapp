@@ -46,7 +46,7 @@ export const flexBoxStyle: <T>(props: FlexBoxProps<T>) => CSSObject = ({
   };
 };
 
-export const filterFlexBoxProps = (props: FlexBoxProps) => {
+export const filterFlexBoxProps = (props: FlexBoxProps): Object => {
   return filterProps(props, ['align', 'column', 'justify', 'flexWrap']);
 };
 
