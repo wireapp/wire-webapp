@@ -101,6 +101,7 @@ export const CellsBulkMovePreviewModal: FunctionComponent<CellsBulkMovePreviewMo
       isMoveRequestError={isMoveRequestError}
       isMoveDisabled={
         !move.isValid ||
+        destination.disabledDestinationPaths.includes(destination.selectedDestinationPath) ||
         move.isSubmitting ||
         isMoveOutcomeUnresolved ||
         isBackgroundMovePending ||

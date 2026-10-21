@@ -68,7 +68,7 @@ export const useBulkMoveDestinationSelection = ({
     [id, domain],
   );
   const [currentPath, setCurrentPath] = useState(getCellsFilesPath());
-  const [selectedDestinationPath, setSelectedDestinationPath] = useState('');
+  const [selectedDestinationPath, setSelectedDestinationPath] = useState(currentPath);
   const {folders, status, shouldShowLoadingSpinner} = useGetCellsFolders({
     cellsRepository,
     conversationQualifiedId,

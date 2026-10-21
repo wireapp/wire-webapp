@@ -394,6 +394,7 @@ describe('CellsTable selection', () => {
     await user.click(screen.getByRole('button', {name: 'Move'}));
 
     const dialog = await screen.findByRole('dialog');
+    await user.click(within(dialog).getByRole('button', {name: 'cells.breadcrumb.files'}));
     const submitButton = within(dialog).getByRole('button', {name: 'Move'});
     await waitFor(() => {
       expect(submitButton).toBeEnabled();
@@ -434,6 +435,7 @@ describe('CellsTable selection', () => {
     await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
     await user.click(screen.getByRole('button', {name: 'Move'}));
     const dialog = await screen.findByRole('dialog');
+    await user.click(within(dialog).getByRole('button', {name: 'cells.breadcrumb.files'}));
     await user.click(within(dialog).getByRole('button', {name: 'Move'}));
 
     await waitFor(() => {
@@ -464,7 +466,7 @@ describe('CellsTable selection', () => {
     window.location.hash = originalHash;
   });
 
-  it('moves a nested file to the Drive root selected from the breadcrumb', async () => {
+  it('moves a selected file to the folder shown by the active breadcrumb', async () => {
     const originalHash = window.location.hash;
     window.location.hash = '#/conversation/conversation-id@example.com/files/wire-cells-web/folder';
     const user = userEvent.setup();
@@ -479,7 +481,7 @@ describe('CellsTable selection', () => {
         createNode({
           id: 'nested-file',
           name: 'aaaa-1.docx',
-          path: 'wire-cells-web/folder/aaaa-1.docx',
+          path: 'wire-cells-web/other-folder/aaaa-1.docx',
           type: CellNodeType.FILE,
           extension: 'docx',
         }),
@@ -490,15 +492,15 @@ describe('CellsTable selection', () => {
     await user.click(screen.getByRole('checkbox', {name: 'Select aaaa-1.docx'}));
     await user.click(screen.getByRole('button', {name: 'Move'}));
     const preview = await screen.findByRole('dialog');
-    await user.click(within(preview).getByRole('button', {name: 'cells.breadcrumb.files'}));
     const breadcrumbs = within(preview).getAllByRole('list')[0];
-    expect(within(breadcrumbs).getByText('cells.breadcrumb.files')).toBeInTheDocument();
+    expect(within(breadcrumbs).getByText('folder')).toBeInTheDocument();
+    expect(within(preview).getByRole('button', {name: 'Move'})).toBeEnabled();
     await user.click(within(preview).getByRole('button', {name: 'Move'}));
 
     await waitFor(() => {
       expect(repository.moveNodes).toHaveBeenCalledWith({
-        currentPaths: ['wire-cells-web/folder/aaaa-1.docx'],
-        targetPath: 'conversation-id@example.com',
+        currentPaths: ['wire-cells-web/other-folder/aaaa-1.docx'],
+        targetPath: 'conversation-id@example.com/wire-cells-web/folder',
       });
     });
     expect(onRefresh).toHaveBeenCalledTimes(1);
@@ -536,6 +538,7 @@ describe('CellsTable selection', () => {
     await user.click(screen.getByRole('checkbox', {name: 'Select Report.pdf'}));
     await user.click(screen.getByRole('button', {name: 'Move'}));
     const preview = await screen.findByRole('dialog');
+    expect(within(preview).getByRole('button', {name: 'Move'})).toBeDisabled();
     await user.click(within(preview).getByRole('button', {name: 'A'}));
 
     const breadcrumbs = within(preview).getAllByRole('list')[0];
@@ -592,6 +595,7 @@ describe('CellsTable selection', () => {
     await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
     await user.click(screen.getByRole('button', {name: 'Move'}));
     const dialog = await screen.findByRole('dialog');
+    await user.click(within(dialog).getByRole('button', {name: 'cells.breadcrumb.files'}));
     await user.click(within(dialog).getByRole('button', {name: 'Move'}));
 
     await waitFor(() => {
@@ -824,6 +828,7 @@ describe('CellsTable selection', () => {
     await user.click(screen.getByRole('checkbox', {name: 'Select Failed.pdf'}));
     await user.click(screen.getByRole('button', {name: 'Move'}));
     const dialog = await screen.findByRole('dialog');
+    await user.click(within(dialog).getByRole('button', {name: 'cells.breadcrumb.files'}));
     await user.click(within(dialog).getByRole('button', {name: 'Move'}));
 
     await waitFor(() => {
