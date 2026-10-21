@@ -1558,7 +1558,7 @@ yarn dev
 This runs `nx serve server`, which:
 
 1. Builds each upstream library once before its watcher starts (`watch` → `dependsOn: ["build"]` in `nx.json`)
-2. Starts `watch` on every upstream library in the webapp dependency graph (`webapp:watch-deps` → `^watch` — `tsc --watch` or `vite build --watch`)
+2. Starts TypeScript watch compilation on every upstream library in the webapp dependency graph (`webapp:watch-deps` → `^watch`)
 3. Starts the Express server with the Rspack development server in watch mode (`server:build-dev` — server only, no `^build` or `webapp:build`)
 
 Library changes flow: `libraries/*/src` → `watch` recompiles `lib/` → Rspack detects `@wireapp/*` changes → HMR updates the browser, with a full reload when an update cannot be applied.
