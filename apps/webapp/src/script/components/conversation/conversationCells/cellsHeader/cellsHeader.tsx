@@ -21,7 +21,6 @@ import type {FunctionComponent} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {selectionBarBreadcrumbAnchorStyles} from 'Components/cells/common/cellsSelectionBar/cellsSelectionBar.styles';
 import {CellsSearchInput} from 'Components/cellsSearchInput/cellsSearchInput';
 import {
   CELLS_ACTION,
@@ -37,6 +36,7 @@ import {
   breadcrumbsRowStyles,
   contentStyles,
   searchWrapperStyles,
+  selectionBarBreadcrumbAnchorStyles,
   wrapperStyles,
 } from './cellsHeader.styles';
 import {CellsMoreMenu} from './cellsMoreMenu/cellsMoreMenu';

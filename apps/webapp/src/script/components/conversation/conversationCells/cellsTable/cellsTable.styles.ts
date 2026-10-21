@@ -36,9 +36,11 @@ export const selectionBarContainerStyles: CSSObject = {
   position: 'relative',
   width: '100%',
   height: '32px',
+  pointerEvents: 'none',
 
   '& > div': {
     paddingRight: '88px',
+    pointerEvents: 'auto',
   },
 };
 
@@ -54,6 +56,7 @@ export const bulkMoveButtonStyles: CSSObject = {
   background: 'var(--modal-bg)',
   color: 'var(--main-color)',
   cursor: 'pointer',
+  pointerEvents: 'auto',
 
   '&:hover, &:focus-visible': {
     backgroundColor: 'var(--foreground-fade-8)',

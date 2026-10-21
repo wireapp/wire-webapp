@@ -240,6 +240,7 @@ describe('CellsTable selection', () => {
 
     fireEvent.click(checkboxes[0]);
     expect(screen.getByRole('button', {name: 'Move'})).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Move'})).toHaveStyle({pointerEvents: 'auto'});
     expect(screen.getByText('1 selected')).toBeInTheDocument();
     expect(screen.getByRole('row', {name: /Marketing images/})).toHaveAttribute('aria-selected', 'true');
     expect(screen.getByRole('button', {name: 'Clear selection'})).toBeInTheDocument();
