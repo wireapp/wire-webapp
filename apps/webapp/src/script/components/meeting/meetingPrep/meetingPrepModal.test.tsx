@@ -21,6 +21,7 @@ import {act, fireEvent, render, screen, waitFor} from '@testing-library/react';
 import {ThemeProvider} from '@wireapp/react-ui-kit';
 import {task} from 'true-myth';
 
+import {User} from 'Repositories/entity/User';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
@@ -38,6 +39,8 @@ const session: MeetingPrepSession = {
   qualifiedMeetingId: {id: 'meeting-id', domain: 'example.com'},
   qualifiedConversationId: {id: 'conversation-id', domain: 'example.com'},
 };
+const participant = new User('self-id', 'example.com', translateForTest);
+participant.name('Ada');
 
 const pendingPreview: RequestMeetingPrepPreview = () => {
   return task.tryOrElse(
@@ -67,7 +70,7 @@ const renderModal = (joinMeeting: jest.Mock = jest.fn().mockResolvedValue(true))
   render(
     <ThemeProvider>
       <MeetingPrepModal
-        participantName="Ada"
+        participant={participant}
         requestPreviewStream={pendingPreview}
         releasePreviewStream={jest.fn()}
         joinMeeting={joinMeeting}
@@ -139,8 +142,8 @@ describe('MeetingPrepModal', () => {
 
     await waitFor(() => {
       expect(joinMeeting).toHaveBeenCalledWith(session.qualifiedConversationId, {
-        cameraEnabled: false,
-        microphoneEnabled: true,
+        cameraEnabled: true,
+        microphoneEnabled: false,
       });
     });
     await expectClosed();

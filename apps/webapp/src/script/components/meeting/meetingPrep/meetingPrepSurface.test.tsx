@@ -17,11 +17,12 @@
  *
  */
 
-import {act, fireEvent, render, screen} from '@testing-library/react';
+import {act, fireEvent, render, screen, waitFor} from '@testing-library/react';
 import {ThemeProvider} from '@wireapp/react-ui-kit';
 import {task} from 'true-myth';
 
 import {mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
+import {User} from 'Repositories/entity/User';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
@@ -29,13 +30,21 @@ import {
 import type {Translate} from 'Util/localizerUtil';
 
 import {MeetingPrepSurface} from './meetingPrepSurface';
-import {meetingPrepPreviewErrors, type RequestMeetingPrepPreview} from './meetingPrepTypes';
+import {
+  meetingPrepPreviewErrors,
+  meetingPrepDeviceKinds,
+  meetingPrepMediaKinds,
+  type MeetingPrepDeviceKind,
+  type RequestMeetingPrepPreview,
+} from './meetingPrepTypes';
 
 const meetingStartTime = '2026-06-01T09:00:00.000Z';
 
 const translateForPrepTest: Translate = (key, substitutions) => {
   return key === 'meetings.notifications.startsAt' ? `Starts at ${String(substitutions?.time)}` : key;
 };
+const participant = new User('self-id', 'example.com', translateForPrepTest);
+participant.name('Ada');
 
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForPrepTest}),
@@ -66,10 +75,13 @@ type RenderSurfaceResult = {
 const renderSurface = (
   overrides: Partial<{
     onCancel: () => void;
+    onPermissionDenied: (kind: MeetingPrepDeviceKind) => void;
     onJoin: (choice: {cameraEnabled: boolean; microphoneEnabled: boolean}) => void | Promise<void>;
+    requestPreviewStream: RequestMeetingPrepPreview;
   }> = {},
 ): RenderSurfaceResult => {
   const onCancel = overrides.onCancel ?? jest.fn();
+  const onPermissionDenied = overrides.onPermissionDenied ?? jest.fn();
   const onJoin = overrides.onJoin ?? jest.fn();
 
   render(
@@ -77,17 +89,18 @@ const renderSurface = (
       <MeetingPrepSurface
         meetingTitle="Design review"
         meetingStartTime={meetingStartTime}
-        participantName="Ada"
+        participant={participant}
         onCancel={onCancel}
+        onPermissionDenied={onPermissionDenied}
         onJoin={onJoin}
-        requestPreviewStream={pendingPreview}
+        requestPreviewStream={overrides.requestPreviewStream ?? pendingPreview}
         releasePreviewStream={jest.fn()}
       />
     </ThemeProvider>,
     {wrapper: rootProviderWrapper},
   );
 
-  return {onCancel, onJoin};
+  return {onCancel, onJoin, onPermissionDenied};
 };
 
 describe('MeetingPrepSurface', () => {
@@ -125,7 +138,7 @@ describe('MeetingPrepSurface', () => {
     const {onJoin} = renderSurface();
 
     fireEvent.click(screen.getByRole('button', {name: 'callJoin'}));
-    expect(onJoin).toHaveBeenCalledWith({cameraEnabled: true, microphoneEnabled: true});
+    expect(onJoin).toHaveBeenCalledWith({cameraEnabled: false, microphoneEnabled: false});
     await act(async () => {
       await Promise.resolve();
     });
@@ -134,10 +147,35 @@ describe('MeetingPrepSurface', () => {
     fireEvent.click(screen.getByRole('button', {name: 'preferencesAVMicrophone'}));
     fireEvent.click(screen.getByRole('button', {name: 'callJoin'}));
 
-    expect(onJoin).toHaveBeenLastCalledWith({cameraEnabled: false, microphoneEnabled: false});
+    expect(onJoin).toHaveBeenLastCalledWith({cameraEnabled: true, microphoneEnabled: true});
     await act(async () => {
       await Promise.resolve();
     });
+  });
+
+  it('reports a microphone permission failure after enabling the microphone', async () => {
+    const onPermissionDenied = jest.fn();
+    const requestPreviewStream: RequestMeetingPrepPreview = request => {
+      return request.mediaKind === meetingPrepMediaKinds.audio
+        ? task.tryOrElse(
+            () => {
+              return meetingPrepPreviewErrors.microphonePermissionDenied;
+            },
+            () => {
+              return Promise.reject(new Error('microphone permission denied'));
+            },
+          )
+        : pendingPreview(request);
+    };
+
+    renderSurface({onPermissionDenied, requestPreviewStream});
+    fireEvent.click(screen.getByRole('button', {name: 'preferencesAVMicrophone'}));
+
+    await waitFor(() => {
+      expect(onPermissionDenied).toHaveBeenCalledWith(meetingPrepDeviceKinds.microphone);
+    });
+    expect(screen.getByRole('button', {name: 'preferencesAVMicrophone'})).toHaveAttribute('aria-pressed', 'false');
+    expect(document.querySelector('.input-level')).not.toBeInTheDocument();
   });
 
   it('ignores another Join click while the first request is still running', async () => {
@@ -172,7 +210,7 @@ describe('MeetingPrepSurface', () => {
     renderSurface();
 
     fireEvent.click(screen.getByRole('button', {name: 'videoCallOverlayOpenMicrophoneAndSpeakerOptions'}));
-    fireEvent.click(screen.getByRole('button', {name: 'Mic 2'}));
+    fireEvent.click(screen.getByRole('option', {name: 'Mic 2'}));
 
     expect(mediaDevicesStore.getState().audio.input.activeId).toBe('mic-2');
   });
@@ -181,11 +219,11 @@ describe('MeetingPrepSurface', () => {
     renderSurface();
 
     fireEvent.click(screen.getByRole('button', {name: 'videoCallOverlayOpenMicrophoneAndSpeakerOptions'}));
-    expect(screen.getByRole('button', {name: 'Mic 2'})).toBeInTheDocument();
+    expect(screen.getByRole('option', {name: 'Mic 2'})).toBeInTheDocument();
 
     fireEvent.pointerDown(screen.getByRole('heading', {name: 'Design review'}));
 
-    expect(screen.queryByRole('button', {name: 'Mic 2'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('option', {name: 'Mic 2'})).not.toBeInTheDocument();
   });
 
   it('keeps only one device list open and removes the preview when the camera is off', () => {
@@ -194,11 +232,12 @@ describe('MeetingPrepSurface', () => {
     fireEvent.click(screen.getByRole('button', {name: 'videoCallOverlayOpenMicrophoneAndSpeakerOptions'}));
     fireEvent.click(screen.getByRole('button', {name: 'videoCallMenuMoreCameraSettings'}));
 
-    expect(screen.queryByRole('button', {name: 'Mic 2'})).not.toBeInTheDocument();
-    expect(screen.getByRole('button', {name: 'Camera 1'})).toBeInTheDocument();
+    expect(screen.queryByRole('option', {name: 'Mic 2'})).not.toBeInTheDocument();
+    expect(screen.getByRole('option', {name: 'Camera 1'})).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', {name: 'preferencesAVCamera'}));
+    fireEvent.click(screen.getByRole('button', {name: 'preferencesAVCamera'}));
 
-    expect(screen.queryByText('Ada')).not.toBeInTheDocument();
+    expect(screen.getByText('Ada')).toBeInTheDocument();
   });
 });

@@ -54,7 +54,7 @@ type RenderNoCameraMessageOptions = {
   readonly translate: Translate;
 };
 
-function renderNoCameraMessage(options: RenderNoCameraMessageOptions): ReactNode {
+export function renderNoCameraMessage(options: RenderNoCameraMessageOptions): ReactNode {
   const {brandName, translate} = options;
   const translatedText = translate(
     'preferencesAVNoCamera',

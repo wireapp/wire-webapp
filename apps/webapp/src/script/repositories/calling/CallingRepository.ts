@@ -62,9 +62,9 @@ import {AvsDebugger} from '@wireapp/avs-debugger';
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {showNoAudioInputModal, showNoCameraModal} from 'Components/calling/devicePermissionModals';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import type {PrimaryModalTranslatedMessage} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 import {CALL_QUALITY_FEEDBACK_KEY} from 'Components/Modals/QualityFeedbackModal/constants';
 import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
 import {useActiveWindowState} from 'Hooks/useActiveWindow';
@@ -3342,69 +3342,14 @@ export class CallingRepository {
     return this.apiClient.api.account.getCallConfig(limit);
   }
 
-  private showNoAudioInputModal(): void {
+  public showNoAudioInputModal(): void {
     const {container, restoreFocusCallback} = this.getModalContainerAndRestoreFocusCallback();
-
-    const modalOptions = {
-      primaryAction: {
-        text: this.translate('modalAcknowledgeAction'),
-      },
-      secondaryAction: {
-        action: () => {
-          return amplify.publish(WebAppEvents.PREFERENCES.SHOW_AV);
-        },
-        text: this.translate('modalNoAudioInputAction'),
-      },
-      text: {
-        closeBtnLabel: this.translate('modalNoAudioCloseBtn'),
-        message: this.translate('modalNoAudioInputMessage'),
-        title: this.translate('modalNoAudioInputTitle'),
-      },
-      close: restoreFocusCallback(),
-      container,
-    };
-    PrimaryModal.show(PrimaryModal.type.CONFIRM, modalOptions, undefined, this.translate);
+    showNoAudioInputModal(this.translate, {container, close: restoreFocusCallback()});
   }
 
-  private showNoCameraModal(): void {
+  public showNoCameraModal(): void {
     const {container, restoreFocusCallback} = this.getModalContainerAndRestoreFocusCallback();
-
-    const modalOptions = {
-      text: {
-        closeBtnLabel: this.translate('modalNoCameraCloseBtn'),
-        translatedMessage: {
-          compatibilityReplacements: [],
-          components: [
-            {kind: 'line-break', legacyTokens: [], markerName: 'br'},
-            {
-              className: '',
-              dataUieName: 'go-no-camera-faq',
-              href: Config.getConfig().URL.SUPPORT.CAMERA_ACCESS_DENIED,
-              kind: 'link',
-              legacyClosingTokens: [],
-              legacyOpeningTokens: [],
-              markerName: 'faqLink',
-              rel: 'noopener noreferrer',
-              target: '_blank',
-            },
-          ],
-          kind: 'translation',
-          layout: 'default',
-          translationKey: 'modalNoCameraMessage',
-          values: [
-            {
-              alternatePlaceholders: [],
-              placeholder: 'brandName',
-              runtimeText: Config.getConfig().BRAND_NAME,
-            },
-          ],
-        } satisfies PrimaryModalTranslatedMessage,
-        title: this.translate('modalNoCameraTitle'),
-      },
-      close: restoreFocusCallback(),
-      container,
-    };
-    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, modalOptions, undefined, this.translate);
+    showNoCameraModal(this.translate, {container, close: restoreFocusCallback()});
   }
 
   /**

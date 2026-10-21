@@ -19,6 +19,8 @@
 
 import {CSSObject} from '@emotion/react';
 
+import {videoOptionsMenuStyles} from 'Components/calling/VideoControls/VideoControls.styles';
+
 export const meetingPrepSurfaceStyles: CSSObject = {
   display: 'flex',
   flexDirection: 'column',
@@ -90,6 +92,34 @@ export const meetingPrepVideoStyles: CSSObject = {
   height: '100%',
   objectFit: 'cover',
   transform: 'scaleX(-1)',
+};
+
+/** The call menu is reused here, with right-edge anchoring for the narrower prep card. */
+export const meetingPrepDeviceMenuStyles: CSSObject = {
+  ...videoOptionsMenuStyles,
+  right: 0,
+  left: 'auto',
+  transform: 'none',
+  width: 'min(320px, calc(100vw - 32px))',
+  maxWidth: 'calc(100vw - 32px)',
+};
+
+export const meetingPrepAvatarStyles: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: '100%',
+  height: '100%',
+};
+
+export const meetingPrepNoCameraStyles: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: '100%',
+  height: '100%',
+  color: 'var(--white)',
+  backgroundColor: 'var(--black)',
 };
 
 export const meetingPrepNameStyles: CSSObject = {
@@ -189,42 +219,6 @@ export const meetingPrepMenuButtonStyles: CSSObject = {
   'svg, svg > path, svg > g > path': {
     fill: 'var(--white)',
   },
-};
-
-export const meetingPrepMenuStyles: CSSObject = {
-  position: 'absolute',
-  bottom: '40px',
-  right: 0,
-  left: 'auto',
-  zIndex: 1,
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '8px',
-  minWidth: '220px',
-  padding: '8px',
-  borderRadius: '8px',
-  backgroundColor: 'var(--modal-bg)',
-  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.16)',
-};
-
-export const meetingPrepMenuLabelStyles: CSSObject = {
-  margin: 0,
-  fontSize: 'var(--font-size-xsmall, 12px)',
-  fontWeight: 'var(--font-weight-semibold)',
-};
-
-export const meetingPrepDeviceButtonStyles = (selected: boolean): CSSObject => {
-  return {
-    display: 'block',
-    width: '100%',
-    padding: '8px',
-    border: 'none',
-    borderRadius: '6px',
-    textAlign: 'left',
-    cursor: 'pointer',
-    color: 'var(--text-color)',
-    backgroundColor: selected ? 'var(--app-bg-secondary)' : 'transparent',
-  };
 };
 
 export const meetingPrepFooterStyles: CSSObject = {
