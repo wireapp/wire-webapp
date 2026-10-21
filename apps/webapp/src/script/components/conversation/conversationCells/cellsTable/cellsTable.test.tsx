@@ -110,16 +110,6 @@ const createDataTransfer = (files: readonly File[]): DataTransfer => {
   } as unknown as DataTransfer;
 };
 
-type RenderCellsTableResult = {
-  file: CellNode;
-  folder: CellNode;
-  onDropFilesToFolder: (files: readonly File[], uploadPath: string) => void;
-  onDropReadError: () => void;
-  onFolderDropTargetChange: (folderName: string | null) => void;
-  rerenderWithResetKey: (resetKey: number) => void;
-  rerenderWithSelectionScope: (scopeKey: string, isSelectionEnabled?: boolean) => void;
-  rerenderWithNodes: (nodes: CellNode[]) => void;
-};
 const renderCellsTable = ({
   folderPath = 'conversation-id@example.com/Marketing/images',
   onDropFilesToFolder = jest.fn(),
@@ -148,11 +138,21 @@ const renderCellsTable = ({
   readonly isBulkActionsEnabled?: boolean;
   readonly cellsRepository?: CellsRepository;
   readonly initialNodes?: CellNode[];
-  readonly selfUserDriveRole?: CellsSelfUserDriveRole;
   readonly onRefresh?: () => void;
+  readonly selfUserDriveRole?: CellsSelfUserDriveRole;
   readonly clock?: ReturnType<typeof createDeterministicClock>;
   readonly random?: () => number;
-} = {}): RenderCellsTableResult & {unmount: () => void} => {
+} = {}): {
+  file: CellNode;
+  folder: CellNode;
+  onDropFilesToFolder: (files: readonly File[], uploadPath: string) => void;
+  onDropReadError: () => void;
+  onFolderDropTargetChange: (folderName: string | null) => void;
+  unmount: () => void;
+  rerenderWithResetKey: (resetKey: number) => void;
+  rerenderWithSelectionScope: (scopeKey: string, isSelectionEnabled?: boolean) => void;
+  rerenderWithNodes: (nodes: CellNode[]) => void;
+} => {
   const wrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({
       translate: translateSelectionForTest,
