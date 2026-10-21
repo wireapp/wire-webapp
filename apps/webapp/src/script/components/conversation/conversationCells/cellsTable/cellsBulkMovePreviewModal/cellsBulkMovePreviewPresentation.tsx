@@ -98,7 +98,6 @@ export const CellsBulkMovePreviewPresentation: FunctionComponent<CellsBulkMovePr
     }
   };
 
-
   return (
     <CellsModal isOpen={isOpen} onClose={onClose} size="large">
       <CellsModal.Header>
