@@ -30,7 +30,8 @@
     },
     {
       "matchPackageNames": ["quay.io/wire/mirror-images/playwright"],
-      "minimumReleaseAge": null
+      "minimumReleaseAge": null,
+      "pinDigests": true
     },
     {
       "matchDepNames": ["playwright", "@playwright/test", "quay.io/wire/mirror-images/playwright"],
