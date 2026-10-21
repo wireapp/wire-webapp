@@ -18,6 +18,7 @@
  */
 
 import * as React from 'react';
+import {type FunctionComponent} from 'react';
 
 import {CSSObject} from '@emotion/react';
 
@@ -43,6 +44,6 @@ const inputBlockStyle: (props: InputBlockProps) => CSSObject = () => {
   };
 };
 
-export const InputBlock = (props: InputBlockProps) => {
+export const InputBlock: FunctionComponent<InputBlockProps> = props => {
   return <div css={inputBlockStyle(props)} {...props} />;
 };

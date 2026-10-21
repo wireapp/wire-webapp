@@ -22,6 +22,11 @@ import {DateValue, getLocalTimeZone, today} from '@internationalized/date';
 import {Option} from '../select';
 import {nearestTimeOptionFromDate, parseTimeLabel, timeOptionFromDate} from '../timePickerField/timePickerUtils';
 
+type DateTimeSelection = {
+  date: DateValue;
+  time: Option;
+};
+
 export const dateValueFromDate = (date: Date): DateValue => {
   const tz = getLocalTimeZone();
   return today(tz).set({
@@ -49,7 +54,7 @@ export const combineDateAndTime = (date: DateValue | null, time: Option | null):
   return new Date(datePart.getFullYear(), datePart.getMonth(), datePart.getDate(), hour24, minutes, 0, 0);
 };
 
-export const splitDateTime = (dateTime: Date): {date: DateValue; time: Option} => {
+export const splitDateTime = (dateTime: Date): DateTimeSelection => {
   return {
     date: dateValueFromDate(dateTime),
     time: timeOptionFromDate(dateTime),
@@ -63,7 +68,7 @@ export const getNextHourDateTime = (): Date => {
   return plusOneHour;
 };
 
-export const getDefaultDateTimeSelection = (dateTime?: Date | null): {date: DateValue; time: Option} => {
+export const getDefaultDateTimeSelection = (dateTime?: Date | null): DateTimeSelection => {
   const effectiveDateTime = dateTime ?? getNextHourDateTime();
   return {
     date: dateValueFromDate(effectiveDateTime),

@@ -22,7 +22,7 @@ import {noop} from 'noop-esm';
 
 export {noop};
 
-export const inlineSVG = (svg: string) => {
+export const inlineSVG = (svg: string): string => {
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 };
 
@@ -35,7 +35,7 @@ export const filterProps: <T extends Record<string, any>>(props: T, propsToFilte
   }, {});
 };
 
-export const manySelectors = (selectors: string[], css: CSSObject) => {
+export const manySelectors = (selectors: string[], css: CSSObject): Record<string, CSSObject> => {
   return selectors.reduce<Record<string, CSSObject>>((acc, selector) => {
     acc[selector] = css;
     return acc;

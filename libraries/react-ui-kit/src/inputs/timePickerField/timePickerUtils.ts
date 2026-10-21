@@ -27,6 +27,11 @@ const MINUTES_PER_HOUR = 60;
 const TIME_LABEL_DIGITS = 2;
 const TIME_LABEL_REFERENCE_YEAR = 2026;
 
+type ParsedTimeLabel = {
+  hour24: number;
+  minutes: number;
+};
+
 const timeFormatterOptions: Intl.DateTimeFormatOptions = {
   hour: 'numeric',
   minute: '2-digit',
@@ -36,7 +41,7 @@ const getTimeFormatter = (locale: string = navigator.language): Intl.DateTimeFor
   return new Intl.DateTimeFormat(locale, timeFormatterOptions);
 };
 
-export const parseTimeLabel = (value: string | number): {hour24: number; minutes: number} => {
+export const parseTimeLabel = (value: string | number): ParsedTimeLabel => {
   const [timePart, periodPart] = `${value}`.trim().split(/\s+/);
   const [hourPart, minutePart] = (Boolean(timePart) ? timePart : '').split(':');
   const hour = Number(hourPart);

@@ -17,7 +17,7 @@
  *
  */
 
-import {useMemo} from 'react';
+import {useMemo, type FunctionComponent} from 'react';
 
 import {CSSObject} from '@emotion/react';
 import {isNonEmptyString} from '@sindresorhus/is';
@@ -56,7 +56,7 @@ export interface TimePickerFieldProps {
   wrapperCSS?: CSSObject;
 }
 
-export const TimePickerField = ({
+export const TimePickerField: FunctionComponent<TimePickerFieldProps> = ({
   value,
   onChange,
   id,
@@ -71,7 +71,7 @@ export const TimePickerField = ({
   menuPlacement = 'bottom',
   maxMenuHeight = 200,
   wrapperCSS = {},
-}: TimePickerFieldProps) => {
+}) => {
   const timeOptions = useMemo(() => {
     let options = buildTimeOptions(locale);
 

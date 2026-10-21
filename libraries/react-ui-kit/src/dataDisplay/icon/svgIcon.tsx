@@ -18,6 +18,7 @@
  */
 
 import * as React from 'react';
+import {type FunctionComponent} from 'react';
 
 import {CSSObject} from '@emotion/react';
 import {isUndefined} from '@sindresorhus/is';
@@ -44,7 +45,7 @@ const svgIconStyle: <T>(theme: Theme, props: SVGIconProps<T>) => CSSObject = (th
   };
 };
 
-export const SVGIcon = ({
+export const SVGIcon: FunctionComponent<InternalSVGIconProps> = ({
   realWidth,
   realHeight,
   scale = 1,
@@ -54,7 +55,7 @@ export const SVGIcon = ({
   children,
   fill,
   ...props
-}: InternalSVGIconProps) => {
+}) => {
   let newScale = scale;
   if (!isUndefined(width) || !isUndefined(height)) {
     const widthScale = !isUndefined(width) ? width / realWidth : Infinity;

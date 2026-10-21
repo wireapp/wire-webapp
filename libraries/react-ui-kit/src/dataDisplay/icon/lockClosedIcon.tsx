@@ -17,9 +17,11 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
-export const LockClosedIcon = (props: SVGIconProps) => {
+export const LockClosedIcon: FunctionComponent<SVGIconProps> = props => {
   return (
     <SVGIcon realWidth={10} realHeight={10} {...props}>
       <path

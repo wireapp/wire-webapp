@@ -38,7 +38,7 @@ const LIBRARIES = [
   {name: 'license-collector', value: 'license-collector-lib'},
 ] as const;
 
-async function main() {
+async function main(): Promise<void> {
   const selected = await checkbox({
     message: 'Select libraries to watch:',
     choices: LIBRARIES,

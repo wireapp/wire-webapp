@@ -17,6 +17,8 @@
  *
  */
 
+import type {JSX} from 'react';
+
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {components, GroupBase, MenuListProps} from 'react-select';
 
@@ -26,14 +28,18 @@ import {CloseIcon} from '../../../dataDisplay/icon';
 import {Theme} from '../../../identity/theme';
 import {Option} from '../select';
 
+type SelectMenuListComponentType<IsMulti extends boolean, Group extends GroupBase<Option>> = ((
+  props: MenuListProps<Option, IsMulti, Group>,
+) => JSX.Element) & {displayName: string};
+
 export const SelectMenuList = <IsMulti extends boolean = false, Group extends GroupBase<Option> = GroupBase<Option>>(
   menuListHeading: string,
   dataUieName: string,
-) => {
-  function SelectMenuListComponent(props: MenuListProps<Option, IsMulti, Group>) {
+): SelectMenuListComponentType<IsMulti, Group> => {
+  function SelectMenuListComponent(props: MenuListProps<Option, IsMulti, Group>): JSX.Element {
     const {selectProps, children} = props;
 
-    const handleClose = () => {
+    const handleClose = (): void => {
       if (!isNullOrUndefined(selectProps.onMenuClose)) {
         selectProps.onMenuClose();
       }

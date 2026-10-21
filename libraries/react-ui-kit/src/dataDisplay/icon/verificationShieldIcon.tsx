@@ -17,9 +17,11 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
-export const VerificationShieldIcon = (props: SVGIconProps) => {
+export const VerificationShieldIcon: FunctionComponent<SVGIconProps> = props => {
   return (
     <SVGIcon realWidth={14} realHeight={17} {...props}>
       <path

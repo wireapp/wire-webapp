@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {matchers} from '@emotion/jest';
 import {fireEvent, render} from '@testing-library/react';
 
@@ -28,7 +30,10 @@ import {matchComponent} from '../../utils/testUtil';
 
 expect.extend(matchers);
 
-const getDefaultProps = () => {
+type DefaultRangeInputProps = RangeInputProps &
+  Required<Pick<RangeInputProps, 'label' | 'minValueLabel' | 'maxValueLabel'>>;
+
+const getDefaultProps = (): DefaultRangeInputProps => {
   return {
     id: 'zoom-input',
     label: 'Zoom',
@@ -42,7 +47,7 @@ const getDefaultProps = () => {
   };
 };
 
-const ThemedRangeInput = (props: RangeInputProps) => {
+const ThemedRangeInput: FunctionComponent<RangeInputProps> = props => {
   return (
     <StyledApp themeId={THEME_ID.LIGHT}>
       <RangeInput {...props} />
