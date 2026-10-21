@@ -32,7 +32,7 @@ export class EncryptedStorage {
     ]);
   }
 
-  async setItem(key: string, value: string) {
+  async setItem(key: string, value: string): Promise<void> {
     try {
       const encryptionKey = await this.encryptionKey;
       const iv = window.crypto.getRandomValues(new Uint8Array(initializationVectorLengthInBytes));
@@ -50,7 +50,7 @@ export class EncryptedStorage {
     }
   }
 
-  async getItem(key: string) {
+  async getItem(key: string): Promise<string | null> {
     const entry = localStorage.getItem(key);
     if (entry !== null) {
       const encryptionKey = await this.encryptionKey;
@@ -66,11 +66,11 @@ export class EncryptedStorage {
     return null;
   }
 
-  async removeItem(key: string) {
+  async removeItem(key: string): Promise<void> {
     localStorage.removeItem(key);
   }
 
-  async clear() {
+  async clear(): Promise<void> {
     localStorage.clear();
   }
   async key(): Promise<null> {

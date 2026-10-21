@@ -25,7 +25,7 @@ import 'core-js/full/object';
 import 'core-js/full/reflect';
 
 // eslint-disable-next-line import/order
-import {FC} from 'react';
+import {FunctionComponent} from 'react';
 
 import {createRoot} from 'react-dom/client';
 import {Provider} from 'react-redux';
@@ -51,6 +51,8 @@ import {updateApiVersion} from '../lifecycle/updateRemoteConfigs';
 import {setAppLocale} from '../localization/Localizer';
 import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';
+
+type AuthAppProps = {clock: Clock; translate: Translate};
 
 retireLegacyServiceWorker({
   serviceWorkerContainer: Maybe.of(navigator.serviceWorker),
@@ -85,7 +87,7 @@ const store = configureStore({
   localStorage,
 });
 
-const render = (Component: FC<{translate: Translate; clock: Clock}>): void => {
+const render = (Component: FunctionComponent<AuthAppProps>): void => {
   const container = document.getElementById(mainId);
   if (isNull(container)) {
     throw new Error(`No container '${mainId}' found to render application`);
@@ -99,7 +101,7 @@ const render = (Component: FC<{translate: Translate; clock: Clock}>): void => {
 
 const config = Config.getConfig();
 
-async function runApp() {
+async function runApp(): Promise<void> {
   const {domain} = await updateApiVersion();
   await initializeDataDog(config, {domain: domain});
   render(Root);

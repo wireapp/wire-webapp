@@ -55,7 +55,7 @@ export function extractClientDiff(
   const deletedClients = flattenUserMap(allDeleted);
   const missingClients = flattenUserMap(missing);
 
-  const toClientDiff = ({userId, data}: {data: string[]; userId: QualifiedId}) => {
+  const toClientDiff = ({userId, data}: {data: string[]; userId: QualifiedId}): UserClient => {
     return {clients: data, userId};
   };
 

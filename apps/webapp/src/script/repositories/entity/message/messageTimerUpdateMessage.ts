@@ -43,7 +43,7 @@ export class MessageTimerUpdateMessage extends SystemMessage {
   }
 }
 
-const getCaption = (messageTimer: number | null, isSelfUser: boolean, translate: Translate) => {
+const getCaption = (messageTimer: number | null, isSelfUser: boolean, translate: Translate): string => {
   if (!isNull(messageTimer) && messageTimer !== 0 && !isNan(messageTimer)) {
     const timeString = formatDuration(messageTimer, translate).text;
     return isSelfUser

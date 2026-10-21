@@ -26,12 +26,12 @@ import type {Participant} from './Participant';
 
 const participantPairSize = 2;
 
-export interface Grid {
+export type Grid = {
   grid: Participant[];
   thumbnail: Participant | null;
-}
+};
 
-export function getGrid(call: Call | undefined) {
+export function getGrid(call: Call | undefined): Grid {
   if (call === undefined) {
     return {
       grid: [],
@@ -51,7 +51,7 @@ export function getGrid(call: Call | undefined) {
   };
 }
 
-export function updateVideoGrid(call: Call | undefined, setGrid: Dispatch<SetStateAction<Grid>>) {
+export function updateVideoGrid(call: Call | undefined, setGrid: Dispatch<SetStateAction<Grid>>): void {
   if (call === undefined) {
     return;
   }
@@ -67,7 +67,7 @@ export const useVideoGrid = (call: Call): Grid => {
   const {participants, currentPage, pages} = useKoSubscribableChildren(call, ['participants', 'currentPage', 'pages']);
 
   useEffect(() => {
-    const updateGrid = () => {
+    const updateGrid = (): void => {
       return updateVideoGrid(call, setGrid);
     };
     updateGrid();

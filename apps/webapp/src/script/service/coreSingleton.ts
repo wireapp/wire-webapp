@@ -18,6 +18,7 @@
  */
 
 import {isUndefined} from '@sindresorhus/is';
+import type {CRUDEngine} from '@wireapp/store-engine/lib/engine';
 import {container, singleton} from 'tsyringe';
 
 import {Account} from '@wireapp/core';
@@ -67,7 +68,7 @@ export class Core extends Account {
       nbPrekeys: 100,
     });
   }
-  get storage() {
+  get storage(): CRUDEngine | undefined {
     return this['storeEngine'];
   }
 }

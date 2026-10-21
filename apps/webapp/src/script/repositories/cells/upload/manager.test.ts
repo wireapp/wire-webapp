@@ -22,7 +22,7 @@ import {noop} from 'noop-esm';
 import {Task} from 'true-myth';
 
 import type {CellsUploadGateway, CellsUploadGatewayError, UploadDraftRequest} from './gateway';
-import {createCellsUploadManager} from './manager';
+import {createCellsUploadManager, type CellsUploadManager} from './manager';
 import type {DraftIdentity, UploadSource} from './identity';
 
 const source: UploadSource = {blob: new Blob(['data']), name: 'file.txt', contentType: 'text/plain', size: 4};
@@ -38,6 +38,12 @@ type DeferredUploadTask = {
   readonly resolve: (value?: DraftIdentity) => void;
   readonly reject: (error: CellsUploadGatewayError<'upload'>) => void;
 };
+type DeferredCellsUploadManager = {
+  instance: CellsUploadManager;
+  requests: UploadDraftRequest[];
+  tasks: DeferredUploadTask[];
+};
+type CellsUploadManagerTestSetup = Pick<DeferredCellsUploadManager, 'instance' | 'requests'>;
 
 function createDeferredUploadTask(): DeferredUploadTask {
   let resolve: ((value?: DraftIdentity) => void) | undefined;
@@ -56,7 +62,7 @@ function createDeferredUploadTask(): DeferredUploadTask {
   return {task, resolve, reject};
 }
 
-const deferredManager = () => {
+const deferredManager = (): DeferredCellsUploadManager => {
   const requests: UploadDraftRequest[] = [];
   const tasks: DeferredUploadTask[] = [];
   const gateway: CellsUploadGateway = {
@@ -92,7 +98,7 @@ const deferredManager = () => {
 };
 
 describe('createCellsUploadManager', () => {
-  const manager = () => {
+  const manager = (): CellsUploadManagerTestSetup => {
     const requests: UploadDraftRequest[] = [];
     const gateway: CellsUploadGateway = {
       uploadDraft: request => {

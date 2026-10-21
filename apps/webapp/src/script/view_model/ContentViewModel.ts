@@ -80,7 +80,7 @@ export class ContentViewModel {
   previousConversation?: Conversation;
   userRepository: UserRepository;
 
-  get isFederated() {
+  get isFederated(): boolean {
     return this.mainViewModel.isFederated;
   }
 
@@ -99,7 +99,7 @@ export class ContentViewModel {
     this.messageRepository = repositories.message;
     this.logger = getLogger('ContentViewModel');
 
-    const showMostRecentConversation = () => {
+    const showMostRecentConversation = (): void => {
       const mostRecentConversation = this.conversationState.getMostRecentConversation();
       this.showConversation(mostRecentConversation);
     };
@@ -127,7 +127,7 @@ export class ContentViewModel {
     this._initSubscriptions();
   }
 
-  private _initSubscriptions() {
+  private _initSubscriptions(): void {
     amplify.subscribe(WebAppEvents.CONTENT.SWITCH, this.switchContent);
     amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, this.showConversation);
   }
@@ -370,7 +370,7 @@ export class ContentViewModel {
     return newState;
   };
 
-  private readonly showContent = (newContentState: ContentState) => {
+  private readonly showContent = (newContentState: ContentState): void => {
     const {setContentState} = useAppState.getState();
     setContentState(newContentState);
 

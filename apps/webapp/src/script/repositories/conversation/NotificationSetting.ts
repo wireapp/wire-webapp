@@ -25,7 +25,7 @@ export const NOTIFICATION_STATE = {
   NOTHING: 0b11,
 };
 
-export const getNotificationText = (status: number, translate: Translate) => {
+export const getNotificationText = (status: number, translate: Translate): string => {
   const statusTexts: Record<number, string> = {
     [NOTIFICATION_STATE.EVERYTHING]: translate('notificationSettingsEverything'),
     [NOTIFICATION_STATE.MENTIONS_AND_REPLIES]: translate('notificationSettingsMentionsAndReplies'),

@@ -19,7 +19,7 @@
 
 import {createRestartQueue} from './restartQueue';
 
-const flushPromises = () => {
+const flushPromises = (): Promise<void> => {
   return Promise.resolve();
 };
 

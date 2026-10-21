@@ -25,7 +25,7 @@ const avatarHashMultiplier = 31;
 
 // calculation of hash code for string based on this doc:
 // https://wearezeta.atlassian.net/wiki/spaces/AR/pages/1696858160/Consistent+Conversation+Colors+A+Hash-Based+Approach+for+Conversation+id
-function getHashCode(str: string) {
+function getHashCode(str: string): number {
   let hash = 0;
   for (let counter = 0; counter < str.length; counter++) {
     // charCodeAt provides the UTF-16 code unit.
@@ -79,7 +79,7 @@ const channelAvatarColorPalette = channelAvatarColorOptions.map(color => {
  * @param id - unique id - The ID used to generate a hash code for selecting a color.
  * @returns - array of colors for group avatar
  */
-export function getGroupAvatarColors(id = '') {
+export function getGroupAvatarColors(id = ''): string[] {
   const hash = getHashCode(id);
   return groupAvatarOptions[Math.abs(hash) % groupAvatarOptions.length];
 }
@@ -90,7 +90,9 @@ export function getGroupAvatarColors(id = '') {
  * @param id - unique id - The ID used to generate a hash code for selecting a color.
  * @returns {object} - An object containing background, color, and border properties.
  */
-export const getChannelAvatarColors = (id = '') => {
+type ChannelAvatarColors = {background: string; color: string; border: string};
+
+export const getChannelAvatarColors = (id = ''): ChannelAvatarColors => {
   const hash = getHashCode(id);
   return channelAvatarColorPalette[Math.abs(hash) % channelAvatarColorPalette.length];
 };

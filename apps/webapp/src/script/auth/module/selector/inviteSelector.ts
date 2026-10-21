@@ -17,14 +17,16 @@
  *
  */
 
+import type {TeamInvitation} from '@wireapp/api-client/lib/team';
+
 import type {RootState} from '../reducer';
 
-export const getInvites = (state: RootState) => {
+export const getInvites = (state: RootState): TeamInvitation[] => {
   return state.inviteState.invites;
 };
-export const getError = (state: RootState) => {
+export const getError = (state: RootState): Error | null => {
   return state.inviteState.error;
 };
-export const isFetching = (state: RootState) => {
+export const isFetching = (state: RootState): boolean => {
   return state.inviteState.fetching;
 };

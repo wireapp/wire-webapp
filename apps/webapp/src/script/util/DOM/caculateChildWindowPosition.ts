@@ -20,8 +20,9 @@
 import {isNan} from '@sindresorhus/is';
 
 const windowCenterDivisor = 2;
+type ChildWindowPosition = {left: number; top: number};
 
-export const calculateChildWindowPosition = (childHeight: number, childWidth: number) => {
+export const calculateChildWindowPosition = (childHeight: number, childWidth: number): ChildWindowPosition => {
   const screenLeft = window.screenLeft !== 0 && !isNan(window.screenLeft) ? window.screenLeft : window.screenX;
   const screenTop = window.screenTop !== 0 && !isNan(window.screenTop) ? window.screenTop : window.screenY;
 

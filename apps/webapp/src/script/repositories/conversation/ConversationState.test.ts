@@ -29,11 +29,14 @@ import {UserState} from 'Repositories/user/userState';
 import {ConversationState} from './ConversationState';
 import {translateForTest} from 'Util/test/translateForTest';
 
-function createConversationState() {
+function createConversationState(): ConversationState {
   return new ConversationState(new UserState(), new TeamState());
 }
 
-function createConversation(protocol: CONVERSATION_PROTOCOL = CONVERSATION_PROTOCOL.PROTEUS, type?: CONVERSATION_TYPE) {
+function createConversation(
+  protocol: CONVERSATION_PROTOCOL = CONVERSATION_PROTOCOL.PROTEUS,
+  type?: CONVERSATION_TYPE,
+): Conversation {
   const conversation = new Conversation(randomUUID(), '', protocol, translateForTest);
   if (protocol === CONVERSATION_PROTOCOL.MLS) {
     conversation.groupId = `groupid-${randomUUID()}`;

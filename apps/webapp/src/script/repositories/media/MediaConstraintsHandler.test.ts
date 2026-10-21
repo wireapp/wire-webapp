@@ -59,7 +59,7 @@ describe('MediaConstraintsHandler', () => {
     audio = 'mic',
     video = 'camera1',
     screen = 'screen1',
-  }: CreateAvailableDevicesParams = {}) => {
+  }: CreateAvailableDevicesParams = {}): Promise<void> => {
     mediaDevicesStore.setState({
       audio: {
         input: {devices: [], supported: false, activeId: audio, preferredId: audio},
@@ -74,7 +74,7 @@ describe('MediaConstraintsHandler', () => {
     });
   };
 
-  const resetStore = () => {
+  const resetStore = (): void => {
     const state = mediaDevicesStore.getState();
     state.resetDevices();
     state.resetSelections();
@@ -82,7 +82,7 @@ describe('MediaConstraintsHandler', () => {
     createAvailableDevices();
   };
 
-  const createConstraintsHandler = (selfUserId = createUuid()) => {
+  const createConstraintsHandler = (selfUserId = createUuid()): MediaConstraintsHandler => {
     const userState = {
       self: () => {
         return new User(selfUserId, '', translateForTest);

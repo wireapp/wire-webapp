@@ -23,8 +23,8 @@ export const onHitTopOrBottom = (
   scrollingElement: HTMLElement | null,
   onHitTop: () => void,
   onHitBottom: () => void,
-) => {
-  const onScroll = (event: Event) => {
+): void => {
+  const onScroll = (event: Event): void => {
     const element = event.target as HTMLElement;
     const scrollPosition = Math.ceil(element.scrollTop);
     const scrollEnd = element.offsetHeight + scrollPosition;
@@ -38,7 +38,7 @@ export const onHitTopOrBottom = (
     }
   };
 
-  const onMouseWheel = ({currentTarget, deltaY}: WheelEvent) => {
+  const onMouseWheel = ({currentTarget, deltaY}: WheelEvent): true | void => {
     const element = currentTarget as HTMLElement;
     const isScrollable = element.scrollHeight > element.clientHeight;
 

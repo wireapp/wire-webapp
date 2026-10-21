@@ -313,7 +313,9 @@ export type ClientConversationEvent =
   | VerificationEvent
   | MultipartMessageAddEvent;
 
-function buildQualifiedId(conversation: QualifiedId | string) {
+type QualifiedConversationPayload = {conversation: string; qualified_conversation: QualifiedId};
+
+function buildQualifiedId(conversation: QualifiedId | string): QualifiedConversationPayload {
   const qualifiedId = typeof conversation === 'string' ? {domain: '', id: conversation} : conversation;
   return {
     conversation: qualifiedId.id,

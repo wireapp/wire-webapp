@@ -17,12 +17,22 @@
  *
  */
 
-import {applyMiddleware, combineReducers, legacy_createStore as createStore} from 'redux';
+import {
+  applyMiddleware,
+  combineReducers,
+  legacy_createStore as createStore,
+  type AnyAction,
+  type Middleware,
+  type Store,
+  type StoreEnhancer,
+} from 'redux';
 import {withExtraArgument} from 'redux-thunk';
 
 import {LOGGER_NAMESPACE} from 'Util/logger';
 
-import {reducers} from './module/reducer';
+import {reducers, type RootState} from './module/reducer';
+
+type AuthStore = Store<RootState, AnyAction>;
 
 type HotReloadCapableModule = NodeJS.Module & {
   readonly hot?: {
@@ -32,7 +42,7 @@ type HotReloadCapableModule = NodeJS.Module & {
 
 const reduxLogdown = require('redux-logdown');
 
-const configureStore = (thunkArguments: object = {}) => {
+const configureStore = (thunkArguments: object = {}): AuthStore => {
   const store = createStore(combineReducers(reducers), undefined, createMiddleware(thunkArguments));
   const hotReloadCapableModule = module as HotReloadCapableModule;
 
@@ -47,11 +57,11 @@ const configureStore = (thunkArguments: object = {}) => {
   return store;
 };
 
-const createLoggerMiddleware = () => {
+const createLoggerMiddleware = (): Middleware => {
   return reduxLogdown(LOGGER_NAMESPACE, {diff: true});
 };
 
-const createMiddleware = (thunkArguments: object) => {
+const createMiddleware = (thunkArguments: object): StoreEnhancer => {
   const middlewares = [withExtraArgument(thunkArguments), createLoggerMiddleware()];
   return applyMiddleware(...middlewares);
 };

@@ -22,10 +22,26 @@ import {GenericMessageType} from '@wireapp/core/lib/conversation';
 import {GenericMessage, LegalHoldStatus, Text} from '@wireapp/protocol-messaging';
 
 import {CryptographyMapper} from 'Repositories/cryptography/CryptographyMapper';
+import {ClientEvent} from 'Repositories/event/Client';
 import {createMessageAddEvent} from 'test/helper/EventGenerator';
 import {createUuid} from 'Util/uuid';
 
 import * as LegalHoldEvaluator from './LegalHoldEvaluator';
+
+type MappedMessageAddEvent = Extract<
+  NonNullable<Awaited<ReturnType<CryptographyMapper['mapGenericMessage']>>>,
+  {type: typeof ClientEvent.CONVERSATION.MESSAGE_ADD}
+>;
+
+function requireMappedMessageAddEvent(
+  mappedEvent: Awaited<ReturnType<CryptographyMapper['mapGenericMessage']>>,
+): MappedMessageAddEvent {
+  if (mappedEvent === undefined || mappedEvent.type !== ClientEvent.CONVERSATION.MESSAGE_ADD) {
+    throw new Error('Expected a mapped message-add event');
+  }
+
+  return mappedEvent;
+}
 
 describe('LegalHoldEvaluator', () => {
   describe('hasMessageLegalHoldFlag', () => {
@@ -47,7 +63,9 @@ describe('LegalHoldEvaluator', () => {
 
       const event = createMessageAddEvent();
 
-      const mappedEvent = await cryptographyMapper.mapGenericMessage(legalHoldFlagOn, event);
+      const mappedEvent = requireMappedMessageAddEvent(
+        await cryptographyMapper.mapGenericMessage(legalHoldFlagOn, event),
+      );
 
       expect(LegalHoldEvaluator.hasMessageLegalHoldFlag(mappedEvent)).toBe(true);
     });
@@ -64,7 +82,9 @@ describe('LegalHoldEvaluator', () => {
 
       const event = createMessageAddEvent();
 
-      const mappedEvent = await cryptographyMapper.mapGenericMessage(legalHoldFlagOff, event);
+      const mappedEvent = requireMappedMessageAddEvent(
+        await cryptographyMapper.mapGenericMessage(legalHoldFlagOff, event),
+      );
 
       expect(LegalHoldEvaluator.hasMessageLegalHoldFlag(mappedEvent)).toBe(true);
     });
@@ -80,7 +100,9 @@ describe('LegalHoldEvaluator', () => {
 
       const event = createMessageAddEvent();
 
-      const mappedEvent = await cryptographyMapper.mapGenericMessage(legalHoldFlagMissing, event);
+      const mappedEvent = requireMappedMessageAddEvent(
+        await cryptographyMapper.mapGenericMessage(legalHoldFlagMissing, event),
+      );
 
       expect(LegalHoldEvaluator.hasMessageLegalHoldFlag(mappedEvent)).toBe(false);
     });

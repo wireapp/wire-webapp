@@ -53,10 +53,10 @@ export class ServiceEntity {
   category?: string;
   author?: ko.Observable<string>;
   type: ServiceType;
-  get isService() {
+  get isService(): boolean {
     return this.type === 'Service';
   }
-  get isApp() {
+  get isApp(): boolean {
     return this.type === 'App';
   }
 

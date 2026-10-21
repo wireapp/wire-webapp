@@ -28,10 +28,20 @@ import {container} from 'tsyringe';
 import {E2EIHandler, getUsersIdentities, MLSStatuses, WireIdentity} from '../e2eIdentity';
 import {Core} from '../service/coreSingleton';
 
-export const useUserIdentity = (userId: QualifiedId, groupId?: string, updateAfterEnrollment?: boolean) => {
+type UserIdentityState = {
+  deviceIdentities: WireIdentity[] | undefined;
+  status: MLSStatuses.VALID | MLSStatuses.NOT_ACTIVATED | undefined;
+  getDeviceIdentity: (deviceId: string) => WireIdentity | undefined;
+};
+
+export const useUserIdentity = (
+  userId: QualifiedId,
+  groupId?: string,
+  updateAfterEnrollment?: boolean,
+): UserIdentityState => {
   const core = container.resolve(Core);
   const [deviceIdentities, setDeviceIdentities] = useState<WireIdentity[] | undefined>();
-  const getDeviceIdentity = (deviceId: string) => {
+  const getDeviceIdentity = (deviceId: string): WireIdentity | undefined => {
     return deviceIdentities?.find(identity => {
       return identity.deviceId === deviceId;
     });

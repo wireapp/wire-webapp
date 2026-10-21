@@ -23,7 +23,7 @@ import {noop} from 'noop-esm';
 
 import {useRoveFocus} from './useRoveFocus';
 
-function createEvent(key: string) {
+function createEvent(key: string): KeyboardEvent {
   return {key, preventDefault: noop} as KeyboardEvent;
 }
 

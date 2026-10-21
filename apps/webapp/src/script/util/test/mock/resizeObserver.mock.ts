@@ -19,9 +19,9 @@
 
 Object.defineProperty(window, 'ResizeObserver', {
   value: class ResizeObserver {
-    observe() {}
-    unobserve() {}
-    disconnect() {}
+    observe(): void {}
+    unobserve(): void {}
+    disconnect(): void {}
   },
   writable: true,
 });

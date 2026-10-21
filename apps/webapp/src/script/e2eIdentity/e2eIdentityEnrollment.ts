@@ -19,10 +19,10 @@
 
 import type {Clock} from '@enormora/clock/clock';
 import {isArray, isNonEmptyString, isTruthy, isUndefined} from '@sindresorhus/is';
-import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
+import {CredentialType, type E2EIServiceExternal} from '@wireapp/core/lib/messagingProtocols/mls';
 import {LowPrecisionTaskScheduler} from '@wireapp/core/lib/util/lowPrecisionTaskScheduler';
 import {amplify} from 'amplify';
-import {SigninResponse} from 'oidc-client-ts';
+import {SigninResponse, type User} from 'oidc-client-ts';
 import {container} from 'tsyringe';
 
 import {TypedEventEmitter} from '@wireapp/commons';
@@ -49,6 +49,8 @@ import {OIDCService} from './oidcService';
 import {OIDCServiceStore} from './oidcService/oidcServiceStorage';
 
 const enrollmentProgressPollingIntervalInSeconds = 10;
+type EnrollmentStore = ReturnType<typeof getEnrollmentStore>;
+type EnrollmentTimerDelays = {nextReminderDelay: number; remainingGracePeriodDelay: number};
 
 interface E2EIHandlerParams {
   discoveryUrl: string;
@@ -76,7 +78,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   private oidcService?: OIDCService;
   public certificateTtl?: number;
 
-  private get coreE2EIService() {
+  private get coreE2EIService(): E2EIServiceExternal {
     const e2eiService = this.core.service?.e2eIdentity;
 
     if (isUndefined(e2eiService)) {
@@ -86,7 +88,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     return e2eiService;
   }
 
-  private get enrollmentStore() {
+  private get enrollmentStore(): EnrollmentStore {
     const selfUserId = this.userState.self()?.qualifiedId;
 
     if (isUndefined(selfUserId)) {
@@ -97,7 +99,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     return enrollmentStore;
   }
 
-  private createOIDCService() {
+  private createOIDCService(): OIDCService {
     const key = this.core.key;
     const targetURL = OIDCServiceStore.get.targetURL();
     if (isUndefined(key) || !isNonEmptyString(targetURL)) {
@@ -113,12 +115,12 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
    * @param params The params to create the grace period timer
    * @returns The singleton instance of GracePeriodTimer
    */
-  public static getInstance() {
+  public static getInstance(): E2EIHandler {
     E2EIHandler.instance = E2EIHandler.instance ?? new E2EIHandler();
     return E2EIHandler.instance;
   }
 
-  private get config() {
+  private get config(): EnrollmentConfig {
     if (isUndefined(this.#config)) {
       throw new Error('Trying to access config without initializing the E2EIHandler');
     }
@@ -136,7 +138,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   /**
    * Reset the instance
    */
-  public static resetInstance() {
+  public static resetInstance(): void {
     E2EIHandler.instance = null;
   }
 
@@ -144,12 +146,12 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
    * Returns true if the current instance has been configured with team settings params
    * @returns
    */
-  public isE2EIEnabled() {
+  public isE2EIEnabled(): boolean {
     return !isUndefined(this.#config);
   }
 
   /** will initialize the e2ei enrollment handler eventually triggering an enrollment flow if the device is a fresh new one */
-  public async initialize({discoveryUrl, gracePeriodInSeconds, clock}: E2EIHandlerParams) {
+  public async initialize({discoveryUrl, gracePeriodInSeconds, clock}: E2EIHandlerParams): Promise<this> {
     this.applicationClock = clock;
     const gracePeriodInMs = gracePeriodInSeconds * TIME_IN_MILLIS.SECOND;
     this.#config = {
@@ -178,7 +180,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     return this;
   }
 
-  public wasJustRedirected() {
+  public wasJustRedirected(): boolean {
     const searchParams = new URLSearchParams(window.location.search);
 
     const {state, session_state, code} = new SigninResponse(searchParams);
@@ -204,7 +206,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
    * - If the client has already enrolled, and the cert has already expired, they will be forced to enroll
    * @returns the delay under which the next enrollment/renewal modal will be prompted
    */
-  public async startTimers() {
+  public async startTimers(): Promise<EnrollmentTimerDelays> {
     const clock = this.clock;
     // We store the first time the user was prompted with the enrollment modal
     const storedE2eActivatedAt = this.enrollmentStore.get.e2eiActivatedAt();
@@ -277,7 +279,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   /**
    * Used to clean the state/storage after a failed run
    */
-  private async cleanUp(includeOidcServiceUserData: boolean) {
+  private async cleanUp(includeOidcServiceUserData: boolean): Promise<void> {
     // Remove the url parameters of the failed enrolment
     removeUrlParameters();
     // Clear the oidc service progress
@@ -290,7 +292,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   private async getUserData(
     silent: boolean,
     challengeData?: {keyAuth: string; challenge: {url: string; target: string}},
-  ) {
+  ): Promise<void | User | null> {
     if (!isUndefined(challengeData)) {
       // If a challengeData is provided, that means we are at the beginning of the enrollment process
       // We need to first authenticate the user (either silently if we are renewing the certificate, or by redirection if it an initial enrollment)
@@ -409,7 +411,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     PrimaryModal.show(modalType, modalOptions, undefined, translate);
   }
 
-  private async showSuccessMessage(isCertificateRenewal = false) {
+  private async showSuccessMessage(isCertificateRenewal = false): Promise<void> {
     return new Promise<void>(resolve => {
       const {modalOptions, modalType} = getModalOptions(
         {
@@ -500,7 +502,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     });
   }
 
-  private showSnoozeConfirmationModal(delay: number) {
+  private showSnoozeConfirmationModal(delay: number): void {
     // Show the modal with the provided modal type
     const {modalOptions, modalType: determinedModalType} = getModalOptions(
       {

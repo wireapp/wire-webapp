@@ -57,7 +57,7 @@ let buffers: {
  * @param canvas the canvas in which to init the webgl context
  * @param dimension the dimensions (width, height) of the video that we want to blur
  */
-export function initShaderProgram(canvas: HTMLCanvasElement, {width, height}: VideoDimensions) {
+export function initShaderProgram(canvas: HTMLCanvasElement, {width, height}: VideoDimensions): WebGL2RenderingContext {
   const gl = canvas.getContext('webgl2');
   if (isNullOrUndefined(gl)) {
     throw new Error('WebGL not supported');
@@ -105,7 +105,7 @@ export function blurBackground(
   videoElement: HTMLVideoElement,
   gl: WebGLRenderingContext,
   {width, height}: VideoDimensions,
-) {
+): void {
   // Clear the canvas
   gl.viewport(0, 0, width, height);
   gl.clearColor(0, 0, 0, 0);
@@ -151,7 +151,7 @@ export function blurBackground(
   gl.drawArrays(gl.TRIANGLES, 0, rectangleVertexCount /* we draw a rectangle with 2 triangles (so 6 points) */);
 }
 
-function setFramebuffer(gl: WebGLRenderingContext, fbo: WebGLFramebuffer | null, width: number, height: number) {
+function setFramebuffer(gl: WebGLRenderingContext, fbo: WebGLFramebuffer | null, width: number, height: number): void {
   // make this the framebuffer we are rendering to.
   gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
 
@@ -162,7 +162,7 @@ function setFramebuffer(gl: WebGLRenderingContext, fbo: WebGLFramebuffer | null,
   gl.viewport(0, 0, width, height);
 }
 
-function createAndSetupTexture(gl: WebGLRenderingContext) {
+function createAndSetupTexture(gl: WebGLRenderingContext): WebGLTexture {
   const texture = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, texture);
 

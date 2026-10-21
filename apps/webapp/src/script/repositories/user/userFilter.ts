@@ -24,7 +24,7 @@ import {User} from 'Repositories/entity/User';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
 export class UserFilter {
-  static isParticipant(conversationEntity: Conversation, userId: QualifiedId) {
+  static isParticipant(conversationEntity: Conversation, userId: QualifiedId): boolean {
     const index = conversationEntity.allUserEntities().findIndex((user: User) => {
       return matchQualifiedIds(userId, user);
     });

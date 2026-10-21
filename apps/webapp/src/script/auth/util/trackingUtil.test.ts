@@ -37,12 +37,13 @@ const CONFIG_DEFAULTS = {
   COUNTLY_API_KEY: 'api-key',
   COUNTLY_SERVER_URL: 'https://server.url',
 };
+type TrackingTestConfig = typeof CONFIG_DEFAULTS;
 
 describe('trackingUtil', () => {
   const ORIGINAL_LOCAL_STORAGE = global.localStorage;
 
   let localStorageMock: any;
-  const configFactory = (overrides = {}) => {
+  const configFactory = (overrides = {}): TrackingTestConfig => {
     return {
       ...CONFIG_DEFAULTS,
       ...overrides,

@@ -55,7 +55,7 @@ describe('Conversation', () => {
   const second_timestamp = new Date('2017-09-26T10:27:18.837Z').getTime();
   const third_timestamp = new Date('2017-09-26T11:29:21.837Z').getTime();
 
-  function createMessageForTest(id: string = createUuid()) {
+  function createMessageForTest(id: string = createUuid()): Message {
     return new Message(id, undefined, translateForTest);
   }
 
@@ -63,7 +63,7 @@ describe('Conversation', () => {
     conversationId: string = '',
     domain: string = '',
     protocol: CONVERSATION_PROTOCOL = CONVERSATION_PROTOCOL.PROTEUS,
-  ) {
+  ): Conversation {
     return new Conversation(conversationId, domain, protocol, translate);
   }
 

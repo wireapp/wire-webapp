@@ -26,6 +26,7 @@ import {TIME_IN_MILLIS} from 'Util/timeUtil';
 import {AppInitTimingsStep} from './AppInitTimingsStep';
 
 type AppTimings = Partial<Record<AppInitTimingsStep, number>>;
+type AppInitTimingsConfig = {BUCKET_SIZE: number; LOG_LENGTH_KEY: number; LOG_LENGTH_VALUE: number};
 
 export class AppInitTimings {
   private readonly timings: AppTimings;
@@ -34,7 +35,7 @@ export class AppInitTimings {
   private readonly clock: Clock;
   private lastRecordedStep: Maybe<AppInitTimingsStep> = Maybe.nothing();
 
-  static get CONFIG() {
+  static get CONFIG(): AppInitTimingsConfig {
     return {
       BUCKET_SIZE: 10,
       LOG_LENGTH_KEY: 27,
@@ -64,7 +65,7 @@ export class AppInitTimings {
     return Math.floor(appLoadedInSeconds);
   }
 
-  log() {
+  log(): void {
     this.logger.debug('App initialization step durations', this.timings);
   }
 

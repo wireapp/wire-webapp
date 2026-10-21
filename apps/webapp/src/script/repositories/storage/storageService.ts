@@ -99,7 +99,7 @@ export class StorageService {
       obj: Object,
       updatedObj: Object,
       transaction: Transaction,
-    ) => {
+    ): void => {
       transaction.on('complete', () => {
         this.dbListeners
           .filter(listener => {

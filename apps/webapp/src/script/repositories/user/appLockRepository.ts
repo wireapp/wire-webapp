@@ -120,12 +120,12 @@ export class AppLockRepository {
     window.removeEventListener('storage', this.handlePassphraseStorageEvent);
   };
 
-  disableFeature = () => {
+  disableFeature = (): void => {
     this.appLockState.isActivatedInPreferences(false);
     window.localStorage.removeItem(this.getEnabledStorageKey());
   };
 
-  setEnabled = (enabled: boolean) => {
+  setEnabled = (enabled: boolean): void => {
     if (enabled) {
       window.localStorage.setItem(this.getEnabledStorageKey(), 'true');
       this.appLockState.isActivatedInPreferences(true);
@@ -167,7 +167,7 @@ export class AppLockRepository {
     this.appLockState.hasPassphrase(true);
   };
 
-  removeCode = () => {
+  removeCode = (): void => {
     this.stopPassphraseObserver();
     window.localStorage.removeItem(this.getPassphraseStorageKey());
     this.appLockState.hasPassphrase(false);

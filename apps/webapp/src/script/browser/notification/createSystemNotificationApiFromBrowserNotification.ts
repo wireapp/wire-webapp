@@ -26,6 +26,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {
   type SystemNotificationApi,
+  type SystemNotificationError,
   systemNotificationErrorKinds,
   type SystemNotificationPermission,
   toSystemNotificationError,
@@ -97,7 +98,7 @@ export const createSystemNotificationApiFromBrowserNotification = ({
         // close we asked for would be reported twice.
         let closeReported = false;
 
-        const reportClose = () => {
+        const reportClose = (): void => {
           if (closeReported) {
             return;
           }
@@ -106,7 +107,7 @@ export const createSystemNotificationApiFromBrowserNotification = ({
           onClose();
         };
 
-        const closeNotification = () => {
+        const closeNotification = (): result.Result<void, SystemNotificationError> => {
           const closeAttempt = result.tryOrElse(
             toSystemNotificationError(systemNotificationErrorKinds.closeFailed),
             () => {

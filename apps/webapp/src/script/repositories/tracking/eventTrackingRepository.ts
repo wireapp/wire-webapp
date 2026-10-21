@@ -52,6 +52,18 @@ import {APIClient} from '../../service/apiClientSingleton';
 
 const TEAM_SIZE_THRESHOLD_VALUE = 6;
 
+type EventTrackingRepositoryConfig = {
+  USER_ANALYTICS: {
+    API_KEY: string;
+    CLIENT_TYPE: string;
+    COUNTLY_DEVICE_ID_LOCAL_STORAGE_KEY: string;
+    COUNTLY_FAILED_TO_MIGRATE_DEVICE_ID: string;
+    COUNTLY_SYNCED_AT_LEAST_ONCE_LOCAL_STORAGE_KEY: string;
+    COUNTLY_UNSYNCED_DEVICE_ID_LOCAL_STORAGE_KEY: string;
+    DISABLED_DOMAINS: string[];
+  };
+};
+
 type HttpRetryReportingClient = {
   readonly on: (
     event: typeof HttpClient.TOPIC.ON_LONG_RUNNING_RETRY,
@@ -83,7 +95,7 @@ export class EventTrackingRepository {
   private telemetryInitialized: boolean = false;
   isErrorReportingActivated: boolean = false;
 
-  static get CONFIG() {
+  static get CONFIG(): EventTrackingRepositoryConfig {
     return {
       USER_ANALYTICS: {
         API_KEY: window.wire.env.ANALYTICS_API_KEY,
@@ -109,7 +121,7 @@ export class EventTrackingRepository {
     this.logger.info('EventTrackingRepository initialized');
   }
 
-  public readonly onUserEvent = (eventJson: any) => {
+  public readonly onUserEvent = (eventJson: any): void => {
     const type = eventJson.type;
     if (type === ClientEvent.USER.DATA_TRANSFER && this.teamState.isTeam()) {
       this.telemetryLogger.info('Received data transfer event with new telemetry tracking id', eventJson.data);
@@ -119,7 +131,7 @@ export class EventTrackingRepository {
     }
   };
 
-  public migrateDeviceId = async (newId: string) => {
+  public migrateDeviceId = async (newId: string): Promise<void> => {
     if (!telemetry.isLoaded()) {
       this.telemetryLogger.warn('Telemetry is not available');
       return;
@@ -215,7 +227,7 @@ export class EventTrackingRepository {
     await this.toggleTelemetry(isConsentGiven);
   }
 
-  private readonly toggleTelemetry = async (isEnabled: boolean) => {
+  private readonly toggleTelemetry = async (isEnabled: boolean): Promise<void> => {
     if (isEnabled && this.isDomainAllowedForAnalytics()) {
       telemetry.addAllConsentFeatures();
       this.telemetryLogger.info('Consent was given due to user preferences');

@@ -28,13 +28,23 @@ import {subscribeToMLSKeyPackageUpdates} from './subscribeToMLSKeyPackageUpdates
 const enabled: FeatureList = {mlsMigration: {status: FEATURE_STATUS.ENABLED, config: {}}};
 const disabled: FeatureList = {mlsMigration: {status: FEATURE_STATUS.DISABLED, config: {}}};
 
-function setup(initialFeatures: FeatureList = disabled) {
+type RefreshKeyPackages = jest.MockedFunction<() => Promise<void>>;
+
+type MLSKeyPackageUpdateTestSetup = {
+  getFeatures: () => FeatureList;
+  observedAllowances: number[];
+  refreshKeyPackages: RefreshKeyPackages;
+  reportError: jest.Mock;
+  update: (newFeatureList: FeatureList) => Promise<void>;
+};
+
+function setup(initialFeatures: FeatureList = disabled): MLSKeyPackageUpdateTestSetup {
   const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
   const teamRepository = new TypedEventEmitter<{featureConfigUpdated: {newFeatureList: FeatureList}}>();
   const reportError = jest.fn();
   const fireAndForgetInvoker = createFireAndForgetInvoker({reportError});
   let features = initialFeatures;
-  const getFeatures = () => {
+  const getFeatures = (): FeatureList => {
     return features;
   };
   const observedAllowances: number[] = [];
@@ -51,7 +61,7 @@ function setup(initialFeatures: FeatureList = disabled) {
     },
     refreshKeyPackages,
   });
-  const update = async (newFeatureList: FeatureList) => {
+  const update = async (newFeatureList: FeatureList): Promise<void> => {
     teamRepository.emit('featureConfigUpdated', {newFeatureList});
     await fireAndForgetInvoker.waitUntilAllSettled();
   };

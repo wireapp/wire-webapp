@@ -33,7 +33,7 @@ interface OverlayElement {
 const overlayedElements = new Map<HTMLElement, OverlayElement>();
 let overlayCheckerInterval: number | undefined = undefined;
 
-function checkOverlayedElements() {
+function checkOverlayedElements(): void {
   overlayedElements.forEach(({onVisible, onChange}, element) => {
     const isVisible = !isOverlayed(element);
     if (!isUndefined(onChange)) {
@@ -63,7 +63,7 @@ const isOverlayed = (domElement: HTMLElement): boolean => {
   return elementAtPoint !== null && domElement !== elementAtPoint && !domElement.contains(elementAtPoint);
 };
 
-const onElementVisible = (element: HTMLElement, onVisible: () => void) => {
+const onElementVisible = (element: HTMLElement, onVisible: () => void): void => {
   if (!isOverlayed(element)) {
     return onVisible();
   }
@@ -73,7 +73,7 @@ const onElementVisible = (element: HTMLElement, onVisible: () => void) => {
   overlayedElements.set(element, {onVisible});
 };
 
-const trackElement = (element: HTMLElement, onChange: (isChanged: boolean) => void) => {
+const trackElement = (element: HTMLElement, onChange: (isChanged: boolean) => void): void => {
   onChange(!isOverlayed(element));
   if (overlayCheckerInterval === undefined) {
     overlayCheckerInterval = window.setInterval(checkOverlayedElements, overlayCheckIntervalInMilliseconds);
@@ -81,7 +81,7 @@ const trackElement = (element: HTMLElement, onChange: (isChanged: boolean) => vo
   overlayedElements.set(element, {onChange});
 };
 
-const removeElement = (element: HTMLElement) => {
+const removeElement = (element: HTMLElement): void => {
   overlayedElements.delete(element);
   if (overlayedElements.size < 1 && overlayCheckerInterval !== undefined) {
     clearInterval(overlayCheckerInterval);

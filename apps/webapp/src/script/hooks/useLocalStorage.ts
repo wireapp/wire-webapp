@@ -19,6 +19,8 @@
 
 import {useSyncExternalStore} from 'react';
 
+type LocalStorageHookValue<Value> = readonly [Value | null, (newValue: Value) => void];
+
 const parseJSON = <Value>(key: string, value: string | null): Value | null => {
   try {
     return value === null ? null : JSON.parse(value);
@@ -28,14 +30,14 @@ const parseJSON = <Value>(key: string, value: string | null): Value | null => {
   }
 };
 
-export const useLocalStorage = <T>(key: string) => {
+export const useLocalStorage = <T>(key: string): LocalStorageHookValue<T> => {
   const setLocalStorage = (newValue: T): void => {
     const serializedValue = JSON.stringify(newValue);
     window.localStorage.setItem(key, serializedValue);
     window.dispatchEvent(new StorageEvent('storage', {key, newValue: serializedValue}));
   };
 
-  const getSnapshot = () => {
+  const getSnapshot = (): string | null => {
     return localStorage.getItem(key);
   };
 

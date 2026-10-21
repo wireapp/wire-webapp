@@ -56,6 +56,11 @@ const backupMetadataIndentationSpaces = 2;
 
 const UINT8ARRAY_FIELDS = ['otr_key', 'sha256'];
 
+type WithoutEventRecordPrimaryKey<StoredEvent> = StoredEvent extends EventRecord
+  ? Omit<StoredEvent, 'primary_key'>
+  : never;
+type BackupEventRecord = WithoutEventRecordPrimaryKey<EventRecord>;
+
 export class BackupRepository {
   private readonly backupService: BackupService;
   private readonly conversationRepository: ConversationRepository;
@@ -92,7 +97,7 @@ export class BackupRepository {
   ): Promise<Blob> {
     this.canceled = false;
 
-    const checkCancelStatus = () => {
+    const checkCancelStatus = (): boolean => {
       return this.canceled;
     };
 
@@ -182,7 +187,11 @@ export class BackupRepository {
     return new Blob([Uint8Array.from(combinedArray)], {type: 'application/zip'});
   }
 
-  private async generateBackupHeader(user: User, password: string, backupCoder: BackUpHeader) {
+  private async generateBackupHeader(
+    user: User,
+    password: string,
+    backupCoder: BackUpHeader,
+  ): Promise<Uint8Array<ArrayBuffer>> {
     const backupHeader = await backupCoder.encodeHeader();
     if (backupHeader.byteLength === 0) {
       throw new Error('Backup header is empty');
@@ -367,7 +376,7 @@ export class BackupRepository {
   ): Promise<Conversation[]> {
     let importedEntities: Conversation[] = [];
 
-    const importConversationChunk = async (conversationChunk: ConversationRecord[]) => {
+    const importConversationChunk = async (conversationChunk: ConversationRecord[]): Promise<number> => {
       const importedConversationEntities =
         await this.conversationRepository.updateConversationStates(conversationChunk);
       importedEntities = importedEntities.concat(importedConversationEntities);
@@ -392,7 +401,7 @@ export class BackupRepository {
       });
     });
 
-    const importEventChunk = async (eventChunk: Omit<EventRecord, 'primary_key'>[]) => {
+    const importEventChunk = async (eventChunk: Omit<EventRecord, 'primary_key'>[]): Promise<number> => {
       const nbImported = await this.backupService.importEntities(StorageSchemata.OBJECT_STORE.EVENTS, eventChunk, {
         generateId: event => {
           return event.id;
@@ -405,13 +414,13 @@ export class BackupRepository {
     return this.chunkImport(importEventChunk, eventsToImport, Filename.EVENTS);
   }
 
-  private async importUsers(users: UserRecord[], progressCallback: ProgressCallback) {
+  private async importUsers(users: UserRecord[], progressCallback: ProgressCallback): Promise<void> {
     /* we want to remove users that don't have qualified ids (has we cannot generate primary keys for them) */
     const qualifiedUsers = users.filter(user => {
       return isTruthy(user.qualified_id);
     });
 
-    const importEventChunk = async (usersChunk: UserRecord[]) => {
+    const importEventChunk = async (usersChunk: UserRecord[]): Promise<number> => {
       const nbImported = await this.backupService.importEntities(StorageSchemata.OBJECT_STORE.USERS, usersChunk, {
         generatePrimaryKey: user => {
           return constructUserPrimaryKey(user.qualified_id);
@@ -446,7 +455,7 @@ export class BackupRepository {
     }
   }
 
-  private prepareEvents(entity: EventRecord) {
+  private prepareEvents(entity: EventRecord): BackupEventRecord {
     const data = entity.data as any;
     if (isTruthy(data)) {
       UINT8ARRAY_FIELDS.forEach(field => {
@@ -459,7 +468,7 @@ export class BackupRepository {
     return omit(entity, 'primary_key');
   }
 
-  private mapDecodingError(decodingError: string) {
+  private mapDecodingError(decodingError: string): void {
     let message = '';
     switch (decodingError) {
       case ERROR_TYPES.INVALID_USER_ID: {

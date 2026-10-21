@@ -42,7 +42,7 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {ConversationRecord} from 'Repositories/storage/record/conversationRecord';
 import {type Translate} from 'Util/localizerUtil';
 
-import {ACCESS_STATE} from './AccessState';
+import {ACCESS_STATE, type TEAM} from './AccessState';
 import {ConversationStatus} from './ConversationStatus';
 import {ConversationVerificationState} from './ConversationVerificationState';
 import {NOTIFICATION_STATE} from './NotificationSetting';
@@ -51,6 +51,8 @@ import {BaseError, BASE_ERROR_TYPE} from '../../error/baseError';
 import {ConversationError} from '../../error/conversationError';
 
 const guestLinkAccessModeCount = 2;
+type TeamAccessState =
+  typeof TEAM.GUEST_ROOM | typeof TEAM.GUESTS_SERVICES | typeof TEAM.SERVICES | typeof TEAM.TEAM_ONLY;
 
 /** Conversation self data from the database. */
 export interface SelfStatusUpdateDatabaseData {
@@ -794,7 +796,7 @@ export class ConversationMapper {
     return conversationEntity.accessState(personalAccessState);
   }
 
-  private static mapAccessStateV2(accessRole: CONVERSATION_ACCESS_ROLE[]) {
+  private static mapAccessStateV2(accessRole: CONVERSATION_ACCESS_ROLE[]): TeamAccessState | undefined {
     if (!accessRole.includes(CONVERSATION_ACCESS_ROLE.TEAM_MEMBER)) {
       return undefined;
     }

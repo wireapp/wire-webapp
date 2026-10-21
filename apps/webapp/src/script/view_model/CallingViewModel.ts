@@ -220,7 +220,7 @@ export class CallingViewModel {
       }
     });
 
-    const showE2EICallModal = (conversationEntity: Conversation, media?: CallMediaChoice) => {
+    const showE2EICallModal = (conversationEntity: Conversation, media?: CallMediaChoice): void => {
       PrimaryModal.show(
         PrimaryModal.type.CONFIRM,
         {
@@ -250,7 +250,7 @@ export class CallingViewModel {
       );
     };
 
-    const showMaxUsersToCallModalWithoutConfirm = (conversationEntity: Conversation, media?: CallMediaChoice) => {
+    const showMaxUsersToCallModalWithoutConfirm = (conversationEntity: Conversation, media?: CallMediaChoice): void => {
       const memberCount = conversationEntity.participating_user_ets().length;
 
       PrimaryModal.show(
@@ -480,7 +480,7 @@ export class CallingViewModel {
     });
   }
 
-  private showRestrictedConferenceCallingModal() {
+  private showRestrictedConferenceCallingModal(): void {
     if (this.teamState.isInTeam(this.selfUser())) {
       if (this.selfUser().teamRole() === ROLE.OWNER) {
         PrimaryModal.show(
@@ -594,7 +594,7 @@ export class CallingViewModel {
     return isPermissionGranted(PermissionType.CAMERA);
   }
 
-  readonly onCancelScreenSelection = () => {
+  readonly onCancelScreenSelection = (): void => {
     this.callState.selectableScreens([]);
     this.callState.selectableWindows([]);
   };

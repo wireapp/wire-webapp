@@ -32,10 +32,18 @@ const testFactory = new TestFactory();
 
 jest.spyOn(mlsSupport, 'isMLSSupportedByEnvironment').mockResolvedValue(true);
 
+type MLSFeaturesConfig = {
+  mls: {status: FEATURE_STATUS; config: {supportedProtocols: CONVERSATION_PROTOCOL[]}};
+  mlsMigration: {
+    status: FEATURE_STATUS;
+    config: {startTime?: string; finaliseRegardlessAfter?: string};
+  };
+};
+
 const generateMLSFeaturesConfig = (
   migrationStatus: MLSMigrationStatus,
   supportedProtocols: CONVERSATION_PROTOCOL[],
-) => {
+): MLSFeaturesConfig => {
   const now = Date.now();
 
   switch (migrationStatus) {
@@ -92,7 +100,7 @@ const generateMLSFeaturesConfig = (
   }
 };
 
-const createMockClientResponse = (doesSupportMLS = false, wasActiveWithinLast4Weeks = false) => {
+const createMockClientResponse = (doesSupportMLS = false, wasActiveWithinLast4Weeks = false): RegisteredClient => {
   return {
     mls_public_keys: doesSupportMLS ? {ed25519: 'key'} : {},
     last_active: wasActiveWithinLast4Weeks
@@ -101,7 +109,11 @@ const createMockClientResponse = (doesSupportMLS = false, wasActiveWithinLast4We
   } as unknown as RegisteredClient;
 };
 
-const generateListOfSelfClients = ({allActiveClientsMLSCapable}: {allActiveClientsMLSCapable: boolean}) => {
+const generateListOfSelfClients = ({
+  allActiveClientsMLSCapable,
+}: {
+  allActiveClientsMLSCapable: boolean;
+}): RegisteredClient[] => {
   const clients: RegisteredClient[] = [];
 
   new Array(4).fill(0).forEach(() => {

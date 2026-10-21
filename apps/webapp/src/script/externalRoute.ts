@@ -51,7 +51,7 @@ export const getUserProfileUrl = (userId: string, domain: string): string | unde
   return getAccountPagesUrl(`/user-profile/?id=${userId}@${domain}`);
 };
 
-const getPrivacyPolicyUrl = () => {
+const getPrivacyPolicyUrl = (): string => {
   const language = currentLanguage();
   if (language === 'de-DE') {
     return PRIVACY_POLICY_URL_DE;
@@ -59,7 +59,7 @@ const getPrivacyPolicyUrl = () => {
   return URL.PRIVACY_POLICY;
 };
 
-const getTermsOfUseUrl = () => {
+const getTermsOfUseUrl = (): string => {
   const language = currentLanguage();
   if (language === 'de-DE') {
     return TERMS_OF_USE_URL_DE;

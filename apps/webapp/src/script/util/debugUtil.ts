@@ -29,7 +29,9 @@ import {
 } from '@wireapp/api-client/lib/event/';
 import type {Notification, NotificationList} from '@wireapp/api-client/lib/notification/';
 import {CONVERSATION_PROTOCOL, FEATURE_KEY, FEATURE_STATUS} from '@wireapp/api-client/lib/team/feature/';
+import type {FeatureList} from '@wireapp/api-client/lib/team/feature/featureList.types';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
+import type {BaseCreateConversationResponse} from '@wireapp/core/lib/conversation/conversationService/conversationService.types';
 import {NotificationSource} from '@wireapp/core/lib/notification';
 import {DatabaseKeys} from '@wireapp/core/lib/notification/notificationDatabaseRepository';
 import {Dexie} from 'dexie';
@@ -79,6 +81,10 @@ const debugDumpIndentationSpaces = 2;
 const debugFrameRectangleSizeInPixels = 10;
 const debugFrameUpdateIntervalInMilliseconds = 500;
 const debugCaptureFramesPerSecond = 25;
+type TeamSupportedProtocolsFeature = NonNullable<FeatureList['mls']>;
+type MLSMigrationFeature = NonNullable<FeatureList['mlsMigration']>;
+type DebugEventInfo = {conversation: Conversation; event: ConversationEvent; user?: User};
+type ActiveCallStats = {userid: string; stats: RTCStatsReport};
 
 /* eslint-disable @typescript-eslint/no-magic-numbers -- Log levels define the external logging API values inline. */
 export enum CoreCryptoLogLevel {
@@ -163,7 +169,7 @@ export class DebugUtil {
     this.setupAvsDebugger();
   }
 
-  async importEvents() {
+  async importEvents(): Promise<void> {
     try {
       const [fileHandle] = await window.showOpenFilePicker();
       const file = await fileHandle.getFile();
@@ -195,7 +201,7 @@ export class DebugUtil {
     }
   }
 
-  addCallParticipants(number: number) {
+  addCallParticipants(number: number): void {
     const call = this.callState.activeCalls()[0];
 
     if (call === undefined) {
@@ -212,7 +218,7 @@ export class DebugUtil {
 
   /** will print all the ids of entities that show on screen (userIds, conversationIds, messageIds) */
   toggleDebugUi = (): void => {
-    const logMLSInfo = async (event: Event) => {
+    const logMLSInfo = async (event: Event): Promise<void> => {
       const eventTarget = event.currentTarget;
       if (!(eventTarget instanceof HTMLDivElement)) {
         return;
@@ -247,13 +253,13 @@ export class DebugUtil {
       });
     };
 
-    const removeDebugInfo = (els: NodeListOf<HTMLElement>) => {
+    const removeDebugInfo = (els: NodeListOf<HTMLElement>): void => {
       return els.forEach(el => {
         el.parentNode?.removeChild(el);
       });
     };
 
-    const addDebugInfo = (els: NodeListOf<HTMLElement>) => {
+    const addDebugInfo = (els: NodeListOf<HTMLElement>): void => {
       return els.forEach(el => {
         const debugInfo = document.createElement('div');
         debugInfo.classList.add('debug-info');
@@ -285,7 +291,7 @@ export class DebugUtil {
     }
   };
 
-  breakLastNotificationId() {
+  breakLastNotificationId(): Promise<number> {
     return this.storageRepository.storageService.update(
       StorageSchemata.OBJECT_STORE.AMPLIFY,
       DatabaseKeys.PRIMARY_KEY_LAST_NOTIFICATION,
@@ -297,11 +303,11 @@ export class DebugUtil {
     return this.apiClient.transport.http.isGzipEnabled();
   }
 
-  toggleGzipping(enabled: boolean) {
+  toggleGzipping(enabled: boolean): void {
     this.apiClient.transport.http.toggleGzip(enabled);
   }
 
-  reconnectWebSocket({dryRun} = {dryRun: false}) {
+  reconnectWebSocket({dryRun} = {dryRun: false}): Promise<void> {
     const teamFeatures = this.teamState.teamFeatures();
     const useAsyncNotificationStream =
       teamFeatures?.[FEATURE_KEY.CONSUMABLE_NOTIFICATIONS]?.status === FEATURE_STATUS.ENABLED;
@@ -309,30 +315,30 @@ export class DebugUtil {
     return this.eventRepository.connectWebSocket(this.core, useLegacyNotificationStream, noop, dryRun);
   }
 
-  async reconnectWebSocketWithLastNotificationIdFromBackend({dryRun} = {dryRun: false}) {
+  async reconnectWebSocketWithLastNotificationIdFromBackend({dryRun} = {dryRun: false}): Promise<void> {
     return this.reconnectWebSocket({dryRun});
   }
 
-  async updateActiveConversationKeyPackages() {
+  async updateActiveConversationKeyPackages(): Promise<void> {
     const groupId = this.conversationState.activeConversation()?.groupId;
     if (isNonEmptyString(groupId)) {
       return this.core.service?.mls?.renewKeyMaterial(groupId);
     }
   }
 
-  async enablePressSpaceToUnmute() {
+  async enablePressSpaceToUnmute(): Promise<void> {
     this.propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE, true);
   }
 
-  async disablePressSpaceToUnmute() {
+  async disablePressSpaceToUnmute(): Promise<void> {
     this.propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE, false);
   }
 
-  async setCoreCryptoMaxLogLevel(level: CoreCryptoLogLevel) {
+  async setCoreCryptoMaxLogLevel(level: CoreCryptoLogLevel): Promise<void> {
     return this.core.setMaxCoreCryptoLogLevel(level);
   }
 
-  async resetMLSConversation() {
+  async resetMLSConversation(): Promise<BaseCreateConversationResponse> {
     return (this.core.service?.conversation as any).resetMLSConversation(
       this.conversationState.activeConversation()?.qualifiedId,
     );
@@ -342,11 +348,11 @@ export class DebugUtil {
     return this.callingRepository.getBackgroundEffectsHandler().readPerformancePanelEnabledFromStore();
   }
 
-  enablePerformancePanel(flag: boolean) {
+  enablePerformancePanel(flag: boolean): boolean {
     return this.callingRepository.getBackgroundEffectsHandler().savePerformancePanelEnabledStateInStore(flag);
   }
 
-  setupAvsDebugger() {
+  setupAvsDebugger(): void {
     if (this.isEnabledAvsDebugger()) {
       this.enableAvsDebugger(true);
     }
@@ -422,7 +428,7 @@ export class DebugUtil {
   async setTeamSupportedProtocols(
     supportedProtocols: CONVERSATION_PROTOCOL[],
     defaultProtocol?: CONVERSATION_PROTOCOL,
-  ) {
+  ): Promise<TeamSupportedProtocolsFeature | undefined> {
     const {teamId} = await this.userRepository.getSelf();
     if (!isNonEmptyString(teamId)) {
       throw new Error('teamId of self user is undefined');
@@ -450,7 +456,7 @@ export class DebugUtil {
       finaliseRegardlessAfter: new Date(Date.now() + TIME_IN_MILLIS.YEAR).toISOString(),
       allowManualMigration: true,
     },
-  ) {
+  ): Promise<MLSMigrationFeature | undefined> {
     const {teamId} = await this.userRepository.getSelf();
 
     if (!isNonEmptyString(teamId)) {
@@ -488,7 +494,7 @@ export class DebugUtil {
    * This is used by QA to fill the input
    * @param text the text to add to the input
    */
-  inputText(text: string) {
+  inputText(text: string): void {
     // This is a hacky way of accessing the lexical editor directly from the DOM element
     const lexicalEditor = (document.querySelector<HTMLElement>('[data-uie-name=input-message]') as any)
       .__lexicalEditor as LexicalEditor;
@@ -505,11 +511,11 @@ export class DebugUtil {
   }
 
   // Used by QA to trigger a focus event on the app (in order to trigger the update of the team feature-config)
-  simulateAppToForeground() {
+  simulateAppToForeground(): void {
     window.dispatchEvent(new FocusEvent('focus'));
   }
 
-  setE2EICertificateTtl(ttl: number) {
+  setE2EICertificateTtl(ttl: number): void {
     E2EIHandler.getInstance().certificateTtl = ttl;
   }
 
@@ -720,16 +726,16 @@ export class DebugUtil {
     const clientId = this.clientState.currentClient?.id;
     const userId = this.userState.self().id;
 
-    const isOTRMessage = (notification: BackendEvent) => {
+    const isOTRMessage = (notification: BackendEvent): boolean => {
       return notification.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD;
     };
-    const isInCurrentConversation = (notification: ConversationEvent) => {
+    const isInCurrentConversation = (notification: ConversationEvent): boolean => {
       return notification.conversation === conversationId;
     };
-    const wasSentByOurCurrentClient = (notification: ConversationOtrMessageAddEvent) => {
+    const wasSentByOurCurrentClient = (notification: ConversationOtrMessageAddEvent): boolean => {
       return notification.from === userId && notification.data.sender === clientId;
     };
-    const hasExpectedTimestamp = (notification: ConversationOtrMessageAddEvent, dateTime: Date) => {
+    const hasExpectedTimestamp = (notification: ConversationOtrMessageAddEvent, dateTime: Date): boolean => {
       return notification.time === dateTime.toISOString();
     };
     const conversation = await this.conversationRepository.getConversationById({domain: '', id: conversationId});
@@ -769,9 +775,7 @@ export class DebugUtil {
     this.logger.info(logMessage);
   }
 
-  async getEventInfo(
-    event: ConversationEvent,
-  ): Promise<{conversation: Conversation; event: ConversationEvent; user?: User}> {
+  async getEventInfo(event: ConversationEvent): Promise<DebugEventInfo> {
     const conversationId = event.qualified_conversation ?? {domain: '', id: event.conversation};
     const conversation = await this.conversationRepository.getConversationById(conversationId);
 
@@ -801,7 +805,7 @@ export class DebugUtil {
     return this.callingRepository['callLog'].join('\n');
   }
 
-  getActiveCallStats() {
+  getActiveCallStats(): Promise<ActiveCallStats[]> | undefined {
     const activeCall = this.callState.joinedCall();
     if (isNullOrUndefined(activeCall)) {
       throw new Error('no active call found');
@@ -884,7 +888,7 @@ export class DebugUtil {
     }
   }
 
-  injectLegalHoldLeaveEvent(includeSelf = false, maxUsers = Infinity) {
+  injectLegalHoldLeaveEvent(includeSelf = false, maxUsers = Infinity): Promise<void | BackendEvent> {
     const conversation = this.conversationState.activeConversation();
     if (conversation === undefined) {
       return Promise.resolve();
@@ -915,7 +919,7 @@ export class DebugUtil {
     );
   }
 
-  blockUserForLegalHold(userId: string) {
+  blockUserForLegalHold(userId: string): Promise<void | BackendEvent> {
     const conversation = this.conversationState.activeConversation();
     if (conversation === undefined) {
       return Promise.resolve();
@@ -939,7 +943,7 @@ export class DebugUtil {
   }
 
   // Used by QA test automation, allows to disable or enable the forced error reporting
-  disableForcedErrorReporting() {
+  disableForcedErrorReporting(): void {
     return disableForcedErrorReporting();
   }
 }
