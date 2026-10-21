@@ -104,6 +104,25 @@ describe('CellsRepository upload cancellation', () => {
   });
 });
 
+describe('CellsRepository bulk moves', () => {
+  it('forwards all selected paths in one request and returns the Cells result', async () => {
+    const response = {BackgroundActions: [{JobUuid: 'move-job', Name: 'move'}]};
+    const apiClient = {
+      api: {
+        cells: {
+          moveNodes: jest.fn().mockResolvedValue(response),
+        },
+      },
+    };
+    const repository = new CellsRepository(apiClient as never);
+    const move = {currentPaths: ['Drive/file.txt', 'Drive/Folder'], targetPath: 'conversation-id@example.com/Archive'};
+
+    await expect(repository.moveNodes(move)).resolves.toBe(response);
+    expect(apiClient.api.cells.moveNodes).toHaveBeenCalledTimes(1);
+    expect(apiClient.api.cells.moveNodes).toHaveBeenCalledWith(move);
+  });
+});
+
 describe('CellsRepository upload paths', () => {
   const uploadPath = 'conversation-id@example.com/direct-upload';
 

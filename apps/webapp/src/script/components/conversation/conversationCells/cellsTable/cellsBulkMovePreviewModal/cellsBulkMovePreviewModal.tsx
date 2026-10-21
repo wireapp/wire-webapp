@@ -20,12 +20,14 @@
 import type {FunctionComponent} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
+import type {RestPerformActionResponse} from 'cells-sdk-ts';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {CellNode} from 'src/script/types/cellNode';
 
 import {CellsBulkMovePreviewPresentation} from './cellsBulkMovePreviewPresentation';
 import {useBulkMoveDestinationSelection} from './useBulkMoveDestinationSelection';
+import {useMoveSelectedCellsNodes} from './useMoveSelectedCellsNodes';
 
 interface CellsBulkMovePreviewModalProps {
   isOpen: boolean;
@@ -34,6 +36,10 @@ interface CellsBulkMovePreviewModalProps {
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
   conversationName: string;
+  isMoveOutcomeUnresolved: boolean;
+  isMoveRequestError: boolean;
+  onMoveResult: (response: RestPerformActionResponse) => void;
+  onMoveError: () => void;
 }
 
 export const CellsBulkMovePreviewModal: FunctionComponent<CellsBulkMovePreviewModalProps> = ({
@@ -43,6 +49,10 @@ export const CellsBulkMovePreviewModal: FunctionComponent<CellsBulkMovePreviewMo
   cellsRepository,
   conversationQualifiedId,
   conversationName,
+  isMoveOutcomeUnresolved,
+  isMoveRequestError,
+  onMoveResult,
+  onMoveError,
 }: CellsBulkMovePreviewModalProps) => {
   const destination = useBulkMoveDestinationSelection({
     isOpen,
@@ -50,14 +60,34 @@ export const CellsBulkMovePreviewModal: FunctionComponent<CellsBulkMovePreviewMo
     cellsRepository,
     conversationQualifiedId,
   });
+  const move = useMoveSelectedCellsNodes({
+    conversationQualifiedId,
+    destinationPath: destination.selectedDestinationPath,
+    selectedNodes,
+    cellsRepository,
+  });
+  const handleClose = (): void => {
+    if (move.isSubmitting) {
+      return;
+    }
+
+    onClose();
+  };
 
   return (
     <CellsBulkMovePreviewPresentation
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={handleClose}
       selectedNodes={selectedNodes}
       conversationName={conversationName}
       destination={destination}
+      onMove={move.submitMove}
+      onMoveResult={onMoveResult}
+      onMoveError={onMoveError}
+      isMoveOutcomeUnresolved={isMoveOutcomeUnresolved}
+      isMoveRequestError={isMoveRequestError}
+      isMoveDisabled={!move.isValid || move.isSubmitting || isMoveOutcomeUnresolved || destination.status !== 'success'}
+      isMoveLoading={move.isSubmitting}
     />
   );
 };

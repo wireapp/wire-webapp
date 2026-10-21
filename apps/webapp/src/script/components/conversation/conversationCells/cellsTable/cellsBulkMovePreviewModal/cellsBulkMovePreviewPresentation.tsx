@@ -17,7 +17,10 @@
  *
  */
 
-import type {FunctionComponent} from 'react';
+import {useEffect, useRef, type FunctionComponent} from 'react';
+
+import {RestActionStatus, type RestPerformActionResponse} from 'cells-sdk-ts';
+import type {Result} from 'true-myth';
 
 import {CellsModal} from 'Components/conversation/conversationCells/common/cellsModal/cellsModal';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -33,6 +36,13 @@ interface CellsBulkMovePreviewPresentationProps {
   selectedNodes: CellNode[];
   conversationName: string;
   destination: BulkMoveDestinationSelection;
+  onMove: () => Promise<Result<RestPerformActionResponse, unknown>>;
+  onMoveResult: (response: RestPerformActionResponse) => void;
+  onMoveError: () => void;
+  isMoveOutcomeUnresolved: boolean;
+  isMoveRequestError: boolean;
+  isMoveDisabled: boolean;
+  isMoveLoading: boolean;
 }
 
 export const CellsBulkMovePreviewPresentation: FunctionComponent<CellsBulkMovePreviewPresentationProps> = ({
@@ -41,8 +51,42 @@ export const CellsBulkMovePreviewPresentation: FunctionComponent<CellsBulkMovePr
   selectedNodes,
   conversationName,
   destination,
+  onMove,
+  onMoveResult,
+  onMoveError,
+  isMoveOutcomeUnresolved,
+  isMoveRequestError,
+  isMoveDisabled,
+  isMoveLoading,
 }: CellsBulkMovePreviewPresentationProps) => {
   const {translate} = useApplicationContext();
+  const isCurrentDialog = useRef(true);
+
+  useEffect(() => {
+    isCurrentDialog.current = true;
+    return () => {
+      isCurrentDialog.current = false;
+    };
+  }, []);
+
+  const handleMove = async (): Promise<void> => {
+    const moveResult = await onMove();
+    if (!isCurrentDialog.current) {
+      return;
+    }
+
+    if (moveResult.isErr) {
+      onMoveError();
+      return;
+    }
+
+    if (moveResult.isOk) {
+      onMoveResult(moveResult.value);
+      if (moveResult.value.Status === RestActionStatus.Performed) {
+        onClose();
+      }
+    }
+  };
 
   return (
     <CellsModal isOpen={isOpen} onClose={onClose} size="large">
@@ -70,10 +114,22 @@ export const CellsBulkMovePreviewPresentation: FunctionComponent<CellsBulkMovePr
           return path;
         }}
       />
+      {isMoveOutcomeUnresolved && (
+        <div role="alert">
+          <p>
+            {isMoveRequestError
+              ? translate('cells.newItemMenuModalForm.genericError')
+              : translate('cells.bulkMove.outcomeUnresolved')}
+          </p>
+        </div>
+      )}
       <CellsModal.Actions>
         <CellsModal.SecondaryButton onClick={onClose}>
           {translate('cells.moveNodeModal.cancelButton')}
         </CellsModal.SecondaryButton>
+        <CellsModal.PrimaryButton onClick={handleMove} isDisabled={isMoveDisabled}>
+          {translate(isMoveLoading ? 'cells.bulkMove.movingButton' : 'cells.bulkMove.moveButton')}
+        </CellsModal.PrimaryButton>
       </CellsModal.Actions>
     </CellsModal>
   );
