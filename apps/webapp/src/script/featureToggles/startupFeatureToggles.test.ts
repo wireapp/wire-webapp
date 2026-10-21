@@ -27,6 +27,7 @@ import {
   conversationListCollapseFeatureToggleName,
   disableMessagePreprocessingFeatureToggleName,
   driveBulkActionsFeatureToggleName,
+  sendCallLogsFeatureToggleName,
   sharedDriveDirectUploadFeatureToggleName,
   startupFeatureToggleNames,
   forTestsOnlyFeatureToggleName,
@@ -39,6 +40,7 @@ const featureToggleNamesWithDedicatedExistenceTests = [
   disableMessagePreprocessingFeatureToggleName,
   sharedDriveDirectUploadFeatureToggleName,
   driveBulkActionsFeatureToggleName,
+  sendCallLogsFeatureToggleName,
 ] as const;
 
 describe('startupFeatureToggles', function () {
@@ -47,6 +49,16 @@ describe('startupFeatureToggles', function () {
 
     expect(startupFeatureToggles.isFeatureToggleEnabled(applockRefactoredFeatureToggleName)).toBe(false);
     expect(startupFeatureToggles.enabledFeatureToggleNames).toEqual([]);
+  });
+
+  it('keeps sending call logs disabled by default and enables it through developer settings', () => {
+    expect(
+      createStartupFeatureTogglesFromLocationSearch('').isFeatureToggleEnabled(sendCallLogsFeatureToggleName),
+    ).toBe(false);
+    const enabled = createStartupFeatureTogglesFromLocationSearch(
+      `?${startupFeatureToggleQueryParameterName}=${sendCallLogsFeatureToggleName}`,
+    );
+    expect(enabled.isFeatureToggleEnabled(sendCallLogsFeatureToggleName)).toBe(true);
   });
 
   it('keeps Drive bulk actions disabled by default', () => {
@@ -190,6 +202,7 @@ describe('startupFeatureToggles', function () {
       disableMessagePreprocessingFeatureToggleName,
       sharedDriveDirectUploadFeatureToggleName,
       driveBulkActionsFeatureToggleName,
+      sendCallLogsFeatureToggleName,
     ]);
   });
 

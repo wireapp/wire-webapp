@@ -19,6 +19,8 @@
 
 import React from 'react';
 
+import type {CSSObject} from '@emotion/react';
+
 import {ClientNotificationData} from 'Repositories/notification/PreferenceNotificationRepository';
 import type {Translate as TranslationFunction} from 'Util/localizerUtil';
 
@@ -75,6 +77,9 @@ export interface ModalOptions {
   allButtonsFullWidth?: boolean;
   primaryBtnFirst?: boolean;
   size?: ModalSize;
+  bodyCSS?: CSSObject;
+  optionPosition?: 'before-actions' | 'after-actions';
+  optionVariant?: 'default' | 'warning';
   /** DOM element where modal should be rendered for detached windows */
   container?: Element | DocumentFragment;
 }
@@ -117,6 +122,9 @@ export interface ModalContent {
   allButtonsFullWidth?: boolean;
   primaryBtnFirst?: boolean;
   size?: ModalSize;
+  bodyCSS?: CSSObject;
+  optionPosition?: 'before-actions' | 'after-actions';
+  optionVariant?: 'default' | 'warning';
   container?: Element | DocumentFragment;
 }
 

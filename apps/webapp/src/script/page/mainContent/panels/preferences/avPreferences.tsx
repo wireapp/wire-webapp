@@ -28,6 +28,7 @@ import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import type {MediaDeviceType} from 'Repositories/media/MediaDeviceType';
 import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import type {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
+import {sendCallLogsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {AudioOutPreferences} from './avPreferences/audioOutPreferences';
@@ -35,6 +36,7 @@ import {CallOptions} from './avPreferences/callOptions';
 import {CameraPreferences} from './avPreferences/cameraPreferences';
 import {MicrophonePreferences} from './avPreferences/microphonePreferences';
 import {SaveCallLogs} from './avPreferences/saveCallLogs';
+import {SendCallLogs} from './avPreferences/sendCallLogs';
 import {PreferencesPage} from './components/preferencesPage';
 import {useCameraReloadOnCallEnd} from './useCameraReloadOnCallEnd';
 
@@ -48,7 +50,7 @@ interface AVPreferencesProps {
 }
 
 const AVPreferencesComponent = ({propertiesRepository, callingRepository, deviceSupport}: AVPreferencesProps) => {
-  const {translate} = useApplicationContext();
+  const {translate, isFeatureToggleEnabled} = useApplicationContext();
   const devicesHandler = container.resolve(MediaDevicesHandler);
   const constraintsHandler = container.resolve(MediaConstraintsHandler);
   const streamHandler = container.resolve(MediaStreamHandler);
@@ -96,7 +98,12 @@ const AVPreferencesComponent = ({propertiesRepository, callingRepository, device
           return callingRepository.refreshAudioInput();
         }}
       />
-      {callingRepository.supportsCalling && <SaveCallLogs {...{callingRepository}} />}
+      {callingRepository.supportsCalling &&
+        (isFeatureToggleEnabled(sendCallLogsFeatureToggleName) ? (
+          <SendCallLogs callingRepository={callingRepository} />
+        ) : (
+          <SaveCallLogs callingRepository={callingRepository} />
+        ))}
     </PreferencesPage>
   );
 };

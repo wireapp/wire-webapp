@@ -102,6 +102,9 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
     allButtonsFullWidth = false,
     primaryBtnFirst = false,
     size = 'small',
+    bodyCSS = {},
+    optionPosition = 'before-actions',
+    optionVariant = 'default',
     container,
   } = content;
 
@@ -274,7 +277,7 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
 
   const onKeyDown = useCallback(
     (event: KeyboardEvent) => {
-      if (isEscapeKey(event)) {
+      if (isEscapeKey(event) && !showLoadingIndicator) {
         removeCurrentModal();
         closeAction();
       }
@@ -285,7 +288,7 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
         removeCurrentModal();
       }
     },
-    [closeAction, primaryAction],
+    [closeAction, primaryAction, showLoadingIndicator],
   );
 
   useEffect(() => {
@@ -353,7 +356,7 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
         hideCloseBtn={hideCloseBtn}
         closeAction={closeAction}
       />
-      <FadingScrollbar className="modal__body">
+      <FadingScrollbar className="modal__body" css={bodyCSS}>
         <MessageContent message={message} translatedMessage={translatedMessage} translate={translate} />
 
         {isGuestLinkPassword && (
@@ -432,12 +435,27 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
 
         {errorMessage !== undefined && errorMessage !== '' && <div className="modal__input__error">{errorMessage}</div>}
 
-        {isOption && <CheckboxOption isChecked={optionChecked} onChange={onOptionChange} label={checkboxLabel} />}
+        {isOption && optionPosition === 'before-actions' && (
+          <CheckboxOption
+            isChecked={optionChecked}
+            onChange={onOptionChange}
+            label={checkboxLabel}
+            variant={optionVariant}
+          />
+        )}
 
         {showLoadingIndicator ? (
           <PrimaryModalLoading />
         ) : (
           <PrimaryModalButtons isColumn={hasMultipleSecondary || allButtonsFullWidth}>{buttons}</PrimaryModalButtons>
+        )}
+        {isOption && optionPosition === 'after-actions' && (
+          <CheckboxOption
+            isChecked={optionChecked}
+            onChange={onOptionChange}
+            label={checkboxLabel}
+            variant={optionVariant}
+          />
         )}
       </FadingScrollbar>
     </PrimaryModalShell>

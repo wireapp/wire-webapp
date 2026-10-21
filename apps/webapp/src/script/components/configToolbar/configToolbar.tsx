@@ -35,6 +35,7 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CoreCryptoLogLevel} from 'Util/debugUtil';
 import {getLogger} from 'Util/logger';
 
+import {CallLogsUploadSettings} from './callLogsUploadSettings';
 import {wrapperStyles} from './configToolbar.styles';
 import {openDebugToolbarEventName} from './debugToolbarEvents';
 
@@ -624,6 +625,10 @@ export function ConfigToolbar() {
       <hr />
 
       <div>{renderStartupFeatureToggleCheckboxList()}</div>
+
+      <hr />
+
+      <CallLogsUploadSettings />
 
       <hr />
 
