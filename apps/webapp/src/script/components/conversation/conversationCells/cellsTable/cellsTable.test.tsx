@@ -157,7 +157,6 @@ const renderCellsTable = ({
   readonly cellsRepository?: CellsRepository;
   readonly selfUserDriveRole?: CellsSelfUserDriveRole;
   readonly initialNodes?: CellNode[];
-  readonly onBulkMoveResult?: (response: RestPerformActionResponse) => void;
 } = {}): RenderCellsTableResult => {
   const wrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({
