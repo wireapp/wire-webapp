@@ -38,7 +38,6 @@ interface UseBulkMoveDestinationSelectionProps {
 }
 
 export interface BulkMoveDestinationSelection {
-  currentDestination: string;
   currentPath: string;
   disabledDestinationLabels: Readonly<Record<string, string>>;
   disabledDestinationPaths: readonly string[];
@@ -127,14 +126,7 @@ export const useBulkMoveDestinationSelection = ({
     setSelectedDestinationPath(getDestinationPath(path));
   };
 
-  const driveLabel = translate('cells.bulkMove.drive');
-  const currentDestination =
-    selectedDestinationPath.length > 0
-      ? `${driveLabel} / ${selectedDestinationPath.split('/').filter(Boolean).join(' / ')}`
-      : driveLabel;
-
   return {
-    currentDestination,
     currentPath,
     disabledDestinationLabels,
     disabledDestinationPaths,

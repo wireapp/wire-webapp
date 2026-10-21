@@ -92,7 +92,6 @@ export const CellsBulkMovePreviewModal: FunctionComponent<CellsBulkMovePreviewMo
     <CellsBulkMovePreviewPresentation
       isOpen={isOpen}
       onClose={handleClose}
-      selectedNodes={selectedNodes}
       conversationName={conversationName}
       destination={destination}
       onMove={move.submitMove}

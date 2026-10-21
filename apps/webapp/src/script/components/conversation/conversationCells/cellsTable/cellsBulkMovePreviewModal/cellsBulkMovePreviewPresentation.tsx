@@ -24,7 +24,6 @@ import type {Result} from 'true-myth';
 
 import {CellsModal} from 'Components/conversation/conversationCells/common/cellsModal/cellsModal';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {CellNode} from 'src/script/types/cellNode';
 
 import {BulkMoveDestinationSelection} from './useBulkMoveDestinationSelection';
 
@@ -33,7 +32,6 @@ import {CellsFoldersListModalContent} from '../cellsTableColumns/cellsTableRowOp
 interface CellsBulkMovePreviewPresentationProps {
   isOpen: boolean;
   onClose: () => void;
-  selectedNodes: CellNode[];
   conversationName: string;
   destination: BulkMoveDestinationSelection;
   onMove: () => Promise<Result<RestPerformActionResponse, unknown>>;
@@ -53,7 +51,6 @@ interface CellsBulkMovePreviewPresentationProps {
 export const CellsBulkMovePreviewPresentation: FunctionComponent<CellsBulkMovePreviewPresentationProps> = ({
   isOpen,
   onClose,
-  selectedNodes,
   conversationName,
   destination,
   onMove,
@@ -101,15 +98,7 @@ export const CellsBulkMovePreviewPresentation: FunctionComponent<CellsBulkMovePr
 
   return (
     <CellsModal isOpen={isOpen} onClose={onClose} size="large">
-      <CellsModal.Header>
-        {selectedNodes.length === 1
-          ? translate('cells.bulkMove.previewTitleSingular')
-          : translate('cells.bulkMove.previewTitle', {count: selectedNodes.length})}
-      </CellsModal.Header>
-      <p>{translate('cells.bulkMove.previewDescription')}</p>
-      <p aria-live="polite">
-        {translate('cells.bulkMove.currentDestination', {destination: destination.currentDestination})}
-      </p>
+      <CellsModal.Header>{translate('cells.moveNodeModal.moveTitle')}</CellsModal.Header>
       <CellsFoldersListModalContent
         conversationName={conversationName}
         destination={destination}

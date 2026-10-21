@@ -57,14 +57,8 @@ const translateSelectionForTest: Translate = (key, substitutions) => {
   if (key === 'cells.selection.move') {
     return 'Move';
   }
-  if (key === 'cells.bulkMove.previewTitleSingular') {
-    return 'Preview move of 1 item';
-  }
-  if (key === 'cells.bulkMove.previewTitle') {
-    return `Preview move of ${substitutions?.count} items`;
-  }
-  if (key === 'cells.bulkMove.previewDescription') {
-    return 'Choose a destination in this conversation’s Drive, then move the selected items.';
+  if (key === 'cells.moveNodeModal.moveTitle') {
+    return 'Move to folder';
   }
   if (key === 'cells.bulkMove.moveButton') {
     return 'Move';
@@ -74,12 +68,6 @@ const translateSelectionForTest: Translate = (key, substitutions) => {
   }
   if (key === 'cells.bulkMove.outcomeUnresolved') {
     return 'Move status is unresolved. Verify the Drive before trying again.';
-  }
-  if (key === 'cells.bulkMove.currentDestination') {
-    return `Current destination: ${substitutions?.destination}`;
-  }
-  if (key === 'cells.bulkMove.drive') {
-    return 'Drive';
   }
   if (key === 'cells.bulkMove.selected') {
     return 'Selected';
@@ -329,32 +317,27 @@ describe('CellsTable selection', () => {
     await user.click(screen.getByRole('button', {name: 'Move'}));
 
     const preview = await screen.findByRole('dialog');
-    expect(within(preview).getByText('Preview move of 2 items')).toBeInTheDocument();
+    expect(within(preview).getByRole('heading', {name: 'Move to folder'})).toBeInTheDocument();
     expect(
-      within(preview).getByText('Choose a destination in this conversation’s Drive, then move the selected items.'),
-    ).toBeInTheDocument();
+      within(preview).queryByText('Choose a destination in this conversation’s Drive, then move the selected items.'),
+    ).not.toBeInTheDocument();
+    expect(within(preview).queryByText(/Current destination:/)).not.toBeInTheDocument();
+    expect(within(preview).getByRole('button', {name: 'cells.breadcrumb.files'})).toBeInTheDocument();
     expect(within(preview).queryByRole('region', {name: 'Selected items'})).not.toBeInTheDocument();
     expect(within(preview).queryByText('Wire logs.pdf')).not.toBeInTheDocument();
-    expect(within(preview).getByText('Current destination: Drive')).toBeInTheDocument();
     expect(within(preview).getByRole('button', {name: 'Move'})).toBeEnabled();
 
     const selectedSourceFolder = await within(preview).findByRole('button', {name: 'Marketing images Selected'});
     expect(selectedSourceFolder).toBeDisabled();
     await user.click(await within(preview).findByRole('button', {name: 'Design reviews'}));
-    expect(
-      within(preview).getByText('Current destination: Drive / wire-cells-web / Design reviews'),
-    ).toBeInTheDocument();
+    expect(within(preview).getByRole('button', {name: 'Design reviews'})).toHaveAttribute('aria-pressed', 'true');
 
     await user.click(within(preview).getByRole('button', {name: 'Open Design reviews'}));
-    expect(
-      await within(preview).findByText('Current destination: Drive / wire-cells-web / Design reviews'),
-    ).toBeInTheDocument();
+    const designReviewsBreadcrumbs = within(preview).getAllByRole('list')[0];
+    expect(within(designReviewsBreadcrumbs).getByText('Design reviews')).toBeInTheDocument();
     await user.click(await within(preview).findByRole('button', {name: 'Open Quarterly reviews'}));
-    expect(
-      await within(preview).findByText(
-        'Current destination: Drive / wire-cells-web / Design reviews / Quarterly reviews',
-      ),
-    ).toBeInTheDocument();
+    const quarterlyReviewsBreadcrumbs = within(preview).getAllByRole('list')[0];
+    expect(within(quarterlyReviewsBreadcrumbs).getByText('Quarterly reviews')).toBeInTheDocument();
     await waitFor(() => {
       expect(repository.getAllNodes).toHaveBeenCalledTimes(3);
     });
@@ -372,8 +355,8 @@ describe('CellsTable selection', () => {
     await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
     await user.click(screen.getByRole('button', {name: 'Move'}));
     const reopenedPreview = await screen.findByRole('dialog');
-    expect(within(reopenedPreview).getByText('Current destination: Drive')).toBeInTheDocument();
-    expect(within(reopenedPreview).getByText('Preview move of 1 item')).toBeInTheDocument();
+    expect(within(reopenedPreview).getByRole('heading', {name: 'Move to folder'})).toBeInTheDocument();
+    expect(within(reopenedPreview).getByRole('button', {name: 'cells.breadcrumb.files'})).toBeInTheDocument();
     expect(within(reopenedPreview).queryByRole('region', {name: 'Selected items'})).not.toBeInTheDocument();
     expect(within(reopenedPreview).queryByText('Wire logs.pdf')).not.toBeInTheDocument();
     await user.click(within(reopenedPreview).getByRole('button', {name: 'cells.moveNodeModal.cancelButton'}));
@@ -508,7 +491,8 @@ describe('CellsTable selection', () => {
     await user.click(screen.getByRole('button', {name: 'Move'}));
     const preview = await screen.findByRole('dialog');
     await user.click(within(preview).getByRole('button', {name: 'cells.breadcrumb.files'}));
-    expect(within(preview).getByText('Current destination: Drive')).toBeInTheDocument();
+    const breadcrumbs = within(preview).getAllByRole('list')[0];
+    expect(within(breadcrumbs).getByText('cells.breadcrumb.files')).toBeInTheDocument();
     await user.click(within(preview).getByRole('button', {name: 'Move'}));
 
     await waitFor(() => {
@@ -554,7 +538,8 @@ describe('CellsTable selection', () => {
     const preview = await screen.findByRole('dialog');
     await user.click(within(preview).getByRole('button', {name: 'A'}));
 
-    expect(await within(preview).findByText('Current destination: Drive / wire-cells-web / A')).toBeInTheDocument();
+    const breadcrumbs = within(preview).getAllByRole('list')[0];
+    expect(within(breadcrumbs).getByText('A')).toBeInTheDocument();
     expect(await within(preview).findByRole('button', {name: 'B Current location'})).toBeDisabled();
     expect(within(preview).getByRole('button', {name: 'Move'})).toBeEnabled();
 
