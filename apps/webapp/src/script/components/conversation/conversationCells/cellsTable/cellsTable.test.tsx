@@ -126,7 +126,6 @@ const createDataTransfer = (files: readonly File[]): DataTransfer => {
 };
 
 const renderCellsTable = ({
-
   folderPath = 'conversation-id@example.com/Marketing/images',
   onDropFilesToFolder = jest.fn(),
   onDropReadError = jest.fn(),
