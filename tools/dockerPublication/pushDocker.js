@@ -22,6 +22,7 @@
 const child = require('child_process');
 const nodeFileSystem = require('fs');
 const path = require('path');
+
 const appConfigPkg = require('../../apps/webapp/app-config/package.json');
 
 const shortenedCommitIdentifierLength = 7;
@@ -45,13 +46,7 @@ function selectReleaseCommit({releaseCommitSha, commandLineCommitSha, githubSha}
 }
 
 function createUniqueImageTag({versionTag, configurationVersion, releaseCommitSha}) {
-  return (
-    versionTag.replace('/', '-') +
-    '-' +
-    configurationVersion +
-    '-' +
-    releaseCommitSha.substring(0, shortenedCommitIdentifierLength)
-  );
+  return `${versionTag.replace('/', '-')}-${configurationVersion}-${releaseCommitSha.substring(0, shortenedCommitIdentifierLength)}`;
 }
 
 function selectWebAppConfigurationEntry(versionTag, productionTag) {
@@ -155,7 +150,7 @@ function runDockerPublication(
 
   const commitShortSha = releaseCommitSha.substring(0, shortenedCommitIdentifierLength);
   const dockerRegistryDomain = 'quay.io';
-  const repository = dockerRegistryDomain + '/wire/webapp';
+  const repository = `${dockerRegistryDomain}/wire/webapp`;
   const containerImageTags = [];
   const requiredEnvironmentDefaultKeys = [
     'BACKEND_NAME',
@@ -167,7 +162,7 @@ function runDockerPublication(
   const environmentDefaultsSmokeCheckCommand = [
     'test -s /dist/.env.defaults',
     ...requiredEnvironmentDefaultKeys.map(requiredEnvironmentDefaultKey => {
-      return 'grep -q "^' + requiredEnvironmentDefaultKey + '=" /dist/.env.defaults';
+      return `grep -q "^${requiredEnvironmentDefaultKey}=" /dist/.env.defaults`;
     }),
   ].join(' && ');
 
@@ -177,14 +172,14 @@ function runDockerPublication(
   const uniqueImageTag = createUniqueImageTag({versionTag, configurationVersion, releaseCommitSha});
 
   if (printImageTagOnly) {
-    console.log(uniqueImageTag);
+    console.info(uniqueImageTag);
     return uniqueImageTag;
   }
 
   /** One Docker image can have multiple tags, e.g. "production" (links always to the latest production build) & "2021-08-30-production.0-v0.28.25-0-1240cfd" (links to a fixed production build) */
-  containerImageTags.push(repository + ':' + versionTag);
+  containerImageTags.push(`${repository}:${versionTag}`);
 
-  containerImageTags.push(repository + ':' + uniqueImageTag);
+  containerImageTags.push(`${repository}:${uniqueImageTag}`);
 
   const dockerUsername = environment.DOCKER_USERNAME;
   const dockerPassword = environment.DOCKER_PASSWORD;

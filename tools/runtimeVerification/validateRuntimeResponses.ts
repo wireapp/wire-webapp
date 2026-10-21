@@ -53,7 +53,7 @@ function parseJson(serializedValue: string, valueDescription: string): ParsedJso
   try {
     return {value: JSON.parse(serializedValue), errors: []};
   } catch {
-    return {value: undefined, errors: [valueDescription + ' is not valid JSON']};
+    return {value: undefined, errors: [`${valueDescription} is not valid JSON`]};
   }
 }
 
@@ -77,11 +77,11 @@ export function validateBuildMetadataResponse(
     const actualValue = responseValue[propertyName];
 
     if (typeof actualValue !== 'string' || actualValue.length === 0) {
-      return [propertyName + ' must be a non-empty string'];
+      return [`${propertyName} must be a non-empty string`];
     }
 
     if (actualValue !== expectedBuildMetadata[propertyName]) {
-      return [propertyName + ' does not match the expected artifact metadata'];
+      return [`${propertyName} does not match the expected artifact metadata`];
     }
 
     return [];
@@ -130,11 +130,11 @@ export function validateRuntimeConfiguration(
     const actualValue = configurationValue[propertyName];
 
     if (typeof actualValue !== 'string' || actualValue.length === 0) {
-      return [propertyName + ' must be a non-empty string'];
+      return [`${propertyName} must be a non-empty string`];
     }
 
     if (normalizeUrl(actualValue) !== expectedBackendValues[propertyName]) {
-      return [propertyName + ' does not match the expected runtime backend'];
+      return [`${propertyName} does not match the expected runtime backend`];
     }
 
     return [];

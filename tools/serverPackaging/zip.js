@@ -17,9 +17,11 @@
  *
  */
 
+const archiver = require('archiver');
+
 const fs = require('fs');
 const path = require('path');
-const archiver = require('archiver');
+
 const archive = archiver('zip');
 
 const ROOT_PATH = path.resolve(__dirname, '../..');
@@ -41,7 +43,7 @@ const workspaceDeps = [];
 if (packageJson.dependencies) {
   Object.keys(packageJson.dependencies).forEach(dep => {
     if (packageJson.dependencies[dep].startsWith('workspace:')) {
-      console.log(`Marking workspace dependency as pre-bundled: ${dep}`);
+      console.info(`Marking workspace dependency as pre-bundled: ${dep}`);
       workspaceDeps.push(dep);
       // Read version from the library's package.json
       const libPkgPath = path.join(ROOT_PATH, 'libraries', dep.replace('@wireapp/', ''), 'package.json');

@@ -17,15 +17,17 @@
  *
  */
 
+import {createProjectGraphAsync} from '@nx/devkit';
+import type {ProjectGraph} from '@nx/devkit';
+
 import {spawn} from 'node:child_process';
 import {mkdir, writeFile} from 'node:fs/promises';
 import {join} from 'node:path';
 import process from 'node:process';
-import {createProjectGraphAsync} from '@nx/devkit';
-import type {ProjectGraph} from '@nx/devkit';
 
 const defaultReportsDirectory = 'unit-test-reports';
 const defaultCombinedReportFile = 'unit-tests.log';
+const manifestJsonIndentationSpaces = 2;
 
 export type TestableProject = {
   readonly name: string;
@@ -219,7 +221,7 @@ export async function runProjectTestReports(
 
   for (const testableProject of testableProjects) {
     const nxTestCommand = createNxTestCommand(testableProject.name);
-    console.log(`\n==> ${createCommandText(nxTestCommand)}`);
+    console.info(`\n==> ${createCommandText(nxTestCommand)}`);
     const commandExecutionResult = await runCommand(
       nxTestCommand.command,
       nxTestCommand.commandArguments,
@@ -255,7 +257,7 @@ async function writeReports(
   );
   await writeFile(
     join(reportSettings.reportsDirectory, 'manifest.json'),
-    `${JSON.stringify(createManifest(projectTestResults, reportSettings), null, 2)}\n`,
+    `${JSON.stringify(createManifest(projectTestResults, reportSettings), null, manifestJsonIndentationSpaces)}\n`,
   );
   await writeFile(reportSettings.combinedReportFile, createCombinedReport(projectTestResults, reportSettings));
 }
@@ -311,7 +313,7 @@ async function main(): Promise<void> {
 
     if (process.argv.includes('--list-projects')) {
       for (const testableProject of testableProjects) {
-        console.log(testableProject.name);
+        console.info(testableProject.name);
       }
 
       return;
