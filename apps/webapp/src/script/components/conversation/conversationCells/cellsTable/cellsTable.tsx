@@ -85,6 +85,7 @@ interface CellsTableProps {
   selectionEnabled: boolean;
   selectionScopeKey: string;
   selectionBarAnchor: HTMLElement | null;
+  random?: () => number;
 }
 
 interface CellsTableHeaderCellProps {
@@ -121,6 +122,8 @@ const preventDefaultFileDrop = (event: DragEvent<HTMLElement>): void => {
 
 const BACKGROUND_MOVE_STATUS_POLL_INTERVAL_MS = 1000;
 const BACKGROUND_MOVE_STATUS_RETRY_BACKOFF_FACTOR = 2;
+const BACKGROUND_MOVE_STATUS_RETRY_MIN_JITTER_FACTOR = 0.75;
+const BACKGROUND_MOVE_STATUS_RETRY_MAX_JITTER_FACTOR = 1.25;
 const MAX_BACKGROUND_MOVE_STATUS_RETRIES = 5;
 
 export const CellsTable = ({
@@ -141,6 +144,7 @@ export const CellsTable = ({
   selectionEnabled,
   selectionScopeKey,
   selectionBarAnchor,
+  random = Math.random,
 }: CellsTableProps) => {
   const {clock, translate, isFeatureToggleEnabled} = useApplicationContext();
   const canPerformCurrentDriveAction = useCellsActionPermissions();
@@ -189,7 +193,10 @@ export const CellsTable = ({
       }
 
       const retryDelay =
-        BACKGROUND_MOVE_STATUS_POLL_INTERVAL_MS * BACKGROUND_MOVE_STATUS_RETRY_BACKOFF_FACTOR ** retryCount;
+        BACKGROUND_MOVE_STATUS_POLL_INTERVAL_MS *
+        BACKGROUND_MOVE_STATUS_RETRY_BACKOFF_FACTOR ** retryCount *
+        (BACKGROUND_MOVE_STATUS_RETRY_MIN_JITTER_FACTOR +
+          random() * (BACKGROUND_MOVE_STATUS_RETRY_MAX_JITTER_FACTOR - BACKGROUND_MOVE_STATUS_RETRY_MIN_JITTER_FACTOR));
       retryCount += 1;
       scheduleNextCheck(retryDelay);
     };
@@ -262,7 +269,7 @@ export const CellsTable = ({
         clock.clearTimeout(timeout);
       }
     };
-  }, [backgroundMoveJobUuids, backgroundMoveStatusCheckId, cellsRepository, clock, onRefresh]);
+  }, [backgroundMoveJobUuids, backgroundMoveStatusCheckId, cellsRepository, clock, onRefresh, random]);
 
   useEffect(() => {
     const currentNodeIds = new Set<string>();

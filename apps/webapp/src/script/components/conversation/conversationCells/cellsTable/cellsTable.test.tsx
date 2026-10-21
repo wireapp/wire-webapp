@@ -138,6 +138,9 @@ const renderCellsTable = ({
   selfUserDriveRole = CELLS_SELF_USER_DRIVE_ROLE.EDITOR,
   onRefresh = jest.fn(),
   clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
+  random = () => {
+    return 0.5;
+  },
 }: {
   readonly folderPath?: string;
   readonly onDropFilesToFolder?: (files: readonly File[], uploadPath: string) => void;
@@ -152,6 +155,7 @@ const renderCellsTable = ({
   readonly selfUserDriveRole?: CellsSelfUserDriveRole;
   readonly onRefresh?: () => void;
   readonly clock?: ReturnType<typeof createDeterministicClock>;
+  readonly random?: () => number;
 } = {}) => {
   const wrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({
@@ -200,6 +204,7 @@ const renderCellsTable = ({
             selectionEnabled={isSelectionEnabled}
             selectionScopeKey={scopeKey}
             selectionBarAnchor={document.body}
+            random={random}
           />
         </CellsSelfUserDriveRoleProvider>
       </ThemeProvider>
@@ -670,6 +675,118 @@ describe('CellsTable selection', () => {
     window.location.hash = originalHash;
   });
 
+  it('jitters unknown-status retries within bounded, increasing exponential intervals', async () => {
+    const user = userEvent.setup();
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    const randomSamples = [0, 1 - Number.EPSILON];
+    let randomSampleIndex = 0;
+    const repository = {
+      getAllNodes: jest.fn().mockResolvedValue({Nodes: []}),
+      moveNodes: jest
+        .fn()
+        .mockResolvedValue({Status: 'Background', BackgroundActions: [{JobUuid: 'move-job', Name: 'move'}]}),
+      getBackgroundMoveInfo: jest
+        .fn()
+        .mockResolvedValueOnce({Status: 'Unknown'})
+        .mockResolvedValueOnce({Status: 'Unknown'})
+        .mockResolvedValueOnce({Status: 'Unknown'}),
+    } as unknown as CellsRepository;
+    const random = () => {
+      return randomSamples[randomSampleIndex++] ?? 0.5;
+    };
+    renderCellsTable({cellsRepository: repository, clock, random});
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+    await user.click(screen.getByRole('button', {name: 'Move'}));
+    const dialog = await screen.findByRole('dialog');
+    await user.click(within(dialog).getByRole('button', {name: 'Move'}));
+    await waitFor(() => {
+      expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(1);
+    });
+
+    await act(async () => {
+      clock.advanceByMilliseconds(749);
+      await Promise.resolve();
+    });
+    expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(1);
+    await act(async () => {
+      clock.advanceByMilliseconds(1);
+      await waitFor(() => {
+        expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(2);
+      });
+    });
+
+    await act(async () => {
+      clock.advanceByMilliseconds(2499);
+      await Promise.resolve();
+    });
+    expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(2);
+    await act(async () => {
+      clock.advanceByMilliseconds(1);
+      await waitFor(() => {
+        expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(3);
+      });
+    });
+  });
+
+  it('keeps normal polling steady and resets the retry backoff after a known status', async () => {
+    const user = userEvent.setup();
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    const random = jest.fn(() => {
+      return 0.5;
+    });
+    const repository = {
+      getAllNodes: jest.fn().mockResolvedValue({Nodes: []}),
+      moveNodes: jest
+        .fn()
+        .mockResolvedValue({Status: 'Background', BackgroundActions: [{JobUuid: 'move-job', Name: 'move'}]}),
+      getBackgroundMoveInfo: jest
+        .fn()
+        .mockResolvedValueOnce({Status: 'Unknown'})
+        .mockResolvedValueOnce({Status: 'Running'})
+        .mockResolvedValueOnce({Status: 'Unknown'})
+        .mockResolvedValueOnce({Status: 'Finished'}),
+    } as unknown as CellsRepository;
+    renderCellsTable({cellsRepository: repository, clock, random});
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+    await user.click(screen.getByRole('button', {name: 'Move'}));
+    const dialog = await screen.findByRole('dialog');
+    await user.click(within(dialog).getByRole('button', {name: 'Move'}));
+    await waitFor(() => {
+      expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(1);
+    });
+    expect(random).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      clock.advanceByMilliseconds(1000);
+      await waitFor(() => {
+        expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(2);
+      });
+    });
+    expect(random).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      clock.advanceByMilliseconds(1000);
+      await waitFor(() => {
+        expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(3);
+      });
+    });
+    expect(random).toHaveBeenCalledTimes(2);
+
+    await act(async () => {
+      clock.advanceByMilliseconds(999);
+      await Promise.resolve();
+    });
+    expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(3);
+    await act(async () => {
+      clock.advanceByMilliseconds(1);
+      await waitFor(() => {
+        expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(4);
+      });
+    });
+  });
+
   it('keeps retry blocked after a mixed terminal result despite loading or refreshed rows', async () => {
     const originalHash = window.location.hash;
     window.location.hash = '#/conversation/conversation-id@example.com/files/wire-cells-web';
@@ -744,6 +861,9 @@ describe('CellsTable selection', () => {
     const user = userEvent.setup();
     const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
     const onRefresh = jest.fn();
+    const random = jest.fn(() => {
+      return 0.5;
+    });
     const repository = {
       getAllNodes: jest.fn().mockResolvedValue({Nodes: []}),
       moveNodes: jest
@@ -759,7 +879,7 @@ describe('CellsTable selection', () => {
         .mockResolvedValueOnce({Status: 'Unknown'})
         .mockResolvedValueOnce({Status: 'Finished'}),
     } as unknown as CellsRepository;
-    renderCellsTable({cellsRepository: repository, onRefresh, clock});
+    renderCellsTable({cellsRepository: repository, onRefresh, clock, random});
 
     await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
     await user.click(screen.getByRole('button', {name: 'Move'}));
@@ -780,10 +900,10 @@ describe('CellsTable selection', () => {
       expect(within(dialog).getByRole('alert')).toHaveTextContent('cells.bulkMove.statusUnknown');
     });
     expect(repository.moveNodes).toHaveBeenCalledTimes(1);
+    expect(random).toHaveBeenCalledTimes(5);
     expect(within(dialog).getByRole('button', {name: 'Move'})).toBeDisabled();
     expect(onRefresh).not.toHaveBeenCalled();
     expect(within(dialog).getByRole('alert')).toHaveTextContent('cells.bulkMove.statusUnknown');
-
     await user.click(within(dialog).getByRole('button', {name: 'cells.bulkMove.checkStatus'}));
     await waitFor(() => {
       expect(onRefresh).toHaveBeenCalledTimes(1);
