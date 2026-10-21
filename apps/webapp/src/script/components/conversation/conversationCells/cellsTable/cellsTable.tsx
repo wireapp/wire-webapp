@@ -160,6 +160,7 @@ export const CellsTable: FunctionComponent<CellsTableProps> = ({
     if (response.Status === RestActionStatus.Performed) {
       setIsBulkMoveOutcomeUnresolved(false);
       setIsBulkMoveRequestError(false);
+      setSelectedNodeIds(new Set());
       onRefresh();
       return;
     }

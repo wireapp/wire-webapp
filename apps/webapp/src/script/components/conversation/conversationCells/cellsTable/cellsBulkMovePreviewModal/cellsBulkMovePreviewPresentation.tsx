@@ -17,7 +17,7 @@
  *
  */
 
-import type {FunctionComponent} from 'react';
+import {useEffect, useRef, type FunctionComponent} from 'react';
 
 import {RestActionStatus, type RestPerformActionResponse} from 'cells-sdk-ts';
 import type {Result} from 'true-myth';
@@ -60,9 +60,21 @@ export const CellsBulkMovePreviewPresentation: FunctionComponent<CellsBulkMovePr
   isMoveLoading,
 }: CellsBulkMovePreviewPresentationProps) => {
   const {translate} = useApplicationContext();
+  const isCurrentDialog = useRef(true);
+
+  useEffect(() => {
+    isCurrentDialog.current = true;
+    return () => {
+      isCurrentDialog.current = false;
+    };
+  }, []);
 
   const handleMove = async (): Promise<void> => {
     const moveResult = await onMove();
+    if (!isCurrentDialog.current) {
+      return;
+    }
+
     if (moveResult.isErr) {
       onMoveError();
       return;

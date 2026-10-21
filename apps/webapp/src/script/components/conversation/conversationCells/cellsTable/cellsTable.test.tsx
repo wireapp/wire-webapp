@@ -17,7 +17,7 @@
  *
  */
 
-import {fireEvent, render, screen, waitFor, within} from '@testing-library/react';
+import {act, fireEvent, render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {noop} from 'noop-esm';
 
@@ -49,7 +49,7 @@ const selectionTranslations: Partial<Record<TranslationKey, string>> = {
   'cells.bulkMove.previewDescription':
     'Choose a destination in this conversation’s Drive, then move the selected items.',
   'cells.bulkMove.selectedItems': 'Selected items',
-  'cells.bulkMove.outcomeUnresolved': 'Move status is unresolved. Verify the Drive before trying again.',
+  'cells.bulkMove.outcomeUnresolved': 'Move status is unresolved. Further moves are disabled in this view.',
   'cells.bulkMove.drive': 'Drive',
   'cells.bulkMove.selected': 'Selected',
   'cells.bulkMove.currentLocation': 'Current location',
@@ -428,7 +428,10 @@ describe('CellsTable selection', () => {
     await waitFor(() => {
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
-    expect(screen.getByText('2 selected')).toBeInTheDocument();
+    expect(screen.queryByText('2 selected')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'Move'})).not.toBeInTheDocument();
+    expect(screen.getByRole('checkbox', {name: 'Select Marketing images'})).not.toBeChecked();
+    expect(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'})).not.toBeChecked();
     expect(onRefresh).toHaveBeenCalledTimes(1);
     window.location.hash = originalHash;
   });
@@ -516,6 +519,60 @@ describe('CellsTable selection', () => {
     expect(within(reopenedDialog).getByRole('alert')).toHaveTextContent('cells.newItemMenuModalForm.genericError');
     expect(repository.moveNodes).toHaveBeenCalledTimes(1);
     window.location.hash = originalHash;
+  });
+
+  it.each([
+    {
+      name: 'Performed',
+      complete: () => {
+        return Promise.resolve({Status: 'Performed'});
+      },
+    },
+    {
+      name: 'Background',
+      complete: () => {
+        return Promise.resolve({Status: 'Background'});
+      },
+    },
+    {
+      name: 'error',
+      complete: () => {
+        return Promise.reject(new Error('Move failed'));
+      },
+    },
+  ])('ignores a stale $name result after opening another move dialog', async ({complete}) => {
+    const user = userEvent.setup();
+    let completeMove: () => void = noop;
+    const pendingMove = new Promise<void>(resolve => {
+      completeMove = resolve;
+    }).then(complete);
+    const repository = {
+      getAllNodes: jest.fn().mockResolvedValue({Nodes: []}),
+      moveNodes: jest.fn().mockReturnValue(pendingMove),
+    } as unknown as CellsRepository;
+    const onRefresh = jest.fn();
+    const {rerenderWithSelectionScope} = renderCellsTable({cellsRepository: repository, onRefresh});
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+    await user.click(screen.getByRole('button', {name: 'Move'}));
+    await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Move'}));
+    rerenderWithSelectionScope('conversation:/subfolder');
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+    await user.click(screen.getByRole('button', {name: 'Move'}));
+    const laterDialog = await screen.findByRole('dialog');
+
+    await act(async () => {
+      completeMove();
+      await pendingMove.catch(noop);
+    });
+
+    expect(laterDialog).toBeInTheDocument();
+    expect(within(laterDialog).getByRole('button', {name: 'Move'})).toBeEnabled();
+    expect(within(laterDialog).queryByRole('alert')).not.toBeInTheDocument();
+    expect(screen.getByText('1 selected')).toBeInTheDocument();
+    expect(onRefresh).not.toHaveBeenCalled();
+    expect(repository.moveNodes).toHaveBeenCalledTimes(1);
   });
 
   it('prevents duplicate submissions while a move request is pending', async () => {
