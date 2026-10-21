@@ -92,7 +92,6 @@ export const CellsBulkMovePreviewModal: FunctionComponent<CellsBulkMovePreviewMo
     <CellsBulkMovePreviewPresentation
       isOpen={isOpen}
       onClose={handleClose}
-      selectedNodes={selectedNodes}
       conversationName={conversationName}
       destination={destination}
       onMove={move.submitMove}
@@ -102,6 +101,7 @@ export const CellsBulkMovePreviewModal: FunctionComponent<CellsBulkMovePreviewMo
       isMoveRequestError={isMoveRequestError}
       isMoveDisabled={
         !move.isValid ||
+        destination.disabledDestinationPaths.includes(destination.selectedDestinationPath) ||
         move.isSubmitting ||
         isMoveOutcomeUnresolved ||
         isBackgroundMovePending ||

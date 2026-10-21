@@ -19,6 +19,8 @@
 
 import {CSSObject} from '@emotion/react';
 
+import {selectionBarBreadcrumbAnchorStyles as sharedSelectionBarBreadcrumbAnchorStyles} from 'Components/cells/common/cellsSelectionBar/cellsSelectionBar.styles';
+
 export const wrapperStyles: CSSObject = {
   display: 'flex',
   alignItems: 'flex-start',
@@ -44,6 +46,11 @@ export const breadcrumbsRowStyles: CSSObject = {
   height: '24px',
   alignItems: 'center',
   gap: '10px',
+};
+
+export const selectionBarBreadcrumbAnchorStyles: CSSObject = {
+  ...sharedSelectionBarBreadcrumbAnchorStyles,
+  pointerEvents: 'none',
 };
 
 export const rootHomeIconStyles: CSSObject = {
