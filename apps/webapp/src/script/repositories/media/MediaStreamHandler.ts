@@ -40,8 +40,14 @@ import {NoAudioInputError} from '../../error/noAudioInputError';
 import {PermissionError} from '../../error/permissionError';
 import {Warnings} from '../../view_model/WarningsContainer';
 
+type DeniedPermissionWarningType =
+  typeof Warnings.TYPE.DENIED_CAMERA | typeof Warnings.TYPE.DENIED_MICROPHONE | typeof Warnings.TYPE.DENIED_SCREEN;
+type PermissionRequestWarningType =
+  typeof Warnings.TYPE.REQUEST_CAMERA | typeof Warnings.TYPE.REQUEST_MICROPHONE | typeof Warnings.TYPE.REQUEST_SCREEN;
+type MediaStreamHandlerConfig = {PERMISSION_HINT_DELAY: number};
+
 export class MediaStreamHandler {
-  static get CONFIG() {
+  static get CONFIG(): MediaStreamHandlerConfig {
     return {PERMISSION_HINT_DELAY: 200};
   }
 
@@ -286,7 +292,11 @@ export class MediaStreamHandler {
     }
   }
 
-  private selectPermissionDeniedWarningType(audio: boolean, video: boolean, screen: boolean) {
+  private selectPermissionDeniedWarningType(
+    audio: boolean,
+    video: boolean,
+    screen: boolean,
+  ): DeniedPermissionWarningType {
     if (video) {
       return Warnings.TYPE.DENIED_CAMERA;
     }
@@ -296,7 +306,11 @@ export class MediaStreamHandler {
     return Warnings.TYPE.DENIED_MICROPHONE;
   }
 
-  private selectPermissionRequestWarningType(audio: boolean, video: boolean, screen: boolean) {
+  private selectPermissionRequestWarningType(
+    audio: boolean,
+    video: boolean,
+    screen: boolean,
+  ): PermissionRequestWarningType {
     if (video) {
       return Warnings.TYPE.REQUEST_CAMERA;
     }

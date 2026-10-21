@@ -254,7 +254,7 @@ export class ConversationState {
    * Indicates whether the selfUser has a conversation (1:1 or group conversation) with this other user
    * @param user the user to check
    */
-  hasConversationWith(user: User) {
+  hasConversationWith(user: User): boolean {
     return this.connectedUsers().some(connectedUser => {
       return matchQualifiedIds(connectedUser.qualifiedId, user.qualifiedId);
     });

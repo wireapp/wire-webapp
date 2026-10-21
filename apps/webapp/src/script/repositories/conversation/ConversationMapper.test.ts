@@ -56,34 +56,34 @@ import {translateForTest} from 'Util/test/translateForTest';
 describe('ConversationMapper', () => {
   describe('mapConversations', () => {
     it('throws an error for unexpected parameters', () => {
-      const functionCallUndefinedParam = () => {
+      const functionCallUndefinedParam = (): Conversation[] => {
         //@ts-expect-error
         return ConversationMapper.mapConversations();
       };
 
       expect(functionCallUndefinedParam).toThrow(BaseError.MESSAGE.MISSING_PARAMETER);
 
-      const functionCallEmtpyArray = () => {
+      const functionCallEmtpyArray = (): Conversation[] => {
         return ConversationMapper.mapConversations([], 1, translate);
       };
 
       expect(functionCallEmtpyArray).toThrow(BaseError.MESSAGE.INVALID_PARAMETER);
 
-      const functionCallWrongType = () => {
+      const functionCallWrongType = (): Conversation[] => {
         //@ts-expect-error
         return ConversationMapper.mapConversations('Conversation');
       };
 
       expect(functionCallWrongType).toThrow(BaseError.MESSAGE.INVALID_PARAMETER);
 
-      const functionCallUndefinedInArray = () => {
+      const functionCallUndefinedInArray = (): Conversation[] => {
         // @ts-expect-error intentionally exercises an invalid array item
         return ConversationMapper.mapConversations([undefined], 1, translate);
       };
 
       expect(functionCallUndefinedInArray).toThrow(BaseError.MESSAGE.MISSING_PARAMETER);
 
-      const functionCallStringInArray = () => {
+      const functionCallStringInArray = (): Conversation[] => {
         //@ts-expect-error
         return ConversationMapper.mapConversations(['Conversation']);
       };

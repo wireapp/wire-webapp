@@ -30,7 +30,16 @@ import {APIClient} from '../../service/apiClientSingleton';
 import {Core} from '../../service/coreSingleton';
 import {translateForTest} from 'Util/test/translateForTest';
 
-function buildSearchRepository() {
+type SerializedSearchUser = {name: string; username: string};
+
+function buildSearchRepository(): readonly [
+  SearchRepository,
+  {
+    readonly userRepository: jest.Mocked<UserRepository>;
+    readonly core: jest.Mocked<Core>;
+    readonly apiClient: jest.Mocked<APIClient>;
+  },
+] {
   const userRepository = {
     getUsersById: jest.fn((): User[] => {
       return [];
@@ -271,7 +280,7 @@ describe('SearchRepository', () => {
   });
 });
 
-function createUser(handle: string | undefined, name: string | undefined) {
+function createUser(handle: string | undefined, name: string | undefined): User {
   const user = new User('', '', translateForTest);
   if (handle) {
     user.username(handle);
@@ -281,6 +290,6 @@ function createUser(handle: string | undefined, name: string | undefined) {
   }
   return user;
 }
-function serializeUser(userEntity: User) {
+function serializeUser(userEntity: User): SerializedSearchUser {
   return {name: userEntity.name(), username: userEntity.username()};
 }

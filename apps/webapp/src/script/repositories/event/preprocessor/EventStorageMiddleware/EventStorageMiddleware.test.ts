@@ -46,7 +46,29 @@ import {EventSource} from '../../EventSource';
 import {translateForTest} from 'Util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-function buildEventStorageMiddleware() {
+type MappedSessionResetEvent = Extract<
+  NonNullable<Awaited<ReturnType<CryptographyMapper['mapGenericMessage']>>>,
+  {type: typeof ClientEvent.CONVERSATION.SESSION_RESET}
+>;
+
+function requireMappedSessionResetEvent(
+  mappedEvent: Awaited<ReturnType<CryptographyMapper['mapGenericMessage']>>,
+): MappedSessionResetEvent {
+  if (mappedEvent === undefined || mappedEvent.type !== ClientEvent.CONVERSATION.SESSION_RESET) {
+    throw new Error('Expected a mapped session-reset event');
+  }
+
+  return mappedEvent;
+}
+
+function buildEventStorageMiddleware(): readonly [
+  EventStorageMiddleware,
+  {
+    readonly eventService: jest.Mocked<EventService>;
+    readonly conversationState: jest.Mocked<ConversationState>;
+    readonly selfUser: User;
+  },
+] {
   const eventService = {
     saveEvent: jest.fn(event => {
       return event;
@@ -124,7 +146,9 @@ describe('EventStorageMiddleware', () => {
           GenericMessage.create({messageId: 'reset-id', clientAction: ClientAction.RESET_SESSION}),
         ).finish(),
       );
-      const mappedEvent = await new CryptographyMapper().mapGenericMessage(decodedMessage, incomingEvent);
+      const mappedEvent = requireMappedSessionResetEvent(
+        await new CryptographyMapper().mapGenericMessage(decodedMessage, incomingEvent),
+      );
       const storedEvent = await middleware.processEvent(mappedEvent, EventSource.WEBSOCKET);
 
       expect(eventService.saveEvent).toHaveBeenCalledWith(mappedEvent);

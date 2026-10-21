@@ -45,7 +45,7 @@ export const joinConversationsAfterMigrationFinalisation = async ({
   core: Account;
   onSuccess: (conversation: Conversation) => void;
   onError?: (conversation: Conversation, error: unknown) => void;
-}) => {
+}): Promise<void> => {
   //we filter out the conversations that are known by the clients (saved in the db) before being refetch from the backend
   //if such conversations were previously using proteus, and now are using MLS,
   //it means that the self user did not take part in the migration and is joining a conversation late
@@ -59,7 +59,7 @@ export const joinConversationsAfterMigrationFinalisation = async ({
   });
 };
 
-const filterGroupConversationsAlreadyMigratedToMLS = (conversations: Conversation[]) => {
+const filterGroupConversationsAlreadyMigratedToMLS = (conversations: Conversation[]): MLSConversation[] => {
   return conversations.filter((conversation): conversation is MLSConversation => {
     if (!conversation.isGroupOrChannel()) {
       return false;

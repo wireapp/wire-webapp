@@ -149,8 +149,8 @@ export class CanvasMediaStreamMixer {
     return video;
   }
 
-  private startAnimation() {
-    const mixFrames = () => {
+  private startAnimation(): void {
+    const mixFrames = (): void => {
       if (isNullOrUndefined(this.screenVideo) || isNullOrUndefined(this.cameraVideo)) {
         return;
       }
@@ -235,7 +235,7 @@ export class CanvasMediaStreamMixer {
     }
   }
 
-  private setupPipWindow(pipWindow: Window) {
+  private setupPipWindow(pipWindow: Window): void {
     pipWindow.document.body.style.cssText = `
       margin: 0;
       padding: 0;
@@ -261,7 +261,7 @@ export class CanvasMediaStreamMixer {
     pipWindow.document.body.appendChild(video);
     this.isPipActive = true;
 
-    const updatePosition = () => {
+    const updatePosition = (): void => {
       this.targetOffsetX = pipWindow.screenX - window.screenX;
       this.targetOffsetY = pipWindow.screenY - window.screenY;
       this.positionAnimationFrame = requestAnimationFrame(updatePosition);
@@ -287,7 +287,7 @@ export class CanvasMediaStreamMixer {
     });
   }
 
-  private resetPipState() {
+  private resetPipState(): void {
     this.isPipActive = false;
     this.smallOffsetX = 0;
     this.smallOffsetY = 0;

@@ -49,6 +49,10 @@ interface GroupedNotifications {
   notification: Notification[];
   type: string;
 }
+type PreferenceNotificationRepositoryConfig = {
+  NOTIFICATION_TYPES: {NEW_CLIENT: string; READ_RECEIPTS_CHANGED: string};
+  STORAGE_KEY: string;
+};
 
 /**
  * Take care of storing and keeping track of all the notifications relative to the user preferences (read receipts config, active devices ...)
@@ -56,7 +60,7 @@ interface GroupedNotifications {
 export class PreferenceNotificationRepository {
   public readonly notifications: ko.ObservableArray<Notification>;
 
-  static get CONFIG() {
+  static get CONFIG(): PreferenceNotificationRepositoryConfig {
     return {
       NOTIFICATION_TYPES: {
         NEW_CLIENT: 'new-client',
@@ -114,7 +118,7 @@ export class PreferenceNotificationRepository {
       PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT,
       PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.READ_RECEIPTS_CHANGED,
     ];
-    const prio = (item: GroupedNotifications) => {
+    const prio = (item: GroupedNotifications): number => {
       return notificationPriorities.indexOf(item.type);
     };
     const notifications = this.notifications.removeAll();

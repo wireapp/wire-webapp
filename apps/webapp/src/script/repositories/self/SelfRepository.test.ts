@@ -35,7 +35,15 @@ import {Core} from '../../service/coreSingleton';
 
 const testFactory = new TestFactory();
 
-const generateMLSFeatureConfig = (supportedProtocols: CONVERSATION_PROTOCOL[]) => {
+type MLSFeatureConfig = {
+  allowedCipherSuites: number[];
+  defaultCipherSuite: number;
+  defaultProtocol: CONVERSATION_PROTOCOL;
+  protocolToggleUsers: string[];
+  supportedProtocols: CONVERSATION_PROTOCOL[];
+};
+
+const generateMLSFeatureConfig = (supportedProtocols: CONVERSATION_PROTOCOL[]): MLSFeatureConfig => {
   return {
     allowedCipherSuites: [1],
     defaultCipherSuite: 1,

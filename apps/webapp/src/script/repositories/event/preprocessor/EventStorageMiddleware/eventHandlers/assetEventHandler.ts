@@ -57,7 +57,7 @@ function computeEventUpdates(
   const handledEvent = isRetryEvent ? RETRY_EVENT : newEventData.status;
   const previewStatus = isPreviewEvent ? ASSET_PREVIEW : handledEvent;
 
-  const updateEventData = (newData: Partial<AssetAddEvent['data']>) => {
+  const updateEventData = (newData: Partial<AssetAddEvent['data']>): StoredEvent<AssetAddEvent> => {
     return {
       ...originalEvent,
       data: {...originalEvent.data, ...newData},

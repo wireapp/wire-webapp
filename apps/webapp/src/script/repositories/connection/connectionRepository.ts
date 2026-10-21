@@ -52,6 +52,9 @@ import {ConnectionState} from './connectionState';
 import {Config} from '../../Config';
 import {SystemMessageType} from '../../message/systemMessageType';
 
+type ConnectionRequestResult = {connectionStatus: ConnectionStatus; conversationId: QualifiedId};
+type ConnectionsResult = {connections: ConnectionEntity[]; deadConnections: ConnectionEntity[]};
+
 export class ConnectionRepository {
   private readonly connectionService: ConnectionService;
   private readonly userRepository: UserRepository;
@@ -81,7 +84,7 @@ export class ConnectionRepository {
    * @param eventJson JSON data for event
    * @param source Source of event
    */
-  private readonly onUserEvent = async (eventJson: UserEvent, source: EventSource) => {
+  private readonly onUserEvent = async (eventJson: UserEvent, source: EventSource): Promise<void> => {
     const eventType = eventJson.type;
 
     switch (eventType) {
@@ -94,7 +97,7 @@ export class ConnectionRepository {
     }
   };
 
-  private async onUserUpdate(eventJson: UserUpdateData) {
+  private async onUserUpdate(eventJson: UserUpdateData): Promise<void> {
     if (eventJson.user.id === this.userState.self()?.qualifiedId.id) {
       await this.deletePendingConnectionsToSelfNewTeamMembers();
       return;
@@ -196,9 +199,7 @@ export class ConnectionRepository {
    * @param userEntity User to connect to
    * @returns Promise that resolves to true if the request was successfully sent, false if not
    */
-  public async createConnection(
-    userEntity: User,
-  ): Promise<{connectionStatus: ConnectionStatus; conversationId: QualifiedId} | null> {
+  public async createConnection(userEntity: User): Promise<ConnectionRequestResult | null> {
     try {
       const response = await this.connectionService.postConnections(userEntity.qualifiedId);
       const connectionEvent = {connection: response, user: {name: userEntity.name()}};
@@ -329,9 +330,7 @@ export class ConnectionRepository {
    *
    * @returns Promise that resolves when all connections have been retrieved and mapped
    */
-  async getConnections(
-    teamMembers: QualifiedId[],
-  ): Promise<{connections: ConnectionEntity[]; deadConnections: ConnectionEntity[]}> {
+  async getConnections(teamMembers: QualifiedId[]): Promise<ConnectionsResult> {
     const connectionData = await this.connectionService.getConnections();
 
     const acceptedConnectionsOrNoneTeamMembersConnections: Connection[] = [];
@@ -498,7 +497,7 @@ export class ConnectionRepository {
     }
   }
 
-  public async deleteConnectionWithUser(user: User) {
+  public async deleteConnectionWithUser(user: User): Promise<void> {
     const connection = this.connectionState.connections().find(connection => {
       return matchQualifiedIds(connection.userId, user.qualifiedId);
     });
@@ -561,7 +560,7 @@ export class ConnectionRepository {
     }
   }
 
-  async deletePendingConnectionsToSelfNewTeamMembers() {
+  async deletePendingConnectionsToSelfNewTeamMembers(): Promise<void> {
     const freshSelf = await this.selfService.getSelf([]);
     const newTeamId = freshSelf.team;
 
@@ -592,7 +591,7 @@ export class ConnectionRepository {
     }
   }
 
-  async deletePendingConnectionToNewTeamMember(event: UserUpdateData) {
+  async deletePendingConnectionToNewTeamMember(event: UserUpdateData): Promise<void> {
     const newlyJoinedUserId = event.user.id;
     const selfUserDomain = this.userState.self()?.domain;
     const newlyJoinedUserQualifiedId = {

@@ -26,11 +26,11 @@ import {Conversation} from 'Repositories/entity/Conversation';
 
 import {useConversationFocus} from './useConversationFocus';
 
-const createConversation = (id: string) => {
+const createConversation = (id: string): Conversation => {
   return {id} as Conversation;
 };
 
-const createEvent = (key: string) => {
+const createEvent = (key: string): KeyboardEvent => {
   return {key, preventDefault: noop} as KeyboardEvent;
 };
 
@@ -89,7 +89,7 @@ describe('useConversationFocus', () => {
       }),
     );
     document.body.append(searchInput, ...focusableElements.values());
-    const focusConversation = (conversationId: string) => {
+    const focusConversation = (conversationId: string): boolean => {
       const element = focusableElements.get(conversationId);
       element?.focus();
       return document.activeElement === element;

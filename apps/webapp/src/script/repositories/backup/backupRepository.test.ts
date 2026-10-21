@@ -27,6 +27,7 @@ import {TestFactory} from 'test/helper/TestFactory';
 import {generateAPIUser} from 'test/helper/UserGenerator';
 
 import {User} from 'Repositories/entity/User';
+import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ClientEvent} from 'Repositories/event/Client';
 import {StorageService} from 'Repositories/storage';
 import {StorageSchemata} from 'Repositories/storage/storageSchemata';
@@ -76,7 +77,14 @@ const messages = [
   },
 ];
 
-async function buildBackupRepository() {
+type BackupRepositoryTestDependencies = {
+  readonly backupService: BackupService;
+  readonly conversationRepository: ConversationRepository;
+  readonly storageService: StorageService;
+};
+type BackupRepositoryTestFixture = readonly [BackupRepository, BackupRepositoryTestDependencies];
+
+async function buildBackupRepository(): Promise<BackupRepositoryTestFixture> {
   const storageService = container.resolve(StorageService);
   const engine = await createStorageEngine('test', DatabaseTypes.PERMANENT);
   storageService.init(engine);

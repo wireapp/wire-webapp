@@ -25,7 +25,12 @@ import {getLogger} from 'Util/logger';
 
 const logger = getLogger('useInitializeMediaDevices');
 
-export const useInitializeMediaDevices = (devicesHandler: MediaDevicesHandler, streamHandler: MediaStreamHandler) => {
+type MediaDeviceInitializationState = {areMediaDevicesInitialized: boolean};
+
+export const useInitializeMediaDevices = (
+  devicesHandler: MediaDevicesHandler,
+  streamHandler: MediaStreamHandler,
+): MediaDeviceInitializationState => {
   const [areMediaDevicesInitialized, setAreMediaDevicesInitialized] = useState(false);
 
   const initializeMediaDevices = useCallback(async () => {

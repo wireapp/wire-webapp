@@ -38,7 +38,7 @@ export const getForcedErrorReportingStatus = (): boolean => {
 };
 
 // Init the forced activation of error reporting based on the environment
-export const initForcedErrorReporting = () => {
+export const initForcedErrorReporting = (): void => {
   const {COUNTLY_ENABLE_LOGGING, COUNTLY_FORCE_REPORTING} = Config.getConfig();
   const {name} = getWebEnvironment();
 

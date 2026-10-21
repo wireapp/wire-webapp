@@ -22,11 +22,11 @@ export class TypedEventTarget<EventDef extends {type: any}> extends EventTarget 
     return this.dispatchEvent(new Event(event.type));
   }
 
-  public addEventListener<T extends EventDef['type']>(type: T, listener: ((e: Event & EventDef) => void) | null) {
+  public addEventListener<T extends EventDef['type']>(type: T, listener: ((e: Event & EventDef) => void) | null): void {
     super.addEventListener(type, listener);
   }
 
-  public removeEventListener(type: EventDef['type'], listener: (e: Event & EventDef) => void) {
+  public removeEventListener(type: EventDef['type'], listener: (e: Event & EventDef) => void): void {
     super.removeEventListener(type, listener);
   }
 }

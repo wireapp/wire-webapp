@@ -69,6 +69,8 @@ import {APIClient} from '../../service/apiClientSingleton';
 const teamRefreshIntervalInMinutes = 5;
 const minimumDesktopDownloadPathMinorVersion = 20;
 const minimumDesktopDownloadPathMajorVersion = 3;
+type TeamInitializationResult = {team: TeamEntity | undefined; features: FeatureList; members: QualifiedId[]};
+type UpdatedFeatureConfig = {newFeatureList: FeatureList; prevFeatureList?: FeatureList};
 
 export const HAS_PERSISTED_SUPPORTED_PROTOCOLS = 'HAS_PERSISTED_SUPPORTED_PROTOCOLS';
 
@@ -132,7 +134,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     );
   }
 
-  private updatePersistedSupportedProtocols() {
+  private updatePersistedSupportedProtocols(): void {
     localStorage.setItem(HAS_PERSISTED_SUPPORTED_PROTOCOLS, 'true');
   }
 
@@ -141,9 +143,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
    * @param teamId the Id of the team to init
    * @param contacts all the contacts the self user has, team members will be deduced from it.
    */
-  async initTeam(
-    teamId?: string,
-  ): Promise<{team: TeamEntity | undefined; features: FeatureList; members: QualifiedId[]}> {
+  async initTeam(teamId?: string): Promise<TeamInitializationResult> {
     const team = await this.getTeam();
     // get the fresh feature config from backend
     const newFeatureList = await this.teamService.getAllTeamFeatures();
@@ -183,7 +183,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     return {team, features: newFeatureList, members};
   }
 
-  private async updateFeatureConfig(): Promise<{newFeatureList: FeatureList; prevFeatureList?: FeatureList}> {
+  private async updateFeatureConfig(): Promise<UpdatedFeatureConfig> {
     const prevFeatureList = this.teamState.teamFeatures();
     const newFeatureList = await this.teamService.getAllTeamFeatures();
 
@@ -223,7 +223,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
   }
 
   private readonly scheduleTeamRefresh = async (): Promise<void> => {
-    const updateTeam = async () => {
+    const updateTeam = async (): Promise<void> => {
       try {
         updateRemoteConfigLogger.info('Updating team-settings');
         await this.getTeam();
@@ -242,7 +242,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     });
   };
 
-  private showReloadAppModal = () => {
+  private showReloadAppModal = (): void => {
     PrimaryModal.show(
       PrimaryModal.type.CONFIRM,
       {
@@ -593,7 +593,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     return this.teamService.getTeamById(teamId);
   }
 
-  private async onDelete(eventJson: TeamDeleteEvent | TeamMemberLeaveEvent) {
+  private async onDelete(eventJson: TeamDeleteEvent | TeamMemberLeaveEvent): Promise<void> {
     const {team: teamId} = eventJson;
     if (this.teamState.isTeam() && this.teamState.team().id === teamId) {
       this.teamState.isTeamDeleted(true);
@@ -601,7 +601,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     }
   }
 
-  private onDeleteConversation(eventJson: TeamConversationDeleteEvent) {
+  private onDeleteConversation(eventJson: TeamConversationDeleteEvent): void {
     const {
       data: {conv: conversationId},
     } = eventJson;
@@ -629,7 +629,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     await this.updateFeatureConfig();
   };
 
-  private async onMemberLeave(eventJson: TeamMemberLeaveEvent) {
+  private async onMemberLeave(eventJson: TeamMemberLeaveEvent): Promise<void> {
     const {
       data: {user: userId},
       team: teamId,

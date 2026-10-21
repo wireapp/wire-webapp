@@ -42,6 +42,12 @@ import {ConversationMapper} from './ConversationMapper';
 import {EphemeralStatusType} from '../../message/ephemeralStatusType';
 import {StatusType} from '../../message/statusType';
 
+type ConversationTimerRange = {MAX: TIME_IN_MILLIS; MIN: TIME_IN_MILLIS};
+type ConversationEphemeralHandlerConfig = {
+  INTERVAL_TIME: TIME_IN_MILLIS;
+  TIMER_RANGE: ConversationTimerRange;
+};
+
 export class ConversationEphemeralHandler extends AbstractConversationEventHandler {
   eventListeners: Record<string, (...args: any[]) => void>;
   eventService: EventService;
@@ -49,7 +55,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
   timedMessages: ko.ObservableArray<ContentMessage>;
   timedMessagesSubscription: ko.Subscription;
 
-  static get CONFIG() {
+  static get CONFIG(): ConversationEphemeralHandlerConfig {
     return {
       INTERVAL_TIME: TIME_IN_MILLIS.SECOND,
       TIMER_RANGE: {

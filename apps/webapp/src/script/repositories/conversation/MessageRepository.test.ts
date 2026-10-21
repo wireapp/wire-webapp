@@ -150,7 +150,7 @@ describe('MessageRepository', () => {
   const generateConversation = (
     conversation_type = CONVERSATION_TYPE.REGULAR,
     connection_status = ConnectionStatus.ACCEPTED,
-  ) => {
+  ): Conversation => {
     const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     conversation.type(conversation_type);
 

@@ -46,7 +46,7 @@ import {BackupRepository} from 'Repositories/backup/backupRepository';
 import {BackupService} from 'Repositories/backup/backupService';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {ClientRepository, ClientService} from 'Repositories/client';
+import {ClientRepository, ClientService, type ClientEntity} from 'Repositories/client';
 import {getClientMLSConfig} from 'Repositories/client/clientMLSConfig';
 import {subscribeToMLSKeyPackageUpdates} from 'Repositories/client/subscribeToMLSKeyPackageUpdates';
 import {ConnectionRepository} from 'Repositories/connection/connectionRepository';
@@ -143,6 +143,18 @@ import {WindowHandler} from '../ui/windowHandler';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
 import {Warnings} from '../view_model/WarningsContainer';
 
+type AppConfig = {
+  COOKIES_CHECK: {COOKIE_NAME: string};
+  NOTIFICATION_CHECK: number;
+};
+type AppServices = {
+  conversation: ConversationService;
+  event: EventService;
+  integration: IntegrationService;
+  notification: NotificationService;
+  storage: StorageService;
+};
+
 const notificationCheckIntervalInSeconds = 10;
 const connectionStatisticsRoundingFactor = 50;
 const conversationStatisticsRoundingFactor = 50;
@@ -174,7 +186,9 @@ type ApplicationStartupInput = {
   readonly timing: ApplicationStartupTimingInput;
 };
 
-export async function waitUntilAllMessagesAreProcessed(dependencies: WaitUntilAllMessagesAreProcessedDependencies) {
+export async function waitUntilAllMessagesAreProcessed(
+  dependencies: WaitUntilAllMessagesAreProcessedDependencies,
+): Promise<void> {
   const {eventRepository} = dependencies;
 
   await pWaitFor(
@@ -201,7 +215,7 @@ export class App {
   private newVersionPollingCleanup: (() => void) | undefined;
   private mlsConversationRecoveryCleanup: (() => void) | undefined;
 
-  static get CONFIG() {
+  static get CONFIG(): AppConfig {
     return {
       COOKIES_CHECK: {
         COOKIE_NAME: 'cookies_enabled',
@@ -400,7 +414,7 @@ export class App {
    * @param Encrypted database handler
    * @returns All services
    */
-  private _setupServices() {
+  private _setupServices(): AppServices {
     container.registerInstance(StorageService, new StorageService());
     const storageService = container.resolve(StorageService);
     const eventService = new EventService();
@@ -421,11 +435,11 @@ export class App {
   /**
    * Subscribe to amplify events.
    */
-  private _subscribeToEvents() {
+  private _subscribeToEvents(): void {
     amplify.subscribe(WebAppEvents.LIFECYCLE.SIGN_OUT, this.repository.lifeCycle.logout);
   }
 
-  private initializeCells({cellsRepository, selfUser}: {cellsRepository: CellsRepository; selfUser: User}) {
+  private initializeCells({cellsRepository, selfUser}: {cellsRepository: CellsRepository; selfUser: User}): void {
     const cellPydioApiKey = Config.getConfig().CELLS_TOKEN_SHARED_SECRET;
     const cellsInitWithZauthToken = Config.getConfig().FEATURE.CELLS_INIT_WITH_ZAUTH_TOKEN;
 
@@ -463,7 +477,11 @@ export class App {
    * @param config
    * @param onProgress
    */
-  async initApp(clientType: ClientType, onProgress: (message?: string) => void, startupInput: ApplicationStartupInput) {
+  async initApp(
+    clientType: ClientType,
+    onProgress: (message?: string) => void,
+    startupInput: ApplicationStartupInput,
+  ): Promise<User | undefined> {
     const application = this;
     const {applicationObservability, fetchLatestBuildMetadata, fireAndForgetInvoker, isOnline, clock} =
       startupInput.dependencies;
@@ -476,7 +494,7 @@ export class App {
     telemetry.timeStepAt(AppInitTimingsStep.DOM_CONTENT_LOADED, domContentLoadedAtMonotonicMicroseconds);
     telemetry.timeStepAt(AppInitTimingsStep.INIT_APP_STARTED, appInitStartedAtMonotonicMicroseconds);
 
-    function reportStartup(result: ApplicationStartupReport['result']) {
+    function reportStartup(result: ApplicationStartupReport['result']): Promise<void> {
       return reportApplicationStartup(
         {
           result,
@@ -488,7 +506,7 @@ export class App {
       );
     }
 
-    async function handleBaseError(baseError: BaseError) {
+    async function handleBaseError(baseError: BaseError): Promise<void> {
       await application._appInitFailure(baseError);
     }
 
@@ -872,10 +890,10 @@ export class App {
     }
 
     let recoveryInProgress = false;
-    const isApplicationActive = () => {
+    const isApplicationActive = (): boolean => {
       return document.visibilityState === 'visible';
     };
-    const isNotificationSyncLive = () => {
+    const isNotificationSyncLive = (): boolean => {
       return eventRepository.notificationHandlingState() === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
     };
 
@@ -930,10 +948,10 @@ export class App {
       }
     };
 
-    const triggerRecovery = () => {
+    const triggerRecovery = (): void => {
       return fireAndForgetInvoker.fireAndForget(recoverConversations);
     };
-    const handleVisibilityChange = () => {
+    const handleVisibilityChange = (): void => {
       if (isApplicationActive()) {
         triggerRecovery();
       }
@@ -954,7 +972,7 @@ export class App {
     triggerRecovery();
   }
 
-  private _appInitFailure(error: BaseError) {
+  private _appInitFailure(error: BaseError): void | Promise<void> {
     const {message, type} = error;
     let logMessage = `Could not initialize app version '${Environment.version(false)}'`;
 
@@ -1014,7 +1032,7 @@ export class App {
    * Initiate the self user by getting it from the backend.
    * @returns Resolves with the self user entity
    */
-  private async initiateSelfUser(selfUser: User) {
+  private async initiateSelfUser(selfUser: User): Promise<User> {
     if (!selfUser.hasActivatedIdentity()) {
       if (!selfUser.isTemporaryGuest()) {
         throw new Error('User does not have an activated identity');
@@ -1035,7 +1053,7 @@ export class App {
    * Initiate the current client of the self user.
    * @returns Resolves with the local client entity
    */
-  private async _initiateSelfUserClients(selfUser: User, clientRepository: ClientRepository) {
+  private async _initiateSelfUserClients(selfUser: User, clientRepository: ClientRepository): Promise<ClientEntity> {
     // Add the local client to the user
     selfUser.localClient = await clientRepository.getValidLocalClient();
     await this.repository.client.getClientsForSelf();
@@ -1052,7 +1070,7 @@ export class App {
   /**
    * Check whether the page has been reloaded.
    */
-  private _isReload() {
+  private _isReload(): boolean {
     const NAVIGATION_TYPE_RELOAD = 1;
     return window.performance.navigation.type === NAVIGATION_TYPE_RELOAD;
   }
@@ -1157,7 +1175,7 @@ export class App {
     }
   };
 
-  private readonly showClientCertificateRevokedWarning = async () => {
+  private readonly showClientCertificateRevokedWarning = async (): Promise<void> => {
     const {modalOptions, modalType} = getModalOptions(
       {
         type: ModalType.SELF_CERTIFICATE_REVOKED,
@@ -1172,7 +1190,7 @@ export class App {
   };
 
   // Todo: Move this to a separate hook or service
-  private readonly showForceLogoutModal = (reason: SIGN_OUT_REASON) => {
+  private readonly showForceLogoutModal = (reason: SIGN_OUT_REASON): void => {
     // ToDo: Extract the softlock logic to a separate hook instead of using the E2EIHandler directly
     // This is a temporary solution until we have a proper softlock implementation
     const e2eiHandler = E2EIHandler.getInstance();

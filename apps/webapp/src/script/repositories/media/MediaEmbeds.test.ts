@@ -26,7 +26,7 @@ import {MediaParser} from './MediaParser';
 
 describe('MediaEmbeds', () => {
   // Will test all common link variations
-  const testLinkVariants = (site: string, re: RegExp) => {
+  const testLinkVariants = (site: string, re: RegExp): void => {
     expect(`http://${site}.com`.match(re)).toBe(null);
     expect(`http://${site}.com/`.match(re)).toBe(null);
     expect(`https://${site}.com`.match(re)).toBe(null);
@@ -43,31 +43,31 @@ describe('MediaEmbeds', () => {
     expect(`www.${site}.com/`.match(re)).toBe(null);
   };
 
-  const buildMessageWithAnchor = (link: string) => {
+  const buildMessageWithAnchor = (link: string): string => {
     return `<a href="${link}" target="_blank" rel="nofollow">${link}</a>`;
   };
 
-  const buildYoutubeIframe = (link: string) => {
+  const buildYoutubeIframe = (link: string): string => {
     const embed_url = MediaEmbeds.generateYouTubeEmbedUrl(link);
     return `<a href="${link}" target="_blank" rel="nofollow">${link}</a><div class="iframe-container iframe-container-video"><iframe class="youtube" width="100%" height="100%" src="${embed_url}" frameborder="0" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>`;
   };
 
-  const buildSoundcloudIframeForTracks = (link: string) => {
+  const buildSoundcloudIframeForTracks = (link: string): string => {
     return `<a href="${link}" target="_blank" rel="nofollow">${link}</a><div class="iframe-container"><iframe class="soundcloud" width="100%" height="164" src="https://w.soundcloud.com/player/?url=${link}&visual=false&show_comments=false&buying=false&show_playcount=false&liking=false&sharing=false&hide_related=true" frameborder="0"></iframe></div>`;
   };
 
-  const buildSoundcloudIframeForPlaylists = (link: string) => {
+  const buildSoundcloudIframeForPlaylists = (link: string): string => {
     return `<a href="${link}" target="_blank" rel="nofollow">${link}</a><div class="iframe-container"><iframe class="soundcloud" width="100%" height="465" src="https://w.soundcloud.com/player/?url=${link}&visual=false&show_comments=false&buying=false&show_playcount=false&liking=false&sharing=false&hide_related=true" frameborder="0"></iframe></div>`;
   };
 
-  const buildSpotifyIframe = (link: string, partial_link: string) => {
+  const buildSpotifyIframe = (link: string, partial_link: string): string => {
     partial_link = partial_link.replace(/\//g, ':');
     return `<a href="${link}" target="_blank" rel="nofollow">${link}</a><div class="iframe-container"><iframe class="spotify" width="100%" height="80px" src="https://embed.spotify.com/?uri=spotify%3A${window.encodeURIComponent(
       partial_link,
     )}" frameborder="0"></iframe></div>`;
   };
 
-  const buildVimeoIframe = (link: string, id: string) => {
+  const buildVimeoIframe = (link: string, id: string): string => {
     return `<a href="${link}" target="_blank" rel="nofollow">${link}</a><div class="iframe-container iframe-container-video"><iframe class="vimeo" width="100%" height="100%" src="https://player.vimeo.com/video/${id}?portrait=0&color=333&badge=0" frameborder="0" allowfullscreen></iframe></div>`;
   };
 

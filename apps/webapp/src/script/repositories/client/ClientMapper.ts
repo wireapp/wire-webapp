@@ -25,8 +25,11 @@ import {isClientRecord, isClientWithMLSPublicKeys} from 'Util/typePredicateUtil'
 import {ClientEntity} from './ClientEntity';
 import {parseClientId} from './ClientIdUtil';
 
+type ClientMapperConfig = {CLIENT_PAYLOAD: string[]; SELF_CLIENT_PAYLOAD: string[]};
+type ClientMappingResult<T> = {client: T; wasUpdated: boolean};
+
 export class ClientMapper {
-  static get CONFIG() {
+  static get CONFIG(): ClientMapperConfig {
     return {
       CLIENT_PAYLOAD: ['class', 'id', 'domain'],
       SELF_CLIENT_PAYLOAD: ['address', 'cookie', 'label', 'model', 'time', 'type'],
@@ -103,7 +106,7 @@ export class ClientMapper {
   static updateClient<T extends ClientRecord | ClientEntity>(
     clientData: T,
     updatePayload: Partial<T>,
-  ): {client: T; wasUpdated: boolean} {
+  ): ClientMappingResult<T> {
     let containsUpdate = false;
 
     for (const member in updatePayload) {

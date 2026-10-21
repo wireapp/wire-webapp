@@ -36,7 +36,7 @@ export class ReceiptModeUpdateMessage extends SystemMessage {
   }
 }
 
-const getCaption = (isReceiptEnabled: boolean, isSelfUser: boolean, translate: Translate) => {
+const getCaption = (isReceiptEnabled: boolean, isSelfUser: boolean, translate: Translate): string => {
   if (isReceiptEnabled) {
     return isSelfUser ? translate('conversationReceiptsOnYou') : translate('conversationReceiptsOn');
   }

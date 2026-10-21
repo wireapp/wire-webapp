@@ -198,7 +198,7 @@ describe('User Mapper', () => {
       const user_et = new User('', '', translateForTest);
       user_et.id = entities.user.john_doe.id;
       const data = {id: entities.user.jane_roe.id, name: entities.user.jane_roe.name};
-      const functionCall = () => {
+      const functionCall = (): User => {
         return mapper.updateUserFromObject(user_et, data, '');
       };
 

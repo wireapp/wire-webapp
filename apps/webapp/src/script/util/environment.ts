@@ -38,6 +38,16 @@ const DEV_ENVIRONMENT_IDENTIFIERS = {
   LOCAL: 'local.',
   STAGING: 'staging',
 } as const;
+type WebEnvironment = {
+  isEdge: boolean;
+  isStaging: boolean;
+  isDev: boolean;
+  isInternal: boolean;
+  isLinked: boolean;
+  isLocalhost: boolean;
+  isProduction: boolean;
+  name: string;
+};
 
 const getElectronVersion = (userAgent: string): string => {
   // [match, version]
@@ -52,7 +62,7 @@ const isLocalhost = (): boolean => {
 const isProduction = (): boolean => {
   return Config.getConfig().ENVIRONMENT === BackendEnvironment.PRODUCTION;
 };
-export const getWebEnvironment = () => {
+export const getWebEnvironment = (): WebEnvironment => {
   const {APP_BASE} = Config.getConfig();
 
   const environment = {

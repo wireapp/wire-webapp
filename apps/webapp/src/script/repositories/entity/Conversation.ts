@@ -750,13 +750,13 @@ export class Conversation {
     return {domain: this.domain, id: this.id};
   }
 
-  private hasInitializedUsers() {
+  private hasInitializedUsers(): boolean {
     const hasMappedUsers =
       isNonEmptyArray(this.participating_user_ets()) || isEmptyArray(this.participating_user_ids());
     return !isUndefined(this.selfUser()) && hasMappedUsers;
   }
 
-  private _initSubscriptions() {
+  private _initSubscriptions(): void {
     [
       this.archivedState,
       this.readOnlyState,
@@ -809,7 +809,7 @@ export class Conversation {
     }
   }
 
-  public isAdmin(userId: QualifiedId) {
+  public isAdmin(userId: QualifiedId): boolean {
     return this.roles()[userId.id] === DefaultConversationRoleName.WIRE_ADMIN;
   }
 
@@ -886,10 +886,10 @@ export class Conversation {
       return;
     }
 
-    const messageWithLinkPreview = () => {
+    const messageWithLinkPreview = (): Message => {
       return this._findDuplicate(messageEntity.id, messageEntity.from);
     };
-    const editedMessage = () => {
+    const editedMessage = (): Message | undefined => {
       const replacingMessageId = (messageEntity as ContentMessage).replacing_message_id;
       return replacingMessageId !== undefined ? this._findDuplicate(replacingMessageId, messageEntity.from) : undefined;
     };

@@ -23,13 +23,20 @@ import DexieBatch from 'dexie-batch';
 import {container} from 'tsyringe';
 
 import {CONVERSATION} from 'Repositories/event/Client';
-import {StorageService} from 'Repositories/storage';
+import {StorageService, type EventRecord} from 'Repositories/storage';
 import {Logger, getLogger} from 'Util/logger';
+
+type BackupTables = readonly [
+  NonNullable<StorageService['db']>['conversations'],
+  NonNullable<StorageService['db']>['events'],
+  NonNullable<StorageService['db']>['users'],
+];
+type BackupServiceConfig = {BATCH_SIZE: number};
 
 export class BackupService {
   private readonly logger: Logger;
 
-  static get CONFIG() {
+  static get CONFIG(): BackupServiceConfig {
     return {
       BATCH_SIZE: 5_000,
     };
@@ -67,7 +74,7 @@ export class BackupService {
     }, 0);
   }
 
-  getTables() {
+  getTables(): BackupTables {
     const database = this.storageService.db;
     if (isUndefined(database)) {
       throw new Error('The backup database is not initialized');
@@ -119,7 +126,7 @@ export class BackupService {
     return entities.length;
   }
 
-  async getConversationCreationEvents() {
+  async getConversationCreationEvents(): Promise<EventRecord[]> {
     const database = this.storageService.db;
     if (isUndefined(database)) {
       throw new Error('The backup database is not initialized');

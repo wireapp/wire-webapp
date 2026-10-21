@@ -48,6 +48,11 @@ enum UserVerificationState {
   SOME_INVALID = 1,
 }
 
+type ConversationCredentialVerification = {
+  userVerificationState: UserVerificationState;
+  userIdentities: Map<string, WireIdentity[]> | undefined;
+};
+
 export class MLSConversationVerificationStateHandler {
   private readonly logger: Logger;
 
@@ -78,7 +83,7 @@ export class MLSConversationVerificationStateHandler {
   private async degradeConversation(
     conversation: MLSConversation,
     userIdentities: Map<string, WireIdentity[]> | undefined,
-  ) {
+  ): Promise<void> {
     if (isUndefined(userIdentities)) {
       return;
     }
@@ -110,7 +115,7 @@ export class MLSConversationVerificationStateHandler {
    * Changes mls verification state to "verified"
    * @param conversation
    */
-  private async verifyConversation(conversation: MLSConversation) {
+  private async verifyConversation(conversation: MLSConversation): Promise<void> {
     const state = ConversationVerificationState.VERIFIED;
     conversation.mlsVerificationState(state);
     this.onConversationVerificationStateChange({
@@ -136,10 +141,7 @@ export class MLSConversationVerificationStateHandler {
 
   private checkAllUserCredentialsInConversation = async (
     conversation: MLSCapableConversation,
-  ): Promise<{
-    userVerificationState: UserVerificationState;
-    userIdentities: Map<string, WireIdentity[]> | undefined;
-  }> => {
+  ): Promise<ConversationCredentialVerification> => {
     const userIdentities = await getAllGroupUsersIdentities(conversation.groupId);
     const processedUserIds: Set<StringifiedQualifiedId> = new Set();
     let userVerificationState = UserVerificationState.ALL_VALID;

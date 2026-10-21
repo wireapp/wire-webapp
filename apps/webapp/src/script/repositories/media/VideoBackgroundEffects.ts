@@ -103,7 +103,7 @@ export type BuiltinBackground = BuiltinBackgroundDefinition & {
  * @param colors - Array of CSS color strings (hex, rgb, named colors, etc.).
  * @returns CSS linear-gradient() function string.
  */
-const buildGradient = (colors: string[]) => {
+const buildGradient = (colors: string[]): string => {
   return `linear-gradient(135deg, ${colors.join(', ')})`;
 };
 export const DEFAULT_BUILTIN_BACKGROUND_ID = 'wire-1';

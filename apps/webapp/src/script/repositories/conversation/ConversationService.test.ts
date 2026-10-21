@@ -262,7 +262,7 @@ describe('ConversationService', () => {
   describe('getSafeConversationById', () => {
     const conversationId: QualifiedId = {id: 'conv-id', domain: 'wire.com'};
 
-    const makeService = (getConversation: jest.Mock) => {
+    const makeService = (getConversation: jest.Mock): ConversationService => {
       const apiClient = {
         api: {conversation: {getConversation}},
       } as unknown as APIClient;

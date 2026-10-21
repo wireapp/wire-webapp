@@ -82,14 +82,14 @@ const getVisibleWarning = (): TYPE => {
   return visibleWarning;
 };
 
-const hideWarning = (type = getVisibleWarning()) => {
+const hideWarning = (type = getVisibleWarning()): void => {
   const {warnings, removeWarning} = useWarningsState.getState();
   if (warnings.includes(type)) {
     removeWarning(type);
   }
 };
 
-const showWarning = (type: TYPE, info?: {name: string}) => {
+const showWarning = (type: TYPE, info?: {name: string}): void => {
   const {setName, addWarning} = useWarningsState.getState();
   const visibleWarning = getVisibleWarning();
   const connectivityTypes = [TYPE.CONNECTIVITY_RECONNECT, TYPE.NO_INTERNET];

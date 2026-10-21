@@ -54,7 +54,7 @@ export const initialiseMigrationOfProteusConversations = async (
   conversations: Conversation[],
   selfUserId: QualifiedId,
   {updateConversationProtocol, tryEstablishingMLSGroup}: MigrationInitConversationHandler,
-) => {
+): Promise<void> => {
   const proteusConversations = conversations.filter(isProteusConversation);
   if (proteusConversations.length < 1) {
     return;
@@ -73,7 +73,7 @@ const initialiseMigrationOfProteusConversation = async (
   proteusConversation: ProteusConversation,
   selfUserId: QualifiedId,
   {updateConversationProtocol, tryEstablishingMLSGroup}: MigrationInitConversationHandler,
-) => {
+): Promise<void> => {
   mlsMigrationLogger.info(
     `Initialising MLS migration for "proteus" conversation: ${proteusConversation.qualifiedId.id}`,
   );

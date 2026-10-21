@@ -22,7 +22,7 @@ import {container} from 'tsyringe';
 import {Config} from 'src/script/Config';
 import {Core} from 'src/script/service/coreSingleton';
 
-export function getEnterpriseLoginV2FF() {
+export function getEnterpriseLoginV2FF(): boolean {
   const core = container.resolve(Core);
   return core.backendFeatures.version >= Config.getConfig().MIN_ENTERPRISE_LOGIN_V2_AND_CHANNELS_SUPPORTED_API_VERSION;
 }

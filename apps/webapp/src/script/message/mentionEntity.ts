@@ -26,6 +26,13 @@ import {PROTO_MESSAGE_TYPE} from 'Repositories/cryptography/ProtoMessageType';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {isUUID} from 'Util/validationUtil';
 
+type MentionEntityJSON = {
+  length: number;
+  startIndex: number;
+  userId: string;
+  userQualifiedId: QualifiedId | undefined;
+};
+
 enum ERROR {
   INVALID_LENGTH = 'Invalid mention: Invalid length',
   INVALID_START_CHAR = 'Invalid mention: Mention does not start with @',
@@ -123,7 +130,7 @@ export class MentionEntity {
     return true;
   }
 
-  toJSON() {
+  toJSON(): MentionEntityJSON {
     return {
       length: this.length,
       startIndex: this.startIndex,

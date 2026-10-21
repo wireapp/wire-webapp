@@ -53,7 +53,7 @@ const RANDOM_WORDS_2 = [
   ...['wasp', 'weasel', 'whale', 'wolf', 'wombat', 'yak', 'zebra'],
 ];
 
-const getRandomWordCombination = () => {
+const getRandomWordCombination = (): string => {
   return `${randomElement(RANDOM_WORDS_1)}${randomElement(RANDOM_WORDS_2)}`;
 };
 

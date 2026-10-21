@@ -23,6 +23,7 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {Conversation} from 'Repositories/entity/Conversation';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import type {EventService} from 'Repositories/event/EventService';
 import type {IncomingEvent} from '../EventProcessor';
 import {ConfirmationEvent} from 'Repositories/conversation/EventBuilder';
 import {User} from 'Repositories/entity/User';
@@ -34,16 +35,24 @@ import {ReceiptsMiddleware} from './ReceiptsMiddleware';
 import {ClientEvent} from '../Client';
 import {translateForTest} from 'Util/test/translateForTest';
 
-function buildReadReceiptMiddleware() {
-  const selfUser = new User(createUuid(), '', translateForTest);
-  const eventService = {
-    loadEvents: jest.fn((): never[] => {
-      return [];
-    }),
-    replaceEvent: jest.fn(),
-  } as any;
+type ReadReceiptEventServiceStub = {
+  loadEvents: jest.Mock<Promise<unknown[]>, [conversationId: string, eventIds: string[]]>;
+  replaceEvent: jest.Mock;
+};
+type ReadReceiptMiddlewareDependencies = {eventService: ReadReceiptEventServiceStub; selfUser: User};
+type ReadReceiptMiddlewareFixture = readonly [ReceiptsMiddleware, ReadReceiptMiddlewareDependencies];
 
-  return [new ReceiptsMiddleware(eventService, {} as any, selfUser), {eventService, selfUser}] as const;
+function buildReadReceiptMiddleware(): ReadReceiptMiddlewareFixture {
+  const selfUser = new User(createUuid(), '', translateForTest);
+  const eventService: ReadReceiptEventServiceStub = {
+    loadEvents: jest.fn<Promise<unknown[]>, [conversationId: string, eventIds: string[]]>().mockResolvedValue([]),
+    replaceEvent: jest.fn(),
+  };
+
+  return [
+    new ReceiptsMiddleware(eventService as unknown as EventService, {} as any, selfUser),
+    {eventService, selfUser},
+  ] as const;
 }
 
 describe('ReceiptsMiddleware', () => {

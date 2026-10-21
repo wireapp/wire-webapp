@@ -19,12 +19,17 @@
 
 /** Reference: https://www.freecodecamp.org/news/html-roving-tabindex-attribute-explained-with-examples/ */
 
-import {useCallback, useState} from 'react';
-import type {KeyboardEvent as ReactKeyboardEvent} from 'react';
+import {useCallback, useState, type Dispatch, type SetStateAction, KeyboardEvent as ReactKeyboardEvent} from 'react';
 
 import {isKey, isTabKey, KEY} from 'Util/keyboardUtil';
 
-export function useRoveFocus(elements: string[]) {
+type RoveFocusState = {
+  focusedId: string | undefined;
+  handleKeyDown: (event: ReactKeyboardEvent | KeyboardEvent) => void;
+  setFocusedId: Dispatch<SetStateAction<string | undefined>>;
+};
+
+export function useRoveFocus(elements: string[]): RoveFocusState {
   const [focusedId, setFocusedId] = useState<string | undefined>(undefined);
 
   const lastIndex = elements.length - 1;

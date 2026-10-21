@@ -24,7 +24,7 @@ import {ConversationRecord} from 'Repositories/storage';
 
 import {BackUpConversation} from '../CPB.library';
 
-const isGroupConversation = (name: string) => {
+const isGroupConversation = (name: string): boolean => {
   return name.length > 0;
 };
 
