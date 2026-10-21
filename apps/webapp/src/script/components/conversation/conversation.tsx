@@ -88,6 +88,7 @@ import {ConversationViewerPermissionBanner} from './conversationViewerPermission
 import {useReadReceiptSender} from './hooks/useReadReceipt';
 import {ReadOnlyConversationMessage} from './readOnlyConversationMessage';
 import {useFilesUploadDropzone} from './useFilesUploadDropzone/useFilesUploadDropzone';
+import {withAutoReadGuard} from './utils/autoReadGuard';
 import {checkFileSharingPermission} from './utils/checkFileSharingPermission';
 
 import {UserError} from '../../error/userError';
@@ -632,17 +633,21 @@ function ConversationContent({
       }
 
       if (isLastReceivedMessage(messageEntity, conversationEntity)) {
-        callbacks.push(() => {
-          return updateConversationLastRead(conversationEntity, messageEntity);
-        });
+        callbacks.push(
+          withAutoReadGuard(conversationEntity, () => {
+            return updateConversationLastRead(conversationEntity, messageEntity);
+          }),
+        );
       }
 
       if (isUnreadMessage && isNotOwnMessage) {
-        callbacks.push(updateLastRead);
+        callbacks.push(withAutoReadGuard(conversationEntity, updateLastRead));
         if (shouldSendReadReceipt) {
-          callbacks.push(() => {
-            return addReadReceiptToBatch(conversationEntity, messageEntity);
-          });
+          callbacks.push(
+            withAutoReadGuard(conversationEntity, () => {
+              return addReadReceiptToBatch(conversationEntity, messageEntity);
+            }),
+          );
         }
       }
 
