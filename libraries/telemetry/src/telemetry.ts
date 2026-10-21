@@ -17,7 +17,7 @@
  *
  */
 
-import {Countly, type CountlyConsentFeatures} from './countly';
+import {Countly, type CountlyConsentFeatures} from './countly.js';
 
 declare global {
   interface Window {
