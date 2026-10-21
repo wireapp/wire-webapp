@@ -158,12 +158,13 @@ const renderCellsTable = ({
   readonly selfUserDriveRole?: CellsSelfUserDriveRole;
   readonly clock?: ReturnType<typeof createDeterministicClock>;
   readonly random?: () => number;
-} = {}): ReturnType<typeof render> & {
+} = {}): {
   file: CellNode;
   folder: CellNode;
   onDropFilesToFolder: (files: readonly File[], uploadPath: string) => void;
   onDropReadError: () => void;
   onFolderDropTargetChange: (folderName: string | null) => void;
+  unmount: () => void;
   rerenderWithResetKey: (resetKey: number) => void;
   rerenderWithSelectionScope: (scopeKey: string, isSelectionEnabled?: boolean) => void;
   rerenderWithNodes: (nodes: CellNode[]) => void;
