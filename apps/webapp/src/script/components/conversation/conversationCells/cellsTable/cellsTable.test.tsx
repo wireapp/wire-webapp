@@ -18,6 +18,7 @@
  */
 
 import {act, fireEvent, render, screen, waitFor, within} from '@testing-library/react';
+import type {ReactElement} from 'react';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import userEvent from '@testing-library/user-event';
 import {noop} from 'noop-esm';
@@ -42,7 +43,6 @@ import {
   CellsSelfUserDriveRoleProvider,
   CellsSelfUserDriveRole,
 } from '../common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
-import type {JSX} from '@emotion/react/jsx-runtime';
 
 const translateSelectionForTest: Translate = (key, substitutions) => {
   if (key === 'cells.selection.selectedCount') {
@@ -142,7 +142,6 @@ const renderCellsTable = ({
   readonly onDropFilesToFolder?: (files: readonly File[], uploadPath: string) => void;
   readonly onDropReadError?: () => void;
   readonly onFolderDropTargetChange?: (folderName: string | null) => void;
-  readonly onRefresh?: () => void;
   readonly folderDropResetKey?: number;
   readonly selectionEnabled?: boolean;
   readonly selectionScopeKey?: string;
@@ -153,7 +152,7 @@ const renderCellsTable = ({
   readonly onRefresh?: () => void;
   readonly clock?: ReturnType<typeof createDeterministicClock>;
   readonly random?: () => number;
-} = {}) => {
+} = {}): RenderCellsTableResult & {unmount: () => void} => {
   const wrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({
       translate: translateSelectionForTest,
@@ -178,7 +177,7 @@ const renderCellsTable = ({
     scopeKey = selectionScopeKey,
     isSelectionEnabled = selectionEnabled,
     nodes = initialNodes ?? [folder, file],
-  ) => {
+  ): ReactElement => {
     return (
       <ThemeProvider>
         <CellsSelfUserDriveRoleProvider selfUserDriveRole={selfUserDriveRole}>
@@ -683,7 +682,7 @@ describe('CellsTable selection', () => {
         .mockResolvedValueOnce({Status: 'Unknown'})
         .mockResolvedValueOnce({Status: 'Unknown'}),
     } as unknown as CellsRepository;
-    const random = () => {
+    const random = (): number => {
       return randomSamples[randomSampleIndex++] ?? 0.5;
     };
     renderCellsTable({cellsRepository: repository, clock, random});

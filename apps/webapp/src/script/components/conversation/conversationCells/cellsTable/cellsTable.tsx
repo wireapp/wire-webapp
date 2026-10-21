@@ -17,7 +17,7 @@
  *
  */
 
-import {DragEvent, useEffect, useState, type FunctionComponent} from 'react';
+import {DragEvent, useEffect, useState, type FunctionComponent, type ReactElement} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 import {flexRender, getCoreRowModel, type Header, useReactTable} from '@tanstack/react-table';
@@ -149,7 +149,7 @@ export const CellsTable = ({
   selectionScopeKey,
   selectionBarAnchor,
   random = Math.random,
-}: CellsTableProps) => {
+}: CellsTableProps): ReactElement => {
   const {clock, translate, isFeatureToggleEnabled} = useApplicationContext();
   const canPerformCurrentDriveAction = useCellsActionPermissions();
   const isSelectionEnabled = selectionEnabled && isFeatureToggleEnabled(driveBulkActionsFeatureToggleName);

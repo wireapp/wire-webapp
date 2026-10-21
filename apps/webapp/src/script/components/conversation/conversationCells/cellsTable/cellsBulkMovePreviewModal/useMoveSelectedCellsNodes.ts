@@ -46,7 +46,11 @@ export const useMoveSelectedCellsNodes = ({
   destinationPath,
   selectedNodes,
   cellsRepository,
-}: UseMoveSelectedCellsNodesProps) => {
+}: UseMoveSelectedCellsNodesProps): {
+  isSubmitting: boolean;
+  isValid: boolean;
+  submitMove: () => Promise<Result<RestPerformActionResponse, unknown>>;
+} => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isSubmittingRef = useRef(false);
   const canPerformCurrentDriveAction = useCellsActionPermissions();
