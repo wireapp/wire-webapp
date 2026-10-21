@@ -17,7 +17,7 @@
  *
  */
 
-import {useMemo, useState} from 'react';
+import {useCallback, useMemo, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
@@ -54,10 +54,6 @@ const getParentPath = (path: string): string => {
   return path.split('/').slice(0, -1).join('/');
 };
 
-const getDestinationPath = (path: string, conversationQualifiedId: QualifiedId): string => {
-  return normalizeCellsPath(path, conversationQualifiedId);
-};
-
 export const useBulkMoveDestinationSelection = ({
   isOpen,
   selectedNodes,
@@ -65,6 +61,13 @@ export const useBulkMoveDestinationSelection = ({
   conversationQualifiedId,
 }: UseBulkMoveDestinationSelectionProps): BulkMoveDestinationSelection => {
   const {clock, fireAndForgetInvoker, translate} = useApplicationContext();
+  const {id, domain} = conversationQualifiedId;
+  const getDestinationPath = useCallback(
+    (path: string): string => {
+      return normalizeCellsPath(path, {id, domain});
+    },
+    [id, domain],
+  );
   const [currentPath, setCurrentPath] = useState(getCellsFilesPath());
   const [selectedDestinationPath, setSelectedDestinationPath] = useState('');
   const {folders, status, shouldShowLoadingSpinner} = useGetCellsFolders({
@@ -80,29 +83,29 @@ export const useBulkMoveDestinationSelection = ({
     return folders.map(folder => {
       return {
         ...folder,
-        path: getDestinationPath(folder.path, conversationQualifiedId),
+        path: getDestinationPath(folder.path),
       };
     });
-  }, [folders, conversationQualifiedId]);
+  }, [folders, getDestinationPath]);
   const selectedFolderPaths = useMemo(() => {
     return selectedNodes
       .filter(node => {
         return node.type === CellNodeType.FOLDER;
       })
       .map(node => {
-        return getDestinationPath(node.path, conversationQualifiedId);
+        return getDestinationPath(node.path);
       });
-  }, [selectedNodes, conversationQualifiedId]);
+  }, [selectedNodes, getDestinationPath]);
   const selectedParentPath = useMemo(() => {
     const parentPaths = selectedNodes.map(node => {
-      return getParentPath(getDestinationPath(node.path, conversationQualifiedId));
+      return getParentPath(getDestinationPath(node.path));
     });
     return parentPaths.every(path => {
       return path === parentPaths[0];
     })
       ? parentPaths[0]
       : null;
-  }, [selectedNodes, conversationQualifiedId]);
+  }, [selectedNodes, getDestinationPath]);
   const disabledDestinationPaths = useMemo(() => {
     return selectedParentPath === null ? selectedFolderPaths : [...selectedFolderPaths, selectedParentPath];
   }, [selectedFolderPaths, selectedParentPath]);
@@ -116,12 +119,12 @@ export const useBulkMoveDestinationSelection = ({
   }, [selectedFolderPaths, selectedParentPath, translate]);
 
   const handlePathChange = (path: string): void => {
-    const destinationPath = getDestinationPath(path, conversationQualifiedId);
+    const destinationPath = getDestinationPath(path);
     setCurrentPath(destinationPath);
     setSelectedDestinationPath(destinationPath);
   };
   const handleDestinationSelect = (path: string): void => {
-    setSelectedDestinationPath(getDestinationPath(path, conversationQualifiedId));
+    setSelectedDestinationPath(getDestinationPath(path));
   };
 
   const driveLabel = translate('cells.bulkMove.drive');
