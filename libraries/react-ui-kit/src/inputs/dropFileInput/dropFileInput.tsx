@@ -112,11 +112,11 @@ export const DropFileInput = forwardRef<HTMLInputElement, DropFileInputProps<HTM
   ) => {
     const [isDraggedOver, setIsDraggedOver] = useState(false);
 
-    const resetDraggedOver = () => {
+    const resetDraggedOver = (): void => {
       return setIsDraggedOver(false);
     };
 
-    const handleDragOver = (event: DragEvent<HTMLDivElement>) => {
+    const handleDragOver = (event: DragEvent<HTMLDivElement>): void => {
       event.preventDefault();
       event.stopPropagation();
       event.dataTransfer.dropEffect = 'copy';
@@ -126,7 +126,7 @@ export const DropFileInput = forwardRef<HTMLInputElement, DropFileInputProps<HTM
       }
     };
 
-    const handleDrop = (event: DragEvent<HTMLDivElement>) => {
+    const handleDrop = (event: DragEvent<HTMLDivElement>): void => {
       event.preventDefault();
       event.stopPropagation();
 
@@ -158,7 +158,7 @@ export const DropFileInput = forwardRef<HTMLInputElement, DropFileInputProps<HTM
       onFilesUploaded(filesArr);
     };
 
-    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
       const {files} = event.target;
 
       if (isNullOrUndefined(files) || !isNonEmptyArray(Array.from(files))) {

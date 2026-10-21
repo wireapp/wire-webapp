@@ -56,6 +56,9 @@ const translateSelectionForTest: Translate = (key, substitutions) => {
   if (key === 'cells.selection.move') {
     return 'Move';
   }
+  if (key === 'cells.bulkMove.previewTitleSingular') {
+    return 'Preview move of 1 item';
+  }
   if (key === 'cells.bulkMove.previewTitle') {
     return `Preview move of ${substitutions?.count} items`;
   }
@@ -326,13 +329,19 @@ describe('CellsTable selection', () => {
     const selectedSourceFolder = await within(preview).findByRole('button', {name: 'Marketing images Selected'});
     expect(selectedSourceFolder).toBeDisabled();
     await user.click(await within(preview).findByRole('button', {name: 'Design reviews'}));
-    expect(within(preview).getByText('Current destination: Drive / Design reviews')).toBeInTheDocument();
+    expect(
+      within(preview).getByText('Current destination: Drive / wire-cells-web / Design reviews'),
+    ).toBeInTheDocument();
 
     await user.click(within(preview).getByRole('button', {name: 'Open Design reviews'}));
-    expect(await within(preview).findByText('Current destination: Drive / Design reviews')).toBeInTheDocument();
+    expect(
+      await within(preview).findByText('Current destination: Drive / wire-cells-web / Design reviews'),
+    ).toBeInTheDocument();
     await user.click(await within(preview).findByRole('button', {name: 'Open Quarterly reviews'}));
     expect(
-      await within(preview).findByText('Current destination: Drive / Design reviews / Quarterly reviews'),
+      await within(preview).findByText(
+        'Current destination: Drive / wire-cells-web / Design reviews / Quarterly reviews',
+      ),
     ).toBeInTheDocument();
     await waitFor(() => {
       expect(repository.getAllNodes).toHaveBeenCalledTimes(3);
@@ -352,6 +361,7 @@ describe('CellsTable selection', () => {
     await user.click(screen.getByRole('button', {name: 'Move'}));
     const reopenedPreview = await screen.findByRole('dialog');
     expect(within(reopenedPreview).getByText('Current destination: Drive')).toBeInTheDocument();
+    expect(within(reopenedPreview).getByText('Preview move of 1 item')).toBeInTheDocument();
     const reopenedSelectedItems = within(reopenedPreview).getByRole('region', {name: 'Selected items'});
     expect(within(reopenedSelectedItems).getByText('Wire logs.pdf')).toBeInTheDocument();
     expect(within(reopenedSelectedItems).queryByText('Marketing images')).not.toBeInTheDocument();
@@ -533,7 +543,7 @@ describe('CellsTable selection', () => {
     const preview = await screen.findByRole('dialog');
     await user.click(within(preview).getByRole('button', {name: 'A'}));
 
-    expect(await within(preview).findByText('Current destination: Drive / A')).toBeInTheDocument();
+    expect(await within(preview).findByText('Current destination: Drive / wire-cells-web / A')).toBeInTheDocument();
     expect(await within(preview).findByRole('button', {name: 'B Current location'})).toBeDisabled();
     expect(within(preview).getByRole('button', {name: 'Move'})).toBeEnabled();
 

@@ -183,6 +183,6 @@ export const loadingMessageStyles = {
   padding: '8px 12px',
 };
 
-export const labelCSS = ({isVisuallyHidden}: {isVisuallyHidden: boolean}) => {
+export const labelCSS = ({isVisuallyHidden}: {isVisuallyHidden: boolean}): CSSObject => {
   return isVisuallyHidden ? visuallyHidden() : {};
 };

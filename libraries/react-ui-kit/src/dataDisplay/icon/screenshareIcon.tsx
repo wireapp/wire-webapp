@@ -17,9 +17,11 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
-export const ScreenshareIcon = (props: SVGIconProps) => {
+export const ScreenshareIcon: FunctionComponent<SVGIconProps> = props => {
   return (
     <SVGIcon realWidth={16} realHeight={16} {...props}>
       <path d="M5 14h6v2H5v-2zM0 1c0-.6.4-1 1-1h14c.6 0 1 .4 1 1v11c0 .6-.4 1-1 1H1a1 1 0 0 1-1-1V1zm7 10h2V7h4L8 3 3 7h4v4z" />

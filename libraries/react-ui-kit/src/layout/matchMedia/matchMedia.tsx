@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useMemo, useState} from 'react';
+import {useEffect, useMemo, useState, type FunctionComponent} from 'react';
 import * as React from 'react';
 
 import {QUERY, QueryKeys} from '../../utils';
@@ -36,7 +36,7 @@ export type MatchMediaProps = React.PropsWithChildren<{
   query: Query;
 }>;
 
-export const useMatchMedia = (query: Query, customWindowObj?: Window) => {
+export const useMatchMedia = (query: Query, customWindowObj?: Window): boolean => {
   const windowObj = customWindowObj !== undefined ? customWindowObj : window;
   const matchMedia = useMemo(() => {
     return windowObj.matchMedia(`(${query})`);
@@ -44,7 +44,7 @@ export const useMatchMedia = (query: Query, customWindowObj?: Window) => {
 
   const [isMatching, setIsMatching] = useState(matchMedia.matches);
 
-  const updateMatching = (event: MediaQueryListEvent | MediaQueryList) => {
+  const updateMatching = (event: MediaQueryListEvent | MediaQueryList): void => {
     setIsMatching(event.matches);
   };
 
@@ -68,27 +68,27 @@ export const MatchMedia: React.FC<MatchMediaProps> = ({query, children, not}) =>
 
 export type NamedMatchMediaProps = Omit<MatchMediaProps, 'query'>;
 
-export const IsDesktop = (props: NamedMatchMediaProps) => {
+export const IsDesktop: FunctionComponent<NamedMatchMediaProps> = props => {
   return <MatchMedia query={QueryKeys.DESKTOP} {...props} />;
 };
-export const IsDesktopXL = (props: NamedMatchMediaProps) => {
+export const IsDesktopXL: FunctionComponent<NamedMatchMediaProps> = props => {
   return <MatchMedia query={QueryKeys.DESKTOP_XL} {...props} />;
 };
-export const IsMobile = (props: NamedMatchMediaProps) => {
+export const IsMobile: FunctionComponent<NamedMatchMediaProps> = props => {
   return <MatchMedia query={QueryKeys.MOBILE} {...props} />;
 };
-export const IsMobileDown = (props: NamedMatchMediaProps) => {
+export const IsMobileDown: FunctionComponent<NamedMatchMediaProps> = props => {
   return <MatchMedia query={QueryKeys.MOBILE_DOWN} {...props} />;
 };
-export const IsMobileUp = (props: NamedMatchMediaProps) => {
+export const IsMobileUp: FunctionComponent<NamedMatchMediaProps> = props => {
   return <MatchMedia query={QueryKeys.MOBILE_UP} {...props} />;
 };
-export const IsTablet = (props: NamedMatchMediaProps) => {
+export const IsTablet: FunctionComponent<NamedMatchMediaProps> = props => {
   return <MatchMedia query={QueryKeys.TABLET} {...props} />;
 };
-export const IsTabletDown = (props: NamedMatchMediaProps) => {
+export const IsTabletDown: FunctionComponent<NamedMatchMediaProps> = props => {
   return <MatchMedia query={QueryKeys.TABLET_DOWN} {...props} />;
 };
-export const IsTabletUp = (props: NamedMatchMediaProps) => {
+export const IsTabletUp: FunctionComponent<NamedMatchMediaProps> = props => {
   return <MatchMedia query={QueryKeys.TABLET_UP} {...props} />;
 };

@@ -78,7 +78,7 @@ export const textAreaStyle: <T>(theme: Theme, props: TextAreaProps<T>) => CSSObj
 };
 
 export const TEXTAREA_CLASSNAME = 'textarea';
-const filterTextAreaProps = (props: TextAreaProps) => {
+const filterTextAreaProps = (props: TextAreaProps): Object => {
   return filterProps(props, ['markInvalid', 'placeholderTextTransform']);
 };
 

@@ -32,7 +32,7 @@ expect.extend(matchers);
 
 type SwitchTestProps = ComponentProps<typeof Switch>;
 
-const renderSwitch = (props: SwitchTestProps, themeId = THEME_ID.LIGHT) => {
+const renderSwitch = (props: SwitchTestProps, themeId = THEME_ID.LIGHT): ReturnType<typeof render> => {
   return render(
     <StyledApp themeId={themeId}>
       <Switch {...props} />
@@ -40,7 +40,7 @@ const renderSwitch = (props: SwitchTestProps, themeId = THEME_ID.LIGHT) => {
   );
 };
 
-const renderSwitchWithTheme = (props: SwitchTestProps, theme: Theme) => {
+const renderSwitchWithTheme = (props: SwitchTestProps, theme: Theme): ReturnType<typeof render> => {
   return render(
     <StyledApp theme={theme}>
       <Switch {...props} />
@@ -48,7 +48,7 @@ const renderSwitchWithTheme = (props: SwitchTestProps, theme: Theme) => {
   );
 };
 
-const getTrack = (container: HTMLElement) => {
+const getTrack = (container: HTMLElement): HTMLElement => {
   const track = container.querySelector('label span');
   if (!track) {
     throw new Error('Switch track not found.');

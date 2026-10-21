@@ -17,11 +17,13 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {iconStyles} from './breadcrumbLeaf.styles';
 
 import {ChevronUpIcon} from '../../../dataDisplay/icon';
 
-export const BreadcrumbLeaf = () => {
+export const BreadcrumbLeaf: FunctionComponent = () => {
   return (
     <li aria-hidden="true">
       <ChevronUpIcon css={iconStyles} width={12} height={12} />

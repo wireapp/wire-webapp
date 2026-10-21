@@ -17,9 +17,11 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
-export const BulletListIcon = (props: SVGIconProps) => {
+export const BulletListIcon: FunctionComponent<SVGIconProps> = props => {
   return (
     <SVGIcon realWidth={16} realHeight={16} {...props}>
       <path d="M3 1H1V3H3V1ZM15 7H5V9H15V7ZM15 1H5V3H15V1ZM15 13H5V15H15V13ZM1 7H3V9H1V7ZM3 13H1V15H3V13Z" />

@@ -58,23 +58,6 @@ const getDestinationPath = (path: string, conversationQualifiedId: QualifiedId):
   return normalizeCellsPath(path, conversationQualifiedId);
 };
 
-const getDriveRootPath = (path: string, conversationQualifiedId: QualifiedId): string => {
-  const normalizedPath = path.replace(/^\/+|\/+$/g, '');
-  const conversationPrefix = `${conversationQualifiedId.id}@${conversationQualifiedId.domain}`;
-  if (normalizedPath === conversationPrefix || normalizedPath.startsWith(`${conversationPrefix}/`)) {
-    return '';
-  }
-
-  return getDestinationPath(path, conversationQualifiedId).split('/')[0] ?? '';
-};
-
-const getRelativeDestinationPath = (path: string, driveRootPath: string): string => {
-  if (path === driveRootPath) {
-    return '';
-  }
-  return path.startsWith(`${driveRootPath}/`) ? path.slice(driveRootPath.length + 1) : path;
-};
-
 export const useBulkMoveDestinationSelection = ({
   isOpen,
   selectedNodes,
@@ -101,9 +84,6 @@ export const useBulkMoveDestinationSelection = ({
       };
     });
   }, [folders, conversationQualifiedId]);
-  const driveRootPath = useMemo(() => {
-    return getDriveRootPath(selectedNodes[0]?.path ?? '', conversationQualifiedId);
-  }, [selectedNodes, conversationQualifiedId]);
   const selectedFolderPaths = useMemo(() => {
     return selectedNodes
       .filter(node => {
@@ -145,10 +125,9 @@ export const useBulkMoveDestinationSelection = ({
   };
 
   const driveLabel = translate('cells.bulkMove.drive');
-  const relativeDestinationPath = getRelativeDestinationPath(selectedDestinationPath, driveRootPath);
   const currentDestination =
-    relativeDestinationPath.length > 0
-      ? `${driveLabel} / ${relativeDestinationPath.split('/').filter(Boolean).join(' / ')}`
+    selectedDestinationPath.length > 0
+      ? `${driveLabel} / ${selectedDestinationPath.split('/').filter(Boolean).join(' / ')}`
       : driveLabel;
 
   return {
