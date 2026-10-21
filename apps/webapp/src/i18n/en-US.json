@@ -400,7 +400,6 @@
   "cells.bulkMove.previewTitle": "Preview move of {count} items",
   "cells.bulkMove.previewTitleSingular": "Preview move of 1 item",
   "cells.bulkMove.refreshDrive": "Refresh Drive",
-  "cells.bulkMove.reviewAndRetry": "I reviewed the Drive; allow retry",
   "cells.bulkMove.selected": "Selected",
   "cells.bulkMove.selectedItems": "Selected items",
   "cells.bulkMove.statusUnknown": "We couldn’t determine whether the move completed. Refresh the Drive to inspect item locations. The Move action stays disabled while the outcome is unknown.",
