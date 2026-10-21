@@ -18,6 +18,7 @@
  */
 
 import {act, fireEvent, render, screen, waitFor, within} from '@testing-library/react';
+import type {ReactElement} from 'react';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import userEvent from '@testing-library/user-event';
 import {noop} from 'noop-esm';
@@ -42,7 +43,6 @@ import {
   CellsSelfUserDriveRoleProvider,
   CellsSelfUserDriveRole,
 } from '../common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
-import type {JSX} from '@emotion/react/jsx-runtime';
 
 const translateSelectionForTest: Translate = (key, substitutions) => {
   if (key === 'cells.selection.selectedCount') {
@@ -125,17 +125,8 @@ const createDataTransfer = (files: readonly File[]): DataTransfer => {
   } as unknown as DataTransfer;
 };
 
-type RenderCellsTableResult = {
-  file: CellNode;
-  folder: CellNode;
-  onDropFilesToFolder: (files: readonly File[], uploadPath: string) => void;
-  onDropReadError: () => void;
-  onFolderDropTargetChange: (folderName: string | null) => void;
-  rerenderWithResetKey: (resetKey: number) => void;
-  rerenderWithSelectionScope: (scopeKey: string, isSelectionEnabled?: boolean) => void;
-  rerenderWithNodes: (nodes: CellNode[]) => void;
-};
 const renderCellsTable = ({
+
   folderPath = 'conversation-id@example.com/Marketing/images',
   onDropFilesToFolder = jest.fn(),
   onDropReadError = jest.fn(),
@@ -165,10 +156,18 @@ const renderCellsTable = ({
   readonly cellsRepository?: CellsRepository;
   readonly initialNodes?: CellNode[];
   readonly selfUserDriveRole?: CellsSelfUserDriveRole;
-  readonly onRefresh?: () => void;
   readonly clock?: ReturnType<typeof createDeterministicClock>;
   readonly random?: () => number;
-} = {}) => {
+} = {}): ReturnType<typeof render> & {
+  file: CellNode;
+  folder: CellNode;
+  onDropFilesToFolder: (files: readonly File[], uploadPath: string) => void;
+  onDropReadError: () => void;
+  onFolderDropTargetChange: (folderName: string | null) => void;
+  rerenderWithResetKey: (resetKey: number) => void;
+  rerenderWithSelectionScope: (scopeKey: string, isSelectionEnabled?: boolean) => void;
+  rerenderWithNodes: (nodes: CellNode[]) => void;
+} => {
   const wrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({
       translate: translateSelectionForTest,
@@ -193,7 +192,7 @@ const renderCellsTable = ({
     scopeKey = selectionScopeKey,
     isSelectionEnabled = selectionEnabled,
     nodes = initialNodes ?? [folder, file],
-  ) => {
+  ): ReactElement => {
     return (
       <ThemeProvider>
         <CellsSelfUserDriveRoleProvider selfUserDriveRole={selfUserDriveRole}>
@@ -703,7 +702,7 @@ describe('CellsTable selection', () => {
         .mockResolvedValueOnce({Status: 'Unknown'})
         .mockResolvedValueOnce({Status: 'Unknown'}),
     } as unknown as CellsRepository;
-    const random = () => {
+    const random = (): number => {
       return randomSamples[randomSampleIndex++] ?? 0.5;
     };
     renderCellsTable({cellsRepository: repository, clock, random});

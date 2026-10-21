@@ -149,7 +149,7 @@ export const CellsTable = ({
   selectionScopeKey,
   selectionBarAnchor,
   random = Math.random,
-}: CellsTableProps) => {
+}: CellsTableProps): ReturnType<FunctionComponent<CellsTableProps>> => {
   const {clock, translate, isFeatureToggleEnabled} = useApplicationContext();
   const canPerformCurrentDriveAction = useCellsActionPermissions();
   const isSelectionEnabled = selectionEnabled && isFeatureToggleEnabled(driveBulkActionsFeatureToggleName);
