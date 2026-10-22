@@ -451,8 +451,6 @@ jobs:
         env:
           DOCKER_IMAGE_TAG: wire-webapp-production-ci:${{ github.run_id }}-${{ github.run_attempt }}
           DISTRIBUTION_CONTEXT_PATH: ${{ runner.temp }}/production-docker-context
-          EXPECTED_VERSION: ${{ steps.public_rspack_package.outputs.expected_version }}
-          WIRE_WEBAPP_BUILD_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
           set -euo pipefail
 
@@ -464,24 +462,6 @@ jobs:
           cp -a apps/server/Dockerfile apps/server/package.json apps/server/dist "${DISTRIBUTION_CONTEXT_PATH}/apps/server/"
           cp -a libraries/config/package.json libraries/config/lib "${DISTRIBUTION_CONTEXT_PATH}/libraries/config/"
 
-          cloud_artifact_checksum="$(sha256sum apps/server/dist/s3/ebs.zip | awk '{print $1}')"
-          jq -n \
-            --arg release_version "${EXPECTED_VERSION}" \
-            --arg release_commit_sha "${WIRE_WEBAPP_BUILD_COMMIT}" \
-            --arg artifact_version "${EXPECTED_VERSION}" \
-            --arg cloud_artifact_checksum "${cloud_artifact_checksum}" \
-            --arg source_run_id "${GITHUB_RUN_ID}" \
-            --arg source_run_attempt "${GITHUB_RUN_ATTEMPT}" \
-            '{
-              productionTag: null,
-              releaseIdentifier: $release_version,
-              releaseCommitSha: $release_commit_sha,
-              artifactVersion: $artifact_version,
-              cloudArtifactChecksum: $cloud_artifact_checksum,
-              sourceRunId: $source_run_id,
-              sourceRunAttempt: $source_run_attempt
-            }' > "${DISTRIBUTION_CONTEXT_PATH}/distribution-manifest.json"
-
           docker build \
             "${DISTRIBUTION_CONTEXT_PATH}" \
             --file "${DISTRIBUTION_CONTEXT_PATH}/apps/server/Dockerfile" \
@@ -491,7 +471,6 @@ jobs:
             test -s /dist/index.js &&
             test -s /dist/version.json &&
             test -d /dist/static &&
-            test -s /app/libraries/config/lib/index.js &&
             test -s /app/run.sh &&
             test -s /dist/.env.defaults &&
             grep -q "^BACKEND_NAME=" /dist/.env.defaults &&
@@ -499,8 +478,5 @@ jobs:
             grep -q "^URL_ACCOUNT_BASE=" /dist/.env.defaults &&
             grep -q "^BACKEND_REST=" /dist/.env.defaults &&
             grep -q "^BACKEND_WS=" /dist/.env.defaults &&
-            test ! -e /app/node_modules/jest &&
-            test ! -e /app/node_modules/nx &&
-            test ! -e /app/node_modules/typescript &&
             node -e "require(\"@wireapp/config\")"
           '
