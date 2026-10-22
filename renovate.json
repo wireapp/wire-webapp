@@ -2,7 +2,7 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended", ":semanticCommitsDisabled"],
   "constraints": {
-    "npm": "11.19.0"
+    "npm": "11.21.1"
   },
   "labels": ["renovate", "semver:patch"],
   "timezone": "Europe/Berlin",
