@@ -105,7 +105,7 @@
       "inputs": ["production", "webappBuildMetadata"],
       "cache": false,
       "options": {
-        "commands": ["yarn verify:bundle:prod:public", "node tools/serverPackaging/zip.js"],
+        "commands": ["npm run verify:bundle:prod:public", "node tools/serverPackaging/zip.js"],
         "parallel": false
       }
     },

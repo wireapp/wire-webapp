@@ -77,14 +77,11 @@ jobs:
             git push origin -f "refs/tags/$tag"
           done <<< "$TAGS_TO_MOVE"
 
-      - name: Add repository Yarn wrapper to PATH
-        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
-
       - name: Setup Node.js
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'npm'
           registry-url: 'https://registry.npmjs.org'
 
       - name: Configure git
@@ -93,15 +90,15 @@ jobs:
           git config user.email "8736538+otto-the-bot@users.noreply.github.com"
 
       - name: Install dependencies
-        run: ./bin/yarn --immutable
+        run: npm clean-install
 
       - name: Build libraries
-        run: ./bin/yarn nx run-many -t build --projects=tag:type:lib
+        run: npm exec -- nx run-many -t build --projects=tag:type:lib
 
       - name: Publish to npm
         run: |
           echo "📦 Publishing release to npm..."
-          ./bin/yarn nx release publish --verbose
+          npm exec -- nx release publish --verbose
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_CONFIG_PROVENANCE: true

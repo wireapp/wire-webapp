@@ -6,7 +6,6 @@
 /config
 /coverage
 /keys
-/package-lock.json
 /resource
 /temp
 /target/
@@ -14,18 +13,9 @@
 CHANGELOG.md
 node_modules
 npm-debug.log
-yarn-error.log
 
 # auto generated source files
 apps/webapp/src/script/components/icon.tsx
-
-# yarn 2 - not using zero-installs
-.pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/sdks
 
 yalc.lock
 .yalc

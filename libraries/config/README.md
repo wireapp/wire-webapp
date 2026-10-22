@@ -14,12 +14,12 @@ This library contains environment variable type definitions and configuration ge
 
 ## Installation
 
-This package is part of the workspace and should be installed using workspace protocol:
+This package is part of the npm workspace. Depend on its current semver range so npm links the local package:
 
 ```json
 {
   "dependencies": {
-    "@wireapp/config": "workspace:^"
+    "@wireapp/config": "^1.0.0"
   }
 }
 ```

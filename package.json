@@ -40,8 +40,9 @@
     "@types/tough-cookie": "4.0.5",
     "@typescript-eslint/eslint-plugin": "8.71.2",
     "@typescript-eslint/parser": "8.71.2",
-    "@wireapp/copy-config": "workspace:^",
-    "@wireapp/prettier-config": "workspace:^",
+    "@typescript-eslint/utils": "8.71.2",
+    "@wireapp/copy-config": "^2.3.13",
+    "@wireapp/prettier-config": "^0.6.11",
     "archiver": "7.0.1",
     "cross-env": "10.1.0",
     "dpdm": "3.15.1",
@@ -72,6 +73,7 @@
     "nock": "14.0.17",
     "nx": "22.7.12",
     "playwright": "1.64.1",
+    "patch-package": "8.0.1",
     "prettier": "3.9.10",
     "rimraf": "6.1.3",
     "semver": "7.8.5",
@@ -83,9 +85,21 @@
     "type-fest": "5.10.0",
     "typescript": "6.0.3"
   },
+  "allowScripts": {
+    "@parcel/watcher@2.6.0": true,
+    "@swc/core@1.16.18": true,
+    "canvas@3.1.0": true,
+    "core-js@3.50.0": true,
+    "esbuild@0.25.12": true,
+    "nx@22.7.12": true,
+    "protobufjs@7.2.5": true,
+    "protobufjs@7.5.0": true,
+    "unrs-resolver@1.11.1": true,
+    "unrs-resolver@1.12.2": true
+  },
   "engines": {
-    "yarn": ">=4.12.0",
-    "node": ">=24.10.0"
+    "node": ">=24.10.0",
+    "npm": ">=11.19.0"
   },
   "license": "GPL-3.0",
   "name": "wire-webapp",
@@ -105,19 +119,20 @@
     "bundle:prod": "nx run server:assemble-webapp",
     "bundle:prod:public": "nx run server:assemble-webapp-public",
     "clean:jest": "nx reset && nx run workspace-tools:clean-jest",
-    "clean:yarn": "find . -name node_modules -type d -prune -exec rm -rf '{}' + && ./bin/yarn cache clean",
+    "clean:dependencies": "find . -name node_modules -type d -prune -exec rm -rf '{}' +",
     "dev": "nx serve server",
     "dev:packages": "nx run-many -t watch --projects=tag:type:lib",
     "docker": "nx run workspace-tools:docker",
     "fix": "nx format:write && nx run-many -t lint --all --fix",
-    "lint": "yarn lint:projects && yarn lint:format && yarn stylelint && yarn lint:duplication",
-    "lint:affected": "nx affected -t lint --base=\"origin/${BASE_REF}\" && yarn lint:format && yarn stylelint",
+    "lint": "npm run lint:projects && npm run lint:format && npm run stylelint && npm run lint:duplication",
+    "lint:affected": "nx affected -t lint --base=\"origin/${BASE_REF}\" && npm run lint:format && npm run stylelint",
     "lint:duplication": "jscpd --config ./jscpd.json .",
     "lint:projects": "nx run-many -t lint --all",
     "lint:fileNames": "ls-lint",
     "lint:fix": "nx run-many -t lint --all --fix",
     "lint:format": "bash tools/ci/lintFormatCheck.sh",
-    "postinstall": "nx run webapp:configure",
+    "postinstall": "patch-package && nx run webapp:configure",
+    "ci:install": "npm clean-install --ignore-scripts && npm exec -- patch-package --error-on-fail",
     "prettier": "nx format:check --base=main --head=HEAD",
     "release": "nx release",
     "release:dry-run": "nx release --dry-run",
@@ -134,8 +149,14 @@
     "test": "nx run-many -t test --all",
     "type-check": "nx run-many -t type-check --all"
   },
-  "resolutions": {
+  "overrides": {
+    "@emotion/eslint-plugin": {
+      "eslint": "^8.0.0 || ^9.0.0"
+    },
     "license-checker": "25.0.1",
+    "stylelint-order": {
+      "stylelint": "^14.0.0 || ^15.0.0 || ^16.0.1 || ^17.0.0"
+    },
     "typescript": "6.0.3",
     "xml2js": "0.6.2",
     "@stablelib/utf8": "1.0.2",
@@ -145,18 +166,12 @@
     "jest-environment-node": "30.5.2",
     "@jest/environment": "30.5.2",
     "jest-mock": "30.5.2",
-    "dexie-encrypted@2.0.0": "patch:dexie-encrypted@npm%3A2.0.0#./.yarn/patches/dexie-encrypted-npm-2.0.0-eb61eb5975.patch",
     "axios": "1.20.0",
     "dexie": "4.4.6",
     "dotenv": "16.6.1",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0"
   },
-  "dependenciesMeta": {
-    "canvas": {
-      "built": true
-    }
-  },
   "version": "1.0.0",
-  "packageManager": "yarn@4.18.1"
+  "packageManager": "npm@11.19.0"
 }

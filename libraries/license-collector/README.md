@@ -19,7 +19,7 @@ Here is what it does:
 ### Installation
 
 ```
-yarn add @wireapp/license-collector
+npm install @wireapp/license-collector
 ```
 
 ### CLI Usage

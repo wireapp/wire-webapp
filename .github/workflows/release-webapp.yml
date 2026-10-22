@@ -93,19 +93,14 @@ jobs:
             exit 1
           fi
 
-      - name: Add repository Yarn wrapper to PATH
-        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
-
       - name: Setup Node.js
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: Install release tooling dependencies
-        env:
-          YARN_ENABLE_SCRIPTS: 'false'
-        run: ./bin/yarn install --immutable --mode=skip-build
+        run: npm run ci:install
 
       - name: Prepare release branch and version
         id: prepare
@@ -170,17 +165,28 @@ jobs:
           fetch-depth: 0
           ref: ${{ needs.prepare_release.outputs.release_commit_sha }}
 
-      - name: Add repository Yarn wrapper to PATH
-        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+      - name: Checkout current package manager selector
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          ref: ${{ github.workflow_sha }}
+          path: workflow-source
+          sparse-checkout: tools/packageManager/packageManager.js
+          sparse-checkout-cone-mode: false
 
       - name: Setup Node.js
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
-
       - name: Install dependencies
-        run: ./bin/yarn --immutable
+        run: |
+          package_manager="$(node workflow-source/tools/packageManager/packageManager.js "$PWD")"
+          if [[ "${package_manager}" == 'npm' ]]; then
+            npm clean-install
+          else
+            ./bin/yarn --immutable
+          fi
 
       - name: Verify prepared release commit
         id: release_metadata
@@ -205,13 +211,25 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       - name: Update configuration
-        run: ./bin/yarn nx run webapp:configure
+        run: |
+          package_manager="$(node workflow-source/tools/packageManager/packageManager.js "$PWD")"
+          if [[ "${package_manager}" == 'npm' ]]; then
+            npm exec -- nx run webapp:configure
+          else
+            ./bin/yarn nx run webapp:configure
+          fi
 
       - name: Build and package public production
         env:
           WIRE_WEBAPP_BUILD_COMMIT: ${{ steps.release_metadata.outputs.release_commit_sha }}
           WIRE_WEBAPP_BUILD_VERSION: ${{ steps.release_metadata.outputs.release_version }}
-        run: ./bin/yarn build:prod:public
+        run: |
+          package_manager="$(node workflow-source/tools/packageManager/packageManager.js "$PWD")"
+          if [[ "${package_manager}" == 'npm' ]]; then
+            npm run build:prod:public
+          else
+            ./bin/yarn build:prod:public
+          fi
 
       - name: Validate release artifact metadata
         id: validate_artifact_metadata
@@ -254,9 +272,15 @@ jobs:
             "${distribution_context_directory}/libraries/config" \
             "${distribution_context_directory}/bin"
 
-          cp -a package.json yarn.lock .yarnrc.yml .npmrc run.sh .env.defaults "${distribution_context_directory}/"
-          cp -a .yarn "${distribution_context_directory}/.yarn"
-          cp -a bin/yarn "${distribution_context_directory}/bin/yarn"
+          cp -a package.json .npmrc run.sh .env.defaults "${distribution_context_directory}/"
+          package_manager="$(node workflow-source/tools/packageManager/packageManager.js "$PWD")"
+          if [[ "${package_manager}" == 'npm' ]]; then
+            cp -a package-lock.json "${distribution_context_directory}/package-lock.json"
+          else
+            cp -a yarn.lock .yarnrc.yml "${distribution_context_directory}/"
+            cp -a .yarn "${distribution_context_directory}/.yarn"
+            cp -a bin/yarn "${distribution_context_directory}/bin/yarn"
+          fi
           cp -a apps/server/Dockerfile apps/server/package.json "${distribution_context_directory}/apps/server/"
           cp -a apps/server/dist "${distribution_context_directory}/apps/server/dist"
           cp -a libraries/config/package.json libraries/config/lib "${distribution_context_directory}/libraries/config/"
@@ -380,19 +404,30 @@ jobs:
           fetch-tags: false
           ref: ${{ needs.build_artifact.outputs.release_commit_sha }}
 
-      - name: Add repository Yarn wrapper to PATH
-        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+      - name: Checkout current package manager selector
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          ref: ${{ github.workflow_sha }}
+          path: workflow-source
+          sparse-checkout: tools/packageManager/packageManager.js
+          sparse-checkout-cone-mode: false
 
       - name: Setup Node.js
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          # The release commit may use Yarn or npm; the selector verifies its metadata and lockfile.
 
       - name: Install dependencies
-        env:
-          YARN_ENABLE_SCRIPTS: 'false'
-        run: ./bin/yarn install --immutable --mode=skip-build
+        run: |
+          package_manager="$(node workflow-source/tools/packageManager/packageManager.js "$PWD")"
+          if [[ "${package_manager}" == 'npm' ]]; then
+            npm run ci:install
+          else
+            YARN_ENABLE_SCRIPTS=false ./bin/yarn install --immutable --mode=skip-build
+          fi
 
       - name: Create and push Beta tag
         id: beta_tag
@@ -492,19 +527,14 @@ jobs:
           fetch-tags: true
           ref: ${{ github.sha }}
 
-      - name: Add repository Yarn wrapper to PATH
-        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
-
       - name: Setup Node.js
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: Install dependencies
-        env:
-          YARN_ENABLE_SCRIPTS: 'false'
-        run: ./bin/yarn install --immutable --mode=skip-build
+        run: npm run ci:install
 
       - name: Add Beta release appearance comments
         env:
@@ -538,19 +568,14 @@ jobs:
           fetch-depth: 1
           ref: ${{ github.sha }}
 
-      - name: Add repository Yarn wrapper to PATH
-        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
-
       - name: Setup Node.js
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: Install renderer dependencies
-        env:
-          YARN_ENABLE_SCRIPTS: 'false'
-        run: ./bin/yarn install --immutable
+        run: npm run ci:install
 
       - name: Add Beta release summary
         env:
@@ -672,19 +697,30 @@ jobs:
           fetch-depth: 0
           ref: ${{ needs.build_artifact.outputs.release_commit_sha }}
 
-      - name: Add repository Yarn wrapper to PATH
-        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+      - name: Checkout current package manager selector
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          ref: ${{ github.workflow_sha }}
+          path: workflow-source
+          sparse-checkout: tools/packageManager/packageManager.js
+          sparse-checkout-cone-mode: false
 
       - name: Setup Node.js
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          # The release commit may use Yarn or npm; the selector verifies its metadata and lockfile.
 
       - name: Install dependencies
-        env:
-          YARN_ENABLE_SCRIPTS: 'false'
-        run: ./bin/yarn install --immutable --mode=skip-build
+        run: |
+          package_manager="$(node workflow-source/tools/packageManager/packageManager.js "$PWD")"
+          if [[ "${package_manager}" == 'npm' ]]; then
+            npm run ci:install
+          else
+            YARN_ENABLE_SCRIPTS=false ./bin/yarn install --immutable --mode=skip-build
+          fi
 
       - name: Check Production promotion eligibility
         id: production_preflight
@@ -961,19 +997,14 @@ jobs:
           fetch-tags: true
           ref: ${{ github.sha }}
 
-      - name: Add repository Yarn wrapper to PATH
-        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
-
       - name: Setup Node.js
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: Install dependencies
-        env:
-          YARN_ENABLE_SCRIPTS: 'false'
-        run: ./bin/yarn install --immutable --mode=skip-build
+        run: npm run ci:install
 
       - name: Add Production release appearance comments
         env:
@@ -1042,19 +1073,14 @@ jobs:
           fetch-depth: 1
           ref: ${{ github.sha }}
 
-      - name: Add repository Yarn wrapper to PATH
-        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
-
       - name: Setup Node.js
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: Install dependencies
-        env:
-          YARN_ENABLE_SCRIPTS: 'false'
-        run: ./bin/yarn install --immutable --mode=skip-build
+        run: npm run ci:install
 
       - name: Ensure GitHub Release for immutable Production tag
         id: ensure_github_release
@@ -1110,19 +1136,14 @@ jobs:
           fetch-depth: 0
           ref: ${{ github.sha }}
 
-      - name: Add repository Yarn wrapper to PATH
-        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
-
       - name: Setup Node.js
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: Install synchronization tooling dependencies
-        env:
-          YARN_ENABLE_SCRIPTS: 'false'
-        run: ./bin/yarn install --immutable --mode=skip-build
+        run: npm run ci:install
 
       - name: Synchronize WebApp version with Production
         id: synchronize
@@ -1251,19 +1272,14 @@ jobs:
           fetch-depth: 1
           ref: ${{ github.sha }}
 
-      - name: Add repository Yarn wrapper to PATH
-        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
-
       - name: Setup Node.js
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: Install renderer dependencies
-        env:
-          YARN_ENABLE_SCRIPTS: 'false'
-        run: ./bin/yarn install --immutable
+        run: npm run ci:install
 
       - name: Add release summary
         env:

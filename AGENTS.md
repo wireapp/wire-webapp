@@ -20,33 +20,33 @@ Run unit tests through Nx from the repository root. Paths passed to test options
 
 ### Webapp
 
-- `yarn nx run webapp:test`
-- `yarn nx run webapp:test --testFile=src/script/components/titleBar/titleBar.test.tsx`
-- `yarn nx run webapp:test --testFile=src/script/util/componentUtil.test.ts --testNamePattern="returns a new object"`
+- `npm exec -- nx run webapp:test`
+- `npm exec -- nx run webapp:test --testFile=src/script/components/titleBar/titleBar.test.tsx`
+- `npm exec -- nx run webapp:test --testFile=src/script/util/componentUtil.test.ts --testNamePattern="returns a new object"`
 
 ### Server
 
-- `yarn nx run server:test`
-- `yarn nx run server:test --testFile=util/timeUtil.test.ts`
-- `yarn nx run server:test --testFile=util/timeUtil.test.ts --testNamePattern="formats the time correctly"`
+- `npm exec -- nx run server:test`
+- `npm exec -- nx run server:test --testFile=util/timeUtil.test.ts`
+- `npm exec -- nx run server:test --testFile=util/timeUtil.test.ts --testNamePattern="formats the time correctly"`
 
 ### Libraries
 
 Library Nx project names end with `-lib`, such as `core-lib` or `api-client-lib`.
 
-- `yarn nx run core-lib:test`
-- `yarn nx run core-lib:test --testFile=src/util/numberToHex.test.ts`
-- `yarn nx run core-lib:test --testFile=src/util/numberToHex.test.ts --testNamePattern="should convert a number to a hex string"`
+- `npm exec -- nx run core-lib:test`
+- `npm exec -- nx run core-lib:test --testFile=src/util/numberToHex.test.ts`
+- `npm exec -- nx run core-lib:test --testFile=src/util/numberToHex.test.ts --testNamePattern="should convert a number to a hex string"`
 
 ## Running ESLint
 
 For investigation, run ESLint once with JSON to `/tmp`, then analyze with `jq`, `rg`, or `node` — do not re-run ESLint for each query.
 
 ```bash
-yarn eslint --config eslint.config.mjs --no-cache -f json -o /tmp/eslint-output.json apps/webapp/src
+npm exec -- eslint --config eslint.config.mjs --no-cache -f json -o /tmp/eslint-output.json apps/webapp/src
 ```
 
-Per-file checks: pass a single file path as the last argument, not `yarn nx run webapp:lint`.
+Per-file checks: pass a single file path as the last argument, not `npm exec -- nx run webapp:lint`.
 
 ## TypeScript and JavaScript
 
@@ -57,7 +57,7 @@ Per-file checks: pass a single file path as the last argument, not `yarn nx run 
 ## Git
 
 - Commit messages must include a concise subject and a description body explaining what changed and why.
-- When changes are ready to commit, prompt the user to run checks first: `yarn type-check`, `BASE_REF=main yarn lint:affected` (includes Prettier via `lint:format` and Stylelint), and relevant `yarn nx run <project>:test` for touched projects.
+- When changes are ready to commit, prompt the user to run checks first: `npm run type-check`, `BASE_REF=main npm run lint:affected` (includes Prettier via `lint:format` and Stylelint), and relevant `npm exec -- nx run <project>:test` for touched projects.
 
 ## Webapp code rules
 

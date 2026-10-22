@@ -24,7 +24,7 @@ import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSu
 import {mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {loadValue, storeValue} from 'Util/storageUtil';
 
-/* yarn test:app --specs media/MediaDevicesHandler --nolegacy */
+/* npm exec -- jest --runTestsByPath apps/webapp/src/script/repositories/media/MediaDevicesHandler.test.ts */
 describe('MediaDevicesHandler', () => {
   /**
    * Test data from a real-world scenario:

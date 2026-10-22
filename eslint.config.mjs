@@ -580,6 +580,7 @@ const productionConfigs = [
       'tools/productionDistribution/**/*.ts',
       'tools/releaseSummary/**/*.ts',
       'tools/runtimeVerification/**/*.ts',
+      'tools/serverPackaging/**/*.ts',
       'tools/testReporting/**/*.ts',
     ],
     languageOptions: {

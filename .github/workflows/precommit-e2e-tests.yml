@@ -56,16 +56,13 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
 
-      - name: Add repository Yarn wrapper to PATH
-        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
-
       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'npm'
 
-      - run: ./bin/yarn --immutable
-      - run: ./bin/yarn nx run webapp:configure
+      - run: npm clean-install
+      - run: npm exec -- nx run webapp:configure
       - id: package
         env:
           EVENT_NAME: ${{ github.event_name }}
@@ -77,10 +74,10 @@ jobs:
 
           if [[ "${EVENT_NAME}" == "workflow_dispatch" && "${USE_PUBLIC_RSPACK}" == "true" ]]; then
             WIRE_WEBAPP_BUILD_VERSION="${expected_version}" \
-              ./bin/yarn nx run server:package-public
+              npm exec -- nx run server:package-public
           else
             WIRE_WEBAPP_BUILD_VERSION="${expected_version}" \
-              ./bin/yarn build:prod
+              npm run build:prod
           fi
 
           {

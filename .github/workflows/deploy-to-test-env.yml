@@ -38,17 +38,14 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Add repository Yarn wrapper to PATH
-        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
-
       - name: Setup Node.js
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: Install JS dependencies
-        run: ./bin/yarn --immutable
+        run: npm clean-install
 
       - name: Build and package
         env:
@@ -56,7 +53,7 @@ jobs:
         run: |
           short_commit_sha="${GITHUB_SHA::7}"
           WIRE_WEBAPP_BUILD_VERSION="dev-${short_commit_sha}" \
-          ./bin/yarn nx run server:package
+          npm exec -- nx run server:package
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@ec61189d14ec14c8efccab744f656cffd0e33f37

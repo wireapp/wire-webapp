@@ -11,7 +11,7 @@
       "dependsOn": ["^build", "server:generate-build-metadata"],
       "inputs": ["production", "webappBuildMetadata", "{workspaceRoot}/apps/server/build/metadata/version.json"],
       "options": {
-        "command": "WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/internal yarn build:prod",
+        "command": "WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/internal npm run build:prod",
         "cwd": "{projectRoot}"
       }
     },
@@ -22,7 +22,7 @@
       "dependsOn": ["^build", "server:generate-build-metadata"],
       "inputs": ["production", "webappBuildMetadata", "{workspaceRoot}/apps/server/build/metadata/version.json"],
       "options": {
-        "command": "WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/development yarn build:dev",
+        "command": "WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/development npm run build:dev",
         "cwd": "{projectRoot}"
       }
     },
@@ -33,7 +33,7 @@
       "dependsOn": ["^build", "server:generate-build-metadata"],
       "inputs": ["production", "webappBuildMetadata", "{workspaceRoot}/apps/server/build/metadata/version.json"],
       "options": {
-        "command": "WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/public yarn build:prod:public",
+        "command": "WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/public npm run build:prod:public",
         "cwd": "{projectRoot}"
       }
     },
@@ -67,7 +67,7 @@
       "executor": "nx:run-commands",
       "defaultConfiguration": "development",
       "options": {
-        "command": "echo 'Use yarn start from the root to run the Rspack development server'"
+        "command": "echo 'Use npm run start from the root to run the Rspack development server'"
       }
     },
     "test": {
@@ -167,7 +167,7 @@
       "executor": "nx:run-commands",
       "dependsOn": ["copy-config-lib:build"],
       "options": {
-        "command": "copy-config ./.copyconfigrc.js && ts-node ./bin/generate_react_icons.ts && tsc --project ./tsconfig.generated-icons.json --noEmit",
+        "command": "node ../../libraries/copy-config/lib/cli.js ./.copyconfigrc.js && ts-node ./bin/generate_react_icons.ts && tsc --project ./tsconfig.generated-icons.json --noEmit",
         "cwd": "{projectRoot}"
       }
     }
