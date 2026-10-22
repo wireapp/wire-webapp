@@ -446,3 +446,37 @@ jobs:
           EXPECTED_COMMIT="${WIRE_WEBAPP_BUILD_COMMIT}" \
           EXPECTED_VERSION="${expected_version}" \
             node ./tools/buildArtifact/validateBuildArtifact.mts
+
+      - name: Build and smoke-test sparse production Docker context
+        env:
+          DOCKER_IMAGE_TAG: wire-webapp-production-ci:${{ github.run_id }}-${{ github.run_attempt }}
+          DISTRIBUTION_CONTEXT_PATH: ${{ runner.temp }}/production-docker-context
+        run: |
+          set -euo pipefail
+
+          mkdir -p \
+            "${DISTRIBUTION_CONTEXT_PATH}/apps/server" \
+            "${DISTRIBUTION_CONTEXT_PATH}/libraries/config"
+
+          cp -a package.json package-lock.json .npmrc run.sh .env.defaults "${DISTRIBUTION_CONTEXT_PATH}/"
+          cp -a apps/server/Dockerfile apps/server/package.json apps/server/dist "${DISTRIBUTION_CONTEXT_PATH}/apps/server/"
+          cp -a libraries/config/package.json libraries/config/lib "${DISTRIBUTION_CONTEXT_PATH}/libraries/config/"
+
+          docker build \
+            "${DISTRIBUTION_CONTEXT_PATH}" \
+            --file "${DISTRIBUTION_CONTEXT_PATH}/apps/server/Dockerfile" \
+            --tag "${DOCKER_IMAGE_TAG}"
+
+          docker run --rm --entrypoint sh "${DOCKER_IMAGE_TAG}" -c '
+            test -s /dist/index.js &&
+            test -s /dist/version.json &&
+            test -d /dist/static &&
+            test -s /app/run.sh &&
+            test -s /dist/.env.defaults &&
+            grep -q "^BACKEND_NAME=" /dist/.env.defaults &&
+            grep -q "^BRAND_NAME=" /dist/.env.defaults &&
+            grep -q "^URL_ACCOUNT_BASE=" /dist/.env.defaults &&
+            grep -q "^BACKEND_REST=" /dist/.env.defaults &&
+            grep -q "^BACKEND_WS=" /dist/.env.defaults &&
+            node -e "require(\"@wireapp/config\")"
+          '
