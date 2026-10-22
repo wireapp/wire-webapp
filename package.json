@@ -173,5 +173,5 @@
     "@types/react-dom": "19.3.0"
   },
   "version": "1.0.0",
-  "packageManager": "npm@11.19.0"
+  "packageManager": "npm@11.21.1"
 }
