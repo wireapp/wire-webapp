@@ -567,12 +567,12 @@ In [`apps/webapp/package.json`](apps/webapp/package.json):
 ```json
 {
   "dependencies": {
-    "@wireapp/core": "workspace:^"
+    "@wireapp/core": "^46.47.4"
   }
 }
 ```
 
-The `workspace:^` protocol tells Yarn to resolve to the local workspace version.
+The semver range allows npm to link the matching local workspace package.
 
 ---
 
@@ -793,7 +793,7 @@ The deployment process includes a special step to pre-bundle workspace dependenc
 
 **Why this is needed:**
 
-In a standard deployment, `npm install` would resolve dependencies from npm. However, our monorepo uses workspace dependencies (`workspace:^`) which are local packages. When deploying to AWS, we need to:
+In a standard deployment, `npm install` would resolve dependencies from npm. Our monorepo declares local workspace packages using semver ranges that match their package versions. When deploying to AWS, we need to:
 
 1. Pre-compile all workspace libraries
 2. Copy the compiled output to the deployment bundle
@@ -801,54 +801,41 @@ In a standard deployment, `npm install` would resolve dependencies from npm. How
 
 **How it works:**
 
-The script reads [`apps/server/package.json`](apps/server/package.json) to find workspace dependencies:
+The script reads [`apps/server/package.json`](apps/server/package.json) and each local library manifest. It identifies local dependencies by package name, so it works with the npm-compatible semver ranges in the workspace manifests:
 
 ```javascript
 const serverPackageJson = require('../package.json');
-const workspaceDeps = Object.entries(serverPackageJson.dependencies || {})
-  .filter(([, version]) => version.startsWith('workspace:'))
-  .map(([name]) => name);
+const workspaceDependencyPackages = findLocalWorkspaceDependencyPackages({
+  dependencies: serverPackageJson.dependencies || {},
+  workspacePackages,
+});
 
-console.log('Bundling workspace dependencies:', workspaceDeps.join(', '));
+console.log(
+  'Bundling workspace dependencies:',
+  workspaceDependencyPackages.map(workspacePackage => workspacePackage.manifest.name).join(', '),
+);
 ```
 
 For each workspace dependency, it:
 1. Locates the library in the monorepo (`libraries/{lib-name}`)
-2. Copies the compiled `lib/` directory to `dist/node_modules/@wireapp/{lib-name}/lib/`
-3. Copies the `package.json` to `dist/node_modules/@wireapp/{lib-name}/package.json`
+2. Copies the compiled `lib/` directory to `dist/node_modules/{package-name}/lib/`
+3. Copies the `package.json` to `dist/node_modules/{package-name}/package.json`
 
 This creates a self-contained deployment where all workspace dependencies are pre-bundled and ready to run.
 
 ### Version Resolution for Workspace Dependencies
 
-The [`tools/serverPackaging/zip.js`](../tools/serverPackaging/zip.js) script handles version resolution for workspace dependencies:
+The [`tools/serverPackaging/zip.js`](../tools/serverPackaging/zip.js) script records the actual local package versions in the deployment manifest:
 
 ```javascript
-// Read and modify package.json to handle workspace dependencies
-const packageJson = JSON.parse(fs.readFileSync(path.join(SERVER_PATH, 'package.json'), 'utf8'));
-
-// Convert workspace:* dependencies to "*" version - they're pre-bundled in node_modules
-const workspaceDeps = [];
-if (packageJson.dependencies) {
-  Object.keys(packageJson.dependencies).forEach(dep => {
-    if (packageJson.dependencies[dep].startsWith('workspace:')) {
-      console.log(`Marking workspace dependency as pre-bundled: ${dep}`);
-      workspaceDeps.push(dep);
-      // Read version from the library's package.json
-      const libPkgPath = path.join(ROOT_PATH, 'libraries', dep.replace('@wireapp/', ''), 'package.json');
-      if (fs.existsSync(libPkgPath)) {
-        const libPkg = JSON.parse(fs.readFileSync(libPkgPath, 'utf8'));
-        packageJson.dependencies[dep] = libPkg.version;
-      } else {
-        packageJson.dependencies[dep] = '*';
-      }
-    }
-  });
-}
+const packageJson = createPackagedServerManifest({
+  serverPackageManifest,
+  workspacePackages,
+});
 ```
 
 This ensures that:
-1. The deployment package's `package.json` has concrete versions instead of `workspace:*`
+1. The deployment package's `package.json` has concrete versions matching bundled local packages
 2. AWS Elastic Beanstalk doesn't try to resolve workspace dependencies
 3. The pre-bundled libraries in `node_modules` are used directly
 
@@ -934,8 +921,8 @@ If you see errors about missing library files during deployment:
 
 If deployment fails due to version issues:
 1. Check that [`libraries/{lib}/package.json`](libraries/core/package.json) has correct versions
-2. Verify [`apps/server/package.json`](apps/server/package.json) uses `workspace:^` for workspace deps
-3. Run `./bin/yarn install` to update local workspace resolution
+2. Verify [`apps/server/package.json`](apps/server/package.json) uses a semver range matching each local workspace package
+3. Run `npm install` to update local workspace resolution
 
 **Asset Copy Failures:**
 
@@ -1134,7 +1121,7 @@ Nx will:
 **What happens when you run Rspack directly instead of Nx:**
 
 ```bash
-cd apps/webapp && ../../bin/yarn rspack build --config rspack.config.mts
+npm exec --prefix . -- nx run webapp:build
 ```
 
 You might get:
@@ -1286,20 +1273,20 @@ Running underlying tools directly (Rspack, Jest, TypeScript, ESLint) can cause s
 
 ```bash
 # DON'T DO THIS
-cd apps/webapp && ../../bin/yarn build
+npm --workspace=@wireapp/webapp run build
 
 # INSTEAD DO THIS
-./bin/yarn nx build webapp
+npm exec -- nx run webapp:build
 ```
 
 **Running package `test` scripts directly:**
 
 ```bash
 # DON'T DO THIS
-cd apps/webapp && ../../bin/yarn test
+npm --workspace=@wireapp/webapp run test
 
 # INSTEAD DO THIS
-./bin/yarn nx test webapp
+npm exec -- nx run webapp:test
 ```
 
 **Running `tsc` directly:**
@@ -1350,16 +1337,16 @@ nx affected -t lint
 # 1. Make changes to code
 
 # 2. Build everything manually
-cd apps/webapp && ../../bin/yarn build
-cd apps/server && ../../bin/yarn build
+npm --workspace=@wireapp/webapp run build
+npm --workspace=@wireapp/server run build
 
 # 3. Test everything manually
-cd apps/webapp && ../../bin/yarn test
-cd apps/server && ../../bin/yarn test
+npm --workspace=@wireapp/webapp run test
+npm --workspace=@wireapp/server run test
 
 # 4. Lint everything manually
-cd apps/webapp && ../../bin/yarn lint
-cd apps/server && ../../bin/yarn lint
+npm --workspace=@wireapp/webapp run lint
+npm --workspace=@wireapp/server run lint
 ```
 
 The incorrect workflow:
@@ -1496,7 +1483,7 @@ From [`.github/workflows/ci.yml`](.github/workflows/ci.yml):
 
 ```yaml
 - name: Test
-  run: ./tools/ci/runWithNetworkIsolation.sh ./bin/yarn nx run-many -t test --all --configuration=ci --detectOpenHandles=false
+  run: ./tools/ci/runWithNetworkIsolation.sh npm exec -- nx run-many -t test --all --configuration=ci --detectOpenHandles=false
 
 - name: Upload coverage reports
   if: always()
@@ -1552,7 +1539,7 @@ stage('Wait for GitHub action to finish') {
 Start the full dev stack with one command:
 
 ```bash
-yarn dev
+npm run dev
 ```
 
 This runs `nx serve server`, which:
@@ -1599,14 +1586,14 @@ In [`apps/webapp/package.json`](apps/webapp/package.json):
 ```json
 {
   "dependencies": {
-    "@wireapp/core": "workspace:^"
+    "@wireapp/core": "^46.47.4"
   }
 }
 ```
 
-The `workspace:^` protocol ensures:
-- Local workspace packages are linked via Yarn workspaces
-- Version is automatically resolved to the local workspace version
+The npm workspace configuration ensures:
+- Matching local workspace packages are linked in `node_modules`
+- Their versions stay aligned through explicit semver ranges
 - Rspack consumes compiled `lib/` output; `watch` targets keep `lib/` in sync during development
 
 ### Nx Daemon for Fast Rebuilds
@@ -1635,8 +1622,8 @@ nx lint <project>                     # Lint specific project
 nx run-many -t lint --all             # Lint all projects
 
 # Development
-yarn dev                              # Dev server + upstream lib watchers
-nx serve server                       # Same as yarn dev / yarn start
+npm run dev                           # Dev server + upstream lib watchers
+npm exec -- nx serve server           # Same as npm run dev / npm run start
 
 # Graph & Analysis
 nx graph                              # Visualize dependency graph
@@ -1674,12 +1661,12 @@ nx run-many -t test --projects=tag:lib
 3. **Cache is your friend** - Nx cache saves time, but remember `nx reset` when needed
 4. **Add projects to [`tsconfig.json`](tsconfig.json)** - Project references are required
 5. **Update [`tsconfig.eslint.json`](tsconfig.eslint.json)** - For type-aware linting to work
-6. **Use `workspace:^`** - For local workspace dependencies in package.json
+6. **Use matching semver ranges** - npm links local workspace dependencies when the declared range matches the local package version
 7. **Configure Jest coverage thresholds** - Add realistic project-local baselines when new libraries/apps add tests
 8. **Update [`.github/labeler.yml`](.github/labeler.yml)** - Add label rules for new projects
 9. **Check `nx graph`** - Visualize dependencies before making changes
 10. **CI uses Nx** - All GitHub workflows use Nx commands
-11. **`yarn dev` watches upstream libs** - `server:serve` depends on `webapp:watch-deps`, which starts `^watch` on webapp's library dependencies
+11. **`npm run dev` watches upstream libs** - `server:serve` depends on `webapp:watch-deps`, which starts `^watch` on webapp's library dependencies
 12. **Path mappings enable clean imports** - Use TypeScript paths for library imports
 13. **`typesVersions` in libraries** - Maps `lib/*` imports to `src/*` for source-based type resolution
 14. **`paths` in tsconfig.eslint.json** - Required for ESLint TypeScript Project Service to resolve imports during linting

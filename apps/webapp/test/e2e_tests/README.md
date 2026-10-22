@@ -16,8 +16,8 @@ It will generate .env file with variables from 1Password
 
 ### Install dependencies
 
-1. Install JS dependencies: `yarn --immutable`
-2. Install Playwright dependencies: `yarn playwright install --with-deps`
+1. Install JS dependencies from the root: `npm clean-install`
+2. Install Playwright dependencies: `npm exec -- playwright install --with-deps`
 
 _Note: If in doubt, refer to test jobs in [git actions workflows folder](/.github/workflows)._
 
@@ -77,7 +77,7 @@ in the options object.
 The pure URL adapter tests need no browser, backend, or credentials:
 
 ```bash
-yarn nx run webapp:e2e --excludeTaskDependencies -- utils/startupFeatureToggleOverrides.spec.ts --workers=1 --reporter=line
+npm exec -- nx run webapp:e2e --excludeTaskDependencies -- utils/startupFeatureToggleOverrides.spec.ts --workers=1 --reporter=line
 ```
 
 ### Running the tests
@@ -86,10 +86,10 @@ For hosted manual regression runs, use the logical company-facing Beta environme
 
 E2E tests can be run via
 
-1. Executing `yarn e2e-test` in the root folder of the repo. Running it with `--ui` flag will open Playwright app that can be handy for debugging. Providing `--grep "@{TAG_NAME}"` will result in running only tests with @{TAG_NAME}. For example:
+1. Executing `npm run e2e-test` in the root folder of the repo. Running it with `-- --ui` will open Playwright app that can be handy for debugging. Providing `--grep "@{TAG_NAME}"` will result in running only tests with @{TAG_NAME}. For example:
 
 ```
-yarn e2e-test --grep "@regression"
+npm run e2e-test -- --grep "@regression"
 ```
 
 You can provide multiple tags with `--grep "@{TAG_NAME1}|@{TAG_NAME2}|@{TAG_NAME3}..."`

@@ -4,7 +4,6 @@
 coverage/
 node_modules/
 npm-debug.log
-yarn-error.log
 temp/
 
 # Playwright artifacts
@@ -14,13 +13,6 @@ blob-report/
 playwright/.cache/
 test/e2e_tests/.env
 
-# Yarn 2 - not using zero-installs
-.pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/sdks
 yalc.lock
 .yalc
 

@@ -1,7 +1,6 @@
-diff --git a/dist/installHooks.js b/dist/installHooks.js
-index f1d3626df21b417c799eac2bbcc6ded06ebe90af..0a98817fb7abe6c4550458e9a4a5ed5f3a1e0f39 100644
---- a/dist/installHooks.js
-+++ b/dist/installHooks.js
+diff --git a/node_modules/dexie-encrypted/dist/installHooks.js b/node_modules/dexie-encrypted/dist/installHooks.js
+--- a/node_modules/dexie-encrypted/dist/installHooks.js
++++ b/node_modules/dexie-encrypted/dist/installHooks.js
 @@ -105,27 +105,13 @@ function installHooks(db, encryptionOptions, keyPromise, performEncryption, perf
                                  if (!cursor) {
                                      return cursor;

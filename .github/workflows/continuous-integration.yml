@@ -68,20 +68,17 @@ jobs:
           persist-credentials: false
           fetch-depth: 1
 
-      - name: Add repository Yarn wrapper to PATH
-        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
-
       - name: Setup Node.js
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: Verify sparse runtime validation entry point
         run: bash ./tools/runtimeVerification/verifySparseRuntimeValidation.sh
 
       - name: Install dependencies
-        run: ./bin/yarn --immutable
+        run: npm clean-install
 
       - name: Verify deployment CLI from clean install
         run: |
@@ -102,7 +99,7 @@ jobs:
 
       - name: Verify generated i18n artifacts are committed
         run: |
-          ./bin/yarn nx run webapp:translate-merge
+          npm exec -- nx run webapp:translate-merge
 
           if ! test -z "$(git status --porcelain)"; then
             echo "Repository is not clean after generation. Run generation locally and commit the changes."
@@ -111,7 +108,7 @@ jobs:
           fi
 
       - name: Validate translation markers
-        run: ./bin/yarn nx run webapp:validate-translations
+        run: npm exec -- nx run webapp:validate-translations
 
   build-libraries:
     runs-on: ubuntu-24.04
@@ -126,20 +123,17 @@ jobs:
           persist-credentials: false
           fetch-depth: 1
 
-      - name: Add repository Yarn wrapper to PATH
-        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
-
       - name: Setup Node.js
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: ./bin/yarn --immutable
+        run: npm clean-install
 
       - name: Build libraries
-        run: ./bin/yarn nx run-many -t build --projects=tag:type:lib
+        run: npm exec -- nx run-many -t build --projects=tag:type:lib
 
   rspack-build:
     runs-on: ubuntu-24.04
@@ -160,20 +154,17 @@ jobs:
           persist-credentials: false
           fetch-depth: 1
 
-      - name: Add repository Yarn wrapper to PATH
-        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
-
       - name: Setup Node.js
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: ./bin/yarn --immutable
+        run: npm clean-install
 
       - name: Build internal webapp
-        run: ./bin/yarn nx run webapp:build
+        run: npm exec -- nx run webapp:build
 
       - name: Build and package public webapp with Rspack
         id: public_rspack_package
@@ -183,7 +174,7 @@ jobs:
           short_commit_sha="${WIRE_WEBAPP_BUILD_COMMIT::7}"
           expected_version="dev-${short_commit_sha}"
           WIRE_WEBAPP_BUILD_VERSION="${expected_version}" \
-            ./bin/yarn nx run server:package-public
+            npm exec -- nx run server:package-public
           echo "expected_version=${expected_version}" >> "$GITHUB_OUTPUT"
 
       - name: Install unzip for artifact verification
@@ -235,7 +226,7 @@ jobs:
           fi
 
       - name: Run Rspack browser smoke tests
-        run: ./bin/yarn nx run webapp:smoke-rspack
+        run: npm exec -- nx run webapp:smoke-rspack
 
       - name: Upload Rspack smoke diagnostics
         if: ${{ failure() }}
@@ -261,20 +252,17 @@ jobs:
           persist-credentials: false
           fetch-depth: 1
 
-      - name: Add repository Yarn wrapper to PATH
-        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
-
       - name: Setup Node.js
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: ./bin/yarn --immutable
+        run: npm clean-install
 
       - name: Type check
-        run: ./bin/yarn type-check
+        run: npm run type-check
 
   lint-file-names:
     runs-on: ubuntu-24.04
@@ -289,20 +277,17 @@ jobs:
           persist-credentials: false
           fetch-depth: 1
 
-      - name: Add repository Yarn wrapper to PATH
-        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
-
       - name: Setup Node.js
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: ./bin/yarn --immutable
+        run: npm clean-install
 
       - name: Lint file names
-        run: ./bin/yarn lint:fileNames
+        run: npm run lint:fileNames
 
   lint:
     runs-on: ubuntu-24.04
@@ -327,21 +312,18 @@ jobs:
             "${BASE_REF}:refs/remotes/origin/${BASE_REF}" \
             "${BASE_REF}:${BASE_REF}"
 
-      - name: Add repository Yarn wrapper to PATH
-        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
-
       - name: Setup Node.js
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: ./bin/yarn --immutable
+        run: npm clean-install
 
       - name: Check code duplication
         id: duplication
-        run: ./bin/yarn lint:duplication
+        run: npm run lint:duplication
 
       - name: Upload duplication report
         if: ${{ !cancelled() && steps.duplication.outcome != 'skipped' }}
@@ -353,35 +335,35 @@ jobs:
           retention-days: 3
 
       - name: Build libraries for lint import resolution
-        run: ./bin/yarn nx run-many -t build --projects=tag:type:lib
+        run: npm exec -- nx run-many -t build --projects=tag:type:lib
 
       - name: Lint affected projects (ESLint)
         if: ${{ github.event_name == 'pull_request' }}
         env:
           BASE_REF: ${{ github.base_ref }}
-        run: ./bin/yarn nx affected -t lint --base="origin/${BASE_REF}"
+        run: npm exec -- nx affected -t lint --base="origin/${BASE_REF}"
 
       - name: Check formatting (Prettier)
         if: ${{ github.event_name == 'pull_request' }}
         env:
           BASE_REF: ${{ github.base_ref }}
-        run: ./bin/yarn lint:format
+        run: npm run lint:format
 
       - name: Stylelint
         if: ${{ github.event_name == 'pull_request' }}
-        run: ./bin/yarn stylelint
+        run: npm run stylelint
 
       - name: Lint all projects (ESLint)
         if: ${{ github.event_name != 'pull_request' }}
-        run: ./bin/yarn lint:projects
+        run: npm run lint:projects
 
       - name: Check formatting (Prettier)
         if: ${{ github.event_name != 'pull_request' }}
-        run: ./bin/yarn lint:format
+        run: npm run lint:format
 
       - name: Stylelint
         if: ${{ github.event_name != 'pull_request' }}
-        run: ./bin/yarn stylelint
+        run: npm run stylelint
 
   unit-tests:
     runs-on: ubuntu-24.04
@@ -396,20 +378,17 @@ jobs:
           persist-credentials: false
           fetch-depth: 1
 
-      - name: Add repository Yarn wrapper to PATH
-        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
-
       - name: Setup Node.js
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: ./bin/yarn --immutable
+        run: npm clean-install
 
       - name: Test
-        run: ./tools/ci/runWithNetworkIsolation.sh ./bin/yarn nx run-many -t test --all --configuration=ci --detectOpenHandles=false
+        run: ./tools/ci/runWithNetworkIsolation.sh npm exec -- nx run-many -t test --all --configuration=ci --detectOpenHandles=false
 
       - name: Upload coverage reports
         if: always()
@@ -445,17 +424,14 @@ jobs:
           persist-credentials: false
           fetch-depth: 1
 
-      - name: Add repository Yarn wrapper to PATH
-        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
-
       - name: Setup Node.js
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: ./bin/yarn --immutable
+        run: npm clean-install
 
       - name: Build and verify public production package
         env:
@@ -464,7 +440,7 @@ jobs:
           short_commit_sha="${WIRE_WEBAPP_BUILD_COMMIT::7}"
           expected_version="dev-${short_commit_sha}"
           WIRE_WEBAPP_BUILD_VERSION="${expected_version}" \
-            ./bin/yarn build:prod:public
+            npm run build:prod:public
 
           BUILD_ARTIFACT_PATH=apps/server/dist/s3/ebs.zip \
           EXPECTED_COMMIT="${WIRE_WEBAPP_BUILD_COMMIT}" \

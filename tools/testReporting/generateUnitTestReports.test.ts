@@ -95,8 +95,8 @@ describe('generate-unit-test-reports', (): void => {
     const actualCommand = createNxTestCommand('webapp');
 
     expect(actualCommand).toEqual({
-      command: './bin/yarn',
-      commandArguments: ['nx', 'run', 'webapp:test', '--configuration=ci', '--verbose'],
+      command: 'npm',
+      commandArguments: ['exec', '--', 'nx', 'run', 'webapp:test', '--configuration=ci', '--verbose'],
     });
   });
 
@@ -134,14 +134,14 @@ describe('generate-unit-test-reports', (): void => {
       overallStatus: 'failed',
       projects: [
         {
-          command: './bin/yarn nx run server:test --configuration=ci --verbose',
+          command: 'npm exec -- nx run server:test --configuration=ci --verbose',
           exitCode: 0,
           name: 'server',
           reportFileName: 'unit-tests-server-abc123.log',
           status: 'passed',
         },
         {
-          command: './bin/yarn nx run webapp:test --configuration=ci --verbose',
+          command: 'npm exec -- nx run webapp:test --configuration=ci --verbose',
           exitCode: 1,
           name: 'webapp',
           reportFileName: 'unit-tests-webapp-abc123.log',
@@ -178,7 +178,7 @@ describe('generate-unit-test-reports', (): void => {
       testableProjects,
       reportSettings,
       async (_command, commandArguments) => {
-        const projectName = commandArguments[2].split(':')[0];
+        const projectName = commandArguments[4].split(':')[0];
         executedProjectNames.push(projectName);
 
         return {exitCode: projectName === 'first-project' ? 1 : 0, output: `${projectName} output`};

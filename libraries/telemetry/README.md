@@ -55,12 +55,6 @@ output, including the assembled deployment archive.
 ### Installation
 
 ```bash
-yarn add @wireapp/telemetry
-```
-
-or
-
-```bash
 npm install @wireapp/telemetry
 ```
 

@@ -93,8 +93,8 @@ export function createReportFileName(projectName: string, commitSha: string): st
 
 export function createNxTestCommand(projectName: string): NxTestCommand {
   return {
-    command: './bin/yarn',
-    commandArguments: ['nx', 'run', `${projectName}:test`, '--configuration=ci', '--verbose'],
+    command: 'npm',
+    commandArguments: ['exec', '--', 'nx', 'run', `${projectName}:test`, '--configuration=ci', '--verbose'],
   };
 }
 

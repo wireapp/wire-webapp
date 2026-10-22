@@ -39,13 +39,13 @@ while IFS= read -r file; do
   [[ -z "$file" ]] && continue
   [[ -f "$file" ]] || continue
   FILES+=("$file")
-  echo "::error file=${file}::Not formatted with Prettier. Run: yarn nx format:write --files=${file}"
+  echo "::error file=${file}::Not formatted with Prettier. Run: npm exec -- nx format:write --files=${file}"
 done < "$OUTPUT"
 
 if ((${#FILES[@]} > 0)); then
   FILES_CSV=$(IFS=,; echo "${FILES[*]}")
   echo "Fix all at once:"
-  echo "  yarn nx format:write --files=${FILES_CSV}"
+  echo "  npm exec -- nx format:write --files=${FILES_CSV}"
 fi
 
 exit 1

@@ -13,7 +13,7 @@ Wire's internal configuration copy tool.
 ### Installation
 
 ```
-yarn add @wireapp/copy-config
+npm install @wireapp/copy-config
 ```
 
 ### CLI Setup
