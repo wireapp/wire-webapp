@@ -141,7 +141,7 @@
     "babel-jest": "30.5.2",
     "babel-plugin-transform-import-meta": "2.3.3",
     "baseline-browser-mapping": "2.11.29",
-    "browserslist": "4.29.3",
+    "browserslist": "4.29.4",
     "css-loader": "7.1.5",
     "cssnano": "7.1.9",
     "dexie": "4.4.6",
