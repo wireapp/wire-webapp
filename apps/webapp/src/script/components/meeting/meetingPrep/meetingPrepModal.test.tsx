@@ -104,6 +104,27 @@ describe('MeetingPrepModal', () => {
     expect(screen.getByRole('heading', {name: 'Design review'})).toBeInTheDocument();
   });
 
+  it('closes an open device list before closing the prep modal on Escape', () => {
+    renderModal();
+
+    act(() => {
+      useMeetingPrepModal.getState().open(session);
+    });
+
+    fireEvent.click(screen.getByRole('button', {name: 'videoCallOverlayOpenMicrophoneAndSpeakerOptions'}));
+    fireEvent.keyDown(screen.getByRole('listbox'), {key: KEY.ESC});
+
+    expect(screen.getByRole('heading', {name: 'Design review'})).toBeInTheDocument();
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+
+    const content = screen.getByRole('dialog').firstElementChild;
+    if (content === null) {
+      throw new Error('Expected modal content element');
+    }
+    fireEvent.keyDown(content, {key: KEY.ESC});
+    expect(screen.queryByRole('heading', {name: 'Design review'})).not.toBeInTheDocument();
+  });
+
   it('closes from Cancel, Escape, and the overlay', async () => {
     renderModal();
     act(() => {

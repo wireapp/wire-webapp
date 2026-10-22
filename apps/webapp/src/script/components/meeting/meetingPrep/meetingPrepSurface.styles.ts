@@ -25,6 +25,8 @@ export const meetingPrepSurfaceStyles: CSSObject = {
   display: 'flex',
   flexDirection: 'column',
   width: '100%',
+  maxHeight: 'calc(90vh - 2rem)',
+  minHeight: 0,
   backgroundColor: 'var(--modal-bg)',
   borderRadius: '12px',
   overflow: 'hidden',
@@ -74,7 +76,10 @@ export const meetingPrepCloseButtonStyles: CSSObject = {
 export const meetingPrepBodyStyles: CSSObject = {
   display: 'flex',
   flexDirection: 'column',
+  flex: '1 1 auto',
   gap: '16px',
+  minHeight: 0,
+  overflowY: 'auto',
   padding: '0 24px 8px',
 };
 

@@ -31,10 +31,10 @@ import type {Translate} from 'Util/localizerUtil';
 
 import {MeetingPrepSurface} from './meetingPrepSurface';
 import {
-  meetingPrepPreviewErrors,
+  type MeetingPrepDeviceKind,
   meetingPrepDeviceKinds,
   meetingPrepMediaKinds,
-  type MeetingPrepDeviceKind,
+  meetingPrepPreviewErrors,
   type RequestMeetingPrepPreview,
 } from './meetingPrepTypes';
 
@@ -69,6 +69,7 @@ const pendingPreview: RequestMeetingPrepPreview = () => {
 
 type RenderSurfaceResult = {
   onCancel: (() => void) | jest.Mock<any, any, any>;
+  onPermissionDenied: ((kind: MeetingPrepDeviceKind) => void) | jest.Mock<any, any, any>;
   onJoin:
     jest.Mock<any, any, any> | ((choice: {cameraEnabled: boolean; microphoneEnabled: boolean}) => void | Promise<void>);
 };
@@ -153,6 +154,113 @@ describe('MeetingPrepSurface', () => {
     });
   });
 
+  it('shows the loading indicator while the camera preview is pending', () => {
+    renderSurface();
+
+    fireEvent.click(screen.getByRole('button', {name: 'preferencesAVCamera'}));
+
+    expect(screen.queryByText('callNoCameraAccess')).not.toBeInTheDocument();
+    expect(screen.getByText('Ada')).toBeInTheDocument();
+    expect(document.querySelector('[data-uie-name="background-effect-initializing"]')).toBeInTheDocument();
+  });
+
+  it('hides the camera loading indicator after the preview video can play', async () => {
+    const previewStream = {
+      getVideoTracks: jest.fn(() => {
+        return [];
+      }),
+    } as unknown as MediaStream;
+    const requestPreviewStream: RequestMeetingPrepPreview = () => {
+      return task.tryOrElse(
+        () => {
+          return meetingPrepPreviewErrors.requestFailed;
+        },
+        () => {
+          return Promise.resolve(previewStream);
+        },
+      );
+    };
+
+    renderSurface({requestPreviewStream});
+    fireEvent.click(screen.getByRole('button', {name: 'preferencesAVCamera'}));
+
+    const video = await waitFor(() => {
+      const element = document.querySelector('video');
+      expect(element).toBeInTheDocument();
+      return element as HTMLVideoElement;
+    });
+    expect(document.querySelector('[data-uie-name="background-effect-initializing"]')).toBeInTheDocument();
+
+    fireEvent.canPlay(video);
+
+    await waitFor(() => {
+      expect(document.querySelector('[data-uie-name="background-effect-initializing"]')).not.toBeInTheDocument();
+    });
+  });
+
+  it('shows the loading indicator again after toggling the camera off and on', async () => {
+    const previewStream = {
+      getVideoTracks: jest.fn(() => {
+        return [];
+      }),
+    } as unknown as MediaStream;
+    const requestPreviewStream: RequestMeetingPrepPreview = () => {
+      return task.tryOrElse(
+        () => {
+          return meetingPrepPreviewErrors.requestFailed;
+        },
+        () => {
+          return Promise.resolve(previewStream);
+        },
+      );
+    };
+
+    renderSurface({requestPreviewStream});
+    const cameraButton = screen.getByRole('button', {name: 'preferencesAVCamera'});
+    fireEvent.click(cameraButton);
+
+    const video = await waitFor(() => {
+      const element = document.querySelector('video');
+      expect(element).toBeInTheDocument();
+      return element as HTMLVideoElement;
+    });
+    fireEvent.canPlay(video);
+    await waitFor(() => {
+      expect(document.querySelector('[data-uie-name="background-effect-initializing"]')).not.toBeInTheDocument();
+    });
+
+    fireEvent.click(cameraButton);
+    fireEvent.click(cameraButton);
+
+    expect(document.querySelector('[data-uie-name="background-effect-initializing"]')).toBeInTheDocument();
+  });
+
+  it('turns the camera off when the preview request fails', async () => {
+    const requestPreviewStream: RequestMeetingPrepPreview = request => {
+      return request.mediaKind === meetingPrepMediaKinds.video
+        ? task.tryOrElse(
+            () => {
+              return meetingPrepPreviewErrors.requestFailed;
+            },
+            () => {
+              return Promise.reject(new Error('camera request failed'));
+            },
+          )
+        : pendingPreview(request);
+    };
+    const {onJoin} = renderSurface({requestPreviewStream});
+
+    fireEvent.click(screen.getByRole('button', {name: 'preferencesAVCamera'}));
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', {name: 'preferencesAVCamera'})).toHaveAttribute('aria-pressed', 'false');
+    });
+    expect(document.querySelector('[data-uie-name="background-effect-initializing"]')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', {name: 'callJoin'}));
+    expect(onJoin).toHaveBeenCalledWith({cameraEnabled: false, microphoneEnabled: false});
+  });
+
   it('reports a microphone permission failure after enabling the microphone', async () => {
     const onPermissionDenied = jest.fn();
     const requestPreviewStream: RequestMeetingPrepPreview = request => {
@@ -224,6 +332,26 @@ describe('MeetingPrepSurface', () => {
     fireEvent.pointerDown(screen.getByRole('heading', {name: 'Design review'}));
 
     expect(screen.queryByRole('option', {name: 'Mic 2'})).not.toBeInTheDocument();
+  });
+
+  it('closes the microphone device list without closing the prep screen on Escape', () => {
+    renderSurface();
+
+    fireEvent.click(screen.getByRole('button', {name: 'videoCallOverlayOpenMicrophoneAndSpeakerOptions'}));
+    fireEvent.keyDown(screen.getByRole('option', {name: 'Mic 1'}), {key: 'Escape'});
+
+    expect(screen.getByRole('heading', {name: 'Design review'})).toBeInTheDocument();
+    expect(screen.queryByRole('option', {name: 'Mic 2'})).not.toBeInTheDocument();
+  });
+
+  it('closes the camera device list without closing the prep screen on Escape', () => {
+    renderSurface();
+
+    fireEvent.click(screen.getByRole('button', {name: 'videoCallMenuMoreCameraSettings'}));
+    fireEvent.keyDown(screen.getByRole('option', {name: 'Camera 1'}), {key: 'Escape'});
+
+    expect(screen.getByRole('heading', {name: 'Design review'})).toBeInTheDocument();
+    expect(screen.queryByRole('option', {name: 'Camera 1'})).not.toBeInTheDocument();
   });
 
   it('keeps only one device list open and removes the preview when the camera is off', () => {

@@ -17,13 +17,16 @@
  *
  */
 
-import {useEffect, useRef, useState, type FunctionComponent} from 'react';
+import {type FunctionComponent, type KeyboardEvent, useEffect, useRef, useState} from 'react';
 
+import {JSX} from '@emotion/react/jsx-runtime';
 import {Maybe, maybe} from 'true-myth';
 
-import {Button, ButtonVariant, CloseIcon} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant, CloseIcon, Loading} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/avatar';
+import {groupVideoBackgroundInitializingOverlay} from 'Components/calling/GroupVideoGridTile.styles';
+import {useShowLoadingOverlay} from 'Components/calling/useShowLoadingOverlay';
 import {VideoControlsSelect} from 'Components/calling/VideoControls/VideoControlsSelect/VideoControlsSelect';
 import {CameraIcon, CameraOffIcon, ChevronIcon, MicOffIcon, MicOnIcon} from 'Components/icon';
 import type {User} from 'Repositories/entity/User';
@@ -87,7 +90,10 @@ const toDeviceOptions = (devices: readonly MediaDeviceInfo[]): DeviceOption[] =>
   });
 };
 
-const toSelectDeviceOptions = (devices: readonly MediaDeviceInfo[], suffix = '') => {
+const toSelectDeviceOptions = (
+  devices: readonly MediaDeviceInfo[],
+  suffix = '',
+): (DeviceOption & {value: string})[] => {
   return toDeviceOptions(devices).map(device => {
     return {...device, value: `${device.id}${suffix}`};
   });
@@ -242,8 +248,11 @@ export const MeetingPrepSurface: FunctionComponent<MeetingPrepSurfaceProps> = ({
       return;
     }
 
-    videoElement.srcObject = maybe.isJust(videoPreview.stream) ? videoPreview.stream.value : null;
-  }, [videoPreview]);
+    const previewStream = maybe.isJust(videoPreview.stream) ? videoPreview.stream.value : null;
+    if (videoElement.srcObject !== previewStream) {
+      videoElement.srcObject = previewStream;
+    }
+  }, [videoPreview.stream]);
 
   useEffect(() => {
     const cameraPermissionDenied =
@@ -252,13 +261,12 @@ export const MeetingPrepSurface: FunctionComponent<MeetingPrepSurfaceProps> = ({
       reportedCameraPermissionErrorRef.current = false;
     }
 
-    if (cameraPermissionDenied) {
-      if (!reportedCameraPermissionErrorRef.current) {
+    if (maybe.isJust(videoPreview.error)) {
+      setCameraEnabled(false);
+      if (cameraPermissionDenied && !reportedCameraPermissionErrorRef.current) {
         reportedCameraPermissionErrorRef.current = true;
-        setCameraEnabled(false);
         onPermissionDenied(meetingPrepDeviceKinds.camera);
       }
-      return;
     }
 
     const microphonePermissionDenied =
@@ -268,10 +276,12 @@ export const MeetingPrepSurface: FunctionComponent<MeetingPrepSurfaceProps> = ({
       reportedMicrophonePermissionErrorRef.current = false;
     }
 
-    if (microphonePermissionDenied && !reportedMicrophonePermissionErrorRef.current) {
-      reportedMicrophonePermissionErrorRef.current = true;
+    if (maybe.isJust(audioPreview.error)) {
       setMicrophoneEnabled(false);
-      onPermissionDenied(meetingPrepDeviceKinds.microphone);
+      if (microphonePermissionDenied && !reportedMicrophonePermissionErrorRef.current) {
+        reportedMicrophonePermissionErrorRef.current = true;
+        onPermissionDenied(meetingPrepDeviceKinds.microphone);
+      }
     }
   }, [audioPreview.error, onPermissionDenied, videoPreview.error]);
 
@@ -293,6 +303,12 @@ export const MeetingPrepSurface: FunctionComponent<MeetingPrepSurfaceProps> = ({
   });
 
   const showVideo = cameraEnabled && maybe.isJust(videoPreview.stream);
+  const {showLoadingOverlay: showVideoLoadingOverlay, onVideoCanPlay} = useShowLoadingOverlay(
+    true,
+    showVideo,
+    undefined,
+  );
+  const showLoadingOverlay = showVideoLoadingOverlay || (cameraEnabled && !showVideo);
 
   const showCameraPermissionError =
     maybe.isJust(videoPreview.error) && videoPreview.error.value === meetingPrepPreviewErrors.cameraPermissionDenied;
@@ -345,7 +361,7 @@ export const MeetingPrepSurface: FunctionComponent<MeetingPrepSurfaceProps> = ({
     },
   ];
 
-  const selectAudioDevice = (option: {value?: string | number} | null) => {
+  const selectAudioDevice = (option: {value?: string | number} | null): void => {
     const value = String(option?.value);
     const deviceId = value.replace(/-(input|output)$/, '');
     if (value.endsWith('-input')) {
@@ -357,14 +373,23 @@ export const MeetingPrepSurface: FunctionComponent<MeetingPrepSurfaceProps> = ({
     setMicrophoneMenuOpen(false);
   };
 
-  const selectVideoDevice = (option: {value?: string | number} | null) => {
+  const selectVideoDevice = (option: {value?: string | number} | null): void => {
     setVideoInputDeviceId(String(option?.value));
     setCameraMenuOpen(false);
   };
 
-  const renderCameraPreview = () => {
+  const renderCameraPreview = (): JSX.Element => {
     if (showVideo) {
-      return <video css={meetingPrepVideoStyles} autoPlay playsInline muted ref={videoElementRef} />;
+      return (
+        <video
+          css={meetingPrepVideoStyles}
+          autoPlay
+          playsInline
+          muted
+          ref={videoElementRef}
+          onCanPlay={onVideoCanPlay}
+        />
+      );
     }
 
     if (showCameraPermissionError) {
@@ -382,8 +407,20 @@ export const MeetingPrepSurface: FunctionComponent<MeetingPrepSurfaceProps> = ({
     );
   };
 
+  const handleKeyDownCapture = (event: KeyboardEvent<HTMLElement>): void => {
+    if (event.key === 'Escape' && (microphoneMenuOpen || cameraMenuOpen)) {
+      event.stopPropagation();
+      setMicrophoneMenuOpen(false);
+      setCameraMenuOpen(false);
+    }
+  };
+
   return (
-    <section css={meetingPrepSurfaceStyles} data-uie-name="meeting-prep-surface">
+    <section
+      css={meetingPrepSurfaceStyles}
+      data-uie-name="meeting-prep-surface"
+      onKeyDownCapture={handleKeyDownCapture}
+    >
       <header css={meetingPrepHeaderStyles}>
         <button
           type="button"
@@ -404,13 +441,23 @@ export const MeetingPrepSurface: FunctionComponent<MeetingPrepSurfaceProps> = ({
 
       <div css={meetingPrepBodyStyles}>
         <div css={meetingPrepSelfViewStyles}>
-          {cameraEnabled ? (
-            renderCameraPreview()
-          ) : (
+          {!cameraEnabled ? (
             <div css={meetingPrepAvatarStyles}>
               <Avatar participant={participant} avatarSize={AVATAR_SIZE.X_LARGE} hideAvailabilityStatus />
             </div>
+          ) : (
+            showVideo && renderCameraPreview()
           )}
+          {showLoadingOverlay && (
+            <div
+              aria-busy={showLoadingOverlay}
+              css={groupVideoBackgroundInitializingOverlay}
+              data-uie-name="background-effect-initializing"
+            >
+              <Loading size={32} />
+            </div>
+          )}
+          {cameraEnabled && showCameraPermissionError && renderCameraPreview()}
           <span css={meetingPrepNameStyles}>{participant.name()}</span>
         </div>
         <div css={meetingPrepMeterRowStyles}>
@@ -458,6 +505,7 @@ export const MeetingPrepSurface: FunctionComponent<MeetingPrepSurfaceProps> = ({
                     onChange={selectAudioDevice}
                     onKeyDown={event => {
                       if (event.key === 'Escape') {
+                        event.stopPropagation();
                         setMicrophoneMenuOpen(false);
                       }
                     }}
@@ -505,6 +553,7 @@ export const MeetingPrepSurface: FunctionComponent<MeetingPrepSurfaceProps> = ({
                     onChange={selectVideoDevice}
                     onKeyDown={event => {
                       if (event.key === 'Escape') {
+                        event.stopPropagation();
                         setCameraMenuOpen(false);
                       }
                     }}
