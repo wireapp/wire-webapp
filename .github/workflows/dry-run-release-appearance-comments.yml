@@ -55,7 +55,6 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        env:
         run: npm run ci:install
 
       - name: Fetch tags
