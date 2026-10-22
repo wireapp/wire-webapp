@@ -28,6 +28,7 @@ const stableCommitSha = 'a'.repeat(40);
 const dispatchCommitSha = 'b'.repeat(40);
 const activeReleaseCommitSha = 'c'.repeat(40);
 const advancedReleaseCommitSha = 'd'.repeat(40);
+const historicalReleaseCommitSha = 'e'.repeat(40);
 
 type PreparationTestOptions = {
   readonly releaseBranches?: readonly WebAppReleaseBranchRef[];
@@ -131,9 +132,57 @@ describe('prepareWebAppRelease', () => {
     ]);
   });
 
-  it('continue reuses the active branch HEAD without planning or changing its ref', async () => {
+  it.each(['release/2026-03-23', 'release/2026-07-15.1'])(
+    'start ignores historical date-based release branch %s',
+    async historicalReleaseBranch => {
+      const testDependencies = createPreparationTestDependencies({
+        releaseBranches: [{releaseBranch: historicalReleaseBranch, releaseCommitSha: historicalReleaseCommitSha}],
+      });
+      const actualResult = await prepareRelease(
+        {operation: 'start', targetCommit: dispatchCommitSha},
+        testDependencies.dependencies,
+      ).toPromise();
+
+      assert(actualResult.isOk);
+      expect(actualResult.value).toMatchObject({
+        releaseBranch: 'release/1.1.0',
+        releaseCommitSha: dispatchCommitSha,
+        action: 'created',
+      });
+      expect(testDependencies.createdBranches).toEqual([
+        {releaseBranch: 'release/1.1.0', targetCommit: dispatchCommitSha},
+      ]);
+    },
+  );
+
+  it('start works when multiple historical date-based release branches exist', async () => {
     const testDependencies = createPreparationTestDependencies({
-      releaseBranches: [{releaseBranch: 'release/1.1.0', releaseCommitSha: activeReleaseCommitSha}],
+      releaseBranches: [
+        {releaseBranch: 'release/2026-03-23', releaseCommitSha: historicalReleaseCommitSha},
+        {releaseBranch: 'release/2026-07-15.1', releaseCommitSha: historicalReleaseCommitSha},
+        {releaseBranch: 'release/2026-08-28.1', releaseCommitSha: historicalReleaseCommitSha},
+        {releaseBranch: 'release/2026-10-06.1', releaseCommitSha: historicalReleaseCommitSha},
+      ],
+    });
+    const actualResult = await prepareRelease(
+      {operation: 'start', targetCommit: dispatchCommitSha},
+      testDependencies.dependencies,
+    ).toPromise();
+
+    assert(actualResult.isOk);
+    expect(actualResult.value).toMatchObject({releaseBranch: 'release/1.1.0', action: 'created'});
+    expect(testDependencies.createdBranches).toEqual([
+      {releaseBranch: 'release/1.1.0', targetCommit: dispatchCommitSha},
+    ]);
+  });
+
+  it('continue reuses the active SemVer branch when historical branches coexist', async () => {
+    const testDependencies = createPreparationTestDependencies({
+      releaseBranches: [
+        {releaseBranch: 'release/2026-03-23', releaseCommitSha: historicalReleaseCommitSha},
+        {releaseBranch: 'release/2026-07-15.1', releaseCommitSha: historicalReleaseCommitSha},
+        {releaseBranch: 'release/1.1.0', releaseCommitSha: activeReleaseCommitSha},
+      ],
     });
     const actualResult = await prepareRelease({operation: 'continue'}, testDependencies.dependencies).toPromise();
 
@@ -152,9 +201,12 @@ describe('prepareWebAppRelease', () => {
     ]);
   });
 
-  it('start fails when another release is active', async () => {
+  it('start preserves release reservation conflict detection alongside historical branches', async () => {
     const testDependencies = createPreparationTestDependencies({
-      releaseBranches: [{releaseBranch: 'release/1.1.0', releaseCommitSha: activeReleaseCommitSha}],
+      releaseBranches: [
+        {releaseBranch: 'release/2026-03-23', releaseCommitSha: historicalReleaseCommitSha},
+        {releaseBranch: 'release/1.1.0', releaseCommitSha: activeReleaseCommitSha},
+      ],
     });
     const actualResult = await prepareRelease(
       {operation: 'start', targetCommit: dispatchCommitSha},
@@ -164,6 +216,16 @@ describe('prepareWebAppRelease', () => {
     assert(actualResult.isErr);
     expect(actualResult.error.message).toContain('release reservation conflict');
     expect(testDependencies.plannedVersions).toEqual([]);
+  });
+
+  it('preparation rejects malformed SemVer release branches', async () => {
+    const testDependencies = createPreparationTestDependencies({
+      releaseBranches: [{releaseBranch: 'release/1.2', releaseCommitSha: activeReleaseCommitSha}],
+    });
+    const actualResult = await prepareRelease({operation: 'continue'}, testDependencies.dependencies).toPromise();
+
+    assert(actualResult.isErr);
+    expect(actualResult.error.message).toContain('Malformed WebApp release branch found in Git history: release/1.2');
   });
 
   it('continue fails when no release is active', async () => {
