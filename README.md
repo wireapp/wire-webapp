@@ -34,7 +34,7 @@ The root npm workspace and local Nx installation are the entry points; package-l
 Prerequisites:
 
 1. Install [Node.js](https://nodejs.org/)
-1. Use Node.js 24.21.0 and npm 11.19.0, as pinned by `.nvmrc` and `packageManager`.
+1. Use Node.js 24.22.1 and npm 11.19.0, as pinned by `.nvmrc` and `packageManager`.
 
 ## 1. Install Dependencies & Fetch Configuration
 

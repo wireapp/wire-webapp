@@ -33,6 +33,14 @@
       "dependencyDashboardApproval": true
     },
     {
+      "description": "Update the pinned Node.js runtime promptly",
+      "matchManagers": ["nvm"],
+      "matchFileNames": [".nvmrc"],
+      "matchDatasources": ["node-version"],
+      "groupName": "node runtime",
+      "minimumReleaseAge": null
+    },
+    {
       "matchFileNames": ["apps/webapp/app-config/package.json"],
       "groupName": "webapp app configuration"
     },
@@ -43,6 +51,17 @@
     {
       "matchManagers": ["dockerfile"],
       "groupName": "docker images"
+    },
+    {
+      "description": "Update the production Node.js image and digest promptly",
+      "matchManagers": ["dockerfile"],
+      "matchFileNames": ["apps/server/Dockerfile"],
+      "matchDepTypes": ["final"],
+      "matchDatasources": ["docker"],
+      "matchDepNames": ["node"],
+      "groupName": "node runtime",
+      "minimumReleaseAge": null,
+      "pinDigests": true
     },
     {
       "matchPackageNames": ["quay.io/wire/mirror-images/playwright"],
