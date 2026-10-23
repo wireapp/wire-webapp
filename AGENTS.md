@@ -57,7 +57,7 @@ Per-file checks: pass a single file path as the last argument, not `npm exec -- 
 ## Git
 
 - Commit messages must include a concise subject and a description body explaining what changed and why.
-- When changes are ready to commit, prompt the user to run checks first: `npm run type-check`, `BASE_REF=main npm run lint:affected` (includes Prettier via `lint:format` and Stylelint), and relevant `npm exec -- nx run <project>:test` for touched projects.
+- When changes are ready to commit, prompt the user to run checks first: `npm run type-check`, `BASE_REF=main npm run lint:affected` (includes `npx just format-check` and `npx just stylesheet-lint`), and relevant `npm exec -- nx run <project>:test` for touched projects.
 
 ## Webapp code rules
 

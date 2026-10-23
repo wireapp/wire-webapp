@@ -1,51 +1,65 @@
 #!/usr/bin/env bash
 #
-# Wraps `nx format:check` so Prettier failures are obvious in CI and locally.
-#
-# CI used to run ESLint and Prettier in one "Lint (PR)" step. ESLint output
-# flooded the log, and format:check only printed bare file paths before exit 1,
-# so GitHub showed nothing useful beyond "Process completed with exit code 1."
-#
-# This script keeps the same nx check, but on failure prints a clear summary,
-# per-file fix commands, and GitHub ::error:: annotations for the Checks UI.
+# Check changed files with Prettier so formatting failures are clear in CI.
 #
 set -euo pipefail
 
-BASE="${BASE_REF:-main}"
-HEAD="${HEAD_REF:-HEAD}"
+BASE_REVISION="${BASE_REF:-main}"
+HEAD_REVISION="${HEAD_REF:-HEAD}"
+GIT_DIFF_OUTPUT="$(mktemp)"
+PRETTIER_OUTPUT="$(mktemp)"
+trap 'rm -f "$GIT_DIFF_OUTPUT" "$PRETTIER_OUTPUT"' EXIT
 
-OUTPUT="$(mktemp)"
-trap 'rm -f "$OUTPUT"' EXIT
+if ! git diff --name-only -z --diff-filter=ACMR --find-renames "$BASE_REVISION" "$HEAD_REVISION" >"$GIT_DIFF_OUTPUT"; then
+  echo "::error title=Prettier check failed::Could not compare Git base '${BASE_REVISION}' with head '${HEAD_REVISION}'. Verify both revisions are available."
+  exit 1
+fi
 
-set +e
-nx format:check --base="$BASE" --head="$HEAD" >"$OUTPUT" 2>&1
-STATUS=$?
-set -e
+changedFiles=()
 
-if [[ "$STATUS" -eq 0 ]]; then
+while IFS= read -r -d '' changedFilePath; do
+  [[ -f "$changedFilePath" ]] || continue
+  changedFiles+=("$changedFilePath")
+done < "$GIT_DIFF_OUTPUT"
+
+if ((${#changedFiles[@]} == 0)); then
+  echo "No changed files to check with Prettier (base=${BASE_REVISION}, head=${HEAD_REVISION})."
   exit 0
 fi
 
-echo "::error title=Prettier check failed::One or more files are not formatted. See the job log for paths and fix commands."
-echo ""
-echo "Prettier check failed (nx format:check --base=${BASE} --head=${HEAD})."
-echo ""
-echo "Unformatted files:"
-cat "$OUTPUT"
-echo ""
+set +e
+prettier --list-different --ignore-unknown --ignore-path .prettierignore -- "${changedFiles[@]}" >"$PRETTIER_OUTPUT" 2>&1
+PRETTIER_STATUS=$?
+set -e
 
-FILES=()
-while IFS= read -r file; do
-  [[ -z "$file" ]] && continue
-  [[ -f "$file" ]] || continue
-  FILES+=("$file")
-  echo "::error file=${file}::Not formatted with Prettier. Run: npm exec -- nx format:write --files=${file}"
-done < "$OUTPUT"
-
-if ((${#FILES[@]} > 0)); then
-  FILES_CSV=$(IFS=,; echo "${FILES[*]}")
-  echo "Fix all at once:"
-  echo "  npm exec -- nx format:write --files=${FILES_CSV}"
+if [[ "$PRETTIER_STATUS" -eq 0 ]]; then
+  exit 0
 fi
 
-exit 1
+if [[ "$PRETTIER_STATUS" -eq 1 ]]; then
+  echo "::error title=Prettier check failed::Changed files are not formatted. Run npx just format to fix them."
+  echo ""
+  echo "Prettier check failed (base=${BASE_REVISION}, head=${HEAD_REVISION})."
+  echo ""
+  echo "Unformatted files:"
+  cat "$PRETTIER_OUTPUT"
+  echo ""
+
+  while IFS= read -r changedFilePath; do
+    [[ -f "$changedFilePath" ]] || continue
+    if grep -Fqx -- "$changedFilePath" "$PRETTIER_OUTPUT"; then
+      echo "::error file=${changedFilePath}::Not formatted with Prettier. Run: npx just format"
+    fi
+  done < <(printf '%s\n' "${changedFiles[@]}")
+
+  echo "Fix formatting with: npx just format"
+  exit 1
+fi
+
+echo "::error title=Prettier check failed::Prettier could not check one or more changed files. Review the error below."
+echo ""
+echo "Prettier failed while checking files changed between base=${BASE_REVISION} and head=${HEAD_REVISION}."
+echo "Resolve the reported Prettier error, then rerun: npx just format-check"
+echo ""
+cat "$PRETTIER_OUTPUT"
+exit "$PRETTIER_STATUS"
