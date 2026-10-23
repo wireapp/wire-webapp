@@ -22,7 +22,7 @@
     "@emotion/eslint-plugin": "11.12.0",
     "@enormora/objectory": "0.0.25",
     "@faker-js/faker": "10.6.0",
-    "@inquirer/prompts": "8.7.3",
+    "@inquirer/prompts": "8.7.4",
     "@ls-lint/ls-lint": "2.3.2",
     "@nx/jest": "22.7.12",
     "@nx/node": "22.7.12",
