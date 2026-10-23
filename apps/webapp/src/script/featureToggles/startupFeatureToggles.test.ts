@@ -27,7 +27,6 @@ import {
   conversationListCollapseFeatureToggleName,
   disableMessagePreprocessingFeatureToggleName,
   driveBulkActionsFeatureToggleName,
-  sharedDriveDirectUploadFeatureToggleName,
   startupFeatureToggleNames,
   forTestsOnlyFeatureToggleName,
 } from './startupFeatureToggleNames';
@@ -37,7 +36,6 @@ const featureToggleNamesWithDedicatedExistenceTests = [
   conversationListCollapseFeatureToggleName,
   forTestsOnlyFeatureToggleName,
   disableMessagePreprocessingFeatureToggleName,
-  sharedDriveDirectUploadFeatureToggleName,
   driveBulkActionsFeatureToggleName,
 ] as const;
 
@@ -138,14 +136,6 @@ describe('startupFeatureToggles', function () {
     expect(startupFeatureToggles.isFeatureToggleEnabled(disableMessagePreprocessingFeatureToggleName)).toBe(true);
   });
 
-  it('enables the shared drive direct upload feature toggle when present in the query parameter', () => {
-    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
-      `?${startupFeatureToggleQueryParameterName}=${sharedDriveDirectUploadFeatureToggleName}`,
-    );
-
-    expect(startupFeatureToggles.isFeatureToggleEnabled(sharedDriveDirectUploadFeatureToggleName)).toBe(true);
-  });
-
   it('trims whitespace around feature toggle names', () => {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
       `?${startupFeatureToggleQueryParameterName}= ${applockRefactoredFeatureToggleName} `,
@@ -188,7 +178,6 @@ describe('startupFeatureToggles', function () {
       conversationListCollapseFeatureToggleName,
       forTestsOnlyFeatureToggleName,
       disableMessagePreprocessingFeatureToggleName,
-      sharedDriveDirectUploadFeatureToggleName,
       driveBulkActionsFeatureToggleName,
     ]);
   });

@@ -47,7 +47,6 @@ import {User} from 'Repositories/entity/User';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {TeamState} from 'Repositories/team/TeamState';
 import {Config} from 'src/script/Config';
-import {sharedDriveDirectUploadFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext, useMainViewModel} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isLastReceivedMessage} from 'Util/conversationMessages';
@@ -138,7 +137,7 @@ function ConversationContent({
   const isVirtualizedMessagesListEnabled = CONFIG.FEATURE.ENABLE_VIRTUALIZED_MESSAGES_LIST;
 
   const mainViewModel = useMainViewModel();
-  const {fireAndForgetInvoker, isFeatureToggleEnabled, translate} = useApplicationContext();
+  const {fireAndForgetInvoker, translate} = useApplicationContext();
   const {content: contentViewModel} = mainViewModel;
   const {conversationRepository, repositories} = contentViewModel;
   const sharedDriveUploadController = useMemo(() => {
@@ -678,7 +677,6 @@ function ConversationContent({
 
   const isCellsEnabled =
     Config.getConfig().FEATURE.ENABLE_CELLS && activeConversation?.cellsState() !== CONVERSATION_CELLS_STATE.DISABLED;
-  const isSharedDriveDirectUploadFeatureEnabled = isFeatureToggleEnabled(sharedDriveDirectUploadFeatureToggleName);
   const isFileUploadAllowed = isConversationFileUploadAllowed({
     conversationTeamId: activeConversation?.teamId,
     selfUserTeamId: activeConversation?.selfUser()?.teamId,
@@ -698,7 +696,6 @@ function ConversationContent({
       cellsRepository: repositories.cells,
       conversation: activeConversation,
       isCellsEnabled: isCellsEnabled,
-      isDisabled: isFileTabActive && !isSharedDriveDirectUploadFeatureEnabled,
       isFileDropAllowed: isFileUploadAllowed,
       translate,
     });
