@@ -221,8 +221,6 @@ const AppLock: FunctionComponent<AppLockProps> = ({
   useEffect(() => {
     if (isAppLockEnabled) {
       showAppLock();
-    } else if (appLockState.hasPassphrase()) {
-      appLockRepository.removeCode();
     }
   }, [isAppLockEnabled]);
 
