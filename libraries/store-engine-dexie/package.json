@@ -16,7 +16,7 @@
     "@wireapp/store-engine": "5.1.19"
   },
   "dependencies": {
-    "dexie": "4.4.6"
+    "dexie": "4.4.7"
   },
   "devDependencies": {
     "@swc/core": "1.16.18",

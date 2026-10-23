@@ -144,7 +144,7 @@
     "browserslist": "4.29.4",
     "css-loader": "7.1.5",
     "cssnano": "7.1.9",
-    "dexie": "4.4.6",
+    "dexie": "4.4.7",
     "html-rspack-plugin": "6.1.11",
     "i18next-scanner": "4.6.0",
     "jest-canvas-mock": "2.5.8",

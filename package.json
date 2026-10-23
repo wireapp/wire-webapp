@@ -167,7 +167,7 @@
     "@jest/environment": "30.5.2",
     "jest-mock": "30.5.2",
     "axios": "1.20.0",
-    "dexie": "4.4.6",
+    "dexie": "4.4.7",
     "dotenv": "16.6.1",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0"
