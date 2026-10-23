@@ -367,17 +367,17 @@ describe('CallingRepository', () => {
       expect(sftResponse).toHaveBeenLastCalledWith(avsUser, 200, responseBody, responseBody.length, requestContext);
     });
 
-    it('trusts the Rust override instead of the original backend SFT lists without mutating the response', async () => {
+    it('trusts the Staging override instead of the original backend SFT lists without mutating the response', async () => {
       const {repository, requestConfig, sendRequest, postSftRequest, configUpdate, backendConfig, avsUser} =
         createSftCallingFixture();
-      repository['isOnAvsRustSft'] = true;
+      repository['isOnAvsStagingSft'] = true;
       await requestConfig();
-      const rustSftServers = [{urls: ['https://rust-sft.stars.wire.link']}];
+      const stagingSftServers = [{urls: ['https://rust-sft.stars.wire.link']}];
 
       expect(configUpdate).toHaveBeenLastCalledWith(
         avsUser,
         0,
-        JSON.stringify({...backendConfig, sft_servers: rustSftServers, sft_servers_all: rustSftServers}),
+        JSON.stringify({...backendConfig, sft_servers: stagingSftServers, sft_servers_all: stagingSftServers}),
       );
       expect(backendConfig.sft_servers).toEqual([{urls: ['https://initial.example.com']}]);
       expect(backendConfig.sft_servers_all).toEqual([{urls: ['https://joinable.example.com:8443']}]);
