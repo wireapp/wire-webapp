@@ -25,9 +25,9 @@ No license is granted to the Wire trademark and its associated logos, all of whi
 - `apps/server/`: node/express wrapper that serves the built webapp and handles proxying
 - `libraries/config/`: `@wireapp/config` package - centralized environment configuration management with type-safe configuration loading and validation
 - `libraries/core/`: `@wireapp/core` package - Wire's communication core library handling authentication, WebSocket connections, and protocol messaging
-- Root-level tooling (`package.json`, Nx, bin scripts) orchestrates both apps and libraries
+- Root-level tooling (`package.json`, `justfile`, Nx, and bin scripts) provides commands shared by apps and libraries
 
-The root npm workspace and local Nx installation are the entry points; package-level scripts delegate to Nx.
+The root npm workspaces and local Nx remain the existing build and application task entry points. Use `npx just --list` to discover the native repository tooling recipes; existing npm scripts and workflows remain supported.
 
 # How to Build the Open Source Client
 
