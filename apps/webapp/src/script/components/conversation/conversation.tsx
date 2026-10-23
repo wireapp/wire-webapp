@@ -754,7 +754,7 @@ function ConversationContent({
                       onIndexChange={setActiveTabIndex}
                       conversationQualifiedId={activeConversation.qualifiedId}
                       sharedDriveUploadController={sharedDriveUploadController}
-                      isUploadStatusIndicatorEnabled={isSharedDriveDirectUploadFeatureEnabled}
+                      isUploadStatusIndicatorEnabled
                     />
                   </div>
                   {isSharedDriveSearchViewOpen && (
@@ -782,7 +782,7 @@ function ConversationContent({
                         onCloseSearchView={() => {
                           return setIsSharedDriveSearchViewOpen(false);
                         }}
-                        isUploadFilesEnabled={isSharedDriveDirectUploadFeatureEnabled && isFileUploadAllowed}
+                        isUploadFilesEnabled={isFileUploadAllowed}
                         showViewerPermission={showViewerPermission}
                       />
                     </SharedDriveUploadProvider>
@@ -882,7 +882,7 @@ function ConversationContent({
             <SharedDriveUploadStatusPopupHost
               controller={sharedDriveUploadController}
               conversationQualifiedId={`${activeConversation.qualifiedId.id}@${activeConversation.qualifiedId.domain}`}
-              isEnabled={isSharedDriveDirectUploadFeatureEnabled}
+              isEnabled
               isFileTabActive={isFileTabActive}
             />
           </SharedDriveUploadStatusProvider>
