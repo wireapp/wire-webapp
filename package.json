@@ -68,7 +68,7 @@
     "jest": "30.5.2",
     "jest-environment-jsdom": "30.5.2",
     "js-yaml": "4.3.2",
-    "jscpd": "5.4.1",
+    "jscpd": "5.4.2",
     "jsdom": "29.1.1",
     "nock": "14.0.17",
     "nx": "22.7.12",
