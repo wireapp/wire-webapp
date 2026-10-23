@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode, useEffect, useRef, useState} from 'react';
+import {ReactNode, useEffect, useMemo, useRef, useState} from 'react';
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
@@ -38,6 +38,8 @@ import {User} from 'Repositories/entity/User';
 import {MediaDeviceType} from 'Repositories/media/MediaDeviceType';
 import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {TeamState} from 'Repositories/team/TeamState';
+import {createTroubleshooterRepository} from 'Repositories/troubleshooter/troubleshooterRepository';
+import {createMockTroubleshooterService} from 'Repositories/troubleshooter/troubleshooterService';
 import {AppLockRepository} from 'Repositories/user/appLockRepository';
 import {UserState} from 'Repositories/user/userState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -51,6 +53,7 @@ import {AccountPreferences} from './panels/preferences/accountPreferences';
 import {AVPreferences} from './panels/preferences/avPreferences';
 import {DevicesPreferences} from './panels/preferences/devicesPreferences';
 import {OptionPreferences} from './panels/preferences/optionPreferences';
+import {TroubleshootingPreferences} from './panels/preferences/troubleshootingPreferences';
 
 import {RightSidebarParams} from '../appMain';
 import {PanelState} from '../rightSidebar';
@@ -93,7 +96,10 @@ const MainContent = ({
   reloadApp,
 }: MainContentProps) => {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-  const {mainViewModel, translate} = useApplicationContext();
+  const {mainViewModel, translate, clock} = useApplicationContext();
+  const troubleshooterRepository = useMemo(() => {
+    return createTroubleshooterRepository(createMockTroubleshooterService(clock), clock);
+  }, [clock]);
 
   const userState = container.resolve(UserState);
   const teamState = container.resolve(TeamState);
@@ -149,6 +155,7 @@ const MainContent = ({
     [ContentState.PREFERENCES_ABOUT]: translate('accessibility.headings.preferencesAbout'),
     [ContentState.PREFERENCES_ACCOUNT]: translate('accessibility.headings.preferencesAccount'),
     [ContentState.PREFERENCES_AV]: translate('accessibility.headings.preferencesAV'),
+    [ContentState.PREFERENCES_TROUBLESHOOTING]: translate('accessibility.headings.preferencesTroubleshooting'),
     [ContentState.PREFERENCES_DEVICES]: translate('accessibility.headings.preferencesDevices'),
     [ContentState.PREFERENCES_OPTIONS]: translate('accessibility.headings.preferencesOptions'),
     [ContentState.WATERMARK]: translate('accessibility.headings.noConversation'),
@@ -223,6 +230,16 @@ const MainContent = ({
                   propertiesRepository={repositories.properties}
                   deviceSupport={deviceSupport}
                 />
+              </div>
+            )}
+
+            {contentState === ContentState.PREFERENCES_TROUBLESHOOTING && (
+              <div
+                id="preferences-troubleshooting"
+                className={cx('preferences-page', incomingCssClass)}
+                ref={removeAnimationsClass}
+              >
+                <TroubleshootingPreferences repository={troubleshooterRepository} />
               </div>
             )}
 

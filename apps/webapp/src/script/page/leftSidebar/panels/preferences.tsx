@@ -174,6 +174,12 @@ const Preferences = ({
       uieName: 'go-audio-video',
     },
     {
+      IconComponent: Icon.NetworkIcon,
+      id: ContentState.PREFERENCES_TROUBLESHOOTING,
+      label: translate('preferencesTroubleshooting'),
+      uieName: 'go-troubleshooting',
+    },
+    {
       IconComponent: Icon.AboutIcon,
       id: ContentState.PREFERENCES_ABOUT,
       label: translate('preferencesAbout'),

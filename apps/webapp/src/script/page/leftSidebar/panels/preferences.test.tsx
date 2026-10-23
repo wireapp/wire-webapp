@@ -46,6 +46,7 @@ describe('Preferences', () => {
     expect(getByText('preferencesAccount')).not.toBeNull();
     expect(getByText('preferencesDevices')).not.toBeNull();
     expect(getByText('preferencesOptions')).not.toBeNull();
+    expect(getByText('preferencesTroubleshooting')).not.toBeNull();
     expect(queryByText('preferencesAbout')).not.toBeNull();
     expect(queryByText('preferencesAV')).toBeNull();
   });

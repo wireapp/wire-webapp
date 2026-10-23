@@ -137,6 +137,7 @@ describe('ListViewModel', () => {
     [ContentState.PREFERENCES_ABOUT, '/preferences/about'],
     [ContentState.PREFERENCES_ACCOUNT, '/preferences/account'],
     [ContentState.PREFERENCES_AV, '/preferences/av'],
+    [ContentState.PREFERENCES_TROUBLESHOOTING, '/preferences/troubleshooting'],
     [ContentState.PREFERENCES_DEVICES, '/preferences/devices'],
     [ContentState.PREFERENCES_OPTIONS, '/preferences/options'],
   ])('maps preference %s to its deep link', (contentState, path) => {
