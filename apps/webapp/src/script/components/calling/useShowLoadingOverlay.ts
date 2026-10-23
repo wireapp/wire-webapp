@@ -39,7 +39,7 @@ const useShowLoadingOverlay = (
 
   useEffect(() => {
     setIsVideoReady(false);
-  }, [processedVideoStream]);
+  }, [hasActiveVideo, processedVideoStream]);
 
   const onVideoCanPlay = useCallback(() => {
     setIsVideoReady(true);

@@ -17,33 +17,38 @@
  *
  */
 
-import {useRef, type FunctionComponent} from 'react';
+import {type FunctionComponent, useCallback, useRef} from 'react';
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {maybe} from 'true-myth';
 
+import {showNoAudioInputModal, showNoCameraModal} from 'Components/calling/devicePermissionModals';
 import {modalWrapperStyles} from 'Components/meeting/shared/styles/meetingModalShell.styles';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import type {CallMediaChoice} from 'Repositories/calling/callMediaChoice';
+import type {User} from 'Repositories/entity/User';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleEscDown} from 'Util/keyboardUtil';
+import {captureModalFocusContext} from 'Util/modalFocusUtil';
 
 import {MeetingPrepSurface} from './meetingPrepSurface';
-import type {RequestMeetingPrepPreview} from './meetingPrepTypes';
+import {type MeetingPrepDeviceKind, meetingPrepDeviceKinds, type RequestMeetingPrepPreview} from './meetingPrepTypes';
 import {useMeetingPrepModal} from './useMeetingPrepModal';
 
 export type MeetingPrepModalProps = {
-  participantName: string;
+  participant: User;
   requestPreviewStream: RequestMeetingPrepPreview;
   releasePreviewStream: (stream: MediaStream) => void;
   joinMeeting: (qualifiedConversationId: QualifiedId, media: CallMediaChoice) => Promise<boolean>;
 };
 
 export const MeetingPrepModal: FunctionComponent<MeetingPrepModalProps> = ({
-  participantName,
+  participant,
   requestPreviewStream,
   releasePreviewStream,
   joinMeeting,
 }: MeetingPrepModalProps) => {
+  const {translate} = useApplicationContext();
   const session = useMeetingPrepModal(state => {
     return state.session;
   });
@@ -58,6 +63,22 @@ export const MeetingPrepModal: FunctionComponent<MeetingPrepModalProps> = ({
     }
     close();
   };
+
+  const handlePermissionDenied = useCallback(
+    (kind: MeetingPrepDeviceKind): void => {
+      const focusContext = captureModalFocusContext();
+      const modalFocusContext = {
+        container: focusContext.container,
+        close: focusContext.createFocusRestorationCallback(),
+      };
+      if (kind === meetingPrepDeviceKinds.camera) {
+        showNoCameraModal(translate, modalFocusContext);
+      } else {
+        showNoAudioInputModal(translate, modalFocusContext);
+      }
+    },
+    [translate],
+  );
 
   return (
     <ModalComponent
@@ -74,8 +95,9 @@ export const MeetingPrepModal: FunctionComponent<MeetingPrepModalProps> = ({
         <MeetingPrepSurface
           meetingTitle={session.value.meetingTitle}
           meetingStartTime={session.value.meetingStartTime}
-          participantName={participantName}
+          participant={participant}
           onCancel={requestClose}
+          onPermissionDenied={handlePermissionDenied}
           onJoin={async choice => {
             isJoiningRef.current = true;
             try {

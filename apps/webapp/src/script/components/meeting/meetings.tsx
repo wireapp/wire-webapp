@@ -82,7 +82,7 @@ export const Meetings: FunctionComponent = () => {
       <ScheduleMeetingModal />
       <MeetNowModal />
       <MeetingPrepModal
-        participantName={selfUser.name()}
+        participant={selfUser}
         requestPreviewStream={preview.requestPreviewStream}
         releasePreviewStream={preview.releasePreviewStream}
         joinMeeting={joinMeeting}

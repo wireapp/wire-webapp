@@ -21,6 +21,7 @@ import {act, fireEvent, render, screen, waitFor} from '@testing-library/react';
 import {ThemeProvider} from '@wireapp/react-ui-kit';
 import {task} from 'true-myth';
 
+import {User} from 'Repositories/entity/User';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
@@ -38,6 +39,8 @@ const session: MeetingPrepSession = {
   qualifiedMeetingId: {id: 'meeting-id', domain: 'example.com'},
   qualifiedConversationId: {id: 'conversation-id', domain: 'example.com'},
 };
+const participant = new User('self-id', 'example.com', translateForTest);
+participant.name('Ada');
 
 const pendingPreview: RequestMeetingPrepPreview = () => {
   return task.tryOrElse(
@@ -67,7 +70,7 @@ const renderModal = (joinMeeting: jest.Mock = jest.fn().mockResolvedValue(true))
   render(
     <ThemeProvider>
       <MeetingPrepModal
-        participantName="Ada"
+        participant={participant}
         requestPreviewStream={pendingPreview}
         releasePreviewStream={jest.fn()}
         joinMeeting={joinMeeting}
@@ -99,6 +102,27 @@ describe('MeetingPrepModal', () => {
 
     expect(screen.getByRole('dialog')).toBeInTheDocument();
     expect(screen.getByRole('heading', {name: 'Design review'})).toBeInTheDocument();
+  });
+
+  it('closes an open device list before closing the prep modal on Escape', () => {
+    renderModal();
+
+    act(() => {
+      useMeetingPrepModal.getState().open(session);
+    });
+
+    fireEvent.click(screen.getByRole('button', {name: 'videoCallOverlayOpenMicrophoneAndSpeakerOptions'}));
+    fireEvent.keyDown(screen.getByRole('listbox'), {key: KEY.ESC});
+
+    expect(screen.getByRole('heading', {name: 'Design review'})).toBeInTheDocument();
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+
+    const content = screen.getByRole('dialog').firstElementChild;
+    if (content === null) {
+      throw new Error('Expected modal content element');
+    }
+    fireEvent.keyDown(content, {key: KEY.ESC});
+    expect(screen.queryByRole('heading', {name: 'Design review'})).not.toBeInTheDocument();
   });
 
   it('closes from Cancel, Escape, and the overlay', async () => {
@@ -139,8 +163,8 @@ describe('MeetingPrepModal', () => {
 
     await waitFor(() => {
       expect(joinMeeting).toHaveBeenCalledWith(session.qualifiedConversationId, {
-        cameraEnabled: false,
-        microphoneEnabled: true,
+        cameraEnabled: true,
+        microphoneEnabled: false,
       });
     });
     await expectClosed();
