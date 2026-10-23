@@ -696,6 +696,7 @@ function ConversationContent({
       cellsRepository: repositories.cells,
       conversation: activeConversation,
       isCellsEnabled: isCellsEnabled,
+      isDisabled: false,
       isFileDropAllowed: isFileUploadAllowed,
       translate,
     });
