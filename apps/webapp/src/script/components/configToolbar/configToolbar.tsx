@@ -82,7 +82,9 @@ export function ConfigToolbar(): JSX.Element | null {
   const [avsDebuggerEnabled, setAvsDebuggerEnabled] = useState(
     window.wire?.app?.debug?.isEnabledAvsDebugger() ?? false,
   );
-  const [avsRustSftEnabled, setAvsRustSftEnabled] = useState(window.wire?.app?.debug?.isEnabledAvsRustSFT() ?? false);
+  const [avsStagingSftEnabled, setAvsStagingSftEnabled] = useState(
+    window.wire?.app?.debug?.isEnabledAvsStagingSFT() ?? false,
+  );
   const [isPerformancePanelEnabled, setIsPerformancePanelEnabled] = useState(
     window.wire?.app?.debug?.isPerformancePanelEnabled() ?? false,
   );
@@ -287,20 +289,20 @@ export function ConfigToolbar(): JSX.Element | null {
     );
   };
 
-  const handleAvsRustSftEnable = (isChecked: boolean): void => {
-    setAvsRustSftEnabled(window.wire?.app?.debug?.enableAvsRustSFT(isChecked) === true);
+  const handleAvsStagingSftEnable = (isChecked: boolean): void => {
+    setAvsStagingSftEnabled(window.wire?.app?.debug?.enableAvsStagingSFT(isChecked) === true);
   };
-  const renderAvsRustSftSwitch = (): JSX.Element => {
+  const renderAvsStagingSftSwitch = (): JSX.Element => {
     return (
       <div style={{marginBottom: '10px'}}>
-        <label htmlFor="avs-rust-sft-checkbox" style={{display: 'block', fontWeight: 'bold'}}>
-          ENABLE AVS RUST SFT
+        <label htmlFor="avs-staging-sft-checkbox" style={{display: 'block', fontWeight: 'bold'}}>
+          ENABLE AVS STAGING SFT
         </label>
         <Switch
-          id="avs-rust-sft-checkbox"
-          checked={avsRustSftEnabled}
+          id="avs-staging-sft-checkbox"
+          checked={avsStagingSftEnabled}
           onToggle={isChecked => {
-            return handleAvsRustSftEnable(isChecked);
+            return handleAvsStagingSftEnable(isChecked);
           }}
         />
       </div>
@@ -611,7 +613,7 @@ export function ConfigToolbar(): JSX.Element | null {
 
       <hr />
 
-      <div>{renderAvsRustSftSwitch()}</div>
+      <div>{renderAvsStagingSftSwitch()}</div>
 
       <hr />
 
