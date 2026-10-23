@@ -118,8 +118,7 @@
     "stylelint": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "prettier --ignore-path {projectRoot}/.prettierignore --check \"**/*.less\" && stylelint --ignore-path {projectRoot}/.gitignore \"**/*.less\"",
-        "cwd": "{projectRoot}"
+        "command": "npx just stylesheet-lint"
       }
     },
     "type-check": {
