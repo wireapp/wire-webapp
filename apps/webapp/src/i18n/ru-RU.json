@@ -390,7 +390,7 @@
   "cells.breadcrumb.files": "Файлы {conversationName}",
   "cells.bulkMove.currentLocation": "Текущее местоположение",
   "cells.bulkMove.moveButton": "Переместить",
-  "cells.bulkMove.movingButton": "Перемещение",
+  "cells.bulkMove.processing": "Обработка",
   "cells.bulkMove.outcomeUnresolved": "Статус перемещения не разрешен. Дальнейшие перемещения отключены в этом представлении.",
   "cells.bulkMove.selected": "Выбрано",
   "cells.clearFilters.button": "Очистить все",
