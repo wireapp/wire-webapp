@@ -61,9 +61,7 @@ test.describe('Drive file uploads', () => {
       users: [teamMember],
       features: {cells: true},
     });
-    pageManager = await PageManager.from(
-      createPage(withLogin(team.owner)),
-    );
+    pageManager = await PageManager.from(createPage(withLogin(team.owner)));
     const {pages} = pageManager.webapp;
 
     await test.step('Preconditions: Create and open a conversation with Shared Drive enabled', async () => {
