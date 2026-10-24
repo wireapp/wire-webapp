@@ -390,7 +390,7 @@
   "cells.breadcrumb.files": "{conversationName} Dateien",
   "cells.bulkMove.currentLocation": "Current location",
   "cells.bulkMove.moveButton": "Move",
-  "cells.bulkMove.movingButton": "Moving",
+  "cells.bulkMove.processing": "Processing",
   "cells.bulkMove.outcomeUnresolved": "Move status is unresolved. Further moves are disabled in this view.",
   "cells.bulkMove.selected": "Selected",
   "cells.clearFilters.button": "Entfernen",

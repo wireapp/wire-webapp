@@ -19,7 +19,8 @@
 
 import {useEffect, useRef, type FunctionComponent} from 'react';
 
-import {RestActionStatus, type RestPerformActionResponse} from 'cells-sdk-ts';
+import {css, keyframes} from '@emotion/react';
+import type {RestPerformActionResponse} from 'cells-sdk-ts';
 import type {Result} from 'true-myth';
 
 import {CellsModal} from 'Components/conversation/conversationCells/common/cellsModal/cellsModal';
@@ -29,18 +30,48 @@ import {BulkMoveDestinationSelection} from './useBulkMoveDestinationSelection';
 
 import {CellsFoldersListModalContent} from '../cellsTableColumns/cellsTableRowOptions/cellsMoveNodeModal/cellsFoldersListModalContent/cellsFoldersListModalContent';
 
+const progressIndicatorAnimation = keyframes({
+  from: {transform: 'translateX(-100%)'},
+  to: {transform: 'translateX(700%)'},
+});
+
+const progressIndicatorStyles = css({
+  position: 'relative',
+  width: '100%',
+  height: '2px',
+  marginBlock: '0.5rem',
+  overflow: 'hidden',
+  backgroundColor: 'var(--border-color)',
+  '&::after': {
+    position: 'absolute',
+    insetBlock: 0,
+    width: '15%',
+    backgroundColor: 'var(--accent-color-500)',
+    content: '""',
+    animation: `${progressIndicatorAnimation} 1.4s ease-in-out infinite`,
+  },
+  '@media (prefers-reduced-motion: reduce)': {
+    '&::after': {
+      width: '100%',
+      opacity: 0.5,
+      animation: 'none',
+    },
+  },
+});
+
 interface CellsBulkMovePreviewPresentationProps {
   isOpen: boolean;
   onClose: () => void;
   conversationName: string;
   destination: BulkMoveDestinationSelection;
   onMove: () => Promise<Result<RestPerformActionResponse, unknown>>;
-  onMoveResult: (response: RestPerformActionResponse) => void;
+  onMoveResult: (response: RestPerformActionResponse) => boolean;
   onMoveError: () => void;
   isMoveOutcomeUnresolved: boolean;
   isMoveRequestError: boolean;
   isMoveDisabled: boolean;
   isMoveLoading: boolean;
+  isBackgroundMovePending: boolean;
   isBackgroundMoveError: boolean;
   isBackgroundMoveStatusUnknown: boolean;
   canRetryBackgroundMoveStatus: boolean;
@@ -60,6 +91,7 @@ export const CellsBulkMovePreviewPresentation: FunctionComponent<CellsBulkMovePr
   isMoveRequestError,
   isMoveDisabled,
   isMoveLoading,
+  isBackgroundMovePending,
   isBackgroundMoveError,
   isBackgroundMoveStatusUnknown,
   canRetryBackgroundMoveStatus,
@@ -88,8 +120,8 @@ export const CellsBulkMovePreviewPresentation: FunctionComponent<CellsBulkMovePr
     }
 
     if (moveResult.isOk) {
-      onMoveResult(moveResult.value);
-      if (moveResult.value.Status === RestActionStatus.Performed) {
+      const canCloseAfterMove = onMoveResult(moveResult.value);
+      if (canCloseAfterMove) {
         onClose();
       }
     }
@@ -105,6 +137,9 @@ export const CellsBulkMovePreviewPresentation: FunctionComponent<CellsBulkMovePr
           return path;
         }}
       />
+      {isBackgroundMovePending && (
+        <div aria-label={translate('cells.bulkMove.processing')} css={progressIndicatorStyles} role="progressbar" />
+      )}
       {isMoveOutcomeUnresolved && !isBackgroundMoveError && !isBackgroundMoveStatusUnknown && (
         <div role="alert">
           <p>
@@ -136,11 +171,15 @@ export const CellsBulkMovePreviewPresentation: FunctionComponent<CellsBulkMovePr
         </div>
       )}
       <CellsModal.Actions>
-        <CellsModal.SecondaryButton onClick={onClose}>
-          {translate('cells.moveNodeModal.cancelButton')}
-        </CellsModal.SecondaryButton>
+        {!isBackgroundMovePending && (
+          <CellsModal.SecondaryButton onClick={onClose}>
+            {translate('cells.moveNodeModal.cancelButton')}
+          </CellsModal.SecondaryButton>
+        )}
         <CellsModal.PrimaryButton onClick={handleMove} isDisabled={isMoveDisabled}>
-          {translate(isMoveLoading ? 'cells.bulkMove.movingButton' : 'cells.bulkMove.moveButton')}
+          {translate(
+            isMoveLoading || isBackgroundMovePending ? 'cells.bulkMove.processing' : 'cells.bulkMove.moveButton',
+          )}
         </CellsModal.PrimaryButton>
       </CellsModal.Actions>
     </CellsModal>
