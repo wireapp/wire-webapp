@@ -46,6 +46,16 @@ interface SharedDriveUploadStatusPopupHostProps {
   readonly isFileTabActive: boolean;
 }
 
+const moveStatusLabelKey = {
+  processing: 'cells.bulkMove.processing',
+  completed: 'cells.bulkMove.completed',
+} as const;
+
+const moveStatusTitleKey = {
+  processing: 'cells.bulkMove.movingItems',
+  completed: 'cells.bulkMove.movedItems',
+} as const;
+
 const getRowStatusLabel = (
   row: SharedDriveUploadStatus,
   translate: Translate,
@@ -84,6 +94,8 @@ export const SharedDriveUploadStatusPopupHost: FunctionComponent<SharedDriveUplo
   const {
     dismissedUpload: contextDismissedUpload,
     dismissUpload: onDismissUpload,
+    moveStatus,
+    dismissMoveStatus,
     isProvided,
   } = useSharedDriveUploadStatus();
   const readStatuses = useCallback(() => {
@@ -93,6 +105,7 @@ export const SharedDriveUploadStatusPopupHost: FunctionComponent<SharedDriveUplo
     return {conversationQualifiedId, uploads: readStatuses()};
   });
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isMoveExpanded, setIsMoveExpanded] = useState(true);
   const [cancellingUploadIds, setCancellingUploadIds] = useState<ReadonlySet<string>>(() => {
     return new Set();
   });
@@ -275,6 +288,29 @@ export const SharedDriveUploadStatusPopupHost: FunctionComponent<SharedDriveUplo
     updateStatus();
     return controller.subscribe(updateStatus);
   }, [controller, conversationQualifiedId, readStatuses]);
+
+  if (isFileTabActive && maybe.isJust(moveStatus)) {
+    const move = moveStatus.value;
+    return (
+      <SharedDriveUploadStatusPopup
+        move={move}
+        title={translate(moveStatusTitleKey[move.kind], {count: move.items.length})}
+        statusLabel={translate(moveStatusLabelKey[move.kind])}
+        destination={translate('cells.uploadStatus.destination', {destination: move.destinationPath})}
+        isExpanded={isMoveExpanded}
+        toggleLabel={translate(isMoveExpanded ? 'cells.uploadStatus.collapse' : 'cells.uploadStatus.expand')}
+        dismissLabel={translate('fileCardDefaultCloseButtonLabel')}
+        onToggle={() => {
+          return setIsMoveExpanded(expanded => {
+            return !expanded;
+          });
+        }}
+        onDismiss={() => {
+          return dismissMoveStatus(move.id);
+        }}
+      />
+    );
+  }
 
   if (!isEnabled || !isFileTabActive || isNull(representativeUpload) || isUploadDismissed || isNull(aggregateKind)) {
     return null;

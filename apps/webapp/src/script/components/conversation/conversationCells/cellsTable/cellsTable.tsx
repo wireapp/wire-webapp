@@ -24,7 +24,7 @@ import {flexRender, getCoreRowModel, type Header, useReactTable} from '@tanstack
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {JobsTaskStatus, RestActionStatus, type RestPerformActionResponse} from 'cells-sdk-ts';
 import {createPortal} from 'react-dom';
-import {task} from 'true-myth';
+import {Maybe, maybe, task} from 'true-myth';
 
 import {UploadIcon} from '@wireapp/react-ui-kit';
 
@@ -36,6 +36,10 @@ import {
   useCellsActionPermissions,
 } from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {isInRecycleBin} from 'Components/conversation/conversationCells/common/recycleBin/recycleBin';
+import {
+  useSharedDriveUploadStatus,
+  type SharedDriveMoveSummary,
+} from 'Components/conversation/conversationCells/sharedDriveUploadStatusContext';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
@@ -151,25 +155,30 @@ export const CellsTable = ({
   random = Math.random,
 }: CellsTableProps): ReactElement => {
   const {clock, translate, isFeatureToggleEnabled} = useApplicationContext();
+  const {updateMoveStatus, createMoveStatusId, clearMoveStatus} = useSharedDriveUploadStatus();
+  const backgroundMoveSummary = useRef<Maybe<SharedDriveMoveSummary>>(Maybe.nothing());
+  const activeMoveStatusId = useRef<Maybe<string>>(Maybe.nothing());
   const canPerformCurrentDriveAction = useCellsActionPermissions();
   const isSelectionEnabled = selectionEnabled && isFeatureToggleEnabled(driveBulkActionsFeatureToggleName);
   const [selectedNodeIds, setSelectedNodeIds] = useState<Set<string>>(() => {
     return new Set();
   });
   const [isBulkMovePreviewOpen, setIsBulkMovePreviewOpen] = useState(false);
+  const [isBulkMoveRequestPending, setIsBulkMoveRequestPending] = useState(false);
   const [isBackgroundMovePending, setIsBackgroundMovePending] = useState(false);
-  const isBackgroundMovePendingRef = useRef(isBackgroundMovePending);
-  isBackgroundMovePendingRef.current = isBackgroundMovePending;
+  const isMovePendingRef = useRef(false);
+  isMovePendingRef.current = isBulkMoveRequestPending || isBackgroundMovePending;
   const [isBackgroundMoveError, setIsBackgroundMoveError] = useState(false);
   const [isBackgroundMoveRetryBlocked, setIsBackgroundMoveRetryBlocked] = useState(false);
   const [isBackgroundMoveStatusUnknown, setIsBackgroundMoveStatusUnknown] = useState(false);
   const [backgroundMoveJobUuids, setBackgroundMoveJobUuids] = useState<string[]>([]);
+  const [backgroundMoveStatusId, setBackgroundMoveStatusId] = useState('');
   const [backgroundMoveStatusCheckId, setBackgroundMoveStatusCheckId] = useState(0);
   const [isBulkMoveOutcomeUnresolved, setIsBulkMoveOutcomeUnresolved] = useState(false);
   const [isBulkMoveRequestError, setIsBulkMoveRequestError] = useState(false);
 
   useEffect(() => {
-    if (isBackgroundMovePendingRef.current) {
+    if (isMovePendingRef.current) {
       return;
     }
 
@@ -178,12 +187,32 @@ export const CellsTable = ({
   }, [selectionScopeKey, isSelectionEnabled]);
 
   const handleBulkMoveRequestError = (): void => {
+    if (maybe.isJust(activeMoveStatusId.current)) {
+      clearMoveStatus(activeMoveStatusId.current.value);
+    }
+    activeMoveStatusId.current = Maybe.nothing();
+    backgroundMoveSummary.current = Maybe.nothing();
+    setIsBulkMoveRequestPending(false);
+    setIsBulkMovePreviewOpen(true);
     setIsBulkMoveOutcomeUnresolved(true);
     setIsBulkMoveRequestError(true);
   };
 
+  const handleBulkMoveStart = (summary: SharedDriveMoveSummary): void => {
+    const id = createMoveStatusId();
+    activeMoveStatusId.current = Maybe.just(id);
+    backgroundMoveSummary.current = Maybe.just(summary);
+    setIsBulkMoveRequestPending(true);
+    setIsBulkMovePreviewOpen(false);
+    setIsBulkMoveOutcomeUnresolved(false);
+    setIsBulkMoveRequestError(false);
+    setIsBackgroundMoveError(false);
+    setIsBackgroundMoveStatusUnknown(false);
+    updateMoveStatus({id, kind: 'processing', ...summary});
+  };
+
   useEffect(() => {
-    if (backgroundMoveJobUuids.length === 0) {
+    if (backgroundMoveJobUuids.length === 0 || backgroundMoveStatusId.length === 0) {
       return undefined;
     }
 
@@ -195,10 +224,13 @@ export const CellsTable = ({
         void checkBackgroundMoveStatus();
       }, delay);
     };
+    const moveStatusId = backgroundMoveStatusId;
     const handleUnknownStatus = (): void => {
       if (retryCount >= MAX_BACKGROUND_MOVE_STATUS_RETRIES) {
+        clearMoveStatus(moveStatusId);
         setIsBackgroundMovePending(false);
         setIsBackgroundMoveStatusUnknown(true);
+        setIsBulkMovePreviewOpen(true);
         return;
       }
 
@@ -227,8 +259,11 @@ export const CellsTable = ({
         return;
       }
 
-      const statuses = statusResults.map(statusResult => {
-        return statusResult.isOk ? statusResult.value.Status : undefined;
+      const backgroundActions = statusResults.map(statusResult => {
+        return statusResult.isOk ? statusResult.value : undefined;
+      });
+      const statuses = backgroundActions.map(action => {
+        return action?.Status;
       });
       if (
         statuses.some(status => {
@@ -239,10 +274,20 @@ export const CellsTable = ({
         return;
       }
       retryCount = 0;
+      if (maybe.isJust(backgroundMoveSummary.current)) {
+        updateMoveStatus({id: moveStatusId, kind: 'processing', ...backgroundMoveSummary.current.value});
+      }
       const areAllJobsFinished = statuses.every(status => {
         return status === JobsTaskStatus.Finished;
       });
       if (areAllJobsFinished) {
+        if (maybe.isJust(backgroundMoveSummary.current)) {
+          updateMoveStatus({id: moveStatusId, kind: 'completed', ...backgroundMoveSummary.current.value});
+        } else {
+          clearMoveStatus(moveStatusId);
+        }
+        backgroundMoveSummary.current = Maybe.nothing();
+        setBackgroundMoveStatusId('');
         setBackgroundMoveJobUuids([]);
         setIsBackgroundMovePending(false);
         setIsBackgroundMoveError(false);
@@ -263,11 +308,15 @@ export const CellsTable = ({
         return;
       }
 
+      clearMoveStatus(moveStatusId);
       setBackgroundMoveJobUuids([]);
       setIsBackgroundMovePending(false);
       setIsBackgroundMoveRetryBlocked(true);
       setIsBackgroundMoveStatusUnknown(false);
       setIsBackgroundMoveError(true);
+      backgroundMoveSummary.current = Maybe.nothing();
+      setBackgroundMoveStatusId('');
+      setIsBulkMovePreviewOpen(true);
       onRefresh();
     };
 
@@ -279,7 +328,17 @@ export const CellsTable = ({
         clock.clearTimeout(timeout);
       }
     };
-  }, [backgroundMoveJobUuids, backgroundMoveStatusCheckId, cellsRepository, clock, onRefresh, random]);
+  }, [
+    backgroundMoveJobUuids,
+    backgroundMoveStatusId,
+    backgroundMoveStatusCheckId,
+    cellsRepository,
+    clock,
+    clearMoveStatus,
+    onRefresh,
+    random,
+    updateMoveStatus,
+  ]);
 
   useEffect(() => {
     const currentNodeIds = new Set<string>();
@@ -297,35 +356,51 @@ export const CellsTable = ({
     });
   }, [nodes]);
 
-  const handleBulkMoveResult = (response: RestPerformActionResponse): boolean => {
+  const handleBulkMoveResult = (response: RestPerformActionResponse, summary: SharedDriveMoveSummary): boolean => {
+    const moveStatusId = maybe.isJust(activeMoveStatusId.current)
+      ? activeMoveStatusId.current.value
+      : createMoveStatusId();
+    setIsBulkMoveRequestPending(false);
     setIsBackgroundMoveError(false);
     setIsBackgroundMoveRetryBlocked(false);
     setIsBackgroundMoveStatusUnknown(false);
+
     if (response.Status === RestActionStatus.Performed) {
+      updateMoveStatus({id: moveStatusId, kind: 'completed', ...summary});
+      activeMoveStatusId.current = Maybe.nothing();
+      backgroundMoveSummary.current = Maybe.nothing();
       setIsBulkMoveOutcomeUnresolved(false);
       setIsBulkMoveRequestError(false);
       onRefresh();
       return true;
     }
 
-    setIsBulkMoveOutcomeUnresolved(false);
-    setIsBulkMoveRequestError(false);
-    setIsBackgroundMovePending(true);
     const moveJobUuids = response.BackgroundActions?.filter(action => {
       return action.Name === 'move' && isNonEmptyString(action.JobUuid);
     }).map(action => {
       return action.JobUuid;
     });
     const uniqueMoveJobUuids = [...new Set(moveJobUuids ?? [])];
-    setBackgroundMoveJobUuids(uniqueMoveJobUuids);
     if (uniqueMoveJobUuids.length === 0) {
+      clearMoveStatus(moveStatusId);
+      activeMoveStatusId.current = Maybe.nothing();
+      backgroundMoveSummary.current = Maybe.nothing();
       setIsBulkMoveOutcomeUnresolved(true);
       setIsBackgroundMovePending(false);
       setIsBackgroundMoveStatusUnknown(true);
+      setIsBulkMovePreviewOpen(true);
       return false;
     }
 
-    return false;
+    activeMoveStatusId.current = Maybe.nothing();
+    backgroundMoveSummary.current = Maybe.just(summary);
+    setBackgroundMoveStatusId(moveStatusId);
+    setBackgroundMoveJobUuids(uniqueMoveJobUuids);
+    setIsBulkMoveOutcomeUnresolved(false);
+    setIsBulkMoveRequestError(false);
+    setIsBackgroundMovePending(true);
+    updateMoveStatus({id: moveStatusId, kind: 'processing', ...summary});
+    return true;
   };
 
   const handleRetryBackgroundMoveStatus = (): void => {
@@ -389,6 +464,8 @@ export const CellsTable = ({
   });
   const canMoveSelection =
     selectedNodes.length > 0 &&
+    !isBulkMoveRequestPending &&
+    !isBackgroundMovePending &&
     !isInRecycleBin() &&
     canPerformCurrentDriveAction(CELLS_ACTION.MOVE) &&
     selectedNodes.every(node => {
@@ -512,10 +589,14 @@ export const CellsTable = ({
             </div>,
             selectionBarAnchor,
           )}
-        {isBulkMovePreviewOpen &&
-          (canMoveSelection || isBackgroundMovePending || isBackgroundMoveError || isBackgroundMoveStatusUnknown) && (
+        {(isBulkMovePreviewOpen || isBulkMoveRequestPending || isBackgroundMovePending) &&
+          (canMoveSelection ||
+            isBulkMoveRequestPending ||
+            isBackgroundMovePending ||
+            isBackgroundMoveError ||
+            isBackgroundMoveStatusUnknown) && (
             <CellsBulkMovePreviewModal
-              isOpen
+              isOpen={isBulkMovePreviewOpen}
               onClose={() => {
                 return setIsBulkMovePreviewOpen(false);
               }}
@@ -525,6 +606,8 @@ export const CellsTable = ({
               conversationName={conversationName}
               isMoveOutcomeUnresolved={isBulkMoveOutcomeUnresolved}
               isMoveRequestError={isBulkMoveRequestError}
+              isMoveRequestPending={isBulkMoveRequestPending}
+              onMoveStart={handleBulkMoveStart}
               onMoveResult={handleBulkMoveResult}
               onMoveError={handleBulkMoveRequestError}
               isBackgroundMovePending={isBackgroundMovePending}

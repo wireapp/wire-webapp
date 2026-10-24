@@ -19,53 +19,30 @@
 
 import {useEffect, useRef, type FunctionComponent} from 'react';
 
-import {css, keyframes} from '@emotion/react';
 import type {RestPerformActionResponse} from 'cells-sdk-ts';
 import type {Result} from 'true-myth';
 
 import {CellsModal} from 'Components/conversation/conversationCells/common/cellsModal/cellsModal';
+import type {
+  SharedDriveMoveItem,
+  SharedDriveMoveSummary,
+} from 'Components/conversation/conversationCells/sharedDriveUploadStatusContext';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {BulkMoveDestinationSelection} from './useBulkMoveDestinationSelection';
 
 import {CellsFoldersListModalContent} from '../cellsTableColumns/cellsTableRowOptions/cellsMoveNodeModal/cellsFoldersListModalContent/cellsFoldersListModalContent';
 
-const progressIndicatorAnimation = keyframes({
-  from: {transform: 'translateX(-100%)'},
-  to: {transform: 'translateX(700%)'},
-});
-
-const progressIndicatorStyles = css({
-  position: 'relative',
-  width: '100%',
-  height: '2px',
-  marginBlock: '0.5rem',
-  overflow: 'hidden',
-  backgroundColor: 'var(--border-color)',
-  '&::after': {
-    position: 'absolute',
-    insetBlock: 0,
-    width: '15%',
-    backgroundColor: 'var(--accent-color-500)',
-    content: '""',
-    animation: `${progressIndicatorAnimation} 1.4s ease-in-out infinite`,
-  },
-  '@media (prefers-reduced-motion: reduce)': {
-    '&::after': {
-      width: '100%',
-      opacity: 0.5,
-      animation: 'none',
-    },
-  },
-});
-
 interface CellsBulkMovePreviewPresentationProps {
   isOpen: boolean;
   onClose: () => void;
   conversationName: string;
   destination: BulkMoveDestinationSelection;
+  selectedItems: readonly SharedDriveMoveItem[];
+  destinationPath: string;
   onMove: () => Promise<Result<RestPerformActionResponse, unknown>>;
-  onMoveResult: (response: RestPerformActionResponse) => boolean;
+  onMoveStart: (summary: SharedDriveMoveSummary) => void;
+  onMoveResult: (response: RestPerformActionResponse, summary: SharedDriveMoveSummary) => boolean;
   onMoveError: () => void;
   isMoveOutcomeUnresolved: boolean;
   isMoveRequestError: boolean;
@@ -84,7 +61,10 @@ export const CellsBulkMovePreviewPresentation: FunctionComponent<CellsBulkMovePr
   onClose,
   conversationName,
   destination,
+  selectedItems,
+  destinationPath,
   onMove,
+  onMoveStart,
   onMoveResult,
   onMoveError,
   isMoveOutcomeUnresolved,
@@ -109,6 +89,11 @@ export const CellsBulkMovePreviewPresentation: FunctionComponent<CellsBulkMovePr
   }, []);
 
   const handleMove = async (): Promise<void> => {
+    const moveSummary = {
+      items: selectedItems,
+      destinationPath: destinationPath.length > 0 ? destinationPath : translate('cells.sharedDrive.title'),
+    };
+    onMoveStart(moveSummary);
     const moveResult = await onMove();
     if (!isCurrentDialog.current) {
       return;
@@ -120,7 +105,7 @@ export const CellsBulkMovePreviewPresentation: FunctionComponent<CellsBulkMovePr
     }
 
     if (moveResult.isOk) {
-      const canCloseAfterMove = onMoveResult(moveResult.value);
+      const canCloseAfterMove = onMoveResult(moveResult.value, moveSummary);
       if (canCloseAfterMove) {
         onClose();
       }
@@ -137,9 +122,6 @@ export const CellsBulkMovePreviewPresentation: FunctionComponent<CellsBulkMovePr
           return path;
         }}
       />
-      {isBackgroundMovePending && (
-        <div aria-label={translate('cells.bulkMove.processing')} css={progressIndicatorStyles} role="progressbar" />
-      )}
       {isMoveOutcomeUnresolved && !isBackgroundMoveError && !isBackgroundMoveStatusUnknown && (
         <div role="alert">
           <p>
