@@ -22,6 +22,10 @@ import type {FunctionComponent} from 'react';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import type {RestPerformActionResponse} from 'cells-sdk-ts';
 
+import type {
+  SharedDriveMoveItem,
+  SharedDriveMoveSummary,
+} from 'Components/conversation/conversationCells/sharedDriveUploadStatusContext';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {CellNode} from 'src/script/types/cellNode';
 
@@ -38,7 +42,9 @@ interface CellsBulkMovePreviewModalProps {
   conversationName: string;
   isMoveOutcomeUnresolved: boolean;
   isMoveRequestError: boolean;
-  onMoveResult: (response: RestPerformActionResponse) => boolean;
+  isMoveRequestPending: boolean;
+  onMoveStart: (summary: SharedDriveMoveSummary) => void;
+  onMoveResult: (response: RestPerformActionResponse, summary: SharedDriveMoveSummary) => boolean;
   onMoveError: () => void;
   isBackgroundMovePending: boolean;
   isBackgroundMoveError: boolean;
@@ -58,6 +64,8 @@ export const CellsBulkMovePreviewModal: FunctionComponent<CellsBulkMovePreviewMo
   conversationName,
   isMoveOutcomeUnresolved,
   isMoveRequestError,
+  isMoveRequestPending,
+  onMoveStart,
   onMoveResult,
   onMoveError,
   isBackgroundMovePending,
@@ -81,7 +89,7 @@ export const CellsBulkMovePreviewModal: FunctionComponent<CellsBulkMovePreviewMo
     cellsRepository,
   });
   const handleClose = (): void => {
-    if (move.isSubmitting || isBackgroundMovePending) {
+    if (move.isSubmitting || isMoveRequestPending || isBackgroundMovePending) {
       return;
     }
 
@@ -95,7 +103,12 @@ export const CellsBulkMovePreviewModal: FunctionComponent<CellsBulkMovePreviewMo
       conversationName={conversationName}
       destination={destination}
       onMove={move.submitMove}
+      onMoveStart={onMoveStart}
       onMoveResult={onMoveResult}
+      selectedItems={selectedNodes.map((node): SharedDriveMoveItem => {
+        return {id: node.id, name: node.name, isFolder: node.type === 'folder'};
+      })}
+      destinationPath={destination.selectedDestinationPath}
       onMoveError={onMoveError}
       isMoveOutcomeUnresolved={isMoveOutcomeUnresolved}
       isMoveRequestError={isMoveRequestError}
@@ -103,6 +116,7 @@ export const CellsBulkMovePreviewModal: FunctionComponent<CellsBulkMovePreviewMo
         !move.isValid ||
         destination.disabledDestinationPaths.includes(destination.selectedDestinationPath) ||
         move.isSubmitting ||
+        isMoveRequestPending ||
         isMoveOutcomeUnresolved ||
         isBackgroundMovePending ||
         isBackgroundMoveRetryBlocked ||
