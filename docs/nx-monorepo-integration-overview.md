@@ -155,10 +155,6 @@ wire-webapp/
     "test": {
       "cache": true,
       "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"]
-    },
-    "lint": {
-      "cache": true,
-      "inputs": ["default", "{workspaceRoot}/eslint.config.mjs"]
     }
   },
   "namedInputs": {
@@ -179,7 +175,7 @@ wire-webapp/
 
 **Key Points:**
 - `dependsOn: ["^build"]` - Automatic dependency graph resolution
-- `cache: true` - Nx caching enabled for build/test/lint
+- `cache: true` - Nx caching enabled for Nx-managed build and test tasks
 - `namedInputs` - Defines file sets for cache hashing
 
 ### [`tsconfig.base.json`](tsconfig.base.json) - Base TypeScript Config
@@ -410,12 +406,6 @@ Project Jest configs define `coverageThreshold` for CI coverage enforcement. The
       "options": {
         "jestConfig": "{projectRoot}/jest.config.js",
         "passWithNoTests": false
-      }
-    },
-    "lint": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "eslint --quiet --ext .js,.ts {projectRoot}"
       }
     }
   },
@@ -1060,20 +1050,14 @@ rules: {
 ### Running ESLint
 
 ```bash
-# Lint a specific project
-nx lint webapp
-nx lint server
-nx lint core-lib
+# Lint the repository
+npx just eslint
 
-# Lint all projects
-nx run-many -t lint --all
-
-# Lint affected projects
-nx affected -t lint
-
-# Lint with auto-fix
-nx lint webapp --fix
+# Lint and automatically fix eligible issues
+npx just eslint-fix
 ```
+
+ESLint uses its native content cache under `target/eslint/`. CI builds libraries with Nx before linting so import resolution can use compiled library outputs.
 
 ### Common Issues
 
@@ -1093,14 +1077,14 @@ nx lint webapp --fix
 **Performance issues:**
 
 1. ESLint with type-aware linting can be slower
-2. Use `nx affected -t lint` to only lint changed files
+2. ESLint checks all configured projects; its native content cache skips unchanged files
 3. Consider running type-check separately: `nx type-check <project>`
 
 ---
 
-## Why Use Nx Commands Throughout All Workflows
+## Why Use Nx for Nx-Managed Workflows
 
-Using Nx commands consistently across all workflows (local development, CI/CD, testing, building) is critical for maintaining a healthy monorepo. This section explains why you should always use Nx commands instead of running underlying tools directly.
+Nx continues to manage build, test, packaging, and server tasks. ESLint and migrated repository quality checks run through the root Just recipes.
 
 ### 1. Dependency Graph Resolution
 
@@ -1175,8 +1159,6 @@ nx affected -t build
 # Only test projects affected by current changes
 nx affected -t test
 
-# Only lint projects affected by current changes
-nx affected -t lint
 ```
 
 **How it works:**
@@ -1197,14 +1179,18 @@ Using Nx commands ensures consistent behavior between local development and CI/C
 **Local development:**
 
 ```bash
-nx run-many -t build test lint --all
+nx run-many -t build test --all
+npx just eslint
 ```
 
 **CI/CD pipeline (GitHub Actions):**
 
 ```yaml
 - name: Build and test
-  run: nx run-many -t build test lint --all
+  run: nx run-many -t build test --all
+
+- name: Lint all projects
+  run: npx just eslint
 ```
 
 Both environments:
@@ -1255,7 +1241,7 @@ Nx runs a daemon process that maintains the project graph in memory for faster o
 
 ### 7. Avoiding Direct Tool Usage
 
-Running underlying tools directly (Rspack, Jest, TypeScript, ESLint) can cause several issues:
+Running Nx-managed tools directly (Rspack, Jest, and TypeScript) can cause several issues:
 
 | Issue | Running with Nx | Running Directly |
 |--------|----------------|-----------------|
@@ -1301,13 +1287,14 @@ nx type-check webapp
 
 ### Best Practices
 
-1. **Always use Nx commands** - For build, test, lint, and any other task
-2. **Use `nx run-many`** - When you need to run tasks on multiple projects
-3. **Use `nx affected`** - When you only want to work with changed projects
-4. **Check `nx graph`** - To understand the project structure
-5. **Use `nx show project`** - To see project details and dependencies
-6. **Configure targets in `project.json`** - Don't create custom scripts that bypass Nx
-7. **Use Nx cache** - Let Nx handle caching for you
+1. **Use Just for migrated tasks** - Run ESLint with `npx just eslint` and fixes with `npx just eslint-fix`
+2. **Use Nx for remaining tasks** - Nx manages build, test, package, and server execution
+3. **Use `nx run-many`** - When you need to run Nx tasks on multiple projects
+4. **Use `nx affected`** - When you only want to run supported Nx tasks on changed projects
+5. **Check `nx graph`** - To understand the project structure
+6. **Use `nx show project`** - To see project details and dependencies
+7. **Configure Nx targets in `project.json`** - Keep Nx-managed task configuration with its project
+8. **Use Nx cache for Nx tasks** - Let Nx handle caching for the tasks it still manages
 
 ### Example Workflow
 
@@ -1325,8 +1312,8 @@ nx affected -t build
 # 4. Test affected projects
 nx affected -t test
 
-# 5. Lint affected projects
-nx affected -t lint
+# 5. Lint the repository
+npx just eslint
 
 # 6. If everything passes, commit and push
 ```
@@ -1467,11 +1454,11 @@ normal Beta-to-Production release entrypoint. Recovery workflows remain
 separate explicit operations for rollback, redeployment from historical
 Production tags, and distribution repair.
 
-### GitHub Workflows Using Nx
+### GitHub Workflow Task Runners
 
-| Workflow | Nx Commands Used |
+| Workflow | Commands Used |
 |----------|------------------|
-| [`ci.yml`](.github/workflows/ci.yml) | `nx run-many -t lint --all`, `nx run-many -t test --all` |
+| [`continuous-integration.yml`](.github/workflows/continuous-integration.yml) | `npx just eslint`, `nx run-many -t test --all` |
 | [`precommit.yml`](.github/workflows/precommit.yml) | `nx run webapp:configure`, `nx run server:package` |
 | [`release-webapp.yml`](.github/workflows/release-webapp.yml) | `nx run webapp:configure`, `nx run server:package` through the exact WebApp release artifact build |
 | [`publish-main.yml`](.github/workflows/publish-main.yml) | Main artifact build, Edge and Hosted Dev delivery, and development distribution |
@@ -1505,11 +1492,8 @@ From [`.github/workflows/ci.yml`](.github/workflows/ci.yml):
 # Run all tests
 nx run-many -t test --all --configuration=ci
 
-# Run all linting
-nx run-many -t lint --all
-
 # Run affected projects only
-nx affected -t build test lint
+nx affected -t build test
 
 # Build specific configuration
 nx build webapp --configuration=production
@@ -1618,8 +1602,8 @@ nx run-many -t test --all             # Test all projects
 nx test <project> --coverage          # Test with coverage
 
 # Lint
-nx lint <project>                     # Lint specific project
-nx run-many -t lint --all             # Lint all projects
+npx just eslint                       # Lint the repository
+npx just eslint-fix                   # Fix eligible ESLint issues
 
 # Development
 npm run dev                           # Dev server + upstream lib watchers

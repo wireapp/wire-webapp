@@ -1,7 +1,10 @@
-const nxPreset = require('@nx/jest/preset').default;
-
 module.exports = {
-  ...nxPreset,
+  testMatch: ['**/?(*.)+(spec|test).?([mc])[jt]s?(x)'],
+  testEnvironmentOptions: {
+    customExportConditions: ['node', 'require', 'default'],
+  },
+  modulePathIgnorePatterns: ['<rootDir>/dist/', '<rootDir>/out-tsc/'],
+  coverageReporters: ['html'],
   collectCoverageFrom: [
     '**/*.{js,jsx,ts,tsx}',
     '!**/*.d.ts',

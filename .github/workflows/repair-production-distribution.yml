@@ -36,7 +36,7 @@ permissions: {}
 jobs:
   validate_repair:
     name: Validate Production repair request
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     outputs:
@@ -117,7 +117,7 @@ jobs:
 
   notify_repair_failure:
     name: Notify Production repair failure
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs: [validate_repair, publish_distribution]
     if: ${{ always() && (needs.validate_repair.result == 'failure' || needs.publish_distribution.result == 'failure') }}
     permissions:

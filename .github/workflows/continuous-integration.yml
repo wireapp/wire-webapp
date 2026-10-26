@@ -22,7 +22,7 @@ env:
 
 jobs:
   workflow-security:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     name: Workflow security analysis
     permissions:
       actions: read # required by zizmor online audits in private repositories
@@ -36,7 +36,7 @@ jobs:
 
       - name: Run zizmor
         id: zizmor
-        uses: zizmorcore/zizmor-action@85b2b9fb8e3325e7a23d7d0a9d7ba5ae0f999e3e # v0.7.1
+        uses: zizmorcore/zizmor-action@53290badfa369cb0bf7ad16342cb62c2fa47ac7b # v0.8.0
         with:
           inputs: .github/workflows/continuous-integration.yml
           version: 1.25.2
@@ -54,7 +54,7 @@ jobs:
           test "$findingsCount" -eq 0
 
   generated-artifacts:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     name: generated artifacts check
     permissions:
       contents: read
@@ -111,7 +111,7 @@ jobs:
         run: npm exec -- nx run webapp:validate-translations
 
   build-libraries:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     name: build libraries
     permissions:
       contents: read
@@ -136,7 +136,7 @@ jobs:
         run: npm exec -- nx run-many -t build --projects=tag:type:lib
 
   rspack-build:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     name: Rspack production build
     permissions:
       contents: read
@@ -240,7 +240,7 @@ jobs:
           retention-days: 3
 
   type-check:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     name: type check
     permissions:
       contents: read
@@ -265,7 +265,7 @@ jobs:
         run: npm run type-check
 
   lint-file-names:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     name: lint file names
     permissions:
       contents: read
@@ -290,10 +290,13 @@ jobs:
         run: npx just lint-file-names
 
   lint:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     name: lint
     permissions:
       contents: read
+    env:
+      # Pin the comparison to the target branch commit from the event, even if the branch advances.
+      BASE_REF: ${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha }}
 
     steps:
       - name: Checkout repository
@@ -301,16 +304,11 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 1
-          # Keep this shallow. Nx gets the base branch explicitly in the next step.
+          # Keep this shallow. Git-dependent checks get the base commit explicitly in the next step.
 
-      - name: Fetch base branch for Nx checks
-        if: ${{ github.event_name == 'pull_request' }}
-        env:
-          BASE_REF: ${{ github.base_ref }}
+      - name: Fetch base commit for Git-dependent checks
         run: |
-          git fetch --no-tags --depth=1 origin \
-            "${BASE_REF}:refs/remotes/origin/${BASE_REF}" \
-            "${BASE_REF}:${BASE_REF}"
+          git fetch --no-tags --depth=1 origin "${BASE_REF:?Missing event base revision}"
 
       - name: Setup Node.js
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
@@ -337,36 +335,17 @@ jobs:
       - name: Build libraries for lint import resolution
         run: npm exec -- nx run-many -t build --projects=tag:type:lib
 
-      - name: Lint affected projects (ESLint)
-        if: ${{ github.event_name == 'pull_request' }}
-        env:
-          BASE_REF: ${{ github.base_ref }}
-        run: npm exec -- nx affected -t lint --base="origin/${BASE_REF}"
+      - name: Lint repository
+        run: npx just eslint
 
-      - name: Check formatting (Prettier)
-        if: ${{ github.event_name == 'pull_request' }}
-        env:
-          BASE_REF: ${{ github.base_ref }}
+      - name: Check formatting
         run: npx just format-check
 
       - name: Stylelint
-        if: ${{ github.event_name == 'pull_request' }}
-        run: npx just stylesheet-lint
-
-      - name: Lint all projects (ESLint)
-        if: ${{ github.event_name != 'pull_request' }}
-        run: npm run lint:projects
-
-      - name: Check formatting (Prettier)
-        if: ${{ github.event_name != 'pull_request' }}
-        run: npx just format-check
-
-      - name: Stylelint
-        if: ${{ github.event_name != 'pull_request' }}
         run: npx just stylesheet-lint
 
   unit-tests:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     name: unit tests
     permissions:
       contents: read
@@ -404,7 +383,7 @@ jobs:
             coverage/libraries/api-client
 
   public-production-package:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     name: Public production package verification
     if: ${{ github.event_name == 'pull_request' }}
     needs:

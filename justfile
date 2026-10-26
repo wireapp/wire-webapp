@@ -1,5 +1,6 @@
 set default-list := true
 export PATH := justfile_directory() + "/node_modules/.bin:" + env_var("PATH")
+export NODE_OPTIONS := "--max-old-space-size=6144"
 
 # Check repository file and directory names against .ls-lint.yml.
 [group('lint')]
@@ -15,6 +16,24 @@ lint-duplication:
 [group('lint')]
 stylesheet-lint:
     cd apps/webapp && prettier --ignore-path ../../.prettierignore --check "**/*.less" && stylelint --ignore-path .gitignore "**/*.less"
+
+# Lint the repository with ESLint's flat config and the temporary 287-warning budget.
+[group('lint')]
+[arg("fix", long, value="true")]
+eslint fix="false":
+    eslint . --config eslint.config.mjs --max-warnings=287 --cache --cache-strategy content --cache-location ./target/eslintcache {{if fix == "true" { "--fix" } else { "" }}}
+
+# Automatically fix eligible ESLint issues across the repository.
+[group('lint')]
+eslint-fix: (eslint "true")
+
+# Run all repository lint checks, including ESLint, Prettier, Stylelint, and duplication.
+[group('lint')]
+lint: eslint format-check stylesheet-lint lint-duplication
+
+# Format repository files and automatically fix eligible ESLint issues.
+[group('lint')]
+fix: format eslint-fix
 
 # Check changed files with Prettier against BASE_REF and HEAD_REF.
 [group('format')]

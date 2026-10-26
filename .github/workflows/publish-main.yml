@@ -35,7 +35,7 @@ env:
 jobs:
   validate_request:
     name: Validate main delivery request
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions: {}
 
     steps:
@@ -71,7 +71,7 @@ jobs:
 
   build_main_artifacts:
     name: Build main delivery artifacts
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs: validate_request
     env:
       WIRE_WEBAPP_CONFIGURATION: development
@@ -181,7 +181,7 @@ jobs:
 
   deploy_to_edge:
     name: Deploy to Edge
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs: build_main_artifacts
     permissions:
       contents: read
@@ -312,7 +312,7 @@ jobs:
 
   deploy_to_dev:
     name: Deploy to Hosted Dev
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs: build_main_artifacts
     permissions:
       contents: read
@@ -474,7 +474,7 @@ jobs:
 
   publish_to_development_channel:
     name: Publish to development channel
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs: build_main_artifacts
     permissions:
       actions: read
@@ -660,7 +660,7 @@ jobs:
 
   notify_main_delivery_failure:
     name: Notify Deployoholics of main delivery failure
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs:
       - build_main_artifacts
       - deploy_to_edge
@@ -706,7 +706,7 @@ jobs:
 
   summarize_main_delivery:
     name: Summarize main delivery
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs:
       [
         build_main_artifacts,

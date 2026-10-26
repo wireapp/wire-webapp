@@ -58,12 +58,6 @@
         "coverage": true
       }
     },
-    "lint": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "eslint --config eslint.config.mjs --max-warnings=0 --cache --cache-location node_modules/.cache/eslint/license-collector --ext .js,.jsx,.ts,.tsx,.cjs,.mjs {projectRoot}"
-      }
-    },
     "type-check": {
       "executor": "nx:run-commands",
       "options": {

@@ -1,3 +1,4 @@
+---
 name: Create Library Release PR
 
 on:
@@ -14,7 +15,7 @@ concurrency:
 jobs:
   create-release-pr:
     name: Create Release PR
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
 
     steps:
       - name: Checkout
@@ -45,14 +46,14 @@ jobs:
       - name: Install dependencies
         run: npm clean-install
 
-      - name: Lint libraries
-        run: npm exec -- nx run-many -t lint --projects=tag:type:lib
+      - name: Build libraries for lint import resolution
+        run: npm exec -- nx run-many -t build --projects=tag:type:lib
+
+      - name: Lint repository (ESLint)
+        run: npx just eslint
 
       - name: Test libraries
         run: npm exec -- nx run-many -t test --projects=tag:type:lib
-
-      - name: Build libraries
-        run: npm exec -- nx run-many -t build --projects=tag:type:lib
 
       - name: Create version PR
         run: |

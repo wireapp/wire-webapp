@@ -1,3 +1,4 @@
+---
 name: Redeploy production from tag
 
 on:
@@ -20,7 +21,7 @@ concurrency:
 jobs:
   validate_request:
     name: Validate redeploy request
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     outputs:
       webapp_build_version: ${{ steps.validate.outputs.webapp_build_version }}
       tag: ${{ steps.validate.outputs.tag }}
@@ -82,7 +83,7 @@ jobs:
 
   build_artifact:
     name: Rebuild tagged release artifact
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs: validate_request
     outputs:
       artifact_version: ${{ steps.validate_artifact_metadata.outputs.artifact_version }}
@@ -213,7 +214,7 @@ jobs:
 
   deploy_to_production:
     name: Deploy to production
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     env:
       AWS_REGION: eu-central-1
     needs: [validate_request, build_artifact]
@@ -251,7 +252,7 @@ jobs:
           use-existing-application-version-if-available: true
   notify_redeploy_failure:
     name: Notify redeploy failure
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs: [validate_request, build_artifact, deploy_to_production]
     if: ${{ always() && needs.deploy_to_production.result == 'failure' }}
     permissions:

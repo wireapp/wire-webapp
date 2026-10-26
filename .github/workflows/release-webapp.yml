@@ -53,7 +53,7 @@ env:
 jobs:
   prepare_release:
     name: Prepare SemVer release
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: write # Create the create-only SemVer release branch reservation.
       pull-requests: read # Read merged PR labels used to calculate the version.
@@ -134,7 +134,7 @@ jobs:
 
   build_artifact:
     name: Build release artifact
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs: prepare_release
     env:
       WIRE_WEBAPP_CONFIGURATION: production
@@ -320,7 +320,7 @@ jobs:
 
   deploy_to_beta:
     name: Deploy to Beta
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs: build_artifact
     permissions:
       contents: read
@@ -388,7 +388,7 @@ jobs:
 
   create_beta_tag:
     name: Create Beta tag
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs: [build_artifact, deploy_to_beta]
     permissions:
       contents: write # Create the immutable annotated Beta tag.
@@ -469,7 +469,7 @@ jobs:
 
   notify_beta_release_success:
     name: Notify successful Beta release
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs: [build_artifact, deploy_to_beta, create_beta_tag]
     if: >-
       ${{
@@ -509,7 +509,7 @@ jobs:
 
   comment_beta_release_appearances:
     name: Comment Beta release appearances
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 30
     needs: [build_artifact, create_beta_tag]
     if: ${{ needs.create_beta_tag.result == 'success' }}
@@ -551,7 +551,7 @@ jobs:
 
   summarize_beta_release:
     name: Summarize Beta release
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs:
       - build_artifact
       - deploy_to_beta
@@ -627,7 +627,7 @@ jobs:
 
   notify_e2e_success:
     name: Notify successful release E2E gate
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs:
       - build_artifact
       - create_beta_tag
@@ -679,7 +679,7 @@ jobs:
 
   production_preflight:
     name: Production preflight
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs: [build_artifact, create_beta_tag, run_e2e]
     permissions:
       contents: read
@@ -783,7 +783,7 @@ jobs:
 
   production_approval:
     name: Approve Production deployment
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs: production_preflight
     if: ${{ needs.production_preflight.outputs.should_deploy == 'true' }}
     permissions: {}
@@ -796,7 +796,7 @@ jobs:
 
   deploy_to_production:
     name: Deploy to Production
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs: [build_artifact, production_preflight, production_approval]
     if: >-
       ${{
@@ -865,7 +865,7 @@ jobs:
 
   verify_production_runtime:
     name: Verify Production runtime
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs: [build_artifact, deploy_to_production]
     if: ${{ needs.deploy_to_production.result == 'success' }}
     permissions:
@@ -898,7 +898,7 @@ jobs:
 
   create_production_tag:
     name: Create Production tag
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs: [build_artifact, production_preflight, deploy_to_production, verify_production_runtime]
     if: ${{ needs.production_preflight.outputs.should_deploy == 'true' && needs.deploy_to_production.result == 'success' && needs.verify_production_runtime.result == 'success' }}
     permissions:
@@ -980,7 +980,7 @@ jobs:
 
   comment_production_release_appearances:
     name: Comment Production release appearances
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs: [build_artifact, create_beta_tag, create_production_tag]
     if: ${{ needs.create_production_tag.result == 'success' }}
     continue-on-error: true
@@ -1043,7 +1043,7 @@ jobs:
 
   ensure_github_release:
     name: Ensure GitHub Release draft
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     # This job is intentionally independent of Production distribution. Both
     # jobs consume the immutable Production tag, so a GitHub metadata failure
     # must not prevent Docker, Helm or wire-builds publication.
@@ -1091,7 +1091,7 @@ jobs:
 
   synchronize_webapp_version:
     name: Synchronize WebApp version
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     continue-on-error: true
     needs:
       [
@@ -1175,7 +1175,7 @@ jobs:
 
   notify_production_release_success:
     name: Notify successful Production release
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs:
       [
         build_artifact,
@@ -1244,7 +1244,7 @@ jobs:
 
   summarize_release:
     name: Summarize release
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs:
       [
         build_artifact,
@@ -1346,7 +1346,7 @@ jobs:
 
   notify_release_failure:
     name: Notify failed release
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs:
       [
         prepare_release,

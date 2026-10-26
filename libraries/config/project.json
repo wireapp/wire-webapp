@@ -46,12 +46,6 @@
         "command": "tsc --watch",
         "cwd": "{projectRoot}"
       }
-    },
-    "lint": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "eslint --config eslint.config.mjs --cache --cache-location node_modules/.cache/eslint/config --max-warnings=0 --ext .js,.jsx,.ts,.tsx,.cjs,.mjs {projectRoot}"
-      }
     }
   },
   "tags": ["type:lib", "scope:config"]

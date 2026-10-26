@@ -68,12 +68,6 @@
       "options": {
         "command": "tsc --project {projectRoot}/tsconfig.json --noEmit && tsc --project {projectRoot}/tsconfig.commonjs.json --noEmit && tsc --project {projectRoot}/tsconfig.type-check.json"
       }
-    },
-    "lint": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "eslint --config eslint.config.mjs --max-warnings=0 --cache --cache-location node_modules/.cache/eslint/telemetry --ext .js,.jsx,.ts,.tsx,.cjs,.mjs,.mts {projectRoot}"
-      }
     }
   },
   "tags": ["type:lib", "scope:telemetry"]

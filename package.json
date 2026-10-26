@@ -28,7 +28,7 @@
     "@nx/node": "22.7.12",
     "@nx/workspace": "22.7.12",
     "@stylistic/eslint-plugin": "5.10.0",
-    "@swc/core": "1.16.18",
+    "@swc/core": "1.16.20",
     "@swc/jest": "0.2.39",
     "@tony.ganchev/eslint-plugin-header": "3.4.4",
     "@types/fs-extra": "11.0.4",
@@ -68,7 +68,7 @@
     "jest": "30.5.2",
     "jest-environment-jsdom": "30.5.2",
     "js-yaml": "4.3.2",
-    "jscpd": "5.4.1",
+    "jscpd": "5.4.2",
     "jsdom": "29.1.1",
     "nock": "14.0.17",
     "nx": "22.7.12",
@@ -124,11 +124,6 @@
     "dev": "nx serve server",
     "dev:packages": "nx run-many -t watch --projects=tag:type:lib",
     "docker": "nx run workspace-tools:docker",
-    "fix": "npx just format && nx run-many -t lint --all --fix",
-    "lint": "npm run lint:projects && npx just format-check && npx just stylesheet-lint && npx just lint-duplication",
-    "lint:affected": "nx affected -t lint --base=\"origin/${BASE_REF}\" && npx just format-check && npx just stylesheet-lint",
-    "lint:projects": "nx run-many -t lint --all",
-    "lint:fix": "nx run-many -t lint --all --fix",
     "postinstall": "patch-package && nx run webapp:configure",
     "ci:install": "npm clean-install --ignore-scripts && npm exec -- patch-package --error-on-fail",
     "release": "nx release",
@@ -168,6 +163,6 @@
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0"
   },
-  "version": "1.0.0",
+  "version": "1.1.0",
   "packageManager": "npm@11.21.1"
 }

@@ -220,15 +220,22 @@ export const setupDetachedWindowExternalLinksClick = (
   };
 };
 
-function getEffectiveCallingConfig(callingConfig: CallConfigData, useRustSft: boolean): CallConfigData {
-  if (!useRustSft) {
+function getEffectiveCallingConfig(callingConfig: CallConfigData, useStagingSft: boolean): CallConfigData {
+  if (!useStagingSft) {
     return callingConfig;
   }
 
   return {
     ...callingConfig,
-    sft_servers: [{urls: ['https://rust-sft.stars.wire.link']}],
-    sft_servers_all: [{urls: ['https://rust-sft.stars.wire.link']}],
+    sft_servers: [{urls: ['https://sft.calling-staging-v01.zinfra.io']}],
+    sft_servers_all: [
+      {
+        urls: [
+          'https://sft.calling-staging-v01.zinfra.io/sfts/sftd-0',
+          'https://sft.calling-staging-v01.zinfra.io/sfts/sftd-1',
+        ],
+      },
+    ],
   };
 }
 
@@ -255,7 +262,7 @@ export class CallingRepository {
   private wUser: number = 0;
   private nextMuteState: MuteState = MuteState.SELF_MUTED;
   private isConferenceCallingSupported = false;
-  private isOnAvsRustSft = false;
+  private isOnAvsStagingSft = false;
   private allowedSftOrigins: ReadonlySet<string> = new Set();
   private readonly incomingSetupReceivedAtByConversation = new Map<SerializedConversationId, number>();
 
@@ -1439,7 +1446,7 @@ export class CallingRepository {
       );
       this.storeCall(call);
 
-      // Temporary feature to toggle Rust SFT
+      // Temporary feature to toggle Staging SFT
       this.setSetupSftConfig(call);
 
       // Microphone access is required to start a call. Camera failures stay separate:
@@ -1511,22 +1518,22 @@ export class CallingRepository {
   }
 
   /**
-   * We're fetching Rust SFT config in case user wants to use them.
+   * We're fetching Staging SFT config in case user wants to use them.
    * We also use a cache value to avoid unnecessarily fetching the config.
    */
   private setSetupSftConfig(call: Call): void {
-    if (call.useAvsRustSFT()) {
-      if (!this.isOnAvsRustSft) {
-        this.isOnAvsRustSft = true;
+    if (call.useAvsStagingSFT()) {
+      if (!this.isOnAvsStagingSft) {
+        this.isOnAvsStagingSft = true;
         this.requestConfig();
-        this.logger.info('SetupSftConfig: Switch SFT setup use Rust SFT: false->true');
+        this.logger.info('SetupSftConfig: Switch SFT setup use Staging SFT: false->true');
       }
-    } else if (this.isOnAvsRustSft) {
-      this.isOnAvsRustSft = false;
+    } else if (this.isOnAvsStagingSft) {
+      this.isOnAvsStagingSft = false;
       this.requestConfig();
-      this.logger.info('SetupSftConfig: Switch SFT setup use Rust SFT: true->false');
+      this.logger.info('SetupSftConfig: Switch SFT setup use Staging SFT: true->false');
     }
-    this.logger.info('SetupSftConfig: Use Rust SFT', this.isOnAvsRustSft);
+    this.logger.info('SetupSftConfig: Use Staging SFT', this.isOnAvsStagingSft);
   }
 
   private serializeQualifiedId(id: QualifiedId): string {
@@ -1835,7 +1842,7 @@ export class CallingRepository {
   async answerCall(call: Call, callType?: CALL_TYPE, media?: CallMediaChoice): Promise<void> {
     void this.setViewModeMinimized();
 
-    // Temporary feature to toggle Rust SFT
+    // Temporary feature to toggle Staging SFT
     this.setSetupSftConfig(call);
 
     const {conversation} = call;
@@ -2667,11 +2674,11 @@ export class CallingRepository {
   };
 
   private readonly requestConfig = (): number => {
-    const useRustSft = this.isOnAvsRustSft;
+    const useStagingSft = this.isOnAvsStagingSft;
     const _requestConfig = async (): Promise<void> => {
       const limit = Runtime.isFirefox() ? CallingRepository.CONFIG.MAX_FIREFOX_TURN_COUNT : undefined;
       const config = await this.fetchConfig(limit);
-      const effectiveConfig = getEffectiveCallingConfig(config, useRustSft);
+      const effectiveConfig = getEffectiveCallingConfig(config, useStagingSft);
 
       const serializedConfig = JSON.stringify(effectiveConfig);
       this.allowedSftOrigins = getAllowedSftOrigins(effectiveConfig);

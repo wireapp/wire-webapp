@@ -27,13 +27,6 @@
         "command": "echo \"workspace-tools has no build\""
       }
     },
-    "lint": {
-      "executor": "nx:run-commands",
-      "dependsOn": [],
-      "options": {
-        "command": "eslint --config eslint.config.mjs --max-warnings=0 --ext .js,.jsx,.ts,.tsx,.cjs,.mjs,.mts,.cts tools"
-      }
-    },
     "e2e": {
       "executor": "nx:run-commands",
       "options": {
