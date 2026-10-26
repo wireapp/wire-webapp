@@ -1,3 +1,4 @@
+---
 name: Release Maintenance WebApp
 
 on:
@@ -35,7 +36,7 @@ env:
 jobs:
   validate_request:
     name: Validate maintenance request
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     outputs:
@@ -105,7 +106,7 @@ jobs:
 
   prepare_maintenance_branch:
     name: Prepare maintenance branch
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs: validate_request
     permissions:
       contents: write
@@ -252,7 +253,7 @@ jobs:
 
   select_maintenance_tag:
     name: Select maintenance tag
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs: [validate_request, prepare_maintenance_branch]
     if: ${{ needs.prepare_maintenance_branch.outputs.maintenance_branch_action == 'reused' }}
     permissions:
@@ -312,7 +313,7 @@ jobs:
 
   build_maintenance_artifact:
     name: Build exact maintenance artifact
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs: [validate_request, prepare_maintenance_branch, select_maintenance_tag]
     if: ${{ needs.prepare_maintenance_branch.outputs.maintenance_branch_action == 'reused' }}
     env:
@@ -456,7 +457,7 @@ jobs:
 
   create_maintenance_tag:
     name: Create immutable maintenance tag
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     if: ${{ needs.prepare_maintenance_branch.outputs.maintenance_branch_action == 'reused' }}
     needs:
       [
@@ -626,7 +627,7 @@ jobs:
 
   maintenance_summary:
     name: Write maintenance release summary
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     if: ${{ always() }}
     needs:
       - validate_request

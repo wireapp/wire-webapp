@@ -1,3 +1,4 @@
+---
 name: Create Library Release PR
 
 on:
@@ -14,7 +15,7 @@ concurrency:
 jobs:
   create-release-pr:
     name: Create Release PR
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
 
     steps:
       - name: Checkout

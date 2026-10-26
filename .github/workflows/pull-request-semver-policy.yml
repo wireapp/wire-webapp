@@ -16,7 +16,7 @@ concurrency:
 jobs:
   pull-request-semver-policy:
     name: Pull request SemVer policy
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read # required for checkout; labels come from the event payload
     steps:

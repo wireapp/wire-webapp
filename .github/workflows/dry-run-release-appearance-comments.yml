@@ -26,7 +26,7 @@ concurrency:
 jobs:
   dry_run_release_appearance_comments:
     name: Plan release appearance comments
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read # required to check out and inspect release history
       pull-requests: read # required to discover merged pull requests

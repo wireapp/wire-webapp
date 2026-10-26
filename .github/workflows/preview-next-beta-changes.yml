@@ -9,7 +9,7 @@ permissions: {}
 jobs:
   preview_next_beta_changes:
     name: Preview next Beta changes
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
       pull-requests: read
