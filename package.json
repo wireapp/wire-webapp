@@ -28,7 +28,7 @@
     "@nx/node": "22.7.12",
     "@nx/workspace": "22.7.12",
     "@stylistic/eslint-plugin": "5.10.0",
-    "@swc/core": "1.16.18",
+    "@swc/core": "1.16.20",
     "@swc/jest": "0.2.39",
     "@tony.ganchev/eslint-plugin-header": "3.4.4",
     "@types/fs-extra": "11.0.4",
