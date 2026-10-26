@@ -19,7 +19,7 @@
     "dexie": "4.4.7"
   },
   "devDependencies": {
-    "@swc/core": "1.16.18",
+    "@swc/core": "1.16.20",
     "@swc/jest": "0.2.39",
     "@types/jest": "29.5.14",
     "@types/node": "22.20.5",

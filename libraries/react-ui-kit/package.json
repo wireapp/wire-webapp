@@ -28,7 +28,7 @@
   "devDependencies": {
     "@emotion/jest": "11.14.2",
     "@emotion/react": "11.14.0",
-    "@swc/core": "1.16.18",
+    "@swc/core": "1.16.20",
     "@swc/jest": "0.2.39",
     "@testing-library/dom": "10.4.2",
     "@testing-library/jest-dom": "6.9.1",

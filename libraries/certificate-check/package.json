@@ -16,7 +16,7 @@
     "jsrsasign": "11.1.5"
   },
   "devDependencies": {
-    "@swc/core": "1.16.18",
+    "@swc/core": "1.16.20",
     "@swc/jest": "0.2.39",
     "@types/jest": "29.5.14",
     "@types/jsrsasign": "10.5.15",

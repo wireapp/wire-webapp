@@ -19,7 +19,7 @@
     "fs-extra": "11.4.1"
   },
   "devDependencies": {
-    "@swc/core": "1.16.18",
+    "@swc/core": "1.16.20",
     "@swc/jest": "0.2.39",
     "@types/fs-extra": "11.0.4",
     "@types/jest": "29.5.14",
