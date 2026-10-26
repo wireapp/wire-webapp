@@ -55,6 +55,7 @@ interface CellsBulkMovePreviewPresentationProps {
   onMoveResult: (response: RestPerformActionResponse, summary: SharedDriveMoveSummary) => boolean;
   onMoveError: () => void;
   isMoveOutcomeUnresolved: boolean;
+  isPartialMoveOutcome: boolean;
   isMoveRequestError: boolean;
   isMoveDisabled: boolean;
   isMoveLoading: boolean;
@@ -82,6 +83,7 @@ export const CellsBulkMovePreviewPresentation: FunctionComponent<CellsBulkMovePr
   onMoveResult,
   onMoveError,
   isMoveOutcomeUnresolved,
+  isPartialMoveOutcome,
   isMoveRequestError,
   isMoveDisabled,
   isMoveLoading,
@@ -154,7 +156,9 @@ export const CellsBulkMovePreviewPresentation: FunctionComponent<CellsBulkMovePr
               <p>
                 {isMoveRequestError
                   ? translate('cells.newItemMenuModalForm.genericError')
-                  : translate('cells.bulkMove.outcomeUnresolved')}
+                  : translate(
+                      isPartialMoveOutcome ? 'cells.bulkMove.partialMoveWarning' : 'cells.bulkMove.outcomeUnresolved',
+                    )}
               </p>
             </div>
           )}

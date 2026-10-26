@@ -163,6 +163,38 @@ const BACKGROUND_MOVE_STATUS_RETRY_MIN_JITTER_FACTOR = 0.75;
 const BACKGROUND_MOVE_STATUS_RETRY_MAX_JITTER_FACTOR = 1.25;
 const MAX_BACKGROUND_MOVE_STATUS_RETRIES = 5;
 
+type BulkMoveOutcomeEvidence = 'complete' | 'partial' | 'unknown';
+
+const getBulkMoveOutcomeEvidence = (
+  affectedNodes: RestPerformActionResponse['AffectedNodes'],
+  expectedNodeIds: string[],
+): BulkMoveOutcomeEvidence => {
+  if (affectedNodes === undefined) {
+    return 'unknown';
+  }
+
+  const affectedNodeIds = affectedNodes.map(({Uuid}) => {
+    return Uuid;
+  });
+  const affectedNodeIdSet = new Set(affectedNodeIds);
+  if (affectedNodeIdSet.size !== affectedNodeIds.length) {
+    return 'unknown';
+  }
+
+  const expectedNodeIdSet = new Set(expectedNodeIds);
+  const missingExpectedNodes = expectedNodeIds.some(nodeId => {
+    return !affectedNodeIdSet.has(nodeId);
+  });
+  if (!missingExpectedNodes) {
+    return 'complete';
+  }
+
+  const includesUnexpectedNodes = affectedNodeIds.some(nodeId => {
+    return !expectedNodeIdSet.has(nodeId);
+  });
+  return includesUnexpectedNodes ? 'unknown' : 'partial';
+};
+
 export const CellsTable = ({
   nodes,
   cellsRepository,
@@ -204,6 +236,7 @@ export const CellsTable = ({
   const [backgroundMoveStatusId, setBackgroundMoveStatusId] = useState('');
   const [backgroundMoveStatusCheckId, setBackgroundMoveStatusCheckId] = useState(0);
   const [isBulkMoveOutcomeUnresolved, setIsBulkMoveOutcomeUnresolved] = useState(false);
+  const [isBulkMovePartialOutcome, setIsBulkMovePartialOutcome] = useState(false);
   const [isBulkMoveRequestError, setIsBulkMoveRequestError] = useState(false);
 
   useEffect(() => {
@@ -224,6 +257,8 @@ export const CellsTable = ({
     setIsBulkMoveRequestPending(false);
     setIsBulkMovePreviewOpen(true);
     setIsBulkMoveOutcomeUnresolved(true);
+    setIsBulkMovePartialOutcome(false);
+    onRefresh();
     setIsBulkMoveRequestError(true);
   };
 
@@ -234,6 +269,7 @@ export const CellsTable = ({
     setIsBulkMoveRequestPending(true);
     setIsBulkMovePreviewOpen(false);
     setIsBulkMoveOutcomeUnresolved(false);
+    setIsBulkMovePartialOutcome(false);
     setIsBulkMoveRequestError(false);
     setIsBackgroundMoveError(false);
     setIsBackgroundMoveStatusUnknown(false);
@@ -310,20 +346,19 @@ export const CellsTable = ({
         return status === JobsTaskStatus.Finished;
       });
       if (areAllJobsFinished) {
-        if (maybe.isJust(backgroundMoveSummary.current)) {
-          updateMoveStatus({id: moveStatusId, kind: 'completed', ...backgroundMoveSummary.current.value});
-        } else {
-          clearMoveStatus(moveStatusId);
-        }
+        clearMoveStatus(moveStatusId);
         backgroundMoveSummary.current = Maybe.nothing();
         setBackgroundMoveStatusId('');
         setBackgroundMoveJobUuids([]);
         setIsBackgroundMovePending(false);
         setIsBackgroundMoveError(false);
-        setIsBulkMoveOutcomeUnresolved(false);
+        setIsBackgroundMoveRetryBlocked(true);
+        setIsBackgroundMoveStatusUnknown(false);
+        setIsBulkMoveOutcomeUnresolved(true);
+        setIsBulkMovePartialOutcome(false);
         setIsBulkMoveRequestError(false);
         onRefresh();
-        setIsBulkMovePreviewOpen(false);
+        setIsBulkMovePreviewOpen(true);
         return;
       }
 
@@ -334,6 +369,26 @@ export const CellsTable = ({
       });
       if (hasNonTerminalJob) {
         scheduleNextCheck(BACKGROUND_MOVE_STATUS_POLL_INTERVAL_MS);
+        return;
+      }
+
+      const hasFinishedJob = statuses.some(status => {
+        return status === JobsTaskStatus.Finished;
+      });
+      if (hasFinishedJob) {
+        clearMoveStatus(moveStatusId);
+        setBackgroundMoveJobUuids([]);
+        setIsBackgroundMovePending(false);
+        setIsBackgroundMoveRetryBlocked(true);
+        setIsBackgroundMoveStatusUnknown(false);
+        setIsBackgroundMoveError(false);
+        setIsBulkMoveOutcomeUnresolved(true);
+        setIsBulkMovePartialOutcome(true);
+        setIsBulkMoveRequestError(false);
+        backgroundMoveSummary.current = Maybe.nothing();
+        setBackgroundMoveStatusId('');
+        setIsBulkMovePreviewOpen(true);
+        onRefresh();
         return;
       }
 
@@ -389,10 +444,34 @@ export const CellsTable = ({
     const moveStatusId = maybe.isJust(activeMoveStatusId.current)
       ? activeMoveStatusId.current.value
       : createMoveStatusId();
+    const outcomeEvidence = getBulkMoveOutcomeEvidence(
+      response.AffectedNodes,
+      summary.items.map(({id}) => {
+        return id;
+      }),
+    );
     setIsBulkMoveRequestPending(false);
     setIsBackgroundMoveError(false);
     setIsBackgroundMoveRetryBlocked(false);
     setIsBackgroundMoveStatusUnknown(false);
+
+    if (
+      response.Status === RestActionStatus.Performed &&
+      response.AffectedNodes !== undefined &&
+      outcomeEvidence !== 'complete'
+    ) {
+      clearMoveStatus(moveStatusId);
+      activeMoveStatusId.current = Maybe.nothing();
+      backgroundMoveSummary.current = Maybe.nothing();
+      setIsBulkMoveOutcomeUnresolved(true);
+      setIsBulkMovePartialOutcome(outcomeEvidence === 'partial');
+      setIsBulkMoveRequestError(false);
+      setIsBackgroundMovePending(false);
+      setIsBackgroundMoveRetryBlocked(true);
+      setIsBulkMovePreviewOpen(true);
+      onRefresh();
+      return false;
+    }
 
     if (response.Status === RestActionStatus.Performed) {
       updateMoveStatus({id: moveStatusId, kind: 'completed', ...summary});
@@ -426,6 +505,7 @@ export const CellsTable = ({
     setBackgroundMoveStatusId(moveStatusId);
     setBackgroundMoveJobUuids(uniqueMoveJobUuids);
     setIsBulkMoveOutcomeUnresolved(false);
+    setIsBulkMovePartialOutcome(false);
     setIsBulkMoveRequestError(false);
     setIsBackgroundMovePending(true);
     updateMoveStatus({id: moveStatusId, kind: 'processing', ...summary});
@@ -596,7 +676,11 @@ export const CellsTable = ({
                 <p role="status">
                   {isBulkMoveRequestError
                     ? translate('cells.newItemMenuModalForm.genericError')
-                    : translate('cells.bulkMove.outcomeUnresolved')}
+                    : translate(
+                        isBulkMovePartialOutcome
+                          ? 'cells.bulkMove.partialMoveWarning'
+                          : 'cells.bulkMove.outcomeUnresolved',
+                      )}
                 </p>
               )}
               {selectedNodeIds.size > 0 && (
@@ -651,6 +735,7 @@ export const CellsTable = ({
               conversationQualifiedId={conversationQualifiedId}
               conversationName={conversationName}
               isMoveOutcomeUnresolved={isBulkMoveOutcomeUnresolved}
+              isPartialMoveOutcome={isBulkMovePartialOutcome}
               isMoveRequestError={isBulkMoveRequestError}
               isMoveRequestPending={isBulkMoveRequestPending}
               onMoveStart={handleBulkMoveStart}

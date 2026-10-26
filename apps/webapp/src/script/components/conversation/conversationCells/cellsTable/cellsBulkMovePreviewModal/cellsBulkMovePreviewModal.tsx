@@ -47,6 +47,7 @@ interface CellsBulkMovePreviewModalProps {
   conversationQualifiedId: QualifiedId;
   conversationName: string;
   isMoveOutcomeUnresolved: boolean;
+  isPartialMoveOutcome: boolean;
   isMoveRequestError: boolean;
   isMoveRequestPending: boolean;
   onMoveStart: (summary: SharedDriveMoveSummary) => void;
@@ -69,6 +70,7 @@ export const CellsBulkMovePreviewModal: FunctionComponent<CellsBulkMovePreviewMo
   conversationQualifiedId,
   conversationName,
   isMoveOutcomeUnresolved,
+  isPartialMoveOutcome,
   isMoveRequestError,
   isMoveRequestPending,
   onMoveStart,
@@ -178,6 +180,7 @@ export const CellsBulkMovePreviewModal: FunctionComponent<CellsBulkMovePreviewMo
       destinationPath={destination.selectedDestinationPath}
       onMoveError={onMoveError}
       isMoveOutcomeUnresolved={isMoveOutcomeUnresolved}
+      isPartialMoveOutcome={isPartialMoveOutcome}
       isMoveRequestError={isMoveRequestError}
       isMoveDisabled={
         !move.isValid ||

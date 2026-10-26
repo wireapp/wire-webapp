@@ -396,6 +396,7 @@
   "cells.bulkMove.movedItems": "Moved {count} items",
   "cells.bulkMove.movingItems": "Moving {count} items",
   "cells.bulkMove.outcomeUnresolved": "Move status is unresolved. Verify the Drive before trying again.",
+  "cells.bulkMove.partialMoveWarning": "The move may be incomplete. Check item locations before trying again. Move stays disabled in this view.",
   "cells.bulkMove.processing": "Processing",
   "cells.bulkMove.refreshDrive": "Refresh Drive",
   "cells.bulkMove.selected": "Selected",

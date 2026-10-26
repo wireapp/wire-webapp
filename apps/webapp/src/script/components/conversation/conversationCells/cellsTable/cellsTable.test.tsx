@@ -88,6 +88,9 @@ const translateSelectionForTest: Translate = (key, substitutions) => {
   if (key === 'cells.bulkMove.outcomeUnresolved') {
     return 'Move status is unresolved. Verify the Drive before trying again.';
   }
+  if (key === 'cells.bulkMove.partialMoveWarning') {
+    return 'The move may be incomplete. Check item locations before trying again. Move stays disabled in this view.';
+  }
   if (key === 'cells.bulkMove.selected') {
     return 'Selected';
   }
@@ -459,7 +462,10 @@ describe('CellsTable selection', () => {
           Nodes: [{Type: 'COLLECTION', Uuid: 'reports', Path: 'conversation-id@example.com/Reports'}],
         }),
       createFolder: jest.fn().mockResolvedValue(undefined),
-      moveNodes: jest.fn().mockResolvedValue({Status: 'Performed'}),
+      moveNodes: jest.fn().mockResolvedValue({
+        Status: 'Performed',
+        AffectedNodes: [{Path: 'conversation-id@example.com/Reports/Wire logs.pdf', Uuid: 'file-id'}],
+      }),
     } as unknown as CellsRepository;
     const selectedFile = createNode({
       id: 'file-id',
@@ -499,6 +505,94 @@ describe('CellsTable selection', () => {
         targetPath: 'conversation-id@example.com/Reports',
       });
     });
+    expect(onRefresh).toHaveBeenCalledTimes(1);
+    window.location.hash = originalHash;
+  });
+
+  it('warns when only some affected nodes are reported without naming failed items', async () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files/Drive';
+    const user = userEvent.setup();
+    const onRefresh = jest.fn();
+    const repository = {
+      getAllNodes: jest.fn().mockResolvedValue({Nodes: []}),
+      moveNodes: jest.fn().mockResolvedValue({
+        Status: 'Performed',
+        AffectedNodes: [{Path: 'Drive/Moved.pdf', Uuid: 'moved'}],
+      }),
+    } as unknown as CellsRepository;
+    const selectedFiles = [
+      createNode({
+        id: 'moved',
+        name: 'Moved.pdf',
+        path: 'conversation-id@example.com/Drive/Moved.pdf',
+        type: CellNodeType.FILE,
+      }),
+      createNode({
+        id: 'not-reported',
+        name: 'Not reported.pdf',
+        path: 'conversation-id@example.com/Drive/Not reported.pdf',
+        type: CellNodeType.FILE,
+      }),
+    ];
+    renderCellsTable({cellsRepository: repository, initialNodes: selectedFiles, onRefresh});
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Moved.pdf'}));
+    await user.click(screen.getByRole('checkbox', {name: 'Select Not reported.pdf'}));
+    await user.click(screen.getByRole('button', {name: 'Move'}));
+    const dialog = await screen.findByRole('dialog');
+    await user.click(within(dialog).getByRole('button', {name: 'cells.breadcrumb.files'}));
+    await user.click(within(dialog).getByRole('button', {name: 'Move'}));
+
+    const reviewDialog = await screen.findByRole('dialog');
+    expect(within(reviewDialog).getByRole('alert')).toHaveTextContent(
+      'The move may be incomplete. Check item locations before trying again. Move stays disabled in this view.',
+    );
+    expect(within(reviewDialog).getByRole('alert')).not.toHaveTextContent('Moved.pdf');
+    expect(within(reviewDialog).getByRole('alert')).not.toHaveTextContent('Not reported.pdf');
+    expect(screen.queryByText('Moved 2 items')).not.toBeInTheDocument();
+    expect(within(reviewDialog).getByRole('button', {name: 'Move'})).toBeDisabled();
+    expect(repository.moveNodes).toHaveBeenCalledTimes(1);
+    expect(onRefresh).toHaveBeenCalledTimes(1);
+    window.location.hash = originalHash;
+  });
+
+  it('does not mark a finished background job successful when item outcomes are unknown', async () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files/Drive';
+    const user = userEvent.setup();
+    const onRefresh = jest.fn();
+    const repository = {
+      getAllNodes: jest.fn().mockResolvedValue({Nodes: []}),
+      moveNodes: jest.fn().mockResolvedValue({
+        Status: 'Background',
+        BackgroundActions: [{JobUuid: 'move-job', Name: 'move'}],
+      }),
+      getBackgroundMoveInfo: jest.fn().mockResolvedValue({Status: 'Finished', JobUuid: 'move-job', Name: 'move'}),
+    } as unknown as CellsRepository;
+    renderCellsTable({
+      cellsRepository: repository,
+      initialNodes: [
+        createNode({id: 'unknown-file', path: 'conversation-id@example.com/Drive/Node name', type: CellNodeType.FILE}),
+      ],
+      onRefresh,
+    });
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Node name'}));
+    await user.click(screen.getByRole('button', {name: 'Move'}));
+    const dialog = await screen.findByRole('dialog');
+    await user.click(within(dialog).getByRole('button', {name: 'cells.breadcrumb.files'}));
+    await user.click(within(dialog).getByRole('button', {name: 'Move'}));
+
+    const reviewDialog = await screen.findByRole('dialog');
+    expect(within(reviewDialog).getByRole('alert')).toHaveTextContent(
+      'Move status is unresolved. Verify the Drive before trying again.',
+    );
+    expect(screen.queryByText('Moved 1 items')).not.toBeInTheDocument();
+    expect(screen.queryByRole('progressbar', {name: 'Move completed'})).not.toBeInTheDocument();
+    expect(within(reviewDialog).getByRole('button', {name: 'Move'})).toBeDisabled();
+    expect(repository.moveNodes).toHaveBeenCalledTimes(1);
+    expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(1);
     expect(onRefresh).toHaveBeenCalledTimes(1);
     window.location.hash = originalHash;
   });
@@ -735,17 +829,15 @@ describe('CellsTable selection', () => {
     window.location.hash = originalHash;
   });
 
-  it('shows completed progress after the background move finishes', async () => {
+  it('does not report success when background jobs finish without item outcomes', async () => {
     const originalHash = window.location.hash;
     window.location.hash = '#/conversation/conversation-id@example.com/files/wire-cells-web/Marketing images';
     const user = userEvent.setup();
-    let refreshList: () => void = noop;
-    const onRefresh = jest.fn(() => {
-      return refreshList();
-    });
+    const onRefresh = jest.fn();
     const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
     const backgroundResponse = {
       Status: 'Background',
+      AffectedNodes: [{Path: 'wire-cells-web/Marketing images', Uuid: 'folder-id'}],
       BackgroundActions: [
         {JobUuid: 'move-job-1', Name: 'move'},
         {JobUuid: 'move-job-2', Name: 'move'},
@@ -761,16 +853,12 @@ describe('CellsTable selection', () => {
         .mockResolvedValueOnce({Status: 'Finished'})
         .mockResolvedValueOnce({Status: 'Finished'}),
     } as unknown as CellsRepository;
-    const table = renderCellsTable({
+    renderCellsTable({
       cellsRepository: repository,
       folderPath: 'wire-cells-web/Marketing images/Reports',
       onRefresh,
       clock,
     });
-    refreshList = () => {
-      return table.rerenderWithNodes([]);
-    };
-
     await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
     await user.click(screen.getByRole('button', {name: 'Move'}));
     const dialog = await screen.findByRole('dialog');
@@ -791,11 +879,52 @@ describe('CellsTable selection', () => {
         expect(onRefresh).toHaveBeenCalledTimes(1);
       });
     });
-    expect(screen.queryByText('Move to folder')).not.toBeInTheDocument();
-    expect(screen.getByText('Moved 1 items')).toBeInTheDocument();
-    expect(screen.getByRole('progressbar', {name: 'Move completed'})).toHaveAttribute('aria-valuenow', '100');
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    const reviewDialog = await screen.findByRole('dialog');
+    expect(within(reviewDialog).getByRole('alert')).toHaveTextContent(
+      'Move status is unresolved. Verify the Drive before trying again.',
+    );
+    expect(screen.queryByText('Moved 1 items')).not.toBeInTheDocument();
+    expect(screen.queryByRole('progressbar', {name: 'Move completed'})).not.toBeInTheDocument();
     expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(4);
+    window.location.hash = originalHash;
+  });
+
+  it('warns when one background job finishes while another fails', async () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files/wire-cells-web';
+    const user = userEvent.setup();
+    const onRefresh = jest.fn();
+    const repository = {
+      getAllNodes: jest.fn().mockResolvedValue({Nodes: []}),
+      moveNodes: jest.fn().mockResolvedValue({
+        Status: 'Background',
+        BackgroundActions: [
+          {JobUuid: 'finished-job', Name: 'move'},
+          {JobUuid: 'failed-job', Name: 'move'},
+        ],
+      }),
+      getBackgroundMoveInfo: jest
+        .fn()
+        .mockResolvedValueOnce({Status: 'Finished'})
+        .mockResolvedValueOnce({Status: 'Error'}),
+    } as unknown as CellsRepository;
+    renderCellsTable({cellsRepository: repository, folderPath: 'wire-cells-web/Marketing images', onRefresh});
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+    await user.click(screen.getByRole('button', {name: 'Move'}));
+    const dialog = await screen.findByRole('dialog');
+    await user.click(within(dialog).getByRole('button', {name: 'cells.breadcrumb.files'}));
+    await user.click(within(dialog).getByRole('button', {name: 'Move'}));
+
+    const reviewDialog = await screen.findByRole('dialog');
+    expect(within(reviewDialog).getByRole('alert')).toHaveTextContent(
+      'The move may be incomplete. Check item locations before trying again. Move stays disabled in this view.',
+    );
+    expect(screen.queryByText('Moved 1 items')).not.toBeInTheDocument();
+    expect(screen.queryByRole('progressbar', {name: 'Move completed'})).not.toBeInTheDocument();
+    expect(within(reviewDialog).getByRole('button', {name: 'Move'})).toBeDisabled();
+    expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(2);
+    expect(onRefresh).toHaveBeenCalledTimes(1);
     window.location.hash = originalHash;
   });
 
@@ -1014,7 +1143,9 @@ describe('CellsTable selection', () => {
     });
     const reviewDialog = await screen.findByRole('dialog');
     expect(within(reviewDialog).getByRole('button', {name: 'Move'})).toBeDisabled();
-    expect(within(reviewDialog).getByRole('alert')).toHaveTextContent('cells.bulkMove.moveNeedsReview');
+    expect(within(reviewDialog).getByRole('alert')).toHaveTextContent(
+      'The move may be incomplete. Check item locations before trying again. Move stays disabled in this view.',
+    );
     expect(within(reviewDialog).queryByRole('button', {name: 'cells.bulkMove.reviewAndRetry'})).not.toBeInTheDocument();
 
     table.rerenderWithNodes([movedFile, failedFile]);
@@ -1040,9 +1171,11 @@ describe('CellsTable selection', () => {
     });
     const repository = {
       getAllNodes: jest.fn().mockResolvedValue({Nodes: []}),
-      moveNodes: jest
-        .fn()
-        .mockResolvedValue({Status: 'Background', BackgroundActions: [{JobUuid: 'move-job', Name: 'move'}]}),
+      moveNodes: jest.fn().mockResolvedValue({
+        Status: 'Background',
+        AffectedNodes: [{Path: 'conversation-id@example.com/Marketing images', Uuid: 'folder-id'}],
+        BackgroundActions: [{JobUuid: 'move-job', Name: 'move'}],
+      }),
       getBackgroundMoveInfo: jest
         .fn()
         .mockResolvedValueOnce({Status: 'Unknown'})
@@ -1084,7 +1217,10 @@ describe('CellsTable selection', () => {
     });
     expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(7);
     expect(repository.moveNodes).toHaveBeenCalledTimes(1);
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    const reviewDialog = await screen.findByRole('dialog');
+    expect(within(reviewDialog).getByRole('alert')).toHaveTextContent(
+      'Move status is unresolved. Verify the Drive before trying again.',
+    );
     window.location.hash = originalHash;
   });
 
@@ -1417,7 +1553,7 @@ describe('CellsTable selection', () => {
       'cells.newItemMenuModalForm.genericError',
     );
     expect(within(reopenedAfterFailure).getByRole('button', {name: 'Move'})).toBeDisabled();
-    expect(onRefresh).not.toHaveBeenCalled();
+    expect(onRefresh).toHaveBeenCalledTimes(1);
 
     await user.click(within(reopenedAfterFailure).getByRole('button', {name: 'cells.moveNodeModal.cancelButton'}));
     expect(screen.getByText('cells.newItemMenuModalForm.genericError')).toBeInTheDocument();
