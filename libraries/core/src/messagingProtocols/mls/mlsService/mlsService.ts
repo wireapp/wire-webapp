@@ -18,7 +18,12 @@
  */
 
 import {isNonEmptyArray} from '@sindresorhus/is';
-import type {ClaimedKeyPackages, MLSPublicKeyRecord, RegisteredClient} from '@wireapp/api-client/lib/client';
+import type {
+  ClaimedKeyPackages,
+  MLSPublicKeyAlgorithmKeys,
+  MLSPublicKeyRecord,
+  RegisteredClient,
+} from '@wireapp/api-client/lib/client';
 import {
   MLSGroupOutOfSyncError,
   MLSInvalidLeafNodeIndexError,
@@ -34,11 +39,14 @@ import {Task, task} from 'true-myth';
 import {APIClient} from '@wireapp/api-client';
 import {LogFactory, TimeUtil, TypedEventEmitter} from '@wireapp/commons';
 import {
-  Ciphersuite,
+  CipherSuite as Ciphersuite,
+  ClientId as CoreCryptoClientId,
   CommitBundle,
   ConversationConfiguration,
   ConversationId,
   CoreCrypto,
+  Credential,
+  CredentialRef,
   CredentialType,
   DecryptedMessage,
   EpochObserver,
@@ -104,6 +112,7 @@ interface MLSConfig {
   /** Resolve the current upload allowance, including time-dependent consumer policy. */
   getNbKeyPackages?: () => number;
 }
+type ConfiguredMLSConfig = MLSConfig & {signatureAlgorithm: MLSPublicKeyAlgorithmKeys};
 export type InitClientOptions = Optional<MLSConfig, 'keyingMaterialUpdateThreshold' | 'nbKeyPackages'> & {
   skipInitIdentity?: boolean;
 };
@@ -143,7 +152,7 @@ type Events = {
 const MLS_CONVERSATION_RECOVERY_KEY = 'required';
 export class MLSService extends TypedEventEmitter<Events> {
   logger = LogFactory.getLogger('@wireapp/core/MLSService');
-  private _config?: MLSConfig;
+  private _config?: ConfiguredMLSConfig;
   private readonly textDecoder = new TextDecoder();
   private initialKeyPackageUploadDeferred = false;
   private readonly mlsTransport: MlsTransport;
@@ -185,11 +194,82 @@ export class MLSService extends TypedEventEmitter<Events> {
     return this._config !== undefined;
   }
 
-  get config(): MLSConfig {
+  get config(): ConfiguredMLSConfig {
     if (this._config === undefined) {
       throw new Error('mls config is not set, did you forget to call initClient?');
     }
     return this._config;
+  }
+
+  public async hasCredential(credentialType: CredentialType): Promise<boolean> {
+    const credentials = await this.coreCryptoClient.findCredentials({
+      cipherSuite: this.config.defaultCiphersuite,
+      credentialType,
+    });
+    return credentials.length > 0;
+  }
+
+  private getCredentialRef(): Task<CredentialRef, unknown> {
+    const findCredentials = (credentialType: CredentialType): Task<CredentialRef[], unknown> => {
+      return task.tryOrElse(
+        error => error,
+        () => {
+          return this.coreCryptoClient.findCredentials({
+            cipherSuite: this.config.defaultCiphersuite,
+            credentialType,
+          });
+        },
+      );
+    };
+
+    return findCredentials(CredentialType.X509)
+      .andThen(x509Credentials => {
+        return x509Credentials.length > 0 ? task.resolve(x509Credentials) : findCredentials(CredentialType.Basic);
+      })
+      .andThen(credentials => {
+        const selectedCredential = credentials.reduce<CredentialRef | undefined>((latest, credential) => {
+          if (latest === undefined || credential.earliestValidity() > latest.earliestValidity()) {
+            return credential;
+          }
+          return latest;
+        }, undefined);
+
+        return selectedCredential === undefined
+          ? task.reject(new Error(`No credential found for cipher suite ${this.config.defaultCiphersuite}`))
+          : task.resolve(selectedCredential);
+      });
+  }
+
+  private async requireCredentialRef(): Promise<CredentialRef> {
+    const credentialRef = await this.getCredentialRef();
+    return credentialRef.match({
+      Ok: value => Promise.resolve(value),
+      Err: error => Promise.reject(error),
+    });
+  }
+
+  private async ensureBasicCredentials(clientId: CoreCryptoClientId): Promise<void> {
+    const missingCipherSuites: Ciphersuite[] = [];
+    for (const cipherSuite of this.config.ciphersuites) {
+      const credentials = await this.coreCryptoClient.findCredentials({
+        cipherSuite,
+        clientId,
+        credentialType: CredentialType.Basic,
+      });
+      if (credentials.length === 0) {
+        missingCipherSuites.push(cipherSuite);
+      }
+    }
+
+    if (missingCipherSuites.length === 0) {
+      return;
+    }
+
+    await this.coreCryptoClient.transaction(async context => {
+      for (const cipherSuite of missingCipherSuites) {
+        await context.addCredential(Credential.basic(cipherSuite, clientId));
+      }
+    });
   }
 
   private get keyPackageUploadAmount(): number {
@@ -227,22 +307,28 @@ export class MLSService extends TypedEventEmitter<Events> {
     ) as typeof mlsConfig;
 
     this.initialKeyPackageUploadDeferred = skipInitIdentity === true;
+    const signatureAlgorithm = await getSignatureAlgorithmForCiphersuite(mlsConfig.defaultCiphersuite).match({
+      Ok: value => Promise.resolve(value),
+      Err: error => Promise.reject(error),
+    });
     this._config = {
       ...defaultConfig,
       ...filteredMLSConfig,
+      signatureAlgorithm,
     };
 
+    const coreCryptoClientId = createMLSClientId(userId, client.id);
     await this.coreCryptoClient.transaction(cx => {
-      const clientId = createMLSClientId(userId, client.id);
-      return cx.mlsInit(clientId, this.mlsTransport);
+      return cx.mlsInit(coreCryptoClientId, this.mlsTransport);
     });
+    await this.ensureBasicCredentials(coreCryptoClientId);
 
     this.initialKeyPackageUploadDeferred =
-      skipInitIdentity === true && !(await this.coreCryptoClient.e2eiIsEnabled(this.config.defaultCiphersuite));
+      skipInitIdentity === true && !(await this.hasCredential(CredentialType.X509));
 
     try {
       const ccClientSignature = await this.getCCClientSignatureString();
-      const mlsDeviceStatus = getMLSDeviceStatus(client, this.config.defaultCiphersuite, ccClientSignature);
+      const mlsDeviceStatus = getMLSDeviceStatus(client, this.config.signatureAlgorithm, ccClientSignature);
 
       switch (mlsDeviceStatus) {
         case MLSDeviceStatus.REGISTERED:
@@ -278,13 +364,11 @@ export class MLSService extends TypedEventEmitter<Events> {
    * @param client the client to check
    */
   public isInitializedMLSClient = (client: RegisteredClient): boolean => {
-    return isMLSDevice(client, this.config.defaultCiphersuite);
+    return isMLSDevice(client, this.config.signatureAlgorithm);
   };
 
   private async getCredentialType(): Promise<CredentialType> {
-    return (await this.coreCryptoClient.e2eiIsEnabled(this.config.defaultCiphersuite))
-      ? CredentialType.X509
-      : CredentialType.Basic;
+    return (await this.requireCredentialRef()).type();
   }
 
   private readonly _uploadCommitBundle = async ({
@@ -536,12 +620,12 @@ export class MLSService extends TypedEventEmitter<Events> {
   public async joinByExternalCommit(getGroupInfo: () => Promise<Uint8Array>): Promise<void> {
     try {
       this.logger.info('Trying to join MLS group via external commit');
-      const credentialType = await this.getCredentialType();
+      const credentialRef = await this.requireCredentialRef();
 
       const groupInfo = await getGroupInfo();
 
       const welcomeBundle = await this.coreCryptoClient.transaction(cx => {
-        return cx.joinByExternalCommit(new GroupInfo(groupInfo), credentialType);
+        return cx.joinByExternalCommit(new GroupInfo(groupInfo), credentialRef);
       });
 
       await this.dispatchNewCrlDistributionPoints(welcomeBundle.crlNewDistributionPoints);
@@ -684,7 +768,7 @@ export class MLSService extends TypedEventEmitter<Events> {
         new ExternalSenderKey(await this.coreCryptoClient.getExternalSender(new ConversationId(parentGroupIdBytes))),
       ];
     } else {
-      const ciphersuiteSignature = getSignatureAlgorithmForCiphersuite(this.config.defaultCiphersuite);
+      const ciphersuiteSignature = this.config.signatureAlgorithm;
       const removalKeyForSignature =
         removalKeyFor1to1Signature?.[ciphersuiteSignature] ?? mlsPublicRemovalKeys[ciphersuiteSignature];
       if (removalKeyForSignature === undefined || removalKeyForSignature.length === 0) {
@@ -700,11 +784,11 @@ export class MLSService extends TypedEventEmitter<Events> {
       ciphersuite: this.config.defaultCiphersuite,
     };
 
-    const credentialType = await this.getCredentialType();
+    const credentialRef = await this.requireCredentialRef();
 
     await coreCryptoTransactionContext.createConversation(
       new ConversationId(groupIdBytes),
-      credentialType,
+      credentialRef,
       configuration,
     );
   }
@@ -1082,11 +1166,8 @@ export class MLSService extends TypedEventEmitter<Events> {
   }
 
   private async getCCClientSignatureString(): Promise<string> {
-    const credentialType = await this.getCredentialType();
-    const publicKey = await this.coreCryptoClient.clientPublicKey(this.config.defaultCiphersuite, credentialType);
-    if (publicKey === undefined) {
-      throw new Error('No public key found for client');
-    }
+    const credentialRef = await this.requireCredentialRef();
+    const publicKey = await this.coreCryptoClient.publicKey(credentialRef);
     return btoa(Converter.arrayBufferViewToBaselineString(publicKey));
   }
 
@@ -1102,7 +1183,7 @@ export class MLSService extends TypedEventEmitter<Events> {
       const clientSignature = await this.getCCClientSignatureString();
       return this.apiClient.api.client.putClient(client.id, {
         mls_public_keys: {
-          [getSignatureAlgorithmForCiphersuite(this.config.defaultCiphersuite)]: clientSignature,
+          [this.config.signatureAlgorithm]: clientSignature,
         },
       });
     } catch (error: unknown) {
@@ -1347,7 +1428,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     getOAuthToken: getTokenCallback,
     getAllConversations: getAllConversationsCallback,
   ): Promise<void> {
-    const isCertificateRenewal = await this.coreCryptoClient.e2eiIsEnabled(this.config.defaultCiphersuite);
+    const isCertificateRenewal = await this.hasCredential(CredentialType.X509);
     const e2eiServiceInternal = new E2EIServiceInternal(
       this.coreDatabase,
       this.coreCryptoClient,

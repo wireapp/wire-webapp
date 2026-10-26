@@ -17,7 +17,7 @@
  *
  */
 
-import {ClientType, RegisteredClient} from '@wireapp/api-client/lib/client';
+import {ClientType, MLSPublicKeyAlgorithmKeys, RegisteredClient} from '@wireapp/api-client/lib/client';
 import {
   CONVERSATION_EVENT,
   ConversationMLSMessageAddEvent,
@@ -31,11 +31,14 @@ import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
 
 import {APIClient} from '@wireapp/api-client';
 import {
-  Ciphersuite,
+  CipherSuite as Ciphersuite,
   ClientId,
   ConversationId,
   CoreCrypto,
   CoreCryptoContext,
+  Credential,
+  CredentialRef,
+  CredentialType,
   DecryptedMessage,
   WelcomeBundle,
 } from '@wireapp/core-crypto';
@@ -74,8 +77,8 @@ function createUserId(): {id: UUID; domain: string} {
 }
 
 const defaultMLSInitConfig: InitClientOptions = {
-  ciphersuites: [Ciphersuite.MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519],
-  defaultCiphersuite: Ciphersuite.MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519,
+  ciphersuites: [Ciphersuite.Mls128Dhkemx25519Aes128gcmSha256Ed25519],
+  defaultCiphersuite: Ciphersuite.Mls128Dhkemx25519Aes128gcmSha256Ed25519,
 };
 
 // Needs to be divisible by 4 to be a valid base64 string
@@ -84,10 +87,19 @@ const mockedMLSWelcomeEventData = '';
 
 const apiClients: APIClient[] = [];
 
+const createCredentialRef = (credentialType: CredentialType, earliestValidity = 0n): CredentialRef => {
+  return {
+    earliestValidity: jest.fn(() => earliestValidity),
+    type: jest.fn(() => credentialType),
+  } as unknown as CredentialRef;
+};
+
 const createMLSService = async (): Promise<MLSServiceTestSetup> => {
   const apiClient = new APIClient();
   apiClients.push(apiClient);
+  const basicCredentialRef = createCredentialRef(CredentialType.Basic);
   const transactionContext = {
+    addCredential: jest.fn().mockResolvedValue(basicCredentialRef),
     mlsInit: jest.fn(),
     wipeConversation: jest.fn(),
     clientKeypackages: jest.fn(),
@@ -105,13 +117,12 @@ const createMLSService = async (): Promise<MLSServiceTestSetup> => {
       return fn(transactionContext);
     }),
     registerEpochObserver: jest.fn(),
-    provideTransport: jest.fn(),
     version: jest.fn(),
     conversationExists: jest.fn(),
-    e2eiIsEnabled: jest.fn(() => {
-      return false;
+    findCredentials: jest.fn(({credentialType}: {credentialType?: CredentialType}) => {
+      return Promise.resolve(credentialType === CredentialType.X509 ? [] : [basicCredentialRef]);
     }),
-    clientPublicKey: jest.fn(),
+    publicKey: jest.fn().mockResolvedValue(new Uint8Array()),
     conversationEpoch: jest.fn(),
   } as unknown as jest.Mocked<CoreCrypto>;
 
@@ -133,7 +144,12 @@ const createMLSService = async (): Promise<MLSServiceTestSetup> => {
 
   const mlsService = new MLSService(apiClient, mockCoreCrypto, mockedDb, recurringTaskScheduler);
 
-  mlsService['_config'] = {...defaultMLSInitConfig, nbKeyPackages: 100, keyingMaterialUpdateThreshold: 1};
+  mlsService['_config'] = {
+    ...defaultMLSInitConfig,
+    nbKeyPackages: 100,
+    keyingMaterialUpdateThreshold: 1,
+    signatureAlgorithm: MLSPublicKeyAlgorithmKeys.ED25519,
+  };
   return [
     mlsService,
     {apiClient, coreCrypto: mockCoreCrypto, recurringTaskScheduler, transactionContext, coreDatabase: mockedDb},
@@ -399,14 +415,14 @@ describe('MLSService', () => {
 
   describe('isInitializedMLSClient', () => {
     it.each([
-      [Ciphersuite.MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519],
-      [Ciphersuite.MLS_128_DHKEMP256_AES128GCM_SHA256_P256],
-      [Ciphersuite.MLS_128_DHKEMX25519_CHACHA20POLY1305_SHA256_Ed25519],
-      [Ciphersuite.MLS_256_DHKEMX448_AES256GCM_SHA512_Ed448],
-      [Ciphersuite.MLS_256_DHKEMP521_AES256GCM_SHA512_P521],
-      [Ciphersuite.MLS_256_DHKEMX448_CHACHA20POLY1305_SHA512_Ed448],
-      [Ciphersuite.MLS_256_DHKEMP384_AES256GCM_SHA384_P384],
-    ])('always return false for empty mls_public_keys (%d)', async ciphersuite => {
+      [Ciphersuite.Mls128Dhkemx25519Aes128gcmSha256Ed25519, MLSPublicKeyAlgorithmKeys.ED25519],
+      [Ciphersuite.Mls128Dhkemp256Aes128gcmSha256P256, MLSPublicKeyAlgorithmKeys.ECDSA_SECP256R1_SHA256],
+      [Ciphersuite.Mls128Dhkemx25519Chacha20poly1305Sha256Ed25519, MLSPublicKeyAlgorithmKeys.ED25519],
+      [Ciphersuite.Mls256Dhkemx448Aes256gcmSha512Ed448, MLSPublicKeyAlgorithmKeys.ED448],
+      [Ciphersuite.Mls256Dhkemp521Aes256gcmSha512P521, MLSPublicKeyAlgorithmKeys.ECDSA_SECP521R1_SHA512],
+      [Ciphersuite.Mls256Dhkemx448Chacha20poly1305Sha512Ed448, MLSPublicKeyAlgorithmKeys.ED448],
+      [Ciphersuite.Mls256Dhkemp384Aes256gcmSha384P384, MLSPublicKeyAlgorithmKeys.ECDSA_SECP384R1_SHA384],
+    ])('always return false for empty mls_public_keys (%d)', async (ciphersuite, signatureAlgorithm) => {
       const [mlsService] = await createMLSService();
 
       const mockClient = {mls_public_keys: {}} as unknown as RegisteredClient;
@@ -416,6 +432,7 @@ describe('MLSService', () => {
         defaultCiphersuite: ciphersuite,
         nbKeyPackages: 100,
         keyingMaterialUpdateThreshold: 1,
+        signatureAlgorithm,
       };
 
       const isInitialized = mlsService.isInitializedMLSClient(mockClient);
@@ -424,13 +441,13 @@ describe('MLSService', () => {
     });
 
     it.each([
-      [Ciphersuite.MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519, 'ed25519'],
-      [Ciphersuite.MLS_128_DHKEMP256_AES128GCM_SHA256_P256, 'ecdsa_secp256r1_sha256'],
-      [Ciphersuite.MLS_128_DHKEMX25519_CHACHA20POLY1305_SHA256_Ed25519, 'ed25519'],
-      [Ciphersuite.MLS_256_DHKEMX448_AES256GCM_SHA512_Ed448, 'ed448'],
-      [Ciphersuite.MLS_256_DHKEMP521_AES256GCM_SHA512_P521, 'ecdsa_secp521r1_sha512'],
-      [Ciphersuite.MLS_256_DHKEMX448_CHACHA20POLY1305_SHA512_Ed448, 'ed448'],
-      [Ciphersuite.MLS_256_DHKEMP384_AES256GCM_SHA384_P384, 'ecdsa_secp384r1_sha384'],
+      [Ciphersuite.Mls128Dhkemx25519Aes128gcmSha256Ed25519, MLSPublicKeyAlgorithmKeys.ED25519],
+      [Ciphersuite.Mls128Dhkemp256Aes128gcmSha256P256, MLSPublicKeyAlgorithmKeys.ECDSA_SECP256R1_SHA256],
+      [Ciphersuite.Mls128Dhkemx25519Chacha20poly1305Sha256Ed25519, MLSPublicKeyAlgorithmKeys.ED25519],
+      [Ciphersuite.Mls256Dhkemx448Aes256gcmSha512Ed448, MLSPublicKeyAlgorithmKeys.ED448],
+      [Ciphersuite.Mls256Dhkemp521Aes256gcmSha512P521, MLSPublicKeyAlgorithmKeys.ECDSA_SECP521R1_SHA512],
+      [Ciphersuite.Mls256Dhkemx448Chacha20poly1305Sha512Ed448, MLSPublicKeyAlgorithmKeys.ED448],
+      [Ciphersuite.Mls256Dhkemp384Aes256gcmSha384P384, MLSPublicKeyAlgorithmKeys.ECDSA_SECP384R1_SHA384],
     ])(
       'returns true if there is a signature corresponding to the ciphersuite used (%d, %s)',
       async (ciphersuite, signatureAlgo) => {
@@ -443,6 +460,7 @@ describe('MLSService', () => {
           defaultCiphersuite: ciphersuite,
           nbKeyPackages: 100,
           keyingMaterialUpdateThreshold: 1,
+          signatureAlgorithm: signatureAlgo,
         };
 
         const isInitialized = mlsService.isInitializedMLSClient(mockClient);
@@ -452,16 +470,16 @@ describe('MLSService', () => {
     );
 
     it.each([
-      [Ciphersuite.MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519, 'p256'],
-      [Ciphersuite.MLS_128_DHKEMP256_AES128GCM_SHA256_P256, 'ed25519'],
-      [Ciphersuite.MLS_128_DHKEMX25519_CHACHA20POLY1305_SHA256_Ed25519, 'p256'],
-      [Ciphersuite.MLS_256_DHKEMX448_AES256GCM_SHA512_Ed448, 'p384'],
-      [Ciphersuite.MLS_256_DHKEMP521_AES256GCM_SHA512_P521, 'ed448'],
-      [Ciphersuite.MLS_256_DHKEMX448_CHACHA20POLY1305_SHA512_Ed448, 'p256'],
-      [Ciphersuite.MLS_256_DHKEMP384_AES256GCM_SHA384_P384, 'p256'],
+      [Ciphersuite.Mls128Dhkemx25519Aes128gcmSha256Ed25519, 'p256', MLSPublicKeyAlgorithmKeys.ED25519],
+      [Ciphersuite.Mls128Dhkemp256Aes128gcmSha256P256, 'ed25519', MLSPublicKeyAlgorithmKeys.ECDSA_SECP256R1_SHA256],
+      [Ciphersuite.Mls128Dhkemx25519Chacha20poly1305Sha256Ed25519, 'p256', MLSPublicKeyAlgorithmKeys.ED25519],
+      [Ciphersuite.Mls256Dhkemx448Aes256gcmSha512Ed448, 'p384', MLSPublicKeyAlgorithmKeys.ED448],
+      [Ciphersuite.Mls256Dhkemp521Aes256gcmSha512P521, 'ed448', MLSPublicKeyAlgorithmKeys.ECDSA_SECP521R1_SHA512],
+      [Ciphersuite.Mls256Dhkemx448Chacha20poly1305Sha512Ed448, 'p256', MLSPublicKeyAlgorithmKeys.ED448],
+      [Ciphersuite.Mls256Dhkemp384Aes256gcmSha384P384, 'p256', MLSPublicKeyAlgorithmKeys.ECDSA_SECP384R1_SHA384],
     ])(
       'returns false if there is a signature not corresponding to the ciphersuite used (%d, %s)',
-      async (ciphersuite, signatureAlgo) => {
+      async (ciphersuite, signatureAlgo, expectedSignatureAlgorithm) => {
         const [mlsService] = await createMLSService();
 
         const mockClient = {mls_public_keys: {[signatureAlgo]: 'signature'}} as unknown as RegisteredClient;
@@ -471,6 +489,7 @@ describe('MLSService', () => {
           defaultCiphersuite: ciphersuite,
           nbKeyPackages: 100,
           keyingMaterialUpdateThreshold: 1,
+          signatureAlgorithm: expectedSignatureAlgorithm,
         };
 
         const isInitialized = mlsService.isInitializedMLSClient(mockClient);
@@ -487,6 +506,36 @@ describe('MLSService', () => {
       sendCommitBundle: expect.any(Function),
     });
 
+    it('registers a basic credential when the database does not contain one', async () => {
+      const [mlsService, {apiClient, coreCrypto, transactionContext}] = await createMLSService();
+      const basicCredential = {} as Credential;
+      const basicCredentialRef = createCredentialRef(CredentialType.Basic);
+      let credentialAdded = false;
+
+      jest.spyOn(Credential, 'basic').mockReturnValue(basicCredential);
+      jest.spyOn(coreCrypto, 'findCredentials').mockImplementation(async ({credentialType}) => {
+        if (credentialType === CredentialType.X509) {
+          return [];
+        }
+        return credentialAdded ? [basicCredentialRef] : [];
+      });
+      transactionContext.addCredential.mockImplementation(async () => {
+        credentialAdded = true;
+        return basicCredentialRef;
+      });
+      jest.spyOn(Helper, 'getMLSDeviceStatus').mockReturnValueOnce(Helper.MLSDeviceStatus.REGISTERED);
+      jest.spyOn(apiClient.api.client, 'getMLSKeyPackageCount').mockResolvedValueOnce(100);
+
+      await mlsService.initClient(
+        {...createUserId(), domain: 'local.zinfra.io'},
+        {id: validClientId, mls_public_keys: {}} as RegisteredClient,
+        defaultMLSInitConfig,
+      );
+
+      expect(Credential.basic).toHaveBeenCalledWith(defaultMLSInitConfig.defaultCiphersuite, expect.any(ClientId));
+      expect(transactionContext.addCredential).toHaveBeenCalledWith(basicCredential);
+    });
+
     it('uses the default config if config is not provided by the consumer', async () => {
       const [mlsService, {apiClient, coreCrypto, transactionContext}] = await createMLSService();
 
@@ -498,7 +547,7 @@ describe('MLSService', () => {
 
       const mockedClientPublicKey = new Uint8Array();
 
-      jest.spyOn(coreCrypto, 'clientPublicKey').mockResolvedValueOnce(mockedClientPublicKey);
+      jest.spyOn(coreCrypto, 'publicKey').mockResolvedValueOnce(mockedClientPublicKey);
       jest.spyOn(apiClient.api.client, 'putClient').mockResolvedValueOnce(undefined);
       jest.spyOn(apiClient.api.client, 'getMLSKeyPackageCount').mockResolvedValueOnce(mlsService.config.nbKeyPackages);
 
@@ -522,7 +571,7 @@ describe('MLSService', () => {
 
       const mockedClientPublicKey = new Uint8Array();
 
-      jest.spyOn(coreCrypto, 'clientPublicKey').mockResolvedValueOnce(mockedClientPublicKey);
+      jest.spyOn(coreCrypto, 'publicKey').mockResolvedValueOnce(mockedClientPublicKey);
       jest.spyOn(apiClient.api.client, 'putClient').mockResolvedValueOnce(undefined);
       jest.spyOn(apiClient.api.client, 'getMLSKeyPackageCount').mockResolvedValueOnce(mlsService.config.nbKeyPackages);
 
@@ -546,7 +595,7 @@ describe('MLSService', () => {
 
       const mockedClientPublicKey = new Uint8Array();
 
-      jest.spyOn(coreCrypto, 'clientPublicKey').mockResolvedValueOnce(mockedClientPublicKey);
+      jest.spyOn(coreCrypto, 'publicKey').mockResolvedValueOnce(mockedClientPublicKey);
       jest.spyOn(apiClient.api.client, 'putClient').mockResolvedValueOnce(undefined);
       jest.spyOn(apiClient.api.client, 'getMLSKeyPackageCount').mockResolvedValueOnce(mlsService.config.nbKeyPackages);
 
@@ -586,7 +635,7 @@ describe('MLSService', () => {
           expect(publicKeyRegistered).toBe(true);
         });
         jest.spyOn(Helper, 'getMLSDeviceStatus').mockReturnValueOnce(Helper.MLSDeviceStatus.FRESH);
-        jest.spyOn(coreCrypto, 'clientPublicKey').mockResolvedValue(new Uint8Array());
+        jest.spyOn(coreCrypto, 'publicKey').mockResolvedValue(new Uint8Array());
 
         await mlsService.initClient(mockUserId, mockClient, {
           ...defaultMLSInitConfig,
@@ -612,7 +661,7 @@ describe('MLSService', () => {
       const [mlsService, {apiClient, coreCrypto}] = await createMLSService();
       const mockClient = {mls_public_keys: {}, id: validClientId} as RegisteredClient;
       jest.spyOn(Helper, 'getMLSDeviceStatus').mockReturnValueOnce(Helper.MLSDeviceStatus.FRESH);
-      jest.spyOn(coreCrypto, 'clientPublicKey').mockResolvedValue(new Uint8Array());
+      jest.spyOn(coreCrypto, 'publicKey').mockResolvedValue(new Uint8Array());
       const putClient = jest.spyOn(apiClient.api.client, 'putClient');
       const uploadKeyPackages = jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages');
 
@@ -634,7 +683,7 @@ describe('MLSService', () => {
 
       const mockedClientKeyPackages = [new Uint8Array()];
       jest.spyOn(transactionContext, 'clientKeypackages').mockResolvedValueOnce(mockedClientKeyPackages);
-      jest.spyOn(coreCrypto, 'clientPublicKey').mockResolvedValueOnce(new Uint8Array());
+      jest.spyOn(coreCrypto, 'publicKey').mockResolvedValueOnce(new Uint8Array());
       jest.spyOn(Helper, 'getMLSDeviceStatus').mockReturnValueOnce(Helper.MLSDeviceStatus.REGISTERED);
       jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages').mockResolvedValueOnce(undefined);
 
@@ -663,7 +712,7 @@ describe('MLSService', () => {
       jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages');
       jest.spyOn(apiClient.api.client, 'putClient');
 
-      jest.spyOn(coreCrypto, 'clientPublicKey').mockResolvedValueOnce(new Uint8Array());
+      jest.spyOn(coreCrypto, 'publicKey').mockResolvedValueOnce(new Uint8Array());
 
       await mlsService.initClient(mockUserId, mockClient, defaultMLSInitConfig);
 
@@ -691,7 +740,7 @@ describe('MLSService', () => {
 
       if (startup) {
         jest.spyOn(Helper, 'getMLSDeviceStatus').mockReturnValueOnce(Helper.MLSDeviceStatus.REGISTERED);
-        jest.spyOn(coreCrypto, 'clientPublicKey').mockResolvedValue(new Uint8Array());
+        jest.spyOn(coreCrypto, 'publicKey').mockResolvedValue(new Uint8Array());
         await mlsService.initClient(createUserId(), {id: '0000000000000001'} as RegisteredClient, {
           ...defaultMLSInitConfig,
           getNbKeyPackages: () => {
@@ -734,8 +783,12 @@ describe('MLSService', () => {
     it('checks enrolled E2EI clients at startup even when identity initialization is skipped', async () => {
       const [mlsService, {apiClient, transactionContext, coreCrypto}] = await createMLSService();
       jest.spyOn(Helper, 'getMLSDeviceStatus').mockReturnValueOnce(Helper.MLSDeviceStatus.REGISTERED);
-      jest.spyOn(coreCrypto, 'clientPublicKey').mockResolvedValue(new Uint8Array());
-      jest.spyOn(coreCrypto, 'e2eiIsEnabled').mockResolvedValue(true);
+      jest.spyOn(coreCrypto, 'publicKey').mockResolvedValue(new Uint8Array());
+      jest.spyOn(coreCrypto, 'findCredentials').mockImplementation(async ({credentialType}) => {
+        return credentialType === CredentialType.X509
+          ? [createCredentialRef(CredentialType.X509)]
+          : [createCredentialRef(CredentialType.Basic)];
+      });
       jest.spyOn(apiClient.api.client, 'getMLSKeyPackageCount').mockResolvedValue(999);
       jest.spyOn(transactionContext, 'clientKeypackages').mockResolvedValue([new Uint8Array()]);
       const upload = jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages').mockResolvedValue(undefined);

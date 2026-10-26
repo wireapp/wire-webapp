@@ -19,7 +19,7 @@
 
 import {
   E2eiEnrollment,
-  Ciphersuite,
+  CipherSuite as Ciphersuite,
   CoreCrypto,
   WireIdentity,
   E2eiConversationState,

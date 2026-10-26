@@ -86,7 +86,7 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
   }
 
   public isE2EIEnabled(): Promise<boolean> {
-    return this.coreCryptoClient.e2eiIsEnabled(this.mlsService.config.defaultCiphersuite);
+    return this.mlsService.hasCredential(CredentialType.X509);
   }
 
   public async getAllGroupUsersIdentities(
