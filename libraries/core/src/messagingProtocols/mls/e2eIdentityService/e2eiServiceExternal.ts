@@ -29,11 +29,9 @@ import {
   DeviceStatus,
   CredentialType,
   ConversationId,
-  ClientId,
 } from '@wireapp/core-crypto';
 
 import {AcmeService} from './connection';
-import {getE2EIClientId} from './helper';
 import {createE2EIEnrollmentStorage} from './storage/e2eiStorage';
 
 import {ClientService} from '../../../client';
@@ -43,6 +41,7 @@ import {LowPrecisionTaskScheduler} from '../../../util/lowPrecisionTaskScheduler
 import {StringifiedQualifiedId, stringifyQualifiedId} from '../../../util/qualifiedIdUtil';
 import {RecurringTaskScheduler} from '../../../util/recurringTaskScheduler';
 import {MLSService, MLSServiceEvents} from '../mlsService';
+import {createMLSClientId} from '../utils/mlsId';
 
 export type DeviceIdentity = Omit<WireIdentity, 'free' | 'status' | typeof Symbol.dispose> & {
   status?: DeviceStatus;
@@ -197,8 +196,8 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     groupId: string,
     userClientsMap: Record<string, QualifiedId>,
   ): Promise<DeviceIdentity[]> {
-    const clientIds: ClientId[] = Object.entries(userClientsMap).map(([clientId, userId]) => {
-      return new ClientId(getE2EIClientId(clientId, userId.id, userId.domain).asBytes);
+    const clientIds = Object.entries(userClientsMap).map(([clientId, userId]) => {
+      return createMLSClientId(userId, clientId);
     });
     const deviceIdentities = await this.coreCryptoClient.getDeviceIdentities(
       new ConversationId(Decoder.fromBase64(groupId).asBytes),

@@ -20,16 +20,18 @@
 import axios from 'axios';
 import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
 
-import {ClientId, CoreCrypto, CoreCryptoContext, CredentialType, WireIdentity} from '@wireapp/core-crypto';
+import {CoreCrypto, CoreCryptoContext, CredentialType, WireIdentity} from '@wireapp/core-crypto';
 
 import {E2EIServiceExternal} from './e2eiServiceExternal';
 
 import {ClientService} from '../../../client';
 import {openDB} from '../../../storage/coreDb';
 import {getUUID} from '../../../test/payloadHelper';
+import {parseFullQualifiedClientId} from '../../../util/fullyQualifiedClientIdUtils';
 import {stringifyQualifiedId} from '../../../util/qualifiedIdUtil';
 import {RecurringTaskScheduler} from '../../../util/recurringTaskScheduler';
 import {MLSService} from '../mlsService';
+import {createMLSClientId} from '../utils/mlsId';
 
 type E2EIServiceTestSetup = readonly [
   E2EIServiceExternal,
@@ -157,19 +159,19 @@ describe('E2EIServiceExternal', () => {
         generateCoreCryptoIdentity({userId: user1.id}),
         generateCoreCryptoIdentity({userId: user1.id}),
       ];
-      const encoder = new TextEncoder();
       coreCrypto.getUserIdentities.mockResolvedValue(new Map([[user1.id, user1Identities]]));
 
       const allClients = [
         ...user1Identities.map(identity => {
-          return identity.clientId;
+          return identity.clientId as unknown as string;
         }),
         `${user1.id}:74a50c1f4352b41f@elna.wire.link`,
         `${user2.id}:452cb4c65f0369a8@elna.wire.link`,
       ];
       coreCrypto.getClientIds.mockResolvedValue(
         allClients.map(clientId => {
-          return new ClientId(encoder.encode(clientId));
+          const {user, client, domain} = parseFullQualifiedClientId(clientId);
+          return createMLSClientId({id: user, domain}, client);
         }),
       );
 

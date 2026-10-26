@@ -481,11 +481,17 @@ describe('MLSService', () => {
   });
 
   describe('initClient', () => {
+    const validClientId = '0000000000000001';
+    const expectedMlsTransport = expect.objectContaining({
+      prepareForTransport: expect.any(Function),
+      sendCommitBundle: expect.any(Function),
+    });
+
     it('uses the default config if config is not provided by the consumer', async () => {
       const [mlsService, {apiClient, coreCrypto, transactionContext}] = await createMLSService();
 
-      const mockUserId = {id: 'user-1', domain: 'local.zinfra.io'};
-      const mockClientId = 'client-1';
+      const mockUserId = {...createUserId(), domain: 'local.zinfra.io'};
+      const mockClientId = validClientId;
       const mockClient = {mls_public_keys: {}, id: mockClientId} as unknown as RegisteredClient;
 
       apiClient.context = {clientType: ClientType.PERMANENT, clientId: mockClientId, userId: ''};
@@ -500,11 +506,7 @@ describe('MLSService', () => {
 
       await mlsService.initClient(mockUserId, mockClient, config);
 
-      expect(transactionContext.mlsInit).toHaveBeenCalledWith(
-        expect.any(ClientId),
-        [Ciphersuite.MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519],
-        100,
-      );
+      expect(transactionContext.mlsInit).toHaveBeenCalledWith(expect.any(ClientId), expectedMlsTransport);
 
       expect(mlsService.config.nbKeyPackages).toEqual(100);
     });
@@ -512,8 +514,8 @@ describe('MLSService', () => {
     it('uses the config provided by the consumer', async () => {
       const [mlsService, {apiClient, transactionContext, coreCrypto}] = await createMLSService();
 
-      const mockUserId = {id: 'user-1', domain: 'local.zinfra.io'};
-      const mockClientId = 'client-1';
+      const mockUserId = {...createUserId(), domain: 'local.zinfra.io'};
+      const mockClientId = validClientId;
       const mockClient = {mls_public_keys: {}, id: mockClientId} as unknown as RegisteredClient;
 
       apiClient.context = {clientType: ClientType.PERMANENT, clientId: mockClientId, userId: ''};
@@ -528,11 +530,7 @@ describe('MLSService', () => {
 
       await mlsService.initClient(mockUserId, mockClient, config);
 
-      expect(transactionContext.mlsInit).toHaveBeenCalledWith(
-        expect.any(ClientId),
-        [Ciphersuite.MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519],
-        config.nbKeyPackages,
-      );
+      expect(transactionContext.mlsInit).toHaveBeenCalledWith(expect.any(ClientId), expectedMlsTransport);
 
       expect(mlsService.config).toEqual(config);
     });
@@ -540,8 +538,8 @@ describe('MLSService', () => {
     it('uses the default config value when provided with undefined by the consumer', async () => {
       const [mlsService, {apiClient, transactionContext, coreCrypto}] = await createMLSService();
 
-      const mockUserId = {id: 'user-1', domain: 'local.zinfra.io'};
-      const mockClientId = 'client-1';
+      const mockUserId = {...createUserId(), domain: 'local.zinfra.io'};
+      const mockClientId = validClientId;
       const mockClient = {mls_public_keys: {}, id: mockClientId} as unknown as RegisteredClient;
 
       apiClient.context = {clientType: ClientType.PERMANENT, clientId: mockClientId, userId: ''};
@@ -560,11 +558,7 @@ describe('MLSService', () => {
 
       await mlsService.initClient(mockUserId, mockClient, config);
 
-      expect(transactionContext.mlsInit).toHaveBeenCalledWith(
-        expect.any(ClientId),
-        [Ciphersuite.MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519],
-        100,
-      );
+      expect(transactionContext.mlsInit).toHaveBeenCalledWith(expect.any(ClientId), expectedMlsTransport);
 
       expect(mlsService.config).toEqual({...config, nbKeyPackages: 100});
     });
@@ -577,8 +571,8 @@ describe('MLSService', () => {
         const onRecoveryRequired = jest.fn();
         mlsService.on(MLSServiceEvents.MLS_CONVERSATION_RECOVERY_REQUIRED, onRecoveryRequired);
 
-        const mockUserId = {id: 'user-1', domain: 'local.zinfra.io'};
-        const mockClientId = 'client-1';
+        const mockUserId = {...createUserId(), domain: 'local.zinfra.io'};
+        const mockClientId = validClientId;
         const mockClient = {mls_public_keys: {}, id: mockClientId} as unknown as RegisteredClient;
 
         apiClient.context = {clientType: ClientType.PERMANENT, clientId: mockClientId, userId: ''};
@@ -616,7 +610,7 @@ describe('MLSService', () => {
 
     it('defers fresh client registration and key package upload when E2EI enrollment is required', async () => {
       const [mlsService, {apiClient, coreCrypto}] = await createMLSService();
-      const mockClient = {mls_public_keys: {}, id: 'client-1'} as RegisteredClient;
+      const mockClient = {mls_public_keys: {}, id: validClientId} as RegisteredClient;
       jest.spyOn(Helper, 'getMLSDeviceStatus').mockReturnValueOnce(Helper.MLSDeviceStatus.FRESH);
       jest.spyOn(coreCrypto, 'clientPublicKey').mockResolvedValue(new Uint8Array());
       const putClient = jest.spyOn(apiClient.api.client, 'putClient');
@@ -631,8 +625,8 @@ describe('MLSService', () => {
     it('uploads key packages if there are not enough keys on backend', async () => {
       const [mlsService, {apiClient, transactionContext, coreCrypto}] = await createMLSService();
 
-      const mockUserId = {id: 'user-1', domain: 'local.zinfra.io'};
-      const mockClientId = 'client-1';
+      const mockUserId = {...createUserId(), domain: 'local.zinfra.io'};
+      const mockClientId = validClientId;
 
       const mockClient = {mls_public_keys: {ed25519: 'key'}, id: mockClientId} as unknown as RegisteredClient;
 
@@ -657,8 +651,8 @@ describe('MLSService', () => {
     it('does not upload public key or key packages if both are already uploaded', async () => {
       const [mlsService, {apiClient, transactionContext, coreCrypto}] = await createMLSService();
 
-      const mockUserId = {id: 'user-1', domain: 'local.zinfra.io'};
-      const mockClientId = 'client-1';
+      const mockUserId = {...createUserId(), domain: 'local.zinfra.io'};
+      const mockClientId = validClientId;
       const mockClient = {mls_public_keys: {ed25519: 'key'}, id: mockClientId} as unknown as RegisteredClient;
 
       apiClient.context = {clientType: ClientType.PERMANENT, clientId: mockClientId, userId: ''};
@@ -698,7 +692,7 @@ describe('MLSService', () => {
       if (startup) {
         jest.spyOn(Helper, 'getMLSDeviceStatus').mockReturnValueOnce(Helper.MLSDeviceStatus.REGISTERED);
         jest.spyOn(coreCrypto, 'clientPublicKey').mockResolvedValue(new Uint8Array());
-        await mlsService.initClient(createUserId(), {id: 'client-1'} as RegisteredClient, {
+        await mlsService.initClient(createUserId(), {id: '0000000000000001'} as RegisteredClient, {
           ...defaultMLSInitConfig,
           getNbKeyPackages: () => {
             return 1000;
@@ -746,7 +740,7 @@ describe('MLSService', () => {
       jest.spyOn(transactionContext, 'clientKeypackages').mockResolvedValue([new Uint8Array()]);
       const upload = jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages').mockResolvedValue(undefined);
 
-      await mlsService.initClient(createUserId(), {id: 'client-1'} as RegisteredClient, {
+      await mlsService.initClient(createUserId(), {id: '0000000000000001'} as RegisteredClient, {
         ...defaultMLSInitConfig,
         getNbKeyPackages: () => {
           return 1000;

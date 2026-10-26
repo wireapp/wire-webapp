@@ -35,7 +35,6 @@ import {APIClient} from '@wireapp/api-client';
 import {LogFactory, TimeUtil, TypedEventEmitter} from '@wireapp/commons';
 import {
   Ciphersuite,
-  ClientId as CoreCryptoClientId,
   CommitBundle,
   ConversationConfiguration,
   ConversationId,
@@ -82,7 +81,7 @@ import {
 } from '../e2eIdentityService/helper';
 import {handleMLSMessageAdd, handleMLSWelcomeMessage} from '../eventHandler/events';
 import {ClientId, HandlePendingProposalsParams} from '../types';
-import {generateMLSDeviceId} from '../utils/mlsId';
+import {createMLSClientId} from '../utils/mlsId';
 
 const keyingMaterialLifetimeInDays = 30;
 const keyPackageReplenishmentDivisor = 2;
@@ -145,9 +144,9 @@ const MLS_CONVERSATION_RECOVERY_KEY = 'required';
 export class MLSService extends TypedEventEmitter<Events> {
   logger = LogFactory.getLogger('@wireapp/core/MLSService');
   private _config?: MLSConfig;
-  private readonly textEncoder = new TextEncoder();
   private readonly textDecoder = new TextDecoder();
   private initialKeyPackageUploadDeferred = false;
+  private readonly mlsTransport: MlsTransport;
 
   constructor(
     private readonly apiClient: APIClient,
@@ -157,7 +156,7 @@ export class MLSService extends TypedEventEmitter<Events> {
   ) {
     super();
 
-    const mlsTransport: MlsTransport = {
+    this.mlsTransport = {
       sendCommitBundle: this._uploadCommitBundle,
       // Info: This is not used for now, but we need to implement it to be able to use the mls transport
       sendMessage: async () => {
@@ -177,7 +176,6 @@ export class MLSService extends TypedEventEmitter<Events> {
     };
 
     void this.coreCryptoClient.registerEpochObserver(epochObserver);
-    void this.coreCryptoClient.provideTransport(mlsTransport);
   }
 
   /**
@@ -235,8 +233,8 @@ export class MLSService extends TypedEventEmitter<Events> {
     };
 
     await this.coreCryptoClient.transaction(cx => {
-      const clientId = new CoreCryptoClientId(generateMLSDeviceId(userId, client.id));
-      return cx.mlsInit(clientId, this.config.ciphersuites, this.keyPackageUploadAmount);
+      const clientId = createMLSClientId(userId, client.id);
+      return cx.mlsInit(clientId, this.mlsTransport);
     });
 
     this.initialKeyPackageUploadDeferred =
@@ -872,7 +870,8 @@ export class MLSService extends TypedEventEmitter<Events> {
       return cx.removeClientsFromConversation(
         new ConversationId(groupIdBytes),
         clientIds.map(id => {
-          return new CoreCryptoClientId(this.textEncoder.encode(id));
+          const {user, client, domain} = parseFullQualifiedClientId(id);
+          return createMLSClientId({id: user, domain}, client);
         }),
       );
     });
