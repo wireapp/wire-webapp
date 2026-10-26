@@ -19,9 +19,7 @@
   "scripts": {
     "build": "nx run webapp-events-lib:build",
     "clean": "nx run webapp-events-lib:clean",
-    "dist": "nx run webapp-events-lib:dist",
-    "test": "nx run webapp-events-lib:test",
-    "test:watch": "nx run webapp-events-lib:test --watch"
+    "dist": "nx run webapp-events-lib:dist"
   },
   "version": "0.29.2",
   "private": true

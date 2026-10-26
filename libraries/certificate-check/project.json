@@ -27,30 +27,6 @@
         "command": "echo 'Build complete'"
       }
     },
-    "test": {
-      "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/libraries/certificate-check"],
-      "options": {
-        "jestConfig": "{projectRoot}/jest.config.js",
-        "passWithNoTests": false
-      },
-      "configurations": {
-        "ci": {
-          "ci": true,
-          "coverage": true,
-          "coverageReporters": ["lcov", "text"]
-        }
-      }
-    },
-    "test:coverage": {
-      "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/libraries/certificate-check"],
-      "options": {
-        "jestConfig": "{projectRoot}/jest.config.js",
-        "passWithNoTests": false,
-        "coverage": true
-      }
-    },
     "watch": {
       "executor": "nx:run-commands",
       "options": {

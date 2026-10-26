@@ -47,13 +47,13 @@ jobs:
         run: npm clean-install
 
       - name: Build libraries for lint import resolution
-        run: npm exec -- nx run-many -t build --projects=tag:type:lib
+        run: npx nx run-many -t build --projects=tag:type:lib
 
       - name: Lint repository (ESLint)
         run: npx just eslint
 
       - name: Test libraries
-        run: npm exec -- nx run-many -t test --projects=tag:type:lib
+        run: npx jest --config ./jest.config.js --projects './libraries/*/jest.config.js' --ci
 
       - name: Create version PR
         run: |
@@ -61,7 +61,7 @@ jobs:
           echo "🔍 Auto-detecting version bump from conventional commits..."
 
           # Run nx release version to update versions, commit, and tag
-          npm exec -- nx release version
+          npx nx release version
 
           # Check if any commits were created
           COMMITS_AHEAD="$(git rev-list --count "origin/main..HEAD")"

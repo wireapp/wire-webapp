@@ -103,7 +103,7 @@
       "groupName": "eslint tooling"
     },
     {
-      "matchPackageNames": ["jest", "@jest/**", "jest-*", "babel-jest", "@types/jest", "@nx/jest", "@swc/jest"],
+      "matchPackageNames": ["jest", "@jest/**", "jest-*", "babel-jest", "@types/jest", "@swc/jest"],
       "groupName": "jest ecosystem"
     },
     {

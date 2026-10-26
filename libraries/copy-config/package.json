@@ -36,10 +36,7 @@
   "scripts": {
     "build": "nx run copy-config-lib:build",
     "clean": "nx run copy-config-lib:clean",
-    "dist": "nx run copy-config-lib:dist",
-    "test": "nx run copy-config-lib:test",
-    "test:coverage": "nx run copy-config-lib:test:coverage",
-    "test:watch": "nx run copy-config-lib:test --watch"
+    "dist": "nx run copy-config-lib:dist"
   },
   "version": "2.3.13",
   "private": true

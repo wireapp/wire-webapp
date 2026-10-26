@@ -20,12 +20,12 @@ For ANY UI change in `apps/webapp/src/`:
 - ✓ Form labels tied to inputs with error descriptions
 - ✓ Screen reader support (aria-live for dynamic content)
 
-### 3. ✅ USE NX COMMANDS (NEVER USE DIRECT TOOL CALLS)
+### 3. ✅ USE REPOSITORY TASK RUNNERS
 ```bash
 nx run webapp:build      # ✅ CORRECT
 npm run build           # ❌ WRONG
 
-nx run-many -t test     # ✅ CORRECT
+npx just test           # ✅ CORRECT
 jest                    # ❌ WRONG
 ```
 
@@ -102,7 +102,7 @@ Review in this exact order:
 
 ## Repository Task Runners
 
-Use Just for ESLint and migrated repository quality checks. Use Nx for build, test, and other tasks that have not migrated yet.
+Use Just for repository quality checks and unit tests. Use Nx for build, E2E, and other tasks that have not migrated yet.
 ```bash
 # Development
 nx run webapp:serve
@@ -112,8 +112,9 @@ nx run webapp:build --configuration=production
 nx run server:package
 
 # Testing
-nx run-many -t test --all
-nx affected -t test
+npx just test
+npx just test-ci
+npx just test-watch
 
 # Linting
 npx just eslint

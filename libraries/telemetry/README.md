@@ -17,9 +17,9 @@ Under the hood uses [Countly](https://countly.com/).
 Run from the repository root:
 
 ```bash
-yarn nx run telemetry-lib:build
-yarn nx run telemetry-lib:test
-yarn nx run telemetry-lib:watch
+npx nx run telemetry-lib:build
+npx just test
+npx nx run telemetry-lib:watch
 ```
 
 TypeScript compiles the library without bundling. The build first copies the original

@@ -367,7 +367,7 @@ jobs:
         run: npm clean-install
 
       - name: Test
-        run: ./tools/ci/runWithNetworkIsolation.sh npm exec -- nx run-many -t test --all --configuration=ci --detectOpenHandles=false
+        run: ./tools/ci/runWithNetworkIsolation.sh npx just test-ci
 
       - name: Upload coverage reports
         if: always()
@@ -377,10 +377,10 @@ jobs:
           if-no-files-found: error
           retention-days: 1
           path: |
-            apps/webapp/coverage
-            apps/server/coverage
-            coverage/libraries/core
-            coverage/libraries/api-client
+            target/coverage/apps/webapp
+            target/coverage/apps/server
+            target/coverage/libraries/core
+            target/coverage/libraries/api-client
 
   public-production-package:
     runs-on: ubuntu-26.04

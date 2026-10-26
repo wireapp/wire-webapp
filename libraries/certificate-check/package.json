@@ -29,10 +29,7 @@
   "scripts": {
     "build": "nx run certificate-check-lib:build",
     "clean": "nx run certificate-check-lib:clean",
-    "dist": "nx run certificate-check-lib:dist",
-    "test": "nx run certificate-check-lib:test",
-    "test:coverage": "nx run certificate-check-lib:test:coverage",
-    "test:watch": "nx run certificate-check-lib:test --watch"
+    "dist": "nx run certificate-check-lib:dist"
   },
   "version": "0.7.27",
   "private": true

@@ -1,4 +1,4 @@
-set default-list := true
+set default-list
 export PATH := justfile_directory() + "/node_modules/.bin:" + env_var("PATH")
 export NODE_OPTIONS := "--max-old-space-size=6144"
 
@@ -18,10 +18,10 @@ stylesheet-lint:
     cd apps/webapp && prettier --ignore-path ../../.prettierignore --check "**/*.less" && stylelint --ignore-path .gitignore "**/*.less"
 
 # Lint the repository with ESLint's flat config and the temporary 287-warning budget.
-[group('lint')]
 [arg("fix", long, value="true")]
+[group('lint')]
 eslint fix="false":
-    eslint . --config eslint.config.mjs --max-warnings=287 --cache --cache-strategy content --cache-location ./target/eslintcache {{if fix == "true" { "--fix" } else { "" }}}
+    eslint . --config eslint.config.mjs --max-warnings=287 --cache --cache-strategy content --cache-location ./target/eslintcache {{ if fix == "true" { "--fix" } else { "" } }}
 
 # Automatically fix eligible ESLint issues across the repository.
 [group('lint')]
@@ -72,7 +72,25 @@ type-check-release-appearance:
 type-check-release-cli:
     tsc --project ./tsconfig.release-cli.json --noEmit
 
-# Run the repository-owned tooling tests.
-[group('tooling')]
-tooling-test:
-    jest --config ./tools/jest.config.js --cacheDirectory target/jest/cache
+# Build workspace libraries required by the application and library test suites.
+[group('testing')]
+build-libraries:
+    npx nx run-many -t build --projects=tag:type:lib
+
+# Run all unit tests with native Jest multi-project execution.
+[group('testing')]
+test: build-libraries
+    jest --config ./jest.config.js
+
+# Run each Jest project separately to preserve its coverage thresholds.
+[group('testing')]
+test-ci: build-libraries
+    for jest_config_path in apps/*/jest.config.* libraries/*/jest.config.js; do \
+        CI=true jest --config "${jest_config_path}" --ci --coverage --maxWorkers=2 || exit $?; \
+    done
+    CI=true jest --config tools/jest.config.js --ci --maxWorkers=2
+
+# Run all unit tests in watch mode through the repository Jest project configuration.
+[group('testing')]
+test-watch: build-libraries
+    jest --config ./jest.config.js --watch

@@ -18,6 +18,7 @@
  */
 
 const {TextDecoder, TextEncoder} = require('util');
+const rootJestConfiguration = require('../../jest.config.js');
 
 module.exports = {
   displayName: 'store-engine-dexie-lib',
@@ -38,11 +39,14 @@ module.exports = {
     TextDecoder,
     TextEncoder,
   },
-  coverageDirectory: '../../coverage/libraries/store-engine-dexie',
+  cacheDirectory: '../../target/jest/cache',
+  coverageDirectory: '../../target/coverage/libraries/store-engine-dexie',
+  coverageReporters: rootJestConfiguration.coverageReporters,
   testMatch: [
     '<rootDir>/src/**/__tests__/**/*.[jt]s?(x)',
     '<rootDir>/src/**/?(*.)+(spec|test).[jt]s?(x)',
     '<rootDir>/spec/**/*.[jt]s?(x)',
   ],
   moduleFileExtensions: ['js', 'json', 'ts', 'tsx'],
+  reporters: rootJestConfiguration.reporters,
 };

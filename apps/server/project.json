@@ -127,21 +127,6 @@
         }
       }
     },
-    "test": {
-      "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/apps/server"],
-      "options": {
-        "jestConfig": "{projectRoot}/jest.config.js",
-        "passWithNoTests": true
-      },
-      "configurations": {
-        "ci": {
-          "ci": true,
-          "coverage": true,
-          "coverageReporters": ["html", "lcov", "text"]
-        }
-      }
-    },
     "type-check": {
       "executor": "nx:run-commands",
       "dependsOn": ["config-lib:build"],

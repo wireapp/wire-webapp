@@ -24,7 +24,6 @@
     "@faker-js/faker": "10.6.0",
     "@inquirer/prompts": "8.7.4",
     "@ls-lint/ls-lint": "2.3.2",
-    "@nx/jest": "22.7.12",
     "@nx/node": "22.7.12",
     "@nx/workspace": "22.7.12",
     "@stylistic/eslint-plugin": "5.10.0",
@@ -67,6 +66,7 @@
     "globals": "17.13.0",
     "jest": "30.5.2",
     "jest-environment-jsdom": "30.5.2",
+    "jest-silent-reporter": "0.6.0",
     "js-yaml": "4.3.2",
     "jscpd": "5.4.2",
     "jsdom": "29.1.1",
@@ -137,7 +137,6 @@
     "build:prod": "nx run server:package",
     "build:prod:public": "nx run server:package-public",
     "verify:bundle:prod:public": "node tools/buildArtifact/verifyPublicProductionBundle.ts",
-    "test": "nx run-many -t test --all",
     "type-check": "nx run-many -t type-check --all"
   },
   "overrides": {

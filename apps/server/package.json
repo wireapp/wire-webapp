@@ -9,8 +9,7 @@
     "copy-assets": "node ./bin/copy_server_assets.js",
     "generate-version-file": "node ./bin/generateVersionFile.mts",
     "clean": "rimraf ./dist/",
-    "start:prod": "node ./index.js",
-    "test": "jest"
+    "start:prod": "node ./index.js"
   },
   "dependencies": {
     "@sindresorhus/is": "8.1.0",

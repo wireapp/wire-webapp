@@ -18,12 +18,13 @@
  */
 
 const {TextDecoder, TextEncoder} = require('util');
-const isContinuousIntegrationEnvironment = process.env.CI === 'true';
+const rootJestConfiguration = require('../../jest.config.js');
 
 module.exports = {
   displayName: 'core-lib',
   testEnvironment: 'node',
   clearMocks: true,
+  cacheDirectory: '../../target/jest/cache',
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   globals: {
     TextDecoder,
@@ -39,7 +40,7 @@ module.exports = {
   transformIgnorePatterns: [
     '/node_modules/(?!(true-myth|uuid|noop-esm|p-queue|p-timeout|eventemitter3|@sindresorhus/is|@faker-js/faker|@enormora/fire-and-forget)/)',
   ],
-  coverageDirectory: '../../coverage/libraries/core',
+  coverageDirectory: '../../target/coverage/libraries/core',
   coverageThreshold: {
     global: {
       branches: 49,
@@ -48,8 +49,8 @@ module.exports = {
       statements: 62,
     },
   },
-  coverageReporters: isContinuousIntegrationEnvironment ? ['html', 'lcov', 'text-summary'] : undefined,
+  coverageReporters: rootJestConfiguration.coverageReporters,
   testMatch: ['<rootDir>/src/**/__tests__/**/*.[jt]s?(x)', '<rootDir>/src/**/?(*.)+(spec|test).[jt]s?(x)'],
   moduleFileExtensions: ['js', 'json', 'ts', 'tsx'],
-  reporters: isContinuousIntegrationEnvironment ? ['github-actions', 'summary'] : ['default'],
+  reporters: rootJestConfiguration.reporters,
 };

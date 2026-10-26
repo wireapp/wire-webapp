@@ -1,5 +1,10 @@
 # Nx Monorepo Integration - Comprehensive Overview
 
+> Historical reference for the original Nx integration. Unit tests now run through
+> `npx just test`, `npx just test-ci`, and `npx just test-watch`; CI uses native Jest
+> with per-project coverage thresholds. Nx remains in use for builds and other tasks
+> that have not migrated.
+
 ## Table of Contents
 
 - [Workspace-Tools Project](#workspace-tools-project)
@@ -22,7 +27,7 @@
 
 ## Workspace-Tools Project
 
-The `workspace-tools` project is a special Nx project that provides workspace-level utilities. It doesn't have actual code to test or build - it's a container for shared scripts and commands.
+The `workspace-tools` project provides workspace-level utilities and the Jest config for repository-owned tooling tests. Nx still owns its remaining build and server commands.
 
 **Available workspace-tools commands:**
 - `nx run workspace-tools:clean-jest` - Clean Jest cache
@@ -293,9 +298,9 @@ The `typesVersions` field is a TypeScript feature that maps type resolution path
 
 Without `typesVersions`, consumers would get type errors or no IntelliSense when importing subpaths like `@wireapp/core/lib/connection`.
 
-### Jest/Nx Coverage Configuration
+### Jest Coverage Configuration
 
-Project Jest configs define `coverageThreshold` for CI coverage enforcement. The `ci` test target in each covered Nx project enables coverage and keeps `text`, `lcov`, and `html` reporters so GitHub Actions logs show a coverage table and the workflow can upload browsable coverage artifacts.
+Project Jest configs define `coverageThreshold` for CI coverage enforcement. `npx just test-ci` invokes each project config separately because Jest's multi-project runner does not apply project-local thresholds. The configs retain `text`, `lcov`, and `html` reporters where required, and store coverage under `target/coverage/` for GitHub Actions artifacts.
 
 ### [`.github/labeler.yml`](.github/labeler.yml) - PR Auto-Labeling
 
@@ -1084,7 +1089,7 @@ ESLint uses its native content cache under `target/eslint/`. CI builds libraries
 
 ## Why Use Nx for Nx-Managed Workflows
 
-Nx continues to manage build, test, packaging, and server tasks. ESLint and migrated repository quality checks run through the root Just recipes.
+Nx continues to manage build, packaging, and server tasks. Unit tests, ESLint, and migrated repository quality checks run through the root Just recipes.
 
 ### 1. Dependency Graph Resolution
 
@@ -1458,7 +1463,7 @@ Production tags, and distribution repair.
 
 | Workflow | Commands Used |
 |----------|------------------|
-| [`continuous-integration.yml`](.github/workflows/continuous-integration.yml) | `npx just eslint`, `nx run-many -t test --all` |
+| [`continuous-integration.yml`](.github/workflows/continuous-integration.yml) | `npx just eslint`, `npx just test-ci` |
 | [`precommit.yml`](.github/workflows/precommit.yml) | `nx run webapp:configure`, `nx run server:package` |
 | [`release-webapp.yml`](.github/workflows/release-webapp.yml) | `nx run webapp:configure`, `nx run server:package` through the exact WebApp release artifact build |
 | [`publish-main.yml`](.github/workflows/publish-main.yml) | Main artifact build, Edge and Hosted Dev delivery, and development distribution |
@@ -1466,11 +1471,11 @@ Production tags, and distribution repair.
 
 ### Coverage in CI
 
-From [`.github/workflows/ci.yml`](.github/workflows/ci.yml):
+From [`.github/workflows/continuous-integration.yml`](.github/workflows/continuous-integration.yml):
 
 ```yaml
 - name: Test
-  run: ./tools/ci/runWithNetworkIsolation.sh npm exec -- nx run-many -t test --all --configuration=ci --detectOpenHandles=false
+  run: ./tools/ci/runWithNetworkIsolation.sh npx just test-ci
 
 - name: Upload coverage reports
   if: always()
@@ -1480,17 +1485,17 @@ From [`.github/workflows/ci.yml`](.github/workflows/ci.yml):
     if-no-files-found: warn
     retention-days: 14
     path: |
-      apps/webapp/coverage
-      apps/server/coverage
-      coverage/libraries/core
-      coverage/libraries/api-client
+      target/coverage/apps/webapp
+      target/coverage/apps/server
+      target/coverage/libraries/core
+      target/coverage/libraries/api-client
 ```
 
 ### Common Nx CI Patterns
 
 ```bash
-# Run all tests
-nx run-many -t test --all --configuration=ci
+# Run unit tests with coverage and project-specific thresholds
+npx just test-ci
 
 # Run affected projects only
 nx affected -t build test
@@ -1597,9 +1602,9 @@ nx run-many -t build --all           # Build all projects
 nx affected -t build                  # Build affected projects
 
 # Test
-nx test <project>                     # Test specific project
-nx run-many -t test --all             # Test all projects
-nx test <project> --coverage          # Test with coverage
+npx just test                         # Test all projects
+npx just test-ci                      # Test with coverage and thresholds
+npx just test-watch                   # Watch all projects
 
 # Lint
 npx just eslint                       # Lint the repository
@@ -1630,17 +1635,16 @@ Projects use tags for organization:
 }
 ```
 
-Run by tags:
+Build by tags:
 ```bash
 nx run-many -t build --projects=tag:frontend
-nx run-many -t test --projects=tag:lib
 ```
 
 ---
 
 ## Key Takeaways for Developers
 
-1. **Always use Nx commands** - Don't run Rspack, Jest, or TypeScript directly
+1. **Use the task runner for each task** - Just runs unit tests and migrated quality checks; Nx runs builds and remaining Nx tasks
 2. **Understand `dependsOn`** - Dependencies are automatically built first
 3. **Cache is your friend** - Nx cache saves time, but remember `nx reset` when needed
 4. **Add projects to [`tsconfig.json`](tsconfig.json)** - Project references are required

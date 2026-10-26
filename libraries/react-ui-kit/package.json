@@ -58,11 +58,7 @@
   "scripts": {
     "build": "nx run react-ui-kit-lib:build",
     "clean": "nx run react-ui-kit-lib:clean",
-    "dist": "nx run react-ui-kit-lib:dist",
-    "test": "nx run react-ui-kit-lib:test",
-    "test:coverage": "nx run react-ui-kit-lib:test:coverage",
-    "test:watch": "nx run react-ui-kit-lib:test --watch",
-    "test:update": "nx run react-ui-kit-lib:test --updateSnapshot"
+    "dist": "nx run react-ui-kit-lib:dist"
   },
   "version": "9.77.0"
 }
