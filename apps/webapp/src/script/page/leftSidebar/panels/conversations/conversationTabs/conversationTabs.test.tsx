@@ -151,7 +151,7 @@ describe('ConversationTabs — team creation banner', () => {
       const selfUser = new User('self-user', '', translate);
       selfUser.isTemporaryGuest(true);
       renderConversationTabs(translationRootProviderWrapper, selfUser);
-      expect(screen.queryByText('Enjoy benefits of a team')).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', {name: translate('teamUpgradeBannerButtonText')})).not.toBeInTheDocument();
     }),
   );
 
@@ -161,7 +161,7 @@ describe('ConversationTabs — team creation banner', () => {
       const selfUser = new User('self-user', '', translate);
       selfUser.isTemporaryGuest(false);
       renderConversationTabs(translationRootProviderWrapper, selfUser);
-      expect(screen.queryByText('Enjoy benefits of a team')).toBeInTheDocument();
+      expect(screen.queryByRole('button', {name: translate('teamUpgradeBannerButtonText')})).toBeInTheDocument();
     }),
   );
 });

@@ -67,10 +67,12 @@ describe('AccountPreferences — team creation header', () => {
     originalVersion = core.backendFeatures.version;
     core.backendFeatures.version = 7;
     isInTeamSpy = jest.spyOn(teamState, 'isInTeam').mockReturnValue(false);
+    const realConfig = Config.getConfig();
     configSpy = jest.spyOn(Config, 'getConfig').mockReturnValue({
-      FEATURE: {ENABLE_TEAM_CREATION: true},
+      ...realConfig,
+      FEATURE: {...realConfig.FEATURE, ENABLE_TEAM_CREATION: true},
       MIN_TEAM_CREATION_SUPPORTED_API_VERSION: 7,
-    } as unknown as ReturnType<typeof Config.getConfig>);
+    });
   });
 
   afterEach(() => {

@@ -17,7 +17,7 @@
  *
  */
 
-import {render} from '@testing-library/react';
+import {render, screen} from '@testing-library/react';
 import {container} from 'tsyringe';
 
 import {User} from 'Repositories/entity/User';
@@ -40,38 +40,39 @@ function renderConversationHistory(): ReturnType<typeof render> {
   });
 }
 
-describe('ConversationHistory — team creation banner', () => {
+describe('ConversationHistory — upgrade banner', () => {
   const teamState = container.resolve(TeamState);
-  let originalIsConferenceCallingEnabled: typeof teamState.isConferenceCallingEnabled;
+  const userState = container.resolve(UserState);
+  let originalSelfUser: User;
+  let conferenceCallingSpy: jest.SpyInstance;
 
   beforeEach(() => {
-    originalIsConferenceCallingEnabled = teamState.isConferenceCallingEnabled;
-    (teamState as any).isConferenceCallingEnabled = () => {
-      return false;
-    };
+    originalSelfUser = userState.self();
+    conferenceCallingSpy = jest.spyOn(teamState, 'isConferenceCallingEnabled').mockReturnValue(false);
   });
 
   afterEach(() => {
-    (teamState as any).isConferenceCallingEnabled = originalIsConferenceCallingEnabled;
+    userState.self(originalSelfUser);
+    conferenceCallingSpy.mockRestore();
   });
 
-  it('hides the team creation banner for temporary guests', () => {
+  it('hides the upgrade banner for temporary guests', () => {
     const selfUser = new User('test-id', '', translateForTest);
     selfUser.isTemporaryGuest(true);
-    container.resolve(UserState).self(selfUser);
+    userState.self(selfUser);
 
-    const {container: renderContainer} = renderConversationHistory();
+    renderConversationHistory();
 
-    expect(renderContainer.querySelector('[data-uie-name="do-submit"]')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: translateForTest('createConversationUpgradePlanModalButton')})).not.toBeInTheDocument();
   });
 
-  it('shows the team creation banner for regular users', () => {
+  it('shows the upgrade banner for regular users', () => {
     const selfUser = new User('test-id', '', translateForTest);
     selfUser.isTemporaryGuest(false);
-    container.resolve(UserState).self(selfUser);
+    userState.self(selfUser);
 
-    const {container: renderContainer} = renderConversationHistory();
+    renderConversationHistory();
 
-    expect(renderContainer.querySelector('[data-uie-name="do-submit"]')).toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: translateForTest('createConversationUpgradePlanModalButton')})).toBeInTheDocument();
   });
 });
