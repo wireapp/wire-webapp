@@ -342,11 +342,6 @@ jobs:
         run: npx just format-check
 
       - name: Stylelint
-        if: ${{ github.event_name == 'pull_request' }}
-        run: npx just stylesheet-lint
-
-      - name: Stylelint
-        if: ${{ github.event_name != 'pull_request' }}
         run: npx just stylesheet-lint
 
   unit-tests:
