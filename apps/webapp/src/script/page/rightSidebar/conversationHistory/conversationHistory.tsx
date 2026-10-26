@@ -30,7 +30,9 @@ import {ChatHistory, HistorySharingUnit} from 'Components/Modals/CreateConversat
 import {getChatHistoryOptions, getChatHistorySharingUnitOptions} from 'Components/Modals/CreateConversation/utils';
 import {RadioGroup} from 'Components/Radio';
 import {TeamState} from 'Repositories/team/TeamState';
+import {UserState} from 'Repositories/user/userState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {
   conversationHistoryContainerCss,
@@ -54,6 +56,8 @@ export const ConversationHistory: FunctionComponent<AccessProps> = ({onGoBack, o
   const chatHistorySharingUnitOptions = getChatHistorySharingUnitOptions(translate, historySharingQuantity);
   const chatHistoryOptions = getChatHistoryOptions(translate, chatHistory, historySharingQuantity, historySharingUnit);
   const teamState = container.resolve(TeamState);
+  const userState = container.resolve(UserState);
+  const {isTemporaryGuest} = useKoSubscribableChildren(userState.self(), ['isTemporaryGuest']);
 
   return (
     <div id="access-settings" className="panel__page">
@@ -109,7 +113,7 @@ export const ConversationHistory: FunctionComponent<AccessProps> = ({onGoBack, o
             />
           </FlexBox>
         )}
-        {!teamState.isConferenceCallingEnabled() && <TeamCreationBanner />}
+        {!teamState.isConferenceCallingEnabled() && !isTemporaryGuest && <TeamCreationBanner />}
       </FadingScrollbar>
     </div>
   );

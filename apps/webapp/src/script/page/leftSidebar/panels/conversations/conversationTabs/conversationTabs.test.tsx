@@ -17,13 +17,17 @@
  *
  */
 
-import {render} from '@testing-library/react';
+import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ko from 'knockout';
+import {container} from 'tsyringe';
 
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationLabelRepository} from 'Repositories/conversation/ConversationLabelRepository';
 import {User} from 'Repositories/entity/User';
+import {TeamState} from 'Repositories/team/TeamState';
+import {Config} from 'src/script/Config';
+import {Core} from 'src/script/service/coreSingleton';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
@@ -90,6 +94,7 @@ function withInternalEnvironment(testFunction: TranslationTestFunction): Isolate
 
 function renderConversationTabs(
   rootProviderWrapper: ReturnType<typeof createRootProviderWrapperForTest>,
+  selfUser = new User('self-user', '', translate),
 ): ReturnType<typeof render> {
   return render(
     <div id="wire-app">
@@ -107,13 +112,59 @@ function renderConversationTabs(
           currentTab={SidebarTabs.RECENT}
           onClickPreferences={jest.fn()}
           showNotificationsBadge={false}
-          selfUser={new User('self-user', '', translate)}
+          selfUser={selfUser}
         />,
         rootProviderWrapper,
       )}
     </div>,
   );
 }
+
+describe('ConversationTabs — team creation banner', () => {
+  const core = container.resolve(Core);
+  const teamState = container.resolve(TeamState);
+  let configSpy: jest.SpyInstance;
+  let isInTeamSpy: jest.SpyInstance;
+  let originalVersion: number;
+
+  beforeEach(() => {
+    originalVersion = core.backendFeatures.version;
+    core.backendFeatures.version = 7;
+    isInTeamSpy = jest.spyOn(teamState, 'isInTeam').mockReturnValue(false);
+    const realConfig = Config.getConfig();
+    configSpy = jest.spyOn(Config, 'getConfig').mockReturnValue({
+      ...realConfig,
+      FEATURE: {...realConfig.FEATURE, ENABLE_TEAM_CREATION: true},
+      MIN_TEAM_CREATION_SUPPORTED_API_VERSION: 7,
+    });
+  });
+
+  afterEach(() => {
+    core.backendFeatures.version = originalVersion;
+    configSpy.mockRestore();
+    isInTeamSpy.mockRestore();
+  });
+
+  it(
+    'hides the team creation banner for temporary guests',
+    withTranslationStrings(en, () => {
+      const selfUser = new User('self-user', '', translate);
+      selfUser.isTemporaryGuest(true);
+      renderConversationTabs(translationRootProviderWrapper, selfUser);
+      expect(screen.queryByText('Enjoy benefits of a team')).not.toBeInTheDocument();
+    }),
+  );
+
+  it(
+    'shows the team creation banner for regular users',
+    withTranslationStrings(en, () => {
+      const selfUser = new User('self-user', '', translate);
+      selfUser.isTemporaryGuest(false);
+      renderConversationTabs(translationRootProviderWrapper, selfUser);
+      expect(screen.queryByText('Enjoy benefits of a team')).toBeInTheDocument();
+    }),
+  );
+});
 
 describe('ConversationTabs', () => {
   it(
