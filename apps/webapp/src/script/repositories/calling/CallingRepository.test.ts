@@ -373,11 +373,14 @@ describe('CallingRepository', () => {
       repository['isOnAvsStagingSft'] = true;
       await requestConfig();
       const stagingSftServers = [{urls: ['https://sft.calling-staging-v01.zinfra.io']}];
-      const stagingSftServerAll = [{urls: [
-          'https://sft.calling-staging-v01.zinfra.io/sfts/sftd-0',
-          'https://sft.calling-staging-v01.zinfra.io/sfts/sftd-1'
-        ]
-      }];
+      const stagingSftServerAll = [
+        {
+          urls: [
+            'https://sft.calling-staging-v01.zinfra.io/sfts/sftd-0',
+            'https://sft.calling-staging-v01.zinfra.io/sfts/sftd-1',
+          ],
+        },
+      ];
 
       expect(configUpdate).toHaveBeenLastCalledWith(
         avsUser,
