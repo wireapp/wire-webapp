@@ -18,6 +18,7 @@
  */
 
 import {act, renderHook, waitFor} from '@testing-library/react';
+import {Maybe} from 'true-myth';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {CELLS_SELF_USER_DRIVE_ROLE} from 'src/script/components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
@@ -53,6 +54,7 @@ describe('useCellPublicLink', () => {
       path: '/test/test-file.pdf',
       mimeType: 'application/pdf',
       sizeMb: '1.5',
+      sizeBytes: Maybe.nothing(),
       extension: 'pdf',
       uploadedAtTimestamp: Date.now(),
       owner: 'test-owner',

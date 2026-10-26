@@ -37,6 +37,23 @@ const createStubNode = (properties: Partial<RestNode> = {}): RestNode => {
 };
 
 describe('transformCellsNodes', () => {
+  it('retains a safe byte size for file selection totals', () => {
+    const file = createStubNode({Size: '234881024'});
+
+    const [node] = transformCellsNodes({nodes: [file], users: []});
+
+    expect(node.sizeBytes.isJust).toBe(true);
+    expect(node.sizeBytes.unwrapOr(0)).toBe(234881024);
+  });
+
+  it.each(['-1', '1.5', 'not-a-size', '9007199254740992'])('rejects invalid or unsafe raw byte size %s', size => {
+    const file = createStubNode({Size: size});
+
+    const [node] = transformCellsNodes({nodes: [file], users: []});
+
+    expect(node.sizeBytes.isNothing).toBe(true);
+  });
+
   it('preserves backend tag order in the cell model', () => {
     const nodeWithTags = createStubNode({
       UserMetadata: [{Namespace: 'usermeta-tags', JsonValue: JSON.stringify('Zulu, alpha, Beta')}],
@@ -56,6 +73,7 @@ describe('transformCellsNodes', () => {
     const [node] = transformCellsNodes({nodes: [emptyFolder], users: []});
 
     expect(node.sizeMb).toBe('0 B');
+    expect(node.sizeBytes.isNothing).toBe(true);
   });
 
   it.each([
@@ -67,6 +85,7 @@ describe('transformCellsNodes', () => {
     const [node] = transformCellsNodes({nodes: [fileWithoutSize], users: []});
 
     expect(node.sizeMb).toBe('-');
+    expect(node.sizeBytes.isNothing).toBe(true);
   });
 
   it('enriches a node with its conversation when conversations are provided', () => {

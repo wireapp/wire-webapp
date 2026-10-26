@@ -17,6 +17,8 @@
  *
  */
 
+import {Maybe} from 'true-myth';
+
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {CellsSelfUserDriveRole} from 'src/script/components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
@@ -33,6 +35,7 @@ interface CellNodeGeneral {
   mimeType?: string;
   name: string;
   sizeMb: string;
+  sizeBytes: Maybe<number>;
   previewImageUrl?: string;
   previewPdfUrl?: string;
   uploadedAtTimestamp: number;
