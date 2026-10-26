@@ -299,7 +299,13 @@ describe('SingleSignOnForm', () => {
     });
 
     const {getByTestId} = mountComponent(
-      <SingleSignOnForm {...{doLogin: () => {return Promise.resolve()}}} />,
+      <SingleSignOnForm
+        {...{
+          doLogin: () => {
+            return Promise.resolve();
+          },
+        }}
+      />,
       mockStoreFactory()(initialRootState),
     );
 
