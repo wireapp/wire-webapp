@@ -142,12 +142,6 @@
         }
       }
     },
-    "lint": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "eslint --config eslint.config.mjs --cache --cache-location node_modules/.cache/eslint/server --max-warnings=0 --ext .js,.jsx,.ts,.tsx,.cjs,.mjs,.mts,.cts {projectRoot}"
-      }
-    },
     "type-check": {
       "executor": "nx:run-commands",
       "dependsOn": ["config-lib:build"],

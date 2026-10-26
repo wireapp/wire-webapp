@@ -335,9 +335,8 @@ jobs:
       - name: Build libraries for lint import resolution
         run: npm exec -- nx run-many -t build --projects=tag:type:lib
 
-      - name: Lint affected projects (ESLint)
-        if: ${{ github.event_name == 'pull_request' }}
-        run: npm exec -- nx affected -t lint --base="${BASE_REF}" --head=HEAD
+      - name: Lint all projects (ESLint)
+        run: npx just eslint-all
 
       - name: Check formatting (Prettier)
         run: npx just format-check
@@ -345,10 +344,6 @@ jobs:
       - name: Stylelint
         if: ${{ github.event_name == 'pull_request' }}
         run: npx just stylesheet-lint
-
-      - name: Lint all projects (ESLint)
-        if: ${{ github.event_name != 'pull_request' }}
-        run: npm run lint:projects
 
       - name: Stylelint
         if: ${{ github.event_name != 'pull_request' }}

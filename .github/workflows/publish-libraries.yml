@@ -47,7 +47,7 @@ jobs:
         run: npm clean-install
 
       - name: Lint libraries
-        run: npm exec -- nx run-many -t lint --projects=tag:type:lib
+        run: npx just eslint-libraries
 
       - name: Test libraries
         run: npm exec -- nx run-many -t test --projects=tag:type:lib

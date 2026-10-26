@@ -14,8 +14,6 @@
     "test:watch": "nx test webapp --watch",
     "e2e": "nx e2e webapp",
     "e2e:ui": "nx e2e webapp --ui",
-    "lint": "nx lint webapp",
-    "lint:fix": "nx lint webapp --fix",
     "check:circular-dependencies": "nx check-circular webapp",
     "translate:extract": "nx translate-extract webapp",
     "translate:merge": "nx translate-merge webapp"
