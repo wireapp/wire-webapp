@@ -18,10 +18,12 @@
  */
 
 import {fireEvent, RenderResult} from '@testing-library/react';
+import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {noop} from 'noop-esm';
 
 import {AccountForm} from './accountForm';
 
+import {AUTH_ACTION} from '../module/action/creator/authActionCreator';
 import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/testUtil';
@@ -136,6 +138,27 @@ describe('when entering account data', () => {
       fireEvent.submit(doNextButton());
 
       expect(validationErrorMessage().innerHTML).toContain(expectedErrorMessage);
+    });
+
+    it('from a previous submit is cleared when submitting again', () => {
+      const store = mockStoreFactory()({
+        ...initialRootState,
+        authState: {
+          account: {
+            email: 'new-email@email.com',
+            name: 'name',
+            password: 'Ab1!Ab1!Ab1!Ab1!Ab1!',
+            termsAccepted: true,
+          },
+          error: new BackendError('The given e-mail address is in use.', BackendErrorLabel.KEY_EXISTS, 409),
+        },
+      });
+      wrapper = mountComponent(<AccountForm onSubmit={noop} />, store);
+
+      fireEvent.change(wrapper.getByTestId('enter-confirm-password'), {target: {value: 'mismatch'}});
+      fireEvent.submit(doNextButton());
+
+      expect(store.getActions()).toContainEqual({type: AUTH_ACTION.AUTH_RESET_ERROR});
     });
   });
 });

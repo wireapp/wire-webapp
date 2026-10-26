@@ -65,6 +65,7 @@ const AccountFormComponent: FunctionComponent<Props & ConnectedProps & DispatchP
   isFetching,
   onSubmit,
   pushAccountRegistrationData,
+  resetAuthError,
   beforeSubmit,
 }: Props & ConnectedProps & DispatchProps) => {
   const {translate} = useApplicationContext();
@@ -102,6 +103,7 @@ const AccountFormComponent: FunctionComponent<Props & ConnectedProps & DispatchP
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
+    void resetAuthError();
     const errors: Error[] | ValidationError[] = [];
     const newValidInputs: Record<string, boolean> = {};
     Object.entries(inputs).forEach(([inputKey, currentInput]) => {
@@ -396,12 +398,14 @@ type DispatchProps = ReturnType<typeof mapDispatchToProps>;
 type MapDispatchToPropsResult = {
   doSendActivationCode: (email: string) => ThunkAction;
   pushAccountRegistrationData: (registration: Partial<RegistrationDataState>) => ThunkAction;
+  resetAuthError: () => ThunkAction;
 };
 const mapDispatchToProps = (dispatch: Dispatch<AnyAction>): MapDispatchToPropsResult => {
   return bindActionCreators(
     {
       doSendActivationCode: ROOT_ACTIONS.userAction.doSendActivationCode,
       pushAccountRegistrationData: ROOT_ACTIONS.authAction.pushAccountRegistrationData,
+      resetAuthError: ROOT_ACTIONS.authAction.resetAuthError,
     },
     dispatch,
   );
