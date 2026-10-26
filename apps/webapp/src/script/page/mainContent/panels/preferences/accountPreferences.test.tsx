@@ -38,7 +38,9 @@ import {translateForTest} from 'Util/test/translateForTest';
 
 import {AccountPreferences} from './accountPreferences';
 
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
 
 const mockProps = {
   appLockRepository: {} as unknown as AppLockRepository,

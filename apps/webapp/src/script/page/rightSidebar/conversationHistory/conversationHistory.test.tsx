@@ -32,7 +32,9 @@ import {translateForTest} from 'Util/test/translateForTest';
 
 import {ConversationHistory} from './conversationHistory';
 
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
 
 function renderConversationHistory(): ReturnType<typeof render> {
   return render(withTheme(<ConversationHistory onClose={jest.fn()} onGoBack={jest.fn()} />), {
@@ -63,7 +65,9 @@ describe('ConversationHistory — upgrade banner', () => {
 
     renderConversationHistory();
 
-    expect(screen.queryByRole('button', {name: translateForTest('createConversationUpgradePlanModalButton')})).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', {name: translateForTest('createConversationUpgradePlanModalButton')}),
+    ).not.toBeInTheDocument();
   });
 
   it('shows the upgrade banner for regular users', () => {
@@ -73,6 +77,8 @@ describe('ConversationHistory — upgrade banner', () => {
 
     renderConversationHistory();
 
-    expect(screen.queryByRole('button', {name: translateForTest('createConversationUpgradePlanModalButton')})).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', {name: translateForTest('createConversationUpgradePlanModalButton')}),
+    ).toBeInTheDocument();
   });
 });
