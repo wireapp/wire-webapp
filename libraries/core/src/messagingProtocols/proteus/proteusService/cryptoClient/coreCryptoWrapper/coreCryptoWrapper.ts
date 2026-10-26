@@ -20,6 +20,7 @@
 import {PreKey} from '@wireapp/api-client/lib/auth';
 import {Encoder} from 'bazinga64';
 import {deleteDB} from 'idb';
+import {result, type Result} from 'true-myth';
 
 import {LogFactory} from '@wireapp/commons';
 import {
@@ -30,6 +31,7 @@ import {
   version as CCVersion,
   initWasmModule,
   migrateDatabaseKeyTypeToBytes,
+  Database,
   DatabaseKey,
 } from '@wireapp/core-crypto';
 import type {CRUDEngine} from '@wireapp/store-engine';
@@ -66,7 +68,7 @@ const logFunctions: Record<CoreCryptoLogLevel, Function> = {
 };
 
 const coreCryptoLogger = {
-  log: (level: CoreCryptoLogLevel, message: string, context: string) => {
+  log: (level: CoreCryptoLogLevel, message: string, context: string | undefined) => {
     logFunctions[level].call(logger, {message, context});
   },
 };
@@ -125,10 +127,43 @@ export const getCoreCryptoDbName = (storeEngine: CRUDEngine): string => {
   return `corecrypto-${storeEngine.storeName}`;
 };
 
+let coreCryptoInstance: CoreCrypto | undefined;
+let coreCryptoDatabase: Database | undefined;
+
+const destroyCoreCryptoHandles = (): Result<void, Error> => {
+  const instance = coreCryptoInstance;
+  const database = coreCryptoDatabase;
+
+  // Clear the references first so a failed destroy cannot leave handles that
+  // might be destroyed a second time on a later wipe attempt.
+  coreCryptoInstance = undefined;
+  coreCryptoDatabase = undefined;
+
+  const instanceDestroyResult = result.tryOrElse(
+    cause => new Error('Failed to destroy the CoreCrypto instance', {cause}),
+    () => {
+      instance?.uniffiDestroy();
+    },
+  );
+  const databaseDestroyResult = result.tryOrElse(
+    cause => new Error('Failed to destroy the CoreCrypto database', {cause}),
+    () => {
+      database?.uniffiDestroy();
+    },
+  );
+
+  // Both operations have already run. Combining their results preserves the
+  // first failure while still surfacing a database-only failure.
+  return instanceDestroyResult.and(databaseDestroyResult);
+};
+
 export const wipeCoreCryptoDb = async (storeEngine: CRUDEngine): Promise<void> => {
   const coreCryptoDbName = getCoreCryptoDbName(storeEngine);
   try {
-    await coreCryptoInstance?.close();
+    const destroyResult = destroyCoreCryptoHandles();
+    if (result.isErr(destroyResult)) {
+      throw destroyResult.error;
+    }
     await deleteDB(coreCryptoDbName);
     logger.log('info', 'CoreCrypto DB wiped successfully');
   } catch {
@@ -136,7 +171,6 @@ export const wipeCoreCryptoDb = async (storeEngine: CRUDEngine): Promise<void> =
   }
 };
 
-let coreCryptoInstance: CoreCrypto | undefined;
 export async function buildClient(
   storeEngine: CRUDEngine,
   {generateSecretKey, nbPrekeys, onNewPrekeys}: Config,
@@ -165,10 +199,8 @@ export async function buildClient(
           }
         }
 
-        coreCryptoInstance = await CoreCrypto.deferredInit({
-          databaseName: coreCryptoDbName,
-          key: key.key,
-        });
+        coreCryptoDatabase = await Database.open(coreCryptoDbName, key.key);
+        coreCryptoInstance = CoreCrypto.new(coreCryptoDatabase);
 
         setLogger(coreCryptoLogger);
         setMaxLogLevel(CoreCryptoLogLevel.Info);
