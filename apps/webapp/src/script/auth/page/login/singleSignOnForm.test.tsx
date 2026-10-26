@@ -18,6 +18,7 @@
  */
 
 import {fireEvent, waitFor} from '@testing-library/react';
+import {ClientType} from '@wireapp/api-client/lib/client';
 
 import {TypeUtil} from '@wireapp/commons';
 import {noop} from 'noop-esm';
@@ -262,17 +263,20 @@ describe('SingleSignOnForm', () => {
           },
         }}
       />,
-      mockStoreFactory()(initialRootState),
+      mockStoreFactory()({
+        ...initialRootState,
+        authState: {...initialRootState.authState, loginData: {clientType: ClientType.TEMPORARY}},
+      }),
     );
 
     const codeOrEmailInput = getByTestId(codeOrEmailInputId) as HTMLInputElement;
     const submitButton = getByTestId(submitButtonId) as HTMLInputElement;
     const temporaryCheckbox = getByTestId(temporaryCheckboxId) as HTMLInputElement;
 
+    expect(temporaryCheckbox.checked).toBe(true);
     expect(submitButton.disabled).toBe(true);
 
     fireEvent.change(codeOrEmailInput, {target: {value: email}});
-    fireEvent.click(temporaryCheckbox);
 
     expect(submitButton.disabled).toBe(false);
 
@@ -282,5 +286,25 @@ describe('SingleSignOnForm', () => {
       expect(actionRoot.authAction.doGetDomainInfo).toHaveBeenCalledTimes(1);
       expect(actionRoot.navigationAction.doNavigate).toHaveBeenCalledWith(expectedHost);
     });
+  });
+
+  it('stores the public computer choice in the shared login data', () => {
+    spyOn<{getConfig: () => TypeUtil.RecursivePartial<Configuration>}>(Config, 'getConfig').and.returnValue({
+      FEATURE: {
+        ENABLE_DOMAIN_DISCOVERY: true,
+      },
+    });
+    spyOn(actionRoot.authAction, 'pushLoginData').and.returnValue(() => {
+      return Promise.resolve();
+    });
+
+    const {getByTestId} = mountComponent(
+      <SingleSignOnForm {...{doLogin: () => {return Promise.resolve()}}} />,
+      mockStoreFactory()(initialRootState),
+    );
+
+    fireEvent.click(getByTestId(temporaryCheckboxId));
+
+    expect(actionRoot.authAction.pushLoginData).toHaveBeenCalledWith({clientType: ClientType.TEMPORARY});
   });
 });
