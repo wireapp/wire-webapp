@@ -57,7 +57,7 @@ env:
 jobs:
   publish_distribution:
     name: Publish Docker, Helm, and wire-builds distribution
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       actions: read
       contents: read
