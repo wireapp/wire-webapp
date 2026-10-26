@@ -372,12 +372,17 @@ describe('CallingRepository', () => {
         createSftCallingFixture();
       repository['isOnAvsStagingSft'] = true;
       await requestConfig();
-      const stagingSftServers = [{urls: ['https://rust-sft.stars.wire.link']}];
+      const stagingSftServers = [{urls: ['https://sft.calling-staging-v01.zinfra.io']}];
+      const stagingSftServerAll = [{urls: [
+          'https://sft.calling-staging-v01.zinfra.io/sfts/sftd-0',
+          'https://sft.calling-staging-v01.zinfra.io/sfts/sftd-1'
+        ]
+      }];
 
       expect(configUpdate).toHaveBeenLastCalledWith(
         avsUser,
         0,
-        JSON.stringify({...backendConfig, sft_servers: stagingSftServers, sft_servers_all: stagingSftServers}),
+        JSON.stringify({...backendConfig, sft_servers: stagingSftServers, sft_servers_all: stagingSftServerAll}),
       );
       expect(backendConfig.sft_servers).toEqual([{urls: ['https://initial.example.com']}]);
       expect(backendConfig.sft_servers_all).toEqual([{urls: ['https://joinable.example.com:8443']}]);
@@ -387,7 +392,7 @@ describe('CallingRepository', () => {
 
       expect(postSftRequest).not.toHaveBeenCalled();
 
-      await sendRequest('https://rust-sft.stars.wire.link/sft/conversation-id');
+      await sendRequest('https://sft.calling-staging-v01.zinfra.io/sfts/conversation-id');
 
       expect(postSftRequest).toHaveBeenCalledTimes(1);
     });
