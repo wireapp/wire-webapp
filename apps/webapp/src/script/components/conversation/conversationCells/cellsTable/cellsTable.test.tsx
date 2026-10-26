@@ -158,6 +158,7 @@ const renderCellsTable = ({
   random = () => {
     return 0.5;
   },
+  selectionBarAnchor = document.body,
 }: {
   readonly folderPath?: string;
   readonly onDropFilesToFolder?: (files: readonly File[], uploadPath: string) => void;
@@ -173,6 +174,7 @@ const renderCellsTable = ({
   readonly selfUserDriveRole?: CellsSelfUserDriveRole;
   readonly clock?: ReturnType<typeof createDeterministicClock>;
   readonly random?: () => number;
+  readonly selectionBarAnchor?: HTMLElement | null;
 } = {}): {
   file: CellNode;
   folder: CellNode;
@@ -231,7 +233,7 @@ const renderCellsTable = ({
               onToggleSort={jest.fn()}
               selectionEnabled={isSelectionEnabled}
               selectionScopeKey={scopeKey}
-              selectionBarAnchor={document.body}
+              selectionBarAnchor={selectionBarAnchor}
               random={random}
             />
           </CellsSelfUserDriveRoleProvider>
@@ -514,6 +516,8 @@ describe('CellsTable selection', () => {
     window.location.hash = '#/conversation/conversation-id@example.com/files/Drive';
     const user = userEvent.setup();
     const onRefresh = jest.fn();
+    const breadcrumbAnchor = document.createElement('div');
+    document.body.appendChild(breadcrumbAnchor);
     const repository = {
       getAllNodes: jest.fn().mockResolvedValue({Nodes: []}),
       moveNodes: jest.fn().mockResolvedValue({
@@ -535,7 +539,12 @@ describe('CellsTable selection', () => {
         type: CellNodeType.FILE,
       }),
     ];
-    renderCellsTable({cellsRepository: repository, initialNodes: selectedFiles, onRefresh});
+    renderCellsTable({
+      cellsRepository: repository,
+      initialNodes: selectedFiles,
+      onRefresh,
+      selectionBarAnchor: breadcrumbAnchor,
+    });
 
     await user.click(screen.getByRole('checkbox', {name: 'Select Moved.pdf'}));
     await user.click(screen.getByRole('checkbox', {name: 'Select Not reported.pdf'}));
@@ -545,15 +554,20 @@ describe('CellsTable selection', () => {
     await user.click(within(dialog).getByRole('button', {name: 'Move'}));
 
     const reviewDialog = await screen.findByRole('dialog');
-    expect(within(reviewDialog).getByRole('alert')).toHaveTextContent(
-      'The move may be incomplete. Check item locations before trying again. Move stays disabled in this view.',
-    );
+    const warningCopy =
+      'The move may be incomplete. Check item locations before trying again. Move stays disabled in this view.';
+    expect(within(reviewDialog).getByRole('alert')).toHaveTextContent(warningCopy);
+    const tableRegion = screen.getByRole('table').parentElement;
+    expect(tableRegion).not.toBeNull();
+    expect(within(tableRegion as HTMLElement).getByRole('status')).toHaveTextContent(warningCopy);
+    expect(within(breadcrumbAnchor).queryByText(warningCopy)).not.toBeInTheDocument();
     expect(within(reviewDialog).getByRole('alert')).not.toHaveTextContent('Moved.pdf');
     expect(within(reviewDialog).getByRole('alert')).not.toHaveTextContent('Not reported.pdf');
     expect(screen.queryByText('Moved 2 items')).not.toBeInTheDocument();
     expect(within(reviewDialog).getByRole('button', {name: 'Move'})).toBeDisabled();
     expect(repository.moveNodes).toHaveBeenCalledTimes(1);
     expect(onRefresh).toHaveBeenCalledTimes(1);
+    breadcrumbAnchor.remove();
     window.location.hash = originalHash;
   });
 

@@ -39,6 +39,17 @@ export const selectionBarContainerStyles: CSSObject = {
   pointerEvents: 'none',
 };
 
+export const moveOutcomeMessageStyles: CSSObject = {
+  margin: '0 0 12px',
+  padding: '12px 16px',
+  border: '1px solid var(--border-color)',
+  borderRadius: '8px',
+  backgroundColor: 'var(--foreground-fade-8)',
+  color: 'var(--main-color)',
+  fontSize: 'var(--font-size-small)',
+  lineHeight: 1.5,
+};
+
 export const selectionBarStyles: CSSObject = {
   position: 'absolute',
   zIndex: 1,

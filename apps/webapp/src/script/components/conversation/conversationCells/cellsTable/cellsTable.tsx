@@ -56,6 +56,7 @@ import {
   folderDropOverlayTitleStyles,
   folderDropTargetRowStyles,
   headerCellStyles,
+  moveOutcomeMessageStyles,
   tableActionsCellStyles,
   tableCellRow,
   tableCellStyles,
@@ -672,17 +673,6 @@ export const CellsTable = ({
           selectionBarAnchor !== null &&
           createPortal(
             <div css={selectionBarContainerStyles}>
-              {isBulkMoveOutcomeUnresolved && (
-                <p role="status">
-                  {isBulkMoveRequestError
-                    ? translate('cells.newItemMenuModalForm.genericError')
-                    : translate(
-                        isBulkMovePartialOutcome
-                          ? 'cells.bulkMove.partialMoveWarning'
-                          : 'cells.bulkMove.outcomeUnresolved',
-                      )}
-                </p>
-              )}
               {selectedNodeIds.size > 0 && (
                 <div css={selectionBarStyles} role="status" aria-live="polite">
                   <button
@@ -760,6 +750,15 @@ export const CellsTable = ({
                 {activeFolderDropTargetName}
               </span>
             </p>
+          </div>
+        )}
+        {isBulkMoveOutcomeUnresolved && (
+          <div css={moveOutcomeMessageStyles} role="status" aria-live="polite">
+            {isBulkMoveRequestError
+              ? translate('cells.newItemMenuModalForm.genericError')
+              : translate(
+                  isBulkMovePartialOutcome ? 'cells.bulkMove.partialMoveWarning' : 'cells.bulkMove.outcomeUnresolved',
+                )}
           </div>
         )}
         <table css={tableStyles}>
