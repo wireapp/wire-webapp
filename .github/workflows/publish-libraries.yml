@@ -46,14 +46,14 @@ jobs:
       - name: Install dependencies
         run: npm clean-install
 
-      - name: Lint libraries
-        run: npx just eslint-libraries
+      - name: Build libraries for lint import resolution
+        run: npm exec -- nx run-many -t build --projects=tag:type:lib
+
+      - name: Lint repository (ESLint)
+        run: npx just eslint
 
       - name: Test libraries
         run: npm exec -- nx run-many -t test --projects=tag:type:lib
-
-      - name: Build libraries
-        run: npm exec -- nx run-many -t build --projects=tag:type:lib
 
       - name: Create version PR
         run: |

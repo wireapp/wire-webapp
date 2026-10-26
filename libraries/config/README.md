@@ -290,7 +290,7 @@ nx run config-lib:type-check
 ### Lint
 
 ```bash
-nx run config-lib:lint
+npx just eslint
 ```
 
 ## License

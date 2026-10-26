@@ -335,10 +335,10 @@ jobs:
       - name: Build libraries for lint import resolution
         run: npm exec -- nx run-many -t build --projects=tag:type:lib
 
-      - name: Lint all projects (ESLint)
-        run: npx just eslint-all
+      - name: Lint repository
+        run: npx just eslint
 
-      - name: Check formatting (Prettier)
+      - name: Check formatting
         run: npx just format-check
 
       - name: Stylelint

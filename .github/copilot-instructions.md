@@ -100,9 +100,9 @@ Review in this exact order:
 
 ---
 
-## NX WORKFLOW (MANDATORY)
+## Repository Task Runners
 
-**ALWAYS use Nx commands:**
+Use Just for ESLint and migrated repository quality checks. Use Nx for build, test, and other tasks that have not migrated yet.
 ```bash
 # Development
 nx run webapp:serve
@@ -116,7 +116,8 @@ nx run-many -t test --all
 nx affected -t test
 
 # Linting
-nx run-many -t lint --all
+npx just eslint
+npx just eslint-fix
 ```
 
 **MCP Tools Available:**
