@@ -3,7 +3,7 @@
 
 # General Guidelines for working with Nx
 
-- When running tasks (for example build, lint, test, e2e, etc.), always prefer running the task through `nx` (i.e. `nx run`, `nx run-many`, `nx affected`) instead of using the underlying tooling directly
+- Use `npx just` for ESLint and the migrated repository quality checks. Use Nx for build, test, e2e, and other tasks that have not migrated.
 - You have access to the Nx MCP server and its tools, use them to help the user
 - When answering questions about the repository, use the `nx_workspace` tool first to gain an understanding of the workspace architecture where applicable.
 - When working in individual projects, use the `nx_project_details` mcp tool to analyze and understand the specific project structure and dependencies
@@ -43,10 +43,10 @@ Library Nx project names end with `-lib`, such as `core-lib` or `api-client-lib`
 For investigation, run ESLint once with JSON to `/tmp`, then analyze with `jq`, `rg`, or `node` — do not re-run ESLint for each query.
 
 ```bash
-npm exec -- eslint --config eslint.config.mjs --no-cache -f json -o /tmp/eslint-output.json apps/webapp/src
+npm exec -- eslint --config eslint.config.mjs --cache --cache-strategy content --cache-location target/eslint/investigation -f json -o /tmp/eslint-output.json apps/webapp/src
 ```
 
-Per-file checks: pass a single file path as the last argument, not `npm exec -- nx run webapp:lint`.
+Per-file checks: pass a single file path as the last argument. Full repository checks run through `npx just eslint`.
 
 ## TypeScript and JavaScript
 
@@ -57,7 +57,7 @@ Per-file checks: pass a single file path as the last argument, not `npm exec -- 
 ## Git
 
 - Commit messages must include a concise subject and a description body explaining what changed and why.
-- When changes are ready to commit, prompt the user to run checks first: `npm run type-check`, `BASE_REF=main npm run lint:affected` (includes `npx just format-check` and `npx just stylesheet-lint`), and relevant `npm exec -- nx run <project>:test` for touched projects.
+- When changes are ready to commit, prompt the user to run checks first: `npm run type-check`, `npx just eslint`, `npx just format-check`, `npx just stylesheet-lint`, and relevant `npm exec -- nx run <project>:test` for touched projects.
 
 ## Webapp code rules
 

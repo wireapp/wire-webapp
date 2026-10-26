@@ -101,20 +101,6 @@
         "cwd": "{workspaceRoot}"
       }
     },
-    "lint": {
-      "executor": "nx:run-commands",
-      "dependsOn": [],
-      "options": {
-        "command": "eslint --config eslint.config.mjs --max-warnings=266 --cache --cache-location node_modules/.cache/eslint/webapp --ext .js,.jsx,.ts,.tsx,.cjs,.mjs,.mts {projectRoot}"
-      }
-    },
-    "lint:full": {
-      "executor": "nx:run-commands",
-      "dependsOn": ["stylelint", "type-check", "lint"],
-      "options": {
-        "command": "echo 'Full lint checks complete'"
-      }
-    },
     "stylelint": {
       "executor": "nx:run-commands",
       "options": {

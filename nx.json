@@ -13,11 +13,6 @@
       "cache": true,
       "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"]
     },
-    "lint": {
-      "dependsOn": [],
-      "cache": true,
-      "inputs": ["default", "{workspaceRoot}/eslint.config.mjs"]
-    },
     "type-check": {
       "dependsOn": ["^build"],
       "cache": true,

@@ -27,7 +27,7 @@ No license is granted to the Wire trademark and its associated logos, all of whi
 - `libraries/core/`: `@wireapp/core` package - Wire's communication core library handling authentication, WebSocket connections, and protocol messaging
 - Root-level tooling (`package.json`, `justfile`, Nx, and bin scripts) provides commands shared by apps and libraries
 
-The root npm workspaces and local Nx remain the existing build and application task entry points. Use `npx just --list` to discover the native repository tooling recipes; existing npm scripts and workflows remain supported.
+Use `npx just --list` to discover native repository tasks, including all ESLint checks. Nx remains responsible for build, test, compilation, and server tasks that have not migrated yet.
 
 # How to Build the Open Source Client
 
@@ -122,7 +122,9 @@ CI runs the Nx/Jest test targets with `--configuration=ci`, which generates cove
 
 Other useful tasks:
 
-- Lint: `npm run lint`
+- Lint: `npx just lint`
+- ESLint only: `npx just eslint`
+- Fix ESLint issues: `npx just eslint-fix`
 - Type-check: `npm exec -- nx run-many -t type-check --all`
 - E2E (Playwright): `npm exec -- nx e2e webapp`
 
