@@ -17,7 +17,7 @@
  *
  */
 
-import {render, screen} from '@testing-library/react';
+import {render} from '@testing-library/react';
 import {container} from 'tsyringe';
 
 import {User} from 'Repositories/entity/User';
@@ -46,7 +46,9 @@ describe('ConversationHistory — team creation banner', () => {
 
   beforeEach(() => {
     originalIsConferenceCallingEnabled = teamState.isConferenceCallingEnabled;
-    (teamState as any).isConferenceCallingEnabled = () => false;
+    (teamState as any).isConferenceCallingEnabled = () => {
+      return false;
+    };
   });
 
   afterEach(() => {
