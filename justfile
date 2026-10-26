@@ -21,7 +21,7 @@ stylesheet-lint:
 [group('lint')]
 [arg("fix", long, value="true")]
 eslint fix="false":
-    eslint . --config eslint.config.mjs --max-warnings=287 --cache --cache-strategy content --cache-location target/eslint/eslint-{{fix}} {{if fix == "true" { "--fix" } else { "" }}}
+    eslint . --config eslint.config.mjs --max-warnings=287 --cache --cache-strategy content --cache-location ./target/eslintcache {{if fix == "true" { "--fix" } else { "" }}}
 
 # Automatically fix eligible ESLint issues across the repository.
 [group('lint')]
