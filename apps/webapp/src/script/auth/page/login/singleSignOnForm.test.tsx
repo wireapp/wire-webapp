@@ -17,13 +17,21 @@
  *
  */
 
-import {fireEvent, waitFor} from '@testing-library/react';
+import {fireEvent, render, waitFor} from '@testing-library/react';
 import {ClientType} from '@wireapp/api-client/lib/client';
 
 import {TypeUtil} from '@wireapp/commons';
 import {noop} from 'noop-esm';
+import {Provider} from 'react-redux';
+import {HashRouter as Router} from 'react-router';
 
-import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {
+  createExecutingFireAndForgetInvokerForTest,
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+  requireValueForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
+import {translateForTest} from 'Util/test/translateForTest';
 
 import {SingleSignOnForm} from './singleSignOnForm';
 
@@ -33,7 +41,7 @@ import {ValidationError} from '../../module/action/validationError';
 import {initialRootState} from '../../module/reducer';
 import {ROUTE, QUERY_KEY} from '../../route';
 import {mockStoreFactory} from '../../util/test/mockStoreFactory';
-import {mountComponent} from '../../util/test/testUtil';
+import {mountComponent, withIntl, withThemeAndRootContext} from '../../util/test/testUtil';
 
 jest.mock('@wireapp/react-ui-kit', () => {
   const actualModule = jest.requireActual('@wireapp/react-ui-kit');
@@ -288,7 +296,7 @@ describe('SingleSignOnForm', () => {
     });
   });
 
-  it('stores the public computer choice in the shared login data', () => {
+  it('stores the public computer choice in the shared login data', async () => {
     spyOn<{getConfig: () => TypeUtil.RecursivePartial<Configuration>}>(Config, 'getConfig').and.returnValue({
       FEATURE: {
         ENABLE_DOMAIN_DISCOVERY: true,
@@ -298,19 +306,36 @@ describe('SingleSignOnForm', () => {
       return Promise.resolve();
     });
 
-    const {getByTestId} = mountComponent(
-      <SingleSignOnForm
-        {...{
-          doLogin: () => {
-            return Promise.resolve();
-          },
-        }}
-      />,
-      mockStoreFactory()(initialRootState),
+    const rootProviderWrapper = createRootProviderWrapperForTest(
+      createRootContextValueForTest({
+        fireAndForgetInvoker: createExecutingFireAndForgetInvokerForTest(),
+        translate: translateForTest,
+      }),
+    );
+
+    const {getByTestId} = render(
+      <Router>
+        {withThemeAndRootContext(
+          <Provider store={mockStoreFactory()(initialRootState)}>
+            {withIntl(
+              <SingleSignOnForm
+                {...{
+                  doLogin: () => {
+                    return Promise.resolve();
+                  },
+                }}
+              />,
+            )}
+          </Provider>,
+          rootProviderWrapper,
+        )}
+      </Router>,
     );
 
     fireEvent.click(getByTestId(temporaryCheckboxId));
 
-    expect(actionRoot.authAction.pushLoginData).toHaveBeenCalledWith({clientType: ClientType.TEMPORARY});
+    await waitFor(() => {
+      expect(actionRoot.authAction.pushLoginData).toHaveBeenCalledWith({clientType: ClientType.TEMPORARY});
+    });
   });
 });

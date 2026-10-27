@@ -84,7 +84,7 @@ const SingleSignOnFormComponent: FunctionComponent<SingleSignOnFormProps & Conne
   account,
   loginData,
 }: SingleSignOnFormProps & ConnectedProps & DispatchProps) => {
-  const {translate} = useApplicationContext();
+  const {fireAndForgetInvoker, translate} = useApplicationContext();
   const codeOrMailInput = useRef<HTMLInputElement>(null);
   const [codeOrMail, setCodeOrMail] = useState(account.email ?? '');
   const [disableInput, setDisableInput] = useState(false);
@@ -157,9 +157,11 @@ const SingleSignOnFormComponent: FunctionComponent<SingleSignOnFormProps & Conne
   useEffect(() => {
     const queryClientType = UrlUtil.getURLParameter(QUERY_KEY.CLIENT_TYPE);
     if (queryClientType === ClientType.TEMPORARY) {
-      void pushLoginData({clientType: ClientType.TEMPORARY});
+      fireAndForgetInvoker.fireAndForget(async () => {
+        await pushLoginData({clientType: ClientType.TEMPORARY});
+      });
     }
-  }, [pushLoginData]);
+  }, [fireAndForgetInvoker, pushLoginData]);
 
   useEffect(() => {
     const queryLogoutReason = UrlUtil.getURLParameter(QUERY_KEY.LOGOUT_REASON);
@@ -399,7 +401,10 @@ const SingleSignOnFormComponent: FunctionComponent<SingleSignOnFormProps & Conne
             name="enter-public-computer-sso-sign-in"
             id="enter-public-computer-sso-sign-in"
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              void pushLoginData({clientType: event.target.checked ? ClientType.TEMPORARY : ClientType.PERMANENT});
+              const isChecked = event.target.checked;
+              fireAndForgetInvoker.fireAndForget(async () => {
+                await pushLoginData({clientType: isChecked ? ClientType.TEMPORARY : ClientType.PERMANENT});
+              });
             }}
             checked={clientType === ClientType.TEMPORARY}
             data-uie-name="enter-public-computer-sso-sign-in"
