@@ -262,7 +262,7 @@ jobs:
         run: npm clean-install
 
       - name: Type check
-        run: npm run type-check
+        run: npx just type-check
 
   lint-file-names:
     runs-on: ubuntu-26.04-arm

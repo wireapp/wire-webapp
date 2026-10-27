@@ -34,12 +34,6 @@
         "command": "node bin/copyAssets.mts && tsc --build tsconfig.json tsconfig.commonjs.json --watch --preserveWatchOutput",
         "cwd": "{projectRoot}"
       }
-    },
-    "type-check": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "tsc --project {projectRoot}/tsconfig.json --noEmit && tsc --project {projectRoot}/tsconfig.commonjs.json --noEmit && tsc --project {projectRoot}/tsconfig.type-check.json"
-      }
     }
   },
   "tags": ["type:lib", "scope:telemetry"]

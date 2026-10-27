@@ -27,7 +27,7 @@ No license is granted to the Wire trademark and its associated logos, all of whi
 - `libraries/core/`: `@wireapp/core` package - Wire's communication core library handling authentication, WebSocket connections, and protocol messaging
 - Root-level tooling (`package.json`, `justfile`, Nx, and bin scripts) provides commands shared by apps and libraries
 
-Use `npx just --list` to discover native repository tasks, including unit tests and ESLint checks. Nx remains responsible for build, compilation, and server tasks that have not migrated yet.
+Use `npx just --list` to discover native repository tasks, including type checks, unit tests, and ESLint checks. Nx remains responsible for workspace builds and server tasks that have not migrated yet.
 
 # How to Build the Open Source Client
 
@@ -125,7 +125,7 @@ Other useful tasks:
 - Lint: `npx just lint`
 - ESLint only: `npx just eslint`
 - Fix ESLint issues: `npx just eslint-fix`
-- Type-check: `npx nx run-many -t type-check --all`
+- Type-check: `npx just type-check`
 - E2E (Playwright): `npx nx e2e webapp`
 
 ## CI Status

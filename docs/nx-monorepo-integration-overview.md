@@ -1083,13 +1083,13 @@ ESLint uses its native content cache under `target/eslint/`. CI builds libraries
 
 1. ESLint with type-aware linting can be slower
 2. ESLint checks all configured projects; its native content cache skips unchanged files
-3. Consider running type-check separately: `nx type-check <project>`
+3. Run the repository type checks with `npx just type-check`
 
 ---
 
 ## Why Use Nx for Nx-Managed Workflows
 
-Nx continues to manage build, packaging, and server tasks. Unit tests, ESLint, and migrated repository quality checks run through the root Just recipes.
+Nx continues to manage build, packaging, and server tasks. Type-checking, unit tests, and ESLint run through the root Just recipes.
 
 ### 1. Dependency Graph Resolution
 
@@ -1244,19 +1244,23 @@ Nx runs a daemon process that maintains the project graph in memory for faster o
 - Slower startup times
 - Repeated file analysis
 
-### 7. Avoiding Direct Tool Usage
+### 7. Running Nx-Managed Tools
 
-Running Nx-managed tools directly (Rspack, Jest, and TypeScript) can cause several issues:
+Nx continues to manage production builds and server tasks. The Just recipes manage TypeScript checks, unit tests, and linting.
 
-| Issue | Running with Nx | Running Directly |
-|--------|----------------|-----------------|
-| **Dependency order** | Automatic | Manual, error-prone |
-| **Caching** | Automatic | None |
-| **Affected detection** | Available | Not available |
-| **Parallel execution** | Optimized | Manual |
-| **CI consistency** | Guaranteed | Not guaranteed |
-| **Project graph** | Aware | Unaware |
-| **Performance** | Optimized | Slower |
+Use Nx for production builds and server tasks:
+
+```bash
+npm exec -- nx run webapp:build
+```
+
+Use Just for repository TypeScript checks, unit tests, and ESLint:
+
+```bash
+npx just type-check
+npx just test
+npx just eslint
+```
 
 ### Common Pitfalls
 
@@ -1280,20 +1284,16 @@ npm --workspace=@wireapp/webapp run test
 npm exec -- nx run webapp:test
 ```
 
-**Running `tsc` directly:**
+**Type-checking TypeScript:**
 
 ```bash
-# DON'T DO THIS
-tsc --project apps/webapp/tsconfig.json
-
-# INSTEAD DO THIS
-nx type-check webapp
+npx just type-check
 ```
 
 ### Best Practices
 
-1. **Use Just for migrated tasks** - Run ESLint with `npx just eslint` and fixes with `npx just eslint-fix`
-2. **Use Nx for remaining tasks** - Nx manages build, test, package, and server execution
+1. **Use Just for migrated checks** - Run type-checking with `npx just type-check`, unit tests with `npx just test`, and ESLint with `npx just eslint` or fixes with `npx just eslint-fix`
+2. **Use Nx for remaining tasks** - Nx manages builds, packaging, and server execution
 3. **Use `nx run-many`** - When you need to run Nx tasks on multiple projects
 4. **Use `nx affected`** - When you only want to run supported Nx tasks on changed projects
 5. **Check `nx graph`** - To understand the project structure

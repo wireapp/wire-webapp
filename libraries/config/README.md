@@ -284,7 +284,7 @@ nx run config-lib:build
 ### Type Check
 
 ```bash
-nx run config-lib:type-check
+npx just type-check
 ```
 
 ### Lint

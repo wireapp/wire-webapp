@@ -72,8 +72,33 @@ type-check-release-appearance:
 type-check-release-cli:
     tsc --project ./tsconfig.release-cli.json --noEmit
 
-# Build workspace libraries required by the application and library test suites.
-[group('testing')]
+# Type-check every configuration currently covered by Nx, in sequence.
+[group('type-check')]
+type-check: build-libraries tooling-type-check
+    tsc --project ./apps/webapp/tsconfig.type-check.json --noEmit
+    tsc --project ./apps/webapp/tsconfig.rspack.json --noEmit
+    tsc --project ./apps/server/tsconfig.json --noEmit
+    tsc --project ./apps/server/bin/tsconfig.json --noEmit
+    tsc --project ./libraries/api-client/tsconfig.type-check.json --noEmit
+    tsc --project ./libraries/bazinga64/tsconfig.type-check.json --noEmit
+    tsc --project ./libraries/certificate-check/tsconfig.type-check.json --noEmit
+    tsc --project ./libraries/commons/tsconfig.type-check.json --noEmit
+    tsc --project ./libraries/config/tsconfig.type-check.json --noEmit
+    tsc --project ./libraries/copy-config/tsconfig.type-check.json --noEmit
+    tsc --project ./libraries/core/tsconfig.type-check.json --noEmit
+    tsc --project ./libraries/license-collector/tsconfig.json --noEmit
+    tsc --project ./libraries/priority-queue/tsconfig.type-check.json --noEmit
+    tsc --project ./libraries/react-ui-kit/tsconfig.type-check.json --noEmit
+    tsc --project ./libraries/store-engine/tsconfig.type-check.json --noEmit
+    tsc --project ./libraries/store-engine-dexie/tsconfig.type-check.json --noEmit
+    tsc --project ./libraries/store-engine-fs/tsconfig.type-check.json --noEmit
+    tsc --project ./libraries/telemetry/tsconfig.json --noEmit
+    tsc --project ./libraries/telemetry/tsconfig.commonjs.json --noEmit
+    tsc --project ./libraries/telemetry/tsconfig.type-check.json
+    tsc --project ./libraries/webapp-events/tsconfig.json --noEmit
+
+# Build workspace libraries required by dependent tasks such as type-checking and tests.
+[group('build')]
 build-libraries:
     npx nx run-many -t build --projects=tag:type:lib
 
