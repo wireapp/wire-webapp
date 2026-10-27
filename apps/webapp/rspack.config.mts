@@ -318,6 +318,8 @@ function createRspackConfiguration(mode: 'development' | 'production' = 'product
     resolve: {
       alias: {
         '@enormora/fire-and-forget$': path.resolve(rootPath, 'node_modules/@enormora/fire-and-forget/index.js'),
+        // core-lib is compiled to CommonJS, but core-crypto only declares an `import` export condition
+        '@wireapp/core-crypto$': path.resolve(rootPath, 'node_modules/@wireapp/core-crypto/dist/corecrypto.js'),
         Components: path.resolve(scriptPath, 'components'),
         Hooks: path.resolve(scriptPath, 'hooks'),
         Repositories: path.resolve(scriptPath, 'repositories'),
