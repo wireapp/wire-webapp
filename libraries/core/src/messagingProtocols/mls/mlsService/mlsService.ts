@@ -57,6 +57,7 @@ import {
   ExternalSenderKey,
   isMlsMessageRejectedError,
   GroupInfo,
+  KeyPackage,
   CoreCryptoContext,
 } from '@wireapp/core-crypto';
 
@@ -367,10 +368,6 @@ export class MLSService extends TypedEventEmitter<Events> {
     return isMLSDevice(client, this.config.signatureAlgorithm);
   };
 
-  private async getCredentialType(): Promise<CredentialType> {
-    return (await this.requireCredentialRef()).type();
-  }
-
   private readonly _uploadCommitBundle = async ({
     commit,
     groupInfo,
@@ -458,6 +455,10 @@ export class MLSService extends TypedEventEmitter<Events> {
       throw new Error('Empty list of keys provided to addUsersToExistingConversation');
     }
 
+    const parsedKeyPackages = keyPackages.map(keyPackage => {
+      return new KeyPackage(keyPackage);
+    });
+
     let crlNewDistributionPoints: NewCrlDistributionPoints;
 
     /**
@@ -469,11 +470,11 @@ export class MLSService extends TypedEventEmitter<Events> {
     if (coreCryptoTransactionContext !== undefined) {
       crlNewDistributionPoints = await coreCryptoTransactionContext.addClientsToConversation(
         new ConversationId(groupIdBytes),
-        keyPackages,
+        parsedKeyPackages,
       );
     } else {
       crlNewDistributionPoints = await this.coreCryptoClient.transaction(transactionContext => {
-        return transactionContext.addClientsToConversation(new ConversationId(groupIdBytes), keyPackages);
+        return transactionContext.addClientsToConversation(new ConversationId(groupIdBytes), parsedKeyPackages);
       });
     }
 
@@ -981,16 +982,28 @@ export class MLSService extends TypedEventEmitter<Events> {
   }
 
   public async clientValidKeypackagesCount(): Promise<number> {
-    const credentialType = await this.getCredentialType();
-    return this.coreCryptoClient.transaction(cx => {
-      return cx.clientValidKeypackagesCount(this.config.defaultCiphersuite, credentialType);
+    const credentialRef = await this.requireCredentialRef();
+    return this.coreCryptoClient.transaction(async cx => {
+      const keyPackages = await cx.getKeyPackages();
+      return keyPackages.filter(keyPackage => {
+        return (
+          keyPackage.cipherSuite() === credentialRef.cipherSuite() &&
+          keyPackage.credentialType() === credentialRef.type() &&
+          keyPackage.isValid()
+        );
+      }).length;
     });
   }
 
   public async clientKeypackages(amountRequested: number): Promise<Uint8Array[]> {
-    const credentialType = await this.getCredentialType();
-    return this.coreCryptoClient.transaction(cx => {
-      return cx.clientKeypackages(this.config.defaultCiphersuite, credentialType, amountRequested);
+    const credentialRef = await this.requireCredentialRef();
+    return this.coreCryptoClient.transaction(async cx => {
+      const keyPackages: Uint8Array[] = [];
+      for (let index = 0; index < amountRequested; index++) {
+        const keyPackage = await cx.generateKeyPackage(credentialRef);
+        keyPackages.push(keyPackage.serialize());
+      }
+      return keyPackages;
     });
   }
 

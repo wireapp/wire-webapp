@@ -19,10 +19,11 @@
 
 import {isEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {Decoder} from 'bazinga64';
+import {Maybe, Task, task} from 'true-myth';
 
 import {APIClient} from '@wireapp/api-client';
 import {LogFactory} from '@wireapp/commons';
-import {ConversationId, NewCrlDistributionPoints} from '@wireapp/core-crypto';
+import {ConversationId, CredentialRef, NewCrlDistributionPoints} from '@wireapp/core-crypto';
 
 import {AcmeService} from './connection/acmeServer';
 import {AcmeDirectory, Ciphersuite, CoreCrypto, CredentialType, E2eiEnrollment} from './e2eiService.types';
@@ -128,6 +129,31 @@ export class E2EIServiceInternal {
   }
 
   // ############ Internal Functions ############
+
+  private getLatestX509CredentialRef(cipherSuite: Ciphersuite): Task<CredentialRef, unknown> {
+    return task
+      .tryOrElse(
+        error => error,
+        () => {
+          return this.coreCryptoClient.findCredentials({cipherSuite, credentialType: CredentialType.X509});
+        },
+      )
+      .andThen(credentials => {
+        const latestCredential = credentials.reduce<Maybe<CredentialRef>>((latest, credential) => {
+          return latest.match({
+            Just: current => {
+              return credential.earliestValidity() > current.earliestValidity() ? Maybe.just(credential) : latest;
+            },
+            Nothing: () => Maybe.just(credential),
+          });
+        }, Maybe.nothing());
+
+        return latestCredential.match({
+          Just: credential => task.resolve(credential),
+          Nothing: () => task.reject(new Error(`No X509 credential found for cipher suite ${cipherSuite}`)),
+        });
+      });
+  }
 
   private async initIdentity(hasActiveCertificate: boolean, ciphersuite: Ciphersuite): Promise<E2eiEnrollment> {
     const {user} = this.initialData;
@@ -290,7 +316,7 @@ export class E2EIServiceInternal {
     }
 
     // Step 10: Initialize MLS with the certificate
-    return this.coreCryptoClient.transaction(async cx => {
+    const newCrlDistributionPoints = await this.coreCryptoClient.transaction(async cx => {
       const conversations = await getAllConversations();
       const newCrlDistributionPoints = await cx.saveX509Credential(identity, certificate);
       for (const conversation of conversations) {
@@ -313,14 +339,31 @@ export class E2EIServiceInternal {
         }
       }
 
-      await cx.deleteStaleKeyPackages(cipherSuite);
-
-      const keyPackages = await cx.clientKeypackages(cipherSuite, CredentialType.X509, this.keyPackagesAmount);
-
-      return {
-        newCrlDistributionPoints,
-        keyPackages,
-      };
+      return newCrlDistributionPoints;
     });
+
+    const credentialRefResult = await this.getLatestX509CredentialRef(cipherSuite);
+    const credentialRef = await credentialRefResult.match({
+      Ok: value => Promise.resolve(value),
+      Err: error => Promise.reject(error),
+    });
+    const keyPackages = await this.coreCryptoClient.transaction(async cx => {
+      const storedKeyPackages = await cx.getKeyPackages();
+      const staleKeyPackages = storedKeyPackages.filter(keyPackage => {
+        return keyPackage.cipherSuite() === cipherSuite && !keyPackage.isValid();
+      });
+      for (const staleKeyPackage of staleKeyPackages) {
+        await cx.removeKeyPackage(staleKeyPackage);
+      }
+
+      const generatedKeyPackages: Uint8Array[] = [];
+      for (let index = 0; index < this.keyPackagesAmount; index++) {
+        const keyPackage = await cx.generateKeyPackage(credentialRef);
+        generatedKeyPackages.push(keyPackage.serialize());
+      }
+      return generatedKeyPackages;
+    });
+
+    return {newCrlDistributionPoints, keyPackages};
   }
 }
