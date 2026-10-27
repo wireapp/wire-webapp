@@ -20,7 +20,6 @@
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {CoreCryptoError, ProteusError} from '@wireapp/core-crypto';
-import {errors as LegacyProteusErrors} from '@wireapp/proteus';
 
 import {DecryptionError} from '../../../../errors/decryptionError';
 
@@ -37,9 +36,21 @@ export const ProteusErrors = {
 
 type SenderInfo = {clientId: string; userId: QualifiedId};
 
+type LegacyProteusError = Error & {code: number};
+
+/**
+ * Errors from the legacy cryptobox stack (`@wireapp/proteus`) carry a numeric Proteus error code.
+ * They are detected structurally on purpose: importing `@wireapp/proteus` here would load it, and its own copy of
+ * libsodium, at startup. That copy shares its libsodium core with other libsodium consumers, and whichever
+ * initializes second fails with "libsodium was not correctly initialized".
+ */
+const isLegacyProteusError = (error: unknown): error is LegacyProteusError => {
+  return error instanceof Error && typeof Reflect.get(error, 'code') === 'number';
+};
+
 function getErrorCode(error: unknown): number {
   if (!CoreCryptoError.Proteus.instanceOf(error)) {
-    if (error instanceof LegacyProteusErrors.ProteusError) {
+    if (isLegacyProteusError(error)) {
       return error.code;
     }
 
