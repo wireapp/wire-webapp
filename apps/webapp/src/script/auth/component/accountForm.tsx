@@ -68,7 +68,7 @@ const AccountFormComponent: FunctionComponent<Props & ConnectedProps & DispatchP
   resetAuthError,
   beforeSubmit,
 }: Props & ConnectedProps & DispatchProps) => {
-  const {translate} = useApplicationContext();
+  const {translate, fireAndForgetInvoker} = useApplicationContext();
   const [registrationData, setRegistrationData] = useState({
     accent_id: AccentColor.STRONG_BLUE.id,
     email: account.email ?? '',
@@ -103,7 +103,9 @@ const AccountFormComponent: FunctionComponent<Props & ConnectedProps & DispatchP
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
-    void resetAuthError();
+    fireAndForgetInvoker.fireAndForget(async () => {
+      resetAuthError();
+    });
     const errors: Error[] | ValidationError[] = [];
     const newValidInputs: Record<string, boolean> = {};
     Object.entries(inputs).forEach(([inputKey, currentInput]) => {

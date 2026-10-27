@@ -17,16 +17,25 @@
  *
  */
 
-import {fireEvent, RenderResult} from '@testing-library/react';
+import {fireEvent, render, RenderResult} from '@testing-library/react';
 import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {noop} from 'noop-esm';
+import {Provider} from 'react-redux';
+import {HashRouter as Router} from 'react-router';
+
+import {
+  createExecutingFireAndForgetInvokerForTest,
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
+import {translate} from 'Util/localizerUtil';
 
 import {AccountForm} from './accountForm';
 
 import {AUTH_ACTION} from '../module/action/creator/authActionCreator';
 import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
-import {mountComponent} from '../util/test/testUtil';
+import {mountComponent, withIntl, withThemeAndRootContext} from '../util/test/testUtil';
 
 describe('when entering account data', () => {
   let wrapper: RenderResult;
@@ -140,7 +149,11 @@ describe('when entering account data', () => {
       expect(validationErrorMessage().innerHTML).toContain(expectedErrorMessage);
     });
 
-    it('from a previous submit is cleared when submitting again', () => {
+    it('from a previous submit is cleared when submitting again', async () => {
+      const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
+      const rootProviderWrapper = createRootProviderWrapperForTest(
+        createRootContextValueForTest({fireAndForgetInvoker, translate}),
+      );
       const store = mockStoreFactory()({
         ...initialRootState,
         authState: {
@@ -153,10 +166,18 @@ describe('when entering account data', () => {
           error: new BackendError('The given e-mail address is in use.', BackendErrorLabel.KEY_EXISTS, 409),
         },
       });
-      wrapper = mountComponent(<AccountForm onSubmit={noop} />, store);
+      wrapper = render(
+        <Router>
+          {withThemeAndRootContext(
+            <Provider store={store}>{withIntl(<AccountForm onSubmit={noop} />)}</Provider>,
+            rootProviderWrapper,
+          )}
+        </Router>,
+      );
 
       fireEvent.change(wrapper.getByTestId('enter-confirm-password'), {target: {value: 'mismatch'}});
       fireEvent.submit(doNextButton());
+      await fireAndForgetInvoker.waitUntilAllSettled();
 
       expect(store.getActions()).toContainEqual({type: AUTH_ACTION.AUTH_RESET_ERROR});
     });
