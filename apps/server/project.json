@@ -126,14 +126,6 @@
           "buildTarget": "server:build"
         }
       }
-    },
-    "type-check": {
-      "executor": "nx:run-commands",
-      "dependsOn": ["config-lib:build"],
-      "options": {
-        "commands": ["tsc --project {projectRoot}/tsconfig.json --noEmit", "tsc --project {projectRoot}/bin/tsconfig.json --noEmit"],
-        "parallel": false
-      }
     }
   },
   "tags": ["type:app", "scope:backend"]

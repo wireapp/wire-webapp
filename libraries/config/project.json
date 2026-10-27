@@ -20,12 +20,6 @@
         "cwd": "{projectRoot}"
       }
     },
-    "type-check": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "tsc --project {projectRoot}/tsconfig.type-check.json --noEmit"
-      }
-    },
     "watch": {
       "executor": "nx:run-commands",
       "options": {

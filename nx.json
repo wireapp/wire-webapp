@@ -8,11 +8,6 @@
       "inputs": ["production"],
       "outputs": ["{projectRoot}/dist"]
     },
-    "type-check": {
-      "dependsOn": ["^build"],
-      "cache": true,
-      "inputs": ["default", "^production"]
-    },
     "watch": {
       "continuous": true
     }

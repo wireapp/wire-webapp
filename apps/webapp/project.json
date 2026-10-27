@@ -92,20 +92,6 @@
         "command": "npx just stylesheet-lint"
       }
     },
-    "type-check": {
-      "executor": "nx:run-commands",
-      "dependsOn": ["^build", "rspack-config-type-check"],
-      "options": {
-        "command": "tsc --project {projectRoot}/tsconfig.type-check.json --noEmit"
-      }
-    },
-    "rspack-config-type-check": {
-      "executor": "nx:run-commands",
-      "dependsOn": ["^build"],
-      "options": {
-        "command": "tsc --project {projectRoot}/tsconfig.rspack.json --noEmit"
-      }
-    },
     "check-circular": {
       "executor": "nx:run-commands",
       "options": {

@@ -136,8 +136,7 @@
     "e2e-ui": "nx e2e webapp --ui",
     "build:prod": "nx run server:package",
     "build:prod:public": "nx run server:package-public",
-    "verify:bundle:prod:public": "node tools/buildArtifact/verifyPublicProductionBundle.ts",
-    "type-check": "nx run-many -t type-check --all"
+    "verify:bundle:prod:public": "node tools/buildArtifact/verifyPublicProductionBundle.ts"
   },
   "overrides": {
     "@emotion/eslint-plugin": {

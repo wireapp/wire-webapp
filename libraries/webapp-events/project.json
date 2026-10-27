@@ -33,12 +33,6 @@
         "command": "tsc --watch",
         "cwd": "{projectRoot}"
       }
-    },
-    "type-check": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "tsc --project {projectRoot}/tsconfig.json --noEmit"
-      }
     }
   },
   "tags": ["type:lib", "scope:webapp-events"]

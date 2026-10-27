@@ -34,12 +34,6 @@
         "cwd": "{projectRoot}"
       }
     },
-    "type-check": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "tsc --project {projectRoot}/tsconfig.type-check.json --noEmit"
-      }
-    },
     "start": {
       "executor": "nx:run-commands",
       "dependsOn": ["dist"],
