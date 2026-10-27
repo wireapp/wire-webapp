@@ -75,10 +75,7 @@ import {
   resumeRejoiningMLSConversations,
 } from './messagingProtocols/mls/conversationRejoinQueue';
 import {E2EIServiceExternal, User} from './messagingProtocols/mls/e2eIdentityService';
-import {
-  getAllConversationsCallback,
-  getTokenCallback,
-} from './messagingProtocols/mls/e2eIdentityService/e2eiServiceInternal';
+import {getAllConversationsCallback} from './messagingProtocols/mls/e2eIdentityService/e2eiServiceInternal';
 import {
   flushProposalsQueue,
   getProposalQueueLength,
@@ -305,7 +302,6 @@ export class Account extends TypedEventEmitter<Events> {
     handle,
     teamId,
     discoveryUrl,
-    getOAuthToken,
     getAllConversations,
     certificateTtl = defaultCertificateLifetimeInDays * (TimeInMillis.DAY / TimeInMillis.SECOND),
   }: {
@@ -316,8 +312,6 @@ export class Account extends TypedEventEmitter<Events> {
     /** team of the user */
     teamId: string;
     discoveryUrl: string;
-    /** function called to get the oauth token */
-    getOAuthToken: getTokenCallback;
     /** function called to get all conversations */
     getAllConversations: getAllConversationsCallback;
     /** number of seconds the certificate should be valid (default 90 days) */
@@ -348,7 +342,6 @@ export class Account extends TypedEventEmitter<Events> {
       this.currentClient,
       this.options.nbPrekeys,
       certificateTtl,
-      getOAuthToken,
       getAllConversations,
     );
   };
@@ -560,6 +553,7 @@ export class Account extends TypedEventEmitter<Events> {
 
       e2eServiceExternal = new E2EIServiceExternal(
         cryptoClient.getNativeClient(),
+        this.apiClient,
         this.db,
         this.recurringTaskScheduler,
         clientService,

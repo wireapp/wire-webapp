@@ -18,7 +18,6 @@
  */
 
 import {
-  E2eiEnrollment,
   CipherSuite as Ciphersuite,
   CoreCrypto,
   WireIdentity,
@@ -30,16 +29,7 @@ import {
 /**
  * Proxy types relevant to the E2EIService from CoreCrypto
  */
-type OmitFree<T> = Omit<T, 'free'>;
-type NewAcmeAuthzOriginal = OmitFree<Awaited<ReturnType<E2eiEnrollment['newAuthzResponse']>>>;
-export type AcmeDirectory = OmitFree<Awaited<ReturnType<E2eiEnrollment['directoryResponse']>>>;
-export type AcmeChallenge = OmitFree<NonNullable<NewAcmeAuthzOriginal['challenge']>>;
-export type NewAcmeOrder = OmitFree<Awaited<ReturnType<E2eiEnrollment['newOrderResponse']>>>;
-export type NewAcmeAuthz = Pick<
-  Awaited<ReturnType<E2eiEnrollment['newAuthzResponse']>>,
-  'identifier' | 'keyauth' | 'challenge'
->;
-export {E2eiEnrollment, Ciphersuite, CoreCrypto, DeviceStatus, WireIdentity, E2eiConversationState, CredentialType};
+export {Ciphersuite, CoreCrypto, DeviceStatus, WireIdentity, E2eiConversationState, CredentialType};
 
 export type User = {
   id: string;
@@ -48,6 +38,21 @@ export type User = {
   teamId: string;
   handle: string;
 };
-export type AcmeAccount = Uint8Array;
-export type Nonce = string;
-export type KeyAuth = NewAcmeAuthzOriginal['keyauth'];
+
+/**
+ * Performs the identity provider authentication step of the X509 credential acquisition flow.
+ *
+ * CoreCrypto calls this through the `PkiEnvironmentHooks.authenticate` hook. The webapp owns the
+ * OIDC details, the core owns persisting the acquisition snapshot and resuming the flow after a
+ * redirect.
+ */
+export type E2EIAuthenticateCallback = (params: {
+  /** Identity provider the user has to be authenticated against. */
+  idp: string;
+  /** Key authorization that has to be added as the `key_auth` claim of the id token. */
+  keyAuth: string;
+  /** ACME audience that has to be added as the `acme_aud` claim of the id token. */
+  acmeAudience: string;
+  /** Serialized acquisition, used to resume the flow once the user comes back from the IdP. */
+  acquisitionSnapshot: Uint8Array;
+}) => Promise<string>;

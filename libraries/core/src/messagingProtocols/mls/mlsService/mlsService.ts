@@ -66,6 +66,7 @@ import {
   shouldMLSDecryptionErrorBeIgnored,
   UPLOAD_COMMIT_BUNDLE_ABORT_REASONS,
 } from './coreCryptoMlsError';
+import {getMLSDeviceStatus, isMLSDevice, MLSDeviceStatus} from './mlsDeviceStatus';
 
 import {AddUsersFailure, AddUsersFailureReasons, KeyPackageClaimUser} from '../../../conversation';
 import type {HandledEventPayload} from '../../../notification';
@@ -75,17 +76,8 @@ import {numberToHex} from '../../../util/numberToHex';
 import {RecurringTaskScheduler} from '../../../util/recurringTaskScheduler';
 import {TaskScheduler} from '../../../util/taskScheduler';
 import {User} from '../e2eIdentityService';
-import {
-  E2EIServiceInternal,
-  getAllConversationsCallback,
-  getTokenCallback,
-} from '../e2eIdentityService/e2eiServiceInternal';
-import {
-  getMLSDeviceStatus,
-  getSignatureAlgorithmForCiphersuite,
-  isMLSDevice,
-  MLSDeviceStatus,
-} from '../e2eIdentityService/helper';
+import {E2EIServiceInternal, getAllConversationsCallback} from '../e2eIdentityService/e2eiServiceInternal';
+import {getSignatureAlgorithmForCiphersuite} from '../e2eIdentityService/helper';
 import {handleMLSMessageAdd, handleMLSWelcomeMessage} from '../eventHandler/events';
 import {ClientId, HandlePendingProposalsParams} from '../types';
 import {createMLSClientId} from '../utils/mlsId';
@@ -124,7 +116,6 @@ const defaultConfig = {
 export enum MLSServiceEvents {
   NEW_EPOCH = 'newEpoch',
   MLS_CLIENT_MISMATCH = 'mlsClientMismatch',
-  NEW_CRL_DISTRIBUTION_POINTS = 'newCrlDistributionPoints',
   MLS_EVENT_DISTRIBUTED = 'mlsEventDistributed',
   KEY_MATERIAL_UPDATE_FAILURE = 'keyMaterialUpdateFailure',
   MLS_CONVERSATION_RECOVERY_REQUIRED = 'mlsConversationRecoveryRequired',
@@ -133,7 +124,6 @@ export enum MLSServiceEvents {
 type Events = {
   [MLSServiceEvents.KEY_MATERIAL_UPDATE_FAILURE]: {error: unknown; groupId: string};
   [MLSServiceEvents.NEW_EPOCH]: {epoch: number; groupId: string};
-  [MLSServiceEvents.NEW_CRL_DISTRIBUTION_POINTS]: string[];
   [MLSServiceEvents.MLS_CLIENT_MISMATCH]: void;
   [MLSServiceEvents.MLS_EVENT_DISTRIBUTED]: {
     events: any;
@@ -629,12 +619,6 @@ export class MLSService extends TypedEventEmitter<Events> {
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
     const key = await this.coreCryptoClient.exportSecretKey(new ConversationId(groupIdBytes), keyLength);
     return Encoder.toBase64(key).asString;
-  }
-
-  private dispatchNewCrlDistributionPoints(crlNewDistributionPoints: string[]): void {
-    if (crlNewDistributionPoints !== undefined && crlNewDistributionPoints.length > 0) {
-      this.emit(MLSServiceEvents.NEW_CRL_DISTRIBUTION_POINTS, crlNewDistributionPoints);
-    }
   }
 
   public async processWelcomeMessage(welcomeMessage: Uint8Array): Promise<ConversationId> {
@@ -1424,8 +1408,7 @@ export class MLSService extends TypedEventEmitter<Events> {
    * @param user User object
    * @param clientId The client id of the current device
    * @param nbPrekeys Amount of prekeys to generate
-   * @param oAuthIdToken The OAuth id token if the user is already authenticated
-   * @returns AcmeChallenge if the user is not authenticated, true if the user is authenticated
+   * @returns the newly generated key packages
    */
   public async enrollE2EI(
     discoveryUrl: string,
@@ -1433,27 +1416,23 @@ export class MLSService extends TypedEventEmitter<Events> {
     client: RegisteredClient,
     nbPrekeys: number,
     certificateTtl: number,
-    getOAuthToken: getTokenCallback,
     getAllConversations: getAllConversationsCallback,
   ): Promise<void> {
     const isCertificateRenewal = await this.hasCredential(CredentialType.X509);
     const e2eiServiceInternal = new E2EIServiceInternal(
       this.coreDatabase,
       this.coreCryptoClient,
-      this.apiClient,
       certificateTtl,
       this.config.getNbKeyPackages?.() ?? nbPrekeys,
       {user, clientId: client.id, discoveryUrl},
     );
 
-    const {keyPackages, newCrlDistributionPoints} = await e2eiServiceInternal.generateCertificate(
-      getOAuthToken,
+    const {keyPackages} = await e2eiServiceInternal.generateCertificate(
       isCertificateRenewal,
       getAllConversations,
       this.config.defaultCiphersuite,
     );
 
-    this.dispatchNewCrlDistributionPoints(newCrlDistributionPoints);
     // upload the clients public keys
     if (!this.isInitializedMLSClient(client)) {
       // we only upload public keys for the initial certification process if the device is not already a registered MLS device.

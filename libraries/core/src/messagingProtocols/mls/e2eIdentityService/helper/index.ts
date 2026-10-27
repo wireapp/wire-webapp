@@ -17,30 +17,10 @@
  *
  */
 
-import {MLSPublicKeyAlgorithmKeys, RegisteredClient} from '@wireapp/api-client/lib/client';
-
-import {CipherSuite as Ciphersuite} from '@wireapp/core-crypto';
+import {MLSPublicKeyAlgorithmKeys} from '@wireapp/api-client/lib/client';
 import {result, type Result} from 'true-myth';
 
-import {ClientIdStringType, constructFullyQualifiedClientId} from '../../../../util/fullyQualifiedClientIdUtils';
-
-export const jsonToByteArray = (data: any): Uint8Array => {
-  const encoder = new TextEncoder();
-  return encoder.encode(JSON.stringify(data, null, 0));
-};
-
-type GetE2EIClientIdReturnType = {
-  asString: ClientIdStringType;
-  asBytes: Uint8Array;
-};
-export const getE2EIClientId = (clientId: string, userId: string, userDomain: string): GetE2EIClientIdReturnType => {
-  const asString = constructFullyQualifiedClientId(userId, clientId, userDomain);
-  const asBytes: Uint8Array = new TextEncoder().encode(asString);
-  return {
-    asString,
-    asBytes,
-  };
-};
+import {CipherSuite as Ciphersuite} from '@wireapp/core-crypto';
 
 /**
  * depending on the ciphersuite used, the signature algorithm used is different. We need to keep a mapping of the ciphersuite to the signature algorithm
@@ -62,42 +42,4 @@ export const getSignatureAlgorithmForCiphersuite = (
   return signatureAlgorithm === undefined
     ? result.err(new Error(`Unsupported MLS cipher suite: ${ciphersuite}`))
     : result.ok(signatureAlgorithm);
-};
-
-export const isMLSDevice = (
-  {mls_public_keys}: RegisteredClient,
-  signatureAlgorithm: MLSPublicKeyAlgorithmKeys,
-): boolean => {
-  const signature = mls_public_keys[signatureAlgorithm];
-  return typeof signature === 'string' && signature.length > 0;
-};
-
-export enum MLSDeviceStatus {
-  REGISTERED = 'registered',
-  FRESH = 'fresh',
-  MISMATCH = 'mismatch',
-}
-export const getMLSDeviceStatus = (
-  {mls_public_keys}: RegisteredClient,
-  signatureAlgorithm: MLSPublicKeyAlgorithmKeys,
-  existingClientSignature: string,
-): MLSDeviceStatus => {
-  const signature = mls_public_keys[signatureAlgorithm];
-
-  if (
-    signature === undefined ||
-    signature.length === 0 ||
-    existingClientSignature === undefined ||
-    existingClientSignature.length === 0
-  ) {
-    return MLSDeviceStatus.FRESH;
-  }
-  if (signature !== existingClientSignature) {
-    return MLSDeviceStatus.MISMATCH;
-  }
-  return MLSDeviceStatus.REGISTERED;
-};
-
-export const isResponseStatusValid = (status: string | undefined): boolean => {
-  return status !== undefined && status.length > 0 && status === 'valid';
 };

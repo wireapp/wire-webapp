@@ -17,6 +17,8 @@
  *
  */
 
+import {asyncNoop, noop} from 'noop-esm';
+
 export interface CommitBundle {}
 
 export enum Ciphersuite {
@@ -63,8 +65,24 @@ export enum DeviceStatus {
   Revoked = 3,
 }
 
+export enum HttpMethod {
+  Get = 0,
+  Post = 1,
+  Put = 2,
+  Delete = 3,
+  Patch = 4,
+  Head = 5,
+}
+
 export class CoreCrypto {
   proteusInit = jest.fn();
+  getPkiEnvironment = async (): Promise<PkiEnvironment | undefined> => {
+    return undefined;
+  };
+  setPkiEnvironment = asyncNoop;
+  findCredentials = async (): Promise<CredentialRef[]> => {
+    return [];
+  };
   proteusNewPrekey = jest.fn(() => {
     return Uint8Array.from([]);
   });
@@ -104,16 +122,16 @@ class ByteContainer {
 export class Welcome extends ByteContainer {}
 export class GroupInfo extends ByteContainer {}
 export class Uuid extends ByteContainer {
-  constructor(value: string) {
-    super(new TextEncoder().encode(value));
+  constructor(value: string | Uuid) {
+    super(typeof value === 'string' ? new TextEncoder().encode(value) : value.copyBytes());
   }
   toString(): string {
     return new TextDecoder().decode(this.bytes);
   }
 }
 export class DeviceId extends ByteContainer {
-  private constructor(value: string) {
-    super(new TextEncoder().encode(value));
+  constructor(value: string | DeviceId) {
+    super(typeof value === 'string' ? new TextEncoder().encode(value) : value.copyBytes());
   }
   static fromHexString(value: string): DeviceId {
     return new DeviceId(value);
@@ -122,13 +140,61 @@ export class DeviceId extends ByteContainer {
     return new TextDecoder().decode(this.bytes);
   }
   toU64(): bigint {
-    return BigInt(`0x${this.toHexString()}`);
+    const value = this.toHexString();
+    if (/^[0-9a-fA-F]+$/.test(value)) {
+      return BigInt(`0x${value}`);
+    }
+    // Device ids are not necessarily hex encoded (e.g. a UUID in tests), so fall back to the
+    // bytes of the value itself instead of failing.
+    const bytes = new TextEncoder().encode(value);
+    return BigInt(
+      `0x${Array.from(bytes, byte => {
+        return byte.toString(16).padStart(2, '0');
+      }).join('')}`,
+    );
   }
 }
 export class ClientId extends ByteContainer {
-  constructor(userId: Uuid, deviceId: DeviceId, domain: string) {
-    super(new TextEncoder().encode(`${userId.toString()}:${deviceId.toU64().toString(16)}@${domain}`));
+  /**
+   * Either a Wire formatted client id (`<user-id>:<device-id>@<domain>`), or the parts of it.
+   */
+  constructor(userId: Uuid | string, deviceId?: DeviceId, domain?: string) {
+    const value =
+      deviceId === undefined || domain === undefined
+        ? String(userId)
+        : `${new Uuid(userId).toString()}:${deviceId.toU64().toString(16)}@${domain}`;
+    super(new TextEncoder().encode(value));
   }
+  toString(): string {
+    return new TextDecoder().decode(this.bytes);
+  }
+}
+export class CredentialRef extends ByteContainer {}
+export class Credential extends ByteContainer {}
+export class ExternalSender extends ByteContainer {}
+
+export class PkiEnvironment {
+  addTrustAnchor = asyncNoop;
+  addIntermediateCert = asyncNoop;
+  getTrustAnchors = async (): Promise<string[]> => {
+    return [];
+  };
+  removeTrustAnchor = asyncNoop;
+  uniffiDestroy = noop;
+  static create = async (): Promise<PkiEnvironment> => {
+    return new PkiEnvironment();
+  };
+}
+
+export class X509CredentialAcquisition {
+  finalize = asyncNoop;
+  uniffiDestroy = noop;
+  static fromBytes = (): X509CredentialAcquisition => {
+    return new X509CredentialAcquisition();
+  };
+  static newFromCredentialRef = async (): Promise<X509CredentialAcquisition> => {
+    return new X509CredentialAcquisition();
+  };
 }
 export class ConversationId extends ByteContainer {}
 export class ExternalSenderKey extends ByteContainer {}

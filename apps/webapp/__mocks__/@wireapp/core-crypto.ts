@@ -37,6 +37,16 @@ export enum Ciphersuite {
   MLS_256_DHKEMP384_AES256GCM_SHA384_P384 = 7,
   MLS_128_X25519KYBER768DRAFT00_AES128GCM_SHA256_Ed25519 = 61489,
 }
+export enum CipherSuite {
+  Mls128Dhkemx25519Aes128gcmSha256Ed25519 = 1,
+  Mls128Dhkemp256Aes128gcmSha256P256 = 2,
+  Mls128Dhkemx25519Chacha20poly1305Sha256Ed25519 = 3,
+  Mls256Dhkemx448Aes256gcmSha512Ed448 = 4,
+  Mls256Dhkemp521Aes256gcmSha512P521 = 5,
+  Mls256Dhkemx448Chacha20poly1305Sha512Ed448 = 6,
+  Mls256Dhkemp384Aes256gcmSha384P384 = 7,
+  Mls128X25519kyber768draft00Aes128gcmSha256Ed25519 = 61489,
+}
 export enum CredentialType {
   Basic = 1,
   X509 = 2,
@@ -45,6 +55,14 @@ export enum DeviceStatus {
   Valid = 1,
   Expired = 2,
   Revoked = 3,
+}
+export enum HttpMethod {
+  Get = 0,
+  Post = 1,
+  Put = 2,
+  Delete = 3,
+  Patch = 4,
+  Head = 5,
 }
 export enum E2eiConversationState {
   /**

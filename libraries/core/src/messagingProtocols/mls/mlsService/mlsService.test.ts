@@ -66,7 +66,7 @@ import {AddUsersFailure, AddUsersFailureReasons} from '../../../conversation';
 import {openDB, CoreDatabase} from '../../../storage/coreDb';
 import {RecurringTaskScheduler} from '../../../util/recurringTaskScheduler';
 import {TaskScheduler} from '../../../util/taskScheduler';
-import * as Helper from '../e2eIdentityService/helper';
+import * as Helper from './mlsDeviceStatus';
 
 type MLSServiceTestSetup = readonly [
   MLSService,
@@ -79,9 +79,9 @@ type MLSServiceTestSetup = readonly [
   },
 ];
 
-jest.mock('../e2eIdentityService/helper', () => {
+jest.mock('./mlsDeviceStatus', () => {
   return {
-    ...jest.requireActual('../e2eIdentityService/helper'),
+    ...jest.requireActual('./mlsDeviceStatus'),
     getMLSDeviceStatus: jest.fn(),
   };
 });
