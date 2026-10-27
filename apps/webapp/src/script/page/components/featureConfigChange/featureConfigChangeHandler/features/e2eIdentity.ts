@@ -67,6 +67,9 @@ export const configureE2EI = (config: FeatureList, clock: Clock): undefined | Pr
   return E2EIHandler.getInstance().initialize({
     discoveryUrl,
     gracePeriodInSeconds: e2eiConfig.config.verificationExpiration,
+    // `useProxyOnMobile` only applies to mobile clients. In the browser the proxy is the only
+    // reachable CRL endpoint, so it is always preferred when the deployment provides one.
+    crlProxy: isNonEmptyString(e2eiConfig.config.crlProxy) ? e2eiConfig.config.crlProxy : undefined,
     clock,
   });
 };

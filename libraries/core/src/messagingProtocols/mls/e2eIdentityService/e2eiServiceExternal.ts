@@ -21,9 +21,10 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import axios from 'axios';
 import {Decoder} from 'bazinga64';
+import {result, task, type Result} from 'true-myth';
 
 import {APIClient} from '@wireapp/api-client';
-import {TypedEventEmitter} from '@wireapp/commons';
+import {LogFactory, TypedEventEmitter} from '@wireapp/commons';
 import {
   ConversationId,
   CoreCrypto,
@@ -67,8 +68,21 @@ export type DeviceIdentity = Omit<WireIdentity, 'clientId' | 'status'> & {
 };
 
 type Events = {
-  /** Emitted when a CRL that affects the self domain changed. */
-  crlChanged: {domain: string};
+  /**
+   * Emitted after CoreCrypto successfully checked every X509 credential and refreshed its CRLs.
+   *
+   * Revocation lists are not scoped to a domain anymore, so consumers have to re-evaluate the
+   * conversations they care about themselves.
+   */
+  credentialsChecked: void;
+};
+
+type InitializeOptions = {
+  /**
+   * Proxy that serves CRLs on behalf of hosts the browser cannot reach directly. The deployment
+   * exposes it as `<crlProxy>/<host>`.
+   */
+  crlProxy?: string;
 };
 
 const axiosMethods: Record<HttpMethod, 'get' | 'post' | 'put' | 'delete' | 'patch' | 'head'> = {
@@ -86,7 +100,9 @@ const decodeClientId = (clientId: WireIdentity['clientId']): string => {
 
 // This export is meant to be accessible from the outside (e.g the Webapp / UI)
 export class E2EIServiceExternal extends TypedEventEmitter<Events> {
+  private readonly logger = LogFactory.getLogger('@wireapp/core/E2EIdentityServiceExternal');
   private _acmeService?: AcmeService;
+  private crlProxy?: string;
   private readonly enrollmentStorage: ReturnType<typeof createE2EIEnrollmentStorage>;
 
   public constructor(
@@ -286,28 +302,34 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
   /**
    * will initialize the E2EIServiceExternal with the given discoveryUrl and userId.
    * It will create the PKI environment, register the server certificates in CoreCrypto and start
-   * the background process that keeps the intermediate certificates up to date.
+   * the background processes that keep the intermediate certificates and the X509 credentials up to date.
    *
    * @param discoveryUrl the discovery url of the acme server
    * @param authenticate authenticates the user against its identity provider. This is owned by the webapp
    * because it needs the OIDC details, while the rest of the PKI environment hooks live in core.
+   * @param options.crlProxy proxy used for CRL downloads, if the deployment provides one
    */
-  public async initialize(discoveryUrl: string, authenticate: E2EIAuthenticateCallback): Promise<void> {
+  public async initialize(
+    discoveryUrl: string,
+    authenticate: E2EIAuthenticateCallback,
+    {crlProxy}: InitializeOptions = {},
+  ): Promise<void> {
+    this.crlProxy = crlProxy;
     this._acmeService = new AcmeService(discoveryUrl);
 
     await this.initializePkiEnvironment(authenticate);
     await this.registerIntermediateCertificates();
+    await this.scheduleCredentialsCheck();
   }
 
   /**
    * Forces an immediate refresh of revocation-related data.
    * - Re-fetches and registers federation intermediate certificates
-   *
-   * Fetching and registering CRLs is done by CoreCrypto (`checkCredentials`), its scheduling is
-   * handled separately.
+   * - Asks CoreCrypto to fetch and apply the current CRLs (`checkCredentials`)
    */
   public async refreshRevocationData(): Promise<void> {
     await this.registerCrossSignedCertificates(this.acmeService);
+    await this.checkAllCredentials();
   }
 
   private async initializePkiEnvironment(authenticate: E2EIAuthenticateCallback): Promise<void> {
@@ -363,6 +385,10 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
    *
    * CoreCrypto uses this for every ACME server call (directory, nonce, account, order, challenges
    * and certificate). Every status code is handed back to CoreCrypto, which decides how to react.
+   *
+   * CRL downloads are routed through the deployment's CRL proxy, which serves the CRL of a host at
+   * `<crlProxy>/<host>`. This mirrors the iOS client: only requests whose path ends in `crl` are
+   * rewritten, everything else is fetched as-is.
    */
   private async httpRequest(
     method: HttpMethod,
@@ -370,9 +396,14 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     headers: HttpHeader[],
     body: Uint8Array,
   ): Promise<HttpResponse> {
+    const requestUrl = this.resolveRequestUrl(url);
+    if (requestUrl.isErr) {
+      return Promise.reject(requestUrl.error);
+    }
+
     const response = await axios.request<ArrayBuffer>({
       method: axiosMethods[method],
-      url,
+      url: requestUrl.value,
       headers: Object.fromEntries(
         headers.map(({name, value}) => {
           return [name, value];
@@ -397,6 +428,32 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     };
   }
 
+  /**
+   * Rewrites a CRL URL to its proxy form. A malformed URL is surfaced as an error instead of being
+   * passed through silently.
+   */
+  private resolveRequestUrl(url: string): Result<string, Error> {
+    return result.tryOrElse(
+      cause => {
+        return new Error(`Could not parse request URL "${url}"`, {cause});
+      },
+      () => {
+        const parsedUrl = new URL(url);
+
+        if (this.crlProxy === undefined || !parsedUrl.pathname.endsWith('crl')) {
+          return url;
+        }
+
+        const proxyUrl = new URL(this.crlProxy);
+        if (!proxyUrl.pathname.endsWith('/')) {
+          proxyUrl.pathname = `${proxyUrl.pathname}/`;
+        }
+
+        return new URL(parsedUrl.host, proxyUrl).toString();
+      },
+    );
+  }
+
   private async registerCrossSignedCertificates(acmeService: AcmeService): Promise<void> {
     const certificates = await acmeService.getFederationCrossSignedCertificates();
     const pkiEnvironment = await this.getPkiEnvironment();
@@ -405,6 +462,59 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
         return pkiEnvironment.addIntermediateCert(cert);
       }),
     );
+  }
+
+  /**
+   * Asks CoreCrypto to check all X509 credentials for expiration and revocation. CoreCrypto owns
+   * CRL fetching, so this is also what refreshes the revocation data behind `getUserIdentities`,
+   * `getDeviceIdentities` and `e2eiConversationState`.
+   *
+   * A failed check can also mean that a CRL could not be fetched (for example on a flaky
+   * connection). It must not be treated as a revoked credential, so failures are only logged.
+   */
+  private async checkAllCredentials(): Promise<void> {
+    const outcome = await task.tryOrElse(
+      error => {
+        return error;
+      },
+      () => {
+        return this.coreCryptoClient.transaction(cx => {
+          return cx.checkCredentials();
+        });
+      },
+    );
+
+    if (outcome.isErr) {
+      this.logger.warn('Failed to check X509 credentials', {error: outcome.error});
+      return;
+    }
+
+    this.emit('credentialsChecked');
+  }
+
+  /**
+   * Runs {@link checkAllCredentials} once at startup and then at most once every 24 hours.
+   *
+   * The scheduler persists the next firing date by task key, so restarting the app (or calling
+   * `initialize` again after a feature config update) does not run the check twice.
+   */
+  private async scheduleCredentialsCheck(): Promise<void> {
+    const CREDENTIALS_CHECK_KEY = 'check-credentials';
+    const hasPendingTask = await this.recurringTaskScheduler.hasTask(CREDENTIALS_CHECK_KEY);
+
+    const runCheck = (): Promise<void> => {
+      return this.checkAllCredentials();
+    };
+
+    if (!hasPendingTask) {
+      await runCheck();
+    }
+
+    await this.recurringTaskScheduler.registerTask({
+      every: TimeInMillis.DAY,
+      key: CREDENTIALS_CHECK_KEY,
+      task: runCheck,
+    });
   }
 
   /**

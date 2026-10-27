@@ -437,12 +437,10 @@ export class ConversationRepository {
   }
 
   public registerMLSConversationVerificationStateHandler = (
-    domain: string,
     onConversationVerificationStateChange: OnConversationE2EIVerificationStateChange = noop,
     onSelfClientCertificateRevoked: () => Promise<void> = asyncNoop,
   ): void => {
     this.mlsConversationVerificationStateHandler = new MLSConversationVerificationStateHandler(
-      domain,
       onConversationVerificationStateChange,
       onSelfClientCertificateRevoked,
       this.conversationState,

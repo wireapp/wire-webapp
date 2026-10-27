@@ -18,6 +18,7 @@
  */
 
 import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
+import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import axios from 'axios';
 import {task} from 'true-myth';
 
@@ -71,7 +72,9 @@ type E2EIServiceTestSetup = readonly [
 ];
 
 async function buildE2EIService(dbName = 'core-test-db'): Promise<E2EIServiceTestSetup> {
-  const transactionContext = {} as unknown as jest.Mocked<CoreCryptoContext>;
+  const transactionContext = {
+    checkCredentials: jest.fn().mockResolvedValue(undefined),
+  } as unknown as jest.Mocked<CoreCryptoContext>;
 
   const coreCrypto = {
     getUserIdentities: jest.fn(),
@@ -349,23 +352,79 @@ describe('E2EIServiceExternal', () => {
     });
 
     it('refreshes revocation data on demand', async () => {
-      const [service, {pkiEnvironment}] = await buildE2EIService('initializeRefreshRevocationData');
+      const [service, {pkiEnvironment, transactionContext}] = await buildE2EIService('initializeRefreshRevocationData');
 
       await service.initialize(discoveryUrl, authenticate);
       expect(pkiEnvironment.addIntermediateCert).toHaveBeenCalledTimes(2);
+      expect(transactionContext.checkCredentials).toHaveBeenCalledTimes(1);
 
       await service.refreshRevocationData();
       expect(pkiEnvironment.addIntermediateCert).toHaveBeenCalledTimes(4);
+      expect(transactionContext.checkCredentials).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  describe('credentials check', () => {
+    const authenticate = jest.fn(async () => {
+      return 'id-token';
+    });
+
+    it('emits credentialsChecked after a successful check', async () => {
+      const [service] = await buildE2EIService('credentialsCheckedEvent');
+      const listener = jest.fn();
+      service.on('credentialsChecked', listener);
+
+      await service.initialize(discoveryUrl, authenticate);
+
+      expect(listener).toHaveBeenCalledTimes(1);
+    });
+
+    it('logs a failed check without emitting credentialsChecked', async () => {
+      const [service, {transactionContext}] = await buildE2EIService('credentialsCheckFailure');
+      const listener = jest.fn();
+      service.on('credentialsChecked', listener);
+      transactionContext.checkCredentials.mockRejectedValueOnce(new Error('CRL endpoint unavailable'));
+
+      await expect(service.initialize(discoveryUrl, authenticate)).resolves.toBeUndefined();
+
+      expect(transactionContext.checkCredentials).toHaveBeenCalledTimes(1);
+      expect(listener).not.toHaveBeenCalled();
+    });
+
+    it('schedules a check every 24 hours and runs it once on first initialization', async () => {
+      const [service, {recurringTaskScheduler, transactionContext}] =
+        await buildE2EIService('credentialsCheckSchedule');
+      const registerTask = jest.spyOn(recurringTaskScheduler, 'registerTask');
+
+      await service.initialize(discoveryUrl, authenticate);
+
+      expect(transactionContext.checkCredentials).toHaveBeenCalledTimes(1);
+      expect(registerTask).toHaveBeenCalledWith(
+        expect.objectContaining({every: TimeInMillis.DAY, key: 'check-credentials'}),
+      );
+    });
+
+    it('does not run the check twice when the task was already scheduled before a restart', async () => {
+      const dbName = 'credentialsCheckIdempotent';
+      const [firstService, firstDependencies] = await buildE2EIService(dbName);
+      await firstService.initialize(discoveryUrl, authenticate);
+      expect(firstDependencies.transactionContext.checkCredentials).toHaveBeenCalledTimes(1);
+
+      // A new service instance and scheduler sharing the same database models an app restart.
+      const [secondService, secondDependencies] = await buildE2EIService(dbName);
+      await secondService.initialize(discoveryUrl, authenticate);
+
+      expect(secondDependencies.transactionContext.checkCredentials).not.toHaveBeenCalled();
     });
   });
 
   describe('PKI environment hooks', () => {
-    const initializeService = async (dbName: string): Promise<InitializedService> => {
+    const initializeService = async (dbName: string, crlProxy?: string): Promise<InitializedService> => {
       const [service, dependencies] = await buildE2EIService(dbName);
       const authenticate = jest.fn(async () => {
         return 'id-token';
       });
-      await service.initialize(discoveryUrl, authenticate);
+      await service.initialize(discoveryUrl, authenticate, {crlProxy});
       const hooks = createPkiEnvironmentMock.mock.calls[0][0];
       return {service, ...dependencies, authenticate, hooks};
     };
@@ -435,6 +494,55 @@ describe('E2EIServiceExternal', () => {
         headers: [{name: 'replay-nonce', value: 'nonce'}],
         body: new Uint8Array([123, 34, 111, 107, 34, 58, 116, 114, 117, 101, 125]),
       });
+    });
+
+    it.each([
+      ['https://crl.example.test/crl', 'https://proxy.example.test/proxyCrl/crl.example.test'],
+      ['https://crl.example.test/some/nested/path/crl', 'https://proxy.example.test/proxyCrl/crl.example.test'],
+      ['https://crl.example.test/crl?tenant=wire', 'https://proxy.example.test/proxyCrl/crl.example.test'],
+    ])('routes the CRL URL %s through the proxy', async (crlUrl, expectedUrl) => {
+      const {hooks} = await initializeService('hooksCrlProxyRewrite', 'https://proxy.example.test/proxyCrl');
+
+      await hooks.httpRequest(HttpMethod.Get, crlUrl, [], new Uint8Array());
+
+      expect(axiosMock.request).toHaveBeenCalledWith(expect.objectContaining({url: expectedUrl}));
+    });
+
+    it('does not add a second slash when the proxy URL ends with one', async () => {
+      const {hooks} = await initializeService('hooksCrlProxyTrailingSlash', 'https://proxy.example.test/proxyCrl/');
+
+      await hooks.httpRequest(HttpMethod.Get, 'https://crl.example.test/crl', [], new Uint8Array());
+
+      expect(axiosMock.request).toHaveBeenCalledWith(
+        expect.objectContaining({url: 'https://proxy.example.test/proxyCrl/crl.example.test'}),
+      );
+    });
+
+    it('keeps non CRL requests untouched when a proxy is configured', async () => {
+      const {hooks} = await initializeService('hooksCrlProxyNonCrl', 'https://proxy.example.test/proxyCrl');
+
+      await hooks.httpRequest(HttpMethod.Post, 'https://acme.example.test/new-order', [], new Uint8Array());
+
+      expect(axiosMock.request).toHaveBeenCalledWith(
+        expect.objectContaining({url: 'https://acme.example.test/new-order'}),
+      );
+    });
+
+    it('keeps the raw CRL URL when no proxy is configured', async () => {
+      const {hooks} = await initializeService('hooksCrlWithoutProxy');
+
+      await hooks.httpRequest(HttpMethod.Get, 'https://crl.example.test/crl', [], new Uint8Array());
+
+      expect(axiosMock.request).toHaveBeenCalledWith(expect.objectContaining({url: 'https://crl.example.test/crl'}));
+    });
+
+    it('rejects a malformed URL instead of passing it through', async () => {
+      const {hooks} = await initializeService('hooksMalformedUrl', 'https://proxy.example.test/proxyCrl');
+
+      await expect(hooks.httpRequest(HttpMethod.Get, 'not a url', [], new Uint8Array())).rejects.toThrow(
+        'Could not parse request URL',
+      );
+      expect(axiosMock.request).not.toHaveBeenCalled();
     });
   });
 });
