@@ -708,7 +708,7 @@ describe('MLSService', () => {
 
       expect(transactionContext.mlsInit).toHaveBeenCalledWith(expect.any(ClientId), expectedMlsTransport);
 
-      expect(mlsService.config).toEqual(config);
+      expect(mlsService.config).toEqual({...config, signatureAlgorithm: MLSPublicKeyAlgorithmKeys.ED25519});
     });
 
     it('uses the default config value when provided with undefined by the consumer', async () => {
@@ -736,7 +736,11 @@ describe('MLSService', () => {
 
       expect(transactionContext.mlsInit).toHaveBeenCalledWith(expect.any(ClientId), expectedMlsTransport);
 
-      expect(mlsService.config).toEqual({...config, nbKeyPackages: 100});
+      expect(mlsService.config).toEqual({
+        ...config,
+        nbKeyPackages: 100,
+        signatureAlgorithm: MLSPublicKeyAlgorithmKeys.ED25519,
+      });
     });
 
     it.each([100, 1000])(
