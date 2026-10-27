@@ -63,7 +63,7 @@ export class Core extends Account {
       systemCrypto: !isUndefined(window.systemCrypto) ? wrapSystemCrypto(window.systemCrypto) : undefined,
       coreCryptoConfig: {
         enabled: enableCoreCrypto,
-        wasmFilePath: `/min/`,
+        wasmFilePath: '/min/core-crypto.wasm',
       },
       nbPrekeys: 100,
     });
