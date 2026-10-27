@@ -99,88 +99,31 @@ type-check: build-libraries tooling-type-check
 
 # Build workspace libraries required by dependent tasks such as type-checking and tests.
 [group('build')]
-build-libraries: \
-    _build-bazinga64 \
-    _build-certificate-check \
-    _build-commons \
-    _build-config \
-    _build-copy-config \
-    _build-license-collector \
-    _build-prettier-config \
-    _build-priority-queue \
-    _build-react-ui-kit \
-    _build-store-engine \
-    _build-store-engine-dexie \
-    _build-store-engine-fs \
-    _build-telemetry \
-    _build-webapp-events \
-    _build-api-client \
-    _build-core
-
-_build-api-client: _build-commons _build-priority-queue _build-store-engine-fs
-    rimraf libraries/api-client/lib
-    cd libraries/api-client && tsc
-
-_build-bazinga64:
-    rimraf libraries/bazinga64/lib
+build-libraries:
     cd libraries/bazinga64 && tsc
-
-_build-certificate-check:
-    rimraf libraries/certificate-check/lib
     cd libraries/certificate-check && tsc
-
-_build-commons:
-    rimraf libraries/commons/lib
     cd libraries/commons && tsc
-
-_build-config:
-    rimraf libraries/config/lib
-    cd libraries/config && tsc --build --clean && tsc
-
-_build-copy-config:
-    rimraf libraries/copy-config/lib
+    cd libraries/config && tsc
     cd libraries/copy-config && tsc
-
-_build-core: _build-api-client _build-bazinga64 _build-commons _build-priority-queue _build-store-engine
-    rimraf libraries/core/.tmp libraries/core/lib
-    cd libraries/core && tsc
-
-_build-license-collector:
-    rimraf libraries/license-collector/lib
     cd libraries/license-collector && tsc
-
-_build-prettier-config:
-    echo 'No build required'
-
-_build-priority-queue:
-    rimraf libraries/priority-queue/lib
     cd libraries/priority-queue && tsc
-
-_build-react-ui-kit:
-    rimraf libraries/react-ui-kit/lib
     cd libraries/react-ui-kit && tsc
-
-_build-store-engine:
-    rimraf libraries/store-engine/lib
     cd libraries/store-engine && tsc
-
-_build-store-engine-dexie: _build-store-engine
-    rimraf libraries/store-engine-dexie/lib
     cd libraries/store-engine-dexie && tsc
-
-_build-store-engine-fs: _build-store-engine
-    rimraf libraries/store-engine-fs/lib
     cd libraries/store-engine-fs && tsc
-
-_build-telemetry:
-    rimraf libraries/telemetry/lib
-    cd libraries/telemetry && tsc --build --clean tsconfig.json tsconfig.commonjs.json
     cd libraries/telemetry && node bin/copyAssets.mts
     cd libraries/telemetry && tsc --build tsconfig.json tsconfig.commonjs.json
-
-_build-webapp-events:
-    rimraf libraries/webapp-events/lib
     cd libraries/webapp-events && tsc
+    cd libraries/api-client && tsc
+    cd libraries/core && tsc
+
+# Remove generated library outputs and library build information for a clean build.
+[group('build')]
+clean-libraries:
+    rimraf libraries/*/lib
+    rimraf target/buildcache/config-build.tsbuildinfo
+    rimraf target/buildcache/telemetry-esm-build.tsbuildinfo
+    rimraf target/buildcache/telemetry-commonjs-build.tsbuildinfo
 
 # Run all unit tests with native Jest multi-project execution.
 [group('testing')]
