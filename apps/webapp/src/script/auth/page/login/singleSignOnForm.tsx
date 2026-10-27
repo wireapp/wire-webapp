@@ -45,7 +45,7 @@ import {JoinGuestLinkPasswordModal} from '../../component/joinGuestLinkPasswordM
 import {actionRoot as ROOT_ACTIONS} from '../../module/action';
 import {ValidationError} from '../../module/action/validationError';
 import {RootState, ThunkDispatch} from '../../module/reducer';
-import type {RegistrationDataState} from '../../module/reducer/authReducer';
+import type {LoginDataState, RegistrationDataState} from '../../module/reducer/authReducer';
 import * as AuthSelector from '../../module/selector/authSelector';
 import * as ConversationSelector from '../../module/selector/conversationSelector';
 import {QUERY_KEY, ROUTE} from '../../route';
@@ -80,15 +80,17 @@ const SingleSignOnFormComponent: FunctionComponent<SingleSignOnFormProps & Conne
   doGetConversationInfoByCode,
   doNavigate,
   pushAccountRegistrationData,
+  pushLoginData,
   account,
+  loginData,
 }: SingleSignOnFormProps & ConnectedProps & DispatchProps) => {
-  const {translate} = useApplicationContext();
+  const {fireAndForgetInvoker, translate} = useApplicationContext();
   const codeOrMailInput = useRef<HTMLInputElement>(null);
   const [codeOrMail, setCodeOrMail] = useState(account.email ?? '');
   const [disableInput, setDisableInput] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [clientType, setClientType] = useState<ClientType>(ClientType.PERMANENT);
+  const {clientType} = loginData;
   const [ssoError, setSsoError] = useState<BackendError | null>(null);
   const [isCodeOrMailInputValid, setIsCodeOrMailInputValid] = useState(true);
   const [validationError, setValidationError] = useState<unknown>();
@@ -155,11 +157,11 @@ const SingleSignOnFormComponent: FunctionComponent<SingleSignOnFormProps & Conne
   useEffect(() => {
     const queryClientType = UrlUtil.getURLParameter(QUERY_KEY.CLIENT_TYPE);
     if (queryClientType === ClientType.TEMPORARY) {
-      setClientType(ClientType.TEMPORARY);
-    } else {
-      setClientType(ClientType.PERMANENT);
+      fireAndForgetInvoker.fireAndForget(async () => {
+        await pushLoginData({clientType: ClientType.TEMPORARY});
+      });
     }
-  }, [doCheckConversationCode, doGetConversationInfoByCode]);
+  }, [fireAndForgetInvoker, pushLoginData]);
 
   useEffect(() => {
     const queryLogoutReason = UrlUtil.getURLParameter(QUERY_KEY.LOGOUT_REASON);
@@ -399,7 +401,10 @@ const SingleSignOnFormComponent: FunctionComponent<SingleSignOnFormProps & Conne
             name="enter-public-computer-sso-sign-in"
             id="enter-public-computer-sso-sign-in"
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              setClientType(event.target.checked ? ClientType.TEMPORARY : ClientType.PERMANENT);
+              const isChecked = event.target.checked;
+              fireAndForgetInvoker.fireAndForget(async () => {
+                await pushLoginData({clientType: isChecked ? ClientType.TEMPORARY : ClientType.PERMANENT});
+              });
             }}
             checked={clientType === ClientType.TEMPORARY}
             data-uie-name="enter-public-computer-sso-sign-in"
@@ -422,6 +427,7 @@ type MapStateToPropsResult = {
   conversationError: (Error & {label?: string; code?: number; message?: string}) | null;
   conversationInfo: ConversationJoinData | null;
   conversationInfoFetching: boolean;
+  loginData: LoginDataState;
 };
 const mapStateToProps = (state: RootState): MapStateToPropsResult => {
   return {
@@ -431,6 +437,7 @@ const mapStateToProps = (state: RootState): MapStateToPropsResult => {
     conversationError: ConversationSelector.getError(state),
     conversationInfo: ConversationSelector.conversationInfo(state),
     conversationInfoFetching: ConversationSelector.conversationInfoFetching(state),
+    loginData: AuthSelector.getLoginData(state),
   };
 };
 
@@ -450,6 +457,7 @@ type MapDispatchToPropsResult = {
   resetAuthError: () => Promise<void>;
   validateSSOCode: (code: string) => Promise<void>;
   pushAccountRegistrationData: (registration: Partial<RegistrationDataState>) => Promise<void>;
+  pushLoginData: (loginData: Partial<LoginDataState>) => Promise<void>;
 };
 const mapDispatchToProps = (dispatch: ThunkDispatch): MapDispatchToPropsResult => {
   return {
@@ -483,6 +491,9 @@ const mapDispatchToProps = (dispatch: ThunkDispatch): MapDispatchToPropsResult =
     },
     pushAccountRegistrationData: (...args: Parameters<typeof ROOT_ACTIONS.authAction.pushAccountRegistrationData>) => {
       return dispatch(ROOT_ACTIONS.authAction.pushAccountRegistrationData(...args));
+    },
+    pushLoginData: (...args: Parameters<typeof ROOT_ACTIONS.authAction.pushLoginData>) => {
+      return dispatch(ROOT_ACTIONS.authAction.pushLoginData(...args));
     },
   };
 };
