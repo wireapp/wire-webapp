@@ -4,6 +4,8 @@
     "noEmit": true,
     "types": ["node", "jest"],
     "noUncheckedIndexedAccess": false,
+    "incremental": true,
+    "tsBuildInfoFile": "../../target/buildcache/store-engine-dexie-type-check.tsbuildinfo",
     "rootDir": "..",
     "baseUrl": ".",
     "paths": {

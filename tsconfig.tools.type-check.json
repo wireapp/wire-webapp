@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.tools.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "incremental": true,
+    "tsBuildInfoFile": "target/buildcache/tooling-type-check.tsbuildinfo"
+  }
+}

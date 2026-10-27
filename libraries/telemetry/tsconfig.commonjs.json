@@ -3,6 +3,6 @@
   "compilerOptions": {
     "module": "CommonJS",
     "outDir": "lib/commonjs",
-    "tsBuildInfoFile": "lib/commonjs/telemetry.tsbuildinfo"
+    "tsBuildInfoFile": "../../target/buildcache/telemetry-commonjs-build.tsbuildinfo"
   }
 }

@@ -7,13 +7,13 @@
     "clean": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npx rimraf lib",
+        "command": "npx rimraf lib && tsc --build --clean tsconfig.json tsconfig.commonjs.json",
         "cwd": "{projectRoot}"
       }
     },
     "build": {
       "executor": "nx:run-commands",
-      "outputs": ["{projectRoot}/lib"],
+      "outputs": ["{projectRoot}/lib", "{workspaceRoot}/target/buildcache/telemetry-esm-build.tsbuildinfo", "{workspaceRoot}/target/buildcache/telemetry-commonjs-build.tsbuildinfo"],
       "dependsOn": ["clean"],
       "options": {
         "command": "node bin/copyAssets.mts && tsc --build tsconfig.json tsconfig.commonjs.json",
