@@ -82,14 +82,6 @@ import {handleMLSMessageAdd, handleMLSWelcomeMessage} from '../eventHandler/even
 import {ClientId, HandlePendingProposalsParams} from '../types';
 import {createMLSClientId} from '../utils/mlsId';
 
-/**
- * CoreCrypto reports epochs as `bigint`. Epochs only grow by one per commit, so they will never exceed
- * `Number.MAX_SAFE_INTEGER` in practice; converting at this boundary keeps the rest of the codebase on `number`.
- */
-const epochToNumber = (epoch: bigint): number => {
-  return Number(epoch);
-};
-
 const keyingMaterialLifetimeInDays = 30;
 const keyPackageReplenishmentDivisor = 2;
 
@@ -131,7 +123,7 @@ export enum MLSServiceEvents {
 
 type Events = {
   [MLSServiceEvents.KEY_MATERIAL_UPDATE_FAILURE]: {error: unknown; groupId: string};
-  [MLSServiceEvents.NEW_EPOCH]: {epoch: number; groupId: string};
+  [MLSServiceEvents.NEW_EPOCH]: {epoch: bigint; groupId: string};
   [MLSServiceEvents.MLS_CLIENT_MISMATCH]: void;
   [MLSServiceEvents.MLS_EVENT_DISTRIBUTED]: {
     events: any;
@@ -165,9 +157,8 @@ export class MLSService extends TypedEventEmitter<Events> {
     };
 
     const epochObserver: EpochObserver = {
-      epochChanged: async (groupId, coreCryptoEpoch) => {
+      epochChanged: async (groupId, epoch) => {
         const groupIdStr = Encoder.toBase64(groupId.copyBytes()).asString;
-        const epoch = epochToNumber(coreCryptoEpoch);
         this.logger.info(`Epoch changed for group ${groupIdStr}, new epoch: ${epoch}`);
         this.emit(MLSServiceEvents.NEW_EPOCH, {epoch, groupId: groupIdStr});
       },
@@ -345,7 +336,7 @@ export class MLSService extends TypedEventEmitter<Events> {
           if (!this.initialKeyPackageUploadDeferred) {
             await this.uploadMLSPublicKeys(client);
             // Initial registration needs packages immediately, without triggering exhaustion recovery.
-            const keyPackages = await this.clientKeypackages(this.keyPackageUploadAmount);
+            const keyPackages = await this.generateKeyPackages(this.keyPackageUploadAmount);
             await this.uploadMLSKeyPackages(client.id, keyPackages);
           } else {
             this.logger.info(`Blocked initial key package upload for client ${client.id} as E2EI is enabled`);
@@ -588,9 +579,9 @@ export class MLSService extends TypedEventEmitter<Events> {
   /**
    * @deprecated Use `getSafeEpoch` to receive a `Task` with explicit error handling.
    */
-  public async getEpoch(groupId: string | Uint8Array): Promise<number> {
+  public getEpoch(groupId: string | Uint8Array): Promise<bigint> {
     const groupIdBytes = typeof groupId === 'string' ? Decoder.fromBase64(groupId).asBytes : groupId;
-    return epochToNumber(await this.coreCryptoClient.conversationEpoch(new ConversationId(groupIdBytes)));
+    return this.coreCryptoClient.conversationEpoch(new ConversationId(groupIdBytes));
   }
 
   /**
@@ -603,14 +594,14 @@ export class MLSService extends TypedEventEmitter<Events> {
    * `MlsErrorOther: Couldn't find conversation` (for example when the group is
    * not present on core-crypto level).
    */
-  public getSafeEpoch(groupId: string | Uint8Array): Task<number, unknown> {
+  public getSafeEpoch(groupId: string | Uint8Array): Task<bigint, unknown> {
     return task.tryOrElse(
       errorReason => {
         return `Failed to get safe epoch for group ${groupId}: ${errorReason}`;
       },
-      async () => {
+      () => {
         const groupIdBytes = typeof groupId === 'string' ? Decoder.fromBase64(groupId).asBytes : groupId;
-        return epochToNumber(await this.coreCryptoClient.conversationEpoch(new ConversationId(groupIdBytes)));
+        return this.coreCryptoClient.conversationEpoch(new ConversationId(groupIdBytes));
       },
     );
   }
@@ -670,12 +661,12 @@ export class MLSService extends TypedEventEmitter<Events> {
       return decryptedMessage;
     } catch (error: unknown) {
       // This is safe (read-only) and helps correlate decryption failures with local epoch.
-      const coreCryptoEpochNumber = await task.tryOrElse<number, unknown>(
+      const coreCryptoEpochNumber = await task.tryOrElse<bigint, unknown>(
         errorReason => {
           return `Failed to collect epoch details for decryption failure: ${conversationId}: ${errorReason}`;
         },
-        async () => {
-          return epochToNumber(await this.coreCryptoClient.conversationEpoch(conversationId));
+        () => {
+          return this.coreCryptoClient.conversationEpoch(conversationId);
         },
       );
       this.logger.warn('Failed to decrypt MLS message', {
@@ -972,7 +963,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     return doesConversationExist && (await this.getEpoch(groupId)) > 0;
   }
 
-  public async clientValidKeypackagesCount(): Promise<number> {
+  public async countValidKeyPackages(): Promise<number> {
     const credentialRef = await this.requireCredentialRef();
     return this.coreCryptoClient.transaction(async cx => {
       const keyPackages = await cx.getKeyPackages();
@@ -986,7 +977,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     });
   }
 
-  public async clientKeypackages(amountRequested: number): Promise<Uint8Array[]> {
+  public async generateKeyPackages(amountRequested: number): Promise<Uint8Array[]> {
     const credentialRef = await this.requireCredentialRef();
     return this.coreCryptoClient.transaction(async cx => {
       const keyPackages: Uint8Array[] = [];
@@ -1085,7 +1076,7 @@ export class MLSService extends TypedEventEmitter<Events> {
    * @param clientId id of the client
    */
   private async verifyLocalMLSKeyPackagesAmount(clientId: string): Promise<void> {
-    const keyPackagesCount = await this.clientValidKeypackagesCount();
+    const keyPackagesCount = await this.countValidKeyPackages();
 
     if (keyPackagesCount <= this.minRequiredKeyPackages) {
       return this.verifyRemoteMLSKeyPackagesAmount(clientId);
@@ -1113,7 +1104,7 @@ export class MLSService extends TypedEventEmitter<Events> {
       return;
     }
 
-    const keyPackages = await this.clientKeypackages(uploadAmount);
+    const keyPackages = await this.generateKeyPackages(uploadAmount);
     await this.uploadMLSKeyPackages(clientId, keyPackages);
 
     // Mark recovery only after a successful upload, so the marker never outlives a failed refill attempt.

@@ -34,8 +34,8 @@ import {
   Database,
   DatabaseKey,
   PkiEnvironment,
-  type PkiEnvironmentHooks,
   proteusLastResortPrekeyId,
+  type PkiEnvironmentHooks,
 } from '@wireapp/core-crypto';
 import type {CRUDEngine} from '@wireapp/store-engine';
 
@@ -48,6 +48,18 @@ import {CryptoClient, InitialPrekeys} from '../cryptoClient.types';
 type SecretKeySizeInBytes = 16 | 32;
 const legacySecretKeySizeInBytes = 16;
 const secretKeySizeInBytes = 32;
+const reseedSeedSizeInBytes = 32;
+
+const validateReseedSeed = (seed: Uint8Array): Result<Uint8Array, Error> => {
+  if (seed.byteLength !== reseedSeedSizeInBytes) {
+    return result.err(
+      new Error(
+        `CoreCrypto reseed requires a seed of exactly ${reseedSeedSizeInBytes} bytes, received ${seed.byteLength}`,
+      ),
+    );
+  }
+  return result.ok(seed);
+};
 
 type Config = {
   generateSecretKey: (keyId: string, keySize: SecretKeySizeInBytes) => Promise<GeneratedKey>;
@@ -302,7 +314,11 @@ export class CoreCryptoWrapper implements CryptoClient {
 
   async create(nbPrekeys: number, entropy?: Uint8Array): Promise<InitialPrekeys> {
     if (entropy !== undefined) {
-      await this.coreCrypto.reseed(entropy);
+      const seed = validateReseedSeed(entropy);
+      if (result.isErr(seed)) {
+        return Promise.reject(seed.error);
+      }
+      await this.coreCrypto.reseed(seed.value);
     }
     await this.init();
     const prekeys: PreKey[] = [];

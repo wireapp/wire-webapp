@@ -88,13 +88,13 @@ describe('MLS welcomeMessage eventHandler', () => {
     });
 
     it('emits new epoch event after processing a welcome message', async () => {
-      jest.spyOn(mockParams.mlsService, 'getEpoch').mockResolvedValue(1);
+      jest.spyOn(mockParams.mlsService, 'getEpoch').mockResolvedValue(1n);
 
       await handleMLSWelcomeMessage(mockParams);
 
       expect(mockParams.mlsService.emit).toHaveBeenCalledWith(MLSServiceEvents.NEW_EPOCH, {
         groupId: Uint8Array.from([1, 2, 3]),
-        epoch: 1,
+        epoch: 1n,
       });
     });
   });

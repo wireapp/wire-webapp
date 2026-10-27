@@ -55,6 +55,7 @@ type EnrollmentTimerDelays = {nextReminderDelay: number; remainingGracePeriodDel
 interface E2EIHandlerParams {
   discoveryUrl: string;
   gracePeriodInSeconds: number;
+  crlProxy?: string;
   clock: Clock;
 }
 
@@ -151,7 +152,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   }
 
   /** will initialize the e2ei enrollment handler eventually triggering an enrollment flow if the device is a fresh new one */
-  public async initialize({discoveryUrl, gracePeriodInSeconds, clock}: E2EIHandlerParams): Promise<this> {
+  public async initialize({discoveryUrl, gracePeriodInSeconds, crlProxy, clock}: E2EIHandlerParams): Promise<this> {
     this.applicationClock = clock;
     const gracePeriodInMs = gracePeriodInSeconds * TIME_IN_MILLIS.SECOND;
     this.#config = {
@@ -159,9 +160,13 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       gracePeriodInMs,
     };
 
-    await this.coreE2EIService.initialize(discoveryUrl, params => {
-      return this.authenticateWithIdentityProvider(params);
-    });
+    await this.coreE2EIService.initialize(
+      discoveryUrl,
+      params => {
+        return this.authenticateWithIdentityProvider(params);
+      },
+      {crlProxy},
+    );
 
     const isFreshClient = await isFreshMLSSelfClient();
 

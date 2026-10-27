@@ -290,7 +290,7 @@ describe('ConversationService', () => {
         .mockResolvedValueOnce(undefined as any);
 
       const remoteEpoch = 6;
-      const localEpoch = 5;
+      const localEpoch = 5n;
       jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(localEpoch)));
 
       jest.spyOn(apiClient.api.conversation, 'getConversation').mockResolvedValue({
@@ -327,7 +327,7 @@ describe('ConversationService', () => {
         .mockResolvedValueOnce(undefined as any);
 
       const remoteEpoch = 10;
-      const localEpoch = 9;
+      const localEpoch = 9n;
       jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(localEpoch)));
       jest.spyOn(apiClient.api.conversation, 'getConversation').mockResolvedValueOnce({
         qualified_id: conversationId,
@@ -384,7 +384,7 @@ describe('ConversationService', () => {
         .mockResolvedValueOnce(undefined as unknown as void);
 
       const remoteEpoch = 5;
-      const localEpoch = 4;
+      const localEpoch = 4n;
 
       jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(localEpoch)));
 
@@ -426,7 +426,7 @@ describe('ConversationService', () => {
       jest.spyOn(apiClient.api.conversation, 'postMlsMessage').mockRejectedValueOnce(staleMessageError);
 
       const remoteEpoch = 5;
-      const localEpoch = 4;
+      const localEpoch = 4n;
 
       jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(localEpoch)));
 
@@ -533,7 +533,7 @@ describe('ConversationService', () => {
       const mockedDBResponse: Conversation[] = [mlsConversation1, mlsConversation2];
       jest.spyOn(apiClient.api.conversation, 'getConversationList').mockResolvedValueOnce({found: mockedDBResponse});
 
-      jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(2)));
+      jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(2n)));
 
       await conversationService.handleConversationsEpochMismatch();
       expect(conversationService.joinByExternalCommit).toHaveBeenCalledWith(mlsConversation1.qualified_id);
@@ -548,7 +548,7 @@ describe('ConversationService', () => {
       const mockedDBResponse: Conversation[] = [mlsConversation];
       jest.spyOn(apiClient.api.conversation, 'getConversationList').mockResolvedValueOnce({found: mockedDBResponse});
 
-      jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(1)));
+      jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(1n)));
 
       await conversationService.handleConversationsEpochMismatch();
       expect(conversationService.joinByExternalCommit).not.toHaveBeenCalled();
@@ -830,7 +830,7 @@ describe('ConversationService', () => {
       jest.spyOn(mlsService, 'handleMLSMessageAddEvent').mockRejectedValueOnce(wrongEpochError);
 
       const remoteEpoch = 5;
-      const localEpoch = 4;
+      const localEpoch = 4n;
 
       jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(localEpoch)));
 
@@ -943,7 +943,7 @@ describe('ConversationService', () => {
       jest.spyOn(mlsService, 'handleMLSMessageAddEvent').mockRejectedValueOnce(wrongEpochError);
 
       const remoteEpoch = 5;
-      const localEpoch = 4;
+      const localEpoch = 4n;
 
       jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(localEpoch)));
 
@@ -1216,7 +1216,7 @@ describe('ConversationService', () => {
         .mockResolvedValueOnce(undefined as any);
 
       const remoteEpoch = 5;
-      const localEpoch = 4;
+      const localEpoch = 4n;
       jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(localEpoch)));
 
       const getConvSpy = jest.spyOn(apiClient.api.conversation, 'getConversation');
@@ -1481,7 +1481,7 @@ describe('ConversationService', () => {
       );
 
       const remoteEpoch = 3;
-      const localEpoch = 2;
+      const localEpoch = 2n;
 
       jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(localEpoch)));
 

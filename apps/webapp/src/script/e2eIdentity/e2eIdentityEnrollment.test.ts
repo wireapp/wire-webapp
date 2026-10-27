@@ -152,6 +152,16 @@ describe('E2EIHandler', () => {
     expect(coreMock.service?.e2eIdentity?.initialize).toHaveBeenCalled();
   });
 
+  it('forwards the CRL proxy to the core E2EI service', async () => {
+    const crlProxy = 'https://proxy.example.test/proxyCrl';
+
+    await E2EIHandler.getInstance().initialize({...params, crlProxy});
+
+    expect(getE2EIServiceForTest().initialize).toHaveBeenCalledWith('http://example.com', expect.any(Function), {
+      crlProxy,
+    });
+  });
+
   it('does nothing if there is not enrollment in progress and device is alreaady enrolled', async () => {
     jest.spyOn(getE2EIServiceForTest(), 'isEnrollmentInProgress').mockResolvedValue(false);
     jest.spyOn(getE2EIServiceForTest(), 'isFreshMLSSelfClient').mockResolvedValue(false);

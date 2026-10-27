@@ -4407,7 +4407,7 @@ describe('onMLSResetMessage', () => {
     const coreConversationService = getConversationServiceFromCoreForTest(core);
     spyOn(coreConversationService, 'wipeMLSConversation').and.returnValue(Promise.resolve(undefined));
     spyOn(coreConversationService, 'mlsGroupExistsLocally').and.returnValue(Promise.resolve(true));
-    spyOn(getMlsServiceForTest(core), 'getEpoch').and.returnValue(Promise.resolve(5));
+    spyOn(getMlsServiceForTest(core), 'getEpoch').and.returnValue(Promise.resolve(5n));
 
     const addEventSpy = jest.spyOn(conversationRepository as any, 'addEventToConversation').mockResolvedValue({});
     const updatePropertiesSpy = jest.spyOn(ConversationMapper, 'updateProperties');
