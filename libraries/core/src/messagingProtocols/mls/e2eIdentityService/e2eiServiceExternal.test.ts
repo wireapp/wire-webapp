@@ -36,7 +36,7 @@ import {
 
 import {E2EIServiceExternal} from './e2eiServiceExternal';
 
-import {createPkiEnvironment} from '../../proteus/proteusService/cryptoClient/coreCryptoWrapper';
+import type {createPkiEnvironment} from '../../proteus/proteusService/cryptoClient/coreCryptoWrapper';
 import {ClientService} from '../../../client';
 import {openDB} from '../../../storage/coreDb';
 import {getUUID} from '../../../test/payloadHelper';
@@ -46,11 +46,10 @@ import {RecurringTaskScheduler} from '../../../util/recurringTaskScheduler';
 import {MLSService} from '../mlsService';
 import {createMLSClientId} from '../utils/mlsId';
 
-jest.mock('../../proteus/proteusService/cryptoClient/coreCryptoWrapper', () => {
-  return {createPkiEnvironment: jest.fn()};
-});
-
-const createPkiEnvironmentMock = createPkiEnvironment as jest.MockedFunction<typeof createPkiEnvironment>;
+const createPkiEnvironmentMock = jest.fn<
+  ReturnType<typeof createPkiEnvironment>,
+  Parameters<typeof createPkiEnvironment>
+>();
 
 type InitializedService = E2EIServiceTestSetup[1] & {
   readonly authenticate: jest.Mock;
@@ -129,7 +128,15 @@ async function buildE2EIService(dbName = 'core-test-db'): Promise<E2EIServiceTes
     return task.resolve(pkiEnvironment);
   });
   return [
-    new E2EIServiceExternal(coreCrypto, apiClient, mockedDb, recurringTaskScheduler, clientService, mockedMLSService),
+    new E2EIServiceExternal(
+      coreCrypto,
+      apiClient,
+      mockedDb,
+      recurringTaskScheduler,
+      clientService,
+      mockedMLSService,
+      createPkiEnvironmentMock,
+    ),
     {apiClient, coreCrypto, mlsService: mockedMLSService, pkiEnvironment, recurringTaskScheduler, transactionContext},
   ] as const;
 }

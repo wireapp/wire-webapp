@@ -96,6 +96,7 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     private readonly recurringTaskScheduler: RecurringTaskScheduler,
     private readonly clientService: ClientService,
     private readonly mlsService: MLSService,
+    private readonly createPkiEnvironmentFromHooks: typeof createPkiEnvironment = createPkiEnvironment,
   ) {
     super();
     this.enrollmentStorage = createE2EIEnrollmentStorage(coreDatabase);
@@ -316,7 +317,7 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
       return;
     }
 
-    const pkiEnvironment = await createPkiEnvironment(this.buildPkiEnvironmentHooks(authenticate)).match({
+    const pkiEnvironment = await this.createPkiEnvironmentFromHooks(this.buildPkiEnvironmentHooks(authenticate)).match({
       Resolved: environment => {
         return Promise.resolve(environment);
       },
