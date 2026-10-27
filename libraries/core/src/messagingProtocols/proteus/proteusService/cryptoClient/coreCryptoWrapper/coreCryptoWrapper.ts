@@ -257,11 +257,20 @@ export async function buildClient(
           }
         }
 
-        coreCryptoDatabase = await Database.open(coreCryptoDbName, key.key);
-        coreCryptoInstance = CoreCrypto.new(coreCryptoDatabase);
-
+        // Install the logger before opening the database, so that failures to open it are logged by CoreCrypto too.
         setLogger(coreCryptoLogger);
         setMaxLogLevel(CoreCryptoLogLevel.Info);
+
+        // The client may be built more than once per page: `registerClient` rebuilds the one created at login.
+        // CoreCrypto's SQLite keystore only allows one open handle per database, so opening it again while the
+        // previous handle is alive fails with "database is locked". Release the previous handles first.
+        const releaseResult = destroyCoreCryptoHandles();
+        if (result.isErr(releaseResult)) {
+          throw releaseResult.error;
+        }
+
+        coreCryptoDatabase = await Database.open(coreCryptoDbName, key.key);
+        coreCryptoInstance = CoreCrypto.new(coreCryptoDatabase);
 
         return new CoreCryptoWrapper(coreCryptoInstance, {nbPrekeys, onNewPrekeys, onWipe: key.deleteKey});
       })
