@@ -154,6 +154,7 @@ const renderCellsTable = ({
   initialNodes,
   selfUserDriveRole = CELLS_SELF_USER_DRIVE_ROLE.EDITOR,
   onRefresh = jest.fn(),
+  onRefreshAfterBulkMoveOutcome = jest.fn().mockResolvedValue(true),
   clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
   random = () => {
     return 0.5;
@@ -171,6 +172,7 @@ const renderCellsTable = ({
   readonly cellsRepository?: CellsRepository;
   readonly initialNodes?: CellNode[];
   readonly onRefresh?: () => void;
+  readonly onRefreshAfterBulkMoveOutcome?: () => Promise<boolean>;
   readonly selfUserDriveRole?: CellsSelfUserDriveRole;
   readonly clock?: ReturnType<typeof createDeterministicClock>;
   readonly random?: () => number;
@@ -222,6 +224,7 @@ const renderCellsTable = ({
               conversationQualifiedId={conversationQualifiedId}
               conversationName="Conversation"
               onRefresh={onRefresh}
+              onRefreshAfterBulkMoveOutcome={onRefreshAfterBulkMoveOutcome}
               onFolderDropTargetChange={onFolderDropTargetChange}
               onDropFilesToFolder={onDropFilesToFolder}
               onDropReadError={onDropReadError}
@@ -566,8 +569,71 @@ describe('CellsTable selection', () => {
     expect(screen.queryByText('Moved 2 items')).not.toBeInTheDocument();
     expect(within(reviewDialog).getByRole('button', {name: 'Move'})).toBeDisabled();
     expect(repository.moveNodes).toHaveBeenCalledTimes(1);
-    expect(onRefresh).toHaveBeenCalledTimes(1);
+    expect(onRefresh).not.toHaveBeenCalled();
     breadcrumbAnchor.remove();
+    window.location.hash = originalHash;
+  });
+
+  it('keeps unresolved selections locked after a failed refresh and clears them after a successful refresh', async () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files/Drive';
+    const user = userEvent.setup();
+    const onRefreshAfterBulkMoveOutcome = jest.fn().mockResolvedValueOnce(false).mockResolvedValueOnce(true);
+    const repository = {
+      getAllNodes: jest.fn().mockResolvedValue({Nodes: []}),
+      moveNodes: jest.fn().mockResolvedValue({
+        Status: 'Performed',
+        AffectedNodes: [{Path: 'Drive/Moved.pdf', Uuid: 'moved'}],
+      }),
+    } as unknown as CellsRepository;
+    const selectedFiles = [
+      createNode({
+        id: 'moved',
+        name: 'Moved.pdf',
+        path: 'conversation-id@example.com/Drive/Moved.pdf',
+        type: CellNodeType.FILE,
+      }),
+      createNode({
+        id: 'not-reported',
+        name: 'Not reported.pdf',
+        path: 'conversation-id@example.com/Drive/Not reported.pdf',
+        type: CellNodeType.FILE,
+      }),
+    ];
+    renderCellsTable({
+      cellsRepository: repository,
+      initialNodes: selectedFiles,
+      onRefreshAfterBulkMoveOutcome,
+    });
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Moved.pdf'}));
+    await user.click(screen.getByRole('checkbox', {name: 'Select Not reported.pdf'}));
+    await user.click(screen.getByRole('button', {name: 'Move'}));
+    const dialog = await screen.findByRole('dialog');
+    await user.click(within(dialog).getByRole('button', {name: 'cells.breadcrumb.files'}));
+    await user.click(within(dialog).getByRole('button', {name: 'Move'}));
+    const reviewDialog = await screen.findByRole('dialog');
+
+    expect(within(reviewDialog).getByRole('button', {name: 'cells.bulkMove.refreshDrive'})).toBeEnabled();
+    expect(screen.queryByRole('checkbox', {name: 'Select Moved.pdf'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('checkbox', {name: 'Select Not reported.pdf'})).not.toBeInTheDocument();
+    await user.click(within(reviewDialog).getByRole('button', {name: 'cells.bulkMove.refreshDrive'}));
+
+    expect(onRefreshAfterBulkMoveOutcome).toHaveBeenCalledTimes(1);
+    expect(within(reviewDialog).getByRole('alert')).toHaveTextContent('The move may be incomplete.');
+    expect(within(reviewDialog).getByRole('button', {name: 'cells.bulkMove.refreshDrive'})).toBeEnabled();
+    expect(screen.queryByRole('checkbox', {name: 'Select Moved.pdf'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('checkbox', {name: 'Select Not reported.pdf'})).not.toBeInTheDocument();
+
+    await user.click(within(reviewDialog).getByRole('button', {name: 'cells.bulkMove.refreshDrive'}));
+
+    expect(onRefreshAfterBulkMoveOutcome).toHaveBeenCalledTimes(2);
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.getByRole('checkbox', {name: 'Select Moved.pdf'})).not.toBeChecked();
+    expect(screen.getByRole('checkbox', {name: 'Select Not reported.pdf'})).not.toBeChecked();
+    await user.click(screen.getByRole('checkbox', {name: 'Select Moved.pdf'}));
+    expect(screen.getByText('1 selected')).toBeInTheDocument();
+    expect(repository.moveNodes).toHaveBeenCalledTimes(1);
     window.location.hash = originalHash;
   });
 
@@ -607,7 +673,7 @@ describe('CellsTable selection', () => {
     expect(within(reviewDialog).getByRole('button', {name: 'Move'})).toBeDisabled();
     expect(repository.moveNodes).toHaveBeenCalledTimes(1);
     expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(1);
-    expect(onRefresh).toHaveBeenCalledTimes(1);
+    expect(onRefresh).not.toHaveBeenCalled();
     window.location.hash = originalHash;
   });
 
@@ -890,9 +956,10 @@ describe('CellsTable selection', () => {
     await act(async () => {
       clock.advanceByMilliseconds(1000);
       await waitFor(() => {
-        expect(onRefresh).toHaveBeenCalledTimes(1);
+        expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(4);
       });
     });
+    expect(onRefresh).not.toHaveBeenCalled();
     const reviewDialog = await screen.findByRole('dialog');
     expect(within(reviewDialog).getByRole('alert')).toHaveTextContent(
       'Move status is unresolved. Verify the Drive before trying again.',
@@ -938,57 +1005,72 @@ describe('CellsTable selection', () => {
     expect(screen.queryByRole('progressbar', {name: 'Move completed'})).not.toBeInTheDocument();
     expect(within(reviewDialog).getByRole('button', {name: 'Move'})).toBeDisabled();
     expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(2);
-    expect(onRefresh).toHaveBeenCalledTimes(1);
-    window.location.hash = originalHash;
-  });
-
-  it('refreshes and requires review after a status lookup failure followed by terminal error', async () => {
-    const originalHash = window.location.hash;
-    window.location.hash = '#/conversation/conversation-id@example.com/files/wire-cells-web';
-    const user = userEvent.setup();
-    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
-    const onRefresh = jest.fn();
-    const repository = {
-      getAllNodes: jest.fn().mockResolvedValue({Nodes: []}),
-      moveNodes: jest
-        .fn()
-        .mockResolvedValueOnce({Status: 'Background', BackgroundActions: [{JobUuid: 'move-job', Name: 'move'}]})
-        .mockResolvedValueOnce({Status: 'Performed'}),
-      getBackgroundMoveInfo: jest
-        .fn()
-        .mockRejectedValueOnce(new Error('Status unavailable'))
-        .mockResolvedValueOnce({Status: 'Error'}),
-    } as unknown as CellsRepository;
-    renderCellsTable({cellsRepository: repository, onRefresh, clock});
-
-    await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
-    await user.click(screen.getByRole('button', {name: 'Move'}));
-    const dialog = await screen.findByRole('dialog');
-    await user.click(within(dialog).getByRole('button', {name: 'Move'}));
-    await waitFor(() => {
-      expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(1);
-    });
     expect(onRefresh).not.toHaveBeenCalled();
-
-    await act(async () => {
-      clock.advanceByMilliseconds(1000);
-      await Promise.resolve();
-    });
-    await waitFor(() => {
-      expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(2);
-    });
-    expect(onRefresh).toHaveBeenCalledTimes(1);
-    const preview = await screen.findByRole('dialog');
-    expect(within(preview).getByRole('alert')).toHaveTextContent('cells.bulkMove.moveNeedsReview');
-    expect(within(preview).getByRole('button', {name: 'Move'})).toBeDisabled();
-    expect(within(preview).queryByRole('button', {name: 'cells.bulkMove.reviewAndRetry'})).not.toBeInTheDocument();
-
-    await user.click(within(preview).getByRole('button', {name: 'cells.bulkMove.refreshDrive'}));
-    expect(onRefresh).toHaveBeenCalledTimes(2);
-    expect(within(preview).getByRole('button', {name: 'Move'})).toBeDisabled();
-    expect(repository.moveNodes).toHaveBeenCalledTimes(1);
     window.location.hash = originalHash;
   });
+
+  it.each([true, false])(
+    'requires a user refresh after a status lookup failure followed by terminal error (refresh succeeds: %s)',
+    async refreshSucceeded => {
+      const originalHash = window.location.hash;
+      window.location.hash = '#/conversation/conversation-id@example.com/files/wire-cells-web';
+      const user = userEvent.setup();
+      const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+      const onRefresh = jest.fn();
+      const onRefreshAfterBulkMoveOutcome = jest.fn().mockResolvedValue(refreshSucceeded);
+      const repository = {
+        getAllNodes: jest.fn().mockResolvedValue({Nodes: []}),
+        moveNodes: jest
+          .fn()
+          .mockResolvedValueOnce({Status: 'Background', BackgroundActions: [{JobUuid: 'move-job', Name: 'move'}]})
+          .mockResolvedValueOnce({Status: 'Performed'}),
+        getBackgroundMoveInfo: jest
+          .fn()
+          .mockRejectedValueOnce(new Error('Status unavailable'))
+          .mockResolvedValueOnce({Status: 'Error'}),
+      } as unknown as CellsRepository;
+      renderCellsTable({cellsRepository: repository, onRefresh, onRefreshAfterBulkMoveOutcome, clock});
+
+      await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+      await user.click(screen.getByRole('button', {name: 'Move'}));
+      const dialog = await screen.findByRole('dialog');
+      await user.click(within(dialog).getByRole('button', {name: 'Move'}));
+      await waitFor(() => {
+        expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(1);
+      });
+      expect(onRefresh).not.toHaveBeenCalled();
+
+      await act(async () => {
+        clock.advanceByMilliseconds(1000);
+        await Promise.resolve();
+      });
+      await waitFor(() => {
+        expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(2);
+      });
+      expect(onRefresh).not.toHaveBeenCalled();
+      const preview = await screen.findByRole('dialog');
+      expect(within(preview).getByRole('alert')).toHaveTextContent('cells.bulkMove.moveNeedsReview');
+      expect(within(preview).getByRole('button', {name: 'Move'})).toBeDisabled();
+      expect(within(preview).queryByRole('button', {name: 'cells.bulkMove.reviewAndRetry'})).not.toBeInTheDocument();
+
+      await user.click(within(preview).getByRole('button', {name: 'cells.bulkMove.refreshDrive'}));
+      await waitFor(() => {
+        expect(onRefreshAfterBulkMoveOutcome).toHaveBeenCalledTimes(1);
+      });
+      expect(onRefresh).not.toHaveBeenCalled();
+      expect(repository.moveNodes).toHaveBeenCalledTimes(1);
+      if (refreshSucceeded) {
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+        expect(screen.getByRole('checkbox', {name: 'Select Marketing images'})).not.toBeChecked();
+      } else {
+        const recoveryDialog = screen.getByRole('dialog');
+        expect(within(recoveryDialog).getByRole('alert')).toHaveTextContent('cells.bulkMove.moveNeedsReview');
+        expect(within(recoveryDialog).getByRole('button', {name: 'Move'})).toBeDisabled();
+        expect(screen.getByText('cells.newItemMenuModalForm.genericError')).toBeInTheDocument();
+      }
+      window.location.hash = originalHash;
+    },
+  );
 
   it('jitters unknown-status retries within bounded, increasing exponential intervals', async () => {
     const user = userEvent.setup();
@@ -1153,8 +1235,8 @@ describe('CellsTable selection', () => {
 
     await waitFor(() => {
       expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(2);
-      expect(onRefresh).toHaveBeenCalledTimes(1);
     });
+    expect(onRefresh).not.toHaveBeenCalled();
     const reviewDialog = await screen.findByRole('dialog');
     expect(within(reviewDialog).getByRole('button', {name: 'Move'})).toBeDisabled();
     expect(within(reviewDialog).getByRole('alert')).toHaveTextContent(
@@ -1227,9 +1309,9 @@ describe('CellsTable selection', () => {
     expect(within(statusDialog).getByRole('alert')).toHaveTextContent('cells.bulkMove.statusUnknown');
     await user.click(within(statusDialog).getByRole('button', {name: 'cells.bulkMove.checkStatus'}));
     await waitFor(() => {
-      expect(onRefresh).toHaveBeenCalledTimes(1);
+      expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(7);
     });
-    expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(7);
+    expect(onRefresh).not.toHaveBeenCalled();
     expect(repository.moveNodes).toHaveBeenCalledTimes(1);
     const reviewDialog = await screen.findByRole('dialog');
     expect(within(reviewDialog).getByRole('alert')).toHaveTextContent(
@@ -1277,10 +1359,10 @@ describe('CellsTable selection', () => {
     await act(async () => {
       clock.advanceByMilliseconds(1000);
       await waitFor(() => {
-        expect(onRefresh).toHaveBeenCalledTimes(1);
+        expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(2);
       });
     });
-    expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(2);
+    expect(onRefresh).not.toHaveBeenCalled();
     window.location.hash = originalHash;
   });
 
@@ -1309,8 +1391,9 @@ describe('CellsTable selection', () => {
     expect(within(dialog).getByRole('button', {name: 'Move'})).toBeDisabled();
     expect(repository.getBackgroundMoveInfo).not.toHaveBeenCalled();
     await user.click(within(dialog).getByRole('button', {name: 'cells.bulkMove.refreshDrive'}));
-    expect(onRefresh).toHaveBeenCalledTimes(1);
-    expect(within(dialog).getByRole('button', {name: 'Move'})).toBeDisabled();
+    expect(onRefresh).not.toHaveBeenCalled();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.getByRole('checkbox', {name: 'Select Marketing images'})).toBeInTheDocument();
   });
 
   it('ignores an in-flight status response after the table unmounts', async () => {
@@ -1567,13 +1650,14 @@ describe('CellsTable selection', () => {
       'cells.newItemMenuModalForm.genericError',
     );
     expect(within(reopenedAfterFailure).getByRole('button', {name: 'Move'})).toBeDisabled();
-    expect(onRefresh).toHaveBeenCalledTimes(1);
+    expect(onRefresh).not.toHaveBeenCalled();
 
     await user.click(within(reopenedAfterFailure).getByRole('button', {name: 'cells.moveNodeModal.cancelButton'}));
     expect(screen.getByText('cells.newItemMenuModalForm.genericError')).toBeInTheDocument();
-    await user.click(screen.getByRole('button', {name: 'Move'}));
-    const reopenedDialog = await screen.findByRole('dialog');
-    expect(within(reopenedDialog).getByRole('button', {name: 'Move'})).toBeDisabled();
+    expect(screen.queryByRole('button', {name: 'Move'})).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', {name: 'cells.bulkMove.refreshDrive'}));
+    expect(screen.queryByText('cells.newItemMenuModalForm.genericError')).not.toBeInTheDocument();
+    expect(screen.getByRole('checkbox', {name: 'Select Marketing images'})).not.toBeChecked();
     expect(repository.moveNodes).toHaveBeenCalledTimes(1);
     window.location.hash = originalHash;
   });

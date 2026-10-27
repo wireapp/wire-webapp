@@ -83,6 +83,7 @@ interface CellsTableProps {
   conversationQualifiedId: QualifiedId;
   conversationName: string;
   onRefresh: () => void;
+  onRefreshAfterBulkMoveOutcome: () => Promise<boolean>;
   onCloseSearchView?: () => void;
   folderDropResetKey?: number;
   onFolderDropTargetChange?: (folderName: string | null) => void;
@@ -203,6 +204,7 @@ export const CellsTable = ({
   conversationQualifiedId,
   conversationName,
   onRefresh,
+  onRefreshAfterBulkMoveOutcome,
   onCloseSearchView,
   folderDropResetKey,
   onFolderDropTargetChange,
@@ -239,6 +241,8 @@ export const CellsTable = ({
   const [isBulkMoveOutcomeUnresolved, setIsBulkMoveOutcomeUnresolved] = useState(false);
   const [isBulkMovePartialOutcome, setIsBulkMovePartialOutcome] = useState(false);
   const [isBulkMoveRequestError, setIsBulkMoveRequestError] = useState(false);
+  const [isRefreshingBulkMoveOutcome, setIsRefreshingBulkMoveOutcome] = useState(false);
+  const [didBulkMoveOutcomeRefreshFail, setDidBulkMoveOutcomeRefreshFail] = useState(false);
 
   useEffect(() => {
     if (isMovePendingRef.current) {
@@ -259,8 +263,30 @@ export const CellsTable = ({
     setIsBulkMovePreviewOpen(true);
     setIsBulkMoveOutcomeUnresolved(true);
     setIsBulkMovePartialOutcome(false);
-    onRefresh();
     setIsBulkMoveRequestError(true);
+  };
+
+  const handleRefreshAfterBulkMoveOutcome = async (): Promise<void> => {
+    if (isRefreshingBulkMoveOutcome) {
+      return;
+    }
+
+    setIsRefreshingBulkMoveOutcome(true);
+    const wasRefreshSuccessful = await onRefreshAfterBulkMoveOutcome();
+    setIsRefreshingBulkMoveOutcome(false);
+    setDidBulkMoveOutcomeRefreshFail(!wasRefreshSuccessful);
+    if (!wasRefreshSuccessful) {
+      return;
+    }
+
+    setSelectedNodeIds(new Set());
+    setIsBulkMoveOutcomeUnresolved(false);
+    setIsBulkMovePartialOutcome(false);
+    setIsBulkMoveRequestError(false);
+    setIsBackgroundMoveError(false);
+    setIsBackgroundMoveRetryBlocked(false);
+    setIsBackgroundMoveStatusUnknown(false);
+    setIsBulkMovePreviewOpen(false);
   };
 
   const handleBulkMoveStart = (summary: SharedDriveMoveSummary): void => {
@@ -296,6 +322,7 @@ export const CellsTable = ({
         clearMoveStatus(moveStatusId);
         setIsBackgroundMovePending(false);
         setIsBackgroundMoveStatusUnknown(true);
+        setIsBulkMoveOutcomeUnresolved(true);
         setIsBulkMovePreviewOpen(true);
         return;
       }
@@ -358,7 +385,6 @@ export const CellsTable = ({
         setIsBulkMoveOutcomeUnresolved(true);
         setIsBulkMovePartialOutcome(false);
         setIsBulkMoveRequestError(false);
-        onRefresh();
         setIsBulkMovePreviewOpen(true);
         return;
       }
@@ -389,7 +415,6 @@ export const CellsTable = ({
         backgroundMoveSummary.current = Maybe.nothing();
         setBackgroundMoveStatusId('');
         setIsBulkMovePreviewOpen(true);
-        onRefresh();
         return;
       }
 
@@ -399,10 +424,12 @@ export const CellsTable = ({
       setIsBackgroundMoveRetryBlocked(true);
       setIsBackgroundMoveStatusUnknown(false);
       setIsBackgroundMoveError(true);
+      setIsBulkMoveOutcomeUnresolved(true);
+      setIsBulkMovePartialOutcome(false);
+      setIsBulkMoveRequestError(false);
       backgroundMoveSummary.current = Maybe.nothing();
       setBackgroundMoveStatusId('');
       setIsBulkMovePreviewOpen(true);
-      onRefresh();
     };
 
     void checkBackgroundMoveStatus();
@@ -420,7 +447,6 @@ export const CellsTable = ({
     cellsRepository,
     clock,
     clearMoveStatus,
-    onRefresh,
     random,
     updateMoveStatus,
   ]);
@@ -470,7 +496,6 @@ export const CellsTable = ({
       setIsBackgroundMovePending(false);
       setIsBackgroundMoveRetryBlocked(true);
       setIsBulkMovePreviewOpen(true);
-      onRefresh();
       return false;
     }
 
@@ -563,7 +588,7 @@ export const CellsTable = ({
       onToggleSort,
       selectedNodeIds,
       onToggleSelection: handleToggleSelection,
-      selectionEnabled: isSelectionEnabled,
+      selectionEnabled: isSelectionEnabled && !isBulkMoveOutcomeUnresolved,
     }),
     getCoreRowModel: getCoreRowModel(),
   });
@@ -576,6 +601,7 @@ export const CellsTable = ({
     selectedNodes.length === selectedNodeIds.size ? getSelectedFilesTotalSize(selectedNodes) : Maybe.nothing();
   const canMoveSelection =
     selectedNodes.length > 0 &&
+    !isBulkMoveOutcomeUnresolved &&
     !isBulkMoveRequestPending &&
     !isBackgroundMovePending &&
     !isInRecycleBin() &&
@@ -670,6 +696,7 @@ export const CellsTable = ({
     <CellsFilePreviewModalProvider>
       <div css={tableWrapperStyles}>
         {isSelectionEnabled &&
+          !isBulkMoveOutcomeUnresolved &&
           selectionBarAnchor !== null &&
           createPortal(
             <div css={selectionBarContainerStyles}>
@@ -711,6 +738,7 @@ export const CellsTable = ({
           )}
         {(isBulkMovePreviewOpen || isBulkMoveRequestPending || isBackgroundMovePending) &&
           (canMoveSelection ||
+            isBulkMoveOutcomeUnresolved ||
             isBulkMoveRequestPending ||
             isBackgroundMovePending ||
             isBackgroundMoveError ||
@@ -737,7 +765,8 @@ export const CellsTable = ({
               isBackgroundMoveStatusUnknown={isBackgroundMoveStatusUnknown}
               canRetryBackgroundMoveStatus={backgroundMoveJobUuids.length > 0}
               onRetryBackgroundMoveStatus={handleRetryBackgroundMoveStatus}
-              onRefresh={onRefresh}
+              onRefreshAfterBulkMoveOutcome={handleRefreshAfterBulkMoveOutcome}
+              isRefreshingBulkMoveOutcome={isRefreshingBulkMoveOutcome}
             />
           )}
         {activeFolderDropTargetName !== null && (
@@ -754,11 +783,26 @@ export const CellsTable = ({
         )}
         {isBulkMoveOutcomeUnresolved && (
           <div css={moveOutcomeMessageStyles} role="status" aria-live="polite">
-            {isBulkMoveRequestError
-              ? translate('cells.newItemMenuModalForm.genericError')
-              : translate(
-                  isBulkMovePartialOutcome ? 'cells.bulkMove.partialMoveWarning' : 'cells.bulkMove.outcomeUnresolved',
-                )}
+            <span>
+              {isBulkMoveRequestError
+                ? translate('cells.newItemMenuModalForm.genericError')
+                : translate(
+                    isBulkMovePartialOutcome ? 'cells.bulkMove.partialMoveWarning' : 'cells.bulkMove.outcomeUnresolved',
+                  )}
+              {didBulkMoveOutcomeRefreshFail && (
+                <span role="alert">{translate('cells.newItemMenuModalForm.genericError')}</span>
+              )}
+            </span>
+            <button
+              css={bulkMoveButtonStyles}
+              type="button"
+              onClick={() => {
+                void handleRefreshAfterBulkMoveOutcome();
+              }}
+              disabled={isRefreshingBulkMoveOutcome}
+            >
+              {translate('cells.bulkMove.refreshDrive')}
+            </button>
           </div>
         )}
         <table css={tableStyles}>

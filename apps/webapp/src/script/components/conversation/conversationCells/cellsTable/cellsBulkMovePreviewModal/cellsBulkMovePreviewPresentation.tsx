@@ -64,7 +64,8 @@ interface CellsBulkMovePreviewPresentationProps {
   isBackgroundMoveStatusUnknown: boolean;
   canRetryBackgroundMoveStatus: boolean;
   onRetryBackgroundMoveStatus: () => void;
-  onRefresh: () => void;
+  onRefreshAfterBulkMoveOutcome: () => void;
+  isRefreshingBulkMoveOutcome: boolean;
   activeModalContent: 'move' | 'create';
   onChangeModalContent: (content: 'move' | 'create') => void;
   canCreateNewFolder: boolean;
@@ -92,7 +93,8 @@ export const CellsBulkMovePreviewPresentation: FunctionComponent<CellsBulkMovePr
   isBackgroundMoveStatusUnknown,
   canRetryBackgroundMoveStatus,
   onRetryBackgroundMoveStatus,
-  onRefresh,
+  onRefreshAfterBulkMoveOutcome,
+  isRefreshingBulkMoveOutcome,
   activeModalContent,
   onChangeModalContent,
   canCreateNewFolder,
@@ -160,12 +162,15 @@ export const CellsBulkMovePreviewPresentation: FunctionComponent<CellsBulkMovePr
                       isPartialMoveOutcome ? 'cells.bulkMove.partialMoveWarning' : 'cells.bulkMove.outcomeUnresolved',
                     )}
               </p>
+              <button type="button" onClick={onRefreshAfterBulkMoveOutcome} disabled={isRefreshingBulkMoveOutcome}>
+                {translate('cells.bulkMove.refreshDrive')}
+              </button>
             </div>
           )}
           {isBackgroundMoveError && (
             <div role="alert">
               <p>{translate('cells.bulkMove.moveNeedsReview')}</p>
-              <button type="button" onClick={onRefresh}>
+              <button type="button" onClick={onRefreshAfterBulkMoveOutcome} disabled={isRefreshingBulkMoveOutcome}>
                 {translate('cells.bulkMove.refreshDrive')}
               </button>
             </div>
@@ -178,7 +183,7 @@ export const CellsBulkMovePreviewPresentation: FunctionComponent<CellsBulkMovePr
                   {translate('cells.bulkMove.checkStatus')}
                 </button>
               )}
-              <button type="button" onClick={onRefresh}>
+              <button type="button" onClick={onRefreshAfterBulkMoveOutcome} disabled={isRefreshingBulkMoveOutcome}>
                 {translate('cells.bulkMove.refreshDrive')}
               </button>
             </div>

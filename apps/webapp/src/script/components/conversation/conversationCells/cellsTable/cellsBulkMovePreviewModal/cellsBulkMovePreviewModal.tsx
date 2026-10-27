@@ -59,7 +59,8 @@ interface CellsBulkMovePreviewModalProps {
   isBackgroundMoveStatusUnknown: boolean;
   canRetryBackgroundMoveStatus: boolean;
   onRetryBackgroundMoveStatus: () => void;
-  onRefresh: () => void;
+  onRefreshAfterBulkMoveOutcome: () => void;
+  isRefreshingBulkMoveOutcome: boolean;
 }
 
 export const CellsBulkMovePreviewModal: FunctionComponent<CellsBulkMovePreviewModalProps> = ({
@@ -82,7 +83,8 @@ export const CellsBulkMovePreviewModal: FunctionComponent<CellsBulkMovePreviewMo
   isBackgroundMoveStatusUnknown,
   canRetryBackgroundMoveStatus,
   onRetryBackgroundMoveStatus,
-  onRefresh,
+  onRefreshAfterBulkMoveOutcome,
+  isRefreshingBulkMoveOutcome,
 }: CellsBulkMovePreviewModalProps) => {
   const {fireAndForgetInvoker, translate} = useApplicationContext();
   const canPerformDriveAction = useCellsActionPermissions();
@@ -199,7 +201,8 @@ export const CellsBulkMovePreviewModal: FunctionComponent<CellsBulkMovePreviewMo
       isBackgroundMoveStatusUnknown={isBackgroundMoveStatusUnknown}
       canRetryBackgroundMoveStatus={canRetryBackgroundMoveStatus}
       onRetryBackgroundMoveStatus={onRetryBackgroundMoveStatus}
-      onRefresh={onRefresh}
+      onRefreshAfterBulkMoveOutcome={onRefreshAfterBulkMoveOutcome}
+      isRefreshingBulkMoveOutcome={isRefreshingBulkMoveOutcome}
       activeModalContent={activeModalContent}
       onChangeModalContent={handleChangeModalContent}
       canCreateNewFolder={canCreateNewFolder}

@@ -228,7 +228,8 @@ describe('CellsBulkMovePreviewModal', () => {
               isBackgroundMoveStatusUnknown={false}
               canRetryBackgroundMoveStatus={false}
               onRetryBackgroundMoveStatus={jest.fn()}
-              onRefresh={jest.fn()}
+              onRefreshAfterBulkMoveOutcome={jest.fn()}
+              isRefreshingBulkMoveOutcome={false}
             />
           </CellsSelfUserDriveRoleProvider>
         </>
@@ -292,7 +293,8 @@ describe('CellsBulkMovePreviewModal', () => {
             isBackgroundMoveStatusUnknown={false}
             canRetryBackgroundMoveStatus={false}
             onRetryBackgroundMoveStatus={jest.fn()}
-            onRefresh={jest.fn()}
+            onRefreshAfterBulkMoveOutcome={jest.fn()}
+            isRefreshingBulkMoveOutcome={false}
           />
         </CellsSelfUserDriveRoleProvider>
       </ThemeProvider>,
