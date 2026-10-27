@@ -22,7 +22,7 @@ import {isArray, isNonEmptyString, isTruthy, isUndefined} from '@sindresorhus/is
 import {CredentialType, type E2EIServiceExternal} from '@wireapp/core/lib/messagingProtocols/mls';
 import {LowPrecisionTaskScheduler} from '@wireapp/core/lib/util/lowPrecisionTaskScheduler';
 import {amplify} from 'amplify';
-import {SigninResponse, type User} from 'oidc-client-ts';
+import {SigninResponse} from 'oidc-client-ts';
 import {container} from 'tsyringe';
 
 import {TypedEventEmitter} from '@wireapp/commons';
@@ -159,7 +159,9 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       gracePeriodInMs,
     };
 
-    await this.coreE2EIService.initialize(discoveryUrl);
+    await this.coreE2EIService.initialize(discoveryUrl, params => {
+      return this.authenticateWithIdentityProvider(params);
+    });
 
     const isFreshClient = await isFreshMLSSelfClient();
 
@@ -289,30 +291,41 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     await this.coreE2EIService.clearAllProgress();
   }
 
-  private async getUserData(
-    silent: boolean,
-    challengeData?: {keyAuth: string; challenge: {url: string; target: string}},
-  ): Promise<void | User | null> {
-    if (!isUndefined(challengeData)) {
-      // If a challengeData is provided, that means we are at the beginning of the enrollment process
-      // We need to first authenticate the user (either silently if we are renewing the certificate, or by redirection if it an initial enrollment)
-      const {challenge, keyAuth} = challengeData;
-      OIDCServiceStore.store.targetURL(challenge.target);
-      const oidcService = this.createOIDCService();
-      try {
-        return await oidcService.authenticate(keyAuth, challenge.url, silent);
-      } catch (error: unknown) {
-        if (silent) {
-          // if we attempted a silent login and it failed, we need to try again with a redirect
-          return oidcService.authenticate(keyAuth, challenge.url, false);
-        }
-        throw error;
+  /**
+   * Authenticates the user against the identity provider during the X509 credential acquisition.
+   *
+   * CoreCrypto calls this through `PkiEnvironmentHooks.authenticate`: either before redirecting the
+   * user to the identity provider, or once the user comes back from it. In the first case the
+   * redirect interrupts the flow, in the second case the id token is returned.
+   */
+  private async authenticateWithIdentityProvider({
+    idp,
+    keyAuth,
+    acmeAudience,
+  }: {
+    idp: string;
+    keyAuth: string;
+    acmeAudience: string;
+  }): Promise<string> {
+    OIDCServiceStore.store.targetURL(idp);
+    const oidcService = this.createOIDCService();
+
+    if (this.wasJustRedirected()) {
+      const userData = await oidcService.getUser();
+      const idToken = userData?.id_token;
+      if (!isNonEmptyString(idToken)) {
+        throw new Error('No id token received from the identity provider');
       }
+      return idToken;
     }
 
-    const oidcService = this.createOIDCService();
-    // If there is no challengeData, that means we have already authenticated the user and we just need to get the userdata
-    return oidcService.getUser();
+    // For now we cannot do silent login as keycloak refresh token extension is not supported
+    // We can fix this condition when the plugin is enabled on keycloak
+    await oidcService.authenticate(keyAuth, acmeAudience, false);
+
+    // `signinRedirect` navigates away from the application, so this is only reached if the
+    // identity provider never redirected the user.
+    throw new Error('No user data received from the identity provider');
   }
 
   public async enroll({
@@ -341,16 +354,6 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
         displayName,
         handle,
         teamId,
-        getOAuthToken: async authenticationChallenge => {
-          // For now we cannot do silent login as keycloak refresh token extension is not supported
-          // We can fix this condition when the plugin is enabled on keycloak
-          const silent = false && isCertificateRenewal;
-          const userData = await this.getUserData(silent, authenticationChallenge);
-          if (userData === undefined || userData === null) {
-            throw new Error('No user data received');
-          }
-          return userData.id_token;
-        },
         certificateTtl: this.certificateTtl,
         getAllConversations: async () => {
           if (isUndefined(this.core.service)) {

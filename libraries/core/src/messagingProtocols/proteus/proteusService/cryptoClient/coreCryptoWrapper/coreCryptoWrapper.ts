@@ -20,6 +20,7 @@
 import {PreKey} from '@wireapp/api-client/lib/auth';
 import {Encoder} from 'bazinga64';
 import {deleteDB} from 'idb';
+import {result, task, type Result, type Task} from 'true-myth';
 
 import {LogFactory} from '@wireapp/commons';
 import {
@@ -30,7 +31,10 @@ import {
   version as CCVersion,
   initWasmModule,
   migrateDatabaseKeyTypeToBytes,
+  Database,
   DatabaseKey,
+  PkiEnvironment,
+  type PkiEnvironmentHooks,
 } from '@wireapp/core-crypto';
 import type {CRUDEngine} from '@wireapp/store-engine';
 
@@ -66,7 +70,7 @@ const logFunctions: Record<CoreCryptoLogLevel, Function> = {
 };
 
 const coreCryptoLogger = {
-  log: (level: CoreCryptoLogLevel, message: string, context: string) => {
+  log: (level: CoreCryptoLogLevel, message: string, context: string | undefined) => {
     logFunctions[level].call(logger, {message, context});
   },
 };
@@ -125,10 +129,86 @@ export const getCoreCryptoDbName = (storeEngine: CRUDEngine): string => {
   return `corecrypto-${storeEngine.storeName}`;
 };
 
+let coreCryptoInstance: CoreCrypto | undefined;
+let coreCryptoDatabase: Database | undefined;
+let coreCryptoPkiEnvironment: PkiEnvironment | undefined;
+
+const destroyCoreCryptoHandles = (): Result<void, Error> => {
+  const instance = coreCryptoInstance;
+  const database = coreCryptoDatabase;
+  const pkiEnvironment = coreCryptoPkiEnvironment;
+
+  // Clear the references first so a failed destroy cannot leave handles that
+  // might be destroyed a second time on a later wipe attempt.
+  coreCryptoInstance = undefined;
+  coreCryptoDatabase = undefined;
+  coreCryptoPkiEnvironment = undefined;
+
+  // The PKI environment references the database, so it has to be destroyed before it.
+  const pkiEnvironmentDestroyResult = result.tryOrElse(
+    cause => {
+      return new Error('Failed to destroy the CoreCrypto PKI environment', {cause});
+    },
+    () => {
+      pkiEnvironment?.uniffiDestroy();
+    },
+  );
+  const instanceDestroyResult = result.tryOrElse(
+    cause => {
+      return new Error('Failed to destroy the CoreCrypto instance', {cause});
+    },
+    () => {
+      instance?.uniffiDestroy();
+    },
+  );
+  const databaseDestroyResult = result.tryOrElse(
+    cause => {
+      return new Error('Failed to destroy the CoreCrypto database', {cause});
+    },
+    () => {
+      database?.uniffiDestroy();
+    },
+  );
+
+  // All operations have already run. Combining their results preserves the
+  // first failure while still surfacing failures of the later handles.
+  return pkiEnvironmentDestroyResult.and(instanceDestroyResult).and(databaseDestroyResult);
+};
+
+/**
+ * Creates the PKI environment used for X509 credential acquisition and registers it on the
+ * current CoreCrypto instance.
+ *
+ * The environment is owned by this module because it shares the lifetime of the CoreCrypto
+ * database handle. It is destroyed together with the other handles on wipe, so callers never
+ * receive a database handle that can outlive (and dangle after) a wipe.
+ */
+export const createPkiEnvironment = (hooks: PkiEnvironmentHooks): Task<PkiEnvironment, Error> => {
+  return task.tryOrElse(
+    cause => {
+      return new Error('Failed to create the CoreCrypto PKI environment', {cause});
+    },
+    async () => {
+      if (coreCryptoInstance === undefined || coreCryptoDatabase === undefined) {
+        throw new Error('CoreCrypto is not initialized');
+      }
+
+      const pkiEnvironment = await PkiEnvironment.create(hooks, coreCryptoDatabase);
+      await coreCryptoInstance.setPkiEnvironment(pkiEnvironment);
+      coreCryptoPkiEnvironment?.uniffiDestroy();
+      coreCryptoPkiEnvironment = pkiEnvironment;
+      return pkiEnvironment;
+    },
+  );
+};
+
 export const wipeCoreCryptoDb = async (storeEngine: CRUDEngine): Promise<void> => {
   const coreCryptoDbName = getCoreCryptoDbName(storeEngine);
   try {
-    await coreCryptoInstance?.close();
+    const destroyResult = destroyCoreCryptoHandles();
+    if (result.isErr(destroyResult)) {
+      throw destroyResult.error;
+    }
     await deleteDB(coreCryptoDbName);
     logger.log('info', 'CoreCrypto DB wiped successfully');
   } catch {
@@ -136,7 +216,6 @@ export const wipeCoreCryptoDb = async (storeEngine: CRUDEngine): Promise<void> =
   }
 };
 
-let coreCryptoInstance: CoreCrypto | undefined;
 export async function buildClient(
   storeEngine: CRUDEngine,
   {generateSecretKey, nbPrekeys, onNewPrekeys}: Config,
@@ -165,10 +244,8 @@ export async function buildClient(
           }
         }
 
-        coreCryptoInstance = await CoreCrypto.deferredInit({
-          databaseName: coreCryptoDbName,
-          key: key.key,
-        });
+        coreCryptoDatabase = await Database.open(coreCryptoDbName, key.key);
+        coreCryptoInstance = CoreCrypto.new(coreCryptoDatabase);
 
         setLogger(coreCryptoLogger);
         setMaxLogLevel(CoreCryptoLogLevel.Info);

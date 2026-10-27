@@ -37,7 +37,7 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
 describe('ConversationProtocolDetails', () => {
   it('renders the correct infos for the conversation with mls protocol', () => {
     const props = {
-      cipherSuite: Ciphersuite.MLS_128_DHKEMP256_AES128GCM_SHA256_P256,
+      cipherSuite: Ciphersuite.Mls128Dhkemp256Aes128gcmSha256P256,
       protocol: CONVERSATION_PROTOCOL.MLS,
     };
 

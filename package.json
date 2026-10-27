@@ -142,6 +142,7 @@
     "@emotion/eslint-plugin": {
       "eslint": "^8.0.0 || ^9.0.0"
     },
+    "@ubjs/core": "0.31.0-6",
     "license-checker": "25.0.1",
     "stylelint-order": {
       "stylelint": "^14.0.0 || ^15.0.0 || ^16.0.1 || ^17.0.0"

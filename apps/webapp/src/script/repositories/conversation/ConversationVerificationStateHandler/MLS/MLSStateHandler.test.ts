@@ -70,15 +70,13 @@ describe('MLSConversationVerificationStateHandler', () => {
   const createRevokedWireIdentity = (): e2eIdentity.WireIdentity => {
     return {
       x509Identity: {
-        free: jest.fn(),
         certificate: '',
         displayName: 'John Doe',
         domain: 'wire.com',
         handle: 'wireapp://%40john.doe@wire.com',
-        notAfter: BigInt(0),
-        notBefore: BigInt(0),
+        notAfter: new Date(0),
+        notBefore: new Date(0),
         serialNumber: '',
-        [Symbol.dispose]: noop,
       },
       thumbprint: '',
       credentialType: CredentialType.X509,

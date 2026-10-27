@@ -21,7 +21,6 @@ import {waitFor} from '@testing-library/react';
 import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
 import {LowPrecisionTaskScheduler} from '@wireapp/core/lib/util/lowPrecisionTaskScheduler';
 import {container} from 'tsyringe';
-import {noop} from 'noop-esm';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
@@ -75,15 +74,13 @@ const generateWireIdentity = (
 ): e2eIdentityVerification.WireIdentity => {
   return {
     x509Identity: {
-      free: jest.fn(),
       certificate: '',
       displayName: 'John Doe',
       domain: 'domain',
       handle: 'johndoe',
-      notAfter: BigInt(0),
-      notBefore: BigInt(0),
+      notAfter: new Date(0),
+      notBefore: new Date(0),
       serialNumber: '',
-      [Symbol.dispose]: noop,
     },
     thumbprint: '',
     credentialType,

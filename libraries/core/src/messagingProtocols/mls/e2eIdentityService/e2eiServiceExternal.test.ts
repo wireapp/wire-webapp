@@ -17,44 +17,81 @@
  *
  */
 
-import axios from 'axios';
 import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
+import axios from 'axios';
+import {task} from 'true-myth';
 
-import {ClientId, CoreCrypto, CoreCryptoContext, CredentialType, WireIdentity} from '@wireapp/core-crypto';
+import {APIClient} from '@wireapp/api-client';
+import {
+  CoreCrypto,
+  CoreCryptoContext,
+  CredentialType,
+  DeviceStatus,
+  HttpMethod,
+  PkiEnvironment,
+  type PkiEnvironmentHooks,
+  Uuid,
+  WireIdentity,
+} from '@wireapp/core-crypto';
 
 import {E2EIServiceExternal} from './e2eiServiceExternal';
 
+import {createPkiEnvironment} from '../../proteus/proteusService/cryptoClient/coreCryptoWrapper';
 import {ClientService} from '../../../client';
 import {openDB} from '../../../storage/coreDb';
 import {getUUID} from '../../../test/payloadHelper';
+import {parseFullQualifiedClientId} from '../../../util/fullyQualifiedClientIdUtils';
 import {stringifyQualifiedId} from '../../../util/qualifiedIdUtil';
 import {RecurringTaskScheduler} from '../../../util/recurringTaskScheduler';
 import {MLSService} from '../mlsService';
+import {createMLSClientId} from '../utils/mlsId';
+
+jest.mock('../../proteus/proteusService/cryptoClient/coreCryptoWrapper', () => {
+  return {createPkiEnvironment: jest.fn()};
+});
+
+const createPkiEnvironmentMock = createPkiEnvironment as jest.MockedFunction<typeof createPkiEnvironment>;
+
+type InitializedService = E2EIServiceTestSetup[1] & {
+  readonly authenticate: jest.Mock;
+  readonly hooks: PkiEnvironmentHooks;
+  readonly service: E2EIServiceExternal;
+};
 
 type E2EIServiceTestSetup = readonly [
   E2EIServiceExternal,
   {
+    readonly apiClient: jest.Mocked<APIClient>;
     readonly coreCrypto: jest.Mocked<CoreCrypto>;
     readonly mlsService: MLSService;
+    readonly pkiEnvironment: jest.Mocked<PkiEnvironment>;
     readonly recurringTaskScheduler: RecurringTaskScheduler;
     readonly transactionContext: jest.Mocked<CoreCryptoContext>;
   },
 ];
 
 async function buildE2EIService(dbName = 'core-test-db'): Promise<E2EIServiceTestSetup> {
-  const transactionContext = {
-    e2eiIsPKIEnvSetup: jest.fn(),
-    e2eiRegisterAcmeCA: jest.fn(),
-    e2eiRegisterIntermediateCA: jest.fn(),
-  } as unknown as jest.Mocked<CoreCryptoContext>;
+  const transactionContext = {} as unknown as jest.Mocked<CoreCryptoContext>;
 
   const coreCrypto = {
     getUserIdentities: jest.fn(),
     getClientIds: jest.fn().mockResolvedValue([]),
+    getPkiEnvironment: jest.fn().mockResolvedValue(undefined),
     transaction: jest.fn(fn => {
       return fn(transactionContext);
     }),
   } as unknown as jest.Mocked<CoreCrypto>;
+
+  const apiClient = {
+    validatedClientId: 'client-id',
+    api: {
+      client: {
+        getNonce: jest.fn(),
+        getAccessToken: jest.fn(),
+      },
+    },
+  } as unknown as jest.Mocked<APIClient>;
+
   const clientService = {} as jest.Mocked<ClientService>;
 
   const mockedDb = await openDB(dbName);
@@ -80,40 +117,67 @@ async function buildE2EIService(dbName = 'core-test-db'): Promise<E2EIServiceTes
     createFireAndForgetInvoker({reportError: jest.fn<void, [unknown]>()}),
   );
 
+  const pkiEnvironment = {
+    addTrustAnchor: jest.fn(),
+    addIntermediateCert: jest.fn(),
+    getTrustAnchors: jest.fn().mockResolvedValue([]),
+  } as unknown as jest.Mocked<PkiEnvironment>;
+
+  createPkiEnvironmentMock.mockImplementation(() => {
+    // Mirrors `createPkiEnvironment` in coreCryptoWrapper, which sets the environment on CoreCrypto
+    coreCrypto.getPkiEnvironment.mockResolvedValue(pkiEnvironment);
+    return task.resolve(pkiEnvironment);
+  });
   return [
-    new E2EIServiceExternal(coreCrypto, mockedDb, recurringTaskScheduler, clientService, mockedMLSService),
-    {coreCrypto, mlsService: mockedMLSService, recurringTaskScheduler, transactionContext},
+    new E2EIServiceExternal(coreCrypto, apiClient, mockedDb, recurringTaskScheduler, clientService, mockedMLSService),
+    {apiClient, coreCrypto, mlsService: mockedMLSService, pkiEnvironment, recurringTaskScheduler, transactionContext},
   ] as const;
 }
 
-function generateCoreCryptoIdentity({
-  userId,
-  status = 'Valid',
-  deviceId = getUUID(),
-}: {
-  userId: string;
-  status?: string;
-  deviceId?: string;
-}): WireIdentity {
+function generateCoreCryptoIdentity({userId, deviceId = getUUID()}: {userId: string; deviceId?: string}): WireIdentity {
   return {
-    clientId: `${userId}:${deviceId}@elna.wire.link`,
-    handle: 'adrian_wire2@elna.wire.link',
-    display_name: 'Adrian Weiss 2',
-    domain: 'elna.wire.link',
-    certificate:
-      '-----BEGIN CERTIFICATE-----\nMIICRTCCAeqgAwIBAgIQcpcbKbgHLM5qoB7xgxm6BTAKBggqhkjOPQQDAjAuMSww\nKgYDVQQDEyNlbG5hLndpcmUubGluayBFMkVJIEludGVybWVkaWF0ZSBDQTAeFw0y\nMzExMjIxMTIwMDVaFw0yMzExMjQxMTIwMDVaMDIxFzAVBgNVBAoTDmVsbmEud2ly\nZS5saW5rMRcwFQYDVQQDEw5BZHJpYW4gV2Vpc3MgMjAqMAUGAytlcAMhAMwP5B9X\nwanLL7JUmHEc1SJYAvHUvMnL1MS/D4CK3JaMo4IBEzCCAQ8wDgYDVR0PAQH/BAQD\nAgeAMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjAdBgNVHQ4EFgQUrIPC\nem20zAl1ybZqXm2LkvD2U1swHwYDVR0jBBgwFoAU5bQTjX1Ps09suTYe4tzXUKgl\nN9YwdwYDVR0RBHAwboYpaW06d2lyZWFwcD0lNDBhZHJpYW5fd2lyZTJAZWxuYS53\naXJlLmxpbmuGQWltOndpcmVhcHA9U0tIRHNFc09TODJUcldUSE5Fc1ZOQS9lYjll\nMDM4NjE4MzllOWRhQGVsbmEud2lyZS5saW5rMCUGDCsGAQQBgqRkxihAAQQVMBMC\nAQYEDGRlZmF1bHR0ZWFtcwQAMAoGCCqGSM49BAMCA0kAMEYCIQCQQHVAd6wjp2A+\nVvKIXu4oVlCMZkAUATU5bXY4njvapwIhAO8rION7Mz5rSjixJsdEL8E+HHsNvCax\ndjrSL0FL9SM6\n-----END CERTIFICATE-----\n',
-    status,
+    clientId: createMLSClientId({id: userId, domain: 'elna.wire.link'}, deviceId),
+    status: DeviceStatus.Valid,
     thumbprint: 'mNyAo88vAF5s7v0UWBNxlQKxP3dfT91A-4PbuzEA5uQ',
     credentialType: CredentialType.X509,
-  } as unknown as WireIdentity;
+  };
 }
 
 const groupId = 'AAEAAhJrE+8TbFFUqiagedTYDUMAZWxuYS53aXJlLmxpbms=';
 
+const discoveryUrl = 'https://some.crl.discovery.url';
+const mockedRootCA = 'cert';
+const federatedCerts = ['federatedCert1', 'federatedCert2'];
+const axiosMock = axios as jest.Mocked<typeof axios>;
+
 describe('E2EIServiceExternal', () => {
+  beforeEach(() => {
+    axiosMock.get = jest.fn(async url => {
+      if (url === `${discoveryUrl}/roots.pem`) {
+        return {data: mockedRootCA};
+      }
+
+      if (url === `${discoveryUrl}/federation`) {
+        return {data: {crts: federatedCerts}};
+      }
+
+      return {data: null};
+    }) as unknown as typeof axiosMock.get;
+    axiosMock.request = jest.fn(async () => {
+      return {status: 200, headers: {}, data: new ArrayBuffer(0)};
+    }) as unknown as typeof axiosMock.request;
+    axiosMock.create = jest.fn(() => {
+      return axiosMock;
+    }) as unknown as typeof axiosMock.create;
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   describe('getUsersIdentities', () => {
     it('returns undefined if conversation does not exist', async () => {
-      const [service, {mlsService}] = await buildE2EIService();
+      const [service, {mlsService}] = await buildE2EIService('usersIdentitiesNoConversation');
       const user1 = {domain: 'elna.wire.link', id: '48a1c3b0-4b0e-4bcd-93ad-64c7344b1534'};
       const user2 = {domain: 'elna.wire.link', id: 'b7d287e4-7bbd-40e0-a550-6b18dcaf5f31'};
       const userIds = [user1, user2];
@@ -127,15 +191,18 @@ describe('E2EIServiceExternal', () => {
     });
 
     it('returns the user identities', async () => {
-      const [service, {coreCrypto, mlsService}] = await buildE2EIService();
+      const [service, {coreCrypto, mlsService}] = await buildE2EIService('usersIdentities');
       const user1 = {domain: 'elna.wire.link', id: '48a1c3b0-4b0e-4bcd-93ad-64c7344b1534'};
       const user2 = {domain: 'elna.wire.link', id: 'b7d287e4-7bbd-40e0-a550-6b18dcaf5f31'};
       const userIds = [user1, user2];
 
       coreCrypto.getUserIdentities.mockResolvedValue(
         new Map([
-          [user1.id, [generateCoreCryptoIdentity({userId: user1.id}), generateCoreCryptoIdentity({userId: user1.id})]],
-          [user2.id, [generateCoreCryptoIdentity({userId: user2.id})]],
+          [
+            new Uuid(user1.id),
+            [generateCoreCryptoIdentity({userId: user1.id}), generateCoreCryptoIdentity({userId: user1.id})],
+          ],
+          [new Uuid(user2.id), [generateCoreCryptoIdentity({userId: user2.id})]],
         ]),
       );
 
@@ -148,7 +215,7 @@ describe('E2EIServiceExternal', () => {
     });
 
     it('returns MLS basic devices with empty identity', async () => {
-      const [service, {coreCrypto, mlsService}] = await buildE2EIService();
+      const [service, {coreCrypto, mlsService}] = await buildE2EIService('usersIdentitiesBasicDevices');
       const user1 = {domain: 'elna.wire.link', id: '48a1c3b0-4b0e-4bcd-93ad-64c7344b1534'};
       const user2 = {domain: 'elna.wire.link', id: 'b7d287e4-7bbd-40e0-a550-6b18dcaf5f31'};
       const userIds = [user1, user2];
@@ -157,19 +224,19 @@ describe('E2EIServiceExternal', () => {
         generateCoreCryptoIdentity({userId: user1.id}),
         generateCoreCryptoIdentity({userId: user1.id}),
       ];
-      const encoder = new TextEncoder();
-      coreCrypto.getUserIdentities.mockResolvedValue(new Map([[user1.id, user1Identities]]));
+      coreCrypto.getUserIdentities.mockResolvedValue(new Map([[new Uuid(user1.id), user1Identities]]));
 
       const allClients = [
         ...user1Identities.map(identity => {
-          return identity.clientId;
+          return new TextDecoder().decode(identity.clientId?.copyBytes());
         }),
         `${user1.id}:74a50c1f4352b41f@elna.wire.link`,
         `${user2.id}:452cb4c65f0369a8@elna.wire.link`,
       ];
       coreCrypto.getClientIds.mockResolvedValue(
         allClients.map(clientId => {
-          return new ClientId(encoder.encode(clientId));
+          const {user, client, domain} = parseFullQualifiedClientId(clientId);
+          return createMLSClientId({id: user, domain}, client);
         }),
       );
 
@@ -184,7 +251,7 @@ describe('E2EIServiceExternal', () => {
 
   describe('getAllGroupUsersIdentities', () => {
     it('returns undefined if mls group does not exist', async () => {
-      const [service, {mlsService}] = await buildE2EIService();
+      const [service, {mlsService}] = await buildE2EIService('groupUsersIdentitiesNoGroup');
       const user1 = {
         domain: 'elna.wire.link',
         userId: '48a1c3b0-4b0e-4bcd-93ad-64c7344b1534',
@@ -208,7 +275,7 @@ describe('E2EIServiceExternal', () => {
     });
 
     it('returns all the user identities of a mls group', async () => {
-      const [service, {coreCrypto, mlsService}] = await buildE2EIService();
+      const [service, {coreCrypto, mlsService}] = await buildE2EIService('groupUsersIdentities');
       const user1 = {
         domain: 'elna.wire.link',
         userId: '48a1c3b0-4b0e-4bcd-93ad-64c7344b1534',
@@ -227,10 +294,10 @@ describe('E2EIServiceExternal', () => {
       coreCrypto.getUserIdentities.mockResolvedValue(
         new Map([
           [
-            user1.userId,
+            new Uuid(user1.userId),
             [generateCoreCryptoIdentity({userId: user1.userId}), generateCoreCryptoIdentity({userId: user1.userId})],
           ],
-          [user2.userId, [generateCoreCryptoIdentity({userId: user2.userId})]],
+          [new Uuid(user2.userId), [generateCoreCryptoIdentity({userId: user2.userId})]],
         ]),
       );
 
@@ -242,67 +309,132 @@ describe('E2EIServiceExternal', () => {
   });
 
   describe('initialize', () => {
-    const axiosMock = axios as jest.Mocked<typeof axios>;
-    axiosMock.get = jest.fn();
-    axiosMock.get.mockImplementation(async url => {
-      if (url === `${mockDiscoveryUrl}/roots.pem`) {
-        return {data: mockedRootCA};
-      }
-
-      if (url === `${mockDiscoveryUrl}/federation`) {
-        return {data: {crts: federatedCerts}};
-      }
-
-      return {data: null};
-    });
-    axios.create = jest.fn(() => {
-      return axiosMock;
-    });
-
-    const mockDiscoveryUrl = 'https://some.crl.discovery.url';
-
-    const mockedRootCA = 'cert';
-    const federatedCerts = ['federatedCert1', 'federatedCert2'];
-
-    afterEach(() => {
-      jest.clearAllMocks();
-      jest.useRealTimers();
+    const authenticate = jest.fn(async () => {
+      return 'id-token';
     });
 
     it('registers the server certificates on initialization', async () => {
-      const [service, {transactionContext}] = await buildE2EIService('mockedDB1');
-      jest.spyOn(transactionContext, 'e2eiIsPKIEnvSetup').mockResolvedValueOnce(false);
-      await service.initialize('https://some.crl.discovery.url');
+      const [service, {pkiEnvironment}] = await buildE2EIService('initializeRegistersCertificates');
+      // A fresh environment has no trust anchor yet, so the deployment root has to be added.
+      pkiEnvironment.getTrustAnchors.mockResolvedValue([]);
 
-      expect(transactionContext.e2eiRegisterAcmeCA).toHaveBeenCalledWith(mockedRootCA);
-      expect(transactionContext.e2eiRegisterIntermediateCA).toHaveBeenCalledWith(federatedCerts[0]);
-      expect(transactionContext.e2eiRegisterIntermediateCA).toHaveBeenCalledWith(federatedCerts[1]);
-      expect(transactionContext.e2eiRegisterIntermediateCA).toHaveBeenCalledTimes(2);
+      await service.initialize(discoveryUrl, authenticate);
+
+      expect(createPkiEnvironmentMock).toHaveBeenCalledTimes(1);
+      expect(pkiEnvironment.addTrustAnchor).toHaveBeenCalledWith(mockedRootCA);
+      expect(pkiEnvironment.addIntermediateCert).toHaveBeenCalledWith(federatedCerts[0]);
+      expect(pkiEnvironment.addIntermediateCert).toHaveBeenCalledWith(federatedCerts[1]);
+      expect(pkiEnvironment.addIntermediateCert).toHaveBeenCalledTimes(2);
     });
 
-    it('does not register the root cert if it was already registered', async () => {
-      const [service, {transactionContext}] = await buildE2EIService('mockedDB2');
+    it('does not register the root cert if a trust anchor already exists', async () => {
+      const [service, {pkiEnvironment}] = await buildE2EIService('initializeExistingTrustAnchor');
+      pkiEnvironment.getTrustAnchors.mockResolvedValue(['existing trust anchor']);
 
-      jest.spyOn(transactionContext, 'e2eiIsPKIEnvSetup').mockResolvedValueOnce(true);
+      await service.initialize(discoveryUrl, authenticate);
 
-      await service.initialize('https://some.crl.discovery.url');
+      expect(pkiEnvironment.addTrustAnchor).not.toHaveBeenCalled();
+      expect(pkiEnvironment.addIntermediateCert).toHaveBeenCalledTimes(2);
+    });
 
-      jest.useFakeTimers();
+    it('does not create a second PKI environment when one is already set', async () => {
+      const [service, {coreCrypto, pkiEnvironment}] = await buildE2EIService('initializeExistingEnvironment');
+      coreCrypto.getPkiEnvironment.mockResolvedValue(pkiEnvironment);
 
-      expect(transactionContext.e2eiRegisterAcmeCA).not.toHaveBeenCalled();
-      expect(transactionContext.e2eiRegisterIntermediateCA).toHaveBeenCalledTimes(2);
+      await service.initialize(discoveryUrl, authenticate);
+
+      expect(createPkiEnvironmentMock).not.toHaveBeenCalled();
+      expect(pkiEnvironment.addTrustAnchor).not.toHaveBeenCalled();
+      expect(pkiEnvironment.addIntermediateCert).toHaveBeenCalledTimes(2);
     });
 
     it('refreshes revocation data on demand', async () => {
-      const [service, {transactionContext}] = await buildE2EIService('mockedDB3');
+      const [service, {pkiEnvironment}] = await buildE2EIService('initializeRefreshRevocationData');
 
-      jest.spyOn(transactionContext, 'e2eiIsPKIEnvSetup').mockResolvedValueOnce(true);
-
-      await service.initialize('https://some.crl.discovery.url');
-      expect(transactionContext.e2eiRegisterIntermediateCA).toHaveBeenCalledTimes(2);
+      await service.initialize(discoveryUrl, authenticate);
+      expect(pkiEnvironment.addIntermediateCert).toHaveBeenCalledTimes(2);
 
       await service.refreshRevocationData();
-      expect(transactionContext.e2eiRegisterIntermediateCA).toHaveBeenCalledTimes(4);
+      expect(pkiEnvironment.addIntermediateCert).toHaveBeenCalledTimes(4);
+    });
+  });
+
+  describe('PKI environment hooks', () => {
+    const initializeService = async (dbName: string): Promise<InitializedService> => {
+      const [service, dependencies] = await buildE2EIService(dbName);
+      const authenticate = jest.fn(async () => {
+        return 'id-token';
+      });
+      await service.initialize(discoveryUrl, authenticate);
+      const hooks = createPkiEnvironmentMock.mock.calls[0][0];
+      return {service, ...dependencies, authenticate, hooks};
+    };
+
+    it('persists the acquisition snapshot before authenticating and returns the id token', async () => {
+      const {service, authenticate, hooks} = await initializeService('hooksAuthenticate');
+      const snapshot = new Uint8Array([1, 2, 3]);
+
+      await expect(hooks.authenticate('idp-url', 'key-auth', 'acme-aud', snapshot)).resolves.toBe('id-token');
+
+      expect(authenticate).toHaveBeenCalledWith({
+        idp: 'idp-url',
+        keyAuth: 'key-auth',
+        acmeAudience: 'acme-aud',
+        acquisitionSnapshot: snapshot,
+      });
+      await expect(service.isEnrollmentInProgress()).resolves.toBe(true);
+    });
+
+    it('forwards the backend nonce request to the client api', async () => {
+      const {apiClient, hooks} = await initializeService('hooksBackendNonce');
+      (apiClient.api.client.getNonce as jest.Mock).mockResolvedValue('backend-nonce');
+
+      await expect(hooks.getBackendNonce()).resolves.toBe('backend-nonce');
+      expect(apiClient.api.client.getNonce).toHaveBeenCalledWith('client-id');
+    });
+
+    it('forwards the backend access token request to the client api', async () => {
+      const {apiClient, hooks} = await initializeService('hooksBackendAccessToken');
+      (apiClient.api.client.getAccessToken as jest.Mock).mockResolvedValue({
+        token: 'access-token',
+        type: 'DPoP',
+        expires_in: 60,
+      });
+
+      await expect(hooks.fetchBackendAccessToken('dpop-token')).resolves.toBe('access-token');
+      expect(apiClient.api.client.getAccessToken).toHaveBeenCalledWith(
+        'client-id',
+        new TextEncoder().encode('dpop-token'),
+      );
+    });
+
+    it('performs ACME requests with the given method, headers and body', async () => {
+      const {hooks} = await initializeService('hooksHttpRequest');
+      const responseBody = new TextEncoder().encode('{"ok":true}').buffer;
+      axiosMock.request = jest.fn(async () => {
+        return {status: 200, headers: {'replay-nonce': 'nonce'}, data: responseBody};
+      }) as unknown as typeof axiosMock.request;
+
+      const response = await hooks.httpRequest(
+        HttpMethod.Post,
+        'https://acme.example/new-order',
+        [{name: 'content-type', value: 'application/jose+json'}],
+        new Uint8Array([4, 5, 6]),
+      );
+
+      expect(axiosMock.request).toHaveBeenCalledWith(
+        expect.objectContaining({
+          method: 'post',
+          url: 'https://acme.example/new-order',
+          headers: {'content-type': 'application/jose+json'},
+          data: new Uint8Array([4, 5, 6]),
+        }),
+      );
+      expect(response).toEqual({
+        status: 200,
+        headers: [{name: 'replay-nonce', value: 'nonce'}],
+        body: new Uint8Array([123, 34, 111, 107, 34, 58, 116, 114, 117, 101, 125]),
+      });
     });
   });
 });

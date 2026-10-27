@@ -21,7 +21,7 @@ import {SUBCONVERSATION_ID} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {DBSchema, deleteDB as idbDeleteDB, IDBPDatabase, openDB as idbOpenDb} from 'idb';
 
-import {EnrollmentFlowData} from '../messagingProtocols/mls/e2eIdentityService/storage/e2eiStorage.schema';
+import {PendingEnrollmentData} from '../messagingProtocols/mls/e2eIdentityService/storage/e2eiStorage.schema';
 
 const recurringTasksMigrationVersion = 2;
 const conversationBlacklistMigrationVersion = 3;
@@ -57,7 +57,7 @@ interface CoreDBSchema extends DBSchema {
   };
   pendingEnrollmentData: {
     key: string;
-    value: EnrollmentFlowData;
+    value: PendingEnrollmentData;
   };
   mlsConversationRecovery: {
     key: string;
