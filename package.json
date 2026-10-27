@@ -115,7 +115,7 @@
     "url": "https://github.com/wireapp/wire-webapp.git"
   },
   "scripts": {
-    "build:libs": "nx run-many -t build --projects=tag:type:lib",
+    "build:libs": "npx just build-libraries",
     "bundle:dev": "nx run server:assemble-webapp-development",
     "bundle:prod": "nx run server:assemble-webapp",
     "bundle:prod:public": "nx run server:assemble-webapp-public",

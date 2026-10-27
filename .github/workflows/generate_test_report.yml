@@ -47,7 +47,7 @@ jobs:
         run: npm clean-install
 
       - name: Build libraries for Jest tests
-        run: npx nx run-many -t build --projects=tag:type:lib
+        run: npx just build-libraries
 
       - name: Generate unit test reports
         id: unit_test_reports
