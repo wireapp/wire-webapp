@@ -30,6 +30,17 @@ export enum Ciphersuite {
   MLS_128_X25519KYBER768DRAFT00_AES128GCM_SHA256_Ed25519 = 61489,
 }
 
+export enum CipherSuite {
+  Mls128Dhkemx25519Aes128gcmSha256Ed25519 = 1,
+  Mls128Dhkemp256Aes128gcmSha256P256 = 2,
+  Mls128Dhkemx25519Chacha20poly1305Sha256Ed25519 = 3,
+  Mls256Dhkemx448Aes256gcmSha512Ed448 = 4,
+  Mls256Dhkemp521Aes256gcmSha512P521 = 5,
+  Mls256Dhkemx448Chacha20poly1305Sha512Ed448 = 6,
+  Mls256Dhkemp384Aes256gcmSha384P384 = 7,
+  Mls128X25519kyber768draft00Aes128gcmSha256Ed25519 = 61489,
+}
+
 export enum CredentialType {
   Basic = 1,
   X509 = 2,
@@ -128,6 +139,44 @@ export enum MlsErrorType {
   MessageRejected = 'MessageRejected',
   Other = 'Other',
 }
+
+type TaggedError<Tag extends string, Inner> = Error & {
+  tag: Tag;
+  inner: Inner;
+};
+
+const taggedError = <Tag extends string, Inner>(tag: Tag, inner: Inner): TaggedError<Tag, Inner> => {
+  return Object.assign(new Error(tag), {tag, inner});
+};
+
+const isTaggedError = <Tag extends string>(error: unknown, tag: Tag): error is TaggedError<Tag, unknown> => {
+  return error instanceof Error && 'tag' in error && error.tag === tag;
+};
+
+export const MlsError = {
+  MessageRejected: {
+    new: (inner: {reason: string}) => taggedError('MessageRejected', inner),
+    instanceOf: (error: unknown) => isTaggedError(error, 'MessageRejected'),
+  },
+  Other: {
+    new: (inner: {msg: string}) => taggedError('Other', inner),
+    instanceOf: (error: unknown) => isTaggedError(error, 'Other'),
+  },
+};
+
+export const CoreCryptoError = {
+  Mls: {
+    new: (inner: {mlsError: ReturnType<(typeof MlsError)[keyof typeof MlsError]['new']>}) => taggedError('Mls', inner),
+    instanceOf: (error: unknown) => isTaggedError(error, 'Mls'),
+  },
+};
+
+export const MlsTransportError = {
+  MessageRejected: {
+    new: (inner: {reason: string}) => taggedError('MessageRejected', inner),
+    instanceOf: (error: unknown) => isTaggedError(error, 'MessageRejected'),
+  },
+};
 
 type CoreCryptoError<T extends ErrorType> = Error & {
   type: T;

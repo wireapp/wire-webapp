@@ -49,19 +49,19 @@ import {
   CredentialType,
   DecryptedMessage,
   EpochObserver,
-  MlsTransport,
-  MlsTransportResponse,
-  Welcome,
   ExternalSender,
-  isMlsMessageRejectedError,
   GroupInfo,
+  MlsTransport,
+  MlsTransportError,
   KeyPackage,
   CoreCryptoContext,
+  Welcome,
 } from '@wireapp/core-crypto';
 
 import {ClientMLSError, ClientMLSErrorLabel} from './clientMlsError';
 import {
   isCoreCryptoMLSConversationAlreadyExistsError,
+  isMlsMessageRejectedError,
   serializeAbortReason,
   shouldMLSDecryptionErrorBeIgnored,
   UPLOAD_COMMIT_BUNDLE_ABORT_REASONS,
@@ -166,12 +166,8 @@ export class MLSService extends TypedEventEmitter<Events> {
 
     this.mlsTransport = {
       sendCommitBundle: this._uploadCommitBundle,
-      // Info: This is not used for now, but we need to implement it to be able to use the mls transport
-      sendMessage: async () => {
-        return 'success';
-      },
-      prepareForTransport: async () => {
-        throw new Error('Method not implemented.');
+      prepareForTransport: historySecret => {
+        return Promise.resolve(historySecret.data);
       },
     };
 
@@ -366,70 +362,72 @@ export class MLSService extends TypedEventEmitter<Events> {
     return isMLSDevice(client, this.config.signatureAlgorithm);
   };
 
-  private readonly _uploadCommitBundle = async ({
-    commit,
-    groupInfo,
-    welcome,
-  }: CommitBundle): Promise<MlsTransportResponse> => {
+  private readonly _uploadCommitBundle = async ({commit, groupInfo, welcome}: CommitBundle): Promise<void> => {
     const bundlePayload = new Uint8Array([...commit, ...groupInfo.payload, ...(welcome?.serialize() ?? [])]);
-    try {
-      const response = await this.apiClient.api.conversation.postMlsCommitBundle(bundlePayload);
 
-      if (response.failed_to_send !== undefined) {
-        this.logger.warn(`Failed to send commit bundle to backend`);
-        return 'retry';
-      }
-
-      const {events, time} = response;
-
-      this.emit(MLSServiceEvents.MLS_EVENT_DISTRIBUTED, {events, time});
-
-      return 'success';
-    } catch (error: unknown) {
-      this.logger.warn(`Failed to upload commit bundle`, error);
-
-      if (error instanceof MLSInvalidLeafNodeSignatureError || error instanceof MLSInvalidLeafNodeIndexError) {
-        this.logger.info('Aborting commit bundle upload due to broken MLS conversation');
-        return {
-          abort: {
-            reason: serializeAbortReason({
-              message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.BROKEN_MLS_CONVERSATION,
+    const uploadResult = await task
+      .tryOrElse(
+        error => this.toMlsTransportError(error),
+        () => this.apiClient.api.conversation.postMlsCommitBundle(bundlePayload),
+      )
+      .andThen(response => {
+        if (response.failed_to_send !== undefined) {
+          this.logger.warn('Failed to send commit bundle to backend', {failedToSend: response.failed_to_send});
+          return task.reject(
+            MlsTransportError.MessageRejected.new({
+              reason: serializeAbortReason({message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.OTHER}),
             }),
-          },
-        };
-      }
+          );
+        }
 
-      if (error instanceof MLSStaleMessageError) {
-        this.logger.info('Aborting commit bundle upload due to stale MLS message');
-        return {
-          abort: {
-            reason: serializeAbortReason({message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_STALE_MESSAGE}),
-          },
-        };
-      }
+        const {events, time} = response;
+        this.emit(MLSServiceEvents.MLS_EVENT_DISTRIBUTED, {events, time});
 
-      if (error instanceof MLSGroupOutOfSyncError) {
-        this.logger.info('Aborting commit bundle upload due to group out of sync');
-        return {
-          abort: {
-            reason: serializeAbortReason({
-              message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_GROUP_OUT_OF_SYNC,
-              missing_users: error.missing_users,
-            }),
-          },
-        };
-      }
+        return task.resolve(undefined);
+      });
 
-      this.logger.info('Aborting commit bundle upload due to unknown error');
-      return {
-        abort: {
-          reason: serializeAbortReason({
-            message: error instanceof Error ? error.message : UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.OTHER,
-          }),
-        },
-      };
-    }
+    return uploadResult.match({
+      Ok: () => Promise.resolve(),
+      Err: error => Promise.reject(error),
+    });
   };
+
+  private toMlsTransportError(error: unknown): MlsTransportError {
+    this.logger.warn('Failed to upload commit bundle', error);
+
+    if (error instanceof MLSInvalidLeafNodeSignatureError || error instanceof MLSInvalidLeafNodeIndexError) {
+      this.logger.info('Rejecting commit bundle upload due to broken MLS conversation');
+      return MlsTransportError.MessageRejected.new({
+        reason: serializeAbortReason({
+          message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.BROKEN_MLS_CONVERSATION,
+        }),
+      });
+    }
+
+    if (error instanceof MLSStaleMessageError) {
+      this.logger.info('Rejecting commit bundle upload due to stale MLS message');
+      return MlsTransportError.MessageRejected.new({
+        reason: serializeAbortReason({message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_STALE_MESSAGE}),
+      });
+    }
+
+    if (error instanceof MLSGroupOutOfSyncError) {
+      this.logger.info('Rejecting commit bundle upload due to group out of sync');
+      return MlsTransportError.MessageRejected.new({
+        reason: serializeAbortReason({
+          message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_GROUP_OUT_OF_SYNC,
+          missing_users: error.missing_users,
+        }),
+      });
+    }
+
+    this.logger.info('Rejecting commit bundle upload due to unknown error');
+    return MlsTransportError.MessageRejected.new({
+      reason: serializeAbortReason({
+        message: error instanceof Error ? error.message : UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.OTHER,
+      }),
+    });
+  }
 
   /**
    * Will add users to an existing MLS group and send a commit bundle to backend.

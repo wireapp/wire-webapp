@@ -19,7 +19,7 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {ErrorType, MlsErrorType} from '@wireapp/core-crypto';
+import {CoreCryptoError, MlsError} from '@wireapp/core-crypto';
 
 import {
   CORE_CRYPTO_ERROR_NAMES,
@@ -31,6 +31,7 @@ import {
   isMlsConversationNotFoundError,
   isMLSGroupOutOfSyncError,
   isMLSStaleMessageError,
+  isMlsMessageRejectedError,
   serializeAbortReason,
   shouldMLSDecryptionErrorBeIgnored,
 } from './coreCryptoMlsError';
@@ -99,19 +100,8 @@ describe('CoreCryptoMLSError helpers', () => {
   });
 
   describe('abort reason based guards', () => {
-    function makeRejectedError(reason: string): {
-      type: ErrorType;
-      context: {type: MlsErrorType; context: {reason: string}};
-    } {
-      return {
-        type: ErrorType.Mls,
-        context: {
-          type: MlsErrorType.MessageRejected,
-          context: {
-            reason,
-          },
-        },
-      };
+    function makeRejectedError(reason: string): CoreCryptoError {
+      return CoreCryptoError.Mls.new({mlsError: MlsError.MessageRejected.new({reason})});
     }
 
     it('detects broken MLS conversation errors', () => {
@@ -161,15 +151,24 @@ describe('CoreCryptoMLSError helpers', () => {
     });
 
     it('returns false for non-mls message rejected errors', () => {
-      const err = {
-        type: ErrorType.Mls,
-        context: {
-          type: MlsErrorType.Other,
-          context: {
-            reason: serializeAbortReason({message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_STALE_MESSAGE}),
-          },
-        },
-      };
+      const err = CoreCryptoError.Mls.new({mlsError: MlsError.Other.new({msg: 'other MLS error'})});
+
+      expect(isBrokenMLSConversationError(err)).toBe(false);
+      expect(isMLSStaleMessageError(err)).toBe(false);
+      expect(isMLSGroupOutOfSyncError(err)).toBe(false);
+    });
+
+    it('recognizes the nested V11 message-rejected error shape', () => {
+      const err = makeRejectedError(
+        serializeAbortReason({message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_STALE_MESSAGE}),
+      );
+
+      expect(isMlsMessageRejectedError(err)).toBe(true);
+      expect(isMlsMessageRejectedError(MlsError.MessageRejected.new({reason: 'not wrapped'}))).toBe(false);
+    });
+
+    it('returns false instead of throwing for a malformed rejection reason', () => {
+      const err = makeRejectedError('not-json');
 
       expect(isBrokenMLSConversationError(err)).toBe(false);
       expect(isMLSStaleMessageError(err)).toBe(false);

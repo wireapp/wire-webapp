@@ -19,6 +19,12 @@
 
 import {ClientType, MLSPublicKeyAlgorithmKeys, RegisteredClient} from '@wireapp/api-client/lib/client';
 import {
+  MLSGroupOutOfSyncError,
+  MLSInvalidLeafNodeIndexError,
+  MLSInvalidLeafNodeSignatureError,
+  MLSStaleMessageError,
+} from '@wireapp/api-client/lib/conversation';
+import {
   CONVERSATION_EVENT,
   ConversationMLSMessageAddEvent,
   ConversationMLSWelcomeEvent,
@@ -33,6 +39,7 @@ import {APIClient} from '@wireapp/api-client';
 import {
   CipherSuite as Ciphersuite,
   ClientId,
+  CommitBundle,
   ConversationId,
   CoreCrypto,
   CoreCryptoContext,
@@ -43,10 +50,11 @@ import {
   ExternalSender,
   KeyPackage,
   KeyPackageRef,
+  MlsTransportError,
   SignatureScheme,
 } from '@wireapp/core-crypto';
 
-import {CORE_CRYPTO_ERROR_NAMES} from './coreCryptoMlsError';
+import {CORE_CRYPTO_ERROR_NAMES, UPLOAD_COMMIT_BUNDLE_ABORT_REASONS, serializeAbortReason} from './coreCryptoMlsError';
 import {InitClientOptions, MLSService, MLSServiceEvents} from './mlsService';
 
 import {AddUsersFailure, AddUsersFailureReasons} from '../../../conversation';
@@ -190,6 +198,82 @@ describe('MLSService', () => {
   afterAll(() => {
     apiClients.forEach(client => {
       client.disconnect();
+    });
+  });
+
+  describe('MLS transport', () => {
+    const welcomeBytes = new Uint8Array([3]);
+    const commitBundle = {
+      commit: new Uint8Array([1]),
+      groupInfo: {payload: new Uint8Array([2])},
+      welcome: {serialize: jest.fn(() => welcomeBytes)} as unknown as NonNullable<CommitBundle['welcome']>,
+    } as CommitBundle;
+
+    it('uploads a commit bundle and emits the distributed events', async () => {
+      const [mlsService, {apiClient}] = await createMLSService();
+      const response = {events: [], time: '2026-10-27T10:00:00.000Z'};
+      const onDistributed = jest.fn();
+
+      jest.spyOn(apiClient.api.conversation, 'postMlsCommitBundle').mockResolvedValueOnce(response);
+      mlsService.on(MLSServiceEvents.MLS_EVENT_DISTRIBUTED, onDistributed);
+
+      await expect(mlsService['mlsTransport'].sendCommitBundle(commitBundle)).resolves.toBeUndefined();
+
+      expect(apiClient.api.conversation.postMlsCommitBundle).toHaveBeenCalledWith(new Uint8Array([1, 2, 3]));
+      expect(onDistributed).toHaveBeenCalledWith(response);
+    });
+
+    it('rejects a partially delivered commit bundle with the V11 transport error', async () => {
+      const [mlsService, {apiClient}] = await createMLSService();
+      jest.spyOn(apiClient.api.conversation, 'postMlsCommitBundle').mockResolvedValueOnce({
+        events: [],
+        failed_to_send: [{id: randomUUID(), domain: 'example.com'}],
+        time: '2026-10-27T10:00:00.000Z',
+      });
+
+      await expect(mlsService['mlsTransport'].sendCommitBundle(commitBundle)).rejects.toMatchObject({
+        inner: {
+          reason: serializeAbortReason({message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.OTHER}),
+        },
+      } satisfies Partial<MlsTransportError>);
+    });
+
+    it.each([
+      [
+        new MLSInvalidLeafNodeSignatureError('invalid signature'),
+        serializeAbortReason({message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.BROKEN_MLS_CONVERSATION}),
+      ],
+      [
+        new MLSInvalidLeafNodeIndexError('invalid index'),
+        serializeAbortReason({message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.BROKEN_MLS_CONVERSATION}),
+      ],
+      [
+        new MLSStaleMessageError('stale message'),
+        serializeAbortReason({message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_STALE_MESSAGE}),
+      ],
+      [
+        new MLSGroupOutOfSyncError(StatusCode.CONFLICT, [{id: 'user-id', domain: 'example.com'}], 'out of sync'),
+        serializeAbortReason({
+          message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_GROUP_OUT_OF_SYNC,
+          missing_users: [{id: 'user-id', domain: 'example.com'}],
+        }),
+      ],
+    ])('maps backend rejection %s to a V11 transport rejection', async (backendError, reason) => {
+      const [mlsService, {apiClient}] = await createMLSService();
+      jest.spyOn(apiClient.api.conversation, 'postMlsCommitBundle').mockRejectedValueOnce(backendError);
+
+      await expect(mlsService['mlsTransport'].sendCommitBundle(commitBundle)).rejects.toMatchObject({
+        inner: {reason},
+      } satisfies Partial<MlsTransportError>);
+    });
+
+    it('forwards opaque history secret data unchanged', async () => {
+      const [mlsService] = await createMLSService();
+      const data = new Uint8Array([4, 5, 6]);
+
+      await expect(mlsService['mlsTransport'].prepareForTransport({clientId: {} as ClientId, data})).resolves.toBe(
+        data,
+      );
     });
   });
 
