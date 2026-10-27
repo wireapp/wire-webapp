@@ -53,9 +53,14 @@ function withConferenceCallingDisabled(testFunction: TestFunction): IsolatedTest
 
 function renderConversationHistory(selfUser: User): ReturnType<typeof render> {
   const teamState = container.resolve(TeamState);
-  return render(withTheme(<ConversationHistory onClose={jest.fn()} onGoBack={jest.fn()} selfUser={selfUser} teamState={teamState} />), {
-    wrapper: rootProviderWrapper,
-  });
+  return render(
+    withTheme(
+      <ConversationHistory onClose={jest.fn()} onGoBack={jest.fn()} selfUser={selfUser} teamState={teamState} />,
+    ),
+    {
+      wrapper: rootProviderWrapper,
+    },
+  );
 }
 
 describe('ConversationHistory — upgrade banner', () => {
