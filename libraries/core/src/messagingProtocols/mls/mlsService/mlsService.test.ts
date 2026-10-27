@@ -1265,7 +1265,7 @@ describe('MLSService', () => {
       const mockedDecryptoedMessage = DecryptedMessage.Commit.new({identity: mockWireIdentity, isActive: false});
 
       jest.spyOn(transactionContext, 'decryptMessage').mockResolvedValueOnce(mockedDecryptoedMessage);
-      jest.spyOn(coreCrypto, 'conversationEpoch').mockResolvedValueOnce(mockedNewEpoch);
+      jest.spyOn(coreCrypto, 'conversationEpoch').mockResolvedValueOnce(BigInt(mockedNewEpoch));
 
       const mockedMLSWelcomeEvent: ConversationMLSMessageAddEvent = {
         type: CONVERSATION_EVENT.MLS_MESSAGE_ADD,
@@ -1298,7 +1298,7 @@ describe('MLSService', () => {
       });
 
       jest.spyOn(transactionContext, 'decryptMessage').mockResolvedValueOnce(mockedDecryptoedMessage);
-      jest.spyOn(coreCrypto, 'conversationEpoch').mockResolvedValueOnce(mockedNewEpoch);
+      jest.spyOn(coreCrypto, 'conversationEpoch').mockResolvedValueOnce(BigInt(mockedNewEpoch));
 
       jest.spyOn(mlsService, 'commitPendingProposals');
 

@@ -35,6 +35,7 @@ import {
   DatabaseKey,
   PkiEnvironment,
   type PkiEnvironmentHooks,
+  proteusLastResortPrekeyId,
 } from '@wireapp/core-crypto';
 import type {CRUDEngine} from '@wireapp/store-engine';
 
@@ -301,7 +302,7 @@ export class CoreCryptoWrapper implements CryptoClient {
 
   async create(nbPrekeys: number, entropy?: Uint8Array): Promise<InitialPrekeys> {
     if (entropy !== undefined) {
-      await this.coreCrypto.reseedRng(entropy);
+      await this.coreCrypto.reseed(entropy);
     }
     await this.init();
     const prekeys: PreKey[] = [];
@@ -314,7 +315,7 @@ export class CoreCryptoWrapper implements CryptoClient {
     });
     const lastPrekey = Encoder.toBase64(lastPrekeyBytes).asString;
 
-    const lastPrekeyId = CoreCrypto.proteusLastResortPrekeyId();
+    const lastPrekeyId = proteusLastResortPrekeyId();
 
     return {
       prekeys,

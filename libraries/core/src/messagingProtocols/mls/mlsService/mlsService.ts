@@ -82,6 +82,14 @@ import {handleMLSMessageAdd, handleMLSWelcomeMessage} from '../eventHandler/even
 import {ClientId, HandlePendingProposalsParams} from '../types';
 import {createMLSClientId} from '../utils/mlsId';
 
+/**
+ * CoreCrypto reports epochs as `bigint`. Epochs only grow by one per commit, so they will never exceed
+ * `Number.MAX_SAFE_INTEGER` in practice; converting at this boundary keeps the rest of the codebase on `number`.
+ */
+const epochToNumber = (epoch: bigint): number => {
+  return Number(epoch);
+};
+
 const keyingMaterialLifetimeInDays = 30;
 const keyPackageReplenishmentDivisor = 2;
 
@@ -157,8 +165,9 @@ export class MLSService extends TypedEventEmitter<Events> {
     };
 
     const epochObserver: EpochObserver = {
-      epochChanged: async (groupId, epoch) => {
+      epochChanged: async (groupId, coreCryptoEpoch) => {
         const groupIdStr = Encoder.toBase64(groupId.copyBytes()).asString;
+        const epoch = epochToNumber(coreCryptoEpoch);
         this.logger.info(`Epoch changed for group ${groupIdStr}, new epoch: ${epoch}`);
         this.emit(MLSServiceEvents.NEW_EPOCH, {epoch, groupId: groupIdStr});
       },
@@ -561,9 +570,9 @@ export class MLSService extends TypedEventEmitter<Events> {
   /**
    * @deprecated Use `getSafeEpoch` to receive a `Task` with explicit error handling.
    */
-  public getEpoch(groupId: string | Uint8Array): Promise<number> {
+  public async getEpoch(groupId: string | Uint8Array): Promise<number> {
     const groupIdBytes = typeof groupId === 'string' ? Decoder.fromBase64(groupId).asBytes : groupId;
-    return this.coreCryptoClient.conversationEpoch(new ConversationId(groupIdBytes));
+    return epochToNumber(await this.coreCryptoClient.conversationEpoch(new ConversationId(groupIdBytes)));
   }
 
   /**
@@ -581,9 +590,9 @@ export class MLSService extends TypedEventEmitter<Events> {
       errorReason => {
         return `Failed to get safe epoch for group ${groupId}: ${errorReason}`;
       },
-      () => {
+      async () => {
         const groupIdBytes = typeof groupId === 'string' ? Decoder.fromBase64(groupId).asBytes : groupId;
-        return this.coreCryptoClient.conversationEpoch(new ConversationId(groupIdBytes));
+        return epochToNumber(await this.coreCryptoClient.conversationEpoch(new ConversationId(groupIdBytes)));
       },
     );
   }
@@ -618,7 +627,7 @@ export class MLSService extends TypedEventEmitter<Events> {
   public async exportSecretKey(groupId: string, keyLength: number): Promise<string> {
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
     const key = await this.coreCryptoClient.exportSecretKey(new ConversationId(groupIdBytes), keyLength);
-    return Encoder.toBase64(key).asString;
+    return Encoder.toBase64(key.copyBytes()).asString;
   }
 
   public async processWelcomeMessage(welcomeMessage: Uint8Array): Promise<ConversationId> {
@@ -647,8 +656,8 @@ export class MLSService extends TypedEventEmitter<Events> {
         errorReason => {
           return `Failed to collect epoch details for decryption failure: ${conversationId}: ${errorReason}`;
         },
-        () => {
-          return this.coreCryptoClient.conversationEpoch(conversationId);
+        async () => {
+          return epochToNumber(await this.coreCryptoClient.conversationEpoch(conversationId));
         },
       );
       this.logger.warn('Failed to decrypt MLS message', {
