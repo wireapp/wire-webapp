@@ -35,6 +35,9 @@ import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/start
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 import type {Translate} from 'Util/localizerUtil/translationTypes';
 import {translateForTest} from 'Util/test/translateForTest';
+import type {SharedDriveUploadController} from 'Components/conversation/conversationCells/sharedDriveUploadController';
+import {SharedDriveUploadStatusProvider} from 'Components/conversation/conversationCells/sharedDriveUploadStatusContext';
+import {SharedDriveUploadStatusPopupHost} from 'Components/conversation/conversationCells/sharedDriveUploadStatusPopupHost';
 
 import {CellsTable} from './cellsTable';
 
@@ -63,8 +66,20 @@ const translateSelectionForTest: Translate = (key, substitutions) => {
   if (key === 'cells.bulkMove.moveButton') {
     return 'Move';
   }
+  if (key === 'cells.bulkMove.movingItems') {
+    return `Moving ${substitutions?.count} items`;
+  }
+  if (key === 'cells.bulkMove.movedItems') {
+    return `Moved ${substitutions?.count} items`;
+  }
   if (key === 'cells.bulkMove.processing') {
     return 'Processing';
+  }
+  if (key === 'cells.bulkMove.completed') {
+    return 'Move completed';
+  }
+  if (key === 'cells.uploadStatus.destination') {
+    return `to ${substitutions?.destination}`;
   }
   if (key === 'cells.bulkMove.outcomeUnresolved') {
     return 'Move status is unresolved. Verify the Drive before trying again.';
@@ -82,6 +97,14 @@ const translateSelectionForTest: Translate = (key, substitutions) => {
 };
 
 const conversationQualifiedId = {id: 'conversation-id', domain: 'example.com'};
+const uploadStatusController = {
+  snapshots: () => {
+    return [];
+  },
+  subscribe: () => {
+    return noop;
+  },
+} as unknown as SharedDriveUploadController;
 
 const createNode = (overrides: Partial<CellNode>): CellNode => {
   return {
@@ -180,29 +203,37 @@ const renderCellsTable = ({
   ): ReactElement => {
     return (
       <ThemeProvider>
-        <CellsSelfUserDriveRoleProvider selfUserDriveRole={selfUserDriveRole}>
-          <CellsTable
-            nodes={nodes}
-            cellsRepository={cellsRepository}
-            conversation={{} as Conversation}
-            conversationQualifiedId={conversationQualifiedId}
-            conversationName="Conversation"
-            onRefresh={onRefresh}
-            onFolderDropTargetChange={onFolderDropTargetChange}
-            onDropFilesToFolder={onDropFilesToFolder}
-            onDropReadError={onDropReadError}
-            folderDropResetKey={resetKey}
-            getDirectionFor={() => {
-              return undefined;
-            }}
-            isSortingEnabled
-            onToggleSort={jest.fn()}
-            selectionEnabled={isSelectionEnabled}
-            selectionScopeKey={scopeKey}
-            selectionBarAnchor={document.body}
-            random={random}
+        <SharedDriveUploadStatusProvider>
+          <CellsSelfUserDriveRoleProvider selfUserDriveRole={selfUserDriveRole}>
+            <CellsTable
+              nodes={nodes}
+              cellsRepository={cellsRepository}
+              conversation={{} as Conversation}
+              conversationQualifiedId={conversationQualifiedId}
+              conversationName="Conversation"
+              onRefresh={onRefresh}
+              onFolderDropTargetChange={onFolderDropTargetChange}
+              onDropFilesToFolder={onDropFilesToFolder}
+              onDropReadError={onDropReadError}
+              folderDropResetKey={resetKey}
+              getDirectionFor={() => {
+                return undefined;
+              }}
+              isSortingEnabled
+              onToggleSort={jest.fn()}
+              selectionEnabled={isSelectionEnabled}
+              selectionScopeKey={scopeKey}
+              selectionBarAnchor={document.body}
+              random={random}
+            />
+          </CellsSelfUserDriveRoleProvider>
+          <SharedDriveUploadStatusPopupHost
+            controller={uploadStatusController}
+            conversationQualifiedId={`${conversationQualifiedId.id}@${conversationQualifiedId.domain}`}
+            isEnabled
+            isFileTabActive
           />
-        </CellsSelfUserDriveRoleProvider>
+        </SharedDriveUploadStatusProvider>
       </ThemeProvider>
     );
   };
@@ -442,10 +473,8 @@ describe('CellsTable selection', () => {
     await waitFor(() => {
       expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(1);
     });
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
-    const progressBar = screen.getByRole('progressbar', {name: 'Processing'});
-    expect(progressBar).toBeInTheDocument();
-    expect(progressBar).not.toHaveAttribute('aria-valuenow');
+    expect(screen.queryByText('Move to folder')).not.toBeInTheDocument();
+    expect(screen.getByText('Moving 1 items')).toBeInTheDocument();
     expect(repository.moveNodes).toHaveBeenCalledTimes(1);
     expect(onRefresh).not.toHaveBeenCalled();
 
@@ -453,11 +482,8 @@ describe('CellsTable selection', () => {
     rerenderWithSelectionScope('conversation:/files');
     rerenderWithSelectionScope('conversation:/files', false);
     rerenderWithSelectionScope('conversation:/files', true);
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
-    expect(screen.getByRole('progressbar', {name: 'Processing'})).toBeInTheDocument();
-
-    const reopenedDialog = dialog;
-    expect(within(reopenedDialog).getByRole('button', {name: 'Processing'})).toBeDisabled();
+    expect(screen.queryByText('Move to folder')).not.toBeInTheDocument();
+    expect(screen.getByText('Moving 1 items')).toBeInTheDocument();
     expect(repository.moveNodes).toHaveBeenCalledTimes(1);
     expect(onRefresh).not.toHaveBeenCalled();
     window.location.hash = originalHash;
@@ -553,7 +579,7 @@ describe('CellsTable selection', () => {
     window.location.hash = originalHash;
   });
 
-  it('keeps the destination dialog open with progress until the background move finishes', async () => {
+  it('shows completed progress after the background move finishes', async () => {
     const originalHash = window.location.hash;
     window.location.hash = '#/conversation/conversation-id@example.com/files/wire-cells-web/Marketing images';
     const user = userEvent.setup();
@@ -599,11 +625,8 @@ describe('CellsTable selection', () => {
       expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(2);
     });
     expect(onRefresh).not.toHaveBeenCalled();
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
-    expect(screen.getByRole('progressbar', {name: 'Processing'})).toBeInTheDocument();
-    const processingButton = within(dialog).getByRole('button', {name: 'Processing'});
-    expect(processingButton).toBeDisabled();
-    await user.click(processingButton);
+    expect(screen.queryByText('Move to folder')).not.toBeInTheDocument();
+    expect(screen.getByText('Moving 1 items')).toBeInTheDocument();
     expect(repository.moveNodes).toHaveBeenCalledTimes(1);
 
     await act(async () => {
@@ -612,8 +635,9 @@ describe('CellsTable selection', () => {
         expect(onRefresh).toHaveBeenCalledTimes(1);
       });
     });
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    expect(screen.queryByRole('progressbar', {name: 'Processing'})).not.toBeInTheDocument();
+    expect(screen.queryByText('Move to folder')).not.toBeInTheDocument();
+    expect(screen.getByText('Moved 1 items')).toBeInTheDocument();
+    expect(screen.getByRole('progressbar', {name: 'Move completed'})).toHaveAttribute('aria-valuenow', '100');
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(4);
     window.location.hash = originalHash;
@@ -655,8 +679,7 @@ describe('CellsTable selection', () => {
       expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(2);
     });
     expect(onRefresh).toHaveBeenCalledTimes(1);
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
-    const preview = dialog;
+    const preview = await screen.findByRole('dialog');
     expect(within(preview).getByRole('alert')).toHaveTextContent('cells.bulkMove.moveNeedsReview');
     expect(within(preview).getByRole('button', {name: 'Move'})).toBeDisabled();
     expect(within(preview).queryByRole('button', {name: 'cells.bulkMove.reviewAndRetry'})).not.toBeInTheDocument();
@@ -833,8 +856,7 @@ describe('CellsTable selection', () => {
       expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(2);
       expect(onRefresh).toHaveBeenCalledTimes(1);
     });
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
-    const reviewDialog = dialog;
+    const reviewDialog = await screen.findByRole('dialog');
     expect(within(reviewDialog).getByRole('button', {name: 'Move'})).toBeDisabled();
     expect(within(reviewDialog).getByRole('alert')).toHaveTextContent('cells.bulkMove.moveNeedsReview');
     expect(within(reviewDialog).queryByRole('button', {name: 'cells.bulkMove.reviewAndRetry'})).not.toBeInTheDocument();
@@ -896,8 +918,7 @@ describe('CellsTable selection', () => {
     });
     expect(repository.moveNodes).toHaveBeenCalledTimes(1);
     expect(random).toHaveBeenCalledTimes(5);
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
-    const statusDialog = dialog;
+    const statusDialog = await screen.findByRole('dialog');
     expect(within(statusDialog).getByRole('button', {name: 'Move'})).toBeDisabled();
     expect(onRefresh).not.toHaveBeenCalled();
     expect(within(statusDialog).getByRole('alert')).toHaveTextContent('cells.bulkMove.statusUnknown');
@@ -911,7 +932,7 @@ describe('CellsTable selection', () => {
     window.location.hash = originalHash;
   });
 
-  it('keeps the move dialog open while tracking a background move', async () => {
+  it('closes the destination dialog while tracking a background move', async () => {
     const originalHash = window.location.hash;
     window.location.hash = '#/conversation/conversation-id@example.com/files/wire-cells-web';
     const user = userEvent.setup();
@@ -936,19 +957,16 @@ describe('CellsTable selection', () => {
     await waitFor(() => {
       expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(1);
     });
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
-    expect(screen.getByRole('progressbar', {name: 'Processing'})).toBeInTheDocument();
+    expect(screen.queryByText('Move to folder')).not.toBeInTheDocument();
+    expect(screen.getByText('Moving 1 items')).toBeInTheDocument();
 
     rerenderWithSelectionScope('conversation:/files/subfolder');
     rerenderWithSelectionScope('conversation:/files');
     rerenderWithSelectionScope('conversation:/files', false);
     rerenderWithSelectionScope('conversation:/files', true);
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
-    expect(screen.getByRole('progressbar', {name: 'Processing'})).toBeInTheDocument();
-
-    expect(within(dialog).getByRole('button', {name: 'Processing'})).toBeDisabled();
+    expect(screen.queryByText('Move to folder')).not.toBeInTheDocument();
+    expect(screen.getByText('Moving 1 items')).toBeInTheDocument();
     expect(repository.moveNodes).toHaveBeenCalledTimes(1);
-    expect(within(dialog).queryByRole('button', {name: 'cells.moveNodeModal.cancelButton'})).not.toBeInTheDocument();
 
     await act(async () => {
       clock.advanceByMilliseconds(1000);
@@ -976,18 +994,17 @@ describe('CellsTable selection', () => {
     await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
     await user.click(screen.getByRole('button', {name: 'Move'}));
     const dialog = await screen.findByRole('dialog');
-    const moveButton = within(dialog).getByRole('button', {name: 'Move'});
-    await user.click(moveButton);
+    await user.click(within(dialog).getByRole('button', {name: 'Move'}));
 
     await waitFor(() => {
       expect(repository.moveNodes).toHaveBeenCalledTimes(1);
     });
-    expect(moveButton).toBeDisabled();
+    expect(await within(dialog).findByRole('alert')).toHaveTextContent('cells.bulkMove.statusUnknown');
+    expect(within(dialog).getByRole('button', {name: 'Move'})).toBeDisabled();
     expect(repository.getBackgroundMoveInfo).not.toHaveBeenCalled();
-    expect(within(dialog).getByRole('alert')).toHaveTextContent('cells.bulkMove.statusUnknown');
     await user.click(within(dialog).getByRole('button', {name: 'cells.bulkMove.refreshDrive'}));
     expect(onRefresh).toHaveBeenCalledTimes(1);
-    expect(moveButton).toBeDisabled();
+    expect(within(dialog).getByRole('button', {name: 'Move'})).toBeDisabled();
   });
 
   it('ignores an in-flight status response after the table unmounts', async () => {
@@ -1083,15 +1100,66 @@ describe('CellsTable selection', () => {
     await waitFor(() => {
       expect(repository.moveNodes).toHaveBeenCalledTimes(1);
     });
-    expect(submitButton).toBeDisabled();
-    await user.click(submitButton);
+    expect(screen.queryByText('Move to folder')).not.toBeInTheDocument();
+    expect(screen.getByText('Moving 2 items')).toBeInTheDocument();
+    expect(screen.getByRole('progressbar', {name: 'Processing'})).toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'Move'})).not.toBeInTheDocument();
     expect(repository.moveNodes).toHaveBeenCalledTimes(1);
-    await user.click(within(dialog).getByRole('button', {name: 'cells.moveNodeModal.cancelButton'}));
-    expect(dialog).toBeInTheDocument();
-    resolveMove({Status: 'Performed'});
-    await waitFor(() => {
-      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    await act(async () => {
+      resolveMove({Status: 'Performed'});
     });
+    await waitFor(() => {
+      expect(screen.getByText('Moved 2 items')).toBeInTheDocument();
+    });
+    expect(screen.getByRole('progressbar', {name: 'Move completed'})).toHaveAttribute('aria-valuenow', '100');
+    window.location.hash = originalHash;
+  });
+
+  it('keeps a dismissed provisional popup hidden after the request starts background polling', async () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files/wire-cells-web';
+    const user = userEvent.setup();
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    let resolveMove: (response: object) => void = noop;
+    const pendingMove = new Promise<object>(resolve => {
+      resolveMove = resolve;
+    });
+    const repository = {
+      getAllNodes: jest.fn().mockResolvedValue({Nodes: []}),
+      moveNodes: jest.fn().mockReturnValue(pendingMove),
+      getBackgroundMoveInfo: jest.fn().mockResolvedValue({Status: 'Running'}),
+    } as unknown as CellsRepository;
+    renderCellsTable({cellsRepository: repository, clock, folderPath: 'wire-cells-web/Marketing images'});
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+    await user.click(screen.getByRole('button', {name: 'Move'}));
+    const dialog = await screen.findByRole('dialog');
+    await user.click(within(dialog).getByRole('button', {name: 'cells.breadcrumb.files'}));
+    await user.click(within(dialog).getByRole('button', {name: 'Move'}));
+    await waitFor(() => {
+      expect(repository.moveNodes).toHaveBeenCalledTimes(1);
+    });
+    expect(screen.queryByText('Move to folder')).not.toBeInTheDocument();
+    expect(screen.getByText('Moving 1 items')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', {name: 'fileCardDefaultCloseButtonLabel'}));
+    expect(screen.queryByText('Moving 1 items')).not.toBeInTheDocument();
+    await act(async () => {
+      resolveMove({Status: 'Background', BackgroundActions: [{JobUuid: 'move-job', Name: 'move'}]});
+    });
+    await waitFor(() => {
+      expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(1);
+    });
+    expect(screen.queryByText('Moving 1 items')).not.toBeInTheDocument();
+
+    await act(async () => {
+      clock.advanceByMilliseconds(1000);
+      await waitFor(() => {
+        expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(2);
+      });
+    });
+    expect(screen.queryByText('Moving 1 items')).not.toBeInTheDocument();
+    expect(repository.moveNodes).toHaveBeenCalledTimes(1);
     window.location.hash = originalHash;
   });
 
@@ -1158,9 +1226,13 @@ describe('CellsTable selection', () => {
     window.location.hash = '#/conversation/conversation-id@example.com/files/wire-cells-web';
     const user = userEvent.setup();
     const onRefresh = jest.fn();
+    let rejectMove: (reason: unknown) => void = noop;
+    const pendingMove = new Promise<object>((_, reject) => {
+      rejectMove = reject;
+    });
     const repository = {
       getAllNodes: jest.fn().mockResolvedValue({Nodes: []}),
-      moveNodes: jest.fn().mockRejectedValue(new Error('Move failed')),
+      moveNodes: jest.fn().mockReturnValue(pendingMove),
     } as unknown as CellsRepository;
     renderCellsTable({cellsRepository: repository, folderPath: 'wire-cells-web/Marketing images', onRefresh});
 
@@ -1178,12 +1250,20 @@ describe('CellsTable selection', () => {
     await waitFor(() => {
       expect(repository.moveNodes).toHaveBeenCalledTimes(1);
     });
-    expect(await screen.findByRole('dialog')).toBeInTheDocument();
-    expect(within(dialog).getByRole('alert')).toHaveTextContent('cells.newItemMenuModalForm.genericError');
-    expect(submitButton).toBeDisabled();
+    expect(screen.queryByText('Move to folder')).not.toBeInTheDocument();
+    expect(screen.getByText('Moving 2 items')).toBeInTheDocument();
+    await act(async () => {
+      rejectMove(new Error('Move failed'));
+    });
+    const reopenedAfterFailure = await screen.findByRole('dialog');
+    expect(screen.queryByText('Moving 2 items')).not.toBeInTheDocument();
+    expect(await within(reopenedAfterFailure).findByRole('alert')).toHaveTextContent(
+      'cells.newItemMenuModalForm.genericError',
+    );
+    expect(within(reopenedAfterFailure).getByRole('button', {name: 'Move'})).toBeDisabled();
     expect(onRefresh).not.toHaveBeenCalled();
 
-    await user.click(within(dialog).getByRole('button', {name: 'cells.moveNodeModal.cancelButton'}));
+    await user.click(within(reopenedAfterFailure).getByRole('button', {name: 'cells.moveNodeModal.cancelButton'}));
     expect(screen.getByText('cells.newItemMenuModalForm.genericError')).toBeInTheDocument();
     await user.click(screen.getByRole('button', {name: 'Move'}));
     const reopenedDialog = await screen.findByRole('dialog');

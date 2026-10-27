@@ -17,15 +17,36 @@
  *
  */
 
-import {createContext, type ReactNode, useCallback, useContext, useState, type FunctionComponent} from 'react';
+import {createContext, type ReactNode, useCallback, useContext, useRef, useState, type FunctionComponent} from 'react';
 
-import {Maybe} from 'true-myth';
+import {Maybe, maybe} from 'true-myth';
 
 import type {DismissedUpload} from './sharedDriveUploadStatus';
+
+export interface SharedDriveMoveItem {
+  readonly id: string;
+  readonly name: string;
+  readonly isFolder: boolean;
+}
+
+export interface SharedDriveMoveSummary {
+  readonly items: readonly SharedDriveMoveItem[];
+  readonly destinationPath: string;
+}
+
+export interface SharedDriveMoveStatus extends SharedDriveMoveSummary {
+  readonly id: string;
+  readonly kind: 'processing' | 'completed';
+}
 
 type SharedDriveUploadStatusContextValue = {
   readonly dismissedUpload: Maybe<DismissedUpload>;
   readonly dismissUpload: (upload: DismissedUpload) => void;
+  readonly moveStatus: Maybe<SharedDriveMoveStatus>;
+  readonly updateMoveStatus: (status: SharedDriveMoveStatus) => void;
+  readonly createMoveStatusId: () => string;
+  readonly dismissMoveStatus: (id: string) => void;
+  readonly clearMoveStatus: (id: string) => void;
   readonly isProvided: boolean;
 };
 
@@ -34,25 +55,78 @@ const SharedDriveUploadStatusContext = createContext<SharedDriveUploadStatusCont
   dismissUpload: () => {
     return undefined;
   },
+  moveStatus: Maybe.nothing(),
+  updateMoveStatus: () => {
+    return undefined;
+  },
+  createMoveStatusId: () => {
+    return 'shared-drive-move-1';
+  },
+  dismissMoveStatus: () => {
+    return undefined;
+  },
+  clearMoveStatus: () => {
+    return undefined;
+  },
   isProvided: false,
 });
 
 interface SharedDriveUploadStatusProviderProps {
   readonly children: ReactNode;
   readonly initialDismissedUpload?: Maybe<DismissedUpload>;
+  readonly initialMoveStatus?: Maybe<SharedDriveMoveStatus>;
 }
 
 export const SharedDriveUploadStatusProvider: FunctionComponent<SharedDriveUploadStatusProviderProps> = ({
   children,
   initialDismissedUpload = Maybe.nothing(),
+  initialMoveStatus = Maybe.nothing(),
 }: SharedDriveUploadStatusProviderProps) => {
   const [dismissedUpload, setDismissedUpload] = useState<Maybe<DismissedUpload>>(initialDismissedUpload);
+  const [moveStatus, setMoveStatus] = useState<Maybe<SharedDriveMoveStatus>>(initialMoveStatus);
+  const moveStatusSequence = useRef(0);
+  const createMoveStatusId = useCallback(() => {
+    moveStatusSequence.current += 1;
+    return `shared-drive-move-${moveStatusSequence.current}`;
+  }, []);
+  const dismissedMoveStatusId = useRef<Maybe<string>>(Maybe.nothing());
+  const updateMoveStatus = useCallback((status: SharedDriveMoveStatus) => {
+    if (maybe.isJust(dismissedMoveStatusId.current)) {
+      if (dismissedMoveStatusId.current.value === status.id) {
+        return;
+      }
+      dismissedMoveStatusId.current = Maybe.nothing();
+    }
+    setMoveStatus(Maybe.just(status));
+  }, []);
+  const dismissMoveStatus = useCallback((id: string) => {
+    dismissedMoveStatusId.current = Maybe.just(id);
+    setMoveStatus(current => {
+      return maybe.isJust(current) && current.value.id === id ? Maybe.nothing() : current;
+    });
+  }, []);
+  const clearMoveStatus = useCallback((id: string) => {
+    setMoveStatus(current => {
+      return maybe.isJust(current) && current.value.id === id ? Maybe.nothing() : current;
+    });
+  }, []);
   const dismissUpload = useCallback((upload: DismissedUpload) => {
     return setDismissedUpload(Maybe.just(upload));
   }, []);
 
   return (
-    <SharedDriveUploadStatusContext.Provider value={{dismissedUpload, dismissUpload, isProvided: true}}>
+    <SharedDriveUploadStatusContext.Provider
+      value={{
+        dismissedUpload,
+        dismissUpload,
+        moveStatus,
+        updateMoveStatus,
+        createMoveStatusId,
+        dismissMoveStatus,
+        clearMoveStatus,
+        isProvided: true,
+      }}
+    >
       {children}
     </SharedDriveUploadStatusContext.Provider>
   );
