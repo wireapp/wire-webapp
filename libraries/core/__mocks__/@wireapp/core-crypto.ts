@@ -109,22 +109,20 @@ export class ExternalSenderKey extends ByteContainer {}
 export class KeyPackage extends ByteContainer {}
 export class SecretKey extends ByteContainer {}
 
-export enum ErrorType {
-  Mls = 'Mls',
-  Proteus = 'Proteus',
-  E2ei = 'E2ei',
-  TransactionFailed = 'TransactionFailed',
-  Other = 'Other',
-}
+type TaggedError<Tag extends string, Inner> = Error & {
+  tag: Tag;
+  inner: Inner;
+};
 
-export enum ProteusErrorType {
-  SessionNotFound = 'SessionNotFound',
-  DuplicateMessage = 'DuplicateMessage',
-  RemoteIdentityChanged = 'RemoteIdentityChanged',
-  Other = 'Other',
-}
+const taggedError = <Tag extends string, Inner>(tag: Tag, inner: Inner): TaggedError<Tag, Inner> => {
+  return Object.assign(new Error(tag), {tag, inner});
+};
 
-export enum MlsErrorType {
+const isTaggedError = <Tag extends string>(error: unknown, tag: Tag): error is TaggedError<Tag, unknown> => {
+  return error instanceof Error && 'tag' in error && error.tag === tag;
+};
+
+export enum MlsError_Tags {
   ConversationAlreadyExists = 'ConversationAlreadyExists',
   DuplicateMessage = 'DuplicateMessage',
   BufferedFutureMessage = 'BufferedFutureMessage',
@@ -140,20 +138,39 @@ export enum MlsErrorType {
   Other = 'Other',
 }
 
-type TaggedError<Tag extends string, Inner> = Error & {
-  tag: Tag;
-  inner: Inner;
-};
-
-const taggedError = <Tag extends string, Inner>(tag: Tag, inner: Inner): TaggedError<Tag, Inner> => {
-  return Object.assign(new Error(tag), {tag, inner});
-};
-
-const isTaggedError = <Tag extends string>(error: unknown, tag: Tag): error is TaggedError<Tag, unknown> => {
-  return error instanceof Error && 'tag' in error && error.tag === tag;
-};
-
 export const MlsError = {
+  ConversationAlreadyExists: {
+    new: (inner: {conversationId: Uint8Array}) => taggedError('ConversationAlreadyExists', inner),
+    instanceOf: (error: unknown) => isTaggedError(error, 'ConversationAlreadyExists'),
+  },
+  DuplicateMessage: {
+    new: () => taggedError('DuplicateMessage', undefined),
+    instanceOf: (error: unknown) => isTaggedError(error, 'DuplicateMessage'),
+  },
+  BufferedFutureMessage: {
+    new: () => taggedError('BufferedFutureMessage', undefined),
+    instanceOf: (error: unknown) => isTaggedError(error, 'BufferedFutureMessage'),
+  },
+  WrongEpoch: {
+    new: () => taggedError('WrongEpoch', undefined),
+    instanceOf: (error: unknown) => isTaggedError(error, 'WrongEpoch'),
+  },
+  UnmergedPendingGroup: {
+    new: () => taggedError('UnmergedPendingGroup', undefined),
+    instanceOf: (error: unknown) => isTaggedError(error, 'UnmergedPendingGroup'),
+  },
+  StaleProposal: {
+    new: () => taggedError('StaleProposal', undefined),
+    instanceOf: (error: unknown) => isTaggedError(error, 'StaleProposal'),
+  },
+  StaleCommit: {
+    new: () => taggedError('StaleCommit', undefined),
+    instanceOf: (error: unknown) => isTaggedError(error, 'StaleCommit'),
+  },
+  OrphanWelcome: {
+    new: () => taggedError('OrphanWelcome', undefined),
+    instanceOf: (error: unknown) => isTaggedError(error, 'OrphanWelcome'),
+  },
   MessageRejected: {
     new: (inner: {reason: string}) => taggedError('MessageRejected', inner),
     instanceOf: (error: unknown) => isTaggedError(error, 'MessageRejected'),
@@ -164,10 +181,33 @@ export const MlsError = {
   },
 };
 
+export const ProteusError = {
+  SessionNotFound: {
+    new: () => taggedError('SessionNotFound', undefined),
+    instanceOf: (error: unknown) => isTaggedError(error, 'SessionNotFound'),
+  },
+  DuplicateMessage: {
+    new: () => taggedError('DuplicateMessage', undefined),
+    instanceOf: (error: unknown) => isTaggedError(error, 'DuplicateMessage'),
+  },
+  RemoteIdentityChanged: {
+    new: () => taggedError('RemoteIdentityChanged', undefined),
+    instanceOf: (error: unknown) => isTaggedError(error, 'RemoteIdentityChanged'),
+  },
+  Other: {
+    new: (inner: {errorCode: number}) => taggedError('Other', inner),
+    instanceOf: (error: unknown) => isTaggedError(error, 'Other'),
+  },
+};
+
 export const CoreCryptoError = {
   Mls: {
-    new: (inner: {mlsError: ReturnType<(typeof MlsError)[keyof typeof MlsError]['new']>}) => taggedError('Mls', inner),
+    new: (inner: {mlsError: Error}) => taggedError('Mls', inner),
     instanceOf: (error: unknown) => isTaggedError(error, 'Mls'),
+  },
+  Proteus: {
+    new: (inner: {exception: Error}) => taggedError('Proteus', inner),
+    instanceOf: (error: unknown) => isTaggedError(error, 'Proteus'),
   },
 };
 
@@ -176,47 +216,4 @@ export const MlsTransportError = {
     new: (inner: {reason: string}) => taggedError('MessageRejected', inner),
     instanceOf: (error: unknown) => isTaggedError(error, 'MessageRejected'),
   },
-};
-
-type CoreCryptoError<T extends ErrorType> = Error & {
-  type: T;
-  context?: {type: string; context: {conversationId?: Uint8Array}};
-};
-
-export const isCoreCryptoError = <E extends ErrorType>(error: unknown, errorType: E): error is CoreCryptoError<E> => {
-  return typeof error === 'object' && error !== null && (error as any).type === errorType;
-};
-
-export const isProteusError = <E extends ProteusErrorType>(
-  error: unknown,
-  errorType: E,
-): error is CoreCryptoError<ErrorType.Proteus> & {context: {type: E}} => {
-  return isCoreCryptoError(error, ErrorType.Proteus) && (error as any).context?.type === errorType;
-};
-
-export const isProteusSessionNotFoundError = (error: unknown): boolean => {
-  return isProteusError(error, ProteusErrorType.SessionNotFound);
-};
-export const isProteusDuplicateMessageError = (error: unknown): boolean => {
-  return isProteusError(error, ProteusErrorType.DuplicateMessage);
-};
-export const isProteusRemoteIdentityChangedError = (error: unknown): boolean => {
-  return isProteusError(error, ProteusErrorType.RemoteIdentityChanged);
-};
-
-export const isMlsOrphanWelcomeError = (error: unknown): boolean => {
-  return isCoreCryptoError(error, ErrorType.Mls) && (error as any).context?.type === MlsErrorType.OrphanWelcome;
-};
-
-// Added to support tests that rely on the core-crypto guard for ConversationAlreadyExists classification
-export const isMlsConversationAlreadyExistsError = (error: unknown): boolean => {
-  return (
-    isCoreCryptoError(error, ErrorType.Mls) &&
-    error.context?.type === MlsErrorType.ConversationAlreadyExists &&
-    Array.isArray(error.context?.context?.conversationId)
-  );
-};
-
-export const isMlsMessageRejectedError = (error: unknown): boolean => {
-  return isCoreCryptoError(error, ErrorType.Mls) && error.context?.type === MlsErrorType.MessageRejected;
 };

@@ -22,7 +22,6 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {CoreCryptoError, MlsError} from '@wireapp/core-crypto';
 
 import {
-  CORE_CRYPTO_ERROR_NAMES,
   UPLOAD_COMMIT_BUNDLE_ABORT_REASONS,
   getMLSGroupOutOfSyncErrorMissingUsers,
   isBrokenMLSConversationError,
@@ -38,62 +37,62 @@ import {
 
 describe('CoreCryptoMLSError helpers', () => {
   describe('epoch and conversation existence guards', () => {
-    it('detects MlsErrorWrongEpoch by name', () => {
-      const err = new Error('wrong epoch');
-      err.name = CORE_CRYPTO_ERROR_NAMES.MlsErrorWrongEpoch;
+    it('detects the nested V11 WrongEpoch variant', () => {
+      const err = CoreCryptoError.Mls.new({mlsError: MlsError.WrongEpoch.new()});
       expect(isCoreCryptoMLSWrongEpochError(err)).toBe(true);
 
-      const other = new Error('nope');
+      const other = CoreCryptoError.Mls.new({mlsError: MlsError.Other.new({msg: 'nope'})});
       expect(isCoreCryptoMLSWrongEpochError(other)).toBe(false);
       expect(isCoreCryptoMLSWrongEpochError('not-an-error')).toBe(false);
     });
 
-    it('detects MlsErrorConversationAlreadyExists by name', () => {
-      const err = new Error('already exists');
-      err.name = CORE_CRYPTO_ERROR_NAMES.MlsErrorConversationAlreadyExists;
+    it('detects the nested V11 ConversationAlreadyExists variant', () => {
+      const err = CoreCryptoError.Mls.new({
+        mlsError: MlsError.ConversationAlreadyExists.new({conversationId: new Uint8Array([1, 2, 3])}),
+      });
       expect(isCoreCryptoMLSConversationAlreadyExistsError(err)).toBe(true);
 
-      const other = new Error('nope');
+      const other = CoreCryptoError.Mls.new({mlsError: MlsError.Other.new({msg: 'nope'})});
       expect(isCoreCryptoMLSConversationAlreadyExistsError(other)).toBe(false);
       expect(isCoreCryptoMLSConversationAlreadyExistsError(42)).toBe(false);
     });
 
-    it('detects MlsErrorOther when the local MLS group is missing', () => {
-      const err = new Error("Couldn't find conversation");
-      err.name = CORE_CRYPTO_ERROR_NAMES.MlsErrorOther;
+    it('detects nested V11 MlsError.Other when the local MLS group is missing', () => {
+      const err = CoreCryptoError.Mls.new({
+        mlsError: MlsError.Other.new({msg: "Couldn't find conversation"}),
+      });
       expect(isMlsConversationNotFoundError(err)).toBe(true);
       expect(isMlsConversationNotFoundError(new Error('other'))).toBe(false);
     });
   });
 
   describe('shouldMLSDecryptionErrorBeIgnored', () => {
-    const namesToIgnore = [
-      CORE_CRYPTO_ERROR_NAMES.MlsErrorStaleCommit,
-      CORE_CRYPTO_ERROR_NAMES.MlsErrorStaleProposal,
-      CORE_CRYPTO_ERROR_NAMES.MlsErrorDuplicateMessage,
-      CORE_CRYPTO_ERROR_NAMES.MlsErrorBufferedFutureMessage,
-      CORE_CRYPTO_ERROR_NAMES.MlsErrorUnmergedPendingGroup,
+    const errorsToIgnore = [
+      MlsError.StaleCommit.new(),
+      MlsError.StaleProposal.new(),
+      MlsError.DuplicateMessage.new(),
+      MlsError.BufferedFutureMessage.new(),
+      MlsError.UnmergedPendingGroup.new(),
     ];
 
-    it('returns true for known ignorable error names', () => {
-      for (const name of namesToIgnore) {
-        const err = new Error('ignore me');
-        err.name = name;
+    it('returns true for known ignorable V11 variants', () => {
+      for (const mlsError of errorsToIgnore) {
+        const err = CoreCryptoError.Mls.new({mlsError});
         expect(shouldMLSDecryptionErrorBeIgnored(err)).toBe(true);
       }
     });
 
-    it('returns true for generic MlsErrorOther with expected commit/proposals message', () => {
-      const err = new Error(
-        'Incoming message is a commit for which we have not yet received all the proposals: details...',
-      );
-      err.name = CORE_CRYPTO_ERROR_NAMES.MlsErrorOther;
+    it('returns true for V11 MlsError.Other with expected commit/proposals message', () => {
+      const err = CoreCryptoError.Mls.new({
+        mlsError: MlsError.Other.new({
+          msg: 'Incoming message is a commit for which we have not yet received all the proposals: details...',
+        }),
+      });
       expect(shouldMLSDecryptionErrorBeIgnored(err)).toBe(true);
     });
 
     it('returns false for other errors or non-Error values', () => {
-      const err = new Error('some real failure');
-      err.name = 'RandomErrorName';
+      const err = CoreCryptoError.Mls.new({mlsError: MlsError.Other.new({msg: 'some real failure'})});
       expect(shouldMLSDecryptionErrorBeIgnored(err)).toBe(false);
       expect(shouldMLSDecryptionErrorBeIgnored('not-an-error')).toBe(false);
     });

@@ -19,29 +19,15 @@
 
 import {generateDecryptionError, ProteusErrors} from './decryptionErrorGenerator';
 
-import {ErrorType, ProteusErrorType} from '@wireapp/core-crypto';
+import {CoreCryptoError, ProteusError} from '@wireapp/core-crypto';
+import {errors as LegacyProteusErrors} from '@wireapp/proteus';
 
 import {DecryptionError} from '../../../../errors/decryptionError';
 
-type StructuredProteusError = Error & {
-  name: string;
-  errorStack: never[];
-  type: ErrorType;
-  context: {type: ProteusErrorType; context: {errorCode?: undefined} | {errorCode: number}};
-};
-
 const basePayload = {userId: {id: 'user1', domain: 'domain'}, clientId: 'client1'};
 
-const createStructuredProteusError = (errorCode?: number): StructuredProteusError => {
-  return Object.assign(new Error('proteus decryption error'), {
-    name: 'ProteusErrorOther',
-    errorStack: [],
-    type: ErrorType.Proteus,
-    context: {
-      type: ProteusErrorType.Other,
-      context: errorCode === undefined ? {} : {errorCode},
-    },
-  });
+const createStructuredProteusError = (errorCode: number): CoreCryptoError => {
+  return CoreCryptoError.Proteus.new({exception: ProteusError.Other.new({errorCode})});
 };
 
 describe('generateDecryptionError', () => {
@@ -57,31 +43,21 @@ describe('generateDecryptionError', () => {
     },
   );
 
-  it('falls back to the unknown code for a malformed structured CoreCrypto Proteus error', () => {
-    const coreCryptoError = createStructuredProteusError();
+  it.each([
+    [ProteusError.SessionNotFound.new(), ProteusErrors.SessionNotFound],
+    [ProteusError.RemoteIdentityChanged.new(), ProteusErrors.RemoteIdentityChanged],
+    [ProteusError.DuplicateMessage.new(), ProteusErrors.DuplicateMessage],
+  ])('maps a nested V11 Proteus error variant', (proteusError, expectedCode) => {
+    const coreCryptoError = CoreCryptoError.Proteus.new({exception: proteusError});
 
-    const error = generateDecryptionError(basePayload, coreCryptoError);
-
-    expect(error.code).toBe(ProteusErrors.Unknown);
+    expect(generateDecryptionError(basePayload, coreCryptoError).code).toBe(expectedCode);
   });
 
-  it.each([Math.floor(Math.random() * 100), 0])('handles coreCrypto error', proteusErrorCode => {
-    const coreCryptoError = {proteusErrorCode, message: 'decryption error'};
-    const error = generateDecryptionError(basePayload, coreCryptoError);
+  it.each([Math.floor(Math.random() * 100), 0])('handles legacy Proteus errors from Cryptobox', code => {
+    const legacyError = new LegacyProteusErrors.DecryptError('decryption error', code);
+    const error = generateDecryptionError(basePayload, legacyError);
     expect(error).toBeInstanceOf(DecryptionError);
-    expect(error.message).toBe(
-      `Decryption error from user1 (client1) (name: undefined) (message: ${coreCryptoError.message})`,
-    );
-    expect(error.code).toBe(coreCryptoError.proteusErrorCode);
-  });
-
-  it.each([Math.floor(Math.random() * 100), 0])('handles cryptobox error', code => {
-    const coreCryptoError = {code, message: 'decryption error'};
-    const error = generateDecryptionError(basePayload, coreCryptoError);
-    expect(error).toBeInstanceOf(DecryptionError);
-    expect(error.message).toBe(
-      `Decryption error from user1 (client1) (name: undefined) (message: ${coreCryptoError.message})`,
-    );
-    expect(error.code).toBe(coreCryptoError.code);
+    expect(error.message).toBe(`Decryption error from user1 (client1) (name: Error) (message: ${legacyError.message})`);
+    expect(error.code).toBe(legacyError.code);
   });
 });

@@ -42,6 +42,7 @@ import {
   CommitBundle,
   ConversationId,
   CoreCrypto,
+  CoreCryptoError,
   CoreCryptoContext,
   Credential,
   CredentialRef,
@@ -51,10 +52,11 @@ import {
   KeyPackage,
   KeyPackageRef,
   MlsTransportError,
+  MlsError,
   SignatureScheme,
 } from '@wireapp/core-crypto';
 
-import {CORE_CRYPTO_ERROR_NAMES, UPLOAD_COMMIT_BUNDLE_ABORT_REASONS, serializeAbortReason} from './coreCryptoMlsError';
+import {UPLOAD_COMMIT_BUNDLE_ABORT_REASONS, serializeAbortReason} from './coreCryptoMlsError';
 import {InitClientOptions, MLSService, MLSServiceEvents} from './mlsService';
 
 import {AddUsersFailure, AddUsersFailureReasons} from '../../../conversation';
@@ -1233,9 +1235,8 @@ describe('MLSService', () => {
       const getGroupIdFromConversationId = (): Promise<string> => {
         return Promise.resolve(mockGroupId);
       };
-      jest
-        .spyOn(transactionContext, 'decryptMessage')
-        .mockRejectedValueOnce(new Error(CORE_CRYPTO_ERROR_NAMES.MlsErrorWrongEpoch));
+      const wrongEpochError = CoreCryptoError.Mls.new({mlsError: MlsError.WrongEpoch.new()});
+      jest.spyOn(transactionContext, 'decryptMessage').mockRejectedValueOnce(wrongEpochError);
 
       const mockedMLSMessageAddEvent: ConversationMLSMessageAddEvent = {
         type: CONVERSATION_EVENT.MLS_MESSAGE_ADD,
@@ -1248,7 +1249,7 @@ describe('MLSService', () => {
 
       await expect(
         mlsService.handleMLSMessageAddEvent(mockedMLSMessageAddEvent, getGroupIdFromConversationId),
-      ).rejects.toThrow(CORE_CRYPTO_ERROR_NAMES.MlsErrorWrongEpoch);
+      ).rejects.toBe(wrongEpochError);
 
       expect(transactionContext.decryptMessage).toHaveBeenCalled();
     });
@@ -1507,8 +1508,9 @@ describe('MLSService', () => {
 
       jest.spyOn(coreCrypto, 'conversationExists').mockResolvedValueOnce(false);
 
-      const conversationAlreadyExistsError = new Error();
-      conversationAlreadyExistsError.name = CORE_CRYPTO_ERROR_NAMES.MlsErrorConversationAlreadyExists;
+      const conversationAlreadyExistsError = CoreCryptoError.Mls.new({
+        mlsError: MlsError.ConversationAlreadyExists.new({conversationId: new Uint8Array()}),
+      });
 
       jest.spyOn(mlsService, 'registerConversation').mockRejectedValueOnce(conversationAlreadyExistsError);
 

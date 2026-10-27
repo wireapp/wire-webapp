@@ -27,11 +27,13 @@ import {SUBCONVERSATION_ID, MLSStaleMessageError, MLSGroupOutOfSyncError} from '
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Encoder} from 'bazinga64';
 
-import {isMlsConversationAlreadyExistsError, isMlsOrphanWelcomeError, MlsErrorType} from '@wireapp/core-crypto';
+import {MlsError_Tags} from '@wireapp/core-crypto';
 
 // Reuse existing type-guards from the MLS layer
 import {
   isCoreCryptoMLSWrongEpochError,
+  isCoreCryptoMLSConversationAlreadyExistsError,
+  isCoreCryptoMLSOrphanWelcomeError,
   isMLSStaleMessageError,
   isMLSGroupOutOfSyncError,
   isBrokenMLSConversationError,
@@ -44,7 +46,7 @@ import {
  *
  * These are intentionally decoupled from concrete error classes to keep the orchestrator stable.
  */
-export type DomainMlsErrorType = MlsErrorType | 'KeyMaterialUpdateFailure' | 'GroupOutOfSync' | 'GroupNotEstablished';
+export type DomainMlsErrorType = MlsError_Tags | 'KeyMaterialUpdateFailure' | 'GroupOutOfSync' | 'GroupNotEstablished';
 
 /**
  * Normalized error shape produced by the mapper.
@@ -133,7 +135,7 @@ const WrongEpochHandler: ErrorHandler = {
   },
   map: (err, context) => {
     return {
-      type: MlsErrorType.WrongEpoch,
+      type: MlsError_Tags.WrongEpoch,
       message: 'Epoch mismatch or stale message',
       cause: err,
       context: {
@@ -189,15 +191,14 @@ const GroupOutOfSyncHandler: ErrorHandler = {
 /** core-crypto indicates a local group already exists for the welcome's group id. */
 const ConversationAlreadyExistsHandler: ErrorHandler = {
   canHandle: error => {
-    return isMlsConversationAlreadyExistsError?.(error);
+    return isCoreCryptoMLSConversationAlreadyExistsError(error);
   },
   map: (error, context) => {
-    if (!isMlsConversationAlreadyExistsError(error)) {
-      throw new Error('Error is not a ConversationAlreadyExists error');
-    }
-    const groupId = tryExtractGroupIdFromCoreCryptoError(error);
+    const groupId = isCoreCryptoMLSConversationAlreadyExistsError(error)
+      ? extractGroupIdFromCoreCryptoError(error)
+      : context?.groupId;
     return {
-      type: MlsErrorType.ConversationAlreadyExists,
+      type: MlsError_Tags.ConversationAlreadyExists,
       message: 'Conversation already exists',
       cause: error,
       context: {groupId, qualifiedConversationId: context?.qualifiedConversationId},
@@ -208,11 +209,11 @@ const ConversationAlreadyExistsHandler: ErrorHandler = {
 /** Orphan welcome (no matching state); caller should try to join. */
 const OrphanWelcomeHandler: ErrorHandler = {
   canHandle: err => {
-    return isMlsOrphanWelcomeError?.(err);
+    return isCoreCryptoMLSOrphanWelcomeError(err);
   },
   map: (err, context) => {
     return {
-      type: MlsErrorType.OrphanWelcome,
+      type: MlsError_Tags.OrphanWelcome,
       message: 'Orphan welcome message',
       cause: err,
       context: {qualifiedConversationId: context?.qualifiedConversationId},
@@ -227,8 +228,8 @@ const FallbackHandler: ErrorHandler = {
   },
   map: (err, context): DomainMlsError => {
     return err instanceof Error
-      ? {type: MlsErrorType.Other, message: err.message, cause: err, context}
-      : {type: MlsErrorType.Other, message: String(err), cause: err, context};
+      ? {type: MlsError_Tags.Other, message: err.message, cause: err, context}
+      : {type: MlsError_Tags.Other, message: String(err), cause: err, context};
   },
 };
 
@@ -254,20 +255,11 @@ export function createDefaultMlsErrorMapper(): MlsErrorMapper {
 /**
  * Extract the base64 group id from a core-crypto error if present.
  *
- * core-crypto encodes the conversation id bytes under `error.context.context.conversationId`.
+ * core-crypto exposes the conversation id bytes under `error.inner.mlsError.inner.conversationId`.
  * We convert the byte array to base64 for uniform handling in higher layers.
  */
-function tryExtractGroupIdFromCoreCryptoError(err: ConversationAlreadyExistsError): string | undefined {
-  try {
-    // core-crypto error.context?.context?.conversationId is a byte array (number[])
-    const conversationIdArray = err?.context?.context?.conversationId;
-    if (conversationIdArray === undefined) {
-      return undefined;
-    }
-    return Encoder.toBase64(new Uint8Array(conversationIdArray)).asString;
-  } catch {
-    return undefined;
-  }
+function extractGroupIdFromCoreCryptoError(err: ConversationAlreadyExistsError): string {
+  return Encoder.toBase64(err.inner.mlsError.inner.conversationId).asString;
 }
 
 // Intentionally not handling HTTP/network errors here; let them bubble up unmodified.

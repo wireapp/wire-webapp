@@ -23,44 +23,50 @@ import {Result, result} from 'true-myth';
 
 import {CoreCryptoError, MlsError} from '@wireapp/core-crypto';
 
-export const CORE_CRYPTO_ERROR_NAMES = {
-  MlsErrorConversationAlreadyExists: 'MlsErrorConversationAlreadyExists',
-  MlsErrorDuplicateMessage: 'MlsErrorDuplicateMessage',
-  MlsErrorBufferedFutureMessage: 'MlsErrorBufferedFutureMessage',
-  MlsErrorMessageEpochTooOld: 'MlsErrorMessageEpochTooOld',
-  MlsErrorSelfCommitIgnored: 'MlsErrorSelfCommitIgnored',
-  MlsErrorUnmergedPendingGroup: 'MlsErrorUnmergedPendingGroup',
-  MlsErrorStaleProposal: 'MlsErrorStaleProposal',
-  MlsErrorStaleCommit: 'MlsErrorStaleCommit',
-  MlsErrorOther: 'MlsErrorOther',
-  ProteusErrorSessionNotFound: 'ProteusErrorSessionNotFound',
-  ProteusErrorRemoteIdentityChanged: 'ProteusErrorRemoteIdentityChanged',
-  MlsErrorWrongEpoch: 'MlsErrorWrongEpoch',
+type CoreCryptoMlsError = InstanceType<typeof CoreCryptoError.Mls>;
+type CoreCryptoMlsErrorWith<TMlsError extends MlsError> = CoreCryptoMlsError & {
+  inner: {mlsError: TMlsError};
 };
 
-export const isCoreCryptoMLSWrongEpochError = (error: unknown): boolean => {
-  return error instanceof Error && error.name === CORE_CRYPTO_ERROR_NAMES.MlsErrorWrongEpoch;
+export type ConversationAlreadyExistsError = CoreCryptoMlsErrorWith<
+  InstanceType<typeof MlsError.ConversationAlreadyExists>
+>;
+
+export const isCoreCryptoMLSWrongEpochError = (
+  error: unknown,
+): error is CoreCryptoMlsErrorWith<InstanceType<typeof MlsError.WrongEpoch>> => {
+  return CoreCryptoError.Mls.instanceOf(error) && MlsError.WrongEpoch.instanceOf(error.inner.mlsError);
 };
 
-export const isCoreCryptoMLSConversationAlreadyExistsError = (error: unknown): boolean => {
-  return error instanceof Error && error.name === CORE_CRYPTO_ERROR_NAMES.MlsErrorConversationAlreadyExists;
+export const isCoreCryptoMLSConversationAlreadyExistsError = (
+  error: unknown,
+): error is ConversationAlreadyExistsError => {
+  return CoreCryptoError.Mls.instanceOf(error) && MlsError.ConversationAlreadyExists.instanceOf(error.inner.mlsError);
 };
 
-const mlsDecryptionErrorNamesToIgnore: string[] = [
-  CORE_CRYPTO_ERROR_NAMES.MlsErrorStaleCommit,
-  CORE_CRYPTO_ERROR_NAMES.MlsErrorStaleProposal,
-  CORE_CRYPTO_ERROR_NAMES.MlsErrorDuplicateMessage,
-  CORE_CRYPTO_ERROR_NAMES.MlsErrorBufferedFutureMessage,
-  CORE_CRYPTO_ERROR_NAMES.MlsErrorUnmergedPendingGroup,
-];
+export const isCoreCryptoMLSOrphanWelcomeError = (
+  error: unknown,
+): error is CoreCryptoMlsErrorWith<InstanceType<typeof MlsError.OrphanWelcome>> => {
+  return CoreCryptoError.Mls.instanceOf(error) && MlsError.OrphanWelcome.instanceOf(error.inner.mlsError);
+};
+
+const isIgnorableMlsError = (error: MlsError): boolean => {
+  return (
+    MlsError.StaleCommit.instanceOf(error) ||
+    MlsError.StaleProposal.instanceOf(error) ||
+    MlsError.DuplicateMessage.instanceOf(error) ||
+    MlsError.BufferedFutureMessage.instanceOf(error) ||
+    MlsError.UnmergedPendingGroup.instanceOf(error)
+  );
+};
 
 // This error is thrown when we receive a commit for which we have not yet received all the proposals.
 // This is a normal situation and we should ignore this error.
 // This error will get a proper name in the future.
-const isOtherErrorToIgnore = (error: Error): boolean => {
+const isOtherErrorToIgnore = (error: MlsError): boolean => {
   return (
-    error.name === CORE_CRYPTO_ERROR_NAMES.MlsErrorOther &&
-    error.message.startsWith('Incoming message is a commit for which we have not yet received all the proposals')
+    MlsError.Other.instanceOf(error) &&
+    error.inner.msg.startsWith('Incoming message is a commit for which we have not yet received all the proposals')
   );
 };
 
@@ -68,22 +74,19 @@ const CONVERSATION_NOT_FOUND_MESSAGE = "Couldn't find conversation";
 
 /** Local MLS group was removed (e.g. after leaving a call subconversation). */
 export const isMlsConversationNotFoundError = (error: unknown): boolean => {
-  if (!(error instanceof Error) || error.name !== CORE_CRYPTO_ERROR_NAMES.MlsErrorOther) {
+  if (!CoreCryptoError.Mls.instanceOf(error) || !MlsError.Other.instanceOf(error.inner.mlsError)) {
     return false;
   }
 
-  if (error.message.includes(CONVERSATION_NOT_FOUND_MESSAGE)) {
-    return true;
-  }
-
-  const nestedMessage = (error as {context?: {context?: {msg?: string}}}).context?.context?.msg;
-  return nestedMessage === CONVERSATION_NOT_FOUND_MESSAGE;
+  return error.inner.mlsError.inner.msg === CONVERSATION_NOT_FOUND_MESSAGE;
 };
 
 export const shouldMLSDecryptionErrorBeIgnored = (error: unknown): error is Error => {
-  return (
-    error instanceof Error && (mlsDecryptionErrorNamesToIgnore.includes(error.name) || isOtherErrorToIgnore(error))
-  );
+  if (!CoreCryptoError.Mls.instanceOf(error)) {
+    return false;
+  }
+
+  return isIgnorableMlsError(error.inner.mlsError) || isOtherErrorToIgnore(error.inner.mlsError);
 };
 
 export const UPLOAD_COMMIT_BUNDLE_ABORT_REASONS = {
@@ -91,14 +94,6 @@ export const UPLOAD_COMMIT_BUNDLE_ABORT_REASONS = {
   MLS_STALE_MESSAGE: 'MLS_STALE_MESSAGE',
   MLS_GROUP_OUT_OF_SYNC: 'MLS_GROUP_OUT_OF_SYNC',
   OTHER: 'OTHER',
-};
-
-export type ConversationAlreadyExistsError = Error & {
-  context?: {
-    context?: {
-      conversationId?: ArrayLike<number>;
-    };
-  };
 };
 
 type MessageRejectedError = InstanceType<typeof CoreCryptoError.Mls> & {
