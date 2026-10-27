@@ -133,7 +133,7 @@ jobs:
         run: npm clean-install
 
       - name: Build libraries
-        run: npm exec -- nx run-many -t build --projects=tag:type:lib
+        run: npx just build-libraries
 
   rspack-build:
     runs-on: ubuntu-26.04
@@ -333,7 +333,7 @@ jobs:
           retention-days: 3
 
       - name: Build libraries for lint import resolution
-        run: npm exec -- nx run-many -t build --projects=tag:type:lib
+        run: npx just build-libraries
 
       - name: Lint repository
         run: npx just eslint

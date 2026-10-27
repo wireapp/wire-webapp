@@ -94,7 +94,7 @@ jobs:
         run: npm clean-install
 
       - name: Build libraries
-        run: npm exec -- nx run-many -t build --projects=tag:type:lib
+        run: npx just build-libraries
 
       - name: Publish to npm
         run: |
