@@ -54,7 +54,7 @@ jobs:
           test "$findingsCount" -eq 0
 
   generated-artifacts:
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-26.04-arm
     name: generated artifacts check
     permissions:
       contents: read
@@ -111,7 +111,7 @@ jobs:
         run: npm exec -- nx run webapp:validate-translations
 
   build-libraries:
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-26.04-arm
     name: build libraries
     permissions:
       contents: read
@@ -240,7 +240,7 @@ jobs:
           retention-days: 3
 
   type-check:
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-26.04-arm
     name: type check
     permissions:
       contents: read
@@ -265,7 +265,7 @@ jobs:
         run: npm run type-check
 
   lint-file-names:
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-26.04-arm
     name: lint file names
     permissions:
       contents: read
@@ -290,7 +290,7 @@ jobs:
         run: npx just lint-file-names
 
   lint:
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-26.04-arm
     name: lint
     permissions:
       contents: read
@@ -345,7 +345,7 @@ jobs:
         run: npx just stylesheet-lint
 
   unit-tests:
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-26.04-arm
     name: unit tests
     permissions:
       contents: read
