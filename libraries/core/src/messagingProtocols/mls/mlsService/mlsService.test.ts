@@ -757,8 +757,8 @@ describe('MLSService', () => {
         jest.spyOn(apiClient.api.client, 'putClient').mockImplementationOnce(async () => {
           publicKeyRegistered = true;
         });
-        const generateKeyPackages = jest
-          .spyOn(mlsService, 'clientKeypackages')
+        const generateKeyPackagesSpy = jest
+          .spyOn(mlsService, 'generateKeyPackages')
           .mockResolvedValueOnce([new Uint8Array([1, 2, 3])]);
         jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages').mockImplementationOnce(async () => {
           expect(publicKeyRegistered).toBe(true);
@@ -775,7 +775,7 @@ describe('MLSService', () => {
 
         expect(transactionContext.mlsInit).toHaveBeenCalled();
         expect(apiClient.api.client.putClient).toHaveBeenCalledWith(mockClientId, expect.anything());
-        expect(generateKeyPackages).toHaveBeenCalledWith(amount);
+        expect(generateKeyPackagesSpy).toHaveBeenCalledWith(amount);
         expect(apiClient.api.client.uploadMLSKeyPackages).toHaveBeenCalledWith(mockClientId, ['AQID']);
         expect(await mlsService.isMLSConversationRecoveryRequired()).toBe(false);
         expect(onRecoveryRequired).not.toHaveBeenCalled();
@@ -806,7 +806,7 @@ describe('MLSService', () => {
 
       apiClient.context = {clientType: ClientType.PERMANENT, clientId: mockClientId, userId: ''};
 
-      jest.spyOn(mlsService, 'clientKeypackages').mockResolvedValueOnce([new Uint8Array()]);
+      jest.spyOn(mlsService, 'generateKeyPackages').mockResolvedValueOnce([new Uint8Array()]);
       jest.spyOn(coreCrypto, 'publicKey').mockResolvedValueOnce(new Uint8Array());
       jest.spyOn(Helper, 'getMLSDeviceStatus').mockReturnValueOnce(Helper.MLSDeviceStatus.REGISTERED);
       jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages').mockResolvedValueOnce(undefined);
@@ -853,7 +853,7 @@ describe('MLSService', () => {
         .mockResolvedValueOnce(createKeyPackage(new Uint8Array([1])))
         .mockResolvedValueOnce(createKeyPackage(new Uint8Array([2])));
 
-      await expect(mlsService.clientKeypackages(2)).resolves.toEqual([new Uint8Array([1]), new Uint8Array([2])]);
+      await expect(mlsService.generateKeyPackages(2)).resolves.toEqual([new Uint8Array([1]), new Uint8Array([2])]);
       expect(transactionContext.generateKeyPackage).toHaveBeenCalledTimes(2);
       expect(transactionContext.generateKeyPackage).toHaveBeenCalledWith(expect.anything());
     });
@@ -867,7 +867,7 @@ describe('MLSService', () => {
         createKeyPackageRef({cipherSuite: Ciphersuite.Mls128Dhkemp256Aes128gcmSha256P256}),
       ]);
 
-      await expect(mlsService.clientValidKeypackagesCount()).resolves.toBe(1);
+      await expect(mlsService.countValidKeyPackages()).resolves.toBe(1);
     });
   });
 
@@ -884,7 +884,9 @@ describe('MLSService', () => {
         return 1000;
       };
       jest.spyOn(apiClient.api.client, 'getMLSKeyPackageCount').mockResolvedValue(count);
-      const generateKeyPackages = jest.spyOn(mlsService, 'clientKeypackages').mockResolvedValue([new Uint8Array()]);
+      const generateKeyPackagesSpy = jest
+        .spyOn(mlsService, 'generateKeyPackages')
+        .mockResolvedValue([new Uint8Array()]);
       const upload = jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages').mockResolvedValue(undefined);
 
       if (startup) {
@@ -902,7 +904,7 @@ describe('MLSService', () => {
 
       expect(upload).toHaveBeenCalledTimes(uploads ? 1 : 0);
       if (uploads) {
-        expect(generateKeyPackages).toHaveBeenCalledWith(1000);
+        expect(generateKeyPackagesSpy).toHaveBeenCalledWith(1000);
       }
     });
 
@@ -913,12 +915,14 @@ describe('MLSService', () => {
         return allowance;
       };
       jest.spyOn(apiClient.api.client, 'getMLSKeyPackageCount').mockResolvedValueOnce(999).mockResolvedValue(49);
-      const generateKeyPackages = jest.spyOn(mlsService, 'clientKeypackages').mockResolvedValue([new Uint8Array()]);
+      const generateKeyPackagesSpy = jest
+        .spyOn(mlsService, 'generateKeyPackages')
+        .mockResolvedValue([new Uint8Array()]);
       jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages').mockResolvedValue(undefined);
       await mlsService.refreshKeyPackages('client-1');
       allowance = 100;
       await mlsService.refreshKeyPackages('client-1');
-      expect(generateKeyPackages.mock.calls.map(call => call[0])).toEqual([1000, 100]);
+      expect(generateKeyPackagesSpy.mock.calls.map(call => call[0])).toEqual([1000, 100]);
     });
 
     it('checks enrolled E2EI clients at startup even when identity initialization is skipped', async () => {
@@ -931,7 +935,9 @@ describe('MLSService', () => {
           : [createCredentialRef(CredentialType.Basic)];
       });
       jest.spyOn(apiClient.api.client, 'getMLSKeyPackageCount').mockResolvedValue(999);
-      const generateKeyPackages = jest.spyOn(mlsService, 'clientKeypackages').mockResolvedValue([new Uint8Array()]);
+      const generateKeyPackagesSpy = jest
+        .spyOn(mlsService, 'generateKeyPackages')
+        .mockResolvedValue([new Uint8Array()]);
       const upload = jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages').mockResolvedValue(undefined);
 
       await mlsService.initClient(createUserId(), {id: '0000000000000001'} as RegisteredClient, {
@@ -943,7 +949,7 @@ describe('MLSService', () => {
       });
 
       expect(upload).toHaveBeenCalledTimes(1);
-      expect(generateKeyPackages).toHaveBeenCalledWith(1000);
+      expect(generateKeyPackagesSpy).toHaveBeenCalledWith(1000);
     });
 
     it('defers policy-change uploads until identity enrollment completes', async () => {
@@ -960,7 +966,7 @@ describe('MLSService', () => {
       const [mlsService, {apiClient, coreDatabase}] = await createMLSService();
       await coreDatabase.clear('mlsConversationRecovery');
       jest.spyOn(apiClient.api.client, 'getMLSKeyPackageCount').mockResolvedValueOnce(0);
-      jest.spyOn(mlsService, 'clientKeypackages').mockResolvedValueOnce([new Uint8Array()]);
+      jest.spyOn(mlsService, 'generateKeyPackages').mockResolvedValueOnce([new Uint8Array()]);
       jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages').mockImplementationOnce(async () => {
         expect(await mlsService.isMLSConversationRecoveryRequired()).toBe(false);
       });
@@ -976,7 +982,7 @@ describe('MLSService', () => {
       const [mlsService, {apiClient, coreDatabase}] = await createMLSService();
       await coreDatabase.clear('mlsConversationRecovery');
       jest.spyOn(apiClient.api.client, 'getMLSKeyPackageCount').mockResolvedValueOnce(1);
-      jest.spyOn(mlsService, 'clientKeypackages').mockResolvedValueOnce([new Uint8Array()]);
+      jest.spyOn(mlsService, 'generateKeyPackages').mockResolvedValueOnce([new Uint8Array()]);
       jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages').mockResolvedValueOnce(undefined);
       const emitSpy = jest.spyOn(mlsService, 'emit');
 
@@ -990,7 +996,7 @@ describe('MLSService', () => {
       const [mlsService, {apiClient, coreDatabase}] = await createMLSService();
       await coreDatabase.clear('mlsConversationRecovery');
       jest.spyOn(apiClient.api.client, 'getMLSKeyPackageCount').mockResolvedValueOnce(0);
-      jest.spyOn(mlsService, 'clientKeypackages').mockResolvedValueOnce([new Uint8Array()]);
+      jest.spyOn(mlsService, 'generateKeyPackages').mockResolvedValueOnce([new Uint8Array()]);
       jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages').mockRejectedValueOnce(new Error('upload failed'));
       const emitSpy = jest.spyOn(mlsService, 'emit');
 
@@ -1004,14 +1010,16 @@ describe('MLSService', () => {
       const [mlsService, {apiClient, coreDatabase}] = await createMLSService();
       await coreDatabase.clear('mlsConversationRecovery');
       jest.spyOn(apiClient.api.client, 'getMLSKeyPackageCount').mockResolvedValueOnce(0);
-      const generateKeyPackages = jest.spyOn(mlsService, 'clientKeypackages').mockResolvedValueOnce([new Uint8Array()]);
+      const generateKeyPackagesSpy = jest
+        .spyOn(mlsService, 'generateKeyPackages')
+        .mockResolvedValueOnce([new Uint8Array()]);
       coreDatabase.put = jest.fn().mockRejectedValueOnce(new Error('DB write failed')) as typeof coreDatabase.put;
       jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages').mockResolvedValueOnce(undefined);
       const emitSpy = jest.spyOn(mlsService, 'emit');
 
       await expect(mlsService['verifyRemoteMLSKeyPackagesAmount']('client-1')).resolves.toBeUndefined();
 
-      expect(generateKeyPackages).toHaveBeenCalled();
+      expect(generateKeyPackagesSpy).toHaveBeenCalled();
       expect(apiClient.api.client.uploadMLSKeyPackages).toHaveBeenCalled();
       expect(await mlsService.isMLSConversationRecoveryRequired()).toBe(false);
       expect(emitSpy).not.toHaveBeenCalledWith(MLSServiceEvents.MLS_CONVERSATION_RECOVERY_REQUIRED);
@@ -1418,8 +1426,10 @@ describe('MLSService', () => {
         mlsService.config.getNbKeyPackages = () => {
           return 1000;
         };
-        jest.spyOn(mlsService, 'clientValidKeypackagesCount').mockResolvedValue(count);
-        const generateKeyPackages = jest.spyOn(mlsService, 'clientKeypackages').mockResolvedValue([new Uint8Array()]);
+        jest.spyOn(mlsService, 'countValidKeyPackages').mockResolvedValue(count);
+        const generateKeyPackagesSpy = jest
+          .spyOn(mlsService, 'generateKeyPackages')
+          .mockResolvedValue([new Uint8Array()]);
         transactionContext.processWelcomeMessage.mockResolvedValue(new ConversationId(new Uint8Array()));
         jest.spyOn(mlsService, 'scheduleKeyMaterialRenewal').mockImplementation(jest.fn());
         const getRemoteCount = jest.spyOn(apiClient.api.client, 'getMLSKeyPackageCount').mockResolvedValue(count);
@@ -1439,7 +1449,7 @@ describe('MLSService', () => {
         expect(getRemoteCount).toHaveBeenCalledTimes(checksBackend ? 1 : 0);
         expect(upload).toHaveBeenCalledTimes(uploads ? 1 : 0);
         if (uploads) {
-          expect(generateKeyPackages).toHaveBeenCalledWith(1000);
+          expect(generateKeyPackagesSpy).toHaveBeenCalledWith(1000);
         }
         expect(transactionContext.processWelcomeMessage).toHaveBeenCalled();
       },
@@ -1451,8 +1461,8 @@ describe('MLSService', () => {
       mlsService.config.getNbKeyPackages = () => {
         return allowance;
       };
-      jest.spyOn(mlsService, 'clientValidKeypackagesCount').mockResolvedValue(200);
-      jest.spyOn(mlsService, 'clientKeypackages').mockResolvedValue([new Uint8Array()]);
+      jest.spyOn(mlsService, 'countValidKeyPackages').mockResolvedValue(200);
+      jest.spyOn(mlsService, 'generateKeyPackages').mockResolvedValue([new Uint8Array()]);
       transactionContext.processWelcomeMessage.mockResolvedValue(new ConversationId(new Uint8Array()));
       jest.spyOn(mlsService, 'scheduleKeyMaterialRenewal').mockImplementation(jest.fn());
       const getRemoteCount = jest.spyOn(apiClient.api.client, 'getMLSKeyPackageCount').mockResolvedValue(200);
@@ -1485,11 +1495,11 @@ describe('MLSService', () => {
 
       apiClient.context = {clientType: ClientType.PERMANENT, clientId: mockClientId, userId: ''};
 
-      jest.spyOn(mlsService, 'clientKeypackages').mockResolvedValueOnce([new Uint8Array()]);
+      jest.spyOn(mlsService, 'generateKeyPackages').mockResolvedValueOnce([new Uint8Array()]);
 
       const numberOfKeysBelowThreshold = mlsService['minRequiredKeyPackages'] - 1;
       jest.spyOn(apiClient.api.client, 'getMLSKeyPackageCount').mockResolvedValueOnce(numberOfKeysBelowThreshold);
-      jest.spyOn(mlsService, 'clientValidKeypackagesCount').mockResolvedValue(numberOfKeysBelowThreshold);
+      jest.spyOn(mlsService, 'countValidKeyPackages').mockResolvedValue(numberOfKeysBelowThreshold);
 
       jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages').mockResolvedValueOnce(undefined);
       jest.spyOn(transactionContext, 'processWelcomeMessage').mockResolvedValue(new ConversationId(new Uint8Array()));
@@ -1518,10 +1528,10 @@ describe('MLSService', () => {
 
       apiClient.context = {clientType: ClientType.PERMANENT, clientId: mockClientId, userId: ''};
 
-      jest.spyOn(mlsService, 'clientKeypackages').mockResolvedValueOnce([new Uint8Array()]);
+      jest.spyOn(mlsService, 'generateKeyPackages').mockResolvedValueOnce([new Uint8Array()]);
 
       const numberOfKeysAboveThreshold = mlsService['minRequiredKeyPackages'] + 1;
-      jest.spyOn(mlsService, 'clientValidKeypackagesCount').mockResolvedValue(numberOfKeysAboveThreshold);
+      jest.spyOn(mlsService, 'countValidKeyPackages').mockResolvedValue(numberOfKeysAboveThreshold);
       jest.spyOn(apiClient.api.client, 'getMLSKeyPackageCount').mockResolvedValueOnce(numberOfKeysAboveThreshold);
 
       jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages').mockResolvedValueOnce(undefined);
@@ -1551,12 +1561,12 @@ describe('MLSService', () => {
 
       apiClient.context = {clientType: ClientType.PERMANENT, clientId: mockClientId, userId: ''};
 
-      jest.spyOn(mlsService, 'clientKeypackages').mockResolvedValueOnce([new Uint8Array()]);
+      jest.spyOn(mlsService, 'generateKeyPackages').mockResolvedValueOnce([new Uint8Array()]);
 
       const numberOfKeysBelowThreshold = mlsService['minRequiredKeyPackages'] - 1;
       const numberOfKeysAboveThreshold = mlsService['minRequiredKeyPackages'] + 1;
 
-      jest.spyOn(mlsService, 'clientValidKeypackagesCount').mockResolvedValue(numberOfKeysBelowThreshold);
+      jest.spyOn(mlsService, 'countValidKeyPackages').mockResolvedValue(numberOfKeysBelowThreshold);
       jest.spyOn(apiClient.api.client, 'getMLSKeyPackageCount').mockResolvedValueOnce(numberOfKeysAboveThreshold);
 
       jest.spyOn(apiClient.api.client, 'uploadMLSKeyPackages').mockResolvedValueOnce(undefined);

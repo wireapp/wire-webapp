@@ -326,7 +326,7 @@ export class MLSService extends TypedEventEmitter<Events> {
           if (!this.initialKeyPackageUploadDeferred) {
             await this.uploadMLSPublicKeys(client);
             // Initial registration needs packages immediately, without triggering exhaustion recovery.
-            const keyPackages = await this.clientKeypackages(this.keyPackageUploadAmount);
+            const keyPackages = await this.generateKeyPackages(this.keyPackageUploadAmount);
             await this.uploadMLSKeyPackages(client.id, keyPackages);
           } else {
             this.logger.info(`Blocked initial key package upload for client ${client.id} as E2EI is enabled`);
@@ -939,7 +939,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     return doesConversationExist && (await this.getEpoch(groupId)) > 0;
   }
 
-  public async clientValidKeypackagesCount(): Promise<number> {
+  public async countValidKeyPackages(): Promise<number> {
     const credentialRef = await this.requireCredentialRef();
     return this.coreCryptoClient.transaction(async cx => {
       const keyPackages = await cx.getKeyPackages();
@@ -953,7 +953,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     });
   }
 
-  public async clientKeypackages(amountRequested: number): Promise<Uint8Array[]> {
+  public async generateKeyPackages(amountRequested: number): Promise<Uint8Array[]> {
     const credentialRef = await this.requireCredentialRef();
     return this.coreCryptoClient.transaction(async cx => {
       const keyPackages: Uint8Array[] = [];
@@ -1052,7 +1052,7 @@ export class MLSService extends TypedEventEmitter<Events> {
    * @param clientId id of the client
    */
   private async verifyLocalMLSKeyPackagesAmount(clientId: string): Promise<void> {
-    const keyPackagesCount = await this.clientValidKeypackagesCount();
+    const keyPackagesCount = await this.countValidKeyPackages();
 
     if (keyPackagesCount <= this.minRequiredKeyPackages) {
       return this.verifyRemoteMLSKeyPackagesAmount(clientId);
@@ -1080,7 +1080,7 @@ export class MLSService extends TypedEventEmitter<Events> {
       return;
     }
 
-    const keyPackages = await this.clientKeypackages(uploadAmount);
+    const keyPackages = await this.generateKeyPackages(uploadAmount);
     await this.uploadMLSKeyPackages(clientId, keyPackages);
 
     // Mark recovery only after a successful upload, so the marker never outlives a failed refill attempt.
