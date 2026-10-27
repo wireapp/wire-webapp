@@ -34,6 +34,8 @@
 import {isNull} from '@sindresorhus/is';
 import Cookies from 'js-cookie';
 
+import {getMissingCoreCryptoBrowserFeatures, isCoreCryptoUsed} from './coreCryptoSupport';
+
 import {QUERY_KEY} from '../auth/route';
 
 const browserCompatibilityCheckTimeoutInMilliseconds = 10000;
@@ -132,6 +134,26 @@ const checkBrowser = (): void => {
     redirectUnsupportedBrowser("This browser doesn't support RTC to run the Wire app!");
     return;
   }
+
+  if (
+    isCoreCryptoUsed({
+      userAgent: navigator.userAgent,
+      hasSystemCrypto: Reflect.get(window, 'systemCrypto') !== undefined,
+    })
+  ) {
+    const missingCoreCryptoFeatures = getMissingCoreCryptoBrowserFeatures({
+      webAssembly: globalThis.WebAssembly,
+      storageManager: navigator.storage,
+      workerConstructor: globalThis.Worker,
+    });
+    if (missingCoreCryptoFeatures.length > 0) {
+      redirectUnsupportedBrowser(
+        `This browser doesn't support ${missingCoreCryptoFeatures.join(', ')} to run the Wire app!`,
+      );
+      return;
+    }
+  }
+
   void supportsIndexDB()
     .catch(() => {
       return false;
