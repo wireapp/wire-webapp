@@ -39,6 +39,7 @@ import {
 } from '@wireapp/core-crypto';
 import type {CRUDEngine} from '@wireapp/store-engine';
 
+import {removeCoreCryptoDatabaseFiles} from './coreCryptoOpfsStorage';
 import {PrekeyTracker} from './prekeysTracker';
 
 import {CorruptedKeyError, GeneratedKey} from '../../../../../secretStore/secretKeyGenerator';
@@ -222,7 +223,18 @@ export const wipeCoreCryptoDb = async (storeEngine: CRUDEngine): Promise<void> =
     if (result.isErr(destroyResult)) {
       throw destroyResult.error;
     }
+    // CoreCrypto 11 keeps its keystore in OPFS. The IndexedDB database is the CoreCrypto 9 keystore, which
+    // CoreCrypto 11 migrates when it opens a database, so it has to go too or the wiped data would come back.
     await deleteDB(coreCryptoDbName);
+    if (globalThis.navigator?.storage?.getDirectory !== undefined) {
+      const opfsRemoveResult = await removeCoreCryptoDatabaseFiles(
+        await navigator.storage.getDirectory(),
+        coreCryptoDbName,
+      );
+      if (result.isErr(opfsRemoveResult)) {
+        throw opfsRemoveResult.error;
+      }
+    }
     logger.log('info', 'CoreCrypto DB wiped successfully');
   } catch {
     logger.error('error', 'Failed to wipe CoreCrypto DB');
