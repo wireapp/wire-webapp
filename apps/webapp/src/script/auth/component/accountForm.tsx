@@ -104,7 +104,7 @@ const AccountFormComponent: FunctionComponent<Props & ConnectedProps & DispatchP
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
     fireAndForgetInvoker.fireAndForget(async () => {
-      resetAuthError();
+      await resetAuthError();
     });
     const errors: Error[] | ValidationError[] = [];
     const newValidInputs: Record<string, boolean> = {};
