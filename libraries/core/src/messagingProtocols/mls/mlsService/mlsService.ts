@@ -155,6 +155,7 @@ export class MLSService extends TypedEventEmitter<Events> {
   private readonly textDecoder = new TextDecoder();
   private initialKeyPackageUploadDeferred = false;
   private readonly mlsTransport: MlsTransport;
+  private readonly pendingProposalRetries = new Set<string>();
 
   constructor(
     private readonly apiClient: APIClient,
@@ -660,6 +661,7 @@ export class MLSService extends TypedEventEmitter<Events> {
         return cx.decryptMessage(conversationId, payload);
       });
       this.dispatchNewCrlDistributionPoints(decryptedMessage.crlNewDistributionPoints);
+      await this.resumePendingProposalsAfterIncomingMessage(conversationId);
       this.logger.info('Message decrypted successfully', {qualifiedConversationId, duration: Date.now() - start});
       return decryptedMessage;
     } catch (error: unknown) {
@@ -1231,31 +1233,80 @@ export class MLSService extends TypedEventEmitter<Events> {
    * @param eventTime time of the event that had the proposals
    */
   public async handlePendingProposals({delayInMs, groupId, eventTime}: HandlePendingProposalsParams): Promise<void> {
-    if (delayInMs > 0) {
-      const eventDate = new Date(eventTime);
-      const firingDate = eventDate.setTime(eventDate.getTime() + delayInMs);
+    const eventDate = new Date(eventTime);
+    const firingDate = eventDate.setTime(eventDate.getTime() + delayInMs);
 
-      await this.schedulePendingProposalsTask(groupId, firingDate);
-    } else {
-      this.logger.info('Trying to commit pending proposals immediately', {groupId});
-      await this.commitPendingProposals(groupId);
-    }
+    await this.schedulePendingProposalsTask(groupId, firingDate);
   }
 
   private async schedulePendingProposalsTask(groupId: string, firingDate: number): Promise<void> {
     await this.coreDatabase.put('pendingProposals', {groupId, firingDate}, groupId);
 
+    this.registerPendingProposalsTask(groupId, firingDate);
+  }
+
+  private registerPendingProposalsTask(groupId: string, firingDate: number): void {
     TaskScheduler.addTask({
       task: () => {
         this.logger.info('Trying to commit pending proposals from scheduled task', {groupId});
-        return this.commitPendingProposals(groupId);
+        return this.runPendingProposalsTask(groupId);
       },
       firingDate,
       key: this.createPendingProposalsTaskKey(groupId),
     });
   }
 
+  private async runPendingProposalsTask(groupId: string): Promise<void> {
+    const commitResult = await task.tryOrElse(
+      error => error,
+      () => this.commitPendingProposals(groupId),
+    );
+
+    commitResult.match({
+      Ok: () => {
+        this.pendingProposalRetries.delete(groupId);
+      },
+      Err: error => {
+        if (isMlsMessageRejectedError(error)) {
+          this.pendingProposalRetries.add(groupId);
+          this.logger.warn('Pending proposals remain queued until another incoming message is processed', {
+            error,
+            groupId,
+          });
+        } else {
+          this.logger.error('Scheduled pending proposals commit failed', {error, groupId});
+        }
+      },
+    });
+  }
+
+  private async resumePendingProposalsAfterIncomingMessage(conversationId: ConversationId): Promise<void> {
+    const groupId = Encoder.toBase64(conversationId.copyBytes()).asString;
+    if (!this.pendingProposalRetries.has(groupId)) {
+      return;
+    }
+
+    const pendingProposalResult = await task.tryOrElse(
+      error => error,
+      () => this.coreDatabase.get('pendingProposals', groupId),
+    );
+
+    pendingProposalResult.match({
+      Ok: pendingProposal => {
+        this.pendingProposalRetries.delete(groupId);
+        if (pendingProposal !== undefined) {
+          this.logger.info('Retrying pending proposals after processing incoming MLS state', {groupId});
+          this.registerPendingProposalsTask(groupId, pendingProposal.firingDate);
+        }
+      },
+      Err: error => {
+        this.logger.warn('Could not resume pending proposals after processing incoming MLS state', {error, groupId});
+      },
+    });
+  }
+
   private async cancelPendingProposalsTask(groupId: string): Promise<void> {
+    this.pendingProposalRetries.delete(groupId);
     TaskScheduler.cancelTask(this.createPendingProposalsTaskKey(groupId));
     await this.coreDatabase.delete('pendingProposals', groupId);
   }
@@ -1265,18 +1316,21 @@ export class MLSService extends TypedEventEmitter<Events> {
   }
 
   /**
-   * Commit all pending proposals for a given groupId
+   * Commit all pending proposals for a given groupId.
+   *
+   * A failed V11 CoreCrypto transaction is rolled back. The error must leave this method so the
+   * MLS recovery orchestrator can process incoming state before replaying the complete operation
+   * in a fresh transaction; retrying immediately would only rebuild the same stale commit.
    *
    * @param groupId groupId of the conversation
    */
-  public async commitPendingProposals(groupId: string, shouldRetry = true): Promise<void> {
-    this.logger.info(`Committing pending proposals for groupId ${groupId}`, {shouldRetry});
+  public async commitPendingProposals(groupId: string): Promise<void> {
+    this.logger.info(`Committing pending proposals for groupId ${groupId}`);
 
     const doesConversationExist = await this.conversationExists(groupId);
     if (!doesConversationExist) {
       this.logger.info('Skipping pending proposals commit because local MLS conversation is missing', {
         groupId,
-        shouldRetry,
       });
       await this.cancelPendingProposalsTask(groupId);
       return;
@@ -1284,32 +1338,10 @@ export class MLSService extends TypedEventEmitter<Events> {
 
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
 
-    try {
-      await this.coreCryptoClient.transaction(cx => {
-        return cx.commitPendingProposals(new ConversationId(groupIdBytes));
-      });
-      await this.cancelPendingProposalsTask(groupId);
-    } catch (error: unknown) {
-      if (!shouldRetry) {
-        throw error;
-      }
-
-      if (isMlsMessageRejectedError(error)) {
-        this.logger.warn('Failed to commit proposals, conversation is broken, letting the error bubble up', {
-          error,
-          groupId,
-        });
-        throw error;
-      }
-
-      this.logger.warn('Failed to commit proposals, clearing the pending commit and retrying', {
-        error,
-        groupId,
-        shouldRetry,
-      });
-
-      return this.commitPendingProposals(groupId, false);
-    }
+    await this.coreCryptoClient.transaction(cx => {
+      return cx.commitPendingProposals(new ConversationId(groupIdBytes));
+    });
+    await this.cancelPendingProposalsTask(groupId);
   }
 
   /**
@@ -1330,16 +1362,7 @@ export class MLSService extends TypedEventEmitter<Events> {
               return;
             }
 
-            TaskScheduler.addTask({
-              task: () => {
-                this.logger.info('Trying to commit pending proposals from startup rehydration', {
-                  groupId,
-                });
-                return this.commitPendingProposals(groupId);
-              },
-              firingDate,
-              key: this.createPendingProposalsTaskKey(groupId),
-            });
+            this.registerPendingProposalsTask(groupId, firingDate);
           }),
         );
       }

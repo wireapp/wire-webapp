@@ -496,7 +496,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
 
     // immediately execute pending commits before sending the message
-    await this.mlsService.commitPendingProposals(groupId, true);
+    await this.mlsService.commitPendingProposals(groupId);
 
     const encrypted = await this.mlsService.encryptMessage(
       new ConversationId(groupIdBytes),
@@ -569,7 +569,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
     this.logger.info(`Adding users to MLS conversation`, {groupId, conversationId, qualifiedUsers});
 
     if (commitPendingFirst) {
-      await this.mlsService.commitPendingProposals(groupId, true);
+      await this.mlsService.commitPendingProposals(groupId);
     }
 
     const existingClientIdsInGroup = await this.mlsService.getClientIdsInGroup(groupId);

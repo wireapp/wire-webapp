@@ -1262,7 +1262,7 @@ describe('ConversationService', () => {
         commitPendingFirst: true,
       });
 
-      expect(mlsService.commitPendingProposals).toHaveBeenCalledWith(mockGroupId, true);
+      expect(mlsService.commitPendingProposals).toHaveBeenCalledWith(mockGroupId);
       expect(mlsService.addUsersToExistingConversation).not.toHaveBeenCalled();
       expect(mlsService.updateKeyingMaterialForConversation).toHaveBeenCalledWith(mockGroupId);
       expect(mlsService.resetKeyMaterialRenewal).toHaveBeenCalledWith(mockGroupId);

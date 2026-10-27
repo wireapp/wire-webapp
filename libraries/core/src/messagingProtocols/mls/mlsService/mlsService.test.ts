@@ -31,6 +31,7 @@ import {
 } from '@wireapp/api-client/lib/event';
 import {BackendError, BackendErrorLabel, StatusCode} from '@wireapp/api-client/lib/http';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
+import {Decoder} from 'bazinga64';
 
 import {randomUUID, UUID} from 'crypto';
 import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
@@ -1103,6 +1104,90 @@ describe('MLSService', () => {
   });
 
   describe('pending proposals lifecycle', () => {
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    it('commits pending proposals once and clears the persisted task', async () => {
+      const [mlsService, {coreCrypto, transactionContext, coreDatabase}] = await createMLSService();
+      const groupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm4OQFc=';
+      const firingDate = 1_798_000_000_000;
+
+      await coreDatabase.put('pendingProposals', {groupId, firingDate}, groupId);
+      coreCrypto.conversationExists.mockResolvedValue(true);
+
+      await mlsService.commitPendingProposals(groupId);
+
+      expect(coreCrypto.transaction).toHaveBeenCalledTimes(1);
+      expect(transactionContext.commitPendingProposals).toHaveBeenCalledTimes(1);
+      await expect(coreDatabase.get('pendingProposals', groupId)).resolves.toBeUndefined();
+    });
+
+    it('leaves replay to the recovery orchestrator after a rejected transaction', async () => {
+      const [mlsService, {coreCrypto, transactionContext, coreDatabase}] = await createMLSService();
+      const groupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm4OQFc=';
+      const firingDate = 1_798_000_000_000;
+      const rejection = CoreCryptoError.Mls.new({
+        mlsError: MlsError.MessageRejected.new({
+          reason: serializeAbortReason({message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_STALE_MESSAGE}),
+        }),
+      });
+
+      await coreDatabase.put('pendingProposals', {groupId, firingDate}, groupId);
+      coreCrypto.conversationExists.mockResolvedValue(true);
+      transactionContext.commitPendingProposals.mockRejectedValue(rejection);
+
+      await expect(mlsService.commitPendingProposals(groupId)).rejects.toBe(rejection);
+
+      expect(coreCrypto.transaction).toHaveBeenCalledTimes(1);
+      expect(transactionContext.commitPendingProposals).toHaveBeenCalledTimes(1);
+      await expect(coreDatabase.get('pendingProposals', groupId)).resolves.toEqual({groupId, firingDate});
+    });
+
+    it('retries a failed immediate proposal commit only after processing incoming MLS state', async () => {
+      const [mlsService, {coreCrypto, transactionContext, coreDatabase}] = await createMLSService();
+      const groupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm4OQFc=';
+      const firingDate = 1_798_000_000_000;
+      const scheduledTasks: Array<() => Promise<void> | void> = [];
+      const rejection = CoreCryptoError.Mls.new({
+        mlsError: MlsError.MessageRejected.new({
+          reason: serializeAbortReason({message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_STALE_MESSAGE}),
+        }),
+      });
+
+      jest.spyOn(TaskScheduler, 'addTask').mockImplementation(({task}) => {
+        scheduledTasks.push(task);
+      });
+      coreCrypto.conversationExists.mockResolvedValue(true);
+      transactionContext.commitPendingProposals.mockRejectedValueOnce(rejection);
+
+      await mlsService.handlePendingProposals({
+        delayInMs: 0,
+        eventTime: new Date(firingDate).toISOString(),
+        groupId,
+      });
+
+      expect(scheduledTasks).toHaveLength(1);
+      await scheduledTasks[0]?.();
+      expect(transactionContext.commitPendingProposals).toHaveBeenCalledTimes(1);
+      await expect(coreDatabase.get('pendingProposals', groupId)).resolves.toEqual({groupId, firingDate});
+
+      transactionContext.decryptMessage.mockResolvedValue({
+        crlNewDistributionPoints: [],
+      } as unknown as DecryptedMessage);
+      await mlsService.decryptMessage(new ConversationId(Decoder.fromBase64(groupId).asBytes), new Uint8Array(), {
+        domain: 'example.com',
+        id: randomUUID(),
+      });
+
+      expect(scheduledTasks).toHaveLength(2);
+      expect(TaskScheduler.addTask).toHaveBeenLastCalledWith(expect.objectContaining({firingDate}));
+
+      await scheduledTasks[1]?.();
+      expect(transactionContext.commitPendingProposals).toHaveBeenCalledTimes(2);
+      await expect(coreDatabase.get('pendingProposals', groupId)).resolves.toBeUndefined();
+    });
+
     it('skips commit and clears pending task when local conversation is missing', async () => {
       const [mlsService, {coreCrypto, transactionContext}] = await createMLSService();
       const groupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm4OQFc=';
