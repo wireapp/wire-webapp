@@ -57,7 +57,7 @@ Per-file checks: pass a single file path as the last argument. Full repository c
 ## Git
 
 - Commit messages must include a concise subject and a description body explaining what changed and why.
-- When changes are ready to commit, prompt the user to run checks first: `npm run type-check`, `npx just eslint`, `npx just format-check`, `npx just stylesheet-lint`, and `npx just test` for unit tests.
+- When changes are ready to commit, prompt the user to run checks first: `npx just type-check`, `npx just eslint`, `npx just format-check`, `npx just stylesheet-lint`, and `npx just test` for unit tests.
 
 ## Webapp code rules
 

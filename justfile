@@ -97,8 +97,8 @@ type-check: build-libraries tooling-type-check
     tsc --project ./libraries/telemetry/tsconfig.type-check.json
     tsc --project ./libraries/webapp-events/tsconfig.json --noEmit
 
-# Build workspace libraries required by the application and library test suites.
-[group('testing')]
+# Build workspace libraries required by dependent tasks such as type-checking and tests.
+[group('build')]
 build-libraries:
     npx nx run-many -t build --projects=tag:type:lib
 
