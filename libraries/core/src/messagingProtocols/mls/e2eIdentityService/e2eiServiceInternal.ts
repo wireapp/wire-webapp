@@ -23,7 +23,7 @@ import {Maybe, Task, task} from 'true-myth';
 
 import {APIClient} from '@wireapp/api-client';
 import {LogFactory} from '@wireapp/commons';
-import {ConversationId, CredentialRef, NewCrlDistributionPoints} from '@wireapp/core-crypto';
+import {ConversationId, CredentialRef} from '@wireapp/core-crypto';
 
 import {AcmeService} from './connection/acmeServer';
 import {AcmeDirectory, Ciphersuite, CoreCrypto, CredentialType, E2eiEnrollment} from './e2eiService.types';
@@ -40,7 +40,7 @@ import {EnrollmentFlowData, InitialData, UnidentifiedEnrollmentFlowData} from '.
 import {CoreDatabase} from '../../../storage/coreDb';
 import {toBufferSource} from '../../../util/bufferUtils';
 
-type CertificateGenerationResult = {newCrlDistributionPoints: NewCrlDistributionPoints; keyPackages: Uint8Array[]};
+type CertificateGenerationResult = {newCrlDistributionPoints: string[]; keyPackages: Uint8Array[]};
 
 export type getTokenCallback = (challengesData?: {challenge: any; keyAuth: string}) => Promise<string | undefined>;
 

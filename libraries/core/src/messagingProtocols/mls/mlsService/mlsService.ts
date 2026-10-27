@@ -34,7 +34,7 @@ import {
 import {ConversationMLSMessageAddEvent, ConversationMLSWelcomeEvent} from '@wireapp/api-client/lib/event';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Converter, Decoder, Encoder} from 'bazinga64';
-import {Task, task} from 'true-myth';
+import {Task, result, task} from 'true-myth';
 
 import {APIClient} from '@wireapp/api-client';
 import {LogFactory, TimeUtil, TypedEventEmitter} from '@wireapp/commons';
@@ -42,7 +42,6 @@ import {
   CipherSuite as Ciphersuite,
   ClientId as CoreCryptoClientId,
   CommitBundle,
-  ConversationConfiguration,
   ConversationId,
   CoreCrypto,
   Credential,
@@ -52,9 +51,8 @@ import {
   EpochObserver,
   MlsTransport,
   MlsTransportResponse,
-  NewCrlDistributionPoints,
   Welcome,
-  ExternalSenderKey,
+  ExternalSender,
   isMlsMessageRejectedError,
   GroupInfo,
   KeyPackage,
@@ -373,11 +371,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     groupInfo,
     welcome,
   }: CommitBundle): Promise<MlsTransportResponse> => {
-    const bundlePayload = new Uint8Array([
-      ...commit,
-      ...groupInfo.payload.copyBytes(),
-      ...(welcome?.copyBytes() ?? []),
-    ]);
+    const bundlePayload = new Uint8Array([...commit, ...groupInfo.payload, ...(welcome?.serialize() ?? [])]);
     try {
       const response = await this.apiClient.api.conversation.postMlsCommitBundle(bundlePayload);
 
@@ -459,8 +453,6 @@ export class MLSService extends TypedEventEmitter<Events> {
       return new KeyPackage(keyPackage);
     });
 
-    let crlNewDistributionPoints: NewCrlDistributionPoints;
-
     /**
      * this is introducing conditional logic based on the presence of the coreCryptoTransactionContext, which is not ideal
      * as soon as other consumers of this method are refactored to use the transactions api we should remove the possibility to
@@ -468,17 +460,12 @@ export class MLSService extends TypedEventEmitter<Events> {
      * Consumer to be migrated to use transactions api: performAddUsersToMLSConversationAPI in ConversationService
      */
     if (coreCryptoTransactionContext !== undefined) {
-      crlNewDistributionPoints = await coreCryptoTransactionContext.addClientsToConversation(
-        new ConversationId(groupIdBytes),
-        parsedKeyPackages,
-      );
+      await coreCryptoTransactionContext.addClientsToConversation(new ConversationId(groupIdBytes), parsedKeyPackages);
     } else {
-      crlNewDistributionPoints = await this.coreCryptoClient.transaction(transactionContext => {
+      await this.coreCryptoClient.transaction(transactionContext => {
         return transactionContext.addClientsToConversation(new ConversationId(groupIdBytes), parsedKeyPackages);
       });
     }
-
-    this.dispatchNewCrlDistributionPoints(crlNewDistributionPoints);
   }
 
   /**
@@ -625,25 +612,20 @@ export class MLSService extends TypedEventEmitter<Events> {
 
       const groupInfo = await getGroupInfo();
 
-      const welcomeBundle = await this.coreCryptoClient.transaction(cx => {
+      const conversationId = await this.coreCryptoClient.transaction(cx => {
         return cx.joinByExternalCommit(new GroupInfo(groupInfo), credentialRef);
       });
 
-      await this.dispatchNewCrlDistributionPoints(welcomeBundle.crlNewDistributionPoints);
+      //after we've successfully joined via external commit, we schedule periodic key material renewal
+      const groupIdStr = Encoder.toBase64(conversationId.copyBytes()).asString;
+      const newEpoch = await this.getEpoch(groupIdStr);
 
-      this.logger.info('welcome bundle after joining via external commit');
-      if (welcomeBundle.id !== undefined) {
-        //after we've successfully joined via external commit, we schedule periodic key material renewal
-        const groupIdStr = Encoder.toBase64(welcomeBundle.id.copyBytes()).asString;
-        const newEpoch = await this.getEpoch(groupIdStr);
+      // Schedule the next key material renewal
+      await this.scheduleKeyMaterialRenewal(groupIdStr);
 
-        // Schedule the next key material renewal
-        await this.scheduleKeyMaterialRenewal(groupIdStr);
-
-        // Notify subscribers about the new epoch
-        this.emit(MLSServiceEvents.NEW_EPOCH, {groupId: groupIdStr, epoch: newEpoch});
-        this.logger.info(`Joined MLS group with id ${groupIdStr} via external commit, new epoch: ${newEpoch}`);
-      }
+      // Notify subscribers about the new epoch
+      this.emit(MLSServiceEvents.NEW_EPOCH, {groupId: groupIdStr, epoch: newEpoch});
+      this.logger.info(`Joined MLS group with id ${groupIdStr} via external commit, new epoch: ${newEpoch}`);
     } catch (error: unknown) {
       this.logger.warn('Failed to join MLS group via external commit', error);
       throw error;
@@ -656,18 +638,16 @@ export class MLSService extends TypedEventEmitter<Events> {
     return Encoder.toBase64(key).asString;
   }
 
-  private dispatchNewCrlDistributionPoints(crlNewDistributionPoints: NewCrlDistributionPoints): void {
+  private dispatchNewCrlDistributionPoints(crlNewDistributionPoints: string[]): void {
     if (crlNewDistributionPoints !== undefined && crlNewDistributionPoints.length > 0) {
       this.emit(MLSServiceEvents.NEW_CRL_DISTRIBUTION_POINTS, crlNewDistributionPoints);
     }
   }
 
   public async processWelcomeMessage(welcomeMessage: Uint8Array): Promise<ConversationId> {
-    const welcomeBundle = await this.coreCryptoClient.transaction(cx => {
+    return this.coreCryptoClient.transaction(cx => {
       return cx.processWelcomeMessage(new Welcome(welcomeMessage));
     });
-    this.dispatchNewCrlDistributionPoints(welcomeBundle.crlNewDistributionPoints);
-    return welcomeBundle.id;
   }
 
   public async decryptMessage(
@@ -762,12 +742,11 @@ export class MLSService extends TypedEventEmitter<Events> {
   ): Promise<void> {
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
 
-    let externalSenders: ExternalSenderKey[] = [];
+    const credentialRef = await this.requireCredentialRef();
+    let externalSender: ExternalSender;
     if (parentGroupId !== undefined && parentGroupId.length > 0) {
       const parentGroupIdBytes = Decoder.fromBase64(parentGroupId).asBytes;
-      externalSenders = [
-        new ExternalSenderKey(await this.coreCryptoClient.getExternalSender(new ConversationId(parentGroupIdBytes))),
-      ];
+      externalSender = await this.coreCryptoClient.getExternalSender(new ConversationId(parentGroupIdBytes));
     } else {
       const ciphersuiteSignature = this.config.signatureAlgorithm;
       const removalKeyForSignature =
@@ -777,20 +756,25 @@ export class MLSService extends TypedEventEmitter<Events> {
           `Cannot create conversation: No backend removal key found for the signature ${ciphersuiteSignature}`,
         );
       }
-      externalSenders = [new ExternalSenderKey(Decoder.fromBase64(removalKeyForSignature).asBytes)];
+      const parsedExternalSender = result.tryOrElse(
+        error => error,
+        () => {
+          return ExternalSender.parse(
+            Decoder.fromBase64(removalKeyForSignature).asBytes,
+            credentialRef.signatureScheme(),
+          );
+        },
+      );
+      externalSender = await parsedExternalSender.match({
+        Ok: value => Promise.resolve(value),
+        Err: error => Promise.reject(error),
+      });
     }
-
-    const configuration: ConversationConfiguration = {
-      externalSenders,
-      ciphersuite: this.config.defaultCiphersuite,
-    };
-
-    const credentialRef = await this.requireCredentialRef();
 
     await coreCryptoTransactionContext.createConversation(
       new ConversationId(groupIdBytes),
       credentialRef,
-      configuration,
+      externalSender,
     );
   }
 

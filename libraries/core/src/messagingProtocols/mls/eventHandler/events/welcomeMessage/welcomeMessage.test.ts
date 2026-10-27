@@ -20,7 +20,7 @@
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {ConversationMLSWelcomeEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 
-import {Welcome} from '@wireapp/core-crypto';
+import {ConversationId} from '@wireapp/core-crypto';
 
 import {handleMLSWelcomeMessage} from './welcomeMessage';
 
@@ -53,7 +53,9 @@ const mockParams = {
   } as ConversationMLSWelcomeEvent,
   source: {} as NotificationSource,
   mlsService: {
-    processWelcomeMessage: jest.fn().mockResolvedValue(new Welcome(Uint8Array.from([1, 2, 3]))),
+    processWelcomeMessage: jest.fn().mockResolvedValue({
+      copyBytes: jest.fn(() => Uint8Array.from([1, 2, 3])),
+    } as unknown as ConversationId),
     scheduleKeyMaterialRenewal: jest.fn(),
     getEpoch: jest.fn(),
     emit: jest.fn(),

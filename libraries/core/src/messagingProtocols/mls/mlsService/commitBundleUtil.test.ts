@@ -21,18 +21,19 @@ import {isNullOrUndefined} from '@sindresorhus/is';
 import {mls} from '@wireapp/protocol-messaging/web/mls';
 import {Encoder} from 'bazinga64';
 
-import {CommitBundle, RatchetTreeType, GroupInfoEncryptionType, Welcome, GroupInfo} from '@wireapp/core-crypto';
+import {CommitBundle, RatchetTreeType, GroupInfoEncryptionType, Welcome} from '@wireapp/core-crypto';
 
 import {toProtobufCommitBundle} from './commitBundleUtil';
 
 describe('toProtobufCommitBundle', () => {
   it('encode commit bundles', () => {
+    const welcomeMessage = {serialize: jest.fn(() => Uint8Array.from([1]))} as unknown as Welcome;
     const payload: CommitBundle = {
       commit: Uint8Array.from([0]),
-      welcome: new Welcome(Uint8Array.from([1])),
+      welcome: welcomeMessage,
       groupInfo: {
         ratchetTreeType: RatchetTreeType.Full,
-        payload: new GroupInfo(Uint8Array.from([2])),
+        payload: Uint8Array.from([2]),
         encryptionType: GroupInfoEncryptionType.Plaintext,
       },
     };
@@ -43,10 +44,8 @@ describe('toProtobufCommitBundle', () => {
     }
 
     expect(Encoder.toBase64(commit)).toEqual(Encoder.toBase64(payload.commit));
-    expect(Encoder.toBase64(welcome)).toEqual(Encoder.toBase64(payload.welcome.copyBytes()));
-    expect(Encoder.toBase64(groupInfoBundle.groupInfo)).toEqual(
-      Encoder.toBase64(payload.groupInfo.payload.copyBytes()),
-    );
+    expect(Encoder.toBase64(welcome)).toEqual(Encoder.toBase64(payload.welcome.serialize()));
+    expect(Encoder.toBase64(groupInfoBundle.groupInfo)).toEqual(Encoder.toBase64(payload.groupInfo.payload));
     expect(groupInfoBundle.ratchetTreeType).toEqual(mls.RatchetTreeType.FULL);
     expect(groupInfoBundle.groupInfoType).toEqual(mls.GroupInfoType.PUBLIC_GROUP_STATE);
   });

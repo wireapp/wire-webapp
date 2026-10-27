@@ -41,10 +41,10 @@ export function toProtobufCommitBundle({commit, welcome, groupInfo}: CommitBundl
   return mls.CommitBundle.encode({
     groupInfoBundle: {
       ratchetTreeType: ratchetTreeMapping[ratchetTreeType],
-      groupInfo: groupInfo.payload.copyBytes(),
+      groupInfo: groupInfo.payload,
       groupInfoType: groupInfoType[encryptionType],
     },
     commit,
-    welcome: welcome?.copyBytes(),
+    welcome: welcome?.serialize(),
   }).finish();
 }
