@@ -2,7 +2,9 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "noEmit": true,
-    "types": ["node", "jest", "@testing-library/jest-dom"]
+    "types": ["node", "jest", "@testing-library/jest-dom"],
+    "incremental": true,
+    "tsBuildInfoFile": "../../target/buildcache/react-ui-kit-type-check.tsbuildinfo"
   },
   "include": ["src/**/*", "emotion.d.ts"],
   "exclude": ["node_modules", "lib"]

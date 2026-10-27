@@ -8,7 +8,10 @@
     "types": ["node", "jest"],
     "rootDir": ".",
     "allowImportingTsExtensions": true,
-    "erasableSyntaxOnly": true
+    "erasableSyntaxOnly": true,
+    "noEmit": true,
+    "incremental": true,
+    "tsBuildInfoFile": "target/buildcache/release-cli-type-check.tsbuildinfo"
   },
   "include": ["tools/releaseCli/**/*.mts", "tools/releaseCli/**/*.ts"],
   "exclude": ["node_modules", "dist", "tmp"]
