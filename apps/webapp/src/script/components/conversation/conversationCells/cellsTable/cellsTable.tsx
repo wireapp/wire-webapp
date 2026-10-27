@@ -17,7 +17,7 @@
  *
  */
 
-import {DragEvent, useEffect, useState, type FunctionComponent, type ReactElement} from 'react';
+import {DragEvent, useEffect, useRef, useState, type FunctionComponent, type ReactElement} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 import {flexRender, getCoreRowModel, type Header, useReactTable} from '@tanstack/react-table';
@@ -158,6 +158,8 @@ export const CellsTable = ({
   });
   const [isBulkMovePreviewOpen, setIsBulkMovePreviewOpen] = useState(false);
   const [isBackgroundMovePending, setIsBackgroundMovePending] = useState(false);
+  const isBackgroundMovePendingRef = useRef(isBackgroundMovePending);
+  isBackgroundMovePendingRef.current = isBackgroundMovePending;
   const [isBackgroundMoveError, setIsBackgroundMoveError] = useState(false);
   const [isBackgroundMoveRetryBlocked, setIsBackgroundMoveRetryBlocked] = useState(false);
   const [isBackgroundMoveStatusUnknown, setIsBackgroundMoveStatusUnknown] = useState(false);
@@ -167,6 +169,10 @@ export const CellsTable = ({
   const [isBulkMoveRequestError, setIsBulkMoveRequestError] = useState(false);
 
   useEffect(() => {
+    if (isBackgroundMovePendingRef.current) {
+      return;
+    }
+
     setSelectedNodeIds(new Set());
     setIsBulkMovePreviewOpen(false);
   }, [selectionScopeKey, isSelectionEnabled]);
@@ -291,7 +297,7 @@ export const CellsTable = ({
     });
   }, [nodes]);
 
-  const handleBulkMoveResult = (response: RestPerformActionResponse): void => {
+  const handleBulkMoveResult = (response: RestPerformActionResponse): boolean => {
     setIsBackgroundMoveError(false);
     setIsBackgroundMoveRetryBlocked(false);
     setIsBackgroundMoveStatusUnknown(false);
@@ -299,10 +305,10 @@ export const CellsTable = ({
       setIsBulkMoveOutcomeUnresolved(false);
       setIsBulkMoveRequestError(false);
       onRefresh();
-      return;
+      return true;
     }
 
-    setIsBulkMoveOutcomeUnresolved(true);
+    setIsBulkMoveOutcomeUnresolved(false);
     setIsBulkMoveRequestError(false);
     setIsBackgroundMovePending(true);
     const moveJobUuids = response.BackgroundActions?.filter(action => {
@@ -313,9 +319,13 @@ export const CellsTable = ({
     const uniqueMoveJobUuids = [...new Set(moveJobUuids ?? [])];
     setBackgroundMoveJobUuids(uniqueMoveJobUuids);
     if (uniqueMoveJobUuids.length === 0) {
+      setIsBulkMoveOutcomeUnresolved(true);
       setIsBackgroundMovePending(false);
       setIsBackgroundMoveStatusUnknown(true);
+      return false;
     }
+
+    return false;
   };
 
   const handleRetryBackgroundMoveStatus = (): void => {
@@ -502,29 +512,30 @@ export const CellsTable = ({
             </div>,
             selectionBarAnchor,
           )}
-        {isBulkMovePreviewOpen && canMoveSelection && (
-          <CellsBulkMovePreviewModal
-            isOpen
-            onClose={() => {
-              return setIsBulkMovePreviewOpen(false);
-            }}
-            selectedNodes={selectedNodes}
-            cellsRepository={cellsRepository}
-            conversationQualifiedId={conversationQualifiedId}
-            conversationName={conversationName}
-            isMoveOutcomeUnresolved={isBulkMoveOutcomeUnresolved}
-            isMoveRequestError={isBulkMoveRequestError}
-            onMoveResult={handleBulkMoveResult}
-            onMoveError={handleBulkMoveRequestError}
-            isBackgroundMovePending={isBackgroundMovePending}
-            isBackgroundMoveError={isBackgroundMoveError}
-            isBackgroundMoveRetryBlocked={isBackgroundMoveRetryBlocked}
-            isBackgroundMoveStatusUnknown={isBackgroundMoveStatusUnknown}
-            canRetryBackgroundMoveStatus={backgroundMoveJobUuids.length > 0}
-            onRetryBackgroundMoveStatus={handleRetryBackgroundMoveStatus}
-            onRefresh={onRefresh}
-          />
-        )}
+        {isBulkMovePreviewOpen &&
+          (canMoveSelection || isBackgroundMovePending || isBackgroundMoveError || isBackgroundMoveStatusUnknown) && (
+            <CellsBulkMovePreviewModal
+              isOpen
+              onClose={() => {
+                return setIsBulkMovePreviewOpen(false);
+              }}
+              selectedNodes={selectedNodes}
+              cellsRepository={cellsRepository}
+              conversationQualifiedId={conversationQualifiedId}
+              conversationName={conversationName}
+              isMoveOutcomeUnresolved={isBulkMoveOutcomeUnresolved}
+              isMoveRequestError={isBulkMoveRequestError}
+              onMoveResult={handleBulkMoveResult}
+              onMoveError={handleBulkMoveRequestError}
+              isBackgroundMovePending={isBackgroundMovePending}
+              isBackgroundMoveError={isBackgroundMoveError}
+              isBackgroundMoveRetryBlocked={isBackgroundMoveRetryBlocked}
+              isBackgroundMoveStatusUnknown={isBackgroundMoveStatusUnknown}
+              canRetryBackgroundMoveStatus={backgroundMoveJobUuids.length > 0}
+              onRetryBackgroundMoveStatus={handleRetryBackgroundMoveStatus}
+              onRefresh={onRefresh}
+            />
+          )}
         {activeFolderDropTargetName !== null && (
           <div css={folderDropOverlayStyles} role="status">
             <UploadIcon width={24} height={24} aria-hidden="true" />

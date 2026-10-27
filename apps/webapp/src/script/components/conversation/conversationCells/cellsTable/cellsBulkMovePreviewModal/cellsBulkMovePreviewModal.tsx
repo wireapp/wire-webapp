@@ -38,7 +38,7 @@ interface CellsBulkMovePreviewModalProps {
   conversationName: string;
   isMoveOutcomeUnresolved: boolean;
   isMoveRequestError: boolean;
-  onMoveResult: (response: RestPerformActionResponse) => void;
+  onMoveResult: (response: RestPerformActionResponse) => boolean;
   onMoveError: () => void;
   isBackgroundMovePending: boolean;
   isBackgroundMoveError: boolean;
@@ -81,7 +81,7 @@ export const CellsBulkMovePreviewModal: FunctionComponent<CellsBulkMovePreviewMo
     cellsRepository,
   });
   const handleClose = (): void => {
-    if (move.isSubmitting) {
+    if (move.isSubmitting || isBackgroundMovePending) {
       return;
     }
 
@@ -110,6 +110,7 @@ export const CellsBulkMovePreviewModal: FunctionComponent<CellsBulkMovePreviewMo
         destination.status !== 'success'
       }
       isMoveLoading={move.isSubmitting}
+      isBackgroundMovePending={isBackgroundMovePending}
       isBackgroundMoveError={isBackgroundMoveError}
       isBackgroundMoveStatusUnknown={isBackgroundMoveStatusUnknown}
       canRetryBackgroundMoveStatus={canRetryBackgroundMoveStatus}
