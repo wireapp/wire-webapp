@@ -70,7 +70,9 @@ const createEvent = (): ConversationMLSMessageAddEvent => {
 const createMLSService = (decryptedMessage: DecryptedMessage): jest.Mocked<MLSService> => {
   return {
     decryptMessage: jest.fn().mockResolvedValue(decryptedMessage),
-    getSafeEpoch: jest.fn(() => task.resolve(1)),
+    getSafeEpoch: jest.fn(() => {
+      return task.resolve(1);
+    }),
     handlePendingProposals: jest.fn().mockResolvedValue(undefined),
   } as unknown as jest.Mocked<MLSService>;
 };
@@ -172,13 +174,16 @@ describe('handleMLSMessageAdd', () => {
     });
     await proposalHandled.promise;
 
-    expect(payloads.map(payload => payload.decryptedData?.messageId)).toEqual([
-      'buffered-application',
-      'buffered-transient',
-      'buffered-targeted',
-      'buffered-persisted-targeted',
-    ]);
-    expect(payloads.map(payload => payload.event)).toEqual([
+    expect(
+      payloads.map(payload => {
+        return payload.decryptedData?.messageId;
+      }),
+    ).toEqual(['buffered-application', 'buffered-transient', 'buffered-targeted', 'buffered-persisted-targeted']);
+    expect(
+      payloads.map(payload => {
+        return payload.event;
+      }),
+    ).toEqual([
       expect.objectContaining({senderClientId: encodedSenderClientId}),
       expect.objectContaining({senderClientId: encodedSecondarySenderClientId}),
       expect.objectContaining({senderClientId: encodedSenderClientId}),

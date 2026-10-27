@@ -201,7 +201,9 @@ export class MLSService extends TypedEventEmitter<Events> {
   private getCredentialRef(): Task<CredentialRef, unknown> {
     const findCredentials = (credentialType: CredentialType): Task<CredentialRef[], unknown> => {
       return task.tryOrElse(
-        error => error,
+        error => {
+          return error;
+        },
         () => {
           return this.coreCryptoClient.findCredentials({
             cipherSuite: this.config.defaultCiphersuite,
@@ -232,8 +234,12 @@ export class MLSService extends TypedEventEmitter<Events> {
   private async requireCredentialRef(): Promise<CredentialRef> {
     const credentialRef = await this.getCredentialRef();
     return credentialRef.match({
-      Ok: value => Promise.resolve(value),
-      Err: error => Promise.reject(error),
+      Ok: value => {
+        return Promise.resolve(value);
+      },
+      Err: error => {
+        return Promise.reject(error);
+      },
     });
   }
 
@@ -297,8 +303,12 @@ export class MLSService extends TypedEventEmitter<Events> {
 
     this.initialKeyPackageUploadDeferred = skipInitIdentity === true;
     const signatureAlgorithm = await getSignatureAlgorithmForCiphersuite(mlsConfig.defaultCiphersuite).match({
-      Ok: value => Promise.resolve(value),
-      Err: error => Promise.reject(error),
+      Ok: value => {
+        return Promise.resolve(value);
+      },
+      Err: error => {
+        return Promise.reject(error);
+      },
     });
     this._config = {
       ...defaultConfig,
@@ -361,8 +371,12 @@ export class MLSService extends TypedEventEmitter<Events> {
 
     const uploadResult = await task
       .tryOrElse(
-        error => this.toMlsTransportError(error),
-        () => this.apiClient.api.conversation.postMlsCommitBundle(bundlePayload),
+        error => {
+          return this.toMlsTransportError(error);
+        },
+        () => {
+          return this.apiClient.api.conversation.postMlsCommitBundle(bundlePayload);
+        },
       )
       .andThen(response => {
         if (response.failed_to_send !== undefined) {
@@ -381,8 +395,12 @@ export class MLSService extends TypedEventEmitter<Events> {
       });
 
     return uploadResult.match({
-      Ok: () => Promise.resolve(),
-      Err: error => Promise.reject(error),
+      Ok: () => {
+        return Promise.resolve();
+      },
+      Err: error => {
+        return Promise.reject(error);
+      },
     });
   };
 
@@ -740,7 +758,9 @@ export class MLSService extends TypedEventEmitter<Events> {
         );
       }
       const parsedExternalSender = result.tryOrElse(
-        error => error,
+        error => {
+          return error;
+        },
         () => {
           return ExternalSender.parse(
             Decoder.fromBase64(removalKeyForSignature).asBytes,
@@ -749,8 +769,12 @@ export class MLSService extends TypedEventEmitter<Events> {
         },
       );
       externalSender = await parsedExternalSender.match({
-        Ok: value => Promise.resolve(value),
-        Err: error => Promise.reject(error),
+        Ok: value => {
+          return Promise.resolve(value);
+        },
+        Err: error => {
+          return Promise.reject(error);
+        },
       });
     }
 
@@ -1241,8 +1265,12 @@ export class MLSService extends TypedEventEmitter<Events> {
 
   private async runPendingProposalsTask(groupId: string): Promise<void> {
     const commitResult = await task.tryOrElse(
-      error => error,
-      () => this.commitPendingProposals(groupId),
+      error => {
+        return error;
+      },
+      () => {
+        return this.commitPendingProposals(groupId);
+      },
     );
 
     commitResult.match({
@@ -1270,8 +1298,12 @@ export class MLSService extends TypedEventEmitter<Events> {
     }
 
     const pendingProposalResult = await task.tryOrElse(
-      error => error,
-      () => this.coreDatabase.get('pendingProposals', groupId),
+      error => {
+        return error;
+      },
+      () => {
+        return this.coreDatabase.get('pendingProposals', groupId);
+      },
     );
 
     pendingProposalResult.match({

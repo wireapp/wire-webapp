@@ -54,7 +54,9 @@ const mockParams = {
   source: {} as NotificationSource,
   mlsService: {
     processWelcomeMessage: jest.fn().mockResolvedValue({
-      copyBytes: jest.fn(() => Uint8Array.from([1, 2, 3])),
+      copyBytes: jest.fn(() => {
+        return Uint8Array.from([1, 2, 3]);
+      }),
     } as unknown as ConversationId),
     scheduleKeyMaterialRenewal: jest.fn(),
     getEpoch: jest.fn(),

@@ -111,15 +111,27 @@ const mockWireIdentity: WireIdentity = {
 
 const createCredentialRef = (credentialType: CredentialType, earliestValidity = 0n): CredentialRef => {
   return {
-    cipherSuite: jest.fn(() => defaultMLSInitConfig.defaultCiphersuite),
-    earliestValidity: jest.fn(() => earliestValidity),
-    signatureScheme: jest.fn(() => SignatureScheme.Ed25519),
-    type: jest.fn(() => credentialType),
+    cipherSuite: jest.fn(() => {
+      return defaultMLSInitConfig.defaultCiphersuite;
+    }),
+    earliestValidity: jest.fn(() => {
+      return earliestValidity;
+    }),
+    signatureScheme: jest.fn(() => {
+      return SignatureScheme.Ed25519;
+    }),
+    type: jest.fn(() => {
+      return credentialType;
+    }),
   } as unknown as CredentialRef;
 };
 
 const createKeyPackage = (bytes = new Uint8Array()): KeyPackage => {
-  return {serialize: jest.fn(() => bytes)} as unknown as KeyPackage;
+  return {
+    serialize: jest.fn(() => {
+      return bytes;
+    }),
+  } as unknown as KeyPackage;
 };
 
 const createKeyPackageRef = ({
@@ -132,9 +144,15 @@ const createKeyPackageRef = ({
   isValid?: boolean;
 } = {}): KeyPackageRef => {
   return {
-    cipherSuite: jest.fn(() => cipherSuite),
-    credentialType: jest.fn(() => credentialType),
-    isValid: jest.fn(() => isValid),
+    cipherSuite: jest.fn(() => {
+      return cipherSuite;
+    }),
+    credentialType: jest.fn(() => {
+      return credentialType;
+    }),
+    isValid: jest.fn(() => {
+      return isValid;
+    }),
   } as unknown as KeyPackageRef;
 };
 
@@ -217,7 +235,11 @@ describe('MLSService', () => {
     const commitBundle = {
       commit: new Uint8Array([1]),
       groupInfo: {payload: new Uint8Array([2])},
-      welcome: {serialize: jest.fn(() => welcomeBytes)} as unknown as NonNullable<CommitBundle['welcome']>,
+      welcome: {
+        serialize: jest.fn(() => {
+          return welcomeBytes;
+        }),
+      } as unknown as NonNullable<CommitBundle['welcome']>,
     } as CommitBundle;
 
     it('uploads a commit bundle and emits the distributed events', async () => {
@@ -922,7 +944,11 @@ describe('MLSService', () => {
       await mlsService.refreshKeyPackages('client-1');
       allowance = 100;
       await mlsService.refreshKeyPackages('client-1');
-      expect(generateKeyPackages.mock.calls.map(call => call[0])).toEqual([1000, 100]);
+      expect(
+        generateKeyPackages.mock.calls.map(call => {
+          return call[0];
+        }),
+      ).toEqual([1000, 100]);
     });
 
     it('checks enrolled E2EI clients at startup even when identity initialization is skipped', async () => {

@@ -18,9 +18,9 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {errors as LegacyProteusErrors} from '@wireapp/proteus';
 
 import {CoreCryptoError, ProteusError} from '@wireapp/core-crypto';
+import {errors as LegacyProteusErrors} from '@wireapp/proteus';
 
 import {DecryptionError} from '../../../../errors/decryptionError';
 

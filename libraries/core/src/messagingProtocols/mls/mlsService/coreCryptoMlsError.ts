@@ -18,7 +18,6 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-
 import {Result, result} from 'true-myth';
 
 import {CoreCryptoError, MlsError} from '@wireapp/core-crypto';
@@ -112,8 +111,12 @@ const hasAbortReason = (error: unknown, message: AbortReasons['message']): error
   }
 
   return deserializeAbortReason(error.inner.mlsError.inner.reason).match({
-    Ok: reason => reason.message === message,
-    Err: () => false,
+    Ok: reason => {
+      return reason.message === message;
+    },
+    Err: () => {
+      return false;
+    },
   });
 };
 
@@ -132,8 +135,12 @@ export function isMLSGroupOutOfSyncError(error: unknown): error is MessageReject
 export function getMLSGroupOutOfSyncErrorMissingUsers(error: unknown): QualifiedId[] {
   if (isMLSGroupOutOfSyncError(error)) {
     return deserializeAbortReason(error.inner.mlsError.inner.reason).match({
-      Ok: reason => (reason as AbortReasonMLSGroupOutOfSync).missing_users,
-      Err: () => [],
+      Ok: reason => {
+        return (reason as AbortReasonMLSGroupOutOfSync).missing_users;
+      },
+      Err: () => {
+        return [];
+      },
     });
   }
 
@@ -166,7 +173,11 @@ export function serializeAbortReason(reason: AbortReasons): string {
 
 function deserializeAbortReason(reasonString: string): Result<AbortReasons, unknown> {
   return result.tryOrElse(
-    error => error,
-    () => JSON.parse(reasonString) as AbortReasons,
+    error => {
+      return error;
+    },
+    () => {
+      return JSON.parse(reasonString) as AbortReasons;
+    },
   );
 }

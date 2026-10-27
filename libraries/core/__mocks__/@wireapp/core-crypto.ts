@@ -235,10 +235,16 @@ const isVariant = <Tag extends string>(value: unknown, tag: Tag): value is Tagge
   return typeof value === 'object' && value !== null && 'tag' in value && value.tag === tag;
 };
 
-const decryptedMessageVariant = <Tag extends string>(tag: Tag) => {
+const decryptedMessageVariant = <Tag extends string>(
+  tag: Tag,
+): {new: <Inner>(inner: Inner) => TaggedVariant<Tag, Inner>; instanceOf: (value: unknown) => boolean} => {
   return {
-    new: <Inner>(inner: Inner) => variant(tag, inner),
-    instanceOf: (value: unknown) => isVariant(value, tag),
+    new: <Inner>(inner: Inner) => {
+      return variant(tag, inner);
+    },
+    instanceOf: (value: unknown) => {
+      return isVariant(value, tag);
+    },
   };
 };
 
@@ -291,80 +297,148 @@ export enum MlsError_Tags {
 
 export const MlsError = {
   ConversationAlreadyExists: {
-    new: (inner: {conversationId: Uint8Array}) => taggedError('ConversationAlreadyExists', inner),
-    instanceOf: (error: unknown) => isTaggedError(error, 'ConversationAlreadyExists'),
+    new: (inner: {conversationId: Uint8Array}) => {
+      return taggedError('ConversationAlreadyExists', inner);
+    },
+    instanceOf: (error: unknown) => {
+      return isTaggedError(error, 'ConversationAlreadyExists');
+    },
   },
   DuplicateMessage: {
-    new: () => taggedError('DuplicateMessage', undefined),
-    instanceOf: (error: unknown) => isTaggedError(error, 'DuplicateMessage'),
+    new: () => {
+      return taggedError('DuplicateMessage', undefined);
+    },
+    instanceOf: (error: unknown) => {
+      return isTaggedError(error, 'DuplicateMessage');
+    },
   },
   BufferedFutureMessage: {
-    new: () => taggedError('BufferedFutureMessage', undefined),
-    instanceOf: (error: unknown) => isTaggedError(error, 'BufferedFutureMessage'),
+    new: () => {
+      return taggedError('BufferedFutureMessage', undefined);
+    },
+    instanceOf: (error: unknown) => {
+      return isTaggedError(error, 'BufferedFutureMessage');
+    },
   },
   WrongEpoch: {
-    new: () => taggedError('WrongEpoch', undefined),
-    instanceOf: (error: unknown) => isTaggedError(error, 'WrongEpoch'),
+    new: () => {
+      return taggedError('WrongEpoch', undefined);
+    },
+    instanceOf: (error: unknown) => {
+      return isTaggedError(error, 'WrongEpoch');
+    },
   },
   UnmergedPendingGroup: {
-    new: () => taggedError('UnmergedPendingGroup', undefined),
-    instanceOf: (error: unknown) => isTaggedError(error, 'UnmergedPendingGroup'),
+    new: () => {
+      return taggedError('UnmergedPendingGroup', undefined);
+    },
+    instanceOf: (error: unknown) => {
+      return isTaggedError(error, 'UnmergedPendingGroup');
+    },
   },
   StaleProposal: {
-    new: () => taggedError('StaleProposal', undefined),
-    instanceOf: (error: unknown) => isTaggedError(error, 'StaleProposal'),
+    new: () => {
+      return taggedError('StaleProposal', undefined);
+    },
+    instanceOf: (error: unknown) => {
+      return isTaggedError(error, 'StaleProposal');
+    },
   },
   StaleCommit: {
-    new: () => taggedError('StaleCommit', undefined),
-    instanceOf: (error: unknown) => isTaggedError(error, 'StaleCommit'),
+    new: () => {
+      return taggedError('StaleCommit', undefined);
+    },
+    instanceOf: (error: unknown) => {
+      return isTaggedError(error, 'StaleCommit');
+    },
   },
   OrphanWelcome: {
-    new: () => taggedError('OrphanWelcome', undefined),
-    instanceOf: (error: unknown) => isTaggedError(error, 'OrphanWelcome'),
+    new: () => {
+      return taggedError('OrphanWelcome', undefined);
+    },
+    instanceOf: (error: unknown) => {
+      return isTaggedError(error, 'OrphanWelcome');
+    },
   },
   MessageRejected: {
-    new: (inner: {reason: string}) => taggedError('MessageRejected', inner),
-    instanceOf: (error: unknown) => isTaggedError(error, 'MessageRejected'),
+    new: (inner: {reason: string}) => {
+      return taggedError('MessageRejected', inner);
+    },
+    instanceOf: (error: unknown) => {
+      return isTaggedError(error, 'MessageRejected');
+    },
   },
   Other: {
-    new: (inner: {msg: string}) => taggedError('Other', inner),
-    instanceOf: (error: unknown) => isTaggedError(error, 'Other'),
+    new: (inner: {msg: string}) => {
+      return taggedError('Other', inner);
+    },
+    instanceOf: (error: unknown) => {
+      return isTaggedError(error, 'Other');
+    },
   },
 };
 
 export const ProteusError = {
   SessionNotFound: {
-    new: () => taggedError('SessionNotFound', undefined),
-    instanceOf: (error: unknown) => isTaggedError(error, 'SessionNotFound'),
+    new: () => {
+      return taggedError('SessionNotFound', undefined);
+    },
+    instanceOf: (error: unknown) => {
+      return isTaggedError(error, 'SessionNotFound');
+    },
   },
   DuplicateMessage: {
-    new: () => taggedError('DuplicateMessage', undefined),
-    instanceOf: (error: unknown) => isTaggedError(error, 'DuplicateMessage'),
+    new: () => {
+      return taggedError('DuplicateMessage', undefined);
+    },
+    instanceOf: (error: unknown) => {
+      return isTaggedError(error, 'DuplicateMessage');
+    },
   },
   RemoteIdentityChanged: {
-    new: () => taggedError('RemoteIdentityChanged', undefined),
-    instanceOf: (error: unknown) => isTaggedError(error, 'RemoteIdentityChanged'),
+    new: () => {
+      return taggedError('RemoteIdentityChanged', undefined);
+    },
+    instanceOf: (error: unknown) => {
+      return isTaggedError(error, 'RemoteIdentityChanged');
+    },
   },
   Other: {
-    new: (inner: {errorCode: number}) => taggedError('Other', inner),
-    instanceOf: (error: unknown) => isTaggedError(error, 'Other'),
+    new: (inner: {errorCode: number}) => {
+      return taggedError('Other', inner);
+    },
+    instanceOf: (error: unknown) => {
+      return isTaggedError(error, 'Other');
+    },
   },
 };
 
 export const CoreCryptoError = {
   Mls: {
-    new: (inner: {mlsError: Error}) => taggedError('Mls', inner),
-    instanceOf: (error: unknown) => isTaggedError(error, 'Mls'),
+    new: (inner: {mlsError: Error}) => {
+      return taggedError('Mls', inner);
+    },
+    instanceOf: (error: unknown) => {
+      return isTaggedError(error, 'Mls');
+    },
   },
   Proteus: {
-    new: (inner: {exception: Error}) => taggedError('Proteus', inner),
-    instanceOf: (error: unknown) => isTaggedError(error, 'Proteus'),
+    new: (inner: {exception: Error}) => {
+      return taggedError('Proteus', inner);
+    },
+    instanceOf: (error: unknown) => {
+      return isTaggedError(error, 'Proteus');
+    },
   },
 };
 
 export const MlsTransportError = {
   MessageRejected: {
-    new: (inner: {reason: string}) => taggedError('MessageRejected', inner),
-    instanceOf: (error: unknown) => isTaggedError(error, 'MessageRejected'),
+    new: (inner: {reason: string}) => {
+      return taggedError('MessageRejected', inner);
+    },
+    instanceOf: (error: unknown) => {
+      return isTaggedError(error, 'MessageRejected');
+    },
   },
 };
