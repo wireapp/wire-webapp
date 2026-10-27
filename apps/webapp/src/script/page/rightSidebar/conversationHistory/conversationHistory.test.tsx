@@ -22,7 +22,6 @@ import {container} from 'tsyringe';
 
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
-import {UserState} from 'Repositories/user/userState';
 import {withTheme} from 'src/script/auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
@@ -36,49 +35,51 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
 );
 
-function renderConversationHistory(): ReturnType<typeof render> {
-  return render(withTheme(<ConversationHistory onClose={jest.fn()} onGoBack={jest.fn()} />), {
+type TestFunction = () => void | Promise<void>;
+type IsolatedTestFunction = () => Promise<void>;
+
+function withConferenceCallingDisabled(testFunction: TestFunction): IsolatedTestFunction {
+  return async function runWithConferenceCallingDisabled(): Promise<void> {
+    const teamState = container.resolve(TeamState);
+    const conferenceCallingSpy = jest.spyOn(teamState, 'isConferenceCallingEnabled').mockReturnValue(false);
+
+    try {
+      await testFunction();
+    } finally {
+      conferenceCallingSpy.mockRestore();
+    }
+  };
+}
+
+function renderConversationHistory(selfUser: User): ReturnType<typeof render> {
+  const teamState = container.resolve(TeamState);
+  return render(withTheme(<ConversationHistory onClose={jest.fn()} onGoBack={jest.fn()} selfUser={selfUser} teamState={teamState} />), {
     wrapper: rootProviderWrapper,
   });
 }
 
 describe('ConversationHistory — upgrade banner', () => {
-  const teamState = container.resolve(TeamState);
-  const userState = container.resolve(UserState);
-  let originalSelfUser: User;
-  let conferenceCallingSpy: jest.SpyInstance;
+  it(
+    'hides the upgrade banner for temporary guests',
+    withConferenceCallingDisabled(() => {
+      const selfUser = new User('test-id', '', translateForTest);
+      selfUser.isTemporaryGuest(true);
+      renderConversationHistory(selfUser);
+      expect(
+        screen.queryByRole('button', {name: translateForTest('createConversationUpgradePlanModalButton')}),
+      ).not.toBeInTheDocument();
+    }),
+  );
 
-  beforeEach(() => {
-    originalSelfUser = userState.self();
-    conferenceCallingSpy = jest.spyOn(teamState, 'isConferenceCallingEnabled').mockReturnValue(false);
-  });
-
-  afterEach(() => {
-    userState.self(originalSelfUser);
-    conferenceCallingSpy.mockRestore();
-  });
-
-  it('hides the upgrade banner for temporary guests', () => {
-    const selfUser = new User('test-id', '', translateForTest);
-    selfUser.isTemporaryGuest(true);
-    userState.self(selfUser);
-
-    renderConversationHistory();
-
-    expect(
-      screen.queryByRole('button', {name: translateForTest('createConversationUpgradePlanModalButton')}),
-    ).not.toBeInTheDocument();
-  });
-
-  it('shows the upgrade banner for regular users', () => {
-    const selfUser = new User('test-id', '', translateForTest);
-    selfUser.isTemporaryGuest(false);
-    userState.self(selfUser);
-
-    renderConversationHistory();
-
-    expect(
-      screen.queryByRole('button', {name: translateForTest('createConversationUpgradePlanModalButton')}),
-    ).toBeInTheDocument();
-  });
+  it(
+    'shows the upgrade banner for regular users',
+    withConferenceCallingDisabled(() => {
+      const selfUser = new User('test-id', '', translateForTest);
+      selfUser.isTemporaryGuest(false);
+      renderConversationHistory(selfUser);
+      expect(
+        screen.queryByRole('button', {name: translateForTest('createConversationUpgradePlanModalButton')}),
+      ).toBeInTheDocument();
+    }),
+  );
 });

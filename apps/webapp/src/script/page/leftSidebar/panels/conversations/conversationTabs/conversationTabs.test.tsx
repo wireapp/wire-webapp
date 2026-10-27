@@ -92,6 +92,30 @@ function withInternalEnvironment(testFunction: TranslationTestFunction): Isolate
   };
 }
 
+function withTeamCreationEnabled(testFunction: TranslationTestFunction): IsolatedTranslationTestFunction {
+  return async function runWithTeamCreationEnabled(): Promise<void> {
+    const core = container.resolve(Core);
+    const teamState = container.resolve(TeamState);
+    const originalVersion = core.backendFeatures.version;
+    core.backendFeatures.version = 7;
+    const isInTeamSpy = jest.spyOn(teamState, 'isInTeam').mockReturnValue(false);
+    const realConfig = Config.getConfig();
+    const configSpy = jest.spyOn(Config, 'getConfig').mockReturnValue({
+      ...realConfig,
+      FEATURE: {...realConfig.FEATURE, ENABLE_TEAM_CREATION: true},
+      MIN_TEAM_CREATION_SUPPORTED_API_VERSION: 7,
+    });
+
+    try {
+      await testFunction();
+    } finally {
+      core.backendFeatures.version = originalVersion;
+      configSpy.mockRestore();
+      isInTeamSpy.mockRestore();
+    }
+  };
+}
+
 function renderConversationTabs(
   rootProviderWrapper: ReturnType<typeof createRootProviderWrapperForTest>,
   selfUser = new User('self-user', '', translate),
@@ -121,48 +145,28 @@ function renderConversationTabs(
 }
 
 describe('ConversationTabs — team creation banner', () => {
-  const core = container.resolve(Core);
-  const teamState = container.resolve(TeamState);
-  let configSpy: jest.SpyInstance;
-  let isInTeamSpy: jest.SpyInstance;
-  let originalVersion: number;
-
-  beforeEach(() => {
-    originalVersion = core.backendFeatures.version;
-    core.backendFeatures.version = 7;
-    isInTeamSpy = jest.spyOn(teamState, 'isInTeam').mockReturnValue(false);
-    const realConfig = Config.getConfig();
-    configSpy = jest.spyOn(Config, 'getConfig').mockReturnValue({
-      ...realConfig,
-      FEATURE: {...realConfig.FEATURE, ENABLE_TEAM_CREATION: true},
-      MIN_TEAM_CREATION_SUPPORTED_API_VERSION: 7,
-    });
-  });
-
-  afterEach(() => {
-    core.backendFeatures.version = originalVersion;
-    configSpy.mockRestore();
-    isInTeamSpy.mockRestore();
-  });
-
   it(
     'hides the team creation banner for temporary guests',
-    withTranslationStrings(en, () => {
-      const selfUser = new User('self-user', '', translate);
-      selfUser.isTemporaryGuest(true);
-      renderConversationTabs(translationRootProviderWrapper, selfUser);
-      expect(screen.queryByRole('button', {name: translate('teamUpgradeBannerButtonText')})).not.toBeInTheDocument();
-    }),
+    withTeamCreationEnabled(
+      withTranslationStrings(en, () => {
+        const selfUser = new User('self-user', '', translate);
+        selfUser.isTemporaryGuest(true);
+        renderConversationTabs(translationRootProviderWrapper, selfUser);
+        expect(screen.queryByRole('button', {name: translate('teamUpgradeBannerButtonText')})).not.toBeInTheDocument();
+      }),
+    ),
   );
 
   it(
     'shows the team creation banner for regular users',
-    withTranslationStrings(en, () => {
-      const selfUser = new User('self-user', '', translate);
-      selfUser.isTemporaryGuest(false);
-      renderConversationTabs(translationRootProviderWrapper, selfUser);
-      expect(screen.queryByRole('button', {name: translate('teamUpgradeBannerButtonText')})).toBeInTheDocument();
-    }),
+    withTeamCreationEnabled(
+      withTranslationStrings(en, () => {
+        const selfUser = new User('self-user', '', translate);
+        selfUser.isTemporaryGuest(false);
+        renderConversationTabs(translationRootProviderWrapper, selfUser);
+        expect(screen.queryByRole('button', {name: translate('teamUpgradeBannerButtonText')})).toBeInTheDocument();
+      }),
+    ),
   );
 });
 

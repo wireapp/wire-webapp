@@ -391,7 +391,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
             />
           )}
           {currentState === PanelState.CONVERSATION_HISTORY && (
-            <ConversationHistory onClose={closePanel} onGoBack={onBackClick} />
+            <ConversationHistory onClose={closePanel} onGoBack={onBackClick} selfUser={selfUser} teamState={teamState} />
           )}
         </>
       </Animated>

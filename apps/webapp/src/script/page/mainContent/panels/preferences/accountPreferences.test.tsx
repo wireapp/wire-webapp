@@ -42,62 +42,69 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
 );
 
-const mockProps = {
-  appLockRepository: {} as unknown as AppLockRepository,
-  importFile: jest.fn(),
-  clientRepository: {} as unknown as ClientRepository,
-  conversationRepository: {leaveGuestRoom: jest.fn()} as unknown as ConversationRepository,
-  propertiesRepository: {} as unknown as PropertiesRepository,
-  switchContent: jest.fn(),
-  userRepository: {} as unknown as UserRepository,
-};
+type TestFunction = () => void | Promise<void>;
+type IsolatedTestFunction = () => Promise<void>;
+
+function withTeamCreationEnabled(testFunction: TestFunction): IsolatedTestFunction {
+  return async function runWithTeamCreationEnabled(): Promise<void> {
+    const core = container.resolve(Core);
+    const teamState = container.resolve(TeamState);
+    const originalVersion = core.backendFeatures.version;
+    core.backendFeatures.version = 7;
+    const isInTeamSpy = jest.spyOn(teamState, 'isInTeam').mockReturnValue(false);
+    const realConfig = Config.getConfig();
+    const configSpy = jest.spyOn(Config, 'getConfig').mockReturnValue({
+      ...realConfig,
+      FEATURE: {...realConfig.FEATURE, ENABLE_TEAM_CREATION: true},
+      MIN_TEAM_CREATION_SUPPORTED_API_VERSION: 7,
+    });
+
+    try {
+      await testFunction();
+    } finally {
+      core.backendFeatures.version = originalVersion;
+      configSpy.mockRestore();
+      isInTeamSpy.mockRestore();
+    }
+  };
+}
+
+function createMockProps() {
+  return {
+    appLockRepository: {} as unknown as AppLockRepository,
+    importFile: jest.fn(),
+    clientRepository: {} as unknown as ClientRepository,
+    conversationRepository: {leaveGuestRoom: jest.fn()} as unknown as ConversationRepository,
+    propertiesRepository: {} as unknown as PropertiesRepository,
+    switchContent: jest.fn(),
+    userRepository: {} as unknown as UserRepository,
+  };
+}
 
 function renderAccountPreferences(selfUser: User): ReturnType<typeof render> {
-  return render(withTheme(<AccountPreferences {...mockProps} selfUser={selfUser} />), {
+  return render(withTheme(<AccountPreferences {...createMockProps()} selfUser={selfUser} />), {
     wrapper: rootProviderWrapper,
   });
 }
 
 describe('AccountPreferences — team creation header', () => {
-  const core = container.resolve(Core);
-  const teamState = container.resolve(TeamState);
-  let configSpy: jest.SpyInstance;
-  let isInTeamSpy: jest.SpyInstance;
-  let originalVersion: number;
+  it(
+    'hides the team creation header for temporary guests',
+    withTeamCreationEnabled(() => {
+      const selfUser = new User('test-id', '', translateForTest);
+      selfUser.isTemporaryGuest(true);
+      renderAccountPreferences(selfUser);
+      expect(screen.queryByText('teamUpgradeBannerHeader')).not.toBeInTheDocument();
+    }),
+  );
 
-  beforeEach(() => {
-    originalVersion = core.backendFeatures.version;
-    core.backendFeatures.version = 7;
-    isInTeamSpy = jest.spyOn(teamState, 'isInTeam').mockReturnValue(false);
-    const realConfig = Config.getConfig();
-    configSpy = jest.spyOn(Config, 'getConfig').mockReturnValue({
-      ...realConfig,
-      FEATURE: {...realConfig.FEATURE, ENABLE_TEAM_CREATION: true},
-      MIN_TEAM_CREATION_SUPPORTED_API_VERSION: 7,
-    });
-  });
-
-  afterEach(() => {
-    core.backendFeatures.version = originalVersion;
-    configSpy.mockRestore();
-    isInTeamSpy.mockRestore();
-  });
-
-  it('hides the team creation header for temporary guests', () => {
-    const selfUser = new User('test-id', '', translateForTest);
-    selfUser.isTemporaryGuest(true);
-
-    renderAccountPreferences(selfUser);
-
-    expect(screen.queryByText('teamUpgradeBannerHeader')).not.toBeInTheDocument();
-  });
-
-  it('shows the team creation header for regular users', () => {
-    const selfUser = new User('test-id', '', translateForTest);
-    selfUser.isTemporaryGuest(false);
-
-    renderAccountPreferences(selfUser);
-
-    expect(screen.queryByText('teamUpgradeBannerHeader')).toBeInTheDocument();
-  });
+  it(
+    'shows the team creation header for regular users',
+    withTeamCreationEnabled(() => {
+      const selfUser = new User('test-id', '', translateForTest);
+      selfUser.isTemporaryGuest(false);
+      renderAccountPreferences(selfUser);
+      expect(screen.queryByText('teamUpgradeBannerHeader')).toBeInTheDocument();
+    }),
+  );
 });

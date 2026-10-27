@@ -20,7 +20,6 @@
 import {useState, type FunctionComponent} from 'react';
 
 import {isNan, isNullOrUndefined} from '@sindresorhus/is';
-import {container} from 'tsyringe';
 
 import {FlexBox, Input, Select} from '@wireapp/react-ui-kit';
 
@@ -29,8 +28,8 @@ import {customHistorySharingInputCss} from 'Components/Modals/CreateConversation
 import {ChatHistory, HistorySharingUnit} from 'Components/Modals/CreateConversation/types';
 import {getChatHistoryOptions, getChatHistorySharingUnitOptions} from 'Components/Modals/CreateConversation/utils';
 import {RadioGroup} from 'Components/Radio';
+import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
-import {UserState} from 'Repositories/user/userState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
@@ -46,18 +45,18 @@ import {PanelHeader} from '../panelHeader';
 export interface AccessProps {
   onClose: () => void;
   onGoBack: () => void;
+  selfUser: User;
+  teamState: TeamState;
 }
 
-export const ConversationHistory: FunctionComponent<AccessProps> = ({onGoBack, onClose}: AccessProps) => {
+export const ConversationHistory: FunctionComponent<AccessProps> = ({onGoBack, onClose, selfUser, teamState}: AccessProps) => {
   const {translate} = useApplicationContext();
   const [chatHistory, setChatHistory] = useState<ChatHistory>(ChatHistory.OneDay);
   const [historySharingQuantity, setHistorySharingQuantity] = useState(1);
   const [historySharingUnit, setHistorySharingUnit] = useState<HistorySharingUnit>(HistorySharingUnit.Days);
   const chatHistorySharingUnitOptions = getChatHistorySharingUnitOptions(translate, historySharingQuantity);
   const chatHistoryOptions = getChatHistoryOptions(translate, chatHistory, historySharingQuantity, historySharingUnit);
-  const teamState = container.resolve(TeamState);
-  const userState = container.resolve(UserState);
-  const {isTemporaryGuest} = useKoSubscribableChildren(userState.self(), ['isTemporaryGuest']);
+  const {isTemporaryGuest} = useKoSubscribableChildren(selfUser, ['isTemporaryGuest']);
 
   return (
     <div id="access-settings" className="panel__page">
