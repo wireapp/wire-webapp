@@ -9,8 +9,8 @@ jobs:
     runs-on: ubuntu-26.04
 
     env:
-      UNIT_TEST_REPORT_FILE: './unit-tests.log'
-      UNIT_TEST_REPORTS_DIRECTORY: './unit-test-reports'
+      UNIT_TEST_REPORT_FILE: './target/unit-tests.log'
+      UNIT_TEST_REPORTS_DIRECTORY: './target/unit-test-reports'
 
     steps:
       - name: Checkout
@@ -46,12 +46,16 @@ jobs:
       - name: Install JS dependencies
         run: npm clean-install
 
+      - name: Build libraries for Jest tests
+        run: npx nx run-many -t build --projects=tag:type:lib
+
       - name: Generate unit test reports
         id: unit_test_reports
         continue-on-error: true
         env:
           BRANCH: ${{ github.ref_name }}
-        run: npm exec -- ts-node --project ./tsconfig.tools.json ./tools/testReporting/generateUnitTestReports.ts
+          CI: 'true'
+        run: npx ts-node --project ./tsconfig.tools.json ./tools/testReporting/generateUnitTestReports.ts
 
       - name: Upload complete unit test reports
         if: always()
@@ -69,7 +73,7 @@ jobs:
         if: always()
         run: |
           node -e '
-            const manifest = require("./unit-test-reports/manifest.json");
+            const manifest = require("./target/unit-test-reports/manifest.json");
             if (manifest.overallStatus !== "passed") {
               process.exit(1);
             }

@@ -24,7 +24,7 @@ import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSu
 import {mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {loadValue, storeValue} from 'Util/storageUtil';
 
-/* npm exec -- jest --runTestsByPath apps/webapp/src/script/repositories/media/MediaDevicesHandler.test.ts */
+/* npx jest --config apps/webapp/jest.config.ts --runTestsByPath src/script/repositories/media/MediaDevicesHandler.test.ts */
 describe('MediaDevicesHandler', () => {
   /**
    * Test data from a real-world scenario:

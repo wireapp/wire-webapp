@@ -14,13 +14,6 @@
         "command": "jest --clearCache"
       }
     },
-    "test": {
-      "executor": "nx:run-commands",
-      "dependsOn": [],
-      "options": {
-        "command": "jest --config ./tools/jest.config.js"
-      }
-    },
     "build": {
       "executor": "nx:run-commands",
       "options": {

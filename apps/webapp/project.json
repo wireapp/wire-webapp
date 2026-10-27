@@ -70,21 +70,6 @@
         "command": "echo 'Use npm run start from the root to run the Rspack development server'"
       }
     },
-    "test": {
-      "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/apps/webapp"],
-      "options": {
-        "jestConfig": "{projectRoot}/jest.config.ts",
-        "passWithNoTests": false
-      },
-      "configurations": {
-        "ci": {
-          "ci": true,
-          "coverage": true,
-          "coverageReporters": ["html", "lcov", "text"]
-        }
-      }
-    },
     "e2e": {
       "executor": "nx:run-commands",
       "dependsOn": ["^build"],

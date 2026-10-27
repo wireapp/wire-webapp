@@ -27,7 +27,7 @@ No license is granted to the Wire trademark and its associated logos, all of whi
 - `libraries/core/`: `@wireapp/core` package - Wire's communication core library handling authentication, WebSocket connections, and protocol messaging
 - Root-level tooling (`package.json`, `justfile`, Nx, and bin scripts) provides commands shared by apps and libraries
 
-Use `npx just --list` to discover native repository tasks, including all ESLint checks. Nx remains responsible for build, test, compilation, and server tasks that have not migrated yet.
+Use `npx just --list` to discover native repository tasks, including unit tests and ESLint checks. Nx remains responsible for build, compilation, and server tasks that have not migrated yet.
 
 # How to Build the Open Source Client
 
@@ -102,31 +102,31 @@ After updating the environment variables, the app will be available at the corre
 
 Rspack is the sole application bundler for internal and public production builds and local development. Jest continues to use Babel.
 
-1. Build only the internal Rspack WebApp assets: `npm exec -- nx run webapp:build` (or assemble them with `npm run bundle:prod`)
-1. Build and package the default internal Rspack release: `npm run build:prod` (or `npm exec -- nx run server:package`)
+1. Build only the internal Rspack WebApp assets: `npx nx run webapp:build` (or assemble them with `npm run bundle:prod`)
+1. Build and package the default internal Rspack release: `npm run build:prod` (or `npx nx run server:package`)
    - This builds both the server and webapp (in production mode) and creates the deployment package at `apps/server/dist/s3/ebs.zip`
 1. Build and package the default public Rspack release: `npm run build:prod:public`
 1. Start the server output from `apps/server/dist` (or build a Docker image with `npm run docker -- <tag>`)
 
-**Note:** The `zip` command has been deprecated. Packaging is integrated into the build process via `npm run build:prod` or `npm exec -- nx run server:package`.
+**Note:** The `zip` command has been deprecated. Packaging is integrated into the build process via `npm run build:prod` or `npx nx run server:package`.
 
 ## Testing
 
-To launch the full test suite:
+Run all unit tests:
 
 ```bash
-npm exec -- nx run-many -t test --all
+npx just test
 ```
 
-CI runs the Nx/Jest test targets with `--configuration=ci`, which generates coverage, prints the coverage table to the GitHub Actions logs, and fails the `Test` step when project coverage drops below the configured Jest thresholds. Coverage reports are also uploaded as a GitHub Actions artifact for inspection.
+Run `npx just test-ci` to execute each Jest project with coverage and its existing project-specific thresholds. CI uses this command inside the network-isolation wrapper and uploads HTML and LCOV reports for the webapp, server, core, and API client. Use `npx just test-watch` for watch mode.
 
 Other useful tasks:
 
 - Lint: `npx just lint`
 - ESLint only: `npx just eslint`
 - Fix ESLint issues: `npx just eslint-fix`
-- Type-check: `npm exec -- nx run-many -t type-check --all`
-- E2E (Playwright): `npm exec -- nx e2e webapp`
+- Type-check: `npx nx run-many -t type-check --all`
+- E2E (Playwright): `npx nx e2e webapp`
 
 ## CI Status
 

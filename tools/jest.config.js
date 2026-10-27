@@ -17,8 +17,15 @@
  *
  */
 
+const rootJestConfiguration = require('../jest.config.js');
+
 module.exports = {
+  displayName: 'workspace-tools',
   rootDir: '..',
+  roots: ['<rootDir>/tools'],
+  cacheDirectory: '<rootDir>/target/jest/cache',
+  coverageDirectory: '<rootDir>/target/coverage/tools',
+  coverageReporters: rootJestConfiguration.coverageReporters,
   testEnvironment: 'node',
   testMatch: ['<rootDir>/tools/**/*.test.ts'],
   moduleNameMapper: {
@@ -28,4 +35,5 @@ module.exports = {
     '^.+\\.(js|jsx|ts|tsx)$': '@swc/jest',
   },
   transformIgnorePatterns: ['/node_modules/(?!(true-myth|ky|p-map|@enormora/objectory|@sindresorhus/is)/)'],
+  reporters: rootJestConfiguration.reporters,
 };

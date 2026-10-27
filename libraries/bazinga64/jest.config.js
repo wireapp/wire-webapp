@@ -17,6 +17,8 @@
  *
  */
 
+const rootJestConfiguration = require('../../jest.config.js');
+
 module.exports = {
   displayName: 'bazinga64-lib',
   testEnvironment: 'node',
@@ -26,11 +28,14 @@ module.exports = {
     '^.+\\.(js|jsx)$': '@swc/jest',
   },
   transformIgnorePatterns: ['/node_modules/(?!(@sindresorhus/is)/)'],
-  coverageDirectory: '../../coverage/libraries/bazinga64',
+  cacheDirectory: '../../target/jest/cache',
+  coverageDirectory: '../../target/coverage/libraries/bazinga64',
+  coverageReporters: rootJestConfiguration.coverageReporters,
   testMatch: [
     '<rootDir>/src/**/__tests__/**/*.[jt]s?(x)',
     '<rootDir>/src/**/?(*.)+(spec|test).[jt]s?(x)',
     '<rootDir>/spec/**/*.[jt]s?(x)',
   ],
   moduleFileExtensions: ['js', 'json', 'ts', 'tsx'],
+  reporters: rootJestConfiguration.reporters,
 };

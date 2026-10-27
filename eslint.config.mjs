@@ -74,7 +74,6 @@ const ignores = [
   '!**/*.config.test.*',
   '!**/*.config.spec.*',
   'apps/server/bin/copy_server_assets.js',
-  'apps/server/coverage/',
   'apps/server/dist/',
   'apps/server/node_modules/',
   'apps/webapp/src/ext/',

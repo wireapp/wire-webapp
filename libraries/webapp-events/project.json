@@ -27,21 +27,6 @@
         "command": "echo 'Build complete'"
       }
     },
-    "test": {
-      "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/libraries/webapp-events"],
-      "options": {
-        "jestConfig": "{projectRoot}/jest.config.js",
-        "passWithNoTests": true
-      },
-      "configurations": {
-        "ci": {
-          "ci": true,
-          "coverage": true,
-          "coverageReporters": ["lcov", "text"]
-        }
-      }
-    },
     "watch": {
       "executor": "nx:run-commands",
       "options": {
