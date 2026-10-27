@@ -106,7 +106,7 @@ export const CellsBulkMovePreviewModal: FunctionComponent<CellsBulkMovePreviewMo
       setActiveModalContent('move');
     },
     currentPath: destination.currentPath,
-    isOpen,
+    isOpen: isOpen && activeModalContent === 'create',
     validationCopy: {
       genericError: translate('cells.newItemMenuModalForm.genericError'),
       alreadyExistsError: translate('cells.newItemMenuModalForm.alreadyExistsError'),
@@ -147,8 +147,16 @@ export const CellsBulkMovePreviewModal: FunctionComponent<CellsBulkMovePreviewMo
     return folderCreationForm.handleSubmit(event);
   };
 
+  const handleChangeModalContent = (content: 'move' | 'create'): void => {
+    if (folderCreationForm.isSubmitting) {
+      return;
+    }
+
+    setActiveModalContent(content);
+  };
+
   const handleClose = (): void => {
-    if (move.isSubmitting || isMoveRequestPending || isBackgroundMovePending) {
+    if (folderCreationForm.isSubmitting || move.isSubmitting || isMoveRequestPending || isBackgroundMovePending) {
       return;
     }
 
@@ -190,7 +198,7 @@ export const CellsBulkMovePreviewModal: FunctionComponent<CellsBulkMovePreviewMo
       onRetryBackgroundMoveStatus={onRetryBackgroundMoveStatus}
       onRefresh={onRefresh}
       activeModalContent={activeModalContent}
-      onChangeModalContent={setActiveModalContent}
+      onChangeModalContent={handleChangeModalContent}
       canCreateNewFolder={canCreateNewFolder}
       folderCreationForm={{...folderCreationForm, handleSubmit: handleCreateFolder}}
     />

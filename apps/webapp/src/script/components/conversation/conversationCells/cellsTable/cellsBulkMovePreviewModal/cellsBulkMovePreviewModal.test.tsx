@@ -17,7 +17,7 @@
  *
  */
 
-import {render, screen, waitFor, within} from '@testing-library/react';
+import {act, render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {useState, type FunctionComponent} from 'react';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
@@ -57,7 +57,129 @@ const viewerNode = {
   type: CellNodeType.FILE,
 } as unknown as CellNode;
 
+function renderFolderCreationModal(createFolder: CellsRepository['createFolder']): {
+  onClose: jest.Mock;
+  getAllNodes: jest.Mock;
+} {
+  const onClose = jest.fn();
+  const getAllNodes = jest.fn().mockResolvedValue({Nodes: []});
+  const repository = {getAllNodes, createFolder} as unknown as CellsRepository;
+  const wrapper = createRootProviderWrapperForTest(
+    createRootContextValueForTest({
+      translate: translateForTest,
+      fireAndForgetInvoker: createExecutingFireAndForgetInvokerForTest(),
+      clock: createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
+    }),
+  );
+
+  render(
+    <ThemeProvider>
+      <CellsSelfUserDriveRoleProvider selfUserDriveRole={CELLS_SELF_USER_DRIVE_ROLE.EDITOR}>
+        <CellsBulkMovePreviewModal
+          isOpen
+          onClose={onClose}
+          selectedNodes={[viewerNode]}
+          cellsRepository={repository}
+          conversationQualifiedId={{id: 'conversation-id', domain: 'example.com'}}
+          conversationName="Conversation"
+          isMoveOutcomeUnresolved={false}
+          isMoveRequestError={false}
+          isMoveRequestPending={false}
+          onMoveStart={jest.fn()}
+          onMoveResult={() => {
+            return false;
+          }}
+          onMoveError={jest.fn()}
+          isBackgroundMovePending={false}
+          isBackgroundMoveError={false}
+          isBackgroundMoveRetryBlocked={false}
+          isBackgroundMoveStatusUnknown={false}
+          canRetryBackgroundMoveStatus={false}
+          onRetryBackgroundMoveStatus={jest.fn()}
+          onRefresh={jest.fn()}
+        />
+      </CellsSelfUserDriveRoleProvider>
+    </ThemeProvider>,
+    {wrapper},
+  );
+
+  return {onClose, getAllNodes};
+}
+
 describe('CellsBulkMovePreviewModal', () => {
+  it.each(['success', 'failure'])('blocks Back and Close until folder creation finishes with %s', async outcome => {
+    const user = userEvent.setup();
+    const creation = Promise.withResolvers<Awaited<ReturnType<CellsRepository['createFolder']>>>();
+    const createFolder = jest.fn().mockReturnValue(creation.promise);
+    const {onClose, getAllNodes} = renderFolderCreationModal(createFolder);
+    await user.click(await screen.findByRole('button', {name: 'cells.moveNodeModal.createFolder.hintButton'}));
+    await user.type(screen.getByLabelText('cells.newItemMenuModal.labelFolder'), 'New folder');
+
+    await user.click(screen.getByRole('button', {name: 'cells.newItemMenuModal.primaryAction'}));
+    expect(createFolder).toHaveBeenCalledTimes(1);
+    await user.click(screen.getByRole('button', {name: 'cells.newItemMenuModal.secondaryAction'}));
+    await user.click(screen.getByRole('button', {name: 'cells.modal.closeButton'}));
+    await user.keyboard('{Escape}');
+
+    expect(screen.getByRole('heading', {name: 'cells.moveNodeModal.createTitle'})).toBeInTheDocument();
+    expect(onClose).not.toHaveBeenCalled();
+    expect(screen.getByRole('button', {name: 'cells.newItemMenuModal.primaryAction'})).toBeDisabled();
+
+    await act(async () => {
+      if (outcome === 'success') {
+        creation.resolve({});
+      } else {
+        creation.reject(new Error('Folder creation failed'));
+      }
+    });
+
+    if (outcome === 'success') {
+      expect(screen.getByRole('heading', {name: 'cells.moveNodeModal.moveTitle'})).toBeInTheDocument();
+      expect(getAllNodes).toHaveBeenCalledTimes(2);
+    } else {
+      expect(screen.getByText('cells.newItemMenuModalForm.genericError')).toBeInTheDocument();
+      await user.click(screen.getByRole('button', {name: 'cells.newItemMenuModal.secondaryAction'}));
+      expect(screen.getByRole('heading', {name: 'cells.moveNodeModal.moveTitle'})).toBeInTheDocument();
+      await user.click(screen.getByRole('button', {name: 'cells.moveNodeModal.createFolder.hintButton'}));
+      expect(screen.getByLabelText('cells.newItemMenuModal.labelFolder')).toHaveValue('');
+      expect(screen.queryByText('cells.newItemMenuModalForm.genericError')).not.toBeInTheDocument();
+    }
+
+    await user.click(screen.getByRole('button', {name: 'cells.modal.closeButton'}));
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('clears the folder name and validation error when reopening Create from the picker', async () => {
+    const user = userEvent.setup();
+    const createFolder = jest.fn();
+    renderFolderCreationModal(createFolder);
+    await user.click(await screen.findByRole('button', {name: 'cells.moveNodeModal.createFolder.hintButton'}));
+    await user.type(screen.getByLabelText('cells.newItemMenuModal.labelFolder'), 'invalid/name');
+    await user.click(screen.getByRole('button', {name: 'cells.newItemMenuModal.primaryAction'}));
+    expect(screen.getByText('cells.nodeName.invalidCharactersError')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', {name: 'cells.newItemMenuModal.secondaryAction'}));
+    await user.click(screen.getByRole('button', {name: 'cells.moveNodeModal.createFolder.hintButton'}));
+
+    expect(screen.getByLabelText('cells.newItemMenuModal.labelFolder')).toHaveValue('');
+    expect(screen.queryByText('cells.nodeName.invalidCharactersError')).not.toBeInTheDocument();
+    expect(createFolder).not.toHaveBeenCalled();
+  });
+
+  it('clears the successful folder name when creating another folder', async () => {
+    const user = userEvent.setup();
+    const createFolder = jest.fn().mockResolvedValue({});
+    renderFolderCreationModal(createFolder);
+    await user.click(await screen.findByRole('button', {name: 'cells.moveNodeModal.createFolder.hintButton'}));
+    await user.type(screen.getByLabelText('cells.newItemMenuModal.labelFolder'), 'New folder');
+    await user.click(screen.getByRole('button', {name: 'cells.newItemMenuModal.primaryAction'}));
+    expect(createFolder).toHaveBeenCalledWith({path: 'conversation-id@example.com', name: 'New folder'});
+
+    await user.click(await screen.findByRole('button', {name: 'cells.moveNodeModal.createFolder.hintButton'}));
+
+    expect(screen.getByLabelText('cells.newItemMenuModal.labelFolder')).toHaveValue('');
+  });
+
   it('returns to the picker when the drive role changes to viewer', async () => {
     const user = userEvent.setup();
     const repository = {
