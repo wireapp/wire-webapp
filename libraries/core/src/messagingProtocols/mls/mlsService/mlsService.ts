@@ -123,7 +123,7 @@ export enum MLSServiceEvents {
 
 type Events = {
   [MLSServiceEvents.KEY_MATERIAL_UPDATE_FAILURE]: {error: unknown; groupId: string};
-  [MLSServiceEvents.NEW_EPOCH]: {epoch: number; groupId: string};
+  [MLSServiceEvents.NEW_EPOCH]: {epoch: bigint; groupId: string};
   [MLSServiceEvents.MLS_CLIENT_MISMATCH]: void;
   [MLSServiceEvents.MLS_EVENT_DISTRIBUTED]: {
     events: any;
@@ -561,7 +561,7 @@ export class MLSService extends TypedEventEmitter<Events> {
   /**
    * @deprecated Use `getSafeEpoch` to receive a `Task` with explicit error handling.
    */
-  public getEpoch(groupId: string | Uint8Array): Promise<number> {
+  public getEpoch(groupId: string | Uint8Array): Promise<bigint> {
     const groupIdBytes = typeof groupId === 'string' ? Decoder.fromBase64(groupId).asBytes : groupId;
     return this.coreCryptoClient.conversationEpoch(new ConversationId(groupIdBytes));
   }
@@ -576,7 +576,7 @@ export class MLSService extends TypedEventEmitter<Events> {
    * `MlsErrorOther: Couldn't find conversation` (for example when the group is
    * not present on core-crypto level).
    */
-  public getSafeEpoch(groupId: string | Uint8Array): Task<number, unknown> {
+  public getSafeEpoch(groupId: string | Uint8Array): Task<bigint, unknown> {
     return task.tryOrElse(
       errorReason => {
         return `Failed to get safe epoch for group ${groupId}: ${errorReason}`;
@@ -618,7 +618,7 @@ export class MLSService extends TypedEventEmitter<Events> {
   public async exportSecretKey(groupId: string, keyLength: number): Promise<string> {
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
     const key = await this.coreCryptoClient.exportSecretKey(new ConversationId(groupIdBytes), keyLength);
-    return Encoder.toBase64(key).asString;
+    return Encoder.toBase64(key.copyBytes()).asString;
   }
 
   public async processWelcomeMessage(welcomeMessage: Uint8Array): Promise<ConversationId> {
@@ -643,7 +643,7 @@ export class MLSService extends TypedEventEmitter<Events> {
       return decryptedMessage;
     } catch (error: unknown) {
       // This is safe (read-only) and helps correlate decryption failures with local epoch.
-      const coreCryptoEpochNumber = await task.tryOrElse<number, unknown>(
+      const coreCryptoEpochNumber = await task.tryOrElse<bigint, unknown>(
         errorReason => {
           return `Failed to collect epoch details for decryption failure: ${conversationId}: ${errorReason}`;
         },

@@ -197,7 +197,7 @@ export class MLSConversationVerificationStateHandler {
       }),
     );
   };
-  private onEpochChanged = async ({groupId, epoch: newEpoch}: {groupId: string; epoch: number}): Promise<void> => {
+  private onEpochChanged = async ({groupId, epoch: newEpoch}: {groupId: string; epoch: bigint}): Promise<void> => {
     // There could be a race condition where we would receive an epoch update for a conversation that is not yet known by the webapp.
     // We just wait for it to be available and then check the verification state
     const conversation = await waitFor(() => {

@@ -5051,11 +5051,11 @@ export class ConversationRepository {
 
       let epoch = 0;
       if (existingConversation) {
-        const newEpoch: number = await mlsService.getEpoch(newGroupId);
+        const newEpoch: bigint = await mlsService.getEpoch(newGroupId);
         this.logger.info('An MLS conversation with the new group ID already exists fetched epoch from core crypto', {
           newEpoch,
         });
-        epoch = newEpoch;
+        epoch = Number(newEpoch);
       }
 
       const updatedConversation = ConversationMapper.updateProperties(conversationEntity, {

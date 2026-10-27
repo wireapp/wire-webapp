@@ -519,14 +519,14 @@ describe('MLSService', () => {
       const groupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm3OQFc=';
 
       jest.spyOn(coreCrypto, 'conversationExists').mockResolvedValueOnce(true);
-      jest.spyOn(mlsService, 'getEpoch').mockResolvedValueOnce(0);
+      jest.spyOn(mlsService, 'getEpoch').mockResolvedValueOnce(0n);
 
       const isEstablshed = await mlsService.isConversationEstablished(groupId);
 
       expect(isEstablshed).toBe(false);
     });
 
-    it.each([1, 2, 100])('returns false if epoch number is 1 or more', async epoch => {
+    it.each([1n, 2n, 100n])('returns false if epoch number is 1 or more', async epoch => {
       const [mlsService, {coreCrypto}] = await createMLSService();
 
       const groupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm3OQFc=';
@@ -1256,7 +1256,7 @@ describe('MLSService', () => {
       const [mlsService, {transactionContext, coreCrypto}] = await createMLSService();
 
       const mockGroupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm3OQFc=';
-      const mockedNewEpoch = 3;
+      const mockedNewEpoch = 3n;
 
       const getGroupIdFromConversationId = (): Promise<string> => {
         return Promise.resolve(mockGroupId);
@@ -1285,7 +1285,7 @@ describe('MLSService', () => {
       jest.useFakeTimers();
 
       const mockGroupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm3OQFc=';
-      const mockedNewEpoch = 3;
+      const mockedNewEpoch = 3n;
       const commitDelay = 1n;
 
       const getGroupIdFromConversationId = (): Promise<string> => {
