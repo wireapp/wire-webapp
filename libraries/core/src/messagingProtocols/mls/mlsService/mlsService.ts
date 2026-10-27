@@ -116,12 +116,6 @@ export type InitClientOptions = Optional<MLSConfig, 'keyingMaterialUpdateThresho
   skipInitIdentity?: boolean;
 };
 
-//@todo: this function is temporary, we wait for the update from core-crypto side
-//they are returning regular array instead of Uint8Array for commit and welcome messages
-export const optionalToUint8Array = (array: Uint8Array | []): Uint8Array => {
-  return Array.isArray(array) ? Uint8Array.from(array) : array;
-};
-
 const defaultConfig = {
   keyingMaterialUpdateThreshold: TimeUtil.TimeInMillis.DAY * keyingMaterialLifetimeInDays,
   nbKeyPackages: 100,
@@ -660,7 +654,6 @@ export class MLSService extends TypedEventEmitter<Events> {
       const decryptedMessage = await this.coreCryptoClient.transaction(cx => {
         return cx.decryptMessage(conversationId, payload);
       });
-      this.dispatchNewCrlDistributionPoints(decryptedMessage.crlNewDistributionPoints);
       await this.resumePendingProposalsAfterIncomingMessage(conversationId);
       this.logger.info('Message decrypted successfully', {qualifiedConversationId, duration: Date.now() - start});
       return decryptedMessage;
@@ -688,10 +681,7 @@ export class MLSService extends TypedEventEmitter<Events> {
       });
       // According to CoreCrypto JS doc on .decryptMessage method, we should ignore some errors (corecrypto handle them internally)
       if (shouldMLSDecryptionErrorBeIgnored(error)) {
-        return {
-          hasEpochChanged: false,
-          isActive: false,
-        };
+        return undefined;
       }
       throw error;
     }
@@ -1394,7 +1384,7 @@ export class MLSService extends TypedEventEmitter<Events> {
       conversationId: QualifiedId,
       subconversationId?: SUBCONVERSATION_ID,
     ) => Promise<string | undefined>,
-  ): Promise<HandledEventPayload | null> {
+  ): Promise<HandledEventPayload[]> {
     const qualifiedConversationId = event.qualified_conversation ?? {id: event.conversation, domain: ''};
 
     const groupId = await groupIdFromConversationId(qualifiedConversationId, event.subconv);

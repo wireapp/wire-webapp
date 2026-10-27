@@ -1176,10 +1176,10 @@ export class ConversationService extends TypedEventEmitter<Events> {
    * - WrongEpoch during notification replay → defer recovery until runDeferredEpochRecovery.
    * - GroupOutOfSync.handleMessageAdd → not handled here; the error bubbles.
    *
-   * Returns the decrypted payload when available. Unknown or unrecoverable errors are logged
-   * and result in null so event processing can continue safely.
+   * Returns decrypted payloads when available. Unknown or unrecoverable errors are logged
+   * and result in an empty list so event processing can continue safely.
    */
-  private async handleMLSMessageAddEvent(event: ConversationMLSMessageAddEvent): Promise<HandledEventPayload | null> {
+  private async handleMLSMessageAddEvent(event: ConversationMLSMessageAddEvent): Promise<HandledEventPayload[]> {
     try {
       const {qualified_conversation: qualifiedConversationId, subconv} = event;
       if (qualifiedConversationId === undefined) {
@@ -1189,7 +1189,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
         throw new Error('MLSService is required to handle MLS message-add event');
       }
 
-      return await requireMlsRecoveryOrchestrator(this.MLSRecoveryOrchestrator).execute<HandledEventPayload | null>({
+      return await requireMlsRecoveryOrchestrator(this.MLSRecoveryOrchestrator).execute<HandledEventPayload[]>({
         context: {
           operationName: OperationName.handleMessageAdd,
           qualifiedConversationId,
@@ -1201,24 +1201,24 @@ export class ConversationService extends TypedEventEmitter<Events> {
       });
     } catch (error: unknown) {
       if (error instanceof MlsEpochRecoveryDeferredError) {
-        this.logger.info('MLS message-add skipped until notification replay completes; returning null', {
+        this.logger.info('MLS message-add skipped until notification replay completes; returning no payloads', {
           conversationId: error.conversationId,
           subconvId: error.subconvId,
         });
-        return null;
+        return [];
       }
 
       // For unmapped or unrecoverable errors, avoid surfacing exceptions from event handling
-      // and instead log and return null so the event processing queue can continue safely.
+      // and instead log and return no payloads so the event processing queue can continue safely.
       const isSafeMissingSubconversationGroup = event.subconv !== undefined && isMlsConversationNotFoundError(error);
 
       this.logger.error(
         isSafeMissingSubconversationGroup
-          ? 'MLS message-add for subconversation skipped: local group missing (safe after leave); returning null'
-          : 'Failed to handle MLS message-add event after recovery; returning null',
+          ? 'MLS message-add for subconversation skipped: local group missing (safe after leave); returning no payloads'
+          : 'Failed to handle MLS message-add event after recovery; returning no payloads',
         {error, event},
       );
-      return null;
+      return [];
     }
   }
 

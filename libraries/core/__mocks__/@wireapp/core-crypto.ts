@@ -103,11 +103,75 @@ class ByteContainer {
 
 export class Welcome extends ByteContainer {}
 export class GroupInfo extends ByteContainer {}
-export class ClientId extends ByteContainer {}
+export class Uuid extends ByteContainer {
+  constructor(value: string) {
+    super(new TextEncoder().encode(value));
+  }
+  toString(): string {
+    return new TextDecoder().decode(this.bytes);
+  }
+}
+export class DeviceId extends ByteContainer {
+  private constructor(value: string) {
+    super(new TextEncoder().encode(value));
+  }
+  static fromHexString(value: string): DeviceId {
+    return new DeviceId(value);
+  }
+  toHexString(): string {
+    return new TextDecoder().decode(this.bytes);
+  }
+  toU64(): bigint {
+    return BigInt(`0x${this.toHexString()}`);
+  }
+}
+export class ClientId extends ByteContainer {
+  constructor(userId: Uuid, deviceId: DeviceId, domain: string) {
+    super(new TextEncoder().encode(`${userId.toString()}:${deviceId.toU64().toString(16)}@${domain}`));
+  }
+}
 export class ConversationId extends ByteContainer {}
 export class ExternalSenderKey extends ByteContainer {}
 export class KeyPackage extends ByteContainer {}
 export class SecretKey extends ByteContainer {}
+
+type TaggedVariant<Tag extends string, Inner> = {
+  tag: Tag;
+  inner: Inner;
+};
+
+const variant = <Tag extends string, Inner>(tag: Tag, inner: Inner): TaggedVariant<Tag, Inner> => {
+  return {tag, inner};
+};
+
+const isVariant = <Tag extends string>(value: unknown, tag: Tag): value is TaggedVariant<Tag, unknown> => {
+  return typeof value === 'object' && value !== null && 'tag' in value && value.tag === tag;
+};
+
+const decryptedMessageVariant = <Tag extends string>(tag: Tag) => {
+  return {
+    new: <Inner>(inner: Inner) => variant(tag, inner),
+    instanceOf: (value: unknown) => isVariant(value, tag),
+  };
+};
+
+export const DecryptedMessage = {
+  ApplicationMessage: decryptedMessageVariant('ApplicationMessage'),
+  Commit: decryptedMessageVariant('Commit'),
+  Proposal: decryptedMessageVariant('Proposal'),
+  Transient: decryptedMessageVariant('Transient'),
+  TransientTargeted: decryptedMessageVariant('TransientTargeted'),
+  PersistedTargeted: decryptedMessageVariant('PersistedTargeted'),
+};
+
+export const BufferedDecryptedMessage = {
+  ApplicationMessage: decryptedMessageVariant('ApplicationMessage'),
+  Commit: decryptedMessageVariant('Commit'),
+  Proposal: decryptedMessageVariant('Proposal'),
+  Transient: decryptedMessageVariant('Transient'),
+  TransientTargeted: decryptedMessageVariant('TransientTargeted'),
+  PersistedTargeted: decryptedMessageVariant('PersistedTargeted'),
+};
 
 type TaggedError<Tag extends string, Inner> = Error & {
   tag: Tag;

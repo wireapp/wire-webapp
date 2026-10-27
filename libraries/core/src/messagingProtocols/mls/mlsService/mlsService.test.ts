@@ -49,12 +49,14 @@ import {
   CredentialRef,
   CredentialType,
   DecryptedMessage,
+  DeviceStatus,
   ExternalSender,
   KeyPackage,
   KeyPackageRef,
   MlsTransportError,
   MlsError,
   SignatureScheme,
+  WireIdentity,
 } from '@wireapp/core-crypto';
 
 import {UPLOAD_COMMIT_BUNDLE_ABORT_REASONS, serializeAbortReason} from './coreCryptoMlsError';
@@ -100,6 +102,12 @@ const mockGroupId = 'Z3JvdXAtdGVzdC0x';
 const mockedMLSWelcomeEventData = '';
 
 const apiClients: APIClient[] = [];
+
+const mockWireIdentity: WireIdentity = {
+  credentialType: CredentialType.Basic,
+  status: DeviceStatus.Valid,
+  thumbprint: 'mock-thumbprint',
+};
 
 const createCredentialRef = (credentialType: CredentialType, earliestValidity = 0n): CredentialRef => {
   return {
@@ -1172,9 +1180,9 @@ describe('MLSService', () => {
       expect(transactionContext.commitPendingProposals).toHaveBeenCalledTimes(1);
       await expect(coreDatabase.get('pendingProposals', groupId)).resolves.toEqual({groupId, firingDate});
 
-      transactionContext.decryptMessage.mockResolvedValue({
-        crlNewDistributionPoints: [],
-      } as unknown as DecryptedMessage);
+      transactionContext.decryptMessage.mockResolvedValue(
+        DecryptedMessage.Commit.new({identity: mockWireIdentity, isActive: true}),
+      );
       await mlsService.decryptMessage(new ConversationId(Decoder.fromBase64(groupId).asBytes), new Uint8Array(), {
         domain: 'example.com',
         id: randomUUID(),
@@ -1254,10 +1262,7 @@ describe('MLSService', () => {
         return Promise.resolve(mockGroupId);
       };
 
-      const mockedDecryptoedMessage: DecryptedMessage = {
-        hasEpochChanged: true,
-        isActive: false,
-      };
+      const mockedDecryptoedMessage = DecryptedMessage.Commit.new({identity: mockWireIdentity, isActive: false});
 
       jest.spyOn(transactionContext, 'decryptMessage').mockResolvedValueOnce(mockedDecryptoedMessage);
       jest.spyOn(coreCrypto, 'conversationEpoch').mockResolvedValueOnce(mockedNewEpoch);
@@ -1281,17 +1286,16 @@ describe('MLSService', () => {
 
       const mockGroupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm3OQFc=';
       const mockedNewEpoch = 3;
-      const commitDelay = 1000;
+      const commitDelay = 1n;
 
       const getGroupIdFromConversationId = (): Promise<string> => {
         return Promise.resolve(mockGroupId);
       };
 
-      const mockedDecryptoedMessage: DecryptedMessage = {
-        hasEpochChanged: true,
-        isActive: false,
-        commitDelay,
-      };
+      const mockedDecryptoedMessage = DecryptedMessage.Proposal.new({
+        delay: commitDelay,
+        identity: mockWireIdentity,
+      });
 
       jest.spyOn(transactionContext, 'decryptMessage').mockResolvedValueOnce(mockedDecryptoedMessage);
       jest.spyOn(coreCrypto, 'conversationEpoch').mockResolvedValueOnce(mockedNewEpoch);
@@ -1309,7 +1313,7 @@ describe('MLSService', () => {
 
       await mlsService.handleMLSMessageAddEvent(mockedMLSWelcomeEvent, getGroupIdFromConversationId);
 
-      jest.advanceTimersByTime(commitDelay);
+      jest.advanceTimersByTime(Number(commitDelay) * TimeInMillis.SECOND);
       expect(transactionContext.decryptMessage).toHaveBeenCalled();
     });
 
