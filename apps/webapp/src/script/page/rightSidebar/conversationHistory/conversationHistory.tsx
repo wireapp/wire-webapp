@@ -49,7 +49,12 @@ export interface AccessProps {
   teamState: TeamState;
 }
 
-export const ConversationHistory: FunctionComponent<AccessProps> = ({onGoBack, onClose, selfUser, teamState}: AccessProps) => {
+export const ConversationHistory: FunctionComponent<AccessProps> = ({
+  onGoBack,
+  onClose,
+  selfUser,
+  teamState,
+}: AccessProps) => {
   const {translate} = useApplicationContext();
   const [chatHistory, setChatHistory] = useState<ChatHistory>(ChatHistory.OneDay);
   const [historySharingQuantity, setHistorySharingQuantity] = useState(1);

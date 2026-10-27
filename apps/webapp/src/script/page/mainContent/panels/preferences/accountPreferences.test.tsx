@@ -69,22 +69,22 @@ function withTeamCreationEnabled(testFunction: TestFunction): IsolatedTestFuncti
   };
 }
 
-function createMockProps() {
-  return {
-    appLockRepository: {} as unknown as AppLockRepository,
-    importFile: jest.fn(),
-    clientRepository: {} as unknown as ClientRepository,
-    conversationRepository: {leaveGuestRoom: jest.fn()} as unknown as ConversationRepository,
-    propertiesRepository: {} as unknown as PropertiesRepository,
-    switchContent: jest.fn(),
-    userRepository: {} as unknown as UserRepository,
-  };
-}
-
 function renderAccountPreferences(selfUser: User): ReturnType<typeof render> {
-  return render(withTheme(<AccountPreferences {...createMockProps()} selfUser={selfUser} />), {
-    wrapper: rootProviderWrapper,
-  });
+  return render(
+    withTheme(
+      <AccountPreferences
+        appLockRepository={{} as unknown as AppLockRepository}
+        importFile={jest.fn()}
+        clientRepository={{} as unknown as ClientRepository}
+        conversationRepository={{leaveGuestRoom: jest.fn()} as unknown as ConversationRepository}
+        propertiesRepository={{} as unknown as PropertiesRepository}
+        switchContent={jest.fn()}
+        userRepository={{} as unknown as UserRepository}
+        selfUser={selfUser}
+      />,
+    ),
+    {wrapper: rootProviderWrapper},
+  );
 }
 
 describe('AccountPreferences — team creation header', () => {
