@@ -83,7 +83,6 @@ function renderFolderCreationModal(createFolder: CellsRepository['createFolder']
           conversationQualifiedId={{id: 'conversation-id', domain: 'example.com'}}
           conversationName="Conversation"
           isMoveOutcomeUnresolved={false}
-          isMoveRequestError={false}
           isMoveRequestPending={false}
           onMoveStart={jest.fn()}
           onMoveResult={() => {
@@ -94,9 +93,6 @@ function renderFolderCreationModal(createFolder: CellsRepository['createFolder']
           isBackgroundMoveError={false}
           isBackgroundMoveRetryBlocked={false}
           isBackgroundMoveStatusUnknown={false}
-          canRetryBackgroundMoveStatus={false}
-          onRetryBackgroundMoveStatus={jest.fn()}
-          onRefresh={jest.fn()}
         />
       </CellsSelfUserDriveRoleProvider>
     </ThemeProvider>,
@@ -214,8 +210,6 @@ describe('CellsBulkMovePreviewModal', () => {
               conversationQualifiedId={{id: 'conversation-id', domain: 'example.com'}}
               conversationName="Conversation"
               isMoveOutcomeUnresolved={false}
-              isPartialMoveOutcome={false}
-              isMoveRequestError={false}
               isMoveRequestPending={false}
               onMoveStart={jest.fn()}
               onMoveResult={() => {
@@ -226,10 +220,6 @@ describe('CellsBulkMovePreviewModal', () => {
               isBackgroundMoveError={false}
               isBackgroundMoveRetryBlocked={false}
               isBackgroundMoveStatusUnknown={false}
-              canRetryBackgroundMoveStatus={false}
-              onRetryBackgroundMoveStatus={jest.fn()}
-              onRefreshAfterBulkMoveOutcome={jest.fn()}
-              isRefreshingBulkMoveOutcome={false}
             />
           </CellsSelfUserDriveRoleProvider>
         </>
@@ -279,8 +269,6 @@ describe('CellsBulkMovePreviewModal', () => {
             conversationQualifiedId={{id: 'conversation-id', domain: 'example.com'}}
             conversationName="Conversation"
             isMoveOutcomeUnresolved={false}
-            isPartialMoveOutcome={false}
-            isMoveRequestError={false}
             isMoveRequestPending={false}
             onMoveStart={jest.fn()}
             onMoveResult={() => {
@@ -291,10 +279,6 @@ describe('CellsBulkMovePreviewModal', () => {
             isBackgroundMoveError={false}
             isBackgroundMoveRetryBlocked={false}
             isBackgroundMoveStatusUnknown={false}
-            canRetryBackgroundMoveStatus={false}
-            onRetryBackgroundMoveStatus={jest.fn()}
-            onRefreshAfterBulkMoveOutcome={jest.fn()}
-            isRefreshingBulkMoveOutcome={false}
           />
         </CellsSelfUserDriveRoleProvider>
       </ThemeProvider>,

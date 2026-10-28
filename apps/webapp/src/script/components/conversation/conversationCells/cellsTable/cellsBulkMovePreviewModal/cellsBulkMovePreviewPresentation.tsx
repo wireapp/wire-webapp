@@ -54,18 +54,9 @@ interface CellsBulkMovePreviewPresentationProps {
   onMoveStart: (summary: SharedDriveMoveSummary) => void;
   onMoveResult: (response: RestPerformActionResponse, summary: SharedDriveMoveSummary) => boolean;
   onMoveError: () => void;
-  isMoveOutcomeUnresolved: boolean;
-  isPartialMoveOutcome: boolean;
-  isMoveRequestError: boolean;
   isMoveDisabled: boolean;
   isMoveLoading: boolean;
   isBackgroundMovePending: boolean;
-  isBackgroundMoveError: boolean;
-  isBackgroundMoveStatusUnknown: boolean;
-  canRetryBackgroundMoveStatus: boolean;
-  onRetryBackgroundMoveStatus: () => void;
-  onRefreshAfterBulkMoveOutcome: () => void;
-  isRefreshingBulkMoveOutcome: boolean;
   activeModalContent: 'move' | 'create';
   onChangeModalContent: (content: 'move' | 'create') => void;
   canCreateNewFolder: boolean;
@@ -83,18 +74,9 @@ export const CellsBulkMovePreviewPresentation: FunctionComponent<CellsBulkMovePr
   onMoveStart,
   onMoveResult,
   onMoveError,
-  isMoveOutcomeUnresolved,
-  isPartialMoveOutcome,
-  isMoveRequestError,
   isMoveDisabled,
   isMoveLoading,
   isBackgroundMovePending,
-  isBackgroundMoveError,
-  isBackgroundMoveStatusUnknown,
-  canRetryBackgroundMoveStatus,
-  onRetryBackgroundMoveStatus,
-  onRefreshAfterBulkMoveOutcome,
-  isRefreshingBulkMoveOutcome,
   activeModalContent,
   onChangeModalContent,
   canCreateNewFolder,
@@ -116,15 +98,6 @@ export const CellsBulkMovePreviewPresentation: FunctionComponent<CellsBulkMovePr
       destinationPath: destinationPath.length > 0 ? destinationPath : translate('cells.sharedDrive.title'),
     };
     onMoveStart(moveSummary);
-
-    // Temporary local preview: bypass the request so no Drive items are moved.
-    if (
-      process.env.NODE_ENV === 'development' &&
-      new URLSearchParams(window.location.search).get('simulateBulkMoveFailure') === '1'
-    ) {
-      onMoveError();
-      return;
-    }
 
     const moveResult = await onMove();
     if (!isCurrentDialog.current) {
@@ -163,41 +136,6 @@ export const CellsBulkMovePreviewPresentation: FunctionComponent<CellsBulkMovePr
               return path;
             }}
           />
-          {isMoveOutcomeUnresolved && !isBackgroundMoveError && !isBackgroundMoveStatusUnknown && (
-            <div role="alert">
-              <p>
-                {isMoveRequestError
-                  ? translate('cells.bulkMove.requestFailed')
-                  : translate(
-                      isPartialMoveOutcome ? 'cells.bulkMove.partialMoveWarning' : 'cells.bulkMove.finishedUnknown',
-                    )}
-              </p>
-              <button type="button" onClick={onRefreshAfterBulkMoveOutcome} disabled={isRefreshingBulkMoveOutcome}>
-                {translate('cells.bulkMove.refreshDrive')}
-              </button>
-            </div>
-          )}
-          {isBackgroundMoveError && (
-            <div role="alert">
-              <p>{translate('cells.bulkMove.allJobsFailed')}</p>
-              <button type="button" onClick={onRefreshAfterBulkMoveOutcome} disabled={isRefreshingBulkMoveOutcome}>
-                {translate('cells.bulkMove.refreshDrive')}
-              </button>
-            </div>
-          )}
-          {isBackgroundMoveStatusUnknown && (
-            <div role="alert">
-              <p>{translate('cells.bulkMove.statusUnknown')}</p>
-              {canRetryBackgroundMoveStatus && (
-                <button type="button" onClick={onRetryBackgroundMoveStatus}>
-                  {translate('cells.bulkMove.checkStatus')}
-                </button>
-              )}
-              <button type="button" onClick={onRefreshAfterBulkMoveOutcome} disabled={isRefreshingBulkMoveOutcome}>
-                {translate('cells.bulkMove.refreshDrive')}
-              </button>
-            </div>
-          )}
           <CellsModal.Actions>
             {!isBackgroundMovePending && (
               <CellsModal.SecondaryButton onClick={onClose}>

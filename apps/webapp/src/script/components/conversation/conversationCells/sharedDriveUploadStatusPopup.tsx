@@ -123,7 +123,7 @@ const getMoveRowStatusKind = (move: SharedDriveMoveStatus): SharedDriveUploadSta
   if (move.kind === 'completed') {
     return 'uploaded';
   }
-  return 'failed';
+  return 'queued';
 };
 
 const statusIcon = (upload: SharedDriveUploadStatus): ReactNode => {

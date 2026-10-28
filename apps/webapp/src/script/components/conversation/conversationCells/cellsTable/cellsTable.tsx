@@ -263,7 +263,7 @@ export const CellsTable = ({
     }
     backgroundMoveSummary.current = Maybe.nothing();
     setIsBulkMoveRequestPending(false);
-    setIsBulkMovePreviewOpen(true);
+    setIsBulkMovePreviewOpen(false);
     setIsBulkMoveOutcomeUnresolved(true);
     setIsBulkMovePartialOutcome(false);
     setIsBulkMoveRequestError(true);
@@ -331,11 +331,10 @@ export const CellsTable = ({
           updateMoveStatus({id: moveStatusId, kind: 'status-unknown', ...backgroundMoveSummary.current.value});
         }
         activeMoveStatusId.current = Maybe.just(moveStatusId);
-        backgroundMoveSummary.current = Maybe.nothing();
         setIsBackgroundMovePending(false);
         setIsBackgroundMoveStatusUnknown(true);
         setIsBulkMoveOutcomeUnresolved(true);
-        setIsBulkMovePreviewOpen(true);
+        setIsBulkMovePreviewOpen(false);
         return;
       }
 
@@ -400,7 +399,7 @@ export const CellsTable = ({
         setIsBulkMoveOutcomeUnresolved(true);
         setIsBulkMovePartialOutcome(false);
         setIsBulkMoveRequestError(false);
-        setIsBulkMovePreviewOpen(true);
+        setIsBulkMovePreviewOpen(false);
         return;
       }
 
@@ -432,7 +431,7 @@ export const CellsTable = ({
         setIsBulkMoveRequestError(false);
         backgroundMoveSummary.current = Maybe.nothing();
         setBackgroundMoveStatusId('');
-        setIsBulkMovePreviewOpen(true);
+        setIsBulkMovePreviewOpen(false);
         return;
       }
 
@@ -450,7 +449,7 @@ export const CellsTable = ({
       setIsBulkMoveRequestError(false);
       backgroundMoveSummary.current = Maybe.nothing();
       setBackgroundMoveStatusId('');
-      setIsBulkMovePreviewOpen(true);
+      setIsBulkMovePreviewOpen(false);
     };
 
     void checkBackgroundMoveStatus();
@@ -520,7 +519,7 @@ export const CellsTable = ({
       setIsBulkMoveRequestError(false);
       setIsBackgroundMovePending(false);
       setIsBackgroundMoveRetryBlocked(true);
-      setIsBulkMovePreviewOpen(true);
+      setIsBulkMovePreviewOpen(false);
       return false;
     }
 
@@ -547,7 +546,7 @@ export const CellsTable = ({
       setIsBulkMoveOutcomeUnresolved(true);
       setIsBackgroundMovePending(false);
       setIsBackgroundMoveStatusUnknown(true);
-      setIsBulkMovePreviewOpen(true);
+      setIsBulkMovePreviewOpen(false);
       return false;
     }
 
@@ -569,7 +568,15 @@ export const CellsTable = ({
     }
 
     setIsBackgroundMoveStatusUnknown(false);
+    setIsBulkMoveOutcomeUnresolved(false);
     setIsBackgroundMovePending(true);
+    if (maybe.isJust(backgroundMoveSummary.current)) {
+      updateMoveStatus({
+        id: backgroundMoveStatusId,
+        kind: 'processing',
+        ...backgroundMoveSummary.current.value,
+      });
+    }
     setBackgroundMoveStatusCheckId(currentCheckId => {
       return currentCheckId + 1;
     });
@@ -794,8 +801,6 @@ export const CellsTable = ({
               conversationQualifiedId={conversationQualifiedId}
               conversationName={conversationName}
               isMoveOutcomeUnresolved={isBulkMoveOutcomeUnresolved}
-              isPartialMoveOutcome={isBulkMovePartialOutcome}
-              isMoveRequestError={isBulkMoveRequestError}
               isMoveRequestPending={isBulkMoveRequestPending}
               onMoveStart={handleBulkMoveStart}
               onMoveResult={handleBulkMoveResult}
@@ -803,11 +808,6 @@ export const CellsTable = ({
               isBackgroundMovePending={isBackgroundMovePending}
               isBackgroundMoveError={isBackgroundMoveError}
               isBackgroundMoveRetryBlocked={isBackgroundMoveRetryBlocked}
-              isBackgroundMoveStatusUnknown={isBackgroundMoveStatusUnknown}
-              canRetryBackgroundMoveStatus={backgroundMoveJobUuids.length > 0}
-              onRetryBackgroundMoveStatus={handleRetryBackgroundMoveStatus}
-              onRefreshAfterBulkMoveOutcome={handleRefreshAfterBulkMoveOutcome}
-              isRefreshingBulkMoveOutcome={isRefreshingBulkMoveOutcome}
             />
           )}
         {activeFolderDropTargetName !== null && (
@@ -840,6 +840,16 @@ export const CellsTable = ({
             >
               {translate('cells.bulkMove.refreshDrive')}
             </button>
+            {isBackgroundMoveStatusUnknown && backgroundMoveJobUuids.length > 0 && (
+              <button
+                css={bulkMoveButtonStyles}
+                type="button"
+                onClick={handleRetryBackgroundMoveStatus}
+                disabled={isBackgroundMovePending}
+              >
+                {translate('cells.bulkMove.checkStatus')}
+              </button>
+            )}
           </div>
         )}
         <table css={tableStyles}>

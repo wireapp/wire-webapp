@@ -212,6 +212,7 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     expect(screen.getByRole('alert')).toHaveTextContent(warning);
     expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
     expect(screen.getByRole('listitem')).toHaveTextContent('mockup.pdf');
+    expect(screen.getByRole('listitem')).not.toHaveTextContent(/failed/i);
   });
 
   it('keeps a dismissed pending move hidden across status updates without cancelling it', async () => {

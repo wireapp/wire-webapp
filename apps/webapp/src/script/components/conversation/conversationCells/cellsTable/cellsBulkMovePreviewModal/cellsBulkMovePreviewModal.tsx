@@ -47,20 +47,14 @@ interface CellsBulkMovePreviewModalProps {
   conversationQualifiedId: QualifiedId;
   conversationName: string;
   isMoveOutcomeUnresolved: boolean;
-  isPartialMoveOutcome: boolean;
-  isMoveRequestError: boolean;
   isMoveRequestPending: boolean;
   onMoveStart: (summary: SharedDriveMoveSummary) => void;
   onMoveResult: (response: RestPerformActionResponse, summary: SharedDriveMoveSummary) => boolean;
-  onMoveError: () => void;
+  onMoveError: (isSimulated?: boolean) => void;
   isBackgroundMovePending: boolean;
   isBackgroundMoveError: boolean;
   isBackgroundMoveRetryBlocked: boolean;
   isBackgroundMoveStatusUnknown: boolean;
-  canRetryBackgroundMoveStatus: boolean;
-  onRetryBackgroundMoveStatus: () => void;
-  onRefreshAfterBulkMoveOutcome: () => void;
-  isRefreshingBulkMoveOutcome: boolean;
 }
 
 export const CellsBulkMovePreviewModal: FunctionComponent<CellsBulkMovePreviewModalProps> = ({
@@ -71,8 +65,6 @@ export const CellsBulkMovePreviewModal: FunctionComponent<CellsBulkMovePreviewMo
   conversationQualifiedId,
   conversationName,
   isMoveOutcomeUnresolved,
-  isPartialMoveOutcome,
-  isMoveRequestError,
   isMoveRequestPending,
   onMoveStart,
   onMoveResult,
@@ -81,10 +73,6 @@ export const CellsBulkMovePreviewModal: FunctionComponent<CellsBulkMovePreviewMo
   isBackgroundMoveError,
   isBackgroundMoveRetryBlocked,
   isBackgroundMoveStatusUnknown,
-  canRetryBackgroundMoveStatus,
-  onRetryBackgroundMoveStatus,
-  onRefreshAfterBulkMoveOutcome,
-  isRefreshingBulkMoveOutcome,
 }: CellsBulkMovePreviewModalProps) => {
   const {fireAndForgetInvoker, translate} = useApplicationContext();
   const canPerformDriveAction = useCellsActionPermissions();
@@ -181,9 +169,6 @@ export const CellsBulkMovePreviewModal: FunctionComponent<CellsBulkMovePreviewMo
       })}
       destinationPath={destination.selectedDestinationPath}
       onMoveError={onMoveError}
-      isMoveOutcomeUnresolved={isMoveOutcomeUnresolved}
-      isPartialMoveOutcome={isPartialMoveOutcome}
-      isMoveRequestError={isMoveRequestError}
       isMoveDisabled={
         !move.isValid ||
         destination.disabledDestinationPaths.includes(destination.selectedDestinationPath) ||
@@ -197,12 +182,6 @@ export const CellsBulkMovePreviewModal: FunctionComponent<CellsBulkMovePreviewMo
       }
       isMoveLoading={move.isSubmitting}
       isBackgroundMovePending={isBackgroundMovePending}
-      isBackgroundMoveError={isBackgroundMoveError}
-      isBackgroundMoveStatusUnknown={isBackgroundMoveStatusUnknown}
-      canRetryBackgroundMoveStatus={canRetryBackgroundMoveStatus}
-      onRetryBackgroundMoveStatus={onRetryBackgroundMoveStatus}
-      onRefreshAfterBulkMoveOutcome={onRefreshAfterBulkMoveOutcome}
-      isRefreshingBulkMoveOutcome={isRefreshingBulkMoveOutcome}
       activeModalContent={activeModalContent}
       onChangeModalContent={handleChangeModalContent}
       canCreateNewFolder={canCreateNewFolder}

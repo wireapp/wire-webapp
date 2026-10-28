@@ -568,18 +568,18 @@ describe('CellsTable selection', () => {
     await user.click(within(dialog).getByRole('button', {name: 'cells.breadcrumb.files'}));
     await user.click(within(dialog).getByRole('button', {name: 'Move'}));
 
-    const reviewDialog = await screen.findByRole('dialog');
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     const warningCopy =
       'The move may be incomplete. Check item locations before trying again. Move stays disabled in this view.';
-    expect(within(reviewDialog).getByRole('alert')).toHaveTextContent(warningCopy);
+    expect(screen.getByRole('alert')).toHaveTextContent(warningCopy);
     const tableRegion = screen.getByRole('table').parentElement;
     expect(tableRegion).not.toBeNull();
     expect(within(tableRegion as HTMLElement).getByRole('status')).toHaveTextContent(warningCopy);
     expect(within(breadcrumbAnchor).queryByText(warningCopy)).not.toBeInTheDocument();
-    expect(within(reviewDialog).getByRole('alert')).not.toHaveTextContent('Moved.pdf');
-    expect(within(reviewDialog).getByRole('alert')).not.toHaveTextContent('Not reported.pdf');
+    expect(screen.getByRole('alert')).not.toHaveTextContent('Moved.pdf');
+    expect(screen.getByRole('alert')).not.toHaveTextContent('Not reported.pdf');
     expect(screen.queryByText('Moved 2 items')).not.toBeInTheDocument();
-    expect(within(reviewDialog).getByRole('button', {name: 'Move'})).toBeDisabled();
+    expect(screen.queryByRole('button', {name: 'Move'})).not.toBeInTheDocument();
     expect(repository.moveNodes).toHaveBeenCalledTimes(1);
     expect(onRefresh).not.toHaveBeenCalled();
     breadcrumbAnchor.remove();
@@ -624,20 +624,21 @@ describe('CellsTable selection', () => {
     const dialog = await screen.findByRole('dialog');
     await user.click(within(dialog).getByRole('button', {name: 'cells.breadcrumb.files'}));
     await user.click(within(dialog).getByRole('button', {name: 'Move'}));
-    const reviewDialog = await screen.findByRole('dialog');
-
-    expect(within(reviewDialog).getByRole('button', {name: 'cells.bulkMove.refreshDrive'})).toBeEnabled();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'cells.bulkMove.refreshDrive'})).toBeEnabled();
     expect(screen.queryByRole('checkbox', {name: 'Select Moved.pdf'})).not.toBeInTheDocument();
     expect(screen.queryByRole('checkbox', {name: 'Select Not reported.pdf'})).not.toBeInTheDocument();
-    await user.click(within(reviewDialog).getByRole('button', {name: 'cells.bulkMove.refreshDrive'}));
+    await user.click(screen.getByRole('button', {name: 'cells.bulkMove.refreshDrive'}));
 
     expect(onRefreshAfterBulkMoveOutcome).toHaveBeenCalledTimes(1);
-    expect(within(reviewDialog).getByRole('alert')).toHaveTextContent('The move may be incomplete.');
-    expect(within(reviewDialog).getByRole('button', {name: 'cells.bulkMove.refreshDrive'})).toBeEnabled();
+    const tableRegion = screen.getByRole('table').parentElement;
+    expect(tableRegion).not.toBeNull();
+    expect(within(tableRegion as HTMLElement).getByRole('status')).toHaveTextContent('The move may be incomplete.');
+    expect(screen.getByRole('button', {name: 'cells.bulkMove.refreshDrive'})).toBeEnabled();
     expect(screen.queryByRole('checkbox', {name: 'Select Moved.pdf'})).not.toBeInTheDocument();
     expect(screen.queryByRole('checkbox', {name: 'Select Not reported.pdf'})).not.toBeInTheDocument();
 
-    await user.click(within(reviewDialog).getByRole('button', {name: 'cells.bulkMove.refreshDrive'}));
+    await user.click(screen.getByRole('button', {name: 'cells.bulkMove.refreshDrive'}));
 
     expect(onRefreshAfterBulkMoveOutcome).toHaveBeenCalledTimes(2);
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
@@ -676,8 +677,10 @@ describe('CellsTable selection', () => {
     await user.click(within(dialog).getByRole('button', {name: 'cells.breadcrumb.files'}));
     await user.click(within(dialog).getByRole('button', {name: 'Move'}));
 
-    const reviewDialog = await screen.findByRole('dialog');
-    expect(within(reviewDialog).getByRole('alert')).toHaveTextContent(
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+    expect(screen.getByRole('alert')).toHaveTextContent(
       'The move job finished, but item locations are unknown. Refresh Drive to check before trying again.',
     );
     expect(
@@ -687,7 +690,7 @@ describe('CellsTable selection', () => {
     ).toContain('The move job finished, but item locations are unknown. Refresh Drive to check before trying again.');
     expect(screen.queryByText('Moved 1 items')).not.toBeInTheDocument();
     expect(screen.queryByRole('progressbar', {name: 'Move completed'})).not.toBeInTheDocument();
-    expect(within(reviewDialog).getByRole('button', {name: 'Move'})).toBeDisabled();
+    expect(screen.queryByRole('button', {name: 'Move'})).not.toBeInTheDocument();
     expect(repository.moveNodes).toHaveBeenCalledTimes(1);
     expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(1);
     expect(onRefresh).not.toHaveBeenCalled();
@@ -977,8 +980,8 @@ describe('CellsTable selection', () => {
       });
     });
     expect(onRefresh).not.toHaveBeenCalled();
-    const reviewDialog = await screen.findByRole('dialog');
-    expect(within(reviewDialog).getByRole('alert')).toHaveTextContent(
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.getByRole('alert')).toHaveTextContent(
       'The move job finished, but item locations are unknown. Refresh Drive to check before trying again.',
     );
     expect(screen.queryByText('Moved 1 items')).not.toBeInTheDocument();
@@ -1019,8 +1022,8 @@ describe('CellsTable selection', () => {
     await user.click(within(dialog).getByRole('button', {name: 'cells.breadcrumb.files'}));
     await user.click(within(dialog).getByRole('button', {name: 'Move'}));
 
-    const reviewDialog = await screen.findByRole('dialog');
-    expect(within(reviewDialog).getByRole('alert')).toHaveTextContent(
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.getByRole('alert')).toHaveTextContent(
       'The move may be incomplete. Check item locations before trying again. Move stays disabled in this view.',
     );
     expect(
@@ -1032,7 +1035,7 @@ describe('CellsTable selection', () => {
     );
     expect(screen.queryByText('Moved 1 items')).not.toBeInTheDocument();
     expect(screen.queryByRole('progressbar', {name: 'Move completed'})).not.toBeInTheDocument();
-    expect(within(reviewDialog).getByRole('button', {name: 'Move'})).toBeDisabled();
+    expect(screen.queryByRole('button', {name: 'Move'})).not.toBeInTheDocument();
     expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(2);
     expect(onRefresh).not.toHaveBeenCalled();
     window.location.hash = originalHash;
@@ -1077,8 +1080,8 @@ describe('CellsTable selection', () => {
         expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(2);
       });
       expect(onRefresh).not.toHaveBeenCalled();
-      const preview = await screen.findByRole('dialog');
-      expect(within(preview).getByRole('alert')).toHaveTextContent(
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(screen.getByRole('alert')).toHaveTextContent(
         'The move jobs failed or were interrupted. Refresh Drive to check item locations before trying again.',
       );
       expect(
@@ -1088,10 +1091,9 @@ describe('CellsTable selection', () => {
       ).toContain(
         'The move jobs failed or were interrupted. Refresh Drive to check item locations before trying again.',
       );
-      expect(within(preview).getByRole('button', {name: 'Move'})).toBeDisabled();
-      expect(within(preview).queryByRole('button', {name: 'cells.bulkMove.reviewAndRetry'})).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', {name: 'Move'})).not.toBeInTheDocument();
 
-      await user.click(within(preview).getByRole('button', {name: 'cells.bulkMove.refreshDrive'}));
+      await user.click(screen.getByRole('button', {name: 'cells.bulkMove.refreshDrive'}));
       await waitFor(() => {
         expect(onRefreshAfterBulkMoveOutcome).toHaveBeenCalledTimes(1);
       });
@@ -1101,12 +1103,15 @@ describe('CellsTable selection', () => {
         expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
         expect(screen.getByRole('checkbox', {name: 'Select Marketing images'})).not.toBeChecked();
       } else {
-        const recoveryDialog = screen.getByRole('dialog');
-        expect(within(recoveryDialog).getByRole('alert')).toHaveTextContent(
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+        const tableRegion = screen.getByRole('table').parentElement;
+        expect(tableRegion).not.toBeNull();
+        expect(within(tableRegion as HTMLElement).getByRole('status')).toHaveTextContent(
           'The move jobs failed or were interrupted. Refresh Drive to check item locations before trying again.',
         );
-        expect(within(recoveryDialog).getByRole('button', {name: 'Move'})).toBeDisabled();
-        expect(screen.getByText('cells.newItemMenuModalForm.genericError')).toBeInTheDocument();
+        expect(within(tableRegion as HTMLElement).getByRole('alert')).toHaveTextContent(
+          'cells.newItemMenuModalForm.genericError',
+        );
       }
       window.location.hash = originalHash;
     },
@@ -1277,21 +1282,20 @@ describe('CellsTable selection', () => {
       expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(2);
     });
     expect(onRefresh).not.toHaveBeenCalled();
-    const reviewDialog = await screen.findByRole('dialog');
-    expect(within(reviewDialog).getByRole('button', {name: 'Move'})).toBeDisabled();
-    expect(within(reviewDialog).getByRole('alert')).toHaveTextContent(
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.getByRole('alert')).toHaveTextContent(
       'The move may be incomplete. Check item locations before trying again. Move stays disabled in this view.',
     );
-    expect(within(reviewDialog).queryByRole('button', {name: 'cells.bulkMove.reviewAndRetry'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'Move'})).not.toBeInTheDocument();
 
     table.rerenderWithNodes([movedFile, failedFile]);
-    expect(within(reviewDialog).getByRole('button', {name: 'Move'})).toBeDisabled();
+    expect(screen.queryByRole('button', {name: 'Move'})).not.toBeInTheDocument();
     table.rerenderWithNodes([]);
-    expect(within(reviewDialog).getByRole('button', {name: 'Move'})).toBeDisabled();
+    expect(screen.queryByRole('button', {name: 'Move'})).not.toBeInTheDocument();
     table.rerenderWithNodes([movedFile, failedFile]);
-    expect(within(reviewDialog).getByRole('button', {name: 'Move'})).toBeDisabled();
+    expect(screen.queryByRole('button', {name: 'Move'})).not.toBeInTheDocument();
     table.rerenderWithNodes([failedFile]);
-    expect(within(reviewDialog).getByRole('button', {name: 'Move'})).toBeDisabled();
+    expect(screen.queryByRole('button', {name: 'Move'})).not.toBeInTheDocument();
     expect(repository.moveNodes).toHaveBeenCalledTimes(1);
     window.location.hash = originalHash;
   });
@@ -1343,23 +1347,25 @@ describe('CellsTable selection', () => {
     });
     expect(repository.moveNodes).toHaveBeenCalledTimes(1);
     expect(random).toHaveBeenCalledTimes(5);
-    const statusDialog = await screen.findByRole('dialog');
-    expect(within(statusDialog).getByRole('button', {name: 'Move'})).toBeDisabled();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'Move'})).not.toBeInTheDocument();
     expect(onRefresh).not.toHaveBeenCalled();
-    expect(within(statusDialog).getByRole('alert')).toHaveTextContent('cells.bulkMove.statusUnknown');
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      'The move status could not be checked. Refresh Drive to check item locations before trying again.',
+    );
     expect(
       screen.getAllByRole('alert').map(alert => {
         return alert.textContent;
       }),
     ).toContain('The move status could not be checked. Refresh Drive to check item locations before trying again.');
-    await user.click(within(statusDialog).getByRole('button', {name: 'cells.bulkMove.checkStatus'}));
+    await user.click(screen.getByRole('button', {name: 'cells.bulkMove.checkStatus'}));
     await waitFor(() => {
       expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(7);
     });
     expect(onRefresh).not.toHaveBeenCalled();
     expect(repository.moveNodes).toHaveBeenCalledTimes(1);
-    const reviewDialog = await screen.findByRole('dialog');
-    expect(within(reviewDialog).getByRole('alert')).toHaveTextContent(
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.getByRole('alert')).toHaveTextContent(
       'The move job finished, but item locations are unknown. Refresh Drive to check before trying again.',
     );
     window.location.hash = originalHash;
@@ -1432,10 +1438,15 @@ describe('CellsTable selection', () => {
     await waitFor(() => {
       expect(repository.moveNodes).toHaveBeenCalledTimes(1);
     });
-    expect(await within(dialog).findByRole('alert')).toHaveTextContent('cells.bulkMove.statusUnknown');
-    expect(within(dialog).getByRole('button', {name: 'Move'})).toBeDisabled();
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      'The move status could not be checked. Refresh Drive to check item locations before trying again.',
+    );
+    expect(screen.queryByRole('button', {name: 'Move'})).not.toBeInTheDocument();
     expect(repository.getBackgroundMoveInfo).not.toHaveBeenCalled();
-    await user.click(within(dialog).getByRole('button', {name: 'cells.bulkMove.refreshDrive'}));
+    await user.click(screen.getByRole('button', {name: 'cells.bulkMove.refreshDrive'}));
     expect(onRefresh).not.toHaveBeenCalled();
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(screen.getByRole('checkbox', {name: 'Select Marketing images'})).toBeInTheDocument();
@@ -1655,7 +1666,7 @@ describe('CellsTable selection', () => {
     }
   });
 
-  it('shows an error when the move request fails and keeps the preview open', async () => {
+  it('closes the move preview and keeps recovery available after a request failure', async () => {
     const originalHash = window.location.hash;
     window.location.hash = '#/conversation/conversation-id@example.com/files/wire-cells-web';
     const user = userEvent.setup();
@@ -1689,16 +1700,23 @@ describe('CellsTable selection', () => {
     await act(async () => {
       rejectMove(new Error('Move failed'));
     });
-    const reopenedAfterFailure = await screen.findByRole('dialog');
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(screen.queryByText('Moving 2 items')).not.toBeInTheDocument();
-    expect(await within(reopenedAfterFailure).findByRole('alert')).toHaveTextContent(
+    expect(screen.getByRole('alert')).toHaveTextContent(
       'The move request failed. Some items may have moved. Refresh Drive to check item locations before trying again.',
     );
-    expect(within(reopenedAfterFailure).getByRole('button', {name: 'Move'})).toBeDisabled();
+    const tableRegion = screen.getByRole('table').parentElement;
+    expect(tableRegion).not.toBeNull();
+    expect(within(tableRegion as HTMLElement).getByRole('status')).toHaveTextContent(
+      'The move request failed. Some items may have moved. Refresh Drive to check item locations before trying again.',
+    );
     expect(onRefresh).not.toHaveBeenCalled();
 
-    await user.click(within(reopenedAfterFailure).getByRole('button', {name: 'cells.moveNodeModal.cancelButton'}));
-    expect(screen.getByRole('alert')).toHaveTextContent(
+    await user.click(screen.getByRole('button', {name: 'fileCardDefaultCloseButtonLabel'}));
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    const bannerRegion = screen.getByRole('table').parentElement;
+    expect(bannerRegion).not.toBeNull();
+    expect(within(bannerRegion as HTMLElement).getByRole('status')).toHaveTextContent(
       'The move request failed. Some items may have moved. Refresh Drive to check item locations before trying again.',
     );
     expect(screen.queryByRole('button', {name: 'Move'})).not.toBeInTheDocument();
