@@ -98,7 +98,7 @@ const conversationOtherMemberSchema = z.object({
   status_ref: z.string().optional(),
   status_time: z.string().optional(),
   qualified_id: qualifiedIdSchema.optional(),
-  status: z.nativeEnum(SERVICE_MEMBER_STATUS).default(SERVICE_MEMBER_STATUS.REGULAR_MEMBER),
+  status: z.enum(SERVICE_MEMBER_STATUS).default(SERVICE_MEMBER_STATUS.REGULAR_MEMBER),
 });
 
 export const conversationMembersSchema = z.object({
@@ -113,17 +113,14 @@ export const conversationMembersSchema = z.object({
 export const conversationSchema = z.object({
   qualified_id: qualifiedIdSchema,
   creator: z.string(),
-  type: z.nativeEnum(CONVERSATION_TYPE),
-  access: z.array(z.nativeEnum(CONVERSATION_ACCESS)),
-  access_role: z.union([
-    z.nativeEnum(CONVERSATION_LEGACY_ACCESS_ROLE),
-    z.array(z.nativeEnum(CONVERSATION_ACCESS_ROLE)),
-  ]),
-  access_role_v2: z.array(z.nativeEnum(CONVERSATION_ACCESS_ROLE)).optional(),
-  cells_state: z.nativeEnum(CONVERSATION_CELLS_STATE),
-  group_conv_type: z.nativeEnum(GROUP_CONVERSATION_TYPE).optional(),
+  type: z.enum(CONVERSATION_TYPE),
+  access: z.array(z.enum(CONVERSATION_ACCESS)),
+  access_role: z.union([z.enum(CONVERSATION_LEGACY_ACCESS_ROLE), z.array(z.enum(CONVERSATION_ACCESS_ROLE))]),
+  access_role_v2: z.array(z.enum(CONVERSATION_ACCESS_ROLE)).optional(),
+  cells_state: z.enum(CONVERSATION_CELLS_STATE),
+  group_conv_type: z.enum(GROUP_CONVERSATION_TYPE).optional(),
   add_permission: z
-    .nativeEnum(ADD_PERMISSION)
+    .enum(ADD_PERMISSION)
     .nullable()
     .optional()
     .transform(addPermission => {
@@ -147,15 +144,15 @@ export const conversationSchema = z.object({
       return messageTimer ?? undefined;
     }),
   receipt_mode: z
-    .nativeEnum(RECEIPT_MODE)
+    .enum(RECEIPT_MODE)
     .nullable()
     .optional()
     .transform(receiptMode => {
       return receiptMode ?? undefined;
     }),
   members: conversationMembersSchema,
-  protocol: z.nativeEnum(CONVERSATION_PROTOCOL),
-  initial_protocol: z.nativeEnum(CONVERSATION_PROTOCOL).optional(),
+  protocol: z.enum(CONVERSATION_PROTOCOL),
+  initial_protocol: z.enum(CONVERSATION_PROTOCOL).optional(),
   group_id: z.string().optional(),
   epoch: z.number().optional(),
   cipher_suite: z.number().optional(),
