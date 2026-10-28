@@ -99,7 +99,7 @@ jobs:
 
       - name: Verify generated i18n artifacts are committed
         run: |
-          npm exec -- nx run webapp:translate-merge
+          npx nx run webapp:translate-merge
 
           if ! test -z "$(git status --porcelain)"; then
             echo "Repository is not clean after generation. Run generation locally and commit the changes."
@@ -108,7 +108,7 @@ jobs:
           fi
 
       - name: Validate translation markers
-        run: npm exec -- nx run webapp:validate-translations
+        run: npx nx run webapp:validate-translations
 
   build-libraries:
     runs-on: ubuntu-26.04-arm
@@ -166,16 +166,25 @@ jobs:
       - name: Build internal webapp
         run: npx just build-webapp-internal
 
-      - name: Build and package public webapp with Rspack
-        id: public_rspack_package
+      - name: Build public webapp with Just
+        id: public_rspack_build
         env:
           WIRE_WEBAPP_BUILD_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
           short_commit_sha="${WIRE_WEBAPP_BUILD_COMMIT::7}"
           expected_version="dev-${short_commit_sha}"
-          WIRE_WEBAPP_BUILD_VERSION="${expected_version}" \
-            npm exec -- nx run server:package-public
+          WIRE_WEBAPP_BUILD_VERSION="${expected_version}" npx just build-webapp-public
           echo "expected_version=${expected_version}" >> "$GITHUB_OUTPUT"
+
+      - name: Run Rspack browser smoke tests
+        run: npx nx run webapp:smoke-rspack
+
+      - name: Build and package public webapp with Rspack
+        env:
+          WIRE_WEBAPP_BUILD_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+          WIRE_WEBAPP_BUILD_VERSION: ${{ steps.public_rspack_build.outputs.expected_version }}
+        run: |
+          npx nx run server:package-public
 
       - name: Install unzip for artifact verification
         run: |
@@ -187,7 +196,7 @@ jobs:
         env:
           BUILD_ARTIFACT_PATH: apps/server/dist/s3/ebs.zip
           EXPECTED_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
-          EXPECTED_VERSION: ${{ steps.public_rspack_package.outputs.expected_version }}
+          EXPECTED_VERSION: ${{ steps.public_rspack_build.outputs.expected_version }}
         run: |
           set -euo pipefail
 
@@ -224,9 +233,6 @@ jobs:
             echo "Public deployment package contains the Webpack runtime fingerprint." >&2
             exit 1
           fi
-
-      - name: Run Rspack browser smoke tests
-        run: npm exec -- nx run webapp:smoke-rspack
 
       - name: Upload Rspack smoke diagnostics
         if: ${{ failure() }}
