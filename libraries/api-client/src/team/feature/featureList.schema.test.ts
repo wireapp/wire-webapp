@@ -18,7 +18,31 @@
  */
 
 import {allFeaturesResponseSchema} from './featureList.schema';
-import {FEATURE_STATUS} from './featureList.types';
+import {ACCESS_TYPE, FEATURE_STATUS} from './featureList.types';
+
+describe('allFeaturesResponseSchema', () => {
+  it('validates known feature configuration with its specific inferred fields', () => {
+    const response = allFeaturesResponseSchema.parse({
+      channels: {
+        status: FEATURE_STATUS.ENABLED,
+        config: {
+          allowed_to_create_channels: ACCESS_TYPE.ADMINS,
+          allowed_to_open_channels: ACCESS_TYPE.EVERYONE,
+        },
+      },
+    });
+
+    expect(response.channels?.config.allowed_to_create_channels).toBe(ACCESS_TYPE.ADMINS);
+    expect(response.channels?.config.allowed_to_open_channels).toBe(ACCESS_TYPE.EVERYONE);
+  });
+
+  it('accepts and preserves unknown feature keys', () => {
+    const unknownFeature = {status: 'enabled', rollout: {enabled: true}};
+    const response = allFeaturesResponseSchema.parse({nextFeature: unknownFeature});
+
+    expect(response.nextFeature).toStrictEqual(unknownFeature);
+  });
+});
 
 describe('manual migration feature parsing', () => {
   it.each([true, false])('preserves allowManualMigration=%s', allowManualMigration => {

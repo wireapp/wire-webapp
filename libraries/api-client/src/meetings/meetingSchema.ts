@@ -38,7 +38,7 @@ export type {ValidatedMeetingConversation} from '../conversation/conversationSch
 const utcTimeSchema = z.string().datetime();
 
 const meetingRecurrenceSchema = z.object({
-  frequency: z.nativeEnum(MeetingRecurrenceFrequency),
+  frequency: z.enum(MeetingRecurrenceFrequency),
   interval: z.number().int().positive().optional(),
   until: utcTimeSchema.optional(),
 });
