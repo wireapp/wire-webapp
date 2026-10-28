@@ -139,6 +139,12 @@ assemble-server-internal: build-server build-webapp-internal
 assemble-server-public: build-server build-webapp-public
     node apps/server/bin/assembleBuild.mts public artifact
 
+# Package the verified public server deployment artifact as a ZIP.
+[group('build')]
+package-server-public: assemble-server-public
+    node tools/buildArtifact/verifyPublicProductionBundle.ts
+    node tools/serverPackaging/zip.js
+
 # Build the development webapp with Rspack.
 [group('build')]
 build-webapp-development: build-libraries

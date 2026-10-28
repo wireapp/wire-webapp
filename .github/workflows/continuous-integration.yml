@@ -189,7 +189,7 @@ jobs:
           WIRE_WEBAPP_BUILD_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
           WIRE_WEBAPP_BUILD_VERSION: ${{ steps.public_rspack_build.outputs.expected_version }}
         run: |
-          npx nx run server:package-public
+          npx just package-server-public
 
       - name: Install unzip for artifact verification
         run: |
