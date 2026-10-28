@@ -117,6 +117,12 @@ build-libraries:
     cd libraries/api-client && tsc
     cd libraries/core && tsc
 
+# Compile the production server and copy its runtime assets.
+[group('build')]
+build-server: build-libraries
+    tsc --project apps/server/tsconfig.json --outDir apps/server/build/server
+    WIRE_WEBAPP_SERVER_OUTPUT_PATH=apps/server/build/server node apps/server/bin/copy_server_assets.js
+
 # Build the internal production webapp with Rspack.
 [group('build')]
 build-webapp-internal: build-libraries
