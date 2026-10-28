@@ -34,6 +34,7 @@ import {container} from 'tsyringe';
 import {
   CALL_TYPE,
   CONV_TYPE,
+  ERROR,
   QUALITY,
   REASON,
   STATE as CALL_STATE,
@@ -61,6 +62,9 @@ import {Call} from './Call';
 import {CallingRepository, MediaStreamQuery, setupDetachedWindowExternalLinksClick} from './CallingRepository';
 import {CallingViewMode, CallState, MuteState} from './CallState';
 import {type NetworkQuality, UNKNOWN_NETWORK_QUALITY} from './calling.schema';
+import assert from 'node:assert';
+
+import {parseSerializedCallingMessage} from './callingMessage.schema';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
 import {Participant} from './Participant';
@@ -425,6 +429,83 @@ describe('CallingRepository', () => {
   });
 
   describe('onCallEvent', () => {
+    it.each([
+      {avsResult: 0, expectedWarnings: 0},
+      {avsResult: ERROR.UNKNOWN_PROTOCOL, expectedWarnings: 1},
+    ])('forwards version 4.0 to AVS returning $avsResult', async ({avsResult, expectedWarnings}) => {
+      const conversation = createConversation();
+      callingRepository['conversationState'].conversations.push(conversation);
+      const recvMsg = jest.spyOn(wCall, 'recvMsg').mockReturnValue(avsResult);
+      const warnOutdatedClient = jest
+        .spyOn(
+          callingRepository as unknown as {warnOutdatedClient: (conversationId: QualifiedId) => void},
+          'warnOutdatedClient',
+        )
+        .mockImplementation(noop);
+      const content = {
+        type: CALL_MESSAGE_TYPE.CONF_START as const,
+        version: '4.0',
+        resp: false,
+        sessid: 'session',
+        secret: 'c2VjcmV0',
+        seqno: '0',
+        sft_url: 'https://sft.example',
+        timestamp: '1',
+        future: {codecs: ['example']},
+      };
+      const parsed = parseSerializedCallingMessage(JSON.stringify(content));
+      assert(parsed.isOk);
+      const event: CallingEvent = {
+        content: parsed.value,
+        conversation: conversation.id,
+        qualified_conversation: conversation.qualifiedId,
+        from: 'sender',
+        sender: 'client',
+        time: '2026-01-01T00:00:00.000Z',
+        type: CALL.E_CALL,
+      };
+
+      await callingRepository.onCallEvent(event, EventRepository.SOURCE.WEB_SOCKET);
+
+      expect(recvMsg).toHaveBeenCalledTimes(1);
+      expect(JSON.parse(recvMsg.mock.calls[0][1])).toEqual(content);
+      expect(warnOutdatedClient).toHaveBeenCalledTimes(expectedWarnings);
+    });
+
+    it('forwards validated CONFCHECK messages to AVS', async () => {
+      const conversation = createConversation();
+      callingRepository['conversationState'].conversations.push(conversation);
+      const recvMsg = jest.spyOn(wCall, 'recvMsg').mockReturnValue(0);
+      const content = {
+        type: CALL_MESSAGE_TYPE.CONF_CHECK,
+        version: '3.0',
+        resp: true,
+        sessid: 'session',
+        secret: 'c2VjcmV0',
+        seqno: '0',
+        sft_url: 'https://sft.example',
+        timestamp: '1',
+      };
+      const parsed = parseSerializedCallingMessage(JSON.stringify(content));
+      assert(parsed.isOk);
+
+      await callingRepository.onCallEvent(
+        {
+          content: parsed.value,
+          conversation: conversation.id,
+          qualified_conversation: conversation.qualifiedId,
+          from: 'sender',
+          sender: 'client',
+          time: '2026-01-01T00:00:00.000Z',
+          type: CALL.E_CALL,
+        },
+        EventRepository.SOURCE.WEB_SOCKET,
+      );
+
+      expect(recvMsg).toHaveBeenCalledTimes(1);
+      expect(JSON.parse(recvMsg.mock.calls[0][1])).toEqual(content);
+    });
+
     it('does mute itself when remote muted message arrives', async () => {
       const conversation = createConversation();
       const selfParticipant = createSelfParticipant();
@@ -564,6 +645,20 @@ describe('CallingRepository', () => {
       expect(callingRepository.muteCall).not.toHaveBeenCalled();
       expect(wCall.recvMsg).not.toHaveBeenCalled();
     });
+  });
+
+  it('preserves version 3.0 in outgoing AVS messages', async () => {
+    const conversation = createConversation();
+    callingRepository['conversationState'].conversations.push(conversation);
+    const sendCallingMessage = jest
+      .spyOn(callingRepository['messageRepository'], 'sendCallingMessage')
+      .mockResolvedValue({} as Awaited<ReturnType<MessageRepository['sendCallingMessage']>>);
+    const payload = JSON.stringify({resp: false, sessid: 'session', type: CALL_MESSAGE_TYPE.CANCEL, version: '3.0'});
+
+    await callingRepository['sendCallingMessage'](conversation.qualifiedId, payload);
+
+    expect(sendCallingMessage).toHaveBeenCalledWith(conversation, payload, undefined);
+    expect(JSON.parse(sendCallingMessage.mock.calls[0][1] as string).version).toBe('3.0');
   });
 
   describe('startCall', () => {
@@ -1780,7 +1875,7 @@ describe('CallingRepository ISO', () => {
         sendIncomingSetup: async (setupReceivedAt: number) => {
           await callingRepo.onCallEvent(
             {
-              content: {resp: false, type: CALL_MESSAGE_TYPE.SETUP, version: '3.0'},
+              content: {resp: false, sessid: 'test-session', sdp: '', type: CALL_MESSAGE_TYPE.SETUP, version: '3.0'},
               conversation: conversation.id,
               from: createUuid(),
               sender: createUuid(),

@@ -65,6 +65,7 @@ import {TIME_IN_MILLIS} from '../../util/timeUtil';
 import {toError} from '../../util/toError';
 import {base64ToArray, arrayToBase64} from '../../util/util';
 import {AssetTransferState} from '../assets/assetTransferState';
+import {parseSerializedCallingMessage} from '../calling/callingMessage.schema';
 import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
 import {ConversationEphemeralHandler} from '../conversation/ConversationEphemeralHandler';
 import type {MessageAddEvent} from '../conversation/EventBuilder';
@@ -274,7 +275,11 @@ export class CryptographyMapper {
       }
 
       case GenericMessageType.CALLING: {
-        specificContent = this._mapCalling(genericMessage.calling as Calling, event);
+        const mappedCalling = this._mapCalling(genericMessage.calling as Calling, event);
+        if (isUndefined(mappedCalling)) {
+          return;
+        }
+        specificContent = mappedCalling;
         break;
       }
 
@@ -566,9 +571,15 @@ export class CryptographyMapper {
     };
   }
 
-  private _mapCalling(calling: Calling, event: EncryptedEvent): MappedCallingContent {
+  private _mapCalling(calling: Calling, event: EncryptedEvent): MappedCallingContent | undefined {
+    const content = parseSerializedCallingMessage(calling.content);
+    if (content.isErr) {
+      this.logger.warn('Discarding invalid calling message', content.error);
+      return undefined;
+    }
+
     return {
-      content: JSON.parse(calling.content),
+      content: content.value,
       targetConversation: calling.qualifiedConversationId,
       sender: event.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD ? event.data.sender : undefined,
       senderClientId: event.type === CONVERSATION_EVENT.MLS_MESSAGE_ADD ? event.senderClientId : undefined,
