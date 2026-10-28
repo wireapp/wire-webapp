@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import React, {type FunctionComponent} from 'react';
 
 import {isNonEmptyObject, isNullOrUndefined} from '@sindresorhus/is';
 
@@ -44,7 +44,9 @@ interface LeaveGroupAdminModalProps {
   readonly translate: Translate;
 }
 
-export const LeaveGroupAdminModal = ({translate}: LeaveGroupAdminModalProps) => {
+export const LeaveGroupAdminModal: FunctionComponent<LeaveGroupAdminModalProps> = ({
+  translate,
+}: LeaveGroupAdminModalProps) => {
   const {isOpen, params, selectedUser, clearContent, isLoading, hide, setSelectedUser, setClearContent, setIsLoading} =
     useLeaveGroupAdminModalStore();
 
@@ -57,11 +59,11 @@ export const LeaveGroupAdminModal = ({translate}: LeaveGroupAdminModalProps) => 
   const hasEligibleUsers = eligibleUsers.length > 0;
   const canLeave = hasEligibleUsers && selectedUser !== null;
 
-  const handleClose = () => {
+  const handleClose = (): void => {
     return hide();
   };
 
-  const handleLeave = async () => {
+  const handleLeave = async (): Promise<void> => {
     setIsLoading(true);
     try {
       if (isNonEmptyObject(selectedUser)) {
@@ -75,12 +77,12 @@ export const LeaveGroupAdminModal = ({translate}: LeaveGroupAdminModalProps) => 
     }
   };
 
-  const handleDelete = () => {
+  const handleDelete = (): void => {
     hide();
     onDelete();
   };
 
-  const handleUserSelect = (user: typeof selectedUser) => {
+  const handleUserSelect = (user: typeof selectedUser): void => {
     setSelectedUser(user);
   };
 

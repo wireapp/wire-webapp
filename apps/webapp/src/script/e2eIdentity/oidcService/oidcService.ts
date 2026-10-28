@@ -18,7 +18,7 @@
  */
 
 import {KeyAuth} from '@wireapp/core/lib/messagingProtocols/mls';
-import {UserManager, UserManagerSettings, WebStorageStateStore} from 'oidc-client-ts';
+import {UserManager, UserManagerSettings, WebStorageStateStore, type User} from 'oidc-client-ts';
 
 import {clearKeysStartingWith} from 'Util/localStorage';
 
@@ -61,7 +61,7 @@ export class OIDCService {
     this.userManager = new UserManager(dexioConfig);
   }
 
-  public async authenticate(keyAuth: KeyAuth, challengeUrl: string, silent: boolean) {
+  public async authenticate(keyAuth: KeyAuth, challengeUrl: string, silent: boolean): Promise<void | User | null> {
     // New claims value for keycloak
     const claims = {
       id_token: {
@@ -76,7 +76,7 @@ export class OIDCService {
       : this.userManager.signinRedirect({extraQueryParams: params});
   }
 
-  public getUser() {
+  public getUser(): Promise<User | undefined> {
     // Remove the hash (hash router) from the url before processing
     const url = window.location.href.replace('/#', '');
     return this.userManager.signinCallback(url);

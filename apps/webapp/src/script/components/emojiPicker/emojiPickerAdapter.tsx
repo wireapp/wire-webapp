@@ -39,7 +39,7 @@ export const defaultEmojiStyle = EmojiStyle.NATIVE;
 export const EmojiPickerAdapter: FunctionComponent<EmojiPickerAdapterProperties> = properties => {
   const {onEmojiClick, searchPlaceholder, defaultSkinTone} = properties;
 
-  function handleEmojiClick(emojiClickData: EmojiClickData) {
+  function handleEmojiClick(emojiClickData: EmojiClickData): void {
     const emojiPickerSelection: EmojiPickerSelection = {
       emoji: emojiClickData.emoji,
       activeSkinTone: emojiClickData.activeSkinTone,

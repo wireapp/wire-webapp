@@ -18,6 +18,7 @@
  */
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
+import type {NonEmptyString} from '@sindresorhus/is/distribution/types';
 import {Maybe} from 'true-myth';
 import {container} from 'tsyringe';
 
@@ -41,6 +42,9 @@ interface Config {
   };
   DEFAULT_DEVICE_ID: string;
 }
+
+type DeviceConstraint = {deviceId: {exact: NonEmptyString}} | {deviceId?: undefined};
+type VideoStreamConstraints = MediaTrackConstraints & {resizeMode: string};
 
 /* eslint-disable @typescript-eslint/no-magic-numbers -- Capture modes define their existing numeric values inline. */
 export enum ScreensharingMethods {
@@ -197,7 +201,7 @@ export class MediaConstraintsHandler {
     }
   }
 
-  private getDeviceConstraint(mediaDeviceId?: string) {
+  private getDeviceConstraint(mediaDeviceId?: string): DeviceConstraint {
     const hasMediaDevice =
       isNonEmptyString(mediaDeviceId) && mediaDeviceId !== MediaConstraintsHandler.CONFIG.DEFAULT_DEVICE_ID;
 
@@ -233,7 +237,10 @@ export class MediaConstraintsHandler {
     };
   }
 
-  private getVideoStreamConstraints(mediaDeviceId?: string, mode: VIDEO_QUALITY_MODE = VIDEO_QUALITY_MODE.MOBILE) {
+  private getVideoStreamConstraints(
+    mediaDeviceId?: string,
+    mode: VIDEO_QUALITY_MODE = VIDEO_QUALITY_MODE.MOBILE,
+  ): VideoStreamConstraints {
     const streamConstraints = MediaConstraintsHandler.CONFIG.CONSTRAINTS.VIDEO[mode];
 
     const deviceConstraint = this.getDeviceConstraint(mediaDeviceId);

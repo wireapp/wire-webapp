@@ -26,6 +26,8 @@ import {
   RestShareLink,
   RestVersion,
   RestPerformActionResponse,
+  RestBackgroundAction,
+  JobsTaskStatus,
 } from 'cells-sdk-ts';
 import {v4 as uuidv4} from 'uuid';
 
@@ -69,6 +71,7 @@ describe('CellsAPI', () => {
       getByUuid: jest.fn(),
       lookup: jest.fn(),
       performAction: jest.fn(),
+      backgroundActionInfo: jest.fn(),
       create: jest.fn(),
       promoteVersion: jest.fn(),
       deleteVersion: jest.fn(),
@@ -871,6 +874,61 @@ describe('CellsAPI', () => {
         AwaitTimeout: '5000ms',
       });
       expect(result).toEqual(mockResponse);
+    });
+  });
+
+  describe('getBackgroundActionInfo', () => {
+    it('retrieves status for a background move action', async () => {
+      const response: RestBackgroundAction = {
+        JobUuid: 'move-job',
+        Name: 'move',
+        Status: JobsTaskStatus.Finished,
+      };
+      mockNodeServiceApi.backgroundActionInfo.mockResolvedValueOnce(createMockResponse(response));
+
+      await expect(cellsAPI.getBackgroundActionInfo({name: 'move', jobUuid: 'move-job'})).resolves.toEqual(response);
+      expect(mockNodeServiceApi.backgroundActionInfo).toHaveBeenCalledWith('move', 'move-job');
+    });
+
+    it('propagates status lookup errors', async () => {
+      const error = new Error('Status lookup failed');
+      mockNodeServiceApi.backgroundActionInfo.mockRejectedValueOnce(error);
+
+      await expect(cellsAPI.getBackgroundActionInfo({name: 'move', jobUuid: 'move-job'})).rejects.toBe(error);
+    });
+  });
+
+  describe('moveNodes', () => {
+    it('moves all paths in one action and returns the Cells result', async () => {
+      const currentPaths = ['/current/file.txt', '/current/folder'];
+      const targetPath = '/new-location';
+      const mockResponse: RestPerformActionResponse = {
+        AffectedNodes: [],
+        BackgroundActions: [{JobUuid: 'move-job', Name: 'move'}],
+      } as RestPerformActionResponse;
+      mockNodeServiceApi.performAction.mockResolvedValueOnce(createMockResponse(mockResponse));
+
+      const result = await cellsAPI.moveNodes({currentPaths, targetPath});
+
+      expect(mockNodeServiceApi.performAction).toHaveBeenCalledTimes(1);
+      expect(mockNodeServiceApi.performAction).toHaveBeenCalledWith('move', {
+        Nodes: currentPaths.map(Path => {
+          return {Path};
+        }),
+        CopyMoveOptions: {TargetIsParent: true, TargetPath: targetPath},
+        AwaitStatus: 'Finished',
+        AwaitTimeout: '5000ms',
+      });
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('propagates errors when the move action fails', async () => {
+      const error = new Error('Move operation failed');
+      mockNodeServiceApi.performAction.mockRejectedValueOnce(error);
+
+      await expect(
+        cellsAPI.moveNodes({currentPaths: ['/current/file.txt', '/current/folder'], targetPath: '/target'}),
+      ).rejects.toBe(error);
     });
   });
 

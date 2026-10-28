@@ -57,18 +57,19 @@ const loginHashSeed = 42;
 
 export type UserClientEntityMap = {[userId: string]: ClientEntity[]};
 export type QualifiedUserClientEntityMap = {[domain: string]: UserClientEntityMap};
+type ClientRepositoryConfig = {AVERAGE_NUMBER_OF_CLIENTS: number};
 
 export class ClientRepository {
   private readonly logger: Logger;
   public selfUser: ko.Observable<User>;
 
-  static get CONFIG() {
+  static get CONFIG(): ClientRepositoryConfig {
     return {
       AVERAGE_NUMBER_OF_CLIENTS: 4,
     };
   }
 
-  static get PRIMARY_KEY_CURRENT_CLIENT() {
+  static get PRIMARY_KEY_CURRENT_CLIENT(): string {
     return 'local_identity';
   }
 
@@ -103,7 +104,7 @@ export class ClientRepository {
    * Delete the temporary client on the backend.
    * @returns Resolves when the temporary client was deleted on the backend
    */
-  private deleteLocalTemporaryClient() {
+  private deleteLocalTemporaryClient(): Promise<string> {
     const coreServices = this.core.service;
     if (isUndefined(coreServices)) {
       throw new Error('Core services are not initialized');
@@ -116,7 +117,7 @@ export class ClientRepository {
    * Load all known clients from the database.
    * @returns Resolves with all the clients found in the local database
    */
-  getAllClientsFromDb(): Promise<{[userId: string]: ClientEntity[]}> {
+  getAllClientsFromDb(): Promise<UserClientEntityMap> {
     return this.clientService.loadAllClientsFromDb().then(clientRecords => {
       // TODO(Federation): Add domain to identifier
       const recipients: {[userId: string]: ClientEntity[]} = {};

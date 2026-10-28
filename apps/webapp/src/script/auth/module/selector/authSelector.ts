@@ -20,7 +20,7 @@
 import type {TeamData} from '@wireapp/api-client/lib/team/';
 
 import type {RootState} from '../reducer';
-import type {RegistrationDataState} from '../reducer/authReducer';
+import type {LoginDataState, RegistrationDataState} from '../reducer/authReducer';
 
 const unsetTeam: TeamData = {
   creator: '',
@@ -47,40 +47,40 @@ const unsetRegistrationData: RegistrationDataState = {
   privacyPolicyAccepted: false,
 };
 
-export const isAuthenticated = (state: RootState) => {
+export const isAuthenticated = (state: RootState): boolean => {
   return state.authState.isAuthenticated;
 };
-export const isFetching = (state: RootState) => {
+export const isFetching = (state: RootState): boolean => {
   return state.authState.fetching;
 };
-export const isSendingTwoFactorCode = (state: RootState) => {
+export const isSendingTwoFactorCode = (state: RootState): boolean => {
   return state.authState.isSendingTwoFactorCode;
 };
-export const isFetchingSSOSettings = (state: RootState) => {
+export const isFetchingSSOSettings = (state: RootState): boolean => {
   return state.authState.fetchingSSOSettings;
 };
-export const getDefaultSSOCode = (state: RootState) => {
+export const getDefaultSSOCode = (state: RootState): string | undefined => {
   return state.authState.ssoSettings?.default_sso_code;
 };
-export const hasDefaultSSOCode = (state: RootState) => {
+export const hasDefaultSSOCode = (state: RootState): boolean => {
   const defaultSSOCode = state.authState.ssoSettings?.default_sso_code;
   return defaultSSOCode !== undefined && defaultSSOCode !== null && defaultSSOCode.length > 0;
 };
-export const getError = (state: RootState) => {
+export const getError = (state: RootState): Error | null => {
   return state.authState.error;
 };
-export const getLoginData = (state: RootState) => {
+export const getLoginData = (state: RootState): LoginDataState => {
   return state.authState.loginData;
 };
-export const getEntropy = (state: RootState) => {
+export const getEntropy = (state: RootState): Uint8Array<ArrayBufferLike> | undefined => {
   return state.authState.entropy;
 };
 export const getAccount = (state: RootState): RegistrationDataState => {
   return state.authState.account ?? unsetRegistrationData;
 };
-export const getAccountTeam = (state: RootState) => {
+export const getAccountTeam = (state: RootState): TeamData => {
   return getAccount(state).team ?? unsetTeam;
 };
-export const getAccountTeamName = (state: RootState) => {
+export const getAccountTeamName = (state: RootState): string => {
   return getAccountTeam(state).name;
 };

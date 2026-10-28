@@ -18,6 +18,7 @@
  */
 
 import * as React from 'react';
+import {type FunctionComponent} from 'react';
 
 import {CSSObject} from '@emotion/react';
 
@@ -33,6 +34,6 @@ export const boxStyle: <T>(props: BoxProps<T>) => CSSObject = () => {
   };
 };
 
-export const Box = (props: BoxProps) => {
+export const Box: FunctionComponent<BoxProps> = props => {
   return <div css={boxStyle(props)} {...props} />;
 };

@@ -83,7 +83,7 @@ export class ListViewModel {
   public readonly selfUser: ko.Subscribable<User>;
   private readonly visibleListItems: ko.PureComputed<(string | Conversation)[]>;
 
-  get isFederated() {
+  get isFederated(): boolean {
     return this.mainViewModel.isFederated;
   }
 
@@ -147,7 +147,7 @@ export class ListViewModel {
     this._initSubscriptions();
   }
 
-  private readonly _initSubscriptions = () => {
+  private readonly _initSubscriptions = (): void => {
     amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, (conversation?: Conversation) => {
       this.openConversations(conversation?.archivedState());
     });
@@ -189,7 +189,7 @@ export class ListViewModel {
     await this.callingViewModel.callActions.answer(call);
   };
 
-  readonly changeNotificationSetting = () => {
+  readonly changeNotificationSetting = (): void => {
     if (this.isProAccount()) {
       const {rightSidebar} = useAppMainState.getState();
       rightSidebar.goTo(PanelState.NOTIFICATIONS, {entity: this.conversationState.activeConversation() ?? null});
@@ -198,15 +198,15 @@ export class ListViewModel {
     }
   };
 
-  readonly goToNext = () => {
+  readonly goToNext = (): void => {
     this.iterateActiveItem(true);
   };
 
-  readonly goToPrevious = () => {
+  readonly goToPrevious = (): void => {
     this.iterateActiveItem(false);
   };
 
-  onKeyDownListView = (keyboardEvent: KeyboardEvent) => {
+  onKeyDownListView = (keyboardEvent: KeyboardEvent): void => {
     const {currentModalId} = usePrimaryModalState.getState();
     const {currentTab} = useSidebarStore.getState();
 
@@ -222,14 +222,14 @@ export class ListViewModel {
     }
   };
 
-  private readonly iterateActiveItem = (reverse = false) => {
+  private readonly iterateActiveItem = (reverse = false): void => {
     const {listState} = useAppState.getState();
     const isStatePreferences = listState === ListState.PREFERENCES;
 
     return isStatePreferences ? this.iterateActivePreference(reverse) : this.iterateActiveConversation(reverse);
   };
 
-  private readonly iterateActiveConversation = (reverse: boolean) => {
+  private readonly iterateActiveConversation = (reverse: boolean): void => {
     const {contentState} = useAppState.getState();
 
     const isStateRequests = contentState === ContentState.CONNECTION_REQUESTS;
@@ -248,7 +248,7 @@ export class ListViewModel {
     }
   };
 
-  private readonly iterateActivePreference = (reverse: boolean) => {
+  private readonly iterateActivePreference = (reverse: boolean): void => {
     const {contentState} = useAppState.getState();
     let activePreference = contentState;
     const isDeviceDetails = activePreference === ContentState.PREFERENCES_DEVICE_DETAILS;
@@ -264,7 +264,7 @@ export class ListViewModel {
     }
   };
 
-  private switchListAndSetTab = (listState: ListState, tab: SidebarTabs) => {
+  private switchListAndSetTab = (listState: ListState, tab: SidebarTabs): void => {
     useSidebarStore.getState().setCurrentTab(tab);
     this.switchList(listState);
   };

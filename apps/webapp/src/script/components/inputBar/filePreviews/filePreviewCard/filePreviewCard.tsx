@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {FileCard} from 'Components/fileCard/fileCard';
 
 import {wrapperStyles} from './filePreviewCard.styles';
@@ -34,7 +36,7 @@ interface FilePreviewCardProps {
   uploadProgress: number;
 }
 
-export const FilePreviewCard = ({
+export const FilePreviewCard: FunctionComponent<FilePreviewCardProps> = ({
   extension,
   name,
   size,

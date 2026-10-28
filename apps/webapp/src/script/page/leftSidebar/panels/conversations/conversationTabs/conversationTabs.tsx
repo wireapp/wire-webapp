@@ -17,7 +17,7 @@
  *
  */
 
-import type {ReactNode} from 'react';
+import type {ReactNode, FunctionComponent} from 'react';
 
 import {container} from 'tsyringe';
 
@@ -177,7 +177,7 @@ interface ConversationTabsProps {
   selfUser: User;
 }
 
-export const ConversationTabs = ({
+export const ConversationTabs: FunctionComponent<ConversationTabsProps> = ({
   unreadConversations,
   favoriteConversations,
   archivedConversations,
@@ -198,7 +198,7 @@ export const ConversationTabs = ({
   const core = container.resolve(Core);
   const teamState = container.resolve(TeamState);
   const totalUnreadConversations = unreadConversations.length;
-  const {teamRole} = useKoSubscribableChildren(selfUser, ['teamRole']);
+  const {teamRole, isTemporaryGuest} = useKoSubscribableChildren(selfUser, ['teamRole', 'isTemporaryGuest']);
   const {isCellsEnabled: isCellsEnabledForTeam} = useKoSubscribableChildren(teamState, ['isCellsEnabled']);
   const {isMeetingsEnabled} = useMeetingsFeatureFlag();
   const isDebugEnabled = Config.getConfig().FEATURE.ENABLE_DEBUG;
@@ -211,7 +211,7 @@ export const ConversationTabs = ({
     return conversation.hasUnread();
   }).length;
 
-  const filterUnreadAndArchivedConversations = (conversation: Conversation) => {
+  const filterUnreadAndArchivedConversations = (conversation: Conversation): boolean => {
     return conversationFilters.notArchived(conversation) && conversationFilters.hasUnread(conversation);
   };
 
@@ -441,7 +441,7 @@ export const ConversationTabs = ({
         aria-owns="tab-1 tab-2"
         className="conversations-sidebar-list-footer"
       >
-        {isTeamCreationEnabled && !teamState.isInTeam(selfUser) && <TeamCreationBanner />}
+        {isTeamCreationEnabled && !teamState.isInTeam(selfUser) && !isTemporaryGuest && <TeamCreationBanner />}
 
         {renderEnvironmentDisclaimerIfNeeded({translate})}
 

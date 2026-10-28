@@ -23,7 +23,7 @@ import {noop} from 'noop-esm';
 
 import {useTimeout} from './useTimeout';
 
-const useLongTouch = (element: HTMLElement | null, onLongTouch: () => void, touchDuration = 800) => {
+const useLongTouch = (element: HTMLElement | null, onLongTouch: () => void, touchDuration = 800): void => {
   const {startTimeout, removeTimeout} = useTimeout(onLongTouch, touchDuration);
 
   useEffect(() => {
@@ -31,11 +31,11 @@ const useLongTouch = (element: HTMLElement | null, onLongTouch: () => void, touc
       return noop;
     }
 
-    const onTouchStart = () => {
+    const onTouchStart = (): void => {
       startTimeout();
     };
 
-    const onTouchEnd = () => {
+    const onTouchEnd = (): void => {
       removeTimeout();
     };
 

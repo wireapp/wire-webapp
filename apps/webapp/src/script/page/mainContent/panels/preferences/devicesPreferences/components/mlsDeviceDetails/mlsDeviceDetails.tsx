@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {isNonEmptyString, isUndefined} from '@sindresorhus/is';
 
 import {isKnownSignature, MLSPublicKeys} from 'Repositories/client';
@@ -36,7 +38,7 @@ interface MLSDeviceDetailsProps {
   isSelfUser?: boolean;
 }
 
-export const MLSDeviceDetails = ({
+export const MLSDeviceDetails: FunctionComponent<MLSDeviceDetailsProps> = ({
   cipherSuite,
   isCurrentDevice,
   identity,

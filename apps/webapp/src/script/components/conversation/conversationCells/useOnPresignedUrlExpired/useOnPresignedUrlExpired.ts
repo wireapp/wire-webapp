@@ -30,7 +30,7 @@ export const useOnPresignedUrlExpired = ({
 }: {
   refreshCallback: () => void;
   conversationId: string;
-}) => {
+}): void => {
   const {getNodes} = useCellsStore();
 
   const nodes = getNodes({conversationId});

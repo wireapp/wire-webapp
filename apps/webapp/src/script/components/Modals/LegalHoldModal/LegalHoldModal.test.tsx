@@ -95,7 +95,16 @@ function createOthersDescriptionProps(): LegalHoldModalProps {
   return props;
 }
 
-const defaultProps = () => {
+type DefaultPropsResult = {
+  clientRepository: ClientRepository;
+  conversationRepository: ConversationRepository;
+  cryptographyRepository: CryptographyRepository;
+  messageRepository: MessageRepository;
+  searchRepository: SearchRepository;
+  teamRepository: TeamRepository;
+  selfUser: User;
+};
+const defaultProps = (): DefaultPropsResult => {
   return {
     clientRepository: {} as ClientRepository,
     conversationRepository: {

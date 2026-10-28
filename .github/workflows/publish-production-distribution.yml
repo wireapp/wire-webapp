@@ -57,7 +57,7 @@ env:
 jobs:
   publish_distribution:
     name: Publish Docker, Helm, and wire-builds distribution
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       actions: read
       contents: read
@@ -78,6 +78,15 @@ jobs:
           persist-credentials: false
           fetch-depth: 1
           ref: ${{ inputs.production_tag }}
+          path: selected-release
+
+      - name: Checkout current distribution tooling
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          ref: ${{ github.workflow_sha }}
+          path: workflow-source
 
       - name: Download exact distribution context
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
@@ -88,28 +97,26 @@ jobs:
           repository: ${{ github.repository }}
           run-id: ${{ inputs.source_run_id }}
 
-      - name: Add repository Yarn wrapper to PATH
-        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
-
       - name: Setup Node.js
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
-          node-version-file: '.nvmrc'
-          cache: 'yarn'
+          node-version-file: 'workflow-source/.nvmrc'
+          cache: 'npm'
+          cache-dependency-path: 'workflow-source/package-lock.json'
 
-      - name: Install exact release dependencies
-        env:
-          YARN_ENABLE_SCRIPTS: 'false'
-        run: ./bin/yarn install --immutable --mode=skip-build
+      - name: Install current distribution tooling dependencies
+        working-directory: workflow-source
+        run: npm run ci:install
 
       - name: Validate Production tag and distribution manifest
         id: validate_identity
         env:
-          DISTRIBUTION_CONTEXT_PATH: ${{ env.DISTRIBUTION_CONTEXT_PATH }}
+          DISTRIBUTION_CONTEXT_PATH: ${{ github.workspace }}/${{ env.DISTRIBUTION_CONTEXT_PATH }}
           EXPECTED_COMMIT_SHA: ${{ inputs.expected_commit_sha }}
           PRODUCTION_TAG: ${{ inputs.production_tag }}
           SOURCE_RUN_ID: ${{ inputs.source_run_id }}
-        run: ./tools/productionDistribution/validateProductionDistribution.sh
+        working-directory: selected-release
+        run: ../workflow-source/tools/productionDistribution/validateProductionDistribution.sh
 
       - name: Setup Helm
         uses: azure/setup-helm@dda3372f752e03dde6b3237bc9431cdc2f7a02a2
@@ -125,9 +132,10 @@ jobs:
           PRODUCTION_IMAGE_TAG_OUTPUT_PATH: ${{ runner.temp }}/production-image-tag.txt
           PRODUCTION_TAG: ${{ inputs.production_tag }}
           RELEASE_COMMIT_SHA: ${{ steps.validate_identity.outputs.production_tag_commit_sha }}
+          WIRE_WEBAPP_CONFIG_MANIFEST_PATH: ${{ github.workspace }}/selected-release/apps/webapp/app-config/package.json
           WIRE_WEBAPP_DOCKER_CONTEXT_PATH: ${{ env.DISTRIBUTION_CONTEXT_PATH }}
           WIRE_WEBAPP_RELEASE_COMMIT_SHA: ${{ steps.validate_identity.outputs.production_tag_commit_sha }}
-        run: ./tools/dockerPublication/publishProductionDocker.sh
+        run: ./workflow-source/tools/dockerPublication/publishProductionDocker.sh
 
       - name: Publish or reuse Helm chart
         id: publish_helm
@@ -137,7 +145,8 @@ jobs:
           DOCKER_IMAGE_TAG: ${{ steps.publish_docker.outputs.docker_image_tag }}
           CHART_REPOSITORY_NAME: ${{ env.CHART_REPOSITORY_NAME }}
           CHART_REPOSITORY_URL: ${{ env.CHART_REPOSITORY_URL }}
-        run: ./tools/helmPublication/publishProductionHelm.sh
+        working-directory: selected-release
+        run: ../workflow-source/tools/helmPublication/publishProductionHelm.sh
 
       - name: Check out wire-builds main
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
@@ -155,7 +164,7 @@ jobs:
           HELM_CHART_VERSION: ${{ steps.publish_helm.outputs.helm_chart_version }}
           RELEASE_COMMIT_SHA: ${{ steps.validate_identity.outputs.production_tag_commit_sha }}
         working-directory: wire-builds
-        run: ../tools/wireBuilds/updateWireBuilds.sh
+        run: ../workflow-source/tools/wireBuilds/updateWireBuilds.sh
 
       - name: Mark distribution complete
         id: distribution_result

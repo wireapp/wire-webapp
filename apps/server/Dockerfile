@@ -1,20 +1,17 @@
-FROM node:24-alpine
+FROM node:24.22.1-alpine3.24@sha256:06d7adf3e0ef61a13f1d28682726366f97a15aa1888c934d3ecec86c33918b53
 
 # For some extra dependencies...
 RUN apk add --no-cache dumb-init git bash
 
 WORKDIR /app
 
-# Yarn berry workspace metadata
-COPY package.json yarn.lock .yarnrc.yml .npmrc* ./
-COPY bin/yarn ./bin/yarn
-COPY .yarn ./.yarn
+# npm workspace metadata
+COPY package.json package-lock.json .npmrc ./
 COPY apps/server/package.json ./apps/server/package.json
 COPY libraries/config/package.json ./libraries/config/package.json
 
 # Install only server production deps
-# Artifact downloads do not preserve executable file permissions.
-RUN chmod +x ./bin/yarn && ./bin/yarn workspaces focus @wireapp/server --production
+RUN npm clean-install --omit=dev --workspace=@wireapp/server --include-workspace-root=false --ignore-scripts
 
 # Copy built config library artifacts
 COPY libraries/config/lib ./libraries/config/lib

@@ -49,6 +49,8 @@ import {isBackendError} from 'Util/typePredicateUtil';
 
 import type {MainViewModel} from './MainViewModel';
 
+type ConnectionRequestResult = {connectionStatus: ConnectionStatus; conversationId: QualifiedId};
+
 export class ActionsViewModel {
   constructor(
     private readonly selfRepository: SelfRepository,
@@ -190,7 +192,7 @@ export class ActionsViewModel {
     }
   };
 
-  readonly deleteClient = (clientEntity: ClientEntity) => {
+  readonly deleteClient = (clientEntity: ClientEntity): Promise<void> | Promise<ClientEntity[]> => {
     const isSSO = this.userState.self().isNoPasswordSSO;
     const isTemporary = clientEntity.isTemporary();
     if (isSSO || isTemporary) {
@@ -281,7 +283,7 @@ export class ActionsViewModel {
     if (conversationEntity !== undefined && messageEntity !== undefined) {
       const cellsAssets = this.messageRepository.getCellsAssetAttachmentIds(messageEntity);
 
-      const deleteMessage = async () => {
+      const deleteMessage = async (): Promise<void> => {
         if (cellsAssets.length > 0) {
           await this.cellsRepository.deleteNodes({uuids: cellsAssets, permanently: true});
         }
@@ -402,7 +404,7 @@ export class ActionsViewModel {
     });
   };
 
-  readonly deleteConversation = (conversationEntity: Conversation) => {
+  readonly deleteConversation = (conversationEntity: Conversation): void => {
     PrimaryModal.show(
       PrimaryModal.type.CONFIRM,
       {
@@ -424,7 +426,7 @@ export class ActionsViewModel {
     );
   };
 
-  readonly removeConversation = (conversationEntity: Conversation) => {
+  readonly removeConversation = (conversationEntity: Conversation): void => {
     if (!conversationEntity.isGroupOrChannel() || !conversationEntity.isSelfUserRemoved()) {
       return;
     }
@@ -551,9 +553,7 @@ export class ActionsViewModel {
    * @param userEntity User to connect to
    * @returns Promise that resolves to true if the request was successfully sent, false if not
    */
-  readonly sendConnectionRequest = (
-    userEntity: User,
-  ): Promise<{connectionStatus: ConnectionStatus; conversationId: QualifiedId} | null> => {
+  readonly sendConnectionRequest = (userEntity: User): Promise<ConnectionRequestResult | null> => {
     return this.connectionRepository.createConnection(userEntity);
   };
 

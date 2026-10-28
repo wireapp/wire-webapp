@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useRef, useState} from 'react';
+import React, {useRef, useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyString, isNull} from '@sindresorhus/is';
 import {LoginData} from '@wireapp/api-client/lib/auth';
@@ -38,7 +38,7 @@ interface LoginFormProps {
   onSubmit: (loginData: Partial<LoginData>, validationErrors: Error[]) => Promise<void>;
 }
 
-const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
+const LoginForm: FunctionComponent<LoginFormProps> = ({isFetching, onSubmit}: LoginFormProps) => {
   const {translate} = useApplicationContext();
   const emailInput = useRef<HTMLInputElement>(null);
   const passwordInput = useRef<HTMLInputElement>(null);

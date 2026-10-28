@@ -17,7 +17,7 @@
  *
  */
 
-import type {ReactNode} from 'react';
+import type {ReactNode, FunctionComponent} from 'react';
 
 import {Button, CheckRoundIcon, Link} from '@wireapp/react-ui-kit';
 
@@ -63,7 +63,7 @@ function renderIntroductionListItem(options: RenderIntroductionListItemOptions):
   );
 }
 
-export const Introduction = ({onNextStep}: StepProps) => {
+export const Introduction: FunctionComponent<StepProps> = ({onNextStep}: StepProps) => {
   const {translate} = useApplicationContext();
   const featuresList = [
     translate('teamCreationIntroListItem1'),

@@ -19,10 +19,10 @@
 
 import {useMemo} from 'react';
 
-import {act, fireEvent, render, screen} from '@testing-library/react';
+import {act, fireEvent, render, screen, type RenderResult} from '@testing-library/react';
 import type {Virtualizer} from '@tanstack/react-virtual';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
-import {createStore} from 'zustand/vanilla';
+import {createStore, type StoreApi} from 'zustand/vanilla';
 
 import type {UseMeetingListVirtualizer} from 'Components/meeting/meetingList/useMeetingListVirtualizer';
 import type {MeetingStoreState} from 'Components/meeting/meetingStore/createMeetingStore';
@@ -109,7 +109,7 @@ const createMainViewModelForTest = (): MainViewModel => {
   } as MainViewModel;
 };
 
-const createMeetingStoreForTest = () => {
+const createMeetingStoreForTest = (): StoreApi<MeetingStoreState> => {
   return createStore<MeetingStoreState>(() => {
     return {
       meetingSeries: [],
@@ -133,7 +133,7 @@ const renderMeetingList = (
     Partial<Pick<MeetingListProps, 'selfUser' | 'onRefresh'>>,
   clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
   useMeetingListVirtualizer = createUseMeetingListVirtualizerForTest(),
-) => {
+): RenderResult => {
   const rootProviderWrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({
       translate: translateForTest,

@@ -110,13 +110,17 @@ type CreateWebAppReleaseReservationResultOptions = {
 
 const fullCommitShaPattern = /^[0-9a-f]{40}$/i;
 const likelyWebAppSemVerReleaseBranchPattern = /^release\/(?:v)?\d/;
+const historicalWebAppDateReleaseBranchPattern = /^release\/\d{4}-\d{2}-\d{2}(?:\.\d+)?$/;
 
 function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
 
 function isLikelyWebAppSemVerReleaseBranchName(branchName: string): boolean {
-  return likelyWebAppSemVerReleaseBranchPattern.test(branchName);
+  return (
+    likelyWebAppSemVerReleaseBranchPattern.test(branchName) &&
+    historicalWebAppDateReleaseBranchPattern.test(branchName) === false
+  );
 }
 
 function createReservationResult(options: CreateWebAppReleaseReservationResultOptions): WebAppReleasePreparation {

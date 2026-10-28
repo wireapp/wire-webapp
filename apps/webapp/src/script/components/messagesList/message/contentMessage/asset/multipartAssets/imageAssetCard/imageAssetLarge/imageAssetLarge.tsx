@@ -17,7 +17,7 @@
  *
  */
 
-import {CSSProperties, useState} from 'react';
+import {CSSProperties, useState, type FunctionComponent} from 'react';
 
 import {Maybe} from 'true-myth';
 
@@ -52,7 +52,7 @@ interface ImageAssetLargeProps {
   id: string;
 }
 
-export const ImageAssetLarge = ({
+export const ImageAssetLarge: FunctionComponent<ImageAssetLargeProps> = ({
   id,
   filePreviewUrl,
   fileUrl,

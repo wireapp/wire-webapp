@@ -33,6 +33,7 @@ import {AuthError} from '../error/authError';
 
 const decimalRadix = 10;
 const environmentPollingIntervalInMilliseconds = 100;
+type LoadedUrlBuffer = {buffer: ArrayBuffer; mimeType: string};
 
 export const checkIndexedDb = (): Promise<void> => {
   if (!Runtime.isSupportingIndexedDb()) {
@@ -97,10 +98,7 @@ export const loadDataUrl = (file: Blob): Promise<string | ArrayBuffer> => {
   });
 };
 
-const loadUrlBuffer = (
-  url: string,
-  xhrAccessorFunction?: (xhr: XMLHttpRequest) => void,
-): Promise<{buffer: ArrayBuffer; mimeType: string}> => {
+const loadUrlBuffer = (url: string, xhrAccessorFunction?: (xhr: XMLHttpRequest) => void): Promise<LoadedUrlBuffer> => {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.open('GET', url, true);
@@ -308,7 +306,7 @@ export const getFileNameWithExtension = (name: string, extension: string): strin
  * Forces file download instead of browser "preview".
  * We use fetch + blob because native <a download> doesn't work reliably across browsers and file types (especially PDFs and images).
  */
-export const forcedDownloadFile = async ({url, name}: {url: string; name: string}) => {
+export const forcedDownloadFile = async ({url, name}: {url: string; name: string}): Promise<void> => {
   const response = await fetch(url);
   const blob = await response.blob();
   const newBlob = new Blob([blob], {type: 'application/octet-stream'});
@@ -335,7 +333,7 @@ export const sortGroupsByLastEvent = (groupA: Conversation, groupB: Conversation
 };
 
 // Removes url(' and url(" from the beginning of the string and also ") and ') from the end
-export const stripUrlWrapper = (url: string) => {
+export const stripUrlWrapper = (url: string): string => {
   return url.replace(/^url\(["']?/, '').replace(/["']?\)$/, '');
 };
 
@@ -395,7 +393,7 @@ export const preventFocusOutside = (
   (focusableContent[focusedItemIndex + 1] as HTMLElement)?.focus();
 };
 
-export const setContextMenuPosition = (event: React.KeyboardEvent) => {
+export const setContextMenuPosition = (event: React.KeyboardEvent): MouseEvent => {
   event.stopPropagation();
   event.preventDefault();
 
@@ -407,18 +405,18 @@ export const setContextMenuPosition = (event: React.KeyboardEvent) => {
   });
 };
 
-const supportsSecretStorage = () => {
+const supportsSecretStorage = (): boolean => {
   return !Runtime.isDesktopApp() || !isUndefined(window.systemCrypto);
 };
 
 // disables mls for old 'broken' desktop clients, see https://github.com/wireapp/wire-desktop/pull/6094
-export const supportsMLS = () => {
+export const supportsMLS = (): boolean => {
   return supportsSecretStorage();
 };
 
 export const incomingCssClass = 'content-animation-incoming-horizontal-left';
 
-export const removeAnimationsClass = (element: HTMLElement | null) => {
+export const removeAnimationsClass = (element: HTMLElement | null): void => {
   if (!isNullOrUndefined(element)) {
     element.addEventListener('animationend', () => {
       if (element.classList.contains(incomingCssClass)) {
@@ -436,7 +434,7 @@ export class InitializationEventLogger {
     this.timestamp = Date.now();
   }
 
-  log(step: string, options = {}) {
+  log(step: string, options = {}): void {
     this.logger.info('Performance tracking: ', {
       appInitialization: {
         user_id: this.userId,

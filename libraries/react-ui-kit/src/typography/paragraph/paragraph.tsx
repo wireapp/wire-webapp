@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {CSSObject} from '@emotion/react';
 
 import {Theme} from '../../identity/theme';
@@ -36,7 +38,7 @@ export const paragraphStyle: <T>(theme: Theme, props: ParagraphProps<T>) => CSSO
   };
 };
 
-export const Paragraph = (props: ParagraphProps) => {
+export const Paragraph: FunctionComponent<ParagraphProps> = props => {
   return (
     <p
       css={theme => {
@@ -63,7 +65,7 @@ export const leadStyle: <T>(theme: Theme, props: LeadProps<T>) => CSSObject = (
   };
 };
 
-export const Lead = (props: LeadProps) => {
+export const Lead: FunctionComponent<LeadProps> = props => {
   return (
     <p
       css={theme => {

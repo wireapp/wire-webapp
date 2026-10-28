@@ -44,6 +44,7 @@ import type {LegalHoldMessage} from './legalHoldMessage';
 import type {LinkPreview} from './linkPreview';
 import type {MemberMessage} from './memberMessage';
 import type {MissedMessage} from './missedMessage';
+import type {Multipart} from './multipart';
 import type {PingMessage} from './pingMessage';
 import type {SystemMessage} from './systemMessage';
 import type {VerificationMessage} from './verificationMessage';
@@ -232,7 +233,7 @@ export class Message {
       : false;
   }
 
-  getMultipartAssets() {
+  getMultipartAssets(): Multipart[] {
     const hasMultipartAsset = this.hasMultipartAsset();
     if (!hasMultipartAsset) {
       return [];

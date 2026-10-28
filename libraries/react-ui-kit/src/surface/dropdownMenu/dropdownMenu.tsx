@@ -17,7 +17,7 @@
  *
  */
 
-import {forwardRef, ReactNode} from 'react';
+import {forwardRef, ReactNode, type FunctionComponent, type JSX} from 'react';
 
 import {CSSObject} from '@emotion/react';
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
@@ -63,19 +63,19 @@ import {
  * ```
  *
  */
-export const DropdownMenu = ({children}: {children: ReactNode}) => {
+type DropdownMenuProps = {children: ReactNode};
+
+export const DropdownMenu = ({children}: DropdownMenuProps): JSX.Element => {
   return <DropdownMenuPrimitive.Root>{children}</DropdownMenuPrimitive.Root>;
 };
 
-const DropdownMenuTrigger = ({
-  children,
-  asChild = false,
-  cssObj,
-}: {
+type DropdownMenuTriggerProps = {
   children: ReactNode;
   asChild?: boolean;
   cssObj?: CSSObject;
-}) => {
+};
+
+const DropdownMenuTrigger: FunctionComponent<DropdownMenuTriggerProps> = ({children, asChild = false, cssObj}) => {
   return (
     <DropdownMenuPrimitive.Trigger asChild={asChild} css={!asChild && {...triggerStyles, ...cssObj}}>
       {children}
@@ -85,7 +85,9 @@ const DropdownMenuTrigger = ({
 
 DropdownMenu.Trigger = DropdownMenuTrigger;
 
-const DropdownMenuContent = ({children}: {children: ReactNode}) => {
+type DropdownMenuContentProps = {children: ReactNode};
+
+const DropdownMenuContent: FunctionComponent<DropdownMenuContentProps> = ({children}) => {
   return (
     <DropdownMenuPrimitive.Portal>
       <DropdownMenuPrimitive.Content css={contentStyle} sideOffset={6}>
@@ -97,15 +99,13 @@ const DropdownMenuContent = ({children}: {children: ReactNode}) => {
 
 DropdownMenu.Content = DropdownMenuContent;
 
-const DropdownMenuItem = ({
-  children,
-  disabled = false,
-  onClick,
-}: {
+type DropdownMenuItemProps = {
   children: ReactNode;
   disabled?: boolean;
   onClick?: () => void;
-}) => {
+};
+
+const DropdownMenuItem: FunctionComponent<DropdownMenuItemProps> = ({children, disabled = false, onClick}) => {
   return (
     <DropdownMenuPrimitive.Item css={itemStyle} disabled={disabled} onClick={onClick}>
       <span css={textStyles}>{children}</span>

@@ -18,7 +18,7 @@
  */
 
 import * as React from 'react';
-import {useEffect, useRef} from 'react';
+import {useEffect, useRef, type FunctionComponent} from 'react';
 
 import {isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 
@@ -28,12 +28,12 @@ export interface IsInViewportProps<T = HTMLDivElement> extends React.HTMLProps<T
   onEnterViewport?: () => void;
 }
 
-export const IsInViewport = ({
+export const IsInViewport: FunctionComponent<IsInViewportProps> = ({
   onEnterViewport,
   disabled = false,
   checkViewportOnce = false,
   ...props
-}: IsInViewportProps) => {
+}) => {
   const element = useRef<HTMLDivElement>(null);
   useEffect(() => {
     let observer: IntersectionObserver | undefined;

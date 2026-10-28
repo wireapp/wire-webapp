@@ -18,6 +18,7 @@
  */
 
 import * as React from 'react';
+import {type FunctionComponent} from 'react';
 
 import {CSSObject} from '@emotion/react';
 
@@ -40,6 +41,6 @@ export const menuScrollableItemsStyle: <T>(props: MenuScrollableItemsProps<T>) =
   };
 };
 
-export const MenuScrollableItems = (props: MenuScrollableItemsProps) => {
+export const MenuScrollableItems: FunctionComponent<MenuScrollableItemsProps> = props => {
   return <div css={menuScrollableItemsStyle(props)} {...props} />;
 };

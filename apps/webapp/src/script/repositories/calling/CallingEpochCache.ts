@@ -42,7 +42,7 @@ export class CallingEpochCache {
     this.isActive = false;
   }
 
-  public clean() {
+  public clean(): void {
     this.epochList = [];
   }
 

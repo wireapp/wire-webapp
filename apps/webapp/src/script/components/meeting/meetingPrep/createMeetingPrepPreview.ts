@@ -20,8 +20,10 @@
 import {task} from 'true-myth';
 
 import type {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
+import {MediaError} from 'src/script/error/mediaError';
+import {NoAudioInputError} from 'src/script/error/noAudioInputError';
 
-import {meetingPrepPreviewErrors, type RequestMeetingPrepPreview} from './meetingPrepTypes';
+import {meetingPrepMediaKinds, meetingPrepPreviewErrors, type RequestMeetingPrepPreview} from './meetingPrepTypes';
 
 export const createMeetingPrepPreview = (
   streamHandler: MediaStreamHandler,
@@ -32,7 +34,17 @@ export const createMeetingPrepPreview = (
   return {
     requestPreviewStream: request => {
       return task.tryOrElse(
-        () => {
+        error => {
+          if (error instanceof NoAudioInputError) {
+            return meetingPrepPreviewErrors.microphonePermissionDenied;
+          }
+          if (
+            error instanceof MediaError &&
+            error.type === MediaError.TYPE.MEDIA_STREAM_PERMISSION &&
+            request.mediaKind === meetingPrepMediaKinds.video
+          ) {
+            return meetingPrepPreviewErrors.cameraPermissionDenied;
+          }
           return meetingPrepPreviewErrors.requestFailed;
         },
         () => {

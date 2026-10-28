@@ -1,6 +1,9 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended", ":semanticCommitsDisabled"],
+  "constraints": {
+    "npm": "11.21.1"
+  },
   "labels": ["renovate", "semver:patch"],
   "timezone": "Europe/Berlin",
   "dependencyDashboard": true,
@@ -13,8 +16,29 @@
   },
   "packageRules": [
     {
+      "matchManagers": ["npm"],
+      "matchDepTypes": ["dependencies", "devDependencies", "optionalDependencies"],
+      "rangeStrategy": "pin"
+    },
+    {
+      "description": "Keep library @types/node dependencies on Node 22 typings",
+      "matchManagers": ["npm"],
+      "matchFileNames": ["libraries/**/package.json"],
+      "matchPackageNames": ["@types/node"],
+      "matchCurrentVersion": ">=22 <23",
+      "allowedVersions": ">=22 <23"
+    },
+    {
       "matchUpdateTypes": ["major"],
       "dependencyDashboardApproval": true
+    },
+    {
+      "description": "Update the pinned Node.js runtime promptly",
+      "matchManagers": ["nvm"],
+      "matchFileNames": [".nvmrc"],
+      "matchDatasources": ["node-version"],
+      "groupName": "node runtime",
+      "minimumReleaseAge": null
     },
     {
       "matchFileNames": ["apps/webapp/app-config/package.json"],
@@ -29,8 +53,20 @@
       "groupName": "docker images"
     },
     {
+      "description": "Update the production Node.js image and digest promptly",
+      "matchManagers": ["dockerfile"],
+      "matchFileNames": ["apps/server/Dockerfile"],
+      "matchDepTypes": ["final"],
+      "matchDatasources": ["docker"],
+      "matchDepNames": ["node"],
+      "groupName": "node runtime",
+      "minimumReleaseAge": null,
+      "pinDigests": true
+    },
+    {
       "matchPackageNames": ["quay.io/wire/mirror-images/playwright"],
-      "minimumReleaseAge": null
+      "minimumReleaseAge": null,
+      "pinDigests": true
     },
     {
       "matchDepNames": ["playwright", "@playwright/test", "quay.io/wire/mirror-images/playwright"],
@@ -67,7 +103,7 @@
       "groupName": "eslint tooling"
     },
     {
-      "matchPackageNames": ["jest", "@jest/**", "jest-*", "babel-jest", "@types/jest", "@nx/jest", "@swc/jest"],
+      "matchPackageNames": ["jest", "@jest/**", "jest-*", "babel-jest", "@types/jest", "@swc/jest"],
       "groupName": "jest ecosystem"
     },
     {

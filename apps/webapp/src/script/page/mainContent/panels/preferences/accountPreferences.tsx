@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {isNonEmptyString} from '@sindresorhus/is';
 import {ErrorBoundary} from 'react-error-boundary';
 import {container} from 'tsyringe';
@@ -79,7 +81,7 @@ interface AccountPreferencesProps {
 
 const logger = getLogger('AccountPreferences');
 
-export const AccountPreferences = ({
+export const AccountPreferences: FunctionComponent<AccountPreferencesProps> = ({
   appLockRepository,
   importFile,
   clientRepository,
@@ -100,12 +102,13 @@ export const AccountPreferences = ({
     'teamName',
     'isProfileLinkEnabled',
   ]);
-  const {name, email, availability, username, managedBy} = useKoSubscribableChildren(selfUser, [
+  const {name, email, availability, username, managedBy, isTemporaryGuest} = useKoSubscribableChildren(selfUser, [
     'name',
     'email',
     'availability',
     'username',
     'managedBy',
+    'isTemporaryGuest',
   ]);
 
   const canEditProfile = managedBy === User.CONFIG.MANAGED_BY.WIRE;
@@ -149,7 +152,7 @@ export const AccountPreferences = ({
   return (
     <PreferencesPage title={translate('preferencesAccount')}>
       <div className="preferences-wrapper">
-        {isTeamCreationEnabled && !teamState.isInTeam(selfUser) && <TeamCreationAccountHeader />}
+        {isTeamCreationEnabled && !teamState.isInTeam(selfUser) && !isTemporaryGuest && <TeamCreationAccountHeader />}
         <div className="preferences-account-name">
           <h3 className="heading-h3 text-center" title={name}>
             {name}

@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {useEffect, useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 import {flexRender, getCoreRowModel, type Header, useReactTable} from '@tanstack/react-table';
@@ -66,7 +66,11 @@ interface CellsTableHeaderCellProps {
   isSortingEnabled: boolean;
 }
 
-const CellsTableHeaderCell = ({header, getDirectionFor, isSortingEnabled}: CellsTableHeaderCellProps) => {
+const CellsTableHeaderCell: FunctionComponent<CellsTableHeaderCellProps> = ({
+  header,
+  getDirectionFor,
+  isSortingEnabled,
+}: CellsTableHeaderCellProps) => {
   const sortField = SORTABLE_COLUMN_FIELD[header.column.id];
   const ariaSort = isSortingEnabled && isNonEmptyString(sortField) ? toAriaSort(getDirectionFor(sortField)) : undefined;
 
@@ -84,7 +88,7 @@ const CellsTableHeaderCell = ({header, getDirectionFor, isSortingEnabled}: Cells
   );
 };
 
-export const CellsTable = ({
+export const CellsTable: FunctionComponent<CellsTableProps> = ({
   nodes,
   cellsRepository,
   getDirectionFor,

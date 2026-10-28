@@ -1,3 +1,4 @@
+---
 name: Redeploy production from tag
 
 on:
@@ -20,7 +21,7 @@ concurrency:
 jobs:
   validate_request:
     name: Validate redeploy request
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     outputs:
       webapp_build_version: ${{ steps.validate.outputs.webapp_build_version }}
       tag: ${{ steps.validate.outputs.tag }}
@@ -31,19 +32,14 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Add repository Yarn wrapper to PATH
-        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
-
       - name: Setup Node.js
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: Install dependencies
-        env:
-          YARN_ENABLE_SCRIPTS: 'false'
-        run: ./bin/yarn install --immutable --mode=skip-build
+        run: npm run ci:install
 
       - name: Validate input, actor, and tag
         id: validate
@@ -87,7 +83,7 @@ jobs:
 
   build_artifact:
     name: Rebuild tagged release artifact
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs: validate_request
     outputs:
       artifact_version: ${{ steps.validate_artifact_metadata.outputs.artifact_version }}
@@ -142,44 +138,59 @@ jobs:
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: 'workflow-source/.nvmrc'
-          cache: 'yarn'
-          cache-dependency-path: 'workflow-source/yarn.lock'
+          cache: 'npm'
+          cache-dependency-path: 'workflow-source/package-lock.json'
 
       - name: Install workflow tool dependencies
         working-directory: workflow-source
-        env:
-          YARN_ENABLE_SCRIPTS: 'false'
-        run: ./bin/yarn install --immutable --mode=skip-build
+        run: npm run ci:install
 
       - name: Build workflow tool dependencies
         working-directory: workflow-source
-        run: ./bin/yarn nx run config-lib:build
+        run: npm exec -- nx run config-lib:build
 
       - name: Setup Node.js for selected release
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: 'selected-release/.nvmrc'
-          cache: 'yarn'
-          cache-dependency-path: 'selected-release/yarn.lock'
+          # Historical tags may contain either package-manager lockfile.
 
       - name: Install selected release dependencies
         working-directory: selected-release
         env:
           WIRE_WEBAPP_CONFIGURATION: production
-        run: ./bin/yarn --immutable
+        run: |
+          package_manager="$(node ../workflow-source/tools/packageManager/packageManager.js "$PWD")"
+          if [[ "${package_manager}" == 'npm' ]]; then
+            npm clean-install
+          else
+            ./bin/yarn --immutable
+          fi
 
       - name: Update selected release configuration
         working-directory: selected-release
         env:
           WIRE_WEBAPP_CONFIGURATION: production
-        run: ./bin/yarn nx run webapp:configure
+        run: |
+          package_manager="$(node ../workflow-source/tools/packageManager/packageManager.js "$PWD")"
+          if [[ "${package_manager}" == 'npm' ]]; then
+            npm exec -- nx run webapp:configure
+          else
+            ./bin/yarn nx run webapp:configure
+          fi
 
       - name: Build and package
         working-directory: selected-release
         env:
           WIRE_WEBAPP_BUILD_COMMIT: ${{ steps.git_metadata.outputs.commit_sha }}
           WIRE_WEBAPP_BUILD_VERSION: ${{ needs.validate_request.outputs.webapp_build_version }}
-        run: ./bin/yarn build:prod:public
+        run: |
+          package_manager="$(node ../workflow-source/tools/packageManager/packageManager.js "$PWD")"
+          if [[ "${package_manager}" == 'npm' ]]; then
+            npm run build:prod:public
+          else
+            ./bin/yarn build:prod:public
+          fi
 
       - name: Restore Node.js for workflow tools
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
@@ -203,7 +214,7 @@ jobs:
 
   deploy_to_production:
     name: Deploy to production
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     env:
       AWS_REGION: eu-central-1
     needs: [validate_request, build_artifact]
@@ -241,7 +252,7 @@ jobs:
           use-existing-application-version-if-available: true
   notify_redeploy_failure:
     name: Notify redeploy failure
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs: [validate_request, build_artifact, deploy_to_production]
     if: ${{ always() && needs.deploy_to_production.result == 'failure' }}
     permissions:

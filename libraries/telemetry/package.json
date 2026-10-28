@@ -9,21 +9,27 @@
   "files": [
     "lib"
   ],
-  "main": "./lib/index.js",
+  "main": "./lib/commonjs/index.js",
+  "types": "./lib/index.d.ts",
   "exports": {
     "./package.json": "./package.json",
     ".": {
-      "import": "./lib/index.js",
-      "default": "./lib/index.cjs"
+      "import": {
+        "types": "./lib/index.d.ts",
+        "default": "./lib/index.js"
+      },
+      "require": {
+        "types": "./lib/commonjs/index.d.ts",
+        "default": "./lib/commonjs/index.js"
+      },
+      "default": "./lib/commonjs/index.js"
     }
   },
   "version": "0.3.10",
   "devDependencies": {
-    "@types/node": "^22.0.0",
+    "@types/node": "22.20.5",
     "rimraf": "6.1.3",
-    "typescript": "^5.0.4",
-    "vite": "^6.0.1",
-    "vite-plugin-dts": "^4.3.0"
+    "typescript": "6.0.3"
   },
   "scripts": {
     "build": "nx run telemetry-lib:build",

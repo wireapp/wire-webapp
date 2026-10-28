@@ -22,7 +22,6 @@
 const child = require('child_process');
 const nodeFileSystem = require('fs');
 const path = require('path');
-const appConfigPkg = require('../../apps/webapp/app-config/package.json');
 
 const shortenedCommitIdentifierLength = 7;
 
@@ -34,10 +33,10 @@ require('dotenv').config({quiet: true});
  *
  * To run this script, you need to have Docker installed (i.e. "Docker Desktop for Mac"). The docker daemon (or Docker for Desktop app) has to be started before running this script. Make sure to set "DOCKER_USERNAME" and "DOCKER_PASSWORD" in your local ".env" file or system environment variables.
  *
- * Note: You must run "./bin/yarn nx run server:package" from the repository root before creating the Docker image, otherwise the compiled JavaScript code (and other assets) won't be part of the bundle.
+ * Note: You must run "npm run build:prod" from the repository root before creating the Docker image, otherwise the compiled JavaScript code (and other assets) won't be part of the bundle.
  *
  * Demo execution:
- * ./bin/yarn docker staging '2021-08-25' '1240cfda9e609470cf1154e18f5bc582ca8907ff'
+ * npm run docker -- staging '2021-08-25' '1240cfda9e609470cf1154e18f5bc582ca8907ff'
  */
 
 function selectReleaseCommit({releaseCommitSha, commandLineCommitSha, githubSha}) {
@@ -45,13 +44,56 @@ function selectReleaseCommit({releaseCommitSha, commandLineCommitSha, githubSha}
 }
 
 function createUniqueImageTag({versionTag, configurationVersion, releaseCommitSha}) {
-  return (
-    versionTag.replace('/', '-') +
-    '-' +
-    configurationVersion +
-    '-' +
-    releaseCommitSha.substring(0, shortenedCommitIdentifierLength)
-  );
+  return `${versionTag.replace('/', '-')}-${configurationVersion}-${releaseCommitSha.substring(0, shortenedCommitIdentifierLength)}`;
+}
+
+/**
+ * @typedef {object} ConfigurationVersionOptions
+ * @property {string} configurationEntry
+ * @property {string} configurationManifestPath
+ * @property {(filePath: string, encoding: 'utf8') => string} [readFile]
+ */
+
+/**
+ * @param {ConfigurationVersionOptions} options
+ * @returns {string}
+ */
+function readConfigurationVersion(options) {
+  const {configurationEntry, configurationManifestPath, readFile = nodeFileSystem.readFileSync} = options;
+  let configurationManifestContents;
+
+  try {
+    configurationManifestContents = readFile(configurationManifestPath, 'utf8');
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    throw new Error(`Failed to read WebApp configuration manifest at ${configurationManifestPath}: ${errorMessage}`, {
+      cause: error,
+    });
+  }
+
+  let appConfigPackage;
+
+  try {
+    appConfigPackage = JSON.parse(configurationManifestContents);
+  } catch (error) {
+    throw new Error(`WebApp configuration manifest is not valid JSON: ${configurationManifestPath}`, {cause: error});
+  }
+
+  const configurationDependency = appConfigPackage?.dependencies?.[configurationEntry];
+  if (typeof configurationDependency !== 'string') {
+    throw new Error(
+      `WebApp configuration manifest is missing dependency ${configurationEntry}: ${configurationManifestPath}`,
+    );
+  }
+
+  const configurationVersion = configurationDependency.split('#')[1];
+  if (typeof configurationVersion !== 'string' || configurationVersion.length === 0) {
+    throw new Error(
+      `WebApp configuration dependency ${configurationEntry} must include a non-empty Git reference after #: ${configurationManifestPath}`,
+    );
+  }
+
+  return configurationVersion;
 }
 
 function selectWebAppConfigurationEntry(versionTag, productionTag) {
@@ -127,11 +169,28 @@ function writeImageTag(outputPath, imageTag) {
   }
 }
 
-function runDockerPublication(
-  commandLineArguments,
-  environment,
-  {runProcess: executeProcess = runProcess, writeFile = writeImageTag} = {},
-) {
+/**
+ * @typedef {object} DockerPublicationOptions
+ * @property {string[]} commandLineArguments
+ * @property {NodeJS.ProcessEnv} environment
+ * @property {{
+ *   readonly runProcess?: typeof runProcess;
+ *   readonly writeFile?: typeof writeImageTag;
+ *   readonly readFile?: ConfigurationVersionOptions['readFile'];
+ * }} [dependencies]
+ */
+
+/**
+ * @param {DockerPublicationOptions} options
+ * @returns {string}
+ */
+function runDockerPublication(options) {
+  const {commandLineArguments, environment, dependencies = {}} = options;
+  const {
+    runProcess: executeProcess = runProcess,
+    writeFile = writeImageTag,
+    readFile = nodeFileSystem.readFileSync,
+  } = dependencies;
   /** Version tag of webapp (e.g. "2023-11-09-staging.0", "dev") */
   const versionTag = commandLineArguments[0].replace('/', '-');
   const uniqueTagOut = commandLineArguments[1] || '';
@@ -155,7 +214,7 @@ function runDockerPublication(
 
   const commitShortSha = releaseCommitSha.substring(0, shortenedCommitIdentifierLength);
   const dockerRegistryDomain = 'quay.io';
-  const repository = dockerRegistryDomain + '/wire/webapp';
+  const repository = `${dockerRegistryDomain}/wire/webapp`;
   const containerImageTags = [];
   const requiredEnvironmentDefaultKeys = [
     'BACKEND_NAME',
@@ -167,24 +226,33 @@ function runDockerPublication(
   const environmentDefaultsSmokeCheckCommand = [
     'test -s /dist/.env.defaults',
     ...requiredEnvironmentDefaultKeys.map(requiredEnvironmentDefaultKey => {
-      return 'grep -q "^' + requiredEnvironmentDefaultKey + '=" /dist/.env.defaults';
+      return `grep -q "^${requiredEnvironmentDefaultKey}=" /dist/.env.defaults`;
     }),
   ].join(' && ');
 
   /** Defines which config version (listed in "app-config/package.json") is going to be used */
   const configurationEntry = selectWebAppConfigurationEntry(versionTag, environment.PRODUCTION_TAG);
-  const configurationVersion = appConfigPkg.dependencies[configurationEntry].split('#')[1];
+  const configuredManifestPath = environment.WIRE_WEBAPP_CONFIG_MANIFEST_PATH;
+  const configurationManifestPath =
+    configuredManifestPath === undefined
+      ? path.resolve(__dirname, '../../apps/webapp/app-config/package.json')
+      : path.resolve(configuredManifestPath);
+  const configurationVersion = readConfigurationVersion({
+    configurationEntry,
+    configurationManifestPath,
+    readFile,
+  });
   const uniqueImageTag = createUniqueImageTag({versionTag, configurationVersion, releaseCommitSha});
 
   if (printImageTagOnly) {
-    console.log(uniqueImageTag);
+    console.info(uniqueImageTag);
     return uniqueImageTag;
   }
 
   /** One Docker image can have multiple tags, e.g. "production" (links always to the latest production build) & "2021-08-30-production.0-v0.28.25-0-1240cfd" (links to a fixed production build) */
-  containerImageTags.push(repository + ':' + versionTag);
+  containerImageTags.push(`${repository}:${versionTag}`);
 
-  containerImageTags.push(repository + ':' + uniqueImageTag);
+  containerImageTags.push(`${repository}:${uniqueImageTag}`);
 
   const dockerUsername = environment.DOCKER_USERNAME;
   const dockerPassword = environment.DOCKER_PASSWORD;
@@ -233,11 +301,15 @@ function runDockerPublication(
 
 if (require.main === module) {
   const runtimeArgumentPrefixLength = 2;
-  runDockerPublication(process.argv.slice(runtimeArgumentPrefixLength), process.env);
+  runDockerPublication({
+    commandLineArguments: process.argv.slice(runtimeArgumentPrefixLength),
+    environment: process.env,
+  });
 }
 
 module.exports = {
   createUniqueImageTag,
+  readConfigurationVersion,
   resolveDockerContextPath,
   runDockerPublication,
   runProcess,

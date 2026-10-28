@@ -35,7 +35,9 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
 );
 
-const createCallTimeoutMessage = (partialCallTimeoutMessage: Partial<CallTimeoutMessageEntity>) => {
+const createCallTimeoutMessage = (
+  partialCallTimeoutMessage: Partial<CallTimeoutMessageEntity>,
+): CallTimeoutMessageEntity => {
   const callMessage: Partial<CallTimeoutMessageEntity> = {
     displayTimestampLong: () => {
       return '';

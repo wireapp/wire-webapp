@@ -98,13 +98,13 @@ function CallingContainerWithJoinedCall({
 
   const videoGrid = useVideoGrid(joinedCall);
 
-  const changePage = (newPage: number, call: Call) => {
+  const changePage = (newPage: number, call: Call): void => {
     return callingRepository.changeCallPage(call, newPage);
   };
 
   const {clearShowAlert} = useCallAlertState();
 
-  const leave = (call: Call) => {
+  const leave = (call: Call): void => {
     callingRepository.setViewModeMinimized();
     callingRepository.leaveCall(call.conversation.qualifiedId, LEAVE_CALL_REASON.MANUAL_LEAVE_BY_UI_CLICK);
     callState.activeCallViewTab(CallViewTab.ALL);
@@ -112,11 +112,11 @@ function CallingContainerWithJoinedCall({
     clearShowAlert();
   };
 
-  const setMaximizedParticipant = (call: Call, participant: Participant | null) => {
+  const setMaximizedParticipant = (call: Call, participant: Participant | null): void => {
     call.maximizedParticipant(participant);
   };
 
-  const setActiveCallViewTab = (tab: CallViewTab) => {
+  const setActiveCallViewTab = (tab: CallViewTab): void => {
     callState.activeCallViewTab(tab);
     if (tab === CallViewTab.ALL) {
       callingRepository.requestCurrentPageVideoStreams(joinedCall);
@@ -131,42 +131,42 @@ function CallingContainerWithJoinedCall({
     };
   });
 
-  const switchCameraInput = (deviceId: string) => {
+  const switchCameraInput = (deviceId: string): void => {
     setVideoInputDeviceId(deviceId);
     fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
       await callingRepository.refreshVideoInput();
     });
   };
 
-  const switchMicrophoneInput = (deviceId: string) => {
+  const switchMicrophoneInput = (deviceId: string): void => {
     setAudioInputDeviceId(deviceId);
     fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
       await callingRepository.refreshAudioInput();
     });
   };
 
-  const switchSpeakerOutput = (deviceId: string) => {
+  const switchSpeakerOutput = (deviceId: string): void => {
     setAudioOutputDeviceId(deviceId);
     callingRepository.refreshAudioOutput();
   };
 
-  const sendEmoji = (emoji: string, call: Call) => {
+  const sendEmoji = (emoji: string, call: Call): void => {
     fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
       await callingRepository.sendInCallEmoji(emoji, call);
     });
   };
 
-  const sendHandRaised = (isHandUp: boolean, call: Call) => {
+  const sendHandRaised = (isHandUp: boolean, call: Call): void => {
     fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
       await callingRepository.sendInCallHandRaised(isHandUp, call);
     });
   };
 
-  const toggleCamera = (call: Call) => {
+  const toggleCamera = (call: Call): void => {
     return callingRepository.toggleCamera(call);
   };
 
-  const toggleMute = (call: Call, muteState: boolean) => {
+  const toggleMute = (call: Call, muteState: boolean): void => {
     return callingRepository.muteCall(call, muteState);
   };
 
@@ -176,7 +176,7 @@ function CallingContainerWithJoinedCall({
     return null;
   }
 
-  const toggleScreenShare = (call: Call) => {
+  const toggleScreenShare = (call: Call): void => {
     toggleScreenshare(call, DesktopScreenShareMenu.DETACHED_WINDOW);
   };
 

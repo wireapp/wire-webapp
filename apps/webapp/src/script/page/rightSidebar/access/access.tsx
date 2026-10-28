@@ -17,7 +17,7 @@
  *
  */
 
-import {useState} from 'react';
+import {useState, type FunctionComponent} from 'react';
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {ADD_PERMISSION, CONVERSATION_ACCESS} from '@wireapp/api-client/lib/conversation/';
@@ -47,7 +47,7 @@ export interface AccessProps {
   activeConversation: Conversation;
 }
 
-export const Access = ({
+export const Access: FunctionComponent<AccessProps> = ({
   onGoBack,
   onClose,
   activeConversation,
@@ -64,7 +64,7 @@ export const Access = ({
 
   const {isPublicChannelsEnabled} = useChannelsFeatureFlag();
 
-  const updateAddPermission = async (addPermission: ADD_PERMISSION) => {
+  const updateAddPermission = async (addPermission: ADD_PERMISSION): Promise<void> => {
     if (!isNullOrUndefined(activeConversation.qualifiedId)) {
       await conversationRepository.updateAddPermission(activeConversation.qualifiedId, addPermission);
     }

@@ -23,7 +23,7 @@ import {useSidebarStore, SidebarTabs} from 'src/script/page/leftSidebar/panels/c
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate} from 'src/script/router/routerBindings';
 
-export const openConversation = (conversationQualifiedId: QualifiedId) => {
+export const openConversation = (conversationQualifiedId: QualifiedId): void => {
   const store = useSidebarStore.getState();
   store.setCurrentTab(SidebarTabs.RECENT);
   createNavigate(generateConversationUrl(conversationQualifiedId))();

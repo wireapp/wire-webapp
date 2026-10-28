@@ -10,7 +10,7 @@ set -euo pipefail
 script_directory="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 if [[ "${PRODUCTION_TAG}" == v* ]]; then
-  node ./tools/releaseCli/releaseMetadataCli.mts validate-webapp-production-tag "${PRODUCTION_TAG}" >/dev/null
+  node "${script_directory}/../releaseCli/releaseMetadataCli.mts" validate-webapp-production-tag "${PRODUCTION_TAG}" >/dev/null
 elif [[ ! "${PRODUCTION_TAG}" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}\.[1-9][0-9]*-production$ ]]; then
   echo "Production tag must be YYYY-MM-DD.N-production or a stable WebApp SemVer tag: ${PRODUCTION_TAG}" >&2
   exit 1
@@ -47,11 +47,7 @@ for required_context_path in \
   "${DISTRIBUTION_CONTEXT_PATH}/apps/server/dist" \
   "${DISTRIBUTION_CONTEXT_PATH}/libraries/config/lib" \
   "${DISTRIBUTION_CONTEXT_PATH}/package.json" \
-  "${DISTRIBUTION_CONTEXT_PATH}/yarn.lock" \
-  "${DISTRIBUTION_CONTEXT_PATH}/.yarnrc.yml" \
   "${DISTRIBUTION_CONTEXT_PATH}/.npmrc" \
-  "${DISTRIBUTION_CONTEXT_PATH}/.yarn" \
-  "${DISTRIBUTION_CONTEXT_PATH}/bin/yarn" \
   "${DISTRIBUTION_CONTEXT_PATH}/apps/server/package.json" \
   "${DISTRIBUTION_CONTEXT_PATH}/libraries/config/package.json" \
   "${DISTRIBUTION_CONTEXT_PATH}/run.sh" \
@@ -61,6 +57,28 @@ for required_context_path in \
     exit 1
   fi
 done
+
+package_manager="$(node "${script_directory}/../packageManager/packageManager.js" "${DISTRIBUTION_CONTEXT_PATH}")"
+if [[ "${package_manager}" == 'npm' ]]; then
+  if [[ ! -f "${DISTRIBUTION_CONTEXT_PATH}/package-lock.json" ]]; then
+    echo 'npm production distribution is missing its package-lock.json.' >&2
+    exit 1
+  fi
+elif [[ "${package_manager}" == 'yarn' ]]; then
+  for yarn_context_path in \
+    "${DISTRIBUTION_CONTEXT_PATH}/yarn.lock" \
+    "${DISTRIBUTION_CONTEXT_PATH}/.yarnrc.yml" \
+    "${DISTRIBUTION_CONTEXT_PATH}/.yarn" \
+    "${DISTRIBUTION_CONTEXT_PATH}/bin/yarn"; do
+    if [[ ! -e "${yarn_context_path}" ]]; then
+      echo "Required historical Yarn Docker context path is missing: ${yarn_context_path}" >&2
+      exit 1
+    fi
+  done
+else
+  echo "Unsupported production distribution package manager: ${package_manager}" >&2
+  exit 1
+fi
 
 cloud_artifact_checksum="$(jq --raw-output '.cloudArtifactChecksum' "${manifest_path}")"
 actual_cloud_artifact_checksum="$(sha256sum "${DISTRIBUTION_CONTEXT_PATH}/apps/server/dist/s3/ebs.zip" | awk '{print $1}')"

@@ -17,9 +17,16 @@
  *
  */
 
-import {useRef, useState, useCallback} from 'react';
+import {useRef, useState, useCallback, type RefObject, type Dispatch, type SetStateAction} from 'react';
 
-export const usePageControls = () => {
+type UsePageControlsResult = {
+  currentPage: number;
+  thumbnailsRef: RefObject<HTMLDivElement | null>;
+  handleNextPage: () => void;
+  handlePreviousPage: () => void;
+  handlePageChange: Dispatch<SetStateAction<number>>;
+};
+export const usePageControls = (): UsePageControlsResult => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const thumbnailsRef = useRef<HTMLDivElement | null>(null);

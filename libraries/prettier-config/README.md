@@ -15,7 +15,7 @@ For licensing information, see the attached LICENSE file and the list of third-p
 **Install**:
 
 ```bash
-yarn add --dev @wireapp/prettier-config
+npm install --save-dev @wireapp/prettier-config
 ```
 
 **Edit `package.json`**:

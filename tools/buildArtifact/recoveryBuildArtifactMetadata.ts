@@ -23,9 +23,9 @@ import {Result} from 'true-myth';
 import {isBuildMetadata} from '@wireapp/config';
 import type {BuildMetadata} from '@wireapp/config';
 
-import {isLegacyTimestampBuildVersion} from './legacyBuildMetadata.ts';
 import {validateBuildArtifactMetadata} from './buildArtifactMetadata.ts';
 import type {BuildArtifactHtmlDocument} from './buildArtifactMetadata.ts';
+import {isLegacyTimestampBuildVersion} from './legacyBuildMetadata.ts';
 
 export type LegacyBuildMetadata = {
   readonly version: string;
@@ -50,6 +50,7 @@ export type RecoveryBuildArtifactMetadataValidationInput = {
 };
 
 const fullCommitShaPattern = /^[0-9a-f]{40}$/iu;
+const legacyMetadataFieldCount = 2;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return isPlainObject(value);
@@ -60,9 +61,13 @@ function hasCurrentMetadataField(metadata: Record<string, unknown>): boolean {
 }
 
 function hasExactlyLegacyMetadataFields(metadata: Record<string, unknown>): boolean {
-  const metadataFieldNames = Object.keys(metadata).sort();
+  const metadataFieldNames = Object.keys(metadata).toSorted();
 
-  return metadataFieldNames.length === 2 && metadataFieldNames[0] === 'commit' && metadataFieldNames[1] === 'version';
+  return (
+    metadataFieldNames.length === legacyMetadataFieldCount &&
+    metadataFieldNames[0] === 'commit' &&
+    metadataFieldNames[1] === 'version'
+  );
 }
 
 function isFullCommitSha(value: unknown): value is string {

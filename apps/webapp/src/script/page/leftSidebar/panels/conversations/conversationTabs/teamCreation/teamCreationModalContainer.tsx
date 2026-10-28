@@ -17,7 +17,7 @@
  *
  */
 
-import {useState} from 'react';
+import {useState, type FunctionComponent} from 'react';
 
 import {User} from 'Repositories/entity/User';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
@@ -34,12 +34,16 @@ interface Props {
   userRepository: UserRepository;
 }
 
-export const TeamCreationModalContainer = ({selfUser, userRepository, teamRepository}: Props) => {
+export const TeamCreationModalContainer: FunctionComponent<Props> = ({
+  selfUser,
+  userRepository,
+  teamRepository,
+}: Props) => {
   const {isModalOpen, hideModal} = useTeamCreationModal();
   const [isLeaveConfirmModalVisible, setIsLeaveConfirmModalVisible] = useState(false);
   const {name} = useKoSubscribableChildren(selfUser, ['name']);
 
-  const modalCloseHandler = async () => {
+  const modalCloseHandler = async (): Promise<void> => {
     hideModal();
     setIsLeaveConfirmModalVisible(false);
 

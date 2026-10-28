@@ -20,6 +20,7 @@
 import {isUndefined} from '@sindresorhus/is';
 import type {PreKey as BackendPreKey} from '@wireapp/api-client/lib/auth/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
+import type {ProteusService} from '@wireapp/core/lib/index';
 import {container} from 'tsyringe';
 
 import {getLogger, Logger} from 'Util/logger';
@@ -48,7 +49,7 @@ export class CryptographyRepository {
     this.cryptographyMapper = new CryptographyMapper();
   }
 
-  get proteusService() {
+  get proteusService(): ProteusService {
     const coreServices = this.core.service;
     if (isUndefined(coreServices)) {
       throw new Error('Core is not initiated');
@@ -72,7 +73,7 @@ export class CryptographyRepository {
    * @param preKey PreKey to initialize a session from
    * @returns Resolves with the remote fingerprint
    */
-  async getRemoteFingerprint(userId: QualifiedId, clientId: string, prekey?: BackendPreKey) {
+  async getRemoteFingerprint(userId: QualifiedId, clientId: string, prekey?: BackendPreKey): Promise<string> {
     return this.proteusService.getRemoteFingerprint(userId, clientId, prekey);
   }
 

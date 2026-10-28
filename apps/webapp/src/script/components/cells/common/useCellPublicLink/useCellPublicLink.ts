@@ -40,6 +40,22 @@ interface UseCellPublicLinkParams {
   fireAndForgetInvoker: FireAndForgetInvoker;
 }
 
+type UseCellPublicLinkResult = {
+  status: PublicLinkStatus;
+  link: string | undefined;
+  linkData: RestShareLink | null;
+  isEnabled: boolean;
+  togglePublicLink: () => void;
+  updatePublicLink: ({
+    password,
+    passwordEnabled,
+    accessEnd,
+  }: {
+    password?: string;
+    passwordEnabled?: boolean;
+    accessEnd?: string | null;
+  }) => Promise<void>;
+};
 export const useCellPublicLink = ({
   uuid,
   node,
@@ -49,7 +65,7 @@ export const useCellPublicLink = ({
   setStatusOnPublicLinkUrl = false,
   includeNodePublicLinkInCallbacks = false,
   fireAndForgetInvoker,
-}: UseCellPublicLinkParams) => {
+}: UseCellPublicLinkParams): UseCellPublicLinkResult => {
   const [isEnabled, setIsEnabled] = useState(node?.publicLink?.alreadyShared === true);
   const [status, setStatus] = useState<PublicLinkStatus>(node?.publicLink !== undefined ? 'success' : 'idle');
   const [linkData, setLinkData] = useState<RestShareLink | null>(null);

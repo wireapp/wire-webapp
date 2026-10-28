@@ -21,7 +21,13 @@ import {useMemo, useState} from 'react';
 
 import {UserDevicesHistoryEntry, UserDevicesState} from 'Components/userDevices';
 
-export const useUserDevicesHistory = () => {
+type UserDevicesHistoryState = {
+  current: UserDevicesHistoryEntry;
+  goBack: () => void;
+  goTo: (state: UserDevicesState, headline: string) => void;
+};
+
+export const useUserDevicesHistory = (): UserDevicesHistoryState => {
   const [history, setHistory] = useState<UserDevicesHistoryEntry[]>([
     {headline: '', state: UserDevicesState.DEVICE_LIST},
   ]);

@@ -19,6 +19,7 @@
 
 import {AxiosHeaders} from 'axios';
 import {
+  BackgroundActionInfoNameEnum,
   NodeServiceApi,
   LookupFilterMetaFilter,
   RestLookupRequest,
@@ -33,6 +34,7 @@ import {
   RestIncomingNode,
   RestNodeLocator,
   RestActionOptionsCopyMove,
+  RestBackgroundAction,
   RestNamespaceValuesResponse,
   GetByUuidFlagsEnum,
 } from 'cells-sdk-ts';
@@ -336,6 +338,44 @@ export class CellsAPI {
 
     const result = await this.client.performAction('move', {
       Nodes: [{Path: currentPath}],
+      CopyMoveOptions: {TargetIsParent: true, TargetPath: targetPath},
+      AwaitStatus: 'Finished',
+      AwaitTimeout: '5000ms',
+    });
+
+    return result.data;
+  }
+
+  async getBackgroundActionInfo({
+    name,
+    jobUuid,
+  }: {
+    name: BackgroundActionInfoNameEnum;
+    jobUuid: string;
+  }): Promise<RestBackgroundAction> {
+    if (this.client === null || this.storageService === null) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
+    const result = await this.client.backgroundActionInfo(name, jobUuid);
+    return result.data;
+  }
+
+  async moveNodes({
+    currentPaths,
+    targetPath,
+  }: {
+    currentPaths: RestNodeLocator['Path'][];
+    targetPath: RestActionOptionsCopyMove['TargetPath'];
+  }): Promise<RestPerformActionResponse> {
+    if (this.client === null || this.storageService === null) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
+    const result = await this.client.performAction('move', {
+      Nodes: currentPaths.map(Path => {
+        return {Path};
+      }),
       CopyMoveOptions: {TargetIsParent: true, TargetPath: targetPath},
       AwaitStatus: 'Finished',
       AwaitTimeout: '5000ms',

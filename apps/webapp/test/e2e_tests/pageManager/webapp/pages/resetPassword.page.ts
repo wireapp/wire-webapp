@@ -30,12 +30,12 @@ export class ResetPasswordPage {
     this.setNewPasswordButton = page.getByTestId('do-set-new-password');
   }
 
-  async setNewPassword(password: string) {
+  async setNewPassword(password: string): Promise<void> {
     await this.newPasswordInput.fill(password);
     await this.setNewPasswordButton.click();
   }
 
-  async isPasswordChangeMessageVisible() {
+  async isPasswordChangeMessageVisible(): Promise<boolean> {
     await this.passwordChangeMessage.waitFor({state: 'visible'});
     return this.passwordChangeMessage.isVisible();
   }

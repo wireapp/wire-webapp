@@ -27,47 +27,11 @@
         "command": "echo 'Build complete'"
       }
     },
-    "test": {
-      "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/libraries/store-engine-dexie"],
-      "options": {
-        "jestConfig": "{projectRoot}/jest.config.js",
-        "passWithNoTests": false
-      },
-      "configurations": {
-        "ci": {
-          "ci": true,
-          "coverage": true,
-          "coverageReporters": ["lcov", "text"]
-        }
-      }
-    },
-    "test:coverage": {
-      "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/libraries/store-engine-dexie"],
-      "options": {
-        "jestConfig": "{projectRoot}/jest.config.js",
-        "passWithNoTests": false,
-        "coverage": true
-      }
-    },
     "watch": {
       "executor": "nx:run-commands",
       "options": {
         "command": "tsc --watch",
         "cwd": "{projectRoot}"
-      }
-    },
-    "lint": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "eslint --config eslint.config.mjs --max-warnings=0 --cache --cache-location node_modules/.cache/eslint/store-engine-dexie --ext .js,.jsx,.ts,.tsx,.cjs,.mjs {projectRoot}"
-      }
-    },
-    "type-check": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "tsc --project {projectRoot}/tsconfig.type-check.json --noEmit"
       }
     }
   },

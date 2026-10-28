@@ -17,7 +17,7 @@
  *
  */
 
-import {ChangeEvent, FormEvent} from 'react';
+import {ChangeEvent, FormEvent, type FunctionComponent} from 'react';
 
 import {TextInput} from 'Components/TextInput';
 
@@ -36,7 +36,7 @@ interface CellsNewNodeFormProps {
   isOpen: boolean;
 }
 
-export const CellsNewNodeForm = ({
+export const CellsNewNodeForm: FunctionComponent<CellsNewNodeFormProps> = ({
   label,
   placeholder,
   onSubmit,

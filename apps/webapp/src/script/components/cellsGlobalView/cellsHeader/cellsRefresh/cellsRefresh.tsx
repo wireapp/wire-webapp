@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {IconButton, IconButtonVariant, ReloadIcon} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -27,7 +29,7 @@ interface CellsRefreshProps {
   onRefresh: () => void;
 }
 
-export const CellsRefresh = ({onRefresh}: CellsRefreshProps) => {
+export const CellsRefresh: FunctionComponent<CellsRefreshProps> = ({onRefresh}: CellsRefreshProps) => {
   const {translate} = useApplicationContext();
 
   return (

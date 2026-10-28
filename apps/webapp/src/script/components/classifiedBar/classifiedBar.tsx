@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {CSSObject} from '@emotion/react';
 import cx from 'classnames';
 
@@ -52,7 +54,12 @@ interface UserClassifiedBarProps extends ClassifiedBarProps {
   users: User[];
 }
 
-export const UserClassifiedBar = ({users, conversationDomain, classifiedDomains, style}: UserClassifiedBarProps) => {
+export const UserClassifiedBar: FunctionComponent<UserClassifiedBarProps> = ({
+  users,
+  conversationDomain,
+  classifiedDomains,
+  style,
+}: UserClassifiedBarProps) => {
   const {translate} = useApplicationContext();
 
   if (typeof classifiedDomains === 'undefined') {
@@ -78,7 +85,10 @@ interface ConversationClassifiedBarProps extends ClassifiedBarProps {
   conversation: Conversation;
 }
 
-export const ConversationClassifiedBar = ({conversation, ...classifiedBarProps}: ConversationClassifiedBarProps) => {
+export const ConversationClassifiedBar: FunctionComponent<ConversationClassifiedBarProps> = ({
+  conversation,
+  ...classifiedBarProps
+}: ConversationClassifiedBarProps) => {
   const {allUserEntities: users} = useKoSubscribableChildren(conversation, ['allUserEntities']);
   return <UserClassifiedBar users={users} conversationDomain={conversation.domain} {...classifiedBarProps} />;
 };

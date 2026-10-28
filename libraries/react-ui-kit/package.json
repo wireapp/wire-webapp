@@ -28,14 +28,14 @@
   "devDependencies": {
     "@emotion/jest": "11.14.2",
     "@emotion/react": "11.14.0",
-    "@swc/core": "1.16.18",
+    "@swc/core": "1.16.20",
     "@swc/jest": "0.2.39",
     "@testing-library/dom": "10.4.2",
     "@testing-library/jest-dom": "6.9.1",
     "@testing-library/react": "16.3.3",
     "@testing-library/user-event": "14.6.8",
     "@types/jest": "30.0.0",
-    "@types/node": "24.13.4",
+    "@types/node": "24.19.2",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "jest": "30.5.2",
@@ -58,13 +58,7 @@
   "scripts": {
     "build": "nx run react-ui-kit-lib:build",
     "clean": "nx run react-ui-kit-lib:clean",
-    "dist": "nx run react-ui-kit-lib:dist",
-    "test": "nx run react-ui-kit-lib:test",
-    "test:coverage": "nx run react-ui-kit-lib:test:coverage",
-    "test:watch": "nx run react-ui-kit-lib:test --watch",
-    "test:update": "nx run react-ui-kit-lib:test --updateSnapshot",
-    "lint": "nx lint react-ui-kit-lib",
-    "lint:fix": "nx lint react-ui-kit-lib --fix"
+    "dist": "nx run react-ui-kit-lib:dist"
   },
   "version": "9.77.0"
 }

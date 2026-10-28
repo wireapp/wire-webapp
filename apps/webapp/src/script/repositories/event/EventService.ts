@@ -50,18 +50,18 @@ type DexieCollection = Dexie.Collection<any, any>;
 type DBEvents = DexieCollection | EventRecord[];
 export type IdentifiedUpdatePayload = Partial<EventRecord> & Pick<EventRecord, 'primary_key'>;
 
-const eventTimeToDate = (time: string) => {
+const eventTimeToDate = (time: string): Date => {
   return new Date(time);
 };
 
-const compareEventsByConversation = (eventA: EventRecord, eventB: EventRecord) => {
+const compareEventsByConversation = (eventA: EventRecord, eventB: EventRecord): number => {
   return (eventA.conversation ?? '').localeCompare(eventB.conversation ?? '');
 };
 
-const compareEventsById = (eventA: EventRecord, eventB: EventRecord) => {
+const compareEventsById = (eventA: EventRecord, eventB: EventRecord): number => {
   return (eventA.id ?? '').localeCompare(eventB.id ?? '');
 };
-const compareEventsByTime = (eventA: EventRecord, eventB: EventRecord) => {
+const compareEventsByTime = (eventA: EventRecord, eventB: EventRecord): number => {
   return eventTimeToDate(eventA.time).getTime() - eventTimeToDate(eventB.time).getTime();
 };
 const MAX_INDEXED_DB_LIMIT = 0xffffffff; // 4_294_967_295
@@ -195,7 +195,7 @@ export class EventService {
     categoryMin: MessageCategory,
     categoryMax = MessageCategory.LIKED,
   ): Promise<DBEvents> {
-    const filterExpired = (record: EventRecord) => {
+    const filterExpired = (record: EventRecord): boolean => {
       if (!isUndefined(record.ephemeral_expires)) {
         return +record.ephemeral_expires - Date.now() > 0;
       }
@@ -224,7 +224,11 @@ export class EventService {
       .toSorted(compareEventsByTime);
   }
 
-  async loadEventsReplyingToMessage(conversationId: string, quotedMessageId: string, quotedMessageTime: string) {
+  async loadEventsReplyingToMessage(
+    conversationId: string,
+    quotedMessageId: string,
+    quotedMessageTime: string,
+  ): Promise<EventRecord[]> {
     if (!isNullOrUndefined(this.storageService.db)) {
       const events = await this.storageService.db
         .table(StorageSchemata.OBJECT_STORE.EVENTS)
@@ -512,7 +516,10 @@ export class EventService {
    * @param conversationId - conversation id from which events should be moved
    * @param newConversationId - conversation id to which events should be moved
    */
-  public async moveEventsToConversation(conversationId: QualifiedId, newConversationId: QualifiedId) {
+  public async moveEventsToConversation(
+    conversationId: QualifiedId,
+    newConversationId: QualifiedId,
+  ): Promise<string[]> {
     const eventsToSkip = [CLIENT_CONVERSATION_EVENT.ONE2ONE_CREATION];
 
     const events = await this.loadAllConversationEvents(conversationId.id, eventsToSkip);

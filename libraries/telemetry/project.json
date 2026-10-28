@@ -7,16 +7,16 @@
     "clean": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npx rimraf lib",
+        "command": "npx rimraf lib && tsc --build --clean tsconfig.json tsconfig.commonjs.json",
         "cwd": "{projectRoot}"
       }
     },
     "build": {
       "executor": "nx:run-commands",
-      "outputs": ["{projectRoot}/lib"],
+      "outputs": ["{projectRoot}/lib", "{workspaceRoot}/target/buildcache/telemetry-esm-build.tsbuildinfo", "{workspaceRoot}/target/buildcache/telemetry-commonjs-build.tsbuildinfo"],
       "dependsOn": ["clean"],
       "options": {
-        "command": "vite build",
+        "command": "node bin/copyAssets.mts && tsc --build tsconfig.json tsconfig.commonjs.json",
         "cwd": "{projectRoot}"
       }
     },
@@ -27,42 +27,12 @@
         "command": "echo 'Build complete'"
       }
     },
-    "test": {
-      "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/libraries/telemetry"],
-      "options": {
-        "jestConfig": "{projectRoot}/jest.config.js",
-        "passWithNoTests": true
-      },
-      "configurations": {
-        "ci": {
-          "ci": true,
-          "coverage": true,
-          "coverageReporters": ["lcov", "text"]
-        }
-      }
-    },
-    "test:coverage": {
-      "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/libraries/telemetry"],
-      "options": {
-        "jestConfig": "{projectRoot}/jest.config.js",
-        "passWithNoTests": true,
-        "coverage": true
-      }
-    },
     "watch": {
       "executor": "nx:run-commands",
       "outputs": ["{projectRoot}/lib"],
       "options": {
-        "command": "vite build --watch",
+        "command": "node bin/copyAssets.mts && tsc --build tsconfig.json tsconfig.commonjs.json --watch --preserveWatchOutput",
         "cwd": "{projectRoot}"
-      }
-    },
-    "lint": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "eslint --config eslint.config.mjs --max-warnings=0 --cache --cache-location node_modules/.cache/eslint/telemetry --ext .js,.jsx,.ts,.tsx,.cjs,.mjs {projectRoot}"
       }
     }
   },

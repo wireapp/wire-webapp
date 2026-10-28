@@ -17,7 +17,7 @@
  *
  */
 
-import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
+import {createDeterministicClock, type DeterministicClock} from '@enormora/clock/deterministic-clock';
 import {GROUP_CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {maybe, task} from 'true-myth';
@@ -74,13 +74,13 @@ const meetingId = {id: 'meeting-id', domain: 'example.com'};
 const qualifiedConversation = {id: 'conversation-id', domain: 'example.com'};
 const groupId = 'group-id';
 
-const createUser = (id: string) => {
+const createUser = (id: string): User => {
   const user = new User(id, 'example.com', translateForTest);
   user.name(`User ${id}`);
   return user;
 };
 
-const createConversation = (epoch = 0) => {
+const createConversation = (epoch = 0): Conversation => {
   const conversation = new Conversation(
     qualifiedConversation.id,
     qualifiedConversation.domain,
@@ -297,6 +297,18 @@ describe('scheduleMeeting', () => {
 });
 
 describe('meetNowMeeting', () => {
+  type CreateDepsResult = {
+    deps: {
+      meetingsRepository: MeetingsRepository;
+      conversationRepository: ConversationRepository;
+      callingRepository: CallingRepository;
+      clock: DeterministicClock;
+      deviceTimeZone: {ianaTimeZoneId: string};
+    };
+    createMeetingMock: jest.Mock<any, any, any>;
+    establishMeetingConversation: jest.Mock<any, any, any>;
+    requestMeetingConversationCode: jest.Mock<any, any, any>;
+  };
   const createDeps = ({
     createMeetingMock = jest.fn().mockReturnValue(
       task.resolve({
@@ -317,7 +329,7 @@ describe('meetNowMeeting', () => {
     establishMeetingConversation?: jest.Mock;
     safeAddUsers?: jest.Mock;
     requestMeetingConversationCode?: jest.Mock;
-  } = {}) => {
+  } = {}): CreateDepsResult => {
     const meetingsRepository = {
       createMeeting: createMeetingMock,
       getMeetingsList: jest.fn(),
@@ -405,13 +417,29 @@ describe('updateMeeting', () => {
     name?: string;
     groupConversationType?: GROUP_CONVERSATION_TYPE;
     epoch?: number;
-  } = {}) => {
+  } = {}): Conversation => {
     const conversation = createConversation(epoch);
     conversation.name(name);
     conversation.groupConversationType(groupConversationType);
     return conversation;
   };
 
+  type CreateDepsResult2 = {
+    deps: {
+      meetingsRepository: MeetingsRepository;
+      conversationRepository: ConversationRepository;
+      callingRepository: CallingRepository;
+      clock: DeterministicClock;
+      deviceTimeZone: {ianaTimeZoneId: string};
+    };
+    updateMeetingMock: jest.Mock<any, any, any>;
+    saveMeetingConversationFromBackend: jest.Mock<any, any, any>;
+    safeGetConversationById: jest.Mock<any, any, any>;
+    renameConversation: jest.Mock<any, any, any>;
+    safeAddUsers: jest.Mock<any, any, any>;
+    safeRemoveMembers: jest.Mock<any, any, any>;
+    establishMeetingConversation: jest.Mock<any, any, any>;
+  };
   const createDeps = ({
     updateMeetingMock = jest.fn().mockReturnValue(
       task.resolve({
@@ -435,7 +463,7 @@ describe('updateMeeting', () => {
     safeAddUsers?: jest.Mock;
     safeRemoveMembers?: jest.Mock;
     establishMeetingConversation?: jest.Mock;
-  } = {}) => {
+  } = {}): CreateDepsResult2 => {
     const meetingsRepository = {
       updateMeeting: updateMeetingMock,
       getMeetingsList: jest.fn(),

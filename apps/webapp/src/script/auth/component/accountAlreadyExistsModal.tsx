@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {Button, Container, H2, Link, Modal, Text} from '@wireapp/react-ui-kit';
 
 import {Config} from 'src/script/Config';
@@ -28,7 +30,9 @@ interface AccountAlreadyExistsModalProps {
   onClose: () => void;
 }
 
-export const AccountAlreadyExistsModal = ({onClose}: AccountAlreadyExistsModalProps) => {
+export const AccountAlreadyExistsModal: FunctionComponent<AccountAlreadyExistsModalProps> = ({
+  onClose,
+}: AccountAlreadyExistsModalProps) => {
   const {translate} = useApplicationContext();
   const {CHANGE_EMAIL_ADDRESS: changeEmailAddressUrl, DELETE_PERSONAL_ACCOUNT: deletePersonalAccountUrl} =
     Config.getConfig().URL.SUPPORT;

@@ -22,6 +22,7 @@ import {forwardRef, useEffect, useMemo, useState, type ReactElement} from 'react
 import {isNan, isNonEmptyArray, isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {CONVERSATION_ACCESS, CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/';
+import type {ConversationRenameEvent, ConversationReceiptModeUpdateEvent} from '@wireapp/api-client/lib/event';
 import {UserType} from '@wireapp/api-client/lib/user';
 import {noop} from 'noop-esm';
 
@@ -259,23 +260,23 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       });
     }, [integrationRepository, participatingUserEts]);
 
-    const toggleMute = () => {
+    const toggleMute = (): Promise<void> => {
       return actionsViewModel.toggleMuteConversation(activeConversation);
     };
 
-    const updateConversationName = (conversationName: string) => {
+    const updateConversationName = (conversationName: string): Promise<ConversationRenameEvent | undefined> => {
       return conversationRepository.renameConversation(activeConversation, conversationName);
     };
 
-    const openAddParticipants = () => {
+    const openAddParticipants = (): void => {
       return togglePanel(PanelState.ADD_PARTICIPANTS, activeConversation);
     };
 
-    const showUser = (userEntity: User) => {
+    const showUser = (userEntity: User): void => {
       return togglePanel(PanelState.GROUP_PARTICIPANT_USER, userEntity);
     };
 
-    const showService = async (entity: ServiceEntity) => {
+    const showService = async (entity: ServiceEntity): Promise<void> => {
       if (entity.isService) {
         const serviceEntity = await integrationRepository.getServiceFromUser(entity);
         if (serviceEntity === undefined) {
@@ -295,11 +296,11 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       }
     };
 
-    const showAllParticipants = () => {
+    const showAllParticipants = (): void => {
       return togglePanel(PanelState.CONVERSATION_PARTICIPANTS, activeConversation);
     };
 
-    const updateConversationReceiptMode = (receiptMode: RECEIPT_MODE) => {
+    const updateConversationReceiptMode = (receiptMode: RECEIPT_MODE): Promise<ConversationReceiptModeUpdateEvent> => {
       return conversationRepository.updateConversationReceiptMode(activeConversation, {receipt_mode: receiptMode});
     };
 
@@ -317,7 +318,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
     }, [firstParticipant, isSingleUserMode, team, teamRepository]);
 
     useEffect(() => {
-      const getService = async () => {
+      const getService = async (): Promise<void> => {
         if (!isUndefined(firstParticipant)) {
           const serviceEntity = await integrationRepository.getServiceFromUser(firstParticipant);
 

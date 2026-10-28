@@ -268,7 +268,7 @@ const accentsMap: Record<string, string> = {
  * @param text The string to replace accents its charachters
  * @returns new string with replaced accents charachters
  */
-export const replaceAccents = (text: string) => {
+export const replaceAccents = (text: string): string => {
   return getSlug(text, {custom: accentsMap, uric: true});
 };
 

@@ -28,7 +28,10 @@ import type {CallMediaChoice} from 'Repositories/calling/callMediaChoice';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {useApplicationContext, useMainViewModel} from 'src/script/page/rootProvider';
 
-export const useMeetingPrepJoin = () => {
+export const useMeetingPrepJoin = (): ((
+  qualifiedConversationId: QualifiedId,
+  media: CallMediaChoice,
+) => Promise<boolean>) => {
   const {translate} = useApplicationContext();
   const {content, calling: callingViewModel} = useMainViewModel();
   const {conversation: conversationRepository, calling: callingRepository} = content.repositories;

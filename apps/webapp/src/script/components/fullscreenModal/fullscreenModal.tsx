@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useCallback, ReactNode, useState} from 'react';
+import {useEffect, useCallback, ReactNode, useState, type FunctionComponent} from 'react';
 
 import {createPortal} from 'react-dom';
 
@@ -56,7 +56,12 @@ interface FullscreenModalProps {
  * };
  * ```
  */
-export const FullscreenModal = ({id, isOpen, children, onClose}: FullscreenModalProps) => {
+export const FullscreenModal: FunctionComponent<FullscreenModalProps> = ({
+  id,
+  isOpen,
+  children,
+  onClose,
+}: FullscreenModalProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
 

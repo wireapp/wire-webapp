@@ -17,9 +17,15 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {spinnerStyles, wrapperStyles} from './cellsFolderListLoading.styles';
 
-export const CellsFolderListLoading = ({announceLoading = true}: {announceLoading?: boolean}) => {
+export const CellsFolderListLoading: FunctionComponent<{announceLoading?: boolean}> = ({
+  announceLoading = true,
+}: {
+  announceLoading?: boolean;
+}) => {
   return (
     <div css={wrapperStyles} role={announceLoading ? 'status' : undefined}>
       <div className="icon-spinner spin" css={spinnerStyles} />

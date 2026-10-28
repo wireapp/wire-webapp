@@ -29,11 +29,12 @@ interface UseDeleteNodeProps {
   deleteNodeFailedMessage: string;
 }
 
+type UseDeleteNodeResult = {deleteNode: ({uuid, permanently}: {uuid: string; permanently?: boolean}) => Promise<void>};
 export const useDeleteNode = ({
   conversationQualifiedId,
   cellsRepository,
   deleteNodeFailedMessage,
-}: UseDeleteNodeProps) => {
+}: UseDeleteNodeProps): UseDeleteNodeResult => {
   const {removeNode} = useCellsStore();
 
   const deleteFileFailedNotification = useAppNotification({

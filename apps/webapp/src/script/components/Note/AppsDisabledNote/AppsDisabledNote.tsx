@@ -17,10 +17,12 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {Note} from 'Components/Note/Note';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-const AppsDisabledNote = () => {
+const AppsDisabledNote: FunctionComponent = () => {
   const {translate} = useApplicationContext();
 
   return (

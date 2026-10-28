@@ -17,7 +17,7 @@
  *
  */
 
-import {type FormEvent, useEffect, useRef} from 'react';
+import {type FormEvent, useEffect, useRef, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
@@ -55,7 +55,7 @@ export interface MeetNowFormProps {
   selfUser: User;
 }
 
-export const MeetNowForm = ({
+export const MeetNowForm: FunctionComponent<MeetNowFormProps> = ({
   isOpen,
   formState,
   titleError,

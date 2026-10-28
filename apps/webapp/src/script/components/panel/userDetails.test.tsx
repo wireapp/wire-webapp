@@ -19,7 +19,7 @@
 
 import {ReactElement} from 'react';
 
-import {render} from '@testing-library/react';
+import {render, type RenderResult} from '@testing-library/react';
 
 import {User} from 'Repositories/entity/User';
 import {RootProvider} from 'src/script/page/rootProvider';
@@ -39,7 +39,7 @@ jest.mock('Components/avatar', () => {
   };
 });
 
-function renderWithRootProvider(element: ReactElement) {
+function renderWithRootProvider(element: ReactElement): RenderResult {
   return render(
     <RootProvider value={createRootContextValueForTest({translate: translateForTest})}>{element}</RootProvider>,
   );

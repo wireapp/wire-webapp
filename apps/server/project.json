@@ -62,53 +62,6 @@
         "command": "node {projectRoot}/bin/assembleBuild.mts public artifact"
       }
     },
-    "assemble-webapp": {
-      "executor": "nx:run-commands",
-      "dependsOn": [{"projects": "webapp", "target": "build"}, "generate-build-metadata"],
-      "outputs": ["{projectRoot}/dist"],
-      "cache": false,
-      "options": {
-        "command": "node {projectRoot}/bin/assembleBuild.mts internal webapp"
-      }
-    },
-    "assemble-webapp-development": {
-      "executor": "nx:run-commands",
-      "dependsOn": [{"projects": "webapp", "target": "build-development"}, "generate-build-metadata"],
-      "outputs": ["{projectRoot}/dist"],
-      "cache": false,
-      "options": {
-        "command": "node {projectRoot}/bin/assembleBuild.mts development webapp"
-      }
-    },
-    "assemble-webapp-public": {
-      "executor": "nx:run-commands",
-      "dependsOn": [{"projects": "webapp", "target": "build-production-public"}, "generate-build-metadata"],
-      "outputs": ["{projectRoot}/dist"],
-      "cache": false,
-      "options": {
-        "command": "node {projectRoot}/bin/assembleBuild.mts public webapp"
-      }
-    },
-    "package": {
-      "executor": "nx:run-commands",
-      "dependsOn": ["assemble"],
-      "inputs": ["production", "webappBuildMetadata"],
-      "cache": false,
-      "options": {
-        "commands": ["node tools/serverPackaging/zip.js"],
-        "parallel": false
-      }
-    },
-    "package-public": {
-      "executor": "nx:run-commands",
-      "dependsOn": ["assemble-public"],
-      "inputs": ["production", "webappBuildMetadata"],
-      "cache": false,
-      "options": {
-        "commands": ["yarn verify:bundle:prod:public", "node tools/serverPackaging/zip.js"],
-        "parallel": false
-      }
-    },
     "serve": {
       "continuous": true,
       "dependsOn": ["config-lib:build", "webapp:build-libs", "webapp:watch-deps-dynamic"],
@@ -125,35 +78,6 @@
         "production": {
           "buildTarget": "server:build"
         }
-      }
-    },
-    "test": {
-      "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/apps/server"],
-      "options": {
-        "jestConfig": "{projectRoot}/jest.config.js",
-        "passWithNoTests": true
-      },
-      "configurations": {
-        "ci": {
-          "ci": true,
-          "coverage": true,
-          "coverageReporters": ["html", "lcov", "text"]
-        }
-      }
-    },
-    "lint": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "eslint --config eslint.config.mjs --cache --cache-location node_modules/.cache/eslint/server --max-warnings=0 --ext .js,.jsx,.ts,.tsx,.cjs,.mjs {projectRoot}"
-      }
-    },
-    "type-check": {
-      "executor": "nx:run-commands",
-      "dependsOn": ["config-lib:build"],
-      "options": {
-        "commands": ["tsc --project {projectRoot}/tsconfig.json --noEmit", "tsc --project {projectRoot}/bin/tsconfig.json --noEmit"],
-        "parallel": false
       }
     }
   },

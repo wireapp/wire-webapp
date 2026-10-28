@@ -101,7 +101,7 @@ const testDetails = Object.values(testFilesToReport).reduce((acc, testFile) => {
   return acc;
 }, '');
 
-const formatDuration = (duration: number) => {
+const formatDuration = (duration: number): string => {
   const minutes = Math.floor(duration / 60000);
   const totalSeconds = Math.round((duration % 60000) / 1000);
   const seconds = totalSeconds % 60;

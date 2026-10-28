@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {isNonEmptyString} from '@sindresorhus/is';
 
 import {Button, ButtonVariant, COLOR} from '@wireapp/react-ui-kit';
@@ -32,7 +34,12 @@ interface MessageButtonProps {
   onClick?: () => void;
 }
 
-export const MessageButton = ({id, label, message, onClick = noop}: MessageButtonProps) => {
+export const MessageButton: FunctionComponent<MessageButtonProps> = ({
+  id,
+  label,
+  message,
+  onClick = noop,
+}: MessageButtonProps) => {
   const {errorButtonId, errorMessage, selectedButtonId, waitingButtonId} = useKoSubscribableChildren(message, [
     'errorButtonId',
     'errorMessage',

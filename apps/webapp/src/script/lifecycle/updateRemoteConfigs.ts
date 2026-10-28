@@ -18,6 +18,7 @@
  */
 
 import {isUndefined} from '@sindresorhus/is';
+import type {BackendFeatures} from '@wireapp/api-client/lib/apiClient';
 import {TaskParams} from '@wireapp/core/lib/util/recurringTaskScheduler';
 import {container} from 'tsyringe';
 
@@ -30,14 +31,14 @@ import {Core} from '../service/coreSingleton';
 let core: Core | undefined = undefined;
 export const updateRemoteConfigLogger = getLogger('updateRemoteConfigs');
 
-export const scheduleRecurringTask = async (params: TaskParams) => {
+export const scheduleRecurringTask = async (params: TaskParams): Promise<void> => {
   if (isUndefined(core)) {
     core = container.resolve(Core);
   }
   return core.recurringTaskScheduler.registerTask(params);
 };
 
-export const updateApiVersion = async () => {
+export const updateApiVersion = async (): Promise<BackendFeatures> => {
   if (isUndefined(core)) {
     core = container.resolve(Core);
   }
@@ -50,7 +51,7 @@ export const updateApiVersion = async () => {
   return core.useAPIVersion(min, max, ENABLE_DEV_BACKEND_API);
 };
 
-export const scheduleApiVersionUpdate = async () => {
+export const scheduleApiVersionUpdate = async (): Promise<void> => {
   // Schedule the task to run every day and add it to the window focus event
   await scheduleRecurringTask({
     every: TIME_IN_MILLIS.DAY,

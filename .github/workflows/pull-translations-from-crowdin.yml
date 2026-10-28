@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   pull_from_crowdin:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
 
     steps:
       - name: Checkout
@@ -24,17 +24,14 @@ jobs:
           ref: main
           fetch-depth: 1
 
-      - name: Add repository Yarn wrapper to PATH
-        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
-
       - name: Setup Node.js
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: Install JS dependencies
-        run: ./bin/yarn --immutable
+        run: npm clean-install
 
       - name: Download translations and create PR
         uses: crowdin/github-action@7ca9c452bfe9197d3bb7fa83a4d7e2b0c9ae835d
@@ -61,4 +58,4 @@ jobs:
           base_path: '.'
 
       - name: Validate downloaded translation markers
-        run: ./bin/yarn nx run webapp:validate-translations
+        run: node tools/i18n/validateTranslationPlaceholders.mts

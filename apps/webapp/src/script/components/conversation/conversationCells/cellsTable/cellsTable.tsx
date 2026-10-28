@@ -17,16 +17,17 @@
  *
  */
 
-import {DragEvent, useEffect, useState} from 'react';
+import {DragEvent, useEffect, useRef, useState, type FunctionComponent, type ReactElement} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 import {flexRender, getCoreRowModel, type Header, useReactTable} from '@tanstack/react-table';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
+import {JobsTaskStatus, RestActionStatus, type RestPerformActionResponse} from 'cells-sdk-ts';
 import {createPortal} from 'react-dom';
+import {Maybe, maybe, task} from 'true-myth';
 
-import {UploadIcon} from '@wireapp/react-ui-kit';
+import {ArrowIcon, CloseIcon, UploadIcon} from '@wireapp/react-ui-kit';
 
-import {CellsSelectionBar} from 'Components/cells/common/cellsSelectionBar/cellsSelectionBar';
 import {CellsBulkMovePreviewModal} from 'Components/conversation/conversationCells/cellsTable/cellsBulkMovePreviewModal/cellsBulkMovePreviewModal';
 import {
   CELLS_ACTION,
@@ -34,15 +35,21 @@ import {
   useCellsActionPermissions,
 } from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {isInRecycleBin} from 'Components/conversation/conversationCells/common/recycleBin/recycleBin';
+import {
+  useSharedDriveUploadStatus,
+  type SharedDriveMoveSummary,
+} from 'Components/conversation/conversationCells/sharedDriveUploadStatusContext';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
+import {formatBytes} from 'Util/util';
 
 import {CellsFilePreviewModal} from './cellsFilePreviewModal/cellsFilePreviewModal';
 import {
   bulkMoveButtonStyles,
+  clearSelectionButtonStyles,
   folderDropOverlayDescriptionStyles,
   folderDropOverlayFolderNameStyles,
   folderDropOverlayStyles,
@@ -54,6 +61,9 @@ import {
   tableCellStyles,
   selectedTableCellRowStyles,
   selectionBarContainerStyles,
+  selectionBarStyles,
+  selectionCountStyles,
+  selectionSizeStyles,
   tableStyles,
   wrapperWithRowsStyles,
   wrapperStyles,
@@ -83,6 +93,7 @@ interface CellsTableProps {
   selectionEnabled: boolean;
   selectionScopeKey: string;
   selectionBarAnchor: HTMLElement | null;
+  random?: () => number;
 }
 
 interface CellsTableHeaderCellProps {
@@ -91,7 +102,11 @@ interface CellsTableHeaderCellProps {
   isSortingEnabled: boolean;
 }
 
-const CellsTableHeaderCell = ({header, getDirectionFor, isSortingEnabled}: CellsTableHeaderCellProps) => {
+const CellsTableHeaderCell: FunctionComponent<CellsTableHeaderCellProps> = ({
+  header,
+  getDirectionFor,
+  isSortingEnabled,
+}: CellsTableHeaderCellProps) => {
   const sortField = SORTABLE_COLUMN_FIELD[header.column.id];
   const ariaSort = isSortingEnabled && isNonEmptyString(sortField) ? toAriaSort(getDirectionFor(sortField)) : undefined;
 
@@ -112,10 +127,41 @@ const dragEventContainsFiles = (event: DragEvent<HTMLElement>): boolean => {
   return Array.from(event.dataTransfer.types).includes('Files');
 };
 
+const getSelectedFilesTotalSize = (nodes: CellNode[]): Maybe<number> => {
+  if (nodes.length === 0) {
+    return Maybe.nothing();
+  }
+
+  let totalBytes = 0;
+  for (const node of nodes) {
+    if (node.type !== CellNodeType.FILE || maybe.isNothing(node.sizeBytes)) {
+      return Maybe.nothing();
+    }
+
+    const fileBytes = node.sizeBytes.value;
+    if (!Number.isSafeInteger(fileBytes) || fileBytes < 0) {
+      return Maybe.nothing();
+    }
+
+    totalBytes += fileBytes;
+    if (!Number.isSafeInteger(totalBytes)) {
+      return Maybe.nothing();
+    }
+  }
+
+  return Maybe.just(totalBytes);
+};
+
 const preventDefaultFileDrop = (event: DragEvent<HTMLElement>): void => {
   event.preventDefault();
   event.stopPropagation();
 };
+
+const BACKGROUND_MOVE_STATUS_POLL_INTERVAL_MS = 1000;
+const BACKGROUND_MOVE_STATUS_RETRY_BACKOFF_FACTOR = 2;
+const BACKGROUND_MOVE_STATUS_RETRY_MIN_JITTER_FACTOR = 0.75;
+const BACKGROUND_MOVE_STATUS_RETRY_MAX_JITTER_FACTOR = 1.25;
+const MAX_BACKGROUND_MOVE_STATUS_RETRIES = 5;
 
 export const CellsTable = ({
   nodes,
@@ -135,19 +181,193 @@ export const CellsTable = ({
   selectionEnabled,
   selectionScopeKey,
   selectionBarAnchor,
-}: CellsTableProps) => {
-  const {translate, isFeatureToggleEnabled} = useApplicationContext();
+  random = Math.random,
+}: CellsTableProps): ReactElement => {
+  const {clock, translate, isFeatureToggleEnabled} = useApplicationContext();
+  const {updateMoveStatus, createMoveStatusId, clearMoveStatus} = useSharedDriveUploadStatus();
+  const backgroundMoveSummary = useRef<Maybe<SharedDriveMoveSummary>>(Maybe.nothing());
+  const activeMoveStatusId = useRef<Maybe<string>>(Maybe.nothing());
   const canPerformCurrentDriveAction = useCellsActionPermissions();
   const isSelectionEnabled = selectionEnabled && isFeatureToggleEnabled(driveBulkActionsFeatureToggleName);
   const [selectedNodeIds, setSelectedNodeIds] = useState<Set<string>>(() => {
     return new Set();
   });
   const [isBulkMovePreviewOpen, setIsBulkMovePreviewOpen] = useState(false);
+  const [isBulkMoveRequestPending, setIsBulkMoveRequestPending] = useState(false);
+  const [isBackgroundMovePending, setIsBackgroundMovePending] = useState(false);
+  const isMovePendingRef = useRef(false);
+  isMovePendingRef.current = isBulkMoveRequestPending || isBackgroundMovePending;
+  const [isBackgroundMoveError, setIsBackgroundMoveError] = useState(false);
+  const [isBackgroundMoveRetryBlocked, setIsBackgroundMoveRetryBlocked] = useState(false);
+  const [isBackgroundMoveStatusUnknown, setIsBackgroundMoveStatusUnknown] = useState(false);
+  const [backgroundMoveJobUuids, setBackgroundMoveJobUuids] = useState<string[]>([]);
+  const [backgroundMoveStatusId, setBackgroundMoveStatusId] = useState('');
+  const [backgroundMoveStatusCheckId, setBackgroundMoveStatusCheckId] = useState(0);
+  const [isBulkMoveOutcomeUnresolved, setIsBulkMoveOutcomeUnresolved] = useState(false);
+  const [isBulkMoveRequestError, setIsBulkMoveRequestError] = useState(false);
 
   useEffect(() => {
+    if (isMovePendingRef.current) {
+      return;
+    }
+
     setSelectedNodeIds(new Set());
     setIsBulkMovePreviewOpen(false);
   }, [selectionScopeKey, isSelectionEnabled]);
+
+  const handleBulkMoveRequestError = (): void => {
+    if (maybe.isJust(activeMoveStatusId.current)) {
+      clearMoveStatus(activeMoveStatusId.current.value);
+    }
+    activeMoveStatusId.current = Maybe.nothing();
+    backgroundMoveSummary.current = Maybe.nothing();
+    setIsBulkMoveRequestPending(false);
+    setIsBulkMovePreviewOpen(true);
+    setIsBulkMoveOutcomeUnresolved(true);
+    setIsBulkMoveRequestError(true);
+  };
+
+  const handleBulkMoveStart = (summary: SharedDriveMoveSummary): void => {
+    const id = createMoveStatusId();
+    activeMoveStatusId.current = Maybe.just(id);
+    backgroundMoveSummary.current = Maybe.just(summary);
+    setIsBulkMoveRequestPending(true);
+    setIsBulkMovePreviewOpen(false);
+    setIsBulkMoveOutcomeUnresolved(false);
+    setIsBulkMoveRequestError(false);
+    setIsBackgroundMoveError(false);
+    setIsBackgroundMoveStatusUnknown(false);
+    updateMoveStatus({id, kind: 'processing', ...summary});
+  };
+
+  useEffect(() => {
+    if (backgroundMoveJobUuids.length === 0 || backgroundMoveStatusId.length === 0) {
+      return undefined;
+    }
+
+    let isActive = true;
+    let timeout: ReturnType<typeof clock.setTimeout> | undefined;
+    let retryCount = 0;
+    const scheduleNextCheck = (delay: number): void => {
+      timeout = clock.setTimeout(() => {
+        void checkBackgroundMoveStatus();
+      }, delay);
+    };
+    const moveStatusId = backgroundMoveStatusId;
+    const handleUnknownStatus = (): void => {
+      if (retryCount >= MAX_BACKGROUND_MOVE_STATUS_RETRIES) {
+        clearMoveStatus(moveStatusId);
+        setIsBackgroundMovePending(false);
+        setIsBackgroundMoveStatusUnknown(true);
+        setIsBulkMovePreviewOpen(true);
+        return;
+      }
+
+      const retryDelay =
+        BACKGROUND_MOVE_STATUS_POLL_INTERVAL_MS *
+        BACKGROUND_MOVE_STATUS_RETRY_BACKOFF_FACTOR ** retryCount *
+        (BACKGROUND_MOVE_STATUS_RETRY_MIN_JITTER_FACTOR +
+          random() * (BACKGROUND_MOVE_STATUS_RETRY_MAX_JITTER_FACTOR - BACKGROUND_MOVE_STATUS_RETRY_MIN_JITTER_FACTOR));
+      retryCount += 1;
+      scheduleNextCheck(retryDelay);
+    };
+    const checkBackgroundMoveStatus = async (): Promise<void> => {
+      const statusResults = await Promise.all(
+        backgroundMoveJobUuids.map(jobUuid => {
+          return task.tryOrElse(
+            error => {
+              return error;
+            },
+            () => {
+              return cellsRepository.getBackgroundMoveInfo({jobUuid});
+            },
+          );
+        }),
+      );
+      if (!isActive) {
+        return;
+      }
+
+      const backgroundActions = statusResults.map(statusResult => {
+        return statusResult.isOk ? statusResult.value : undefined;
+      });
+      const statuses = backgroundActions.map(action => {
+        return action?.Status;
+      });
+      if (
+        statuses.some(status => {
+          return status === undefined || status === JobsTaskStatus.Unknown;
+        })
+      ) {
+        handleUnknownStatus();
+        return;
+      }
+      retryCount = 0;
+      if (maybe.isJust(backgroundMoveSummary.current)) {
+        updateMoveStatus({id: moveStatusId, kind: 'processing', ...backgroundMoveSummary.current.value});
+      }
+      const areAllJobsFinished = statuses.every(status => {
+        return status === JobsTaskStatus.Finished;
+      });
+      if (areAllJobsFinished) {
+        if (maybe.isJust(backgroundMoveSummary.current)) {
+          updateMoveStatus({id: moveStatusId, kind: 'completed', ...backgroundMoveSummary.current.value});
+        } else {
+          clearMoveStatus(moveStatusId);
+        }
+        backgroundMoveSummary.current = Maybe.nothing();
+        setBackgroundMoveStatusId('');
+        setBackgroundMoveJobUuids([]);
+        setIsBackgroundMovePending(false);
+        setIsBackgroundMoveError(false);
+        setIsBulkMoveOutcomeUnresolved(false);
+        setIsBulkMoveRequestError(false);
+        onRefresh();
+        setIsBulkMovePreviewOpen(false);
+        return;
+      }
+
+      const hasNonTerminalJob = statuses.some(status => {
+        return (
+          status !== JobsTaskStatus.Finished && status !== JobsTaskStatus.Error && status !== JobsTaskStatus.Interrupted
+        );
+      });
+      if (hasNonTerminalJob) {
+        scheduleNextCheck(BACKGROUND_MOVE_STATUS_POLL_INTERVAL_MS);
+        return;
+      }
+
+      clearMoveStatus(moveStatusId);
+      setBackgroundMoveJobUuids([]);
+      setIsBackgroundMovePending(false);
+      setIsBackgroundMoveRetryBlocked(true);
+      setIsBackgroundMoveStatusUnknown(false);
+      setIsBackgroundMoveError(true);
+      backgroundMoveSummary.current = Maybe.nothing();
+      setBackgroundMoveStatusId('');
+      setIsBulkMovePreviewOpen(true);
+      onRefresh();
+    };
+
+    void checkBackgroundMoveStatus();
+
+    return () => {
+      isActive = false;
+      if (timeout !== undefined) {
+        clock.clearTimeout(timeout);
+      }
+    };
+  }, [
+    backgroundMoveJobUuids,
+    backgroundMoveStatusId,
+    backgroundMoveStatusCheckId,
+    cellsRepository,
+    clock,
+    clearMoveStatus,
+    onRefresh,
+    random,
+    updateMoveStatus,
+  ]);
 
   useEffect(() => {
     const currentNodeIds = new Set<string>();
@@ -164,6 +384,65 @@ export const CellsTable = ({
       return nextSelection.size === currentSelection.size ? currentSelection : nextSelection;
     });
   }, [nodes]);
+
+  const handleBulkMoveResult = (response: RestPerformActionResponse, summary: SharedDriveMoveSummary): boolean => {
+    const moveStatusId = maybe.isJust(activeMoveStatusId.current)
+      ? activeMoveStatusId.current.value
+      : createMoveStatusId();
+    setIsBulkMoveRequestPending(false);
+    setIsBackgroundMoveError(false);
+    setIsBackgroundMoveRetryBlocked(false);
+    setIsBackgroundMoveStatusUnknown(false);
+
+    if (response.Status === RestActionStatus.Performed) {
+      updateMoveStatus({id: moveStatusId, kind: 'completed', ...summary});
+      activeMoveStatusId.current = Maybe.nothing();
+      backgroundMoveSummary.current = Maybe.nothing();
+      setIsBulkMoveOutcomeUnresolved(false);
+      setIsBulkMoveRequestError(false);
+      onRefresh();
+      return true;
+    }
+
+    const moveJobUuids = response.BackgroundActions?.filter(action => {
+      return action.Name === 'move' && isNonEmptyString(action.JobUuid);
+    }).map(action => {
+      return action.JobUuid;
+    });
+    const uniqueMoveJobUuids = [...new Set(moveJobUuids ?? [])];
+    if (uniqueMoveJobUuids.length === 0) {
+      clearMoveStatus(moveStatusId);
+      activeMoveStatusId.current = Maybe.nothing();
+      backgroundMoveSummary.current = Maybe.nothing();
+      setIsBulkMoveOutcomeUnresolved(true);
+      setIsBackgroundMovePending(false);
+      setIsBackgroundMoveStatusUnknown(true);
+      setIsBulkMovePreviewOpen(true);
+      return false;
+    }
+
+    activeMoveStatusId.current = Maybe.nothing();
+    backgroundMoveSummary.current = Maybe.just(summary);
+    setBackgroundMoveStatusId(moveStatusId);
+    setBackgroundMoveJobUuids(uniqueMoveJobUuids);
+    setIsBulkMoveOutcomeUnresolved(false);
+    setIsBulkMoveRequestError(false);
+    setIsBackgroundMovePending(true);
+    updateMoveStatus({id: moveStatusId, kind: 'processing', ...summary});
+    return true;
+  };
+
+  const handleRetryBackgroundMoveStatus = (): void => {
+    if (backgroundMoveJobUuids.length === 0) {
+      return;
+    }
+
+    setIsBackgroundMoveStatusUnknown(false);
+    setIsBackgroundMovePending(true);
+    setBackgroundMoveStatusCheckId(currentCheckId => {
+      return currentCheckId + 1;
+    });
+  };
 
   const handleToggleSelection = (nodeId: string, isSelected: boolean): void => {
     setSelectedNodeIds(currentSelection => {
@@ -212,8 +491,12 @@ export const CellsTable = ({
   const selectedNodes = nodes.filter(node => {
     return selectedNodeIds.has(node.id);
   });
+  const selectedFilesTotalSize =
+    selectedNodes.length === selectedNodeIds.size ? getSelectedFilesTotalSize(selectedNodes) : Maybe.nothing();
   const canMoveSelection =
     selectedNodes.length > 0 &&
+    !isBulkMoveRequestPending &&
+    !isBackgroundMovePending &&
     !isInRecycleBin() &&
     canPerformCurrentDriveAction(CELLS_ACTION.MOVE) &&
     selectedNodes.every(node => {
@@ -238,7 +521,15 @@ export const CellsTable = ({
     onFolderDropTargetChange?.(node?.name ?? null);
   };
 
-  const getFolderDropHandlers = (node: CellNode) => {
+  type GetFolderDropHandlersResult =
+    | {onDragEnter?: undefined; onDragOver?: undefined; onDragLeave?: undefined; onDrop?: undefined}
+    | {
+        onDragEnter: (event: DragEvent<HTMLTableRowElement>) => void;
+        onDragOver: (event: DragEvent<HTMLTableRowElement>) => void;
+        onDragLeave: (event: DragEvent<HTMLTableRowElement>) => void;
+        onDrop: (event: DragEvent<HTMLTableRowElement>) => void;
+      };
+  const getFolderDropHandlers = (node: CellNode): GetFolderDropHandlersResult => {
     if (node.type !== CellNodeType.FOLDER || onDropFilesToFolder === undefined) {
       return {};
     }
@@ -301,39 +592,79 @@ export const CellsTable = ({
           selectionBarAnchor !== null &&
           createPortal(
             <div css={selectionBarContainerStyles}>
-              <CellsSelectionBar
-                selectedCount={selectedNodeIds.size}
-                onClear={() => {
-                  return setSelectedNodeIds(new Set());
-                }}
-              />
-              {canMoveSelection && (
-                <button
-                  css={bulkMoveButtonStyles}
-                  type="button"
-                  aria-haspopup="dialog"
-                  onClick={() => {
-                    return setIsBulkMovePreviewOpen(true);
-                  }}
-                >
-                  {translate('cells.selection.move')}
-                </button>
+              {isBulkMoveOutcomeUnresolved && (
+                <p role="status">
+                  {isBulkMoveRequestError
+                    ? translate('cells.newItemMenuModalForm.genericError')
+                    : translate('cells.bulkMove.outcomeUnresolved')}
+                </p>
+              )}
+              {selectedNodeIds.size > 0 && (
+                <div css={selectionBarStyles} role="status" aria-live="polite">
+                  <button
+                    css={clearSelectionButtonStyles}
+                    type="button"
+                    aria-label={translate('cells.selection.clear')}
+                    onClick={() => {
+                      return setSelectedNodeIds(new Set());
+                    }}
+                  >
+                    <CloseIcon aria-hidden="true" />
+                  </button>
+                  <span css={selectionCountStyles}>
+                    {translate('cells.selection.selectedCount', {count: selectedNodeIds.size})}
+                  </span>
+                  {maybe.isJust(selectedFilesTotalSize) && (
+                    <span css={selectionSizeStyles}>{formatBytes(selectedFilesTotalSize.value)}</span>
+                  )}
+                  {canMoveSelection && (
+                    <button
+                      css={bulkMoveButtonStyles}
+                      type="button"
+                      aria-haspopup="dialog"
+                      onClick={() => {
+                        return setIsBulkMovePreviewOpen(true);
+                      }}
+                    >
+                      <ArrowIcon direction="right" aria-hidden="true" focusable="false" />
+                      {translate('cells.selection.move')}
+                    </button>
+                  )}
+                </div>
               )}
             </div>,
             selectionBarAnchor,
           )}
-        {isBulkMovePreviewOpen && canMoveSelection && (
-          <CellsBulkMovePreviewModal
-            isOpen
-            onClose={() => {
-              return setIsBulkMovePreviewOpen(false);
-            }}
-            selectedNodes={selectedNodes}
-            cellsRepository={cellsRepository}
-            conversationQualifiedId={conversationQualifiedId}
-            conversationName={conversationName}
-          />
-        )}
+        {(isBulkMovePreviewOpen || isBulkMoveRequestPending || isBackgroundMovePending) &&
+          (canMoveSelection ||
+            isBulkMoveRequestPending ||
+            isBackgroundMovePending ||
+            isBackgroundMoveError ||
+            isBackgroundMoveStatusUnknown) && (
+            <CellsBulkMovePreviewModal
+              isOpen={isBulkMovePreviewOpen}
+              onClose={() => {
+                return setIsBulkMovePreviewOpen(false);
+              }}
+              selectedNodes={selectedNodes}
+              cellsRepository={cellsRepository}
+              conversationQualifiedId={conversationQualifiedId}
+              conversationName={conversationName}
+              isMoveOutcomeUnresolved={isBulkMoveOutcomeUnresolved}
+              isMoveRequestError={isBulkMoveRequestError}
+              isMoveRequestPending={isBulkMoveRequestPending}
+              onMoveStart={handleBulkMoveStart}
+              onMoveResult={handleBulkMoveResult}
+              onMoveError={handleBulkMoveRequestError}
+              isBackgroundMovePending={isBackgroundMovePending}
+              isBackgroundMoveError={isBackgroundMoveError}
+              isBackgroundMoveRetryBlocked={isBackgroundMoveRetryBlocked}
+              isBackgroundMoveStatusUnknown={isBackgroundMoveStatusUnknown}
+              canRetryBackgroundMoveStatus={backgroundMoveJobUuids.length > 0}
+              onRetryBackgroundMoveStatus={handleRetryBackgroundMoveStatus}
+              onRefresh={onRefresh}
+            />
+          )}
         {activeFolderDropTargetName !== null && (
           <div css={folderDropOverlayStyles} role="status">
             <UploadIcon width={24} height={24} aria-hidden="true" />

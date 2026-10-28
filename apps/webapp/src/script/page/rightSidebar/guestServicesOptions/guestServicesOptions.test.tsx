@@ -42,7 +42,15 @@ let conversationRepository: ConversationRepository;
 const rootContextValue = createRootContextValueForTest({translate: translateForTest});
 const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
-const getDefaultParams = (isGuest: boolean = true) => {
+type GetDefaultParamsResult = {
+  conversationRepository: ConversationRepository;
+  isGuest: boolean;
+  onBack: jest.Mock<any, any, any>;
+  onClose: jest.Mock<any, any, any>;
+  teamRepository: TeamRepository;
+  teamState: TeamState;
+};
+const getDefaultParams = (isGuest: boolean = true): GetDefaultParamsResult => {
   return {
     conversationRepository,
     isGuest,

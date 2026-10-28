@@ -42,7 +42,7 @@ export interface RelativeTimestampLabels {
 
 export type RelativeTimestampFormatter = (timestamp: number, isDay: boolean) => string;
 
-function calculateTimestamp(ts: number, isDay: boolean, relativeTimestampLabels: RelativeTimestampLabels) {
+function calculateTimestamp(ts: number, isDay: boolean, relativeTimestampLabels: RelativeTimestampLabels): string {
   const date = fromUnixTime(ts / TIME_IN_MILLIS.SECOND);
   if (isYoungerThanMinute(date)) {
     return relativeTimestampLabels.justNow;
@@ -84,7 +84,7 @@ export const useRelativeTimestamp = (
   timestamp: number,
   asDay = false,
   getMessagesGroupLabelCallBack: RelativeTimestampFormatter,
-) => {
+): string => {
   const [timeago, setTimeago] = useState<string>(getMessagesGroupLabelCallBack(timestamp, asDay));
 
   useEffect(() => {

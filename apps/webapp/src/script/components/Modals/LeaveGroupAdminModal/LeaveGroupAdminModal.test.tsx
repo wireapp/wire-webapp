@@ -19,7 +19,7 @@
 
 import React from 'react';
 
-import {act, fireEvent, render, waitFor} from '@testing-library/react';
+import {act, fireEvent, render, waitFor, type RenderResult} from '@testing-library/react';
 
 import {User} from 'Repositories/entity/User';
 import {generateConversation} from 'test/helper/ConversationGenerator';
@@ -45,11 +45,11 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
 );
 
-const renderModalWithRootProvider = () => {
+const renderModalWithRootProvider = (): RenderResult => {
   return render(withTheme(<LeaveGroupAdminModal translate={translateForTest} />), {wrapper: rootProviderWrapper});
 };
 
-const createEligibleUser = (id: string) => {
+const createEligibleUser = (id: string): User => {
   const user = new User(id, 'example.com', translateForTest);
   user.name(`User ${id}`);
   user.username(`user.${id}`);

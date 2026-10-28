@@ -18,6 +18,7 @@
  */
 
 import {checkbox} from '@inquirer/prompts';
+
 import {type ChildProcess, spawn} from 'child_process';
 
 const LIBRARIES = [
@@ -38,7 +39,7 @@ const LIBRARIES = [
   {name: 'license-collector', value: 'license-collector-lib'},
 ] as const;
 
-async function main() {
+async function main(): Promise<void> {
   const selected = await checkbox({
     message: 'Select libraries to watch:',
     choices: LIBRARIES,
@@ -56,7 +57,7 @@ async function main() {
   });
 }
 
-main().catch(error => {
+main().catch((error: unknown) => {
   console.error(error);
   process.exitCode = 1;
 });

@@ -68,19 +68,19 @@ const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
   const [isEditingName, setIsEditingName] = useState<boolean>(false);
   const [groupName, setGroupName] = useState(displayName);
 
-  const clickToEditGroupName = () => {
+  const clickToEditGroupName = (): void => {
     if (isActiveGroupParticipant) {
       setIsEditingName(true);
     }
   };
 
-  const renameConversation = (event: ChangeEvent<HTMLTextAreaElement>) => {
+  const renameConversation = (event: ChangeEvent<HTMLTextAreaElement>): void => {
     const {value: currentValue} = event.target;
 
     setGroupName(currentValue);
   };
 
-  const handleRenameConversation = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleRenameConversation = (event: KeyboardEvent<HTMLTextAreaElement>): void => {
     if (isEnterKey(event)) {
       event.preventDefault();
       const {value: currentValue} = event.currentTarget;

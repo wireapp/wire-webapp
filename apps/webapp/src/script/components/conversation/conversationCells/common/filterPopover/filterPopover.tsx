@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode, useCallback, useMemo, useState} from 'react';
+import {ReactNode, useCallback, useMemo, useState, type FunctionComponent} from 'react';
 
 import {Button, Dialog, DialogTrigger, Popover} from 'react-aria-components';
 
@@ -80,7 +80,7 @@ interface FilterPopoverProps {
   singleSelect: boolean;
 }
 
-export const FilterPopover = ({
+export const FilterPopover: FunctionComponent<FilterPopoverProps> = ({
   triggerLabel,
   items,
   selectedIds,

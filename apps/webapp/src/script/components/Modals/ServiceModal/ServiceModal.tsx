@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {Avatar, AVATAR_SIZE} from 'Components/avatar';
 import * as Icon from 'Components/icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
@@ -38,7 +40,7 @@ interface ServiceModalProps {
   readonly avatarSize?: AVATAR_SIZE;
 }
 
-const ServiceModal = ({
+const ServiceModal: FunctionComponent<ServiceModalProps> = ({
   translate,
   service,
   avatarSize = AVATAR_SIZE.LARGE,
@@ -47,7 +49,7 @@ const ServiceModal = ({
 }: ServiceModalProps) => {
   const {setCurrentTab: setCurrentSidebarTab} = useSidebarStore();
 
-  const onOpenService = () => {
+  const onOpenService = (): void => {
     onClose?.();
     setCurrentSidebarTab(SidebarTabs.RECENT);
     void actionsViewModel.open1to1ConversationWithService(service);

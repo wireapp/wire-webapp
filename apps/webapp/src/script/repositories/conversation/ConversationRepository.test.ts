@@ -122,6 +122,29 @@ import {createMockHttpServer, MockHttpServer} from '../../../../test/helper/mock
 import {generateUser} from '../../../../test/helper/UserGenerator';
 import {Core} from '../../service/coreSingleton';
 
+type ConversationRepositoryTestDependencies = {
+  readonly conversationState: ConversationState;
+  readonly teamState: TeamState;
+  readonly userState: UserState;
+  readonly eventRepository: EventRepository;
+  readonly callingRepository: CallingRepository;
+  readonly userRepository: UserRepository;
+  readonly teamRepository: TeamRepository;
+  readonly messageRepository: MessageRepository;
+  readonly conversationService: ConversationService;
+  readonly core: Core;
+};
+type ConversationRepositoryTestFixture = readonly [ConversationRepository, ConversationRepositoryTestDependencies];
+type GeneratedConversation = {
+  members: {others: {qualified_id: QualifiedId}[]; self: {}};
+  name: string;
+  protocol: CONVERSATION_PROTOCOL;
+  qualified_id: QualifiedId;
+  receipt_mode: number;
+  team: string;
+  type: CONVERSATION_TYPE;
+};
+
 function getCoreConversationServiceForTest(): NonNullable<NonNullable<Core['service']>['conversation']> {
   const service = requireValueForTest(container.resolve(Core).service);
 
@@ -138,7 +161,7 @@ function getConversationServiceFromCoreForTest(core: Core): NonNullable<NonNulla
   return requireValueForTest(requireValueForTest(core.service).conversation);
 }
 
-function buildConversationRepository(translate: Translate) {
+function buildConversationRepository(translate: Translate): ConversationRepositoryTestFixture {
   const teamState = new TeamState();
   const conversationState = new ConversationState();
   // @ts-ignore
@@ -213,7 +236,7 @@ describe('ConversationRepository', () => {
   let storage_service: StorageService;
   const messageSenderId = createUuid();
 
-  const _findConversation = (conversation: Conversation, conversations: () => Conversation[]) => {
+  const _findConversation = (conversation: Conversation, conversations: () => Conversation[]): Conversation => {
     return ko.utils.arrayFirst(conversations(), _conversation => {
       return _conversation.id === conversation.id;
     });
@@ -2525,7 +2548,7 @@ describe('ConversationRepository', () => {
         };
       };
 
-      const saveMeetingConversation = async () => {
+      const saveMeetingConversation = async (): Promise<Conversation> => {
         const conversationRepository = requireValueForTest(testFactory.conversation_repository);
         const meetingConversation = _generateConversation({
           protocol: CONVERSATION_PROTOCOL.MLS,
@@ -3434,7 +3457,7 @@ describe('ConversationRepository', () => {
     otherMembers: QualifiedId[] = [],
     protocol = CONVERSATION_PROTOCOL.PROTEUS,
     type = CONVERSATION_TYPE.REGULAR,
-  ) {
+  ): GeneratedConversation {
     return {
       members: {
         others:

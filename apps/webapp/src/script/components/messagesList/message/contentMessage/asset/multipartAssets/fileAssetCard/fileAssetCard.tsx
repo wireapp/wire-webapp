@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {FileAssetSmall} from './fileAssetSmall/fileAssetSmall';
@@ -37,7 +39,7 @@ interface FileAssetCardProps {
   id: string;
 }
 
-export const FileAssetCard = ({
+export const FileAssetCard: FunctionComponent<FileAssetCardProps> = ({
   src,
   variant,
   extension,

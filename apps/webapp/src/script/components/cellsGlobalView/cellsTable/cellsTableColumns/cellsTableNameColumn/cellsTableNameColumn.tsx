@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {isNonEmptyString} from '@sindresorhus/is';
 
 import {FolderIcon, PlayIcon, Tooltip, ViewerAccessIcon} from '@wireapp/react-ui-kit';
@@ -45,7 +47,9 @@ interface CellsTableNameColumnProps {
   node: CellNode;
 }
 
-export const CellsTableNameColumn = ({node}: CellsTableNameColumnProps) => {
+export const CellsTableNameColumn: FunctionComponent<CellsTableNameColumnProps> = ({
+  node,
+}: CellsTableNameColumnProps) => {
   return (
     <>
       <span css={mobileNameStyles}>{node.name}</span>
@@ -60,7 +64,7 @@ export const CellsTableNameColumn = ({node}: CellsTableNameColumnProps) => {
   );
 };
 
-const FileNameColumn = ({file}: {file: CellFile}) => {
+const FileNameColumn: FunctionComponent<{file: CellFile}> = ({file}: {file: CellFile}) => {
   const {translate} = useApplicationContext();
   const {id, handleOpenFile, selectedFile} = useCellsFilePreviewModal();
 
@@ -112,7 +116,13 @@ const FileNameColumn = ({file}: {file: CellFile}) => {
   );
 };
 
-const FolderNameColumn = ({name, path}: {name: string; path: string}) => {
+const FolderNameColumn: FunctionComponent<{name: string; path: string}> = ({
+  name,
+  path,
+}: {
+  name: string;
+  path: string;
+}) => {
   return (
     <>
       <FolderIcon width={24} height={24} />

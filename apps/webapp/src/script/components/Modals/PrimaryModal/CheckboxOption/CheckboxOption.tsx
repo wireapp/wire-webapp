@@ -17,7 +17,7 @@
  *
  */
 
-import type {ChangeEvent} from 'react';
+import type {ChangeEvent, FunctionComponent} from 'react';
 
 import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 
@@ -27,7 +27,11 @@ interface CheckboxOptionProps {
   label: string;
 }
 
-export const CheckboxOption = ({label, isChecked, onChange}: CheckboxOptionProps) => {
+export const CheckboxOption: FunctionComponent<CheckboxOptionProps> = ({
+  label,
+  isChecked,
+  onChange,
+}: CheckboxOptionProps) => {
   return (
     <div className="modal-option">
       <Checkbox checked={isChecked} data-uie-name="modal-option-checkbox" id="clear-data-checkbox" onChange={onChange}>

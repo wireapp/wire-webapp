@@ -18,12 +18,14 @@
  */
 
 import {Page} from '@playwright/test';
+import type {Locator} from 'playwright-core';
 
-export const DeviceDetailsPage = (page: Page) => {
+type DeviceDetailsPageResult = {verifiedBadge: Locator; toggleDeviceVerification: () => Promise<void>};
+export const DeviceDetailsPage = (page: Page): DeviceDetailsPageResult => {
   const verificationToggleLabel = page.getByText('Verified');
   const verifiedBadge = page.getByTestId('device-model').getByTestId('proteus-verified');
 
-  const toggleDeviceVerification = async () => {
+  const toggleDeviceVerification = async (): Promise<void> => {
     await verificationToggleLabel.click();
   };
 

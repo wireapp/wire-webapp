@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {isNan} from '@sindresorhus/is';
 
 import {Button, ButtonVariant, FlexBox, Input, Select, Text} from '@wireapp/react-ui-kit';
@@ -37,7 +39,7 @@ import {
   customHistorySharingButtonCss,
 } from '../CreateConversationSteps.styles';
 
-export const CustomHistoryModal = () => {
+export const CustomHistoryModal: FunctionComponent = () => {
   const {translate} = useApplicationContext();
   const {
     setIsCustomHistoryModalOpen,
@@ -51,13 +53,13 @@ export const CustomHistoryModal = () => {
 
   const chatHistorySharingUnitOptions = getChatHistorySharingUnitOptions(translate, historySharingQuantity);
 
-  const onCancel = () => {
+  const onCancel = (): void => {
     setHistorySharingQuantity(1);
     setHistorySharingUnit(HistorySharingUnit.Days);
     setIsCustomHistoryModalOpen(false);
   };
 
-  const onSubmit = () => {
+  const onSubmit = (): void => {
     setIsCustomHistoryModalOpen(false);
     setChatHistory(ChatHistory.Custom);
   };

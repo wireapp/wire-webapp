@@ -55,7 +55,7 @@ export const EmojiPicker: FunctionComponent<EmojiPickerProperties> = properties 
 
   useEffect(() => {
     const mainElement = emojiRef.current;
-    function updateSize() {
+    function updateSize(): void {
       const emojiPickerWidth = 350;
       const reactionMenuOpenerButtonHeight = 40;
       const left = mainElement !== null ? posX - emojiPickerWidth : null;
@@ -81,7 +81,7 @@ export const EmojiPicker: FunctionComponent<EmojiPickerProperties> = properties 
     };
   }, [posX, posY]);
 
-  function onEmojiClick(emojiPickerSelection: EmojiPickerSelection) {
+  function onEmojiClick(emojiPickerSelection: EmojiPickerSelection): void {
     localStorage.setItem('activeSkinTone', emojiPickerSelection.activeSkinTone);
 
     handleReactionClick(emojiPickerSelection.emoji);
@@ -95,7 +95,7 @@ export const EmojiPicker: FunctionComponent<EmojiPickerProperties> = properties 
     }
   }
 
-  function getSkinTone() {
+  function getSkinTone(): SkinTones {
     const currentSkinTone = localStorage.getItem('activeSkinTone');
     const skinTone =
       currentSkinTone !== null && currentSkinTone.length > 0 ? (currentSkinTone as SkinTones) : SkinTones.NEUTRAL;

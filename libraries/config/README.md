@@ -14,12 +14,12 @@ This library contains environment variable type definitions and configuration ge
 
 ## Installation
 
-This package is part of the workspace and should be installed using workspace protocol:
+This package is part of the npm workspace. Depend on its current semver range so npm links the local package:
 
 ```json
 {
   "dependencies": {
-    "@wireapp/config": "workspace:^"
+    "@wireapp/config": "^1.0.0"
   }
 }
 ```
@@ -73,7 +73,7 @@ If `FEDERATION` is not set, `APP_BASE`, `BACKEND_REST`, and `BACKEND_WS` must re
 ### How configuration repositories are used
 
 - `apps/webapp/app-config/package.json` pins configuration repositories and versions.
-- `webapp:configure` runs `copy-config` using `apps/webapp/.copyconfigrc.js`.
+- `npx just configure-webapp` runs `copy-config` using `apps/webapp/.copyconfigrc.js`.
 - That step copies repository content into `apps/webapp/resource/` and writes repo `.env.defaults` into workspace root `.env.defaults`.
 - Configuration selection order in `.copyconfigrc.js`:
   1. If `FORCED_CONFIG_URL` is set, that URL is used directly.
@@ -91,7 +91,7 @@ If `FEDERATION` is not set, `APP_BASE`, `BACKEND_REST`, and `BACKEND_WS` must re
 ### Where default values come from
 
 - **Primary source:** configuration repositories (pinned in `apps/webapp/app-config/package.json`) provide baseline values via their `.env.defaults`.
-- During `webapp:configure`, the selected config repository is copied and its `.env.defaults` is written to workspace root `.env.defaults`.
+- During `configure-webapp`, the selected config repository is copied and its `.env.defaults` is written to workspace root `.env.defaults`.
 - At runtime/build time, values are loaded with this priority: **process env** > **`.env`** > **`.env.defaults`** > **code fallback**.
 - **Code fallbacks** are defined in config generators for specific variables only (for example `MAX_API_VERSION = 17`, `PORT = 21080`).
 - So, defaults are mostly from config repositories; webapp/server code provides fallback defaults only for a smaller subset.
@@ -278,19 +278,19 @@ Notes:
 ### Build
 
 ```bash
-nx run config-lib:build
+npx tsc --project libraries/config/tsconfig.json
 ```
 
 ### Type Check
 
 ```bash
-nx run config-lib:type-check
+npx just type-check
 ```
 
 ### Lint
 
 ```bash
-nx run config-lib:lint
+npx just eslint
 ```
 
 ## License

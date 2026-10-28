@@ -91,7 +91,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
 
   const isAdmin = isGroupOrChannel && conversationRoleRepository.isUserGroupAdmin(activeConversation, currentUser);
 
-  const toggleAdmin = async () => {
+  const toggleAdmin = async (): Promise<void> => {
     if (currentUser.isFederated) {
       return;
     }
@@ -103,7 +103,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
     activeConversation.roles(roles);
   };
 
-  const onUserAction = (action: Actions) => {
+  const onUserAction = (action: Actions): void => {
     if (action === Actions.REMOVE) {
       onBack(activeConversation);
     }

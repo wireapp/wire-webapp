@@ -20,6 +20,7 @@
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
+import type {DeterministicClock} from '@enormora/clock/deterministic-clock';
 import {CONVERSATION_TYPE, GROUP_CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
@@ -80,7 +81,14 @@ function buildNotificationRepository(
   clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
   notificationApi?: SystemNotificationApi,
   fireAndForgetInvoker: FireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest(),
-) {
+): readonly [
+  NotificationRepository,
+  {
+    readonly userState: UserState;
+    readonly clock: DeterministicClock;
+    readonly fireAndForgetInvoker: FireAndForgetInvoker;
+  },
+] {
   const userState = container.resolve(UserState);
   const conversationRepository = {
     isMessageRead: jest.fn(async () => {
@@ -740,7 +748,7 @@ describe('NotificationRepository', () => {
 
   describe('reacts according to availability status', () => {
     let allMessageTypes: Record<string, any>;
-    function generateTextAsset() {
+    function generateTextAsset(): Text {
       const textEntity = new Text(createUuid(), 'hey there');
       return textEntity;
     }
@@ -1208,7 +1216,7 @@ describe('NotificationRepository', () => {
     const userId = {domain: '', id: createUuid()};
     const shouldNotifyInConversation = NotificationRepository.shouldNotifyInConversation;
 
-    function generateTextAsset(selfMentioned = false) {
+    function generateTextAsset(selfMentioned = false): Text {
       const mentionId = selfMentioned ? userId.id : createUuid();
 
       const textEntity = new Text(createUuid(), '@Gregor can you take a look?');

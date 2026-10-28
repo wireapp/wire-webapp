@@ -33,7 +33,7 @@ jobs:
   build:
     name: Build and package Webapp
     if: ${{ github.repository == 'wireapp/wire-webapp' && (github.event_name != 'pull_request' || (github.event.pull_request.head.repo.full_name == github.repository && contains(github.event.pull_request.labels.*.name, 'run-e2e'))) }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 20
     permissions:
       contents: read
@@ -56,16 +56,13 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
 
-      - name: Add repository Yarn wrapper to PATH
-        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
-
       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'npm'
 
-      - run: ./bin/yarn --immutable
-      - run: ./bin/yarn nx run webapp:configure
+      - run: npm clean-install
+      - run: npx just configure-webapp
       - id: package
         env:
           EVENT_NAME: ${{ github.event_name }}
@@ -77,10 +74,10 @@ jobs:
 
           if [[ "${EVENT_NAME}" == "workflow_dispatch" && "${USE_PUBLIC_RSPACK}" == "true" ]]; then
             WIRE_WEBAPP_BUILD_VERSION="${expected_version}" \
-              ./bin/yarn nx run server:package-public
+              npm run build:prod:public
           else
             WIRE_WEBAPP_BUILD_VERSION="${expected_version}" \
-              ./bin/yarn build:prod
+              npm run build:prod
           fi
 
           {
@@ -182,7 +179,7 @@ jobs:
     name: Playwright Critical Flow
     if: ${{ always() && github.repository == 'wireapp/wire-webapp' && (github.event_name != 'pull_request' || (github.event.pull_request.head.repo.full_name == github.repository && contains(github.event.pull_request.labels.*.name, 'run-e2e'))) }}
     needs: [deploy_and_run_e2e]
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 5
     permissions: {}
     steps:
@@ -201,7 +198,7 @@ jobs:
     name: Generate test summary
     needs: [build, deploy_and_run_e2e]
     if: ${{ always() && github.repository == 'wireapp/wire-webapp' && (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 10
     permissions: {}
     steps:

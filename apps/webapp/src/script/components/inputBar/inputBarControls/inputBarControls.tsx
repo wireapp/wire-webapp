@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect} from 'react';
+import {useEffect, type FunctionComponent} from 'react';
 
 import {amplify} from 'amplify';
 
@@ -61,7 +61,7 @@ interface InputBarControlsProps {
   isSending: boolean;
 }
 
-export const InputBarControls = ({
+export const InputBarControls: FunctionComponent<InputBarControlsProps> = ({
   conversation,
   isFileSharingSendingEnabled,
   pingDisabled,

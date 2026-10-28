@@ -17,7 +17,7 @@
  *
  */
 
-import {useLayoutEffect, useMemo, useRef} from 'react';
+import {useLayoutEffect, useMemo, useRef, type FunctionComponent} from 'react';
 
 import {SerializedStyles, css} from '@emotion/react';
 import {isNull} from '@sindresorhus/is';
@@ -46,7 +46,7 @@ interface Props {
   index?: number;
 }
 
-export const MarkerComponent = ({marker, scrollTo, measureElement, index}: Props) => {
+export const MarkerComponent: FunctionComponent<Props> = ({marker, scrollTo, measureElement, index}: Props) => {
   const {translate} = useApplicationContext();
   const elementRef = useRef<HTMLDivElement | null>(null);
 

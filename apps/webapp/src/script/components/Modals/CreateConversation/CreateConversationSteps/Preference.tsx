@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect} from 'react';
+import {useEffect, type FunctionComponent} from 'react';
 
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {container} from 'tsyringe';
@@ -33,7 +33,7 @@ import {checkAppsFeatureAvailability} from 'Util/featureUtil';
 import {useCreateConversationModal} from '../hooks/useCreateConversationModal';
 import {getSharedDrivePermissionHint} from '../utils';
 
-export const Preference = () => {
+export const Preference: FunctionComponent = () => {
   const {translate} = useApplicationContext();
   const {
     isCellsEnabled,

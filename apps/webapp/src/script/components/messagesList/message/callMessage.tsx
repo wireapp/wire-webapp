@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import * as Icon from 'Components/icon';
 import {CallMessage as CallMessageEntity} from 'Repositories/entity/message/callMessage';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
@@ -27,7 +29,7 @@ interface CallMessageProps {
   message: CallMessageEntity;
 }
 
-const CallMessage = ({message}: CallMessageProps) => {
+const CallMessage: FunctionComponent<CallMessageProps> = ({message}: CallMessageProps) => {
   const {caption, unsafeSenderName, timestamp} = useKoSubscribableChildren(message, [
     'caption',
     'unsafeSenderName',

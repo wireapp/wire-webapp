@@ -16,7 +16,7 @@ concurrency:
 jobs:
   pull-request-semver-policy:
     name: Pull request SemVer policy
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read # required for checkout; labels come from the event payload
     steps:
@@ -38,11 +38,8 @@ jobs:
 
       - name: Install policy tooling dependencies
         if: ${{ github.event_name == 'pull_request' }}
-        env:
-          YARN_ENABLE_SCRIPTS: 'false'
-        # Production-only focus still executes the root postinstall, which requires Nx.
-        # Skip builds explicitly to avoid running workspace setup or building the WebApp.
-        run: ./bin/yarn install --immutable --mode=skip-build
+        # Skip lifecycle scripts because policy analysis does not need WebApp configuration.
+        run: npm run ci:install
 
       - name: Validate pull request release impact
         if: ${{ github.event_name == 'pull_request' }}

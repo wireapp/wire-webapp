@@ -17,7 +17,7 @@
  *
  */
 
-import {render, screen} from '@testing-library/react';
+import {render, screen, type RenderResult} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
@@ -64,7 +64,7 @@ const renderCellsHeader = (
     onSelectionBarAnchorChange?: (anchor: HTMLDivElement | null) => void;
   } = {},
   isBulkActionsEnabled = true,
-) => {
+): RenderResult => {
   const wrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({
       translate: translateForTest,
@@ -83,7 +83,7 @@ const renderCellsHeader = (
 };
 
 describe('CellsHeader', () => {
-  it('provides the selection overlay anchor in the breadcrumb strip', () => {
+  it('keeps the breadcrumb strip clickable while providing a selection overlay anchor', () => {
     const onSelectionBarAnchorChange = jest.fn();
     const {container} = renderCellsHeader({isSearchViewOpen: false, onSelectionBarAnchorChange});
 
@@ -92,6 +92,22 @@ describe('CellsHeader', () => {
     })?.[0];
 
     expect(anchor?.parentElement).toBe(container.querySelector('[data-uie-name="cells-selection-overlay-row"]'));
+    expect(anchor).toHaveStyle({pointerEvents: 'none'});
+  });
+
+  it('navigates to the Drive root when clicking the root breadcrumb from a nested folder', async () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id/wire.com/files/wire-cells-web/folder';
+
+    try {
+      renderCellsHeader({isSearchViewOpen: false});
+
+      await userEvent.click(screen.getByRole('button', {name: 'cells.breadcrumb.files'}));
+
+      expect(window.location.hash).toBe('#/conversation/conversation-id/wire.com/files');
+    } finally {
+      window.location.hash = originalHash;
+    }
   });
 
   it('does not render a selection overlay anchor when the feature flag is off', () => {

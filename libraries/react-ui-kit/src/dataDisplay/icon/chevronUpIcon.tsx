@@ -17,9 +17,11 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
-export const ChevronUpIcon = (props: SVGIconProps) => {
+export const ChevronUpIcon: FunctionComponent<SVGIconProps> = props => {
   return (
     <SVGIcon realWidth={16} realHeight={16} {...props}>
       <path

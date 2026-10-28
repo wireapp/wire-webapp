@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/avatar';
@@ -32,11 +34,11 @@ interface ServiceListItemProps {
   onClick: (service: ServiceEntity) => void;
 }
 
-export const ServiceListItem = ({service, onClick}: ServiceListItemProps) => {
+export const ServiceListItem: FunctionComponent<ServiceListItemProps> = ({service, onClick}: ServiceListItemProps) => {
   const {translate} = useApplicationContext();
   const {name: serviceName} = useKoSubscribableChildren(service, ['name']);
 
-  const onServiceClick = () => {
+  const onServiceClick = (): void => {
     return onClick(service);
   };
 

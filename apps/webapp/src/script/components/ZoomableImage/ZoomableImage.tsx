@@ -17,7 +17,7 @@
  *
  */
 
-import React, {HTMLProps, RefObject, useEffect, useRef, useState} from 'react';
+import React, {HTMLProps, RefObject, useEffect, useRef, useState, type FunctionComponent} from 'react';
 
 import {CSSObject} from '@emotion/react';
 
@@ -35,7 +35,7 @@ type Offset = {
 
 const DEFAULT_OFFSET: Offset = {x: 0, y: 0};
 
-function calculateZoomRatio(element: HTMLImageElement) {
+function calculateZoomRatio(element: HTMLImageElement): number {
   const parentElement = element.parentElement;
 
   if (parentElement === null) {
@@ -51,10 +51,11 @@ function calculateZoomRatio(element: HTMLImageElement) {
 }
 
 // if we will add more image zooming, we need to pass 2 props, for check if is image is zoomed and imageScale
+type CalculateMaxOffsetResult = {maxXOffset: number; maxYOffset: number};
 function calculateMaxOffset(
   containerRef: RefObject<HTMLDivElement | null>,
   imgRef: RefObject<HTMLImageElement | null>,
-) {
+): CalculateMaxOffsetResult {
   if (containerRef.current === null || imgRef.current === null) {
     return {
       maxXOffset: 0,
@@ -78,7 +79,7 @@ function calculateMaxOffset(
 
 type ZoomableImageProps = {imageCSS?: CSSObject} & HTMLProps<HTMLImageElement>;
 
-export const ZoomableImage = (props: ZoomableImageProps) => {
+export const ZoomableImage: FunctionComponent<ZoomableImageProps> = (props: ZoomableImageProps) => {
   const imageRef = useRef<HTMLImageElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [imageRatio, setImageRatio] = useState(1);
@@ -94,7 +95,7 @@ export const ZoomableImage = (props: ZoomableImageProps) => {
   const canZoomImage = imageRatio !== 1;
   const zoomScale = isZoomEnabled ? 1 : imageRatio;
 
-  const handleMouseClick = (event: React.MouseEvent<HTMLDivElement>) => {
+  const handleMouseClick = (event: React.MouseEvent<HTMLDivElement>): void => {
     const element = event.target;
 
     if (!isHTMLImageElement(element)) {
@@ -151,7 +152,7 @@ export const ZoomableImage = (props: ZoomableImageProps) => {
     });
   };
 
-  const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
+  const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>): void => {
     if (!canZoomImage && !isZoomEnabled) {
       return;
     }
@@ -177,7 +178,7 @@ export const ZoomableImage = (props: ZoomableImageProps) => {
     event.preventDefault();
   };
 
-  const handleMouseUp = (event: React.MouseEvent<HTMLDivElement>) => {
+  const handleMouseUp = (event: React.MouseEvent<HTMLDivElement>): void => {
     if (!isZoomEnabled && !mouseDownRef.current) {
       return;
     }
@@ -195,7 +196,7 @@ export const ZoomableImage = (props: ZoomableImageProps) => {
     });
   };
 
-  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
+  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>): void => {
     if (!isZoomEnabled || !mouseDownRef.current || containerRef.current === null || imageRef.current === null) {
       return;
     }
@@ -226,7 +227,7 @@ export const ZoomableImage = (props: ZoomableImageProps) => {
     event.preventDefault();
   };
 
-  const updateZoomRatio = () => {
+  const updateZoomRatio = (): void => {
     if (imageRef.current === null) {
       return;
     }

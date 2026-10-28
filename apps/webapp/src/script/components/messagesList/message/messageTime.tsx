@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import React, {type FunctionComponent} from 'react';
 
 import {formatDateNumeral, formatTimeShort, fromUnixTime, TIME_IN_MILLIS} from 'Util/timeUtil';
 
@@ -27,14 +27,14 @@ interface MessageTimeProps {
   className?: string;
 }
 
-const MessageTime = ({timestamp, children, ...props}: MessageTimeProps) => {
+const MessageTime: FunctionComponent<MessageTimeProps> = ({timestamp, children, ...props}: MessageTimeProps) => {
   const date = fromUnixTime(timestamp / TIME_IN_MILLIS.SECOND);
   const formattedTime = formatTimeShort(date);
   const formattedDate = formatDateNumeral(date);
   const dateTimeFormat = new Date(date).toISOString();
 
   // Equivalent for `ko.bindingHandlers.showAllTimestamps`
-  const showAllTimestamps = (show: boolean) => {
+  const showAllTimestamps = (show: boolean): void => {
     const times = document.querySelectorAll('.time');
     times.forEach(time => {
       time.classList.toggle('show-timestamp', show);

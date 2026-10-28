@@ -59,7 +59,7 @@ export class ContentMessage extends Message {
     });
   }
 
-  readonly displayEditedTimestamp = () => {
+  readonly displayEditedTimestamp = (): string => {
     return this.translate('conversationEditTimestamp', {date: formatTimeShort(this.edited_timestamp() ?? 0)});
   };
 

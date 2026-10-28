@@ -43,7 +43,7 @@ export class MediumImage extends FileAsset {
     this.logger = getLogger('MediumImage');
   }
 
-  public get ratio() {
+  public get ratio(): number {
     return parseInt(this.width, 10) / parseInt(this.height, 10);
   }
 }

@@ -17,9 +17,11 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
-export const ShareLinkIcon = (props: SVGIconProps) => {
+export const ShareLinkIcon: FunctionComponent<SVGIconProps> = props => {
   return (
     <SVGIcon realWidth={16} realHeight={16} strokeWidth="2" {...props}>
       <path

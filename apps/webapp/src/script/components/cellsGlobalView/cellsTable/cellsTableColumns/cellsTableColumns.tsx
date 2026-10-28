@@ -17,7 +17,13 @@
  *
  */
 
-import {createColumnHelper} from '@tanstack/react-table';
+import {
+  createColumnHelper,
+  type ColumnDefBase,
+  type StringHeaderIdentifier,
+  type IdIdentifier,
+  type AccessorKeyColumnDefBase,
+} from '@tanstack/react-table';
 
 import {CellsSelectionCheckbox} from 'Components/cells/common/cellsSelectionCheckbox/cellsSelectionCheckbox';
 import {CellsSortDirection} from 'Components/conversation/conversationCells/common/cellsSortIcon/cellsSortIcon';
@@ -37,7 +43,17 @@ import {CellsTableTagsColumn} from './cellsTableTagsColumn/cellsTableTagsColumn'
 
 const columnHelper = createColumnHelper<CellNode>();
 
-const getCellsTableColumnLabels = (translate: RootContextValue['translate']) => {
+type GetCellsTableColumnLabelsResult = {
+  actions: string;
+  conversationName: string;
+  created: string;
+  name: string;
+  owner: string;
+  publicLink: string;
+  size: string;
+  tags: string;
+};
+const getCellsTableColumnLabels = (translate: RootContextValue['translate']): GetCellsTableColumnLabelsResult => {
   return {
     actions: translate('cells.tableRow.actions'),
     conversationName: translate('cells.tableRow.conversationName'),
@@ -66,6 +82,15 @@ export const getCellsTableDataCellLabels = (
   };
 };
 
+type GetCellsTableColumnsResult = (
+  | (ColumnDefBase<CellNode, unknown> & StringHeaderIdentifier)
+  | (ColumnDefBase<CellNode, unknown> & IdIdentifier<CellNode, unknown>)
+  | (AccessorKeyColumnDefBase<CellNode, string> & Partial<IdIdentifier<CellNode, string>>)
+  | (AccessorKeyColumnDefBase<CellNode, string[]> & Partial<IdIdentifier<CellNode, string[]>>)
+  | (AccessorKeyColumnDefBase<CellNode, number> & Partial<IdIdentifier<CellNode, number>>)
+  | (AccessorKeyColumnDefBase<CellNode, {alreadyShared: boolean; uuid?: string; url?: string} | undefined> &
+      Partial<IdIdentifier<CellNode, {alreadyShared: boolean; uuid?: string; url?: string} | undefined>>)
+)[];
 export const getCellsTableColumns = ({
   cellsRepository,
   translate,
@@ -84,7 +109,7 @@ export const getCellsTableColumns = ({
   selectedNodeIds: Set<string>;
   onToggleSelection: (nodeId: string, isSelected: boolean) => void;
   selectionEnabled: boolean;
-}) => {
+}): GetCellsTableColumnsResult => {
   const labels = getCellsTableColumnLabels(translate);
 
   return [

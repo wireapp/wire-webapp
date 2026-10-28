@@ -28,7 +28,7 @@ import {translateForTest} from 'Util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 describe('videoGridHandler', () => {
-  const createCall = () => {
+  const createCall = (): Call => {
     const selfUser = new User(createUuid(), '', translateForTest);
 
     return new Call(
@@ -41,7 +41,7 @@ describe('videoGridHandler', () => {
     );
   };
 
-  const createParticipant = (name: string) => {
+  const createParticipant = (name: string): Participant => {
     const user = new User(createUuid(), '', translateForTest);
     user.name(name);
 

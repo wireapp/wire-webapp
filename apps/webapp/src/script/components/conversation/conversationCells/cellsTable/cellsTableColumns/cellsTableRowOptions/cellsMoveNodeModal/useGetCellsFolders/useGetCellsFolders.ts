@@ -49,6 +49,12 @@ interface Folder {
 
 const SHOW_LOADING_SPINNER_DELAY_MS = 1000;
 
+type UseGetCellsFoldersResult = {
+  refresh: () => Promise<void>;
+  folders: Folder[];
+  status: Status;
+  shouldShowLoadingSpinner: boolean;
+};
 export const useGetCellsFolders = ({
   nodeToMove,
   cellsRepository,
@@ -57,11 +63,13 @@ export const useGetCellsFolders = ({
   enabled,
   fireAndForgetInvoker,
   clock,
-}: UseGetCellsFoldersProps) => {
+}: UseGetCellsFoldersProps): UseGetCellsFoldersResult => {
   const [folders, setFolders] = useState<Folder[]>([]);
   const [status, setStatus] = useState<Status>('idle');
   const [shouldShowLoadingSpinner, setShouldShowLoadingSpinner] = useState(true);
   const latestRequestId = useRef(0);
+  const {id, domain} = conversationQualifiedId;
+  const nodeToMovePath = nodeToMove?.path;
 
   const fetchFolders = useCallback(async () => {
     if (!enabled) {
@@ -78,7 +86,7 @@ export const useGetCellsFolders = ({
       },
       () => {
         return cellsRepository.getAllNodes({
-          path: getCellsApiPath({conversationQualifiedId, currentPath}),
+          path: getCellsApiPath({conversationQualifiedId: {id, domain}, currentPath}),
           type: 'folder',
         });
       },
@@ -103,14 +111,14 @@ export const useGetCellsFolders = ({
 
     const transformedFolders = transformNodesToCellsFolders(nodes);
     const filteredFolders = transformedFolders.filter(folder => {
-      return folder.path !== nodeToMove?.path;
+      return folder.path !== nodeToMovePath;
     });
 
     setFolders(filteredFolders);
     setStatus('success');
     // cellsRepository is not a dependency because it's a singleton
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setFolders, setStatus, conversationQualifiedId, enabled, currentPath, nodeToMove]);
+  }, [setFolders, setStatus, id, domain, enabled, currentPath, nodeToMovePath]);
 
   useEffect(() => {
     fireAndForgetInvoker.fireAndForget(fetchFolders);

@@ -42,11 +42,11 @@ export const getConnectionQualityHander = (): ConnectionQualityHandler | null =>
     return null;
   }
 
-  const isConnectionSlow = () => {
+  const isConnectionSlow = (): boolean => {
     return slowConnectionTypes.includes(navigatorConnection.effectiveType);
   };
 
-  const onChange = (callback: (isSlow: boolean) => void) => {
+  const onChange = (callback: (isSlow: boolean) => void): void => {
     const isSlow = isConnectionSlow();
     logger.info(`Current connection quality is: ${navigatorConnection.effectiveType}`);
 
@@ -58,7 +58,7 @@ export const getConnectionQualityHander = (): ConnectionQualityHandler | null =>
   };
 
   const subscribe = (callback: (isSlow: boolean) => void) => {
-    const handler = () => {
+    const handler = (): void => {
       return onChange(callback);
     };
 

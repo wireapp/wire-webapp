@@ -36,7 +36,7 @@ permissions: {}
 jobs:
   validate_repair:
     name: Validate Production repair request
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     outputs:
@@ -51,19 +51,14 @@ jobs:
           fetch-depth: 0
           ref: main
 
-      - name: Add repository Yarn wrapper to PATH
-        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
-
       - name: Setup Node.js
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: Install workflow tooling dependencies
-        env:
-          YARN_ENABLE_SCRIPTS: 'false'
-        run: ./bin/yarn install --immutable --mode=skip-build
+        run: npm run ci:install
 
       - name: Validate repair confirmation and resolve annotated tag
         id: resolve_tag
@@ -122,7 +117,7 @@ jobs:
 
   notify_repair_failure:
     name: Notify Production repair failure
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs: [validate_repair, publish_distribution]
     if: ${{ always() && (needs.validate_repair.result == 'failure' || needs.publish_distribution.result == 'failure') }}
     permissions:

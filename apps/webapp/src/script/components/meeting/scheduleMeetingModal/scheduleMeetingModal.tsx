@@ -17,7 +17,7 @@
  *
  */
 
-import {useMemo} from 'react';
+import {useMemo, type FunctionComponent} from 'react';
 
 import {isUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
@@ -45,7 +45,7 @@ import {scheduleMeetingModes, wasScheduleMeetingPersisted} from './scheduleMeeti
 import {hasScheduleMeetingFormErrors, useScheduleMeetingModal} from './useScheduleMeetingModal';
 import {useScheduleMeetingSubmit} from './useScheduleMeetingSubmit';
 
-export const ScheduleMeetingModal = () => {
+export const ScheduleMeetingModal: FunctionComponent = () => {
   const {fireAndForgetInvoker, translate, clock} = useApplicationContext();
   const {
     isOpen,
@@ -82,7 +82,7 @@ export const ScheduleMeetingModal = () => {
     };
   }, [errors, translate]);
 
-  const handleClose = () => {
+  const handleClose = (): void => {
     if (isSubmitting) {
       return;
     }
@@ -91,7 +91,7 @@ export const ScheduleMeetingModal = () => {
     reset(clock);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (): void => {
     const validationErrors = validate(clock);
     if (hasScheduleMeetingFormErrors(validationErrors)) {
       return;

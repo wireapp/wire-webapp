@@ -16,7 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-import {fireEvent, render, screen} from '@testing-library/react';
+import {fireEvent, render, screen, type RenderResult} from '@testing-library/react';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {ThemeProvider} from '@wireapp/react-ui-kit';
 import {container} from 'tsyringe';
@@ -79,7 +79,7 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForNotificationTest, mainViewModel}),
 );
 
-const renderCard = (card: ReactElement) => {
+const renderCard = (card: ReactElement): RenderResult => {
   return render(<ThemeProvider>{card}</ThemeProvider>, {wrapper: rootProviderWrapper});
 };
 

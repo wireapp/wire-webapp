@@ -17,7 +17,7 @@
  *
  */
 
-import {HTMLProps, useEffect, useRef, useState} from 'react';
+import {HTMLProps, useEffect, useRef, useState, type FunctionComponent} from 'react';
 
 import cx from 'classnames';
 
@@ -46,7 +46,12 @@ const logger = getLogger('InputLevel');
  * @param disabled Show audio meter with disabled bullets if set to `true`
  * @param level Audio input volume as floating point number, `1.0` is 100%
  */
-const InputLevel = ({disabled, mediaStream, className = '', ...rest}: InputLevelProps) => {
+const InputLevel: FunctionComponent<InputLevelProps> = ({
+  disabled,
+  mediaStream,
+  className = '',
+  ...rest
+}: InputLevelProps) => {
   const {translate} = useApplicationContext();
   const bullets = useRef(Array.from(Array(MAX_AUDIO_BULLETS).keys()));
   const [level, setLevel] = useState(0);

@@ -24,7 +24,7 @@ import {FileAsset} from 'Repositories/entity/message/fileAsset';
 import {AudioSeekBarNew} from './audioSeekBarV2';
 
 describe('AudioSeekBarNew', () => {
-  const getAudioAsset = () => {
+  const getAudioAsset = (): FileAsset => {
     return {
       meta: {
         loudness: new Uint8Array(
@@ -36,7 +36,7 @@ describe('AudioSeekBarNew', () => {
     } as unknown as FileAsset;
   };
 
-  const createAudioElement = (currentTime = 0) => {
+  const createAudioElement = (currentTime = 0): HTMLAudioElement => {
     const audioElement = document.createElement('audio');
     Object.defineProperty(audioElement, 'duration', {
       get: () => {
@@ -47,7 +47,8 @@ describe('AudioSeekBarNew', () => {
     return audioElement;
   };
 
-  const getDefaultProps = () => {
+  type GetDefaultPropsResult = {asset: FileAsset; audioElement: HTMLAudioElement; disabled: boolean};
+  const getDefaultProps = (): GetDefaultPropsResult => {
     return {
       asset: getAudioAsset(),
       audioElement: createAudioElement(),
@@ -64,7 +65,7 @@ describe('AudioSeekBarNew', () => {
     const audioElement = createAudioElement(500);
     const {container} = render(<AudioSeekBarNew {...getDefaultProps()} audioElement={audioElement} />);
 
-    const clipPathWidth = () => {
+    const clipPathWidth = (): string | null | undefined => {
       return container.querySelector('svg rect')?.getAttribute('width');
     };
 

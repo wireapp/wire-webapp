@@ -38,7 +38,14 @@ const messages = new Array(NUMBER_OF_ASSETS).fill(null).map(() => {
   return new ContentMessage(createUuid(), translateForTest);
 });
 
-const getDefaultProps = (limit: number) => {
+type GetDefaultPropsResult = {
+  label: string;
+  limit: number;
+  messages: ContentMessage[];
+  onSelect: jest.Mock<any, any, any>;
+  uieName: string;
+};
+const getDefaultProps = (limit: number): GetDefaultPropsResult => {
   return {
     label: 'cool collection',
     limit,

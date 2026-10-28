@@ -19,6 +19,7 @@
 
 import {fireEvent, render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import {Maybe} from 'true-myth';
 
 import {ThemeProvider} from '@wireapp/react-ui-kit';
 
@@ -35,6 +36,7 @@ import {translateForTest} from 'Util/test/translateForTest';
 import {CellsTable} from './cellsTable';
 
 import {CELLS_SELF_USER_DRIVE_ROLE} from '../../conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
+import type {JSX} from '@emotion/react/jsx-runtime';
 
 const translateSelectionForTest: Translate = (key, substitutions) => {
   if (key === 'cells.selection.selectedCount') {
@@ -55,6 +57,7 @@ const createNode = (id: string, type: CellNodeType): CellNode => {
     path: `/${id}`,
     name: `${id} name`,
     sizeMb: '1 MB',
+    sizeBytes: Maybe.nothing(),
     uploadedAtTimestamp: 0,
     owner: 'Owner',
     conversationName: 'Conversation',
@@ -67,7 +70,15 @@ const createNode = (id: string, type: CellNodeType): CellNode => {
   };
 };
 
-const renderCellsTable = (selectionEnabled = true, selectionScopeKey = 'filters:none', isBulkActionsEnabled = true) => {
+type RenderCellsTableResult = {
+  rerenderWithNodes: (nodes: CellNode[]) => void;
+  rerenderWithScope: (scopeKey: string) => void;
+};
+const renderCellsTable = (
+  selectionEnabled = true,
+  selectionScopeKey = 'filters:none',
+  isBulkActionsEnabled = true,
+): RenderCellsTableResult => {
   const wrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({
       translate: translateSelectionForTest,
@@ -76,7 +87,7 @@ const renderCellsTable = (selectionEnabled = true, selectionScopeKey = 'filters:
       },
     }),
   );
-  const renderTable = (nodes: CellNode[], scopeKey = selectionScopeKey) => {
+  const renderTable = (nodes: CellNode[], scopeKey = selectionScopeKey): JSX.Element => {
     return (
       <ThemeProvider>
         <CellsTable

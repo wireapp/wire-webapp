@@ -74,7 +74,7 @@ const createCall = (
   state: CALL_STATE,
   selfUser = new User(createUuid(), '', translateForTest),
   selfClientId = createUuid(),
-) => {
+): Call => {
   const selfParticipant = new Participant(selfUser, selfClientId);
   const call = new Call(
     {domain: '', id: ''},
@@ -88,7 +88,7 @@ const createCall = (
   return call;
 };
 
-const createProps = async () => {
+const createProps = async (): Promise<CallingCellProps> => {
   const mockCallingRepository: Partial<CallingRepository> = {
     sendModeratorMute: jest.fn(),
     supportsScreenSharing: true,

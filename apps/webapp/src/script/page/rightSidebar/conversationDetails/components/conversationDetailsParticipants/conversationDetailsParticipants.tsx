@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {isNonEmptyArray} from '@sindresorhus/is';
 
 import * as Icon from 'Components/icon';
@@ -40,7 +42,7 @@ interface ConversationDetailsParticipantsProps {
   userParticipants: User[];
 }
 
-export const ConversationDetailsParticipants = ({
+export const ConversationDetailsParticipants: FunctionComponent<ConversationDetailsParticipantsProps> = ({
   activeConversation,
   allUsersCount,
   conversationRepository,

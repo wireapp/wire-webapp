@@ -17,7 +17,7 @@
  *
  */
 
-import type {ComponentProps} from 'react';
+import type {ComponentProps, FunctionComponent} from 'react';
 import {useCallback, useEffect, useMemo, useRef} from 'react';
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
@@ -96,7 +96,7 @@ export interface ScheduleMeetingFormProps {
   selfUser: User;
 }
 
-export const ScheduleMeetingForm = ({
+export const ScheduleMeetingForm: FunctionComponent<ScheduleMeetingFormProps> = ({
   isOpen,
   mode,
   formState,
@@ -198,7 +198,7 @@ export const ScheduleMeetingForm = ({
     })
     .unwrapOr(null);
 
-  const handleDateChange = (date: Parameters<ComponentProps<typeof DatePickerField>['onChange']>[0]) => {
+  const handleDateChange = (date: Parameters<ComponentProps<typeof DatePickerField>['onChange']>[0]): void => {
     if (date === null) {
       onStartChange(maybe.nothing());
       return;
@@ -217,7 +217,7 @@ export const ScheduleMeetingForm = ({
     onStartChange(Maybe.of(adjustedStart));
   };
 
-  const handleTimeChange = (value: Parameters<ComponentProps<typeof TimePickerField>['onChange']>[0]) => {
+  const handleTimeChange = (value: Parameters<ComponentProps<typeof TimePickerField>['onChange']>[0]): void => {
     if (value === null || formState.start.isNothing) {
       onStartChange(maybe.nothing());
       return;
@@ -227,7 +227,7 @@ export const ScheduleMeetingForm = ({
     onStartChange(Maybe.of(nextStart));
   };
 
-  const handleEndTimeChange = (value: Parameters<ComponentProps<typeof TimePickerField>['onChange']>[0]) => {
+  const handleEndTimeChange = (value: Parameters<ComponentProps<typeof TimePickerField>['onChange']>[0]): void => {
     if (value === null || formState.end.isNothing) {
       onEndChange(maybe.nothing());
       return;

@@ -20,6 +20,7 @@
 import {ReactNode} from 'react';
 
 import {render} from '@testing-library/react';
+import {Maybe} from 'true-myth';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
@@ -31,8 +32,9 @@ import {CELLS_SELF_USER_DRIVE_ROLE} from '../../../common/cellsSelfUserDriveRole
 import {CellShareModalContent} from './cellsNodeShareModal';
 
 import {useCellsStore} from '../../../common/useCellsStore/useCellsStore';
+import type {JSX} from '@emotion/react/jsx-runtime';
 
-const withTheme = (component: ReactNode) => {
+const withTheme = (component: ReactNode): JSX.Element => {
   return <StyledApp themeId={THEME_ID.DEFAULT}>{component}</StyledApp>;
 };
 
@@ -47,6 +49,7 @@ describe('CellShareModalContent', () => {
       path: '/file.pdf',
       mimeType: 'application/pdf',
       sizeMb: '1',
+      sizeBytes: Maybe.nothing(),
       extension: 'pdf',
       uploadedAtTimestamp: Date.now(),
       owner: 'owner',

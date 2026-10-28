@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode} from 'react';
+import {ReactNode, type FunctionComponent} from 'react';
 
 import {WavesPattern} from '@wireapp/react-ui-kit/lib/images/wavesPattern';
 
@@ -37,7 +37,11 @@ import {
   registrationLayoutListItemIconCss,
 } from './layout.styles';
 
-export const AccountRegistrationLayout = ({children}: {children: ReactNode}) => {
+export const AccountRegistrationLayout: FunctionComponent<{children: ReactNode}> = ({
+  children,
+}: {
+  children: ReactNode;
+}) => {
   const {translate} = useApplicationContext();
   const featureList = [
     translate('registrationLayout.listItem1'),

@@ -35,6 +35,11 @@ interface UseLegacyMoveCellsNodeProps {
   navigateToPath: (params: {conversationQualifiedId: QualifiedId; path: string}) => void;
 }
 
+type UseLegacyMoveCellsNodeResult = {
+  handleMove: () => Promise<void>;
+  movingDisabled: boolean;
+  status: 'idle' | 'loading' | 'error' | 'success';
+};
 export const useLegacyMoveCellsNode = ({
   cellsRepository,
   nodeToMove,
@@ -42,13 +47,13 @@ export const useLegacyMoveCellsNode = ({
   currentPath,
   onClose,
   navigateToPath,
-}: UseLegacyMoveCellsNodeProps) => {
+}: UseLegacyMoveCellsNodeProps): UseLegacyMoveCellsNodeResult => {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const nodeToMoveParent = nodeToMove.path.split('/').slice(0, -1).join('/');
   const targetPath = getCellsApiPath({conversationQualifiedId, currentPath});
   const movingDisabled = nodeToMoveParent === targetPath;
 
-  const handleMove = async () => {
+  const handleMove = async (): Promise<void> => {
     setStatus('loading');
     const moveResult = await task.tryOrElse(
       error => {

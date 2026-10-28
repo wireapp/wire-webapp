@@ -10,7 +10,10 @@
     "skipLibCheck": true,
     "moduleResolution": "node",
     "outDir": "lib",
-    "target": "es5",
+    "declaration": true,
+    "incremental": true,
+    "tsBuildInfoFile": "../../target/buildcache/telemetry-esm-build.tsbuildinfo",
+    "target": "esnext",
     "rootDir": "src"
   },
   "exclude": [

@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {FileCard} from 'Components/fileCard/fileCard';
 import {
   controlStyles,
@@ -40,7 +42,7 @@ interface AudioPreviewCardProps {
   uploadProgress: number;
 }
 
-export const AudioPreviewCard = ({
+export const AudioPreviewCard: FunctionComponent<AudioPreviewCardProps> = ({
   extension,
   name,
   size,

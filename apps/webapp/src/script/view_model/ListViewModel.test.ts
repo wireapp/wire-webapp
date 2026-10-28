@@ -24,7 +24,14 @@ import {ContentState, ListState, useAppState} from '../page/useAppState';
 import * as Router from '../router/Router';
 import {translateForTest} from 'Util/test/translateForTest';
 
-const createListViewModel = () => {
+type ListViewModelTestTeamRepository = {getTeam: jest.Mock<Promise<unknown>, []>};
+type ListViewModelTestFixture = {
+  readonly fireAndForgetInvoker: ReturnType<typeof createExecutingFireAndForgetInvokerForTest>;
+  readonly listViewModel: ListViewModel;
+  readonly teamRepository: ListViewModelTestTeamRepository;
+};
+
+const createListViewModel = (): ListViewModelTestFixture => {
   const switchContent = jest.fn((contentState: ContentState) => {
     useAppState.setState({contentState});
   });
@@ -39,7 +46,7 @@ const createListViewModel = () => {
     isFederated: false,
   } as unknown as ConstructorParameters<typeof ListViewModel>[0];
 
-  const teamRepository = {getTeam: jest.fn().mockResolvedValue(undefined)};
+  const teamRepository: ListViewModelTestTeamRepository = {getTeam: jest.fn().mockResolvedValue(undefined)};
   const repositories = {
     calling: {},
     conversation: {},

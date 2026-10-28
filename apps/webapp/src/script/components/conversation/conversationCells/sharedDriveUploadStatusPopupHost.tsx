@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useState, type FunctionComponent} from 'react';
 
 import {isNull} from '@sindresorhus/is';
 import {Maybe, maybe} from 'true-myth';
@@ -45,6 +45,16 @@ interface SharedDriveUploadStatusPopupHostProps {
   readonly isEnabled: boolean;
   readonly isFileTabActive: boolean;
 }
+
+const moveStatusLabelKey = {
+  processing: 'cells.bulkMove.processing',
+  completed: 'cells.bulkMove.completed',
+} as const;
+
+const moveStatusTitleKey = {
+  processing: 'cells.bulkMove.movingItems',
+  completed: 'cells.bulkMove.movedItems',
+} as const;
 
 const getRowStatusLabel = (
   row: SharedDriveUploadStatus,
@@ -74,7 +84,7 @@ const getRowStatusLabel = (
   return translate(statusLabelKey[row.kind], {size: formatBytes(row.fileSize)});
 };
 
-export const SharedDriveUploadStatusPopupHost = ({
+export const SharedDriveUploadStatusPopupHost: FunctionComponent<SharedDriveUploadStatusPopupHostProps> = ({
   controller,
   conversationQualifiedId,
   isEnabled,
@@ -84,6 +94,8 @@ export const SharedDriveUploadStatusPopupHost = ({
   const {
     dismissedUpload: contextDismissedUpload,
     dismissUpload: onDismissUpload,
+    moveStatus,
+    dismissMoveStatus,
     isProvided,
   } = useSharedDriveUploadStatus();
   const readStatuses = useCallback(() => {
@@ -93,6 +105,7 @@ export const SharedDriveUploadStatusPopupHost = ({
     return {conversationQualifiedId, uploads: readStatuses()};
   });
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isMoveExpanded, setIsMoveExpanded] = useState(true);
   const [cancellingUploadIds, setCancellingUploadIds] = useState<ReadonlySet<string>>(() => {
     return new Set();
   });
@@ -183,7 +196,7 @@ export const SharedDriveUploadStatusPopupHost = ({
       setCancellingUploadIds(current => {
         return new Set([...current, ...pendingIds]);
       });
-      const finishCancellation = (uploadId: string) => {
+      const finishCancellation = (uploadId: string): void => {
         return setCancellingUploadIds(current => {
           const next = new Set(current);
           next.delete(uploadId);
@@ -246,7 +259,7 @@ export const SharedDriveUploadStatusPopupHost = ({
           }),
         ]);
       });
-      const finishRetry = (id: string) => {
+      const finishRetry = (id: string): void => {
         return setRetryingUploadIds(current => {
           const next = new Set(current);
           next.delete(id);
@@ -269,12 +282,35 @@ export const SharedDriveUploadStatusPopupHost = ({
   );
 
   useEffect(() => {
-    const updateStatus = () => {
+    const updateStatus = (): void => {
       return setUploadSnapshot({conversationQualifiedId, uploads: readStatuses()});
     };
     updateStatus();
     return controller.subscribe(updateStatus);
   }, [controller, conversationQualifiedId, readStatuses]);
+
+  if (isFileTabActive && maybe.isJust(moveStatus)) {
+    const move = moveStatus.value;
+    return (
+      <SharedDriveUploadStatusPopup
+        move={move}
+        title={translate(moveStatusTitleKey[move.kind], {count: move.items.length})}
+        statusLabel={translate(moveStatusLabelKey[move.kind])}
+        destination={translate('cells.uploadStatus.destination', {destination: move.destinationPath})}
+        isExpanded={isMoveExpanded}
+        toggleLabel={translate(isMoveExpanded ? 'cells.uploadStatus.collapse' : 'cells.uploadStatus.expand')}
+        dismissLabel={translate('fileCardDefaultCloseButtonLabel')}
+        onToggle={() => {
+          return setIsMoveExpanded(expanded => {
+            return !expanded;
+          });
+        }}
+        onDismiss={() => {
+          return dismissMoveStatus(move.id);
+        }}
+      />
+    );
+  }
 
   if (!isEnabled || !isFileTabActive || isNull(representativeUpload) || isUploadDismissed || isNull(aggregateKind)) {
     return null;

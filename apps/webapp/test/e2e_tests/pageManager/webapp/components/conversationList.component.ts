@@ -26,7 +26,7 @@ export class ContactList {
     this.searchList = page.getByTestId('search-list');
   }
 
-  async clickOnContact(name: string) {
+  async clickOnContact(name: string): Promise<void> {
     await this.searchList.getByRole('button').getByText(name).click();
   }
 }

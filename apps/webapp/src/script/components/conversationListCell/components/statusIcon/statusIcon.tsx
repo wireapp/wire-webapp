@@ -17,7 +17,7 @@
  *
  */
 
-import {useMemo} from 'react';
+import {useMemo, type FunctionComponent} from 'react';
 
 import * as Icon from 'Components/icon';
 import {generateCellState} from 'Repositories/conversation/ConversationCellState';
@@ -30,7 +30,7 @@ interface Props {
   conversation: Conversation;
 }
 
-export const StatusIcon = ({conversation}: Props) => {
+export const StatusIcon: FunctionComponent<Props> = ({conversation}: Props) => {
   const {translate} = useApplicationContext();
   const {unreadState, mutedState, isRequest, isGhostGroup} = useKoSubscribableChildren(conversation, [
     'unreadState',

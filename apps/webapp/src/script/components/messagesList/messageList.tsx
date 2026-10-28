@@ -194,7 +194,7 @@ export const MessagesList: FC<MessagesListParams> = ({
     }
   };
 
-  const loadFollowingMessages = () => {
+  const loadFollowingMessages = (): void => {
     const lastMessage = conversation.getNewestMessage();
 
     if (!isNullOrUndefined(lastMessage)) {
@@ -267,7 +267,7 @@ export const MessagesList: FC<MessagesListParams> = ({
     syncScrollPosition();
   };
 
-  const jumpToLastMessage = () => {
+  const jumpToLastMessage = (): void => {
     if (conversation !== undefined) {
       // clean up anything like search result
       setHighlightedMessage(undefined);
@@ -310,7 +310,7 @@ export const MessagesList: FC<MessagesListParams> = ({
 
               const isLastMessage = isLastLoadedMessage && conversation.hasLastReceivedMessageLoaded();
 
-              const visibleCallback = () => {
+              const visibleCallback = (): void => {
                 getVisibleCallback(conversation, message)?.();
                 if (isLastMessage) {
                   conversation.isLastMessageVisible(true);

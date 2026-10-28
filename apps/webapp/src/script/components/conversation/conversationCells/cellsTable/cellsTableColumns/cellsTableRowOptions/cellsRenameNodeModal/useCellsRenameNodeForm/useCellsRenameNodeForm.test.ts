@@ -19,6 +19,7 @@
 
 import {ChangeEvent, FormEvent} from 'react';
 import {act, renderHook} from '@testing-library/react';
+import {Maybe} from 'true-myth';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
@@ -41,6 +42,7 @@ describe('useCellsRenameForm', () => {
       name: 'Folder',
       path: '/Folder',
       sizeMb: '0',
+      sizeBytes: Maybe.nothing(),
       extension: '',
       uploadedAtTimestamp: 0,
       owner: 'owner-id',
@@ -54,7 +56,7 @@ describe('useCellsRenameForm', () => {
     };
   };
 
-  const createEvent = () => {
+  const createEvent = (): FormEvent<HTMLFormElement> => {
     return {preventDefault: jest.fn()} as unknown as FormEvent<HTMLFormElement>;
   };
 

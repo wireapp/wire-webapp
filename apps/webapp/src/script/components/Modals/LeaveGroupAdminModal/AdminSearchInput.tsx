@@ -17,6 +17,9 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
+import type {JSX} from '@emotion/react/jsx-runtime';
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {FormatOptionLabelMeta} from 'react-select';
 
@@ -50,7 +53,7 @@ interface AdminSearchInputProps {
   onUserSelect: (user: User | null) => void;
 }
 
-export const AdminSearchInput = ({
+export const AdminSearchInput: FunctionComponent<AdminSearchInputProps> = ({
   translate,
   clearContent,
   eligibleUsers,
@@ -67,7 +70,7 @@ export const AdminSearchInput = ({
       }) ?? null)
     : null;
 
-  const handleChange = (option: Option | null) => {
+  const handleChange = (option: Option | null): void => {
     if (isNullOrUndefined(option)) {
       onUserSelect(null);
       return;
@@ -80,7 +83,7 @@ export const AdminSearchInput = ({
     }
   };
 
-  const formatOptionLabel = (option: Option, meta: FormatOptionLabelMeta<Option>) => {
+  const formatOptionLabel = (option: Option, meta: FormatOptionLabelMeta<Option>): JSX.Element => {
     const user = eligibleUsers.find(usr => {
       return usr.id === option.value;
     });

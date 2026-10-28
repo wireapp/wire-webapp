@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useLayoutEffect, useMemo} from 'react';
+import {useEffect, useLayoutEffect, useMemo, type FunctionComponent} from 'react';
 
 import type {Clock} from '@enormora/clock/clock';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
@@ -96,7 +96,7 @@ type AppMainProps = {
   readonly locked: boolean;
 };
 
-export const AppMain = (properties: AppMainProps) => {
+export const AppMain: FunctionComponent<AppMainProps> = (properties: AppMainProps) => {
   const {
     app,
     fireAndForgetInvoker,
@@ -154,7 +154,7 @@ export const AppMain = (properties: AppMainProps) => {
 
   const {currentTab} = useSidebarStore();
 
-  const toggleRightSidebar = (panelState: PanelState, params: RightSidebarParams, compareEntityId = false) => {
+  const toggleRightSidebar = (panelState: PanelState, params: RightSidebarParams, compareEntityId = false): void => {
     const isDifferentState = currentState !== panelState;
     const isDifferentId = compareEntityId && currentEntity?.id !== params?.entity?.id;
 
@@ -177,8 +177,8 @@ export const AppMain = (properties: AppMainProps) => {
   const isMobileLeftSidebarView = currentView == ViewType.MOBILE_LEFT_SIDEBAR;
   const isMobileCentralColumnView = currentView == ViewType.MOBILE_CENTRAL_COLUMN;
 
-  const initializeApp = async () => {
-    const showMostRecentConversation = () => {
+  const initializeApp = async (): Promise<void> => {
+    const showMostRecentConversation = (): void => {
       const isShowingConversation = useAppState.getState().isShowingConversation();
       if (!isShowingConversation) {
         return;
@@ -209,7 +209,7 @@ export const AppMain = (properties: AppMainProps) => {
       window.history.replaceState(historyState, '', window.location.hash);
     }
 
-    const showConversationMessages = (conversationId: string, domain = apiContext.domain ?? '') => {
+    const showConversationMessages = (conversationId: string, domain = apiContext.domain ?? ''): void => {
       void mainView.content.showConversation({id: conversationId, domain});
     };
 
@@ -217,7 +217,7 @@ export const AppMain = (properties: AppMainProps) => {
       conversationId: string,
       domain = apiContext.domain ?? '',
       path: string | string[] = '',
-    ) => {
+    ): Promise<void> => {
       const pathString = Array.isArray(path) ? path.join('/') : path;
 
       await mainView.content.showConversation(
@@ -226,7 +226,7 @@ export const AppMain = (properties: AppMainProps) => {
       );
     };
 
-    const showUserProfile = (param1: string, param2?: string) => {
+    const showUserProfile = (param1: string, param2?: string): void => {
       // If param1 is a UUID, it's the userId, otherwise param2 must be the userId
       const userId = isUUID(param1) ? param1 : param2;
       let domain = param1;

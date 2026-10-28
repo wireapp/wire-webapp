@@ -30,7 +30,10 @@ type ReadMessageBuffer = {conversation: Conversation; message: Message};
 
 const DEBOUNCE = 500;
 
-export const useReadReceiptSender = (messageSender: Pick<MessageRepository, 'sendReadReceipt'>) => {
+type UseReadReceiptSenderResult = {addReadReceiptToBatch: (conversation: Conversation, message: Message) => void};
+export const useReadReceiptSender = (
+  messageSender: Pick<MessageRepository, 'sendReadReceipt'>,
+): UseReadReceiptSenderResult => {
   const readMessagesBuffer = useRef<ReadMessageBuffer[]>([]);
   const flushTimer = useRef<number | undefined>(undefined);
 

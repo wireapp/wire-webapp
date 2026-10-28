@@ -43,7 +43,7 @@ const richInfo: Partial<RichInfo> = {
   ],
 };
 
-const createRichProfileRepository = () => {
+const createRichProfileRepository = (): RichProfileRepository => {
   const richProfileRepository = new RichProfileRepository();
   jest.spyOn(richProfileRepository, 'getUserRichProfile').mockImplementation(() => {
     return Promise.resolve(richInfo as RichInfo);

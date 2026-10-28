@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
@@ -73,7 +73,7 @@ export interface PeopleTabProps {
   selfUser: User;
 }
 
-export const PeopleTab = ({
+export const PeopleTab: FunctionComponent<PeopleTabProps> = ({
   searchQuery,
   isTeam,
   isFederated,
@@ -133,7 +133,7 @@ export const PeopleTab = ({
     });
   }, [teamApps, searchQuery]);
 
-  const getLocalUsers = (unfiltered?: boolean) => {
+  const getLocalUsers = (unfiltered?: boolean): User[] => {
     const connectedUsers = conversationState.connectedUsers();
     if (!canSearchUnconnectedUsers) {
       return connectedUsers;
@@ -160,7 +160,7 @@ export const PeopleTab = ({
   };
 
   const [results, setResults] = useState<SearchResultsData>({contacts: getLocalUsers(), others: []});
-  const searchOnFederatedDomain = () => {
+  const searchOnFederatedDomain = (): string => {
     return '';
   };
   const hasResults = results.contacts.length + results.others.length + filteredApps.length > 0;

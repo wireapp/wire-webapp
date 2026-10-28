@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, KeyboardEvent, MouseEvent, useEffect, useState} from 'react';
+import {useCallback, KeyboardEvent, MouseEvent, useEffect, useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyString, isNull} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
@@ -57,7 +57,7 @@ const sharedDriveUploadTabStatusLabelKey = {
   failed: 'cells.uploadStatus.failed',
 } as const;
 
-export const ConversationTabs = ({
+export const ConversationTabs: FunctionComponent<ConversationTabsProps> = ({
   activeTabIndex,
   onIndexChange,
   conversationQualifiedId,
@@ -133,7 +133,7 @@ export const ConversationTabs = ({
   }, [handleHashChange]);
 
   useEffect(() => {
-    const updateUploadStatus = () => {
+    const updateUploadStatus = (): void => {
       return setUploadStatus(readUploadStatus());
     };
     updateUploadStatus();
@@ -180,7 +180,14 @@ interface ConversationTabProps {
   onKeyDown: (event: KeyboardEvent<HTMLButtonElement>) => void;
 }
 
-const ConversationTab = ({id, label, isActive, uploadStatus = null, onClick, onKeyDown}: ConversationTabProps) => {
+const ConversationTab: FunctionComponent<ConversationTabProps> = ({
+  id,
+  label,
+  isActive,
+  uploadStatus = null,
+  onClick,
+  onKeyDown,
+}: ConversationTabProps) => {
   const {translate} = useApplicationContext();
   const uploadStatusLabel =
     uploadStatus !== null
@@ -211,7 +218,11 @@ const ConversationTab = ({id, label, isActive, uploadStatus = null, onClick, onK
   );
 };
 
-const SharedDriveTabUploadStatusIcon = ({kind}: {kind: SharedDriveUploadStatus['kind']}) => {
+const SharedDriveTabUploadStatusIcon: FunctionComponent<{kind: SharedDriveUploadStatus['kind']}> = ({
+  kind,
+}: {
+  kind: SharedDriveUploadStatus['kind'];
+}) => {
   if (kind === 'uploading' || kind === 'queued') {
     return (
       <SharedDriveUploadSpinnerIcon

@@ -32,13 +32,13 @@ import {meetingConversationSyncErrors, syncMeetingConversationParticipants} from
 const qualifiedConversationId: QualifiedId = {id: 'conversation-id', domain: 'example.com'};
 const groupId = 'group-id';
 
-const createUser = (id: string) => {
+const createUser = (id: string): User => {
   const user = new User(id, 'example.com', translateForTest);
   user.name(`User ${id}`);
   return user;
 };
 
-const createConversation = (epoch = 0) => {
+const createConversation = (epoch = 0): Conversation => {
   const conversation = new Conversation(
     qualifiedConversationId.id,
     qualifiedConversationId.domain,
@@ -63,7 +63,7 @@ describe('syncMeetingConversationParticipants', () => {
     safeAddUsers?: jest.Mock;
     safeRemoveMembers?: jest.Mock;
     safeGetConversationById?: jest.Mock;
-  } = {}) => {
+  } = {}): ConversationRepository => {
     return {
       safeGetConversationById,
       establishMeetingConversation,

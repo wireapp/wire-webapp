@@ -34,13 +34,13 @@ import {normalizePermissionState} from './Permissions.types';
 class MockNotificationRepository {
   constructor() {}
 
-  updatePermissionState(permissionState: string) {
+  updatePermissionState(permissionState: string): boolean | undefined {
     const normalizedState = normalizePermissionState(permissionState as NotificationPermission);
     setPermissionState(PermissionType.NOTIFICATIONS, normalizedState);
     return this.checkPermissionState();
   }
 
-  checkPermissionState() {
+  checkPermissionState(): boolean | undefined {
     const permissionState = getPermissionState(PermissionType.NOTIFICATIONS);
     switch (permissionState) {
       case BrowserPermissionStatus.GRANTED:

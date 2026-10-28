@@ -23,7 +23,7 @@ import {backgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsSto
 
 import {useShowLoadingOverlay} from './useShowLoadingOverlay';
 
-const createMediaStream = () => {
+const createMediaStream = (): MediaStream => {
   return {
     getVideoTracks: jest.fn(() => {
       return [];
@@ -31,7 +31,8 @@ const createMediaStream = () => {
   } as unknown as MediaStream;
 };
 
-const createProcessedVideoStream = (stream: MediaStream) => {
+type CreateProcessedVideoStreamResult = {stream: MediaStream; release: jest.Mock<any, any, any>};
+const createProcessedVideoStream = (stream: MediaStream): CreateProcessedVideoStreamResult => {
   return {
     stream,
     release: jest.fn(),

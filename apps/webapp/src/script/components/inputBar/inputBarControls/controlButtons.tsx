@@ -17,7 +17,7 @@
  *
  */
 
-import {MouseEvent} from 'react';
+import {MouseEvent, type FunctionComponent} from 'react';
 
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation/';
 
@@ -60,7 +60,7 @@ interface ControlButtonsProps {
   onCellImageUpload: () => void;
 }
 
-const ControlButtons = ({
+const ControlButtons: FunctionComponent<ControlButtonsProps> = ({
   conversation,
   disablePing,
   disableFilesharing,

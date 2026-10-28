@@ -30,7 +30,7 @@ export const showMoveToRecycleBinModal = ({
   node: CellNode;
   onMoveToRecycleBin: (uuid: string) => void;
   translate: RootContextValue['translate'];
-}) => {
+}): void => {
   PrimaryModal.show(
     PrimaryModal.type.CONFIRM,
     {

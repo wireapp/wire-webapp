@@ -29,7 +29,7 @@ type TypingIndicatorProps = {
   onTypingChange: (isTyping: boolean) => void;
 };
 
-export function useTypingIndicator({text, isEnabled, onTypingChange}: TypingIndicatorProps) {
+export function useTypingIndicator({text, isEnabled, onTypingChange}: TypingIndicatorProps): void {
   const hasHitKeyboard = useRef(false);
   const isTypingRef = useRef(false);
 
@@ -46,7 +46,7 @@ export function useTypingIndicator({text, isEnabled, onTypingChange}: TypingIndi
   useEffect(() => {
     if (!hasHitKeyboard.current && isEnabled) {
       // If the user hasn't typed yet, we register a callback that will set the flag to true when the user first type
-      const setHasHitKeyboard = () => {
+      const setHasHitKeyboard = (): void => {
         hasHitKeyboard.current = true;
       };
       document.addEventListener('keydown', setHasHitKeyboard);

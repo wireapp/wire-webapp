@@ -17,7 +17,8 @@
  *
  */
 
-import {render} from '@testing-library/react';
+import {render, type RenderResult} from '@testing-library/react';
+import {Maybe} from 'true-myth';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
@@ -42,6 +43,7 @@ const file: CellFile = {
   name: 'file.pdf',
   extension: 'pdf',
   sizeMb: '1 MB',
+  sizeBytes: Maybe.nothing(),
   uploadedAtTimestamp: 1700000000000,
   owner: 'John Doe',
   conversationName: 'Marketing Team',
@@ -58,7 +60,7 @@ const renderNameColumn = ({
   selfUserDriveRole = CELLS_SELF_USER_DRIVE_ROLE.VIEWER,
 }: {
   selfUserDriveRole?: CellFile['selfUserDriveRole'];
-} = {}) => {
+} = {}): RenderResult => {
   const portalRoot = document.createElement('div');
   portalRoot.id = 'wire-app';
   document.body.append(portalRoot);

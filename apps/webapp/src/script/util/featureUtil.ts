@@ -24,7 +24,7 @@ export interface AppsFeatureOptions {
   isAppsEnabled: boolean;
 }
 
-export const checkAppsFeatureAvailability = ({protocol, isAppsEnabled}: AppsFeatureOptions) => {
+export const checkAppsFeatureAvailability = ({protocol, isAppsEnabled}: AppsFeatureOptions): boolean => {
   switch (protocol) {
     case CONVERSATION_PROTOCOL.MLS:
       return isAppsEnabled;

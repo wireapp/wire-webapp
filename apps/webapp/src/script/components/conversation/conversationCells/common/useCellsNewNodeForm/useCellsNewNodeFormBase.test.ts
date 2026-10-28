@@ -17,7 +17,7 @@
  *
  */
 
-import {ChangeEvent, FormEvent} from 'react';
+import {ChangeEvent, FormEvent, type MouseEvent} from 'react';
 import {act, renderHook} from '@testing-library/react';
 
 import {useCellsNewNodeFormBase} from './useCellsNewNodeFormBase';
@@ -38,14 +38,32 @@ describe('useCellsNewNodeFormBase', () => {
     maxLengthError: 'cells.newItemMenuModalForm.maxLengthError',
     nameRequired: 'cells.newItemMenuModalForm.nameRequired',
   };
-  const createEvent = () => {
+  const createEvent = (): FormEvent<HTMLFormElement> => {
     return {preventDefault: jest.fn()} as unknown as FormEvent<HTMLFormElement>;
   };
-  const createNodeMock = () => {
+  const createNodeMock = (): CreateNodeMock => {
     return jest.fn().mockResolvedValue(undefined) as CreateNodeMock;
   };
 
-  const setup = ({createNode = createNodeMock(), normalizeNameForCreation, isOpen = true}: SetupOptions = {}) => {
+  type SetupResult = {
+    result: {
+      current: {
+        name: string;
+        error: string | null;
+        isSubmitting: boolean;
+        handleSubmit: (formEvent: FormEvent<HTMLFormElement> | MouseEvent<HTMLButtonElement>) => Promise<void>;
+        handleChange: (event: ChangeEvent<HTMLInputElement>) => void;
+        handleClear: () => void;
+      };
+    };
+    rerender: (props?: {modalIsOpen: boolean} | undefined) => void;
+    createNode: CreateNodeMock;
+  };
+  const setup = ({
+    createNode = createNodeMock(),
+    normalizeNameForCreation,
+    isOpen = true,
+  }: SetupOptions = {}): SetupResult => {
     const {result, rerender} = renderHook(
       ({modalIsOpen}: {modalIsOpen: boolean}) => {
         return useCellsNewNodeFormBase({

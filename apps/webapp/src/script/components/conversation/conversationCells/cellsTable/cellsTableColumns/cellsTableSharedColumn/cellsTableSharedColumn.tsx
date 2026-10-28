@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {LinkIcon} from 'Components/icon';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
@@ -32,7 +34,9 @@ interface CellsTableSharedColumnProps {
   isShared: boolean;
 }
 
-export const CellsTableSharedColumn = ({isShared}: CellsTableSharedColumnProps) => {
+export const CellsTableSharedColumn: FunctionComponent<CellsTableSharedColumnProps> = ({
+  isShared,
+}: CellsTableSharedColumnProps) => {
   const {translate} = useApplicationContext();
 
   return (

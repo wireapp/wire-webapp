@@ -64,7 +64,7 @@ describe('sanitizationUtil', () => {
 
       expect(escapedDativeName).toEqual(translate('conversationYouDative'));
 
-      const translateUnsafeSelfName = () => {
+      const translateUnsafeSelfName = (): string => {
         return '<script>you</script>';
       };
       const escapedAccusativeName = getSelfName(translateUnsafeSelfName, Declension.DATIVE, false);

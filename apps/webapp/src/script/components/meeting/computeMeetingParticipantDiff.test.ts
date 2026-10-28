@@ -22,7 +22,7 @@ import {translateForTest} from 'Util/test/translateForTest';
 
 import {computeParticipantDiff} from './computeMeetingParticipantDiff';
 
-const createUser = (id: string, domain = 'example.com') => {
+const createUser = (id: string, domain = 'example.com'): User => {
   const user = new User(id, domain, translateForTest);
   user.name(`User ${id}`);
   return user;

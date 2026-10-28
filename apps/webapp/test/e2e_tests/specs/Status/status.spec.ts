@@ -34,7 +34,11 @@ enum UserStatus {
   Busy = 'Busy',
 }
 
-async function updateUserStatus(pageManager: PageManager['webapp'], userName: string, status: UserStatus) {
+async function updateUserStatus(
+  pageManager: PageManager['webapp'],
+  userName: string,
+  status: UserStatus,
+): Promise<void> {
   const {components, modals} = pageManager;
   await components.conversationSidebar().openStatusMenu(userName);
   await components.conversationSidebar().setStatus(status);

@@ -56,7 +56,19 @@ import {UserState} from './userState';
 import {serverTimeHandler} from '../../time/serverTimeHandler';
 
 const testFactory = new TestFactory();
-async function buildUserRepository(translate: Translate) {
+type UserRepositoryTestDependencies = {
+  readonly userService: UserService;
+  readonly assetRepository: AssetRepository;
+  readonly selfService: SelfService;
+  readonly clientRepository: ClientRepository;
+  readonly serverTimeHandler: typeof serverTimeHandler;
+  readonly propertyRepository: PropertiesRepository;
+  readonly userState: UserState;
+  readonly teamState: TeamState;
+};
+type UserRepositoryTestFixture = readonly [UserRepository, UserRepositoryTestDependencies];
+
+async function buildUserRepository(translate: Translate): Promise<UserRepositoryTestFixture> {
   const storageRepo = await testFactory.exposeStorageActors();
 
   const userService = new UserService(storageRepo['storageService']);
@@ -93,7 +105,7 @@ async function buildUserRepository(translate: Translate) {
   ] as const;
 }
 
-function createConnections(users: APIClientUser[]) {
+function createConnections(users: APIClientUser[]): ConnectionEntity[] {
   return users.map(user => {
     const connection = new ConnectionEntity();
     connection.userId = user.qualified_id;

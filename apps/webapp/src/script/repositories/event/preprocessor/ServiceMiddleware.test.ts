@@ -29,7 +29,14 @@ import {UserType} from '@wireapp/api-client/lib/user';
 import {translateForTest} from 'Util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-function buildServiceMiddleware() {
+function buildServiceMiddleware(): readonly [
+  ServiceMiddleware,
+  {
+    readonly conversationRepository: jest.Mocked<ConversationRepository>;
+    readonly userRepository: jest.Mocked<UserRepository>;
+    readonly selfUser: User;
+  },
+] {
   const selfUser = new User(createUuid(), '', translateForTest);
   const conversationRepository = {getConversationById: jest.fn()} as unknown as jest.Mocked<ConversationRepository>;
   const userRepository = {getUsersById: jest.fn()} as unknown as jest.Mocked<UserRepository>;

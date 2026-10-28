@@ -13,14 +13,14 @@ Wire for Web's API client.
 ### Getting Started
 
 ```bash
-yarn
-yarn start
+npm install
+npm run start
 ```
 
 ### Installation
 
 ```bash
-yarn add @wireapp/api-client
+npm install @wireapp/api-client
 ```
 
 ### Usage

@@ -17,56 +17,210 @@
  *
  */
 
+import {useEffect, useRef, type ChangeEvent, type FormEvent, type FunctionComponent, type MouseEvent} from 'react';
+
+import type {RestPerformActionResponse} from 'cells-sdk-ts';
+import type {Result} from 'true-myth';
+
 import {CellsModal} from 'Components/conversation/conversationCells/common/cellsModal/cellsModal';
+import {CellsNewNodeForm} from 'Components/conversation/conversationCells/common/cellsNewNodeForm/cellsNewNodeForm';
+import type {
+  SharedDriveMoveItem,
+  SharedDriveMoveSummary,
+} from 'Components/conversation/conversationCells/sharedDriveUploadStatusContext';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {CellNode} from 'src/script/types/cellNode';
 
 import {BulkMoveDestinationSelection} from './useBulkMoveDestinationSelection';
 
 import {CellsFoldersListModalContent} from '../cellsTableColumns/cellsTableRowOptions/cellsMoveNodeModal/cellsFoldersListModalContent/cellsFoldersListModalContent';
 
+interface FolderCreationForm {
+  name: string;
+  error: string | null;
+  isSubmitting: boolean;
+  handleSubmit: (event: FormEvent<HTMLFormElement> | MouseEvent<HTMLButtonElement>) => Promise<void>;
+  handleChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  handleClear: () => void;
+}
+
 interface CellsBulkMovePreviewPresentationProps {
   isOpen: boolean;
   onClose: () => void;
-  selectedNodes: CellNode[];
   conversationName: string;
   destination: BulkMoveDestinationSelection;
+  selectedItems: readonly SharedDriveMoveItem[];
+  destinationPath: string;
+  onMove: () => Promise<Result<RestPerformActionResponse, unknown>>;
+  onMoveStart: (summary: SharedDriveMoveSummary) => void;
+  onMoveResult: (response: RestPerformActionResponse, summary: SharedDriveMoveSummary) => boolean;
+  onMoveError: () => void;
+  isMoveOutcomeUnresolved: boolean;
+  isMoveRequestError: boolean;
+  isMoveDisabled: boolean;
+  isMoveLoading: boolean;
+  isBackgroundMovePending: boolean;
+  isBackgroundMoveError: boolean;
+  isBackgroundMoveStatusUnknown: boolean;
+  canRetryBackgroundMoveStatus: boolean;
+  onRetryBackgroundMoveStatus: () => void;
+  onRefresh: () => void;
+  activeModalContent: 'move' | 'create';
+  onChangeModalContent: (content: 'move' | 'create') => void;
+  canCreateNewFolder: boolean;
+  folderCreationForm: FolderCreationForm;
 }
 
-export const CellsBulkMovePreviewPresentation = ({
+export const CellsBulkMovePreviewPresentation: FunctionComponent<CellsBulkMovePreviewPresentationProps> = ({
   isOpen,
   onClose,
-  selectedNodes,
   conversationName,
   destination,
+  selectedItems,
+  destinationPath,
+  onMove,
+  onMoveStart,
+  onMoveResult,
+  onMoveError,
+  isMoveOutcomeUnresolved,
+  isMoveRequestError,
+  isMoveDisabled,
+  isMoveLoading,
+  isBackgroundMovePending,
+  isBackgroundMoveError,
+  isBackgroundMoveStatusUnknown,
+  canRetryBackgroundMoveStatus,
+  onRetryBackgroundMoveStatus,
+  onRefresh,
+  activeModalContent,
+  onChangeModalContent,
+  canCreateNewFolder,
+  folderCreationForm,
 }: CellsBulkMovePreviewPresentationProps) => {
   const {translate} = useApplicationContext();
+  const isCurrentDialog = useRef(true);
+
+  useEffect(() => {
+    isCurrentDialog.current = true;
+    return () => {
+      isCurrentDialog.current = false;
+    };
+  }, []);
+
+  const handleMove = async (): Promise<void> => {
+    const moveSummary = {
+      items: selectedItems,
+      destinationPath: destinationPath.length > 0 ? destinationPath : translate('cells.sharedDrive.title'),
+    };
+    onMoveStart(moveSummary);
+    const moveResult = await onMove();
+    if (!isCurrentDialog.current) {
+      return;
+    }
+
+    if (moveResult.isErr) {
+      onMoveError();
+      return;
+    }
+
+    if (moveResult.isOk) {
+      const canCloseAfterMove = onMoveResult(moveResult.value, moveSummary);
+      if (canCloseAfterMove) {
+        onClose();
+      }
+    }
+  };
 
   return (
     <CellsModal isOpen={isOpen} onClose={onClose} size="large">
       <CellsModal.Header>
-        {selectedNodes.length === 1
-          ? translate('cells.bulkMove.previewTitleSingular')
-          : translate('cells.bulkMove.previewTitle', {count: selectedNodes.length})}
+        {translate(
+          activeModalContent === 'create' ? 'cells.moveNodeModal.createTitle' : 'cells.moveNodeModal.moveTitle',
+        )}
       </CellsModal.Header>
-      <p>{translate('cells.bulkMove.previewDescription')}</p>
-      <section aria-labelledby="bulk-move-selected-items-heading">
-        <h3 id="bulk-move-selected-items-heading">{translate('cells.bulkMove.selectedItems')}</h3>
-        <ul>
-          {selectedNodes.map(node => {
-            return <li key={node.id}>{node.name}</li>;
-          })}
-        </ul>
-      </section>
-      <p aria-live="polite">
-        {translate('cells.bulkMove.currentDestination', {destination: destination.currentDestination})}
-      </p>
-      <CellsFoldersListModalContent conversationName={conversationName} destination={destination} />
-      <CellsModal.Actions>
-        <CellsModal.SecondaryButton onClick={onClose}>
-          {translate('cells.moveNodeModal.cancelButton')}
-        </CellsModal.SecondaryButton>
-      </CellsModal.Actions>
+      {activeModalContent === 'move' ? (
+        <>
+          <CellsFoldersListModalContent
+            conversationName={conversationName}
+            destination={{
+              ...destination,
+              onChangeModalContent: canCreateNewFolder ? onChangeModalContent : undefined,
+            }}
+            getCurrentPathFromFolder={path => {
+              return path;
+            }}
+          />
+          {isMoveOutcomeUnresolved && !isBackgroundMoveError && !isBackgroundMoveStatusUnknown && (
+            <div role="alert">
+              <p>
+                {isMoveRequestError
+                  ? translate('cells.newItemMenuModalForm.genericError')
+                  : translate('cells.bulkMove.outcomeUnresolved')}
+              </p>
+            </div>
+          )}
+          {isBackgroundMoveError && (
+            <div role="alert">
+              <p>{translate('cells.bulkMove.moveNeedsReview')}</p>
+              <button type="button" onClick={onRefresh}>
+                {translate('cells.bulkMove.refreshDrive')}
+              </button>
+            </div>
+          )}
+          {isBackgroundMoveStatusUnknown && (
+            <div role="alert">
+              <p>{translate('cells.bulkMove.statusUnknown')}</p>
+              {canRetryBackgroundMoveStatus && (
+                <button type="button" onClick={onRetryBackgroundMoveStatus}>
+                  {translate('cells.bulkMove.checkStatus')}
+                </button>
+              )}
+              <button type="button" onClick={onRefresh}>
+                {translate('cells.bulkMove.refreshDrive')}
+              </button>
+            </div>
+          )}
+          <CellsModal.Actions>
+            {!isBackgroundMovePending && (
+              <CellsModal.SecondaryButton onClick={onClose}>
+                {translate('cells.moveNodeModal.cancelButton')}
+              </CellsModal.SecondaryButton>
+            )}
+            <CellsModal.PrimaryButton onClick={handleMove} isDisabled={isMoveDisabled}>
+              {translate(
+                isMoveLoading || isBackgroundMovePending ? 'cells.bulkMove.processing' : 'cells.bulkMove.moveButton',
+              )}
+            </CellsModal.PrimaryButton>
+          </CellsModal.Actions>
+        </>
+      ) : (
+        <>
+          <CellsNewNodeForm
+            label={translate('cells.newItemMenuModal.labelFolder')}
+            placeholder={translate('cells.newItemMenuModal.placeholderFolder')}
+            onSubmit={folderCreationForm.handleSubmit}
+            inputValue={folderCreationForm.name}
+            onChange={folderCreationForm.handleChange}
+            onClear={folderCreationForm.handleClear}
+            error={folderCreationForm.error}
+            isOpen={isOpen}
+          />
+          <CellsModal.Actions>
+            <CellsModal.SecondaryButton
+              onClick={() => {
+                return onChangeModalContent('move');
+              }}
+            >
+              {translate('cells.newItemMenuModal.secondaryAction')}
+            </CellsModal.SecondaryButton>
+            <CellsModal.PrimaryButton
+              onClick={folderCreationForm.handleSubmit}
+              isDisabled={folderCreationForm.isSubmitting}
+            >
+              {translate('cells.newItemMenuModal.primaryAction')}
+            </CellsModal.PrimaryButton>
+          </CellsModal.Actions>
+        </>
+      )}
     </CellsModal>
   );
 };

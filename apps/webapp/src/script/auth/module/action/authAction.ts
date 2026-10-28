@@ -231,7 +231,7 @@ export class AuthAction {
 
   validateSSOCode = (code: string): ThunkAction => {
     return async (dispatch, getState, {apiClient}) => {
-      const mapError = (errorCandidate: unknown) => {
+      const mapError = (errorCandidate: unknown): BackendError => {
         const statusCode = isAxiosError(errorCandidate) ? errorCandidate.response?.status : undefined;
         if (statusCode === HTTP_STATUS.NOT_FOUND) {
           return new BackendError('', BackendErrorLabel.NOT_FOUND, HTTP_STATUS.NOT_FOUND);

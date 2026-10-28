@@ -294,7 +294,8 @@ describe('getTabConversations', () => {
     archivedConversations = [conversation4];
   });
 
-  const runTest = (currentTab: SidebarTabs, conversationsFilter: string) => {
+  type RunTestResult = {conversations: Conversation[]; searchInputPlaceholder: string};
+  const runTest = (currentTab: SidebarTabs, conversationsFilter: string): RunTestResult => {
     return getTabConversations({
       currentTab,
       conversations,

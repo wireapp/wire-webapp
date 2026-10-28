@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useId, useState} from 'react';
+import {useEffect, useId, useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 import type {RichInfoField} from '@wireapp/api-client/lib/user/richInfo';
@@ -46,7 +46,7 @@ export const useEnrichedFields = (
   translate: RootContextValue['translate'],
   richProfileRepository: RichProfileRepository = container.resolve(RichProfileRepository),
   onFieldsLoaded: (richFields: RichInfoField[]) => void = noop,
-) => {
+): RichInfoField[] => {
   const [fields, setFields] = useState<RichInfoField[]>([]);
   const {email} = useKoSubscribableChildren(user, ['email']);
   useEffect(() => {
@@ -61,7 +61,7 @@ export const useEnrichedFields = (
       });
     }
 
-    const loadRichFields = async () => {
+    const loadRichFields = async (): Promise<void> => {
       try {
         const richProfile = await richProfileRepository.getUserRichProfile(user.id);
         returnFields.push(...(richProfile?.fields ?? []));
@@ -83,7 +83,7 @@ export const useEnrichedFields = (
   return fields;
 };
 
-const EnrichedFields = ({
+const EnrichedFields: FunctionComponent<EnrichedFieldsProps> = ({
   onFieldsLoaded = noop,
   showDomain = false,
   richProfileRepository = container.resolve(RichProfileRepository),

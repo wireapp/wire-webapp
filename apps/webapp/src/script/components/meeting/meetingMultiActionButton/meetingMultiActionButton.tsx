@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {Button, ButtonVariant, CalendarIcon, CallIcon} from '@wireapp/react-ui-kit';
 
 import {
@@ -31,7 +33,7 @@ export interface MeetingMultiActionButtonProps {
   useMeetingActionsHook?: typeof useMeetingActions;
 }
 
-export const MeetingMultiActionButton = ({
+export const MeetingMultiActionButton: FunctionComponent<MeetingMultiActionButtonProps> = ({
   useMeetingActionsHook = useMeetingActions,
 }: MeetingMultiActionButtonProps) => {
   const {translate} = useApplicationContext();

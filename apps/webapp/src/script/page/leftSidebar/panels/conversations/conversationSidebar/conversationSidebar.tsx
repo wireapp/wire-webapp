@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {ChevronIcon, IconButton} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/fadingScrollbar';
@@ -57,7 +59,7 @@ type ConversationSidebarProps = {
   showNotificationsBadge: boolean;
 };
 
-export const ConversationSidebar = ({
+export const ConversationSidebar: FunctionComponent<ConversationSidebarProps> = ({
   isOpen,
   toggleOpen,
   isScreenLessThanMdBreakpoint,

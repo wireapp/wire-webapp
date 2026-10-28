@@ -33,7 +33,10 @@ import {EventService} from '../EventService';
 import {translateForTest} from 'Util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-function buildQuotedMessageMiddleware() {
+function buildQuotedMessageMiddleware(): readonly [
+  QuotedMessageMiddleware,
+  {readonly eventService: jest.Mocked<EventService>},
+] {
   const eventService = {
     loadEvent: jest.fn((): never[] => {
       return [];

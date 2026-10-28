@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode, useEffect} from 'react';
+import {ReactNode, useEffect, type FunctionComponent} from 'react';
 
 import {isUndefined} from '@sindresorhus/is';
 
@@ -38,7 +38,7 @@ interface VideoPlayButtonProps {
   isFullscreen?: boolean;
 }
 
-export const VideoPlayButton = ({
+export const VideoPlayButton: FunctionComponent<VideoPlayButtonProps> = ({
   mediaElement,
   onPlay,
   onPause,
@@ -86,7 +86,7 @@ interface VideoButtonProps {
   tabIndex: number;
 }
 
-const VideoButton = ({
+const VideoButton: FunctionComponent<VideoButtonProps> = ({
   label,
   isDisabled = false,
   isFullscreen = false,

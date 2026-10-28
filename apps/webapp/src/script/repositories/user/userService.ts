@@ -20,6 +20,7 @@
 import {isNan, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import type {User as APIClientUser, QualifiedHandle, QualifiedId} from '@wireapp/api-client/lib/user';
+import type {UserService as CoreUserService} from '@wireapp/core/lib/user';
 import {container} from 'tsyringe';
 
 import {UserRecord} from 'Repositories/storage';
@@ -29,6 +30,12 @@ import {constructUserPrimaryKey} from 'Util/storageUtil';
 
 import {APIClient} from '../../service/apiClientSingleton';
 import {Core} from '../../service/coreSingleton';
+
+type UserDirectoryLookupResult = {
+  found: APIClientUser[];
+  failed?: QualifiedId[];
+  not_found?: QualifiedId[];
+};
 
 export class UserService {
   private readonly USER_STORE_NAME: string;
@@ -41,7 +48,7 @@ export class UserService {
     this.USER_STORE_NAME = StorageSchemata.OBJECT_STORE.USERS;
   }
 
-  private get coreUserService() {
+  private get coreUserService(): CoreUserService {
     const userService = this.core.service?.user;
 
     if (isNullOrUndefined(userService)) {
@@ -108,7 +115,7 @@ export class UserService {
     await this.storageService.save(this.USER_STORE_NAME, primaryKey, user);
   }
 
-  async updateUser(userId: QualifiedId, updates: Partial<UserRecord>) {
+  async updateUser(userId: QualifiedId, updates: Partial<UserRecord>): Promise<void> {
     const primaryKey = constructUserPrimaryKey(userId);
     const hasBeenUpdated = await this.storageService.update(this.USER_STORE_NAME, primaryKey, updates);
     if (hasBeenUpdated === 0 || isNan(hasBeenUpdated)) {
@@ -160,7 +167,7 @@ export class UserService {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/users
    * @example ['0bb84213-8cc2-4bb1-9e0b-b8dd522396d5', '15ede065-72b3-433a-9917-252f076ed031']
    */
-  async getUsers(userIds: QualifiedId[]) {
+  async getUsers(userIds: QualifiedId[]): Promise<UserDirectoryLookupResult> {
     if (userIds.length === 0) {
       return {found: []};
     }

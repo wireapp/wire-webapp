@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import * as Icon from 'Components/icon';
 import {Participant} from 'Repositories/calling/Participant';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
@@ -37,7 +39,9 @@ interface CallParticipantStatusIconsProps {
 
 const DEFAULT_VISIBLE_ICONS = 1;
 
-export const CallParticipantStatusIcons = ({callParticipant}: CallParticipantStatusIconsProps) => {
+export const CallParticipantStatusIcons: FunctionComponent<CallParticipantStatusIconsProps> = ({
+  callParticipant,
+}: CallParticipantStatusIconsProps) => {
   const {sharesCamera, sharesScreen, isActivelySpeaking, isMuted} = useKoSubscribableChildren(callParticipant, [
     'sharesCamera',
     'sharesScreen',

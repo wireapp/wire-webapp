@@ -25,7 +25,11 @@ const pkg = require(path.join(rootDir, 'package.json'));
 const appConfigPkg = require('./app-config/package.json');
 
 const {selectConfiguration} = require('./configuration-selection');
-require('dotenv').config({quiet: true});
+// Nx loads the workspace .env before running this command; load it for direct Just invocations too.
+require('dotenv').config({
+  path: [path.join(__dirname, '.env'), path.join(rootDir, '.env')],
+  quiet: true,
+});
 
 /**
  * Reads the tag at HEAD for the compatibility fallback.

@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2024 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,5 +17,17 @@
  *
  */
 
-// File used to embed the telemetry library into the application.
-// Bundle proccess copies analytics provider script to this file.
+import {QualifiedId} from '@wireapp/api-client/lib/user/';
+
+export const normalizeCellsPath = (path: string, conversationQualifiedId: QualifiedId): string => {
+  const normalizedPath = path.replace(/^\/+|\/+$/g, '');
+  const conversationPrefix = `${conversationQualifiedId.id}@${conversationQualifiedId.domain}`;
+
+  if (normalizedPath === conversationPrefix) {
+    return '';
+  }
+
+  return normalizedPath.startsWith(`${conversationPrefix}/`)
+    ? normalizedPath.slice(conversationPrefix.length + 1)
+    : normalizedPath;
+};

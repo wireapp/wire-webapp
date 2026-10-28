@@ -9,11 +9,11 @@ For licensing information, see the attached LICENSE file and the list of third-p
 ## Installation
 
 ```
-yarn add bazinga64
+npm install bazinga64
 ```
 
 ```
-npm -i bazinga64
+npm install bazinga64
 ```
 
 ```javascript
@@ -23,8 +23,8 @@ const bazinga64 = require('bazinga64');
 ### Development
 
 ```
-yarn
-yarn dist
+npm install
+npm run dist
 ```
 
 ### Usage

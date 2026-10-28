@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {FORMAT_TEXT_COMMAND, TextFormatType} from 'lexical';
@@ -51,7 +53,7 @@ interface FormatToolbarProps {
   isEditing: boolean;
 }
 
-export const FormatToolbar = ({isEditing}: FormatToolbarProps) => {
+export const FormatToolbar: FunctionComponent<FormatToolbarProps> = ({isEditing}: FormatToolbarProps) => {
   const [editor] = useLexicalComposerContext();
   const {translate} = useApplicationContext();
 
@@ -67,7 +69,7 @@ export const FormatToolbar = ({isEditing}: FormatToolbarProps) => {
 
   const {formatLink, insertLink, isModalOpen, closeModal, selectedText, linkUrl, linkNode} = useLinkState();
 
-  const formatText = (format: Extract<TextFormatType, 'bold' | 'italic' | 'strikethrough' | 'code'>) => {
+  const formatText = (format: Extract<TextFormatType, 'bold' | 'italic' | 'strikethrough' | 'code'>): void => {
     editor.dispatchCommand(FORMAT_TEXT_COMMAND, format);
   };
 

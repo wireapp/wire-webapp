@@ -21,14 +21,15 @@
 
 import {readFileSync} from 'node:fs';
 
-import {validateRuntimeResponses} from './validateRuntimeResponses.ts';
 import type {BuildMetadata} from '@wireapp/config';
+
+import {validateRuntimeResponses} from './validateRuntimeResponses.ts';
 
 function readRequiredEnvironmentValue(environmentVariableName: string): string {
   const environmentValue = process.env[environmentVariableName];
 
   if (typeof environmentValue !== 'string' || environmentValue.length === 0) {
-    throw new Error('Missing required runtime verification input ' + environmentVariableName);
+    throw new Error(`Missing required runtime verification input ${environmentVariableName}`);
   }
 
   return environmentValue;

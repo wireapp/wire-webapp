@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import React, {type FunctionComponent} from 'react';
 
 import cx from 'classnames';
 
@@ -31,8 +31,12 @@ interface SelectTextProps {
   dataUieName?: string;
 }
 
-export const SelectText = ({text, className = '', dataUieName = 'select-text'}: SelectTextProps) => {
-  const onClick = ({currentTarget}: React.UIEvent) => {
+export const SelectText: FunctionComponent<SelectTextProps> = ({
+  text,
+  className = '',
+  dataUieName = 'select-text',
+}: SelectTextProps) => {
+  const onClick = ({currentTarget}: React.UIEvent): void => {
     if (typeof window.getSelection === 'function') {
       const selectionRange = document.createRange();
       selectionRange.selectNode(currentTarget);

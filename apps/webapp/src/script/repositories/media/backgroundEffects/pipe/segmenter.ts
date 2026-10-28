@@ -63,13 +63,13 @@ const activeGpuQueries = new Map<
   }
 >();
 
-export function updateSegmenterOptions(opts: WorkerProcessVideoTrackOptions) {
+export function updateSegmenterOptions(opts: WorkerProcessVideoTrackOptions): void {
   // Keep the reference stable so that runtime option changes
   // are immediately visible inside the processing loop.
   Object.assign(segmenterOptions, opts);
 }
 
-async function createSegmenter(canvas: OffscreenCanvas) {
+async function createSegmenter(canvas: OffscreenCanvas): Promise<ImageSegmenter> {
   const logger = getSafeLogger('segmenter:createSegmenter');
 
   const {wasmLoaderPath, wasmBinaryPath, modelPath} = segmenterOptions;
@@ -105,10 +105,13 @@ async function createSegmenter(canvas: OffscreenCanvas) {
   });
 }
 
+type SegmenterBaseOptions = {modelAssetPath: string | undefined};
+type SegmenterModelUpdatedOptions = {baseOptions: SegmenterBaseOptions};
+
 export function getSegmenterModelUpdatedOptions(
   targetModelPath: string | undefined,
   currentModelPath: string | undefined,
-) {
+): SegmenterModelUpdatedOptions | null {
   if (targetModelPath === currentModelPath) {
     return null;
   }
@@ -126,7 +129,7 @@ export async function runSegmenter(
   opts: WorkerProcessVideoTrackOptions,
   onMetrics: (metrics: Metrics) => void,
   onPerformanceSample: (sample: PerformanceSample, mode: Mode) => void,
-) {
+): Promise<void> {
   const logger = getSafeLogger('segmenter:runSegmenter');
 
   logger.log('[virtual-background] runSegmenter');
@@ -135,7 +138,7 @@ export async function runSegmenter(
 
   let webGLRenderer: WebGLRenderer | null = new WebGLRenderer(canvas);
 
-  function onContextLost(event: Event) {
+  function onContextLost(event: Event): void {
     logger.log(`[virtual-background] webglcontextlost (${!isNullOrUndefined(webGLRenderer)})`);
 
     event.preventDefault();
@@ -144,7 +147,7 @@ export async function runSegmenter(
     webGLRenderer = null;
   }
 
-  function onContextRestored() {
+  function onContextRestored(): void {
     logger.log(`[virtual-background] webglcontextrestored (${!isNullOrUndefined(webGLRenderer)})`);
 
     if (isNullOrUndefined(webGLRenderer)) {
@@ -161,7 +164,7 @@ export async function runSegmenter(
     }
   }
 
-  function attachCanvasEvents() {
+  function attachCanvasEvents(): void {
     canvas.addEventListener('webglcontextlost', onContextLost, {once: true});
 
     canvas.addEventListener('webglcontextrestored', onContextRestored, {once: true});
@@ -187,7 +190,7 @@ export async function runSegmenter(
 
   const restartSegmenter = createRestartQueue(restartSegmenterSequentially);
 
-  async function restartSegmenterSequentially() {
+  async function restartSegmenterSequentially(): Promise<void> {
     const targetModelPath = segmenterOptions.modelPath;
 
     try {
@@ -211,7 +214,7 @@ export async function runSegmenter(
     }
   }
 
-  async function updateSegmenterModel() {
+  async function updateSegmenterModel(): Promise<void> {
     const targetModelPath = segmenterOptions.modelPath;
 
     const nextOptions = getSegmenterModelUpdatedOptions(targetModelPath, currentModelPath);
@@ -250,7 +253,7 @@ export async function runSegmenter(
 
   const droppedFrames = 0;
 
-  function updateMetrics(totalMs: number, segmentationMs: number, gpuMs: number) {
+  function updateMetrics(totalMs: number, segmentationMs: number, gpuMs: number): void {
     pushMetricsSample(metricsWindow, {
       totalMs,
       segmentationMs,
@@ -276,7 +279,7 @@ export async function runSegmenter(
     );
   }
 
-  function close() {
+  function close(): void {
     segmenter.close();
 
     webGLRenderer?.close();
@@ -291,7 +294,7 @@ export async function runSegmenter(
 
   const triggerGpuLogger = getSafeLogger('segmenter:triggerGpuLogger');
   let hasLoggedTriggerGpuMissingWebGLContext = false;
-  function triggerGpuTracking(gpuStart: number, frameDeltaMs: number, segmentationMs: number, filterMs: number) {
+  function triggerGpuTracking(gpuStart: number, frameDeltaMs: number, segmentationMs: number, filterMs: number): void {
     const gl = webGLRenderer?.gl;
     if (isNullOrUndefined(gl)) {
       if (!hasLoggedTriggerGpuMissingWebGLContext) {
@@ -321,7 +324,7 @@ export async function runSegmenter(
 
   const queriesLogger = getSafeLogger('segmenter:heckGpuQueries');
   let hasLoggedMissingWebGLContext = false;
-  function checkGpuQueries() {
+  function checkGpuQueries(): void {
     const gl = webGLRenderer?.gl;
     if (isNullOrUndefined(gl)) {
       if (!hasLoggedMissingWebGLContext) {

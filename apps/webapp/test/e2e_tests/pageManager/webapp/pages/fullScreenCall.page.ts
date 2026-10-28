@@ -20,8 +20,32 @@
 import {Page} from '@playwright/test';
 
 import {User} from 'test/e2e_tests/data/user';
+import type {Locator} from 'playwright-core';
 
-export const FullScreenCallPage = (page: Page) => {
+type FullScreenCallPageResult = {
+  sendReaction: (emoji: '\uD83D\uDC4D') => Promise<void>;
+  getReaction: (options?: {emoji?: '\uD83D\uDC4D'; sender?: Pick<User, 'fullName'>}) => Locator;
+  toggleParticipantsBtn: Locator;
+  toggleHandRaise: () => Promise<void>;
+  selfVideoThumbnail: Locator;
+  gridTiles: Locator;
+  toggleParticipantsList: () => Promise<void>;
+  getCallingParticipant: (userName: string) => Locator & {
+    muteIcon: Locator;
+    guestIcon: Locator;
+    activeSpeakerIcon: Locator;
+    videoIcon: Locator;
+    screenShareIcon: Locator;
+    menuButton: Locator;
+    openContextMenu: () => Promise<Locator & {muteButton: Locator; muteOthersButton: Locator}>;
+  };
+  getGridTile: (name: string) => Locator & {muteIcon: Locator; videoElement: Locator};
+  goToNextPage: () => Promise<void>;
+  goToPreviousPage: () => Promise<void>;
+  toggleScreenShareButton: Locator;
+  toggleVideoButton: Locator;
+};
+export const FullScreenCallPage = (page: Page): FullScreenCallPageResult => {
   const component = page.locator('.video-calling-wrapper');
 
   const reactButton = component.getByTitle('Reactions');
@@ -36,7 +60,7 @@ export const FullScreenCallPage = (page: Page) => {
   const toggleVideoButton = component.getByRole('switch', {name: 'Camera'});
 
   /* Press the react button and click the given emoji within the opened toolbar */
-  const sendReaction = async (emoji: '👍') => {
+  const sendReaction = async (emoji: '👍'): Promise<void> => {
     await reactButton.click();
     const emojiPicker = component.getByRole('toolbar').and(component.getByLabel('Reactions'));
 
@@ -48,30 +72,39 @@ export const FullScreenCallPage = (page: Page) => {
    * @param options.emoji Optional emoji to filter for
    * @param options.sender Optional filter for the user who sent the emoji
    */
-  const getReaction = (options?: {emoji?: '👍'; sender?: Pick<User, 'fullName'>}) => {
+  const getReaction = (options?: {emoji?: '👍'; sender?: Pick<User, 'fullName'>}): Locator => {
     return component.getByRole('img', {
       name: new RegExp(`Emoji ${options?.emoji ?? '.*'} from ${options?.sender?.fullName ?? '.*'}`),
     });
   };
 
-  const toggleHandRaise = async () => {
+  const toggleHandRaise = async (): Promise<void> => {
     await raiseHandButton.click();
   };
 
-  const toggleParticipantsList = async () => {
+  const toggleParticipantsList = async (): Promise<void> => {
     await toggleParticipantsBtn.click();
   };
 
-  const goToNextPage = async () => {
+  const goToNextPage = async (): Promise<void> => {
     await nextPageButton.click();
   };
 
-  const goToPreviousPage = async () => {
+  const goToPreviousPage = async (): Promise<void> => {
     await previousPageButton.click();
   };
 
   // Sidebar list of participants in the call
-  const getCallingParticipant = (userName: string) => {
+  type GetCallingParticipantResult = Locator & {
+    muteIcon: Locator;
+    guestIcon: Locator;
+    activeSpeakerIcon: Locator;
+    videoIcon: Locator;
+    screenShareIcon: Locator;
+    menuButton: Locator;
+    openContextMenu: () => Promise<Locator & {muteButton: Locator; muteOthersButton: Locator}>;
+  };
+  const getCallingParticipant = (userName: string): GetCallingParticipantResult => {
     const participant = callingParticipants.filter({hasText: userName});
 
     return Object.assign(participant, {
@@ -94,7 +127,8 @@ export const FullScreenCallPage = (page: Page) => {
     });
   };
 
-  const getGridTile = (name: string) => {
+  type GetGridTileResult = Locator & {muteIcon: Locator; videoElement: Locator};
+  const getGridTile = (name: string): GetGridTileResult => {
     const tile = gridTiles.filter({hasText: name});
 
     return Object.assign(tile, {

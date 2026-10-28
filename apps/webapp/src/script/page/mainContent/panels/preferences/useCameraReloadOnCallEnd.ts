@@ -26,7 +26,8 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import type {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {EventName} from 'Repositories/tracking/eventName';
 
-export const useCameraReloadOnCallEnd = (callingRepository: CallingRepository) => {
+type UseCameraReloadOnCallEndResult = {shouldReloadCamera: boolean};
+export const useCameraReloadOnCallEnd = (callingRepository: CallingRepository): UseCameraReloadOnCallEndResult => {
   const [shouldReloadCamera, setShouldReloadCamera] = useState(false);
 
   const handleCallEnd = useCallback(

@@ -17,10 +17,11 @@
  *
  */
 
-import {ReactNode} from 'react';
+import {ReactNode, type FunctionComponent} from 'react';
 
 import {act, render, screen} from '@testing-library/react';
 import {container} from 'tsyringe';
+import {Maybe} from 'true-myth';
 
 import {CELLS_SELF_USER_DRIVE_ROLE} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
@@ -37,8 +38,9 @@ import {
   CellsFilePreviewModalContext,
   CellsFilePreviewModalContextValue,
 } from '../common/cellsFilePreviewModalContext/cellsFilePreviewModalContext';
+import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 
-const translate = (key: string) => {
+const translate = (key: string): string => {
   return (
     {
       'cells.imageFullScreenModal.closeButton': 'Close',
@@ -50,11 +52,12 @@ const translate = (key: string) => {
   );
 };
 
+type CreateRootProviderWrapperResult = (properties: {readonly children: ReactNode}) => ReactNode;
 const createRootProviderWrapper = ({
   fireAndForgetInvoker,
 }: {
   fireAndForgetInvoker: ReturnType<typeof createExecutingFireAndForgetInvokerForTest>;
-}) => {
+}): CreateRootProviderWrapperResult => {
   return createRootProviderWrapperForTest(
     createRootContextValueForTest({
       fireAndForgetInvoker,
@@ -72,6 +75,7 @@ const file: CellFile = {
   name: 'document',
   extension: 'docx',
   sizeMb: '1 MB',
+  sizeBytes: Maybe.nothing(),
   previewImageUrl: 'https://example.com/document-preview.jpg',
   uploadedAtTimestamp: 1700000000000,
   owner: 'John Doe',
@@ -82,7 +86,11 @@ const file: CellFile = {
   selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER,
 };
 
-const FakeFilePreviewProvider = ({
+const FakeFilePreviewProvider: FunctionComponent<{
+  children: ReactNode;
+  selfUserDriveRole: CellFile['selfUserDriveRole'];
+  selectedFile?: CellFile;
+}> = ({
   children,
   selfUserDriveRole,
   selectedFile = file,
@@ -121,13 +129,14 @@ describe('CellsFilePreviewModal', () => {
     container.reset();
   });
 
+  type RenderModalResult = {fireAndForgetInvoker: FireAndForgetInvoker};
   const renderModal = ({
     selfUserDriveRole,
     selectedFile,
   }: {
     selfUserDriveRole: CellFile['selfUserDriveRole'];
     selectedFile?: CellFile;
-  }) => {
+  }): RenderModalResult => {
     const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
 
     render(

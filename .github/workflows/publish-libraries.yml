@@ -1,3 +1,4 @@
+---
 name: Create Library Release PR
 
 on:
@@ -14,7 +15,7 @@ concurrency:
 jobs:
   create-release-pr:
     name: Create Release PR
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
 
     steps:
       - name: Checkout
@@ -25,14 +26,11 @@ jobs:
           ref: main
           token: ${{ secrets.OTTO_THE_BOT_GH_TOKEN }}
 
-      - name: Add repository Yarn wrapper to PATH
-        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
-
       - name: Setup Node.js
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: Configure git
         run: |
@@ -46,16 +44,16 @@ jobs:
           echo "RELEASE_BRANCH=$BRANCH_NAME" >> $GITHUB_ENV
 
       - name: Install dependencies
-        run: ./bin/yarn --immutable
+        run: npm clean-install
 
-      - name: Lint libraries
-        run: ./bin/yarn nx run-many -t lint --projects=tag:type:lib
+      - name: Build libraries for lint import resolution
+        run: npx just build-libraries
+
+      - name: Lint repository (ESLint)
+        run: npx just eslint
 
       - name: Test libraries
-        run: ./bin/yarn nx run-many -t test --projects=tag:type:lib
-
-      - name: Build libraries
-        run: ./bin/yarn nx run-many -t build --projects=tag:type:lib
+        run: npx jest --config ./jest.config.js --projects './libraries/*/jest.config.js' --ci
 
       - name: Create version PR
         run: |
@@ -63,7 +61,7 @@ jobs:
           echo "🔍 Auto-detecting version bump from conventional commits..."
 
           # Run nx release version to update versions, commit, and tag
-          ./bin/yarn nx release version
+          npx nx release version
 
           # Check if any commits were created
           COMMITS_AHEAD="$(git rev-list --count "origin/main..HEAD")"

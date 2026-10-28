@@ -17,7 +17,7 @@
  *
  */
 
-import type {UploadSource} from 'Repositories/cells/upload';
+import type {UploadSource, UploadState} from 'Repositories/cells/upload';
 import {createCellsUploadManager, type CellsUploadManager} from 'Repositories/cells/upload/manager';
 import type {CellsUploadGateway, CellsUploadGatewayError, UploadDraftRequest} from 'Repositories/cells/upload/gateway';
 import type {DraftIdentity} from 'Repositories/cells/upload/identity';
@@ -33,16 +33,38 @@ import {
 const uploadPath = 'conversation-id@example.com/files';
 const conversationQualifiedId = 'conversation-id@example.com';
 
-function createCellsRepositoryMock() {
+type CreateCellsRepositoryMockResult = {uploadNode: jest.Mock<any, any, any>};
+function createCellsRepositoryMock(): CreateCellsRepositoryMockResult {
   return {
     uploadNode: jest.fn().mockResolvedValue({uuid: 'remote-id', versionId: 'version-id'}),
   };
 }
 
+type CreateDirectUploadControllerHelperResult = {
+  cellsRepository: {uploadNode: jest.Mock<any, any, any>};
+  controller: {
+    upload: (
+      files: readonly File[],
+      path: string,
+      onRefresh: () => void,
+      conversationQualifiedId: string,
+    ) => Promise<void>;
+    updateRefresh: (conversationQualifiedId: string, onRefresh: () => void) => void;
+    snapshots: (conversationQualifiedId: string) => readonly UploadState[];
+    subscribe: (listener: () => void) => () => boolean;
+    cancel: (id: string) => Promise<void>;
+    retryUpload: (id: string) => Promise<void>;
+    retryPublish: (uploadId: string) => Promise<void>;
+    discard: (uploadId: string) => Promise<void>;
+    retryDiscard: (uploadId: string) => Promise<void>;
+    dismiss: (conversationQualifiedId: string, uploadId: string) => void;
+    isDismissed: (conversationQualifiedId: string, uploadId: string) => boolean;
+  };
+};
 function createDirectUploadControllerHelper(
   cellsRepository = createCellsRepositoryMock(),
   createUploadId = jest.fn().mockReturnValueOnce('upload-1').mockReturnValueOnce('upload-2'),
-) {
+): CreateDirectUploadControllerHelperResult {
   const createSource = jest.fn((file: File): UploadSource => {
     return {
       blob: file,
@@ -108,7 +130,8 @@ function createDraftUploadControllerHelper<T extends CellsUploadManager = jest.M
   return {controller, manager};
 }
 
-function createDeferredTaskHelper<Value, Failure>(defaultValue: Value) {
+type CreateDeferredTaskHelperResult<Value, Failure> = {value: Task<Value, Failure>; resolve: (value?: Value) => void};
+function createDeferredTaskHelper<Value, Failure>(defaultValue: Value): CreateDeferredTaskHelperResult<Value, Failure> {
   let resolveTask: ((value?: Value) => void) | undefined;
   const value = new Task<Value, Failure>(resolve => {
     resolveTask = nextValue => {

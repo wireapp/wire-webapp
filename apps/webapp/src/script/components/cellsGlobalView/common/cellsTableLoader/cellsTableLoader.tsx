@@ -17,9 +17,11 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {spinnerStyles, spinnerWrapperStyles} from './cellsTableLoader.styles';
 
-export const CellsTableLoader = () => {
+export const CellsTableLoader: FunctionComponent = () => {
   return (
     <div css={spinnerWrapperStyles}>
       <div className="icon-spinner spin" css={spinnerStyles} />

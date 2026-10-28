@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode} from 'react';
+import {ReactNode, type FunctionComponent} from 'react';
 
 import {CSSObject} from '@emotion/react';
 
@@ -75,11 +75,11 @@ export const linkStyle: <T>(theme: Theme, props: LinkProps<T>) => CSSObject = (
   };
 };
 
-export const filterLinkProps = (props: LinkProps) => {
+export const filterLinkProps = (props: LinkProps): Object => {
   return filterProps(filterTextProps(props) as LinkProps, []);
 };
 
-export const Link = ({targetBlank, ...props}: LinkProps) => {
+export const Link: FunctionComponent<LinkProps> = ({targetBlank, ...props}) => {
   return (
     <a
       css={(theme: Theme) => {

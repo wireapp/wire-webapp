@@ -123,7 +123,7 @@ describe('MLSConversationVerificationStateHandler', () => {
   it('should do nothing if MLS service is not available', () => {
     getCoreServiceForTest().mls = undefined;
 
-    const t = () => {
+    const t = (): MLSConversationVerificationStateHandler => {
       return new MLSConversationVerificationStateHandler('domain', noop, asyncNoop, conversationState, core);
     };
 

@@ -17,23 +17,26 @@
  *
  */
 
-import {spawn} from 'node:child_process';
-import {mkdir, writeFile} from 'node:fs/promises';
-import {join} from 'node:path';
-import process from 'node:process';
-import {createProjectGraphAsync} from '@nx/devkit';
-import type {ProjectGraph} from '@nx/devkit';
+import {isArray, isObject, isString} from '@sindresorhus/is';
 
-const defaultReportsDirectory = 'unit-test-reports';
-const defaultCombinedReportFile = 'unit-tests.log';
+import {spawn} from 'node:child_process';
+import {existsSync} from 'node:fs';
+import {mkdir, writeFile} from 'node:fs/promises';
+import {basename, join, relative, sep} from 'node:path';
+import process from 'node:process';
+
+const defaultReportsDirectory = 'target/unit-test-reports';
+const defaultCombinedReportFile = 'target/unit-tests.log';
+const manifestJsonIndentationSpaces = 2;
 
 export type TestableProject = {
+  readonly jestConfigFile: string;
   readonly name: string;
   readonly root: string;
-  readonly type: string | undefined;
+  readonly type: 'app' | 'lib' | 'tool';
 };
 
-export type NxTestCommand = {
+export type JestTestCommand = {
   readonly command: string;
   readonly commandArguments: readonly string[];
 };
@@ -48,7 +51,7 @@ export type ReportSettings = {
 };
 
 export type ProjectTestResult = {
-  readonly command: NxTestCommand;
+  readonly command: JestTestCommand;
   readonly exitCode: number;
   readonly output: string;
   readonly project: TestableProject;
@@ -89,34 +92,102 @@ export function createReportFileName(projectName: string, commitSha: string): st
   return `unit-tests-${sanitizeProjectNameForFileName(projectName)}-${commitSha}.log`;
 }
 
-export function createNxTestCommand(projectName: string): NxTestCommand {
+export function createJestConfigCommand(): JestTestCommand {
   return {
-    command: './bin/yarn',
-    commandArguments: ['nx', 'run', `${projectName}:test`, '--configuration=ci', '--verbose'],
+    command: 'npx',
+    commandArguments: ['jest', '--config', './jest.config.js', '--showConfig'],
   };
 }
 
-export function findTestableProjects(projectGraph: ProjectGraph): readonly TestableProject[] {
-  return Object.values(projectGraph.nodes)
-    .filter((projectNode): boolean => {
-      return projectNode.data.targets?.test !== undefined;
-    })
-    .map((projectNode): TestableProject => {
-      return {
-        name: projectNode.name,
-        root: projectNode.data.root,
-        type: projectNode.type,
-      };
-    })
-    .toSorted((leftProject, rightProject): number => {
-      return leftProject.name.localeCompare(rightProject.name);
-    });
+function findJestConfigFile(projectRoot: string, workspaceRoot: string): string {
+  const projectDirectory = join(workspaceRoot, projectRoot);
+  const candidateConfigFiles =
+    projectRoot === '.'
+      ? [join(workspaceRoot, 'tools/jest.config.js')]
+      : [join(projectDirectory, 'jest.config.js'), join(projectDirectory, 'jest.config.ts')];
+
+  for (const candidateConfigFile of candidateConfigFiles) {
+    if (existsSync(candidateConfigFile)) {
+      return relative(workspaceRoot, candidateConfigFile);
+    }
+  }
+
+  throw new Error(`Jest configuration not found for project root: ${projectRoot}`);
+}
+
+export function findTestableProjects(jestConfigOutput: string, workspaceRoot: string): readonly TestableProject[] {
+  const jsonStartIndex = jestConfigOutput.indexOf('{');
+
+  if (jsonStartIndex === -1) {
+    throw new Error('Jest did not return project configuration JSON');
+  }
+
+  const parsedJestConfiguration: unknown = JSON.parse(jestConfigOutput.slice(jsonStartIndex));
+
+  if (!isObject(parsedJestConfiguration)) {
+    throw new Error('Jest project configuration output is invalid');
+  }
+
+  const jestConfigurationRecord = parsedJestConfiguration as Record<string, unknown>;
+  const projectConfigurations = jestConfigurationRecord['configs'];
+
+  if (!isArray(projectConfigurations)) {
+    throw new Error('Jest project configuration output is invalid');
+  }
+
+  const testableProjects = projectConfigurations.map((projectConfiguration): TestableProject => {
+    if (!isObject(projectConfiguration)) {
+      throw new Error('Jest project configuration is invalid');
+    }
+
+    const projectConfigurationRecord = projectConfiguration as Record<string, unknown>;
+    const rootDirectory = projectConfigurationRecord['rootDir'];
+
+    if (!isString(rootDirectory)) {
+      throw new Error('Jest project configuration is missing its root directory');
+    }
+
+    const projectRoot = relative(workspaceRoot, rootDirectory).split(sep).join('/') || '.';
+    const displayName = projectConfigurationRecord['displayName'];
+    const displayNameRecord = isObject(displayName) ? (displayName as Record<string, unknown>) : undefined;
+    const projectDisplayName = displayNameRecord?.['name'];
+    const projectName = isString(projectDisplayName) ? projectDisplayName : basename(projectRoot);
+    let projectType: TestableProject['type'];
+
+    if (projectRoot.startsWith('apps/')) {
+      projectType = 'app';
+    } else if (projectRoot.startsWith('libraries/')) {
+      projectType = 'lib';
+    } else {
+      projectType = 'tool';
+    }
+
+    return {
+      jestConfigFile: findJestConfigFile(projectRoot, workspaceRoot),
+      name: projectName,
+      root: projectRoot,
+      type: projectType,
+    };
+  });
+
+  return testableProjects.toSorted((leftProject, rightProject): number => {
+    return leftProject.name.localeCompare(rightProject.name);
+  });
 }
 
 export async function discoverTestableProjects(): Promise<readonly TestableProject[]> {
-  const projectGraph = await createProjectGraphAsync();
+  const jestConfigCommand = createJestConfigCommand();
+  const commandResult = await runCommandAndCaptureOutput(
+    jestConfigCommand.command,
+    jestConfigCommand.commandArguments,
+    process.cwd(),
+  );
 
-  return findTestableProjects(projectGraph);
+  if (commandResult.exitCode !== 0) {
+    throw new Error('Failed to discover Jest projects');
+  }
+
+  return findTestableProjects(commandResult.output, process.cwd());
 }
 
 function readRequiredEnvironmentValue(name: string): string {
@@ -140,8 +211,8 @@ function readReportSettings(): ReportSettings {
   };
 }
 
-export function createCommandText(nxTestCommand: NxTestCommand): string {
-  return [nxTestCommand.command, ...nxTestCommand.commandArguments].join(' ');
+export function createCommandText(jestTestCommand: JestTestCommand): string {
+  return [jestTestCommand.command, ...jestTestCommand.commandArguments].join(' ');
 }
 
 export function createProjectReport(projectTestResult: ProjectTestResult, reportSettings: ReportSettings): string {
@@ -210,6 +281,23 @@ function sortProjectTestResults(projectTestResults: readonly ProjectTestResult[]
   });
 }
 
+export function createJestTestCommand(testableProject: TestableProject): JestTestCommand {
+  const coverageArguments = testableProject.type === 'tool' ? [] : ['--coverage'];
+
+  return {
+    command: 'npx',
+    commandArguments: [
+      'jest',
+      '--config',
+      testableProject.jestConfigFile,
+      '--ci',
+      '--verbose',
+      '--maxWorkers=2',
+      ...coverageArguments,
+    ],
+  };
+}
+
 export async function runProjectTestReports(
   testableProjects: readonly TestableProject[],
   reportSettings: ReportSettings,
@@ -218,16 +306,16 @@ export async function runProjectTestReports(
   const projectTestResults: ProjectTestResult[] = [];
 
   for (const testableProject of testableProjects) {
-    const nxTestCommand = createNxTestCommand(testableProject.name);
-    console.log(`\n==> ${createCommandText(nxTestCommand)}`);
+    const jestTestCommand = createJestTestCommand(testableProject);
+    console.info(`\n==> ${createCommandText(jestTestCommand)}`);
     const commandExecutionResult = await runCommand(
-      nxTestCommand.command,
-      nxTestCommand.commandArguments,
+      jestTestCommand.command,
+      jestTestCommand.commandArguments,
       reportSettings.workspaceRoot,
     );
 
     projectTestResults.push({
-      command: nxTestCommand,
+      command: jestTestCommand,
       exitCode: commandExecutionResult.exitCode,
       output: commandExecutionResult.output,
       project: testableProject,
@@ -255,7 +343,7 @@ async function writeReports(
   );
   await writeFile(
     join(reportSettings.reportsDirectory, 'manifest.json'),
-    `${JSON.stringify(createManifest(projectTestResults, reportSettings), null, 2)}\n`,
+    `${JSON.stringify(createManifest(projectTestResults, reportSettings), null, manifestJsonIndentationSpaces)}\n`,
   );
   await writeFile(reportSettings.combinedReportFile, createCombinedReport(projectTestResults, reportSettings));
 }
@@ -306,12 +394,12 @@ async function main(): Promise<void> {
     const testableProjects = await discoverTestableProjects();
 
     if (testableProjects.length === 0) {
-      throw new Error('No Nx projects with a test target found');
+      throw new Error('No Jest projects found');
     }
 
     if (process.argv.includes('--list-projects')) {
       for (const testableProject of testableProjects) {
-        console.log(testableProject.name);
+        console.info(testableProject.name);
       }
 
       return;

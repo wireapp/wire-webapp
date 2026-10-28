@@ -17,7 +17,7 @@
  *
  */
 
-import {memo} from 'react';
+import {memo, type FunctionComponent} from 'react';
 
 import {Button, ButtonVariant, CallIcon} from '@wireapp/react-ui-kit';
 
@@ -38,7 +38,12 @@ export interface MeetingStatusProps {
   isCallActive: boolean;
 }
 
-const MeetingStatusComponent = ({temporalStatus, joinMeeting, isJoinDisabled, isCallActive}: MeetingStatusProps) => {
+const MeetingStatusComponent: FunctionComponent<MeetingStatusProps> = ({
+  temporalStatus,
+  joinMeeting,
+  isJoinDisabled,
+  isCallActive,
+}: MeetingStatusProps) => {
   const {translate} = useApplicationContext();
 
   if (isCallActive) {

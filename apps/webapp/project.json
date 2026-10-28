@@ -11,7 +11,7 @@
       "dependsOn": ["^build", "server:generate-build-metadata"],
       "inputs": ["production", "webappBuildMetadata", "{workspaceRoot}/apps/server/build/metadata/version.json"],
       "options": {
-        "command": "WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/internal yarn build:prod",
+        "command": "WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/internal npm run build:prod",
         "cwd": "{projectRoot}"
       }
     },
@@ -22,7 +22,7 @@
       "dependsOn": ["^build", "server:generate-build-metadata"],
       "inputs": ["production", "webappBuildMetadata", "{workspaceRoot}/apps/server/build/metadata/version.json"],
       "options": {
-        "command": "WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/development yarn build:dev",
+        "command": "WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/development npm run build:dev",
         "cwd": "{projectRoot}"
       }
     },
@@ -33,7 +33,7 @@
       "dependsOn": ["^build", "server:generate-build-metadata"],
       "inputs": ["production", "webappBuildMetadata", "{workspaceRoot}/apps/server/build/metadata/version.json"],
       "options": {
-        "command": "WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/public yarn build:prod:public",
+        "command": "WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/public npm run build:prod:public",
         "cwd": "{projectRoot}"
       }
     },
@@ -67,22 +67,7 @@
       "executor": "nx:run-commands",
       "defaultConfiguration": "development",
       "options": {
-        "command": "echo 'Use yarn start from the root to run the Rspack development server'"
-      }
-    },
-    "test": {
-      "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/apps/webapp"],
-      "options": {
-        "jestConfig": "{projectRoot}/jest.config.ts",
-        "passWithNoTests": false
-      },
-      "configurations": {
-        "ci": {
-          "ci": true,
-          "coverage": true,
-          "coverageReporters": ["html", "lcov", "text"]
-        }
+        "command": "echo 'Use npm run start from the root to run the Rspack development server'"
       }
     },
     "e2e": {
@@ -92,82 +77,17 @@
         "command": "playwright test --config {projectRoot}/playwright.config.ts"
       }
     },
-    "smoke-rspack": {
-      "executor": "nx:run-commands",
-      "cache": false,
-      "outputs": ["{projectRoot}/playwright-report/rspack-smoke", "{projectRoot}/test-results/rspack-smoke"],
-      "options": {
-        "command": "playwright test --config {projectRoot}/playwright.rspack.config.ts",
-        "cwd": "{workspaceRoot}"
-      }
-    },
-    "lint": {
-      "executor": "nx:run-commands",
-      "dependsOn": [],
-      "options": {
-        "command": "eslint --config eslint.config.mjs --max-warnings=267 --cache --cache-location node_modules/.cache/eslint/webapp --ext .js,.jsx,.ts,.tsx,.cjs,.mjs,.mts {projectRoot}"
-      }
-    },
-    "lint:full": {
-      "executor": "nx:run-commands",
-      "dependsOn": ["stylelint", "type-check", "lint"],
-      "options": {
-        "command": "echo 'Full lint checks complete'"
-      }
-    },
     "stylelint": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "prettier --ignore-path {projectRoot}/.prettierignore --check \"**/*.less\" && stylelint --ignore-path {projectRoot}/.gitignore \"**/*.less\"",
-        "cwd": "{projectRoot}"
-      }
-    },
-    "type-check": {
-      "executor": "nx:run-commands",
-      "dependsOn": ["^build", "rspack-config-type-check"],
-      "options": {
-        "command": "tsc --project {projectRoot}/tsconfig.type-check.json --noEmit"
-      }
-    },
-    "rspack-config-type-check": {
-      "executor": "nx:run-commands",
-      "dependsOn": ["^build"],
-      "options": {
-        "command": "tsc --project {projectRoot}/tsconfig.rspack.json --noEmit"
-      }
-    },
-    "check-circular": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "dpdm --no-warning --no-tree -T {projectRoot}/src/script/auth/main.tsx {projectRoot}/src/script/main/app.ts"
-      }
-    },
-    "translate-extract": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "i18next-scanner 'src/{page,script}/**/*.{js,html,htm}'",
-        "cwd": "{projectRoot}"
-      }
-    },
-    "translate-merge": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "formatjs extract --format './bin/translations_extract_formatter.js' --out-file './src/i18n/en-US.json' 'src/**/*.{ts,tsx,js,jsx}' --ignore 'src/**/*.d.ts' --additional-function-names t",
-        "cwd": "{projectRoot}"
-      }
-    },
-    "validate-translations": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "node tools/i18n/validateTranslationPlaceholders.mts",
-        "cwd": "{workspaceRoot}"
+        "command": "npx just stylesheet-lint"
       }
     },
     "configure": {
       "executor": "nx:run-commands",
       "dependsOn": ["copy-config-lib:build"],
       "options": {
-        "command": "copy-config ./.copyconfigrc.js && ts-node ./bin/generate_react_icons.ts && tsc --project ./tsconfig.generated-icons.json --noEmit",
+        "command": "node ../../libraries/copy-config/lib/cli.js ./.copyconfigrc.js && ts-node ./bin/generate_react_icons.ts && tsc --project ./tsconfig.generated-icons.json --noEmit",
         "cwd": "{projectRoot}"
       }
     }

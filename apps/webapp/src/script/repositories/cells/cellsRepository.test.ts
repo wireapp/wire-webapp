@@ -26,8 +26,10 @@ type UploadCall = {
   readonly resolve: () => void;
   readonly reject: (error: unknown) => void;
 };
+type CellsRepositoryTestSetup = {repository: CellsRepository; calls: UploadCall[]};
+type UploadedNodeVersion = {uuid: string; versionId: string};
 
-const createRepository = () => {
+const createRepository = (): CellsRepositoryTestSetup => {
   const calls: UploadCall[] = [];
   const apiClient = {
     api: {
@@ -44,7 +46,10 @@ const createRepository = () => {
   return {repository: new CellsRepository(apiClient as unknown as APIClient), calls};
 };
 
-const upload = (repository: CellsRepository, options?: {uuid?: string; abortController?: AbortController}) => {
+const upload = (
+  repository: CellsRepository,
+  options?: {uuid?: string; abortController?: AbortController},
+): Promise<UploadedNodeVersion> => {
   return repository.uploadNodeDraft({
     uuid: options?.uuid ?? 'upload-id',
     file: new File(['content'], 'document.txt', {type: 'text/plain'}),
@@ -99,10 +104,53 @@ describe('CellsRepository upload cancellation', () => {
   });
 });
 
+describe('CellsRepository bulk moves', () => {
+  it('retrieves status for a background move job', async () => {
+    const response = {JobUuid: 'move-job', Name: 'move', Status: 'Running'};
+    const apiClient = {
+      api: {
+        cells: {
+          getBackgroundActionInfo: jest.fn().mockResolvedValue(response),
+        },
+      },
+    };
+    const repository = new CellsRepository(apiClient as never);
+
+    await expect(repository.getBackgroundMoveInfo({jobUuid: 'move-job'})).resolves.toBe(response);
+    expect(apiClient.api.cells.getBackgroundActionInfo).toHaveBeenCalledWith({name: 'move', jobUuid: 'move-job'});
+  });
+
+  it('forwards all selected paths in one request and returns the Cells result', async () => {
+    const response = {BackgroundActions: [{JobUuid: 'move-job', Name: 'move'}]};
+    const apiClient = {
+      api: {
+        cells: {
+          moveNodes: jest.fn().mockResolvedValue(response),
+        },
+      },
+    };
+    const repository = new CellsRepository(apiClient as never);
+    const move = {currentPaths: ['Drive/file.txt', 'Drive/Folder'], targetPath: 'conversation-id@example.com/Archive'};
+
+    await expect(repository.moveNodes(move)).resolves.toBe(response);
+    expect(apiClient.api.cells.moveNodes).toHaveBeenCalledTimes(1);
+    expect(apiClient.api.cells.moveNodes).toHaveBeenCalledWith(move);
+  });
+});
+
 describe('CellsRepository upload paths', () => {
   const uploadPath = 'conversation-id@example.com/direct-upload';
 
-  const createApiClient = () => {
+  type CellsRepositoryUploadApiClient = {
+    api: {
+      cells: {
+        uploadNode: jest.Mock;
+        uploadNodeDraft: jest.Mock;
+      };
+    };
+  };
+
+  const createApiClient = (): CellsRepositoryUploadApiClient => {
     return {
       api: {
         cells: {

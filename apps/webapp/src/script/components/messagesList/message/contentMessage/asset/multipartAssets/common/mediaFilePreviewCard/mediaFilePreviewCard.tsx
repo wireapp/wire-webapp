@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode} from 'react';
+import {ReactNode, type FunctionComponent} from 'react';
 
 import {UnavailableFileIcon} from '@wireapp/react-ui-kit';
 
@@ -39,7 +39,12 @@ interface MediaFilePreviewCardProps {
   children?: ReactNode;
 }
 
-export const MediaFilePreviewCard = ({label, isLoading, isError, children}: MediaFilePreviewCardProps) => {
+export const MediaFilePreviewCard: FunctionComponent<MediaFilePreviewCardProps> = ({
+  label,
+  isLoading,
+  isError,
+  children,
+}: MediaFilePreviewCardProps) => {
   const {translate} = useApplicationContext();
 
   return (

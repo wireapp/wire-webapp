@@ -17,7 +17,7 @@
  *
  */
 
-import type {Configuration} from '@rspack/core';
+import type {Configuration, rspack as rspackFactory} from '@rspack/core';
 import type {RspackDevServer} from '@rspack/dev-server';
 import {isNullOrUndefined, isObject, isString, isTruthy} from '@sindresorhus/is';
 import express, {Router} from 'express';
@@ -44,6 +44,11 @@ import {HealthCheckRoute} from './routes/health/healthRoute';
 import {RedirectRoutes} from './routes/redirectRoutes';
 import {Root} from './routes/root';
 import {replaceHostnameInObject} from './util/hostnameReplacer';
+
+type SitemapPage = {
+  changeFreq: string;
+  url: string;
+};
 
 class Server {
   private readonly app: express.Express;
@@ -247,7 +252,7 @@ class Server {
 
   private initSiteMap(application: express.Express, config: ServerConfig): void {
     if (Boolean(config.APP_BASE)) {
-      const pages = () => {
+      const pages = (): SitemapPage[] => {
         return [
           {
             changeFreq: 'weekly',
@@ -287,8 +292,10 @@ class Server {
   private async startRspackDevelopmentServer(): Promise<number> {
     const rspackConfigurationPath = path.resolve(process.cwd(), 'apps/webapp/rspack.config.dev.mts');
     const nativeRequire = createRequire(__filename);
-    const rspackCore = nativeRequire('@rspack/core') as typeof import('@rspack/core');
-    const rspackDevServer = nativeRequire('@rspack/dev-server') as typeof import('@rspack/dev-server');
+    type RspackCoreModule = {readonly rspack: typeof rspackFactory};
+    type RspackDevServerModule = {readonly RspackDevServer: typeof RspackDevServer};
+    const rspackCore = nativeRequire('@rspack/core') as RspackCoreModule;
+    const rspackDevServer = nativeRequire('@rspack/dev-server') as RspackDevServerModule;
     const configurationModule = nativeRequire(rspackConfigurationPath) as {readonly default: Configuration};
     const rspackConfiguration = configurationModule.default;
 

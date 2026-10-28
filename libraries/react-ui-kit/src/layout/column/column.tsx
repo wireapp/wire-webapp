@@ -18,6 +18,7 @@
  */
 
 import * as React from 'react';
+import {type FunctionComponent} from 'react';
 
 import {CSSObject} from '@emotion/react';
 
@@ -29,7 +30,7 @@ export interface ColumnsProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   query?: QueryKeys;
 }
 
-export const filterColumnsProps = (props: ColumnsProps) => {
+export const filterColumnsProps = (props: ColumnsProps): Object => {
   return filterProps(props, ['query']);
 };
 
@@ -41,7 +42,7 @@ const columnsStyle: <T>(props: ColumnsProps<T>) => CSSObject = ({query = QueryKe
   };
 };
 
-export const Columns = (props: ColumnsProps) => {
+export const Columns: FunctionComponent<ColumnsProps> = props => {
   return <div css={columnsStyle(props)} {...filterColumnsProps(props)} />;
 };
 
@@ -57,6 +58,6 @@ const columnStyle: <T>(props: ColumnProps<T>) => CSSObject = () => {
   };
 };
 
-export const Column = (props: ColumnProps) => {
+export const Column: FunctionComponent<ColumnProps> = props => {
   return <div css={columnStyle(props)} {...props} />;
 };

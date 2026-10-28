@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect, useMemo, useRef} from 'react';
+import {useCallback, useEffect, useMemo, useRef, type FunctionComponent} from 'react';
 
 import {container} from 'tsyringe';
 
@@ -36,7 +36,7 @@ import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import {UserState} from 'Repositories/user/userState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-export const Meetings = () => {
+export const Meetings: FunctionComponent = () => {
   const {fireAndForgetInvoker} = useApplicationContext();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const meetingSeries = useMeetingStore(state => {
@@ -82,7 +82,7 @@ export const Meetings = () => {
       <ScheduleMeetingModal />
       <MeetNowModal />
       <MeetingPrepModal
-        participantName={selfUser.name()}
+        participant={selfUser}
         requestPreviewStream={preview.requestPreviewStream}
         releasePreviewStream={preview.releasePreviewStream}
         joinMeeting={joinMeeting}

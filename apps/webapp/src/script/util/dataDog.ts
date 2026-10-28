@@ -28,12 +28,12 @@ const uuidRegex = /([a-z\d]{8})-([a-z\d]{4})-([a-z\d]{4})-([a-z\d]{4})-([a-z\d]{
 
 let isDataDogInitialized = false;
 
-export const isDataDogEnabled = () => {
+export const isDataDogEnabled = (): boolean => {
   const config = Config.getConfig();
   return isNonEmptyString(config.dataDog?.applicationId) && isNonEmptyString(config.dataDog?.clientToken);
 };
 
-export async function initializeDataDog(config: Configuration, user: {id?: string; domain: string}) {
+export async function initializeDataDog(config: Configuration, user: {id?: string; domain: string}): Promise<void> {
   if (isDataDogInitialized) {
     return;
   }
@@ -49,22 +49,22 @@ export async function initializeDataDog(config: Configuration, user: {id?: strin
 
   const {domain, id: userId} = user ?? {};
 
-  const replacer = (_match: string, p1: string) => {
+  const replacer = (_match: string, p1: string): string => {
     return `${p1}***`;
   };
-  const truncateDomain = (value: string) => {
+  const truncateDomain = (value: string): string => {
     return `${value.substring(0, redactedValuePrefixLength)}***`;
   };
-  const replaceAllStrings = (string: string) => {
+  const replaceAllStrings = (string: string): string => {
     return string.replaceAll(uuidRegex, replacer);
   };
-  const replaceDomains = (string: string) => {
+  const replaceDomains = (string: string): string => {
     return isNonEmptyString(domain) ? string.replaceAll(domain, truncateDomain(domain)) : string;
   };
-  const removeColors = (string: string) => {
+  const removeColors = (string: string): string => {
     return string.replaceAll(/%c/g, '').replaceAll(/color:[^;]+; font-weight:[^;]+; /g, '');
   };
-  const removeTimestamp = (string: string) => {
+  const removeTimestamp = (string: string): string => {
     return string.replaceAll(/\[\d+-\d+-\d+ \d+:\d+:\d+\] /g, '');
   };
 

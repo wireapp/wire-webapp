@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {useEffect, useState, type FunctionComponent} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
@@ -44,7 +44,7 @@ interface LegacyCellsMoveNodeModalProps {
   navigateToPath?: (params: {conversationQualifiedId: QualifiedId; path: string}) => void;
 }
 
-export const LegacyCellsMoveNodeModal = ({
+export const LegacyCellsMoveNodeModal: FunctionComponent<LegacyCellsMoveNodeModalProps> = ({
   nodeToMove,
   isOpen,
   onClose,

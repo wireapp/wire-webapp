@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {Button, Text} from '@wireapp/react-ui-kit';
 
 import {ModalComponent} from 'Components/Modals/ModalComponent';
@@ -35,7 +37,7 @@ import {
 
 import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';
 
-export const CreateTeamModal = () => {
+export const CreateTeamModal: FunctionComponent = () => {
   const {translate} = useApplicationContext();
   const {
     isCreateTeamModalOpen,
@@ -44,11 +46,11 @@ export const CreateTeamModal = () => {
   } = useCreateConversationModal();
   const {showModal: showTeamCreationModal} = useTeamCreationModal();
 
-  const onCancel = () => {
+  const onCancel = (): void => {
     setIsCreateTeamModalOpen(false);
   };
 
-  const onSubmit = () => {
+  const onSubmit = (): void => {
     setIsCreateTeamModalOpen(false);
     hideConversationCreationModal();
     showTeamCreationModal();

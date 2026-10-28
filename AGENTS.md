@@ -3,7 +3,7 @@
 
 # General Guidelines for working with Nx
 
-- When running tasks (for example build, lint, test, e2e, etc.), always prefer running the task through `nx` (i.e. `nx run`, `nx run-many`, `nx affected`) instead of using the underlying tooling directly
+- Use `npx just` for ESLint, unit tests, and migrated repository quality checks. Use Nx for build, e2e, and other tasks that have not migrated.
 - You have access to the Nx MCP server and its tools, use them to help the user
 - When answering questions about the repository, use the `nx_workspace` tool first to gain an understanding of the workspace architecture where applicable.
 - When working in individual projects, use the `nx_project_details` mcp tool to analyze and understand the specific project structure and dependencies
@@ -14,39 +14,39 @@
 
 ## Running tests
 
-Run unit tests through Nx from the repository root. Paths passed to test options are relative to each project's root, such as `apps/webapp/`, `apps/server/`, or `libraries/<name>/`.
+Run the full unit suite with `npx just test`, coverage and thresholds with `npx just test-ci`, or watch mode with `npx just test-watch`.
+
+For a focused test run, call Jest with the project's existing config from the repository root. Paths passed to `--runTestsByPath` are relative to that project's root.
 
 - New tests should be meaningful and verify real behavior or risk. Do not add tests only to increase coverage numbers.
 
 ### Webapp
 
-- `yarn nx run webapp:test`
-- `yarn nx run webapp:test --testFile=src/script/components/titleBar/titleBar.test.tsx`
-- `yarn nx run webapp:test --testFile=src/script/util/componentUtil.test.ts --testNamePattern="returns a new object"`
+- `npx jest --config apps/webapp/jest.config.ts`
+- `npx jest --config apps/webapp/jest.config.ts --runTestsByPath src/script/components/titleBar/titleBar.test.tsx`
+- `npx jest --config apps/webapp/jest.config.ts --runTestsByPath src/script/util/componentUtil.test.ts --testNamePattern="returns a new object"`
 
 ### Server
 
-- `yarn nx run server:test`
-- `yarn nx run server:test --testFile=util/timeUtil.test.ts`
-- `yarn nx run server:test --testFile=util/timeUtil.test.ts --testNamePattern="formats the time correctly"`
+- `npx jest --config apps/server/jest.config.js`
+- `npx jest --config apps/server/jest.config.js --runTestsByPath util/timeUtil.test.ts`
+- `npx jest --config apps/server/jest.config.js --runTestsByPath util/timeUtil.test.ts --testNamePattern="formats the time correctly"`
 
 ### Libraries
 
-Library Nx project names end with `-lib`, such as `core-lib` or `api-client-lib`.
-
-- `yarn nx run core-lib:test`
-- `yarn nx run core-lib:test --testFile=src/util/numberToHex.test.ts`
-- `yarn nx run core-lib:test --testFile=src/util/numberToHex.test.ts --testNamePattern="should convert a number to a hex string"`
+- `npx jest --config libraries/core/jest.config.js`
+- `npx jest --config libraries/core/jest.config.js --runTestsByPath src/util/numberToHex.test.ts`
+- `npx jest --config libraries/core/jest.config.js --runTestsByPath src/util/numberToHex.test.ts --testNamePattern="should convert a number to a hex string"`
 
 ## Running ESLint
 
 For investigation, run ESLint once with JSON to `/tmp`, then analyze with `jq`, `rg`, or `node` — do not re-run ESLint for each query.
 
 ```bash
-yarn eslint --config eslint.config.mjs --no-cache -f json -o /tmp/eslint-output.json apps/webapp/src
+npx eslint --config eslint.config.mjs --cache --cache-strategy content --cache-location target/eslint/investigation -f json -o /tmp/eslint-output.json apps/webapp/src
 ```
 
-Per-file checks: pass a single file path as the last argument, not `yarn nx run webapp:lint`.
+Per-file checks: pass a single file path as the last argument. Full repository checks run through `npx just eslint`.
 
 ## TypeScript and JavaScript
 
@@ -57,7 +57,7 @@ Per-file checks: pass a single file path as the last argument, not `yarn nx run 
 ## Git
 
 - Commit messages must include a concise subject and a description body explaining what changed and why.
-- When changes are ready to commit, prompt the user to run checks first: `yarn type-check`, `BASE_REF=main yarn lint:affected` (includes Prettier via `lint:format` and Stylelint), and relevant `yarn nx run <project>:test` for touched projects.
+- When changes are ready to commit, prompt the user to run checks first: `npx just type-check`, `npx just eslint`, `npx just format-check`, `npx just stylesheet-lint`, and `npx just test` for unit tests.
 
 ## Webapp code rules
 

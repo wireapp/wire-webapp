@@ -17,7 +17,7 @@
  *
  */
 
-import {render, screen, within} from '@testing-library/react';
+import {render, screen, within, type RenderResult} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {ThemeProvider} from '@wireapp/react-ui-kit';
 
@@ -42,7 +42,7 @@ const renderPopup = (
   isExpanded = false,
   isRetrying = false,
   fileName = upload.fileName,
-) => {
+): RenderResult => {
   return render(
     <ThemeProvider>
       <SharedDriveUploadStatusPopup
@@ -120,21 +120,21 @@ describe('SharedDriveUploadStatusPopup', () => {
       </ThemeProvider>,
     );
 
-    const rows = screen.getAllByTestId('shared-drive-upload-status-row');
+    const rows = screen.getAllByRole('listitem');
     expect(rows).toHaveLength(2);
     expect(within(rows[0]).getByText('report.pdf')).toBeInTheDocument();
     expect(within(rows[1]).getByText('queued.txt')).toBeInTheDocument();
     expect(within(rows[1]).getByText('Queued')).toBeInTheDocument();
-    expect(screen.getAllByTestId('shared-drive-upload-progress')).toHaveLength(1);
-    expect(within(rows[0]).queryByTestId('shared-drive-upload-progress')).not.toBeInTheDocument();
-    expect(within(rows[1]).queryByTestId('shared-drive-upload-progress')).not.toBeInTheDocument();
+    expect(screen.getAllByRole('progressbar')).toHaveLength(1);
+    expect(within(rows[0]).queryByRole('progressbar')).not.toBeInTheDocument();
+    expect(within(rows[1]).queryByRole('progressbar')).not.toBeInTheDocument();
 
     await user.click(within(rows[1]).getByRole('button', {name: 'Cancel'}));
     expect(onCancelUpload).toHaveBeenCalledWith('upload-2');
   });
 
   it('shows the filename and destination while uploading with indeterminate progress', () => {
-    const {getByRole, getByText, getByTestId} = renderPopup('uploading');
+    const {getByRole, getByText} = renderPopup('uploading');
 
     expect(getByRole('status')).toBeInTheDocument();
     expect(getByText('uploading report.pdf')).toBeInTheDocument();
@@ -143,7 +143,7 @@ describe('SharedDriveUploadStatusPopup', () => {
     expect(progress).not.toHaveAttribute('aria-valuenow');
     expect(progress).not.toHaveAttribute('aria-valuemin');
     expect(progress).not.toHaveAttribute('aria-valuemax');
-    expect(getByTestId('shared-drive-upload-progress')).toBeInTheDocument();
+    expect(getByRole('progressbar')).toBeInTheDocument();
   });
 
   it('shows determinate progress when Cells reports bytes sent', () => {
@@ -199,7 +199,10 @@ describe('SharedDriveUploadStatusPopup', () => {
 
     const progress = screen.getByRole('progressbar', {name: 'report.pdf'});
     const progressClassName = progress.className;
-    const statusIcon = screen.getByTestId('shared-drive-upload-uploading');
+    const statusIcon = screen
+      .getByRole('listitem', {hidden: true})
+      .querySelector('[data-uie-name="shared-drive-upload-uploading"]');
+    expect(statusIcon).toHaveAttribute('aria-hidden', 'true');
 
     rerender(
       <ThemeProvider>
@@ -225,7 +228,9 @@ describe('SharedDriveUploadStatusPopup', () => {
     expect(screen.getByRole('progressbar', {name: 'report.pdf'})).toBe(progress);
     expect(screen.getByRole('progressbar', {name: 'report.pdf'})).toHaveClass(progressClassName);
     expect(screen.getByRole('progressbar', {name: 'report.pdf'})).toHaveStyle({transform: 'scaleX(0.46)'});
-    expect(screen.getByTestId('shared-drive-upload-uploading')).toBe(statusIcon);
+    expect(
+      screen.getByRole('listitem', {hidden: true}).querySelector('[data-uie-name="shared-drive-upload-uploading"]'),
+    ).toBe(statusIcon);
   });
 
   it.each([
@@ -235,9 +240,10 @@ describe('SharedDriveUploadStatusPopup', () => {
   ] as const)('hides the decorative %s icon from assistive technology', (kind, iconName) => {
     renderPopup(kind, true);
 
-    expect(
-      screen.getByTestId('shared-drive-upload-status-row').querySelector(`[data-uie-name="${iconName}"]`),
-    ).toHaveAttribute('aria-hidden', 'true');
+    expect(screen.getByRole('listitem', {hidden: true}).querySelector(`[data-uie-name="${iconName}"]`)).toHaveAttribute(
+      'aria-hidden',
+      'true',
+    );
   });
 
   it('provides full text for ellipsized row content', () => {
@@ -248,34 +254,36 @@ describe('SharedDriveUploadStatusPopup', () => {
   });
 
   it('shows uploaded status with a completed progress bar', () => {
-    const {getByText, getByTestId} = renderPopup('uploaded');
+    const {getByRole, getByText} = renderPopup('uploaded');
 
     expect(getByText('uploaded report.pdf')).toBeInTheDocument();
-    expect(getByTestId('shared-drive-upload-progress')).toBeInTheDocument();
+    expect(getByRole('progressbar')).toBeInTheDocument();
   });
 
   it('shows an icon when an uploaded file has no extension', () => {
-    const {getByTestId} = renderPopup('uploaded', true, false, 'Wire – New Features');
+    renderPopup('uploaded', true, false, 'Wire – New Features');
 
-    expect(getByTestId('shared-drive-upload-uploaded').querySelector('svg')).toBeInTheDocument();
+    expect(
+      screen.getByRole('listitem', {hidden: true}).querySelector('[data-uie-name="shared-drive-upload-uploaded"]'),
+    ).toHaveAttribute('aria-hidden', 'true');
   });
 
-  it('shows a progress bar for failed status', () => {
-    const {getByTestId} = renderPopup('failed', true);
+  it('does not expose failed transfer decoration as progress', () => {
+    renderPopup('failed', true);
 
-    expect(getByTestId('shared-drive-upload-progress')).toBeInTheDocument();
+    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
   });
 
   it('starts collapsed and exposes accessible cancel and toggle actions in the header', () => {
     renderPopup('uploading');
 
-    const header = screen.getByTestId('shared-drive-upload-status-header');
+    const header = screen.getByRole('group');
     const toggle = within(header).getByRole('button', {name: 'Show upload details'});
     expect(within(header).getByRole('button', {name: 'Cancel'})).toBeInTheDocument();
     expect(toggle).toHaveAttribute('aria-expanded', 'false');
     expect(toggle).toHaveAttribute('aria-controls', 'shared-drive-upload-status-upload-1');
     expect(screen.getByRole('status').querySelector('button')).not.toBeInTheDocument();
-    expect(screen.getByTestId('shared-drive-upload-status-row')).not.toBeVisible();
+    expect(screen.getByRole('listitem', {hidden: true})).not.toBeVisible();
   });
 
   it.each([
@@ -285,12 +293,12 @@ describe('SharedDriveUploadStatusPopup', () => {
   ] as const)('shows the %s file status row without duplicate header icons', (kind, label, iconName) => {
     renderPopup(kind, true);
 
-    const header = screen.getByTestId('shared-drive-upload-status-header');
-    const row = screen.getByTestId('shared-drive-upload-status-row');
+    const header = screen.getByRole('group');
+    const row = screen.getByRole('listitem', {hidden: true});
     expect(screen.getByRole('button', {name: 'Hide upload details'})).toHaveAttribute('aria-expanded', 'true');
     expect(row).toBeVisible();
     expect(within(row).getByText('report.pdf')).toBeInTheDocument();
-    expect(within(row).getByTestId(iconName)).toBeInTheDocument();
+    expect(row.querySelector(`[data-uie-name="${iconName}"]`)).toHaveAttribute('aria-hidden', 'true');
     expect(header.querySelector(`[data-uie-name="${iconName}"]`)).not.toBeInTheDocument();
   });
 
@@ -347,9 +355,7 @@ describe('SharedDriveUploadStatusPopup', () => {
       </ThemeProvider>,
     );
 
-    await user.click(
-      within(screen.getByTestId('shared-drive-upload-status-header')).getByRole('button', {name: 'Cancel'}),
-    );
+    await user.click(within(screen.getByRole('group')).getByRole('button', {name: 'Cancel'}));
 
     expect(onCancelAll).toHaveBeenCalledTimes(1);
   });
@@ -378,7 +384,7 @@ describe('SharedDriveUploadStatusPopup', () => {
       </ThemeProvider>,
     );
 
-    const row = screen.getByTestId('shared-drive-upload-status-row');
+    const row = screen.getByRole('listitem', {hidden: true});
     const rowCancel = within(row).getByRole('button', {name: 'Cancel'});
     expect(rowCancel).toHaveAttribute('data-uie-name', 'shared-drive-upload-cancel');
     expect(rowCancel.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
@@ -483,7 +489,7 @@ describe('SharedDriveUploadStatusPopup', () => {
       </ThemeProvider>,
     );
 
-    const headerClose = within(screen.getByTestId('shared-drive-upload-status-header')).getByRole('button', {
+    const headerClose = within(screen.getByRole('group')).getByRole('button', {
       name: 'Close upload status',
     });
     expect(headerClose).toHaveTextContent('Close');
@@ -498,7 +504,7 @@ describe('SharedDriveUploadStatusPopup', () => {
     renderPopup(kind, true);
 
     expect(
-      within(screen.getByTestId('shared-drive-upload-status-header')).queryByRole('button', {
+      within(screen.getByRole('group')).queryByRole('button', {
         name: 'Close upload status',
       }),
     ).not.toBeInTheDocument();

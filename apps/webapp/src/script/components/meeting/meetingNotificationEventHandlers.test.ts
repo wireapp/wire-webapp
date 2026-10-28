@@ -27,7 +27,10 @@ import {
 import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
-import {createMeetingNotificationEventHandlers} from './meetingNotificationEventHandlers';
+import {
+  createMeetingNotificationEventHandlers,
+  type MeetingNotificationEventHandlers,
+} from './meetingNotificationEventHandlers';
 
 const meetingId: QualifiedId = {id: 'meeting-id', domain: 'example.com'};
 const creatorId: QualifiedId = {id: 'creator-id', domain: 'example.com'};
@@ -54,7 +57,7 @@ describe('createMeetingNotificationEventHandlers', () => {
     notifications: AddNotificationInput[],
     meetingId: QualifiedId,
     kinds?: readonly MeetingNotificationKind[],
-  ) => {
+  ): void => {
     for (let index = notifications.length - 1; index >= 0; index -= 1) {
       const notification = notifications[index];
       if (!matchQualifiedIds(notification.qualifiedId, meetingId)) {
@@ -75,7 +78,7 @@ describe('createMeetingNotificationEventHandlers', () => {
     notifications = [] as AddNotificationInput[],
     dismissedMeetings = [] as {meetingId: QualifiedId; kinds?: readonly MeetingNotificationKind[]}[],
     warnings = [] as {message: string; context?: unknown}[],
-  } = {}) => {
+  } = {}): MeetingNotificationEventHandlers => {
     return createMeetingNotificationEventHandlers({
       getMeetingSeries,
       clock,

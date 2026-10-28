@@ -24,7 +24,7 @@ import {isQualifiedUserClients} from '@wireapp/core/lib/util';
 export const removeClientFromUserClientMap = (
   userMap: QualifiedUserClients | UserClients,
   clientToExclude: {domain?: string; userId: string; clientId: string},
-) => {
+): QualifiedUserClients | UserClients => {
   if (isQualifiedUserClients(userMap)) {
     const {domain, userId} = clientToExclude;
     if (

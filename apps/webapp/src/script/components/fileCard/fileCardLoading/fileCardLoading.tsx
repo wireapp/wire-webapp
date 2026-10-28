@@ -17,7 +17,7 @@
  *
  */
 
-import {CSSProperties, useEffect, useState} from 'react';
+import {CSSProperties, useEffect, useState, type FunctionComponent} from 'react';
 
 import {easeOutStyles, loadingStyles, wrapperStyles} from './fileCardLoading.styles';
 
@@ -34,7 +34,9 @@ const INITIAL_PROGRESS = 0;
 const FAKE_PROGRESS = 20;
 const FAKE_PROGRESS_DELAY = 200;
 
-export const FileCardLoading = ({progress = MAX_PROGRESS}: FileCardLoadingProps) => {
+export const FileCardLoading: FunctionComponent<FileCardLoadingProps> = ({
+  progress = MAX_PROGRESS,
+}: FileCardLoadingProps) => {
   const [fakeProgress, setFakeProgress] = useState(INITIAL_PROGRESS);
 
   // After the timeout, we set progress to a small value to indicate that the file is loading

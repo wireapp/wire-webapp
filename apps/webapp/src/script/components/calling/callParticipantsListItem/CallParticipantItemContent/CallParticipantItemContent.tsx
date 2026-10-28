@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import React, {type FunctionComponent} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
@@ -44,7 +44,7 @@ interface CallParticipantItemContentProps {
   onDropdownClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
-export const CallParticipantItemContent = ({
+export const CallParticipantItemContent: FunctionComponent<CallParticipantItemContentProps> = ({
   user,
   isAudioEstablished,
   isSelf = false,

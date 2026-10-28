@@ -19,7 +19,7 @@
 
 const MIN_PARTS_LENGTH = 2;
 
-export const getCellsFilesPath = (hash = window.location.hash) => {
+export const getCellsFilesPath = (hash = window.location.hash): string => {
   const normalizedHash = hash.replace('#', '');
 
   const parts = normalizedHash.split('/files/');

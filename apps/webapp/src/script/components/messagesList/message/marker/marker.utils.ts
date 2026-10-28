@@ -29,7 +29,7 @@ interface MessageGroupLabels {
  If yesterday: “Yesterday”
  Any other day: <Week day>, <date> (e.g. “Monday, April 12” or “Friday, January 6 2023”)
  */
-export const getMessagesGroupLabel = (timestamp: number, messageGroupLabels: MessageGroupLabels) => {
+export const getMessagesGroupLabel = (timestamp: number, messageGroupLabels: MessageGroupLabels): string => {
   const date = new Date(timestamp);
 
   if (isToday(date)) {

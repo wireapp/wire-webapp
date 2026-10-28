@@ -66,7 +66,8 @@ export const handleJoinMeetingCallResult = (
   }
 };
 
-const useMeetingConversationCall = (qualifiedConversationId: QualifiedId) => {
+type UseMeetingConversationCallResult = {isCallConnecting: boolean; isCallActive: boolean};
+const useMeetingConversationCall = (qualifiedConversationId: QualifiedId): UseMeetingConversationCallResult => {
   const callState = container.resolve(CallState);
   const {calls, joinedCall} = useKoSubscribableChildren(callState, ['calls', 'joinedCall']);
 
@@ -108,7 +109,14 @@ const useMeetingConversationCall = (qualifiedConversationId: QualifiedId) => {
   return {isCallConnecting, isCallActive};
 };
 
-export const useJoinMeetingCall = (qualifiedConversationId: QualifiedId) => {
+type UseJoinMeetingCallResult = {
+  joinMeeting: (media: CallMediaChoice) => void;
+  isJoinDisabled: boolean;
+  isCallActive: boolean;
+  isCallConnecting: boolean;
+  isJoining: boolean;
+};
+export const useJoinMeetingCall = (qualifiedConversationId: QualifiedId): UseJoinMeetingCallResult => {
   const {translate} = useApplicationContext();
   const {content, calling: callingViewModel} = useMainViewModel();
   const {conversation: conversationRepository, calling: callingRepository} = content.repositories;

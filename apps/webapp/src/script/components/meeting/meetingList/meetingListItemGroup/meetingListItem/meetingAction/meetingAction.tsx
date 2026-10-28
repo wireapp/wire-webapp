@@ -17,7 +17,7 @@
  *
  */
 
-import {MouseEvent} from 'react';
+import {MouseEvent, type FunctionComponent} from 'react';
 
 import {IconButton, MoreIcon} from '@wireapp/react-ui-kit';
 
@@ -43,12 +43,17 @@ interface MeetingActionProps {
   isJoinDisabled: boolean;
 }
 
-export const MeetingAction = ({meetingInstance, selfUser, joinMeeting, isJoinDisabled}: MeetingActionProps) => {
+export const MeetingAction: FunctionComponent<MeetingActionProps> = ({
+  meetingInstance,
+  selfUser,
+  joinMeeting,
+  isJoinDisabled,
+}: MeetingActionProps) => {
   const {translate, clock, fireAndForgetInvoker} = useApplicationContext();
   const {editMeeting} = useEditMeeting();
   const {openDeleteMeetingModal} = useDeleteMeeting();
 
-  const handleActionButton = (event: MouseEvent<HTMLElement>) => {
+  const handleActionButton = (event: MouseEvent<HTMLElement>): void => {
     if (selfUser === undefined) {
       return;
     }

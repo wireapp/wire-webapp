@@ -18,8 +18,9 @@
  */
 
 import * as React from 'react';
+import {type FunctionComponent} from 'react';
 
-export const Form = (props: React.HTMLProps<HTMLFormElement>) => {
+export const Form: FunctionComponent<React.HTMLProps<HTMLFormElement>> = props => {
   return (
     <form
       css={{

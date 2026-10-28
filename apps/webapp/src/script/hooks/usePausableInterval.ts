@@ -19,20 +19,26 @@
 
 import {useRef, useEffect, useState} from 'react';
 
-export const usePausableInterval = (callback: () => void, timer: number) => {
+type PausableIntervalControls = {
+  clearInterval: () => void;
+  pauseInterval: () => void;
+  startInterval: () => void;
+};
+
+export const usePausableInterval = (callback: () => void, timer: number): PausableIntervalControls => {
   const intervalIdRef = useRef<(() => void) | undefined>(undefined);
   const totalTimeRun = useRef(0);
   const intervalId = useRef<number | undefined>(undefined);
   const startTime = useRef(new Date().getTime());
   const [pause, setPause] = useState(true);
 
-  const pauseInterval = () => {
+  const pauseInterval = (): void => {
     return setPause(true);
   };
-  const startInterval = () => {
+  const startInterval = (): void => {
     return setPause(false);
   };
-  const clearInterval = () => {
+  const clearInterval = (): void => {
     return window.clearTimeout(intervalId.current);
   };
 
@@ -41,7 +47,7 @@ export const usePausableInterval = (callback: () => void, timer: number) => {
   }, [callback]);
 
   useEffect(() => {
-    const fn = () => {
+    const fn = (): void => {
       const intervalCallback = intervalIdRef.current;
       if (intervalCallback === undefined) {
         return;

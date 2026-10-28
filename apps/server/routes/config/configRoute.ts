@@ -24,7 +24,7 @@ import type {ClientConfig, ServerConfig} from '@wireapp/config';
 import {setNonCacheHeaders} from '../../http/setNonCacheHeaders';
 import {replaceHostname} from '../../util/hostnameReplacer';
 
-export const ConfigRoute = (serverConfig: ServerConfig, clientConfig: ClientConfig) => {
+export const ConfigRoute = (serverConfig: ServerConfig, clientConfig: ClientConfig): Router => {
   return Router().get('/config.js', (request, res) => {
     const serializedConfig = `window.wire = window.wire || {}; window.wire.env = ${JSON.stringify(clientConfig)};`;
     const payload = serverConfig.ENABLE_DYNAMIC_HOSTNAME

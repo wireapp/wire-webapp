@@ -46,7 +46,7 @@ export function GlobalEventsPlugin({onShiftTab, onArrowUp, onEscape, onBlur}: Gl
   const [editor] = useLexicalComposerContext();
 
   useLayoutEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
+    const onKeyDown = (event: KeyboardEvent): void => {
       // "Shift" + "Tab"
       if (event.shiftKey && isTabKey(event)) {
         editor.dispatchCommand(ON_SHIFT_TAB, event);

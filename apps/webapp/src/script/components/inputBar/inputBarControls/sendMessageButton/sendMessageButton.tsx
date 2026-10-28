@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import cx from 'classnames';
 
 import * as Icon from 'Components/icon';
@@ -29,7 +31,12 @@ interface SendMessageButtonProps {
   isLoading: boolean;
 }
 
-export const SendMessageButton = ({isDisabled, isLoading, onSend, className}: SendMessageButtonProps) => {
+export const SendMessageButton: FunctionComponent<SendMessageButtonProps> = ({
+  isDisabled,
+  isLoading,
+  onSend,
+  className,
+}: SendMessageButtonProps) => {
   const {translate} = useApplicationContext();
 
   return (

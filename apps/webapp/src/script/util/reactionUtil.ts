@@ -52,7 +52,11 @@ export function userReactionMapToReactionMap(userReactions: UserReactionMap | Re
   }, []);
 }
 
-export function addReaction(reactions: ReactionMap, reactionsStr: string, userId: QualifiedId) {
+export function addReaction(
+  reactions: ReactionMap,
+  reactionsStr: string,
+  userId: QualifiedId,
+): [reaction: string, userIds: {domain: string; id: string}[]][] {
   const userReactions = reactionsStr.split(',');
 
   // First step is to remove all of this user's reactions

@@ -53,7 +53,7 @@ function shouldStickToBottomFromPrev(
 export const useScrollMessages = (
   virtualizer: Virtualizer<HTMLDivElement, Element>,
   {messages, userId, isConversationLoaded}: Props,
-) => {
+): void => {
   const prevNbMessages = useRef(0);
   const prevTotalSizeRef = useRef(0);
 

@@ -36,7 +36,7 @@ jest.mock('Components/icon', () => {
   };
 });
 
-const createCallMessage = (partialCallMessage: Partial<CallMessageEntity>) => {
+const createCallMessage = (partialCallMessage: Partial<CallMessageEntity>): CallMessageEntity => {
   const callMessage: Partial<CallMessageEntity> = {
     caption: ko.pureComputed(() => {
       return '';

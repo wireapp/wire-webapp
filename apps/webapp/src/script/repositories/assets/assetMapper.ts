@@ -46,7 +46,7 @@ export const mapProfileAssets = (userId: QualifiedId, assets: APIClientUserAsset
     }, {});
 };
 
-export const updateUserEntityAssets = (userEntity: User | ServiceEntity, mappedAssets: MappedAsset = {}) => {
+export const updateUserEntityAssets = (userEntity: User | ServiceEntity, mappedAssets: MappedAsset = {}): void => {
   const {preview, medium} = mappedAssets;
   if (!isUndefined(preview)) {
     userEntity.previewPictureResource(preview);

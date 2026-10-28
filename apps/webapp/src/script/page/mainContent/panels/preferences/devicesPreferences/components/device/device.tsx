@@ -17,7 +17,7 @@
  *
  */
 
-import {MouseEvent, KeyboardEvent} from 'react';
+import {MouseEvent, KeyboardEvent, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
@@ -43,7 +43,14 @@ interface DeviceProps {
   deviceNumber: number;
 }
 
-export const Device = ({device, isSSO, onSelect, onRemove, getDeviceIdentity, deviceNumber}: DeviceProps) => {
+export const Device: FunctionComponent<DeviceProps> = ({
+  device,
+  isSSO,
+  onSelect,
+  onRemove,
+  getDeviceIdentity,
+  deviceNumber,
+}: DeviceProps) => {
   const {translate} = useApplicationContext();
   const {isVerified} = useKoSubscribableChildren(device.meta, ['isVerified']);
   const verifiedLabel = isVerified
@@ -53,16 +60,16 @@ export const Device = ({device, isSSO, onSelect, onRemove, getDeviceIdentity, de
 
   const deviceIdentity = getDeviceIdentity?.(device.id);
 
-  const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
+  const handleClick = (event: MouseEvent<HTMLButtonElement>): void => {
     event.stopPropagation();
     onRemove(device);
   };
 
-  const handleKeyPress = (event: KeyboardEvent<HTMLButtonElement>) => {
+  const handleKeyPress = (event: KeyboardEvent<HTMLButtonElement>): void => {
     event.stopPropagation();
   };
 
-  const onDeviceSelect = () => {
+  const onDeviceSelect = (): void => {
     return onSelect(device);
   };
 

@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, ReactNode, useEffect, useMemo} from 'react';
+import {FunctionComponent, ReactNode, useEffect, useMemo} from 'react';
 
 import type {Clock} from '@enormora/clock/clock';
 import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
@@ -53,12 +53,13 @@ import {Success} from './success';
 import {VerifyEmailCode} from './verifyEmailCode';
 import {VerifyEmailLink} from './verifyEmailLink';
 
+import type englishMessages from '../../../i18n/en-US.json';
 import {Config} from '../../Config';
 import {MainViewModel} from '../../view_model/MainViewModel';
 import {RouteA11y} from '../component/routeA11Y';
 import {mapLanguage, normalizeLanguage} from '../localeConfig';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
-import {bindActionCreators, RootState} from '../module/reducer';
+import {bindActionCreators, RootState, type ThunkAction} from '../module/reducer';
 import * as AuthSelector from '../module/selector/authSelector';
 import * as LanguageSelector from '../module/selector/languageSelector';
 import {ROUTE} from '../route';
@@ -71,6 +72,9 @@ interface RootProps {
   clock: Clock;
 }
 
+type TitleProperties = {readonly title: string; readonly children: ReactNode};
+type LanguageMessages = typeof englishMessages;
+
 const fireAndForgetInvokerLogger = getLogger('FireAndForgetInvoker');
 const authFireAndForgetInvoker = createFireAndForgetInvoker({
   reportError(error) {
@@ -82,14 +86,14 @@ function createAuthMainViewModel(): MainViewModel {
   return {} as MainViewModel;
 }
 
-const Title: FC<{title: string; children: ReactNode}> = ({title, children}) => {
+const Title: FunctionComponent<TitleProperties> = ({title, children}) => {
   useEffect(() => {
     document.title = title;
   }, [title]);
   return <>{children}</>;
 };
 
-const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
+const RootComponent: FunctionComponent<RootProps & ConnectedProps & DispatchProps> = ({
   isAuthenticated,
   language,
   isFetchingSSOSettings,
@@ -136,7 +140,7 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
 
   useEffect(() => {
     // Force the hash url to have a initial `/` (see https://stackoverflow.com/a/71864506)
-    const forceSlashAfterHash = () => {
+    const forceSlashAfterHash = (): void => {
       const hash = window.location.hash;
       if (!hash.startsWith('#/')) {
         window.location.hash = `#/${hash.slice(1)}`;
@@ -155,7 +159,7 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
     void doGetSSOSettings();
   }, [doGetSSOSettings]);
 
-  const loadLanguage = (language: string) => {
+  const loadLanguage = (language: string): LanguageMessages => {
     return require(`I18n/${mapLanguage(language)}.json`);
   };
 
@@ -181,23 +185,23 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
     );
   };
 
-  const ProtectedHistoryInfo = () => {
+  const ProtectedHistoryInfo = (): ReactNode => {
     return isAuthenticatedCheck(<HistoryInfo />);
   };
-  const ProtectedClientManager = () => {
+  const ProtectedClientManager = (): ReactNode => {
     return isAuthenticatedCheck(<ClientManager />);
   };
 
-  const ProtectedSetHandle = () => {
+  const ProtectedSetHandle = (): ReactNode => {
     return isAuthenticatedCheck(<SetHandle />);
   };
-  const ProtectedSetEmail = () => {
+  const ProtectedSetEmail = (): ReactNode => {
     return isAuthenticatedCheck(<SetEmail />);
   };
-  const ProtectedSetPassword = () => {
+  const ProtectedSetPassword = (): ReactNode => {
     return isAuthenticatedCheck(<SetPassword />);
   };
-  const ProtectedOAuthPermissions = () => {
+  const ProtectedOAuthPermissions = (): ReactNode => {
     return isOAuthCheck(<OAuthPermissions />);
   };
 
@@ -314,7 +318,8 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
 };
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
-const mapStateToProps = (state: RootState) => {
+type MapStateToPropsResult = {isAuthenticated: boolean; isFetchingSSOSettings: boolean; language: string};
+const mapStateToProps = (state: RootState): MapStateToPropsResult => {
   return {
     isAuthenticated: AuthSelector.isAuthenticated(state),
     isFetchingSSOSettings: AuthSelector.isFetchingSSOSettings(state),
@@ -323,7 +328,8 @@ const mapStateToProps = (state: RootState) => {
 };
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => {
+type MapDispatchToPropsResult = {doGetSSOSettings: () => ThunkAction<Promise<void>>};
+const mapDispatchToProps = (dispatch: Dispatch<AnyAction>): MapDispatchToPropsResult => {
   return bindActionCreators(
     {
       doGetSSOSettings: ROOT_ACTIONS.authAction.doGetSSOSettings,

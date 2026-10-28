@@ -22,7 +22,7 @@ env:
 
 jobs:
   workflow-security:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     name: Workflow security analysis
     permissions:
       actions: read # required by zizmor online audits in private repositories
@@ -36,7 +36,7 @@ jobs:
 
       - name: Run zizmor
         id: zizmor
-        uses: zizmorcore/zizmor-action@85b2b9fb8e3325e7a23d7d0a9d7ba5ae0f999e3e # v0.7.1
+        uses: zizmorcore/zizmor-action@53290badfa369cb0bf7ad16342cb62c2fa47ac7b # v0.8.0
         with:
           inputs: .github/workflows/continuous-integration.yml
           version: 1.25.2
@@ -54,7 +54,7 @@ jobs:
           test "$findingsCount" -eq 0
 
   generated-artifacts:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04-arm
     name: generated artifacts check
     permissions:
       contents: read
@@ -68,20 +68,17 @@ jobs:
           persist-credentials: false
           fetch-depth: 1
 
-      - name: Add repository Yarn wrapper to PATH
-        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
-
       - name: Setup Node.js
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: Verify sparse runtime validation entry point
         run: bash ./tools/runtimeVerification/verifySparseRuntimeValidation.sh
 
       - name: Install dependencies
-        run: ./bin/yarn --immutable
+        run: npm clean-install
 
       - name: Verify deployment CLI from clean install
         run: |
@@ -102,7 +99,7 @@ jobs:
 
       - name: Verify generated i18n artifacts are committed
         run: |
-          ./bin/yarn nx run webapp:translate-merge
+          npm run --workspace @wireapp/webapp translate:merge
 
           if ! test -z "$(git status --porcelain)"; then
             echo "Repository is not clean after generation. Run generation locally and commit the changes."
@@ -111,10 +108,10 @@ jobs:
           fi
 
       - name: Validate translation markers
-        run: ./bin/yarn nx run webapp:validate-translations
+        run: node tools/i18n/validateTranslationPlaceholders.mts
 
   build-libraries:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04-arm
     name: build libraries
     permissions:
       contents: read
@@ -126,26 +123,29 @@ jobs:
           persist-credentials: false
           fetch-depth: 1
 
-      - name: Add repository Yarn wrapper to PATH
-        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
-
       - name: Setup Node.js
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: ./bin/yarn --immutable
+        run: npm clean-install
 
       - name: Build libraries
-        run: ./bin/yarn nx run-many -t build --projects=tag:type:lib
+        run: npx just build-libraries
 
   rspack-build:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     name: Rspack production build
     permissions:
       contents: read
+    container:
+      image: quay.io/wire/mirror-images/playwright:v1.64.1-noble@sha256:7852dc5a7d72f5fe458a597d690f6c42fbc8e9e26ddfa95f8e6ef552558d9bbf
+      options: --ipc=host
+    defaults:
+      run:
+        shell: bash
 
     steps:
       - name: Checkout repository
@@ -154,37 +154,55 @@ jobs:
           persist-credentials: false
           fetch-depth: 1
 
-      - name: Add repository Yarn wrapper to PATH
-        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
-
       - name: Setup Node.js
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: ./bin/yarn --immutable
+        run: npm clean-install
 
-      - name: Build internal webapp
-        run: ./bin/yarn nx run webapp:build
-
-      - name: Build and package public webapp with Rspack
-        id: public_rspack_package
+      - name: Build webapps and assemble the internal production server with Just
+        id: public_rspack_build
         env:
           WIRE_WEBAPP_BUILD_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
           short_commit_sha="${WIRE_WEBAPP_BUILD_COMMIT::7}"
           expected_version="dev-${short_commit_sha}"
-          WIRE_WEBAPP_BUILD_VERSION="${expected_version}" \
-            ./bin/yarn nx run server:package-public
+          export WIRE_WEBAPP_BUILD_VERSION="${expected_version}"
+          npx just package-server-internal build-webapp-development build-webapp-public
           echo "expected_version=${expected_version}" >> "$GITHUB_OUTPUT"
+
+      - name: Verify internal server assembly
+        run: |
+          test -s apps/server/dist/index.js
+          test -s apps/server/dist/static/index.html
+          test -s apps/server/dist/version.json
+          test -s apps/server/dist/libs/wire/telemetry/embed.js
+          test -s apps/server/dist/s3/ebs.zip
+
+      - name: Run Rspack browser smoke tests
+        run: npx playwright test --config apps/webapp/playwright.rspack.config.ts
+
+      - name: Build and package public webapp with Rspack
+        env:
+          WIRE_WEBAPP_BUILD_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+          WIRE_WEBAPP_BUILD_VERSION: ${{ steps.public_rspack_build.outputs.expected_version }}
+        run: |
+          npx just package-server-public
+
+      - name: Install unzip for artifact verification
+        run: |
+          apt-get update
+          apt-get install --yes --no-install-recommends unzip
+          rm -rf /var/lib/apt/lists/*
 
       - name: Verify public Rspack deployment package
         env:
           BUILD_ARTIFACT_PATH: apps/server/dist/s3/ebs.zip
           EXPECTED_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
-          EXPECTED_VERSION: ${{ steps.public_rspack_package.outputs.expected_version }}
+          EXPECTED_VERSION: ${{ steps.public_rspack_build.outputs.expected_version }}
         run: |
           set -euo pipefail
 
@@ -222,12 +240,6 @@ jobs:
             exit 1
           fi
 
-      - name: Install Chromium for Rspack smoke tests
-        run: ./bin/yarn exec playwright install --only-shell --with-deps chromium
-
-      - name: Run Rspack browser smoke tests
-        run: ./bin/yarn nx run webapp:smoke-rspack
-
       - name: Upload Rspack smoke diagnostics
         if: ${{ failure() }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -240,7 +252,7 @@ jobs:
           retention-days: 3
 
   type-check:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04-arm
     name: type check
     permissions:
       contents: read
@@ -252,23 +264,20 @@ jobs:
           persist-credentials: false
           fetch-depth: 1
 
-      - name: Add repository Yarn wrapper to PATH
-        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
-
       - name: Setup Node.js
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: ./bin/yarn --immutable
+        run: npm clean-install
 
       - name: Type check
-        run: ./bin/yarn type-check
+        run: npx just type-check
 
   lint-file-names:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04-arm
     name: lint file names
     permissions:
       contents: read
@@ -280,26 +289,26 @@ jobs:
           persist-credentials: false
           fetch-depth: 1
 
-      - name: Add repository Yarn wrapper to PATH
-        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
-
       - name: Setup Node.js
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: ./bin/yarn --immutable
+        run: npm clean-install
 
       - name: Lint file names
-        run: ./bin/yarn lint:fileNames
+        run: npx just lint-file-names
 
   lint:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04-arm
     name: lint
     permissions:
       contents: read
+    env:
+      # Pin the comparison to the target branch commit from the event, even if the branch advances.
+      BASE_REF: ${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha }}
 
     steps:
       - name: Checkout repository
@@ -307,32 +316,24 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 1
-          # Keep this shallow. Nx gets the base branch explicitly in the next step.
+          # Keep this shallow. Git-dependent checks get the base commit explicitly in the next step.
 
-      - name: Fetch base branch for Nx checks
-        if: ${{ github.event_name == 'pull_request' }}
-        env:
-          BASE_REF: ${{ github.base_ref }}
+      - name: Fetch base commit for Git-dependent checks
         run: |
-          git fetch --no-tags --depth=1 origin \
-            "${BASE_REF}:refs/remotes/origin/${BASE_REF}" \
-            "${BASE_REF}:${BASE_REF}"
-
-      - name: Add repository Yarn wrapper to PATH
-        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+          git fetch --no-tags --depth=1 origin "${BASE_REF:?Missing event base revision}"
 
       - name: Setup Node.js
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: ./bin/yarn --immutable
+        run: npm clean-install
 
       - name: Check code duplication
         id: duplication
-        run: ./bin/yarn lint:duplication
+        run: npx just lint-duplication
 
       - name: Upload duplication report
         if: ${{ !cancelled() && steps.duplication.outcome != 'skipped' }}
@@ -344,38 +345,19 @@ jobs:
           retention-days: 3
 
       - name: Build libraries for lint import resolution
-        run: ./bin/yarn nx run-many -t build --projects=tag:type:lib
+        run: npx just build-libraries
 
-      - name: Lint affected projects (ESLint)
-        if: ${{ github.event_name == 'pull_request' }}
-        env:
-          BASE_REF: ${{ github.base_ref }}
-        run: ./bin/yarn nx affected -t lint --base="origin/${BASE_REF}"
+      - name: Lint repository
+        run: npx just eslint
 
-      - name: Check formatting (Prettier)
-        if: ${{ github.event_name == 'pull_request' }}
-        env:
-          BASE_REF: ${{ github.base_ref }}
-        run: ./bin/yarn lint:format
+      - name: Check formatting
+        run: npx just format-check
 
       - name: Stylelint
-        if: ${{ github.event_name == 'pull_request' }}
-        run: ./bin/yarn stylelint
-
-      - name: Lint all projects (ESLint)
-        if: ${{ github.event_name != 'pull_request' }}
-        run: ./bin/yarn lint:projects
-
-      - name: Check formatting (Prettier)
-        if: ${{ github.event_name != 'pull_request' }}
-        run: ./bin/yarn lint:format
-
-      - name: Stylelint
-        if: ${{ github.event_name != 'pull_request' }}
-        run: ./bin/yarn stylelint
+        run: npx just stylesheet-lint
 
   unit-tests:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04-arm
     name: unit tests
     permissions:
       contents: read
@@ -387,20 +369,17 @@ jobs:
           persist-credentials: false
           fetch-depth: 1
 
-      - name: Add repository Yarn wrapper to PATH
-        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
-
       - name: Setup Node.js
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: ./bin/yarn --immutable
+        run: npm clean-install
 
       - name: Test
-        run: ./tools/ci/runWithNetworkIsolation.sh ./bin/yarn nx run-many -t test --all --configuration=ci --detectOpenHandles=false
+        run: ./tools/ci/runWithNetworkIsolation.sh npx just test-ci
 
       - name: Upload coverage reports
         if: always()
@@ -410,13 +389,13 @@ jobs:
           if-no-files-found: error
           retention-days: 1
           path: |
-            apps/webapp/coverage
-            apps/server/coverage
-            coverage/libraries/core
-            coverage/libraries/api-client
+            target/coverage/apps/webapp
+            target/coverage/apps/server
+            target/coverage/libraries/core
+            target/coverage/libraries/api-client
 
   public-production-package:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     name: Public production package verification
     if: ${{ github.event_name == 'pull_request' }}
     needs:
@@ -436,17 +415,14 @@ jobs:
           persist-credentials: false
           fetch-depth: 1
 
-      - name: Add repository Yarn wrapper to PATH
-        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
-
       - name: Setup Node.js
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: ./bin/yarn --immutable
+        run: npm clean-install
 
       - name: Build and verify public production package
         env:
@@ -455,9 +431,43 @@ jobs:
           short_commit_sha="${WIRE_WEBAPP_BUILD_COMMIT::7}"
           expected_version="dev-${short_commit_sha}"
           WIRE_WEBAPP_BUILD_VERSION="${expected_version}" \
-            ./bin/yarn build:prod:public
+            npm run build:prod:public
 
           BUILD_ARTIFACT_PATH=apps/server/dist/s3/ebs.zip \
           EXPECTED_COMMIT="${WIRE_WEBAPP_BUILD_COMMIT}" \
           EXPECTED_VERSION="${expected_version}" \
             node ./tools/buildArtifact/validateBuildArtifact.mts
+
+      - name: Build and smoke-test sparse production Docker context
+        env:
+          DOCKER_IMAGE_TAG: wire-webapp-production-ci:${{ github.run_id }}-${{ github.run_attempt }}
+          DISTRIBUTION_CONTEXT_PATH: ${{ runner.temp }}/production-docker-context
+        run: |
+          set -euo pipefail
+
+          mkdir -p \
+            "${DISTRIBUTION_CONTEXT_PATH}/apps/server" \
+            "${DISTRIBUTION_CONTEXT_PATH}/libraries/config"
+
+          cp -a package.json package-lock.json .npmrc run.sh .env.defaults "${DISTRIBUTION_CONTEXT_PATH}/"
+          cp -a apps/server/Dockerfile apps/server/package.json apps/server/dist "${DISTRIBUTION_CONTEXT_PATH}/apps/server/"
+          cp -a libraries/config/package.json libraries/config/lib "${DISTRIBUTION_CONTEXT_PATH}/libraries/config/"
+
+          docker build \
+            "${DISTRIBUTION_CONTEXT_PATH}" \
+            --file "${DISTRIBUTION_CONTEXT_PATH}/apps/server/Dockerfile" \
+            --tag "${DOCKER_IMAGE_TAG}"
+
+          docker run --rm --entrypoint sh "${DOCKER_IMAGE_TAG}" -c '
+            test -s /dist/index.js &&
+            test -s /dist/version.json &&
+            test -d /dist/static &&
+            test -s /app/run.sh &&
+            test -s /dist/.env.defaults &&
+            grep -q "^BACKEND_NAME=" /dist/.env.defaults &&
+            grep -q "^BRAND_NAME=" /dist/.env.defaults &&
+            grep -q "^URL_ACCOUNT_BASE=" /dist/.env.defaults &&
+            grep -q "^BACKEND_REST=" /dist/.env.defaults &&
+            grep -q "^BACKEND_WS=" /dist/.env.defaults &&
+            node -e "require(\"@wireapp/config\")"
+          '

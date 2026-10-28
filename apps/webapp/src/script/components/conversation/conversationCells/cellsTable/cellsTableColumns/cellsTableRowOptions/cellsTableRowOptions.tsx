@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useState} from 'react';
+import {useCallback, useState, type FunctionComponent} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
@@ -64,7 +64,7 @@ interface CellsTableRowOptionsProps {
   onCloseSearchView?: () => void;
 }
 
-export const CellsTableRowOptions = ({
+export const CellsTableRowOptions: FunctionComponent<CellsTableRowOptionsProps> = ({
   node,
   cellsRepository,
   conversationQualifiedId,
@@ -94,7 +94,7 @@ export const CellsTableRowOptions = ({
   );
 };
 
-const CellsTableRowOptionsContent = ({
+const CellsTableRowOptionsContent: FunctionComponent<CellsTableRowOptionsProps> = ({
   node,
   cellsRepository,
   conversationQualifiedId,

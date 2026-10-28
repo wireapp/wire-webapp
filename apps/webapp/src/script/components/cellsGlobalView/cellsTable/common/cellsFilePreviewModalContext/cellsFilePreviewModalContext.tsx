@@ -17,7 +17,7 @@
  *
  */
 
-import {createContext, ReactNode, useContext, useId, useMemo, useState} from 'react';
+import {createContext, ReactNode, useContext, useId, useMemo, useState, type FunctionComponent} from 'react';
 
 import {CellFile} from 'src/script/types/cellNode';
 
@@ -35,7 +35,9 @@ interface FilePreviewProviderProps {
   children: ReactNode;
 }
 
-export const FilePreviewProvider = ({children}: FilePreviewProviderProps) => {
+export const FilePreviewProvider: FunctionComponent<FilePreviewProviderProps> = ({
+  children,
+}: FilePreviewProviderProps) => {
   const [selectedFile, setSelectedFile] = useState<CellFile | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
 
@@ -59,7 +61,7 @@ export const FilePreviewProvider = ({children}: FilePreviewProviderProps) => {
   return <CellsFilePreviewModalContext.Provider value={value}>{children}</CellsFilePreviewModalContext.Provider>;
 };
 
-export const useCellsFilePreviewModal = () => {
+export const useCellsFilePreviewModal = (): CellsFilePreviewModalContextValue => {
   const context = useContext(CellsFilePreviewModalContext);
   if (context === null) {
     throw new Error('useCellsFilePreviewModal must be used within a CellsFilePreviewModalProvider');

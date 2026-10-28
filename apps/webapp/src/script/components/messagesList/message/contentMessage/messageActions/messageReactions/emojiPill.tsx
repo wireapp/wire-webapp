@@ -19,6 +19,7 @@
 
 import {useRef, useState} from 'react';
 
+import type {JSX} from '@emotion/react/jsx-runtime';
 import {isNan, isNonEmptyString} from '@sindresorhus/is';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {task} from 'true-myth';
@@ -81,7 +82,7 @@ export const EmojiPill = ({
   reactingUsers,
   reactorIds,
   loadUsersByIdsFromDb,
-}: EmojiPillProps) => {
+}: EmojiPillProps): false | JSX.Element => {
   const [storedReactingUsers, setStoredReactingUsers] = useState<User[]>([]);
   const isLoadingStoredUsers = useRef(false);
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
@@ -138,7 +139,7 @@ export const EmojiPill = ({
     }
   }
 
-  const conversationReactionCaption = () => {
+  const conversationReactionCaption = (): string => {
     if (emojiCount > MAX_USER_NAMES_TO_SHOW) {
       return translate(
         'conversationLikesCaptionPluralMoreThan2',

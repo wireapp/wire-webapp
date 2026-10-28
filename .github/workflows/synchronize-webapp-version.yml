@@ -1,3 +1,4 @@
+---
 name: Synchronize WebApp version
 
 on:
@@ -23,7 +24,7 @@ permissions: {}
 jobs:
   synchronize:
     name: Synchronize stable package version
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     steps:
@@ -46,19 +47,14 @@ jobs:
           fetch-tags: true
           ref: refs/heads/main
 
-      - name: Add repository Yarn wrapper to PATH
-        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
-
       - name: Setup Node.js
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: Install synchronization dependencies
-        env:
-          YARN_ENABLE_SCRIPTS: 'false'
-        run: ./bin/yarn install --immutable --mode=skip-build
+        run: npm run ci:install
 
       - name: Validate annotated stable Production tag
         id: production_tag

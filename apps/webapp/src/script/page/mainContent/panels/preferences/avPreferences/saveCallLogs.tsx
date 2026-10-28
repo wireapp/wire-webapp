@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {container} from 'tsyringe';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
@@ -38,10 +40,13 @@ interface SaveCallLogsProps {
 
 const OBFUSCATION_TRUNCATE_TO = 4;
 
-const SaveCallLogs = ({callingRepository, userState = container.resolve(UserState)}: SaveCallLogsProps) => {
+const SaveCallLogs: FunctionComponent<SaveCallLogsProps> = ({
+  callingRepository,
+  userState = container.resolve(UserState),
+}: SaveCallLogsProps) => {
   const {translate} = useApplicationContext();
   const brandName = Config.getConfig().BRAND_NAME;
-  const saveCallLogs = () => {
+  const saveCallLogs = (): void => {
     const messageLog = callingRepository.getCallLog();
     if (messageLog !== undefined) {
       const selfUser = userState.self();

@@ -17,9 +17,11 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {VideoAssetPlaceholder} from '../common/videoAssetPlaceholder/videoAssetPlaceholder';
 
-export const VideoAssetLoading = () => {
+export const VideoAssetLoading: FunctionComponent = () => {
   return (
     <VideoAssetPlaceholder>
       <div className="loading-dots" />

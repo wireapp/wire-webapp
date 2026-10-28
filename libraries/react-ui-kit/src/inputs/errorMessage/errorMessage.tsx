@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {CSSObject} from '@emotion/react';
 
 import {COLOR_V2} from '../../identity';
@@ -40,11 +42,11 @@ export const errorMessageStyle: <T>(theme: Theme, props: ErrorMessageProps<T>) =
   };
 };
 
-export const filterErrorMessageProps = (props: ErrorMessageProps) => {
+export const filterErrorMessageProps = (props: ErrorMessageProps): Object => {
   return filterProps(filterFlexBoxProps(props) as ErrorMessageProps, []);
 };
 
-export const ErrorMessage = ({children, ...props}: ErrorMessageProps) => {
+export const ErrorMessage: FunctionComponent<ErrorMessageProps> = ({children, ...props}) => {
   return (
     <FlexBox
       css={(theme: Theme) => {

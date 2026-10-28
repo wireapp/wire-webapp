@@ -17,7 +17,7 @@
  *
  */
 
-import {useMemo} from 'react';
+import {useMemo, type FunctionComponent} from 'react';
 
 import {CSSObject, useTheme} from '@emotion/react';
 import {isNonEmptyString} from '@sindresorhus/is';
@@ -65,7 +65,7 @@ export interface ComboboxSelectProps {
   closeMenuOnSelect?: boolean;
 }
 
-export const ComboboxSelect = ({
+export const ComboboxSelect: FunctionComponent<ComboboxSelectProps> = ({
   id,
   options,
   value,
@@ -85,7 +85,7 @@ export const ComboboxSelect = ({
   isLoading = false,
   loadingMessage,
   closeMenuOnSelect = true,
-}: ComboboxSelectProps) => {
+}) => {
   return (
     <div css={wrapperStyles} data-uie-name={dataUieName}>
       {isNonEmptyString(label) && (
@@ -115,7 +115,7 @@ export const ComboboxSelect = ({
   );
 };
 
-const Select = ({
+const Select: FunctionComponent<ComboboxSelectProps & {creatable?: boolean}> = ({
   id,
   options,
   value,
@@ -132,10 +132,10 @@ const Select = ({
   loadingMessage,
   creatable = false,
   closeMenuOnSelect = true,
-}: ComboboxSelectProps & {creatable?: boolean}) => {
+}) => {
   const theme = useTheme() as Theme;
 
-  const handleChange = (newValue: MultiValue<ComboboxSelectOption>) => {
+  const handleChange = (newValue: MultiValue<ComboboxSelectOption>): void => {
     onChange?.([...newValue]);
   };
 
@@ -203,7 +203,7 @@ const Select = ({
   );
 };
 
-const MultiValueRemove = (props: MultiValueRemoveProps<ComboboxSelectOption, true>) => {
+const MultiValueRemove: FunctionComponent<MultiValueRemoveProps<ComboboxSelectOption, true>> = props => {
   return (
     <components.MultiValueRemove {...props}>
       <CloseIcon width={10} height={10} />
@@ -211,7 +211,10 @@ const MultiValueRemove = (props: MultiValueRemoveProps<ComboboxSelectOption, tru
   );
 };
 
-const NoOptionsMessage = ({message, ...props}: NoticeProps<ComboboxSelectOption, true> & {message: string}) => {
+const NoOptionsMessage: FunctionComponent<NoticeProps<ComboboxSelectOption, true> & {message: string}> = ({
+  message,
+  ...props
+}) => {
   return (
     <components.NoOptionsMessage {...props}>
       <div css={noOptionsMessageStyles}>{message}</div>
@@ -219,7 +222,10 @@ const NoOptionsMessage = ({message, ...props}: NoticeProps<ComboboxSelectOption,
   );
 };
 
-const LoadingMessage = ({message, ...props}: NoticeProps<ComboboxSelectOption, true> & {message: string}) => {
+const LoadingMessage: FunctionComponent<NoticeProps<ComboboxSelectOption, true> & {message: string}> = ({
+  message,
+  ...props
+}) => {
   return (
     <components.LoadingMessage {...props}>
       <div css={loadingMessageStyles}>{message}</div>

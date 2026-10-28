@@ -63,7 +63,13 @@ interface CellsSortingState {
 
 const DEFAULT_SCOPE_KEY = 'default';
 
-export const useCellsSorting = (scopeKey = DEFAULT_SCOPE_KEY, displayedSort?: CellsSort) => {
+type UseCellsSortingResult = {
+  sort: CellsSort | null;
+  setSort: (nextSort: CellsSort | null) => void;
+  toggleSort: (field: CellsSortField) => void;
+  getDirectionFor: (field: CellsSortField) => CellsSortDirection | undefined;
+};
+export const useCellsSorting = (scopeKey = DEFAULT_SCOPE_KEY, displayedSort?: CellsSort): UseCellsSortingResult => {
   const [state, setSortState] = useState<CellsSortingState>({scopeKey, sort: null});
 
   // Scope changes must clear synchronously so request hooks never receive a stale sort.

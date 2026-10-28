@@ -17,7 +17,7 @@
  *
  */
 
-import {UIEvent} from 'react';
+import {UIEvent, type FunctionComponent} from 'react';
 
 import {css, SerializedStyles} from '@emotion/react';
 
@@ -30,8 +30,13 @@ interface DeviceToggleButtonProps {
   styles?: SerializedStyles;
 }
 
-const DeviceToggleButton = ({currentDevice, devices, onChooseDevice, styles}: DeviceToggleButtonProps) => {
-  const selectNextDevice = (event: UIEvent) => {
+const DeviceToggleButton: FunctionComponent<DeviceToggleButtonProps> = ({
+  currentDevice,
+  devices,
+  onChooseDevice,
+  styles,
+}: DeviceToggleButtonProps) => {
+  const selectNextDevice = (event: UIEvent): void => {
     event.preventDefault();
     event.stopPropagation();
     const currentDeviceIndex = devices.indexOf(currentDevice);

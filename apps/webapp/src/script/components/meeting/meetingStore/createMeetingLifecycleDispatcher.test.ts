@@ -26,7 +26,7 @@ import {createMeetingLifecycleDispatcher} from './createMeetingLifecycleDispatch
 import type {MeetingLifecycleDispatcherDependencies} from './createMeetingLifecycleDispatcher';
 import {syncMeetingErrors} from './createMeetingStore';
 
-const flushPendingWork = () => {
+const flushPendingWork = (): Promise<void> => {
   return Promise.resolve();
 };
 

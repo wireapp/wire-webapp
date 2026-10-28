@@ -64,7 +64,7 @@ export const useLoadMoreMeetingListItems = ({
 
     let timeoutId: ReturnType<Clock['setTimeout']> | undefined;
 
-    const handleScroll = () => {
+    const handleScroll = (): void => {
       if (timeoutId !== undefined) {
         clock.clearTimeout(timeoutId);
       }

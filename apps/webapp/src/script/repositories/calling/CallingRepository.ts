@@ -25,7 +25,10 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import type {WebappProperties} from '@wireapp/api-client/lib/user/data';
 import {MessageSendingState} from '@wireapp/core/lib/conversation';
 import {flattenUserMap} from '@wireapp/core/lib/conversation/message/userClientsUtil';
-import {SubconversationEpochInfoMember} from '@wireapp/core/lib/conversation/subconversationService/subconversationService';
+import {
+  SubconversationEpochInfoMember,
+  SubconversationService,
+} from '@wireapp/core/lib/conversation/subconversationService/subconversationService';
 import {TaskScheduler} from '@wireapp/core/lib/util';
 import {constructFullyQualifiedClientId} from '@wireapp/core/lib/util/fullyQualifiedClientIdUtils';
 import {amplify} from 'amplify';
@@ -59,9 +62,9 @@ import {AvsDebugger} from '@wireapp/avs-debugger';
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {showNoAudioInputModal, showNoCameraModal} from 'Components/calling/devicePermissionModals';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import type {PrimaryModalTranslatedMessage} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 import {CALL_QUALITY_FEEDBACK_KEY} from 'Components/Modals/QualityFeedbackModal/constants';
 import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
 import {useActiveWindowState} from 'Hooks/useActiveWindow';
@@ -124,6 +127,23 @@ import {Core} from '../../service/coreSingleton';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
 import {Warnings} from '../../view_model/WarningsContainer';
 
+type DetachedExternalLinksCleanup = () => void;
+type CallingRepositoryConfig = {
+  DEFAULT_CONFIG_TTL: number;
+  MAX_FIREFOX_TURN_COUNT: number;
+};
+type CallingStats = {
+  stats: RTCStatsReport;
+  userid: string;
+};
+type AvsInstances = {wCall: Wcall; wUser: number};
+type ModalFocusCallback = () => void;
+type ModalFocusRestoration = (additionalCallback?: ModalFocusCallback) => ModalFocusCallback;
+type ModalContainerAndRestoreFocus = {
+  container: HTMLElement | undefined;
+  restoreFocusCallback: ModalFocusRestoration;
+};
+
 const emojiTimeoutInSeconds = 4;
 const secondsPerMinute = 60;
 const minutesPerHour = 60;
@@ -178,12 +198,15 @@ type SubconversationData = {
   members: SubconversationEpochInfoMember[];
 };
 
-export const setupDetachedWindowExternalLinksClick = (detachedWindow: Window, openerWindow: Window) => {
+export const setupDetachedWindowExternalLinksClick = (
+  detachedWindow: Window,
+  openerWindow: Window,
+): DetachedExternalLinksCleanup => {
   if (!Runtime.isDesktopApp()) {
     return noop;
   }
 
-  const handleClick = (event: MouseEvent) => {
+  const handleClick = (event: MouseEvent): void => {
     const anchor = (event.target as HTMLElement).closest('a');
     if (anchor?.target === '_blank' && isNonEmptyString(anchor.href)) {
       event.preventDefault();
@@ -197,15 +220,22 @@ export const setupDetachedWindowExternalLinksClick = (detachedWindow: Window, op
   };
 };
 
-function getEffectiveCallingConfig(callingConfig: CallConfigData, useRustSft: boolean): CallConfigData {
-  if (!useRustSft) {
+function getEffectiveCallingConfig(callingConfig: CallConfigData, useStagingSft: boolean): CallConfigData {
+  if (!useStagingSft) {
     return callingConfig;
   }
 
   return {
     ...callingConfig,
-    sft_servers: [{urls: ['https://rust-sft.stars.wire.link']}],
-    sft_servers_all: [{urls: ['https://rust-sft.stars.wire.link']}],
+    sft_servers: [{urls: ['https://sft.calling-staging-v01.zinfra.io']}],
+    sft_servers_all: [
+      {
+        urls: [
+          'https://sft.calling-staging-v01.zinfra.io/sfts/sftd-0',
+          'https://sft.calling-staging-v01.zinfra.io/sfts/sftd-1',
+        ],
+      },
+    ],
   };
 }
 
@@ -232,7 +262,7 @@ export class CallingRepository {
   private wUser: number = 0;
   private nextMuteState: MuteState = MuteState.SELF_MUTED;
   private isConferenceCallingSupported = false;
-  private isOnAvsRustSft = false;
+  private isOnAvsStagingSft = false;
   private allowedSftOrigins: ReadonlySet<string> = new Set();
   private readonly incomingSetupReceivedAtByConversation = new Map<SerializedConversationId, number>();
 
@@ -246,7 +276,7 @@ export class CallingRepository {
 
   onChooseScreen: (deviceId: string) => void;
 
-  static get CONFIG() {
+  static get CONFIG(): CallingRepositoryConfig {
     return {
       DEFAULT_CONFIG_TTL: secondsPerMinute * minutesPerHour, // 60 minutes in seconds
       MAX_FIREFOX_TURN_COUNT: 3,
@@ -380,7 +410,7 @@ export class CallingRepository {
     });
   }
 
-  get subconversationService() {
+  get subconversationService(): SubconversationService {
     const subconversationService = this.core.service?.subconversation;
     if (isUndefined(subconversationService)) {
       throw new Error('SubconversationService was not initialised');
@@ -432,7 +462,7 @@ export class CallingRepository {
     await this.applyCurrentBackgroundEffectOnSelfParticipant(originalVideoStream, true);
   }
 
-  public setBackgroundEffectsQualityTier(quality: BackgroundEffectsQuality) {
+  public setBackgroundEffectsQualityTier(quality: BackgroundEffectsQuality): void {
     this.backgroundEffectsHandler.setQualityTier(quality);
   }
 
@@ -545,15 +575,15 @@ export class CallingRepository {
     return media.stream;
   }
 
-  getStats(conversationId: QualifiedId) {
+  getStats(conversationId: QualifiedId): Promise<CallingStats[]> | undefined {
     return this.wCall?.getStats(this.serializeQualifiedId(conversationId));
   }
 
-  setSoftLock(value: boolean) {
+  setSoftLock(value: boolean): void {
     this.isSoftLock = value;
   }
 
-  async initAvs(selfUser: User, clientId: ClientId): Promise<{wCall: Wcall; wUser: number}> {
+  async initAvs(selfUser: User, clientId: ClientId): Promise<AvsInstances> {
     this.selfUser = selfUser;
     this.selfClientId = clientId;
     const callingInstance = await getAvsInstance();
@@ -566,7 +596,7 @@ export class CallingRepository {
     return {wCall: this.wCall, wUser: this.wUser};
   }
 
-  private onMediaDevicesRefresh = () => {
+  private onMediaDevicesRefresh = (): void => {
     const activeCall = this.callState.joinedCall();
 
     if (isUndefined(activeCall)) {
@@ -627,7 +657,7 @@ export class CallingRepository {
     return wCall;
   }
 
-  private readonly avsLogHandler = (level: LOG_LEVEL, message: string, error: Error | unknown) => {
+  private readonly avsLogHandler = (level: LOG_LEVEL, message: string, error: Error | unknown): void => {
     const logLevels: Record<LOG_LEVEL, string> = {
       [LOG_LEVEL.DEBUG]: 'DEBUG',
       [LOG_LEVEL.INFO]: 'INFO ',
@@ -685,7 +715,7 @@ export class CallingRepository {
     return wUser;
   }
 
-  private readonly handleMissedCall = (conversationId: string, timestamp: number, userId: string) => {
+  private readonly handleMissedCall = (conversationId: string, timestamp: number, userId: string): void => {
     const callDuration = 0;
     this.injectDeactivateEvent(
       this.parseQualifiedId(conversationId),
@@ -697,7 +727,7 @@ export class CallingRepository {
     );
   };
 
-  private readonly updateMuteState = (isMuted: number) => {
+  private readonly updateMuteState = (isMuted: number): void => {
     const activeStates = [CALL_STATE.MEDIA_ESTAB, CALL_STATE.ANSWERED, CALL_STATE.OUTGOING];
     const activeCall = this.callState.calls().find(call => {
       return activeStates.includes(call.state());
@@ -709,7 +739,10 @@ export class CallingRepository {
     return isMLSConversation(conversation) && this.getConversationType(conversation) === CONV_TYPE.CONFERENCE_MLS;
   };
 
-  public async pushClients(call: Call | undefined = this.callState.joinedCall(), checkMismatch?: boolean) {
+  public async pushClients(
+    call: Call | undefined = this.callState.joinedCall(),
+    checkMismatch?: boolean,
+  ): Promise<boolean | undefined> {
     if (isUndefined(call)) {
       return false;
     }
@@ -755,7 +788,7 @@ export class CallingRepository {
     userId: string,
     clientId: string,
     qualityInfoJson: string,
-  ) => {
+  ): void => {
     let qualityInfo: NetworkQualityInfo;
 
     try {
@@ -1066,7 +1099,7 @@ export class CallingRepository {
     this.leaveCall(conversationId, reason);
   }
 
-  private warnOutdatedClient(conversationId: QualifiedId) {
+  private warnOutdatedClient(conversationId: QualifiedId): void {
     const brandName = Config.getConfig().BRAND_NAME;
     const {container, restoreFocusCallback} = this.getModalContainerAndRestoreFocusCallback();
 
@@ -1303,7 +1336,7 @@ export class CallingRepository {
     } = event;
     const contentStr = JSON.stringify(content);
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const toSecond = (timestamp: number) => {
+    const toSecond = (timestamp: number): number => {
       return Math.floor(timestamp / millisecondsPerSecond);
     };
 
@@ -1413,7 +1446,7 @@ export class CallingRepository {
       );
       this.storeCall(call);
 
-      // Temporary feature to toggle Rust SFT
+      // Temporary feature to toggle Staging SFT
       this.setSetupSftConfig(call);
 
       // Microphone access is required to start a call. Camera failures stay separate:
@@ -1485,22 +1518,22 @@ export class CallingRepository {
   }
 
   /**
-   * We're fetching Rust SFT config in case user wants to use them.
+   * We're fetching Staging SFT config in case user wants to use them.
    * We also use a cache value to avoid unnecessarily fetching the config.
    */
-  private setSetupSftConfig(call: Call) {
-    if (call.useAvsRustSFT()) {
-      if (!this.isOnAvsRustSft) {
-        this.isOnAvsRustSft = true;
+  private setSetupSftConfig(call: Call): void {
+    if (call.useAvsStagingSFT()) {
+      if (!this.isOnAvsStagingSft) {
+        this.isOnAvsStagingSft = true;
         this.requestConfig();
-        this.logger.info('SetupSftConfig: Switch SFT setup use Rust SFT: false->true');
+        this.logger.info('SetupSftConfig: Switch SFT setup use Staging SFT: false->true');
       }
-    } else if (this.isOnAvsRustSft) {
-      this.isOnAvsRustSft = false;
+    } else if (this.isOnAvsStagingSft) {
+      this.isOnAvsStagingSft = false;
       this.requestConfig();
-      this.logger.info('SetupSftConfig: Switch SFT setup use Rust SFT: true->false');
+      this.logger.info('SetupSftConfig: Switch SFT setup use Staging SFT: true->false');
     }
-    this.logger.info('SetupSftConfig: Use Rust SFT', this.isOnAvsRustSft);
+    this.logger.info('SetupSftConfig: Use Staging SFT', this.isOnAvsStagingSft);
   }
 
   private serializeQualifiedId(id: QualifiedId): string {
@@ -1699,7 +1732,7 @@ export class CallingRepository {
     this.wCall?.setVideoSendState(this.wUser, this.serializeQualifiedId(conversation.qualifiedId), VIDEO_STATE.STOPPED);
   }
 
-  onPageHide = (event: PageTransitionEvent) => {
+  onPageHide = (event: PageTransitionEvent): void => {
     if (event.persisted) {
       return;
     }
@@ -1707,14 +1740,14 @@ export class CallingRepository {
     this.callState.detachedWindow()?.close();
   };
 
-  handleThemeUpdateEvent = () => {
+  handleThemeUpdateEvent = (): void => {
     const detachedWindow = this.callState.detachedWindow();
     if (!isNullOrUndefined(detachedWindow)) {
       detachedWindow.document.body.className = window.document.body.className;
     }
   };
 
-  closeDetachedWindow = () => {
+  closeDetachedWindow = (): void => {
     this.callState.detachedWindow(null);
     this.callState.detachedWindowCallQualifiedId(null);
     amplify.unsubscribe(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, this.handleThemeUpdateEvent);
@@ -1731,7 +1764,7 @@ export class CallingRepository {
     }
   };
 
-  setViewModeMinimized = () => {
+  setViewModeMinimized = (): void => {
     const isDetachedWindowSupported = isDetachedCallingFeatureEnabled();
 
     if (!isDetachedWindowSupported) {
@@ -1743,7 +1776,7 @@ export class CallingRepository {
     this.closeDetachedWindow();
   };
 
-  setViewModeFullScreen = () => {
+  setViewModeFullScreen = (): void => {
     this.callState.viewMode(CallingViewMode.FULL_SCREEN);
   };
 
@@ -1753,7 +1786,7 @@ export class CallingRepository {
       width: 1026,
       height: 829,
     },
-  ) {
+  ): Promise<void> {
     if (!isDetachedCallingFeatureEnabled()) {
       this.setViewModeFullScreen();
       return;
@@ -1809,7 +1842,7 @@ export class CallingRepository {
   async answerCall(call: Call, callType?: CALL_TYPE, media?: CallMediaChoice): Promise<void> {
     void this.setViewModeMinimized();
 
-    // Temporary feature to toggle Rust SFT
+    // Temporary feature to toggle Staging SFT
     this.setSetupSftConfig(call);
 
     const {conversation} = call;
@@ -1912,7 +1945,7 @@ export class CallingRepository {
     return this.conversationState.findConversation(conversationId);
   }
 
-  private readonly leave1on1MLSConference = async (conversationId: QualifiedId) => {
+  private readonly leave1on1MLSConference = async (conversationId: QualifiedId): Promise<void> => {
     const call = this.findCall(conversationId);
     call?.endedAt(Date.now());
     if (isTelemetryEnabledAtCurrentEnvironment()) {
@@ -1929,7 +1962,7 @@ export class CallingRepository {
     AvsDebugger.reset();
   };
 
-  private readonly leaveMLSConference = async (conversationId: QualifiedId) => {
+  private readonly leaveMLSConference = async (conversationId: QualifiedId): Promise<void> => {
     const serializeSelfUser = isNullOrUndefined(this.selfUser) ? 'unknown' : this.serializeQualifiedId(this.selfUser);
     const serializeConversationId = this.serializeQualifiedId(conversationId);
 
@@ -1937,7 +1970,7 @@ export class CallingRepository {
     await this.subconversationService.leaveConferenceSubconversation(conversationId);
   };
 
-  private readonly leaveMLSConferenceBecauseError = async (conversationId: QualifiedId) => {
+  private readonly leaveMLSConferenceBecauseError = async (conversationId: QualifiedId): Promise<void> => {
     const call = this.findCall(conversationId);
     if (call !== undefined) {
       call.epochCache.clean();
@@ -1947,7 +1980,10 @@ export class CallingRepository {
     callingSubscriptions.removeCall(conversationId);
   };
 
-  private readonly joinMlsConferenceSubconversation = async ({qualifiedId, groupId}: MLSConversation) => {
+  private readonly joinMlsConferenceSubconversation = async ({
+    qualifiedId,
+    groupId,
+  }: MLSConversation): Promise<void> => {
     const serializeSelfUser = isNullOrUndefined(this.selfUser) ? 'unknown' : this.serializeQualifiedId(this.selfUser);
     const serializeConversationId = this.serializeQualifiedId(qualifiedId);
 
@@ -1969,7 +2005,7 @@ export class CallingRepository {
     this.logger.info(`Call Epoch Info: _join, user: ${serializeSelfUser}, conversation: ${serializeConversationId}`);
   };
 
-  private readonly updateConferenceSubconversationEpoch = async (conversationId: QualifiedId) => {
+  private readonly updateConferenceSubconversationEpoch = async (conversationId: QualifiedId): Promise<void> => {
     const conversation = this.getConversationById(conversationId);
     if (isUndefined(conversation) || !this.isMLSConference(conversation)) {
       return;
@@ -1992,7 +2028,10 @@ export class CallingRepository {
     this.setEpochInfo(conversationId, subconversationEpochInfo);
   };
 
-  private readonly handleCallParticipantChange = (conversationId: QualifiedId, members: QualifiedWcallMember[]) => {
+  private readonly handleCallParticipantChange = (
+    conversationId: QualifiedId,
+    members: QualifiedWcallMember[],
+  ): void => {
     const conversation = this.getConversationById(conversationId);
     if (isUndefined(conversation) || !this.isMLSConference(conversation)) {
       return;
@@ -2045,7 +2084,7 @@ export class CallingRepository {
     }
   };
 
-  private setCachedEpochInfos(call: Call) {
+  private setCachedEpochInfos(call: Call): void {
     call.epochCache.disable();
     const userId = isNullOrUndefined(this.selfUser) ? 'unknown' : this.serializeQualifiedId(this.selfUser.qualifiedId);
     this.logger.info(
@@ -2066,7 +2105,10 @@ export class CallingRepository {
     call.epochCache.clean();
   }
 
-  private readonly setEpochInfo = (conversationId: QualifiedId, subconversationData: SubconversationData) => {
+  private readonly setEpochInfo = (
+    conversationId: QualifiedId,
+    subconversationData: SubconversationData,
+  ): number | undefined => {
     const serializedConversationId = this.serializeQualifiedId(conversationId);
     const userId = isNullOrUndefined(this.selfUser) ? 'unknown' : this.serializeQualifiedId(this.selfUser.qualifiedId);
     const {epoch, secretKey, members} = subconversationData;
@@ -2121,7 +2163,7 @@ export class CallingRepository {
     this.requestVideoStreams(call.conversation.qualifiedId, currentPageParticipants, videoQuality);
   }
 
-  requestVideoStreams(conversationId: QualifiedId, participants: Participant[], videoQuality: RESOLUTION) {
+  requestVideoStreams(conversationId: QualifiedId, participants: Participant[], videoQuality: RESOLUTION): void {
     if (participants.length === 0) {
       return;
     }
@@ -2148,7 +2190,7 @@ export class CallingRepository {
     this.wCall?.requestVideoStreams(this.wUser, convId, VSTREAMS.LIST, JSON.stringify(payload));
   }
 
-  readonly showCallQualityFeedbackModal = (conversationId: QualifiedId) => {
+  readonly showCallQualityFeedbackModal = (conversationId: QualifiedId): void => {
     if (isNullOrUndefined(this.selfUser) || !this.hasActiveCall()) {
       return;
     }
@@ -2239,7 +2281,7 @@ export class CallingRepository {
     call.muteState(microphoneEnabled ? MuteState.NOT_MUTED : MuteState.SELF_MUTED);
   }
 
-  private readonly setAvsVersion = (version: number) => {
+  private readonly setAvsVersion = (version: number): void => {
     this.avsVersion = version;
   };
 
@@ -2360,7 +2402,7 @@ export class CallingRepository {
     }
   }
 
-  public async refreshVideoInput() {
+  public async refreshVideoInput(): Promise<void | MediaStream> {
     const activeCallBeforeRefresh = this.callState.joinedCall();
     const isGroupOrConference = activeCallBeforeRefresh?.isGroupOrConference ?? false;
     const stream = await this.mediaStreamHandler.requestMediaStream(false, true, false, isGroupOrConference);
@@ -2378,14 +2420,14 @@ export class CallingRepository {
     return this.changeMediaSource(stream, MediaType.VIDEO);
   }
 
-  public async refreshAudioInput() {
+  public async refreshAudioInput(): Promise<MediaStream> {
     const stream = await this.mediaStreamHandler.requestMediaStream(true, false, false, false);
     this.stopMediaSource(MediaType.AUDIO);
     this.changeMediaSource(stream, MediaType.AUDIO);
     return stream;
   }
 
-  public refreshAudioOutput() {
+  public refreshAudioOutput(): void {
     const activeCall = this.callState.joinedCall();
     if (isUndefined(activeCall)) {
       return;
@@ -2578,17 +2620,17 @@ export class CallingRepository {
     }, {} as QualifiedUserClients);
   };
 
-  readonly sendInCallEmoji = async (emojis: string, call: Call) => {
+  readonly sendInCallEmoji = async (emojis: string, call: Call): Promise<void> => {
     void this.messageRepository.sendInCallEmoji(call.conversation, {
       [emojis]: 1,
     });
   };
 
-  readonly sendInCallHandRaised = async (isHandUp: boolean, call: Call) => {
+  readonly sendInCallHandRaised = async (isHandUp: boolean, call: Call): Promise<void> => {
     void this.messageRepository.sendInCallHandRaised(call.conversation, isHandUp);
   };
 
-  readonly sendModeratorMute = (conversationId: QualifiedId, participants: Participant[]) => {
+  readonly sendModeratorMute = (conversationId: QualifiedId, participants: Participant[]): void => {
     const recipients = this.convertParticipantsToCallingMessageRecepients(participants);
     void this.sendCallingMessage(
       conversationId,
@@ -2597,13 +2639,13 @@ export class CallingRepository {
     );
   };
 
-  readonly sendModeratorKick = (conversationId: QualifiedId, participants: Participant[]) => {
+  readonly sendModeratorKick = (conversationId: QualifiedId, participants: Participant[]): void => {
     const recipients = this.convertParticipantsToCallingMessageRecepients(participants);
     void this.sendCallingMessage(conversationId, {type: CALL_MESSAGE_TYPE.REMOTE_KICK}, {nativePush: true, recipients});
   };
 
   private readonly sendSFTRequest: SFTRequestCallback = (context, url, data) => {
-    const _sendSFTRequest = async () => {
+    const _sendSFTRequest = async (): Promise<void> => {
       if (!isAllowedSftUrl(url, this.allowedSftOrigins)) {
         throw new Error('SFT request destination is not allowed');
       }
@@ -2631,12 +2673,12 @@ export class CallingRepository {
     return 0;
   };
 
-  private readonly requestConfig = () => {
-    const useRustSft = this.isOnAvsRustSft;
-    const _requestConfig = async () => {
+  private readonly requestConfig = (): number => {
+    const useStagingSft = this.isOnAvsStagingSft;
+    const _requestConfig = async (): Promise<void> => {
       const limit = Runtime.isFirefox() ? CallingRepository.CONFIG.MAX_FIREFOX_TURN_COUNT : undefined;
       const config = await this.fetchConfig(limit);
-      const effectiveConfig = getEffectiveCallingConfig(config, useRustSft);
+      const effectiveConfig = getEffectiveCallingConfig(config, useStagingSft);
 
       const serializedConfig = JSON.stringify(effectiveConfig);
       this.allowedSftOrigins = getAllowedSftOrigins(effectiveConfig);
@@ -2650,7 +2692,7 @@ export class CallingRepository {
     return 0;
   };
 
-  private readonly callClosed = async (reason: REASON, convId: SerializedConversationId) => {
+  private readonly callClosed = async (reason: REASON, convId: SerializedConversationId): Promise<void> => {
     Warnings.hideWarning(Warnings.TYPE.CALL_QUALITY_POOR);
     const conversationId = this.parseQualifiedId(convId);
     const call = this.findCall(conversationId);
@@ -2802,7 +2844,7 @@ export class CallingRepository {
     hasVideo: number,
     shouldRing: number,
     conversationType: CONV_TYPE,
-  ) => {
+  ): void => {
     const qualifiedUserId = this.parseQualifiedId(userId);
     const conversationId = this.parseQualifiedId(convId);
     const conversation = this.getConversationById(conversationId);
@@ -2877,7 +2919,7 @@ export class CallingRepository {
     this.sendCallingEvent(EventName.CALLING.RECEIVED_CALL, call);
   };
 
-  private readonly updateCallState = (convId: SerializedConversationId, state: CALL_STATE) => {
+  private readonly updateCallState = (convId: SerializedConversationId, state: CALL_STATE): void => {
     const call = this.findCall(this.parseQualifiedId(convId));
     if (isUndefined(call)) {
       this.logger.warn(`received state for call in conversation '${convId}' but no stored call found`);
@@ -2963,7 +3005,7 @@ export class CallingRepository {
     this.changeCallPage(call, call.currentPage());
   }
 
-  private readonly handleCallParticipantChanges = (convId: SerializedConversationId, membersJson: string) => {
+  private readonly handleCallParticipantChanges = (convId: SerializedConversationId, membersJson: string): void => {
     const conversationId = this.parseQualifiedId(convId);
     const call = this.findCall(conversationId);
 
@@ -2990,7 +3032,7 @@ export class CallingRepository {
   private readonly handleOneToOneMlsCallParticipantLeave = (
     conversationId: QualifiedId,
     members: QualifiedWcallMember[],
-  ) => {
+  ): void => {
     const conversation = this.getConversationById(conversationId);
     const call = this.findCall(conversationId);
 
@@ -3031,7 +3073,7 @@ export class CallingRepository {
     }
   };
 
-  private readonly requestClients = async (wUser: number, convId: SerializedConversationId) => {
+  private readonly requestClients = async (wUser: number, convId: SerializedConversationId): Promise<void> => {
     const call = this.findCall(this.parseQualifiedId(convId));
     if (isUndefined(call)) {
       this.logger.warn(`Unable to find a call for the conversation id of ${convId}`);
@@ -3056,7 +3098,7 @@ export class CallingRepository {
     await this.pushClients(call);
   };
 
-  private readonly requestNewEpoch = async (_wUser: number, convId: SerializedConversationId) => {
+  private readonly requestNewEpoch = async (_wUser: number, convId: SerializedConversationId): Promise<void> => {
     const qualifiedConversationId = this.parseQualifiedId(convId);
     return this.updateConferenceSubconversationEpoch(qualifiedConversationId);
   };
@@ -3100,7 +3142,7 @@ export class CallingRepository {
     }
   };
 
-  private readonly updateActiveSpeakers = (wuser: number, convId: string, rawJson: string) => {
+  private readonly updateActiveSpeakers = (wuser: number, convId: string, rawJson: string): void => {
     const call = this.findCall(this.parseQualifiedId(convId));
     const activeSpeakers: ActiveSpeakers = JSON.parse(rawJson);
     if (!isUndefined(call) && isTruthy(activeSpeakers)) {
@@ -3180,7 +3222,7 @@ export class CallingRepository {
     }
   };
 
-  private readonly audioCbrChanged = (userid: UserId, clientid: ClientId, enabled: number) => {
+  private readonly audioCbrChanged = (userid: UserId, clientid: ClientId, enabled: number): void => {
     const activeCall = this.callState.calls()[0];
     if (!isUndefined(activeCall) && !Config.getConfig().FEATURE.ENFORCE_CONSTANT_BITRATE) {
       activeCall.isCbrEnabled(enabled !== 0 && !isNan(enabled));
@@ -3192,7 +3234,7 @@ export class CallingRepository {
     userid: UserId,
     clientId: ClientId,
     state: VIDEO_STATE,
-  ) => {
+  ): void => {
     const call = this.findCall(this.parseQualifiedId(convId));
     const userId = this.parseQualifiedId(userid);
     if (isUndefined(call)) {
@@ -3243,7 +3285,7 @@ export class CallingRepository {
       });
   };
 
-  private readonly metricsReceived = (metricName: string, metrics: string) => {
+  private readonly metricsReceived = (metricName: string, metrics: string): void => {
     this.logger.info('Calling metrics:', metrics);
   };
 
@@ -3251,7 +3293,7 @@ export class CallingRepository {
     eventName: string,
     call: Call,
     customSegmentations: Record<string, any> = {},
-  ) => {
+  ): void => {
     const {conversation} = call;
     const participants = conversation.participating_user_ets();
     const selfUserTeamId = call.getSelfParticipant().user.id;
@@ -3307,69 +3349,14 @@ export class CallingRepository {
     return this.apiClient.api.account.getCallConfig(limit);
   }
 
-  private showNoAudioInputModal(): void {
+  public showNoAudioInputModal(): void {
     const {container, restoreFocusCallback} = this.getModalContainerAndRestoreFocusCallback();
-
-    const modalOptions = {
-      primaryAction: {
-        text: this.translate('modalAcknowledgeAction'),
-      },
-      secondaryAction: {
-        action: () => {
-          return amplify.publish(WebAppEvents.PREFERENCES.SHOW_AV);
-        },
-        text: this.translate('modalNoAudioInputAction'),
-      },
-      text: {
-        closeBtnLabel: this.translate('modalNoAudioCloseBtn'),
-        message: this.translate('modalNoAudioInputMessage'),
-        title: this.translate('modalNoAudioInputTitle'),
-      },
-      close: restoreFocusCallback(),
-      container,
-    };
-    PrimaryModal.show(PrimaryModal.type.CONFIRM, modalOptions, undefined, this.translate);
+    showNoAudioInputModal(this.translate, {container, close: restoreFocusCallback()});
   }
 
-  private showNoCameraModal(): void {
+  public showNoCameraModal(): void {
     const {container, restoreFocusCallback} = this.getModalContainerAndRestoreFocusCallback();
-
-    const modalOptions = {
-      text: {
-        closeBtnLabel: this.translate('modalNoCameraCloseBtn'),
-        translatedMessage: {
-          compatibilityReplacements: [],
-          components: [
-            {kind: 'line-break', legacyTokens: [], markerName: 'br'},
-            {
-              className: '',
-              dataUieName: 'go-no-camera-faq',
-              href: Config.getConfig().URL.SUPPORT.CAMERA_ACCESS_DENIED,
-              kind: 'link',
-              legacyClosingTokens: [],
-              legacyOpeningTokens: [],
-              markerName: 'faqLink',
-              rel: 'noopener noreferrer',
-              target: '_blank',
-            },
-          ],
-          kind: 'translation',
-          layout: 'default',
-          translationKey: 'modalNoCameraMessage',
-          values: [
-            {
-              alternatePlaceholders: [],
-              placeholder: 'brandName',
-              runtimeText: Config.getConfig().BRAND_NAME,
-            },
-          ],
-        } satisfies PrimaryModalTranslatedMessage,
-        title: this.translate('modalNoCameraTitle'),
-      },
-      close: restoreFocusCallback(),
-      container,
-    };
-    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, modalOptions, undefined, this.translate);
+    showNoCameraModal(this.translate, {container, close: restoreFocusCallback()});
   }
 
   /**
@@ -3378,7 +3365,7 @@ export class CallingRepository {
    * Prefer the currently focused window so detached calls still show modals in the window the user interacted with.
    * @returns Object containing container and focus restoration callback
    */
-  private getModalContainerAndRestoreFocusCallback() {
+  private getModalContainerAndRestoreFocusCallback(): ModalContainerAndRestoreFocus {
     const detachedWindow = this.callState.detachedWindow();
     const isDetachedWindow = this.callState.viewMode() === CallingViewMode.DETACHED_WINDOW;
     const activeWindow = useActiveWindowState.getState().activeWindow;
@@ -3414,7 +3401,7 @@ export class CallingRepository {
    *
    * @param handlingState State of the notifications stream handling
    */
-  private readonly setNotificationHandlingState = (handlingState: NOTIFICATION_HANDLING_STATE) => {
+  private readonly setNotificationHandlingState = (handlingState: NOTIFICATION_HANDLING_STATE): void => {
     const isFetchingFromStream = handlingState !== NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
 
     if (isFetchingFromStream) {
@@ -3438,7 +3425,7 @@ export class CallingRepository {
     return this.callLog.length > this.avsInitLogLength ? this.callLog : undefined;
   }
 
-  public getMediaStreamHandler() {
+  public getMediaStreamHandler(): MediaStreamHandler {
     return this.mediaStreamHandler;
   }
 }

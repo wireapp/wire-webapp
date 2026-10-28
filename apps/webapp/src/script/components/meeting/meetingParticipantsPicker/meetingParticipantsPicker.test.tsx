@@ -17,7 +17,7 @@
  *
  */
 
-import {useState} from 'react';
+import {useState, type FunctionComponent} from 'react';
 
 import {fireEvent, render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -49,7 +49,7 @@ const CONTACTS_LABEL = 'userListContactsWithCount';
 const SELECTED_CONTACTS_LABEL = 'userListSelectedContacts';
 const NO_MATCHES_LABEL = 'searchListNoMatches';
 
-const createUser = (id: string, name: string, handle: string) => {
+const createUser = (id: string, name: string, handle: string): User => {
   const user = new User(id, 'example.com', translateForTest);
   user.name(name);
   user.username(handle);
@@ -62,7 +62,7 @@ const createConversation = (
   members: User[],
   channel = false,
   {removed = false, archived = false, cleared = false}: {removed?: boolean; archived?: boolean; cleared?: boolean} = {},
-) => {
+): Conversation => {
   return {
     display_name: () => {
       return name;
@@ -136,7 +136,14 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
   }),
 );
 
-const ControlledPicker = ({
+const ControlledPicker: FunctionComponent<{
+  initialSelected?: User[];
+  initialFilter?: string;
+  searchByName?: (query: string, teamId?: string) => Promise<User[]>;
+  availableUsers?: User[];
+  label?: string;
+  conversationRepository?: Pick<ConversationRepository, 'getAllGroupConversations'>;
+}> = ({
   initialSelected = [],
   initialFilter = '',
   searchByName = searchRepositoryDouble.searchByName,
@@ -175,7 +182,7 @@ const ControlledPicker = ({
   );
 };
 
-const getSearchInput = (accessibleName = PARTICIPANTS_LABEL) => {
+const getSearchInput = (accessibleName = PARTICIPANTS_LABEL): HTMLElement => {
   return screen.getByRole('combobox', {name: accessibleName});
 };
 

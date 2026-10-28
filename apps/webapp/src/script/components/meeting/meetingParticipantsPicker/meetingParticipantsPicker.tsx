@@ -17,7 +17,7 @@
  *
  */
 
-import {useId} from 'react';
+import {useId, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 import {Button, Popover} from 'react-aria-components';
@@ -74,7 +74,7 @@ export interface MeetingParticipantsPickerProps {
   popoverPortalContainer?: HTMLElement;
 }
 
-export const MeetingParticipantsPicker = ({
+export const MeetingParticipantsPicker: FunctionComponent<MeetingParticipantsPickerProps> = ({
   id,
   dataUieName,
   users,

@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState, type FunctionComponent} from 'react';
 
 import type {Clock} from '@enormora/clock/clock';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
@@ -74,7 +74,7 @@ type AppProps = {
   readonly translate: Translate;
 };
 
-export const AppContainer = (properties: AppProps) => {
+export const AppContainer: FunctionComponent<AppProps> = (properties: AppProps) => {
   const {
     config,
     clientType,
@@ -130,7 +130,7 @@ export const AppContainer = (properties: AppProps) => {
   useEffect(() => {
     // Prevent Chrome (and Electron) from pushing the content out of the
     // viewport when using form elements (e.g. in the preferences)
-    const resetWindowScroll = () => {
+    const resetWindowScroll = (): void => {
       return window.scrollTo(0, 0);
     };
     document.addEventListener('scroll', resetWindowScroll);

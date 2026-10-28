@@ -155,7 +155,7 @@ export class UserMapper {
 
     if (isNonEmptyString(expirationDate)) {
       userEntity.isTemporaryGuest(true);
-      const setAdjustedTimestamp = () => {
+      const setAdjustedTimestamp = (): void => {
         const adjustedTimestamp = this.serverTimeHandler.toLocalTimestamp(new Date(expirationDate).getTime());
         userEntity.setGuestExpiration(adjustedTimestamp);
       };

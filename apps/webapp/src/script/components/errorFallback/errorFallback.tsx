@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect} from 'react';
+import {useEffect, type FunctionComponent} from 'react';
 
 import {FallbackProps} from 'react-error-boundary';
 
@@ -27,7 +27,7 @@ import {getLogger} from 'Util/logger';
 
 const logger = getLogger('ErrorFallback');
 
-export const ErrorFallback = ({error, resetErrorBoundary}: FallbackProps) => {
+export const ErrorFallback: FunctionComponent<FallbackProps> = ({error, resetErrorBoundary}: FallbackProps) => {
   const {translate} = useApplicationContext();
 
   useEffect(() => {

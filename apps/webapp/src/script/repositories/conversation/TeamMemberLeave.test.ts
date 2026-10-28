@@ -47,7 +47,40 @@ import type {MessageRepository} from './MessageRepository';
 import {Core} from '../../service/coreSingleton';
 import {serverTimeHandler} from '../../time/serverTimeHandler';
 
-function buildConversationRepository() {
+type TeamMemberLeaveTestDependencies = {
+  readonly conversationState: ConversationState;
+  readonly teamState: TeamState;
+  readonly userState: UserState;
+  readonly eventRepository: jest.Mocked<Pick<EventRepository, 'eventService' | 'injectEvent' | 'injectEvents'>>;
+  readonly callingRepository: CallingRepository;
+  readonly userRepository: jest.Mocked<Pick<UserRepository, 'on' | 'getUserById' | 'getUsersById'>>;
+  readonly teamRepository: TeamRepository;
+  readonly messageRepository: jest.Mocked<Pick<MessageRepository, 'setClientMismatchHandler'>>;
+  readonly conversationService: jest.Mocked<
+    Pick<
+      ConversationService,
+      | 'deleteConversation'
+      | 'deleteConversationFromDb'
+      | 'wipeMLSCapableConversation'
+      | 'postBots'
+      | 'saveConversationStateInDb'
+    >
+  >;
+  readonly core: Core;
+  readonly serverTimeHandler: typeof serverTimeHandler;
+};
+type TeamMemberLeaveTestFixture = readonly [ConversationRepository, TeamMemberLeaveTestDependencies];
+type EventInjectFunction = EventRepository['injectEvent'];
+type ClearConversationUsersFunction = ConversationRepository['clearUsersFromConversation'];
+type TeamMemberLeaveSpies = {
+  readonly injectSpy: jest.SpyInstance<ReturnType<EventInjectFunction>, Parameters<EventInjectFunction>>;
+  readonly clearSpy: jest.SpyInstance<
+    ReturnType<ClearConversationUsersFunction>,
+    Parameters<ClearConversationUsersFunction>
+  >;
+};
+
+function buildConversationRepository(): TeamMemberLeaveTestFixture {
   const teamState = new TeamState();
   const conversationState = new ConversationState();
 
@@ -142,7 +175,7 @@ function buildConversationRepository() {
 function setupTeamMemberLeaveSpies(
   repo: ConversationRepository,
   eventRepo: jest.Mocked<Pick<EventRepository, 'injectEvent'>>,
-) {
+): TeamMemberLeaveSpies {
   eventRepo.injectEvent.mockResolvedValue(undefined);
   type ClearFn = ConversationRepository['clearUsersFromConversation'];
   const clearSpy = jest.spyOn(repo as unknown as {clearUsersFromConversation: ClearFn}, 'clearUsersFromConversation');

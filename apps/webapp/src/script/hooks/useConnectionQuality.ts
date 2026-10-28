@@ -24,7 +24,9 @@ import {noop} from 'noop-esm';
 
 import {getConnectionQualityHander} from 'Util/connectionQualityHandler';
 
-export const useConnectionQuality = () => {
+type ConnectionQualityState = {isSlow: boolean};
+
+export const useConnectionQuality = (): ConnectionQualityState => {
   const [isSlow, setIsSlow] = useState(false);
 
   useEffect(() => {

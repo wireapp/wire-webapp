@@ -42,7 +42,17 @@ conversation.type(CONVERSATION_TYPE.REGULAR);
 const rootContextValue = createRootContextValueForTest({translate: translateForTest});
 const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
-const getDefaultProps = () => {
+type GetDefaultPropsResult = {
+  isActiveGroupParticipant: boolean;
+  canRenameGroup: boolean;
+  updateConversationName: jest.Mock<any, any, any>;
+  userParticipants: User[];
+  serviceParticipants: ServiceEntity[];
+  allUsersCount: number;
+  isTeam: boolean;
+  conversation: Conversation;
+};
+const getDefaultProps = (): GetDefaultPropsResult => {
   return {
     isActiveGroupParticipant: true,
     canRenameGroup: true,

@@ -18,6 +18,7 @@
  */
 
 import * as React from 'react';
+import {type FunctionComponent} from 'react';
 
 import {CSSObject, keyframes} from '@emotion/react';
 import {isNullOrUndefined} from '@sindresorhus/is';
@@ -86,11 +87,11 @@ export const pillStyle: <T>(theme: Theme, props: PillProps<T>) => CSSObject = (
   };
 };
 
-export const filterPillProps = (props: PillProps) => {
+export const filterPillProps = (props: PillProps): Object => {
   return filterProps(props, ['active']);
 };
 
-export const Pill = (props: PillProps) => {
+export const Pill: FunctionComponent<PillProps> = props => {
   return (
     <span
       css={(theme: Theme) => {

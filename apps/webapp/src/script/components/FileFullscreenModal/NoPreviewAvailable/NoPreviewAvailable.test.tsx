@@ -17,7 +17,7 @@
  *
  */
 
-import {render, screen} from '@testing-library/react';
+import {render, screen, type RenderResult} from '@testing-library/react';
 
 import {
   CELLS_SELF_USER_DRIVE_ROLE,
@@ -31,8 +31,9 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {NoPreviewAvailable} from './NoPreviewAvailable';
+import type {ReactNode} from 'react';
 
-const translate = (key: string) => {
+const translate = (key: string): string => {
   return (
     {
       'fileFullscreenModal.noPreviewAvailable.title': 'No preview available',
@@ -50,7 +51,8 @@ const defaultProps = {
   fileUrl: 'https://example.com/archive.zip',
 };
 
-const createWrapper = () => {
+type CreateWrapperResult = (properties: {readonly children: ReactNode}) => ReactNode;
+const createWrapper = (): CreateWrapperResult => {
   return createRootProviderWrapperForTest(
     createRootContextValueForTest({
       translate,
@@ -59,7 +61,7 @@ const createWrapper = () => {
 };
 
 describe('NoPreviewAvailable', () => {
-  const renderPlaceholder = (selfUserDriveRole: CellsSelfUserDriveRole) => {
+  const renderPlaceholder = (selfUserDriveRole: CellsSelfUserDriveRole): RenderResult => {
     return render(
       withThemeAndRootContext(
         <CellsSelfUserDriveRoleProvider selfUserDriveRole={selfUserDriveRole}>

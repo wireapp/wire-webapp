@@ -36,7 +36,7 @@ export class MarketingConsentModal {
     this.actionButton = page.locator("[data-uie-name='do-confirm-marketing-consent']");
   }
 
-  async clickConfirmButton() {
+  async clickConfirmButton(): Promise<void> {
     await this.actionButton.click();
   }
 }

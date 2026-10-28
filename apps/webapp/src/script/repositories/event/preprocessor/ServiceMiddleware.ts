@@ -45,7 +45,7 @@ export class ServiceMiddleware implements EventMiddleware {
     this.logger = getLogger('ServiceMiddleware');
   }
 
-  processEvent(event: IncomingEvent) {
+  processEvent(event: IncomingEvent): Promise<IncomingEvent> {
     switch (event.type) {
       case ClientEvent.CONVERSATION.ONE2ONE_CREATION:
         return this.process1To1ConversationCreationEvent(event);
@@ -58,7 +58,7 @@ export class ServiceMiddleware implements EventMiddleware {
     }
   }
 
-  private async processMemberJoinEvent(event: MemberJoinEvent | ConversationMemberJoinEvent) {
+  private async processMemberJoinEvent(event: MemberJoinEvent | ConversationMemberJoinEvent): Promise<IncomingEvent> {
     this.logger.info(`Preprocessing event of type ${event.type}`);
 
     const {conversation: conversationId, qualified_conversation, data: eventData} = event;
@@ -92,20 +92,22 @@ export class ServiceMiddleware implements EventMiddleware {
     return userIds;
   }
 
-  private async process1To1ConversationCreationEvent(event: OneToOneCreationEvent) {
+  private async process1To1ConversationCreationEvent(event: OneToOneCreationEvent): Promise<IncomingEvent> {
     this.logger.info(`Preprocessing event of type ${event.type}`);
     const hasService = await this.containsService(event.data.userIds);
     return hasService ? this.decorateWithHasServiceFlag(event) : event;
   }
 
-  private async containsService(users: QualifiedId[]) {
+  private async containsService(users: QualifiedId[]): Promise<boolean> {
     const userEntities = await this.userRepository.getUsersById(users);
     return userEntities.some(userEntity => {
       return userEntity.isService || userEntity.type === UserType.APP;
     });
   }
 
-  private decorateWithHasServiceFlag(event: MemberJoinEvent | ConversationMemberJoinEvent | OneToOneCreationEvent) {
+  private decorateWithHasServiceFlag(
+    event: MemberJoinEvent | ConversationMemberJoinEvent | OneToOneCreationEvent,
+  ): IncomingEvent {
     const updatedData = {...event.data, has_service: true};
     return {...event, data: updatedData} as IncomingEvent;
   }

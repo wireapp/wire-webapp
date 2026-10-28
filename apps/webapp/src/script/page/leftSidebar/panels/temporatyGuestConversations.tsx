@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {CallingCell} from 'Components/calling/CallingCell';
 import * as Icon from 'Components/icon';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
@@ -34,7 +36,11 @@ type TemporaryGuestConversations = {
   selfUser: User;
 };
 
-const TemporaryGuestConversations = ({selfUser, listViewModel, callingViewModel}: TemporaryGuestConversations) => {
+const TemporaryGuestConversations: FunctionComponent<TemporaryGuestConversations> = ({
+  selfUser,
+  listViewModel,
+  callingViewModel,
+}: TemporaryGuestConversations) => {
   const {translate} = useApplicationContext();
   const {expirationIsUrgent, expirationRemainingText} = useKoSubscribableChildren(selfUser, [
     'expirationIsUrgent',
@@ -43,7 +49,7 @@ const TemporaryGuestConversations = ({selfUser, listViewModel, callingViewModel}
 
   const {activeCalls} = useKoSubscribableChildren(callingViewModel, ['activeCalls']);
   const isAccountCreationEnabled = Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION;
-  const openPreferences = () => {
+  const openPreferences = (): void => {
     void listViewModel.openPreferencesAccount();
   };
 

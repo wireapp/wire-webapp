@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useRef, useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
@@ -68,7 +68,7 @@ const enum Tabs {
   SERVICES,
 }
 
-const StartUI = ({
+const StartUI: FunctionComponent<StartUIProps> = ({
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
   conversationState = container.resolve(ConversationState),
@@ -113,7 +113,7 @@ const StartUI = ({
     }
   };
 
-  const openContact = async (user: User) => {
+  const openContact = async (user: User): Promise<void> => {
     const isSameTeam =
       isNonEmptyString(user.teamId) && isNonEmptyString(selfUser.teamId) && user.teamId === selfUser.teamId;
     const has1to1Conversation = conversationState.has1to1ConversationWithUser(user.qualifiedId);
@@ -127,7 +127,7 @@ const StartUI = ({
     return actions.open1to1Conversation(conversationEntity);
   };
 
-  const openOther = (user: User) => {
+  const openOther = (user: User): void | Promise<void> => {
     if (user.isOutgoingRequest()) {
       return openContact(user);
     }
@@ -135,7 +135,7 @@ const StartUI = ({
     return showUserModal({domain: user.domain, id: user.id});
   };
 
-  const openService = (service: ServiceEntity) => {
+  const openService = (service: ServiceEntity): void => {
     showServiceModal({
       translate,
       actionsViewModel: mainViewModel.actions,
@@ -144,10 +144,10 @@ const StartUI = ({
     });
   };
 
-  const openApp = (user: User) => {
+  const openApp = (user: User): void => {
     return openService(integrationRepository.mapServiceFromUser(user));
   };
-  const openInviteModal = () => {
+  const openInviteModal = (): void => {
     return showInviteModal({translate, selfUser});
   };
 

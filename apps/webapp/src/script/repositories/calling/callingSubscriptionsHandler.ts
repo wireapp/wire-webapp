@@ -19,7 +19,7 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-const serializeQualifiedId = ({id, domain}: QualifiedId) => {
+const serializeQualifiedId = ({id, domain}: QualifiedId): string => {
   return `${id}@${domain}`;
 };
 
@@ -30,7 +30,7 @@ const store = new Map<string, (() => void)[]>();
  * @param conversationId the conversation in which the call is happening
  * @param unsubscribe the function to call to teardown the subscription once the call is terminated
  */
-const addCall = (conversationId: QualifiedId, unsubscribe: () => void) => {
+const addCall = (conversationId: QualifiedId, unsubscribe: () => void): void => {
   const serializedId = serializeQualifiedId(conversationId);
 
   const existingCallbacks = store.get(serializedId) ?? [];
@@ -41,7 +41,7 @@ const addCall = (conversationId: QualifiedId, unsubscribe: () => void) => {
  * Will cleanly terminate all the subscriptions for a given call
  * @param conversationId the conversation in which the call is happening
  */
-const removeCall = (conversationId: QualifiedId) => {
+const removeCall = (conversationId: QualifiedId): void => {
   const serializedId = serializeQualifiedId(conversationId);
 
   const existingCallbacks = store.get(serializedId);

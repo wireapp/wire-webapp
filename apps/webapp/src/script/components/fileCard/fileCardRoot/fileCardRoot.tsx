@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode, memo, useMemo} from 'react';
+import {ReactNode, memo, useMemo, type FunctionComponent} from 'react';
 
 import {contentStyles, wrapperStylesLarge, wrapperStylesSmall} from './fileCardRoot.styles';
 
@@ -59,7 +59,7 @@ interface FileCardRootWithContextProps extends FileCardOptions {
   children: ReactNode;
 }
 
-const FileCardRootWithContext = ({
+const FileCardRootWithContext: FunctionComponent<FileCardRootWithContextProps> = ({
   children,
   variant = 'small',
   extension,

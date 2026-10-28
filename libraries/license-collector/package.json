@@ -23,11 +23,11 @@
   },
   "devDependencies": {
     "@types/fs-extra": "11.0.4",
-    "@types/license-checker": "^25",
+    "@types/license-checker": "25.0.6",
     "@types/npm-registry-package-info": "1.0.4",
-    "license-checker": "^25.0.1",
+    "license-checker": "25.0.1",
     "rimraf": "6.1.3",
-    "typescript": "^5.0.4"
+    "typescript": "6.0.3"
   },
   "scripts": {
     "build": "nx run license-collector-lib:build",

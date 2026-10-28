@@ -1,3 +1,4 @@
+---
 name: Generate test reports
 
 on:
@@ -5,11 +6,11 @@ on:
 
 jobs:
   generate_test_report:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
 
     env:
-      UNIT_TEST_REPORT_FILE: './unit-tests.log'
-      UNIT_TEST_REPORTS_DIRECTORY: './unit-test-reports'
+      UNIT_TEST_REPORT_FILE: './target/unit-tests.log'
+      UNIT_TEST_REPORTS_DIRECTORY: './target/unit-test-reports'
 
     steps:
       - name: Checkout
@@ -31,14 +32,11 @@ jobs:
         with:
           access_token: ${{github.token}}
 
-      - name: Add repository Yarn wrapper to PATH
-        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
-
       - name: Setup Node.js
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: Authenticate git clone
         env:
@@ -46,14 +44,18 @@ jobs:
         run: echo -e "machine github.com\n  login ${GH_TOKEN}" > ~/.netrc
 
       - name: Install JS dependencies
-        run: ./bin/yarn --immutable
+        run: npm clean-install
+
+      - name: Build libraries for Jest tests
+        run: npx just build-libraries
 
       - name: Generate unit test reports
         id: unit_test_reports
         continue-on-error: true
         env:
           BRANCH: ${{ github.ref_name }}
-        run: ./bin/yarn ts-node --project ./tsconfig.tools.json ./tools/testReporting/generateUnitTestReports.ts
+          CI: 'true'
+        run: npx ts-node --project ./tsconfig.tools.json ./tools/testReporting/generateUnitTestReports.ts
 
       - name: Upload complete unit test reports
         if: always()
@@ -71,7 +73,7 @@ jobs:
         if: always()
         run: |
           node -e '
-            const manifest = require("./unit-test-reports/manifest.json");
+            const manifest = require("./target/unit-test-reports/manifest.json");
             if (manifest.overallStatus !== "passed") {
               process.exit(1);
             }

@@ -27,7 +27,7 @@ const THEMES_CLASS_PREFIX = 'theme-';
 
 export type Theme = WebappProperties['settings']['interface']['theme'];
 
-function setTheme(theme: Theme) {
+function setTheme(theme: Theme): void {
   const bodyClassList = document.body.classList;
   const themeClasses = Array.from(bodyClassList).filter(existingClassName => {
     return existingClassName.startsWith(THEMES_CLASS_PREFIX);
@@ -40,7 +40,7 @@ function setTheme(theme: Theme) {
   bodyClassList.add(`${THEMES_CLASS_PREFIX}${theme}`);
 }
 
-export function useTheme(getTheme: () => Theme) {
+export function useTheme(getTheme: () => Theme): void {
   setTheme(getTheme());
   useUserPropertyChange(getTheme, WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, setTheme);
 }

@@ -226,7 +226,7 @@ describe('ClientRepository', () => {
 
     it('throws an error on Electron if no current client', () => {
       spyOn(Runtime, 'isDesktopApp').and.returnValue(true);
-      const functionCall = () => {
+      const functionCall = (): boolean => {
         return testFactory.client_repository.isCurrentClientPermanent();
       };
 
@@ -262,7 +262,7 @@ describe('ClientRepository', () => {
     });
 
     it('throws an error if no current client', () => {
-      const functionCall = () => {
+      const functionCall = (): boolean => {
         return testFactory.client_repository.isCurrentClientPermanent();
       };
 
@@ -305,7 +305,7 @@ describe('ClientRepository', () => {
     });
 
     it('throws an error if current client is not set', () => {
-      const functionCall = () => {
+      const functionCall = (): boolean => {
         return testFactory.client_repository['isCurrentClient']({domain: '', id: userId}, clientId);
       };
 
@@ -314,7 +314,7 @@ describe('ClientRepository', () => {
 
     it('throws an error if client ID is not specified', () => {
       testFactory.client_repository['clientState'].currentClient = new ClientEntity(false, null);
-      const functionCall = () => {
+      const functionCall = (): boolean => {
         return testFactory.client_repository['isCurrentClient'](
           {domain: '', id: userId},
           undefined as unknown as string,
@@ -326,7 +326,7 @@ describe('ClientRepository', () => {
 
     it('throws an error if user ID is not specified', () => {
       testFactory.client_repository['clientState'].currentClient = new ClientEntity(false, null);
-      const functionCall = () => {
+      const functionCall = (): boolean => {
         return testFactory.client_repository['isCurrentClient'](undefined as unknown as QualifiedId, clientId);
       };
 

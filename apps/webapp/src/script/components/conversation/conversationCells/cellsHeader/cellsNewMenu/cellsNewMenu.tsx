@@ -17,7 +17,7 @@
  *
  */
 
-import {useState} from 'react';
+import {useState, type FunctionComponent} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
@@ -47,7 +47,7 @@ interface CellsNewMenuProps {
 
 export type CellsNewFileType = 'document' | 'spreadsheet' | 'presentation';
 
-export const CellsNewMenu = ({
+export const CellsNewMenu: FunctionComponent<CellsNewMenuProps> = ({
   cellsRepository,
   conversationQualifiedId,
   onRefresh,
@@ -61,11 +61,11 @@ export const CellsNewMenu = ({
   const [isFileModalOpen, setIsFileModalOpen] = useState(false);
   const [fileType, setFileType] = useState<CellsNewFileType>('document');
 
-  const openFolderModal = () => {
+  const openFolderModal = (): void => {
     return setIsFolderModalOpen(true);
   };
 
-  const openFileModal = (selectedFileType: CellsNewFileType) => {
+  const openFileModal = (selectedFileType: CellsNewFileType): void => {
     setFileType(selectedFileType);
     setIsFileModalOpen(true);
   };

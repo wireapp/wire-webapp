@@ -34,13 +34,13 @@ import {ContentState, useAppState} from '../page/useAppState';
 import {ContentViewModel} from './ContentViewModel';
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 
-const buildConversation = () => {
+const buildConversation = (): Conversation => {
   return new Conversation('conversation-id', 'example.com', CONVERSATION_PROTOCOL.PROTEUS, (text: string) => {
     return text;
   });
 };
 
-const buildContentViewModel = () => {
+const buildContentViewModel = (): ContentViewModel => {
   const conversationRepository = {
     getConversationById: jest.fn().mockResolvedValue(buildConversation()),
     init1to1Conversation: jest.fn(),

@@ -26,6 +26,7 @@ import React, {
   useCallback,
   useRef,
   RefObject,
+  type FunctionComponent,
 } from 'react';
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
@@ -162,7 +163,7 @@ interface ConversationsListProps {
   cancelPendingFocusRef?: RefObject<(() => void) | null>;
 }
 
-export const ConversationsList = ({
+export const ConversationsList: FunctionComponent<ConversationsListProps> = ({
   conversations,
   conversationsFilter,
   conversationFocusCandidates,
@@ -226,7 +227,7 @@ export const ConversationsList = ({
     [joinableCalls],
   );
 
-  const onConnectionRequestClick = () => {
+  const onConnectionRequestClick = (): void => {
     setCurrentView(ViewType.MOBILE_CENTRAL_COLUMN);
     listViewModel.contentViewModel.switchContent(ContentState.CONNECTION_REQUESTS);
   };
@@ -447,7 +448,15 @@ export const ConversationsList = ({
     };
   });
 
-  const getCommonConversationRowProps = (conversation: Conversation) => {
+  type GetCommonConversationRowPropsResult = {
+    conversation: Conversation;
+    isFocused: boolean;
+    isActive: boolean;
+    showJoinButton: boolean;
+    handlersRef: React.RefObject<ConversationRowHandlers>;
+    registerConversationElement: RegisterConversationElement | undefined;
+  };
+  const getCommonConversationRowProps = (conversation: Conversation): GetCommonConversationRowPropsResult => {
     return {
       conversation,
       isFocused: currentFocus === conversation.id,

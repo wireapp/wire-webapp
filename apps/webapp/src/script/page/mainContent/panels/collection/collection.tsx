@@ -19,6 +19,7 @@
 
 import {useEffect, useState} from 'react';
 
+import type {JSX} from '@emotion/react/jsx-runtime';
 import {isNonEmptyArray, isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {amplify} from 'amplify';
@@ -84,7 +85,7 @@ function splitIntoCategories(messages: ContentMessage[]): Categories {
   );
 }
 
-function Collection(props: CollectionProps) {
+function Collection(props: CollectionProps): JSX.Element {
   const {conversation, conversationRepository, assetRepository, messageRepository, selfUser} = props;
   const {fireAndForgetInvoker, translate} = useApplicationContext();
   const [searchTerm, setSearchTerm] = useState('');
@@ -99,13 +100,13 @@ function Collection(props: CollectionProps) {
   }, [conversation, conversationRepository]);
 
   useEffect(() => {
-    const addItem = (message: ContentMessage) => {
+    const addItem = (message: ContentMessage): void => {
       setMessages(oldMessages => {
         return [message].concat(oldMessages);
       });
     };
 
-    const removeItem = (messageId: string, conversationId: string) => {
+    const removeItem = (messageId: string, conversationId: string): void => {
       if (conversation.id !== conversationId) {
         // A message from a different converation, nothing to do
         return;
@@ -117,7 +118,7 @@ function Collection(props: CollectionProps) {
       });
     };
 
-    const removeMessage = (message: ContentMessage) => {
+    const removeMessage = (message: ContentMessage): void => {
       removeItem(message.id, message.conversation_id);
     };
 
@@ -134,7 +135,7 @@ function Collection(props: CollectionProps) {
   const categories = splitIntoCategories(messages);
   const {images, audio, links, files} = categories;
 
-  const onImageClick = (message: ContentMessage) => {
+  const onImageClick = (message: ContentMessage): void => {
     showDetailViewModal({
       assetRepository,
       conversationRepository,

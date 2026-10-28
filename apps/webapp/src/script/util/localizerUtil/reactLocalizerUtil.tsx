@@ -84,7 +84,7 @@ type RenderReactTranslationOptions = {
   readonly valueReplacements: readonly ReactTranslationValueReplacement[];
 };
 
-function sanitizeRegexp(text: string) {
+function sanitizeRegexp(text: string): string {
   return text.replaceAll('[', '\\[').replaceAll(']', '\\]');
 }
 

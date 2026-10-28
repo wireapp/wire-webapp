@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import React, {type FunctionComponent} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
@@ -48,7 +48,7 @@ interface CallParticipantsListItemProps {
   handRaisedAt?: number | null;
 }
 
-export const CallParticipantsListItem = ({
+export const CallParticipantsListItem: FunctionComponent<CallParticipantsListItemProps> = ({
   callParticipant,
   isSelfVerified = false,
   showContextMenu,
@@ -68,7 +68,7 @@ export const CallParticipantsListItem = ({
     isExternal,
   } = useKoSubscribableChildren(user, ['isDirectGuest', 'is_verified', 'name', 'isExternal']);
 
-  const handleContextKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+  const handleContextKeyDown = (event: React.KeyboardEvent<HTMLDivElement>): void => {
     handleKeyDown({
       event,
       callback: () => {

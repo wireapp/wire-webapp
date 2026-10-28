@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, type FunctionComponent} from 'react';
 
 import {amplify} from 'amplify';
 
@@ -42,7 +42,11 @@ interface DataUsageSectionProps {
 
 type WebappProperties = PropertiesRepository['properties'];
 
-const DataUsageSection = ({propertiesRepository, brandName, isActivatedAccount}: DataUsageSectionProps) => {
+const DataUsageSection: FunctionComponent<DataUsageSectionProps> = ({
+  propertiesRepository,
+  brandName,
+  isActivatedAccount,
+}: DataUsageSectionProps) => {
   const {translate} = useApplicationContext();
   const [optionTelemetry, setOptionTelemetry] = useState(
     propertiesRepository.properties.settings.privacy.telemetry_data_sharing,

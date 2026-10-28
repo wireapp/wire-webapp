@@ -12,7 +12,6 @@ apps/webapp/src/worker/
 CHANGELOG.md
 node_modules
 npm-debug.log
-yarn-error.log
 charts/
 *.md
 tsconfig*.json

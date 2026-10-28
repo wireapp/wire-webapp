@@ -18,7 +18,7 @@
  */
 
 import {renderHook} from '@testing-library/react';
-import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
+import {createDeterministicClock, type DeterministicClock} from '@enormora/clock/deterministic-clock';
 import {act} from 'react';
 import {Maybe} from 'true-myth';
 
@@ -48,7 +48,12 @@ function createInMemoryStorage(): InMemoryStorage {
   };
 }
 
-function renderRegisteredSingleInstance() {
+type RenderRegisteredSingleInstanceResult = {
+  result: {current: {hasOtherInstance: boolean; killRunningInstance: () => void; registerInstance: () => () => void}};
+  storage: InMemoryStorage;
+  clock: DeterministicClock;
+};
+function renderRegisteredSingleInstance(): RenderRegisteredSingleInstanceResult {
   const storage = createInMemoryStorage();
   const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
   const useSingleInstance = createUseSingleInstance({

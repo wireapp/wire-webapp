@@ -17,7 +17,7 @@
  *
  */
 
-import React, {ChangeEvent, useId} from 'react';
+import React, {ChangeEvent, useId, type FunctionComponent} from 'react';
 
 import {TabIndex, Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 
@@ -50,7 +50,7 @@ export interface UserListItemProps {
   showArrow: boolean;
 }
 
-export const UserListItem = ({
+export const UserListItem: FunctionComponent<UserListItemProps> = ({
   groupId,
   canSelect,
   customInfo,
@@ -81,7 +81,7 @@ export const UserListItem = ({
 
   const userName = useUserName(user);
 
-  const getContentInfoText = () => {
+  const getContentInfoText = (): string => {
     if (customInfo !== undefined && customInfo !== '') {
       return customInfo;
     }

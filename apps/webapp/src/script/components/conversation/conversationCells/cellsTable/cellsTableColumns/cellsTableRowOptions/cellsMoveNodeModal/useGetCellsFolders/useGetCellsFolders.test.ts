@@ -17,7 +17,7 @@
  *
  */
 
-import {act, renderHook, waitFor} from '@testing-library/react';
+import {act, renderHook, waitFor, type RenderHookResult} from '@testing-library/react';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {RestNode} from 'cells-sdk-ts';
 import {noop} from 'noop-esm';
@@ -47,18 +47,32 @@ describe('useGetCellsFolders', () => {
     clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
   });
 
-  const renderUseGetCellsFolders = () => {
-    return renderHook(() => {
-      return useGetCellsFolders({
-        nodeToMove,
-        cellsRepository: cellsRepository as never,
-        conversationQualifiedId,
-        currentPath: 'wire-cells-web',
-        enabled: true,
-        fireAndForgetInvoker,
-        clock,
-      });
-    });
+  type RenderUseGetCellsFoldersOptions = {
+    conversationQualifiedId: typeof conversationQualifiedId;
+  };
+  type RenderUseGetCellsFoldersResult = RenderHookResult<
+    ReturnType<typeof useGetCellsFolders>,
+    RenderUseGetCellsFoldersOptions
+  >;
+  const renderUseGetCellsFolders = (
+    qualifiedId: RenderUseGetCellsFoldersOptions['conversationQualifiedId'] = conversationQualifiedId,
+  ): RenderUseGetCellsFoldersResult => {
+    return renderHook(
+      (options: RenderUseGetCellsFoldersOptions) => {
+        const {conversationQualifiedId} = options;
+
+        return useGetCellsFolders({
+          nodeToMove,
+          cellsRepository: cellsRepository as never,
+          conversationQualifiedId,
+          currentPath: 'wire-cells-web',
+          enabled: true,
+          fireAndForgetInvoker,
+          clock,
+        });
+      },
+      {initialProps: {conversationQualifiedId: qualifiedId}},
+    );
   };
 
   it('loads destination folders and excludes the folder being moved', async () => {
@@ -73,6 +87,37 @@ describe('useGetCellsFolders', () => {
     ]);
     expect(cellsRepository.getAllNodes).toHaveBeenCalledWith({
       path: 'conversation-id@wire.com/wire-cells-web',
+      type: 'folder',
+    });
+  });
+
+  it('does not refetch when the qualified ID object changes but its values do not', async () => {
+    const {result, rerender} = renderUseGetCellsFolders();
+
+    await waitFor(() => {
+      expect(result.current.status).toBe('success');
+    });
+    expect(cellsRepository.getAllNodes).toHaveBeenCalledTimes(1);
+
+    rerender({conversationQualifiedId: {...conversationQualifiedId}});
+
+    expect(cellsRepository.getAllNodes).toHaveBeenCalledTimes(1);
+  });
+
+  it('refetches when the qualified conversation ID changes', async () => {
+    const {result, rerender} = renderUseGetCellsFolders();
+
+    await waitFor(() => {
+      expect(result.current.status).toBe('success');
+    });
+
+    rerender({conversationQualifiedId: {id: 'another-conversation', domain: 'wire.com'}});
+
+    await waitFor(() => {
+      expect(cellsRepository.getAllNodes).toHaveBeenCalledTimes(2);
+    });
+    expect(cellsRepository.getAllNodes).toHaveBeenLastCalledWith({
+      path: 'another-conversation@wire.com/wire-cells-web',
       type: 'folder',
     });
   });

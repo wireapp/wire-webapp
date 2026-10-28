@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, FC, useState, HTMLProps, useRef} from 'react';
+import {useEffect, FC, useState, HTMLProps, useRef, type FunctionComponent} from 'react';
 
 import {isNan, isNull} from '@sindresorhus/is';
 
@@ -92,7 +92,7 @@ const TextMessage: FC<TextMessageRendererProps> = ({
     event: KeyboardEvent | MouseEvent,
     elementType: ElementType,
     messageDetails: MessageDetails,
-  ) => {
+  ): void => {
     if (isKeyDownEvent(event) && isFocusable) {
       handleKeyDown({
         event,
@@ -112,7 +112,7 @@ const TextMessage: FC<TextMessageRendererProps> = ({
    * Will handle interaction with the message.
    * Depending on the child element clicked, it will forward the event to the parent component.
    */
-  const handleInteraction = (event: React.MouseEvent | React.KeyboardEvent) => {
+  const handleInteraction = (event: React.MouseEvent | React.KeyboardEvent): void => {
     const target = event.target as HTMLElement;
     const emailElement = target.closest('[data-email-link]');
     const markdownLinkElement = target.closest('[data-md-link]');
@@ -141,7 +141,7 @@ const TextMessage: FC<TextMessageRendererProps> = ({
 
   const extraClasses = showFullText ? 'message-quote__text--full' : '';
 
-  const toggleShowMore = () => {
+  const toggleShowMore = (): void => {
     return setShowFullText(prev => {
       return !prev;
     });
@@ -173,7 +173,7 @@ const TextMessage: FC<TextMessageRendererProps> = ({
   );
 };
 
-export const TextMessageRenderer = (props: TextMessageRendererProps) => {
+export const TextMessageRenderer: FunctionComponent<TextMessageRendererProps> = (props: TextMessageRendererProps) => {
   // We want to make sure that this element is re-rendered when the text changes (this will trigger useEffects' calculations to run).
   return <TextMessage key={props.text} {...props} />;
 };

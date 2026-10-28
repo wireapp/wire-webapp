@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode} from 'react';
+import {ReactNode, type FunctionComponent} from 'react';
 
 import type {Translate} from 'Util/localizerUtil';
 
@@ -31,7 +31,7 @@ interface DownloadButtonProps {
   className?: string;
 }
 
-const DownloadButton = ({
+const DownloadButton: FunctionComponent<DownloadButtonProps> = ({
   translate,
   actionId,
   messageFocusedTabIndex,

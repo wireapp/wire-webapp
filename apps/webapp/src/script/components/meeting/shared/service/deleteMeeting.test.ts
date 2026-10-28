@@ -40,7 +40,7 @@ const clock = createDeterministicClock({
   initialUnixEpochMicroseconds: BigInt(Date.parse('2026-06-15T13:00:00.000Z')) * 1_000n,
 });
 
-const createConversation = () => {
+const createConversation = (): Conversation => {
   const conversation = new Conversation(
     qualifiedConversation.id,
     qualifiedConversation.domain,

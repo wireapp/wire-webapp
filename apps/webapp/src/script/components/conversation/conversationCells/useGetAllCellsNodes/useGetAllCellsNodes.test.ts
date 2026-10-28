@@ -28,6 +28,7 @@ import {useGetAllCellsNodes} from './useGetAllCellsNodes';
 
 import type {CellsSort} from '../common/useCellsSorting/useCellsSorting';
 import {useCellsStore} from '../common/useCellsStore/useCellsStore';
+import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 
 const CONV_ID = 'conv-abc';
 const DOMAIN = 'staging.zinfra.io';
@@ -52,6 +53,12 @@ function createDeferred<T>(): PromiseWithResolvers<T> {
   return Promise.withResolvers<T>();
 }
 
+type RenderGetAllNodesHookResult = {
+  rerender: (props?: {enabled: boolean; sort: CellsSort | null} | undefined) => void;
+  result: {current: {refresh: () => Promise<void>; setOffset: (nextOffset: number) => void}};
+  unmount: () => void;
+  fireAndForgetInvoker: FireAndForgetInvoker;
+};
 function renderGetAllNodesHook({
   cellsRepository = createFakeCellsRepository(),
   userRepository = createFakeUserRepository(),
@@ -64,7 +71,7 @@ function renderGetAllNodesHook({
   enabled?: boolean;
   fireAndForgetInvoker?: ReturnType<typeof createExecutingFireAndForgetInvokerForTest>;
   sort?: CellsSort | null;
-} = {}) {
+} = {}): RenderGetAllNodesHookResult {
   return {
     fireAndForgetInvoker,
     ...renderHook(

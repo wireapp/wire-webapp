@@ -2,48 +2,16 @@
   "name": "workspace-tools",
   "$schema": "./node_modules/nx/schemas/project-schema.json",
   "targets": {
-    "docker": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "node ./tools/dockerPublication/pushDocker.js"
-      }
-    },
-    "clean-jest": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "jest --clearCache"
-      }
-    },
-    "test": {
-      "executor": "nx:run-commands",
-      "dependsOn": [],
-      "options": {
-        "command": "jest --config ./tools/jest.config.js"
-      }
-    },
     "build": {
       "executor": "nx:run-commands",
       "options": {
         "command": "echo \"workspace-tools has no build\""
       }
     },
-    "lint": {
-      "executor": "nx:run-commands",
-      "dependsOn": [],
-      "options": {
-        "command": "eslint --config eslint.config.mjs --max-warnings=0 tools/i18n tools/releaseAppearance tools/releaseMetadata tools/releaseGithub tools/releaseCli 'tools/**/*.test.ts'"
-      }
-    },
     "e2e": {
       "executor": "nx:run-commands",
       "options": {
         "command": "echo \"workspace-tools has no e2e\""
-      }
-    },
-    "type-check": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "tsc --project ./tsconfig.tools.json --noEmit && tsc --project ./tools/releaseAppearance/tsconfig.json --noEmit && tsc --project ./tsconfig.release-cli.json --noEmit"
       }
     }
   },

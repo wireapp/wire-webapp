@@ -31,6 +31,7 @@ const MAX_REFRESH_COUNT = 5;
 
 // Refreshes the cells state in a interval when the state is PENDING
 // Ensures that the cells state is always up to date and to avoid the user seeing a stale state
+type UseRefreshCellsStateResult = {cellsState: CONVERSATION_CELLS_STATE; isRefreshing: boolean};
 export const useRefreshCellsState = ({
   initialCellState,
   conversationRepository,
@@ -41,7 +42,7 @@ export const useRefreshCellsState = ({
   conversationRepository: ConversationRepository;
   conversationQualifiedId: QualifiedId;
   fireAndForgetInvoker: FireAndForgetInvoker;
-}) => {
+}): UseRefreshCellsStateResult => {
   const [cellsState, setCellsState] = useState(initialCellState);
   const [isRefreshing, setIsRefreshing] = useState(cellsState === CONVERSATION_CELLS_STATE.PENDING);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);

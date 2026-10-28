@@ -1,5 +1,10 @@
 # Nx Monorepo Integration - Comprehensive Overview
 
+> Historical reference for the original Nx integration. Unit tests now run through
+> `npx just test`, `npx just test-ci`, and `npx just test-watch`; CI uses native Jest
+> with per-project coverage thresholds. Nx remains in use for builds and other tasks
+> that have not migrated.
+
 ## Table of Contents
 
 - [Workspace-Tools Project](#workspace-tools-project)
@@ -22,7 +27,7 @@
 
 ## Workspace-Tools Project
 
-The `workspace-tools` project is a special Nx project that provides workspace-level utilities. It doesn't have actual code to test or build - it's a container for shared scripts and commands.
+The `workspace-tools` project provides workspace-level utilities and the Jest config for repository-owned tooling tests. Nx still owns its remaining build and server commands.
 
 **Available workspace-tools commands:**
 - `nx run workspace-tools:clean-jest` - Clean Jest cache
@@ -155,10 +160,6 @@ wire-webapp/
     "test": {
       "cache": true,
       "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"]
-    },
-    "lint": {
-      "cache": true,
-      "inputs": ["default", "{workspaceRoot}/eslint.config.mjs"]
     }
   },
   "namedInputs": {
@@ -179,7 +180,7 @@ wire-webapp/
 
 **Key Points:**
 - `dependsOn: ["^build"]` - Automatic dependency graph resolution
-- `cache: true` - Nx caching enabled for build/test/lint
+- `cache: true` - Nx caching enabled for Nx-managed build and test tasks
 - `namedInputs` - Defines file sets for cache hashing
 
 ### [`tsconfig.base.json`](tsconfig.base.json) - Base TypeScript Config
@@ -297,9 +298,9 @@ The `typesVersions` field is a TypeScript feature that maps type resolution path
 
 Without `typesVersions`, consumers would get type errors or no IntelliSense when importing subpaths like `@wireapp/core/lib/connection`.
 
-### Jest/Nx Coverage Configuration
+### Jest Coverage Configuration
 
-Project Jest configs define `coverageThreshold` for CI coverage enforcement. The `ci` test target in each covered Nx project enables coverage and keeps `text`, `lcov`, and `html` reporters so GitHub Actions logs show a coverage table and the workflow can upload browsable coverage artifacts.
+Project Jest configs define `coverageThreshold` for CI coverage enforcement. `npx just test-ci` invokes each project config separately because Jest's multi-project runner does not apply project-local thresholds. The configs retain `text`, `lcov`, and `html` reporters where required, and store coverage under `target/coverage/` for GitHub Actions artifacts.
 
 ### [`.github/labeler.yml`](.github/labeler.yml) - PR Auto-Labeling
 
@@ -410,12 +411,6 @@ Project Jest configs define `coverageThreshold` for CI coverage enforcement. The
       "options": {
         "jestConfig": "{projectRoot}/jest.config.js",
         "passWithNoTests": false
-      }
-    },
-    "lint": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "eslint --quiet --ext .js,.ts {projectRoot}"
       }
     }
   },
@@ -567,12 +562,12 @@ In [`apps/webapp/package.json`](apps/webapp/package.json):
 ```json
 {
   "dependencies": {
-    "@wireapp/core": "workspace:^"
+    "@wireapp/core": "^46.47.4"
   }
 }
 ```
 
-The `workspace:^` protocol tells Yarn to resolve to the local workspace version.
+The semver range allows npm to link the matching local workspace package.
 
 ---
 
@@ -793,7 +788,7 @@ The deployment process includes a special step to pre-bundle workspace dependenc
 
 **Why this is needed:**
 
-In a standard deployment, `npm install` would resolve dependencies from npm. However, our monorepo uses workspace dependencies (`workspace:^`) which are local packages. When deploying to AWS, we need to:
+In a standard deployment, `npm install` would resolve dependencies from npm. Our monorepo declares local workspace packages using semver ranges that match their package versions. When deploying to AWS, we need to:
 
 1. Pre-compile all workspace libraries
 2. Copy the compiled output to the deployment bundle
@@ -801,54 +796,41 @@ In a standard deployment, `npm install` would resolve dependencies from npm. How
 
 **How it works:**
 
-The script reads [`apps/server/package.json`](apps/server/package.json) to find workspace dependencies:
+The script reads [`apps/server/package.json`](apps/server/package.json) and each local library manifest. It identifies local dependencies by package name, so it works with the npm-compatible semver ranges in the workspace manifests:
 
 ```javascript
 const serverPackageJson = require('../package.json');
-const workspaceDeps = Object.entries(serverPackageJson.dependencies || {})
-  .filter(([, version]) => version.startsWith('workspace:'))
-  .map(([name]) => name);
+const workspaceDependencyPackages = findLocalWorkspaceDependencyPackages({
+  dependencies: serverPackageJson.dependencies || {},
+  workspacePackages,
+});
 
-console.log('Bundling workspace dependencies:', workspaceDeps.join(', '));
+console.log(
+  'Bundling workspace dependencies:',
+  workspaceDependencyPackages.map(workspacePackage => workspacePackage.manifest.name).join(', '),
+);
 ```
 
 For each workspace dependency, it:
 1. Locates the library in the monorepo (`libraries/{lib-name}`)
-2. Copies the compiled `lib/` directory to `dist/node_modules/@wireapp/{lib-name}/lib/`
-3. Copies the `package.json` to `dist/node_modules/@wireapp/{lib-name}/package.json`
+2. Copies the compiled `lib/` directory to `dist/node_modules/{package-name}/lib/`
+3. Copies the `package.json` to `dist/node_modules/{package-name}/package.json`
 
 This creates a self-contained deployment where all workspace dependencies are pre-bundled and ready to run.
 
 ### Version Resolution for Workspace Dependencies
 
-The [`tools/serverPackaging/zip.js`](../tools/serverPackaging/zip.js) script handles version resolution for workspace dependencies:
+The [`tools/serverPackaging/zip.js`](../tools/serverPackaging/zip.js) script records the actual local package versions in the deployment manifest:
 
 ```javascript
-// Read and modify package.json to handle workspace dependencies
-const packageJson = JSON.parse(fs.readFileSync(path.join(SERVER_PATH, 'package.json'), 'utf8'));
-
-// Convert workspace:* dependencies to "*" version - they're pre-bundled in node_modules
-const workspaceDeps = [];
-if (packageJson.dependencies) {
-  Object.keys(packageJson.dependencies).forEach(dep => {
-    if (packageJson.dependencies[dep].startsWith('workspace:')) {
-      console.log(`Marking workspace dependency as pre-bundled: ${dep}`);
-      workspaceDeps.push(dep);
-      // Read version from the library's package.json
-      const libPkgPath = path.join(ROOT_PATH, 'libraries', dep.replace('@wireapp/', ''), 'package.json');
-      if (fs.existsSync(libPkgPath)) {
-        const libPkg = JSON.parse(fs.readFileSync(libPkgPath, 'utf8'));
-        packageJson.dependencies[dep] = libPkg.version;
-      } else {
-        packageJson.dependencies[dep] = '*';
-      }
-    }
-  });
-}
+const packageJson = createPackagedServerManifest({
+  serverPackageManifest,
+  workspacePackages,
+});
 ```
 
 This ensures that:
-1. The deployment package's `package.json` has concrete versions instead of `workspace:*`
+1. The deployment package's `package.json` has concrete versions matching bundled local packages
 2. AWS Elastic Beanstalk doesn't try to resolve workspace dependencies
 3. The pre-bundled libraries in `node_modules` are used directly
 
@@ -885,10 +867,9 @@ ebs.zip
 The deployment process uses a dual build chain:
 
 1. **Server Build Chain:**
-   - `server:build` depends on `^build` (all libraries)
-   - Compiles server TypeScript to JavaScript
-   - Generates version file
-   - Copies server assets and pre-bundles workspace libraries
+   - `npx just build-server` builds workspace libraries, compiles server TypeScript to `apps/server/build/server`, and copies runtime assets and local workspace dependencies
+   - Build metadata generation remains separate
+   - The Nx `server:build` target still cleans and compiles this output for the remaining Nx assembly and packaging workflows
 
 2. **Webapp Build Chain:**
    - `webapp:build` depends on `^build` (all libraries)
@@ -934,8 +915,8 @@ If you see errors about missing library files during deployment:
 
 If deployment fails due to version issues:
 1. Check that [`libraries/{lib}/package.json`](libraries/core/package.json) has correct versions
-2. Verify [`apps/server/package.json`](apps/server/package.json) uses `workspace:^` for workspace deps
-3. Run `./bin/yarn install` to update local workspace resolution
+2. Verify [`apps/server/package.json`](apps/server/package.json) uses a semver range matching each local workspace package
+3. Run `npm install` to update local workspace resolution
 
 **Asset Copy Failures:**
 
@@ -1073,20 +1054,14 @@ rules: {
 ### Running ESLint
 
 ```bash
-# Lint a specific project
-nx lint webapp
-nx lint server
-nx lint core-lib
+# Lint the repository
+npx just eslint
 
-# Lint all projects
-nx run-many -t lint --all
-
-# Lint affected projects
-nx affected -t lint
-
-# Lint with auto-fix
-nx lint webapp --fix
+# Lint and automatically fix eligible issues
+npx just eslint-fix
 ```
+
+ESLint uses its native content cache under `target/eslint/`. CI builds libraries with Nx before linting so import resolution can use compiled library outputs.
 
 ### Common Issues
 
@@ -1106,14 +1081,20 @@ nx lint webapp --fix
 **Performance issues:**
 
 1. ESLint with type-aware linting can be slower
-2. Use `nx affected -t lint` to only lint changed files
-3. Consider running type-check separately: `nx type-check <project>`
+2. ESLint checks all configured projects; its native content cache skips unchanged files
+3. Run the repository type checks with `npx just type-check`
 
 ---
 
-## Why Use Nx Commands Throughout All Workflows
+## Why Use Nx for Nx-Managed Workflows
 
-Using Nx commands consistently across all workflows (local development, CI/CD, testing, building) is critical for maintaining a healthy monorepo. This section explains why you should always use Nx commands instead of running underlying tools directly.
+Nx continues to manage packaging and server tasks that have not migrated. The production server compilation also has a native Just recipe; type-checking, unit tests, and ESLint run through the root Just recipes.
+
+### Production Server Compilation
+
+Run `npx just build-server` to build workspace libraries, compile `apps/server/tsconfig.json` into `apps/server/build/server`, and copy the runtime assets with `apps/server/bin/copy_server_assets.js`. The copy step includes `.ebextensions`, robots files, templates, certificates, the telemetry embed, and compiled local workspace dependencies. Build metadata generation remains separate.
+
+The Just recipe and its existing `build-libraries` prerequisite do not run Nx clean targets. This avoids unnecessary deletion for normal local builds, but removed or renamed server outputs, copied assets, and compiled library files can remain stale; copied workspace packages can include those stale library files. The Nx `server:build` target cleans `apps/server/build/server`, and Nx cleans the upstream library outputs it rebuilds. The Nx target remains in use by assembly and packaging workflows.
 
 ### 1. Dependency Graph Resolution
 
@@ -1134,7 +1115,7 @@ Nx will:
 **What happens when you run Rspack directly instead of Nx:**
 
 ```bash
-cd apps/webapp && ../../bin/yarn rspack build --config rspack.config.mts
+npm exec --prefix . -- nx run webapp:build
 ```
 
 You might get:
@@ -1188,8 +1169,6 @@ nx affected -t build
 # Only test projects affected by current changes
 nx affected -t test
 
-# Only lint projects affected by current changes
-nx affected -t lint
 ```
 
 **How it works:**
@@ -1210,14 +1189,18 @@ Using Nx commands ensures consistent behavior between local development and CI/C
 **Local development:**
 
 ```bash
-nx run-many -t build test lint --all
+nx run-many -t build test --all
+npx just eslint
 ```
 
 **CI/CD pipeline (GitHub Actions):**
 
 ```yaml
 - name: Build and test
-  run: nx run-many -t build test lint --all
+  run: nx run-many -t build test --all
+
+- name: Lint all projects
+  run: npx just eslint
 ```
 
 Both environments:
@@ -1266,19 +1249,24 @@ Nx runs a daemon process that maintains the project graph in memory for faster o
 - Slower startup times
 - Repeated file analysis
 
-### 7. Avoiding Direct Tool Usage
+### 7. Running Nx-Managed Tools
 
-Running underlying tools directly (Rspack, Jest, TypeScript, ESLint) can cause several issues:
+Nx continues to manage server assembly, packaging, and server tasks that have not migrated. Just recipes manage the standalone Rspack builds, production server compilation, TypeScript checks, unit tests, and ESLint.
 
-| Issue | Running with Nx | Running Directly |
-|--------|----------------|-----------------|
-| **Dependency order** | Automatic | Manual, error-prone |
-| **Caching** | Automatic | None |
-| **Affected detection** | Available | Not available |
-| **Parallel execution** | Optimized | Manual |
-| **CI consistency** | Guaranteed | Not guaranteed |
-| **Project graph** | Aware | Unaware |
-| **Performance** | Optimized | Slower |
+Use Nx for server packaging and remaining server tasks:
+
+```bash
+npx nx run server:package-public
+```
+
+Use Just for builds and repository checks:
+
+```bash
+npx just build-server
+npx just type-check
+npx just test
+npx just eslint
+```
 
 ### Common Pitfalls
 
@@ -1286,41 +1274,38 @@ Running underlying tools directly (Rspack, Jest, TypeScript, ESLint) can cause s
 
 ```bash
 # DON'T DO THIS
-cd apps/webapp && ../../bin/yarn build
+npm --workspace=@wireapp/webapp run build
 
 # INSTEAD DO THIS
-./bin/yarn nx build webapp
+npm exec -- nx run webapp:build
 ```
 
 **Running package `test` scripts directly:**
 
 ```bash
 # DON'T DO THIS
-cd apps/webapp && ../../bin/yarn test
+npm --workspace=@wireapp/webapp run test
 
 # INSTEAD DO THIS
-./bin/yarn nx test webapp
+npm exec -- nx run webapp:test
 ```
 
-**Running `tsc` directly:**
+**Type-checking TypeScript:**
 
 ```bash
-# DON'T DO THIS
-tsc --project apps/webapp/tsconfig.json
-
-# INSTEAD DO THIS
-nx type-check webapp
+npx just type-check
 ```
 
 ### Best Practices
 
-1. **Always use Nx commands** - For build, test, lint, and any other task
-2. **Use `nx run-many`** - When you need to run tasks on multiple projects
-3. **Use `nx affected`** - When you only want to work with changed projects
-4. **Check `nx graph`** - To understand the project structure
-5. **Use `nx show project`** - To see project details and dependencies
-6. **Configure targets in `project.json`** - Don't create custom scripts that bypass Nx
-7. **Use Nx cache** - Let Nx handle caching for you
+1. **Use Just for migrated checks** - Run type-checking with `npx just type-check`, unit tests with `npx just test`, and ESLint with `npx just eslint` or fixes with `npx just eslint-fix`
+2. **Use Nx for remaining tasks** - Nx manages builds, packaging, and server execution
+3. **Use `nx run-many`** - When you need to run Nx tasks on multiple projects
+4. **Use `nx affected`** - When you only want to run supported Nx tasks on changed projects
+5. **Check `nx graph`** - To understand the project structure
+6. **Use `nx show project`** - To see project details and dependencies
+7. **Configure Nx targets in `project.json`** - Keep Nx-managed task configuration with its project
+8. **Use Nx cache for Nx tasks** - Let Nx handle caching for the tasks it still manages
 
 ### Example Workflow
 
@@ -1338,8 +1323,8 @@ nx affected -t build
 # 4. Test affected projects
 nx affected -t test
 
-# 5. Lint affected projects
-nx affected -t lint
+# 5. Lint the repository
+npx just eslint
 
 # 6. If everything passes, commit and push
 ```
@@ -1350,16 +1335,16 @@ nx affected -t lint
 # 1. Make changes to code
 
 # 2. Build everything manually
-cd apps/webapp && ../../bin/yarn build
-cd apps/server && ../../bin/yarn build
+npm --workspace=@wireapp/webapp run build
+npm --workspace=@wireapp/server run build
 
 # 3. Test everything manually
-cd apps/webapp && ../../bin/yarn test
-cd apps/server && ../../bin/yarn test
+npm --workspace=@wireapp/webapp run test
+npm --workspace=@wireapp/server run test
 
 # 4. Lint everything manually
-cd apps/webapp && ../../bin/yarn lint
-cd apps/server && ../../bin/yarn lint
+npm --workspace=@wireapp/webapp run lint
+npm --workspace=@wireapp/server run lint
 ```
 
 The incorrect workflow:
@@ -1480,11 +1465,11 @@ normal Beta-to-Production release entrypoint. Recovery workflows remain
 separate explicit operations for rollback, redeployment from historical
 Production tags, and distribution repair.
 
-### GitHub Workflows Using Nx
+### GitHub Workflow Task Runners
 
-| Workflow | Nx Commands Used |
+| Workflow | Commands Used |
 |----------|------------------|
-| [`ci.yml`](.github/workflows/ci.yml) | `nx run-many -t lint --all`, `nx run-many -t test --all` |
+| [`continuous-integration.yml`](.github/workflows/continuous-integration.yml) | `npx just eslint`, `npx just test-ci` |
 | [`precommit.yml`](.github/workflows/precommit.yml) | `nx run webapp:configure`, `nx run server:package` |
 | [`release-webapp.yml`](.github/workflows/release-webapp.yml) | `nx run webapp:configure`, `nx run server:package` through the exact WebApp release artifact build |
 | [`publish-main.yml`](.github/workflows/publish-main.yml) | Main artifact build, Edge and Hosted Dev delivery, and development distribution |
@@ -1492,11 +1477,11 @@ Production tags, and distribution repair.
 
 ### Coverage in CI
 
-From [`.github/workflows/ci.yml`](.github/workflows/ci.yml):
+From [`.github/workflows/continuous-integration.yml`](.github/workflows/continuous-integration.yml):
 
 ```yaml
 - name: Test
-  run: ./tools/ci/runWithNetworkIsolation.sh ./bin/yarn nx run-many -t test --all --configuration=ci --detectOpenHandles=false
+  run: ./tools/ci/runWithNetworkIsolation.sh npx just test-ci
 
 - name: Upload coverage reports
   if: always()
@@ -1506,23 +1491,20 @@ From [`.github/workflows/ci.yml`](.github/workflows/ci.yml):
     if-no-files-found: warn
     retention-days: 14
     path: |
-      apps/webapp/coverage
-      apps/server/coverage
-      coverage/libraries/core
-      coverage/libraries/api-client
+      target/coverage/apps/webapp
+      target/coverage/apps/server
+      target/coverage/libraries/core
+      target/coverage/libraries/api-client
 ```
 
 ### Common Nx CI Patterns
 
 ```bash
-# Run all tests
-nx run-many -t test --all --configuration=ci
-
-# Run all linting
-nx run-many -t lint --all
+# Run unit tests with coverage and project-specific thresholds
+npx just test-ci
 
 # Run affected projects only
-nx affected -t build test lint
+nx affected -t build test
 
 # Build specific configuration
 nx build webapp --configuration=production
@@ -1552,13 +1534,13 @@ stage('Wait for GitHub action to finish') {
 Start the full dev stack with one command:
 
 ```bash
-yarn dev
+npm run dev
 ```
 
 This runs `nx serve server`, which:
 
 1. Builds each upstream library once before its watcher starts (`watch` → `dependsOn: ["build"]` in `nx.json`)
-2. Starts `watch` on every upstream library in the webapp dependency graph (`webapp:watch-deps` → `^watch` — `tsc --watch` or `vite build --watch`)
+2. Starts TypeScript watch compilation on every upstream library in the webapp dependency graph (`webapp:watch-deps` → `^watch`)
 3. Starts the Express server with the Rspack development server in watch mode (`server:build-dev` — server only, no `^build` or `webapp:build`)
 
 Library changes flow: `libraries/*/src` → `watch` recompiles `lib/` → Rspack detects `@wireapp/*` changes → HMR updates the browser, with a full reload when an update cannot be applied.
@@ -1599,14 +1581,14 @@ In [`apps/webapp/package.json`](apps/webapp/package.json):
 ```json
 {
   "dependencies": {
-    "@wireapp/core": "workspace:^"
+    "@wireapp/core": "^46.47.4"
   }
 }
 ```
 
-The `workspace:^` protocol ensures:
-- Local workspace packages are linked via Yarn workspaces
-- Version is automatically resolved to the local workspace version
+The npm workspace configuration ensures:
+- Matching local workspace packages are linked in `node_modules`
+- Their versions stay aligned through explicit semver ranges
 - Rspack consumes compiled `lib/` output; `watch` targets keep `lib/` in sync during development
 
 ### Nx Daemon for Fast Rebuilds
@@ -1626,17 +1608,17 @@ nx run-many -t build --all           # Build all projects
 nx affected -t build                  # Build affected projects
 
 # Test
-nx test <project>                     # Test specific project
-nx run-many -t test --all             # Test all projects
-nx test <project> --coverage          # Test with coverage
+npx just test                         # Test all projects
+npx just test-ci                      # Test with coverage and thresholds
+npx just test-watch                   # Watch all projects
 
 # Lint
-nx lint <project>                     # Lint specific project
-nx run-many -t lint --all             # Lint all projects
+npx just eslint                       # Lint the repository
+npx just eslint-fix                   # Fix eligible ESLint issues
 
 # Development
-yarn dev                              # Dev server + upstream lib watchers
-nx serve server                       # Same as yarn dev / yarn start
+npm run dev                           # Dev server + upstream lib watchers
+npm exec -- nx serve server           # Same as npm run dev / npm run start
 
 # Graph & Analysis
 nx graph                              # Visualize dependency graph
@@ -1659,27 +1641,26 @@ Projects use tags for organization:
 }
 ```
 
-Run by tags:
+Build by tags:
 ```bash
 nx run-many -t build --projects=tag:frontend
-nx run-many -t test --projects=tag:lib
 ```
 
 ---
 
 ## Key Takeaways for Developers
 
-1. **Always use Nx commands** - Don't run Rspack, Jest, or TypeScript directly
+1. **Use the task runner for each task** - Just runs unit tests and migrated quality checks; Nx runs builds and remaining Nx tasks
 2. **Understand `dependsOn`** - Dependencies are automatically built first
 3. **Cache is your friend** - Nx cache saves time, but remember `nx reset` when needed
 4. **Add projects to [`tsconfig.json`](tsconfig.json)** - Project references are required
 5. **Update [`tsconfig.eslint.json`](tsconfig.eslint.json)** - For type-aware linting to work
-6. **Use `workspace:^`** - For local workspace dependencies in package.json
+6. **Use matching semver ranges** - npm links local workspace dependencies when the declared range matches the local package version
 7. **Configure Jest coverage thresholds** - Add realistic project-local baselines when new libraries/apps add tests
 8. **Update [`.github/labeler.yml`](.github/labeler.yml)** - Add label rules for new projects
 9. **Check `nx graph`** - Visualize dependencies before making changes
 10. **CI uses Nx** - All GitHub workflows use Nx commands
-11. **`yarn dev` watches upstream libs** - `server:serve` depends on `webapp:watch-deps`, which starts `^watch` on webapp's library dependencies
+11. **`npm run dev` watches upstream libs** - `server:serve` depends on `webapp:watch-deps`, which starts `^watch` on webapp's library dependencies
 12. **Path mappings enable clean imports** - Use TypeScript paths for library imports
 13. **`typesVersions` in libraries** - Maps `lib/*` imports to `src/*` for source-based type resolution
 14. **`paths` in tsconfig.eslint.json** - Required for ESLint TypeScript Project Service to resolve imports during linting

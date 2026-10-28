@@ -17,12 +17,15 @@
  *
  */
 
-import {act, render, screen, waitFor, within} from '@testing-library/react';
+import {act, render, screen, waitFor, within, type RenderResult} from '@testing-library/react';
+import type {FunctionComponent} from 'react';
+import {Maybe} from 'true-myth';
 import userEvent from '@testing-library/user-event';
 import {noop} from 'noop-esm';
 import type {UploadState} from 'Repositories/cells/upload';
 import type {Translate} from 'Util/localizerUtil';
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
+import {SharedDriveUploadStatusProvider, useSharedDriveUploadStatus} from './sharedDriveUploadStatusContext';
 import {SharedDriveUploadStatusPopupHost} from './sharedDriveUploadStatusPopupHost';
 import {
   createRootContextValueForTest,
@@ -32,6 +35,39 @@ import {translateForTest} from 'Util/test/translateForTest';
 
 const conversationQualifiedId = 'conversation@example.com';
 const otherConversationQualifiedId = 'other@example.com';
+const translateMoveSummaryForTest: Translate = (key, substitutions) => {
+  if (key === 'cells.bulkMove.movingItems') {
+    return `Moving ${substitutions?.count} items`;
+  }
+  if (key === 'cells.bulkMove.movedItems') {
+    return `Moved ${substitutions?.count} items`;
+  }
+  if (key === 'cells.uploadStatus.destination') {
+    return `to ${substitutions?.destination}`;
+  }
+  return translateForTest(key);
+};
+
+type TestMoveStatus = {
+  readonly id: string;
+  readonly kind: 'processing' | 'completed';
+  readonly items: readonly {readonly id: string; readonly name: string; readonly isFolder: boolean}[];
+  readonly destinationPath: string;
+};
+
+const MoveStatusPollControl: FunctionComponent<{readonly status: TestMoveStatus}> = ({status}) => {
+  const {updateMoveStatus} = useSharedDriveUploadStatus();
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        return updateMoveStatus(status);
+      }}
+    >
+      Poll move status
+    </button>
+  );
+};
 
 const uploadSource = {blob: new Blob(['data']), name: 'report.pdf', contentType: 'application/pdf', size: 4};
 const uploadState: UploadState = {
@@ -108,19 +144,102 @@ const renderHost = (
   isEnabled = true,
   isFileTabActive = true,
   translate = translateForTest,
-) => {
+  moveStatus?: TestMoveStatus,
+): RenderResult => {
   return render(
-    <SharedDriveUploadStatusPopupHost
-      controller={controller}
-      conversationQualifiedId={scope}
-      isEnabled={isEnabled}
-      isFileTabActive={isFileTabActive}
-    />,
+    moveStatus ? (
+      <SharedDriveUploadStatusProvider initialMoveStatus={Maybe.just(moveStatus)}>
+        <MoveStatusPollControl status={moveStatus} />
+        <SharedDriveUploadStatusPopupHost
+          controller={controller}
+          conversationQualifiedId={scope}
+          isEnabled={isEnabled}
+          isFileTabActive={isFileTabActive}
+        />
+      </SharedDriveUploadStatusProvider>
+    ) : (
+      <SharedDriveUploadStatusPopupHost
+        controller={controller}
+        conversationQualifiedId={scope}
+        isEnabled={isEnabled}
+        isFileTabActive={isFileTabActive}
+      />
+    ),
     {wrapper: createRootProviderWrapperForTest(createRootContextValueForTest({translate}))},
   );
 };
 
 describe('SharedDriveUploadStatusPopupHost', () => {
+  it('uses the existing popup for indeterminate move status and prioritizes it over concurrent upload status', () => {
+    const controller = createController();
+    renderHost(controller, conversationQualifiedId, true, true, translateMoveSummaryForTest, {
+      id: 'move-job',
+      kind: 'processing',
+      items: [
+        {id: 'folder-1', name: 'Design reviews', isFolder: true},
+        {id: 'file-1', name: 'mockup.pdf', isFolder: false},
+        {id: 'file-2', name: 'notes.txt', isFolder: false},
+      ],
+      destinationPath: 'Design reviews',
+    });
+
+    expect(document.querySelectorAll('[data-uie-name="shared-drive-upload-status-popup"]')).toHaveLength(1);
+    expect(screen.getByText('Moving 3 items')).toBeInTheDocument();
+    expect(screen.getByText('to Design reviews')).toBeInTheDocument();
+    expect(within(screen.getByRole('list')).getByText('Design reviews')).toBeInTheDocument();
+    expect(screen.getByText('mockup.pdf')).toBeInTheDocument();
+    expect(screen.getByText('notes.txt')).toBeInTheDocument();
+    const progress = screen.getByRole('progressbar', {name: 'cells.bulkMove.processing'});
+    expect(progress).not.toHaveAttribute('aria-valuenow');
+    expect(progress).not.toHaveAttribute('aria-valuemax');
+    expect(screen.getAllByRole('listitem')).toHaveLength(3);
+  });
+
+  it('keeps a dismissed pending move hidden across status updates without cancelling it', async () => {
+    const user = userEvent.setup();
+    const controller = createController();
+    renderHost(controller, conversationQualifiedId, true, true, translateMoveSummaryForTest, {
+      id: 'move-job',
+      kind: 'processing',
+      items: [{id: 'file-1', name: 'mockup.pdf', isFolder: false}],
+      destinationPath: 'Design reviews',
+    });
+
+    await user.click(screen.getByRole('button', {name: 'fileCardDefaultCloseButtonLabel'}));
+    expect(screen.queryByText('Moving 1 items')).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', {name: 'Poll move status'}));
+    expect(screen.queryByText('Moving 1 items')).not.toBeInTheDocument();
+    expect(controller.cancel).not.toHaveBeenCalled();
+  });
+
+  it('shows completion then resumes the upload status in the same popup after dismissal', async () => {
+    const user = userEvent.setup();
+    const controller = createController();
+    renderHost(controller, conversationQualifiedId, true, true, translateMoveSummaryForTest, {
+      id: 'move-job',
+      kind: 'completed',
+      items: [
+        {id: 'folder-1', name: 'Design reviews', isFolder: true},
+        {id: 'file-1', name: 'mockup.pdf', isFolder: false},
+        {id: 'file-2', name: 'notes.txt', isFolder: false},
+      ],
+      destinationPath: 'Design reviews',
+    });
+
+    expect(screen.getByText('Moved 3 items')).toBeInTheDocument();
+    expect(screen.getAllByText('cells.bulkMove.completed')).toHaveLength(3);
+    const progress = screen.getByRole('progressbar', {name: 'cells.bulkMove.completed'});
+    expect(progress).toHaveAttribute('aria-valuemin', '0');
+    expect(progress).toHaveAttribute('aria-valuemax', '100');
+    expect(progress).toHaveAttribute('aria-valuenow', '100');
+    expect(document.querySelectorAll('[data-uie-name="shared-drive-upload-status-popup"]')).toHaveLength(1);
+    await user.click(screen.getByRole('button', {name: 'fileCardDefaultCloseButtonLabel'}));
+
+    expect(await screen.findByText('report.pdf')).toBeInTheDocument();
+    expect(document.querySelectorAll('[data-uie-name="shared-drive-upload-status-popup"]')).toHaveLength(1);
+  });
+
   it('does not render when direct upload is disabled', () => {
     renderHost(createController(), conversationQualifiedId, false);
 
@@ -181,12 +300,10 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     const view = renderHost(controller, conversationQualifiedId, true, true, translateAggregate);
 
     await user.click(view.getByRole('button', {name: 'cells.uploadStatus.expand'}));
-    const rows = view.getAllByTestId('shared-drive-upload-status-row');
+    const rows = view.getAllByRole('listitem');
     expect(rows).toHaveLength(7);
     expect(view.getByText('Uploading 7 items')).toBeInTheDocument();
-    expect(
-      within(view.getByTestId('shared-drive-upload-status-header')).getByRole('button', {name: 'Cancel all'}),
-    ).toBeInTheDocument();
+    expect(within(view.getByRole('group')).getByRole('button', {name: 'Cancel all'})).toBeInTheDocument();
     expect(
       Array.from(rows).map(row => {
         return row.querySelector('strong')?.textContent;
@@ -231,7 +348,7 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     const view = renderHost(controller, conversationQualifiedId, true, true, translateFolder);
     await user.click(view.getByRole('button', {name: 'cells.uploadStatus.expand'}));
 
-    const rows = view.getAllByTestId('shared-drive-upload-status-row');
+    const rows = view.getAllByRole('listitem');
     expect(rows).toHaveLength(1);
     expect(within(rows[0]).getByText('Marketing')).toBeInTheDocument();
     expect(within(rows[0]).getByText('Couldn’t upload 1 of 2 files')).toBeInTheDocument();
@@ -270,7 +387,7 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     const view = renderHost(controller, conversationQualifiedId, true, true, translateFolder);
     await user.click(view.getByRole('button', {name: 'cells.uploadStatus.expand'}));
 
-    const row = view.getByTestId('shared-drive-upload-status-row');
+    const row = view.getByRole('listitem', {hidden: true});
     expect(within(row).getByText('Uploading 1 of 3 files…')).toBeInTheDocument();
     expect(within(row).getByRole('button', {name: 'conversationAssetUploadCancel'})).toBeInTheDocument();
     expect(within(row).queryByRole('button', {name: 'fileCardDefaultCloseButtonLabel'})).not.toBeInTheDocument();
@@ -304,7 +421,7 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     await user.click(view.getByRole('button', {name: 'cells.uploadStatus.expand'}));
 
     await user.click(
-      within(view.getByTestId('shared-drive-upload-status-row')).getByRole('button', {
+      within(view.getByRole('listitem', {hidden: true})).getByRole('button', {
         name: 'conversationAssetUploadCancel',
       }),
     );
@@ -354,14 +471,14 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     controller.cancel.mockReturnValue(new Promise<void>(noop));
 
     const view = renderHost(controller, conversationQualifiedId);
-    const cancel = within(view.getByTestId('shared-drive-upload-status-header')).getByRole('button', {
+    const cancel = within(view.getByRole('group')).getByRole('button', {
       name: 'conversationAssetUploadCancel',
     });
     await user.click(cancel);
 
     expect(controller.cancel).toHaveBeenCalledWith('upload-1');
     expect(view.queryByRole('status')).toBeInTheDocument();
-    expect(view.queryByTestId('shared-drive-upload-status-popup')).toBeInTheDocument();
+    expect(view.queryByRole('status')).toBeInTheDocument();
   });
 
   it('keeps each row cancel disabled until its own batch cancellation settles', async () => {
@@ -389,11 +506,11 @@ describe('SharedDriveUploadStatusPopupHost', () => {
 
     await user.click(view.getByRole('button', {name: 'cells.uploadStatus.expand'}));
     await user.click(
-      within(view.getByTestId('shared-drive-upload-status-header')).getByRole('button', {
+      within(view.getByRole('group')).getByRole('button', {
         name: 'cells.uploadStatus.cancelAll',
       }),
     );
-    const rowCancels = view.getAllByTestId('shared-drive-upload-status-row').map(row => {
+    const rowCancels = view.getAllByRole('listitem').map(row => {
       return within(row).getByRole('button', {name: 'conversationAssetUploadCancel'});
     });
     expect(rowCancels).toHaveLength(2);
@@ -418,7 +535,7 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     controller.cancel.mockRejectedValue(new Error('cancellation failed'));
 
     const view = renderHost(controller, conversationQualifiedId);
-    const cancel = within(view.getByTestId('shared-drive-upload-status-header')).getByRole('button', {
+    const cancel = within(view.getByRole('group')).getByRole('button', {
       name: 'conversationAssetUploadCancel',
     });
     await user.click(cancel);
@@ -434,7 +551,7 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     const controller = createController(uploadedState);
     const view = renderHost(controller, conversationQualifiedId);
 
-    const close = within(view.getByTestId('shared-drive-upload-status-header')).getByRole('button', {
+    const close = within(view.getByRole('group')).getByRole('button', {
       name: 'cells.uploadStatus.closeAriaLabel',
     });
     expect(close).toHaveTextContent('fileCardDefaultCloseButtonLabel');
@@ -449,7 +566,7 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     const user = userEvent.setup();
     const controller = createController(uploadedState);
     const firstRender = renderHost(controller, conversationQualifiedId);
-    const close = within(firstRender.getByTestId('shared-drive-upload-status-header')).getByRole('button', {
+    const close = within(firstRender.getByRole('group')).getByRole('button', {
       name: 'cells.uploadStatus.closeAriaLabel',
     });
 
@@ -493,7 +610,7 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     const view = renderHost(controller, conversationQualifiedId);
 
     await user.click(
-      within(view.getByTestId('shared-drive-upload-status-header')).getByRole('button', {
+      within(view.getByRole('group')).getByRole('button', {
         name: 'cells.uploadStatus.closeAriaLabel',
       }),
     );
@@ -572,7 +689,7 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     const view = renderHost(controller, conversationQualifiedId);
     await user.click(view.getByRole('button', {name: 'cells.uploadStatus.expand'}));
 
-    const retryButtons = view.getAllByTestId('shared-drive-upload-status-row').map(row => {
+    const retryButtons = view.getAllByRole('listitem').map(row => {
       return within(row).getByRole('button', {name: 'conversationFilePreviewErrorRetry'});
     });
     await user.click(retryButtons[0]);
@@ -677,8 +794,11 @@ describe('SharedDriveUploadStatusPopupHost', () => {
         return notify();
       });
       expect(document.querySelectorAll('[data-uie-name="shared-drive-upload-status-popup"]')).toHaveLength(1);
-      expect(screen.getAllByTestId('shared-drive-upload-progress')).toHaveLength(1);
-      expect(screen.getAllByTestId('shared-drive-upload-uploading')).toHaveLength(1);
+      expect(screen.getAllByRole('progressbar')).toHaveLength(1);
+      const decorativeIcon = screen
+        .getByRole('listitem', {hidden: true})
+        .querySelector('[data-uie-name="shared-drive-upload-uploading"]');
+      expect(decorativeIcon).toHaveAttribute('aria-hidden', 'true');
       expect(screen.getByRole('progressbar', {name: 'report.pdf'})).toBe(progress);
       expect(progress).toHaveAttribute('aria-valuenow', `${nextProgress * 100}`);
       expect(progress).toHaveStyle({transform: `scaleX(${nextProgress})`});
@@ -720,7 +840,7 @@ describe('SharedDriveUploadStatusPopupHost', () => {
   it('formats the source size in the expanded status copy', async () => {
     const user = userEvent.setup();
     const controller = createController();
-    const translate = (key: string, substitutions?: Record<string, string | number>) => {
+    const translate = (key: string, substitutions?: Record<string, string | number>): string => {
       return substitutions?.size ? `${key} ${substitutions.size}` : key;
     };
 
@@ -733,7 +853,7 @@ describe('SharedDriveUploadStatusPopupHost', () => {
   it('uses queued copy for queued uploads', async () => {
     const user = userEvent.setup();
     const controller = createController(queuedState);
-    const translate = (key: string, substitutions?: Record<string, string | number>) => {
+    const translate = (key: string, substitutions?: Record<string, string | number>): string => {
       if (substitutions?.name) {
         return `${key} ${substitutions.name}`;
       }
@@ -775,7 +895,7 @@ describe('SharedDriveUploadStatusPopupHost', () => {
 
     expect(screen.getByText('cells.uploadStatus.uploaded')).toBeInTheDocument();
     expect(screen.getByRole('button', {name: 'cells.uploadStatus.expand'})).toHaveAttribute('aria-expanded', 'false');
-    expect(screen.getByTestId('shared-drive-upload-status-row')).not.toBeVisible();
+    expect(screen.getByRole('listitem', {hidden: true})).not.toBeVisible();
   });
 
   it('preserves the expanded state while switching tabs', async () => {
@@ -784,7 +904,7 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     const view = renderHost(controller, conversationQualifiedId);
 
     await user.click(view.getByRole('button', {name: 'cells.uploadStatus.expand'}));
-    expect(view.getByTestId('shared-drive-upload-status-row')).toBeVisible();
+    expect(view.getByRole('listitem', {hidden: true})).toBeVisible();
 
     view.rerender(
       <SharedDriveUploadStatusPopupHost
@@ -806,7 +926,7 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     );
 
     expect(view.getByRole('button', {name: 'cells.uploadStatus.collapse'})).toHaveAttribute('aria-expanded', 'true');
-    expect(view.getByTestId('shared-drive-upload-status-row')).toBeVisible();
+    expect(view.getByRole('listitem', {hidden: true})).toBeVisible();
   });
 
   it('does not show an upload from another conversation', () => {

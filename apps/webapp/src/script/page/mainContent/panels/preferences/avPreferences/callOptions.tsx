@@ -17,7 +17,7 @@
  *
  */
 
-import {ChangeEvent, useCallback, useEffect, useRef, useState} from 'react';
+import {ChangeEvent, useCallback, useEffect, useRef, useState, type FunctionComponent} from 'react';
 
 import type {WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
@@ -43,7 +43,7 @@ interface CallOptionsProps {
   refreshAudioInput: () => Promise<MediaStream>;
 }
 
-const CallOptions = ({
+const CallOptions: FunctionComponent<CallOptionsProps> = ({
   constraintsHandler,
   hasActiveCall,
   propertiesRepository,
@@ -66,7 +66,7 @@ const CallOptions = ({
   );
 
   useEffect(() => {
-    const updateProperties = ({settings}: WebappProperties) => {
+    const updateProperties = ({settings}: WebappProperties): void => {
       setVbrEncoding(!isCbrEncodingEnforced && settings.call.enable_vbr_encoding);
     };
 

@@ -58,7 +58,7 @@ export const ActionLinkButton = forwardRef<HTMLAnchorElement | HTMLButtonElement
       ...restProps
     } = props;
 
-    const baseCss = (theme: Theme) => {
+    const baseCss = (theme: Theme): CSSObject => {
       return {
         ...linkStyle(theme, {
           bold,

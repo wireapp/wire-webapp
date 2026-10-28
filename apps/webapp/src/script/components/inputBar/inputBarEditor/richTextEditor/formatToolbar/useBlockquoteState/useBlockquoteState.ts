@@ -22,10 +22,11 @@ import {$isQuoteNode, $createQuoteNode} from '@lexical/rich-text';
 import {$setBlocksType} from '@lexical/selection';
 import {$createParagraphNode, $getSelection, $isRangeSelection} from 'lexical';
 
-export const useBlockquoteState = () => {
+type UseBlockquoteStateResult = {formatBlockquote: () => void};
+export const useBlockquoteState = (): UseBlockquoteStateResult => {
   const [editor] = useLexicalComposerContext();
 
-  const formatBlockquote = () => {
+  const formatBlockquote = (): void => {
     editor.update(() => {
       const selection = $getSelection();
 

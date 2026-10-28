@@ -24,13 +24,30 @@ export type MeetingPrepJoinChoice = {
   microphoneEnabled: boolean;
 };
 
+export const meetingPrepMediaKinds = {
+  audio: 'audio',
+  video: 'video',
+} as const;
+
+export type MeetingPrepMediaKind = (typeof meetingPrepMediaKinds)[keyof typeof meetingPrepMediaKinds];
+
+export const meetingPrepDeviceKinds = {
+  camera: 'camera',
+  microphone: 'microphone',
+} as const;
+
+export type MeetingPrepDeviceKind = (typeof meetingPrepDeviceKinds)[keyof typeof meetingPrepDeviceKinds];
+
 export type MeetingPrepPreviewRequest = {
   audio: boolean;
   video: boolean;
+  mediaKind: MeetingPrepMediaKind;
 };
 
 export const meetingPrepPreviewErrors = {
   requestFailed: 'requestFailed',
+  cameraPermissionDenied: 'cameraPermissionDenied',
+  microphonePermissionDenied: 'microphonePermissionDenied',
 } as const;
 
 export type MeetingPrepPreviewError = (typeof meetingPrepPreviewErrors)[keyof typeof meetingPrepPreviewErrors];
