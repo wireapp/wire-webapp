@@ -27,67 +27,102 @@ export type OpfsDirectoryHandle = {
   removeEntry: (name: string) => Promise<void>;
 };
 
-/** OPFS directory in which the CoreCrypto browser build keeps all of its SQLite databases. */
+/** OPFS directory in which the CoreCrypto browser build keeps its SQLite databases. */
 const coreCryptoOpfsDirectoryName = 'core-crypto';
 
 /** SQLite files that can exist next to a database file. */
 const sqliteCompanionFileSuffixes = ['', '-wal', '-journal', '-shm'];
 
-const hexadecimalRadix = 16;
-const hexDigitsPerByte = 2;
-
-/** Lowercase hex encoding of the UTF-8 bytes of `value`. */
-const toHex = (value: string): string => {
-  return Array.from(new TextEncoder().encode(value), byte => {
-    return byte.toString(hexadecimalRadix).padStart(hexDigitsPerByte, '0');
-  }).join('');
-};
-
 /**
- * Names of the OPFS files that back the CoreCrypto database opened at `databaseLocation`.
- *
- * The CoreCrypto browser build stores each SQLite file as `f-<hex-encoded file path>` inside its OPFS directory,
- * where the file path is the database location followed by SQLite's suffix (such as `-wal`). This mirrors an
- * internal detail of CoreCrypto, which does not offer an API to delete a database.
+ * Names of the files, relative to the CoreCrypto OPFS directory, that back the database opened at
+ * `databaseLocation`: the database file itself and the SQLite files next to it (such as `-wal`).
  */
 export const getCoreCryptoDatabaseFileNames = (databaseLocation: string): string[] => {
   return sqliteCompanionFileSuffixes.map(suffix => {
-    return `f-${toHex(`${databaseLocation}${suffix}`)}`;
+    return `${databaseLocation}${suffix}`;
   });
 };
 
-const isNotFoundError = (error: unknown): boolean => {
-  return error instanceof DOMException && error.name === 'NotFoundError';
+export type RemoveRetryOptions = {
+  /** Delays between attempts to remove a file that CoreCrypto still holds open. */
+  readonly retryDelaysInMilliseconds: readonly number[];
+  readonly wait: (milliseconds: number) => Promise<void>;
+};
+
+const firstRetryDelayInMilliseconds = 50;
+const retryBackoffFactor = 2;
+const retryCount = 6;
+
+/**
+ * After the CoreCrypto handles are destroyed, its OPFS worker releases the files asynchronously, and nothing
+ * signals when that has happened. In Chromium this took between 50 and 500 milliseconds; these delays add up to
+ * about three seconds.
+ */
+export const defaultRemoveRetryOptions: RemoveRetryOptions = {
+  retryDelaysInMilliseconds: Array.from({length: retryCount}, (_unused, attempt) => {
+    return firstRetryDelayInMilliseconds * retryBackoffFactor ** attempt;
+  }),
+  wait: milliseconds => {
+    return new Promise(resolve => {
+      setTimeout(resolve, milliseconds);
+    });
+  },
+};
+
+const isDomExceptionNamed = (error: unknown, name: string): boolean => {
+  return error instanceof DOMException && error.name === name;
+};
+
+/** Removes a file, waiting for CoreCrypto to release it if necessary. A missing file counts as removed. */
+const removeFile = async (
+  directory: OpfsDirectoryHandle,
+  fileName: string,
+  {retryDelaysInMilliseconds, wait}: RemoveRetryOptions,
+): Promise<Result<void, unknown>> => {
+  const delays = [...retryDelaysInMilliseconds];
+  for (;;) {
+    try {
+      await directory.removeEntry(fileName);
+      return result.ok(undefined);
+    } catch (error) {
+      if (isDomExceptionNamed(error, 'NotFoundError')) {
+        return result.ok(undefined);
+      }
+      const delay = delays.shift();
+      if (!isDomExceptionNamed(error, 'NoModificationAllowedError') || delay === undefined) {
+        return result.err(error);
+      }
+      await wait(delay);
+    }
+  }
 };
 
 /**
  * Removes the OPFS files of the CoreCrypto database opened at `databaseLocation`.
  *
- * Files that do not exist are skipped. The files of a database that is still open in this page, or whose
- * handles were destroyed but not yet garbage collected, cannot be removed: those failures are reported in the
- * returned error after every file has been tried.
+ * All CoreCrypto handles on the database must have been destroyed (see `destroyCoreCryptoHandles`). Files that
+ * do not exist are skipped, and files that are still held open are retried until CoreCrypto releases them.
+ * Failures are reported in the returned error after every file has been tried.
  */
 export const removeCoreCryptoDatabaseFiles = async (
   opfsRoot: OpfsDirectoryHandle,
   databaseLocation: string,
+  retryOptions: RemoveRetryOptions = defaultRemoveRetryOptions,
 ): Promise<Result<void, Error>> => {
   let coreCryptoDirectory: OpfsDirectoryHandle;
   try {
     coreCryptoDirectory = await opfsRoot.getDirectoryHandle(coreCryptoOpfsDirectoryName);
   } catch (error) {
-    return isNotFoundError(error)
+    return isDomExceptionNamed(error, 'NotFoundError')
       ? result.ok(undefined)
       : result.err(new Error('Failed to open the CoreCrypto OPFS directory', {cause: error}));
   }
 
   const failures: unknown[] = [];
   for (const fileName of getCoreCryptoDatabaseFileNames(databaseLocation)) {
-    try {
-      await coreCryptoDirectory.removeEntry(fileName);
-    } catch (error) {
-      if (!isNotFoundError(error)) {
-        failures.push(error);
-      }
+    const removeResult = await removeFile(coreCryptoDirectory, fileName, retryOptions);
+    if (result.isErr(removeResult)) {
+      failures.push(removeResult.error);
     }
   }
 

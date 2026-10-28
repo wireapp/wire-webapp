@@ -23,14 +23,17 @@ import {
   getCoreCryptoDatabaseFileNames,
   OpfsDirectoryHandle,
   removeCoreCryptoDatabaseFiles,
+  RemoveRetryOptions,
 } from './coreCryptoOpfsStorage';
 
-// File names CoreCrypto 11.0.0-pre.2 created in Chromium for a database opened at `corecrypto-flat`.
-const observedDatabaseFileName = 'f-636f726563727970746f2d666c6174';
-const observedWriteAheadLogFileName = 'f-636f726563727970746f2d666c61742d77616c';
+const databaseLocation = 'corecrypto-wire@staging@9d1c4a7e-0000-4000-8000-000000000000@permanent';
+// File names CoreCrypto 11.0.0-pre.4 created in Chromium for a database opened at `databaseLocation`.
+const observedDatabaseFileName = databaseLocation;
+const observedWriteAheadLogFileName = `${databaseLocation}-wal`;
+const otherDatabaseFileName = 'corecrypto-other';
 
-const notFoundError = (): DOMException => {
-  return new DOMException('not found', 'NotFoundError');
+const domException = (name: string): DOMException => {
+  return new DOMException(name, name);
 };
 
 type FakeOpfs = {
@@ -41,23 +44,33 @@ type FakeOpfs = {
 function createFakeOpfs({
   files,
   hasCoreCryptoDirectory = true,
-  lockedFiles = [],
+  heldOpenFor = {},
+  failingFiles = {},
 }: {
   files: string[];
   hasCoreCryptoDirectory?: boolean;
-  lockedFiles?: string[];
+  /** Number of removal attempts per file that fail because CoreCrypto still holds the file open. */
+  heldOpenFor?: Record<string, number>;
+  /** Files whose removal always fails with the given exception name. */
+  failingFiles?: Record<string, string>;
 }): FakeOpfs {
   const storedFiles = new Set(files);
+  const remainingHeldOpenAttempts = new Map(Object.entries(heldOpenFor));
   const coreCryptoDirectory: OpfsDirectoryHandle = {
     getDirectoryHandle: async () => {
-      throw notFoundError();
+      throw domException('NotFoundError');
     },
     removeEntry: async name => {
-      if (lockedFiles.includes(name)) {
-        throw new DOMException('locked', 'NoModificationAllowedError');
+      if (failingFiles[name] !== undefined) {
+        throw domException(failingFiles[name]);
+      }
+      const heldOpenAttempts = remainingHeldOpenAttempts.get(name) ?? 0;
+      if (heldOpenAttempts > 0) {
+        remainingHeldOpenAttempts.set(name, heldOpenAttempts - 1);
+        throw domException('NoModificationAllowedError');
       }
       if (!storedFiles.delete(name)) {
-        throw notFoundError();
+        throw domException('NotFoundError');
       }
     },
   };
@@ -66,18 +79,29 @@ function createFakeOpfs({
       if (name === 'core-crypto' && hasCoreCryptoDirectory) {
         return coreCryptoDirectory;
       }
-      throw notFoundError();
+      throw domException('NotFoundError');
     },
     removeEntry: async () => {
-      throw notFoundError();
+      throw domException('NotFoundError');
     },
   };
   return {root, files: storedFiles};
 }
 
+function createRetryOptions(retryDelaysInMilliseconds: number[]): RemoveRetryOptions & {waits: number[]} {
+  const waits: number[] = [];
+  return {
+    retryDelaysInMilliseconds,
+    waits,
+    wait: async milliseconds => {
+      waits.push(milliseconds);
+    },
+  };
+}
+
 describe('getCoreCryptoDatabaseFileNames', () => {
-  it('derives the file names CoreCrypto uses for a database and its SQLite companion files', () => {
-    const fileNames = getCoreCryptoDatabaseFileNames('corecrypto-flat');
+  it('names the database file and its SQLite companion files as CoreCrypto creates them', () => {
+    const fileNames = getCoreCryptoDatabaseFileNames(databaseLocation);
 
     expect(fileNames).toContain(observedDatabaseFileName);
     expect(fileNames).toContain(observedWriteAheadLogFileName);
@@ -85,14 +109,12 @@ describe('getCoreCryptoDatabaseFileNames', () => {
 });
 
 describe('removeCoreCryptoDatabaseFiles', () => {
-  const otherDatabaseFileName = getCoreCryptoDatabaseFileNames('corecrypto-other')[0];
-
   it('removes the files of the given database and leaves other databases alone', async () => {
     const opfs = createFakeOpfs({
       files: [observedDatabaseFileName, observedWriteAheadLogFileName, otherDatabaseFileName],
     });
 
-    const removeResult = await removeCoreCryptoDatabaseFiles(opfs.root, 'corecrypto-flat');
+    const removeResult = await removeCoreCryptoDatabaseFiles(opfs.root, databaseLocation, createRetryOptions([]));
 
     expect(result.isOk(removeResult)).toBe(true);
     expect([...opfs.files]).toEqual([otherDatabaseFileName]);
@@ -101,7 +123,7 @@ describe('removeCoreCryptoDatabaseFiles', () => {
   it('succeeds when the database has no files', async () => {
     const opfs = createFakeOpfs({files: [otherDatabaseFileName]});
 
-    const removeResult = await removeCoreCryptoDatabaseFiles(opfs.root, 'corecrypto-flat');
+    const removeResult = await removeCoreCryptoDatabaseFiles(opfs.root, databaseLocation, createRetryOptions([]));
 
     expect(result.isOk(removeResult)).toBe(true);
     expect([...opfs.files]).toEqual([otherDatabaseFileName]);
@@ -110,20 +132,49 @@ describe('removeCoreCryptoDatabaseFiles', () => {
   it('succeeds when CoreCrypto never created its OPFS directory', async () => {
     const opfs = createFakeOpfs({files: [], hasCoreCryptoDirectory: false});
 
-    const removeResult = await removeCoreCryptoDatabaseFiles(opfs.root, 'corecrypto-flat');
+    const removeResult = await removeCoreCryptoDatabaseFiles(opfs.root, databaseLocation, createRetryOptions([]));
 
     expect(result.isOk(removeResult)).toBe(true);
   });
 
-  it('removes what it can and reports files that are still in use', async () => {
+  it('waits for CoreCrypto to release files that it still holds open', async () => {
     const opfs = createFakeOpfs({
       files: [observedDatabaseFileName, observedWriteAheadLogFileName],
-      lockedFiles: [observedDatabaseFileName],
+      heldOpenFor: {[observedDatabaseFileName]: 2},
     });
+    const retryOptions = createRetryOptions([10, 20, 40]);
 
-    const removeResult = await removeCoreCryptoDatabaseFiles(opfs.root, 'corecrypto-flat');
+    const removeResult = await removeCoreCryptoDatabaseFiles(opfs.root, databaseLocation, retryOptions);
+
+    expect(result.isOk(removeResult)).toBe(true);
+    expect([...opfs.files]).toEqual([]);
+    expect(retryOptions.waits).toEqual([10, 20]);
+  });
+
+  it('gives up on a file that stays held open and still removes the others', async () => {
+    const opfs = createFakeOpfs({
+      files: [observedDatabaseFileName, observedWriteAheadLogFileName],
+      heldOpenFor: {[observedDatabaseFileName]: 5},
+    });
+    const retryOptions = createRetryOptions([10, 20]);
+
+    const removeResult = await removeCoreCryptoDatabaseFiles(opfs.root, databaseLocation, retryOptions);
 
     expect(result.isErr(removeResult)).toBe(true);
     expect([...opfs.files]).toEqual([observedDatabaseFileName]);
+    expect(retryOptions.waits).toEqual([10, 20]);
+  });
+
+  it('does not retry other failures', async () => {
+    const opfs = createFakeOpfs({
+      files: [observedDatabaseFileName],
+      failingFiles: {[observedDatabaseFileName]: 'SecurityError'},
+    });
+    const retryOptions = createRetryOptions([10, 20]);
+
+    const removeResult = await removeCoreCryptoDatabaseFiles(opfs.root, databaseLocation, retryOptions);
+
+    expect(result.isErr(removeResult)).toBe(true);
+    expect(retryOptions.waits).toEqual([]);
   });
 });
