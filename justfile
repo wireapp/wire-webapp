@@ -134,6 +134,11 @@ build-webapp-internal: build-libraries
 assemble-server-internal: build-server build-webapp-internal
     node apps/server/bin/assembleBuild.mts internal artifact
 
+# Package the internal server deployment artifact as a ZIP.
+[group('build')]
+package-server-internal: assemble-server-internal
+    node tools/serverPackaging/zip.js
+
 # Assemble the public server deployment artifact without creating a ZIP.
 [group('build')]
 assemble-server-public: build-server build-webapp-public
