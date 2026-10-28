@@ -162,6 +162,28 @@ build-webapp-public: build-libraries
     WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json node apps/server/bin/generateVersionFile.mts
     cd apps/webapp && WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/public rspack build --config rspack.config.public.mts
 
+# Configure the webapp, generate its React icon components, and validate their types.
+configure-webapp:
+    cd libraries/copy-config && rimraf lib && tsc
+    cd apps/webapp && node ../../libraries/copy-config/lib/cli.js ./.copyconfigrc.js
+    cd apps/webapp && ts-node ./bin/generate_react_icons.ts
+    cd apps/webapp && tsc --project ./tsconfig.generated-icons.json --noEmit
+
+# Assemble the internal production webapp into the server webapp artifact scope.
+[group('build')]
+assemble-webapp-internal: build-webapp-internal
+    node apps/server/bin/assembleBuild.mts internal webapp
+
+# Assemble the development webapp into the server webapp artifact scope.
+[group('build')]
+assemble-webapp-development: build-webapp-development
+    node apps/server/bin/assembleBuild.mts development webapp
+
+# Assemble the public production webapp into the server webapp artifact scope.
+[group('build')]
+assemble-webapp-public: build-webapp-public
+    node apps/server/bin/assembleBuild.mts public webapp
+
 # Remove generated library outputs and library build information for a clean build.
 [group('build')]
 clean-libraries:

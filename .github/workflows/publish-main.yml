@@ -106,7 +106,7 @@ jobs:
         run: npm clean-install
 
       - name: Update configuration
-        run: npm exec -- nx run webapp:configure
+        run: npx just configure-webapp
 
       - name: Resolve main webapp build metadata inputs
         id: build_metadata_inputs

@@ -77,54 +77,10 @@
         "command": "playwright test --config {projectRoot}/playwright.config.ts"
       }
     },
-    "smoke-rspack": {
-      "executor": "nx:run-commands",
-      "cache": false,
-      "outputs": ["{projectRoot}/playwright-report/rspack-smoke", "{projectRoot}/test-results/rspack-smoke"],
-      "options": {
-        "command": "playwright test --config {projectRoot}/playwright.rspack.config.ts",
-        "cwd": "{workspaceRoot}"
-      }
-    },
     "stylelint": {
       "executor": "nx:run-commands",
       "options": {
         "command": "npx just stylesheet-lint"
-      }
-    },
-    "check-circular": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "dpdm --no-warning --no-tree -T {projectRoot}/src/script/auth/main.tsx {projectRoot}/src/script/main/app.ts"
-      }
-    },
-    "translate-extract": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "i18next-scanner 'src/{page,script}/**/*.{js,html,htm}'",
-        "cwd": "{projectRoot}"
-      }
-    },
-    "translate-merge": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "formatjs extract --format './bin/translations_extract_formatter.js' --out-file './src/i18n/en-US.json' 'src/**/*.{ts,tsx,js,jsx}' --ignore 'src/**/*.d.ts' --additional-function-names t",
-        "cwd": "{projectRoot}"
-      }
-    },
-    "validate-translations": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "node tools/i18n/validateTranslationPlaceholders.mts",
-        "cwd": "{workspaceRoot}"
-      }
-    },
-    "configure": {
-      "executor": "nx:run-commands",
-      "dependsOn": ["copy-config-lib:build"],
-      "options": {
-        "command": "node ../../libraries/copy-config/lib/cli.js ./.copyconfigrc.js && ts-node ./bin/generate_react_icons.ts && tsc --project ./tsconfig.generated-icons.json --noEmit",
-        "cwd": "{projectRoot}"
       }
     }
   },

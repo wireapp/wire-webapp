@@ -39,8 +39,8 @@ Prerequisites:
 ## 1. Install Dependencies & Fetch Configuration
 
 1. Run `npm clean-install` (uses npm workspaces and the committed root lockfile)
-   - This will install all dependencies and run `webapp:configure` (via root `postinstall`).
-   - `webapp:configure` uses `apps/webapp/app-config/package.json` to select a config repository version (`wire-web-config-wire` or `wire-web-config-default`), then copies:
+   - This will install all dependencies and run `npx just configure-webapp` (via root `postinstall`).
+   - `configure-webapp` uses `apps/webapp/app-config/package.json` to select a config repository version (`wire-web-config-wire` or `wire-web-config-default`), then copies:
      - config content into `apps/webapp/resource/`
      - `.env.defaults` into repository root
    - Runtime priority is: process environment (for example AWS) > `.env` > `.env.defaults` > code fallback.
@@ -108,14 +108,14 @@ Rspack is the sole application bundler for internal and public production builds
 
 1. Build only the internal Rspack WebApp assets: `npx just build-webapp-internal` (or assemble them with `npm run bundle:prod`)
 1. Compile the production server and copy its runtime assets: `npx just build-server` (writes to `apps/server/build/server` after building workspace libraries)
-1. Build and package the default internal Rspack release: `npm run build:prod` (or `npx nx run server:package`)
+1. Build and package the default internal Rspack release: `npm run build:prod` (or `npx just package-server-internal`)
    - This builds both the server and webapp (in production mode) and creates the deployment package at `apps/server/dist/s3/ebs.zip`
 1. Build and package the default public Rspack release: `npm run build:prod:public`
 1. Start the server output from `apps/server/dist` (or build a Docker image with `npm run docker -- <tag>`)
 
 `npx just build-server` compiles with the server TypeScript project and copies the server runtime assets, including the telemetry embed and compiled local workspace dependencies. It does not remove an existing `apps/server/build/server` directory, and its `build-libraries` prerequisite does not run Nx clean targets. Files for removed or renamed server sources, assets, or library outputs can remain; the Nx `server:build` target cleans its output and Nx cleans upstream library outputs it rebuilds.
 
-**Note:** The `zip` command has been deprecated. Packaging is integrated into the build process via `npm run build:prod` or `npx nx run server:package`.
+**Note:** The `zip` command has been deprecated. Packaging is integrated into the build process via `npm run build:prod` or `npx just package-server-internal`.
 
 ## Testing
 
