@@ -29,7 +29,7 @@
     "@sindresorhus/is": "8.1.0",
     "@wireapp/api-client": "27.96.0",
     "@wireapp/commons": "5.4.13",
-    "@wireapp/core-crypto": "11.0.0-pre.2",
+    "@wireapp/core-crypto": "11.0.0-pre.4",
     "@wireapp/cryptobox": "12.8.0",
     "@wireapp/priority-queue": "2.1.19",
     "@wireapp/protocol-messaging": "1.56.0",
