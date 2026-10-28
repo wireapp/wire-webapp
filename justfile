@@ -168,23 +168,34 @@ build-webapp-public: build-libraries
 prepare-development-server: build-libraries
     rimraf apps/server/dist apps/server/build/metadata
     WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json node apps/server/bin/generateVersionFile.mts
-    tsc --project apps/server/tsconfig.json
+    tsc --project apps/server/tsconfig.json --incremental
     WIRE_WEBAPP_SERVER_OUTPUT_PATH=apps/server/dist node apps/server/bin/copy_server_assets.js
     cp apps/server/build/metadata/version.json apps/server/dist/version.json
 
-# Build dependencies, then compile TypeScript and run the Express server with native watch modes.
+# Build dependencies once, then run the server and its upstream library watchers.
 [group('development')]
-development: prepare-development-server
-    concurrently --kill-others --names server-types,server \
+develop: prepare-development-server
+    concurrently --raw --kill-others \
         "just watch-server-typescript" \
-        "just run-development-server"
+        "just run-development-server" \
+        "just watch-library-commons" \
+        "just watch-library-config" \
+        "just watch-library-core" \
+        "just watch-library-api-client" \
+        "just watch-library-priority-queue" \
+        "just watch-library-react-ui-kit" \
+        "just watch-library-store-engine" \
+        "just watch-library-store-engine-dexie" \
+        "just watch-library-telemetry" \
+        "just watch-library-webapp-events" \
+        "just watch-library-bazinga64"
 
-# Compile dependencies, prompt for libraries, then run selected watchers with the server.
+# Alternative to develop: build dependencies, select libraries, and start the server.
 [group('development')]
-development-watch: prepare-development-server
+develop-watch: prepare-development-server
     ts-node --project ./tsconfig.tools.json tools/development/startDevelopment.ts
 
-# Build all workspace libraries and run all native TypeScript watchers.
+# Build and watch every workspace library without starting the server.
 [group('development')]
 watch-libraries: build-libraries
     concurrently --kill-others --names bazinga64,certificate-check,commons,config,copy-config,license-collector,priority-queue,react-ui-kit,store-engine,store-engine-dexie,store-engine-fs,telemetry,webapp-events,api-client,core \
@@ -207,13 +218,18 @@ watch-libraries: build-libraries
 # Recompile server sources while Node watches the compiled output and restarts the server.
 [group('development')]
 watch-server-typescript:
-    tsc --project apps/server/tsconfig.json --watch --preserveWatchOutput
+    tsc --project apps/server/tsconfig.json --incremental --watch --preserveWatchOutput
 
 [group('development')]
 run-development-server:
-    node --watch apps/server/dist/index.js
+    export NODE_ENV=development; \
+    if [ "$(uname -s)" = "Darwin" ]; then \
+        node --watch-path=apps/server/dist apps/server/dist/index.js; \
+    else \
+        node --watch apps/server/dist/index.js; \
+    fi
 
-# Compile one workspace library continuously; watch-libraries and development-watch select these.
+# Compile one workspace library continuously; watch-libraries and develop-watch select these.
 [group('development')]
 watch-library-bazinga64:
     tsc --project libraries/bazinga64/tsconfig.json --watch --preserveWatchOutput

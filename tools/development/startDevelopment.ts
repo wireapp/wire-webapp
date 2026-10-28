@@ -29,7 +29,6 @@ async function main(): Promise<void> {
     choices: developmentLibraries,
   });
   const libraryWatchRecipes = getSelectedLibraryWatchRecipes({libraryRecipeNames: selectedLibraryRecipeNames});
-  const concurrentProcessNames = ['server-typescript', 'server', ...libraryWatchRecipes];
   const concurrentCommands = [
     'just watch-server-typescript',
     'just run-development-server',
@@ -37,11 +36,11 @@ async function main(): Promise<void> {
       return `just ${recipeName}`;
     }),
   ];
-  const concurrentlyResult = spawnSync(
-    'concurrently',
-    ['--kill-others', '--names', concurrentProcessNames.join(','), ...concurrentCommands],
-    {cwd: process.cwd(), env: process.env, stdio: 'inherit'},
-  );
+  const concurrentlyResult = spawnSync('concurrently', ['--raw', '--kill-others', ...concurrentCommands], {
+    cwd: process.cwd(),
+    env: process.env,
+    stdio: 'inherit',
+  });
 
   if (concurrentlyResult.error !== undefined) {
     throw concurrentlyResult.error;
