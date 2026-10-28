@@ -7,7 +7,7 @@ These tests serve the generated default internal Rspack build in `dist/internal`
 Build both variants and install Chromium once:
 
 ```bash
-npm exec -- nx run webapp:build
+npx just build-webapp-internal
 npm exec -- nx run webapp:build-production-public
 npm exec -- playwright install chromium
 npm exec -- nx run webapp:smoke-rspack

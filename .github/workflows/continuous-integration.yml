@@ -164,7 +164,7 @@ jobs:
         run: npm clean-install
 
       - name: Build internal webapp
-        run: npm exec -- nx run webapp:build
+        run: npx just build-webapp-internal
 
       - name: Build and package public webapp with Rspack
         id: public_rspack_package

@@ -102,7 +102,7 @@ After updating the environment variables, the app will be available at the corre
 
 Rspack is the sole application bundler for internal and public production builds and local development. Jest continues to use Babel.
 
-1. Build only the internal Rspack WebApp assets: `npx nx run webapp:build` (or assemble them with `npm run bundle:prod`)
+1. Build only the internal Rspack WebApp assets: `npx just build-webapp-internal` (or assemble them with `npm run bundle:prod`)
 1. Build and package the default internal Rspack release: `npm run build:prod` (or `npx nx run server:package`)
    - This builds both the server and webapp (in production mode) and creates the deployment package at `apps/server/dist/s3/ebs.zip`
 1. Build and package the default public Rspack release: `npm run build:prod:public`
