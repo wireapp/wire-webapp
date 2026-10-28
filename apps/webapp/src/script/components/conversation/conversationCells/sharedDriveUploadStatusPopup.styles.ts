@@ -73,7 +73,7 @@ export const sharedDriveUploadStatusPopupTitleStyles: CSSObject = {
 export const sharedDriveUploadStatusPopupMoveAlertStyles: CSSObject = {
   margin: 0,
   color: 'var(--danger-color, #c20013)',
-  fontSize: 12,
+  fontSize: 'var(--font-size-small)',
   lineHeight: '16px',
 };
 

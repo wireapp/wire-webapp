@@ -26,6 +26,7 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 import type {Translate} from 'Util/localizerUtil';
 import {formatBytes} from 'Util/util';
 
+import {moveStatusMessageKey} from './sharedDriveMoveStatusMessages';
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
 import {
   getRepresentativeSharedDriveUploadStatus,
@@ -54,14 +55,6 @@ const moveStatusLabelKey: Record<SharedDriveMoveStatusKind, Parameters<Translate
   'finished-unknown': 'cells.bulkMove.needsReviewStatus',
   failed: 'cells.bulkMove.needsReviewStatus',
   'status-unknown': 'cells.bulkMove.needsReviewStatus',
-};
-
-const moveStatusMessageKey: Partial<Record<SharedDriveMoveStatusKind, Parameters<Translate>[0]>> = {
-  'request-failed': 'cells.bulkMove.requestFailed',
-  partial: 'cells.bulkMove.partialMoveWarning',
-  'finished-unknown': 'cells.bulkMove.finishedUnknown',
-  failed: 'cells.bulkMove.allJobsFailed',
-  'status-unknown': 'cells.bulkMove.statusLookupUnknown',
 };
 
 const moveStatusTitleKey: Record<SharedDriveMoveStatusKind, Parameters<Translate>[0]> = {
@@ -309,7 +302,8 @@ export const SharedDriveUploadStatusPopupHost: FunctionComponent<SharedDriveUplo
 
   if (isFileTabActive && maybe.isJust(moveStatus)) {
     const move = moveStatus.value;
-    const statusMessageKey = moveStatusMessageKey[move.kind];
+    const statusMessageKey =
+      move.kind === 'processing' || move.kind === 'completed' ? undefined : moveStatusMessageKey[move.kind];
     return (
       <SharedDriveUploadStatusPopup
         move={move}
