@@ -35,7 +35,7 @@ jobs:
         run: npm clean-install
 
       - name: Merge translations
-        run: npm exec -- nx run webapp:translate-merge
+        run: npm run --workspace @wireapp/webapp translate:merge
 
       - name: Upload sources to Crowdin
         uses: crowdin/github-action@7ca9c452bfe9197d3bb7fa83a4d7e2b0c9ae835d
