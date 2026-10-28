@@ -163,7 +163,7 @@ jobs:
       - name: Install dependencies
         run: npm clean-install
 
-      - name: Build webapps and production server with Just
+      - name: Build webapps and assemble the internal production server with Just
         id: public_rspack_build
         env:
           WIRE_WEBAPP_BUILD_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
@@ -171,30 +171,15 @@ jobs:
           short_commit_sha="${WIRE_WEBAPP_BUILD_COMMIT::7}"
           expected_version="dev-${short_commit_sha}"
           export WIRE_WEBAPP_BUILD_VERSION="${expected_version}"
-          npx just build-webapp-internal build-webapp-development build-webapp-public build-server
+          npx just assemble-server-internal build-webapp-development build-webapp-public
           echo "expected_version=${expected_version}" >> "$GITHUB_OUTPUT"
 
-      - name: Verify native production server build output
+      - name: Verify internal server assembly
         run: |
-          set -euo pipefail
-
-          required_server_output_paths=(
-            apps/server/build/server/index.js
-            apps/server/build/server/index.js.map
-            apps/server/build/server/.ebextensions/00-environment.config
-            apps/server/build/server/robots/robots.txt
-            apps/server/build/server/templates/error.html
-            apps/server/build/server/certificate/rootCA.pem
-            apps/server/build/server/libs/wire/telemetry/embed.js
-            apps/server/build/server/node_modules/@wireapp/config/lib/index.js
-          )
-
-          for required_server_output_path in "${required_server_output_paths[@]}"; do
-            if [[ ! -f "${required_server_output_path}" ]]; then
-              echo "Native production server build is missing required output: ${required_server_output_path}" >&2
-              exit 1
-            fi
-          done
+          test -s apps/server/dist/index.js
+          test -s apps/server/dist/static/index.html
+          test -s apps/server/dist/version.json
+          test -s apps/server/dist/libs/wire/telemetry/embed.js
 
       - name: Run Rspack browser smoke tests
         run: npx nx run webapp:smoke-rspack
