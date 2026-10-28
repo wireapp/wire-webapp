@@ -867,10 +867,9 @@ ebs.zip
 The deployment process uses a dual build chain:
 
 1. **Server Build Chain:**
-   - `server:build` depends on `^build` (all libraries)
-   - Compiles server TypeScript to JavaScript
-   - Generates version file
-   - Copies server assets and pre-bundles workspace libraries
+   - `npx just build-server` builds workspace libraries, compiles server TypeScript to `apps/server/build/server`, and copies runtime assets and local workspace dependencies
+   - Build metadata generation remains separate
+   - The Nx `server:build` target still cleans and compiles this output for the remaining Nx assembly and packaging workflows
 
 2. **Webapp Build Chain:**
    - `webapp:build` depends on `^build` (all libraries)
@@ -1089,7 +1088,13 @@ ESLint uses its native content cache under `target/eslint/`. CI builds libraries
 
 ## Why Use Nx for Nx-Managed Workflows
 
-Nx continues to manage build, packaging, and server tasks. Type-checking, unit tests, and ESLint run through the root Just recipes.
+Nx continues to manage packaging and server tasks that have not migrated. The production server compilation also has a native Just recipe; type-checking, unit tests, and ESLint run through the root Just recipes.
+
+### Production Server Compilation
+
+Run `npx just build-server` to build workspace libraries, compile `apps/server/tsconfig.json` into `apps/server/build/server`, and copy the runtime assets with `apps/server/bin/copy_server_assets.js`. The copy step includes `.ebextensions`, robots files, templates, certificates, the telemetry embed, and compiled local workspace dependencies. Build metadata generation remains separate.
+
+The Just recipe and its existing `build-libraries` prerequisite do not run Nx clean targets. This avoids unnecessary deletion for normal local builds, but removed or renamed server outputs, copied assets, and compiled library files can remain stale; copied workspace packages can include those stale library files. The Nx `server:build` target cleans `apps/server/build/server`, and Nx cleans the upstream library outputs it rebuilds. The Nx target remains in use by assembly and packaging workflows.
 
 ### 1. Dependency Graph Resolution
 
@@ -1246,17 +1251,18 @@ Nx runs a daemon process that maintains the project graph in memory for faster o
 
 ### 7. Running Nx-Managed Tools
 
-Nx continues to manage production builds and server tasks. The Just recipes manage TypeScript checks, unit tests, and linting.
+Nx continues to manage server assembly, packaging, and server tasks that have not migrated. Just recipes manage the standalone Rspack builds, production server compilation, TypeScript checks, unit tests, and ESLint.
 
-Use Nx for production builds and server tasks:
+Use Nx for server packaging and remaining server tasks:
 
 ```bash
-npm exec -- nx run webapp:build
+npx nx run server:package-public
 ```
 
-Use Just for repository TypeScript checks, unit tests, and ESLint:
+Use Just for builds and repository checks:
 
 ```bash
+npx just build-server
 npx just type-check
 npx just test
 npx just eslint

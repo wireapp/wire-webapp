@@ -107,10 +107,13 @@ Build a one-shot development-mode WebApp bundle with `npx just build-webapp-deve
 Rspack is the sole application bundler for internal and public production builds and local development. Jest continues to use Babel.
 
 1. Build only the internal Rspack WebApp assets: `npx just build-webapp-internal` (or assemble them with `npm run bundle:prod`)
+1. Compile the production server and copy its runtime assets: `npx just build-server` (writes to `apps/server/build/server` after building workspace libraries)
 1. Build and package the default internal Rspack release: `npm run build:prod` (or `npx nx run server:package`)
    - This builds both the server and webapp (in production mode) and creates the deployment package at `apps/server/dist/s3/ebs.zip`
 1. Build and package the default public Rspack release: `npm run build:prod:public`
 1. Start the server output from `apps/server/dist` (or build a Docker image with `npm run docker -- <tag>`)
+
+`npx just build-server` compiles with the server TypeScript project and copies the server runtime assets, including the telemetry embed and compiled local workspace dependencies. It does not remove an existing `apps/server/build/server` directory, and its `build-libraries` prerequisite does not run Nx clean targets. Files for removed or renamed server sources, assets, or library outputs can remain; the Nx `server:build` target cleans its output and Nx cleans upstream library outputs it rebuilds.
 
 **Note:** The `zip` command has been deprecated. Packaging is integrated into the build process via `npm run build:prod` or `npx nx run server:package`.
 
