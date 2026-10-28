@@ -431,7 +431,7 @@ jobs:
           short_commit_sha="${WIRE_WEBAPP_BUILD_COMMIT::7}"
           expected_version="dev-${short_commit_sha}"
           WIRE_WEBAPP_BUILD_VERSION="${expected_version}" \
-            npm run build:prod:public
+            npx just package-server-public
 
           BUILD_ARTIFACT_PATH=apps/server/dist/s3/ebs.zip \
           EXPECTED_COMMIT="${WIRE_WEBAPP_BUILD_COMMIT}" \

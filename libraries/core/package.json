@@ -53,8 +53,7 @@
   "scripts": {
     "build": "nx run core-lib:build",
     "clean": "nx run core-lib:clean",
-    "dist": "nx run core-lib:dist",
-    "start": "nx run core-lib:start"
+    "dist": "nx run core-lib:dist"
   },
   "version": "46.47.4",
   "gitHead": "5339f01fe01ef0871da8c8bc8662fbe9e604754a"

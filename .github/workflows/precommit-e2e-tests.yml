@@ -74,10 +74,10 @@ jobs:
 
           if [[ "${EVENT_NAME}" == "workflow_dispatch" && "${USE_PUBLIC_RSPACK}" == "true" ]]; then
             WIRE_WEBAPP_BUILD_VERSION="${expected_version}" \
-              npm run build:prod:public
+              npx just package-server-public
           else
             WIRE_WEBAPP_BUILD_VERSION="${expected_version}" \
-              npm run build:prod
+              npx just package-server-internal
           fi
 
           {

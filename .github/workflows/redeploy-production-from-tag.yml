@@ -147,7 +147,7 @@ jobs:
 
       - name: Build workflow tool dependencies
         working-directory: workflow-source
-        run: npm exec -- nx run config-lib:build
+        run: npx nx run config-lib:build
 
       - name: Setup Node.js for selected release
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
@@ -174,11 +174,12 @@ jobs:
         run: |
           package_manager="$(node ../workflow-source/tools/packageManager/packageManager.js "$PWD")"
           if [[ "${package_manager}" == 'npm' ]]; then
-            npm exec -- nx run webapp:configure
+            npx nx run webapp:configure
           else
             ./bin/yarn nx run webapp:configure
           fi
 
+      # This checkout is a selected historical release; keep its own build command for compatibility.
       - name: Build and package
         working-directory: selected-release
         env:

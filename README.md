@@ -53,10 +53,10 @@ Prerequisites:
 1. Add the following entries to your hosts file (macOS / Linux: `/etc/hosts`, Windows 10: `%WINDIR%\system32\drivers\etc\hosts`):
    - `127.0.0.1 local.zinfra.io` (to connect with the staging backend)
    - `127.0.0.1 local.imai.wire.link` (to connect with the imai backend)
-1. Run `npm run dev` or `npm run start`; Just builds the workspace libraries and server output, then starts the Express server with the existing Rspack development configuration. Rspack compiles the WebApp in memory and serves it at https://local.zinfra.io:8081/auth/ with React Fast Refresh.
-1. Server TypeScript changes are recompiled with `tsc --watch`; `node --watch` restarts the compiled Express server when its output changes. `concurrently` stops the other process if either watcher exits.
-1. To rebuild selected libraries while developing, run `npm run start:watch` and choose the libraries to watch. It builds dependencies first, then runs native TypeScript watchers for the selected libraries; Rspack picks up their compiled `@wireapp/*` modules.
-1. To watch all development libraries without starting the server, run `npm run dev:packages`.
+1. Run `npx just develop`; Just builds the workspace libraries and server output, then starts the Express server, its TypeScript watcher, and watchers for the WebApp's upstream libraries. Rspack compiles the WebApp in memory and serves it at https://local.zinfra.io:8081/auth/ with React Fast Refresh.
+1. Server TypeScript changes are recompiled with `tsc --watch`; `node --watch` restarts the compiled Express server when its output changes. `concurrently` stops sibling processes if any watcher exits.
+1. `npx just develop-watch` is an alternative to `npx just develop`: it starts the server with libraries you select interactively. Choose one development command; do not run `develop-watch` alongside `develop`.
+1. To watch all development libraries without starting the server, run `npx just watch-libraries`.
 1. In case you're facing a CORS issue after login when the app tries to fetch `self/consent` from the backend, append
    `FEATURE_CHECK_CONSENT="false"` to the env file
 
@@ -102,22 +102,22 @@ After updating the environment variables, the app will be available at the corre
 
 ### Development bundle
 
-Build a one-shot development-mode WebApp bundle with `npx just build-webapp-development`. The static files are written to `apps/webapp/dist/development`. This does not start the live development server: use `npm run dev` for the server with Rspack watch mode and hot reload. `npm run bundle:dev` continues to assemble the development bundle into the server output.
+Build a one-shot development-mode WebApp bundle with `npx just build-webapp-development`. The static files are written to `apps/webapp/dist/development`. This does not start the live development server: use `npx just develop` for the server with Rspack watch mode and hot reload. Use `npx just assemble-webapp-development` to assemble the development bundle into the server output.
 
 ### Production
 
 Rspack is the sole application bundler for internal and public production builds and local development. Jest continues to use Babel.
 
-1. Build only the internal Rspack WebApp assets: `npx just build-webapp-internal` (or assemble them with `npm run bundle:prod`)
+1. Build only the internal Rspack WebApp assets: `npx just build-webapp-internal` (or assemble them with `npx just assemble-webapp-internal`)
 1. Compile the production server and copy its runtime assets: `npx just build-server` (writes to `apps/server/build/server` after building workspace libraries)
-1. Build and package the default internal Rspack release: `npm run build:prod` (or `npx just package-server-internal`)
+1. Build and package the default internal Rspack release: `npx just package-server-internal`
    - This builds both the server and webapp (in production mode) and creates the deployment package at `apps/server/dist/s3/ebs.zip`
-1. Build and package the default public Rspack release: `npm run build:prod:public`
+1. Build and package the default public Rspack release: `npx just package-server-public`
 1. Start the server output from `apps/server/dist` (or build a Docker image with `npm run docker -- <tag>`)
 
 `npx just build-server` compiles with the server TypeScript project and copies the server runtime assets, including the telemetry embed and compiled local workspace dependencies. It does not remove an existing `apps/server/build/server` directory, and its `build-libraries` prerequisite does not run Nx clean targets. Files for removed or renamed server sources, assets, or library outputs can remain; the Nx `server:build` target cleans its output and Nx cleans upstream library outputs it rebuilds.
 
-**Note:** The `zip` command has been deprecated. Packaging is integrated into the build process via `npm run build:prod` or `npx just package-server-internal`.
+**Note:** The `zip` command has been deprecated. Packaging is integrated into the build process via `npx just package-server-internal`.
 
 ## Testing
 
@@ -135,8 +135,8 @@ Other useful tasks:
 - ESLint only: `npx just eslint`
 - Fix ESLint issues: `npx just eslint-fix`
 - Type-check: `npx just type-check`
-- E2E (Playwright): `npm run e2e-test` (pass Playwright options after `--`, for example `npm run e2e-test -- --grep "@regression|@crit-flow-web"`)
-- E2E UI mode: `npm run e2e-ui`
+- E2E (Playwright): `npx just e2e-test` (for example, `npx just e2e-test --grep "@regression|@crit-flow-web"`)
+- E2E UI mode: `npx just e2e-ui`
 
 ## CI Status
 
@@ -173,14 +173,14 @@ If our CI pipeline is broken, you still have the option to upload new strings ma
 
 1. Install [Crowdin CLI v3](https://support.crowdin.com/cli-tool/)
 1. Verify you have a `keys/crowdin.yaml` in place
-1. Run `npm run translate:upload`
+1. Run `crowdin upload sources` with the Crowdin CLI v3 configuration.
 
 Once translations are uploaded on Crowdin, our (and external) translators can translate the new strings on Crowdin. There is a script that will run to create PRs with translation updates. As an alternative, translations can be downloaded in the following way:
 
 1. Verify your string shows up on the [Crowdin project: wire-webapp](https://crowdin.com/translate/wire-webapp/1224/en-en)
 1. Add a translation on Crowdin
 1. Approve the translation on Crowdin
-1. Run `npm run translate:download`
+1. Run `crowdin download translations` with the Crowdin CLI v3 configuration.
 
 ## Contributing
 

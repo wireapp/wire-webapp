@@ -34,24 +34,14 @@ The `workspace-tools` project provides workspace-level utilities and the Jest co
 - `nx run workspace-tools:clean-jest` - Clean Jest cache
 - `nx run workspace-tools:docker` - Build Docker image
 
-The root package keeps Nx for release commands and routes local development and E2E
-through Just and native tools:
+Run local development and E2E tasks directly through Just:
 
-```json
-{
-  "scripts": {
-    "dev": "npx just development",
-    "dev:packages": "npx just watch-libraries",
-    "start": "npx just development",
-    "start:watch": "npx just development-watch",
-    "e2e-test": "npx just e2e-test",
-    "e2e-ui": "npx just e2e-ui",
-    "release": "nx release",
-    "release:dry-run": "nx release --dry-run",
-    "release:version": "nx release version",
-    "release:publish": "nx release publish"
-  }
-}
+```bash
+npx just develop
+npx just develop-watch
+npx just watch-libraries
+npx just e2e-test
+npx just e2e-ui
 ```
 
 ---
@@ -1119,7 +1109,7 @@ Nx will:
 **What happens when you run Rspack directly instead of Nx:**
 
 ```bash
-npm exec --prefix . -- nx run webapp:build
+npx just build-webapp-internal
 ```
 
 You might get:
@@ -1274,24 +1264,16 @@ npx just eslint
 
 ### Common Pitfalls
 
-**Running package `build` scripts directly:**
+**Build and test through Just:**
 
 ```bash
-# DON'T DO THIS
-npm --workspace=@wireapp/webapp run build
-
-# INSTEAD DO THIS
-npm exec -- nx run webapp:build
+# Build the WebApp and its workspace dependencies.
+npx just build-webapp-internal
 ```
 
-**Running package `test` scripts directly:**
-
 ```bash
-# DON'T DO THIS
-npm --workspace=@wireapp/webapp run test
-
-# INSTEAD DO THIS
-npm exec -- nx run webapp:test
+# Run the repository's unit tests.
+npx just test
 ```
 
 **Type-checking TypeScript:**
@@ -1302,8 +1284,8 @@ npx just type-check
 
 ### Best Practices
 
-1. **Use Just for migrated checks** - Run type-checking with `npx just type-check`, unit tests with `npx just test`, and ESLint with `npx just eslint` or fixes with `npx just eslint-fix`
-2. **Use Nx for remaining tasks** - Nx manages builds, packaging, and server execution
+1. **Use Just for migrated tasks** - Run builds, type-checking, tests, lint, development, and E2E through Just
+2. **Use Nx for remaining tasks** - Nx remains for release, publishing, and deployment compatibility
 3. **Use `nx run-many`** - When you need to run Nx tasks on multiple projects
 4. **Use `nx affected`** - When you only want to run supported Nx tasks on changed projects
 5. **Check `nx graph`** - To understand the project structure
@@ -1313,49 +1295,14 @@ npx just type-check
 
 ### Example Workflow
 
-**Correct workflow:**
+**Current workflow:**
 
 ```bash
-# 1. Make changes to code
-
-# 2. See what's affected
-nx affected:graph
-
-# 3. Build affected projects
-nx affected -t build
-
-# 4. Test affected projects
-nx affected -t test
-
-# 5. Lint the repository
-npx just eslint
-
-# 6. If everything passes, commit and push
+npx just build-webapp-internal
+npx just build-server
+npx just test
+npx just lint
 ```
-
-**Incorrect workflow:**
-
-```bash
-# 1. Make changes to code
-
-# 2. Build everything manually
-npm --workspace=@wireapp/webapp run build
-npm --workspace=@wireapp/server run build
-
-# 3. Test everything manually
-npm --workspace=@wireapp/webapp run test
-npm --workspace=@wireapp/server run test
-
-# 4. Lint everything manually
-npm --workspace=@wireapp/webapp run lint
-npm --workspace=@wireapp/server run lint
-```
-
-The incorrect workflow:
-- Takes longer (no caching, no affected detection)
-- May miss dependencies (manual order)
-- May behave differently in CI
-- Is harder to maintain
 
 ---
 
@@ -1535,26 +1482,24 @@ stage('Wait for GitHub action to finish') {
 
 ### Development server and library watchers
 
-Run `npm run dev` or `npm run start` to start the local server. Both commands call
-`npx just development`, which builds workspace libraries, generates server version metadata,
-cleans and compiles the server with `tsc`, and copies the runtime assets. It then starts
-`tsc --watch` for server sources alongside `node --watch` on the compiled server output.
-The initial compile and asset preparation finish before either long-running process starts.
-When TypeScript updates compiled output, Node restarts the server. `concurrently --kill-others`
-stops the sibling process if either long-running command exits.
+Run `npx just develop` to build workspace libraries, generate server version metadata,
+clean and compile the server with `tsc`, and copy runtime assets. It starts server TypeScript
+and Node watchers together with watchers for the WebApp's upstream workspace libraries.
+Preparation finishes before any long-running process starts. When TypeScript updates compiled
+server output, Node restarts the server. `concurrently --kill-others` stops sibling processes
+if any long-running command exits.
 
 The server continues to use the Express and Rspack development setup in `apps/server/Server.ts`
 and `apps/webapp/rspack.config.dev.mts`. Rspack serves its output in memory with React Fast
 Refresh. When server source changes, TypeScript updates `apps/server/dist` and Node restarts
 the server process.
 
-The default `npm run dev` command builds libraries but does not watch library source. Use
-`npm run start:watch` to choose libraries interactively; the existing defaults are
-`react-ui-kit` and `api-client`. Selected libraries rebuild with `tsc --watch`, and Rspack
-detects their updated workspace package output. `npm run dev:packages` builds and watches
-all development libraries without starting the server. The Justfile defines one watch recipe
-per library, and `concurrently` runs the selected recipes. Telemetry is the special case: its
-watch recipe copies SDK assets and uses TypeScript build mode for both `tsconfig.json` and
+`npx just develop-watch` is an alternative to `npx just develop`. It builds
+dependencies, lets you choose libraries interactively (defaulting to `react-ui-kit` and
+`api-client`), and starts the server with those library watchers. Do not run both development
+recipes at the same time. Use `npx just watch-libraries` to build and watch all development
+libraries without starting the server. The Justfile defines one watch recipe per library.
+Telemetry's recipe copies SDK assets and watches both `tsconfig.json` and
 `tsconfig.commonjs.json`.
 
 The Just recipes are in [`justfile`](../justfile). The interactive library selection is in
@@ -1624,9 +1569,9 @@ npx just eslint                       # Lint the repository
 npx just eslint-fix                   # Fix eligible ESLint issues
 
 # Development
-npm run dev                           # Build dependencies and run the server with native watch mode
-npm run start:watch                   # Choose libraries to watch alongside the server
-npm run dev:packages                  # Watch all development libraries without the server
+npx just develop                       # Run the server and upstream library watchers
+npx just develop-watch                 # Alternative: choose library watchers interactively
+npx just watch-libraries              # Watch libraries without starting the server
 
 # Graph & Analysis
 nx graph                              # Visualize dependency graph
@@ -1668,7 +1613,7 @@ nx run-many -t build --projects=tag:frontend
 8. **Update [`.github/labeler.yml`](.github/labeler.yml)** - Add label rules for new projects
 9. **Check `nx graph`** - Visualize dependencies before making changes
 10. **E2E uses Playwright directly** - The workflow builds workspace libraries before native Playwright discovery and execution
-11. **`npm run dev` watches server output** - Use `npm run start:watch` to watch selected library sources
+11. **`npx just develop` watches upstream libraries** - Use `npx just develop-watch` as an alternative to select a subset
 12. **Path mappings enable clean imports** - Use TypeScript paths for library imports
 13. **`typesVersions` in libraries** - Maps `lib/*` imports to `src/*` for source-based type resolution
 14. **`paths` in tsconfig.eslint.json** - Required for ESLint TypeScript Project Service to resolve imports during linting

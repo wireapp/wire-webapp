@@ -26,14 +26,6 @@
       "options": {
         "command": "echo 'Build complete'"
       }
-    },
-    "start": {
-      "executor": "nx:run-commands",
-      "dependsOn": ["dist"],
-      "options": {
-        "command": "node index.js",
-        "cwd": "{projectRoot}"
-      }
     }
   },
   "tags": ["type:lib", "scope:core"]

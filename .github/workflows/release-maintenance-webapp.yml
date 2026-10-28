@@ -378,11 +378,12 @@ jobs:
         run: |
           package_manager="$(node workflow-source/tools/packageManager/packageManager.js "$PWD")"
           if [[ "${package_manager}" == 'npm' ]]; then
-            npm exec -- nx run webapp:configure
+            npx nx run webapp:configure
           else
             ./bin/yarn nx run webapp:configure
           fi
 
+      # The exact maintenance commit may predate the Just build recipes; run its own build command.
       - name: Build and package public production artifact
         env:
           WIRE_WEBAPP_BUILD_COMMIT: ${{ needs.prepare_maintenance_branch.outputs.maintenance_commit_sha }}

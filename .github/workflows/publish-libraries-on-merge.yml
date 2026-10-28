@@ -99,7 +99,7 @@ jobs:
       - name: Publish to npm
         run: |
           echo "📦 Publishing release to npm..."
-          npm exec -- nx release publish --verbose
+          npx nx release publish --verbose
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_CONFIG_PROVENANCE: true

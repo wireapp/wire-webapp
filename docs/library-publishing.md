@@ -113,10 +113,10 @@ Preview what a release would do without publishing:
 npm run release:dry-run
 
 # Version only (no publish)
-npm exec -- nx release version
+npx nx release version
 
 # Publish already-versioned packages
-npm exec -- nx release publish
+npx nx release publish
 ```
 
 ---
@@ -198,7 +198,7 @@ cd libraries/api-client
 npm version patch  # or minor / major
 
 # 2. Build
-npm exec -- nx build api-client-lib
+npx nx build api-client-lib
 
 # 3. Publish with provenance
 npm publish --provenance --access public

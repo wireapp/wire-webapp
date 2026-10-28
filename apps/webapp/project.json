@@ -11,7 +11,7 @@
       "dependsOn": ["^build", "server:generate-build-metadata"],
       "inputs": ["production", "webappBuildMetadata", "{workspaceRoot}/apps/server/build/metadata/version.json"],
       "options": {
-        "command": "WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/internal npm run build:prod",
+        "command": "npx just --justfile ../../justfile build-webapp-internal",
         "cwd": "{projectRoot}"
       }
     },
@@ -22,7 +22,7 @@
       "dependsOn": ["^build", "server:generate-build-metadata"],
       "inputs": ["production", "webappBuildMetadata", "{workspaceRoot}/apps/server/build/metadata/version.json"],
       "options": {
-        "command": "WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/public npm run build:prod:public",
+        "command": "npx just --justfile ../../justfile build-webapp-public",
         "cwd": "{projectRoot}"
       }
     },

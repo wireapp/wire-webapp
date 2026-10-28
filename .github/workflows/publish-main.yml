@@ -122,7 +122,7 @@ jobs:
           WIRE_WEBAPP_BUILD_COMMIT: ${{ steps.build_metadata_inputs.outputs.commit }}
           WIRE_WEBAPP_BUILD_VERSION: ${{ steps.build_metadata_inputs.outputs.version }}
         run: |
-          npm run build:prod
+          npx just package-server-internal
 
       - name: Validate main artifact metadata
         id: validate_artifact_metadata

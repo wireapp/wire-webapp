@@ -211,25 +211,13 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       - name: Update configuration
-        run: |
-          package_manager="$(node workflow-source/tools/packageManager/packageManager.js "$PWD")"
-          if [[ "${package_manager}" == 'npm' ]]; then
-            npm exec -- nx run webapp:configure
-          else
-            ./bin/yarn nx run webapp:configure
-          fi
+        run: npx just configure-webapp
 
       - name: Build and package public production
         env:
           WIRE_WEBAPP_BUILD_COMMIT: ${{ steps.release_metadata.outputs.release_commit_sha }}
           WIRE_WEBAPP_BUILD_VERSION: ${{ steps.release_metadata.outputs.release_version }}
-        run: |
-          package_manager="$(node workflow-source/tools/packageManager/packageManager.js "$PWD")"
-          if [[ "${package_manager}" == 'npm' ]]; then
-            npm run build:prod:public
-          else
-            ./bin/yarn build:prod:public
-          fi
+        run: npx just package-server-public
 
       - name: Validate release artifact metadata
         id: validate_artifact_metadata
