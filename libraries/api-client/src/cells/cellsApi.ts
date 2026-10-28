@@ -73,16 +73,19 @@ const bulkMutationNetworkRetryConfig = {
 } as const;
 
 const getNodeUuidLocators = (uuids: readonly string[]): RestNodeLocator[] => {
-  if (
-    uuids.length === 0 ||
-    uuids.some(uuid => {
-      return uuid.trim().length === 0;
-    })
-  ) {
+  const uniqueUuids = [
+    ...new Set(
+      uuids.filter(uuid => {
+        return uuid.trim().length > 0;
+      }),
+    ),
+  ];
+
+  if (uniqueUuids.length === 0) {
     throw new Error('At least one non-empty node UUID is required');
   }
 
-  return [...new Set(uuids)].map(Uuid => {
+  return uniqueUuids.map(Uuid => {
     return {Uuid};
   });
 };

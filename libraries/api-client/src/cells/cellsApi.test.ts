@@ -816,8 +816,21 @@ describe('CellsAPI', () => {
       await expect(cellsAPI[method]({uuids: ['file-uuid']})).resolves.toBe(response);
     });
 
-    it.each([{uuids: []}, {uuids: ['']}, {uuids: ['file-uuid', '   ']}])(
-      'rejects invalid targets $uuids before sending a request',
+    it('drops blank targets and preserves the original non-blank UUIDs', async () => {
+      mockNodeServiceApi.performAction.mockResolvedValueOnce(createMockResponse({Status: 'Performed'}));
+
+      await cellsAPI[method]({uuids: ['file-uuid', '  ', 'folder-uuid', '\t']});
+
+      expect(mockNodeServiceApi.performAction).toHaveBeenCalledWith(
+        action,
+        expect.objectContaining({Nodes: [{Uuid: 'file-uuid'}, {Uuid: 'folder-uuid'}]}),
+        undefined,
+        {'axios-retry': {retries: 0}},
+      );
+    });
+
+    it.each([{uuids: []}, {uuids: ['']}, {uuids: [' ', '\t']}])(
+      'rejects when no non-blank targets remain: $uuids',
       async ({uuids}) => {
         await expect(cellsAPI[method]({uuids})).rejects.toThrow('At least one non-empty node UUID is required');
 
