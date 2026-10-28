@@ -334,16 +334,6 @@ jobs:
           fetch-depth: 1
           ref: ${{ needs.prepare_maintenance_branch.outputs.maintenance_commit_sha }}
 
-      - name: Checkout current package manager selector
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          persist-credentials: false
-          fetch-depth: 1
-          ref: ${{ github.workflow_sha }}
-          path: workflow-source
-          sparse-checkout: tools/packageManager/packageManager.js
-          sparse-checkout-cone-mode: false
-
       - name: Verify exact maintenance application commit
         env:
           EXPECTED_MAINTENANCE_COMMIT_SHA: ${{ needs.prepare_maintenance_branch.outputs.maintenance_commit_sha }}
@@ -363,37 +353,23 @@ jobs:
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: '.nvmrc'
-          # The source checkout may still use Yarn; package manager selection is validated at runtime.
 
       - name: Install maintenance source dependencies
-        run: |
-          package_manager="$(node workflow-source/tools/packageManager/packageManager.js "$PWD")"
-          if [[ "${package_manager}" == 'npm' ]]; then
-            npm clean-install
-          else
-            ./bin/yarn --immutable
-          fi
+        run: npm clean-install
 
       - name: Update WebApp configuration
-        run: |
-          package_manager="$(node workflow-source/tools/packageManager/packageManager.js "$PWD")"
-          if [[ "${package_manager}" == 'npm' ]]; then
-            npx nx run webapp:configure
-          else
-            ./bin/yarn nx run webapp:configure
-          fi
+        run: npx nx run webapp:configure
 
-      # The exact maintenance commit may predate the Just build recipes; run its own build command.
+      # Use the maintenance checkout's Just recipe when available, with legacy commands as fallback.
       - name: Build and package public production artifact
         env:
           WIRE_WEBAPP_BUILD_COMMIT: ${{ needs.prepare_maintenance_branch.outputs.maintenance_commit_sha }}
           WIRE_WEBAPP_BUILD_VERSION: ${{ needs.select_maintenance_tag.outputs.candidate_tag }}
         run: |
-          package_manager="$(node workflow-source/tools/packageManager/packageManager.js "$PWD")"
-          if [[ "${package_manager}" == 'npm' ]]; then
-            npm run build:prod:public
+          if [[ -f justfile ]] && grep -Eq '^package-server-public[[:space:]]*:' justfile; then
+            npx just package-server-public
           else
-            ./bin/yarn build:prod:public
+            npm run build:prod:public
           fi
 
       - name: Validate maintenance artifact metadata

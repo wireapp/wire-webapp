@@ -174,46 +174,32 @@ jobs:
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: 'selected-release/.nvmrc'
-          # The selected release may predate the npm migration, so its lockfile is selected at runtime.
 
       - name: Install selected release dependencies
         working-directory: selected-release
         env:
           WIRE_WEBAPP_CONFIGURATION: production
-        run: |
-          package_manager="$(node ../workflow-source/tools/packageManager/packageManager.js "$PWD")"
-          if [[ "${package_manager}" == 'npm' ]]; then
-            npm clean-install
-          else
-            ./bin/yarn --immutable
-          fi
+        run: npm clean-install
 
       - name: Update selected release configuration
         working-directory: selected-release
         env:
           WIRE_WEBAPP_CONFIGURATION: production
-        run: |
-          package_manager="$(node ../workflow-source/tools/packageManager/packageManager.js "$PWD")"
-          if [[ "${package_manager}" == 'npm' ]]; then
-            npx nx run webapp:configure
-          else
-            ./bin/yarn nx run webapp:configure
-          fi
+        run: npx nx run webapp:configure
 
       # Interim limitation: until durable release artifact storage exists, this
       # workflow rebuilds the deployable artifact from the selected Production tag.
-      # This checkout is a selected historical release; keep its own build command for compatibility.
+      # Use the selected release's Just recipe when available, with its legacy commands as fallback.
       - name: Build and package
         working-directory: selected-release
         env:
           WIRE_WEBAPP_BUILD_COMMIT: ${{ steps.git_metadata.outputs.rollback_commit_sha }}
           WIRE_WEBAPP_BUILD_VERSION: ${{ needs.validate_request.outputs.webapp_build_version }}
         run: |
-          package_manager="$(node ../workflow-source/tools/packageManager/packageManager.js "$PWD")"
-          if [[ "${package_manager}" == 'npm' ]]; then
-            npm run build:prod:public
+          if [[ -f justfile ]] && grep -Eq '^package-server-public[[:space:]]*:' justfile; then
+            npx just package-server-public
           else
-            ./bin/yarn build:prod:public
+            npm run build:prod:public
           fi
 
       - name: Restore Node.js for workflow tools
