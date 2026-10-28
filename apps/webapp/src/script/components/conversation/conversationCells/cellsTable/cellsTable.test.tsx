@@ -24,6 +24,7 @@ import userEvent from '@testing-library/user-event';
 import {noop} from 'noop-esm';
 
 import {ThemeProvider} from '@wireapp/react-ui-kit';
+import {Maybe} from 'true-myth';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {
@@ -62,6 +63,9 @@ const translateSelectionForTest: Translate = (key, substitutions) => {
   }
   if (key === 'cells.moveNodeModal.moveTitle') {
     return 'Move to folder';
+  }
+  if (key === 'cells.moveNodeModal.createTitle') {
+    return 'Create Folder';
   }
   if (key === 'cells.bulkMove.moveButton') {
     return 'Move';
@@ -112,6 +116,7 @@ const createNode = (overrides: Partial<CellNode>): CellNode => {
     path: 'node-name',
     name: 'Node name',
     sizeMb: '1 MB',
+    sizeBytes: Maybe.nothing(),
     uploadedAtTimestamp: 0,
     owner: 'Owner',
     conversationName: 'Conversation',
@@ -260,6 +265,51 @@ const renderCellsTable = ({
 };
 
 describe('CellsTable selection', () => {
+  it('shows the precise total for selected files and clears it with the selection', () => {
+    const files = [
+      createNode({id: 'first-file', type: CellNodeType.FILE, sizeBytes: Maybe.just(104857600)}),
+      createNode({id: 'second-file', type: CellNodeType.FILE, sizeBytes: Maybe.just(129918566)}),
+    ];
+    renderCellsTable({initialNodes: files});
+
+    fireEvent.click(screen.getAllByRole('checkbox')[0]);
+    fireEvent.click(screen.getAllByRole('checkbox')[1]);
+
+    expect(within(screen.getByRole('status')).getByText('2 selected')).toBeInTheDocument();
+    expect(within(screen.getByRole('status')).getByText('223.9 MB')).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Move'})).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', {name: 'Clear selection'}));
+    expect(screen.queryByText('223.9 MB')).not.toBeInTheDocument();
+  });
+
+  it('omits the total when the selected files would overflow a safe integer', () => {
+    const files = [
+      createNode({id: 'first-file', type: CellNodeType.FILE, sizeBytes: Maybe.just(Number.MAX_SAFE_INTEGER)}),
+      createNode({id: 'second-file', type: CellNodeType.FILE, sizeBytes: Maybe.just(1)}),
+    ];
+    renderCellsTable({initialNodes: files});
+
+    fireEvent.click(screen.getAllByRole('checkbox')[0]);
+    fireEvent.click(screen.getAllByRole('checkbox')[1]);
+
+    expect(within(screen.getByRole('status')).getByText('2 selected')).toBeInTheDocument();
+    expect(within(screen.getByRole('status')).queryByText(/\d+(\.\d+)? (B|KB|MB|GB)/)).not.toBeInTheDocument();
+  });
+
+  it.each([
+    {label: 'a folder', node: createNode({id: 'folder', type: CellNodeType.FOLDER, sizeBytes: Maybe.just(1048576)})},
+    {label: 'a file with unknown size', node: createNode({id: 'unknown', type: CellNodeType.FILE})},
+  ])('omits the selected size when the selection contains $label', ({node}) => {
+    renderCellsTable({initialNodes: [node]});
+
+    fireEvent.click(screen.getByRole('checkbox'));
+
+    const selectionStatus = screen.getByRole('status');
+    expect(within(selectionStatus).getByText('1 selected')).toBeInTheDocument();
+    expect(within(selectionStatus).queryByText(/\d+(\.\d+)? (B|KB|MB|GB)/)).not.toBeInTheDocument();
+  });
+
   it('selects files and folders and clears the selection', () => {
     renderCellsTable();
 
@@ -393,6 +443,112 @@ describe('CellsTable selection', () => {
     await user.click(within(reopenedPreview).getByRole('button', {name: 'cells.moveNodeModal.cancelButton'}));
 
     expect(repository.moveNodes).not.toHaveBeenCalled();
+    window.location.hash = originalHash;
+  });
+
+  it('creates a folder, refreshes the picker, and moves only after selecting it', async () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files';
+    const user = userEvent.setup();
+    const onRefresh = jest.fn();
+    const repository = {
+      getAllNodes: jest
+        .fn()
+        .mockResolvedValueOnce({Nodes: []})
+        .mockResolvedValueOnce({
+          Nodes: [{Type: 'COLLECTION', Uuid: 'reports', Path: 'conversation-id@example.com/Reports'}],
+        }),
+      createFolder: jest.fn().mockResolvedValue(undefined),
+      moveNodes: jest.fn().mockResolvedValue({Status: 'Performed'}),
+    } as unknown as CellsRepository;
+    const selectedFile = createNode({
+      id: 'file-id',
+      name: 'Wire logs.pdf',
+      path: 'conversation-id@example.com/Wire logs.pdf',
+      type: CellNodeType.FILE,
+      extension: 'pdf',
+    });
+    renderCellsTable({cellsRepository: repository, initialNodes: [selectedFile], onRefresh});
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'}));
+    await user.click(screen.getByRole('button', {name: 'Move'}));
+    const dialog = await screen.findByRole('dialog');
+    await user.click(within(dialog).getByRole('button', {name: 'cells.moveNodeModal.createFolder.hintButton'}));
+    expect(within(dialog).getByRole('heading', {name: 'Create Folder'})).toBeInTheDocument();
+    await user.type(within(dialog).getByLabelText('cells.newItemMenuModal.labelFolder'), 'Reports');
+    await user.click(within(dialog).getByRole('button', {name: 'cells.newItemMenuModal.primaryAction'}));
+
+    await waitFor(() => {
+      expect(repository.createFolder).toHaveBeenCalledWith({
+        path: 'conversation-id@example.com',
+        name: 'Reports',
+      });
+    });
+    const reportsFolder = await within(dialog).findByRole('button', {name: 'Reports'});
+    expect(reportsFolder).toHaveAttribute('aria-pressed', 'false');
+    expect(repository.moveNodes).not.toHaveBeenCalled();
+    expect(screen.getByText('1 selected')).toBeInTheDocument();
+
+    await user.click(reportsFolder);
+    expect(reportsFolder).toHaveAttribute('aria-pressed', 'true');
+    await user.click(within(dialog).getByRole('button', {name: 'Move'}));
+
+    await waitFor(() => {
+      expect(repository.moveNodes).toHaveBeenCalledWith({
+        currentPaths: ['conversation-id@example.com/Wire logs.pdf'],
+        targetPath: 'conversation-id@example.com/Reports',
+      });
+    });
+    expect(onRefresh).toHaveBeenCalledTimes(1);
+    window.location.hash = originalHash;
+  });
+
+  it('keeps the folder form open with an error when creation fails', async () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files';
+    const user = userEvent.setup();
+    const repository = {
+      getAllNodes: jest.fn().mockResolvedValue({Nodes: []}),
+      createFolder: jest.fn().mockRejectedValue(new Error('folder creation failed')),
+      moveNodes: jest.fn(),
+    } as unknown as CellsRepository;
+    renderCellsTable({cellsRepository: repository, initialNodes: [createNode({type: CellNodeType.FILE})]});
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Node name'}));
+    await user.click(screen.getByRole('button', {name: 'Move'}));
+    const dialog = await screen.findByRole('dialog');
+    await user.click(within(dialog).getByRole('button', {name: 'cells.moveNodeModal.createFolder.hintButton'}));
+    await user.type(within(dialog).getByLabelText('cells.newItemMenuModal.labelFolder'), 'Reports');
+    await user.click(within(dialog).getByRole('button', {name: 'cells.newItemMenuModal.primaryAction'}));
+
+    expect(await within(dialog).findByText('cells.newItemMenuModalForm.genericError')).toBeInTheDocument();
+    expect(within(dialog).getByLabelText('cells.newItemMenuModal.labelFolder')).toHaveValue('Reports');
+    expect(repository.moveNodes).not.toHaveBeenCalled();
+    window.location.hash = originalHash;
+  });
+
+  it('returns to the destination picker when folder creation is canceled', async () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files';
+    const user = userEvent.setup();
+    const repository = {
+      getAllNodes: jest.fn().mockResolvedValue({Nodes: []}),
+      createFolder: jest.fn(),
+      moveNodes: jest.fn(),
+    } as unknown as CellsRepository;
+    renderCellsTable({cellsRepository: repository, initialNodes: [createNode({type: CellNodeType.FILE})]});
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Node name'}));
+    await user.click(screen.getByRole('button', {name: 'Move'}));
+    const dialog = await screen.findByRole('dialog');
+    await user.click(within(dialog).getByRole('button', {name: 'cells.moveNodeModal.createFolder.hintButton'}));
+    await user.click(within(dialog).getByRole('button', {name: 'cells.newItemMenuModal.secondaryAction'}));
+
+    expect(within(dialog).getByRole('heading', {name: 'Move to folder'})).toBeInTheDocument();
+    expect(
+      within(dialog).getByRole('button', {name: 'cells.moveNodeModal.createFolder.hintButton'}),
+    ).toBeInTheDocument();
+    expect(repository.createFolder).not.toHaveBeenCalled();
     window.location.hash = originalHash;
   });
 

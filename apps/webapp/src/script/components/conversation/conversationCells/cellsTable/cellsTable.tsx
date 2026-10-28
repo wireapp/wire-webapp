@@ -26,9 +26,8 @@ import {JobsTaskStatus, RestActionStatus, type RestPerformActionResponse} from '
 import {createPortal} from 'react-dom';
 import {Maybe, maybe, task} from 'true-myth';
 
-import {UploadIcon} from '@wireapp/react-ui-kit';
+import {ArrowIcon, CloseIcon, UploadIcon} from '@wireapp/react-ui-kit';
 
-import {CellsSelectionBar} from 'Components/cells/common/cellsSelectionBar/cellsSelectionBar';
 import {CellsBulkMovePreviewModal} from 'Components/conversation/conversationCells/cellsTable/cellsBulkMovePreviewModal/cellsBulkMovePreviewModal';
 import {
   CELLS_ACTION,
@@ -45,10 +44,12 @@ import type {Conversation} from 'Repositories/entity/Conversation';
 import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
+import {formatBytes} from 'Util/util';
 
 import {CellsFilePreviewModal} from './cellsFilePreviewModal/cellsFilePreviewModal';
 import {
   bulkMoveButtonStyles,
+  clearSelectionButtonStyles,
   folderDropOverlayDescriptionStyles,
   folderDropOverlayFolderNameStyles,
   folderDropOverlayStyles,
@@ -60,6 +61,9 @@ import {
   tableCellStyles,
   selectedTableCellRowStyles,
   selectionBarContainerStyles,
+  selectionBarStyles,
+  selectionCountStyles,
+  selectionSizeStyles,
   tableStyles,
   wrapperWithRowsStyles,
   wrapperStyles,
@@ -121,6 +125,31 @@ const CellsTableHeaderCell: FunctionComponent<CellsTableHeaderCellProps> = ({
 
 const dragEventContainsFiles = (event: DragEvent<HTMLElement>): boolean => {
   return Array.from(event.dataTransfer.types).includes('Files');
+};
+
+const getSelectedFilesTotalSize = (nodes: CellNode[]): Maybe<number> => {
+  if (nodes.length === 0) {
+    return Maybe.nothing();
+  }
+
+  let totalBytes = 0;
+  for (const node of nodes) {
+    if (node.type !== CellNodeType.FILE || maybe.isNothing(node.sizeBytes)) {
+      return Maybe.nothing();
+    }
+
+    const fileBytes = node.sizeBytes.value;
+    if (!Number.isSafeInteger(fileBytes) || fileBytes < 0) {
+      return Maybe.nothing();
+    }
+
+    totalBytes += fileBytes;
+    if (!Number.isSafeInteger(totalBytes)) {
+      return Maybe.nothing();
+    }
+  }
+
+  return Maybe.just(totalBytes);
 };
 
 const preventDefaultFileDrop = (event: DragEvent<HTMLElement>): void => {
@@ -462,6 +491,8 @@ export const CellsTable = ({
   const selectedNodes = nodes.filter(node => {
     return selectedNodeIds.has(node.id);
   });
+  const selectedFilesTotalSize =
+    selectedNodes.length === selectedNodeIds.size ? getSelectedFilesTotalSize(selectedNodes) : Maybe.nothing();
   const canMoveSelection =
     selectedNodes.length > 0 &&
     !isBulkMoveRequestPending &&
@@ -568,23 +599,38 @@ export const CellsTable = ({
                     : translate('cells.bulkMove.outcomeUnresolved')}
                 </p>
               )}
-              <CellsSelectionBar
-                selectedCount={selectedNodeIds.size}
-                onClear={() => {
-                  return setSelectedNodeIds(new Set());
-                }}
-              />
-              {canMoveSelection && (
-                <button
-                  css={bulkMoveButtonStyles}
-                  type="button"
-                  aria-haspopup="dialog"
-                  onClick={() => {
-                    return setIsBulkMovePreviewOpen(true);
-                  }}
-                >
-                  {translate('cells.selection.move')}
-                </button>
+              {selectedNodeIds.size > 0 && (
+                <div css={selectionBarStyles} role="status" aria-live="polite">
+                  <button
+                    css={clearSelectionButtonStyles}
+                    type="button"
+                    aria-label={translate('cells.selection.clear')}
+                    onClick={() => {
+                      return setSelectedNodeIds(new Set());
+                    }}
+                  >
+                    <CloseIcon aria-hidden="true" />
+                  </button>
+                  <span css={selectionCountStyles}>
+                    {translate('cells.selection.selectedCount', {count: selectedNodeIds.size})}
+                  </span>
+                  {maybe.isJust(selectedFilesTotalSize) && (
+                    <span css={selectionSizeStyles}>{formatBytes(selectedFilesTotalSize.value)}</span>
+                  )}
+                  {canMoveSelection && (
+                    <button
+                      css={bulkMoveButtonStyles}
+                      type="button"
+                      aria-haspopup="dialog"
+                      onClick={() => {
+                        return setIsBulkMovePreviewOpen(true);
+                      }}
+                    >
+                      <ArrowIcon direction="right" aria-hidden="true" focusable="false" />
+                      {translate('cells.selection.move')}
+                    </button>
+                  )}
+                </div>
               )}
             </div>,
             selectionBarAnchor,

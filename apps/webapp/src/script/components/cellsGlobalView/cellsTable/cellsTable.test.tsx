@@ -19,6 +19,7 @@
 
 import {fireEvent, render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import {Maybe} from 'true-myth';
 
 import {ThemeProvider} from '@wireapp/react-ui-kit';
 
@@ -56,6 +57,7 @@ const createNode = (id: string, type: CellNodeType): CellNode => {
     path: `/${id}`,
     name: `${id} name`,
     sizeMb: '1 MB',
+    sizeBytes: Maybe.nothing(),
     uploadedAtTimestamp: 0,
     owner: 'Owner',
     conversationName: 'Conversation',

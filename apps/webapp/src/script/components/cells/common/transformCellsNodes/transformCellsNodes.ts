@@ -46,7 +46,8 @@ export const transformCellsNodes = ({
   return nodes.map(node => {
     const id = node.Uuid;
     const name = getName(node.Path);
-    const sizeMb = getFileSize(node);
+    const sizeBytes = getSizeBytes(node);
+    const sizeMb = getFileSize(node, sizeBytes);
     const uploadedAtTimestamp = getUploadedAtTimestamp(node);
     const firstShare = node.Shares?.[0];
     const firstShareUuid = firstShare?.Uuid;
@@ -90,6 +91,7 @@ export const transformCellsNodes = ({
         name,
         extension: '',
         sizeMb,
+        sizeBytes,
         uploadedAtTimestamp,
         publicLink,
         tags,
@@ -111,6 +113,7 @@ export const transformCellsNodes = ({
       name,
       extension: getFileExtension(node.Path),
       sizeMb,
+      sizeBytes,
       previewImageUrl: getPreviewImageUrl(node),
       previewPdfUrl: getPreviewPdfUrl(node),
       uploadedAtTimestamp,
@@ -153,14 +156,34 @@ const getUploadedAtTimestamp = (node: RestNode): number => {
   return (node.Modified as unknown as number) * TIME_IN_MILLIS.SECOND;
 };
 
-const getFileSize = (node: RestNode): string => {
-  const isSizeMissing = isNullOrUndefined(node.Size);
-
-  if (isSizeMissing && node.Type !== 'COLLECTION') {
-    return '-';
+const getSizeBytes = (node: RestNode): Maybe<number> => {
+  if (!isNonEmptyString(node.Size)) {
+    return Maybe.nothing();
   }
 
-  return formatBytes((node.Size ?? 0) as unknown as number);
+  const rawSize = node.Size.trim();
+  if (!/^\d+$/.test(rawSize)) {
+    return Maybe.nothing();
+  }
+
+  const sizeBytes = Number(rawSize);
+  if (!Number.isSafeInteger(sizeBytes)) {
+    return Maybe.nothing();
+  }
+
+  return Maybe.just(sizeBytes);
+};
+
+const getFileSize = (node: RestNode, sizeBytes: Maybe<number>): string => {
+  if (maybe.isJust(sizeBytes)) {
+    return formatBytes(sizeBytes.value);
+  }
+
+  if (node.Type === 'COLLECTION' && isNullOrUndefined(node.Size)) {
+    return formatBytes(0);
+  }
+
+  return '-';
 };
 
 const getOwner = (node: RestNode): string => {

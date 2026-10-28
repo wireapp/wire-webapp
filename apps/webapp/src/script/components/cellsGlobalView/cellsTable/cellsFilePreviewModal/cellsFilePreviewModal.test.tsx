@@ -21,6 +21,7 @@ import {ReactNode, type FunctionComponent} from 'react';
 
 import {act, render, screen} from '@testing-library/react';
 import {container} from 'tsyringe';
+import {Maybe} from 'true-myth';
 
 import {CELLS_SELF_USER_DRIVE_ROLE} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
@@ -74,6 +75,7 @@ const file: CellFile = {
   name: 'document',
   extension: 'docx',
   sizeMb: '1 MB',
+  sizeBytes: Maybe.nothing(),
   previewImageUrl: 'https://example.com/document-preview.jpg',
   uploadedAtTimestamp: 1700000000000,
   owner: 'John Doe',
