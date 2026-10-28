@@ -117,6 +117,12 @@ build-libraries:
     cd libraries/api-client && tsc
     cd libraries/core && tsc
 
+# Build the internal production webapp with Rspack.
+[group('build')]
+build-webapp-internal: build-libraries
+    WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json node apps/server/bin/generateVersionFile.mts
+    cd apps/webapp && WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/internal rspack build --config rspack.config.mts
+
 # Remove generated library outputs and library build information for a clean build.
 [group('build')]
 clean-libraries:
