@@ -265,7 +265,7 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
               </div>
             )}
 
-            {isErrorState && (
+            {(isErrorState || noSearchResults) && (
               <div className="gif-container-error">
                 <span className="gif-container-error-message" data-uie-name="giphy-error-message">
                   {translate('extensionsGiphyNoGifs')}
