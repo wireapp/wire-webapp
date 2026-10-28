@@ -56,6 +56,7 @@ import {
 } from '@wireapp/protocol-messaging';
 
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
+import {parseSerializedCallingMessage} from 'Repositories/calling/callingMessage.schema';
 import {CALL_MESSAGE_TYPE} from 'Repositories/calling/enum/CallMessageType';
 import {ConversationEphemeralHandler} from 'Repositories/conversation/ConversationEphemeralHandler';
 import type {MessageAddEvent} from 'Repositories/conversation/EventBuilder';
@@ -275,7 +276,11 @@ export class CryptographyMapper {
       }
 
       case GenericMessageType.CALLING: {
-        specificContent = this._mapCalling(genericMessage.calling as Calling, event);
+        const mappedCalling = this._mapCalling(genericMessage.calling as Calling, event);
+        if (isUndefined(mappedCalling)) {
+          return;
+        }
+        specificContent = mappedCalling;
         break;
       }
 
@@ -567,9 +572,15 @@ export class CryptographyMapper {
     };
   }
 
-  private _mapCalling(calling: Calling, event: EncryptedEvent): MappedCallingContent {
+  private _mapCalling(calling: Calling, event: EncryptedEvent): MappedCallingContent | undefined {
+    const content = parseSerializedCallingMessage(calling.content);
+    if (content.isErr) {
+      this.logger.warn('Discarding invalid calling message', content.error);
+      return undefined;
+    }
+
     return {
-      content: JSON.parse(calling.content),
+      content: content.value,
       targetConversation: calling.qualifiedConversationId,
       sender: event.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD ? event.data.sender : undefined,
       senderClientId: event.type === CONVERSATION_EVENT.MLS_MESSAGE_ADD ? event.senderClientId : undefined,
