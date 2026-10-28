@@ -163,17 +163,15 @@ jobs:
       - name: Install dependencies
         run: npm clean-install
 
-      - name: Build internal webapp
-        run: npx just build-webapp-internal
-
-      - name: Build public webapp with Just
+      - name: Build internal, development and public webapps with Just
         id: public_rspack_build
         env:
           WIRE_WEBAPP_BUILD_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
           short_commit_sha="${WIRE_WEBAPP_BUILD_COMMIT::7}"
           expected_version="dev-${short_commit_sha}"
-          WIRE_WEBAPP_BUILD_VERSION="${expected_version}" npx just build-webapp-public
+          export WIRE_WEBAPP_BUILD_VERSION="${expected_version}"
+          npx just build-webapp-internal build-webapp-development build-webapp-public
           echo "expected_version=${expected_version}" >> "$GITHUB_OUTPUT"
 
       - name: Run Rspack browser smoke tests

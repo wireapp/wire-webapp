@@ -98,6 +98,10 @@ BACKEND_WS="ws://localhost:8080"
 
 After updating the environment variables, the app will be available at the corresponding `APP_BASE` URL.
 
+### Development bundle
+
+Build a one-shot development-mode WebApp bundle with `npx just build-webapp-development`. The static files are written to `apps/webapp/dist/development`. This does not start the live development server: use `npm run dev` for the server with Rspack watch mode and hot reload. `npm run bundle:dev` continues to assemble the development bundle into the server output.
+
 ### Production
 
 Rspack is the sole application bundler for internal and public production builds and local development. Jest continues to use Babel.
