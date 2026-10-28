@@ -274,6 +274,31 @@ describe('AssetAPI', () => {
       expect(bodyString).toMatch(/--Frontier.*\r\n/);
     });
 
+    it.each(['Moenchsjochhuette.txt', 'Mönchsjochhütte.txt'])(
+      'declares the correct metadata length for filename %s',
+      async filename => {
+        mockSendRequest.mockResolvedValue({data: mockUploadResponse});
+
+        await assetAPI.postAsset(mockAssetData, {
+          auditData: {
+            conversationId: {domain: validDomain, id: validAssetId},
+            filename,
+            filetype: 'text/plain',
+          },
+        }).response;
+
+        const body: Buffer = mockSendRequest.mock.calls[0][0].data;
+        const metadataStart = body.indexOf('\r\n\r\n') + 4;
+        const metadataHeaders = body.toString('utf8', 0, metadataStart);
+        const declaredLength = Number(metadataHeaders.match(/Content-length: (\d+)/)?.[1]);
+        const metadataEnd = metadataStart + declaredLength;
+        const metadata = JSON.parse(body.toString('utf8', metadataStart, metadataEnd));
+
+        expect(metadata.filename).toBe(filename);
+        expect(body.toString('utf8', metadataEnd, metadataEnd + 2)).toBe('\r\n');
+      },
+    );
+
     it('should handle progress callback', async () => {
       const progressCallback = jest.fn();
       mockSendRequest.mockResolvedValue({
