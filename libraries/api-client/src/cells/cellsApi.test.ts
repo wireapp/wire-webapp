@@ -828,7 +828,7 @@ describe('CellsAPI', () => {
     it('rejects calls before initialization without sending a request', async () => {
       const uninitializedAPI = new CellsAPI({
         accessTokenStore: {} as AccessTokenStore,
-        httpClientConfig: mockHttpClient.config,
+        httpClientConfig: {} as never,
       });
 
       await expect(uninitializedAPI[method]({uuids: ['file-uuid']})).rejects.toThrow('CellsAPI is not initialized');
