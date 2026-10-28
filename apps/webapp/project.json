@@ -82,6 +82,14 @@
       "options": {
         "command": "npx just stylesheet-lint"
       }
+    },
+    "configure": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["copy-config-lib:build"],
+      "options": {
+        "command": "node ../../libraries/copy-config/lib/cli.js ./.copyconfigrc.js && ts-node ./bin/generate_react_icons.ts && tsc --project ./tsconfig.generated-icons.json --noEmit",
+        "cwd": "{projectRoot}"
+      }
     }
   },
   "tags": ["type:app", "scope:frontend"]
