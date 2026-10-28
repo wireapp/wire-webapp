@@ -65,6 +65,28 @@ const uploadNetworkRetryConfig = {
   },
 } as const;
 
+// A lost response does not mean the mutation failed. Never replay a bulk mutation automatically.
+const bulkMutationNetworkRetryConfig = {
+  'axios-retry': {
+    retries: 0,
+  },
+} as const;
+
+const getNodeUuidLocators = (uuids: readonly string[]): RestNodeLocator[] => {
+  if (
+    uuids.length === 0 ||
+    uuids.some(uuid => {
+      return uuid.trim().length === 0;
+    })
+  ) {
+    throw new Error('At least one non-empty node UUID is required');
+  }
+
+  return [...new Set(uuids)].map(Uuid => {
+    return {Uuid};
+  });
+};
+
 // Each selected tag is sent as its own metadata filter with the `Should` operation so the
 // backend applies OR semantics across tags (a node matching any selected tag is returned).
 // Matches the iOS client shape in WireMessaging RestAPI.swift.
@@ -325,6 +347,27 @@ export class CellsAPI {
     return result.data;
   }
 
+  async deleteNodes({
+    uuids,
+    permanently = false,
+  }: {
+    uuids: readonly string[];
+    permanently?: boolean;
+  }): Promise<RestPerformActionResponse> {
+    if (this.client === null || this.storageService === null) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
+    const result = await this.client.performAction(
+      'delete',
+      {Nodes: getNodeUuidLocators(uuids), DeleteOptions: {PermanentDelete: permanently}},
+      undefined,
+      bulkMutationNetworkRetryConfig,
+    );
+
+    return result.data;
+  }
+
   async moveNode({
     currentPath,
     targetPath,
@@ -390,6 +433,21 @@ export class CellsAPI {
     }
 
     const result = await this.client.performAction('restore', {Nodes: [{Uuid: uuid}]});
+
+    return result.data;
+  }
+
+  async restoreNodes({uuids}: {uuids: readonly string[]}): Promise<RestPerformActionResponse> {
+    if (this.client === null || this.storageService === null) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
+    const result = await this.client.performAction(
+      'restore',
+      {Nodes: getNodeUuidLocators(uuids)},
+      undefined,
+      bulkMutationNetworkRetryConfig,
+    );
 
     return result.data;
   }
