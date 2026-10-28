@@ -50,7 +50,7 @@ interface CellsBulkMovePreviewModalProps {
   isMoveRequestPending: boolean;
   onMoveStart: (summary: SharedDriveMoveSummary) => void;
   onMoveResult: (response: RestPerformActionResponse, summary: SharedDriveMoveSummary) => boolean;
-  onMoveError: (isSimulated?: boolean) => void;
+  onMoveError: () => void;
   isBackgroundMovePending: boolean;
   isBackgroundMoveError: boolean;
   isBackgroundMoveRetryBlocked: boolean;

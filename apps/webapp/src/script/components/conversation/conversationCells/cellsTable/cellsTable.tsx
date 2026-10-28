@@ -808,6 +808,7 @@ export const CellsTable = ({
               isBackgroundMovePending={isBackgroundMovePending}
               isBackgroundMoveError={isBackgroundMoveError}
               isBackgroundMoveRetryBlocked={isBackgroundMoveRetryBlocked}
+              isBackgroundMoveStatusUnknown={isBackgroundMoveStatusUnknown}
             />
           )}
         {activeFolderDropTargetName !== null && (
