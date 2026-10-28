@@ -16,7 +16,7 @@
     "ts-pattern": "5.9.2",
     "tslib": "2.8.1",
     "uuid": "14.0.0",
-    "zod": "4.6.6"
+    "zod": "4.6.7"
   },
   "devDependencies": {
     "@emotion/eslint-plugin": "11.12.0",
