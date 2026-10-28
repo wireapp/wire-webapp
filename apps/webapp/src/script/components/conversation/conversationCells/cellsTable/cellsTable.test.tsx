@@ -88,6 +88,18 @@ const translateSelectionForTest: Translate = (key, substitutions) => {
   if (key === 'cells.bulkMove.outcomeUnresolved') {
     return 'Move status is unresolved. Verify the Drive before trying again.';
   }
+  if (key === 'cells.bulkMove.requestFailed') {
+    return 'The move request failed. Some items may have moved. Refresh Drive to check item locations before trying again.';
+  }
+  if (key === 'cells.bulkMove.finishedUnknown') {
+    return 'The move job finished, but item locations are unknown. Refresh Drive to check before trying again.';
+  }
+  if (key === 'cells.bulkMove.allJobsFailed') {
+    return 'The move jobs failed or were interrupted. Refresh Drive to check item locations before trying again.';
+  }
+  if (key === 'cells.bulkMove.statusLookupUnknown') {
+    return 'The move status could not be checked. Refresh Drive to check item locations before trying again.';
+  }
   if (key === 'cells.bulkMove.partialMoveWarning') {
     return 'The move may be incomplete. Check item locations before trying again. Move stays disabled in this view.';
   }
@@ -666,8 +678,13 @@ describe('CellsTable selection', () => {
 
     const reviewDialog = await screen.findByRole('dialog');
     expect(within(reviewDialog).getByRole('alert')).toHaveTextContent(
-      'Move status is unresolved. Verify the Drive before trying again.',
+      'The move job finished, but item locations are unknown. Refresh Drive to check before trying again.',
     );
+    expect(
+      screen.getAllByRole('alert').map(alert => {
+        return alert.textContent;
+      }),
+    ).toContain('The move job finished, but item locations are unknown. Refresh Drive to check before trying again.');
     expect(screen.queryByText('Moved 1 items')).not.toBeInTheDocument();
     expect(screen.queryByRole('progressbar', {name: 'Move completed'})).not.toBeInTheDocument();
     expect(within(reviewDialog).getByRole('button', {name: 'Move'})).toBeDisabled();
@@ -962,10 +979,15 @@ describe('CellsTable selection', () => {
     expect(onRefresh).not.toHaveBeenCalled();
     const reviewDialog = await screen.findByRole('dialog');
     expect(within(reviewDialog).getByRole('alert')).toHaveTextContent(
-      'Move status is unresolved. Verify the Drive before trying again.',
+      'The move job finished, but item locations are unknown. Refresh Drive to check before trying again.',
     );
     expect(screen.queryByText('Moved 1 items')).not.toBeInTheDocument();
     expect(screen.queryByRole('progressbar', {name: 'Move completed'})).not.toBeInTheDocument();
+    expect(
+      screen.getAllByRole('alert').map(alert => {
+        return alert.textContent;
+      }),
+    ).toContain('The move job finished, but item locations are unknown. Refresh Drive to check before trying again.');
     expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(4);
     window.location.hash = originalHash;
   });
@@ -999,6 +1021,13 @@ describe('CellsTable selection', () => {
 
     const reviewDialog = await screen.findByRole('dialog');
     expect(within(reviewDialog).getByRole('alert')).toHaveTextContent(
+      'The move may be incomplete. Check item locations before trying again. Move stays disabled in this view.',
+    );
+    expect(
+      screen.getAllByRole('alert').map(alert => {
+        return alert.textContent;
+      }),
+    ).toContain(
       'The move may be incomplete. Check item locations before trying again. Move stays disabled in this view.',
     );
     expect(screen.queryByText('Moved 1 items')).not.toBeInTheDocument();
@@ -1049,7 +1078,16 @@ describe('CellsTable selection', () => {
       });
       expect(onRefresh).not.toHaveBeenCalled();
       const preview = await screen.findByRole('dialog');
-      expect(within(preview).getByRole('alert')).toHaveTextContent('cells.bulkMove.moveNeedsReview');
+      expect(within(preview).getByRole('alert')).toHaveTextContent(
+        'The move jobs failed or were interrupted. Refresh Drive to check item locations before trying again.',
+      );
+      expect(
+        screen.getAllByRole('alert').map(alert => {
+          return alert.textContent;
+        }),
+      ).toContain(
+        'The move jobs failed or were interrupted. Refresh Drive to check item locations before trying again.',
+      );
       expect(within(preview).getByRole('button', {name: 'Move'})).toBeDisabled();
       expect(within(preview).queryByRole('button', {name: 'cells.bulkMove.reviewAndRetry'})).not.toBeInTheDocument();
 
@@ -1064,7 +1102,9 @@ describe('CellsTable selection', () => {
         expect(screen.getByRole('checkbox', {name: 'Select Marketing images'})).not.toBeChecked();
       } else {
         const recoveryDialog = screen.getByRole('dialog');
-        expect(within(recoveryDialog).getByRole('alert')).toHaveTextContent('cells.bulkMove.moveNeedsReview');
+        expect(within(recoveryDialog).getByRole('alert')).toHaveTextContent(
+          'The move jobs failed or were interrupted. Refresh Drive to check item locations before trying again.',
+        );
         expect(within(recoveryDialog).getByRole('button', {name: 'Move'})).toBeDisabled();
         expect(screen.getByText('cells.newItemMenuModalForm.genericError')).toBeInTheDocument();
       }
@@ -1307,6 +1347,11 @@ describe('CellsTable selection', () => {
     expect(within(statusDialog).getByRole('button', {name: 'Move'})).toBeDisabled();
     expect(onRefresh).not.toHaveBeenCalled();
     expect(within(statusDialog).getByRole('alert')).toHaveTextContent('cells.bulkMove.statusUnknown');
+    expect(
+      screen.getAllByRole('alert').map(alert => {
+        return alert.textContent;
+      }),
+    ).toContain('The move status could not be checked. Refresh Drive to check item locations before trying again.');
     await user.click(within(statusDialog).getByRole('button', {name: 'cells.bulkMove.checkStatus'}));
     await waitFor(() => {
       expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(7);
@@ -1315,7 +1360,7 @@ describe('CellsTable selection', () => {
     expect(repository.moveNodes).toHaveBeenCalledTimes(1);
     const reviewDialog = await screen.findByRole('dialog');
     expect(within(reviewDialog).getByRole('alert')).toHaveTextContent(
-      'Move status is unresolved. Verify the Drive before trying again.',
+      'The move job finished, but item locations are unknown. Refresh Drive to check before trying again.',
     );
     window.location.hash = originalHash;
   });
@@ -1647,16 +1692,22 @@ describe('CellsTable selection', () => {
     const reopenedAfterFailure = await screen.findByRole('dialog');
     expect(screen.queryByText('Moving 2 items')).not.toBeInTheDocument();
     expect(await within(reopenedAfterFailure).findByRole('alert')).toHaveTextContent(
-      'cells.newItemMenuModalForm.genericError',
+      'The move request failed. Some items may have moved. Refresh Drive to check item locations before trying again.',
     );
     expect(within(reopenedAfterFailure).getByRole('button', {name: 'Move'})).toBeDisabled();
     expect(onRefresh).not.toHaveBeenCalled();
 
     await user.click(within(reopenedAfterFailure).getByRole('button', {name: 'cells.moveNodeModal.cancelButton'}));
-    expect(screen.getByText('cells.newItemMenuModalForm.genericError')).toBeInTheDocument();
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      'The move request failed. Some items may have moved. Refresh Drive to check item locations before trying again.',
+    );
     expect(screen.queryByRole('button', {name: 'Move'})).not.toBeInTheDocument();
     await user.click(screen.getByRole('button', {name: 'cells.bulkMove.refreshDrive'}));
-    expect(screen.queryByText('cells.newItemMenuModalForm.genericError')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(
+        'The move request failed. Some items may have moved. Refresh Drive to check item locations before trying again.',
+      ),
+    ).not.toBeInTheDocument();
     expect(screen.getByRole('checkbox', {name: 'Select Marketing images'})).not.toBeChecked();
     expect(repository.moveNodes).toHaveBeenCalledTimes(1);
     window.location.hash = originalHash;

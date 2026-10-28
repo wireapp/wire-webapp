@@ -157,9 +157,9 @@ export const CellsBulkMovePreviewPresentation: FunctionComponent<CellsBulkMovePr
             <div role="alert">
               <p>
                 {isMoveRequestError
-                  ? translate('cells.newItemMenuModalForm.genericError')
+                  ? translate('cells.bulkMove.requestFailed')
                   : translate(
-                      isPartialMoveOutcome ? 'cells.bulkMove.partialMoveWarning' : 'cells.bulkMove.outcomeUnresolved',
+                      isPartialMoveOutcome ? 'cells.bulkMove.partialMoveWarning' : 'cells.bulkMove.finishedUnknown',
                     )}
               </p>
               <button type="button" onClick={onRefreshAfterBulkMoveOutcome} disabled={isRefreshingBulkMoveOutcome}>
@@ -169,7 +169,7 @@ export const CellsBulkMovePreviewPresentation: FunctionComponent<CellsBulkMovePr
           )}
           {isBackgroundMoveError && (
             <div role="alert">
-              <p>{translate('cells.bulkMove.moveNeedsReview')}</p>
+              <p>{translate('cells.bulkMove.allJobsFailed')}</p>
               <button type="button" onClick={onRefreshAfterBulkMoveOutcome} disabled={isRefreshingBulkMoveOutcome}>
                 {translate('cells.bulkMove.refreshDrive')}
               </button>
