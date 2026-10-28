@@ -116,6 +116,16 @@ export const CellsBulkMovePreviewPresentation: FunctionComponent<CellsBulkMovePr
       destinationPath: destinationPath.length > 0 ? destinationPath : translate('cells.sharedDrive.title'),
     };
     onMoveStart(moveSummary);
+
+    // Temporary local preview: bypass the request so no Drive items are moved.
+    if (
+      process.env.NODE_ENV === 'development' &&
+      new URLSearchParams(window.location.search).get('simulateBulkMoveFailure') === '1'
+    ) {
+      onMoveError();
+      return;
+    }
+
     const moveResult = await onMove();
     if (!isCurrentDialog.current) {
       return;
