@@ -87,6 +87,7 @@ jobs:
           cache: 'npm'
 
       - run: npm clean-install
+      - run: npx just build-libraries
 
       - name: Install unzip for 1Password CLI setup
         run: |
@@ -105,7 +106,7 @@ jobs:
         env:
           WEBAPP_URL: ${{ inputs.webappUrl }}
           TEST_SERVICE_URL: http://testservice:8080
-        run: npm exec -- playwright test -c apps/webapp/playwright.config.ts apps/webapp/test/e2e_tests/specs/CriticalFlow/startupHasNoConsoleErrors.spec.ts
+        run: npx playwright test -c apps/webapp/playwright.config.ts apps/webapp/test/e2e_tests/specs/CriticalFlow/startupHasNoConsoleErrors.spec.ts
 
   # Since not always all e2e tests are run the number of shards to start up is computed dynamically from the amount of tests which will run
   compute_shards:
@@ -125,14 +126,24 @@ jobs:
           node-version-file: '.nvmrc'
           cache: 'npm'
       - run: npm clean-install
+      - run: npx just build-libraries
 
       - name: Compute shards
         id: computeShards
         env:
           GREP: ${{ inputs.grep }}
         run: |
-          NUMBER_OF_TESTS=$(npm exec -- nx run webapp:e2e --list --grep=\"$GREP\" | grep 'Total:' | awk '{print $2}')
-          NUMBER_OF_SHARDS=$(( $NUMBER_OF_TESTS > 64 ? 64 : $NUMBER_OF_TESTS )) # Limit the number of shards to 64
+          set -euo pipefail
+          TEST_LISTING="$(npx playwright test --config apps/webapp/playwright.config.ts --list --grep "$GREP")"
+          printf '%s\n' "$TEST_LISTING"
+          NUMBER_OF_TESTS="$(printf '%s\n' "$TEST_LISTING" | sed -nE 's/^Total: ([0-9]+) tests?.*/\1/p')"
+
+          if ! [[ "$NUMBER_OF_TESTS" =~ ^[0-9]+$ ]] || (( NUMBER_OF_TESTS == 0 )); then
+            echo "Playwright discovered no tests for grep pattern '$GREP'; refusing to create an empty shard matrix." >&2
+            exit 1
+          fi
+
+          NUMBER_OF_SHARDS=$(( NUMBER_OF_TESTS > 64 ? 64 : NUMBER_OF_TESTS )) # Limit the number of shards to 64
           MATRIX_SHARDS=$(jq -nc --argjson len "$NUMBER_OF_SHARDS" '[range(1; $len + 1)]')
           echo "matrixShards=$MATRIX_SHARDS" >> $GITHUB_OUTPUT
           echo "$NUMBER_OF_TESTS tests will be run across $NUMBER_OF_SHARDS shards"
@@ -172,6 +183,9 @@ jobs:
       - name: Install dependencies
         run: npm clean-install
 
+      - name: Build Playwright library dependencies
+        run: npx just build-libraries
+
       - name: Install 1Password CLI
         run: |
           curl --fail --silent --show-error --location \
@@ -193,7 +207,7 @@ jobs:
           TEST_SERVICE_URL: http://testservice:8080
           PLAYWRIGHT_BLOB_OUTPUT_DIR: apps/webapp/playwright-report/blob-reports
           GREP: ${{ inputs.grep }}
-        run: npm exec -- nx run webapp:e2e --shard=${{ matrix.shard }}/${{ strategy.job-total }} --reporter=blob --grep=\"$GREP\"
+        run: npx playwright test --config apps/webapp/playwright.config.ts --shard=${{ matrix.shard }}/${{ strategy.job-total }} --reporter=blob --grep "$GREP"
 
       - name: Run tests
         if: ${{ inputs.teamManagementUrl == '' }}
@@ -202,7 +216,7 @@ jobs:
           TEST_SERVICE_URL: http://testservice:8080
           PLAYWRIGHT_BLOB_OUTPUT_DIR: apps/webapp/playwright-report/blob-reports
           GREP: ${{ inputs.grep }}
-        run: npm exec -- nx run webapp:e2e --shard=${{ matrix.shard }}/${{ strategy.job-total }} --reporter=blob --grep=\"$GREP\"
+        run: npx playwright test --config apps/webapp/playwright.config.ts --shard=${{ matrix.shard }}/${{ strategy.job-total }} --reporter=blob --grep "$GREP"
 
       - name: Upload blob report
         if: ${{ !cancelled() }}
@@ -272,7 +286,7 @@ jobs:
         if: ${{ steps.check_blob_reports.outputs.hasReports == 'true' }}
         working-directory: apps/webapp
         run: |
-          npm exec --prefix ../.. -- playwright merge-reports --config ./playwright.config.ts playwright-report/blob-reports
+          npx playwright merge-reports --config ./playwright.config.ts playwright-report/blob-reports
           rm -rf playwright-report/blob-reports
 
       - name: Upload test report

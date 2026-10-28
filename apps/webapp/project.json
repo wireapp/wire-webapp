@@ -15,17 +15,6 @@
         "cwd": "{projectRoot}"
       }
     },
-    "build-development": {
-      "executor": "nx:run-commands",
-      "cache": false,
-      "outputs": ["{projectRoot}/dist/development"],
-      "dependsOn": ["^build", "server:generate-build-metadata"],
-      "inputs": ["production", "webappBuildMetadata", "{workspaceRoot}/apps/server/build/metadata/version.json"],
-      "options": {
-        "command": "WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/development npm run build:dev",
-        "cwd": "{projectRoot}"
-      }
-    },
     "build-production-public": {
       "executor": "nx:run-commands",
       "cache": false,
@@ -35,46 +24,6 @@
       "options": {
         "command": "WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/public npm run build:prod:public",
         "cwd": "{projectRoot}"
-      }
-    },
-    "watch-deps": {
-      "continuous": true,
-      "dependsOn": ["^watch"],
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "echo 'Watching upstream library dependencies' && tail -f /dev/null",
-        "cwd": "{projectRoot}"
-      }
-    },
-    "build-libs": {
-      "dependsOn": ["^build"],
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "echo 'All libraries built'",
-        "cwd": "{projectRoot}"
-      }
-    },
-    "watch-deps-dynamic": {
-      "continuous": true,
-      "dependsOn": ["build-libs"],
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "[ -n \"$WATCH_LIBS\" ] && nx run-many -t watch --projects=$WATCH_LIBS || tail -f /dev/null",
-        "cwd": "{projectRoot}"
-      }
-    },
-    "serve": {
-      "executor": "nx:run-commands",
-      "defaultConfiguration": "development",
-      "options": {
-        "command": "echo 'Use npm run start from the root to run the Rspack development server'"
-      }
-    },
-    "e2e": {
-      "executor": "nx:run-commands",
-      "dependsOn": ["^build"],
-      "options": {
-        "command": "playwright test --config {projectRoot}/playwright.config.ts"
       }
     },
     "stylelint": {

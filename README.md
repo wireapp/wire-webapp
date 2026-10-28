@@ -53,8 +53,10 @@ Prerequisites:
 1. Add the following entries to your hosts file (macOS / Linux: `/etc/hosts`, Windows 10: `%WINDIR%\system32\drivers\etc\hosts`):
    - `127.0.0.1 local.zinfra.io` (to connect with the staging backend)
    - `127.0.0.1 local.imai.wire.link` (to connect with the imai backend)
-1. Run `npm run start` (runs `nx serve server`); Rspack compiles the WebApp in memory and serves the app at https://local.zinfra.io:8081/auth/ with React Fast Refresh.
-1. To rebuild selected libraries while developing, run `npm run start:watch` and choose the libraries to watch; Rspack picks up their compiled `@wireapp/*` modules.
+1. Run `npm run dev` or `npm run start`; Just builds the workspace libraries and server output, then starts the Express server with the existing Rspack development configuration. Rspack compiles the WebApp in memory and serves it at https://local.zinfra.io:8081/auth/ with React Fast Refresh.
+1. Server TypeScript changes are recompiled with `tsc --watch`; `node --watch` restarts the compiled Express server when its output changes. `concurrently` stops the other process if either watcher exits.
+1. To rebuild selected libraries while developing, run `npm run start:watch` and choose the libraries to watch. It builds dependencies first, then runs native TypeScript watchers for the selected libraries; Rspack picks up their compiled `@wireapp/*` modules.
+1. To watch all development libraries without starting the server, run `npm run dev:packages`.
 1. In case you're facing a CORS issue after login when the app tries to fetch `self/consent` from the backend, append
    `FEATURE_CHECK_CONSENT="false"` to the env file
 
@@ -133,7 +135,8 @@ Other useful tasks:
 - ESLint only: `npx just eslint`
 - Fix ESLint issues: `npx just eslint-fix`
 - Type-check: `npx just type-check`
-- E2E (Playwright): `npx nx e2e webapp`
+- E2E (Playwright): `npm run e2e-test` (pass Playwright options after `--`, for example `npm run e2e-test -- --grep "@regression|@crit-flow-web"`)
+- E2E UI mode: `npm run e2e-ui`
 
 ## CI Status
 

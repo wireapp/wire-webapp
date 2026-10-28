@@ -3,7 +3,7 @@
 
 # General Guidelines for working with Nx
 
-- Use `npx just` for ESLint, unit tests, and migrated repository quality checks. Use Nx for build, e2e, and other tasks that have not migrated.
+- Use `npx just` for migrated build, development, E2E, and repository quality tasks. Use Nx for remaining tasks, including release and versioning workflows.
 - You have access to the Nx MCP server and its tools, use them to help the user
 - When answering questions about the repository, use the `nx_workspace` tool first to gain an understanding of the workspace architecture where applicable.
 - When working in individual projects, use the `nx_project_details` mcp tool to analyze and understand the specific project structure and dependencies

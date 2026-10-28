@@ -27,13 +27,6 @@
         "command": "echo 'Build complete'"
       }
     },
-    "watch": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "tsc --watch",
-        "cwd": "{projectRoot}"
-      }
-    },
     "start": {
       "executor": "nx:run-commands",
       "dependsOn": ["dist"],

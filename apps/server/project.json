@@ -29,21 +29,6 @@
         "parallel": false
       }
     },
-    "build-dev": {
-      "executor": "nx:run-commands",
-      "dependsOn": ["config-lib:build", "generate-build-metadata", "telemetry-lib:build"],
-      "inputs": ["production", "webappBuildMetadata"],
-      "outputs": ["{projectRoot}/dist"],
-      "options": {
-        "commands": [
-          "rimraf {projectRoot}/dist",
-          "tsc -p {projectRoot}/tsconfig.json",
-          "node {projectRoot}/bin/copy_server_assets.js",
-          "cp {projectRoot}/build/metadata/version.json {projectRoot}/dist/version.json"
-        ],
-        "parallel": false
-      }
-    },
     "assemble": {
       "executor": "nx:run-commands",
       "dependsOn": ["build", {"projects": "webapp", "target": "build"}, "generate-build-metadata"],
@@ -60,24 +45,6 @@
       "cache": false,
       "options": {
         "command": "node {projectRoot}/bin/assembleBuild.mts public artifact"
-      }
-    },
-    "serve": {
-      "continuous": true,
-      "dependsOn": ["config-lib:build", "webapp:build-libs", "webapp:watch-deps-dynamic"],
-      "executor": "@nx/js:node",
-      "options": {
-        "buildTarget": "server:build-dev",
-        "buildTargetOptions": {
-          "outputPath": "{projectRoot}/dist",
-          "outputFileName": "index.js"
-        },
-        "watch": true
-      },
-      "configurations": {
-        "production": {
-          "buildTarget": "server:build"
-        }
       }
     }
   },

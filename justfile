@@ -1,4 +1,5 @@
 set default-list
+set positional-arguments
 export PATH := justfile_directory() + "/node_modules/.bin:" + env_var("PATH")
 export NODE_OPTIONS := "--max-old-space-size=6144"
 
@@ -162,6 +163,118 @@ build-webapp-public: build-libraries
     WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json node apps/server/bin/generateVersionFile.mts
     cd apps/webapp && WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/public rspack build --config rspack.config.public.mts
 
+# Prepare compiled server output for local development after building its workspace dependencies.
+[group('development')]
+prepare-development-server: build-libraries
+    rimraf apps/server/dist apps/server/build/metadata
+    WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json node apps/server/bin/generateVersionFile.mts
+    tsc --project apps/server/tsconfig.json
+    WIRE_WEBAPP_SERVER_OUTPUT_PATH=apps/server/dist node apps/server/bin/copy_server_assets.js
+    cp apps/server/build/metadata/version.json apps/server/dist/version.json
+
+# Build dependencies, then compile TypeScript and run the Express server with native watch modes.
+[group('development')]
+development: prepare-development-server
+    concurrently --kill-others --names server-types,server \
+        "just watch-server-typescript" \
+        "just run-development-server"
+
+# Compile dependencies, prompt for libraries, then run selected watchers with the server.
+[group('development')]
+development-watch: prepare-development-server
+    ts-node --project ./tsconfig.tools.json tools/development/startDevelopment.ts
+
+# Build all workspace libraries and run all native TypeScript watchers.
+[group('development')]
+watch-libraries: build-libraries
+    concurrently --kill-others --names bazinga64,certificate-check,commons,config,copy-config,license-collector,priority-queue,react-ui-kit,store-engine,store-engine-dexie,store-engine-fs,telemetry,webapp-events,api-client,core \
+        "just watch-library-bazinga64" \
+        "just watch-library-certificate-check" \
+        "just watch-library-commons" \
+        "just watch-library-config" \
+        "just watch-library-copy-config" \
+        "just watch-library-license-collector" \
+        "just watch-library-priority-queue" \
+        "just watch-library-react-ui-kit" \
+        "just watch-library-store-engine" \
+        "just watch-library-store-engine-dexie" \
+        "just watch-library-store-engine-fs" \
+        "just watch-library-telemetry" \
+        "just watch-library-webapp-events" \
+        "just watch-library-api-client" \
+        "just watch-library-core"
+
+# Recompile server sources while Node watches the compiled output and restarts the server.
+[group('development')]
+watch-server-typescript:
+    tsc --project apps/server/tsconfig.json --watch --preserveWatchOutput
+
+[group('development')]
+run-development-server:
+    node --watch apps/server/dist/index.js
+
+# Compile one workspace library continuously; watch-libraries and development-watch select these.
+[group('development')]
+watch-library-bazinga64:
+    tsc --project libraries/bazinga64/tsconfig.json --watch --preserveWatchOutput
+
+[group('development')]
+watch-library-certificate-check:
+    tsc --project libraries/certificate-check/tsconfig.json --watch --preserveWatchOutput
+
+[group('development')]
+watch-library-commons:
+    tsc --project libraries/commons/tsconfig.json --watch --preserveWatchOutput
+
+[group('development')]
+watch-library-config:
+    tsc --project libraries/config/tsconfig.json --watch --preserveWatchOutput
+
+[group('development')]
+watch-library-copy-config:
+    tsc --project libraries/copy-config/tsconfig.json --watch --preserveWatchOutput
+
+[group('development')]
+watch-library-license-collector:
+    tsc --project libraries/license-collector/tsconfig.json --watch --preserveWatchOutput
+
+[group('development')]
+watch-library-priority-queue:
+    tsc --project libraries/priority-queue/tsconfig.json --watch --preserveWatchOutput
+
+[group('development')]
+watch-library-react-ui-kit:
+    tsc --project libraries/react-ui-kit/tsconfig.json --watch --preserveWatchOutput
+
+[group('development')]
+watch-library-store-engine:
+    tsc --project libraries/store-engine/tsconfig.json --watch --preserveWatchOutput
+
+[group('development')]
+watch-library-store-engine-dexie:
+    tsc --project libraries/store-engine-dexie/tsconfig.json --watch --preserveWatchOutput
+
+[group('development')]
+watch-library-store-engine-fs:
+    tsc --project libraries/store-engine-fs/tsconfig.json --watch --preserveWatchOutput
+
+[group('development')]
+watch-library-telemetry:
+    cd libraries/telemetry && node bin/copyAssets.mts
+    cd libraries/telemetry && tsc --build tsconfig.json tsconfig.commonjs.json --watch --preserveWatchOutput
+
+[group('development')]
+watch-library-webapp-events:
+    tsc --project libraries/webapp-events/tsconfig.json --watch --preserveWatchOutput
+
+[group('development')]
+watch-library-api-client:
+    tsc --project libraries/api-client/tsconfig.json --watch --preserveWatchOutput
+
+[group('development')]
+watch-library-core:
+    tsc --project libraries/core/tsconfig.json --watch --preserveWatchOutput
+
 # Configure the webapp, generate its React icon components, and validate their types.
 configure-webapp:
     cd libraries/copy-config && rimraf lib && tsc
@@ -196,6 +309,16 @@ clean-libraries:
 [group('testing')]
 test: build-libraries
     jest --config ./jest.config.js
+
+# Build workspace dependencies and run Playwright with the webapp's shared configuration.
+[group('testing')]
+e2e-test *playwrightArguments: build-libraries
+    npx playwright test --config apps/webapp/playwright.config.ts "$@"
+
+# Run Playwright UI mode with the same webapp configuration and dependency build.
+[group('testing')]
+e2e-ui *playwrightArguments: build-libraries
+    npx playwright test --config apps/webapp/playwright.config.ts --ui "$@"
 
 # Run each Jest project separately to preserve its coverage thresholds.
 [group('testing')]

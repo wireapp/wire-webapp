@@ -17,7 +17,7 @@ It will generate .env file with variables from 1Password
 ### Install dependencies
 
 1. Install JS dependencies from the root: `npm clean-install`
-2. Install Playwright dependencies: `npm exec -- playwright install --with-deps`
+2. Install Playwright dependencies: `npx playwright install --with-deps`
 
 _Note: If in doubt, refer to test jobs in [git actions workflows folder](/.github/workflows)._
 
@@ -38,7 +38,7 @@ Other important items: [test fixtures](/test/e2e_tests/test.fixtures.ts), [scrip
 
 CI/CD PR git actions job can be found [here](/.github/workflows/precommit-crit-flows.yml)
 
-[Playwright config can be found in the root folder of the repo](/playwright.config.ts)
+[Playwright config is in the webapp project](/apps/webapp/playwright.config.ts)
 
 ### Startup feature toggles
 
@@ -74,10 +74,10 @@ Keys derive from the production `StartupFeatureToggleName` type, so arbitrary fe
 Existing `baseUrl` and `confirmNewHistory` options still work with `withLogin`; navigation methods accept `baseUrl`
 in the options object.
 
-The pure URL adapter tests need no browser, backend, or credentials:
+The pure URL adapter tests need no browser, backend, or credentials. The root Just task builds workspace libraries before invoking Playwright:
 
 ```bash
-npm exec -- nx run webapp:e2e --excludeTaskDependencies -- utils/startupFeatureToggleOverrides.spec.ts --workers=1 --reporter=line
+npm run e2e-test -- utils/startupFeatureToggleOverrides.spec.ts --workers=1 --reporter=line
 ```
 
 ### Running the tests
@@ -86,12 +86,12 @@ For hosted manual regression runs, use the logical company-facing Beta environme
 
 E2E tests can be run via
 
-1. Executing `npm run e2e-test` in the root folder of the repo. Running it with `-- --ui` will open Playwright app that can be handy for debugging. Providing `--grep "@{TAG_NAME}"` will result in running only tests with @{TAG_NAME}. For example:
+1. Executing `npm run e2e-test` in the root folder of the repo. Pass `-- --ui` to open the Playwright app, or use `npm run e2e-ui`. Providing `--grep "@{TAG_NAME}"` runs only tests with @{TAG_NAME}. For example:
 
 ```
 npm run e2e-test -- --grep "@regression"
 ```
 
-You can provide multiple tags with `--grep "@{TAG_NAME1}|@{TAG_NAME2}|@{TAG_NAME3}..."`
+You can provide multiple tags with `--grep "@{TAG_NAME1}|@{TAG_NAME2}|@{TAG_NAME3}..."`. The pattern is passed as one quoted Playwright argument, so `|` remains part of the regular expression.
 
 2. via VSCode extension in IDE.

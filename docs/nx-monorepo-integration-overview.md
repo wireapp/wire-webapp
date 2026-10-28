@@ -2,8 +2,9 @@
 
 > Historical reference for the original Nx integration. Unit tests now run through
 > `npx just test`, `npx just test-ci`, and `npx just test-watch`; CI uses native Jest
-> with per-project coverage thresholds. Nx remains in use for builds and other tasks
-> that have not migrated.
+> with per-project coverage thresholds. Development startup, library watching, and E2E
+> execution now use Just and native Node.js, TypeScript, and Playwright commands. Nx
+> remains for release and deployment responsibilities that have not migrated.
 
 ## Table of Contents
 
@@ -27,25 +28,28 @@
 
 ## Workspace-Tools Project
 
-The `workspace-tools` project provides workspace-level utilities and the Jest config for repository-owned tooling tests. Nx still owns its remaining build and server commands.
+The `workspace-tools` project provides workspace-level utilities and the Jest config for repository-owned tooling tests. Nx remains in release and deployment workflows that have not migrated.
 
 **Available workspace-tools commands:**
 - `nx run workspace-tools:clean-jest` - Clean Jest cache
 - `nx run workspace-tools:docker` - Build Docker image
 
-These commands are exposed as root npm scripts in [`package.json`](package.json):
+The root package keeps Nx for release commands and routes local development and E2E
+through Just and native tools:
 
 ```json
 {
   "scripts": {
-    "clean:jest": "nx reset && nx run workspace-tools:clean-jest",
-    "docker": "nx run workspace-tools:docker",
+    "dev": "npx just development",
+    "dev:packages": "npx just watch-libraries",
+    "start": "npx just development",
+    "start:watch": "npx just development-watch",
+    "e2e-test": "npx just e2e-test",
+    "e2e-ui": "npx just e2e-ui",
     "release": "nx release",
     "release:dry-run": "nx release --dry-run",
     "release:version": "nx release version",
-    "release:publish": "nx release publish",
-    "start": "nx serve server",
-    "build:prod": "nx build webapp --configuration=production"
+    "release:publish": "nx release publish"
   }
 }
 ```
@@ -1529,29 +1533,32 @@ stage('Wait for GitHub action to finish') {
 
 ## Local Development - Watching Libraries
 
-### Single-command dev server
+### Development server and library watchers
 
-Start the full dev stack with one command:
+Run `npm run dev` or `npm run start` to start the local server. Both commands call
+`npx just development`, which builds workspace libraries, generates server version metadata,
+cleans and compiles the server with `tsc`, and copies the runtime assets. It then starts
+`tsc --watch` for server sources alongside `node --watch` on the compiled server output.
+The initial compile and asset preparation finish before either long-running process starts.
+When TypeScript updates compiled output, Node restarts the server. `concurrently --kill-others`
+stops the sibling process if either long-running command exits.
 
-```bash
-npm run dev
-```
+The server continues to use the Express and Rspack development setup in `apps/server/Server.ts`
+and `apps/webapp/rspack.config.dev.mts`. Rspack serves its output in memory with React Fast
+Refresh. When server source changes, TypeScript updates `apps/server/dist` and Node restarts
+the server process.
 
-This runs `nx serve server`, which:
+The default `npm run dev` command builds libraries but does not watch library source. Use
+`npm run start:watch` to choose libraries interactively; the existing defaults are
+`react-ui-kit` and `api-client`. Selected libraries rebuild with `tsc --watch`, and Rspack
+detects their updated workspace package output. `npm run dev:packages` builds and watches
+all development libraries without starting the server. The Justfile defines one watch recipe
+per library, and `concurrently` runs the selected recipes. Telemetry is the special case: its
+watch recipe copies SDK assets and uses TypeScript build mode for both `tsconfig.json` and
+`tsconfig.commonjs.json`.
 
-1. Builds each upstream library once before its watcher starts (`watch` → `dependsOn: ["build"]` in `nx.json`)
-2. Starts TypeScript watch compilation on every upstream library in the webapp dependency graph (`webapp:watch-deps` → `^watch`)
-3. Starts the Express server with the Rspack development server in watch mode (`server:build-dev` — server only, no `^build` or `webapp:build`)
-
-Library changes flow: `libraries/*/src` → `watch` recompiles `lib/` → Rspack detects `@wireapp/*` changes → HMR updates the browser, with a full reload when an update cannot be applied.
-
-Only libraries reachable from the server/webapp dependency graph are watched (e.g. `core`, `api-client`, `commons`, `store-engine*`). Config-only packages (`eslint-config`, `prettier-config`) are excluded — they are not part of the webapp bundle.
-
-Configuration:
-
-- [`nx.json`](../nx.json) — `targetDefaults.watch.continuous: true` (long-running watchers)
-- [`apps/webapp/project.json`](../apps/webapp/project.json) — `watch-deps` starts `^watch` on webapp's upstream libraries
-- [`apps/server/project.json`](../apps/server/project.json) — `serve.continuous: true`, `serve.dependsOn: ["webapp:watch-deps"]`, `serve` uses `server:build-dev` (not `server:build`) to avoid racing lib `clean` with `watch`
+The Just recipes are in [`justfile`](../justfile). The interactive library selection is in
+[`tools/development/startDevelopment.ts`](../tools/development/startDevelopment.ts).
 
 ### TypeScript Path Mappings for Import Resolution
 
@@ -1589,7 +1596,7 @@ In [`apps/webapp/package.json`](apps/webapp/package.json):
 The npm workspace configuration ensures:
 - Matching local workspace packages are linked in `node_modules`
 - Their versions stay aligned through explicit semver ranges
-- Rspack consumes compiled `lib/` output; `watch` targets keep `lib/` in sync during development
+- Rspack consumes compiled `lib/` output; the native TypeScript watchers keep selected `lib/` output in sync during development
 
 ### Nx Daemon for Fast Rebuilds
 
@@ -1617,8 +1624,9 @@ npx just eslint                       # Lint the repository
 npx just eslint-fix                   # Fix eligible ESLint issues
 
 # Development
-npm run dev                           # Dev server + upstream lib watchers
-npm exec -- nx serve server           # Same as npm run dev / npm run start
+npm run dev                           # Build dependencies and run the server with native watch mode
+npm run start:watch                   # Choose libraries to watch alongside the server
+npm run dev:packages                  # Watch all development libraries without the server
 
 # Graph & Analysis
 nx graph                              # Visualize dependency graph
@@ -1650,7 +1658,7 @@ nx run-many -t build --projects=tag:frontend
 
 ## Key Takeaways for Developers
 
-1. **Use the task runner for each task** - Just runs unit tests and migrated quality checks; Nx runs builds and remaining Nx tasks
+1. **Use the task runner for each task** - Just runs migrated builds, quality checks, local development, and E2E; Nx runs remaining release and deployment tasks
 2. **Understand `dependsOn`** - Dependencies are automatically built first
 3. **Cache is your friend** - Nx cache saves time, but remember `nx reset` when needed
 4. **Add projects to [`tsconfig.json`](tsconfig.json)** - Project references are required
@@ -1659,8 +1667,8 @@ nx run-many -t build --projects=tag:frontend
 7. **Configure Jest coverage thresholds** - Add realistic project-local baselines when new libraries/apps add tests
 8. **Update [`.github/labeler.yml`](.github/labeler.yml)** - Add label rules for new projects
 9. **Check `nx graph`** - Visualize dependencies before making changes
-10. **CI uses Nx** - All GitHub workflows use Nx commands
-11. **`npm run dev` watches upstream libs** - `server:serve` depends on `webapp:watch-deps`, which starts `^watch` on webapp's library dependencies
+10. **E2E uses Playwright directly** - The workflow builds workspace libraries before native Playwright discovery and execution
+11. **`npm run dev` watches server output** - Use `npm run start:watch` to watch selected library sources
 12. **Path mappings enable clean imports** - Use TypeScript paths for library imports
 13. **`typesVersions` in libraries** - Maps `lib/*` imports to `src/*` for source-based type resolution
 14. **`paths` in tsconfig.eslint.json** - Required for ESLint TypeScript Project Service to resolve imports during linting
