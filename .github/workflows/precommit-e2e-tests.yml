@@ -62,7 +62,7 @@ jobs:
           cache: 'npm'
 
       - run: npm clean-install
-      - run: npm exec -- nx run webapp:configure
+      - run: npx just configure-webapp
       - id: package
         env:
           EVENT_NAME: ${{ github.event_name }}
@@ -74,7 +74,7 @@ jobs:
 
           if [[ "${EVENT_NAME}" == "workflow_dispatch" && "${USE_PUBLIC_RSPACK}" == "true" ]]; then
             WIRE_WEBAPP_BUILD_VERSION="${expected_version}" \
-              npm exec -- nx run server:package-public
+              npm run build:prod:public
           else
             WIRE_WEBAPP_BUILD_VERSION="${expected_version}" \
               npm run build:prod

@@ -58,4 +58,4 @@ jobs:
           base_path: '.'
 
       - name: Validate downloaded translation markers
-        run: npm exec -- nx run webapp:validate-translations
+        run: node tools/i18n/validateTranslationPlaceholders.mts

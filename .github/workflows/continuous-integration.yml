@@ -99,7 +99,7 @@ jobs:
 
       - name: Verify generated i18n artifacts are committed
         run: |
-          npx nx run webapp:translate-merge
+          npm run --workspace @wireapp/webapp translate:merge
 
           if ! test -z "$(git status --porcelain)"; then
             echo "Repository is not clean after generation. Run generation locally and commit the changes."
@@ -108,7 +108,7 @@ jobs:
           fi
 
       - name: Validate translation markers
-        run: npx nx run webapp:validate-translations
+        run: node tools/i18n/validateTranslationPlaceholders.mts
 
   build-libraries:
     runs-on: ubuntu-26.04-arm
@@ -183,7 +183,7 @@ jobs:
           test -s apps/server/dist/s3/ebs.zip
 
       - name: Run Rspack browser smoke tests
-        run: npx nx run webapp:smoke-rspack
+        run: npx playwright test --config apps/webapp/playwright.rspack.config.ts
 
       - name: Build and package public webapp with Rspack
         env:

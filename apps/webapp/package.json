@@ -11,9 +11,9 @@
     "build:prod:public": "rspack build --config rspack.config.public.mts",
     "e2e": "nx e2e webapp",
     "e2e:ui": "nx e2e webapp --ui",
-    "check:circular-dependencies": "nx check-circular webapp",
-    "translate:extract": "nx translate-extract webapp",
-    "translate:merge": "nx translate-merge webapp"
+    "check:circular-dependencies": "dpdm --no-warning --no-tree -T src/script/auth/main.tsx src/script/main/app.ts",
+    "translate:extract": "i18next-scanner 'src/{page,script}/**/*.{js,html,htm}'",
+    "translate:merge": "formatjs extract --format './bin/translations_extract_formatter.js' --out-file './src/i18n/en-US.json' 'src/**/*.{ts,tsx,js,jsx}' --ignore 'src/**/*.d.ts' --additional-function-names t"
   },
   "dependencies": {
     "@datadog/browser-logs": "7.16.0",
