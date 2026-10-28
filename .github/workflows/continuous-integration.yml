@@ -171,7 +171,7 @@ jobs:
           short_commit_sha="${WIRE_WEBAPP_BUILD_COMMIT::7}"
           expected_version="dev-${short_commit_sha}"
           export WIRE_WEBAPP_BUILD_VERSION="${expected_version}"
-          npx just assemble-server-internal build-webapp-development build-webapp-public
+          npx just package-server-internal build-webapp-development build-webapp-public
           echo "expected_version=${expected_version}" >> "$GITHUB_OUTPUT"
 
       - name: Verify internal server assembly
@@ -180,6 +180,7 @@ jobs:
           test -s apps/server/dist/static/index.html
           test -s apps/server/dist/version.json
           test -s apps/server/dist/libs/wire/telemetry/embed.js
+          test -s apps/server/dist/s3/ebs.zip
 
       - name: Run Rspack browser smoke tests
         run: npx nx run webapp:smoke-rspack
