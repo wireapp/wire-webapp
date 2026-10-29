@@ -539,6 +539,7 @@ describe('CellsTable selection', () => {
       getAllNodes: jest.fn().mockResolvedValue({Nodes: []}),
       moveNodes: jest.fn().mockResolvedValue({
         Status: 'Performed',
+        BackgroundActions: [{Name: 'move', JobUuid: 'move-job', Status: 'Finished'}],
         AffectedNodes: [{Path: 'Drive/Moved.pdf', Uuid: 'moved'}],
       }),
     } as unknown as CellsRepository;
@@ -656,76 +657,123 @@ describe('CellsTable selection', () => {
     window.location.hash = originalHash;
   });
 
-  it('requires review and a successful refresh when Performed has no affected-node evidence', async () => {
-    const originalHash = window.location.hash;
-    window.location.hash = '#/conversation/conversation-id@example.com/files/Drive';
-    const user = userEvent.setup();
-    const onRefresh = jest.fn();
-    const onRefreshAfterBulkMoveOutcome = jest.fn().mockResolvedValueOnce(false).mockResolvedValueOnce(true);
-    const repository = {
-      getAllNodes: jest.fn().mockResolvedValue({Nodes: []}),
-      moveNodes: jest.fn().mockResolvedValue({Status: 'Performed'}),
-    } as unknown as CellsRepository;
-    renderCellsTable({
-      cellsRepository: repository,
-      initialNodes: [
-        createNode({id: 'unknown-file', path: 'conversation-id@example.com/Drive/Node name', type: CellNodeType.FILE}),
+  it.each([
+    {description: 'no job evidence', backgroundActions: undefined},
+    {description: 'an empty job list', backgroundActions: []},
+    {
+      description: 'an unrelated finished job',
+      backgroundActions: [{Name: 'copy', JobUuid: 'copy-job', Status: 'Finished'}],
+    },
+    {description: 'a finished job without an ID', backgroundActions: [{Name: 'move', JobUuid: '', Status: 'Finished'}]},
+    {description: 'a job without status', backgroundActions: [{Name: 'move', JobUuid: 'move-job'}]},
+    {description: 'a running job', backgroundActions: [{Name: 'move', JobUuid: 'move-job', Status: 'Running'}]},
+    {description: 'an unknown job', backgroundActions: [{Name: 'move', JobUuid: 'move-job', Status: 'Unknown'}]},
+    {
+      description: 'mixed finished and failed jobs',
+      backgroundActions: [
+        {Name: 'move', JobUuid: 'finished-job', Status: 'Finished'},
+        {Name: 'move', JobUuid: 'failed-job', Status: 'Error'},
       ],
-      onRefresh,
-      onRefreshAfterBulkMoveOutcome,
-    });
+    },
+  ])(
+    'requires review and a successful refresh when Performed has $description but no node evidence',
+    async ({backgroundActions}) => {
+      const originalHash = window.location.hash;
+      window.location.hash = '#/conversation/conversation-id@example.com/files/Drive';
+      const user = userEvent.setup();
+      const onRefresh = jest.fn();
+      const onRefreshAfterBulkMoveOutcome = jest.fn().mockResolvedValueOnce(false).mockResolvedValueOnce(true);
+      const repository = {
+        getAllNodes: jest.fn().mockResolvedValue({Nodes: []}),
+        moveNodes: jest.fn().mockResolvedValue({Status: 'Performed', BackgroundActions: backgroundActions}),
+      } as unknown as CellsRepository;
+      renderCellsTable({
+        cellsRepository: repository,
+        initialNodes: [
+          createNode({
+            id: 'unknown-file',
+            path: 'conversation-id@example.com/Drive/Node name',
+            type: CellNodeType.FILE,
+          }),
+        ],
+        onRefresh,
+        onRefreshAfterBulkMoveOutcome,
+      });
 
-    await user.click(screen.getByRole('checkbox', {name: 'Select Node name'}));
-    await user.click(screen.getByRole('button', {name: 'Move'}));
-    const dialog = await screen.findByRole('dialog');
-    await user.click(within(dialog).getByRole('button', {name: 'cells.breadcrumb.files'}));
-    await user.click(within(dialog).getByRole('button', {name: 'Move'}));
+      await user.click(screen.getByRole('checkbox', {name: 'Select Node name'}));
+      await user.click(screen.getByRole('button', {name: 'Move'}));
+      const dialog = await screen.findByRole('dialog');
+      await user.click(within(dialog).getByRole('button', {name: 'cells.breadcrumb.files'}));
+      await user.click(within(dialog).getByRole('button', {name: 'Move'}));
 
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    expect(screen.getByRole('alert')).toHaveTextContent(
-      'The move job finished, but item locations are unknown. Refresh Drive to check before trying again.',
-    );
-    expect(screen.queryByText('Moved 1 items')).not.toBeInTheDocument();
-    expect(screen.queryByRole('progressbar', {name: 'Move completed'})).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', {name: 'Move'})).not.toBeInTheDocument();
-    expect(onRefresh).not.toHaveBeenCalled();
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(screen.getByRole('alert')).toHaveTextContent(
+        'The move job finished, but item locations are unknown. Refresh Drive to check before trying again.',
+      );
+      expect(screen.queryByText('Moved 1 items')).not.toBeInTheDocument();
+      expect(screen.queryByRole('progressbar', {name: 'Move completed'})).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', {name: 'Move'})).not.toBeInTheDocument();
+      expect(onRefresh).not.toHaveBeenCalled();
 
-    await user.click(screen.getByRole('button', {name: 'cells.bulkMove.refreshDrive'}));
+      await user.click(screen.getByRole('button', {name: 'cells.bulkMove.refreshDrive'}));
 
-    expect(onRefreshAfterBulkMoveOutcome).toHaveBeenCalledTimes(1);
-    expect(screen.getByText('cells.newItemMenuModalForm.genericError')).toBeInTheDocument();
-    expect(screen.queryByRole('checkbox', {name: 'Select Node name'})).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', {name: 'Move'})).not.toBeInTheDocument();
+      expect(onRefreshAfterBulkMoveOutcome).toHaveBeenCalledTimes(1);
+      expect(screen.getByText('cells.newItemMenuModalForm.genericError')).toBeInTheDocument();
+      expect(screen.queryByRole('checkbox', {name: 'Select Node name'})).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', {name: 'Move'})).not.toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', {name: 'cells.bulkMove.refreshDrive'}));
+      await user.click(screen.getByRole('button', {name: 'cells.bulkMove.refreshDrive'}));
 
-    expect(onRefreshAfterBulkMoveOutcome).toHaveBeenCalledTimes(2);
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
-    expect(screen.getByRole('checkbox', {name: 'Select Node name'})).not.toBeChecked();
-    expect(repository.moveNodes).toHaveBeenCalledTimes(1);
-    expect(onRefresh).not.toHaveBeenCalled();
-    window.location.hash = originalHash;
-  });
+      expect(onRefreshAfterBulkMoveOutcome).toHaveBeenCalledTimes(2);
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+      expect(screen.getByRole('checkbox', {name: 'Select Node name'})).not.toBeChecked();
+      expect(repository.moveNodes).toHaveBeenCalledTimes(1);
+      expect(onRefresh).not.toHaveBeenCalled();
+      window.location.hash = originalHash;
+    },
+  );
 
-  it('does not mark a finished background job successful when item outcomes are unknown', async () => {
+  it.each([
+    {
+      description: 'a polled background job',
+      response: {Status: 'Background', BackgroundActions: [{JobUuid: 'move-job', Name: 'move'}]},
+      statusChecks: 1,
+    },
+    {
+      description: 'an awaited job',
+      response: {Status: 'Performed', BackgroundActions: [{JobUuid: 'move-job', Name: 'move', Status: 'Finished'}]},
+      statusChecks: 0,
+    },
+    {
+      description: 'multiple awaited jobs',
+      response: {
+        Status: 'Performed',
+        BackgroundActions: [
+          {JobUuid: 'move-job-1', Name: 'move', Status: 'Finished'},
+          {JobUuid: 'move-job-2', Name: 'move', Status: 'Finished'},
+        ],
+      },
+      statusChecks: 0,
+    },
+  ])('completes and refreshes with $description and no item outcomes', async ({response, statusChecks}) => {
     const originalHash = window.location.hash;
     window.location.hash = '#/conversation/conversation-id@example.com/files/Drive';
     const user = userEvent.setup();
     const onRefresh = jest.fn();
     const repository = {
       getAllNodes: jest.fn().mockResolvedValue({Nodes: []}),
-      moveNodes: jest.fn().mockResolvedValue({
-        Status: 'Background',
-        BackgroundActions: [{JobUuid: 'move-job', Name: 'move'}],
-      }),
+      moveNodes: jest.fn().mockResolvedValue(response),
       getBackgroundMoveInfo: jest.fn().mockResolvedValue({Status: 'Finished', JobUuid: 'move-job', Name: 'move'}),
     } as unknown as CellsRepository;
-    renderCellsTable({
+    const table = renderCellsTable({
       cellsRepository: repository,
       initialNodes: [
         createNode({id: 'unknown-file', path: 'conversation-id@example.com/Drive/Node name', type: CellNodeType.FILE}),
       ],
       onRefresh,
+    });
+    onRefresh.mockImplementation(() => {
+      table.rerenderWithNodes([]);
     });
 
     await user.click(screen.getByRole('checkbox', {name: 'Select Node name'}));
@@ -737,20 +785,14 @@ describe('CellsTable selection', () => {
     await waitFor(() => {
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
-    expect(screen.getByRole('alert')).toHaveTextContent(
-      'The move job finished, but item locations are unknown. Refresh Drive to check before trying again.',
-    );
-    expect(
-      screen.getAllByRole('alert').map(alert => {
-        return alert.textContent;
-      }),
-    ).toContain('The move job finished, but item locations are unknown. Refresh Drive to check before trying again.');
-    expect(screen.queryByText('Moved 1 items')).not.toBeInTheDocument();
-    expect(screen.queryByRole('progressbar', {name: 'Move completed'})).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', {name: 'Move'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(screen.getByText('Moved 1 items')).toBeInTheDocument();
+    expect(screen.getByRole('progressbar', {name: 'Move completed'})).toHaveAttribute('aria-valuenow', '100');
+    expect(screen.queryByRole('button', {name: 'cells.bulkMove.refreshDrive'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('checkbox', {name: 'Select Node name'})).not.toBeInTheDocument();
     expect(repository.moveNodes).toHaveBeenCalledTimes(1);
-    expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(1);
-    expect(onRefresh).not.toHaveBeenCalled();
+    expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(statusChecks);
+    expect(onRefresh).toHaveBeenCalledTimes(1);
     window.location.hash = originalHash;
   });
 
@@ -998,7 +1040,7 @@ describe('CellsTable selection', () => {
     window.location.hash = originalHash;
   });
 
-  it('does not report success when background jobs finish without item outcomes', async () => {
+  it('refreshes and completes only after every background job finishes', async () => {
     const originalHash = window.location.hash;
     window.location.hash = '#/conversation/conversation-id@example.com/files/wire-cells-web/Marketing images';
     const user = userEvent.setup();
@@ -1048,19 +1090,22 @@ describe('CellsTable selection', () => {
         expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(4);
       });
     });
-    expect(onRefresh).not.toHaveBeenCalled();
+    expect(onRefresh).toHaveBeenCalledTimes(1);
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    expect(screen.getByRole('alert')).toHaveTextContent(
-      'The move job finished, but item locations are unknown. Refresh Drive to check before trying again.',
-    );
-    expect(screen.queryByText('Moved 1 items')).not.toBeInTheDocument();
-    expect(screen.queryByRole('progressbar', {name: 'Move completed'})).not.toBeInTheDocument();
-    expect(
-      screen.getAllByRole('alert').map(alert => {
-        return alert.textContent;
-      }),
-    ).toContain('The move job finished, but item locations are unknown. Refresh Drive to check before trying again.');
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(screen.getByText('Moved 1 items')).toBeInTheDocument();
+    expect(screen.getByRole('progressbar', {name: 'Move completed'})).toHaveAttribute('aria-valuenow', '100');
+    expect(screen.getByRole('button', {name: 'Move'})).toBeEnabled();
+    expect(screen.queryByRole('button', {name: 'cells.bulkMove.refreshDrive'})).not.toBeInTheDocument();
     expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(4);
+
+    await act(async () => {
+      clock.advanceByMilliseconds(1000);
+      await Promise.resolve();
+    });
+
+    expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(4);
+    expect(onRefresh).toHaveBeenCalledTimes(1);
     window.location.hash = originalHash;
   });
 
@@ -1433,12 +1478,11 @@ describe('CellsTable selection', () => {
     await waitFor(() => {
       expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(7);
     });
-    expect(onRefresh).not.toHaveBeenCalled();
+    expect(onRefresh).toHaveBeenCalledTimes(1);
     expect(repository.moveNodes).toHaveBeenCalledTimes(1);
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    expect(screen.getByRole('alert')).toHaveTextContent(
-      'The move job finished, but item locations are unknown. Refresh Drive to check before trying again.',
-    );
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(screen.getByText('Moved 1 items')).toBeInTheDocument();
     window.location.hash = originalHash;
   });
 
@@ -1484,7 +1528,9 @@ describe('CellsTable selection', () => {
         expect(repository.getBackgroundMoveInfo).toHaveBeenCalledTimes(2);
       });
     });
-    expect(onRefresh).not.toHaveBeenCalled();
+    expect(onRefresh).toHaveBeenCalledTimes(1);
+    expect(screen.getByText('Moved 1 items')).toBeInTheDocument();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     window.location.hash = originalHash;
   });
 

@@ -339,16 +339,16 @@ export const CellsTable = ({
         return status === JobsTaskStatus.Finished;
       });
       if (areAllJobsFinished) {
-        // Finished is job-level status, not evidence of each selected item's destination.
         if (maybe.isJust(backgroundMoveSummary.current)) {
-          updateMoveStatus({id: moveStatusId, kind: 'finished-unknown', ...backgroundMoveSummary.current.value});
+          updateMoveStatus({id: moveStatusId, kind: 'completed', ...backgroundMoveSummary.current.value});
         }
-        activeMoveStatusId.current = Maybe.just(moveStatusId);
+        activeMoveStatusId.current = Maybe.nothing();
         backgroundMoveSummary.current = Maybe.nothing();
         setBackgroundMoveStatusId('');
         setBackgroundMoveJobUuids([]);
-        dispatchMove({type: 'needs-review', reason: 'finished-unknown'});
+        dispatchMove({type: 'resolved'});
         setIsBulkMovePreviewOpen(false);
+        onRefresh();
         return;
       }
 
@@ -404,6 +404,7 @@ export const CellsTable = ({
     cellsRepository,
     clock,
     clearMoveStatus,
+    onRefresh,
     random,
     updateMoveStatus,
   ]);
@@ -434,7 +435,16 @@ export const CellsTable = ({
         return id;
       }),
     );
-    if (response.Status === RestActionStatus.Performed && outcomeEvidence !== 'complete') {
+    const hasFinishedMoveJobs =
+      response.BackgroundActions !== undefined &&
+      response.BackgroundActions.length > 0 &&
+      response.BackgroundActions.every(action => {
+        return action.Name === 'move' && isNonEmptyString(action.JobUuid) && action.Status === JobsTaskStatus.Finished;
+      });
+    // Cells 5.0.3 returns awaited job statuses without AffectedNodes.
+    const isMoveComplete =
+      outcomeEvidence === 'complete' || (response.AffectedNodes === undefined && hasFinishedMoveJobs);
+    if (response.Status === RestActionStatus.Performed && !isMoveComplete) {
       updateMoveStatus({
         id: moveStatusId,
         kind: outcomeEvidence === 'partial' ? 'partial' : 'finished-unknown',
