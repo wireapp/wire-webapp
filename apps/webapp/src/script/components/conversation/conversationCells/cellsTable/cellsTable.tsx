@@ -17,7 +17,16 @@
  *
  */
 
-import {DragEvent, useEffect, useReducer, useRef, useState, type FunctionComponent, type ReactElement} from 'react';
+import {
+  DragEvent,
+  useEffect,
+  useId,
+  useReducer,
+  useRef,
+  useState,
+  type FunctionComponent,
+  type ReactElement,
+} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 import {flexRender, getCoreRowModel, type Header, useReactTable} from '@tanstack/react-table';
@@ -34,11 +43,13 @@ import {
   canPerformCellsAction,
   useCellsActionPermissions,
 } from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
+import {getCellsFilesPath} from 'Components/conversation/conversationCells/common/getCellsFilesPath/getCellsFilesPath';
 import {isInRecycleBin} from 'Components/conversation/conversationCells/common/recycleBin/recycleBin';
 import {
   useSharedDriveUploadStatus,
   type SharedDriveMoveSummary,
 } from 'Components/conversation/conversationCells/sharedDriveUploadStatusContext';
+import {PrimaryModal, removeCurrentModal, usePrimaryModalState} from 'Components/Modals/PrimaryModal';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
@@ -81,6 +92,7 @@ import {moveStatusMessageKey} from '../sharedDriveMoveStatusMessages';
 
 interface CellsTableProps {
   nodes: CellNode[];
+  isNodesLoading: boolean;
   cellsRepository: CellsRepository;
   conversation: Conversation;
   conversationQualifiedId: QualifiedId;
@@ -168,8 +180,33 @@ const BACKGROUND_MOVE_STATUS_RETRY_MIN_JITTER_FACTOR = 0.75;
 const BACKGROUND_MOVE_STATUS_RETRY_MAX_JITTER_FACTOR = 1.25;
 const MAX_BACKGROUND_MOVE_STATUS_RETRIES = 5;
 
+const hasSameSelection = (selectedNodeIds: ReadonlySet<string>, nodeIds: readonly string[]): boolean => {
+  return (
+    selectedNodeIds.size === nodeIds.length &&
+    nodeIds.every(nodeId => {
+      return selectedNodeIds.has(nodeId);
+    })
+  );
+};
+
+const hasPermanentDeleteCompleted = (response: RestPerformActionResponse): boolean => {
+  if (response.Status !== RestActionStatus.Performed) {
+    return false;
+  }
+
+  const {BackgroundActions: backgroundActions} = response;
+  if (backgroundActions === undefined || backgroundActions.length === 0) {
+    return true;
+  }
+
+  return backgroundActions.every(action => {
+    return action.Name === 'delete' && isNonEmptyString(action.JobUuid) && action.Status === JobsTaskStatus.Finished;
+  });
+};
+
 export const CellsTable = ({
   nodes,
+  isNodesLoading,
   cellsRepository,
   conversation,
   conversationQualifiedId,
@@ -210,6 +247,24 @@ export const CellsTable = ({
   const didBulkMoveOutcomeRefreshFail = moveState.kind === 'needs-review' && moveState.refresh === 'failed';
   const isMovePendingRef = useRef(false);
   isMovePendingRef.current = isBulkMoveRequestPending || isBackgroundMovePending;
+  const [isPermanentDeletePending, setIsPermanentDeletePending] = useState(false);
+  const [isPermanentDeleteUnresolved, setIsPermanentDeleteUnresolved] = useState(false);
+  const [isRefreshingPermanentDeleteReview, setIsRefreshingPermanentDeleteReview] = useState(false);
+  const [isWaitingForPermanentDeleteReconciliation, setIsWaitingForPermanentDeleteReconciliation] = useState(false);
+  const [didPermanentDeleteReviewRefreshFail, setDidPermanentDeleteReviewRefreshFail] = useState(false);
+  const isPermanentDeletePendingRef = useRef(false);
+  const isPermanentDeleteUnresolvedRef = useRef(false);
+  const pendingPermanentDeleteNodeIdsRef = useRef<string[]>([]);
+  const isMountedRef = useRef(true);
+  const selectedNodeIdsRef = useRef(selectedNodeIds);
+  selectedNodeIdsRef.current = selectedNodeIds;
+  const nodesRef = useRef(nodes);
+  nodesRef.current = nodes;
+  const selectionScopeKeyRef = useRef(selectionScopeKey);
+  selectionScopeKeyRef.current = selectionScopeKey;
+  const canPerformCurrentDriveActionRef = useRef(canPerformCurrentDriveAction);
+  canPerformCurrentDriveActionRef.current = canPerformCurrentDriveAction;
+  const permanentDeleteModalId = useId();
   const [backgroundMoveJobUuids, setBackgroundMoveJobUuids] = useState<string[]>([]);
   const [backgroundMoveStatusId, setBackgroundMoveStatusId] = useState('');
   const [backgroundMoveStatusCheckId, setBackgroundMoveStatusCheckId] = useState(0);
@@ -221,7 +276,51 @@ export const CellsTable = ({
 
     setSelectedNodeIds(new Set());
     setIsBulkMovePreviewOpen(false);
-  }, [selectionScopeKey, isSelectionEnabled]);
+    isPermanentDeleteUnresolvedRef.current = false;
+    pendingPermanentDeleteNodeIdsRef.current = [];
+    setIsPermanentDeleteUnresolved(false);
+    setIsWaitingForPermanentDeleteReconciliation(false);
+    setDidPermanentDeleteReviewRefreshFail(false);
+
+    if (usePrimaryModalState.getState().currentModalId === permanentDeleteModalId) {
+      removeCurrentModal();
+    }
+  }, [permanentDeleteModalId, selectionScopeKey, isSelectionEnabled]);
+
+  useEffect(() => {
+    if (!isWaitingForPermanentDeleteReconciliation || isNodesLoading) {
+      return;
+    }
+
+    const visibleNodeIds = new Set(
+      nodes.map(node => {
+        return node.id;
+      }),
+    );
+    if (
+      pendingPermanentDeleteNodeIdsRef.current.some(nodeId => {
+        return visibleNodeIds.has(nodeId);
+      })
+    ) {
+      return;
+    }
+
+    pendingPermanentDeleteNodeIdsRef.current = [];
+    isPermanentDeleteUnresolvedRef.current = false;
+    setIsPermanentDeleteUnresolved(false);
+    setIsWaitingForPermanentDeleteReconciliation(false);
+    setSelectedNodeIds(new Set());
+  }, [isNodesLoading, isWaitingForPermanentDeleteReconciliation, nodes]);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+      if (usePrimaryModalState.getState().currentModalId === permanentDeleteModalId) {
+        removeCurrentModal();
+      }
+    };
+  }, [permanentDeleteModalId]);
 
   const handleBulkMoveRequestError = (): void => {
     if (maybe.isJust(activeMoveStatusId.current) && maybe.isJust(backgroundMoveSummary.current)) {
@@ -519,6 +618,114 @@ export const CellsTable = ({
       return nextSelection;
     });
   };
+
+  const isCurrentPermanentDeleteScope = (scopeKey: string, path: string): boolean => {
+    return (
+      isMountedRef.current &&
+      isInRecycleBin() &&
+      getCellsFilesPath() === path &&
+      selectionScopeKeyRef.current === scopeKey
+    );
+  };
+
+  const handlePermanentDelete = async (nodeIds: string[], scopeKey: string, path: string): Promise<void> => {
+    if (isPermanentDeletePendingRef.current || isPermanentDeleteUnresolvedRef.current) {
+      return;
+    }
+    if (!isCurrentPermanentDeleteScope(scopeKey, path)) {
+      return;
+    }
+    if (!hasSameSelection(selectedNodeIdsRef.current, nodeIds)) {
+      return;
+    }
+
+    const selectedIdSet = new Set(nodeIds);
+    const currentSelectedNodes = nodesRef.current.filter(node => {
+      return selectedIdSet.has(node.id);
+    });
+    if (currentSelectedNodes.length !== nodeIds.length) {
+      return;
+    }
+    if (!canPerformCurrentDriveActionRef.current(CELLS_ACTION.DELETE)) {
+      return;
+    }
+    if (
+      currentSelectedNodes.some(node => {
+        return !canPerformCellsAction({action: CELLS_ACTION.DELETE, selfUserDriveRole: node.selfUserDriveRole});
+      })
+    ) {
+      return;
+    }
+
+    isPermanentDeletePendingRef.current = true;
+    setIsPermanentDeletePending(true);
+
+    try {
+      const response = await cellsRepository.deleteNodes({uuids: nodeIds, permanently: true});
+      if (!isCurrentPermanentDeleteScope(scopeKey, path)) {
+        return;
+      }
+
+      if (!hasPermanentDeleteCompleted(response)) {
+        pendingPermanentDeleteNodeIdsRef.current = nodeIds;
+        isPermanentDeleteUnresolvedRef.current = true;
+        setIsPermanentDeleteUnresolved(true);
+        onRefresh();
+        return;
+      }
+
+      setSelectedNodeIds(currentSelection => {
+        return hasSameSelection(currentSelection, nodeIds) ? new Set() : currentSelection;
+      });
+      onRefresh();
+    } catch (error: unknown) {
+      console.error(error);
+      if (!isCurrentPermanentDeleteScope(scopeKey, path)) {
+        return;
+      }
+
+      pendingPermanentDeleteNodeIdsRef.current = nodeIds;
+      isPermanentDeleteUnresolvedRef.current = true;
+      setIsPermanentDeleteUnresolved(true);
+      onRefresh();
+    } finally {
+      isPermanentDeletePendingRef.current = false;
+      if (isMountedRef.current) {
+        setIsPermanentDeletePending(false);
+      }
+    }
+  };
+
+  const handleRefreshAfterPermanentDeleteReview = async (): Promise<void> => {
+    if (isRefreshingPermanentDeleteReview) {
+      return;
+    }
+
+    const scopeKey = selectionScopeKeyRef.current;
+    const path = getCellsFilesPath();
+    setIsRefreshingPermanentDeleteReview(true);
+    setDidPermanentDeleteReviewRefreshFail(false);
+    try {
+      const wasRefreshSuccessful = await onRefreshAfterBulkMoveOutcome();
+      if (!isCurrentPermanentDeleteScope(scopeKey, path)) {
+        return;
+      }
+      if (!wasRefreshSuccessful) {
+        setDidPermanentDeleteReviewRefreshFail(true);
+        return;
+      }
+
+      setIsWaitingForPermanentDeleteReconciliation(true);
+    } catch {
+      if (isCurrentPermanentDeleteScope(scopeKey, path)) {
+        setDidPermanentDeleteReviewRefreshFail(true);
+      }
+    } finally {
+      if (isMountedRef.current) {
+        setIsRefreshingPermanentDeleteReview(false);
+      }
+    }
+  };
   const [activeFolderDropTargetId, setActiveFolderDropTargetId] = useState<string | null>(null);
   const [activeFolderDropTargetName, setActiveFolderDropTargetName] = useState<string | null>(null);
   const labels = {
@@ -546,7 +753,7 @@ export const CellsTable = ({
       onToggleSort,
       selectedNodeIds,
       onToggleSelection: handleToggleSelection,
-      selectionEnabled: isSelectionEnabled && !isBulkMoveOutcomeUnresolved,
+      selectionEnabled: isSelectionEnabled && !isBulkMoveOutcomeUnresolved && !isPermanentDeleteUnresolved,
     }),
     getCoreRowModel: getCoreRowModel(),
   });
@@ -557,6 +764,15 @@ export const CellsTable = ({
   });
   const selectedFilesTotalSize =
     selectedNodes.length === selectedNodeIds.size ? getSelectedFilesTotalSize(selectedNodes) : Maybe.nothing();
+  const canPermanentlyDeleteSelection =
+    selectedNodes.length > 0 &&
+    selectedNodes.length === selectedNodeIds.size &&
+    isInRecycleBin() &&
+    !isPermanentDeleteUnresolved &&
+    canPerformCurrentDriveAction(CELLS_ACTION.DELETE) &&
+    selectedNodes.every(node => {
+      return canPerformCellsAction({action: CELLS_ACTION.DELETE, selfUserDriveRole: node.selfUserDriveRole});
+    });
   const canMoveSelection =
     selectedNodes.length > 0 &&
     !isBulkMoveOutcomeUnresolved &&
@@ -678,6 +894,43 @@ export const CellsTable = ({
                   {maybe.isJust(selectedFilesTotalSize) && (
                     <span css={selectionSizeStyles}>{formatBytes(selectedFilesTotalSize.value)}</span>
                   )}
+                  {canPermanentlyDeleteSelection && (
+                    <button
+                      css={bulkMoveButtonStyles}
+                      type="button"
+                      aria-haspopup="dialog"
+                      disabled={isPermanentDeletePending}
+                      onClick={() => {
+                        const nodeIds = selectedNodes.map(node => {
+                          return node.id;
+                        });
+                        const path = getCellsFilesPath();
+                        const descriptionKey =
+                          nodeIds.length === 1
+                            ? 'cells.bulkDelete.confirmation.single'
+                            : 'cells.bulkDelete.confirmation.multiple';
+                        PrimaryModal.show(
+                          PrimaryModal.type.CONFIRM,
+                          {
+                            primaryAction: {
+                              action: () => {
+                                void handlePermanentDelete(nodeIds, selectionScopeKey, path);
+                              },
+                              text: translate('cells.deletePermanentlyModal.button'),
+                            },
+                            text: {
+                              message: translate(descriptionKey, {count: nodeIds.length}),
+                              title: translate('cells.deletePermanentlyModal.headline'),
+                            },
+                          },
+                          permanentDeleteModalId,
+                          translate,
+                        );
+                      }}
+                    >
+                      {translate('cells.options.deletePermanently')}
+                    </button>
+                  )}
                   {canMoveSelection && (
                     <button
                       css={bulkMoveButtonStyles}
@@ -733,6 +986,26 @@ export const CellsTable = ({
                 {activeFolderDropTargetName}
               </span>
             </p>
+          </div>
+        )}
+        {isPermanentDeleteUnresolved && (
+          <div css={moveOutcomeMessageStyles} role="alert">
+            <span>
+              {translate(
+                isWaitingForPermanentDeleteReconciliation ? 'cells.bulkDelete.stillVisible' : 'cells.bulkDelete.unresolved',
+              )}
+              {didPermanentDeleteReviewRefreshFail && translate('cells.newItemMenuModalForm.genericError')}
+            </span>
+            <Button
+              variant={ButtonVariant.SECONDARY}
+              type="button"
+              onClick={() => {
+                void handleRefreshAfterPermanentDeleteReview();
+              }}
+              disabled={isRefreshingPermanentDeleteReview}
+            >
+              {translate('cells.bulkDelete.refresh')}
+            </Button>
           </div>
         )}
         {isBulkMoveOutcomeUnresolved && (

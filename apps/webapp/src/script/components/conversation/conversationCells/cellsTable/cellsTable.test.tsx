@@ -24,6 +24,7 @@ import userEvent from '@testing-library/user-event';
 import {noop} from 'noop-esm';
 
 import {ThemeProvider, themes, THEME_ID} from '@wireapp/react-ui-kit';
+import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
 import {Maybe} from 'true-myth';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import type {Conversation} from 'Repositories/entity/Conversation';
@@ -60,6 +61,33 @@ const translateSelectionForTest: Translate = (key, substitutions) => {
   }
   if (key === 'cells.selection.move') {
     return 'Move';
+  }
+  if (key === 'cells.options.deletePermanently') {
+    return 'Delete permanently';
+  }
+  if (key === 'cells.deletePermanentlyModal.headline') {
+    return 'Delete permanently?';
+  }
+  if (key === 'cells.deletePermanentlyModal.button') {
+    return 'Delete';
+  }
+  if (key === 'modalConfirmSecondary') {
+    return 'Cancel';
+  }
+  if (key === 'cells.bulkDelete.confirmation.single') {
+    return 'This will permanently delete the 1 selected item and any selected folder contents. This cannot be undone.';
+  }
+  if (key === 'cells.bulkDelete.confirmation.multiple') {
+    return `This will permanently delete the ${substitutions?.count} selected items and any selected folder contents. This cannot be undone.`;
+  }
+  if (key === 'cells.bulkDelete.unresolved') {
+    return 'We could not confirm that the selected items were deleted. Refresh the Bin to check before trying again.';
+  }
+  if (key === 'cells.bulkDelete.stillVisible') {
+    return 'Selected items still appear in the Bin. The action remains blocked until they disappear.';
+  }
+  if (key === 'cells.bulkDelete.refresh') {
+    return 'Refresh Bin';
   }
   if (key === 'cells.moveNodeModal.moveTitle') {
     return 'Move to folder';
@@ -233,6 +261,7 @@ const renderCellsTable = ({
           <CellsSelfUserDriveRoleProvider selfUserDriveRole={selfUserDriveRole}>
             <CellsTable
               nodes={nodes}
+              isNodesLoading={false}
               cellsRepository={cellsRepository}
               conversation={{} as Conversation}
               conversationQualifiedId={conversationQualifiedId}
@@ -260,6 +289,7 @@ const renderCellsTable = ({
             isEnabled
             isFileTabActive
           />
+          <PrimaryModalComponent translate={translateSelectionForTest} />
         </SharedDriveUploadStatusProvider>
       </ThemeProvider>
     );
@@ -300,6 +330,7 @@ describe('CellsTable selection', () => {
     expect(within(screen.getByRole('status')).getByText('2 selected')).toBeInTheDocument();
     expect(within(screen.getByRole('status')).getByText('223.9 MB')).toBeInTheDocument();
     expect(screen.getByRole('button', {name: 'Move'})).toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'Delete permanently'})).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', {name: 'Clear selection'}));
     expect(screen.queryByText('223.9 MB')).not.toBeInTheDocument();
@@ -370,6 +401,318 @@ describe('CellsTable selection', () => {
 
       expect(screen.getByText('1 selected')).toBeInTheDocument();
       expect(screen.queryByRole('button', {name: 'Move'})).not.toBeInTheDocument();
+      expect(screen.getByRole('button', {name: 'Delete permanently'})).toBeInTheDocument();
+    } finally {
+      window.location.hash = originalHash;
+    }
+  });
+
+  it('cancels permanent deletion without a request and confirms the captured mixed selection once', async () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files/recycle_bin';
+    const user = userEvent.setup();
+    const onRefresh = jest.fn();
+    const repository = {
+      deleteNodes: jest.fn().mockResolvedValue({Status: 'Performed'}),
+    } as unknown as CellsRepository;
+
+    try {
+      renderCellsTable({cellsRepository: repository, onRefresh});
+      await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+      await user.click(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'}));
+      await user.click(screen.getByRole('button', {name: 'Delete permanently'}));
+
+      const confirmation = await screen.findByRole('dialog');
+      expect(within(confirmation).getByRole('heading', {name: 'Delete permanently?'})).toBeInTheDocument();
+      expect(within(confirmation).getByText(/2 selected items/)).toBeInTheDocument();
+      expect(within(confirmation).getByText(/selected folder contents/)).toBeInTheDocument();
+
+      await user.click(within(confirmation).getByRole('button', {name: 'Cancel'}));
+      expect(repository.deleteNodes).not.toHaveBeenCalled();
+      expect(screen.getByText('2 selected')).toBeInTheDocument();
+
+      await user.click(screen.getByRole('button', {name: 'Delete permanently'}));
+      await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Delete'}));
+
+      await waitFor(() => {
+        expect(repository.deleteNodes).toHaveBeenCalledTimes(1);
+      });
+      expect(repository.deleteNodes).toHaveBeenCalledWith({uuids: ['folder-id', 'file-id'], permanently: true});
+      expect(onRefresh).toHaveBeenCalledTimes(1);
+      expect(screen.queryByText('2 selected')).not.toBeInTheDocument();
+    } finally {
+      window.location.hash = originalHash;
+    }
+  });
+
+  it('does not retry a permanent delete when the result is unknown', async () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files/recycle_bin';
+    const user = userEvent.setup();
+    const onRefresh = jest.fn();
+    const repository = {
+      deleteNodes: jest.fn().mockResolvedValue({Status: 'Background'}),
+    } as unknown as CellsRepository;
+
+    try {
+      renderCellsTable({cellsRepository: repository, onRefresh});
+      await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+      await user.click(screen.getByRole('button', {name: 'Delete permanently'}));
+      await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Delete'}));
+
+      expect(await screen.findByRole('alert')).toHaveTextContent(
+        'We could not confirm that the selected items were deleted. Refresh the Bin to check before trying again.',
+      );
+      expect(repository.deleteNodes).toHaveBeenCalledTimes(1);
+      expect(onRefresh).toHaveBeenCalledTimes(1);
+      expect(screen.getByRole('button', {name: 'Refresh Bin'})).toBeInTheDocument();
+      expect(screen.queryByRole('button', {name: 'Delete permanently'})).not.toBeInTheDocument();
+    } finally {
+      window.location.hash = originalHash;
+    }
+  });
+
+  it('disables the action while the permanent-delete request is pending', async () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files/recycle_bin';
+    const user = userEvent.setup();
+    let resolveDelete: (response: {Status: string}) => void = () => {
+      return undefined;
+    };
+    const deleteRequest = new Promise<{Status: string}>(resolve => {
+      resolveDelete = resolve;
+    });
+    const onRefresh = jest.fn();
+    const repository = {
+      deleteNodes: jest.fn().mockReturnValue(deleteRequest),
+    } as unknown as CellsRepository;
+
+    try {
+      renderCellsTable({cellsRepository: repository, onRefresh});
+      await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+      await user.click(screen.getByRole('button', {name: 'Delete permanently'}));
+      await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Delete'}));
+
+      expect(screen.getByRole('button', {name: 'Delete permanently'})).toBeDisabled();
+      expect(repository.deleteNodes).toHaveBeenCalledTimes(1);
+
+      await act(async () => {
+        resolveDelete({Status: 'Performed'});
+        await deleteRequest;
+      });
+
+      expect(onRefresh).toHaveBeenCalledTimes(1);
+      expect(screen.queryByRole('button', {name: 'Delete permanently'})).not.toBeInTheDocument();
+    } finally {
+      window.location.hash = originalHash;
+    }
+  });
+
+  it('does not report completion while a delete background job is unfinished', async () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files/recycle_bin';
+    const user = userEvent.setup();
+    const onRefresh = jest.fn();
+    const repository = {
+      deleteNodes: jest.fn().mockResolvedValue({
+        Status: 'Performed',
+        BackgroundActions: [{Name: 'delete', JobUuid: 'delete-job', Status: 'Running'}],
+      }),
+    } as unknown as CellsRepository;
+
+    try {
+      renderCellsTable({cellsRepository: repository, onRefresh});
+      await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+      await user.click(screen.getByRole('button', {name: 'Delete permanently'}));
+      await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Delete'}));
+
+      expect(await screen.findByRole('alert')).toHaveTextContent(
+        'We could not confirm that the selected items were deleted. Refresh the Bin to check before trying again.',
+      );
+      expect(repository.deleteNodes).toHaveBeenCalledTimes(1);
+      expect(onRefresh).toHaveBeenCalledTimes(1);
+      expect(screen.queryByText('1 selected')).toBeInTheDocument();
+    } finally {
+      window.location.hash = originalHash;
+    }
+  });
+
+  it('shows an unresolved warning after a rejected request without retrying it', async () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files/recycle_bin';
+    const user = userEvent.setup();
+    const onRefresh = jest.fn();
+    const repository = {
+      deleteNodes: jest.fn().mockRejectedValue(new Error('request failed')),
+    } as unknown as CellsRepository;
+
+    try {
+      renderCellsTable({cellsRepository: repository, onRefresh});
+      await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+      await user.click(screen.getByRole('button', {name: 'Delete permanently'}));
+      await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Delete'}));
+
+      expect(await screen.findByRole('alert')).toHaveTextContent(
+        'We could not confirm that the selected items were deleted. Refresh the Bin to check before trying again.',
+      );
+      expect(repository.deleteNodes).toHaveBeenCalledTimes(1);
+      expect(onRefresh).toHaveBeenCalledTimes(1);
+    } finally {
+      window.location.hash = originalHash;
+    }
+  });
+
+  it('does not delete if the Bin folder changes while confirmation is open without a rerender', async () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files/recycle_bin/folder-a';
+    const user = userEvent.setup();
+    const repository = {
+      deleteNodes: jest.fn(),
+    } as unknown as CellsRepository;
+
+    try {
+      renderCellsTable({
+        cellsRepository: repository,
+        selectionScopeKey: 'conversation-id:recycle_bin/folder-a:bin',
+      });
+      await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+      await user.click(screen.getByRole('button', {name: 'Delete permanently'}));
+
+      const confirmation = await screen.findByRole('dialog');
+      window.location.hash = '#/conversation/conversation-id@example.com/files/recycle_bin/folder-b';
+      await user.click(within(confirmation).getByRole('button', {name: 'Delete'}));
+
+      expect(repository.deleteNodes).not.toHaveBeenCalled();
+    } finally {
+      window.location.hash = originalHash;
+    }
+  });
+
+  it('does not unlock deletion until an explicit Bin refresh succeeds', async () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files/recycle_bin';
+    const user = userEvent.setup();
+    const refreshResolvers: Array<(wasSuccessful: boolean) => void> = [];
+    const onRefreshAfterBulkMoveOutcome = jest.fn(() => {
+      return new Promise<boolean>(resolve => {
+        refreshResolvers.push(resolve);
+      });
+    });
+    const repository = {
+      deleteNodes: jest.fn().mockResolvedValue({Status: 'Background'}),
+    } as unknown as CellsRepository;
+
+    try {
+      const {file, rerenderWithNodes} = renderCellsTable({cellsRepository: repository, onRefreshAfterBulkMoveOutcome});
+      await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+      await user.click(screen.getByRole('button', {name: 'Delete permanently'}));
+      await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Delete'}));
+
+      expect(await screen.findByRole('alert')).toBeInTheDocument();
+      await user.click(screen.getByRole('button', {name: 'Refresh Bin'}));
+      expect(screen.getByRole('button', {name: 'Refresh Bin'})).toBeDisabled();
+      expect(screen.queryByRole('button', {name: 'Delete permanently'})).not.toBeInTheDocument();
+
+      await act(async () => {
+        refreshResolvers[0](false);
+      });
+      expect(await screen.findByRole('alert')).toBeInTheDocument();
+      expect(screen.getByRole('button', {name: 'Refresh Bin'})).toBeEnabled();
+      expect(screen.queryByRole('button', {name: 'Delete permanently'})).not.toBeInTheDocument();
+
+      await user.click(screen.getByRole('button', {name: 'Refresh Bin'}));
+      await act(async () => {
+        refreshResolvers[1](true);
+      });
+
+      expect(await screen.findByRole('alert')).toHaveTextContent(
+        'Selected items still appear in the Bin. The action remains blocked until they disappear.',
+      );
+      expect(screen.queryByRole('button', {name: 'Delete permanently'})).not.toBeInTheDocument();
+
+      rerenderWithNodes([file]);
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+      expect(screen.queryByText('1 selected')).not.toBeInTheDocument();
+      expect(repository.deleteNodes).toHaveBeenCalledTimes(1);
+    } finally {
+      window.location.hash = originalHash;
+    }
+  });
+
+  it('does not delete if the view leaves the recycle bin while confirmation is open', async () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files/recycle_bin';
+    const user = userEvent.setup();
+    const repository = {
+      deleteNodes: jest.fn(),
+    } as unknown as CellsRepository;
+
+    try {
+      renderCellsTable({cellsRepository: repository});
+      await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+      await user.click(screen.getByRole('button', {name: 'Delete permanently'}));
+
+      const confirmation = await screen.findByRole('dialog');
+      window.location.hash = '#/conversation/conversation-id@example.com/files';
+      await user.click(within(confirmation).getByRole('button', {name: 'Delete'}));
+
+      expect(repository.deleteNodes).not.toHaveBeenCalled();
+    } finally {
+      window.location.hash = originalHash;
+    }
+  });
+
+  it('rechecks node permission when confirmation is open', async () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files/recycle_bin';
+    const user = userEvent.setup();
+    const repository = {
+      deleteNodes: jest.fn(),
+    } as unknown as CellsRepository;
+
+    try {
+      const {file, folder, rerenderWithNodes} = renderCellsTable({cellsRepository: repository});
+      await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+      await user.click(screen.getByRole('button', {name: 'Delete permanently'}));
+
+      const confirmation = await screen.findByRole('dialog');
+      rerenderWithNodes([{...folder, selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER}, file]);
+      await user.click(within(confirmation).getByRole('button', {name: 'Delete'}));
+
+      expect(repository.deleteNodes).not.toHaveBeenCalled();
+    } finally {
+      window.location.hash = originalHash;
+    }
+  });
+
+  it('hides permanent deletion when any selected item is viewer-only', () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files/recycle_bin';
+    try {
+      const viewerFile = createNode({
+        id: 'viewer-file',
+        name: 'Viewer file',
+        type: CellNodeType.FILE,
+        selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER,
+      });
+      renderCellsTable({initialNodes: [createNode({id: 'editor-folder'}), viewerFile]});
+      fireEvent.click(screen.getAllByRole('checkbox')[0]);
+      fireEvent.click(screen.getAllByRole('checkbox')[1]);
+
+      expect(screen.queryByRole('button', {name: 'Delete permanently'})).not.toBeInTheDocument();
+    } finally {
+      window.location.hash = originalHash;
+    }
+  });
+
+  it('hides permanent deletion for a viewer even inside the recycle bin', () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files/recycle_bin';
+    try {
+      renderCellsTable({selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER});
+      fireEvent.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+
+      expect(screen.queryByRole('button', {name: 'Delete permanently'})).not.toBeInTheDocument();
     } finally {
       window.location.hash = originalHash;
     }
