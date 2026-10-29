@@ -1,4 +1,5 @@
 set default-list
+set positional-arguments
 export PATH := justfile_directory() + "/node_modules/.bin:" + env_var("PATH")
 export NODE_OPTIONS := "--max-old-space-size=6144"
 
@@ -162,6 +163,134 @@ build-webapp-public: build-libraries
     WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json node apps/server/bin/generateVersionFile.mts
     cd apps/webapp && WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/public rspack build --config rspack.config.public.mts
 
+# Prepare compiled server output for local development after building its workspace dependencies.
+[group('development')]
+prepare-development-server: build-libraries
+    rimraf apps/server/dist apps/server/build/metadata
+    WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json node apps/server/bin/generateVersionFile.mts
+    tsc --project apps/server/tsconfig.json --incremental
+    WIRE_WEBAPP_SERVER_OUTPUT_PATH=apps/server/dist node apps/server/bin/copy_server_assets.js
+    cp apps/server/build/metadata/version.json apps/server/dist/version.json
+
+# Build dependencies once, then run the server and its upstream library watchers.
+[group('development')]
+develop: prepare-development-server
+    concurrently --raw --kill-others \
+        "just watch-server-typescript" \
+        "just run-development-server" \
+        "just watch-library-commons" \
+        "just watch-library-config" \
+        "just watch-library-core" \
+        "just watch-library-api-client" \
+        "just watch-library-priority-queue" \
+        "just watch-library-react-ui-kit" \
+        "just watch-library-store-engine" \
+        "just watch-library-store-engine-dexie" \
+        "just watch-library-telemetry" \
+        "just watch-library-webapp-events" \
+        "just watch-library-bazinga64"
+
+# Alternative to develop: build dependencies, select libraries, and start the server.
+[group('development')]
+develop-watch: prepare-development-server
+    ts-node --project ./tsconfig.tools.json tools/development/startDevelopment.ts
+
+# Build and watch every workspace library without starting the server.
+[group('development')]
+watch-libraries: build-libraries
+    concurrently --kill-others --names bazinga64,certificate-check,commons,config,copy-config,license-collector,priority-queue,react-ui-kit,store-engine,store-engine-dexie,store-engine-fs,telemetry,webapp-events,api-client,core \
+        "just watch-library-bazinga64" \
+        "just watch-library-certificate-check" \
+        "just watch-library-commons" \
+        "just watch-library-config" \
+        "just watch-library-copy-config" \
+        "just watch-library-license-collector" \
+        "just watch-library-priority-queue" \
+        "just watch-library-react-ui-kit" \
+        "just watch-library-store-engine" \
+        "just watch-library-store-engine-dexie" \
+        "just watch-library-store-engine-fs" \
+        "just watch-library-telemetry" \
+        "just watch-library-webapp-events" \
+        "just watch-library-api-client" \
+        "just watch-library-core"
+
+# Recompile server sources while Node watches the compiled output and restarts the server.
+[group('development')]
+watch-server-typescript:
+    tsc --project apps/server/tsconfig.json --incremental --watch --preserveWatchOutput
+
+[group('development')]
+run-development-server:
+    export NODE_ENV=development; \
+    if [ "$(uname -s)" = "Darwin" ]; then \
+        node --watch-path=apps/server/dist apps/server/dist/index.js; \
+    else \
+        node --watch apps/server/dist/index.js; \
+    fi
+
+# Compile one workspace library continuously; watch-libraries and develop-watch select these.
+[group('development')]
+watch-library-bazinga64:
+    tsc --project libraries/bazinga64/tsconfig.json --watch --preserveWatchOutput
+
+[group('development')]
+watch-library-certificate-check:
+    tsc --project libraries/certificate-check/tsconfig.json --watch --preserveWatchOutput
+
+[group('development')]
+watch-library-commons:
+    tsc --project libraries/commons/tsconfig.json --watch --preserveWatchOutput
+
+[group('development')]
+watch-library-config:
+    tsc --project libraries/config/tsconfig.json --watch --preserveWatchOutput
+
+[group('development')]
+watch-library-copy-config:
+    tsc --project libraries/copy-config/tsconfig.json --watch --preserveWatchOutput
+
+[group('development')]
+watch-library-license-collector:
+    tsc --project libraries/license-collector/tsconfig.json --watch --preserveWatchOutput
+
+[group('development')]
+watch-library-priority-queue:
+    tsc --project libraries/priority-queue/tsconfig.json --watch --preserveWatchOutput
+
+[group('development')]
+watch-library-react-ui-kit:
+    tsc --project libraries/react-ui-kit/tsconfig.json --watch --preserveWatchOutput
+
+[group('development')]
+watch-library-store-engine:
+    tsc --project libraries/store-engine/tsconfig.json --watch --preserveWatchOutput
+
+[group('development')]
+watch-library-store-engine-dexie:
+    tsc --project libraries/store-engine-dexie/tsconfig.json --watch --preserveWatchOutput
+
+[group('development')]
+watch-library-store-engine-fs:
+    tsc --project libraries/store-engine-fs/tsconfig.json --watch --preserveWatchOutput
+
+[group('development')]
+watch-library-telemetry:
+    cd libraries/telemetry && node bin/copyAssets.mts
+    cd libraries/telemetry && tsc --build tsconfig.json tsconfig.commonjs.json --watch --preserveWatchOutput
+
+[group('development')]
+watch-library-webapp-events:
+    tsc --project libraries/webapp-events/tsconfig.json --watch --preserveWatchOutput
+
+[group('development')]
+watch-library-api-client:
+    tsc --project libraries/api-client/tsconfig.json --watch --preserveWatchOutput
+
+[group('development')]
+watch-library-core:
+    tsc --project libraries/core/tsconfig.json --watch --preserveWatchOutput
+
 # Configure the webapp, generate its React icon components, and validate their types.
 configure-webapp:
     cd libraries/copy-config && rimraf lib && tsc
@@ -197,6 +326,16 @@ clean-libraries:
 test: build-libraries
     jest --config ./jest.config.js
 
+# Build workspace dependencies and run Playwright with the webapp's shared configuration.
+[group('testing')]
+e2e-test *playwrightArguments: build-libraries
+    npx playwright test --config apps/webapp/playwright.config.ts "$@"
+
+# Run Playwright UI mode with the same webapp configuration and dependency build.
+[group('testing')]
+e2e-ui *playwrightArguments: build-libraries
+    npx playwright test --config apps/webapp/playwright.config.ts --ui "$@"
+
 # Run each Jest project separately to preserve its coverage thresholds.
 [group('testing')]
 test-ci: build-libraries
@@ -209,3 +348,40 @@ test-ci: build-libraries
 [group('testing')]
 test-watch: build-libraries
     jest --config ./jest.config.js --watch
+
+# Extract i18next strings from webapp JavaScript, HTML, and template files.
+[group('translation')]
+translate-extract:
+    cd apps/webapp && i18next-scanner --config ../../i18next-scanner.config.js 'src/{page,script}/**/*.{js,html,htm}'
+
+# Extract FormatJS strings and merge them into the canonical English source file.
+[group('translation')]
+translate-merge:
+    cd apps/webapp && formatjs extract --format './bin/translations_extract_formatter.js' --out-file './src/i18n/en-US.json' 'src/**/*.{ts,tsx,js,jsx}' --ignore 'src/**/*.d.ts' --additional-function-names t
+
+# Validate translated locale placeholders against the canonical English source.
+[group('translation')]
+translate-validate:
+    node tools/i18n/validateTranslationPlaceholders.mts
+
+# Extract and merge canonical source strings, then upload only source strings to Crowdin.
+[group('translation')]
+translate-upload: translate-extract
+    just translate-merge
+    crowdin upload sources --config crowdin.yaml
+
+# Download Crowdin translations and validate their placeholders.
+[group('translation')]
+translate-download:
+    crowdin download --config crowdin.yaml
+    just translate-validate
+
+# Validate build artifact metadata using the expected values from the environment.
+[group('build')]
+validate-build-artifact:
+    node tools/buildArtifact/validateBuildArtifact.mts
+
+# Validate recovered artifact metadata using the expected values from the environment.
+[group('build')]
+validate-recovery-build-artifact:
+    node tools/buildArtifact/validateRecoveryBuildArtifact.mts

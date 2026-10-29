@@ -15,11 +15,6 @@ concurrency:
 
 permissions: {}
 
-# Keep Nx task caching disabled in pull_request and merge_group runs because
-# repository-controlled code is untrusted and could poison task results (CVE-2025-36852, CREEP).
-env:
-  NX_SKIP_NX_CACHE: 'true'
-
 jobs:
   workflow-security:
     runs-on: ubuntu-26.04
@@ -99,7 +94,7 @@ jobs:
 
       - name: Verify generated i18n artifacts are committed
         run: |
-          npm run --workspace @wireapp/webapp translate:merge
+          npx just translate-merge
 
           if ! test -z "$(git status --porcelain)"; then
             echo "Repository is not clean after generation. Run generation locally and commit the changes."
@@ -108,7 +103,7 @@ jobs:
           fi
 
       - name: Validate translation markers
-        run: node tools/i18n/validateTranslationPlaceholders.mts
+        run: npx just translate-validate
 
   build-libraries:
     runs-on: ubuntu-26.04-arm
@@ -208,7 +203,7 @@ jobs:
 
           test -f "$BUILD_ARTIFACT_PATH"
           unzip -tq "$BUILD_ARTIFACT_PATH"
-          node ./tools/buildArtifact/validateBuildArtifact.mts
+          npx just validate-build-artifact
 
           archive_entries="$(unzip -Z1 "$BUILD_ARTIFACT_PATH")"
           required_entry_scripts=(
@@ -431,12 +426,12 @@ jobs:
           short_commit_sha="${WIRE_WEBAPP_BUILD_COMMIT::7}"
           expected_version="dev-${short_commit_sha}"
           WIRE_WEBAPP_BUILD_VERSION="${expected_version}" \
-            npm run build:prod:public
+            npx just package-server-public
 
           BUILD_ARTIFACT_PATH=apps/server/dist/s3/ebs.zip \
           EXPECTED_COMMIT="${WIRE_WEBAPP_BUILD_COMMIT}" \
           EXPECTED_VERSION="${expected_version}" \
-            node ./tools/buildArtifact/validateBuildArtifact.mts
+            npx just validate-build-artifact
 
       - name: Build and smoke-test sparse production Docker context
         env:

@@ -7,12 +7,6 @@
       "options": {
         "command": "echo \"workspace-tools has no build\""
       }
-    },
-    "e2e": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "echo \"workspace-tools has no e2e\""
-      }
     }
   },
   "tags": ["scope:tooling"]

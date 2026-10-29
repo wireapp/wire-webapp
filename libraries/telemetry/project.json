@@ -26,14 +26,6 @@
       "options": {
         "command": "echo 'Build complete'"
       }
-    },
-    "watch": {
-      "executor": "nx:run-commands",
-      "outputs": ["{projectRoot}/lib"],
-      "options": {
-        "command": "node bin/copyAssets.mts && tsc --build tsconfig.json tsconfig.commonjs.json --watch --preserveWatchOutput",
-        "cwd": "{projectRoot}"
-      }
     }
   },
   "tags": ["type:lib", "scope:telemetry"]

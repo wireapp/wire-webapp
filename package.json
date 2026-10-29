@@ -19,6 +19,7 @@
     "zod": "4.6.7"
   },
   "devDependencies": {
+    "@crowdin/cli": "5.5.0",
     "@emotion/eslint-plugin": "11.12.0",
     "@enormora/objectory": "0.0.25",
     "@faker-js/faker": "10.6.0",
@@ -43,6 +44,7 @@
     "@wireapp/copy-config": "2.3.13",
     "@wireapp/prettier-config": "0.6.11",
     "archiver": "7.0.1",
+    "concurrently": "9.2.5",
     "cross-env": "10.1.0",
     "dpdm": "3.15.1",
     "eslint": "9.39.5",
@@ -115,28 +117,15 @@
     "url": "https://github.com/wireapp/wire-webapp.git"
   },
   "scripts": {
-    "build:libs": "npx just build-libraries",
-    "bundle:dev": "npx just assemble-webapp-development",
-    "bundle:prod": "npx just assemble-webapp-internal",
-    "bundle:prod:public": "npx just assemble-webapp-public",
     "clean:jest": "jest --clearCache",
     "clean:dependencies": "find . -name node_modules -type d -prune -exec rm -rf '{}' +",
-    "dev": "nx serve server",
-    "dev:packages": "nx run-many -t watch --projects=tag:type:lib",
     "docker": "node ./tools/dockerPublication/pushDocker.js",
     "postinstall": "patch-package && npx just configure-webapp",
-    "ci:install": "npm clean-install --ignore-scripts && npm exec -- patch-package --error-on-fail",
+    "ci:install": "npm clean-install --ignore-scripts && npx patch-package --error-on-fail",
     "release": "nx release",
     "release:dry-run": "nx release --dry-run",
     "release:version": "nx release version",
-    "release:publish": "nx release publish",
-    "start": "nx serve server",
-    "start:watch": "ts-node --project ./tsconfig.tools.json tools/development/startWatch.ts",
-    "e2e-test": "nx e2e webapp",
-    "e2e-ui": "nx e2e webapp --ui",
-    "build:prod": "npx just package-server-internal",
-    "build:prod:public": "npx just package-server-public",
-    "verify:bundle:prod:public": "node tools/buildArtifact/verifyPublicProductionBundle.ts"
+    "release:publish": "nx release publish"
   },
   "overrides": {
     "@emotion/eslint-plugin": {

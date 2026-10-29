@@ -2,8 +2,9 @@
 
 > Historical reference for the original Nx integration. Unit tests now run through
 > `npx just test`, `npx just test-ci`, and `npx just test-watch`; CI uses native Jest
-> with per-project coverage thresholds. Nx remains in use for builds and other tasks
-> that have not migrated.
+> with per-project coverage thresholds. Development startup, library watching, and E2E
+> execution now use Just and native Node.js, TypeScript, and Playwright commands. Nx
+> remains for release and deployment responsibilities that have not migrated.
 
 ## Table of Contents
 
@@ -27,27 +28,20 @@
 
 ## Workspace-Tools Project
 
-The `workspace-tools` project provides workspace-level utilities and the Jest config for repository-owned tooling tests. Nx still owns its remaining build and server commands.
+The `workspace-tools` project provides workspace-level utilities and the Jest config for repository-owned tooling tests. Nx remains in release and deployment workflows that have not migrated.
 
 **Available workspace-tools commands:**
 - `nx run workspace-tools:clean-jest` - Clean Jest cache
 - `nx run workspace-tools:docker` - Build Docker image
 
-These commands are exposed as root npm scripts in [`package.json`](package.json):
+Run local development and E2E tasks directly through Just:
 
-```json
-{
-  "scripts": {
-    "clean:jest": "nx reset && nx run workspace-tools:clean-jest",
-    "docker": "nx run workspace-tools:docker",
-    "release": "nx release",
-    "release:dry-run": "nx release --dry-run",
-    "release:version": "nx release version",
-    "release:publish": "nx release publish",
-    "start": "nx serve server",
-    "build:prod": "nx build webapp --configuration=production"
-  }
-}
+```bash
+npx just develop
+npx just develop-watch
+npx just watch-libraries
+npx just e2e-test
+npx just e2e-ui
 ```
 
 ---
@@ -1115,7 +1109,7 @@ Nx will:
 **What happens when you run Rspack directly instead of Nx:**
 
 ```bash
-npm exec --prefix . -- nx run webapp:build
+npx just build-webapp-internal
 ```
 
 You might get:
@@ -1270,24 +1264,16 @@ npx just eslint
 
 ### Common Pitfalls
 
-**Running package `build` scripts directly:**
+**Build and test through Just:**
 
 ```bash
-# DON'T DO THIS
-npm --workspace=@wireapp/webapp run build
-
-# INSTEAD DO THIS
-npm exec -- nx run webapp:build
+# Build the WebApp and its workspace dependencies.
+npx just build-webapp-internal
 ```
 
-**Running package `test` scripts directly:**
-
 ```bash
-# DON'T DO THIS
-npm --workspace=@wireapp/webapp run test
-
-# INSTEAD DO THIS
-npm exec -- nx run webapp:test
+# Run the repository's unit tests.
+npx just test
 ```
 
 **Type-checking TypeScript:**
@@ -1298,8 +1284,8 @@ npx just type-check
 
 ### Best Practices
 
-1. **Use Just for migrated checks** - Run type-checking with `npx just type-check`, unit tests with `npx just test`, and ESLint with `npx just eslint` or fixes with `npx just eslint-fix`
-2. **Use Nx for remaining tasks** - Nx manages builds, packaging, and server execution
+1. **Use Just for migrated tasks** - Run builds, type-checking, tests, lint, development, and E2E through Just
+2. **Use Nx for remaining tasks** - Nx remains for release, publishing, and deployment compatibility
 3. **Use `nx run-many`** - When you need to run Nx tasks on multiple projects
 4. **Use `nx affected`** - When you only want to run supported Nx tasks on changed projects
 5. **Check `nx graph`** - To understand the project structure
@@ -1309,49 +1295,14 @@ npx just type-check
 
 ### Example Workflow
 
-**Correct workflow:**
+**Current workflow:**
 
 ```bash
-# 1. Make changes to code
-
-# 2. See what's affected
-nx affected:graph
-
-# 3. Build affected projects
-nx affected -t build
-
-# 4. Test affected projects
-nx affected -t test
-
-# 5. Lint the repository
-npx just eslint
-
-# 6. If everything passes, commit and push
+npx just build-webapp-internal
+npx just build-server
+npx just test
+npx just lint
 ```
-
-**Incorrect workflow:**
-
-```bash
-# 1. Make changes to code
-
-# 2. Build everything manually
-npm --workspace=@wireapp/webapp run build
-npm --workspace=@wireapp/server run build
-
-# 3. Test everything manually
-npm --workspace=@wireapp/webapp run test
-npm --workspace=@wireapp/server run test
-
-# 4. Lint everything manually
-npm --workspace=@wireapp/webapp run lint
-npm --workspace=@wireapp/server run lint
-```
-
-The incorrect workflow:
-- Takes longer (no caching, no affected detection)
-- May miss dependencies (manual order)
-- May behave differently in CI
-- Is harder to maintain
 
 ---
 
@@ -1529,29 +1480,30 @@ stage('Wait for GitHub action to finish') {
 
 ## Local Development - Watching Libraries
 
-### Single-command dev server
+### Development server and library watchers
 
-Start the full dev stack with one command:
+Run `npx just develop` to build workspace libraries, generate server version metadata,
+clean and compile the server with `tsc`, and copy runtime assets. It starts server TypeScript
+and Node watchers together with watchers for the WebApp's upstream workspace libraries.
+Preparation finishes before any long-running process starts. When TypeScript updates compiled
+server output, Node restarts the server. `concurrently --kill-others` stops sibling processes
+if any long-running command exits.
 
-```bash
-npm run dev
-```
+The server continues to use the Express and Rspack development setup in `apps/server/Server.ts`
+and `apps/webapp/rspack.config.dev.mts`. Rspack serves its output in memory with React Fast
+Refresh. When server source changes, TypeScript updates `apps/server/dist` and Node restarts
+the server process.
 
-This runs `nx serve server`, which:
+`npx just develop-watch` is an alternative to `npx just develop`. It builds
+dependencies, lets you choose libraries interactively (defaulting to `react-ui-kit` and
+`api-client`), and starts the server with those library watchers. Do not run both development
+recipes at the same time. Use `npx just watch-libraries` to build and watch all development
+libraries without starting the server. The Justfile defines one watch recipe per library.
+Telemetry's recipe copies SDK assets and watches both `tsconfig.json` and
+`tsconfig.commonjs.json`.
 
-1. Builds each upstream library once before its watcher starts (`watch` → `dependsOn: ["build"]` in `nx.json`)
-2. Starts TypeScript watch compilation on every upstream library in the webapp dependency graph (`webapp:watch-deps` → `^watch`)
-3. Starts the Express server with the Rspack development server in watch mode (`server:build-dev` — server only, no `^build` or `webapp:build`)
-
-Library changes flow: `libraries/*/src` → `watch` recompiles `lib/` → Rspack detects `@wireapp/*` changes → HMR updates the browser, with a full reload when an update cannot be applied.
-
-Only libraries reachable from the server/webapp dependency graph are watched (e.g. `core`, `api-client`, `commons`, `store-engine*`). Config-only packages (`eslint-config`, `prettier-config`) are excluded — they are not part of the webapp bundle.
-
-Configuration:
-
-- [`nx.json`](../nx.json) — `targetDefaults.watch.continuous: true` (long-running watchers)
-- [`apps/webapp/project.json`](../apps/webapp/project.json) — `watch-deps` starts `^watch` on webapp's upstream libraries
-- [`apps/server/project.json`](../apps/server/project.json) — `serve.continuous: true`, `serve.dependsOn: ["webapp:watch-deps"]`, `serve` uses `server:build-dev` (not `server:build`) to avoid racing lib `clean` with `watch`
+The Just recipes are in [`justfile`](../justfile). The interactive library selection is in
+[`tools/development/startDevelopment.ts`](../tools/development/startDevelopment.ts).
 
 ### TypeScript Path Mappings for Import Resolution
 
@@ -1589,7 +1541,7 @@ In [`apps/webapp/package.json`](apps/webapp/package.json):
 The npm workspace configuration ensures:
 - Matching local workspace packages are linked in `node_modules`
 - Their versions stay aligned through explicit semver ranges
-- Rspack consumes compiled `lib/` output; `watch` targets keep `lib/` in sync during development
+- Rspack consumes compiled `lib/` output; the native TypeScript watchers keep selected `lib/` output in sync during development
 
 ### Nx Daemon for Fast Rebuilds
 
@@ -1617,8 +1569,9 @@ npx just eslint                       # Lint the repository
 npx just eslint-fix                   # Fix eligible ESLint issues
 
 # Development
-npm run dev                           # Dev server + upstream lib watchers
-npm exec -- nx serve server           # Same as npm run dev / npm run start
+npx just develop                       # Run the server and upstream library watchers
+npx just develop-watch                 # Alternative: choose library watchers interactively
+npx just watch-libraries              # Watch libraries without starting the server
 
 # Graph & Analysis
 nx graph                              # Visualize dependency graph
@@ -1650,7 +1603,7 @@ nx run-many -t build --projects=tag:frontend
 
 ## Key Takeaways for Developers
 
-1. **Use the task runner for each task** - Just runs unit tests and migrated quality checks; Nx runs builds and remaining Nx tasks
+1. **Use the task runner for each task** - Just runs migrated builds, quality checks, local development, and E2E; Nx runs remaining release and deployment tasks
 2. **Understand `dependsOn`** - Dependencies are automatically built first
 3. **Cache is your friend** - Nx cache saves time, but remember `nx reset` when needed
 4. **Add projects to [`tsconfig.json`](tsconfig.json)** - Project references are required
@@ -1659,8 +1612,8 @@ nx run-many -t build --projects=tag:frontend
 7. **Configure Jest coverage thresholds** - Add realistic project-local baselines when new libraries/apps add tests
 8. **Update [`.github/labeler.yml`](.github/labeler.yml)** - Add label rules for new projects
 9. **Check `nx graph`** - Visualize dependencies before making changes
-10. **CI uses Nx** - All GitHub workflows use Nx commands
-11. **`npm run dev` watches upstream libs** - `server:serve` depends on `webapp:watch-deps`, which starts `^watch` on webapp's library dependencies
+10. **E2E uses Playwright directly** - The workflow builds workspace libraries before native Playwright discovery and execution
+11. **`npx just develop` watches upstream libraries** - Use `npx just develop-watch` as an alternative to select a subset
 12. **Path mappings enable clean imports** - Use TypeScript paths for library imports
 13. **`typesVersions` in libraries** - Maps `lib/*` imports to `src/*` for source-based type resolution
 14. **`paths` in tsconfig.eslint.json** - Required for ESLint TypeScript Project Service to resolve imports during linting

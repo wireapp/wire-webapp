@@ -147,50 +147,31 @@ jobs:
 
       - name: Build workflow tool dependencies
         working-directory: workflow-source
-        run: npm exec -- nx run config-lib:build
+        run: npx just build-libraries
 
       - name: Setup Node.js for selected release
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: 'selected-release/.nvmrc'
-          # Historical tags may contain either package-manager lockfile.
 
       - name: Install selected release dependencies
         working-directory: selected-release
         env:
           WIRE_WEBAPP_CONFIGURATION: production
-        run: |
-          package_manager="$(node ../workflow-source/tools/packageManager/packageManager.js "$PWD")"
-          if [[ "${package_manager}" == 'npm' ]]; then
-            npm clean-install
-          else
-            ./bin/yarn --immutable
-          fi
+        run: npm clean-install
 
       - name: Update selected release configuration
         working-directory: selected-release
         env:
           WIRE_WEBAPP_CONFIGURATION: production
-        run: |
-          package_manager="$(node ../workflow-source/tools/packageManager/packageManager.js "$PWD")"
-          if [[ "${package_manager}" == 'npm' ]]; then
-            npm exec -- nx run webapp:configure
-          else
-            ./bin/yarn nx run webapp:configure
-          fi
+        run: npx just configure-webapp
 
       - name: Build and package
         working-directory: selected-release
         env:
           WIRE_WEBAPP_BUILD_COMMIT: ${{ steps.git_metadata.outputs.commit_sha }}
           WIRE_WEBAPP_BUILD_VERSION: ${{ needs.validate_request.outputs.webapp_build_version }}
-        run: |
-          package_manager="$(node ../workflow-source/tools/packageManager/packageManager.js "$PWD")"
-          if [[ "${package_manager}" == 'npm' ]]; then
-            npm run build:prod:public
-          else
-            ./bin/yarn build:prod:public
-          fi
+        run: npx just package-server-public
 
       - name: Restore Node.js for workflow tools
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
@@ -204,7 +185,7 @@ jobs:
           BUILD_ARTIFACT_PATH: ${{ github.workspace }}/selected-release/apps/server/dist/s3/ebs.zip
           EXPECTED_COMMIT: ${{ steps.git_metadata.outputs.commit_sha }}
           EXPECTED_VERSION: ${{ needs.validate_request.outputs.webapp_build_version }}
-        run: node ./tools/buildArtifact/validateRecoveryBuildArtifact.mts
+        run: npx just validate-recovery-build-artifact
 
       - name: Upload build artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
