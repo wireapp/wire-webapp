@@ -396,7 +396,7 @@
   "cells.bulkMove.movedItems": "Moved {count} items",
   "cells.bulkMove.movingItems": "Moving {count} items",
   "cells.bulkMove.outcomeUnresolved": "Move status is unresolved. Verify the Drive before trying again.",
-  "cells.bulkMove.processing": "Processing",
+  "cells.bulkMove.processing": "Wird verarbeitet",
   "cells.bulkMove.refreshDrive": "Refresh Drive",
   "cells.bulkMove.selected": "Ausgewählt",
   "cells.bulkMove.statusUnknown": "We couldn’t determine whether the move completed. Refresh the Drive to inspect item locations. The Move action stays disabled while the outcome is unknown.",
