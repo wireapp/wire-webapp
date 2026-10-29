@@ -125,7 +125,7 @@
     "babel-jest": "30.5.2",
     "babel-plugin-transform-import-meta": "2.3.3",
     "baseline-browser-mapping": "2.11.33",
-    "browserslist": "4.29.4",
+    "browserslist": "4.29.5",
     "css-loader": "7.1.5",
     "cssnano": "7.1.9",
     "dexie": "4.4.7",
