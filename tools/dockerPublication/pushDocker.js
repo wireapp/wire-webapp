@@ -36,7 +36,7 @@ require('dotenv').config({quiet: true});
  * Note: You must run "npx just package-server-internal" from the repository root before creating the Docker image, otherwise the compiled JavaScript code (and other assets) won't be part of the bundle.
  *
  * Demo execution:
- * npm run docker -- staging '2021-08-25' '1240cfda9e609470cf1154e18f5bc582ca8907ff'
+ * npx just docker staging '2021-08-25' '1240cfda9e609470cf1154e18f5bc582ca8907ff'
  */
 
 function selectReleaseCommit({releaseCommitSha, commandLineCommitSha, githubSha}) {

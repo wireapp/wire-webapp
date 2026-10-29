@@ -32,7 +32,7 @@ jobs:
         run: echo -e "machine github.com\n  login ${GH_TOKEN}" > ~/.netrc
 
       - name: Install JS dependencies
-        run: npm clean-install
+        run: npm clean-install && npx just setup
 
       - name: Merge translations
         run: npx just translate-merge

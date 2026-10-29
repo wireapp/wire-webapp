@@ -32,11 +32,6 @@
     "ts-node": "10.9.2",
     "typescript": "6.0.3"
   },
-  "scripts": {
-    "build": "nx run store-engine-lib:build",
-    "clean": "nx run store-engine-lib:clean",
-    "dist": "nx run store-engine-lib:dist"
-  },
   "version": "5.1.19",
   "private": true
 }

@@ -26,11 +26,6 @@
     "ts-node": "10.9.2",
     "typescript": "6.0.3"
   },
-  "scripts": {
-    "build": "nx run certificate-check-lib:build",
-    "clean": "nx run certificate-check-lib:clean",
-    "dist": "nx run certificate-check-lib:dist"
-  },
   "version": "0.7.27",
   "private": true
 }

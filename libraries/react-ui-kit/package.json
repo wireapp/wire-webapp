@@ -55,10 +55,5 @@
       "optional": true
     }
   },
-  "scripts": {
-    "build": "nx run react-ui-kit-lib:build",
-    "clean": "nx run react-ui-kit-lib:clean",
-    "dist": "nx run react-ui-kit-lib:dist"
-  },
   "version": "9.77.0"
 }

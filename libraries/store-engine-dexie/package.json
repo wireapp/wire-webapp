@@ -33,11 +33,6 @@
     "typescript": "6.0.3",
     "uuid": "11.1.1"
   },
-  "scripts": {
-    "build": "nx run store-engine-dexie-lib:build",
-    "clean": "nx run store-engine-dexie-lib:clean",
-    "dist": "nx run store-engine-dexie-lib:dist"
-  },
   "version": "2.1.24",
   "private": true
 }

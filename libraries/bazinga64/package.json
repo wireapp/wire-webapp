@@ -37,11 +37,6 @@
     "ts-node": "10.9.2",
     "typescript": "6.0.3"
   },
-  "scripts": {
-    "build": "nx run bazinga64-lib:build",
-    "clean": "nx run bazinga64-lib:clean",
-    "dist": "nx run bazinga64-lib:dist"
-  },
   "version": "6.5.13",
   "private": true
 }

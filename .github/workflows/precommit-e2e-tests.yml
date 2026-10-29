@@ -61,8 +61,7 @@ jobs:
           node-version-file: '.nvmrc'
           cache: 'npm'
 
-      - run: npm clean-install
-      - run: npx just configure-webapp
+      - run: npm clean-install && npx just setup
       - id: package
         env:
           EVENT_NAME: ${{ github.event_name }}

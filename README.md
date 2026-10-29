@@ -27,7 +27,7 @@ No license is granted to the Wire trademark and its associated logos, all of whi
 - `libraries/core/`: `@wireapp/core` package - Wire's communication core library handling authentication, WebSocket connections, and protocol messaging
 - Root-level tooling (`justfile`, npm workspaces, and `tools/`) provides commands shared by apps and libraries
 
-Use `npx just --list` to discover repository tasks, including builds, development, type checks, unit tests, linting, E2E, and translation management. Nx remains for library release and publishing tasks that have not migrated yet.
+Use `npx just --list` to discover repository tasks, including builds, development, type checks, unit tests, linting, E2E, and translation management.
 
 # How to Build the Open Source Client
 
@@ -38,8 +38,8 @@ Prerequisites:
 
 ## 1. Install Dependencies & Fetch Configuration
 
-1. Run `npm clean-install` (uses npm workspaces and the committed root lockfile)
-   - This will install all dependencies and run `npx just configure-webapp` (via root `postinstall`).
+1. Run `npm clean-install` to install dependencies from the committed root lockfile.
+1. Run `npx just setup` to apply dependency patches, fetch the webapp configuration, generate React icons, and validate their types.
    - `configure-webapp` uses `apps/webapp/app-config/package.json` to select a config repository version (`wire-web-config-wire` or `wire-web-config-default`), then copies:
      - config content into `apps/webapp/resource/`
      - `.env.defaults` into repository root
@@ -113,9 +113,9 @@ Rspack is the sole application bundler for internal and public production builds
 1. Build and package the default internal Rspack release: `npx just package-server-internal`
    - This builds both the server and webapp (in production mode) and creates the deployment package at `apps/server/dist/s3/ebs.zip`
 1. Build and package the default public Rspack release: `npx just package-server-public`
-1. Start the server output from `apps/server/dist` (or build a Docker image with `npm run docker -- <tag>`)
+1. Start the server output from `apps/server/dist` (or build a Docker image with `npx just docker <tag>`)
 
-`npx just build-server` compiles with the server TypeScript project and copies the server runtime assets, including the telemetry embed and compiled local workspace dependencies. It does not remove an existing `apps/server/build/server` directory, and its `build-libraries` prerequisite does not run Nx clean targets. Files for removed or renamed server sources, assets, or library outputs can remain; the Nx `server:build` target cleans its output and Nx cleans upstream library outputs it rebuilds.
+`npx just build-server` compiles with the server TypeScript project and copies the server runtime assets, including the telemetry embed and compiled local workspace dependencies. It does not remove an existing `apps/server/build/server` directory. Run `npx just clean-libraries` to remove generated library outputs and TypeScript build metadata before rebuilding those libraries.
 
 **Note:** The `zip` command has been deprecated. Packaging is integrated into the build process via `npx just package-server-internal`.
 
@@ -148,7 +148,7 @@ All Wire translations are crowdsourced via [Crowdin](https://crowdin.com/project
 
 ### Local translation tasks
 
-Install dependencies with `npm clean-install`, create a [Crowdin personal access token](https://crowdin.com/settings#api-key), then set it in your shell:
+Install dependencies with `npm clean-install` and run `npx just setup`. Create a [Crowdin personal access token](https://crowdin.com/settings#api-key), then set it in your shell:
 
 ```sh
 export CROWDIN_PERSONAL_TOKEN="<personal-access-token>"
