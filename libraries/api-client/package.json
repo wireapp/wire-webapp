@@ -1,5 +1,6 @@
 {
   "name": "@wireapp/api-client",
+  "private": true,
   "license": "GPL-3.0",
   "description": "Wire API Client to send and receive data.",
   "repository": {
