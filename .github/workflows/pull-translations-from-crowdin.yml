@@ -37,7 +37,7 @@ jobs:
         uses: crowdin/github-action@7ca9c452bfe9197d3bb7fa83a4d7e2b0c9ae835d
         env:
           GITHUB_TOKEN: ${{ secrets.OTTO_THE_BOT_GH_TOKEN }}
-          CROWDIN_PROJECT_ID: 342359
+          CROWDIN_PERSONAL_TOKEN: ${{ secrets.WEBTEAM_CROWDIN_TOKEN }}
           INPUT_DEBUG_MODE: false
         with:
           upload_sources: false
@@ -52,10 +52,7 @@ jobs:
           commit_message: 'Update translations'
           github_user_name: otto-the-bot
           github_user_email: webapp+otto@wire.com
-          token: ${{ secrets.WEBTEAM_CROWDIN_TOKEN }}
-          source: '/apps/webapp/src/i18n/en-US.json'
-          translation: '/apps/webapp/src/i18n/%locale%.json'
-          base_path: '.'
+          config: crowdin.yaml
 
       - name: Validate downloaded translation markers
-        run: node tools/i18n/validateTranslationPlaceholders.mts
+        run: npx just translate-validate

@@ -19,6 +19,7 @@
     "zod": "4.6.7"
   },
   "devDependencies": {
+    "@crowdin/cli": "5.5.0",
     "@emotion/eslint-plugin": "11.12.0",
     "@enormora/objectory": "0.0.25",
     "@faker-js/faker": "10.6.0",
@@ -124,8 +125,7 @@
     "release": "nx release",
     "release:dry-run": "nx release --dry-run",
     "release:version": "nx release version",
-    "release:publish": "nx release publish",
-    "verify:bundle:prod:public": "node tools/buildArtifact/verifyPublicProductionBundle.ts"
+    "release:publish": "nx release publish"
   },
   "overrides": {
     "@emotion/eslint-plugin": {

@@ -25,16 +25,16 @@ No license is granted to the Wire trademark and its associated logos, all of whi
 - `apps/server/`: node/express wrapper that serves the built webapp and handles proxying
 - `libraries/config/`: `@wireapp/config` package - centralized environment configuration management with type-safe configuration loading and validation
 - `libraries/core/`: `@wireapp/core` package - Wire's communication core library handling authentication, WebSocket connections, and protocol messaging
-- Root-level tooling (`package.json`, `justfile`, Nx, and bin scripts) provides commands shared by apps and libraries
+- Root-level tooling (`justfile`, npm workspaces, and `tools/`) provides commands shared by apps and libraries
 
-Use `npx just --list` to discover native repository tasks, including type checks, unit tests, and ESLint checks. Nx remains responsible for workspace builds and server tasks that have not migrated yet.
+Use `npx just --list` to discover repository tasks, including builds, development, type checks, unit tests, linting, E2E, and translation management. Nx remains for library release and publishing tasks that have not migrated yet.
 
 # How to Build the Open Source Client
 
 Prerequisites:
 
 1. Install [Node.js](https://nodejs.org/)
-1. Use Node.js 24.22.1 and npm 11.19.0, as pinned by `.nvmrc` and `packageManager`.
+1. Use Node.js 24.22.1 and npm 11.21.1, as pinned by `.nvmrc` and `packageManager`.
 
 ## 1. Install Dependencies & Fetch Configuration
 
@@ -146,41 +146,25 @@ Other useful tasks:
 
 All Wire translations are crowdsourced via [Crowdin](https://crowdin.com/projects/wire).
 
-### Add New Strings
+### Local translation tasks
 
-**Info:**
+Install dependencies with `npm clean-install`, create a [Crowdin personal access token](https://crowdin.com/settings#api-key), then set it in your shell:
 
-- To download translations we use Crowdin API v1, and you need to set up your [username](https://crowdin.com/settings#account) and [api_key](https://crowdin.com/settings#api-key) (Account API key)
-- To upload translations we use Crowdin CLI v3, and you will need to set up [project_identifier](https://crowdin.com/project/wire-webapp/settings#api) and [api_token](https://crowdin.com/settings#api-key) (Personal Access Token)
-
-**Setup:**
-
-Create a `keys/crowdin.yaml` in this repository and add the following entries:
-
-```yaml
-api_key: your-account-api-key
-api_token: your-personal-access-token
-project_identifier: wire-webapp
-username: your-username
+```sh
+export CROWDIN_PERSONAL_TOKEN="<personal-access-token>"
 ```
 
-**Usage:**
+The committed `crowdin.yaml` is the CLI configuration. It keeps the Crowdin project ID and translation paths; authentication comes from `CROWDIN_PERSONAL_TOKEN`. Do not add credentials to the configuration file.
 
-1. Add a string variable to "i18n/en-US.json"
-2. Create a PR and merge it after approval. When the PR gets merged, our CI will take care of uploading the English texts to Crowdin
+Use these Just recipes from the repository root:
 
-If our CI pipeline is broken, you still have the option to upload new strings manually. For this case, do the following:
+- `npx just translate-extract` scans i18next strings in webapp JavaScript, HTML, and template files.
+- `npx just translate-merge` extracts FormatJS strings and merges them into `apps/webapp/src/i18n/en-US.json` using the custom formatter.
+- `npx just translate-validate` checks translation file structure and placeholder markers against the canonical English file.
+- `npx just translate-upload` runs both source extraction steps and explicitly uploads source strings only. It does not upload translated locale files.
+- `npx just translate-download` explicitly downloads translated locale files and validates their placeholders.
 
-1. Install [Crowdin CLI v3](https://support.crowdin.com/cli-tool/)
-1. Verify you have a `keys/crowdin.yaml` in place
-1. Run `crowdin upload sources` with the Crowdin CLI v3 configuration.
-
-Once translations are uploaded on Crowdin, our (and external) translators can translate the new strings on Crowdin. There is a script that will run to create PRs with translation updates. As an alternative, translations can be downloaded in the following way:
-
-1. Verify your string shows up on the [Crowdin project: wire-webapp](https://crowdin.com/translate/wire-webapp/1224/en-en)
-1. Add a translation on Crowdin
-1. Approve the translation on Crowdin
-1. Run `crowdin download translations` with the Crowdin CLI v3 configuration.
+Uploads and downloads are opt-in local actions. After an English source change is reviewed and merged to `main`, the push workflow prepares the canonical source strings and uses the pinned Crowdin GitHub Action to upload sources. The manually dispatched pull workflow downloads translations, validates placeholders, and opens the existing translation pull request. These workflows remain separate from the local Just commands.
 
 ## Contributing
 

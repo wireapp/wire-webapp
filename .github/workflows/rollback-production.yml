@@ -168,7 +168,7 @@ jobs:
 
       - name: Build workflow tool dependencies
         working-directory: workflow-source
-        run: npx nx run config-lib:build
+        run: npx just build-libraries
 
       - name: Setup Node.js for selected release
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
@@ -185,22 +185,16 @@ jobs:
         working-directory: selected-release
         env:
           WIRE_WEBAPP_CONFIGURATION: production
-        run: npx nx run webapp:configure
+        run: npx just configure-webapp
 
       # Interim limitation: until durable release artifact storage exists, this
       # workflow rebuilds the deployable artifact from the selected Production tag.
-      # Use the selected release's Just recipe when available, with its legacy commands as fallback.
       - name: Build and package
         working-directory: selected-release
         env:
           WIRE_WEBAPP_BUILD_COMMIT: ${{ steps.git_metadata.outputs.rollback_commit_sha }}
           WIRE_WEBAPP_BUILD_VERSION: ${{ needs.validate_request.outputs.webapp_build_version }}
-        run: |
-          if [[ -f justfile ]] && grep -Eq '^package-server-public[[:space:]]*:' justfile; then
-            npx just package-server-public
-          else
-            npm run build:prod:public
-          fi
+        run: npx just package-server-public
 
       - name: Restore Node.js for workflow tools
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
@@ -214,7 +208,7 @@ jobs:
           BUILD_ARTIFACT_PATH: ${{ github.workspace }}/selected-release/${{ env.ARTIFACT_PATH }}
           EXPECTED_COMMIT: ${{ steps.git_metadata.outputs.rollback_commit_sha }}
           EXPECTED_VERSION: ${{ needs.validate_request.outputs.webapp_build_version }}
-        run: node ./tools/buildArtifact/validateRecoveryBuildArtifact.mts
+        run: npx just validate-recovery-build-artifact
 
       - name: Compute artifact metadata
         id: artifact_metadata

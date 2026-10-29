@@ -348,3 +348,40 @@ test-ci: build-libraries
 [group('testing')]
 test-watch: build-libraries
     jest --config ./jest.config.js --watch
+
+# Extract i18next strings from webapp JavaScript, HTML, and template files.
+[group('translation')]
+translate-extract:
+    cd apps/webapp && i18next-scanner --config ../../i18next-scanner.config.js 'src/{page,script}/**/*.{js,html,htm}'
+
+# Extract FormatJS strings and merge them into the canonical English source file.
+[group('translation')]
+translate-merge:
+    cd apps/webapp && formatjs extract --format './bin/translations_extract_formatter.js' --out-file './src/i18n/en-US.json' 'src/**/*.{ts,tsx,js,jsx}' --ignore 'src/**/*.d.ts' --additional-function-names t
+
+# Validate translated locale placeholders against the canonical English source.
+[group('translation')]
+translate-validate:
+    node tools/i18n/validateTranslationPlaceholders.mts
+
+# Extract and merge canonical source strings, then upload only source strings to Crowdin.
+[group('translation')]
+translate-upload: translate-extract
+    just translate-merge
+    crowdin upload sources --config crowdin.yaml
+
+# Download Crowdin translations and validate their placeholders.
+[group('translation')]
+translate-download:
+    crowdin download --config crowdin.yaml
+    just translate-validate
+
+# Validate build artifact metadata using the expected values from the environment.
+[group('build')]
+validate-build-artifact:
+    node tools/buildArtifact/validateBuildArtifact.mts
+
+# Validate recovered artifact metadata using the expected values from the environment.
+[group('build')]
+validate-recovery-build-artifact:
+    node tools/buildArtifact/validateRecoveryBuildArtifact.mts

@@ -34,5 +34,4 @@ Located in `libraries/core/`, this is Wire's communication core library that pro
 
 The webapp depends on this library for all backend communication. When making changes to core functionality:
 - Run unit tests: `npx just test`
-- Build the library: `npx nx run core-lib:build`
-- Check for circular dependencies: `npx nx run core-lib:check:circular-dependencies`
+- Build workspace libraries: `npx just build-libraries`

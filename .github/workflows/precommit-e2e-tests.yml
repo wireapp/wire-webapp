@@ -95,7 +95,7 @@ jobs:
 
           test -f "$BUILD_ARTIFACT_PATH"
           unzip -tq "$BUILD_ARTIFACT_PATH"
-          node ./tools/buildArtifact/validateBuildArtifact.mts
+          npx just validate-build-artifact
 
           archive_entries="$(unzip -Z1 "$BUILD_ARTIFACT_PATH")"
           required_entry_scripts=(

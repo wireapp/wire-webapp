@@ -165,13 +165,6 @@ jobs:
           fetch-depth: 0
           ref: ${{ needs.prepare_release.outputs.release_commit_sha }}
 
-      - name: Setup Node.js
-        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
-        with:
-          node-version-file: '.nvmrc'
-      - name: Install dependencies
-        run: npm clean-install
-
       - name: Verify prepared release commit
         id: release_metadata
         env:
@@ -194,26 +187,21 @@ jobs:
             echo "release_commit_sha=${EXPECTED_RELEASE_COMMIT_SHA}"
           } >> "$GITHUB_OUTPUT"
 
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
+      - name: Install dependencies
+        run: npm clean-install
+
       - name: Update configuration
-        run: |
-          if [[ -f justfile ]] &&
-            grep -Eq '^configure-webapp[[:space:]]*:' justfile; then
-            npx just configure-webapp
-          else
-            npx nx run webapp:configure
-          fi
+        run: npx just configure-webapp
 
       - name: Build and package public production
         env:
           WIRE_WEBAPP_BUILD_COMMIT: ${{ steps.release_metadata.outputs.release_commit_sha }}
           WIRE_WEBAPP_BUILD_VERSION: ${{ steps.release_metadata.outputs.release_version }}
-        run: |
-          if [[ -f justfile ]] &&
-            grep -Eq '^package-server-public[[:space:]]*:' justfile; then
-            npx just package-server-public
-          else
-            npm run build:prod:public
-          fi
+        run: npx just package-server-public
 
       - name: Validate release artifact metadata
         id: validate_artifact_metadata
@@ -221,7 +209,7 @@ jobs:
           BUILD_ARTIFACT_PATH: ${{ env.ARTIFACT_PATH }}
           EXPECTED_COMMIT: ${{ steps.release_metadata.outputs.release_commit_sha }}
           EXPECTED_VERSION: ${{ steps.release_metadata.outputs.release_version }}
-        run: node ./tools/buildArtifact/validateBuildArtifact.mts
+        run: npx just validate-build-artifact
 
       - name: Compute artifact metadata
         id: artifact_metadata
