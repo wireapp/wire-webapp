@@ -32,6 +32,23 @@ export const wrapperWithRowsStyles: CSSObject = {
   marginBottom: 'auto',
 };
 
+export const permanentDeleteReloadLinkStyles: CSSObject = {
+  flexShrink: 0,
+  color: 'var(--accent-color)',
+  fontWeight: 'var(--font-weight-semibold)',
+  textDecoration: 'underline',
+};
+
+export const permanentDeleteProgressStyles: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px',
+  margin: '0 0 8px',
+  color: 'var(--main-color)',
+  fontSize: 'var(--font-size-small)',
+  lineHeight: 1.5,
+};
+
 export const selectionBarContainerStyles: CSSObject = {
   position: 'relative',
   width: '100%',
