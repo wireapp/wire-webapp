@@ -434,11 +434,7 @@ export const CellsTable = ({
         return id;
       }),
     );
-    if (
-      response.Status === RestActionStatus.Performed &&
-      response.AffectedNodes !== undefined &&
-      outcomeEvidence !== 'complete'
-    ) {
+    if (response.Status === RestActionStatus.Performed && outcomeEvidence !== 'complete') {
       updateMoveStatus({
         id: moveStatusId,
         kind: outcomeEvidence === 'partial' ? 'partial' : 'finished-unknown',
