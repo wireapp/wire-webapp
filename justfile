@@ -33,17 +33,9 @@ stylesheet-lint:
 eslint fix="false":
     eslint . --config eslint.config.mjs --max-warnings=287 --cache --cache-strategy content --cache-location ./target/eslintcache {{ if fix == "true" { "--fix" } else { "" } }}
 
-# Automatically fix eligible ESLint issues across the repository.
-[group('lint')]
-eslint-fix: (eslint "true")
-
 # Run all repository lint checks, including ESLint, Prettier, Stylelint, and duplication.
 [group('lint')]
 lint: eslint format-check stylesheet-lint lint-duplication
-
-# Format repository files and automatically fix eligible ESLint issues.
-[group('lint')]
-fix: format eslint-fix
 
 # Check changed files with Prettier against BASE_REF and HEAD_REF.
 [group('format')]
@@ -63,28 +55,12 @@ format:
         --ignore-path libraries/license-collector/.gitignore \
         .
 
-# Type-check the repository-owned TypeScript tooling.
-[group('tooling')]
-tooling-type-check: type-check-tooling type-check-release-appearance type-check-release-cli
-
-# Type-check the shared repository tooling.
-[group('tooling')]
-type-check-tooling:
-    tsc --project ./tsconfig.tools.type-check.json
-
-# Type-check the release appearance tooling.
-[group('tooling')]
-type-check-release-appearance:
-    tsc --project ./tools/releaseAppearance/tsconfig.json
-
-# Type-check the release command-line tooling.
-[group('tooling')]
-type-check-release-cli:
-    tsc --project ./tsconfig.release-cli.json
-
 # Type-check all application and library configurations in sequence.
 [group('type-check')]
-type-check: build-libraries tooling-type-check
+type-check: build-libraries
+    tsc --project ./tsconfig.tools.type-check.json
+    tsc --project ./tools/releaseAppearance/tsconfig.json
+    tsc --project ./tsconfig.release-cli.json
     tsc --project ./apps/webapp/tsconfig.type-check.json
     tsc --project ./apps/webapp/tsconfig.rspack.json
     tsc --project ./apps/server/tsconfig.type-check.json
@@ -139,24 +115,16 @@ build-webapp-internal: build-libraries
     WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json node apps/server/bin/generateVersionFile.mts
     cd apps/webapp && WIRE_WEBAPP_BUILD_METADATA_PATH=apps/server/build/metadata/version.json WIRE_WEBAPP_BUILD_OUTPUT_PATH=apps/webapp/dist/internal rspack build --config rspack.config.mts
 
-# Assemble the internal server deployment artifact without creating a ZIP.
+# Build and assemble the internal server deployment artifact as a ZIP.
 [group('build')]
-assemble-server-internal: build-server build-webapp-internal
+package-server-internal: build-server build-webapp-internal
     node apps/server/bin/assembleBuild.mts internal artifact
-
-# Package the internal server deployment artifact as a ZIP.
-[group('build')]
-package-server-internal: assemble-server-internal
     node tools/serverPackaging/zip.js
 
-# Assemble the public server deployment artifact without creating a ZIP.
+# Build, verify, and package the public server deployment artifact as a ZIP.
 [group('build')]
-assemble-server-public: build-server build-webapp-public
+package-server-public: build-server build-webapp-public
     node apps/server/bin/assembleBuild.mts public artifact
-
-# Package the verified public server deployment artifact as a ZIP.
-[group('build')]
-package-server-public: assemble-server-public
     node tools/buildArtifact/verifyPublicProductionBundle.ts
     node tools/serverPackaging/zip.js
 
@@ -187,42 +155,22 @@ develop: prepare-development-server
     concurrently --raw --kill-others \
         "just watch-server-typescript" \
         "just run-development-server" \
-        "just watch-library-commons" \
-        "just watch-library-config" \
-        "just watch-library-core" \
-        "just watch-library-api-client" \
-        "just watch-library-priority-queue" \
-        "just watch-library-react-ui-kit" \
-        "just watch-library-store-engine" \
-        "just watch-library-store-engine-dexie" \
+        "just watch-library commons" \
+        "just watch-library config" \
+        "just watch-library core" \
+        "just watch-library api-client" \
+        "just watch-library priority-queue" \
+        "just watch-library react-ui-kit" \
+        "just watch-library store-engine" \
+        "just watch-library store-engine-dexie" \
         "just watch-library-telemetry" \
-        "just watch-library-webapp-events" \
-        "just watch-library-bazinga64"
+        "just watch-library webapp-events" \
+        "just watch-library bazinga64"
 
 # Alternative to develop: build dependencies, select libraries, and start the server.
 [group('development')]
 develop-watch: prepare-development-server
     ts-node --project ./tsconfig.tools.json tools/development/startDevelopment.ts
-
-# Build and watch every workspace library without starting the server.
-[group('development')]
-watch-libraries: build-libraries
-    concurrently --kill-others --names bazinga64,certificate-check,commons,config,copy-config,license-collector,priority-queue,react-ui-kit,store-engine,store-engine-dexie,store-engine-fs,telemetry,webapp-events,api-client,core \
-        "just watch-library-bazinga64" \
-        "just watch-library-certificate-check" \
-        "just watch-library-commons" \
-        "just watch-library-config" \
-        "just watch-library-copy-config" \
-        "just watch-library-license-collector" \
-        "just watch-library-priority-queue" \
-        "just watch-library-react-ui-kit" \
-        "just watch-library-store-engine" \
-        "just watch-library-store-engine-dexie" \
-        "just watch-library-store-engine-fs" \
-        "just watch-library-telemetry" \
-        "just watch-library-webapp-events" \
-        "just watch-library-api-client" \
-        "just watch-library-core"
 
 # Recompile server sources while Node watches the compiled output and restarts the server.
 [group('development')]
@@ -238,67 +186,20 @@ run-development-server:
         node --watch apps/server/dist/index.js; \
     fi
 
-# Compile one workspace library continuously; watch-libraries and develop-watch select these.
+# Compile a selected workspace library continuously.
 [group('development')]
-watch-library-bazinga64:
-    tsc --project libraries/bazinga64/tsconfig.json --watch --preserveWatchOutput
+watch-library library:
+    case {{ quote(library) }} in \
+        api-client|bazinga64|certificate-check|commons|config|copy-config|core|license-collector|priority-queue|react-ui-kit|store-engine|store-engine-dexie|store-engine-fs|webapp-events) ;; \
+        *) echo "Unknown library: {{ quote(library) }}" >&2; exit 2 ;; \
+    esac
+    tsc --project {{ quote("libraries/" + library + "/tsconfig.json") }} --watch --preserveWatchOutput
 
-[group('development')]
-watch-library-certificate-check:
-    tsc --project libraries/certificate-check/tsconfig.json --watch --preserveWatchOutput
-
-[group('development')]
-watch-library-commons:
-    tsc --project libraries/commons/tsconfig.json --watch --preserveWatchOutput
-
-[group('development')]
-watch-library-config:
-    tsc --project libraries/config/tsconfig.json --watch --preserveWatchOutput
-
-[group('development')]
-watch-library-copy-config:
-    tsc --project libraries/copy-config/tsconfig.json --watch --preserveWatchOutput
-
-[group('development')]
-watch-library-license-collector:
-    tsc --project libraries/license-collector/tsconfig.json --watch --preserveWatchOutput
-
-[group('development')]
-watch-library-priority-queue:
-    tsc --project libraries/priority-queue/tsconfig.json --watch --preserveWatchOutput
-
-[group('development')]
-watch-library-react-ui-kit:
-    tsc --project libraries/react-ui-kit/tsconfig.json --watch --preserveWatchOutput
-
-[group('development')]
-watch-library-store-engine:
-    tsc --project libraries/store-engine/tsconfig.json --watch --preserveWatchOutput
-
-[group('development')]
-watch-library-store-engine-dexie:
-    tsc --project libraries/store-engine-dexie/tsconfig.json --watch --preserveWatchOutput
-
-[group('development')]
-watch-library-store-engine-fs:
-    tsc --project libraries/store-engine-fs/tsconfig.json --watch --preserveWatchOutput
-
+# Copy telemetry assets and watch both TypeScript module formats.
 [group('development')]
 watch-library-telemetry:
     cd libraries/telemetry && node bin/copyAssets.mts
     cd libraries/telemetry && tsc --build tsconfig.json tsconfig.commonjs.json --watch --preserveWatchOutput
-
-[group('development')]
-watch-library-webapp-events:
-    tsc --project libraries/webapp-events/tsconfig.json --watch --preserveWatchOutput
-
-[group('development')]
-watch-library-api-client:
-    tsc --project libraries/api-client/tsconfig.json --watch --preserveWatchOutput
-
-[group('development')]
-watch-library-core:
-    tsc --project libraries/core/tsconfig.json --watch --preserveWatchOutput
 
 # Configure the webapp, generate its React icon components, and validate their types.
 [group('setup')]
@@ -308,48 +209,10 @@ configure-webapp:
     cd apps/webapp && ts-node ./bin/generate_react_icons.ts
     cd apps/webapp && tsc --project ./tsconfig.generated-icons.json --noEmit
 
-# Clear Jest's local cache.
-[group('maintenance')]
-clean-jest:
-    jest --clearCache
-
-# Remove installed dependency directories from the repository.
-[group('maintenance')]
-clean-dependencies:
-    find . -name node_modules -type d -prune -exec rm -rf '{}' +
-
 # Build and publish a Docker image after packaging the application.
 [group('release')]
 docker *dockerArguments:
     node ./tools/dockerPublication/pushDocker.js "$@"
-
-# Check the webapp entry points for circular dependencies.
-[group('lint')]
-check-webapp-circular-dependencies:
-    cd apps/webapp && dpdm --no-warning --no-tree -T src/script/auth/main.tsx src/script/main/app.ts
-
-# Assemble the internal production webapp into the server webapp artifact scope.
-[group('build')]
-assemble-webapp-internal: build-webapp-internal
-    node apps/server/bin/assembleBuild.mts internal webapp
-
-# Assemble the development webapp into the server webapp artifact scope.
-[group('build')]
-assemble-webapp-development: build-webapp-development
-    node apps/server/bin/assembleBuild.mts development webapp
-
-# Assemble the public production webapp into the server webapp artifact scope.
-[group('build')]
-assemble-webapp-public: build-webapp-public
-    node apps/server/bin/assembleBuild.mts public webapp
-
-# Remove generated library outputs and library build information for a clean build.
-[group('build')]
-clean-libraries:
-    rimraf libraries/*/lib
-    rimraf target/buildcache/config-build.tsbuildinfo
-    rimraf target/buildcache/telemetry-esm-build.tsbuildinfo
-    rimraf target/buildcache/telemetry-commonjs-build.tsbuildinfo
 
 # Run all unit tests with native Jest multi-project execution.
 [group('testing')]

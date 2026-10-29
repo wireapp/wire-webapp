@@ -18,14 +18,12 @@ Run from the repository root:
 
 ```bash
 npx just develop-watch # choose telemetry with the server (alternative to develop)
-npx just watch-libraries # watch all development libraries without the server
 ```
 
-To watch only telemetry directly, run from `libraries/telemetry`:
+To watch only telemetry from the repository root:
 
 ```bash
-node bin/copyAssets.mts
-tsc --build tsconfig.json tsconfig.commonjs.json --watch --preserveWatchOutput
+npx just watch-library-telemetry
 ```
 
 TypeScript compiles the library without bundling. The build first copies the original

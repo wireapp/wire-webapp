@@ -21,21 +21,15 @@ import {checkbox} from '@inquirer/prompts';
 
 import {spawnSync} from 'node:child_process';
 
-import {developmentLibraries, getSelectedLibraryWatchRecipes} from './libraryWatchRecipes';
+import {developmentLibraries, getSelectedLibraryWatchCommands} from './libraryWatchRecipes';
 
 async function main(): Promise<void> {
-  const selectedLibraryRecipeNames = await checkbox({
+  const selectedLibraryNames = await checkbox({
     message: 'Select libraries to watch:',
     choices: developmentLibraries,
   });
-  const libraryWatchRecipes = getSelectedLibraryWatchRecipes({libraryRecipeNames: selectedLibraryRecipeNames});
-  const concurrentCommands = [
-    'just watch-server-typescript',
-    'just run-development-server',
-    ...libraryWatchRecipes.map((recipeName): string => {
-      return `just ${recipeName}`;
-    }),
-  ];
+  const libraryWatchCommands = getSelectedLibraryWatchCommands({libraryNames: selectedLibraryNames});
+  const concurrentCommands = ['just watch-server-typescript', 'just run-development-server', ...libraryWatchCommands];
   const concurrentlyResult = spawnSync('concurrently', ['--raw', '--kill-others', ...concurrentCommands], {
     cwd: process.cwd(),
     env: process.env,
