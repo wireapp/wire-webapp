@@ -24,47 +24,51 @@ export type DevelopmentLibrary = {
 };
 
 export const developmentLibraries: readonly DevelopmentLibrary[] = [
-  {name: 'react-ui-kit', value: 'watch-library-react-ui-kit', checked: true},
-  {name: 'api-client', value: 'watch-library-api-client', checked: true},
-  {name: 'core-lib', value: 'watch-library-core'},
-  {name: 'commons', value: 'watch-library-commons'},
-  {name: 'bazinga64', value: 'watch-library-bazinga64'},
-  {name: 'config', value: 'watch-library-config'},
-  {name: 'copy-config', value: 'watch-library-copy-config'},
-  {name: 'priority-queue', value: 'watch-library-priority-queue'},
-  {name: 'store-engine', value: 'watch-library-store-engine'},
-  {name: 'store-engine-fs', value: 'watch-library-store-engine-fs'},
-  {name: 'store-engine-dexie', value: 'watch-library-store-engine-dexie'},
-  {name: 'webapp-events', value: 'watch-library-webapp-events'},
-  {name: 'telemetry', value: 'watch-library-telemetry'},
-  {name: 'certificate-check', value: 'watch-library-certificate-check'},
-  {name: 'license-collector', value: 'watch-library-license-collector'},
+  {name: 'react-ui-kit', value: 'react-ui-kit', checked: true},
+  {name: 'api-client', value: 'api-client', checked: true},
+  {name: 'core', value: 'core'},
+  {name: 'commons', value: 'commons'},
+  {name: 'bazinga64', value: 'bazinga64'},
+  {name: 'config', value: 'config'},
+  {name: 'copy-config', value: 'copy-config'},
+  {name: 'priority-queue', value: 'priority-queue'},
+  {name: 'store-engine', value: 'store-engine'},
+  {name: 'store-engine-fs', value: 'store-engine-fs'},
+  {name: 'store-engine-dexie', value: 'store-engine-dexie'},
+  {name: 'webapp-events', value: 'webapp-events'},
+  {name: 'telemetry', value: 'telemetry'},
+  {name: 'certificate-check', value: 'certificate-check'},
+  {name: 'license-collector', value: 'license-collector'},
 ];
 
-export type SelectedLibraryWatchRecipesOptions = {
-  readonly libraryRecipeNames: readonly string[];
+export type SelectedLibraryWatchCommandsOptions = {
+  readonly libraryNames: readonly string[];
 };
 
-export function getSelectedLibraryWatchRecipes(options: SelectedLibraryWatchRecipesOptions): readonly string[] {
-  const selectedLibraryRecipeNames = new Set(options.libraryRecipeNames);
-  const knownLibraryRecipeNames = new Set(
+export function getSelectedLibraryWatchCommands(options: SelectedLibraryWatchCommandsOptions): readonly string[] {
+  const selectedLibraryNames = new Set(options.libraryNames);
+  const knownLibraryNames = new Set(
     developmentLibraries.map((library): string => {
       return library.value;
     }),
   );
-  const unknownLibraryRecipeNames = [...selectedLibraryRecipeNames].filter((recipeName): boolean => {
-    return knownLibraryRecipeNames.has(recipeName) === false;
+  const unknownLibraryNames = [...selectedLibraryNames].filter((libraryName): boolean => {
+    return knownLibraryNames.has(libraryName) === false;
   });
 
-  if (unknownLibraryRecipeNames.length > 0) {
-    throw new Error(`Unknown development library selection: ${unknownLibraryRecipeNames.join(', ')}`);
+  if (unknownLibraryNames.length > 0) {
+    throw new Error(`Unknown development library selection: ${unknownLibraryNames.join(', ')}`);
   }
 
   return developmentLibraries
     .filter((library): boolean => {
-      return selectedLibraryRecipeNames.has(library.value);
+      return selectedLibraryNames.has(library.value);
     })
     .map((library): string => {
-      return library.value;
+      if (library.value === 'telemetry') {
+        return 'just watch-library-telemetry';
+      }
+
+      return `just watch-library ${library.value}`;
     });
 }
