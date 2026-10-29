@@ -783,7 +783,7 @@ function ConversationContent({
                         onCloseSearchView={() => {
                           return setIsSharedDriveSearchViewOpen(false);
                         }}
-                        isUploadFilesEnabled={isFileUploadAllowed}
+                        isFileUploadAllowed={isFileUploadAllowed}
                         showViewerPermission={showViewerPermission}
                       />
                     </SharedDriveUploadProvider>
