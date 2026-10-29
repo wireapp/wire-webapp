@@ -3,6 +3,15 @@ set positional-arguments
 export PATH := justfile_directory() + "/node_modules/.bin:" + env_var("PATH")
 export NODE_OPTIONS := "--max-old-space-size=6144"
 
+# Apply committed dependency patches without running repository setup automatically.
+[group('setup')]
+apply-patches:
+    patch-package --error-on-fail
+
+# Configure the repository after npm installs dependencies.
+[group('setup')]
+setup: apply-patches configure-webapp
+
 # Check repository file and directory names against .ls-lint.yml.
 [group('lint')]
 lint-file-names:
@@ -73,7 +82,7 @@ type-check-release-appearance:
 type-check-release-cli:
     tsc --project ./tsconfig.release-cli.json
 
-# Type-check every configuration currently covered by Nx, in sequence.
+# Type-check all application and library configurations in sequence.
 [group('type-check')]
 type-check: build-libraries tooling-type-check
     tsc --project ./apps/webapp/tsconfig.type-check.json
@@ -292,11 +301,32 @@ watch-library-core:
     tsc --project libraries/core/tsconfig.json --watch --preserveWatchOutput
 
 # Configure the webapp, generate its React icon components, and validate their types.
+[group('setup')]
 configure-webapp:
     cd libraries/copy-config && rimraf lib && tsc
     cd apps/webapp && node ../../libraries/copy-config/lib/cli.js ./.copyconfigrc.js
     cd apps/webapp && ts-node ./bin/generate_react_icons.ts
     cd apps/webapp && tsc --project ./tsconfig.generated-icons.json --noEmit
+
+# Clear Jest's local cache.
+[group('maintenance')]
+clean-jest:
+    jest --clearCache
+
+# Remove installed dependency directories from the repository.
+[group('maintenance')]
+clean-dependencies:
+    find . -name node_modules -type d -prune -exec rm -rf '{}' +
+
+# Build and publish a Docker image after packaging the application.
+[group('release')]
+docker *dockerArguments:
+    node ./tools/dockerPublication/pushDocker.js "$@"
+
+# Check the webapp entry points for circular dependencies.
+[group('lint')]
+check-webapp-circular-dependencies:
+    cd apps/webapp && dpdm --no-warning --no-tree -T src/script/auth/main.tsx src/script/main/app.ts
 
 # Assemble the internal production webapp into the server webapp artifact scope.
 [group('build')]

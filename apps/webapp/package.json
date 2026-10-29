@@ -4,9 +4,6 @@
   "private": true,
   "license": "GPL-3.0",
   "main": "src/script/main/index.tsx",
-  "scripts": {
-    "check:circular-dependencies": "dpdm --no-warning --no-tree -T src/script/auth/main.tsx src/script/main/app.ts"
-  },
   "dependencies": {
     "@datadog/browser-logs": "7.16.0",
     "@datadog/browser-rum": "7.16.0",

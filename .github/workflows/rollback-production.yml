@@ -69,7 +69,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm run ci:install
+        run: npm clean-install --ignore-scripts && npx just apply-patches
 
       - name: Validate Production tag
         id: validate_production_tag
@@ -164,7 +164,7 @@ jobs:
 
       - name: Install workflow tool dependencies
         working-directory: workflow-source
-        run: npm run ci:install
+        run: npm clean-install --ignore-scripts && npx just apply-patches
 
       - name: Build workflow tool dependencies
         working-directory: workflow-source
@@ -185,7 +185,7 @@ jobs:
         working-directory: selected-release
         env:
           WIRE_WEBAPP_CONFIGURATION: production
-        run: npx just configure-webapp
+        run: npx patch-package --error-on-fail && npx just configure-webapp
 
       # Interim limitation: until durable release artifact storage exists, this
       # workflow rebuilds the deployable artifact from the selected Production tag.

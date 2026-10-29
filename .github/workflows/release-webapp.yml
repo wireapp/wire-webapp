@@ -100,7 +100,7 @@ jobs:
           cache: 'npm'
 
       - name: Install release tooling dependencies
-        run: npm run ci:install
+        run: npm clean-install --ignore-scripts && npx just apply-patches
 
       - name: Prepare release branch and version
         id: prepare
@@ -195,7 +195,7 @@ jobs:
         run: npm clean-install
 
       - name: Update configuration
-        run: npx just configure-webapp
+        run: npx just setup
 
       - name: Build and package public production
         env:
@@ -375,7 +375,7 @@ jobs:
           node-version-file: '.nvmrc'
 
       - name: Install dependencies
-        run: npm run ci:install
+        run: npm clean-install --ignore-scripts && npx just apply-patches
 
       - name: Create and push Beta tag
         id: beta_tag
@@ -482,7 +482,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm run ci:install
+        run: npm clean-install --ignore-scripts && npx just apply-patches
 
       - name: Add Beta release appearance comments
         env:
@@ -523,7 +523,7 @@ jobs:
           cache: 'npm'
 
       - name: Install renderer dependencies
-        run: npm run ci:install
+        run: npm clean-install --ignore-scripts && npx just apply-patches
 
       - name: Add Beta release summary
         env:
@@ -651,7 +651,7 @@ jobs:
           node-version-file: '.nvmrc'
 
       - name: Install dependencies
-        run: npm run ci:install
+        run: npm clean-install --ignore-scripts && npx just apply-patches
 
       - name: Check Production promotion eligibility
         id: production_preflight
@@ -935,7 +935,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm run ci:install
+        run: npm clean-install --ignore-scripts && npx just apply-patches
 
       - name: Add Production release appearance comments
         env:
@@ -1011,7 +1011,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm run ci:install
+        run: npm clean-install --ignore-scripts && npx just apply-patches
 
       - name: Ensure GitHub Release for immutable Production tag
         id: ensure_github_release
@@ -1074,7 +1074,7 @@ jobs:
           cache: 'npm'
 
       - name: Install synchronization tooling dependencies
-        run: npm run ci:install
+        run: npm clean-install --ignore-scripts && npx just apply-patches
 
       - name: Synchronize WebApp version with Production
         id: synchronize
@@ -1210,7 +1210,7 @@ jobs:
           cache: 'npm'
 
       - name: Install renderer dependencies
-        run: npm run ci:install
+        run: npm clean-install --ignore-scripts && npx just apply-patches
 
       - name: Add release summary
         env:

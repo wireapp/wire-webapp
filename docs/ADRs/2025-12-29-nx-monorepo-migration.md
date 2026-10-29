@@ -1,5 +1,7 @@
 # 2025-12-29 - Nx Monorepo Migration
 
+> **Status: Superseded (2026-10-29).** The repository migrated from Nx to Just and native npm tooling. This record documents the previous decision and is retained as historical context.
+
 ## Context
 
 The `wire-webapp` repository was using a standard Yarn workspace structure with separate `server/` and `webapp/` (via `src/`) directories. While this structure worked, it lacked:

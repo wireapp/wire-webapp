@@ -43,7 +43,6 @@ const magicNumberOptions = {
 
 const ignores = [
   '.git/',
-  '.nx/',
   'target/',
   'config/',
   'temp/',

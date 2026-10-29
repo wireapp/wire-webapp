@@ -46,7 +46,7 @@ jobs:
           cache: 'npm'
 
       - name: Install JS dependencies
-        run: npm clean-install
+        run: npm clean-install && npx just setup
 
       - name: Build and package
         env:

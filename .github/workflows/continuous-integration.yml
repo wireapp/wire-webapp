@@ -73,7 +73,7 @@ jobs:
         run: bash ./tools/runtimeVerification/verifySparseRuntimeValidation.sh
 
       - name: Install dependencies
-        run: npm clean-install
+        run: npm clean-install && npx just setup
 
       - name: Verify deployment CLI from clean install
         run: |
@@ -125,7 +125,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm clean-install
+        run: npm clean-install && npx just setup
 
       - name: Build libraries
         run: npx just build-libraries
@@ -156,7 +156,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm clean-install
+        run: npm clean-install && npx just setup
 
       - name: Build webapps and assemble the internal production server with Just
         id: public_rspack_build
@@ -266,7 +266,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm clean-install
+        run: npm clean-install && npx just setup
 
       - name: Type check
         run: npx just type-check
@@ -291,7 +291,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm clean-install
+        run: npm clean-install && npx just setup
 
       - name: Lint file names
         run: npx just lint-file-names
@@ -324,7 +324,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm clean-install
+        run: npm clean-install && npx just setup
 
       - name: Check code duplication
         id: duplication
@@ -371,7 +371,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm clean-install
+        run: npm clean-install && npx just setup
 
       - name: Test
         run: ./tools/ci/runWithNetworkIsolation.sh npx just test-ci
@@ -417,7 +417,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm clean-install
+        run: npm clean-install && npx just setup
 
       - name: Build and verify public production package
         env:

@@ -58,7 +58,7 @@ jobs:
           cache: 'npm'
 
       - name: Install workflow tooling dependencies
-        run: npm run ci:install
+        run: npm clean-install --ignore-scripts && npx just apply-patches
 
       - name: Validate repair confirmation and resolve annotated tag
         id: resolve_tag
