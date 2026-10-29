@@ -26,6 +26,7 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 import type {Translate} from 'Util/localizerUtil';
 import {formatBytes} from 'Util/util';
 
+import {moveStatusMessageKey} from './sharedDriveMoveStatusMessages';
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
 import {
   getRepresentativeSharedDriveUploadStatus,
@@ -36,7 +37,7 @@ import {
   type SharedDriveUploadStatusKind,
   type DismissedUpload,
 } from './sharedDriveUploadStatus';
-import {useSharedDriveUploadStatus} from './sharedDriveUploadStatusContext';
+import {useSharedDriveUploadStatus, type SharedDriveMoveStatusKind} from './sharedDriveUploadStatusContext';
 import {SharedDriveUploadStatusPopup} from './sharedDriveUploadStatusPopup';
 
 interface SharedDriveUploadStatusPopupHostProps {
@@ -46,15 +47,25 @@ interface SharedDriveUploadStatusPopupHostProps {
   readonly isFileTabActive: boolean;
 }
 
-const moveStatusLabelKey = {
+const moveStatusLabelKey: Record<SharedDriveMoveStatusKind, Parameters<Translate>[0]> = {
   processing: 'cells.bulkMove.processing',
   completed: 'cells.bulkMove.completed',
-} as const;
+  'request-failed': 'cells.bulkMove.needsReviewStatus',
+  partial: 'cells.bulkMove.needsReviewStatus',
+  'finished-unknown': 'cells.bulkMove.needsReviewStatus',
+  failed: 'cells.bulkMove.needsReviewStatus',
+  'status-unknown': 'cells.bulkMove.needsReviewStatus',
+};
 
-const moveStatusTitleKey = {
+const moveStatusTitleKey: Record<SharedDriveMoveStatusKind, Parameters<Translate>[0]> = {
   processing: 'cells.bulkMove.movingItems',
   completed: 'cells.bulkMove.movedItems',
-} as const;
+  'request-failed': 'cells.bulkMove.requestFailedTitle',
+  partial: 'cells.bulkMove.partialMoveWarningTitle',
+  'finished-unknown': 'cells.bulkMove.finishedUnknownTitle',
+  failed: 'cells.bulkMove.allJobsFailedTitle',
+  'status-unknown': 'cells.bulkMove.statusLookupUnknownTitle',
+};
 
 const getRowStatusLabel = (
   row: SharedDriveUploadStatus,
@@ -291,11 +302,14 @@ export const SharedDriveUploadStatusPopupHost: FunctionComponent<SharedDriveUplo
 
   if (isFileTabActive && maybe.isJust(moveStatus)) {
     const move = moveStatus.value;
+    const statusMessageKey =
+      move.kind === 'processing' || move.kind === 'completed' ? undefined : moveStatusMessageKey[move.kind];
     return (
       <SharedDriveUploadStatusPopup
         move={move}
         title={translate(moveStatusTitleKey[move.kind], {count: move.items.length})}
         statusLabel={translate(moveStatusLabelKey[move.kind])}
+        statusMessage={statusMessageKey !== undefined ? translate(statusMessageKey) : ''}
         destination={translate('cells.uploadStatus.destination', {destination: move.destinationPath})}
         isExpanded={isMoveExpanded}
         toggleLabel={translate(isMoveExpanded ? 'cells.uploadStatus.collapse' : 'cells.uploadStatus.expand')}

@@ -34,9 +34,12 @@ export interface SharedDriveMoveSummary {
   readonly destinationPath: string;
 }
 
+export type SharedDriveMoveStatusKind =
+  'processing' | 'completed' | 'request-failed' | 'partial' | 'finished-unknown' | 'failed' | 'status-unknown';
+
 export interface SharedDriveMoveStatus extends SharedDriveMoveSummary {
   readonly id: string;
-  readonly kind: 'processing' | 'completed';
+  readonly kind: SharedDriveMoveStatusKind;
 }
 
 type SharedDriveUploadStatusContextValue = {

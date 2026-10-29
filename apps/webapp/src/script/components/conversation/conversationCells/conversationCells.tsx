@@ -21,6 +21,7 @@ import {memo, useCallback, useEffect, useRef, useState} from 'react';
 
 import {isNonEmptyArray} from '@sindresorhus/is';
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
+import {task} from 'true-myth';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
@@ -213,6 +214,18 @@ export const ConversationCells = memo(
       fireAndForgetInvoker.fireAndForget(refresh);
     }, [fireAndForgetInvoker, handleReload, isSearchMode, refresh]);
 
+    const handleRefreshAfterBulkMoveOutcome = useCallback(async (): Promise<boolean> => {
+      const refreshResult = await task.tryOrElse(
+        error => {
+          return error;
+        },
+        () => {
+          return refresh({preserveStatusOnError: true});
+        },
+      );
+      return refreshResult.isOk && refreshResult.value;
+    }, [refresh]);
+
     const sharedDriveUploadPath = getCellsApiPath({conversationQualifiedId, currentPath: getCellsFilesPath()});
     const sharedDriveConversationQualifiedId = `${conversationQualifiedId.id}@${conversationQualifiedId.domain}`;
 
@@ -369,6 +382,7 @@ export const ConversationCells = memo(
                 conversationQualifiedId={conversationQualifiedId}
                 conversationName={name}
                 onRefresh={handleRefresh}
+                onRefreshAfterBulkMoveOutcome={handleRefreshAfterBulkMoveOutcome}
                 // opening a folder must close search view and open the browse view
                 // with that folder (and breadcrumbs)
                 onCloseSearchView={handleSearchViewClosure}
