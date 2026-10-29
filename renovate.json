@@ -2,7 +2,7 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended", ":semanticCommitsDisabled"],
   "constraints": {
-    "npm": "11.21.1"
+    "npm": "11.20.0"
   },
   "labels": ["renovate", "semver:patch"],
   "timezone": "Europe/Berlin",
@@ -36,6 +36,13 @@
       "description": "Update the pinned Node.js runtime promptly",
       "matchManagers": ["nvm"],
       "matchFileNames": [".nvmrc"],
+      "matchDatasources": ["node-version"],
+      "groupName": "node runtime",
+      "minimumReleaseAge": null
+    },
+    {
+      "description": "Group Node.js package manifest pins with .nvmrc",
+      "matchPackageNames": ["node"],
       "matchDatasources": ["node-version"],
       "groupName": "node runtime",
       "minimumReleaseAge": null

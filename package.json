@@ -33,7 +33,7 @@
     "@types/jest": "30.0.0",
     "@types/js-yaml": "4.0.9",
     "@types/jsdom": "28.0.3",
-    "@types/node": "24.19.2",
+    "@types/node": "26.6.6",
     "@types/semver": "7.8.0",
     "@types/tough-cookie": "4.0.5",
     "@typescript-eslint/eslint-plugin": "8.72.0",
@@ -96,8 +96,20 @@
     "unrs-resolver@1.12.2": true
   },
   "engines": {
-    "node": ">=24.10.0",
-    "npm": ">=11.19.0"
+    "node": ">=26.12.1",
+    "npm": ">=11.20.0 <12"
+  },
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": ">=26.12.1 <27",
+      "onFail": "error"
+    },
+    "packageManager": {
+      "name": "npm",
+      "version": ">=11.20.0 <12",
+      "onFail": "error"
+    }
   },
   "license": "GPL-3.0",
   "name": "wire-webapp",
@@ -135,5 +147,5 @@
     "@types/react-dom": "19.3.0"
   },
   "version": "1.1.0",
-  "packageManager": "npm@11.21.1"
+  "packageManager": "npm@11.20.0"
 }
