@@ -74,10 +74,6 @@
       "addLabels": ["run-e2e"]
     },
     {
-      "matchPackageNames": ["nx", "@nx/**"],
-      "groupName": "nx monorepo tooling"
-    },
-    {
       "extends": ["monorepo:typescript-eslint"],
       "groupName": "typescript-eslint"
     },
