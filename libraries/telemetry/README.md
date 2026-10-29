@@ -18,7 +18,6 @@ Run from the repository root:
 
 ```bash
 npx just develop-watch # choose telemetry with the server (alternative to develop)
-npx just watch-libraries # watch all development libraries without the server
 ```
 
 To watch only telemetry from the repository root:

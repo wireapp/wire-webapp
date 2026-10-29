@@ -56,7 +56,6 @@ Prerequisites:
 1. Run `npx just develop`; Just builds the workspace libraries and server output, then starts the Express server, its TypeScript watcher, and watchers for the WebApp's upstream libraries. Rspack compiles the WebApp in memory and serves it at https://local.zinfra.io:8081/auth/ with React Fast Refresh.
 1. Server TypeScript changes are recompiled with `tsc --watch`; `node --watch` restarts the compiled Express server when its output changes. `concurrently` stops sibling processes if any watcher exits.
 1. `npx just develop-watch` is an alternative to `npx just develop`: it starts the server with libraries you select interactively. Choose one development command; do not run `develop-watch` alongside `develop`.
-1. To watch all development libraries without starting the server, run `npx just watch-libraries`.
 1. To watch one library without the server, run `npx just watch-library core`. Use `npx just watch-library-telemetry` to copy telemetry assets and watch both TypeScript module formats.
 1. In case you're facing a CORS issue after login when the app tries to fetch `self/consent` from the backend, append
    `FEATURE_CHECK_CONSENT="false"` to the env file

@@ -172,26 +172,6 @@ develop: prepare-development-server
 develop-watch: prepare-development-server
     ts-node --project ./tsconfig.tools.json tools/development/startDevelopment.ts
 
-# Build and watch every workspace library without starting the server.
-[group('development')]
-watch-libraries: build-libraries
-    concurrently --kill-others --names bazinga64,certificate-check,commons,config,copy-config,license-collector,priority-queue,react-ui-kit,store-engine,store-engine-dexie,store-engine-fs,telemetry,webapp-events,api-client,core \
-        "just watch-library bazinga64" \
-        "just watch-library certificate-check" \
-        "just watch-library commons" \
-        "just watch-library config" \
-        "just watch-library copy-config" \
-        "just watch-library license-collector" \
-        "just watch-library priority-queue" \
-        "just watch-library react-ui-kit" \
-        "just watch-library store-engine" \
-        "just watch-library store-engine-dexie" \
-        "just watch-library store-engine-fs" \
-        "just watch-library-telemetry" \
-        "just watch-library webapp-events" \
-        "just watch-library api-client" \
-        "just watch-library core"
-
 # Recompile server sources while Node watches the compiled output and restarts the server.
 [group('development')]
 watch-server-typescript:
