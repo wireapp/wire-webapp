@@ -7,9 +7,6 @@
       "cache": true,
       "inputs": ["production"],
       "outputs": ["{projectRoot}/dist"]
-    },
-    "watch": {
-      "continuous": true
     }
   },
   "namedInputs": {

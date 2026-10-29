@@ -21,6 +21,7 @@ import {isNonEmptyString, isNullOrUndefined, isTruthy} from '@sindresorhus/is';
 import {NodeFlags, RestShareLink} from '@wireapp/api-client/lib/cells';
 import type {Node as CellsNode, NodeVersions} from '@wireapp/api-client/lib/cells/cellsApi.schema';
 import type {
+  BackgroundActionInfoNameEnum,
   RestBackgroundAction,
   RestDeleteVersionResponse,
   RestNamespaceValuesResponse,
@@ -164,10 +165,14 @@ export class CellsRepository {
     return this.apiClient.api.cells.deleteNode({uuid, permanently});
   }
 
-  async deleteNodes({uuids, permanently = false}: {uuids: string[]; permanently?: boolean}): Promise<void> {
-    uuids.forEach(async uuid => {
-      await this.deleteNode({uuid, permanently});
-    });
+  async deleteNodes({
+    uuids,
+    permanently = false,
+  }: {
+    uuids: readonly string[];
+    permanently?: boolean;
+  }): Promise<RestPerformActionResponse> {
+    return this.apiClient.api.cells.deleteNodes({uuids, permanently});
   }
 
   async moveNode({
@@ -191,7 +196,17 @@ export class CellsRepository {
   }
 
   async getBackgroundMoveInfo({jobUuid}: {jobUuid: string}): Promise<RestBackgroundAction> {
-    return this.apiClient.api.cells.getBackgroundActionInfo({name: 'move', jobUuid});
+    return this.getBackgroundActionInfo({name: 'move', jobUuid});
+  }
+
+  async getBackgroundActionInfo({
+    name,
+    jobUuid,
+  }: {
+    name: BackgroundActionInfoNameEnum;
+    jobUuid: string;
+  }): Promise<RestBackgroundAction> {
+    return this.apiClient.api.cells.getBackgroundActionInfo({name, jobUuid});
   }
 
   async getAllNodes({
@@ -371,6 +386,10 @@ export class CellsRepository {
 
   async restoreNode({uuid}: {uuid: string}): Promise<RestPerformActionResponse> {
     return this.apiClient.api.cells.restoreNode({uuid});
+  }
+
+  async restoreNodes({uuids}: {uuids: readonly string[]}): Promise<RestPerformActionResponse> {
+    return this.apiClient.api.cells.restoreNodes({uuids});
   }
 
   async renameNode({currentPath, newName}: {currentPath: string; newName: string}): Promise<RestPerformActionResponse> {

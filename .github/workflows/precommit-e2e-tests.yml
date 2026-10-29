@@ -74,10 +74,10 @@ jobs:
 
           if [[ "${EVENT_NAME}" == "workflow_dispatch" && "${USE_PUBLIC_RSPACK}" == "true" ]]; then
             WIRE_WEBAPP_BUILD_VERSION="${expected_version}" \
-              npm run build:prod:public
+              npx just package-server-public
           else
             WIRE_WEBAPP_BUILD_VERSION="${expected_version}" \
-              npm run build:prod
+              npx just package-server-internal
           fi
 
           {
@@ -95,7 +95,7 @@ jobs:
 
           test -f "$BUILD_ARTIFACT_PATH"
           unzip -tq "$BUILD_ARTIFACT_PATH"
-          node ./tools/buildArtifact/validateBuildArtifact.mts
+          npx just validate-build-artifact
 
           archive_entries="$(unzip -Z1 "$BUILD_ARTIFACT_PATH")"
           required_entry_scripts=(

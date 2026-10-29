@@ -26,13 +26,6 @@
       "options": {
         "command": "echo 'Build complete'"
       }
-    },
-    "watch": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "tsc --watch",
-        "cwd": "{projectRoot}"
-      }
     }
   },
   "tags": ["type:lib", "scope:store-engine-dexie"]

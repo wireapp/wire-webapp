@@ -5,15 +5,7 @@
   "license": "GPL-3.0",
   "main": "src/script/main/index.tsx",
   "scripts": {
-    "build": "nx build webapp",
-    "build:dev": "rspack build --config rspack.config.dev.mts",
-    "build:prod": "rspack build --config rspack.config.mts",
-    "build:prod:public": "rspack build --config rspack.config.public.mts",
-    "e2e": "nx e2e webapp",
-    "e2e:ui": "nx e2e webapp --ui",
-    "check:circular-dependencies": "dpdm --no-warning --no-tree -T src/script/auth/main.tsx src/script/main/app.ts",
-    "translate:extract": "i18next-scanner 'src/{page,script}/**/*.{js,html,htm}'",
-    "translate:merge": "formatjs extract --format './bin/translations_extract_formatter.js' --out-file './src/i18n/en-US.json' 'src/**/*.{ts,tsx,js,jsx}' --ignore 'src/**/*.d.ts' --additional-function-names t"
+    "check:circular-dependencies": "dpdm --no-warning --no-tree -T src/script/auth/main.tsx src/script/main/app.ts"
   },
   "dependencies": {
     "@datadog/browser-logs": "7.16.0",
@@ -108,7 +100,7 @@
     "@roamhq/wrtc": "0.10.0",
     "@rspack/cli": "2.2.9",
     "@rspack/core": "2.2.9",
-    "@rspack/dev-server": "2.2.1",
+    "@rspack/dev-server": "2.2.2",
     "@rspack/plugin-react-refresh": "2.0.2",
     "@swc/plugin-emotion": "15.0.0",
     "@testing-library/dom": "10.4.2",
@@ -135,7 +127,7 @@
     "autoprefixer": "10.6.1",
     "babel-jest": "30.5.2",
     "babel-plugin-transform-import-meta": "2.3.3",
-    "baseline-browser-mapping": "2.11.32",
+    "baseline-browser-mapping": "2.11.33",
     "browserslist": "4.29.4",
     "css-loader": "7.1.5",
     "cssnano": "7.1.9",

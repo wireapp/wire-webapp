@@ -1,4 +1,5 @@
 project_id: 342359
+api_token_env: CROWDIN_PERSONAL_TOKEN
 base_path: .
 
 files:

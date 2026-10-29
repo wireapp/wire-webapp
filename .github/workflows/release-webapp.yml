@@ -165,29 +165,6 @@ jobs:
           fetch-depth: 0
           ref: ${{ needs.prepare_release.outputs.release_commit_sha }}
 
-      - name: Checkout current package manager selector
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          persist-credentials: false
-          fetch-depth: 1
-          ref: ${{ github.workflow_sha }}
-          path: workflow-source
-          sparse-checkout: tools/packageManager/packageManager.js
-          sparse-checkout-cone-mode: false
-
-      - name: Setup Node.js
-        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
-        with:
-          node-version-file: '.nvmrc'
-      - name: Install dependencies
-        run: |
-          package_manager="$(node workflow-source/tools/packageManager/packageManager.js "$PWD")"
-          if [[ "${package_manager}" == 'npm' ]]; then
-            npm clean-install
-          else
-            ./bin/yarn --immutable
-          fi
-
       - name: Verify prepared release commit
         id: release_metadata
         env:
@@ -210,26 +187,21 @@ jobs:
             echo "release_commit_sha=${EXPECTED_RELEASE_COMMIT_SHA}"
           } >> "$GITHUB_OUTPUT"
 
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
+      - name: Install dependencies
+        run: npm clean-install
+
       - name: Update configuration
-        run: |
-          package_manager="$(node workflow-source/tools/packageManager/packageManager.js "$PWD")"
-          if [[ "${package_manager}" == 'npm' ]]; then
-            npm exec -- nx run webapp:configure
-          else
-            ./bin/yarn nx run webapp:configure
-          fi
+        run: npx just configure-webapp
 
       - name: Build and package public production
         env:
           WIRE_WEBAPP_BUILD_COMMIT: ${{ steps.release_metadata.outputs.release_commit_sha }}
           WIRE_WEBAPP_BUILD_VERSION: ${{ steps.release_metadata.outputs.release_version }}
-        run: |
-          package_manager="$(node workflow-source/tools/packageManager/packageManager.js "$PWD")"
-          if [[ "${package_manager}" == 'npm' ]]; then
-            npm run build:prod:public
-          else
-            ./bin/yarn build:prod:public
-          fi
+        run: npx just package-server-public
 
       - name: Validate release artifact metadata
         id: validate_artifact_metadata
@@ -237,7 +209,7 @@ jobs:
           BUILD_ARTIFACT_PATH: ${{ env.ARTIFACT_PATH }}
           EXPECTED_COMMIT: ${{ steps.release_metadata.outputs.release_commit_sha }}
           EXPECTED_VERSION: ${{ steps.release_metadata.outputs.release_version }}
-        run: node ./tools/buildArtifact/validateBuildArtifact.mts
+        run: npx just validate-build-artifact
 
       - name: Compute artifact metadata
         id: artifact_metadata
@@ -273,14 +245,7 @@ jobs:
             "${distribution_context_directory}/bin"
 
           cp -a package.json .npmrc run.sh .env.defaults "${distribution_context_directory}/"
-          package_manager="$(node workflow-source/tools/packageManager/packageManager.js "$PWD")"
-          if [[ "${package_manager}" == 'npm' ]]; then
-            cp -a package-lock.json "${distribution_context_directory}/package-lock.json"
-          else
-            cp -a yarn.lock .yarnrc.yml "${distribution_context_directory}/"
-            cp -a .yarn "${distribution_context_directory}/.yarn"
-            cp -a bin/yarn "${distribution_context_directory}/bin/yarn"
-          fi
+          cp -a package-lock.json "${distribution_context_directory}/package-lock.json"
           cp -a apps/server/Dockerfile apps/server/package.json "${distribution_context_directory}/apps/server/"
           cp -a apps/server/dist "${distribution_context_directory}/apps/server/dist"
           cp -a libraries/config/package.json libraries/config/lib "${distribution_context_directory}/libraries/config/"
@@ -404,30 +369,13 @@ jobs:
           fetch-tags: false
           ref: ${{ needs.build_artifact.outputs.release_commit_sha }}
 
-      - name: Checkout current package manager selector
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          persist-credentials: false
-          fetch-depth: 1
-          ref: ${{ github.workflow_sha }}
-          path: workflow-source
-          sparse-checkout: tools/packageManager/packageManager.js
-          sparse-checkout-cone-mode: false
-
       - name: Setup Node.js
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: '.nvmrc'
-          # The release commit may use Yarn or npm; the selector verifies its metadata and lockfile.
 
       - name: Install dependencies
-        run: |
-          package_manager="$(node workflow-source/tools/packageManager/packageManager.js "$PWD")"
-          if [[ "${package_manager}" == 'npm' ]]; then
-            npm run ci:install
-          else
-            YARN_ENABLE_SCRIPTS=false ./bin/yarn install --immutable --mode=skip-build
-          fi
+        run: npm run ci:install
 
       - name: Create and push Beta tag
         id: beta_tag
@@ -697,30 +645,13 @@ jobs:
           fetch-depth: 0
           ref: ${{ needs.build_artifact.outputs.release_commit_sha }}
 
-      - name: Checkout current package manager selector
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          persist-credentials: false
-          fetch-depth: 1
-          ref: ${{ github.workflow_sha }}
-          path: workflow-source
-          sparse-checkout: tools/packageManager/packageManager.js
-          sparse-checkout-cone-mode: false
-
       - name: Setup Node.js
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: '.nvmrc'
-          # The release commit may use Yarn or npm; the selector verifies its metadata and lockfile.
 
       - name: Install dependencies
-        run: |
-          package_manager="$(node workflow-source/tools/packageManager/packageManager.js "$PWD")"
-          if [[ "${package_manager}" == 'npm' ]]; then
-            npm run ci:install
-          else
-            YARN_ENABLE_SCRIPTS=false ./bin/yarn install --immutable --mode=skip-build
-          fi
+        run: npm run ci:install
 
       - name: Check Production promotion eligibility
         id: production_preflight

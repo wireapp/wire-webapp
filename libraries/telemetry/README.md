@@ -17,9 +17,15 @@ Under the hood uses [Countly](https://countly.com/).
 Run from the repository root:
 
 ```bash
-npx nx run telemetry-lib:build
-npx just test
-npx nx run telemetry-lib:watch
+npx just develop-watch # choose telemetry with the server (alternative to develop)
+npx just watch-libraries # watch all development libraries without the server
+```
+
+To watch only telemetry directly, run from `libraries/telemetry`:
+
+```bash
+node bin/copyAssets.mts
+tsc --build tsconfig.json tsconfig.commonjs.json --watch --preserveWatchOutput
 ```
 
 TypeScript compiles the library without bundling. The build first copies the original
@@ -42,11 +48,13 @@ Both advertised module formats therefore work with Node and application bundlers
 The previous CommonJS export pointed to a nonexistent `lib/index.cjs`; it now points to
 the generated CommonJS entry above.
 
-Builds clean `lib` before compiling. Watch mode copies assets once, then incrementally
+Builds clean `lib` before compiling. The repository's development commands build libraries
+before starting watchers. Telemetry's watch command copies assets once, then incrementally
 compiles both formats without cleaning the output directory. Its build information lives
 inside `lib`, so cleaning also resets incremental state. There is no TypeScript embed
-source that could overwrite the SDK. `yarn start:watch` can select `telemetry` through
-the existing library watcher.
+source that could overwrite the SDK. `npx just develop-watch` is an alternative
+to `npx just develop`; choose it to select telemetry alongside the development
+server instead of starting both commands.
 
 Both server build targets depend on the telemetry build. The server's asset-copy step
 copies `lib/embed.js` to `libs/wire/telemetry/embed.js` in development and production

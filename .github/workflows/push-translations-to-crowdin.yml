@@ -35,13 +35,13 @@ jobs:
         run: npm clean-install
 
       - name: Merge translations
-        run: npm run --workspace @wireapp/webapp translate:merge
+        run: npx just translate-merge
 
       - name: Upload sources to Crowdin
         uses: crowdin/github-action@7ca9c452bfe9197d3bb7fa83a4d7e2b0c9ae835d
         env:
           GITHUB_TOKEN: ${{ secrets.OTTO_THE_BOT_GH_TOKEN }}
-          CROWDIN_PROJECT_ID: 342359
+          CROWDIN_PERSONAL_TOKEN: ${{ secrets.WEBTEAM_CROWDIN_TOKEN }}
           INPUT_DEBUG_MODE: false
         with:
           upload_sources: true
@@ -49,7 +49,4 @@ jobs:
           download_translations: false
           push_translations: false
           create_pull_request: false
-          token: ${{ secrets.WEBTEAM_CROWDIN_TOKEN }}
-          source: '/apps/webapp/src/i18n/en-US.json'
-          translation: '/apps/webapp/src/i18n/%locale%.json'
-          base_path: '.'
+          config: crowdin.yaml
