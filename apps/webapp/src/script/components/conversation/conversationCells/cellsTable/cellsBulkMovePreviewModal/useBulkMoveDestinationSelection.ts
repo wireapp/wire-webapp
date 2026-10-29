@@ -39,6 +39,7 @@ interface UseBulkMoveDestinationSelectionProps {
 
 export interface BulkMoveDestinationSelection {
   currentPath: string;
+  refresh: () => Promise<void>;
   disabledDestinationLabels: Readonly<Record<string, string>>;
   disabledDestinationPaths: readonly string[];
   folders: {id: string; name: string; path: string}[];
@@ -69,7 +70,7 @@ export const useBulkMoveDestinationSelection = ({
   );
   const [currentPath, setCurrentPath] = useState(getCellsFilesPath());
   const [selectedDestinationPath, setSelectedDestinationPath] = useState(currentPath);
-  const {folders, status, shouldShowLoadingSpinner} = useGetCellsFolders({
+  const {folders, refresh, status, shouldShowLoadingSpinner} = useGetCellsFolders({
     cellsRepository,
     conversationQualifiedId,
     currentPath,
@@ -128,6 +129,7 @@ export const useBulkMoveDestinationSelection = ({
 
   return {
     currentPath,
+    refresh,
     disabledDestinationLabels,
     disabledDestinationPaths,
     folders: normalizedFolders,

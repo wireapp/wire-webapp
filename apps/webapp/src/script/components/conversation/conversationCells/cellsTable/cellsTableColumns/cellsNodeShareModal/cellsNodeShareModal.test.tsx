@@ -20,6 +20,7 @@
 import {ReactNode} from 'react';
 
 import {render} from '@testing-library/react';
+import {Maybe} from 'true-myth';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
@@ -48,6 +49,7 @@ describe('CellShareModalContent', () => {
       path: '/file.pdf',
       mimeType: 'application/pdf',
       sizeMb: '1',
+      sizeBytes: Maybe.nothing(),
       extension: 'pdf',
       uploadedAtTimestamp: Date.now(),
       owner: 'owner',

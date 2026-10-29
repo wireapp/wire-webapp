@@ -3,7 +3,9 @@
   "compilerOptions": {
     "noEmit": true,
     "types": ["node", "jest"],
-    "noUncheckedIndexedAccess": false
+    "noUncheckedIndexedAccess": false,
+    "incremental": true,
+    "tsBuildInfoFile": "../../target/buildcache/bazinga64-type-check.tsbuildinfo"
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "lib"]

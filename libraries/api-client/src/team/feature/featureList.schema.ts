@@ -43,10 +43,10 @@ import {
 
 // Core feature flag field schemas
 
-const featureStatusSchema = z.nativeEnum(FEATURE_STATUS);
-const featureLockStatusSchema = z.nativeEnum(FEATURE_LOCK_STATUS);
-const accessTypeSchema = z.nativeEnum(ACCESS_TYPE);
-const conversationProtocolSchema = z.nativeEnum(CONVERSATION_PROTOCOL);
+const featureStatusSchema = z.enum(FEATURE_STATUS);
+const featureLockStatusSchema = z.enum(FEATURE_LOCK_STATUS);
+const accessTypeSchema = z.enum(ACCESS_TYPE);
+const conversationProtocolSchema = z.enum(CONVERSATION_PROTOCOL);
 
 /**
  * TTL (Time To Live) can be either:
@@ -128,9 +128,9 @@ const preventAdminLessGroupsConfigSchema = z.object({
  * Helper to create a feature schema that includes both base fields
  * (status, lockStatus, ttl) and a feature-specific config object.
  */
-const createFeatureSchemaWithConfig = <TConfig extends z.ZodTypeAny>(
+const createFeatureSchemaWithConfig = <TConfig extends z.ZodType>(
   featureSpecificConfigSchema: TConfig,
-): z.ZodObject<typeof baseFeatureWithoutConfigSchema.shape & {config: TConfig}, 'strip'> => {
+): z.ZodObject<typeof baseFeatureWithoutConfigSchema.shape & {config: TConfig}> => {
   return baseFeatureWithoutConfigSchema.extend({
     config: featureSpecificConfigSchema,
   });

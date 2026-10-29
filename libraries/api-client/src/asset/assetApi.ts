@@ -166,11 +166,12 @@ export class AssetAPI {
     }
 
     const metadata = JSON.stringify(metadataObject);
+    const metadataByteLength = new TextEncoder().encode(metadata).length;
 
     const body =
       `--${BOUNDARY}\r\n` +
       'Content-Type: application/json;charset=utf-8\r\n' +
-      `Content-length: ${metadata.length}\r\n` +
+      `Content-length: ${metadataByteLength}\r\n` +
       '\r\n' +
       `${metadata}\r\n` +
       `--${BOUNDARY}\r\n` +

@@ -62,9 +62,7 @@ class Server {
     private readonly clientConfig: ClientConfig,
     private readonly buildMetadata: BuildMetadata,
   ) {
-    if (this.config.DEVELOPMENT) {
-      console.info(this.config);
-    } else if (!this.config.APP_BASE.startsWith('https')) {
+    if (!this.config.DEVELOPMENT && !this.config.APP_BASE.startsWith('https')) {
       throw new Error(`Config variable 'APP_BASE' must be protocol https but is '${this.config.APP_BASE}'`);
     }
 

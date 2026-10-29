@@ -17,6 +17,8 @@
  *
  */
 
+const rootJestConfiguration = require('../../jest.config.js');
+
 module.exports = {
   displayName: 'store-engine-fs-lib',
   testEnvironment: 'node',
@@ -26,7 +28,9 @@ module.exports = {
     '^.+\\.(js|jsx)$': '@swc/jest',
   },
   transformIgnorePatterns: ['/node_modules/(?!(@sindresorhus/is)/)'],
-  coverageDirectory: '../../coverage/libraries/store-engine-fs',
+  cacheDirectory: '../../target/jest/cache',
+  coverageDirectory: '../../target/coverage/libraries/store-engine-fs',
+  coverageReporters: rootJestConfiguration.coverageReporters,
   testMatch: [
     '<rootDir>/src/**/__tests__/**/*.[jt]s?(x)',
     '<rootDir>/src/**/?(*.)+(spec|test).[jt]s?(x)',
@@ -37,4 +41,5 @@ module.exports = {
     '^@wireapp/store-engine/lib/test/(.*)$': '<rootDir>/../store-engine/src/test/$1',
     '^@wireapp/store-engine$': '<rootDir>/../store-engine/src/index',
   },
+  reporters: rootJestConfiguration.reporters,
 };

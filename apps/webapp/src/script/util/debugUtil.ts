@@ -385,24 +385,24 @@ export class DebugUtil {
     return isEnabled === 'true';
   }
 
-  isEnabledAvsRustSFT(): boolean {
+  isEnabledAvsStagingSFT(): boolean {
     const storage = getStorage();
 
     if (storage === undefined) {
       return false;
     }
 
-    const isEnabled = storage.getItem('avs-rust-sft-enabled');
+    const isEnabled = storage.getItem('avs-staging-sft-enabled');
     return isEnabled === 'true';
   }
 
-  enableAvsRustSFT(enable: boolean): boolean {
+  enableAvsStagingSFT(enable: boolean): boolean {
     const storage = getStorage();
 
     if (storage === undefined) {
       return false;
     }
-    storage.setItem('avs-rust-sft-enabled', `${enable}`);
+    storage.setItem('avs-staging-sft-enabled', `${enable}`);
     return enable;
   }
 

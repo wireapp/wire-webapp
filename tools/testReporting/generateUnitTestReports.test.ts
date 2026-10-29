@@ -17,15 +17,12 @@
  *
  */
 
-import type {ProjectGraph} from '@nx/devkit';
-
 import {
   createCombinedReport,
+  createJestTestCommand,
   createManifest,
-  createNxTestCommand,
   createProjectReport,
   createReportFileName,
-  findTestableProjects,
   runProjectTestReports,
   sanitizeProjectNameForFileName,
 } from './generateUnitTestReports';
@@ -40,38 +37,9 @@ const reportSettings: ReportSettings = {
   workspaceRoot: '/workspace',
 };
 
-function createProjectGraph(): ProjectGraph {
-  return {
-    dependencies: {},
-    externalNodes: {},
-    nodes: {
-      webapp: {
-        data: {root: 'apps/webapp', projectType: 'application', targets: {test: {}}},
-        name: 'webapp',
-        type: 'app',
-      },
-      server: {
-        data: {root: 'apps/server', projectType: 'application', targets: {test: {}}},
-        name: 'server',
-        type: 'app',
-      },
-      nestedLibrary: {
-        data: {root: 'libraries/client/nested', projectType: 'library', targets: {test: {}}},
-        name: 'nested-library',
-        type: 'lib',
-      },
-      untestableLibrary: {
-        data: {root: 'libraries/config', projectType: 'library', targets: {build: {}}},
-        name: 'untestable-library',
-        type: 'lib',
-      },
-    },
-  } as ProjectGraph;
-}
-
 function createProjectTestResult(project: TestableProject, exitCode: number, output: string): ProjectTestResult {
   return {
-    command: createNxTestCommand(project.name),
+    command: createJestTestCommand(project),
     exitCode,
     output,
     project,
@@ -81,22 +49,25 @@ function createProjectTestResult(project: TestableProject, exitCode: number, out
 }
 
 describe('generate-unit-test-reports', (): void => {
-  it('discovers application, library, and nested projects with test targets in deterministic order', (): void => {
-    const actualProjects = findTestableProjects(createProjectGraph());
-
-    expect(actualProjects).toEqual([
-      {name: 'nested-library', root: 'libraries/client/nested', type: 'lib'},
-      {name: 'server', root: 'apps/server', type: 'app'},
-      {name: 'webapp', root: 'apps/webapp', type: 'app'},
-    ]);
-  });
-
-  it('creates the canonical verbose Nx CI test command', (): void => {
-    const actualCommand = createNxTestCommand('webapp');
+  it('creates a native Jest CI test command for each project', (): void => {
+    const actualCommand = createJestTestCommand({
+      jestConfigFile: 'apps/webapp/jest.config.ts',
+      name: 'webapp',
+      root: 'apps/webapp',
+      type: 'app',
+    });
 
     expect(actualCommand).toEqual({
-      command: 'npm',
-      commandArguments: ['exec', '--', 'nx', 'run', 'webapp:test', '--configuration=ci', '--verbose'],
+      command: 'npx',
+      commandArguments: [
+        'jest',
+        '--config',
+        'apps/webapp/jest.config.ts',
+        '--ci',
+        '--verbose',
+        '--maxWorkers=2',
+        '--coverage',
+      ],
     });
   });
 
@@ -118,8 +89,16 @@ describe('generate-unit-test-reports', (): void => {
 
   it('writes consistent metadata into project reports and the manifest', (): void => {
     const projectTestResults = [
-      createProjectTestResult({name: 'server', root: 'apps/server', type: 'app'}, 0, 'server output'),
-      createProjectTestResult({name: 'webapp', root: 'apps/webapp', type: 'app'}, 1, 'webapp output'),
+      createProjectTestResult(
+        {jestConfigFile: 'apps/server/jest.config.js', name: 'server', root: 'apps/server', type: 'app'},
+        0,
+        'server output',
+      ),
+      createProjectTestResult(
+        {jestConfigFile: 'apps/webapp/jest.config.ts', name: 'webapp', root: 'apps/webapp', type: 'app'},
+        1,
+        'webapp output',
+      ),
     ];
     const actualProjectReport = createProjectReport(projectTestResults[0], reportSettings);
     const actualManifest = createManifest(projectTestResults, reportSettings);
@@ -134,14 +113,14 @@ describe('generate-unit-test-reports', (): void => {
       overallStatus: 'failed',
       projects: [
         {
-          command: 'npm exec -- nx run server:test --configuration=ci --verbose',
+          command: 'npx jest --config apps/server/jest.config.js --ci --verbose --maxWorkers=2 --coverage',
           exitCode: 0,
           name: 'server',
           reportFileName: 'unit-tests-server-abc123.log',
           status: 'passed',
         },
         {
-          command: 'npm exec -- nx run webapp:test --configuration=ci --verbose',
+          command: 'npx jest --config apps/webapp/jest.config.ts --ci --verbose --maxWorkers=2 --coverage',
           exitCode: 1,
           name: 'webapp',
           reportFileName: 'unit-tests-webapp-abc123.log',
@@ -154,8 +133,16 @@ describe('generate-unit-test-reports', (): void => {
 
   it('creates a combined report with every project once in sorted order and explicit delimiters', (): void => {
     const projectTestResults = [
-      createProjectTestResult({name: 'webapp', root: 'apps/webapp', type: 'app'}, 0, 'webapp output'),
-      createProjectTestResult({name: 'server', root: 'apps/server', type: 'app'}, 0, 'server output'),
+      createProjectTestResult(
+        {jestConfigFile: 'apps/webapp/jest.config.ts', name: 'webapp', root: 'apps/webapp', type: 'app'},
+        0,
+        'webapp output',
+      ),
+      createProjectTestResult(
+        {jestConfigFile: 'apps/server/jest.config.js', name: 'server', root: 'apps/server', type: 'app'},
+        0,
+        'server output',
+      ),
     ];
     const actualCombinedReport = createCombinedReport(projectTestResults, reportSettings);
 
@@ -170,15 +157,24 @@ describe('generate-unit-test-reports', (): void => {
 
   it('continues after failures and returns a failing result for the failed project', async (): Promise<void> => {
     const testableProjects = [
-      {name: 'first-project', root: 'libraries/first', type: 'lib'},
-      {name: 'second-project', root: 'libraries/second', type: 'lib'},
+      {jestConfigFile: 'libraries/first/jest.config.js', name: 'first-project', root: 'libraries/first', type: 'lib'},
+      {
+        jestConfigFile: 'libraries/second/jest.config.js',
+        name: 'second-project',
+        root: 'libraries/second',
+        type: 'lib',
+      },
     ] satisfies readonly TestableProject[];
     const executedProjectNames: string[] = [];
     const projectTestResults = await runProjectTestReports(
       testableProjects,
       reportSettings,
-      async (_command, commandArguments) => {
-        const projectName = commandArguments[4].split(':')[0];
+      async (command, commandArguments) => {
+        expect(command).toBe('npx');
+
+        const projectName = commandArguments.includes('libraries/first/jest.config.js')
+          ? 'first-project'
+          : 'second-project';
         executedProjectNames.push(projectName);
 
         return {exitCode: projectName === 'first-project' ? 1 : 0, output: `${projectName} output`};

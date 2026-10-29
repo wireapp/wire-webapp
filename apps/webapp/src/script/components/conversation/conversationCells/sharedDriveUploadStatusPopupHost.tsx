@@ -26,6 +26,7 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 import type {Translate} from 'Util/localizerUtil';
 import {formatBytes} from 'Util/util';
 
+import {moveStatusMessageKey} from './sharedDriveMoveStatusMessages';
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
 import {
   getRepresentativeSharedDriveUploadStatus,
@@ -36,7 +37,7 @@ import {
   type SharedDriveUploadStatusKind,
   type DismissedUpload,
 } from './sharedDriveUploadStatus';
-import {useSharedDriveUploadStatus} from './sharedDriveUploadStatusContext';
+import {useSharedDriveUploadStatus, type SharedDriveMoveStatusKind} from './sharedDriveUploadStatusContext';
 import {SharedDriveUploadStatusPopup} from './sharedDriveUploadStatusPopup';
 
 interface SharedDriveUploadStatusPopupHostProps {
@@ -45,6 +46,26 @@ interface SharedDriveUploadStatusPopupHostProps {
   readonly isEnabled: boolean;
   readonly isFileTabActive: boolean;
 }
+
+const moveStatusLabelKey: Record<SharedDriveMoveStatusKind, Parameters<Translate>[0]> = {
+  processing: 'cells.bulkMove.processing',
+  completed: 'cells.bulkMove.completed',
+  'request-failed': 'cells.bulkMove.needsReviewStatus',
+  partial: 'cells.bulkMove.needsReviewStatus',
+  'finished-unknown': 'cells.bulkMove.needsReviewStatus',
+  failed: 'cells.bulkMove.needsReviewStatus',
+  'status-unknown': 'cells.bulkMove.needsReviewStatus',
+};
+
+const moveStatusTitleKey: Record<SharedDriveMoveStatusKind, Parameters<Translate>[0]> = {
+  processing: 'cells.bulkMove.movingItems',
+  completed: 'cells.bulkMove.movedItems',
+  'request-failed': 'cells.bulkMove.requestFailedTitle',
+  partial: 'cells.bulkMove.partialMoveWarningTitle',
+  'finished-unknown': 'cells.bulkMove.finishedUnknownTitle',
+  failed: 'cells.bulkMove.allJobsFailedTitle',
+  'status-unknown': 'cells.bulkMove.statusLookupUnknownTitle',
+};
 
 const getRowStatusLabel = (
   row: SharedDriveUploadStatus,
@@ -84,6 +105,8 @@ export const SharedDriveUploadStatusPopupHost: FunctionComponent<SharedDriveUplo
   const {
     dismissedUpload: contextDismissedUpload,
     dismissUpload: onDismissUpload,
+    moveStatus,
+    dismissMoveStatus,
     isProvided,
   } = useSharedDriveUploadStatus();
   const readStatuses = useCallback(() => {
@@ -93,6 +116,7 @@ export const SharedDriveUploadStatusPopupHost: FunctionComponent<SharedDriveUplo
     return {conversationQualifiedId, uploads: readStatuses()};
   });
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isMoveExpanded, setIsMoveExpanded] = useState(true);
   const [cancellingUploadIds, setCancellingUploadIds] = useState<ReadonlySet<string>>(() => {
     return new Set();
   });
@@ -275,6 +299,32 @@ export const SharedDriveUploadStatusPopupHost: FunctionComponent<SharedDriveUplo
     updateStatus();
     return controller.subscribe(updateStatus);
   }, [controller, conversationQualifiedId, readStatuses]);
+
+  if (isFileTabActive && maybe.isJust(moveStatus)) {
+    const move = moveStatus.value;
+    const statusMessageKey =
+      move.kind === 'processing' || move.kind === 'completed' ? undefined : moveStatusMessageKey[move.kind];
+    return (
+      <SharedDriveUploadStatusPopup
+        move={move}
+        title={translate(moveStatusTitleKey[move.kind], {count: move.items.length})}
+        statusLabel={translate(moveStatusLabelKey[move.kind])}
+        statusMessage={statusMessageKey !== undefined ? translate(statusMessageKey) : ''}
+        destination={translate('cells.uploadStatus.destination', {destination: move.destinationPath})}
+        isExpanded={isMoveExpanded}
+        toggleLabel={translate(isMoveExpanded ? 'cells.uploadStatus.collapse' : 'cells.uploadStatus.expand')}
+        dismissLabel={translate('fileCardDefaultCloseButtonLabel')}
+        onToggle={() => {
+          return setIsMoveExpanded(expanded => {
+            return !expanded;
+          });
+        }}
+        onDismiss={() => {
+          return dismissMoveStatus(move.id);
+        }}
+      />
+    );
+  }
 
   if (!isEnabled || !isFileTabActive || isNull(representativeUpload) || isUploadDismissed || isNull(aggregateKind)) {
     return null;

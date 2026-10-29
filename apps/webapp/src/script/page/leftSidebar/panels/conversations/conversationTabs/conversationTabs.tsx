@@ -198,7 +198,7 @@ export const ConversationTabs: FunctionComponent<ConversationTabsProps> = ({
   const core = container.resolve(Core);
   const teamState = container.resolve(TeamState);
   const totalUnreadConversations = unreadConversations.length;
-  const {teamRole} = useKoSubscribableChildren(selfUser, ['teamRole']);
+  const {teamRole, isTemporaryGuest} = useKoSubscribableChildren(selfUser, ['teamRole', 'isTemporaryGuest']);
   const {isCellsEnabled: isCellsEnabledForTeam} = useKoSubscribableChildren(teamState, ['isCellsEnabled']);
   const {isMeetingsEnabled} = useMeetingsFeatureFlag();
   const isDebugEnabled = Config.getConfig().FEATURE.ENABLE_DEBUG;
@@ -441,7 +441,7 @@ export const ConversationTabs: FunctionComponent<ConversationTabsProps> = ({
         aria-owns="tab-1 tab-2"
         className="conversations-sidebar-list-footer"
       >
-        {isTeamCreationEnabled && !teamState.isInTeam(selfUser) && <TeamCreationBanner />}
+        {isTeamCreationEnabled && !teamState.isInTeam(selfUser) && !isTemporaryGuest && <TeamCreationBanner />}
 
         {renderEnvironmentDisclaimerIfNeeded({translate})}
 

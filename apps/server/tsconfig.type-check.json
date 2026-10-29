@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.json",
+  "references": [{"path": "../../libraries/config"}],
+  "compilerOptions": {
+    "noEmit": true,
+    "incremental": true,
+    "tsBuildInfoFile": "../../target/buildcache/server-type-check.tsbuildinfo"
+  }
+}

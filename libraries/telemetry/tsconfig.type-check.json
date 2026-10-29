@@ -5,7 +5,9 @@
     "moduleResolution": "NodeNext",
     "rootDir": ".",
     "types": ["node", "jest"],
-    "noEmit": true
+    "noEmit": true,
+    "incremental": true,
+    "tsBuildInfoFile": "../../target/buildcache/telemetry-type-check.tsbuildinfo"
   },
   "include": ["src/**/*.ts", "spec/**/*.ts", "bin/**/*.mts"]
 }

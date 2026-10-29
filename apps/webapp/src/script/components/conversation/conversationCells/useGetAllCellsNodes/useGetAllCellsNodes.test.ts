@@ -55,7 +55,12 @@ function createDeferred<T>(): PromiseWithResolvers<T> {
 
 type RenderGetAllNodesHookResult = {
   rerender: (props?: {enabled: boolean; sort: CellsSort | null} | undefined) => void;
-  result: {current: {refresh: () => Promise<void>; setOffset: (nextOffset: number) => void}};
+  result: {
+    current: {
+      refresh: (options?: {preserveStatusOnError?: boolean}) => Promise<boolean>;
+      setOffset: (nextOffset: number) => void;
+    };
+  };
   unmount: () => void;
   fireAndForgetInvoker: FireAndForgetInvoker;
 };
@@ -93,7 +98,7 @@ function renderGetAllNodesHook({
 describe('useGetAllCellsNodes', () => {
   beforeEach(() => {
     useCellsStore.getState().clearAll({conversationId: CONV_ID});
-    window.location.hash = `/conversation/${CONV_ID}/${DOMAIN}/files`;
+    window.history.replaceState({}, '', `#/conversation/${CONV_ID}/${DOMAIN}/files`);
   });
 
   it('does not write to the store when disabled mid-flight', async () => {
@@ -118,6 +123,31 @@ describe('useGetAllCellsNodes', () => {
     });
 
     expect(useCellsStore.getState().getNodes({conversationId: CONV_ID})).toHaveLength(0);
+  });
+
+  it('preserves the existing table state when an outcome refresh fails', async () => {
+    useCellsStore.getState().setStatus('idle');
+    useCellsStore.getState().setError(null);
+    const cellsRepository = {
+      getAllNodes: jest
+        .fn()
+        .mockResolvedValueOnce({Nodes: [createRestNode('moved-file.txt')]})
+        .mockRejectedValueOnce(new Error('Refresh failed')),
+    } as FakeCellsRepository;
+    const {fireAndForgetInvoker, result} = renderGetAllNodesHook({cellsRepository});
+    await act(() => {
+      return fireAndForgetInvoker.waitUntilAllSettled();
+    });
+    expect(useCellsStore.getState().status).toBe('success');
+
+    await act(async () => {
+      await expect(result.current.refresh({preserveStatusOnError: true})).rejects.toThrow('Refresh failed');
+    });
+
+    expect(cellsRepository.getAllNodes).toHaveBeenCalledTimes(2);
+    expect(useCellsStore.getState().status).toBe('success');
+    expect(useCellsStore.getState().getNodes({conversationId: CONV_ID})).toHaveLength(1);
+    expect(useCellsStore.getState().error).toEqual(new Error('Refresh failed'));
   });
 
   it('keeps the browse order natural when no sort is selected', async () => {

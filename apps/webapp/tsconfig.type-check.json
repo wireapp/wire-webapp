@@ -5,6 +5,8 @@
     "allowImportingTsExtensions": true,
     "noUnusedLocals": false,
     "noUncheckedIndexedAccess": false,
+    "incremental": true,
+    "tsBuildInfoFile": "../../target/buildcache/webapp-type-check.tsbuildinfo",
     "paths": {
       "@sindresorhus/is": ["../../node_modules/@sindresorhus/is/distribution/index.d.ts"],
       "@enormora/objectory": ["../../node_modules/@enormora/objectory/main.d.ts"],

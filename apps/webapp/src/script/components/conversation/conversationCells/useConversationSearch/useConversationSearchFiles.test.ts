@@ -19,6 +19,7 @@
 
 import {act, renderHook, waitFor} from '@testing-library/react';
 import {RestNode, RestNodeCollection} from 'cells-sdk-ts';
+import {Maybe} from 'true-myth';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {UserRepository} from 'Repositories/user/userRepository';
@@ -51,6 +52,7 @@ const staleFolderNode: CellNode = {
   type: CellNodeType.FOLDER,
   extension: '',
   sizeMb: '-',
+  sizeBytes: Maybe.nothing(),
   uploadedAtTimestamp: 0,
   owner: '',
   conversationName: '',

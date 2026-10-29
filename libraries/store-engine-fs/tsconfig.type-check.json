@@ -3,6 +3,8 @@
   "compilerOptions": {
     "noEmit": true,
     "types": ["node", "jest"],
+    "incremental": true,
+    "tsBuildInfoFile": "../../target/buildcache/store-engine-fs-type-check.tsbuildinfo",
     "noUncheckedIndexedAccess": false,
     "rootDir": "..",
     "baseUrl": ".",

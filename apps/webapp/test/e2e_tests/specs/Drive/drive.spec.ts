@@ -20,7 +20,8 @@
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {getImageFilePath, getLocalQRCodeValue, ImageQRCodeFileName} from 'test/e2e_tests/utils/sendImage.util';
-import {getVideoFilePath, VideoFileName} from 'test/e2e_tests/utils/asset.util';
+import {getTextFilePath, getVideoFilePath, TextFileName, VideoFileName} from 'test/e2e_tests/utils/asset.util';
+import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 
 import {test, expect, withLogin} from '../../test.fixtures';
 import {connectWithUser, createGroup} from '../../utils/userActions';
@@ -191,6 +192,78 @@ test.describe('Conversations', () => {
         const reply = userAPages.conversation().getMessage({content: replyMessageText});
         await expect(reply).toBeVisible();
       });
+    },
+  );
+
+  test(
+    'recovers from a failed bulk move after an explicit Drive refresh',
+    {tag: ['@crit-flow-cells', '@regression']},
+    async ({createPage}) => {
+      const page = await createPage(
+        withLogin(userA, {startupFeatureToggles: {[driveBulkActionsFeatureToggleName]: true}}),
+      );
+      const pageManager = await PageManager.from(page);
+      await connectWithUser(pageManager, userB);
+      const {pages} = pageManager.webapp;
+      const sourceFolderName = 'Bulk move recovery folder';
+      const sharedDrive = pages.cellsSharedDrive();
+
+      await createGroup(pages, conversationName, [userB], {cells: true});
+      await pages.conversationList().getConversation(conversationName).open();
+      await pages.conversation().clickFilesTab();
+      await sharedDrive.createFolder(sourceFolderName);
+      await expect(async () => {
+        await sharedDrive.refresh();
+        await expect(sharedDrive.getFolder(sourceFolderName)).toBeVisible({timeout: 2_000});
+      }).toPass({intervals: [1_000, 2_000, 5_000], timeout: 20_000});
+      await sharedDrive.openFolder(sourceFolderName);
+      await sharedDrive.uploadFile(getTextFilePath());
+      await expect(sharedDrive.uploadStatusHeader).toContainText(`Uploaded ${TextFileName}`);
+      await expect(async () => {
+        await sharedDrive.refresh();
+        await expect(sharedDrive.getFile(TextFileName)).toBeVisible({timeout: 2_000});
+      }).toPass({intervals: [1_000, 2_000, 5_000], timeout: 20_000});
+
+      let moveRequestCount = 0;
+      await page.route(/\/n\/action\/move(?:\?.*)?$/, async route => {
+        if (route.request().method() !== 'POST') {
+          await route.continue();
+          return;
+        }
+
+        moveRequestCount += 1;
+        await route.fulfill({
+          status: 500,
+          contentType: 'application/json',
+          body: JSON.stringify({message: 'Move failed'}),
+        });
+      });
+
+      const selection = page.getByRole('checkbox', {name: `Select ${TextFileName}`});
+      await selection.focus();
+      await selection.press('Space');
+      await expect(selection).toBeChecked();
+      await page.getByRole('button', {name: 'Move', exact: true}).click();
+      const preview = page.getByRole('dialog');
+      await expect(preview).toBeVisible();
+      await preview.getByRole('button', {name: `${conversationName} files`}).click();
+      await expect(preview.getByRole('button', {name: 'Move', exact: true})).toBeEnabled();
+      await preview.getByRole('button', {name: 'Move', exact: true}).click();
+
+      await expect(preview.getByRole('alert')).toBeVisible();
+      await expect(preview.getByRole('button', {name: 'Refresh Drive'})).toBeVisible();
+      await expect(preview.getByRole('button', {name: 'Move', exact: true})).toBeDisabled();
+      await expect
+        .poll(() => {
+          return moveRequestCount;
+        })
+        .toBe(1);
+
+      await preview.getByRole('button', {name: 'Refresh Drive'}).click();
+      await expect(preview).not.toBeVisible();
+      await expect(selection).toBeEnabled();
+      await expect(selection).not.toBeChecked();
+      expect(moveRequestCount).toBe(1);
     },
   );
 

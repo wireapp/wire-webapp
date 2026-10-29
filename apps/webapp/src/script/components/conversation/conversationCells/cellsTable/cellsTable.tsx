@@ -17,18 +17,17 @@
  *
  */
 
-import {DragEvent, useEffect, useState, type FunctionComponent, type ReactElement} from 'react';
+import {DragEvent, useEffect, useReducer, useRef, useState, type FunctionComponent, type ReactElement} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 import {flexRender, getCoreRowModel, type Header, useReactTable} from '@tanstack/react-table';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {JobsTaskStatus, RestActionStatus, type RestPerformActionResponse} from 'cells-sdk-ts';
 import {createPortal} from 'react-dom';
-import {task} from 'true-myth';
+import {Maybe, maybe, task} from 'true-myth';
 
-import {UploadIcon} from '@wireapp/react-ui-kit';
+import {ArrowIcon, Button, ButtonVariant, CloseIcon, UploadIcon} from '@wireapp/react-ui-kit';
 
-import {CellsSelectionBar} from 'Components/cells/common/cellsSelectionBar/cellsSelectionBar';
 import {CellsBulkMovePreviewModal} from 'Components/conversation/conversationCells/cellsTable/cellsBulkMovePreviewModal/cellsBulkMovePreviewModal';
 import {
   CELLS_ACTION,
@@ -36,36 +35,49 @@ import {
   useCellsActionPermissions,
 } from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {isInRecycleBin} from 'Components/conversation/conversationCells/common/recycleBin/recycleBin';
+import {
+  useSharedDriveUploadStatus,
+  type SharedDriveMoveSummary,
+} from 'Components/conversation/conversationCells/sharedDriveUploadStatusContext';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
+import {formatBytes} from 'Util/util';
 
+import {bulkMoveReducer} from './bulkMoveState';
 import {CellsFilePreviewModal} from './cellsFilePreviewModal/cellsFilePreviewModal';
 import {
   bulkMoveButtonStyles,
+  clearSelectionButtonStyles,
   folderDropOverlayDescriptionStyles,
   folderDropOverlayFolderNameStyles,
   folderDropOverlayStyles,
   folderDropOverlayTitleStyles,
   folderDropTargetRowStyles,
   headerCellStyles,
+  moveOutcomeMessageStyles,
   tableActionsCellStyles,
   tableCellRow,
   tableCellStyles,
   selectedTableCellRowStyles,
   selectionBarContainerStyles,
+  selectionBarStyles,
+  selectionCountStyles,
+  selectionSizeStyles,
   tableStyles,
   wrapperWithRowsStyles,
   wrapperStyles,
 } from './cellsTable.styles';
 import {getCellsTableColumns, getCellsTableDataCellLabels} from './cellsTableColumns/cellsTableColumns';
 import {CellsFilePreviewModalProvider} from './common/cellsFilePreviewModalContext/cellsFilePreviewModalContext';
+import {getBulkMoveOutcomeEvidence} from './getBulkMoveOutcomeEvidence';
 
 import {CellsSortDirection} from '../common/cellsSortIcon/cellsSortIcon';
 import {CellsSortField, SORTABLE_COLUMN_FIELD, toAriaSort} from '../common/useCellsSorting/useCellsSorting';
 import {getSharedDriveDroppedFiles} from '../getSharedDriveDroppedFiles';
+import {moveStatusMessageKey} from '../sharedDriveMoveStatusMessages';
 
 interface CellsTableProps {
   nodes: CellNode[];
@@ -74,6 +86,7 @@ interface CellsTableProps {
   conversationQualifiedId: QualifiedId;
   conversationName: string;
   onRefresh: () => void;
+  onRefreshAfterBulkMoveOutcome: () => Promise<boolean>;
   onCloseSearchView?: () => void;
   folderDropResetKey?: number;
   onFolderDropTargetChange?: (folderName: string | null) => void;
@@ -119,6 +132,31 @@ const dragEventContainsFiles = (event: DragEvent<HTMLElement>): boolean => {
   return Array.from(event.dataTransfer.types).includes('Files');
 };
 
+const getSelectedFilesTotalSize = (nodes: CellNode[]): Maybe<number> => {
+  if (nodes.length === 0) {
+    return Maybe.nothing();
+  }
+
+  let totalBytes = 0;
+  for (const node of nodes) {
+    if (node.type !== CellNodeType.FILE || maybe.isNothing(node.sizeBytes)) {
+      return Maybe.nothing();
+    }
+
+    const fileBytes = node.sizeBytes.value;
+    if (!Number.isSafeInteger(fileBytes) || fileBytes < 0) {
+      return Maybe.nothing();
+    }
+
+    totalBytes += fileBytes;
+    if (!Number.isSafeInteger(totalBytes)) {
+      return Maybe.nothing();
+    }
+  }
+
+  return Maybe.just(totalBytes);
+};
+
 const preventDefaultFileDrop = (event: DragEvent<HTMLElement>): void => {
   event.preventDefault();
   event.stopPropagation();
@@ -137,6 +175,7 @@ export const CellsTable = ({
   conversationQualifiedId,
   conversationName,
   onRefresh,
+  onRefreshAfterBulkMoveOutcome,
   onCloseSearchView,
   folderDropResetKey,
   onFolderDropTargetChange,
@@ -151,33 +190,85 @@ export const CellsTable = ({
   random = Math.random,
 }: CellsTableProps): ReactElement => {
   const {clock, translate, isFeatureToggleEnabled} = useApplicationContext();
+  const {updateMoveStatus, createMoveStatusId, clearMoveStatus} = useSharedDriveUploadStatus();
+  const backgroundMoveSummary = useRef<Maybe<SharedDriveMoveSummary>>(Maybe.nothing());
+  const activeMoveStatusId = useRef<Maybe<string>>(Maybe.nothing());
   const canPerformCurrentDriveAction = useCellsActionPermissions();
   const isSelectionEnabled = selectionEnabled && isFeatureToggleEnabled(driveBulkActionsFeatureToggleName);
   const [selectedNodeIds, setSelectedNodeIds] = useState<Set<string>>(() => {
     return new Set();
   });
   const [isBulkMovePreviewOpen, setIsBulkMovePreviewOpen] = useState(false);
-  const [isBackgroundMovePending, setIsBackgroundMovePending] = useState(false);
-  const [isBackgroundMoveError, setIsBackgroundMoveError] = useState(false);
-  const [isBackgroundMoveRetryBlocked, setIsBackgroundMoveRetryBlocked] = useState(false);
-  const [isBackgroundMoveStatusUnknown, setIsBackgroundMoveStatusUnknown] = useState(false);
+  const [moveState, dispatchMove] = useReducer(bulkMoveReducer, {kind: 'idle'});
+  const isBulkMoveRequestPending = moveState.kind === 'request-pending';
+  const isBackgroundMovePending = moveState.kind === 'background-pending';
+  const isBulkMoveOutcomeUnresolved = moveState.kind === 'needs-review';
+  const isBackgroundMoveError = moveState.kind === 'needs-review' && moveState.reason === 'failed';
+  const isBackgroundMoveStatusUnknown = moveState.kind === 'needs-review' && moveState.reason === 'status-unknown';
+  const isBackgroundMoveRetryBlocked = moveState.kind === 'needs-review' && moveState.reason !== 'status-unknown';
+  const isRefreshingBulkMoveOutcome = moveState.kind === 'needs-review' && moveState.refresh === 'refreshing';
+  const didBulkMoveOutcomeRefreshFail = moveState.kind === 'needs-review' && moveState.refresh === 'failed';
+  const isMovePendingRef = useRef(false);
+  isMovePendingRef.current = isBulkMoveRequestPending || isBackgroundMovePending;
   const [backgroundMoveJobUuids, setBackgroundMoveJobUuids] = useState<string[]>([]);
+  const [backgroundMoveStatusId, setBackgroundMoveStatusId] = useState('');
   const [backgroundMoveStatusCheckId, setBackgroundMoveStatusCheckId] = useState(0);
-  const [isBulkMoveOutcomeUnresolved, setIsBulkMoveOutcomeUnresolved] = useState(false);
-  const [isBulkMoveRequestError, setIsBulkMoveRequestError] = useState(false);
 
   useEffect(() => {
+    if (isMovePendingRef.current) {
+      return;
+    }
+
     setSelectedNodeIds(new Set());
     setIsBulkMovePreviewOpen(false);
   }, [selectionScopeKey, isSelectionEnabled]);
 
   const handleBulkMoveRequestError = (): void => {
-    setIsBulkMoveOutcomeUnresolved(true);
-    setIsBulkMoveRequestError(true);
+    if (maybe.isJust(activeMoveStatusId.current) && maybe.isJust(backgroundMoveSummary.current)) {
+      updateMoveStatus({
+        id: activeMoveStatusId.current.value,
+        kind: 'request-failed',
+        ...backgroundMoveSummary.current.value,
+      });
+    }
+    backgroundMoveSummary.current = Maybe.nothing();
+    dispatchMove({type: 'needs-review', reason: 'request-failed'});
+    setIsBulkMovePreviewOpen(false);
+  };
+
+  const handleRefreshAfterBulkMoveOutcome = async (): Promise<void> => {
+    if (isRefreshingBulkMoveOutcome) {
+      return;
+    }
+
+    dispatchMove({type: 'refresh-started'});
+    const wasRefreshSuccessful = await onRefreshAfterBulkMoveOutcome();
+    if (!wasRefreshSuccessful) {
+      dispatchMove({type: 'refresh-failed'});
+      return;
+    }
+
+    if (maybe.isJust(activeMoveStatusId.current)) {
+      clearMoveStatus(activeMoveStatusId.current.value);
+    }
+    activeMoveStatusId.current = Maybe.nothing();
+    backgroundMoveSummary.current = Maybe.nothing();
+    setSelectedNodeIds(new Set());
+    dispatchMove({type: 'resolved'});
+    setIsBulkMovePreviewOpen(false);
+  };
+
+  const handleBulkMoveStart = (summary: SharedDriveMoveSummary): void => {
+    const id = createMoveStatusId();
+    activeMoveStatusId.current = Maybe.just(id);
+    backgroundMoveSummary.current = Maybe.just(summary);
+    dispatchMove({type: 'request-started'});
+    setIsBulkMovePreviewOpen(false);
+    updateMoveStatus({id, kind: 'processing', ...summary});
   };
 
   useEffect(() => {
-    if (backgroundMoveJobUuids.length === 0) {
+    if (backgroundMoveJobUuids.length === 0 || backgroundMoveStatusId.length === 0) {
       return undefined;
     }
 
@@ -189,10 +280,15 @@ export const CellsTable = ({
         void checkBackgroundMoveStatus();
       }, delay);
     };
+    const moveStatusId = backgroundMoveStatusId;
     const handleUnknownStatus = (): void => {
       if (retryCount >= MAX_BACKGROUND_MOVE_STATUS_RETRIES) {
-        setIsBackgroundMovePending(false);
-        setIsBackgroundMoveStatusUnknown(true);
+        if (maybe.isJust(backgroundMoveSummary.current)) {
+          updateMoveStatus({id: moveStatusId, kind: 'status-unknown', ...backgroundMoveSummary.current.value});
+        }
+        activeMoveStatusId.current = Maybe.just(moveStatusId);
+        dispatchMove({type: 'needs-review', reason: 'status-unknown'});
+        setIsBulkMovePreviewOpen(false);
         return;
       }
 
@@ -221,8 +317,11 @@ export const CellsTable = ({
         return;
       }
 
-      const statuses = statusResults.map(statusResult => {
-        return statusResult.isOk ? statusResult.value.Status : undefined;
+      const backgroundActions = statusResults.map(statusResult => {
+        return statusResult.isOk ? statusResult.value : undefined;
+      });
+      const statuses = backgroundActions.map(action => {
+        return action?.Status;
       });
       if (
         statuses.some(status => {
@@ -233,17 +332,23 @@ export const CellsTable = ({
         return;
       }
       retryCount = 0;
+      if (maybe.isJust(backgroundMoveSummary.current)) {
+        updateMoveStatus({id: moveStatusId, kind: 'processing', ...backgroundMoveSummary.current.value});
+      }
       const areAllJobsFinished = statuses.every(status => {
         return status === JobsTaskStatus.Finished;
       });
       if (areAllJobsFinished) {
+        if (maybe.isJust(backgroundMoveSummary.current)) {
+          updateMoveStatus({id: moveStatusId, kind: 'completed', ...backgroundMoveSummary.current.value});
+        }
+        activeMoveStatusId.current = Maybe.nothing();
+        backgroundMoveSummary.current = Maybe.nothing();
+        setBackgroundMoveStatusId('');
         setBackgroundMoveJobUuids([]);
-        setIsBackgroundMovePending(false);
-        setIsBackgroundMoveError(false);
-        setIsBulkMoveOutcomeUnresolved(false);
-        setIsBulkMoveRequestError(false);
-        onRefresh();
+        dispatchMove({type: 'resolved'});
         setIsBulkMovePreviewOpen(false);
+        onRefresh();
         return;
       }
 
@@ -257,12 +362,31 @@ export const CellsTable = ({
         return;
       }
 
+      const hasFinishedJob = statuses.some(status => {
+        return status === JobsTaskStatus.Finished;
+      });
+      if (hasFinishedJob) {
+        if (maybe.isJust(backgroundMoveSummary.current)) {
+          updateMoveStatus({id: moveStatusId, kind: 'partial', ...backgroundMoveSummary.current.value});
+        }
+        activeMoveStatusId.current = Maybe.just(moveStatusId);
+        setBackgroundMoveJobUuids([]);
+        dispatchMove({type: 'needs-review', reason: 'partial'});
+        backgroundMoveSummary.current = Maybe.nothing();
+        setBackgroundMoveStatusId('');
+        setIsBulkMovePreviewOpen(false);
+        return;
+      }
+
+      if (maybe.isJust(backgroundMoveSummary.current)) {
+        updateMoveStatus({id: moveStatusId, kind: 'failed', ...backgroundMoveSummary.current.value});
+      }
+      activeMoveStatusId.current = Maybe.just(moveStatusId);
       setBackgroundMoveJobUuids([]);
-      setIsBackgroundMovePending(false);
-      setIsBackgroundMoveRetryBlocked(true);
-      setIsBackgroundMoveStatusUnknown(false);
-      setIsBackgroundMoveError(true);
-      onRefresh();
+      dispatchMove({type: 'needs-review', reason: 'failed'});
+      backgroundMoveSummary.current = Maybe.nothing();
+      setBackgroundMoveStatusId('');
+      setIsBulkMovePreviewOpen(false);
     };
 
     void checkBackgroundMoveStatus();
@@ -273,7 +397,17 @@ export const CellsTable = ({
         clock.clearTimeout(timeout);
       }
     };
-  }, [backgroundMoveJobUuids, backgroundMoveStatusCheckId, cellsRepository, clock, onRefresh, random]);
+  }, [
+    backgroundMoveJobUuids,
+    backgroundMoveStatusId,
+    backgroundMoveStatusCheckId,
+    cellsRepository,
+    clock,
+    clearMoveStatus,
+    onRefresh,
+    random,
+    updateMoveStatus,
+  ]);
 
   useEffect(() => {
     const currentNodeIds = new Set<string>();
@@ -291,31 +425,69 @@ export const CellsTable = ({
     });
   }, [nodes]);
 
-  const handleBulkMoveResult = (response: RestPerformActionResponse): void => {
-    setIsBackgroundMoveError(false);
-    setIsBackgroundMoveRetryBlocked(false);
-    setIsBackgroundMoveStatusUnknown(false);
-    if (response.Status === RestActionStatus.Performed) {
-      setIsBulkMoveOutcomeUnresolved(false);
-      setIsBulkMoveRequestError(false);
-      onRefresh();
-      return;
+  const handleBulkMoveResult = (response: RestPerformActionResponse, summary: SharedDriveMoveSummary): boolean => {
+    const moveStatusId = maybe.isJust(activeMoveStatusId.current)
+      ? activeMoveStatusId.current.value
+      : createMoveStatusId();
+    const outcomeEvidence = getBulkMoveOutcomeEvidence(
+      response.AffectedNodes,
+      summary.items.map(({id}) => {
+        return id;
+      }),
+    );
+    const hasFinishedMoveJobs =
+      response.BackgroundActions !== undefined &&
+      response.BackgroundActions.length > 0 &&
+      response.BackgroundActions.every(action => {
+        return action.Name === 'move' && isNonEmptyString(action.JobUuid) && action.Status === JobsTaskStatus.Finished;
+      });
+    // Cells 5.0.3 returns awaited job statuses without AffectedNodes.
+    const isMoveComplete =
+      outcomeEvidence === 'complete' || (response.AffectedNodes === undefined && hasFinishedMoveJobs);
+    if (response.Status === RestActionStatus.Performed && !isMoveComplete) {
+      updateMoveStatus({
+        id: moveStatusId,
+        kind: outcomeEvidence === 'partial' ? 'partial' : 'finished-unknown',
+        ...summary,
+      });
+      activeMoveStatusId.current = Maybe.just(moveStatusId);
+      backgroundMoveSummary.current = Maybe.nothing();
+      dispatchMove({type: 'needs-review', reason: outcomeEvidence === 'partial' ? 'partial' : 'finished-unknown'});
+      setIsBulkMovePreviewOpen(false);
+      return false;
     }
 
-    setIsBulkMoveOutcomeUnresolved(true);
-    setIsBulkMoveRequestError(false);
-    setIsBackgroundMovePending(true);
+    if (response.Status === RestActionStatus.Performed) {
+      updateMoveStatus({id: moveStatusId, kind: 'completed', ...summary});
+      activeMoveStatusId.current = Maybe.nothing();
+      backgroundMoveSummary.current = Maybe.nothing();
+      dispatchMove({type: 'resolved'});
+      onRefresh();
+      return true;
+    }
+
     const moveJobUuids = response.BackgroundActions?.filter(action => {
       return action.Name === 'move' && isNonEmptyString(action.JobUuid);
     }).map(action => {
       return action.JobUuid;
     });
     const uniqueMoveJobUuids = [...new Set(moveJobUuids ?? [])];
-    setBackgroundMoveJobUuids(uniqueMoveJobUuids);
     if (uniqueMoveJobUuids.length === 0) {
-      setIsBackgroundMovePending(false);
-      setIsBackgroundMoveStatusUnknown(true);
+      updateMoveStatus({id: moveStatusId, kind: 'status-unknown', ...summary});
+      activeMoveStatusId.current = Maybe.just(moveStatusId);
+      backgroundMoveSummary.current = Maybe.nothing();
+      dispatchMove({type: 'needs-review', reason: 'status-unknown'});
+      setIsBulkMovePreviewOpen(false);
+      return false;
     }
+
+    activeMoveStatusId.current = Maybe.nothing();
+    backgroundMoveSummary.current = Maybe.just(summary);
+    setBackgroundMoveStatusId(moveStatusId);
+    setBackgroundMoveJobUuids(uniqueMoveJobUuids);
+    dispatchMove({type: 'background-started'});
+    updateMoveStatus({id: moveStatusId, kind: 'processing', ...summary});
+    return true;
   };
 
   const handleRetryBackgroundMoveStatus = (): void => {
@@ -323,8 +495,14 @@ export const CellsTable = ({
       return;
     }
 
-    setIsBackgroundMoveStatusUnknown(false);
-    setIsBackgroundMovePending(true);
+    dispatchMove({type: 'background-started'});
+    if (maybe.isJust(backgroundMoveSummary.current)) {
+      updateMoveStatus({
+        id: backgroundMoveStatusId,
+        kind: 'processing',
+        ...backgroundMoveSummary.current.value,
+      });
+    }
     setBackgroundMoveStatusCheckId(currentCheckId => {
       return currentCheckId + 1;
     });
@@ -368,7 +546,7 @@ export const CellsTable = ({
       onToggleSort,
       selectedNodeIds,
       onToggleSelection: handleToggleSelection,
-      selectionEnabled: isSelectionEnabled,
+      selectionEnabled: isSelectionEnabled && !isBulkMoveOutcomeUnresolved,
     }),
     getCoreRowModel: getCoreRowModel(),
   });
@@ -377,8 +555,13 @@ export const CellsTable = ({
   const selectedNodes = nodes.filter(node => {
     return selectedNodeIds.has(node.id);
   });
+  const selectedFilesTotalSize =
+    selectedNodes.length === selectedNodeIds.size ? getSelectedFilesTotalSize(selectedNodes) : Maybe.nothing();
   const canMoveSelection =
     selectedNodes.length > 0 &&
+    !isBulkMoveOutcomeUnresolved &&
+    !isBulkMoveRequestPending &&
+    !isBackgroundMovePending &&
     !isInRecycleBin() &&
     canPerformCurrentDriveAction(CELLS_ACTION.MOVE) &&
     selectedNodes.every(node => {
@@ -467,64 +650,79 @@ export const CellsTable = ({
     };
   };
 
+  const moveOutcomeMessage = moveState.kind === 'needs-review' ? translate(moveStatusMessageKey[moveState.reason]) : '';
+
   return (
     <CellsFilePreviewModalProvider>
       <div css={tableWrapperStyles}>
         {isSelectionEnabled &&
+          !isBulkMoveOutcomeUnresolved &&
           selectionBarAnchor !== null &&
           createPortal(
             <div css={selectionBarContainerStyles}>
-              {isBulkMoveOutcomeUnresolved && (
-                <p role="status">
-                  {isBulkMoveRequestError
-                    ? translate('cells.newItemMenuModalForm.genericError')
-                    : translate('cells.bulkMove.outcomeUnresolved')}
-                </p>
-              )}
-              <CellsSelectionBar
-                selectedCount={selectedNodeIds.size}
-                onClear={() => {
-                  return setSelectedNodeIds(new Set());
-                }}
-              />
-              {canMoveSelection && (
-                <button
-                  css={bulkMoveButtonStyles}
-                  type="button"
-                  aria-haspopup="dialog"
-                  onClick={() => {
-                    return setIsBulkMovePreviewOpen(true);
-                  }}
-                >
-                  {translate('cells.selection.move')}
-                </button>
+              {selectedNodeIds.size > 0 && (
+                <div css={selectionBarStyles} role="status" aria-live="polite">
+                  <button
+                    css={clearSelectionButtonStyles}
+                    type="button"
+                    aria-label={translate('cells.selection.clear')}
+                    onClick={() => {
+                      return setSelectedNodeIds(new Set());
+                    }}
+                  >
+                    <CloseIcon aria-hidden="true" />
+                  </button>
+                  <span css={selectionCountStyles}>
+                    {translate('cells.selection.selectedCount', {count: selectedNodeIds.size})}
+                  </span>
+                  {maybe.isJust(selectedFilesTotalSize) && (
+                    <span css={selectionSizeStyles}>{formatBytes(selectedFilesTotalSize.value)}</span>
+                  )}
+                  {canMoveSelection && (
+                    <button
+                      css={bulkMoveButtonStyles}
+                      type="button"
+                      aria-haspopup="dialog"
+                      onClick={() => {
+                        return setIsBulkMovePreviewOpen(true);
+                      }}
+                    >
+                      <ArrowIcon direction="right" aria-hidden="true" focusable="false" />
+                      {translate('cells.selection.move')}
+                    </button>
+                  )}
+                </div>
               )}
             </div>,
             selectionBarAnchor,
           )}
-        {isBulkMovePreviewOpen && canMoveSelection && (
-          <CellsBulkMovePreviewModal
-            isOpen
-            onClose={() => {
-              return setIsBulkMovePreviewOpen(false);
-            }}
-            selectedNodes={selectedNodes}
-            cellsRepository={cellsRepository}
-            conversationQualifiedId={conversationQualifiedId}
-            conversationName={conversationName}
-            isMoveOutcomeUnresolved={isBulkMoveOutcomeUnresolved}
-            isMoveRequestError={isBulkMoveRequestError}
-            onMoveResult={handleBulkMoveResult}
-            onMoveError={handleBulkMoveRequestError}
-            isBackgroundMovePending={isBackgroundMovePending}
-            isBackgroundMoveError={isBackgroundMoveError}
-            isBackgroundMoveRetryBlocked={isBackgroundMoveRetryBlocked}
-            isBackgroundMoveStatusUnknown={isBackgroundMoveStatusUnknown}
-            canRetryBackgroundMoveStatus={backgroundMoveJobUuids.length > 0}
-            onRetryBackgroundMoveStatus={handleRetryBackgroundMoveStatus}
-            onRefresh={onRefresh}
-          />
-        )}
+        {(isBulkMovePreviewOpen || isBulkMoveRequestPending || isBackgroundMovePending) &&
+          (canMoveSelection ||
+            isBulkMoveOutcomeUnresolved ||
+            isBulkMoveRequestPending ||
+            isBackgroundMovePending ||
+            isBackgroundMoveError ||
+            isBackgroundMoveStatusUnknown) && (
+            <CellsBulkMovePreviewModal
+              isOpen={isBulkMovePreviewOpen}
+              onClose={() => {
+                return setIsBulkMovePreviewOpen(false);
+              }}
+              selectedNodes={selectedNodes}
+              cellsRepository={cellsRepository}
+              conversationQualifiedId={conversationQualifiedId}
+              conversationName={conversationName}
+              isMoveOutcomeUnresolved={isBulkMoveOutcomeUnresolved}
+              isMoveRequestPending={isBulkMoveRequestPending}
+              onMoveStart={handleBulkMoveStart}
+              onMoveResult={handleBulkMoveResult}
+              onMoveError={handleBulkMoveRequestError}
+              isBackgroundMovePending={isBackgroundMovePending}
+              isBackgroundMoveError={isBackgroundMoveError}
+              isBackgroundMoveRetryBlocked={isBackgroundMoveRetryBlocked}
+              isBackgroundMoveStatusUnknown={isBackgroundMoveStatusUnknown}
+            />
+          )}
         {activeFolderDropTargetName !== null && (
           <div css={folderDropOverlayStyles} role="status">
             <UploadIcon width={24} height={24} aria-hidden="true" />
@@ -535,6 +733,36 @@ export const CellsTable = ({
                 {activeFolderDropTargetName}
               </span>
             </p>
+          </div>
+        )}
+        {isBulkMoveOutcomeUnresolved && (
+          <div css={moveOutcomeMessageStyles}>
+            <span>
+              {moveOutcomeMessage}
+              {didBulkMoveOutcomeRefreshFail && (
+                <span role="alert">{translate('cells.newItemMenuModalForm.genericError')}</span>
+              )}
+            </span>
+            <Button
+              variant={ButtonVariant.SECONDARY}
+              type="button"
+              onClick={() => {
+                void handleRefreshAfterBulkMoveOutcome();
+              }}
+              disabled={isRefreshingBulkMoveOutcome}
+            >
+              {translate('cells.bulkMove.refreshDrive')}
+            </Button>
+            {isBackgroundMoveStatusUnknown && backgroundMoveJobUuids.length > 0 && (
+              <Button
+                variant={ButtonVariant.SECONDARY}
+                type="button"
+                onClick={handleRetryBackgroundMoveStatus}
+                disabled={isBackgroundMovePending}
+              >
+                {translate('cells.bulkMove.checkStatus')}
+              </Button>
+            )}
           </div>
         )}
         <table css={tableStyles}>

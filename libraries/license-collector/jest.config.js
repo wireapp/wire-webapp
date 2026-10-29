@@ -17,19 +17,25 @@
  *
  */
 
+const rootJestConfiguration = require('../../jest.config.js');
+
 module.exports = {
   displayName: 'license-collector-lib',
   testEnvironment: 'node',
   clearMocks: true,
+  passWithNoTests: true,
   transform: {
     '^.+\\.(ts|tsx)$': '@swc/jest',
     '^.+\\.(js|jsx)$': '@swc/jest',
   },
-  coverageDirectory: '../../coverage/libraries/license-collector',
+  cacheDirectory: '../../target/jest/cache',
+  coverageDirectory: '../../target/coverage/libraries/license-collector',
+  coverageReporters: rootJestConfiguration.coverageReporters,
   testMatch: [
     '<rootDir>/src/**/__tests__/**/*.[jt]s?(x)',
     '<rootDir>/src/**/?(*.)+(spec|test).[jt]s?(x)',
     '<rootDir>/spec/**/*.[jt]s?(x)',
   ],
   moduleFileExtensions: ['js', 'json', 'ts', 'tsx'],
+  reporters: rootJestConfiguration.reporters,
 };

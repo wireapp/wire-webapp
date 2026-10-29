@@ -17,12 +17,22 @@
  *
  */
 
-import type {FunctionComponent} from 'react';
+import {useEffect, useState, type FunctionComponent} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import type {RestPerformActionResponse} from 'cells-sdk-ts';
 
+import {
+  CELLS_ACTION,
+  useCellsActionPermissions,
+} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
+import {useCellsNewFolderForm} from 'Components/conversation/conversationCells/common/useCellsNewNodeForm/useCellsNewFolderForm';
+import type {
+  SharedDriveMoveItem,
+  SharedDriveMoveSummary,
+} from 'Components/conversation/conversationCells/sharedDriveUploadStatusContext';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CellNode} from 'src/script/types/cellNode';
 
 import {CellsBulkMovePreviewPresentation} from './cellsBulkMovePreviewPresentation';
@@ -37,16 +47,14 @@ interface CellsBulkMovePreviewModalProps {
   conversationQualifiedId: QualifiedId;
   conversationName: string;
   isMoveOutcomeUnresolved: boolean;
-  isMoveRequestError: boolean;
-  onMoveResult: (response: RestPerformActionResponse) => void;
+  isMoveRequestPending: boolean;
+  onMoveStart: (summary: SharedDriveMoveSummary) => void;
+  onMoveResult: (response: RestPerformActionResponse, summary: SharedDriveMoveSummary) => boolean;
   onMoveError: () => void;
   isBackgroundMovePending: boolean;
   isBackgroundMoveError: boolean;
   isBackgroundMoveRetryBlocked: boolean;
   isBackgroundMoveStatusUnknown: boolean;
-  canRetryBackgroundMoveStatus: boolean;
-  onRetryBackgroundMoveStatus: () => void;
-  onRefresh: () => void;
 }
 
 export const CellsBulkMovePreviewModal: FunctionComponent<CellsBulkMovePreviewModalProps> = ({
@@ -57,17 +65,19 @@ export const CellsBulkMovePreviewModal: FunctionComponent<CellsBulkMovePreviewMo
   conversationQualifiedId,
   conversationName,
   isMoveOutcomeUnresolved,
-  isMoveRequestError,
+  isMoveRequestPending,
+  onMoveStart,
   onMoveResult,
   onMoveError,
   isBackgroundMovePending,
   isBackgroundMoveError,
   isBackgroundMoveRetryBlocked,
   isBackgroundMoveStatusUnknown,
-  canRetryBackgroundMoveStatus,
-  onRetryBackgroundMoveStatus,
-  onRefresh,
 }: CellsBulkMovePreviewModalProps) => {
+  const {fireAndForgetInvoker, translate} = useApplicationContext();
+  const canPerformDriveAction = useCellsActionPermissions();
+  const [activeModalContent, setActiveModalContent] = useState<'move' | 'create'>('move');
+  const hasCreatePermission = canPerformDriveAction(CELLS_ACTION.CREATE);
   const destination = useBulkMoveDestinationSelection({
     isOpen,
     selectedNodes,
@@ -80,8 +90,65 @@ export const CellsBulkMovePreviewModal: FunctionComponent<CellsBulkMovePreviewMo
     selectedNodes,
     cellsRepository,
   });
+  const folderCreationForm = useCellsNewFolderForm({
+    cellsRepository,
+    conversationQualifiedId,
+    onSuccess: () => {
+      fireAndForgetInvoker.fireAndForget(destination.refresh);
+      setActiveModalContent('move');
+    },
+    currentPath: destination.currentPath,
+    isOpen: isOpen && activeModalContent === 'create',
+    validationCopy: {
+      genericError: translate('cells.newItemMenuModalForm.genericError'),
+      alreadyExistsError: translate('cells.newItemMenuModalForm.alreadyExistsError'),
+      invalidCharactersError: translate('cells.nodeName.invalidCharactersError'),
+      maxLengthError: translate('cells.newItemMenuModalForm.maxLengthError'),
+      nameRequired: translate('cells.newItemMenuModalForm.nameRequired'),
+    },
+  });
+  useEffect(() => {
+    if (isOpen) {
+      setActiveModalContent('move');
+    }
+  }, [isOpen]);
+  useEffect(() => {
+    if (!hasCreatePermission) {
+      setActiveModalContent('move');
+    }
+  }, [hasCreatePermission]);
+
+  const canCreateNewFolder =
+    isOpen &&
+    hasCreatePermission &&
+    !folderCreationForm.isSubmitting &&
+    !move.isSubmitting &&
+    !isMoveRequestPending &&
+    !isMoveOutcomeUnresolved &&
+    !isBackgroundMovePending &&
+    !isBackgroundMoveRetryBlocked &&
+    !isBackgroundMoveError &&
+    !isBackgroundMoveStatusUnknown;
+
+  const handleCreateFolder = (event: Parameters<typeof folderCreationForm.handleSubmit>[0]): Promise<void> => {
+    if (!hasCreatePermission) {
+      setActiveModalContent('move');
+      return Promise.resolve();
+    }
+
+    return folderCreationForm.handleSubmit(event);
+  };
+
+  const handleChangeModalContent = (content: 'move' | 'create'): void => {
+    if (folderCreationForm.isSubmitting) {
+      return;
+    }
+
+    setActiveModalContent(content);
+  };
+
   const handleClose = (): void => {
-    if (move.isSubmitting) {
+    if (folderCreationForm.isSubmitting || move.isSubmitting || isMoveRequestPending || isBackgroundMovePending) {
       return;
     }
 
@@ -95,14 +162,18 @@ export const CellsBulkMovePreviewModal: FunctionComponent<CellsBulkMovePreviewMo
       conversationName={conversationName}
       destination={destination}
       onMove={move.submitMove}
+      onMoveStart={onMoveStart}
       onMoveResult={onMoveResult}
+      selectedItems={selectedNodes.map((node): SharedDriveMoveItem => {
+        return {id: node.id, name: node.name, isFolder: node.type === 'folder'};
+      })}
+      destinationPath={destination.selectedDestinationPath}
       onMoveError={onMoveError}
-      isMoveOutcomeUnresolved={isMoveOutcomeUnresolved}
-      isMoveRequestError={isMoveRequestError}
       isMoveDisabled={
         !move.isValid ||
         destination.disabledDestinationPaths.includes(destination.selectedDestinationPath) ||
         move.isSubmitting ||
+        isMoveRequestPending ||
         isMoveOutcomeUnresolved ||
         isBackgroundMovePending ||
         isBackgroundMoveRetryBlocked ||
@@ -110,11 +181,11 @@ export const CellsBulkMovePreviewModal: FunctionComponent<CellsBulkMovePreviewMo
         destination.status !== 'success'
       }
       isMoveLoading={move.isSubmitting}
-      isBackgroundMoveError={isBackgroundMoveError}
-      isBackgroundMoveStatusUnknown={isBackgroundMoveStatusUnknown}
-      canRetryBackgroundMoveStatus={canRetryBackgroundMoveStatus}
-      onRetryBackgroundMoveStatus={onRetryBackgroundMoveStatus}
-      onRefresh={onRefresh}
+      isBackgroundMovePending={isBackgroundMovePending}
+      activeModalContent={activeModalContent}
+      onChangeModalContent={handleChangeModalContent}
+      canCreateNewFolder={canCreateNewFolder}
+      folderCreationForm={{...folderCreationForm, handleSubmit: handleCreateFolder}}
     />
   );
 };

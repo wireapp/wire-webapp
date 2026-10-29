@@ -242,6 +242,18 @@ describe('meetingSchema', () => {
     expect(result.data).not.toHaveProperty('trial');
   });
 
+  it.each(Object.values(MeetingRecurrenceFrequency))('accepts %s meeting recurrence', frequency => {
+    const actualMeeting = meetingSchema.parse({...validMeeting, recurrence: {frequency}});
+
+    expect(actualMeeting.recurrence?.frequency).toBe(frequency);
+  });
+
+  it.each(['WEEKLY', 'hourly', 0])('rejects invalid meeting recurrence %s', frequency => {
+    const actualResult = meetingSchema.safeParse({...validMeeting, recurrence: {frequency}});
+
+    expect(actualResult.success).toBe(false);
+  });
+
   it('accepts optional recurrence and strips unknown backend fields', () => {
     const result = meetingSchema.safeParse({
       ...validMeeting,

@@ -1,3 +1,5 @@
+import {Maybe} from 'true-myth';
+
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 
 import {isBulkMoveValid} from './validateBulkMove';
@@ -10,6 +12,7 @@ const createNode = (path: string, type: CellNodeType): CellNode => {
     path,
     name: path.split('/').pop() ?? path,
     sizeMb: '1 MB',
+    sizeBytes: Maybe.nothing(),
     uploadedAtTimestamp: 0,
     owner: 'Owner',
     conversationName: 'Conversation',

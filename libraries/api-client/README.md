@@ -13,13 +13,6 @@ Wire for Web's API client.
 ### Getting Started
 
 ```bash
-npm install
-npm run start
-```
-
-### Installation
-
-```bash
 npm install @wireapp/api-client
 ```
 
@@ -86,6 +79,5 @@ node index.js --e="$EMAIL" --p="$PASSWORD"
 **Node**
 
 ```bash
-npm run dist
 node index.js --e="name@email.com" --p="password"
 ```

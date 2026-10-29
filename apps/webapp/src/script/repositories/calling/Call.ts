@@ -292,11 +292,11 @@ export class Call {
     this.pages(newPages);
   }
 
-  public useAvsRustSFT(): boolean {
+  public useAvsStagingSFT(): boolean {
     const conversationName = this.conversation.display_name();
     if (!conversationName.includes('Sync - Calling')) {
       return false;
     }
-    return window.wire?.app?.debug?.isEnabledAvsRustSFT() === true;
+    return window.wire?.app?.debug?.isEnabledAvsStagingSFT() === true;
   }
 }

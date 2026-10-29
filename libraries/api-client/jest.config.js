@@ -17,18 +17,20 @@
  *
  */
 
-const isContinuousIntegrationEnvironment = process.env.CI === 'true';
+const rootJestConfiguration = require('../../jest.config.js');
 
 module.exports = {
   displayName: 'api-client-lib',
   testEnvironment: 'node',
   clearMocks: true,
+  cacheDirectory: '../../target/jest/cache',
   transform: {
     '^.+\\.(ts|tsx)$': '@swc/jest',
     '^.+\\.(js|jsx)$': '@swc/jest',
   },
   transformIgnorePatterns: ['/node_modules/(?!(true-myth|p-timeout|p-cancelable|uuid|noop-esm|@sindresorhus/is)/)'],
-  coverageDirectory: '../../coverage/libraries/api-client',
+  coverageDirectory: '../../target/coverage/libraries/api-client',
+  coverageReporters: rootJestConfiguration.coverageReporters,
   coverageThreshold: {
     global: {
       branches: 50,
@@ -37,8 +39,7 @@ module.exports = {
       statements: 53,
     },
   },
-  coverageReporters: isContinuousIntegrationEnvironment ? ['html', 'lcov', 'text-summary'] : undefined,
   testMatch: ['<rootDir>/src/**/__tests__/**/*.[jt]s?(x)', '<rootDir>/src/**/?(*.)+(spec|test).[jt]s?(x)'],
   moduleFileExtensions: ['js', 'json', 'ts', 'tsx'],
-  reporters: isContinuousIntegrationEnvironment ? ['github-actions', 'summary'] : ['default'],
+  reporters: rootJestConfiguration.reporters,
 };

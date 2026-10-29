@@ -19,6 +19,6 @@
 
 import {z} from 'zod';
 
-export const translationFileSchema = z.record(z.string());
+export const translationFileSchema = z.record(z.string(), z.string());
 
 export type TranslationStringMap = z.infer<typeof translationFileSchema>;
