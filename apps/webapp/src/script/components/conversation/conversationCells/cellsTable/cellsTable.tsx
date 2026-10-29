@@ -198,6 +198,8 @@ const PERMANENT_DELETE_RECONCILIATION_STORAGE_KEY = 'wire.cells.pendingPermanent
 
 type PermanentDeleteReviewReason =
   'job-failed' | 'refresh-failed' | 'storage-failed' | 'still-visible' | 'timed-out' | 'request-timeout';
+type PermanentDeleteCheckingMessageKey =
+  'cells.bulkDelete.checking' | 'cells.bulkDelete.checkingAfterJobFailure' | 'cells.bulkDelete.retryingRefresh';
 type PermanentDeleteReviewMessageKey =
   | 'cells.bulkDelete.jobFailed'
   | 'cells.bulkDelete.refreshFailed'
@@ -294,8 +296,8 @@ const isAuthoritativePermanentDeleteRejection = (error: unknown): boolean => {
   return (
     error instanceof BackendError &&
     error.code !== undefined &&
-    error.code >= 400 &&
-    error.code < 500 &&
+    error.code >= StatusCode.BAD_REQUEST &&
+    error.code < StatusCode.INTERNAL_SERVER_ERROR &&
     error.code !== StatusCode.REQUEST_TIMEOUT
   );
 };
@@ -309,6 +311,19 @@ const hasPermanentDeleteJobFailure = (response: RestPerformActionResponse): bool
       );
     }) ?? false
   );
+};
+
+const getPermanentDeleteCheckingMessageKey = (
+  reason: PermanentDeleteReviewReason | null,
+): PermanentDeleteCheckingMessageKey => {
+  if (reason === 'job-failed') {
+    return 'cells.bulkDelete.checkingAfterJobFailure';
+  }
+  if (reason === 'refresh-failed') {
+    return 'cells.bulkDelete.retryingRefresh';
+  }
+
+  return 'cells.bulkDelete.checking';
 };
 
 const getPermanentDeleteReviewMessageKey = (
@@ -882,23 +897,35 @@ export const CellsTable = ({
         setIsWaitingForPermanentDeleteReconciliation(true);
       }
 
-      if (hasJobFailure && !hasPendingJob) {
-        clearPermanentDeleteReconciliationDeadline();
+      if (!wasRefreshSuccessful) {
+        setPermanentDeleteReviewReason('refresh-failed');
+      } else if (hasJobFailure) {
         setPermanentDeleteReviewReason('job-failed');
-        setIsPermanentDeleteReconciling(false);
-        return;
+      } else {
+        setPermanentDeleteReviewReason(null);
       }
 
       if (attempt >= MAX_PERMANENT_DELETE_RECONCILIATION_ATTEMPTS) {
         clearPermanentDeleteReconciliationDeadline();
-        setPermanentDeleteReviewReason(wasRefreshSuccessful ? 'timed-out' : 'refresh-failed');
+        if (!wasRefreshSuccessful) {
+          setPermanentDeleteReviewReason('refresh-failed');
+        } else if (hasJobFailure) {
+          setPermanentDeleteReviewReason('job-failed');
+        } else {
+          setPermanentDeleteReviewReason('timed-out');
+        }
         setIsPermanentDeleteReconciling(false);
         return;
       }
 
+      const nextContext = {
+        ...context,
+        jobUuids: hasPendingJob ? context.jobUuids : [],
+        hasKnownJobFailure: hasJobFailure,
+      };
       permanentDeleteReconciliationTimeoutRef.current = clock.setTimeout(() => {
         permanentDeleteReconciliationTimeoutRef.current = undefined;
-        void runPermanentDeleteReconciliation(context, generation, attempt + 1);
+        void runPermanentDeleteReconciliation(nextContext, generation, attempt + 1);
       }, PERMANENT_DELETE_RECONCILIATION_INTERVAL_MS);
     } finally {
       permanentDeleteReconciliationRequestInFlightRef.current = false;
@@ -1347,7 +1374,7 @@ export const CellsTable = ({
         {isPermanentDeleteUnresolved && isPermanentDeleteReconciling && (
           <div css={permanentDeleteProgressStyles} role="status" aria-live="polite">
             <SharedDriveUploadSpinnerIcon color="var(--accent-color)" width={16} height={16} aria-hidden="true" />
-            <span>{translate('cells.bulkDelete.checking')}</span>
+            <span>{translate(getPermanentDeleteCheckingMessageKey(permanentDeleteReviewReason))}</span>
           </div>
         )}
         {isPermanentDeleteRejected && !isPermanentDeleteUnresolved && (

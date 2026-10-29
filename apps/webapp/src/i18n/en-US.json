@@ -391,6 +391,8 @@
   "cells.bulkDelete.confirmation.multiple": "Permanently delete {count} selected items? Any selected folders and their contents will also be deleted. This cannot be undone.",
   "cells.bulkDelete.confirmation.single": "Permanently delete the 1 selected item? Any selected folders and their contents will also be deleted. This cannot be undone.",
   "cells.bulkDelete.checking": "Checking the Bin for selected items…",
+  "cells.bulkDelete.checkingAfterJobFailure": "The delete job failed. Checking the Bin for remaining items…",
+  "cells.bulkDelete.retryingRefresh": "Could not refresh the Bin. Checking again…",
   "cells.bulkDelete.jobFailed": "The delete job failed. Refresh the Bin to check the selected items.",
   "cells.bulkDelete.refresh": "Refresh Bin",
   "cells.bulkDelete.refreshFailed": "Could not refresh the Bin. The delete outcome is still unknown.",

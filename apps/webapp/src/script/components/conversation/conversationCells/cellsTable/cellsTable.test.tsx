@@ -88,6 +88,12 @@ const translateSelectionForTest: Translate = (key, substitutions) => {
   if (key === 'cells.bulkDelete.checking') {
     return 'Checking the Bin for selected items…';
   }
+  if (key === 'cells.bulkDelete.checkingAfterJobFailure') {
+    return 'The delete job failed. Checking the Bin for remaining items…';
+  }
+  if (key === 'cells.bulkDelete.retryingRefresh') {
+    return 'Could not refresh the Bin. Checking again…';
+  }
   if (key === 'cells.bulkDelete.timedOut') {
     return 'Deletion is taking longer than expected. Refresh the Bin to check before taking further action.';
   }
@@ -941,7 +947,7 @@ describe('CellsTable selection', () => {
       await user.click(screen.getByRole('button', {name: 'Delete permanently'}));
       await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Delete'}));
 
-      expect(await screen.findByText('Checking the Bin for selected items…')).toBeInTheDocument();
+      expect(await screen.findByText('Could not refresh the Bin. Checking again…')).toBeInTheDocument();
       await waitFor(() => {
         expect(onRefreshAfterBulkMoveOutcome).toHaveBeenCalledTimes(1);
       });
@@ -968,7 +974,62 @@ describe('CellsTable selection', () => {
     }
   });
 
-  it('shows known delete-job failure separately and stops automatic checks', async () => {
+  it('reports failed Bin reads while reconciling a failed delete job', async () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files/recycle_bin';
+    const user = userEvent.setup();
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    const onRefreshAfterBulkMoveOutcome = jest
+      .fn()
+      .mockResolvedValueOnce(false)
+      .mockRejectedValueOnce(new Error('refresh failed'))
+      .mockResolvedValue(true);
+    const repository = {
+      deleteNodes: jest.fn().mockResolvedValue({
+        Status: 'Background',
+        BackgroundActions: [{Name: 'delete', JobUuid: 'delete-job'}],
+      }),
+      getBackgroundActionInfo: jest.fn().mockResolvedValue({
+        Name: 'delete',
+        JobUuid: 'delete-job',
+        Status: JobsTaskStatus.Error,
+      }),
+    } as unknown as CellsRepository;
+
+    try {
+      const view = renderCellsTable({cellsRepository: repository, onRefreshAfterBulkMoveOutcome, clock});
+      await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+      await user.click(screen.getByRole('button', {name: 'Delete permanently'}));
+      await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Delete'}));
+
+      expect(await screen.findByText('Could not refresh the Bin. Checking again…')).toBeInTheDocument();
+      await waitFor(() => {
+        expect(onRefreshAfterBulkMoveOutcome).toHaveBeenCalledTimes(1);
+      });
+
+      await act(async () => {
+        clock.advanceByMilliseconds(1000);
+        await waitFor(() => {
+          expect(onRefreshAfterBulkMoveOutcome).toHaveBeenCalledTimes(2);
+        });
+      });
+      expect(screen.getByText('Could not refresh the Bin. Checking again…')).toBeInTheDocument();
+
+      await act(async () => {
+        clock.advanceByMilliseconds(1000);
+        await waitFor(() => {
+          expect(onRefreshAfterBulkMoveOutcome).toHaveBeenCalledTimes(3);
+        });
+      });
+      expect(screen.getByText('The delete job failed. Checking the Bin for remaining items…')).toBeInTheDocument();
+      expect(repository.deleteNodes).toHaveBeenCalledTimes(1);
+      view.unmount();
+    } finally {
+      window.location.hash = originalHash;
+    }
+  });
+
+  it('keeps reconciling partial results after a delete job fails', async () => {
     const originalHash = window.location.hash;
     window.location.hash = '#/conversation/conversation-id@example.com/files/recycle_bin';
     const user = userEvent.setup();
@@ -988,24 +1049,55 @@ describe('CellsTable selection', () => {
     } as unknown as CellsRepository;
 
     try {
-      renderCellsTable({cellsRepository: repository, onRefreshAfterBulkMoveOutcome, clock});
+      const view = renderCellsTable({cellsRepository: repository, onRefreshAfterBulkMoveOutcome, clock});
+      onRefreshAfterBulkMoveOutcome
+        .mockImplementationOnce(async () => {
+          return true;
+        })
+        .mockImplementationOnce(async () => {
+          view.rerenderWithNodes([view.file]);
+          return true;
+        })
+        .mockImplementationOnce(async () => {
+          view.rerenderWithNodes([]);
+          return true;
+        });
       await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+      await user.click(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'}));
       await user.click(screen.getByRole('button', {name: 'Delete permanently'}));
       await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Delete'}));
 
-      expect(await screen.findByRole('alert')).toHaveTextContent(
-        'The delete job failed. Refresh the Bin to check the selected items.',
-      );
-      expect(screen.queryByText('Checking the Bin for selected items…')).not.toBeInTheDocument();
-      expect(screen.getByRole('button', {name: 'Refresh Bin'})).toBeInTheDocument();
+      expect(
+        await screen.findByText('The delete job failed. Checking the Bin for remaining items…'),
+      ).toBeInTheDocument();
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+      await waitFor(() => {
+        expect(onRefreshAfterBulkMoveOutcome).toHaveBeenCalledTimes(1);
+      });
       expect(repository.deleteNodes).toHaveBeenCalledTimes(1);
+      expect(repository.getBackgroundActionInfo).toHaveBeenCalledTimes(1);
 
       await act(async () => {
-        clock.advanceByMilliseconds(10_000);
-        await Promise.resolve();
+        clock.advanceByMilliseconds(1000);
+        await waitFor(() => {
+          expect(onRefreshAfterBulkMoveOutcome).toHaveBeenCalledTimes(2);
+        });
+      });
+      expect(screen.getByText('1 selected')).toBeInTheDocument();
+      expect(screen.getByText('The delete job failed. Checking the Bin for remaining items…')).toBeInTheDocument();
+      expect(screen.queryByRole('button', {name: 'Refresh Bin'})).not.toBeInTheDocument();
+
+      await act(async () => {
+        clock.advanceByMilliseconds(1000);
+        await waitFor(() => {
+          expect(onRefreshAfterBulkMoveOutcome).toHaveBeenCalledTimes(3);
+        });
+      });
+      await waitFor(() => {
+        expect(screen.queryByText('1 selected')).not.toBeInTheDocument();
       });
       expect(repository.getBackgroundActionInfo).toHaveBeenCalledTimes(1);
-      expect(onRefreshAfterBulkMoveOutcome).toHaveBeenCalledTimes(1);
+      expect(repository.deleteNodes).toHaveBeenCalledTimes(1);
     } finally {
       window.location.hash = originalHash;
     }
