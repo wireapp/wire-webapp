@@ -58,6 +58,11 @@ type ClearSearchRefreshOptions = {
   preserveFilters: boolean;
 };
 
+type ClearSearchOptions = {
+  preserveFilters?: boolean;
+  preserveInputValue?: boolean;
+};
+
 const DEBOUNCE_TIME = 300;
 
 const normalizeSearchQuery = (query: string): string => {
@@ -68,13 +73,7 @@ type UseConversationSearchFilesResult = {
   searchValue: string;
   handleSearch: (value: string) => void;
   handleReload: () => Promise<void>;
-  handleClearSearch: ({
-    preserveFilters,
-    preserveInputValue,
-  }?: {
-    preserveFilters?: boolean;
-    preserveInputValue?: boolean;
-  }) => void;
+  handleClearSearch: (options?: ClearSearchOptions) => void;
   loadMore: (offset: number) => Promise<void>;
 };
 export const useConversationSearchFiles = ({
@@ -268,10 +267,9 @@ export const useConversationSearchFiles = ({
     });
   };
 
-  const handleClearSearch = ({
-    preserveFilters = true,
-    preserveInputValue = false,
-  }: {preserveFilters?: boolean; preserveInputValue?: boolean} = {}): void => {
+  const handleClearSearch = (options: ClearSearchOptions = {}): void => {
+    const {preserveFilters = true, preserveInputValue = false} = options;
+
     searchNodesDebounced.cancel();
     requestVersionGate.current.invalidate();
     if (!preserveInputValue) {
