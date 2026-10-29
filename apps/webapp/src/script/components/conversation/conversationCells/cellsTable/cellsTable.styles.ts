@@ -32,13 +32,6 @@ export const wrapperWithRowsStyles: CSSObject = {
   marginBottom: 'auto',
 };
 
-export const permanentDeleteReloadLinkStyles: CSSObject = {
-  flexShrink: 0,
-  color: 'var(--accent-color)',
-  fontWeight: 'var(--font-weight-semibold)',
-  textDecoration: 'underline',
-};
-
 export const permanentDeleteProgressStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',

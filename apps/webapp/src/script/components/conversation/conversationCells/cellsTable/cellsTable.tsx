@@ -26,7 +26,6 @@ import {
   useRef,
   useState,
   type FunctionComponent,
-  type MouseEvent,
   type ReactElement,
 } from 'react';
 
@@ -80,7 +79,6 @@ import {
   headerCellStyles,
   moveOutcomeMessageStyles,
   permanentDeleteProgressStyles,
-  permanentDeleteReloadLinkStyles,
   tableActionsCellStyles,
   tableCellRow,
   tableCellStyles,
@@ -194,17 +192,12 @@ const MAX_BACKGROUND_MOVE_STATUS_RETRIES = 5;
 const PERMANENT_DELETE_RECONCILIATION_INTERVAL_MS = 1000;
 const PERMANENT_DELETE_RECONCILIATION_TIMEOUT_MS = 20_000;
 const MAX_PERMANENT_DELETE_RECONCILIATION_ATTEMPTS = 10;
-const PERMANENT_DELETE_RECONCILIATION_STORAGE_KEY = 'wire.cells.pendingPermanentDelete';
-
-type PermanentDeleteReviewReason =
-  'job-failed' | 'refresh-failed' | 'storage-failed' | 'still-visible' | 'timed-out' | 'request-timeout';
+type PermanentDeleteReviewReason = 'job-failed' | 'refresh-failed' | 'still-visible' | 'timed-out';
 type PermanentDeleteCheckingMessageKey =
   'cells.bulkDelete.checking' | 'cells.bulkDelete.checkingAfterJobFailure' | 'cells.bulkDelete.retryingRefresh';
 type PermanentDeleteReviewMessageKey =
   | 'cells.bulkDelete.jobFailed'
   | 'cells.bulkDelete.refreshFailed'
-  | 'cells.bulkDelete.requestTimedOut'
-  | 'cells.bulkDelete.storageFailed'
   | 'cells.bulkDelete.stillVisible'
   | 'cells.bulkDelete.timedOut';
 
@@ -223,65 +216,6 @@ const hasSameSelection = (selectedNodeIds: ReadonlySet<string>, nodeIds: readonl
       return selectedNodeIds.has(nodeId);
     })
   );
-};
-
-const clearStoredPermanentDeleteReconciliation = (): boolean => {
-  try {
-    window.sessionStorage.removeItem(PERMANENT_DELETE_RECONCILIATION_STORAGE_KEY);
-    return true;
-  } catch {
-    return false;
-  }
-};
-
-const storePermanentDeleteReconciliation = (context: PermanentDeleteReconciliationContext): boolean => {
-  try {
-    window.sessionStorage.setItem(PERMANENT_DELETE_RECONCILIATION_STORAGE_KEY, JSON.stringify(context));
-    return true;
-  } catch {
-    return false;
-  }
-};
-
-const getStoredPermanentDeleteReconciliation = (
-  scopeKey: string,
-  path: string,
-): PermanentDeleteReconciliationContext | null => {
-  let serializedContext: string | null;
-  try {
-    serializedContext = window.sessionStorage.getItem(PERMANENT_DELETE_RECONCILIATION_STORAGE_KEY);
-  } catch {
-    return null;
-  }
-  if (serializedContext === null) {
-    return null;
-  }
-
-  try {
-    const context = JSON.parse(serializedContext) as Partial<PermanentDeleteReconciliationContext>;
-    if (
-      context.scopeKey !== scopeKey ||
-      context.path !== path ||
-      !Array.isArray(context.nodeIds) ||
-      context.nodeIds.length === 0 ||
-      !context.nodeIds.every(isNonEmptyString) ||
-      !Array.isArray(context.jobUuids) ||
-      !context.jobUuids.every(isNonEmptyString) ||
-      typeof context.hasKnownJobFailure !== 'boolean'
-    ) {
-      return null;
-    }
-
-    return {
-      nodeIds: context.nodeIds,
-      scopeKey: context.scopeKey,
-      path: context.path,
-      jobUuids: context.jobUuids,
-      hasKnownJobFailure: context.hasKnownJobFailure,
-    };
-  } catch {
-    return null;
-  }
 };
 
 const getPermanentDeleteJobUuids = (response: RestPerformActionResponse): string[] => {
@@ -334,10 +268,6 @@ const getPermanentDeleteReviewMessageKey = (
       return 'cells.bulkDelete.jobFailed';
     case 'refresh-failed':
       return 'cells.bulkDelete.refreshFailed';
-    case 'request-timeout':
-      return 'cells.bulkDelete.requestTimedOut';
-    case 'storage-failed':
-      return 'cells.bulkDelete.storageFailed';
     case 'still-visible':
       return 'cells.bulkDelete.stillVisible';
     case 'timed-out':
@@ -384,7 +314,6 @@ export const CellsTable = ({
   random = Math.random,
 }: CellsTableProps): ReactElement => {
   const {clock, translate, isFeatureToggleEnabled} = useApplicationContext();
-  const currentPermanentDeletePath = getCellsFilesPath();
   const {updateMoveStatus, createMoveStatusId, clearMoveStatus} = useSharedDriveUploadStatus();
   const backgroundMoveSummary = useRef<Maybe<SharedDriveMoveSummary>>(Maybe.nothing());
   const activeMoveStatusId = useRef<Maybe<string>>(Maybe.nothing());
@@ -419,12 +348,8 @@ export const CellsTable = ({
   const isPermanentDeletePendingRef = useRef(false);
   const isPermanentDeleteUnresolvedRef = useRef(false);
   const pendingPermanentDeleteNodeIdsRef = useRef<string[]>([]);
-  const pendingPermanentDeleteContextRef = useRef<PermanentDeleteReconciliationContext | null>(null);
-  const startPermanentDeleteReconciliationRef = useRef<
-    ((context: PermanentDeleteReconciliationContext) => void) | null
-  >(null);
-  const hasRehydratedPermanentDeleteContextRef = useRef(false);
   const permanentDeleteReconciliationGenerationRef = useRef(0);
+  const permanentDeleteReconciliationRequestIdRef = useRef(0);
   const permanentDeleteReconciliationTimeoutRef = useRef<ReturnType<typeof clock.setTimeout> | undefined>(undefined);
   const permanentDeleteReconciliationDeadlineRef = useRef<ReturnType<typeof clock.setTimeout> | undefined>(undefined);
   const permanentDeleteReconciliationRequestInFlightRef = useRef(false);
@@ -453,6 +378,12 @@ export const CellsTable = ({
       permanentDeleteReconciliationTimeoutRef.current = undefined;
     }
     clearPermanentDeleteReconciliationDeadline();
+    permanentDeleteReconciliationRequestIdRef.current += 1;
+    permanentDeleteReconciliationRequestInFlightRef.current = false;
+    if (isMountedRef.current) {
+      setIsRefreshingPermanentDeleteReview(false);
+      setIsPermanentDeleteReconciliationRequestInFlight(false);
+    }
   }, [clearPermanentDeleteReconciliationDeadline, clock]);
   const [backgroundMoveJobUuids, setBackgroundMoveJobUuids] = useState<string[]>([]);
   const [backgroundMoveStatusId, setBackgroundMoveStatusId] = useState('');
@@ -469,7 +400,6 @@ export const CellsTable = ({
     setIsPermanentDeleteRejected(false);
     isPermanentDeleteUnresolvedRef.current = false;
     pendingPermanentDeleteNodeIdsRef.current = [];
-    pendingPermanentDeleteContextRef.current = null;
     setIsPermanentDeleteUnresolved(false);
     setIsPermanentDeleteReconciling(false);
     setIsWaitingForPermanentDeleteReconciliation(false);
@@ -501,8 +431,6 @@ export const CellsTable = ({
 
     cancelPermanentDeleteReconciliation();
     pendingPermanentDeleteNodeIdsRef.current = [];
-    pendingPermanentDeleteContextRef.current = null;
-    clearStoredPermanentDeleteReconciliation();
     setIsPermanentDeleteRejected(false);
     isPermanentDeleteUnresolvedRef.current = false;
     setIsPermanentDeleteUnresolved(false);
@@ -849,6 +777,8 @@ export const CellsTable = ({
       return;
     }
 
+    const requestId = permanentDeleteReconciliationRequestIdRef.current + 1;
+    permanentDeleteReconciliationRequestIdRef.current = requestId;
     permanentDeleteReconciliationRequestInFlightRef.current = true;
     setIsPermanentDeleteReconciliationRequestInFlight(true);
     try {
@@ -928,9 +858,11 @@ export const CellsTable = ({
         void runPermanentDeleteReconciliation(nextContext, generation, attempt + 1);
       }, PERMANENT_DELETE_RECONCILIATION_INTERVAL_MS);
     } finally {
-      permanentDeleteReconciliationRequestInFlightRef.current = false;
-      if (isMountedRef.current) {
-        setIsPermanentDeleteReconciliationRequestInFlight(false);
+      if (permanentDeleteReconciliationRequestIdRef.current === requestId) {
+        permanentDeleteReconciliationRequestInFlightRef.current = false;
+        if (isMountedRef.current) {
+          setIsPermanentDeleteReconciliationRequestInFlight(false);
+        }
       }
     }
   };
@@ -938,19 +870,12 @@ export const CellsTable = ({
   const startPermanentDeleteReconciliation = (context: PermanentDeleteReconciliationContext): void => {
     cancelPermanentDeleteReconciliation();
     const generation = permanentDeleteReconciliationGenerationRef.current;
-    pendingPermanentDeleteContextRef.current = context;
     pendingPermanentDeleteNodeIdsRef.current = context.nodeIds;
     isPermanentDeleteUnresolvedRef.current = true;
     setIsPermanentDeleteUnresolved(true);
     setIsPermanentDeleteReconciling(true);
     setIsWaitingForPermanentDeleteReconciliation(false);
     setPermanentDeleteReviewReason(null);
-    if (permanentDeleteReconciliationRequestInFlightRef.current) {
-      setIsPermanentDeleteReconciling(false);
-      setPermanentDeleteReviewReason('request-timeout');
-      return;
-    }
-
     permanentDeleteReconciliationDeadlineRef.current = clock.setTimeout(() => {
       permanentDeleteReconciliationDeadlineRef.current = undefined;
       if (!isCurrentPermanentDeleteReconciliation(context, generation)) {
@@ -959,32 +884,10 @@ export const CellsTable = ({
 
       cancelPermanentDeleteReconciliation();
       setIsPermanentDeleteReconciling(false);
-      setPermanentDeleteReviewReason('request-timeout');
+      setPermanentDeleteReviewReason('timed-out');
     }, PERMANENT_DELETE_RECONCILIATION_TIMEOUT_MS);
     void runPermanentDeleteReconciliation(context, generation, 1);
   };
-  startPermanentDeleteReconciliationRef.current = startPermanentDeleteReconciliation;
-
-  useEffect(() => {
-    if (hasRehydratedPermanentDeleteContextRef.current) {
-      return;
-    }
-    hasRehydratedPermanentDeleteContextRef.current = true;
-
-    const context = getStoredPermanentDeleteReconciliation(selectionScopeKey, currentPermanentDeletePath);
-    if (context !== null) {
-      startPermanentDeleteReconciliationRef.current?.(context);
-      return;
-    }
-
-    clearStoredPermanentDeleteReconciliation();
-  }, [currentPermanentDeletePath, selectionScopeKey]);
-
-  useEffect(() => {
-    if (getStoredPermanentDeleteReconciliation(selectionScopeKey, currentPermanentDeletePath) === null) {
-      clearStoredPermanentDeleteReconciliation();
-    }
-  }, [currentPermanentDeletePath, selectionScopeKey]);
 
   const handlePermanentDelete = async (nodeIds: string[], scopeKey: string, path: string): Promise<void> => {
     if (isPermanentDeletePendingRef.current || isPermanentDeleteUnresolvedRef.current) {
@@ -1060,14 +963,6 @@ export const CellsTable = ({
     }
   };
 
-  const handleReloadAfterPermanentDeleteTimeout = (event: MouseEvent<HTMLAnchorElement>): void => {
-    const context = pendingPermanentDeleteContextRef.current;
-    if (context === null || !storePermanentDeleteReconciliation(context)) {
-      event.preventDefault();
-      setPermanentDeleteReviewReason('storage-failed');
-    }
-  };
-
   const handleRefreshAfterPermanentDeleteReview = async (): Promise<void> => {
     if (isRefreshingPermanentDeleteReview || permanentDeleteReconciliationRequestInFlightRef.current) {
       return;
@@ -1075,15 +970,35 @@ export const CellsTable = ({
 
     const scopeKey = selectionScopeKeyRef.current;
     const path = getCellsFilesPath();
+    cancelPermanentDeleteReconciliation();
+    const generation = permanentDeleteReconciliationGenerationRef.current;
+    const requestId = permanentDeleteReconciliationRequestIdRef.current + 1;
+    permanentDeleteReconciliationRequestIdRef.current = requestId;
     permanentDeleteReconciliationRequestInFlightRef.current = true;
     setIsPermanentDeleteReconciliationRequestInFlight(true);
     setIsRefreshingPermanentDeleteReview(true);
     setIsWaitingForPermanentDeleteReconciliation(false);
-    try {
-      const wasRefreshSuccessful = await onRefreshAfterBulkMoveOutcome();
-      if (!isCurrentPermanentDeleteScope(scopeKey, path)) {
+    permanentDeleteReconciliationDeadlineRef.current = clock.setTimeout(() => {
+      permanentDeleteReconciliationDeadlineRef.current = undefined;
+      if (
+        permanentDeleteReconciliationGenerationRef.current !== generation ||
+        !isCurrentPermanentDeleteScope(scopeKey, path)
+      ) {
         return;
       }
+
+      cancelPermanentDeleteReconciliation();
+      setPermanentDeleteReviewReason('timed-out');
+    }, PERMANENT_DELETE_RECONCILIATION_TIMEOUT_MS);
+    try {
+      const wasRefreshSuccessful = await onRefreshAfterBulkMoveOutcome();
+      if (
+        permanentDeleteReconciliationGenerationRef.current !== generation ||
+        !isCurrentPermanentDeleteScope(scopeKey, path)
+      ) {
+        return;
+      }
+      clearPermanentDeleteReconciliationDeadline();
       if (!wasRefreshSuccessful) {
         setPermanentDeleteReviewReason(previousReason => {
           return previousReason === 'job-failed' ? previousReason : 'refresh-failed';
@@ -1096,16 +1011,22 @@ export const CellsTable = ({
       });
       setIsWaitingForPermanentDeleteReconciliation(true);
     } catch {
-      if (isCurrentPermanentDeleteScope(scopeKey, path)) {
+      clearPermanentDeleteReconciliationDeadline();
+      if (
+        permanentDeleteReconciliationGenerationRef.current === generation &&
+        isCurrentPermanentDeleteScope(scopeKey, path)
+      ) {
         setPermanentDeleteReviewReason(previousReason => {
           return previousReason === 'job-failed' ? previousReason : 'refresh-failed';
         });
       }
     } finally {
-      permanentDeleteReconciliationRequestInFlightRef.current = false;
-      if (isMountedRef.current) {
-        setIsRefreshingPermanentDeleteReview(false);
-        setIsPermanentDeleteReconciliationRequestInFlight(false);
+      if (permanentDeleteReconciliationRequestIdRef.current === requestId) {
+        permanentDeleteReconciliationRequestInFlightRef.current = false;
+        if (isMountedRef.current) {
+          setIsRefreshingPermanentDeleteReview(false);
+          setIsPermanentDeleteReconciliationRequestInFlight(false);
+        }
       }
     }
   };
@@ -1385,26 +1306,16 @@ export const CellsTable = ({
         {isPermanentDeleteUnresolved && !isPermanentDeleteReconciling && (
           <div css={permanentDeleteProgressStyles} role="alert">
             <span>{translate(getPermanentDeleteReviewMessageKey(permanentDeleteReviewReason))}</span>
-            {permanentDeleteReviewReason === 'request-timeout' ? (
-              <a
-                href={window.location.href}
-                css={permanentDeleteReloadLinkStyles}
-                onClick={handleReloadAfterPermanentDeleteTimeout}
-              >
-                {translate('cells.bulkDelete.reload')}
-              </a>
-            ) : (
-              <Button
-                variant={ButtonVariant.SECONDARY}
-                type="button"
-                onClick={() => {
-                  void handleRefreshAfterPermanentDeleteReview();
-                }}
-                disabled={isRefreshingPermanentDeleteReview || isPermanentDeleteReconciliationRequestInFlight}
-              >
-                {translate('cells.bulkDelete.refresh')}
-              </Button>
-            )}
+            <Button
+              variant={ButtonVariant.SECONDARY}
+              type="button"
+              onClick={() => {
+                void handleRefreshAfterPermanentDeleteReview();
+              }}
+              disabled={isRefreshingPermanentDeleteReview || isPermanentDeleteReconciliationRequestInFlight}
+            >
+              {translate('cells.bulkDelete.refresh')}
+            </Button>
           </div>
         )}
         {isBulkMoveOutcomeUnresolved && (
