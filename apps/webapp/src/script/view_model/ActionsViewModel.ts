@@ -290,14 +290,18 @@ export class ActionsViewModel {
         await this.messageRepository.deleteMessageForEveryone(conversationEntity, messageEntity);
       };
 
-      return new Promise(resolve => {
+      return new Promise((resolve, reject) => {
         PrimaryModal.show(
           PrimaryModal.type.CONFIRM,
           {
             primaryAction: {
               action: async () => {
-                await deleteMessage();
-                resolve();
+                try {
+                  await deleteMessage();
+                  resolve();
+                } catch (error) {
+                  reject(error);
+                }
               },
               text: this.translate('modalConversationDeleteMessageEveryoneAction'),
             },

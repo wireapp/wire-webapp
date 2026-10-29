@@ -17,6 +17,8 @@
  *
  */
 
+import type {RestPerformActionResponse} from 'cells-sdk-ts';
+
 import type {APIClient} from '../../service/apiClientSingleton';
 
 import {CellsRepository} from './cellsRepository';
@@ -101,6 +103,86 @@ describe('CellsRepository upload cancellation', () => {
     expect(calls[1].abortController.signal.aborted).toBe(true);
     calls[1].resolve();
     await secondUpload;
+  });
+});
+
+describe('CellsRepository bulk Bin actions', () => {
+  it('waits for the batch delete response and returns every background job', async () => {
+    const completions: Array<(response: RestPerformActionResponse) => void> = [];
+    const request = new Promise<RestPerformActionResponse>(resolve => {
+      completions.push(resolve);
+    });
+    const deleteNodes = jest.fn().mockReturnValue(request);
+    const apiClient = {api: {cells: {deleteNodes}}};
+    const repository = new CellsRepository(apiClient as never);
+    const response: RestPerformActionResponse = {
+      Status: 'Background',
+      BackgroundActions: [
+        {Name: 'delete', JobUuid: 'first-job'},
+        {Name: 'delete', JobUuid: 'second-job'},
+      ],
+    };
+    const resolved = jest.fn();
+
+    const deletion = repository.deleteNodes({uuids: ['file-uuid', 'folder-uuid'], permanently: true});
+    void deletion.then(resolved);
+    await Promise.resolve();
+
+    expect(deleteNodes).toHaveBeenCalledTimes(1);
+    expect(deleteNodes).toHaveBeenCalledWith({uuids: ['file-uuid', 'folder-uuid'], permanently: true});
+    expect(resolved).not.toHaveBeenCalled();
+
+    completions[0](response);
+    await expect(deletion).resolves.toBe(response);
+  });
+
+  it('defaults batch deletion to recycling', async () => {
+    const response = {Status: 'Performed'};
+    const deleteNodes = jest.fn().mockResolvedValue(response);
+    const repository = new CellsRepository({api: {cells: {deleteNodes}}} as never);
+
+    await expect(repository.deleteNodes({uuids: ['file-uuid']})).resolves.toBe(response);
+
+    expect(deleteNodes).toHaveBeenCalledWith({uuids: ['file-uuid'], permanently: false});
+  });
+
+  it('propagates batch deletion failures to callers awaiting attachment deletion', async () => {
+    const error = new Error('Delete failed');
+    const deleteNodes = jest.fn().mockRejectedValue(error);
+    const repository = new CellsRepository({api: {cells: {deleteNodes}}} as never);
+
+    await expect(repository.deleteNodes({uuids: ['attachment-uuid'], permanently: true})).rejects.toBe(error);
+
+    expect(deleteNodes).toHaveBeenCalledTimes(1);
+  });
+
+  it('forwards restore UUIDs in one request and preserves the response', async () => {
+    const response = {Status: 'Background', BackgroundActions: [{Name: 'restore', JobUuid: 'restore-job'}]};
+    const restoreNodes = jest.fn().mockResolvedValue(response);
+    const repository = new CellsRepository({api: {cells: {restoreNodes}}} as never);
+
+    await expect(repository.restoreNodes({uuids: ['file-uuid', 'folder-uuid']})).resolves.toBe(response);
+
+    expect(restoreNodes).toHaveBeenCalledTimes(1);
+    expect(restoreNodes).toHaveBeenCalledWith({uuids: ['file-uuid', 'folder-uuid']});
+  });
+
+  it('propagates batch restore failures', async () => {
+    const error = new Error('Restore failed');
+    const restoreNodes = jest.fn().mockRejectedValue(error);
+    const repository = new CellsRepository({api: {cells: {restoreNodes}}} as never);
+
+    await expect(repository.restoreNodes({uuids: ['file-uuid']})).rejects.toBe(error);
+  });
+
+  it.each(['delete', 'restore'] as const)('retrieves status for a background %s job', async name => {
+    const response = {Name: name, JobUuid: 'action-job', Status: 'Running'};
+    const getBackgroundActionInfo = jest.fn().mockResolvedValue(response);
+    const repository = new CellsRepository({api: {cells: {getBackgroundActionInfo}}} as never);
+
+    await expect(repository.getBackgroundActionInfo({name, jobUuid: 'action-job'})).resolves.toBe(response);
+
+    expect(getBackgroundActionInfo).toHaveBeenCalledWith({name, jobUuid: 'action-job'});
   });
 });
 
