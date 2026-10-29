@@ -395,6 +395,7 @@
   "cells.bulkDelete.refresh": "Refresh Bin",
   "cells.bulkDelete.refreshFailed": "Could not refresh the Bin. The delete outcome is still unknown.",
   "cells.bulkDelete.reload": "Reload Bin",
+  "cells.bulkDelete.rejected": "The delete request was rejected. Resolve the issue before trying again.",
   "cells.bulkDelete.requestTimedOut": "A Bin check did not finish. Reload the Bin before trying again.",
   "cells.bulkDelete.storageFailed": "Could not save the unresolved check for reload. Keep this Bin open; do not retry the delete.",
   "cells.bulkDelete.timedOut": "Deletion is taking longer than expected. Refresh the Bin to check before taking further action.",

@@ -32,6 +32,7 @@ import {
 
 import {isNonEmptyString} from '@sindresorhus/is';
 import {flexRender, getCoreRowModel, type Header, useReactTable} from '@tanstack/react-table';
+import {BackendError, StatusCode} from '@wireapp/api-client/lib/http/';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {JobsTaskStatus, RestActionStatus, type RestPerformActionResponse} from 'cells-sdk-ts';
 import {createPortal} from 'react-dom';
@@ -289,6 +290,16 @@ const getPermanentDeleteJobUuids = (response: RestPerformActionResponse): string
   return [...new Set(jobUuids ?? [])];
 };
 
+const isAuthoritativePermanentDeleteRejection = (error: unknown): boolean => {
+  return (
+    error instanceof BackendError &&
+    error.code !== undefined &&
+    error.code >= 400 &&
+    error.code < 500 &&
+    error.code !== StatusCode.REQUEST_TIMEOUT
+  );
+};
+
 const hasPermanentDeleteJobFailure = (response: RestPerformActionResponse): boolean => {
   return (
     response.BackgroundActions?.some(action => {
@@ -380,6 +391,7 @@ export const CellsTable = ({
   const isMovePendingRef = useRef(false);
   isMovePendingRef.current = isBulkMoveRequestPending || isBackgroundMovePending;
   const [isPermanentDeletePending, setIsPermanentDeletePending] = useState(false);
+  const [isPermanentDeleteRejected, setIsPermanentDeleteRejected] = useState(false);
   const [isPermanentDeleteUnresolved, setIsPermanentDeleteUnresolved] = useState(false);
   const [isRefreshingPermanentDeleteReview, setIsRefreshingPermanentDeleteReview] = useState(false);
   const [isPermanentDeleteReconciling, setIsPermanentDeleteReconciling] = useState(false);
@@ -439,6 +451,7 @@ export const CellsTable = ({
 
     setSelectedNodeIds(new Set());
     setIsBulkMovePreviewOpen(false);
+    setIsPermanentDeleteRejected(false);
     isPermanentDeleteUnresolvedRef.current = false;
     pendingPermanentDeleteNodeIdsRef.current = [];
     pendingPermanentDeleteContextRef.current = null;
@@ -475,6 +488,7 @@ export const CellsTable = ({
     pendingPermanentDeleteNodeIdsRef.current = [];
     pendingPermanentDeleteContextRef.current = null;
     clearStoredPermanentDeleteReconciliation();
+    setIsPermanentDeleteRejected(false);
     isPermanentDeleteUnresolvedRef.current = false;
     setIsPermanentDeleteUnresolved(false);
     setIsPermanentDeleteReconciling(false);
@@ -780,6 +794,7 @@ export const CellsTable = ({
   };
 
   const handleToggleSelection = (nodeId: string, isSelected: boolean): void => {
+    setIsPermanentDeleteRejected(false);
     setSelectedNodeIds(currentSelection => {
       const nextSelection = new Set(currentSelection);
       if (isSelected) {
@@ -974,6 +989,7 @@ export const CellsTable = ({
     }
 
     isPermanentDeletePendingRef.current = true;
+    setIsPermanentDeleteRejected(false);
     setIsPermanentDeletePending(true);
 
     try {
@@ -993,6 +1009,7 @@ export const CellsTable = ({
         return;
       }
 
+      setIsPermanentDeleteRejected(false);
       setSelectedNodeIds(currentSelection => {
         return hasSameSelection(currentSelection, nodeIds) ? new Set() : currentSelection;
       });
@@ -1000,6 +1017,10 @@ export const CellsTable = ({
     } catch (error: unknown) {
       console.error(error);
       if (!isCurrentPermanentDeleteScope(scopeKey, path)) {
+        return;
+      }
+      if (isAuthoritativePermanentDeleteRejection(error)) {
+        setIsPermanentDeleteRejected(true);
         return;
       }
 
@@ -1329,8 +1350,13 @@ export const CellsTable = ({
             <span>{translate('cells.bulkDelete.checking')}</span>
           </div>
         )}
+        {isPermanentDeleteRejected && !isPermanentDeleteUnresolved && (
+          <div css={permanentDeleteProgressStyles} role="alert">
+            {translate('cells.bulkDelete.rejected')}
+          </div>
+        )}
         {isPermanentDeleteUnresolved && !isPermanentDeleteReconciling && (
-          <div css={moveOutcomeMessageStyles} role="alert">
+          <div css={permanentDeleteProgressStyles} role="alert">
             <span>{translate(getPermanentDeleteReviewMessageKey(permanentDeleteReviewReason))}</span>
             {permanentDeleteReviewReason === 'request-timeout' ? (
               <a

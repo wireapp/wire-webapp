@@ -23,6 +23,7 @@ import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import userEvent from '@testing-library/user-event';
 import {noop} from 'noop-esm';
 
+import {BackendError, StatusCode} from '@wireapp/api-client/lib/http/';
 import {ThemeProvider, themes, THEME_ID} from '@wireapp/react-ui-kit';
 import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
 import {JobsTaskStatus} from 'cells-sdk-ts';
@@ -104,6 +105,9 @@ const translateSelectionForTest: Translate = (key, substitutions) => {
   }
   if (key === 'cells.bulkDelete.reload') {
     return 'Reload Bin';
+  }
+  if (key === 'cells.bulkDelete.rejected') {
+    return 'The delete request was rejected. Resolve the issue before trying again.';
   }
   if (key === 'cells.bulkDelete.refresh') {
     return 'Refresh Bin';
@@ -520,6 +524,63 @@ describe('CellsTable selection', () => {
 
       expect(onRefresh).toHaveBeenCalledTimes(1);
       expect(screen.queryByRole('button', {name: 'Delete permanently'})).not.toBeInTheDocument();
+    } finally {
+      window.location.hash = originalHash;
+    }
+  });
+
+  it.each([THEME_ID.LIGHT, THEME_ID.DARK])(
+    'shows an authoritative delete rejection without treating it as pending work in %s',
+    async themeId => {
+      const originalHash = window.location.hash;
+      window.location.hash = '#/conversation/conversation-id@example.com/files/recycle_bin';
+      const user = userEvent.setup();
+      const rejectedError = new BackendError('Delete rejected', undefined, StatusCode.FORBIDDEN);
+      const onRefreshAfterBulkMoveOutcome = jest.fn();
+      const repository = {
+        deleteNodes: jest.fn().mockRejectedValue(rejectedError),
+      } as unknown as CellsRepository;
+
+      try {
+        renderCellsTable({cellsRepository: repository, onRefreshAfterBulkMoveOutcome, themeId});
+        await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+        await user.click(screen.getByRole('button', {name: 'Delete permanently'}));
+        await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Delete'}));
+
+        expect(await screen.findByRole('alert')).toHaveTextContent(
+          'The delete request was rejected. Resolve the issue before trying again.',
+        );
+        expect(screen.queryByText('Checking the Bin for selected items…')).not.toBeInTheDocument();
+        expect(screen.getByText('1 selected')).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Delete permanently'})).toBeEnabled();
+        expect(repository.deleteNodes).toHaveBeenCalledTimes(1);
+        expect(onRefreshAfterBulkMoveOutcome).not.toHaveBeenCalled();
+      } finally {
+        window.location.hash = originalHash;
+      }
+    },
+  );
+
+  it('keeps a request-timeout response unresolved because the delete outcome is uncertain', async () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files/recycle_bin';
+    const user = userEvent.setup();
+    const onRefreshAfterBulkMoveOutcome = jest.fn().mockResolvedValue(true);
+    const repository = {
+      deleteNodes: jest
+        .fn()
+        .mockRejectedValue(new BackendError('Request timed out', undefined, StatusCode.REQUEST_TIMEOUT)),
+    } as unknown as CellsRepository;
+
+    try {
+      renderCellsTable({cellsRepository: repository, onRefreshAfterBulkMoveOutcome});
+      await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+      await user.click(screen.getByRole('button', {name: 'Delete permanently'}));
+      await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Delete'}));
+
+      expect(await screen.findByText('Checking the Bin for selected items…')).toBeInTheDocument();
+      expect(repository.deleteNodes).toHaveBeenCalledTimes(1);
+      expect(onRefreshAfterBulkMoveOutcome).toHaveBeenCalledTimes(1);
     } finally {
       window.location.hash = originalHash;
     }
