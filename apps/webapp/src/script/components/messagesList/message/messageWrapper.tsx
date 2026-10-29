@@ -36,7 +36,7 @@ import {CompositeMessage} from 'Repositories/entity/message/compositeMessage';
 import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {Text} from 'Repositories/entity/message/text';
 import {TeamState} from 'Repositories/team/TeamState';
-import {Config} from 'src/script/Config';
+import {markAsUnreadFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {QuoteEntity} from 'src/script/message/quoteEntity';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
@@ -90,7 +90,7 @@ export const MessageWrapper: FunctionComponent<MessageParams> = ({
   teamState = container.resolve(TeamState),
   isMsgElementsFocusable,
 }: MessageParams) => {
-  const {fireAndForgetInvoker, translate} = useApplicationContext();
+  const {fireAndForgetInvoker, isFeatureToggleEnabled, translate} = useApplicationContext();
   type FindMessageResult = Promise<ContentMessage & {primary_key: string}>;
   const findMessage = async (conversation: Conversation, messageId: string): FindMessageResult => {
     const eventFromId = await messageRepository.getMessageInConversationById(conversation, messageId);
@@ -188,7 +188,7 @@ export const MessageWrapper: FunctionComponent<MessageParams> = ({
       });
     }
 
-    if (Config.getConfig().FEATURE.ENABLE_MARK_AS_UNREAD && !conversation.isSelfUserRemoved()) {
+    if (isFeatureToggleEnabled(markAsUnreadFeatureToggleName) && !conversation.isSelfUserRemoved()) {
       entries.push({
         click: () => {
           return conversation.markUnreadFrom(message);

@@ -48,7 +48,6 @@ export type Env = {
 
   /** Specifies configuration for Cells */
   FEATURE_ENABLE_CELLS: string;
-  FEATURE_ENABLE_MARK_AS_UNREAD: string;
   FEATURE_CELLS_INIT_WITH_ZAUTH_TOKEN: string;
   CELLS_TOKEN_SHARED_SECRET: string;
   CELLS_PYDIO_SEGMENT: string;

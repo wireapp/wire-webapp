@@ -131,7 +131,6 @@ Notes:
 | Environment Variable | Default / Source | Used for | Additional Conditions |
 | --- | --- | --- | --- |
 | `FEATURE_ENABLE_CELLS` | `false` | Enables Cells integration features | May apply (requires conversation Cells state not disabled) |
-| `FEATURE_ENABLE_MARK_AS_UNREAD` | `false` | Enables the "Mark as unread from here" message menu entry | N/A |
 | `FEATURE_CELLS_INIT_WITH_ZAUTH_TOKEN` | `false` | Initialize Cells with ZAuth token | N/A |
 | `FEATURE_ALLOW_LINK_PREVIEWS` | `false` | Enables link preview rendering | May apply (also requires user preview preference enabled) |
 | `FEATURE_CHECK_CONSENT` | `true` | User consent checks | N/A |

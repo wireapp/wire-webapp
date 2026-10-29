@@ -58,7 +58,6 @@ export function generateConfig(params: ConfigGeneratorParams, env: Env) {
         : null,
       ENABLE_MDM_CONFIG: env.FEATURE_ENABLE_MDM_CONFIG == 'true',
       ENABLE_CELLS: env.FEATURE_ENABLE_CELLS == 'true',
-      ENABLE_MARK_AS_UNREAD: env.FEATURE_ENABLE_MARK_AS_UNREAD == 'true',
       CELLS_INIT_WITH_ZAUTH_TOKEN: env.FEATURE_CELLS_INIT_WITH_ZAUTH_TOKEN == 'true',
       CHECK_CONSENT: env.FEATURE_CHECK_CONSENT != 'false',
       CONFERENCE_AUTO_MUTE: env.FEATURE_CONFERENCE_AUTO_MUTE == 'true',

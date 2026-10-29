@@ -962,15 +962,22 @@ describe('Conversation', () => {
   });
 
   describe('manual unread marker', () => {
-    const createContentMessage = (timestamp: number, user: User) => {
+    type ManualUnreadMarkerConversationSetup = {
+      readonly otherFirst: ContentMessage;
+      readonly ownSecond: ContentMessage;
+      readonly otherThird: ContentMessage;
+    };
+
+    function createContentMessage(timestamp: number, user: User): ContentMessage {
       const message = new ContentMessage(createUuid(), translateForTest);
       message.timestamp(timestamp);
       message.user(user);
       message.addAsset(new Text(createUuid(), 'text'));
-      return message;
-    };
 
-    const setupConversation = () => {
+      return message;
+    }
+
+    function setupConversation(): ManualUnreadMarkerConversationSetup {
       const otherFirst = createContentMessage(first_timestamp, other_user);
       const ownSecond = createContentMessage(second_timestamp, self_user);
       const otherThird = createContentMessage(third_timestamp, other_user);
@@ -979,8 +986,9 @@ describe('Conversation', () => {
       conversation_et.last_event_timestamp(third_timestamp);
       conversation_et.last_read_timestamp(third_timestamp);
       conversation_et.messages_unordered.push(otherFirst, ownSecond, otherThird);
+
       return {otherFirst, ownSecond, otherThird};
-    };
+    }
 
     it('moves the read timestamp right before the message and sets both flags', () => {
       const {otherFirst} = setupConversation();

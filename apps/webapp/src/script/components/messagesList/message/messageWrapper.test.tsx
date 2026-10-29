@@ -27,8 +27,9 @@ import {ContentMessage as ContentMessageEntity} from 'Repositories/entity/messag
 import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/memberMessage';
 import {Text} from 'Repositories/entity/message/text';
 import {User} from 'Repositories/entity/User';
-import {withTheme} from 'src/script/auth/util/test/testUtil';
-import {Config} from 'src/script/Config';
+import {withTheme, withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
+import {markAsUnreadFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
+import type {StartupFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {SystemMessageType} from 'src/script/message/systemMessageType';
 import {translateForTest} from 'Util/test/translateForTest';
 import {
@@ -261,14 +262,15 @@ describe('MessageWrapper', () => {
   });
 
   describe('Mark as unread context menu entry', () => {
-    const setMarkAsUnreadFeature = (enabled: boolean) => {
-      const config = Config.getConfig();
-      jest
-        .spyOn(Config, 'getConfig')
-        .mockReturnValue({...config, FEATURE: {...config.FEATURE, ENABLE_MARK_AS_UNREAD: enabled}});
+    type RenderContentMessageResult = ReturnType<typeof render> & {
+      readonly isFeatureToggleEnabledForTest: jest.MockedFunction<
+        (featureToggleName: StartupFeatureToggleName) => boolean
+      >;
+      readonly markUnreadFrom: jest.SpiedFunction<Conversation['markUnreadFrom']>;
+      readonly message: ContentMessageEntity;
     };
 
-    const renderContentMessage = () => {
+    function renderContentMessage(isMarkAsUnreadEnabled?: boolean): RenderContentMessageResult {
       const conversation = new Conversation(
         createUuid(),
         'test.wire.link',
@@ -282,26 +284,40 @@ describe('MessageWrapper', () => {
       const markUnreadFrom = jest.spyOn(conversation, 'markUnreadFrom');
       const props = {...createBaseProps(conversation, message), isFocused: true};
 
-      const view = render(withTheme(<MessageWrapper {...props} />), {wrapper: rootProviderWrapper});
+      const isFeatureToggleEnabledForTest = jest.fn((featureToggleName: StartupFeatureToggleName): boolean => {
+        return isMarkAsUnreadEnabled === true && featureToggleName === markAsUnreadFeatureToggleName;
+      });
+
+      const rootProviderWrapperForMessage =
+        isMarkAsUnreadEnabled === true
+          ? createRootProviderWrapperForTest(
+              createRootContextValueForTest({
+                translate: translateForTest,
+                isFeatureToggleEnabled: isFeatureToggleEnabledForTest,
+              }),
+            )
+          : rootProviderWrapper;
+      const view = render(withThemeAndRootContext(<MessageWrapper {...props} />, rootProviderWrapperForMessage));
       fireEvent.click(view.getByLabelText('accessibility.conversationContextMenuOpenLabel'));
-      return {...view, markUnreadFrom, message};
-    };
+
+      return {...view, isFeatureToggleEnabledForTest, markUnreadFrom, message};
+    }
 
     afterEach(() => {
       jest.restoreAllMocks();
     });
 
     it('marks the conversation as unread from the message when the entry is clicked', () => {
-      setMarkAsUnreadFeature(true);
-      const {getByText, markUnreadFrom, message} = renderContentMessage();
+      const {getByText, isFeatureToggleEnabledForTest, markUnreadFrom, message} = renderContentMessage(true);
+
+      expect(isFeatureToggleEnabledForTest).toHaveBeenCalledWith(markAsUnreadFeatureToggleName);
 
       fireEvent.click(getByText('conversationContextMenuMarkUnread'));
 
       expect(markUnreadFrom).toHaveBeenCalledWith(message);
     });
 
-    it('does not offer the entry when the feature is disabled', () => {
-      setMarkAsUnreadFeature(false);
+    it('does not offer the entry by default', () => {
       const {queryByText} = renderContentMessage();
 
       expect(queryByText('conversationContextMenuMarkUnread')).not.toBeInTheDocument();
