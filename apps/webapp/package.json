@@ -108,7 +108,7 @@
     "@roamhq/wrtc": "0.10.0",
     "@rspack/cli": "2.2.9",
     "@rspack/core": "2.2.9",
-    "@rspack/dev-server": "2.2.1",
+    "@rspack/dev-server": "2.2.2",
     "@rspack/plugin-react-refresh": "2.0.2",
     "@swc/plugin-emotion": "15.0.0",
     "@testing-library/dom": "10.4.2",
