@@ -127,4 +127,4 @@ export const util = {
   TaskScheduler,
 };
 
-export {Ciphersuite} from '@wireapp/core-crypto';
+export {CipherSuite as Ciphersuite} from '@wireapp/core-crypto';

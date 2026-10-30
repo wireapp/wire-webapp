@@ -19,65 +19,113 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
+import axios from 'axios';
 import {Decoder} from 'bazinga64';
+import {result, task, type Result} from 'true-myth';
 
-import {TypedEventEmitter} from '@wireapp/commons';
+import {APIClient} from '@wireapp/api-client';
+import {LogFactory, TypedEventEmitter} from '@wireapp/commons';
 import {
-  CoreCrypto,
-  E2eiConversationState,
-  WireIdentity,
-  DeviceStatus,
-  CredentialType,
   ConversationId,
-  ClientId,
+  CoreCrypto,
+  DeviceStatus,
+  E2eiConversationState,
+  HttpMethod,
+  Uuid,
+  WireIdentity,
+  CredentialType,
+  type HttpHeader,
+  type HttpResponse,
+  type PkiEnvironment,
+  type PkiEnvironmentHooks,
 } from '@wireapp/core-crypto';
 
 import {AcmeService} from './connection';
-import {getE2EIClientId} from './helper';
+import {E2EIAuthenticateCallback} from './e2eiService.types';
 import {createE2EIEnrollmentStorage} from './storage/e2eiStorage';
 
 import {ClientService} from '../../../client';
+import {createPkiEnvironment} from '../../../messagingProtocols/proteus/proteusService/cryptoClient/coreCryptoWrapper';
 import {CoreDatabase} from '../../../storage/coreDb';
 import {parseFullQualifiedClientId} from '../../../util/fullyQualifiedClientIdUtils';
-import {LowPrecisionTaskScheduler} from '../../../util/lowPrecisionTaskScheduler';
 import {StringifiedQualifiedId, stringifyQualifiedId} from '../../../util/qualifiedIdUtil';
 import {RecurringTaskScheduler} from '../../../util/recurringTaskScheduler';
-import {MLSService, MLSServiceEvents} from '../mlsService';
+import {MLSService} from '../mlsService';
+import {createMLSClientId} from '../utils/mlsId';
 
-export type DeviceIdentity = Omit<WireIdentity, 'free' | 'status' | typeof Symbol.dispose> & {
+/**
+ * Identity of a device in an MLS conversation.
+ *
+ * `clientId` is exposed in its Wire format (`<user-id>:<device-id>@<domain>`) because the webapp
+ * and the backend speak that format. X509 specific fields live in `x509Identity`, the way
+ * CoreCrypto models them.
+ */
+export type DeviceIdentity = Omit<WireIdentity, 'clientId' | 'status'> & {
   status?: DeviceStatus;
+  clientId: string;
   deviceId: string;
   qualifiedUserId: QualifiedId;
 };
 
 type Events = {
-  crlChanged: {domain: string};
+  /**
+   * Emitted after CoreCrypto successfully checked every X509 credential and refreshed its CRLs.
+   *
+   * Revocation lists are not scoped to a domain anymore, so consumers have to re-evaluate the
+   * conversations they care about themselves.
+   */
+  credentialsChecked: void;
+};
+
+type InitializeOptions = {
+  /**
+   * Proxy that serves CRLs on behalf of hosts the browser cannot reach directly. The deployment
+   * exposes it as `<crlProxy>/<host>`.
+   */
+  crlProxy?: string;
+};
+
+const axiosMethods: Record<HttpMethod, 'get' | 'post' | 'put' | 'delete' | 'patch' | 'head'> = {
+  [HttpMethod.Get]: 'get',
+  [HttpMethod.Post]: 'post',
+  [HttpMethod.Put]: 'put',
+  [HttpMethod.Delete]: 'delete',
+  [HttpMethod.Patch]: 'patch',
+  [HttpMethod.Head]: 'head',
+};
+
+const decodeClientId = (clientId: WireIdentity['clientId']): string => {
+  return clientId === undefined ? '' : new TextDecoder().decode(clientId.copyBytes());
 };
 
 // This export is meant to be accessible from the outside (e.g the Webapp / UI)
 export class E2EIServiceExternal extends TypedEventEmitter<Events> {
+  private readonly logger = LogFactory.getLogger('@wireapp/core/E2EIdentityServiceExternal');
   private _acmeService?: AcmeService;
+  private crlProxy?: string;
   private readonly enrollmentStorage: ReturnType<typeof createE2EIEnrollmentStorage>;
 
   public constructor(
     private readonly coreCryptoClient: CoreCrypto,
-    private readonly coreDatabase: CoreDatabase,
+    private readonly apiClient: APIClient,
+    coreDatabase: CoreDatabase,
     private readonly recurringTaskScheduler: RecurringTaskScheduler,
     private readonly clientService: ClientService,
     private readonly mlsService: MLSService,
+    private readonly createPkiEnvironmentFromHooks: typeof createPkiEnvironment = createPkiEnvironment,
   ) {
     super();
     this.enrollmentStorage = createE2EIEnrollmentStorage(coreDatabase);
   }
 
-  // If we have a handle in the local storage, we are in the enrollment process (this handle is saved before oauth redirect)
+  // If we have a snapshot of an interrupted acquisition in the local storage, we are in the enrollment process
   public async isEnrollmentInProgress(): Promise<boolean> {
-    const data = await this.enrollmentStorage.getPendingEnrollmentData();
-    return data !== undefined;
+    const snapshot = await this.enrollmentStorage.getPendingAcquisitionSnapshot();
+    return snapshot.isJust;
   }
 
   public clearAllProgress(): Promise<void> {
-    return this.enrollmentStorage.deletePendingEnrollmentData();
+    return this.enrollmentStorage.deletePendingAcquisitionSnapshot();
   }
 
   public async getConversationState(conversationId: Uint8Array): Promise<E2eiConversationState> {
@@ -87,7 +135,7 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
   }
 
   public isE2EIEnabled(): Promise<boolean> {
-    return this.coreCryptoClient.e2eiIsEnabled(this.mlsService.config.defaultCiphersuite);
+    return this.mlsService.hasCredential(CredentialType.X509);
   }
 
   public async getAllGroupUsersIdentities(
@@ -125,20 +173,19 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     }
 
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
-    const textDecoder = new TextDecoder();
 
     // we get all the devices that have an identity (either valid, expired or revoked)
     const userIdentities = await this.coreCryptoClient.getUserIdentities(
       new ConversationId(groupIdBytes),
       userIds.map(userId => {
-        return userId.id;
+        return new Uuid(userId.id);
       }),
     );
 
     // We get all the devices in the conversation (in order to get devices that have no identity)
     const allUsersMLSDevices = (await this.coreCryptoClient.getClientIds(new ConversationId(groupIdBytes)))
       .map(id => {
-        return textDecoder.decode(id.copyBytes());
+        return decodeClientId(id);
       })
       .map(fullyQualifiedId => {
         return parseFullQualifiedClientId(fullyQualifiedId);
@@ -146,13 +193,30 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
 
     const mappedUserIdentities = new Map<StringifiedQualifiedId, DeviceIdentity[]>();
     for (const userId of userIds) {
-      const identities = (userIdentities.get(userId.id) ?? []).map(identity => {
-        return {
-          ...identity,
-          deviceId: parseFullQualifiedClientId(identity.clientId).client,
-          qualifiedUserId: userId,
-        };
-      });
+      // The map is keyed by `Uuid` instances, which cannot be looked up with a fresh instance,
+      // so the entries are matched by their string representation instead.
+      const identities = Array.from(userIdentities.entries())
+        .filter(([uuid]) => {
+          return uuid.toString() === userId.id;
+        })
+        .flatMap(([, identities]) => {
+          return identities;
+        })
+        .flatMap(identity => {
+          const clientId = decodeClientId(identity.clientId);
+          if (clientId.length === 0) {
+            return [];
+          }
+
+          return [
+            {
+              ...identity,
+              clientId,
+              deviceId: parseFullQualifiedClientId(clientId).client,
+              qualifiedUserId: userId,
+            },
+          ];
+        });
 
       const basicMLSDevices = allUsersMLSDevices
         .filter(({user}) => {
@@ -169,20 +233,11 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
         // map basic MLS devices to "fake" identity object
         .map<DeviceIdentity>(id => {
           return {
-            ...id,
+            clientId: `${id.user}:${id.client}@${id.domain}`,
             deviceId: id.client,
             thumbprint: '',
-            user: '',
-            certificate: '',
-            displayName: '',
-            handle: '',
-            notAfter: BigInt(0),
-            notBefore: BigInt(0),
-            serialNumber: '',
-            clientId: id.client,
             qualifiedUserId: userId,
             credentialType: CredentialType.Basic,
-            x509Identity: undefined,
           };
         });
 
@@ -197,8 +252,8 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     groupId: string,
     userClientsMap: Record<string, QualifiedId>,
   ): Promise<DeviceIdentity[]> {
-    const clientIds: ClientId[] = Object.entries(userClientsMap).map(([clientId, userId]) => {
-      return new ClientId(getE2EIClientId(clientId, userId.id, userId.domain).asBytes);
+    const clientIds = Object.entries(userClientsMap).map(([clientId, userId]) => {
+      return createMLSClientId(userId, clientId);
     });
     const deviceIdentities = await this.coreCryptoClient.getDeviceIdentities(
       new ConversationId(Decoder.fromBase64(groupId).asBytes),
@@ -206,7 +261,8 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     );
 
     return deviceIdentities.flatMap(identity => {
-      const qualifiedUserId = userClientsMap[identity.clientId];
+      const clientId = decodeClientId(identity.clientId);
+      const qualifiedUserId = userClientsMap[clientId];
 
       if (qualifiedUserId === undefined) {
         return [];
@@ -215,7 +271,8 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
       return [
         {
           ...identity,
-          deviceId: parseFullQualifiedClientId(identity.clientId).client,
+          clientId,
+          deviceId: parseFullQualifiedClientId(clientId).client,
           credentialType: identity.credentialType,
           qualifiedUserId,
         },
@@ -228,54 +285,6 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     return client === undefined || !this.mlsService.isInitializedMLSClient(client);
   }
 
-  private async registerLocalCertificateRoot(acmeService: AcmeService): Promise<string> {
-    const localCertificateRoot = await acmeService.getLocalCertificateRoot();
-    await this.coreCryptoClient.transaction(cx => {
-      return cx.e2eiRegisterAcmeCA(localCertificateRoot);
-    });
-
-    return localCertificateRoot;
-  }
-
-  /**
-   * will initialize the E2EIServiceExternal with the given discoveryUrl and userId.
-   * It will also register the server certificates in CoreCrypto and start the CRL background check process
-   *
-   * @param discoveryUrl the discovery url of the acme server
-   */
-  public async initialize(discoveryUrl: string): Promise<void> {
-    this._acmeService = new AcmeService(discoveryUrl);
-
-    this.mlsService.on(MLSServiceEvents.NEW_CRL_DISTRIBUTION_POINTS, distributionPoints => {
-      return this.handleNewCrlDistributionPoints(distributionPoints);
-    });
-
-    await this.registerServerCertificates();
-    await this.initialiseCrlDistributionTimers();
-  }
-
-  /**
-   * Forces an immediate refresh of revocation-related data.
-   * - Re-fetches and registers federation intermediate certificates
-   * - Re-validates all known CRL distribution points from local storage
-   */
-  public async refreshRevocationData(): Promise<void> {
-    await this.registerCrossSignedCertificates(this.acmeService);
-
-    const knownCrlDistributionPoints = await this.coreDatabase.getAll('crls');
-    const uniqueDistributionPointUrls = Array.from(
-      new Set(
-        knownCrlDistributionPoints.map(crl => {
-          return crl.url;
-        }),
-      ),
-    );
-
-    for (const distributionPointUrl of uniqueDistributionPointUrls) {
-      await this.validateCrlDistributionPoint(distributionPointUrl);
-    }
-  }
-
   private get acmeService(): AcmeService {
     if (this._acmeService === undefined) {
       throw new Error('AcmeService not initialized');
@@ -283,42 +292,239 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     return this._acmeService;
   }
 
+  private async getPkiEnvironment(): Promise<PkiEnvironment> {
+    const pkiEnvironment = await this.coreCryptoClient.getPkiEnvironment();
+    if (pkiEnvironment === undefined) {
+      throw new Error('The PKI environment is not initialized');
+    }
+    return pkiEnvironment;
+  }
+
+  /**
+   * will initialize the E2EIServiceExternal with the given discoveryUrl and userId.
+   * It will create the PKI environment, register the server certificates in CoreCrypto and start
+   * the background processes that keep the intermediate certificates and the X509 credentials up to date.
+   *
+   * @param discoveryUrl the discovery url of the acme server
+   * @param authenticate authenticates the user against its identity provider. This is owned by the webapp
+   * because it needs the OIDC details, while the rest of the PKI environment hooks live in core.
+   * @param options.crlProxy proxy used for CRL downloads, if the deployment provides one
+   */
+  public async initialize(
+    discoveryUrl: string,
+    authenticate: E2EIAuthenticateCallback,
+    {crlProxy}: InitializeOptions = {},
+  ): Promise<void> {
+    this.crlProxy = crlProxy;
+    this._acmeService = new AcmeService(discoveryUrl);
+
+    await this.initializePkiEnvironment(authenticate);
+    await this.registerIntermediateCertificates();
+    await this.scheduleCredentialsCheck();
+  }
+
+  /**
+   * Forces an immediate refresh of revocation-related data.
+   * - Re-fetches and registers federation intermediate certificates
+   * - Asks CoreCrypto to fetch and apply the current CRLs (`checkCredentials`)
+   */
+  public async refreshRevocationData(): Promise<void> {
+    await this.registerCrossSignedCertificates(this.acmeService);
+    await this.checkAllCredentials();
+  }
+
+  private async initializePkiEnvironment(authenticate: E2EIAuthenticateCallback): Promise<void> {
+    const existingPkiEnvironment = await this.coreCryptoClient.getPkiEnvironment();
+    if (existingPkiEnvironment !== undefined) {
+      return;
+    }
+
+    const pkiEnvironment = await this.createPkiEnvironmentFromHooks(this.buildPkiEnvironmentHooks(authenticate)).match({
+      Resolved: environment => {
+        return Promise.resolve(environment);
+      },
+      Rejected: error => {
+        return Promise.reject(error);
+      },
+    });
+
+    // Trust anchors are persisted in the CoreCrypto database. Only add the deployment root if
+    // there is none yet, otherwise every app start would add a duplicate anchor.
+    const trustAnchors = await pkiEnvironment.getTrustAnchors();
+    if (trustAnchors.length === 0) {
+      const localCertificateRoot = await this.acmeService.getLocalCertificateRoot();
+      await pkiEnvironment.addTrustAnchor(localCertificateRoot);
+    }
+  }
+
+  private buildPkiEnvironmentHooks(authenticate: E2EIAuthenticateCallback): PkiEnvironmentHooks {
+    return {
+      httpRequest: (method, url, headers, body) => {
+        return this.httpRequest(method, url, headers, body);
+      },
+      authenticate: async (idp, keyAuth, acmeAud, acquisitionSnapshot) => {
+        // Persist the acquisition before the user is redirected to the identity provider. If the
+        // page reloads, the next enrollment resumes from this snapshot instead of starting over.
+        await this.enrollmentStorage.savePendingAcquisitionSnapshot(acquisitionSnapshot);
+        return authenticate({idp, keyAuth, acmeAudience: acmeAud, acquisitionSnapshot});
+      },
+      getBackendNonce: () => {
+        return this.apiClient.api.client.getNonce(this.apiClient.validatedClientId);
+      },
+      fetchBackendAccessToken: async dpop => {
+        const {token} = await this.apiClient.api.client.getAccessToken(
+          this.apiClient.validatedClientId,
+          new TextEncoder().encode(dpop),
+        );
+        return token;
+      },
+    };
+  }
+
+  /**
+   * Performs an HTTP request on behalf of CoreCrypto.
+   *
+   * CoreCrypto uses this for every ACME server call (directory, nonce, account, order, challenges
+   * and certificate). Every status code is handed back to CoreCrypto, which decides how to react.
+   *
+   * CRL downloads are routed through the deployment's CRL proxy, which serves the CRL of a host at
+   * `<crlProxy>/<host>`. This mirrors the iOS client: only requests whose path ends in `crl` are
+   * rewritten, everything else is fetched as-is.
+   */
+  private async httpRequest(
+    method: HttpMethod,
+    url: string,
+    headers: HttpHeader[],
+    body: Uint8Array,
+  ): Promise<HttpResponse> {
+    const requestUrl = this.resolveRequestUrl(url);
+    if (requestUrl.isErr) {
+      return Promise.reject(requestUrl.error);
+    }
+
+    const response = await axios.request<ArrayBuffer>({
+      method: axiosMethods[method],
+      url: requestUrl.value,
+      headers: Object.fromEntries(
+        headers.map(({name, value}) => {
+          return [name, value];
+        }),
+      ),
+      data: body.byteLength > 0 ? body : undefined,
+      responseType: 'arraybuffer',
+      validateStatus: () => {
+        return true;
+      },
+    });
+
+    const responseBody =
+      typeof response.data === 'string' ? new TextEncoder().encode(response.data) : new Uint8Array(response.data);
+
+    return {
+      status: response.status,
+      headers: Object.entries(response.headers).map(([name, value]) => {
+        return {name, value: String(value)};
+      }),
+      body: responseBody,
+    };
+  }
+
+  /**
+   * Rewrites a CRL URL to its proxy form. A malformed URL is surfaced as an error instead of being
+   * passed through silently.
+   */
+  private resolveRequestUrl(url: string): Result<string, Error> {
+    return result.tryOrElse(
+      cause => {
+        return new Error(`Could not parse request URL "${url}"`, {cause});
+      },
+      () => {
+        const parsedUrl = new URL(url);
+
+        if (this.crlProxy === undefined || !parsedUrl.pathname.endsWith('crl')) {
+          return url;
+        }
+
+        const proxyUrl = new URL(this.crlProxy);
+        if (!proxyUrl.pathname.endsWith('/')) {
+          proxyUrl.pathname = `${proxyUrl.pathname}/`;
+        }
+
+        return new URL(parsedUrl.host, proxyUrl).toString();
+      },
+    );
+  }
+
   private async registerCrossSignedCertificates(acmeService: AcmeService): Promise<void> {
     const certificates = await acmeService.getFederationCrossSignedCertificates();
+    const pkiEnvironment = await this.getPkiEnvironment();
     await Promise.all(
       certificates.map(cert => {
-        return this.coreCryptoClient.transaction(cx => {
-          return cx.e2eiRegisterIntermediateCA(cert);
-        });
+        return pkiEnvironment.addIntermediateCert(cert);
       }),
     );
   }
 
   /**
-   * This function is used to register different server certificates in CoreCrypto.
+   * Asks CoreCrypto to check all X509 credentials for expiration and revocation. CoreCrypto owns
+   * CRL fetching, so this is also what refreshes the revocation data behind `getUserIdentities`,
+   * `getDeviceIdentities` and `e2eiConversationState`.
    *
-   * 1. Root Certificate: This is the root certificate of the server.
-   * - It must only be registered once.
-   * - It must be the first certificate to be registered. Nothing else will work
-   *
-   * 2. Intermediate Certificate: This is the intermediate certificate of the server. It must be updated every 24 hours.
-   * - It must be registered after the root certificate.
-   * - It must be updated every 24 hours.
-   *
-   * Both must be registered before the first enrollment.
+   * A failed check can also mean that a CRL could not be fetched (for example on a flaky
+   * connection). It must not be treated as a revoked credential, so failures are only logged.
    */
-  private async registerServerCertificates(): Promise<void> {
-    const isRootRegistered = await this.coreCryptoClient.transaction(cx => {
-      return cx.e2eiIsPKIEnvSetup();
-    });
+  private async checkAllCredentials(): Promise<void> {
+    const outcome = await task.tryOrElse(
+      error => {
+        return error;
+      },
+      () => {
+        return this.coreCryptoClient.transaction(cx => {
+          return cx.checkCredentials();
+        });
+      },
+    );
 
-    // Register root certificate if not already registered
-    if (!isRootRegistered) {
-      await this.registerLocalCertificateRoot(this.acmeService);
+    if (outcome.isErr) {
+      this.logger.warn('Failed to check X509 credentials', {error: outcome.error});
+      return;
     }
 
-    // Register intermediate certificate and update it every 24 hours
+    this.emit('credentialsChecked');
+  }
 
+  /**
+   * Runs {@link checkAllCredentials} once at startup and then at most once every 24 hours.
+   *
+   * The scheduler persists the next firing date by task key, so restarting the app (or calling
+   * `initialize` again after a feature config update) does not run the check twice.
+   */
+  private async scheduleCredentialsCheck(): Promise<void> {
+    const CREDENTIALS_CHECK_KEY = 'check-credentials';
+    const hasPendingTask = await this.recurringTaskScheduler.hasTask(CREDENTIALS_CHECK_KEY);
+
+    const runCheck = (): Promise<void> => {
+      return this.checkAllCredentials();
+    };
+
+    if (!hasPendingTask) {
+      await runCheck();
+    }
+
+    await this.recurringTaskScheduler.registerTask({
+      every: TimeInMillis.DAY,
+      key: CREDENTIALS_CHECK_KEY,
+      task: runCheck,
+    });
+  }
+
+  /**
+   * This function is used to register different server certificates in CoreCrypto.
+   *
+   * Intermediate certificates are the intermediate certificates of the server. They must be
+   * updated every 24 hours.
+   */
+  private async registerIntermediateCertificates(): Promise<void> {
     const INTERMEDIATE_CA_KEY = 'update-intermediate-certificates';
     const hasPendingTask = await this.recurringTaskScheduler.hasTask(INTERMEDIATE_CA_KEY);
 
@@ -336,70 +542,5 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
       key: INTERMEDIATE_CA_KEY,
       task,
     });
-  }
-
-  private scheduleCrlDistributionTimer({expiresAt, url}: {expiresAt: number; url: string}): void {
-    LowPrecisionTaskScheduler.addTask({
-      intervalDelay: TimeInMillis.SECOND,
-      firingDate: expiresAt,
-      key: url,
-      task: () => {
-        return this.validateCrlDistributionPoint(url);
-      },
-    });
-  }
-
-  private async initialiseCrlDistributionTimers(): Promise<void> {
-    const crls = await this.coreDatabase.getAll('crls');
-
-    for (const crl of crls) {
-      this.scheduleCrlDistributionTimer(crl);
-    }
-  }
-
-  private async addCrlDistributionTimer({expiresAt, url}: {expiresAt: number; url: string}): Promise<void> {
-    await this.coreDatabase.put('crls', {expiresAt, url}, url);
-    this.scheduleCrlDistributionTimer({expiresAt, url});
-  }
-
-  private async cancelCrlDistributionTimer(url: string): Promise<void> {
-    await this.coreDatabase.delete('crls', url);
-  }
-
-  private async validateCrlDistributionPoint(distributionPointUrl: string): Promise<void> {
-    const domain = new URL(distributionPointUrl).hostname;
-    const crl = await this.acmeService.getCRLFromDistributionPoint(domain);
-
-    await this.validateCrl(distributionPointUrl, crl, () => {
-      return this.emit('crlChanged', {domain});
-    });
-  }
-
-  private async validateCrl(url: string, crl: Uint8Array, onDirty: () => void): Promise<void> {
-    const {expiration: expirationTimestampSeconds, dirty} = await this.coreCryptoClient.transaction(cx => {
-      return cx.e2eiRegisterCRL(url, crl);
-    });
-
-    const expirationTimestamp =
-      expirationTimestampSeconds !== undefined ? expirationTimestampSeconds * TimeInMillis.SECOND : undefined;
-
-    await this.cancelCrlDistributionTimer(url);
-
-    //set a new timer that will execute a task once the CRL is expired
-    if (expirationTimestamp !== undefined) {
-      await this.addCrlDistributionTimer({expiresAt: expirationTimestamp, url});
-    }
-
-    //if it was dirty, trigger e2eiconversationstate for every conversation
-    if (dirty) {
-      onDirty();
-    }
-  }
-
-  private async handleNewCrlDistributionPoints(distributionPoints: string[]): Promise<void> {
-    const uniqueDistributionPoints = Array.from(new Set(distributionPoints));
-    for (const distributionPointUrl of uniqueDistributionPoints) {
-      await this.validateCrlDistributionPoint(distributionPointUrl);
-    }
   }
 }

@@ -21,14 +21,15 @@ import {SUBCONVERSATION_ID} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {DBSchema, deleteDB as idbDeleteDB, IDBPDatabase, openDB as idbOpenDb} from 'idb';
 
-import {EnrollmentFlowData} from '../messagingProtocols/mls/e2eIdentityService/storage/e2eiStorage.schema';
+import {PendingEnrollmentData} from '../messagingProtocols/mls/e2eIdentityService/storage/e2eiStorage.schema';
 
 const recurringTasksMigrationVersion = 2;
 const conversationBlacklistMigrationVersion = 3;
 const subconversationsMigrationVersion = 4;
 const enrollmentMigrationVersion = 5;
 const mlsRecoveryMigrationVersion = 6;
-const VERSION = 7;
+const removeUnusedCrlsMigrationVersion = 7;
+const VERSION = 8;
 
 interface CoreDBSchema extends DBSchema {
   prekeys: {
@@ -51,13 +52,9 @@ interface CoreDBSchema extends DBSchema {
     key: string;
     value: {parentConversationId: QualifiedId; subconversationId: SUBCONVERSATION_ID; groupId: string};
   };
-  crls: {
-    key: string;
-    value: {expiresAt: number; url: string};
-  };
   pendingEnrollmentData: {
     key: string;
-    value: EnrollmentFlowData;
+    value: PendingEnrollmentData;
   };
   mlsConversationRecovery: {
     key: string;
@@ -83,10 +80,18 @@ export async function openDB(dbName: string): Promise<CoreDatabase> {
         case subconversationsMigrationVersion:
           db.createObjectStore('subconversations');
         case enrollmentMigrationVersion:
-          db.createObjectStore('crls');
           db.createObjectStore('pendingEnrollmentData');
         case mlsRecoveryMigrationVersion:
           db.createObjectStore('mlsConversationRecovery');
+        case removeUnusedCrlsMigrationVersion: {
+          // CRLs moved into CoreCrypto with V11. The store was never read, but older databases
+          // still contain it, so drop it instead of leaving a dead object store behind.
+          // The schema no longer contains `crls`, so this migration uses the untyped database view.
+          const legacyDb = db as IDBPDatabase;
+          if (legacyDb.objectStoreNames.contains('crls')) {
+            legacyDb.deleteObjectStore('crls');
+          }
+        }
       }
     },
   });

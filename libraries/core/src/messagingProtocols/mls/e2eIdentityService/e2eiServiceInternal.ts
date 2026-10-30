@@ -17,310 +17,233 @@
  *
  */
 
-import {isEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {Decoder} from 'bazinga64';
+import {Maybe, Task, result, task} from 'true-myth';
 
-import {APIClient} from '@wireapp/api-client';
 import {LogFactory} from '@wireapp/commons';
-import {ConversationId, NewCrlDistributionPoints} from '@wireapp/core-crypto';
+import {
+  ConversationId,
+  CredentialRef,
+  X509CredentialAcquisition,
+  type Credential,
+  type PkiEnvironment,
+  type X509CredentialAcquisitionConfiguration,
+} from '@wireapp/core-crypto';
 
-import {AcmeService} from './connection/acmeServer';
-import {AcmeDirectory, Ciphersuite, CoreCrypto, CredentialType, E2eiEnrollment} from './e2eiService.types';
-import {isResponseStatusValid} from './helper';
-import {createNewAccount} from './steps/account';
-import {getAuthorizationChallenges} from './steps/authorization';
-import {getCertificate} from './steps/certificate';
-import {doWireDpopChallenge} from './steps/dpopChallenge/dpopChallenge';
-import {doWireOidcChallenge} from './steps/oidcChallenge';
-import {createNewOrder, finalizeOrder} from './steps/order';
+import {Ciphersuite, CoreCrypto, CredentialType} from './e2eiService.types';
 import {createE2EIEnrollmentStorage} from './storage/e2eiStorage';
-import {EnrollmentFlowData, InitialData, UnidentifiedEnrollmentFlowData} from './storage/e2eiStorage.schema';
+import {InitialData} from './storage/e2eiStorage.schema';
 
 import {CoreDatabase} from '../../../storage/coreDb';
-import {toBufferSource} from '../../../util/bufferUtils';
+import {createMLSClientId} from '../utils/mlsId';
 
-type CertificateGenerationResult = {newCrlDistributionPoints: NewCrlDistributionPoints; keyPackages: Uint8Array[]};
-
-export type getTokenCallback = (challengesData?: {challenge: any; keyAuth: string}) => Promise<string | undefined>;
+type CertificateGenerationResult = {keyPackages: Uint8Array[]};
 
 export type getAllConversationsCallback = () => Promise<
   {
     group_id: string;
   }[]
 >;
+
 export class E2EIServiceInternal {
   private readonly logger = LogFactory.getLogger('@wireapp/core/E2EIdentityServiceInternal');
-  private acmeService: AcmeService;
-  private enrollmentStorage: ReturnType<typeof createE2EIEnrollmentStorage>;
+  private readonly enrollmentStorage: ReturnType<typeof createE2EIEnrollmentStorage>;
 
   public constructor(
     coreDb: CoreDatabase,
     private readonly coreCryptoClient: CoreCrypto,
-    private readonly apiClient: APIClient,
     /** number of seconds the certificate should be valid */
     private readonly certificateTtl: number,
     private readonly keyPackagesAmount: number,
     private readonly initialData: InitialData,
   ) {
-    const {discoveryUrl} = initialData;
-    this.acmeService = new AcmeService(discoveryUrl);
     this.enrollmentStorage = createE2EIEnrollmentStorage(coreDb);
   }
 
   /**
    * Will get a certificate for the user
-   * @param getOAuthToken function called when the process needs an oauth token
    * @param refresh should the process refresh the current certificate or get a new one
+   * @param getAllConversations function called to get all conversations
+   * @param cipherSuite cipher suite of the credential to acquire
    */
   public async generateCertificate(
-    getOAuthToken: getTokenCallback,
     refresh: boolean,
-    getAllConversations: getAllConversationsCallback,
-    ciphersuite: Ciphersuite,
-  ): Promise<CertificateGenerationResult> {
-    const stashedEnrollmentData = await this.enrollmentStorage.getPendingEnrollmentData();
-
-    if (!isUndefined(stashedEnrollmentData)) {
-      // In case we have stashed data, we continue the enrollment flow (we are coming back from a redirect)
-      const oAuthToken = await getOAuthToken();
-      if (isUndefined(oAuthToken) || isEmptyString(oAuthToken)) {
-        throw new Error('No OAuthToken received for in progress enrollment process');
-      }
-      return this.continueCertificateGeneration(oAuthToken, stashedEnrollmentData, getAllConversations, ciphersuite);
-    }
-
-    // We first get the challenges needed to validate the user identity
-    const identity = await this.initIdentity(refresh, ciphersuite);
-    const enrollmentChallenges = await this.getEnrollmentChallenges(identity);
-    const {keyauth, oidcChallenge} = enrollmentChallenges.authorization;
-    const challengeData = {challenge: oidcChallenge, keyAuth: keyauth};
-
-    // store auth data for continuing the flow later on (in case we are redirected to the identity provider)
-    const handle = await this.coreCryptoClient.transaction(cx => {
-      return cx.e2eiEnrollmentStash(identity);
-    });
-
-    const enrollmentData = {
-      handle: toBufferSource(handle),
-      ...enrollmentChallenges,
-    };
-    await this.enrollmentStorage.savePendingEnrollmentData(enrollmentData);
-
-    // At this point we might be redirected to the identity provider. We have
-    const oAuthToken = await getOAuthToken(challengeData);
-    if (isUndefined(oAuthToken) || isEmptyString(oAuthToken)) {
-      throw new Error('No OAuthToken received for in initial enrollment process');
-    }
-    return this.continueCertificateGeneration(oAuthToken, enrollmentData, getAllConversations, ciphersuite);
-  }
-
-  private async continueCertificateGeneration(
-    oAuthToken: string,
-    enrollmentData: EnrollmentFlowData,
     getAllConversations: getAllConversationsCallback,
     cipherSuite: Ciphersuite,
   ): Promise<CertificateGenerationResult> {
-    const handle = enrollmentData.handle;
-    const identity = await this.coreCryptoClient.transaction(cx => {
-      return cx.e2eiEnrollmentStashPop(handle);
-    });
-    return this.getKeyPackages(identity, oAuthToken, enrollmentData, getAllConversations, cipherSuite);
+    const pkiEnvironment = await this.getPkiEnvironment();
+    const acquisition = await this.createAcquisition(pkiEnvironment, refresh, cipherSuite);
+
+    const credential = await acquisition.finalize();
+
+    // From here on CoreCrypto owns the credential. The acquisition itself is not needed anymore.
+    acquisition.uniffiDestroy();
+
+    const credentialRef = await this.storeCredential(credential);
+    await this.setConversationCredentials(credentialRef, getAllConversations);
+    const keyPackages = await this.generateKeyPackages(credentialRef, cipherSuite);
+
+    await this.enrollmentStorage.deletePendingAcquisitionSnapshot();
+
+    return {keyPackages};
   }
 
   // ############ Internal Functions ############
 
-  private async initIdentity(hasActiveCertificate: boolean, ciphersuite: Ciphersuite): Promise<E2eiEnrollment> {
-    const {user} = this.initialData;
-
-    return hasActiveCertificate
-      ? this.coreCryptoClient.transaction(cx => {
-          return cx.e2eiNewRotateEnrollment(
-            this.certificateTtl,
-            ciphersuite,
-            user.displayName,
-            user.handle,
-            user.teamId,
-          );
-        })
-      : this.coreCryptoClient.transaction(cx => {
-          return cx.e2eiNewActivationEnrollment(
-            user.displayName,
-            user.handle,
-            this.certificateTtl,
-            ciphersuite,
-            user.teamId,
-          );
-        });
-  }
-
-  private async getDirectory(identity: E2eiEnrollment, connection: AcmeService): Promise<AcmeDirectory | undefined> {
-    const directory = await connection.getDirectory();
-
-    if (!isUndefined(directory)) {
-      const parsedDirectory = identity.directoryResponse(directory);
-      return parsedDirectory;
+  private async getPkiEnvironment(): Promise<PkiEnvironment> {
+    const pkiEnvironment = await this.coreCryptoClient.getPkiEnvironment();
+    if (pkiEnvironment === undefined) {
+      throw new Error('The PKI environment is not initialized, E2EIdentity has to be initialized first');
     }
-    return undefined;
-  }
-
-  private async getInitialNonce(directory: AcmeDirectory, connection: AcmeService): Promise<string> {
-    const nonce = await connection.getInitialNonce(directory.newNonce);
-    if (isUndefined(nonce) || isEmptyString(nonce)) {
-      throw new Error('No initial-nonce received');
-    }
-    return nonce;
+    return pkiEnvironment;
   }
 
   /**
-   * Start of the ACME enrollment flow
-   * Stores the received data in local storage for later use (e.g. in the continue flow)
-   *
-   * @returns authData
+   * Resumes an acquisition that was interrupted by an identity provider redirect, creates a new
+   * activation acquisition, or creates a rotation acquisition based on the latest credential.
    */
-  private async getEnrollmentChallenges(identity: E2eiEnrollment): Promise<UnidentifiedEnrollmentFlowData> {
-    // Get the directory
-    const {acmeService: acmeService} = this;
-    const directory = await this.getDirectory(identity, acmeService);
-    if (isUndefined(directory)) {
-      throw new Error('Error while trying to start OAuth flow. No directory received');
-    }
-
-    // Step 1: Get a new nonce from ACME server
-    const nonce = await this.getInitialNonce(directory, acmeService);
-    if (isEmptyString(nonce)) {
-      throw new Error('Error while trying to start OAuth flow. No nonce received');
-    }
-
-    // Step 2: Create a new account
-    const newAccountNonce = await createNewAccount({
-      connection: acmeService,
-      directory,
-      identity,
-      nonce,
-    });
-
-    // Step 3: Create a new order
-    const orderData = await createNewOrder({
-      directory,
-      connection: acmeService,
-      identity,
-      nonce: newAccountNonce,
-    });
-
-    // Step 4: Get authorization challenges
-    const authChallenges = await getAuthorizationChallenges({
-      connection: acmeService,
-      identity: identity,
-      authzUrls: orderData.authzUrls,
-      nonce: orderData.nonce,
-    });
-
-    return {orderUrl: orderData.orderUrl, ...authChallenges};
-  }
-
-  /**
-   * Continuation of the ACME enrollment flow
-   * Needs to be called after the user has authenticated with the OIDC provider
-   * Stores the received certificate data in local storage for later use
-   *
-   * @param oAuthIdToken
-   * @returns KeyPackages
-   */
-  private async getKeyPackages(
-    identity: E2eiEnrollment,
-    oAuthIdToken: string,
-    enrollmentData: UnidentifiedEnrollmentFlowData,
-    getAllConversations: getAllConversationsCallback,
+  private async createAcquisition(
+    pkiEnvironment: PkiEnvironment,
+    refresh: boolean,
     cipherSuite: Ciphersuite,
-  ): Promise<CertificateGenerationResult> {
-    // Step 7: Do OIDC client challenge
-    const oidcData = await doWireOidcChallenge({
-      oAuthIdToken,
-      authData: enrollmentData,
-      connection: this.acmeService,
-      identity,
-      nonce: enrollmentData.nonce,
-    });
-    this.logger.debug('oidc data', oidcData);
-
-    if (isNullOrUndefined(oidcData.data.validated)) {
-      throw new Error('Error while trying to continue OAuth flow. OIDC challenge not validated');
+  ): Promise<X509CredentialAcquisition> {
+    // The hook that persists the snapshot has already run: we are coming back from the identity provider.
+    const pendingSnapshot = await this.enrollmentStorage.getPendingAcquisitionSnapshot();
+    if (pendingSnapshot.isJust) {
+      return X509CredentialAcquisition.fromBytes(pkiEnvironment, pendingSnapshot.value);
     }
 
-    const {user: wireUser, clientId} = this.initialData;
-    //Step 8: Do DPOP Challenge
-    const dpopData = await doWireDpopChallenge({
-      authData: enrollmentData,
-      clientId,
-      connection: this.acmeService,
-      identity,
-      userDomain: wireUser.domain,
-      apiClient: this.apiClient,
-      expirySecs: 30,
-      nonce: oidcData.nonce,
-    });
-    this.logger.debug('dpop data', dpopData);
+    const config = this.createAcquisitionConfiguration(cipherSuite);
 
-    if (!isResponseStatusValid(dpopData.data.status)) {
-      throw new Error('Error while trying to continue OAuth flow. DPOP challenge not validated');
+    if (!refresh) {
+      return new X509CredentialAcquisition(pkiEnvironment, config);
     }
 
-    //Step 9: Finalize Order
-    const finalizeOrderData = await finalizeOrder({
-      connection: this.acmeService,
-      identity,
-      nonce: dpopData.nonce,
-      orderUrl: enrollmentData.orderUrl,
+    const credentialRef = await this.getLatestX509CredentialRef(cipherSuite).match({
+      Resolved: value => {
+        return Promise.resolve(value);
+      },
+      Rejected: error => {
+        return Promise.reject(error);
+      },
     });
 
-    if (isEmptyString(finalizeOrderData.certificateUrl)) {
-      throw new Error('Error while trying to continue OAuth flow. No certificateUrl received');
-    }
+    return X509CredentialAcquisition.newFromCredentialRef(pkiEnvironment, config, credentialRef, undefined);
+  }
 
-    // Step 9: Get certificate
-    const {certificate} = await getCertificate({
-      certificateUrl: finalizeOrderData.certificateUrl,
-      nonce: finalizeOrderData.nonce,
-      connection: this.acmeService,
-      identity,
+  private createAcquisitionConfiguration(cipherSuite: Ciphersuite): X509CredentialAcquisitionConfiguration {
+    const {user, clientId, discoveryUrl} = this.initialData;
+
+    return {
+      acmeDirectoryUrl: discoveryUrl,
+      cipherSuite,
+      displayName: user.displayName,
+      clientId: createMLSClientId({id: user.id, domain: user.domain}, clientId),
+      handle: user.handle,
+      domain: user.domain,
+      ...(user.teamId.length > 0 ? {team: user.teamId} : {}),
+      validityPeriodSecs: BigInt(this.certificateTtl),
+    };
+  }
+
+  private getLatestX509CredentialRef(cipherSuite: Ciphersuite): Task<CredentialRef, unknown> {
+    return task
+      .tryOrElse(
+        error => {
+          return error;
+        },
+        () => {
+          return this.coreCryptoClient.findCredentials({cipherSuite, credentialType: CredentialType.X509});
+        },
+      )
+      .andThen(credentials => {
+        const latestCredential = credentials.reduce<Maybe<CredentialRef>>((latest, credential) => {
+          return latest.match({
+            Just: current => {
+              return credential.earliestValidity() > current.earliestValidity() ? Maybe.just(credential) : latest;
+            },
+            Nothing: () => {
+              return Maybe.just(credential);
+            },
+          });
+        }, Maybe.nothing());
+
+        return latestCredential.match({
+          Just: credential => {
+            return task.resolve(credential);
+          },
+          Nothing: () => {
+            return task.reject(new Error(`No X509 credential found for cipher suite ${cipherSuite}`));
+          },
+        });
+      });
+  }
+
+  private storeCredential(credential: Credential): Promise<CredentialRef> {
+    return this.coreCryptoClient.transaction(cx => {
+      return cx.addCredential(credential);
     });
+  }
 
-    if (isEmptyString(certificate)) {
-      throw new Error('Error while trying to continue OAuth flow. No certificate received');
-    }
+  /**
+   * Changes the credential of every MLS conversation the client takes part in, so that the next
+   * outgoing commit is signed with the newly acquired certificate.
+   */
+  private async setConversationCredentials(
+    credentialRef: CredentialRef,
+    getAllConversations: getAllConversationsCallback,
+  ): Promise<void> {
+    const conversations = await getAllConversations();
 
-    // Step 10: Initialize MLS with the certificate
-    return this.coreCryptoClient.transaction(async cx => {
-      const conversations = await getAllConversations();
-      const newCrlDistributionPoints = await cx.saveX509Credential(identity, certificate);
+    await this.coreCryptoClient.transaction(async cx => {
       for (const conversation of conversations) {
-        if (Boolean(conversation.group_id?.length)) {
-          try {
-            const idAsBytes = Decoder.fromBase64(conversation.group_id).asBytes;
-            const conversationId = new ConversationId(idAsBytes);
-
-            // Check if conversation exists before rotating
-            const conversationExists = await cx.conversationExists(conversationId);
-            if (conversationExists) {
-              await cx.e2eiRotate(conversationId);
-            }
-          } catch (error) {
-            // Log error but don't fail the entire enrollment if one conversation fails
-            this.logger.warn('Failed to rotate conversation', {groupId: conversation.group_id, error});
-          }
-        } else {
+        if (conversation.group_id.length === 0) {
           this.logger.error('No group id found in conversation');
+          continue;
+        }
+
+        const conversationId = result.tryOrElse(
+          cause => {
+            return new Error('Failed to decode the conversation group id', {cause});
+          },
+          () => {
+            return new ConversationId(Decoder.fromBase64(conversation.group_id).asBytes);
+          },
+        );
+
+        if (result.isErr(conversationId)) {
+          this.logger.warn('Invalid group id found in conversation', {
+            groupId: conversation.group_id,
+            error: conversationId.error,
+          });
+          continue;
+        }
+
+        const conversationExists = await cx.conversationExists(conversationId.value);
+        if (!conversationExists) {
+          continue;
+        }
+
+        await cx.setConversationCredential(conversationId.value, credentialRef);
+      }
+    });
+  }
+
+  private async generateKeyPackages(credentialRef: CredentialRef, cipherSuite: Ciphersuite): Promise<Uint8Array[]> {
+    return this.coreCryptoClient.transaction(async cx => {
+      const storedKeyPackages = await cx.getKeyPackages();
+      for (const keyPackage of storedKeyPackages) {
+        if (keyPackage.cipherSuite() === cipherSuite && !keyPackage.isValid()) {
+          await cx.removeKeyPackage(keyPackage);
         }
       }
 
-      await cx.deleteStaleKeyPackages(cipherSuite);
-
-      const keyPackages = await cx.clientKeypackages(cipherSuite, CredentialType.X509, this.keyPackagesAmount);
-
-      return {
-        newCrlDistributionPoints,
-        keyPackages,
-      };
+      const generatedKeyPackages: Uint8Array[] = [];
+      for (let index = 0; index < this.keyPackagesAmount; index++) {
+        const keyPackage = await cx.generateKeyPackage(credentialRef);
+        generatedKeyPackages.push(keyPackage.serialize());
+      }
+      return generatedKeyPackages;
     });
   }
 }

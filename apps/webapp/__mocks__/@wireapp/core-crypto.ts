@@ -27,15 +27,25 @@ export enum RatchetTreeType {
   Delta = 2,
   ByRef = 3,
 }
-export enum Ciphersuite {
-  MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519 = 1,
-  MLS_128_DHKEMP256_AES128GCM_SHA256_P256 = 2,
-  MLS_128_DHKEMX25519_CHACHA20POLY1305_SHA256_Ed25519 = 3,
-  MLS_256_DHKEMX448_AES256GCM_SHA512_Ed448 = 4,
-  MLS_256_DHKEMP521_AES256GCM_SHA512_P521 = 5,
-  MLS_256_DHKEMX448_CHACHA20POLY1305_SHA512_Ed448 = 6,
-  MLS_256_DHKEMP384_AES256GCM_SHA384_P384 = 7,
-  MLS_128_X25519KYBER768DRAFT00_AES128GCM_SHA256_Ed25519 = 61489,
+export enum CipherSuite {
+  Mls128Dhkemx25519Aes128gcmSha256Ed25519 = 1,
+  Mls128Dhkemp256Aes128gcmSha256P256 = 2,
+  Mls128Dhkemx25519Chacha20poly1305Sha256Ed25519 = 3,
+  Mls256Dhkemx448Aes256gcmSha512Ed448 = 4,
+  Mls256Dhkemp521Aes256gcmSha512P521 = 5,
+  Mls256Dhkemx448Chacha20poly1305Sha512Ed448 = 6,
+  Mls256Dhkemp384Aes256gcmSha384P384 = 7,
+  Mls128Mlkem768x25519Aes128gcmSha256Ed25519 = 61441,
+  Mls128Mlkem768x25519Aes256gcmSha384Ed25519 = 61442,
+  Mls128Mlkem768p256Aes128gcmSha256P256 = 61443,
+  Mls128Mlkem768p256Aes256gcmSha384P256 = 61444,
+  Mls192Mlkem1024p384Aes256gcmSha384P384 = 61445,
+  Mls128Mlkem768Aes256gcmSha384Ed25519 = 61446,
+  Mls128Mlkem768Aes256gcmSha384P256 = 61447,
+  Mls192Mlkem1024Aes256gcmSha384P384 = 61448,
+  Mls128Mlkem768x25519Chacha20poly1305Sha384Mldsa44 = 61449,
+  Mls192Mlkem768Aes256gcmSha384Mldsa65 = 61450,
+  Mls256Mlkem1024Aes256gcmSha384Mldsa87 = 61451,
 }
 export enum CredentialType {
   Basic = 1,
@@ -45,6 +55,14 @@ export enum DeviceStatus {
   Valid = 1,
   Expired = 2,
   Revoked = 3,
+}
+export enum HttpMethod {
+  Get = 0,
+  Post = 1,
+  Put = 2,
+  Delete = 3,
+  Patch = 4,
+  Head = 5,
 }
 export enum E2eiConversationState {
   /**

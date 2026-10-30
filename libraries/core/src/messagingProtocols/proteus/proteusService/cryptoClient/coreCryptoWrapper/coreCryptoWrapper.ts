@@ -20,6 +20,7 @@
 import {PreKey} from '@wireapp/api-client/lib/auth';
 import {Encoder} from 'bazinga64';
 import {deleteDB} from 'idb';
+import {result, task, type Result, type Task} from 'true-myth';
 
 import {LogFactory} from '@wireapp/commons';
 import {
@@ -30,10 +31,15 @@ import {
   version as CCVersion,
   initWasmModule,
   migrateDatabaseKeyTypeToBytes,
+  Database,
   DatabaseKey,
+  PkiEnvironment,
+  proteusLastResortPrekeyId,
+  type PkiEnvironmentHooks,
 } from '@wireapp/core-crypto';
 import type {CRUDEngine} from '@wireapp/store-engine';
 
+import {removeCoreCryptoDatabaseFiles} from './coreCryptoOpfsStorage';
 import {PrekeyTracker} from './prekeysTracker';
 
 import {CorruptedKeyError, GeneratedKey} from '../../../../../secretStore/secretKeyGenerator';
@@ -43,6 +49,18 @@ import {CryptoClient, InitialPrekeys} from '../cryptoClient.types';
 type SecretKeySizeInBytes = 16 | 32;
 const legacySecretKeySizeInBytes = 16;
 const secretKeySizeInBytes = 32;
+const reseedSeedSizeInBytes = 32;
+
+const validateReseedSeed = (seed: Uint8Array): Result<Uint8Array, Error> => {
+  if (seed.byteLength !== reseedSeedSizeInBytes) {
+    return result.err(
+      new Error(
+        `CoreCrypto reseed requires a seed of exactly ${reseedSeedSizeInBytes} bytes, received ${seed.byteLength}`,
+      ),
+    );
+  }
+  return result.ok(seed);
+};
 
 type Config = {
   generateSecretKey: (keyId: string, keySize: SecretKeySizeInBytes) => Promise<GeneratedKey>;
@@ -66,7 +84,7 @@ const logFunctions: Record<CoreCryptoLogLevel, Function> = {
 };
 
 const coreCryptoLogger = {
-  log: (level: CoreCryptoLogLevel, message: string, context: string) => {
+  log: (level: CoreCryptoLogLevel, message: string, context: string | undefined) => {
     logFunctions[level].call(logger, {message, context});
   },
 };
@@ -125,18 +143,104 @@ export const getCoreCryptoDbName = (storeEngine: CRUDEngine): string => {
   return `corecrypto-${storeEngine.storeName}`;
 };
 
+let coreCryptoInstance: CoreCrypto | undefined;
+let coreCryptoDatabase: Database | undefined;
+let coreCryptoPkiEnvironment: PkiEnvironment | undefined;
+
+const destroyCoreCryptoHandles = (): Result<void, Error> => {
+  const instance = coreCryptoInstance;
+  const database = coreCryptoDatabase;
+  const pkiEnvironment = coreCryptoPkiEnvironment;
+
+  // Clear the references first so a failed destroy cannot leave handles that
+  // might be destroyed a second time on a later wipe attempt.
+  coreCryptoInstance = undefined;
+  coreCryptoDatabase = undefined;
+  coreCryptoPkiEnvironment = undefined;
+
+  // The PKI environment references the database, so it has to be destroyed before it.
+  const pkiEnvironmentDestroyResult = result.tryOrElse(
+    cause => {
+      return new Error('Failed to destroy the CoreCrypto PKI environment', {cause});
+    },
+    () => {
+      pkiEnvironment?.uniffiDestroy();
+    },
+  );
+  const instanceDestroyResult = result.tryOrElse(
+    cause => {
+      return new Error('Failed to destroy the CoreCrypto instance', {cause});
+    },
+    () => {
+      instance?.uniffiDestroy();
+    },
+  );
+  const databaseDestroyResult = result.tryOrElse(
+    cause => {
+      return new Error('Failed to destroy the CoreCrypto database', {cause});
+    },
+    () => {
+      database?.uniffiDestroy();
+    },
+  );
+
+  // All operations have already run. Combining their results preserves the
+  // first failure while still surfacing failures of the later handles.
+  return pkiEnvironmentDestroyResult.and(instanceDestroyResult).and(databaseDestroyResult);
+};
+
+/**
+ * Creates the PKI environment used for X509 credential acquisition and registers it on the
+ * current CoreCrypto instance.
+ *
+ * The environment is owned by this module because it shares the lifetime of the CoreCrypto
+ * database handle. It is destroyed together with the other handles on wipe, so callers never
+ * receive a database handle that can outlive (and dangle after) a wipe.
+ */
+export const createPkiEnvironment = (hooks: PkiEnvironmentHooks): Task<PkiEnvironment, Error> => {
+  return task.tryOrElse(
+    cause => {
+      return new Error('Failed to create the CoreCrypto PKI environment', {cause});
+    },
+    async () => {
+      if (coreCryptoInstance === undefined || coreCryptoDatabase === undefined) {
+        throw new Error('CoreCrypto is not initialized');
+      }
+
+      const pkiEnvironment = await PkiEnvironment.create(hooks, coreCryptoDatabase);
+      await coreCryptoInstance.setPkiEnvironment(pkiEnvironment);
+      coreCryptoPkiEnvironment?.uniffiDestroy();
+      coreCryptoPkiEnvironment = pkiEnvironment;
+      return pkiEnvironment;
+    },
+  );
+};
+
 export const wipeCoreCryptoDb = async (storeEngine: CRUDEngine): Promise<void> => {
   const coreCryptoDbName = getCoreCryptoDbName(storeEngine);
   try {
-    await coreCryptoInstance?.close();
+    const destroyResult = destroyCoreCryptoHandles();
+    if (result.isErr(destroyResult)) {
+      throw destroyResult.error;
+    }
+    // CoreCrypto 11 keeps its keystore in OPFS. The IndexedDB database is the CoreCrypto 9 keystore, which
+    // CoreCrypto 11 migrates when it opens a database, so it has to go too or the wiped data would come back.
     await deleteDB(coreCryptoDbName);
+    if (globalThis.navigator?.storage?.getDirectory !== undefined) {
+      const opfsRemoveResult = await removeCoreCryptoDatabaseFiles(
+        await navigator.storage.getDirectory(),
+        coreCryptoDbName,
+      );
+      if (result.isErr(opfsRemoveResult)) {
+        throw opfsRemoveResult.error;
+      }
+    }
     logger.log('info', 'CoreCrypto DB wiped successfully');
   } catch {
     logger.error('error', 'Failed to wipe CoreCrypto DB');
   }
 };
 
-let coreCryptoInstance: CoreCrypto | undefined;
 export async function buildClient(
   storeEngine: CRUDEngine,
   {generateSecretKey, nbPrekeys, onNewPrekeys}: Config,
@@ -165,13 +269,20 @@ export async function buildClient(
           }
         }
 
-        coreCryptoInstance = await CoreCrypto.deferredInit({
-          databaseName: coreCryptoDbName,
-          key: key.key,
-        });
-
+        // Install the logger before opening the database, so that failures to open it are logged by CoreCrypto too.
         setLogger(coreCryptoLogger);
         setMaxLogLevel(CoreCryptoLogLevel.Info);
+
+        // The client may be built more than once per page: `registerClient` rebuilds the one created at login.
+        // CoreCrypto's SQLite keystore only allows one open handle per database, so opening it again while the
+        // previous handle is alive fails with "database is locked". Release the previous handles first.
+        const releaseResult = destroyCoreCryptoHandles();
+        if (result.isErr(releaseResult)) {
+          throw releaseResult.error;
+        }
+
+        coreCryptoDatabase = await Database.open(coreCryptoDbName, key.key);
+        coreCryptoInstance = CoreCrypto.new(coreCryptoDatabase);
 
         return new CoreCryptoWrapper(coreCryptoInstance, {nbPrekeys, onNewPrekeys, onWipe: key.deleteKey});
       })
@@ -224,7 +335,11 @@ export class CoreCryptoWrapper implements CryptoClient {
 
   async create(nbPrekeys: number, entropy?: Uint8Array): Promise<InitialPrekeys> {
     if (entropy !== undefined) {
-      await this.coreCrypto.reseedRng(entropy);
+      const seed = validateReseedSeed(entropy);
+      if (result.isErr(seed)) {
+        return Promise.reject(seed.error);
+      }
+      await this.coreCrypto.reseed(seed.value);
     }
     await this.init();
     const prekeys: PreKey[] = [];
@@ -237,7 +352,7 @@ export class CoreCryptoWrapper implements CryptoClient {
     });
     const lastPrekey = Encoder.toBase64(lastPrekeyBytes).asString;
 
-    const lastPrekeyId = CoreCrypto.proteusLastResortPrekeyId();
+    const lastPrekeyId = proteusLastResortPrekeyId();
 
     return {
       prekeys,

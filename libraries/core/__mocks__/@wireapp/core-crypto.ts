@@ -17,22 +17,42 @@
  *
  */
 
+import {asyncNoop, noop} from 'noop-esm';
+
 export interface CommitBundle {}
 
-export enum Ciphersuite {
-  MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519 = 1,
-  MLS_128_DHKEMP256_AES128GCM_SHA256_P256 = 2,
-  MLS_128_DHKEMX25519_CHACHA20POLY1305_SHA256_Ed25519 = 3,
-  MLS_256_DHKEMX448_AES256GCM_SHA512_Ed448 = 4,
-  MLS_256_DHKEMP521_AES256GCM_SHA512_P521 = 5,
-  MLS_256_DHKEMX448_CHACHA20POLY1305_SHA512_Ed448 = 6,
-  MLS_256_DHKEMP384_AES256GCM_SHA384_P384 = 7,
-  MLS_128_X25519KYBER768DRAFT00_AES128GCM_SHA256_Ed25519 = 61489,
+export enum CipherSuite {
+  Mls128Dhkemx25519Aes128gcmSha256Ed25519 = 1,
+  Mls128Dhkemp256Aes128gcmSha256P256 = 2,
+  Mls128Dhkemx25519Chacha20poly1305Sha256Ed25519 = 3,
+  Mls256Dhkemx448Aes256gcmSha512Ed448 = 4,
+  Mls256Dhkemp521Aes256gcmSha512P521 = 5,
+  Mls256Dhkemx448Chacha20poly1305Sha512Ed448 = 6,
+  Mls256Dhkemp384Aes256gcmSha384P384 = 7,
+  Mls128Mlkem768x25519Aes128gcmSha256Ed25519 = 61441,
+  Mls128Mlkem768x25519Aes256gcmSha384Ed25519 = 61442,
+  Mls128Mlkem768p256Aes128gcmSha256P256 = 61443,
+  Mls128Mlkem768p256Aes256gcmSha384P256 = 61444,
+  Mls192Mlkem1024p384Aes256gcmSha384P384 = 61445,
+  Mls128Mlkem768Aes256gcmSha384Ed25519 = 61446,
+  Mls128Mlkem768Aes256gcmSha384P256 = 61447,
+  Mls192Mlkem1024Aes256gcmSha384P384 = 61448,
+  Mls128Mlkem768x25519Chacha20poly1305Sha384Mldsa44 = 61449,
+  Mls192Mlkem768Aes256gcmSha384Mldsa65 = 61450,
+  Mls256Mlkem1024Aes256gcmSha384Mldsa87 = 61451,
 }
 
 export enum CredentialType {
   Basic = 1,
   X509 = 2,
+}
+
+export enum SignatureScheme {
+  EcdsaSecp256r1Sha256 = 1027,
+  EcdsaSecp384r1Sha384 = 1283,
+  EcdsaSecp521r1Sha512 = 1539,
+  Ed25519 = 2055,
+  Ed448 = 2056,
 }
 
 export enum GroupInfoEncryptionType {
@@ -52,8 +72,24 @@ export enum DeviceStatus {
   Revoked = 3,
 }
 
+export enum HttpMethod {
+  Get = 0,
+  Post = 1,
+  Put = 2,
+  Delete = 3,
+  Patch = 4,
+  Head = 5,
+}
+
 export class CoreCrypto {
   proteusInit = jest.fn();
+  getPkiEnvironment = async (): Promise<PkiEnvironment | undefined> => {
+    return undefined;
+  };
+  setPkiEnvironment = asyncNoop;
+  findCredentials = async (): Promise<CredentialRef[]> => {
+    return [];
+  };
   proteusNewPrekey = jest.fn(() => {
     return Uint8Array.from([]);
   });
@@ -92,28 +128,158 @@ class ByteContainer {
 
 export class Welcome extends ByteContainer {}
 export class GroupInfo extends ByteContainer {}
-export class ClientId extends ByteContainer {}
+export class Uuid extends ByteContainer {
+  constructor(value: string | Uuid) {
+    super(typeof value === 'string' ? new TextEncoder().encode(value) : value.copyBytes());
+  }
+  toString(): string {
+    return new TextDecoder().decode(this.bytes);
+  }
+}
+export class DeviceId extends ByteContainer {
+  constructor(value: string | DeviceId) {
+    super(typeof value === 'string' ? new TextEncoder().encode(value) : value.copyBytes());
+  }
+  static fromHexString(value: string): DeviceId {
+    return new DeviceId(value);
+  }
+  toHexString(): string {
+    return new TextDecoder().decode(this.bytes);
+  }
+  toU64(): bigint {
+    const value = this.toHexString();
+    if (/^[0-9a-fA-F]+$/.test(value)) {
+      return BigInt(`0x${value}`);
+    }
+    // Device ids are not necessarily hex encoded (e.g. a UUID in tests), so fall back to the
+    // bytes of the value itself instead of failing.
+    const bytes = new TextEncoder().encode(value);
+    return BigInt(
+      `0x${Array.from(bytes, byte => {
+        return byte.toString(16).padStart(2, '0');
+      }).join('')}`,
+    );
+  }
+}
+export class ClientId extends ByteContainer {
+  /**
+   * Either a Wire formatted client id (`<user-id>:<device-id>@<domain>`), or the parts of it.
+   */
+  constructor(userId: Uuid | string, deviceId?: DeviceId, domain?: string) {
+    const value =
+      deviceId === undefined || domain === undefined
+        ? String(userId)
+        : `${new Uuid(userId).toString()}:${deviceId.toU64().toString(16)}@${domain}`;
+    super(new TextEncoder().encode(value));
+  }
+  toString(): string {
+    return new TextDecoder().decode(this.bytes);
+  }
+}
+export class CredentialRef extends ByteContainer {}
+export class Credential extends ByteContainer {
+  static basic(): Credential {
+    return new Credential(new Uint8Array());
+  }
+}
+export class ExternalSender extends ByteContainer {
+  static parse(key: Uint8Array): ExternalSender {
+    return new ExternalSender(key);
+  }
+  static parseJwk(jwk: Uint8Array): ExternalSender {
+    return new ExternalSender(jwk);
+  }
+  static parsePublicKey(key: Uint8Array): ExternalSender {
+    return new ExternalSender(key);
+  }
+}
+
+export class PkiEnvironment {
+  addTrustAnchor = asyncNoop;
+  addIntermediateCert = asyncNoop;
+  getTrustAnchors = async (): Promise<string[]> => {
+    return [];
+  };
+  removeTrustAnchor = asyncNoop;
+  uniffiDestroy = noop;
+  static create = async (): Promise<PkiEnvironment> => {
+    return new PkiEnvironment();
+  };
+}
+
+export class X509CredentialAcquisition {
+  finalize = asyncNoop;
+  uniffiDestroy = noop;
+  static fromBytes = (): X509CredentialAcquisition => {
+    return new X509CredentialAcquisition();
+  };
+  static newFromCredentialRef = async (): Promise<X509CredentialAcquisition> => {
+    return new X509CredentialAcquisition();
+  };
+}
 export class ConversationId extends ByteContainer {}
 export class ExternalSenderKey extends ByteContainer {}
 export class KeyPackage extends ByteContainer {}
 export class SecretKey extends ByteContainer {}
 
-export enum ErrorType {
-  Mls = 'Mls',
-  Proteus = 'Proteus',
-  E2ei = 'E2ei',
-  TransactionFailed = 'TransactionFailed',
-  Other = 'Other',
-}
+type TaggedVariant<Tag extends string, Inner> = {
+  tag: Tag;
+  inner: Inner;
+};
 
-export enum ProteusErrorType {
-  SessionNotFound = 'SessionNotFound',
-  DuplicateMessage = 'DuplicateMessage',
-  RemoteIdentityChanged = 'RemoteIdentityChanged',
-  Other = 'Other',
-}
+const variant = <Tag extends string, Inner>(tag: Tag, inner: Inner): TaggedVariant<Tag, Inner> => {
+  return {tag, inner};
+};
 
-export enum MlsErrorType {
+const isVariant = <Tag extends string>(value: unknown, tag: Tag): value is TaggedVariant<Tag, unknown> => {
+  return typeof value === 'object' && value !== null && 'tag' in value && value.tag === tag;
+};
+
+const decryptedMessageVariant = <Tag extends string>(
+  tag: Tag,
+): {new: <Inner>(inner: Inner) => TaggedVariant<Tag, Inner>; instanceOf: (value: unknown) => boolean} => {
+  return {
+    new: <Inner>(inner: Inner) => {
+      return variant(tag, inner);
+    },
+    instanceOf: (value: unknown) => {
+      return isVariant(value, tag);
+    },
+  };
+};
+
+export const DecryptedMessage = {
+  ApplicationMessage: decryptedMessageVariant('ApplicationMessage'),
+  Commit: decryptedMessageVariant('Commit'),
+  Proposal: decryptedMessageVariant('Proposal'),
+  Transient: decryptedMessageVariant('Transient'),
+  TransientTargeted: decryptedMessageVariant('TransientTargeted'),
+  PersistedTargeted: decryptedMessageVariant('PersistedTargeted'),
+};
+
+export const BufferedDecryptedMessage = {
+  ApplicationMessage: decryptedMessageVariant('ApplicationMessage'),
+  Commit: decryptedMessageVariant('Commit'),
+  Proposal: decryptedMessageVariant('Proposal'),
+  Transient: decryptedMessageVariant('Transient'),
+  TransientTargeted: decryptedMessageVariant('TransientTargeted'),
+  PersistedTargeted: decryptedMessageVariant('PersistedTargeted'),
+};
+
+type TaggedError<Tag extends string, Inner> = Error & {
+  tag: Tag;
+  inner: Inner;
+};
+
+const taggedError = <Tag extends string, Inner>(tag: Tag, inner: Inner): TaggedError<Tag, Inner> => {
+  return Object.assign(new Error(tag), {tag, inner});
+};
+
+const isTaggedError = <Tag extends string>(error: unknown, tag: Tag): error is TaggedError<Tag, unknown> => {
+  return error instanceof Error && 'tag' in error && error.tag === tag;
+};
+
+export enum MlsError_Tags {
   ConversationAlreadyExists = 'ConversationAlreadyExists',
   DuplicateMessage = 'DuplicateMessage',
   BufferedFutureMessage = 'BufferedFutureMessage',
@@ -129,45 +295,150 @@ export enum MlsErrorType {
   Other = 'Other',
 }
 
-type CoreCryptoError<T extends ErrorType> = Error & {
-  type: T;
-  context?: {type: string; context: {conversationId?: Uint8Array}};
+export const MlsError = {
+  ConversationAlreadyExists: {
+    new: (inner: {conversationId: Uint8Array}) => {
+      return taggedError('ConversationAlreadyExists', inner);
+    },
+    instanceOf: (error: unknown) => {
+      return isTaggedError(error, 'ConversationAlreadyExists');
+    },
+  },
+  DuplicateMessage: {
+    new: () => {
+      return taggedError('DuplicateMessage', undefined);
+    },
+    instanceOf: (error: unknown) => {
+      return isTaggedError(error, 'DuplicateMessage');
+    },
+  },
+  BufferedFutureMessage: {
+    new: () => {
+      return taggedError('BufferedFutureMessage', undefined);
+    },
+    instanceOf: (error: unknown) => {
+      return isTaggedError(error, 'BufferedFutureMessage');
+    },
+  },
+  WrongEpoch: {
+    new: () => {
+      return taggedError('WrongEpoch', undefined);
+    },
+    instanceOf: (error: unknown) => {
+      return isTaggedError(error, 'WrongEpoch');
+    },
+  },
+  UnmergedPendingGroup: {
+    new: () => {
+      return taggedError('UnmergedPendingGroup', undefined);
+    },
+    instanceOf: (error: unknown) => {
+      return isTaggedError(error, 'UnmergedPendingGroup');
+    },
+  },
+  StaleProposal: {
+    new: () => {
+      return taggedError('StaleProposal', undefined);
+    },
+    instanceOf: (error: unknown) => {
+      return isTaggedError(error, 'StaleProposal');
+    },
+  },
+  StaleCommit: {
+    new: () => {
+      return taggedError('StaleCommit', undefined);
+    },
+    instanceOf: (error: unknown) => {
+      return isTaggedError(error, 'StaleCommit');
+    },
+  },
+  OrphanWelcome: {
+    new: () => {
+      return taggedError('OrphanWelcome', undefined);
+    },
+    instanceOf: (error: unknown) => {
+      return isTaggedError(error, 'OrphanWelcome');
+    },
+  },
+  MessageRejected: {
+    new: (inner: {reason: string}) => {
+      return taggedError('MessageRejected', inner);
+    },
+    instanceOf: (error: unknown) => {
+      return isTaggedError(error, 'MessageRejected');
+    },
+  },
+  Other: {
+    new: (inner: {msg: string}) => {
+      return taggedError('Other', inner);
+    },
+    instanceOf: (error: unknown) => {
+      return isTaggedError(error, 'Other');
+    },
+  },
 };
 
-export const isCoreCryptoError = <E extends ErrorType>(error: unknown, errorType: E): error is CoreCryptoError<E> => {
-  return typeof error === 'object' && error !== null && (error as any).type === errorType;
+export const ProteusError = {
+  SessionNotFound: {
+    new: () => {
+      return taggedError('SessionNotFound', undefined);
+    },
+    instanceOf: (error: unknown) => {
+      return isTaggedError(error, 'SessionNotFound');
+    },
+  },
+  DuplicateMessage: {
+    new: () => {
+      return taggedError('DuplicateMessage', undefined);
+    },
+    instanceOf: (error: unknown) => {
+      return isTaggedError(error, 'DuplicateMessage');
+    },
+  },
+  RemoteIdentityChanged: {
+    new: () => {
+      return taggedError('RemoteIdentityChanged', undefined);
+    },
+    instanceOf: (error: unknown) => {
+      return isTaggedError(error, 'RemoteIdentityChanged');
+    },
+  },
+  Other: {
+    new: (inner: {errorCode: number}) => {
+      return taggedError('Other', inner);
+    },
+    instanceOf: (error: unknown) => {
+      return isTaggedError(error, 'Other');
+    },
+  },
 };
 
-export const isProteusError = <E extends ProteusErrorType>(
-  error: unknown,
-  errorType: E,
-): error is CoreCryptoError<ErrorType.Proteus> & {context: {type: E}} => {
-  return isCoreCryptoError(error, ErrorType.Proteus) && (error as any).context?.type === errorType;
+export const CoreCryptoError = {
+  Mls: {
+    new: (inner: {mlsError: Error}) => {
+      return taggedError('Mls', inner);
+    },
+    instanceOf: (error: unknown) => {
+      return isTaggedError(error, 'Mls');
+    },
+  },
+  Proteus: {
+    new: (inner: {exception: Error}) => {
+      return taggedError('Proteus', inner);
+    },
+    instanceOf: (error: unknown) => {
+      return isTaggedError(error, 'Proteus');
+    },
+  },
 };
 
-export const isProteusSessionNotFoundError = (error: unknown): boolean => {
-  return isProteusError(error, ProteusErrorType.SessionNotFound);
-};
-export const isProteusDuplicateMessageError = (error: unknown): boolean => {
-  return isProteusError(error, ProteusErrorType.DuplicateMessage);
-};
-export const isProteusRemoteIdentityChangedError = (error: unknown): boolean => {
-  return isProteusError(error, ProteusErrorType.RemoteIdentityChanged);
-};
-
-export const isMlsOrphanWelcomeError = (error: unknown): boolean => {
-  return isCoreCryptoError(error, ErrorType.Mls) && (error as any).context?.type === MlsErrorType.OrphanWelcome;
-};
-
-// Added to support tests that rely on the core-crypto guard for ConversationAlreadyExists classification
-export const isMlsConversationAlreadyExistsError = (error: unknown): boolean => {
-  return (
-    isCoreCryptoError(error, ErrorType.Mls) &&
-    error.context?.type === MlsErrorType.ConversationAlreadyExists &&
-    Array.isArray(error.context?.context?.conversationId)
-  );
-};
-
-export const isMlsMessageRejectedError = (error: unknown): boolean => {
-  return isCoreCryptoError(error, ErrorType.Mls) && error.context?.type === MlsErrorType.MessageRejected;
+export const MlsTransportError = {
+  MessageRejected: {
+    new: (inner: {reason: string}) => {
+      return taggedError('MessageRejected', inner);
+    },
+    instanceOf: (error: unknown) => {
+      return isTaggedError(error, 'MessageRejected');
+    },
+  },
 };

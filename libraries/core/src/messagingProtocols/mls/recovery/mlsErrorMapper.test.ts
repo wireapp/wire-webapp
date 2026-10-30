@@ -21,21 +21,21 @@ import {MLSStaleMessageError} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Encoder} from 'bazinga64';
 
-import {ErrorType, MlsErrorType} from '@wireapp/core-crypto';
+import {CoreCryptoError, MlsError} from '@wireapp/core-crypto';
 
 import {createDefaultMlsErrorMapper, DomainMlsError} from './mlsErrorMapper';
 
-import {
-  CORE_CRYPTO_ERROR_NAMES,
-  serializeAbortReason,
-  UPLOAD_COMMIT_BUNDLE_ABORT_REASONS,
-} from '../mlsService/coreCryptoMlsError';
+import {serializeAbortReason, UPLOAD_COMMIT_BUNDLE_ABORT_REASONS} from '../mlsService/coreCryptoMlsError';
 
 // Helpers
 const id: QualifiedId = {id: 'conv-id', domain: 'wire.test'};
 const groupIdBase64 = Encoder.toBase64(new Uint8Array([1, 2, 3, 4])).asString;
 
 const mapper = createDefaultMlsErrorMapper();
+const makeRejectedError = (reason: string): CoreCryptoError => {
+  return CoreCryptoError.Mls.new({mlsError: MlsError.MessageRejected.new({reason})});
+};
+
 function map(error: unknown, extra?: {groupId?: string}): DomainMlsError {
   return mapper.map(error, {qualifiedConversationId: id, groupId: extra?.groupId});
 }
@@ -54,13 +54,9 @@ describe('MlsErrorMapper', () => {
   });
 
   it('maps GroupNotEstablished for broken conversation error', () => {
-    const err: any = {
-      type: ErrorType.Mls,
-      context: {
-        type: MlsErrorType.MessageRejected,
-        context: {reason: serializeAbortReason({message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.BROKEN_MLS_CONVERSATION})},
-      },
-    };
+    const err = makeRejectedError(
+      serializeAbortReason({message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.BROKEN_MLS_CONVERSATION}),
+    );
     const mapped = map(err);
     expect(mapped.type).toBe('GroupNotEstablished');
   });
@@ -70,18 +66,12 @@ describe('MlsErrorMapper', () => {
       {id: 'u1', domain: 'wire.test'},
       {id: 'u2', domain: 'wire.test'},
     ];
-    const err: any = {
-      type: ErrorType.Mls,
-      context: {
-        type: MlsErrorType.MessageRejected,
-        context: {
-          reason: serializeAbortReason({
-            message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_GROUP_OUT_OF_SYNC,
-            missing_users: missing,
-          }),
-        },
-      },
-    };
+    const err = makeRejectedError(
+      serializeAbortReason({
+        message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_GROUP_OUT_OF_SYNC,
+        missing_users: missing,
+      }),
+    );
     const mapped = map(err, {groupId: groupIdBase64});
     expect(mapped.type).toBe('GroupOutOfSync');
     expect(mapped.context?.missingUsers).toEqual(missing);
@@ -89,19 +79,18 @@ describe('MlsErrorMapper', () => {
   });
 
   it('maps ConversationAlreadyExists and extracts groupId bytes', () => {
-    const conversationIdArray = [1, 2, 3, 4];
-    const expectedGroupId = Encoder.toBase64(new Uint8Array(conversationIdArray)).asString;
-    const err: any = {
-      type: ErrorType.Mls,
-      context: {type: MlsErrorType.ConversationAlreadyExists, context: {conversationId: conversationIdArray}},
-    };
+    const conversationId = new Uint8Array([1, 2, 3, 4]);
+    const expectedGroupId = Encoder.toBase64(conversationId).asString;
+    const err = CoreCryptoError.Mls.new({
+      mlsError: MlsError.ConversationAlreadyExists.new({conversationId}),
+    });
     const mapped = map(err);
     expect(mapped.type).toBe('ConversationAlreadyExists');
     expect(mapped.context?.groupId).toBe(expectedGroupId);
   });
 
   it('maps OrphanWelcome', () => {
-    const err: any = {type: ErrorType.Mls, context: {type: MlsErrorType.OrphanWelcome}};
+    const err = CoreCryptoError.Mls.new({mlsError: MlsError.OrphanWelcome.new()});
     const mapped = map(err);
     expect(mapped.type).toBe('OrphanWelcome');
     expect(mapped.context?.qualifiedConversationId).toEqual(id);
@@ -110,25 +99,13 @@ describe('MlsErrorMapper', () => {
   it('falls back to Unknown for unmapped error', () => {
     const err = new Error('random');
     const mapped = map(err);
-    expect(mapped.type).toBe(MlsErrorType.Other);
+    expect(mapped.type).toBe('Other');
     expect(mapped.cause).toBe(err);
   });
 
-  it('honors handler priority (WrongEpoch before GroupOutOfSync)', () => {
-    const err: any = new Error('ambiguous');
-    err.name = CORE_CRYPTO_ERROR_NAMES.MlsErrorWrongEpoch; // triggers WrongEpoch guard
-    // Also craft message-rejected with out-of-sync to trigger GroupOutOfSync guard
-    err.type = ErrorType.Mls;
-    err.context = {
-      type: MlsErrorType.MessageRejected,
-      context: {
-        reason: serializeAbortReason({
-          message: UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_GROUP_OUT_OF_SYNC,
-          missing_users: [],
-        }),
-      },
-    };
-    const mapped = map(err);
-    expect(mapped.type).toBe('WrongEpoch');
+  it('maps the nested V11 WrongEpoch variant', () => {
+    const err = CoreCryptoError.Mls.new({mlsError: MlsError.WrongEpoch.new()});
+
+    expect(map(err).type).toBe('WrongEpoch');
   });
 });
