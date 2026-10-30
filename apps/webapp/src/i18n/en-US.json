@@ -419,7 +419,7 @@
   "cells.deletePermanentlyModal.file.description": "This will permanently delete the file {name} for all participants.",
   "cells.deletePermanentlyModal.folder.description": "This will permanently delete the folder {name} and its contents for all participants.",
   "cells.deletePermanentlyModal.headline": "Delete permanently?",
-  "cells.emptyBin.button": "Empty Bin",
+  "cells.emptyBin.button": "Empty recycle bin",
   "cells.emptyBin.cancel": "Cancel",
   "cells.emptyBin.checkStatus": "Check status again",
   "cells.emptyBin.confirm": "Empty Bin",

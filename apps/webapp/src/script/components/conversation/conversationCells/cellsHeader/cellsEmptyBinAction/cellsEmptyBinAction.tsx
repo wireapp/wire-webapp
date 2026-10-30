@@ -23,7 +23,7 @@ import {isNonEmptyString} from '@sindresorhus/is';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {JobsTaskStatus, RestActionStatus} from 'cells-sdk-ts';
 
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant, TrashIcon} from '@wireapp/react-ui-kit';
 
 import type {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
@@ -33,6 +33,7 @@ import {
   actionStyles,
   confirmationContentStyles,
   confirmationTextStyles,
+  emptyBinButtonStyles,
   statusStyles,
 } from './cellsEmptyBinAction.styles';
 import {emptyBin, isEmptyBinRootPath} from './emptyBinAction';
@@ -332,13 +333,15 @@ export const CellsEmptyBinAction: FunctionComponent<CellsEmptyBinActionProps> = 
   return (
     <div css={actionStyles}>
       <Button
-        variant={ButtonVariant.TERTIARY}
+        variant={ButtonVariant.CANCEL}
         type="button"
+        css={emptyBinButtonStyles}
         disabled={isSubmitting || status === 'processing' || requiresReview}
         onClick={() => {
           setIsConfirmationOpen(true);
         }}
       >
+        <TrashIcon aria-hidden="true" />
         {translate('cells.emptyBin.button')}
       </Button>
 

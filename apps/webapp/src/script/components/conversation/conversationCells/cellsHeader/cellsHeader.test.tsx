@@ -134,7 +134,13 @@ describe('CellsHeader', () => {
       isSearchViewOpen: false,
     });
 
-    expect(screen.getByRole('button', {name: 'cells.emptyBin.button'})).toBeInTheDocument();
+    const emptyBinButton = screen.getByRole('button', {name: 'cells.emptyBin.button'});
+    const headerButtons = screen.getAllByRole('button');
+
+    expect(emptyBinButton).toBeInTheDocument();
+    expect(headerButtons.indexOf(emptyBinButton)).toBeLessThan(
+      headerButtons.indexOf(screen.getByRole('button', {name: 'cells.refreshButton'})),
+    );
   });
 
   it('does not show Empty Bin below the Bin root', () => {

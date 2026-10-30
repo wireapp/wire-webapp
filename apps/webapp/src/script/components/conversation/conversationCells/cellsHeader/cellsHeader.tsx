@@ -141,17 +141,7 @@ export const CellsHeader: FunctionComponent<CellsHeaderProps> = ({
         {isSearchViewOpen && !isInRecycleBin ? (
           <CellsFiltersBar filters={filters} />
         ) : (
-          <div css={actionsStyles}>
-            {!isInRecycleBin && (
-              <CellsNewMenu
-                cellsRepository={cellsRepository}
-                conversationQualifiedId={conversationQualifiedId}
-                onRefresh={onRefresh}
-                onUploadFiles={onUploadFiles}
-                onUploadFolder={onUploadFolder}
-                isUploadFilesEnabled={isUploadFilesEnabled}
-              />
-            )}
+          <>
             {isInRecycleBin && isEmptyBinRootPath(currentPath) && (
               <CellsEmptyBinAction
                 key={`${conversationQualifiedId.id}@${conversationQualifiedId.domain}`}
@@ -162,12 +152,24 @@ export const CellsHeader: FunctionComponent<CellsHeaderProps> = ({
                 onEmptyBinSubmitted={handleEmptyBinSubmitted}
               />
             )}
-            {shouldShowViewerAccessLabel && (
-              <CellsViewerAccessLabel label={translate('cells.sharedDriveAccess.viewerAccess')} />
-            )}
-            <CellsRefresh onRefresh={onRefresh} />
-            <CellsMoreMenu conversationQualifiedId={conversationQualifiedId} />
-          </div>
+            <div css={actionsStyles}>
+              {!isInRecycleBin && (
+                <CellsNewMenu
+                  cellsRepository={cellsRepository}
+                  conversationQualifiedId={conversationQualifiedId}
+                  onRefresh={onRefresh}
+                  onUploadFiles={onUploadFiles}
+                  onUploadFolder={onUploadFolder}
+                  isUploadFilesEnabled={isUploadFilesEnabled}
+                />
+              )}
+              {shouldShowViewerAccessLabel && (
+                <CellsViewerAccessLabel label={translate('cells.sharedDriveAccess.viewerAccess')} />
+              )}
+              <CellsRefresh onRefresh={onRefresh} />
+              <CellsMoreMenu conversationQualifiedId={conversationQualifiedId} />
+            </div>
+          </>
         )}
       </div>
 

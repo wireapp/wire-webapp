@@ -31,6 +31,42 @@ export const statusStyles: CSSObject = {
   gap: '8px',
 };
 
+export const emptyBinButtonStyles: CSSObject = {
+  backgroundColor: 'var(--danger-color)',
+  border: 'none',
+  borderRadius: '16px',
+  color: 'var(--text-input-background)',
+  fontSize: '14px',
+  fontWeight: 700,
+  gap: '4px',
+  height: '32px',
+  lineHeight: '20px',
+  marginBottom: 0,
+  minWidth: 0,
+  padding: '6px 12px',
+  '& > svg > path': {
+    fill: 'var(--text-input-background)',
+  },
+  '&:hover, &:active': {
+    backgroundColor: 'var(--danger-color)',
+  },
+  '&:focus': {
+    backgroundColor: 'var(--danger-color)',
+    border: '1px solid var(--accent-color-focus)',
+  },
+  '&:focus-visible': {
+    outline: '2px solid var(--accent-color-focus)',
+    outlineOffset: '2px',
+  },
+  '&:disabled': {
+    backgroundColor: 'var(--button-tertiary-disabled-bg)',
+    color: 'var(--text-input-placeholder)',
+    '& > svg > path': {
+      fill: 'var(--text-input-placeholder)',
+    },
+  },
+};
+
 export const confirmationContentStyles: CSSObject = {
   display: 'flex',
   flexDirection: 'column',
