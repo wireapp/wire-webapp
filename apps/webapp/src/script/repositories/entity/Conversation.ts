@@ -882,9 +882,10 @@ export class Conversation {
       );
     }
 
-    const updatedTimestamp = forceUpdate ? timestamp : this._incrementTimeOnly(entityTimestamp(), timestamp);
+    const currentTimestamp = entityTimestamp();
+    const updatedTimestamp = forceUpdate ? timestamp : this._incrementTimeOnly(currentTimestamp, timestamp);
 
-    if (type === TIMESTAMP_TYPE.LAST_READ) {
+    if (type === TIMESTAMP_TYPE.LAST_READ && timestamp > currentTimestamp) {
       this.clearManualUnreadMarkerIfReadThrough(timestamp);
     }
 
