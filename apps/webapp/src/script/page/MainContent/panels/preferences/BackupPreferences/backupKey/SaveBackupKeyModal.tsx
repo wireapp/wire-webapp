@@ -17,7 +17,7 @@
  *
  */
 
-import {useId, useState} from 'react';
+import {useEffect, useId, useRef, useState} from 'react';
 
 import {AlertIcon, CheckIcon, Checkbox, CheckboxLabel, CopyIcon, DownloadIcon, TabIndex} from '@wireapp/react-ui-kit';
 
@@ -65,6 +65,13 @@ export const SaveBackupKeyModal = ({onClose}: SaveBackupKeyModalProps) => {
 
   const titleId = useId();
   const checkboxId = useId();
+  const copyButtonRef = useRef<HTMLButtonElement>(null);
+  const backButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Move focus into the modal so keyboard navigation (and Esc) work right away
+  useEffect(() => {
+    (step === 'save' ? copyButtonRef : backButtonRef).current?.focus();
+  }, [step]);
 
   const markSaved = () => {
     setIsSaved(true);
@@ -141,7 +148,13 @@ export const SaveBackupKeyModal = ({onClose}: SaveBackupKeyModalProps) => {
             </div>
 
             <div css={optionsStyle}>
-              <button type="button" css={optionStyle(isCopied)} onClick={onCopy} data-uie-name="do-copy-backup-key">
+              <button
+                ref={copyButtonRef}
+                type="button"
+                css={optionStyle(isCopied)}
+                onClick={onCopy}
+                data-uie-name="do-copy-backup-key"
+              >
                 {isCopied ? <CheckIcon /> : <CopyIcon />}
                 <span css={optionTextStyle}>
                   <span css={optionTitleStyle}>{t('preferencesBackupKeyCopy')}</span>
@@ -222,6 +235,7 @@ export const SaveBackupKeyModal = ({onClose}: SaveBackupKeyModalProps) => {
               {t('preferencesBackupKeySkipAnyway')}
             </button>
             <button
+              ref={backButtonRef}
               type="button"
               className="modal__button modal__button--primary"
               onClick={() => setStep('save')}

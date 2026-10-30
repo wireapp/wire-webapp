@@ -111,4 +111,15 @@ describe('SaveBackupKeyModal', () => {
     expect(onClose).toHaveBeenCalled();
     expect(useBackupKeyStore.getState().key).toBe('existing key');
   });
+
+  it('closes with Escape without storing the key', () => {
+    const onClose = jest.fn();
+    renderModal(onClose);
+
+    expect(document.activeElement?.getAttribute('data-uie-name')).toBe('do-copy-backup-key');
+    fireEvent.keyDown(document.activeElement!, {key: 'Escape'});
+
+    expect(onClose).toHaveBeenCalled();
+    expect(useBackupKeyStore.getState().key).toBeUndefined();
+  });
 });
