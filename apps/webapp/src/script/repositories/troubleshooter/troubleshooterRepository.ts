@@ -19,7 +19,7 @@
 
 import type {Clock} from '@enormora/clock/clock';
 import {Maybe, Task, task} from 'true-myth';
-import {createStore} from 'zustand/vanilla';
+import {createStore, type StoreApi} from 'zustand/vanilla';
 
 import type {ConnectionResult, ScanResult, TroubleshooterService} from './troubleshooterService';
 
@@ -30,10 +30,19 @@ export type TroubleshooterState = {
   scan: Maybe<DiagnosticResult<ScanResult>>;
   error: Maybe<Error>;
 };
+export type TroubleshooterRepository = {
+  store: StoreApi<TroubleshooterState>;
+  testConnection: () => Task<ConnectionResult, Error>;
+  runFullScan: () => Task<ScanResult, Error>;
+  getReport: (version: string) => string;
+};
 const MICROSECONDS_PER_MILLISECOND = 1_000;
 const REPORT_INDENTATION = 2;
 
-export const createTroubleshooterRepository = (service: TroubleshooterService, clock: Clock) => {
+export const createTroubleshooterRepository = (
+  service: TroubleshooterService,
+  clock: Clock,
+): TroubleshooterRepository => {
   const store = createStore<TroubleshooterState>(() => {
     return {running: 'idle', connection: Maybe.nothing(), scan: Maybe.nothing(), error: Maybe.nothing()};
   });
@@ -102,4 +111,3 @@ export const createTroubleshooterRepository = (service: TroubleshooterService, c
     },
   };
 };
-export type TroubleshooterRepository = ReturnType<typeof createTroubleshooterRepository>;

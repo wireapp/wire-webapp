@@ -18,11 +18,14 @@
  */
 
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
-import {act, fireEvent, render, screen} from '@testing-library/react';
+import {act, fireEvent, render, screen, type RenderResult} from '@testing-library/react';
 import {Maybe} from 'true-myth';
 import {ThemeProvider} from '@wireapp/react-ui-kit';
 
-import {createTroubleshooterRepository} from 'Repositories/troubleshooter/troubleshooterRepository';
+import {
+  createTroubleshooterRepository,
+  type TroubleshooterRepository,
+} from 'Repositories/troubleshooter/troubleshooterRepository';
 import {
   createMockTroubleshooterService,
   MOCK_CONNECTION_DELAY_MILLISECONDS,
@@ -39,7 +42,10 @@ import {translateForTest} from 'Util/test/translateForTest';
 
 import {TroubleshootingPreferences} from './troubleshootingPreferences';
 
-const setup = () => {
+const setup = (): RenderResult & {
+  clock: ReturnType<typeof createDeterministicClock>;
+  repository: TroubleshooterRepository;
+} => {
   const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
   const repository = createTroubleshooterRepository(createMockTroubleshooterService(clock), clock);
   const wrapper = createRootProviderWrapperForTest(createRootContextValueForTest({clock, translate: translateForTest}));
