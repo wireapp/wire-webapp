@@ -740,6 +740,7 @@
   "conversationContextMenuDownload": "Laadi alla",
   "conversationContextMenuEdit": "Muuda",
   "conversationContextMenuLike": "Meeldib",
+  "conversationContextMenuMarkUnread": "Mark as unread from here",
   "conversationContextMenuReply": "Vasta",
   "conversationContextMenuUnlike": "Eemalda meeldimine",
   "conversationCreateReceiptsEnabled": "Lugemiskinnitused on sees",
