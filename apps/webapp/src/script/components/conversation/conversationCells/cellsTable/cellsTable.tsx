@@ -743,6 +743,7 @@ export const CellsTable = ({
 
     isBulkMoveToBinPendingRef.current = true;
     setIsBulkMoveToBinPending(true);
+    setIsBulkMoveToBinConfirmationOpen(false);
     const statusId = createMoveStatusId();
     bulkMoveToBinStatusId.current = Maybe.just(statusId);
     updateMoveStatus({id: statusId, kind: 'processing', ...captured.summary});

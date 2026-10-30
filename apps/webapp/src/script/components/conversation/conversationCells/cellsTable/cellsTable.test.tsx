@@ -427,7 +427,7 @@ describe('CellsTable selection', () => {
     });
   });
 
-  it('prevents duplicate batch submissions while the request is pending', async () => {
+  it('closes the confirmation and reports pending status without allowing duplicate submissions', async () => {
     const user = userEvent.setup();
     let resolveDelete: (response: {Status: string}) => void = () => {
       return undefined;
@@ -447,11 +447,12 @@ describe('CellsTable selection', () => {
     const confirmation = await screen.findByRole('dialog');
     const confirmButton = within(confirmation).getByRole('button', {name: 'Move to Bin'});
     await user.click(confirmButton);
-    expect(confirmButton).toBeDisabled();
-    expect(within(confirmation).queryByText('Moving 1 selected items to Bin')).not.toBeInTheDocument();
-    await user.click(within(confirmation).getByRole('button', {name: 'Cancel'}));
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
-    await user.click(confirmButton);
+
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+    expect(screen.getByText('Moving 1 selected items to Bin')).toHaveAttribute('role', 'status');
+    expect(screen.queryByRole('button', {name: 'Move to bin'})).not.toBeInTheDocument();
     expect(deleteNodes).toHaveBeenCalledTimes(1);
 
     resolveDelete({Status: 'Performed'});
