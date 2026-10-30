@@ -377,7 +377,7 @@ const _getStateManualUnread: ConversationCellStateDefinition = {
     return ConversationStatusIcon.MANUAL_UNREAD;
   },
   match: (conversationEntity: Conversation) => {
-    return conversationEntity.manualUnreadTimestamp() !== undefined;
+    return isNumber(conversationEntity.manualUnreadTimestamp());
   },
 };
 

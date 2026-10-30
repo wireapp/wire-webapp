@@ -295,7 +295,7 @@ export const VirtualizedMessagesList: FunctionComponent<Props> = ({
     }
 
     const newestMessage = allMessages.at(-1);
-    if (newestMessage !== undefined) {
+    if (!isUndefined(newestMessage)) {
       conversationLastReadTimestampReference.current = newestMessage.timestamp();
       setConversationLastReadTimestamp(newestMessage.timestamp());
     }

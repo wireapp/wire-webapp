@@ -19,7 +19,7 @@
 
 import {UIEvent, useCallback, useEffect, useMemo, useState, type ReactElement} from 'react';
 
-import {isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined, isNumber, isUndefined} from '@sindresorhus/is';
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {container} from 'tsyringe';
 
@@ -618,7 +618,7 @@ function ConversationContent({
       const isNotOwnMessage = !messageEntity.user().isMe;
       const manualUnreadTimestamp = conversationEntity.manualUnreadTimestamp();
 
-      if (manualUnreadTimestamp !== undefined && messageTimestamp >= manualUnreadTimestamp) {
+      if (isNumber(manualUnreadTimestamp) && messageTimestamp >= manualUnreadTimestamp) {
         callbacks.push(
           withAutoReadGuard(conversationEntity, () => {
             conversationEntity.clearManualUnreadMarker();

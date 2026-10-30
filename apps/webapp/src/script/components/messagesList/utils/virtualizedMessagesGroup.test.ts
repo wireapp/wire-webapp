@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 
 import {EventMapper} from 'Repositories/conversation/EventMapper';
@@ -124,7 +125,7 @@ describe('MessagesGroup', () => {
     });
     const selectedMessage = messages[1];
     expect(selectedMessage).toBeDefined();
-    if (selectedMessage === undefined) {
+    if (isUndefined(selectedMessage)) {
       return;
     }
     conversation.last_read_timestamp(0);

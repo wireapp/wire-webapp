@@ -19,7 +19,7 @@
 
 import React, {FC, useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react';
 
-import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
@@ -273,7 +273,7 @@ export const MessagesList: FC<MessagesListParams> = ({
       // jumping to the latest message is an explicit "read" action, resume auto-read
       conversation.clearManualUnreadMarker();
       const newestMessage = conversation.getNewestMessage();
-      if (newestMessage !== undefined) {
+      if (!isUndefined(newestMessage)) {
         setConversationLastReadTimestamp(newestMessage.timestamp());
       }
       // clean up anything like search result

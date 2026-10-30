@@ -138,6 +138,18 @@ describe('ConversationMapper', () => {
       expect(conversationEntity.effectiveReadTimestamp()).toBe(manualUnreadTimestamp - 1);
     });
 
+    it('ignores a malformed persisted manual unread timestamp', () => {
+      const conversationData = {
+        ...entities.conversation,
+        members: undefined,
+        manual_unread_timestamp: 'invalid',
+      } as unknown as ConversationDatabaseData;
+
+      const [conversationEntity] = ConversationMapper.mapConversations([conversationData], 1, translate);
+
+      expect(conversationEntity.manualUnreadTimestamp()).toBeUndefined();
+    });
+
     it('maps a backend conversation roles', () => {
       const conversation = {
         ...entities.conversation,

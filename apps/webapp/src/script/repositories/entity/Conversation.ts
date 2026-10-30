@@ -416,7 +416,7 @@ export class Conversation {
     this.manualUnreadTimestamp = ko.observable<number | undefined>(undefined);
     this.effectiveReadTimestamp = ko.pureComputed(() => {
       const manualUnreadTimestamp = this.manualUnreadTimestamp();
-      return manualUnreadTimestamp === undefined ? this.last_read_timestamp() : manualUnreadTimestamp - 1;
+      return isUndefined(manualUnreadTimestamp) ? this.last_read_timestamp() : manualUnreadTimestamp - 1;
     });
     this.isAutoReadSuppressed = ko.observable(false);
     this.last_server_timestamp = ko.observable(0);
@@ -606,7 +606,7 @@ export class Conversation {
           const isOwnContentMessage = messageEntity.user().isMe && !messageEntity.isSystem();
           const isReadMessage =
             messageEntity.timestamp() <= this.effectiveReadTimestamp() ||
-            (isOwnContentMessage && this.manualUnreadTimestamp() === undefined);
+            (isOwnContentMessage && isUndefined(this.manualUnreadTimestamp()));
 
           if (isReadMessage) {
             break;
@@ -656,7 +656,7 @@ export class Conversation {
     });
 
     this.hasUnread = ko.pureComputed(() => {
-      if (this.manualUnreadTimestamp() !== undefined) {
+      if (isNumber(this.manualUnreadTimestamp())) {
         return true;
       }
 
@@ -911,7 +911,7 @@ export class Conversation {
 
   clearManualUnreadMarkerIfReadThrough(timestamp: number): void {
     const manualUnreadTimestamp = this.manualUnreadTimestamp();
-    if (manualUnreadTimestamp !== undefined && timestamp >= manualUnreadTimestamp) {
+    if (isNumber(manualUnreadTimestamp) && timestamp >= manualUnreadTimestamp) {
       this.clearManualUnreadMarker();
     }
   }
@@ -993,7 +993,7 @@ export class Conversation {
       const message_et = message_ets[counter];
       if (message_et?.user()?.isMe) {
         // Loading history must not clear a manual "unread" marker by moving the read timestamp forward
-        if (this.manualUnreadTimestamp() === undefined) {
+        if (isUndefined(this.manualUnreadTimestamp())) {
           this.updateTimestamps(message_et);
         }
         break;
@@ -1324,7 +1324,7 @@ export class Conversation {
       id: this.id,
       is_guest: this.isGuest(),
       is_ghost_group: this.isGhostGroup(),
-      ...(manualUnreadTimestamp === undefined ? {} : {manual_unread_timestamp: manualUnreadTimestamp}),
+      ...(isNumber(manualUnreadTimestamp) ? {manual_unread_timestamp: manualUnreadTimestamp} : {}),
       last_event_timestamp: this.last_event_timestamp(),
       last_read_timestamp: this.last_read_timestamp(),
       last_server_timestamp: this.last_server_timestamp(),

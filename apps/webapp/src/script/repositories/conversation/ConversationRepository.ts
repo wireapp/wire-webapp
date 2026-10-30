@@ -1017,7 +1017,7 @@ export class ConversationRepository {
 
     if (!this.options.isMarkAsUnreadFeatureEnabled) {
       const hasManualUnreadMarkers = localConversations.some(conversationData => {
-        return conversationData.manual_unread_timestamp !== undefined;
+        return !isUndefined(conversationData.manual_unread_timestamp);
       });
 
       if (hasManualUnreadMarkers) {
