@@ -448,6 +448,9 @@ describe('CellsTable selection', () => {
     const confirmButton = within(confirmation).getByRole('button', {name: 'Move to Bin'});
     await user.click(confirmButton);
     expect(confirmButton).toBeDisabled();
+    expect(within(confirmation).queryByText('Moving 1 selected items to Bin')).not.toBeInTheDocument();
+    await user.click(within(confirmation).getByRole('button', {name: 'Cancel'}));
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
     await user.click(confirmButton);
     expect(deleteNodes).toHaveBeenCalledTimes(1);
 

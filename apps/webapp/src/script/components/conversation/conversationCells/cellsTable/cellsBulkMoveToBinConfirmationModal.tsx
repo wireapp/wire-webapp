@@ -25,9 +25,6 @@ import {CellsModal} from 'Components/conversation/conversationCells/common/cells
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 const confirmationContentStyles: CSSObject = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '8px',
   padding: '0 16px 16px',
 };
 
@@ -64,11 +61,6 @@ export const CellsBulkMoveToBinConfirmationModal: FunctionComponent<CellsBulkMov
         <p css={confirmationTextStyles}>
           {translate('cells.bulkMoveToBin.confirmation.description', {count: selectedRootCount})}
         </p>
-        {isSubmitting && (
-          <p css={confirmationTextStyles} role="status">
-            {translate('cells.bulkMoveToBin.moving', {count: selectedRootCount})}
-          </p>
-        )}
       </div>
       <CellsModal.Actions>
         <CellsModal.SecondaryButton onClick={handleClose}>
