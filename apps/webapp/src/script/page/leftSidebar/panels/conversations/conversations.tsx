@@ -34,7 +34,6 @@ import {container} from 'tsyringe';
 import {useShallow} from 'zustand/react/shallow';
 
 import {useMatchMedia} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {MeetingNotificationHost} from 'Components/meeting/meetingNotificationHost/meetingNotificationHost';
 import {useConversationFocus} from 'Hooks/useConversationFocus';
@@ -88,6 +87,7 @@ import {generateConversationUrl} from '../../../../router/routeGenerator';
 import {setHistoryParam} from '../../../../router/Router';
 import {createNavigateKeyboard} from '../../../../router/routerBindings';
 import {ListViewModel} from '../../../../view_model/ListViewModel';
+import {WebAppEvents} from '../../../../webAppEvents';
 import {ListWrapper} from '../listWrapper';
 import {StartUI} from '../startUi';
 

@@ -26,8 +26,6 @@ import {isNonFederatingBackendsError} from '@wireapp/core/lib/errors';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {ACCESS_STATE, type TEAM as TEAMType2} from 'Repositories/conversation/AccessState';
 import {
   toggleFeature,
@@ -43,6 +41,7 @@ import {createNavigateKeyboard, createNavigate} from 'src/script/router/routerBi
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isKeyboardEvent} from 'Util/keyboardUtil';
 
+import {WebAppEvents} from '../../../../webAppEvents';
 import {PrimaryModal} from '../../PrimaryModal';
 import {useCreateConversationModal} from '../hooks/useCreateConversationModal';
 import {ConversationAccess, ConversationCreationStep, ConversationType} from '../types';

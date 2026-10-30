@@ -21,7 +21,7 @@ import {useEffect, useCallback, useState} from 'react';
 
 import {amplify} from 'amplify';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {WebAppEvents} from '../webAppEvents';
 
 /**
  * This hook is used to subscribe to a property of the user and update the state of the component when the property changes.

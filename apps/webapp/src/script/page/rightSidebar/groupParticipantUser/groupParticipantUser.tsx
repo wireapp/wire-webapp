@@ -24,7 +24,6 @@ import {DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/li
 import {amplify} from 'amplify';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {FadingScrollbar} from 'Components/fadingScrollbar';
 import * as Icon from 'Components/icon';
@@ -44,6 +43,7 @@ import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
+import {WebAppEvents} from '../../../webAppEvents';
 import {PanelHeader} from '../panelHeader';
 import {PanelEntity} from '../rightSidebar';
 

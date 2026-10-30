@@ -22,8 +22,6 @@ import {FC, useCallback, useRef, useState} from 'react';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {useClickOutside} from 'Hooks/useClickOutside';
 import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -44,6 +42,7 @@ import {
 import {MessageReactions} from './messageReactions/messageReactions';
 import {ReplyButton} from './replyButton';
 
+import {WebAppEvents} from '../../../../../webAppEvents';
 import {useMessageFocusedTabIndex} from '../../util';
 
 export const MessageActionsId = {

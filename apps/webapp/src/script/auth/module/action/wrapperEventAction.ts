@@ -17,8 +17,7 @@
  *
  */
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
+import {WebAppEvents} from '../../../webAppEvents';
 import type {ThunkAction} from '../reducer';
 
 class WrapperChangeEnvironmentEvent extends CustomEvent<{url: string}> {

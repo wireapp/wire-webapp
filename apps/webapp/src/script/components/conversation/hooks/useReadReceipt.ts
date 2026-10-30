@@ -19,7 +19,8 @@
 
 import {useCallback, useRef} from 'react';
 
-import {isNonEmptyArray} from '@sindresorhus/is';
+import type {Clock, TimeoutIdentifier} from '@enormora/clock/clock';
+import {isNonEmptyArray, isUndefined} from '@sindresorhus/is';
 import {groupBy} from 'underscore';
 
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
@@ -27,18 +28,33 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {Message} from 'Repositories/entity/message/message';
 
 type ReadMessageBuffer = {conversation: Conversation; message: Message};
+type ReadReceiptClock = Pick<Clock, 'setTimeout' | 'clearTimeout'>;
+
+type UseReadReceiptSenderOptions = {
+  readonly messageSender: Pick<MessageRepository, 'sendReadReceipt'>;
+  readonly clock: ReadReceiptClock;
+};
 
 const DEBOUNCE = 500;
 
-type UseReadReceiptSenderResult = {addReadReceiptToBatch: (conversation: Conversation, message: Message) => void};
-export const useReadReceiptSender = (
-  messageSender: Pick<MessageRepository, 'sendReadReceipt'>,
-): UseReadReceiptSenderResult => {
+type UseReadReceiptSenderResult = {
+  addReadReceiptToBatch: (conversation: Conversation, message: Message) => void;
+  cancelPendingReadReceiptsForConversation: (conversation: Conversation) => void;
+};
+export const useReadReceiptSender = (options: UseReadReceiptSenderOptions): UseReadReceiptSenderResult => {
+  const {messageSender, clock} = options;
   const readMessagesBuffer = useRef<ReadMessageBuffer[]>([]);
-  const flushTimer = useRef<number | undefined>(undefined);
+  const flushTimer = useRef<TimeoutIdentifier | undefined>(undefined);
 
   const flush = useCallback(() => {
     const readMessages = readMessagesBuffer.current;
+    readMessagesBuffer.current = [];
+    const scheduledFlushTimer = flushTimer.current;
+    if (!isUndefined(scheduledFlushTimer)) {
+      clock.clearTimeout(scheduledFlushTimer);
+    }
+    flushTimer.current = undefined;
+
     if (isNonEmptyArray(readMessages)) {
       const groupedMessages = groupBy(readMessages, ({conversation, message}) => {
         return conversation.id + message.from;
@@ -55,9 +71,25 @@ export const useReadReceiptSender = (
           messageSender.sendReadReceipt(conversation, firstMessage, otherMessageIds);
         }
       });
-      readMessagesBuffer.current = [];
     }
-  }, [messageSender]);
+  }, [clock, messageSender]);
+
+  const cancelPendingReadReceiptsForConversation = useCallback(
+    (conversationToCancel: Conversation): void => {
+      readMessagesBuffer.current = readMessagesBuffer.current.filter(readMessage => {
+        return (
+          readMessage.conversation.id !== conversationToCancel.id ||
+          readMessage.conversation.domain !== conversationToCancel.domain
+        );
+      });
+
+      if (!isNonEmptyArray(readMessagesBuffer.current) && !isUndefined(flushTimer.current)) {
+        clock.clearTimeout(flushTimer.current);
+        flushTimer.current = undefined;
+      }
+    },
+    [clock],
+  );
 
   return {
     addReadReceiptToBatch: (conversation: Conversation, message: Message) => {
@@ -69,14 +101,15 @@ export const useReadReceiptSender = (
         return;
       }
 
-      if (flushTimer.current !== undefined) {
-        window.clearTimeout(flushTimer.current);
+      if (!isUndefined(flushTimer.current)) {
+        clock.clearTimeout(flushTimer.current);
       }
 
       // add the message in the buffer of read messages (actual read receipt will be sent in the next batch)
       const entry = {conversation, message};
       readMessagesBuffer.current = readMessagesBuffer.current.concat(entry);
-      flushTimer.current = window.setTimeout(flush, DEBOUNCE);
+      flushTimer.current = clock.setTimeout(flush, DEBOUNCE);
     },
+    cancelPendingReadReceiptsForConversation,
   };
 };

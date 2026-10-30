@@ -25,7 +25,6 @@ import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {amplify} from 'amplify';
 
 import {ChevronIcon, SecondaryButton} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/icon';
 import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
@@ -47,6 +46,7 @@ import {FullSearch} from './fullSearch';
 import {Category, isOfCategory} from './utils';
 
 import {MessageCategory} from '../../../../message/messageCategory';
+import {WebAppEvents} from '../../../../webAppEvents';
 
 type CollectionProps = {
   conversation: Conversation;

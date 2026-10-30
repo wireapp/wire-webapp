@@ -23,8 +23,6 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import * as Icon from 'Components/icon';
 import {AssetImage} from 'Components/image';
 import type {Conversation} from 'Repositories/entity/Conversation';
@@ -49,6 +47,7 @@ import {VideoAsset} from './asset/videoAsset/videoAsset';
 import {MessageActions} from '..';
 import {ConversationError} from '../../../../error/conversationError';
 import {QuoteEntity} from '../../../../message/quoteEntity';
+import {WebAppEvents} from '../../../../webAppEvents';
 import {useMessageFocusedTabIndex} from '../util';
 
 function createPlaceholderMessage(translate: Translate): ContentMessage {

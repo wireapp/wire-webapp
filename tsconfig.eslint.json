@@ -12,7 +12,6 @@
       "@wireapp/react-ui-kit": ["libraries/react-ui-kit/src/index.ts"],
       "@wireapp/commons/lib/*": ["libraries/commons/src/*"],
       "@wireapp/commons": ["libraries/commons/src/index.ts"],
-      "@wireapp/webapp-events": ["libraries/webapp-events/src/index.ts"],
       "@wireapp/store-engine/lib/*": ["libraries/store-engine/src/*"],
       "@wireapp/store-engine": ["libraries/store-engine/src/index.ts"],
       "@wireapp/store-engine-dexie": ["libraries/store-engine-dexie/src/index.ts"],

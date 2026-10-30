@@ -22,6 +22,7 @@ export const conversationListCollapseFeatureToggleName = 'conversation-list-coll
 export const forTestsOnlyFeatureToggleName = 'for-tests-only';
 export const disableMessagePreprocessingFeatureToggleName = 'disable-message-preprocessing';
 export const driveBulkActionsFeatureToggleName = 'drive-bulk-actions';
+export const markAsUnreadFeatureToggleName = 'mark-as-unread';
 export const troubleshooterFeatureToggleName = 'troubleshooter';
 
 export const startupFeatureToggleNames = [
@@ -30,6 +31,7 @@ export const startupFeatureToggleNames = [
   forTestsOnlyFeatureToggleName,
   disableMessagePreprocessingFeatureToggleName,
   driveBulkActionsFeatureToggleName,
+  markAsUnreadFeatureToggleName,
   troubleshooterFeatureToggleName,
 ] as const;
 

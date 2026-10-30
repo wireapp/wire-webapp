@@ -35,7 +35,6 @@ import {
   QUERY,
   TabIndex,
 } from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useAppNotification} from 'Components/appNotification/appNotification';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
@@ -83,6 +82,7 @@ import {VideoControls} from './VideoControls/VideoControls';
 
 import {useWarningsState} from '../../view_model/WarningsContainer/WarningsState';
 import {CONFIG, TYPE} from '../../view_model/WarningsContainer/WarningsTypes';
+import {WebAppEvents} from '../../webAppEvents';
 
 export interface FullscreenVideoCallProps {
   activeCallViewTab: string;

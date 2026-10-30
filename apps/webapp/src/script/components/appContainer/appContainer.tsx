@@ -27,7 +27,6 @@ import ky from 'ky';
 import {container} from 'tsyringe';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {MeetingStoreRoot} from 'Components/meeting/meetingStore/meetingStoreRoot';
 import {LeaveGroupAdminModal} from 'Components/Modals/LeaveGroupAdminModal/LeaveGroupAdminModal';
@@ -47,6 +46,7 @@ import {useTheme} from './hooks/useTheme';
 import {runClientVersionCheck} from '../../applicationPeriodicChecks/runClientVersionCheck';
 import {startApplicationPeriodicChecks} from '../../applicationPeriodicChecks/startApplicationPeriodicChecks';
 import {Config, Configuration} from '../../Config';
+import {markAsUnreadFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
 import {StartupFeatureToggleName} from '../../featureToggles/startupFeatureToggles';
 import type {FetchLatestBuildMetadata} from '../../lifecycle/newVersionHandler';
 import {setAppLocale} from '../../localization/Localizer';
@@ -58,6 +58,7 @@ import {APIClient} from '../../service/apiClientSingleton';
 import {Core} from '../../service/coreSingleton';
 import {TIME_IN_MILLIS} from '../../util/timeUtil';
 import {MainViewModel} from '../../view_model/MainViewModel';
+import {WebAppEvents} from '../../webAppEvents';
 import {AppLoader} from '../appLoader/index';
 
 type AppProps = {
@@ -89,6 +90,7 @@ export const AppContainer: FunctionComponent<AppProps> = (properties: AppProps) 
     translate,
   } = properties;
   setAppLocale();
+  const isMarkAsUnreadFeatureEnabled = isFeatureToggleEnabled(markAsUnreadFeatureToggleName);
   const app = useMemo(() => {
     return new App(
       container.resolve(Core),
@@ -97,8 +99,9 @@ export const AppContainer: FunctionComponent<AppProps> = (properties: AppProps) 
       translate,
       clock,
       fireAndForgetInvoker,
+      {isMarkAsUnreadFeatureEnabled},
     );
-  }, [config, fireAndForgetInvoker, translate, clock]);
+  }, [config, fireAndForgetInvoker, translate, clock, isMarkAsUnreadFeatureEnabled]);
   const enableAutoLogin = Config.getConfig().FEATURE.ENABLE_AUTO_LOGIN;
   // Publishing application on the global scope for debug and testing purposes.
   window.wire.app = app;

@@ -77,7 +77,6 @@ import {flatten, isError} from 'underscore';
 
 import {Account} from '@wireapp/core';
 import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {TYPING_TIMEOUT, useTypingIndicatorState} from 'Components/inputBar/typingIndicator';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
@@ -183,6 +182,20 @@ import {SystemMessageType} from '../../message/systemMessageType';
 import {ensureMLSGroupIsEstablished, initMLSGroupConversation} from '../../mls';
 import {Core} from '../../service/coreSingleton';
 import {ServerTimeHandler} from '../../time/serverTimeHandler';
+import {WebAppEvents} from '../../webAppEvents';
+
+export type ConversationRepositoryOptions = {
+  readonly isMarkAsUnreadFeatureEnabled: boolean;
+};
+
+function withoutManualUnreadTimestamp<ConversationData extends ConversationRecord>(
+  conversationData: ConversationData,
+): ConversationData {
+  const conversationWithoutManualUnreadTimestamp = {...conversationData};
+  delete conversationWithoutManualUnreadTimestamp.manual_unread_timestamp;
+
+  return conversationWithoutManualUnreadTimestamp;
+}
 
 const bytesPerKibibyte = 1024;
 const externalMessageThresholdInKibibytes = 200;
@@ -286,6 +299,7 @@ export class ConversationRepository {
     private readonly callingRepository: CallingRepository,
     private readonly serverTimeHandler: ServerTimeHandler,
     private readonly translate: Translate,
+    private readonly options: ConversationRepositoryOptions,
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
     private readonly conversationState = container.resolve(ConversationState),
@@ -999,7 +1013,18 @@ export class ConversationRepository {
     connections: ConnectionEntity[],
     deadConnections: ConnectionEntity[] = [],
   ): Promise<Conversation[]> {
-    const localConversations = await this.conversationService.loadConversationStatesFromDb<ConversationDatabaseData>();
+    let localConversations = await this.conversationService.loadConversationStatesFromDb<ConversationDatabaseData>();
+
+    if (!this.options.isMarkAsUnreadFeatureEnabled) {
+      const hasManualUnreadMarkers = localConversations.some(conversationData => {
+        return !isUndefined(conversationData.manual_unread_timestamp);
+      });
+
+      if (hasManualUnreadMarkers) {
+        localConversations = localConversations.map(withoutManualUnreadTimestamp);
+        await this.conversationService.saveConversationsInDb(localConversations);
+      }
+    }
 
     let conversationsData: any[];
 
@@ -1043,7 +1068,7 @@ export class ConversationRepository {
         return;
       }
 
-      unknownConversations.push(conversationData);
+      unknownConversations.push(withoutManualUnreadTimestamp(conversationData));
     });
 
     let conversationEntities: Conversation[] = [];
@@ -1242,7 +1267,7 @@ export class ConversationRepository {
   private async getUnreadEvents(conversationEntity: Conversation): Promise<void> {
     const first_message = conversationEntity.getOldestMessage();
     // The lower bound should be right after the last read timestamp in order not to load the last read message again (thus the +1)
-    const lower_bound = new Date(conversationEntity.last_read_timestamp() + 1);
+    const lower_bound = new Date(conversationEntity.effectiveReadTimestamp() + 1);
     const upper_bound = !isUndefined(first_message)
       ? new Date(first_message.timestamp())
       : new Date(conversationEntity.getLatestTimestamp(this.serverTimeHandler.toServerTimestamp()) + 1);
@@ -2021,6 +2046,8 @@ export class ConversationRepository {
     try {
       mlsConversation.last_event_timestamp(proteusConversationToBeKept.last_event_timestamp());
       mlsConversation.last_read_timestamp(proteusConversationToBeKept.last_read_timestamp());
+      mlsConversation.manualUnreadTimestamp(proteusConversationToBeKept.manualUnreadTimestamp());
+      mlsConversation.isAutoReadSuppressed(proteusConversationToBeKept.isAutoReadSuppressed());
       mlsConversation.last_server_timestamp(proteusConversationToBeKept.last_server_timestamp());
       mlsConversation.archivedState(proteusConversationToBeKept.archivedState());
       mlsConversation.archivedTimestamp(proteusConversationToBeKept.archivedTimestamp());
@@ -2700,11 +2727,11 @@ export class ConversationRepository {
     payload: (BackendConversation | ValidatedMeetingConversation | ConversationDatabaseData)[],
     initialTimestamp = this.getLatestEventTimestamp(true),
   ): Conversation[] {
-    const entities = ConversationMapper.mapConversations(
-      payload as ConversationDatabaseData[],
-      initialTimestamp,
-      this.translate,
-    );
+    const conversationData = payload as ConversationDatabaseData[];
+    const conversationsForMapping = this.options.isMarkAsUnreadFeatureEnabled
+      ? conversationData
+      : conversationData.map(withoutManualUnreadTimestamp);
+    const entities = ConversationMapper.mapConversations(conversationsForMapping, initialTimestamp, this.translate);
     entities.forEach(conversationEntity => {
       this._mapGuestStatusSelf(conversationEntity);
       conversationEntity.selfUser(this.userState.self());

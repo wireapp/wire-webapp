@@ -22,7 +22,7 @@ import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
 import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {WebAppEvents} from '../../../webAppEvents';
 
 import {TestFactory} from 'test/helper/TestFactory';
 

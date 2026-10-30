@@ -21,12 +21,12 @@ import {useState} from 'react';
 
 import {amplify} from 'amplify';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {StorageKey} from 'Repositories/storage';
 import {EventName} from 'Repositories/tracking/eventName';
 import {Config} from 'src/script/Config';
 import {loadValue, storeValue} from 'Util/storageUtil';
+
+import {WebAppEvents} from '../../../webAppEvents';
 
 type UseFormatToolbarResult = {open: boolean; handleClick: () => void};
 export const useFormatToolbar = (): UseFormatToolbarResult => {

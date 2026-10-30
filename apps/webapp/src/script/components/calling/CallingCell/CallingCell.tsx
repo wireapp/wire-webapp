@@ -24,7 +24,6 @@ import {container} from 'tsyringe';
 
 import {CALL_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {TabIndex} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useAppNotification} from 'Components/appNotification/index';
 import {callingContainer} from 'Components/calling/CallingCell/CallingCell.styles';
@@ -56,6 +55,7 @@ import {usePressSpaceToUnmute} from './usePressSpaceToUnmute/usePressSpaceToUnmu
 
 import {generateConversationUrl} from '../../../router/routeGenerator';
 import {CallActions, CallViewTab} from '../../../view_model/CallingViewModel';
+import {WebAppEvents} from '../../../webAppEvents';
 
 interface VideoCallProps {
   hasAccessToCamera?: boolean;

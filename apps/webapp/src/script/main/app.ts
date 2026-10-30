@@ -37,7 +37,6 @@ import {task} from 'true-myth';
 import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
@@ -51,7 +50,10 @@ import {getClientMLSConfig} from 'Repositories/client/clientMLSConfig';
 import {subscribeToMLSKeyPackageUpdates} from 'Repositories/client/subscribeToMLSKeyPackageUpdates';
 import {ConnectionRepository} from 'Repositories/connection/connectionRepository';
 import {ConnectionService} from 'Repositories/connection/connectionService';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {
+  ConversationRepository,
+  type ConversationRepositoryOptions,
+} from 'Repositories/conversation/ConversationRepository';
 import {ConversationService} from 'Repositories/conversation/ConversationService';
 import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
 import {OnConversationE2EIVerificationStateChange} from 'Repositories/conversation/ConversationVerificationStateHandler/shared';
@@ -142,6 +144,7 @@ import {serverTimeHandler} from '../time/serverTimeHandler';
 import {WindowHandler} from '../ui/windowHandler';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
 import {Warnings} from '../view_model/WarningsContainer';
+import {WebAppEvents} from '../webAppEvents';
 
 type AppConfig = {
   COOKIES_CHECK: {COOKIE_NAME: string};
@@ -239,6 +242,7 @@ export class App {
     private readonly translate: Translate,
     private readonly clock: Clock,
     private readonly fireAndForgetInvoker: FireAndForgetInvoker,
+    private readonly conversationRepositoryOptions: ConversationRepositoryOptions,
   ) {
     this.config = config;
     this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () => {
@@ -370,6 +374,7 @@ export class App {
       repositories.calling,
       serverTimeHandler,
       this.translate,
+      this.conversationRepositoryOptions,
     );
 
     repositories.eventTracker = new EventTrackingRepository(repositories.message, this.apiClient);

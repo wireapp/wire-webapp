@@ -22,7 +22,7 @@ import {FEATURE_STATUS} from '@wireapp/api-client/lib/team/feature/';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {WebAppEvents} from '../../webAppEvents';
 
 import en from 'I18n/en-US.json';
 import type {ClientRepository} from 'Repositories/client';

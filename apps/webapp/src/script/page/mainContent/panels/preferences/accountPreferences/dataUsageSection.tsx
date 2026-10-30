@@ -22,7 +22,6 @@ import React, {useEffect, useState, type FunctionComponent} from 'react';
 import {amplify} from 'amplify';
 
 import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
@@ -31,6 +30,7 @@ import {getForcedErrorReportingStatus} from 'Repositories/tracking/telemetry.hel
 import {ConsentValue} from 'Repositories/user/consentValue';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
+import {WebAppEvents} from '../../../../../webAppEvents';
 import {PreferencesSection} from '../components/preferencesSection';
 
 interface DataUsageSectionProps {
