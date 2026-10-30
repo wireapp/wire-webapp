@@ -45,6 +45,7 @@ import {Collection} from './panels/Collection';
 import {AboutPreferences} from './panels/preferences/AboutPreferences';
 import {AccountPreferences} from './panels/preferences/AccountPreferences';
 import {AVPreferences} from './panels/preferences/AVPreferences';
+import {BackupPreferences} from './panels/preferences/BackupPreferences';
 import {DevicesPreferences} from './panels/preferences/DevicesPreferences';
 import {OptionPreferences} from './panels/preferences/OptionPreferences';
 
@@ -131,6 +132,7 @@ const MainContent = ({
     [ContentState.PREFERENCES_ABOUT]: t('accessibility.headings.preferencesAbout'),
     [ContentState.PREFERENCES_ACCOUNT]: t('accessibility.headings.preferencesAccount'),
     [ContentState.PREFERENCES_AV]: t('accessibility.headings.preferencesAV'),
+    [ContentState.PREFERENCES_BACKUP]: t('accessibility.headings.preferencesBackup'),
     [ContentState.PREFERENCES_DEVICES]: t('accessibility.headings.preferencesDevices'),
     [ContentState.PREFERENCES_OPTIONS]: t('accessibility.headings.preferencesOptions'),
     [ContentState.WATERMARK]: t('accessibility.headings.noConversation'),
@@ -201,6 +203,16 @@ const MainContent = ({
                   propertiesRepository={repositories.properties}
                   deviceSupport={deviceSupport}
                 />
+              </div>
+            )}
+
+            {contentState === ContentState.PREFERENCES_BACKUP && (
+              <div
+                id="preferences-backup"
+                className={cx('preferences-page preferences-backup', incomingCssClass)}
+                ref={removeAnimationsClass}
+              >
+                <BackupPreferences />
               </div>
             )}
 

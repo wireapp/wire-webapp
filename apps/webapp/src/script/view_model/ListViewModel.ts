@@ -113,6 +113,7 @@ export class ListViewModel {
           ContentState.PREFERENCES_ACCOUNT,
           ContentState.PREFERENCES_DEVICES,
           ContentState.PREFERENCES_OPTIONS,
+          ...(Config.getConfig().FEATURE.ENABLE_AUTO_BACKUP ? [ContentState.PREFERENCES_BACKUP] : []),
           ContentState.PREFERENCES_AV,
         ];
 

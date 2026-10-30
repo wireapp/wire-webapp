@@ -22,7 +22,7 @@ import React, {useEffect} from 'react';
 import {amplify} from 'amplify';
 
 import {Runtime} from '@wireapp/commons';
-import {TabIndex} from '@wireapp/react-ui-kit';
+import {DownloadIcon, TabIndex} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/Icon';
@@ -33,6 +33,7 @@ import {
   PreferenceNotificationRepository,
 } from 'Repositories/notification/PreferenceNotificationRepository';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
+import {Config} from 'src/script/Config';
 import {t} from 'Util/LocalizerUtil';
 
 import {ListWrapper} from './ListWrapper';
@@ -152,6 +153,13 @@ const Preferences = ({
       id: ContentState.PREFERENCES_OPTIONS,
       label: t('preferencesOptions'),
       uieName: 'go-options',
+    },
+    {
+      IconComponent: DownloadIcon,
+      hidden: !Config.getConfig().FEATURE.ENABLE_AUTO_BACKUP,
+      id: ContentState.PREFERENCES_BACKUP,
+      label: t('preferencesBackup'),
+      uieName: 'go-backup',
     },
     {
       IconComponent: Icon.AvIcon,

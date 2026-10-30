@@ -126,6 +126,11 @@ const useWindowTitle = () => {
           break;
         }
 
+        case ContentState.PREFERENCES_BACKUP: {
+          specificTitle += t('preferencesBackup');
+          break;
+        }
+
         case ContentState.PREFERENCES_DEVICE_DETAILS: {
           specificTitle += t('preferencesDeviceDetails');
           break;

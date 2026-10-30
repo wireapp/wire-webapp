@@ -21,6 +21,9 @@ import {render} from '@testing-library/react';
 
 import {Runtime} from '@wireapp/commons';
 
+import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {Config} from 'src/script/Config';
+
 import {Preferences} from './Preferences';
 
 describe('Preferences', () => {
@@ -55,5 +58,31 @@ describe('Preferences', () => {
     const {queryByText} = render(<Preferences {...defaultParams} />);
     expect(queryByText('preferencesAV')).toBeNull();
     expect(queryByText('preferencesAbout')).not.toBeNull();
+  });
+
+  describe('back up & restore section', () => {
+    const mockAutoBackupFlag = (enabled: boolean) => {
+      const config = Config.getConfig();
+      jest.spyOn(Config, 'getConfig').mockReturnValue({
+        ...config,
+        FEATURE: {...config.FEATURE, ENABLE_AUTO_BACKUP: enabled},
+      });
+    };
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    it('is shown when the auto backup feature is enabled', () => {
+      mockAutoBackupFlag(true);
+      const {queryByText} = render(withTheme(<Preferences {...defaultParams} />));
+      expect(queryByText('preferencesBackup')).not.toBeNull();
+    });
+
+    it('is hidden when the auto backup feature is disabled', () => {
+      mockAutoBackupFlag(false);
+      const {queryByText} = render(withTheme(<Preferences {...defaultParams} />));
+      expect(queryByText('preferencesBackup')).toBeNull();
+    });
   });
 });
