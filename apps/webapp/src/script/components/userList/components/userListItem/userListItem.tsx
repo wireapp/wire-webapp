@@ -100,7 +100,7 @@ export const UserListItem: FunctionComponent<UserListItemProps> = ({
     if (isTemporaryGuest) {
       return expirationText;
     }
-    if (isPendingOnboardingShown) {
+    if (isPendingOnboardingShown && user.handle === '') {
       return translate('userOnboardingPending');
     }
     if (!isAvailable) {

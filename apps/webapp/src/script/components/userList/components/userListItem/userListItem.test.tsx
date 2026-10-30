@@ -17,7 +17,7 @@
  *
  */
 
-import {render} from '@testing-library/react';
+import {render, type RenderResult} from '@testing-library/react';
 import {noop} from 'noop-esm';
 
 import {User} from 'Repositories/entity/User';
@@ -104,7 +104,7 @@ describe('UserListItem', () => {
       return user;
     };
 
-    const renderUserListItem = (user: User, showPendingOnboarding?: boolean) => {
+    const renderUserListItem = (user: User, showPendingOnboarding?: boolean): RenderResult => {
       return render(
         <UserListItem
           canSelect={false}
@@ -125,8 +125,17 @@ describe('UserListItem', () => {
       );
     };
 
-    it('replaces the handle with the pending onboarding subtitle and shows the badge', () => {
+    it('keeps the handle as subtitle and shows the badge', () => {
       const {getByTestId} = renderUserListItem(createPendingUser(), true);
+
+      expect(getByTestId('status-username').textContent).toBe('@alice');
+      expect(getByTestId('status-pending-onboarding')).toBeDefined();
+    });
+
+    it('shows the pending onboarding subtitle when the user has no handle', () => {
+      const user = createPendingUser();
+      user.username('');
+      const {getByTestId} = renderUserListItem(user, true);
 
       expect(getByTestId('status-username').textContent).toBe('userOnboardingPending');
       expect(getByTestId('status-pending-onboarding')).toBeDefined();
