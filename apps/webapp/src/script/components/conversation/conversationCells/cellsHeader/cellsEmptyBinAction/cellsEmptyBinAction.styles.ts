@@ -44,8 +44,8 @@ export const emptyBinButtonStyles: CSSObject = {
   marginBottom: 0,
   minWidth: 0,
   padding: '6px 12px',
-  '& > svg > path': {
-    fill: 'var(--text-input-background)',
+  '& > svg': {
+    fill: 'currentColor',
   },
   '&:hover, &:active': {
     backgroundColor: 'var(--danger-color)',
@@ -61,9 +61,6 @@ export const emptyBinButtonStyles: CSSObject = {
   '&:disabled': {
     backgroundColor: 'var(--button-tertiary-disabled-bg)',
     color: 'var(--text-input-placeholder)',
-    '& > svg > path': {
-      fill: 'var(--text-input-placeholder)',
-    },
   },
 };
 
