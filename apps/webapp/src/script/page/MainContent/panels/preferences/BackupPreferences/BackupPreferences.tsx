@@ -21,10 +21,13 @@ import {useId, useState} from 'react';
 
 import {AlertIcon, Button, ButtonVariant, HistoryIcon, LockClosedIcon, ShieldIcon, Switch} from '@wireapp/react-ui-kit';
 
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {RadioGroup} from 'Components/Radio';
 import {Config} from 'src/script/Config';
 import {t} from 'Util/LocalizerUtil';
 
+import {SaveBackupKeyModal} from './backupKey/SaveBackupKeyModal';
+import {useBackupKeyStore} from './backupKey/useBackupKeyStore';
 import {mockBackupPreferencesState} from './BackupPreferences.mock';
 import {
   actionsStyle,
@@ -80,11 +83,13 @@ const getStatusLine = (enabled: boolean, paused: boolean, frequency: BackupFrequ
 };
 
 export const BackupPreferences = ({state = mockBackupPreferencesState}: BackupPreferencesProps) => {
-  const {adminEnforced, run, location, lastBackup, nextBackup, hasKey} = state;
+  const {adminEnforced, run, location, lastBackup, nextBackup} = state;
   const brandName = Config.getConfig().BRAND_NAME;
 
   const [autoBackupEnabled, setAutoBackupEnabled] = useState(state.autoBackupEnabled);
   const [frequency, setFrequency] = useState(state.frequency);
+  const [isSaveKeyModalOpen, setIsSaveKeyModalOpen] = useState(false);
+  const hasKey = useBackupKeyStore(keyState => !!keyState.key);
 
   const statusTitleId = useId();
   const statusLineId = useId();
@@ -93,6 +98,24 @@ export const BackupPreferences = ({state = mockBackupPreferencesState}: BackupPr
   const paused = autoBackupEnabled && state.paused;
   const isActive = autoBackupEnabled && !paused;
   const showSummary = !run && (autoBackupEnabled || !!lastBackup);
+
+  const openSaveKeyModal = () => setIsSaveKeyModalOpen(true);
+
+  const confirmCreateNewKey = () => {
+    PrimaryModal.show(PrimaryModal.type.CONFIRM, {
+      primaryAction: {
+        action: openSaveKeyModal,
+        text: t('preferencesBackupKeyCreate'),
+      },
+      secondaryAction: {
+        text: t('modalConfirmSecondary'),
+      },
+      text: {
+        message: t('preferencesBackupKeyNewMessage'),
+        title: t('preferencesBackupKeyNewTitle'),
+      },
+    });
+  };
 
   const frequencyOptions = [
     {label: t('preferencesBackupScheduleDaily'), value: BackupFrequency.DAILY},
@@ -234,22 +257,43 @@ export const BackupPreferences = ({state = mockBackupPreferencesState}: BackupPr
         </>
       )}
 
-      {hasKey && (
-        <PreferencesSection hasSeparator title={t('preferencesBackupKeyHeader')} uieName="backup-key">
-          <div css={keyRowStyle}>
-            <LockClosedIcon />
-            <div css={growStyle}>
-              <p css={valueStyle}>{t('preferencesBackupKeyTitle')}</p>
-              <p className="preferences-detail">{t('preferencesBackupKeyDescription', {brandName})}</p>
+      <PreferencesSection hasSeparator title={t('preferencesBackupKeyHeader')} uieName="backup-key">
+        {hasKey ? (
+          <>
+            <div css={keyRowStyle}>
+              <LockClosedIcon />
+              <div css={growStyle}>
+                <p css={valueStyle}>{t('preferencesBackupKeyTitle')}</p>
+                <p className="preferences-detail">{t('preferencesBackupKeyDescription', {brandName})}</p>
+              </div>
             </div>
-          </div>
-          <div css={actionsStyle}>
-            <Button variant={ButtonVariant.SECONDARY} onClick={noop} data-uie-name="do-create-backup-key" type="button">
-              {t('preferencesBackupKeyCreate')}
-            </Button>
-          </div>
-        </PreferencesSection>
-      )}
+            <div css={actionsStyle}>
+              <Button
+                variant={ButtonVariant.SECONDARY}
+                onClick={confirmCreateNewKey}
+                data-uie-name="do-create-backup-key"
+                type="button"
+              >
+                {t('preferencesBackupKeyCreate')}
+              </Button>
+            </div>
+          </>
+        ) : (
+          <>
+            <p className="preferences-detail">{t('preferencesBackupKeyMissing')}</p>
+            <div css={actionsStyle}>
+              <Button
+                variant={ButtonVariant.SECONDARY}
+                onClick={openSaveKeyModal}
+                data-uie-name="do-generate-backup-key"
+                type="button"
+              >
+                {t('preferencesBackupKeyGenerate')}
+              </Button>
+            </div>
+          </>
+        )}
+      </PreferencesSection>
 
       <PreferencesSection hasSeparator title={t('preferencesBackupRestoreHeader')} uieName="backup-restore">
         <div css={rowStyle}>
@@ -267,6 +311,8 @@ export const BackupPreferences = ({state = mockBackupPreferencesState}: BackupPr
           </Button>
         </div>
       </PreferencesSection>
+
+      {isSaveKeyModalOpen && <SaveBackupKeyModal onClose={() => setIsSaveKeyModalOpen(false)} />}
     </PreferencesPage>
   );
 };

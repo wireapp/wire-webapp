@@ -48,5 +48,4 @@ export interface BackupPreferencesViewState {
   lastBackup?: string;
   /** Preformatted date of the next scheduled backup */
   nextBackup?: string;
-  hasKey: boolean;
 }

@@ -28,5 +28,4 @@ export const mockBackupPreferencesState: BackupPreferencesViewState = {
   location: '~/Documents/Wire Backups',
   lastBackup: 'Today, 09:41',
   nextBackup: 'Sat, 3 Oct',
-  hasKey: true,
 };

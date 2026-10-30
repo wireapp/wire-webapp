@@ -21,14 +21,21 @@ import {fireEvent, render} from '@testing-library/react';
 
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+
 import {BackupPreferences} from './BackupPreferences';
 import {mockBackupPreferencesState} from './BackupPreferences.mock';
 import {BackupPreferencesViewState} from './BackupPreferences.types';
+import {useBackupKeyStore} from './backupKey/useBackupKeyStore';
 
 const renderWithState = (overrides: Partial<BackupPreferencesViewState> = {}) =>
   render(withTheme(<BackupPreferences state={{...mockBackupPreferencesState, ...overrides}} />));
 
 describe('BackupPreferences', () => {
+  beforeEach(() => {
+    useBackupKeyStore.getState().clearKey();
+  });
+
   it('renders all sections when automatic backups are on', () => {
     const {getByText, getByTestId, queryByTestId} = renderWithState();
 
@@ -97,9 +104,25 @@ describe('BackupPreferences', () => {
     expect((getByTestId('do-restore-from-file') as HTMLButtonElement).disabled).toBe(true);
   });
 
-  it('hides the encryption key section when there is no key', () => {
-    const {queryByTestId} = renderWithState({hasKey: false});
+  it('offers to generate a key when there is none', () => {
+    const {getByTestId, queryByTestId} = renderWithState();
 
-    expect(queryByTestId('backup-key')).toBeNull();
+    expect(queryByTestId('do-create-backup-key')).toBeNull();
+    fireEvent.click(getByTestId('do-generate-backup-key'));
+
+    expect(getByTestId('backup-key-modal')).not.toBeNull();
+  });
+
+  it('asks for confirmation before creating a new key', () => {
+    const showSpy = jest.spyOn(PrimaryModal, 'show').mockImplementation(() => undefined);
+    useBackupKeyStore.getState().setKey('existing key');
+    const {getByTestId, queryByTestId} = renderWithState();
+
+    expect(queryByTestId('do-generate-backup-key')).toBeNull();
+    fireEvent.click(getByTestId('do-create-backup-key'));
+
+    expect(showSpy).toHaveBeenCalledWith(PrimaryModal.type.CONFIRM, expect.anything());
+    expect(queryByTestId('backup-key-modal')).toBeNull();
+    showSpy.mockRestore();
   });
 });
