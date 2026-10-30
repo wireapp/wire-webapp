@@ -20,6 +20,8 @@
 import {act, render, screen, waitFor, type RenderResult} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
+
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 import {JobsTaskStatus, type RestNode} from 'cells-sdk-ts';
 
@@ -57,6 +59,7 @@ const renderEmptyBinAction = (
   {
     enabled = true,
     role = CELLS_SELF_USER_DRIVE_ROLE.EDITOR,
+    clock,
     getCurrentCellsPath = () => {
       return 'recycle_bin';
     },
@@ -65,6 +68,7 @@ const renderEmptyBinAction = (
   }: {
     enabled?: boolean;
     role?: typeof CELLS_SELF_USER_DRIVE_ROLE.EDITOR | typeof CELLS_SELF_USER_DRIVE_ROLE.VIEWER;
+    clock?: ReturnType<typeof createDeterministicClock>;
     getCurrentCellsPath?: () => string;
     onRefreshAfterEmptyBinOutcome?: () => Promise<boolean>;
     onEmptyBinSubmitted?: () => void;
@@ -72,6 +76,7 @@ const renderEmptyBinAction = (
 ): RenderResult => {
   const rootContext = createRootContextValueForTest({
     translate: translateForTest,
+    clock,
     isFeatureToggleEnabled: featureName => {
       return enabled && featureName === driveBulkActionsFeatureToggleName;
     },
@@ -277,6 +282,118 @@ describe('CellsEmptyBinAction', () => {
       expect(screen.getByRole('button', {name: 'cells.emptyBin.button'})).toBeEnabled();
     });
     expect(cellsRepository.deleteNodes).toHaveBeenCalledTimes(1);
+  });
+
+  it('resumes polling after returning to the same Bin view', async () => {
+    const user = userEvent.setup();
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    let currentPath = 'recycle_bin';
+    const getCurrentCellsPath = (): string => {
+      return currentPath;
+    };
+    const getBackgroundActionInfo = jest
+      .fn()
+      .mockResolvedValueOnce({Status: JobsTaskStatus.Running})
+      .mockResolvedValueOnce({Status: JobsTaskStatus.Finished});
+    const cellsRepository = createRepository({
+      deleteNodes: jest.fn().mockResolvedValue({
+        Status: 'Background',
+        BackgroundActions: [{Name: 'delete', JobUuid: 'delete-job'}],
+      }),
+      getBackgroundActionInfo,
+    });
+    const onRefreshAfterEmptyBinOutcome = jest.fn().mockResolvedValue(true);
+    const onEmptyBinSubmitted = jest.fn();
+    const rendered = renderEmptyBinAction(cellsRepository, {
+      clock,
+      getCurrentCellsPath,
+      onRefreshAfterEmptyBinOutcome,
+      onEmptyBinSubmitted,
+    });
+    const rerender = (): void => {
+      rendered.rerender(
+        <StyledApp themeId={THEME_ID.DEFAULT}>
+          <CellsSelfUserDriveRoleProvider selfUserDriveRole={CELLS_SELF_USER_DRIVE_ROLE.EDITOR}>
+            <CellsEmptyBinAction
+              cellsRepository={cellsRepository}
+              conversationQualifiedId={conversationQualifiedId}
+              getCurrentCellsPath={getCurrentCellsPath}
+              onRefreshAfterEmptyBinOutcome={onRefreshAfterEmptyBinOutcome}
+              onEmptyBinSubmitted={onEmptyBinSubmitted}
+            />
+          </CellsSelfUserDriveRoleProvider>
+        </StyledApp>,
+      );
+    };
+
+    await user.click(screen.getByRole('button', {name: 'cells.emptyBin.button'}));
+    await user.click(screen.getByRole('button', {name: 'cells.emptyBin.confirm'}));
+    await waitFor(() => {
+      expect(getBackgroundActionInfo).toHaveBeenCalledTimes(1);
+    });
+    expect(screen.getByRole('status')).toHaveTextContent('cells.emptyBin.status.processing');
+
+    currentPath = 'recycle_bin/nested';
+    rerender();
+    await act(async () => {
+      clock.advanceByMilliseconds(1000);
+      await Promise.resolve();
+    });
+    expect(getBackgroundActionInfo).toHaveBeenCalledTimes(1);
+
+    currentPath = 'recycle_bin';
+    rerender();
+    await waitFor(() => {
+      expect(screen.getByRole('status')).toHaveTextContent('cells.emptyBin.status.completed');
+    });
+    expect(getBackgroundActionInfo).toHaveBeenCalledTimes(2);
+    expect(cellsRepository.deleteNodes).toHaveBeenCalledTimes(1);
+    expect(onEmptyBinSubmitted).toHaveBeenCalledTimes(1);
+    expect(onRefreshAfterEmptyBinOutcome).toHaveBeenCalledTimes(1);
+  });
+
+  it('retries a failed status lookup without repeating the delete request', async () => {
+    const user = userEvent.setup();
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    const getBackgroundActionInfo = jest
+      .fn()
+      .mockRejectedValueOnce(new Error('temporary status lookup failure'))
+      .mockResolvedValueOnce({Status: JobsTaskStatus.Finished});
+    const cellsRepository = createRepository({
+      deleteNodes: jest.fn().mockResolvedValue({
+        Status: 'Background',
+        BackgroundActions: [{Name: 'delete', JobUuid: 'delete-job'}],
+      }),
+      getBackgroundActionInfo,
+    });
+    const onEmptyBinSubmitted = jest.fn();
+    const onRefreshAfterEmptyBinOutcome = jest.fn().mockResolvedValue(true);
+    renderEmptyBinAction(cellsRepository, {clock, onEmptyBinSubmitted, onRefreshAfterEmptyBinOutcome});
+
+    await user.click(screen.getByRole('button', {name: 'cells.emptyBin.button'}));
+    await user.click(screen.getByRole('button', {name: 'cells.emptyBin.confirm'}));
+    await waitFor(() => {
+      expect(getBackgroundActionInfo).toHaveBeenCalledTimes(1);
+    });
+    expect(screen.getByRole('status')).toHaveTextContent('cells.emptyBin.status.processing');
+
+    await act(async () => {
+      clock.advanceByMilliseconds(999);
+      await Promise.resolve();
+    });
+    expect(getBackgroundActionInfo).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      clock.advanceByMilliseconds(1);
+      await Promise.resolve();
+    });
+    await waitFor(() => {
+      expect(screen.getByRole('status')).toHaveTextContent('cells.emptyBin.status.completed');
+    });
+    expect(getBackgroundActionInfo).toHaveBeenCalledTimes(2);
+    expect(cellsRepository.deleteNodes).toHaveBeenCalledTimes(1);
+    expect(onEmptyBinSubmitted).toHaveBeenCalledTimes(1);
+    expect(onRefreshAfterEmptyBinOutcome).toHaveBeenCalledTimes(1);
   });
 
   it('reports partial background failure, refreshes the Bin, and requires review before another action', async () => {

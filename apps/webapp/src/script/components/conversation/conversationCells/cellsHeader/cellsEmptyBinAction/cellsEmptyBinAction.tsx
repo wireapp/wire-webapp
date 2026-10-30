@@ -21,7 +21,9 @@ import {useCallback, useEffect, useRef, useState, type FunctionComponent} from '
 
 import {isNonEmptyString} from '@sindresorhus/is';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
-import {JobsTaskStatus, RestActionStatus} from 'cells-sdk-ts';
+import {JobsTaskStatus, RestActionStatus, type JobsTaskStatus as JobsTaskStatusValue} from 'cells-sdk-ts';
+import {noop} from 'noop-esm';
+import {Maybe, task} from 'true-myth';
 
 import {Button, ButtonVariant, TrashIcon} from '@wireapp/react-ui-kit';
 
@@ -37,8 +39,8 @@ import {
   statusStyles,
 } from './cellsEmptyBinAction.styles';
 import {emptyBin, isEmptyBinRootPath} from './emptyBinAction';
-import {getEmptyBinOutcome} from './emptyBinStatus';
 
+import {pollCellsBackgroundActionJobs} from '../../common/cellsBackgroundActionPolling/cellsBackgroundActionPolling';
 import {CellsModal} from '../../common/cellsModal/cellsModal';
 import {
   CELLS_ACTION,
@@ -134,87 +136,73 @@ export const CellsEmptyBinAction: FunctionComponent<CellsEmptyBinActionProps> = 
       return undefined;
     }
 
-    let isActive = true;
-    let timeout: ReturnType<typeof clock.setTimeout> | undefined;
-    let retryCount = 0;
-
-    const finishWithReview = async (outcome: 'partial' | 'failed' | 'unknown'): Promise<void> => {
-      if (!isActive) {
-        return;
-      }
-
-      setStatus(outcome);
-      setRequiresReview(true);
-      await refreshAfterOutcome();
-    };
-
-    const scheduleNextCheck = (delay: number): void => {
-      timeout = clock.setTimeout(() => {
-        void checkBackgroundDeleteStatus();
-      }, delay);
-    };
-
-    const checkBackgroundDeleteStatus = async (): Promise<void> => {
-      const results = await Promise.all(
-        backgroundJobUuids.map(async jobUuid => {
-          try {
-            return await cellsRepository.getBackgroundActionInfo({name: 'delete', jobUuid});
-          } catch {
-            return undefined;
-          }
-        }),
-      );
-      if (!isActive) {
-        return;
-      }
-
-      const statuses = results.map(result => {
-        return result?.Status;
-      });
-      if (
-        statuses.some(status => {
-          return status === undefined || status === JobsTaskStatus.Unknown;
-        })
-      ) {
-        if (retryCount >= MAX_BACKGROUND_DELETE_STATUS_RETRIES) {
-          await finishWithReview('unknown');
+    return pollCellsBackgroundActionJobs({
+      jobUuids: backgroundJobUuids,
+      readStatus: jobUuid => {
+        return task.tryOrElse(
+          error => {
+            return error;
+          },
+          async () => {
+            const response = await cellsRepository.getBackgroundActionInfo({name: 'delete', jobUuid});
+            return Maybe.of<JobsTaskStatusValue>(response.Status);
+          },
+        );
+      },
+      clock,
+      pollingPolicy: {
+        pollIntervalMs: BACKGROUND_DELETE_STATUS_POLL_INTERVAL_MS,
+        maxUnknownRetries: MAX_BACKGROUND_DELETE_STATUS_RETRIES,
+        maxPollAttempts: Maybe.nothing(),
+        getUnknownRetryDelay: retryIndex => {
+          return (
+            BACKGROUND_DELETE_STATUS_POLL_INTERVAL_MS * BACKGROUND_DELETE_STATUS_RETRY_BACKOFF_FACTOR ** retryIndex
+          );
+        },
+      },
+      isCurrent: isCurrentScope,
+      onStatusSnapshot: noop,
+      onOutcome: outcome => {
+        if (outcome === 'all-finished') {
+          setBackgroundJobUuids([]);
+          setStatus('completed');
+          setRequiresReview(false);
+          void refreshAfterOutcome();
           return;
         }
 
-        retryCount += 1;
-        scheduleNextCheck(
-          BACKGROUND_DELETE_STATUS_POLL_INTERVAL_MS * BACKGROUND_DELETE_STATUS_RETRY_BACKOFF_FACTOR ** (retryCount - 1),
-        );
-        return;
-      }
+        if (outcome === 'mixed-terminal') {
+          setBackgroundJobUuids([]);
+          setStatus('partial');
+          setRequiresReview(true);
+          void refreshAfterOutcome();
+          return;
+        }
 
-      retryCount = 0;
-      const outcome = getEmptyBinOutcome(statuses);
-      if (outcome === 'processing') {
-        scheduleNextCheck(BACKGROUND_DELETE_STATUS_POLL_INTERVAL_MS);
-        return;
-      }
+        if (outcome === 'all-failed') {
+          setBackgroundJobUuids([]);
+          setStatus('failed');
+          setRequiresReview(true);
+          void refreshAfterOutcome();
+          return;
+        }
 
-      setBackgroundJobUuids([]);
-      if (outcome === 'completed') {
-        setStatus('completed');
-        setRequiresReview(false);
-        await refreshAfterOutcome();
-        return;
-      }
-
-      await finishWithReview(outcome);
-    };
-
-    void checkBackgroundDeleteStatus();
-
-    return () => {
-      isActive = false;
-      if (timeout !== undefined) {
-        clock.clearTimeout(timeout);
-      }
-    };
-  }, [backgroundJobUuids, cellsRepository, clock, refreshAfterOutcome, status]);
+        setStatus('unknown');
+        setRequiresReview(true);
+        void refreshAfterOutcome();
+      },
+    });
+  }, [
+    backgroundJobUuids,
+    canEmptyBin,
+    cellsRepository,
+    clock,
+    currentCellsPath,
+    isCurrentScope,
+    refreshAfterOutcome,
+    scopeKey,
+    status,
+  ]);
 
   if (!canEmptyBin) {
     return null;

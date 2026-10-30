@@ -32,7 +32,6 @@ import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/start
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {CellsEmptyBinAction} from './cellsEmptyBinAction/cellsEmptyBinAction';
-import {isEmptyBinRootPath} from './cellsEmptyBinAction/emptyBinAction';
 import {
   actionsStyles,
   breadcrumbsRowStyles,
@@ -142,7 +141,7 @@ export const CellsHeader: FunctionComponent<CellsHeaderProps> = ({
           <CellsFiltersBar filters={filters} />
         ) : (
           <>
-            {isInRecycleBin && isEmptyBinRootPath(currentPath) && (
+            {isInRecycleBin && (
               <CellsEmptyBinAction
                 key={`${conversationQualifiedId.id}@${conversationQualifiedId.domain}`}
                 cellsRepository={cellsRepository}
