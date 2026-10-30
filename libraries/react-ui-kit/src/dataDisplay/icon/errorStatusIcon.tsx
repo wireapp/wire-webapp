@@ -17,23 +17,21 @@
  *
  */
 
-export const ComputerIcon = () => {
+import type {FunctionComponent} from 'react';
+
+import {SVGIcon, SVGIconProps} from './svgIcon';
+
+export const ErrorStatusIcon: FunctionComponent<SVGIconProps> = props => {
   return (
-    <svg
-      width="28"
-      height="28"
-      viewBox="0 0 28 28"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden="true"
-      focusable="false"
-    >
+    <SVGIcon realWidth={20} realHeight={20} color="#C20013" aria-hidden="true" focusable="false" {...props}>
+      <path d="M10 20C15.5228 20 20 15.5228 20 10C20 4.47715 15.5228 0 10 0C4.47715 0 0 4.47715 0 10C0 15.5228 4.47715 20 10 20Z" />
       <path
-        d="M6.4165 5.83325H21.5832C22.5497 5.83325 23.3332 6.61675 23.3332 7.58325V16.9166C23.3332 17.8831 22.5497 18.6666 21.5832 18.6666H6.4165C5.45001 18.6666 4.6665 17.8831 4.6665 16.9166V7.58325C4.6665 6.61675 5.45001 5.83325 6.4165 5.83325Z"
-        strokeWidth="1.98333"
-        stroke="currentColor"
+        d="M7 7L10 10M10 10L13 13M10 10L13 7M10 10L7 13"
+        fill="none"
+        strokeWidth="2"
+        strokeLinecap="round"
+        stroke="white"
       />
-      <path d="M2.3335 22.1667H25.6668" strokeWidth="1.98333" strokeLinecap="round" stroke="currentColor" />
-    </svg>
+    </SVGIcon>
   );
 };

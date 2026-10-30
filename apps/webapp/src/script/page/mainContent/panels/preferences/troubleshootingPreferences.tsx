@@ -17,12 +17,12 @@
  *
  */
 
-import {useState} from 'react';
+import {useState, type JSX} from 'react';
 
 import {Maybe, task} from 'true-myth';
 import {useStore} from 'zustand';
 
-import {Button, ButtonVariant, Loading} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant, ComputerIcon, Loading, NetworkBuildingIcon, WireLogoIcon} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
 import type {TroubleshooterRepository, DiagnosticResult} from 'Repositories/troubleshooter/troubleshooterRepository';
@@ -33,11 +33,8 @@ import {copyText} from 'Util/clipboardUtil';
 import {downloadBlob} from 'Util/util';
 
 import {PreferencesPage} from './components/preferencesPage';
-import {ComputerIcon} from './troubleshooting/computerIcon';
 import {DiagnosticStatusIcon as StatusIcon} from './troubleshooting/diagnosticStatusIcon';
-import {NetworkBuildingIcon} from './troubleshooting/networkBuildingIcon';
 import * as styles from './troubleshooting/troubleshooting.styles';
-import {WireLogoIcon} from './troubleshooting/wireLogoIcon';
 
 const MILLISECONDS_PER_SECOND = 1_000;
 const statusTone = (status: CheckStatus): 'good' | 'warning' | 'bad' | 'muted' => {
@@ -59,28 +56,28 @@ const groups = [
   {id: 'quality', tone: 'good', status: 'good', checks: ['roundTrip', 'jitter', 'packetLoss'], open: false},
 ] as const;
 
-export const TroubleshootingPreferences = ({repository}: {repository: TroubleshooterRepository}) => {
+export const TroubleshootingPreferences = ({repository}: {repository: TroubleshooterRepository}): JSX.Element => {
   const {translate} = useApplicationContext();
   const {BRAND_NAME: brandName, VERSION: version} = Config.getConfig();
   const state = useStore(repository.store);
   const [copyState, setCopyState] = useState<'idle' | 'copied' | 'error'>('idle');
   const busy = state.running !== 'idle';
-  const runConnection = () => {
+  const runConnection = (): void => {
     setCopyState('idle');
     void repository.testConnection();
   };
-  const runScan = () => {
+  const runScan = (): void => {
     setCopyState('idle');
     void repository.runFullScan();
   };
-  const timestamp = <T,>(result: DiagnosticResult<T>, scan: boolean) => {
+  const timestamp = <T,>(result: DiagnosticResult<T>, scan: boolean): string => {
     const date = new Date(result.completedAt);
     return translate(scan ? 'troubleshooter.scanTime' : 'troubleshooter.connectionTime', {
       time: date.toLocaleString(),
       seconds: Math.round(result.durationMilliseconds / MILLISECONDS_PER_SECOND),
     });
   };
-  const renderCheck = (id: CheckId) => {
+  const renderCheck = (id: CheckId): JSX.Element => {
     const check = state.scan.andThen(result => {
       return Maybe.of(
         result.data.checks.find(value => {
