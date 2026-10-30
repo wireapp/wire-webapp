@@ -60,7 +60,6 @@ import {
 } from '@wireapp/avs';
 import {AvsDebugger} from '@wireapp/avs-debugger';
 import {Runtime} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {showNoAudioInputModal, showNoCameraModal} from 'Components/calling/devicePermissionModals';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
@@ -97,6 +96,7 @@ import * as trackingHelpers from 'Repositories/tracking/helpers';
 import {Segmentation} from 'Repositories/tracking/segmentation';
 import {isTelemetryEnabledAtCurrentEnvironment} from 'Repositories/tracking/telemetry.helpers';
 import type {UserRepository} from 'Repositories/user/userRepository';
+import {WebAppEvents} from 'src/script/webAppEvents';
 import {flatten} from 'Util/arrayUtil';
 import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';

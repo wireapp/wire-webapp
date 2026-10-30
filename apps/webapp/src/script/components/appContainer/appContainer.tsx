@@ -27,7 +27,6 @@ import ky from 'ky';
 import {container} from 'tsyringe';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {MeetingStoreRoot} from 'Components/meeting/meetingStore/meetingStoreRoot';
 import {LeaveGroupAdminModal} from 'Components/Modals/LeaveGroupAdminModal/LeaveGroupAdminModal';
@@ -38,6 +37,7 @@ import {SIGN_OUT_REASON} from 'src/script/auth/signOutReason';
 import {useAppSoftLock} from 'src/script/hooks/useAppSoftLock';
 import {useSingleInstance} from 'src/script/hooks/useSingleInstance';
 import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
+import {WebAppEvents} from 'src/script/webAppEvents';
 import type {Translate} from 'Util/localizerUtil';
 
 import {getOtherInstanceAction} from './getOtherInstanceAction';

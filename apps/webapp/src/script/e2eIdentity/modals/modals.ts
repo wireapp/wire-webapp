@@ -20,8 +20,6 @@
 import {isUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {
   ModalOptions,
@@ -31,6 +29,7 @@ import {
   PrimaryModalType,
 } from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 import {Config} from 'src/script/Config';
+import {WebAppEvents} from 'src/script/webAppEvents';
 import type {Translate, TranslationKey} from 'Util/localizerUtil';
 
 const hideSecondaryBtn = {hideSecondary: true};

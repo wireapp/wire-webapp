@@ -20,8 +20,6 @@
 import {isNonEmptyString, isNullOrUndefined, isTruthy} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {useTypingIndicatorState} from 'Components/inputBar/typingIndicator';
 import {CacheRepository} from 'Repositories/cache/cacheRepository';
 import type {ClientRepository} from 'Repositories/client/ClientRepository';
@@ -31,6 +29,7 @@ import {StorageKey} from 'Repositories/storage/storageKey';
 import type {StorageRepository} from 'Repositories/storage/storageRepository';
 import type {UserRepository} from 'Repositories/user/userRepository';
 import {replaceBrowserLocation} from 'src/script/navigation/browserLocation';
+import {WebAppEvents} from 'src/script/webAppEvents';
 import {getLogger, Logger} from 'Util/logger';
 import {includesString} from 'Util/stringUtil';
 import {appendParameter} from 'Util/urlUtil';

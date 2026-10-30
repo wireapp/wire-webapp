@@ -27,8 +27,6 @@ import {ClientMLSError, ClientMLSErrorLabel} from '@wireapp/core/lib/messagingPr
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import * as Icon from 'Components/icon';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {listCSS} from 'Components/panel/panelActions/panelActions.styles';
@@ -40,6 +38,7 @@ import type {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {useApplicationContext} from 'src/script/page/rootProvider';
+import {WebAppEvents} from 'src/script/webAppEvents';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 

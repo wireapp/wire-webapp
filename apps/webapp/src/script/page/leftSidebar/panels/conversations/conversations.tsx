@@ -34,7 +34,6 @@ import {container} from 'tsyringe';
 import {useShallow} from 'zustand/react/shallow';
 
 import {useMatchMedia} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {MeetingNotificationHost} from 'Components/meeting/meetingNotificationHost/meetingNotificationHost';
 import {useConversationFocus} from 'Hooks/useConversationFocus';
@@ -58,6 +57,7 @@ import {ANIMATED_PAGE_TRANSITION_DURATION} from 'src/script/page/mainContent';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {ContentState, ListState, useAppState} from 'src/script/page/useAppState';
+import {WebAppEvents} from 'src/script/webAppEvents';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 import {useMeetingsFeatureFlag} from 'Util/useMeetingsFeatureFlag';

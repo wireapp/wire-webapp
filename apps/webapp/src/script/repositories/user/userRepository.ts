@@ -43,7 +43,6 @@ import {flatten, uniq} from 'underscore';
 
 import {TypedEventEmitter, type AccentColor} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
@@ -62,6 +61,7 @@ import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
 import type {SelfService} from 'Repositories/self/SelfService';
 import {UserRecord} from 'Repositories/storage';
 import {TeamState} from 'Repositories/team/TeamState';
+import {WebAppEvents} from 'src/script/webAppEvents';
 import {chunk, partition} from 'Util/arrayUtil';
 import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';

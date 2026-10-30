@@ -20,14 +20,13 @@
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import * as Icon from 'Components/icon';
 import {MenuItem} from 'Components/panel/panelActions';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import * as UserPermission from 'Repositories/user/userPermission';
 import type {RootContextValue} from 'src/script/page/rootProvider';
+import {WebAppEvents} from 'src/script/webAppEvents';
 
 import {Config} from '../../../../Config';
 import {ActionsViewModel} from '../../../../view_model/ActionsViewModel';

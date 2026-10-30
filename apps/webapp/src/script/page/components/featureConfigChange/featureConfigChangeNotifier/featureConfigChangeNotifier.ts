@@ -29,7 +29,6 @@ import {
 import {amplify} from 'amplify';
 
 import {Runtime} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {ButtonAction} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
@@ -40,6 +39,7 @@ import type {
 } from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 import {TeamState} from 'Repositories/team/TeamState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
+import {WebAppEvents} from 'src/script/webAppEvents';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {type TranslationKey} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';

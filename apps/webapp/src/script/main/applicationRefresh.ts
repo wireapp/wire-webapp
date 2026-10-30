@@ -17,7 +17,7 @@
  *
  */
 
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {WebAppEvents} from 'src/script/webAppEvents';
 
 type ApplicationRefreshDependencies = {
   readonly isDesktopApplication: () => boolean;

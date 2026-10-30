@@ -23,12 +23,12 @@ import type {WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
 
 import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import type {MediaConstraintsHandler} from 'Repositories/media/MediaConstraintsHandler';
 import type {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
 import {useApplicationContext} from 'src/script/page/rootProvider';
+import {WebAppEvents} from 'src/script/webAppEvents';
 import {getLogger} from 'Util/logger';
 
 import {Config} from '../../../../../Config';

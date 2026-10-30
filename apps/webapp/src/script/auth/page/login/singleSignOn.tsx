@@ -44,10 +44,10 @@ import {
   Text,
   useMatchMedia,
 } from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {LogoFullIcon} from 'Components/icon';
 import {useApplicationContext} from 'src/script/page/rootProvider';
+import {WebAppEvents} from 'src/script/webAppEvents';
 import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
 import {getLogger} from 'Util/logger';
 

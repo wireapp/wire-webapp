@@ -24,11 +24,10 @@ import {amplify} from 'amplify';
 import {match} from 'ts-pattern';
 import {container} from 'tsyringe';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
 import {UserState} from 'Repositories/user/userState';
+import {WebAppEvents} from 'src/script/webAppEvents';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import type {Translate} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';

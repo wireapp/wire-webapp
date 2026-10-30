@@ -25,12 +25,12 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 
 import {Availability} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import type {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
 import type {ClientEntity} from 'Repositories/client/ClientEntity';
 import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
 import {ROLE as TEAM_ROLE} from 'Repositories/user/userPermission';
+import {WebAppEvents} from 'src/script/webAppEvents';
 import type {Translate} from 'Util/localizerUtil';
 import {clamp} from 'Util/numberUtil';
 import {getFirstChar} from 'Util/stringUtil';

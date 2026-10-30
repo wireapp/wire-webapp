@@ -23,7 +23,6 @@ import {isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
 import {CircleCloseIcon, IconButton, Input, SearchIcon} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/icon';
 import {useCreateConversationModal} from 'Components/Modals/CreateConversation/hooks/useCreateConversationModal';
@@ -33,6 +32,7 @@ import {generatePermissionHelpers} from 'Repositories/user/userPermission';
 import {useConversationSearch} from 'src/script/page/leftSidebar/panels/conversations/hooks/useConversationSearch';
 import {SidebarTabs} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {useApplicationContext} from 'src/script/page/rootProvider';
+import {WebAppEvents} from 'src/script/webAppEvents';
 import {handleEnterDown, handleEscDown, isTabKey} from 'Util/keyboardUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 

@@ -21,10 +21,9 @@ import {useCallback, useEffect, useState} from 'react';
 
 import {amplify} from 'amplify';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import type {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {EventName} from 'Repositories/tracking/eventName';
+import {WebAppEvents} from 'src/script/webAppEvents';
 
 type UseCameraReloadOnCallEndResult = {shouldReloadCamera: boolean};
 export const useCameraReloadOnCallEnd = (callingRepository: CallingRepository): UseCameraReloadOnCallEndResult => {

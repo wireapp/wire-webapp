@@ -23,12 +23,12 @@ import {amplify} from 'amplify';
 import cx from 'classnames';
 
 import {useMatchMedia} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {MeetingNotificationHost} from 'Components/meeting/meetingNotificationHost/meetingNotificationHost';
 import {User} from 'Repositories/entity/User';
 import {conversationListCollapseFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
+import {WebAppEvents} from 'src/script/webAppEvents';
 
 import {Conversations} from './panels/conversations';
 import {getIsConversationListCollapsed, SidebarTabs, useSidebarStore} from './panels/conversations/useSidebarStore';

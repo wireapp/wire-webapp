@@ -25,8 +25,6 @@ import ko from 'knockout';
 import {container} from 'tsyringe';
 import {isError} from 'underscore';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
@@ -35,6 +33,7 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import type {Message} from 'Repositories/entity/message/message';
 import type {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
+import {WebAppEvents} from 'src/script/webAppEvents';
 import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {isConversationEntity} from 'Util/typePredicateUtil';

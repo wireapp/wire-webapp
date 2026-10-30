@@ -60,7 +60,6 @@ import {container} from 'tsyringe';
 import {partition} from 'underscore';
 
 import {Asset, Availability, Confirmation, GenericMessage} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {buildMetadata, ImageMetadata, isAudio, isImage, isVideo} from 'Repositories/assets/assetMetaDataBuilder';
@@ -92,6 +91,7 @@ import {Segmentation} from 'Repositories/tracking/segmentation';
 import {protoFromType} from 'Repositories/user/availabilityMapper';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
+import {WebAppEvents} from 'src/script/webAppEvents';
 import {
   cancelSendingLinkPreview,
   clearLinkPreviewSendingState,

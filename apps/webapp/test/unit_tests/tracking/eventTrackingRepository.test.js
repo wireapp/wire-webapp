@@ -17,7 +17,7 @@
  *
  */
 
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {WebAppEvents} from 'src/script/webAppEvents';
 
 import {EventTrackingRepository} from 'Repositories/tracking/eventTrackingRepository';
 import {resetStoreValue, storeValue} from 'Util/storageUtil';

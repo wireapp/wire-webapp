@@ -22,11 +22,10 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {Conversation} from 'Repositories/entity/Conversation';
 import {UserState} from 'Repositories/user/userState';
 import {VerificationMessageType} from 'src/script/message/verificationMessageType';
+import {WebAppEvents} from 'src/script/webAppEvents';
 import {getLogger, Logger} from 'Util/logger';
 
 import {isMixedConversation, isProteusConversation} from '../../ConversationSelectors';

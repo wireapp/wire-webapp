@@ -26,7 +26,6 @@ import {container} from 'tsyringe';
 
 import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {Availability} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import 'Components/calling/ChooseScreen';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
@@ -53,6 +52,7 @@ import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
 import type {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {ROLE} from 'Repositories/user/userPermission';
+import {WebAppEvents} from 'src/script/webAppEvents';
 import {type Translate} from 'Util/localizerUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {safeWindowOpen} from 'Util/sanitizationUtil';

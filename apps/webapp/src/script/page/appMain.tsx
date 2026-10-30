@@ -28,7 +28,6 @@ import {ErrorBoundary} from 'react-error-boundary';
 import {container} from 'tsyringe';
 
 import {QUERY, StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallingContainer} from 'Components/calling/CallingOverlayContainer';
 import {ChooseScreen} from 'Components/calling/ChooseScreen';
@@ -52,6 +51,7 @@ import {showInitialModal} from 'Repositories/user/availabilityModal';
 import {UserState} from 'Repositories/user/userState';
 import {isUUID} from 'src/script/auth/util/stringUtil';
 import {Config} from 'src/script/Config';
+import {WebAppEvents} from 'src/script/webAppEvents';
 import {canUseMeetings} from 'Util/canUseMeetings';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';

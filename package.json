@@ -40,7 +40,6 @@
     "@typescript-eslint/parser": "8.72.0",
     "@typescript-eslint/utils": "8.72.0",
     "@wireapp/copy-config": "2.3.13",
-    "@wireapp/prettier-config": "0.6.11",
     "archiver": "7.0.1",
     "concurrently": "9.2.5",
     "cross-env": "10.1.0",
@@ -113,7 +112,33 @@
   },
   "license": "GPL-3.0",
   "name": "wire-webapp",
-  "prettier": "@wireapp/prettier-config",
+  "prettier": {
+    "$schema": "http://json.schemastore.org/prettierrc",
+    "arrowParens": "avoid",
+    "bracketSpacing": false,
+    "endOfLine": "lf",
+    "htmlWhitespaceSensitivity": "css",
+    "jsxSingleQuote": false,
+    "overrides": [
+      {
+        "files": [
+          "*.json"
+        ],
+        "options": {
+          "printWidth": 200
+        }
+      }
+    ],
+    "printWidth": 120,
+    "proseWrap": "never",
+    "quoteProps": "as-needed",
+    "requirePragma": false,
+    "semi": true,
+    "singleQuote": true,
+    "tabWidth": 2,
+    "trailingComma": "all",
+    "useTabs": false
+  },
   "private": true,
   "workspaces": [
     "apps/*",

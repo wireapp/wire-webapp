@@ -24,7 +24,6 @@ import ko from 'knockout';
 import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal, usePrimaryModalState} from 'Components/Modals/PrimaryModal';
 import type {CallingRepository} from 'Repositories/calling/CallingRepository';
@@ -37,6 +36,7 @@ import {SearchRepository} from 'Repositories/search/searchRepository';
 import type {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/userState';
+import {WebAppEvents} from 'src/script/webAppEvents';
 import {iterateItem} from 'Util/arrayUtil';
 import {isEscapeKey} from 'Util/keyboardUtil';
 import {type Translate} from 'Util/localizerUtil';

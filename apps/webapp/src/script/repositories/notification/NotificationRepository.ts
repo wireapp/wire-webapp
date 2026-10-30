@@ -30,7 +30,6 @@ import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {AudioRepository} from 'Repositories/audio/audioRepository';
@@ -58,6 +57,7 @@ import {getPermissionState, setPermissionState} from 'Repositories/permission/pe
 import {normalizePermissionState} from 'Repositories/permission/Permissions.types';
 import {PermissionType} from 'Repositories/permission/PermissionType';
 import {UserState} from 'Repositories/user/userState';
+import {WebAppEvents} from 'src/script/webAppEvents';
 import {Declension, getUserName, type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {getRenderedTextContent} from 'Util/messageRenderer';

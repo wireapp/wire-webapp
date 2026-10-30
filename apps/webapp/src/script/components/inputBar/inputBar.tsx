@@ -25,8 +25,6 @@ import cx from 'classnames';
 import {LexicalEditor, $createTextNode, $insertNodes} from 'lexical';
 import {container} from 'tsyringe';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {Avatar, AVATAR_SIZE} from 'Components/avatar';
 import {ConversationClassifiedBar} from 'Components/classifiedBar/classifiedBar';
 import {isConversationFileUploadAllowed} from 'Components/conversation/conversationFileDropzone/isConversationFileUploadAllowed/isConversationFileUploadAllowed';
@@ -48,6 +46,7 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {EventName} from 'Repositories/tracking/eventName';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from 'Repositories/user/typingIndicatorMode';
 import {disableMessagePreprocessingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
+import {WebAppEvents} from 'src/script/webAppEvents';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 

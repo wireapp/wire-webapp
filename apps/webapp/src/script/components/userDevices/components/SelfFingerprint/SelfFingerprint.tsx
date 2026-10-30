@@ -24,11 +24,10 @@ import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {ClientState} from 'Repositories/client/ClientState';
 import type {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
+import {WebAppEvents} from 'src/script/webAppEvents';
 import {splitFingerprint} from 'Util/stringUtil';
 
 import {FormattedId} from '../../../../page/mainContent/panels/preferences/devicesPreferences/components/formattedId';

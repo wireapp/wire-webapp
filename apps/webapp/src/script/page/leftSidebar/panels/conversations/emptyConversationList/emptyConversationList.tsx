@@ -23,9 +23,9 @@ import {isNonEmptyString} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
 import {Button, ButtonVariant, Link, LinkVariant} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
+import {WebAppEvents} from 'src/script/webAppEvents';
 
 import {button, paragraph, paragraphBold, paragraphGray, seperator, wrapper} from './emptyConversationList.styles';
 

@@ -77,7 +77,6 @@ import {flatten, isError} from 'underscore';
 
 import {Account} from '@wireapp/core';
 import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {TYPING_TIMEOUT, useTypingIndicatorState} from 'Components/inputBar/typingIndicator';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
@@ -108,6 +107,7 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {UserFilter} from 'Repositories/user/userFilter';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
+import {WebAppEvents} from 'src/script/webAppEvents';
 import {getNextItem} from 'Util/arrayUtil';
 import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/fileTypeUtil';
 import {type Translate} from 'Util/localizerUtil';

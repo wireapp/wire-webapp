@@ -24,7 +24,6 @@ import {container} from 'tsyringe';
 
 import {CALL_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {TabIndex} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useAppNotification} from 'Components/appNotification/index';
 import {callingContainer} from 'Components/calling/CallingCell/CallingCell.styles';
@@ -49,6 +48,7 @@ import {Config} from 'src/script/Config';
 import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useAppMainState, ViewType} from 'src/script/page/state';
+import {WebAppEvents} from 'src/script/webAppEvents';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isEnterKey, isSpaceOrEnterKey} from 'Util/keyboardUtil';
 

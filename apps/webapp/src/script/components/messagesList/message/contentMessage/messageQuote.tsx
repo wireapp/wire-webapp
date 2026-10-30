@@ -23,8 +23,6 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import * as Icon from 'Components/icon';
 import {AssetImage} from 'Components/image';
 import type {Conversation} from 'Repositories/entity/Conversation';
@@ -33,6 +31,7 @@ import {Multipart} from 'Repositories/entity/message/multipart';
 import {Text} from 'Repositories/entity/message/text';
 import {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
+import {WebAppEvents} from 'src/script/webAppEvents';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {includesOnlyEmojis} from 'Util/emojiUtil';
 import {type Translate} from 'Util/localizerUtil';

@@ -36,7 +36,6 @@ import {
   RaiseHandIcon,
   TabIndex,
 } from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/icon';
 import {useActiveWindowMatchMedia} from 'Hooks/useActiveWindowMatchMedia';
@@ -62,6 +61,7 @@ import {isMediaDevice} from 'src/script/guards/MediaDevice';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {ContextMenuEntry, showContextMenu} from 'src/script/ui/contextMenu';
 import {CallViewTab} from 'src/script/view_model/CallingViewModel';
+import {WebAppEvents} from 'src/script/webAppEvents';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, isEscapeKey, KEY} from 'Util/keyboardUtil';
 

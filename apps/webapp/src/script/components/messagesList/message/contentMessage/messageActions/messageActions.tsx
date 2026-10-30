@@ -22,12 +22,11 @@ import {FC, useCallback, useRef, useState} from 'react';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {useClickOutside} from 'Hooks/useClickOutside';
 import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {ContextMenuEntry, showContextMenu} from 'src/script/ui/contextMenu';
+import {WebAppEvents} from 'src/script/webAppEvents';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isSpaceOrEnterKey, isTabKey} from 'Util/keyboardUtil';
 import {setContextMenuPosition} from 'Util/util';

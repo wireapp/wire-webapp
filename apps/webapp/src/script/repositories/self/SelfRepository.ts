@@ -24,7 +24,6 @@ import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
 import {TypedEventEmitter} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ClientEntity, ClientRepository} from 'Repositories/client';
 import type {User as UserEntity} from 'Repositories/entity/User';
@@ -36,6 +35,7 @@ import {
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
+import {WebAppEvents} from 'src/script/webAppEvents';
 import {Logger, getLogger} from 'Util/logger';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 

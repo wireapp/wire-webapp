@@ -26,11 +26,11 @@ import {SigninResponse, type User} from 'oidc-client-ts';
 import {container} from 'tsyringe';
 
 import {TypedEventEmitter} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
 import {UserState} from 'Repositories/user/userState';
 import {Core} from 'src/script/service/coreSingleton';
+import {WebAppEvents} from 'src/script/webAppEvents';
 import {translate} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 import {formatDelayTime, TIME_IN_MILLIS} from 'Util/timeUtil';

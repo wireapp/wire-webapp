@@ -37,7 +37,6 @@ import {partition} from 'underscore';
 
 import {Runtime, TypedEventEmitter} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
@@ -50,6 +49,7 @@ import {ROLE, ROLE as TEAM_ROLE, roleFromTeamPermissions} from 'Repositories/use
 import {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
 import {Config} from 'src/script/Config';
+import {WebAppEvents} from 'src/script/webAppEvents';
 import {Environment} from 'Util/environment';
 import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';

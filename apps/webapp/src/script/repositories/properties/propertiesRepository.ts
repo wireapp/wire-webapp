@@ -25,8 +25,6 @@ import {AudioPreference, NotificationPreference, WebappProperties} from '@wireap
 import {amplify} from 'amplify';
 import ko from 'knockout';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 import type {User} from 'Repositories/entity/User';
@@ -36,6 +34,7 @@ import {isTelemetryEnabledAtCurrentEnvironment} from 'Repositories/tracking/tele
 import {ConsentValue} from 'Repositories/user/consentValue';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from 'Repositories/user/typingIndicatorMode';
 import {Config} from 'src/script/Config';
+import {WebAppEvents} from 'src/script/webAppEvents';
 import {Environment} from 'Util/environment';
 import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';

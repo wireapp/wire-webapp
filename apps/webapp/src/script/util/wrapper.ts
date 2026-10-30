@@ -20,9 +20,9 @@
 import {amplify} from 'amplify';
 
 import {Runtime} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ROLE} from 'Repositories/user/userPermission';
+import {WebAppEvents} from 'src/script/webAppEvents';
 
 import {Environment} from './environment';
 

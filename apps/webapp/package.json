@@ -32,7 +32,6 @@
     "@wireapp/react-ui-kit": "9.77.0",
     "@wireapp/store-engine-dexie": "2.1.24",
     "@wireapp/telemetry": "0.3.10",
-    "@wireapp/webapp-events": "0.29.2",
     "amplify": "git+https://github.com/wireapp/amplify.git#c28502cf2a3c99291cc2cda667e7c9fd10f5ddf1",
     "bazinga64": "6.5.13",
     "beautiful-react-hooks": "5.0.3",

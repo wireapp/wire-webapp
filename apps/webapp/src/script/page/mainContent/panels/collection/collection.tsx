@@ -25,7 +25,6 @@ import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {amplify} from 'amplify';
 
 import {ChevronIcon, SecondaryButton} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/icon';
 import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
@@ -39,6 +38,7 @@ import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate} from 'src/script/router/routerBindings';
+import {WebAppEvents} from 'src/script/webAppEvents';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {CollectionDetails} from './collectionDetails';

@@ -24,11 +24,11 @@ import ko from 'knockout';
 import {singleton} from 'tsyringe';
 
 import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import type {ElectronDesktopCapturerSource} from 'Repositories/media/MediaDevicesHandler';
 import {EventName} from 'Repositories/tracking/eventName';
 import {Segmentation} from 'Repositories/tracking/segmentation';
+import {WebAppEvents} from 'src/script/webAppEvents';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import {Call} from './Call';

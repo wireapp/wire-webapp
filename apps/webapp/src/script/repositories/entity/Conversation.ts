@@ -45,7 +45,6 @@ import {container} from 'tsyringe';
 import {Cancelable, debounce} from 'underscore';
 
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {ClientRepository} from 'Repositories/client';
@@ -58,6 +57,7 @@ import {ConversationVerificationState} from 'Repositories/conversation/Conversat
 import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting';
 import {ConversationRecord} from 'Repositories/storage/record/conversationRecord';
 import {TeamState} from 'Repositories/team/TeamState';
+import {WebAppEvents} from 'src/script/webAppEvents';
 import type {Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {matchQualifiedIds} from 'Util/qualifiedId';

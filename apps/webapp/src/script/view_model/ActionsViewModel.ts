@@ -26,8 +26,6 @@ import {UserType, QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {useLeaveGroupAdminModalStore} from 'Components/Modals/LeaveGroupAdminModal/useLeaveGroupAdminModalStore';
 import {PrimaryModal, removeCurrentModal, usePrimaryModalState} from 'Components/Modals/PrimaryModal';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
@@ -44,6 +42,7 @@ import type {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {SelfRepository} from 'Repositories/self/SelfRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/userState';
+import {WebAppEvents} from 'src/script/webAppEvents';
 import {type Translate} from 'Util/localizerUtil';
 import {isBackendError} from 'Util/typePredicateUtil';
 

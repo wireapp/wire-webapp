@@ -37,7 +37,6 @@ import {task} from 'true-myth';
 import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
@@ -100,6 +99,7 @@ import {UserRepository} from 'Repositories/user/userRepository';
 import {UserService} from 'Repositories/user/userService';
 import {UserState} from 'Repositories/user/userState';
 import {createBrowserSystemNotificationApi} from 'src/script/browser/notification/createSystemNotificationApiFromBrowserNotification';
+import {WebAppEvents} from 'src/script/webAppEvents';
 import {initializeDataDog} from 'Util/dataDog';
 import {DebugUtil} from 'Util/debugUtil';
 import {Environment} from 'Util/environment';

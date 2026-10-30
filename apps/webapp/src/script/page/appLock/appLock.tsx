@@ -26,7 +26,6 @@ import {container} from 'tsyringe';
 
 import {ValidationUtil} from '@wireapp/commons';
 import {Button, ButtonVariant, Checkbox, CheckboxLabel, Input, Link, LinkVariant} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
@@ -37,6 +36,7 @@ import {AppLockState} from 'Repositories/user/appLockState';
 import {SIGN_OUT_REASON} from 'src/script/auth/signOutReason';
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
+import {WebAppEvents} from 'src/script/webAppEvents';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
 import type {ReactTranslationValueReplacement} from 'Util/localizerUtil/reactLocalizerUtil';

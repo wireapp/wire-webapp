@@ -21,10 +21,9 @@ import {isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import {create} from 'zustand';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {AppPermissionState} from 'Repositories/notification/AppPermissionState';
+import {WebAppEvents} from 'src/script/webAppEvents';
 import type {Substitutions, TranslationKey} from 'Util/localizerUtil';
 import {safeWindowOpen} from 'Util/sanitizationUtil';
 

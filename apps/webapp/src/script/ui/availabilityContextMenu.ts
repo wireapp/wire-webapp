@@ -20,7 +20,8 @@
 import {amplify} from 'amplify';
 
 import {Availability} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
+
+import {WebAppEvents} from 'src/script/webAppEvents';
 
 import {ContextMenuEntry, showContextMenu} from './contextMenu';
 

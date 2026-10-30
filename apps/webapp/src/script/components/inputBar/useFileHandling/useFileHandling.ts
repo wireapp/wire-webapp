@@ -22,8 +22,7 @@ import {useEffect, useState} from 'react';
 import {isNull} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
+import {WebAppEvents} from 'src/script/webAppEvents';
 import type {Translate} from 'Util/localizerUtil';
 
 import {useFilePaste} from './useFilePaste/useFilePaste';

@@ -26,8 +26,6 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {E2EIVerificationMessage} from 'Components/messagesList/message/e2eiVerificationMessage';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {OutgoingQuote} from 'Repositories/conversation/MessageRepository';
@@ -39,6 +37,7 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {markAsUnreadFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {QuoteEntity} from 'src/script/message/quoteEntity';
 import {useApplicationContext} from 'src/script/page/rootProvider';
+import {WebAppEvents} from 'src/script/webAppEvents';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {CallMessage} from './callMessage';

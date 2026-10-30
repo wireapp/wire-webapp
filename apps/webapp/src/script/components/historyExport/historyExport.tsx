@@ -24,7 +24,6 @@ import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, FlexBox} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {ProgressBar} from 'Components/ProgressBar/ProgressBar';
@@ -35,6 +34,7 @@ import {EventName} from 'Repositories/tracking/eventName';
 import {Segmentation} from 'Repositories/tracking/segmentation';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {ContentState} from 'src/script/page/useAppState';
+import {WebAppEvents} from 'src/script/webAppEvents';
 import {getLogger} from 'Util/logger';
 import {getCurrentDate} from 'Util/timeUtil';
 import {downloadBlob} from 'Util/util';

@@ -20,10 +20,9 @@
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 
-import {WebAppEvents, type ConversationSelfRemovedPayload} from '@wireapp/webapp-events';
-
 import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
 import {findMeetingSeriesByQualifiedConversation} from 'Components/meeting/utils/findMeetingSeriesByQualifiedConversation';
+import {WebAppEvents, type ConversationSelfRemovedPayload} from 'src/script/webAppEvents';
 
 import type {MeetingLifecycleDispatcher} from './createMeetingLifecycleDispatcher';
 

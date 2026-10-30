@@ -28,13 +28,13 @@ import murmurhash from 'murmurhash';
 import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
 import {User} from 'Repositories/entity/User';
 import {ClientRecord} from 'Repositories/storage';
 import {StorageKey} from 'Repositories/storage/storageKey';
+import {WebAppEvents} from 'src/script/webAppEvents';
 import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {matchQualifiedIds} from 'Util/qualifiedId';

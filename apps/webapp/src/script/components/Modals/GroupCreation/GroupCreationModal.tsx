@@ -28,7 +28,6 @@ import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, Option, Select} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {FadingScrollbar} from 'Components/fadingScrollbar';
 import * as Icon from 'Components/icon';
@@ -52,6 +51,7 @@ import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/c
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from 'src/script/router/routerBindings';
+import {WebAppEvents} from 'src/script/webAppEvents';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {checkAppsFeatureAvailability} from 'Util/featureUtil';
 import {handleEnterDown, handleEscDown, isKeyboardEvent} from 'Util/keyboardUtil';

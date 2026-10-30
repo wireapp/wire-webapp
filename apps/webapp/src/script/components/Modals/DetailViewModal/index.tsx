@@ -24,8 +24,6 @@ import {isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {ZoomableImage} from 'Components/ZoomableImage';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
@@ -34,6 +32,7 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {MediumImage} from 'Repositories/entity/message/mediumImage';
 import {User} from 'Repositories/entity/User';
+import {WebAppEvents} from 'src/script/webAppEvents';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import type {Translate} from 'Util/localizerUtil';
 import {renderElement} from 'Util/renderElement';

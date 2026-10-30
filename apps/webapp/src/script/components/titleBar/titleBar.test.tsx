@@ -25,7 +25,7 @@ import {isNull} from '@sindresorhus/is';
 
 import {Runtime} from '@wireapp/commons';
 import * as uiKit from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {WebAppEvents} from 'src/script/webAppEvents';
 
 import en from 'I18n/en-US.json';
 import ru from 'I18n/ru-RU.json';

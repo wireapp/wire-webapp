@@ -23,7 +23,6 @@ import {amplify} from 'amplify';
 
 import {Runtime} from '@wireapp/commons';
 import {TabIndex} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/icon';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
@@ -34,6 +33,7 @@ import {
 } from 'Repositories/notification/PreferenceNotificationRepository';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
+import {WebAppEvents} from 'src/script/webAppEvents';
 
 import {ListWrapper} from './listWrapper';
 

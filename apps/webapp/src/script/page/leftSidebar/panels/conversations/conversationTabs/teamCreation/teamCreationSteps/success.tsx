@@ -22,12 +22,12 @@ import type {FunctionComponent} from 'react';
 import {amplify} from 'amplify';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {EventName} from 'Repositories/tracking/eventName';
 import {Segmentation} from 'Repositories/tracking/segmentation';
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
+import {WebAppEvents} from 'src/script/webAppEvents';
 import {safeWindowOpen} from 'Util/sanitizationUtil';
 
 import {StepProps} from './stepProps';

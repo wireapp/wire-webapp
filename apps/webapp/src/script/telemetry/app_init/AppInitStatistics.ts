@@ -20,8 +20,7 @@
 import {isNan, isUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
+import {WebAppEvents} from 'src/script/webAppEvents';
 import {Logger, getLogger} from 'Util/logger';
 
 import {AppInitStatisticsValue} from './AppInitStatisticsValue';

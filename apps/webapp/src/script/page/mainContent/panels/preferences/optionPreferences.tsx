@@ -22,7 +22,6 @@ import React, {useEffect, useState, type FunctionComponent} from 'react';
 import {amplify} from 'amplify';
 
 import {TabIndex, Checkbox, CheckboxLabel, IndicatorRangeInput} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Theme} from 'Components/appContainer/hooks/useTheme';
 import {RadioGroup} from 'Components/Radio';
@@ -32,6 +31,7 @@ import {PropertiesRepository} from 'Repositories/properties/propertiesRepository
 import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
+import {WebAppEvents} from 'src/script/webAppEvents';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
 import type {Translate} from 'Util/localizerUtil/translationTypes';

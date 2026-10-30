@@ -26,7 +26,6 @@ import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import {CallIcon, IconButton, IconButtonVariant, QUERY, TabIndex, useMatchMedia} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ConversationVerificationBadges} from 'Components/badge';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
@@ -46,6 +45,7 @@ import {useAppMainState, ViewType} from 'src/script/page/state';
 import {ContentState} from 'src/script/page/useAppState';
 import {CallActions} from 'src/script/view_model/CallingViewModel';
 import {ViewModelRepositories} from 'src/script/view_model/MainViewModel';
+import {WebAppEvents} from 'src/script/webAppEvents';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
