@@ -124,6 +124,32 @@ describe('CellsHeader', () => {
     expect(screen.queryByRole('button', {name: 'Public links'})).not.toBeInTheDocument();
   });
 
+  it('shows Empty Bin at the Bin root even when the current page has no visible rows', () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id/wire.com/files/recycle_bin';
+
+    try {
+      renderCellsHeader({isInRecycleBin: true, isSearchViewOpen: false});
+
+      expect(screen.getByRole('button', {name: 'cells.emptyBin.button'})).toBeInTheDocument();
+    } finally {
+      window.location.hash = originalHash;
+    }
+  });
+
+  it('does not show Empty Bin below the Bin root', () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id/wire.com/files/recycle_bin/folder';
+
+    try {
+      renderCellsHeader({isInRecycleBin: true, isSearchViewOpen: false});
+
+      expect(screen.queryByRole('button', {name: 'cells.emptyBin.button'})).not.toBeInTheDocument();
+    } finally {
+      window.location.hash = originalHash;
+    }
+  });
+
   it('keeps search and filters available outside the recycle bin', () => {
     renderCellsHeader();
 
