@@ -400,13 +400,23 @@ describe('ConversationMapper', () => {
       expect(updatedConversationEntity.manualUnreadTimestamp()).toBe(123);
     });
 
-    it('clears a local manual unread marker when a newer synchronized read state arrives', () => {
+    it('preserves a local manual unread marker when a stale synchronized read state arrives', () => {
       conversationEntity.last_read_timestamp(500);
       conversationEntity.manualUnreadTimestamp(100);
 
       ConversationMapper.updateSelfStatus(conversationEntity, {last_read_timestamp: 200});
 
       expect(conversationEntity.last_read_timestamp()).toBe(500);
+      expect(conversationEntity.manualUnreadTimestamp()).toBe(100);
+    });
+
+    it('clears a local manual unread marker when a newer synchronized read state arrives', () => {
+      conversationEntity.last_read_timestamp(500);
+      conversationEntity.manualUnreadTimestamp(100);
+
+      ConversationMapper.updateSelfStatus(conversationEntity, {last_read_timestamp: 600});
+
+      expect(conversationEntity.last_read_timestamp()).toBe(600);
       expect(conversationEntity.manualUnreadTimestamp()).toBeUndefined();
     });
 
