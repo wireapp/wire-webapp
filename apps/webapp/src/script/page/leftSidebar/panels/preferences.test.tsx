@@ -21,6 +21,7 @@ import {render} from '@testing-library/react';
 
 import {Runtime} from '@wireapp/commons';
 
+import {troubleshooterFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {translateForTest} from 'Util/test/translateForTest';
 import {
   createRootContextValueForTest,
@@ -46,9 +47,23 @@ describe('Preferences', () => {
     expect(getByText('preferencesAccount')).not.toBeNull();
     expect(getByText('preferencesDevices')).not.toBeNull();
     expect(getByText('preferencesOptions')).not.toBeNull();
-    expect(getByText('preferencesTroubleshooting')).not.toBeNull();
+    expect(queryByText('preferencesTroubleshooting')).toBeNull();
     expect(queryByText('preferencesAbout')).not.toBeNull();
     expect(queryByText('preferencesAV')).toBeNull();
+  });
+
+  it('shows troubleshooting when enabled in the developer menu', () => {
+    const wrapper = createRootProviderWrapperForTest(
+      createRootContextValueForTest({
+        translate: translateForTest,
+        isFeatureToggleEnabled: featureName => {
+          return featureName === troubleshooterFeatureToggleName;
+        },
+      }),
+    );
+    const {getByRole} = render(<Preferences {...defaultParams} />, {wrapper});
+
+    expect(getByRole('button', {name: 'preferencesTroubleshooting'})).toBeInTheDocument();
   });
 
   it('renders the a/v section in a desktop app', () => {

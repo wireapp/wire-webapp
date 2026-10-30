@@ -27,6 +27,7 @@ import {
   conversationListCollapseFeatureToggleName,
   disableMessagePreprocessingFeatureToggleName,
   driveBulkActionsFeatureToggleName,
+  troubleshooterFeatureToggleName,
   startupFeatureToggleNames,
   forTestsOnlyFeatureToggleName,
 } from './startupFeatureToggleNames';
@@ -37,6 +38,7 @@ const featureToggleNamesWithDedicatedExistenceTests = [
   forTestsOnlyFeatureToggleName,
   disableMessagePreprocessingFeatureToggleName,
   driveBulkActionsFeatureToggleName,
+  troubleshooterFeatureToggleName,
 ] as const;
 
 describe('startupFeatureToggles', function () {
@@ -45,6 +47,20 @@ describe('startupFeatureToggles', function () {
 
     expect(startupFeatureToggles.isFeatureToggleEnabled(applockRefactoredFeatureToggleName)).toBe(false);
     expect(startupFeatureToggles.enabledFeatureToggleNames).toEqual([]);
+  });
+
+  it('keeps the troubleshooter disabled by default', () => {
+    const toggles = createStartupFeatureTogglesFromLocationSearch('');
+
+    expect(toggles.isFeatureToggleEnabled(troubleshooterFeatureToggleName)).toBe(false);
+  });
+
+  it('enables the troubleshooter when selected in developer settings', () => {
+    const toggles = createStartupFeatureTogglesFromLocationSearch(
+      `?${startupFeatureToggleQueryParameterName}=${troubleshooterFeatureToggleName}`,
+    );
+
+    expect(toggles.isFeatureToggleEnabled(troubleshooterFeatureToggleName)).toBe(true);
   });
 
   it('keeps Drive bulk actions disabled by default', () => {
@@ -179,6 +195,7 @@ describe('startupFeatureToggles', function () {
       forTestsOnlyFeatureToggleName,
       disableMessagePreprocessingFeatureToggleName,
       driveBulkActionsFeatureToggleName,
+      troubleshooterFeatureToggleName,
     ]);
   });
 
