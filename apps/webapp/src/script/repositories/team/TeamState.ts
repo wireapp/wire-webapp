@@ -45,6 +45,7 @@ export class TeamState {
   public readonly hasWhitelistedServices: ko.Observable<boolean>;
   public readonly teamName: ko.PureComputed<string>;
   public readonly teamFeatures: ko.Observable<FeatureList | undefined>;
+  public readonly isTeamFeatureConfigFallback: ko.Observable<boolean>;
   public readonly classifiedDomains: ko.PureComputed<string[] | undefined>;
   public readonly isConferenceCallingEnabled: ko.PureComputed<boolean>;
   public readonly isFileSharingSendingEnabled: ko.PureComputed<boolean>;
@@ -90,6 +91,7 @@ export class TeamState {
     this.memberRoles = ko.observable({});
     this.memberInviters = ko.observable({});
     this.teamFeatures = ko.observable();
+    this.isTeamFeatureConfigFallback = ko.observable(false);
     this.teamApps = ko.observable([]);
     this.teamCollaborators = ko.observable([]);
 
