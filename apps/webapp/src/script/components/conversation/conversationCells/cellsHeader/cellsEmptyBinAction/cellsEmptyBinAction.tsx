@@ -35,7 +35,7 @@ import {
   confirmationTextStyles,
   statusStyles,
 } from './cellsEmptyBinAction.styles';
-import {emptyBin} from './emptyBinAction';
+import {emptyBin, isEmptyBinRootPath} from './emptyBinAction';
 import {getEmptyBinOutcome} from './emptyBinStatus';
 
 import {CellsModal} from '../../common/cellsModal/cellsModal';
@@ -43,7 +43,6 @@ import {
   CELLS_ACTION,
   useCellsActionPermissions,
 } from '../../common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
-import {isRootRecycleBinPath as isCurrentRecycleBinRootPath} from '../../common/recycleBin/recycleBin';
 
 const BACKGROUND_DELETE_STATUS_POLL_INTERVAL_MS = 1000;
 const BACKGROUND_DELETE_STATUS_RETRY_BACKOFF_FACTOR = 2;
@@ -55,7 +54,7 @@ type EmptyBinStatus =
 interface CellsEmptyBinActionProps {
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
-  isRootRecycleBinPath: boolean;
+  getCurrentCellsPath: () => string;
   onRefreshAfterEmptyBinOutcome: () => Promise<boolean>;
   onEmptyBinSubmitted: () => void;
 }
@@ -63,7 +62,7 @@ interface CellsEmptyBinActionProps {
 export const CellsEmptyBinAction: FunctionComponent<CellsEmptyBinActionProps> = ({
   cellsRepository,
   conversationQualifiedId,
-  isRootRecycleBinPath,
+  getCurrentCellsPath,
   onRefreshAfterEmptyBinOutcome,
   onEmptyBinSubmitted,
 }: CellsEmptyBinActionProps) => {
@@ -79,23 +78,20 @@ export const CellsEmptyBinAction: FunctionComponent<CellsEmptyBinActionProps> = 
   const isMounted = useRef(false);
 
   const isFeatureEnabled = isFeatureToggleEnabled(driveBulkActionsFeatureToggleName);
-  const canEmptyBin = isFeatureEnabled && isRootRecycleBinPath && canPerformCellsAction(CELLS_ACTION.DELETE);
+  const currentCellsPath = getCurrentCellsPath();
+  const isAtBinRoot = isEmptyBinRootPath(currentCellsPath);
+  const canEmptyBin = isFeatureEnabled && isAtBinRoot && canPerformCellsAction(CELLS_ACTION.DELETE);
   const scopeKey = `${conversationQualifiedId.id}@${conversationQualifiedId.domain}`;
   const initialScopeKey = useRef(scopeKey).current;
   const currentScopeKey = useRef(scopeKey);
   currentScopeKey.current = scopeKey;
   const canEmptyBinRef = useRef(canEmptyBin);
   canEmptyBinRef.current = canEmptyBin;
-  const isAtBinRootRef = useRef(isRootRecycleBinPath);
-  isAtBinRootRef.current = isRootRecycleBinPath;
   const isSameBinView = useCallback((): boolean => {
     return (
-      isMounted.current &&
-      currentScopeKey.current === initialScopeKey &&
-      isAtBinRootRef.current &&
-      isCurrentRecycleBinRootPath()
+      isMounted.current && currentScopeKey.current === initialScopeKey && isEmptyBinRootPath(getCurrentCellsPath())
     );
-  }, [initialScopeKey]);
+  }, [getCurrentCellsPath, initialScopeKey]);
   const isCurrentScope = useCallback((): boolean => {
     return isSameBinView() && canEmptyBinRef.current;
   }, [isSameBinView]);

@@ -61,6 +61,7 @@ const defaultProperties = {
 
 const renderCellsHeader = (
   properties: Partial<typeof defaultProperties> & {
+    getCurrentCellsPath?: () => string;
     onSelectionBarAnchorChange?: (anchor: HTMLDivElement | null) => void;
   } = {},
   isBulkActionsEnabled = true,
@@ -125,29 +126,27 @@ describe('CellsHeader', () => {
   });
 
   it('shows Empty Bin at the Bin root even when the current page has no visible rows', () => {
-    const originalHash = window.location.hash;
-    window.location.hash = '#/conversation/conversation-id/wire.com/files/recycle_bin';
+    renderCellsHeader({
+      getCurrentCellsPath: () => {
+        return 'recycle_bin';
+      },
+      isInRecycleBin: true,
+      isSearchViewOpen: false,
+    });
 
-    try {
-      renderCellsHeader({isInRecycleBin: true, isSearchViewOpen: false});
-
-      expect(screen.getByRole('button', {name: 'cells.emptyBin.button'})).toBeInTheDocument();
-    } finally {
-      window.location.hash = originalHash;
-    }
+    expect(screen.getByRole('button', {name: 'cells.emptyBin.button'})).toBeInTheDocument();
   });
 
   it('does not show Empty Bin below the Bin root', () => {
-    const originalHash = window.location.hash;
-    window.location.hash = '#/conversation/conversation-id/wire.com/files/recycle_bin/folder';
+    renderCellsHeader({
+      getCurrentCellsPath: () => {
+        return 'recycle_bin/folder';
+      },
+      isInRecycleBin: true,
+      isSearchViewOpen: false,
+    });
 
-    try {
-      renderCellsHeader({isInRecycleBin: true, isSearchViewOpen: false});
-
-      expect(screen.queryByRole('button', {name: 'cells.emptyBin.button'})).not.toBeInTheDocument();
-    } finally {
-      window.location.hash = originalHash;
-    }
+    expect(screen.queryByRole('button', {name: 'cells.emptyBin.button'})).not.toBeInTheDocument();
   });
 
   it('keeps search and filters available outside the recycle bin', () => {

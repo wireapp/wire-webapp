@@ -19,7 +19,15 @@
 
 import type {CellsRepository} from 'Repositories/cells/cellsRepository';
 
-import {emptyBin} from './emptyBinAction';
+import {emptyBin, isEmptyBinRootPath} from './emptyBinAction';
+
+describe('isEmptyBinRootPath', () => {
+  it('matches only the Shared Drive Bin root path', () => {
+    expect(isEmptyBinRootPath('recycle_bin')).toBe(true);
+    expect(isEmptyBinRootPath('recycle_bin/folder')).toBe(false);
+    expect(isEmptyBinRootPath('files')).toBe(false);
+  });
+});
 
 describe('emptyBin', () => {
   const conversationQualifiedId = {id: 'shared-drive', domain: 'wire.com'};

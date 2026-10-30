@@ -26,6 +26,10 @@ import type {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {getCellsApiPath} from '../../common/getCellsApiPath/getCellsApiPath';
 import {RECYCLE_BIN_PATH} from '../../common/recycleBin/recycleBin';
 
+export const isEmptyBinRootPath = (currentPath: string): boolean => {
+  return currentPath === RECYCLE_BIN_PATH;
+};
+
 export const getRecycleBinNodePath = (conversationQualifiedId: QualifiedId): string => {
   const workspacePath = getCellsApiPath({conversationQualifiedId, currentPath: ''});
   return `${workspacePath}/${RECYCLE_BIN_PATH}`;

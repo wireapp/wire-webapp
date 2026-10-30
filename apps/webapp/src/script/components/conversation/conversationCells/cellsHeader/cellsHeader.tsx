@@ -32,6 +32,7 @@ import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/start
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {CellsEmptyBinAction} from './cellsEmptyBinAction/cellsEmptyBinAction';
+import {isEmptyBinRootPath} from './cellsEmptyBinAction/emptyBinAction';
 import {
   actionsStyles,
   breadcrumbsRowStyles,
@@ -52,7 +53,6 @@ import type {FilterConfig} from '../common/cellsFiltersBar/filterConfig';
 import {getBreadcrumbsFromPath} from '../common/getBreadcrumbsFromPath/getBreadcrumbsFromPath';
 import {getCellsFilesPath} from '../common/getCellsFilesPath/getCellsFilesPath';
 import {openBreadcrumb} from '../common/openBreadcrumb/openBreadcrumb';
-import {isRootRecycleBinPath} from '../common/recycleBin/recycleBin';
 
 interface CellsHeaderProps {
   onRefresh: () => void;
@@ -73,6 +73,7 @@ interface CellsHeaderProps {
   onSelectionBarAnchorChange?: (anchor: HTMLDivElement | null) => void;
   onRefreshAfterEmptyBinOutcome?: () => Promise<boolean>;
   onEmptyBinSubmitted?: () => void;
+  getCurrentCellsPath?: () => string;
 }
 
 export const CellsHeader: FunctionComponent<CellsHeaderProps> = ({
@@ -94,13 +95,16 @@ export const CellsHeader: FunctionComponent<CellsHeaderProps> = ({
   onSelectionBarAnchorChange,
   onRefreshAfterEmptyBinOutcome,
   onEmptyBinSubmitted,
+  getCurrentCellsPath,
 }: CellsHeaderProps) => {
   const {translate, isFeatureToggleEnabled} = useApplicationContext();
   const isSelectionBarEnabled = isFeatureToggleEnabled(driveBulkActionsFeatureToggleName);
   const canPerformCellsAction = useCellsActionPermissions();
+  const readCurrentCellsPath = getCurrentCellsPath ?? getCellsFilesPath;
+  const currentPath = readCurrentCellsPath();
   const breadcrumbs = getBreadcrumbsFromPath({
     baseCrumb: translate('cells.breadcrumb.files', {conversationName}),
-    currentPath: getCellsFilesPath(),
+    currentPath,
     recycleBinLabel: translate('cells.recycleBin.breadcrumb'),
   });
   const isRootLevel = breadcrumbs.length === 1;
@@ -148,12 +152,12 @@ export const CellsHeader: FunctionComponent<CellsHeaderProps> = ({
                 isUploadFilesEnabled={isUploadFilesEnabled}
               />
             )}
-            {isInRecycleBin && isRootRecycleBinPath() && (
+            {isInRecycleBin && isEmptyBinRootPath(currentPath) && (
               <CellsEmptyBinAction
                 key={`${conversationQualifiedId.id}@${conversationQualifiedId.domain}`}
                 cellsRepository={cellsRepository}
                 conversationQualifiedId={conversationQualifiedId}
-                isRootRecycleBinPath={isRootRecycleBinPath()}
+                getCurrentCellsPath={readCurrentCellsPath}
                 onRefreshAfterEmptyBinOutcome={refreshAfterEmptyBinOutcome}
                 onEmptyBinSubmitted={handleEmptyBinSubmitted}
               />

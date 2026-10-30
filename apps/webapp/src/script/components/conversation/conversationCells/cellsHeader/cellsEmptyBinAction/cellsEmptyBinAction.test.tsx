@@ -38,7 +38,6 @@ import {translateForTest} from 'Util/test/translateForTest';
 import {CellsEmptyBinAction} from './cellsEmptyBinAction';
 
 const conversationQualifiedId = {id: 'shared-drive', domain: 'wire.com'};
-const originalHash = window.location.hash;
 
 const createRepository = (overrides: Partial<CellsRepository> = {}): CellsRepository => {
   return {
@@ -58,18 +57,19 @@ const renderEmptyBinAction = (
   {
     enabled = true,
     role = CELLS_SELF_USER_DRIVE_ROLE.EDITOR,
-    isRootRecycleBinPath = true,
+    getCurrentCellsPath = () => {
+      return 'recycle_bin';
+    },
     onRefreshAfterEmptyBinOutcome = jest.fn().mockResolvedValue(true),
     onEmptyBinSubmitted = jest.fn(),
   }: {
     enabled?: boolean;
     role?: typeof CELLS_SELF_USER_DRIVE_ROLE.EDITOR | typeof CELLS_SELF_USER_DRIVE_ROLE.VIEWER;
-    isRootRecycleBinPath?: boolean;
+    getCurrentCellsPath?: () => string;
     onRefreshAfterEmptyBinOutcome?: () => Promise<boolean>;
     onEmptyBinSubmitted?: () => void;
   } = {},
 ): RenderResult => {
-  window.location.hash = '#/conversation/shared-drive/wire.com/files/recycle_bin';
   const rootContext = createRootContextValueForTest({
     translate: translateForTest,
     isFeatureToggleEnabled: featureName => {
@@ -84,7 +84,7 @@ const renderEmptyBinAction = (
         <CellsEmptyBinAction
           cellsRepository={cellsRepository}
           conversationQualifiedId={conversationQualifiedId}
-          isRootRecycleBinPath={isRootRecycleBinPath}
+          getCurrentCellsPath={getCurrentCellsPath}
           onRefreshAfterEmptyBinOutcome={onRefreshAfterEmptyBinOutcome}
           onEmptyBinSubmitted={onEmptyBinSubmitted}
         />
@@ -95,10 +95,6 @@ const renderEmptyBinAction = (
 };
 
 describe('CellsEmptyBinAction', () => {
-  afterEach(() => {
-    window.location.hash = originalHash;
-  });
-
   it('shows a no-count confirmation and cancel sends no request', async () => {
     const user = userEvent.setup();
     const cellsRepository = createRepository();
@@ -145,7 +141,11 @@ describe('CellsEmptyBinAction', () => {
   });
 
   it('does not render outside the Bin root, for viewers, or when the feature is disabled', () => {
-    renderEmptyBinAction(createRepository(), {isRootRecycleBinPath: false});
+    renderEmptyBinAction(createRepository(), {
+      getCurrentCellsPath: () => {
+        return 'recycle_bin/nested';
+      },
+    });
     expect(screen.queryByRole('button', {name: 'cells.emptyBin.button'})).not.toBeInTheDocument();
 
     renderEmptyBinAction(createRepository(), {role: CELLS_SELF_USER_DRIVE_ROLE.VIEWER});
@@ -163,6 +163,10 @@ describe('CellsEmptyBinAction', () => {
 
   it('does not submit if the Bin route changes while resolving the current root', async () => {
     const user = userEvent.setup();
+    let currentPath = 'recycle_bin';
+    const getCurrentCellsPath = (): string => {
+      return currentPath;
+    };
     let resolveLookup: (node: RestNode) => void = () => {
       return undefined;
     };
@@ -173,13 +177,13 @@ describe('CellsEmptyBinAction', () => {
     });
     const cellsRepository = createRepository({lookupNodeByPath});
     const onEmptyBinSubmitted = jest.fn();
-    renderEmptyBinAction(cellsRepository, {onEmptyBinSubmitted});
+    renderEmptyBinAction(cellsRepository, {getCurrentCellsPath, onEmptyBinSubmitted});
 
     await user.click(screen.getByRole('button', {name: 'cells.emptyBin.button'}));
     await user.click(screen.getByRole('button', {name: 'cells.emptyBin.confirm'}));
     expect(lookupNodeByPath).toHaveBeenCalledTimes(1);
 
-    window.location.hash = '#/conversation/shared-drive/wire.com/files/recycle_bin/nested';
+    currentPath = 'recycle_bin/nested';
     await act(async () => {
       resolveLookup({
         Path: 'shared-drive@wire.com/recycle_bin',
@@ -216,7 +220,9 @@ describe('CellsEmptyBinAction', () => {
           <CellsEmptyBinAction
             cellsRepository={cellsRepository}
             conversationQualifiedId={conversationQualifiedId}
-            isRootRecycleBinPath
+            getCurrentCellsPath={() => {
+              return 'recycle_bin';
+            }}
             onRefreshAfterEmptyBinOutcome={onRefreshAfterEmptyBinOutcome}
             onEmptyBinSubmitted={onEmptyBinSubmitted}
           />
