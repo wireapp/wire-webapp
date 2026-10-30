@@ -19,8 +19,21 @@
 
 import type {FunctionComponent} from 'react';
 
+import type {CSSObject} from '@emotion/react';
+
 import {CellsModal} from 'Components/conversation/conversationCells/common/cellsModal/cellsModal';
 import {useApplicationContext} from 'src/script/page/rootProvider';
+
+const confirmationContentStyles: CSSObject = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '8px',
+  padding: '0 16px 16px',
+};
+
+const confirmationTextStyles: CSSObject = {
+  margin: 0,
+};
 
 interface CellsBulkMoveToBinConfirmationModalProps {
   isOpen: boolean;
@@ -47,8 +60,16 @@ export const CellsBulkMoveToBinConfirmationModal: FunctionComponent<CellsBulkMov
   return (
     <CellsModal isOpen={isOpen} onClose={handleClose}>
       <CellsModal.Header>{translate('cells.bulkMoveToBin.confirmation.title')}</CellsModal.Header>
-      <p>{translate('cells.bulkMoveToBin.confirmation.description', {count: selectedRootCount})}</p>
-      {isSubmitting && <p role="status">{translate('cells.bulkMoveToBin.moving', {count: selectedRootCount})}</p>}
+      <div css={confirmationContentStyles}>
+        <p css={confirmationTextStyles}>
+          {translate('cells.bulkMoveToBin.confirmation.description', {count: selectedRootCount})}
+        </p>
+        {isSubmitting && (
+          <p css={confirmationTextStyles} role="status">
+            {translate('cells.bulkMoveToBin.moving', {count: selectedRootCount})}
+          </p>
+        )}
+      </div>
       <CellsModal.Actions>
         <CellsModal.SecondaryButton onClick={handleClose}>
           {translate('cells.bulkMoveToBin.confirmation.cancel')}
