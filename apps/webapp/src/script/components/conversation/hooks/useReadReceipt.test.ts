@@ -28,15 +28,19 @@ import {useReadReceiptSender} from './useReadReceipt';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 describe('useReadReceipt', () => {
-  beforeEach(() => {
-    jest.useFakeTimers();
-  });
+  function withFakeTimers(testName: string, testBody: () => void): void {
+    it(testName, () => {
+      jest.useFakeTimers();
 
-  afterEach(() => {
-    jest.useRealTimers();
-  });
+      try {
+        testBody();
+      } finally {
+        jest.useRealTimers();
+      }
+    });
+  }
 
-  it('batches the read receipt sending per conversation', async () => {
+  withFakeTimers('batches the read receipt sending per conversation', () => {
     const sendReadReceipt = jest.fn();
     const {result} = renderHook(() => {
       return useReadReceiptSender({sendReadReceipt});
@@ -68,7 +72,7 @@ describe('useReadReceipt', () => {
     expect(sendReadReceipt).toHaveBeenCalledTimes(3);
   });
 
-  it('batches the read receipt sending per sender', async () => {
+  withFakeTimers('batches the read receipt sending per sender', () => {
     const sendReadReceipt = jest.fn();
     const {result} = renderHook(() => {
       return useReadReceiptSender({sendReadReceipt});
@@ -96,7 +100,7 @@ describe('useReadReceipt', () => {
     expect(sendReadReceipt).toHaveBeenCalledTimes(2);
   });
 
-  it('does not add the same message multiple times', async () => {
+  withFakeTimers('does not add the same message multiple times', () => {
     const sendReadReceipt = jest.fn();
     const {result} = renderHook(() => {
       return useReadReceiptSender({sendReadReceipt});
@@ -123,7 +127,7 @@ describe('useReadReceipt', () => {
     expect(sendReadReceipt).toHaveBeenCalledWith(conversation, message, []);
   });
 
-  it('cancels a queued receipt when its conversation is marked unread', () => {
+  withFakeTimers('cancels a queued receipt when its conversation is marked unread', () => {
     const sendReadReceipt = jest.fn();
     const {result} = renderHook(() => {
       return useReadReceiptSender({sendReadReceipt});
@@ -140,14 +144,24 @@ describe('useReadReceipt', () => {
     expect(sendReadReceipt).not.toHaveBeenCalled();
   });
 
-  it('keeps queued receipts for other conversations when one is marked unread', () => {
+  withFakeTimers('keeps queued receipts for other conversations when one is marked unread', () => {
     const sendReadReceipt = jest.fn();
     const {result} = renderHook(() => {
       return useReadReceiptSender({sendReadReceipt});
     });
     const conversationId = createUuid();
-    const conversationA = new Conversation(conversationId, 'conversation-a.example', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
-    const conversationB = new Conversation(conversationId, 'conversation-b.example', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    const conversationA = new Conversation(
+      conversationId,
+      'conversation-a.example',
+      CONVERSATION_PROTOCOL.PROTEUS,
+      translateForTest,
+    );
+    const conversationB = new Conversation(
+      conversationId,
+      'conversation-b.example',
+      CONVERSATION_PROTOCOL.PROTEUS,
+      translateForTest,
+    );
     const sender = createUuid();
     const messageA1 = new Message(createUuid(), undefined, translateForTest);
     const messageA2 = new Message(createUuid(), undefined, translateForTest);
@@ -169,7 +183,7 @@ describe('useReadReceipt', () => {
     expect(sendReadReceipt).toHaveBeenCalledWith(conversationB, messageB1, [messageB2]);
   });
 
-  it('does not send a canceled receipt after leaving the conversation resets auto-read suppression', () => {
+  withFakeTimers('does not send a canceled receipt after leaving the conversation resets auto-read suppression', () => {
     const sendReadReceipt = jest.fn();
     const {result} = renderHook(() => {
       return useReadReceiptSender({sendReadReceipt});
@@ -188,7 +202,7 @@ describe('useReadReceipt', () => {
     expect(sendReadReceipt).not.toHaveBeenCalled();
   });
 
-  it('sends newly queued receipts after normal reading resumes', () => {
+  withFakeTimers('sends newly queued receipts after normal reading resumes', () => {
     const sendReadReceipt = jest.fn();
     const {result} = renderHook(() => {
       return useReadReceiptSender({sendReadReceipt});
@@ -210,7 +224,7 @@ describe('useReadReceipt', () => {
     expect(sendReadReceipt).toHaveBeenCalledWith(conversation, newlyReadMessage, []);
   });
 
-  it('sends queued receipts normally when unread cancellation is not used', () => {
+  withFakeTimers('sends queued receipts normally when unread cancellation is not used', () => {
     const sendReadReceipt = jest.fn();
     const {result} = renderHook(() => {
       return useReadReceiptSender({sendReadReceipt});
@@ -224,5 +238,4 @@ describe('useReadReceipt', () => {
 
     expect(sendReadReceipt).toHaveBeenCalledWith(conversation, message, []);
   });
-
 });
