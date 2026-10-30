@@ -36,6 +36,7 @@ import {CompositeMessage} from 'Repositories/entity/message/compositeMessage';
 import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {Text} from 'Repositories/entity/message/text';
 import {TeamState} from 'Repositories/team/TeamState';
+import {markAsUnreadFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {QuoteEntity} from 'src/script/message/quoteEntity';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
@@ -66,6 +67,7 @@ const isOutgoingQuote = (QuoteEntity: QuoteEntity): QuoteEntity is OutgoingQuote
 export const MessageWrapper: FunctionComponent<MessageParams> = ({
   message,
   conversation,
+  cancelPendingReadReceiptsForConversation,
   selfId,
   isFocused,
   isSelfTemporaryGuest,
@@ -89,7 +91,7 @@ export const MessageWrapper: FunctionComponent<MessageParams> = ({
   teamState = container.resolve(TeamState),
   isMsgElementsFocusable,
 }: MessageParams) => {
-  const {fireAndForgetInvoker, translate} = useApplicationContext();
+  const {fireAndForgetInvoker, isFeatureToggleEnabled, translate} = useApplicationContext();
   type FindMessageResult = Promise<ContentMessage & {primary_key: string}>;
   const findMessage = async (conversation: Conversation, messageId: string): FindMessageResult => {
     const eventFromId = await messageRepository.getMessageInConversationById(conversation, messageId);
@@ -184,6 +186,17 @@ export const MessageWrapper: FunctionComponent<MessageParams> = ({
           return onClickDetails(message);
         },
         label: translate('conversationContextMenuDetails'),
+      });
+    }
+
+    if (isFeatureToggleEnabled(markAsUnreadFeatureToggleName) && !conversation.isSelfUserRemoved()) {
+      entries.push({
+        click: () => {
+          cancelPendingReadReceiptsForConversation(conversation);
+
+          return conversation.markUnreadFrom(message);
+        },
+        label: translate('conversationContextMenuMarkUnread'),
       });
     }
 

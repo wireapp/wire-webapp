@@ -81,7 +81,7 @@ import {EventRepository} from 'Repositories/event/EventRepository';
 import {EventService} from 'Repositories/event/EventService';
 import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
 import {SelfRepository} from 'Repositories/self/SelfRepository';
-import {LegacyEventRecord, StorageService} from 'Repositories/storage';
+import {ConversationRecord, LegacyEventRecord, StorageService} from 'Repositories/storage';
 import {StorageSchemata} from 'Repositories/storage/storageSchemata';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
@@ -161,7 +161,10 @@ function getConversationServiceFromCoreForTest(core: Core): NonNullable<NonNulla
   return requireValueForTest(requireValueForTest(core.service).conversation);
 }
 
-function buildConversationRepository(translate: Translate): ConversationRepositoryTestFixture {
+function buildConversationRepository(
+  translate: Translate,
+  isMarkAsUnreadFeatureEnabled: boolean = false,
+): ConversationRepositoryTestFixture {
   const teamState = new TeamState();
   const conversationState = new ConversationState();
   // @ts-ignore
@@ -171,6 +174,12 @@ function buildConversationRepository(translate: Translate): ConversationReposito
     wipeMLSCapableConversation: noop,
     postBots: noop,
     saveConversationStateInDb: noop,
+    loadConversationStatesFromDb: async <RecordType>(): Promise<RecordType[]> => {
+      return [];
+    },
+    saveConversationsInDb: async (conversations: ConversationRecord[]): Promise<ConversationRecord[]> => {
+      return conversations;
+    },
     wipeMLSConversation: noop,
   } as ConversationService;
   const messageRepository = {setClientMismatchHandler: noop} as unknown as MessageRepository;
@@ -202,6 +211,7 @@ function buildConversationRepository(translate: Translate): ConversationReposito
     callingRepository,
     {} as any,
     translate,
+    {isMarkAsUnreadFeatureEnabled},
     userState,
     teamState,
     conversationState,
@@ -3517,6 +3527,64 @@ describe('ConversationRepository', () => {
       const conversations = await conversationRepository.loadConversations([], []);
 
       expect(conversations).toHaveLength(remoteConversations.found.length);
+    });
+
+    it('discards persisted manual unread state while disabled so it cannot return after re-enabling', async () => {
+      const existingConversation = _generateConversation();
+      existingConversation.last_read_timestamp(500);
+      existingConversation.manualUnreadTimestamp(100);
+      let persistedConversations: ConversationRecord[] = [existingConversation.serialize()];
+      const remoteConversations = {failed: [], found: []} as unknown as RemoteConversations;
+
+      const [disabledRepository] = buildConversationRepository(translateForTest, false);
+      const disabledConversationService = disabledRepository['conversationService'];
+      jest.spyOn(disabledConversationService, 'loadConversationStatesFromDb').mockImplementation(async () => {
+        return persistedConversations as unknown as ConversationDatabaseData[];
+      });
+      const saveDisabledState = jest
+        .spyOn(disabledConversationService, 'saveConversationsInDb')
+        .mockImplementation(async conversations => {
+          persistedConversations = conversations;
+          return conversations;
+        });
+
+      const disabledConversations = await disabledRepository['loadRemoteConversations'](remoteConversations, []);
+
+      expect(saveDisabledState).toHaveBeenCalledTimes(1);
+      expect(persistedConversations.at(0)).not.toHaveProperty('manual_unread_timestamp');
+      expect(persistedConversations.at(0)?.last_read_timestamp).toBe(500);
+      expect(disabledConversations.at(0)?.manualUnreadTimestamp()).toBeUndefined();
+
+      const [enabledRepository] = buildConversationRepository(translateForTest, true);
+      jest
+        .spyOn(enabledRepository['conversationService'], 'loadConversationStatesFromDb')
+        .mockImplementation(async () => {
+          return persistedConversations as unknown as ConversationDatabaseData[];
+        });
+
+      const enabledConversations = await enabledRepository['loadRemoteConversations'](remoteConversations, []);
+
+      expect(enabledConversations.at(0)?.manualUnreadTimestamp()).toBeUndefined();
+      expect(enabledConversations.at(0)?.last_read_timestamp()).toBe(500);
+    });
+
+    it('loads unread history from the local manual boundary without changing canonical read state', async () => {
+      const [conversationRepository] = buildConversationRepository(translateForTest, true);
+      const conversation = _generateConversation();
+      const firstUnreadMessage = new ContentMessage(createUuid(), translateForTest);
+      firstUnreadMessage.timestamp(300);
+      conversation.last_read_timestamp(200);
+      conversation.manualUnreadTimestamp(100);
+      conversation.messages_unordered.push(firstUnreadMessage);
+      const loadPrecedingEvents = jest
+        .spyOn(conversationRepository['eventService'], 'loadPrecedingEvents')
+        .mockResolvedValue([]);
+
+      await conversationRepository['getUnreadEvents'](conversation);
+
+      expect(loadPrecedingEvents).toHaveBeenCalledWith(conversation.id, new Date(100), new Date(300));
+      expect(conversation.last_read_timestamp()).toBe(200);
+      expect(conversation.manualUnreadTimestamp()).toBe(100);
     });
 
     it("does not load proteus 1:1 conversation if there's mls 1:1 conversation with the same user", async () => {

@@ -147,6 +147,7 @@ function buildConversationRepository(): TeamMemberLeaveTestFixture {
     callingRepository,
     serverTimeHandler,
     translate,
+    {isMarkAsUnreadFeatureEnabled: false},
     userState,
     teamState,
     conversationState,

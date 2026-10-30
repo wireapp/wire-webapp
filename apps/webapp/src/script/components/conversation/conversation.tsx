@@ -19,7 +19,7 @@
 
 import {UIEvent, useCallback, useEffect, useMemo, useState, type ReactElement} from 'react';
 
-import {isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined, isNumber, isUndefined} from '@sindresorhus/is';
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {container} from 'tsyringe';
 
@@ -87,6 +87,7 @@ import {ConversationViewerPermissionBanner} from './conversationViewerPermission
 import {useReadReceiptSender} from './hooks/useReadReceipt';
 import {ReadOnlyConversationMessage} from './readOnlyConversationMessage';
 import {useFilesUploadDropzone} from './useFilesUploadDropzone/useFilesUploadDropzone';
+import {withAutoReadGuard} from './utils/autoReadGuard';
 import {checkFileSharingPermission} from './utils/checkFileSharingPermission';
 
 import {UserError} from '../../error/userError';
@@ -137,7 +138,7 @@ function ConversationContent({
   const isVirtualizedMessagesListEnabled = CONFIG.FEATURE.ENABLE_VIRTUALIZED_MESSAGES_LIST;
 
   const mainViewModel = useMainViewModel();
-  const {fireAndForgetInvoker, translate} = useApplicationContext();
+  const {fireAndForgetInvoker, translate, clock} = useApplicationContext();
   const {content: contentViewModel} = mainViewModel;
   const {conversationRepository, repositories} = contentViewModel;
   const sharedDriveUploadController = useMemo(() => {
@@ -195,7 +196,10 @@ function ConversationContent({
 
   const [activeTabIndex, setActiveTabIndex] = useState(0);
 
-  const {addReadReceiptToBatch} = useReadReceiptSender(repositories.message);
+  const {addReadReceiptToBatch, cancelPendingReadReceiptsForConversation} = useReadReceiptSender({
+    messageSender: repositories.message,
+    clock,
+  });
 
   useEffect(() => {
     if (!isVirtualizedMessagesListEnabled) {
@@ -615,6 +619,15 @@ function ConversationContent({
 
       const isUnreadMessage = messageTimestamp > conversationEntity.last_read_timestamp();
       const isNotOwnMessage = !messageEntity.user().isMe;
+      const manualUnreadTimestamp = conversationEntity.manualUnreadTimestamp();
+
+      if (isNumber(manualUnreadTimestamp) && messageTimestamp >= manualUnreadTimestamp) {
+        callbacks.push(
+          withAutoReadGuard(conversationEntity, () => {
+            conversationEntity.clearManualUnreadMarker();
+          }),
+        );
+      }
 
       let shouldSendReadReceipt = false;
 
@@ -632,17 +645,21 @@ function ConversationContent({
       }
 
       if (isLastReceivedMessage(messageEntity, conversationEntity)) {
-        callbacks.push(() => {
-          return updateConversationLastRead(conversationEntity, messageEntity);
-        });
+        callbacks.push(
+          withAutoReadGuard(conversationEntity, () => {
+            return updateConversationLastRead(conversationEntity, messageEntity);
+          }),
+        );
       }
 
       if (isUnreadMessage && isNotOwnMessage) {
-        callbacks.push(updateLastRead);
+        callbacks.push(withAutoReadGuard(conversationEntity, updateLastRead));
         if (shouldSendReadReceipt) {
-          callbacks.push(() => {
-            return addReadReceiptToBatch(conversationEntity, messageEntity);
-          });
+          callbacks.push(
+            withAutoReadGuard(conversationEntity, () => {
+              return addReadReceiptToBatch(conversationEntity, messageEntity);
+            }),
+          );
         }
       }
 
@@ -840,6 +857,7 @@ function ConversationContent({
                 setMsgElementsFocusable={setMsgElementsFocusable}
                 isRightSidebarOpen={isRightSidebarOpen}
                 updateConversationLastRead={updateConversationLastRead}
+                cancelPendingReadReceiptsForConversation={cancelPendingReadReceiptsForConversation}
               />
 
               {showViewerPermission && !isFileTabActive && <ConversationViewerPermissionBanner />}

@@ -58,6 +58,7 @@ export interface MessageActions {
 
 export interface MessageParams extends MessageActions {
   conversation: Conversation;
+  cancelPendingReadReceiptsForConversation: (conversation: Conversation) => void;
   hasReadReceiptsTurnedOn: boolean;
   isLastDeliveredMessage: boolean;
   isSelfTemporaryGuest: boolean;

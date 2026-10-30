@@ -17,7 +17,7 @@
  *
  */
 
-import {isEmptyArray, isNonEmptyArray, isNonEmptyString, isUndefined} from '@sindresorhus/is';
+import {isEmptyArray, isNonEmptyArray, isNonEmptyString, isNumber, isUndefined} from '@sindresorhus/is';
 import {
   CONVERSATION_ACCESS_ROLE,
   Conversation as ConversationBackendData,
@@ -481,6 +481,10 @@ export class ConversationMapper {
     conversationEntity.cellsState(cells_state ?? CONVERSATION_CELLS_STATE.DISABLED);
     const selfState = members?.self ?? conversationData;
     conversationEntity = ConversationMapper.updateSelfStatus(conversationEntity, selfState as any);
+
+    if (isNumber(conversationData.manual_unread_timestamp)) {
+      conversationEntity.manualUnreadTimestamp(conversationData.manual_unread_timestamp);
+    }
 
     if ((conversationEntity.last_event_timestamp() ?? 0) === 0 && initialTimestamp !== undefined) {
       conversationEntity.last_event_timestamp(initialTimestamp);

@@ -51,7 +51,10 @@ import {getClientMLSConfig} from 'Repositories/client/clientMLSConfig';
 import {subscribeToMLSKeyPackageUpdates} from 'Repositories/client/subscribeToMLSKeyPackageUpdates';
 import {ConnectionRepository} from 'Repositories/connection/connectionRepository';
 import {ConnectionService} from 'Repositories/connection/connectionService';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {
+  ConversationRepository,
+  type ConversationRepositoryOptions,
+} from 'Repositories/conversation/ConversationRepository';
 import {ConversationService} from 'Repositories/conversation/ConversationService';
 import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
 import {OnConversationE2EIVerificationStateChange} from 'Repositories/conversation/ConversationVerificationStateHandler/shared';
@@ -239,6 +242,7 @@ export class App {
     private readonly translate: Translate,
     private readonly clock: Clock,
     private readonly fireAndForgetInvoker: FireAndForgetInvoker,
+    private readonly conversationRepositoryOptions: ConversationRepositoryOptions,
   ) {
     this.config = config;
     this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () => {
@@ -370,6 +374,7 @@ export class App {
       repositories.calling,
       serverTimeHandler,
       this.translate,
+      this.conversationRepositoryOptions,
     );
 
     repositories.eventTracker = new EventTrackingRepository(repositories.message, this.apiClient);

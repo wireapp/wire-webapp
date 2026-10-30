@@ -17,6 +17,7 @@
  *
  */
 
+import {isUndefined} from '@sindresorhus/is';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 
 import {EventMapper} from 'Repositories/conversation/EventMapper';
@@ -61,7 +62,7 @@ describe('MessagesGroup', () => {
       return eventMapper.mapJsonEvent(event, conversation) as Message;
     });
 
-    const groupedMessages = groupMessagesBySenderAndTime(allMessages, 0);
+    const groupedMessages = groupMessagesBySenderAndTime(allMessages, Infinity);
 
     const sameSenderGrouped = groupedMessages.filter(m => {
       return m.messageType === 'message' && m.sender === sender;
@@ -87,7 +88,7 @@ describe('MessagesGroup', () => {
       return eventMapper.mapJsonEvent(event, conversation) as Message;
     });
 
-    const groupedMessages = groupMessagesBySenderAndTime(allMessages, 0);
+    const groupedMessages = groupMessagesBySenderAndTime(allMessages, Infinity);
     expect(groupedMessages).toHaveLength(2);
   });
 
@@ -113,6 +114,48 @@ describe('MessagesGroup', () => {
         return isMarker(group);
       }),
     ).toBe(nbReadMessages);
+  });
+
+  it('places the unread separator at the manually selected message', () => {
+    const messageEvents = [1, 2, 3].map(timestamp => {
+      return createMessageAddEvent({overrides: {time: new Date(timestamp).toISOString()}});
+    });
+    const messages = messageEvents.map(event => {
+      return eventMapper.mapJsonEvent(event, conversation) as Message;
+    });
+    const selectedMessage = messages[1];
+    expect(selectedMessage).toBeDefined();
+    if (isUndefined(selectedMessage)) {
+      return;
+    }
+    conversation.last_read_timestamp(0);
+
+    conversation.markUnreadFrom(selectedMessage);
+
+    const groupedMessages = groupMessagesBySenderAndTime(messages, conversation.effectiveReadTimestamp());
+    const unreadSeparator = groupedMessages.find(group => {
+      return isMarker(group) && group.type === 'unread';
+    });
+
+    expect(unreadSeparator?.timestamp).toBe(selectedMessage.timestamp());
+    conversation.clearManualUnreadMarker();
+  });
+
+  it('places the unread separator before the first loaded selected message', () => {
+    const messageEvent = createMessageAddEvent({overrides: {time: new Date(1).toISOString()}});
+    const selectedMessage = eventMapper.mapJsonEvent(messageEvent, conversation) as Message;
+    conversation.last_read_timestamp(0);
+
+    conversation.markUnreadFrom(selectedMessage);
+
+    const groupedMessages = groupMessagesBySenderAndTime([selectedMessage], conversation.effectiveReadTimestamp());
+    const unreadSeparator = groupedMessages.find(item => {
+      return isMarker(item) && item.type === 'unread';
+    });
+
+    expect(unreadSeparator?.timestamp).toBe(selectedMessage.timestamp());
+    expect(groupedMessages[0]).toBe(unreadSeparator);
+    conversation.clearManualUnreadMarker();
   });
 
   it('adds markers for messages sent on different days', () => {
