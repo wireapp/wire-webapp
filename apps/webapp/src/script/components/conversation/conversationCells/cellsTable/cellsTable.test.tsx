@@ -457,6 +457,37 @@ describe('CellsTable selection', () => {
     });
   });
 
+  it('does not apply a pending result to a newly navigated selection scope', async () => {
+    const user = userEvent.setup();
+    let resolveDelete: (response: {Status: string}) => void = () => {
+      return undefined;
+    };
+    const pendingDelete = new Promise<{Status: string}>(resolve => {
+      resolveDelete = resolve;
+    });
+    const deleteNodes = jest.fn().mockReturnValue(pendingDelete);
+    const onRefreshAfterBulkMoveToBinOutcome = jest.fn().mockResolvedValue(true);
+    const view = renderCellsTable({
+      cellsRepository: {deleteNodes} as unknown as CellsRepository,
+      onRefreshAfterBulkMoveToBinOutcome,
+    });
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+    await user.click(screen.getByRole('button', {name: 'Move to bin'}));
+    const confirmation = await screen.findByRole('dialog');
+    await user.click(within(confirmation).getByRole('button', {name: 'Move to Bin'}));
+    view.rerenderWithSelectionScope('conversation:/files/subfolder');
+
+    expect(screen.queryByText('1 selected')).not.toBeInTheDocument();
+    resolveDelete({Status: 'Performed'});
+
+    await waitFor(() => {
+      expect(screen.getAllByRole('checkbox')[0]).toBeEnabled();
+    });
+    expect(deleteNodes).toHaveBeenCalledTimes(1);
+    expect(onRefreshAfterBulkMoveToBinOutcome).not.toHaveBeenCalled();
+  });
+
   it('does not retry the batch mutation after a request error', async () => {
     const user = userEvent.setup();
     const deleteNodes = jest.fn().mockRejectedValue(new Error('network unavailable'));

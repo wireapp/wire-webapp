@@ -230,6 +230,9 @@ export const CellsTable = ({
   const [bulkMoveToBinReviewReason, setBulkMoveToBinReviewReason] = useState<BulkMoveToBinReviewReason | null>(null);
   const [backgroundMoveToBinJobUuids, setBackgroundMoveToBinJobUuids] = useState<string[]>([]);
   const isBulkMoveToBinPendingRef = useRef(false);
+  const latestSelectionScopeKey = useRef(selectionScopeKey);
+  latestSelectionScopeKey.current = selectionScopeKey;
+  const previousSelectionScopeKey = useRef(selectionScopeKey);
   const bulkMoveToBinStatusId = useRef<Maybe<string>>(Maybe.nothing());
   const [isBulkMovePreviewOpen, setIsBulkMovePreviewOpen] = useState(false);
   const [moveState, dispatchMove] = useReducer(bulkMoveReducer, {kind: 'idle'});
@@ -248,7 +251,18 @@ export const CellsTable = ({
   const [backgroundMoveStatusCheckId, setBackgroundMoveStatusCheckId] = useState(0);
 
   useEffect(() => {
-    if (isMovePendingRef.current || isBulkMoveToBinPendingRef.current) {
+    const didSelectionScopeChange = previousSelectionScopeKey.current !== selectionScopeKey;
+    previousSelectionScopeKey.current = selectionScopeKey;
+
+    if (isMovePendingRef.current) {
+      return;
+    }
+
+    if (isBulkMoveToBinPendingRef.current) {
+      if (didSelectionScopeChange) {
+        setSelectedNodeIds(new Set());
+        setIsBulkMoveToBinConfirmationOpen(false);
+      }
       return;
     }
 
@@ -629,7 +643,7 @@ export const CellsTable = ({
   const isCapturedBulkMoveToBinSelectionCurrent = useCallback(
     (captured: CapturedBulkMoveToBinSelection): boolean => {
       if (
-        captured.scopeKey !== selectionScopeKey ||
+        captured.scopeKey !== latestSelectionScopeKey.current ||
         !selectionEnabled ||
         !isSelectionEnabled ||
         isInRecycleBin() ||
@@ -652,7 +666,7 @@ export const CellsTable = ({
         })
       );
     },
-    [selectionEnabled, isSelectionEnabled, selectionScopeKey, selectedNodeIds, nodes, canPerformCurrentDriveAction],
+    [selectionEnabled, isSelectionEnabled, selectedNodeIds, nodes, canPerformCurrentDriveAction],
   );
 
   const resetBulkMoveToBinAfterScopeChange = useCallback((): void => {
@@ -673,7 +687,7 @@ export const CellsTable = ({
       setIsRefreshingBulkMoveToBin(true);
       setBackgroundMoveToBinJobUuids([]);
 
-      if (captured.scopeKey !== selectionScopeKey || isInRecycleBin()) {
+      if (captured.scopeKey !== latestSelectionScopeKey.current || isInRecycleBin()) {
         updateMoveStatus({id: statusId, kind: 'status-unknown', ...captured.summary});
         resetBulkMoveToBinAfterScopeChange();
         return;
@@ -686,7 +700,7 @@ export const CellsTable = ({
         didRefresh = false;
       }
 
-      if (captured.scopeKey !== selectionScopeKey || isInRecycleBin()) {
+      if (captured.scopeKey !== latestSelectionScopeKey.current || isInRecycleBin()) {
         updateMoveStatus({id: statusId, kind: 'status-unknown', ...captured.summary});
         resetBulkMoveToBinAfterScopeChange();
         return;
@@ -712,7 +726,7 @@ export const CellsTable = ({
       setIsBulkMoveToBinPending(false);
       setIsRefreshingBulkMoveToBin(false);
     },
-    [onRefreshAfterBulkMoveToBinOutcome, resetBulkMoveToBinAfterScopeChange, selectionScopeKey, updateMoveStatus],
+    [onRefreshAfterBulkMoveToBinOutcome, resetBulkMoveToBinAfterScopeChange, updateMoveStatus],
   );
 
   const handleConfirmBulkMoveToBin = useCallback(async (): Promise<void> => {
@@ -735,7 +749,7 @@ export const CellsTable = ({
 
     try {
       const response = await cellsRepository.deleteNodes({uuids: captured.nodeIds, permanently: false});
-      if (captured.scopeKey !== selectionScopeKey || isInRecycleBin()) {
+      if (captured.scopeKey !== latestSelectionScopeKey.current || isInRecycleBin()) {
         updateMoveStatus({id: statusId, kind: 'status-unknown', ...captured.summary});
         resetBulkMoveToBinAfterScopeChange();
         return;
@@ -777,7 +791,6 @@ export const CellsTable = ({
     createMoveStatusId,
     updateMoveStatus,
     cellsRepository,
-    selectionScopeKey,
     resetBulkMoveToBinAfterScopeChange,
     finishBulkMoveToBinOutcome,
   ]);
@@ -795,7 +808,7 @@ export const CellsTable = ({
       didRefresh = false;
     }
 
-    if (capturedBulkMoveToBin.scopeKey !== selectionScopeKey || isInRecycleBin()) {
+    if (capturedBulkMoveToBin.scopeKey !== latestSelectionScopeKey.current || isInRecycleBin()) {
       resetBulkMoveToBinAfterScopeChange();
       return;
     }
@@ -814,7 +827,6 @@ export const CellsTable = ({
     isRefreshingBulkMoveToBin,
     onRefreshAfterBulkMoveToBinOutcome,
     resetBulkMoveToBinAfterScopeChange,
-    selectionScopeKey,
   ]);
 
   useEffect(() => {
