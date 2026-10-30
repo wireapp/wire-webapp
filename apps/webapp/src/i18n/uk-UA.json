@@ -740,6 +740,7 @@
   "conversationContextMenuDownload": "Скачати",
   "conversationContextMenuEdit": "Редагування",
   "conversationContextMenuLike": "Подобається",
+  "conversationContextMenuMarkUnread": "Mark as unread from here",
   "conversationContextMenuReply": "Відповісти",
   "conversationContextMenuUnlike": "Не подобається",
   "conversationCreateReceiptsEnabled": "Звіти про перегляд увімкнені",

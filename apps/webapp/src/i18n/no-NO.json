@@ -740,6 +740,7 @@
   "conversationContextMenuDownload": "Last ned",
   "conversationContextMenuEdit": "Rediger",
   "conversationContextMenuLike": "Liker",
+  "conversationContextMenuMarkUnread": "Mark as unread from here",
   "conversationContextMenuReply": "Svar",
   "conversationContextMenuUnlike": "Slutt å like",
   "conversationCreateReceiptsEnabled": "Lesebekreftelser er på",
