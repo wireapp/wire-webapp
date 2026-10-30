@@ -22,10 +22,7 @@ const bazinga64 = require('bazinga64');
 
 ### Development
 
-```
-npm install
-npm run dist
-```
+From the repository root, install dependencies and configure the workspace with `npm clean-install` and `npx just setup`, then build the workspace libraries with `npx just build-libraries`.
 
 ### Usage
 

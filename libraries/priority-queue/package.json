@@ -26,11 +26,6 @@
     "ts-node": "10.9.2",
     "typescript": "6.0.3"
   },
-  "scripts": {
-    "build": "nx run priority-queue-lib:build",
-    "clean": "nx run priority-queue-lib:clean",
-    "dist": "nx run priority-queue-lib:dist"
-  },
   "version": "2.1.19",
   "private": true
 }

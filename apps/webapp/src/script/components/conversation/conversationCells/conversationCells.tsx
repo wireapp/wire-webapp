@@ -21,6 +21,7 @@ import {memo, useCallback, useEffect, useRef, useState} from 'react';
 
 import {isNonEmptyArray} from '@sindresorhus/is';
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
+import {task} from 'true-myth';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
@@ -76,7 +77,7 @@ interface ConversationCellsProps {
   isSearchViewOpen: boolean;
   onOpenSearchView: () => void;
   onCloseSearchView: () => void;
-  isUploadFilesEnabled: boolean;
+  isFileUploadAllowed: boolean;
   showViewerPermission: boolean;
 }
 
@@ -89,7 +90,7 @@ export const ConversationCells = memo(
     isSearchViewOpen,
     onOpenSearchView,
     onCloseSearchView,
-    isUploadFilesEnabled,
+    isFileUploadAllowed,
     showViewerPermission,
   }: ConversationCellsProps) => {
     const {fireAndForgetInvoker, translate} = useApplicationContext();
@@ -213,13 +214,25 @@ export const ConversationCells = memo(
       fireAndForgetInvoker.fireAndForget(refresh);
     }, [fireAndForgetInvoker, handleReload, isSearchMode, refresh]);
 
+    const handleRefreshAfterBulkMoveOutcome = useCallback(async (): Promise<boolean> => {
+      const refreshResult = await task.tryOrElse(
+        error => {
+          return error;
+        },
+        () => {
+          return refresh({preserveStatusOnError: true});
+        },
+      );
+      return refreshResult.isOk && refreshResult.value;
+    }, [refresh]);
+
     const sharedDriveUploadPath = getCellsApiPath({conversationQualifiedId, currentPath: getCellsFilesPath()});
     const sharedDriveConversationQualifiedId = `${conversationQualifiedId.id}@${conversationQualifiedId.domain}`;
 
     useEffect(() => {
       sharedDriveUploadController.updateRefresh(sharedDriveConversationQualifiedId, handleRefresh);
     }, [handleRefresh, sharedDriveConversationQualifiedId, sharedDriveUploadController]);
-    const canUploadToSharedDrive = isUploadFilesEnabled && !showViewerPermission;
+    const canUploadToSharedDrive = isFileUploadAllowed && !showViewerPermission;
     const maxSharedDriveUploadFileSize = Config.getConfig().MAXIMUM_ASSET_FILE_SIZE_CELLS;
     const handleSharedDriveUploadRejection = useCallback(
       (rejection: SharedDriveDropRejection): void => {
@@ -329,7 +342,7 @@ export const ConversationCells = memo(
       <CellsSelfUserDriveRoleProvider selfUserDriveRole={selfUserDriveRole}>
         <SharedDriveDropzone
           dragStateResetKey={folderDropResetKey}
-          isEnabled={isCellsStateReady && isUploadFilesEnabled && !isInRecycleBin}
+          isEnabled={isCellsStateReady && !isInRecycleBin}
           isFileDropAllowed={canUploadToSharedDrive}
           isOverlaySuppressed={activeFolderDropTargetName !== null}
           onDragStateReset={resetSharedDriveDropState}
@@ -356,7 +369,7 @@ export const ConversationCells = memo(
               onSearchClear={handleClearSearch}
               onUploadFiles={onUploadFiles}
               onUploadFolder={onUploadFolder}
-              isUploadFilesEnabled={isUploadFilesEnabled}
+              isUploadFilesEnabled={canUploadToSharedDrive}
               filters={filters}
               showViewerPermission={showViewerPermission}
               onSelectionBarAnchorChange={setSelectionBarAnchor}
@@ -369,6 +382,7 @@ export const ConversationCells = memo(
                 conversationQualifiedId={conversationQualifiedId}
                 conversationName={name}
                 onRefresh={handleRefresh}
+                onRefreshAfterBulkMoveOutcome={handleRefreshAfterBulkMoveOutcome}
                 // opening a folder must close search view and open the browse view
                 // with that folder (and breadcrumbs)
                 onCloseSearchView={handleSearchViewClosure}

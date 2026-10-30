@@ -26,8 +26,6 @@ yalc.lock
 /playwright/.cache/
 /test/e2e_tests/.env
 
-# Nx
-.nx/
 apps/server/dist/
 apps/server/build/
 dist/

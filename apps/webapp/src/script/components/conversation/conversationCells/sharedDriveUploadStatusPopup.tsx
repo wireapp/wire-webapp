@@ -53,6 +53,7 @@ import {
   sharedDriveUploadStatusPopupRowIconStyles,
   sharedDriveUploadStatusPopupRowLeadingStyles,
   sharedDriveUploadStatusPopupRowStatusStyles,
+  sharedDriveUploadStatusPopupMoveAlertStyles,
   sharedDriveUploadStatusPopupRowStyles,
   sharedDriveUploadStatusPopupRowsStyles,
   sharedDriveUploadStatusPopupRowTextStyles,
@@ -75,6 +76,7 @@ interface SharedDriveMoveActivityProps {
   readonly move: SharedDriveMoveStatus;
   readonly title: string;
   readonly statusLabel: string;
+  readonly statusMessage: string;
   readonly destination: string;
   readonly isExpanded: boolean;
   readonly toggleLabel: string;
@@ -112,6 +114,16 @@ interface SharedDriveUploadStatusPopupProps {
 
 const isActionPending = (state: UploadActionState, uploadId: string): boolean => {
   return typeof state === 'function' ? state(uploadId) : state;
+};
+
+const getMoveRowStatusKind = (move: SharedDriveMoveStatus): SharedDriveUploadStatusKind => {
+  if (move.kind === 'processing') {
+    return 'uploading';
+  }
+  if (move.kind === 'completed') {
+    return 'uploaded';
+  }
+  return 'queued';
 };
 
 const statusIcon = (upload: SharedDriveUploadStatus): ReactNode => {
@@ -427,9 +439,21 @@ export const SharedDriveUploadStatusPopup: FunctionComponent<
   SharedDriveUploadStatusPopupProps | SharedDriveMoveActivityProps
 > = props => {
   if ('move' in props) {
-    const {move, title, statusLabel, destination, isExpanded, toggleLabel, dismissLabel, onToggle, onDismiss} = props;
-    const rowStatusKind = move.kind === 'processing' ? 'uploading' : 'uploaded';
+    const {
+      move,
+      title,
+      statusLabel,
+      statusMessage,
+      destination,
+      isExpanded,
+      toggleLabel,
+      dismissLabel,
+      onToggle,
+      onDismiss,
+    } = props;
+    const rowStatusKind = getMoveRowStatusKind(move);
     const rowsId = 'shared-drive-move-status-rows';
+    const isMoveWarning = move.kind !== 'processing' && move.kind !== 'completed';
 
     return (
       <div css={sharedDriveUploadStatusPopupStyles} data-uie-name="shared-drive-upload-status-popup">
@@ -473,14 +497,20 @@ export const SharedDriveUploadStatusPopup: FunctionComponent<
             </button>
           </div>
         </div>
-        {move.kind === 'processing' ? (
+        {isMoveWarning && (
+          <p role="alert" css={sharedDriveUploadStatusPopupMoveAlertStyles}>
+            {statusMessage}
+          </p>
+        )}
+        {move.kind === 'processing' && (
           <div
             role="progressbar"
             aria-label={statusLabel}
             css={sharedDriveUploadStatusPopupProgressStyles(isExpanded)}
             data-uie-name="shared-drive-move-progress"
           />
-        ) : (
+        )}
+        {move.kind === 'completed' && (
           <div
             role="progressbar"
             aria-label={statusLabel}

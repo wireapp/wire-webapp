@@ -70,6 +70,13 @@ export const sharedDriveUploadStatusPopupTitleStyles: CSSObject = {
   whiteSpace: 'nowrap',
 };
 
+export const sharedDriveUploadStatusPopupMoveAlertStyles: CSSObject = {
+  margin: 0,
+  color: 'var(--danger-color, #c20013)',
+  fontSize: 'var(--font-size-small)',
+  lineHeight: '16px',
+};
+
 export const sharedDriveUploadStatusPopupDestinationStyles: CSSObject = {
   overflow: 'hidden',
   color: 'var(--text-input-placeholder, #676b71)',

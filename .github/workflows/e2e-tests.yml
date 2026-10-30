@@ -86,7 +86,7 @@ jobs:
           node-version-file: '.nvmrc'
           cache: 'npm'
 
-      - run: npm clean-install
+      - run: npm clean-install && npx just setup
       - run: npx just build-libraries
 
       - name: Install unzip for 1Password CLI setup
@@ -125,7 +125,7 @@ jobs:
         with:
           node-version-file: '.nvmrc'
           cache: 'npm'
-      - run: npm clean-install
+      - run: npm clean-install && npx just setup
       - run: npx just build-libraries
 
       - name: Compute shards
@@ -181,7 +181,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm clean-install
+        run: npm clean-install && npx just setup
 
       - name: Build Playwright library dependencies
         run: npx just build-libraries
@@ -250,7 +250,7 @@ jobs:
           node-version-file: '.nvmrc'
           cache: 'npm'
 
-      - run: npm clean-install
+      - run: npm clean-install && npx just setup
 
       - name: Download blob reports
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c

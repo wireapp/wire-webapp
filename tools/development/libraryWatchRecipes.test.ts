@@ -17,12 +17,12 @@
  *
  */
 
-import {developmentLibraries, getSelectedLibraryWatchRecipes} from './libraryWatchRecipes';
+import {developmentLibraries, getSelectedLibraryWatchCommands} from './libraryWatchRecipes';
 
-describe('getSelectedLibraryWatchRecipes', () => {
-  it('returns only selected watch recipes and keeps the existing defaults', () => {
-    const actualRecipes = getSelectedLibraryWatchRecipes({
-      libraryRecipeNames: ['watch-library-api-client', 'watch-library-telemetry'],
+describe('getSelectedLibraryWatchCommands', () => {
+  it('returns commands for selected libraries and keeps the existing defaults', () => {
+    const actualCommands = getSelectedLibraryWatchCommands({
+      libraryNames: ['api-client', 'telemetry'],
     });
     const defaultSelections = developmentLibraries
       .filter((library): boolean => {
@@ -32,13 +32,13 @@ describe('getSelectedLibraryWatchRecipes', () => {
         return library.value;
       });
 
-    expect(actualRecipes).toEqual(['watch-library-api-client', 'watch-library-telemetry']);
-    expect(defaultSelections).toEqual(['watch-library-react-ui-kit', 'watch-library-api-client']);
+    expect(actualCommands).toEqual(['just watch-library api-client', 'just watch-library-telemetry']);
+    expect(defaultSelections).toEqual(['react-ui-kit', 'api-client']);
   });
 
-  it('rejects unknown library recipes', () => {
+  it('rejects unknown library names', () => {
     expect(() => {
-      getSelectedLibraryWatchRecipes({libraryRecipeNames: ['watch-library-missing']});
-    }).toThrow('Unknown development library selection: watch-library-missing');
+      getSelectedLibraryWatchCommands({libraryNames: ['missing']});
+    }).toThrow('Unknown development library selection: missing');
   });
 });

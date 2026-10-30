@@ -16,7 +16,7 @@ It will generate .env file with variables from 1Password
 
 ### Install dependencies
 
-1. Install JS dependencies from the root: `npm clean-install`
+1. Install JS dependencies from the root with `npm clean-install`, then run `npx just setup`.
 2. Install Playwright dependencies: `npx playwright install --with-deps`
 
 _Note: If in doubt, refer to test jobs in [git actions workflows folder](/.github/workflows)._

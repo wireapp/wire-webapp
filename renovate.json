@@ -41,6 +41,13 @@
       "minimumReleaseAge": null
     },
     {
+      "description": "Group Node.js package manifest pins with .nvmrc",
+      "matchPackageNames": ["node"],
+      "matchDatasources": ["node-version"],
+      "groupName": "node runtime",
+      "minimumReleaseAge": null
+    },
+    {
       "matchFileNames": ["apps/webapp/app-config/package.json"],
       "groupName": "webapp app configuration"
     },
@@ -72,10 +79,6 @@
       "matchDepNames": ["playwright", "@playwright/test", "quay.io/wire/mirror-images/playwright"],
       "groupName": "playwright",
       "addLabels": ["run-e2e"]
-    },
-    {
-      "matchPackageNames": ["nx", "@nx/**"],
-      "groupName": "nx monorepo tooling"
     },
     {
       "extends": ["monorepo:typescript-eslint"],

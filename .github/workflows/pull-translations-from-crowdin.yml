@@ -31,7 +31,7 @@ jobs:
           cache: 'npm'
 
       - name: Install JS dependencies
-        run: npm clean-install
+        run: npm clean-install && npx just setup
 
       - name: Download translations and create PR
         uses: crowdin/github-action@7ca9c452bfe9197d3bb7fa83a4d7e2b0c9ae835d

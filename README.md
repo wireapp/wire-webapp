@@ -27,19 +27,21 @@ No license is granted to the Wire trademark and its associated logos, all of whi
 - `libraries/core/`: `@wireapp/core` package - Wire's communication core library handling authentication, WebSocket connections, and protocol messaging
 - Root-level tooling (`justfile`, npm workspaces, and `tools/`) provides commands shared by apps and libraries
 
-Use `npx just --list` to discover repository tasks, including builds, development, type checks, unit tests, linting, E2E, and translation management. Nx remains for library release and publishing tasks that have not migrated yet.
+Use `npx just --list` to discover repository tasks, including builds, development, type checks, unit tests, linting, E2E, and translation management.
 
 # How to Build the Open Source Client
 
 Prerequisites:
 
 1. Install [Node.js](https://nodejs.org/)
-1. Use Node.js 24.22.1 and npm 11.21.1, as pinned by `.nvmrc` and `packageManager`.
+1. Use Node.js 26.12.1, as pinned by `.nvmrc`.
+1. Use npm 11.20.0, bundled with Node.js 26.12.1 and declared by the root `package.json` `packageManager` field.
+1. The `devEngines` checks require Node.js `>=26.12.1 <27` and npm `>=11.20.0 <12` for `npm install` and `npm clean-install`.
 
 ## 1. Install Dependencies & Fetch Configuration
 
-1. Run `npm clean-install` (uses npm workspaces and the committed root lockfile)
-   - This will install all dependencies and run `npx just configure-webapp` (via root `postinstall`).
+1. Run `npm clean-install` to install dependencies from the committed root lockfile.
+1. Run `npx just setup` to apply dependency patches, fetch the webapp configuration, generate React icons, and validate their types.
    - `configure-webapp` uses `apps/webapp/app-config/package.json` to select a config repository version (`wire-web-config-wire` or `wire-web-config-default`), then copies:
      - config content into `apps/webapp/resource/`
      - `.env.defaults` into repository root
@@ -56,7 +58,7 @@ Prerequisites:
 1. Run `npx just develop`; Just builds the workspace libraries and server output, then starts the Express server, its TypeScript watcher, and watchers for the WebApp's upstream libraries. Rspack compiles the WebApp in memory and serves it at https://local.zinfra.io:8081/auth/ with React Fast Refresh.
 1. Server TypeScript changes are recompiled with `tsc --watch`; `node --watch` restarts the compiled Express server when its output changes. `concurrently` stops sibling processes if any watcher exits.
 1. `npx just develop-watch` is an alternative to `npx just develop`: it starts the server with libraries you select interactively. Choose one development command; do not run `develop-watch` alongside `develop`.
-1. To watch all development libraries without starting the server, run `npx just watch-libraries`.
+1. To watch one library without the server, run `npx just watch-library core`. Use `npx just watch-library-telemetry` to copy telemetry assets and watch both TypeScript module formats.
 1. In case you're facing a CORS issue after login when the app tries to fetch `self/consent` from the backend, append
    `FEATURE_CHECK_CONSENT="false"` to the env file
 
@@ -102,20 +104,20 @@ After updating the environment variables, the app will be available at the corre
 
 ### Development bundle
 
-Build a one-shot development-mode WebApp bundle with `npx just build-webapp-development`. The static files are written to `apps/webapp/dist/development`. This does not start the live development server: use `npx just develop` for the server with Rspack watch mode and hot reload. Use `npx just assemble-webapp-development` to assemble the development bundle into the server output.
+Build a one-shot development-mode WebApp bundle with `npx just build-webapp-development`. The static files are written to `apps/webapp/dist/development`. This does not start the live development server: use `npx just develop` for the server with Rspack watch mode and hot reload.
 
 ### Production
 
 Rspack is the sole application bundler for internal and public production builds and local development. Jest continues to use Babel.
 
-1. Build only the internal Rspack WebApp assets: `npx just build-webapp-internal` (or assemble them with `npx just assemble-webapp-internal`)
+1. Build only the internal Rspack WebApp assets: `npx just build-webapp-internal`
 1. Compile the production server and copy its runtime assets: `npx just build-server` (writes to `apps/server/build/server` after building workspace libraries)
 1. Build and package the default internal Rspack release: `npx just package-server-internal`
    - This builds both the server and webapp (in production mode) and creates the deployment package at `apps/server/dist/s3/ebs.zip`
 1. Build and package the default public Rspack release: `npx just package-server-public`
-1. Start the server output from `apps/server/dist` (or build a Docker image with `npm run docker -- <tag>`)
+1. Start the server output from `apps/server/dist` (or build a Docker image with `npx just docker <tag>`)
 
-`npx just build-server` compiles with the server TypeScript project and copies the server runtime assets, including the telemetry embed and compiled local workspace dependencies. It does not remove an existing `apps/server/build/server` directory, and its `build-libraries` prerequisite does not run Nx clean targets. Files for removed or renamed server sources, assets, or library outputs can remain; the Nx `server:build` target cleans its output and Nx cleans upstream library outputs it rebuilds.
+`npx just build-server` compiles with the server TypeScript project and copies the server runtime assets, including the telemetry embed and compiled local workspace dependencies. It does not remove an existing `apps/server/build/server` directory.
 
 **Note:** The `zip` command has been deprecated. Packaging is integrated into the build process via `npx just package-server-internal`.
 
@@ -133,7 +135,7 @@ Other useful tasks:
 
 - Lint: `npx just lint`
 - ESLint only: `npx just eslint`
-- Fix ESLint issues: `npx just eslint-fix`
+- Fix ESLint issues: `npx just eslint --fix`
 - Type-check: `npx just type-check`
 - E2E (Playwright): `npx just e2e-test` (for example, `npx just e2e-test --grep "@regression|@crit-flow-web"`)
 - E2E UI mode: `npx just e2e-ui`
@@ -148,7 +150,7 @@ All Wire translations are crowdsourced via [Crowdin](https://crowdin.com/project
 
 ### Local translation tasks
 
-Install dependencies with `npm clean-install`, create a [Crowdin personal access token](https://crowdin.com/settings#api-key), then set it in your shell:
+Install dependencies with `npm clean-install` and run `npx just setup`. Create a [Crowdin personal access token](https://crowdin.com/settings#api-key), then set it in your shell:
 
 ```sh
 export CROWDIN_PERSONAL_TOKEN="<personal-access-token>"

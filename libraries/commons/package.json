@@ -33,11 +33,6 @@
     "rimraf": "6.1.3",
     "typescript": "6.0.3"
   },
-  "scripts": {
-    "build": "nx run commons-lib:build",
-    "clean": "nx run commons-lib:clean",
-    "dist": "nx run commons-lib:dist"
-  },
   "version": "5.4.13",
   "private": true
 }

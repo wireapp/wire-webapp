@@ -25,7 +25,11 @@ import {noop} from 'noop-esm';
 import type {UploadState} from 'Repositories/cells/upload';
 import type {Translate} from 'Util/localizerUtil';
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
-import {SharedDriveUploadStatusProvider, useSharedDriveUploadStatus} from './sharedDriveUploadStatusContext';
+import {
+  SharedDriveUploadStatusProvider,
+  useSharedDriveUploadStatus,
+  type SharedDriveMoveStatus,
+} from './sharedDriveUploadStatusContext';
 import {SharedDriveUploadStatusPopupHost} from './sharedDriveUploadStatusPopupHost';
 import {
   createRootContextValueForTest,
@@ -48,12 +52,7 @@ const translateMoveSummaryForTest: Translate = (key, substitutions) => {
   return translateForTest(key);
 };
 
-type TestMoveStatus = {
-  readonly id: string;
-  readonly kind: 'processing' | 'completed';
-  readonly items: readonly {readonly id: string; readonly name: string; readonly isFolder: boolean}[];
-  readonly destinationPath: string;
-};
+type TestMoveStatus = SharedDriveMoveStatus;
 
 const MoveStatusPollControl: FunctionComponent<{readonly status: TestMoveStatus}> = ({status}) => {
   const {updateMoveStatus} = useSharedDriveUploadStatus();
@@ -193,6 +192,27 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     expect(progress).not.toHaveAttribute('aria-valuenow');
     expect(progress).not.toHaveAttribute('aria-valuemax');
     expect(screen.getAllByRole('listitem')).toHaveLength(3);
+  });
+
+  it.each([
+    ['request-failed', 'cells.bulkMove.requestFailed'],
+    ['partial', 'cells.bulkMove.partialMoveWarning'],
+    ['finished-unknown', 'cells.bulkMove.finishedUnknown'],
+    ['failed', 'cells.bulkMove.allJobsFailed'],
+    ['status-unknown', 'cells.bulkMove.statusLookupUnknown'],
+  ] as const)('announces %s in the move status popup without showing progress', (kind, warning) => {
+    const controller = createController();
+    renderHost(controller, conversationQualifiedId, true, true, translateMoveSummaryForTest, {
+      id: 'move-job',
+      kind,
+      items: [{id: 'file-1', name: 'mockup.pdf', isFolder: false}],
+      destinationPath: 'Design reviews',
+    });
+
+    expect(screen.getByRole('alert')).toHaveTextContent(warning);
+    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
+    expect(screen.getByRole('listitem')).toHaveTextContent('mockup.pdf');
+    expect(screen.getByRole('listitem')).not.toHaveTextContent(/failed/i);
   });
 
   it('keeps a dismissed pending move hidden across status updates without cancelling it', async () => {
