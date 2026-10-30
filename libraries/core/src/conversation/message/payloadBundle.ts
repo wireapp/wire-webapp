@@ -62,6 +62,7 @@ export enum PayloadBundleType {
   CONVERSATION_CLEAR = 'PayloadBundleType.CONVERSATION_CLEAR',
   CONVERSATION_RENAME = 'PayloadBundleType.CONVERSATION_RENAME',
   LOCATION = 'PayloadBundleType.LOCATION',
+  MARK_UNREAD = 'PayloadBundleType.MARK_UNREAD',
   MEMBER_JOIN = 'PayloadBundleType.MEMBER_JOIN',
   MESSAGE_DELETE = 'PayloadBundleType.MESSAGE_DELETE',
   MESSAGE_EDIT = 'PayloadBundleType.MESSAGE_EDIT',

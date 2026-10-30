@@ -39,6 +39,7 @@ export enum GenericMessageType {
   IMAGE = 'image',
   KNOCK = 'knock',
   LAST_READ = 'lastRead',
+  MARK_UNREAD = 'markUnread',
   LOCATION = 'location',
   REACTION = 'reaction',
   IN_CALL_EMOJI = 'inCallEmoji',

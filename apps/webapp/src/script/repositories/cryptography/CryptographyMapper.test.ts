@@ -34,6 +34,7 @@ import {
   GenericMessage,
   Knock,
   LastRead,
+  MarkUnread,
   LegalHoldStatus,
   Location,
   MessageDelete,
@@ -563,6 +564,60 @@ describe('CryptographyMapper', () => {
 
       expect(mappedEvent.data.legal_hold_status).toBe(expectedLegalHoldStatus);
     });
+
+    it('maps a decoded unread control with its qualified target and action timestamp', async () => {
+      const target = {id: createUuid(), domain: 'target.example'};
+      const message = GenericMessage.decode(
+        GenericMessage.encode({
+          messageId: createUuid(),
+          markUnread: MarkUnread.create({
+            qualifiedConversationId: target,
+            unreadFromTimestamp: 1000,
+            operationTimestamp: 2000,
+          }),
+        }).finish(),
+      );
+
+      const mapped = requireMappedMessageData(await mapper.mapGenericMessage(message, event));
+
+      expect(mapped).toMatchObject({
+        type: CONVERSATION_EVENT.MEMBER_UPDATE,
+        conversation: event.conversation,
+        from: event.from,
+        time: event.time,
+        data: {
+          conversationId: target.id,
+          qualified_conversation_id: target,
+          manual_unread_timestamp: '1000',
+          operation_timestamp: '2000',
+        },
+      });
+    });
+
+    it.each([undefined, 2000])(
+      'preserves optional action-time presence for decoded LastRead %p',
+      async operationTime => {
+        const message = GenericMessage.decode(
+          GenericMessage.encode({
+            messageId: createUuid(),
+            lastRead: LastRead.create({
+              conversationId: createUuid(),
+              lastReadTimestamp: 1000,
+              operationTimestamp: operationTime,
+            }),
+          }).finish(),
+        );
+
+        const mapped = requireMappedMessageData(await mapper.mapGenericMessage(message, event));
+
+        expect(mapped.data.last_read_timestamp).toBe('1000');
+        if (operationTime === undefined) {
+          expect(mapped.data).not.toHaveProperty('operation_timestamp');
+        } else {
+          expect(mapped.data).toHaveProperty('operation_timestamp', '2000');
+        }
+      },
+    );
 
     it('resolves with a mapped last read message', () => {
       const date = Date.now();

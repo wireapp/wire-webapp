@@ -27,7 +27,7 @@ import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {Message} from 'Repositories/entity/message/message';
 
-type ReadMessageBuffer = {conversation: Conversation; message: Message};
+type ReadMessageBuffer = {conversation: Conversation; message: Message; generation: number};
 type ReadReceiptClock = Pick<Clock, 'setTimeout' | 'clearTimeout'>;
 
 type UseReadReceiptSenderOptions = {
@@ -47,7 +47,9 @@ export const useReadReceiptSender = (options: UseReadReceiptSenderOptions): UseR
   const flushTimer = useRef<TimeoutIdentifier | undefined>(undefined);
 
   const flush = useCallback(() => {
-    const readMessages = readMessagesBuffer.current;
+    const readMessages = readMessagesBuffer.current.filter(({conversation, generation}) => {
+      return !conversation.isAutoReadSuppressed() && conversation.autoReadGeneration === generation;
+    });
     readMessagesBuffer.current = [];
     const scheduledFlushTimer = flushTimer.current;
     if (!isUndefined(scheduledFlushTimer)) {
@@ -93,6 +95,9 @@ export const useReadReceiptSender = (options: UseReadReceiptSenderOptions): UseR
 
   return {
     addReadReceiptToBatch: (conversation: Conversation, message: Message) => {
+      if (conversation.isAutoReadSuppressed()) {
+        return;
+      }
       // Check that the message has not already been batched for a future read receipt
       const hasBatchedReadReceipts = readMessagesBuffer.current.some(readReceipt => {
         return readReceipt.message.id === message.id;
@@ -106,7 +111,7 @@ export const useReadReceiptSender = (options: UseReadReceiptSenderOptions): UseR
       }
 
       // add the message in the buffer of read messages (actual read receipt will be sent in the next batch)
-      const entry = {conversation, message};
+      const entry = {conversation, message, generation: conversation.autoReadGeneration};
       readMessagesBuffer.current = readMessagesBuffer.current.concat(entry);
       flushTimer.current = clock.setTimeout(flush, DEBOUNCE);
     },
