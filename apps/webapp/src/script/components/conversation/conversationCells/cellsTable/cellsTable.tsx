@@ -24,7 +24,7 @@ import {flexRender, getCoreRowModel, type Header, useReactTable} from '@tanstack
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {JobsTaskStatus, RestActionStatus, type RestPerformActionResponse} from 'cells-sdk-ts';
 import {createPortal} from 'react-dom';
-import {Maybe, maybe, task} from 'true-myth';
+import {Maybe, maybe} from 'true-myth';
 
 import {ArrowIcon, Button, ButtonVariant, CloseIcon, UploadIcon} from '@wireapp/react-ui-kit';
 
@@ -74,6 +74,7 @@ import {getCellsTableColumns, getCellsTableDataCellLabels} from './cellsTableCol
 import {CellsFilePreviewModalProvider} from './common/cellsFilePreviewModalContext/cellsFilePreviewModalContext';
 import {getBulkMoveOutcomeEvidence} from './getBulkMoveOutcomeEvidence';
 
+import {pollCellsBackgroundActionJobs} from '../common/cellsBackgroundActionPolling/cellsBackgroundActionPolling';
 import {CellsSortDirection} from '../common/cellsSortIcon/cellsSortIcon';
 import {CellsSortField, SORTABLE_COLUMN_FIELD, toAriaSort} from '../common/useCellsSorting/useCellsSorting';
 import {getSharedDriveDroppedFiles} from '../getSharedDriveDroppedFiles';
@@ -272,131 +273,80 @@ export const CellsTable = ({
       return undefined;
     }
 
-    let isActive = true;
-    let timeout: ReturnType<typeof clock.setTimeout> | undefined;
-    let retryCount = 0;
-    const scheduleNextCheck = (delay: number): void => {
-      timeout = clock.setTimeout(() => {
-        void checkBackgroundMoveStatus();
-      }, delay);
-    };
     const moveStatusId = backgroundMoveStatusId;
-    const handleUnknownStatus = (): void => {
-      if (retryCount >= MAX_BACKGROUND_MOVE_STATUS_RETRIES) {
+    return pollCellsBackgroundActionJobs({
+      jobUuids: backgroundMoveJobUuids,
+      readStatus: async jobUuid => {
+        return (await cellsRepository.getBackgroundMoveInfo({jobUuid})).Status;
+      },
+      clock,
+      pollingPolicy: {
+        pollIntervalMs: BACKGROUND_MOVE_STATUS_POLL_INTERVAL_MS,
+        maxUnknownRetries: MAX_BACKGROUND_MOVE_STATUS_RETRIES,
+        getUnknownRetryDelay: retryIndex => {
+          return (
+            BACKGROUND_MOVE_STATUS_POLL_INTERVAL_MS *
+            BACKGROUND_MOVE_STATUS_RETRY_BACKOFF_FACTOR ** retryIndex *
+            (BACKGROUND_MOVE_STATUS_RETRY_MIN_JITTER_FACTOR +
+              random() *
+                (BACKGROUND_MOVE_STATUS_RETRY_MAX_JITTER_FACTOR - BACKGROUND_MOVE_STATUS_RETRY_MIN_JITTER_FACTOR))
+          );
+        },
+      },
+      onStatusSnapshot: () => {
+        if (maybe.isJust(backgroundMoveSummary.current)) {
+          updateMoveStatus({id: moveStatusId, kind: 'processing', ...backgroundMoveSummary.current.value});
+        }
+      },
+      onOutcome: outcome => {
+        if (outcome === 'all-finished') {
+          if (maybe.isJust(backgroundMoveSummary.current)) {
+            updateMoveStatus({id: moveStatusId, kind: 'completed', ...backgroundMoveSummary.current.value});
+          }
+          activeMoveStatusId.current = Maybe.nothing();
+          backgroundMoveSummary.current = Maybe.nothing();
+          setBackgroundMoveStatusId('');
+          setBackgroundMoveJobUuids([]);
+          dispatchMove({type: 'resolved'});
+          setIsBulkMovePreviewOpen(false);
+          onRefresh();
+          return;
+        }
+
+        if (outcome === 'mixed-terminal') {
+          if (maybe.isJust(backgroundMoveSummary.current)) {
+            updateMoveStatus({id: moveStatusId, kind: 'partial', ...backgroundMoveSummary.current.value});
+          }
+          activeMoveStatusId.current = Maybe.just(moveStatusId);
+          setBackgroundMoveJobUuids([]);
+          dispatchMove({type: 'needs-review', reason: 'partial'});
+          backgroundMoveSummary.current = Maybe.nothing();
+          setBackgroundMoveStatusId('');
+          setIsBulkMovePreviewOpen(false);
+          return;
+        }
+
+        if (outcome === 'all-failed') {
+          if (maybe.isJust(backgroundMoveSummary.current)) {
+            updateMoveStatus({id: moveStatusId, kind: 'failed', ...backgroundMoveSummary.current.value});
+          }
+          activeMoveStatusId.current = Maybe.just(moveStatusId);
+          setBackgroundMoveJobUuids([]);
+          dispatchMove({type: 'needs-review', reason: 'failed'});
+          backgroundMoveSummary.current = Maybe.nothing();
+          setBackgroundMoveStatusId('');
+          setIsBulkMovePreviewOpen(false);
+          return;
+        }
+
         if (maybe.isJust(backgroundMoveSummary.current)) {
           updateMoveStatus({id: moveStatusId, kind: 'status-unknown', ...backgroundMoveSummary.current.value});
         }
         activeMoveStatusId.current = Maybe.just(moveStatusId);
         dispatchMove({type: 'needs-review', reason: 'status-unknown'});
         setIsBulkMovePreviewOpen(false);
-        return;
-      }
-
-      const retryDelay =
-        BACKGROUND_MOVE_STATUS_POLL_INTERVAL_MS *
-        BACKGROUND_MOVE_STATUS_RETRY_BACKOFF_FACTOR ** retryCount *
-        (BACKGROUND_MOVE_STATUS_RETRY_MIN_JITTER_FACTOR +
-          random() * (BACKGROUND_MOVE_STATUS_RETRY_MAX_JITTER_FACTOR - BACKGROUND_MOVE_STATUS_RETRY_MIN_JITTER_FACTOR));
-      retryCount += 1;
-      scheduleNextCheck(retryDelay);
-    };
-    const checkBackgroundMoveStatus = async (): Promise<void> => {
-      const statusResults = await Promise.all(
-        backgroundMoveJobUuids.map(jobUuid => {
-          return task.tryOrElse(
-            error => {
-              return error;
-            },
-            () => {
-              return cellsRepository.getBackgroundMoveInfo({jobUuid});
-            },
-          );
-        }),
-      );
-      if (!isActive) {
-        return;
-      }
-
-      const backgroundActions = statusResults.map(statusResult => {
-        return statusResult.isOk ? statusResult.value : undefined;
-      });
-      const statuses = backgroundActions.map(action => {
-        return action?.Status;
-      });
-      if (
-        statuses.some(status => {
-          return status === undefined || status === JobsTaskStatus.Unknown;
-        })
-      ) {
-        handleUnknownStatus();
-        return;
-      }
-      retryCount = 0;
-      if (maybe.isJust(backgroundMoveSummary.current)) {
-        updateMoveStatus({id: moveStatusId, kind: 'processing', ...backgroundMoveSummary.current.value});
-      }
-      const areAllJobsFinished = statuses.every(status => {
-        return status === JobsTaskStatus.Finished;
-      });
-      if (areAllJobsFinished) {
-        if (maybe.isJust(backgroundMoveSummary.current)) {
-          updateMoveStatus({id: moveStatusId, kind: 'completed', ...backgroundMoveSummary.current.value});
-        }
-        activeMoveStatusId.current = Maybe.nothing();
-        backgroundMoveSummary.current = Maybe.nothing();
-        setBackgroundMoveStatusId('');
-        setBackgroundMoveJobUuids([]);
-        dispatchMove({type: 'resolved'});
-        setIsBulkMovePreviewOpen(false);
-        onRefresh();
-        return;
-      }
-
-      const hasNonTerminalJob = statuses.some(status => {
-        return (
-          status !== JobsTaskStatus.Finished && status !== JobsTaskStatus.Error && status !== JobsTaskStatus.Interrupted
-        );
-      });
-      if (hasNonTerminalJob) {
-        scheduleNextCheck(BACKGROUND_MOVE_STATUS_POLL_INTERVAL_MS);
-        return;
-      }
-
-      const hasFinishedJob = statuses.some(status => {
-        return status === JobsTaskStatus.Finished;
-      });
-      if (hasFinishedJob) {
-        if (maybe.isJust(backgroundMoveSummary.current)) {
-          updateMoveStatus({id: moveStatusId, kind: 'partial', ...backgroundMoveSummary.current.value});
-        }
-        activeMoveStatusId.current = Maybe.just(moveStatusId);
-        setBackgroundMoveJobUuids([]);
-        dispatchMove({type: 'needs-review', reason: 'partial'});
-        backgroundMoveSummary.current = Maybe.nothing();
-        setBackgroundMoveStatusId('');
-        setIsBulkMovePreviewOpen(false);
-        return;
-      }
-
-      if (maybe.isJust(backgroundMoveSummary.current)) {
-        updateMoveStatus({id: moveStatusId, kind: 'failed', ...backgroundMoveSummary.current.value});
-      }
-      activeMoveStatusId.current = Maybe.just(moveStatusId);
-      setBackgroundMoveJobUuids([]);
-      dispatchMove({type: 'needs-review', reason: 'failed'});
-      backgroundMoveSummary.current = Maybe.nothing();
-      setBackgroundMoveStatusId('');
-      setIsBulkMovePreviewOpen(false);
-    };
-
-    void checkBackgroundMoveStatus();
-
-    return () => {
-      isActive = false;
-      if (timeout !== undefined) {
-        clock.clearTimeout(timeout);
-      }
-    };
+      },
+    });
   }, [
     backgroundMoveJobUuids,
     backgroundMoveStatusId,
