@@ -61,6 +61,36 @@ const translateSelectionForTest: Translate = (key, substitutions) => {
   if (key === 'cells.selection.move') {
     return 'Move';
   }
+  if (key === 'cells.selection.moveToBin') {
+    return 'Move to bin';
+  }
+  if (key === 'cells.bulkMoveToBin.confirmation.title') {
+    return 'Move selected items to Bin?';
+  }
+  if (key === 'cells.bulkMoveToBin.confirmation.description') {
+    return `Move ${substitutions?.count} selected items to Bin. Selected folders and their contents will also move to Bin.`;
+  }
+  if (key === 'cells.bulkMoveToBin.destination') {
+    return 'Bin';
+  }
+  if (key === 'cells.bulkMoveToBin.moving') {
+    return `Moving ${substitutions?.count} selected items to Bin`;
+  }
+  if (key === 'cells.bulkMoveToBin.requestFailed') {
+    return 'The request result is unknown. Refresh Drive and Bin before trying again.';
+  }
+  if (key === 'cells.bulkMoveToBin.refresh') {
+    return 'Refresh Drive and Bin';
+  }
+  if (key === 'cells.bulkMoveToBin.refreshFailed') {
+    return 'Could not refresh Drive and Bin. The result is still unknown.';
+  }
+  if (key === 'cells.bulkMoveToBin.confirmation.cancel') {
+    return 'Cancel';
+  }
+  if (key === 'cells.bulkMoveToBin.confirmation.confirm') {
+    return 'Move to Bin';
+  }
   if (key === 'cells.moveNodeModal.moveTitle') {
     return 'Move to folder';
   }
@@ -167,6 +197,7 @@ const renderCellsTable = ({
   selfUserDriveRole = CELLS_SELF_USER_DRIVE_ROLE.EDITOR,
   onRefresh = jest.fn(),
   onRefreshAfterBulkMoveOutcome = jest.fn().mockResolvedValue(true),
+  onRefreshAfterBulkMoveToBinOutcome = jest.fn().mockResolvedValue(true),
   clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
   random = () => {
     return 0.5;
@@ -186,6 +217,7 @@ const renderCellsTable = ({
   readonly initialNodes?: CellNode[];
   readonly onRefresh?: () => void;
   readonly onRefreshAfterBulkMoveOutcome?: () => Promise<boolean>;
+  readonly onRefreshAfterBulkMoveToBinOutcome?: () => Promise<boolean>;
   readonly selfUserDriveRole?: CellsSelfUserDriveRole;
   readonly clock?: ReturnType<typeof createDeterministicClock>;
   readonly random?: () => number;
@@ -239,6 +271,7 @@ const renderCellsTable = ({
               conversationName="Conversation"
               onRefresh={onRefresh}
               onRefreshAfterBulkMoveOutcome={onRefreshAfterBulkMoveOutcome}
+              onRefreshAfterBulkMoveToBinOutcome={onRefreshAfterBulkMoveToBinOutcome}
               onFolderDropTargetChange={onFolderDropTargetChange}
               onDropFilesToFolder={onDropFilesToFolder}
               onDropReadError={onDropReadError}
@@ -332,6 +365,169 @@ describe('CellsTable selection', () => {
     expect(within(selectionStatus).queryByText(/\d+(\.\d+)? (B|KB|MB|GB)/)).not.toBeInTheDocument();
   });
 
+  it('opens a captured mixed-selection confirmation and cancels without deleting', async () => {
+    const user = userEvent.setup();
+    const repository = {deleteNodes: jest.fn()} as unknown as CellsRepository;
+    renderCellsTable({cellsRepository: repository});
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+    await user.click(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'}));
+    await user.click(screen.getByRole('button', {name: 'Move to bin'}));
+
+    const confirmation = await screen.findByRole('dialog');
+    expect(within(confirmation).getByRole('heading', {name: 'Move selected items to Bin?'})).toBeInTheDocument();
+    expect(within(confirmation).getByText(/Move 2 selected items to Bin/)).toBeInTheDocument();
+    expect(within(confirmation).getByText(/Selected folders and their contents/)).toBeInTheDocument();
+
+    await user.click(within(confirmation).getByRole('button', {name: 'Cancel'}));
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+    expect(repository.deleteNodes).not.toHaveBeenCalled();
+    expect(screen.getByText('2 selected')).toBeInTheDocument();
+  });
+
+  it('revalidates delete permission when confirming the captured selection', async () => {
+    const user = userEvent.setup();
+    const deleteNodes = jest.fn();
+    const view = renderCellsTable({cellsRepository: {deleteNodes} as unknown as CellsRepository});
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+    await user.click(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'}));
+    await user.click(screen.getByRole('button', {name: 'Move to bin'}));
+    const confirmation = await screen.findByRole('dialog');
+    view.rerenderWithNodes([{...view.folder, selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER}, view.file]);
+    await user.click(within(confirmation).getByRole('button', {name: 'Move to Bin'}));
+
+    expect(deleteNodes).not.toHaveBeenCalled();
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+  });
+
+  it('submits the captured selection once with existing non-permanent batch semantics', async () => {
+    const user = userEvent.setup();
+    const deleteNodes = jest.fn().mockResolvedValue({Status: 'Performed'});
+    const onRefreshAfterBulkMoveToBinOutcome = jest.fn().mockResolvedValue(true);
+    const repository = {deleteNodes} as unknown as CellsRepository;
+    renderCellsTable({cellsRepository: repository, onRefreshAfterBulkMoveToBinOutcome});
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+    await user.click(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'}));
+    await user.click(screen.getByRole('button', {name: 'Move to bin'}));
+    const confirmation = await screen.findByRole('dialog');
+    await user.click(within(confirmation).getByRole('button', {name: 'Move to Bin'}));
+
+    await waitFor(() => {
+      expect(deleteNodes).toHaveBeenCalledTimes(1);
+    });
+    expect(deleteNodes).toHaveBeenCalledWith({uuids: ['folder-id', 'file-id'], permanently: false});
+    await waitFor(() => {
+      expect(onRefreshAfterBulkMoveToBinOutcome).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it('prevents duplicate batch submissions while the request is pending', async () => {
+    const user = userEvent.setup();
+    let resolveDelete: (response: {Status: string}) => void = () => {
+      return undefined;
+    };
+    const pendingDelete = new Promise<{Status: string}>(resolve => {
+      resolveDelete = resolve;
+    });
+    const deleteNodes = jest.fn().mockReturnValue(pendingDelete);
+    const onRefreshAfterBulkMoveToBinOutcome = jest.fn().mockResolvedValue(true);
+    renderCellsTable({
+      cellsRepository: {deleteNodes} as unknown as CellsRepository,
+      onRefreshAfterBulkMoveToBinOutcome,
+    });
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+    await user.click(screen.getByRole('button', {name: 'Move to bin'}));
+    const confirmation = await screen.findByRole('dialog');
+    const confirmButton = within(confirmation).getByRole('button', {name: 'Move to Bin'});
+    await user.click(confirmButton);
+    expect(confirmButton).toBeDisabled();
+    await user.click(confirmButton);
+    expect(deleteNodes).toHaveBeenCalledTimes(1);
+
+    resolveDelete({Status: 'Performed'});
+    await waitFor(() => {
+      expect(onRefreshAfterBulkMoveToBinOutcome).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it('does not retry the batch mutation after a request error', async () => {
+    const user = userEvent.setup();
+    const deleteNodes = jest.fn().mockRejectedValue(new Error('network unavailable'));
+    const onRefreshAfterBulkMoveToBinOutcome = jest.fn().mockResolvedValue(true);
+    renderCellsTable({
+      cellsRepository: {deleteNodes} as unknown as CellsRepository,
+      onRefreshAfterBulkMoveToBinOutcome,
+    });
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+    await user.click(screen.getByRole('button', {name: 'Move to bin'}));
+    const confirmation = await screen.findByRole('dialog');
+    await user.click(within(confirmation).getByRole('button', {name: 'Move to Bin'}));
+
+    await waitFor(() => {
+      expect(onRefreshAfterBulkMoveToBinOutcome).toHaveBeenCalledTimes(1);
+    });
+    expect(deleteNodes).toHaveBeenCalledTimes(1);
+    expect(deleteNodes).toHaveBeenCalledWith({uuids: ['folder-id'], permanently: false});
+  });
+
+  it('keeps the selection locked when refreshing the action outcome fails', async () => {
+    const user = userEvent.setup();
+    const deleteNodes = jest.fn().mockResolvedValue({Status: 'Performed'});
+    const onRefreshAfterBulkMoveToBinOutcome = jest.fn().mockResolvedValueOnce(false).mockResolvedValue(true);
+    renderCellsTable({
+      cellsRepository: {deleteNodes} as unknown as CellsRepository,
+      onRefreshAfterBulkMoveToBinOutcome,
+    });
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+    await user.click(screen.getByRole('button', {name: 'Move to bin'}));
+    const confirmation = await screen.findByRole('dialog');
+    await user.click(within(confirmation).getByRole('button', {name: 'Move to Bin'}));
+
+    const refreshButton = await screen.findByRole('button', {name: 'Refresh Drive and Bin'});
+    expect(screen.getByText('Could not refresh Drive and Bin. The result is still unknown.')).toBeInTheDocument();
+    await user.click(refreshButton);
+
+    await waitFor(() => {
+      expect(onRefreshAfterBulkMoveToBinOutcome).toHaveBeenCalledTimes(2);
+    });
+    expect(deleteNodes).toHaveBeenCalledTimes(1);
+    expect(screen.queryByText('Could not refresh Drive and Bin. The result is still unknown.')).not.toBeInTheDocument();
+  });
+
+  it('polls delete background jobs and refreshes after they finish', async () => {
+    const user = userEvent.setup();
+    const deleteNodes = jest.fn().mockResolvedValue({
+      Status: 'Background',
+      BackgroundActions: [{Name: 'delete', JobUuid: 'delete-job'}],
+    });
+    const getBackgroundActionInfo = jest.fn().mockResolvedValue({Status: 'Finished'});
+    const onRefreshAfterBulkMoveToBinOutcome = jest.fn().mockResolvedValue(true);
+    renderCellsTable({
+      cellsRepository: {deleteNodes, getBackgroundActionInfo} as unknown as CellsRepository,
+      onRefreshAfterBulkMoveToBinOutcome,
+    });
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+    await user.click(screen.getByRole('button', {name: 'Move to bin'}));
+    const confirmation = await screen.findByRole('dialog');
+    await user.click(within(confirmation).getByRole('button', {name: 'Move to Bin'}));
+
+    await waitFor(() => {
+      expect(onRefreshAfterBulkMoveToBinOutcome).toHaveBeenCalledTimes(1);
+    });
+    expect(deleteNodes).toHaveBeenCalledTimes(1);
+    expect(getBackgroundActionInfo).toHaveBeenCalledWith({name: 'delete', jobUuid: 'delete-job'});
+  });
+
   it('selects files and folders and clears the selection', () => {
     renderCellsTable();
 
@@ -370,6 +566,7 @@ describe('CellsTable selection', () => {
 
       expect(screen.getByText('1 selected')).toBeInTheDocument();
       expect(screen.queryByRole('button', {name: 'Move'})).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', {name: 'Move to bin'})).not.toBeInTheDocument();
     } finally {
       window.location.hash = originalHash;
     }
@@ -381,6 +578,7 @@ describe('CellsTable selection', () => {
 
     expect(screen.getByText('1 selected')).toBeInTheDocument();
     expect(screen.queryByRole('button', {name: 'Move'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'Move to bin'})).not.toBeInTheDocument();
   });
 
   it('hides selection controls when the Drive bulk actions feature flag is off', () => {
@@ -389,6 +587,7 @@ describe('CellsTable selection', () => {
     expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', {name: 'Clear selection'})).not.toBeInTheDocument();
     expect(screen.queryByRole('button', {name: 'Move'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'Move to bin'})).not.toBeInTheDocument();
   });
 
   it('browses destinations without listing selected items, moving, or clearing selection', async () => {
