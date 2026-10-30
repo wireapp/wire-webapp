@@ -33,10 +33,21 @@ export enum UserType {
   BOT = 'bot',
 }
 
+export enum ContactStatusState {
+  CONTACTABLE = 'contactable',
+  NON_CONTACTABLE = 'non-contactable',
+}
+
+export interface ContactStatus {
+  state: ContactStatusState;
+}
+
 export interface User {
   accent_id?: AccentColor.AccentColorID;
   app?: App;
   assets?: UserAsset[];
+  /** Only returned for local users when requested with `include-contact-status` */
+  contact_status?: ContactStatus;
   deleted?: boolean;
   email?: string;
   expires_at?: string;

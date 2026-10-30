@@ -34,3 +34,13 @@ export const icon: CSSObject = {
   fill: 'var(--main-color)',
   justifyContent: 'center',
 };
+
+export const pendingOnboardingIcon: CSSObject = {
+  ...icon,
+  backgroundColor: 'var(--app-bg)',
+  border: '1px solid var(--border-color)',
+  borderRadius: '6px',
+  fill: 'var(--base-secondary-text)',
+  height: '24px',
+  padding: '3px 4px',
+};

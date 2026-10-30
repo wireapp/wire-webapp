@@ -21,16 +21,10 @@ import type {FunctionComponent} from 'react';
 
 import {Button, ButtonVariant, FlexBox} from '@wireapp/react-ui-kit';
 
+import type {MenuItem} from 'Components/panel/panelActions';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {singleActionButtonStyle} from './singleAction.styles';
-
-interface MenuItem {
-  click: () => void;
-  Icon: React.FC<React.SVGProps<SVGSVGElement>>;
-  identifier: string;
-  label: string;
-}
 
 interface SingleActionProps {
   item: MenuItem;
@@ -63,7 +57,13 @@ const SingleAction: FunctionComponent<SingleActionProps> = ({
       >
         {translate('modalConfirmSecondary')}
       </Button>
-      <Button onClick={item.click} data-uie-name={item.identifier} css={singleActionButtonStyle(oneButtonPerRow)}>
+      <Button
+        onClick={item.click}
+        data-uie-name={item.identifier}
+        css={singleActionButtonStyle(oneButtonPerRow)}
+        disabled={item.disabled}
+        aria-describedby={item.descriptionId}
+      >
         {item.label}
       </Button>
     </FlexBox>

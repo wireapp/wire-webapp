@@ -18,7 +18,7 @@
  */
 
 import {isNan, isNonEmptyArray, isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
-import {UserType} from '@wireapp/api-client/lib/user';
+import {ContactStatusState, UserType} from '@wireapp/api-client/lib/user';
 
 import {MappedAsset, mapProfileAssets, updateUserEntityAssets} from 'Repositories/assets/assetMapper';
 import {User} from 'Repositories/entity/User';
@@ -115,6 +115,7 @@ export class UserMapper {
       availability,
       app,
       assets,
+      contact_status: contactStatus,
       deleted,
       email,
       expires_at: expirationDate,
@@ -151,6 +152,11 @@ export class UserMapper {
 
     if (!isNullOrUndefined(supportedProtocols)) {
       userEntity.supportedProtocols(supportedProtocols);
+    }
+
+    if (!isNullOrUndefined(contactStatus)) {
+      // The contact status is only sent for local users, a missing value should not reset it
+      userEntity.isPendingOnboarding(contactStatus.state === ContactStatusState.NON_CONTACTABLE);
     }
 
     if (isNonEmptyString(expirationDate)) {

@@ -26,6 +26,9 @@ export interface MenuItem {
   Icon: React.FC<React.SVGProps<SVGSVGElement>>;
   identifier: string;
   label: string;
+  disabled?: boolean;
+  /** id of the element describing the action, e.g. why it is disabled */
+  descriptionId?: string;
 }
 
 interface PanelActionsProps {
@@ -33,10 +36,17 @@ interface PanelActionsProps {
 }
 
 export const PanelActions = ({items}: PanelActionsProps): JSX.Element[] => {
-  return items.map(({click, identifier, Icon, label}) => {
+  return items.map(({click, identifier, Icon, label, disabled, descriptionId}) => {
     return (
       <li key={identifier}>
-        <button className="panel__action-item" onClick={click} data-uie-name={identifier} type="button">
+        <button
+          className="panel__action-item"
+          onClick={click}
+          data-uie-name={identifier}
+          type="button"
+          disabled={disabled}
+          aria-describedby={descriptionId}
+        >
           <span className="panel__action-item__icon">
             <Icon />
           </span>

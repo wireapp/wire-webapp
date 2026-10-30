@@ -2268,6 +2268,8 @@
   "userNotFoundMessage": "You may not have permission with this account or the person may not be on {brandName}.",
   "userNotFoundTitle": "{brandName} can’t find this person.",
   "userNotVerified": "Get certainty about {user}’s identity before connecting.",
+  "userOnboardingPending": "Onboarding pending",
+  "userOnboardingPendingStartConversationInfo": "You can start a conversation with this team member once they are fully onboarded.",
   "userProfileButtonConnect": "Connect",
   "userProfileButtonIgnore": "Ignore",
   "userProfileButtonUnblock": "Unblock",

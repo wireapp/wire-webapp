@@ -108,6 +108,8 @@ export class User {
   public readonly isRequest: ko.PureComputed<boolean>;
   /** @deprecated use teamState.isInTeam method instead */
   public readonly isTeamMember: ko.Observable<boolean> = ko.observable(false);
+  /** The user exists but cannot be contacted yet because they have not finished onboarding */
+  public readonly isPendingOnboarding: ko.Observable<boolean> = ko.observable(false);
   public readonly isTemporaryGuest: ko.Observable<boolean>;
   public readonly isUnknown: ko.PureComputed<boolean>;
   public readonly managedBy: ko.Observable<string>;

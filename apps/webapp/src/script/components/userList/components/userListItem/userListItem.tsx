@@ -48,6 +48,7 @@ export interface UserListItemProps {
   onKeyDown: (user: User, event: KeyboardEvent) => void;
   user: User;
   showArrow: boolean;
+  showPendingOnboarding?: boolean;
 }
 
 export const UserListItem: FunctionComponent<UserListItemProps> = ({
@@ -61,6 +62,7 @@ export const UserListItem: FunctionComponent<UserListItemProps> = ({
   mode = UserlistMode.DEFAULT,
   noInteraction,
   noUnderline = false,
+  showPendingOnboarding = false,
   user,
   onClick,
   onKeyDown,
@@ -68,7 +70,12 @@ export const UserListItem: FunctionComponent<UserListItemProps> = ({
   const {translate} = useApplicationContext();
   const checkboxId = useId();
 
-  const {isDirectGuest, expirationText} = useKoSubscribableChildren(user, ['isDirectGuest', 'expirationText']);
+  const {isDirectGuest, expirationText, isPendingOnboarding} = useKoSubscribableChildren(user, [
+    'isDirectGuest',
+    'expirationText',
+    'isPendingOnboarding',
+  ]);
+  const isPendingOnboardingShown = showPendingOnboarding && isPendingOnboarding;
 
   const {isMe: isSelf, isFederated} = user;
   const isTemporaryGuest = user.isTemporaryGuest();
@@ -92,6 +99,9 @@ export const UserListItem: FunctionComponent<UserListItemProps> = ({
 
     if (isTemporaryGuest) {
       return expirationText;
+    }
+    if (isPendingOnboardingShown) {
+      return translate('userOnboardingPending');
     }
     if (!isAvailable) {
       return user.domain;
@@ -119,6 +129,7 @@ export const UserListItem: FunctionComponent<UserListItemProps> = ({
           guest: !isOthersMode && isDirectGuest && !isFederated,
           federated: isFederated,
           external,
+          pendingOnboarding: isPendingOnboardingShown,
         }}
       />
     </div>

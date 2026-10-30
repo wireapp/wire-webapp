@@ -383,6 +383,7 @@ export const PeopleTab: FunctionComponent<PeopleTabProps> = ({
                 mode={UserlistMode.COMPACT}
                 users={results.contacts}
                 selfUser={selfUser}
+                showPendingOnboarding
               />
             </div>
           </div>
