@@ -138,7 +138,7 @@ function ConversationContent({
   const isVirtualizedMessagesListEnabled = CONFIG.FEATURE.ENABLE_VIRTUALIZED_MESSAGES_LIST;
 
   const mainViewModel = useMainViewModel();
-  const {fireAndForgetInvoker, translate} = useApplicationContext();
+  const {fireAndForgetInvoker, translate, clock} = useApplicationContext();
   const {content: contentViewModel} = mainViewModel;
   const {conversationRepository, repositories} = contentViewModel;
   const sharedDriveUploadController = useMemo(() => {
@@ -196,7 +196,10 @@ function ConversationContent({
 
   const [activeTabIndex, setActiveTabIndex] = useState(0);
 
-  const {addReadReceiptToBatch, cancelPendingReadReceiptsForConversation} = useReadReceiptSender(repositories.message);
+  const {addReadReceiptToBatch, cancelPendingReadReceiptsForConversation} = useReadReceiptSender({
+    messageSender: repositories.message,
+    clock,
+  });
 
   useEffect(() => {
     if (!isVirtualizedMessagesListEnabled) {

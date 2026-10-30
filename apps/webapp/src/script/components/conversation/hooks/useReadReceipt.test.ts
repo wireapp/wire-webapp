@@ -18,6 +18,7 @@
  */
 
 import {renderHook} from '@testing-library/react';
+import {createDeterministicClock, type DeterministicClock} from '@enormora/clock/deterministic-clock';
 
 import {Conversation} from 'Repositories/entity/Conversation';
 import {Message} from 'Repositories/entity/message/message';
@@ -28,22 +29,17 @@ import {useReadReceiptSender} from './useReadReceipt';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 describe('useReadReceipt', () => {
-  function withFakeTimers(testName: string, testBody: () => void): void {
+  function withDeterministicClock(testName: string, testBody: (clock: DeterministicClock) => void): void {
     it(testName, () => {
-      jest.useFakeTimers();
-
-      try {
-        testBody();
-      } finally {
-        jest.useRealTimers();
-      }
+      const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+      testBody(clock);
     });
   }
 
-  withFakeTimers('batches the read receipt sending per conversation', () => {
+  withDeterministicClock('batches the read receipt sending per conversation', clock => {
     const sendReadReceipt = jest.fn();
     const {result} = renderHook(() => {
-      return useReadReceiptSender({sendReadReceipt});
+      return useReadReceiptSender({messageSender: {sendReadReceipt}, clock});
     });
     const conversation1 = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     const conversation2 = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
@@ -63,19 +59,45 @@ describe('useReadReceipt', () => {
     });
 
     expect(sendReadReceipt).not.toHaveBeenCalled();
-    jest.runAllTimers();
+    clock.advanceByMilliseconds(499);
+    expect(sendReadReceipt).not.toHaveBeenCalled();
+    clock.advanceByMilliseconds(1);
     expect(sendReadReceipt).toHaveBeenCalledTimes(2);
 
     result.current.addReadReceiptToBatch(conversation1, new Message(createUuid(), undefined, translateForTest));
     expect(sendReadReceipt).toHaveBeenCalledTimes(2);
-    jest.runAllTimers();
+    clock.advanceByMilliseconds(500);
     expect(sendReadReceipt).toHaveBeenCalledTimes(3);
   });
 
-  withFakeTimers('batches the read receipt sending per sender', () => {
+  withDeterministicClock('resets the batching period when another receipt is added', clock => {
     const sendReadReceipt = jest.fn();
     const {result} = renderHook(() => {
-      return useReadReceiptSender({sendReadReceipt});
+      return useReadReceiptSender({messageSender: {sendReadReceipt}, clock});
+    });
+    const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    const sender = createUuid();
+    const firstMessage = new Message(createUuid(), undefined, translateForTest);
+    const secondMessage = new Message(createUuid(), undefined, translateForTest);
+    firstMessage.from = sender;
+    secondMessage.from = sender;
+
+    result.current.addReadReceiptToBatch(conversation, firstMessage);
+    clock.advanceByMilliseconds(300);
+    result.current.addReadReceiptToBatch(conversation, secondMessage);
+
+    clock.advanceByMilliseconds(499);
+    expect(sendReadReceipt).not.toHaveBeenCalled();
+    clock.advanceByMilliseconds(1);
+
+    expect(sendReadReceipt).toHaveBeenCalledTimes(1);
+    expect(sendReadReceipt).toHaveBeenCalledWith(conversation, firstMessage, [secondMessage]);
+  });
+
+  withDeterministicClock('batches the read receipt sending per sender', clock => {
+    const sendReadReceipt = jest.fn();
+    const {result} = renderHook(() => {
+      return useReadReceiptSender({messageSender: {sendReadReceipt}, clock});
     });
     const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
@@ -96,14 +118,14 @@ describe('useReadReceipt', () => {
     });
 
     expect(sendReadReceipt).not.toHaveBeenCalled();
-    jest.runAllTimers();
+    clock.advanceByMilliseconds(500);
     expect(sendReadReceipt).toHaveBeenCalledTimes(2);
   });
 
-  withFakeTimers('does not add the same message multiple times', () => {
+  withDeterministicClock('does not add the same message multiple times', clock => {
     const sendReadReceipt = jest.fn();
     const {result} = renderHook(() => {
-      return useReadReceiptSender({sendReadReceipt});
+      return useReadReceiptSender({messageSender: {sendReadReceipt}, clock});
     });
     const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
@@ -122,15 +144,15 @@ describe('useReadReceipt', () => {
     });
 
     expect(sendReadReceipt).not.toHaveBeenCalled();
-    jest.runAllTimers();
+    clock.advanceByMilliseconds(500);
     expect(sendReadReceipt).toHaveBeenCalledTimes(1);
     expect(sendReadReceipt).toHaveBeenCalledWith(conversation, message, []);
   });
 
-  withFakeTimers('cancels a queued receipt when its conversation is marked unread', () => {
+  withDeterministicClock('cancels a queued receipt when its conversation is marked unread', clock => {
     const sendReadReceipt = jest.fn();
     const {result} = renderHook(() => {
-      return useReadReceiptSender({sendReadReceipt});
+      return useReadReceiptSender({messageSender: {sendReadReceipt}, clock});
     });
     const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     const message = new Message(createUuid(), undefined, translateForTest);
@@ -139,15 +161,15 @@ describe('useReadReceipt', () => {
     result.current.cancelPendingReadReceiptsForConversation(conversation);
     conversation.markUnreadFrom(message);
 
-    jest.advanceTimersByTime(500);
+    clock.advanceByMilliseconds(500);
 
     expect(sendReadReceipt).not.toHaveBeenCalled();
   });
 
-  withFakeTimers('keeps queued receipts for other conversations when one is marked unread', () => {
+  withDeterministicClock('keeps queued receipts for other conversations when one is marked unread', clock => {
     const sendReadReceipt = jest.fn();
     const {result} = renderHook(() => {
-      return useReadReceiptSender({sendReadReceipt});
+      return useReadReceiptSender({messageSender: {sendReadReceipt}, clock});
     });
     const conversationId = createUuid();
     const conversationA = new Conversation(
@@ -177,35 +199,38 @@ describe('useReadReceipt', () => {
     result.current.addReadReceiptToBatch(conversationB, messageB2);
     result.current.cancelPendingReadReceiptsForConversation(conversationA);
 
-    jest.advanceTimersByTime(500);
+    clock.advanceByMilliseconds(500);
 
     expect(sendReadReceipt).toHaveBeenCalledTimes(1);
     expect(sendReadReceipt).toHaveBeenCalledWith(conversationB, messageB1, [messageB2]);
   });
 
-  withFakeTimers('does not send a canceled receipt after leaving the conversation resets auto-read suppression', () => {
+  withDeterministicClock(
+    'does not send a canceled receipt after leaving the conversation resets auto-read suppression',
+    clock => {
+      const sendReadReceipt = jest.fn();
+      const {result} = renderHook(() => {
+        return useReadReceiptSender({messageSender: {sendReadReceipt}, clock});
+      });
+      const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+      const message = new Message(createUuid(), undefined, translateForTest);
+
+      result.current.addReadReceiptToBatch(conversation, message);
+      result.current.cancelPendingReadReceiptsForConversation(conversation);
+      conversation.markUnreadFrom(message);
+      conversation.release();
+
+      clock.advanceByMilliseconds(500);
+
+      expect(conversation.isAutoReadSuppressed()).toBe(false);
+      expect(sendReadReceipt).not.toHaveBeenCalled();
+    },
+  );
+
+  withDeterministicClock('sends newly queued receipts after normal reading resumes', clock => {
     const sendReadReceipt = jest.fn();
     const {result} = renderHook(() => {
-      return useReadReceiptSender({sendReadReceipt});
-    });
-    const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
-    const message = new Message(createUuid(), undefined, translateForTest);
-
-    result.current.addReadReceiptToBatch(conversation, message);
-    result.current.cancelPendingReadReceiptsForConversation(conversation);
-    conversation.markUnreadFrom(message);
-    conversation.release();
-
-    jest.advanceTimersByTime(500);
-
-    expect(conversation.isAutoReadSuppressed()).toBe(false);
-    expect(sendReadReceipt).not.toHaveBeenCalled();
-  });
-
-  withFakeTimers('sends newly queued receipts after normal reading resumes', () => {
-    const sendReadReceipt = jest.fn();
-    const {result} = renderHook(() => {
-      return useReadReceiptSender({sendReadReceipt});
+      return useReadReceiptSender({messageSender: {sendReadReceipt}, clock});
     });
     const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     const unreadMessage = new Message(createUuid(), undefined, translateForTest);
@@ -218,23 +243,23 @@ describe('useReadReceipt', () => {
     conversation.clearManualUnreadMarker();
     result.current.addReadReceiptToBatch(conversation, newlyReadMessage);
 
-    jest.advanceTimersByTime(500);
+    clock.advanceByMilliseconds(500);
 
     expect(sendReadReceipt).toHaveBeenCalledTimes(1);
     expect(sendReadReceipt).toHaveBeenCalledWith(conversation, newlyReadMessage, []);
   });
 
-  withFakeTimers('sends queued receipts normally when unread cancellation is not used', () => {
+  withDeterministicClock('sends queued receipts normally when unread cancellation is not used', clock => {
     const sendReadReceipt = jest.fn();
     const {result} = renderHook(() => {
-      return useReadReceiptSender({sendReadReceipt});
+      return useReadReceiptSender({messageSender: {sendReadReceipt}, clock});
     });
     const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     const message = new Message(createUuid(), undefined, translateForTest);
 
     result.current.addReadReceiptToBatch(conversation, message);
 
-    jest.advanceTimersByTime(500);
+    clock.advanceByMilliseconds(500);
 
     expect(sendReadReceipt).toHaveBeenCalledWith(conversation, message, []);
   });
