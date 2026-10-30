@@ -107,7 +107,6 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {UserFilter} from 'Repositories/user/userFilter';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {getNextItem} from 'Util/arrayUtil';
 import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/fileTypeUtil';
 import {type Translate} from 'Util/localizerUtil';
@@ -183,6 +182,7 @@ import {SystemMessageType} from '../../message/systemMessageType';
 import {ensureMLSGroupIsEstablished, initMLSGroupConversation} from '../../mls';
 import {Core} from '../../service/coreSingleton';
 import {ServerTimeHandler} from '../../time/serverTimeHandler';
+import {WebAppEvents} from '../../webAppEvents';
 
 export type ConversationRepositoryOptions = {
   readonly isMarkAsUnreadFeatureEnabled: boolean;

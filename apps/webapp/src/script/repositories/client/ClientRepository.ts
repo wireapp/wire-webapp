@@ -34,7 +34,6 @@ import type {CryptographyRepository} from 'Repositories/cryptography/Cryptograph
 import {User} from 'Repositories/entity/User';
 import {ClientRecord} from 'Repositories/storage';
 import {StorageKey} from 'Repositories/storage/storageKey';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {matchQualifiedIds} from 'Util/qualifiedId';
@@ -52,6 +51,7 @@ import {isClientMLSCapable, wasClientActiveWithinLast4Weeks} from './ClientUtils
 import {SIGN_OUT_REASON} from '../../auth/signOutReason';
 import {ClientError} from '../../error/clientError';
 import {Core} from '../../service/coreSingleton';
+import {WebAppEvents} from '../../webAppEvents';
 
 const loginHashSeed = 42;
 

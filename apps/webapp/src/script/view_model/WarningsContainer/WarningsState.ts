@@ -23,13 +23,13 @@ import {create} from 'zustand';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {AppPermissionState} from 'Repositories/notification/AppPermissionState';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import type {Substitutions, TranslationKey} from 'Util/localizerUtil';
 import {safeWindowOpen} from 'Util/sanitizationUtil';
 
 import {TYPE} from './WarningsTypes';
 
 import {Config} from '../../Config';
+import {WebAppEvents} from '../../webAppEvents';
 
 type WarningsState = {
   name: string;

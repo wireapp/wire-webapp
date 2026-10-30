@@ -25,9 +25,9 @@ import {container} from 'tsyringe';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {UserState} from 'Repositories/user/userState';
 import {VerificationMessageType} from 'src/script/message/verificationMessageType';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {getLogger, Logger} from 'Util/logger';
 
+import {WebAppEvents} from '../../../../webAppEvents';
 import {isMixedConversation, isProteusConversation} from '../../ConversationSelectors';
 import {ConversationState} from '../../ConversationState';
 import {ConversationVerificationState} from '../../ConversationVerificationState';

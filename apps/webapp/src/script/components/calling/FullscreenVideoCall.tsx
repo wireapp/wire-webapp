@@ -59,7 +59,6 @@ import {useActiveWindowMatchMedia} from 'src/script/hooks/useActiveWindowMatchMe
 import {useToggleState} from 'src/script/hooks/useToggleState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CallViewTab} from 'src/script/view_model/CallingViewModel';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
 import {handleKeyDown, isTabKey, KEY} from 'Util/keyboardUtil';
@@ -83,6 +82,7 @@ import {VideoControls} from './VideoControls/VideoControls';
 
 import {useWarningsState} from '../../view_model/WarningsContainer/WarningsState';
 import {CONFIG, TYPE} from '../../view_model/WarningsContainer/WarningsTypes';
+import {WebAppEvents} from '../../webAppEvents';
 
 export interface FullscreenVideoCallProps {
   activeCallViewTab: string;

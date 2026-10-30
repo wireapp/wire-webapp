@@ -32,7 +32,6 @@ import {generatePermissionHelpers} from 'Repositories/user/userPermission';
 import {useConversationSearch} from 'src/script/page/leftSidebar/panels/conversations/hooks/useConversationSearch';
 import {SidebarTabs} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {handleEnterDown, handleEscDown, isTabKey} from 'Util/keyboardUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
@@ -48,6 +47,8 @@ import {
   searchInputStyles,
   searchInputWrapperStyles,
 } from './conversationHeader.styles';
+
+import {WebAppEvents} from '../../../../../webAppEvents';
 
 export const conversationsPanelHeadingId = 'conversations-heading';
 

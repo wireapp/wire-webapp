@@ -31,7 +31,6 @@ import {Multipart} from 'Repositories/entity/message/multipart';
 import {Text} from 'Repositories/entity/message/text';
 import {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {includesOnlyEmojis} from 'Util/emojiUtil';
 import {type Translate} from 'Util/localizerUtil';
@@ -48,6 +47,7 @@ import {VideoAsset} from './asset/videoAsset/videoAsset';
 import {MessageActions} from '..';
 import {ConversationError} from '../../../../error/conversationError';
 import {QuoteEntity} from '../../../../message/quoteEntity';
+import {WebAppEvents} from '../../../../webAppEvents';
 import {useMessageFocusedTabIndex} from '../util';
 
 function createPlaceholderMessage(translate: Translate): ContentMessage {

@@ -20,10 +20,11 @@
 import {isNan, isUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {Logger, getLogger} from 'Util/logger';
 
 import {AppInitStatisticsValue} from './AppInitStatisticsValue';
+
+import {WebAppEvents} from '../../webAppEvents';
 
 export type AppStatistics = Partial<Record<AppInitStatisticsValue, string | number>>;
 type AppInitStatisticsConfig = {LOG_LENGTH_KEY: number; LOG_LENGTH_VALUE: number};

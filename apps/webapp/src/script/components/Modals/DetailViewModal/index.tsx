@@ -32,7 +32,6 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {MediumImage} from 'Repositories/entity/message/mediumImage';
 import {User} from 'Repositories/entity/User';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import type {Translate} from 'Util/localizerUtil';
 import {renderElement} from 'Util/renderElement';
@@ -45,6 +44,7 @@ import {DetailViewModalHeader} from './DetailViewModalHeader';
 import {isContentMessage} from '../../../guards/Message';
 import {MessageCategory} from '../../../message/messageCategory';
 import {isOfCategory} from '../../../page/mainContent/panels/collection/utils';
+import {WebAppEvents} from '../../../webAppEvents';
 
 const detailModalScrollDelayInMilliseconds = 150;
 

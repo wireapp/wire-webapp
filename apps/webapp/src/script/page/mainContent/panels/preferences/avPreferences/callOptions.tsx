@@ -28,10 +28,10 @@ import type {MediaConstraintsHandler} from 'Repositories/media/MediaConstraintsH
 import type {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {getLogger} from 'Util/logger';
 
 import {Config} from '../../../../../Config';
+import {WebAppEvents} from '../../../../../webAppEvents';
 import {PreferencesSection} from '../components/preferencesSection';
 
 const logger = getLogger('CallOptions');

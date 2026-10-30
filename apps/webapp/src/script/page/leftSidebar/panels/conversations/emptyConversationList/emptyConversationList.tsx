@@ -25,11 +25,11 @@ import {amplify} from 'amplify';
 import {Button, ButtonVariant, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {WebAppEvents} from 'src/script/webAppEvents';
 
 import {button, paragraph, paragraphBold, paragraphGray, seperator, wrapper} from './emptyConversationList.styles';
 
 import {Config} from '../../../../../Config';
+import {WebAppEvents} from '../../../../../webAppEvents';
 import {SidebarTabs} from '../useSidebarStore';
 
 interface EmptyConversationListProps {

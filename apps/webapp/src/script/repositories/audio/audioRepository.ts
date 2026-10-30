@@ -24,11 +24,12 @@ import {noop} from 'noop-esm';
 
 import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
 import {mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {getLogger, Logger} from 'Util/logger';
 
 import {AudioPlayingType} from './audioPlayingType';
 import {AudioType} from './audioType';
+
+import {WebAppEvents} from '../../webAppEvents';
 
 /* eslint-disable @typescript-eslint/no-magic-numbers -- Playback outcomes define their existing numeric values inline. */
 enum AUDIO_PLAY_PERMISSION {

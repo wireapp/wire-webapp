@@ -29,8 +29,9 @@ import {
   PrimaryModalType,
 } from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 import {Config} from 'src/script/Config';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import type {Translate, TranslationKey} from 'Util/localizerUtil';
+
+import {WebAppEvents} from '../../webAppEvents';
 
 const hideSecondaryBtn = {hideSecondary: true};
 const hideCloseBtn = {hideCloseBtn: true, preventClose: true};

@@ -23,7 +23,8 @@ import {isUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
 import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {WebAppEvents} from 'src/script/webAppEvents';
+
+import {WebAppEvents} from '../../../../webAppEvents';
 
 type UseMessageEditingResult = {
   editedMessage: ContentMessage | undefined;

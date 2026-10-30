@@ -91,7 +91,6 @@ import {Segmentation} from 'Repositories/tracking/segmentation';
 import {protoFromType} from 'Repositories/user/availabilityMapper';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {
   cancelSendingLinkPreview,
   clearLinkPreviewSendingState,
@@ -126,6 +125,7 @@ import {QuoteEntity} from '../../message/quoteEntity';
 import {StatusType} from '../../message/statusType';
 import {Core} from '../../service/coreSingleton';
 import {ServerTimeHandler} from '../../time/serverTimeHandler';
+import {WebAppEvents} from '../../webAppEvents';
 
 type OptimisticMessageEvent = Parameters<EventRepository['injectEvent']>[0];
 

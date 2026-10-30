@@ -26,7 +26,7 @@ import {amplify} from 'amplify';
 
 import {Account} from '@wireapp/core';
 import {Confirmation, GenericMessage, LegalHoldStatus} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from 'src/script/webAppEvents';
+import {WebAppEvents} from '../../webAppEvents';
 
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {AudioRepository} from 'Repositories/audio/audioRepository';

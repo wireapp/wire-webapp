@@ -40,7 +40,6 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
@@ -48,6 +47,7 @@ import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 import {ConversationDetailsOption} from './conversationDetailsOption';
 
 import {ActionsViewModel} from '../../../../../view_model/ActionsViewModel';
+import {WebAppEvents} from '../../../../../webAppEvents';
 import {PanelEntity, PanelState} from '../../../rightSidebar';
 import {getConversationActions} from '../../utils/getConversationActions';
 import {ConversationDetailsBottomActions} from '../conversationDetailsBottomActions';

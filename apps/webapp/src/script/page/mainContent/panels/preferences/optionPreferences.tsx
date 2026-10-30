@@ -31,13 +31,14 @@ import {PropertiesRepository} from 'Repositories/properties/propertiesRepository
 import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
 import type {Translate} from 'Util/localizerUtil/translationTypes';
 
 import {PreferencesPage} from './components/preferencesPage';
 import {PreferencesSection} from './components/preferencesSection';
+
+import {WebAppEvents} from '../../../../webAppEvents';
 
 interface OptionPreferencesProps {
   propertiesRepository: PropertiesRepository;

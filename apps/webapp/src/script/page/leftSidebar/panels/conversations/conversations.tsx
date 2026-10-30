@@ -57,7 +57,6 @@ import {ANIMATED_PAGE_TRANSITION_DURATION} from 'src/script/page/mainContent';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {ContentState, ListState, useAppState} from 'src/script/page/useAppState';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 import {useMeetingsFeatureFlag} from 'Util/useMeetingsFeatureFlag';
@@ -88,6 +87,7 @@ import {generateConversationUrl} from '../../../../router/routeGenerator';
 import {setHistoryParam} from '../../../../router/Router';
 import {createNavigateKeyboard} from '../../../../router/routerBindings';
 import {ListViewModel} from '../../../../view_model/ListViewModel';
+import {WebAppEvents} from '../../../../webAppEvents';
 import {ListWrapper} from '../listWrapper';
 import {StartUI} from '../startUi';
 

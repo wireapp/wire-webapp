@@ -39,11 +39,11 @@ import {ClientEvent} from 'Repositories/event/Client';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
+import {WebAppEvents} from '../../../webAppEvents';
 import {PanelHeader} from '../panelHeader';
 import {PanelEntity} from '../rightSidebar';
 

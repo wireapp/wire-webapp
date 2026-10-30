@@ -29,7 +29,8 @@ import {GifImage} from 'Components/giphy/gifImage';
 import * as Icon from 'Components/icon';
 import {Gif, GiphyRepository} from 'Repositories/extension/GiphyRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {WebAppEvents} from 'src/script/webAppEvents';
+
+import {WebAppEvents} from '../../webAppEvents';
 
 const GIPHY_CLOSE_TIMEOUT = 350;
 

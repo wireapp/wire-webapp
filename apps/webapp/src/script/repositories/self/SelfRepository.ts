@@ -35,7 +35,6 @@ import {
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {Logger, getLogger} from 'Util/logger';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
@@ -43,6 +42,7 @@ import {SelfService} from './SelfService';
 import {evaluateSelfSupportedProtocols} from './SelfSupportedProtocols/SelfSupportedProtocols';
 
 import {Core} from '../../service/coreSingleton';
+import {WebAppEvents} from '../../webAppEvents';
 
 type Events = {selfSupportedProtocolsUpdated: CONVERSATION_PROTOCOL[]};
 

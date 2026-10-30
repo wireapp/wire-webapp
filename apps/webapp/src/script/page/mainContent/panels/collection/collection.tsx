@@ -38,7 +38,6 @@ import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate} from 'src/script/router/routerBindings';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {CollectionDetails} from './collectionDetails';
@@ -47,6 +46,7 @@ import {FullSearch} from './fullSearch';
 import {Category, isOfCategory} from './utils';
 
 import {MessageCategory} from '../../../../message/messageCategory';
+import {WebAppEvents} from '../../../../webAppEvents';
 
 type CollectionProps = {
   conversation: Conversation;

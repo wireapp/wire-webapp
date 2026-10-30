@@ -49,7 +49,6 @@ import {ROLE, ROLE as TEAM_ROLE, roleFromTeamPermissions} from 'Repositories/use
 import {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
 import {Config} from 'src/script/Config';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {Environment} from 'Util/environment';
 import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
@@ -65,6 +64,7 @@ import {TeamState} from './TeamState';
 import {scheduleRecurringTask, updateRemoteConfigLogger} from '../../lifecycle/updateRemoteConfigs';
 import {getMLSMigrationStatus, MLSMigrationStatus} from '../../mls/MLSMigration/migrationStatus';
 import {APIClient} from '../../service/apiClientSingleton';
+import {WebAppEvents} from '../../webAppEvents';
 
 const teamRefreshIntervalInMinutes = 5;
 const minimumDesktopDownloadPathMinorVersion = 20;

@@ -6,7 +6,7 @@ import {act, getByRole} from '@testing-library/react';
 import {UserState} from 'Repositories/user/userState';
 import {User} from 'Repositories/entity/User';
 import {amplify} from 'amplify';
-import {WebAppEvents} from 'src/script/webAppEvents';
+import {WebAppEvents} from '../../../webAppEvents';
 import {mountComponent} from '../../../auth/util/test/testUtil';
 import {mockStoreFactory} from '../../../auth/util/test/mockStoreFactory';
 import {initialRootState} from '../../../auth/module/reducer';

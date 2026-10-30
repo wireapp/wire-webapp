@@ -37,7 +37,6 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {markAsUnreadFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {QuoteEntity} from 'src/script/message/quoteEntity';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {CallMessage} from './callMessage';
@@ -56,6 +55,7 @@ import {SystemMessage} from './systemMessage';
 import {VerificationMessage} from './verificationMessage';
 
 import {ContextMenuEntry} from '../../../ui/contextMenu';
+import {WebAppEvents} from '../../../webAppEvents';
 
 import {MessageParams} from './index';
 

@@ -29,7 +29,6 @@ import {StorageKey} from 'Repositories/storage/storageKey';
 import type {StorageRepository} from 'Repositories/storage/storageRepository';
 import type {UserRepository} from 'Repositories/user/userRepository';
 import {replaceBrowserLocation} from 'src/script/navigation/browserLocation';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {getLogger, Logger} from 'Util/logger';
 import {includesString} from 'Util/stringUtil';
 import {appendParameter} from 'Util/urlUtil';
@@ -40,6 +39,7 @@ import {BaseError} from '../../error/baseError';
 import {ClientError} from '../../error/clientError';
 import {externalUrl} from '../../externalRoute';
 import type {Core} from '../../service/coreSingleton';
+import {WebAppEvents} from '../../webAppEvents';
 
 const LogoutConfig = {
   LOGIN_REDIRECT_STORAGE_KEY: 'LOGIN_REDIRECT_KEY',

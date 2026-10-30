@@ -26,10 +26,10 @@ import {ConversationRepository} from 'Repositories/conversation/ConversationRepo
 import {Conversation} from 'Repositories/entity/Conversation';
 import * as UserPermission from 'Repositories/user/userPermission';
 import type {RootContextValue} from 'src/script/page/rootProvider';
-import {WebAppEvents} from 'src/script/webAppEvents';
 
 import {Config} from '../../../../Config';
 import {ActionsViewModel} from '../../../../view_model/ActionsViewModel';
+import {WebAppEvents} from '../../../../webAppEvents';
 
 interface GetConversationActionsParams {
   conversationEntity: Conversation;

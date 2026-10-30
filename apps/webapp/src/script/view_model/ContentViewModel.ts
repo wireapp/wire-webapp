@@ -33,7 +33,6 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import type {Message} from 'Repositories/entity/message/message';
 import type {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {isConversationEntity} from 'Util/typePredicateUtil';
@@ -54,6 +53,7 @@ import {useAppMainState} from '../page/state';
 import {ContentState, useAppState} from '../page/useAppState';
 import {generateConversationUrl} from '../router/routeGenerator';
 import {navigate, setHistoryParam} from '../router/Router';
+import {WebAppEvents} from '../webAppEvents';
 
 interface ShowConversationOptions {
   exposeMessage?: Message;

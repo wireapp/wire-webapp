@@ -19,7 +19,7 @@
 
 import {amplify} from 'amplify';
 
-import {WebAppEvents} from 'src/script/webAppEvents';
+import {WebAppEvents} from '../../webAppEvents';
 
 import {useTypingIndicatorState} from 'Components/inputBar/typingIndicator';
 import {CacheRepository} from 'Repositories/cache/cacheRepository';

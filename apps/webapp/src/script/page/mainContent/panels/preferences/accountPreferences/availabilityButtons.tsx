@@ -26,10 +26,10 @@ import cx from 'classnames';
 import {Availability} from '@wireapp/protocol-messaging';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {availabilityStatus} from 'Util/availabilityStatus';
 
 import {ContextMenuEntry} from '../../../../../ui/contextMenu';
+import {WebAppEvents} from '../../../../../webAppEvents';
 
 interface AvailabilityInputProps {
   availability: Availability.Type;

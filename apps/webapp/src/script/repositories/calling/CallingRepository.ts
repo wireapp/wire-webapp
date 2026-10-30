@@ -96,7 +96,6 @@ import * as trackingHelpers from 'Repositories/tracking/helpers';
 import {Segmentation} from 'Repositories/tracking/segmentation';
 import {isTelemetryEnabledAtCurrentEnvironment} from 'Repositories/tracking/telemetry.helpers';
 import type {UserRepository} from 'Repositories/user/userRepository';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {flatten} from 'Util/arrayUtil';
 import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
@@ -126,6 +125,7 @@ import {APIClient} from '../../service/apiClientSingleton';
 import {Core} from '../../service/coreSingleton';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
 import {Warnings} from '../../view_model/WarningsContainer';
+import {WebAppEvents} from '../../webAppEvents';
 
 type DetachedExternalLinksCleanup = () => void;
 type CallingRepositoryConfig = {

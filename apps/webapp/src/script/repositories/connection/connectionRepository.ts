@@ -36,7 +36,6 @@ import {SelfService} from 'Repositories/self/SelfService';
 import {TeamService} from 'Repositories/team/TeamService';
 import type {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {matchQualifiedIds} from 'Util/qualifiedId';
@@ -50,6 +49,7 @@ import {ConnectionState} from './connectionState';
 
 import {Config} from '../../Config';
 import {SystemMessageType} from '../../message/systemMessageType';
+import {WebAppEvents} from '../../webAppEvents';
 
 type ConnectionRequestResult = {connectionStatus: ConnectionStatus; conversationId: QualifiedId};
 type ConnectionsResult = {connections: ConnectionEntity[]; deadConnections: ConnectionEntity[]};

@@ -31,7 +31,6 @@ import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {EventRepository} from 'Repositories/event/EventRepository';
 import {StorageRepository} from 'Repositories/storage';
 import type {RootContextValue} from 'src/script/page/rootProvider';
-import {WebAppEvents} from 'src/script/webAppEvents';
 
 import {useDraftState} from './useDraftState/useDraftState';
 import {useMessageEditing} from './useMessageEditing/useMessageEditing';
@@ -39,6 +38,7 @@ import {useMessageReply} from './useMessageReply/useMessageReply';
 import {useMessageSend} from './useMessageSend/useMessageSend';
 import {useOutsideInputClick} from './useOutsideInputClick/useOutsideInputClick';
 
+import {WebAppEvents} from '../../../webAppEvents';
 import type {DraftState} from '../common/draftState/draftState';
 import {MessageContent} from '../common/messageContent/messageContent';
 

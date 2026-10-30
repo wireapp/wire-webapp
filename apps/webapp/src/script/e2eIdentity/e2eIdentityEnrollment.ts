@@ -30,7 +30,6 @@ import {TypedEventEmitter} from '@wireapp/commons';
 import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
 import {UserState} from 'Repositories/user/userState';
 import {Core} from 'src/script/service/coreSingleton';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {translate} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 import {formatDelayTime, TIME_IN_MILLIS} from 'Util/timeUtil';
@@ -47,6 +46,8 @@ import {getEnrollmentTimer, getRemainingGracePeriodDelay, hasGracePeriodStartedF
 import {getModalOptions, ModalType} from './modals';
 import {OIDCService} from './oidcService';
 import {OIDCServiceStore} from './oidcService/oidcServiceStorage';
+
+import {WebAppEvents} from '../webAppEvents';
 
 const enrollmentProgressPollingIntervalInSeconds = 10;
 type EnrollmentStore = ReturnType<typeof getEnrollmentStore>;

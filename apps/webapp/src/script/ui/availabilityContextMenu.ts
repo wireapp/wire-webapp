@@ -21,9 +21,9 @@ import {amplify} from 'amplify';
 
 import {Availability} from '@wireapp/protocol-messaging';
 
-import {WebAppEvents} from 'src/script/webAppEvents';
-
 import {ContextMenuEntry, showContextMenu} from './contextMenu';
+
+import {WebAppEvents} from '../webAppEvents';
 
 type AvailabilityLabels = {
   readonly none: string;

@@ -34,7 +34,6 @@ import {isTelemetryEnabledAtCurrentEnvironment} from 'Repositories/tracking/tele
 import {ConsentValue} from 'Repositories/user/consentValue';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from 'Repositories/user/typingIndicatorMode';
 import {Config} from 'src/script/Config';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {Environment} from 'Util/environment';
 import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
@@ -42,6 +41,8 @@ import {loadValue} from 'Util/storageUtil';
 
 import type {PropertiesService} from './propertiesService';
 import {PROPERTIES_TYPE, UserConsentStatus} from './propertiesType';
+
+import {WebAppEvents} from '../../webAppEvents';
 
 const mergeWebappProperties = createDeepmerge();
 const nestedPreferencePathDepth = 2;

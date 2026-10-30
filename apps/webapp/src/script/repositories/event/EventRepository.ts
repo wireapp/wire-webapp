@@ -41,7 +41,6 @@ import {ClientConversationEvent, EventBuilder} from 'Repositories/conversation/E
 import {CryptographyMapper} from 'Repositories/cryptography/CryptographyMapper';
 import {EventName} from 'Repositories/tracking/eventName';
 import {UserState} from 'Repositories/user/userState';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {getLogger, Logger} from 'Util/logger';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 import {toError} from 'Util/toError';
@@ -62,6 +61,7 @@ import {CryptographyError} from '../../error/cryptographyError';
 import {EventError} from '../../error/eventError';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
 import {Warnings} from '../../view_model/WarningsContainer';
+import {WebAppEvents} from '../../webAppEvents';
 
 const callEventLifetimeInSeconds = 30;
 const heartbeatIntervalInSeconds = 30;

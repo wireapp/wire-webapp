@@ -20,7 +20,7 @@
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {FEATURE_STATUS, type FeatureList} from '@wireapp/api-client/lib/team/feature/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
-import {WebAppEvents} from 'src/script/webAppEvents';
+import {WebAppEvents} from '../../../webAppEvents';
 import {
   act,
   render,

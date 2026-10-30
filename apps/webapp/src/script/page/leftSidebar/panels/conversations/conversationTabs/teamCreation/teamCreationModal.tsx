@@ -26,7 +26,6 @@ import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {EventName} from 'Repositories/tracking/eventName';
 import {Segmentation} from 'Repositories/tracking/segmentation';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {WebAppEvents} from 'src/script/webAppEvents';
 
 import {teamCreationModalBodyCss, teamCreationModalWrapperCss} from './teamCreation.styles';
 import {Confirmation} from './teamCreationSteps/confirmation';
@@ -34,6 +33,8 @@ import {Form} from './teamCreationSteps/form';
 import {Introduction} from './teamCreationSteps/introduction';
 import {Success} from './teamCreationSteps/success';
 import {useTeamCreationModal} from './useTeamCreationModal';
+
+import {WebAppEvents} from '../../../../../../webAppEvents';
 
 enum Step {
   Introduction = 'Introduction',

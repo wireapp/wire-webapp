@@ -33,10 +33,10 @@ import {
 } from 'Repositories/notification/PreferenceNotificationRepository';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {WebAppEvents} from 'src/script/webAppEvents';
 
 import {ListWrapper} from './listWrapper';
 
+import {WebAppEvents} from '../../../webAppEvents';
 import {ContentState, useAppState} from '../../useAppState';
 
 type PreferencesProps = {

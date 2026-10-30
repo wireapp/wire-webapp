@@ -34,12 +34,12 @@ import {EventName} from 'Repositories/tracking/eventName';
 import {Segmentation} from 'Repositories/tracking/segmentation';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {ContentState} from 'src/script/page/useAppState';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {getLogger} from 'Util/logger';
 import {getCurrentDate} from 'Util/timeUtil';
 import {downloadBlob} from 'Util/util';
 
 import {Config} from '../../Config';
+import {WebAppEvents} from '../../webAppEvents';
 
 enum ExportState {
   COMPRESSING = 'ExportState.STATE.COMPRESSING',

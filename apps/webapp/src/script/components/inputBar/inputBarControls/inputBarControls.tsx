@@ -23,11 +23,11 @@ import {amplify} from 'amplify';
 
 import {Conversation} from 'Repositories/entity/Conversation';
 import {Config} from 'src/script/Config';
-import {WebAppEvents} from 'src/script/webAppEvents';
 
 import {ControlButtons} from './controlButtons';
 import {SendMessageButton} from './sendMessageButton/sendMessageButton';
 
+import {WebAppEvents} from '../../../webAppEvents';
 import {MessageContent} from '../common/messageContent/messageContent';
 
 interface InputBarControlsProps {

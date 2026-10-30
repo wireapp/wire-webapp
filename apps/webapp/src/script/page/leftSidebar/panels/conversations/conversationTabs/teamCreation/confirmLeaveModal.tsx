@@ -28,7 +28,6 @@ import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {EventName} from 'Repositories/tracking/eventName';
 import {Segmentation} from 'Repositories/tracking/segmentation';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {WebAppEvents} from 'src/script/webAppEvents';
 
 import {
   buttonCss,
@@ -36,6 +35,8 @@ import {
   confirmLeaveModalButtonsCss,
   confirmLeaveModalWrapperCss,
 } from './teamCreation.styles';
+
+import {WebAppEvents} from '../../../../../../webAppEvents';
 
 interface Props {
   isShown: boolean;

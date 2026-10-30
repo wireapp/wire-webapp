@@ -22,10 +22,11 @@ import keyboardJS from 'keyboardjs';
 
 import {Runtime} from '@wireapp/commons';
 
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {capitalizeFirstChar, includesString} from 'Util/stringUtil';
 
 import {ShortcutType} from './shortcutType';
+
+import {WebAppEvents} from '../webAppEvents';
 
 interface Shortcut {
   event: string;

@@ -20,12 +20,12 @@
 import type {WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
 
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {getLinksFromHtml} from 'Util/urlUtil';
 
 import {MediaEmbeds} from './MediaEmbeds';
 
 import {Config} from '../../Config';
+import {WebAppEvents} from '../../webAppEvents';
 
 export class MediaParser {
   showEmbed: boolean;

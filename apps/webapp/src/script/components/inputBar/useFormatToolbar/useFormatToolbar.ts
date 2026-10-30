@@ -24,8 +24,9 @@ import {amplify} from 'amplify';
 import {StorageKey} from 'Repositories/storage';
 import {EventName} from 'Repositories/tracking/eventName';
 import {Config} from 'src/script/Config';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {loadValue, storeValue} from 'Util/storageUtil';
+
+import {WebAppEvents} from '../../../webAppEvents';
 
 type UseFormatToolbarResult = {open: boolean; handleClick: () => void};
 export const useFormatToolbar = (): UseFormatToolbarResult => {

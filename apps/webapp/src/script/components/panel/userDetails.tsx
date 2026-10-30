@@ -31,8 +31,9 @@ import * as Icon from 'Components/icon';
 import {UserInfo} from 'Components/UserInfo';
 import {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
+
+import {WebAppEvents} from '../../webAppEvents';
 
 interface UserDetailsProps {
   badge?: string;

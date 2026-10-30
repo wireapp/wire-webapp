@@ -22,10 +22,11 @@ import {amplify} from 'amplify';
 
 import type {MeetingCancellationOptions} from 'Components/meeting/meetingNotificationEventHandlers';
 import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import type {MeetingLifecycleDispatcher} from './createMeetingLifecycleDispatcher';
+
+import {WebAppEvents} from '../../../webAppEvents';
 
 export type SubscribeToMeetingLifecycleEventsDependencies = {
   dispatcher: MeetingLifecycleDispatcher;

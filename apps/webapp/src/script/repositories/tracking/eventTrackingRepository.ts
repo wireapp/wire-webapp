@@ -29,7 +29,6 @@ import type {ContributedSegmentations, MessageRepository} from 'Repositories/con
 import {ClientEvent} from 'Repositories/event/Client';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/userState';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {getLogger, Logger} from 'Util/logger';
 import {loadValue, storeValue, resetStoreValue} from 'Util/storageUtil';
 import {includesString} from 'Util/stringUtil';
@@ -49,6 +48,7 @@ import {UserData} from './userData';
 import {URLParameter} from '../../auth/urlParameter';
 import {Config} from '../../Config';
 import {APIClient} from '../../service/apiClientSingleton';
+import {WebAppEvents} from '../../webAppEvents';
 
 const TEAM_SIZE_THRESHOLD_VALUE = 6;
 

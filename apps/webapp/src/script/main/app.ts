@@ -99,7 +99,6 @@ import {UserRepository} from 'Repositories/user/userRepository';
 import {UserService} from 'Repositories/user/userService';
 import {UserState} from 'Repositories/user/userState';
 import {createBrowserSystemNotificationApi} from 'src/script/browser/notification/createSystemNotificationApiFromBrowserNotification';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {initializeDataDog} from 'Util/dataDog';
 import {DebugUtil} from 'Util/debugUtil';
 import {Environment} from 'Util/environment';
@@ -145,6 +144,7 @@ import {serverTimeHandler} from '../time/serverTimeHandler';
 import {WindowHandler} from '../ui/windowHandler';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
 import {Warnings} from '../view_model/WarningsContainer';
+import {WebAppEvents} from '../webAppEvents';
 
 type AppConfig = {
   COOKIES_CHECK: {COOKIE_NAME: string};

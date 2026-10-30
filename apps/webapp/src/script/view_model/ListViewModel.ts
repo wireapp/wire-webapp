@@ -36,7 +36,6 @@ import {SearchRepository} from 'Repositories/search/searchRepository';
 import type {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/userState';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {iterateItem} from 'Util/arrayUtil';
 import {isEscapeKey} from 'Util/keyboardUtil';
 import {type Translate} from 'Util/localizerUtil';
@@ -60,6 +59,7 @@ import {showContextMenu} from '../ui/contextMenu';
 import {showLabelContextMenu} from '../ui/labelContextMenu';
 import {Shortcut} from '../ui/shortcut';
 import {ShortcutType} from '../ui/shortcutType';
+import {WebAppEvents} from '../webAppEvents';
 
 export class ListViewModel {
   private readonly userState: UserState;

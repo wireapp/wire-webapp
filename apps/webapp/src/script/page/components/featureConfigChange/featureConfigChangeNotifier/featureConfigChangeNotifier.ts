@@ -39,7 +39,6 @@ import type {
 } from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 import {TeamState} from 'Repositories/team/TeamState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {type TranslationKey} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
@@ -48,6 +47,7 @@ import {formatDuration} from 'Util/timeUtil';
 import {loadFeatureConfig, saveFeatureConfig} from './featureConfigChangeNotifier.store';
 
 import {Config} from '../../../../Config';
+import {WebAppEvents} from '../../../../webAppEvents';
 
 type Features =
   | 'FileSharing'

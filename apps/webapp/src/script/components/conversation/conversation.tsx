@@ -47,7 +47,6 @@ import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {TeamState} from 'Repositories/team/TeamState';
 import {Config} from 'src/script/Config';
 import {useApplicationContext, useMainViewModel} from 'src/script/page/rootProvider';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isLastReceivedMessage} from 'Util/conversationMessages';
 import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from 'Util/fileTypeUtil';
@@ -98,6 +97,7 @@ import {RightSidebarParams} from '../../page/appMain';
 import {PanelState} from '../../page/rightSidebar';
 import {createCellsRepositoryGateway} from '../../repositories/cells/cellsRepositoryGateway';
 import {createCellsUploadManager} from '../../repositories/cells/upload/manager';
+import {WebAppEvents} from '../../webAppEvents';
 import {ElementType, MessageDetails} from '../messagesList/message/contentMessage/asset/textMessageRenderer';
 
 interface ConversationProps {

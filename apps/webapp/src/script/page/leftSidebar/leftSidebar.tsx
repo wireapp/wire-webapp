@@ -28,13 +28,13 @@ import {MeetingNotificationHost} from 'Components/meeting/meetingNotificationHos
 import {User} from 'Repositories/entity/User';
 import {conversationListCollapseFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {WebAppEvents} from 'src/script/webAppEvents';
 
 import {Conversations} from './panels/conversations';
 import {getIsConversationListCollapsed, SidebarTabs, useSidebarStore} from './panels/conversations/useSidebarStore';
 import {TemporaryGuestConversations} from './panels/temporatyGuestConversations';
 
 import {ListViewModel} from '../../view_model/ListViewModel';
+import {WebAppEvents} from '../../webAppEvents';
 import {ListState, useAppState} from '../useAppState';
 
 type LeftSidebarProps = {

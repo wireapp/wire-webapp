@@ -42,11 +42,12 @@ import type {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {SelfRepository} from 'Repositories/self/SelfRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/userState';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {type Translate} from 'Util/localizerUtil';
 import {isBackendError} from 'Util/typePredicateUtil';
 
 import type {MainViewModel} from './MainViewModel';
+
+import {WebAppEvents} from '../webAppEvents';
 
 type ConnectionRequestResult = {connectionStatus: ConnectionStatus; conversationId: QualifiedId};
 

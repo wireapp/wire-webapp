@@ -28,9 +28,10 @@ import {groupBy} from 'underscore';
 import type {ClientEntity} from 'Repositories/client/ClientEntity';
 import type {User} from 'Repositories/entity/User';
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {loadValue, resetStoreValue, storeValue} from 'Util/storageUtil';
+
+import {WebAppEvents} from '../../webAppEvents';
 
 export type ClientNotificationData = {
   domain?: string;

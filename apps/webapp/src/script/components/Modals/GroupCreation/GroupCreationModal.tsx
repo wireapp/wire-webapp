@@ -51,7 +51,6 @@ import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/c
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from 'src/script/router/routerBindings';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {checkAppsFeatureAvailability} from 'Util/featureUtil';
 import {handleEnterDown, handleEscDown, isKeyboardEvent} from 'Util/keyboardUtil';
@@ -59,6 +58,7 @@ import {sortUsersByPriority} from 'Util/stringUtil';
 
 import {Config} from '../../../Config';
 import {isProtocolOption, ProtocolOption} from '../../../guards/Protocol';
+import {WebAppEvents} from '../../../webAppEvents';
 import {getSharedDrivePermissionHint} from '../CreateConversation/utils';
 import {PrimaryModal} from '../PrimaryModal';
 

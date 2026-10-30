@@ -22,9 +22,10 @@ import {amplify} from 'amplify';
 import {Runtime} from '@wireapp/commons';
 
 import {ROLE} from 'Repositories/user/userPermission';
-import {WebAppEvents} from 'src/script/webAppEvents';
 
 import {Environment} from './environment';
+
+import {WebAppEvents} from '../webAppEvents';
 
 export function exposeWrapperGlobals(): void {
   if (Runtime.isDesktopApp()) {

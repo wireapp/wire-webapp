@@ -20,7 +20,7 @@
 import {renderHook} from '@testing-library/react';
 import {amplify} from 'amplify';
 
-import {WebAppEvents} from 'src/script/webAppEvents';
+import {WebAppEvents} from '../../../webAppEvents';
 
 import {Theme, useTheme} from './useTheme';
 

@@ -36,13 +36,14 @@ import {AppLockState} from 'Repositories/user/appLockState';
 import {SIGN_OUT_REASON} from 'src/script/auth/signOutReason';
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
 import type {ReactTranslationValueReplacement} from 'Util/localizerUtil/reactLocalizerUtil';
 import type {Translate} from 'Util/localizerUtil/translationTypes';
 
 import {applockStyles} from './appLock.styles';
+
+import {WebAppEvents} from '../../webAppEvents';
 
 const millisecondsPerSecond = 1000;
 

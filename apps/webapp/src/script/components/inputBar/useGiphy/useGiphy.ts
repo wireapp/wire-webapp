@@ -24,7 +24,8 @@ import {amplify} from 'amplify';
 import {MessageRepository, OutgoingQuote} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {Config} from 'src/script/Config';
-import {WebAppEvents} from 'src/script/webAppEvents';
+
+import {WebAppEvents} from '../../../webAppEvents';
 
 interface UseGiphyProps {
   text: string;

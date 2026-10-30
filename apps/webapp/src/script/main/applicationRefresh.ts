@@ -17,7 +17,7 @@
  *
  */
 
-import {WebAppEvents} from 'src/script/webAppEvents';
+import {WebAppEvents} from '../webAppEvents';
 
 type ApplicationRefreshDependencies = {
   readonly isDesktopApplication: () => boolean;

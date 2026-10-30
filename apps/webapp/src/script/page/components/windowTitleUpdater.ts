@@ -27,12 +27,12 @@ import {container} from 'tsyringe';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
 import {UserState} from 'Repositories/user/userState';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import type {Translate} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 
 import {Config} from '../../Config';
+import {WebAppEvents} from '../../webAppEvents';
 import {ContentState, useAppState} from '../useAppState';
 
 const windowTitleLogger = getLogger('WindowTitlesViewModel');

@@ -25,12 +25,12 @@ import {VerificationIcon} from 'Components/VerificationIcon';
 import {VerificationMessage as VerificationMessageEntity} from 'Repositories/entity/message/verificationMessage';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {Declension, joinNames} from 'Util/localizerUtil';
 import {capitalizeFirstChar} from 'Util/stringUtil';
 
 import {VerificationMessageType} from '../../../message/verificationMessageType';
+import {WebAppEvents} from '../../../webAppEvents';
 
 interface VerificationMessageProps {
   message: VerificationMessageEntity;

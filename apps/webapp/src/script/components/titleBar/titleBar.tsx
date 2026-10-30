@@ -45,13 +45,14 @@ import {useAppMainState, ViewType} from 'src/script/page/state';
 import {ContentState} from 'src/script/page/useAppState';
 import {CallActions} from 'src/script/view_model/CallingViewModel';
 import {ViewModelRepositories} from 'src/script/view_model/MainViewModel';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
 import type {Translate} from 'Util/localizerUtil/translationTypes';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
+
+import {WebAppEvents} from '../../webAppEvents';
 
 interface TitleBarProps {
   callActions: CallActions;

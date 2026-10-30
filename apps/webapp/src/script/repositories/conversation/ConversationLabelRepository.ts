@@ -26,12 +26,13 @@ import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import type {PropertiesService} from 'Repositories/properties/propertiesService';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {fixWebsocketString} from 'Util/stringUtil';
 import {TypedEventTarget} from 'Util/typedEventTarget';
 import {createUuid} from 'Util/uuid';
+
+import {WebAppEvents} from '../../webAppEvents';
 
 export enum LabelType {
   Custom = 0,

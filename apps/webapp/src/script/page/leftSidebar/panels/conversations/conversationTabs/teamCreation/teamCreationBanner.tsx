@@ -28,7 +28,6 @@ import * as Icon from 'Components/icon';
 import {EventName} from 'Repositories/tracking/eventName';
 import {Segmentation} from 'Repositories/tracking/segmentation';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {WebAppEvents} from 'src/script/webAppEvents';
 
 import {
   bannerHeaderContainerCss,
@@ -41,6 +40,7 @@ import {
 } from './teamCreation.styles';
 import {useTeamCreationModal} from './useTeamCreationModal';
 
+import {WebAppEvents} from '../../../../../../webAppEvents';
 import {SidebarStatus, useSidebarStore} from '../../useSidebarStore';
 
 const Banner: FunctionComponent<{onClick: () => void}> = ({onClick}: {onClick: () => void}) => {

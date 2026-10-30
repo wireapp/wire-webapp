@@ -22,9 +22,10 @@ import {amplify} from 'amplify';
 
 import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
 import {findMeetingSeriesByQualifiedConversation} from 'Components/meeting/utils/findMeetingSeriesByQualifiedConversation';
-import {WebAppEvents, type ConversationSelfRemovedPayload} from 'src/script/webAppEvents';
 
 import type {MeetingLifecycleDispatcher} from './createMeetingLifecycleDispatcher';
+
+import {WebAppEvents, type ConversationSelfRemovedPayload} from '../../../webAppEvents';
 
 export type SubscribeToMeetingConversationEventsDependencies = {
   dispatcher: MeetingLifecycleDispatcher;

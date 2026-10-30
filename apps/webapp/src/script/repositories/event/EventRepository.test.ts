@@ -20,7 +20,7 @@
 import {isUndefined} from '@sindresorhus/is';
 import {BackendEvent, CONVERSATION_EVENT, MEETING_EVENT, USER_EVENT} from '@wireapp/api-client/lib/event/';
 import {ConnectionState} from '@wireapp/core';
-import {WebAppEvents} from 'src/script/webAppEvents';
+import {WebAppEvents} from '../../webAppEvents';
 import {amplify} from 'amplify';
 import {Runtime} from '@wireapp/commons';
 

@@ -38,10 +38,10 @@ import {useSidebarStore, SidebarTabs} from 'src/script/page/leftSidebar/panels/c
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigateKeyboard, createNavigate} from 'src/script/router/routerBindings';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isKeyboardEvent} from 'Util/keyboardUtil';
 
+import {WebAppEvents} from '../../../../webAppEvents';
 import {PrimaryModal} from '../../PrimaryModal';
 import {useCreateConversationModal} from '../hooks/useCreateConversationModal';
 import {ConversationAccess, ConversationCreationStep, ConversationType} from '../types';

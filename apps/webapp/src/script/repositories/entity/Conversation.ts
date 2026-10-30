@@ -57,7 +57,6 @@ import {ConversationVerificationState} from 'Repositories/conversation/Conversat
 import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting';
 import {ConversationRecord} from 'Repositories/storage/record/conversationRecord';
 import {TeamState} from 'Repositories/team/TeamState';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import type {Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {matchQualifiedIds} from 'Util/qualifiedId';
@@ -74,6 +73,7 @@ import {ConversationError} from '../../error/conversationError';
 import {isContentMessage, isDeleteMessage} from '../../guards/Message';
 import {StatusType} from '../../message/statusType';
 import {ContentState, useAppState} from '../../page/useAppState';
+import {WebAppEvents} from '../../webAppEvents';
 
 const userSearchDebounceInMilliseconds = 100;
 const decimalRadix = 10;

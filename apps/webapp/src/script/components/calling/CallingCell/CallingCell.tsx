@@ -48,7 +48,6 @@ import {Config} from 'src/script/Config';
 import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useAppMainState, ViewType} from 'src/script/page/state';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isEnterKey, isSpaceOrEnterKey} from 'Util/keyboardUtil';
 
@@ -56,6 +55,7 @@ import {usePressSpaceToUnmute} from './usePressSpaceToUnmute/usePressSpaceToUnmu
 
 import {generateConversationUrl} from '../../../router/routeGenerator';
 import {CallActions, CallViewTab} from '../../../view_model/CallingViewModel';
+import {WebAppEvents} from '../../../webAppEvents';
 
 interface VideoCallProps {
   hasAccessToCamera?: boolean;

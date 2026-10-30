@@ -29,8 +29,8 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {getForcedErrorReportingStatus} from 'Repositories/tracking/telemetry.helpers';
 import {ConsentValue} from 'Repositories/user/consentValue';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {WebAppEvents} from 'src/script/webAppEvents';
 
+import {WebAppEvents} from '../../../../../webAppEvents';
 import {PreferencesSection} from '../components/preferencesSection';
 
 interface DataUsageSectionProps {

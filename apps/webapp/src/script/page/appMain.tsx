@@ -51,7 +51,6 @@ import {showInitialModal} from 'Repositories/user/availabilityModal';
 import {UserState} from 'Repositories/user/userState';
 import {isUUID} from 'src/script/auth/util/stringUtil';
 import {Config} from 'src/script/Config';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {canUseMeetings} from 'Util/canUseMeetings';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
@@ -77,6 +76,7 @@ import {Core} from '../service/coreSingleton';
 import {MainViewModel} from '../view_model/MainViewModel';
 import {useWarningOffset} from '../view_model/WarningsContainer/useWarningOffset';
 import {WarningsContainer} from '../view_model/WarningsContainer/WarningsContainer';
+import {WebAppEvents} from '../webAppEvents';
 
 export type RightSidebarParams = {
   entity: PanelEntity | null;

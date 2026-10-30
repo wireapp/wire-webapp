@@ -30,8 +30,9 @@ import {
   type SystemNotificationPermission,
   toSystemNotificationError,
 } from 'src/script/notification/systemNotificationTypes';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {getLogger} from 'Util/logger';
+
+import {WebAppEvents} from '../../webAppEvents';
 
 type SystemNotificationLogger = {
   warn: (message: string, context?: unknown) => void;

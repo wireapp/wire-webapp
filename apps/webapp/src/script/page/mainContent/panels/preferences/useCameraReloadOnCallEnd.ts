@@ -23,7 +23,8 @@ import {amplify} from 'amplify';
 
 import type {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {EventName} from 'Repositories/tracking/eventName';
-import {WebAppEvents} from 'src/script/webAppEvents';
+
+import {WebAppEvents} from '../../../../webAppEvents';
 
 type UseCameraReloadOnCallEndResult = {shouldReloadCamera: boolean};
 export const useCameraReloadOnCallEnd = (callingRepository: CallingRepository): UseCameraReloadOnCallEndResult => {

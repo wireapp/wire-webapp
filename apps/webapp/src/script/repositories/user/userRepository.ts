@@ -61,7 +61,6 @@ import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
 import type {SelfService} from 'Repositories/self/SelfService';
 import {UserRecord} from 'Repositories/storage';
 import {TeamState} from 'Repositories/team/TeamState';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {chunk, partition} from 'Util/arrayUtil';
 import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
@@ -80,6 +79,7 @@ import {SIGN_OUT_REASON} from '../../auth/signOutReason';
 import {Config} from '../../Config';
 import {UserError} from '../../error/userError';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
+import {WebAppEvents} from '../../webAppEvents';
 
 const connectionUpdateDebounceInMilliseconds = 100;
 const maximumUserClients = 8;

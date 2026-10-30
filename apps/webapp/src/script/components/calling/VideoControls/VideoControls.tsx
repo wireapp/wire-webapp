@@ -61,7 +61,6 @@ import {isMediaDevice} from 'src/script/guards/MediaDevice';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {ContextMenuEntry, showContextMenu} from 'src/script/ui/contextMenu';
 import {CallViewTab} from 'src/script/view_model/CallingViewModel';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, isEscapeKey, KEY} from 'Util/keyboardUtil';
 
@@ -79,6 +78,8 @@ import {
   videoOptionsSheetStyles,
 } from './VideoControls.styles';
 import {VideoControlsSelect} from './VideoControlsSelect/VideoControlsSelect';
+
+import {WebAppEvents} from '../../../webAppEvents';
 
 type BackgroundOptionValue = 'none' | 'blur-high' | 'blur-low' | 'virtual' | 'settings';
 

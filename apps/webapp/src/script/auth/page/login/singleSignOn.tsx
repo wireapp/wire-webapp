@@ -47,13 +47,13 @@ import {
 
 import {LogoFullIcon} from 'Components/icon';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
 import {getLogger} from 'Util/logger';
 
 import {SingleSignOnForm} from './singleSignOnForm';
 
 import {Config} from '../../../Config';
+import {WebAppEvents} from '../../../webAppEvents';
 import {AppAlreadyOpen} from '../../component/appAlreadyOpen';
 import {BackButton} from '../../component/backButton';
 import {RootState, bindActionCreators} from '../../module/reducer';

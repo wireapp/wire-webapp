@@ -26,7 +26,6 @@ import {useClickOutside} from 'Hooks/useClickOutside';
 import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {ContextMenuEntry, showContextMenu} from 'src/script/ui/contextMenu';
-import {WebAppEvents} from 'src/script/webAppEvents';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isSpaceOrEnterKey, isTabKey} from 'Util/keyboardUtil';
 import {setContextMenuPosition} from 'Util/util';
@@ -43,6 +42,7 @@ import {
 import {MessageReactions} from './messageReactions/messageReactions';
 import {ReplyButton} from './replyButton';
 
+import {WebAppEvents} from '../../../../../webAppEvents';
 import {useMessageFocusedTabIndex} from '../../util';
 
 export const MessageActionsId = {
