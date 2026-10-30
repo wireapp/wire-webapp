@@ -30,3 +30,14 @@ export const statusStyles: CSSObject = {
   alignItems: 'center',
   gap: '8px',
 };
+
+export const confirmationContentStyles: CSSObject = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '8px',
+  padding: '0 16px 16px',
+};
+
+export const confirmationTextStyles: CSSObject = {
+  margin: 0,
+};

@@ -29,7 +29,12 @@ import type {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {actionStyles, statusStyles} from './cellsEmptyBinAction.styles';
+import {
+  actionStyles,
+  confirmationContentStyles,
+  confirmationTextStyles,
+  statusStyles,
+} from './cellsEmptyBinAction.styles';
 import {emptyBin} from './emptyBinAction';
 import {getEmptyBinOutcome} from './emptyBinStatus';
 
@@ -366,7 +371,9 @@ export const CellsEmptyBinAction: FunctionComponent<CellsEmptyBinActionProps> = 
 
       <CellsModal isOpen={isConfirmationOpen} onClose={closeConfirmation}>
         <CellsModal.Header>{translate('cells.emptyBin.title')}</CellsModal.Header>
-        <p>{translate('cells.emptyBin.description')}</p>
+        <div css={confirmationContentStyles}>
+          <p css={confirmationTextStyles}>{translate('cells.emptyBin.description')}</p>
+        </div>
         <CellsModal.Actions>
           <CellsModal.SecondaryButton onClick={closeConfirmation}>
             {translate('cells.emptyBin.cancel')}
