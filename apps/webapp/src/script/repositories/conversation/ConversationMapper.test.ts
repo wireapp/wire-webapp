@@ -121,6 +121,23 @@ describe('ConversationMapper', () => {
       expect(conversationEntity.last_server_timestamp()).toBe(initialTimestamp);
     });
 
+    it('rehydrates a local manual unread timestamp without changing canonical read state', () => {
+      const lastReadTimestamp = Date.now();
+      const manualUnreadTimestamp = lastReadTimestamp - 1000;
+      const conversationData = {
+        ...entities.conversation,
+        members: undefined,
+        last_read_timestamp: lastReadTimestamp,
+        manual_unread_timestamp: manualUnreadTimestamp,
+      } as ConversationDatabaseData;
+
+      const [conversationEntity] = ConversationMapper.mapConversations([conversationData], 1, translate);
+
+      expect(conversationEntity.manualUnreadTimestamp()).toBe(manualUnreadTimestamp);
+      expect(conversationEntity.last_read_timestamp()).toBe(lastReadTimestamp);
+      expect(conversationEntity.effectiveReadTimestamp()).toBe(manualUnreadTimestamp - 1);
+    });
+
     it('maps a backend conversation roles', () => {
       const conversation = {
         ...entities.conversation,
@@ -363,22 +380,22 @@ describe('ConversationMapper', () => {
       expect(updatedConversationEntity.last_event_timestamp()).toBe(timestamp);
     });
 
-    it('keeps the manual unread marker when applied together with the last read timestamp', () => {
-      const selfStatus: Partial<SelfStatusUpdateDatabaseData> = {
-        is_marked_unread: true,
-        last_read_timestamp: Date.now(),
-      };
-      const updatedConversationEntity = ConversationMapper.updateSelfStatus(conversationEntity, selfStatus);
-
-      expect(updatedConversationEntity.isMarkedUnread()).toBe(true);
-    });
-
-    it('does not touch the manual unread marker when the status has no marker', () => {
-      conversationEntity.isMarkedUnread(true);
+    it('does not change the local manual unread marker for unrelated self status updates', () => {
+      conversationEntity.manualUnreadTimestamp(123);
       const selfStatus: Partial<SelfStatusUpdateDatabaseData> = {last_event_timestamp: Date.now()};
       const updatedConversationEntity = ConversationMapper.updateSelfStatus(conversationEntity, selfStatus);
 
-      expect(updatedConversationEntity.isMarkedUnread()).toBe(true);
+      expect(updatedConversationEntity.manualUnreadTimestamp()).toBe(123);
+    });
+
+    it('clears a local manual unread marker when a newer synchronized read state arrives', () => {
+      conversationEntity.last_read_timestamp(500);
+      conversationEntity.manualUnreadTimestamp(100);
+
+      ConversationMapper.updateSelfStatus(conversationEntity, {last_read_timestamp: 200});
+
+      expect(conversationEntity.last_read_timestamp()).toBe(500);
+      expect(conversationEntity.manualUnreadTimestamp()).toBeUndefined();
     });
 
     it('can update the self status using otr_archived', () => {

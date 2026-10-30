@@ -17,16 +17,7 @@
  *
  */
 
-import {
-  MutableRefObject,
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-  type FunctionComponent,
-} from 'react';
+import {useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type FunctionComponent} from 'react';
 
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isNonEmptyArray, isNumber, isUndefined} from '@sindresorhus/is';
@@ -39,6 +30,7 @@ import {MessagesListParams} from 'Components/messagesList/messageList.types';
 import {UploadAssets} from 'Components/messagesList/uploadAssets';
 import {verticallyCenterMessage} from 'Components/messagesList/utils/helpers';
 import {filterMessages} from 'Components/messagesList/utils/messagesFilter';
+import {useConversationReadBoundary} from 'Components/messagesList/utils/useConversationReadBoundary';
 import {useLoadConversation} from 'Components/messagesList/utils/useLoadConversation';
 import {useScrollToLastUnreadMessage} from 'Components/messagesList/utils/useScrollToLastUnreadMessage';
 import {
@@ -64,7 +56,6 @@ const MARKER_ESTIMATE = 56;
 
 interface Props extends Omit<MessagesListParams, 'isRightSidebarOpen' | 'onLoading'> {
   parentElement: HTMLDivElement;
-  conversationLastReadTimestamp: MutableRefObject<number>;
   onLoading: (isLoading: boolean) => void;
 }
 
@@ -113,7 +104,6 @@ export const VirtualizedMessagesList: FunctionComponent<Props> = ({
   messageActions,
   isMsgElementsFocusable,
   setMsgElementsFocusable,
-  conversationLastReadTimestamp,
   updateConversationLastRead,
   onLoading,
   isConversationLoaded,
@@ -145,9 +135,14 @@ export const VirtualizedMessagesList: FunctionComponent<Props> = ({
   });
 
   const filteredMessages = filterMessages(allMessages);
+  const {
+    timestamp: conversationLastReadTimestamp,
+    timestampReference: conversationLastReadTimestampReference,
+    setTimestamp: setConversationLastReadTimestamp,
+  } = useConversationReadBoundary(conversation);
 
   const groupedMessages = useMemo(() => {
-    return groupMessagesBySenderAndTime(filteredMessages, conversationLastReadTimestamp.current);
+    return groupMessagesBySenderAndTime(filteredMessages, conversationLastReadTimestamp);
   }, [conversationLastReadTimestamp, filteredMessages]);
 
   const [highlightedMessage, setHighlightedMessage] = useState<string | undefined>(conversation.initialMessage()?.id);
@@ -207,7 +202,7 @@ export const VirtualizedMessagesList: FunctionComponent<Props> = ({
   const {loadConversation} = useLoadConversation({
     conversation,
     conversationRepository,
-    conversationLastReadTimestamp,
+    conversationLastReadTimestamp: conversationLastReadTimestampReference,
     onLoading,
   });
 
@@ -215,7 +210,7 @@ export const VirtualizedMessagesList: FunctionComponent<Props> = ({
   useScrollToLastUnreadMessage(virtualizer, {
     isConversationLoaded,
     groupedMessages,
-    conversationLastReadTimestamp,
+    conversationLastReadTimestamp: conversationLastReadTimestampReference,
   });
 
   // Hook for loading preceding / following messages when user scrolls to top / bottom
@@ -288,7 +283,7 @@ export const VirtualizedMessagesList: FunctionComponent<Props> = ({
 
   const onJumpToLastMessageClick = async (): Promise<void> => {
     // jumping to the latest message is an explicit "read" action, resume auto-read
-    conversation.isAutoReadSuppressed(false);
+    conversation.clearManualUnreadMarker();
     setHighlightedMessage(undefined);
     conversation.initialMessage(undefined);
 
@@ -299,7 +294,11 @@ export const VirtualizedMessagesList: FunctionComponent<Props> = ({
       await loadConversation(conversation);
     }
 
-    conversationLastReadTimestamp.current = allMessages[allMessages.length - 1].timestamp();
+    const newestMessage = allMessages.at(-1);
+    if (newestMessage !== undefined) {
+      conversationLastReadTimestampReference.current = newestMessage.timestamp();
+      setConversationLastReadTimestamp(newestMessage.timestamp());
+    }
 
     const scrollTimeout = setTimeout(() => {
       virtualizer.scrollToIndex(groupedMessages.length - 1, {align: 'end'});

@@ -52,7 +52,6 @@ function createMessageListProperties(): ComponentProps<typeof VirtualizedMessage
     messageRepository: {} as MessageRepository,
     selfUser: new User('self', '', translateForTest),
     parentElement: document.createElement('div'),
-    conversationLastReadTimestamp: {current: 0},
     isConversationLoaded: false,
     isMsgElementsFocusable: false,
     cancelConnectionRequest: noop,

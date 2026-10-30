@@ -616,6 +616,15 @@ function ConversationContent({
 
       const isUnreadMessage = messageTimestamp > conversationEntity.last_read_timestamp();
       const isNotOwnMessage = !messageEntity.user().isMe;
+      const manualUnreadTimestamp = conversationEntity.manualUnreadTimestamp();
+
+      if (manualUnreadTimestamp !== undefined && messageTimestamp >= manualUnreadTimestamp) {
+        callbacks.push(
+          withAutoReadGuard(conversationEntity, () => {
+            conversationEntity.clearManualUnreadMarker();
+          }),
+        );
+      }
 
       let shouldSendReadReceipt = false;
 

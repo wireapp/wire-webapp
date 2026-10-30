@@ -60,7 +60,6 @@ export interface SelfStatusUpdateDatabaseData {
   archived_timestamp: number;
   cleared_timestamp: number;
   ephemeral_timer: number;
-  is_marked_unread: boolean;
   last_event_timestamp: number;
   last_read_timestamp: number;
   last_server_timestamp: number;
@@ -320,7 +319,6 @@ export class ConversationMapper {
       archived_timestamp,
       cleared_timestamp,
       ephemeral_timer,
-      is_marked_unread,
       message_timer,
       last_event_timestamp,
       last_read_timestamp,
@@ -360,11 +358,6 @@ export class ConversationMapper {
 
     if (last_read_timestamp !== undefined) {
       conversationEntity.setTimestamp(last_read_timestamp, Conversation.TIMESTAMP_TYPE.LAST_READ);
-    }
-
-    // Must be applied after the read timestamp, as moving the timestamp forward resets the flag
-    if (is_marked_unread !== undefined) {
-      conversationEntity.isMarkedUnread(is_marked_unread);
     }
 
     if (last_server_timestamp !== undefined) {
@@ -488,6 +481,10 @@ export class ConversationMapper {
     conversationEntity.cellsState(cells_state ?? CONVERSATION_CELLS_STATE.DISABLED);
     const selfState = members?.self ?? conversationData;
     conversationEntity = ConversationMapper.updateSelfStatus(conversationEntity, selfState as any);
+
+    if (conversationData.manual_unread_timestamp !== undefined) {
+      conversationEntity.manualUnreadTimestamp(conversationData.manual_unread_timestamp);
+    }
 
     if ((conversationEntity.last_event_timestamp() ?? 0) === 0 && initialTimestamp !== undefined) {
       conversationEntity.last_event_timestamp(initialTimestamp);

@@ -32,16 +32,14 @@ interface Props {
 
 export const StatusIcon: FunctionComponent<Props> = ({conversation}: Props) => {
   const {translate} = useApplicationContext();
-  const {unreadState, mutedState, isRequest, isGhostGroup} = useKoSubscribableChildren(conversation, [
-    'unreadState',
-    'mutedState',
-    'isRequest',
-    'isGhostGroup',
-  ]);
+  const {unreadState, manualUnreadTimestamp, mutedState, isRequest, isGhostGroup} = useKoSubscribableChildren(
+    conversation,
+    ['unreadState', 'manualUnreadTimestamp', 'mutedState', 'isRequest', 'isGhostGroup'],
+  );
 
   const cellState = useMemo(() => {
     return generateCellState(conversation, translate);
-  }, [conversation, isRequest, mutedState, isGhostGroup, translate, unreadState]);
+  }, [conversation, isRequest, mutedState, isGhostGroup, manualUnreadTimestamp, translate, unreadState]);
 
   return (
     <>
@@ -105,6 +103,25 @@ export const StatusIcon: FunctionComponent<Props> = ({conversation}: Props) => {
         >
           <Icon.MuteIcon className="svg-icon" />
         </span>
+      )}
+
+      {cellState.icon === ConversationStatusIcon.MANUAL_UNREAD && unreadState.allMessages.length > 0 && (
+        <span
+          className="conversation-list-cell-badge cell-badge-dark"
+          data-uie-name="status-unread"
+          title={translate('accessibility.conversationStatusUnread')}
+        >
+          {unreadState.allMessages.length}
+        </span>
+      )}
+
+      {cellState.icon === ConversationStatusIcon.MANUAL_UNREAD && unreadState.allMessages.length === 0 && (
+        <span
+          className="conversation-list-cell-manual-unread-indicator"
+          data-uie-name="status-manual-unread"
+          title={translate('accessibility.conversationStatusUnread')}
+          aria-label={translate('accessibility.conversationStatusUnread')}
+        />
       )}
 
       {cellState.icon === ConversationStatusIcon.UNREAD_MESSAGES && unreadState.allMessages.length > 0 && (

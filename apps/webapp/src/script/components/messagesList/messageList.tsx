@@ -27,6 +27,7 @@ import {TabIndex} from '@wireapp/react-ui-kit';
 import {FadingScrollbar} from 'Components/fadingScrollbar';
 import {JumpToLastMessageButton} from 'Components/messagesList/jumpToLastMessageButton';
 import {filterMessages} from 'Components/messagesList/utils/messagesFilter';
+import {useConversationReadBoundary} from 'Components/messagesList/utils/useConversationReadBoundary';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
@@ -130,12 +131,13 @@ export const MessagesList: FC<MessagesListParams> = ({
   const messageListRef = useRef<HTMLDivElement | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [highlightedMessage, setHighlightedMessage] = useState<string | undefined>(conversation.initialMessage()?.id);
-  const conversationLastReadTimestamp = useRef(conversation.last_read_timestamp());
+  const {timestamp: conversationLastReadTimestamp, setTimestamp: setConversationLastReadTimestamp} =
+    useConversationReadBoundary(conversation);
 
   const filteredMessages = filterMessages(allMessages);
   const filteredMessagesLength = filteredMessages.length;
 
-  const groupedMessages = groupMessagesBySenderAndTime(filteredMessages, conversationLastReadTimestamp.current);
+  const groupedMessages = groupMessagesBySenderAndTime(filteredMessages, conversationLastReadTimestamp);
 
   const [messagesContainer, setMessagesContainer] = useState<HTMLDivElement | null>(null);
 
@@ -208,7 +210,6 @@ export const MessagesList: FC<MessagesListParams> = ({
   useEffect(() => {
     onLoading(true);
     setLoaded(false);
-    conversationLastReadTimestamp.current = conversation.last_read_timestamp();
     loadConversation(conversation, conversation.initialMessage()).then(() => {
       setTimeout(() => {
         setLoaded(true);
@@ -270,7 +271,11 @@ export const MessagesList: FC<MessagesListParams> = ({
   const jumpToLastMessage = (): void => {
     if (conversation !== undefined) {
       // jumping to the latest message is an explicit "read" action, resume auto-read
-      conversation.isAutoReadSuppressed(false);
+      conversation.clearManualUnreadMarker();
+      const newestMessage = conversation.getNewestMessage();
+      if (newestMessage !== undefined) {
+        setConversationLastReadTimestamp(newestMessage.timestamp());
+      }
       // clean up anything like search result
       setHighlightedMessage(undefined);
       conversation.initialMessage(undefined);

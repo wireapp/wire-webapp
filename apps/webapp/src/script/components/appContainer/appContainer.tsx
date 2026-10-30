@@ -47,6 +47,7 @@ import {useTheme} from './hooks/useTheme';
 import {runClientVersionCheck} from '../../applicationPeriodicChecks/runClientVersionCheck';
 import {startApplicationPeriodicChecks} from '../../applicationPeriodicChecks/startApplicationPeriodicChecks';
 import {Config, Configuration} from '../../Config';
+import {markAsUnreadFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
 import {StartupFeatureToggleName} from '../../featureToggles/startupFeatureToggles';
 import type {FetchLatestBuildMetadata} from '../../lifecycle/newVersionHandler';
 import {setAppLocale} from '../../localization/Localizer';
@@ -89,6 +90,7 @@ export const AppContainer: FunctionComponent<AppProps> = (properties: AppProps) 
     translate,
   } = properties;
   setAppLocale();
+  const isMarkAsUnreadFeatureEnabled = isFeatureToggleEnabled(markAsUnreadFeatureToggleName);
   const app = useMemo(() => {
     return new App(
       container.resolve(Core),
@@ -97,8 +99,9 @@ export const AppContainer: FunctionComponent<AppProps> = (properties: AppProps) 
       translate,
       clock,
       fireAndForgetInvoker,
+      {isMarkAsUnreadFeatureEnabled},
     );
-  }, [config, fireAndForgetInvoker, translate, clock]);
+  }, [config, fireAndForgetInvoker, translate, clock, isMarkAsUnreadFeatureEnabled]);
   const enableAutoLogin = Config.getConfig().FEATURE.ENABLE_AUTO_LOGIN;
   // Publishing application on the global scope for debug and testing purposes.
   window.wire.app = app;

@@ -115,6 +115,31 @@ describe('MessagesGroup', () => {
     ).toBe(nbReadMessages);
   });
 
+  it('places the unread separator at the manually selected message', () => {
+    const messageEvents = [1, 2, 3].map(timestamp => {
+      return createMessageAddEvent({overrides: {time: new Date(timestamp).toISOString()}});
+    });
+    const messages = messageEvents.map(event => {
+      return eventMapper.mapJsonEvent(event, conversation) as Message;
+    });
+    const selectedMessage = messages[1];
+    expect(selectedMessage).toBeDefined();
+    if (selectedMessage === undefined) {
+      return;
+    }
+    conversation.last_read_timestamp(0);
+
+    conversation.markUnreadFrom(selectedMessage);
+
+    const groupedMessages = groupMessagesBySenderAndTime(messages, conversation.effectiveReadTimestamp());
+    const unreadSeparator = groupedMessages.find(group => {
+      return isMarker(group) && group.type === 'unread';
+    });
+
+    expect(unreadSeparator?.timestamp).toBe(selectedMessage.timestamp());
+    conversation.clearManualUnreadMarker();
+  });
+
   it('adds markers for messages sent on different days', () => {
     const nbPrevHourMessages = getRandomNumber(1, 10);
     const nbNextHourMessages = getRandomNumber(1, 10);

@@ -99,6 +99,7 @@ export const ConversationListCell: FunctionComponent<ConversationListCellProps> 
     isChannel,
     isGroupOrChannel,
     isGhostGroup,
+    manualUnreadTimestamp,
   } = useKoSubscribableChildren(conversation, [
     'isGroup',
     'is1to1',
@@ -112,6 +113,7 @@ export const ConversationListCell: FunctionComponent<ConversationListCellProps> 
     'isChannel',
     'isGroupOrChannel',
     'isGhostGroup',
+    'manualUnreadTimestamp',
   ]);
 
   const guardCall = useNoInternetCallGuard({
@@ -150,6 +152,8 @@ export const ConversationListCell: FunctionComponent<ConversationListCellProps> 
 
   if (unreadMessagesCount > 0) {
     accessibilityParts.push(`${unreadMessagesCount} ${translate('conversationLabelUnread')}`);
+  } else if (manualUnreadTimestamp !== undefined) {
+    accessibilityParts.push(translate('conversationLabelUnread'));
   }
 
   if (isMutedConversation) {

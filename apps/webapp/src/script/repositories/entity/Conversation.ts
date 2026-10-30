@@ -172,8 +172,10 @@ export class Conversation {
   public readonly isTeamOnly: ko.PureComputed<boolean>;
   public readonly last_event_timestamp: ko.Observable<number>;
   public readonly last_read_timestamp: ko.Observable<number>;
-  /** Set when the user manually marked the conversation as unread from a given message (local to this device) */
-  public readonly isMarkedUnread: ko.Observable<boolean>;
+  /** The locally selected message from which this conversation is manually unread. */
+  public readonly manualUnreadTimestamp: ko.Observable<number | undefined>;
+  /** Read boundary used for local unread presentation and history loading. */
+  public readonly effectiveReadTimestamp: ko.PureComputed<number>;
   /** While true, viewing messages does not advance the read marker (in-memory only) */
   public readonly isAutoReadSuppressed: ko.Observable<boolean>;
   public readonly legalHoldStatus: ko.Observable<LegalHoldStatus>;
@@ -411,7 +413,11 @@ export class Conversation {
     this.cleared_timestamp = ko.observable(0);
     this.last_event_timestamp = ko.observable(0);
     this.last_read_timestamp = ko.observable(0);
-    this.isMarkedUnread = ko.observable(false);
+    this.manualUnreadTimestamp = ko.observable<number | undefined>(undefined);
+    this.effectiveReadTimestamp = ko.pureComputed(() => {
+      const manualUnreadTimestamp = this.manualUnreadTimestamp();
+      return manualUnreadTimestamp === undefined ? this.last_read_timestamp() : manualUnreadTimestamp - 1;
+    });
     this.isAutoReadSuppressed = ko.observable(false);
     this.last_server_timestamp = ko.observable(0);
     this.mutedTimestamp = ko.observable(0);
@@ -599,7 +605,8 @@ export class Conversation {
         if (messageEntity.visible()) {
           const isOwnContentMessage = messageEntity.user().isMe && !messageEntity.isSystem();
           const isReadMessage =
-            messageEntity.timestamp() <= this.last_read_timestamp() || (isOwnContentMessage && !this.isMarkedUnread());
+            messageEntity.timestamp() <= this.effectiveReadTimestamp() ||
+            (isOwnContentMessage && this.manualUnreadTimestamp() === undefined);
 
           if (isReadMessage) {
             break;
@@ -649,6 +656,10 @@ export class Conversation {
     });
 
     this.hasUnread = ko.pureComputed(() => {
+      if (this.manualUnreadTimestamp() !== undefined) {
+        return true;
+      }
+
       const isIgnored = this.isRequest() || this.showNotificationsNothing();
       if (isIgnored) {
         return false;
@@ -778,7 +789,7 @@ export class Conversation {
       this.isGhostGroup,
       this.last_event_timestamp,
       this.last_read_timestamp,
-      this.isMarkedUnread,
+      this.manualUnreadTimestamp,
       this.last_server_timestamp,
       this.mutedState,
       this.mutedTimestamp,
@@ -873,14 +884,12 @@ export class Conversation {
 
     const updatedTimestamp = forceUpdate ? timestamp : this._incrementTimeOnly(entityTimestamp(), timestamp);
 
+    if (type === TIMESTAMP_TYPE.LAST_READ) {
+      this.clearManualUnreadMarkerIfReadThrough(timestamp);
+    }
+
     if (updatedTimestamp !== false) {
       entityTimestamp(updatedTimestamp);
-
-      if (type === TIMESTAMP_TYPE.LAST_READ && !forceUpdate) {
-        // The read marker moved forward, so any manual "unread" marker is obsolete
-        this.isMarkedUnread(false);
-        this.isAutoReadSuppressed(false);
-      }
     }
 
     return updatedTimestamp;
@@ -888,12 +897,23 @@ export class Conversation {
 
   /**
    * Mark the conversation as unread starting at (and including) the given message.
-   * The state is local to this device and auto-read is paused until the read marker is moved forward explicitly.
+   * The state is local to this device and does not change the synchronized read timestamp.
    */
   markUnreadFrom(message: Message): void {
-    this.setTimestamp(message.timestamp() - 1, TIMESTAMP_TYPE.LAST_READ, true);
-    this.isMarkedUnread(true);
+    this.manualUnreadTimestamp(message.timestamp());
     this.isAutoReadSuppressed(true);
+  }
+
+  clearManualUnreadMarker(): void {
+    this.manualUnreadTimestamp(undefined);
+    this.isAutoReadSuppressed(false);
+  }
+
+  clearManualUnreadMarkerIfReadThrough(timestamp: number): void {
+    const manualUnreadTimestamp = this.manualUnreadTimestamp();
+    if (manualUnreadTimestamp !== undefined && timestamp >= manualUnreadTimestamp) {
+      this.clearManualUnreadMarker();
+    }
   }
 
   /**
@@ -973,7 +993,7 @@ export class Conversation {
       const message_et = message_ets[counter];
       if (message_et?.user()?.isMe) {
         // Loading history must not clear a manual "unread" marker by moving the read timestamp forward
-        if (!this.isMarkedUnread()) {
+        if (this.manualUnreadTimestamp() === undefined) {
           this.updateTimestamps(message_et);
         }
         break;
@@ -1284,6 +1304,8 @@ export class Conversation {
   };
 
   serialize(): ConversationRecord {
+    const manualUnreadTimestamp = this.manualUnreadTimestamp();
+
     return {
       access: this.accessModes ?? [],
       access_role: this.accessRole ?? [],
@@ -1302,7 +1324,7 @@ export class Conversation {
       id: this.id,
       is_guest: this.isGuest(),
       is_ghost_group: this.isGhostGroup(),
-      is_marked_unread: this.isMarkedUnread(),
+      ...(manualUnreadTimestamp === undefined ? {} : {manual_unread_timestamp: manualUnreadTimestamp}),
       last_event_timestamp: this.last_event_timestamp(),
       last_read_timestamp: this.last_read_timestamp(),
       last_server_timestamp: this.last_server_timestamp(),
