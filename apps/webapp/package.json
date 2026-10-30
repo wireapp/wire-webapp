@@ -5,8 +5,8 @@
   "license": "GPL-3.0",
   "main": "src/script/main/index.tsx",
   "dependencies": {
-    "@datadog/browser-logs": "7.16.1",
-    "@datadog/browser-rum": "7.16.1",
+    "@datadog/browser-logs": "7.16.2",
+    "@datadog/browser-rum": "7.16.2",
     "@date-fns/tz": "1.5.0",
     "@emotion/react": "11.14.0",
     "@enormora/clock": "0.0.3",
