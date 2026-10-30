@@ -40,6 +40,7 @@ import {
   External,
   GenericMessage,
   LastRead,
+  MarkUnread,
   LegalHoldStatus,
   LinkPreview,
   Location,
@@ -161,7 +162,21 @@ type MappedHidden = {
 };
 type MappedKnock = {data: {}; type: typeof ClientEvent.CONVERSATION.KNOCK};
 type MappedLastRead = {
-  data: {conversationId: string; last_read_timestamp: string};
+  data: {
+    conversationId: string;
+    qualified_conversation_id?: LastRead['qualifiedConversationId'];
+    last_read_timestamp: string;
+    operation_timestamp?: string;
+  };
+  type: CONVERSATION_EVENT.MEMBER_UPDATE;
+};
+type MappedMarkUnread = {
+  data: {
+    conversationId: string;
+    qualified_conversation_id: MarkUnread['qualifiedConversationId'];
+    manual_unread_timestamp: string;
+    operation_timestamp: string;
+  };
   type: CONVERSATION_EVENT.MEMBER_UPDATE;
 };
 type MappedDataTransfer = {
@@ -204,6 +219,7 @@ type MappedGenericMessageNonEphemeralContent =
   | MappedHidden
   | MappedKnock
   | MappedLastRead
+  | MappedMarkUnread
   | MappedDataTransfer
   | MappedLocation
   | MappedReaction
@@ -325,6 +341,11 @@ export class CryptographyMapper {
 
       case GenericMessageType.LAST_READ: {
         specificContent = this._mapLastRead(genericMessage.lastRead as LastRead);
+        break;
+      }
+
+      case GenericMessageType.MARK_UNREAD: {
+        specificContent = this._mapMarkUnread(genericMessage.markUnread as MarkUnread);
         break;
       }
 
@@ -710,8 +731,30 @@ export class CryptographyMapper {
   private _mapLastRead(lastRead: LastRead): MappedLastRead {
     return {
       data: {
-        conversationId: lastRead.conversationId,
+        conversationId: lastRead.qualifiedConversationId?.id ?? lastRead.conversationId,
+        qualified_conversation_id: lastRead.qualifiedConversationId,
         last_read_timestamp: lastRead.lastReadTimestamp.toString(),
+        ...(Object.hasOwn(lastRead, 'operationTimestamp')
+          ? {operation_timestamp: lastRead.operationTimestamp?.toString()}
+          : {}),
+      },
+      type: CONVERSATION_EVENT.MEMBER_UPDATE,
+    };
+  }
+
+  private _mapMarkUnread(markUnread: MarkUnread): MappedMarkUnread {
+    if (isNullOrUndefined(markUnread.qualifiedConversationId)) {
+      throw new CryptographyError(
+        CryptographyError.TYPE.NO_GENERIC_MESSAGE,
+        CryptographyError.MESSAGE.NO_GENERIC_MESSAGE,
+      );
+    }
+    return {
+      data: {
+        conversationId: markUnread.qualifiedConversationId.id,
+        qualified_conversation_id: markUnread.qualifiedConversationId,
+        manual_unread_timestamp: markUnread.unreadFromTimestamp.toString(),
+        operation_timestamp: markUnread.operationTimestamp.toString(),
       },
       type: CONVERSATION_EVENT.MEMBER_UPDATE,
     };

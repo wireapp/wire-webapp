@@ -482,8 +482,19 @@ export class ConversationMapper {
     const selfState = members?.self ?? conversationData;
     conversationEntity = ConversationMapper.updateSelfStatus(conversationEntity, selfState as any);
 
-    if (isNumber(conversationData.manual_unread_timestamp)) {
+    if (
+      isNumber(conversationData.manual_unread_timestamp) &&
+      Number.isSafeInteger(conversationData.manual_unread_timestamp) &&
+      conversationData.manual_unread_timestamp >= 0
+    ) {
       conversationEntity.manualUnreadTimestamp(conversationData.manual_unread_timestamp);
+    }
+    if (
+      isNumber(conversationData.manual_unread_updated_at) &&
+      Number.isSafeInteger(conversationData.manual_unread_updated_at) &&
+      conversationData.manual_unread_updated_at >= 0
+    ) {
+      conversationEntity.manualUnreadUpdatedAt(conversationData.manual_unread_updated_at);
     }
 
     if ((conversationEntity.last_event_timestamp() ?? 0) === 0 && initialTimestamp !== undefined) {

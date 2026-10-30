@@ -298,6 +298,119 @@ describe('ConversationRepository', () => {
     conversationRepository['conversationState'].conversations.removeAll();
   });
 
+  describe('synced unread control messages', () => {
+    type Signal = {
+      from: string;
+      qualified_from: User['qualifiedId'];
+      conversation: string;
+      qualified_conversation: Conversation['qualifiedId'];
+      time: string;
+    };
+    function setupReadState(enabled = true): {
+      conversation: Conversation;
+      receive: (data: Record<string, string | number>, overrides?: Partial<Signal>) => Promise<void>;
+    } {
+      const [repository, {conversationState, userState}] = buildConversationRepository(translateForTest, enabled);
+      const selfUser = new User('self-user', 'example.com', translateForTest);
+      selfUser.isMe = true;
+      userState.self(selfUser);
+      const carrier = new Conversation(
+        'self-conversation',
+        'example.com',
+        CONVERSATION_PROTOCOL.PROTEUS,
+        translateForTest,
+      );
+      carrier.type(CONVERSATION_TYPE.SELF);
+      const conversation = new Conversation('target', 'example.com', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+      conversation.selfUser(selfUser);
+      conversation.last_read_timestamp(500);
+      conversationState.conversations([carrier, conversation]);
+      conversationState.activeConversation(conversation);
+      const event = {
+        from: selfUser.id,
+        qualified_from: selfUser.qualifiedId,
+        conversation: carrier.id,
+        qualified_conversation: carrier.qualifiedId,
+        time: new Date(4000).toISOString(),
+      };
+      const receive = (data: Record<string, string | number>, overrides: Partial<typeof event> = {}): Promise<void> => {
+        return repository['onMemberUpdate'](conversation, {...event, ...overrides, data: data as any});
+      };
+      return {conversation, receive};
+    }
+
+    it('applies an authenticated unread boundary without rewinding canonical reading', async () => {
+      const {conversation, receive} = setupReadState();
+
+      await receive({manual_unread_timestamp: '100', operation_timestamp: '1000'});
+
+      expect(conversation.manualUnreadTimestamp()).toBe(100);
+      expect(conversation.manualUnreadUpdatedAt()).toBe(1000);
+      expect(conversation.last_read_timestamp()).toBe(500);
+      expect(conversation.isAutoReadSuppressed()).toBe(true);
+    });
+
+    it.each([undefined, '3000'])(
+      'clears on a later equal-canonical read, including legacy action time %p',
+      async operation => {
+        const {conversation, receive} = setupReadState();
+        conversation.applyManualUnreadMarker(100, 1000);
+
+        await receive({
+          last_read_timestamp: '500',
+          ...(operation === undefined ? {} : {operation_timestamp: operation}),
+        });
+
+        expect(conversation.manualUnreadTimestamp()).toBeUndefined();
+        expect(conversation.isAutoReadSuppressed()).toBe(false);
+        expect(conversation.last_read_timestamp()).toBe(500);
+      },
+    );
+
+    it('keeps a newer manual marker when older read and unread operations arrive late', async () => {
+      const {conversation, receive} = setupReadState();
+      conversation.applyManualUnreadMarker(100, 1000);
+
+      await receive({last_read_timestamp: '500', operation_timestamp: '999'});
+      await receive({manual_unread_timestamp: '50', operation_timestamp: '999'});
+
+      expect(conversation.manualUnreadTimestamp()).toBe(100);
+      expect(conversation.manualUnreadUpdatedAt()).toBe(1000);
+      expect(conversation.last_read_timestamp()).toBe(500);
+    });
+
+    it.each([
+      ['another sender', 'other-user', 'example.com', 'self-conversation', 'example.com'],
+      ['another sender domain', 'self-user', 'other.example', 'self-conversation', 'example.com'],
+      ['an ordinary conversation', 'self-user', 'example.com', 'target', 'example.com'],
+      ['another carrier domain', 'self-user', 'example.com', 'self-conversation', 'other.example'],
+    ])('rejects unread updates from %s', async (_, sender, senderDomain, carrier, carrierDomain) => {
+      const {conversation, receive} = setupReadState();
+
+      await receive(
+        {manual_unread_timestamp: '100', operation_timestamp: '1000'},
+        {
+          from: sender,
+          qualified_from: {id: sender, domain: senderDomain},
+          conversation: carrier,
+          qualified_conversation: {id: carrier, domain: carrierDomain},
+        },
+      );
+
+      expect(conversation.manualUnreadTimestamp()).toBeUndefined();
+      expect(conversation.manualUnreadUpdatedAt()).toBeUndefined();
+      expect(conversation.last_read_timestamp()).toBe(500);
+    });
+
+    it('ignores unread updates while the feature is disabled', async () => {
+      const {conversation, receive} = setupReadState(false);
+
+      await receive({manual_unread_timestamp: '100', operation_timestamp: '1000'});
+
+      expect(conversation.manualUnreadTimestamp()).toBeUndefined();
+    });
+  });
+
   describe('translation injection', () => {
     it('uses the injected translate function for delete conversation error modal copy', async () => {
       const translate = jest.fn((translationKey: Parameters<Translate>[0]) => {

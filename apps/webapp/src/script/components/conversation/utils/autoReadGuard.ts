@@ -25,11 +25,13 @@ import type {Conversation} from 'Repositories/entity/Conversation';
  * The check happens when the wrapped callback runs, not when it is created.
  */
 export const withAutoReadGuard = <Args extends unknown[]>(
-  conversation: Pick<Conversation, 'isAutoReadSuppressed'>,
+  conversation: Pick<Conversation, 'isAutoReadSuppressed'> & Partial<Pick<Conversation, 'autoReadGeneration'>>,
   callback: (...args: Args) => void,
 ): ((...args: Args) => void) => {
+  const generation = conversation.autoReadGeneration;
+  const wasSuppressed = conversation.isAutoReadSuppressed();
   return (...args: Args) => {
-    if (conversation.isAutoReadSuppressed()) {
+    if (wasSuppressed || conversation.isAutoReadSuppressed() || generation !== conversation.autoReadGeneration) {
       return;
     }
     callback(...args);

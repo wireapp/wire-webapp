@@ -172,6 +172,76 @@ describe('MessageRepository', () => {
     state: MessageSendingState.OUTGOING_SENT,
   };
 
+  describe('unread state synchronization', () => {
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    it('keeps canonical reading unchanged and sends MarkUnread through every self conversation', async () => {
+      const [repository, {conversationState, serverTimeHandler: clock}] =
+        await buildMessageRepository(translateForTest);
+      const proteusSelf = new Conversation(
+        'self-proteus',
+        'example.com',
+        CONVERSATION_PROTOCOL.PROTEUS,
+        translateForTest,
+      );
+      const mlsSelf = new Conversation('self-mls', 'example.com', CONVERSATION_PROTOCOL.MLS, translateForTest);
+      jest.spyOn(conversationState, 'getSelfConversations').mockReturnValue([proteusSelf, mlsSelf]);
+      jest.spyOn(clock, 'toServerTimestamp').mockReturnValue(1000);
+      const send = jest
+        .spyOn(repository as unknown as MessageRepositoryPrivateMethodsForTest, 'sendAndInjectMessage')
+        .mockResolvedValue(successPayload);
+      const conversation = generateConversation();
+      conversation.last_read_timestamp(500);
+      const selectedMessage = new ContentMessage('selected-message', translateForTest);
+      selectedMessage.timestamp(100);
+
+      await repository.markAsUnread(conversation, selectedMessage);
+
+      expect(conversation.last_read_timestamp()).toBe(500);
+      expect(conversation.manualUnreadTimestamp()).toBe(100);
+      expect(conversation.manualUnreadUpdatedAt()).toBe(1000);
+      expect(conversation.isAutoReadSuppressed()).toBe(true);
+      const payload = expect.objectContaining({
+        content: 'markUnread',
+        markUnread: expect.objectContaining({
+          qualifiedConversationId: conversation.qualifiedId,
+          unreadFromTimestamp: 100,
+          operationTimestamp: 1000,
+        }),
+      });
+      expect(send).toHaveBeenCalledTimes(2);
+      expect(send).toHaveBeenNthCalledWith(1, payload, proteusSelf, {skipInjection: true});
+      expect(send).toHaveBeenNthCalledWith(2, payload, mlsSelf, {skipInjection: true});
+    });
+
+    it('syncs a later equal-canonical reread so the remote manual marker can clear', async () => {
+      const [repository, {conversationState}] = await buildMessageRepository(translateForTest);
+      const selfConversation = requireValueForTest(conversationState.conversations().at(0));
+      selfConversation.type(CONVERSATION_TYPE.SELF);
+      const send = jest
+        .spyOn(repository as unknown as MessageRepositoryPrivateMethodsForTest, 'sendAndInjectMessage')
+        .mockResolvedValue(successPayload);
+      const conversation = generateConversation();
+      conversation.last_read_timestamp(500);
+      conversation.applyManualUnreadMarker(100, 1000);
+
+      await repository.markAsRead(conversation, 500, 2000);
+
+      expect(conversation.manualUnreadTimestamp()).toBeUndefined();
+      expect(conversation.last_read_timestamp()).toBe(500);
+      expect(send).toHaveBeenCalledWith(
+        expect.objectContaining({
+          content: 'lastRead',
+          lastRead: expect.objectContaining({lastReadTimestamp: 500, operationTimestamp: 2000}),
+        }),
+        selfConversation,
+        {skipInjection: true},
+      );
+    });
+  });
+
   describe('read receipts after migration', () => {
     it.each([
       [CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_TYPE.REGULAR, true],

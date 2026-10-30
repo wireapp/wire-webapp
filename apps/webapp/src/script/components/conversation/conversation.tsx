@@ -574,23 +574,38 @@ function ConversationContent({
     }
   };
 
-  const updateConversationLastRead = (conversationEntity: ConversationEntity, messageEntity?: Message): void => {
-    const conversationLastRead = conversationEntity.last_read_timestamp();
-    const lastKnownTimestamp = conversationEntity.getLastKnownTimestamp(repositories.serverTime.toServerTimestamp());
-    const needsUpdate = conversationLastRead < lastKnownTimestamp;
+  const updateConversationLastRead = useCallback(
+    (conversationEntity: ConversationEntity, messageEntity?: Message): void => {
+      const conversationLastRead = conversationEntity.last_read_timestamp();
+      const lastKnownTimestamp = conversationEntity.getLastKnownTimestamp(repositories.serverTime.toServerTimestamp());
+      const needsUpdate =
+        conversationLastRead < lastKnownTimestamp || isNumber(conversationEntity.manualUnreadTimestamp());
+      const operationTime = Math.max(
+        repositories.serverTime.toServerTimestamp(),
+        (conversationEntity.manualUnreadUpdatedAt() ?? 0) + 1,
+      );
+      const generation = conversationEntity.autoReadGeneration;
 
-    // if no message provided it means we need to jump to the last message
-    if (needsUpdate && (isUndefined(messageEntity) || isLastReceivedMessage(messageEntity, conversationEntity))) {
-      conversationEntity.setTimestamp(lastKnownTimestamp, ConversationEntity.TIMESTAMP_TYPE.LAST_READ);
-      fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
-        await repositories.message.markAsRead(conversationEntity);
-      });
-    }
-  };
+      // if no message provided it means we need to jump to the last message
+      if (needsUpdate && (isUndefined(messageEntity) || isLastReceivedMessage(messageEntity, conversationEntity))) {
+        conversationEntity.setTimestamp(lastKnownTimestamp, ConversationEntity.TIMESTAMP_TYPE.LAST_READ);
+        fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+          if (generation === conversationEntity.autoReadGeneration) {
+            await repositories.message.markAsRead(conversationEntity, lastKnownTimestamp, operationTime);
+          }
+        });
+      }
+    },
+    [fireAndForgetInvoker, repositories.message, repositories.serverTime],
+  );
 
   const getInViewportCallback = useCallback(
     (conversationEntity: ConversationEntity, messageEntity: Message) => {
       const messageTimestamp = messageEntity.timestamp();
+      const readOperationTime = Math.max(
+        repositories.serverTime.toServerTimestamp(),
+        (conversationEntity.manualUnreadUpdatedAt() ?? 0) + 1,
+      );
 
       const callbacks: Function[] = [];
 
@@ -624,7 +639,9 @@ function ConversationContent({
       if (isNumber(manualUnreadTimestamp) && messageTimestamp >= manualUnreadTimestamp) {
         callbacks.push(
           withAutoReadGuard(conversationEntity, () => {
-            conversationEntity.clearManualUnreadMarker();
+            fireAndForgetInvoker.fireAndForget(async () => {
+              await repositories.message.markAsRead(conversationEntity, messageTimestamp, readOperationTime);
+            });
           }),
         );
       }
@@ -686,6 +703,8 @@ function ConversationContent({
       fireAndForgetInvoker,
       repositories.conversation,
       repositories.integration,
+      repositories.message,
+      repositories.serverTime,
       updateConversationLastRead,
     ],
   );

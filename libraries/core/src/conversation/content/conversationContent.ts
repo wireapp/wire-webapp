@@ -41,6 +41,7 @@ import {
   ImageContent,
   KnockContent,
   LocationContent,
+  MarkUnreadContent,
   ReactionContent,
   TextContent,
   InCallEmojiContent,
@@ -71,6 +72,7 @@ export type ConversationContent =
   | ImageContent
   | KnockContent
   | LocationContent
+  | MarkUnreadContent
   | ReactionContent
   | InCallEmojiContent
   | InCallHandRaiseContent
