@@ -20,6 +20,7 @@
 import type {Clock} from '@enormora/clock/clock';
 import {JobsTaskStatus, type JobsTaskStatus as JobsTaskStatusValue} from 'cells-sdk-ts';
 import {noop} from 'noop-esm';
+import {Maybe, maybe, type Task} from 'true-myth';
 
 export type CellsBackgroundActionOutcome =
   'all-finished' | 'mixed-terminal' | 'all-failed' | 'status-unknown' | 'check-limit';
@@ -28,34 +29,27 @@ export interface CellsBackgroundActionPollingPolicy {
   readonly pollIntervalMs: number;
   readonly maxUnknownRetries: number;
   readonly getUnknownRetryDelay: (retryIndex: number) => number;
-  readonly maxPollAttempts?: number;
+  readonly maxPollAttempts: Maybe<number>;
 }
 
 export interface CellsBackgroundActionPollingOptions {
   readonly jobUuids: readonly string[];
-  readonly readStatus: (jobUuid: string) => Promise<JobsTaskStatusValue | undefined>;
+  readonly readStatus: (jobUuid: string) => Task<Maybe<JobsTaskStatusValue>, unknown>;
   readonly clock: Clock;
   readonly pollingPolicy: CellsBackgroundActionPollingPolicy;
-  readonly isCurrent?: () => boolean;
-  readonly onStatusSnapshot?: (statuses: readonly JobsTaskStatusValue[]) => void;
-  readonly onOutcome: (
-    outcome: CellsBackgroundActionOutcome,
-    statuses: readonly (JobsTaskStatusValue | undefined)[],
-  ) => void;
+  readonly isCurrent: () => boolean;
+  readonly onStatusSnapshot: (statuses: readonly JobsTaskStatusValue[]) => void;
+  readonly onOutcome: (outcome: CellsBackgroundActionOutcome) => void;
 }
 
 export type CancelCellsBackgroundActionPolling = () => void;
-
-const isAlwaysCurrent = (): boolean => {
-  return true;
-};
 
 export const pollCellsBackgroundActionJobs = ({
   jobUuids,
   readStatus,
   clock,
   pollingPolicy,
-  isCurrent = isAlwaysCurrent,
+  isCurrent,
   onStatusSnapshot,
   onOutcome,
 }: CellsBackgroundActionPollingOptions): CancelCellsBackgroundActionPolling => {
@@ -65,15 +59,17 @@ export const pollCellsBackgroundActionJobs = ({
   }
 
   let isActive = true;
-  let timeout: ReturnType<typeof clock.setTimeout> | undefined;
+  let timeout: Maybe<ReturnType<typeof clock.setTimeout>> = Maybe.nothing();
   let unknownRetryCount = 0;
   let pollAttemptCount = 0;
 
   const clearScheduledCheck = (): void => {
-    if (timeout !== undefined) {
-      clock.clearTimeout(timeout);
-      timeout = undefined;
+    if (maybe.isNothing(timeout)) {
+      return;
     }
+
+    clock.clearTimeout(timeout.value);
+    timeout = Maybe.nothing();
   };
 
   const cancel = (): void => {
@@ -98,17 +94,14 @@ export const pollCellsBackgroundActionJobs = ({
     return true;
   };
 
-  const finish = (
-    outcome: CellsBackgroundActionOutcome,
-    statuses: readonly (JobsTaskStatusValue | undefined)[],
-  ): void => {
+  const finish = (outcome: CellsBackgroundActionOutcome): void => {
     if (!canContinue()) {
       return;
     }
 
     isActive = false;
     clearScheduledCheck();
-    onOutcome(outcome, statuses);
+    onOutcome(outcome);
   };
 
   const scheduleNextCheck = (delay: number): void => {
@@ -116,10 +109,16 @@ export const pollCellsBackgroundActionJobs = ({
       return;
     }
 
-    timeout = clock.setTimeout(() => {
-      timeout = undefined;
-      void checkStatuses();
-    }, delay);
+    timeout = Maybe.just(
+      clock.setTimeout(() => {
+        timeout = Maybe.nothing();
+        void checkStatuses();
+      }, delay),
+    );
+  };
+
+  const hasReachedPollLimit = (): boolean => {
+    return maybe.isJust(pollingPolicy.maxPollAttempts) && pollAttemptCount >= pollingPolicy.maxPollAttempts.value;
   };
 
   const checkStatuses = async (): Promise<void> => {
@@ -128,30 +127,36 @@ export const pollCellsBackgroundActionJobs = ({
     }
 
     pollAttemptCount += 1;
-    const statuses = await Promise.all(
-      uniqueJobUuids.map(async jobUuid => {
-        try {
-          return await readStatus(jobUuid);
-        } catch {
-          return undefined;
-        }
+    const statusResults = await Promise.all(
+      uniqueJobUuids.map(jobUuid => {
+        return readStatus(jobUuid);
       }),
     );
     if (!canContinue()) {
       return;
     }
 
+    const statuses = statusResults.map(statusResult => {
+      return statusResult.match({
+        Ok: status => {
+          return status;
+        },
+        Err: () => {
+          return Maybe.nothing<JobsTaskStatusValue>();
+        },
+      });
+    });
     const hasUnknownStatus = statuses.some(status => {
-      return status === undefined || status === JobsTaskStatus.Unknown;
+      return maybe.isNothing(status) || status.value === JobsTaskStatus.Unknown;
     });
     if (hasUnknownStatus) {
       if (unknownRetryCount >= pollingPolicy.maxUnknownRetries) {
-        finish('status-unknown', statuses);
+        finish('status-unknown');
         return;
       }
 
-      if (pollingPolicy.maxPollAttempts !== undefined && pollAttemptCount >= pollingPolicy.maxPollAttempts) {
-        finish('check-limit', statuses);
+      if (hasReachedPollLimit()) {
+        finish('check-limit');
         return;
       }
 
@@ -161,8 +166,14 @@ export const pollCellsBackgroundActionJobs = ({
     }
 
     unknownRetryCount = 0;
-    const knownStatuses = statuses as JobsTaskStatusValue[];
-    onStatusSnapshot?.(knownStatuses);
+    const knownStatuses = statuses.flatMap(status => {
+      if (maybe.isNothing(status)) {
+        return [];
+      }
+
+      return [status.value];
+    });
+    onStatusSnapshot(knownStatuses);
     if (!canContinue()) {
       return;
     }
@@ -172,7 +183,7 @@ export const pollCellsBackgroundActionJobs = ({
         return status === JobsTaskStatus.Finished;
       })
     ) {
-      finish('all-finished', knownStatuses);
+      finish('all-finished');
       return;
     }
 
@@ -182,8 +193,8 @@ export const pollCellsBackgroundActionJobs = ({
       );
     });
     if (hasPendingJob) {
-      if (pollingPolicy.maxPollAttempts !== undefined && pollAttemptCount >= pollingPolicy.maxPollAttempts) {
-        finish('check-limit', knownStatuses);
+      if (hasReachedPollLimit()) {
+        finish('check-limit');
         return;
       }
 
@@ -194,7 +205,7 @@ export const pollCellsBackgroundActionJobs = ({
     const hasFinishedJob = knownStatuses.some(status => {
       return status === JobsTaskStatus.Finished;
     });
-    finish(hasFinishedJob ? 'mixed-terminal' : 'all-failed', knownStatuses);
+    finish(hasFinishedJob ? 'mixed-terminal' : 'all-failed');
   };
 
   void checkStatuses();

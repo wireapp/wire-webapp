@@ -22,9 +22,14 @@ import {DragEvent, useEffect, useReducer, useRef, useState, type FunctionCompone
 import {isNonEmptyString} from '@sindresorhus/is';
 import {flexRender, getCoreRowModel, type Header, useReactTable} from '@tanstack/react-table';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
-import {JobsTaskStatus, RestActionStatus, type RestPerformActionResponse} from 'cells-sdk-ts';
+import {
+  JobsTaskStatus,
+  RestActionStatus,
+  type JobsTaskStatus as JobsTaskStatusValue,
+  type RestPerformActionResponse,
+} from 'cells-sdk-ts';
 import {createPortal} from 'react-dom';
-import {Maybe, maybe} from 'true-myth';
+import {Maybe, maybe, task} from 'true-myth';
 
 import {ArrowIcon, Button, ButtonVariant, CloseIcon, UploadIcon} from '@wireapp/react-ui-kit';
 
@@ -276,13 +281,22 @@ export const CellsTable = ({
     const moveStatusId = backgroundMoveStatusId;
     return pollCellsBackgroundActionJobs({
       jobUuids: backgroundMoveJobUuids,
-      readStatus: async jobUuid => {
-        return (await cellsRepository.getBackgroundMoveInfo({jobUuid})).Status;
+      readStatus: jobUuid => {
+        return task.tryOrElse(
+          error => {
+            return error;
+          },
+          async () => {
+            const response = await cellsRepository.getBackgroundMoveInfo({jobUuid});
+            return Maybe.of<JobsTaskStatusValue>(response.Status);
+          },
+        );
       },
       clock,
       pollingPolicy: {
         pollIntervalMs: BACKGROUND_MOVE_STATUS_POLL_INTERVAL_MS,
         maxUnknownRetries: MAX_BACKGROUND_MOVE_STATUS_RETRIES,
+        maxPollAttempts: Maybe.nothing(),
         getUnknownRetryDelay: retryIndex => {
           return (
             BACKGROUND_MOVE_STATUS_POLL_INTERVAL_MS *
@@ -292,6 +306,9 @@ export const CellsTable = ({
                 (BACKGROUND_MOVE_STATUS_RETRY_MAX_JITTER_FACTOR - BACKGROUND_MOVE_STATUS_RETRY_MIN_JITTER_FACTOR))
           );
         },
+      },
+      isCurrent: () => {
+        return true;
       },
       onStatusSnapshot: () => {
         if (maybe.isJust(backgroundMoveSummary.current)) {
