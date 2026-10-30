@@ -3538,11 +3538,9 @@ describe('ConversationRepository', () => {
 
       const [disabledRepository] = buildConversationRepository(translateForTest, false);
       const disabledConversationService = disabledRepository['conversationService'];
-      jest
-        .spyOn(disabledConversationService, 'loadConversationStatesFromDb')
-        .mockImplementation(async () => {
-          return persistedConversations as unknown as ConversationDatabaseData[];
-        });
+      jest.spyOn(disabledConversationService, 'loadConversationStatesFromDb').mockImplementation(async () => {
+        return persistedConversations as unknown as ConversationDatabaseData[];
+      });
       const saveDisabledState = jest
         .spyOn(disabledConversationService, 'saveConversationsInDb')
         .mockImplementation(async conversations => {
