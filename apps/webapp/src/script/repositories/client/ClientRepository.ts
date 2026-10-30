@@ -28,7 +28,6 @@ import murmurhash from 'murmurhash';
 import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
@@ -52,6 +51,7 @@ import {isClientMLSCapable, wasClientActiveWithinLast4Weeks} from './ClientUtils
 import {SIGN_OUT_REASON} from '../../auth/signOutReason';
 import {ClientError} from '../../error/clientError';
 import {Core} from '../../service/coreSingleton';
+import {WebAppEvents} from '../../webAppEvents';
 
 const loginHashSeed = 42;
 

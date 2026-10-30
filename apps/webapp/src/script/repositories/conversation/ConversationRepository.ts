@@ -77,7 +77,6 @@ import {flatten, isError} from 'underscore';
 
 import {Account} from '@wireapp/core';
 import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {TYPING_TIMEOUT, useTypingIndicatorState} from 'Components/inputBar/typingIndicator';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
@@ -183,6 +182,7 @@ import {SystemMessageType} from '../../message/systemMessageType';
 import {ensureMLSGroupIsEstablished, initMLSGroupConversation} from '../../mls';
 import {Core} from '../../service/coreSingleton';
 import {ServerTimeHandler} from '../../time/serverTimeHandler';
+import {WebAppEvents} from '../../webAppEvents';
 
 export type ConversationRepositoryOptions = {
   readonly isMarkAsUnreadFeatureEnabled: boolean;

@@ -20,9 +20,10 @@
 import {amplify} from 'amplify';
 
 import {Availability} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ContextMenuEntry, showContextMenu} from './contextMenu';
+
+import {WebAppEvents} from '../webAppEvents';
 
 type AvailabilityLabels = {
   readonly none: string;

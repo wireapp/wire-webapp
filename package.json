@@ -40,7 +40,6 @@
     "@typescript-eslint/parser": "8.72.0",
     "@typescript-eslint/utils": "8.72.0",
     "@wireapp/copy-config": "2.3.13",
-    "@wireapp/prettier-config": "0.6.11",
     "archiver": "7.0.1",
     "concurrently": "9.2.5",
     "cross-env": "10.1.0",
@@ -113,7 +112,6 @@
   },
   "license": "GPL-3.0",
   "name": "wire-webapp",
-  "prettier": "@wireapp/prettier-config",
   "private": true,
   "workspaces": [
     "apps/*",

@@ -18,7 +18,7 @@
  */
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {WebAppEvents} from '../../../webAppEvents';
 import {amplify} from 'amplify';
 
 import type {MeetingLifecycleDispatcher} from './createMeetingLifecycleDispatcher';

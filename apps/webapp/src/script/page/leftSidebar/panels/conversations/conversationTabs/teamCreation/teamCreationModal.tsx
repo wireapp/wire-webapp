@@ -21,8 +21,6 @@ import {useEffect, useState, type FunctionComponent} from 'react';
 
 import {amplify} from 'amplify';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import * as Icon from 'Components/icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {EventName} from 'Repositories/tracking/eventName';
@@ -35,6 +33,8 @@ import {Form} from './teamCreationSteps/form';
 import {Introduction} from './teamCreationSteps/introduction';
 import {Success} from './teamCreationSteps/success';
 import {useTeamCreationModal} from './useTeamCreationModal';
+
+import {WebAppEvents} from '../../../../../../webAppEvents';
 
 enum Step {
   Introduction = 'Introduction',

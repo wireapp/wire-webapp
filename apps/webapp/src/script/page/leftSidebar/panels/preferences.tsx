@@ -23,7 +23,6 @@ import {amplify} from 'amplify';
 
 import {Runtime} from '@wireapp/commons';
 import {TabIndex} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/icon';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
@@ -37,6 +36,7 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {ListWrapper} from './listWrapper';
 
+import {WebAppEvents} from '../../../webAppEvents';
 import {ContentState, useAppState} from '../../useAppState';
 
 type PreferencesProps = {

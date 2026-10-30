@@ -22,7 +22,7 @@ import assert from 'node:assert';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {MEETING_EVENT} from '@wireapp/api-client/lib/event';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {WebAppEvents} from '../../../webAppEvents';
 import {amplify} from 'amplify';
 import {noop} from 'noop-esm';
 import {maybe, task} from 'true-myth';

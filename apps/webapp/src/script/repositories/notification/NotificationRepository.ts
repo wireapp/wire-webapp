@@ -30,7 +30,6 @@ import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {AudioRepository} from 'Repositories/audio/audioRepository';
@@ -72,6 +71,7 @@ import {SystemMessageType} from '../../message/systemMessageType';
 import type {SystemNotificationApi, SystemNotificationHandle} from '../../notification/systemNotificationTypes';
 import {ContentState, useAppState} from '../../page/useAppState';
 import {Warnings} from '../../view_model/WarningsContainer';
+import {WebAppEvents} from '../../webAppEvents';
 
 const notificationTimeoutInSeconds = 5;
 

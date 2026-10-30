@@ -22,7 +22,6 @@ import React, {useEffect, useState, type FunctionComponent} from 'react';
 import {amplify} from 'amplify';
 
 import {TabIndex, Checkbox, CheckboxLabel, IndicatorRangeInput} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Theme} from 'Components/appContainer/hooks/useTheme';
 import {RadioGroup} from 'Components/Radio';
@@ -38,6 +37,8 @@ import type {Translate} from 'Util/localizerUtil/translationTypes';
 
 import {PreferencesPage} from './components/preferencesPage';
 import {PreferencesSection} from './components/preferencesSection';
+
+import {WebAppEvents} from '../../../../webAppEvents';
 
 interface OptionPreferencesProps {
   propertiesRepository: PropertiesRepository;

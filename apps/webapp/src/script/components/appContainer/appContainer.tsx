@@ -27,7 +27,6 @@ import ky from 'ky';
 import {container} from 'tsyringe';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {MeetingStoreRoot} from 'Components/meeting/meetingStore/meetingStoreRoot';
 import {LeaveGroupAdminModal} from 'Components/Modals/LeaveGroupAdminModal/LeaveGroupAdminModal';
@@ -59,6 +58,7 @@ import {APIClient} from '../../service/apiClientSingleton';
 import {Core} from '../../service/coreSingleton';
 import {TIME_IN_MILLIS} from '../../util/timeUtil';
 import {MainViewModel} from '../../view_model/MainViewModel';
+import {WebAppEvents} from '../../webAppEvents';
 import {AppLoader} from '../appLoader/index';
 
 type AppProps = {

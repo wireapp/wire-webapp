@@ -24,7 +24,6 @@ import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, FlexBox} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {ProgressBar} from 'Components/ProgressBar/ProgressBar';
@@ -40,6 +39,7 @@ import {getCurrentDate} from 'Util/timeUtil';
 import {downloadBlob} from 'Util/util';
 
 import {Config} from '../../Config';
+import {WebAppEvents} from '../../webAppEvents';
 
 enum ExportState {
   COMPRESSING = 'ExportState.STATE.COMPRESSING',

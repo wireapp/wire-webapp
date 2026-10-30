@@ -43,7 +43,6 @@ import {flatten, uniq} from 'underscore';
 
 import {TypedEventEmitter, type AccentColor} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
@@ -80,6 +79,7 @@ import {SIGN_OUT_REASON} from '../../auth/signOutReason';
 import {Config} from '../../Config';
 import {UserError} from '../../error/userError';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
+import {WebAppEvents} from '../../webAppEvents';
 
 const connectionUpdateDebounceInMilliseconds = 100;
 const maximumUserClients = 8;

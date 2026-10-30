@@ -37,7 +37,6 @@ import {partition} from 'underscore';
 
 import {Runtime, TypedEventEmitter} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
@@ -65,6 +64,7 @@ import {TeamState} from './TeamState';
 import {scheduleRecurringTask, updateRemoteConfigLogger} from '../../lifecycle/updateRemoteConfigs';
 import {getMLSMigrationStatus, MLSMigrationStatus} from '../../mls/MLSMigration/migrationStatus';
 import {APIClient} from '../../service/apiClientSingleton';
+import {WebAppEvents} from '../../webAppEvents';
 
 const teamRefreshIntervalInMinutes = 5;
 const minimumDesktopDownloadPathMinorVersion = 20;

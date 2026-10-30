@@ -28,7 +28,6 @@ import {ErrorBoundary} from 'react-error-boundary';
 import {container} from 'tsyringe';
 
 import {QUERY, StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallingContainer} from 'Components/calling/CallingOverlayContainer';
 import {ChooseScreen} from 'Components/calling/ChooseScreen';
@@ -77,6 +76,7 @@ import {Core} from '../service/coreSingleton';
 import {MainViewModel} from '../view_model/MainViewModel';
 import {useWarningOffset} from '../view_model/WarningsContainer/useWarningOffset';
 import {WarningsContainer} from '../view_model/WarningsContainer/WarningsContainer';
+import {WebAppEvents} from '../webAppEvents';
 
 export type RightSidebarParams = {
   entity: PanelEntity | null;

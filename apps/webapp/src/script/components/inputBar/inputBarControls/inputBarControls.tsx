@@ -21,14 +21,13 @@ import {useEffect, type FunctionComponent} from 'react';
 
 import {amplify} from 'amplify';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {Conversation} from 'Repositories/entity/Conversation';
 import {Config} from 'src/script/Config';
 
 import {ControlButtons} from './controlButtons';
 import {SendMessageButton} from './sendMessageButton/sendMessageButton';
 
+import {WebAppEvents} from '../../../webAppEvents';
 import {MessageContent} from '../common/messageContent/messageContent';
 
 interface InputBarControlsProps {

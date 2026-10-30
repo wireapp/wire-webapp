@@ -26,8 +26,6 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {E2EIVerificationMessage} from 'Components/messagesList/message/e2eiVerificationMessage';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {OutgoingQuote} from 'Repositories/conversation/MessageRepository';
@@ -57,6 +55,7 @@ import {SystemMessage} from './systemMessage';
 import {VerificationMessage} from './verificationMessage';
 
 import {ContextMenuEntry} from '../../../ui/contextMenu';
+import {WebAppEvents} from '../../../webAppEvents';
 
 import {MessageParams} from './index';
 

@@ -21,11 +21,11 @@ import {useCallback, useEffect, useMemo} from 'react';
 
 import {amplify} from 'amplify';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {MessageRepository, OutgoingQuote} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {Config} from 'src/script/Config';
+
+import {WebAppEvents} from '../../../webAppEvents';
 
 interface UseGiphyProps {
   text: string;

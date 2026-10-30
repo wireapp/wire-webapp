@@ -42,7 +42,7 @@ import {
   type WcallAudioCbrChangeHandler,
 } from '@wireapp/avs';
 import {Runtime} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {WebAppEvents} from '../../webAppEvents';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {Conversation} from 'Repositories/entity/Conversation';

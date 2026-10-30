@@ -37,7 +37,6 @@ import {task} from 'true-myth';
 import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
@@ -145,6 +144,7 @@ import {serverTimeHandler} from '../time/serverTimeHandler';
 import {WindowHandler} from '../ui/windowHandler';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
 import {Warnings} from '../view_model/WarningsContainer';
+import {WebAppEvents} from '../webAppEvents';
 
 type AppConfig = {
   COOKIES_CHECK: {COOKIE_NAME: string};

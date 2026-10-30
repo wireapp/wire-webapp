@@ -25,7 +25,6 @@ import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/';
 import {amplify} from 'amplify';
 
 import {CollectionIcon, HideIcon, HistoryIcon, LockClosedIcon, UnlockedIcon} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {
   CELLS_SELF_USER_DRIVE_ROLE,
@@ -48,6 +47,7 @@ import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 import {ConversationDetailsOption} from './conversationDetailsOption';
 
 import {ActionsViewModel} from '../../../../../view_model/ActionsViewModel';
+import {WebAppEvents} from '../../../../../webAppEvents';
 import {PanelEntity, PanelState} from '../../../rightSidebar';
 import {getConversationActions} from '../../utils/getConversationActions';
 import {ConversationDetailsBottomActions} from '../conversationDetailsBottomActions';

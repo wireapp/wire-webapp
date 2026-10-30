@@ -24,7 +24,6 @@ import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {container} from 'tsyringe';
 
 import {useMatchMedia} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallingCell} from 'Components/calling/CallingCell';
 import {parseAccountDeepLink} from 'Components/conversation/utils/parseAccountDeepLink';
@@ -98,6 +97,7 @@ import {RightSidebarParams} from '../../page/appMain';
 import {PanelState} from '../../page/rightSidebar';
 import {createCellsRepositoryGateway} from '../../repositories/cells/cellsRepositoryGateway';
 import {createCellsUploadManager} from '../../repositories/cells/upload/manager';
+import {WebAppEvents} from '../../webAppEvents';
 import {ElementType, MessageDetails} from '../messagesList/message/contentMessage/asset/textMessageRenderer';
 
 interface ConversationProps {

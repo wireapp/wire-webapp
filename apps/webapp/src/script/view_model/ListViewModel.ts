@@ -24,7 +24,6 @@ import ko from 'knockout';
 import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal, usePrimaryModalState} from 'Components/Modals/PrimaryModal';
 import type {CallingRepository} from 'Repositories/calling/CallingRepository';
@@ -60,6 +59,7 @@ import {showContextMenu} from '../ui/contextMenu';
 import {showLabelContextMenu} from '../ui/labelContextMenu';
 import {Shortcut} from '../ui/shortcut';
 import {ShortcutType} from '../ui/shortcutType';
+import {WebAppEvents} from '../webAppEvents';
 
 export class ListViewModel {
   private readonly userState: UserState;
