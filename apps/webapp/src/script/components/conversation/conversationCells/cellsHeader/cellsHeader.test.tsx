@@ -61,6 +61,7 @@ const defaultProperties = {
 
 const renderCellsHeader = (
   properties: Partial<typeof defaultProperties> & {
+    getCurrentCellsPath?: () => string;
     onSelectionBarAnchorChange?: (anchor: HTMLDivElement | null) => void;
   } = {},
   isBulkActionsEnabled = true,
@@ -122,6 +123,36 @@ describe('CellsHeader', () => {
 
     expect(screen.queryByRole('textbox', {name: 'cells.search.placeholder'})).not.toBeInTheDocument();
     expect(screen.queryByRole('button', {name: 'Public links'})).not.toBeInTheDocument();
+  });
+
+  it('shows Empty Bin at the Bin root even when the current page has no visible rows', () => {
+    renderCellsHeader({
+      getCurrentCellsPath: () => {
+        return 'recycle_bin';
+      },
+      isInRecycleBin: true,
+      isSearchViewOpen: false,
+    });
+
+    const emptyBinButton = screen.getByRole('button', {name: 'cells.emptyBin.button'});
+    const headerButtons = screen.getAllByRole('button');
+
+    expect(emptyBinButton).toBeInTheDocument();
+    expect(headerButtons.indexOf(emptyBinButton)).toBeLessThan(
+      headerButtons.indexOf(screen.getByRole('button', {name: 'cells.refreshButton'})),
+    );
+  });
+
+  it('does not show Empty Bin below the Bin root', () => {
+    renderCellsHeader({
+      getCurrentCellsPath: () => {
+        return 'recycle_bin/folder';
+      },
+      isInRecycleBin: true,
+      isSearchViewOpen: false,
+    });
+
+    expect(screen.queryByRole('button', {name: 'cells.emptyBin.button'})).not.toBeInTheDocument();
   });
 
   it('keeps search and filters available outside the recycle bin', () => {

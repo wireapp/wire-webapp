@@ -17,7 +17,7 @@
  *
  */
 
-import type {FunctionComponent} from 'react';
+import {useCallback, type FunctionComponent} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
@@ -31,6 +31,8 @@ import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
+import {CellsEmptyBinAction} from './cellsEmptyBinAction/cellsEmptyBinAction';
+import {isEmptyBinRootPath} from './cellsEmptyBinAction/emptyBinAction';
 import {
   actionsStyles,
   breadcrumbsRowStyles,
@@ -69,6 +71,9 @@ interface CellsHeaderProps {
   filters: FilterConfig[];
   showViewerPermission: boolean;
   onSelectionBarAnchorChange?: (anchor: HTMLDivElement | null) => void;
+  onRefreshAfterEmptyBinOutcome?: () => Promise<boolean>;
+  onEmptyBinSubmitted?: () => void;
+  getCurrentCellsPath?: () => string;
 }
 
 export const CellsHeader: FunctionComponent<CellsHeaderProps> = ({
@@ -88,17 +93,33 @@ export const CellsHeader: FunctionComponent<CellsHeaderProps> = ({
   filters,
   showViewerPermission,
   onSelectionBarAnchorChange,
+  onRefreshAfterEmptyBinOutcome,
+  onEmptyBinSubmitted,
+  getCurrentCellsPath,
 }: CellsHeaderProps) => {
   const {translate, isFeatureToggleEnabled} = useApplicationContext();
   const isSelectionBarEnabled = isFeatureToggleEnabled(driveBulkActionsFeatureToggleName);
   const canPerformCellsAction = useCellsActionPermissions();
+  const readCurrentCellsPath = getCurrentCellsPath ?? getCellsFilesPath;
+  const currentPath = readCurrentCellsPath();
   const breadcrumbs = getBreadcrumbsFromPath({
     baseCrumb: translate('cells.breadcrumb.files', {conversationName}),
-    currentPath: getCellsFilesPath(),
+    currentPath,
     recycleBinLabel: translate('cells.recycleBin.breadcrumb'),
   });
   const isRootLevel = breadcrumbs.length === 1;
   const shouldShowViewerAccessLabel = !isInRecycleBin && !canPerformCellsAction(CELLS_ACTION.CREATE);
+  const refreshAfterEmptyBinOutcome = useCallback(async (): Promise<boolean> => {
+    if (onRefreshAfterEmptyBinOutcome !== undefined) {
+      return onRefreshAfterEmptyBinOutcome();
+    }
+
+    onRefresh();
+    return true;
+  }, [onRefresh, onRefreshAfterEmptyBinOutcome]);
+  const handleEmptyBinSubmitted = useCallback((): void => {
+    onEmptyBinSubmitted?.();
+  }, [onEmptyBinSubmitted]);
 
   return (
     <div css={wrapperStyles}>
@@ -120,23 +141,35 @@ export const CellsHeader: FunctionComponent<CellsHeaderProps> = ({
         {isSearchViewOpen && !isInRecycleBin ? (
           <CellsFiltersBar filters={filters} />
         ) : (
-          <div css={actionsStyles}>
-            {!isInRecycleBin && (
-              <CellsNewMenu
+          <>
+            {isInRecycleBin && isEmptyBinRootPath(currentPath) && (
+              <CellsEmptyBinAction
+                key={`${conversationQualifiedId.id}@${conversationQualifiedId.domain}`}
                 cellsRepository={cellsRepository}
                 conversationQualifiedId={conversationQualifiedId}
-                onRefresh={onRefresh}
-                onUploadFiles={onUploadFiles}
-                onUploadFolder={onUploadFolder}
-                isUploadFilesEnabled={isUploadFilesEnabled}
+                getCurrentCellsPath={readCurrentCellsPath}
+                onRefreshAfterEmptyBinOutcome={refreshAfterEmptyBinOutcome}
+                onEmptyBinSubmitted={handleEmptyBinSubmitted}
               />
             )}
-            {shouldShowViewerAccessLabel && (
-              <CellsViewerAccessLabel label={translate('cells.sharedDriveAccess.viewerAccess')} />
-            )}
-            <CellsRefresh onRefresh={onRefresh} />
-            <CellsMoreMenu conversationQualifiedId={conversationQualifiedId} />
-          </div>
+            <div css={actionsStyles}>
+              {!isInRecycleBin && (
+                <CellsNewMenu
+                  cellsRepository={cellsRepository}
+                  conversationQualifiedId={conversationQualifiedId}
+                  onRefresh={onRefresh}
+                  onUploadFiles={onUploadFiles}
+                  onUploadFolder={onUploadFolder}
+                  isUploadFilesEnabled={isUploadFilesEnabled}
+                />
+              )}
+              {shouldShowViewerAccessLabel && (
+                <CellsViewerAccessLabel label={translate('cells.sharedDriveAccess.viewerAccess')} />
+              )}
+              <CellsRefresh onRefresh={onRefresh} />
+              <CellsMoreMenu conversationQualifiedId={conversationQualifiedId} />
+            </div>
+          </>
         )}
       </div>
 
