@@ -32,6 +32,10 @@ describe('useReadReceipt', () => {
     jest.useFakeTimers();
   });
 
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   it('batches the read receipt sending per conversation', async () => {
     const sendReadReceipt = jest.fn();
     const {result} = renderHook(() => {
@@ -118,4 +122,107 @@ describe('useReadReceipt', () => {
     expect(sendReadReceipt).toHaveBeenCalledTimes(1);
     expect(sendReadReceipt).toHaveBeenCalledWith(conversation, message, []);
   });
+
+  it('cancels a queued receipt when its conversation is marked unread', () => {
+    const sendReadReceipt = jest.fn();
+    const {result} = renderHook(() => {
+      return useReadReceiptSender({sendReadReceipt});
+    });
+    const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    const message = new Message(createUuid(), undefined, translateForTest);
+
+    result.current.addReadReceiptToBatch(conversation, message);
+    result.current.cancelPendingReadReceiptsForConversation(conversation);
+    conversation.markUnreadFrom(message);
+
+    jest.advanceTimersByTime(500);
+
+    expect(sendReadReceipt).not.toHaveBeenCalled();
+  });
+
+  it('keeps queued receipts for other conversations when one is marked unread', () => {
+    const sendReadReceipt = jest.fn();
+    const {result} = renderHook(() => {
+      return useReadReceiptSender({sendReadReceipt});
+    });
+    const conversationId = createUuid();
+    const conversationA = new Conversation(conversationId, 'conversation-a.example', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    const conversationB = new Conversation(conversationId, 'conversation-b.example', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    const sender = createUuid();
+    const messageA1 = new Message(createUuid(), undefined, translateForTest);
+    const messageA2 = new Message(createUuid(), undefined, translateForTest);
+    const messageB1 = new Message(createUuid(), undefined, translateForTest);
+    const messageB2 = new Message(createUuid(), undefined, translateForTest);
+    [messageA1, messageA2, messageB1, messageB2].forEach(message => {
+      message.from = sender;
+    });
+
+    result.current.addReadReceiptToBatch(conversationA, messageA1);
+    result.current.addReadReceiptToBatch(conversationA, messageA2);
+    result.current.addReadReceiptToBatch(conversationB, messageB1);
+    result.current.addReadReceiptToBatch(conversationB, messageB2);
+    result.current.cancelPendingReadReceiptsForConversation(conversationA);
+
+    jest.advanceTimersByTime(500);
+
+    expect(sendReadReceipt).toHaveBeenCalledTimes(1);
+    expect(sendReadReceipt).toHaveBeenCalledWith(conversationB, messageB1, [messageB2]);
+  });
+
+  it('does not send a canceled receipt after leaving the conversation resets auto-read suppression', () => {
+    const sendReadReceipt = jest.fn();
+    const {result} = renderHook(() => {
+      return useReadReceiptSender({sendReadReceipt});
+    });
+    const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    const message = new Message(createUuid(), undefined, translateForTest);
+
+    result.current.addReadReceiptToBatch(conversation, message);
+    result.current.cancelPendingReadReceiptsForConversation(conversation);
+    conversation.markUnreadFrom(message);
+    conversation.release();
+
+    jest.advanceTimersByTime(500);
+
+    expect(conversation.isAutoReadSuppressed()).toBe(false);
+    expect(sendReadReceipt).not.toHaveBeenCalled();
+  });
+
+  it('sends newly queued receipts after normal reading resumes', () => {
+    const sendReadReceipt = jest.fn();
+    const {result} = renderHook(() => {
+      return useReadReceiptSender({sendReadReceipt});
+    });
+    const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    const unreadMessage = new Message(createUuid(), undefined, translateForTest);
+    const newlyReadMessage = new Message(createUuid(), undefined, translateForTest);
+
+    result.current.addReadReceiptToBatch(conversation, unreadMessage);
+    result.current.cancelPendingReadReceiptsForConversation(conversation);
+    conversation.markUnreadFrom(unreadMessage);
+    conversation.release();
+    conversation.clearManualUnreadMarker();
+    result.current.addReadReceiptToBatch(conversation, newlyReadMessage);
+
+    jest.advanceTimersByTime(500);
+
+    expect(sendReadReceipt).toHaveBeenCalledTimes(1);
+    expect(sendReadReceipt).toHaveBeenCalledWith(conversation, newlyReadMessage, []);
+  });
+
+  it('sends queued receipts normally when unread cancellation is not used', () => {
+    const sendReadReceipt = jest.fn();
+    const {result} = renderHook(() => {
+      return useReadReceiptSender({sendReadReceipt});
+    });
+    const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    const message = new Message(createUuid(), undefined, translateForTest);
+
+    result.current.addReadReceiptToBatch(conversation, message);
+
+    jest.advanceTimersByTime(500);
+
+    expect(sendReadReceipt).toHaveBeenCalledWith(conversation, message, []);
+  });
+
 });

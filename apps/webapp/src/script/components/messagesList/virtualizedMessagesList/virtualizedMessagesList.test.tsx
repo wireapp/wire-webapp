@@ -54,6 +54,7 @@ function createMessageListProperties(): ComponentProps<typeof VirtualizedMessage
     parentElement: document.createElement('div'),
     isConversationLoaded: false,
     isMsgElementsFocusable: false,
+    cancelPendingReadReceiptsForConversation: noop,
     cancelConnectionRequest: noop,
     getVisibleCallback: () => {
       return undefined;

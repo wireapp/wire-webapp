@@ -196,7 +196,7 @@ function ConversationContent({
 
   const [activeTabIndex, setActiveTabIndex] = useState(0);
 
-  const {addReadReceiptToBatch} = useReadReceiptSender(repositories.message);
+  const {addReadReceiptToBatch, cancelPendingReadReceiptsForConversation} = useReadReceiptSender(repositories.message);
 
   useEffect(() => {
     if (!isVirtualizedMessagesListEnabled) {
@@ -854,6 +854,7 @@ function ConversationContent({
                 setMsgElementsFocusable={setMsgElementsFocusable}
                 isRightSidebarOpen={isRightSidebarOpen}
                 updateConversationLastRead={updateConversationLastRead}
+                cancelPendingReadReceiptsForConversation={cancelPendingReadReceiptsForConversation}
               />
 
               {showViewerPermission && !isFileTabActive && <ConversationViewerPermissionBanner />}

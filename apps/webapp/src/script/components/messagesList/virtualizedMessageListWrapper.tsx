@@ -31,6 +31,7 @@ import {MessagesListParams} from './messageList.types';
 export const VirtualizedMessageListWrapper: FunctionComponent<MessagesListParams> = ({
   assetRepository,
   conversation,
+  cancelPendingReadReceiptsForConversation,
   selfUser,
   conversationRepository,
   messageRepository,
@@ -74,6 +75,7 @@ export const VirtualizedMessageListWrapper: FunctionComponent<MessagesListParams
         <VirtualizedMessagesList
           parentElement={parentRef.current}
           conversation={conversation}
+          cancelPendingReadReceiptsForConversation={cancelPendingReadReceiptsForConversation}
           cancelConnectionRequest={cancelConnectionRequest}
           resetSession={resetSession}
           invitePeople={invitePeople}

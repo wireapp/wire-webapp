@@ -61,6 +61,7 @@ interface MessagesListParams {
   cancelConnectionRequest: (message: MemberMessage) => void;
   conversation: Conversation;
   conversationRepository: ConversationRepository;
+  cancelPendingReadReceiptsForConversation: (conversation: Conversation) => void;
   getVisibleCallback: (conversationEntity: Conversation, messageEntity: MessageEntity) => (() => void) | undefined;
   invitePeople: (convesation: Conversation) => void;
   messageActions: {
@@ -87,6 +88,7 @@ interface MessagesListParams {
 export const MessagesList: FC<MessagesListParams> = ({
   assetRepository,
   conversation,
+  cancelPendingReadReceiptsForConversation,
   selfUser,
   conversationRepository,
   messageRepository,
@@ -345,6 +347,7 @@ export const MessagesList: FC<MessagesListParams> = ({
                   hideHeader={message.timestamp() !== firstMessageTimestamp}
                   messageActions={messageActions}
                   conversation={conversation}
+                  cancelPendingReadReceiptsForConversation={cancelPendingReadReceiptsForConversation}
                   hasReadReceiptsTurnedOn={conversationRepository.expectReadReceipt(conversation)}
                   isLastDeliveredMessage={isLastDeliveredMessage}
                   isHighlighted={isHighlighted}

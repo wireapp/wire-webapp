@@ -19,7 +19,7 @@
 
 import {useCallback, useRef} from 'react';
 
-import {isNonEmptyArray} from '@sindresorhus/is';
+import {isNonEmptyArray, isUndefined} from '@sindresorhus/is';
 import {groupBy} from 'underscore';
 
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
@@ -30,7 +30,10 @@ type ReadMessageBuffer = {conversation: Conversation; message: Message};
 
 const DEBOUNCE = 500;
 
-type UseReadReceiptSenderResult = {addReadReceiptToBatch: (conversation: Conversation, message: Message) => void};
+type UseReadReceiptSenderResult = {
+  addReadReceiptToBatch: (conversation: Conversation, message: Message) => void;
+  cancelPendingReadReceiptsForConversation: (conversation: Conversation) => void;
+};
 export const useReadReceiptSender = (
   messageSender: Pick<MessageRepository, 'sendReadReceipt'>,
 ): UseReadReceiptSenderResult => {
@@ -39,6 +42,13 @@ export const useReadReceiptSender = (
 
   const flush = useCallback(() => {
     const readMessages = readMessagesBuffer.current;
+    readMessagesBuffer.current = [];
+    const scheduledFlushTimer = flushTimer.current;
+    if (!isUndefined(scheduledFlushTimer)) {
+      window.clearTimeout(scheduledFlushTimer);
+    }
+    flushTimer.current = undefined;
+
     if (isNonEmptyArray(readMessages)) {
       const groupedMessages = groupBy(readMessages, ({conversation, message}) => {
         return conversation.id + message.from;
@@ -55,9 +65,22 @@ export const useReadReceiptSender = (
           messageSender.sendReadReceipt(conversation, firstMessage, otherMessageIds);
         }
       });
-      readMessagesBuffer.current = [];
     }
   }, [messageSender]);
+
+  const cancelPendingReadReceiptsForConversation = useCallback((conversationToCancel: Conversation): void => {
+    readMessagesBuffer.current = readMessagesBuffer.current.filter(readMessage => {
+      return (
+        readMessage.conversation.id !== conversationToCancel.id ||
+        readMessage.conversation.domain !== conversationToCancel.domain
+      );
+    });
+
+    if (!isNonEmptyArray(readMessagesBuffer.current) && !isUndefined(flushTimer.current)) {
+      window.clearTimeout(flushTimer.current);
+      flushTimer.current = undefined;
+    }
+  }, []);
 
   return {
     addReadReceiptToBatch: (conversation: Conversation, message: Message) => {
@@ -69,7 +92,7 @@ export const useReadReceiptSender = (
         return;
       }
 
-      if (flushTimer.current !== undefined) {
+      if (!isUndefined(flushTimer.current)) {
         window.clearTimeout(flushTimer.current);
       }
 
@@ -78,5 +101,6 @@ export const useReadReceiptSender = (
       readMessagesBuffer.current = readMessagesBuffer.current.concat(entry);
       flushTimer.current = window.setTimeout(flush, DEBOUNCE);
     },
+    cancelPendingReadReceiptsForConversation,
   };
 };

@@ -85,6 +85,7 @@ async function loadMessagesForTimestampSelection(options: LoadMessagesForTimesta
 
 export const VirtualizedMessagesList: FunctionComponent<Props> = ({
   conversation,
+  cancelPendingReadReceiptsForConversation,
   parentElement,
   assetRepository,
   selfUser,
@@ -385,6 +386,7 @@ export const VirtualizedMessagesList: FunctionComponent<Props> = ({
                   hideHeader={item.shouldGroup}
                   messageActions={messageActions}
                   conversation={conversation}
+                  cancelPendingReadReceiptsForConversation={cancelPendingReadReceiptsForConversation}
                   hasReadReceiptsTurnedOn={conversationRepository.expectReadReceipt(conversation)}
                   isLastDeliveredMessage={lastDeliveredMessage?.id === item.message.id}
                   isHighlighted={
