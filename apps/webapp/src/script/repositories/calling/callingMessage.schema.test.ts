@@ -28,6 +28,14 @@ const serializeOtherVersion = (padding: string): string => {
   return JSON.stringify({type: CALL_MESSAGE_TYPE.CONF_START, version: '4.0', padding});
 };
 
+const nestedEnvelope = (depth: number): unknown => {
+  let value: unknown = 'leaf';
+  for (let index = 0; index < depth; index++) {
+    value = {child: value};
+  }
+  return value;
+};
+
 describe('parseSerializedCallingMessage', () => {
   it('preserves fields from an unfamiliar version with a different payload shape', () => {
     const content = {type: CALL_MESSAGE_TYPE.SETUP, version: '4.0', negotiation: {formats: ['example']}};
@@ -35,6 +43,46 @@ describe('parseSerializedCallingMessage', () => {
 
     assert(parsed.isOk);
     expect(parsed.value).toEqual(content);
+  });
+
+  it.each([
+    ['string', 'a'.repeat(65_536), 'a'.repeat(65_537)],
+    ['UTF-8 string', '€'.repeat(21_845) + 'a', '€'.repeat(21_846)],
+    ['array', Array(256).fill(0), Array(257).fill(0)],
+    [
+      'object',
+      Object.fromEntries(
+        Array.from({length: 256}, (_, index) => {
+          return [index, true];
+        }),
+      ),
+      Object.fromEntries(
+        Array.from({length: 257}, (_, index) => {
+          return [index, true];
+        }),
+      ),
+    ],
+    ['property key', {['a'.repeat(128)]: true}, {['a'.repeat(129)]: true}],
+    ['nesting', nestedEnvelope(15), nestedEnvelope(16)],
+  ])('bounds unfamiliar-version %s values', (_name, accepted, rejected) => {
+    const valid = parseSerializedCallingMessage(
+      JSON.stringify({type: CALL_MESSAGE_TYPE.CONF_START, version: '4.0', future: accepted}),
+    );
+    assert(valid.isOk);
+    const invalid = parseSerializedCallingMessage(
+      JSON.stringify({type: CALL_MESSAGE_TYPE.CONF_START, version: '4.0', future: rejected}),
+    );
+    assert(invalid.isErr);
+    expect(invalid.error.reason).toBe('invalid_message');
+  });
+
+  it('rejects extreme nesting without overflowing the validation stack', () => {
+    const serialized =
+      '{"type":"CONFSTART","version":"4.0","future":' + '['.repeat(10_000) + '0' + ']'.repeat(10_000) + '}';
+    const parsed = parseSerializedCallingMessage(serialized);
+
+    assert(parsed.isErr);
+    expect(parsed.error.reason).toBe('invalid_message');
   });
 
   it('rejects unknown fields for the supported version', () => {
@@ -95,7 +143,14 @@ describe('parseSerializedCallingMessage', () => {
   });
 
   it('accepts an envelope at the serialized size limit', () => {
-    const serialized = serializeOtherVersion('a'.repeat(MAX_MESSAGE_BYTES - serializeOtherVersion('').length));
+    const fields = Object.fromEntries(
+      Array.from({length: 16}, (_, index) => {
+        return [`field${index}`, 'a'.repeat(65_000)];
+      }),
+    );
+    const envelope = {type: CALL_MESSAGE_TYPE.CONF_START, version: '4.0', ...fields, padding: ''};
+    envelope.padding = 'a'.repeat(MAX_MESSAGE_BYTES - JSON.stringify(envelope).length);
+    const serialized = JSON.stringify(envelope);
     const parsed = parseSerializedCallingMessage(serialized);
 
     assert(parsed.isOk);

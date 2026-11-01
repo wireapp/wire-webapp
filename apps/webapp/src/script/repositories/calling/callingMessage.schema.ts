@@ -17,8 +17,8 @@
  *
  */
 
-import {Result, result} from 'true-myth';
-import {z} from 'zod';
+import {Maybe, Result, result} from 'true-myth';
+import {z} from 'zod/v3';
 
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 
@@ -37,7 +37,9 @@ const MAX_TIMESTAMP_LENGTH = 32;
 const MAX_SEQUENCE_NUMBER_LENGTH = 16;
 const MAX_PROPERTIES = 256;
 const MAX_TARGET_DOMAINS = 256;
-const MAX_TARGET_USERS = 256;
+export const MAX_MODERATOR_TARGET_USERS = 256;
+const MAX_ENVELOPE_DEPTH = 16;
+const MAX_ENVELOPE_ENTRIES = 256;
 
 const identifier = z.string().max(MAX_IDENTIFIER_LENGTH);
 const common = {
@@ -61,7 +63,7 @@ const qualifiedTargets = z
   .record(
     z.string().max(MAX_DOMAIN_LENGTH),
     z.record(z.string().max(MAX_IDENTIFIER_LENGTH), z.array(identifier).max(MAX_KEYS)).refine(value => {
-      return Object.keys(value).length <= MAX_TARGET_USERS;
+      return Object.keys(value).length <= MAX_MODERATOR_TARGET_USERS;
     }),
   )
   .refine(value => {
@@ -133,8 +135,44 @@ const moderatorMessageSchema = z.discriminatedUnion('type', [
     .strict(),
 ]);
 
-// Other protocol versions may add or change fields. AVS decides compatibility;
-// the serialized size limit still bounds everything passed through this envelope.
+// AVS parses the full JSON before checking protocol compatibility. Bound unknown
+// fields too, without imposing the supported version's payload shape.
+const validateOtherVersionEnvelope = (input: unknown, context: z.RefinementCtx): void => {
+  const pending = [{value: input, depth: 0}];
+  const encoder = new TextEncoder();
+  while (pending.length > 0) {
+    const entry = Maybe.of(pending.pop());
+    if (entry.isNothing) {
+      break;
+    }
+    const {value, depth} = entry.value;
+    if (
+      depth > MAX_ENVELOPE_DEPTH ||
+      (typeof value === 'string' && encoder.encode(value).byteLength > MAX_SDP_LENGTH)
+    ) {
+      context.addIssue({code: z.ZodIssueCode.custom, message: 'Protocol envelope exceeds structural limits'});
+      return;
+    }
+    if (typeof value !== 'object' || value === null) {
+      continue;
+    }
+    const entries = Object.entries(value);
+    if (
+      entries.length > MAX_ENVELOPE_ENTRIES ||
+      (!Array.isArray(value) &&
+        entries.some(([key]) => {
+          return encoder.encode(key).byteLength > MAX_PROPERTY_KEY_LENGTH;
+        }))
+    ) {
+      context.addIssue({code: z.ZodIssueCode.custom, message: 'Protocol envelope exceeds structural limits'});
+      return;
+    }
+    for (const [, child] of entries) {
+      pending.push({value: child, depth: depth + 1});
+    }
+  }
+};
+
 const otherVersionMessageSchema = z
   .object({
     type: z.enum([
@@ -160,7 +198,8 @@ const otherVersionMessageSchema = z
         return version !== SUPPORTED_PROTOCOL_VERSION;
       }),
   })
-  .passthrough();
+  .passthrough()
+  .superRefine(validateOtherVersionEnvelope);
 
 const callingMessageSchema = z.union([avsMessageSchema, moderatorMessageSchema, otherVersionMessageSchema]);
 

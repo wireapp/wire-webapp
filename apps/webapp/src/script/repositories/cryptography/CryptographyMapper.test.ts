@@ -31,6 +31,7 @@ import {
   Cleared,
   ClientAction,
   External,
+  Ephemeral,
   GenericMessage,
   Knock,
   LastRead,
@@ -142,6 +143,45 @@ describe('CryptographyMapper', () => {
   });
 
   describe('"mapGenericMessage"', () => {
+    it.each(['not-json', JSON.stringify({type: 'CANCEL', version: '3.0'})])(
+      'skips invalid calling content inside an ephemeral wrapper: %s',
+      async content => {
+        // Calling is outside the current protobuf's ephemeral field set, but
+        // the mapper interprets the wrapper as a generic message at runtime.
+        const ephemeral = Object.assign(
+          new GenericMessage({messageId: createUuid(), calling: new Calling({content})}),
+          {
+            expireAfterMillis: Long.fromNumber(5_000),
+          },
+        );
+        const genericMessage = new GenericMessage({
+          messageId: createUuid(),
+          ephemeral,
+        });
+
+        expect(ephemeral.content).toBe(GenericMessageType.CALLING);
+        await expect(mapper.mapGenericMessage(genericMessage, event)).resolves.toBeUndefined();
+      },
+    );
+
+    it('preserves valid ephemeral content and its expiry', async () => {
+      const messageId = createUuid();
+      const genericMessage = new GenericMessage({
+        messageId,
+        ephemeral: new Ephemeral({
+          expireAfterMillis: Long.fromNumber(5_000),
+          text: new Text({content: 'temporary message'}),
+        }),
+      });
+
+      await expect(mapper.mapGenericMessage(genericMessage, event)).resolves.toMatchObject({
+        id: messageId,
+        ephemeral_expires: 5_000,
+        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
+        data: {content: 'temporary message'},
+      });
+    });
+
     it.each([
       [0, 0],
       [NaN, 0],

@@ -22,6 +22,8 @@ import {
   DefaultConversationRoleName,
   GROUP_CONVERSATION_TYPE,
 } from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
+import {Calling, GenericMessage} from '@wireapp/protocol-messaging';
 import type {CallConfigData} from '@wireapp/api-client/lib/account/callConfigData';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {amplify} from 'amplify';
@@ -47,6 +49,7 @@ import {WebAppEvents} from '../../webAppEvents';
 
 import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {Conversation} from '../entity/Conversation';
+import {CryptographyMapper} from '../cryptography/CryptographyMapper';
 import {User} from '../entity/User';
 import {CallingEvent} from '../event/CallingEvent';
 import {CALL} from '../event/Client';
@@ -472,6 +475,44 @@ describe('CallingRepository', () => {
       expect(warnOutdatedClient).toHaveBeenCalledTimes(expectedWarnings);
     });
 
+    it.each([
+      ['oversized string', JSON.stringify({type: 'SETUP', version: '4.0', sdp: 'a'.repeat(65_537)})],
+      ['deep nesting', '{"type":"CONFSTART","version":"4.0","future":' + '['.repeat(17) + '0' + ']'.repeat(17) + '}'],
+    ])('discards an unfamiliar-version %s before AVS', async (_name, content) => {
+      const conversation = createConversation();
+      callingRepository['conversationState'].conversations.push(conversation);
+      const recvMsg = jest.spyOn(wCall, 'recvMsg').mockReturnValue(0);
+      const mapper = new CryptographyMapper(container.resolve(Core));
+      const mapped = await mapper.mapGenericMessage(
+        new GenericMessage({messageId: createUuid(), calling: new Calling({content})}),
+        {
+          conversation: conversation.id,
+          qualified_conversation: conversation.qualifiedId,
+          from: 'sender',
+          time: '2026-01-01T00:00:00.000Z',
+          type: CONVERSATION_EVENT.OTR_MESSAGE_ADD,
+          data: {sender: 'client', recipient: 'self-client', text: ''},
+        },
+      );
+      if (mapped && mapped.type === CALL.E_CALL) {
+        await callingRepository.onCallEvent(
+          {
+            content: mapped.content,
+            conversation: mapped.conversation,
+            qualified_conversation: conversation.qualifiedId,
+            from: mapped.from,
+            sender: 'client',
+            time: mapped.time,
+            type: CALL.E_CALL,
+          },
+          EventRepository.SOURCE.WEB_SOCKET,
+        );
+      }
+
+      expect(mapped).toBeUndefined();
+      expect(recvMsg).not.toHaveBeenCalled();
+    });
+
     it('forwards validated CONFCHECK messages to AVS', async () => {
       const conversation = createConversation();
       callingRepository['conversationState'].conversations.push(conversation);
@@ -645,6 +686,42 @@ describe('CallingRepository', () => {
       expect(callingRepository.muteCall).not.toHaveBeenCalled();
       expect(wCall.recvMsg).not.toHaveBeenCalled();
     });
+  });
+
+  it.each([1, 256, 257, 500])('sends valid moderator-mute batches for %s same-domain users', count => {
+    const conversation = createConversation();
+    callingRepository['conversationState'].conversations.push(conversation);
+    const sendCallingMessage = jest
+      .spyOn(callingRepository['messageRepository'], 'sendCallingMessage')
+      .mockResolvedValue({} as Awaited<ReturnType<MessageRepository['sendCallingMessage']>>);
+    const participants = Array.from({length: count}, (_, index) => {
+      return new Participant(new User(`user-${index}`, 'example.com', translateForTest), `client-${index}`);
+    });
+
+    callingRepository.sendModeratorMute(conversation.qualifiedId, participants);
+
+    expect(sendCallingMessage).toHaveBeenCalledTimes(Math.ceil(count / 256));
+    const receivedUsers: string[] = [];
+    for (const [targetConversation, serialized, options] of sendCallingMessage.mock.calls) {
+      assert(typeof serialized === 'string');
+      const parsed = parseSerializedCallingMessage(serialized);
+      assert(parsed.isOk);
+      assert(parsed.value.type === CALL_MESSAGE_TYPE.REMOTE_MUTE);
+      const targets = parsed.value.data.targets;
+      expect(targetConversation).toBe(conversation);
+      expect(options).toEqual({nativePush: true, recipients: targets});
+      const users = Object.keys(targets['example.com']);
+      expect(users.length).toBeLessThanOrEqual(256);
+      for (const user of users) {
+        expect(targets['example.com'][user]).toEqual([`client-${user.slice('user-'.length)}`]);
+      }
+      receivedUsers.push(...users);
+    }
+    expect(receivedUsers).toEqual(
+      participants.map(participant => {
+        return participant.user.id;
+      }),
+    );
   });
 
   it('preserves version 3.0 in outgoing AVS messages', async () => {

@@ -25,6 +25,7 @@ import {
 } from '@wireapp/api-client/lib/event';
 import {GenericMessageType} from '@wireapp/core/lib/conversation';
 import {MultiPartContent} from '@wireapp/core/lib/conversation/content';
+import {Maybe} from 'true-myth';
 import {container} from 'tsyringe';
 
 import {
@@ -210,7 +211,7 @@ type MappedGenericMessageNonEphemeralContent =
   | MappedInCallEmoji
   | MappedInCallHandRaise;
 type MappedEphemeralMessageEvent = MappedGenericMessageMetadata &
-  MappedGenericMessageNonEphemeralContent & {ephemeral_expires: number | null};
+  (MappedGenericMessageNonEphemeralContent | MappedSessionReset) & {ephemeral_expires: number | null};
 type MappedGenericMessageSpecificContent =
   MappedGenericMessageNonEphemeralContent | MappedEphemeralMessageEvent | MappedSessionReset;
 type MappedGenericMessageEvent = MappedGenericMessageMetadata & MappedGenericMessageSpecificContent;
@@ -312,7 +313,11 @@ export class CryptographyMapper {
       }
 
       case GenericMessageType.EPHEMERAL: {
-        specificContent = this._mapEphemeral(genericMessage, event);
+        const mappedEphemeral = this._mapEphemeral(genericMessage, event);
+        if (mappedEphemeral.isNothing) {
+          return;
+        }
+        specificContent = mappedEphemeral.value;
         break;
       }
 
@@ -647,7 +652,7 @@ export class CryptographyMapper {
     return mappedMessage;
   }
 
-  private _mapEphemeral(genericMessage: GenericMessage, event: EncryptedEvent): MappedEphemeralMessageEvent {
+  private _mapEphemeral(genericMessage: GenericMessage, event: EncryptedEvent): Maybe<MappedEphemeralMessageEvent> {
     if (isNullOrUndefined(genericMessage.ephemeral)) {
       throw new CryptographyError(
         CryptographyError.TYPE.NO_GENERIC_MESSAGE,
@@ -657,13 +662,14 @@ export class CryptographyMapper {
     const messageTimer = genericMessage.ephemeral[PROTO_MESSAGE_TYPE.EPHEMERAL_EXPIRATION];
     (genericMessage.ephemeral as unknown as GenericMessage).messageId = genericMessage.messageId;
 
-    const embeddedMessage = this._mapGenericMessage(
-      genericMessage.ephemeral as unknown as GenericMessage,
-      event,
-    ) as MappedEphemeralMessageEvent;
-    embeddedMessage.ephemeral_expires = ConversationEphemeralHandler.validateTimer(messageTimer as number);
-
-    return embeddedMessage;
+    return Maybe.of(this._mapGenericMessage(genericMessage.ephemeral as unknown as GenericMessage, event)).map(
+      embeddedMessage => {
+        return {
+          ...embeddedMessage,
+          ephemeral_expires: ConversationEphemeralHandler.validateTimer(messageTimer as number),
+        };
+      },
+    );
   }
 
   /**
