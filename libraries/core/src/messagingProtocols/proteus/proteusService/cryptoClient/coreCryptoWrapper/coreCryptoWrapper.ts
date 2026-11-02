@@ -75,6 +75,16 @@ type ClientConfig = Omit<Config, 'clock' | 'generateSecretKey'> & {
   onWipe: () => Promise<void>;
 };
 
+type CoreCryptoRuntime = {
+  configureLogging: () => void;
+  createCoreCrypto: (database: Database) => CoreCrypto;
+  createDatabaseKey: (key: Uint8Array) => DatabaseKey;
+  getVersion: () => string;
+  initializeWasm: (wasmFilePath?: string) => Promise<void>;
+  migrateDatabaseKey: (databaseName: string, oldKey: string, newKey: DatabaseKey) => Promise<void>;
+  openDatabase: (databaseName: string, key: DatabaseKey) => Promise<Database>;
+};
+
 const logger = LogFactory.getLogger('@wireapp/core/CoreCryptoWrapper');
 
 const logFunctions: Record<CoreCryptoLogLevel, Function> = {
@@ -89,6 +99,25 @@ const logFunctions: Record<CoreCryptoLogLevel, Function> = {
 const coreCryptoLogger = {
   log: (level: CoreCryptoLogLevel, message: string, context: string | undefined) => {
     logFunctions[level].call(logger, {message, context});
+  },
+};
+
+const defaultCoreCryptoRuntime: CoreCryptoRuntime = {
+  configureLogging: () => {
+    setLogger(coreCryptoLogger);
+    setMaxLogLevel(CoreCryptoLogLevel.Info);
+  },
+  createCoreCrypto: database => {
+    return CoreCrypto.new(database);
+  },
+  createDatabaseKey: key => {
+    return new DatabaseKey(key);
+  },
+  getVersion: CCVersion,
+  initializeWasm: initWasmModule,
+  migrateDatabaseKey: migrateDatabaseKeyTypeToBytes,
+  openDatabase: (databaseName, key) => {
+    return Database.open(databaseName, key);
   },
 };
 
@@ -107,6 +136,7 @@ type MigrateOnceAndGetKeyReturnType = {
 const migrateOnceAndGetKey = async (
   generateSecretKey: Config['generateSecretKey'],
   coreCryptoDbName: string,
+  runtime: CoreCryptoRuntime,
 ): Promise<MigrateOnceAndGetKeyReturnType> => {
   const coreCryptoNewKeyId = 'corecrypto-key-v2';
   const coreCryptoKeyId = 'corecrypto-key';
@@ -129,15 +159,15 @@ const migrateOnceAndGetKey = async (
    *     - Migrate data from `keyOld` to `keyNew`
    */
   if (keyNew.freshlyGenerated && !keyOld.freshlyGenerated) {
-    const databaseKey = new DatabaseKey(keyNew.key);
-    await migrateDatabaseKeyTypeToBytes(coreCryptoDbName, Encoder.toBase64(keyOld.key).asString, databaseKey);
+    const databaseKey = runtime.createDatabaseKey(keyNew.key);
+    await runtime.migrateDatabaseKey(coreCryptoDbName, Encoder.toBase64(keyOld.key).asString, databaseKey);
   }
 
   // Always clean up the old key
   await keyOld.deleteKey();
 
   return {
-    key: new DatabaseKey(keyNew.key),
+    key: runtime.createDatabaseKey(keyNew.key),
     deleteKey: keyNew.deleteKey,
   };
 };
@@ -246,6 +276,7 @@ export async function buildClient(
   storeEngine: CRUDEngine,
   {clock, generateSecretKey, nbPrekeys, onNewPrekeys}: Config,
   {wasmFilePath}: CoreCryptoConfig,
+  runtime: CoreCryptoRuntime = defaultCoreCryptoRuntime,
 ): Promise<CoreCryptoWrapper> {
   // A client can be rebuilt during registration. Explicitly release every object
   // which retains the database before opening the same OPFS location again.
@@ -261,7 +292,7 @@ export async function buildClient(
     async () => {
       // We need to initialize the CoreCrypto package with the path to the WASM file
       // before creating the CoreCrypto instance.
-      const output = await initWasmModule(wasmFilePath);
+      const output = await runtime.initializeWasm(wasmFilePath);
       logger.info('CoreCrypto initialized', {output});
       const coreCryptoDbName = getCoreCryptoDbName(storeEngine);
 
@@ -271,7 +302,7 @@ export async function buildClient(
             return cause;
           },
           () => {
-            return migrateOnceAndGetKey(generateSecretKey, coreCryptoDbName);
+            return migrateOnceAndGetKey(generateSecretKey, coreCryptoDbName, runtime);
           },
         )
         .toPromise();
@@ -285,7 +316,7 @@ export async function buildClient(
               return cause;
             },
             () => {
-              return migrateOnceAndGetKey(generateSecretKey, coreCryptoDbName);
+              return migrateOnceAndGetKey(generateSecretKey, coreCryptoDbName, runtime);
             },
           )
           .toPromise();
@@ -295,17 +326,20 @@ export async function buildClient(
         return Promise.reject(keyResult.error);
       }
 
-      setLogger(coreCryptoLogger);
-      setMaxLogLevel(CoreCryptoLogLevel.Info);
+      runtime.configureLogging();
 
-      coreCryptoDatabase = await Database.open(coreCryptoDbName, keyResult.value.key);
-      coreCryptoInstance = CoreCrypto.new(coreCryptoDatabase);
+      coreCryptoDatabase = await runtime.openDatabase(coreCryptoDbName, keyResult.value.key);
+      coreCryptoInstance = runtime.createCoreCrypto(coreCryptoDatabase);
 
-      return new CoreCryptoWrapper(coreCryptoInstance, {
-        nbPrekeys,
-        onNewPrekeys,
-        onWipe: keyResult.value.deleteKey,
-      });
+      return new CoreCryptoWrapper(
+        coreCryptoInstance,
+        {
+          nbPrekeys,
+          onNewPrekeys,
+          onWipe: keyResult.value.deleteKey,
+        },
+        runtime.getVersion(),
+      );
     },
   );
 
@@ -315,21 +349,13 @@ export async function buildClient(
   }
 
   logger.error('CoreCrypto initialization failed', {error: initializationResult.error});
-  const wipeResult = await task
-    .tryOrElse(
-      cause => {
-        return cause;
-      },
-      () => {
-        return wipeCoreCryptoDb(storeEngine, clock);
-      },
-    )
-    .toPromise();
-  if (result.isErr(wipeResult)) {
+  // Database.open keeps an interrupted legacy import retryable. Release handles without deleting either database.
+  const releaseResult = destroyCoreCryptoHandles();
+  if (result.isErr(releaseResult)) {
     return Promise.reject(
       new AggregateError(
-        [initializationResult.error, wipeResult.error],
-        'CoreCrypto initialization failed and its database could not be wiped',
+        [initializationResult.error, releaseResult.error],
+        'CoreCrypto initialization failed and its database handles could not be released',
       ),
     );
   }
@@ -344,8 +370,9 @@ export class CoreCryptoWrapper implements CryptoClient {
   constructor(
     private readonly coreCrypto: CoreCrypto,
     config: ClientConfig,
+    version = CCVersion(),
   ) {
-    this.version = CCVersion();
+    this.version = version;
     this.prekeyTracker = new PrekeyTracker(this, config);
   }
 
