@@ -19,7 +19,7 @@
 
 import {noop} from 'noop-esm';
 
-import {Priority} from './Priority';
+import {Priority} from './priority';
 
 export class Item {
   /** original business logic */

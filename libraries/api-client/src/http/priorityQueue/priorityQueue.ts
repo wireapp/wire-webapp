@@ -19,9 +19,9 @@
 
 import {isObject, isUndefined} from '@sindresorhus/is';
 
-import {Config} from './Config';
-import {Item} from './Item';
-import {Priority} from './Priority';
+import {Config} from './config';
+import {Item} from './item';
+import {Priority} from './priority';
 
 export class PriorityQueue {
   private readonly config: Config = {

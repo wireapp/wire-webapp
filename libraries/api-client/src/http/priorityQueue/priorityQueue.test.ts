@@ -17,7 +17,8 @@
  *
  */
 
-import {PriorityQueue, Priority} from '@wireapp/priority-queue';
+import {Priority} from './priority';
+import {PriorityQueue} from './priorityQueue';
 
 describe('PriorityQueue', () => {
   beforeAll(() => {
