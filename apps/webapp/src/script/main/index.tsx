@@ -39,11 +39,17 @@ import {translate} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 import {enableLogging} from 'Util/loggerUtil';
 import {loadValue} from 'Util/storageUtil';
+import {supportsMLS} from 'Util/util';
 import {exposeWrapperGlobals} from 'Util/wrapper';
 
 import {createApplicationServices} from './createApplicationServices';
 
 import {SIGN_OUT_REASON} from '../auth/signOutReason';
+import {
+  getCurrentCoreCryptoBrowserEnvironment,
+  isCoreCryptoEnabled,
+  redirectIfCoreCryptoUnsupported,
+} from '../browser/coreCryptoSupport';
 import {Config} from '../Config';
 import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
 import {createIncrementalHttpRetryBackoffReset} from '../lifecycle/createIncrementalHttpRetryBackoffReset';
@@ -88,6 +94,22 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (enforceDesktopApplication) {
     const unSupportedPageUrl = `${window.location.origin}/unsupported`;
     window.location.replace(unSupportedPageUrl);
+    return;
+  }
+
+  const coreCryptoEnabled = isCoreCryptoEnabled({
+    supportsMls: supportsMLS(),
+    useCoreCryptoOverride: config.FEATURE.USE_CORE_CRYPTO,
+  });
+  const redirectedForCoreCryptoSupport = redirectIfCoreCryptoUnsupported({
+    coreCryptoEnabled,
+    environment: getCurrentCoreCryptoBrowserEnvironment(),
+    onUnsupported(message) {
+      console.error(message);
+      window.location.replace(`${window.location.origin}/unsupported`);
+    },
+  });
+  if (redirectedForCoreCryptoSupport) {
     return;
   }
 

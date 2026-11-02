@@ -29,6 +29,7 @@ import {APIClient} from './apiClientSingleton';
 import {createStorageEngine, DatabaseTypes} from './storeEngineProvider';
 import {SystemCrypto, wrapSystemCrypto} from './utils/systemCryptoWrapper';
 
+import {isCoreCryptoEnabled} from '../browser/coreCryptoSupport';
 import {Config} from '../Config';
 
 declare global {
@@ -46,7 +47,10 @@ export class Core extends Account {
       FEATURE: {USE_CORE_CRYPTO, ENABLE_ENCRYPTION_AT_REST},
     } = Config.getConfig();
 
-    const enableCoreCrypto = supportsMLS() || USE_CORE_CRYPTO;
+    const enableCoreCrypto = isCoreCryptoEnabled({
+      supportsMls: supportsMLS(),
+      useCoreCryptoOverride: USE_CORE_CRYPTO,
+    });
     super(apiClient, {
       clock: apiClient.clock,
       createStore: async (storeName, key) => {
