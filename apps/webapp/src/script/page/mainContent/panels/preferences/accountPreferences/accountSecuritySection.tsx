@@ -25,7 +25,6 @@ import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
 import {TabIndex, Link, LinkVariant} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {User} from 'Repositories/entity/User';
@@ -37,6 +36,7 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {externalUrl, getManageTeamUrl} from '../../../../../externalRoute';
+import {WebAppEvents} from '../../../../../webAppEvents';
 import {PreferencesSection} from '../components/preferencesSection';
 
 interface AccountSecuritySectionProps {

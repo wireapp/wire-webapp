@@ -29,7 +29,6 @@ import {
 import {amplify} from 'amplify';
 
 import {Runtime} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {ButtonAction} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
@@ -48,6 +47,7 @@ import {formatDuration} from 'Util/timeUtil';
 import {loadFeatureConfig, saveFeatureConfig} from './featureConfigChangeNotifier.store';
 
 import {Config} from '../../../../Config';
+import {WebAppEvents} from '../../../../webAppEvents';
 
 type Features =
   | 'FileSharing'

@@ -42,7 +42,7 @@ import {
   type WcallAudioCbrChangeHandler,
 } from '@wireapp/avs';
 import {Runtime} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {WebAppEvents} from '../../webAppEvents';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {Conversation} from 'Repositories/entity/Conversation';
@@ -375,10 +375,10 @@ describe('CallingRepository', () => {
       const stagingSftServers = [{urls: ['https://sft.calling-staging-v01.zinfra.io']}];
       const stagingSftServerAll = [
         {
-          urls: [
-            'https://sft.calling-staging-v01.zinfra.io/sfts/sftd-0',
-            'https://sft.calling-staging-v01.zinfra.io/sfts/sftd-1',
-          ],
+          urls: ['https://sft.calling-staging-v01.zinfra.io/sfts/sftd-0'],
+        },
+        {
+          urls: ['https://sft.calling-staging-v01.zinfra.io/sfts/sftd-1'],
         },
       ];
 

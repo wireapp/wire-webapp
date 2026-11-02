@@ -25,7 +25,7 @@ import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {Availability} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {WebAppEvents} from '../../webAppEvents';
 
 import {entities} from 'test/api/payloads';
 import {TestFactory} from 'test/helper/TestFactory';

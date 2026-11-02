@@ -24,7 +24,6 @@ import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
 import {TypedEventEmitter} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ClientEntity, ClientRepository} from 'Repositories/client';
 import type {User as UserEntity} from 'Repositories/entity/User';
@@ -43,6 +42,7 @@ import {SelfService} from './SelfService';
 import {evaluateSelfSupportedProtocols} from './SelfSupportedProtocols/SelfSupportedProtocols';
 
 import {Core} from '../../service/coreSingleton';
+import {WebAppEvents} from '../../webAppEvents';
 
 type Events = {selfSupportedProtocolsUpdated: CONVERSATION_PROTOCOL[]};
 

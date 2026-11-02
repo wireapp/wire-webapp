@@ -23,7 +23,6 @@ import {amplify} from 'amplify';
 import cx from 'classnames';
 
 import {useMatchMedia} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {MeetingNotificationHost} from 'Components/meeting/meetingNotificationHost/meetingNotificationHost';
 import {User} from 'Repositories/entity/User';
@@ -35,6 +34,7 @@ import {getIsConversationListCollapsed, SidebarTabs, useSidebarStore} from './pa
 import {TemporaryGuestConversations} from './panels/temporatyGuestConversations';
 
 import {ListViewModel} from '../../view_model/ListViewModel';
+import {WebAppEvents} from '../../webAppEvents';
 import {ListState, useAppState} from '../useAppState';
 
 type LeftSidebarProps = {

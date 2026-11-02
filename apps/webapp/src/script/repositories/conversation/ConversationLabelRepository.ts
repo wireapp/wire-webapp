@@ -22,8 +22,6 @@ import {USER_EVENT} from '@wireapp/api-client/lib/event/';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import type {PropertiesService} from 'Repositories/properties/propertiesService';
@@ -33,6 +31,8 @@ import {getLogger, Logger} from 'Util/logger';
 import {fixWebsocketString} from 'Util/stringUtil';
 import {TypedEventTarget} from 'Util/typedEventTarget';
 import {createUuid} from 'Util/uuid';
+
+import {WebAppEvents} from '../../webAppEvents';
 
 export enum LabelType {
   Custom = 0,

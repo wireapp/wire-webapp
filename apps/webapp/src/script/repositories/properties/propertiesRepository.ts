@@ -25,8 +25,6 @@ import {AudioPreference, NotificationPreference, WebappProperties} from '@wireap
 import {amplify} from 'amplify';
 import ko from 'knockout';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 import type {User} from 'Repositories/entity/User';
@@ -43,6 +41,8 @@ import {loadValue} from 'Util/storageUtil';
 
 import type {PropertiesService} from './propertiesService';
 import {PROPERTIES_TYPE, UserConsentStatus} from './propertiesType';
+
+import {WebAppEvents} from '../../webAppEvents';
 
 const mergeWebappProperties = createDeepmerge();
 const nestedPreferencePathDepth = 2;

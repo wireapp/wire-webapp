@@ -26,7 +26,6 @@ import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import {CallIcon, IconButton, IconButtonVariant, QUERY, TabIndex, useMatchMedia} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ConversationVerificationBadges} from 'Components/badge';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
@@ -52,6 +51,8 @@ import {createReactTranslationMarker, renderReactTranslation} from 'Util/localiz
 import type {Translate} from 'Util/localizerUtil/translationTypes';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
+
+import {WebAppEvents} from '../../webAppEvents';
 
 interface TitleBarProps {
   callActions: CallActions;

@@ -27,6 +27,7 @@ import {
   conversationListCollapseFeatureToggleName,
   disableMessagePreprocessingFeatureToggleName,
   driveBulkActionsFeatureToggleName,
+  markAsUnreadFeatureToggleName,
   startupFeatureToggleNames,
   forTestsOnlyFeatureToggleName,
 } from './startupFeatureToggleNames';
@@ -37,6 +38,7 @@ const featureToggleNamesWithDedicatedExistenceTests = [
   forTestsOnlyFeatureToggleName,
   disableMessagePreprocessingFeatureToggleName,
   driveBulkActionsFeatureToggleName,
+  markAsUnreadFeatureToggleName,
 ] as const;
 
 describe('startupFeatureToggles', function () {
@@ -51,6 +53,12 @@ describe('startupFeatureToggles', function () {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch('');
 
     expect(startupFeatureToggles.isFeatureToggleEnabled(driveBulkActionsFeatureToggleName)).toBe(false);
+  });
+
+  it('keeps Mark as unread disabled by default', () => {
+    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch('');
+
+    expect(startupFeatureToggles.isFeatureToggleEnabled(markAsUnreadFeatureToggleName)).toBe(false);
   });
 
   it('enables Drive bulk actions when selected in developer settings', () => {
@@ -136,6 +144,14 @@ describe('startupFeatureToggles', function () {
     expect(startupFeatureToggles.isFeatureToggleEnabled(disableMessagePreprocessingFeatureToggleName)).toBe(true);
   });
 
+  it('enables the mark as unread feature toggle when present in the query parameter', () => {
+    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
+      `?${startupFeatureToggleQueryParameterName}=${markAsUnreadFeatureToggleName}`,
+    );
+
+    expect(startupFeatureToggles.isFeatureToggleEnabled(markAsUnreadFeatureToggleName)).toBe(true);
+  });
+
   it('trims whitespace around feature toggle names', () => {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
       `?${startupFeatureToggleQueryParameterName}= ${applockRefactoredFeatureToggleName} `,
@@ -179,6 +195,7 @@ describe('startupFeatureToggles', function () {
       forTestsOnlyFeatureToggleName,
       disableMessagePreprocessingFeatureToggleName,
       driveBulkActionsFeatureToggleName,
+      markAsUnreadFeatureToggleName,
     ]);
   });
 

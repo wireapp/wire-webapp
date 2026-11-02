@@ -25,7 +25,6 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 
 import {Availability} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import type {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
 import type {ClientEntity} from 'Repositories/client/ClientEntity';
@@ -37,6 +36,7 @@ import {getFirstChar} from 'Util/stringUtil';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {ACCENT_ID} from '../../../Config';
+import {WebAppEvents} from '../../../webAppEvents';
 
 const guestExpirationThresholdInSeconds = 10;
 const singleNameInitialsLength = 2;

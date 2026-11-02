@@ -2,7 +2,7 @@
   "dependencies": {
     "@actions/core": "1.11.1",
     "@sindresorhus/is": "8.1.0",
-    "axios": "1.20.0",
+    "axios": "1.21.0",
     "commander": "15.0.0",
     "dotenv": "16.6.1",
     "dotenv-extended": "2.9.0",
@@ -40,7 +40,6 @@
     "@typescript-eslint/parser": "8.72.0",
     "@typescript-eslint/utils": "8.72.0",
     "@wireapp/copy-config": "2.3.13",
-    "@wireapp/prettier-config": "0.6.11",
     "archiver": "7.0.1",
     "concurrently": "9.2.5",
     "cross-env": "10.1.0",
@@ -113,7 +112,6 @@
   },
   "license": "GPL-3.0",
   "name": "wire-webapp",
-  "prettier": "@wireapp/prettier-config",
   "private": true,
   "workspaces": [
     "apps/*",
@@ -140,7 +138,7 @@
     "jest-environment-node": "30.5.2",
     "@jest/environment": "30.5.2",
     "jest-mock": "30.5.2",
-    "axios": "1.20.0",
+    "axios": "1.21.0",
     "dexie": "4.4.7",
     "dotenv": "16.6.1",
     "@types/react": "19.3.0",

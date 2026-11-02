@@ -26,7 +26,6 @@ import {SigninResponse, type User} from 'oidc-client-ts';
 import {container} from 'tsyringe';
 
 import {TypedEventEmitter} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
 import {UserState} from 'Repositories/user/userState';
@@ -47,6 +46,8 @@ import {getEnrollmentTimer, getRemainingGracePeriodDelay, hasGracePeriodStartedF
 import {getModalOptions, ModalType} from './modals';
 import {OIDCService} from './oidcService';
 import {OIDCServiceStore} from './oidcService/oidcServiceStorage';
+
+import {WebAppEvents} from '../webAppEvents';
 
 const enrollmentProgressPollingIntervalInSeconds = 10;
 type EnrollmentStore = ReturnType<typeof getEnrollmentStore>;

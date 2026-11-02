@@ -22,7 +22,6 @@ import type {FunctionComponent} from 'react';
 import {amplify} from 'amplify';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
@@ -36,6 +35,8 @@ import {
   confirmLeaveModalButtonsCss,
   confirmLeaveModalWrapperCss,
 } from './teamCreation.styles';
+
+import {WebAppEvents} from '../../../../../../webAppEvents';
 
 interface Props {
   isShown: boolean;

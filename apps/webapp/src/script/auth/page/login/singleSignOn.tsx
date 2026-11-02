@@ -44,7 +44,6 @@ import {
   Text,
   useMatchMedia,
 } from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {LogoFullIcon} from 'Components/icon';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -54,6 +53,7 @@ import {getLogger} from 'Util/logger';
 import {SingleSignOnForm} from './singleSignOnForm';
 
 import {Config} from '../../../Config';
+import {WebAppEvents} from '../../../webAppEvents';
 import {AppAlreadyOpen} from '../../component/appAlreadyOpen';
 import {BackButton} from '../../component/backButton';
 import {RootState, bindActionCreators} from '../../module/reducer';

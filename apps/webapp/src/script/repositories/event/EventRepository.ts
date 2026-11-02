@@ -36,7 +36,6 @@ import {container} from 'tsyringe';
 
 import {Runtime, StringUtil} from '@wireapp/commons';
 import {Account, ConnectionState, ProcessedEventPayload, type WebSocketConnectionContext} from '@wireapp/core';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ClientConversationEvent, EventBuilder} from 'Repositories/conversation/EventBuilder';
 import {CryptographyMapper} from 'Repositories/cryptography/CryptographyMapper';
@@ -62,6 +61,7 @@ import {CryptographyError} from '../../error/cryptographyError';
 import {EventError} from '../../error/eventError';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
 import {Warnings} from '../../view_model/WarningsContainer';
+import {WebAppEvents} from '../../webAppEvents';
 
 const callEventLifetimeInSeconds = 30;
 const heartbeatIntervalInSeconds = 30;

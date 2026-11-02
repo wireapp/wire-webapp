@@ -740,6 +740,7 @@
   "conversationContextMenuDownload": "Download",
   "conversationContextMenuEdit": "Redigér",
   "conversationContextMenuLike": "Synes Om",
+  "conversationContextMenuMarkUnread": "Mark as unread from here",
   "conversationContextMenuReply": "Reply",
   "conversationContextMenuUnlike": "Synes Ikke Om",
   "conversationCreateReceiptsEnabled": "Read receipts are on",

@@ -25,8 +25,6 @@ import ko from 'knockout';
 import {container} from 'tsyringe';
 import {isError} from 'underscore';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
@@ -55,6 +53,7 @@ import {useAppMainState} from '../page/state';
 import {ContentState, useAppState} from '../page/useAppState';
 import {generateConversationUrl} from '../router/routeGenerator';
 import {navigate, setHistoryParam} from '../router/Router';
+import {WebAppEvents} from '../webAppEvents';
 
 interface ShowConversationOptions {
   exposeMessage?: Message;

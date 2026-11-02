@@ -24,8 +24,6 @@ import {isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {ZoomableImage} from 'Components/ZoomableImage';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
@@ -46,6 +44,7 @@ import {DetailViewModalHeader} from './DetailViewModalHeader';
 import {isContentMessage} from '../../../guards/Message';
 import {MessageCategory} from '../../../message/messageCategory';
 import {isOfCategory} from '../../../page/mainContent/panels/collection/utils';
+import {WebAppEvents} from '../../../webAppEvents';
 
 const detailModalScrollDelayInMilliseconds = 150;
 

@@ -60,7 +60,6 @@ import {
 } from '@wireapp/avs';
 import {AvsDebugger} from '@wireapp/avs-debugger';
 import {Runtime} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {showNoAudioInputModal, showNoCameraModal} from 'Components/calling/devicePermissionModals';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
@@ -126,6 +125,7 @@ import {APIClient} from '../../service/apiClientSingleton';
 import {Core} from '../../service/coreSingleton';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
 import {Warnings} from '../../view_model/WarningsContainer';
+import {WebAppEvents} from '../../webAppEvents';
 
 type DetachedExternalLinksCleanup = () => void;
 type CallingRepositoryConfig = {
@@ -230,10 +230,10 @@ function getEffectiveCallingConfig(callingConfig: CallConfigData, useStagingSft:
     sft_servers: [{urls: ['https://sft.calling-staging-v01.zinfra.io']}],
     sft_servers_all: [
       {
-        urls: [
-          'https://sft.calling-staging-v01.zinfra.io/sfts/sftd-0',
-          'https://sft.calling-staging-v01.zinfra.io/sfts/sftd-1',
-        ],
+        urls: ['https://sft.calling-staging-v01.zinfra.io/sfts/sftd-0'],
+      },
+      {
+        urls: ['https://sft.calling-staging-v01.zinfra.io/sfts/sftd-1'],
       },
     ],
   };

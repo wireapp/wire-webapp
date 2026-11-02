@@ -55,13 +55,17 @@ function getMessageMarkerType(
   lastReadTimestamp: number,
   previousMessage?: Message,
 ): Marker['type'] | undefined {
-  if (isNullOrUndefined(previousMessage) || message.isCall()) {
+  if (message.isCall()) {
     return undefined;
   }
 
-  const previousMessageTimestamp = previousMessage.timestamp();
   const currentMessageTimestamp = message.timestamp();
 
+  if (isNullOrUndefined(previousMessage)) {
+    return currentMessageTimestamp > lastReadTimestamp ? 'unread' : undefined;
+  }
+
+  const previousMessageTimestamp = previousMessage.timestamp();
   const isFirstUnread = previousMessageTimestamp <= lastReadTimestamp && currentMessageTimestamp > lastReadTimestamp;
 
   if (isFirstUnread) {

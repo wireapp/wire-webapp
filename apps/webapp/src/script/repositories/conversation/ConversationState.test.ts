@@ -112,6 +112,19 @@ describe('ConversationState', () => {
       expect(conversationState.visibleConversations()).toEqual([regularConversation]);
       expect(conversationState.findConversation(meetingConversation.qualifiedId)).toBe(meetingConversation);
     });
+
+    it('includes a manually unread conversation without incoming unread messages', () => {
+      const conversationState = createConversationState();
+      const conversation = createConversation();
+      conversationState.conversations([conversation]);
+
+      expect(conversationState.unreadConversations()).toEqual([]);
+
+      conversation.manualUnreadTimestamp(123);
+
+      expect(conversation.unreadState().allMessages).toEqual([]);
+      expect(conversationState.unreadConversations()).toEqual([conversation]);
+    });
   });
 
   describe('isSelfConversation', () => {

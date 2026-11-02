@@ -31,7 +31,7 @@ import {result} from 'true-myth';
 
 import {Runtime} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {WebAppEvents} from '../../webAppEvents';
 
 import {AudioRepository} from 'Repositories/audio/audioRepository';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';

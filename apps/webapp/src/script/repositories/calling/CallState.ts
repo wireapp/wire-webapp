@@ -24,7 +24,6 @@ import ko from 'knockout';
 import {singleton} from 'tsyringe';
 
 import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import type {ElectronDesktopCapturerSource} from 'Repositories/media/MediaDevicesHandler';
 import {EventName} from 'Repositories/tracking/eventName';
@@ -35,6 +34,7 @@ import {Call} from './Call';
 
 import {Config} from '../../Config';
 import {CallViewTab} from '../../view_model/CallingViewModel';
+import {WebAppEvents} from '../../webAppEvents';
 
 export enum MuteState {
   NOT_MUTED,

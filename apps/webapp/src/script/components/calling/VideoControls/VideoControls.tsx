@@ -36,7 +36,6 @@ import {
   RaiseHandIcon,
   TabIndex,
 } from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/icon';
 import {useActiveWindowMatchMedia} from 'Hooks/useActiveWindowMatchMedia';
@@ -79,6 +78,8 @@ import {
   videoOptionsSheetStyles,
 } from './VideoControls.styles';
 import {VideoControlsSelect} from './VideoControlsSelect/VideoControlsSelect';
+
+import {WebAppEvents} from '../../../webAppEvents';
 
 type BackgroundOptionValue = 'none' | 'blur-high' | 'blur-low' | 'virtual' | 'settings';
 

@@ -26,8 +26,6 @@ import {UserType, QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {useLeaveGroupAdminModalStore} from 'Components/Modals/LeaveGroupAdminModal/useLeaveGroupAdminModalStore';
 import {PrimaryModal, removeCurrentModal, usePrimaryModalState} from 'Components/Modals/PrimaryModal';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
@@ -48,6 +46,8 @@ import {type Translate} from 'Util/localizerUtil';
 import {isBackendError} from 'Util/typePredicateUtil';
 
 import type {MainViewModel} from './MainViewModel';
+
+import {WebAppEvents} from '../webAppEvents';
 
 type ConnectionRequestResult = {connectionStatus: ConnectionStatus; conversationId: QualifiedId};
 

@@ -25,13 +25,13 @@ import cx from 'classnames';
 import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {VirtualizedMessagesList} from 'Components/messagesList/virtualizedMessagesList/virtualizedMessagesList';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {MessagesListParams} from './messageList.types';
 
 export const VirtualizedMessageListWrapper: FunctionComponent<MessagesListParams> = ({
   assetRepository,
   conversation,
+  cancelPendingReadReceiptsForConversation,
   selfUser,
   conversationRepository,
   messageRepository,
@@ -54,10 +54,7 @@ export const VirtualizedMessageListWrapper: FunctionComponent<MessagesListParams
   isConversationLoaded,
   updateConversationLastRead,
 }: MessagesListParams) => {
-  const {last_read_timestamp: lastReadTimestamp} = useKoSubscribableChildren(conversation, ['last_read_timestamp']);
-
   const parentRef = useRef<HTMLDivElement | null>(null);
-  const conversationLastReadTimestamp = useRef<number>(lastReadTimestamp);
 
   return (
     <div
@@ -77,8 +74,8 @@ export const VirtualizedMessageListWrapper: FunctionComponent<MessagesListParams
       ) : (
         <VirtualizedMessagesList
           parentElement={parentRef.current}
-          conversationLastReadTimestamp={conversationLastReadTimestamp}
           conversation={conversation}
+          cancelPendingReadReceiptsForConversation={cancelPendingReadReceiptsForConversation}
           cancelConnectionRequest={cancelConnectionRequest}
           resetSession={resetSession}
           invitePeople={invitePeople}

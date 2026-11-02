@@ -26,7 +26,6 @@ import {container} from 'tsyringe';
 
 import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {Availability} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import 'Components/calling/ChooseScreen';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
@@ -58,6 +57,7 @@ import {matchQualifiedIds} from 'Util/qualifiedId';
 import {safeWindowOpen} from 'Util/sanitizationUtil';
 
 import {Config} from '../Config';
+import {WebAppEvents} from '../webAppEvents';
 
 const callStateSettleDelayInMilliseconds = 1000;
 

@@ -21,7 +21,7 @@ import {USER_EVENT} from '@wireapp/api-client/lib/event/';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {WebAppEvents} from '../../webAppEvents';
 
 import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {User} from 'Repositories/entity/User';
