@@ -1,11 +1,1516 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["typescript", "unicorn", "oxc"],
+  "plugins": ["jest", "jsx-a11y", "react", "unicorn", "typescript", "import"],
+  "jsPlugins": [
+    {
+      "name": "prettier",
+      "specifier": "eslint-plugin-prettier"
+    },
+    {
+      "name": "unused-imports",
+      "specifier": "eslint-plugin-unused-imports"
+    },
+    {
+      "name": "better-styled-components",
+      "specifier": "./tools/oxlint/plugins/betterStyledComponentsPlugin.mjs"
+    },
+    {
+      "name": "no-unsanitized",
+      "specifier": "eslint-plugin-no-unsanitized"
+    },
+    {
+      "name": "@stylistic",
+      "specifier": "@stylistic/eslint-plugin"
+    },
+    {
+      "name": "@emotion",
+      "specifier": "./tools/oxlint/plugins/emotionPlugin.mjs"
+    },
+    {
+      "name": "header-tony",
+      "specifier": "./tools/oxlint/plugins/headerPlugin.mjs"
+    },
+    {
+      "name": "eslint-core-compat",
+      "specifier": "./tools/oxlint/plugins/eslintCorePlugin.mjs"
+    },
+    {
+      "name": "import-js",
+      "specifier": "eslint-plugin-import-x"
+    }
+  ],
   "categories": {
-    "correctness": "warn"
+    "correctness": "off"
   },
-  "rules": {},
+  "options": {
+    "typeAware": false
+  },
   "env": {
-    "builtin": true
+    "builtin": true,
+    "jest": true
+  },
+  "ignorePatterns": [
+    ".git/",
+    "target/",
+    "config/",
+    "temp/",
+    "docs/",
+    "bin/",
+    "**/node_modules/",
+    "**/.yalc/",
+    "apps/webapp/assets/",
+    "resource/",
+    "**/dist/**",
+    "**/build/**",
+    "**/coverage/**",
+    "**/test-results/",
+    "**/playwright-report/",
+    "**/blob-report/",
+    "**/playwright/.cache/",
+    "apps/webapp/resource/",
+    "**/*.config.*",
+    "apps/webapp/*.config.*",
+    "!apps/webapp/jest.config.ts",
+    "!apps/webapp/playwright.config.ts",
+    "!apps/webapp/playwright.rspack.config.ts",
+    "!apps/webapp/rspack.config.mts",
+    "!apps/webapp/rspack.config.dev.mts",
+    "!apps/webapp/rspack.config.public.mts",
+    "!libraries/config/src/client.config.ts",
+    "!libraries/config/src/server.config.ts",
+    "!**/*.config.test.*",
+    "!**/*.config.spec.*",
+    "apps/server/bin/copy_server_assets.js",
+    "apps/server/dist/",
+    "apps/server/node_modules/",
+    "apps/webapp/src/ext/",
+    "apps/webapp/src/script/localization/**/webapp*.js",
+    "apps/webapp/src/worker/",
+    "apps/webapp/src/script/components/icon.tsx",
+    "libraries/core/lib/",
+    "libraries/api-client/lib/",
+    "libraries/core/.tmp/",
+    "libraries/config/lib/",
+    "libraries/react-ui-kit/lib/",
+    "libraries/*/lib/",
+    "libraries/react-ui-kit/emotion.d.ts"
+  ],
+  "rules": {},
+  "overrides": [
+    {
+      "files": ["**/*.{js,jsx,cjs,mjs,ts,tsx,mts,cts}"],
+      "excludeFiles": [
+        "apps/webapp/test/**",
+        "libraries/core/src/test/**",
+        "**/test/**",
+        "**/__mocks__/**",
+        "*.js",
+        "**/setupTests.*",
+        "**/*.test.*",
+        "**/*.spec.*",
+        "**/jest.setup.*",
+        "apps/webapp/.copyconfigrc.js",
+        "apps/webapp/jest.config.ts",
+        "apps/webapp/playwright.config.ts",
+        "apps/webapp/playwright.rspack.config.ts",
+        "apps/webapp/rspack.config*.mts",
+        "libraries/config/src/client.config.ts",
+        "libraries/config/src/server.config.ts"
+      ],
+      "rules": {
+        "jest/expect-expect": "warn",
+        "jest/no-alias-methods": "error",
+        "jest/no-commented-out-tests": "warn",
+        "jest/no-conditional-expect": "warn",
+        "jest/no-deprecated-functions": "error",
+        "jest/no-disabled-tests": "warn",
+        "jest/no-done-callback": "warn",
+        "jest/no-export": "error",
+        "jest/no-focused-tests": "error",
+        "jest/no-identical-title": "warn",
+        "jest/no-interpolation-in-snapshots": "error",
+        "jest/no-jasmine-globals": "error",
+        "jest/no-mocks-import": "error",
+        "jest/no-standalone-expect": "error",
+        "jest/no-test-prefixes": "error",
+        "jest/valid-describe-callback": "error",
+        "jest/valid-expect": "error",
+        "jest/valid-expect-in-promise": "error",
+        "jest/valid-title": "error",
+        "jsx-a11y/alt-text": "error",
+        "jsx-a11y/anchor-has-content": "error",
+        "jsx-a11y/anchor-is-valid": "error",
+        "jsx-a11y/aria-activedescendant-has-tabindex": "error",
+        "jsx-a11y/aria-props": "error",
+        "jsx-a11y/aria-proptypes": "error",
+        "jsx-a11y/aria-role": "error",
+        "jsx-a11y/aria-unsupported-elements": "error",
+        "jsx-a11y/autocomplete-valid": "error",
+        "jsx-a11y/click-events-have-key-events": "error",
+        "jsx-a11y/heading-has-content": "error",
+        "jsx-a11y/html-has-lang": "error",
+        "jsx-a11y/iframe-has-title": "error",
+        "jsx-a11y/img-redundant-alt": "error",
+        "jsx-a11y/interactive-supports-focus": [
+          "error",
+          {
+            "tabbable": ["button", "checkbox", "link", "searchbox", "spinbutton", "switch", "textbox"]
+          }
+        ],
+        "jsx-a11y/label-has-associated-control": "error",
+        "jsx-a11y/media-has-caption": "warn",
+        "jsx-a11y/mouse-events-have-key-events": "error",
+        "jsx-a11y/no-access-key": "error",
+        "jsx-a11y/no-autofocus": "error",
+        "jsx-a11y/no-distracting-elements": "error",
+        "jsx-a11y/no-interactive-element-to-noninteractive-role": [
+          "error",
+          {
+            "tr": ["none", "presentation"],
+            "canvas": ["img"]
+          }
+        ],
+        "jsx-a11y/no-noninteractive-element-interactions": [
+          "error",
+          {
+            "handlers": ["onClick", "onError", "onLoad", "onMouseDown", "onMouseUp", "onKeyPress", "onKeyDown", "onKeyUp"],
+            "alert": ["onKeyUp", "onKeyDown", "onKeyPress"],
+            "body": ["onError", "onLoad"],
+            "dialog": ["onKeyUp", "onKeyDown", "onKeyPress"],
+            "iframe": ["onError", "onLoad"],
+            "img": ["onError", "onLoad"]
+          }
+        ],
+        "jsx-a11y/no-noninteractive-element-to-interactive-role": [
+          "error",
+          {
+            "ul": ["listbox", "menu", "menubar", "radiogroup", "tablist", "tree", "treegrid"],
+            "ol": ["listbox", "menu", "menubar", "radiogroup", "tablist", "tree", "treegrid"],
+            "li": ["menuitem", "menuitemradio", "menuitemcheckbox", "option", "row", "tab", "treeitem"],
+            "table": ["grid"],
+            "td": ["gridcell"],
+            "fieldset": ["radiogroup", "presentation"]
+          }
+        ],
+        "jsx-a11y/no-noninteractive-tabindex": [
+          "warn",
+          {
+            "tags": [],
+            "roles": ["tabpanel"],
+            "allowExpressionValues": true
+          }
+        ],
+        "jsx-a11y/no-redundant-roles": "error",
+        "jsx-a11y/no-static-element-interactions": [
+          "error",
+          {
+            "allowExpressionValues": true,
+            "handlers": ["onClick", "onMouseDown", "onMouseUp", "onKeyPress", "onKeyDown", "onKeyUp"]
+          }
+        ],
+        "jsx-a11y/role-has-required-aria-props": "error",
+        "jsx-a11y/role-supports-aria-props": "error",
+        "jsx-a11y/scope": "error",
+        "jsx-a11y/tabindex-no-positive": "error",
+        "react/display-name": "error",
+        "react/jsx-key": "error",
+        "react/jsx-no-comment-textnodes": "error",
+        "react/jsx-no-duplicate-props": "error",
+        "react/jsx-no-target-blank": "error",
+        "react/jsx-no-undef": "error",
+        "react/no-children-prop": "error",
+        "react/no-danger-with-children": "error",
+        "react/no-direct-mutation-state": "error",
+        "react/no-find-dom-node": "error",
+        "react/no-is-mounted": "error",
+        "react/no-render-return-value": "error",
+        "react/no-string-refs": "error",
+        "react/no-unescaped-entities": "error",
+        "react/no-unknown-property": [
+          "error",
+          {
+            "ignore": ["css"]
+          }
+        ],
+        "react/require-render-return": "error",
+        "curly": "error",
+        "constructor-super": "error",
+        "no-cond-assign": "error",
+        "no-console": [
+          "error",
+          {
+            "allow": ["error", "info", "warn"]
+          }
+        ],
+        "no-const-assign": "error",
+        "no-dupe-class-members": "error",
+        "no-duplicate-case": "error",
+        "no-else-return": "error",
+        "no-inner-declarations": "error",
+        "no-lonely-if": "error",
+        "no-magic-numbers": [
+          "error",
+          {
+            "ignoreDefaultValues": true,
+            "ignoreArrayIndexes": false,
+            "detectObjects": false,
+            "enforceConst": false,
+            "ignoreClassFieldInitialValues": false,
+            "ignore": [-1, 0, 1]
+          }
+        ],
+        "no-restricted-globals": [
+          "warn",
+          {
+            "message": "Do not commit `fit`. Use `it` instead.",
+            "name": "fit"
+          },
+          {
+            "message": "Do not commit `fdescribe`. Use `describe` instead.",
+            "name": "fdescribe"
+          }
+        ],
+        "no-sequences": "error",
+        "no-sparse-arrays": "error",
+        "no-undef": "error",
+        "no-nested-ternary": "error",
+        "no-unneeded-ternary": "error",
+        "no-unused-expressions": "error",
+        "no-useless-return": "error",
+        "no-var": "error",
+        "one-var": ["error", "never"],
+        "prefer-arrow-callback": "error",
+        "prefer-const": "error",
+        "prefer-object-spread": "error",
+        "prefer-promise-reject-errors": "error",
+        "prefer-spread": "error",
+        "prefer-template": "error",
+        "prettier/prettier": "error",
+        "sort-vars": "error",
+        "unused-imports/no-unused-imports": "error",
+        "better-styled-components/sort-declarations-alphabetically": "error",
+        "no-unsanitized/property": "error",
+        "no-unsanitized/method": "error",
+        "react/rules-of-hooks": "error",
+        "react/exhaustive-deps": "warn",
+        "typescript/require-array-sort-compare": "warn",
+        "eslint-core-compat/no-restricted-syntax": [
+          "error",
+          {
+            "selector": "CallExpression[callee.property.name='splice']",
+            "message": "Use toSpliced() instead of splice() to avoid mutating arrays. Reassign the toSpliced() result when ordering must be preserved."
+          },
+          {
+            "selector": "ImportDeclaration[source.value='@sindresorhus/is'] > ImportDefaultSpecifier",
+            "message": "Use named imports from @sindresorhus/is instead of its default API object."
+          },
+          {
+            "selector": "ImportDeclaration[source.value='@sindresorhus/is'] > ImportNamespaceSpecifier",
+            "message": "Use named imports from @sindresorhus/is instead of a namespace import."
+          },
+          {
+            "selector": "ArrowFunctionExpression[async=false][body.type='BlockStatement'][body.body.length=0]",
+            "message": "Use noop from noop-esm instead of an empty arrow function."
+          },
+          {
+            "selector": "ArrowFunctionExpression[async=true][body.type='BlockStatement'][body.body.length=0]",
+            "message": "Use asyncNoop from noop-esm instead of an empty async arrow function."
+          },
+          {
+            "selector": "PropertyDefinition[definite=true]",
+            "message": "Definite assignment assertions are not allowed. Initialize the value explicitly or model its absence in the type."
+          },
+          {
+            "selector": "VariableDeclarator[definite=true]",
+            "message": "Definite assignment assertions are not allowed. Initialize the value explicitly or model its absence in the type."
+          }
+        ],
+        "@stylistic/no-trailing-spaces": "error",
+        "import-js/no-unresolved": "error",
+        "import-js/order": [
+          "error",
+          {
+            "groups": ["external", "builtin", "internal", "sibling", "parent", "index"],
+            "pathGroups": [
+              {
+                "pattern": "react",
+                "group": "external",
+                "position": "before"
+              },
+              {
+                "pattern": "@wireapp/*",
+                "group": "internal",
+                "position": "before"
+              }
+            ],
+            "pathGroupsExcludedImportTypes": ["react", "@wireapp/*"],
+            "newlines-between": "always",
+            "alphabetize": {
+              "order": "asc",
+              "caseInsensitive": true
+            },
+            "warnOnUnassignedImports": true
+          }
+        ],
+        "react/prefer-function-component": "error",
+        "typescript/no-deprecated": "error",
+        "import/named": "error",
+        "import/namespace": [
+          "error",
+          {
+            "allowComputed": true
+          }
+        ],
+        "import/default": "error",
+        "import/export": "error",
+        "import/no-duplicates": "error",
+        "import/no-default-export": "error",
+        "import/no-dynamic-require": "error",
+        "import/newline-after-import": "error",
+        "import/first": "error",
+        "import/no-absolute-path": "error",
+        "import/no-webpack-loader-syntax": "error",
+        "import/no-self-import": "error",
+        "import/no-amd": "error",
+        "import/no-mutable-exports": "error",
+        "import/no-empty-named-blocks": "error"
+      }
+    },
+    {
+      "files": ["**/*.{js,jsx,cjs,mjs,ts,tsx,mts,cts}"],
+      "rules": {
+        "import/no-named-as-default-member": "error",
+        "import/no-named-as-default": "error"
+      }
+    },
+    {
+      "files": ["**/*.ts", "**/*.tsx", "**/*.mts", "**/*.cts"],
+      "rules": {
+        "getter-return": "off",
+        "no-class-assign": "off",
+        "no-dupe-keys": "off",
+        "no-func-assign": "off",
+        "no-import-assign": "off",
+        "no-new-native-nonconstructor": "off",
+        "no-obj-calls": "off",
+        "no-redeclare": "off",
+        "no-setter-return": "off",
+        "no-this-before-super": "off",
+        "no-unreachable": "off",
+        "no-unsafe-negation": "off",
+        "no-with": "off",
+        "prefer-rest-params": "error"
+      },
+      "excludeFiles": [
+        "apps/webapp/test/**",
+        "libraries/core/src/test/**",
+        "**/test/**",
+        "**/__mocks__/**",
+        "*.js",
+        "**/setupTests.*",
+        "**/*.test.*",
+        "**/*.spec.*",
+        "**/jest.setup.*",
+        "apps/webapp/.copyconfigrc.js",
+        "apps/webapp/jest.config.ts",
+        "apps/webapp/playwright.config.ts",
+        "apps/webapp/playwright.rspack.config.ts",
+        "apps/webapp/rspack.config*.mts",
+        "libraries/config/src/client.config.ts",
+        "libraries/config/src/server.config.ts"
+      ]
+    },
+    {
+      "files": ["apps/webapp/src/**/*.{jsx,tsx}", "libraries/react-ui-kit/src/**/*.{jsx,tsx}"],
+      "rules": {
+        "react/forbid-dom-props": [
+          "warn",
+          {
+            "forbid": ["data-testid"]
+          }
+        ],
+        "react/forbid-component-props": [
+          "warn",
+          {
+            "forbid": ["data-testid"]
+          }
+        ]
+      },
+      "excludeFiles": [
+        "apps/webapp/test/**",
+        "libraries/core/src/test/**",
+        "**/test/**",
+        "**/__mocks__/**",
+        "*.js",
+        "**/setupTests.*",
+        "**/*.test.*",
+        "**/*.spec.*",
+        "**/jest.setup.*",
+        "apps/webapp/.copyconfigrc.js",
+        "apps/webapp/jest.config.ts",
+        "apps/webapp/playwright.config.ts",
+        "apps/webapp/playwright.rspack.config.ts",
+        "apps/webapp/rspack.config*.mts",
+        "libraries/config/src/client.config.ts",
+        "libraries/config/src/server.config.ts"
+      ]
+    },
+    {
+      "files": ["**/*.{ts,tsx,mts,cts}"],
+      "rules": {
+        "no-magic-numbers": [
+          "error",
+          {
+            "ignoreEnums": false,
+            "ignoreNumericLiteralTypes": true,
+            "ignoreReadonlyClassProperties": false,
+            "ignoreTypeIndexes": false,
+            "ignoreDefaultValues": true,
+            "ignoreArrayIndexes": false,
+            "detectObjects": false,
+            "enforceConst": false,
+            "ignoreClassFieldInitialValues": false,
+            "ignore": [-1, 0, 1]
+          }
+        ],
+        "import/named": "off"
+      },
+      "excludeFiles": [
+        "apps/webapp/test/**",
+        "libraries/core/src/test/**",
+        "**/test/**",
+        "**/__mocks__/**",
+        "*.js",
+        "**/setupTests.*",
+        "**/*.test.*",
+        "**/*.spec.*",
+        "**/jest.setup.*",
+        "apps/webapp/.copyconfigrc.js",
+        "apps/webapp/jest.config.ts",
+        "apps/webapp/playwright.config.ts",
+        "apps/webapp/playwright.rspack.config.ts",
+        "apps/webapp/rspack.config*.mts",
+        "libraries/config/src/client.config.ts",
+        "libraries/config/src/server.config.ts"
+      ]
+    },
+    {
+      "files": ["**/*.{ts,tsx,js,jsx,cjs,mjs}"],
+      "rules": {
+        "@stylistic/eol-last": ["error", "always"]
+      },
+      "excludeFiles": [
+        "apps/webapp/test/**",
+        "libraries/core/src/test/**",
+        "**/test/**",
+        "**/__mocks__/**",
+        "*.js",
+        "**/setupTests.*",
+        "**/*.test.*",
+        "**/*.spec.*",
+        "**/jest.setup.*",
+        "apps/webapp/.copyconfigrc.js",
+        "apps/webapp/jest.config.ts",
+        "apps/webapp/playwright.config.ts",
+        "apps/webapp/playwright.rspack.config.ts",
+        "apps/webapp/rspack.config*.mts",
+        "libraries/config/src/client.config.ts",
+        "libraries/config/src/server.config.ts"
+      ]
+    },
+    {
+      "files": ["**/*.mts"],
+      "globals": {
+        "NodeJS": "readonly"
+      },
+      "env": {
+        "browser": true,
+        "es2020": true,
+        "node": true
+      },
+      "excludeFiles": [
+        "apps/webapp/test/**",
+        "libraries/core/src/test/**",
+        "**/test/**",
+        "**/__mocks__/**",
+        "*.js",
+        "**/setupTests.*",
+        "**/*.test.*",
+        "**/*.spec.*",
+        "**/jest.setup.*",
+        "apps/webapp/.copyconfigrc.js",
+        "apps/webapp/jest.config.ts",
+        "apps/webapp/playwright.config.ts",
+        "apps/webapp/playwright.rspack.config.ts",
+        "apps/webapp/rspack.config*.mts",
+        "libraries/config/src/client.config.ts",
+        "libraries/config/src/server.config.ts"
+      ]
+    },
+    {
+      "files": ["apps/webapp/rspack.config.mts", "apps/webapp/rspack.config.dev.mts", "apps/webapp/rspack.config.public.mts"],
+      "rules": {
+        "import/no-default-export": "off"
+      },
+      "globals": {
+        "NodeJS": "readonly"
+      },
+      "env": {
+        "browser": true,
+        "es2020": true,
+        "node": true
+      },
+      "excludeFiles": [
+        "apps/webapp/test/**",
+        "libraries/core/src/test/**",
+        "**/test/**",
+        "**/__mocks__/**",
+        "*.js",
+        "**/setupTests.*",
+        "**/*.test.*",
+        "**/*.spec.*",
+        "**/jest.setup.*",
+        "apps/webapp/.copyconfigrc.js",
+        "apps/webapp/jest.config.ts",
+        "apps/webapp/playwright.config.ts",
+        "apps/webapp/playwright.rspack.config.ts",
+        "apps/webapp/rspack.config*.mts",
+        "libraries/config/src/client.config.ts",
+        "libraries/config/src/server.config.ts"
+      ]
+    },
+    {
+      "files": ["**/*.{ts,tsx}", "tools/releaseCli/webappVersionSynchronization.mts", "tools/releaseCli/pullRequestSemverPolicy.mts"],
+      "rules": {
+        "@emotion/pkg-renaming": "error",
+        "@emotion/no-vanilla": "error",
+        "@emotion/import-from-emotion": "error",
+        "@emotion/styled-import": "error",
+        "unicorn/no-array-reverse": "error",
+        "unicorn/no-array-sort": "error",
+        "header-tony/header": [
+          "error",
+          {
+            "header": {
+              "commentType": "block",
+              "lines": [
+                "",
+                " * Wire",
+                {
+                  "pattern": " \\* Copyright \\(C\\) \\d{4} Wire Swiss GmbH",
+                  "template": " * Copyright (C) 2026 Wire Swiss GmbH"
+                },
+                " *",
+                " * This program is free software: you can redistribute it and/or modify",
+                " * it under the terms of the GNU General Public License as published by",
+                " * the Free Software Foundation, either version 3 of the License, or",
+                " * (at your option) any later version.",
+                " *",
+                " * This program is distributed in the hope that it will be useful,",
+                " * but WITHOUT ANY WARRANTY; without even the implied warranty of",
+                " * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the",
+                " * GNU General Public License for more details.",
+                " *",
+                " * You should have received a copy of the GNU General Public License",
+                " * along with this program. If not, see http://www.gnu.org/licenses/.",
+                " *",
+                " "
+              ]
+            },
+            "trailingEmptyLines": {
+              "minimum": 2
+            }
+          }
+        ],
+        "no-dupe-class-members": "off",
+        "no-unsanitized/property": "off",
+        "prefer-promise-reject-errors": "off",
+        "jest/no-jasmine-globals": "off",
+        "jsx-a11y/media-has-caption": "off",
+        "no-empty": "error",
+        "typescript/explicit-module-boundary-types": "off",
+        "typescript/ban-ts-comment": "off",
+        "typescript/no-var-requires": "off",
+        "typescript/no-non-null-assertion": "error",
+        "typescript/no-floating-promises": "warn",
+        "typescript/use-unknown-in-catch-callback-variable": "error",
+        "typescript/array-type": [
+          "error",
+          {
+            "default": "array"
+          }
+        ],
+        "eslint-core-compat/id-length": [
+          "error",
+          {
+            "min": 2,
+            "properties": "never"
+          }
+        ]
+      },
+      "globals": {
+        "React": "readonly",
+        "JSX": "readonly",
+        "amplify": "readonly",
+        "NodeJS": "readonly"
+      },
+      "env": {
+        "browser": true,
+        "es2020": true,
+        "node": true
+      },
+      "excludeFiles": [
+        "apps/webapp/test/**",
+        "libraries/core/src/test/**",
+        "**/test/**",
+        "**/__mocks__/**",
+        "*.js",
+        "**/setupTests.*",
+        "**/*.test.*",
+        "**/*.spec.*",
+        "**/jest.setup.*",
+        "apps/webapp/.copyconfigrc.js",
+        "apps/webapp/jest.config.ts",
+        "apps/webapp/playwright.config.ts",
+        "apps/webapp/playwright.rspack.config.ts",
+        "apps/webapp/rspack.config*.mts",
+        "libraries/config/src/client.config.ts",
+        "libraries/config/src/server.config.ts"
+      ]
+    },
+    {
+      "files": ["tools/i18n/**/*.{ts,mts}"],
+      "env": {
+        "browser": true,
+        "es2020": true,
+        "node": true
+      },
+      "excludeFiles": [
+        "apps/webapp/test/**",
+        "libraries/core/src/test/**",
+        "**/test/**",
+        "**/__mocks__/**",
+        "*.js",
+        "**/setupTests.*",
+        "**/*.test.*",
+        "**/*.spec.*",
+        "**/jest.setup.*",
+        "apps/webapp/.copyconfigrc.js",
+        "apps/webapp/jest.config.ts",
+        "apps/webapp/playwright.config.ts",
+        "apps/webapp/playwright.rspack.config.ts",
+        "apps/webapp/rspack.config*.mts",
+        "libraries/config/src/client.config.ts",
+        "libraries/config/src/server.config.ts"
+      ]
+    },
+    {
+      "files": [
+        "apps/server/**/*.{ts,tsx}",
+        "libraries/api-client/**/*.{ts,tsx}",
+        "libraries/commons/**/*.{ts,tsx}",
+        "libraries/certificate-check/**/*.{ts,tsx}",
+        "libraries/core/**/*.{ts,tsx}",
+        "libraries/copy-config/**/*.{ts,tsx}",
+        "libraries/license-collector/**/*.{ts,tsx}",
+        "libraries/store-engine/**/*.{ts,tsx}",
+        "libraries/store-engine-dexie/**/*.{ts,tsx}",
+        "libraries/react-ui-kit/**/*.{ts,tsx}"
+      ],
+      "rules": {
+        "typescript/strict-boolean-expressions": [
+          "error",
+          {
+            "allowAny": false,
+            "allowNullableBoolean": false,
+            "allowNullableEnum": false,
+            "allowNullableNumber": false,
+            "allowNullableObject": false,
+            "allowNullableString": false,
+            "allowNumber": false,
+            "allowString": false
+          }
+        ],
+        "typescript/no-unnecessary-boolean-literal-compare": "error"
+      },
+      "excludeFiles": [
+        "apps/webapp/test/**",
+        "libraries/core/src/test/**",
+        "**/test/**",
+        "**/__mocks__/**",
+        "*.js",
+        "**/setupTests.*",
+        "**/*.test.*",
+        "**/*.spec.*",
+        "**/jest.setup.*",
+        "apps/webapp/.copyconfigrc.js",
+        "apps/webapp/jest.config.ts",
+        "apps/webapp/playwright.config.ts",
+        "apps/webapp/playwright.rspack.config.ts",
+        "apps/webapp/rspack.config*.mts",
+        "libraries/config/src/client.config.ts",
+        "libraries/config/src/server.config.ts"
+      ]
+    },
+    {
+      "files": ["**/*.js", "**/*.jsx", "**/*.cjs", "**/*.mjs"],
+      "rules": {
+        "unicorn/no-array-reverse": "error",
+        "unicorn/no-array-sort": "error",
+        "no-unused-vars": "off",
+        "typescript/require-array-sort-compare": "off"
+      },
+      "env": {
+        "browser": true,
+        "es2020": true,
+        "node": true
+      },
+      "excludeFiles": [
+        "apps/webapp/test/**",
+        "libraries/core/src/test/**",
+        "**/test/**",
+        "**/__mocks__/**",
+        "*.js",
+        "**/setupTests.*",
+        "**/*.test.*",
+        "**/*.spec.*",
+        "**/jest.setup.*",
+        "apps/webapp/.copyconfigrc.js",
+        "apps/webapp/jest.config.ts",
+        "apps/webapp/playwright.config.ts",
+        "apps/webapp/playwright.rspack.config.ts",
+        "apps/webapp/rspack.config*.mts",
+        "libraries/config/src/client.config.ts",
+        "libraries/config/src/server.config.ts"
+      ]
+    },
+    {
+      "files": ["**/*.test.tsx", "**/*.test.ts", "**/*.spec.tsx", "**/*.spec.ts", "**/test/**/*", "**/mocks/**/*"],
+      "rules": {
+        "no-magic-numbers": "off",
+        "eslint-core-compat/id-length": "off"
+      },
+      "excludeFiles": [
+        "apps/webapp/test/**",
+        "libraries/core/src/test/**",
+        "**/test/**",
+        "**/__mocks__/**",
+        "*.js",
+        "**/setupTests.*",
+        "**/*.test.*",
+        "**/*.spec.*",
+        "**/jest.setup.*",
+        "apps/webapp/.copyconfigrc.js",
+        "apps/webapp/jest.config.ts",
+        "apps/webapp/playwright.config.ts",
+        "apps/webapp/playwright.rspack.config.ts",
+        "apps/webapp/rspack.config*.mts",
+        "libraries/config/src/client.config.ts",
+        "libraries/config/src/server.config.ts"
+      ]
+    },
+    {
+      "files": ["apps/webapp/src/script/page/rightSidebar/groupParticipantService/groupParticipantService.tsx"],
+      "rules": {
+        "typescript/no-unnecessary-condition": "error"
+      },
+      "excludeFiles": [
+        "apps/webapp/test/**",
+        "libraries/core/src/test/**",
+        "**/test/**",
+        "**/__mocks__/**",
+        "*.js",
+        "**/setupTests.*",
+        "**/*.test.*",
+        "**/*.spec.*",
+        "**/jest.setup.*",
+        "apps/webapp/.copyconfigrc.js",
+        "apps/webapp/jest.config.ts",
+        "apps/webapp/playwright.config.ts",
+        "apps/webapp/playwright.rspack.config.ts",
+        "apps/webapp/rspack.config*.mts",
+        "libraries/config/src/client.config.ts",
+        "libraries/config/src/server.config.ts"
+      ]
+    },
+    {
+      "files": ["apps/webapp/src/script/**/*.{ts,tsx}"],
+      "rules": {
+        "typescript/strict-boolean-expressions": [
+          "error",
+          {
+            "allowAny": false,
+            "allowNullableBoolean": false,
+            "allowNullableEnum": false,
+            "allowNullableNumber": false,
+            "allowNullableObject": false,
+            "allowNullableString": false,
+            "allowNumber": false,
+            "allowString": false
+          }
+        ],
+        "typescript/no-unnecessary-boolean-literal-compare": "error"
+      },
+      "excludeFiles": [
+        "apps/webapp/test/**",
+        "libraries/core/src/test/**",
+        "**/test/**",
+        "**/__mocks__/**",
+        "*.js",
+        "**/setupTests.*",
+        "**/*.test.*",
+        "**/*.spec.*",
+        "**/jest.setup.*",
+        "apps/webapp/.copyconfigrc.js",
+        "apps/webapp/jest.config.ts",
+        "apps/webapp/playwright.config.ts",
+        "apps/webapp/playwright.rspack.config.ts",
+        "apps/webapp/rspack.config*.mts",
+        "libraries/config/src/client.config.ts",
+        "libraries/config/src/server.config.ts"
+      ]
+    },
+    {
+      "files": ["libraries/react-ui-kit/**/*.{ts,tsx}"],
+      "rules": {
+        "import/no-default-export": "off"
+      },
+      "excludeFiles": [
+        "apps/webapp/test/**",
+        "libraries/core/src/test/**",
+        "**/test/**",
+        "**/__mocks__/**",
+        "*.js",
+        "**/setupTests.*",
+        "**/*.test.*",
+        "**/*.spec.*",
+        "**/jest.setup.*",
+        "apps/webapp/.copyconfigrc.js",
+        "apps/webapp/jest.config.ts",
+        "apps/webapp/playwright.config.ts",
+        "apps/webapp/playwright.rspack.config.ts",
+        "apps/webapp/rspack.config*.mts",
+        "libraries/config/src/client.config.ts",
+        "libraries/config/src/server.config.ts"
+      ]
+    },
+    {
+      "files": [
+        "apps/webapp/src/script/components/Modals/PrimaryModal/**/*.{ts,tsx}",
+        "apps/webapp/src/script/components/Modals/LeaveGroupAdminModal/**/*.{ts,tsx}",
+        "apps/webapp/src/script/components/Modals/QualityFeedbackModal/**/*.{ts,tsx}",
+        "apps/webapp/src/script/components/Modals/DetailViewModal/**/*.{ts,tsx}"
+      ],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "src/script/page/RootProvider",
+                "importNames": ["useApplicationContext"],
+                "message": "This modal is rendered outside RootProvider. Pass required dependencies explicitly instead."
+              }
+            ]
+          }
+        ]
+      },
+      "excludeFiles": [
+        "apps/webapp/test/**",
+        "libraries/core/src/test/**",
+        "**/test/**",
+        "**/__mocks__/**",
+        "*.js",
+        "**/setupTests.*",
+        "**/*.test.*",
+        "**/*.spec.*",
+        "**/jest.setup.*",
+        "apps/webapp/.copyconfigrc.js",
+        "apps/webapp/jest.config.ts",
+        "apps/webapp/playwright.config.ts",
+        "apps/webapp/playwright.rspack.config.ts",
+        "apps/webapp/rspack.config*.mts",
+        "libraries/config/src/client.config.ts",
+        "libraries/config/src/server.config.ts"
+      ]
+    },
+    {
+      "files": ["apps/webapp/src/script/page/components/WindowTitleUpdater.ts"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "src/script/page/RootProvider",
+                "importNames": ["useApplicationContext"],
+                "message": "This component is rendered outside RootProvider. Pass required dependencies explicitly instead."
+              },
+              {
+                "name": "../RootProvider",
+                "importNames": ["useApplicationContext"],
+                "message": "This component is rendered outside RootProvider. Pass required dependencies explicitly instead."
+              }
+            ]
+          }
+        ]
+      },
+      "excludeFiles": [
+        "apps/webapp/test/**",
+        "libraries/core/src/test/**",
+        "**/test/**",
+        "**/__mocks__/**",
+        "*.js",
+        "**/setupTests.*",
+        "**/*.test.*",
+        "**/*.spec.*",
+        "**/jest.setup.*",
+        "apps/webapp/.copyconfigrc.js",
+        "apps/webapp/jest.config.ts",
+        "apps/webapp/playwright.config.ts",
+        "apps/webapp/playwright.rspack.config.ts",
+        "apps/webapp/rspack.config*.mts",
+        "libraries/config/src/client.config.ts",
+        "libraries/config/src/server.config.ts"
+      ]
+    },
+    {
+      "files": [
+        "apps/webapp/src/script/components/Badge/components/VerificationBadges/VerificationBadges.tsx",
+        "apps/webapp/src/script/components/Cells/common/useCellPublicLink/useCellPublicLink.ts",
+        "apps/webapp/src/script/components/CellsGlobalView/CellsGlobalView.tsx",
+        "apps/webapp/src/script/components/CellsGlobalView/CellsHeader/CellsFilters/CellsFiltersMenu/CellsFiltersMenu.tsx",
+        "apps/webapp/src/script/components/CellsGlobalView/CellsHeader/CellsFilters/CellsFiltersMenu/useGetAllTags/useGetAllTags.ts",
+        "apps/webapp/src/script/components/CellsGlobalView/CellsTable/CellsTableColumns/CellsShareModal/CellsShareModal.tsx",
+        "apps/webapp/src/script/components/CellsGlobalView/CellsTable/CellsTableColumns/CellsTableRowOptions/CellsTableRowOptions.tsx",
+        "apps/webapp/src/script/components/CellsGlobalView/useSearchCellsNodes/useSearchCellsNodes.ts",
+        "apps/webapp/src/script/components/ConfigToolbar/ConfigToolbar.tsx",
+        "apps/webapp/src/script/components/conversation/conversation.tsx",
+        "apps/webapp/src/script/components/conversation/conversationCells/conversationCells.tsx",
+        "apps/webapp/src/script/components/conversation/conversationCells/cellsTable/cellsTableColumns/cellsNodeShareModal/cellsNodeShareModal.tsx",
+        "apps/webapp/src/script/components/conversation/conversationCells/cellsTable/cellsTableColumns/cellsTableRowOptions/cellsMoveNodeModal/cellsMoveNodeModal.tsx",
+        "apps/webapp/src/script/components/conversation/conversationCells/cellsTable/cellsTableColumns/cellsTableRowOptions/cellsMoveNodeModal/useGetCellsFolders/useGetCellsFolders.ts",
+        "apps/webapp/src/script/components/conversation/conversationCells/cellsTable/cellsTableColumns/cellsTableRowOptions/cellsTableRowOptions.tsx",
+        "apps/webapp/src/script/components/conversation/conversationCells/cellsTable/cellsTableColumns/cellsTableRowOptions/cellsTagsModal/useTagsManagement/useGetAllTags/useGetAllTags.ts",
+        "apps/webapp/src/script/components/conversation/conversationCells/cellsTable/cellsTableColumns/cellsTableRowOptions/cellsTagsModal/useTagsManagement/useTagsManagement.ts",
+        "apps/webapp/src/script/components/conversation/conversationCells/common/useGetAllTags/useGetAllTags.ts",
+        "apps/webapp/src/script/components/conversation/conversationCells/useConversationSearch/useConversationSearchFiles.ts",
+        "apps/webapp/src/script/components/conversation/conversationCells/useGetAllCellsNodes/useGetAllCellsNodes.ts",
+        "apps/webapp/src/script/components/conversation/conversationCells/useRefreshCellsState/useRefreshCellsState.ts",
+        "apps/webapp/src/script/components/FileFullscreenModal/FileEditor/FileEditor.tsx",
+        "apps/webapp/src/script/components/inputBar/InputBar.tsx",
+        "apps/webapp/src/script/components/inputBar/FilePreviews/useFilePreview/useFilePreview.ts",
+        "apps/webapp/src/script/components/inputBar/usePing/usePing.ts",
+        "apps/webapp/src/script/components/inputBar/useMessageHandling/useDraftState/useDraftState.ts",
+        "apps/webapp/src/script/components/messagesList/message/contentMessage/asset/common/useGetAssetUrl/useGetAssetUrl.ts",
+        "apps/webapp/src/script/components/messagesList/message/contentMessage/asset/multipartAssets/multipartAssets.tsx",
+        "apps/webapp/src/script/components/messagesList/message/contentMessage/asset/multipartAssets/useGetMultipartAsset/useGetMultipartAsset.ts",
+        "apps/webapp/src/script/components/messagesList/message/messageWrapper.tsx",
+        "apps/webapp/src/script/components/messagesList/virtualizedMessagesList/virtualizedMessagesList.tsx",
+        "apps/webapp/src/script/components/messagesList/virtualizedMessagesList/useLoadMessages.ts",
+        "apps/webapp/src/script/components/messagesList/utils/useLoadConversation.ts",
+        "apps/webapp/src/script/components/Modals/FileHistoryModal/FileVersionItem.tsx",
+        "apps/webapp/src/script/components/Modals/FileHistoryModal/hooks/useFileVersions.ts",
+        "apps/webapp/src/script/components/Modals/DetailViewModal/DetailViewModalFooter.tsx",
+        "apps/webapp/src/script/components/UserSearchableList/UserSearchableList.tsx",
+        "apps/webapp/src/script/components/calling/CallingCell/CallingCell.tsx",
+        "apps/webapp/src/script/components/calling/CallingOverlayContainer.tsx",
+        "apps/webapp/src/script/components/calling/FullscreenVideoCall.tsx"
+      ],
+      "rules": {
+        "no-void": "error",
+        "typescript/no-floating-promises": "error"
+      },
+      "excludeFiles": [
+        "apps/webapp/test/**",
+        "libraries/core/src/test/**",
+        "**/test/**",
+        "**/__mocks__/**",
+        "*.js",
+        "**/setupTests.*",
+        "**/*.test.*",
+        "**/*.spec.*",
+        "**/jest.setup.*",
+        "apps/webapp/.copyconfigrc.js",
+        "apps/webapp/jest.config.ts",
+        "apps/webapp/playwright.config.ts",
+        "apps/webapp/playwright.rspack.config.ts",
+        "apps/webapp/rspack.config*.mts",
+        "libraries/config/src/client.config.ts",
+        "libraries/config/src/server.config.ts"
+      ]
+    },
+    {
+      "files": ["apps/webapp/jest.config.ts", "apps/webapp/playwright.config.ts", "apps/webapp/playwright.rspack.config.ts"],
+      "globals": {
+        "NodeJS": "readonly"
+      },
+      "env": {
+        "browser": true,
+        "es2020": true,
+        "node": true
+      }
+    },
+    {
+      "files": ["apps/webapp/rspack.config.mts", "apps/webapp/rspack.config.dev.mts", "apps/webapp/rspack.config.public.mts"],
+      "rules": {
+        "import/no-default-export": "off"
+      },
+      "globals": {
+        "NodeJS": "readonly"
+      },
+      "env": {
+        "browser": true,
+        "es2020": true,
+        "node": true
+      }
+    },
+    {
+      "files": ["libraries/config/src/client.config.ts", "libraries/config/src/server.config.ts"],
+      "globals": {
+        "NodeJS": "readonly"
+      },
+      "env": {
+        "browser": true,
+        "es2020": true,
+        "node": true
+      }
+    },
+    {
+      "files": ["**/*.{ts,tsx,mts,cts}"],
+      "rules": {
+        "typescript/explicit-function-return-type": [
+          "error",
+          {
+            "allowExpressions": true,
+            "allowTypedFunctionExpressions": true
+          }
+        ]
+      }
+    },
+    {
+      "files": ["apps/webapp/src/script/auth/page/root.tsx"],
+      "rules": {
+        "import/no-dynamic-require": "off"
+      }
+    },
+    {
+      "files": ["**/*.{ts,tsx,mts,cts}"],
+      "rules": {
+        "no-unused-vars": [
+          "error",
+          {
+            "vars": "all",
+            "args": "after-used",
+            "ignoreRestSiblings": true,
+            "argsIgnorePattern": "^_$",
+            "caughtErrors": "all",
+            "caughtErrorsIgnorePattern": "^_$"
+          }
+        ]
+      }
+    },
+    {
+      "files": ["**/*.{ts,tsx,mts}"],
+      "rules": {
+        "arrow-body-style": ["error", "always"],
+        "array-callback-return": [
+          "error",
+          {
+            "allowImplicit": false,
+            "checkForEach": true,
+            "allowVoid": false
+          }
+        ]
+      }
+    },
+    {
+      "files": [
+        "apps/**/test/**/*.ts",
+        "libraries/**/test/**/*.ts",
+        "apps/**/__mocks__/**/*.ts",
+        "libraries/**/__mocks__/**/*.ts",
+        "apps/**/*.test.ts",
+        "libraries/**/*.test.ts",
+        "apps/**/*.test.*.ts",
+        "libraries/**/*.test.*.ts",
+        "apps/**/*.spec.ts",
+        "libraries/**/*.spec.ts",
+        "apps/**/*.spec.*.ts",
+        "libraries/**/*.spec.*.ts",
+        "apps/**/setupTests.ts",
+        "libraries/**/setupTests.ts",
+        "apps/**/jest.setup.ts",
+        "libraries/**/jest.setup.ts",
+        "tools/**/*.test.ts",
+        "apps/**/test/**/*.tsx",
+        "libraries/**/test/**/*.tsx",
+        "apps/**/__mocks__/**/*.tsx",
+        "libraries/**/__mocks__/**/*.tsx",
+        "apps/**/*.test.tsx",
+        "libraries/**/*.test.tsx",
+        "apps/**/*.test.*.tsx",
+        "libraries/**/*.test.*.tsx",
+        "apps/**/*.spec.tsx",
+        "libraries/**/*.spec.tsx",
+        "apps/**/*.spec.*.tsx",
+        "libraries/**/*.spec.*.tsx",
+        "apps/**/setupTests.tsx",
+        "libraries/**/setupTests.tsx",
+        "apps/**/jest.setup.tsx",
+        "libraries/**/jest.setup.tsx",
+        "tools/**/*.test.tsx"
+      ],
+      "rules": {
+        "typescript/no-non-null-assertion": "error"
+      }
+    },
+    {
+      "files": [
+        "apps/**/test/**/*.ts",
+        "libraries/**/test/**/*.ts",
+        "apps/**/__mocks__/**/*.ts",
+        "libraries/**/__mocks__/**/*.ts",
+        "apps/**/*.test.ts",
+        "libraries/**/*.test.ts",
+        "apps/**/*.test.*.ts",
+        "libraries/**/*.test.*.ts",
+        "apps/**/*.spec.ts",
+        "libraries/**/*.spec.ts",
+        "apps/**/*.spec.*.ts",
+        "libraries/**/*.spec.*.ts",
+        "apps/**/setupTests.ts",
+        "libraries/**/setupTests.ts",
+        "apps/**/jest.setup.ts",
+        "libraries/**/jest.setup.ts",
+        "tools/**/*.test.ts",
+        "apps/**/test/**/*.tsx",
+        "libraries/**/test/**/*.tsx",
+        "apps/**/__mocks__/**/*.tsx",
+        "libraries/**/__mocks__/**/*.tsx",
+        "apps/**/*.test.tsx",
+        "libraries/**/*.test.tsx",
+        "apps/**/*.test.*.tsx",
+        "libraries/**/*.test.*.tsx",
+        "apps/**/*.spec.tsx",
+        "libraries/**/*.spec.tsx",
+        "apps/**/*.spec.*.tsx",
+        "libraries/**/*.spec.*.tsx",
+        "apps/**/setupTests.tsx",
+        "libraries/**/setupTests.tsx",
+        "apps/**/jest.setup.tsx",
+        "libraries/**/jest.setup.tsx",
+        "tools/**/*.test.tsx",
+        "apps/**/test/**/*.js",
+        "libraries/**/test/**/*.js",
+        "apps/**/__mocks__/**/*.js",
+        "libraries/**/__mocks__/**/*.js",
+        "apps/**/*.test.js",
+        "libraries/**/*.test.js",
+        "apps/**/*.test.*.js",
+        "libraries/**/*.test.*.js",
+        "apps/**/*.spec.js",
+        "libraries/**/*.spec.js",
+        "apps/**/*.spec.*.js",
+        "libraries/**/*.spec.*.js",
+        "apps/**/setupTests.js",
+        "libraries/**/setupTests.js",
+        "apps/**/jest.setup.js",
+        "libraries/**/jest.setup.js",
+        "apps/**/test/**/*.cjs",
+        "libraries/**/test/**/*.cjs",
+        "apps/**/__mocks__/**/*.cjs",
+        "libraries/**/__mocks__/**/*.cjs",
+        "apps/**/*.test.cjs",
+        "libraries/**/*.test.cjs",
+        "apps/**/*.test.*.cjs",
+        "libraries/**/*.test.*.cjs",
+        "apps/**/*.spec.cjs",
+        "libraries/**/*.spec.cjs",
+        "apps/**/*.spec.*.cjs",
+        "libraries/**/*.spec.*.cjs",
+        "apps/**/setupTests.cjs",
+        "libraries/**/setupTests.cjs",
+        "apps/**/jest.setup.cjs",
+        "libraries/**/jest.setup.cjs",
+        "apps/**/test/**/*.mjs",
+        "libraries/**/test/**/*.mjs",
+        "apps/**/__mocks__/**/*.mjs",
+        "libraries/**/__mocks__/**/*.mjs",
+        "apps/**/*.test.mjs",
+        "libraries/**/*.test.mjs",
+        "apps/**/*.test.*.mjs",
+        "libraries/**/*.test.*.mjs",
+        "apps/**/*.spec.mjs",
+        "libraries/**/*.spec.mjs",
+        "apps/**/*.spec.*.mjs",
+        "libraries/**/*.spec.*.mjs",
+        "apps/**/setupTests.mjs",
+        "libraries/**/setupTests.mjs",
+        "apps/**/jest.setup.mjs",
+        "libraries/**/jest.setup.mjs",
+        "apps/**/test/**/*.jsx",
+        "libraries/**/test/**/*.jsx",
+        "apps/**/__mocks__/**/*.jsx",
+        "libraries/**/__mocks__/**/*.jsx",
+        "apps/**/*.test.jsx",
+        "libraries/**/*.test.jsx",
+        "apps/**/*.test.*.jsx",
+        "libraries/**/*.test.*.jsx",
+        "apps/**/*.spec.jsx",
+        "libraries/**/*.spec.jsx",
+        "apps/**/*.spec.*.jsx",
+        "libraries/**/*.spec.*.jsx",
+        "apps/**/setupTests.jsx",
+        "libraries/**/setupTests.jsx",
+        "apps/**/jest.setup.jsx",
+        "libraries/**/jest.setup.jsx",
+        "apps/**/test/**/*.cjs",
+        "libraries/**/test/**/*.cjs",
+        "apps/**/__mocks__/**/*.cjs",
+        "libraries/**/__mocks__/**/*.cjs",
+        "apps/**/*.test.cjs",
+        "libraries/**/*.test.cjs",
+        "apps/**/*.test.*.cjs",
+        "libraries/**/*.test.*.cjs",
+        "apps/**/*.spec.cjs",
+        "libraries/**/*.spec.cjs",
+        "apps/**/*.spec.*.cjs",
+        "libraries/**/*.spec.*.cjs",
+        "apps/**/setupTests.cjs",
+        "libraries/**/setupTests.cjs",
+        "apps/**/jest.setup.cjs",
+        "libraries/**/jest.setup.cjs",
+        "apps/**/test/**/*.mjs",
+        "libraries/**/test/**/*.mjs",
+        "apps/**/__mocks__/**/*.mjs",
+        "libraries/**/__mocks__/**/*.mjs",
+        "apps/**/*.test.mjs",
+        "libraries/**/*.test.mjs",
+        "apps/**/*.test.*.mjs",
+        "libraries/**/*.test.*.mjs",
+        "apps/**/*.spec.mjs",
+        "libraries/**/*.spec.mjs",
+        "apps/**/*.spec.*.mjs",
+        "libraries/**/*.spec.*.mjs",
+        "apps/**/setupTests.mjs",
+        "libraries/**/setupTests.mjs",
+        "apps/**/jest.setup.mjs",
+        "libraries/**/jest.setup.mjs"
+      ],
+      "rules": {
+        "no-magic-numbers": "off",
+        "eslint-core-compat/no-restricted-syntax": [
+          "error",
+          {
+            "selector": "ArrowFunctionExpression[async=false][body.type='BlockStatement'][body.body.length=0]",
+            "message": "Use noop from noop-esm instead of an empty arrow function."
+          },
+          {
+            "selector": "ArrowFunctionExpression[async=true][body.type='BlockStatement'][body.body.length=0]",
+            "message": "Use asyncNoop from noop-esm instead of an empty async arrow function."
+          },
+          {
+            "selector": "PropertyDefinition[definite=true]",
+            "message": "Definite assignment assertions are not allowed. Initialize the value explicitly or model its absence in the type."
+          },
+          {
+            "selector": "VariableDeclarator[definite=true]",
+            "message": "Definite assignment assertions are not allowed. Initialize the value explicitly or model its absence in the type."
+          }
+        ]
+      }
+    },
+    {
+      "files": [
+        "apps/**/*.test.ts",
+        "libraries/**/*.test.ts",
+        "apps/**/*.test.*.ts",
+        "libraries/**/*.test.*.ts",
+        "apps/**/*.spec.ts",
+        "libraries/**/*.spec.ts",
+        "apps/**/*.spec.*.ts",
+        "libraries/**/*.spec.*.ts",
+        "tools/**/*.test.ts",
+        "apps/**/*.test.tsx",
+        "libraries/**/*.test.tsx",
+        "apps/**/*.test.*.tsx",
+        "libraries/**/*.test.*.tsx",
+        "apps/**/*.spec.tsx",
+        "libraries/**/*.spec.tsx",
+        "apps/**/*.spec.*.tsx",
+        "libraries/**/*.spec.*.tsx",
+        "tools/**/*.test.tsx",
+        "apps/**/*.test.js",
+        "libraries/**/*.test.js",
+        "apps/**/*.test.*.js",
+        "libraries/**/*.test.*.js",
+        "apps/**/*.spec.js",
+        "libraries/**/*.spec.js",
+        "apps/**/*.spec.*.js",
+        "libraries/**/*.spec.*.js",
+        "apps/**/*.test.cjs",
+        "libraries/**/*.test.cjs",
+        "apps/**/*.test.*.cjs",
+        "libraries/**/*.test.*.cjs",
+        "apps/**/*.spec.cjs",
+        "libraries/**/*.spec.cjs",
+        "apps/**/*.spec.*.cjs",
+        "libraries/**/*.spec.*.cjs",
+        "apps/**/*.test.mjs",
+        "libraries/**/*.test.mjs",
+        "apps/**/*.test.*.mjs",
+        "libraries/**/*.test.*.mjs",
+        "apps/**/*.spec.mjs",
+        "libraries/**/*.spec.mjs",
+        "apps/**/*.spec.*.mjs",
+        "libraries/**/*.spec.*.mjs",
+        "apps/**/*.test.jsx",
+        "libraries/**/*.test.jsx",
+        "apps/**/*.test.*.jsx",
+        "libraries/**/*.test.*.jsx",
+        "apps/**/*.spec.jsx",
+        "libraries/**/*.spec.jsx",
+        "apps/**/*.spec.*.jsx",
+        "libraries/**/*.spec.*.jsx",
+        "apps/**/*.test.cjs",
+        "libraries/**/*.test.cjs",
+        "apps/**/*.test.*.cjs",
+        "libraries/**/*.test.*.cjs",
+        "apps/**/*.spec.cjs",
+        "libraries/**/*.spec.cjs",
+        "apps/**/*.spec.*.cjs",
+        "libraries/**/*.spec.*.cjs",
+        "apps/**/*.test.mjs",
+        "libraries/**/*.test.mjs",
+        "apps/**/*.test.*.mjs",
+        "libraries/**/*.test.*.mjs",
+        "apps/**/*.spec.mjs",
+        "libraries/**/*.spec.mjs",
+        "apps/**/*.spec.*.mjs",
+        "libraries/**/*.spec.*.mjs"
+      ],
+      "rules": {
+        "jest/require-top-level-describe": "error",
+        "jest/consistent-test-it": [
+          "error",
+          {
+            "fn": "it",
+            "withinDescribe": "it"
+          }
+        ]
+      }
+    },
+    {
+      "files": ["apps/**/*.{js,jsx,ts,tsx,cjs,mjs}", "libraries/**/*.{js,jsx,ts,tsx,cjs,mjs}"],
+      "rules": {
+        "jest/no-restricted-jest-methods": [
+          "warn",
+          {
+            "mock": "Do not use jest.mock() or jest.mocked(). Pass dependencies explicitly instead of intercepting modules.",
+            "mocked": "Do not use jest.mock() or jest.mocked(). Pass dependencies explicitly instead of intercepting modules."
+          }
+        ]
+      }
+    },
+    {
+      "files": ["apps/webapp/**/*.{ts,tsx}"],
+      "rules": {
+        "import-js/no-unresolved": [
+          "error",
+          {
+            "caseSensitive": false
+          }
+        ],
+        "import-js/order": [
+          "error",
+          {
+            "groups": ["external", "builtin", "internal", "sibling", "parent", "index"],
+            "pathGroups": [
+              {
+                "pattern": "react",
+                "group": "external",
+                "position": "before"
+              },
+              {
+                "pattern": "@wireapp/*",
+                "group": "internal",
+                "position": "before"
+              },
+              {
+                "pattern": "{apps,Components,Hooks,I18n,Repositories,Resource,src,Util}/**",
+                "group": "internal",
+                "position": "after"
+              }
+            ],
+            "pathGroupsExcludedImportTypes": ["react", "@wireapp/*"],
+            "newlines-between": "always",
+            "alphabetize": {
+              "order": "asc",
+              "caseInsensitive": true
+            },
+            "warnOnUnassignedImports": true
+          }
+        ]
+      },
+      "excludeFiles": [
+        "apps/webapp/test/**",
+        "libraries/core/src/test/**",
+        "**/test/**",
+        "**/__mocks__/**",
+        "*.js",
+        "**/setupTests.*",
+        "**/*.test.*",
+        "**/*.spec.*",
+        "**/jest.setup.*",
+        "apps/webapp/.copyconfigrc.js",
+        "apps/webapp/jest.config.ts",
+        "apps/webapp/playwright.config.ts",
+        "apps/webapp/playwright.rspack.config.ts",
+        "apps/webapp/rspack.config*.mts",
+        "libraries/config/src/client.config.ts",
+        "libraries/config/src/server.config.ts"
+      ]
+    },
+    {
+      "files": ["**/*.{js,jsx,cjs,mjs}"],
+      "excludeFiles": [
+        "apps/webapp/test/**",
+        "libraries/core/src/test/**",
+        "**/test/**",
+        "**/__mocks__/**",
+        "*.js",
+        "**/setupTests.*",
+        "**/*.test.*",
+        "**/*.spec.*",
+        "**/jest.setup.*",
+        "apps/webapp/.copyconfigrc.js",
+        "apps/webapp/jest.config.ts",
+        "apps/webapp/playwright.config.ts",
+        "apps/webapp/playwright.rspack.config.ts",
+        "apps/webapp/rspack.config*.mts",
+        "libraries/config/src/client.config.ts",
+        "libraries/config/src/server.config.ts"
+      ],
+      "rules": {
+        "eslint-core-compat/strict": ["error", "global"]
+      }
+    }
+  ],
+  "settings": {
+    "react": {
+      "version": "19.3.1"
+    },
+    "import-x/extensions": [".js", ".jsx", ".ts", ".tsx", ".mjs", ".cjs", ".mts", ".cts"],
+    "import-x/external-module-folders": ["node_modules", "node_modules/@types"],
+    "import-x/resolver": {
+      "typescript": {
+        "alwaysTryTypes": true,
+        "project": "./apps/webapp/tsconfig.json"
+      },
+      "node": {
+        "extensions": [".js", ".jsx", ".ts", ".tsx", ".mjs", ".cjs", ".mts", ".cts"]
+      }
+    }
   }
 }

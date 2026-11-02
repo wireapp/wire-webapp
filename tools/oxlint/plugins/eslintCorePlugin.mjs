@@ -1,0 +1,31 @@
+/*
+ * Wire
+ * Copyright (C) 2026 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {builtinRules} from 'eslint/use-at-your-own-risk';
+
+/* eslint-disable import/no-default-export -- Oxlint JS plugins require a default export. */
+/* oxlint-disable import/no-default-export -- Oxlint JS plugins require a default export. */
+export default {
+  meta: {name: 'wire-eslint-core-compat'},
+  rules: {
+    'id-length': builtinRules.get('id-length'),
+    'no-restricted-syntax': builtinRules.get('no-restricted-syntax'),
+    strict: builtinRules.get('strict'),
+  },
+};

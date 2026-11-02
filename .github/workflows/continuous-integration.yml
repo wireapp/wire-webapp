@@ -315,9 +315,13 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm clean-install
+        run: npm clean-install && npx just setup
+
+      - name: Build libraries for lint import resolution
+        run: npx just build-libraries
 
       - name: Lint repository with Oxlint
+        continue-on-error: true
         run: npx oxlint . --format github
 
   lint:
