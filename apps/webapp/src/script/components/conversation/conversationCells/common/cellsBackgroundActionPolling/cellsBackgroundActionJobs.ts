@@ -30,7 +30,6 @@ import {Maybe, maybe, task, type Task} from 'true-myth';
 import {pollCellsBackgroundActionJobs, type CellsBackgroundActionPollingOptions} from './cellsBackgroundActionPolling';
 
 import type {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
-
 type CellsBackgroundActionName = 'move' | 'delete' | 'restore';
 
 type CellsBackgroundActionSource =
