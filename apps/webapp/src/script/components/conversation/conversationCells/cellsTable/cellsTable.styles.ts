@@ -75,7 +75,7 @@ export const selectionBarStyles: CSSObject = {
   gap: '8px',
   padding: '0 8px',
   borderRadius: '12px',
-  background: 'linear-gradient(var(--accent-color-fade-16), var(--accent-color-fade-16)), var(--modal-bg)',
+  background: 'var(--Background-Base-Secondary, #EDEFF0)',
   color: 'var(--main-color)',
   pointerEvents: 'auto',
 
