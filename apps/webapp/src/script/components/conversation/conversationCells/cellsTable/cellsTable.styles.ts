@@ -32,6 +32,16 @@ export const wrapperWithRowsStyles: CSSObject = {
   marginBottom: 'auto',
 };
 
+export const permanentDeleteProgressStyles: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px',
+  margin: '0 0 8px',
+  color: 'var(--main-color)',
+  fontSize: 'var(--font-size-small)',
+  lineHeight: 1.5,
+};
+
 export const selectionBarContainerStyles: CSSObject = {
   position: 'relative',
   width: '100%',
@@ -121,7 +131,7 @@ export const selectionSizeStyles: CSSObject = {
   },
 };
 
-export const bulkMoveButtonStyles: CSSObject = {
+export const bulkActionButtonStyles: CSSObject = {
   flexShrink: 0,
   display: 'inline-flex',
   minHeight: '30px',
@@ -153,7 +163,7 @@ export const bulkMoveButtonStyles: CSSObject = {
 };
 
 export const bulkMoveToBinButtonStyles: CSSObject = {
-  ...bulkMoveButtonStyles,
+  ...bulkActionButtonStyles,
   marginLeft: 0,
   borderColor: 'transparent',
   background: 'var(--danger-color)',

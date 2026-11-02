@@ -221,9 +221,10 @@ export const ConversationCells = memo(
       });
     }, []);
 
-    const handleRefreshAfterBulkMoveOutcome = useCallback(async (): Promise<boolean> => {
+    const handleRefreshAndReportSuccess = useCallback(async (): Promise<boolean> => {
       const refreshResult = await task.tryOrElse(
         error => {
+          console.error(error);
           return error;
         },
         () => {
@@ -390,7 +391,7 @@ export const ConversationCells = memo(
             />
             <CellsHeader
               onRefresh={handleRefresh}
-              onRefreshAfterEmptyBinOutcome={handleRefreshAfterBulkMoveOutcome}
+              onRefreshAfterEmptyBinOutcome={handleRefreshAndReportSuccess}
               onEmptyBinSubmitted={handleEmptyBinSubmitted}
               getCurrentCellsPath={getCellsFilesPath}
               conversationName={name}
@@ -412,12 +413,13 @@ export const ConversationCells = memo(
             {isTableVisible && (
               <CellsTable
                 nodes={isLoading ? [] : nodes}
+                isNodesLoading={isLoading}
                 cellsRepository={cellsRepository}
                 conversation={activeConversation}
                 conversationQualifiedId={conversationQualifiedId}
                 conversationName={name}
                 onRefresh={handleRefresh}
-                onRefreshAfterBulkMoveOutcome={handleRefreshAfterBulkMoveOutcome}
+                onRefreshAndReportSuccess={handleRefreshAndReportSuccess}
                 onRefreshAfterBulkMoveToBinOutcome={handleRefreshAfterBulkMoveToBinOutcome}
                 // opening a folder must close search view and open the browse view
                 // with that folder (and breadcrumbs)
