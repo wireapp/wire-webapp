@@ -26,6 +26,7 @@ import {
   getMLSGroupOutOfSyncErrorMissingUsers,
   isBrokenMLSConversationError,
   isCoreCryptoMLSConversationAlreadyExistsError,
+  isCoreCryptoMLSInvalidCredentialsError,
   isCoreCryptoMLSWrongEpochError,
   isMlsConversationNotFoundError,
   isMLSGroupOutOfSyncError,
@@ -63,6 +64,22 @@ describe('CoreCryptoMLSError helpers', () => {
       });
       expect(isMlsConversationNotFoundError(err)).toBe(true);
       expect(isMlsConversationNotFoundError(new Error('other'))).toBe(false);
+    });
+
+    it('detects the V11 invalid-local-credentials error', () => {
+      const invalidCredentialsError = CoreCryptoError.Mls.new({
+        mlsError: MlsError.Other.new({
+          msg: 'There are invalid CredentialRefs that should be removed. Hex encoded sha256 hashes: abc123',
+        }),
+      });
+
+      expect(isCoreCryptoMLSInvalidCredentialsError(invalidCredentialsError)).toBe(true);
+      expect(
+        isCoreCryptoMLSInvalidCredentialsError(
+          CoreCryptoError.Mls.new({mlsError: MlsError.Other.new({msg: 'CRL endpoint unavailable'})}),
+        ),
+      ).toBe(false);
+      expect(isCoreCryptoMLSInvalidCredentialsError(new Error('CRL endpoint unavailable'))).toBe(false);
     });
   });
 

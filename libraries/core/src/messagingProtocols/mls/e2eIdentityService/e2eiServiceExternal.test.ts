@@ -25,10 +25,12 @@ import {task} from 'true-myth';
 import {APIClient} from '@wireapp/api-client';
 import {
   CoreCrypto,
+  CoreCryptoError,
   CoreCryptoContext,
   CredentialType,
   DeviceStatus,
   HttpMethod,
+  MlsError,
   PkiEnvironment,
   type PkiEnvironmentHooks,
   Uuid,
@@ -389,6 +391,24 @@ describe('E2EIServiceExternal', () => {
 
       expect(transactionContext.checkCredentials).toHaveBeenCalledTimes(1);
       expect(listener).not.toHaveBeenCalled();
+    });
+
+    it('emits credentialsChecked when CoreCrypto reports an invalid own credential', async () => {
+      const [service, {transactionContext}] = await buildE2EIService('credentialsCheckInvalidOwnCredential');
+      const listener = jest.fn();
+      service.on('credentialsChecked', listener);
+      transactionContext.checkCredentials.mockRejectedValueOnce(
+        CoreCryptoError.Mls.new({
+          mlsError: MlsError.Other.new({
+            msg: 'There are invalid CredentialRefs that should be removed. Hex encoded sha256 hashes: abc123',
+          }),
+        }),
+      );
+
+      await expect(service.initialize(discoveryUrl, authenticate)).resolves.toBeUndefined();
+
+      expect(transactionContext.checkCredentials).toHaveBeenCalledTimes(1);
+      expect(listener).toHaveBeenCalledTimes(1);
     });
 
     it('schedules a check every 24 hours and runs it once on first initialization', async () => {

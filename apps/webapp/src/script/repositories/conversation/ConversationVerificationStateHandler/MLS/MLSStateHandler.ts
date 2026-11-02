@@ -126,8 +126,9 @@ export class MLSConversationVerificationStateHandler {
    * CoreCrypto finished a credentials check, so the CRLs it uses are up to date.
    *
    * The event has no payload: V11 no longer tells us which domain changed. Only an actually
-   * revoked self certificate is acted on, and only after CoreCrypto reported a successful check.
-   * A failed check (for example an unreachable CRL) never reaches this handler.
+   * revoked self certificate is acted on. CoreCrypto V11 reports an invalid own credential as an
+   * error after completing the check, so that specific outcome also reaches this handler. A check
+   * that failed before refreshing state (for example an unreachable CRL) does not.
    */
   private handleCredentialsChecked = async (): Promise<void> => {
     const activeIdentity = await getActiveWireIdentity();

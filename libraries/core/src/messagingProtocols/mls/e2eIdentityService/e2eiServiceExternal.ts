@@ -51,6 +51,7 @@ import {parseFullQualifiedClientId} from '../../../util/fullyQualifiedClientIdUt
 import {StringifiedQualifiedId, stringifyQualifiedId} from '../../../util/qualifiedIdUtil';
 import {RecurringTaskScheduler} from '../../../util/recurringTaskScheduler';
 import {MLSService} from '../mlsService';
+import {isCoreCryptoMLSInvalidCredentialsError} from '../mlsService/coreCryptoMlsError';
 import {createMLSClientId} from '../utils/mlsId';
 
 /**
@@ -69,7 +70,8 @@ export type DeviceIdentity = Omit<WireIdentity, 'clientId' | 'status'> & {
 
 type Events = {
   /**
-   * Emitted after CoreCrypto successfully checked every X509 credential and refreshed its CRLs.
+   * Emitted after CoreCrypto checked every X509 credential and refreshed its CRLs. An invalid own
+   * credential is a completed check even though V11 reports it as an error.
    *
    * Revocation lists are not scoped to a domain anymore, so consumers have to re-evaluate the
    * conversations they care about themselves.
@@ -469,8 +471,9 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
    * CRL fetching, so this is also what refreshes the revocation data behind `getUserIdentities`,
    * `getDeviceIdentities` and `e2eiConversationState`.
    *
-   * A failed check can also mean that a CRL could not be fetched (for example on a flaky
-   * connection). It must not be treated as a revoked credential, so failures are only logged.
+   * An invalid own credential is reported as an error even though the check completed and the
+   * refreshed state must be consumed. Other failures can mean that a CRL could not be fetched (for
+   * example on a flaky connection), so they must not trigger credential-state handling.
    */
   private async checkAllCredentials(): Promise<void> {
     const outcome = await task.tryOrElse(
@@ -484,7 +487,7 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
       },
     );
 
-    if (outcome.isErr) {
+    if (outcome.isErr && !isCoreCryptoMLSInvalidCredentialsError(outcome.error)) {
       this.logger.warn('Failed to check X509 credentials', {error: outcome.error});
       return;
     }
