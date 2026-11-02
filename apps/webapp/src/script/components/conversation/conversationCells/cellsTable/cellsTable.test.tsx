@@ -1914,29 +1914,6 @@ describe('CellsTable selection', () => {
     }
   });
 
-  it('hides permanent deletion for a viewer even inside the recycle bin', () => {
-    const originalHash = window.location.hash;
-    window.location.hash = '#/conversation/conversation-id@example.com/files/recycle_bin';
-    try {
-      renderCellsTable({selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER});
-      fireEvent.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
-
-      expect(screen.queryByRole('button', {name: 'Delete permanently'})).not.toBeInTheDocument();
-      expect(screen.queryByRole('button', {name: 'Move to bin'})).not.toBeInTheDocument();
-    } finally {
-      window.location.hash = originalHash;
-    }
-  });
-
-  it('hides Move for viewers while keeping selection available', () => {
-    renderCellsTable({selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER});
-    fireEvent.click(screen.getAllByRole('checkbox')[0]);
-
-    expect(screen.getByText('1 selected')).toBeInTheDocument();
-    expect(screen.queryByRole('button', {name: 'Move'})).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', {name: 'Move to bin'})).not.toBeInTheDocument();
-  });
-
   it('hides selection controls when the Drive bulk actions feature flag is off', () => {
     renderCellsTable({isBulkActionsEnabled: false});
 
@@ -3769,17 +3746,17 @@ describe('CellsTable restoring selected Bin items', () => {
     expect(screen.getByRole('button', {name: 'Delete permanently'})).not.toHaveStyle({marginLeft: 'auto'});
   });
 
-  it('does not offer Restore to a viewer', async () => {
-    const user = userEvent.setup();
+  it.each([
+    {location: 'in the Bin', hash: binHash},
+    {location: 'in the files', hash: '#/conversation/conversation-id@example.com/files'},
+  ])('does not offer row selection to a viewer $location because every bulk action is restricted', ({hash}) => {
+    window.location.hash = hash;
     renderCellsTable({
       selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER,
       initialNodes: [createBinNode('a.txt')],
     });
 
-    await user.click(screen.getByRole('checkbox', {name: 'Select a.txt'}));
-
-    expect(screen.getByText('1 selected')).toBeInTheDocument();
-    expect(screen.queryByRole('button', {name: 'Restore'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
   });
 
   it('does not offer Restore when bulk actions are disabled', () => {

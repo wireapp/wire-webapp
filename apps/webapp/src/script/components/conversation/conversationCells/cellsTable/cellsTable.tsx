@@ -206,6 +206,9 @@ type PermanentDeleteReviewMessageKey =
   | 'cells.bulkDelete.stillVisible'
   | 'cells.bulkDelete.timedOut';
 
+// Selecting rows only makes sense when at least one of these is available, e.g. never for viewers.
+const BULK_ACTIONS = [CELLS_ACTION.MOVE, CELLS_ACTION.DELETE, CELLS_ACTION.RESTORE];
+
 const hasSameSelection = (selectedNodeIds: ReadonlySet<string>, nodeIds: readonly string[]): boolean => {
   return (
     selectedNodeIds.size === nodeIds.length &&
@@ -288,7 +291,11 @@ export const CellsTable = ({
   const backgroundMoveSummary = useRef<Maybe<SharedDriveMoveSummary>>(Maybe.nothing());
   const activeMoveStatusId = useRef<Maybe<string>>(Maybe.nothing());
   const canPerformCurrentDriveAction = useCellsActionPermissions();
-  const isSelectionEnabled = selectionEnabled && isFeatureToggleEnabled(driveBulkActionsFeatureToggleName);
+  const canPerformAnyBulkAction = BULK_ACTIONS.some(action => {
+    return canPerformCurrentDriveAction(action);
+  });
+  const isSelectionEnabled =
+    selectionEnabled && isFeatureToggleEnabled(driveBulkActionsFeatureToggleName) && canPerformAnyBulkAction;
   const [selectedNodeIds, setSelectedNodeIds] = useState<Set<string>>(() => {
     return new Set();
   });
