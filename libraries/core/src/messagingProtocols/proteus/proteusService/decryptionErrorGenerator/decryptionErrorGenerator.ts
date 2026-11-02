@@ -18,7 +18,6 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {errors as LegacyProteusErrors} from '@wireapp/proteus';
 
 import {CoreCryptoError, ProteusError} from '@wireapp/core-crypto';
 
@@ -37,9 +36,21 @@ export const ProteusErrors = {
 
 type SenderInfo = {clientId: string; userId: QualifiedId};
 
+type LegacyProteusError = Error & {code: number};
+
+/**
+ * Legacy Cryptobox errors are Proteus `Error` instances carrying a numeric code.
+ * This boundary is intentionally structural: importing `@wireapp/proteus` only
+ * for `instanceof` would eagerly initialize its separate libsodium stack even
+ * when the application uses CoreCrypto.
+ */
+const isLegacyProteusError = (error: unknown): error is LegacyProteusError => {
+  return error instanceof Error && 'code' in error && typeof error.code === 'number';
+};
+
 function getErrorCode(error: unknown): number {
   if (!CoreCryptoError.Proteus.instanceOf(error)) {
-    if (error instanceof LegacyProteusErrors.ProteusError) {
+    if (isLegacyProteusError(error)) {
       return error.code;
     }
 

@@ -20,7 +20,6 @@
 import {generateDecryptionError, ProteusErrors} from './decryptionErrorGenerator';
 
 import {CoreCryptoError, ProteusError} from '@wireapp/core-crypto';
-import {errors as LegacyProteusErrors} from '@wireapp/proteus';
 
 import {DecryptionError} from '../../../../errors/decryptionError';
 
@@ -31,6 +30,10 @@ const createStructuredProteusError = (errorCode: number): CoreCryptoError => {
 };
 
 describe('generateDecryptionError', () => {
+  it('does not load the legacy Proteus runtime with the mapper', () => {
+    expect(require.cache[require.resolve('@wireapp/proteus')]).toBeUndefined();
+  });
+
   it.each([ProteusErrors.TooDistantFuture, ProteusErrors.PreKeyMessageUnMatchedSignature])(
     'preserves structured CoreCrypto Proteus error code %s',
     errorCode => {
@@ -53,11 +56,17 @@ describe('generateDecryptionError', () => {
     expect(generateDecryptionError(basePayload, coreCryptoError).code).toBe(expectedCode);
   });
 
-  it.each([Math.floor(Math.random() * 100), 0])('handles legacy Proteus errors from Cryptobox', code => {
-    const legacyError = new LegacyProteusErrors.DecryptError('decryption error', code);
+  it.each([ProteusErrors.InvalidMessage, 0])('handles legacy Proteus errors from Cryptobox', code => {
+    const legacyError = Object.assign(new Error('decryption error'), {code});
     const error = generateDecryptionError(basePayload, legacyError);
     expect(error).toBeInstanceOf(DecryptionError);
     expect(error.message).toBe(`Decryption error from user1 (client1) (name: Error) (message: ${legacyError.message})`);
     expect(error.code).toBe(legacyError.code);
+  });
+
+  it('does not accept unrelated objects which happen to carry a code', () => {
+    const error = generateDecryptionError(basePayload, {code: ProteusErrors.InvalidMessage});
+
+    expect(error.code).toBe(ProteusErrors.Unknown);
   });
 });
