@@ -37,6 +37,7 @@ import {
   type JobsTaskStatus as JobsTaskStatusValue,
   type RestPerformActionResponse,
 } from 'cells-sdk-ts';
+import {noop} from 'noop-esm';
 import {createPortal} from 'react-dom';
 import {Maybe, maybe, task} from 'true-myth';
 
@@ -810,95 +811,54 @@ export const CellsTable = ({
       return undefined;
     }
 
-    let isActive = true;
-    let timeout: ReturnType<typeof clock.setTimeout> | undefined;
-    let statusCheckCount = 0;
     const statusId = bulkMoveToBinStatusId.current.value;
     const captured = capturedBulkMoveToBin;
 
-    const handleUnknownStatus = (): void => {
-      statusCheckCount += 1;
-      if (statusCheckCount >= MAX_BACKGROUND_MOVE_TO_BIN_STATUS_CHECKS) {
-        setBackgroundMoveToBinJobUuids([]);
-        void finishBulkMoveToBinOutcome(captured, statusId, 'status-unknown');
-        return;
-      }
-      timeout = clock.setTimeout(() => {
-        void checkBackgroundMoveToBinStatus();
-      }, BACKGROUND_MOVE_STATUS_POLL_INTERVAL_MS);
-    };
-
-    const checkBackgroundMoveToBinStatus = async (): Promise<void> => {
-      const statusResults = await Promise.all(
-        backgroundMoveToBinJobUuids.map(jobUuid => {
-          return task.tryOrElse(
-            error => {
-              return error;
-            },
-            () => {
-              return cellsRepository.getBackgroundActionInfo({name: 'delete', jobUuid});
-            },
-          );
-        }),
-      );
-      if (!isActive) {
-        return;
-      }
-
-      const statuses = statusResults.map(result => {
-        return result.isOk ? result.value.Status : undefined;
-      });
-      if (
-        statuses.some(status => {
-          return status === undefined || status === JobsTaskStatus.Unknown;
-        })
-      ) {
-        handleUnknownStatus();
-        return;
-      }
-
-      const areAllJobsFinished = statuses.every(status => {
-        return status === JobsTaskStatus.Finished;
-      });
-      const areAllJobsTerminal = statuses.every(status => {
-        return (
-          status === JobsTaskStatus.Finished || status === JobsTaskStatus.Error || status === JobsTaskStatus.Interrupted
+    return pollCellsBackgroundActionJobs({
+      jobUuids: backgroundMoveToBinJobUuids,
+      readStatus: jobUuid => {
+        return task.tryOrElse(
+          error => {
+            return error;
+          },
+          async () => {
+            const response = await cellsRepository.getBackgroundActionInfo({name: 'delete', jobUuid});
+            return Maybe.of<JobsTaskStatusValue>(response.Status);
+          },
         );
-      });
-      if (areAllJobsFinished) {
-        setBackgroundMoveToBinJobUuids([]);
-        await finishBulkMoveToBinOutcome(captured, statusId, 'completed');
-        return;
-      }
+      },
+      clock,
+      pollingPolicy: {
+        pollIntervalMs: BACKGROUND_MOVE_STATUS_POLL_INTERVAL_MS,
+        maxUnknownRetries: MAX_BACKGROUND_MOVE_TO_BIN_STATUS_CHECKS,
+        maxPollAttempts: Maybe.just(MAX_BACKGROUND_MOVE_TO_BIN_STATUS_CHECKS),
+        getUnknownRetryDelay: () => {
+          return BACKGROUND_MOVE_STATUS_POLL_INTERVAL_MS;
+        },
+      },
+      isCurrent: () => {
+        return true;
+      },
+      onStatusSnapshot: noop,
+      onOutcome: outcome => {
+        if (outcome === 'all-finished') {
+          void finishBulkMoveToBinOutcome(captured, statusId, 'completed');
+          return;
+        }
 
-      if (areAllJobsTerminal) {
-        setBackgroundMoveToBinJobUuids([]);
-        const hasFinishedJob = statuses.some(status => {
-          return status === JobsTaskStatus.Finished;
-        });
-        await finishBulkMoveToBinOutcome(captured, statusId, hasFinishedJob ? 'partial' : 'failed');
-        return;
-      }
+        if (outcome === 'mixed-terminal') {
+          void finishBulkMoveToBinOutcome(captured, statusId, 'partial');
+          return;
+        }
 
-      statusCheckCount += 1;
-      if (statusCheckCount >= MAX_BACKGROUND_MOVE_TO_BIN_STATUS_CHECKS) {
-        setBackgroundMoveToBinJobUuids([]);
-        await finishBulkMoveToBinOutcome(captured, statusId, 'status-unknown');
-        return;
-      }
+        if (outcome === 'all-failed') {
+          void finishBulkMoveToBinOutcome(captured, statusId, 'failed');
+          return;
+        }
 
-      timeout = clock.setTimeout(() => {
-        void checkBackgroundMoveToBinStatus();
-      }, BACKGROUND_MOVE_STATUS_POLL_INTERVAL_MS);
-    };
-
-    void checkBackgroundMoveToBinStatus();
-    return () => {
-      isActive = false;
-      if (timeout !== undefined) {
-        clock.clearTimeout(timeout);
-      }
-    };
+        void finishBulkMoveToBinOutcome(captured, statusId, 'status-unknown');
+      },
+    });
   }, [backgroundMoveToBinJobUuids, capturedBulkMoveToBin, cellsRepository, clock, finishBulkMoveToBinOutcome]);
 
   useEffect(() => {
