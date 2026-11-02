@@ -31,10 +31,13 @@ import type {CellsRepository} from 'Repositories/cells/cellsRepository';
 
 import {pollCellsBackgroundActionJobs, type CellsBackgroundActionPollingOptions} from './cellsBackgroundActionPolling';
 
-type CellsBackgroundActionName = 'move' | 'delete';
+type CellsBackgroundActionName = 'move' | 'delete' | 'restore';
 
 type CellsBackgroundActionSource =
-  | {readonly actionName: 'delete'; readonly cellsRepository: Pick<CellsRepository, 'getBackgroundActionInfo'>}
+  | {
+      readonly actionName: 'delete' | 'restore';
+      readonly cellsRepository: Pick<CellsRepository, 'getBackgroundActionInfo'>;
+    }
   | {readonly actionName: 'move'; readonly cellsRepository: Pick<CellsRepository, 'getBackgroundMoveInfo'>};
 
 interface CellsBackgroundActionEvidence {
@@ -97,7 +100,7 @@ const readStatus = (source: CellsBackgroundActionSource, jobUuid: string): Task<
     async () => {
       const response = await (source.actionName === 'move'
         ? source.cellsRepository.getBackgroundMoveInfo({jobUuid})
-        : source.cellsRepository.getBackgroundActionInfo({name: 'delete', jobUuid}));
+        : source.cellsRepository.getBackgroundActionInfo({name: source.actionName, jobUuid}));
       return Maybe.of<JobStatus>(response.Status);
     },
   );
