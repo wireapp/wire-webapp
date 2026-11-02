@@ -100,6 +100,7 @@ export const ConversationCells = memo(
     const [activeFolderDropTargetName, setActiveFolderDropTargetName] = useState<string | null>(null);
     const [folderDropResetKey, setFolderDropResetKey] = useState(0);
     const [selectionBarAnchor, setSelectionBarAnchor] = useState<HTMLDivElement | null>(null);
+    const [emptyBinSelectionResetKey, setEmptyBinSelectionResetKey] = useState(0);
     const onUploadFiles = (): void | undefined => {
       return uploadInput.current?.click();
     };
@@ -213,6 +214,12 @@ export const ConversationCells = memo(
 
       fireAndForgetInvoker.fireAndForget(refresh);
     }, [fireAndForgetInvoker, handleReload, isSearchMode, refresh]);
+
+    const handleEmptyBinSubmitted = useCallback((): void => {
+      setEmptyBinSelectionResetKey(currentKey => {
+        return currentKey + 1;
+      });
+    }, []);
 
     const handleRefreshAndReportSuccess = useCallback(async (): Promise<boolean> => {
       const refreshResult = await task.tryOrElse(
@@ -384,6 +391,9 @@ export const ConversationCells = memo(
             />
             <CellsHeader
               onRefresh={handleRefresh}
+              onRefreshAfterEmptyBinOutcome={handleRefreshAndReportSuccess}
+              onEmptyBinSubmitted={handleEmptyBinSubmitted}
+              getCurrentCellsPath={getCellsFilesPath}
               conversationName={name}
               conversationQualifiedId={conversationQualifiedId}
               cellsRepository={cellsRepository}
@@ -419,7 +429,7 @@ export const ConversationCells = memo(
                 isSortingEnabled={!isInRecycleBin}
                 onToggleSort={toggleSort}
                 selectionEnabled={!isSearchMode}
-                selectionScopeKey={`${conversationId}:${getCellsFilesPath()}:${isInRecycleBin ? 'bin' : 'files'}`}
+                selectionScopeKey={`${conversationId}:${getCellsFilesPath()}:${isInRecycleBin ? 'bin' : 'files'}:${emptyBinSelectionResetKey}`}
                 selectionBarAnchor={selectionBarAnchor}
                 onFolderDropTargetChange={setActiveFolderDropTargetName}
                 onDropFilesToFolder={!isInRecycleBin && canUploadToSharedDrive ? handleDropFilesToFolder : undefined}
