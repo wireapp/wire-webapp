@@ -31,15 +31,9 @@ import {
 import {isNonEmptyString} from '@sindresorhus/is';
 import {flexRender, getCoreRowModel, type Header, useReactTable} from '@tanstack/react-table';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
-import {
-  JobsTaskStatus,
-  RestActionStatus,
-  type JobsTaskStatus as JobsTaskStatusValue,
-  type RestPerformActionResponse,
-} from 'cells-sdk-ts';
-import {noop} from 'noop-esm';
+import {RestActionStatus, type RestPerformActionResponse} from 'cells-sdk-ts';
 import {createPortal} from 'react-dom';
-import {Maybe, maybe, task} from 'true-myth';
+import {Maybe, maybe} from 'true-myth';
 
 import {ArrowIcon, Button, ButtonVariant, CloseIcon, TrashIcon, UploadIcon} from '@wireapp/react-ui-kit';
 
@@ -92,7 +86,10 @@ import {getCellsTableColumns, getCellsTableDataCellLabels} from './cellsTableCol
 import {CellsFilePreviewModalProvider} from './common/cellsFilePreviewModalContext/cellsFilePreviewModalContext';
 import {getBulkMoveOutcomeEvidence} from './getBulkMoveOutcomeEvidence';
 
-import {pollCellsBackgroundActionJobs} from '../common/cellsBackgroundActionPolling/cellsBackgroundActionPolling';
+import {
+  getCellsBackgroundActionEvidence,
+  observeCellsBackgroundActionJobs,
+} from '../common/cellsBackgroundActionPolling/cellsBackgroundActionJobs';
 import {CellsSortDirection} from '../common/cellsSortIcon/cellsSortIcon';
 import {CellsSortField, SORTABLE_COLUMN_FIELD, toAriaSort} from '../common/useCellsSorting/useCellsSorting';
 import {getSharedDriveDroppedFiles} from '../getSharedDriveDroppedFiles';
@@ -333,19 +330,10 @@ export const CellsTable = ({
     }
 
     const moveStatusId = backgroundMoveStatusId;
-    return pollCellsBackgroundActionJobs({
+    return observeCellsBackgroundActionJobs({
+      cellsRepository,
+      actionName: 'move',
       jobUuids: backgroundMoveJobUuids,
-      readStatus: jobUuid => {
-        return task.tryOrElse(
-          error => {
-            return error;
-          },
-          async () => {
-            const response = await cellsRepository.getBackgroundMoveInfo({jobUuid});
-            return Maybe.of<JobsTaskStatusValue>(response.Status);
-          },
-        );
-      },
       clock,
       pollingPolicy: {
         pollIntervalMs: BACKGROUND_MOVE_STATUS_POLL_INTERVAL_MS,
@@ -456,12 +444,8 @@ export const CellsTable = ({
         return id;
       }),
     );
-    const hasFinishedMoveJobs =
-      response.BackgroundActions !== undefined &&
-      response.BackgroundActions.length > 0 &&
-      response.BackgroundActions.every(action => {
-        return action.Name === 'move' && isNonEmptyString(action.JobUuid) && action.Status === JobsTaskStatus.Finished;
-      });
+    const moveEvidence = getCellsBackgroundActionEvidence(response, 'move');
+    const hasFinishedMoveJobs = (response.BackgroundActions?.length ?? 0) > 0 && moveEvidence.hasCompleted;
     // Cells 5.0.3 returns awaited job statuses without AffectedNodes.
     const isMoveComplete =
       outcomeEvidence === 'complete' || (response.AffectedNodes === undefined && hasFinishedMoveJobs);
@@ -487,12 +471,7 @@ export const CellsTable = ({
       return true;
     }
 
-    const moveJobUuids = response.BackgroundActions?.filter(action => {
-      return action.Name === 'move' && isNonEmptyString(action.JobUuid);
-    }).map(action => {
-      return action.JobUuid;
-    });
-    const uniqueMoveJobUuids = [...new Set(moveJobUuids ?? [])];
+    const uniqueMoveJobUuids = [...moveEvidence.jobUuids];
     if (uniqueMoveJobUuids.length === 0) {
       updateMoveStatus({id: moveStatusId, kind: 'status-unknown', ...summary});
       activeMoveStatusId.current = Maybe.just(moveStatusId);
@@ -730,20 +709,9 @@ export const CellsTable = ({
       }
 
       if (response.Status === RestActionStatus.Background) {
-        const jobUuids = [
-          ...new Set(
-            (response.BackgroundActions ?? [])
-              .filter(action => {
-                return action.Name === 'delete';
-              })
-              .map(action => {
-                return action.JobUuid;
-              })
-              .filter(isNonEmptyString),
-          ),
-        ];
+        const {jobUuids} = getCellsBackgroundActionEvidence(response, 'delete');
         if (jobUuids.length > 0) {
-          setBackgroundMoveToBinJobUuids(jobUuids);
+          setBackgroundMoveToBinJobUuids([...jobUuids]);
           setIsBulkMoveToBinConfirmationOpen(false);
           return;
         }
@@ -814,19 +782,10 @@ export const CellsTable = ({
     const statusId = bulkMoveToBinStatusId.current.value;
     const captured = capturedBulkMoveToBin;
 
-    return pollCellsBackgroundActionJobs({
+    return observeCellsBackgroundActionJobs({
+      cellsRepository,
+      actionName: 'delete',
       jobUuids: backgroundMoveToBinJobUuids,
-      readStatus: jobUuid => {
-        return task.tryOrElse(
-          error => {
-            return error;
-          },
-          async () => {
-            const response = await cellsRepository.getBackgroundActionInfo({name: 'delete', jobUuid});
-            return Maybe.of<JobsTaskStatusValue>(response.Status);
-          },
-        );
-      },
       clock,
       pollingPolicy: {
         pollIntervalMs: BACKGROUND_MOVE_STATUS_POLL_INTERVAL_MS,
@@ -839,7 +798,6 @@ export const CellsTable = ({
       isCurrent: () => {
         return true;
       },
-      onStatusSnapshot: noop,
       onOutcome: outcome => {
         if (outcome === 'all-finished') {
           void finishBulkMoveToBinOutcome(captured, statusId, 'completed');
