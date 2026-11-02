@@ -91,6 +91,7 @@ import {
   getCellsBackgroundActionEvidence,
   observeCellsBackgroundActionJobs,
 } from '../common/cellsBackgroundActionPolling/cellsBackgroundActionJobs';
+import {createBulkJobPollingPolicy} from '../common/cellsBackgroundActionPolling/createBulkJobPollingPolicy';
 import {
   CELLS_ACTION,
   canPerformCellsAction,
@@ -192,12 +193,6 @@ const preventDefaultFileDrop = (event: DragEvent<HTMLElement>): void => {
   event.preventDefault();
   event.stopPropagation();
 };
-
-const BACKGROUND_MOVE_STATUS_POLL_INTERVAL_MS = 1000;
-const BACKGROUND_MOVE_STATUS_RETRY_BACKOFF_FACTOR = 2;
-const BACKGROUND_MOVE_STATUS_RETRY_MIN_JITTER_FACTOR = 0.75;
-const BACKGROUND_MOVE_STATUS_RETRY_MAX_JITTER_FACTOR = 1.25;
-const MAX_BACKGROUND_MOVE_STATUS_RETRIES = 5;
 
 type PermanentDeleteCheckingMessageKey =
   'cells.bulkDelete.checking' | 'cells.bulkDelete.checkingAfterJobFailure' | 'cells.bulkDelete.retryingRefresh';
@@ -468,20 +463,7 @@ export const CellsTable = ({
       actionName: 'move',
       jobUuids: backgroundMoveJobUuids,
       clock,
-      pollingPolicy: {
-        pollIntervalMs: BACKGROUND_MOVE_STATUS_POLL_INTERVAL_MS,
-        maxUnknownRetries: MAX_BACKGROUND_MOVE_STATUS_RETRIES,
-        maxPollAttempts: Maybe.nothing(),
-        getUnknownRetryDelay: retryIndex => {
-          return (
-            BACKGROUND_MOVE_STATUS_POLL_INTERVAL_MS *
-            BACKGROUND_MOVE_STATUS_RETRY_BACKOFF_FACTOR ** retryIndex *
-            (BACKGROUND_MOVE_STATUS_RETRY_MIN_JITTER_FACTOR +
-              random() *
-                (BACKGROUND_MOVE_STATUS_RETRY_MAX_JITTER_FACTOR - BACKGROUND_MOVE_STATUS_RETRY_MIN_JITTER_FACTOR))
-          );
-        },
-      },
+      pollingPolicy: createBulkJobPollingPolicy(random),
       isCurrent: () => {
         return true;
       },
@@ -972,20 +954,7 @@ export const CellsTable = ({
       actionName: 'delete',
       jobUuids: backgroundMoveToBinJobUuids,
       clock,
-      pollingPolicy: {
-        pollIntervalMs: BACKGROUND_MOVE_STATUS_POLL_INTERVAL_MS,
-        maxUnknownRetries: MAX_BACKGROUND_MOVE_STATUS_RETRIES,
-        maxPollAttempts: Maybe.nothing(),
-        getUnknownRetryDelay: retryIndex => {
-          return (
-            BACKGROUND_MOVE_STATUS_POLL_INTERVAL_MS *
-            BACKGROUND_MOVE_STATUS_RETRY_BACKOFF_FACTOR ** retryIndex *
-            (BACKGROUND_MOVE_STATUS_RETRY_MIN_JITTER_FACTOR +
-              random() *
-                (BACKGROUND_MOVE_STATUS_RETRY_MAX_JITTER_FACTOR - BACKGROUND_MOVE_STATUS_RETRY_MIN_JITTER_FACTOR))
-          );
-        },
-      },
+      pollingPolicy: createBulkJobPollingPolicy(random),
       isCurrent: () => {
         return true;
       },
