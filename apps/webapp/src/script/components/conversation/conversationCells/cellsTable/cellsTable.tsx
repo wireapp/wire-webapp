@@ -193,7 +193,13 @@ interface CapturedBulkMoveToBinSelection {
 
 type BulkMoveToBinReviewReason = 'request-failed' | 'partial' | 'job-failed' | 'status-unknown' | 'refresh-failed';
 
-const MAX_BACKGROUND_MOVE_TO_BIN_STATUS_CHECKS = 10;
+const bulkMoveToBinReviewReasonByStatus: Readonly<
+  Partial<Record<SharedDriveMoveStatusKind, BulkMoveToBinReviewReason>>
+> = {
+  'request-failed': 'request-failed',
+  partial: 'partial',
+  failed: 'job-failed',
+};
 
 export const CellsTable = ({
   nodes,
@@ -666,7 +672,7 @@ export const CellsTable = ({
           ...captured.summary,
         });
         setIsBulkMoveToBinNeedsReview(true);
-        setBulkMoveToBinReviewReason('refresh-failed');
+        setBulkMoveToBinReviewReason(bulkMoveToBinReviewReasonByStatus[statusKind] ?? 'refresh-failed');
       }
 
       isBulkMoveToBinPendingRef.current = false;
@@ -756,7 +762,12 @@ export const CellsTable = ({
       setIsBulkMoveToBinNeedsReview(false);
       setBulkMoveToBinReviewReason(null);
     } else {
-      setBulkMoveToBinReviewReason('refresh-failed');
+      setBulkMoveToBinReviewReason(reason => {
+        if (reason === 'request-failed' || reason === 'partial' || reason === 'job-failed') {
+          return reason;
+        }
+        return 'refresh-failed';
+      });
     }
     setIsRefreshingBulkMoveToBin(false);
   }, [
@@ -789,35 +800,39 @@ export const CellsTable = ({
       clock,
       pollingPolicy: {
         pollIntervalMs: BACKGROUND_MOVE_STATUS_POLL_INTERVAL_MS,
-        maxUnknownRetries: MAX_BACKGROUND_MOVE_TO_BIN_STATUS_CHECKS,
-        maxPollAttempts: Maybe.just(MAX_BACKGROUND_MOVE_TO_BIN_STATUS_CHECKS),
-        getUnknownRetryDelay: () => {
-          return BACKGROUND_MOVE_STATUS_POLL_INTERVAL_MS;
+        maxUnknownRetries: MAX_BACKGROUND_MOVE_STATUS_RETRIES,
+        maxPollAttempts: Maybe.nothing(),
+        getUnknownRetryDelay: retryIndex => {
+          return (
+            BACKGROUND_MOVE_STATUS_POLL_INTERVAL_MS *
+            BACKGROUND_MOVE_STATUS_RETRY_BACKOFF_FACTOR ** retryIndex *
+            (BACKGROUND_MOVE_STATUS_RETRY_MIN_JITTER_FACTOR +
+              random() *
+                (BACKGROUND_MOVE_STATUS_RETRY_MAX_JITTER_FACTOR - BACKGROUND_MOVE_STATUS_RETRY_MIN_JITTER_FACTOR))
+          );
         },
       },
       isCurrent: () => {
         return true;
       },
       onOutcome: outcome => {
-        if (outcome === 'all-finished') {
-          void finishBulkMoveToBinOutcome(captured, statusId, 'completed');
-          return;
+        switch (outcome) {
+          case 'all-finished':
+            void finishBulkMoveToBinOutcome(captured, statusId, 'completed');
+            return;
+          case 'mixed-terminal':
+            void finishBulkMoveToBinOutcome(captured, statusId, 'partial');
+            return;
+          case 'all-failed':
+            void finishBulkMoveToBinOutcome(captured, statusId, 'failed');
+            return;
+          case 'check-limit':
+          case 'status-unknown':
+            void finishBulkMoveToBinOutcome(captured, statusId, 'status-unknown');
         }
-
-        if (outcome === 'mixed-terminal') {
-          void finishBulkMoveToBinOutcome(captured, statusId, 'partial');
-          return;
-        }
-
-        if (outcome === 'all-failed') {
-          void finishBulkMoveToBinOutcome(captured, statusId, 'failed');
-          return;
-        }
-
-        void finishBulkMoveToBinOutcome(captured, statusId, 'status-unknown');
       },
     });
-  }, [backgroundMoveToBinJobUuids, capturedBulkMoveToBin, cellsRepository, clock, finishBulkMoveToBinOutcome]);
+  }, [backgroundMoveToBinJobUuids, capturedBulkMoveToBin, cellsRepository, clock, finishBulkMoveToBinOutcome, random]);
 
   useEffect(() => {
     return () => {
