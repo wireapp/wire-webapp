@@ -33,10 +33,9 @@ import {pollCellsBackgroundActionJobs, type CellsBackgroundActionPollingOptions}
 
 type CellsBackgroundActionName = 'move' | 'delete';
 
-interface CellsBackgroundActionSource {
-  readonly cellsRepository: Pick<CellsRepository, 'getBackgroundActionInfo'>;
-  readonly actionName: CellsBackgroundActionName;
-}
+type CellsBackgroundActionSource =
+  | {readonly actionName: 'delete'; readonly cellsRepository: Pick<CellsRepository, 'getBackgroundActionInfo'>}
+  | {readonly actionName: 'move'; readonly cellsRepository: Pick<CellsRepository, 'getBackgroundMoveInfo'>};
 
 interface CellsBackgroundActionEvidence {
   readonly jobUuids: readonly string[];
@@ -90,45 +89,36 @@ export const getCellsBackgroundActionEvidence = (
   };
 };
 
-const readStatus = (
-  {cellsRepository, actionName}: CellsBackgroundActionSource,
-  jobUuid: string,
-): Task<Maybe<JobStatus>, unknown> => {
+const readStatus = (source: CellsBackgroundActionSource, jobUuid: string): Task<Maybe<JobStatus>, unknown> => {
   return task.tryOrElse(
     error => {
       return error;
     },
     async () => {
-      const response = await cellsRepository.getBackgroundActionInfo({name: actionName, jobUuid});
+      const response = await (source.actionName === 'move'
+        ? source.cellsRepository.getBackgroundMoveInfo({jobUuid})
+        : source.cellsRepository.getBackgroundActionInfo({name: 'delete', jobUuid}));
       return Maybe.of<JobStatus>(response.Status);
     },
   );
 };
 
-export const observeCellsBackgroundActionJobs = ({
-  cellsRepository,
-  actionName,
-  onStatusSnapshot = noop,
-  ...options
-}: ObserveOptions): (() => void) => {
+export const observeCellsBackgroundActionJobs = (options: ObserveOptions): (() => void) => {
   return pollCellsBackgroundActionJobs({
     ...options,
     readStatus: jobUuid => {
-      return readStatus({cellsRepository, actionName}, jobUuid);
+      return readStatus(options, jobUuid);
     },
-    onStatusSnapshot,
+    onStatusSnapshot: options.onStatusSnapshot ?? noop,
   });
 };
 
 // One batch only: unknown/rejected reads remain pending evidence, not cancellation.
 // Nothing means cancellation/stale scope. Refresh cadence and deadlines belong to callers.
-export const checkCellsBackgroundActionJobs = ({
-  cellsRepository,
-  actionName,
-  jobUuids,
-  clock,
-  isCurrent,
-}: CheckOptions): Readonly<{result: Promise<Maybe<CellsBackgroundActionCheck>>; cancel: () => void}> => {
+export const checkCellsBackgroundActionJobs = (
+  options: CheckOptions,
+): Readonly<{result: Promise<Maybe<CellsBackgroundActionCheck>>; cancel: () => void}> => {
+  const {jobUuids, clock, isCurrent} = options;
   let cancel = noop;
   const result = new Promise<Maybe<CellsBackgroundActionCheck>>(resolve => {
     if (!isCurrent()) {
@@ -152,7 +142,7 @@ export const checkCellsBackgroundActionJobs = ({
         return false;
       },
       readStatus: jobUuid => {
-        return readStatus({cellsRepository, actionName}, jobUuid).map(status => {
+        return readStatus(options, jobUuid).map(status => {
           if (maybe.isJust(status) && isFailedStatus(status.value)) {
             hasFailedJobs = true;
           }
