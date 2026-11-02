@@ -106,7 +106,7 @@ const translateSelectionForTest: Translate = (key, substitutions) => {
   if (key === 'cells.bulkDelete.rejected') {
     return 'The delete request was rejected. Resolve the issue before trying again.';
   }
-  if (key === 'cells.bulkDelete.refresh') {
+  if (key === 'cells.bulkAction.refresh') {
     return 'Refresh Bin';
   }
   if (key === 'cells.selection.moveToBin') {

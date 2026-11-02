@@ -1277,7 +1277,7 @@ export const CellsTable = ({
               }}
               disabled={isRefreshingPermanentDeleteReview || isPermanentDeleteReconciliationRequestInFlight}
             >
-              {translate('cells.bulkDelete.refresh')}
+              {translate('cells.bulkAction.refresh')}
             </Button>
           </div>
         )}
