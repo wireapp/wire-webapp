@@ -109,6 +109,45 @@ const translateSelectionForTest: Translate = (key, substitutions) => {
   if (key === 'cells.bulkDelete.refresh') {
     return 'Refresh Bin';
   }
+  if (key === 'cells.selection.moveToBin') {
+    return 'Move to bin';
+  }
+  if (key === 'cells.bulkMoveToBin.confirmation.title') {
+    return 'Move selected items to Bin?';
+  }
+  if (key === 'cells.bulkMoveToBin.confirmation.description') {
+    return `Move ${substitutions?.count} selected items to Bin. Selected folders and their contents will also move to Bin.`;
+  }
+  if (key === 'cells.bulkMoveToBin.destination') {
+    return 'Bin';
+  }
+  if (key === 'cells.bulkMoveToBin.moving') {
+    return `Moving ${substitutions?.count} selected items to Bin`;
+  }
+  if (key === 'cells.bulkMoveToBin.requestFailed') {
+    return 'The request result is unknown. Refresh Drive and Bin before trying again.';
+  }
+  if (key === 'cells.bulkMoveToBin.partial') {
+    return 'Some selected items may have moved. Refresh Drive and Bin before taking further action.';
+  }
+  if (key === 'cells.bulkMoveToBin.jobFailed') {
+    return 'Some delete jobs failed or were interrupted. Refresh Drive and Bin to check the selected items.';
+  }
+  if (key === 'cells.bulkMoveToBin.statusUnknown') {
+    return 'The job status could not be checked. Refresh Drive and Bin before taking further action.';
+  }
+  if (key === 'cells.bulkMoveToBin.refresh') {
+    return 'Refresh Drive and Bin';
+  }
+  if (key === 'cells.bulkMoveToBin.refreshFailed') {
+    return 'Could not refresh Drive and Bin. The result is still unknown.';
+  }
+  if (key === 'cells.bulkMoveToBin.confirmation.cancel') {
+    return 'Cancel';
+  }
+  if (key === 'cells.bulkMoveToBin.confirmation.confirm') {
+    return 'Move to Bin';
+  }
   if (key === 'cells.moveNodeModal.moveTitle') {
     return 'Move to folder';
   }
@@ -215,6 +254,7 @@ const renderCellsTable = ({
   selfUserDriveRole = CELLS_SELF_USER_DRIVE_ROLE.EDITOR,
   onRefresh = jest.fn(),
   onRefreshAndReportSuccess = jest.fn().mockResolvedValue(true),
+  onRefreshAfterBulkMoveToBinOutcome = jest.fn().mockResolvedValue(true),
   clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
   random = () => {
     return 0.5;
@@ -234,6 +274,7 @@ const renderCellsTable = ({
   readonly initialNodes?: CellNode[];
   readonly onRefresh?: () => void;
   readonly onRefreshAndReportSuccess?: () => Promise<boolean>;
+  readonly onRefreshAfterBulkMoveToBinOutcome?: () => Promise<boolean>;
   readonly selfUserDriveRole?: CellsSelfUserDriveRole;
   readonly clock?: ReturnType<typeof createDeterministicClock>;
   readonly random?: () => number;
@@ -288,6 +329,7 @@ const renderCellsTable = ({
               conversationName="Conversation"
               onRefresh={onRefresh}
               onRefreshAndReportSuccess={onRefreshAndReportSuccess}
+              onRefreshAfterBulkMoveToBinOutcome={onRefreshAfterBulkMoveToBinOutcome}
               onFolderDropTargetChange={onFolderDropTargetChange}
               onDropFilesToFolder={onDropFilesToFolder}
               onDropReadError={onDropReadError}
@@ -381,6 +423,505 @@ describe('CellsTable selection', () => {
     const selectionStatus = screen.getByRole('status');
     expect(within(selectionStatus).getByText('1 selected')).toBeInTheDocument();
     expect(within(selectionStatus).queryByText(/\d+(\.\d+)? (B|KB|MB|GB)/)).not.toBeInTheDocument();
+  });
+
+  it('opens a captured mixed-selection confirmation and cancels without deleting', async () => {
+    const user = userEvent.setup();
+    const repository = {deleteNodes: jest.fn()} as unknown as CellsRepository;
+    renderCellsTable({cellsRepository: repository});
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+    await user.click(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'}));
+    await user.click(screen.getByRole('button', {name: 'Move to bin'}));
+
+    const confirmation = await screen.findByRole('dialog');
+    expect(within(confirmation).getByRole('heading', {name: 'Move selected items to Bin?'})).toBeInTheDocument();
+    expect(within(confirmation).getByText(/Move 2 selected items to Bin/)).toBeInTheDocument();
+    expect(within(confirmation).getByText(/Selected folders and their contents/)).toBeInTheDocument();
+
+    await user.click(within(confirmation).getByRole('button', {name: 'Cancel'}));
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+    expect(repository.deleteNodes).not.toHaveBeenCalled();
+    expect(screen.getByText('2 selected')).toBeInTheDocument();
+  });
+
+  it('revalidates delete permission when confirming the captured selection', async () => {
+    const user = userEvent.setup();
+    const deleteNodes = jest.fn();
+    const view = renderCellsTable({cellsRepository: {deleteNodes} as unknown as CellsRepository});
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+    await user.click(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'}));
+    await user.click(screen.getByRole('button', {name: 'Move to bin'}));
+    const confirmation = await screen.findByRole('dialog');
+    view.rerenderWithNodes([{...view.folder, selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER}, view.file]);
+    await user.click(within(confirmation).getByRole('button', {name: 'Move to Bin'}));
+
+    expect(deleteNodes).not.toHaveBeenCalled();
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+  });
+
+  it('submits the captured selection once with existing non-permanent batch semantics', async () => {
+    const user = userEvent.setup();
+    const deleteNodes = jest.fn().mockResolvedValue({Status: 'Performed'});
+    const onRefreshAfterBulkMoveToBinOutcome = jest.fn().mockResolvedValue(true);
+    const repository = {deleteNodes} as unknown as CellsRepository;
+    renderCellsTable({cellsRepository: repository, onRefreshAfterBulkMoveToBinOutcome});
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+    await user.click(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'}));
+    await user.click(screen.getByRole('button', {name: 'Move to bin'}));
+    const confirmation = await screen.findByRole('dialog');
+    await user.click(within(confirmation).getByRole('button', {name: 'Move to Bin'}));
+
+    await waitFor(() => {
+      expect(deleteNodes).toHaveBeenCalledTimes(1);
+    });
+    expect(deleteNodes).toHaveBeenCalledWith({uuids: ['folder-id', 'file-id'], permanently: false});
+    await waitFor(() => {
+      expect(onRefreshAfterBulkMoveToBinOutcome).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it('closes the confirmation and reports pending status without allowing duplicate submissions', async () => {
+    const user = userEvent.setup();
+    let resolveDelete: (response: {Status: string}) => void = () => {
+      return undefined;
+    };
+    const pendingDelete = new Promise<{Status: string}>(resolve => {
+      resolveDelete = resolve;
+    });
+    const deleteNodes = jest.fn().mockReturnValue(pendingDelete);
+    const onRefreshAfterBulkMoveToBinOutcome = jest.fn().mockResolvedValue(true);
+    renderCellsTable({
+      cellsRepository: {deleteNodes} as unknown as CellsRepository,
+      onRefreshAfterBulkMoveToBinOutcome,
+    });
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+    await user.click(screen.getByRole('button', {name: 'Move to bin'}));
+    const confirmation = await screen.findByRole('dialog');
+    const confirmButton = within(confirmation).getByRole('button', {name: 'Move to Bin'});
+    await user.click(confirmButton);
+
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+    expect(screen.getByText('Moving 1 selected items to Bin')).toHaveAttribute('role', 'status');
+    expect(screen.queryByRole('button', {name: 'Move to bin'})).not.toBeInTheDocument();
+    expect(deleteNodes).toHaveBeenCalledTimes(1);
+
+    resolveDelete({Status: 'Performed'});
+    await waitFor(() => {
+      expect(onRefreshAfterBulkMoveToBinOutcome).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it('does not apply a pending result to a newly navigated selection scope', async () => {
+    const user = userEvent.setup();
+    let resolveDelete: (response: {Status: string}) => void = () => {
+      return undefined;
+    };
+    const pendingDelete = new Promise<{Status: string}>(resolve => {
+      resolveDelete = resolve;
+    });
+    const deleteNodes = jest.fn().mockReturnValue(pendingDelete);
+    const onRefreshAfterBulkMoveToBinOutcome = jest.fn().mockResolvedValue(true);
+    const view = renderCellsTable({
+      cellsRepository: {deleteNodes} as unknown as CellsRepository,
+      onRefreshAfterBulkMoveToBinOutcome,
+    });
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+    await user.click(screen.getByRole('button', {name: 'Move to bin'}));
+    const confirmation = await screen.findByRole('dialog');
+    await user.click(within(confirmation).getByRole('button', {name: 'Move to Bin'}));
+    view.rerenderWithSelectionScope('conversation:/files/subfolder');
+
+    expect(screen.queryByText('1 selected')).not.toBeInTheDocument();
+    resolveDelete({Status: 'Performed'});
+
+    await waitFor(() => {
+      expect(screen.getAllByRole('checkbox')[0]).toBeEnabled();
+    });
+    expect(deleteNodes).toHaveBeenCalledTimes(1);
+    expect(onRefreshAfterBulkMoveToBinOutcome).not.toHaveBeenCalled();
+  });
+
+  it('does not retry the batch mutation after a request error', async () => {
+    const user = userEvent.setup();
+    const deleteNodes = jest.fn().mockRejectedValue(new Error('network unavailable'));
+    const onRefreshAfterBulkMoveToBinOutcome = jest.fn().mockResolvedValue(true);
+    renderCellsTable({
+      cellsRepository: {deleteNodes} as unknown as CellsRepository,
+      onRefreshAfterBulkMoveToBinOutcome,
+    });
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+    await user.click(screen.getByRole('button', {name: 'Move to bin'}));
+    const confirmation = await screen.findByRole('dialog');
+    await user.click(within(confirmation).getByRole('button', {name: 'Move to Bin'}));
+
+    await waitFor(() => {
+      expect(onRefreshAfterBulkMoveToBinOutcome).toHaveBeenCalledTimes(1);
+    });
+    expect(deleteNodes).toHaveBeenCalledTimes(1);
+    expect(deleteNodes).toHaveBeenCalledWith({uuids: ['folder-id'], permanently: false});
+  });
+
+  it('keeps the selection locked when refreshing the action outcome fails', async () => {
+    const user = userEvent.setup();
+    const deleteNodes = jest.fn().mockResolvedValue({Status: 'Performed'});
+    const onRefreshAfterBulkMoveToBinOutcome = jest.fn().mockResolvedValueOnce(false).mockResolvedValue(true);
+    renderCellsTable({
+      cellsRepository: {deleteNodes} as unknown as CellsRepository,
+      onRefreshAfterBulkMoveToBinOutcome,
+    });
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+    await user.click(screen.getByRole('button', {name: 'Move to bin'}));
+    const confirmation = await screen.findByRole('dialog');
+    await user.click(within(confirmation).getByRole('button', {name: 'Move to Bin'}));
+
+    const refreshButton = await screen.findByRole('button', {name: 'Refresh Drive and Bin'});
+    expect(screen.getByText('Could not refresh Drive and Bin. The result is still unknown.')).toBeInTheDocument();
+    await user.click(refreshButton);
+
+    await waitFor(() => {
+      expect(onRefreshAfterBulkMoveToBinOutcome).toHaveBeenCalledTimes(2);
+    });
+    expect(deleteNodes).toHaveBeenCalledTimes(1);
+    expect(screen.queryByText('Could not refresh Drive and Bin. The result is still unknown.')).not.toBeInTheDocument();
+  });
+
+  it('polls delete background jobs and refreshes after they finish', async () => {
+    const user = userEvent.setup();
+    const deleteNodes = jest.fn().mockResolvedValue({
+      Status: 'Background',
+      BackgroundActions: [{Name: 'delete', JobUuid: 'delete-job'}],
+    });
+    const getBackgroundActionInfo = jest.fn().mockResolvedValue({Status: 'Finished'});
+    const onRefreshAfterBulkMoveToBinOutcome = jest.fn().mockResolvedValue(true);
+    renderCellsTable({
+      cellsRepository: {deleteNodes, getBackgroundActionInfo} as unknown as CellsRepository,
+      onRefreshAfterBulkMoveToBinOutcome,
+    });
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+    await user.click(screen.getByRole('button', {name: 'Move to bin'}));
+    const confirmation = await screen.findByRole('dialog');
+    await user.click(within(confirmation).getByRole('button', {name: 'Move to Bin'}));
+
+    await waitFor(() => {
+      expect(onRefreshAfterBulkMoveToBinOutcome).toHaveBeenCalledTimes(1);
+    });
+    expect(deleteNodes).toHaveBeenCalledTimes(1);
+    expect(getBackgroundActionInfo).toHaveBeenCalledWith({name: 'delete', jobUuid: 'delete-job'});
+  });
+
+  it('retries failed Move to Bin status reads with jittered backoff without repeating the delete', async () => {
+    const user = userEvent.setup();
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    const deleteNodes = jest.fn().mockResolvedValue({
+      Status: 'Background',
+      BackgroundActions: [{Name: 'delete', JobUuid: 'delete-job'}],
+    });
+    const getBackgroundActionInfo = jest
+      .fn()
+      .mockRejectedValueOnce(new Error('temporary status lookup failure'))
+      .mockRejectedValueOnce(new Error('another status lookup failure'))
+      .mockResolvedValueOnce({Status: 'Running'})
+      .mockResolvedValueOnce({Status: 'Finished'});
+    const onRefreshAfterBulkMoveToBinOutcome = jest.fn().mockResolvedValue(true);
+    renderCellsTable({
+      cellsRepository: {deleteNodes, getBackgroundActionInfo} as unknown as CellsRepository,
+      onRefreshAfterBulkMoveToBinOutcome,
+      clock,
+      random: () => {
+        return 0;
+      },
+    });
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+    await user.click(screen.getByRole('button', {name: 'Move to bin'}));
+    const confirmation = await screen.findByRole('dialog');
+    await user.click(within(confirmation).getByRole('button', {name: 'Move to Bin'}));
+    await waitFor(() => {
+      expect(getBackgroundActionInfo).toHaveBeenCalledTimes(1);
+    });
+
+    await act(async () => {
+      clock.advanceByMilliseconds(749);
+    });
+    expect(getBackgroundActionInfo).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      clock.advanceByMilliseconds(1);
+    });
+    expect(getBackgroundActionInfo).toHaveBeenCalledTimes(2);
+    await act(async () => {
+      clock.advanceByMilliseconds(1499);
+    });
+    expect(getBackgroundActionInfo).toHaveBeenCalledTimes(2);
+
+    await act(async () => {
+      clock.advanceByMilliseconds(1);
+    });
+    expect(getBackgroundActionInfo).toHaveBeenCalledTimes(3);
+    await act(async () => {
+      clock.advanceByMilliseconds(999);
+    });
+    expect(getBackgroundActionInfo).toHaveBeenCalledTimes(3);
+    await act(async () => {
+      clock.advanceByMilliseconds(1);
+    });
+    expect(onRefreshAfterBulkMoveToBinOutcome).toHaveBeenCalledTimes(1);
+    expect(getBackgroundActionInfo).toHaveBeenCalledTimes(4);
+    expect(deleteNodes).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps polling a running Move to Bin job after ten checks until it finishes', async () => {
+    const user = userEvent.setup();
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    const deleteNodes = jest.fn().mockResolvedValue({
+      Status: 'Background',
+      BackgroundActions: [{Name: 'delete', JobUuid: 'delete-job'}],
+    });
+    const getBackgroundActionInfo = jest.fn().mockResolvedValue({Status: 'Finished'});
+    for (let check = 0; check < 15; check += 1) {
+      getBackgroundActionInfo.mockResolvedValueOnce({Status: 'Running'});
+    }
+    const onRefreshAfterBulkMoveToBinOutcome = jest.fn().mockResolvedValue(true);
+    renderCellsTable({
+      cellsRepository: {deleteNodes, getBackgroundActionInfo} as unknown as CellsRepository,
+      onRefreshAfterBulkMoveToBinOutcome,
+      clock,
+    });
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+    await user.click(screen.getByRole('button', {name: 'Move to bin'}));
+    const confirmation = await screen.findByRole('dialog');
+    await user.click(within(confirmation).getByRole('button', {name: 'Move to Bin'}));
+    await waitFor(() => {
+      expect(getBackgroundActionInfo).toHaveBeenCalledTimes(1);
+    });
+
+    for (let check = 2; check <= 15; check += 1) {
+      await act(async () => {
+        clock.advanceByMilliseconds(1000);
+      });
+      expect(getBackgroundActionInfo).toHaveBeenCalledTimes(check);
+      expect(onRefreshAfterBulkMoveToBinOutcome).not.toHaveBeenCalled();
+    }
+    expect(screen.getByText('Moving 1 selected items to Bin')).toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'Refresh Drive and Bin'})).not.toBeInTheDocument();
+
+    await act(async () => {
+      clock.advanceByMilliseconds(1000);
+    });
+    expect(onRefreshAfterBulkMoveToBinOutcome).toHaveBeenCalledTimes(1);
+    expect(screen.queryByText('Moving 1 selected items to Bin')).not.toBeInTheDocument();
+    await act(async () => {
+      clock.advanceByMilliseconds(60000);
+    });
+
+    expect(getBackgroundActionInfo).toHaveBeenCalledTimes(16);
+    expect(deleteNodes).toHaveBeenCalledTimes(1);
+  });
+
+  it('stops checking unknown Move to Bin jobs after five retries without repeating the delete', async () => {
+    const user = userEvent.setup();
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    const deleteNodes = jest.fn().mockResolvedValue({
+      Status: 'Background',
+      BackgroundActions: [{Name: 'delete', JobUuid: 'delete-job'}],
+    });
+    const getBackgroundActionInfo = jest.fn().mockResolvedValue({Status: 'Unknown'});
+    const onRefreshAfterBulkMoveToBinOutcome = jest.fn().mockResolvedValue(false);
+    renderCellsTable({
+      cellsRepository: {deleteNodes, getBackgroundActionInfo} as unknown as CellsRepository,
+      onRefreshAfterBulkMoveToBinOutcome,
+      clock,
+    });
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+    await user.click(screen.getByRole('button', {name: 'Move to bin'}));
+    const confirmation = await screen.findByRole('dialog');
+    await user.click(within(confirmation).getByRole('button', {name: 'Move to Bin'}));
+
+    expect(getBackgroundActionInfo).toHaveBeenCalledTimes(1);
+    for (let retry = 0; retry < 5; retry += 1) {
+      await act(async () => {
+        clock.advanceByMilliseconds(1000 * 2 ** retry);
+      });
+      expect(getBackgroundActionInfo).toHaveBeenCalledTimes(retry + 2);
+    }
+    expect(onRefreshAfterBulkMoveToBinOutcome).toHaveBeenCalledTimes(1);
+    expect(screen.getByText('Could not refresh Drive and Bin. The result is still unknown.')).toBeInTheDocument();
+    await act(async () => {
+      clock.advanceByMilliseconds(60000);
+    });
+    expect(getBackgroundActionInfo).toHaveBeenCalledTimes(6);
+    expect(deleteNodes).toHaveBeenCalledTimes(1);
+  });
+
+  it.each([
+    {
+      outcome: 'partial',
+      statuses: ['Finished', 'Error'],
+      message: 'Some selected items may have moved. Refresh Drive and Bin before taking further action.',
+    },
+    {
+      outcome: 'failed',
+      statuses: ['Error', 'Interrupted'],
+      message: 'Some delete jobs failed or were interrupted. Refresh Drive and Bin to check the selected items.',
+    },
+    {
+      outcome: 'request-failed',
+      statuses: [],
+      message: 'The request result is unknown. Refresh Drive and Bin before trying again.',
+    },
+  ])(
+    'keeps the $outcome warning through failed automatic and manual refreshes',
+    async ({outcome, statuses, message}) => {
+      const user = userEvent.setup();
+      const deleteNodes = jest.fn();
+      if (outcome === 'request-failed') {
+        deleteNodes.mockRejectedValue(new Error('request result unavailable'));
+      } else {
+        deleteNodes.mockResolvedValue({
+          Status: 'Background',
+          BackgroundActions: statuses.map((_, index) => {
+            return {Name: 'delete', JobUuid: `delete-job-${index}`};
+          }),
+        });
+      }
+      const getBackgroundActionInfo = jest.fn();
+      for (const status of statuses) {
+        getBackgroundActionInfo.mockResolvedValueOnce({Status: status});
+      }
+      const onRefreshAfterBulkMoveToBinOutcome = jest
+        .fn()
+        .mockResolvedValueOnce(false)
+        .mockRejectedValueOnce(new Error('refresh unavailable'))
+        .mockResolvedValueOnce(true);
+      renderCellsTable({
+        cellsRepository: {deleteNodes, getBackgroundActionInfo} as unknown as CellsRepository,
+        onRefreshAfterBulkMoveToBinOutcome,
+      });
+
+      await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+      await user.click(screen.getByRole('button', {name: 'Move to bin'}));
+      const confirmation = await screen.findByRole('dialog');
+      await user.click(within(confirmation).getByRole('button', {name: 'Move to Bin'}));
+
+      expect(await screen.findByText(message)).toBeInTheDocument();
+      expect(screen.queryByRole('button', {name: 'Move to bin'})).not.toBeInTheDocument();
+      await user.click(screen.getByRole('button', {name: 'Refresh Drive and Bin'}));
+      await waitFor(() => {
+        expect(onRefreshAfterBulkMoveToBinOutcome).toHaveBeenCalledTimes(2);
+      });
+      expect(screen.getByText(message)).toBeInTheDocument();
+      await user.click(screen.getByRole('button', {name: 'Refresh Drive and Bin'}));
+      await waitFor(() => {
+        expect(screen.queryByText(message)).not.toBeInTheDocument();
+      });
+      expect(onRefreshAfterBulkMoveToBinOutcome).toHaveBeenCalledTimes(3);
+      expect(getBackgroundActionInfo).toHaveBeenCalledTimes(statuses.length);
+      expect(deleteNodes).toHaveBeenCalledTimes(1);
+    },
+  );
+
+  it('reports a partial outcome when only some background Move to Bin jobs finish', async () => {
+    const user = userEvent.setup();
+    const deleteNodes = jest.fn().mockResolvedValue({
+      Status: 'Background',
+      BackgroundActions: [
+        {Name: 'delete', JobUuid: 'finished-job'},
+        {Name: 'delete', JobUuid: 'failed-job'},
+      ],
+    });
+    const getBackgroundActionInfo = jest
+      .fn()
+      .mockResolvedValueOnce({Status: 'Finished'})
+      .mockResolvedValueOnce({Status: 'Error'});
+    const onRefreshAfterBulkMoveToBinOutcome = jest.fn().mockResolvedValue(true);
+    renderCellsTable({
+      cellsRepository: {deleteNodes, getBackgroundActionInfo} as unknown as CellsRepository,
+      onRefreshAfterBulkMoveToBinOutcome,
+    });
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+    await user.click(screen.getByRole('button', {name: 'Move to bin'}));
+    const confirmation = await screen.findByRole('dialog');
+    await user.click(within(confirmation).getByRole('button', {name: 'Move to Bin'}));
+
+    await waitFor(() => {
+      expect(onRefreshAfterBulkMoveToBinOutcome).toHaveBeenCalledTimes(1);
+    });
+    expect(
+      screen.getByText(
+        'The move may be incomplete. Check item locations before trying again. Move stays disabled in this view.',
+      ),
+    ).toBeInTheDocument();
+    expect(getBackgroundActionInfo).toHaveBeenCalledTimes(2);
+    expect(deleteNodes).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps a failed-job outcome visible when its automatic refresh fails', async () => {
+    const user = userEvent.setup();
+    const deleteNodes = jest.fn().mockResolvedValue({
+      Status: 'Background',
+      BackgroundActions: [
+        {Name: 'delete', JobUuid: 'failed-job'},
+        {Name: 'delete', JobUuid: 'interrupted-job'},
+      ],
+    });
+    const getBackgroundActionInfo = jest
+      .fn()
+      .mockResolvedValueOnce({Status: 'Error'})
+      .mockResolvedValueOnce({Status: 'Interrupted'});
+    const onRefreshAfterBulkMoveToBinOutcome = jest.fn().mockResolvedValueOnce(false).mockResolvedValueOnce(true);
+    renderCellsTable({
+      cellsRepository: {deleteNodes, getBackgroundActionInfo} as unknown as CellsRepository,
+      onRefreshAfterBulkMoveToBinOutcome,
+    });
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+    await user.click(screen.getByRole('button', {name: 'Move to bin'}));
+    const confirmation = await screen.findByRole('dialog');
+    await user.click(within(confirmation).getByRole('button', {name: 'Move to Bin'}));
+
+    await waitFor(() => {
+      expect(onRefreshAfterBulkMoveToBinOutcome).toHaveBeenCalledTimes(1);
+    });
+    expect(
+      screen.getByText(
+        'The move jobs failed or were interrupted. Refresh Drive to check item locations before trying again.',
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'Some delete jobs failed or were interrupted. Refresh Drive and Bin to check the selected items.',
+      ),
+    ).toBeInTheDocument();
+    await user.click(screen.getByRole('button', {name: 'Refresh Drive and Bin'}));
+    await waitFor(() => {
+      expect(onRefreshAfterBulkMoveToBinOutcome).toHaveBeenCalledTimes(2);
+    });
+
+    expect(screen.queryByText('Could not refresh Drive and Bin. The result is still unknown.')).not.toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'The move jobs failed or were interrupted. Refresh Drive to check item locations before trying again.',
+      ),
+    ).toBeInTheDocument();
+    expect(getBackgroundActionInfo).toHaveBeenCalledTimes(2);
+    expect(deleteNodes).toHaveBeenCalledTimes(1);
   });
 
   it('selects files and folders and clears the selection', () => {
@@ -1345,6 +1886,7 @@ describe('CellsTable selection', () => {
       fireEvent.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
 
       expect(screen.queryByRole('button', {name: 'Delete permanently'})).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', {name: 'Move to bin'})).not.toBeInTheDocument();
     } finally {
       window.location.hash = originalHash;
     }
@@ -1356,6 +1898,7 @@ describe('CellsTable selection', () => {
 
     expect(screen.getByText('1 selected')).toBeInTheDocument();
     expect(screen.queryByRole('button', {name: 'Move'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'Move to bin'})).not.toBeInTheDocument();
   });
 
   it('hides selection controls when the Drive bulk actions feature flag is off', () => {
@@ -1364,6 +1907,7 @@ describe('CellsTable selection', () => {
     expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', {name: 'Clear selection'})).not.toBeInTheDocument();
     expect(screen.queryByRole('button', {name: 'Move'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'Move to bin'})).not.toBeInTheDocument();
   });
 
   it('browses destinations without listing selected items, moving, or clearing selection', async () => {
