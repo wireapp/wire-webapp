@@ -25,6 +25,7 @@
     "./lib/cryptography/assetCryptography/crypto.node": "./lib/cryptography/assetCryptography/crypto.browser.js"
   },
   "dependencies": {
+    "@enormora/clock": "0.0.3",
     "@enormora/fire-and-forget": "0.0.4",
     "@sindresorhus/is": "8.1.0",
     "@wireapp/api-client": "27.96.0",

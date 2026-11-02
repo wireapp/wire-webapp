@@ -17,6 +17,7 @@
  *
  */
 
+import {createClock, type Clock} from '@enormora/clock';
 import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import {
@@ -124,6 +125,8 @@ interface AccountOptions {
   createStore?: CreateStoreFn;
   systemCrypto?: SecretCrypto;
   coreCryptoConfig?: CoreCryptoConfig;
+  /** Clock shared by services which need wall time or retry scheduling. */
+  clock?: Clock;
 
   /** Number of prekeys to generate when creating a new device (defaults to 2)
    * Prekeys are Diffie-Hellmann public keys which allow offline initiation of a secure Proteus session between two devices.
@@ -171,6 +174,7 @@ export class Account extends TypedEventEmitter<Events> {
   private db?: CoreDatabase;
   private encryptedDb?: EncryptedStore<any>;
   private coreCallbacks?: CoreCallbacks;
+  private readonly clock: Clock;
   private connectionState: ConnectionState = ConnectionState.CLOSED;
 
   private readonly isConnectionLive = (): boolean => {
@@ -226,6 +230,7 @@ export class Account extends TypedEventEmitter<Events> {
     },
   ) {
     super();
+    this.clock = options.clock ?? createClock();
     this.apiClient = apiClient;
     this.backendFeatures = this.apiClient.backendFeatures;
     this.logger = LogFactory.getLogger('@wireapp/core/Account');
@@ -471,6 +476,7 @@ export class Account extends TypedEventEmitter<Events> {
     encryptedStore: EncryptedStore,
   ): Promise<CryptoClientWithProtocol> => {
     const baseConfig = {
+      clock: this.clock,
       nbPrekeys: this.options.nbPrekeys,
       onNewPrekeys: async (prekeys: PreKey[]) => {
         this.logger.debug(`Received '${prekeys.length}' new PreKeys.`);
@@ -546,7 +552,7 @@ export class Account extends TypedEventEmitter<Events> {
       this.storeEngine,
     );
 
-    const clientService = new ClientService(this.apiClient, proteusService, this.storeEngine);
+    const clientService = new ClientService(this.apiClient, proteusService, this.storeEngine, this.clock);
 
     if (clientType === CryptoClientType.CORE_CRYPTO && (await this.apiClient.supportsMLS())) {
       mlsService = new MLSService(this.apiClient, cryptoClient.getNativeClient(), this.db, this.recurringTaskScheduler);
@@ -638,7 +644,7 @@ export class Account extends TypedEventEmitter<Events> {
 
     try {
       if (this.storeEngine !== undefined) {
-        await wipeCoreCryptoDb(this.storeEngine);
+        await wipeCoreCryptoDb(this.storeEngine, this.clock);
       }
     } catch (error: unknown) {
       this.logger.error('Failed to wipe crypto database during logout cleanup:', error);

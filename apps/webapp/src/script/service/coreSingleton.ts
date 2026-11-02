@@ -48,6 +48,7 @@ export class Core extends Account {
 
     const enableCoreCrypto = supportsMLS() || USE_CORE_CRYPTO;
     super(apiClient, {
+      clock: apiClient.clock,
       createStore: async (storeName, key) => {
         this.key = key;
         return createStorageEngine(storeName, DatabaseTypes.PERMANENT, {
