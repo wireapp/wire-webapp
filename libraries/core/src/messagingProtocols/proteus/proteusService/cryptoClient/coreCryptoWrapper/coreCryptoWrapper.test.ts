@@ -78,4 +78,71 @@ describe('CoreCryptoWrapper initialization', () => {
     await expect(build()).resolves.toBeDefined();
     expect(openDatabase).toHaveBeenCalledTimes(2);
   });
+
+  it('reopens the same database and stored key after releasing the previous handles', async () => {
+    const operations: string[] = [];
+    const firstDatabase = {
+      uniffiDestroy: jest.fn(() => {
+        operations.push('destroy first database');
+      }),
+    } as unknown as Database;
+    const secondDatabase = {uniffiDestroy: jest.fn()} as unknown as Database;
+    const firstCoreCrypto = {
+      uniffiDestroy: jest.fn(() => {
+        operations.push('destroy first CoreCrypto');
+      }),
+    } as unknown as CoreCrypto;
+    const secondCoreCrypto = {uniffiDestroy: jest.fn()} as unknown as CoreCrypto;
+    const databaseKey = {} as DatabaseKey;
+    const openDatabase = jest
+      .fn()
+      .mockImplementationOnce(async () => {
+        operations.push('open first database');
+        return firstDatabase;
+      })
+      .mockImplementationOnce(async () => {
+        operations.push('open second database');
+        return secondDatabase;
+      });
+    const createDatabaseKey = jest.fn().mockReturnValue(databaseKey);
+    const runtime = {
+      configureLogging: jest.fn(),
+      createCoreCrypto: jest.fn().mockReturnValueOnce(firstCoreCrypto).mockReturnValueOnce(secondCoreCrypto),
+      createDatabaseKey,
+      getVersion: jest.fn().mockReturnValue('11.0.0'),
+      initializeWasm: jest.fn().mockResolvedValue(undefined),
+      migrateDatabaseKey: jest.fn().mockResolvedValue(undefined),
+      openDatabase,
+    };
+    const storedDatabaseKey = new Uint8Array(32).fill(7);
+    const generateSecretKey = jest.fn(async (keyId: string, keySize: 16 | 32) => {
+      return {
+        deleteKey: jest.fn().mockResolvedValue(undefined),
+        freshlyGenerated: false,
+        key: keyId === 'corecrypto-key-v2' ? storedDatabaseKey : new Uint8Array(keySize),
+      };
+    });
+    const build = (): ReturnType<typeof buildClient> => {
+      return buildClient(
+        storeEngine,
+        {clock, generateSecretKey, nbPrekeys: 100, onNewPrekeys: jest.fn()},
+        {enabled: true, wasmFilePath: ''},
+        runtime,
+      );
+    };
+
+    await build();
+    await build();
+
+    expect(openDatabase).toHaveBeenNthCalledWith(1, databaseName, databaseKey);
+    expect(openDatabase).toHaveBeenNthCalledWith(2, databaseName, databaseKey);
+    expect(createDatabaseKey).toHaveBeenNthCalledWith(1, storedDatabaseKey);
+    expect(createDatabaseKey).toHaveBeenNthCalledWith(2, storedDatabaseKey);
+    expect(operations).toEqual([
+      'open first database',
+      'destroy first CoreCrypto',
+      'destroy first database',
+      'open second database',
+    ]);
+  });
 });
