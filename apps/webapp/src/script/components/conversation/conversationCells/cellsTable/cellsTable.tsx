@@ -69,7 +69,7 @@ import {formatBytes} from 'Util/util';
 import {bulkMoveReducer} from './bulkMoveState';
 import {CellsFilePreviewModal} from './cellsFilePreviewModal/cellsFilePreviewModal';
 import {
-  bulkMoveButtonStyles,
+  bulkActionButtonStyles,
   clearSelectionButtonStyles,
   folderDropOverlayDescriptionStyles,
   folderDropOverlayFolderNameStyles,
@@ -113,7 +113,7 @@ interface CellsTableProps {
   conversationQualifiedId: QualifiedId;
   conversationName: string;
   onRefresh: () => void;
-  onRefreshAfterBulkMoveOutcome: () => Promise<boolean>;
+  onRefreshAndReportSuccess: () => Promise<boolean>;
   onCloseSearchView?: () => void;
   folderDropResetKey?: number;
   onFolderDropTargetChange?: (folderName: string | null) => void;
@@ -270,7 +270,7 @@ export const CellsTable = ({
   conversationQualifiedId,
   conversationName,
   onRefresh,
-  onRefreshAfterBulkMoveOutcome,
+  onRefreshAndReportSuccess,
   onCloseSearchView,
   folderDropResetKey,
   onFolderDropTargetChange,
@@ -444,7 +444,7 @@ export const CellsTable = ({
     }
 
     dispatchMove({type: 'refresh-started'});
-    const wasRefreshSuccessful = await onRefreshAfterBulkMoveOutcome();
+    const wasRefreshSuccessful = await onRefreshAndReportSuccess();
     if (!wasRefreshSuccessful) {
       dispatchMove({type: 'refresh-failed'});
       return;
@@ -729,7 +729,7 @@ export const CellsTable = ({
       setIsWaitingForPermanentDeleteReconciliation(false);
       let wasRefreshSuccessful = false;
       try {
-        wasRefreshSuccessful = await onRefreshAfterBulkMoveOutcome();
+        wasRefreshSuccessful = await onRefreshAndReportSuccess();
       } catch {
         wasRefreshSuccessful = false;
       }
@@ -906,7 +906,7 @@ export const CellsTable = ({
       setPermanentDeleteReviewReason('timed-out');
     }, PERMANENT_DELETE_RECONCILIATION_TIMEOUT_MS);
     try {
-      const wasRefreshSuccessful = await onRefreshAfterBulkMoveOutcome();
+      const wasRefreshSuccessful = await onRefreshAndReportSuccess();
       if (
         permanentDeleteReconciliationGenerationRef.current !== generation ||
         !isCurrentPermanentDeleteScope(scopeKey, path)
@@ -1115,7 +1115,7 @@ export const CellsTable = ({
                   )}
                   {canPermanentlyDeleteSelection && (
                     <button
-                      css={bulkMoveButtonStyles}
+                      css={bulkActionButtonStyles}
                       type="button"
                       aria-haspopup="dialog"
                       disabled={isPermanentDeletePending}
@@ -1152,7 +1152,7 @@ export const CellsTable = ({
                   )}
                   {canMoveSelection && (
                     <button
-                      css={bulkMoveButtonStyles}
+                      css={bulkActionButtonStyles}
                       type="button"
                       aria-haspopup="dialog"
                       onClick={() => {

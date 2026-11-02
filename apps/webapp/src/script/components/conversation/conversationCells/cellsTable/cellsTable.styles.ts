@@ -131,7 +131,7 @@ export const selectionSizeStyles: CSSObject = {
   },
 };
 
-export const bulkMoveButtonStyles: CSSObject = {
+export const bulkActionButtonStyles: CSSObject = {
   flexShrink: 0,
   display: 'inline-flex',
   minHeight: '30px',

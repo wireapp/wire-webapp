@@ -214,7 +214,7 @@ export const ConversationCells = memo(
       fireAndForgetInvoker.fireAndForget(refresh);
     }, [fireAndForgetInvoker, handleReload, isSearchMode, refresh]);
 
-    const handleRefreshAfterBulkMoveOutcome = useCallback(async (): Promise<boolean> => {
+    const handleRefreshAndReportSuccess = useCallback(async (): Promise<boolean> => {
       const refreshResult = await task.tryOrElse(
         error => {
           return error;
@@ -383,7 +383,7 @@ export const ConversationCells = memo(
                 conversationQualifiedId={conversationQualifiedId}
                 conversationName={name}
                 onRefresh={handleRefresh}
-                onRefreshAfterBulkMoveOutcome={handleRefreshAfterBulkMoveOutcome}
+                onRefreshAndReportSuccess={handleRefreshAndReportSuccess}
                 // opening a folder must close search view and open the browse view
                 // with that folder (and breadcrumbs)
                 onCloseSearchView={handleSearchViewClosure}
