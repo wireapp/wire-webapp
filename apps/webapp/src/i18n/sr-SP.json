@@ -740,6 +740,7 @@
   "conversationContextMenuDownload": "Преузми",
   "conversationContextMenuEdit": "Уређивање",
   "conversationContextMenuLike": "Свиђа ми се",
+  "conversationContextMenuMarkUnread": "Mark as unread from here",
   "conversationContextMenuReply": "Одговорити",
   "conversationContextMenuUnlike": "Не свиђа ми се",
   "conversationCreateReceiptsEnabled": "Прочитати укључене рачуне",

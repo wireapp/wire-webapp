@@ -230,10 +230,10 @@ function getEffectiveCallingConfig(callingConfig: CallConfigData, useStagingSft:
     sft_servers: [{urls: ['https://sft.calling-staging-v01.zinfra.io']}],
     sft_servers_all: [
       {
-        urls: [
-          'https://sft.calling-staging-v01.zinfra.io/sfts/sftd-0',
-          'https://sft.calling-staging-v01.zinfra.io/sfts/sftd-1',
-        ],
+        urls: ['https://sft.calling-staging-v01.zinfra.io/sfts/sftd-0'],
+      },
+      {
+        urls: ['https://sft.calling-staging-v01.zinfra.io/sfts/sftd-1'],
       },
     ],
   };

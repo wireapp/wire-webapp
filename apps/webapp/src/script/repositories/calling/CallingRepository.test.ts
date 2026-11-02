@@ -375,10 +375,10 @@ describe('CallingRepository', () => {
       const stagingSftServers = [{urls: ['https://sft.calling-staging-v01.zinfra.io']}];
       const stagingSftServerAll = [
         {
-          urls: [
-            'https://sft.calling-staging-v01.zinfra.io/sfts/sftd-0',
-            'https://sft.calling-staging-v01.zinfra.io/sfts/sftd-1',
-          ],
+          urls: ['https://sft.calling-staging-v01.zinfra.io/sfts/sftd-0'],
+        },
+        {
+          urls: ['https://sft.calling-staging-v01.zinfra.io/sfts/sftd-1'],
         },
       ];
 
