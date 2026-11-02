@@ -38,6 +38,7 @@ import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
 
+import {createCellsBinOperationController} from 'Components/conversation/conversationCells/common/cellsBinOperations/cellsBinOperationController';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {AudioRepository} from 'Repositories/audio/audioRepository';
@@ -398,11 +399,16 @@ export class App {
     repositories.preferenceNotification = new PreferenceNotificationRepository(repositories.user['userState'].self);
 
     repositories.cells = container.resolve(CellsRepository);
+    repositories.cellsBinOperations = createCellsBinOperationController({
+      cellsRepository: repositories.cells,
+      clock: this.clock,
+    });
 
     repositories.meetings = new MeetingsRepository(new MeetingsApiDataSource(this.apiClient.api.meetings));
 
     // Initialize LifeCycleRepository with all required dependencies
     repositories.lifeCycle = new LifeCycleRepository({
+      disposeBinOperations: repositories.cellsBinOperations.dispose,
       clientRepository: repositories.client,
       conversationRepository: repositories.conversation,
       eventRepository: repositories.event,

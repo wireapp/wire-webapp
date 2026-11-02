@@ -86,6 +86,7 @@ export const getCellsTableColumns = ({
   selectedNodeIds,
   onToggleSelection,
   selectionEnabled,
+  isOperationLocked = false,
 }: {
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
@@ -99,6 +100,7 @@ export const getCellsTableColumns = ({
   selectedNodeIds: Set<string>;
   onToggleSelection: (nodeId: string, isSelected: boolean) => void;
   selectionEnabled: boolean;
+  isOperationLocked?: boolean;
 }): GetCellsTableColumnsResult => {
   return [
     ...(selectionEnabled
@@ -207,6 +209,7 @@ export const getCellsTableColumns = ({
       cell: info => {
         return (
           <CellsTableRowOptions
+            disabled={isOperationLocked}
             node={info.row.original}
             cellsRepository={cellsRepository}
             conversationQualifiedId={conversationQualifiedId}

@@ -42,6 +42,7 @@ import * as browserLocationModule from '../../navigation/browserLocation';
 
 const createMockDependencies = (): LifeCycleDependencies => {
   return {
+    disposeBinOperations: jest.fn(),
     clientRepository: {
       isCurrentClientPermanent: jest.fn(),
       constructCookieLabelKey: jest.fn(),
@@ -131,6 +132,27 @@ describe('LifeCycleRepository', () => {
     (amplify as any).store = originalAmplifyStore;
 
     lifeCycleRepository.resetLogoutState();
+  });
+
+  it('disposes Bin operations before asynchronous session cleanup can complete', async () => {
+    let resolveTypingStop: () => void = () => {
+      return undefined;
+    };
+    const pendingTypingStop = new Promise<void>(resolve => {
+      resolveTypingStop = resolve;
+    });
+    mockDependencies.conversationRepository.getActiveConversation = () => {
+      return mockConversation as Conversation;
+    };
+    mockDependencies.conversationRepository.sendTypingStop = () => {
+      return pendingTypingStop;
+    };
+
+    const logout = lifeCycleRepository.logout(SIGN_OUT_REASON.USER_REQUESTED, false);
+
+    expect(mockDependencies.disposeBinOperations).toHaveBeenCalledTimes(1);
+    resolveTypingStop();
+    await logout;
   });
 
   describe('redirectToLogin', () => {

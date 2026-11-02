@@ -101,6 +101,23 @@ describe('useGetAllCellsNodes', () => {
     window.history.replaceState({}, '', `#/conversation/${CONV_ID}/${DOMAIN}/files`);
   });
 
+  it('does not publish a Bin refresh after the owning view unmounts', async () => {
+    const fetch = createDeferred<RestNodeCollection>();
+    const cellsRepository = {getAllNodes: jest.fn().mockReturnValue(fetch.promise)} as FakeCellsRepository;
+    const {unmount, fireAndForgetInvoker} = renderGetAllNodesHook({cellsRepository});
+    expect(cellsRepository.getAllNodes).toHaveBeenCalledTimes(1);
+
+    unmount();
+    useCellsStore.getState().setStatus('loading');
+    fetch.resolve({Nodes: [createRestNode('stale-bin-refresh.txt')]});
+    await act(() => {
+      return fireAndForgetInvoker.waitUntilAllSettled();
+    });
+
+    expect(useCellsStore.getState().getNodes({conversationId: CONV_ID})).toHaveLength(0);
+    expect(useCellsStore.getState().status).toBe('loading');
+  });
+
   it('does not write to the store when disabled mid-flight', async () => {
     const fetch = createDeferred<RestNodeCollection>();
     const cellsRepository = {getAllNodes: jest.fn().mockReturnValue(fetch.promise)} as FakeCellsRepository;

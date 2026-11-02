@@ -20,7 +20,6 @@
 import {useCallback, useEffect, useRef, useState, type FunctionComponent} from 'react';
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
-import {Maybe} from 'true-myth';
 
 import {Button, ButtonVariant, TrashIcon} from '@wireapp/react-ui-kit';
 
@@ -35,24 +34,18 @@ import {
   emptyBinButtonStyles,
   statusStyles,
 } from './cellsEmptyBinAction.styles';
-import {emptyBin, isEmptyBinRootPath} from './emptyBinAction';
+import {isEmptyBinRootPath} from './emptyBinAction';
 
-import {
-  getCellsBackgroundActionEvidence,
-  observeCellsBackgroundActionJobs,
-} from '../../common/cellsBackgroundActionPolling/cellsBackgroundActionJobs';
+import type {
+  BinOperation,
+  CellsBinOperationController,
+} from '../../common/cellsBinOperations/cellsBinOperationController';
+import {useCellsBinOperationView} from '../../common/cellsBinOperations/useCellsBinOperationView';
 import {CellsModal} from '../../common/cellsModal/cellsModal';
 import {
   CELLS_ACTION,
   useCellsActionPermissions,
 } from '../../common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
-
-const BACKGROUND_DELETE_STATUS_POLL_INTERVAL_MS = 1000;
-const BACKGROUND_DELETE_STATUS_RETRY_BACKOFF_FACTOR = 2;
-const MAX_BACKGROUND_DELETE_STATUS_RETRIES = 5;
-
-type EmptyBinStatus =
-  'idle' | 'submitting' | 'processing' | 'completed' | 'partial' | 'failed' | 'unknown' | 'lookup-error';
 
 interface CellsEmptyBinActionProps {
   cellsRepository: CellsRepository;
@@ -62,8 +55,44 @@ interface CellsEmptyBinActionProps {
   onEmptyBinSubmitted: () => void;
 }
 
+interface CapturedBinView {
+  readonly drive: QualifiedId;
+  readonly path: string;
+  readonly scopeKey: string;
+}
+
+type EmptyBinStatus =
+  'submitting' | 'processing' | 'completed' | 'partial' | 'failed' | 'unknown' | 'rejected' | 'lookup-error';
+
+const reportedSubmittedOperations = new WeakMap<CellsBinOperationController, Set<number>>();
+
+const getEmptyBinStatus = (operation: BinOperation | undefined): EmptyBinStatus | undefined => {
+  if (operation === undefined) {
+    return undefined;
+  }
+
+  if (operation.state === 'submitting' || operation.state === 'processing' || operation.state === 'completed') {
+    return operation.state;
+  }
+
+  if (operation.state === 'rejected') {
+    return operation.targetIds.length > 0 ? 'rejected' : 'lookup-error';
+  }
+
+  switch (operation.reason) {
+    case 'partial':
+      return 'partial';
+    case 'job-failed':
+      return 'failed';
+    case 'request-failed':
+    case 'status-unknown':
+    case 'timed-out':
+    default:
+      return 'unknown';
+  }
+};
+
 export const CellsEmptyBinAction: FunctionComponent<CellsEmptyBinActionProps> = ({
-  cellsRepository,
   conversationQualifiedId,
   getCurrentCellsPath,
   onRefreshAfterEmptyBinOutcome,
@@ -71,224 +100,115 @@ export const CellsEmptyBinAction: FunctionComponent<CellsEmptyBinActionProps> = 
 }: CellsEmptyBinActionProps) => {
   const {clock, isFeatureToggleEnabled, translate} = useApplicationContext();
   const canPerformCellsAction = useCellsActionPermissions();
-  const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [status, setStatus] = useState<EmptyBinStatus>('idle');
-  const [requiresReview, setRequiresReview] = useState(false);
-  const [refreshFailed, setRefreshFailed] = useState(false);
-  const [backgroundJobUuids, setBackgroundJobUuids] = useState<string[]>([]);
-  const requestPending = useRef(false);
-  const isMounted = useRef(false);
-
-  const isFeatureEnabled = isFeatureToggleEnabled(driveBulkActionsFeatureToggleName);
   const currentCellsPath = getCurrentCellsPath();
-  const isAtBinRoot = isEmptyBinRootPath(currentCellsPath);
-  const canEmptyBin = isFeatureEnabled && isAtBinRoot && canPerformCellsAction(CELLS_ACTION.DELETE);
-  const scopeKey = `${conversationQualifiedId.id}@${conversationQualifiedId.domain}`;
-  const initialScopeKey = useRef(scopeKey).current;
+  const scopeKey = JSON.stringify([conversationQualifiedId.domain, conversationQualifiedId.id, currentCellsPath]);
   const currentScopeKey = useRef(scopeKey);
   currentScopeKey.current = scopeKey;
-  const canEmptyBinRef = useRef(canEmptyBin);
-  canEmptyBinRef.current = canEmptyBin;
-  const isSameBinView = useCallback((): boolean => {
-    return (
-      isMounted.current && currentScopeKey.current === initialScopeKey && isEmptyBinRootPath(getCurrentCellsPath())
-    );
-  }, [getCurrentCellsPath, initialScopeKey]);
+  const [confirmation, setConfirmation] = useState<CapturedBinView | null>(null);
+
+  const isFeatureEnabled = isFeatureToggleEnabled(driveBulkActionsFeatureToggleName);
+  const canEmptyBin =
+    isFeatureEnabled && isEmptyBinRootPath(currentCellsPath) && canPerformCellsAction(CELLS_ACTION.DELETE);
+
   const isCurrentScope = useCallback((): boolean => {
-    return isSameBinView() && canEmptyBinRef.current;
-  }, [isSameBinView]);
+    return (
+      currentScopeKey.current === scopeKey &&
+      getCurrentCellsPath() === currentCellsPath &&
+      isEmptyBinRootPath(currentCellsPath) &&
+      canEmptyBin
+    );
+  }, [canEmptyBin, currentCellsPath, getCurrentCellsPath, scopeKey]);
 
-  useEffect(() => {
-    isMounted.current = true;
-    return () => {
-      isMounted.current = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!canEmptyBin) {
-      setIsConfirmationOpen(false);
-    }
-  }, [canEmptyBin]);
-
-  const refreshAfterOutcome = useCallback(async (): Promise<boolean> => {
-    if (!isSameBinView()) {
-      return false;
-    }
-
-    try {
-      const wasRefreshSuccessful = await onRefreshAfterEmptyBinOutcome();
-      if (isMounted.current && !wasRefreshSuccessful) {
-        setRefreshFailed(true);
-      }
-      return wasRefreshSuccessful;
-    } catch {
-      if (isMounted.current) {
-        setRefreshFailed(true);
-      }
-      return false;
-    }
-  }, [isSameBinView, onRefreshAfterEmptyBinOutcome]);
-
-  useEffect(() => {
-    if (status !== 'processing' || backgroundJobUuids.length === 0) {
-      return undefined;
-    }
-
-    return observeCellsBackgroundActionJobs({
-      cellsRepository,
-      actionName: 'delete',
-      jobUuids: backgroundJobUuids,
-      clock,
-      pollingPolicy: {
-        pollIntervalMs: BACKGROUND_DELETE_STATUS_POLL_INTERVAL_MS,
-        maxUnknownRetries: MAX_BACKGROUND_DELETE_STATUS_RETRIES,
-        maxPollAttempts: Maybe.nothing(),
-        getUnknownRetryDelay: retryIndex => {
-          return (
-            BACKGROUND_DELETE_STATUS_POLL_INTERVAL_MS * BACKGROUND_DELETE_STATUS_RETRY_BACKOFF_FACTOR ** retryIndex
-          );
-        },
-      },
-      isCurrent: isCurrentScope,
-      onOutcome: outcome => {
-        if (outcome === 'all-finished') {
-          setBackgroundJobUuids([]);
-          setStatus('completed');
-          setRequiresReview(false);
-          void refreshAfterOutcome();
-          return;
-        }
-
-        if (outcome === 'mixed-terminal') {
-          setBackgroundJobUuids([]);
-          setStatus('partial');
-          setRequiresReview(true);
-          void refreshAfterOutcome();
-          return;
-        }
-
-        if (outcome === 'all-failed') {
-          setBackgroundJobUuids([]);
-          setStatus('failed');
-          setRequiresReview(true);
-          void refreshAfterOutcome();
-          return;
-        }
-
-        setStatus('unknown');
-        setRequiresReview(true);
-        void refreshAfterOutcome();
-      },
-    });
-  }, [
-    backgroundJobUuids,
-    canEmptyBin,
-    cellsRepository,
+  const {controller, operation, isLocked, isRefreshing, refreshFailed, refreshReview} = useCellsBinOperationView({
+    drive: conversationQualifiedId,
+    path: currentCellsPath,
     clock,
+    onRefresh: onRefreshAfterEmptyBinOutcome,
+    isCurrentScope,
+  });
+
+  const displayedOperation =
+    operation?.kind === 'empty-bin' && operation.path === currentCellsPath ? operation : undefined;
+  const status = getEmptyBinStatus(displayedOperation);
+  const requiresReview = displayedOperation?.state === 'needs-review';
+  const isErrorStatus =
+    status === 'partial' ||
+    status === 'failed' ||
+    status === 'unknown' ||
+    status === 'rejected' ||
+    status === 'lookup-error';
+
+  const isConfirmationCurrent =
+    confirmation !== null &&
+    confirmation.scopeKey === scopeKey &&
+    confirmation.path === currentCellsPath &&
+    confirmation.drive.id === conversationQualifiedId.id &&
+    confirmation.drive.domain === conversationQualifiedId.domain &&
+    canEmptyBin;
+
+  useEffect(() => {
+    if (confirmation !== null && !isConfirmationCurrent) {
+      setConfirmation(null);
+    }
+  }, [confirmation, isConfirmationCurrent]);
+
+  useEffect(() => {
+    if (
+      !canEmptyBin ||
+      operation === undefined ||
+      operation.kind !== 'empty-bin' ||
+      operation.drive.id !== conversationQualifiedId.id ||
+      operation.drive.domain !== conversationQualifiedId.domain ||
+      operation.path !== currentCellsPath ||
+      operation.targetIds.length === 0 ||
+      !isCurrentScope()
+    ) {
+      return;
+    }
+
+    let reportedOperationIds = reportedSubmittedOperations.get(controller);
+    if (reportedOperationIds === undefined) {
+      reportedOperationIds = new Set();
+      reportedSubmittedOperations.set(controller, reportedOperationIds);
+    }
+    if (reportedOperationIds.has(operation.id)) {
+      return;
+    }
+    reportedOperationIds.add(operation.id);
+    onEmptyBinSubmitted();
+  }, [
+    canEmptyBin,
+    conversationQualifiedId.domain,
+    conversationQualifiedId.id,
+    controller,
     currentCellsPath,
     isCurrentScope,
-    refreshAfterOutcome,
-    scopeKey,
-    status,
+    onEmptyBinSubmitted,
+    operation,
   ]);
+
+  const closeConfirmation = (): void => {
+    setConfirmation(null);
+  };
+
+  const handleConfirm = (): void => {
+    if (confirmation === null || !isConfirmationCurrent || isLocked) {
+      closeConfirmation();
+      return;
+    }
+
+    controller.start({
+      kind: 'empty-bin',
+      drive: confirmation.drive,
+      path: confirmation.path,
+      targetIds: [],
+    });
+    closeConfirmation();
+  };
 
   if (!canEmptyBin) {
     return null;
   }
-
-  const closeConfirmation = (): void => {
-    if (!isSubmitting) {
-      setIsConfirmationOpen(false);
-    }
-  };
-
-  const handleConfirm = async (): Promise<void> => {
-    if (requestPending.current || requiresReview || !isCurrentScope()) {
-      setIsConfirmationOpen(false);
-      return;
-    }
-
-    requestPending.current = true;
-    setIsSubmitting(true);
-    setIsConfirmationOpen(false);
-    setStatus('submitting');
-    setRefreshFailed(false);
-
-    let deleteRequestStarted = false;
-    try {
-      const response = await emptyBin({
-        cellsRepository,
-        conversationQualifiedId,
-        onDeleteStarted: () => {
-          if (!isCurrentScope()) {
-            throw new Error('The current Bin scope changed before submission.');
-          }
-
-          onEmptyBinSubmitted();
-          deleteRequestStarted = true;
-        },
-      });
-      if (!isSameBinView()) {
-        return;
-      }
-
-      const actionEvidence = getCellsBackgroundActionEvidence(response, 'delete');
-      if (actionEvidence.hasCompleted) {
-        setStatus('completed');
-        setRequiresReview(false);
-        await refreshAfterOutcome();
-        return;
-      }
-
-      if (actionEvidence.jobUuids.length > 0) {
-        setBackgroundJobUuids([...actionEvidence.jobUuids]);
-        setStatus('processing');
-        return;
-      }
-
-      setStatus('unknown');
-      setRequiresReview(true);
-      await refreshAfterOutcome();
-    } catch {
-      if (!isSameBinView()) {
-        return;
-      }
-
-      setStatus(deleteRequestStarted ? 'unknown' : 'lookup-error');
-      setRequiresReview(deleteRequestStarted);
-      if (deleteRequestStarted) {
-        await refreshAfterOutcome();
-      }
-    } finally {
-      requestPending.current = false;
-      if (isMounted.current) {
-        setIsSubmitting(false);
-      }
-    }
-  };
-
-  const handleReview = async (): Promise<void> => {
-    const wasRefreshSuccessful = await refreshAfterOutcome();
-    if (wasRefreshSuccessful && isMounted.current) {
-      setRequiresReview(false);
-      setBackgroundJobUuids([]);
-      setStatus('idle');
-      setRefreshFailed(false);
-    }
-  };
-
-  const handleRetryStatusCheck = (): void => {
-    if (backgroundJobUuids.length === 0) {
-      return;
-    }
-
-    setStatus('processing');
-  };
-
-  const statusMessage = status === 'idle' ? '' : translate(`cells.emptyBin.status.${status}`);
-  const isErrorStatus = ['partial', 'failed', 'unknown', 'lookup-error'].includes(status) || refreshFailed;
 
   return (
     <div css={actionStyles}>
@@ -296,30 +216,44 @@ export const CellsEmptyBinAction: FunctionComponent<CellsEmptyBinActionProps> = 
         variant={ButtonVariant.CANCEL}
         type="button"
         css={emptyBinButtonStyles}
-        disabled={isSubmitting || status === 'processing' || requiresReview}
+        disabled={isLocked}
         onClick={() => {
-          setIsConfirmationOpen(true);
+          setConfirmation({
+            drive: {...conversationQualifiedId},
+            path: currentCellsPath,
+            scopeKey,
+          });
         }}
       >
         <TrashIcon aria-hidden="true" />
         {translate('cells.emptyBin.button')}
       </Button>
 
-      {status !== 'idle' && (
-        <div css={statusStyles} role={isErrorStatus ? 'alert' : 'status'} aria-live="polite">
-          <span>{statusMessage}</span>
+      {status !== undefined && (
+        <div css={statusStyles} role={isErrorStatus || refreshFailed ? 'alert' : 'status'} aria-live="polite">
+          <span>
+            {translate(status === 'rejected' ? 'cells.bulkDelete.rejected' : `cells.emptyBin.status.${status}`)}
+          </span>
           {refreshFailed && <span>{translate('cells.emptyBin.refreshFailed')}</span>}
-          {status === 'unknown' && backgroundJobUuids.length > 0 && (
-            <Button variant={ButtonVariant.TERTIARY} type="button" onClick={handleRetryStatusCheck}>
-              {translate('cells.emptyBin.checkStatus')}
-            </Button>
-          )}
-          {requiresReview && backgroundJobUuids.length === 0 && (
+          {status === 'unknown' && displayedOperation?.jobUuids.length !== 0 && (
             <Button
               variant={ButtonVariant.TERTIARY}
               type="button"
+              disabled={isRefreshing}
               onClick={() => {
-                return void handleReview();
+                void refreshReview();
+              }}
+            >
+              {translate('cells.emptyBin.checkStatus')}
+            </Button>
+          )}
+          {requiresReview && !(status === 'unknown' && (displayedOperation?.jobUuids.length ?? 0) > 0) && (
+            <Button
+              variant={ButtonVariant.TERTIARY}
+              type="button"
+              disabled={isRefreshing}
+              onClick={() => {
+                void refreshReview();
               }}
             >
               {translate('cells.emptyBin.refreshBin')}
@@ -328,7 +262,7 @@ export const CellsEmptyBinAction: FunctionComponent<CellsEmptyBinActionProps> = 
         </div>
       )}
 
-      <CellsModal isOpen={isConfirmationOpen} onClose={closeConfirmation}>
+      <CellsModal isOpen={isConfirmationCurrent} onClose={closeConfirmation}>
         <CellsModal.Header>{translate('cells.emptyBin.title')}</CellsModal.Header>
         <div css={confirmationContentStyles}>
           <p css={confirmationTextStyles}>{translate('cells.emptyBin.description')}</p>
@@ -337,12 +271,7 @@ export const CellsEmptyBinAction: FunctionComponent<CellsEmptyBinActionProps> = 
           <CellsModal.SecondaryButton onClick={closeConfirmation}>
             {translate('cells.emptyBin.cancel')}
           </CellsModal.SecondaryButton>
-          <CellsModal.PrimaryButton
-            onClick={() => {
-              return void handleConfirm();
-            }}
-            isDisabled={isSubmitting}
-          >
+          <CellsModal.PrimaryButton onClick={handleConfirm} isDisabled={isLocked || !isConfirmationCurrent}>
             {translate('cells.emptyBin.confirm')}
           </CellsModal.PrimaryButton>
         </CellsModal.Actions>

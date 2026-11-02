@@ -33,6 +33,7 @@ import {CallingContainer} from 'Components/calling/CallingOverlayContainer';
 import {ChooseScreen} from 'Components/calling/ChooseScreen';
 import {DetachedCallingCell} from 'Components/calling/DetachedCallingCell';
 import {ConfigToolbar} from 'Components/configToolbar/configToolbar';
+import {CellsBinOperationsProvider} from 'Components/conversation/conversationCells/common/cellsBinOperations/cellsBinOperationsContext';
 import {ErrorFallback} from 'Components/errorFallback';
 import {CreateConversationModal} from 'Components/Modals/CreateConversation/CreateConversaionModal';
 import {FileHistoryModal} from 'Components/Modals/FileHistoryModal/FileHistoryModal';
@@ -356,110 +357,116 @@ export const AppMain: FunctionComponent<AppMainProps> = (properties: AppMainProp
     isMobileCentralColumnView;
   const {hasLargeOffset, hasSmallOffset} = useWarningOffset();
   return (
-    <StyledApp
-      themeId={THEME_ID.DEFAULT}
-      css={{backgroundColor: 'unset', height: '100%'}}
-      id="wire-main"
-      data-uie-name="status-webapp"
-      data-uie-value="is-loaded"
-    >
-      {!locked && <WindowTitleUpdater translate={translate} />}
-      <ErrorBoundary FallbackComponent={ErrorFallback}>
-        <ForceReloadModal reloadApplication={app.refresh} />
-        {Config.getConfig().FEATURE.ENABLE_DEBUG && <ConfigToolbar />}
-        {!locked && (
-          <div
-            id="app"
-            className={cx('app', {
-              'app--hide-main-content-on-mobile':
-                currentTab !== SidebarTabs.CELLS && currentTab !== SidebarTabs.MEETINGS,
-              'app--small-offset': hasSmallOffset,
-              'app--large-offset': hasLargeOffset,
-            })}
-          >
-            {showLeftSidebar && (
-              <LeftSidebar listViewModel={mainView.list} selfUser={selfUser} isActivatedAccount={isActivatedAccount} />
-            )}
+    <CellsBinOperationsProvider value={repositories.cellsBinOperations}>
+      <StyledApp
+        themeId={THEME_ID.DEFAULT}
+        css={{backgroundColor: 'unset', height: '100%'}}
+        id="wire-main"
+        data-uie-name="status-webapp"
+        data-uie-value="is-loaded"
+      >
+        {!locked && <WindowTitleUpdater translate={translate} />}
+        <ErrorBoundary FallbackComponent={ErrorFallback}>
+          <ForceReloadModal reloadApplication={app.refresh} />
+          {Config.getConfig().FEATURE.ENABLE_DEBUG && <ConfigToolbar />}
+          {!locked && (
+            <div
+              id="app"
+              className={cx('app', {
+                'app--hide-main-content-on-mobile':
+                  currentTab !== SidebarTabs.CELLS && currentTab !== SidebarTabs.MEETINGS,
+                'app--small-offset': hasSmallOffset,
+                'app--large-offset': hasLargeOffset,
+              })}
+            >
+              {showLeftSidebar && (
+                <LeftSidebar
+                  listViewModel={mainView.list}
+                  selfUser={selfUser}
+                  isActivatedAccount={isActivatedAccount}
+                />
+              )}
 
-            {showMainContent && (
-              <MainContent
+              {showMainContent && (
+                <MainContent
+                  selfUser={selfUser}
+                  isRightSidebarOpen={isTruthy(currentState)}
+                  openRightSidebar={toggleRightSidebar}
+                  reloadApp={app.refresh}
+                  appLockRepository={appLockRepository}
+                />
+              )}
+
+              {isTruthy(currentState) ? (
+                <RightSidebar
+                  lastViewedMessageDetailsEntity={lastViewedMessageDetailsEntity}
+                  currentEntity={currentEntity}
+                  repositories={repositories}
+                  actionsViewModel={mainView.actions}
+                  isFederated={mainView.isFederated}
+                  teamState={teamState}
+                  selfUser={selfUser}
+                  userState={userState}
+                />
+              ) : (
+                currentState
+              )}
+            </div>
+          )}
+
+          <AppLock appLockRepository={appLockRepository} clientRepository={repositories.client} />
+          <WarningsContainer onRefresh={app.refresh} />
+
+          {!locked && (
+            <>
+              <FeatureConfigChangeNotifier selfUserId={selfUser.id} teamState={teamState} />
+
+              {viewMode === CallingViewMode.FULL_SCREEN && (
+                <CallingContainer
+                  propertiesRepository={repositories.properties}
+                  callingRepository={repositories.calling}
+                  fireAndForgetInvoker={fireAndForgetInvoker}
+                  toggleScreenshare={mainView.calling.callActions.toggleScreenshare}
+                />
+              )}
+
+              {isDetachedCallingFeatureEnabled() && (
+                <DetachedCallingCell
+                  propertiesRepository={repositories.properties}
+                  callingRepository={repositories.calling}
+                  fireAndForgetInvoker={fireAndForgetInvoker}
+                  toggleScreenshare={mainView.calling.callActions.toggleScreenshare}
+                />
+              )}
+
+              {isScreenshareActive && <ChooseScreen choose={repositories.calling.onChooseScreen} />}
+
+              <LegalHoldModal
                 selfUser={selfUser}
-                isRightSidebarOpen={isTruthy(currentState)}
-                openRightSidebar={toggleRightSidebar}
-                reloadApp={app.refresh}
-                appLockRepository={appLockRepository}
+                conversationRepository={repositories.conversation}
+                searchRepository={repositories.search}
+                teamRepository={repositories.team}
+                clientRepository={repositories.client}
+                messageRepository={repositories.message}
+                cryptographyRepository={repositories.cryptography}
               />
-            )}
+            </>
+          )}
 
-            {isTruthy(currentState) ? (
-              <RightSidebar
-                lastViewedMessageDetailsEntity={lastViewedMessageDetailsEntity}
-                currentEntity={currentEntity}
-                repositories={repositories}
-                actionsViewModel={mainView.actions}
-                isFederated={mainView.isFederated}
-                teamState={teamState}
-                selfUser={selfUser}
-                userState={userState}
-              />
-            ) : (
-              currentState
-            )}
-          </div>
-        )}
+          {/*The order of these elements matter to show proper modals stack upon each other*/}
+          <UserModal selfUser={selfUser} userRepository={repositories.user} />
+          <GroupCreationModal userState={userState} teamState={teamState} />
+          <CreateConversationModal />
+          <FileHistoryModal />
+          <TeamCreationModalContainer
+            selfUser={selfUser}
+            teamRepository={repositories.team}
+            userRepository={repositories.user}
+          />
+        </ErrorBoundary>
 
-        <AppLock appLockRepository={appLockRepository} clientRepository={repositories.client} />
-        <WarningsContainer onRefresh={app.refresh} />
-
-        {!locked && (
-          <>
-            <FeatureConfigChangeNotifier selfUserId={selfUser.id} teamState={teamState} />
-
-            {viewMode === CallingViewMode.FULL_SCREEN && (
-              <CallingContainer
-                propertiesRepository={repositories.properties}
-                callingRepository={repositories.calling}
-                fireAndForgetInvoker={fireAndForgetInvoker}
-                toggleScreenshare={mainView.calling.callActions.toggleScreenshare}
-              />
-            )}
-
-            {isDetachedCallingFeatureEnabled() && (
-              <DetachedCallingCell
-                propertiesRepository={repositories.properties}
-                callingRepository={repositories.calling}
-                fireAndForgetInvoker={fireAndForgetInvoker}
-                toggleScreenshare={mainView.calling.callActions.toggleScreenshare}
-              />
-            )}
-
-            {isScreenshareActive && <ChooseScreen choose={repositories.calling.onChooseScreen} />}
-
-            <LegalHoldModal
-              selfUser={selfUser}
-              conversationRepository={repositories.conversation}
-              searchRepository={repositories.search}
-              teamRepository={repositories.team}
-              clientRepository={repositories.client}
-              messageRepository={repositories.message}
-              cryptographyRepository={repositories.cryptography}
-            />
-          </>
-        )}
-
-        {/*The order of these elements matter to show proper modals stack upon each other*/}
-        <UserModal selfUser={selfUser} userRepository={repositories.user} />
-        <GroupCreationModal userState={userState} teamState={teamState} />
-        <CreateConversationModal />
-        <FileHistoryModal />
-        <TeamCreationModalContainer
-          selfUser={selfUser}
-          teamRepository={repositories.team}
-          userRepository={repositories.user}
-        />
-      </ErrorBoundary>
-
-      <div id="app-notification"></div>
-    </StyledApp>
+        <div id="app-notification"></div>
+      </StyledApp>
+    </CellsBinOperationsProvider>
   );
 };

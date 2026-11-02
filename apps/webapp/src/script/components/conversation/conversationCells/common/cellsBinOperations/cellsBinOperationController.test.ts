@@ -20,7 +20,7 @@ import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {BackendError, BackendErrorLabel, StatusCode} from '@wireapp/api-client/lib/http/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {JobsTaskStatus, RestActionStatus, TreeNodeType} from 'cells-sdk-ts';
-import {waitFor} from '@testing-library/react';
+import {act, waitFor} from '@testing-library/react';
 
 import type {CellsRepository} from 'Repositories/cells/cellsRepository';
 
@@ -115,9 +115,7 @@ describe('createCellsBinOperationController', () => {
       destinationPath: '/recycle_bin',
     };
 
-    expect(
-      controller.start({kind: 'move-to-bin', drive, path: '/files', targetIds: ['node-1'], summary}),
-    ).toBe(true);
+    expect(controller.start({kind: 'move-to-bin', drive, path: '/files', targetIds: ['node-1'], summary})).toBe(true);
     summary.items[0].name = 'Changed later';
 
     const snapshot = requireSnapshot(controller);
@@ -180,11 +178,161 @@ describe('createCellsBinOperationController', () => {
 
     controller.acknowledgeRefresh(drive, operation.id);
 
-    expect(getSnapshot(controller)).toMatchObject({id: operation.id, state: 'completed', needsRefresh: false, isLocked: false});
+    expect(getSnapshot(controller)).toMatchObject({
+      id: operation.id,
+      state: 'completed',
+      needsRefresh: false,
+      isLocked: false,
+    });
     clock.advanceByMilliseconds(20_000);
     expect(getSnapshot(controller)?.state).toBe('completed');
     expect(startDelete(controller)).toBe(true);
     controller.dispose();
+  });
+
+  it.each([
+    {
+      description: 'a missing job UUID in a background response',
+      response: {
+        Status: RestActionStatus.Background,
+        BackgroundActions: [{Name: 'delete', JobUuid: 'known-job'}, {Name: 'delete'}],
+      },
+    },
+    {
+      description: 'a missing job UUID in a performed response',
+      response: {
+        Status: RestActionStatus.Performed,
+        BackgroundActions: [{Name: 'delete', JobUuid: 'known-job'}, {Name: 'delete'}],
+      },
+    },
+    {
+      description: 'an unrecognized action with its own job UUID',
+      response: {
+        Status: RestActionStatus.Performed,
+        BackgroundActions: [
+          {Name: 'delete', JobUuid: 'known-job'},
+          {Name: 'move', JobUuid: 'untracked-job'},
+        ],
+      },
+    },
+  ])('does not acknowledge the known subset as complete after $description', async ({response}) => {
+    const {cellsRepository, controller} = createController();
+    cellsRepository.deleteNodes.mockResolvedValue(response);
+    cellsRepository.getBackgroundActionInfo.mockResolvedValue({Status: JobsTaskStatus.Finished});
+
+    expect(startDelete(controller)).toBe(true);
+    await waitFor(() => {
+      expect(getSnapshot(controller)).toMatchObject({
+        state: 'processing',
+        reason: 'status-unknown',
+        jobUuids: ['known-job'],
+        needsRefresh: true,
+        isLocked: true,
+      });
+    });
+
+    await controller.recheck(drive);
+    const operation = requireSnapshot(controller);
+    controller.acknowledgeRefresh(drive, operation.id);
+
+    expect(getSnapshot(controller)).toMatchObject({state: 'processing', isLocked: true, needsRefresh: true});
+    expect(cellsRepository.getBackgroundActionInfo).toHaveBeenCalledTimes(2);
+    expect(cellsRepository.getBackgroundActionInfo).toHaveBeenNthCalledWith(1, {name: 'delete', jobUuid: 'known-job'});
+    expect(cellsRepository.getBackgroundActionInfo).toHaveBeenNthCalledWith(2, {name: 'delete', jobUuid: 'known-job'});
+    expect(cellsRepository.deleteNodes).toHaveBeenCalledTimes(1);
+    controller.dispose();
+  });
+
+  it('preserves a known failure without acknowledging untrackable background actions', async () => {
+    const {cellsRepository, controller} = createController();
+    cellsRepository.deleteNodes.mockResolvedValue({
+      Status: RestActionStatus.Background,
+      BackgroundActions: [{Name: 'delete', JobUuid: 'failed-job'}, {Name: 'delete'}],
+    });
+    cellsRepository.getBackgroundActionInfo.mockResolvedValue({Status: JobsTaskStatus.Error});
+
+    expect(startDelete(controller)).toBe(true);
+    await waitFor(() => {
+      expect(getSnapshot(controller)).toMatchObject({
+        state: 'processing',
+        reason: 'job-failed',
+        jobUuids: ['failed-job'],
+        needsRefresh: true,
+        isLocked: true,
+      });
+    });
+
+    const operation = requireSnapshot(controller);
+    controller.acknowledgeRefresh(drive, operation.id);
+
+    expect(getSnapshot(controller)).toMatchObject({state: 'processing', reason: 'job-failed', isLocked: true});
+    expect(cellsRepository.getBackgroundActionInfo).toHaveBeenCalledTimes(1);
+    expect(cellsRepository.deleteNodes).toHaveBeenCalledTimes(1);
+    controller.dispose();
+  });
+
+  it('times out a hung no-job recheck, retries, and ignores the first late node result', async () => {
+    const {cellsRepository, clock, controller} = createController();
+    cellsRepository.deleteNodes.mockRejectedValue(new Error('connection lost'));
+    let resolveFirstNode: ((node: {IsRecycled: boolean}) => void) | undefined;
+    cellsRepository.getNode.mockImplementationOnce(() => {
+      return new Promise(resolve => {
+        resolveFirstNode = resolve;
+      });
+    });
+
+    expect(startDelete(controller, 'move-to-bin')).toBe(true);
+    await waitFor(() => {
+      expect(getSnapshot(controller)?.reason).toBe('request-failed');
+    });
+
+    let firstRecheck = Promise.resolve();
+    await act(async () => {
+      firstRecheck = controller.recheck(drive);
+      await waitFor(() => {
+        expect(cellsRepository.getNode).toHaveBeenCalledTimes(1);
+      });
+    });
+    await act(async () => {
+      clock.advanceByMilliseconds(20_000);
+      await firstRecheck;
+    });
+
+    cellsRepository.getNode.mockResolvedValue({IsRecycled: false});
+    await controller.recheck(drive);
+    resolveFirstNode?.({IsRecycled: true});
+    await Promise.resolve();
+
+    expect(cellsRepository.getNode).toHaveBeenCalledTimes(2);
+    expect(getSnapshot(controller)).toMatchObject({state: 'needs-review', reason: 'request-failed', isLocked: true});
+    expect(cellsRepository.deleteNodes).toHaveBeenCalledTimes(1);
+    controller.dispose();
+  });
+
+  it('stops a no-job target-read loop after disposal', async () => {
+    const {cellsRepository, controller} = createController();
+    cellsRepository.deleteNodes.mockRejectedValue(new Error('connection lost'));
+    let resolveFirstNode: ((node: {IsRecycled: boolean}) => void) | undefined;
+    cellsRepository.getNode.mockImplementationOnce(() => {
+      return new Promise(resolve => {
+        resolveFirstNode = resolve;
+      });
+    });
+
+    expect(startDelete(controller, 'move-to-bin')).toBe(true);
+    await waitFor(() => {
+      expect(getSnapshot(controller)?.reason).toBe('request-failed');
+    });
+    const recheck = controller.recheck(drive);
+    await waitFor(() => {
+      expect(cellsRepository.getNode).toHaveBeenCalledTimes(1);
+    });
+    controller.dispose();
+    resolveFirstNode?.({IsRecycled: true});
+    await recheck;
+
+    expect(cellsRepository.getNode).toHaveBeenCalledTimes(1);
+    expect(cellsRepository.deleteNodes).toHaveBeenCalledTimes(1);
   });
 
   it('uses authoritative node state to resolve a no-job move outcome without replaying the mutation', async () => {
@@ -229,9 +377,7 @@ describe('createCellsBinOperationController', () => {
     cellsRepository.deleteNodes.mockRejectedValue(new Error('connection lost'));
     cellsRepository.getNode
       .mockRejectedValueOnce(new BackendError('missing', BackendErrorLabel.NOT_FOUND, StatusCode.NOT_FOUND))
-      .mockRejectedValueOnce(
-        new BackendError('forbidden', BackendErrorLabel.ACCESS_DENIED, StatusCode.FORBIDDEN),
-      );
+      .mockRejectedValueOnce(new BackendError('forbidden', BackendErrorLabel.ACCESS_DENIED, StatusCode.FORBIDDEN));
 
     expect(startDelete(controller)).toBe(true);
     await waitFor(() => {
@@ -375,6 +521,145 @@ describe('createCellsBinOperationController', () => {
     controller.acknowledgeRefresh(drive, operation.id);
     expect(getSnapshot(controller)?.isLocked).toBe(true);
     expect(startDelete(controller)).toBe(false);
+    controller.dispose();
+  });
+
+  it('retains a per-job failure when another job status is unknown', async () => {
+    const {cellsRepository, controller} = createController();
+    cellsRepository.deleteNodes.mockResolvedValue({
+      Status: RestActionStatus.Background,
+      BackgroundActions: [
+        {Name: 'delete', JobUuid: 'job-failed'},
+        {Name: 'delete', JobUuid: 'job-unknown'},
+      ],
+    });
+    cellsRepository.getBackgroundActionInfo.mockImplementation(({jobUuid}: {jobUuid: string}) => {
+      return Promise.resolve({Status: jobUuid === 'job-failed' ? JobsTaskStatus.Error : JobsTaskStatus.Unknown});
+    });
+
+    expect(startDelete(controller)).toBe(true);
+    await waitFor(() => {
+      expect(cellsRepository.getBackgroundActionInfo).toHaveBeenCalledTimes(2);
+      expect(getSnapshot(controller)).toMatchObject({state: 'processing', reason: 'job-failed', isLocked: true});
+    });
+    const operation = requireSnapshot(controller);
+    controller.acknowledgeRefresh(drive, operation.id);
+    expect(getSnapshot(controller)?.isLocked).toBe(true);
+    controller.dispose();
+  });
+
+  it('times out a hung known-job recheck, retries it, and ignores the late prior status', async () => {
+    const {cellsRepository, clock, controller} = createController();
+    cellsRepository.deleteNodes.mockResolvedValue({
+      Status: RestActionStatus.Background,
+      BackgroundActions: [{Name: 'delete', JobUuid: 'job-1'}],
+    });
+    cellsRepository.getBackgroundActionInfo.mockResolvedValue({Status: JobsTaskStatus.Running});
+
+    expect(startDelete(controller, 'move-to-bin')).toBe(true);
+    await waitFor(() => {
+      expect(cellsRepository.getBackgroundActionInfo).toHaveBeenCalledTimes(1);
+    });
+    let resolveFirstRead: ((status: {Status: JobsTaskStatus}) => void) | undefined;
+    cellsRepository.getBackgroundActionInfo.mockImplementationOnce(() => {
+      return new Promise(resolve => {
+        resolveFirstRead = resolve;
+      });
+    });
+    const firstRecheck = controller.recheckAll();
+    await waitFor(() => {
+      expect(cellsRepository.getBackgroundActionInfo).toHaveBeenCalledTimes(2);
+    });
+    await act(async () => {
+      clock.advanceByMilliseconds(20_000);
+      await firstRecheck;
+    });
+
+    cellsRepository.getBackgroundActionInfo.mockResolvedValueOnce({Status: JobsTaskStatus.Finished});
+    await controller.recheckAll();
+    resolveFirstRead?.({Status: JobsTaskStatus.Running});
+    await Promise.resolve();
+
+    expect(cellsRepository.getBackgroundActionInfo).toHaveBeenCalledTimes(3);
+    expect(getSnapshot(controller)).toMatchObject({state: 'completed', isLocked: true, needsRefresh: true});
+    expect(cellsRepository.deleteNodes).toHaveBeenCalledTimes(1);
+    controller.dispose();
+  });
+
+  it.each([
+    [JobsTaskStatus.Finished, 'completed', undefined],
+    [JobsTaskStatus.Error, 'needs-review', 'job-failed'],
+  ] as const)(
+    'does not re-read a terminal job after a detached view when later reads fail (%s)',
+    async (status, state, reason) => {
+      const {cellsRepository, controller} = createController();
+      cellsRepository.deleteNodes.mockResolvedValue({
+        Status: RestActionStatus.Background,
+        BackgroundActions: [{Name: 'delete', JobUuid: 'job-1'}],
+      });
+      cellsRepository.getBackgroundActionInfo.mockResolvedValue({Status: status});
+
+      expect(startDelete(controller, 'move-to-bin')).toBe(true);
+      await waitFor(() => {
+        expect(getSnapshot(controller)).toMatchObject({state, reason, isLocked: true});
+      });
+      expect(cellsRepository.getBackgroundActionInfo).toHaveBeenCalledTimes(1);
+
+      cellsRepository.getBackgroundActionInfo.mockRejectedValue(new Error('status endpoint unavailable'));
+      await controller.recheck(drive);
+
+      expect(cellsRepository.getBackgroundActionInfo).toHaveBeenCalledTimes(1);
+      expect(getSnapshot(controller)).toMatchObject({state, reason, needsRefresh: true, isLocked: true});
+      controller.dispose();
+    },
+  );
+
+  it('reuses timed-out terminal evidence and starts a fresh view deadline without another status read', async () => {
+    const {cellsRepository, clock, controller} = createController();
+    cellsRepository.deleteNodes.mockResolvedValue({
+      Status: RestActionStatus.Background,
+      BackgroundActions: [{Name: 'delete', JobUuid: 'job-1'}],
+    });
+    cellsRepository.getBackgroundActionInfo.mockResolvedValue({Status: JobsTaskStatus.Finished});
+
+    expect(startDelete(controller)).toBe(true);
+    await waitFor(() => {
+      expect(getSnapshot(controller)?.state).toBe('completed');
+    });
+    expect(cellsRepository.getBackgroundActionInfo).toHaveBeenCalledTimes(1);
+    clock.advanceByMilliseconds(20_000);
+    expect(getSnapshot(controller)).toMatchObject({state: 'completed', needsRefresh: false, isLocked: true});
+
+    cellsRepository.getBackgroundActionInfo.mockRejectedValue(new Error('status endpoint unavailable'));
+    await controller.recheck(drive);
+
+    expect(cellsRepository.getBackgroundActionInfo).toHaveBeenCalledTimes(1);
+    expect(getSnapshot(controller)).toMatchObject({state: 'completed', needsRefresh: true, isLocked: true});
+    clock.advanceByMilliseconds(19_999);
+    expect(getSnapshot(controller)?.needsRefresh).toBe(true);
+    clock.advanceByMilliseconds(1);
+    expect(getSnapshot(controller)).toMatchObject({state: 'completed', needsRefresh: false, isLocked: true});
+    controller.dispose();
+  });
+
+  it('does not re-read targets after authoritative no-job completion evidence', async () => {
+    const {cellsRepository, controller} = createController();
+    cellsRepository.deleteNodes.mockRejectedValue(new Error('connection lost'));
+
+    expect(startDelete(controller, 'move-to-bin')).toBe(true);
+    await waitFor(() => {
+      expect(getSnapshot(controller)?.reason).toBe('request-failed');
+    });
+    cellsRepository.getNode.mockResolvedValue({IsRecycled: true});
+    await controller.recheck(drive);
+    expect(getSnapshot(controller)).toMatchObject({state: 'completed', isLocked: true});
+    expect(cellsRepository.getNode).toHaveBeenCalledTimes(2);
+
+    cellsRepository.getNode.mockRejectedValue(new Error('later read failed'));
+    await controller.recheck(drive);
+
+    expect(cellsRepository.getNode).toHaveBeenCalledTimes(2);
+    expect(getSnapshot(controller)).toMatchObject({state: 'completed', needsRefresh: true, isLocked: true});
     controller.dispose();
   });
 
@@ -530,7 +815,7 @@ describe('createCellsBinOperationController', () => {
     controller.dispose();
   });
 
-  it('keeps the permanent-delete deadline through job completion until refresh acknowledgement', async () => {
+  it('preserves a terminal completion through its refresh deadline', async () => {
     const {clock, controller} = createController();
     expect(startDelete(controller)).toBe(true);
     await waitFor(() => {
@@ -539,8 +824,8 @@ describe('createCellsBinOperationController', () => {
 
     clock.advanceByMilliseconds(20_000);
     expect(getSnapshot(controller)).toMatchObject({
-      state: 'needs-review',
-      reason: 'timed-out',
+      state: 'completed',
+      reason: undefined,
       needsRefresh: false,
       isLocked: true,
     });
@@ -548,7 +833,12 @@ describe('createCellsBinOperationController', () => {
 
     const operation = requireSnapshot(controller);
     controller.acknowledgeRefresh(drive, operation.id);
-    expect(getSnapshot(controller)).toMatchObject({state: 'needs-review', reason: 'timed-out', needsRefresh: false, isLocked: false});
+    expect(getSnapshot(controller)).toMatchObject({
+      state: 'completed',
+      reason: undefined,
+      needsRefresh: false,
+      isLocked: false,
+    });
     expect(startDelete(controller)).toBe(true);
     controller.dispose();
   });

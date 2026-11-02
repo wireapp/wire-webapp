@@ -38,6 +38,7 @@ const BACKGROUND_ACTION_POLL_INTERVAL_MS = 1000;
 const EXPONENTIAL_BACKOFF_BASE = 2;
 const MAX_BACKGROUND_ACTION_UNKNOWN_RETRIES = 5;
 const PERMANENT_DELETE_DEADLINE_MS = 20_000;
+const READONLY_RECHECK_TIMEOUT_MS = 20_000;
 
 export type BinOperationKind = 'move-to-bin' | 'permanent-delete' | 'empty-bin';
 export type BinOperationState = 'submitting' | 'processing' | 'needs-review' | 'completed' | 'rejected';
@@ -79,11 +80,17 @@ interface InternalOperation {
   snapshot: BinOperation;
   isLocked: boolean;
   hasKnownTerminalEvidence: boolean;
+  hasUntrackableJobs: boolean;
+  terminalState: 'completed' | 'needs-review' | undefined;
+  terminalReason: BinOperationReason | undefined;
   hasKnownJobFailure: boolean;
   generation: number;
+  pollingCycle: number;
   cancelPolling: (() => void) | undefined;
   cancelCheck: (() => void) | undefined;
   recheckPromise: Promise<void> | undefined;
+  recheckAttemptId: number;
+  cancelRecheck: (() => void) | undefined;
   restartTimeout: ReturnType<Clock['setTimeout']> | undefined;
   deadline: ReturnType<Clock['setTimeout']> | undefined;
 }
@@ -185,6 +192,10 @@ export const createCellsBinOperationController = ({
   const stopJobTracking = (operation: InternalOperation, keepDeadline = false): void => {
     operation.cancelPolling?.();
     operation.cancelPolling = undefined;
+    operation.pollingCycle += 1;
+    operation.recheckAttemptId += 1;
+    operation.cancelRecheck?.();
+    operation.cancelRecheck = undefined;
     operation.cancelCheck?.();
     operation.cancelCheck = undefined;
     clearRestartTimeout(operation);
@@ -200,6 +211,8 @@ export const createCellsBinOperationController = ({
   ): void => {
     const hasKnownTerminalEvidence = state === 'completed' || reason === 'partial' || reason === 'job-failed';
     operation.hasKnownTerminalEvidence ||= hasKnownTerminalEvidence;
+    operation.terminalState = state;
+    operation.terminalReason = reason;
     operation.hasKnownJobFailure ||= reason === 'job-failed' || reason === 'partial';
     const keepDeadline = operation.snapshot.kind === 'permanent-delete';
     if (keepDeadline) {
@@ -224,6 +237,25 @@ export const createCellsBinOperationController = ({
     );
   };
 
+  const createBackgroundActionReader = (
+    operation: InternalOperation,
+    isCurrentRead: () => boolean,
+  ): Pick<CellsRepository, 'getBackgroundActionInfo'> => {
+    return {
+      getBackgroundActionInfo: async request => {
+        const response = await cellsRepository.getBackgroundActionInfo(request);
+        if (
+          isCurrentRead() &&
+          (response.Status === JobsTaskStatus.Error || response.Status === JobsTaskStatus.Interrupted)
+        ) {
+          operation.hasKnownJobFailure = true;
+          update(operation, {reason: 'job-failed'});
+        }
+        return response;
+      },
+    };
+  };
+
   const startDeadline = (operation: InternalOperation): void => {
     if (operation.snapshot.kind !== 'permanent-delete' || operation.deadline !== undefined) {
       return;
@@ -237,11 +269,24 @@ export const createCellsBinOperationController = ({
       }
       current.cancelPolling?.();
       current.cancelPolling = undefined;
+      current.pollingCycle += 1;
+      current.recheckAttemptId += 1;
+      current.cancelRecheck?.();
+      current.cancelRecheck = undefined;
       current.cancelCheck?.();
       current.cancelCheck = undefined;
       clearRestartTimeout(current);
       current.deadline = undefined;
       current.isLocked = true;
+      if (current.hasKnownTerminalEvidence) {
+        update(current, {
+          state: current.terminalState ?? current.snapshot.state,
+          reason: current.terminalReason,
+          needsRefresh: false,
+          isLocked: true,
+        });
+        return;
+      }
       const reason =
         current.snapshot.reason === 'job-failed' || current.snapshot.reason === 'partial'
           ? current.snapshot.reason
@@ -267,6 +312,10 @@ export const createCellsBinOperationController = ({
     if (!isCurrent(operation)) {
       return;
     }
+    if (operation.hasUntrackableJobs) {
+      setUnresolvedOutcome(operation, 'status-unknown');
+      return;
+    }
     if (outcome === 'all-finished') {
       setTerminalOutcome(
         operation,
@@ -289,11 +338,16 @@ export const createCellsBinOperationController = ({
   const beginPolling = (operation: InternalOperation): void => {
     operation.cancelPolling?.();
     operation.cancelPolling = undefined;
+    operation.pollingCycle += 1;
     startDeadline(operation);
     const generation = operation.generation;
+    const pollingCycle = operation.pollingCycle;
     const {id, drive, jobUuids} = operation.snapshot;
+    const pollingRepository = createBackgroundActionReader(operation, () => {
+      return isCurrent(operation) && operation.pollingCycle === pollingCycle;
+    });
     operation.cancelPolling = observeCellsBackgroundActionJobs({
-      cellsRepository,
+      cellsRepository: pollingRepository,
       actionName: 'delete',
       jobUuids,
       clock,
@@ -308,15 +362,7 @@ export const createCellsBinOperationController = ({
       isCurrent: () => {
         return getCurrentOperation(getDriveKey(drive), id, generation) !== undefined;
       },
-      onStatusSnapshot(statuses) {
-        if (
-          statuses.some(status => {
-            return status === JobsTaskStatus.Error || status === JobsTaskStatus.Interrupted;
-          })
-        ) {
-          operation.hasKnownJobFailure = true;
-        }
-      },
+
       onOutcome: outcome => {
         onPollingOutcome(operation, outcome);
       },
@@ -370,6 +416,10 @@ export const createCellsBinOperationController = ({
       }
 
       const evidence = getCellsBackgroundActionEvidence(response, 'delete');
+      operation.hasUntrackableJobs = (response.BackgroundActions ?? []).some(action => {
+        return action.Name !== 'delete' || typeof action.JobUuid !== 'string' || action.JobUuid.length === 0;
+      });
+      operation.hasKnownJobFailure ||= evidence.hasFailedJobs;
       if (evidence.hasCompleted) {
         setTerminalOutcome(operation, 'completed', undefined);
         return;
@@ -377,13 +427,16 @@ export const createCellsBinOperationController = ({
 
       if (evidence.jobUuids.length > 0) {
         update(operation, {jobUuids: evidence.jobUuids});
-        operation.hasKnownJobFailure ||= evidence.hasFailedJobs;
         beginPolling(operation);
         return;
       }
 
       if (evidence.hasFailedJobs) {
-        setTerminalOutcome(operation, 'needs-review', 'job-failed');
+        if (operation.hasUntrackableJobs) {
+          setUnresolvedOutcome(operation, 'status-unknown');
+        } else {
+          setTerminalOutcome(operation, 'needs-review', 'job-failed');
+        }
         return;
       }
 
@@ -432,11 +485,17 @@ export const createCellsBinOperationController = ({
       }),
       isLocked: true,
       hasKnownTerminalEvidence: false,
+      hasUntrackableJobs: false,
+      terminalState: undefined,
+      terminalReason: undefined,
       hasKnownJobFailure: false,
       generation: (existing?.generation ?? 0) + 1,
+      pollingCycle: 0,
       cancelPolling: undefined,
       cancelCheck: undefined,
       recheckPromise: undefined,
+      recheckAttemptId: 0,
+      cancelRecheck: undefined,
       restartTimeout: undefined,
       deadline: undefined,
     } satisfies InternalOperation;
@@ -450,28 +509,31 @@ export const createCellsBinOperationController = ({
     return operations.get(getDriveKey(drive))?.snapshot;
   };
 
-  const hasAuthoritativeCompletion = async (operation: InternalOperation): Promise<boolean> => {
+  const hasAuthoritativeCompletion = async (
+    operation: InternalOperation,
+    isCurrentAttempt: () => boolean,
+  ): Promise<boolean> => {
     const {kind, targetIds} = operation.snapshot;
     if (kind === 'empty-bin' || targetIds.length === 0) {
       return false;
     }
 
-    if (kind === 'move-to-bin') {
-      const nodes = await Promise.all(
-        targetIds.map(uuid => {
-          return cellsRepository.getNode({uuid});
-        }),
-      );
-      return nodes.every(node => {
-        return node.IsRecycled === true;
-      });
-    }
-
     for (const uuid of targetIds) {
-      try {
-        await cellsRepository.getNode({uuid});
+      if (!isCurrentAttempt()) {
         return false;
+      }
+      try {
+        const node = await cellsRepository.getNode({uuid});
+        if (!isCurrentAttempt()) {
+          return false;
+        }
+        if (kind === 'permanent-delete' || node.IsRecycled !== true) {
+          return false;
+        }
       } catch (error) {
+        if (!isCurrentAttempt() || kind !== 'permanent-delete') {
+          return false;
+        }
         if (!(error instanceof BackendError) || error.code !== StatusCode.NOT_FOUND) {
           return false;
         }
@@ -502,77 +564,161 @@ export const createCellsBinOperationController = ({
     if (operation.cancelPolling !== undefined && !force) {
       return Promise.resolve();
     }
+    if (operation.hasKnownTerminalEvidence) {
+      if (operation.snapshot.kind === 'permanent-delete') {
+        startDeadline(operation);
+      }
+      operation.isLocked = true;
+      update(operation, {
+        state: operation.terminalState ?? operation.snapshot.state,
+        reason: operation.terminalReason,
+        needsRefresh: true,
+        isLocked: true,
+      });
+      return Promise.resolve();
+    }
 
     const {id, drive, jobUuids} = operation.snapshot;
     const generation = operation.generation;
     const driveKey = getDriveKey(drive);
-    const runCheck = async (): Promise<void> => {
-      if (jobUuids.length === 0) {
-        try {
-          const isComplete = await hasAuthoritativeCompletion(operation);
-          const current = getCurrentOperation(driveKey, id, generation);
-          if (isComplete && current !== undefined) {
-            setTerminalOutcome(current, 'completed', undefined);
-          }
-        } catch {
-          // Failed reads are not evidence that an operation completed.
+    const attemptId = ++operation.recheckAttemptId;
+    let isAborted = false;
+    let isSettled = false;
+    let timeout: ReturnType<Clock['setTimeout']> | undefined;
+    let cancelRead = noop;
+    let resolveAbort: (() => void) | undefined;
+    const isCurrentAttempt = (): boolean => {
+      return (
+        !isAborted &&
+        !isSettled &&
+        operation.recheckAttemptId === attemptId &&
+        getCurrentOperation(driveKey, id, generation) !== undefined
+      );
+    };
+    const clearAttempt = (): void => {
+      if (timeout !== undefined) {
+        clock.clearTimeout(timeout);
+        timeout = undefined;
+      }
+      if (operation.cancelRecheck === abort) {
+        operation.cancelRecheck = undefined;
+      }
+      if (operation.cancelCheck === cancelRead) {
+        operation.cancelCheck = undefined;
+      }
+    };
+    const abort = (): void => {
+      if (isAborted || isSettled) {
+        return;
+      }
+      isAborted = true;
+      if (operation.recheckAttemptId === attemptId) {
+        operation.recheckAttemptId += 1;
+      }
+      clearAttempt();
+      cancelRead();
+      resolveAbort?.();
+    };
+    const aborted = new Promise<void>(resolve => {
+      resolveAbort = resolve;
+    });
+    operation.cancelRecheck = abort;
+    timeout = clock.setTimeout(abort, READONLY_RECHECK_TIMEOUT_MS);
+
+    const runRead = async (): Promise<
+      | {readonly kind: 'authoritative'; readonly isComplete: boolean}
+      | {readonly kind: 'jobs'; readonly hasPendingJobs: boolean; readonly hasFailedJobs: boolean}
+      | undefined
+    > => {
+      try {
+        if (jobUuids.length === 0) {
+          const isComplete = await hasAuthoritativeCompletion(operation, isCurrentAttempt);
+          return isCurrentAttempt() ? {kind: 'authoritative', isComplete} : undefined;
         }
+
+        if (force) {
+          operation.cancelPolling?.();
+          operation.cancelPolling = undefined;
+        }
+        const check = checkCellsBackgroundActionJobs({
+          cellsRepository: createBackgroundActionReader(operation, isCurrentAttempt),
+          actionName: 'delete',
+          jobUuids,
+          clock,
+          isCurrent: isCurrentAttempt,
+        });
+        cancelRead = check.cancel;
+        operation.cancelCheck = cancelRead;
+        const result = await check.result;
+        if (!isCurrentAttempt() || maybe.isNothing(result)) {
+          return undefined;
+        }
+        return {
+          kind: 'jobs',
+          hasPendingJobs: result.value.hasPendingJobs,
+          hasFailedJobs: result.value.hasFailedJobs,
+        };
+      } catch {
+        // Failed reads are not evidence that an operation completed.
+        return undefined;
+      }
+    };
+
+    const runCheck = async (): Promise<void> => {
+      const result = await Promise.race([
+        runRead(),
+        aborted.then(() => {
+          return undefined;
+        }),
+      ]);
+      if (!isCurrentAttempt() || result === undefined) {
         return;
       }
-
-      if (force) {
-        operation.cancelPolling?.();
-        operation.cancelPolling = undefined;
-      }
-      operation.cancelCheck?.();
-      const check = checkCellsBackgroundActionJobs({
-        cellsRepository,
-        actionName: 'delete',
-        jobUuids,
-        clock,
-        isCurrent: () => {
-          return getCurrentOperation(driveKey, id, generation) !== undefined;
-        },
-      });
-      operation.cancelCheck = check.cancel;
-      const result = await check.result;
-      if (maybe.isNothing(result)) {
-        return;
-      }
-
+      isSettled = true;
+      clearAttempt();
       const current = getCurrentOperation(driveKey, id, generation);
       if (current === undefined) {
         return;
       }
-      current.cancelCheck = undefined;
-      if (result.value.hasPendingJobs) {
+      if (result.kind === 'authoritative') {
+        if (result.isComplete) {
+          setTerminalOutcome(current, 'completed', undefined);
+        }
+        return;
+      }
+      if (result.hasPendingJobs) {
+        if (result.hasFailedJobs) {
+          current.hasKnownJobFailure = true;
+          update(current, {reason: 'job-failed'});
+        }
         const hasExpiredDeadline = current.snapshot.reason === 'timed-out' && current.deadline === undefined;
         if (!hasExpiredDeadline) {
           schedulePollingRestart(current);
         }
         return;
       }
+      if (current.hasUntrackableJobs) {
+        current.hasKnownJobFailure ||= result.hasFailedJobs;
+        setUnresolvedOutcome(current, 'status-unknown');
+        return;
+      }
       setTerminalOutcome(
         current,
-        result.value.hasFailedJobs ? 'needs-review' : 'completed',
-        result.value.hasFailedJobs ? 'job-failed' : undefined,
+        result.hasFailedJobs ? 'needs-review' : 'completed',
+        result.hasFailedJobs ? 'job-failed' : undefined,
       );
     };
 
-    const checkPromise = runCheck();
+    const checkPromise = runCheck().finally(() => {
+      if (!isAborted && !isSettled) {
+        isSettled = true;
+        clearAttempt();
+      }
+      if (operation.recheckPromise === checkPromise) {
+        operation.recheckPromise = undefined;
+      }
+    });
     operation.recheckPromise = checkPromise;
-    void checkPromise.then(
-      () => {
-        if (operation.recheckPromise === checkPromise) {
-          operation.recheckPromise = undefined;
-        }
-      },
-      () => {
-        if (operation.recheckPromise === checkPromise) {
-          operation.recheckPromise = undefined;
-        }
-      },
-    );
     return checkPromise;
   };
 

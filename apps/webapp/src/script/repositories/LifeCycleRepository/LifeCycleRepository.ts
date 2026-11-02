@@ -77,6 +77,7 @@ export const doSimpleRedirect = (signOutReason: SIGN_OUT_REASON): void => {
 };
 
 export interface LifeCycleDependencies {
+  disposeBinOperations: () => void;
   clientRepository: ClientRepository;
   conversationRepository: ConversationRepository;
   eventRepository: EventRepository;
@@ -199,6 +200,7 @@ export class LifeCycleRepository {
    * Cleans up active conversation state and disconnects WebSocket connections.
    */
   private readonly cleanupActiveSession = async (): Promise<void> => {
+    this.dependencies.disposeBinOperations();
     this.logger.debug(
       'Cleaning up active session: ending typing indicators, disconnecting events, and clearing conversation state.',
     );
