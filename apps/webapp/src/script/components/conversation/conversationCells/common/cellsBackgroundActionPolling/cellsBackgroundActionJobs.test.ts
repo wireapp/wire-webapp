@@ -30,11 +30,14 @@ import {
 } from './cellsBackgroundActionJobs';
 
 const createCheckOptions = (): Parameters<typeof checkCellsBackgroundActionJobs>[0] & {
-  cellsRepository: {getBackgroundActionInfo: jest.Mock};
+  cellsRepository: {getBackgroundActionInfo: jest.Mock; getBackgroundMoveInfo: jest.Mock};
   clock: ReturnType<typeof createDeterministicClock>;
 } => {
   return {
-    cellsRepository: {getBackgroundActionInfo: jest.fn().mockResolvedValue({Status: JobsTaskStatus.Finished})},
+    cellsRepository: {
+      getBackgroundActionInfo: jest.fn().mockResolvedValue({Status: JobsTaskStatus.Finished}),
+      getBackgroundMoveInfo: jest.fn().mockResolvedValue({Status: JobsTaskStatus.Finished}),
+    },
     actionName: 'delete' as const,
     jobUuids: ['job-1'],
     clock: createDeterministicClock({initialUnixEpochMicroseconds: 0n}),
@@ -136,7 +139,7 @@ describe('getCellsBackgroundActionEvidence', () => {
 describe('observeCellsBackgroundActionJobs', () => {
   it('reads the requested action and retries a rejected read under the caller policy', async () => {
     const options = createCheckOptions();
-    options.cellsRepository.getBackgroundActionInfo.mockRejectedValueOnce(new Error('offline'));
+    options.cellsRepository.getBackgroundMoveInfo.mockRejectedValueOnce(new Error('offline'));
     const onOutcome = jest.fn();
     const getUnknownRetryDelay = jest.fn(() => {
       return 500;
@@ -160,7 +163,8 @@ describe('observeCellsBackgroundActionJobs', () => {
     await waitFor(() => {
       expect(onOutcome).toHaveBeenCalledWith('all-finished');
     });
-    expect(options.cellsRepository.getBackgroundActionInfo).toHaveBeenCalledWith({name: 'move', jobUuid: 'job-1'});
+    expect(options.cellsRepository.getBackgroundMoveInfo).toHaveBeenCalledWith({jobUuid: 'job-1'});
+    expect(options.cellsRepository.getBackgroundActionInfo).not.toHaveBeenCalled();
     cancel();
   });
 });
