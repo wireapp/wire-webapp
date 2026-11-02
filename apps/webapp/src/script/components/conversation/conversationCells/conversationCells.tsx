@@ -46,7 +46,7 @@ import {
 import {getCellsApiPath} from './common/getCellsApiPath/getCellsApiPath';
 import {getCellsFilesPath} from './common/getCellsFilesPath/getCellsFilesPath';
 import {getLoadMoreOffset} from './common/loadMorePagination/loadMorePagination';
-import {isInRecycleBin as isCurrentPathInRecycleBin} from './common/recycleBin/recycleBin';
+import {isInRecycleBin as isCurrentPathInRecycleBin, RECYCLE_BIN_PATH} from './common/recycleBin/recycleBin';
 import {useCellsSorting} from './common/useCellsSorting/useCellsSorting';
 import {useCellsStore} from './common/useCellsStore/useCellsStore';
 import {useConversationDriveFilters} from './common/useConversationDriveFilters/useConversationDriveFilters';
@@ -226,6 +226,31 @@ export const ConversationCells = memo(
       return refreshResult.isOk && refreshResult.value;
     }, [refresh]);
 
+    const handleRefreshAfterBulkMoveToBinOutcome = useCallback(async (): Promise<boolean> => {
+      const [sourceResult, binResult] = await Promise.all([
+        task.tryOrElse(
+          error => {
+            return error;
+          },
+          () => {
+            return refresh({preserveStatusOnError: true});
+          },
+        ),
+        task.tryOrElse(
+          error => {
+            return error;
+          },
+          () => {
+            return cellsRepository.getAllNodes({
+              path: getCellsApiPath({conversationQualifiedId, currentPath: RECYCLE_BIN_PATH}),
+              deleted: true,
+            });
+          },
+        ),
+      ]);
+      return sourceResult.isOk && sourceResult.value && binResult.isOk;
+    }, [cellsRepository, conversationQualifiedId, refresh]);
+
     const sharedDriveUploadPath = getCellsApiPath({conversationQualifiedId, currentPath: getCellsFilesPath()});
     const sharedDriveConversationQualifiedId = `${conversationQualifiedId.id}@${conversationQualifiedId.domain}`;
 
@@ -383,6 +408,7 @@ export const ConversationCells = memo(
                 conversationName={name}
                 onRefresh={handleRefresh}
                 onRefreshAfterBulkMoveOutcome={handleRefreshAfterBulkMoveOutcome}
+                onRefreshAfterBulkMoveToBinOutcome={handleRefreshAfterBulkMoveToBinOutcome}
                 // opening a folder must close search view and open the browse view
                 // with that folder (and breadcrumbs)
                 onCloseSearchView={handleSearchViewClosure}

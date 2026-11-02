@@ -152,6 +152,19 @@ export const bulkMoveButtonStyles: CSSObject = {
   },
 };
 
+export const bulkMoveToBinButtonStyles: CSSObject = {
+  ...bulkMoveButtonStyles,
+  marginLeft: 0,
+  borderColor: 'transparent',
+  background: 'var(--danger-color)',
+  color: 'var(--main-color)',
+
+  '&:hover, &:focus-visible': {
+    background: 'var(--danger-color)',
+    opacity: 0.9,
+  },
+};
+
 export const tableStyles: CSSObject = {
   width: '100%',
   borderCollapse: 'collapse',
