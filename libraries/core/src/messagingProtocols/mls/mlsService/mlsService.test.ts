@@ -126,6 +126,15 @@ const createCredentialRef = (credentialType: CredentialType, earliestValidity = 
   } as unknown as CredentialRef;
 };
 
+const useMigratedCredentialFixture = (coreCrypto: jest.Mocked<CoreCrypto>, credentials: CredentialRef[]): void => {
+  // CoreCrypto owns the legacy IndexedDB import. These fixtures pin the WebApp's behavior after that migration.
+  coreCrypto.findCredentials.mockImplementation(async ({credentialType}) => {
+    return credentials.filter(credential => {
+      return credential.type() === credentialType;
+    });
+  });
+};
+
 const createKeyPackage = (bytes = new Uint8Array()): KeyPackage => {
   return {
     serialize: jest.fn(() => {
@@ -433,6 +442,41 @@ describe('MLSService', () => {
       expect(coreCrypto.transaction).toHaveBeenCalledTimes(1);
       expect(transactionContext.createConversation).toHaveBeenCalledTimes(1);
       expect(mlsService.addUsersToExistingConversation).toHaveBeenCalledWith(groupId, keyPackages, transactionContext);
+    });
+  });
+
+  describe('migrated credential selection', () => {
+    const removalKeys = {ed25519: 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm3OQFc='};
+
+    it('uses the newest credential when migration restored multiple basic credentials', async () => {
+      const [mlsService, {coreCrypto, transactionContext}] = await createMLSService();
+      const olderBasicCredential = createCredentialRef(CredentialType.Basic, 10n);
+      const newestBasicCredential = createCredentialRef(CredentialType.Basic, 20n);
+      useMigratedCredentialFixture(coreCrypto, [newestBasicCredential, olderBasicCredential]);
+
+      await mlsService.registerEmptyConversation(mockGroupId, transactionContext, removalKeys);
+
+      expect(transactionContext.createConversation).toHaveBeenCalledWith(
+        expect.any(ConversationId),
+        newestBasicCredential,
+        expect.any(ExternalSender),
+      );
+    });
+
+    it('prefers the newest X509 credential when migration restored basic and X509 credentials', async () => {
+      const [mlsService, {coreCrypto, transactionContext}] = await createMLSService();
+      const newestBasicCredential = createCredentialRef(CredentialType.Basic, 30n);
+      const olderX509Credential = createCredentialRef(CredentialType.X509, 10n);
+      const newestX509Credential = createCredentialRef(CredentialType.X509, 20n);
+      useMigratedCredentialFixture(coreCrypto, [newestBasicCredential, olderX509Credential, newestX509Credential]);
+
+      await mlsService.registerEmptyConversation(mockGroupId, transactionContext, removalKeys);
+
+      expect(transactionContext.createConversation).toHaveBeenCalledWith(
+        expect.any(ConversationId),
+        newestX509Credential,
+        expect.any(ExternalSender),
+      );
     });
   });
 
