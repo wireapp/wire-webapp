@@ -200,6 +200,21 @@ describe('checkCellsBackgroundActionJobs', () => {
     expect(await result).toEqual(Maybe.just({hasPendingJobs: true, hasFailedJobs: true}));
   });
 
+  it('does not start reading when the scope is already stale', async () => {
+    const options = createCheckOptions();
+
+    const check = checkCellsBackgroundActionJobs({
+      ...options,
+      isCurrent: () => {
+        return false;
+      },
+    });
+
+    expect(await check.result).toEqual(Maybe.nothing());
+    expect(options.cellsRepository.getBackgroundActionInfo).not.toHaveBeenCalled();
+    check.cancel();
+  });
+
   it('resolves an empty batch without reading', async () => {
     const options = createCheckOptions();
 
