@@ -28,6 +28,7 @@ import type File from 'vinyl';
 import {exec} from 'node:child_process';
 import {createWriteStream} from 'node:fs';
 import path from 'node:path';
+import {promisify} from 'node:util';
 
 export async function copyAsync(source: string, destination: string): Promise<File[]> {
   if (isFile(destination)) {
@@ -99,16 +100,4 @@ export const isFile = (path: string): boolean => {
   return /\w\.\w+$/.test(path);
 };
 export const rimrafAsync = rimraf;
-export function execAsync(command: string): Promise<{stdout: string; stderr: string}> {
-  return new Promise((resolve, reject) => {
-    exec(command, (error, stdout, stderr) => {
-      if (error !== null) {
-        reject(error);
-
-        return;
-      }
-
-      resolve({stdout, stderr});
-    });
-  });
-}
+export const execAsync = promisify(exec);
