@@ -178,12 +178,7 @@ describe('handleMLSMessageAdd', () => {
       payloads.map(payload => {
         return payload.decryptedData?.messageId;
       }),
-    ).toEqual([
-      'buffered-application',
-      'buffered-transient',
-      'buffered-targeted',
-      'buffered-persisted-targeted',
-    ]);
+    ).toEqual(['buffered-application', 'buffered-transient', 'buffered-targeted', 'buffered-persisted-targeted']);
     expect(
       payloads.map(payload => {
         return payload.event;
