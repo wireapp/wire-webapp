@@ -318,6 +318,7 @@ function createRspackConfiguration(mode: 'development' | 'production' = 'product
     ],
     resolve: {
       alias: {
+        '@enormora/clock$': path.resolve(rootPath, 'node_modules/@enormora/clock/index.js'),
         '@enormora/fire-and-forget$': path.resolve(rootPath, 'node_modules/@enormora/fire-and-forget/index.js'),
         // `@wireapp/core-crypto` V11 only exposes an `import` condition. `@wireapp/core` is compiled to CommonJS, so
         // its `require()` calls would otherwise fail with "Package subpath '.' is not defined by exports".

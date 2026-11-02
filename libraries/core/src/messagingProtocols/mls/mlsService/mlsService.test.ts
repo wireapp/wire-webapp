@@ -222,6 +222,7 @@ const createMLSService = async (): Promise<MLSServiceTestSetup> => {
     keyingMaterialUpdateThreshold: 1,
     signatureAlgorithm: MLSPublicKeyAlgorithmKeys.ED25519,
   };
+  mlsService['clientInitialized'] = true;
   return [
     mlsService,
     {apiClient, coreCrypto: mockCoreCrypto, recurringTaskScheduler, transactionContext, coreDatabase: mockedDb},
@@ -478,6 +479,16 @@ describe('MLSService', () => {
         expect.any(ExternalSender),
       );
     });
+  });
+
+  it('does not query CoreCrypto conversations before the MLS client is initialized', async () => {
+    const [mlsService, {coreCrypto}] = await createMLSService();
+    mlsService['clientInitialized'] = false;
+
+    await expect(mlsService.conversationExists(mockGroupId)).resolves.toBe(false);
+
+    expect(coreCrypto.registerEpochObserver).not.toHaveBeenCalled();
+    expect(coreCrypto.conversationExists).not.toHaveBeenCalled();
   });
 
   describe('getKeyPackagesPayload', () => {
@@ -749,6 +760,10 @@ describe('MLSService', () => {
       await mlsService.initClient(mockUserId, mockClient, config);
 
       expect(transactionContext.mlsInit).toHaveBeenCalledWith(expect.any(ClientId), expectedMlsTransport);
+      expect(coreCrypto.registerEpochObserver).toHaveBeenCalledTimes(1);
+      expect(transactionContext.mlsInit.mock.invocationCallOrder[0]).toBeLessThan(
+        coreCrypto.registerEpochObserver.mock.invocationCallOrder[0],
+      );
 
       expect(mlsService.config.nbKeyPackages).toEqual(100);
     });

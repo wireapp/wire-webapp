@@ -17,7 +17,8 @@
  *
  */
 
-import {createClock, type Clock} from '@enormora/clock';
+import {createClock} from '@enormora/clock';
+import type {Clock} from '@enormora/clock/clock';
 import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import {

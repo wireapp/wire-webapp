@@ -136,6 +136,8 @@ const MLS_CONVERSATION_RECOVERY_KEY = 'required';
 export class MLSService extends TypedEventEmitter<Events> {
   logger = LogFactory.getLogger('@wireapp/core/MLSService');
   private _config?: ConfiguredMLSConfig;
+  private clientInitialized = false;
+  private epochObserverRegistered = false;
   private readonly textDecoder = new TextDecoder();
   private initialKeyPackageUploadDeferred = false;
   private readonly mlsTransport: MlsTransport;
@@ -155,6 +157,12 @@ export class MLSService extends TypedEventEmitter<Events> {
         return Promise.resolve(historySecret.data);
       },
     };
+  }
+
+  private async ensureEpochObserverRegistered(): Promise<void> {
+    if (this.epochObserverRegistered) {
+      return;
+    }
 
     const epochObserver: EpochObserver = {
       epochChanged: async (groupId, epoch) => {
@@ -164,14 +172,15 @@ export class MLSService extends TypedEventEmitter<Events> {
       },
     };
 
-    void this.coreCryptoClient.registerEpochObserver(epochObserver);
+    await this.coreCryptoClient.registerEpochObserver(epochObserver);
+    this.epochObserverRegistered = true;
   }
 
   /**
    * return true if the MLS service if configured and ready to be used
    */
   get isEnabled(): boolean {
-    return this._config !== undefined;
+    return this._config !== undefined && this.clientInitialized;
   }
 
   get config(): ConfiguredMLSConfig {
@@ -192,7 +201,9 @@ export class MLSService extends TypedEventEmitter<Events> {
   private getCredentialRef(): Task<CredentialRef, unknown> {
     const findCredentials = (credentialType: CredentialType): Task<CredentialRef[], unknown> => {
       return task.tryOrElse(
-        error => error,
+        error => {
+          return error;
+        },
         () => {
           return this.coreCryptoClient.findCredentials({
             cipherSuite: this.config.defaultCiphersuite,
@@ -223,8 +234,12 @@ export class MLSService extends TypedEventEmitter<Events> {
   private async requireCredentialRef(): Promise<CredentialRef> {
     const credentialRef = await this.getCredentialRef();
     return credentialRef.match({
-      Ok: value => Promise.resolve(value),
-      Err: error => Promise.reject(error),
+      Ok: value => {
+        return Promise.resolve(value);
+      },
+      Err: error => {
+        return Promise.reject(error);
+      },
     });
   }
 
@@ -279,6 +294,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     client: RegisteredClient,
     {skipInitIdentity, ...mlsConfig}: InitClientOptions,
   ): Promise<void> {
+    this.clientInitialized = false;
     // filter out undefined values from mlsConfig
     const filteredMLSConfig = Object.fromEntries(
       Object.entries(mlsConfig).filter(([, value]) => {
@@ -288,8 +304,12 @@ export class MLSService extends TypedEventEmitter<Events> {
 
     this.initialKeyPackageUploadDeferred = skipInitIdentity === true;
     const signatureAlgorithm = await getSignatureAlgorithmForCiphersuite(mlsConfig.defaultCiphersuite).match({
-      Ok: value => Promise.resolve(value),
-      Err: error => Promise.reject(error),
+      Ok: value => {
+        return Promise.resolve(value);
+      },
+      Err: error => {
+        return Promise.reject(error);
+      },
     });
     this._config = {
       ...defaultConfig,
@@ -301,6 +321,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     await this.coreCryptoClient.transaction(cx => {
       return cx.mlsInit(coreCryptoClientId, this.mlsTransport);
     });
+    await this.ensureEpochObserverRegistered();
     await this.ensureBasicCredentials(coreCryptoClientId);
 
     this.initialKeyPackageUploadDeferred =
@@ -337,6 +358,7 @@ export class MLSService extends TypedEventEmitter<Events> {
       this.logger.error(`Error while initializing client ${client.id}`, error);
       throw error;
     }
+    this.clientInitialized = true;
   }
 
   /**
@@ -352,8 +374,12 @@ export class MLSService extends TypedEventEmitter<Events> {
 
     const uploadResult = await task
       .tryOrElse(
-        error => this.toMlsTransportError(error),
-        () => this.apiClient.api.conversation.postMlsCommitBundle(bundlePayload),
+        error => {
+          return this.toMlsTransportError(error);
+        },
+        () => {
+          return this.apiClient.api.conversation.postMlsCommitBundle(bundlePayload);
+        },
       )
       .andThen(response => {
         if (response.failed_to_send !== undefined) {
@@ -372,8 +398,12 @@ export class MLSService extends TypedEventEmitter<Events> {
       });
 
     return uploadResult.match({
-      Ok: () => Promise.resolve(),
-      Err: error => Promise.reject(error),
+      Ok: () => {
+        return Promise.resolve();
+      },
+      Err: error => {
+        return Promise.reject(error);
+      },
     });
   };
 
@@ -731,7 +761,9 @@ export class MLSService extends TypedEventEmitter<Events> {
         );
       }
       const parsedExternalSender = result.tryOrElse(
-        error => error,
+        error => {
+          return error;
+        },
         () => {
           return ExternalSender.parse(
             Decoder.fromBase64(removalKeyForSignature).asBytes,
@@ -740,8 +772,12 @@ export class MLSService extends TypedEventEmitter<Events> {
         },
       );
       externalSender = await parsedExternalSender.match({
-        Ok: value => Promise.resolve(value),
-        Err: error => Promise.reject(error),
+        Ok: value => {
+          return Promise.resolve(value);
+        },
+        Err: error => {
+          return Promise.reject(error);
+        },
       });
     }
 
@@ -925,6 +961,9 @@ export class MLSService extends TypedEventEmitter<Events> {
    * @param groupId groupId of the conversation
    */
   public async conversationExists(groupId: string): Promise<boolean> {
+    if (!this.isEnabled) {
+      return false;
+    }
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
     return this.coreCryptoClient.conversationExists(new ConversationId(groupIdBytes));
   }
@@ -1232,8 +1271,12 @@ export class MLSService extends TypedEventEmitter<Events> {
 
   private async runPendingProposalsTask(groupId: string): Promise<void> {
     const commitResult = await task.tryOrElse(
-      error => error,
-      () => this.commitPendingProposals(groupId),
+      error => {
+        return error;
+      },
+      () => {
+        return this.commitPendingProposals(groupId);
+      },
     );
 
     commitResult.match({
@@ -1261,8 +1304,12 @@ export class MLSService extends TypedEventEmitter<Events> {
     }
 
     const pendingProposalResult = await task.tryOrElse(
-      error => error,
-      () => this.coreDatabase.get('pendingProposals', groupId),
+      error => {
+        return error;
+      },
+      () => {
+        return this.coreDatabase.get('pendingProposals', groupId);
+      },
     );
 
     pendingProposalResult.match({
