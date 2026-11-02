@@ -35,7 +35,6 @@ export const developmentLibraries: readonly DevelopmentLibrary[] = [
   {name: 'store-engine', value: 'store-engine'},
   {name: 'store-engine-fs', value: 'store-engine-fs'},
   {name: 'store-engine-dexie', value: 'store-engine-dexie'},
-  {name: 'webapp-events', value: 'webapp-events'},
   {name: 'telemetry', value: 'telemetry'},
   {name: 'certificate-check', value: 'certificate-check'},
   {name: 'license-collector', value: 'license-collector'},

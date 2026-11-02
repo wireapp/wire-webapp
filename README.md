@@ -34,7 +34,9 @@ Use `npx just --list` to discover repository tasks, including builds, developmen
 Prerequisites:
 
 1. Install [Node.js](https://nodejs.org/)
-1. Use Node.js 24.22.1 and npm 11.21.1, as pinned by `.nvmrc` and `packageManager`.
+1. Use Node.js 26.12.1, as pinned by `.nvmrc`.
+1. Use npm 11.20.0, bundled with Node.js 26.12.1 and declared by the root `package.json` `packageManager` field.
+1. The `devEngines` checks require Node.js `>=26.12.1 <27` and npm `>=11.20.0 <12` for `npm install` and `npm clean-install`.
 
 ## 1. Install Dependencies & Fetch Configuration
 

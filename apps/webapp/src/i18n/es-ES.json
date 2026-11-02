@@ -740,6 +740,7 @@
   "conversationContextMenuDownload": "Descargar",
   "conversationContextMenuEdit": "Editar",
   "conversationContextMenuLike": "Me gusta",
+  "conversationContextMenuMarkUnread": "Mark as unread from here",
   "conversationContextMenuReply": "Responder",
   "conversationContextMenuUnlike": "No me gusta",
   "conversationCreateReceiptsEnabled": "Read receipts are on",

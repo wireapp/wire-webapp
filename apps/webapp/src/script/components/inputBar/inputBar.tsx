@@ -25,8 +25,6 @@ import cx from 'classnames';
 import {LexicalEditor, $createTextNode, $insertNodes} from 'lexical';
 import {container} from 'tsyringe';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {Avatar, AVATAR_SIZE} from 'Components/avatar';
 import {ConversationClassifiedBar} from 'Components/classifiedBar/classifiedBar';
 import {isConversationFileUploadAllowed} from 'Components/conversation/conversationFileDropzone/isConversationFileUploadAllowed/isConversationFileUploadAllowed';
@@ -69,6 +67,7 @@ import {useTypingIndicator} from './useTypingIndicator/useTypingIndicator';
 
 import {Config} from '../../Config';
 import {useApplicationContext} from '../../page/rootProvider';
+import {WebAppEvents} from '../../webAppEvents';
 
 const pingTimeoutInSeconds = 2;
 

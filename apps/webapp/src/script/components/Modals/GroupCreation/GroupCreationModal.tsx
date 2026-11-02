@@ -28,7 +28,6 @@ import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, Option, Select} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {FadingScrollbar} from 'Components/fadingScrollbar';
 import * as Icon from 'Components/icon';
@@ -59,6 +58,7 @@ import {sortUsersByPriority} from 'Util/stringUtil';
 
 import {Config} from '../../../Config';
 import {isProtocolOption, ProtocolOption} from '../../../guards/Protocol';
+import {WebAppEvents} from '../../../webAppEvents';
 import {getSharedDrivePermissionHint} from '../CreateConversation/utils';
 import {PrimaryModal} from '../PrimaryModal';
 

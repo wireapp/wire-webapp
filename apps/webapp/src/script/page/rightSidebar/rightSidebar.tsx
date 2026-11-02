@@ -24,8 +24,6 @@ import {amplify} from 'amplify';
 import {CSSTransition, TransitionGroup} from 'react-transition-group';
 import {container} from 'tsyringe';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {Message} from 'Repositories/entity/message/message';
@@ -55,6 +53,7 @@ import {isAppOrServiceEntity} from '../../guards/Service';
 import {Core} from '../../service/coreSingleton';
 import {ActionsViewModel} from '../../view_model/ActionsViewModel';
 import {ViewModelRepositories} from '../../view_model/MainViewModel';
+import {WebAppEvents} from '../../webAppEvents';
 import {RightSidebarParams} from '../appMain';
 import {useAppMainState} from '../state';
 import {ContentState} from '../useAppState';

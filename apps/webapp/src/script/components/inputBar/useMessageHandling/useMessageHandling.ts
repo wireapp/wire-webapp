@@ -23,8 +23,6 @@ import {isNull, isUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import {LexicalEditor} from 'lexical';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {MessageRepository, type OutgoingQuote} from 'Repositories/conversation/MessageRepository';
@@ -40,6 +38,7 @@ import {useMessageReply} from './useMessageReply/useMessageReply';
 import {useMessageSend} from './useMessageSend/useMessageSend';
 import {useOutsideInputClick} from './useOutsideInputClick/useOutsideInputClick';
 
+import {WebAppEvents} from '../../../webAppEvents';
 import type {DraftState} from '../common/draftState/draftState';
 import {MessageContent} from '../common/messageContent/messageContent';
 

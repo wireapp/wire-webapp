@@ -41,6 +41,13 @@
       "minimumReleaseAge": null
     },
     {
+      "description": "Group Node.js package manifest pins with .nvmrc",
+      "matchPackageNames": ["node"],
+      "matchDatasources": ["node-version"],
+      "groupName": "node runtime",
+      "minimumReleaseAge": null
+    },
+    {
       "matchFileNames": ["apps/webapp/app-config/package.json"],
       "groupName": "webapp app configuration"
     },

@@ -20,7 +20,7 @@
 import {act, renderHook} from '@testing-library/react';
 import {amplify} from 'amplify';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {WebAppEvents} from '../../../../webAppEvents';
 
 import {EventName} from 'Repositories/tracking/eventName';
 

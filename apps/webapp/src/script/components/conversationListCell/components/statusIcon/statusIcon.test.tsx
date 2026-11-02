@@ -37,6 +37,23 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
 );
 
 describe('StatusIcon', () => {
+  it('renders a manual unread indicator without creating an unread message count', () => {
+    const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+
+    render(<StatusIcon conversation={conversation} />, {wrapper: rootProviderWrapper});
+
+    act(() => {
+      conversation.manualUnreadTimestamp(1);
+    });
+
+    expect(screen.getByTitle('accessibility.conversationStatusUnread')).toBeDefined();
+    expect(screen.getByTitle('accessibility.conversationStatusUnread')).toHaveAttribute(
+      'data-uie-name',
+      'status-manual-unread',
+    );
+    expect(screen.queryByText('1')).toBeNull();
+  });
+
   it('renders an unread mention icon after the conversation unread state changes', () => {
     const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     const selfUser = new User(createUuid(), '', translateForTest);

@@ -77,7 +77,7 @@ interface ConversationCellsProps {
   isSearchViewOpen: boolean;
   onOpenSearchView: () => void;
   onCloseSearchView: () => void;
-  isUploadFilesEnabled: boolean;
+  isFileUploadAllowed: boolean;
   showViewerPermission: boolean;
 }
 
@@ -90,7 +90,7 @@ export const ConversationCells = memo(
     isSearchViewOpen,
     onOpenSearchView,
     onCloseSearchView,
-    isUploadFilesEnabled,
+    isFileUploadAllowed,
     showViewerPermission,
   }: ConversationCellsProps) => {
     const {fireAndForgetInvoker, translate} = useApplicationContext();
@@ -232,7 +232,7 @@ export const ConversationCells = memo(
     useEffect(() => {
       sharedDriveUploadController.updateRefresh(sharedDriveConversationQualifiedId, handleRefresh);
     }, [handleRefresh, sharedDriveConversationQualifiedId, sharedDriveUploadController]);
-    const canUploadToSharedDrive = isUploadFilesEnabled && !showViewerPermission;
+    const canUploadToSharedDrive = isFileUploadAllowed && !showViewerPermission;
     const maxSharedDriveUploadFileSize = Config.getConfig().MAXIMUM_ASSET_FILE_SIZE_CELLS;
     const handleSharedDriveUploadRejection = useCallback(
       (rejection: SharedDriveDropRejection): void => {
@@ -342,7 +342,7 @@ export const ConversationCells = memo(
       <CellsSelfUserDriveRoleProvider selfUserDriveRole={selfUserDriveRole}>
         <SharedDriveDropzone
           dragStateResetKey={folderDropResetKey}
-          isEnabled={isCellsStateReady && isUploadFilesEnabled && !isInRecycleBin}
+          isEnabled={isCellsStateReady && !isInRecycleBin}
           isFileDropAllowed={canUploadToSharedDrive}
           isOverlaySuppressed={activeFolderDropTargetName !== null}
           onDragStateReset={resetSharedDriveDropState}
@@ -369,7 +369,7 @@ export const ConversationCells = memo(
               onSearchClear={handleClearSearch}
               onUploadFiles={onUploadFiles}
               onUploadFolder={onUploadFolder}
-              isUploadFilesEnabled={isUploadFilesEnabled}
+              isUploadFilesEnabled={canUploadToSharedDrive}
               filters={filters}
               showViewerPermission={showViewerPermission}
               onSelectionBarAnchorChange={setSelectionBarAnchor}

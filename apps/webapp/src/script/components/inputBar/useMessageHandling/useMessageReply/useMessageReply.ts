@@ -22,9 +22,9 @@ import {useCallback, useEffect, useState} from 'react';
 import {isNull} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+
+import {WebAppEvents} from '../../../../webAppEvents';
 
 type UseMessageReplyResult = {
   isReplying: boolean;

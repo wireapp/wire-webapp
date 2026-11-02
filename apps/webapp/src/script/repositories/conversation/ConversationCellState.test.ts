@@ -62,6 +62,16 @@ describe('ConversationCellState', () => {
 
       expect(generateCellState(conversationEntity, translate)).toEqual({description: '', icon: 'muted'});
     });
+
+    it('shows a manual unread status even when notifications are muted and no incoming messages are unread', () => {
+      conversationEntity.mutedState(NOTIFICATION_STATE.NOTHING);
+      conversationEntity.manualUnreadTimestamp(123);
+
+      expect(generateCellState(conversationEntity, translate)).toEqual({description: '', icon: 'manual-unread'});
+
+      conversationEntity.manualUnreadTimestamp(undefined);
+      conversationEntity.mutedState(NOTIFICATION_STATE.EVERYTHING);
+    });
   });
 
   describe('Second line description for conversations', () => {

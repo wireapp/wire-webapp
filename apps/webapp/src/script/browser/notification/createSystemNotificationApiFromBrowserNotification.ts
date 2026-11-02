@@ -22,7 +22,6 @@ import {amplify} from 'amplify';
 import {result} from 'true-myth';
 
 import {Runtime} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {
   type SystemNotificationApi,
@@ -32,6 +31,8 @@ import {
   toSystemNotificationError,
 } from 'src/script/notification/systemNotificationTypes';
 import {getLogger} from 'Util/logger';
+
+import {WebAppEvents} from '../../webAppEvents';
 
 type SystemNotificationLogger = {
   warn: (message: string, context?: unknown) => void;

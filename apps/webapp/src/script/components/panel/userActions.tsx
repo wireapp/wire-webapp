@@ -27,8 +27,6 @@ import {ClientMLSError, ClientMLSErrorLabel} from '@wireapp/core/lib/messagingPr
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import * as Icon from 'Components/icon';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {listCSS} from 'Components/panel/panelActions/panelActions.styles';
@@ -48,6 +46,7 @@ import {PanelActions} from './panelActions';
 import {SingleAction} from './singleAction/singleAction';
 
 import type {ActionsViewModel} from '../../view_model/ActionsViewModel';
+import {WebAppEvents} from '../../webAppEvents';
 
 export enum Actions {
   ACCEPT_REQUEST = 'UserActions.ACCEPT_REQUEST',

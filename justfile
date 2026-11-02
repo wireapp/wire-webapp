@@ -81,7 +81,6 @@ type-check: build-libraries
     tsc --project ./libraries/telemetry/tsconfig.type-check-esm.json
     tsc --project ./libraries/telemetry/tsconfig.type-check-commonjs.json
     tsc --project ./libraries/telemetry/tsconfig.type-check.json
-    tsc --project ./libraries/webapp-events/tsconfig.type-check.json
 
 # Build workspace libraries required by dependent tasks such as type-checking and tests.
 [group('build')]
@@ -99,7 +98,6 @@ build-libraries:
     cd libraries/store-engine-fs && tsc
     cd libraries/telemetry && node bin/copyAssets.mts
     cd libraries/telemetry && tsc --build tsconfig.json tsconfig.commonjs.json
-    cd libraries/webapp-events && tsc
     cd libraries/api-client && tsc
     cd libraries/core && tsc
 
@@ -164,7 +162,6 @@ develop: prepare-development-server
         "just watch-library store-engine" \
         "just watch-library store-engine-dexie" \
         "just watch-library-telemetry" \
-        "just watch-library webapp-events" \
         "just watch-library bazinga64"
 
 # Alternative to develop: build dependencies, select libraries, and start the server.
@@ -190,7 +187,7 @@ run-development-server:
 [group('development')]
 watch-library library:
     case {{ quote(library) }} in \
-        api-client|bazinga64|certificate-check|commons|config|copy-config|core|license-collector|priority-queue|react-ui-kit|store-engine|store-engine-dexie|store-engine-fs|webapp-events) ;; \
+        api-client|bazinga64|certificate-check|commons|config|copy-config|core|license-collector|priority-queue|react-ui-kit|store-engine|store-engine-dexie|store-engine-fs) ;; \
         *) echo "Unknown library: {{ quote(library) }}" >&2; exit 2 ;; \
     esac
     tsc --project {{ quote("libraries/" + library + "/tsconfig.json") }} --watch --preserveWatchOutput

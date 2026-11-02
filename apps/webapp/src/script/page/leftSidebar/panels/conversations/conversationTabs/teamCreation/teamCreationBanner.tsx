@@ -22,7 +22,6 @@ import {useState, type FunctionComponent} from 'react';
 import {amplify} from 'amplify';
 
 import {Button, ButtonVariant, IconButton} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {BannerPortal} from 'Components/bannerPortal/bannerPortal';
 import * as Icon from 'Components/icon';
@@ -41,6 +40,7 @@ import {
 } from './teamCreation.styles';
 import {useTeamCreationModal} from './useTeamCreationModal';
 
+import {WebAppEvents} from '../../../../../../webAppEvents';
 import {SidebarStatus, useSidebarStore} from '../../useSidebarStore';
 
 const Banner: FunctionComponent<{onClick: () => void}> = ({onClick}: {onClick: () => void}) => {

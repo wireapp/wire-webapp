@@ -20,8 +20,6 @@
 import {isNonEmptyString, isNullOrUndefined, isTruthy} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {useTypingIndicatorState} from 'Components/inputBar/typingIndicator';
 import {CacheRepository} from 'Repositories/cache/cacheRepository';
 import type {ClientRepository} from 'Repositories/client/ClientRepository';
@@ -41,6 +39,7 @@ import {BaseError} from '../../error/baseError';
 import {ClientError} from '../../error/clientError';
 import {externalUrl} from '../../externalRoute';
 import type {Core} from '../../service/coreSingleton';
+import {WebAppEvents} from '../../webAppEvents';
 
 const LogoutConfig = {
   LOGIN_REDIRECT_STORAGE_KEY: 'LOGIN_REDIRECT_KEY',

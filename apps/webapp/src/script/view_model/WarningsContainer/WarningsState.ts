@@ -21,8 +21,6 @@ import {isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import {create} from 'zustand';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {AppPermissionState} from 'Repositories/notification/AppPermissionState';
 import type {Substitutions, TranslationKey} from 'Util/localizerUtil';
@@ -31,6 +29,7 @@ import {safeWindowOpen} from 'Util/sanitizationUtil';
 import {TYPE} from './WarningsTypes';
 
 import {Config} from '../../Config';
+import {WebAppEvents} from '../../webAppEvents';
 
 type WarningsState = {
   name: string;

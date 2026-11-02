@@ -23,7 +23,6 @@ import {isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
 import {CircleCloseIcon, IconButton, Input, SearchIcon} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/icon';
 import {useCreateConversationModal} from 'Components/Modals/CreateConversation/hooks/useCreateConversationModal';
@@ -48,6 +47,8 @@ import {
   searchInputStyles,
   searchInputWrapperStyles,
 } from './conversationHeader.styles';
+
+import {WebAppEvents} from '../../../../../webAppEvents';
 
 export const conversationsPanelHeadingId = 'conversations-heading';
 

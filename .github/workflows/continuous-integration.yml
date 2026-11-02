@@ -454,15 +454,33 @@ jobs:
             --tag "${DOCKER_IMAGE_TAG}"
 
           docker run --rm --entrypoint sh "${DOCKER_IMAGE_TAG}" -c '
-            test -s /dist/index.js &&
-            test -s /dist/version.json &&
-            test -d /dist/static &&
-            test -s /app/run.sh &&
-            test -s /dist/.env.defaults &&
-            grep -q "^BACKEND_NAME=" /dist/.env.defaults &&
-            grep -q "^BRAND_NAME=" /dist/.env.defaults &&
-            grep -q "^URL_ACCOUNT_BASE=" /dist/.env.defaults &&
-            grep -q "^BACKEND_REST=" /dist/.env.defaults &&
-            grep -q "^BACKEND_WS=" /dist/.env.defaults &&
+            set -eu
+            test -s /dist/index.js
+            test -s /dist/version.json
+            test -d /dist/static
+            test -s /app/run.sh
+            test -s /dist/.env.defaults
+            grep -q "^BACKEND_NAME=" /dist/.env.defaults
+            grep -q "^BRAND_NAME=" /dist/.env.defaults
+            grep -q "^URL_ACCOUNT_BASE=" /dist/.env.defaults
+            grep -q "^BACKEND_REST=" /dist/.env.defaults
+            grep -q "^BACKEND_WS=" /dist/.env.defaults
             node -e "require(\"@wireapp/config\")"
+
+            ENFORCE_HTTPS=false NODE_PORT=8080 /bin/bash /app/run.sh &
+            server_pid=$!
+            trap "kill \"$server_pid\" 2>/dev/null || true; wait \"$server_pid\" 2>/dev/null || true" EXIT
+
+            attempt=0
+            while [ "$attempt" -lt 20 ]; do
+              if node -e "fetch(\"http://127.0.0.1:8080/version\").then(response => process.exit(response.ok ? 0 : 1)).catch(() => process.exit(1))"; then
+                exit 0
+              fi
+
+              attempt=$((attempt + 1))
+              sleep 1
+            done
+
+            echo "Server did not return a successful /version response within 20 seconds." >&2
+            exit 1
           '

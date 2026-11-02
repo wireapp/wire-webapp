@@ -60,7 +60,6 @@ import {container} from 'tsyringe';
 import {partition} from 'underscore';
 
 import {Asset, Availability, Confirmation, GenericMessage} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {buildMetadata, ImageMetadata, isAudio, isImage, isVideo} from 'Repositories/assets/assetMetaDataBuilder';
@@ -126,6 +125,7 @@ import {QuoteEntity} from '../../message/quoteEntity';
 import {StatusType} from '../../message/statusType';
 import {Core} from '../../service/coreSingleton';
 import {ServerTimeHandler} from '../../time/serverTimeHandler';
+import {WebAppEvents} from '../../webAppEvents';
 
 type OptimisticMessageEvent = Parameters<EventRepository['injectEvent']>[0];
 

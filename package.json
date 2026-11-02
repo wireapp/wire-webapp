@@ -2,7 +2,7 @@
   "dependencies": {
     "@actions/core": "1.11.1",
     "@sindresorhus/is": "8.1.0",
-    "axios": "1.20.0",
+    "axios": "1.21.0",
     "commander": "15.0.0",
     "dotenv": "16.6.1",
     "dotenv-extended": "2.9.0",
@@ -23,7 +23,7 @@
     "@emotion/eslint-plugin": "11.12.0",
     "@enormora/objectory": "0.0.25",
     "@faker-js/faker": "10.6.0",
-    "@inquirer/prompts": "8.7.4",
+    "@inquirer/prompts": "8.7.5",
     "@ls-lint/ls-lint": "2.3.2",
     "@stylistic/eslint-plugin": "5.10.0",
     "@swc/core": "1.16.20",
@@ -33,14 +33,13 @@
     "@types/jest": "30.0.0",
     "@types/js-yaml": "4.0.9",
     "@types/jsdom": "28.0.3",
-    "@types/node": "24.19.2",
+    "@types/node": "26.6.6",
     "@types/semver": "7.8.0",
     "@types/tough-cookie": "4.0.5",
     "@typescript-eslint/eslint-plugin": "8.72.0",
     "@typescript-eslint/parser": "8.72.0",
     "@typescript-eslint/utils": "8.72.0",
     "@wireapp/copy-config": "2.3.13",
-    "@wireapp/prettier-config": "0.6.11",
     "archiver": "7.0.1",
     "concurrently": "9.2.5",
     "cross-env": "10.1.0",
@@ -96,12 +95,23 @@
     "unrs-resolver@1.12.2": true
   },
   "engines": {
-    "node": ">=24.10.0",
-    "npm": ">=11.19.0"
+    "node": ">=26.12.1",
+    "npm": ">=11.20.0 <12"
+  },
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": ">=26.12.1 <27",
+      "onFail": "error"
+    },
+    "packageManager": {
+      "name": "npm",
+      "version": ">=11.20.0 <12",
+      "onFail": "error"
+    }
   },
   "license": "GPL-3.0",
   "name": "wire-webapp",
-  "prettier": "@wireapp/prettier-config",
   "private": true,
   "workspaces": [
     "apps/*",
@@ -129,7 +139,7 @@
     "jest-environment-node": "30.5.2",
     "@jest/environment": "30.5.2",
     "jest-mock": "30.5.2",
-    "axios": "1.20.0",
+    "axios": "1.21.0",
     "dexie": "4.4.7",
     "dotenv": "16.6.1",
     "@types/react": "19.3.0",

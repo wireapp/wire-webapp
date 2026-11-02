@@ -26,8 +26,6 @@ import type {UserConnectionData, UserUpdateData} from '@wireapp/api-client/lib/u
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {MemberMessage} from 'Repositories/entity/message/memberMessage';
@@ -51,6 +49,7 @@ import {ConnectionState} from './connectionState';
 
 import {Config} from '../../Config';
 import {SystemMessageType} from '../../message/systemMessageType';
+import {WebAppEvents} from '../../webAppEvents';
 
 type ConnectionRequestResult = {connectionStatus: ConnectionStatus; conversationId: QualifiedId};
 type ConnectionsResult = {connections: ConnectionEntity[]; deadConnections: ConnectionEntity[]};

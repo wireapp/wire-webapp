@@ -26,7 +26,6 @@ import {container} from 'tsyringe';
 
 import {ValidationUtil} from '@wireapp/commons';
 import {Button, ButtonVariant, Checkbox, CheckboxLabel, Input, Link, LinkVariant} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
@@ -43,6 +42,8 @@ import type {ReactTranslationValueReplacement} from 'Util/localizerUtil/reactLoc
 import type {Translate} from 'Util/localizerUtil/translationTypes';
 
 import {applockStyles} from './appLock.styles';
+
+import {WebAppEvents} from '../../webAppEvents';
 
 const millisecondsPerSecond = 1000;
 
