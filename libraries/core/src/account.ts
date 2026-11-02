@@ -87,6 +87,7 @@ import {CoreCallbacks, SecretCrypto} from './messagingProtocols/mls/types';
 import {NewClient, ProteusService} from './messagingProtocols/proteus';
 import {CryptoClientType} from './messagingProtocols/proteus/proteusService/cryptoClient';
 import {
+  createPkiEnvironment,
   wipeCoreCryptoDb,
   CoreCryptoWrapper,
 } from './messagingProtocols/proteus/proteusService/cryptoClient/coreCryptoWrapper';
@@ -564,6 +565,7 @@ export class Account extends TypedEventEmitter<Events> {
         this.recurringTaskScheduler,
         clientService,
         mlsService,
+        createPkiEnvironment,
       );
     }
 

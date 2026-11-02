@@ -37,9 +37,8 @@ import {
   WireIdentity,
 } from '@wireapp/core-crypto';
 
-import {E2EIServiceExternal} from './e2eiServiceExternal';
+import {E2EIServiceExternal, type PkiEnvironmentFactory} from './e2eiServiceExternal';
 
-import {createPkiEnvironment} from '../../proteus/proteusService/cryptoClient/coreCryptoWrapper';
 import {ClientService} from '../../../client';
 import {openDB} from '../../../storage/coreDb';
 import {getUUID} from '../../../test/payloadHelper';
@@ -48,12 +47,6 @@ import {stringifyQualifiedId} from '../../../util/qualifiedIdUtil';
 import {RecurringTaskScheduler} from '../../../util/recurringTaskScheduler';
 import {MLSService} from '../mlsService';
 import {createMLSClientId} from '../utils/mlsId';
-
-jest.mock('../../proteus/proteusService/cryptoClient/coreCryptoWrapper', () => {
-  return {createPkiEnvironment: jest.fn()};
-});
-
-const createPkiEnvironmentMock = createPkiEnvironment as jest.MockedFunction<typeof createPkiEnvironment>;
 
 type InitializedService = E2EIServiceTestSetup[1] & {
   readonly authenticate: jest.Mock;
@@ -68,6 +61,7 @@ type E2EIServiceTestSetup = readonly [
     readonly coreCrypto: jest.Mocked<CoreCrypto>;
     readonly mlsService: MLSService;
     readonly pkiEnvironment: jest.Mocked<PkiEnvironment>;
+    readonly pkiEnvironmentFactory: jest.MockedFunction<PkiEnvironmentFactory>;
     readonly recurringTaskScheduler: RecurringTaskScheduler;
     readonly transactionContext: jest.Mocked<CoreCryptoContext>;
   },
@@ -128,14 +122,33 @@ async function buildE2EIService(dbName = 'core-test-db'): Promise<E2EIServiceTes
     getTrustAnchors: jest.fn().mockResolvedValue([]),
   } as unknown as jest.Mocked<PkiEnvironment>;
 
-  createPkiEnvironmentMock.mockImplementation(() => {
+  const pkiEnvironmentFactory: jest.MockedFunction<PkiEnvironmentFactory> = jest.fn<
+    ReturnType<PkiEnvironmentFactory>,
+    Parameters<PkiEnvironmentFactory>
+  >(() => {
     // Mirrors `createPkiEnvironment` in coreCryptoWrapper, which sets the environment on CoreCrypto
     coreCrypto.getPkiEnvironment.mockResolvedValue(pkiEnvironment);
     return task.resolve(pkiEnvironment);
   });
   return [
-    new E2EIServiceExternal(coreCrypto, apiClient, mockedDb, recurringTaskScheduler, clientService, mockedMLSService),
-    {apiClient, coreCrypto, mlsService: mockedMLSService, pkiEnvironment, recurringTaskScheduler, transactionContext},
+    new E2EIServiceExternal(
+      coreCrypto,
+      apiClient,
+      mockedDb,
+      recurringTaskScheduler,
+      clientService,
+      mockedMLSService,
+      pkiEnvironmentFactory,
+    ),
+    {
+      apiClient,
+      coreCrypto,
+      mlsService: mockedMLSService,
+      pkiEnvironment,
+      pkiEnvironmentFactory,
+      recurringTaskScheduler,
+      transactionContext,
+    },
   ] as const;
 }
 
@@ -319,13 +332,15 @@ describe('E2EIServiceExternal', () => {
     });
 
     it('registers the server certificates on initialization', async () => {
-      const [service, {pkiEnvironment}] = await buildE2EIService('initializeRegistersCertificates');
+      const [service, {pkiEnvironment, pkiEnvironmentFactory}] = await buildE2EIService(
+        'initializeRegistersCertificates',
+      );
       // A fresh environment has no trust anchor yet, so the deployment root has to be added.
       pkiEnvironment.getTrustAnchors.mockResolvedValue([]);
 
       await service.initialize(discoveryUrl, authenticate);
 
-      expect(createPkiEnvironmentMock).toHaveBeenCalledTimes(1);
+      expect(pkiEnvironmentFactory).toHaveBeenCalledTimes(1);
       expect(pkiEnvironment.addTrustAnchor).toHaveBeenCalledWith(mockedRootCA);
       expect(pkiEnvironment.addIntermediateCert).toHaveBeenCalledWith(federatedCerts[0]);
       expect(pkiEnvironment.addIntermediateCert).toHaveBeenCalledWith(federatedCerts[1]);
@@ -343,12 +358,14 @@ describe('E2EIServiceExternal', () => {
     });
 
     it('does not create a second PKI environment when one is already set', async () => {
-      const [service, {coreCrypto, pkiEnvironment}] = await buildE2EIService('initializeExistingEnvironment');
+      const [service, {coreCrypto, pkiEnvironment, pkiEnvironmentFactory}] = await buildE2EIService(
+        'initializeExistingEnvironment',
+      );
       coreCrypto.getPkiEnvironment.mockResolvedValue(pkiEnvironment);
 
       await service.initialize(discoveryUrl, authenticate);
 
-      expect(createPkiEnvironmentMock).not.toHaveBeenCalled();
+      expect(pkiEnvironmentFactory).not.toHaveBeenCalled();
       expect(pkiEnvironment.addTrustAnchor).not.toHaveBeenCalled();
       expect(pkiEnvironment.addIntermediateCert).toHaveBeenCalledTimes(2);
     });
@@ -445,7 +462,7 @@ describe('E2EIServiceExternal', () => {
         return 'id-token';
       });
       await service.initialize(discoveryUrl, authenticate, {crlProxy});
-      const hooks = createPkiEnvironmentMock.mock.calls[0][0];
+      const hooks = dependencies.pkiEnvironmentFactory.mock.calls[0][0];
       return {service, ...dependencies, authenticate, hooks};
     };
 

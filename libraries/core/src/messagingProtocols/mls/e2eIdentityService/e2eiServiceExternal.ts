@@ -21,7 +21,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import axios from 'axios';
 import {Decoder} from 'bazinga64';
-import {result, task, type Result} from 'true-myth';
+import {result, task, type Result, type Task} from 'true-myth';
 
 import {APIClient} from '@wireapp/api-client';
 import {LogFactory, TypedEventEmitter} from '@wireapp/commons';
@@ -45,7 +45,6 @@ import {E2EIAuthenticateCallback} from './e2eiService.types';
 import {createE2EIEnrollmentStorage} from './storage/e2eiStorage';
 
 import {ClientService} from '../../../client';
-import {createPkiEnvironment} from '../../../messagingProtocols/proteus/proteusService/cryptoClient/coreCryptoWrapper';
 import {CoreDatabase} from '../../../storage/coreDb';
 import {parseFullQualifiedClientId} from '../../../util/fullyQualifiedClientIdUtils';
 import {StringifiedQualifiedId, stringifyQualifiedId} from '../../../util/qualifiedIdUtil';
@@ -87,6 +86,8 @@ type InitializeOptions = {
   crlProxy?: string;
 };
 
+export type PkiEnvironmentFactory = (hooks: PkiEnvironmentHooks) => Task<PkiEnvironment, Error>;
+
 const axiosMethods: Record<HttpMethod, 'get' | 'post' | 'put' | 'delete' | 'patch' | 'head'> = {
   [HttpMethod.Get]: 'get',
   [HttpMethod.Post]: 'post',
@@ -114,6 +115,7 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     private readonly recurringTaskScheduler: RecurringTaskScheduler,
     private readonly clientService: ClientService,
     private readonly mlsService: MLSService,
+    private readonly pkiEnvironmentFactory: PkiEnvironmentFactory,
   ) {
     super();
     this.enrollmentStorage = createE2EIEnrollmentStorage(coreDatabase);
@@ -340,7 +342,7 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
       return;
     }
 
-    const pkiEnvironment = await createPkiEnvironment(this.buildPkiEnvironmentHooks(authenticate)).match({
+    const pkiEnvironment = await this.pkiEnvironmentFactory(this.buildPkiEnvironmentHooks(authenticate)).match({
       Resolved: environment => {
         return Promise.resolve(environment);
       },
