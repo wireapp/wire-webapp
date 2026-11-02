@@ -19,11 +19,8 @@
 
 import {useCallback, useEffect, useRef, useState, type FunctionComponent} from 'react';
 
-import {isNonEmptyString} from '@sindresorhus/is';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
-import {JobsTaskStatus, RestActionStatus, type JobsTaskStatus as JobsTaskStatusValue} from 'cells-sdk-ts';
-import {noop} from 'noop-esm';
-import {Maybe, task} from 'true-myth';
+import {Maybe} from 'true-myth';
 
 import {Button, ButtonVariant, TrashIcon} from '@wireapp/react-ui-kit';
 
@@ -40,7 +37,10 @@ import {
 } from './cellsEmptyBinAction.styles';
 import {emptyBin, isEmptyBinRootPath} from './emptyBinAction';
 
-import {pollCellsBackgroundActionJobs} from '../../common/cellsBackgroundActionPolling/cellsBackgroundActionPolling';
+import {
+  getCellsBackgroundActionEvidence,
+  observeCellsBackgroundActionJobs,
+} from '../../common/cellsBackgroundActionPolling/cellsBackgroundActionJobs';
 import {CellsModal} from '../../common/cellsModal/cellsModal';
 import {
   CELLS_ACTION,
@@ -136,19 +136,10 @@ export const CellsEmptyBinAction: FunctionComponent<CellsEmptyBinActionProps> = 
       return undefined;
     }
 
-    return pollCellsBackgroundActionJobs({
+    return observeCellsBackgroundActionJobs({
+      cellsRepository,
+      actionName: 'delete',
       jobUuids: backgroundJobUuids,
-      readStatus: jobUuid => {
-        return task.tryOrElse(
-          error => {
-            return error;
-          },
-          async () => {
-            const response = await cellsRepository.getBackgroundActionInfo({name: 'delete', jobUuid});
-            return Maybe.of<JobsTaskStatusValue>(response.Status);
-          },
-        );
-      },
       clock,
       pollingPolicy: {
         pollIntervalMs: BACKGROUND_DELETE_STATUS_POLL_INTERVAL_MS,
@@ -161,7 +152,6 @@ export const CellsEmptyBinAction: FunctionComponent<CellsEmptyBinActionProps> = 
         },
       },
       isCurrent: isCurrentScope,
-      onStatusSnapshot: noop,
       onOutcome: outcome => {
         if (outcome === 'all-finished') {
           setBackgroundJobUuids([]);
@@ -244,34 +234,16 @@ export const CellsEmptyBinAction: FunctionComponent<CellsEmptyBinActionProps> = 
         return;
       }
 
-      const deleteJobs = response.BackgroundActions?.filter(action => {
-        return action.Name === 'delete' && isNonEmptyString(action.JobUuid);
-      });
-      const jobUuids = [
-        ...new Set(
-          deleteJobs?.map(action => {
-            return action.JobUuid;
-          }) ?? [],
-        ),
-      ];
-      const backgroundActions = response.BackgroundActions ?? [];
-      const allJobsFinished =
-        backgroundActions.length > 0 &&
-        backgroundActions.every(action => {
-          return (
-            action.Name === 'delete' && isNonEmptyString(action.JobUuid) && action.Status === JobsTaskStatus.Finished
-          );
-        });
-
-      if (response.Status === RestActionStatus.Performed && (backgroundActions.length === 0 || allJobsFinished)) {
+      const actionEvidence = getCellsBackgroundActionEvidence(response, 'delete');
+      if (actionEvidence.hasCompleted) {
         setStatus('completed');
         setRequiresReview(false);
         await refreshAfterOutcome();
         return;
       }
 
-      if (jobUuids.length > 0) {
-        setBackgroundJobUuids(jobUuids);
+      if (actionEvidence.jobUuids.length > 0) {
+        setBackgroundJobUuids([...actionEvidence.jobUuids]);
         setStatus('processing');
         return;
       }
