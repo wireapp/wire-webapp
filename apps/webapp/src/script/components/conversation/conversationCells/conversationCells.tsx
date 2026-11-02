@@ -217,6 +217,7 @@ export const ConversationCells = memo(
     const handleRefreshAndReportSuccess = useCallback(async (): Promise<boolean> => {
       const refreshResult = await task.tryOrElse(
         error => {
+          console.error(error);
           return error;
         },
         () => {

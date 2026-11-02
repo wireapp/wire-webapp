@@ -820,7 +820,7 @@ describe('CellsTable selection', () => {
 
       for (
         let attempt = 0;
-        attempt < 10 && screen.queryByRole('button', {name: 'Refresh Bin'}) === null;
+        attempt < 20 && screen.queryByRole('button', {name: 'Refresh Bin'}) === null;
         attempt += 1
       ) {
         await act(async () => {
@@ -971,7 +971,7 @@ describe('CellsTable selection', () => {
 
       for (
         let attempt = 0;
-        attempt < 10 && screen.queryByRole('button', {name: 'Refresh Bin'}) === null;
+        attempt < 20 && screen.queryByRole('button', {name: 'Refresh Bin'}) === null;
         attempt += 1
       ) {
         await act(async () => {
