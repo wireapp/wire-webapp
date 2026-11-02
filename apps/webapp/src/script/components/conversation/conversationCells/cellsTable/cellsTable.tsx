@@ -97,6 +97,9 @@ import {
 import {getCellsTableColumns, getCellsTableDataCellLabels} from './cellsTableColumns/cellsTableColumns';
 import {CellsFilePreviewModalProvider} from './common/cellsFilePreviewModalContext/cellsFilePreviewModalContext';
 import {getBulkMoveOutcomeEvidence} from './getBulkMoveOutcomeEvidence';
+import {resolveRestoreTargets} from './restoreBinSelection/resolveRestoreTargets';
+import {showBulkRestoreModal} from './restoreBinSelection/showBulkRestoreModal';
+import {useBulkRestore} from './restoreBinSelection/useBulkRestore';
 import type {PermanentDeleteReviewReason} from './usePermanentDeleteReconciliation';
 import {usePermanentDeleteReconciliation} from './usePermanentDeleteReconciliation';
 
@@ -360,6 +363,21 @@ export const CellsTable = ({
     clearRejection: clearPermanentDeleteRejection,
     reset: resetPermanentDeleteReconciliation,
   } = permanentDelete;
+  const bulkRestoreModalId = useId();
+  const bulkRestore = useBulkRestore({
+    cellsRepository,
+    clock,
+    random,
+    conversationQualifiedId,
+    isCurrentScope: scopeKey => {
+      return isInRecycleBin() && selectionScopeKeyRef.current === scopeKey;
+    },
+    onRefreshAndReportSuccess,
+    onRestoreSettled: () => {
+      setSelectedNodeIds(new Set());
+    },
+  });
+  const {reset: resetBulkRestore} = bulkRestore;
   const [backgroundMoveJobUuids, setBackgroundMoveJobUuids] = useState<string[]>([]);
   const [backgroundMoveStatusId, setBackgroundMoveStatusId] = useState('');
   const [backgroundMoveStatusCheckId, setBackgroundMoveStatusCheckId] = useState(0);
@@ -381,6 +399,7 @@ export const CellsTable = ({
     }
 
     resetPermanentDeleteReconciliation();
+    resetBulkRestore();
     setSelectedNodeIds(new Set());
     setIsBulkMovePreviewOpen(false);
     setIsBulkMoveToBinConfirmationOpen(false);
@@ -392,10 +411,15 @@ export const CellsTable = ({
     if (usePrimaryModalState.getState().currentModalId === permanentDeleteModalId) {
       removeCurrentModal();
     }
+    if (usePrimaryModalState.getState().currentModalId === bulkRestoreModalId) {
+      removeCurrentModal();
+    }
     return cancelPermanentDeleteReconciliation;
   }, [
+    bulkRestoreModalId,
     cancelPermanentDeleteReconciliation,
     permanentDeleteModalId,
+    resetBulkRestore,
     resetPermanentDeleteReconciliation,
     selectionScopeKey,
     isSelectionEnabled,
@@ -406,8 +430,11 @@ export const CellsTable = ({
       if (usePrimaryModalState.getState().currentModalId === permanentDeleteModalId) {
         removeCurrentModal();
       }
+      if (usePrimaryModalState.getState().currentModalId === bulkRestoreModalId) {
+        removeCurrentModal();
+      }
     };
-  }, [permanentDeleteModalId]);
+  }, [bulkRestoreModalId, permanentDeleteModalId]);
 
   const handleBulkMoveRequestError = (): void => {
     if (maybe.isJust(activeMoveStatusId.current) && maybe.isJust(backgroundMoveSummary.current)) {
@@ -641,6 +668,27 @@ export const CellsTable = ({
     return isInRecycleBin() && getCellsFilesPath() === path && selectionScopeKeyRef.current === scopeKey;
   };
 
+  const handleRestoreSelection = (nodeIds: string[], scopeKey: string): void => {
+    if (!hasSameSelection(selectedNodeIdsRef.current, nodeIds)) {
+      return;
+    }
+
+    const selectedIdSet = new Set(nodeIds);
+    const currentSelectedNodes = nodesRef.current.filter(node => {
+      return selectedIdSet.has(node.id);
+    });
+    const currentResolution = resolveRestoreTargets({selectedNodes: currentSelectedNodes});
+    if (
+      currentSelectedNodes.length !== nodeIds.length ||
+      !canPerformCurrentDriveActionRef.current(CELLS_ACTION.RESTORE) ||
+      !currentResolution.canRestore
+    ) {
+      return;
+    }
+
+    void bulkRestore.restore(currentResolution.targets, scopeKey);
+  };
+
   const handlePermanentDelete = async (nodeIds: string[], scopeKey: string, path: string): Promise<void> => {
     if (isPermanentDeletePending || isPermanentDeleteUnresolved || !isCurrentPermanentDeleteScope(scopeKey, path)) {
       return;
@@ -701,7 +749,9 @@ export const CellsTable = ({
         !isBulkMoveOutcomeUnresolved &&
         !isPermanentDeleteUnresolved &&
         !isBulkMoveToBinNeedsReview &&
-        !isBulkMoveToBinPending,
+        !isBulkMoveToBinPending &&
+        !bulkRestore.isPending &&
+        bulkRestore.reviewReason === null,
     }),
     getCoreRowModel: getCoreRowModel(),
   });
@@ -712,10 +762,23 @@ export const CellsTable = ({
   });
   const selectedFilesTotalSize =
     selectedNodes.length === selectedNodeIds.size ? getSelectedFilesTotalSize(selectedNodes) : Maybe.nothing();
+  const restoreResolution = resolveRestoreTargets({selectedNodes});
+  const isBulkRestoreBlocking = bulkRestore.isPending || bulkRestore.reviewReason !== null;
+  const canRestoreSelection =
+    isSelectionEnabled &&
+    selectedNodes.length > 0 &&
+    selectedNodes.length === selectedNodeIds.size &&
+    isInRecycleBin() &&
+    !isBulkRestoreBlocking &&
+    !isPermanentDeletePending &&
+    !isPermanentDeleteUnresolved &&
+    canPerformCurrentDriveAction(CELLS_ACTION.RESTORE) &&
+    restoreResolution.canRestore;
   const canPermanentlyDeleteSelection =
     selectedNodes.length > 0 &&
     selectedNodes.length === selectedNodeIds.size &&
     isInRecycleBin() &&
+    !isBulkRestoreBlocking &&
     !isPermanentDeleteUnresolved &&
     canPerformCurrentDriveAction(CELLS_ACTION.DELETE) &&
     selectedNodes.every(node => {
@@ -1088,7 +1151,7 @@ export const CellsTable = ({
                     css={clearSelectionButtonStyles}
                     type="button"
                     aria-label={translate('cells.selection.clear')}
-                    disabled={isBulkMoveToBinPending}
+                    disabled={isBulkMoveToBinPending || bulkRestore.isPending}
                     onClick={() => {
                       return setSelectedNodeIds(new Set());
                     }}
@@ -1136,6 +1199,29 @@ export const CellsTable = ({
                       }}
                     >
                       {translate('cells.options.deletePermanently')}
+                    </button>
+                  )}
+                  {canRestoreSelection && (
+                    <button
+                      css={bulkActionButtonStyles}
+                      type="button"
+                      aria-haspopup="dialog"
+                      onClick={() => {
+                        const nodeIds = selectedNodes.map(node => {
+                          return node.id;
+                        });
+                        showBulkRestoreModal({
+                          selectedNodes,
+                          targets: restoreResolution.targets,
+                          onRestore: () => {
+                            handleRestoreSelection(nodeIds, selectionScopeKey);
+                          },
+                          modalId: bulkRestoreModalId,
+                          translate,
+                        });
+                      }}
+                    >
+                      {translate('cells.options.restore')}
                     </button>
                   )}
                   {canMoveSelection && (
@@ -1276,6 +1362,27 @@ export const CellsTable = ({
                 void handleRefreshAfterPermanentDeleteReview();
               }}
               disabled={isRefreshingPermanentDeleteReview || isPermanentDeleteReconciliationRequestInFlight}
+            >
+              {translate('cells.bulkAction.refresh')}
+            </Button>
+          </div>
+        )}
+        {bulkRestore.isPending && (
+          <div css={permanentDeleteProgressStyles} role="status" aria-live="polite">
+            <SharedDriveUploadSpinnerIcon color="var(--accent-color)" width={16} height={16} aria-hidden="true" />
+            <span>{translate('cells.bulkRestore.restoring')}</span>
+          </div>
+        )}
+        {bulkRestore.reviewReason !== null && !bulkRestore.isPending && (
+          <div css={permanentDeleteProgressStyles} role="alert">
+            <span>{translate('cells.restore.error')}</span>
+            <Button
+              variant={ButtonVariant.SECONDARY}
+              type="button"
+              onClick={() => {
+                void bulkRestore.refreshReview();
+              }}
+              disabled={bulkRestore.isRefreshingReview}
             >
               {translate('cells.bulkAction.refresh')}
             </Button>
