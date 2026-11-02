@@ -73,7 +73,7 @@ If `FEDERATION` is not set, `APP_BASE`, `BACKEND_REST`, and `BACKEND_WS` must re
 ### How configuration repositories are used
 
 - `apps/webapp/app-config/package.json` pins configuration repositories and versions.
-- `npx just configure-webapp` runs `copy-config` using `apps/webapp/.copyconfigrc.js`.
+- `npx just configure-webapp` runs the repository tool in `tools/configuration/` using `apps/webapp/.copyconfigrc.js`.
 - That step copies repository content into `apps/webapp/resource/` and writes repo `.env.defaults` into workspace root `.env.defaults`.
 - Configuration selection order in `.copyconfigrc.js`:
   1. If `FORCED_CONFIG_URL` is set, that URL is used directly.

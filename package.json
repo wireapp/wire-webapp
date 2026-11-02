@@ -29,6 +29,7 @@
     "@swc/core": "1.16.20",
     "@swc/jest": "0.2.39",
     "@tony.ganchev/eslint-plugin-header": "3.4.4",
+    "@types/copy": "0.3.5",
     "@types/fs-extra": "11.0.4",
     "@types/jest": "30.0.0",
     "@types/js-yaml": "4.0.9",
@@ -39,9 +40,10 @@
     "@typescript-eslint/eslint-plugin": "8.72.0",
     "@typescript-eslint/parser": "8.72.0",
     "@typescript-eslint/utils": "8.72.0",
-    "@wireapp/copy-config": "2.3.13",
     "archiver": "7.0.1",
     "concurrently": "9.2.5",
+    "copy": "0.3.2",
+    "cosmiconfig": "9.0.2",
     "cross-env": "10.1.0",
     "eslint": "9.39.5",
     "eslint-config-prettier": "10.1.8",
@@ -68,7 +70,9 @@
     "js-yaml": "4.3.2",
     "jscpd": "5.4.2",
     "jsdom": "29.1.1",
+    "jszip": "3.10.2",
     "nock": "14.0.17",
+    "noop-esm": "1.1.0",
     "patch-package": "8.0.1",
     "playwright": "1.64.1",
     "prettier": "3.9.10",
@@ -125,7 +129,6 @@
     "@emotion/eslint-plugin": {
       "eslint": "^8.0.0 || ^9.0.0"
     },
-    "license-checker": "25.0.1",
     "stylelint-order": {
       "stylelint": "^14.0.0 || ^15.0.0 || ^16.0.1 || ^17.0.0"
     },

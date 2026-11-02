@@ -51,8 +51,6 @@ format:
         --ignore-path apps/server/.gitignore \
         --ignore-path apps/webapp/.gitignore \
         --ignore-path libraries/commons/.gitignore \
-        --ignore-path libraries/copy-config/.gitignore \
-        --ignore-path libraries/license-collector/.gitignore \
         .
 
 # Type-check all application and library configurations in sequence.
@@ -67,12 +65,9 @@ type-check: build-libraries
     tsc --project ./apps/server/bin/tsconfig.json
     tsc --project ./libraries/api-client/tsconfig.type-check.json
     tsc --project ./libraries/bazinga64/tsconfig.type-check.json
-    tsc --project ./libraries/certificate-check/tsconfig.type-check.json
     tsc --project ./libraries/commons/tsconfig.type-check.json
     tsc --project ./libraries/config/tsconfig.type-check.json
-    tsc --project ./libraries/copy-config/tsconfig.type-check.json
     tsc --project ./libraries/core/tsconfig.type-check.json
-    tsc --project ./libraries/license-collector/tsconfig.type-check.json
     tsc --project ./libraries/priority-queue/tsconfig.type-check.json
     tsc --project ./libraries/react-ui-kit/tsconfig.type-check.json
     tsc --project ./libraries/store-engine/tsconfig.type-check.json
@@ -86,11 +81,8 @@ type-check: build-libraries
 [group('build')]
 build-libraries:
     cd libraries/bazinga64 && tsc
-    cd libraries/certificate-check && tsc
     cd libraries/commons && tsc
     cd libraries/config && tsc
-    cd libraries/copy-config && tsc
-    cd libraries/license-collector && tsc
     cd libraries/priority-queue && tsc
     cd libraries/react-ui-kit && tsc
     cd libraries/store-engine && tsc
@@ -187,7 +179,7 @@ run-development-server:
 [group('development')]
 watch-library library:
     case {{ quote(library) }} in \
-        api-client|bazinga64|certificate-check|commons|config|copy-config|core|license-collector|priority-queue|react-ui-kit|store-engine|store-engine-dexie|store-engine-fs) ;; \
+        api-client|bazinga64|commons|config|core|priority-queue|react-ui-kit|store-engine|store-engine-dexie|store-engine-fs) ;; \
         *) echo "Unknown library: {{ quote(library) }}" >&2; exit 2 ;; \
     esac
     tsc --project {{ quote("libraries/" + library + "/tsconfig.json") }} --watch --preserveWatchOutput
@@ -201,8 +193,7 @@ watch-library-telemetry:
 # Configure the webapp, generate its React icon components, and validate their types.
 [group('setup')]
 configure-webapp:
-    cd libraries/copy-config && rimraf lib && tsc
-    cd apps/webapp && node ../../libraries/copy-config/lib/cli.js ./.copyconfigrc.js
+    cd apps/webapp && node ../../tools/configuration/cli.mts ./.copyconfigrc.js
     cd apps/webapp && ts-node ./bin/generate_react_icons.ts
     cd apps/webapp && tsc --project ./tsconfig.generated-icons.json --noEmit
 
