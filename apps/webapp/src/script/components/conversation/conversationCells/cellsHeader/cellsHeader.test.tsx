@@ -34,6 +34,7 @@ import {
 import {translateForTest} from 'Util/test/translateForTest';
 
 import {CellsHeader} from './cellsHeader';
+import {getCellsFilesPath} from '../common/getCellsFilesPath/getCellsFilesPath';
 
 const cellsNewItemButtonLabel = 'cells.newItemMenu.button';
 const filter = {
@@ -46,6 +47,9 @@ const filter = {
 
 const defaultProperties = {
   onRefresh: jest.fn(),
+  onRefreshAfterEmptyBinOutcome: jest.fn().mockResolvedValue(true),
+  onEmptyBinSubmitted: jest.fn(),
+  getCurrentCellsPath: getCellsFilesPath,
   conversationName: 'Project Alpha',
   conversationQualifiedId: {id: 'conversation-id', domain: 'wire.com'},
   cellsRepository: {} as CellsRepository,
@@ -65,9 +69,6 @@ const defaultProperties = {
 const renderCellsHeader = (
   properties: Partial<typeof defaultProperties> & {
     clock?: ReturnType<typeof createDeterministicClock>;
-    getCurrentCellsPath?: () => string;
-    onEmptyBinSubmitted?: () => void;
-    onRefreshAfterEmptyBinOutcome?: () => Promise<boolean>;
     onSelectionBarAnchorChange?: (anchor: HTMLDivElement | null) => void;
   } = {},
   isBulkActionsEnabled = true,
@@ -149,6 +150,32 @@ describe('CellsHeader', () => {
     expect(headerButtons.indexOf(emptyBinButton)).toBeLessThan(
       headerButtons.indexOf(screen.getByRole('button', {name: 'cells.refreshButton'})),
     );
+  });
+
+  it('reports a failed Empty Bin refresh instead of treating it as successful', async () => {
+    const cellsRepository = {
+      lookupNodeByPath: jest.fn().mockResolvedValue({Type: TreeNodeType.Collection, Uuid: 'bin-root'}),
+      deleteNodes: jest.fn().mockResolvedValue({Status: 'Performed', BackgroundActions: []}),
+    } as unknown as CellsRepository;
+    const onRefresh = jest.fn();
+    const onRefreshAfterEmptyBinOutcome = jest.fn().mockResolvedValue(false);
+    renderCellsHeader({
+      cellsRepository,
+      getCurrentCellsPath: () => {
+        return 'recycle_bin';
+      },
+      isInRecycleBin: true,
+      isSearchViewOpen: false,
+      onRefresh,
+      onRefreshAfterEmptyBinOutcome,
+    });
+
+    await userEvent.click(screen.getByRole('button', {name: 'cells.emptyBin.button'}));
+    await userEvent.click(screen.getByRole('button', {name: 'cells.emptyBin.confirm'}));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('cells.emptyBin.refreshFailed');
+    expect(onRefreshAfterEmptyBinOutcome).toHaveBeenCalledTimes(1);
+    expect(onRefresh).not.toHaveBeenCalled();
   });
 
   it('keeps background Empty Bin work alive across nested Bin navigation', async () => {

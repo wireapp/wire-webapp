@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, type FunctionComponent} from 'react';
+import type {FunctionComponent} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
@@ -50,7 +50,6 @@ import {CellsBreadcrumbs} from '../common/cellsBreadcrumbs/cellsBreadcrumbs';
 import {CellsFiltersBar} from '../common/cellsFiltersBar/cellsFiltersBar';
 import type {FilterConfig} from '../common/cellsFiltersBar/filterConfig';
 import {getBreadcrumbsFromPath} from '../common/getBreadcrumbsFromPath/getBreadcrumbsFromPath';
-import {getCellsFilesPath} from '../common/getCellsFilesPath/getCellsFilesPath';
 import {openBreadcrumb} from '../common/openBreadcrumb/openBreadcrumb';
 
 interface CellsHeaderProps {
@@ -70,9 +69,9 @@ interface CellsHeaderProps {
   filters: FilterConfig[];
   showViewerPermission: boolean;
   onSelectionBarAnchorChange?: (anchor: HTMLDivElement | null) => void;
-  onRefreshAfterEmptyBinOutcome?: () => Promise<boolean>;
-  onEmptyBinSubmitted?: () => void;
-  getCurrentCellsPath?: () => string;
+  onRefreshAfterEmptyBinOutcome: () => Promise<boolean>;
+  onEmptyBinSubmitted: () => void;
+  getCurrentCellsPath: () => string;
 }
 
 export const CellsHeader: FunctionComponent<CellsHeaderProps> = ({
@@ -99,8 +98,7 @@ export const CellsHeader: FunctionComponent<CellsHeaderProps> = ({
   const {translate, isFeatureToggleEnabled} = useApplicationContext();
   const isSelectionBarEnabled = isFeatureToggleEnabled(driveBulkActionsFeatureToggleName);
   const canPerformCellsAction = useCellsActionPermissions();
-  const readCurrentCellsPath = getCurrentCellsPath ?? getCellsFilesPath;
-  const currentPath = readCurrentCellsPath();
+  const currentPath = getCurrentCellsPath();
   const breadcrumbs = getBreadcrumbsFromPath({
     baseCrumb: translate('cells.breadcrumb.files', {conversationName}),
     currentPath,
@@ -108,18 +106,6 @@ export const CellsHeader: FunctionComponent<CellsHeaderProps> = ({
   });
   const isRootLevel = breadcrumbs.length === 1;
   const shouldShowViewerAccessLabel = !isInRecycleBin && !canPerformCellsAction(CELLS_ACTION.CREATE);
-  const refreshAfterEmptyBinOutcome = useCallback(async (): Promise<boolean> => {
-    if (onRefreshAfterEmptyBinOutcome !== undefined) {
-      return onRefreshAfterEmptyBinOutcome();
-    }
-
-    onRefresh();
-    return true;
-  }, [onRefresh, onRefreshAfterEmptyBinOutcome]);
-  const handleEmptyBinSubmitted = useCallback((): void => {
-    onEmptyBinSubmitted?.();
-  }, [onEmptyBinSubmitted]);
-
   return (
     <div css={wrapperStyles}>
       <div css={contentStyles}>
@@ -146,9 +132,9 @@ export const CellsHeader: FunctionComponent<CellsHeaderProps> = ({
                 key={`${conversationQualifiedId.id}@${conversationQualifiedId.domain}`}
                 cellsRepository={cellsRepository}
                 conversationQualifiedId={conversationQualifiedId}
-                getCurrentCellsPath={readCurrentCellsPath}
-                onRefreshAfterEmptyBinOutcome={refreshAfterEmptyBinOutcome}
-                onEmptyBinSubmitted={handleEmptyBinSubmitted}
+                getCurrentCellsPath={getCurrentCellsPath}
+                onRefreshAfterEmptyBinOutcome={onRefreshAfterEmptyBinOutcome}
+                onEmptyBinSubmitted={onEmptyBinSubmitted}
               />
             )}
             <div css={actionsStyles}>

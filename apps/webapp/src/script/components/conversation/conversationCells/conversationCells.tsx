@@ -367,6 +367,7 @@ export const ConversationCells = memo(
               onRefresh={handleRefresh}
               onRefreshAfterEmptyBinOutcome={handleRefreshAfterBulkMoveOutcome}
               onEmptyBinSubmitted={handleEmptyBinSubmitted}
+              getCurrentCellsPath={getCellsFilesPath}
               conversationName={name}
               conversationQualifiedId={conversationQualifiedId}
               cellsRepository={cellsRepository}
