@@ -17,13 +17,13 @@
  *
  */
 
-import * as fs from 'fs-extra';
+import {copy} from 'fs-extra';
 import logdown from 'logdown';
 
-import path from 'path';
+import path from 'node:path';
 
-import {CopyConfigOptions} from './CopyConfigOptions';
-import * as utils from './utils';
+import {copyAsync, downloadFileAsync, execAsync, isFile, rimrafAsync} from './configurationFileOperations.mts';
+import type {CopyConfigOptions} from './CopyConfigOptions.mts';
 
 const defaultOptions: Required<CopyConfigOptions> = {
   baseDir: 'config',
@@ -39,11 +39,10 @@ export class CopyConfig {
   private readonly noClone: boolean = false;
   private readonly noCleanup: boolean = false;
   private readonly filterFiles: string[] = ['.DS_Store'];
+  private readonly logger?: logdown.Logger;
 
-  constructor(
-    options: CopyConfigOptions | undefined,
-    private readonly logger?: logdown.Logger,
-  ) {
+  constructor(options: CopyConfigOptions | undefined, logger?: logdown.Logger) {
+    this.logger = logger;
     this.options = {...defaultOptions, ...options};
     this.readEnvVars();
 
@@ -141,14 +140,14 @@ export class CopyConfig {
       return /\*$/.test(path);
     };
 
-    if (utils.isFile(destination) && !utils.isFile(source)) {
+    if (isFile(destination) && !isFile(source)) {
       throw new Error('Cannot copy a directory into a file.');
     }
 
     if (isGlob(source)) {
       this.logger?.info(`Resolving "${source}"`);
 
-      const copiedFiles = await utils.copyAsync(source, destination);
+      const copiedFiles = await copyAsync(source, destination);
 
       for (const copiedFile of copiedFiles) {
         const [copiedFrom, copiedTo] = copiedFile.history;
@@ -160,7 +159,7 @@ export class CopyConfig {
       });
     }
 
-    if (utils.isFile(source) && !utils.isFile(destination)) {
+    if (isFile(source) && !isFile(destination)) {
       destination = path.join(destination, path.basename(source));
     }
 
@@ -169,7 +168,7 @@ export class CopyConfig {
     // Info: "fs.copy" creates all sub-folders which are needed along the way:
     // see https://github.com/jprichardson/node-fs-extra/blob/7.0.1/lib/copy/copy.js#L43
     // by default, fs.copy() copies folders recursively
-    await fs.copy(source, destination, {filter, overwrite: true});
+    await copy(source, destination, {filter, overwrite: true});
 
     return [destination];
   }
@@ -178,7 +177,7 @@ export class CopyConfig {
     const repositoryData = this.options.repositoryUrl.split('#');
     let bareUrl = repositoryData[0] ?? '';
     const branch = repositoryData[1] ?? 'master';
-    const {stderr: stderrVersion} = await utils.execAsync('git --version');
+    const {stderr: stderrVersion} = await execAsync('git --version');
 
     if (!this.noCleanup) {
       await this.removeBasedir();
@@ -195,12 +194,12 @@ export class CopyConfig {
       }
       const url = `${bareUrl}/archive/${branch}.zip`;
       this.logger?.info(`Downloading "${url}" ...`);
-      await utils.downloadFileAsync(url, this.options.baseDir);
+      await downloadFileAsync(url, this.options.baseDir);
     } else {
       this.logger?.info(`Cloning "${bareUrl}" (branch "${branch}") ...`);
       const command = `git clone --depth 1 -b ${branch} ${bareUrl} ${this.options.baseDir}`;
 
-      const {stderr: stderrClone} = await utils.execAsync(command);
+      const {stderr: stderrClone} = await execAsync(command);
 
       if (stderrClone.includes('fatal')) {
         throw new Error(stderrClone);
@@ -210,7 +209,7 @@ export class CopyConfig {
 
   private async removeBasedir(): Promise<void> {
     this.logger?.debug(`Cleaning up "${this.options.baseDir}" ...`);
-    await utils.rimrafAsync(this.options.baseDir);
+    await rimrafAsync(this.options.baseDir);
   }
 
   public async copy(): Promise<string[]> {

@@ -21,18 +21,18 @@
 
 import {ensureDir, readdirSync, remove, writeFile} from 'fs-extra';
 
-import path from 'path';
+import path from 'node:path';
 
-import * as utils from './utils';
+import {downloadFileAsync} from './configurationFileOperations.mts';
 
-import {CopyConfig} from '.';
-const LIB_ROOT = path.resolve(__dirname, '..');
-const TEMP_DIR = path.resolve(LIB_ROOT, '.temp');
-const SPEC_HELPERS = './spec/helpers';
+import {CopyConfig} from './CopyConfig.mts';
+const LIB_ROOT = path.resolve(__dirname);
+const TEMP_DIR = path.resolve(LIB_ROOT, '../../target/configuration-test');
+const SPEC_FIXTURES = './spec/fixtures';
 
-jest.mock('./utils', () => {
+jest.mock('./configurationFileOperations.mts', () => {
   return {
-    ...jest.requireActual('./utils'),
+    ...jest.requireActual('./configurationFileOperations.mts'),
     downloadFileAsync: jest.fn().mockReturnValue(Promise.resolve()),
   };
 });
@@ -45,7 +45,7 @@ describe('CopyConfig', () => {
   describe('constructor', () => {
     it('can be configured using environment variables', async () => {
       process.env.WIRE_CONFIGURATION_EXTERNAL_DIR = 'externalDir';
-      process.env.WIRE_CONFIGURATION_FILES = `${SPEC_HELPERS}/**:${TEMP_DIR};${SPEC_HELPERS}/test1.txt:[${TEMP_DIR}/test1.txt,${TEMP_DIR}/test2.txt]`;
+      process.env.WIRE_CONFIGURATION_FILES = `${SPEC_FIXTURES}/**:${TEMP_DIR};${SPEC_FIXTURES}/test1.txt:[${TEMP_DIR}/test1.txt,${TEMP_DIR}/test2.txt]`;
 
       const copyConfig = new CopyConfig({
         files: {},
@@ -56,8 +56,8 @@ describe('CopyConfig', () => {
       expect(copyConfig.options.externalDir.endsWith('externalDir')).toBe(true);
       // @ts-ignore
       expect(copyConfig.options.files).toEqual({
-        [`${SPEC_HELPERS}/**`]: TEMP_DIR,
-        [`${SPEC_HELPERS}/test1.txt`]: [`${TEMP_DIR}/test1.txt`, `${TEMP_DIR}/test2.txt`],
+        [`${SPEC_FIXTURES}/**`]: TEMP_DIR,
+        [`${SPEC_FIXTURES}/test1.txt`]: [`${TEMP_DIR}/test1.txt`, `${TEMP_DIR}/test2.txt`],
       });
 
       delete process.env.WIRE_CONFIGURATION_EXTERNAL_DIR;
@@ -70,7 +70,7 @@ describe('CopyConfig', () => {
       const copyConfig = new CopyConfig({
         externalDir: LIB_ROOT,
         files: {
-          [`${SPEC_HELPERS}/test1.txt`]: `${TEMP_DIR}/test1.txt`,
+          [`${SPEC_FIXTURES}/test1.txt`]: `${TEMP_DIR}/test1.txt`,
         },
         repositoryUrl: '',
       });
@@ -87,7 +87,7 @@ describe('CopyConfig', () => {
       const copyConfig = new CopyConfig({
         externalDir: LIB_ROOT,
         files: {
-          [`${SPEC_HELPERS}/.env.test`]: `${TEMP_DIR}/.env`,
+          [`${SPEC_FIXTURES}/.env.test`]: `${TEMP_DIR}/.env`,
         },
         repositoryUrl: '',
       });
@@ -101,7 +101,7 @@ describe('CopyConfig', () => {
       const copyConfig = new CopyConfig({
         externalDir: LIB_ROOT,
         files: {
-          [`${SPEC_HELPERS}/**`]: TEMP_DIR,
+          [`${SPEC_FIXTURES}/**`]: TEMP_DIR,
         },
         repositoryUrl: '',
       });
@@ -142,7 +142,7 @@ describe('CopyConfig', () => {
       const copyConfig = new CopyConfig({
         externalDir: LIB_ROOT,
         files: {
-          [`${SPEC_HELPERS}/test1.txt`]: `${TEMP_DIR}/test1.txt`,
+          [`${SPEC_FIXTURES}/test1.txt`]: `${TEMP_DIR}/test1.txt`,
         },
         repositoryUrl: '',
       });
@@ -171,7 +171,7 @@ describe('CopyConfig', () => {
 
       await copyConfig.copy();
 
-      expect(utils.downloadFileAsync).toHaveBeenCalledWith(ZIP_URL, expect.any(String));
+      expect(jest.mocked(downloadFileAsync)).toHaveBeenCalledWith(ZIP_URL, expect.any(String));
     });
   });
 
@@ -190,12 +190,11 @@ describe('CopyConfig', () => {
       repositoryUrl: GIT_URL,
     });
 
-    jest.spyOn(utils, 'downloadFileAsync').mockReturnValue(Promise.resolve());
     jest.spyOn(copyConfig, 'copyDirOrFile').mockReturnValue(Promise.resolve([]));
 
     await copyConfig.copy();
 
-    expect(utils.downloadFileAsync).toHaveBeenCalledWith(ZIP_URL, expect.any(String));
+    expect(jest.mocked(downloadFileAsync)).toHaveBeenCalledWith(ZIP_URL, expect.any(String));
   });
 
   describe('getFilesFromString', () => {

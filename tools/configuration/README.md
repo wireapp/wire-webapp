@@ -10,15 +10,10 @@ For licensing information, see the attached LICENSE file and the list of third-p
 
 Wire's internal configuration copy tool.
 
-### Installation
 
-```
-npm install @wireapp/copy-config
-```
+### Setup
 
-### CLI Setup
-
-Create a configuration file following the [cosmiconfig standard](https://github.com/davidtheclark/cosmiconfig#cosmiconfig) (e.g. `.copyconfigrc.js`) to your project and add parameters (see [`CopyConfigOptions.ts`](./src/main/CopyConfigOptions.ts)).
+Run `npx just configure-webapp` from the repository root. The command reads [`apps/webapp/.copyconfigrc.js`](../../apps/webapp/.copyconfigrc.js), which follows the [cosmiconfig standard](https://github.com/davidtheclark/cosmiconfig#cosmiconfig) and uses [`CopyConfigOptions.mts`](./CopyConfigOptions.mts).
 
 **Note**: the `files` parameter needs to be specified, all other are optional.
 
@@ -32,12 +27,3 @@ Additionally, some parameters can be set via environment variables (which then t
 | `files` | `WIRE_CONFIGURATION_FILES` | `/path/to/source.txt:/path/to/destination.txt;/path/to/source/:/path/to/destination/` |
 | `repositoryUrl` | `WIRE_CONFIGURATION_REPOSITORY` | `/path/to/anotherDir/*:[/path/to/thirdDir/,/path/to/destinationDir/]` |
 
-### CLI Usage
-
-```
-copy-config
-```
-
-### API Usage
-
-See [`cli.ts`](./src/main/cli.ts).

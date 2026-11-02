@@ -17,7 +17,7 @@
  *
  */
 
-export interface CopyConfigOptions {
+export type CopyConfigOptions = {
   /**
    * The directory to clone or download into.
    *
@@ -53,4 +53,4 @@ export interface CopyConfigOptions {
    */
   repositoryUrl: string;
   logLevel?: 'verbose' | 'info' | 'silent';
-}
+};

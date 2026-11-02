@@ -624,7 +624,7 @@ const productionConfigs = [
     },
   },
   {
-    files: ['tools/buildArtifact/**/*.mts', 'tools/runtimeVerification/**/*.mts'],
+    files: ['tools/buildArtifact/**/*.mts', 'tools/configuration/**/*.mts', 'tools/runtimeVerification/**/*.mts'],
     languageOptions: {
       parserOptions: {
         project: './tsconfig.tools.json',
@@ -646,12 +646,10 @@ const productionConfigs = [
   {
     files: [
       'apps/server/**/*.{ts,tsx}',
+      'tools/configuration/**/*.{ts,mts}',
       'libraries/api-client/**/*.{ts,tsx}',
       'libraries/commons/**/*.{ts,tsx}',
-      'libraries/certificate-check/**/*.{ts,tsx}',
       'libraries/core/**/*.{ts,tsx}',
-      'libraries/copy-config/**/*.{ts,tsx}',
-      'libraries/license-collector/**/*.{ts,tsx}',
       'libraries/store-engine/**/*.{ts,tsx}',
       'libraries/store-engine-dexie/**/*.{ts,tsx}',
       'libraries/react-ui-kit/**/*.{ts,tsx}',
@@ -834,6 +832,7 @@ const testTypeScriptFilePatterns = [
   'apps/**/jest.setup.ts',
   'libraries/**/jest.setup.ts',
   'tools/**/*.test.ts',
+  'tools/**/*.test.mts',
 ];
 
 const testTsxFilePatterns = testTypeScriptFilePatterns.map(filePattern => filePattern.replaceAll('.ts', '.tsx'));
