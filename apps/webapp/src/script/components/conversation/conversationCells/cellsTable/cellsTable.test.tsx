@@ -199,6 +199,42 @@ const translateSelectionForTest: Translate = (key, substitutions) => {
   if (key === 'cells.moveNodeModal.openFolder') {
     return `Open ${substitutions?.folderName}`;
   }
+  if (key === 'cells.options.restore') {
+    return 'Restore';
+  }
+  if (key === 'cells.bulkRestore.confirmation.title') {
+    return 'Restore selected items?';
+  }
+  if (key === 'cells.restoreRootNodeModal.file.headline') {
+    return 'Restore file?';
+  }
+  if (key === 'cells.restoreRootNodeModal.file.description') {
+    return 'This file {name} will be restored.';
+  }
+  if (key === 'cells.restoreRootNodeModal.button') {
+    return 'Restore';
+  }
+  if (key === 'cells.restoreNestedNodeModal.file.headline') {
+    return 'Restore file';
+  }
+  if (key === 'cells.bulkRestore.confirmation.multiple') {
+    return `Restore ${substitutions?.count} selected items to their original location?`;
+  }
+  if (key === 'cells.restoreNestedNodeModal.button') {
+    return 'Restore Parent Folder';
+  }
+  if (key === 'cells.restoreNestedNodeModal.description1') {
+    return 'You can’t restore folders or files from a deleted folder.';
+  }
+  if (key === 'cells.restoreNestedNodeModal.description2') {
+    return `The folder ${substitutions?.name} with all its files will be restored.`;
+  }
+  if (key === 'cells.bulkRestore.restoring') {
+    return 'Restoring selected items…';
+  }
+  if (key === 'cells.restore.error') {
+    return 'Something went wrong, please try again later and refresh the list.';
+  }
   return translateForTest(key);
 };
 
@@ -3569,5 +3605,184 @@ describe('CellsTable folder row drop target', () => {
 
     expect(folderRow).not.toHaveAttribute('data-folder-drop-active');
     expect(screen.queryByRole('status')).not.toBeInTheDocument();
+  });
+});
+
+describe('CellsTable restoring selected Bin items', () => {
+  const binHash = '#/conversation/conversation-id@example.com/files/recycle_bin';
+  const createBinNode = (name: string, pathInBin = name): CellNode => {
+    return createNode({
+      id: `${pathInBin}-id`,
+      name,
+      path: `conversation-id/recycle_bin/${pathInBin}`,
+      type: CellNodeType.FILE,
+      extension: 'txt',
+    });
+  };
+  const createRepository = (overrides: Partial<Record<keyof CellsRepository, jest.Mock>> = {}): CellsRepository => {
+    return {
+      restoreNodes: jest.fn().mockResolvedValue({Status: 'Performed'}),
+      lookupNodeByPath: jest.fn().mockResolvedValue({Uuid: 'folder-uuid'}),
+      ...overrides,
+    } as unknown as CellsRepository;
+  };
+  let originalHash: string;
+
+  beforeEach(() => {
+    originalHash = window.location.hash;
+    window.location.hash = binHash;
+  });
+
+  afterEach(() => {
+    window.location.hash = originalHash;
+  });
+
+  it('restores the confirmed top-level selection in one request and refreshes the Bin', async () => {
+    const user = userEvent.setup();
+    const onRefreshAndReportSuccess = jest.fn().mockResolvedValue(true);
+    const repository = createRepository();
+    renderCellsTable({
+      cellsRepository: repository,
+      onRefreshAndReportSuccess,
+      initialNodes: [createBinNode('a.txt'), createBinNode('b.txt')],
+    });
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select a.txt'}));
+    await user.click(screen.getByRole('checkbox', {name: 'Select b.txt'}));
+    await user.click(screen.getByRole('button', {name: 'Restore'}));
+    const confirmation = await screen.findByRole('dialog');
+    expect(within(confirmation).getByText('Restore 2 selected items to their original location?')).toBeInTheDocument();
+    await user.click(within(confirmation).getByRole('button', {name: 'Restore'}));
+
+    await waitFor(() => {
+      expect(repository.restoreNodes).toHaveBeenCalledTimes(1);
+    });
+    expect(repository.restoreNodes).toHaveBeenCalledWith({uuids: ['a.txt-id', 'b.txt-id']});
+    await waitFor(() => {
+      expect(onRefreshAndReportSuccess).toHaveBeenCalledTimes(1);
+    });
+    await waitFor(() => {
+      expect(screen.queryByText('2 selected')).not.toBeInTheDocument();
+    });
+  });
+
+  it('keeps the existing single-item dialog when exactly one top-level item is selected', async () => {
+    const user = userEvent.setup();
+    const repository = createRepository();
+    renderCellsTable({cellsRepository: repository, initialNodes: [createBinNode('a.txt')]});
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select a.txt'}));
+    await user.click(screen.getByRole('button', {name: 'Restore'}));
+    const confirmation = await screen.findByRole('dialog');
+
+    expect(within(confirmation).getByRole('heading', {name: 'Restore file?'})).toBeInTheDocument();
+    expect(within(confirmation).getByText('a.txt')).toBeInTheDocument();
+    await user.click(within(confirmation).getByRole('button', {name: 'Restore'}));
+    await waitFor(() => {
+      expect(repository.restoreNodes).toHaveBeenCalledWith({uuids: ['a.txt-id']});
+    });
+  });
+
+  it('keeps the existing nested dialog and restores the parent when one nested item is selected', async () => {
+    const user = userEvent.setup();
+    const repository = createRepository();
+    renderCellsTable({cellsRepository: repository, initialNodes: [createBinNode('a.txt', 'Reports/a.txt')]});
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select a.txt'}));
+    await user.click(screen.getByRole('button', {name: 'Restore'}));
+    const confirmation = await screen.findByRole('dialog');
+
+    expect(within(confirmation).getByRole('heading', {name: 'Restore file'})).toBeInTheDocument();
+    expect(within(confirmation).getByText('Reports')).toBeInTheDocument();
+    await user.click(within(confirmation).getByRole('button', {name: 'Restore Parent Folder'}));
+    await waitFor(() => {
+      expect(repository.restoreNodes).toHaveBeenCalledWith({uuids: ['folder-uuid']});
+    });
+  });
+
+  it('explains that a deleted parent is restored and restores a shared parent only once', async () => {
+    const user = userEvent.setup();
+    const repository = createRepository();
+    renderCellsTable({
+      cellsRepository: repository,
+      initialNodes: [createBinNode('a.txt', 'Reports/a.txt'), createBinNode('b.txt', 'Reports/2024/b.txt')],
+    });
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select a.txt'}));
+    await user.click(screen.getByRole('checkbox', {name: 'Select b.txt'}));
+    await user.click(screen.getByRole('button', {name: 'Restore'}));
+    const confirmation = await screen.findByRole('dialog');
+    expect(within(confirmation).getByText(/The folder Reports with all its files will be restored\./)).toBeInTheDocument();
+    await user.click(within(confirmation).getByRole('button', {name: 'Restore Parent Folder'}));
+
+    await waitFor(() => {
+      expect(repository.restoreNodes).toHaveBeenCalledTimes(1);
+    });
+    expect(repository.lookupNodeByPath).toHaveBeenCalledTimes(1);
+    expect(repository.restoreNodes).toHaveBeenCalledWith({uuids: ['folder-uuid']});
+  });
+
+  it('does not send a request when the confirmation is cancelled', async () => {
+    const user = userEvent.setup();
+    const repository = createRepository();
+    renderCellsTable({cellsRepository: repository, initialNodes: [createBinNode('a.txt')]});
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select a.txt'}));
+    await user.click(screen.getByRole('button', {name: 'Restore'}));
+    await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Cancel'}));
+
+    expect(repository.restoreNodes).not.toHaveBeenCalled();
+    expect(screen.getByText('1 selected')).toBeInTheDocument();
+  });
+
+  it('keeps the selection, asks for a Bin refresh and blocks other bulk actions when the request fails', async () => {
+    const user = userEvent.setup();
+    const repository = createRepository({restoreNodes: jest.fn().mockRejectedValue(new Error('network'))});
+    renderCellsTable({
+      cellsRepository: repository,
+      onRefreshAndReportSuccess: jest.fn().mockResolvedValue(true),
+      initialNodes: [createBinNode('a.txt')],
+    });
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select a.txt'}));
+    await user.click(screen.getByRole('button', {name: 'Restore'}));
+    await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Restore'}));
+
+    expect(
+      await screen.findByText('Something went wrong, please try again later and refresh the list.'),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Refresh Bin'})).toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'Restore'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'Delete permanently'})).not.toBeInTheDocument();
+  });
+
+  it('does not offer Restore to a viewer', async () => {
+    const user = userEvent.setup();
+    renderCellsTable({
+      selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER,
+      initialNodes: [createBinNode('a.txt')],
+    });
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select a.txt'}));
+
+    expect(screen.getByText('1 selected')).toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'Restore'})).not.toBeInTheDocument();
+  });
+
+  it('does not offer Restore when bulk actions are disabled', () => {
+    renderCellsTable({isBulkActionsEnabled: false, initialNodes: [createBinNode('a.txt')]});
+
+    expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'Restore'})).not.toBeInTheDocument();
+  });
+
+  it('does not offer Restore outside the Bin', async () => {
+    window.location.hash = '#/conversation/conversation-id@example.com/files';
+    const user = userEvent.setup();
+    renderCellsTable({initialNodes: [createBinNode('a.txt')]});
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select a.txt'}));
+
+    expect(screen.queryByRole('button', {name: 'Restore'})).not.toBeInTheDocument();
   });
 });
