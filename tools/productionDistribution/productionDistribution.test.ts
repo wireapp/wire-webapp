@@ -436,6 +436,18 @@ describe('production distribution decisions', () => {
     expect(actualSelection.value).toEqual({kind: 'reuse', version: expectedWireBuildsFields.version});
   });
 
+  it('reuses the Helm chart whose appVersion matches the maintenance image identity', () => {
+    const maintenanceImageTag = '2026-09-23.1-airgap-a-maintenance.1-v0.34.9-0-1234567';
+    const maintenanceChartVersion = '0.8.0-pre.3714';
+    const actualSelection = selectHelmChartVersion(
+      [{version: maintenanceChartVersion, appVersion: maintenanceImageTag}],
+      maintenanceImageTag,
+    );
+
+    assert(actualSelection.isOk);
+    expect(actualSelection.value).toEqual({kind: 'reuse', version: maintenanceChartVersion});
+  });
+
   it('requires a fresh Helm chart when no published chart matches', () => {
     const actualSelection = selectHelmChartVersion(
       [{version: '0.8.0-pre.3174', appVersion: 'old-image'}],

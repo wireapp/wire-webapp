@@ -1,0 +1,272 @@
+---
+name: Publish WebApp maintenance distribution
+
+on:
+  workflow_call:
+    inputs:
+      maintenance_line_key:
+        description: 'Validated maintenance line key'
+        required: true
+        type: string
+      maintenance_tag:
+        description: 'Existing immutable, validated maintenance tag'
+        required: true
+        type: string
+      maintenance_commit_sha:
+        description: 'Source commit recorded by the immutable maintenance tag'
+        required: true
+        type: string
+      source_workflow_run_id:
+        description: 'Run that created and validated the maintenance distribution artifact'
+        required: true
+        type: string
+      distribution_artifact_name:
+        description: 'Immutable Docker context and identity manifest artifact'
+        required: true
+        type: string
+      wire_builds_branch:
+        description: 'Optional existing wire-builds branch with a legacy S3 WebApp chart entry'
+        required: false
+        default: ''
+        type: string
+    outputs:
+      docker_image_tag:
+        description: 'Immutable Quay image tag'
+        value: ${{ jobs.publish_distribution.outputs.docker_image_tag }}
+      helm_chart_version:
+        description: 'Selected WebApp Helm chart version'
+        value: ${{ jobs.publish_distribution.outputs.helm_chart_version }}
+      wire_builds_commit_sha:
+        description: 'Verified wire-builds customer branch commit'
+        value: ${{ jobs.publish_distribution.outputs.wire_builds_commit_sha }}
+      distribution_result:
+        description: 'Maintenance distribution result'
+        value: ${{ jobs.publish_distribution.outputs.distribution_result }}
+    secrets:
+      WEBTEAM_QUAY_USERNAME:
+        required: true
+      WEBTEAM_QUAY_PASSWORD:
+        required: true
+      CHARTS_WEBAPP_AUTOMATION_AWS_ACCESS_KEY_ID:
+        required: true
+      CHARTS_WEBAPP_AUTOMATION_AWS_SECRET_ACCESS_KEY:
+        required: true
+      WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN:
+        required: false
+
+permissions: {}
+
+env:
+  CHART_REPOSITORY_NAME: charts-webapp
+  CHART_REPOSITORY_URL: s3://public.wire.com/charts-webapp
+  DOCKER_REPOSITORY: quay.io/wire/webapp
+  WIRE_BUILDS_REPOSITORY: wireapp/wire-builds
+
+jobs:
+  publish_distribution:
+    name: Publish Docker, Helm, and optional wire-builds maintenance metadata
+    runs-on: ubuntu-26.04
+    permissions:
+      actions: read
+      contents: read
+    concurrency:
+      group: publish-webapp-distribution
+      cancel-in-progress: false
+      queue: max
+    outputs:
+      docker_image_tag: ${{ steps.publish_docker.outputs.docker_image_tag }}
+      helm_chart_version: ${{ steps.publish_helm.outputs.helm_chart_version }}
+      wire_builds_commit_sha: ${{ steps.update_wire_builds.outputs.wire_builds_commit_sha }}
+      distribution_result: ${{ steps.distribution_summary.outputs.distribution_result }}
+
+    steps:
+      - name: Checkout exact maintenance tag
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          ref: ${{ inputs.maintenance_tag }}
+          path: selected-release
+
+      - name: Checkout current distribution tooling
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          ref: ${{ github.workflow_sha }}
+          path: workflow-source
+
+      - name: Setup current workflow Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: workflow-source/.nvmrc
+          cache: npm
+          cache-dependency-path: workflow-source/package-lock.json
+
+      - name: Install current distribution tooling dependencies
+        working-directory: workflow-source
+        run: npm clean-install --ignore-scripts && npx just apply-patches
+
+      - name: Validate customer release branch name
+        id: validate_wire_builds_branch
+        if: ${{ inputs.wire_builds_branch != '' }}
+        working-directory: workflow-source
+        env:
+          WIRE_BUILDS_BRANCH: ${{ inputs.wire_builds_branch }}
+        run: |
+          set -euo pipefail
+
+          validated_branch="$(node ./tools/releaseCli/maintenanceReleaseCli.mts validate-wire-builds-branch "${WIRE_BUILDS_BRANCH}")"
+          echo "wire_builds_branch=${validated_branch}" >> "$GITHUB_OUTPUT"
+
+      - name: Require wire-builds write access for selected branch
+        if: ${{ inputs.wire_builds_branch != '' }}
+        env:
+          WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN: ${{ secrets.WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          if [[ -z "${WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN}" ]]; then
+            echo 'WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN is required when a wire-builds branch is selected.' >&2
+            exit 1
+          fi
+
+      - name: Check out selected wire-builds customer branch
+        id: checkout_wire_builds
+        if: ${{ inputs.wire_builds_branch != '' }}
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: ${{ env.WIRE_BUILDS_REPOSITORY }}
+          token: ${{ secrets.WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN }}
+          ref: ${{ steps.validate_wire_builds_branch.outputs.wire_builds_branch }}
+          path: wire-builds
+          fetch-depth: 1
+
+      - name: Verify selected wire-builds branch exists
+        if: ${{ inputs.wire_builds_branch != '' }}
+        working-directory: wire-builds
+        env:
+          WIRE_BUILDS_BRANCH: ${{ steps.validate_wire_builds_branch.outputs.wire_builds_branch }}
+        run: |
+          set -euo pipefail
+
+          if ! git ls-remote --exit-code --heads origin "refs/heads/${WIRE_BUILDS_BRANCH}" > /dev/null; then
+            echo "Selected wire-builds branch does not exist: ${WIRE_BUILDS_BRANCH}" >&2
+            exit 1
+          fi
+
+      - name: Validate selected wire-builds distribution metadata
+        id: validate_wire_builds_metadata
+        if: ${{ inputs.wire_builds_branch != '' }}
+        working-directory: workflow-source
+        env:
+          BUILD_JSON_PATH: ${{ github.workspace }}/wire-builds/build.json
+        run: node ./tools/releaseCli/maintenanceReleaseCli.mts validate-wire-builds-build-json --build-json-path "${BUILD_JSON_PATH}"
+
+      - name: Download validated maintenance distribution artifact
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: ${{ inputs.distribution_artifact_name }}
+          path: ${{ runner.temp }}/maintenance-distribution-artifact
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ inputs.source_workflow_run_id }}
+
+      - name: Validate immutable tag and exact validated artifact
+        id: validate_identity
+        env:
+          DISTRIBUTION_ARTIFACT_PATH: ${{ runner.temp }}/maintenance-distribution-artifact
+          DISTRIBUTION_ARTIFACT_NAME: ${{ inputs.distribution_artifact_name }}
+          DISTRIBUTION_CONTEXT_PATH: ${{ runner.temp }}/maintenance-docker-context
+          EXPECTED_MAINTENANCE_COMMIT_SHA: ${{ inputs.maintenance_commit_sha }}
+          MAINTENANCE_LINE_KEY: ${{ inputs.maintenance_line_key }}
+          MAINTENANCE_TAG: ${{ inputs.maintenance_tag }}
+          SOURCE_WORKFLOW_RUN_ID: ${{ inputs.source_workflow_run_id }}
+        working-directory: selected-release
+        run: bash ../workflow-source/tools/maintenanceRelease/validateMaintenanceDistribution.sh
+
+      - name: Setup Helm
+        uses: azure/setup-helm@dda3372f752e03dde6b3237bc9431cdc2f7a02a2
+        with:
+          version: '3.22.1'
+
+      - name: Publish or reuse immutable Docker image
+        id: publish_docker
+        env:
+          DOCKER_PASSWORD: ${{ secrets.WEBTEAM_QUAY_PASSWORD }}
+          DOCKER_USERNAME: ${{ secrets.WEBTEAM_QUAY_USERNAME }}
+          DOCKER_REPOSITORY: ${{ env.DOCKER_REPOSITORY }}
+          PRODUCTION_IMAGE_TAG_OUTPUT_PATH: ${{ runner.temp }}/maintenance-image-tag.txt
+          PRODUCTION_TAG: ${{ inputs.maintenance_tag }}
+          RELEASE_COMMIT_SHA: ${{ steps.validate_identity.outputs.maintenance_tag_commit_sha }}
+          WIRE_WEBAPP_CONFIG_MANIFEST_PATH: ${{ github.workspace }}/selected-release/apps/webapp/app-config/package.json
+          WIRE_WEBAPP_DOCKER_CONTEXT_PATH: ${{ runner.temp }}/maintenance-docker-context
+          WIRE_WEBAPP_RELEASE_COMMIT_SHA: ${{ steps.validate_identity.outputs.maintenance_tag_commit_sha }}
+        working-directory: ${{ runner.temp }}
+        run: bash "${GITHUB_WORKSPACE}/workflow-source/tools/dockerPublication/publishProductionDocker.sh"
+
+      - name: Publish or reuse matching Helm chart
+        id: publish_helm
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_SECRET_ACCESS_KEY }}
+          DOCKER_IMAGE_TAG: ${{ steps.publish_docker.outputs.docker_image_tag }}
+          CHART_REPOSITORY_NAME: ${{ env.CHART_REPOSITORY_NAME }}
+          CHART_REPOSITORY_URL: ${{ env.CHART_REPOSITORY_URL }}
+        working-directory: selected-release
+        run: ../workflow-source/tools/helmPublication/publishProductionHelm.sh
+
+      - name: Update selected wire-builds customer branch idempotently
+        id: update_wire_builds
+        if: ${{ inputs.wire_builds_branch != '' }}
+        env:
+          DOCKER_IMAGE_TAG: ${{ steps.publish_docker.outputs.docker_image_tag }}
+          HELM_CHART_VERSION: ${{ steps.publish_helm.outputs.helm_chart_version }}
+          RELEASE_COMMIT_SHA: ${{ steps.validate_identity.outputs.maintenance_tag_commit_sha }}
+          WIRE_BUILDS_ALLOW_CUSTOM_BRANCHES: 'true'
+          WIRE_BUILDS_TARGET_BRANCH: ${{ steps.validate_wire_builds_branch.outputs.wire_builds_branch }}
+        working-directory: wire-builds
+        run: ../workflow-source/tools/wireBuilds/updateWireBuilds.sh
+
+      - name: Summarize maintenance distribution
+        id: distribution_summary
+        if: ${{ always() }}
+        env:
+          DOCKER_IMAGE_TAG: ${{ steps.publish_docker.outputs.docker_image_tag || 'not published' }}
+          DOCKER_RESULT: ${{ steps.publish_docker.outcome || 'not run' }}
+          HELM_CHART_VERSION: ${{ steps.publish_helm.outputs.helm_chart_version || 'not published' }}
+          HELM_RESULT: ${{ steps.publish_helm.outcome || 'not run' }}
+          MAINTENANCE_TAG: ${{ inputs.maintenance_tag }}
+          MAINTENANCE_COMMIT_SHA: ${{ steps.validate_identity.outputs.maintenance_tag_commit_sha }}
+          DISTRIBUTION_ARTIFACT_NAME: ${{ inputs.distribution_artifact_name }}
+          SOURCE_WORKFLOW_RUN_ID: ${{ inputs.source_workflow_run_id }}
+          WIRE_BUILDS_BRANCH: ${{ inputs.wire_builds_branch }}
+          WIRE_BUILDS_COMMIT_SHA: ${{ steps.update_wire_builds.outputs.wire_builds_commit_sha || 'not updated' }}
+          WIRE_BUILDS_RESULT: ${{ steps.update_wire_builds.outcome || 'not run' }}
+        run: |
+          set -euo pipefail
+
+          distribution_result='partial'
+          if [[ "${DOCKER_RESULT}" == 'success' ]] && [[ "${HELM_RESULT}" == 'success' ]]; then
+            if [[ -z "${WIRE_BUILDS_BRANCH}" ]] || [[ "${WIRE_BUILDS_RESULT}" == 'success' ]]; then
+              distribution_result='success'
+            fi
+          fi
+
+          {
+            echo '## WebApp maintenance distribution'
+            echo "- Maintenance tag: ${MAINTENANCE_TAG}"
+            echo "- Maintenance source commit: ${MAINTENANCE_COMMIT_SHA}"
+            echo "- Validated distribution artifact: ${DISTRIBUTION_ARTIFACT_NAME} from run ${SOURCE_WORKFLOW_RUN_ID}"
+            echo "- Docker result: ${DOCKER_RESULT} (quay.io/wire/webapp:${DOCKER_IMAGE_TAG})"
+            echo "- Helm result: ${HELM_RESULT} (charts-webapp/webapp:${HELM_CHART_VERSION}, appVersion ${DOCKER_IMAGE_TAG})"
+            if [[ -n "${WIRE_BUILDS_BRANCH}" ]]; then
+              echo "- wire-builds/${WIRE_BUILDS_BRANCH} result: ${WIRE_BUILDS_RESULT} (commit ${WIRE_BUILDS_COMMIT_SHA})"
+            else
+              echo '- wire-builds update: skipped (no branch selected)'
+            fi
+            echo "- Distribution result: ${distribution_result}"
+            echo '- Customer deployment is handled outside this workflow.'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          echo "distribution_result=${distribution_result}" >> "$GITHUB_OUTPUT"
