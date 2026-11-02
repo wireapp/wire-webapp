@@ -66,6 +66,7 @@ import {
   tableCellRow,
   tableCellStyles,
   selectedTableCellRowStyles,
+  selectionActionsStyles,
   selectionBarContainerStyles,
   selectionBarStyles,
   selectionCountStyles,
@@ -1163,105 +1164,107 @@ export const CellsTable = ({
                   {maybe.isJust(selectedFilesTotalSize) && (
                     <span css={selectionSizeStyles}>{formatBytes(selectedFilesTotalSize.value)}</span>
                   )}
-                  {canPermanentlyDeleteSelection && (
-                    <button
-                      css={bulkActionButtonStyles}
-                      type="button"
-                      aria-haspopup="dialog"
-                      disabled={isPermanentDeletePending}
-                      onClick={() => {
-                        const nodeIds = selectedNodes.map(node => {
-                          return node.id;
-                        });
-                        const path = getCellsFilesPath();
-                        const descriptionKey =
-                          nodeIds.length === 1
-                            ? 'cells.bulkDelete.confirmation.single'
-                            : 'cells.bulkDelete.confirmation.multiple';
-                        PrimaryModal.show(
-                          PrimaryModal.type.CONFIRM,
-                          {
-                            primaryAction: {
-                              action: () => {
-                                void handlePermanentDelete(nodeIds, selectionScopeKey, path);
+                  <div css={selectionActionsStyles}>
+                    {canPermanentlyDeleteSelection && (
+                      <button
+                        css={bulkActionButtonStyles}
+                        type="button"
+                        aria-haspopup="dialog"
+                        disabled={isPermanentDeletePending}
+                        onClick={() => {
+                          const nodeIds = selectedNodes.map(node => {
+                            return node.id;
+                          });
+                          const path = getCellsFilesPath();
+                          const descriptionKey =
+                            nodeIds.length === 1
+                              ? 'cells.bulkDelete.confirmation.single'
+                              : 'cells.bulkDelete.confirmation.multiple';
+                          PrimaryModal.show(
+                            PrimaryModal.type.CONFIRM,
+                            {
+                              primaryAction: {
+                                action: () => {
+                                  void handlePermanentDelete(nodeIds, selectionScopeKey, path);
+                                },
+                                text: translate('cells.deletePermanentlyModal.button'),
                               },
-                              text: translate('cells.deletePermanentlyModal.button'),
+                              text: {
+                                message: translate(descriptionKey, {count: nodeIds.length}),
+                                title: translate('cells.deletePermanentlyModal.headline'),
+                              },
                             },
-                            text: {
-                              message: translate(descriptionKey, {count: nodeIds.length}),
-                              title: translate('cells.deletePermanentlyModal.headline'),
+                            permanentDeleteModalId,
+                            translate,
+                          );
+                        }}
+                      >
+                        {translate('cells.options.deletePermanently')}
+                      </button>
+                    )}
+                    {canRestoreSelection && (
+                      <button
+                        css={bulkActionButtonStyles}
+                        type="button"
+                        aria-haspopup="dialog"
+                        onClick={() => {
+                          const nodeIds = selectedNodes.map(node => {
+                            return node.id;
+                          });
+                          showBulkRestoreModal({
+                            selectedNodes,
+                            targets: restoreResolution.targets,
+                            onRestore: () => {
+                              handleRestoreSelection(nodeIds, selectionScopeKey);
                             },
-                          },
-                          permanentDeleteModalId,
-                          translate,
-                        );
-                      }}
-                    >
-                      {translate('cells.options.deletePermanently')}
-                    </button>
-                  )}
-                  {canRestoreSelection && (
-                    <button
-                      css={bulkActionButtonStyles}
-                      type="button"
-                      aria-haspopup="dialog"
-                      onClick={() => {
-                        const nodeIds = selectedNodes.map(node => {
-                          return node.id;
-                        });
-                        showBulkRestoreModal({
-                          selectedNodes,
-                          targets: restoreResolution.targets,
-                          onRestore: () => {
-                            handleRestoreSelection(nodeIds, selectionScopeKey);
-                          },
-                          modalId: bulkRestoreModalId,
-                          translate,
-                        });
-                      }}
-                    >
-                      {translate('cells.options.restore')}
-                    </button>
-                  )}
-                  {canMoveSelection && (
-                    <button
-                      css={bulkActionButtonStyles}
-                      type="button"
-                      aria-haspopup="dialog"
-                      onClick={() => {
-                        return setIsBulkMovePreviewOpen(true);
-                      }}
-                    >
-                      <ArrowIcon direction="right" aria-hidden="true" focusable="false" />
-                      {translate('cells.selection.move')}
-                    </button>
-                  )}
-                  {canMoveSelectionToBin && (
-                    <button
-                      css={bulkMoveToBinButtonStyles}
-                      type="button"
-                      aria-haspopup="dialog"
-                      onClick={() => {
-                        const summary = {
-                          items: selectedNodes.map(node => {
-                            return {id: node.id, name: node.name, isFolder: node.type === CellNodeType.FOLDER};
-                          }),
-                          destinationPath: translate('cells.bulkMoveToBin.destination'),
-                        };
-                        setCapturedBulkMoveToBin({
-                          nodeIds: selectedNodes.map(({id}) => {
-                            return id;
-                          }),
-                          scopeKey: selectionScopeKey,
-                          summary,
-                        });
-                        setIsBulkMoveToBinConfirmationOpen(true);
-                      }}
-                    >
-                      <TrashIcon width={14} height={14} aria-hidden="true" />
-                      {translate('cells.selection.moveToBin')}
-                    </button>
-                  )}
+                            modalId: bulkRestoreModalId,
+                            translate,
+                          });
+                        }}
+                      >
+                        {translate('cells.options.restore')}
+                      </button>
+                    )}
+                    {canMoveSelection && (
+                      <button
+                        css={bulkActionButtonStyles}
+                        type="button"
+                        aria-haspopup="dialog"
+                        onClick={() => {
+                          return setIsBulkMovePreviewOpen(true);
+                        }}
+                      >
+                        <ArrowIcon direction="right" aria-hidden="true" focusable="false" />
+                        {translate('cells.selection.move')}
+                      </button>
+                    )}
+                    {canMoveSelectionToBin && (
+                      <button
+                        css={bulkMoveToBinButtonStyles}
+                        type="button"
+                        aria-haspopup="dialog"
+                        onClick={() => {
+                          const summary = {
+                            items: selectedNodes.map(node => {
+                              return {id: node.id, name: node.name, isFolder: node.type === CellNodeType.FOLDER};
+                            }),
+                            destinationPath: translate('cells.bulkMoveToBin.destination'),
+                          };
+                          setCapturedBulkMoveToBin({
+                            nodeIds: selectedNodes.map(({id}) => {
+                              return id;
+                            }),
+                            scopeKey: selectionScopeKey,
+                            summary,
+                          });
+                          setIsBulkMoveToBinConfirmationOpen(true);
+                        }}
+                      >
+                        <TrashIcon width={14} height={14} aria-hidden="true" />
+                        {translate('cells.selection.moveToBin')}
+                      </button>
+                    )}
+                  </div>
                 </div>
               )}
             </div>,

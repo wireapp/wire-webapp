@@ -3756,6 +3756,19 @@ describe('CellsTable restoring selected Bin items', () => {
     expect(screen.queryByRole('button', {name: 'Delete permanently'})).not.toBeInTheDocument();
   });
 
+  it('groups Delete permanently and Restore together on the right of the selection bar', async () => {
+    const user = userEvent.setup();
+    renderCellsTable({initialNodes: [createBinNode('a.txt')]});
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select a.txt'}));
+    const actions = screen.getByRole('button', {name: 'Restore'}).parentElement;
+
+    expect(actions).toBe(screen.getByRole('button', {name: 'Delete permanently'}).parentElement);
+    expect(actions).toHaveStyle({marginLeft: 'auto'});
+    expect(screen.getByRole('button', {name: 'Restore'})).not.toHaveStyle({marginLeft: 'auto'});
+    expect(screen.getByRole('button', {name: 'Delete permanently'})).not.toHaveStyle({marginLeft: 'auto'});
+  });
+
   it('does not offer Restore to a viewer', async () => {
     const user = userEvent.setup();
     renderCellsTable({
