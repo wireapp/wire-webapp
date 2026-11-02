@@ -47,6 +47,14 @@ export enum CredentialType {
   X509 = 2,
 }
 
+export enum SignatureScheme {
+  EcdsaSecp256r1Sha256 = 1027,
+  EcdsaSecp384r1Sha384 = 1283,
+  EcdsaSecp521r1Sha512 = 1539,
+  Ed25519 = 2055,
+  Ed448 = 2056,
+}
+
 export enum GroupInfoEncryptionType {
   Plaintext = 1,
   JweEncrypted = 2,
@@ -169,8 +177,16 @@ export class ClientId extends ByteContainer {
   }
 }
 export class CredentialRef extends ByteContainer {}
-export class Credential extends ByteContainer {}
-export class ExternalSender extends ByteContainer {}
+export class Credential extends ByteContainer {
+  static basic(_cipherSuite: CipherSuite, clientId: ClientId): Credential {
+    return new Credential(clientId.copyBytes());
+  }
+}
+export class ExternalSender extends ByteContainer {
+  static parse(key: Uint8Array, _signatureScheme: SignatureScheme): ExternalSender {
+    return new ExternalSender(key);
+  }
+}
 
 export class PkiEnvironment {
   addTrustAnchor = asyncNoop;
