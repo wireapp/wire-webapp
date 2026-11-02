@@ -69,6 +69,7 @@
     "jscpd": "5.4.2",
     "jsdom": "29.1.1",
     "nock": "14.0.17",
+    "oxlint": "1.90.0",
     "patch-package": "8.0.1",
     "playwright": "1.64.1",
     "prettier": "3.9.10",
