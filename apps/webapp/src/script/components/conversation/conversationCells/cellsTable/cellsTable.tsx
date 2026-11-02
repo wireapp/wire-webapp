@@ -33,14 +33,9 @@ import {isNonEmptyString} from '@sindresorhus/is';
 import {flexRender, getCoreRowModel, type Header, useReactTable} from '@tanstack/react-table';
 import {BackendError, StatusCode} from '@wireapp/api-client/lib/http/';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
-import {
-  JobsTaskStatus,
-  RestActionStatus,
-  type JobsTaskStatus as JobsTaskStatusValue,
-  type RestPerformActionResponse,
-} from 'cells-sdk-ts';
+import {JobsTaskStatus, RestActionStatus, type RestPerformActionResponse} from 'cells-sdk-ts';
 import {createPortal} from 'react-dom';
-import {Maybe, maybe, task} from 'true-myth';
+import {Maybe, maybe} from 'true-myth';
 
 import {
   ArrowIcon,
@@ -101,10 +96,10 @@ import {CellsFilePreviewModalProvider} from './common/cellsFilePreviewModalConte
 import {getBulkMoveOutcomeEvidence} from './getBulkMoveOutcomeEvidence';
 
 import {
-  pollCellsBackgroundActionJobs,
-  type CellsBackgroundActionOutcome,
-  type CancelCellsBackgroundActionPolling,
-} from '../common/cellsBackgroundActionPolling/cellsBackgroundActionPolling';
+  checkCellsBackgroundActionJobs,
+  getCellsBackgroundActionEvidence,
+  observeCellsBackgroundActionJobs,
+} from '../common/cellsBackgroundActionPolling/cellsBackgroundActionJobs';
 import {CellsSortDirection} from '../common/cellsSortIcon/cellsSortIcon';
 import {CellsSortField, SORTABLE_COLUMN_FIELD, toAriaSort} from '../common/useCellsSorting/useCellsSorting';
 import {getSharedDriveDroppedFiles} from '../getSharedDriveDroppedFiles';
@@ -215,7 +210,7 @@ interface PermanentDeleteReconciliationContext {
   nodeIds: string[];
   scopeKey: string;
   path: string;
-  jobUuids: string[];
+  jobUuids: readonly string[];
   hasKnownJobFailure: boolean;
 }
 
@@ -228,14 +223,6 @@ const hasSameSelection = (selectedNodeIds: ReadonlySet<string>, nodeIds: readonl
   );
 };
 
-const getPermanentDeleteJobUuids = (response: RestPerformActionResponse): string[] => {
-  const jobUuids = response.BackgroundActions?.flatMap(action => {
-    return action.Name === 'delete' && isNonEmptyString(action.JobUuid) ? [action.JobUuid] : [];
-  });
-
-  return [...new Set(jobUuids ?? [])];
-};
-
 const isAuthoritativePermanentDeleteRejection = (error: unknown): boolean => {
   return (
     error instanceof BackendError &&
@@ -243,17 +230,6 @@ const isAuthoritativePermanentDeleteRejection = (error: unknown): boolean => {
     error.code >= StatusCode.BAD_REQUEST &&
     error.code < StatusCode.INTERNAL_SERVER_ERROR &&
     error.code !== StatusCode.REQUEST_TIMEOUT
-  );
-};
-
-const hasPermanentDeleteJobFailure = (response: RestPerformActionResponse): boolean => {
-  return (
-    response.BackgroundActions?.some(action => {
-      return (
-        action.Name === 'delete' &&
-        (action.Status === JobsTaskStatus.Error || action.Status === JobsTaskStatus.Interrupted)
-      );
-    }) ?? false
   );
 };
 
@@ -284,21 +260,6 @@ const getPermanentDeleteReviewMessageKey = (
     default:
       return 'cells.bulkDelete.timedOut';
   }
-};
-
-const hasPermanentDeleteCompleted = (response: RestPerformActionResponse): boolean => {
-  if (response.Status !== RestActionStatus.Performed) {
-    return false;
-  }
-
-  const {BackgroundActions: backgroundActions} = response;
-  if (backgroundActions === undefined || backgroundActions.length === 0) {
-    return true;
-  }
-
-  return backgroundActions.every(action => {
-    return action.Name === 'delete' && isNonEmptyString(action.JobUuid) && action.Status === JobsTaskStatus.Finished;
-  });
 };
 
 export const CellsTable = ({
@@ -360,7 +321,7 @@ export const CellsTable = ({
   const pendingPermanentDeleteNodeIdsRef = useRef<string[]>([]);
   const permanentDeleteReconciliationGenerationRef = useRef(0);
   const permanentDeleteReconciliationRequestIdRef = useRef(0);
-  const cancelPermanentDeleteJobCheckRef = useRef<CancelCellsBackgroundActionPolling | undefined>(undefined);
+  const cancelPermanentDeleteJobCheckRef = useRef<(() => void) | undefined>(undefined);
   const permanentDeleteReconciliationTimeoutRef = useRef<ReturnType<typeof clock.setTimeout> | undefined>(undefined);
   const permanentDeleteReconciliationDeadlineRef = useRef<ReturnType<typeof clock.setTimeout> | undefined>(undefined);
   const permanentDeleteReconciliationRequestInFlightRef = useRef(false);
@@ -514,19 +475,10 @@ export const CellsTable = ({
     }
 
     const moveStatusId = backgroundMoveStatusId;
-    return pollCellsBackgroundActionJobs({
+    return observeCellsBackgroundActionJobs({
+      cellsRepository,
+      actionName: 'move',
       jobUuids: backgroundMoveJobUuids,
-      readStatus: jobUuid => {
-        return task.tryOrElse(
-          error => {
-            return error;
-          },
-          async () => {
-            const response = await cellsRepository.getBackgroundMoveInfo({jobUuid});
-            return Maybe.of<JobsTaskStatusValue>(response.Status);
-          },
-        );
-      },
       clock,
       pollingPolicy: {
         pollIntervalMs: BACKGROUND_MOVE_STATUS_POLL_INTERVAL_MS,
@@ -756,59 +708,23 @@ export const CellsTable = ({
     permanentDeleteReconciliationRequestInFlightRef.current = true;
     setIsPermanentDeleteReconciliationRequestInFlight(true);
     try {
-      let hasJobFailure = context.hasKnownJobFailure;
-      // Reconciliation must refresh even after an unknown status. Check once here;
-      // the feature's reconciliation loop owns the next refresh and its deadline.
-      const jobOutcome =
-        context.jobUuids.length === 0
-          ? 'all-finished'
-          : await new Promise<CellsBackgroundActionOutcome | null>(resolve => {
-              const cancel = pollCellsBackgroundActionJobs({
-                jobUuids: context.jobUuids,
-                clock,
-                isCurrent: () => {
-                  return isCurrentPermanentDeleteReconciliation(context, generation);
-                },
-                pollingPolicy: {
-                  pollIntervalMs: PERMANENT_DELETE_RECONCILIATION_INTERVAL_MS,
-                  maxUnknownRetries: 0,
-                  getUnknownRetryDelay: () => {
-                    return PERMANENT_DELETE_RECONCILIATION_INTERVAL_MS;
-                  },
-                  maxPollAttempts: Maybe.just(1),
-                },
-                readStatus: jobUuid => {
-                  return task
-                    .tryOrElse(
-                      error => {
-                        return error;
-                      },
-                      () => {
-                        return cellsRepository.getBackgroundActionInfo({name: 'delete', jobUuid});
-                      },
-                    )
-                    .map(response => {
-                      if (response.Status === JobsTaskStatus.Error || response.Status === JobsTaskStatus.Interrupted) {
-                        hasJobFailure = true;
-                      }
-                      return Maybe.of<JobsTaskStatusValue>(response.Status);
-                    });
-                },
-                onStatusSnapshot: () => {
-                  return undefined;
-                },
-                onOutcome: resolve,
-              });
-              cancelPermanentDeleteJobCheckRef.current = () => {
-                cancel();
-                resolve(null);
-              };
-            });
-      if (!isCurrentPermanentDeleteReconciliation(context, generation) || jobOutcome === null) {
+      const check = checkCellsBackgroundActionJobs({
+        cellsRepository,
+        actionName: 'delete',
+        jobUuids: context.jobUuids,
+        clock,
+        isCurrent: () => {
+          return isCurrentPermanentDeleteReconciliation(context, generation);
+        },
+      });
+      cancelPermanentDeleteJobCheckRef.current = check.cancel;
+      const jobEvidence = await check.result;
+      if (!isCurrentPermanentDeleteReconciliation(context, generation) || maybe.isNothing(jobEvidence)) {
         return;
       }
       cancelPermanentDeleteJobCheckRef.current = undefined;
-      const hasPendingJob = jobOutcome === 'check-limit' || jobOutcome === 'status-unknown';
+      const hasJobFailure = context.hasKnownJobFailure || jobEvidence.value.hasFailedJobs;
+      const hasPendingJob = jobEvidence.value.hasPendingJobs;
 
       setIsWaitingForPermanentDeleteReconciliation(false);
       let wasRefreshSuccessful = false;
@@ -926,13 +842,14 @@ export const CellsTable = ({
         return;
       }
 
-      if (!hasPermanentDeleteCompleted(response)) {
+      const evidence = getCellsBackgroundActionEvidence(response, 'delete');
+      if (!evidence.hasCompleted) {
         startPermanentDeleteReconciliation({
           nodeIds,
           scopeKey,
           path,
-          jobUuids: getPermanentDeleteJobUuids(response),
-          hasKnownJobFailure: hasPermanentDeleteJobFailure(response),
+          jobUuids: evidence.jobUuids,
+          hasKnownJobFailure: evidence.hasFailedJobs,
         });
         return;
       }
