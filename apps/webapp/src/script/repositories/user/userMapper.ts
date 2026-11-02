@@ -155,7 +155,6 @@ export class UserMapper {
     }
 
     if (!isNullOrUndefined(contactStatus)) {
-      // The contact status is only sent for local users, a missing value should not reset it
       userEntity.isPendingOnboarding(contactStatus.state === ContactStatusState.NON_CONTACTABLE);
     }
 

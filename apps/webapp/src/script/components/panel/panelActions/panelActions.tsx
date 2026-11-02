@@ -27,7 +27,6 @@ export interface MenuItem {
   identifier: string;
   label: string;
   disabled?: boolean;
-  /** id of the element describing the action, e.g. why it is disabled */
   descriptionId?: string;
 }
 
