@@ -6,10 +6,24 @@ You can find the published source code at [github.com/wireapp](https://github.co
 
 For licensing information, see the attached LICENSE file and the list of third-party licenses at [wire.com/legal/licenses/](https://wire.com/legal/licenses/).
 
-## Webapp configuration
+## CopyConfig
 
-This repository tooling copies the selected webapp configuration during `npx just configure-webapp`. The command executes [`cli.mts`](./cli.mts) directly with the repository's pinned Node.js runtime; it does not compile a package first.
+Wire's internal configuration copy tool.
 
-The tool reads [`apps/webapp/.copyconfigrc.js`](../../apps/webapp/.copyconfigrc.js), which selects the configuration repository and maps its `content/` directory to `apps/webapp/resource/` and `.env.defaults` to the repository root. Configuration version selection remains in [`apps/webapp/configuration-selection.js`](../../apps/webapp/configuration-selection.js).
 
-The configuration file follows the [cosmiconfig format](https://github.com/cosmiconfig/cosmiconfig). The `files` option maps source paths to one or more destinations. `WIRE_CONFIGURATION_EXTERNAL_DIR`, `WIRE_CONFIGURATION_FILES`, and `WIRE_CONFIGURATION_REPOSITORY` override the corresponding options for local setup and CI.
+### Setup
+
+Run `npx just configure-webapp` from the repository root. The command reads [`apps/webapp/.copyconfigrc.js`](../../apps/webapp/.copyconfigrc.js), which follows the [cosmiconfig standard](https://github.com/davidtheclark/cosmiconfig#cosmiconfig) and uses [`CopyConfigOptions.mts`](./CopyConfigOptions.mts).
+
+**Note**: the `files` parameter needs to be specified, all other are optional.
+
+#### Environment variables
+
+Additionally, some parameters can be set via environment variables (which then take precedence above all other configuration):
+
+| Parameter | Environment variable | Example |
+| --- | --- | --- |
+| `externalDir` | `WIRE_CONFIGURATION_EXTERNAL_DIR` | `/home/user/externalDir` |
+| `files` | `WIRE_CONFIGURATION_FILES` | `/path/to/source.txt:/path/to/destination.txt;/path/to/source/:/path/to/destination/` |
+| `repositoryUrl` | `WIRE_CONFIGURATION_REPOSITORY` | `/path/to/anotherDir/*:[/path/to/thirdDir/,/path/to/destinationDir/]` |
+

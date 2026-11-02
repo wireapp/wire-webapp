@@ -597,15 +597,6 @@ const productionConfigs = [
     },
   },
   {
-    files: ['tools/configuration/**/*.{ts,mts}'],
-    languageOptions: {
-      parserOptions: {
-        project: './tsconfig.tools.type-check.json',
-        projectService: false,
-      },
-    },
-  },
-  {
     files: ['tools/releaseGithub/**/*.ts'],
     languageOptions: {
       parserOptions: {
@@ -633,7 +624,7 @@ const productionConfigs = [
     },
   },
   {
-    files: ['tools/buildArtifact/**/*.mts', 'tools/runtimeVerification/**/*.mts'],
+    files: ['tools/buildArtifact/**/*.mts', 'tools/configuration/**/*.mts', 'tools/runtimeVerification/**/*.mts'],
     languageOptions: {
       parserOptions: {
         project: './tsconfig.tools.json',

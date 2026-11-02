@@ -17,7 +17,7 @@
  *
  */
 
-export type ConfigurationCopyOptions = {
+export type CopyConfigOptions = {
   /**
    * The directory to clone or download into.
    *

@@ -18,44 +18,39 @@
  *
  */
 
-import {isNull, isUndefined} from '@sindresorhus/is';
 import {cosmiconfig} from 'cosmiconfig';
 import logdown from 'logdown';
 import {noop} from 'noop-esm';
 
-import {ConfigurationCopier} from './ConfigurationCopier.mts';
-import type {ConfigurationCopyOptions} from './ConfigurationCopyOptions.mts';
+import {CopyConfig} from './CopyConfig.mts';
+import type {CopyConfigOptions} from './CopyConfigOptions.mts';
 
-async function runConfigurationCopyCommand(): Promise<void> {
-  const configurationExplorer = cosmiconfig('copyconfig');
-  const configurationFile = await configurationExplorer.search();
-  const configurationOptions: ConfigurationCopyOptions | undefined = isNull(configurationFile)
-    ? undefined
-    : configurationFile.config;
+async function runCopyConfigCommand(): Promise<void> {
+  try {
+    const configExplorer = cosmiconfig('copyconfig');
+    const configFile = await configExplorer.search();
+    const config: CopyConfigOptions | undefined = configFile !== null ? configFile.config : undefined;
 
-  const logLevel = configurationOptions?.logLevel ?? 'info';
-  const logger = logLevel !== 'silent' ? logdown('@wireapp/copy-config', {markdown: false}) : undefined;
-  if (!isUndefined(logger)) {
-    logger.state.isEnabled = true;
-    if (!isNull(configurationFile)) {
-      logger.info(`Found configuration file "${configurationFile.filepath}".`);
+    const logLevel = config?.logLevel ?? 'info';
+    const logger = logLevel !== 'silent' ? logdown('@wireapp/copy-config', {markdown: false}) : undefined;
+    if (logger !== undefined) {
+      logger.state.isEnabled = true;
+      if (configFile !== null) {
+        logger.info(`Found configuration file "${configFile.filepath}".`);
+      }
+      if (logLevel !== 'verbose') {
+        // Disable debug logging when not in verbose mode
+        logger.debug = noop;
+      }
     }
-    if (logLevel !== 'verbose') {
-      // Disable debug logging when not in verbose mode
-      logger.debug = noop;
-    }
+
+    const copiedFiles = await new CopyConfig(config, logger).copy();
+    const copyMessage = Boolean(copiedFiles.length) ? `Copied ${copiedFiles.length}` : "Didn't copy any";
+    logger?.info(`${copyMessage} file${copiedFiles.length === 1 ? '' : 's'}.`);
+  } catch (error: unknown) {
+    console.error(error);
+    process.exitCode = 1;
   }
-
-  const copiedDestinationPaths = await new ConfigurationCopier(configurationOptions, logger).copyConfigurationFiles();
-  const configurationCopyMessage = Boolean(copiedDestinationPaths.length)
-    ? `Copied ${copiedDestinationPaths.length}`
-    : "Didn't copy any";
-  logger?.info(`${configurationCopyMessage} file${copiedDestinationPaths.length === 1 ? '' : 's'}.`);
 }
 
-try {
-  await runConfigurationCopyCommand();
-} catch (error: unknown) {
-  console.error(error);
-  process.exitCode = 1;
-}
+void runCopyConfigCommand();

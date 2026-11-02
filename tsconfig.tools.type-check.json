@@ -1,9 +1,6 @@
 {
   "extends": "./tsconfig.tools.json",
   "compilerOptions": {
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "erasableSyntaxOnly": true,
     "noEmit": true,
     "incremental": true,
     "tsBuildInfoFile": "target/buildcache/tooling-type-check.tsbuildinfo"
