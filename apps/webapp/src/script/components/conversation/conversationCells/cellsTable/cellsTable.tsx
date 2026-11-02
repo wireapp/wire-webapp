@@ -100,7 +100,11 @@ import {getCellsTableColumns, getCellsTableDataCellLabels} from './cellsTableCol
 import {CellsFilePreviewModalProvider} from './common/cellsFilePreviewModalContext/cellsFilePreviewModalContext';
 import {getBulkMoveOutcomeEvidence} from './getBulkMoveOutcomeEvidence';
 
-import {pollCellsBackgroundActionJobs} from '../common/cellsBackgroundActionPolling/cellsBackgroundActionPolling';
+import {
+  pollCellsBackgroundActionJobs,
+  type CellsBackgroundActionOutcome,
+  type CancelCellsBackgroundActionPolling,
+} from '../common/cellsBackgroundActionPolling/cellsBackgroundActionPolling';
 import {CellsSortDirection} from '../common/cellsSortIcon/cellsSortIcon';
 import {CellsSortField, SORTABLE_COLUMN_FIELD, toAriaSort} from '../common/useCellsSorting/useCellsSorting';
 import {getSharedDriveDroppedFiles} from '../getSharedDriveDroppedFiles';
@@ -356,6 +360,7 @@ export const CellsTable = ({
   const pendingPermanentDeleteNodeIdsRef = useRef<string[]>([]);
   const permanentDeleteReconciliationGenerationRef = useRef(0);
   const permanentDeleteReconciliationRequestIdRef = useRef(0);
+  const cancelPermanentDeleteJobCheckRef = useRef<CancelCellsBackgroundActionPolling | undefined>(undefined);
   const permanentDeleteReconciliationTimeoutRef = useRef<ReturnType<typeof clock.setTimeout> | undefined>(undefined);
   const permanentDeleteReconciliationDeadlineRef = useRef<ReturnType<typeof clock.setTimeout> | undefined>(undefined);
   const permanentDeleteReconciliationRequestInFlightRef = useRef(false);
@@ -379,6 +384,8 @@ export const CellsTable = ({
   }, [clock]);
   const cancelPermanentDeleteReconciliation = useCallback((): void => {
     permanentDeleteReconciliationGenerationRef.current += 1;
+    cancelPermanentDeleteJobCheckRef.current?.();
+    cancelPermanentDeleteJobCheckRef.current = undefined;
     if (permanentDeleteReconciliationTimeoutRef.current !== undefined) {
       clock.clearTimeout(permanentDeleteReconciliationTimeoutRef.current);
       permanentDeleteReconciliationTimeoutRef.current = undefined;
@@ -749,35 +756,59 @@ export const CellsTable = ({
     permanentDeleteReconciliationRequestInFlightRef.current = true;
     setIsPermanentDeleteReconciliationRequestInFlight(true);
     try {
-      const jobResults = await Promise.all(
-        context.jobUuids.map(jobUuid => {
-          return task.tryOrElse(
-            error => {
-              return error;
-            },
-            () => {
-              return cellsRepository.getBackgroundActionInfo({name: 'delete', jobUuid});
-            },
-          );
-        }),
-      );
-      if (!isCurrentPermanentDeleteReconciliation(context, generation)) {
+      let hasJobFailure = context.hasKnownJobFailure;
+      // Reconciliation must refresh even after an unknown status. Check once here;
+      // the feature's reconciliation loop owns the next refresh and its deadline.
+      const jobOutcome =
+        context.jobUuids.length === 0
+          ? 'all-finished'
+          : await new Promise<CellsBackgroundActionOutcome | null>(resolve => {
+              const cancel = pollCellsBackgroundActionJobs({
+                jobUuids: context.jobUuids,
+                clock,
+                isCurrent: () => {
+                  return isCurrentPermanentDeleteReconciliation(context, generation);
+                },
+                pollingPolicy: {
+                  pollIntervalMs: PERMANENT_DELETE_RECONCILIATION_INTERVAL_MS,
+                  maxUnknownRetries: 0,
+                  getUnknownRetryDelay: () => {
+                    return PERMANENT_DELETE_RECONCILIATION_INTERVAL_MS;
+                  },
+                  maxPollAttempts: Maybe.just(1),
+                },
+                readStatus: jobUuid => {
+                  return task
+                    .tryOrElse(
+                      error => {
+                        return error;
+                      },
+                      () => {
+                        return cellsRepository.getBackgroundActionInfo({name: 'delete', jobUuid});
+                      },
+                    )
+                    .map(response => {
+                      if (response.Status === JobsTaskStatus.Error || response.Status === JobsTaskStatus.Interrupted) {
+                        hasJobFailure = true;
+                      }
+                      return Maybe.of<JobsTaskStatusValue>(response.Status);
+                    });
+                },
+                onStatusSnapshot: () => {
+                  return undefined;
+                },
+                onOutcome: resolve,
+              });
+              cancelPermanentDeleteJobCheckRef.current = () => {
+                cancel();
+                resolve(null);
+              };
+            });
+      if (!isCurrentPermanentDeleteReconciliation(context, generation) || jobOutcome === null) {
         return;
       }
-
-      const jobStatuses = jobResults.map(result => {
-        return result.isOk ? result.value.Status : undefined;
-      });
-      const hasJobFailure =
-        context.hasKnownJobFailure ||
-        jobStatuses.some(status => {
-          return status === JobsTaskStatus.Error || status === JobsTaskStatus.Interrupted;
-        });
-      const hasPendingJob = jobStatuses.some(status => {
-        return (
-          status !== JobsTaskStatus.Finished && status !== JobsTaskStatus.Error && status !== JobsTaskStatus.Interrupted
-        );
-      });
+      cancelPermanentDeleteJobCheckRef.current = undefined;
+      const hasPendingJob = jobOutcome === 'check-limit' || jobOutcome === 'status-unknown';
 
       setIsWaitingForPermanentDeleteReconciliation(false);
       let wasRefreshSuccessful = false;

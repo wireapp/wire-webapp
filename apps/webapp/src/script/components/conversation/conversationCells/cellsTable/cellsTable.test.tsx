@@ -614,6 +614,53 @@ describe('CellsTable selection', () => {
     }
   });
 
+  it.each([
+    {description: 'a missing status', firstRead: Promise.resolve({})},
+    {description: 'an unknown status', firstRead: Promise.resolve({Status: JobsTaskStatus.Unknown})},
+    {description: 'a rejected status read', firstRead: undefined},
+  ])('refreshes and retries after $description without repeating the delete', async ({firstRead}) => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files/recycle_bin';
+    const user = userEvent.setup();
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    const onRefreshAfterBulkMoveOutcome = jest.fn().mockResolvedValue(true);
+    const repository = {
+      deleteNodes: jest.fn().mockResolvedValue({
+        Status: 'Background',
+        BackgroundActions: [{Name: 'delete', JobUuid: 'delete-job'}],
+      }),
+      getBackgroundActionInfo: jest
+        .fn()
+        .mockImplementationOnce(() => {
+          return firstRead ?? Promise.reject(new Error('status unavailable'));
+        })
+        .mockResolvedValue({Status: JobsTaskStatus.Finished}),
+    } as unknown as CellsRepository;
+
+    try {
+      const view = renderCellsTable({cellsRepository: repository, onRefreshAfterBulkMoveOutcome, clock});
+      await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+      await user.click(screen.getByRole('button', {name: 'Delete permanently'}));
+      await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Delete'}));
+
+      await waitFor(() => {
+        expect(onRefreshAfterBulkMoveOutcome).toHaveBeenCalledTimes(1);
+      });
+      await act(async () => {
+        clock.advanceByMilliseconds(1000);
+      });
+      await waitFor(() => {
+        expect(onRefreshAfterBulkMoveOutcome).toHaveBeenCalledTimes(2);
+      });
+      expect(repository.getBackgroundActionInfo).toHaveBeenCalledTimes(2);
+      expect(repository.deleteNodes).toHaveBeenCalledTimes(1);
+      expect(screen.getByText('Checking the Bin for selected items…')).toBeInTheDocument();
+      view.unmount();
+    } finally {
+      window.location.hash = originalHash;
+    }
+  });
+
   it('shows an unresolved warning after a rejected request without retrying it', async () => {
     const originalHash = window.location.hash;
     window.location.hash = '#/conversation/conversation-id@example.com/files/recycle_bin';
@@ -1067,6 +1114,88 @@ describe('CellsTable selection', () => {
         expect(screen.queryByText('1 selected')).not.toBeInTheDocument();
       });
       expect(repository.getBackgroundActionInfo).toHaveBeenCalledTimes(1);
+      expect(repository.deleteNodes).toHaveBeenCalledTimes(1);
+    } finally {
+      window.location.hash = originalHash;
+    }
+  });
+
+  it('preserves a failed job outcome when another job status is unknown', async () => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files/recycle_bin';
+    const user = userEvent.setup();
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    const onRefreshAfterBulkMoveOutcome = jest.fn().mockResolvedValue(true);
+    const repository = {
+      deleteNodes: jest.fn().mockResolvedValue({
+        Status: 'Background',
+        BackgroundActions: [
+          {Name: 'delete', JobUuid: 'failed-job'},
+          {Name: 'delete', JobUuid: 'unknown-job'},
+        ],
+      }),
+      getBackgroundActionInfo: jest.fn().mockImplementation(({jobUuid}: {jobUuid: string}) => {
+        return Promise.resolve({Status: jobUuid === 'failed-job' ? JobsTaskStatus.Error : JobsTaskStatus.Unknown});
+      }),
+    } as unknown as CellsRepository;
+
+    try {
+      const view = renderCellsTable({cellsRepository: repository, onRefreshAfterBulkMoveOutcome, clock});
+      await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+      await user.click(screen.getByRole('button', {name: 'Delete permanently'}));
+      await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Delete'}));
+
+      expect(
+        await screen.findByText('The delete job failed. Checking the Bin for remaining items…'),
+      ).toBeInTheDocument();
+      expect(onRefreshAfterBulkMoveOutcome).toHaveBeenCalledTimes(1);
+      expect(repository.deleteNodes).toHaveBeenCalledTimes(1);
+      view.unmount();
+    } finally {
+      window.location.hash = originalHash;
+    }
+  });
+
+  it.each(['scope change', 'unmount'])('does not refresh after %s cancels a pending job read', async cancellation => {
+    const originalHash = window.location.hash;
+    window.location.hash = '#/conversation/conversation-id@example.com/files/recycle_bin';
+    const user = userEvent.setup();
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    const onRefreshAfterBulkMoveOutcome = jest.fn().mockResolvedValue(true);
+    let resolveStatus: (response: {Status: typeof JobsTaskStatus.Finished}) => void = () => {
+      return undefined;
+    };
+    const pendingStatus = new Promise<{Status: typeof JobsTaskStatus.Finished}>(resolve => {
+      resolveStatus = resolve;
+    });
+    const repository = {
+      deleteNodes: jest.fn().mockResolvedValue({
+        Status: 'Background',
+        BackgroundActions: [{Name: 'delete', JobUuid: 'delete-job'}],
+      }),
+      getBackgroundActionInfo: jest.fn().mockReturnValue(pendingStatus),
+    } as unknown as CellsRepository;
+
+    try {
+      const view = renderCellsTable({cellsRepository: repository, onRefreshAfterBulkMoveOutcome, clock});
+      await user.click(screen.getByRole('checkbox', {name: 'Select Marketing images'}));
+      await user.click(screen.getByRole('button', {name: 'Delete permanently'}));
+      await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Delete'}));
+      await waitFor(() => {
+        expect(repository.getBackgroundActionInfo).toHaveBeenCalledTimes(1);
+      });
+
+      if (cancellation === 'scope change') {
+        view.rerenderWithSelectionScope('another-bin-folder');
+      } else {
+        view.unmount();
+      }
+      await act(async () => {
+        resolveStatus({Status: JobsTaskStatus.Finished});
+        clock.advanceByMilliseconds(20_000);
+      });
+
+      expect(onRefreshAfterBulkMoveOutcome).not.toHaveBeenCalled();
       expect(repository.deleteNodes).toHaveBeenCalledTimes(1);
     } finally {
       window.location.hash = originalHash;
