@@ -202,6 +202,51 @@ const preventDefaultFileDrop = (event: DragEvent<HTMLElement>): void => {
 
 // Selecting rows only makes sense when at least one of these is available, e.g. never for viewers.
 const BULK_ACTIONS = [CELLS_ACTION.MOVE, CELLS_ACTION.DELETE, CELLS_ACTION.RESTORE];
+type PermanentDeleteCheckingMessageKey =
+  'cells.bulkDelete.checking' | 'cells.bulkDelete.checkingAfterJobFailure' | 'cells.bulkDelete.retryingRefresh';
+type PermanentDeleteReviewMessageKey =
+  | 'cells.bulkDelete.jobFailed'
+  | 'cells.bulkDelete.refreshFailed'
+  | 'cells.bulkDelete.stillVisible'
+  | 'cells.bulkDelete.timedOut';
+
+const hasSameSelection = (selectedNodeIds: ReadonlySet<string>, nodeIds: readonly string[]): boolean => {
+  return (
+    selectedNodeIds.size === nodeIds.length &&
+    nodeIds.every(nodeId => {
+      return selectedNodeIds.has(nodeId);
+    })
+  );
+};
+
+const getPermanentDeleteCheckingMessageKey = (
+  reason: PermanentDeleteReviewReason | null,
+): PermanentDeleteCheckingMessageKey => {
+  if (reason === 'job-failed') {
+    return 'cells.bulkDelete.checkingAfterJobFailure';
+  }
+  if (reason === 'refresh-failed') {
+    return 'cells.bulkDelete.retryingRefresh';
+  }
+
+  return 'cells.bulkDelete.checking';
+};
+
+const getPermanentDeleteReviewMessageKey = (
+  reason: PermanentDeleteReviewReason | null,
+): PermanentDeleteReviewMessageKey => {
+  switch (reason) {
+    case 'job-failed':
+      return 'cells.bulkDelete.jobFailed';
+    case 'refresh-failed':
+      return 'cells.bulkDelete.refreshFailed';
+    case 'still-visible':
+      return 'cells.bulkDelete.stillVisible';
+    case 'timed-out':
+    default:
+      return 'cells.bulkDelete.timedOut';
+  }
+};
 
 interface CapturedBulkMoveToBinSelection {
   nodeIds: string[];
