@@ -62,7 +62,13 @@ import {showUserModal, UserModal} from '../components/Modals/UserModal';
 import {useActiveWindow} from '../hooks/useActiveWindow';
 import {useInitializeRootFontSize} from '../hooks/useRootFontSize';
 import {App} from '../main/app';
+import {isMLSSupportedByEnvironment} from '../mls/isMLSSupportedByEnvironment';
 import {initialiseMLSMigrationFlow} from '../mls/MLSMigration';
+import {finaliseMigrationOfMixedConversations} from '../mls/MLSMigration/migrationFinaliser';
+import {
+  initialiseMigrationOfProteusConversations,
+  joinUnestablishedMixedConversations,
+} from '../mls/MLSMigration/migrationInitialiser';
 import {CallingViewMode, CallState, DesktopScreenShareMenu} from '../repositories/calling/CallState';
 import {ConversationState} from '../repositories/conversation/ConversationState';
 import {User} from '../repositories/entity/User';
@@ -331,6 +337,23 @@ export const AppMain: FunctionComponent<AppMainProps> = (properties: AppMainProp
       conversationRepository: repositories.conversation,
       getTeamMLSMigrationStatus: repositories.team.getTeamMLSMigrationStatus,
       refreshAllKnownUsers: repositories.user.refreshAllKnownUsers,
+      dependencies: {
+        isMLSSupportedByEnvironment,
+        registerTask: core.recurringTaskScheduler.registerTask,
+        initialiseMigrationOfProteusConversations: (conversations, selfUserId) => {
+          return initialiseMigrationOfProteusConversations(conversations, selfUserId, repositories.conversation);
+        },
+        joinUnestablishedMixedConversations: (conversations, selfUserId) => {
+          return joinUnestablishedMixedConversations(conversations, repositories.conversation, selfUserId, {core});
+        },
+        finaliseMigrationOfMixedConversations: conversations => {
+          return finaliseMigrationOfMixedConversations(
+            conversations,
+            repositories.conversation.updateConversationProtocol,
+            repositories.team.getTeamMLSMigrationStatus,
+          );
+        },
+      },
     });
   };
 

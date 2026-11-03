@@ -235,6 +235,46 @@ function buildConversationRepository(
   ] as const;
 }
 
+describe('conversation group selection', () => {
+  it('selects self-team groups separately from groups across all teams', () => {
+    const [conversationRepository, {conversationState, userState}] = buildConversationRepository(translateForTest);
+    const selfTeamId = 'self-team';
+    const selfUser = generateUser();
+    selfUser.teamId = selfTeamId;
+    userState.self(selfUser);
+
+    const selfTeamConversation = _generateConversation();
+    selfTeamConversation.teamId = selfTeamId;
+    const otherTeamConversation = _generateConversation();
+    otherTeamConversation.teamId = 'other-team';
+    const conversationWithoutTeam = _generateConversation();
+    conversationWithoutTeam.teamId = '';
+    const allGroupConversations = [selfTeamConversation, otherTeamConversation, conversationWithoutTeam];
+    conversationState.conversations(allGroupConversations);
+
+    const actualSelfTeamConversations = conversationRepository.getAllTeamGroupConversations();
+    const actualAllGroupConversations = conversationRepository.getAllGroupConversations();
+
+    expect(actualSelfTeamConversations).toEqual([selfTeamConversation]);
+    expect(actualAllGroupConversations).toEqual(allGroupConversations);
+  });
+
+  it('does not match empty conversation and self-user team IDs', () => {
+    const [conversationRepository, {conversationState, userState}] = buildConversationRepository(translateForTest);
+    const selfUser = generateUser();
+    selfUser.teamId = '';
+    userState.self(selfUser);
+
+    const conversationWithoutTeam = _generateConversation();
+    conversationWithoutTeam.teamId = '';
+    conversationState.conversations([conversationWithoutTeam]);
+
+    const actualConversations = conversationRepository.getAllTeamGroupConversations();
+
+    expect(actualConversations).toEqual([]);
+  });
+});
+
 describe('ConversationRepository', () => {
   const originalPrimaryModalShow = PrimaryModal.show;
   const testFactory = new TestFactory();

@@ -1527,7 +1527,8 @@ export class ConversationRepository {
   }
 
   /**
-   * Get all the group conversations owned by self user's team from the local state.
+   * Get all group conversations from the self user's team in the local state.
+   * Conversations are excluded when the self user has no non-empty team ID.
    */
   public readonly getAllTeamGroupConversations = (): Conversation[] => {
     const selfUser = this.userState.self();
@@ -1544,7 +1545,7 @@ export class ConversationRepository {
   };
 
   /**
-   * Get all the group conversations owned by self user's team from the local state.
+   * Get all group conversations from the local state, regardless of team ownership.
    */
   public readonly getAllGroupConversations = (): Conversation[] => {
     return this.conversationState.conversations().filter(conversation => {
