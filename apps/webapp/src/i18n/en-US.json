@@ -888,6 +888,7 @@
   "conversationFileUploadOverlayDescription": "Drag & drop to add files",
   "conversationFileUploadOverlayTitle": "Upload files",
   "conversationFileUploadRestrictedOverlayDescription": "You have view access for this conversation, but you can’t upload, edit, or manage files",
+  "conversationViewerPermissionBannerMessagesAllowed": "You can still send messages.",
   "conversationFileUploadRestrictedOverlayTitle": "Files not sharable",
   "conversationFileVideoPreviewLabel": "Video file preview for: {src}",
   "conversationFoldersEmptyText": "Add your conversations to folders to stay organized.",

@@ -179,7 +179,12 @@ export const CellsHeader: FunctionComponent<CellsHeaderProps> = ({
         </div>
       )}
 
-      {showViewerPermission && !isSearchViewOpen && !isInRecycleBin && <ConversationViewerPermissionBanner />}
+      {showViewerPermission && !isSearchViewOpen && !isInRecycleBin && (
+        <ConversationViewerPermissionBanner
+          key={`${conversationQualifiedId.id}@${conversationQualifiedId.domain}`}
+          conversationId={`${conversationQualifiedId.id}@${conversationQualifiedId.domain}`}
+        />
+      )}
     </div>
   );
 };

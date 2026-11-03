@@ -24,10 +24,19 @@ import {CloseIcon} from '@wireapp/react-ui-kit';
 import {Config} from '../../../Config';
 import {useApplicationContext} from '../../../page/rootProvider';
 
-export const ConversationViewerPermissionBanner: FunctionComponent = () => {
+interface ConversationViewerPermissionBannerProps {
+  conversationId: string;
+}
+
+export const ConversationViewerPermissionBanner: FunctionComponent<ConversationViewerPermissionBannerProps> = ({
+  conversationId,
+}) => {
   const {translate} = useApplicationContext();
   const sharedDriveSupportUrl = Config.getConfig().URL.SUPPORT.SHARED_DRIVE;
-  const [isVisible, setIsVisible] = useState(true);
+  const dismissedKey = `conversation-viewer-permission-banner-dismissed:${conversationId}`;
+  const [isVisible, setIsVisible] = useState(() => {
+    return sessionStorage.getItem(dismissedKey) !== 'true';
+  });
 
   if (!isVisible) {
     return null;
@@ -37,6 +46,7 @@ export const ConversationViewerPermissionBanner: FunctionComponent = () => {
     <div className="conversation-viewer-permission-banner" role="status">
       <div className="conversation-viewer-permission-banner__content">
         <span>{translate('conversationFileUploadRestrictedOverlayDescription')}</span>
+        <span>{translate('conversationViewerPermissionBannerMessagesAllowed')}</span>
         <a
           className="conversation-viewer-permission-banner__learn-more"
           href={sharedDriveSupportUrl}
@@ -52,7 +62,8 @@ export const ConversationViewerPermissionBanner: FunctionComponent = () => {
         className="conversation-viewer-permission-banner__close"
         aria-label={translate('accessibility.rightPanel.close')}
         onClick={() => {
-          return setIsVisible(false);
+          sessionStorage.setItem(dismissedKey, 'true');
+          setIsVisible(false);
         }}
       >
         <CloseIcon />
