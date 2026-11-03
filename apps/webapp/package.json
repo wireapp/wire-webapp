@@ -33,7 +33,6 @@
     "@wireapp/store-engine-dexie": "2.1.24",
     "@wireapp/telemetry": "0.3.10",
     "amplify": "git+https://github.com/wireapp/amplify.git#c28502cf2a3c99291cc2cda667e7c9fd10f5ddf1",
-    "bazinga64": "6.5.13",
     "beautiful-react-hooks": "5.0.3",
     "classnames": "2.5.1",
     "core-js": "3.51.0",

@@ -1,3 +1,5 @@
+/** @jest-environment node */
+
 /*
  * Wire
  * Copyright (C) 2018 Wire Swiss GmbH
@@ -19,7 +21,7 @@
 
 import * as _sodium from 'libsodium-wrappers-sumo';
 
-import * as bazinga64 from './index';
+import {Decoder} from './decoder';
 
 let sodium: typeof _sodium;
 
@@ -32,7 +34,7 @@ describe('decode Base64', () => {
   it('is compliant with libsodium on short sequences', () => {
     const encoded = 'SGVsbG8=';
 
-    const decodedWithBazinga64 = bazinga64.Decoder.fromBase64(encoded).asBytes;
+    const decodedWithBazinga64 = Decoder.fromBase64(encoded).asBytes;
     const decodedWithSodium = sodium.from_base64(encoded, sodium.base64_variants.ORIGINAL);
 
     expect(decodedWithBazinga64).toEqual(decodedWithSodium);
@@ -42,7 +44,7 @@ describe('decode Base64', () => {
     const encoded =
       'pQABARn//wKhAFgg5fwzzahXsFp99ChcRC0/0qIr4vLCujkcRSOkziiTz8gDoQChAFggaK10DY60iH38gbXc9GoOrv+SqQ0p3AEsR0WjHQLkV5kE9g==';
 
-    const decodedWithBazinga64 = bazinga64.Decoder.fromBase64(encoded).asBytes;
+    const decodedWithBazinga64 = Decoder.fromBase64(encoded).asBytes;
     const decodedWithSodium = sodium.from_base64(encoded, sodium.base64_variants.ORIGINAL);
 
     expect(decodedWithBazinga64).toEqual(decodedWithSodium);
