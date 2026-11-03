@@ -23,8 +23,8 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {AddUsersFailure, AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
-import de from 'I18n/de-DE.json';
-import en from 'I18n/en-US.json';
+import de from '../../../../i18n/de-DE.json';
+import en from '../../../../i18n/en-US.json';
 import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from 'Repositories/entity/message/failedToAddUsersMessage';
 import {User} from 'Repositories/entity/User';
 import {UserState} from 'Repositories/user/userState';

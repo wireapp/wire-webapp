@@ -35,7 +35,6 @@ import {
   Tooltip,
 } from '@wireapp/react-ui-kit';
 
-import {useUserIdentity} from 'Hooks/useDeviceIdentities';
 import {ClientEntity} from 'Repositories/client';
 import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
 import {checkUserHandle} from 'Repositories/conversation/ConversationVerificationStateHandler';
@@ -46,6 +45,8 @@ import {MLSStatuses, WireIdentity} from 'src/script/e2eIdentity/e2eIdentityVerif
 import {RootContextValue, useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {waitFor} from 'Util/waitFor';
+
+import {useUserIdentity} from '../../../../hooks/useDeviceIdentities';
 
 type VerificationBadgeContext = 'user' | 'conversation' | 'device';
 

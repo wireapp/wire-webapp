@@ -160,7 +160,7 @@ const RootComponent: FunctionComponent<RootProps & ConnectedProps & DispatchProp
   }, [doGetSSOSettings]);
 
   const loadLanguage = (language: string): LanguageMessages => {
-    return require(`I18n/${mapLanguage(language)}.json`);
+    return require(`../../../i18n/${mapLanguage(language)}.json`);
   };
 
   const navigate = (route: string): null => {

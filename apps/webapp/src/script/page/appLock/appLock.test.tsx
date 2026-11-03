@@ -24,7 +24,7 @@ import ko from 'knockout';
 
 import {WebAppEvents} from '../../webAppEvents';
 
-import en from 'I18n/en-US.json';
+import en from '../../../i18n/en-US.json';
 import type {ClientRepository} from 'Repositories/client';
 import {User} from 'Repositories/entity/User/User';
 import {TeamState} from 'Repositories/team/TeamState';

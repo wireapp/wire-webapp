@@ -19,7 +19,7 @@
 
 import {render} from '@testing-library/react';
 
-import en from 'I18n/en-US.json';
+import en from '../../../../i18n/en-US.json';
 import {FileTypeRestrictedMessage as FileTypeRestrictedMessageEntity} from 'Repositories/entity/message/fileTypeRestrictedMessage';
 import {
   createRootContextValueForTest,

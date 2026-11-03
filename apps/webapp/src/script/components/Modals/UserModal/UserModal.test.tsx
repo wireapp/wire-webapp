@@ -20,7 +20,7 @@
 import {act, render, waitFor} from '@testing-library/react';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 
-import en from 'I18n/en-US.json';
+import en from '../../../../i18n/en-US.json';
 import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';

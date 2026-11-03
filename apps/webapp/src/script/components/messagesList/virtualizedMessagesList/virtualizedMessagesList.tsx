@@ -40,12 +40,12 @@ import {
 } from 'Components/messagesList/utils/virtualizedMessagesGroup';
 import {useLoadMessages} from 'Components/messagesList/virtualizedMessagesList/useLoadMessages';
 import {useScrollMessages} from 'Components/messagesList/virtualizedMessagesList/useScrollMessages';
-import {useRoveFocus} from 'Hooks/useRoveFocus';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
+import {useRoveFocus} from '../../../hooks/useRoveFocus';
 import {VirtualizedJumpToLastMessageButton} from '../virtualizedJumpToLastMessageButton';
 
 const messageHighlightDurationInMilliseconds = 5000;

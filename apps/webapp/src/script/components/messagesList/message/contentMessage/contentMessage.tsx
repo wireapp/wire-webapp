@@ -28,7 +28,6 @@ import {OutlineCheck} from '@wireapp/react-ui-kit';
 
 import {FileFullscreenModalSourceConversationProvider} from 'Components/FileFullscreenModal/FileFullscreenModalSourceConversationContext';
 import {ReadIndicator} from 'Components/messagesList/message/readIndicator';
-import {useClickOutside} from 'Hooks/useClickOutside';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {CompositeMessage} from 'Repositories/entity/message/compositeMessage';
 import {ContentMessage} from 'Repositories/entity/message/contentMessage';
@@ -50,6 +49,7 @@ import {Quote} from './messageQuote';
 import {CompleteFailureToSendWarning, PartialFailureToSendWarning} from './warnings';
 
 import {MessageActions} from '..';
+import {useClickOutside} from '../../../../hooks/useClickOutside';
 import {EphemeralStatusType} from '../../../../message/ephemeralStatusType';
 import {ContextMenuEntry} from '../../../../ui/contextMenu';
 import {EphemeralTimer} from '../ephemeralTimer';

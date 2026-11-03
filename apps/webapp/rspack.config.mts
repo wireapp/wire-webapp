@@ -324,10 +324,7 @@ function createRspackConfiguration(mode: 'development' | 'production' = 'product
         // its `require()` calls would otherwise fail with "Package subpath '.' is not defined by exports".
         '@wireapp/core-crypto$': path.resolve(rootPath, 'node_modules/@wireapp/core-crypto/dist/corecrypto.js'),
         Components: path.resolve(scriptPath, 'components'),
-        Hooks: path.resolve(scriptPath, 'hooks'),
         Repositories: path.resolve(scriptPath, 'repositories'),
-        I18n: path.resolve(srcPath, 'i18n'),
-        Resource: path.resolve(configDirectoryPath, 'resource'),
         Util: path.resolve(scriptPath, 'util'),
         src: path.resolve(configDirectoryPath, 'src'),
         test: path.resolve(configDirectoryPath, 'test'),

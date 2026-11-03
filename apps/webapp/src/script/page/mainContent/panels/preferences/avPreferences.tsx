@@ -21,7 +21,6 @@ import {memo, type FunctionComponent} from 'react';
 
 import {container} from 'tsyringe';
 
-import {useInitializeMediaDevices} from 'Hooks/useInitializeMediaDevices';
 import type {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {MediaConstraintsHandler} from 'Repositories/media/MediaConstraintsHandler';
 import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
@@ -37,6 +36,8 @@ import {MicrophonePreferences} from './avPreferences/microphonePreferences';
 import {SaveCallLogs} from './avPreferences/saveCallLogs';
 import {PreferencesPage} from './components/preferencesPage';
 import {useCameraReloadOnCallEnd} from './useCameraReloadOnCallEnd';
+
+import {useInitializeMediaDevices} from '../../../../hooks/useInitializeMediaDevices';
 
 interface AVPreferencesProps {
   callingRepository: CallingRepository;

@@ -22,7 +22,7 @@ import {render, fireEvent} from '@testing-library/react';
 import {isNull} from '@sindresorhus/is';
 import {ProteusErrors} from '@wireapp/core/lib/messagingProtocols/proteus';
 
-import en from 'I18n/en-US.json';
+import en from '../../../../i18n/en-US.json';
 import {DecryptErrorMessage as DecryptErrorMessageEntity} from 'Repositories/entity/message/decryptErrorMessage';
 import {User} from 'Repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';

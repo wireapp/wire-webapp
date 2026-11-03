@@ -24,7 +24,6 @@ import {container} from 'tsyringe';
 
 import {ICellAsset} from '@wireapp/protocol-messaging';
 
-import {useInView} from 'Hooks/useInView/useInView';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {isPreviewableImage} from 'Util/imageUtil';
@@ -42,6 +41,8 @@ import {
 } from './multipartAssets.styles';
 import {useGetMultipartAsset} from './useGetMultipartAsset/useGetMultipartAsset';
 import {VideoAssetCard} from './videoAssetCard/videoAssetCard';
+
+import {useInView} from '../../../../../../hooks/useInView/useInView';
 
 interface MultipartAssetsProps {
   assets: ICellAsset[];

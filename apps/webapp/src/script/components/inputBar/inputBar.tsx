@@ -30,7 +30,6 @@ import {ConversationClassifiedBar} from 'Components/classifiedBar/classifiedBar'
 import {isConversationFileUploadAllowed} from 'Components/conversation/conversationFileDropzone/isConversationFileUploadAllowed/isConversationFileUploadAllowed';
 import {useFileUploadState} from 'Components/conversation/useFilesUploadState/useFilesUploadState';
 import {EmojiPicker} from 'Components/emojiPicker/emojiPicker';
-import {useUserPropertyValue} from 'Hooks/useUserProperty';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
@@ -66,6 +65,7 @@ import {usePing} from './usePing/usePing';
 import {useTypingIndicator} from './useTypingIndicator/useTypingIndicator';
 
 import {Config} from '../../Config';
+import {useUserPropertyValue} from '../../hooks/useUserProperty';
 import {useApplicationContext} from '../../page/rootProvider';
 import {WebAppEvents} from '../../webAppEvents';
 

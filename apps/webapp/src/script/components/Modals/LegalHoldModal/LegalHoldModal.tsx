@@ -29,7 +29,6 @@ import {LegalHoldDot} from 'Components/LegalHoldDot';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {UserDevicesState, UserDevices} from 'Components/userDevices';
 import {UserSearchableList} from 'Components/UserSearchableList';
-import {useUserDevicesHistory} from 'Hooks/useUserDevicesHistory';
 import {ClientRepository} from 'Repositories/client';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
@@ -50,6 +49,8 @@ import {toError} from 'Util/toError';
 import {isErrorWithCode} from 'Util/typePredicateUtil';
 
 import {useLegalHoldModalState} from './LegalHoldModal.state';
+
+import {useUserDevicesHistory} from '../../../hooks/useUserDevicesHistory';
 
 const DISABLE_SUBMIT_TEXT_LENGTH = 1;
 const legalHoldModalLineBreakMarker = createReactTranslationMarker('legal-hold-modal-line-break');
