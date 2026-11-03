@@ -18,62 +18,64 @@
  */
 
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {container} from 'tsyringe';
+import {asyncNoop} from 'noop-esm';
 
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import {generateConversation} from 'test/helper/ConversationGenerator';
+import {translateForTest} from 'Util/test/translateForTest';
 
-import {finaliseMigrationOfMixedConversations} from './migrationFinaliser';
-import {initialiseMigrationOfProteusConversations, joinUnestablishedMixedConversations} from './migrationInitialiser';
+import {Conversation} from '../../repositories/entity/Conversation';
+import {User} from '../../repositories/entity/User';
+
 import {MLSMigrationStatus} from './migrationStatus';
-import {initialiseMLSMigrationFlow} from './MLSMigration';
+import {initialiseMLSMigrationFlow, type MLSMigrationFlowDependencies} from './MLSMigration';
 
-import {isMLSSupportedByEnvironment} from '../isMLSSupportedByEnvironment';
+function createGroupConversation(teamId: string, protocol: CONVERSATION_PROTOCOL): Conversation {
+  const conversation = generateConversation({protocol});
+  conversation.teamId = teamId;
 
-jest.mock('./migrationFinaliser', () => {
-  return {finaliseMigrationOfMixedConversations: jest.fn()};
-});
-jest.mock('./migrationInitialiser', () => {
+  return conversation;
+}
+
+function createSelfUser(teamId?: string): User {
+  const selfUser = new User('self', 'wire.test', translateForTest);
+  selfUser.teamId = teamId;
+  selfUser.supportedProtocols([CONVERSATION_PROTOCOL.MLS]);
+
+  return selfUser;
+}
+
+function createMigrationFlowDependencies(): MLSMigrationFlowDependencies {
   return {
-    initialiseMigrationOfProteusConversations: jest.fn(),
-    joinUnestablishedMixedConversations: jest.fn(),
+    isMLSSupportedByEnvironment: jest.fn(async (): Promise<boolean> => {
+      return true;
+    }),
+    registerDailyTask: jest.fn(asyncNoop),
+    initialiseMigrationOfProteusConversations: jest.fn(asyncNoop),
+    joinUnestablishedMixedConversations: jest.fn(asyncNoop),
+    finaliseMigrationOfMixedConversations: jest.fn(asyncNoop),
   };
-});
-jest.mock('../isMLSSupportedByEnvironment', () => {
-  return {isMLSSupportedByEnvironment: jest.fn()};
-});
-jest.mock('src/script/service/coreSingleton', () => {
-  return {Core: class {}};
-});
+}
 
 describe('initialiseMLSMigrationFlow', () => {
   const selfTeamId = 'self-team';
-  const makeConversation = (teamId?: string): Conversation => {
-    return {teamId} as unknown as Conversation;
-  };
-  const ownTeamConversation = makeConversation(selfTeamId);
-  const otherTeamConversation = makeConversation('other-team');
-  const noTeamConversation = makeConversation(undefined);
 
-  const run = async (teamId: string | undefined): Promise<Conversation[]> => {
-    const selfUser = {
-      teamId,
-      qualifiedId: {id: 'self', domain: 'wire.test'},
-      supportedProtocols: () => {
-        return [CONVERSATION_PROTOCOL.MLS];
-      },
-    } as unknown as User;
-    const allConversations = [ownTeamConversation, otherTeamConversation, noTeamConversation];
+  it('initialises and finalises self-team conversations while joining mixed conversations from every team', async () => {
+    const selfUser = createSelfUser(selfTeamId);
+    const ownTeamProteusConversation = createGroupConversation(selfTeamId, CONVERSATION_PROTOCOL.PROTEUS);
+    const ownTeamMixedConversation = createGroupConversation(selfTeamId, CONVERSATION_PROTOCOL.MIXED);
+    const otherTeamMixedConversation = createGroupConversation('other-team', CONVERSATION_PROTOCOL.MIXED);
+    const noTeamMixedConversation = createGroupConversation('', CONVERSATION_PROTOCOL.MIXED);
+    const selfTeamGroupConversations = [ownTeamProteusConversation, ownTeamMixedConversation];
+    const allGroupConversations = [...selfTeamGroupConversations, otherTeamMixedConversation, noTeamMixedConversation];
     const conversationRepository = {
-      getAllGroupConversations: jest.fn(() => {
-        return allConversations;
+      getAllTeamGroupConversations: jest.fn(() => {
+        return selfTeamGroupConversations;
       }),
-      updateConversationProtocol: jest.fn(),
-    } as unknown as ConversationRepository;
-
-    jest.spyOn(container, 'resolve').mockReturnValue({recurringTaskScheduler: {registerTask: jest.fn()}});
-    (isMLSSupportedByEnvironment as jest.Mock).mockResolvedValue(true);
+      getAllGroupConversations: jest.fn(() => {
+        return allGroupConversations;
+      }),
+    };
+    const dependencies = createMigrationFlowDependencies();
 
     await initialiseMLSMigrationFlow({
       selfUser,
@@ -81,41 +83,52 @@ describe('initialiseMLSMigrationFlow', () => {
       getTeamMLSMigrationStatus: () => {
         return MLSMigrationStatus.ONGOING;
       },
-      refreshAllKnownUsers: jest.fn().mockResolvedValue(undefined),
+      refreshAllKnownUsers: jest.fn(asyncNoop),
+      dependencies,
     });
-    return allConversations;
-  };
 
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
-  it('only initialises and finalises conversations that belong to the self user team', async () => {
-    await run(selfTeamId);
-
-    expect(initialiseMigrationOfProteusConversations).toHaveBeenCalledWith(
-      [ownTeamConversation],
-      expect.anything(),
-      expect.anything(),
+    expect(conversationRepository.getAllTeamGroupConversations).toHaveBeenCalledTimes(1);
+    expect(dependencies.initialiseMigrationOfProteusConversations).toHaveBeenCalledWith(
+      selfTeamGroupConversations,
+      selfUser.qualifiedId,
     );
-    expect(finaliseMigrationOfMixedConversations).toHaveBeenCalledWith(
-      [ownTeamConversation],
-      expect.anything(),
-      expect.anything(),
+    expect(dependencies.finaliseMigrationOfMixedConversations).toHaveBeenCalledWith(selfTeamGroupConversations);
+    expect(dependencies.joinUnestablishedMixedConversations).toHaveBeenCalledWith(
+      allGroupConversations,
+      selfUser.qualifiedId,
     );
   });
 
-  it('still tries to join all unestablished mixed conversations', async () => {
-    const all = await run(selfTeamId);
-    expect(joinUnestablishedMixedConversations).toHaveBeenCalledWith(all, expect.anything(), expect.anything(), {
-      core: expect.anything(),
+  it('does not initialise or finalise automatic migration for a user without a team', async () => {
+    const selfUser = createSelfUser();
+    const otherTeamMixedConversation = createGroupConversation('other-team', CONVERSATION_PROTOCOL.MIXED);
+    const allGroupConversations = [otherTeamMixedConversation];
+    const conversationRepository = {
+      getAllTeamGroupConversations: jest.fn(() => {
+        return [];
+      }),
+      getAllGroupConversations: jest.fn(() => {
+        return allGroupConversations;
+      }),
+    };
+    const dependencies = createMigrationFlowDependencies();
+
+    await initialiseMLSMigrationFlow({
+      selfUser,
+      conversationRepository,
+      getTeamMLSMigrationStatus: () => {
+        return MLSMigrationStatus.ONGOING;
+      },
+      refreshAllKnownUsers: jest.fn(asyncNoop),
+      dependencies,
     });
-  });
 
-  it('does not migrate any conversation if the self user has no team', async () => {
-    await run(undefined);
-
-    expect(initialiseMigrationOfProteusConversations).toHaveBeenCalledWith([], expect.anything(), expect.anything());
-    expect(finaliseMigrationOfMixedConversations).toHaveBeenCalledWith([], expect.anything(), expect.anything());
+    expect(conversationRepository.getAllTeamGroupConversations).not.toHaveBeenCalled();
+    expect(dependencies.initialiseMigrationOfProteusConversations).not.toHaveBeenCalled();
+    expect(dependencies.finaliseMigrationOfMixedConversations).not.toHaveBeenCalled();
+    expect(dependencies.joinUnestablishedMixedConversations).toHaveBeenCalledWith(
+      allGroupConversations,
+      selfUser.qualifiedId,
+    );
   });
 });

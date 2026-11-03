@@ -34,6 +34,7 @@ import {Config} from 'src/script/Config';
 import {canUseMeetings} from 'Util/canUseMeetings';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
+import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {AppLock} from './appLock';
 import {useE2EIFeatureConfigUpdate} from './components/featureConfigChange/featureConfigChangeHandler/features/useE2eIFeatureConfigUpdate';
@@ -62,7 +63,13 @@ import {showUserModal, UserModal} from '../components/Modals/UserModal';
 import {useActiveWindow} from '../hooks/useActiveWindow';
 import {useInitializeRootFontSize} from '../hooks/useRootFontSize';
 import {App} from '../main/app';
+import {isMLSSupportedByEnvironment} from '../mls/isMLSSupportedByEnvironment';
 import {initialiseMLSMigrationFlow} from '../mls/MLSMigration';
+import {finaliseMigrationOfMixedConversations} from '../mls/MLSMigration/migrationFinaliser';
+import {
+  initialiseMigrationOfProteusConversations,
+  joinUnestablishedMixedConversations,
+} from '../mls/MLSMigration/migrationInitialiser';
 import {CallingViewMode, CallState, DesktopScreenShareMenu} from '../repositories/calling/CallState';
 import {ConversationState} from '../repositories/conversation/ConversationState';
 import {User} from '../repositories/entity/User';
@@ -331,6 +338,29 @@ export const AppMain: FunctionComponent<AppMainProps> = (properties: AppMainProp
       conversationRepository: repositories.conversation,
       getTeamMLSMigrationStatus: repositories.team.getTeamMLSMigrationStatus,
       refreshAllKnownUsers: repositories.user.refreshAllKnownUsers,
+      dependencies: {
+        isMLSSupportedByEnvironment,
+        registerDailyTask: task => {
+          return core.recurringTaskScheduler.registerTask({
+            every: TIME_IN_MILLIS.DAY,
+            task,
+            key: 'mls-migration',
+          });
+        },
+        initialiseMigrationOfProteusConversations: (conversations, selfUserId) => {
+          return initialiseMigrationOfProteusConversations(conversations, selfUserId, repositories.conversation);
+        },
+        joinUnestablishedMixedConversations: (conversations, selfUserId) => {
+          return joinUnestablishedMixedConversations(conversations, repositories.conversation, selfUserId, {core});
+        },
+        finaliseMigrationOfMixedConversations: conversations => {
+          return finaliseMigrationOfMixedConversations(
+            conversations,
+            repositories.conversation.updateConversationProtocol,
+            repositories.team.getTeamMLSMigrationStatus,
+          );
+        },
+      },
     });
   };
 
