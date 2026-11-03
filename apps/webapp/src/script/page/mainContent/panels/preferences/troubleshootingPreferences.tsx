@@ -31,11 +31,11 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 import {copyText} from 'Util/clipboardUtil';
 import {downloadBlob} from 'Util/util';
 
-import * as Icon from '../../../../components/icon';
-
 import {PreferencesPage} from './components/preferencesPage';
 import {DiagnosticStatusIcon as StatusIcon} from './troubleshooting/diagnosticStatusIcon';
 import * as styles from './troubleshooting/troubleshooting.styles';
+
+import * as Icon from '../../../../components/icon';
 
 const MILLISECONDS_PER_SECOND = 1_000;
 const statusTone = (status: CheckStatus): 'good' | 'warning' | 'bad' | 'muted' => {
