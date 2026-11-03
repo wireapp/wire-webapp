@@ -283,6 +283,9 @@ export const AppMain: FunctionComponent<AppMainProps> = (properties: AppMainProp
       '/preferences/av': () => {
         return mainView.list.openPreferencesAudioVideo();
       },
+      '/preferences/troubleshooting': () => {
+        return mainView.list.openPreferences(ContentState.PREFERENCES_TROUBLESHOOTING);
+      },
       '/preferences/devices': () => {
         return mainView.list.openPreferencesDevices();
       },

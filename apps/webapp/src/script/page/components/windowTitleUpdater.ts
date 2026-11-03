@@ -139,6 +139,10 @@ const useWindowTitle = (translate: Translate): void => {
         return translate('preferencesAV');
       })
 
+      .with(ContentState.PREFERENCES_TROUBLESHOOTING, () => {
+        return translate('preferencesTroubleshooting');
+      })
+
       .with(ContentState.PREFERENCES_DEVICE_DETAILS, () => {
         return translate('preferencesDeviceDetails');
       })
