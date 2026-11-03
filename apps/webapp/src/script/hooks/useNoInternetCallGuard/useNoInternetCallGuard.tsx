@@ -20,11 +20,11 @@
 import {useCallback} from 'react';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {styles} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard.styles';
 import type {Translate} from 'Util/localizerUtil';
 
 import {useWarningsState} from '../../view_model/WarningsContainer/WarningsState';
 import {TYPE} from '../../view_model/WarningsContainer/WarningsTypes';
+import {styles} from './useNoInternetCallGuard.styles';
 
 export interface NoInternetCallGuardCopy {
   description: string;

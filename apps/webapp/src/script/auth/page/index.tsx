@@ -30,7 +30,6 @@ import {UrlUtil} from '@wireapp/commons';
 import {Button, ButtonVariant, ContainerXS, ErrorMessage, Text} from '@wireapp/react-ui-kit';
 
 import {LogoFullIcon} from 'Components/icon';
-import {useSingleInstance} from 'Hooks/useSingleInstance';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {Core} from 'src/script/service/coreSingleton';
 import {isDataDogEnabled} from 'Util/dataDog';
@@ -39,6 +38,7 @@ import {getWebEnvironment} from 'Util/environment';
 import {Page} from './page';
 
 import {Config} from '../../Config';
+import {useSingleInstance} from '../../hooks/useSingleInstance';
 import '../../localization/Localizer';
 import {actionRoot} from '../module/action';
 import {bindActionCreators, RootState, type ThunkAction} from '../module/reducer';

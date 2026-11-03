@@ -31,8 +31,6 @@ import {ConversationVerificationBadges} from 'Components/badge';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import * as Icon from 'Components/icon';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
-import {useConversationCall} from 'Hooks/useConversationCall';
-import {useNoInternetCallGuard} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard';
 import {CallState} from 'Repositories/calling/CallState';
 import {ConversationFilter} from 'Repositories/conversation/ConversationFilter';
 import {Conversation} from 'Repositories/entity/Conversation';
@@ -52,6 +50,8 @@ import type {Translate} from 'Util/localizerUtil/translationTypes';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
+import {useConversationCall} from '../../hooks/useConversationCall';
+import {useNoInternetCallGuard} from '../../hooks/useNoInternetCallGuard/useNoInternetCallGuard';
 import {WebAppEvents} from '../../webAppEvents';
 
 interface TitleBarProps {

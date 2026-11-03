@@ -20,7 +20,7 @@
 import {render} from '@testing-library/react';
 import {isNull} from '@sindresorhus/is';
 
-import en from 'I18n/en-US.json';
+import en from '../../../../i18n/en-US.json';
 import {FederationStopMessage as FederationStopMessageEntity} from 'Repositories/entity/message/federationStopMessage';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {

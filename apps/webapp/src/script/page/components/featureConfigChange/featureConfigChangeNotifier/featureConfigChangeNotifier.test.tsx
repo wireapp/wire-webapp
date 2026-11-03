@@ -22,7 +22,7 @@ import {FEATURE_STATUS, FEATURE_KEY, FeatureList} from '@wireapp/api-client/lib/
 import {Runtime} from '@wireapp/commons/lib/util/Runtime';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import en from 'I18n/en-US.json';
+import en from '../../../../../i18n/en-US.json';
 import {TeamState} from 'Repositories/team/TeamState';
 import {
   createRootContextValueForTest,

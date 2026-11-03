@@ -19,7 +19,7 @@
 import {render} from '@testing-library/react';
 import {isNull, isUndefined} from '@sindresorhus/is';
 
-import en from 'I18n/en-US.json';
+import en from '../../../../../i18n/en-US.json';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {
   createRootContextValueForTest,

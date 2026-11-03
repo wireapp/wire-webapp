@@ -21,8 +21,8 @@ import {act, render, waitFor} from '@testing-library/react';
 import {ClientClassification} from '@wireapp/api-client/lib/client/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import en from 'I18n/en-US.json';
-import si from 'I18n/si-LK.json';
+import en from '../../../../i18n/en-US.json';
+import si from '../../../../i18n/si-LK.json';
 import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {ClientRepository} from 'Repositories/client';

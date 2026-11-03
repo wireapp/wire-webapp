@@ -27,8 +27,8 @@ import {Runtime} from '@wireapp/commons';
 import * as uiKit from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '../../webAppEvents';
 
-import en from 'I18n/en-US.json';
-import ru from 'I18n/ru-RU.json';
+import en from '../../../i18n/en-US.json';
+import ru from '../../../i18n/ru-RU.json';
 import {TitleBar} from 'Components/titleBar';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {CallState} from 'Repositories/calling/CallState';

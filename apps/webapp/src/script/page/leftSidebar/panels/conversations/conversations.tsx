@@ -36,7 +36,6 @@ import {useShallow} from 'zustand/react/shallow';
 import {useMatchMedia} from '@wireapp/react-ui-kit';
 
 import {MeetingNotificationHost} from 'Components/meeting/meetingNotificationHost/meetingNotificationHost';
-import {useConversationFocus} from 'Hooks/useConversationFocus';
 import {CallState} from 'Repositories/calling/CallState';
 import {createLabel} from 'Repositories/conversation/ConversationLabelRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
@@ -83,6 +82,7 @@ import {
 } from './useSidebarStore';
 
 import {Config} from '../../../../Config';
+import {useConversationFocus} from '../../../../hooks/useConversationFocus';
 import {generateConversationUrl} from '../../../../router/routeGenerator';
 import {setHistoryParam} from '../../../../router/Router';
 import {createNavigateKeyboard} from '../../../../router/routerBindings';

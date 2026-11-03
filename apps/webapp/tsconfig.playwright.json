@@ -16,9 +16,7 @@
       // E2E startup feature toggles import the production definitions and query-string updater.
       "src/*": ["./src/*"],
       // Calling specs and audio.util.ts import Repositories/audio/audioType.
-      "Repositories/*": ["./src/script/repositories/*"],
-      // localization.spec.ts imports I18n/de-DE.json and I18n/en-US.json.
-      "I18n/*": ["./src/i18n/*"]
+      "Repositories/*": ["./src/script/repositories/*"]
     }
   },
   "include": [
