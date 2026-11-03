@@ -730,6 +730,9 @@ jobs:
         create_maintenance_tag,
       ]
     if: ${{ success() && needs.create_maintenance_tag.outputs.maintenance_tag != '' }}
+    permissions:
+      actions: read
+      contents: read
     uses: ./.github/workflows/publish-maintenance-distribution.yml
     with:
       maintenance_line_key: ${{ needs.validate_request.outputs.maintenance_line_key }}

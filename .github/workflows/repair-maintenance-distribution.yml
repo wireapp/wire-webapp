@@ -148,6 +148,9 @@ jobs:
   publish_distribution:
     name: Reuse validated maintenance distribution
     needs: validate_recovery
+    permissions:
+      actions: read
+      contents: read
     uses: ./.github/workflows/publish-maintenance-distribution.yml
     with:
       maintenance_line_key: ${{ needs.validate_recovery.outputs.maintenance_line_key }}
