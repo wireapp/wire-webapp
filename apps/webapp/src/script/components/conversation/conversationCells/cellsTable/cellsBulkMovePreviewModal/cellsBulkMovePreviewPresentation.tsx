@@ -93,7 +93,8 @@ export const CellsBulkMovePreviewPresentation: FunctionComponent<CellsBulkMovePr
   }, []);
 
   const handleMove = async (): Promise<void> => {
-    const moveSummary = {
+    const moveSummary: SharedDriveMoveSummary = {
+      action: 'move',
       items: selectedItems,
       destinationPath: destinationPath.length > 0 ? destinationPath : translate('cells.sharedDrive.title'),
     };

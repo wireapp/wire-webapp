@@ -29,7 +29,10 @@ export interface SharedDriveMoveItem {
   readonly isFolder: boolean;
 }
 
+export type SharedDriveBulkAction = 'move' | 'restore' | 'permanentDelete' | 'emptyBin';
+
 export interface SharedDriveMoveSummary {
+  readonly action: SharedDriveBulkAction;
   readonly items: readonly SharedDriveMoveItem[];
   readonly destinationPath: string;
 }
