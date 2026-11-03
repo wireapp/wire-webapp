@@ -36,15 +36,7 @@ import {RestActionStatus, type RestPerformActionResponse} from 'cells-sdk-ts';
 import {createPortal} from 'react-dom';
 import {Maybe, maybe} from 'true-myth';
 
-import {
-  ArrowIcon,
-  Button,
-  ButtonVariant,
-  CloseIcon,
-  SharedDriveUploadSpinnerIcon,
-  TrashIcon,
-  UploadIcon,
-} from '@wireapp/react-ui-kit';
+import {ArrowIcon, Button, ButtonVariant, CloseIcon, TrashIcon, UploadIcon} from '@wireapp/react-ui-kit';
 
 import {CellsBulkMovePreviewModal} from 'Components/conversation/conversationCells/cellsTable/cellsBulkMovePreviewModal/cellsBulkMovePreviewModal';
 import {CellsBulkMoveToBinConfirmationModal} from 'Components/conversation/conversationCells/cellsTable/cellsBulkMoveToBinConfirmationModal';
@@ -81,7 +73,6 @@ import {
   folderDropTargetRowStyles,
   headerCellStyles,
   moveOutcomeMessageStyles,
-  permanentDeleteProgressStyles,
   tableActionsCellStyles,
   tableCellRow,
   tableCellStyles,
@@ -98,6 +89,7 @@ import {
 import {getCellsTableColumns, getCellsTableDataCellLabels} from './cellsTableColumns/cellsTableColumns';
 import {CellsFilePreviewModalProvider} from './common/cellsFilePreviewModalContext/cellsFilePreviewModalContext';
 import {getBulkMoveOutcomeEvidence} from './getBulkMoveOutcomeEvidence';
+import {getPermanentDeleteStatusKind} from './getPermanentDeleteStatusKind';
 import {resolveRestoreTargets} from './restoreBinSelection/resolveRestoreTargets';
 import {showBulkRestoreModal} from './restoreBinSelection/showBulkRestoreModal';
 import {useBulkRestore} from './restoreBinSelection/useBulkRestore';
@@ -200,8 +192,6 @@ const preventDefaultFileDrop = (event: DragEvent<HTMLElement>): void => {
   event.stopPropagation();
 };
 
-type PermanentDeleteCheckingMessageKey =
-  'cells.bulkDelete.checking' | 'cells.bulkDelete.checkingAfterJobFailure' | 'cells.bulkDelete.retryingRefresh';
 type PermanentDeleteReviewMessageKey =
   | 'cells.bulkDelete.jobFailed'
   | 'cells.bulkDelete.refreshFailed'
@@ -218,19 +208,6 @@ const hasSameSelection = (selectedNodeIds: ReadonlySet<string>, nodeIds: readonl
       return selectedNodeIds.has(nodeId);
     })
   );
-};
-
-const getPermanentDeleteCheckingMessageKey = (
-  reason: PermanentDeleteReviewReason | null,
-): PermanentDeleteCheckingMessageKey => {
-  if (reason === 'job-failed') {
-    return 'cells.bulkDelete.checkingAfterJobFailure';
-  }
-  if (reason === 'refresh-failed') {
-    return 'cells.bulkDelete.retryingRefresh';
-  }
-
-  return 'cells.bulkDelete.checking';
 };
 
 const getPermanentDeleteReviewMessageKey = (
@@ -334,6 +311,7 @@ export const CellsTable = ({
   const canPerformCurrentDriveActionRef = useRef(canPerformCurrentDriveAction);
   canPerformCurrentDriveActionRef.current = canPerformCurrentDriveAction;
   const permanentDeleteModalId = useId();
+  const permanentDeleteStatusReporter = useBulkActionStatusReporter('permanentDelete');
   const permanentDelete = usePermanentDeleteReconciliation({
     cellsRepository,
     clock,
@@ -347,11 +325,13 @@ export const CellsTable = ({
     onRefresh,
     onRefreshAndReportSuccess,
     onDeleteCompleted: nodeIds => {
+      permanentDeleteStatusReporter.report('completed');
       setSelectedNodeIds(currentSelection => {
         return hasSameSelection(currentSelection, nodeIds) ? new Set() : currentSelection;
       });
     },
     onReconciliationCompleted: () => {
+      permanentDeleteStatusReporter.report('completed');
       setSelectedNodeIds(new Set());
     },
     reportError: error => {
@@ -393,6 +373,25 @@ export const CellsTable = ({
     },
   });
   const {reset: resetBulkRestore} = bulkRestore;
+  const permanentDeleteStatusKind = getPermanentDeleteStatusKind({
+    isPending: isPermanentDeletePending,
+    isRejected: isPermanentDeleteRejected,
+    isUnresolved: isPermanentDeleteUnresolved,
+    isReconciling: isPermanentDeleteReconciling,
+    reviewReason: permanentDeleteReviewReason,
+  });
+  const reportPermanentDeleteStatus = permanentDeleteStatusReporter.report;
+  const isPermanentDeleteStatusProcessing = permanentDeleteStatusReporter.isProcessing;
+  useEffect(() => {
+    if (permanentDeleteStatusKind !== null) {
+      reportPermanentDeleteStatus(permanentDeleteStatusKind);
+      return;
+    }
+    // The reconciliation state was reset (e.g. the user navigated away) before an outcome was known.
+    if (isPermanentDeleteStatusProcessing()) {
+      reportPermanentDeleteStatus('status-unknown');
+    }
+  }, [isPermanentDeleteStatusProcessing, permanentDeleteStatusKind, reportPermanentDeleteStatus]);
   const [backgroundMoveJobUuids, setBackgroundMoveJobUuids] = useState<string[]>([]);
   const [backgroundMoveStatusId, setBackgroundMoveStatusId] = useState('');
   const [backgroundMoveStatusCheckId, setBackgroundMoveStatusCheckId] = useState(0);
@@ -735,6 +734,11 @@ export const CellsTable = ({
       return;
     }
 
+    permanentDeleteStatusReporter.start(
+      currentSelectedNodes.map(node => {
+        return {id: node.id, name: node.name, isFolder: node.type === CellNodeType.FOLDER};
+      }),
+    );
     await deletePermanently(nodeIds, scopeKey, path);
   };
   const [activeFolderDropTargetId, setActiveFolderDropTargetId] = useState<string | null>(null);
@@ -1364,19 +1368,8 @@ export const CellsTable = ({
             </p>
           </div>
         )}
-        {isPermanentDeleteUnresolved && isPermanentDeleteReconciling && (
-          <div css={permanentDeleteProgressStyles} role="status" aria-live="polite">
-            <SharedDriveUploadSpinnerIcon color="var(--accent-color)" width={16} height={16} aria-hidden="true" />
-            <span>{translate(getPermanentDeleteCheckingMessageKey(permanentDeleteReviewReason))}</span>
-          </div>
-        )}
-        {isPermanentDeleteRejected && !isPermanentDeleteUnresolved && (
-          <div css={permanentDeleteProgressStyles} role="alert">
-            {translate('cells.bulkDelete.rejected')}
-          </div>
-        )}
         {isPermanentDeleteUnresolved && !isPermanentDeleteReconciling && (
-          <div css={permanentDeleteProgressStyles} role="alert">
+          <div css={moveOutcomeMessageStyles} role="alert">
             <span>{translate(getPermanentDeleteReviewMessageKey(permanentDeleteReviewReason))}</span>
             <Button
               variant={ButtonVariant.SECONDARY}
