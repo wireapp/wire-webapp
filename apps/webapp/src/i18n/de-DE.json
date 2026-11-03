@@ -584,7 +584,7 @@
   "cells.search.resultsIn": "Suchergebnisse in {folderName}",
   "cells.selection.clear": "Auswahl entfernen",
   "cells.selection.move": "Verschieben",
-  "cells.selection.moveToBin": "Move to bin",
+  "cells.selection.moveToBin": "In Papierkorb verschieben",
   "cells.selection.selectItem": "{name} auswählen",
   "cells.selection.selectedCount": "{count} ausgewählt",
   "cells.selfDeletingMessage.info": "Die Funktion ist für Unterhaltungen mit Geteiltes Drive nicht verfügbar.",
