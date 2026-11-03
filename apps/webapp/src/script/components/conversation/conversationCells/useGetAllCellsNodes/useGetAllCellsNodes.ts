@@ -89,6 +89,15 @@ export const useGetAllCellsNodes = ({
 
   const {domain, id} = conversationQualifiedId;
 
+  useEffect(() => {
+    const gate = requestVersionGate.current;
+    enabledRef.current = enabled;
+    return () => {
+      enabledRef.current = false;
+      gate.invalidate();
+    };
+  }, [enabled]);
+
   const isCurrentFetchRequest = useCallback((requestVersion: number): boolean => {
     return enabledRef.current && !requestVersionGate.current.isStale(requestVersion);
   }, []);

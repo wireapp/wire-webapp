@@ -55,6 +55,7 @@ import {CallingViewModel} from './CallingViewModel';
 import {ContentViewModel} from './ContentViewModel';
 import {ListViewModel} from './ListViewModel';
 
+import type {CellsBinOperationController} from '../components/conversation/conversationCells/common/cellsBinOperations/cellsBinOperationController';
 import {Core} from '../service/coreSingleton';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 
@@ -67,6 +68,7 @@ export interface ViewModelRepositories {
   backup: BackupRepository;
   calling: CallingRepository;
   cells: CellsRepository;
+  cellsBinOperations: CellsBinOperationController;
   client: ClientRepository;
   connection: ConnectionRepository;
   conversation: ConversationRepository;
