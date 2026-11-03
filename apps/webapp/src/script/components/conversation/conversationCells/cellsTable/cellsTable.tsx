@@ -97,13 +97,13 @@ import {
 import {getCellsTableColumns, getCellsTableDataCellLabels} from './cellsTableColumns/cellsTableColumns';
 import {CellsFilePreviewModalProvider} from './common/cellsFilePreviewModalContext/cellsFilePreviewModalContext';
 import {getBulkMoveOutcomeEvidence} from './getBulkMoveOutcomeEvidence';
-import type {PermanentDeleteReviewReason} from './usePermanentDeleteReconciliation';
-import {usePermanentDeleteReconciliation} from './usePermanentDeleteReconciliation';
 
 import {
   getCellsBackgroundActionEvidence,
   observeCellsBackgroundActionJobs,
 } from '../common/cellsBackgroundActionPolling/cellsBackgroundActionJobs';
+import type {BinOperation} from '../common/cellsBinOperations/cellsBinOperationController';
+import {useCellsBinOperationView} from '../common/cellsBinOperations/useCellsBinOperationView';
 import {CellsSortDirection} from '../common/cellsSortIcon/cellsSortIcon';
 import {CellsSortField, SORTABLE_COLUMN_FIELD, toAriaSort} from '../common/useCellsSorting/useCellsSorting';
 import {getSharedDriveDroppedFiles} from '../getSharedDriveDroppedFiles';
@@ -200,6 +200,8 @@ const BACKGROUND_MOVE_STATUS_RETRY_MIN_JITTER_FACTOR = 0.75;
 const BACKGROUND_MOVE_STATUS_RETRY_MAX_JITTER_FACTOR = 1.25;
 const MAX_BACKGROUND_MOVE_STATUS_RETRIES = 5;
 
+type PermanentDeleteReviewReason = 'job-failed' | 'refresh-failed' | 'still-visible' | 'timed-out';
+
 type PermanentDeleteCheckingMessageKey =
   'cells.bulkDelete.checking' | 'cells.bulkDelete.checkingAfterJobFailure' | 'cells.bulkDelete.retryingRefresh';
 type PermanentDeleteReviewMessageKey =
@@ -250,16 +252,65 @@ interface CapturedBulkMoveToBinSelection {
   nodeIds: string[];
   scopeKey: string;
   summary: SharedDriveMoveSummary;
+  drive: QualifiedId;
+  path: string;
 }
 
 type BulkMoveToBinReviewReason = 'request-failed' | 'partial' | 'job-failed' | 'status-unknown' | 'refresh-failed';
 
-const bulkMoveToBinReviewReasonByStatus: Readonly<
-  Partial<Record<SharedDriveMoveStatusKind, BulkMoveToBinReviewReason>>
-> = {
-  'request-failed': 'request-failed',
-  partial: 'partial',
-  failed: 'job-failed',
+const getMoveToBinReviewReason = (
+  operation: BinOperation | undefined,
+  refreshFailed: boolean,
+): BulkMoveToBinReviewReason | null => {
+  if (operation?.reason === 'partial' || operation?.reason === 'job-failed' || operation?.reason === 'request-failed') {
+    return operation.reason;
+  }
+  if (refreshFailed) {
+    return 'refresh-failed';
+  }
+  if (operation?.reason === 'timed-out') {
+    return 'status-unknown';
+  }
+  return operation?.reason ?? null;
+};
+
+const getPermanentDeleteReviewReason = (
+  operation: BinOperation | undefined,
+  refreshFailed: boolean,
+  refreshTimedOut: boolean,
+): PermanentDeleteReviewReason | null => {
+  if (refreshTimedOut && operation?.reason !== 'job-failed' && operation?.reason !== 'partial') {
+    return 'timed-out';
+  }
+  if (refreshFailed) {
+    return 'refresh-failed';
+  }
+  if (operation?.reason === 'job-failed' || operation?.reason === 'partial') {
+    return 'job-failed';
+  }
+  if (operation?.reason === 'timed-out') {
+    return 'timed-out';
+  }
+  return operation?.state === 'needs-review' ? 'still-visible' : null;
+};
+
+const getMoveToBinStatusKind = (operation: BinOperation): SharedDriveMoveStatusKind => {
+  if (operation.state === 'completed') {
+    return 'completed';
+  }
+  if (operation.state === 'submitting' || operation.state === 'processing') {
+    return 'processing';
+  }
+  switch (operation.reason) {
+    case 'partial':
+      return 'partial';
+    case 'job-failed':
+      return 'failed';
+    case 'request-failed':
+      return 'request-failed';
+    default:
+      return 'status-unknown';
+  }
 };
 
 export const CellsTable = ({
@@ -296,16 +347,13 @@ export const CellsTable = ({
   });
   const [isBulkMoveToBinConfirmationOpen, setIsBulkMoveToBinConfirmationOpen] = useState(false);
   const [capturedBulkMoveToBin, setCapturedBulkMoveToBin] = useState<CapturedBulkMoveToBinSelection | null>(null);
-  const [isBulkMoveToBinPending, setIsBulkMoveToBinPending] = useState(false);
-  const [isBulkMoveToBinNeedsReview, setIsBulkMoveToBinNeedsReview] = useState(false);
-  const [isRefreshingBulkMoveToBin, setIsRefreshingBulkMoveToBin] = useState(false);
-  const [bulkMoveToBinReviewReason, setBulkMoveToBinReviewReason] = useState<BulkMoveToBinReviewReason | null>(null);
-  const [backgroundMoveToBinJobUuids, setBackgroundMoveToBinJobUuids] = useState<string[]>([]);
-  const isBulkMoveToBinPendingRef = useRef(false);
   const latestSelectionScopeKey = useRef(selectionScopeKey);
   latestSelectionScopeKey.current = selectionScopeKey;
   const previousSelectionScopeKey = useRef(selectionScopeKey);
-  const bulkMoveToBinStatusId = useRef<Maybe<string>>(Maybe.nothing());
+  const driveKey = JSON.stringify([conversationQualifiedId.domain, conversationQualifiedId.id]);
+  const previousDriveKey = useRef(driveKey);
+  const conversationQualifiedIdRef = useRef(conversationQualifiedId);
+  conversationQualifiedIdRef.current = conversationQualifiedId;
   const [isBulkMovePreviewOpen, setIsBulkMovePreviewOpen] = useState(false);
   const [moveState, dispatchMove] = useReducer(bulkMoveReducer, {kind: 'idle'});
   const isBulkMoveRequestPending = moveState.kind === 'request-pending';
@@ -327,84 +375,75 @@ export const CellsTable = ({
   const canPerformCurrentDriveActionRef = useRef(canPerformCurrentDriveAction);
   canPerformCurrentDriveActionRef.current = canPerformCurrentDriveAction;
   const permanentDeleteModalId = useId();
-  const permanentDelete = usePermanentDeleteReconciliation({
-    cellsRepository,
+  const currentPath = getCellsFilesPath();
+  const binView = useCellsBinOperationView({
+    drive: conversationQualifiedId,
+    path: currentPath,
     clock,
-    isCurrentScope: (scopeKey, path) => {
-      return isInRecycleBin() && getCellsFilesPath() === path && selectionScopeKeyRef.current === scopeKey;
+    isCurrentScope: () => {
+      return getCellsFilesPath() === currentPath;
     },
     visibleNodeIds: nodes.map(node => {
       return node.id;
     }),
     isNodesLoading,
-    onRefresh,
-    onRefreshAndReportSuccess,
-    onDeleteCompleted: nodeIds => {
-      setSelectedNodeIds(currentSelection => {
-        return hasSameSelection(currentSelection, nodeIds) ? new Set() : currentSelection;
+    onRefresh: isInRecycleBin() ? onRefreshAndReportSuccess : onRefreshAfterBulkMoveToBinOutcome,
+    onAcknowledged: operation => {
+      setSelectedNodeIds(current => {
+        return hasSameSelection(current, operation.targetIds) ? new Set() : current;
       });
-    },
-    onReconciliationCompleted: () => {
-      setSelectedNodeIds(new Set());
-    },
-    reportError: error => {
-      console.error(error);
+      setCapturedBulkMoveToBin(null);
     },
   });
-  const {
-    isPending: isPermanentDeletePending,
-    isRejected: isPermanentDeleteRejected,
-    isUnresolved: isPermanentDeleteUnresolved,
-    isRefreshingReview: isRefreshingPermanentDeleteReview,
-    isReconciling: isPermanentDeleteReconciling,
-    isRequestInFlight: isPermanentDeleteReconciliationRequestInFlight,
-    reviewReason: permanentDeleteReviewReason,
-    deletePermanently,
-    refreshReview: handleRefreshAfterPermanentDeleteReview,
-    cancel: cancelPermanentDeleteReconciliation,
-    clearRejection: clearPermanentDeleteRejection,
-    reset: resetPermanentDeleteReconciliation,
-  } = permanentDelete;
+  const binOperation = binView.operation;
+  const isDriveBinLocked = binView.isLocked;
+  const moveToBinOperation = binOperation?.kind === 'move-to-bin' ? binOperation : undefined;
+  const permanentDeleteOperation = binOperation?.kind === 'permanent-delete' ? binOperation : undefined;
+  const isBulkMoveToBinPending =
+    moveToBinOperation !== undefined &&
+    (moveToBinOperation.state === 'submitting' || moveToBinOperation.state === 'processing');
+  const isBulkMoveToBinNeedsReview = moveToBinOperation !== undefined && isDriveBinLocked && !isBulkMoveToBinPending;
+  const isRefreshingBulkMoveToBin = binView.isRefreshing;
+  const bulkMoveToBinReviewReason = getMoveToBinReviewReason(moveToBinOperation, binView.refreshFailed);
+  const isPermanentDeletePending = permanentDeleteOperation?.state === 'submitting';
+  const isPermanentDeleteRejected = permanentDeleteOperation?.state === 'rejected';
+  const isPermanentDeleteUnresolved =
+    permanentDeleteOperation !== undefined && isDriveBinLocked && !isPermanentDeletePending;
+  const isRefreshingPermanentDeleteReview = binView.isRefreshing;
+  const isPermanentDeleteReconciling =
+    permanentDeleteOperation !== undefined &&
+    permanentDeleteOperation.needsRefresh &&
+    permanentDeleteOperation.state !== 'submitting' &&
+    isDriveBinLocked;
+  const isPermanentDeleteReconciliationRequestInFlight = binView.isRefreshing;
+  const permanentDeleteReviewReason = getPermanentDeleteReviewReason(
+    permanentDeleteOperation,
+    binView.refreshFailed,
+    binView.refreshTimedOut,
+  );
+  const handleRefreshAfterPermanentDeleteReview = binView.refreshReview;
   const [backgroundMoveJobUuids, setBackgroundMoveJobUuids] = useState<string[]>([]);
   const [backgroundMoveStatusId, setBackgroundMoveStatusId] = useState('');
   const [backgroundMoveStatusCheckId, setBackgroundMoveStatusCheckId] = useState(0);
 
   useEffect(() => {
-    const didSelectionScopeChange = previousSelectionScopeKey.current !== selectionScopeKey;
+    const didSelectionScopeChange =
+      previousSelectionScopeKey.current !== selectionScopeKey || previousDriveKey.current !== driveKey;
     previousSelectionScopeKey.current = selectionScopeKey;
-
+    previousDriveKey.current = driveKey;
     if (isMovePendingRef.current) {
-      return cancelPermanentDeleteReconciliation;
+      return;
     }
-
-    if (isBulkMoveToBinPendingRef.current) {
-      if (didSelectionScopeChange) {
-        setSelectedNodeIds(new Set());
-        setIsBulkMoveToBinConfirmationOpen(false);
+    if (didSelectionScopeChange || !isSelectionEnabled) {
+      setSelectedNodeIds(new Set());
+      setIsBulkMovePreviewOpen(false);
+      setIsBulkMoveToBinConfirmationOpen(false);
+      setCapturedBulkMoveToBin(null);
+      if (usePrimaryModalState.getState().currentModalId === permanentDeleteModalId) {
+        removeCurrentModal();
       }
-      return cancelPermanentDeleteReconciliation;
     }
-
-    resetPermanentDeleteReconciliation();
-    setSelectedNodeIds(new Set());
-    setIsBulkMovePreviewOpen(false);
-    setIsBulkMoveToBinConfirmationOpen(false);
-    setCapturedBulkMoveToBin(null);
-    setIsBulkMoveToBinNeedsReview(false);
-    setIsRefreshingBulkMoveToBin(false);
-    setBulkMoveToBinReviewReason(null);
-    setBackgroundMoveToBinJobUuids([]);
-    if (usePrimaryModalState.getState().currentModalId === permanentDeleteModalId) {
-      removeCurrentModal();
-    }
-    return cancelPermanentDeleteReconciliation;
-  }, [
-    cancelPermanentDeleteReconciliation,
-    permanentDeleteModalId,
-    resetPermanentDeleteReconciliation,
-    selectionScopeKey,
-    isSelectionEnabled,
-  ]);
+  }, [permanentDeleteModalId, selectionScopeKey, isSelectionEnabled, driveKey]);
 
   useEffect(() => {
     return () => {
@@ -643,7 +682,6 @@ export const CellsTable = ({
   };
 
   const handleToggleSelection = (nodeId: string, isSelected: boolean): void => {
-    clearPermanentDeleteRejection();
     setSelectedNodeIds(currentSelection => {
       const nextSelection = new Set(currentSelection);
       if (isSelected) {
@@ -656,7 +694,13 @@ export const CellsTable = ({
   };
 
   const isCurrentPermanentDeleteScope = (scopeKey: string, path: string): boolean => {
-    return isInRecycleBin() && getCellsFilesPath() === path && selectionScopeKeyRef.current === scopeKey;
+    return (
+      isInRecycleBin() &&
+      getCellsFilesPath() === path &&
+      selectionScopeKeyRef.current === scopeKey &&
+      conversationQualifiedIdRef.current.id === conversationQualifiedId.id &&
+      conversationQualifiedIdRef.current.domain === conversationQualifiedId.domain
+    );
   };
 
   const handlePermanentDelete = async (nodeIds: string[], scopeKey: string, path: string): Promise<void> => {
@@ -685,7 +729,7 @@ export const CellsTable = ({
       return;
     }
 
-    await deletePermanently(nodeIds, scopeKey, path);
+    binView.controller.start({kind: 'permanent-delete', drive: conversationQualifiedId, path, targetIds: nodeIds});
   };
   const [activeFolderDropTargetId, setActiveFolderDropTargetId] = useState<string | null>(null);
   const [activeFolderDropTargetName, setActiveFolderDropTargetName] = useState<string | null>(null);
@@ -714,8 +758,10 @@ export const CellsTable = ({
       onToggleSort,
       selectedNodeIds,
       onToggleSelection: handleToggleSelection,
+      isOperationLocked: isDriveBinLocked,
       selectionEnabled:
         isSelectionEnabled &&
+        !isDriveBinLocked &&
         !isBulkMoveOutcomeUnresolved &&
         !isPermanentDeleteUnresolved &&
         !isBulkMoveToBinNeedsReview &&
@@ -734,6 +780,7 @@ export const CellsTable = ({
     selectedNodes.length > 0 &&
     selectedNodes.length === selectedNodeIds.size &&
     isInRecycleBin() &&
+    !isDriveBinLocked &&
     !isPermanentDeleteUnresolved &&
     canPerformCurrentDriveAction(CELLS_ACTION.DELETE) &&
     selectedNodes.every(node => {
@@ -741,6 +788,7 @@ export const CellsTable = ({
     });
   const canMoveSelection =
     selectedNodes.length > 0 &&
+    !isDriveBinLocked &&
     !isBulkMoveOutcomeUnresolved &&
     !isBulkMoveRequestPending &&
     !isBackgroundMovePending &&
@@ -752,6 +800,7 @@ export const CellsTable = ({
       return canPerformCellsAction({action: CELLS_ACTION.MOVE, selfUserDriveRole: node.selfUserDriveRole});
     });
   const canMoveSelectionToBin =
+    !isDriveBinLocked &&
     isSelectionEnabled &&
     selectionEnabled &&
     selectedNodes.length > 0 &&
@@ -797,217 +846,41 @@ export const CellsTable = ({
     [selectionEnabled, isSelectionEnabled, selectedNodeIds, nodes, canPerformCurrentDriveAction],
   );
 
-  const resetBulkMoveToBinAfterScopeChange = useCallback((): void => {
-    isBulkMoveToBinPendingRef.current = false;
-    setIsBulkMoveToBinPending(false);
-    setIsBulkMoveToBinNeedsReview(false);
-    setIsRefreshingBulkMoveToBin(false);
-    setIsBulkMoveToBinConfirmationOpen(false);
-    setCapturedBulkMoveToBin(null);
-    setSelectedNodeIds(new Set());
-    setBackgroundMoveToBinJobUuids([]);
-    setBulkMoveToBinReviewReason(null);
-  }, []);
-
-  const finishBulkMoveToBinOutcome = useCallback(
-    async (captured: CapturedBulkMoveToBinSelection, statusId: string, statusKind: SharedDriveMoveStatusKind) => {
-      setIsBulkMoveToBinConfirmationOpen(false);
-      setIsRefreshingBulkMoveToBin(true);
-      setBackgroundMoveToBinJobUuids([]);
-
-      if (captured.scopeKey !== latestSelectionScopeKey.current || isInRecycleBin()) {
-        updateMoveStatus({id: statusId, kind: 'status-unknown', ...captured.summary});
-        resetBulkMoveToBinAfterScopeChange();
-        return;
-      }
-
-      let didRefresh = false;
-      try {
-        didRefresh = await onRefreshAfterBulkMoveToBinOutcome();
-      } catch {
-        didRefresh = false;
-      }
-
-      if (captured.scopeKey !== latestSelectionScopeKey.current || isInRecycleBin()) {
-        updateMoveStatus({id: statusId, kind: 'status-unknown', ...captured.summary});
-        resetBulkMoveToBinAfterScopeChange();
-        return;
-      }
-
-      if (didRefresh) {
-        updateMoveStatus({id: statusId, kind: statusKind, ...captured.summary});
-        setSelectedNodeIds(new Set());
-        setCapturedBulkMoveToBin(null);
-        setIsBulkMoveToBinNeedsReview(false);
-        setBulkMoveToBinReviewReason(null);
-      } else {
-        updateMoveStatus({
-          id: statusId,
-          kind: statusKind === 'completed' ? 'finished-unknown' : statusKind,
-          ...captured.summary,
-        });
-        setIsBulkMoveToBinNeedsReview(true);
-        setBulkMoveToBinReviewReason(bulkMoveToBinReviewReasonByStatus[statusKind] ?? 'refresh-failed');
-      }
-
-      isBulkMoveToBinPendingRef.current = false;
-      setIsBulkMoveToBinPending(false);
-      setIsRefreshingBulkMoveToBin(false);
-    },
-    [onRefreshAfterBulkMoveToBinOutcome, resetBulkMoveToBinAfterScopeChange, updateMoveStatus],
-  );
-
-  const handleConfirmBulkMoveToBin = useCallback(async (): Promise<void> => {
+  const handleConfirmBulkMoveToBin = (): void => {
     const captured = capturedBulkMoveToBin;
-    if (captured === null || isBulkMoveToBinPendingRef.current) {
-      return;
-    }
-
-    if (!isCapturedBulkMoveToBinSelectionCurrent(captured)) {
-      setIsBulkMoveToBinConfirmationOpen(false);
-      setCapturedBulkMoveToBin(null);
-      return;
-    }
-
-    isBulkMoveToBinPendingRef.current = true;
-    setIsBulkMoveToBinPending(true);
     setIsBulkMoveToBinConfirmationOpen(false);
-    const statusId = createMoveStatusId();
-    bulkMoveToBinStatusId.current = Maybe.just(statusId);
-    updateMoveStatus({id: statusId, kind: 'processing', ...captured.summary});
-
-    try {
-      const response = await cellsRepository.deleteNodes({uuids: captured.nodeIds, permanently: false});
-      if (captured.scopeKey !== latestSelectionScopeKey.current || isInRecycleBin()) {
-        updateMoveStatus({id: statusId, kind: 'status-unknown', ...captured.summary});
-        resetBulkMoveToBinAfterScopeChange();
-        return;
-      }
-
-      if (response.Status === RestActionStatus.Performed) {
-        await finishBulkMoveToBinOutcome(captured, statusId, 'completed');
-        return;
-      }
-
-      if (response.Status === RestActionStatus.Background) {
-        const {jobUuids} = getCellsBackgroundActionEvidence(response, 'delete');
-        if (jobUuids.length > 0) {
-          setBackgroundMoveToBinJobUuids([...jobUuids]);
-          setIsBulkMoveToBinConfirmationOpen(false);
-          return;
-        }
-      }
-
-      await finishBulkMoveToBinOutcome(captured, statusId, 'status-unknown');
-    } catch {
-      updateMoveStatus({id: statusId, kind: 'request-failed', ...captured.summary});
-      await finishBulkMoveToBinOutcome(captured, statusId, 'request-failed');
-    }
-  }, [
-    capturedBulkMoveToBin,
-    isCapturedBulkMoveToBinSelectionCurrent,
-    createMoveStatusId,
-    updateMoveStatus,
-    cellsRepository,
-    resetBulkMoveToBinAfterScopeChange,
-    finishBulkMoveToBinOutcome,
-  ]);
-
-  const handleRefreshBulkMoveToBinOutcome = useCallback(async (): Promise<void> => {
-    if (capturedBulkMoveToBin === null || isRefreshingBulkMoveToBin || isBulkMoveToBinPendingRef.current) {
-      return;
-    }
-
-    setIsRefreshingBulkMoveToBin(true);
-    let didRefresh = false;
-    try {
-      didRefresh = await onRefreshAfterBulkMoveToBinOutcome();
-    } catch {
-      didRefresh = false;
-    }
-
-    if (capturedBulkMoveToBin.scopeKey !== latestSelectionScopeKey.current || isInRecycleBin()) {
-      resetBulkMoveToBinAfterScopeChange();
-      return;
-    }
-
-    if (didRefresh) {
-      setSelectedNodeIds(new Set());
+    if (
+      captured === null ||
+      isDriveBinLocked ||
+      !isCapturedBulkMoveToBinSelectionCurrent(captured) ||
+      captured.drive.id !== conversationQualifiedId.id ||
+      captured.drive.domain !== conversationQualifiedId.domain ||
+      captured.path !== getCellsFilesPath()
+    ) {
       setCapturedBulkMoveToBin(null);
-      setIsBulkMoveToBinNeedsReview(false);
-      setBulkMoveToBinReviewReason(null);
-    } else {
-      setBulkMoveToBinReviewReason(reason => {
-        if (reason === 'request-failed' || reason === 'partial' || reason === 'job-failed') {
-          return reason;
-        }
-        return 'refresh-failed';
-      });
+      return;
     }
-    setIsRefreshingBulkMoveToBin(false);
-  }, [
-    capturedBulkMoveToBin,
-    isRefreshingBulkMoveToBin,
-    onRefreshAfterBulkMoveToBinOutcome,
-    resetBulkMoveToBinAfterScopeChange,
-  ]);
+    binView.controller.start({
+      kind: 'move-to-bin',
+      drive: captured.drive,
+      path: captured.path,
+      targetIds: captured.nodeIds,
+      summary: captured.summary,
+    });
+  };
+  const handleRefreshBulkMoveToBinOutcome = binView.refreshReview;
 
   useEffect(() => {
-    if (backgroundMoveToBinJobUuids.length === 0 || capturedBulkMoveToBin === null) {
-      return undefined;
+    if (moveToBinOperation?.summary === undefined || moveToBinOperation.state === 'rejected') {
+      return;
     }
-
-    if (!maybe.isJust(bulkMoveToBinStatusId.current)) {
-      setBulkMoveToBinReviewReason('status-unknown');
-      setIsBulkMoveToBinNeedsReview(true);
-      isBulkMoveToBinPendingRef.current = false;
-      setIsBulkMoveToBinPending(false);
-      return undefined;
-    }
-
-    const statusId = bulkMoveToBinStatusId.current.value;
-    const captured = capturedBulkMoveToBin;
-
-    return observeCellsBackgroundActionJobs({
-      cellsRepository,
-      actionName: 'delete',
-      jobUuids: backgroundMoveToBinJobUuids,
-      clock,
-      pollingPolicy: {
-        pollIntervalMs: BACKGROUND_MOVE_STATUS_POLL_INTERVAL_MS,
-        maxUnknownRetries: MAX_BACKGROUND_MOVE_STATUS_RETRIES,
-        maxPollAttempts: Maybe.nothing(),
-        getUnknownRetryDelay: retryIndex => {
-          return (
-            BACKGROUND_MOVE_STATUS_POLL_INTERVAL_MS *
-            BACKGROUND_MOVE_STATUS_RETRY_BACKOFF_FACTOR ** retryIndex *
-            (BACKGROUND_MOVE_STATUS_RETRY_MIN_JITTER_FACTOR +
-              random() *
-                (BACKGROUND_MOVE_STATUS_RETRY_MAX_JITTER_FACTOR - BACKGROUND_MOVE_STATUS_RETRY_MIN_JITTER_FACTOR))
-          );
-        },
-      },
-      isCurrent: () => {
-        return true;
-      },
-      onOutcome: outcome => {
-        switch (outcome) {
-          case 'all-finished':
-            void finishBulkMoveToBinOutcome(captured, statusId, 'completed');
-            return;
-          case 'mixed-terminal':
-            void finishBulkMoveToBinOutcome(captured, statusId, 'partial');
-            return;
-          case 'all-failed':
-            void finishBulkMoveToBinOutcome(captured, statusId, 'failed');
-            return;
-          case 'check-limit':
-          case 'status-unknown':
-            void finishBulkMoveToBinOutcome(captured, statusId, 'status-unknown');
-        }
-      },
-    });
-  }, [backgroundMoveToBinJobUuids, capturedBulkMoveToBin, cellsRepository, clock, finishBulkMoveToBinOutcome, random]);
+    const kind = getMoveToBinStatusKind(moveToBinOperation);
+    const id = `bin-operation-${moveToBinOperation.id}`;
+    updateMoveStatus({id, kind, ...moveToBinOperation.summary});
+    return () => {
+      clearMoveStatus(id);
+    };
+  }, [moveToBinOperation, updateMoveStatus, clearMoveStatus]);
 
   useEffect(() => {
     return () => {
@@ -1200,6 +1073,8 @@ export const CellsTable = ({
                           }),
                           scopeKey: selectionScopeKey,
                           summary,
+                          drive: {...conversationQualifiedId},
+                          path: getCellsFilesPath(),
                         });
                         setIsBulkMoveToBinConfirmationOpen(true);
                       }}
@@ -1254,9 +1129,9 @@ export const CellsTable = ({
             void handleConfirmBulkMoveToBin();
           }}
         />
-        {isBulkMoveToBinPending && !isBulkMoveToBinConfirmationOpen && capturedBulkMoveToBin !== null && (
+        {isBulkMoveToBinPending && !isBulkMoveToBinConfirmationOpen && moveToBinOperation !== undefined && (
           <div css={moveOutcomeMessageStyles} role="status" aria-live="polite">
-            {translate('cells.bulkMoveToBin.moving', {count: capturedBulkMoveToBin.nodeIds.length})}
+            {translate('cells.bulkMoveToBin.moving', {count: moveToBinOperation.targetIds.length})}
           </div>
         )}
         {isBulkMoveToBinNeedsReview && bulkMoveToBinReviewMessageKey !== null && (
@@ -1292,7 +1167,7 @@ export const CellsTable = ({
             <span>{translate(getPermanentDeleteCheckingMessageKey(permanentDeleteReviewReason))}</span>
           </div>
         )}
-        {isPermanentDeleteRejected && !isPermanentDeleteUnresolved && (
+        {(isPermanentDeleteRejected || moveToBinOperation?.state === 'rejected') && !isPermanentDeleteUnresolved && (
           <div css={permanentDeleteProgressStyles} role="alert">
             {translate('cells.bulkDelete.rejected')}
           </div>

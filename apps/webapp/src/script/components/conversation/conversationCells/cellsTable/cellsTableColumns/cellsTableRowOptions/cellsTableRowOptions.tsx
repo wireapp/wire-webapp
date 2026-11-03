@@ -56,6 +56,7 @@ import {useCellsFilePreviewModal} from '../../common/cellsFilePreviewModalContex
 import {showShareModal} from '../cellsNodeShareModal/cellsNodeShareModal';
 
 interface CellsTableRowOptionsProps {
+  disabled?: boolean;
   node: CellNode;
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
@@ -65,6 +66,7 @@ interface CellsTableRowOptionsProps {
 }
 
 export const CellsTableRowOptions: FunctionComponent<CellsTableRowOptionsProps> = ({
+  disabled = false,
   node,
   cellsRepository,
   conversationQualifiedId,
@@ -77,7 +79,7 @@ export const CellsTableRowOptions: FunctionComponent<CellsTableRowOptionsProps> 
   return (
     <DropdownMenu>
       <DropdownMenu.Trigger asChild>
-        <button css={buttonStyles} aria-label={translate('cells.options.label')}>
+        <button css={buttonStyles} aria-label={translate('cells.options.label')} disabled={disabled}>
           <MoreIcon css={iconStyles} />
           <span css={textStyles}>{translate('cells.options.label')}</span>
         </button>
