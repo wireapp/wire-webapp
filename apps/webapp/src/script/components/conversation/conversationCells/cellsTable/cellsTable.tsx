@@ -219,19 +219,6 @@ const hasSameSelection = (selectedNodeIds: ReadonlySet<string>, nodeIds: readonl
   );
 };
 
-const getPermanentDeleteCheckingMessageKey = (
-  reason: PermanentDeleteReviewReason | null,
-): PermanentDeleteCheckingMessageKey => {
-  if (reason === 'job-failed') {
-    return 'cells.bulkDelete.checkingAfterJobFailure';
-  }
-  if (reason === 'refresh-failed') {
-    return 'cells.bulkDelete.retryingRefresh';
-  }
-
-  return 'cells.bulkDelete.checking';
-};
-
 const getPermanentDeleteReviewMessageKey = (
   reason: PermanentDeleteReviewReason | null,
 ): PermanentDeleteReviewMessageKey => {

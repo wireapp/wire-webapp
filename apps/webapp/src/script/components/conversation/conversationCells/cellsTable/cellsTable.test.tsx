@@ -229,6 +229,12 @@ const translateSelectionForTest: Translate = (key, substitutions) => {
   return translateForTest(key);
 };
 
+// The popup also announces the same review message with role=alert, so target the inline row with the Refresh action.
+const findInlineReviewAlert = async (): Promise<HTMLElement> => {
+  const refreshButton = await screen.findByRole('button', {name: 'Refresh Bin'});
+  return refreshButton.closest('[role="alert"]') as HTMLElement;
+};
+
 const conversationQualifiedId = {id: 'conversation-id', domain: 'example.com'};
 const uploadStatusController = {
   snapshots: () => {
@@ -1397,7 +1403,7 @@ describe('CellsTable selection', () => {
         });
       }
 
-      expect(await screen.findByRole('alert')).toHaveTextContent(
+      expect(await findInlineReviewAlert()).toHaveTextContent(
         'Deletion is taking longer than expected. Refresh the Bin to check before taking further action.',
       );
       expect(screen.queryByRole('button', {name: 'Delete permanently'})).not.toBeInTheDocument();
@@ -1415,7 +1421,7 @@ describe('CellsTable selection', () => {
       await waitFor(() => {
         expect(onRefreshAndReportSuccess).toHaveBeenCalledTimes(refreshCount + 1);
       });
-      expect(await screen.findByRole('alert')).toHaveTextContent(
+      expect(await findInlineReviewAlert()).toHaveTextContent(
         'Selected items still appear in the Bin. The action remains blocked until they disappear.',
       );
       expect(repository.deleteNodes).toHaveBeenCalledTimes(1);
@@ -1469,7 +1475,7 @@ describe('CellsTable selection', () => {
         await Promise.resolve();
       });
 
-      expect(await screen.findByRole('alert')).toHaveTextContent(
+      expect(await findInlineReviewAlert()).toHaveTextContent(
         'Deletion is taking longer than expected. Refresh the Bin to check before taking further action.',
       );
       expect(screen.getByRole('button', {name: 'Refresh Bin'})).toBeEnabled();
@@ -1481,7 +1487,7 @@ describe('CellsTable selection', () => {
         clock.advanceByMilliseconds(20_000);
         await Promise.resolve();
       });
-      expect(await screen.findByRole('alert')).toHaveTextContent(
+      expect(await findInlineReviewAlert()).toHaveTextContent(
         'Deletion is taking longer than expected. Refresh the Bin to check before taking further action.',
       );
       expect(screen.getByRole('button', {name: 'Refresh Bin'})).toBeEnabled();
@@ -1490,7 +1496,7 @@ describe('CellsTable selection', () => {
       await waitFor(() => {
         expect(onRefreshAndReportSuccess).toHaveBeenCalledTimes(3);
       });
-      expect(await screen.findByRole('alert')).toHaveTextContent(
+      expect(await findInlineReviewAlert()).toHaveTextContent(
         'Selected items still appear in the Bin. The action remains blocked until they disappear.',
       );
       expect(screen.getByText('1 selected')).toBeInTheDocument();
@@ -1548,7 +1554,7 @@ describe('CellsTable selection', () => {
         });
       }
 
-      expect(await screen.findByRole('alert')).toHaveTextContent(
+      expect(await findInlineReviewAlert()).toHaveTextContent(
         'Could not refresh the Bin. The delete outcome is still unknown.',
       );
       expect(screen.queryByRole('button', {name: 'Delete permanently'})).not.toBeInTheDocument();

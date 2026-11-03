@@ -413,7 +413,6 @@
   "cells.bulkDelete.status.deleted": "Permanently deleted {count} items",
   "cells.bulkDelete.status.deleting": "Permanently deleting {count} items",
   "cells.bulkDelete.status.needsReview": "Delete needs review",
-  "cells.bulkDelete.retryingRefresh": "Could not refresh the Bin. Checking again…",
   "cells.bulkDelete.stillVisible": "Selected items still appear in the Bin. The action remains blocked until they disappear.",
   "cells.bulkDelete.timedOut": "Deletion is taking longer than expected. Refresh the Bin to check before taking further action.",
   "cells.bulkMove.allJobsFailed": "The move jobs failed or were interrupted. Refresh Drive to check item locations before trying again.",
