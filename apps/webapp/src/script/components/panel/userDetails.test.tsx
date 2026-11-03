@@ -30,7 +30,7 @@ import {createUuid} from 'Util/uuid';
 
 import {UserDetails} from './userDetails';
 
-jest.mock('Components/avatar', () => {
+jest.mock('../avatar', () => {
   return {
     Avatar: () => {
       return <div data-testid="mock-avatar" />;

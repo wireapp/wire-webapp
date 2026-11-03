@@ -22,18 +22,19 @@ import {Fragment} from 'react';
 import type {JSX} from '@emotion/react/jsx-runtime';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {EmojiChar} from 'Components/messagesList/message/contentMessage/messageActions/messageReactions/emojiChar';
-import {
-  messageReactionDetailsMargin,
-  reactionsCountAlignment,
-} from 'Components/messagesList/message/contentMessage/messageActions/messageReactions/messageReactions.styles';
-import {UserList} from 'Components/userList';
 import {User} from 'Repositories/entity/User';
 import {ReactionMap} from 'Repositories/storage';
 import {getEmojiTitleFromEmojiUnicode, getEmojiUnicode} from 'Util/emojiUtil';
 import {capitalizeFirstChar} from 'Util/stringUtil';
 
 import {panelContentTitleStyles} from './messageDetails.styles';
+
+import {EmojiChar} from '../../../components/messagesList/message/contentMessage/messageActions/messageReactions/emojiChar';
+import {
+  messageReactionDetailsMargin,
+  reactionsCountAlignment,
+} from '../../../components/messagesList/message/contentMessage/messageActions/messageReactions/messageReactions.styles';
+import {UserList} from '../../../components/userList';
 
 interface UsersReactionsProps {
   reactions: ReactionMap;

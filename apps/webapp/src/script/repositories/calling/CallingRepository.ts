@@ -61,11 +61,6 @@ import {
 import {AvsDebugger} from '@wireapp/avs-debugger';
 import {Runtime} from '@wireapp/commons';
 
-import {showNoAudioInputModal, showNoCameraModal} from 'Components/calling/devicePermissionModals';
-import {useCallAlertState} from 'Components/calling/useCallAlertState';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {CALL_QUALITY_FEEDBACK_KEY} from 'Components/Modals/QualityFeedbackModal/constants';
-import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
 import {
   NetworkQualityInfo,
   NetworkQualityInfoSchema,
@@ -118,6 +113,11 @@ import {isIncomingSetupOffer, shouldRejectStaleIncomingRing} from './incomingCal
 import {ClientId, Participant, UserId} from './Participant';
 import {getAllowedSftOrigins, isAllowedSftUrl} from './sftUrl';
 
+import {showNoAudioInputModal, showNoCameraModal} from '../../components/calling/devicePermissionModals';
+import {useCallAlertState} from '../../components/calling/useCallAlertState';
+import {PrimaryModal} from '../../components/Modals/PrimaryModal';
+import {CALL_QUALITY_FEEDBACK_KEY} from '../../components/Modals/QualityFeedbackModal/constants';
+import {RatingListLabel} from '../../components/Modals/QualityFeedbackModal/typings';
 import {Config} from '../../Config';
 import {NoAudioInputError} from '../../error/noAudioInputError';
 import {useActiveWindowState} from '../../hooks/useActiveWindow';

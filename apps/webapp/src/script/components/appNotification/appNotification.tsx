@@ -23,7 +23,7 @@ import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {createRoot, Root} from 'react-dom/client';
 import {toast, Toaster} from 'sonner';
 
-import {CloseIcon} from 'Components/icon';
+import {CloseIcon} from '../icon';
 
 interface AppNotificationOptions {
   message?: string;

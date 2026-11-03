@@ -25,11 +25,6 @@ import cx from 'classnames';
 
 import {Button, ButtonVariant, TabIndex} from '@wireapp/react-ui-kit';
 
-import {FadingScrollbar} from 'Components/fadingScrollbar';
-import * as Icon from 'Components/icon';
-import {SearchInput} from 'Components/SearchInput';
-import {ServiceList} from 'Components/ServiceList/ServiceList';
-import {UserSearchableList} from 'Components/UserSearchableList';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
@@ -48,6 +43,11 @@ import {getLogger} from 'Util/logger';
 import {safeWindowOpen} from 'Util/sanitizationUtil';
 import {compareTransliteration, sortByPriority, sortUsersByPriority} from 'Util/stringUtil';
 
+import {FadingScrollbar} from '../../../components/fadingScrollbar';
+import * as Icon from '../../../components/icon';
+import {SearchInput} from '../../../components/SearchInput';
+import {ServiceList} from '../../../components/ServiceList/ServiceList';
+import {UserSearchableList} from '../../../components/UserSearchableList';
 import {getManageServicesUrl} from '../../../externalRoute';
 import {PanelHeader} from '../panelHeader';
 import {PanelEntity, PanelState} from '../rightSidebar';

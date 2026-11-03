@@ -33,7 +33,7 @@ import {
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
-jest.mock('Components/meeting/useJoinMeetingCall', () => {
+jest.mock('../useJoinMeetingCall', () => {
   return {
     useJoinMeetingCall: jest.fn(() => {
       return {

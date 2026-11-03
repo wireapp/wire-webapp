@@ -21,9 +21,6 @@ import React, {type FunctionComponent} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {Avatar, AVATAR_SIZE} from 'Components/avatar';
-import {UserStatusBadges} from 'Components/badge';
-import {CallParticipantsListItemHandRaiseIcon} from 'Components/calling/callParticipantsListItem/CallParticipantsListItemHandRaiseIcon';
 import {Participant} from 'Repositories/calling/Participant';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
@@ -37,7 +34,11 @@ import {
   callParticipantAvatar,
   callParticipantConnecting,
 } from './CallParticipantsListItem.styles';
+import {CallParticipantsListItemHandRaiseIcon} from './CallParticipantsListItemHandRaiseIcon';
 import {CallParticipantStatusIcons} from './CallParticipantStatusIcons';
+
+import {Avatar, AVATAR_SIZE} from '../../avatar';
+import {UserStatusBadges} from '../../badge';
 
 interface CallParticipantsListItemProps {
   callParticipant: Participant;

@@ -20,7 +20,6 @@
 import {isNonEmptyString, isNullOrUndefined, isTruthy} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
-import {useTypingIndicatorState} from 'Components/inputBar/typingIndicator';
 import {CacheRepository} from 'Repositories/cache/cacheRepository';
 import type {ClientRepository} from 'Repositories/client/ClientRepository';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
@@ -35,6 +34,7 @@ import {appendParameter} from 'Util/urlUtil';
 
 import {SIGN_OUT_REASON} from '../../auth/signOutReason';
 import {URLParameter} from '../../auth/urlParameter';
+import {useTypingIndicatorState} from '../../components/inputBar/typingIndicator';
 import {BaseError} from '../../error/baseError';
 import {ClientError} from '../../error/clientError';
 import {externalUrl} from '../../externalRoute';

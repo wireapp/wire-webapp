@@ -21,11 +21,12 @@ import type {FunctionComponent} from 'react';
 
 import {isNull} from '@sindresorhus/is';
 
-import {Avatar, AVATAR_SIZE} from 'Components/avatar';
-import {showUserModal} from 'Components/Modals/UserModal';
 import {User} from 'Repositories/entity/User';
 
 import {avatarWrapperStyles, textStyles, wrapperStyles} from './cellsTableOwnerColumn.styles';
+
+import {Avatar, AVATAR_SIZE} from '../../../../../avatar';
+import {showUserModal} from '../../../../../Modals/UserModal';
 
 interface CellsTableOwnerColumnProps {
   owner: string;

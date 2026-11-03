@@ -21,11 +21,12 @@ import type {FunctionComponent} from 'react';
 
 import {container} from 'tsyringe';
 
-import {LegalHoldDot} from 'Components/LegalHoldDot';
-import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {LegalHoldMessage as LegalHoldMessageEntity} from 'Repositories/entity/message/legalHoldMessage';
 import {useApplicationContext} from 'src/script/page/rootProvider';
+
+import {LegalHoldDot} from '../../LegalHoldDot';
+import {useLegalHoldModalState} from '../../Modals/LegalHoldModal/LegalHoldModal.state';
 
 interface LegalHoldMessageProps {
   conversationState?: ConversationState;

@@ -24,7 +24,7 @@ import {asyncNoop} from 'noop-esm';
 import {task} from 'true-myth';
 
 import {buildMediaDevicesHandler, createConversation, createSelfParticipant} from 'src/script/auth/util/test/testUtil';
-import {joinMeetingCall, joinMeetingCallErrors, type JoinMeetingCallDeps} from 'Components/meeting/joinMeetingCall';
+import {joinMeetingCall, joinMeetingCallErrors, type JoinMeetingCallDeps} from './joinMeetingCall';
 import {unwrapErr} from 'Util/test/resultTestSupport';
 import {Call} from 'Repositories/calling/Call';
 import type {Conversation} from 'Repositories/entity/Conversation';

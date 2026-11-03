@@ -27,10 +27,6 @@ import {container} from 'tsyringe';
 
 import {CallIcon, IconButton, IconButtonVariant, QUERY, TabIndex, useMatchMedia} from '@wireapp/react-ui-kit';
 
-import {ConversationVerificationBadges} from 'Components/badge';
-import {useCallAlertState} from 'Components/calling/useCallAlertState';
-import * as Icon from 'Components/icon';
-import {LegalHoldDot} from 'Components/LegalHoldDot';
 import {CallState} from 'Repositories/calling/CallState';
 import {ConversationFilter} from 'Repositories/conversation/ConversationFilter';
 import {Conversation} from 'Repositories/entity/Conversation';
@@ -53,6 +49,10 @@ import {TIME_IN_MILLIS} from 'Util/timeUtil';
 import {useConversationCall} from '../../hooks/useConversationCall';
 import {useNoInternetCallGuard} from '../../hooks/useNoInternetCallGuard/useNoInternetCallGuard';
 import {WebAppEvents} from '../../webAppEvents';
+import {ConversationVerificationBadges} from '../badge';
+import {useCallAlertState} from '../calling/useCallAlertState';
+import * as Icon from '../icon';
+import {LegalHoldDot} from '../LegalHoldDot';
 
 interface TitleBarProps {
   callActions: CallActions;

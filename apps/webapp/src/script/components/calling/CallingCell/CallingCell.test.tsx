@@ -49,7 +49,7 @@ const mockCallAlertState = {
   showAlert: false,
 };
 
-jest.mock('Components/calling/useCallAlertState', () => {
+jest.mock('../useCallAlertState', () => {
   return {
     useCallAlertState: jest.fn(() => {
       return mockCallAlertState;
@@ -57,7 +57,7 @@ jest.mock('Components/calling/useCallAlertState', () => {
   };
 });
 
-jest.mock('Components/inViewport', () => {
+jest.mock('../../inViewport', () => {
   return {
     InViewport: ({onVisible, children}: {onVisible: () => void; children: ReactNode}) => {
       require('react').useEffect(() => {

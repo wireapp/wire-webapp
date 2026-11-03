@@ -23,20 +23,21 @@ import {isNonEmptyString} from '@sindresorhus/is';
 
 import {CircleCloseIcon, ErrorMessage, getOverlayPortalContainer, Input} from '@wireapp/react-ui-kit';
 
-import {MeetingParticipantsPicker} from 'Components/meeting/meetingParticipantsPicker';
-import {MeetingLinkForm} from 'Components/meeting/shared/meetingLinkForm/meetingLinkForm';
-import {useMeetingParticipants} from 'Components/meeting/shared/participants/useMeetingParticipants';
-import {
-  scheduleMeetingParticipantsSectionCss,
-  scheduleMeetingTitleClearButtonStyles,
-  scheduleMeetingTitleInputStyles,
-  scheduleMeetingTitleInputWrapperStyles,
-} from 'Components/meeting/shared/styles/meetingForm.styles';
 import type {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {meetNowFormLayoutStyles} from './meetNowModal.styles';
 import type {MeetNowFormState} from './meetNowTypes';
+
+import {MeetingParticipantsPicker} from '../meetingParticipantsPicker';
+import {MeetingLinkForm} from '../shared/meetingLinkForm/meetingLinkForm';
+import {useMeetingParticipants} from '../shared/participants/useMeetingParticipants';
+import {
+  scheduleMeetingParticipantsSectionCss,
+  scheduleMeetingTitleClearButtonStyles,
+  scheduleMeetingTitleInputStyles,
+  scheduleMeetingTitleInputWrapperStyles,
+} from '../shared/styles/meetingForm.styles';
 
 export const MEET_NOW_FORM_ID = 'meet-now-form';
 

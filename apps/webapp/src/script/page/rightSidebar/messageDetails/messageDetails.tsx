@@ -22,9 +22,6 @@ import {FC, useMemo, useState} from 'react';
 import {isNan, isNonEmptyArray, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
 
-import {FadingScrollbar} from 'Components/fadingScrollbar';
-import * as Icon from 'Components/icon';
-import {UserList} from 'Components/userList';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {ContentMessage} from 'Repositories/entity/message/contentMessage';
@@ -36,6 +33,9 @@ import {formatLocale} from 'Util/timeUtil';
 
 import {UsersReactions} from './userReactions';
 
+import {FadingScrollbar} from '../../../components/fadingScrollbar';
+import * as Icon from '../../../components/icon';
+import {UserList} from '../../../components/userList';
 import {SuperType} from '../../../message/superType';
 import {PanelHeader} from '../panelHeader';
 import {PanelEntity, PanelState} from '../rightSidebar';

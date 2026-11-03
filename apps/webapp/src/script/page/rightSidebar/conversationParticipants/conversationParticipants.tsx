@@ -21,9 +21,6 @@ import {FC, useMemo, useState} from 'react';
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 
-import {FadingScrollbar} from 'Components/fadingScrollbar';
-import {SearchInput} from 'Components/SearchInput';
-import {UserSearchableList} from 'Components/UserSearchableList';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
@@ -33,6 +30,9 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {sortUsersByPriority} from 'Util/stringUtil';
 
+import {FadingScrollbar} from '../../../components/fadingScrollbar';
+import {SearchInput} from '../../../components/SearchInput';
+import {UserSearchableList} from '../../../components/UserSearchableList';
 import {isServiceEntity} from '../../../guards/Service';
 import {PanelHeader} from '../panelHeader';
 import {PanelEntity, PanelState} from '../rightSidebar';

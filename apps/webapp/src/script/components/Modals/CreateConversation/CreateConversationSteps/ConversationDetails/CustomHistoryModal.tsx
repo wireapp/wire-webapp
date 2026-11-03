@@ -23,10 +23,10 @@ import {isNan} from '@sindresorhus/is';
 
 import {Button, ButtonVariant, FlexBox, Input, Select, Text} from '@wireapp/react-ui-kit';
 
-import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleEscDown, handleKeyDown, KEY} from 'Util/keyboardUtil';
 
+import {ModalComponent} from '../../../ModalComponent';
 import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';
 import {ChatHistory, HistorySharingUnit} from '../../types';
 import {getChatHistorySharingUnitOptions} from '../../utils';

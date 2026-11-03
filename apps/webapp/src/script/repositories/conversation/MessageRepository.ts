@@ -61,7 +61,6 @@ import {partition} from 'underscore';
 
 import {Asset, Availability, Confirmation, GenericMessage} from '@wireapp/protocol-messaging';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {buildMetadata, ImageMetadata, isAudio, isImage, isVideo} from 'Repositories/assets/assetMetaDataBuilder';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
@@ -117,6 +116,7 @@ import {EventBuilder} from './EventBuilder';
 import {EventMapper} from './EventMapper';
 import {getLinkPreviewFromString} from './linkPreviews';
 
+import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {Config} from '../../Config';
 import {ConversationError} from '../../error/conversationError';
 import {showLegalHoldWarningModal} from '../../legal-hold/LegalHoldWarning';

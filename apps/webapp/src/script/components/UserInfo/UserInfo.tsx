@@ -22,11 +22,12 @@ import React, {type FunctionComponent} from 'react';
 import {CSSObject} from '@emotion/react';
 import cx from 'classnames';
 
-import {selfIndicator} from 'Components/participantItemContent/participantItem.styles';
-import {UserName} from 'Components/UserName';
 import {User} from 'Repositories/entity/User';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {KEY} from 'Util/keyboardUtil';
+
+import {selfIndicator} from '../participantItemContent/participantItem.styles';
+import {UserName} from '../UserName';
 
 interface UserInfoProps {
   user: User;

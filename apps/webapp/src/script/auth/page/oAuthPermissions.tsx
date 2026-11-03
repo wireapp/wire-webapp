@@ -43,7 +43,6 @@ import {
   useMatchMedia,
 } from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/icon';
 import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -66,6 +65,7 @@ import {
 } from './oauthPermissions.styles';
 import {Page} from './page';
 
+import * as Icon from '../../components/icon';
 import {Config} from '../../Config';
 import {actionRoot} from '../module/action';
 import {RootState, ThunkDispatch} from '../module/reducer';

@@ -24,9 +24,9 @@ import {container} from 'tsyringe';
 import {maybe, task} from 'true-myth';
 import {createStore, type StoreApi} from 'zustand/vanilla';
 
-import type {MeetingStoreState} from 'Components/meeting/meetingStore/createMeetingStore';
-import {MeetingStoreProvider} from 'Components/meeting/meetingStore/meetingStoreProvider';
-import {meetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
+import type {MeetingStoreState} from '../meetingStore/createMeetingStore';
+import {MeetingStoreProvider} from '../meetingStore/meetingStoreProvider';
+import {meetingSubmitErrors} from '../meetingSubmitErrors';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';

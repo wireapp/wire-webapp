@@ -21,14 +21,11 @@ import type {Clock} from '@enormora/clock/clock';
 import {isUndefined} from '@sindresorhus/is';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {
-  type AddNotificationInput,
-  MeetingNotificationKind,
-} from 'Components/meeting/meetingNotificationStore/meetingNotificationStore';
-import {getMeetingInstanceAt} from 'Components/meeting/selectors/getMeetingInstancesInRange';
-import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
+import {type AddNotificationInput, MeetingNotificationKind} from './meetingNotificationStore/meetingNotificationStore';
+import {getMeetingInstanceAt} from './selectors/getMeetingInstancesInRange';
+import type {MeetingSeries} from './types/meetingSeries';
 import {toMeetingIdKey} from './utils/toMeetingIdKey';
 
 type MeetingNotificationLogger = {

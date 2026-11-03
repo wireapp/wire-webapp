@@ -21,8 +21,6 @@ import {useEffect, useState, type FunctionComponent} from 'react';
 
 import {amplify} from 'amplify';
 
-import * as Icon from 'Components/icon';
-import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {EventName} from 'Repositories/tracking/eventName';
 import {Segmentation} from 'Repositories/tracking/segmentation';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -34,6 +32,8 @@ import {Introduction} from './teamCreationSteps/introduction';
 import {Success} from './teamCreationSteps/success';
 import {useTeamCreationModal} from './useTeamCreationModal';
 
+import * as Icon from '../../../../../../components/icon';
+import {ModalComponent} from '../../../../../../components/Modals/ModalComponent';
 import {WebAppEvents} from '../../../../../../webAppEvents';
 
 enum Step {

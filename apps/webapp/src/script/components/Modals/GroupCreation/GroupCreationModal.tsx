@@ -29,14 +29,6 @@ import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, Option, Select} from '@wireapp/react-ui-kit';
 
-import {FadingScrollbar} from 'Components/fadingScrollbar';
-import * as Icon from 'Components/icon';
-import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {AppsDisabledNote} from 'Components/Note/AppsDisabledNote/AppsDisabledNote';
-import {SearchInput} from 'Components/SearchInput';
-import {TextInput} from 'Components/TextInput';
-import {InfoToggle} from 'Components/toggle/InfoToggle';
-import {UserSearchableList} from 'Components/UserSearchableList';
 import {ACCESS_STATE} from 'Repositories/conversation/AccessState';
 import {
   ACCESS_TYPES,
@@ -59,7 +51,15 @@ import {sortUsersByPriority} from 'Util/stringUtil';
 import {Config} from '../../../Config';
 import {isProtocolOption, ProtocolOption} from '../../../guards/Protocol';
 import {WebAppEvents} from '../../../webAppEvents';
+import {FadingScrollbar} from '../../fadingScrollbar';
+import * as Icon from '../../icon';
+import {AppsDisabledNote} from '../../Note/AppsDisabledNote/AppsDisabledNote';
+import {SearchInput} from '../../SearchInput';
+import {TextInput} from '../../TextInput';
+import {InfoToggle} from '../../toggle/InfoToggle';
+import {UserSearchableList} from '../../UserSearchableList';
 import {getSharedDrivePermissionHint} from '../CreateConversation/utils';
+import {ModalComponent} from '../ModalComponent';
 import {PrimaryModal} from '../PrimaryModal';
 
 interface GroupCreationModalProps {

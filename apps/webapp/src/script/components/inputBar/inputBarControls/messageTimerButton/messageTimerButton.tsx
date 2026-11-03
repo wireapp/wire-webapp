@@ -23,7 +23,6 @@ import {isNan, isNullOrUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import * as Icon from 'Components/icon';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {TeamState} from 'Repositories/team/TeamState';
 import {EphemeralTimings} from 'src/script/ephemeral/EphemeralTimings';
@@ -33,6 +32,8 @@ import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isSpaceOrEnterKey} from 'Util/keyboardUtil';
 import {DurationUnit, formatDuration} from 'Util/timeUtil';
 import {setContextMenuPosition} from 'Util/util';
+
+import * as Icon from '../../../icon';
 
 interface MessageTimerButtonProps {
   conversation: Conversation;

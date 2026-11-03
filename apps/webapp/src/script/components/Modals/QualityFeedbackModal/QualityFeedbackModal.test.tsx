@@ -26,9 +26,9 @@ import {WebAppEvents} from '../../../webAppEvents';
 
 import {TestFactory} from 'test/helper/TestFactory';
 
-import {useCallAlertState} from 'Components/calling/useCallAlertState';
-import {CALL_QUALITY_FEEDBACK_KEY} from 'Components/Modals/QualityFeedbackModal/constants';
-import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
+import {useCallAlertState} from '../../calling/useCallAlertState';
+import {CALL_QUALITY_FEEDBACK_KEY} from './constants';
+import {RatingListLabel} from './typings';
 import {Call} from 'Repositories/calling/Call';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {User} from 'Repositories/entity/User';

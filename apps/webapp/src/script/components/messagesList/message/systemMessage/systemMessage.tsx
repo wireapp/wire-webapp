@@ -21,7 +21,6 @@ import type {FunctionComponent} from 'react';
 
 import {ConversationSettingsIcon, MLSVerified} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/icon';
 import {AdminlessDeleteReminderMessage} from 'Repositories/entity/message/adminlessDeleteReminderMessage';
 import {E2EIVerificationMessage} from 'Repositories/entity/message/e2eiVerificationMessage';
 import {JoinedAfterMLSMigrationFinalisationMessage} from 'Repositories/entity/message/joinedAfterMlsMigrationFinalisationMessage';
@@ -40,6 +39,7 @@ import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {SystemMessageBase} from './systemMessageBase';
 import {renderMemberRoleUpdateSystemMessageCaption, renderMlsSystemMessageCaption} from './systemMessageCaption';
 
+import * as Icon from '../../../icon';
 import {AdminlessDeleteReminderMessage as AdminlessDeleteReminderMessageComponent} from '../adminlessDeleteReminderMessage';
 import {messageBodyWrapper} from '../contentMessage/contentMessage.styles';
 import {ProtocolUpdateMessage as ProtocolUpdateMessageComponent} from '../protocolUpdateMessage';

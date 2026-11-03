@@ -21,8 +21,8 @@ import assert from 'node:assert';
 
 import {maybe} from 'true-myth';
 
-import type {MeetingReminderFirePayload} from 'Components/meeting/createMeetingReminderScheduler';
-import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
+import type {MeetingReminderFirePayload} from './createMeetingReminderScheduler';
+import type {MeetingSeries} from './types/meetingSeries';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {resolveCurrentMeetingReminderPayload} from './resolveCurrentMeetingReminderPayload';

@@ -23,7 +23,6 @@ import {Maybe} from 'true-myth';
 
 import {Button, ButtonVariant, COLOR} from '@wireapp/react-ui-kit';
 
-import {ModalComponent} from 'Components/Modals/ModalComponent';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import type {User} from 'Repositories/entity/User';
@@ -51,6 +50,8 @@ import {
   modalActionsStyles,
 } from './manualMigrationProtocolDetails.styles';
 import {useOnMultipleClicks} from './useOnMultipleClicks';
+
+import {ModalComponent} from '../../Modals/ModalComponent';
 
 const REQUIRED_PROTOCOL_ACTIVATIONS = 5;
 

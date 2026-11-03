@@ -23,7 +23,6 @@ import {isNull, isNullOrUndefined} from '@sindresorhus/is';
 
 import {Checkbox, CheckboxLabel, TabIndex} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/icon';
 import {Config} from 'src/script/Config';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -40,6 +39,8 @@ import {
   filterButtonWrapper,
   roundCheckbox,
 } from './tabAndFilterSettings.styles';
+
+import * as Icon from '../../../../../components/icon';
 
 const CHANNEL_TAB_INSERT_INDEX = 2;
 

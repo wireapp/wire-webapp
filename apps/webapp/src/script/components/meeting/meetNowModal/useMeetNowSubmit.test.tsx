@@ -23,10 +23,10 @@ import {act, renderHook} from '@testing-library/react';
 import {task} from 'true-myth';
 import {createStore, type StoreApi} from 'zustand/vanilla';
 
-import {useMeetingPrepModal} from 'Components/meeting/meetingPrep/useMeetingPrepModal';
-import type {MeetingStoreState} from 'Components/meeting/meetingStore/createMeetingStore';
-import {MeetingStoreProvider} from 'Components/meeting/meetingStore/meetingStoreProvider';
-import {meetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
+import {useMeetingPrepModal} from '../meetingPrep/useMeetingPrepModal';
+import type {MeetingStoreState} from '../meetingStore/createMeetingStore';
+import {MeetingStoreProvider} from '../meetingStore/meetingStoreProvider';
+import {meetingSubmitErrors} from '../meetingSubmitErrors';
 import type {ConversationState} from 'Repositories/conversation/ConversationState';
 import {
   createRootContextValueForTest,

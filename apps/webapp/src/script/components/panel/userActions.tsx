@@ -27,9 +27,6 @@ import {ClientMLSError, ClientMLSErrorLabel} from '@wireapp/core/lib/messagingPr
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import * as Icon from 'Components/icon';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {listCSS} from 'Components/panel/panelActions/panelActions.styles';
 import {ACCESS_STATE} from 'Repositories/conversation/AccessState';
 import type {ConversationRoleRepository} from 'Repositories/conversation/ConversationRoleRepository';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
@@ -43,10 +40,13 @@ import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import type {MenuItem} from './panelActions';
 import {PanelActions} from './panelActions';
+import {listCSS} from './panelActions/panelActions.styles';
 import {SingleAction} from './singleAction/singleAction';
 
 import type {ActionsViewModel} from '../../view_model/ActionsViewModel';
 import {WebAppEvents} from '../../webAppEvents';
+import * as Icon from '../icon';
+import {PrimaryModal} from '../Modals/PrimaryModal';
 
 export enum Actions {
   ACCEPT_REQUEST = 'UserActions.ACCEPT_REQUEST',

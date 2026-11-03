@@ -19,12 +19,13 @@
 
 import {useMemo, type FunctionComponent} from 'react';
 
-import * as Icon from 'Components/icon';
 import {generateCellState} from 'Repositories/conversation/ConversationCellState';
 import {ConversationStatusIcon} from 'Repositories/conversation/ConversationStatusIcon';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
+
+import * as Icon from '../../../icon';
 
 interface Props {
   conversation: Conversation;

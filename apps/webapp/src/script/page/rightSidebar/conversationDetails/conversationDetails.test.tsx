@@ -58,7 +58,7 @@ import {MainViewModel} from '../../../view_model/MainViewModel';
 import {withThemeAndRootContext} from '../../../auth/util/test/testUtil';
 import {PanelState} from '../rightSidebar';
 
-jest.mock('Components/panel/enrichedFields', () => {
+jest.mock('../../../components/panel/enrichedFields', () => {
   return {
     useEnrichedFields: (): never[] => {
       return [];
@@ -77,7 +77,7 @@ jest.mock('Components/panel/enrichedFields', () => {
     __esModule: true,
   };
 });
-jest.mock('Components/panel/userDetails', () => {
+jest.mock('../../../components/panel/userDetails', () => {
   return {
     UserDetails: () => {
       return <div />;

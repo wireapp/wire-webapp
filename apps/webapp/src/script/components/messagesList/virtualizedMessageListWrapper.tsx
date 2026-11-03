@@ -24,9 +24,8 @@ import cx from 'classnames';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {VirtualizedMessagesList} from 'Components/messagesList/virtualizedMessagesList/virtualizedMessagesList';
-
 import {MessagesListParams} from './messageList.types';
+import {VirtualizedMessagesList} from './virtualizedMessagesList/virtualizedMessagesList';
 
 export const VirtualizedMessageListWrapper: FunctionComponent<MessagesListParams> = ({
   assetRepository,

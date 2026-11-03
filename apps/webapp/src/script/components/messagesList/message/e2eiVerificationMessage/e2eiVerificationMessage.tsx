@@ -24,7 +24,6 @@ import {Maybe} from 'true-myth';
 
 import {Link, LinkVariant, MLSVerified} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/icon';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {E2EIVerificationMessage as E2EIVerificationMessageEntity} from 'Repositories/entity/message/e2eiVerificationMessage';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -40,6 +39,7 @@ import {MessageIcon, IconInfo, Link as LinkStyles} from './e2eiVerificationMessa
 import {Config} from '../../../../Config';
 import {E2EIHandler} from '../../../../e2eIdentity';
 import {E2EIVerificationMessageType} from '../../../../message/e2eiVerificationMessageType';
+import * as Icon from '../../../icon';
 
 const logger = getLogger('E2EIVerificationMessage');
 

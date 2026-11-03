@@ -21,8 +21,6 @@ import type {FunctionComponent} from 'react';
 
 import cx from 'classnames';
 
-import * as Icon from 'Components/icon';
-import {DraftState, generateConversationInputStorageKey} from 'Components/inputBar/common/draftState/draftState';
 import {generateCellState} from 'Repositories/conversation/ConversationCellState';
 import {Conversation, UnreadState} from 'Repositories/entity/Conversation';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -30,6 +28,8 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 import {iconStyle} from './cellDescription.style';
 
 import {useLocalStorage} from '../../../../hooks/useLocalStorage';
+import * as Icon from '../../../icon';
+import {DraftState, generateConversationInputStorageKey} from '../../../inputBar/common/draftState/draftState';
 
 interface Props {
   conversation: Conversation;

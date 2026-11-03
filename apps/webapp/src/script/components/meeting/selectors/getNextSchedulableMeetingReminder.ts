@@ -20,13 +20,12 @@
 import {isUndefined} from '@sindresorhus/is';
 import {Maybe} from 'true-myth';
 
-import {
-  getFirstMeetingInstanceOnOrAfter,
-  getNextMeetingInstance,
-} from 'Components/meeting/selectors/getMeetingInstancesInRange';
-import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
-import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
+
+import {getFirstMeetingInstanceOnOrAfter, getNextMeetingInstance} from './getMeetingInstancesInRange';
+
+import type {MeetingInstance} from '../types/meetingInstance';
+import type {MeetingSeries} from '../types/meetingSeries';
 
 export const MEETING_REMINDER_OFFSET_MS = TIME_IN_MILLIS.FIVE_MINUTES + TIME_IN_MILLIS.FIVE_MINUTES;
 

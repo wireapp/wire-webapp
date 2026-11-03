@@ -21,13 +21,14 @@ import type {FunctionComponent} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {Avatar, AVATAR_SIZE} from 'Components/avatar';
-import {ParticipantItemContent} from 'Components/participantItemContent';
-import {listItem, listWrapper} from 'Components/participantItemContent/participantItem.styles';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
+
+import {Avatar, AVATAR_SIZE} from '../../../avatar';
+import {ParticipantItemContent} from '../../../participantItemContent';
+import {listItem, listWrapper} from '../../../participantItemContent/participantItem.styles';
 
 interface ServiceListItemProps {
   service: ServiceEntity;

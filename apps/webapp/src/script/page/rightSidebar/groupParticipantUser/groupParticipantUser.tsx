@@ -25,12 +25,6 @@ import {amplify} from 'amplify';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {FadingScrollbar} from 'Components/fadingScrollbar';
-import * as Icon from 'Components/icon';
-import {EnrichedFields} from 'Components/panel/enrichedFields';
-import {UserActions, Actions} from 'Components/panel/userActions';
-import {UserDetails} from 'Components/panel/userDetails';
-import {BaseToggle} from 'Components/toggle/BaseToggle';
 import {ConversationRoleRepository} from 'Repositories/conversation/ConversationRoleRepository';
 import {MemberLeaveEvent, TeamMemberLeaveEvent} from 'Repositories/conversation/EventBuilder';
 import {Conversation} from 'Repositories/entity/Conversation';
@@ -42,6 +36,12 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 
+import {FadingScrollbar} from '../../../components/fadingScrollbar';
+import * as Icon from '../../../components/icon';
+import {EnrichedFields} from '../../../components/panel/enrichedFields';
+import {UserActions, Actions} from '../../../components/panel/userActions';
+import {UserDetails} from '../../../components/panel/userDetails';
+import {BaseToggle} from '../../../components/toggle/BaseToggle';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {WebAppEvents} from '../../../webAppEvents';
 import {PanelHeader} from '../panelHeader';

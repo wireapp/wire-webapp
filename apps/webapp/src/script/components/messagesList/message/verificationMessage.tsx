@@ -21,7 +21,6 @@ import {useMemo, type FunctionComponent} from 'react';
 
 import {amplify} from 'amplify';
 
-import {VerificationIcon} from 'Components/VerificationIcon';
 import {VerificationMessage as VerificationMessageEntity} from 'Repositories/entity/message/verificationMessage';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -31,6 +30,7 @@ import {capitalizeFirstChar} from 'Util/stringUtil';
 
 import {VerificationMessageType} from '../../../message/verificationMessageType';
 import {WebAppEvents} from '../../../webAppEvents';
+import {VerificationIcon} from '../../VerificationIcon';
 
 interface VerificationMessageProps {
   message: VerificationMessageEntity;

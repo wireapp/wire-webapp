@@ -19,11 +19,11 @@
 
 import {FC} from 'react';
 
-import {FadingScrollbar} from 'Components/fadingScrollbar';
-import {UserDevices, UserDevicesState} from 'Components/userDevices';
 import type {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
+import {FadingScrollbar} from '../../../components/fadingScrollbar';
+import {UserDevices, UserDevicesState} from '../../../components/userDevices';
 import {useUserDevicesHistory} from '../../../hooks/useUserDevicesHistory';
 import {ViewModelRepositories} from '../../../view_model/MainViewModel';
 import {PanelHeader} from '../panelHeader';

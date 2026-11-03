@@ -17,7 +17,7 @@
  *
  */
 
-import {meetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
+import {meetingSubmitErrors} from '../../meetingSubmitErrors';
 
 import {
   isMeetingDeletedDespiteSubmitError,

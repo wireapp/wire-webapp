@@ -34,10 +34,6 @@ import cx from 'classnames';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {Avatar, AVATAR_SIZE, GroupAvatar, ChannelAvatar} from 'Components/avatar';
-import {UserBlockedBadge} from 'Components/badge';
-import {CellDescription} from 'Components/conversationListCell/components/cellDescription';
-import {UserInfo} from 'Components/UserInfo';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {MediaType} from 'Repositories/media/MediaType';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -46,11 +42,15 @@ import {isKey, isOneOfKeys, KEY} from 'Util/keyboardUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 import {noop, setContextMenuPosition} from 'Util/util';
 
+import {CellDescription} from './components/cellDescription';
 import {StatusIcon} from './components/statusIcon';
 
 import {useConversationCall} from '../../hooks/useConversationCall';
 import type {RegisterConversationElement} from '../../hooks/useConversationFocus';
 import {useNoInternetCallGuard} from '../../hooks/useNoInternetCallGuard/useNoInternetCallGuard';
+import {Avatar, AVATAR_SIZE, GroupAvatar, ChannelAvatar} from '../avatar';
+import {UserBlockedBadge} from '../badge';
+import {UserInfo} from '../UserInfo';
 
 interface ConversationListCellProps {
   conversation: Conversation;

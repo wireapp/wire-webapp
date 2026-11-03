@@ -44,7 +44,7 @@ import {
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '../../webAppEvents';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {CallingEvent} from 'Repositories/event/CallingEvent';

@@ -29,17 +29,6 @@ import {container} from 'tsyringe';
 
 import {QUERY, StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
 
-import {CallingContainer} from 'Components/calling/CallingOverlayContainer';
-import {ChooseScreen} from 'Components/calling/ChooseScreen';
-import {DetachedCallingCell} from 'Components/calling/DetachedCallingCell';
-import {ConfigToolbar} from 'Components/configToolbar/configToolbar';
-import {ErrorFallback} from 'Components/errorFallback';
-import {CreateConversationModal} from 'Components/Modals/CreateConversation/CreateConversaionModal';
-import {FileHistoryModal} from 'Components/Modals/FileHistoryModal/FileHistoryModal';
-import {GroupCreationModal} from 'Components/Modals/GroupCreation/GroupCreationModal';
-import {LegalHoldModal} from 'Components/Modals/LegalHoldModal/LegalHoldModal';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {showUserModal, UserModal} from 'Components/Modals/UserModal';
 import {CallingViewMode, CallState, DesktopScreenShareMenu} from 'Repositories/calling/CallState';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {User} from 'Repositories/entity/User';
@@ -66,6 +55,17 @@ import {PanelEntity, PanelState, RightSidebar} from './rightSidebar';
 import {useAppMainState, ViewType} from './state';
 import {ContentState, useAppState} from './useAppState';
 
+import {CallingContainer} from '../components/calling/CallingOverlayContainer';
+import {ChooseScreen} from '../components/calling/ChooseScreen';
+import {DetachedCallingCell} from '../components/calling/DetachedCallingCell';
+import {ConfigToolbar} from '../components/configToolbar/configToolbar';
+import {ErrorFallback} from '../components/errorFallback';
+import {CreateConversationModal} from '../components/Modals/CreateConversation/CreateConversaionModal';
+import {FileHistoryModal} from '../components/Modals/FileHistoryModal/FileHistoryModal';
+import {GroupCreationModal} from '../components/Modals/GroupCreation/GroupCreationModal';
+import {LegalHoldModal} from '../components/Modals/LegalHoldModal/LegalHoldModal';
+import {PrimaryModal} from '../components/Modals/PrimaryModal';
+import {showUserModal, UserModal} from '../components/Modals/UserModal';
 import {useActiveWindow} from '../hooks/useActiveWindow';
 import {useInitializeRootFontSize} from '../hooks/useRootFontSize';
 import {App} from '../main/app';

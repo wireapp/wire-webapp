@@ -36,7 +36,6 @@ import {
   LinkIcon,
 } from '@wireapp/react-ui-kit';
 
-import {FormatSeparator} from 'Components/inputBar/common/formatSeparator/formatSeparator';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {FormatButton} from './formatButton/formatButton';
@@ -48,6 +47,8 @@ import {useHeadingState} from './useHeadingState/useHeadingState';
 import {useLinkState} from './useLinkState/useLinkState';
 import {useListState} from './useListState/useListState';
 import {useToolbarState} from './useToolbarState/useToolbarState';
+
+import {FormatSeparator} from '../../../common/formatSeparator/formatSeparator';
 
 interface FormatToolbarProps {
   isEditing: boolean;

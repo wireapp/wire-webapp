@@ -25,11 +25,6 @@ import cx from 'classnames';
 import {LexicalEditor, $createTextNode, $insertNodes} from 'lexical';
 import {container} from 'tsyringe';
 
-import {Avatar, AVATAR_SIZE} from 'Components/avatar';
-import {ConversationClassifiedBar} from 'Components/classifiedBar/classifiedBar';
-import {isConversationFileUploadAllowed} from 'Components/conversation/conversationFileDropzone/isConversationFileUploadAllowed/isConversationFileUploadAllowed';
-import {useFileUploadState} from 'Components/conversation/useFilesUploadState/useFilesUploadState';
-import {EmojiPicker} from 'Components/emojiPicker/emojiPicker';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
@@ -68,6 +63,11 @@ import {Config} from '../../Config';
 import {useUserPropertyValue} from '../../hooks/useUserProperty';
 import {useApplicationContext} from '../../page/rootProvider';
 import {WebAppEvents} from '../../webAppEvents';
+import {Avatar, AVATAR_SIZE} from '../avatar';
+import {ConversationClassifiedBar} from '../classifiedBar/classifiedBar';
+import {isConversationFileUploadAllowed} from '../conversation/conversationFileDropzone/isConversationFileUploadAllowed/isConversationFileUploadAllowed';
+import {useFileUploadState} from '../conversation/useFilesUploadState/useFilesUploadState';
+import {EmojiPicker} from '../emojiPicker/emojiPicker';
 
 const pingTimeoutInSeconds = 2;
 

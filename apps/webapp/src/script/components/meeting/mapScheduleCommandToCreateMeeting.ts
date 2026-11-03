@@ -19,9 +19,9 @@
 
 import type {CreateMeeting} from '@wireapp/api-client/lib/meetings/createMeeting';
 
-import type {DeviceTimeZone} from 'Components/meeting/deviceTimeZone';
-import {mapRecurrenceOptionToMeetingRecurrence} from 'Components/meeting/scheduleMeetingModal/scheduleMeetingRecurrence';
-import type {ScheduleMeetingCommand} from 'Components/meeting/shared/types/meetingCommandTypes';
+import type {DeviceTimeZone} from './deviceTimeZone';
+import {mapRecurrenceOptionToMeetingRecurrence} from './scheduleMeetingModal/scheduleMeetingRecurrence';
+import type {ScheduleMeetingCommand} from './shared/types/meetingCommandTypes';
 
 export const mapScheduleCommandToCreateMeeting = (
   command: ScheduleMeetingCommand,

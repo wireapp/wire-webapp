@@ -21,7 +21,6 @@ import {MouseEvent, type FunctionComponent} from 'react';
 
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation/';
 
-import {FormatSeparator} from 'Components/inputBar/common/formatSeparator/formatSeparator';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {Config} from 'src/script/Config';
 
@@ -35,6 +34,8 @@ import {GiphyButton} from './giphyButton/giphyButton';
 import {ImageUploadButton} from './imageUploadButton/imageUploadButton';
 import {MessageTimerButton} from './messageTimerButton/messageTimerButton';
 import {PingButton} from './pingButton/pingButton';
+
+import {FormatSeparator} from '../common/formatSeparator/formatSeparator';
 
 interface ControlButtonsProps {
   input: string;

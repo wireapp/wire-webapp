@@ -21,8 +21,8 @@ import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {task} from 'true-myth';
 
-import type {JoinMeetingCallDeps} from 'Components/meeting/joinMeetingCall';
-import {joinPreparedMeeting} from 'Components/meeting/meetingPrep/joinPreparedMeeting';
+import type {JoinMeetingCallDeps} from '../joinMeetingCall';
+import {joinPreparedMeeting} from './joinPreparedMeeting';
 import type {CallingRepository} from 'Repositories/calling/CallingRepository';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import type {ConversationState} from 'Repositories/conversation/ConversationState';

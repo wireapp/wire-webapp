@@ -21,8 +21,9 @@ import type {FunctionComponent} from 'react';
 
 import cx from 'classnames';
 
-import * as Icon from 'Components/icon';
 import {useApplicationContext} from 'src/script/page/rootProvider';
+
+import * as Icon from '../../../icon';
 
 interface CancelEditButtonProps {
   isEditing: boolean;

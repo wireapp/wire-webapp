@@ -23,9 +23,6 @@ import cx from 'classnames';
 
 import {Tooltip} from '@wireapp/react-ui-kit';
 
-import {CallParticipantsListItem} from 'Components/calling/callParticipantsListItem';
-import {FadingScrollbar} from 'Components/fadingScrollbar';
-import * as Icon from 'Components/icon';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {Participant} from 'Repositories/calling/Participant';
 import {Conversation} from 'Repositories/entity/Conversation';
@@ -40,6 +37,9 @@ import {
 } from './CallingParticipantList.styles';
 
 import {ContextMenuEntry, showContextMenu} from '../../../../ui/contextMenu';
+import {FadingScrollbar} from '../../../fadingScrollbar';
+import * as Icon from '../../../icon';
+import {CallParticipantsListItem} from '../../callParticipantsListItem';
 
 interface CallingParticipantListProps {
   callingRepository: Pick<CallingRepository, 'supportsScreenSharing' | 'sendModeratorMute'>;

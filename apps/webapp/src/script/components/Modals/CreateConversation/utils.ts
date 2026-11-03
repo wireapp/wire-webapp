@@ -21,13 +21,13 @@ import {isNan} from '@sindresorhus/is';
 import {ADD_PERMISSION} from '@wireapp/api-client/lib/conversation';
 import {container} from 'tsyringe';
 
-import type {PrimaryModalTranslatedMessage} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 import {TeamState} from 'Repositories/team/TeamState';
 import type {RootContextValue} from 'src/script/page/rootProvider';
 
 import {ChatHistory, ConversationAccess, ConversationType, HistorySharingUnit} from './types';
 
 import {Config} from '../../../Config';
+import type {PrimaryModalTranslatedMessage} from '../PrimaryModal/PrimaryModalTypes';
 
 export type Translate = RootContextValue['translate'];
 

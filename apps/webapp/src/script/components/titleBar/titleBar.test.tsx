@@ -29,7 +29,7 @@ import {WebAppEvents} from '../../webAppEvents';
 
 import en from '../../../i18n/en-US.json';
 import ru from '../../../i18n/ru-RU.json';
-import {TitleBar} from 'Components/titleBar';
+import {TitleBar} from './';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {CallState} from 'Repositories/calling/CallState';
 import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
@@ -58,7 +58,7 @@ jest.mock('@wireapp/react-ui-kit', () => {
   };
 });
 
-jest.mock('Components/calling/useCallAlertState', () => {
+jest.mock('../calling/useCallAlertState', () => {
   return {
     useCallAlertState: () => {
       return {

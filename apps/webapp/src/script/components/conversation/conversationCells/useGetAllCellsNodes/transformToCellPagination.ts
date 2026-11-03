@@ -19,7 +19,7 @@
 
 import {RestPagination} from 'cells-sdk-ts';
 
-import {CellPagination} from 'Components/conversation/conversationCells/common/cellPagination/cellPagination';
+import {CellPagination} from '../common/cellPagination/cellPagination';
 
 export const transformToCellPagination = (pagination: RestPagination): CellPagination => {
   return {

@@ -25,7 +25,7 @@ import {noop} from 'noop-esm';
 
 import {BackendError, StatusCode} from '@wireapp/api-client/lib/http/';
 import {ThemeProvider, themes, THEME_ID} from '@wireapp/react-ui-kit';
-import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
+import {PrimaryModalComponent} from '../../../Modals/PrimaryModal/PrimaryModal';
 import {JobsTaskStatus} from 'cells-sdk-ts';
 import {Maybe} from 'true-myth';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
@@ -39,9 +39,9 @@ import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/start
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 import type {Translate} from 'Util/localizerUtil/translationTypes';
 import {translateForTest} from 'Util/test/translateForTest';
-import type {SharedDriveUploadController} from 'Components/conversation/conversationCells/sharedDriveUploadController';
-import {SharedDriveUploadStatusProvider} from 'Components/conversation/conversationCells/sharedDriveUploadStatusContext';
-import {SharedDriveUploadStatusPopupHost} from 'Components/conversation/conversationCells/sharedDriveUploadStatusPopupHost';
+import type {SharedDriveUploadController} from '../sharedDriveUploadController';
+import {SharedDriveUploadStatusProvider} from '../sharedDriveUploadStatusContext';
+import {SharedDriveUploadStatusPopupHost} from '../sharedDriveUploadStatusPopupHost';
 
 import {CellsTable} from './cellsTable';
 

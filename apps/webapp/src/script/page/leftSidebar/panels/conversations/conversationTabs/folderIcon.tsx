@@ -19,8 +19,7 @@
 
 import type {FunctionComponent} from 'react';
 
-import * as Icon from 'Components/icon';
-
+import * as Icon from '../../../../../components/icon';
 import {SidebarStatus, useSidebarStore} from '../useSidebarStore';
 
 export const FolderIcon: FunctionComponent = () => {

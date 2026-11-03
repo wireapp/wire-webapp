@@ -24,7 +24,7 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import en from '../../../../i18n/en-US.json';
 import si from '../../../../i18n/si-LK.json';
 import {ClientEntity} from 'Repositories/client/ClientEntity';
-import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
+import {useLegalHoldModalState} from './LegalHoldModal.state';
 import {ClientRepository} from 'Repositories/client';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';

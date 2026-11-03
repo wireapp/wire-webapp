@@ -25,7 +25,6 @@ import ko from 'knockout';
 import {container} from 'tsyringe';
 import {isError} from 'underscore';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
@@ -39,6 +38,7 @@ import {isConversationEntity} from 'Util/typePredicateUtil';
 
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 
+import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
 import {ConversationError} from '../error/conversationError';
 import '../page/leftSidebar';

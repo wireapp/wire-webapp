@@ -22,7 +22,6 @@ import {ReactElement, useMemo, type FunctionComponent} from 'react';
 import {isNan, isNonEmptyArray, isNonEmptyString} from '@sindresorhus/is';
 import cx from 'classnames';
 
-import * as Icons from 'Components/icon';
 import {createLabel, LabelType} from 'Repositories/conversation/ConversationLabelRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
@@ -36,6 +35,8 @@ import {
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {ContextMenuEntry, showContextMenu} from 'src/script/ui/contextMenu';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
+
+import * as Icons from '../../../../../components/icon';
 
 interface ConversationFolderTabProps {
   title: string;

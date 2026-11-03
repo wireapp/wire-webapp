@@ -24,10 +24,6 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {showInviteModal} from 'Components/Modals/InviteModal';
-import {showServiceModal} from 'Components/Modals/ServiceModal';
-import {showUserModal} from 'Components/Modals/UserModal';
-import {SearchInput} from 'Components/SearchInput';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {User} from 'Repositories/entity/User';
@@ -46,6 +42,10 @@ import {MainViewModel} from 'src/script/view_model/MainViewModel';
 import {PeopleTab, SearchResultsData} from './peopleTab';
 import {ServicesTab} from './servicesTab';
 
+import {showInviteModal} from '../../../../components/Modals/InviteModal';
+import {showServiceModal} from '../../../../components/Modals/ServiceModal';
+import {showUserModal} from '../../../../components/Modals/UserModal';
+import {SearchInput} from '../../../../components/SearchInput';
 import {Config} from '../../../../Config';
 import {ListWrapper} from '../listWrapper';
 

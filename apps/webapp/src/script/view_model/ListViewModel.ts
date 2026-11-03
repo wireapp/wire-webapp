@@ -25,7 +25,6 @@ import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
 
-import {PrimaryModal, usePrimaryModalState} from 'Components/Modals/PrimaryModal';
 import type {CallingRepository} from 'Repositories/calling/CallingRepository';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
@@ -45,6 +44,7 @@ import {CallingViewModel} from './CallingViewModel';
 import {ContentViewModel} from './ContentViewModel';
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 
+import {PrimaryModal, usePrimaryModalState} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
 import {
   getConversationListTab,

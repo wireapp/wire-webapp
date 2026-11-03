@@ -23,11 +23,12 @@ import {isNonEmptyString} from '@sindresorhus/is';
 
 import {Tooltip} from '@wireapp/react-ui-kit';
 
-import {Avatar, AVATAR_SIZE} from 'Components/avatar';
-import {useUserName} from 'Components/UserName';
 import type {User} from 'Repositories/entity/User';
 
 import {avatarItemStyles} from './stackedAvatars.styles';
+
+import {Avatar, AVATAR_SIZE} from '..';
+import {useUserName} from '../../UserName';
 
 interface ParticipantAvatarTooltipProps {
   participant: User;

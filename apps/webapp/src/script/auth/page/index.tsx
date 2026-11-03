@@ -29,7 +29,6 @@ import {container} from 'tsyringe';
 import {UrlUtil} from '@wireapp/commons';
 import {Button, ButtonVariant, ContainerXS, ErrorMessage, Text} from '@wireapp/react-ui-kit';
 
-import {LogoFullIcon} from 'Components/icon';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {Core} from 'src/script/service/coreSingleton';
 import {isDataDogEnabled} from 'Util/dataDog';
@@ -37,6 +36,7 @@ import {getWebEnvironment} from 'Util/environment';
 
 import {Page} from './page';
 
+import {LogoFullIcon} from '../../components/icon';
 import {Config} from '../../Config';
 import {useSingleInstance} from '../../hooks/useSingleInstance';
 import '../../localization/Localizer';

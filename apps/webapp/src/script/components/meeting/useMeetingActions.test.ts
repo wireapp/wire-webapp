@@ -20,8 +20,8 @@
 import {renderHook} from '@testing-library/react';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 
-import {useMeetNowModal} from 'Components/meeting/meetNowModal/useMeetNowModal';
-import {useMeetingActions} from 'Components/meeting/useMeetingActions';
+import {useMeetNowModal} from './meetNowModal/useMeetNowModal';
+import {useMeetingActions} from './useMeetingActions';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

@@ -37,7 +37,6 @@ import {
   TabIndex,
 } from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/icon';
 import {Call} from 'Repositories/calling/Call';
 import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
 import {Participant} from 'Repositories/calling/Participant';
@@ -80,6 +79,7 @@ import {VideoControlsSelect} from './VideoControlsSelect/VideoControlsSelect';
 import {useActiveWindowMatchMedia} from '../../../hooks/useActiveWindowMatchMedia';
 import {useUserPropertyValue} from '../../../hooks/useUserProperty';
 import {WebAppEvents} from '../../../webAppEvents';
+import * as Icon from '../../icon';
 
 type BackgroundOptionValue = 'none' | 'blur-high' | 'blur-low' | 'virtual' | 'settings';
 

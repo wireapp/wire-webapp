@@ -24,6 +24,17 @@ import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, CallIcon, CloseIcon} from '@wireapp/react-ui-kit';
 
+import {UserState} from 'Repositories/user/userState';
+import {useApplicationContext} from 'src/script/page/rootProvider';
+import {handleEscDown} from 'Util/keyboardUtil';
+
+import {MEET_NOW_FORM_ID, MeetNowForm} from './meetNowForm';
+import {meetNowModalWrapperStyles} from './meetNowModal.styles';
+import {wasMeetNowMeetingCreated} from './meetNowTypes';
+import {hasMeetNowFormErrors, useMeetNowModal} from './useMeetNowModal';
+import {useMeetNowSubmit} from './useMeetNowSubmit';
+
+import {ModalComponent} from '../../Modals/ModalComponent';
 import {
   bodyStyles,
   closeButtonStyles,
@@ -34,17 +45,7 @@ import {
   submitButtonIconStyles,
   submitButtonStyles,
   wrapperStyles,
-} from 'Components/meeting/shared/styles/meetingModalShell.styles';
-import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {UserState} from 'Repositories/user/userState';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {handleEscDown} from 'Util/keyboardUtil';
-
-import {MEET_NOW_FORM_ID, MeetNowForm} from './meetNowForm';
-import {meetNowModalWrapperStyles} from './meetNowModal.styles';
-import {wasMeetNowMeetingCreated} from './meetNowTypes';
-import {hasMeetNowFormErrors, useMeetNowModal} from './useMeetNowModal';
-import {useMeetNowSubmit} from './useMeetNowSubmit';
+} from '../shared/styles/meetingModalShell.styles';
 
 export const MeetNowModal: FunctionComponent = () => {
   const {fireAndForgetInvoker, translate} = useApplicationContext();

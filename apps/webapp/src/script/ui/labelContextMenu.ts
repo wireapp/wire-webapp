@@ -17,11 +17,12 @@
  *
  */
 
-import {PlusIcon} from 'Components/icon';
 import type {ConversationLabelRepository} from 'Repositories/conversation/ConversationLabelRepository';
 import type {Conversation} from 'Repositories/entity/Conversation';
 
 import {ContextMenuEntry, showContextMenu} from './contextMenu';
+
+import {PlusIcon} from '../components/icon';
 
 type LabelContextMenuCopy = {
   readonly newFolder: string;

@@ -21,7 +21,6 @@ import type {FunctionComponent} from 'react';
 
 import {ChevronIcon, IconButton} from '@wireapp/react-ui-kit';
 
-import {FadingScrollbar} from 'Components/fadingScrollbar';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {Conversation} from 'Repositories/entity/Conversation';
@@ -33,6 +32,7 @@ import {
   conversationsSidebarStyles,
 } from './conversationSidebar.styles';
 
+import {FadingScrollbar} from '../../../../../components/fadingScrollbar';
 import {ContentState} from '../../../../useAppState';
 import {UserDetails} from '../../../userDetails';
 import {ConversationTabs} from '../conversationTabs';

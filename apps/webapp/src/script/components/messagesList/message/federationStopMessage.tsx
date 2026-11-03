@@ -23,7 +23,6 @@ import {isNonEmptyArray} from '@sindresorhus/is';
 
 import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/icon';
 import {FederationStopMessage as FederationStopMessageEntity} from 'Repositories/entity/message/federationStopMessage';
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -34,6 +33,8 @@ import type {Translate} from 'Util/localizerUtil/translationTypes';
 
 import {MessageTime} from './messageTime';
 import {useMessageFocusedTabIndex} from './util';
+
+import * as Icon from '../../icon';
 
 interface FederationStopMessageProps {
   message: FederationStopMessageEntity;

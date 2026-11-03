@@ -26,7 +26,6 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {E2EIVerificationMessage} from 'Components/messagesList/message/e2eiVerificationMessage';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {OutgoingQuote} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
@@ -44,6 +43,7 @@ import {CallTimeoutMessage} from './callTimeoutMessage';
 import {ContentMessageComponent} from './contentMessage';
 import {DecryptErrorMessage} from './decryptErrorMessage';
 import {DeleteMessage} from './deleteMessage';
+import {E2EIVerificationMessage} from './e2eiVerificationMessage';
 import {FailedToAddUsersMessage} from './failedToAddUsersMessage';
 import {FederationStopMessage} from './federationStopMessage';
 import {FileTypeRestrictedMessage} from './fileTypeRestrictedMessage';

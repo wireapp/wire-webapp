@@ -17,10 +17,11 @@
  *
  */
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {RootContextValue} from 'src/script/page/rootProvider';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
+
+import {PrimaryModal} from '../../../../../../Modals/PrimaryModal';
 
 export const showRestoreRootNodeModal = ({
   node,

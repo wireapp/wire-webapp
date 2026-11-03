@@ -37,11 +37,11 @@ import {createRoot, Root} from 'react-dom/client';
 import {Availability} from '@wireapp/protocol-messaging';
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/icon';
-import {IgnoreOutsideClickWrapper} from 'Components/inputBar/util/clickHandlers';
-import {useMessageActionsState} from 'Components/messagesList/message/contentMessage/messageActions/messageActions.state';
 import {isEnterKey, isEscapeKey, isKey, isOneOfKeys, isSpaceKey, KEY} from 'Util/keyboardUtil';
 
+import * as Icon from '../components/icon';
+import {IgnoreOutsideClickWrapper} from '../components/inputBar/util/clickHandlers';
+import {useMessageActionsState} from '../components/messagesList/message/contentMessage/messageActions/messageActions.state';
 import {useActiveWindowState} from '../hooks/useActiveWindow';
 
 export interface ContextMenuEntry {

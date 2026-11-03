@@ -23,8 +23,6 @@ import {amplify} from 'amplify';
 
 import {Button, ButtonVariant, IconButton} from '@wireapp/react-ui-kit';
 
-import {BannerPortal} from 'Components/bannerPortal/bannerPortal';
-import * as Icon from 'Components/icon';
 import {EventName} from 'Repositories/tracking/eventName';
 import {Segmentation} from 'Repositories/tracking/segmentation';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -40,6 +38,8 @@ import {
 } from './teamCreation.styles';
 import {useTeamCreationModal} from './useTeamCreationModal';
 
+import {BannerPortal} from '../../../../../../components/bannerPortal/bannerPortal';
+import * as Icon from '../../../../../../components/icon';
 import {WebAppEvents} from '../../../../../../webAppEvents';
 import {SidebarStatus, useSidebarStore} from '../../useSidebarStore';
 

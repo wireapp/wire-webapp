@@ -36,7 +36,7 @@ import {createUuid} from 'Util/uuid';
 import {CollectionDetails} from './collectionDetails';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-jest.mock('Components/image', () => {
+jest.mock('../../../../components/image', () => {
   return {
     AssetImage: () => {
       return <div>Image</div>;
@@ -44,7 +44,7 @@ jest.mock('Components/image', () => {
     __esModule: true,
   };
 });
-jest.mock('Components/messagesList/message/contentMessage/asset/audioAsset/audioAsset', () => {
+jest.mock('../../../../components/messagesList/message/contentMessage/asset/audioAsset/audioAsset', () => {
   return {
     AudioAsset: () => {
       return <div>Audio</div>;
@@ -52,7 +52,7 @@ jest.mock('Components/messagesList/message/contentMessage/asset/audioAsset/audio
     __esModule: true,
   };
 });
-jest.mock('Components/messagesList/message/contentMessage/asset/fileAsset/fileAsset', () => {
+jest.mock('../../../../components/messagesList/message/contentMessage/asset/fileAsset/fileAsset', () => {
   return {
     FileAsset: () => {
       return <div>File</div>;
@@ -60,7 +60,7 @@ jest.mock('Components/messagesList/message/contentMessage/asset/fileAsset/fileAs
     __esModule: true,
   };
 });
-jest.mock('Components/messagesList/message/contentMessage/asset/linkPreviewAssetComponent', () => {
+jest.mock('../../../../components/messagesList/message/contentMessage/asset/linkPreviewAssetComponent', () => {
   return {
     LinkPreviewAsset: () => {
       return <div>Link Preview</div>;

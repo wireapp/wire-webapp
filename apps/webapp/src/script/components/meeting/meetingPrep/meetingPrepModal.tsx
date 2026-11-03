@@ -22,9 +22,6 @@ import {type FunctionComponent, useCallback, useRef} from 'react';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {maybe} from 'true-myth';
 
-import {showNoAudioInputModal, showNoCameraModal} from 'Components/calling/devicePermissionModals';
-import {modalWrapperStyles} from 'Components/meeting/shared/styles/meetingModalShell.styles';
-import {ModalComponent} from 'Components/Modals/ModalComponent';
 import type {CallMediaChoice} from 'Repositories/calling/callMediaChoice';
 import type {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -34,6 +31,10 @@ import {captureModalFocusContext} from 'Util/modalFocusUtil';
 import {MeetingPrepSurface} from './meetingPrepSurface';
 import {type MeetingPrepDeviceKind, meetingPrepDeviceKinds, type RequestMeetingPrepPreview} from './meetingPrepTypes';
 import {useMeetingPrepModal} from './useMeetingPrepModal';
+
+import {showNoAudioInputModal, showNoCameraModal} from '../../calling/devicePermissionModals';
+import {ModalComponent} from '../../Modals/ModalComponent';
+import {modalWrapperStyles} from '../shared/styles/meetingModalShell.styles';
 
 export type MeetingPrepModalProps = {
   participant: User;

@@ -24,45 +24,41 @@ import {isSameDay, startOfDay} from 'date-fns';
 
 import {Button, ButtonVariant, Loading} from '@wireapp/react-ui-kit';
 
-import {emptyListContainerStyles} from 'Components/meeting/emptyMeetingList/emptyListStyles';
-import {EmptyMeetingList} from 'Components/meeting/emptyMeetingList/emptyMeetingList';
+import type {User} from 'Repositories/entity/User';
+import {useApplicationContext} from 'src/script/page/rootProvider';
+import {TIME_IN_MILLIS} from 'Util/timeUtil';
+
 import {
   meetingDayHeaderStyles,
   meetingListContainerStyles,
   meetingListItemWrapperStyles,
   screenReaderOnlyStyles,
-} from 'Components/meeting/meetingList/meetingList.styles';
+} from './meetingList.styles';
 import {
   INITIAL_MEETING_INSTANCE_COUNT,
   LOAD_MORE_MEETING_INSTANCE_COUNT,
   MEETING_DAY_GROUP_HEADER_HEIGHT,
   MEETING_DAY_GROUP_SECTION_TOP_PADDING,
   MEETING_LIST_ITEM_HEIGHT,
-} from 'Components/meeting/meetingList/meetingListConstants';
-import {MeetingListItem} from 'Components/meeting/meetingList/meetingListItemGroup/meetingListItem/meetingListItem';
-import {useLoadMoreMeetingListItems} from 'Components/meeting/meetingList/useLoadMoreMeetingListItems';
-import {
-  useMeetingListVirtualizer,
-  type UseMeetingListVirtualizer,
-} from 'Components/meeting/meetingList/useMeetingListVirtualizer';
+} from './meetingListConstants';
+import {MeetingListItem} from './meetingListItemGroup/meetingListItem/meetingListItem';
+import {useLoadMoreMeetingListItems} from './useLoadMoreMeetingListItems';
+import {useMeetingListVirtualizer, type UseMeetingListVirtualizer} from './useMeetingListVirtualizer';
+
+import {emptyListContainerStyles} from '../emptyMeetingList/emptyListStyles';
+import {EmptyMeetingList} from '../emptyMeetingList/emptyMeetingList';
 import {
   getMeetingInstancePage,
   getNextMeetingInstancePage,
   type MeetingInstancePage,
-} from 'Components/meeting/selectors/getMeetingInstancePage';
-import {
-  getMeetingListTimelineItems,
-  type MeetingListTimelineItem,
-} from 'Components/meeting/selectors/getMeetingListTimelineItems';
-import {groupMeetingInstancesByDay} from 'Components/meeting/selectors/groupMeetingInstancesByDay';
-import type {MeetingInstancesByDay} from 'Components/meeting/selectors/groupMeetingInstancesByDay';
-import {isMeetingInstanceVisibleInMeetingList} from 'Components/meeting/selectors/isMeetingInstanceVisibleInMeetingList';
-import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
-import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
-import {getDaySectionHeader} from 'Components/meeting/utils/getDaySectionHeader';
-import type {User} from 'Repositories/entity/User';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
+} from '../selectors/getMeetingInstancePage';
+import {getMeetingListTimelineItems, type MeetingListTimelineItem} from '../selectors/getMeetingListTimelineItems';
+import {groupMeetingInstancesByDay} from '../selectors/groupMeetingInstancesByDay';
+import type {MeetingInstancesByDay} from '../selectors/groupMeetingInstancesByDay';
+import {isMeetingInstanceVisibleInMeetingList} from '../selectors/isMeetingInstanceVisibleInMeetingList';
+import type {MeetingInstance} from '../types/meetingInstance';
+import type {MeetingSeries} from '../types/meetingSeries';
+import {getDaySectionHeader} from '../utils/getDaySectionHeader';
 
 export interface MeetingListProps {
   meetingSeries: MeetingSeries[];

@@ -17,11 +17,12 @@
  *
  */
 
-import type {MeetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {Translate} from 'Util/localizerUtil';
 
 import type {MeetingSubmitErrorTranslationKeys} from './meetingSubmitErrorKeys';
+
+import {PrimaryModal} from '../../../Modals/PrimaryModal';
+import type {MeetingSubmitErrors} from '../../meetingSubmitErrors';
 
 export const showMeetingSubmitError = (
   translate: Translate,

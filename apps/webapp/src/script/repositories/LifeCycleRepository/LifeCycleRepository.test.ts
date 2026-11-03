@@ -21,7 +21,7 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '../../webAppEvents';
 
-import {useTypingIndicatorState} from 'Components/inputBar/typingIndicator';
+import {useTypingIndicatorState} from '../../components/inputBar/typingIndicator';
 import {CacheRepository} from 'Repositories/cache/cacheRepository';
 import type {ClientRepository} from 'Repositories/client/ClientRepository';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';

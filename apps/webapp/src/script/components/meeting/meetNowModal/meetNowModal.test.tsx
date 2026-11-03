@@ -24,14 +24,11 @@ import {container} from 'tsyringe';
 import {task} from 'true-myth';
 import {createStore, type StoreApi} from 'zustand/vanilla';
 
-import type {CreateMeetingSuccess} from 'Components/meeting/shared/service/meetingService';
-import type {MeetingStoreState} from 'Components/meeting/meetingStore/createMeetingStore';
-import {MeetingStoreProvider} from 'Components/meeting/meetingStore/meetingStoreProvider';
-import {meetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
-import {
-  MEETING_TITLE_MAX_LENGTH,
-  meetingTitleErrorKeys,
-} from 'Components/meeting/shared/validation/meetingTitleValidation';
+import type {CreateMeetingSuccess} from '../shared/service/meetingService';
+import type {MeetingStoreState} from '../meetingStore/createMeetingStore';
+import {MeetingStoreProvider} from '../meetingStore/meetingStoreProvider';
+import {meetingSubmitErrors} from '../meetingSubmitErrors';
+import {MEETING_TITLE_MAX_LENGTH, meetingTitleErrorKeys} from '../shared/validation/meetingTitleValidation';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';

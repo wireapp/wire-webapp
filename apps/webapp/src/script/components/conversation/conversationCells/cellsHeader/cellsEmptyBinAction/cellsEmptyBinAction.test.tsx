@@ -28,7 +28,7 @@ import {JobsTaskStatus, type RestNode} from 'cells-sdk-ts';
 import {
   CellsSelfUserDriveRoleProvider,
   CELLS_SELF_USER_DRIVE_ROLE,
-} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
+} from '../../common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import type {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {

@@ -19,7 +19,7 @@
 
 import {renderHook} from '@testing-library/react';
 
-import {useAppNotification} from 'Components/appNotification/index';
+import {useAppNotification} from '../../../appNotification';
 import {useKeyPressAndHold} from '../../../../hooks/useKeyPressAndHold/useKeyPressAndHold';
 import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
 
@@ -31,7 +31,7 @@ jest.mock('../../../../hooks/useKeyPressAndHold/useKeyPressAndHold', () => {
   };
 });
 
-jest.mock('Components/appNotification/index', () => {
+jest.mock('../../../appNotification', () => {
   return {
     useAppNotification: jest.fn(),
   };

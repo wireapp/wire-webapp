@@ -21,11 +21,6 @@ import {useEffect, useState, type FunctionComponent} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {CellsModal} from 'Components/conversation/conversationCells/common/cellsModal/cellsModal';
-import {CellsNewNodeForm} from 'Components/conversation/conversationCells/common/cellsNewNodeForm/cellsNewNodeForm';
-import {getCellsFilesPath} from 'Components/conversation/conversationCells/common/getCellsFilesPath/getCellsFilesPath';
-import {openBreadcrumb} from 'Components/conversation/conversationCells/common/openBreadcrumb/openBreadcrumb';
-import {useCellsNewFolderForm} from 'Components/conversation/conversationCells/common/useCellsNewNodeForm/useCellsNewFolderForm';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CellNode} from 'src/script/types/cellNode';
@@ -33,6 +28,12 @@ import {CellNode} from 'src/script/types/cellNode';
 import {LegacyCellsFoldersListModalContent} from './legacyCellsFoldersListModalContent';
 import {useLegacyGetCellsFolders} from './useLegacyGetCellsFolders';
 import {useLegacyMoveCellsNode} from './useLegacyMoveCellsNode';
+
+import {CellsModal} from '../../../../../common/cellsModal/cellsModal';
+import {CellsNewNodeForm} from '../../../../../common/cellsNewNodeForm/cellsNewNodeForm';
+import {getCellsFilesPath} from '../../../../../common/getCellsFilesPath/getCellsFilesPath';
+import {openBreadcrumb} from '../../../../../common/openBreadcrumb/openBreadcrumb';
+import {useCellsNewFolderForm} from '../../../../../common/useCellsNewNodeForm/useCellsNewFolderForm';
 
 interface LegacyCellsMoveNodeModalProps {
   isOpen: boolean;

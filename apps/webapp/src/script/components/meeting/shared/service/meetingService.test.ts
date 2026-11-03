@@ -23,8 +23,8 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {maybe, task} from 'true-myth';
 
 import type {CallingRepository} from 'Repositories/calling/CallingRepository';
-import type {MeetingServiceDeps} from 'Components/meeting/meetingStore/meetingStoreDeps';
-import {meetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
+import type {MeetingServiceDeps} from '../../meetingStore/meetingStoreDeps';
+import {meetingSubmitErrors} from '../../meetingSubmitErrors';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
@@ -33,7 +33,7 @@ import {translateForTest} from 'Util/test/translateForTest';
 import {unwrapErr} from 'Util/test/resultTestSupport';
 
 import {meetNowMeeting, scheduleMeeting, updateMeeting} from './meetingService';
-import type {ScheduleMeetingCommand, UpdateMeetingCommand} from 'Components/meeting/shared/types/meetingCommandTypes';
+import type {ScheduleMeetingCommand, UpdateMeetingCommand} from '../types/meetingCommandTypes';
 
 const fixedNow = new Date('2026-06-23T14:30:00.000Z');
 const futureStartDate = new Date('2026-06-23T16:00:00.000Z');

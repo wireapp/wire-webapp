@@ -20,10 +20,11 @@
 import {isUndefined} from '@sindresorhus/is';
 import {Maybe} from 'true-myth';
 
-import type {MeetingReminderFirePayload} from 'Components/meeting/createMeetingReminderScheduler';
-import {getFirstMeetingInstanceOnOrAfter} from 'Components/meeting/selectors/getMeetingInstancesInRange';
-import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
 import {matchQualifiedIds} from 'Util/qualifiedId';
+
+import type {MeetingReminderFirePayload} from './createMeetingReminderScheduler';
+import {getFirstMeetingInstanceOnOrAfter} from './selectors/getMeetingInstancesInRange';
+import type {MeetingSeries} from './types/meetingSeries';
 
 export const resolveCurrentMeetingReminderPayload = (
   meetingSeries: readonly MeetingSeries[],

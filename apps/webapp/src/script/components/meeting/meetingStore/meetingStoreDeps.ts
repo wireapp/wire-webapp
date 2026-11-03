@@ -20,22 +20,23 @@
 import type {Clock} from '@enormora/clock/clock';
 import type {Task} from 'true-myth';
 
-import type {DeviceTimeZone} from 'Components/meeting/deviceTimeZone';
-import type {MeetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
-import type {DeleteMeetingCommand} from 'Components/meeting/shared/service/deleteMeeting';
+import type {CallingRepository} from 'Repositories/calling/CallingRepository';
+import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
+
+import type {DeviceTimeZone} from '../deviceTimeZone';
+import type {MeetingSubmitErrors} from '../meetingSubmitErrors';
+import type {DeleteMeetingCommand} from '../shared/service/deleteMeeting';
 import type {
   CreateMeetingSuccess,
   MeetingSubmitSuccess,
   ScheduleMeetingSuccess,
-} from 'Components/meeting/shared/service/meetingService';
+} from '../shared/service/meetingService';
 import type {
   MeetNowMeetingCommand,
   ScheduleMeetingCommand,
   UpdateMeetingCommand,
-} from 'Components/meeting/shared/types/meetingCommandTypes';
-import type {CallingRepository} from 'Repositories/calling/CallingRepository';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
+} from '../shared/types/meetingCommandTypes';
 
 export type MeetingStoreServiceTasks = {
   scheduleMeeting: (command: ScheduleMeetingCommand) => Task<ScheduleMeetingSuccess, MeetingSubmitErrors>;

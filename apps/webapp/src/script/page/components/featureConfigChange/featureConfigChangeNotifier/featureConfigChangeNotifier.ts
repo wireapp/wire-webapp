@@ -30,13 +30,6 @@ import {amplify} from 'amplify';
 
 import {Runtime} from '@wireapp/commons';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {ButtonAction} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
-import type {
-  PrimaryModalTranslatedComponent,
-  PrimaryModalTranslatedTranslation,
-  PrimaryModalTranslatedValue,
-} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 import {TeamState} from 'Repositories/team/TeamState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
@@ -46,6 +39,13 @@ import {formatDuration} from 'Util/timeUtil';
 
 import {loadFeatureConfig, saveFeatureConfig} from './featureConfigChangeNotifier.store';
 
+import {PrimaryModal} from '../../../../components/Modals/PrimaryModal';
+import type {
+  PrimaryModalTranslatedComponent,
+  PrimaryModalTranslatedTranslation,
+  PrimaryModalTranslatedValue,
+} from '../../../../components/Modals/PrimaryModal/PrimaryModalTypes';
+import {ButtonAction} from '../../../../components/Modals/PrimaryModal/PrimaryModalTypes';
 import {Config} from '../../../../Config';
 import {WebAppEvents} from '../../../../webAppEvents';
 

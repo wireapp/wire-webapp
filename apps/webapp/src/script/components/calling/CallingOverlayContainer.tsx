@@ -23,7 +23,6 @@ import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
-import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {Call} from 'Repositories/calling/Call';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {CallingViewMode, CallState, DesktopScreenShareMenu, MuteState} from 'Repositories/calling/CallState';
@@ -37,6 +36,7 @@ import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {ChooseScreen} from './ChooseScreen';
 import {FullscreenVideoCall} from './FullscreenVideoCall';
+import {useCallAlertState} from './useCallAlertState';
 
 import {CallViewTab} from '../../view_model/CallingViewModel';
 

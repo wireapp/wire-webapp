@@ -24,28 +24,29 @@ import {isNonEmptyArray, isNumber, isUndefined} from '@sindresorhus/is';
 import {useVirtualizer} from '@tanstack/react-virtual';
 import cx from 'classnames';
 
-import {MarkerComponent} from 'Components/messagesList/message/marker';
-import {Message} from 'Components/messagesList/message/virtualizedMessage';
-import {MessagesListParams} from 'Components/messagesList/messageList.types';
-import {UploadAssets} from 'Components/messagesList/uploadAssets';
-import {verticallyCenterMessage} from 'Components/messagesList/utils/helpers';
-import {filterMessages} from 'Components/messagesList/utils/messagesFilter';
-import {useConversationReadBoundary} from 'Components/messagesList/utils/useConversationReadBoundary';
-import {useLoadConversation} from 'Components/messagesList/utils/useLoadConversation';
-import {useScrollToLastUnreadMessage} from 'Components/messagesList/utils/useScrollToLastUnreadMessage';
-import {
-  getVirtualizedMessagesGroupItemKey,
-  groupMessagesBySenderAndTime,
-  isMarker,
-} from 'Components/messagesList/utils/virtualizedMessagesGroup';
-import {useLoadMessages} from 'Components/messagesList/virtualizedMessagesList/useLoadMessages';
-import {useScrollMessages} from 'Components/messagesList/virtualizedMessagesList/useScrollMessages';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
+import {useLoadMessages} from './useLoadMessages';
+import {useScrollMessages} from './useScrollMessages';
+
 import {useRoveFocus} from '../../../hooks/useRoveFocus';
+import {MarkerComponent} from '../message/marker';
+import {Message} from '../message/virtualizedMessage';
+import {MessagesListParams} from '../messageList.types';
+import {UploadAssets} from '../uploadAssets';
+import {verticallyCenterMessage} from '../utils/helpers';
+import {filterMessages} from '../utils/messagesFilter';
+import {useConversationReadBoundary} from '../utils/useConversationReadBoundary';
+import {useLoadConversation} from '../utils/useLoadConversation';
+import {useScrollToLastUnreadMessage} from '../utils/useScrollToLastUnreadMessage';
+import {
+  getVirtualizedMessagesGroupItemKey,
+  groupMessagesBySenderAndTime,
+  isMarker,
+} from '../utils/virtualizedMessagesGroup';
 import {VirtualizedJumpToLastMessageButton} from '../virtualizedJumpToLastMessageButton';
 
 const messageHighlightDurationInMilliseconds = 5000;

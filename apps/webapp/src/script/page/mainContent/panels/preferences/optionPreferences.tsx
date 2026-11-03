@@ -23,8 +23,6 @@ import {amplify} from 'amplify';
 
 import {TabIndex, Checkbox, CheckboxLabel, IndicatorRangeInput} from '@wireapp/react-ui-kit';
 
-import {Theme} from 'Components/appContainer/hooks/useTheme';
-import {RadioGroup} from 'Components/Radio';
 import {User} from 'Repositories/entity/User';
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
@@ -37,6 +35,8 @@ import type {Translate} from 'Util/localizerUtil/translationTypes';
 import {PreferencesPage} from './components/preferencesPage';
 import {PreferencesSection} from './components/preferencesSection';
 
+import {Theme} from '../../../../components/appContainer/hooks/useTheme';
+import {RadioGroup} from '../../../../components/Radio';
 import {RootFontSize, useRootFontSize} from '../../../../hooks/useRootFontSize';
 import {WebAppEvents} from '../../../../webAppEvents';
 

@@ -24,8 +24,6 @@ import {container} from 'tsyringe';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {hasActiveGlobalDriveFilters} from 'Components/conversation/conversationCells/common/driveFilters/driveFilters';
-import {useCellsSorting} from 'Components/conversation/conversationCells/common/useCellsSorting/useCellsSorting';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {UserRepository} from 'Repositories/user/userRepository';
@@ -43,6 +41,8 @@ import {useOnPresignedUrlExpired} from './useOnPresignedUrlExpired/useOnPresigne
 import {useSearchCellsNodes} from './useSearchCellsNodes/useSearchCellsNodes';
 
 import {useApplicationContext} from '../../page/rootProvider';
+import {hasActiveGlobalDriveFilters} from '../conversation/conversationCells/common/driveFilters/driveFilters';
+import {useCellsSorting} from '../conversation/conversationCells/common/useCellsSorting/useCellsSorting';
 
 interface CellsGlobalViewProps {
   cellsRepository?: CellsRepository;

@@ -22,12 +22,6 @@ import type {FunctionComponent} from 'react';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {
-  cellControlsList,
-  cellControlsWrapper,
-} from 'Components/calling/CallingCell/CallingControls/CallingControls.styles';
-import {useCallAlertState} from 'Components/calling/useCallAlertState';
-import * as Icon from 'Components/icon';
 import {Call} from 'Repositories/calling/Call';
 import {DesktopScreenShareMenu} from 'Repositories/calling/CallState';
 import {Participant} from 'Repositories/calling/Participant';
@@ -35,7 +29,11 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
+import {cellControlsList, cellControlsWrapper} from './CallingControls.styles';
+
 import {CallActions} from '../../../../view_model/CallingViewModel';
+import * as Icon from '../../../icon';
+import {useCallAlertState} from '../../useCallAlertState';
 
 interface CallingControlsProps {
   answerCall: () => void;

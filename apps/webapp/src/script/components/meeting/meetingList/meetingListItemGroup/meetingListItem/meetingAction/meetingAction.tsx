@@ -21,20 +21,18 @@ import {MouseEvent, type FunctionComponent} from 'react';
 
 import {IconButton, MoreIcon} from '@wireapp/react-ui-kit';
 
-import {getMeetingActionEntries} from 'Components/meeting/meetingList/meetingListItemGroup/meetingListItem/meetingAction/getMeetingActionEntries';
-import {
-  iconContainerStyle,
-  iconStyles,
-} from 'Components/meeting/meetingList/meetingListItemGroup/meetingListItem/meetingAction/meetingAction.styles';
-import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
-import {useDeleteMeeting} from 'Components/meeting/useDeleteMeeting';
-import {useEditMeeting} from 'Components/meeting/useEditMeeting';
-import {canDeleteMeetingForAll, canDeleteMeetingForMe} from 'Components/meeting/utils/canDeleteMeeting';
-import {canEditMeeting} from 'Components/meeting/utils/canEditMeeting';
 import type {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
+import {getMeetingActionEntries} from './getMeetingActionEntries';
+import {iconContainerStyle, iconStyles} from './meetingAction.styles';
+
 import {showContextMenu} from '../../../../../../ui/contextMenu';
+import type {MeetingInstance} from '../../../../types/meetingInstance';
+import {useDeleteMeeting} from '../../../../useDeleteMeeting';
+import {useEditMeeting} from '../../../../useEditMeeting';
+import {canDeleteMeetingForAll, canDeleteMeetingForMe} from '../../../../utils/canDeleteMeeting';
+import {canEditMeeting} from '../../../../utils/canEditMeeting';
 
 interface MeetingActionProps {
   meetingInstance: MeetingInstance;

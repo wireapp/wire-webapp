@@ -21,9 +21,10 @@ import {useCallback, useState} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
-import {useAppNotification} from 'Components/appNotification/index';
-import {FileWithPreview} from 'Components/conversation/useFilesUploadState/useFilesUploadState';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
+
+import {useAppNotification} from '../../../../appNotification';
+import {FileWithPreview} from '../../../../conversation/useFilesUploadState/useFilesUploadState';
 
 type SendFilesStatus = 'idle' | 'loading' | 'success' | 'error';
 
