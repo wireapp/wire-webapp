@@ -43,6 +43,8 @@ export type SharedDriveMoveStatusKind =
 export interface SharedDriveMoveStatus extends SharedDriveMoveSummary {
   readonly id: string;
   readonly kind: SharedDriveMoveStatusKind;
+  /** Retries the check for an outcome that needs review; the popup offers it as a button when set. */
+  readonly onReview?: () => void;
 }
 
 type SharedDriveUploadStatusContextValue = {

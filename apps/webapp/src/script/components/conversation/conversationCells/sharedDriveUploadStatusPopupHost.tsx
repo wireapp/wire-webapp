@@ -295,6 +295,8 @@ export const SharedDriveUploadStatusPopupHost: FunctionComponent<SharedDriveUplo
         isExpanded={isMoveExpanded}
         toggleLabel={translate(isMoveExpanded ? 'cells.uploadStatus.collapse' : 'cells.uploadStatus.expand')}
         dismissLabel={translate('fileCardDefaultCloseButtonLabel')}
+        reviewLabel={translate('cells.bulkAction.refresh')}
+        onReview={move.onReview}
         onToggle={() => {
           return setIsMoveExpanded(expanded => {
             return !expanded;
