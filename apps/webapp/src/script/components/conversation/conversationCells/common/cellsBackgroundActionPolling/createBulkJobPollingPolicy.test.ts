@@ -37,11 +37,14 @@ describe('createBulkJobPollingPolicy', () => {
     {random: 0.5, retryIndex: 0, expectedDelayMs: 1000},
     {random: 1, retryIndex: 0, expectedDelayMs: 1250},
     {random: 0.5, retryIndex: 3, expectedDelayMs: 8000},
-  ])('backs off exponentially with jitter (random $random, retry $retryIndex)', ({random, retryIndex, expectedDelayMs}) => {
-    const policy = createBulkJobPollingPolicy(() => {
-      return random;
-    });
+  ])(
+    'backs off exponentially with jitter (random $random, retry $retryIndex)',
+    ({random, retryIndex, expectedDelayMs}) => {
+      const policy = createBulkJobPollingPolicy(() => {
+        return random;
+      });
 
-    expect(policy.getUnknownRetryDelay(retryIndex)).toBe(expectedDelayMs);
-  });
+      expect(policy.getUnknownRetryDelay(retryIndex)).toBe(expectedDelayMs);
+    },
+  );
 });
