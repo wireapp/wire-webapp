@@ -34,7 +34,6 @@ import {Config} from 'src/script/Config';
 import {canUseMeetings} from 'Util/canUseMeetings';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {AppLock} from './appLock';
 import {useE2EIFeatureConfigUpdate} from './components/featureConfigChange/featureConfigChangeHandler/features/useE2eIFeatureConfigUpdate';
@@ -340,13 +339,7 @@ export const AppMain: FunctionComponent<AppMainProps> = (properties: AppMainProp
       refreshAllKnownUsers: repositories.user.refreshAllKnownUsers,
       dependencies: {
         isMLSSupportedByEnvironment,
-        registerDailyTask: task => {
-          return core.recurringTaskScheduler.registerTask({
-            every: TIME_IN_MILLIS.DAY,
-            task,
-            key: 'mls-migration',
-          });
-        },
+        registerTask: core.recurringTaskScheduler.registerTask,
         initialiseMigrationOfProteusConversations: (conversations, selfUserId) => {
           return initialiseMigrationOfProteusConversations(conversations, selfUserId, repositories.conversation);
         },

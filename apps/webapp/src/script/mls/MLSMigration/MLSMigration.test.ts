@@ -22,6 +22,7 @@ import {asyncNoop} from 'noop-esm';
 
 import {generateConversation} from 'test/helper/ConversationGenerator';
 import {translateForTest} from 'Util/test/translateForTest';
+import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {Conversation} from '../../repositories/entity/Conversation';
 import {User} from '../../repositories/entity/User';
@@ -44,20 +45,71 @@ function createSelfUser(teamId?: string): User {
   return selfUser;
 }
 
+type MigrationGateCase = {
+  readonly description: string;
+  readonly selfUser: User;
+  readonly environmentSupportsMLS: boolean;
+  readonly migrationStatus: MLSMigrationStatus;
+};
+
 function createMigrationFlowDependencies(): MLSMigrationFlowDependencies {
   return {
     isMLSSupportedByEnvironment: jest.fn(async (): Promise<boolean> => {
       return true;
     }),
-    registerDailyTask: jest.fn(asyncNoop),
+    registerTask: jest.fn(asyncNoop),
     initialiseMigrationOfProteusConversations: jest.fn(asyncNoop),
     joinUnestablishedMixedConversations: jest.fn(asyncNoop),
     finaliseMigrationOfMixedConversations: jest.fn(asyncNoop),
   };
 }
 
+function expectMigrationOperationsNotCalled(dependencies: MLSMigrationFlowDependencies): void {
+  expect(dependencies.initialiseMigrationOfProteusConversations).not.toHaveBeenCalled();
+  expect(dependencies.joinUnestablishedMixedConversations).not.toHaveBeenCalled();
+  expect(dependencies.finaliseMigrationOfMixedConversations).not.toHaveBeenCalled();
+}
+
+function expectDailyMigrationCheckRegistered(dependencies: MLSMigrationFlowDependencies): void {
+  expect(dependencies.registerTask).toHaveBeenCalledWith({
+    every: TIME_IN_MILLIS.DAY,
+    task: expect.any(Function),
+    key: 'mls-migration',
+  });
+}
+
 describe('initialiseMLSMigrationFlow', () => {
   const selfTeamId = 'self-team';
+
+  const selfUserWithoutMLS = createSelfUser(selfTeamId);
+  selfUserWithoutMLS.supportedProtocols([]);
+
+  const migrationGateCases: MigrationGateCase[] = [
+    {
+      description: 'environment does not support MLS',
+      selfUser: createSelfUser(selfTeamId),
+      environmentSupportsMLS: false,
+      migrationStatus: MLSMigrationStatus.ONGOING,
+    },
+    {
+      description: 'current user does not support MLS',
+      selfUser: selfUserWithoutMLS,
+      environmentSupportsMLS: true,
+      migrationStatus: MLSMigrationStatus.ONGOING,
+    },
+    {
+      description: 'migration status is disabled',
+      selfUser: createSelfUser(selfTeamId),
+      environmentSupportsMLS: true,
+      migrationStatus: MLSMigrationStatus.DISABLED,
+    },
+    {
+      description: 'migration has not started',
+      selfUser: createSelfUser(selfTeamId),
+      environmentSupportsMLS: true,
+      migrationStatus: MLSMigrationStatus.NOT_STARTED,
+    },
+  ];
 
   it('initialises and finalises self-team conversations while joining mixed conversations from every team', async () => {
     const selfUser = createSelfUser(selfTeamId);
@@ -131,4 +183,38 @@ describe('initialiseMLSMigrationFlow', () => {
       selfUser.qualifiedId,
     );
   });
+
+  it.each(migrationGateCases)(
+    'skips migration operations and registers the daily check when $description',
+    async gate => {
+      const {selfUser, environmentSupportsMLS, migrationStatus} = gate;
+      const conversationRepository = {
+        getAllTeamGroupConversations: jest.fn(() => {
+          return [];
+        }),
+        getAllGroupConversations: jest.fn(() => {
+          return [];
+        }),
+      };
+      const dependencies: MLSMigrationFlowDependencies = {
+        ...createMigrationFlowDependencies(),
+        isMLSSupportedByEnvironment: jest.fn(async (): Promise<boolean> => {
+          return environmentSupportsMLS;
+        }),
+      };
+
+      await initialiseMLSMigrationFlow({
+        selfUser,
+        conversationRepository,
+        getTeamMLSMigrationStatus: () => {
+          return migrationStatus;
+        },
+        refreshAllKnownUsers: jest.fn(asyncNoop),
+        dependencies,
+      });
+
+      expectMigrationOperationsNotCalled(dependencies);
+      expectDailyMigrationCheckRegistered(dependencies);
+    },
+  );
 });

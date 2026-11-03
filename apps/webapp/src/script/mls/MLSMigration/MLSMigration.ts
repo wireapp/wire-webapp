@@ -21,12 +21,20 @@ import {isNonEmptyString} from '@sindresorhus/is';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
+import type {Account} from '@wireapp/core';
+
+import {TIME_IN_MILLIS} from 'Util/timeUtil';
+
 import {MLSMigrationStatus} from './migrationStatus';
 import {mlsMigrationLogger} from './MLSMigrationLogger';
 
 import type {ConversationRepository} from '../../repositories/conversation/ConversationRepository';
 import type {Conversation} from '../../repositories/entity/Conversation';
 import type {User} from '../../repositories/entity/User';
+
+const MIGRATION_TASK_KEY = 'mls-migration';
+
+type RegisterRecurringTask = Account['recurringTaskScheduler']['registerTask'];
 
 type ConversationSelectionRepository = Pick<
   ConversationRepository,
@@ -35,7 +43,7 @@ type ConversationSelectionRepository = Pick<
 
 export type MLSMigrationFlowDependencies = {
   readonly isMLSSupportedByEnvironment: () => Promise<boolean>;
-  readonly registerDailyTask: (task: () => Promise<void>) => Promise<void>;
+  readonly registerTask: RegisterRecurringTask;
   readonly initialiseMigrationOfProteusConversations: (
     conversations: Conversation[],
     selfUserId: QualifiedId,
@@ -107,7 +115,11 @@ export async function initialiseMLSMigrationFlow(options: InitialiseMLSMigration
 
   await checkMigrationConfig();
 
-  await dependencies.registerDailyTask(checkMigrationConfig);
+  await dependencies.registerTask({
+    every: TIME_IN_MILLIS.DAY,
+    task: checkMigrationConfig,
+    key: MIGRATION_TASK_KEY,
+  });
 }
 
 async function migrateConversationsToMLS(options: MigrateConversationsToMLSOptions): Promise<void> {
