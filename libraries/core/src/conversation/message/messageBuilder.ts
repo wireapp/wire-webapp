@@ -41,6 +41,7 @@ import {
   Reaction,
   InCallEmoji,
   LastRead,
+  MarkUnread,
   Cleared,
   ICalling,
   InCallHandRaise,
@@ -212,16 +213,37 @@ export function buildFileAbortMessage(
   return genericMessage;
 }
 
-export function buildLastReadMessage(conversationId: QualifiedId, lastReadTimestamp: number): GenericMessage {
+export function buildLastReadMessage(
+  conversationId: QualifiedId,
+  lastReadTimestamp: number,
+  operationTimestamp?: number,
+): GenericMessage {
   const lastRead = new LastRead({
     conversationId: conversationId.id,
     lastReadTimestamp,
     qualifiedConversationId: conversationId,
+    operationTimestamp,
   });
 
   return GenericMessage.create({
     [GenericMessageType.LAST_READ]: lastRead,
     messageId: createId(),
+  });
+}
+
+export function buildMarkUnreadMessage(
+  conversationId: QualifiedId,
+  unreadFromTimestamp: number,
+  operationTimestamp: number,
+): GenericMessage {
+  return GenericMessage.create({
+    [GenericMessageType.MARK_UNREAD]: MarkUnread.create({
+      qualifiedConversationId: conversationId,
+      unreadFromTimestamp,
+      operationTimestamp,
+    }),
+    messageId: createId(),
+    unknownStrategy: GenericMessage.UnknownStrategy.IGNORE,
   });
 }
 

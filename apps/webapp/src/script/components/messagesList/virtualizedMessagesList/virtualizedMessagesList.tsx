@@ -284,12 +284,17 @@ export const VirtualizedMessagesList: FunctionComponent<Props> = ({
 
   const onJumpToLastMessageClick = async (): Promise<void> => {
     // jumping to the latest message is an explicit "read" action, resume auto-read
-    conversation.clearManualUnreadMarker();
+    const hadManualUnreadMarker = conversation.manualUnreadTimestamp() !== undefined;
+    if (hadManualUnreadMarker) {
+      updateConversationLastRead(conversation);
+    }
     setHighlightedMessage(undefined);
     conversation.initialMessage(undefined);
 
     if (!conversation.hasLastReceivedMessageLoaded()) {
-      updateConversationLastRead(conversation);
+      if (!hadManualUnreadMarker) {
+        updateConversationLastRead(conversation);
+      }
       conversation.release();
 
       await loadConversation(conversation);

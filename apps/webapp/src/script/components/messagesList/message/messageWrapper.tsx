@@ -54,6 +54,7 @@ import {PingMessage} from './pingMessage';
 import {SystemMessage} from './systemMessage';
 import {VerificationMessage} from './verificationMessage';
 
+import {StatusType} from '../../../message/statusType';
 import {ContextMenuEntry} from '../../../ui/contextMenu';
 import {WebAppEvents} from '../../../webAppEvents';
 
@@ -188,12 +189,18 @@ export const MessageWrapper: FunctionComponent<MessageParams> = ({
       });
     }
 
-    if (isFeatureToggleEnabled(markAsUnreadFeatureToggleName) && !conversation.isSelfUserRemoved()) {
+    if (
+      isFeatureToggleEnabled(markAsUnreadFeatureToggleName) &&
+      !conversation.isSelfUserRemoved() &&
+      ![StatusType.SENDING, StatusType.FAILED, StatusType.FEDERATION_ERROR].includes(message.status())
+    ) {
       entries.push({
         click: () => {
           cancelPendingReadReceiptsForConversation(conversation);
 
-          return conversation.markUnreadFrom(message);
+          return fireAndForgetInvoker.fireAndForget(async () => {
+            await messageRepository.markAsUnread(conversation, message);
+          });
         },
         label: translate('conversationContextMenuMarkUnread'),
       });

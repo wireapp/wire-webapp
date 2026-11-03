@@ -17,7 +17,7 @@
  *
  */
 
-import {fireEvent, render} from '@testing-library/react';
+import {fireEvent, render, waitFor} from '@testing-library/react';
 import type {ComponentProps} from 'react';
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
@@ -35,6 +35,7 @@ import {translateForTest} from 'Util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
+  createExecutingFireAndForgetInvokerForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {generateUser} from 'test/helper/UserGenerator';
 import {createUuid} from 'Util/uuid';
@@ -102,6 +103,9 @@ const createBaseProps = (
       getMessageInConversationByReplacementId: jest.fn(),
       ensureMessageSender: jest.fn(),
       sendButtonAction: jest.fn(),
+      markAsUnread: jest.fn(async (conversation: Conversation, message: ContentMessageEntity) => {
+        conversation.markUnreadFrom(message);
+      }),
       sendTextWithLinkPreview: jest.fn(),
       retryUploadFile: jest.fn(),
       toggleReaction: jest.fn(),
@@ -309,6 +313,7 @@ describe('MessageWrapper', () => {
               createRootContextValueForTest({
                 translate: translateForTest,
                 isFeatureToggleEnabled: isFeatureToggleEnabledForTest,
+                fireAndForgetInvoker: createExecutingFireAndForgetInvokerForTest(),
               }),
             )
           : rootProviderWrapper;
@@ -330,7 +335,7 @@ describe('MessageWrapper', () => {
       jest.restoreAllMocks();
     });
 
-    it('marks the conversation as unread from the message when the entry is clicked', () => {
+    it('marks the conversation as unread from the message when the entry is clicked', async () => {
       const {
         getByText,
         actionOrder,
@@ -346,7 +351,9 @@ describe('MessageWrapper', () => {
       fireEvent.click(getByText('conversationContextMenuMarkUnread'));
 
       expect(cancelPendingReadReceiptsForConversation).toHaveBeenCalledWith(conversation);
-      expect(markUnreadFrom).toHaveBeenCalledWith(message);
+      await waitFor(() => {
+        expect(markUnreadFrom).toHaveBeenCalledWith(message);
+      });
       expect(actionOrder).toEqual(['cancel pending receipts', 'mark unread']);
     });
 

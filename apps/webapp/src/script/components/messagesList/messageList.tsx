@@ -273,7 +273,10 @@ export const MessagesList: FC<MessagesListParams> = ({
   const jumpToLastMessage = (): void => {
     if (conversation !== undefined) {
       // jumping to the latest message is an explicit "read" action, resume auto-read
-      conversation.clearManualUnreadMarker();
+      const hadManualUnreadMarker = conversation.manualUnreadTimestamp() !== undefined;
+      if (hadManualUnreadMarker) {
+        updateConversationLastRead(conversation);
+      }
       const newestMessage = conversation.getNewestMessage();
       if (!isUndefined(newestMessage)) {
         setConversationLastReadTimestamp(newestMessage.timestamp());
@@ -284,7 +287,9 @@ export const MessagesList: FC<MessagesListParams> = ({
       focusedElement.current = null;
       // if there are unloaded messages, the conversation should be marked as read and reloaded
       if (!conversation.hasLastReceivedMessageLoaded()) {
-        updateConversationLastRead(conversation);
+        if (!hadManualUnreadMarker) {
+          updateConversationLastRead(conversation);
+        }
         conversation.release();
         loadConversation(conversation);
       } else {

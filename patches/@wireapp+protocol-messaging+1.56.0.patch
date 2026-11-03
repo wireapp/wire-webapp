@@ -1,0 +1,581 @@
+diff --git a/node_modules/@wireapp/protocol-messaging/proto/messages.proto b/node_modules/@wireapp/protocol-messaging/proto/messages.proto
+--- a/node_modules/@wireapp/protocol-messaging/proto/messages.proto
++++ b/node_modules/@wireapp/protocol-messaging/proto/messages.proto
+@@ -51,6 +51,7 @@
+     // UnknownStrategy unknownStrategy = 25; -- Defined outside the oneof
+     // Next field should be 26 ↓
+     InCallHandRaise inCallHandRaise = 26;
++    MarkUnread markUnread = 33;
+   }
+   optional UnknownStrategy unknownStrategy = 25 [default = IGNORE];
+ 
+@@ -189,6 +190,15 @@
+   required int64 last_read_timestamp = 2;
+   // only optional to maintain backwards compatibility
+   optional QualifiedConversationId qualified_conversation_id = 3;
++  // Time of the user's read action, before any queued delivery delay.
++  optional int64 operation_timestamp = 4;
++}
++
++// Private synchronization between the user's own devices. Does not rewind LastRead.
++message MarkUnread {
++  required QualifiedConversationId qualified_conversation_id = 1;
++  required int64 unread_from_timestamp = 2; // inclusive, epoch milliseconds
++  required int64 operation_timestamp = 3; // time of the user's action, epoch milliseconds
+ }
+ 
+ message Cleared {
+diff --git a/node_modules/@wireapp/protocol-messaging/web/messages.js b/node_modules/@wireapp/protocol-messaging/web/messages.js
+--- a/node_modules/@wireapp/protocol-messaging/web/messages.js
++++ b/node_modules/@wireapp/protocol-messaging/web/messages.js
+@@ -40,6 +40,7 @@
+      * @property {IDataTransfer|null} [dataTransfer] GenericMessage dataTransfer
+      * @property {IInCallEmoji|null} [inCallEmoji] GenericMessage inCallEmoji
+      * @property {IInCallHandRaise|null} [inCallHandRaise] GenericMessage inCallHandRaise
++     * @property {IMarkUnread|null} [markUnread] GenericMessage markUnread
+      * @property {GenericMessage.UnknownStrategy|null} [unknownStrategy] GenericMessage unknownStrategy
+      */
+ 
+@@ -259,6 +260,14 @@
+     GenericMessage.prototype.inCallHandRaise = null;
+ 
+     /**
++     * GenericMessage markUnread.
++     * @member {IMarkUnread|null|undefined} markUnread
++     * @memberof GenericMessage
++     * @instance
++     */
++    GenericMessage.prototype.markUnread = null;
++
++    /**
+      * GenericMessage unknownStrategy.
+      * @member {GenericMessage.UnknownStrategy} unknownStrategy
+      * @memberof GenericMessage
+@@ -271,12 +280,12 @@
+ 
+     /**
+      * GenericMessage content.
+-     * @member {"text"|"image"|"knock"|"lastRead"|"cleared"|"external"|"clientAction"|"calling"|"asset"|"multipart"|"hidden"|"location"|"deleted"|"edited"|"confirmation"|"reaction"|"ephemeral"|"availability"|"composite"|"buttonAction"|"buttonActionConfirmation"|"dataTransfer"|"inCallEmoji"|"inCallHandRaise"|undefined} content
++     * @member {"text"|"image"|"knock"|"lastRead"|"cleared"|"external"|"clientAction"|"calling"|"asset"|"multipart"|"hidden"|"location"|"deleted"|"edited"|"confirmation"|"reaction"|"ephemeral"|"availability"|"composite"|"buttonAction"|"buttonActionConfirmation"|"dataTransfer"|"inCallEmoji"|"inCallHandRaise"|"markUnread"|undefined} content
+      * @memberof GenericMessage
+      * @instance
+      */
+     Object.defineProperty(GenericMessage.prototype, "content", {
+-        get: $util.oneOfGetter($oneOfFields = ["text", "image", "knock", "lastRead", "cleared", "external", "clientAction", "calling", "asset", "multipart", "hidden", "location", "deleted", "edited", "confirmation", "reaction", "ephemeral", "availability", "composite", "buttonAction", "buttonActionConfirmation", "dataTransfer", "inCallEmoji", "inCallHandRaise"]),
++        get: $util.oneOfGetter($oneOfFields = ["text", "image", "knock", "lastRead", "cleared", "external", "clientAction", "calling", "asset", "multipart", "hidden", "location", "deleted", "edited", "confirmation", "reaction", "ephemeral", "availability", "composite", "buttonAction", "buttonActionConfirmation", "dataTransfer", "inCallEmoji", "inCallHandRaise", "markUnread"]),
+         set: $util.oneOfSetter($oneOfFields)
+     });
+ 
+@@ -355,6 +364,8 @@
+             $root.InCallHandRaise.encode(message.inCallHandRaise, writer.uint32(/* id 26, wireType 2 =*/210).fork()).ldelim();
+         if (message.multipart != null && Object.hasOwnProperty.call(message, "multipart"))
+             $root.Multipart.encode(message.multipart, writer.uint32(/* id 27, wireType 2 =*/218).fork()).ldelim();
++        if (message.markUnread != null && Object.hasOwnProperty.call(message, "markUnread"))
++            $root.MarkUnread.encode(message.markUnread, writer.uint32(/* id 33, wireType 2 =*/266).fork()).ldelim();
+         return writer;
+     };
+ 
+@@ -487,6 +498,10 @@
+                 }
+             case 26: {
+                     message.inCallHandRaise = $root.InCallHandRaise.decode(reader, reader.uint32());
++                    break;
++                }
++            case 33: {
++                    message.markUnread = $root.MarkUnread.decode(reader, reader.uint32());
+                     break;
+                 }
+             case 25: {
+@@ -772,6 +787,16 @@
+                     return "inCallHandRaise." + error;
+             }
+         }
++        if (message.markUnread != null && message.hasOwnProperty("markUnread")) {
++            if (properties.content === 1)
++                return "content: multiple values";
++            properties.content = 1;
++            {
++                var error = $root.MarkUnread.verify(message.markUnread);
++                if (error)
++                    return "markUnread." + error;
++            }
++        }
+         if (message.unknownStrategy != null && message.hasOwnProperty("unknownStrategy"))
+             switch (message.unknownStrategy) {
+             default:
+@@ -924,6 +949,11 @@
+             if (typeof object.inCallHandRaise !== "object")
+                 throw TypeError(".GenericMessage.inCallHandRaise: object expected");
+             message.inCallHandRaise = $root.InCallHandRaise.fromObject(object.inCallHandRaise);
++        }
++        if (object.markUnread != null) {
++            if (typeof object.markUnread !== "object")
++                throw TypeError(".GenericMessage.markUnread: object expected");
++            message.markUnread = $root.MarkUnread.fromObject(object.markUnread);
+         }
+         switch (object.unknownStrategy) {
+         default:
+@@ -1088,6 +1118,11 @@
+             object.multipart = $root.Multipart.toObject(message.multipart, options);
+             if (options.oneofs)
+                 object.content = "multipart";
++        }
++        if (message.markUnread != null && message.hasOwnProperty("markUnread")) {
++            object.markUnread = $root.MarkUnread.toObject(message.markUnread, options);
++            if (options.oneofs)
++                object.content = "markUnread";
+         }
+         return object;
+     };
+@@ -5378,6 +5413,7 @@
+      * @property {string} conversationId LastRead conversationId
+      * @property {number|Long} lastReadTimestamp LastRead lastReadTimestamp
+      * @property {IQualifiedConversationId|null} [qualifiedConversationId] LastRead qualifiedConversationId
++     * @property {number|Long|null} [operationTimestamp] LastRead operationTimestamp
+      */
+ 
+     /**
+@@ -5418,6 +5454,14 @@
+      * @instance
+      */
+     LastRead.prototype.qualifiedConversationId = null;
++
++    /**
++     * LastRead operationTimestamp.
++     * @member {number|Long} operationTimestamp
++     * @memberof LastRead
++     * @instance
++     */
++    LastRead.prototype.operationTimestamp = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
+ 
+     /**
+      * Creates a new LastRead instance using the specified properties.
+@@ -5447,6 +5491,8 @@
+         writer.uint32(/* id 2, wireType 0 =*/16).int64(message.lastReadTimestamp);
+         if (message.qualifiedConversationId != null && Object.hasOwnProperty.call(message, "qualifiedConversationId"))
+             $root.QualifiedConversationId.encode(message.qualifiedConversationId, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
++        if (message.operationTimestamp != null && Object.hasOwnProperty.call(message, "operationTimestamp"))
++            writer.uint32(/* id 4, wireType 0 =*/32).int64(message.operationTimestamp);
+         return writer;
+     };
+ 
+@@ -5491,6 +5537,10 @@
+                 }
+             case 3: {
+                     message.qualifiedConversationId = $root.QualifiedConversationId.decode(reader, reader.uint32());
++                    break;
++                }
++            case 4: {
++                    message.operationTimestamp = reader.int64();
+                     break;
+                 }
+             default:
+@@ -5541,6 +5591,9 @@
+             if (error)
+                 return "qualifiedConversationId." + error;
+         }
++        if (message.operationTimestamp != null && message.hasOwnProperty("operationTimestamp"))
++            if (!$util.isInteger(message.operationTimestamp) && !(message.operationTimestamp && $util.isInteger(message.operationTimestamp.low) && $util.isInteger(message.operationTimestamp.high)))
++                return "operationTimestamp: integer|Long expected";
+         return null;
+     };
+ 
+@@ -5572,6 +5625,15 @@
+                 throw TypeError(".LastRead.qualifiedConversationId: object expected");
+             message.qualifiedConversationId = $root.QualifiedConversationId.fromObject(object.qualifiedConversationId);
+         }
++        if (object.operationTimestamp != null)
++            if ($util.Long)
++                (message.operationTimestamp = $util.Long.fromValue(object.operationTimestamp)).unsigned = false;
++            else if (typeof object.operationTimestamp === "string")
++                message.operationTimestamp = parseInt(object.operationTimestamp, 10);
++            else if (typeof object.operationTimestamp === "number")
++                message.operationTimestamp = object.operationTimestamp;
++            else if (typeof object.operationTimestamp === "object")
++                message.operationTimestamp = new $util.LongBits(object.operationTimestamp.low >>> 0, object.operationTimestamp.high >>> 0).toNumber();
+         return message;
+     };
+ 
+@@ -5596,6 +5658,11 @@
+             } else
+                 object.lastReadTimestamp = options.longs === String ? "0" : 0;
+             object.qualifiedConversationId = null;
++            if ($util.Long) {
++                var long = new $util.Long(0, 0, false);
++                object.operationTimestamp = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
++            } else
++                object.operationTimestamp = options.longs === String ? "0" : 0;
+         }
+         if (message.conversationId != null && message.hasOwnProperty("conversationId"))
+             object.conversationId = message.conversationId;
+@@ -5606,6 +5673,11 @@
+                 object.lastReadTimestamp = options.longs === String ? $util.Long.prototype.toString.call(message.lastReadTimestamp) : options.longs === Number ? new $util.LongBits(message.lastReadTimestamp.low >>> 0, message.lastReadTimestamp.high >>> 0).toNumber() : message.lastReadTimestamp;
+         if (message.qualifiedConversationId != null && message.hasOwnProperty("qualifiedConversationId"))
+             object.qualifiedConversationId = $root.QualifiedConversationId.toObject(message.qualifiedConversationId, options);
++        if (message.operationTimestamp != null && message.hasOwnProperty("operationTimestamp"))
++            if (typeof message.operationTimestamp === "number")
++                object.operationTimestamp = options.longs === String ? String(message.operationTimestamp) : message.operationTimestamp;
++            else
++                object.operationTimestamp = options.longs === String ? $util.Long.prototype.toString.call(message.operationTimestamp) : options.longs === Number ? new $util.LongBits(message.operationTimestamp.low >>> 0, message.operationTimestamp.high >>> 0).toNumber() : message.operationTimestamp;
+         return object;
+     };
+ 
+@@ -5636,6 +5708,290 @@
+     };
+ 
+     return LastRead;
++})();
++
++$root.MarkUnread = (function() {
++
++    /**
++     * Properties of a MarkUnread.
++     * @exports IMarkUnread
++     * @interface IMarkUnread
++     * @property {IQualifiedConversationId} qualifiedConversationId MarkUnread qualifiedConversationId
++     * @property {number|Long} unreadFromTimestamp MarkUnread unreadFromTimestamp
++     * @property {number|Long} operationTimestamp MarkUnread operationTimestamp
++     */
++
++    /**
++     * Constructs a new MarkUnread.
++     * @exports MarkUnread
++     * @classdesc Represents a MarkUnread.
++     * @implements IMarkUnread
++     * @constructor
++     * @param {IMarkUnread=} [properties] Properties to set
++     */
++    function MarkUnread(properties) {
++        if (properties)
++            for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
++                if (properties[keys[i]] != null)
++                    this[keys[i]] = properties[keys[i]];
++    }
++
++    /**
++     * MarkUnread qualifiedConversationId.
++     * @member {IQualifiedConversationId} qualifiedConversationId
++     * @memberof MarkUnread
++     * @instance
++     */
++    MarkUnread.prototype.qualifiedConversationId = null;
++
++    /**
++     * MarkUnread unreadFromTimestamp.
++     * @member {number|Long} unreadFromTimestamp
++     * @memberof MarkUnread
++     * @instance
++     */
++    MarkUnread.prototype.unreadFromTimestamp = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
++
++    /**
++     * MarkUnread operationTimestamp.
++     * @member {number|Long} operationTimestamp
++     * @memberof MarkUnread
++     * @instance
++     */
++    MarkUnread.prototype.operationTimestamp = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
++
++    /**
++     * Creates a new MarkUnread instance using the specified properties.
++     * @function create
++     * @memberof MarkUnread
++     * @static
++     * @param {IMarkUnread=} [properties] Properties to set
++     * @returns {MarkUnread} MarkUnread instance
++     */
++    MarkUnread.create = function create(properties) {
++        return new MarkUnread(properties);
++    };
++
++    /**
++     * Encodes the specified MarkUnread message. Does not implicitly {@link MarkUnread.verify|verify} messages.
++     * @function encode
++     * @memberof MarkUnread
++     * @static
++     * @param {IMarkUnread} message MarkUnread message or plain object to encode
++     * @param {$protobuf.Writer} [writer] Writer to encode to
++     * @returns {$protobuf.Writer} Writer
++     */
++    MarkUnread.encode = function encode(message, writer) {
++        if (!writer)
++            writer = $Writer.create();
++        $root.QualifiedConversationId.encode(message.qualifiedConversationId, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
++        writer.uint32(/* id 2, wireType 0 =*/16).int64(message.unreadFromTimestamp);
++        writer.uint32(/* id 3, wireType 0 =*/24).int64(message.operationTimestamp);
++        return writer;
++    };
++
++    /**
++     * Encodes the specified MarkUnread message, length delimited. Does not implicitly {@link MarkUnread.verify|verify} messages.
++     * @function encodeDelimited
++     * @memberof MarkUnread
++     * @static
++     * @param {IMarkUnread} message MarkUnread message or plain object to encode
++     * @param {$protobuf.Writer} [writer] Writer to encode to
++     * @returns {$protobuf.Writer} Writer
++     */
++    MarkUnread.encodeDelimited = function encodeDelimited(message, writer) {
++        return this.encode(message, writer).ldelim();
++    };
++
++    /**
++     * Decodes a MarkUnread message from the specified reader or buffer.
++     * @function decode
++     * @memberof MarkUnread
++     * @static
++     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
++     * @param {number} [length] Message length if known beforehand
++     * @returns {MarkUnread} MarkUnread
++     * @throws {Error} If the payload is not a reader or valid buffer
++     * @throws {$protobuf.util.ProtocolError} If required fields are missing
++     */
++    MarkUnread.decode = function decode(reader, length) {
++        if (!(reader instanceof $Reader))
++            reader = $Reader.create(reader);
++        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.MarkUnread();
++        while (reader.pos < end) {
++            var tag = reader.uint32();
++            switch (tag >>> 3) {
++            case 1: {
++                    message.qualifiedConversationId = $root.QualifiedConversationId.decode(reader, reader.uint32());
++                    break;
++                }
++            case 2: {
++                    message.unreadFromTimestamp = reader.int64();
++                    break;
++                }
++            case 3: {
++                    message.operationTimestamp = reader.int64();
++                    break;
++                }
++            default:
++                reader.skipType(tag & 7);
++                break;
++            }
++        }
++        if (!message.hasOwnProperty("qualifiedConversationId"))
++            throw $util.ProtocolError("missing required 'qualifiedConversationId'", { instance: message });
++        if (!message.hasOwnProperty("unreadFromTimestamp"))
++            throw $util.ProtocolError("missing required 'unreadFromTimestamp'", { instance: message });
++        if (!message.hasOwnProperty("operationTimestamp"))
++            throw $util.ProtocolError("missing required 'operationTimestamp'", { instance: message });
++        return message;
++    };
++
++    /**
++     * Decodes a MarkUnread message from the specified reader or buffer, length delimited.
++     * @function decodeDelimited
++     * @memberof MarkUnread
++     * @static
++     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
++     * @returns {MarkUnread} MarkUnread
++     * @throws {Error} If the payload is not a reader or valid buffer
++     * @throws {$protobuf.util.ProtocolError} If required fields are missing
++     */
++    MarkUnread.decodeDelimited = function decodeDelimited(reader) {
++        if (!(reader instanceof $Reader))
++            reader = new $Reader(reader);
++        return this.decode(reader, reader.uint32());
++    };
++
++    /**
++     * Verifies a MarkUnread message.
++     * @function verify
++     * @memberof MarkUnread
++     * @static
++     * @param {Object.<string,*>} message Plain object to verify
++     * @returns {string|null} `null` if valid, otherwise the reason why it is not
++     */
++    MarkUnread.verify = function verify(message) {
++        if (typeof message !== "object" || message === null)
++            return "object expected";
++        {
++            var error = $root.QualifiedConversationId.verify(message.qualifiedConversationId);
++            if (error)
++                return "qualifiedConversationId." + error;
++        }
++        if (!$util.isInteger(message.unreadFromTimestamp) && !(message.unreadFromTimestamp && $util.isInteger(message.unreadFromTimestamp.low) && $util.isInteger(message.unreadFromTimestamp.high)))
++            return "unreadFromTimestamp: integer|Long expected";
++        if (!$util.isInteger(message.operationTimestamp) && !(message.operationTimestamp && $util.isInteger(message.operationTimestamp.low) && $util.isInteger(message.operationTimestamp.high)))
++            return "operationTimestamp: integer|Long expected";
++        return null;
++    };
++
++    /**
++     * Creates a MarkUnread message from a plain object. Also converts values to their respective internal types.
++     * @function fromObject
++     * @memberof MarkUnread
++     * @static
++     * @param {Object.<string,*>} object Plain object
++     * @returns {MarkUnread} MarkUnread
++     */
++    MarkUnread.fromObject = function fromObject(object) {
++        if (object instanceof $root.MarkUnread)
++            return object;
++        var message = new $root.MarkUnread();
++        if (object.qualifiedConversationId != null) {
++            if (typeof object.qualifiedConversationId !== "object")
++                throw TypeError(".MarkUnread.qualifiedConversationId: object expected");
++            message.qualifiedConversationId = $root.QualifiedConversationId.fromObject(object.qualifiedConversationId);
++        }
++        if (object.unreadFromTimestamp != null)
++            if ($util.Long)
++                (message.unreadFromTimestamp = $util.Long.fromValue(object.unreadFromTimestamp)).unsigned = false;
++            else if (typeof object.unreadFromTimestamp === "string")
++                message.unreadFromTimestamp = parseInt(object.unreadFromTimestamp, 10);
++            else if (typeof object.unreadFromTimestamp === "number")
++                message.unreadFromTimestamp = object.unreadFromTimestamp;
++            else if (typeof object.unreadFromTimestamp === "object")
++                message.unreadFromTimestamp = new $util.LongBits(object.unreadFromTimestamp.low >>> 0, object.unreadFromTimestamp.high >>> 0).toNumber();
++        if (object.operationTimestamp != null)
++            if ($util.Long)
++                (message.operationTimestamp = $util.Long.fromValue(object.operationTimestamp)).unsigned = false;
++            else if (typeof object.operationTimestamp === "string")
++                message.operationTimestamp = parseInt(object.operationTimestamp, 10);
++            else if (typeof object.operationTimestamp === "number")
++                message.operationTimestamp = object.operationTimestamp;
++            else if (typeof object.operationTimestamp === "object")
++                message.operationTimestamp = new $util.LongBits(object.operationTimestamp.low >>> 0, object.operationTimestamp.high >>> 0).toNumber();
++        return message;
++    };
++
++    /**
++     * Creates a plain object from a MarkUnread message. Also converts values to other types if specified.
++     * @function toObject
++     * @memberof MarkUnread
++     * @static
++     * @param {MarkUnread} message MarkUnread
++     * @param {$protobuf.IConversionOptions} [options] Conversion options
++     * @returns {Object.<string,*>} Plain object
++     */
++    MarkUnread.toObject = function toObject(message, options) {
++        if (!options)
++            options = {};
++        var object = {};
++        if (options.defaults) {
++            object.qualifiedConversationId = null;
++            if ($util.Long) {
++                var long = new $util.Long(0, 0, false);
++                object.unreadFromTimestamp = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
++            } else
++                object.unreadFromTimestamp = options.longs === String ? "0" : 0;
++            if ($util.Long) {
++                var long = new $util.Long(0, 0, false);
++                object.operationTimestamp = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
++            } else
++                object.operationTimestamp = options.longs === String ? "0" : 0;
++        }
++        if (message.qualifiedConversationId != null && message.hasOwnProperty("qualifiedConversationId"))
++            object.qualifiedConversationId = $root.QualifiedConversationId.toObject(message.qualifiedConversationId, options);
++        if (message.unreadFromTimestamp != null && message.hasOwnProperty("unreadFromTimestamp"))
++            if (typeof message.unreadFromTimestamp === "number")
++                object.unreadFromTimestamp = options.longs === String ? String(message.unreadFromTimestamp) : message.unreadFromTimestamp;
++            else
++                object.unreadFromTimestamp = options.longs === String ? $util.Long.prototype.toString.call(message.unreadFromTimestamp) : options.longs === Number ? new $util.LongBits(message.unreadFromTimestamp.low >>> 0, message.unreadFromTimestamp.high >>> 0).toNumber() : message.unreadFromTimestamp;
++        if (message.operationTimestamp != null && message.hasOwnProperty("operationTimestamp"))
++            if (typeof message.operationTimestamp === "number")
++                object.operationTimestamp = options.longs === String ? String(message.operationTimestamp) : message.operationTimestamp;
++            else
++                object.operationTimestamp = options.longs === String ? $util.Long.prototype.toString.call(message.operationTimestamp) : options.longs === Number ? new $util.LongBits(message.operationTimestamp.low >>> 0, message.operationTimestamp.high >>> 0).toNumber() : message.operationTimestamp;
++        return object;
++    };
++
++    /**
++     * Converts this MarkUnread to JSON.
++     * @function toJSON
++     * @memberof MarkUnread
++     * @instance
++     * @returns {Object.<string,*>} JSON object
++     */
++    MarkUnread.prototype.toJSON = function toJSON() {
++        return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
++    };
++
++    /**
++     * Gets the default type url for MarkUnread
++     * @function getTypeUrl
++     * @memberof MarkUnread
++     * @static
++     * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
++     * @returns {string} The default type url
++     */
++    MarkUnread.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
++        if (typeUrlPrefix === undefined) {
++            typeUrlPrefix = "type.googleapis.com";
++        }
++        return typeUrlPrefix + "/MarkUnread";
++    };
++
++    return MarkUnread;
+ })();
+ 
+ $root.Cleared = (function() {
+diff --git a/node_modules/@wireapp/protocol-messaging/web/messages.d.ts b/node_modules/@wireapp/protocol-messaging/web/messages.d.ts
+--- a/node_modules/@wireapp/protocol-messaging/web/messages.d.ts
++++ b/node_modules/@wireapp/protocol-messaging/web/messages.d.ts
+@@ -26,6 +26,7 @@
+     dataTransfer?: (IDataTransfer|null);
+     inCallEmoji?: (IInCallEmoji|null);
+     inCallHandRaise?: (IInCallHandRaise|null);
++    markUnread?: (IMarkUnread|null);
+     unknownStrategy?: (GenericMessage.UnknownStrategy|null);
+ }
+ 
+@@ -56,8 +57,9 @@
+     public dataTransfer?: (IDataTransfer|null);
+     public inCallEmoji?: (IInCallEmoji|null);
+     public inCallHandRaise?: (IInCallHandRaise|null);
++    public markUnread?: (IMarkUnread|null);
+     public unknownStrategy: GenericMessage.UnknownStrategy;
+-    public content?: ("text"|"image"|"knock"|"lastRead"|"cleared"|"external"|"clientAction"|"calling"|"asset"|"multipart"|"hidden"|"location"|"deleted"|"edited"|"confirmation"|"reaction"|"ephemeral"|"availability"|"composite"|"buttonAction"|"buttonActionConfirmation"|"dataTransfer"|"inCallEmoji"|"inCallHandRaise");
++    public content?: ("text"|"image"|"knock"|"lastRead"|"cleared"|"external"|"clientAction"|"calling"|"asset"|"multipart"|"hidden"|"location"|"deleted"|"edited"|"confirmation"|"reaction"|"ephemeral"|"availability"|"composite"|"buttonAction"|"buttonActionConfirmation"|"dataTransfer"|"inCallEmoji"|"inCallHandRaise"|"markUnread");
+     public static create(properties?: IGenericMessage): GenericMessage;
+     public static encode(message: IGenericMessage, writer?: $protobuf.Writer): $protobuf.Writer;
+     public static encodeDelimited(message: IGenericMessage, writer?: $protobuf.Writer): $protobuf.Writer;
+@@ -454,6 +456,7 @@
+     conversationId: string;
+     lastReadTimestamp: (number|Long);
+     qualifiedConversationId?: (IQualifiedConversationId|null);
++    operationTimestamp?: (number|Long|null);
+ }
+ 
+ export class LastRead implements ILastRead {
+@@ -461,6 +464,7 @@
+     public conversationId: string;
+     public lastReadTimestamp: (number|Long);
+     public qualifiedConversationId?: (IQualifiedConversationId|null);
++    public operationTimestamp: (number|Long);
+     public static create(properties?: ILastRead): LastRead;
+     public static encode(message: ILastRead, writer?: $protobuf.Writer): $protobuf.Writer;
+     public static encodeDelimited(message: ILastRead, writer?: $protobuf.Writer): $protobuf.Writer;
+@@ -469,6 +473,29 @@
+     public static verify(message: { [k: string]: any }): (string|null);
+     public static fromObject(object: { [k: string]: any }): LastRead;
+     public static toObject(message: LastRead, options?: $protobuf.IConversionOptions): { [k: string]: any };
++    public toJSON(): { [k: string]: any };
++    public static getTypeUrl(typeUrlPrefix?: string): string;
++}
++
++export interface IMarkUnread {
++    qualifiedConversationId: IQualifiedConversationId;
++    unreadFromTimestamp: (number|Long);
++    operationTimestamp: (number|Long);
++}
++
++export class MarkUnread implements IMarkUnread {
++    constructor(properties?: IMarkUnread);
++    public qualifiedConversationId: IQualifiedConversationId;
++    public unreadFromTimestamp: (number|Long);
++    public operationTimestamp: (number|Long);
++    public static create(properties?: IMarkUnread): MarkUnread;
++    public static encode(message: IMarkUnread, writer?: $protobuf.Writer): $protobuf.Writer;
++    public static encodeDelimited(message: IMarkUnread, writer?: $protobuf.Writer): $protobuf.Writer;
++    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): MarkUnread;
++    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): MarkUnread;
++    public static verify(message: { [k: string]: any }): (string|null);
++    public static fromObject(object: { [k: string]: any }): MarkUnread;
++    public static toObject(message: MarkUnread, options?: $protobuf.IConversionOptions): { [k: string]: any };
+     public toJSON(): { [k: string]: any };
+     public static getTypeUrl(typeUrlPrefix?: string): string;
+ }

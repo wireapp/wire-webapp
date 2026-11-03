@@ -42,6 +42,7 @@ export * from './imageContent';
 export * from './knockContent';
 export * from './linkPreviewContent';
 export * from './locationContent';
+export * from './markUnreadContent';
 export * from './mentionContent';
 export * from './quoteContent';
 export * from './reactionContent';

@@ -1067,11 +1067,11 @@ describe('Conversation', () => {
       expect(conversation_et.last_read_timestamp()).toBe(third_timestamp);
     });
 
-    it('is cleared when the canonical read timestamp advances through the marker', () => {
+    it('is cleared by a newer read operation through the marker', () => {
       const {otherFirst} = setupConversation();
-      conversation_et.markUnreadFrom(otherFirst);
+      conversation_et.markUnreadFrom(otherFirst, third_timestamp + 10);
 
-      conversation_et.setTimestamp(third_timestamp + 1, Conversation.TIMESTAMP_TYPE.LAST_READ);
+      conversation_et.applyReadMarker(third_timestamp + 1, third_timestamp + 11);
 
       expect(conversation_et.manualUnreadTimestamp()).toBeUndefined();
       expect(conversation_et.isAutoReadSuppressed()).toBe(false);
@@ -1124,7 +1124,7 @@ describe('Conversation', () => {
       const {otherFirst} = setupConversation();
       const newOwnMessage = createContentMessage(third_timestamp + 1, self_user);
       conversation_et.last_server_timestamp(third_timestamp + 2);
-      conversation_et.markUnreadFrom(otherFirst);
+      conversation_et.markUnreadFrom(otherFirst, third_timestamp);
 
       conversation_et.updateTimestamps(newOwnMessage);
 
@@ -1148,7 +1148,101 @@ describe('Conversation', () => {
 
       expect(conversation_et.serialize().manual_unread_timestamp).toBe(first_timestamp);
       expect(conversation_et.serialize().last_read_timestamp).toBe(third_timestamp);
+      expect(conversation_et.serialize().manual_unread_updated_at).toBe(conversation_et.manualUnreadUpdatedAt());
     });
+
+    it('keeps the marker when a delayed read advances the canonical timestamp', () => {
+      const {otherFirst} = setupConversation();
+      const operationTime = third_timestamp + 20;
+      conversation_et.markUnreadFrom(otherFirst, operationTime);
+
+      expect(conversation_et.applyReadMarker(third_timestamp + 1, operationTime - 1)).toBe(false);
+
+      expect(conversation_et.last_read_timestamp()).toBe(third_timestamp + 1);
+      expect(conversation_et.manualUnreadTimestamp()).toBe(first_timestamp);
+      expect(conversation_et.manualUnreadUpdatedAt()).toBe(operationTime);
+      expect(conversation_et.isAutoReadSuppressed()).toBe(true);
+    });
+
+    it('clears at the same canonical timestamp and retains its operation against delayed marks', () => {
+      const {otherFirst} = setupConversation();
+      const operationTime = third_timestamp + 20;
+      conversation_et.markUnreadFrom(otherFirst, operationTime);
+
+      expect(conversation_et.applyReadMarker(third_timestamp, operationTime + 1)).toBe(true);
+
+      expect(conversation_et.last_read_timestamp()).toBe(third_timestamp);
+      expect(conversation_et.manualUnreadTimestamp()).toBeUndefined();
+      expect(conversation_et.manualUnreadUpdatedAt()).toBe(operationTime + 1);
+      expect(conversation_et.serialize().manual_unread_updated_at).toBe(operationTime + 1);
+      expect(conversation_et.applyManualUnreadMarker(first_timestamp, operationTime)).toBe(false);
+      expect(conversation_et.hasUnread()).toBe(false);
+    });
+
+    it('clears when rereading through the manual boundary without regressing canonical reading', () => {
+      const {otherFirst} = setupConversation();
+      const operationTime = third_timestamp + 20;
+      conversation_et.markUnreadFrom(otherFirst, operationTime);
+
+      expect(conversation_et.applyReadMarker(second_timestamp, operationTime + 1)).toBe(true);
+
+      expect(conversation_et.last_read_timestamp()).toBe(third_timestamp);
+      expect(conversation_et.manualUnreadTimestamp()).toBeUndefined();
+      expect(conversation_et.isAutoReadSuppressed()).toBe(false);
+    });
+
+    it('only accepts newer manual operations and requires reading through their boundary', () => {
+      setupConversation();
+      const operationTime = third_timestamp + 20;
+
+      expect(conversation_et.applyManualUnreadMarker(first_timestamp, operationTime)).toBe(true);
+      expect(conversation_et.applyManualUnreadMarker(second_timestamp, operationTime + 2)).toBe(true);
+      expect(conversation_et.applyManualUnreadMarker(first_timestamp, operationTime + 1)).toBe(false);
+      expect(conversation_et.applyManualUnreadMarker(first_timestamp, operationTime + 2)).toBe(false);
+      expect(conversation_et.applyReadMarker(first_timestamp, operationTime + 3)).toBe(false);
+
+      expect(conversation_et.manualUnreadTimestamp()).toBe(second_timestamp);
+      expect(conversation_et.manualUnreadUpdatedAt()).toBe(operationTime + 2);
+    });
+
+    it('advances a local unread action beyond an observed operation even when the local clock is behind', () => {
+      const {otherFirst} = setupConversation();
+      const previousOperation = Date.now() + 1000;
+      conversation_et.manualUnreadUpdatedAt(previousOperation);
+
+      conversation_et.markUnreadFrom(otherFirst);
+
+      expect(conversation_et.manualUnreadUpdatedAt()).toBe(previousOperation + 1);
+      expect(conversation_et.manualUnreadTimestamp()).toBe(first_timestamp);
+    });
+
+    it('invalidates queued visibility effects only when a new manual marker is accepted', () => {
+      setupConversation();
+      const operationTime = third_timestamp + 20;
+
+      expect(conversation_et.autoReadGeneration).toBe(0);
+      conversation_et.applyManualUnreadMarker(first_timestamp, operationTime);
+      expect(conversation_et.autoReadGeneration).toBe(1);
+      conversation_et.applyManualUnreadMarker(second_timestamp, operationTime);
+      conversation_et.release();
+      conversation_et.applyReadMarker(third_timestamp, operationTime + 1);
+      expect(conversation_et.autoReadGeneration).toBe(1);
+      conversation_et.applyManualUnreadMarker(second_timestamp, operationTime + 2);
+      expect(conversation_et.autoReadGeneration).toBe(2);
+    });
+
+    it.each([NaN, Infinity, -1, 1.5, Number.MAX_SAFE_INTEGER + 1])(
+      'rejects malformed operation timestamps and boundaries: %s',
+      timestamp => {
+        setupConversation();
+        expect(conversation_et.applyManualUnreadMarker(first_timestamp, timestamp)).toBe(false);
+        expect(conversation_et.applyManualUnreadMarker(timestamp, third_timestamp)).toBe(false);
+        expect(conversation_et.applyReadMarker(third_timestamp, timestamp)).toBe(false);
+        expect(conversation_et.manualUnreadTimestamp()).toBeUndefined();
+        expect(conversation_et.manualUnreadUpdatedAt()).toBeUndefined();
+        expect(conversation_et.last_read_timestamp()).toBe(third_timestamp);
+      },
+    );
   });
 
   describe('_incrementTimeOnly', () => {

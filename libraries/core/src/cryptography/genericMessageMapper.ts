@@ -32,6 +32,7 @@ import {
   HiddenContent,
   KnockContent,
   LocationContent,
+  MarkUnreadContent,
   MultiPartContent,
   ReactionContent,
   TextContent,
@@ -131,6 +132,14 @@ export class GenericMessageMapper {
           ...baseMessage,
           content,
           type: PayloadBundleType.CONVERSATION_CLEAR,
+        };
+      }
+      case GenericMessageType.MARK_UNREAD: {
+        const content: MarkUnreadContent = genericMessage[GenericMessageType.MARK_UNREAD];
+        return {
+          ...baseMessage,
+          content,
+          type: PayloadBundleType.MARK_UNREAD,
         };
       }
       case GenericMessageType.DELETED: {

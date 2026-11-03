@@ -1806,9 +1806,19 @@ export class MessageRepository {
    *
    * @param conversation Conversation to be marked as read
    */
-  public async markAsRead(conversation: Conversation): Promise<void> {
+  public async markAsRead(
+    conversation: Conversation,
+    readUntil = conversation.last_read_timestamp(),
+    operationTimestamp = Math.max(
+      this.serverTimeHandler.toServerTimestamp(),
+      (conversation.manualUnreadUpdatedAt() ?? 0) + 1,
+    ),
+  ): Promise<void> {
+    if (!conversation.applyReadMarker(readUntil, operationTimestamp)) {
+      return;
+    }
     const timestamp = conversation.last_read_timestamp();
-    const payload = MessageBuilder.buildLastReadMessage(conversation.qualifiedId, timestamp);
+    const payload = MessageBuilder.buildLastReadMessage(conversation.qualifiedId, readUntil, operationTimestamp);
     await this.sendToSelfConversations(payload);
     /*
      * FIXME notification removal can be improved.
@@ -1816,6 +1826,21 @@ export class MessageRepository {
      */
     amplify.publish(WebAppEvents.NOTIFICATION.REMOVE_READ);
     this.logger.info(`Marked conversation '${conversation.id}' as read on '${new Date(timestamp).toISOString()}'`);
+  }
+
+  public async markAsUnread(conversation: Conversation, message: Message): Promise<void> {
+    if ([StatusType.SENDING, StatusType.FAILED, StatusType.FEDERATION_ERROR].includes(message.status())) {
+      return;
+    }
+    const unreadFrom = message.timestamp();
+    const now = this.serverTimeHandler.toServerTimestamp();
+    if (!Number.isSafeInteger(unreadFrom) || unreadFrom < 0 || unreadFrom > now) {
+      return;
+    }
+    const operationTime = Math.max(now, (conversation.manualUnreadUpdatedAt() ?? 0) + 1);
+    conversation.markUnreadFrom(message, operationTime);
+    const payload = MessageBuilder.buildMarkUnreadMessage(conversation.qualifiedId, unreadFrom, operationTime);
+    await this.sendToSelfConversations(payload);
   }
 
   /**

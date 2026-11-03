@@ -223,6 +223,13 @@ type OneToOneMigrationResult = {shouldOpenMLS1to1Conversation: boolean; shouldIn
 type ConversationMuteStateData = {otr_muted_ref: string; otr_muted_status: number};
 type ConversationMuteStateEvent = {data: ConversationMuteStateData; from: string};
 type IncomingEvent = ConversationEvent | ClientConversationEvent;
+const maxReadOperationSkewInMilliseconds = 300000;
+type ReadStateUpdate = {
+  qualified_conversation_id?: QualifiedId;
+  manual_unread_timestamp?: string | number;
+  last_read_timestamp?: string | number;
+  operation_timestamp?: string | number;
+};
 type InitializedCoreServices = NonNullable<Core['service']>;
 type ConversationRepositoryConfig = {
   CONFIRMATION_THRESHOLD: TIME_IN_MILLIS;
@@ -2047,6 +2054,8 @@ export class ConversationRepository {
       mlsConversation.last_event_timestamp(proteusConversationToBeKept.last_event_timestamp());
       mlsConversation.last_read_timestamp(proteusConversationToBeKept.last_read_timestamp());
       mlsConversation.manualUnreadTimestamp(proteusConversationToBeKept.manualUnreadTimestamp());
+      mlsConversation.manualUnreadUpdatedAt(proteusConversationToBeKept.manualUnreadUpdatedAt());
+      mlsConversation.autoReadGeneration = proteusConversationToBeKept.autoReadGeneration;
       mlsConversation.isAutoReadSuppressed(proteusConversationToBeKept.isAutoReadSuppressed());
       mlsConversation.last_server_timestamp(proteusConversationToBeKept.last_server_timestamp());
       mlsConversation.archivedState(proteusConversationToBeKept.archivedState());
@@ -3889,12 +3898,30 @@ export class ConversationRepository {
     }
 
     const {conversation, qualified_conversation, data: eventData, type} = eventJson;
+    const readState = eventData as ReadStateUpdate;
+    const isReadStateSignal =
+      type === CONVERSATION_EVENT.MEMBER_UPDATE &&
+      (readState.manual_unread_timestamp !== undefined || readState.last_read_timestamp !== undefined);
+    if (isReadStateSignal) {
+      const selfUser = this.userState.self();
+      const carrier = qualified_conversation ?? {domain: '', id: conversation};
+      if (
+        selfUser === undefined ||
+        eventJson.from !== selfUser.id ||
+        !this.conversationState.isSelfConversation(carrier) ||
+        (eventJson.qualified_from !== undefined && !matchQualifiedIds(eventJson.qualified_from, selfUser.qualifiedId))
+      ) {
+        return Promise.resolve();
+      }
+    }
     const dataConversationId: string | undefined = (eventData as any)?.conversationId;
+    const qualifiedTarget = (eventData as ReadStateUpdate)?.qualified_conversation_id;
     // data.conversationId is always the conversationId that should be read first. If not found we can fallback to qualified_conversation or conversation
     const conversationId: QualifiedId =
-      dataConversationId !== undefined
+      qualifiedTarget ??
+      (dataConversationId !== undefined
         ? {domain: '', id: dataConversationId}
-        : (qualified_conversation ?? {domain: '', id: conversation});
+        : (qualified_conversation ?? {domain: '', id: conversation}));
 
     const inSelfConversation = this.conversationState.isSelfConversation(conversationId);
     if (inSelfConversation) {
@@ -3933,7 +3960,7 @@ export class ConversationRepository {
             CONVERSATION_EVENT.SYSTEM_ADMINLESS_DELETE_REMINDER,
           ];
 
-          const shouldUpdateTimestampServer = !eventsToSkip.includes(type);
+          const shouldUpdateTimestampServer = !isReadStateSignal && !eventsToSkip.includes(type);
 
           if (shouldUpdateTimestampServer) {
             conversationEntity.updateTimestampServer(eventJson.server_time ?? eventJson.time, isBackendTimestamp);
@@ -4699,10 +4726,15 @@ export class ConversationRepository {
    */
   private async onMemberUpdate(
     conversationEntity: Conversation,
-    eventJson: Pick<ConversationMemberUpdateEvent, 'data' | 'from'> & {conversation?: string},
+    eventJson: Pick<ConversationMemberUpdateEvent, 'data' | 'from'> & {
+      conversation?: string;
+      qualified_conversation?: QualifiedId;
+      qualified_from?: QualifiedId;
+      time?: string;
+    },
   ): Promise<void> {
     const {conversation, data: eventData, from} = eventJson;
-    const conversationId = {domain: '', id: conversation ?? '' /* TODO(federation) add domain on the sender side */};
+    const conversationId = eventJson.qualified_conversation ?? {domain: '', id: conversation ?? ''};
 
     if (isNonEmptyString(eventData.conversation_role)) {
       // `from` is absent for backend/system-initiated role changes (e.g. `conversation.system.member-update`).
@@ -4720,6 +4752,50 @@ export class ConversationRepository {
     }
 
     const selfUser = this.userState.self();
+    const readState = eventData as ReadStateUpdate;
+    if (readState.manual_unread_timestamp !== undefined || readState.last_read_timestamp !== undefined) {
+      const authenticatedSelf =
+        selfUser !== undefined &&
+        from === selfUser.id &&
+        (eventJson.qualified_from === undefined || matchQualifiedIds(eventJson.qualified_from, selfUser.qualifiedId));
+      if (!inSelfConversation || !authenticatedSelf) {
+        return;
+      }
+      const eventTime = Date.parse(eventJson.time ?? '');
+      const operationTime =
+        readState.operation_timestamp === undefined ? eventTime : Number(readState.operation_timestamp);
+      if (
+        !Number.isSafeInteger(operationTime) ||
+        operationTime < 0 ||
+        !Number.isSafeInteger(eventTime) ||
+        operationTime > eventTime + maxReadOperationSkewInMilliseconds
+      ) {
+        return;
+      }
+      if (readState.manual_unread_timestamp !== undefined) {
+        if (readState.operation_timestamp === undefined) {
+          return;
+        }
+        const unreadFrom = Number(readState.manual_unread_timestamp);
+        if (
+          !this.options.isMarkAsUnreadFeatureEnabled ||
+          !Number.isSafeInteger(unreadFrom) ||
+          unreadFrom < 0 ||
+          unreadFrom > eventTime
+        ) {
+          return;
+        }
+        if (
+          conversationEntity.applyManualUnreadMarker(unreadFrom, operationTime) &&
+          !this.conversationState.isActiveConversation(conversationEntity)
+        ) {
+          conversationEntity.isAutoReadSuppressed(false);
+        }
+      } else {
+        conversationEntity.applyReadMarker(Number(readState.last_read_timestamp), operationTime);
+      }
+      return;
+    }
     const isFromSelf = selfUser === undefined || from === selfUser.id;
     if (!isFromSelf) {
       this.logger.warn(`A conversation update message was not sent by the self user. Skipping conversation update`);

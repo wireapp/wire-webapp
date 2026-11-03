@@ -172,8 +172,12 @@ export class Conversation {
   public readonly isTeamOnly: ko.PureComputed<boolean>;
   public readonly last_event_timestamp: ko.Observable<number>;
   public readonly last_read_timestamp: ko.Observable<number>;
-  /** The locally selected message from which this conversation is manually unread. */
+  /** The selected message from which this conversation is manually unread. */
   public readonly manualUnreadTimestamp: ko.Observable<number | undefined>;
+  /** Latest ordered read/unread operation, retained after clearing a manual marker. */
+  public readonly manualUnreadUpdatedAt: ko.Observable<number | undefined>;
+  /** Cancels queued visibility effects admitted before a newer unread action. */
+  public autoReadGeneration: number = 0;
   /** Read boundary used for local unread presentation and history loading. */
   public readonly effectiveReadTimestamp: ko.PureComputed<number>;
   /** While true, viewing messages does not advance the read marker (in-memory only) */
@@ -414,6 +418,7 @@ export class Conversation {
     this.last_event_timestamp = ko.observable(0);
     this.last_read_timestamp = ko.observable(0);
     this.manualUnreadTimestamp = ko.observable<number | undefined>(undefined);
+    this.manualUnreadUpdatedAt = ko.observable<number | undefined>(undefined);
     this.effectiveReadTimestamp = ko.pureComputed(() => {
       const manualUnreadTimestamp = this.manualUnreadTimestamp();
       return isUndefined(manualUnreadTimestamp) ? this.last_read_timestamp() : manualUnreadTimestamp - 1;
@@ -790,6 +795,7 @@ export class Conversation {
       this.last_event_timestamp,
       this.last_read_timestamp,
       this.manualUnreadTimestamp,
+      this.manualUnreadUpdatedAt,
       this.last_server_timestamp,
       this.mutedState,
       this.mutedTimestamp,
@@ -885,10 +891,6 @@ export class Conversation {
     const currentTimestamp = entityTimestamp();
     const updatedTimestamp = forceUpdate ? timestamp : this._incrementTimeOnly(currentTimestamp, timestamp);
 
-    if (type === TIMESTAMP_TYPE.LAST_READ && timestamp > currentTimestamp) {
-      this.clearManualUnreadMarkerIfReadThrough(timestamp);
-    }
-
     if (updatedTimestamp !== false) {
       entityTimestamp(updatedTimestamp);
     }
@@ -898,11 +900,47 @@ export class Conversation {
 
   /**
    * Mark the conversation as unread starting at (and including) the given message.
-   * The state is local to this device and does not change the synchronized read timestamp.
+   * The manual boundary is separate from the synchronized read timestamp.
    */
-  markUnreadFrom(message: Message): void {
-    this.manualUnreadTimestamp(message.timestamp());
+  markUnreadFrom(message: Message, operationTime?: number): void {
+    const orderedOperationTime = operationTime ?? Math.max(Date.now(), (this.manualUnreadUpdatedAt() ?? -1) + 1);
+    this.applyManualUnreadMarker(message.timestamp(), orderedOperationTime);
+  }
+
+  applyManualUnreadMarker(unreadFrom: number, operationTime: number): boolean {
+    if (!this.isReadOperationTimestamp(unreadFrom) || !this.isReadOperationTimestamp(operationTime)) {
+      return false;
+    }
+    if (operationTime <= (this.manualUnreadUpdatedAt() ?? -1)) {
+      return false;
+    }
+    this.autoReadGeneration += 1;
     this.isAutoReadSuppressed(true);
+    this.manualUnreadUpdatedAt(operationTime);
+    this.manualUnreadTimestamp(unreadFrom);
+    return true;
+  }
+
+  applyReadMarker(readUntil: number, operationTime: number): boolean {
+    if (!this.isReadOperationTimestamp(readUntil) || !this.isReadOperationTimestamp(operationTime)) {
+      return false;
+    }
+    // Canonical reading remains monotonic, independently of manual unread operation ordering.
+    this.setTimestamp(readUntil, TIMESTAMP_TYPE.LAST_READ);
+    if (operationTime <= (this.manualUnreadUpdatedAt() ?? -1)) {
+      return false;
+    }
+    const manualUnreadTimestamp = this.manualUnreadTimestamp();
+    if (isNumber(manualUnreadTimestamp) && readUntil < manualUnreadTimestamp) {
+      return false;
+    }
+    this.manualUnreadUpdatedAt(operationTime);
+    this.clearManualUnreadMarker();
+    return true;
+  }
+
+  private isReadOperationTimestamp(timestamp: number): boolean {
+    return Number.isSafeInteger(timestamp) && timestamp >= 0;
   }
 
   clearManualUnreadMarker(): void {
@@ -1170,7 +1208,7 @@ export class Conversation {
 
           const from_self = message_et.user()?.isMe && !message_et.isSystem();
           if (from_self) {
-            this.setTimestamp(timestamp, TIMESTAMP_TYPE.LAST_READ);
+            this.applyReadMarker(timestamp, timestamp);
           }
         }
       }
@@ -1306,6 +1344,7 @@ export class Conversation {
 
   serialize(): ConversationRecord {
     const manualUnreadTimestamp = this.manualUnreadTimestamp();
+    const manualUnreadUpdatedAt = this.manualUnreadUpdatedAt();
 
     return {
       access: this.accessModes ?? [],
@@ -1326,6 +1365,7 @@ export class Conversation {
       is_guest: this.isGuest(),
       is_ghost_group: this.isGhostGroup(),
       ...(isNumber(manualUnreadTimestamp) ? {manual_unread_timestamp: manualUnreadTimestamp} : {}),
+      ...(isNumber(manualUnreadUpdatedAt) ? {manual_unread_updated_at: manualUnreadUpdatedAt} : {}),
       last_event_timestamp: this.last_event_timestamp(),
       last_read_timestamp: this.last_read_timestamp(),
       last_server_timestamp: this.last_server_timestamp(),

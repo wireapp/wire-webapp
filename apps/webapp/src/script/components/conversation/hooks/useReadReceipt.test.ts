@@ -29,6 +29,23 @@ import {useReadReceiptSender} from './useReadReceipt';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 describe('useReadReceipt', () => {
+  withDeterministicClock('drops queued receipts after a received unread marker, including after release', clock => {
+    const sendReadReceipt = jest.fn();
+    const {result} = renderHook(() => {
+      return useReadReceiptSender({messageSender: {sendReadReceipt}, clock});
+    });
+    const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    const message = new Message(createUuid(), undefined, translateForTest);
+    message.timestamp(100);
+    result.current.addReadReceiptToBatch(conversation, message);
+    conversation.applyManualUnreadMarker(100, 200);
+    conversation.release();
+
+    clock.advanceByMilliseconds(500);
+
+    expect(sendReadReceipt).not.toHaveBeenCalled();
+  });
+
   function withDeterministicClock(testName: string, testBody: (clock: DeterministicClock) => void): void {
     it(testName, () => {
       const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});

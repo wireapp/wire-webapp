@@ -22,6 +22,29 @@ import ko from 'knockout';
 import {withAutoReadGuard} from './autoReadGuard';
 
 describe('withAutoReadGuard', () => {
+  it('keeps a queued callback cancelled after a newer mark and release', () => {
+    const callback = jest.fn();
+    const conversation = {isAutoReadSuppressed: ko.observable(false), autoReadGeneration: 0};
+    const guarded = withAutoReadGuard(conversation, callback);
+    conversation.autoReadGeneration += 1;
+    conversation.isAutoReadSuppressed(false);
+
+    guarded();
+
+    expect(callback).not.toHaveBeenCalled();
+  });
+
+  it('does not revive a callback created while suppressed', () => {
+    const callback = jest.fn();
+    const conversation = {isAutoReadSuppressed: ko.observable(true), autoReadGeneration: 1};
+    const guarded = withAutoReadGuard(conversation, callback);
+    conversation.isAutoReadSuppressed(false);
+
+    guarded();
+
+    expect(callback).not.toHaveBeenCalled();
+  });
+
   it('runs the callback with its arguments while auto-read is not suppressed', () => {
     const callback = jest.fn();
     const conversation = {isAutoReadSuppressed: ko.observable(false)};
