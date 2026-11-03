@@ -25,11 +25,6 @@ import {container} from 'tsyringe';
 
 import {ChevronDownIcon} from '@wireapp/react-ui-kit';
 
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isEnterKey, isSpaceKey} from 'Util/keyboardUtil';
@@ -37,6 +32,11 @@ import {isEnterKey, isSpaceKey} from 'Util/keyboardUtil';
 import {UserListItem} from './components/userListItem';
 import {collapseButton, collapseIcon} from './userList.styles';
 
+import type {ConversationRepository} from '../../repositories/conversation/ConversationRepository';
+import {ConversationState} from '../../repositories/conversation/ConversationState';
+import type {Conversation} from '../../repositories/entity/Conversation';
+import type {User} from '../../repositories/entity/User';
+import {TeamState} from '../../repositories/team/TeamState';
 import {InViewport} from '../inViewport';
 
 export enum UserlistMode {

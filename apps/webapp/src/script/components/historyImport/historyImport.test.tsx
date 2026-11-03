@@ -29,8 +29,8 @@ import {
 } from '@testing-library/react';
 
 import {PrimaryModal, removeCurrentModal} from '../Modals/PrimaryModal';
-import {BackupRepository} from 'Repositories/backup/backupRepository';
-import {User} from 'Repositories/entity/User';
+import {BackupRepository} from '../../repositories/backup/backupRepository';
+import {User} from '../../repositories/entity/User';
 import * as RootProvider from 'src/script/page/rootProvider';
 import {RootContextValue} from 'src/script/page/rootProvider';
 import * as BackupUtil from 'Util/backupUtil';

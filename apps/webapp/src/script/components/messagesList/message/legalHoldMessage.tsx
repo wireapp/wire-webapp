@@ -21,10 +21,10 @@ import type {FunctionComponent} from 'react';
 
 import {container} from 'tsyringe';
 
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {LegalHoldMessage as LegalHoldMessageEntity} from 'Repositories/entity/message/legalHoldMessage';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
+import {ConversationState} from '../../../repositories/conversation/ConversationState';
+import {LegalHoldMessage as LegalHoldMessageEntity} from '../../../repositories/entity/message/legalHoldMessage';
 import {LegalHoldDot} from '../../LegalHoldDot';
 import {useLegalHoldModalState} from '../../Modals/LegalHoldModal/LegalHoldModal.state';
 

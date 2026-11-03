@@ -27,7 +27,7 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {setStrings, translate} from 'Util/localizerUtil';
 
-import type {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
+import type {MediaStreamHandler} from '../../../../../repositories/media/MediaStreamHandler';
 
 import en from '../../../../../../i18n/en-US.json';
 

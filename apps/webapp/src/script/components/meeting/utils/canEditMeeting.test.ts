@@ -19,7 +19,7 @@
 
 import type {MeetingInstance} from '../types/meetingInstance';
 import type {MeetingSeries} from '../types/meetingSeries';
-import {User} from 'Repositories/entity/User';
+import {User} from '../../../repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';
 
 import {canEditMeeting} from './canEditMeeting';

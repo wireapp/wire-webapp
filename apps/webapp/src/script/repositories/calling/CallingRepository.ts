@@ -61,35 +61,6 @@ import {
 import {AvsDebugger} from '@wireapp/avs-debugger';
 import {Runtime} from '@wireapp/commons';
 
-import {
-  NetworkQualityInfo,
-  NetworkQualityInfoSchema,
-  UNKNOWN_NETWORK_QUALITY,
-} from 'Repositories/calling/calling.schema';
-import type {CallMediaChoice} from 'Repositories/calling/callMediaChoice';
-import {isMLSConversation, MLSConversation} from 'Repositories/conversation/ConversationSelectors';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
-import {EventBuilder} from 'Repositories/conversation/EventBuilder';
-import {CONSENT_TYPE, MessageRepository, MessageSendingOptions} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import type {User} from 'Repositories/entity/User';
-import {CallingEvent} from 'Repositories/event/CallingEvent';
-import {EventRepository} from 'Repositories/event/EventRepository';
-import {EventSource} from 'Repositories/event/EventSource';
-import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
-import {BackgroundEffectsHandler} from 'Repositories/media/backgroundEffectsHandler';
-import type {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
-import type {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
-import {MediaType} from 'Repositories/media/MediaType';
-import {backgroundEffectsStore, BackgroundEffectsQuality} from 'Repositories/media/useBackgroundEffectsStore';
-import type {BackgroundEffectSelection, BackgroundSource} from 'Repositories/media/VideoBackgroundEffects';
-import {TeamState} from 'Repositories/team/TeamState';
-import {EventName} from 'Repositories/tracking/eventName';
-import * as trackingHelpers from 'Repositories/tracking/helpers';
-import {Segmentation} from 'Repositories/tracking/segmentation';
-import {isTelemetryEnabledAtCurrentEnvironment} from 'Repositories/tracking/telemetry.helpers';
-import type {UserRepository} from 'Repositories/user/userRepository';
 import {flatten} from 'Util/arrayUtil';
 import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
@@ -104,8 +75,10 @@ import {toError} from 'Util/toError';
 import {createUuid} from 'Util/uuid';
 
 import {Call, SerializedConversationId} from './Call';
+import {NetworkQualityInfo, NetworkQualityInfoSchema, UNKNOWN_NETWORK_QUALITY} from './calling.schema';
 import {CallingEpochData} from './CallingEpochCache';
 import {callingSubscriptions} from './callingSubscriptionsHandler';
+import type {CallMediaChoice} from './callMediaChoice';
 import {CallingViewMode, CallState, MuteState} from './CallState';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
@@ -126,6 +99,29 @@ import {Core} from '../../service/coreSingleton';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
 import {Warnings} from '../../view_model/WarningsContainer';
 import {WebAppEvents} from '../../webAppEvents';
+import {isMLSConversation, MLSConversation} from '../conversation/ConversationSelectors';
+import {ConversationState} from '../conversation/ConversationState';
+import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
+import {EventBuilder} from '../conversation/EventBuilder';
+import {CONSENT_TYPE, MessageRepository, MessageSendingOptions} from '../conversation/MessageRepository';
+import {Conversation} from '../entity/Conversation';
+import type {User} from '../entity/User';
+import {CallingEvent} from '../event/CallingEvent';
+import {EventRepository} from '../event/EventRepository';
+import {EventSource} from '../event/EventSource';
+import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
+import {BackgroundEffectsHandler} from '../media/backgroundEffectsHandler';
+import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';
+import type {MediaStreamHandler} from '../media/MediaStreamHandler';
+import {MediaType} from '../media/MediaType';
+import {backgroundEffectsStore, BackgroundEffectsQuality} from '../media/useBackgroundEffectsStore';
+import type {BackgroundEffectSelection, BackgroundSource} from '../media/VideoBackgroundEffects';
+import {TeamState} from '../team/TeamState';
+import {EventName} from '../tracking/eventName';
+import * as trackingHelpers from '../tracking/helpers';
+import {Segmentation} from '../tracking/segmentation';
+import {isTelemetryEnabledAtCurrentEnvironment} from '../tracking/telemetry.helpers';
+import type {UserRepository} from '../user/userRepository';
 
 type DetachedExternalLinksCleanup = () => void;
 type CallingRepositoryConfig = {

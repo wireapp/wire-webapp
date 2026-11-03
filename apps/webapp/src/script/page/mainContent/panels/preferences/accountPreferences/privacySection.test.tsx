@@ -19,9 +19,9 @@
 
 import {render, screen} from '@testing-library/react';
 
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {AppLockRepository} from 'Repositories/user/appLockRepository';
-import {AppLockState} from 'Repositories/user/appLockState';
+import {PropertiesRepository} from '../../../../../repositories/properties/propertiesRepository';
+import {AppLockRepository} from '../../../../../repositories/user/appLockRepository';
+import {AppLockState} from '../../../../../repositories/user/appLockState';
 import {Config} from 'src/script/Config';
 import {withTheme} from 'src/script/auth/util/test/testUtil';
 import {translateForTest} from 'Util/test/translateForTest';

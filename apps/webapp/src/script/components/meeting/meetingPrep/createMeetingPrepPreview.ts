@@ -19,11 +19,12 @@
 
 import {task} from 'true-myth';
 
-import type {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import {MediaError} from 'src/script/error/mediaError';
 import {NoAudioInputError} from 'src/script/error/noAudioInputError';
 
 import {meetingPrepMediaKinds, meetingPrepPreviewErrors, type RequestMeetingPrepPreview} from './meetingPrepTypes';
+
+import type {MediaStreamHandler} from '../../../repositories/media/MediaStreamHandler';
 
 export const createMeetingPrepPreview = (
   streamHandler: MediaStreamHandler,

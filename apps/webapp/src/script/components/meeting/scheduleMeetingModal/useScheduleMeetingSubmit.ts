@@ -23,7 +23,6 @@ import type {Clock} from '@enormora/clock/clock';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {type Maybe, task, type Task} from 'true-myth';
 
-import type {User} from 'Repositories/entity/User';
 import {useApplicationContext, useMainViewModel} from 'src/script/page/rootProvider';
 
 import {
@@ -35,6 +34,7 @@ import {
 } from './scheduleMeetingTypes';
 import {useScheduleMeetingModal} from './useScheduleMeetingModal';
 
+import type {User} from '../../../repositories/entity/User';
 import {mapScheduleFormToMeetingCommand} from '../mapScheduleFormToMeetingCommand';
 import {mapScheduleFormToUpdateMeetingCommand} from '../mapScheduleFormToUpdateMeetingCommand';
 import {useMeetingStore} from '../meetingStore/meetingStoreProvider';

@@ -22,11 +22,11 @@ import type {FunctionComponent} from 'react';
 import {CSSObject} from '@emotion/react';
 import cx from 'classnames';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
+import {Conversation} from '../../repositories/entity/Conversation';
+import {User} from '../../repositories/entity/User';
 import * as Icon from '../icon';
 
 function isClassified(users: User[], classifiedDomains: string[], conversationDomain?: string): boolean {

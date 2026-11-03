@@ -22,9 +22,10 @@ import {Dexie} from 'dexie';
 import DexieBatch from 'dexie-batch';
 import {container} from 'tsyringe';
 
-import {CONVERSATION} from 'Repositories/event/Client';
-import {StorageService, type EventRecord} from 'Repositories/storage';
 import {Logger, getLogger} from 'Util/logger';
+
+import {CONVERSATION} from '../event/Client';
+import {StorageService, type EventRecord} from '../storage';
 
 type BackupTables = readonly [
   NonNullable<StorageService['db']>['conversations'],

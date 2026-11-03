@@ -20,10 +20,9 @@
 import type {Clock} from '@enormora/clock/clock';
 import type {Task} from 'true-myth';
 
-import type {CallingRepository} from 'Repositories/calling/CallingRepository';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
-
+import type {CallingRepository} from '../../../repositories/calling/CallingRepository';
+import type {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import type {MeetingsRepository} from '../../../repositories/meetings/meetingsRepository';
 import type {DeviceTimeZone} from '../deviceTimeZone';
 import type {MeetingSubmitErrors} from '../meetingSubmitErrors';
 import type {DeleteMeetingCommand} from '../shared/service/deleteMeeting';

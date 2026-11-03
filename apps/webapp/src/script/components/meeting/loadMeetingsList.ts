@@ -17,11 +17,12 @@
  *
  */
 
-import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
 import {getLogger} from 'Util/logger';
 
 import {mapApiMeetingToSeries} from './mapApiMeetingToSeries';
 import type {MeetingSeries} from './types/meetingSeries';
+
+import type {MeetingsRepository} from '../../repositories/meetings/meetingsRepository';
 
 export type LoadMeetingsListResult = {meetingSeries: MeetingSeries[]; hasLoadError: boolean};
 

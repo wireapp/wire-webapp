@@ -21,7 +21,7 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {CredentialType, E2eiConversationState} from '@wireapp/core/lib/messagingProtocols/mls';
 import {asyncNoop, noop} from 'noop-esm';
 
-import {Conversation} from 'Repositories/entity/Conversation';
+import {Conversation} from '../../../entity/Conversation';
 import * as e2eIdentity from 'src/script/e2eIdentity';
 import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {Core} from 'src/script/service/coreSingleton';

@@ -22,7 +22,6 @@ import {useEffect, useState, type FunctionComponent} from 'react';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import type {RestPerformActionResponse} from 'cells-sdk-ts';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CellNode} from 'src/script/types/cellNode';
 
@@ -30,6 +29,7 @@ import {CellsBulkMovePreviewPresentation} from './cellsBulkMovePreviewPresentati
 import {useBulkMoveDestinationSelection} from './useBulkMoveDestinationSelection';
 import {useMoveSelectedCellsNodes} from './useMoveSelectedCellsNodes';
 
+import {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
 import {
   CELLS_ACTION,
   useCellsActionPermissions,

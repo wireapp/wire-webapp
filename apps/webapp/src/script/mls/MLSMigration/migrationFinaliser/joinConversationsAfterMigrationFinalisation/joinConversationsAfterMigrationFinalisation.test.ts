@@ -22,9 +22,9 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {result, task} from 'true-myth';
 import {container} from 'tsyringe';
 
-import {ConversationDatabaseData, ConversationMapper} from 'Repositories/conversation/ConversationMapper';
-import type {Conversation as ConversationEntity} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import {ConversationDatabaseData, ConversationMapper} from '../../../../repositories/conversation/ConversationMapper';
+import type {Conversation as ConversationEntity} from '../../../../repositories/entity/Conversation';
+import {User} from '../../../../repositories/entity/User';
 import {Core} from 'src/script/service/coreSingleton';
 import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {TestFactory} from 'test/helper/TestFactory';

@@ -25,7 +25,6 @@ import {
   type AccessorKeyColumnDefBase,
 } from '@tanstack/react-table';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import type {RootContextValue} from 'src/script/page/rootProvider';
 import {CellNode} from 'src/script/types/cellNode';
 
@@ -37,6 +36,7 @@ import {CellsTableRowOptions} from './cellsTableRowOptions/cellsTableRowOptions'
 import {CellsTableSharedColumn} from './cellsTableSharedColumn/cellsTableSharedColumn';
 import {CellsTableTagsColumn} from './cellsTableTagsColumn/cellsTableTagsColumn';
 
+import {CellsRepository} from '../../../../repositories/cells/cellsRepository';
 import {CellsSelectionCheckbox} from '../../../cells/common/cellsSelectionCheckbox/cellsSelectionCheckbox';
 import {CellsSortDirection} from '../../../conversation/conversationCells/common/cellsSortIcon/cellsSortIcon';
 import {CellsTableSortableHeader} from '../../../conversation/conversationCells/common/cellsTableSortableHeader/cellsTableSortableHeader';

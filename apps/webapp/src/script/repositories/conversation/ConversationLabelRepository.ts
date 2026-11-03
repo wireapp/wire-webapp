@@ -22,8 +22,6 @@ import {USER_EVENT} from '@wireapp/api-client/lib/event/';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {PropertiesService} from 'Repositories/properties/propertiesService';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
@@ -33,6 +31,8 @@ import {createUuid} from 'Util/uuid';
 
 import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {WebAppEvents} from '../../webAppEvents';
+import type {Conversation} from '../entity/Conversation';
+import type {PropertiesService} from '../properties/propertiesService';
 
 export enum LabelType {
   Custom = 0,

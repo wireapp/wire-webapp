@@ -23,7 +23,7 @@ import {useState, type FunctionComponent} from 'react';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {ThemeProvider} from '@wireapp/react-ui-kit';
 import {Maybe} from 'true-myth';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
 import {
   createExecutingFireAndForgetInvokerForTest,
   createRootContextValueForTest,

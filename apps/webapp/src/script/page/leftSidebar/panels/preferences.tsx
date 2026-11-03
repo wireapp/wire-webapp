@@ -24,12 +24,6 @@ import {amplify} from 'amplify';
 import {Runtime} from '@wireapp/commons';
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {
-  ClientNotificationData,
-  Notification,
-  PreferenceNotificationRepository,
-} from 'Repositories/notification/PreferenceNotificationRepository';
-import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {troubleshooterFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
@@ -37,6 +31,12 @@ import {ListWrapper} from './listWrapper';
 
 import * as Icon from '../../../components/icon';
 import {PrimaryModal} from '../../../components/Modals/PrimaryModal';
+import {
+  ClientNotificationData,
+  Notification,
+  PreferenceNotificationRepository,
+} from '../../../repositories/notification/PreferenceNotificationRepository';
+import {TeamRepository} from '../../../repositories/team/TeamRepository';
 import {WebAppEvents} from '../../../webAppEvents';
 import {ContentState, useAppState} from '../../useAppState';
 

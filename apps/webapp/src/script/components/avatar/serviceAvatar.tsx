@@ -21,7 +21,6 @@ import React from 'react';
 
 import ko from 'knockout';
 
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {CSS_FILL_PARENT} from 'Util/cssMixin';
 
 import {AvatarBackground} from './avatarBackground';
@@ -29,6 +28,7 @@ import {AvatarBorder} from './avatarBorder';
 import {AvatarImage} from './avatarImage';
 import {AvatarWrapper} from './avatarWrapper';
 
+import {ServiceEntity} from '../../repositories/integration/ServiceEntity';
 import * as Icon from '../icon';
 
 import {AVATAR_SIZE} from '.';

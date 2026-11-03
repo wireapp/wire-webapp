@@ -21,9 +21,9 @@ import React, {type FunctionComponent} from 'react';
 
 import cx from 'classnames';
 
-import type {Conversation} from 'Repositories/entity/Conversation';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
+import type {Conversation} from '../../repositories/entity/Conversation';
 import * as Icon from '../icon';
 import {useLegalHoldModalState} from '../Modals/LegalHoldModal/LegalHoldModal.state';
 

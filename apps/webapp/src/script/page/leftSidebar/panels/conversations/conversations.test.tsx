@@ -30,13 +30,13 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '../../../../webAppEvents';
 
-import {CallState} from 'Repositories/calling/CallState';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {SearchRepository} from 'Repositories/search/searchRepository';
-import {UserRepository} from 'Repositories/user/userRepository';
+import {CallState} from '../../../../repositories/calling/CallState';
+import {ConversationRepository} from '../../../../repositories/conversation/ConversationRepository';
+import {Conversation} from '../../../../repositories/entity/Conversation';
+import {User} from '../../../../repositories/entity/User';
+import {ConversationState} from '../../../../repositories/conversation/ConversationState';
+import {SearchRepository} from '../../../../repositories/search/searchRepository';
+import {UserRepository} from '../../../../repositories/user/userRepository';
 import {withTheme, withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {
   createRootContextValueForTest,

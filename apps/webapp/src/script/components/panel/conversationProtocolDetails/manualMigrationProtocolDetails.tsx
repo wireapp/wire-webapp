@@ -23,10 +23,6 @@ import {Maybe} from 'true-myth';
 
 import {Button, ButtonVariant, COLOR} from '@wireapp/react-ui-kit';
 
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {User} from 'Repositories/entity/User';
-import type {TeamState} from 'Repositories/team/TeamState';
 import {
   canManuallyMigrateConversation,
   manuallyMigrateConversation,
@@ -51,6 +47,10 @@ import {
 } from './manualMigrationProtocolDetails.styles';
 import {useOnMultipleClicks} from './useOnMultipleClicks';
 
+import type {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import type {Conversation} from '../../../repositories/entity/Conversation';
+import type {User} from '../../../repositories/entity/User';
+import type {TeamState} from '../../../repositories/team/TeamState';
 import {ModalComponent} from '../../Modals/ModalComponent';
 
 const REQUIRED_PROTOCOL_ACTIVATIONS = 5;

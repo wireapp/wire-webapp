@@ -19,11 +19,11 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {UserState} from 'Repositories/user/userState';
 import {Logger} from 'Util/logger';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
+import {Conversation} from '../../../../entity/Conversation';
+import {UserState} from '../../../../user/userState';
 import {isMLSCapableConversation, MLSCapableConversation} from '../../../ConversationSelectors';
 import {ConversationState} from '../../../ConversationState';
 import {ConversationVerificationState} from '../../../ConversationVerificationState';

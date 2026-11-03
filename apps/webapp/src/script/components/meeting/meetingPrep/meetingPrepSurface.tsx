@@ -24,8 +24,6 @@ import {Maybe, maybe} from 'true-myth';
 
 import {Button, ButtonVariant, CloseIcon, Loading} from '@wireapp/react-ui-kit';
 
-import type {User} from 'Repositories/entity/User';
-import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {Config} from 'src/script/Config';
 import {renderNoCameraMessage} from 'src/script/page/mainContent/panels/preferences/avPreferences/cameraPreferences';
 import {InputLevel} from 'src/script/page/mainContent/panels/preferences/avPreferences/inputLevel';
@@ -63,6 +61,8 @@ import type {
 } from './meetingPrepTypes';
 import {meetingPrepDeviceKinds, meetingPrepMediaKinds, meetingPrepPreviewErrors} from './meetingPrepTypes';
 
+import type {User} from '../../../repositories/entity/User';
+import {useMediaDevicesStore} from '../../../repositories/media/useMediaDevicesStore';
 import {Avatar, AVATAR_SIZE} from '../../avatar';
 import {groupVideoBackgroundInitializingOverlay} from '../../calling/GroupVideoGridTile.styles';
 import {useShowLoadingOverlay} from '../../calling/useShowLoadingOverlay';

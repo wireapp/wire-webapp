@@ -19,12 +19,12 @@
 
 import {render} from '@testing-library/react';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {FileAsset} from 'Repositories/entity/message/fileAsset';
-import {LinkPreview} from 'Repositories/entity/message/linkPreview';
-import {MediumImage} from 'Repositories/entity/message/mediumImage';
-import {Text} from 'Repositories/entity/message/text';
+import {Conversation} from '../../../../repositories/entity/Conversation';
+import {ContentMessage} from '../../../../repositories/entity/message/contentMessage';
+import {FileAsset} from '../../../../repositories/entity/message/fileAsset';
+import {LinkPreview} from '../../../../repositories/entity/message/linkPreview';
+import {MediumImage} from '../../../../repositories/entity/message/mediumImage';
+import {Text} from '../../../../repositories/entity/message/text';
 import {MessageCategory} from 'src/script/message/messageCategory';
 import {
   createRootContextValueForTest,

@@ -21,7 +21,6 @@ import {useEffect, useState, type FunctionComponent} from 'react';
 
 import {Maybe} from 'true-myth';
 
-import type {Conversation} from 'Repositories/entity/Conversation';
 import {isFileEditable} from 'Util/fileTypeUtil';
 import {getFileTypeFromExtension} from 'Util/getFileTypeFromExtension/getFileTypeFromExtension';
 import {getBestPreviewSource} from 'Util/imageUtil';
@@ -35,6 +34,7 @@ import {ImageFileView} from './ImageFileView/ImageFileView';
 import {NoPreviewAvailable} from './NoPreviewAvailable/NoPreviewAvailable';
 import {PDFViewer} from './PdfViewer/PdfViewer';
 
+import type {Conversation} from '../../repositories/entity/Conversation';
 import {
   CELLS_ACTION,
   useCellsActionPermissions,

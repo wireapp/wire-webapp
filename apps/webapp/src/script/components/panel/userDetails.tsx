@@ -23,10 +23,10 @@ import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import {ErrorBoundary} from 'react-error-boundary';
 
-import {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
+import {User} from '../../repositories/entity/User';
 import {WebAppEvents} from '../../webAppEvents';
 import {Avatar, AVATAR_SIZE} from '../avatar';
 import {UserBlockedBadge, UserVerificationBadges} from '../badge';

@@ -22,14 +22,14 @@ import {act, render, waitFor} from '@testing-library/react';
 import {QUERY, useMatchMedia} from '@wireapp/react-ui-kit';
 import {noop} from 'noop-esm';
 
-import {Call} from 'Repositories/calling/Call';
-import {Participant} from 'Repositories/calling/Participant';
-import {Grid} from 'Repositories/calling/videoGridHandler';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {PropertiesService} from 'Repositories/properties/propertiesService';
-import {SelfService} from 'Repositories/self/SelfService';
+import {Call} from '../../repositories/calling/Call';
+import {Participant} from '../../repositories/calling/Participant';
+import {Grid} from '../../repositories/calling/videoGridHandler';
+import {Conversation} from '../../repositories/entity/Conversation';
+import {User} from '../../repositories/entity/User';
+import {PropertiesRepository} from '../../repositories/properties/propertiesRepository';
+import {PropertiesService} from '../../repositories/properties/propertiesService';
+import {SelfService} from '../../repositories/self/SelfService';
 import {buildCallingRepository, buildMediaDevicesHandler, withTheme} from 'src/script/auth/util/test/testUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 import {
@@ -39,7 +39,7 @@ import {
 import {translate} from 'Util/localizerUtil';
 
 import {FullscreenVideoCall, FullscreenVideoCallProps} from './FullscreenVideoCall';
-import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
+import {CallingViewMode, CallState} from '../../repositories/calling/CallState';
 import {KEY} from 'Util/keyboardUtil';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 

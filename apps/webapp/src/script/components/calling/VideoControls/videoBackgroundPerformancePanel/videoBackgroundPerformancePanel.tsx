@@ -24,10 +24,6 @@ import {Maybe} from 'true-myth';
 
 import {Button, ButtonVariant, CloseIcon, Option, Select} from '@wireapp/react-ui-kit';
 
-import {QualityMode} from 'Repositories/media/backgroundEffects';
-import {CapabilityInfo} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
-import type {BackgroundEffectsHandler} from 'Repositories/media/backgroundEffectsHandler';
-import {RenderMetrics, useBackgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {areCapabilityInfosEqual} from './capabilityInformationValidator';
@@ -46,6 +42,11 @@ import {
   performancePanelStyles,
   performancePanelTitleStyles,
 } from './videoBackgroundPerformancePanel.styles';
+
+import {QualityMode} from '../../../../repositories/media/backgroundEffects';
+import {CapabilityInfo} from '../../../../repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
+import type {BackgroundEffectsHandler} from '../../../../repositories/media/backgroundEffectsHandler';
+import {RenderMetrics, useBackgroundEffectsStore} from '../../../../repositories/media/useBackgroundEffectsStore';
 
 type PerformancePanelProps = {
   backgroundEffectsHandler: BackgroundEffectsHandler;

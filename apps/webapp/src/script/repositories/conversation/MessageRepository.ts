@@ -61,35 +61,6 @@ import {partition} from 'underscore';
 
 import {Asset, Availability, Confirmation, GenericMessage} from '@wireapp/protocol-messaging';
 
-import {buildMetadata, ImageMetadata, isAudio, isImage, isVideo} from 'Repositories/assets/assetMetaDataBuilder';
-import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import {AudioRepository} from 'Repositories/audio/audioRepository';
-import {AudioType} from 'Repositories/audio/audioType';
-import {ClientState} from 'Repositories/client/ClientState';
-import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
-import {PROTO_MESSAGE_TYPE} from 'Repositories/cryptography/ProtoMessageType';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {CompositeMessage} from 'Repositories/entity/message/compositeMessage';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {FileAsset} from 'Repositories/entity/message/fileAsset';
-import {Message} from 'Repositories/entity/message/message';
-import {User} from 'Repositories/entity/User';
-import {EventRepository} from 'Repositories/event/EventRepository';
-import {EventService, type IdentifiedUpdatePayload} from 'Repositories/event/EventService';
-import {EventTypeHandling} from 'Repositories/event/EventTypeHandling';
-import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
-import type {EventRecord, ReactionMap} from 'Repositories/storage';
-import {TeamState} from 'Repositories/team/TeamState';
-import {UserType} from 'Repositories/tracking/attribute';
-import {EventName} from 'Repositories/tracking/eventName';
-import * as trackingHelpers from 'Repositories/tracking/helpers';
-import {Segmentation} from 'Repositories/tracking/segmentation';
-import {protoFromType} from 'Repositories/user/availabilityMapper';
-import {UserRepository} from 'Repositories/user/userRepository';
-import {UserState} from 'Repositories/user/userState';
 import {
   cancelSendingLinkPreview,
   clearLinkPreviewSendingState,
@@ -126,6 +97,35 @@ import {StatusType} from '../../message/statusType';
 import {Core} from '../../service/coreSingleton';
 import {ServerTimeHandler} from '../../time/serverTimeHandler';
 import {WebAppEvents} from '../../webAppEvents';
+import {buildMetadata, ImageMetadata, isAudio, isImage, isVideo} from '../assets/assetMetaDataBuilder';
+import {AssetRepository} from '../assets/assetRepository';
+import {AssetTransferState} from '../assets/assetTransferState';
+import {AudioRepository} from '../audio/audioRepository';
+import {AudioType} from '../audio/audioType';
+import {ClientState} from '../client/ClientState';
+import {CryptographyRepository} from '../cryptography/CryptographyRepository';
+import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
+import {Conversation} from '../entity/Conversation';
+import {CompositeMessage} from '../entity/message/compositeMessage';
+import {ContentMessage} from '../entity/message/contentMessage';
+import {FileAsset} from '../entity/message/fileAsset';
+import {Message} from '../entity/message/message';
+import {User} from '../entity/User';
+import {EventRepository} from '../event/EventRepository';
+import {EventService, type IdentifiedUpdatePayload} from '../event/EventService';
+import {EventTypeHandling} from '../event/EventTypeHandling';
+import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
+import {PropertiesRepository} from '../properties/propertiesRepository';
+import {PROPERTIES_TYPE} from '../properties/propertiesType';
+import type {EventRecord, ReactionMap} from '../storage';
+import {TeamState} from '../team/TeamState';
+import {UserType} from '../tracking/attribute';
+import {EventName} from '../tracking/eventName';
+import * as trackingHelpers from '../tracking/helpers';
+import {Segmentation} from '../tracking/segmentation';
+import {protoFromType} from '../user/availabilityMapper';
+import {UserRepository} from '../user/userRepository';
+import {UserState} from '../user/userState';
 
 type OptimisticMessageEvent = Parameters<EventRepository['injectEvent']>[0];
 

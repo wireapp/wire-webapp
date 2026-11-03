@@ -20,12 +20,12 @@
 import {isNullOrUndefined, isTruthy} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
-import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
-import {EventName} from 'Repositories/tracking/eventName';
 import {KEY} from 'Util/keyboardUtil';
 
 import {useActiveWindowState} from '../../../../hooks/useActiveWindow';
 import {useKeyPressAndHold} from '../../../../hooks/useKeyPressAndHold/useKeyPressAndHold';
+import {CallingViewMode, CallState} from '../../../../repositories/calling/CallState';
+import {EventName} from '../../../../repositories/tracking/eventName';
 import {WebAppEvents} from '../../../../webAppEvents';
 import {useAppNotification} from '../../../appNotification';
 import {MicOnIcon} from '../../../icon';

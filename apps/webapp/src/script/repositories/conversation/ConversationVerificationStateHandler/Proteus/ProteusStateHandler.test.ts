@@ -17,9 +17,9 @@
  *
  */
 
-import {ClientEntity} from 'Repositories/client/ClientEntity';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import {ClientEntity} from '../../../client/ClientEntity';
+import {Conversation} from '../../../entity/Conversation';
+import {User} from '../../../entity/User';
 import {createUuid} from 'Util/uuid';
 
 import {ProteusConversationVerificationStateHandler} from './ProteusStateHandler';

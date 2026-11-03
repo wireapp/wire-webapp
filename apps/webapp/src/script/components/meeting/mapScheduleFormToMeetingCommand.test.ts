@@ -20,7 +20,7 @@
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {maybe} from 'true-myth';
 
-import {User} from 'Repositories/entity/User';
+import {User} from '../../repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';
 import {unwrap, unwrapErr} from 'Util/test/resultTestSupport';
 

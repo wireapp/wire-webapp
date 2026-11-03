@@ -19,7 +19,7 @@
 
 import {act, renderHook} from '@testing-library/react';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {CellsRepository} from '../../../../../../../../repositories/cells/cellsRepository';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

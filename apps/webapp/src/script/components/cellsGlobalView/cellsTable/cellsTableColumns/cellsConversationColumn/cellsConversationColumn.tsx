@@ -21,12 +21,12 @@ import type {FunctionComponent} from 'react';
 
 import {isUndefined} from '@sindresorhus/is';
 
-import {Conversation} from 'Repositories/entity/Conversation';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {avatarWrapperStyles, textStyles, wrapperStyles} from './cellsConversationColumn.styles';
 
+import {Conversation} from '../../../../../repositories/entity/Conversation';
 import {GroupAvatar, ChannelAvatar} from '../../../../avatar';
 import {openConversation} from '../../../common/openConversation/openConversation';
 

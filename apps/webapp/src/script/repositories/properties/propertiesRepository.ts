@@ -25,12 +25,6 @@ import {AudioPreference, NotificationPreference, WebappProperties} from '@wireap
 import {amplify} from 'amplify';
 import ko from 'knockout';
 
-import type {User} from 'Repositories/entity/User';
-import type {SelfService} from 'Repositories/self/SelfService';
-import {StorageKey} from 'Repositories/storage';
-import {isTelemetryEnabledAtCurrentEnvironment} from 'Repositories/tracking/telemetry.helpers';
-import {ConsentValue} from 'Repositories/user/consentValue';
-import {CONVERSATION_TYPING_INDICATOR_MODE} from 'Repositories/user/typingIndicatorMode';
 import {Config} from 'src/script/Config';
 import {Environment} from 'Util/environment';
 import {type Translate} from 'Util/localizerUtil';
@@ -43,6 +37,12 @@ import {PROPERTIES_TYPE, UserConsentStatus} from './propertiesType';
 import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {PrimaryModalType} from '../../components/Modals/PrimaryModal/PrimaryModalTypes';
 import {WebAppEvents} from '../../webAppEvents';
+import type {User} from '../entity/User';
+import type {SelfService} from '../self/SelfService';
+import {StorageKey} from '../storage';
+import {isTelemetryEnabledAtCurrentEnvironment} from '../tracking/telemetry.helpers';
+import {ConsentValue} from '../user/consentValue';
+import {CONVERSATION_TYPING_INDICATOR_MODE} from '../user/typingIndicatorMode';
 
 const mergeWebappProperties = createDeepmerge();
 const nestedPreferencePathDepth = 2;

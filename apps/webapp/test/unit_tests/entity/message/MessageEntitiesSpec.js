@@ -17,10 +17,10 @@
  *
  */
 
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {FileAsset} from 'Repositories/entity/message/fileAsset';
-import {MediumImage} from 'Repositories/entity/message/mediumImage';
-import {Text} from 'Repositories/entity/message/text';
+import {ContentMessage} from '../../../../src/script/repositories/entity/message/contentMessage';
+import {FileAsset} from '../../../../src/script/repositories/entity/message/fileAsset';
+import {MediumImage} from '../../../../src/script/repositories/entity/message/mediumImage';
+import {Text} from '../../../../src/script/repositories/entity/message/text';
 import {StatusType} from 'src/script/message/statusType';
 import {translate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';

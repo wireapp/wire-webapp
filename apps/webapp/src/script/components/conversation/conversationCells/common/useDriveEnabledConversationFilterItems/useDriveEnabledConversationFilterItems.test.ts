@@ -17,8 +17,8 @@
  *
  */
 
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import type {Conversation} from 'Repositories/entity/Conversation';
+import type {ConversationRepository} from '../../../../../repositories/conversation/ConversationRepository';
+import type {Conversation} from '../../../../../repositories/entity/Conversation';
 
 import {getDriveEnabledConversations} from './useDriveEnabledConversationFilterItems';
 

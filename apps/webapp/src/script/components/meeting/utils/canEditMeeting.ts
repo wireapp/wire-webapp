@@ -17,9 +17,9 @@
  *
  */
 
-import type {User} from 'Repositories/entity/User';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
+import type {User} from '../../../repositories/entity/User';
 import type {MeetingInstance} from '../types/meetingInstance';
 import type {MeetingSeries} from '../types/meetingSeries';
 

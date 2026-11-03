@@ -17,8 +17,8 @@
  *
  */
 
-import {MemberMessage} from 'Repositories/entity/message/memberMessage';
-import {ClientEvent} from 'Repositories/event/Client';
+import {MemberMessage} from '../../../repositories/entity/message/memberMessage';
+import {ClientEvent} from '../../../repositories/event/Client';
 import {translateForTest} from 'Util/test/translateForTest';
 
 import {filterMessages} from './messagesFilter';

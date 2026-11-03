@@ -22,7 +22,7 @@ import type {FunctionComponent} from 'react';
 import {Maybe} from 'true-myth';
 import userEvent from '@testing-library/user-event';
 import {noop} from 'noop-esm';
-import type {UploadState} from 'Repositories/cells/upload';
+import type {UploadState} from '../../../repositories/cells/upload';
 import type {Translate} from 'Util/localizerUtil';
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
 import {

@@ -17,12 +17,12 @@
  *
  */
 
-import {ClientEvent} from 'Repositories/event/Client';
 import {Translate} from 'Util/localizerUtil';
 
 import {SystemMessage} from './systemMessage';
 
 import {SystemMessageType} from '../../../message/systemMessageType';
+import {ClientEvent} from '../../event/Client';
 
 export class MemberRoleUpdateMessage extends SystemMessage {
   constructor(translate: Translate) {

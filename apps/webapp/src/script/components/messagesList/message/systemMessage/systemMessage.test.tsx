@@ -19,12 +19,12 @@
 
 import {render, screen} from '@testing-library/react';
 
-import {MemberRoleUpdateMessage} from 'Repositories/entity/message/memberRoleUpdateMessage';
-import {MessageTimerUpdateMessage} from 'Repositories/entity/message/messageTimerUpdateMessage';
-import {ReceiptModeUpdateMessage} from 'Repositories/entity/message/receiptModeUpdateMessage';
-import {RenameMessage} from 'Repositories/entity/message/renameMessage';
-import {SystemMessage as SystemMessageEntity} from 'Repositories/entity/message/systemMessage';
-import {JoinedAfterMLSMigrationFinalisationMessage} from 'Repositories/entity/message/joinedAfterMlsMigrationFinalisationMessage';
+import {MemberRoleUpdateMessage} from '../../../../repositories/entity/message/memberRoleUpdateMessage';
+import {MessageTimerUpdateMessage} from '../../../../repositories/entity/message/messageTimerUpdateMessage';
+import {ReceiptModeUpdateMessage} from '../../../../repositories/entity/message/receiptModeUpdateMessage';
+import {RenameMessage} from '../../../../repositories/entity/message/renameMessage';
+import {SystemMessage as SystemMessageEntity} from '../../../../repositories/entity/message/systemMessage';
+import {JoinedAfterMLSMigrationFinalisationMessage} from '../../../../repositories/entity/message/joinedAfterMlsMigrationFinalisationMessage';
 import type {Translate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 

@@ -20,13 +20,13 @@
 import {render, screen} from '@testing-library/react';
 import {container} from 'tsyringe';
 
-import {ClientRepository} from 'Repositories/client';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {User} from 'Repositories/entity/User';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {TeamState} from 'Repositories/team/TeamState';
-import {AppLockRepository} from 'Repositories/user/appLockRepository';
-import type {UserRepository} from 'Repositories/user/userRepository';
+import {ClientRepository} from '../../../../repositories/client';
+import {ConversationRepository} from '../../../../repositories/conversation/ConversationRepository';
+import {User} from '../../../../repositories/entity/User';
+import {PropertiesRepository} from '../../../../repositories/properties/propertiesRepository';
+import {TeamState} from '../../../../repositories/team/TeamState';
+import {AppLockRepository} from '../../../../repositories/user/appLockRepository';
+import type {UserRepository} from '../../../../repositories/user/userRepository';
 import {Config} from 'src/script/Config';
 import {withTheme} from 'src/script/auth/util/test/testUtil';
 import {

@@ -20,11 +20,11 @@
 import {isNonEmptyString} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {getFileExtension, trimFileExtension, formatBytes} from 'Util/util';
 
+import {CellsRepository} from '../../../../repositories/cells/cellsRepository';
 import {FileWithPreview, useFileUploadState} from '../../../conversation/useFilesUploadState/useFilesUploadState';
 import {buildCellsUploadPath} from '../../../conversation/utils/buildCellsUploadPath';
 

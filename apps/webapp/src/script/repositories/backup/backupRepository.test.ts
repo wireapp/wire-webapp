@@ -26,11 +26,11 @@ import {generateConversation} from 'test/helper/ConversationGenerator';
 import {TestFactory} from 'test/helper/TestFactory';
 import {generateAPIUser} from 'test/helper/UserGenerator';
 
-import {User} from 'Repositories/entity/User';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {ClientEvent} from 'Repositories/event/Client';
-import {StorageService} from 'Repositories/storage';
-import {StorageSchemata} from 'Repositories/storage/storageSchemata';
+import {User} from '../entity/User';
+import type {ConversationRepository} from '../conversation/ConversationRepository';
+import {ClientEvent} from '../event/Client';
+import {StorageService} from '../storage';
+import {StorageSchemata} from '../storage/storageSchemata';
 import {noop} from 'Util/util';
 import {createUuid} from 'Util/uuid';
 import {WebWorker} from 'Util/worker';

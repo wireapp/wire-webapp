@@ -52,14 +52,6 @@ import {MLSServiceEvents} from '@wireapp/core/lib/messagingProtocols/mls';
 import {Task, task} from 'true-myth';
 import {container} from 'tsyringe';
 
-import type {Conversation as ConversationEntity} from 'Repositories/entity/Conversation';
-import {ClientEvent} from 'Repositories/event/Client';
-import type {EventService} from 'Repositories/event/EventService';
-import {getSearchRegex} from 'Repositories/search/fullTextSearch';
-import type {EventRecord} from 'Repositories/storage';
-import {StorageService} from 'Repositories/storage';
-import {ConversationRecord} from 'Repositories/storage/record/conversationRecord';
-import {StorageSchemata} from 'Repositories/storage/storageSchemata';
 import {getLogger} from 'Util/logger';
 
 import {MLSCapableConversation} from './ConversationSelectors';
@@ -67,6 +59,14 @@ import {MLSCapableConversation} from './ConversationSelectors';
 import {MessageCategory} from '../../message/messageCategory';
 import {APIClient} from '../../service/apiClientSingleton';
 import {Core} from '../../service/coreSingleton';
+import type {Conversation as ConversationEntity} from '../entity/Conversation';
+import {ClientEvent} from '../event/Client';
+import type {EventService} from '../event/EventService';
+import {getSearchRegex} from '../search/fullTextSearch';
+import type {EventRecord} from '../storage';
+import {StorageService} from '../storage';
+import {ConversationRecord} from '../storage/record/conversationRecord';
+import {StorageSchemata} from '../storage/storageSchemata';
 
 const minimumLegacyAccessRoleBackendVersion = 3;
 const remoteConversationLookbackInDays = 30;

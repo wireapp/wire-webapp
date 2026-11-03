@@ -20,8 +20,8 @@
 import {render} from '@testing-library/react';
 import ko from 'knockout';
 
-import {PingMessage as PingMessageEntity} from 'Repositories/entity/message/pingMessage';
-import {ReadReceipt} from 'Repositories/storage';
+import {PingMessage as PingMessageEntity} from '../../../repositories/entity/message/pingMessage';
+import {ReadReceipt} from '../../../repositories/storage';
 import {translateForTest} from 'Util/test/translateForTest';
 import {
   createRootContextValueForTest,

@@ -26,10 +26,6 @@ import ko from 'knockout';
 
 import {Availability} from '@wireapp/protocol-messaging';
 
-import type {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
-import type {ClientEntity} from 'Repositories/client/ClientEntity';
-import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
-import {ROLE as TEAM_ROLE} from 'Repositories/user/userPermission';
 import type {Translate} from 'Util/localizerUtil';
 import {clamp} from 'Util/numberUtil';
 import {getFirstChar} from 'Util/stringUtil';
@@ -37,6 +33,10 @@ import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {ACCENT_ID} from '../../../Config';
 import {WebAppEvents} from '../../../webAppEvents';
+import type {AssetRemoteData} from '../../assets/assetRemoteData';
+import type {ClientEntity} from '../../client/ClientEntity';
+import {ConnectionEntity} from '../../connection/connectionEntity';
+import {ROLE as TEAM_ROLE} from '../../user/userPermission';
 
 const guestExpirationThresholdInSeconds = 10;
 const singleNameInitialsLength = 2;

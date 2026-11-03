@@ -26,12 +26,6 @@ import {amplify} from 'amplify';
 
 import {ChevronIcon, SecondaryButton} from '@wireapp/react-ui-kit';
 
-import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {User} from 'Repositories/entity/User';
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
@@ -46,6 +40,12 @@ import {Category, isOfCategory} from './utils';
 import * as Icon from '../../../../components/icon';
 import {showDetailViewModal} from '../../../../components/Modals/DetailViewModal';
 import {MessageCategory} from '../../../../message/messageCategory';
+import {AssetRepository} from '../../../../repositories/assets/assetRepository';
+import {ConversationRepository} from '../../../../repositories/conversation/ConversationRepository';
+import {MessageRepository} from '../../../../repositories/conversation/MessageRepository';
+import {Conversation} from '../../../../repositories/entity/Conversation';
+import {ContentMessage} from '../../../../repositories/entity/message/contentMessage';
+import {User} from '../../../../repositories/entity/User';
 import {WebAppEvents} from '../../../../webAppEvents';
 
 type CollectionProps = {

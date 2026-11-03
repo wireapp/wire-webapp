@@ -17,9 +17,9 @@
  *
  */
 
-import {AssetTransferState} from 'Repositories/assets/assetTransferState';
+import {AssetTransferState} from '../../../src/script/repositories/assets/assetTransferState';
 import {noop} from 'noop-esm';
-import {StorageSchemata} from 'Repositories/storage/storageSchemata';
+import {StorageSchemata} from '../../../src/script/repositories/storage/storageSchemata';
 import {ConversationError} from 'src/script/error/conversationError';
 import {StorageError} from 'src/script/error/storageError';
 import {MessageCategory} from 'src/script/message/messageCategory';

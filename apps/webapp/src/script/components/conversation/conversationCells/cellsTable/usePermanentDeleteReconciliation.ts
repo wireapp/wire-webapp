@@ -23,8 +23,7 @@ import type {Clock} from '@enormora/clock/clock';
 import {BackendError, StatusCode} from '@wireapp/api-client/lib/http/';
 import {maybe} from 'true-myth';
 
-import type {CellsRepository} from 'Repositories/cells/cellsRepository';
-
+import type {CellsRepository} from '../../../../repositories/cells/cellsRepository';
 import {
   checkCellsBackgroundActionJobs,
   getCellsBackgroundActionEvidence,

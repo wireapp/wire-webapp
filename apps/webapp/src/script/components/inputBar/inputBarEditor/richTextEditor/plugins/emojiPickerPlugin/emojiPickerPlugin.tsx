@@ -27,12 +27,12 @@ import emojiList from 'emoji-picker-react/src/data/emojis.json';
 import {$createTextNode, TextNode} from 'lexical';
 import * as ReactDOM from 'react-dom';
 
-import {StorageKey} from 'Repositories/storage';
 import {loadValue, storeValue} from 'Util/storageUtil';
 import {sortByPriority} from 'Util/stringUtil';
 
 import {EmojiItem} from './emojiItem';
 
+import {StorageKey} from '../../../../../../repositories/storage';
 import {getDOMRangeRect} from '../../utils/getDomRangeRect';
 import {getSelectionInfo} from '../../utils/getSelectionInfo';
 import {TypeaheadMenuPlugin} from '../typeaheadMenuPlugin/typeaheadMenuPlugin';

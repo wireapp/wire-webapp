@@ -24,7 +24,6 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {VIDEO_STATE} from '@wireapp/avs';
 import {Loading, TabIndex} from '@wireapp/react-ui-kit';
 
-import type {Participant} from 'Repositories/calling/Participant';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isEnterKey} from 'Util/keyboardUtil';
@@ -43,6 +42,7 @@ import {
 import {useShowLoadingOverlay} from './useShowLoadingOverlay';
 import {Video} from './Video';
 
+import type {Participant} from '../../repositories/calling/Participant';
 import {Avatar, AVATAR_SIZE} from '../avatar';
 import * as Icon from '../icon';
 

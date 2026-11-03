@@ -19,13 +19,13 @@
 
 import type {FunctionComponent} from 'react';
 
-import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {E2EIHandler, WireIdentity} from 'src/script/e2eIdentity';
 
 import {MLSDeviceDetails} from './mlsDeviceDetails';
 import {ProteusDeviceDetails} from './proteusDeviceDetails';
 
 import {DeviceVerificationBadges} from '../../../../../../components/badge';
+import {ClientEntity} from '../../../../../../repositories/client/ClientEntity';
 
 export interface DeviceProps {
   device: ClientEntity;

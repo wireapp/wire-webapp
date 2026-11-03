@@ -22,10 +22,10 @@ import userEvent from '@testing-library/user-event';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {ConversationLabelRepository} from 'Repositories/conversation/ConversationLabelRepository';
-import {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
+import {ConversationRepository} from '../../../../../repositories/conversation/ConversationRepository';
+import {ConversationLabelRepository} from '../../../../../repositories/conversation/ConversationLabelRepository';
+import {User} from '../../../../../repositories/entity/User';
+import {TeamState} from '../../../../../repositories/team/TeamState';
 import {Config} from 'src/script/Config';
 import {Core} from 'src/script/service/coreSingleton';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';

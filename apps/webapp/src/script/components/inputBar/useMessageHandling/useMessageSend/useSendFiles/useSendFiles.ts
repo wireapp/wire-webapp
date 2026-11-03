@@ -21,8 +21,7 @@ import {useCallback, useState} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-
+import {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
 import {useAppNotification} from '../../../../appNotification';
 import {FileWithPreview} from '../../../../conversation/useFilesUploadState/useFilesUploadState';
 

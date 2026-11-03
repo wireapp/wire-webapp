@@ -19,9 +19,9 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {CellNode} from 'src/script/types/cellNode';
 
+import {CellsRepository} from '../../../../../../../repositories/cells/cellsRepository';
 import {useCellsStore} from '../../../../common/useCellsStore/useCellsStore';
 
 interface UseRestoreNestedNodeProps {

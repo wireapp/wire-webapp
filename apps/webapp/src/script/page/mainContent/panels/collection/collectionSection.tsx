@@ -19,10 +19,11 @@
 
 import React, {type FunctionComponent} from 'react';
 
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {CollectionItem} from './collectionItem';
+
+import {ContentMessage} from '../../../../repositories/entity/message/contentMessage';
 
 const CollectionSection: FunctionComponent<{
   children: React.ReactNode;

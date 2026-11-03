@@ -22,15 +22,15 @@ import type {FunctionComponent} from 'react';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {Call} from 'Repositories/calling/Call';
-import {DesktopScreenShareMenu} from 'Repositories/calling/CallState';
-import {Participant} from 'Repositories/calling/Participant';
-import {TeamState} from 'Repositories/team/TeamState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {cellControlsList, cellControlsWrapper} from './CallingControls.styles';
 
+import {Call} from '../../../../repositories/calling/Call';
+import {DesktopScreenShareMenu} from '../../../../repositories/calling/CallState';
+import {Participant} from '../../../../repositories/calling/Participant';
+import {TeamState} from '../../../../repositories/team/TeamState';
 import {CallActions} from '../../../../view_model/CallingViewModel';
 import * as Icon from '../../../icon';
 import {useCallAlertState} from '../../useCallAlertState';

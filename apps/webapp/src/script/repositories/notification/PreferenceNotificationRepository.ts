@@ -25,13 +25,13 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import {groupBy} from 'underscore';
 
-import type {ClientEntity} from 'Repositories/client/ClientEntity';
-import type {User} from 'Repositories/entity/User';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {loadValue, resetStoreValue, storeValue} from 'Util/storageUtil';
 
 import {WebAppEvents} from '../../webAppEvents';
+import type {ClientEntity} from '../client/ClientEntity';
+import type {User} from '../entity/User';
+import {PropertiesRepository} from '../properties/propertiesRepository';
 
 export type ClientNotificationData = {
   domain?: string;

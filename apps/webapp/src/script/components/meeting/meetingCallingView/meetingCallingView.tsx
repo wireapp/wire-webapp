@@ -21,13 +21,13 @@ import type {FunctionComponent} from 'react';
 
 import {container} from 'tsyringe';
 
-import {CallState} from 'Repositories/calling/CallState';
-import {TeamState} from 'Repositories/team/TeamState';
 import {useApplicationContext, useMainViewModel} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {meetingCallingViewStyles} from './meetingCallingView.styles';
 
+import {CallState} from '../../../repositories/calling/CallState';
+import {TeamState} from '../../../repositories/team/TeamState';
 import {CallingCell} from '../../calling/CallingCell';
 import {useMeetingNotificationStore} from '../meetingNotificationStore/meetingNotificationStore';
 

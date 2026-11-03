@@ -20,8 +20,8 @@
 import {render, fireEvent} from '@testing-library/react';
 import ko from 'knockout';
 
-import {Message as MessageEntity} from 'Repositories/entity/message/message';
-import {ReadReceipt} from 'Repositories/storage';
+import {Message as MessageEntity} from '../../../repositories/entity/message/message';
+import {ReadReceipt} from '../../../repositories/storage';
 import {translateForTest} from 'Util/test/translateForTest';
 import {
   createRootContextValueForTest,

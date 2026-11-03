@@ -22,7 +22,6 @@ import {useEffect, useRef, useState, type FunctionComponent} from 'react';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isUndefined} from '@sindresorhus/is';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import type {RootContextValue} from 'src/script/page/rootProvider';
 import {createUuid} from 'Util/uuid';
 
@@ -49,6 +48,7 @@ import {
 } from './cellsNodeShareModal.styles';
 import {useCellConversationPublicLink} from './useCellConversationPublicLink';
 
+import {CellsRepository} from '../../../../../../repositories/cells/cellsRepository';
 import {CellsShareModalContent} from '../../../../../cells/shareModal/cellsShareModalContent';
 import {serializeShareModalInput} from '../../../../../cells/shareModal/shareModalSerializer';
 import {useCellExpirationToggle} from '../../../../../cells/shareModal/useCellExpirationToggle';

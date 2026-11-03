@@ -26,12 +26,6 @@ import {container} from 'tsyringe';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {ACCESS_STATE} from 'Repositories/conversation/AccessState';
-import {teamPermissionsForAccessState} from 'Repositories/conversation/ConversationAccessPermission';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {TeamRepository} from 'Repositories/team/TeamRepository';
-import {TeamState} from 'Repositories/team/TeamState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {copyText} from 'Util/clipboardUtil';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
@@ -42,6 +36,12 @@ import {RadioGroup} from '../../../../../components/Radio';
 import {SelectText} from '../../../../../components/SelectText';
 import {BaseToggle} from '../../../../../components/toggle/BaseToggle';
 import {Config} from '../../../../../Config';
+import {ACCESS_STATE} from '../../../../../repositories/conversation/AccessState';
+import {teamPermissionsForAccessState} from '../../../../../repositories/conversation/ConversationAccessPermission';
+import {ConversationRepository} from '../../../../../repositories/conversation/ConversationRepository';
+import {Conversation} from '../../../../../repositories/entity/Conversation';
+import {TeamRepository} from '../../../../../repositories/team/TeamRepository';
+import {TeamState} from '../../../../../repositories/team/TeamState';
 
 const COPY_LINK_CONFIRM_DURATION = 1500;
 

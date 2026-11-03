@@ -21,9 +21,9 @@ import {isUndefined} from '@sindresorhus/is';
 import {act, renderHook} from '@testing-library/react';
 import {RestNode, RestNodeCollection} from 'cells-sdk-ts';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {UserRepository} from 'Repositories/user/userRepository';
+import {CellsRepository} from '../../../repositories/cells/cellsRepository';
+import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import {UserRepository} from '../../../repositories/user/userRepository';
 import {createExecutingFireAndForgetInvokerForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import type {Logger} from 'Util/logger';
 

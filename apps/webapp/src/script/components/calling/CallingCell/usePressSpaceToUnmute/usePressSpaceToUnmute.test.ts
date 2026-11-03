@@ -21,7 +21,7 @@ import {renderHook} from '@testing-library/react';
 
 import {useAppNotification} from '../../../appNotification';
 import {useKeyPressAndHold} from '../../../../hooks/useKeyPressAndHold/useKeyPressAndHold';
-import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
+import {CallingViewMode, CallState} from '../../../../repositories/calling/CallState';
 
 import {usePressSpaceToUnmute} from './usePressSpaceToUnmute';
 

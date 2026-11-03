@@ -22,7 +22,7 @@ import type {MutableRefObject} from 'react';
 import {renderHook, act} from '@testing-library/react';
 import {Virtualizer} from '@tanstack/react-virtual';
 
-import {Message} from 'Repositories/entity/message/message';
+import {Message} from '../../../repositories/entity/message/message';
 
 import {GroupedMessage, Marker} from './virtualizedMessagesGroup';
 import {getInitialScrollPosition, useScrollToLastUnreadMessage} from './useScrollToLastUnreadMessage';

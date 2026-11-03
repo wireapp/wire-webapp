@@ -20,13 +20,13 @@
 import {isNan, isNull} from '@sindresorhus/is';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 
-import {ConversationEphemeralHandler} from 'Repositories/conversation/ConversationEphemeralHandler';
 import {type Translate} from 'Util/localizerUtil';
 import {formatDuration} from 'Util/timeUtil';
 
 import {SystemMessage} from './systemMessage';
 
 import {SystemMessageType} from '../../../message/systemMessageType';
+import {ConversationEphemeralHandler} from '../../conversation/ConversationEphemeralHandler';
 
 export class MessageTimerUpdateMessage extends SystemMessage {
   public readonly message_timer: number | null;

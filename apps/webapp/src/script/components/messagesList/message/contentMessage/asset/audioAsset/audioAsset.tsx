@@ -23,10 +23,6 @@ import {isUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import type {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import type {FileAsset} from 'Repositories/entity/message/fileAsset';
-import {TeamState} from 'Repositories/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {getLogger} from 'Util/logger';
 import {formatSeconds} from 'Util/timeUtil';
@@ -35,6 +31,10 @@ import {useEffectRef} from 'Util/useEffectRef';
 import {AudioSeekBar} from './audioSeekBar/audioSeekBar';
 import {RestrictedAudio} from './restrictedAudio/restrictedAudio';
 
+import {AssetTransferState} from '../../../../../../repositories/assets/assetTransferState';
+import type {ContentMessage} from '../../../../../../repositories/entity/message/contentMessage';
+import type {FileAsset} from '../../../../../../repositories/entity/message/fileAsset';
+import {TeamState} from '../../../../../../repositories/team/TeamState';
 import * as Icon from '../../../../../icon';
 import {AssetHeader} from '../common/assetHeader/assetHeader';
 import {MediaButton} from '../common/mediaButton/mediaButton';

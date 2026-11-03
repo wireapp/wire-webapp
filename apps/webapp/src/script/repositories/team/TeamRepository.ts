@@ -38,15 +38,6 @@ import {partition} from 'underscore';
 import {Runtime, TypedEventEmitter} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
 
-import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {User} from 'Repositories/entity/User';
-import {EventSource} from 'Repositories/event/EventSource';
-import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
-import {IntegrationMapper} from 'Repositories/integration/IntegrationMapper';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
-import {ROLE, ROLE as TEAM_ROLE, roleFromTeamPermissions} from 'Repositories/user/userPermission';
-import {UserRepository} from 'Repositories/user/userRepository';
-import {UserState} from 'Repositories/user/userState';
 import {Config} from 'src/script/Config';
 import {Environment} from 'Util/environment';
 import {type Translate} from 'Util/localizerUtil';
@@ -65,6 +56,15 @@ import {scheduleRecurringTask, updateRemoteConfigLogger} from '../../lifecycle/u
 import {getMLSMigrationStatus, MLSMigrationStatus} from '../../mls/MLSMigration/migrationStatus';
 import {APIClient} from '../../service/apiClientSingleton';
 import {WebAppEvents} from '../../webAppEvents';
+import {AssetRepository} from '../assets/assetRepository';
+import {User} from '../entity/User';
+import {EventSource} from '../event/EventSource';
+import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
+import {IntegrationMapper} from '../integration/IntegrationMapper';
+import {ServiceEntity} from '../integration/ServiceEntity';
+import {ROLE, ROLE as TEAM_ROLE, roleFromTeamPermissions} from '../user/userPermission';
+import {UserRepository} from '../user/userRepository';
+import {UserState} from '../user/userState';
 
 const teamRefreshIntervalInMinutes = 5;
 const minimumDesktopDownloadPathMinorVersion = 20;

@@ -20,8 +20,9 @@
 import {isNonEmptyString} from '@sindresorhus/is';
 import ko from 'knockout';
 
-import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
 import {isValidAsset} from 'Util/validationUtil';
+
+import {AssetRemoteData} from '../assets/assetRemoteData';
 
 export class TeamEntity {
   creator?: string;

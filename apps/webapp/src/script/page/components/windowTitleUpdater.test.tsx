@@ -22,7 +22,7 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '../../webAppEvents';
 
-import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
+import {NOTIFICATION_HANDLING_STATE} from '../../repositories/event/NotificationHandlingState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {getLogger} from 'Util/logger';
 import {translateForTest} from 'Util/test/translateForTest';

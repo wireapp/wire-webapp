@@ -17,12 +17,12 @@
  *
  */
 
-import {UserState} from 'Repositories/user/userState';
+import {UserState} from '../user/userState';
 
 import {MediaConstraintsHandler} from './MediaConstraintsHandler';
 import {MediaStreamHandler} from './MediaStreamHandler';
 import {NoAudioInputError} from '../../error/noAudioInputError';
-import {MEDIA_STREAM_ERROR} from 'Repositories/media/MediaStreamError';
+import {MEDIA_STREAM_ERROR} from './MediaStreamError';
 
 describe('MediaStreamHandler', () => {
   let streamHandler: MediaStreamHandler;

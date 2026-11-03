@@ -20,13 +20,13 @@
 import {render, waitFor} from '@testing-library/react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {User} from 'Repositories/entity/User';
-import {SearchRepository} from 'Repositories/search/searchRepository';
-import {TeamRepository} from 'Repositories/team/TeamRepository';
-import {UserRepository} from 'Repositories/user/userRepository';
+import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {ContentMessage} from '../../../repositories/entity/message/contentMessage';
+import {User} from '../../../repositories/entity/User';
+import {SearchRepository} from '../../../repositories/search/searchRepository';
+import {TeamRepository} from '../../../repositories/team/TeamRepository';
+import {UserRepository} from '../../../repositories/user/userRepository';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

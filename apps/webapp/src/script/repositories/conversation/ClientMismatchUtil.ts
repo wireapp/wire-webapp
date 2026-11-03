@@ -24,8 +24,9 @@ import {flattenUserMap} from '@wireapp/core/lib/conversation/message/userClients
 import {isQualifiedUserClients} from '@wireapp/core/lib/util';
 import {difference, intersection} from 'underscore';
 
-import {User} from 'Repositories/entity/User';
 import {matchQualifiedIds} from 'Util/qualifiedId';
+
+import {User} from '../entity/User';
 
 type UserClient = {clients: string[]; userId: QualifiedId};
 

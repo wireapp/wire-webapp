@@ -22,8 +22,6 @@ import {UIEvent, useRef, type FunctionComponent} from 'react';
 import {isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
 
-import type {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import type {Text} from 'Repositories/entity/message/text';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
@@ -33,6 +31,8 @@ import {isTweetUrl} from 'Util/validationUtil';
 
 import {AssetHeader} from './common/assetHeader/assetHeader';
 
+import type {ContentMessage} from '../../../../../repositories/entity/message/contentMessage';
+import type {Text} from '../../../../../repositories/entity/message/text';
 import {Image} from '../../../../image';
 import {useMessageFocusedTabIndex} from '../../util';
 

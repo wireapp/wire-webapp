@@ -17,7 +17,7 @@
  *
  */
 
-import {AssetType} from 'Repositories/assets/assetType';
+import {AssetType} from '../../assets/assetType';
 import {translateForTest} from 'Util/test/translateForTest';
 
 import {ContentMessage} from './contentMessage';

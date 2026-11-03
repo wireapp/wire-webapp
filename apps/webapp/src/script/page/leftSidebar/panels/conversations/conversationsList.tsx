@@ -36,12 +36,6 @@ import {useDebouncedCallback} from 'use-debounce';
 
 import {WIDTH} from '@wireapp/react-ui-kit';
 
-import {Call} from 'Repositories/calling/Call';
-import {CallState} from 'Repositories/calling/CallState';
-import {ConversationLabel, ConversationLabelRepository} from 'Repositories/conversation/ConversationLabelRepository';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
 import {useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
@@ -61,6 +55,15 @@ import {getConversationsToDisplay} from './helpers';
 
 import {ConversationListCell} from '../../../../components/conversationListCell';
 import type {RegisterConversationElement} from '../../../../hooks/useConversationFocus';
+import {Call} from '../../../../repositories/calling/Call';
+import {CallState} from '../../../../repositories/calling/CallState';
+import {
+  ConversationLabel,
+  ConversationLabelRepository,
+} from '../../../../repositories/conversation/ConversationLabelRepository';
+import {ConversationState} from '../../../../repositories/conversation/ConversationState';
+import {Conversation} from '../../../../repositories/entity/Conversation';
+import {User} from '../../../../repositories/entity/User';
 import {generateConversationUrl} from '../../../../router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from '../../../../router/routerBindings';
 import {ListViewModel} from '../../../../view_model/ListViewModel';

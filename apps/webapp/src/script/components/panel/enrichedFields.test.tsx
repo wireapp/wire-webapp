@@ -20,8 +20,8 @@
 import {render, waitFor} from '@testing-library/react';
 import type {RichInfo} from '@wireapp/api-client/lib/user/';
 
-import {User} from 'Repositories/entity/User';
-import {RichProfileRepository} from 'Repositories/user/richProfileRepository';
+import {User} from '../../repositories/entity/User';
+import {RichProfileRepository} from '../../repositories/user/richProfileRepository';
 import {translateForTest} from 'Util/test/translateForTest';
 import {
   createRootContextValueForTest,

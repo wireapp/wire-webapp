@@ -21,11 +21,6 @@ import {FC, useMemo, useState} from 'react';
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {SearchRepository} from 'Repositories/search/searchRepository';
-import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {sortUsersByPriority} from 'Util/stringUtil';
@@ -34,6 +29,11 @@ import {FadingScrollbar} from '../../../components/fadingScrollbar';
 import {SearchInput} from '../../../components/SearchInput';
 import {UserSearchableList} from '../../../components/UserSearchableList';
 import {isServiceEntity} from '../../../guards/Service';
+import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {User} from '../../../repositories/entity/User';
+import {SearchRepository} from '../../../repositories/search/searchRepository';
+import {TeamRepository} from '../../../repositories/team/TeamRepository';
 import {PanelHeader} from '../panelHeader';
 import {PanelEntity, PanelState} from '../rightSidebar';
 

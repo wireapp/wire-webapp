@@ -23,12 +23,12 @@ import {isNonEmptyString} from '@sindresorhus/is';
 
 import {Checkbox, CheckboxLabel, ChevronDownIcon} from '@wireapp/react-ui-kit';
 
-import type {Conversation} from 'Repositories/entity/Conversation';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {conversationIconStyles, conversationListStyles} from './meetingParticipantsPicker.styles';
 import {getConversationKey} from './participantPickerUtils';
 
+import type {Conversation} from '../../../repositories/entity/Conversation';
 import {ChannelAvatar} from '../../avatar/channelAvatar';
 import {GroupAvatar} from '../../avatar/groupAvatar';
 import {listItem, listWrapper} from '../../participantItemContent/participantItem.styles';

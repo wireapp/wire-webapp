@@ -35,18 +35,18 @@ import {
   Tooltip,
 } from '@wireapp/react-ui-kit';
 
-import {ClientEntity} from 'Repositories/client';
-import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
-import {checkUserHandle} from 'Repositories/conversation/ConversationVerificationStateHandler';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {UserState} from 'Repositories/user/userState';
 import {MLSStatuses, WireIdentity} from 'src/script/e2eIdentity/e2eIdentityVerification';
 import {RootContextValue, useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {waitFor} from 'Util/waitFor';
 
 import {useUserIdentity} from '../../../../hooks/useDeviceIdentities';
+import {ClientEntity} from '../../../../repositories/client';
+import {ConversationVerificationState} from '../../../../repositories/conversation/ConversationVerificationState';
+import {checkUserHandle} from '../../../../repositories/conversation/ConversationVerificationStateHandler';
+import {Conversation} from '../../../../repositories/entity/Conversation';
+import {User} from '../../../../repositories/entity/User';
+import {UserState} from '../../../../repositories/user/userState';
 
 type VerificationBadgeContext = 'user' | 'conversation' | 'device';
 

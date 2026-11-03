@@ -19,8 +19,8 @@
 
 import {renderHook} from '@testing-library/react';
 
-import type {CellsRepository} from 'Repositories/cells/cellsRepository';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import type {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
+import type {ConversationRepository} from '../../../../../repositories/conversation/ConversationRepository';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

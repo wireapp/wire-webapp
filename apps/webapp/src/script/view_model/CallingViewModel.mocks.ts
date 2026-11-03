@@ -22,16 +22,16 @@ import {container} from 'tsyringe';
 
 import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
 
-import type {AudioRepository} from 'Repositories/audio/audioRepository';
-import {Call} from 'Repositories/calling/Call';
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {CallState} from 'Repositories/calling/CallState';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {type Translate} from 'Util/localizerUtil';
 
 import {CallingViewModel} from './CallingViewModel';
 
+import type {AudioRepository} from '../repositories/audio/audioRepository';
+import {Call} from '../repositories/calling/Call';
+import {CallingRepository} from '../repositories/calling/CallingRepository';
+import {CallState} from '../repositories/calling/CallState';
+import {Conversation} from '../repositories/entity/Conversation';
+import {MediaDevicesHandler} from '../repositories/media/MediaDevicesHandler';
 import {Core} from '../service/coreSingleton';
 
 export const mockCallingRepository = {

@@ -23,7 +23,6 @@ import {isNonEmptyString} from '@sindresorhus/is';
 import {flexRender, getCoreRowModel, type Header, useReactTable} from '@tanstack/react-table';
 import {createPortal} from 'react-dom';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CellNode} from 'src/script/types/cellNode';
@@ -42,6 +41,7 @@ import {
 import {getCellsTableColumns, getCellsTableDataCellLabels} from './cellsTableColumns/cellsTableColumns';
 import {FilePreviewProvider} from './common/cellsFilePreviewModalContext/cellsFilePreviewModalContext';
 
+import {CellsRepository} from '../../../repositories/cells/cellsRepository';
 import {CellsSelectionBar} from '../../cells/common/cellsSelectionBar/cellsSelectionBar';
 import {CellsSortDirection} from '../../conversation/conversationCells/common/cellsSortIcon/cellsSortIcon';
 import {

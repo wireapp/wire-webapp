@@ -32,8 +32,6 @@ import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
 
-import {doSimpleRedirect} from 'Repositories/LifeCycleRepository/LifeCycleRepository';
-import {StorageKey} from 'Repositories/storage';
 import {translate} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 import {enableLogging} from 'Util/loggerUtil';
@@ -50,6 +48,8 @@ import {createIncrementalHttpRetryBackoffReset} from '../lifecycle/createIncreme
 import {createFetchLatestBuildMetadata} from '../lifecycle/newVersionHandler';
 import {retireLegacyServiceWorker} from '../lifecycle/retireLegacyServiceWorker';
 import {createApplicationObservabilityFromConfig} from '../observability/createApplicationObservabilityFromConfig';
+import {doSimpleRedirect} from '../repositories/LifeCycleRepository/LifeCycleRepository';
+import {StorageKey} from '../repositories/storage';
 import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';
 

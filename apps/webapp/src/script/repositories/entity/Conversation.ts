@@ -46,16 +46,6 @@ import {Cancelable, debounce} from 'underscore';
 
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
-import {ClientRepository} from 'Repositories/client';
-import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
-import {ACCESS_STATE} from 'Repositories/conversation/AccessState';
-import {ConversationRepository, CONVERSATION_READONLY_STATE} from 'Repositories/conversation/ConversationRepository';
-import {isProteusTeam1to1Conversation, isSelfConversation} from 'Repositories/conversation/ConversationSelectors';
-import {ConversationStatus} from 'Repositories/conversation/ConversationStatus';
-import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
-import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting';
-import {ConversationRecord} from 'Repositories/storage/record/conversationRecord';
-import {TeamState} from 'Repositories/team/TeamState';
 import type {Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {matchQualifiedIds} from 'Util/qualifiedId';
@@ -74,6 +64,16 @@ import {isContentMessage, isDeleteMessage} from '../../guards/Message';
 import {StatusType} from '../../message/statusType';
 import {ContentState, useAppState} from '../../page/useAppState';
 import {WebAppEvents} from '../../webAppEvents';
+import {ClientRepository} from '../client';
+import {ConnectionEntity} from '../connection/connectionEntity';
+import {ACCESS_STATE} from '../conversation/AccessState';
+import {ConversationRepository, CONVERSATION_READONLY_STATE} from '../conversation/ConversationRepository';
+import {isProteusTeam1to1Conversation, isSelfConversation} from '../conversation/ConversationSelectors';
+import {ConversationStatus} from '../conversation/ConversationStatus';
+import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
+import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
+import {ConversationRecord} from '../storage/record/conversationRecord';
+import {TeamState} from '../team/TeamState';
 
 const userSearchDebounceInMilliseconds = 100;
 const decimalRadix = 10;

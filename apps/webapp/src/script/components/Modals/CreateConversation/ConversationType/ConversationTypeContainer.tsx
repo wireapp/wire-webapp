@@ -22,8 +22,6 @@ import {useEffect, type FunctionComponent} from 'react';
 import {isUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
-import {TeamState} from 'Repositories/team/TeamState';
-import {UserState} from 'Repositories/user/userState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
@@ -31,6 +29,8 @@ import {ConversationFeature} from './ConversationFeature';
 import {ConversationOption} from './ConversationOption';
 import {conversationTypeContainerCss} from './ConversationType.styles';
 
+import {TeamState} from '../../../../repositories/team/TeamState';
+import {UserState} from '../../../../repositories/user/userState';
 import {useCreateConversationModal} from '../hooks/useCreateConversationModal';
 import {ConversationCreationStep, ConversationType} from '../types';
 import {getConversationTypeOptions} from '../utils';

@@ -21,9 +21,6 @@ import {memo, useCallback, useEffect, useRef, useState, type FunctionComponent, 
 
 import {useDebouncedCallback} from 'use-debounce';
 
-import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
-import {MediaType} from 'Repositories/media/MediaType';
-import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
 import type {Translate} from 'Util/localizerUtil/translationTypes';
@@ -33,6 +30,9 @@ import {DeviceSelect} from './deviceSelect';
 
 import * as Icon from '../../../../../components/icon';
 import {Config} from '../../../../../Config';
+import {MediaStreamHandler} from '../../../../../repositories/media/MediaStreamHandler';
+import {MediaType} from '../../../../../repositories/media/MediaType';
+import {useMediaDevicesStore} from '../../../../../repositories/media/useMediaDevicesStore';
 import {PreferencesSection} from '../components/preferencesSection';
 
 const logger = getLogger('CameraPreferences');

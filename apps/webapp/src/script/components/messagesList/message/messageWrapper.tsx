@@ -26,13 +26,6 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {OutgoingQuote} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {CompositeMessage} from 'Repositories/entity/message/compositeMessage';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {Text} from 'Repositories/entity/message/text';
-import {TeamState} from 'Repositories/team/TeamState';
 import {markAsUnreadFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {QuoteEntity} from 'src/script/message/quoteEntity';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -54,6 +47,13 @@ import {PingMessage} from './pingMessage';
 import {SystemMessage} from './systemMessage';
 import {VerificationMessage} from './verificationMessage';
 
+import {AssetRepository} from '../../../repositories/assets/assetRepository';
+import {OutgoingQuote} from '../../../repositories/conversation/MessageRepository';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {CompositeMessage} from '../../../repositories/entity/message/compositeMessage';
+import {ContentMessage} from '../../../repositories/entity/message/contentMessage';
+import {Text} from '../../../repositories/entity/message/text';
+import {TeamState} from '../../../repositories/team/TeamState';
 import {ContextMenuEntry} from '../../../ui/contextMenu';
 import {WebAppEvents} from '../../../webAppEvents';
 

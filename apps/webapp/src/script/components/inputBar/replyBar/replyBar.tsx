@@ -21,11 +21,11 @@ import type {FunctionComponent} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {renderMessage} from 'Util/messageRenderer';
 
+import {ContentMessage} from '../../../repositories/entity/message/contentMessage';
 import {RestrictedVideo} from '../../asset/RestrictedVideo';
 import {ParticipantMicOnIcon} from '../../calling/ParticipantMicOnIcon';
 import * as Icon from '../../icon';

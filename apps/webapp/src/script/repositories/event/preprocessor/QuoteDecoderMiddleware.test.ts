@@ -19,8 +19,8 @@
 
 import {Quote} from '@wireapp/protocol-messaging';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import {Conversation} from '../../entity/Conversation';
+import {User} from '../../entity/User';
 import {MessageHasher} from 'src/script/message/messageHasher';
 import {QuoteEntity} from 'src/script/message/quoteEntity';
 import {createMessageAddEvent, createMultipartMessageAddEvent, toSavedEvent} from 'test/helper/EventGenerator';

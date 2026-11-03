@@ -17,7 +17,7 @@
  *
  */
 
-import type {CellsRepository} from 'Repositories/cells/cellsRepository';
+import type {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
 
 import {emptyBin, isEmptyBinRootPath} from './emptyBinAction';
 

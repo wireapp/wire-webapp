@@ -17,7 +17,7 @@
  *
  */
 
-import {User} from 'Repositories/entity/User';
+import {User} from '../../../../../../repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';
 
 import {getMeetingParticipantsForDisplay} from './getMeetingParticipantsForDisplay';

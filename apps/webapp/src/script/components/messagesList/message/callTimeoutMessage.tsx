@@ -21,12 +21,12 @@ import type {FunctionComponent} from 'react';
 
 import {REASON} from '@wireapp/avs';
 
-import {CallingTimeoutMessage} from 'Repositories/entity/message/callingTimeoutMessage';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {MessageTime} from './messageTime';
 
+import {CallingTimeoutMessage} from '../../../repositories/entity/message/callingTimeoutMessage';
 import * as Icon from '../../icon';
 
 interface CallTimeoutMessageProps {

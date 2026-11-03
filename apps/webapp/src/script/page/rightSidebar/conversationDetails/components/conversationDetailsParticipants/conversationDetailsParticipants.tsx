@@ -21,15 +21,15 @@ import type {FunctionComponent} from 'react';
 
 import {isNonEmptyArray} from '@sindresorhus/is';
 
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import * as Icon from '../../../../../components/icon';
 import {ServiceList} from '../../../../../components/ServiceList';
 import {UserList} from '../../../../../components/userList';
+import {ConversationRepository} from '../../../../../repositories/conversation/ConversationRepository';
+import {Conversation} from '../../../../../repositories/entity/Conversation';
+import {User} from '../../../../../repositories/entity/User';
+import {ServiceEntity} from '../../../../../repositories/integration/ServiceEntity';
 
 interface ConversationDetailsParticipantsProps {
   activeConversation: Conversation;

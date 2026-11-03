@@ -23,10 +23,10 @@ import cx from 'classnames';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {User} from 'Repositories/entity/User';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 
+import {User} from '../../../../../../repositories/entity/User';
 import {Avatar, AVATAR_SIZE} from '../../../../../avatar';
 import * as Icon from '../../../../../icon';
 

@@ -23,8 +23,8 @@ import {isNull} from '@sindresorhus/is';
 import {ProteusErrors} from '@wireapp/core/lib/messagingProtocols/proteus';
 
 import en from '../../../../i18n/en-US.json';
-import {DecryptErrorMessage as DecryptErrorMessageEntity} from 'Repositories/entity/message/decryptErrorMessage';
-import {User} from 'Repositories/entity/User';
+import {DecryptErrorMessage as DecryptErrorMessageEntity} from '../../../repositories/entity/message/decryptErrorMessage';
+import {User} from '../../../repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';
 import {setStrings, translate} from 'Util/localizerUtil';
 import {

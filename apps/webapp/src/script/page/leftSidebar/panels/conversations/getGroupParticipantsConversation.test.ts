@@ -17,8 +17,8 @@
  *
  */
 
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {SearchRepository} from 'Repositories/search/searchRepository';
+import {ConversationRepository} from '../../../../repositories/conversation/ConversationRepository';
+import {SearchRepository} from '../../../../repositories/search/searchRepository';
 
 import {getGroupParticipantsConversations} from './getGroupParticipantsConversation';
 import {SidebarTabs} from './useSidebarStore';

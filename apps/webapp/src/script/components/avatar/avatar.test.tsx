@@ -19,8 +19,8 @@
 
 import {fireEvent, render} from '@testing-library/react';
 
-import {User} from 'Repositories/entity/User';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {User} from '../../repositories/entity/User';
+import {ServiceEntity} from '../../repositories/integration/ServiceEntity';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

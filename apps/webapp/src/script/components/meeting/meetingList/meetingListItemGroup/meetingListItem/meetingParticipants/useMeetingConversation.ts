@@ -22,10 +22,11 @@ import {useMemo} from 'react';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import type {Conversation} from 'Repositories/entity/Conversation';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
+
+import {ConversationState} from '../../../../../../repositories/conversation/ConversationState';
+import type {Conversation} from '../../../../../../repositories/entity/Conversation';
 
 export const useMeetingConversation = (qualifiedConversation: QualifiedId): Conversation | undefined => {
   const conversationState = container.resolve(ConversationState);

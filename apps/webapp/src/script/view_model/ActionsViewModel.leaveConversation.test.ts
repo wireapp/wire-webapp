@@ -23,15 +23,15 @@ import {FEATURE_KEY, FEATURE_STATUS, type FeatureList} from '@wireapp/api-client
 
 import {useLeaveGroupAdminModalStore} from '../components/Modals/LeaveGroupAdminModal/useLeaveGroupAdminModalStore';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {ConnectionRepository} from 'Repositories/connection/connectionRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {User} from 'Repositories/entity/User';
-import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
-import {SelfRepository} from 'Repositories/self/SelfRepository';
-import {TeamState} from 'Repositories/team/TeamState';
-import {UserState} from 'Repositories/user/userState';
+import {CellsRepository} from '../repositories/cells/cellsRepository';
+import {ConnectionRepository} from '../repositories/connection/connectionRepository';
+import {ConversationRepository} from '../repositories/conversation/ConversationRepository';
+import {MessageRepository} from '../repositories/conversation/MessageRepository';
+import {User} from '../repositories/entity/User';
+import {IntegrationRepository} from '../repositories/integration/IntegrationRepository';
+import {SelfRepository} from '../repositories/self/SelfRepository';
+import {TeamState} from '../repositories/team/TeamState';
+import {UserState} from '../repositories/user/userState';
 import {generateConversation} from 'test/helper/ConversationGenerator';
 import type {Translate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';

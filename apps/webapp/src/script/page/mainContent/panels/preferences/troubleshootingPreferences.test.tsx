@@ -25,12 +25,12 @@ import {ThemeProvider} from '@wireapp/react-ui-kit';
 import {
   createTroubleshooterRepository,
   type TroubleshooterRepository,
-} from 'Repositories/troubleshooter/troubleshooterRepository';
+} from '../../../../repositories/troubleshooter/troubleshooterRepository';
 import {
   createMockTroubleshooterService,
   MOCK_CONNECTION_DELAY_MILLISECONDS,
   MOCK_SCAN_DELAY_MILLISECONDS,
-} from 'Repositories/troubleshooter/troubleshooterService';
+} from '../../../../repositories/troubleshooter/troubleshooterService';
 import {Config} from 'src/script/Config';
 import {
   createRootContextValueForTest,

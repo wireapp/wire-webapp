@@ -21,7 +21,7 @@ import {act, fireEvent, render, screen, waitFor, type RenderResult} from '@testi
 import {ThemeProvider} from '@wireapp/react-ui-kit';
 
 import {AVATAR_SIZE} from '..';
-import {User} from 'Repositories/entity/User';
+import {User} from '../../../repositories/entity/User';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

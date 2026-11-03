@@ -28,7 +28,6 @@ import {container} from 'tsyringe';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
-import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
 import {SIGN_OUT_REASON} from 'src/script/auth/signOutReason';
 import {useAppSoftLock} from 'src/script/hooks/useAppSoftLock';
 import {useSingleInstance} from 'src/script/hooks/useSingleInstance';
@@ -50,6 +49,7 @@ import {App} from '../../main/app';
 import type {ApplicationObservability} from '../../observability/applicationObservability';
 import {AppMain} from '../../page/appMain';
 import {RootProvider} from '../../page/rootProvider';
+import {PROPERTIES_TYPE} from '../../repositories/properties/propertiesType';
 import {APIClient} from '../../service/apiClientSingleton';
 import {Core} from '../../service/coreSingleton';
 import {TIME_IN_MILLIS} from '../../util/timeUtil';

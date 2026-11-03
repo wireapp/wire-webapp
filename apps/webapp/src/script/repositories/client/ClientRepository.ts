@@ -29,10 +29,6 @@ import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
 
-import type {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
-import {User} from 'Repositories/entity/User';
-import {ClientRecord} from 'Repositories/storage';
-import {StorageKey} from 'Repositories/storage/storageKey';
 import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {matchQualifiedIds} from 'Util/qualifiedId';
@@ -52,6 +48,10 @@ import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {ClientError} from '../../error/clientError';
 import {Core} from '../../service/coreSingleton';
 import {WebAppEvents} from '../../webAppEvents';
+import type {CryptographyRepository} from '../cryptography/CryptographyRepository';
+import {User} from '../entity/User';
+import {ClientRecord} from '../storage';
+import {StorageKey} from '../storage/storageKey';
 
 const loginHashSeed = 42;
 

@@ -21,12 +21,12 @@ import {useCallback, useMemo, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 
 import {normalizeCellsPath} from './normalizeCellsPath';
 
+import {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
 import {getCellsFilesPath} from '../../common/getCellsFilesPath/getCellsFilesPath';
 import {useGetCellsFolders} from '../cellsTableColumns/cellsTableRowOptions/cellsMoveNodeModal/useGetCellsFolders/useGetCellsFolders';
 

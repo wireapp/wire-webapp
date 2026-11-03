@@ -22,13 +22,13 @@ import {GROUP_CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {maybe, task} from 'true-myth';
 
-import type {CallingRepository} from 'Repositories/calling/CallingRepository';
+import type {CallingRepository} from '../../../../repositories/calling/CallingRepository';
 import type {MeetingServiceDeps} from '../../meetingStore/meetingStoreDeps';
 import {meetingSubmitErrors} from '../../meetingSubmitErrors';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
+import type {ConversationRepository} from '../../../../repositories/conversation/ConversationRepository';
+import {Conversation} from '../../../../repositories/entity/Conversation';
+import {User} from '../../../../repositories/entity/User';
+import type {MeetingsRepository} from '../../../../repositories/meetings/meetingsRepository';
 import {translateForTest} from 'Util/test/translateForTest';
 import {unwrapErr} from 'Util/test/resultTestSupport';
 

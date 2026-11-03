@@ -22,9 +22,6 @@ import {amplify} from 'amplify';
 
 import {Runtime} from '@wireapp/commons';
 
-import {Call} from 'Repositories/calling/Call';
-import {Conversation} from 'Repositories/entity/Conversation';
-import type {User} from 'Repositories/entity/User';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {ConversationType, UserType, PlatformType} from './attribute';
@@ -33,6 +30,9 @@ import {Segmentation} from './segmentation';
 
 import {RatingListLabel} from '../../components/Modals/QualityFeedbackModal/typings';
 import {WebAppEvents} from '../../webAppEvents';
+import {Call} from '../calling/Call';
+import {Conversation} from '../entity/Conversation';
+import type {User} from '../entity/User';
 
 export interface GuestAttributes {
   is_allow_guests: boolean;

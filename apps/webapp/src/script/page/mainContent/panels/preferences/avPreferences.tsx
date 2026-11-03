@@ -21,12 +21,6 @@ import {memo, type FunctionComponent} from 'react';
 
 import {container} from 'tsyringe';
 
-import type {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {MediaConstraintsHandler} from 'Repositories/media/MediaConstraintsHandler';
-import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
-import type {MediaDeviceType} from 'Repositories/media/MediaDeviceType';
-import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
-import type {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {AudioOutPreferences} from './avPreferences/audioOutPreferences';
@@ -38,6 +32,12 @@ import {PreferencesPage} from './components/preferencesPage';
 import {useCameraReloadOnCallEnd} from './useCameraReloadOnCallEnd';
 
 import {useInitializeMediaDevices} from '../../../../hooks/useInitializeMediaDevices';
+import type {CallingRepository} from '../../../../repositories/calling/CallingRepository';
+import {MediaConstraintsHandler} from '../../../../repositories/media/MediaConstraintsHandler';
+import {MediaDevicesHandler} from '../../../../repositories/media/MediaDevicesHandler';
+import type {MediaDeviceType} from '../../../../repositories/media/MediaDeviceType';
+import {MediaStreamHandler} from '../../../../repositories/media/MediaStreamHandler';
+import type {PropertiesRepository} from '../../../../repositories/properties/propertiesRepository';
 
 interface AVPreferencesProps {
   callingRepository: CallingRepository;

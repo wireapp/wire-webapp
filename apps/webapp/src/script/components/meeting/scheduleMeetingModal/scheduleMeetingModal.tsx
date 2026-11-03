@@ -24,7 +24,6 @@ import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, CalendarIcon, CloseIcon} from '@wireapp/react-ui-kit';
 
-import {UserState} from 'Repositories/user/userState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleEscDown} from 'Util/keyboardUtil';
 
@@ -33,6 +32,7 @@ import {scheduleMeetingModes, wasScheduleMeetingPersisted} from './scheduleMeeti
 import {hasScheduleMeetingFormErrors, useScheduleMeetingModal} from './useScheduleMeetingModal';
 import {useScheduleMeetingSubmit} from './useScheduleMeetingSubmit';
 
+import {UserState} from '../../../repositories/user/userState';
 import {ModalComponent} from '../../Modals/ModalComponent';
 import {
   bodyStyles,

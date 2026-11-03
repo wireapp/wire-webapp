@@ -23,9 +23,9 @@ import {
   ConversationLabelRepository,
   LabelType,
   createLabel,
-} from 'Repositories/conversation/ConversationLabelRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {PropertiesService} from 'Repositories/properties/propertiesService';
+} from '../../../src/script/repositories/conversation/ConversationLabelRepository';
+import {Conversation} from '../../../src/script/repositories/entity/Conversation';
+import {PropertiesService} from '../../../src/script/repositories/properties/propertiesService';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {translate} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';

@@ -26,10 +26,9 @@ import {isEmptyArray, isNullOrUndefined} from '@sindresorhus/is';
 import {$createTextNode, TextNode} from 'lexical';
 import * as ReactDOM from 'react-dom';
 
-import {User} from 'Repositories/entity/User';
-
 import {MentionSuggestionsItem} from './mentionSuggestionsItem';
 
+import {User} from '../../../../../../repositories/entity/User';
 import {FadingScrollbar} from '../../../../../fadingScrollbar';
 import {IgnoreOutsideClickWrapper} from '../../../../util/clickHandlers';
 import {$createMentionNode} from '../../nodes/mentionNode';

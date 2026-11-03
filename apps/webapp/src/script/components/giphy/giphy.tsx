@@ -25,11 +25,11 @@ import cx from 'classnames';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {Gif, GiphyRepository} from 'Repositories/extension/GiphyRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {GifImage} from './gifImage';
 
+import {Gif, GiphyRepository} from '../../repositories/extension/GiphyRepository';
 import {WebAppEvents} from '../../webAppEvents';
 import * as Icon from '../icon';
 

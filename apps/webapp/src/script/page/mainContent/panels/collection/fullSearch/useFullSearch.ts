@@ -22,8 +22,8 @@ import {Dispatch, SetStateAction, useCallback, useEffect, useMemo, useRef, useSt
 import {isError} from '@sindresorhus/is';
 import debounceFn from 'debounce-fn';
 
-import type {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import type {Message} from 'Repositories/entity/message/message';
+import type {ContentMessage} from '../../../../../repositories/entity/message/contentMessage';
+import type {Message} from '../../../../../repositories/entity/message/message';
 
 type SearchProviderResult = {messageEntities: Message[]; query: string};
 

@@ -21,9 +21,10 @@ import {MouseEvent, useCallback, useEffect, useMemo, useState} from 'react';
 
 import {isNan, isNull, isUndefined} from '@sindresorhus/is';
 
-import {FileAsset} from 'Repositories/entity/message/fileAsset';
 import {interpolate} from 'Util/arrayUtil';
 import {clamp} from 'Util/numberUtil';
+
+import {FileAsset} from '../../../../../../../../../repositories/entity/message/fileAsset';
 
 const audioBarWidthUnits = 2;
 const audioBarSlotWidth = 3;

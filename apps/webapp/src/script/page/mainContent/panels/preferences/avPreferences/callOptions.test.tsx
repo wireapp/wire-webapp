@@ -26,8 +26,8 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {translateForTest} from 'Util/test/translateForTest';
 
-import type {MediaConstraintsHandler} from 'Repositories/media/MediaConstraintsHandler';
-import type {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
+import type {MediaConstraintsHandler} from '../../../../../repositories/media/MediaConstraintsHandler';
+import type {PropertiesRepository} from '../../../../../repositories/properties/propertiesRepository';
 
 import {CallOptions} from './callOptions';
 

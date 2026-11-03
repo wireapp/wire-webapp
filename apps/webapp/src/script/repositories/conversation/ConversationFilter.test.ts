@@ -24,7 +24,7 @@ import {
 } from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-import {Conversation} from 'Repositories/entity/Conversation';
+import {Conversation} from '../entity/Conversation';
 import {translate} from 'Util/localizerUtil';
 
 import {ConversationFilter} from './ConversationFilter';

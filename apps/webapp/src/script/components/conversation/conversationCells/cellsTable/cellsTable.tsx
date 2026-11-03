@@ -46,8 +46,6 @@ import {
   UploadIcon,
 } from '@wireapp/react-ui-kit';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import type {Conversation} from 'Repositories/entity/Conversation';
 import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
@@ -87,6 +85,8 @@ import {getBulkMoveOutcomeEvidence} from './getBulkMoveOutcomeEvidence';
 import type {PermanentDeleteReviewReason} from './usePermanentDeleteReconciliation';
 import {usePermanentDeleteReconciliation} from './usePermanentDeleteReconciliation';
 
+import {CellsRepository} from '../../../../repositories/cells/cellsRepository';
+import type {Conversation} from '../../../../repositories/entity/Conversation';
 import {PrimaryModal, removeCurrentModal, usePrimaryModalState} from '../../../Modals/PrimaryModal';
 import {
   getCellsBackgroundActionEvidence,

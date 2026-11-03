@@ -24,23 +24,23 @@ import {CONVERSATION_CELLS_STATE, CONVERSATION_TYPE} from '@wireapp/api-client/l
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {UserType} from '@wireapp/api-client/lib/user';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
-import {ConnectionRepository} from 'Repositories/connection/connectionRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {ConversationMapper} from 'Repositories/conversation/ConversationMapper';
-import {ConversationRoleRepository} from 'Repositories/conversation/ConversationRoleRepository';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
-import {SearchRepository} from 'Repositories/search/searchRepository';
-import {SelfRepository} from 'Repositories/self/SelfRepository';
-import {TeamEntity} from 'Repositories/team/TeamEntity';
-import {TeamRepository} from 'Repositories/team/TeamRepository';
-import {TeamState} from 'Repositories/team/TeamState';
-import {UserState} from 'Repositories/user/userState';
+import {CellsRepository} from '../../../repositories/cells/cellsRepository';
+import {ConnectionEntity} from '../../../repositories/connection/connectionEntity';
+import {ConnectionRepository} from '../../../repositories/connection/connectionRepository';
+import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import {ConversationMapper} from '../../../repositories/conversation/ConversationMapper';
+import {ConversationRoleRepository} from '../../../repositories/conversation/ConversationRoleRepository';
+import {MessageRepository} from '../../../repositories/conversation/MessageRepository';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {User} from '../../../repositories/entity/User';
+import {IntegrationRepository} from '../../../repositories/integration/IntegrationRepository';
+import {ServiceEntity} from '../../../repositories/integration/ServiceEntity';
+import {SearchRepository} from '../../../repositories/search/searchRepository';
+import {SelfRepository} from '../../../repositories/self/SelfRepository';
+import {TeamEntity} from '../../../repositories/team/TeamEntity';
+import {TeamRepository} from '../../../repositories/team/TeamRepository';
+import {TeamState} from '../../../repositories/team/TeamState';
+import {UserState} from '../../../repositories/user/userState';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

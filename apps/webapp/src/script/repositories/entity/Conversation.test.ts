@@ -25,10 +25,10 @@ import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {assertNotNullOrUndefined} from '@sindresorhus/is';
 
-import {ClientEntity} from 'Repositories/client/ClientEntity';
-import {ConnectionMapper} from 'Repositories/connection/connectionMapper';
-import {ConversationMapper} from 'Repositories/conversation/ConversationMapper';
-import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting';
+import {ClientEntity} from '../client/ClientEntity';
+import {ConnectionMapper} from '../connection/connectionMapper';
+import {ConversationMapper} from '../conversation/ConversationMapper';
+import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
 import 'src/script/localization/Localizer';
 import {StatusType} from 'src/script/message/statusType';
 import {translate} from 'Util/localizerUtil';

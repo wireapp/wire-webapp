@@ -22,8 +22,8 @@ import {ThemeProvider} from '@wireapp/react-ui-kit';
 import {container} from 'tsyringe';
 
 import en from '../../../../i18n/en-US.json';
-import {User} from 'Repositories/entity/User';
-import {UserState} from 'Repositories/user/userState';
+import {User} from '../../../repositories/entity/User';
+import {UserState} from '../../../repositories/user/userState';
 import {useMeetingPrepModal} from '../meetingPrep/useMeetingPrepModal';
 import {useJoinMeetingCall} from '../useJoinMeetingCall';
 import {MeetingNotificationCard} from './meetingNotificationCard';

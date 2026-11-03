@@ -17,8 +17,8 @@
  *
  */
 
-import {ConversationMapper} from 'Repositories/conversation/ConversationMapper';
-import {StorageSchemata} from 'Repositories/storage/storageSchemata';
+import {ConversationMapper} from '../../../src/script/repositories/conversation/ConversationMapper';
+import {StorageSchemata} from '../../../src/script/repositories/storage/storageSchemata';
 import {translate} from 'Util/localizerUtil';
 
 import {TestFactory} from '../../helper/TestFactory';

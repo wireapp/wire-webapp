@@ -24,7 +24,7 @@ import {
   isImage,
   isAudio,
   buildMetadataAudio,
-} from 'Repositories/assets/assetMetaDataBuilder';
+} from '../../../../repositories/assets/assetMetaDataBuilder';
 
 type BuildCellFileMetadataResult = Promise<
   | void

@@ -23,7 +23,6 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 import {isFileEditable} from 'Util/fileTypeUtil';
@@ -41,6 +40,7 @@ import {useDeleteNode} from './useDeleteNode/useDeleteNode';
 import {useRestoreNestedNode} from './useRestoreNestedNode/useRestoreNestedNode';
 import {useRestoreParentNode} from './useRestoreParentNode/useRestoreParentNode';
 
+import {CellsRepository} from '../../../../../../repositories/cells/cellsRepository';
 import {useAppNotification} from '../../../../../appNotification/appNotification';
 import {useFileHistoryModal} from '../../../../../Modals/FileHistoryModal/hooks/useFileHistoryModal';
 import {
