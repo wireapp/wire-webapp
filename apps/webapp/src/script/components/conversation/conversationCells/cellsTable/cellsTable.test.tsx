@@ -3588,7 +3588,10 @@ describe('CellsTable internal drag and drop', () => {
     expect(screen.queryByRole('dialog', {name: 'Move to folder'})).not.toBeInTheDocument();
   });
 
-  it('does not move a selected folder into itself or a descendant', () => {
+  it.each([
+    {destination: 'itself', targetName: 'Source'},
+    {destination: 'a descendant', targetName: 'Child'},
+  ])('does not move a selected folder into $destination', ({targetName}) => {
     const moveNodes = jest.fn();
     const folder = createNode({id: 'source-id', name: 'Source', path: 'conversation-id@example.com/Source'});
     const child = createNode({id: 'child-id', name: 'Child', path: 'conversation-id@example.com/Source/Child'});
@@ -3596,12 +3599,11 @@ describe('CellsTable internal drag and drop', () => {
     fireEvent.click(screen.getByRole('checkbox', {name: 'Select Source'}));
     const transfer = createInternalDragTransfer();
     fireEvent.dragStart(screen.getByRole('row', {name: /Source/}), {dataTransfer: transfer});
-    for (const target of [folder, child]) {
-      const row = screen.getByRole('row', {name: new RegExp(target.name)});
-      fireEvent.dragOver(row, {dataTransfer: transfer});
-      fireEvent.drop(row, {dataTransfer: transfer});
-      expect(row).not.toHaveAttribute('data-folder-drop-active');
-    }
+    const target = screen.getByRole('row', {name: new RegExp(targetName)});
+    fireEvent.dragOver(target, {dataTransfer: transfer});
+    fireEvent.drop(target, {dataTransfer: transfer});
+
+    expect(target).not.toHaveAttribute('data-folder-drop-active');
     expect(moveNodes).not.toHaveBeenCalled();
   });
 
