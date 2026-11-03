@@ -174,6 +174,8 @@ const CellsTableHeaderCell: FunctionComponent<CellsTableHeaderCellProps> = ({
   );
 };
 
+const INTERNAL_DRIVE_DRAG_TYPE = 'application/x-wire-drive-nodes';
+
 const dragEventContainsFiles = (event: DragEvent<HTMLElement>): boolean => {
   return Array.from(event.dataTransfer.types).includes('Files');
 };
@@ -247,6 +249,11 @@ const getPermanentDeleteReviewMessageKey = (
       return 'cells.bulkDelete.timedOut';
   }
 };
+
+interface CapturedDriveDrag {
+  nodeIds: string[];
+  scopeKey: string;
+}
 
 interface CapturedBulkMoveToBinSelection {
   nodeIds: string[];
@@ -1073,19 +1080,6 @@ export const CellsTable = ({
     if (isFileUpload) {
       onFolderDropTargetChange?.(node?.name ?? null);
     }
-  };
-
-  const getDriveDragNodesForEvent = (destination: CellNode, event: DragEvent<HTMLElement>): CellNode[] | null => {
-    return getDriveDragNodes({
-      activeDrag: activeDriveDrag.current,
-      dataTransferTypes: Array.from(event.dataTransfer.types),
-      selectedNodeIds: selectedNodeIdsRef.current,
-      selectionScopeKey: selectionScopeKeyRef.current,
-      canMoveSelection,
-      destination,
-      nodes: nodesRef.current,
-      conversationQualifiedId,
-    });
   };
 
   const handleDriveDrop = async (destination: CellNode, event: DragEvent<HTMLTableRowElement>): Promise<void> => {
