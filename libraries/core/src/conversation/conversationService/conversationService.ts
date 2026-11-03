@@ -42,8 +42,8 @@ import {
 } from '@wireapp/api-client/lib/event';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {Decoder} from '@wireapp/commons/lib/base64/decoder';
 import {XOR} from '@wireapp/commons/lib/util/TypeUtil';
-import {Decoder} from 'bazinga64';
 
 import {APIClient} from '@wireapp/api-client';
 import {LogFactory, TypedEventEmitter} from '@wireapp/commons';

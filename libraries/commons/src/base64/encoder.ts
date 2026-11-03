@@ -17,8 +17,8 @@
  *
  */
 
-import {Converter} from './Converter';
-import {EncodedData} from './EncodedData';
+import {Converter} from './converter';
+import {EncodedData} from './encodedData';
 
 export class Encoder {
   public static toBase64(data: string | number | number[] | ArrayBuffer | Buffer | Uint8Array): EncodedData {

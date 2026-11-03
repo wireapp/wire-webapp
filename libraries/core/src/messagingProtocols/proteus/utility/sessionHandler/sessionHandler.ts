@@ -28,7 +28,7 @@ import {
 import {PreKey} from '@wireapp/api-client/lib/auth';
 import {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId, QualifiedUserPreKeyBundleMap} from '@wireapp/api-client/lib/user';
-import {Decoder} from 'bazinga64';
+import {Decoder} from '@wireapp/commons/lib/base64/decoder';
 import {Logger} from 'logdown';
 
 import {APIClient} from '@wireapp/api-client';

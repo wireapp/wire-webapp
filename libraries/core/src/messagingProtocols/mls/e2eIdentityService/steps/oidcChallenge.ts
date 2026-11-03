@@ -17,7 +17,7 @@
  *
  */
 
-import {Converter} from 'bazinga64';
+import {Converter} from '@wireapp/commons/lib/base64/converter';
 
 import {AcmeService} from '../connection/acmeServer/acmeService';
 import type {PostJoseRequestReturnValue} from '../connection/acmeServer/acmeService.types';

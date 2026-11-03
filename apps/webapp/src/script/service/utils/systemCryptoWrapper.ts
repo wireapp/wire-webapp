@@ -17,7 +17,8 @@
  *
  */
 
-import {Encoder, Decoder} from 'bazinga64';
+import {Decoder} from '@wireapp/commons/lib/base64/decoder';
+import {Encoder} from '@wireapp/commons/lib/base64/encoder';
 
 type SystemCryptoV0 = {
   encrypt: (value: Uint8Array) => Promise<Uint8Array>;

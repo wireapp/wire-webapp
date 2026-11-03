@@ -1,3 +1,5 @@
+/** @jest-environment node */
+
 /*
  * Wire
  * Copyright (C) 2018 Wire Swiss GmbH
@@ -17,14 +19,15 @@
  *
  */
 
-import * as bazinga64 from './index';
+import {Decoder} from './decoder';
+import {Encoder} from './encoder';
 
 describe('Test Vectors from RFC 4648', () => {
   it('handles empty strings', () => {
     const text = '';
     const expected = '';
-    const encoded = bazinga64.Encoder.toBase64(text).asString;
-    const decoded = bazinga64.Decoder.fromBase64(encoded).asString;
+    const encoded = Encoder.toBase64(text).asString;
+    const decoded = Decoder.fromBase64(encoded).asString;
     expect(encoded).toBe(expected);
     expect(decoded).toBe(text);
   });
@@ -32,8 +35,8 @@ describe('Test Vectors from RFC 4648', () => {
   it('handles "f"', () => {
     const text = 'f';
     const expected = 'Zg==';
-    const encoded = bazinga64.Encoder.toBase64(text).asString;
-    const decoded = bazinga64.Decoder.fromBase64(encoded).asString;
+    const encoded = Encoder.toBase64(text).asString;
+    const decoded = Decoder.fromBase64(encoded).asString;
     expect(encoded).toBe(expected);
     expect(decoded).toBe(text);
   });
@@ -41,8 +44,8 @@ describe('Test Vectors from RFC 4648', () => {
   it('handles "fo"', () => {
     const text = 'fo';
     const expected = 'Zm8=';
-    const encoded = bazinga64.Encoder.toBase64(text).asString;
-    const decoded = bazinga64.Decoder.fromBase64(encoded).asString;
+    const encoded = Encoder.toBase64(text).asString;
+    const decoded = Decoder.fromBase64(encoded).asString;
     expect(encoded).toBe(expected);
     expect(decoded).toBe(text);
   });
@@ -50,8 +53,8 @@ describe('Test Vectors from RFC 4648', () => {
   it('handles "foo"', () => {
     const text = 'foo';
     const expected = 'Zm9v';
-    const encoded = bazinga64.Encoder.toBase64(text).asString;
-    const decoded = bazinga64.Decoder.fromBase64(encoded).asString;
+    const encoded = Encoder.toBase64(text).asString;
+    const decoded = Decoder.fromBase64(encoded).asString;
     expect(encoded).toBe(expected);
     expect(decoded).toBe(text);
   });
@@ -59,8 +62,8 @@ describe('Test Vectors from RFC 4648', () => {
   it('foob', () => {
     const text = 'foob';
     const expected = 'Zm9vYg==';
-    const encoded = bazinga64.Encoder.toBase64(text).asString;
-    const decoded = bazinga64.Decoder.fromBase64(encoded).asString;
+    const encoded = Encoder.toBase64(text).asString;
+    const decoded = Decoder.fromBase64(encoded).asString;
     expect(encoded).toBe(expected);
     expect(decoded).toBe(text);
   });
@@ -68,8 +71,8 @@ describe('Test Vectors from RFC 4648', () => {
   it('handles "fooba"', () => {
     const text = 'fooba';
     const expected = 'Zm9vYmE=';
-    const encoded = bazinga64.Encoder.toBase64(text).asString;
-    const decoded = bazinga64.Decoder.fromBase64(encoded).asString;
+    const encoded = Encoder.toBase64(text).asString;
+    const decoded = Decoder.fromBase64(encoded).asString;
     expect(encoded).toBe(expected);
     expect(decoded).toBe(text);
   });
@@ -77,8 +80,8 @@ describe('Test Vectors from RFC 4648', () => {
   it('handles "foobar"', () => {
     const text = 'foobar';
     const expected = 'Zm9vYmFy';
-    const encoded = bazinga64.Encoder.toBase64(text).asString;
-    const decoded = bazinga64.Decoder.fromBase64(encoded).asString;
+    const encoded = Encoder.toBase64(text).asString;
+    const decoded = Decoder.fromBase64(encoded).asString;
     expect(encoded).toBe(expected);
     expect(decoded).toBe(text);
   });
@@ -88,7 +91,7 @@ describe('Special cases', () => {
   it('handles malformed URIs', () => {
     const serialised =
       'owABAaEAWEAfHNWiDY1dv3AmX8F3SVnrKy1T8rO07mMswqDDy4FYzzS7Nw9JWSxFA1Ithb/mJubaZBvhBJgLAIV0amINi5OAAqEAoQBYIDS7Nw9JWSxFA1Ithb/mJubaZBvhBJgLAIV0amINi5OA';
-    const decoded = bazinga64.Decoder.fromBase64(serialised);
+    const decoded = Decoder.fromBase64(serialised);
     expect(decoded.asBytes).toBeDefined();
     expect(decoded.asString).toBeDefined();
   });

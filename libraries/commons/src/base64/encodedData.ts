@@ -17,7 +17,7 @@
  *
  */
 
-import {IData} from './IData';
+import {IData} from './iData';
 
 export class EncodedData implements IData {
   constructor(

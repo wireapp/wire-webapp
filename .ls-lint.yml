@@ -1,6 +1,14 @@
 ls:
   tools:
     .dir: camelCase
+  libraries/commons/src/base64:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  libraries/commons/src/base64/test:
+    .dir: camelCase
+    .ts: camelCase
+    .json: camelCase
   tools/{buildArtifact,releaseCli,releaseGithub,releaseMetadata}:
     .ts: camelCase
     .test.ts: camelCase

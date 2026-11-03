@@ -1,3 +1,5 @@
+/** @jest-environment node */
+
 /*
  * Wire
  * Copyright (C) 2018 Wire Swiss GmbH
@@ -23,15 +25,15 @@ import {
   helloEncodedString,
   numberDecoded,
   numberEncoded,
-} from './test/TestValues';
+} from './test/testValues';
 
-import * as bazinga64 from './index';
-
-const {Converter, Encoder} = bazinga64;
+import {Converter} from './converter';
+import {Decoder} from './decoder';
+import {Encoder} from './encoder';
 
 describe('toBase64', () => {
   it('encodes arrays', () => {
-    const encoded = bazinga64.Encoder.toBase64(helloDecodedArray);
+    const encoded = Encoder.toBase64(helloDecodedArray);
     expect(encoded.asString).toBe(helloEncodedString);
   });
 
@@ -154,9 +156,9 @@ describe('toBase64', () => {
       '114': 37,
     };
 
-    const arrayBufferView = bazinga64.Converter.jsonToArrayBufferView(json);
+    const arrayBufferView = Converter.jsonToArrayBufferView(json);
     const arrayBuffer = arrayBufferView.buffer as ArrayBuffer;
-    const encoded = bazinga64.Encoder.toBase64(arrayBuffer);
+    const encoded = Encoder.toBase64(arrayBuffer);
     const expected =
       'owABARn//wKiAKEAWEDEX0UODINkYDHbu76tv17jYQX9SBtvclYEQ7765c26Xd9g90BBZTorb+oHtgqPUJ2PDKWb/XXcQbDiUEenRWUlAaEAWCDfYPdAQWU6K2/qB7YKj1Cdjwylm/113EGw4lBHp0VlJQ==';
     expect(encoded.asString).toBe(expected);
@@ -164,16 +166,16 @@ describe('toBase64', () => {
 
   it('encodes byte arrays', () => {
     const data = new Uint8Array(helloDecodedArray);
-    const encoded = bazinga64.Encoder.toBase64(data);
+    const encoded = Encoder.toBase64(data);
     expect(encoded.asString).toBe(helloEncodedString);
   });
 
   it('encodes numbers', () => {
-    expect(bazinga64.Encoder.toBase64(numberDecoded).asString).toBe(numberEncoded);
+    expect(Encoder.toBase64(numberDecoded).asString).toBe(numberEncoded);
   });
 
   it('encodes strings', () => {
-    const encoded = bazinga64.Encoder.toBase64(helloDecodedString);
+    const encoded = Encoder.toBase64(helloDecodedString);
     expect(encoded.asString).toBe(helloEncodedString);
   });
 
@@ -182,21 +184,21 @@ describe('toBase64', () => {
       'Man is distinguished, not only by his reason, but by this singular passion from other animals, which is a lust of the mind, that by a perseverance of delight in the continued and indefatigable generation of knowledge, exceeds the short vehemence of any carnal pleasure.';
     const expected =
       'TWFuIGlzIGRpc3Rpbmd1aXNoZWQsIG5vdCBvbmx5IGJ5IGhpcyByZWFzb24sIGJ1dCBieSB0aGlzIHNpbmd1bGFyIHBhc3Npb24gZnJvbSBvdGhlciBhbmltYWxzLCB3aGljaCBpcyBhIGx1c3Qgb2YgdGhlIG1pbmQsIHRoYXQgYnkgYSBwZXJzZXZlcmFuY2Ugb2YgZGVsaWdodCBpbiB0aGUgY29udGludWVkIGFuZCBpbmRlZmF0aWdhYmxlIGdlbmVyYXRpb24gb2Yga25vd2xlZGdlLCBleGNlZWRzIHRoZSBzaG9ydCB2ZWhlbWVuY2Ugb2YgYW55IGNhcm5hbCBwbGVhc3VyZS4=';
-    const actual = bazinga64.Encoder.toBase64(text).asString;
+    const actual = Encoder.toBase64(text).asString;
     expect(actual).toBe(expected);
   });
 
   it('encodes texts with umlauts', () => {
     const text = 'Polyfon zwitschernd aßen Mäxchens Vögel Rüben, Joghurt und Quark';
     const expected = 'UG9seWZvbiB6d2l0c2NoZXJuZCBhw59lbiBNw6R4Y2hlbnMgVsO2Z2VsIFLDvGJlbiwgSm9naHVydCB1bmQgUXVhcms=';
-    const actual = bazinga64.Encoder.toBase64(text).asString;
+    const actual = Encoder.toBase64(text).asString;
     expect(actual).toBe(expected);
   });
 
   it('encodes texts with unicode symbols', () => {
     const text = 'foo ♥ bar';
     const expected = 'Zm9vIOKZpSBiYXI=';
-    const actual = bazinga64.Encoder.toBase64(text).asString;
+    const actual = Encoder.toBase64(text).asString;
     expect(actual).toBe(expected);
   });
 
@@ -206,15 +208,15 @@ describe('toBase64', () => {
     const arrayBuffer = arrayBufferView.buffer;
 
     const encodedString = 'CAMDBwkJBAI=';
-    const encodedArray = bazinga64.Encoder.toBase64(array).asString;
-    const encodedArrayBuffer = bazinga64.Encoder.toBase64(arrayBuffer).asString;
-    const encodedArrayBufferView = bazinga64.Encoder.toBase64(arrayBufferView).asString;
+    const encodedArray = Encoder.toBase64(array).asString;
+    const encodedArrayBuffer = Encoder.toBase64(arrayBuffer).asString;
+    const encodedArrayBufferView = Encoder.toBase64(arrayBufferView).asString;
 
     expect(encodedArray).toBe(encodedString);
     expect(encodedArrayBuffer).toBe(encodedString);
     expect(encodedArrayBufferView).toBe(encodedString);
 
-    const decoded = bazinga64.Decoder.fromBase64(encodedString);
+    const decoded = Decoder.fromBase64(encodedString);
     expect(decoded.asBytes).toEqual(arrayBufferView);
   });
 });

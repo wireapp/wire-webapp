@@ -1,3 +1,5 @@
+/** @jest-environment node */
+
 /*
  * Wire
  * Copyright (C) 2018 Wire Swiss GmbH
@@ -24,15 +26,15 @@ import {
   helloEncodedString,
   numberDecoded,
   numberString,
-} from './test/TestValues';
+} from './test/testValues';
 
-import * as bazinga64 from './index';
+import {Converter} from './converter';
 
 describe('arrayBufferViewToStringUTF8', () => {
   it('handles UTF-8 conversions', () => {
     const cyrillicCapitalLetterDje = '\u0402';
-    const encoded = bazinga64.Converter.stringToArrayBufferViewUTF8(cyrillicCapitalLetterDje);
-    const decoded = bazinga64.Converter.arrayBufferViewToStringUTF8(encoded);
+    const encoded = Converter.stringToArrayBufferViewUTF8(cyrillicCapitalLetterDje);
+    const decoded = Converter.arrayBufferViewToStringUTF8(encoded);
 
     expect(encoded.constructor.name).toBe('Uint8Array');
     expect(encoded.length).toBe(2);
@@ -43,7 +45,7 @@ describe('arrayBufferViewToStringUTF8', () => {
 
   it('converts an array buffer view into an unicode string', () => {
     const view = new Uint8Array(helloDecodedArray);
-    const utf8 = bazinga64.Converter.arrayBufferViewToStringUTF8(view);
+    const utf8 = Converter.arrayBufferViewToStringUTF8(view);
     expect(utf8.constructor.name).toBe('String');
     expect(utf8).toBe('Hello');
   });
@@ -168,7 +170,7 @@ describe('jsonToArrayBufferView', () => {
       '113': 101,
       '114': 37,
     };
-    const arrayBufferView = bazinga64.Converter.jsonToArrayBufferView(json);
+    const arrayBufferView = Converter.jsonToArrayBufferView(json);
     const expectedLength = Object.keys(json).length;
     expect(arrayBufferView.length).toBe(expectedLength);
     expect(arrayBufferView[0]).toBe(163);
@@ -178,14 +180,14 @@ describe('jsonToArrayBufferView', () => {
 
 describe('numberArrayToArrayBufferView', () => {
   it('converts an array of numbers into an array buffer view', () => {
-    const arrayBufferView = bazinga64.Converter.numberArrayToArrayBufferView(helloDecodedArray);
+    const arrayBufferView = Converter.numberArrayToArrayBufferView(helloDecodedArray);
     expect(arrayBufferView).toEqual(new Uint8Array(helloDecodedArray));
   });
 
   if (typeof Window === 'undefined') {
     it('works with plain Buffers', () => {
       const decoded = Buffer.from(helloEncodedString, 'base64');
-      const arrayBufferView = bazinga64.Converter.numberArrayToArrayBufferView(decoded);
+      const arrayBufferView = Converter.numberArrayToArrayBufferView(decoded);
       expect(arrayBufferView).toEqual(new Uint8Array(helloDecodedArray));
     });
   }
@@ -194,14 +196,14 @@ describe('numberArrayToArrayBufferView', () => {
 describe('stringToArrayBufferViewUTF16', () => {
   it('handles UTF-16 conversions', () => {
     const cyrillicCapitalLetterDje = '\u0402';
-    const encoded = bazinga64.Converter.stringToArrayBufferViewUTF16(cyrillicCapitalLetterDje);
+    const encoded = Converter.stringToArrayBufferViewUTF16(cyrillicCapitalLetterDje);
     expect(encoded.constructor.name).toBe('Uint16Array');
     expect(encoded.length).toBe(1);
   });
 
   it('converts a string into an array buffer view', () => {
     const data = helloEncodedString;
-    const view = bazinga64.Converter.stringToArrayBufferViewUTF16(data);
+    const view = Converter.stringToArrayBufferViewUTF16(data);
     const expectedView = new Uint16Array(helloEncodedArray);
     expect(view.constructor.name).toBe('Uint16Array');
     expect(view).toEqual(expectedView);
@@ -211,33 +213,33 @@ describe('stringToArrayBufferViewUTF16', () => {
 describe('toArrayBufferView', () => {
   it('handles arrays', () => {
     const data = new Uint8Array(helloDecodedArray);
-    const view = bazinga64.Converter.toArrayBufferView(helloDecodedArray);
+    const view = Converter.toArrayBufferView(helloDecodedArray);
     expect(view.constructor.name).toBe('Uint8Array');
     expect(view).toEqual(data);
   });
 
   it('handles array buffer views', () => {
     const data = new Uint8Array(helloDecodedArray);
-    const view = bazinga64.Converter.toArrayBufferView(data);
+    const view = Converter.toArrayBufferView(data);
     expect(view.constructor.name).toBe('Uint8Array');
     expect(view).toBe(data);
   });
 
   it('handles strings', () => {
     const data = 'Thomas M\u00FCller';
-    const view = bazinga64.Converter.toArrayBufferView(data);
+    const view = Converter.toArrayBufferView(data);
     expect(view.constructor.name).toBe('Uint8Array');
   });
 
   it('handles numbers', () => {
     const data = numberDecoded;
-    const view = bazinga64.Converter.toArrayBufferView(data);
+    const view = Converter.toArrayBufferView(data);
     expect(view.constructor.name).toBe('Uint8Array');
   });
 
   it('throws an error on unexpected inputs', () => {
     const test = (): void => {
-      bazinga64.Converter.toArrayBufferView(new Error() as any);
+      Converter.toArrayBufferView(new Error() as any);
     };
 
     expect(test).toThrow();
@@ -247,33 +249,33 @@ describe('toArrayBufferView', () => {
 describe('toString', () => {
   it('handles arrays', () => {
     const data = helloDecodedArray;
-    const text = bazinga64.Converter.toString(data);
+    const text = Converter.toString(data);
     expect(text.constructor.name).toBe('String');
     expect(text).toBe(helloDecodedString);
   });
 
   it('handles array buffer views', () => {
     const data = new Uint8Array(helloDecodedArray);
-    const text = bazinga64.Converter.toString(data);
+    const text = Converter.toString(data);
     expect(text.constructor.name).toBe('String');
     expect(text).toBe(helloDecodedString);
   });
 
   it('handles numbers', () => {
-    const text = bazinga64.Converter.toString(numberDecoded);
+    const text = Converter.toString(numberDecoded);
     expect(text.constructor.name).toBe('String');
     expect(text).toBe(numberString);
   });
 
   it('handles strings', () => {
-    const text = bazinga64.Converter.toString(helloDecodedString);
+    const text = Converter.toString(helloDecodedString);
     expect(text.constructor.name).toBe('String');
     expect(text).toBe(helloDecodedString);
   });
 
   it('throws an error on unexpected inputs', () => {
     const test = (): void => {
-      bazinga64.Converter.toArrayBufferView(new Error() as any);
+      Converter.toArrayBufferView(new Error() as any);
     };
 
     expect(test).toThrow();
@@ -283,13 +285,13 @@ describe('toString', () => {
 describe('stringToArrayBufferViewUTF8', () => {
   it('handles UTF-8 conversions', () => {
     const cyrillicCapitalLetterDje = '\u0402';
-    const encoded = bazinga64.Converter.stringToArrayBufferViewUTF8(cyrillicCapitalLetterDje);
+    const encoded = Converter.stringToArrayBufferViewUTF8(cyrillicCapitalLetterDje);
     expect(encoded.length).toBe(2);
   });
 
   it('converts between a string and an array buffer view', () => {
-    const encoded = bazinga64.Converter.stringToArrayBufferViewUTF8(helloDecodedString);
-    const decoded = bazinga64.Converter.arrayBufferViewToStringUTF8(encoded);
+    const encoded = Converter.stringToArrayBufferViewUTF8(helloDecodedString);
+    const decoded = Converter.arrayBufferViewToStringUTF8(encoded);
 
     expect(encoded.constructor.name).toBe('Uint8Array');
     expect(encoded).toEqual(new Uint8Array(helloDecodedArray));
@@ -300,7 +302,7 @@ describe('stringToArrayBufferViewUTF8', () => {
 describe('hexStringToArrayBufferView', () => {
   it('should correctly convert a valid hex string', () => {
     const hexString = '41d2b365f4a94ba1bddf5afb8aca6786';
-    const byteArray = bazinga64.Converter.hexStringToArrayBufferView(hexString);
+    const byteArray = Converter.hexStringToArrayBufferView(hexString);
     expect(byteArray).toEqual(
       new Uint8Array([65, 210, 179, 101, 244, 169, 75, 161, 189, 223, 90, 251, 138, 202, 103, 134]),
     );
@@ -309,20 +311,20 @@ describe('hexStringToArrayBufferView', () => {
   it('should throw an error for invalid hex strings (odd length)', () => {
     const invalidHexString = '41d2b36'; // odd length
     expect(() => {
-      return bazinga64.Converter.hexStringToArrayBufferView(invalidHexString);
+      return Converter.hexStringToArrayBufferView(invalidHexString);
     }).toThrow('Invalid hexadecimal string');
   });
 
   it('should throw an error for non-hex characters', () => {
     const invalidHexString = '41d2b36zzz'; // contains non-hex characters (z)
     expect(() => {
-      return bazinga64.Converter.hexStringToArrayBufferView(invalidHexString);
+      return Converter.hexStringToArrayBufferView(invalidHexString);
     }).toThrow();
   });
 
   it('should handle an empty string', () => {
     const emptyString = '';
-    const byteArray = bazinga64.Converter.hexStringToArrayBufferView(emptyString);
+    const byteArray = Converter.hexStringToArrayBufferView(emptyString);
     expect(byteArray).toEqual(new Uint8Array([]));
   });
 });

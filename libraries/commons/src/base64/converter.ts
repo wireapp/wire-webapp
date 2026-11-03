@@ -19,7 +19,7 @@
 
 import {isUndefined} from '@sindresorhus/is';
 
-import {UnsupportedInputError} from './UnsupportedInputError';
+import {UnsupportedInputError} from './unsupportedInputError';
 
 const utf16CodeUnitSizeInBytes = 2;
 const hexadecimalCharactersPerByte = 2;

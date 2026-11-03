@@ -1,3 +1,5 @@
+/** @jest-environment node */
+
 /*
  * Wire
  * Copyright (C) 2018 Wire Swiss GmbH
@@ -23,15 +25,15 @@ import {
   helloEncodedArray,
   helloEncodedString,
   numberEncoded,
-} from './test/TestValues';
+} from './test/testValues';
 
-import * as bazinga64 from './index';
+import {Decoder} from './decoder';
 
 const fixtures = require('./test/fixtures.json');
 
 describe('fromBase64', () => {
   it('decodes arrays', () => {
-    const decoded = bazinga64.Decoder.fromBase64(helloEncodedArray);
+    const decoded = Decoder.fromBase64(helloEncodedArray);
     const arrayBufferView = new Uint8Array(helloDecodedArray);
     expect(decoded.asBytes).toEqual(arrayBufferView);
     expect(decoded.asString).toBe(helloDecodedString);
@@ -39,12 +41,12 @@ describe('fromBase64', () => {
 
   it('does not decode from an array with an invalid length', () => {
     expect(() => {
-      bazinga64.Decoder.fromBase64(helloDecodedArray);
+      Decoder.fromBase64(helloDecodedArray);
     }).toThrow();
   });
 
   it('decodes into a byte array', () => {
-    const decoded = bazinga64.Decoder.fromBase64(helloEncodedString);
+    const decoded = Decoder.fromBase64(helloEncodedString);
     const arrayBufferView = new Uint8Array(helloDecodedArray);
     expect(decoded.asBytes).toEqual(arrayBufferView);
     expect(decoded.asString).toBe(helloDecodedString);
@@ -52,12 +54,12 @@ describe('fromBase64', () => {
 
   it('decodes into a string', () => {
     const encoded = 'SGVsbG8sIHdvcmxk';
-    const decoded = bazinga64.Decoder.fromBase64(encoded);
+    const decoded = Decoder.fromBase64(encoded);
     expect(decoded.asString).toBe('Hello, world');
   });
 
   it('decodes numbers', () => {
-    const decoded = bazinga64.Decoder.fromBase64(numberEncoded);
+    const decoded = Decoder.fromBase64(numberEncoded);
     expect(decoded.asString).toBe('1337');
   });
 
@@ -67,29 +69,29 @@ describe('fromBase64', () => {
 
     // RFC 2045: The encoded output stream must be represented in lines of no more than 76 characters each.
     let encoded = `${firstLine}\r\n${secondLine}`;
-    let bytes = bazinga64.Decoder.fromBase64(encoded).asBytes;
+    let bytes = Decoder.fromBase64(encoded).asBytes;
     expect(bytes.byteLength).toBeDefined();
 
     encoded = `${firstLine}${secondLine}:`;
-    bytes = bazinga64.Decoder.fromBase64(encoded).asBytes;
+    bytes = Decoder.fromBase64(encoded).asBytes;
     expect(bytes.byteLength).toBeDefined();
 
     encoded = `${firstLine}${secondLine}.`;
-    bytes = bazinga64.Decoder.fromBase64(encoded).asBytes;
+    bytes = Decoder.fromBase64(encoded).asBytes;
     expect(bytes.byteLength).toBeDefined();
 
     encoded = `${firstLine}${secondLine}!`;
-    bytes = bazinga64.Decoder.fromBase64(encoded).asBytes;
+    bytes = Decoder.fromBase64(encoded).asBytes;
     expect(bytes.byteLength).toBeDefined();
 
     encoded = `${firstLine}\\${secondLine}!`;
-    bytes = bazinga64.Decoder.fromBase64(encoded).asBytes;
+    bytes = Decoder.fromBase64(encoded).asBytes;
     expect(bytes.byteLength).toBeDefined();
   });
 
   it('decodes very long strings.', async () => {
     const encoded = fixtures.files['yaoqi-lai-21901-unsplash_800.jpg'];
-    const bytes = bazinga64.Decoder.fromBase64(encoded).asBytes;
+    const bytes = Decoder.fromBase64(encoded).asBytes;
     expect(bytes instanceof Uint8Array).toBe(true);
     expect(bytes.byteLength).toBeGreaterThan(0);
   });

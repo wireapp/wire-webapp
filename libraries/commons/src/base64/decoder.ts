@@ -17,8 +17,8 @@
  *
  */
 
-import {Converter} from './Converter';
-import {DecodedData} from './DecodedData';
+import {Converter} from './converter';
+import {DecodedData} from './decodedData';
 
 const base64BlockLength = 4;
 
