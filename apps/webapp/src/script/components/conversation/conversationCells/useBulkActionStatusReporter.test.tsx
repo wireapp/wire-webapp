@@ -36,14 +36,14 @@ interface ReporterView {
   readonly shown: Maybe<SharedDriveMoveStatus>;
 }
 
-const renderReporter = (): ReturnType<typeof renderHook<ReporterView, unknown>> => {
+const renderReporter = (onReview?: () => void): ReturnType<typeof renderHook<ReporterView, unknown>> => {
   const wrapper = ({children}: {children: ReactNode}): ReactElement => {
     return <SharedDriveUploadStatusProvider>{children}</SharedDriveUploadStatusProvider>;
   };
   return renderHook(
     (): ReporterView => {
       return {
-        reporter: useBulkActionStatusReporter('restore'),
+        reporter: useBulkActionStatusReporter('restore', onReview),
         shown: useSharedDriveUploadStatus().moveStatus,
       };
     },
@@ -127,5 +127,54 @@ describe('useBulkActionStatusReporter', () => {
     });
 
     expect(maybe.isNothing(result.current.shown)).toBe(true);
+  });
+
+  it('attaches the review callback to the started and the reported status', () => {
+    const onReview = jest.fn();
+    const {result} = renderReporter(onReview);
+
+    act(() => {
+      result.current.reporter.start(items);
+    });
+    expect(maybe.isJust(result.current.shown) && result.current.shown.value.onReview).toBeDefined();
+
+    act(() => {
+      result.current.reporter.report('status-unknown');
+    });
+    const shown = maybe.isJust(result.current.shown) ? result.current.shown.value : undefined;
+    shown?.onReview?.();
+
+    expect(onReview).toHaveBeenCalledTimes(1);
+  });
+
+  it('runs the latest review callback from a status published earlier', () => {
+    const first = jest.fn();
+    const second = jest.fn();
+    let current = first;
+    const {result, rerender} = renderReporter(() => {
+      current();
+    });
+    act(() => {
+      result.current.reporter.start(items);
+    });
+    const published = maybe.isJust(result.current.shown) ? result.current.shown.value : undefined;
+
+    current = second;
+    rerender();
+    published?.onReview?.();
+
+    expect(first).not.toHaveBeenCalled();
+    expect(second).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not attach a review callback when none is given', () => {
+    const {result} = renderReporter();
+
+    act(() => {
+      result.current.reporter.start(items);
+      result.current.reporter.report('failed');
+    });
+
+    expect(maybe.isJust(result.current.shown) && result.current.shown.value.onReview).toBeUndefined();
   });
 });
