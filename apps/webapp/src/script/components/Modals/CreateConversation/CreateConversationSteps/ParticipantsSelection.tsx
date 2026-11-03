@@ -22,9 +22,6 @@ import {useMemo, useState, type FunctionComponent} from 'react';
 import {isUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
-import {FadingScrollbar} from 'Components/fadingScrollbar';
-import {SearchInput} from 'Components/SearchInput';
-import {UserSearchableList} from 'Components/UserSearchableList';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/userState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -33,6 +30,9 @@ import {sortUsersByPriority} from 'Util/stringUtil';
 
 import {participantsSelectionListCss, participantsSelectionSearchCss} from './CreateConversationSteps.styles';
 
+import {FadingScrollbar} from '../../../fadingScrollbar';
+import {SearchInput} from '../../../SearchInput';
+import {UserSearchableList} from '../../../UserSearchableList';
 import {useCreateConversation} from '../hooks/useCreateConversation';
 import {useCreateConversationModal} from '../hooks/useCreateConversationModal';
 import {getNonFederatingParticipantsModalCopy} from '../utils';

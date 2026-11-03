@@ -24,8 +24,8 @@ import {createElement} from 'react';
 
 import {render} from '@testing-library/react';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {MessageContent} from 'Components/Modals/PrimaryModal/Content/MessageContent';
+import {PrimaryModal} from '../../../Modals/PrimaryModal';
+import {MessageContent} from '../../../Modals/PrimaryModal/Content/MessageContent';
 import en from '../../../../../i18n/en-US.json';
 import {User} from 'Repositories/entity/User';
 import {generateQualifiedIds} from 'src/script/auth/util/test/testUtil';

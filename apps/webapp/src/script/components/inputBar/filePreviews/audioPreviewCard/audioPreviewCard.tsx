@@ -19,15 +19,14 @@
 
 import type {FunctionComponent} from 'react';
 
-import {FileCard} from 'Components/fileCard/fileCard';
-import {
-  controlStyles,
-  playerWrapperStyles,
-} from 'Components/messagesList/message/contentMessage/asset/audioAsset/audioAssetV2.styles';
-
 import {AudioEmptySeekBar} from './audioEmptySeekBar/audioEmptySeekBar';
 import {wrapperStyles} from './audioPreviewCard.styles';
 
+import {FileCard} from '../../../fileCard/fileCard';
+import {
+  controlStyles,
+  playerWrapperStyles,
+} from '../../../messagesList/message/contentMessage/asset/audioAsset/audioAssetV2.styles';
 import {FilePreviewDeleteButton} from '../common/filePreviewDeleteButton/filePreviewDeleteButton';
 import {FilePreviewErrorMoreButton} from '../common/filePreviewErrorMoreButton/filePreviewErrorMoreButton';
 import {FilePreviewPlayButton} from '../common/filePreviewPlayButton/filePreviewPlayButton';

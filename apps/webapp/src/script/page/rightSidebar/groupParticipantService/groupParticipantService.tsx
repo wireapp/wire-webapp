@@ -23,9 +23,6 @@ import {isNullOrUndefined} from '@sindresorhus/is';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {FadingScrollbar} from 'Components/fadingScrollbar';
-import * as Icon from 'Components/icon';
-import {ServiceDetails} from 'Components/panel/serviceDetails';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
@@ -37,6 +34,9 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 
+import {FadingScrollbar} from '../../../components/fadingScrollbar';
+import * as Icon from '../../../components/icon';
+import {ServiceDetails} from '../../../components/panel/serviceDetails';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {PanelHeader} from '../panelHeader';
 

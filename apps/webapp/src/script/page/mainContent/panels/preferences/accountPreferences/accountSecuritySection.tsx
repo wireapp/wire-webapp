@@ -26,7 +26,6 @@ import {container} from 'tsyringe';
 import {Runtime} from '@wireapp/commons';
 import {TabIndex, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
 import {AppLockState} from 'Repositories/user/appLockState';
@@ -35,6 +34,7 @@ import {UserRepository} from 'Repositories/user/userRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
+import {PrimaryModal} from '../../../../../components/Modals/PrimaryModal';
 import {externalUrl, getManageTeamUrl} from '../../../../../externalRoute';
 import {WebAppEvents} from '../../../../../webAppEvents';
 import {PreferencesSection} from '../components/preferencesSection';

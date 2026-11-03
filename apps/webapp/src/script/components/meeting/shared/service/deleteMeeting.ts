@@ -21,15 +21,16 @@ import {isNullOrUndefined} from '@sindresorhus/is';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import type {Task} from 'true-myth';
 
-import {meetingConversationSyncErrors} from 'Components/meeting/meetingConversationSync';
+import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/LeaveCallReason';
+
+import {meetingConversationSyncErrors} from '../../meetingConversationSync';
 import {
   removeMeetingConversationLocally,
   safeLeaveMeetingConversation,
   type LeaveMeetingConversationError,
-} from 'Components/meeting/meetingConversationTeardown';
-import type {MeetingServiceDeps} from 'Components/meeting/meetingStore/meetingStoreDeps';
-import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
-import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/LeaveCallReason';
+} from '../../meetingConversationTeardown';
+import type {MeetingServiceDeps} from '../../meetingStore/meetingStoreDeps';
+import {meetingSubmitErrors, type MeetingSubmitErrors} from '../../meetingSubmitErrors';
 
 export type DeleteMeetingCommand = {
   meetingId: QualifiedId;

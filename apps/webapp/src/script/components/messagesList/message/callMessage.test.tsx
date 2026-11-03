@@ -24,7 +24,7 @@ import {CallMessage as CallMessageEntity} from 'Repositories/entity/message/call
 
 import {CallMessage} from './callMessage';
 
-jest.mock('Components/icon', () => {
+jest.mock('../../icon', () => {
   return {
     HangupIcon: () => {
       return <span>hangupIcon</span>;

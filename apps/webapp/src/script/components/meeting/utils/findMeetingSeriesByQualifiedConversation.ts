@@ -20,8 +20,9 @@
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Maybe} from 'true-myth';
 
-import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
 import {matchQualifiedIds} from 'Util/qualifiedId';
+
+import type {MeetingSeries} from '../types/meetingSeries';
 
 export const findMeetingSeriesByQualifiedConversation = (
   meetingSeries: readonly MeetingSeries[],

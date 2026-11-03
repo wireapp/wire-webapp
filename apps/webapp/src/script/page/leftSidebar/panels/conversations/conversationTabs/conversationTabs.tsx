@@ -33,8 +33,6 @@ import {
   Tooltip,
 } from '@wireapp/react-ui-kit';
 
-import {openDebugToolbar} from 'Components/configToolbar/debugToolbarEvents';
-import * as Icon from 'Components/icon';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
@@ -69,6 +67,8 @@ import {MeetingsConversationTab} from './meetingsConversationTab';
 import {SettingsTab} from './settingsTab';
 import {TeamCreationBanner} from './teamCreation/teamCreationBanner';
 
+import {openDebugToolbar} from '../../../../../components/configToolbar/debugToolbarEvents';
+import * as Icon from '../../../../../components/icon';
 import {Config} from '../../../../../Config';
 import {ContentState} from '../../../../useAppState';
 import {ConversationTab} from '../conversationTab';

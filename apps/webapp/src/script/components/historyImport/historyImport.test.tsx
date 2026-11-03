@@ -28,7 +28,7 @@ import {
   type ByRoleOptions,
 } from '@testing-library/react';
 
-import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal, removeCurrentModal} from '../Modals/PrimaryModal';
 import {BackupRepository} from 'Repositories/backup/backupRepository';
 import {User} from 'Repositories/entity/User';
 import * as RootProvider from 'src/script/page/rootProvider';

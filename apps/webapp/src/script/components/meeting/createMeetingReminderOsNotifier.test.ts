@@ -26,7 +26,7 @@ import {isUndefined} from '@sindresorhus/is';
 import {createFactory} from '@enormora/objectory';
 import {Maybe, result} from 'true-myth';
 
-import type {MeetingReminderFirePayload} from 'Components/meeting/createMeetingReminderScheduler';
+import type {MeetingReminderFirePayload} from './createMeetingReminderScheduler';
 import type {Translate} from 'Util/localizerUtil';
 
 import {

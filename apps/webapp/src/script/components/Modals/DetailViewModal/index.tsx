@@ -24,7 +24,6 @@ import {isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 
-import {ZoomableImage} from 'Components/ZoomableImage';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
@@ -45,6 +44,7 @@ import {isContentMessage} from '../../../guards/Message';
 import {MessageCategory} from '../../../message/messageCategory';
 import {isOfCategory} from '../../../page/mainContent/panels/collection/utils';
 import {WebAppEvents} from '../../../webAppEvents';
+import {ZoomableImage} from '../../ZoomableImage';
 
 const detailModalScrollDelayInMilliseconds = 150;
 

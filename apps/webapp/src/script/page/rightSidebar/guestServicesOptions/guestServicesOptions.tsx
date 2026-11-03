@@ -19,8 +19,6 @@
 
 import {FC, useState} from 'react';
 
-import {FadingScrollbar} from 'Components/fadingScrollbar';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {toggleFeature} from 'Repositories/conversation/ConversationAccessPermission';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
@@ -32,6 +30,8 @@ import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {GuestOptions} from './components/guestOptions';
 import {ServicesOptions} from './components/servicesOptions';
 
+import {FadingScrollbar} from '../../../components/fadingScrollbar';
+import {PrimaryModal} from '../../../components/Modals/PrimaryModal';
 import {PanelHeader} from '../panelHeader';
 
 interface GuestServicesOptionsProps {

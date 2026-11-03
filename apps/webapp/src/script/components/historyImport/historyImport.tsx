@@ -23,9 +23,6 @@ import {isNonEmptyString} from '@sindresorhus/is';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/icon';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {ProgressBar} from 'Components/ProgressBar/ProgressBar';
 import {BackupRepository} from 'Repositories/backup/backupRepository';
 import {
   CancelError,
@@ -45,6 +42,9 @@ import {BackupFileUpload} from './backupFileUpload';
 
 import {Config} from '../../Config';
 import {MotionDuration} from '../../motion/MotionDuration';
+import * as Icon from '../icon';
+import {PrimaryModal} from '../Modals/PrimaryModal';
+import {ProgressBar} from '../ProgressBar/ProgressBar';
 
 export enum HistoryImportState {
   DONE = 'HistoryImportState.STATE.DONE',

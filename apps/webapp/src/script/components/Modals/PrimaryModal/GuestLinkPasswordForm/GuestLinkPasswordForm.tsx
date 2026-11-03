@@ -21,10 +21,11 @@ import type {FormEvent, FunctionComponent} from 'react';
 
 import {Form} from '@wireapp/react-ui-kit';
 
-import {PasswordFields} from 'Components/PasswordFields/PasswordFields';
-import {PasswordGeneratorButton} from 'Components/PasswordGeneratorButton';
 import {Config} from 'src/script/Config';
 import type {Translate} from 'Util/localizerUtil';
+
+import {PasswordFields} from '../../../PasswordFields/PasswordFields';
+import {PasswordGeneratorButton} from '../../../PasswordGeneratorButton';
 
 interface GuestLinkPasswordFormProps {
   readonly translate: Translate;

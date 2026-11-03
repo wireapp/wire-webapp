@@ -21,9 +21,10 @@ import type {FunctionComponent} from 'react';
 
 import cx from 'classnames';
 
-import {ServiceListItem} from 'Components/ServiceList/components/ServiceListItem';
 import type {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {useApplicationContext} from 'src/script/page/rootProvider';
+
+import {ServiceListItem} from './components/ServiceListItem';
 
 enum MODE {
   COMPACT = 'ServiceList.MODE.COMPACT',

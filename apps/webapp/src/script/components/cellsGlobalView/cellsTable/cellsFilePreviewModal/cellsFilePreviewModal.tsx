@@ -21,11 +21,11 @@ import type {FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
-import {CellsSelfUserDriveRoleProvider} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
-import {FileFullscreenModal} from 'Components/FileFullscreenModal/FileFullscreenModal';
 import {getFileTypeFromExtension} from 'Util/getFileTypeFromExtension/getFileTypeFromExtension';
 
+import {CellsSelfUserDriveRoleProvider} from '../../../conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {sortTagsAlphabetically} from '../../../conversation/conversationCells/common/sortTagsAlphabetically/sortTagsAlphabetically';
+import {FileFullscreenModal} from '../../../FileFullscreenModal/FileFullscreenModal';
 import {useCellsFilePreviewModal} from '../common/cellsFilePreviewModalContext/cellsFilePreviewModalContext';
 
 // This component is duplicated across global view and conversation view

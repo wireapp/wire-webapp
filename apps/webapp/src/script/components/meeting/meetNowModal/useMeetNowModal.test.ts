@@ -17,11 +17,8 @@
  *
  */
 
-import {
-  MEETING_TITLE_MAX_LENGTH,
-  meetingTitleErrorKeys,
-} from 'Components/meeting/shared/validation/meetingTitleValidation';
-import {meetingPasswordErrorKey} from 'Components/meeting/shared/validation/meetingPasswordValidation';
+import {MEETING_TITLE_MAX_LENGTH, meetingTitleErrorKeys} from '../shared/validation/meetingTitleValidation';
+import {meetingPasswordErrorKey} from '../shared/validation/meetingPasswordValidation';
 
 import {
   getDefaultMeetNowFormState,

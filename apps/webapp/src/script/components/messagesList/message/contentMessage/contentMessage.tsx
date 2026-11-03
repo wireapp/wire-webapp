@@ -26,8 +26,6 @@ import ko from 'knockout';
 
 import {OutlineCheck} from '@wireapp/react-ui-kit';
 
-import {FileFullscreenModalSourceConversationProvider} from 'Components/FileFullscreenModal/FileFullscreenModalSourceConversationContext';
-import {ReadIndicator} from 'Components/messagesList/message/readIndicator';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {CompositeMessage} from 'Repositories/entity/message/compositeMessage';
 import {ContentMessage} from 'Repositories/entity/message/contentMessage';
@@ -52,8 +50,10 @@ import {MessageActions} from '..';
 import {useClickOutside} from '../../../../hooks/useClickOutside';
 import {EphemeralStatusType} from '../../../../message/ephemeralStatusType';
 import {ContextMenuEntry} from '../../../../ui/contextMenu';
+import {FileFullscreenModalSourceConversationProvider} from '../../../FileFullscreenModal/FileFullscreenModalSourceConversationContext';
 import {EphemeralTimer} from '../ephemeralTimer';
 import {MessageTime} from '../messageTime';
+import {ReadIndicator} from '../readIndicator';
 import {useMessageFocusedTabIndex} from '../util';
 
 export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetSession'> {

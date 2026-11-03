@@ -23,7 +23,6 @@ import {useAutoAnimate} from '@formkit/auto-animate/react';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {container} from 'tsyringe';
 
-import {FileWithPreview} from 'Components/conversation/useFilesUploadState/useFilesUploadState';
 import {isAudio, isVideo, isImage} from 'Repositories/assets/assetMetaDataBuilder';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {isPreviewableImage} from 'Util/imageUtil';
@@ -34,6 +33,8 @@ import {wrapperStyles} from './filePreviews.styles';
 import {ImagePreviewCard} from './imagePreviewCard/imagePreviewCard';
 import {useFilePreview} from './useFilePreview/useFilePreview';
 import {VideoPreviewCard} from './videoPreviewCard/videoPreviewCard';
+
+import {FileWithPreview} from '../../conversation/useFilesUploadState/useFilesUploadState';
 
 interface FilePreviewsProps {
   files: FileWithPreview[];

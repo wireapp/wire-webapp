@@ -24,10 +24,6 @@ import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 
-import {useAppNotification} from 'Components/appNotification/index';
-import {useCallAlertState} from 'Components/calling/useCallAlertState';
-import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {trackCallQualityFeedback} from 'Repositories/tracking/helpers';
 import {UserState} from 'Repositories/user/userState';
@@ -46,6 +42,11 @@ import {
   title,
   wrapper,
 } from './QualityFeedbackModal.styles';
+import {RatingListLabel} from './typings';
+
+import {useAppNotification} from '../../appNotification';
+import {useCallAlertState} from '../../calling/useCallAlertState';
+import {ModalComponent} from '../ModalComponent';
 
 const logger = getLogger('CallQualityFeedback');
 

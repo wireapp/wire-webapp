@@ -23,10 +23,10 @@ import {isNonEmptyArray, isNonEmptyString} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import {useDebouncedCallback} from 'use-debounce';
 
-import {DRAFT_STATE_CHANGED_EVENT} from 'Components/inputBar/common/draftState/draftState';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {StorageKey} from 'Repositories/storage';
 
+import {DRAFT_STATE_CHANGED_EVENT} from '../../../../../components/inputBar/common/draftState/draftState';
 import {conversationHasDraft} from '../utils/draftUtils';
 
 const draftCheckDebounceInMilliseconds = 200;

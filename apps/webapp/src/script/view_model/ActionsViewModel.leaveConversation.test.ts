@@ -21,8 +21,8 @@ import ko from 'knockout';
 import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation';
 import {FEATURE_KEY, FEATURE_STATUS, type FeatureList} from '@wireapp/api-client/lib/team';
 
-import {useLeaveGroupAdminModalStore} from 'Components/Modals/LeaveGroupAdminModal/useLeaveGroupAdminModalStore';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {useLeaveGroupAdminModalStore} from '../components/Modals/LeaveGroupAdminModal/useLeaveGroupAdminModalStore';
+import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConnectionRepository} from 'Repositories/connection/connectionRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';

@@ -19,10 +19,11 @@
 
 import type {FunctionComponent} from 'react';
 
-import {CallingCell} from 'Components/calling/CallingCell';
 import {Call} from 'Repositories/calling/Call';
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {ListViewModel} from 'src/script/view_model/ListViewModel';
+
+import {CallingCell} from '../../../../../components/calling/CallingCell';
 
 type ConversationCallingViewProps = {
   activeCalls: Call[];

@@ -21,7 +21,6 @@ import {useCallback, type FunctionComponent} from 'react';
 
 import {FlexBox, IconButton} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/icon';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {CellsPageList} from './cellsPageList/cellsPageList';
@@ -38,6 +37,8 @@ import {
   arrowPreviousIconDisabledStyles,
   arrowNextIconDisabledStyles,
 } from './cellsPagination.styles';
+
+import * as Icon from '../../../icon';
 
 interface CellsPaginationProps {
   currentPage?: number;

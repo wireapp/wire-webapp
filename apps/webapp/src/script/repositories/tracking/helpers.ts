@@ -22,7 +22,6 @@ import {amplify} from 'amplify';
 
 import {Runtime} from '@wireapp/commons';
 
-import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
 import {Call} from 'Repositories/calling/Call';
 import {Conversation} from 'Repositories/entity/Conversation';
 import type {User} from 'Repositories/entity/User';
@@ -32,6 +31,7 @@ import {ConversationType, UserType, PlatformType} from './attribute';
 import {EventName} from './eventName';
 import {Segmentation} from './segmentation';
 
+import {RatingListLabel} from '../../components/Modals/QualityFeedbackModal/typings';
 import {WebAppEvents} from '../../webAppEvents';
 
 export interface GuestAttributes {

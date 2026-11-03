@@ -24,12 +24,6 @@ import {container} from 'tsyringe';
 
 import {TabIndex, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
-import {FadingScrollbar} from 'Components/fadingScrollbar';
-import * as Icon from 'Components/icon';
-import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {EnrichedFields} from 'Components/panel/enrichedFields';
-import {UserActions} from 'Components/panel/userActions';
-import {UserDetails} from 'Components/panel/userDetails';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserRepository} from 'Repositories/user/userRepository';
@@ -53,6 +47,12 @@ import {
 
 import {Config} from '../../../Config';
 import {Core} from '../../../service/coreSingleton';
+import {FadingScrollbar} from '../../fadingScrollbar';
+import * as Icon from '../../icon';
+import {EnrichedFields} from '../../panel/enrichedFields';
+import {UserActions} from '../../panel/userActions';
+import {UserDetails} from '../../panel/userDetails';
+import {ModalComponent} from '../ModalComponent';
 
 export interface UserModalProps {
   userRepository: UserRepository;

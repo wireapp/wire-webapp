@@ -25,15 +25,6 @@ import {container} from 'tsyringe';
 import {CALL_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {useAppNotification} from 'Components/appNotification/index';
-import {callingContainer} from 'Components/calling/CallingCell/CallingCell.styles';
-import {CallingControls} from 'Components/calling/CallingCell/CallingControls';
-import {CallingHeader} from 'Components/calling/CallingCell/CallingHeader';
-import {GroupVideoGrid} from 'Components/calling/GroupVideoGrid';
-import {useCallAlertState} from 'Components/calling/useCallAlertState';
-import {ConversationClassifiedBar} from 'Components/classifiedBar/classifiedBar';
-import * as Icon from 'Components/icon';
-import {useMeetingNotificationStore} from 'Components/meeting/meetingNotificationStore/meetingNotificationStore';
 import type {Call} from 'Repositories/calling/Call';
 import type {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {CallingViewMode, CallState, MuteState} from 'Repositories/calling/CallState';
@@ -49,6 +40,9 @@ import {useAppMainState, ViewType} from 'src/script/page/state';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isEnterKey, isSpaceOrEnterKey} from 'Util/keyboardUtil';
 
+import {callingContainer} from './CallingCell.styles';
+import {CallingControls} from './CallingControls';
+import {CallingHeader} from './CallingHeader';
 import {usePressSpaceToUnmute} from './usePressSpaceToUnmute/usePressSpaceToUnmute';
 
 import {useConversationCall} from '../../../hooks/useConversationCall';
@@ -56,6 +50,12 @@ import {useNoInternetCallGuard} from '../../../hooks/useNoInternetCallGuard/useN
 import {generateConversationUrl} from '../../../router/routeGenerator';
 import {CallActions, CallViewTab} from '../../../view_model/CallingViewModel';
 import {WebAppEvents} from '../../../webAppEvents';
+import {useAppNotification} from '../../appNotification';
+import {ConversationClassifiedBar} from '../../classifiedBar/classifiedBar';
+import * as Icon from '../../icon';
+import {useMeetingNotificationStore} from '../../meeting/meetingNotificationStore/meetingNotificationStore';
+import {GroupVideoGrid} from '../GroupVideoGrid';
+import {useCallAlertState} from '../useCallAlertState';
 
 interface VideoCallProps {
   hasAccessToCamera?: boolean;

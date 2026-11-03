@@ -21,7 +21,6 @@ import type {ReactElement, ReactNode, FunctionComponent} from 'react';
 
 import {Button, ButtonVariant, CollectionIcon, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/icon';
 import {
   groupCreationHeaderSenderNameMarkerEnd,
   groupCreationHeaderSenderNameMarkerStart,
@@ -39,6 +38,8 @@ import {e2eMessageContentLinkCss} from './e2eEncryptionMessage/e2eEncryptionMess
 import {ConnectedMessage} from './memberMessage/connectedMessage';
 import {MessageContent} from './memberMessage/messageContent';
 import {MessageTime} from './messageTime';
+
+import * as Icon from '../../icon';
 
 type RenderGroupCreationHeaderOptions = {
   readonly groupCreationHeader: string;

@@ -23,7 +23,6 @@ import {ConversationAccessUpdateData} from '@wireapp/api-client/lib/conversation
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {type Translate} from 'Util/localizerUtil';
 import type {TranslationKey} from 'Util/localizerUtil/translationTypes';
@@ -40,6 +39,8 @@ import {
 import {ConversationMapper} from './ConversationMapper';
 import type {ConversationService} from './ConversationService';
 import {ConversationEvent} from './EventBuilder';
+
+import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 
 const ACCESS_FEATURE_TRANSLATION_KEYS: Record<
   'Guest' | 'Service',

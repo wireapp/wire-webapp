@@ -25,16 +25,6 @@ import {container} from 'tsyringe';
 
 import {useMatchMedia} from '@wireapp/react-ui-kit';
 
-import {CallingCell} from 'Components/calling/CallingCell';
-import {parseAccountDeepLink} from 'Components/conversation/utils/parseAccountDeepLink';
-import {Giphy} from 'Components/giphy';
-import {InputBar} from 'Components/inputBar';
-import {MessageListWrapper} from 'Components/messagesList/messageListWrapper';
-import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {showUserModal} from 'Components/Modals/UserModal';
-import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
-import {TitleBar} from 'Components/titleBar';
 import {CallState} from 'Repositories/calling/CallState';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {Conversation as ConversationEntity} from 'Repositories/entity/Conversation';
@@ -88,6 +78,7 @@ import {ReadOnlyConversationMessage} from './readOnlyConversationMessage';
 import {useFilesUploadDropzone} from './useFilesUploadDropzone/useFilesUploadDropzone';
 import {withAutoReadGuard} from './utils/autoReadGuard';
 import {checkFileSharingPermission} from './utils/checkFileSharingPermission';
+import {parseAccountDeepLink} from './utils/parseAccountDeepLink';
 
 import {UserError} from '../../error/userError';
 import {isMouseRightClickEvent, isAuxRightClickEvent} from '../../guards/Mouse';
@@ -98,7 +89,16 @@ import {PanelState} from '../../page/rightSidebar';
 import {createCellsRepositoryGateway} from '../../repositories/cells/cellsRepositoryGateway';
 import {createCellsUploadManager} from '../../repositories/cells/upload/manager';
 import {WebAppEvents} from '../../webAppEvents';
+import {CallingCell} from '../calling/CallingCell';
+import {Giphy} from '../giphy';
+import {InputBar} from '../inputBar';
 import {ElementType, MessageDetails} from '../messagesList/message/contentMessage/asset/textMessageRenderer';
+import {MessageListWrapper} from '../messagesList/messageListWrapper';
+import {showDetailViewModal} from '../Modals/DetailViewModal';
+import {PrimaryModal} from '../Modals/PrimaryModal';
+import {showUserModal} from '../Modals/UserModal';
+import {showWarningModal} from '../Modals/utils/showWarningModal';
+import {TitleBar} from '../titleBar';
 
 interface ConversationProps {
   readonly teamState: TeamState;

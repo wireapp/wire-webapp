@@ -26,13 +26,6 @@ import {amplify} from 'amplify';
 
 import {CollectionIcon, HideIcon, HistoryIcon, LockClosedIcon, UnlockedIcon} from '@wireapp/react-ui-kit';
 
-import {
-  CELLS_SELF_USER_DRIVE_ROLE,
-  getSelfUserDriveRole,
-} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
-import * as Icon from 'Components/icon';
-import {PanelActions} from 'Components/panel/panelActions';
-import {ReceiptModeToggle} from 'Components/toggle/ReceiptModeToggle';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationRoleRepository} from 'Repositories/conversation/ConversationRoleRepository';
 import {supportsReadReceipts} from 'Repositories/conversation/ConversationSelectors';
@@ -46,6 +39,13 @@ import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {ConversationDetailsOption} from './conversationDetailsOption';
 
+import {
+  CELLS_SELF_USER_DRIVE_ROLE,
+  getSelfUserDriveRole,
+} from '../../../../../components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
+import * as Icon from '../../../../../components/icon';
+import {PanelActions} from '../../../../../components/panel/panelActions';
+import {ReceiptModeToggle} from '../../../../../components/toggle/ReceiptModeToggle';
 import {ActionsViewModel} from '../../../../../view_model/ActionsViewModel';
 import {WebAppEvents} from '../../../../../webAppEvents';
 import {PanelEntity, PanelState} from '../../../rightSidebar';

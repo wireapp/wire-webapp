@@ -21,8 +21,9 @@ import {CSSObject} from '@emotion/serialize';
 
 import {Availability} from '@wireapp/protocol-messaging';
 
-import * as Icon from 'Components/icon';
 import {CSS_SQUARE} from 'Util/cssMixin';
+
+import * as Icon from '../components/icon';
 
 const availabilityIconSizeInPixels = 10;
 

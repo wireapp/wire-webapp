@@ -26,8 +26,6 @@ import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/icon';
-import {getUserNameWithTranslate} from 'Components/UserName';
 import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from 'Repositories/entity/message/failedToAddUsersMessage';
 import {User} from 'Repositories/entity/User';
 import {UserState} from 'Repositories/user/userState';
@@ -42,6 +40,9 @@ import {matchQualifiedIds} from 'Util/qualifiedId';
 import {backendErrorLink, warning} from './contentMessage/warnings/warnings.styles';
 import {MessageTime} from './messageTime';
 import {useMessageFocusedTabIndex} from './util';
+
+import * as Icon from '../../icon';
+import {getUserNameWithTranslate} from '../../UserName';
 
 interface FailedToAddUsersMessageProps {
   isMessageFocused: boolean;

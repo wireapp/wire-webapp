@@ -36,12 +36,6 @@ import {
   TabIndex,
 } from '@wireapp/react-ui-kit';
 
-import {useAppNotification} from 'Components/appNotification/appNotification';
-import {useCallAlertState} from 'Components/calling/useCallAlertState';
-import {VideoBackgroundPerformancePanel} from 'Components/calling/VideoControls/videoBackgroundPerformancePanel/videoBackgroundPerformancePanel';
-import {ConversationClassifiedBar} from 'Components/classifiedBar/classifiedBar';
-import * as Icon from 'Components/icon';
-import {ModalComponent} from 'Components/Modals/ModalComponent';
 import type {Call} from 'Repositories/calling/Call';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {CallingViewMode, CallState, MuteState} from 'Repositories/calling/CallState';
@@ -77,12 +71,18 @@ import {
 } from './FullscreenVideoCall.styles';
 import {GroupVideoGrid} from './GroupVideoGrid';
 import {Pagination} from './Pagination/Pagination';
+import {useCallAlertState} from './useCallAlertState';
+import {VideoBackgroundPerformancePanel} from './VideoControls/videoBackgroundPerformancePanel/videoBackgroundPerformancePanel';
 import {VideoBackgroundSettings} from './VideoControls/VideoBackgroundSettings/VideoBackgroundSettings';
 import {VideoControls} from './VideoControls/VideoControls';
 
 import {useWarningsState} from '../../view_model/WarningsContainer/WarningsState';
 import {CONFIG, TYPE} from '../../view_model/WarningsContainer/WarningsTypes';
 import {WebAppEvents} from '../../webAppEvents';
+import {useAppNotification} from '../appNotification/appNotification';
+import {ConversationClassifiedBar} from '../classifiedBar/classifiedBar';
+import * as Icon from '../icon';
+import {ModalComponent} from '../Modals/ModalComponent';
 
 export interface FullscreenVideoCallProps {
   activeCallViewTab: string;

@@ -25,8 +25,6 @@ import {AudioPreference, NotificationPreference, WebappProperties} from '@wireap
 import {amplify} from 'amplify';
 import ko from 'knockout';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 import type {User} from 'Repositories/entity/User';
 import type {SelfService} from 'Repositories/self/SelfService';
 import {StorageKey} from 'Repositories/storage';
@@ -42,6 +40,8 @@ import {loadValue} from 'Util/storageUtil';
 import type {PropertiesService} from './propertiesService';
 import {PROPERTIES_TYPE, UserConsentStatus} from './propertiesType';
 
+import {PrimaryModal} from '../../components/Modals/PrimaryModal';
+import {PrimaryModalType} from '../../components/Modals/PrimaryModal/PrimaryModalTypes';
 import {WebAppEvents} from '../../webAppEvents';
 
 const mergeWebappProperties = createDeepmerge();

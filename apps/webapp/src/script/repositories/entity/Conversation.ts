@@ -46,7 +46,6 @@ import {Cancelable, debounce} from 'underscore';
 
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
-import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {ClientRepository} from 'Repositories/client';
 import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
 import {ACCESS_STATE} from 'Repositories/conversation/AccessState';
@@ -68,6 +67,7 @@ import type {Message} from './message/message';
 import {PingMessage} from './message/pingMessage';
 import type {User} from './User';
 
+import {useLegalHoldModalState} from '../../components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {Config} from '../../Config';
 import {ConversationError} from '../../error/conversationError';
 import {isContentMessage, isDeleteMessage} from '../../guards/Message';

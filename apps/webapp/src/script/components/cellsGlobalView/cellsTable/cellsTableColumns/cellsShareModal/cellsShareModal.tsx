@@ -22,11 +22,6 @@ import {ReactElement, useEffect, useRef, useState} from 'react';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isUndefined} from '@sindresorhus/is';
 
-import {CellsShareModalContent} from 'Components/cells/shareModal/cellsShareModalContent';
-import {serializeShareModalInput} from 'Components/cells/shareModal/shareModalSerializer';
-import {useCellExpirationToggle} from 'Components/cells/shareModal/useCellExpirationToggle';
-import {useCellPasswordToggle} from 'Components/cells/shareModal/useCellPasswordToggle';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import type {RootContextValue} from 'src/script/page/rootProvider';
 import {createUuid} from 'Util/uuid';
@@ -54,6 +49,11 @@ import {
 } from './cellsShareModal.styles';
 import {useCellGlobalPublicLink} from './useCellGlobalPublicLink';
 
+import {CellsShareModalContent} from '../../../../cells/shareModal/cellsShareModalContent';
+import {serializeShareModalInput} from '../../../../cells/shareModal/shareModalSerializer';
+import {useCellExpirationToggle} from '../../../../cells/shareModal/useCellExpirationToggle';
+import {useCellPasswordToggle} from '../../../../cells/shareModal/useCellPasswordToggle';
+import {PrimaryModal} from '../../../../Modals/PrimaryModal';
 import {useCellsStore} from '../../../common/useCellsStore/useCellsStore';
 
 interface ShareModalParams {

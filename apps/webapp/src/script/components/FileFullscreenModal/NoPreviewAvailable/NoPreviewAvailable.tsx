@@ -21,13 +21,13 @@ import type {FunctionComponent} from 'react';
 
 import {Button} from '@wireapp/react-ui-kit';
 
-import {
-  CELLS_ACTION,
-  useCellsActionPermissions,
-} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {forcedDownloadFile, getFileNameWithExtension} from 'Util/util';
 
+import {
+  CELLS_ACTION,
+  useCellsActionPermissions,
+} from '../../conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {FilePlaceholder} from '../common/FilePlaceholder/FilePlaceholder';
 
 interface NoPreviewAvailableProps {

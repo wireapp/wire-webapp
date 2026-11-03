@@ -20,11 +20,9 @@
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Task, task} from 'true-myth';
 
-import {
-  meetingConversationSyncErrors,
-  type MeetingConversationSyncError,
-} from 'Components/meeting/meetingConversationSync';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+
+import {meetingConversationSyncErrors, type MeetingConversationSyncError} from './meetingConversationSync';
 
 export type LeaveMeetingConversationError =
   typeof meetingConversationSyncErrors.conversationNotFound | typeof meetingConversationSyncErrors.leaveFailed;

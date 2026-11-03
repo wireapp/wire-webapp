@@ -27,13 +27,6 @@ import {container} from 'tsyringe';
 
 import {STATE as CALL_STATE} from '@wireapp/avs';
 
-import {
-  joinMeetingCall,
-  joinMeetingCallErrors,
-  type JoinMeetingCallDeps,
-  type JoinMeetingCallError,
-} from 'Components/meeting/joinMeetingCall';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {CallMediaChoice} from 'Repositories/calling/callMediaChoice';
 import {CallState} from 'Repositories/calling/CallState';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
@@ -43,9 +36,17 @@ import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import {
+  joinMeetingCall,
+  joinMeetingCallErrors,
+  type JoinMeetingCallDeps,
+  type JoinMeetingCallError,
+} from './joinMeetingCall';
+
+import {
   showCallNotEstablishedModal,
   useNoInternetCallGuard,
 } from '../../hooks/useNoInternetCallGuard/useNoInternetCallGuard';
+import {PrimaryModal} from '../Modals/PrimaryModal';
 
 type JoinMeetingCallResultHandlers = {
   showConversationNotFoundModal: () => void;

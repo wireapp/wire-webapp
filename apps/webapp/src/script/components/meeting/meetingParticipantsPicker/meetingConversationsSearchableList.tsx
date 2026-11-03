@@ -23,15 +23,16 @@ import {isNonEmptyString} from '@sindresorhus/is';
 
 import {Checkbox, CheckboxLabel, ChevronDownIcon} from '@wireapp/react-ui-kit';
 
-import {ChannelAvatar} from 'Components/avatar/channelAvatar';
-import {GroupAvatar} from 'Components/avatar/groupAvatar';
-import {listItem, listWrapper} from 'Components/participantItemContent/participantItem.styles';
-import {collapseButton, collapseIcon} from 'Components/userList/userList.styles';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {conversationIconStyles, conversationListStyles} from './meetingParticipantsPicker.styles';
 import {getConversationKey} from './participantPickerUtils';
+
+import {ChannelAvatar} from '../../avatar/channelAvatar';
+import {GroupAvatar} from '../../avatar/groupAvatar';
+import {listItem, listWrapper} from '../../participantItemContent/participantItem.styles';
+import {collapseButton, collapseIcon} from '../../userList/userList.styles';
 
 type MeetingConversationsSearchableListProps = {
   id: string;

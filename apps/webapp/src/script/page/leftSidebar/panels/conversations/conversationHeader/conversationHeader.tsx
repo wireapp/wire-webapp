@@ -24,8 +24,6 @@ import {amplify} from 'amplify';
 
 import {CircleCloseIcon, IconButton, Input, SearchIcon} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/icon';
-import {useCreateConversationModal} from 'Components/Modals/CreateConversation/hooks/useCreateConversationModal';
 import {ConversationLabel} from 'Repositories/conversation/ConversationLabelRepository';
 import {User} from 'Repositories/entity/User';
 import {generatePermissionHelpers} from 'Repositories/user/userPermission';
@@ -48,6 +46,8 @@ import {
   searchInputWrapperStyles,
 } from './conversationHeader.styles';
 
+import * as Icon from '../../../../../components/icon';
+import {useCreateConversationModal} from '../../../../../components/Modals/CreateConversation/hooks/useCreateConversationModal';
 import {WebAppEvents} from '../../../../../webAppEvents';
 
 export const conversationsPanelHeadingId = 'conversations-heading';

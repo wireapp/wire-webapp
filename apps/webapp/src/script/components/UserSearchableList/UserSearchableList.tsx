@@ -24,7 +24,6 @@ import {QualifiedId, UserType} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 import {useDebouncedCallback} from 'use-debounce';
 
-import {UserList} from 'Components/userList';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import type {User} from 'Repositories/entity/User';
 import type {SearchRepository} from 'Repositories/search/searchRepository';
@@ -34,6 +33,8 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 import {partition} from 'Util/arrayUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {sortByPriority} from 'Util/stringUtil';
+
+import {UserList} from '../userList';
 
 export type UserListProps = Omit<React.ComponentProps<typeof UserList>, 'conversationState' | 'teamState'> & {
   conversationState?: Pick<ConversationState, 'hasConversationWith'>;

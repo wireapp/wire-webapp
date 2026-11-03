@@ -19,10 +19,11 @@
 
 import type {FunctionComponent} from 'react';
 
-import {CellsSearchInput} from 'Components/cellsSearchInput/cellsSearchInput';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {wrapperStyles} from './cellsSearch.styles';
+
+import {CellsSearchInput} from '../../../cellsSearchInput/cellsSearchInput';
 
 interface CellsSearchProps {
   searchValue: string;

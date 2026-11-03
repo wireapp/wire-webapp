@@ -24,8 +24,6 @@ import {amplify} from 'amplify';
 import {Runtime} from '@wireapp/commons';
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/icon';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {
   ClientNotificationData,
   Notification,
@@ -37,6 +35,8 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {ListWrapper} from './listWrapper';
 
+import * as Icon from '../../../components/icon';
+import {PrimaryModal} from '../../../components/Modals/PrimaryModal';
 import {WebAppEvents} from '../../../webAppEvents';
 import {ContentState, useAppState} from '../../useAppState';
 

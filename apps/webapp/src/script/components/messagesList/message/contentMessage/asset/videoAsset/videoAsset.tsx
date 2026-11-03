@@ -25,7 +25,6 @@ import {container} from 'tsyringe';
 
 import {TabIndex, Button, ButtonVariant, useTimeout} from '@wireapp/react-ui-kit';
 
-import {RestrictedVideo} from 'Components/asset/RestrictedVideo';
 import {AssetError} from 'Repositories/assets/assetError';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
@@ -37,6 +36,7 @@ import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {formatSeconds} from 'Util/timeUtil';
 import {useEffectRef} from 'Util/useEffectRef';
 
+import {RestrictedVideo} from '../../../../../asset/RestrictedVideo';
 import {MediaButton} from '../common/mediaButton/mediaButton';
 import {SeekBar} from '../common/seekBar/seekBar';
 import {AssetUrl, useAssetTransfer} from '../common/useAssetTransfer/useAssetTransfer';

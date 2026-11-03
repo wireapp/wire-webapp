@@ -23,13 +23,6 @@ import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isNonEmptyString} from '@sindresorhus/is';
 import {useDebouncedCallback} from 'use-debounce';
 
-import {transformCellsNodes} from 'Components/cells/common/transformCellsNodes/transformCellsNodes';
-import {
-  GlobalDriveFiltersState,
-  toGlobalDriveSearchParams,
-} from 'Components/conversation/conversationCells/common/driveFilters/driveFilters';
-import {CellsSort} from 'Components/conversation/conversationCells/common/useCellsSorting/useCellsSorting';
-import {createRequestVersionGate} from 'Components/conversation/conversationCells/useConversationSearch/requestVersionGate';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {UserRepository} from 'Repositories/user/userRepository';
@@ -38,6 +31,13 @@ import {getLogger, Logger} from 'Util/logger';
 import {getConversationsFromNodes} from './getConversationsFromNodes';
 import {getUsersFromNodes} from './getUsersFromNodes';
 
+import {transformCellsNodes} from '../../cells/common/transformCellsNodes/transformCellsNodes';
+import {
+  GlobalDriveFiltersState,
+  toGlobalDriveSearchParams,
+} from '../../conversation/conversationCells/common/driveFilters/driveFilters';
+import {CellsSort} from '../../conversation/conversationCells/common/useCellsSorting/useCellsSorting';
+import {createRequestVersionGate} from '../../conversation/conversationCells/useConversationSearch/requestVersionGate';
 import {useCellsStore, Status} from '../common/useCellsStore/useCellsStore';
 import {transformCellsPagination} from '../transformCellsPagination/transformCellsPagination';
 

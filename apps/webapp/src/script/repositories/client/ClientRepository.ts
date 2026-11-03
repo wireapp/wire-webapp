@@ -29,7 +29,6 @@ import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
 import {User} from 'Repositories/entity/User';
 import {ClientRecord} from 'Repositories/storage';
@@ -49,6 +48,7 @@ import {ClientState} from './ClientState';
 import {isClientMLSCapable, wasClientActiveWithinLast4Weeks} from './ClientUtils';
 
 import {SIGN_OUT_REASON} from '../../auth/signOutReason';
+import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {ClientError} from '../../error/clientError';
 import {Core} from '../../service/coreSingleton';
 import {WebAppEvents} from '../../webAppEvents';

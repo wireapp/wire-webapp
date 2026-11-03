@@ -21,13 +21,14 @@ import type {FunctionComponent} from 'react';
 
 import {isUndefined} from '@sindresorhus/is';
 
-import {GroupAvatar, ChannelAvatar} from 'Components/avatar';
-import {openConversation} from 'Components/cellsGlobalView/common/openConversation/openConversation';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {avatarWrapperStyles, textStyles, wrapperStyles} from './cellsConversationColumn.styles';
+
+import {GroupAvatar, ChannelAvatar} from '../../../../avatar';
+import {openConversation} from '../../../common/openConversation/openConversation';
 
 interface CellsConversationColumnProps {
   conversation?: Conversation;

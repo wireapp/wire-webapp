@@ -22,9 +22,6 @@ import React, {type FunctionComponent} from 'react';
 import {isNonEmptyString} from '@sindresorhus/is';
 import ko from 'knockout';
 
-import {UserBlockedBadge, UserVerificationBadges} from 'Components/badge';
-import * as Icon from 'Components/icon';
-import {UserInfo} from 'Components/UserInfo';
 import {User} from 'Repositories/entity/User';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
@@ -40,6 +37,10 @@ import {
   contentText,
   wrapper,
 } from './participantItem.styles';
+
+import {UserBlockedBadge, UserVerificationBadges} from '../badge';
+import * as Icon from '../icon';
+import {UserInfo} from '../UserInfo';
 
 interface ParticipantItemContentProps {
   /** the conversation context in which we are displaying the user (will enable e2ei verification badges) */

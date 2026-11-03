@@ -23,7 +23,6 @@ import {isFunction, isNull} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import cx from 'classnames';
 
-import {InViewport} from 'Components/inViewport';
 import type {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import type {ContentMessage} from 'Repositories/entity/message/contentMessage';
@@ -42,6 +41,8 @@ import {ElementType, MessageDetails} from './contentMessage/asset/textMessageRen
 import {MessageWrapper} from './messageWrapper';
 import {ScrollToElement} from './types';
 import {useMessageFocusedTabIndex} from './util';
+
+import {InViewport} from '../../inViewport';
 
 export interface MessageActions {
   onClickAvatar: (user: User | ServiceEntity) => void;

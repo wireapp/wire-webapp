@@ -22,10 +22,11 @@ import {useCallback, useMemo} from 'react';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
-import {joinPreparedMeeting} from 'Components/meeting/meetingPrep/joinPreparedMeeting';
 import type {CallMediaChoice} from 'Repositories/calling/callMediaChoice';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {useApplicationContext, useMainViewModel} from 'src/script/page/rootProvider';
+
+import {joinPreparedMeeting} from './joinPreparedMeeting';
 
 import {useNoInternetCallGuard} from '../../../hooks/useNoInternetCallGuard/useNoInternetCallGuard';
 

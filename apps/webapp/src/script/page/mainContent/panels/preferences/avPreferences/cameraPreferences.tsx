@@ -21,7 +21,6 @@ import {memo, useCallback, useEffect, useRef, useState, type FunctionComponent, 
 
 import {useDebouncedCallback} from 'use-debounce';
 
-import * as Icon from 'Components/icon';
 import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import {MediaType} from 'Repositories/media/MediaType';
 import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
@@ -32,6 +31,7 @@ import {getLogger} from 'Util/logger';
 
 import {DeviceSelect} from './deviceSelect';
 
+import * as Icon from '../../../../../components/icon';
 import {Config} from '../../../../../Config';
 import {PreferencesSection} from '../components/preferencesSection';
 

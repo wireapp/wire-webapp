@@ -19,10 +19,11 @@
 
 import {useCallback, useEffect} from 'react';
 
-import {checkFileSharingPermission} from 'Components/conversation/utils/checkFileSharingPermission';
 import type {Translate} from 'Util/localizerUtil';
 import {formatLocale} from 'Util/timeUtil';
 import {getFileExtension, sanitizeFilename} from 'Util/util';
+
+import {checkFileSharingPermission} from '../../../conversation/utils/checkFileSharingPermission';
 
 interface UseFilePasteParams {
   onFilePasted: (file: File) => void;

@@ -19,7 +19,6 @@
 
 import type {FunctionComponent} from 'react';
 
-import * as Icon from 'Components/icon';
 import {Participant} from 'Repositories/calling/Participant';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
@@ -31,6 +30,7 @@ import {
   screenShareIcon,
 } from './CallParticipantsListItem.styles';
 
+import * as Icon from '../../icon';
 import {ParticipantMicOnIcon} from '../ParticipantMicOnIcon';
 
 interface CallParticipantStatusIconsProps {

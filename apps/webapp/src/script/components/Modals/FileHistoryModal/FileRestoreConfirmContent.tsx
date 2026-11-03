@@ -21,7 +21,6 @@ import type {FunctionComponent} from 'react';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/icon';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {
@@ -32,6 +31,8 @@ import {
   restoreModalDescriptionCss,
   restoreModalTitleCss,
 } from './FileHistoryModal.styles';
+
+import * as Icon from '../../icon';
 
 interface FileRestoreConfirmModalProps {
   isLoading: boolean;

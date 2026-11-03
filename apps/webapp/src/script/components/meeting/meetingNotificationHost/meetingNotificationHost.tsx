@@ -21,8 +21,6 @@ import {useEffect, useRef, type FunctionComponent} from 'react';
 
 import {ChevronIcon} from '@wireapp/react-ui-kit';
 
-import {MeetingNotificationCard} from 'Components/meeting/meetingNotificationCard/meetingNotificationCard';
-import {useMeetingNotificationStore} from 'Components/meeting/meetingNotificationStore/meetingNotificationStore';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {
@@ -36,6 +34,9 @@ import {
   meetingNotificationHostListStyles,
   meetingNotificationHostStyles,
 } from './meetingNotificationHost.styles';
+
+import {MeetingNotificationCard} from '../meetingNotificationCard/meetingNotificationCard';
+import {useMeetingNotificationStore} from '../meetingNotificationStore/meetingNotificationStore';
 
 type MeetingNotificationHostProps = {
   isStandalone: boolean;

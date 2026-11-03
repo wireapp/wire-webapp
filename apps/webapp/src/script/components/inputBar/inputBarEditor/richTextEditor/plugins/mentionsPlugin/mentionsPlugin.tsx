@@ -26,12 +26,12 @@ import {isEmptyArray, isNullOrUndefined} from '@sindresorhus/is';
 import {$createTextNode, TextNode} from 'lexical';
 import * as ReactDOM from 'react-dom';
 
-import {FadingScrollbar} from 'Components/fadingScrollbar';
-import {IgnoreOutsideClickWrapper} from 'Components/inputBar/util/clickHandlers';
 import {User} from 'Repositories/entity/User';
 
 import {MentionSuggestionsItem} from './mentionSuggestionsItem';
 
+import {FadingScrollbar} from '../../../../../fadingScrollbar';
+import {IgnoreOutsideClickWrapper} from '../../../../util/clickHandlers';
 import {$createMentionNode} from '../../nodes/mentionNode';
 import {getSelectionInfo} from '../../utils/getSelectionInfo';
 import {TypeaheadMenuPlugin} from '../typeaheadMenuPlugin/typeaheadMenuPlugin';

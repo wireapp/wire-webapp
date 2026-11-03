@@ -25,7 +25,7 @@ import {useEffect, type FunctionComponent} from 'react';
 
 import {render, waitFor} from '@testing-library/react';
 
-import {DraftState} from 'Components/inputBar/common/draftState/draftState';
+import {DraftState} from '../../../../common/draftState/draftState';
 import {unwrap} from 'Util/test/resultTestSupport';
 
 import {EmojiNode} from '../../nodes/emojiNode';

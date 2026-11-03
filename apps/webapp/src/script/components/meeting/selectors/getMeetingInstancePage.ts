@@ -19,10 +19,10 @@
 
 import {isUndefined} from '@sindresorhus/is';
 
-import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
-import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
-
 import {getFirstMeetingInstanceOnOrAfter, getNextMeetingInstance} from './getMeetingInstancesInRange';
+
+import type {MeetingInstance} from '../types/meetingInstance';
+import type {MeetingSeries} from '../types/meetingSeries';
 
 export type MeetingInstancePage = {
   meetingInstances: MeetingInstance[];

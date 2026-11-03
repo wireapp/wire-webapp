@@ -27,9 +27,6 @@ import {container} from 'tsyringe';
 import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {Availability} from '@wireapp/protocol-messaging';
 
-import 'Components/calling/ChooseScreen';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import type {PrimaryModalTranslatedMessage} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 import type {AudioRepository} from 'Repositories/audio/audioRepository';
 import {AudioType} from 'Repositories/audio/audioType';
 import type {Call} from 'Repositories/calling/Call';
@@ -56,6 +53,9 @@ import {type Translate} from 'Util/localizerUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {safeWindowOpen} from 'Util/sanitizationUtil';
 
+import '../components/calling/ChooseScreen';
+import {PrimaryModal} from '../components/Modals/PrimaryModal';
+import type {PrimaryModalTranslatedMessage} from '../components/Modals/PrimaryModal/PrimaryModalTypes';
 import {Config} from '../Config';
 import {WebAppEvents} from '../webAppEvents';
 

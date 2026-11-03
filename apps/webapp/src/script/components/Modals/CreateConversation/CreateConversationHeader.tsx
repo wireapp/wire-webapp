@@ -24,7 +24,6 @@ import {container} from 'tsyringe';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/icon';
 import {UserState} from 'Repositories/user/userState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
@@ -32,6 +31,8 @@ import {createConversationHeaderContainerCss} from './CreateConversation.styles'
 import {CreateConversationSubmit} from './CreateConversationSubmit';
 import {useCreateConversationModal} from './hooks/useCreateConversationModal';
 import {ConversationType, ConversationCreationStep} from './types';
+
+import * as Icon from '../../icon';
 
 export const CreateConversationHeader: FunctionComponent = () => {
   const {translate} = useApplicationContext();

@@ -24,10 +24,10 @@ import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {task} from 'true-myth';
 
-import {getCellsApiPath} from 'Components/conversation/conversationCells/common/getCellsApiPath/getCellsApiPath';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {CellNode} from 'src/script/types/cellNode';
 
+import {getCellsApiPath} from '../../../../../common/getCellsApiPath/getCellsApiPath';
 import {transformNodesToCellsFolders} from '../useGetCellsFolders/transformNodesToCellsFolders';
 
 interface UseLegacyGetCellsFoldersProps {

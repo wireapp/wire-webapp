@@ -21,13 +21,13 @@ import {useState, RefObject, FC, useRef} from 'react';
 
 import {isNull} from '@sindresorhus/is';
 
-import {EmojiPicker} from 'Components/emojiPicker/emojiPicker';
 import {isSpaceOrEnterKey} from 'Util/keyboardUtil';
 import type {Translate} from 'Util/localizerUtil';
 
 import {EmojiChar} from './emojiChar';
 import {reactionImgSize} from './emojiChar.styles';
 
+import {EmojiPicker} from '../../../../../emojiPicker/emojiPicker';
 import {MessageActionsId} from '../messageActions';
 import {useMessageActionsState} from '../messageActions.state';
 import {messageActionsMenuButton, getActionsMenuCSS, getIconCSS} from '../messageActions.styles';

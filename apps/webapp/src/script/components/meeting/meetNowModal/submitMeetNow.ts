@@ -19,21 +19,22 @@
 
 import {task, type Task} from 'true-myth';
 
-import {mapMeetNowFormToMeetingCommand} from 'Components/meeting/mapMeetNowFormToMeetingCommand';
-import type {MeetingPrepSession} from 'Components/meeting/meetingPrep/useMeetingPrepModal';
-import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
-import type {CreateMeetingSuccess} from 'Components/meeting/shared/service/meetingService';
-import {MEET_NOW_ERROR_TRANSLATION_KEYS} from 'Components/meeting/shared/submit/meetingSubmitErrorKeys';
-import {
-  isMeetingPersistedDespiteSubmitError,
-  shouldRefreshMeetingsListAfterSubmitError,
-} from 'Components/meeting/shared/submit/shouldRefreshMeetingsListAfterSubmitError';
-import {showMeetingPartialAddFailureModal} from 'Components/meeting/shared/submit/showMeetingPartialAddFailureModal';
-import {showMeetingSubmitError} from 'Components/meeting/shared/submit/showMeetingSubmitError';
-import type {MeetNowMeetingCommand} from 'Components/meeting/shared/types/meetingCommandTypes';
 import type {Translate} from 'Util/localizerUtil';
 
 import {meetNowSubmitResults, type MeetNowFormState, type MeetNowSubmitResult} from './meetNowTypes';
+
+import {mapMeetNowFormToMeetingCommand} from '../mapMeetNowFormToMeetingCommand';
+import type {MeetingPrepSession} from '../meetingPrep/useMeetingPrepModal';
+import {meetingSubmitErrors, type MeetingSubmitErrors} from '../meetingSubmitErrors';
+import type {CreateMeetingSuccess} from '../shared/service/meetingService';
+import {MEET_NOW_ERROR_TRANSLATION_KEYS} from '../shared/submit/meetingSubmitErrorKeys';
+import {
+  isMeetingPersistedDespiteSubmitError,
+  shouldRefreshMeetingsListAfterSubmitError,
+} from '../shared/submit/shouldRefreshMeetingsListAfterSubmitError';
+import {showMeetingPartialAddFailureModal} from '../shared/submit/showMeetingPartialAddFailureModal';
+import {showMeetingSubmitError} from '../shared/submit/showMeetingSubmitError';
+import type {MeetNowMeetingCommand} from '../shared/types/meetingCommandTypes';
 
 export type SubmitMeetNowParams = {
   formState: MeetNowFormState;

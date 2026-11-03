@@ -32,7 +32,6 @@ import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
 
-import {AppContainer} from 'Components/appContainer/appContainer';
 import {doSimpleRedirect} from 'Repositories/LifeCycleRepository/LifeCycleRepository';
 import {StorageKey} from 'Repositories/storage';
 import {translate} from 'Util/localizerUtil';
@@ -44,6 +43,7 @@ import {exposeWrapperGlobals} from 'Util/wrapper';
 import {createApplicationServices} from './createApplicationServices';
 
 import {SIGN_OUT_REASON} from '../auth/signOutReason';
+import {AppContainer} from '../components/appContainer/appContainer';
 import {Config} from '../Config';
 import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
 import {createIncrementalHttpRetryBackoffReset} from '../lifecycle/createIncrementalHttpRetryBackoffReset';

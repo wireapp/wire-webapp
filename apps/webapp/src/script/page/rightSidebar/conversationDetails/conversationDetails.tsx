@@ -28,12 +28,6 @@ import {noop} from 'noop-esm';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {FadingScrollbar} from 'Components/fadingScrollbar';
-import * as Icon from 'Components/icon';
-import {ManualMigrationProtocolDetails} from 'Components/panel/conversationProtocolDetails/manualMigrationProtocolDetails';
-import {EnrichedFields} from 'Components/panel/enrichedFields';
-import {ServiceDetails} from 'Components/panel/serviceDetails';
-import {UserDetails} from 'Components/panel/userDetails';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
 import {getNotificationText} from 'Repositories/conversation/NotificationSetting';
@@ -52,6 +46,12 @@ import {ConversationDetailsHeader} from './components/conversationDetailsHeader'
 import {ConversationDetailsOptions} from './components/conversationDetailsOptions';
 import {ConversationDetailsParticipants} from './components/conversationDetailsParticipants';
 
+import {FadingScrollbar} from '../../../components/fadingScrollbar';
+import * as Icon from '../../../components/icon';
+import {ManualMigrationProtocolDetails} from '../../../components/panel/conversationProtocolDetails/manualMigrationProtocolDetails';
+import {EnrichedFields} from '../../../components/panel/enrichedFields';
+import {ServiceDetails} from '../../../components/panel/serviceDetails';
+import {UserDetails} from '../../../components/panel/userDetails';
 import {isServiceEntity} from '../../../guards/Service';
 import {Shortcut} from '../../../ui/shortcut';
 import {ShortcutType} from '../../../ui/shortcutType';

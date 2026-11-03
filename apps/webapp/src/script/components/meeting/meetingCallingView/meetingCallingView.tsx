@@ -21,13 +21,15 @@ import type {FunctionComponent} from 'react';
 
 import {container} from 'tsyringe';
 
-import {CallingCell} from 'Components/calling/CallingCell';
-import {meetingCallingViewStyles} from 'Components/meeting/meetingCallingView/meetingCallingView.styles';
-import {useMeetingNotificationStore} from 'Components/meeting/meetingNotificationStore/meetingNotificationStore';
 import {CallState} from 'Repositories/calling/CallState';
 import {TeamState} from 'Repositories/team/TeamState';
 import {useApplicationContext, useMainViewModel} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
+
+import {meetingCallingViewStyles} from './meetingCallingView.styles';
+
+import {CallingCell} from '../../calling/CallingCell';
+import {useMeetingNotificationStore} from '../meetingNotificationStore/meetingNotificationStore';
 
 export const MeetingCallingView: FunctionComponent = () => {
   const {mainViewModel} = useApplicationContext();

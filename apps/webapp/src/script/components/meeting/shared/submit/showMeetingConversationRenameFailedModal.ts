@@ -20,9 +20,10 @@
 import {noop} from 'noop-esm';
 import type {Task} from 'true-myth';
 
-import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {Translate} from 'Util/localizerUtil';
+
+import {PrimaryModal} from '../../../Modals/PrimaryModal';
+import {meetingSubmitErrors, type MeetingSubmitErrors} from '../../meetingSubmitErrors';
 
 type ShowMeetingConversationRenameFailedModalParams = {
   translate: Translate;

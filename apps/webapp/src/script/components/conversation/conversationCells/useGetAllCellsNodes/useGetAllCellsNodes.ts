@@ -22,13 +22,13 @@ import {useEffect, useCallback, useRef, useState} from 'react';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {transformCellsNodes} from 'Components/cells/common/transformCellsNodes/transformCellsNodes';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {UserRepository} from 'Repositories/user/userRepository';
 
 import {getUsersFromNodes} from './getUsersFromNodes';
 import {transformToCellPagination} from './transformToCellPagination';
 
+import {transformCellsNodes} from '../../../cells/common/transformCellsNodes/transformCellsNodes';
 import {getCellsApiPath} from '../common/getCellsApiPath/getCellsApiPath';
 import {isInRecycleBin} from '../common/recycleBin/recycleBin';
 import {CellsSort} from '../common/useCellsSorting/useCellsSorting';

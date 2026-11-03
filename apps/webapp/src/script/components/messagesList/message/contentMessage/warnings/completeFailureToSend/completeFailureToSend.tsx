@@ -23,13 +23,13 @@ import {isNonEmptyString} from '@sindresorhus/is';
 
 import {Button, ButtonVariant, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
-import {useMessageFocusedTabIndex} from 'Components/messagesList/message/util';
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
 import type {ReactTranslationValueReplacement} from 'Util/localizerUtil/reactLocalizerUtil';
 import type {Translate} from 'Util/localizerUtil/translationTypes';
 
+import {useMessageFocusedTabIndex} from '../../../util';
 import {backendErrorLink, button, warning, wrapper} from '../warnings.styles';
 
 type Props = {

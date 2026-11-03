@@ -24,12 +24,12 @@ import {isNonEmptyStringAndNotWhitespace} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {useDebouncedCallback} from 'use-debounce';
 
-import {transformCellsNodes} from 'Components/cells/common/transformCellsNodes/transformCellsNodes';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {UserRepository} from 'Repositories/user/userRepository';
 
 import {createRequestVersionGate} from './requestVersionGate';
 
+import {transformCellsNodes} from '../../../cells/common/transformCellsNodes/transformCellsNodes';
 import {
   ConversationDriveFiltersState,
   hasActiveSearchParams,

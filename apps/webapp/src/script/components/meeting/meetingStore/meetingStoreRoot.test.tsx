@@ -37,11 +37,11 @@ import {amplify} from 'amplify';
 import {task} from 'true-myth';
 import {container} from 'tsyringe';
 
-import {useMeetingStore} from 'Components/meeting/meetingStore/meetingStoreProvider';
+import {useMeetingStore} from './meetingStoreProvider';
 import {
   MeetingNotificationKind,
   useMeetingNotificationStore,
-} from 'Components/meeting/meetingNotificationStore/meetingNotificationStore';
+} from '../meetingNotificationStore/meetingNotificationStore';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/userState';

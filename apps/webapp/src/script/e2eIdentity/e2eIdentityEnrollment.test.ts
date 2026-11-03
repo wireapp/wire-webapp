@@ -24,8 +24,8 @@ import {container} from 'tsyringe';
 import {noop} from 'noop-esm';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
+import {PrimaryModal} from '../components/Modals/PrimaryModal';
+import {PrimaryModalType} from '../components/Modals/PrimaryModal/PrimaryModalTypes';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';

@@ -25,8 +25,6 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {partition} from 'underscore';
 import {useDebouncedCallback} from 'use-debounce';
 
-import * as Icon from 'Components/icon';
-import {UserList, UserlistMode} from 'Components/userList';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {User} from 'Repositories/entity/User';
@@ -44,6 +42,8 @@ import {isBackendError} from 'Util/typePredicateUtil';
 
 import {TopPeople} from './components/topPeople';
 
+import * as Icon from '../../../../components/icon';
+import {UserList, UserlistMode} from '../../../../components/userList';
 import {getManageTeamUrl} from '../../../../externalRoute';
 
 export type SearchResultsData = {contacts: User[]; others: User[]};

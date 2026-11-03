@@ -78,8 +78,6 @@ import {flatten, isError} from 'underscore';
 import {Account} from '@wireapp/core';
 import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
 
-import {TYPING_TIMEOUT, useTypingIndicatorState} from 'Components/inputBar/typingIndicator';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/LeaveCallReason';
@@ -171,6 +169,8 @@ import {isSelfInitiatedConversationLeave} from './isSelfInitiatedConversationLea
 import {MessageRepository} from './MessageRepository';
 import {NOTIFICATION_STATE} from './NotificationSetting';
 
+import {TYPING_TIMEOUT, useTypingIndicatorState} from '../../components/inputBar/typingIndicator';
+import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {Config} from '../../Config';
 import {BASE_ERROR_TYPE, BaseError} from '../../error/baseError';
 import {ConversationError} from '../../error/conversationError';

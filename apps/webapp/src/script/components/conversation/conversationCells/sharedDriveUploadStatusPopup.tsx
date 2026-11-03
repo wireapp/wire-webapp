@@ -30,7 +30,6 @@ import {
   SharedDriveUploadStatusIcon,
 } from '@wireapp/react-ui-kit';
 
-import {FileTypeIcon} from 'Components/conversation/common/fileTypeIcon/fileTypeIcon';
 import {getFileExtension} from 'Util/util';
 
 import type {SharedDriveUploadStatus, SharedDriveUploadStatusKind} from './sharedDriveUploadStatus';
@@ -63,6 +62,8 @@ import {
   sharedDriveUploadStatusPopupToggleIconStyles,
   sharedDriveUploadStatusPopupToggleStyles,
 } from './sharedDriveUploadStatusPopup.styles';
+
+import {FileTypeIcon} from '../common/fileTypeIcon/fileTypeIcon';
 
 const PROGRESS_PERCENTAGE_MAX = 100;
 

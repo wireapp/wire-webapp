@@ -21,12 +21,13 @@ import type {FunctionComponent} from 'react';
 
 import {isNonEmptyArray} from '@sindresorhus/is';
 
-import {FileTypeIcon} from 'Components/conversation/common/fileTypeIcon/fileTypeIcon';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {Translate} from 'Util/localizerUtil';
 import {getFileExtension} from 'Util/util';
 
 import {fileNameStyles, itemStyles, listStyles} from './showFileDropzoneErrorModal.styles';
+
+import {PrimaryModal} from '../../../Modals/PrimaryModal';
+import {FileTypeIcon} from '../../common/fileTypeIcon/fileTypeIcon';
 
 interface ShowFileDropzoneErrorModalParams {
   title: string;

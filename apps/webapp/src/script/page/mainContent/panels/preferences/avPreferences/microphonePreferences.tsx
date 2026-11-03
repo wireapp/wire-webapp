@@ -21,7 +21,6 @@ import {useEffect, useState, type FunctionComponent} from 'react';
 
 import {useDebouncedCallback} from 'use-debounce';
 
-import * as Icon from 'Components/icon';
 import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import {MediaType} from 'Repositories/media/MediaType';
@@ -32,6 +31,7 @@ import {getLogger} from 'Util/logger';
 import {DeviceSelect} from './deviceSelect';
 import {InputLevel} from './inputLevel';
 
+import * as Icon from '../../../../../components/icon';
 import {Config} from '../../../../../Config';
 import {PreferencesSection} from '../components/preferencesSection';
 

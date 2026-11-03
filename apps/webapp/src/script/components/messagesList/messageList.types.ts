@@ -19,7 +19,6 @@
 
 import React from 'react';
 
-import {MessageActions} from 'Components/messagesList/message';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
@@ -31,6 +30,8 @@ import {Message as MessageEntity} from 'Repositories/entity/message/message';
 import {User} from 'Repositories/entity/User';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import type {UserRepository} from 'Repositories/user/userRepository';
+
+import {MessageActions} from './message';
 
 export interface MessagesListParams {
   assetRepository: AssetRepository;

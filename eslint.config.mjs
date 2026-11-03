@@ -272,7 +272,7 @@ const webappImportOrderRule = [
       {pattern: '@wireapp/*', group: 'internal', position: 'before'},
       // Keep the remaining webapp aliases in one alphabetized group.
       {
-        pattern: '{Components,Repositories,src,Util}/**',
+        pattern: '{Repositories,src,Util}/**',
         group: 'internal',
         position: 'after',
       },
@@ -694,7 +694,7 @@ const productionConfigs = [
   {
     files: ['apps/webapp/**/*.{ts,tsx}'],
     rules: {
-      // Webapp path aliases (Util/*, Components/*, …) resolve to lowercase dirs on disk.
+      // Webapp path aliases resolve to lowercase dirs on disk.
       'import/no-unresolved': ['error', {caseSensitive: false}],
       // Pin alias import order so Linux CI and macOS agree on webapp path aliases.
       'import/order': webappImportOrderRule,

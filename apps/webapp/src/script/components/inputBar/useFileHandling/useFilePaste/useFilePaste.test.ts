@@ -19,13 +19,13 @@
 
 import {act, renderHook} from '@testing-library/react';
 
-import * as checkFileSharingPermissionModule from 'Components/conversation/utils/checkFileSharingPermission';
+import * as checkFileSharingPermissionModule from '../../../conversation/utils/checkFileSharingPermission';
 import type {Translate} from 'Util/localizerUtil';
 import * as TimeUtil from 'Util/timeUtil';
 
 import {useFilePaste} from './useFilePaste';
 
-jest.mock('Components/conversation/utils/checkFileSharingPermission', () => {
+jest.mock('../../../conversation/utils/checkFileSharingPermission', () => {
   return {
     checkFileSharingPermission: jest.fn(callback => {
       return callback;

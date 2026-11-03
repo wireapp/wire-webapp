@@ -44,7 +44,6 @@ import {flatten, uniq} from 'underscore';
 import {TypedEventEmitter, type AccentColor} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
 
-import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import type {ClientRepository, QualifiedUserClientEntityMap} from 'Repositories/client';
 import {ClientEntity} from 'Repositories/client/ClientEntity';
@@ -76,6 +75,7 @@ import type {UserService} from './userService';
 import {UserState} from './userState';
 
 import {SIGN_OUT_REASON} from '../../auth/signOutReason';
+import {useLegalHoldModalState} from '../../components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {Config} from '../../Config';
 import {UserError} from '../../error/userError';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';

@@ -27,7 +27,6 @@ import {container} from 'tsyringe';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {InViewport} from 'Components/inViewport';
 import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
 import {MediumImage} from 'Repositories/entity/message/mediumImage';
 import {TeamState} from 'Repositories/team/TeamState';
@@ -39,6 +38,7 @@ import {failedWrapperStyles, getImageStyle, getWrapperStyles} from './image.styl
 import {RestrictedImage} from './restrictedImage';
 
 import {Config} from '../../Config';
+import {InViewport} from '../inViewport';
 import {
   AssetUrl,
   useAssetTransfer,

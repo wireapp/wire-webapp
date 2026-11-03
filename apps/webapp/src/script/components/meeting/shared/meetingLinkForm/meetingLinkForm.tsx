@@ -19,9 +19,6 @@
 
 import type {FunctionComponent} from 'react';
 
-import {CopyToClipboardButton} from 'Components/copyToClipboardButton';
-import {PasswordFields, type PasswordFieldsProps} from 'Components/PasswordFields/PasswordFields';
-import {PasswordGeneratorButton} from 'Components/PasswordGeneratorButton';
 import {Config} from 'src/script/Config';
 
 import {
@@ -29,6 +26,10 @@ import {
   embeddedPasswordSectionStyles,
   passwordFieldsStyles,
 } from './meetingLinkForm.styles';
+
+import {CopyToClipboardButton} from '../../../copyToClipboardButton';
+import {PasswordFields, type PasswordFieldsProps} from '../../../PasswordFields/PasswordFields';
+import {PasswordGeneratorButton} from '../../../PasswordGeneratorButton';
 
 interface MeetingLinkFormProps extends Omit<PasswordFieldsProps, 'translate'> {
   translate: PasswordFieldsProps['translate'];

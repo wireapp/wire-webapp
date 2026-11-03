@@ -19,10 +19,9 @@
 
 import type {FunctionComponent} from 'react';
 
-import {FileCard} from 'Components/fileCard/fileCard';
-
 import {wrapperStyles} from './filePreviewCard.styles';
 
+import {FileCard} from '../../../fileCard/fileCard';
 import {FilePreviewDeleteButton} from '../common/filePreviewDeleteButton/filePreviewDeleteButton';
 import {FilePreviewErrorMoreButton} from '../common/filePreviewErrorMoreButton/filePreviewErrorMoreButton';
 

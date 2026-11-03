@@ -26,7 +26,6 @@ import {task} from 'true-myth';
 
 import {Tooltip} from '@wireapp/react-ui-kit';
 
-import {useMessageFocusedTabIndex} from 'Components/messagesList/message/util';
 import type {User} from 'Repositories/entity/User';
 import {getEmojiTitleFromEmojiUnicode} from 'Util/emojiUtil';
 import {isTabKey} from 'Util/keyboardUtil';
@@ -45,6 +44,8 @@ import {
   messageReactionCount,
   userBoldStyle,
 } from './messageReactions.styles';
+
+import {useMessageFocusedTabIndex} from '../../../util';
 
 interface EmojiPillProps {
   translate: Translate;

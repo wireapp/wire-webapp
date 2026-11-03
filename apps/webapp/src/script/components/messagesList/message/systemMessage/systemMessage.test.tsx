@@ -33,7 +33,7 @@ import {SystemMessageBase} from './systemMessageBase';
 import {Config} from 'src/script/Config';
 import {withTheme} from 'src/script/auth/util/test/testUtil';
 
-jest.mock('Components/icon', () => {
+jest.mock('../../../icon', () => {
   return {
     EditIcon: () => {
       return <span data-uie-name="editicon" className="editicon"></span>;

@@ -24,7 +24,7 @@ import {StatusCodes} from 'http-status-codes';
 
 import {WebAppEvents} from '../../webAppEvents';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {SelfService} from 'Repositories/self/SelfService';
 import {TeamService} from 'Repositories/team/TeamService';

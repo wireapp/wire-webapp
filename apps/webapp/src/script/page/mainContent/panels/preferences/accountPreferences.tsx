@@ -25,10 +25,6 @@ import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
 
-import {UserVerificationBadges} from 'Components/badge';
-import {ErrorFallback} from 'Components/errorFallback';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {useEnrichedFields} from 'Components/panel/enrichedFields';
 import {ClientRepository} from 'Repositories/client';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
@@ -60,6 +56,10 @@ import {UsernameInput} from './accountPreferences/usernameInput';
 import {PreferencesPage} from './components/preferencesPage';
 import {PreferencesSection} from './components/preferencesSection';
 
+import {UserVerificationBadges} from '../../../../components/badge';
+import {ErrorFallback} from '../../../../components/errorFallback';
+import {PrimaryModal} from '../../../../components/Modals/PrimaryModal';
+import {useEnrichedFields} from '../../../../components/panel/enrichedFields';
 import {Config} from '../../../../Config';
 import {AccentColorPicker} from '../../../accentColorPicker';
 

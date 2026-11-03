@@ -19,7 +19,7 @@
 
 import {render, waitFor} from '@testing-library/react';
 
-import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal, removeCurrentModal} from '../Modals/PrimaryModal';
 import {ClientState} from 'Repositories/client/ClientState';
 import {User} from 'Repositories/entity/User';
 import * as RootProvider from 'src/script/page/rootProvider';

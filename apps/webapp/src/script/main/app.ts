@@ -38,7 +38,6 @@ import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {AudioRepository} from 'Repositories/audio/audioRepository';
 import {BackupRepository} from 'Repositories/backup/backupRepository';
@@ -113,6 +112,7 @@ import {reportStartupFailure} from './reportStartupFailure';
 
 import '../../style/default.less';
 import {SIGN_OUT_REASON} from '../auth/signOutReason';
+import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config, Configuration} from '../Config';
 import {E2EIHandler} from '../e2eIdentity';
 import {getModalOptions, ModalType} from '../e2eIdentity/modals';

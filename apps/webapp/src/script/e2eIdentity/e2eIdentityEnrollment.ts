@@ -27,7 +27,6 @@ import {container} from 'tsyringe';
 
 import {TypedEventEmitter} from '@wireapp/commons';
 
-import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
 import {UserState} from 'Repositories/user/userState';
 import {Core} from 'src/script/service/coreSingleton';
 import {translate} from 'Util/localizerUtil';
@@ -47,6 +46,7 @@ import {getModalOptions, ModalType} from './modals';
 import {OIDCService} from './oidcService';
 import {OIDCServiceStore} from './oidcService/oidcServiceStorage';
 
+import {PrimaryModal, removeCurrentModal} from '../components/Modals/PrimaryModal';
 import {WebAppEvents} from '../webAppEvents';
 
 const enrollmentProgressPollingIntervalInSeconds = 10;

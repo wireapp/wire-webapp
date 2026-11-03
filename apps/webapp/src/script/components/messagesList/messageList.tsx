@@ -24,10 +24,6 @@ import cx from 'classnames';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {FadingScrollbar} from 'Components/fadingScrollbar';
-import {JumpToLastMessageButton} from 'Components/messagesList/jumpToLastMessageButton';
-import {filterMessages} from 'Components/messagesList/utils/messagesFilter';
-import {useConversationReadBoundary} from 'Components/messagesList/utils/useConversationReadBoundary';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
@@ -45,12 +41,17 @@ import {isLastReceivedMessage} from 'Util/conversationMessages';
 import {onHitTopOrBottom} from 'Util/DOM/onHitTopOrBottom';
 import {useResizeObserver} from 'Util/DOM/resizeObserver';
 
+import {JumpToLastMessageButton} from './jumpToLastMessageButton';
 import {Message, MessageActions} from './message';
 import {MarkerComponent} from './message/marker';
 import {ScrollToElement} from './message/types';
 import {UploadAssets} from './uploadAssets';
+import {filterMessages} from './utils/messagesFilter';
 import {groupMessagesBySenderAndTime, isMarker} from './utils/messagesGroup';
 import {updateScroll, FocusedElement} from './utils/scrollUpdater';
+import {useConversationReadBoundary} from './utils/useConversationReadBoundary';
+
+import {FadingScrollbar} from '../fadingScrollbar';
 
 const messageScrollDelayInMilliseconds = 10;
 const messageFocusDelayInMilliseconds = 1000;

@@ -23,7 +23,6 @@ import {isUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import * as Icon from 'Components/icon';
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import type {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import type {FileAsset} from 'Repositories/entity/message/fileAsset';
@@ -36,6 +35,7 @@ import {useEffectRef} from 'Util/useEffectRef';
 import {AudioSeekBar} from './audioSeekBar/audioSeekBar';
 import {RestrictedAudio} from './restrictedAudio/restrictedAudio';
 
+import * as Icon from '../../../../../icon';
 import {AssetHeader} from '../common/assetHeader/assetHeader';
 import {MediaButton} from '../common/mediaButton/mediaButton';
 import {SeekBar} from '../common/seekBar/seekBar';

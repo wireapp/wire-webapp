@@ -20,13 +20,13 @@
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
-import * as Icon from 'Components/icon';
-import {MenuItem} from 'Components/panel/panelActions';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import * as UserPermission from 'Repositories/user/userPermission';
 import type {RootContextValue} from 'src/script/page/rootProvider';
 
+import * as Icon from '../../../../components/icon';
+import {MenuItem} from '../../../../components/panel/panelActions';
 import {Config} from '../../../../Config';
 import {ActionsViewModel} from '../../../../view_model/ActionsViewModel';
 import {WebAppEvents} from '../../../../webAppEvents';
