@@ -64,6 +64,7 @@ export const initialiseMLSMigrationFlow = async ({
       return migrateConversationsToMLS({
         core,
         selfUserId: selfUser.qualifiedId,
+        selfTeamId: selfUser.teamId,
         conversationRepository,
         getTeamMLSMigrationStatus,
         refreshAllKnownUsers,
@@ -137,6 +138,7 @@ interface MigrateConversationsToMLSParams {
   conversationRepository: ConversationRepository;
   core: Account;
   selfUserId: QualifiedId;
+  selfTeamId?: string;
   refreshAllKnownUsers: () => Promise<void>;
   getTeamMLSMigrationStatus: () => MLSMigrationStatus;
 }
@@ -144,6 +146,7 @@ interface MigrateConversationsToMLSParams {
 const migrateConversationsToMLS = async ({
   core,
   selfUserId,
+  selfTeamId,
   conversationRepository,
   refreshAllKnownUsers,
   getTeamMLSMigrationStatus,
@@ -151,7 +154,13 @@ const migrateConversationsToMLS = async ({
   //refetch all known users so we have the latest lists of the protocols they support
   await refreshAllKnownUsers();
 
-  const selfTeamGroupConversations = conversationRepository.getAllGroupConversations();
+  // Only conversations belonging to the same team as the self user can be migrated
+  const selfTeamGroupConversations =
+    selfTeamId !== undefined && selfTeamId !== ''
+      ? conversationRepository.getAllGroupConversations().filter(conversation => {
+          return conversation.teamId === selfTeamId;
+        })
+      : [];
 
   await initialiseMigrationOfProteusConversations(selfTeamGroupConversations, selfUserId, conversationRepository);
 
