@@ -583,6 +583,7 @@ const productionConfigs = [
     files: [
       'tools/buildArtifact/**/*.ts',
       'tools/development/**/*.ts',
+      'tools/maintenanceRelease/**/*.ts',
       'tools/productionDistribution/**/*.ts',
       'tools/releaseSummary/**/*.ts',
       'tools/runtimeVerification/**/*.ts',

@@ -1,0 +1,164 @@
+---
+name: Repair WebApp maintenance distribution
+
+on:
+  workflow_dispatch:
+    inputs:
+      maintenance_tag:
+        description: 'Existing immutable validated maintenance tag, for example v1.1.0-airgap-a-maintenance.1'
+        required: true
+        type: string
+      wire_builds_branch:
+        description: 'Optional existing wire-builds branch with a legacy S3 WebApp chart entry'
+        required: false
+        default: ''
+        type: string
+      confirm_maintenance_repair:
+        description: 'I understand this reuses the existing validated artifact and immutable tag without rebuilding or changing the maintenance branch.'
+        required: true
+        default: false
+        type: boolean
+      reason:
+        description: 'Required non-sensitive reason for repairing the partial distribution'
+        required: true
+        type: string
+
+concurrency:
+  group: repair-maintenance-distribution-${{ inputs.maintenance_tag }}
+  cancel-in-progress: false
+  queue: max
+
+permissions: {}
+
+jobs:
+  validate_recovery:
+    name: Validate maintenance distribution recovery
+    runs-on: ubuntu-26.04
+    permissions:
+      contents: read
+    outputs:
+      maintenance_line_key: ${{ steps.validate_recovery.outputs.maintenance_line_key }}
+      maintenance_tag: ${{ steps.validate_recovery.outputs.maintenance_tag }}
+      maintenance_commit_sha: ${{ steps.validate_recovery.outputs.maintenance_commit_sha }}
+      source_workflow_run_id: ${{ steps.validate_recovery.outputs.source_workflow_run_id }}
+      distribution_artifact_name: ${{ steps.validate_recovery.outputs.distribution_artifact_name }}
+      wire_builds_branch: ${{ steps.validate_recovery.outputs.wire_builds_branch }}
+
+    steps:
+      - name: Check out main maintenance workflow tools
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+          ref: ${{ github.sha }}
+
+      - name: Require main workflow ref
+        run: |
+          set -euo pipefail
+
+          if [[ "${GITHUB_REF}" != 'refs/heads/main' ]]; then
+            echo 'Repair WebApp maintenance distribution must be started with "Use workflow from: main".' >&2
+            echo "Received workflow ref: ${GITHUB_REF}" >&2
+            exit 1
+          fi
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install current workflow tooling dependencies
+        run: npm clean-install --ignore-scripts && npx just apply-patches
+
+      - name: Validate immutable maintenance distribution request
+        id: validate_recovery
+        env:
+          CONFIRM_MAINTENANCE_REPAIR: ${{ inputs.confirm_maintenance_repair }}
+          MAINTENANCE_TAG: ${{ inputs.maintenance_tag }}
+          REASON: ${{ inputs.reason }}
+          WIRE_BUILDS_BRANCH: ${{ inputs.wire_builds_branch }}
+        run: |
+          set -euo pipefail
+
+          if [[ "${CONFIRM_MAINTENANCE_REPAIR}" != 'true' ]]; then
+            echo 'confirm_maintenance_repair must be true to repair a WebApp maintenance distribution.' >&2
+            exit 1
+          fi
+
+          if [[ -z "${REASON//[[:space:]]/}" ]]; then
+            echo 'reason must contain non-whitespace text.' >&2
+            exit 1
+          fi
+
+          maintenance_tag="$(node ./tools/releaseCli/releaseMetadataCli.mts validate-maintenance-tag "${MAINTENANCE_TAG}")"
+          maintenance_line_key="$(node ./tools/releaseCli/maintenanceReleaseCli.mts maintenance-line-key "${maintenance_tag}")"
+          wire_builds_branch=''
+
+          if [[ -n "${WIRE_BUILDS_BRANCH}" ]]; then
+            wire_builds_branch="$(node ./tools/releaseCli/maintenanceReleaseCli.mts validate-wire-builds-branch "${WIRE_BUILDS_BRANCH}")"
+          fi
+
+          git fetch --no-tags origin "refs/tags/${maintenance_tag}:refs/tags/${maintenance_tag}"
+
+          if [[ "$(git cat-file -t "refs/tags/${maintenance_tag}")" != 'tag' ]]; then
+            echo "Maintenance tag ${maintenance_tag} is not annotated." >&2
+            exit 1
+          fi
+
+          maintenance_commit_sha="$(git rev-parse --verify "refs/tags/${maintenance_tag}^{commit}")"
+          tag_annotation="$(git for-each-ref --format='%(contents)' "refs/tags/${maintenance_tag}")"
+          tag_source_workflow_run_id="$(awk -F': ' '$1 == "Source workflow run ID" { print substr($0, index($0, ": ") + 2); exit }' <<< "${tag_annotation}")"
+          tag_validation_status="$(awk -F': ' '$1 == "Maintenance validation" { print substr($0, index($0, ": ") + 2); exit }' <<< "${tag_annotation}")"
+          distribution_artifact_name="$(awk -F': ' '$1 == "Distribution artifact" { print substr($0, index($0, ": ") + 2); exit }' <<< "${tag_annotation}")"
+
+          if [[ ! "${tag_source_workflow_run_id}" =~ ^[0-9]+$ ]] ||
+            [[ "${tag_validation_status}" != 'passed' ]]; then
+            echo 'The maintenance tag does not identify this source run and its validated distribution artifact.' >&2
+            exit 1
+          fi
+
+          node ./tools/releaseCli/maintenanceReleaseCli.mts \
+            validate-distribution-artifact-name \
+            --distribution-artifact-name "${distribution_artifact_name}" \
+            --maintenance-tag "${maintenance_tag}" >/dev/null
+
+          {
+            echo "maintenance_line_key=${maintenance_line_key}"
+            echo "maintenance_tag=${maintenance_tag}"
+            echo "maintenance_commit_sha=${maintenance_commit_sha}"
+            echo "source_workflow_run_id=${tag_source_workflow_run_id}"
+            echo "distribution_artifact_name=${distribution_artifact_name}"
+            echo "wire_builds_branch=${wire_builds_branch}"
+          } >> "$GITHUB_OUTPUT"
+
+          {
+            echo '## Maintenance distribution recovery request'
+            echo "- Immutable maintenance tag: ${maintenance_tag} (${maintenance_commit_sha})"
+            echo "- Existing validated artifact: ${distribution_artifact_name} from run ${tag_source_workflow_run_id}"
+            if [[ -n "${wire_builds_branch}" ]]; then
+              echo "- Customer release branch: wire-builds/${wire_builds_branch}"
+            else
+              echo '- Customer release branch: not selected'
+            fi
+            echo "- Recovery reason: ${REASON}"
+            echo '- Source maintenance branch was not changed and the application was not rebuilt.'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  publish_distribution:
+    name: Reuse validated maintenance distribution
+    needs: validate_recovery
+    uses: ./.github/workflows/publish-maintenance-distribution.yml
+    with:
+      maintenance_line_key: ${{ needs.validate_recovery.outputs.maintenance_line_key }}
+      maintenance_tag: ${{ needs.validate_recovery.outputs.maintenance_tag }}
+      maintenance_commit_sha: ${{ needs.validate_recovery.outputs.maintenance_commit_sha }}
+      source_workflow_run_id: ${{ needs.validate_recovery.outputs.source_workflow_run_id }}
+      distribution_artifact_name: ${{ needs.validate_recovery.outputs.distribution_artifact_name }}
+      wire_builds_branch: ${{ needs.validate_recovery.outputs.wire_builds_branch }}
+    secrets:
+      WEBTEAM_QUAY_USERNAME: ${{ secrets.WEBTEAM_QUAY_USERNAME }}
+      WEBTEAM_QUAY_PASSWORD: ${{ secrets.WEBTEAM_QUAY_PASSWORD }}
+      CHARTS_WEBAPP_AUTOMATION_AWS_ACCESS_KEY_ID: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_ACCESS_KEY_ID }}
+      CHARTS_WEBAPP_AUTOMATION_AWS_SECRET_ACCESS_KEY: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_SECRET_ACCESS_KEY }}
+      WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN: ${{ secrets.WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN }}
