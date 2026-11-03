@@ -3481,6 +3481,160 @@ describe('CellsTable selection scope', () => {
   });
 });
 
+const createInternalDragTransfer = (): DataTransfer => {
+  const types: string[] = [];
+  return {
+    types,
+    dropEffect: 'none',
+    effectAllowed: 'none',
+    setData: (type: string) => {
+      types.push(type);
+    },
+  } as unknown as DataTransfer;
+};
+
+describe('CellsTable internal drag and drop', () => {
+  it('moves every selected item into a folder without opening the Move dialog or uploading files', async () => {
+    const moveNodes = jest
+      .fn()
+      .mockResolvedValue({Status: 'Performed', AffectedNodes: [{Uuid: 'file-id'}, {Uuid: 'other-id'}]});
+    const onRefresh = jest.fn();
+    const otherFolder = createNode({id: 'other-id', name: 'Other folder', path: 'conversation-id@example.com/Other'});
+    const folder = createNode({id: 'target-id', name: 'Target', path: 'conversation-id@example.com/Target'});
+    const file = createNode({
+      id: 'file-id',
+      name: 'Wire logs.pdf',
+      path: 'conversation-id@example.com/Wire logs.pdf',
+      type: CellNodeType.FILE,
+    });
+    const {onDropFilesToFolder} = renderCellsTable({
+      initialNodes: [folder, file, otherFolder],
+      cellsRepository: {moveNodes} as unknown as CellsRepository,
+      onRefresh,
+    });
+    fireEvent.click(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'}));
+    fireEvent.click(screen.getByRole('checkbox', {name: 'Select Other folder'}));
+    const transfer = createInternalDragTransfer();
+    fireEvent.dragStart(screen.getByRole('row', {name: /Wire logs\.pdf/}), {dataTransfer: transfer});
+    const target = screen.getByRole('row', {name: /Target/});
+    fireEvent.dragOver(target, {dataTransfer: transfer});
+    expect(target).toHaveAttribute('data-folder-drop-active', 'true');
+    expect(transfer.dropEffect).toBe('move');
+    fireEvent.drop(target, {dataTransfer: transfer});
+
+    await waitFor(() => {
+      return expect(moveNodes).toHaveBeenCalledWith({
+        currentPaths: ['conversation-id@example.com/Wire logs.pdf', 'conversation-id@example.com/Other'],
+        targetPath: 'conversation-id@example.com/Target',
+      });
+    });
+    expect(moveNodes).toHaveBeenCalledTimes(1);
+    expect(onDropFilesToFolder).not.toHaveBeenCalled();
+    expect(screen.queryByRole('dialog', {name: 'Move to folder'})).not.toBeInTheDocument();
+  });
+
+  it('does not move a selected folder into itself or a descendant', () => {
+    const moveNodes = jest.fn();
+    const folder = createNode({id: 'source-id', name: 'Source', path: 'conversation-id@example.com/Source'});
+    const child = createNode({id: 'child-id', name: 'Child', path: 'conversation-id@example.com/Source/Child'});
+    renderCellsTable({initialNodes: [folder, child], cellsRepository: {moveNodes} as unknown as CellsRepository});
+    fireEvent.click(screen.getByRole('checkbox', {name: 'Select Source'}));
+    const transfer = createInternalDragTransfer();
+    fireEvent.dragStart(screen.getByRole('row', {name: /Source/}), {dataTransfer: transfer});
+    for (const target of [folder, child]) {
+      const row = screen.getByRole('row', {name: new RegExp(target.name)});
+      fireEvent.dragOver(row, {dataTransfer: transfer});
+      fireEvent.drop(row, {dataTransfer: transfer});
+      expect(row).not.toHaveAttribute('data-folder-drop-active');
+    }
+    expect(moveNodes).not.toHaveBeenCalled();
+  });
+
+  it('does not move a file into its current folder', () => {
+    const moveNodes = jest.fn();
+    const file = createNode({
+      id: 'file-id',
+      name: 'Wire logs.pdf',
+      path: 'conversation-id@example.com/Marketing/images/Wire logs.pdf',
+      type: CellNodeType.FILE,
+    });
+    const folder = createNode({
+      id: 'folder-id',
+      name: 'Marketing images',
+      path: 'conversation-id@example.com/Marketing/images',
+    });
+    renderCellsTable({initialNodes: [folder, file], cellsRepository: {moveNodes} as unknown as CellsRepository});
+    fireEvent.click(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'}));
+    const transfer = createInternalDragTransfer();
+    fireEvent.dragStart(screen.getByRole('row', {name: /Wire logs\.pdf/}), {dataTransfer: transfer});
+    const target = screen.getByRole('row', {name: /Marketing images/});
+    fireEvent.dragOver(target, {dataTransfer: transfer});
+    fireEvent.drop(target, {dataTransfer: transfer});
+
+    expect(target).not.toHaveAttribute('data-folder-drop-active');
+    expect(moveNodes).not.toHaveBeenCalled();
+  });
+
+  it('reports an unresolved outcome when the move request fails', async () => {
+    const moveNodes = jest.fn().mockRejectedValue(new Error('network unavailable'));
+    renderCellsTable({cellsRepository: {moveNodes} as unknown as CellsRepository});
+    fireEvent.click(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'}));
+    const transfer = createInternalDragTransfer();
+    fireEvent.dragStart(screen.getByRole('row', {name: /Wire logs\.pdf/}), {dataTransfer: transfer});
+    fireEvent.drop(screen.getByRole('row', {name: /Marketing images/}), {dataTransfer: transfer});
+
+    await waitFor(() => {
+      return expect(screen.getByRole('alert')).toHaveTextContent('The move request failed');
+    });
+    expect(screen.queryByRole('button', {name: 'Move'})).not.toBeInTheDocument();
+    expect(moveNodes).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not start a second move while the first request is pending', async () => {
+    const moveNodes = jest.fn().mockImplementation(() => {
+      return new Promise(() => {
+        return undefined;
+      });
+    });
+    renderCellsTable({cellsRepository: {moveNodes} as unknown as CellsRepository});
+    fireEvent.click(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'}));
+    const transfer = createInternalDragTransfer();
+    fireEvent.dragStart(screen.getByRole('row', {name: /Wire logs\.pdf/}), {dataTransfer: transfer});
+    const target = screen.getByRole('row', {name: /Marketing images/});
+    fireEvent.drop(target, {dataTransfer: transfer});
+    fireEvent.drop(target, {dataTransfer: transfer});
+
+    expect(moveNodes).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole('row', {name: /Wire logs\.pdf/})).toHaveAttribute('draggable', 'false');
+  });
+
+  it('does not allow dragging without Move permission', () => {
+    const moveNodes = jest.fn();
+    renderCellsTable({
+      cellsRepository: {moveNodes} as unknown as CellsRepository,
+      selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER,
+    });
+    fireEvent.click(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'}));
+    const source = screen.getByRole('row', {name: /Wire logs\.pdf/});
+    expect(source).toHaveAttribute('draggable', 'false');
+    const transfer = createInternalDragTransfer();
+    fireEvent.dragStart(source, {dataTransfer: transfer});
+    fireEvent.drop(screen.getByRole('row', {name: /Marketing images/}), {dataTransfer: transfer});
+    expect(moveNodes).not.toHaveBeenCalled();
+  });
+
+  it('rejects a drag after the selection scope changes', () => {
+    const moveNodes = jest.fn();
+    const {rerenderWithSelectionScope} = renderCellsTable({cellsRepository: {moveNodes} as unknown as CellsRepository});
+    fireEvent.click(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'}));
+    const transfer = createInternalDragTransfer();
+    fireEvent.dragStart(screen.getByRole('row', {name: /Wire logs\.pdf/}), {dataTransfer: transfer});
+    rerenderWithSelectionScope('another-folder');
+    fireEvent.drop(screen.getByRole('row', {name: /Marketing images/}), {dataTransfer: transfer});
+    expect(moveNodes).not.toHaveBeenCalled();
+  });
+});
+
 describe('CellsTable folder row drop target', () => {
   it('highlights a folder row and drops files into that folder path', async () => {
     const droppedFile = new File(['content'], 'document.pdf', {type: 'application/pdf'});

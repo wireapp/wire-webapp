@@ -46,6 +46,9 @@ import {
   UploadIcon,
 } from '@wireapp/react-ui-kit';
 
+import {normalizeCellsPath} from './cellsBulkMovePreviewModal/normalizeCellsPath';
+import {isBulkMoveValid} from './cellsBulkMovePreviewModal/validateBulkMove';
+
 import {bulkMoveReducer} from './bulkMoveState';
 import {CellsBulkMovePreviewModal} from './cellsBulkMovePreviewModal/cellsBulkMovePreviewModal';
 import {CellsBulkMoveToBinConfirmationModal} from './cellsBulkMoveToBinConfirmationModal';
@@ -102,6 +105,7 @@ import {
   useCellsActionPermissions,
 } from '../common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {CellsSortDirection} from '../common/cellsSortIcon/cellsSortIcon';
+import {getCellsApiPath} from '../common/getCellsApiPath/getCellsApiPath';
 import {getCellsFilesPath} from '../common/getCellsFilesPath/getCellsFilesPath';
 import {isInRecycleBin} from '../common/recycleBin/recycleBin';
 import {CellsSortField, SORTABLE_COLUMN_FIELD, toAriaSort} from '../common/useCellsSorting/useCellsSorting';
@@ -163,6 +167,8 @@ const CellsTableHeaderCell: FunctionComponent<CellsTableHeaderCellProps> = ({
     </th>
   );
 };
+
+const INTERNAL_DRIVE_DRAG_TYPE = 'application/x-wire-drive-nodes';
 
 const dragEventContainsFiles = (event: DragEvent<HTMLElement>): boolean => {
   return Array.from(event.dataTransfer.types).includes('Files');
@@ -247,6 +253,11 @@ const getPermanentDeleteReviewMessageKey = (
   }
 };
 
+interface CapturedDriveDrag {
+  nodeIds: string[];
+  scopeKey: string;
+}
+
 interface CapturedBulkMoveToBinSelection {
   nodeIds: string[];
   scopeKey: string;
@@ -296,6 +307,8 @@ export const CellsTable = ({
   });
   const isSelectionEnabled =
     selectionEnabled && isFeatureToggleEnabled(driveBulkActionsFeatureToggleName) && canPerformAnyBulkAction;
+  const activeDriveDrag = useRef<CapturedDriveDrag | null>(null);
+  const isDropMoveSubmitting = useRef(false);
   const [selectedNodeIds, setSelectedNodeIds] = useState<Set<string>>(() => {
     return new Set();
   });
@@ -392,6 +405,7 @@ export const CellsTable = ({
   useEffect(() => {
     const didSelectionScopeChange = previousSelectionScopeKey.current !== selectionScopeKey;
     previousSelectionScopeKey.current = selectionScopeKey;
+    activeDriveDrag.current = null;
 
     if (isMovePendingRef.current) {
       return cancelPermanentDeleteReconciliation;
@@ -659,6 +673,7 @@ export const CellsTable = ({
   };
 
   const handleToggleSelection = (nodeId: string, isSelected: boolean): void => {
+    activeDriveDrag.current = null;
     clearPermanentDeleteRejection();
     setSelectedNodeIds(currentSelection => {
       const nextSelection = new Set(currentSelection);
@@ -792,7 +807,9 @@ export const CellsTable = ({
       return canPerformCellsAction({action: CELLS_ACTION.DELETE, selfUserDriveRole: node.selfUserDriveRole});
     });
   const canMoveSelection =
+    isSelectionEnabled &&
     selectedNodes.length > 0 &&
+    selectedNodes.length === selectedNodeIds.size &&
     !isBulkMoveOutcomeUnresolved &&
     !isBulkMoveRequestPending &&
     !isBackgroundMovePending &&
@@ -1059,10 +1076,86 @@ export const CellsTable = ({
     setActiveFolderDropTargetName(null);
   }, [folderDropResetKey]);
 
-  const setActiveFolderDropTarget = (node: CellNode | null): void => {
+  const setActiveFolderDropTarget = (node: CellNode | null, isFileUpload = true): void => {
     setActiveFolderDropTargetId(node?.id ?? null);
-    setActiveFolderDropTargetName(node?.name ?? null);
-    onFolderDropTargetChange?.(node?.name ?? null);
+    setActiveFolderDropTargetName(isFileUpload ? (node?.name ?? null) : null);
+    if (isFileUpload) {
+      onFolderDropTargetChange?.(node?.name ?? null);
+    }
+  };
+
+  const getDriveDragNodes = (destination: CellNode, event: DragEvent<HTMLElement>): CellNode[] | null => {
+    const drag = activeDriveDrag.current;
+    if (
+      drag === null ||
+      !Array.from(event.dataTransfer.types).includes(INTERNAL_DRIVE_DRAG_TYPE) ||
+      drag.scopeKey !== selectionScopeKeyRef.current ||
+      !hasSameSelection(selectedNodeIdsRef.current, drag.nodeIds) ||
+      !canMoveSelection ||
+      destination.type !== CellNodeType.FOLDER ||
+      drag.nodeIds.includes(destination.id)
+    ) {
+      return null;
+    }
+
+    const selected = nodesRef.current.filter(node => {
+      return drag.nodeIds.includes(node.id);
+    });
+    const destinationPath = normalizeCellsPath(destination.path, conversationQualifiedId);
+    const selectedPaths = selected.map(node => {
+      return normalizeCellsPath(node.path, conversationQualifiedId);
+    });
+    const parentPaths = selectedPaths.map(path => {
+      return path.split('/').slice(0, -1).join('/');
+    });
+    if (
+      selected.length !== drag.nodeIds.length ||
+      parentPaths.every(path => {
+        return path === destinationPath;
+      }) ||
+      !isBulkMoveValid({
+        conversationQualifiedId,
+        destinationPath,
+        selectedNodes: selected.map((node, index) => {
+          return {...node, path: selectedPaths[index]};
+        }),
+      })
+    ) {
+      return null;
+    }
+
+    return selected;
+  };
+
+  const handleDriveDrop = async (destination: CellNode, event: DragEvent<HTMLTableRowElement>): Promise<void> => {
+    const selected = getDriveDragNodes(destination, event);
+    activeDriveDrag.current = null;
+    setActiveFolderDropTarget(null, false);
+    if (selected === null || isDropMoveSubmitting.current) {
+      return;
+    }
+
+    isDropMoveSubmitting.current = true;
+    const summary: SharedDriveMoveSummary = {
+      items: selected.map(node => {
+        return {id: node.id, name: node.name, isFolder: node.type === CellNodeType.FOLDER};
+      }),
+      destinationPath: normalizeCellsPath(destination.path, conversationQualifiedId),
+    };
+    handleBulkMoveStart(summary);
+    try {
+      const response = await cellsRepository.moveNodes({
+        currentPaths: selected.map(node => {
+          return node.path;
+        }),
+        targetPath: getCellsApiPath({conversationQualifiedId, currentPath: summary.destinationPath}),
+      });
+      handleBulkMoveResult(response, summary);
+    } catch {
+      handleBulkMoveRequestError();
+    } finally {
+      isDropMoveSubmitting.current = false;
+    }
   };
 
   type GetFolderDropHandlersResult =
@@ -1074,13 +1167,20 @@ export const CellsTable = ({
         onDrop: (event: DragEvent<HTMLTableRowElement>) => void;
       };
   const getFolderDropHandlers = (node: CellNode): GetFolderDropHandlersResult => {
-    if (node.type !== CellNodeType.FOLDER || onDropFilesToFolder === undefined) {
+    if (node.type !== CellNodeType.FOLDER || (onDropFilesToFolder === undefined && !canMoveSelection)) {
       return {};
     }
 
     return {
       onDragEnter: (event: DragEvent<HTMLTableRowElement>): void => {
         if (!dragEventContainsFiles(event)) {
+          if (getDriveDragNodes(node, event) !== null) {
+            preventDefaultFileDrop(event);
+            setActiveFolderDropTarget(node, false);
+          }
+          return;
+        }
+        if (onDropFilesToFolder === undefined) {
           return;
         }
 
@@ -1089,6 +1189,17 @@ export const CellsTable = ({
       },
       onDragOver: (event: DragEvent<HTMLTableRowElement>): void => {
         if (!dragEventContainsFiles(event)) {
+          const isValidTarget = getDriveDragNodes(node, event) !== null;
+          event.dataTransfer.dropEffect = isValidTarget ? 'move' : 'none';
+          if (isValidTarget) {
+            preventDefaultFileDrop(event);
+            setActiveFolderDropTarget(node, false);
+          } else if (activeFolderDropTargetId === node.id) {
+            setActiveFolderDropTarget(null, false);
+          }
+          return;
+        }
+        if (onDropFilesToFolder === undefined) {
           return;
         }
 
@@ -1097,21 +1208,27 @@ export const CellsTable = ({
         setActiveFolderDropTarget(node);
       },
       onDragLeave: (event: DragEvent<HTMLTableRowElement>): void => {
-        if (!dragEventContainsFiles(event)) {
+        if (!dragEventContainsFiles(event) && activeDriveDrag.current === null) {
           return;
         }
 
         preventDefaultFileDrop(event);
-
         const nextTarget = event.relatedTarget;
         if (nextTarget instanceof Node && event.currentTarget.contains(nextTarget)) {
           return;
         }
 
-        setActiveFolderDropTarget(null);
+        setActiveFolderDropTarget(null, dragEventContainsFiles(event));
       },
       onDrop: (event: DragEvent<HTMLTableRowElement>): void => {
         if (!dragEventContainsFiles(event)) {
+          if (activeDriveDrag.current !== null) {
+            preventDefaultFileDrop(event);
+            void handleDriveDrop(node, event);
+          }
+          return;
+        }
+        if (onDropFilesToFolder === undefined) {
           return;
         }
 
@@ -1463,6 +1580,25 @@ export const CellsTable = ({
                     data-folder-drop-active={activeFolderDropTargetId === node.id || undefined}
                     aria-selected={isSelectionEnabled && selectedNodeIds.has(node.id)}
                     data-uie-name="cells-table-row"
+                    draggable={canMoveSelection && selectedNodeIds.has(node.id)}
+                    onDragStart={event => {
+                      if (!canMoveSelection || !selectedNodeIds.has(node.id)) {
+                        event.preventDefault();
+                        return;
+                      }
+                      activeDriveDrag.current = {
+                        nodeIds: selectedNodes.map(({id}) => {
+                          return id;
+                        }),
+                        scopeKey: selectionScopeKey,
+                      };
+                      event.dataTransfer.setData(INTERNAL_DRIVE_DRAG_TYPE, 'move');
+                      event.dataTransfer.effectAllowed = 'move';
+                    }}
+                    onDragEnd={() => {
+                      activeDriveDrag.current = null;
+                      setActiveFolderDropTarget(null, false);
+                    }}
                     {...getFolderDropHandlers(node)}
                   >
                     {row.getVisibleCells().map(cell => {
