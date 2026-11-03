@@ -17,6 +17,8 @@
  *
  */
 
+import type {ReactElement} from 'react';
+
 import {act, render, screen, waitFor, type RenderResult} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -34,6 +36,9 @@ import {
 import {translateForTest} from 'Util/test/translateForTest';
 
 import {CellsHeader} from './cellsHeader';
+import type {SharedDriveUploadController} from '../sharedDriveUploadController';
+import {SharedDriveUploadStatusProvider} from '../sharedDriveUploadStatusContext';
+import {SharedDriveUploadStatusPopupHost} from '../sharedDriveUploadStatusPopupHost';
 import {getCellsFilesPath} from '../common/getCellsFilesPath/getCellsFilesPath';
 
 const cellsNewItemButtonLabel = 'cells.newItemMenu.button';
@@ -49,6 +54,7 @@ const defaultProperties = {
   onRefresh: jest.fn(),
   onRefreshAfterEmptyBinOutcome: jest.fn().mockResolvedValue(true),
   onEmptyBinSubmitted: jest.fn(),
+  onEmptyBinInProgressChange: jest.fn(),
   getCurrentCellsPath: getCellsFilesPath,
   conversationName: 'Project Alpha',
   conversationQualifiedId: {id: 'conversation-id', domain: 'wire.com'},
@@ -64,6 +70,34 @@ const defaultProperties = {
   isUploadFilesEnabled: false,
   filters: [filter],
   showViewerPermission: false,
+};
+
+const uploadStatusController = {
+  snapshots: () => {
+    return [];
+  },
+  subscribe: () => {
+    return () => {
+      return undefined;
+    };
+  },
+} as unknown as SharedDriveUploadController;
+
+// The status popup host is rendered next to the header so bulk action progress is observable.
+const createHeaderTree = (properties: Partial<typeof defaultProperties>): ReactElement => {
+  return (
+    <StyledApp themeId={THEME_ID.DEFAULT}>
+      <SharedDriveUploadStatusProvider>
+        <CellsHeader {...defaultProperties} {...properties} />
+        <SharedDriveUploadStatusPopupHost
+          controller={uploadStatusController}
+          conversationQualifiedId="conversation@example.com"
+          isEnabled
+          isFileTabActive
+        />
+      </SharedDriveUploadStatusProvider>
+    </StyledApp>
+  );
 };
 
 const renderCellsHeader = (
@@ -84,12 +118,7 @@ const renderCellsHeader = (
     }),
   );
 
-  return render(
-    <StyledApp themeId={THEME_ID.DEFAULT}>
-      <CellsHeader {...defaultProperties} {...headerProperties} />
-    </StyledApp>,
-    {wrapper},
-  );
+  return render(createHeaderTree(headerProperties), {wrapper});
 };
 
 describe('CellsHeader', () => {
@@ -210,11 +239,7 @@ describe('CellsHeader', () => {
     };
     const rendered = renderCellsHeader({...properties, clock}, true);
     const rerender = (): void => {
-      rendered.rerender(
-        <StyledApp themeId={THEME_ID.DEFAULT}>
-          <CellsHeader {...properties} />
-        </StyledApp>,
-      );
+      rendered.rerender(createHeaderTree(properties));
     };
 
     await user.click(screen.getByRole('button', {name: 'cells.emptyBin.button'}));
@@ -222,7 +247,7 @@ describe('CellsHeader', () => {
     await waitFor(() => {
       expect(getBackgroundActionInfo).toHaveBeenCalledTimes(1);
     });
-    expect(screen.getByRole('status')).toHaveTextContent('cells.emptyBin.status.processing');
+    expect(screen.getByText('cells.emptyBin.status.processing')).toBeInTheDocument();
 
     currentPath = 'recycle_bin/folder';
     rerender();
