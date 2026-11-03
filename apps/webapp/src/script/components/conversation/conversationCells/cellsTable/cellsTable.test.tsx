@@ -85,15 +85,6 @@ const translateSelectionForTest: Translate = (key, substitutions) => {
   if (key === 'cells.bulkDelete.stillVisible') {
     return 'Selected items still appear in the Bin. The action remains blocked until they disappear.';
   }
-  if (key === 'cells.bulkDelete.checking') {
-    return 'Checking the Bin for selected items…';
-  }
-  if (key === 'cells.bulkDelete.checkingAfterJobFailure') {
-    return 'The delete job failed. Checking the Bin for remaining items…';
-  }
-  if (key === 'cells.bulkDelete.retryingRefresh') {
-    return 'Could not refresh the Bin. Checking again…';
-  }
   if (key === 'cells.bulkDelete.timedOut') {
     return 'Deletion is taking longer than expected. Refresh the Bin to check before taking further action.';
   }
@@ -236,6 +227,12 @@ const translateSelectionForTest: Translate = (key, substitutions) => {
     return 'Something went wrong, please try again later and refresh the list.';
   }
   return translateForTest(key);
+};
+
+// The popup also announces the same review message with role=alert, so target the inline row with the Refresh action.
+const findInlineReviewAlert = async (): Promise<HTMLElement> => {
+  const refreshButton = await screen.findByRole('button', {name: 'Refresh Bin'});
+  return refreshButton.closest('[role="alert"]') as HTMLElement;
 };
 
 const conversationQualifiedId = {id: 'conversation-id', domain: 'example.com'};
@@ -1057,7 +1054,7 @@ describe('CellsTable selection', () => {
       await user.click(screen.getByRole('button', {name: 'Delete permanently'}));
       await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Delete'}));
 
-      expect(await screen.findByText('Checking the Bin for selected items…')).toBeInTheDocument();
+      expect(await screen.findByText('cells.bulkDelete.status.deleting')).toBeInTheDocument();
       expect(repository.deleteNodes).toHaveBeenCalledTimes(1);
       expect(onRefreshAndReportSuccess).toHaveBeenCalledTimes(1);
       expect(screen.queryByRole('button', {name: 'Refresh Bin'})).not.toBeInTheDocument();
@@ -1124,7 +1121,7 @@ describe('CellsTable selection', () => {
         expect(await screen.findByRole('alert')).toHaveTextContent(
           'The delete request was rejected. Resolve the issue before trying again.',
         );
-        expect(screen.queryByText('Checking the Bin for selected items…')).not.toBeInTheDocument();
+        expect(screen.queryByText('cells.bulkDelete.status.deleting')).not.toBeInTheDocument();
         expect(screen.getByText('1 selected')).toBeInTheDocument();
         expect(screen.getByRole('button', {name: 'Delete permanently'})).toBeEnabled();
         expect(repository.deleteNodes).toHaveBeenCalledTimes(1);
@@ -1152,7 +1149,7 @@ describe('CellsTable selection', () => {
       await user.click(screen.getByRole('button', {name: 'Delete permanently'}));
       await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Delete'}));
 
-      expect(await screen.findByText('Checking the Bin for selected items…')).toBeInTheDocument();
+      expect(await screen.findByText('cells.bulkDelete.status.deleting')).toBeInTheDocument();
       expect(repository.deleteNodes).toHaveBeenCalledTimes(1);
       expect(onRefreshAndReportSuccess).toHaveBeenCalledTimes(1);
     } finally {
@@ -1180,7 +1177,7 @@ describe('CellsTable selection', () => {
       await user.click(screen.getByRole('button', {name: 'Delete permanently'}));
       await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Delete'}));
 
-      expect(await screen.findByText('Checking the Bin for selected items…')).toBeInTheDocument();
+      expect(await screen.findByText('cells.bulkDelete.status.deleting')).toBeInTheDocument();
       expect(repository.deleteNodes).toHaveBeenCalledTimes(1);
       expect(repository.getBackgroundActionInfo).toHaveBeenCalledTimes(1);
       expect(onRefreshAndReportSuccess).toHaveBeenCalledTimes(1);
@@ -1231,7 +1228,7 @@ describe('CellsTable selection', () => {
       });
       expect(repository.getBackgroundActionInfo).toHaveBeenCalledTimes(2);
       expect(repository.deleteNodes).toHaveBeenCalledTimes(1);
-      expect(screen.getByText('Checking the Bin for selected items…')).toBeInTheDocument();
+      expect(screen.getByText('cells.bulkDelete.status.deleting')).toBeInTheDocument();
       view.unmount();
     } finally {
       window.location.hash = originalHash;
@@ -1253,7 +1250,7 @@ describe('CellsTable selection', () => {
       await user.click(screen.getByRole('button', {name: 'Delete permanently'}));
       await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Delete'}));
 
-      expect(await screen.findByText('Checking the Bin for selected items…')).toBeInTheDocument();
+      expect(await screen.findByText('cells.bulkDelete.status.deleting')).toBeInTheDocument();
       expect(repository.deleteNodes).toHaveBeenCalledTimes(1);
       expect(onRefreshAndReportSuccess).toHaveBeenCalledTimes(1);
     } finally {
@@ -1334,7 +1331,7 @@ describe('CellsTable selection', () => {
       await user.click(screen.getByRole('button', {name: 'Delete permanently'}));
       await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Delete'}));
 
-      expect(await screen.findByText('Checking the Bin for selected items…')).toBeInTheDocument();
+      expect(await screen.findByText('cells.bulkDelete.status.deleting')).toBeInTheDocument();
       expect(screen.queryByRole('button', {name: 'Refresh Bin'})).not.toBeInTheDocument();
       await waitFor(() => {
         expect(onRefreshAndReportSuccess).toHaveBeenCalledTimes(1);
@@ -1353,7 +1350,7 @@ describe('CellsTable selection', () => {
         resolveFirstRefresh(true);
         await Promise.resolve();
       });
-      expect(screen.getByText('Checking the Bin for selected items…')).toBeInTheDocument();
+      expect(screen.getByText('cells.bulkDelete.status.deleting')).toBeInTheDocument();
       expect(screen.getByText('1 selected')).toBeInTheDocument();
       await act(async () => {
         clock.advanceByMilliseconds(1000);
@@ -1363,7 +1360,7 @@ describe('CellsTable selection', () => {
       });
 
       await waitFor(() => {
-        expect(screen.queryByText('Checking the Bin for selected items…')).not.toBeInTheDocument();
+        expect(screen.queryByText('cells.bulkDelete.status.deleting')).not.toBeInTheDocument();
       });
       expect(screen.queryByText('1 selected')).not.toBeInTheDocument();
       expect(repository.getBackgroundActionInfo).toHaveBeenCalledTimes(2);
@@ -1389,7 +1386,7 @@ describe('CellsTable selection', () => {
       await user.click(screen.getByRole('button', {name: 'Delete permanently'}));
       await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Delete'}));
 
-      expect(await screen.findByText('Checking the Bin for selected items…')).toBeInTheDocument();
+      expect(await screen.findByText('cells.bulkDelete.status.deleting')).toBeInTheDocument();
       expect(screen.queryByRole('button', {name: 'Refresh Bin'})).not.toBeInTheDocument();
       await waitFor(() => {
         expect(onRefreshAndReportSuccess).toHaveBeenCalledTimes(1);
@@ -1406,7 +1403,7 @@ describe('CellsTable selection', () => {
         });
       }
 
-      expect(await screen.findByRole('alert')).toHaveTextContent(
+      expect(await findInlineReviewAlert()).toHaveTextContent(
         'Deletion is taking longer than expected. Refresh the Bin to check before taking further action.',
       );
       expect(screen.queryByRole('button', {name: 'Delete permanently'})).not.toBeInTheDocument();
@@ -1424,7 +1421,7 @@ describe('CellsTable selection', () => {
       await waitFor(() => {
         expect(onRefreshAndReportSuccess).toHaveBeenCalledTimes(refreshCount + 1);
       });
-      expect(await screen.findByRole('alert')).toHaveTextContent(
+      expect(await findInlineReviewAlert()).toHaveTextContent(
         'Selected items still appear in the Bin. The action remains blocked until they disappear.',
       );
       expect(repository.deleteNodes).toHaveBeenCalledTimes(1);
@@ -1469,7 +1466,7 @@ describe('CellsTable selection', () => {
       await user.click(screen.getByRole('button', {name: 'Delete permanently'}));
       await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Delete'}));
 
-      expect(await screen.findByText('Checking the Bin for selected items…')).toBeInTheDocument();
+      expect(await screen.findByText('cells.bulkDelete.status.deleting')).toBeInTheDocument();
       await waitFor(() => {
         expect(onRefreshAndReportSuccess).toHaveBeenCalledTimes(1);
       });
@@ -1478,7 +1475,7 @@ describe('CellsTable selection', () => {
         await Promise.resolve();
       });
 
-      expect(await screen.findByRole('alert')).toHaveTextContent(
+      expect(await findInlineReviewAlert()).toHaveTextContent(
         'Deletion is taking longer than expected. Refresh the Bin to check before taking further action.',
       );
       expect(screen.getByRole('button', {name: 'Refresh Bin'})).toBeEnabled();
@@ -1490,7 +1487,7 @@ describe('CellsTable selection', () => {
         clock.advanceByMilliseconds(20_000);
         await Promise.resolve();
       });
-      expect(await screen.findByRole('alert')).toHaveTextContent(
+      expect(await findInlineReviewAlert()).toHaveTextContent(
         'Deletion is taking longer than expected. Refresh the Bin to check before taking further action.',
       );
       expect(screen.getByRole('button', {name: 'Refresh Bin'})).toBeEnabled();
@@ -1499,7 +1496,7 @@ describe('CellsTable selection', () => {
       await waitFor(() => {
         expect(onRefreshAndReportSuccess).toHaveBeenCalledTimes(3);
       });
-      expect(await screen.findByRole('alert')).toHaveTextContent(
+      expect(await findInlineReviewAlert()).toHaveTextContent(
         'Selected items still appear in the Bin. The action remains blocked until they disappear.',
       );
       expect(screen.getByText('1 selected')).toBeInTheDocument();
@@ -1510,7 +1507,7 @@ describe('CellsTable selection', () => {
         refreshResolvers[1](true);
         await Promise.all(pendingRefreshes);
       });
-      expect(screen.getByRole('alert')).toHaveTextContent(
+      expect((await findInlineReviewAlert())).toHaveTextContent(
         'Selected items still appear in the Bin. The action remains blocked until they disappear.',
       );
       expect(screen.getByRole('button', {name: 'Refresh Bin'})).toBeEnabled();
@@ -1541,7 +1538,7 @@ describe('CellsTable selection', () => {
       await user.click(screen.getByRole('button', {name: 'Delete permanently'}));
       await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Delete'}));
 
-      expect(await screen.findByText('Could not refresh the Bin. Checking again…')).toBeInTheDocument();
+      expect(await screen.findByText('cells.bulkDelete.status.deleting')).toBeInTheDocument();
       await waitFor(() => {
         expect(onRefreshAndReportSuccess).toHaveBeenCalledTimes(1);
       });
@@ -1557,7 +1554,7 @@ describe('CellsTable selection', () => {
         });
       }
 
-      expect(await screen.findByRole('alert')).toHaveTextContent(
+      expect(await findInlineReviewAlert()).toHaveTextContent(
         'Could not refresh the Bin. The delete outcome is still unknown.',
       );
       expect(screen.queryByRole('button', {name: 'Delete permanently'})).not.toBeInTheDocument();
@@ -1596,7 +1593,7 @@ describe('CellsTable selection', () => {
       await user.click(screen.getByRole('button', {name: 'Delete permanently'}));
       await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Delete'}));
 
-      expect(await screen.findByText('Could not refresh the Bin. Checking again…')).toBeInTheDocument();
+      expect(await screen.findByText('cells.bulkDelete.status.deleting')).toBeInTheDocument();
       await waitFor(() => {
         expect(onRefreshAndReportSuccess).toHaveBeenCalledTimes(1);
       });
@@ -1607,7 +1604,7 @@ describe('CellsTable selection', () => {
           expect(onRefreshAndReportSuccess).toHaveBeenCalledTimes(2);
         });
       });
-      expect(screen.getByText('Could not refresh the Bin. Checking again…')).toBeInTheDocument();
+      expect(screen.getByText('cells.bulkDelete.status.deleting')).toBeInTheDocument();
 
       await act(async () => {
         clock.advanceByMilliseconds(1000);
@@ -1615,7 +1612,7 @@ describe('CellsTable selection', () => {
           expect(onRefreshAndReportSuccess).toHaveBeenCalledTimes(3);
         });
       });
-      expect(screen.getByText('The delete job failed. Checking the Bin for remaining items…')).toBeInTheDocument();
+      expect(screen.getByText('cells.bulkDelete.status.deleting')).toBeInTheDocument();
       expect(repository.deleteNodes).toHaveBeenCalledTimes(1);
       view.unmount();
     } finally {
@@ -1662,7 +1659,7 @@ describe('CellsTable selection', () => {
       await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Delete'}));
 
       expect(
-        await screen.findByText('The delete job failed. Checking the Bin for remaining items…'),
+        await screen.findByText('cells.bulkDelete.status.deleting'),
       ).toBeInTheDocument();
       expect(screen.queryByRole('alert')).not.toBeInTheDocument();
       await waitFor(() => {
@@ -1678,7 +1675,7 @@ describe('CellsTable selection', () => {
         });
       });
       expect(screen.getByText('1 selected')).toBeInTheDocument();
-      expect(screen.getByText('The delete job failed. Checking the Bin for remaining items…')).toBeInTheDocument();
+      expect(screen.getByText('cells.bulkDelete.status.deleting')).toBeInTheDocument();
       expect(screen.queryByRole('button', {name: 'Refresh Bin'})).not.toBeInTheDocument();
 
       await act(async () => {
@@ -1723,7 +1720,7 @@ describe('CellsTable selection', () => {
       await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Delete'}));
 
       expect(
-        await screen.findByText('The delete job failed. Checking the Bin for remaining items…'),
+        await screen.findByText('cells.bulkDelete.status.deleting'),
       ).toBeInTheDocument();
       expect(onRefreshAndReportSuccess).toHaveBeenCalledTimes(1);
       expect(repository.deleteNodes).toHaveBeenCalledTimes(1);
@@ -1810,7 +1807,7 @@ describe('CellsTable selection', () => {
 
       expect(onRefreshAndReportSuccess).toHaveBeenCalledTimes(1);
       expect(repository.deleteNodes).toHaveBeenCalledTimes(1);
-      expect(screen.queryByText('Checking the Bin for selected items…')).not.toBeInTheDocument();
+      expect(screen.queryByText('cells.bulkDelete.status.deleting')).not.toBeInTheDocument();
     } finally {
       window.location.hash = originalHash;
     }
