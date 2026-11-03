@@ -18,6 +18,7 @@
  */
 
 import {act, render, screen, waitFor, type RenderResult} from '@testing-library/react';
+import type {ReactNode} from 'react';
 import userEvent from '@testing-library/user-event';
 
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
@@ -35,6 +36,8 @@ import {translateForTest} from 'Util/test/translateForTest';
 
 import {CellsHeader} from './cellsHeader';
 import {getCellsFilesPath} from '../common/getCellsFilesPath/getCellsFilesPath';
+import {createCellsBinOperationController} from '../common/cellsBinOperations/cellsBinOperationController';
+import {CellsBinOperationsProvider} from '../common/cellsBinOperations/cellsBinOperationsContext';
 
 const cellsNewItemButtonLabel = 'cells.newItemMenu.button';
 const filter = {
@@ -74,15 +77,21 @@ const renderCellsHeader = (
   isBulkActionsEnabled = true,
 ): RenderResult => {
   const {clock, ...headerProperties} = properties;
-  const wrapper = createRootProviderWrapperForTest(
+  const testClock = clock ?? createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+  const cellsRepository = headerProperties.cellsRepository ?? defaultProperties.cellsRepository;
+  const controller = createCellsBinOperationController({cellsRepository, clock: testClock});
+  const rootProvider = createRootProviderWrapperForTest(
     createRootContextValueForTest({
       translate: translateForTest,
-      clock,
+      clock: testClock,
       isFeatureToggleEnabled: featureToggleName => {
         return isBulkActionsEnabled && featureToggleName === driveBulkActionsFeatureToggleName;
       },
     }),
   );
+  const wrapper = ({children}: {children: ReactNode}): ReactNode => {
+    return <CellsBinOperationsProvider value={controller}>{rootProvider({children})}</CellsBinOperationsProvider>;
+  };
 
   return render(
     <StyledApp themeId={THEME_ID.DEFAULT}>
@@ -231,7 +240,7 @@ describe('CellsHeader', () => {
       clock.advanceByMilliseconds(1000);
       await Promise.resolve();
     });
-    expect(getBackgroundActionInfo).toHaveBeenCalledTimes(1);
+    expect(getBackgroundActionInfo).toHaveBeenCalledTimes(2);
 
     currentPath = 'recycle_bin';
     rerender();
