@@ -335,6 +335,48 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     expect(screen.getByRole('listitem')).not.toHaveTextContent(/failed/i);
   });
 
+  it('offers a review button for a restore that needs review and runs its callback', async () => {
+    const user = userEvent.setup();
+    const onReview = jest.fn();
+    renderHost(createController(), conversationQualifiedId, true, true, translateMoveSummaryForTest, {
+      id: 'restore-job',
+      action: 'restore',
+      kind: 'status-unknown',
+      items: [{id: 'file-1', name: 'mockup.pdf', isFolder: false}],
+      destinationPath: '',
+      onReview,
+    });
+
+    await user.click(screen.getByRole('button', {name: 'cells.bulkAction.refresh'}));
+
+    expect(onReview).toHaveBeenCalledTimes(1);
+  });
+
+  it.each(['processing', 'completed'] as const)('does not offer the review button while %s', kind => {
+    renderHost(createController(), conversationQualifiedId, true, true, translateMoveSummaryForTest, {
+      id: 'restore-job',
+      action: 'restore',
+      kind,
+      items: [{id: 'file-1', name: 'mockup.pdf', isFolder: false}],
+      destinationPath: '',
+      onReview: jest.fn(),
+    });
+
+    expect(screen.queryByRole('button', {name: 'cells.bulkAction.refresh'})).not.toBeInTheDocument();
+  });
+
+  it('does not offer the review button when the status has no review callback', () => {
+    renderHost(createController(), conversationQualifiedId, true, true, translateMoveSummaryForTest, {
+      id: 'move-job',
+      action: 'move',
+      kind: 'partial',
+      items: [{id: 'file-1', name: 'mockup.pdf', isFolder: false}],
+      destinationPath: 'Design reviews',
+    });
+
+    expect(screen.queryByRole('button', {name: 'cells.bulkAction.refresh'})).not.toBeInTheDocument();
+  });
+
   it('keeps a dismissed pending move hidden across status updates without cancelling it', async () => {
     const user = userEvent.setup();
     const controller = createController();
