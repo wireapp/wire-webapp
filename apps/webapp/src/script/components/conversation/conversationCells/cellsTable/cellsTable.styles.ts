@@ -75,7 +75,7 @@ export const selectionBarStyles: CSSObject = {
   gap: '8px',
   padding: '0 8px',
   borderRadius: '12px',
-  background: 'var(--Background-Base-Secondary, #EDEFF0)',
+  background: 'linear-gradient(var(--accent-color-fade-16), var(--accent-color-fade-16)), var(--modal-bg)',
   color: 'var(--main-color)',
   pointerEvents: 'auto',
 
@@ -108,7 +108,7 @@ export const clearSelectionButtonStyles: CSSObject = {
   cursor: 'pointer',
 
   '&:hover, &:focus-visible': {
-    backgroundColor: 'var(--foreground-fade-8)',
+    backgroundColor: 'var(--accent-color-fade-24)',
   },
 
   '&:focus-visible': {
@@ -154,7 +154,7 @@ export const bulkActionButtonStyles: CSSObject = {
   cursor: 'pointer',
 
   '&:hover, &:focus-visible': {
-    backgroundColor: 'var(--foreground-fade-8)',
+    backgroundColor: 'var(--accent-color-fade-24)',
   },
 
   '&:focus-visible': {
