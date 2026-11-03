@@ -24,13 +24,14 @@ import {useStore} from 'zustand';
 
 import {Button, ButtonVariant, ComputerIcon, Loading, NetworkBuildingIcon, WireLogoIcon} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/icon';
 import type {TroubleshooterRepository, DiagnosticResult} from 'Repositories/troubleshooter/troubleshooterRepository';
 import type {CheckId, CheckStatus} from 'Repositories/troubleshooter/troubleshooterService';
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {copyText} from 'Util/clipboardUtil';
 import {downloadBlob} from 'Util/util';
+
+import * as Icon from '../../../../components/icon';
 
 import {PreferencesPage} from './components/preferencesPage';
 import {DiagnosticStatusIcon as StatusIcon} from './troubleshooting/diagnosticStatusIcon';
