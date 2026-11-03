@@ -37,7 +37,7 @@ import * as DataDog from 'Util/dataDog';
 import * as Environment from 'Util/environment';
 import {setStrings, translate} from 'Util/localizerUtil';
 
-import en from 'I18n/en-US.json';
+import en from '../../../../../../i18n/en-US.json';
 
 import {ConversationTabs} from './conversationTabs';
 import {SidebarTabs} from '../useSidebarStore';

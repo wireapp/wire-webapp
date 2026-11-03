@@ -45,7 +45,6 @@ import {EditIcon} from 'Components/icon';
 import {iconStyles} from 'Components/messagesList/message/contentMessage/asset/multipartAssets/fileAssetCard/common/fileAssetOptions/fileAssetOptions.styles';
 import {MessageTime} from 'Components/messagesList/message/messageTime';
 import {useFileHistoryModal} from 'Components/Modals/FileHistoryModal/hooks/useFileHistoryModal';
-import {createRelativeTimestampFormatter, useRelativeTimestamp} from 'Hooks/useRelativeTimestamp';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -68,6 +67,8 @@ import {
   actionButtonsStyles,
   editModeButtonStyles,
 } from './FileHeader.styles';
+
+import {createRelativeTimestampFormatter, useRelativeTimestamp} from '../../../hooks/useRelativeTimestamp';
 
 interface FileHeaderProps {
   id: string;

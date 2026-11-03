@@ -38,9 +38,6 @@ import {Avatar, AVATAR_SIZE, GroupAvatar, ChannelAvatar} from 'Components/avatar
 import {UserBlockedBadge} from 'Components/badge';
 import {CellDescription} from 'Components/conversationListCell/components/cellDescription';
 import {UserInfo} from 'Components/UserInfo';
-import {useConversationCall} from 'Hooks/useConversationCall';
-import type {RegisterConversationElement} from 'Hooks/useConversationFocus';
-import {useNoInternetCallGuard} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {MediaType} from 'Repositories/media/MediaType';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -50,6 +47,10 @@ import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 import {noop, setContextMenuPosition} from 'Util/util';
 
 import {StatusIcon} from './components/statusIcon';
+
+import {useConversationCall} from '../../hooks/useConversationCall';
+import type {RegisterConversationElement} from '../../hooks/useConversationFocus';
+import {useNoInternetCallGuard} from '../../hooks/useNoInternetCallGuard/useNoInternetCallGuard';
 
 interface ConversationListCellProps {
   conversation: Conversation;

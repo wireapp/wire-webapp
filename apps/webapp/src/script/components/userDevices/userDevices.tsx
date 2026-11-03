@@ -22,7 +22,6 @@ import {useEffect, useMemo, useState, type FunctionComponent} from 'react';
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {ClientClassification} from '@wireapp/api-client/lib/client/';
 
-import {useUserIdentity} from 'Hooks/useDeviceIdentities';
 import {ClientRepository, ClientEntity} from 'Repositories/client';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
@@ -37,6 +36,8 @@ import {DeviceList} from './components/DeviceList';
 import {NoDevicesFound} from './components/NoDevicesFound';
 import {SelfFingerprint} from './components/SelfFingerprint';
 import {FIND_MODE, UserDevicesState} from './userDevices.types';
+
+import {useUserIdentity} from '../../hooks/useDeviceIdentities';
 
 export interface UserDevicesHistoryEntry {
   headline: string;

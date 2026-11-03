@@ -19,7 +19,7 @@
 
 import {act, cleanup, fireEvent, render} from '@testing-library/react';
 
-import en from 'I18n/en-US.json';
+import en from '../../../i18n/en-US.json';
 import {setStrings, translate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 import {

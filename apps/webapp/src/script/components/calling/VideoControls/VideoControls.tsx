@@ -38,8 +38,6 @@ import {
 } from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
-import {useActiveWindowMatchMedia} from 'Hooks/useActiveWindowMatchMedia';
-import {useUserPropertyValue} from 'Hooks/useUserProperty';
 import {Call} from 'Repositories/calling/Call';
 import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
 import {Participant} from 'Repositories/calling/Participant';
@@ -79,6 +77,8 @@ import {
 } from './VideoControls.styles';
 import {VideoControlsSelect} from './VideoControlsSelect/VideoControlsSelect';
 
+import {useActiveWindowMatchMedia} from '../../../hooks/useActiveWindowMatchMedia';
+import {useUserPropertyValue} from '../../../hooks/useUserProperty';
 import {WebAppEvents} from '../../../webAppEvents';
 
 type BackgroundOptionValue = 'none' | 'blur-high' | 'blur-low' | 'virtual' | 'settings';

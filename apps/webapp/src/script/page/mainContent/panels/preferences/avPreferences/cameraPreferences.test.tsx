@@ -29,7 +29,7 @@ import {setStrings, translate} from 'Util/localizerUtil';
 
 import type {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 
-import en from 'I18n/en-US.json';
+import en from '../../../../../../i18n/en-US.json';
 
 import {CameraPreferences} from './cameraPreferences';
 

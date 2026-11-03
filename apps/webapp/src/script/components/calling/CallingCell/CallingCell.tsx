@@ -34,8 +34,6 @@ import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {ConversationClassifiedBar} from 'Components/classifiedBar/classifiedBar';
 import * as Icon from 'Components/icon';
 import {useMeetingNotificationStore} from 'Components/meeting/meetingNotificationStore/meetingNotificationStore';
-import {useConversationCall} from 'Hooks/useConversationCall';
-import {useNoInternetCallGuard} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard';
 import type {Call} from 'Repositories/calling/Call';
 import type {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {CallingViewMode, CallState, MuteState} from 'Repositories/calling/CallState';
@@ -53,6 +51,8 @@ import {isEnterKey, isSpaceOrEnterKey} from 'Util/keyboardUtil';
 
 import {usePressSpaceToUnmute} from './usePressSpaceToUnmute/usePressSpaceToUnmute';
 
+import {useConversationCall} from '../../../hooks/useConversationCall';
+import {useNoInternetCallGuard} from '../../../hooks/useNoInternetCallGuard/useNoInternetCallGuard';
 import {generateConversationUrl} from '../../../router/routeGenerator';
 import {CallActions, CallViewTab} from '../../../view_model/CallingViewModel';
 import {WebAppEvents} from '../../../webAppEvents';

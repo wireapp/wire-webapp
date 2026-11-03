@@ -20,7 +20,7 @@ import type {ComponentProps} from 'react';
 
 import {render} from '@testing-library/react';
 
-import en from 'I18n/en-US.json';
+import en from '../../../../../i18n/en-US.json';
 import {ClientEntity} from 'Repositories/client/ClientEntity';
 import type {ClientRepository} from 'Repositories/client';
 import type {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';

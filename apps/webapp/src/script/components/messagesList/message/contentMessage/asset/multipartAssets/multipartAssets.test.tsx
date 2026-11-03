@@ -33,7 +33,7 @@ import {
 import {MultipartAssets} from './multipartAssets';
 import {translateForTest} from 'Util/test/translateForTest';
 
-jest.mock('Hooks/useInView/useInView', () => {
+jest.mock('../../../../../../hooks/useInView/useInView', () => {
   return {
     useInView: (): {elementRef: {current: null}; hasBeenInView: boolean} => {
       return {

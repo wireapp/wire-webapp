@@ -40,8 +40,6 @@ import {GroupCreationModal} from 'Components/Modals/GroupCreation/GroupCreationM
 import {LegalHoldModal} from 'Components/Modals/LegalHoldModal/LegalHoldModal';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showUserModal, UserModal} from 'Components/Modals/UserModal';
-import {useActiveWindow} from 'Hooks/useActiveWindow';
-import {useInitializeRootFontSize} from 'Hooks/useRootFontSize';
 import {CallingViewMode, CallState, DesktopScreenShareMenu} from 'Repositories/calling/CallState';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {User} from 'Repositories/entity/User';
@@ -68,6 +66,8 @@ import {PanelEntity, PanelState, RightSidebar} from './rightSidebar';
 import {useAppMainState, ViewType} from './state';
 import {ContentState, useAppState} from './useAppState';
 
+import {useActiveWindow} from '../hooks/useActiveWindow';
+import {useInitializeRootFontSize} from '../hooks/useRootFontSize';
 import {App} from '../main/app';
 import {initialiseMLSMigrationFlow} from '../mls/MLSMigration';
 import {generateConversationUrl} from '../router/routeGenerator';

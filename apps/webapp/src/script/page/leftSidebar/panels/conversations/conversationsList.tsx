@@ -37,7 +37,6 @@ import {useDebouncedCallback} from 'use-debounce';
 import {WIDTH} from '@wireapp/react-ui-kit';
 
 import {ConversationListCell} from 'Components/conversationListCell';
-import type {RegisterConversationElement} from 'Hooks/useConversationFocus';
 import {Call} from 'Repositories/calling/Call';
 import {CallState} from 'Repositories/calling/CallState';
 import {ConversationLabel, ConversationLabelRepository} from 'Repositories/conversation/ConversationLabelRepository';
@@ -61,6 +60,7 @@ import {
 } from './conversationsList.styles';
 import {getConversationsToDisplay} from './helpers';
 
+import type {RegisterConversationElement} from '../../../../hooks/useConversationFocus';
 import {generateConversationUrl} from '../../../../router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from '../../../../router/routerBindings';
 import {ListViewModel} from '../../../../view_model/ListViewModel';

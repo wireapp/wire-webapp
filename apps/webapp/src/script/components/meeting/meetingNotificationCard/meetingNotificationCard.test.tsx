@@ -21,7 +21,7 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {ThemeProvider} from '@wireapp/react-ui-kit';
 import {container} from 'tsyringe';
 
-import en from 'I18n/en-US.json';
+import en from '../../../../i18n/en-US.json';
 import {User} from 'Repositories/entity/User';
 import {UserState} from 'Repositories/user/userState';
 import {useMeetingPrepModal} from 'Components/meeting/meetingPrep/useMeetingPrepModal';

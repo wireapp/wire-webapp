@@ -66,7 +66,6 @@ import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {CALL_QUALITY_FEEDBACK_KEY} from 'Components/Modals/QualityFeedbackModal/constants';
 import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
-import {useActiveWindowState} from 'Hooks/useActiveWindow';
 import {
   NetworkQualityInfo,
   NetworkQualityInfoSchema,
@@ -121,6 +120,7 @@ import {getAllowedSftOrigins, isAllowedSftUrl} from './sftUrl';
 
 import {Config} from '../../Config';
 import {NoAudioInputError} from '../../error/noAudioInputError';
+import {useActiveWindowState} from '../../hooks/useActiveWindow';
 import {APIClient} from '../../service/apiClientSingleton';
 import {Core} from '../../service/coreSingleton';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';

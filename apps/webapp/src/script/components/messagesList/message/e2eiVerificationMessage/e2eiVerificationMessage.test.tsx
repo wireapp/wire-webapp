@@ -22,7 +22,7 @@ import {isNull} from '@sindresorhus/is';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {Maybe} from 'true-myth';
 
-import en from 'I18n/en-US.json';
+import en from '../../../../../i18n/en-US.json';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {E2EIVerificationMessage as VerificationMessageEntity} from 'Repositories/entity/message/e2eiVerificationMessage';
 import {User} from 'Repositories/entity/User';

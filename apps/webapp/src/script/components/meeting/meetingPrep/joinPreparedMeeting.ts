@@ -22,13 +22,14 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {joinMeetingCall, type JoinMeetingCallDeps} from 'Components/meeting/joinMeetingCall';
 import {handleJoinMeetingCallResult} from 'Components/meeting/useJoinMeetingCall';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {
-  showCallNotEstablishedModal,
-  type NoInternetCallGuardCopy,
-} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard';
 import type {CallMediaChoice} from 'Repositories/calling/callMediaChoice';
 import {Config} from 'src/script/Config';
 import type {Translate} from 'Util/localizerUtil';
+
+import {
+  showCallNotEstablishedModal,
+  type NoInternetCallGuardCopy,
+} from '../../../hooks/useNoInternetCallGuard/useNoInternetCallGuard';
 
 export type JoinPreparedMeetingParams = {
   deps: JoinMeetingCallDeps;
