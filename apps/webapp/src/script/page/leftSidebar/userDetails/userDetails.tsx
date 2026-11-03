@@ -23,7 +23,6 @@ import cx from 'classnames';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
@@ -32,6 +31,7 @@ import * as styles from './userDetails.styles';
 import {Avatar, AVATAR_SIZE} from '../../../components/avatar';
 import {UserVerificationBadges} from '../../../components/badge';
 import {LegalHoldDot} from '../../../components/LegalHoldDot';
+import {User} from '../../../repositories/entity/User';
 import {AvailabilityContextMenu} from '../../../ui/availabilityContextMenu';
 
 interface AvailabilityStateButtonWrapperProps {

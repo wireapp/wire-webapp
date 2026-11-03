@@ -30,7 +30,6 @@ import {amplify} from 'amplify';
 
 import {Runtime} from '@wireapp/commons';
 
-import {TeamState} from 'Repositories/team/TeamState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {type TranslationKey} from 'Util/localizerUtil';
@@ -47,6 +46,7 @@ import type {
 } from '../../../../components/Modals/PrimaryModal/PrimaryModalTypes';
 import {ButtonAction} from '../../../../components/Modals/PrimaryModal/PrimaryModalTypes';
 import {Config} from '../../../../Config';
+import {TeamState} from '../../../../repositories/team/TeamState';
 import {WebAppEvents} from '../../../../webAppEvents';
 
 type Features =

@@ -19,11 +19,6 @@
 
 import {FC, useState} from 'react';
 
-import {toggleFeature} from 'Repositories/conversation/ConversationAccessPermission';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {TeamRepository} from 'Repositories/team/TeamRepository';
-import {TeamState} from 'Repositories/team/TeamState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
@@ -32,6 +27,11 @@ import {ServicesOptions} from './components/servicesOptions';
 
 import {FadingScrollbar} from '../../../components/fadingScrollbar';
 import {PrimaryModal} from '../../../components/Modals/PrimaryModal';
+import {toggleFeature} from '../../../repositories/conversation/ConversationAccessPermission';
+import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {TeamRepository} from '../../../repositories/team/TeamRepository';
+import {TeamState} from '../../../repositories/team/TeamState';
 import {PanelHeader} from '../panelHeader';
 
 interface GuestServicesOptionsProps {

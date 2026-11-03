@@ -24,7 +24,6 @@ import cx from 'classnames';
 
 import {useMatchMedia} from '@wireapp/react-ui-kit';
 
-import {User} from 'Repositories/entity/User';
 import {conversationListCollapseFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
@@ -33,6 +32,7 @@ import {getIsConversationListCollapsed, SidebarTabs, useSidebarStore} from './pa
 import {TemporaryGuestConversations} from './panels/temporatyGuestConversations';
 
 import {MeetingNotificationHost} from '../../components/meeting/meetingNotificationHost/meetingNotificationHost';
+import {User} from '../../repositories/entity/User';
 import {ListViewModel} from '../../view_model/ListViewModel';
 import {WebAppEvents} from '../../webAppEvents';
 import {ListState, useAppState} from '../useAppState';

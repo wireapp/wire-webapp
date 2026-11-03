@@ -19,7 +19,7 @@
 
 import {WebAppEvents} from '../../../src/script/webAppEvents';
 
-import {EventTrackingRepository} from 'Repositories/tracking/eventTrackingRepository';
+import {EventTrackingRepository} from '../../../src/script/repositories/tracking/eventTrackingRepository';
 import {resetStoreValue, storeValue} from 'Util/storageUtil';
 
 import {TestFactory} from '../../helper/TestFactory';

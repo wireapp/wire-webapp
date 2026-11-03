@@ -22,8 +22,6 @@ import {type FunctionComponent, useCallback, useRef} from 'react';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {maybe} from 'true-myth';
 
-import type {CallMediaChoice} from 'Repositories/calling/callMediaChoice';
-import type {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleEscDown} from 'Util/keyboardUtil';
 import {captureModalFocusContext} from 'Util/modalFocusUtil';
@@ -32,6 +30,8 @@ import {MeetingPrepSurface} from './meetingPrepSurface';
 import {type MeetingPrepDeviceKind, meetingPrepDeviceKinds, type RequestMeetingPrepPreview} from './meetingPrepTypes';
 import {useMeetingPrepModal} from './useMeetingPrepModal';
 
+import type {CallMediaChoice} from '../../../repositories/calling/callMediaChoice';
+import type {User} from '../../../repositories/entity/User';
 import {showNoAudioInputModal, showNoCameraModal} from '../../calling/devicePermissionModals';
 import {ModalComponent} from '../../Modals/ModalComponent';
 import {modalWrapperStyles} from '../shared/styles/meetingModalShell.styles';

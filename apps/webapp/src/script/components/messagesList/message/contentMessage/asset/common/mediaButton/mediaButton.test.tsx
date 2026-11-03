@@ -21,8 +21,8 @@ import {fireEvent, render} from '@testing-library/react';
 import ko from 'knockout';
 import {noop} from 'noop-esm';
 
-import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import {FileAsset} from 'Repositories/entity/message/fileAsset';
+import {AssetTransferState} from '../../../../../../../repositories/assets/assetTransferState';
+import {FileAsset} from '../../../../../../../repositories/entity/message/fileAsset';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

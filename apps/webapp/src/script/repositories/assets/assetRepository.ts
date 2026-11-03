@@ -31,10 +31,6 @@ import {NIL as NilUuid} from 'uuid';
 
 import {GenericMessage, LegalHoldStatus} from '@wireapp/protocol-messaging';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {FileAsset} from 'Repositories/entity/message/fileAsset';
-import type {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
 import {stripImageExifData} from 'Util/imageUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {downloadBlob, loadFileBuffer, loadImage} from 'Util/util';
@@ -46,6 +42,10 @@ import {AssetTransferState} from './assetTransferState';
 import {getAssetUrl, setAssetUrl} from './assetUrlCache';
 
 import {Core} from '../../service/coreSingleton';
+import {Conversation} from '../entity/Conversation';
+import {FileAsset} from '../entity/message/fileAsset';
+import type {User} from '../entity/User';
+import {TeamState} from '../team/TeamState';
 
 const percentageScale = 100;
 type AssetUrlCacheKey = {domain: string | undefined; key: NonEmptyString};

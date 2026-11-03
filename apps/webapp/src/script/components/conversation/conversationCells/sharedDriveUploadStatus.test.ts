@@ -17,7 +17,7 @@
  *
  */
 
-import type {UploadSource} from 'Repositories/cells/upload';
+import type {UploadSource} from '../../../repositories/cells/upload';
 
 import {
   getRepresentativeSharedDriveUploadStatus,

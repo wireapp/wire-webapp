@@ -29,13 +29,6 @@ import {container} from 'tsyringe';
 
 import {QUERY, StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
 
-import {CallingViewMode, CallState, DesktopScreenShareMenu} from 'Repositories/calling/CallState';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
-import {AppLockRepository} from 'Repositories/user/appLockRepository';
-import {showInitialModal} from 'Repositories/user/availabilityModal';
-import {UserState} from 'Repositories/user/userState';
 import {isUUID} from 'src/script/auth/util/stringUtil';
 import {Config} from 'src/script/Config';
 import {canUseMeetings} from 'Util/canUseMeetings';
@@ -70,6 +63,13 @@ import {useActiveWindow} from '../hooks/useActiveWindow';
 import {useInitializeRootFontSize} from '../hooks/useRootFontSize';
 import {App} from '../main/app';
 import {initialiseMLSMigrationFlow} from '../mls/MLSMigration';
+import {CallingViewMode, CallState, DesktopScreenShareMenu} from '../repositories/calling/CallState';
+import {ConversationState} from '../repositories/conversation/ConversationState';
+import {User} from '../repositories/entity/User';
+import {TeamState} from '../repositories/team/TeamState';
+import {AppLockRepository} from '../repositories/user/appLockRepository';
+import {showInitialModal} from '../repositories/user/availabilityModal';
+import {UserState} from '../repositories/user/userState';
 import {generateConversationUrl} from '../router/routeGenerator';
 import {configureRouterClock, configureRoutes, navigate} from '../router/Router';
 import {Core} from '../service/coreSingleton';

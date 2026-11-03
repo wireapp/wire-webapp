@@ -23,11 +23,12 @@ import {isNan} from '@sindresorhus/is';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import type {Message} from 'Repositories/entity/message/message';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {ephemeralTimerBackgroundStyle, ephemeralTimerDialStyle} from './ephemeralTimer.styles';
+
+import type {Message} from '../../../repositories/entity/message/message';
 
 interface EphemeralTimerProps {
   message: Message;

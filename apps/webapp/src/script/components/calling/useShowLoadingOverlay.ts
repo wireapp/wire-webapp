@@ -19,7 +19,7 @@
 
 import {useCallback, useEffect, useState} from 'react';
 
-import {useBackgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
+import {useBackgroundEffectsStore} from '../../repositories/media/useBackgroundEffectsStore';
 
 type ProcessedVideoStream = {
   stream: MediaStream;

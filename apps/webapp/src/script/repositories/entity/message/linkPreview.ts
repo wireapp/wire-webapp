@@ -19,8 +19,9 @@
 
 import type {ITweet} from '@wireapp/protocol-messaging';
 
-import type {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
 import {obfuscate} from 'Util/stringUtil';
+
+import type {AssetRemoteData} from '../../assets/assetRemoteData';
 
 export type LinkPreviewData = {
   image?: AssetRemoteData;

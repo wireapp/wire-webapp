@@ -19,9 +19,9 @@
 
 import type {FunctionComponent} from 'react';
 
-import type {Conversation} from 'Repositories/entity/Conversation';
 import {getFileTypeFromExtension} from 'Util/getFileTypeFromExtension/getFileTypeFromExtension';
 
+import type {Conversation} from '../../../../../repositories/entity/Conversation';
 import {FileFullscreenModal} from '../../../../FileFullscreenModal/FileFullscreenModal';
 import {sortTagsAlphabetically} from '../../common/sortTagsAlphabetically/sortTagsAlphabetically';
 import {useCellsFilePreviewModal} from '../common/cellsFilePreviewModalContext/cellsFilePreviewModalContext';

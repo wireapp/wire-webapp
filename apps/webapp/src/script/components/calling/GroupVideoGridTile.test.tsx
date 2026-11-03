@@ -21,9 +21,9 @@ import {fireEvent, render, type RenderResult} from '@testing-library/react';
 
 import {VIDEO_STATE} from '@wireapp/avs';
 
-import {Participant} from 'Repositories/calling/Participant';
-import {User} from 'Repositories/entity/User';
-import {backgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
+import {Participant} from '../../repositories/calling/Participant';
+import {User} from '../../repositories/entity/User';
+import {backgroundEffectsStore} from '../../repositories/media/useBackgroundEffectsStore';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

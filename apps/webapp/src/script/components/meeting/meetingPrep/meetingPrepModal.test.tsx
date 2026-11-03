@@ -21,7 +21,7 @@ import {act, fireEvent, render, screen, waitFor} from '@testing-library/react';
 import {ThemeProvider} from '@wireapp/react-ui-kit';
 import {task} from 'true-myth';
 
-import {User} from 'Repositories/entity/User';
+import {User} from '../../../repositories/entity/User';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

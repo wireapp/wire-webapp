@@ -23,11 +23,11 @@ import {isNonEmptyString} from '@sindresorhus/is';
 
 import {Runtime} from '@wireapp/commons';
 
-import {User} from 'Repositories/entity/User';
 import {Translate} from 'Util/localizerUtil';
 import {renderElement} from 'Util/renderElement';
 
 import {Config} from '../../../Config';
+import {User} from '../../../repositories/entity/User';
 import * as Icon from '../../icon';
 import {ModalComponent} from '../ModalComponent';
 

@@ -19,10 +19,9 @@
 
 import {FC, ReactNode, useEffect, useRef, useState} from 'react';
 
-import {User} from 'Repositories/entity/User';
-
 import {styles} from './appLoader.styles';
 
+import {User} from '../../repositories/entity/User';
 import {LoadingBar} from '../LoadingBar/LoadingBar';
 
 interface AppLoaderProps {

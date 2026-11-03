@@ -25,12 +25,6 @@ import {container} from 'tsyringe';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import type {ClientRepository, ClientEntity} from 'Repositories/client';
-import {isMLSConversation} from 'Repositories/conversation/ConversationSelectors';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import type {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import type {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
-import type {User} from 'Repositories/entity/User';
 import {WireIdentity} from 'src/script/e2eIdentity';
 import {MLSDeviceDetails} from 'src/script/page/mainContent/panels/preferences/devicesPreferences/components/mlsDeviceDetails';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -44,6 +38,12 @@ import {toError} from 'Util/toError';
 import {Config} from '../../../../Config';
 import {MotionDuration} from '../../../../motion/MotionDuration';
 import {FormattedId} from '../../../../page/mainContent/panels/preferences/devicesPreferences/components/formattedId';
+import type {ClientRepository, ClientEntity} from '../../../../repositories/client';
+import {isMLSConversation} from '../../../../repositories/conversation/ConversationSelectors';
+import {ConversationState} from '../../../../repositories/conversation/ConversationState';
+import type {MessageRepository} from '../../../../repositories/conversation/MessageRepository';
+import type {CryptographyRepository} from '../../../../repositories/cryptography/CryptographyRepository';
+import type {User} from '../../../../repositories/entity/User';
 
 interface DeviceDetailsProps {
   clickToShowSelfFingerprint: () => void;

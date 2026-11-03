@@ -33,11 +33,6 @@ import {
   Tooltip,
 } from '@wireapp/react-ui-kit';
 
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
-import {FEATURES, hasAccessToFeature} from 'Repositories/user/userPermission';
 import {getManageTeamUrl} from 'src/script/externalRoute';
 import {ConversationFolderTab} from 'src/script/page/leftSidebar/panels/conversations/conversationTab/conversationFolderTab';
 import {
@@ -70,6 +65,11 @@ import {TeamCreationBanner} from './teamCreation/teamCreationBanner';
 import {openDebugToolbar} from '../../../../../components/configToolbar/debugToolbarEvents';
 import * as Icon from '../../../../../components/icon';
 import {Config} from '../../../../../Config';
+import {ConversationRepository} from '../../../../../repositories/conversation/ConversationRepository';
+import {Conversation} from '../../../../../repositories/entity/Conversation';
+import {User} from '../../../../../repositories/entity/User';
+import {TeamState} from '../../../../../repositories/team/TeamState';
+import {FEATURES, hasAccessToFeature} from '../../../../../repositories/user/userPermission';
 import {ContentState} from '../../../../useAppState';
 import {ConversationTab} from '../conversationTab';
 import {conversationFilters} from '../helpers';

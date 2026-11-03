@@ -17,10 +17,10 @@
  *
  */
 
-import {AssetRepository} from 'Repositories/assets/assetRepository';
 import type {Translate} from 'Util/localizerUtil';
 
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
+import {AssetRepository} from '../repositories/assets/assetRepository';
 
 const CONCURRENT_UPLOAD_LIMIT = 10;
 

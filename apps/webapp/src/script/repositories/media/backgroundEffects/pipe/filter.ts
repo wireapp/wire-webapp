@@ -19,7 +19,7 @@
 
 import {isNan, isNullOrUndefined} from '@sindresorhus/is';
 
-import {getSafeLogger} from 'Repositories/media/backgroundEffects/helper/logger';
+import {getSafeLogger} from '../helper/logger';
 
 const vertexCoordinateComponentCount = 2;
 const rectangleVertexCount = 6;

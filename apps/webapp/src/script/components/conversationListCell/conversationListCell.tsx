@@ -34,8 +34,6 @@ import cx from 'classnames';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import type {Conversation} from 'Repositories/entity/Conversation';
-import {MediaType} from 'Repositories/media/MediaType';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isKey, isOneOfKeys, KEY} from 'Util/keyboardUtil';
@@ -48,6 +46,8 @@ import {StatusIcon} from './components/statusIcon';
 import {useConversationCall} from '../../hooks/useConversationCall';
 import type {RegisterConversationElement} from '../../hooks/useConversationFocus';
 import {useNoInternetCallGuard} from '../../hooks/useNoInternetCallGuard/useNoInternetCallGuard';
+import type {Conversation} from '../../repositories/entity/Conversation';
+import {MediaType} from '../../repositories/media/MediaType';
 import {Avatar, AVATAR_SIZE, GroupAvatar, ChannelAvatar} from '../avatar';
 import {UserBlockedBadge} from '../badge';
 import {UserInfo} from '../UserInfo';

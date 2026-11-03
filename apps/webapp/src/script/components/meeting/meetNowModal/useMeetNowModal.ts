@@ -21,10 +21,9 @@ import {isUndefined} from '@sindresorhus/is';
 import {result, type Result} from 'true-myth';
 import {create} from 'zustand';
 
-import type {User} from 'Repositories/entity/User';
-
 import {emptyMeetNowFormErrors, type MeetNowFormErrors, type MeetNowFormState} from './meetNowTypes';
 
+import type {User} from '../../../repositories/entity/User';
 import {getMeetingPasswordErrors} from '../shared/validation/meetingPasswordValidation';
 import {getMeetingTitleError, getMeetingTitleInputError} from '../shared/validation/meetingTitleValidation';
 

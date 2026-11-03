@@ -21,17 +21,17 @@ import type {ComponentProps} from 'react';
 import {render} from '@testing-library/react';
 
 import en from '../../../../../i18n/en-US.json';
-import {ClientEntity} from 'Repositories/client/ClientEntity';
-import type {ClientRepository} from 'Repositories/client';
-import type {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
-import {User} from 'Repositories/entity/User';
-import type {MessageRepository} from 'Repositories/conversation/MessageRepository';
+import {ClientEntity} from '../../../../repositories/client/ClientEntity';
+import type {ClientRepository} from '../../../../repositories/client';
+import type {CryptographyRepository} from '../../../../repositories/cryptography/CryptographyRepository';
+import {User} from '../../../../repositories/entity/User';
+import type {MessageRepository} from '../../../../repositories/conversation/MessageRepository';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {ConversationState} from '../../../../repositories/conversation/ConversationState';
 import {setStrings, translate} from 'Util/localizerUtil';
 import type {Logger} from 'Util/logger';
 import {translateForTest} from 'Util/test/translateForTest';

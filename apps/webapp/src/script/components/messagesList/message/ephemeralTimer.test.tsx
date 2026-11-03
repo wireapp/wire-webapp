@@ -19,7 +19,7 @@
 
 import {render} from '@testing-library/react';
 
-import {Message} from 'Repositories/entity/message/message';
+import {Message} from '../../../repositories/entity/message/message';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

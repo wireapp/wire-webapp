@@ -23,7 +23,7 @@ import {RestNode} from 'cells-sdk-ts';
 import {ICellAsset} from '@wireapp/protocol-messaging';
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {CellsRepository} from '../../../../../../repositories/cells/cellsRepository';
 import {
   createExecutingFireAndForgetInvokerForTest,
   createRootContextValueForTest,

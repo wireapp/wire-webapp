@@ -21,7 +21,6 @@ import {type ReactNode, useEffect, useMemo, type FunctionComponent} from 'react'
 
 import {container} from 'tsyringe';
 
-import {UserState} from 'Repositories/user/userState';
 import {createBrowserSystemNotificationApi} from 'src/script/browser/notification/createSystemNotificationApiFromBrowserNotification';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {getLogger} from 'Util/logger';
@@ -34,6 +33,7 @@ import {MeetingStoreProvider} from './meetingStoreProvider';
 import {subscribeToMeetingConversationEvents} from './subscribeToMeetingConversationEvents';
 import {subscribeToMeetingLifecycleEvents} from './subscribeToMeetingLifecycleEvents';
 
+import {UserState} from '../../../repositories/user/userState';
 import {createMeetingReminderOsNotifier} from '../createMeetingReminderOsNotifier';
 import {createMeetingReminderScheduler} from '../createMeetingReminderScheduler';
 import {createBrowserDeviceTimeZone} from '../deviceTimeZone';

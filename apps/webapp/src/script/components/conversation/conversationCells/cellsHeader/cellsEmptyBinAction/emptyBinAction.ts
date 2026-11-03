@@ -21,8 +21,7 @@ import {isNonEmptyString} from '@sindresorhus/is';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {TreeNodeType, type RestPerformActionResponse} from 'cells-sdk-ts';
 
-import type {CellsRepository} from 'Repositories/cells/cellsRepository';
-
+import type {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
 import {getCellsApiPath} from '../../common/getCellsApiPath/getCellsApiPath';
 import {RECYCLE_BIN_PATH} from '../../common/recycleBin/recycleBin';
 

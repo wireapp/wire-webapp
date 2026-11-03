@@ -23,8 +23,6 @@ import {amplify} from 'amplify';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {EventName} from 'Repositories/tracking/eventName';
-import {Segmentation} from 'Repositories/tracking/segmentation';
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {safeWindowOpen} from 'Util/sanitizationUtil';
@@ -32,6 +30,8 @@ import {safeWindowOpen} from 'Util/sanitizationUtil';
 import {StepProps} from './stepProps';
 import {listCss, modalButtonsCss, successStepSubHeaderCss} from './teamCreationSteps.styles';
 
+import {EventName} from '../../../../../../../repositories/tracking/eventName';
+import {Segmentation} from '../../../../../../../repositories/tracking/segmentation';
 import {WebAppEvents} from '../../../../../../../webAppEvents';
 import {buttonCss} from '../teamCreation.styles';
 

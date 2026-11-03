@@ -21,10 +21,11 @@ import {FC} from 'react';
 
 import {isNan, isNonEmptyArray, isNullOrUndefined} from '@sindresorhus/is';
 
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {User} from 'Repositories/entity/User';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {useApplicationContext} from 'src/script/page/rootProvider';
+
+import {ConversationRepository} from '../../../../../repositories/conversation/ConversationRepository';
+import {User} from '../../../../../repositories/entity/User';
+import {ServiceEntity} from '../../../../../repositories/integration/ServiceEntity';
 
 interface GroupDetailsProps {
   userParticipants: User[];

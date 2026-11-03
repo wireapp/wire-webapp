@@ -19,7 +19,6 @@
 
 import type {FunctionComponent} from 'react';
 
-import {Participant} from 'Repositories/calling/Participant';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {
@@ -30,6 +29,7 @@ import {
   screenShareIcon,
 } from './CallParticipantsListItem.styles';
 
+import {Participant} from '../../../repositories/calling/Participant';
 import * as Icon from '../../icon';
 import {ParticipantMicOnIcon} from '../ParticipantMicOnIcon';
 

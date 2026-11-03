@@ -20,7 +20,7 @@
 import {render} from '@testing-library/react';
 import ko from 'knockout';
 
-import {CompositeMessage} from 'Repositories/entity/message/compositeMessage';
+import {CompositeMessage} from '../../../../../../repositories/entity/message/compositeMessage';
 
 import {MessageButton} from './messageButton';
 import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';

@@ -42,11 +42,14 @@ import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import ko from 'knockout';
 
-import {CallState} from 'Repositories/calling/CallState';
-import {ConversationLabel, ConversationLabelRepository} from 'Repositories/conversation/ConversationLabelRepository';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import {CallState} from '../../../../repositories/calling/CallState';
+import {
+  ConversationLabel,
+  ConversationLabelRepository,
+} from '../../../../repositories/conversation/ConversationLabelRepository';
+import {ConversationState} from '../../../../repositories/conversation/ConversationState';
+import {Conversation} from '../../../../repositories/entity/Conversation';
+import {User} from '../../../../repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';
 import {
   createRootContextValueForTest,

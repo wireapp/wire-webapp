@@ -19,11 +19,15 @@
 
 import {isNan, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 
-import {detectCapabilities, Metrics, QualityMode} from 'Repositories/media/backgroundEffects';
-import {BackgroundEffectsController} from 'Repositories/media/backgroundEffects/backgroundEffectsController';
-import {CapabilityInfo} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
-import {defaultOpts} from 'Repositories/media/backgroundEffects/pipe/options';
-import {deriveModelConfig} from 'Repositories/media/backgroundEffects/qualityTierMapping';
+import {getStorage} from 'Util/localStorage';
+import {getLogger, Logger} from 'Util/logger';
+
+import {detectCapabilities, Metrics, QualityMode} from './backgroundEffects';
+import {BackgroundEffectsController} from './backgroundEffects/backgroundEffectsController';
+import {CapabilityInfo} from './backgroundEffects/backgroundEffectsWorkerTypes';
+import {defaultOpts} from './backgroundEffects/pipe/options';
+import {deriveModelConfig} from './backgroundEffects/qualityTierMapping';
+import {BackgroundEffectsQuality, backgroundEffectsStore, RenderMetrics} from './useBackgroundEffectsStore';
 import {
   BackgroundEffectSelection,
   BackgroundSource,
@@ -31,11 +35,7 @@ import {
   DEFAULT_BACKGROUND_EFFECT,
   DEFAULT_BUILTIN_BACKGROUND_ID,
   loadBackgroundSource,
-} from 'Repositories/media/VideoBackgroundEffects';
-import {getStorage} from 'Util/localStorage';
-import {getLogger, Logger} from 'Util/logger';
-
-import {BackgroundEffectsQuality, backgroundEffectsStore, RenderMetrics} from './useBackgroundEffectsStore';
+} from './VideoBackgroundEffects';
 
 const millisecondsPerSecond = 1000;
 const percentageScale = 100;

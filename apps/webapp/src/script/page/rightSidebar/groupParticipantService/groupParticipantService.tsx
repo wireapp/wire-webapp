@@ -23,13 +23,6 @@ import {isNullOrUndefined} from '@sindresorhus/is';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
-import {TeamRepository} from 'Repositories/team/TeamRepository';
-import {generatePermissionHelpers} from 'Repositories/user/userPermission';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
@@ -37,6 +30,13 @@ import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {FadingScrollbar} from '../../../components/fadingScrollbar';
 import * as Icon from '../../../components/icon';
 import {ServiceDetails} from '../../../components/panel/serviceDetails';
+import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {User} from '../../../repositories/entity/User';
+import {IntegrationRepository} from '../../../repositories/integration/IntegrationRepository';
+import {ServiceEntity} from '../../../repositories/integration/ServiceEntity';
+import {TeamRepository} from '../../../repositories/team/TeamRepository';
+import {generatePermissionHelpers} from '../../../repositories/user/userPermission';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {PanelHeader} from '../panelHeader';
 

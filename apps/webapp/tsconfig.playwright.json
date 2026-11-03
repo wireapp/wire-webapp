@@ -15,8 +15,6 @@
     "paths": {
       // E2E startup feature toggles import the production definitions and query-string updater.
       "src/*": ["./src/*"],
-      // Calling specs and audio.util.ts import Repositories/audio/audioType.
-      "Repositories/*": ["./src/script/repositories/*"]
     }
   },
   "include": [

@@ -25,9 +25,6 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {Loading, QUERY} from '@wireapp/react-ui-kit';
 
-import {Call} from 'Repositories/calling/Call';
-import type {Participant} from 'Repositories/calling/Participant';
-import type {Grid} from 'Repositories/calling/videoGridHandler';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
@@ -37,6 +34,9 @@ import {useShowLoadingOverlay} from './useShowLoadingOverlay';
 import {Video} from './Video';
 
 import {useActiveWindowMatchMedia} from '../../hooks/useActiveWindowMatchMedia';
+import {Call} from '../../repositories/calling/Call';
+import type {Participant} from '../../repositories/calling/Participant';
+import type {Grid} from '../../repositories/calling/videoGridHandler';
 import {Avatar, AVATAR_SIZE} from '../avatar';
 import * as Icon from '../icon';
 

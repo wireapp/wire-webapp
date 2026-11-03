@@ -21,11 +21,11 @@ import type {FunctionComponent} from 'react';
 
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-import {ProtocolUpdateMessage as ProtocolUpdateMessageEntity} from 'Repositories/entity/message/protocolUpdateMessage';
-import {SystemMessage} from 'Repositories/entity/message/systemMessage';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {type Translate} from 'Util/localizerUtil';
 
+import {ProtocolUpdateMessage as ProtocolUpdateMessageEntity} from '../../../../repositories/entity/message/protocolUpdateMessage';
+import {SystemMessage} from '../../../../repositories/entity/message/systemMessage';
 import * as Icon from '../../../icon';
 import {SystemMessageBase} from '../systemMessage/systemMessageBase';
 import {renderMlsSystemMessageCaption} from '../systemMessage/systemMessageCaption';

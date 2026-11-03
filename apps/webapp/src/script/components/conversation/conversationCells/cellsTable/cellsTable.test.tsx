@@ -28,8 +28,8 @@ import {ThemeProvider, themes, THEME_ID} from '@wireapp/react-ui-kit';
 import {PrimaryModalComponent} from '../../../Modals/PrimaryModal/PrimaryModal';
 import {JobsTaskStatus} from 'cells-sdk-ts';
 import {Maybe} from 'true-myth';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import type {Conversation} from 'Repositories/entity/Conversation';
+import {CellsRepository} from '../../../../repositories/cells/cellsRepository';
+import type {Conversation} from '../../../../repositories/entity/Conversation';
 import {
   createExecutingFireAndForgetInvokerForTest,
   createRootContextValueForTest,

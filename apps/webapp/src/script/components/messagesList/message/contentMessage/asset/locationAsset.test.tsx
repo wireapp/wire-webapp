@@ -19,7 +19,7 @@
 
 import {render} from '@testing-library/react';
 
-import type {Location} from 'Repositories/entity/message/location';
+import type {Location} from '../../../../../repositories/entity/message/location';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

@@ -27,10 +27,10 @@ import type {MeetingStoreServiceTasks} from '../../../../meetingStore/meetingSto
 import {MeetingAction} from './meetingAction';
 import type {MeetingInstance} from '../../../../types/meetingInstance';
 import type {MeetingSeries} from '../../../../types/meetingSeries';
-import type {CallingRepository} from 'Repositories/calling/CallingRepository';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {User} from 'Repositories/entity/User';
-import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
+import type {CallingRepository} from '../../../../../../repositories/calling/CallingRepository';
+import type {ConversationRepository} from '../../../../../../repositories/conversation/ConversationRepository';
+import {User} from '../../../../../../repositories/entity/User';
+import type {MeetingsRepository} from '../../../../../../repositories/meetings/meetingsRepository';
 import {translateForTest} from 'Util/test/translateForTest';
 import {
   createRootContextValueForTest,

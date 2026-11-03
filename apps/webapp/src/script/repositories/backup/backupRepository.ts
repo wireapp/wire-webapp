@@ -20,13 +20,6 @@
 import {isNonEmptyString, isNull, isTruthy} from '@sindresorhus/is';
 import {omit} from 'underscore';
 
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {isReadableConversation} from 'Repositories/conversation/ConversationSelectors';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {EventRecord, UserRecord} from 'Repositories/storage';
-import {ConversationRecord} from 'Repositories/storage/record/conversationRecord';
-import {StorageSchemata} from 'Repositories/storage/storageSchemata';
 import {chunk} from 'Util/arrayUtil';
 import {Logger, getLogger} from 'Util/logger';
 import {constructUserPrimaryKey} from 'Util/storageUtil';
@@ -51,6 +44,13 @@ import {
 import {createMetaData, exportHistory, importLegacyBackupToDatabase} from './legacyBackup.helper';
 
 import {Config} from '../../Config';
+import type {ConversationRepository} from '../conversation/ConversationRepository';
+import {isReadableConversation} from '../conversation/ConversationSelectors';
+import type {Conversation} from '../entity/Conversation';
+import {User} from '../entity/User';
+import {EventRecord, UserRecord} from '../storage';
+import {ConversationRecord} from '../storage/record/conversationRecord';
+import {StorageSchemata} from '../storage/storageSchemata';
 
 const backupMetadataIndentationSpaces = 2;
 

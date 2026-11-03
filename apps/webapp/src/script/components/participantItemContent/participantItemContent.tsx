@@ -22,8 +22,6 @@ import React, {type FunctionComponent} from 'react';
 import {isNonEmptyString} from '@sindresorhus/is';
 import ko from 'knockout';
 
-import {User} from 'Repositories/entity/User';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {
@@ -38,6 +36,8 @@ import {
   wrapper,
 } from './participantItem.styles';
 
+import {User} from '../../repositories/entity/User';
+import {ServiceEntity} from '../../repositories/integration/ServiceEntity';
 import {UserBlockedBadge, UserVerificationBadges} from '../badge';
 import * as Icon from '../icon';
 import {UserInfo} from '../UserInfo';

@@ -23,8 +23,6 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {E2eiConversationState, MLSServiceEvents} from '@wireapp/core/lib/messagingProtocols/mls';
 import {StringifiedQualifiedId, stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
 import {
   E2EIHandler,
   getActiveWireIdentity,
@@ -38,6 +36,8 @@ import {Core} from 'src/script/service/coreSingleton';
 import {Logger, getLogger} from 'Util/logger';
 import {waitFor} from 'Util/waitFor';
 
+import {Conversation} from '../../../entity/Conversation';
+import {User} from '../../../entity/User';
 import {isMLSConversation, MLSCapableConversation, MLSConversation} from '../../ConversationSelectors';
 import {ConversationState} from '../../ConversationState';
 import {ConversationVerificationState} from '../../ConversationVerificationState';

@@ -29,7 +29,7 @@ import {
   CellsSelfUserDriveRoleProvider,
   CELLS_SELF_USER_DRIVE_ROLE,
 } from '../../common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
-import type {CellsRepository} from 'Repositories/cells/cellsRepository';
+import type {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
 import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {
   createRootContextValueForTest,

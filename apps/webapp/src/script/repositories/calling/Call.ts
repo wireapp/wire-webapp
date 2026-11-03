@@ -23,21 +23,21 @@ import ko from 'knockout';
 
 import {CALL_TYPE, CONV_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 
-import {AudioSpeakerFactory} from 'Repositories/calling/AudioSpeakerFactory';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {CanvasMediaStreamMixer} from 'Repositories/media/CanvasMediaStreamMixer';
-import type {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
-import {mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {chunk, getDifference, partition} from 'Util/arrayUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {sortUsersByPriority} from 'Util/stringUtil';
 
+import {AudioSpeakerFactory} from './AudioSpeakerFactory';
 import {CallingEpochCache} from './CallingEpochCache';
 import {MuteState} from './CallState';
 import type {ClientId, Participant} from './Participant';
 
 import {Config} from '../../Config';
+import {Conversation} from '../entity/Conversation';
+import {CanvasMediaStreamMixer} from '../media/CanvasMediaStreamMixer';
+import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';
+import {mediaDevicesStore} from '../media/useMediaDevicesStore';
 
 const participantsPerPage = 9;
 const maximumDisplayedParticipantNames = 4;

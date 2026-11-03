@@ -19,12 +19,12 @@
 
 import {useState} from 'react';
 
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
+import {MessageRepository} from '../../../repositories/conversation/MessageRepository';
+import {Conversation} from '../../../repositories/entity/Conversation';
 import {PrimaryModal} from '../../Modals/PrimaryModal';
 
 const pingTimeoutInSeconds = 2;

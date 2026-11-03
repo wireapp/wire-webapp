@@ -17,10 +17,10 @@
  *
  */
 
-import {User} from 'Repositories/entity/User';
+import {User} from '../entity/User';
 import {assertNotNullOrUndefined} from '@sindresorhus/is';
-import {defaultAudioOutputId, mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
-import {UserState} from 'Repositories/user/userState';
+import {defaultAudioOutputId, mediaDevicesStore} from './useMediaDevicesStore';
+import {UserState} from '../user/userState';
 import {createUuid} from 'Util/uuid';
 
 import {MediaConstraintsHandler, ScreensharingMethods} from './MediaConstraintsHandler';

@@ -21,12 +21,12 @@ import React, {ChangeEvent, useId, type FunctionComponent} from 'react';
 
 import {TabIndex, Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 
-import {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {capitalizeFirstChar} from 'Util/stringUtil';
 
 import {UserlistMode} from '../..';
+import {User} from '../../../../repositories/entity/User';
 import {Avatar, AVATAR_SIZE} from '../../../avatar';
 import {UserStatusBadges} from '../../../badge';
 import {ParticipantItemContent} from '../../../participantItemContent';

@@ -22,9 +22,9 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {randomUUID} from 'crypto';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {TeamState} from 'Repositories/team/TeamState';
-import {UserState} from 'Repositories/user/userState';
+import {Conversation} from '../entity/Conversation';
+import {TeamState} from '../team/TeamState';
+import {UserState} from '../user/userState';
 
 import {ConversationState} from './ConversationState';
 import {translateForTest} from 'Util/test/translateForTest';

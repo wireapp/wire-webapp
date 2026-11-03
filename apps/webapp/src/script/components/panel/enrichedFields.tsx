@@ -25,12 +25,13 @@ import {container} from 'tsyringe';
 
 import {Availability} from '@wireapp/protocol-messaging';
 
-import type {User} from 'Repositories/entity/User';
-import {RichProfileRepository} from 'Repositories/user/richProfileRepository';
 import {RootContextValue, useApplicationContext} from 'src/script/page/rootProvider';
 import {availabilityStatus, availabilityTranslationKeys} from 'Util/availabilityStatus';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {noop} from 'Util/util';
+
+import type {User} from '../../repositories/entity/User';
+import {RichProfileRepository} from '../../repositories/user/richProfileRepository';
 
 interface EnrichedFieldsProps {
   onFieldsLoaded?: (richFields: RichInfoField[]) => void;

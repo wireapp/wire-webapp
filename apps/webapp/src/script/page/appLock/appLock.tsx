@@ -27,10 +27,6 @@ import {container} from 'tsyringe';
 import {ValidationUtil} from '@wireapp/commons';
 import {Button, ButtonVariant, Checkbox, CheckboxLabel, Input, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
-import {ClientRepository} from 'Repositories/client';
-import {ClientState} from 'Repositories/client/ClientState';
-import {AppLockRepository} from 'Repositories/user/appLockRepository';
-import {AppLockState} from 'Repositories/user/appLockState';
 import {SIGN_OUT_REASON} from 'src/script/auth/signOutReason';
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -43,6 +39,10 @@ import {applockStyles} from './appLock.styles';
 
 import * as Icon from '../../components/icon';
 import {ModalComponent} from '../../components/Modals/ModalComponent';
+import {ClientRepository} from '../../repositories/client';
+import {ClientState} from '../../repositories/client/ClientState';
+import {AppLockRepository} from '../../repositories/user/appLockRepository';
+import {AppLockState} from '../../repositories/user/appLockState';
 import {WebAppEvents} from '../../webAppEvents';
 
 const millisecondsPerSecond = 1000;

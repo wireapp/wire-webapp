@@ -23,8 +23,6 @@ import cx from 'classnames';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {User} from 'Repositories/entity/User';
-import {UserRepository} from 'Repositories/user/userRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {getLogger} from 'Util/logger';
@@ -37,6 +35,8 @@ import {Avatar, AVATAR_SIZE} from '../../../../../components/avatar';
 import {PrimaryModal} from '../../../../../components/Modals/PrimaryModal';
 import {Config} from '../../../../../Config';
 import {UserError} from '../../../../../error/userError';
+import {User} from '../../../../../repositories/entity/User';
+import {UserRepository} from '../../../../../repositories/user/userRepository';
 
 interface AvatarInputProps {
   isActivatedAccount: boolean;

@@ -11,7 +11,6 @@
       "@sindresorhus/is": ["../../node_modules/@sindresorhus/is/distribution/index.d.ts"],
       "@enormora/objectory": ["../../node_modules/@enormora/objectory/main.d.ts"],
       "@enormora/clock/clock": ["../../node_modules/@enormora/clock/clock.entry-point.d.ts"],
-      "Repositories/*": ["./src/script/repositories/*"],
       "Util/*": ["./src/script/util/*"],
     }
   },

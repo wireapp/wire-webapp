@@ -21,10 +21,11 @@ import {MutableRefObject, useEffect} from 'react';
 
 import {isUndefined} from '@sindresorhus/is';
 
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {Message as MessageEntity} from 'Repositories/entity/message/message';
 import {useApplicationContext} from 'src/script/page/rootProvider';
+
+import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {Message as MessageEntity} from '../../../repositories/entity/message/message';
 
 interface Props {
   conversation: Conversation;

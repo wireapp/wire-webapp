@@ -23,13 +23,13 @@ import type {User as APIClientUser, QualifiedHandle, QualifiedId} from '@wireapp
 import type {UserService as CoreUserService} from '@wireapp/core/lib/user';
 import {container} from 'tsyringe';
 
-import {UserRecord} from 'Repositories/storage';
-import {StorageSchemata} from 'Repositories/storage/storageSchemata';
-import {StorageService} from 'Repositories/storage/storageService';
 import {constructUserPrimaryKey} from 'Util/storageUtil';
 
 import {APIClient} from '../../service/apiClientSingleton';
 import {Core} from '../../service/coreSingleton';
+import {UserRecord} from '../storage';
+import {StorageSchemata} from '../storage/storageSchemata';
+import {StorageService} from '../storage/storageService';
 
 type UserDirectoryLookupResult = {
   found: APIClientUser[];

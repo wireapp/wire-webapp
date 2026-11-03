@@ -26,10 +26,10 @@ import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {PrimaryModalType} from '../components/Modals/PrimaryModal/PrimaryModalTypes';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {UserState} from 'Repositories/user/userState';
+import {ConversationState} from '../repositories/conversation/ConversationState';
+import {Conversation} from '../repositories/entity/Conversation';
+import {User} from '../repositories/entity/User';
+import {UserState} from '../repositories/user/userState';
 import {Core} from 'src/script/service/coreSingleton';
 import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import * as util from 'Util/util';

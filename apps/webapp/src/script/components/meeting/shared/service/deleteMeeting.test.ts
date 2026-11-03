@@ -23,10 +23,10 @@ import {task} from 'true-myth';
 
 import type {MeetingServiceDeps} from '../../meetingStore/meetingStoreDeps';
 import {meetingSubmitErrors} from '../../meetingSubmitErrors';
-import type {CallingRepository} from 'Repositories/calling/CallingRepository';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
+import type {CallingRepository} from '../../../../repositories/calling/CallingRepository';
+import type {ConversationRepository} from '../../../../repositories/conversation/ConversationRepository';
+import {Conversation} from '../../../../repositories/entity/Conversation';
+import type {MeetingsRepository} from '../../../../repositories/meetings/meetingsRepository';
 import {unwrapErr} from 'Util/test/resultTestSupport';
 import {translateForTest} from 'Util/test/translateForTest';
 

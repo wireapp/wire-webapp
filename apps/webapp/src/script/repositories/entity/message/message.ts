@@ -23,9 +23,6 @@ import ko from 'knockout';
 
 import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
-import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import {AssetType} from 'Repositories/assets/assetType';
-import type {ReadReceipt} from 'Repositories/storage/record/eventRecord';
 import {type Translate, getUserName} from 'Util/localizerUtil';
 import {formatDateNumeral, formatDurationCaption, formatTimeShort, fromUnixTime, TIME_IN_MILLIS} from 'Util/timeUtil';
 
@@ -53,6 +50,9 @@ import {EphemeralStatusType} from '../../../message/ephemeralStatusType';
 import type {MessageCategory} from '../../../message/messageCategory';
 import {StatusType} from '../../../message/statusType';
 import {SuperType} from '../../../message/superType';
+import {AssetTransferState} from '../../assets/assetTransferState';
+import {AssetType} from '../../assets/assetType';
+import type {ReadReceipt} from '../../storage/record/eventRecord';
 import {User} from '../User';
 
 export class Message {

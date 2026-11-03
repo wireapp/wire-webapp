@@ -21,11 +21,11 @@ import type {FunctionComponent} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {descriptionStyles} from './cellsNewFileModal.styles';
 
+import {CellsRepository} from '../../../../../../repositories/cells/cellsRepository';
 import {CellsModal} from '../../../common/cellsModal/cellsModal';
 import {CellsNewNodeForm} from '../../../common/cellsNewNodeForm/cellsNewNodeForm';
 import {

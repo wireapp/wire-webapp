@@ -22,11 +22,6 @@ import {FC, useMemo, useState} from 'react';
 import {isNan, isNonEmptyArray, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
 
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {User} from 'Repositories/entity/User';
-import {UserRepository} from 'Repositories/user/userRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {formatLocale} from 'Util/timeUtil';
@@ -37,6 +32,11 @@ import {FadingScrollbar} from '../../../components/fadingScrollbar';
 import * as Icon from '../../../components/icon';
 import {UserList} from '../../../components/userList';
 import {SuperType} from '../../../message/superType';
+import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {ContentMessage} from '../../../repositories/entity/message/contentMessage';
+import {User} from '../../../repositories/entity/User';
+import {UserRepository} from '../../../repositories/user/userRepository';
 import {PanelHeader} from '../panelHeader';
 import {PanelEntity, PanelState} from '../rightSidebar';
 

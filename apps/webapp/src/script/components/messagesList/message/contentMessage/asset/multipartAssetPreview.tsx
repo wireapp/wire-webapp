@@ -24,12 +24,12 @@ import {container} from 'tsyringe';
 import {ICellAsset} from '@wireapp/protocol-messaging';
 import {MultipleFilesIcon, PlayIcon} from '@wireapp/react-ui-kit';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {isPreviewableImage} from 'Util/imageUtil';
 import {getFileExtension, getName} from 'Util/util';
 
 import {useGetMultipartAsset} from './multipartAssets/useGetMultipartAsset/useGetMultipartAsset';
 
+import {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
 import {FileTypeIcon} from '../../../../conversation/common/fileTypeIcon/fileTypeIcon';
 import {FileFullscreenModal} from '../../../../FileFullscreenModal/FileFullscreenModal';
 

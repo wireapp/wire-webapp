@@ -24,13 +24,6 @@ import {isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 
-import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {MediumImage} from 'Repositories/entity/message/mediumImage';
-import {User} from 'Repositories/entity/User';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import type {Translate} from 'Util/localizerUtil';
 import {renderElement} from 'Util/renderElement';
@@ -43,6 +36,13 @@ import {DetailViewModalHeader} from './DetailViewModalHeader';
 import {isContentMessage} from '../../../guards/Message';
 import {MessageCategory} from '../../../message/messageCategory';
 import {isOfCategory} from '../../../page/mainContent/panels/collection/utils';
+import {AssetRepository} from '../../../repositories/assets/assetRepository';
+import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import {MessageRepository} from '../../../repositories/conversation/MessageRepository';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {ContentMessage} from '../../../repositories/entity/message/contentMessage';
+import {MediumImage} from '../../../repositories/entity/message/mediumImage';
+import {User} from '../../../repositories/entity/User';
 import {WebAppEvents} from '../../../webAppEvents';
 import {ZoomableImage} from '../../ZoomableImage';
 

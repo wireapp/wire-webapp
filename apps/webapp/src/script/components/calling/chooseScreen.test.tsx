@@ -29,7 +29,7 @@ import {
 } from '@testing-library/react';
 import {container} from 'tsyringe';
 
-import {CallState} from 'Repositories/calling/CallState';
+import {CallState} from '../../repositories/calling/CallState';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

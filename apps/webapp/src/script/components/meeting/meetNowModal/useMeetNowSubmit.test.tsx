@@ -27,7 +27,7 @@ import {useMeetingPrepModal} from '../meetingPrep/useMeetingPrepModal';
 import type {MeetingStoreState} from '../meetingStore/createMeetingStore';
 import {MeetingStoreProvider} from '../meetingStore/meetingStoreProvider';
 import {meetingSubmitErrors} from '../meetingSubmitErrors';
-import type {ConversationState} from 'Repositories/conversation/ConversationState';
+import type {ConversationState} from '../../../repositories/conversation/ConversationState';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

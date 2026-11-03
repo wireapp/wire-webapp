@@ -24,8 +24,8 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {Runtime} from '@wireapp/commons';
 import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 
-import {User} from 'Repositories/entity/User';
-import {ClientRecord} from 'Repositories/storage/record/clientRecord';
+import {User} from '../entity/User';
+import {ClientRecord} from '../storage/record/clientRecord';
 import {ClientError} from 'src/script/error/clientError';
 import {type Translate} from 'Util/localizerUtil';
 

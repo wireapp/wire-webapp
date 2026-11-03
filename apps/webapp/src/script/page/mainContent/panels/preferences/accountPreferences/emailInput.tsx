@@ -21,7 +21,6 @@ import type {FunctionComponent} from 'react';
 
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
-import {UserRepository} from 'Repositories/user/userRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {getLogger} from 'Util/logger';
 import {isErrorWithCode} from 'Util/typePredicateUtil';
@@ -29,6 +28,7 @@ import {isErrorWithCode} from 'Util/typePredicateUtil';
 import {AccountInput, useInputDone} from './accountInput';
 
 import {PrimaryModal} from '../../../../../components/Modals/PrimaryModal';
+import {UserRepository} from '../../../../../repositories/user/userRepository';
 
 interface EmailInputProps {
   canEditProfile: boolean;

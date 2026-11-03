@@ -36,19 +36,6 @@ import {
   TabIndex,
 } from '@wireapp/react-ui-kit';
 
-import type {Call} from 'Repositories/calling/Call';
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {CallingViewMode, CallState, MuteState} from 'Repositories/calling/CallState';
-import {Participant} from 'Repositories/calling/Participant';
-import type {Grid} from 'Repositories/calling/videoGridHandler';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import {detectCapabilities} from 'Repositories/media/backgroundEffects';
-import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
-import {BackgroundEffectsQuality, useBackgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
-import type {BackgroundEffectSelection} from 'Repositories/media/VideoBackgroundEffects';
-import {BUILTIN_BACKGROUNDS} from 'Repositories/media/VideoBackgroundEffects';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {TeamState} from 'Repositories/team/TeamState';
 import {useActiveWindowMatchMedia} from 'src/script/hooks/useActiveWindowMatchMedia';
 import {useToggleState} from 'src/script/hooks/useToggleState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -76,6 +63,19 @@ import {VideoBackgroundPerformancePanel} from './VideoControls/videoBackgroundPe
 import {VideoBackgroundSettings} from './VideoControls/VideoBackgroundSettings/VideoBackgroundSettings';
 import {VideoControls} from './VideoControls/VideoControls';
 
+import type {Call} from '../../repositories/calling/Call';
+import {CallingRepository} from '../../repositories/calling/CallingRepository';
+import {CallingViewMode, CallState, MuteState} from '../../repositories/calling/CallState';
+import {Participant} from '../../repositories/calling/Participant';
+import type {Grid} from '../../repositories/calling/videoGridHandler';
+import type {Conversation} from '../../repositories/entity/Conversation';
+import {detectCapabilities} from '../../repositories/media/backgroundEffects';
+import {MediaDevicesHandler} from '../../repositories/media/MediaDevicesHandler';
+import {BackgroundEffectsQuality, useBackgroundEffectsStore} from '../../repositories/media/useBackgroundEffectsStore';
+import {BUILTIN_BACKGROUNDS} from '../../repositories/media/VideoBackgroundEffects';
+import type {BackgroundEffectSelection} from '../../repositories/media/VideoBackgroundEffects';
+import {PropertiesRepository} from '../../repositories/properties/propertiesRepository';
+import {TeamState} from '../../repositories/team/TeamState';
 import {useWarningsState} from '../../view_model/WarningsContainer/WarningsState';
 import {CONFIG, TYPE} from '../../view_model/WarningsContainer/WarningsTypes';
 import {WebAppEvents} from '../../webAppEvents';

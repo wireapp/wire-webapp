@@ -19,13 +19,13 @@
 
 import type {FunctionComponent} from 'react';
 
-import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {Translate} from 'Util/localizerUtil';
 import {renderElement} from 'Util/renderElement';
 
+import {IntegrationRepository} from '../../../repositories/integration/IntegrationRepository';
+import {ServiceEntity} from '../../../repositories/integration/ServiceEntity';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {Avatar, AVATAR_SIZE} from '../../avatar';
 import * as Icon from '../../icon';

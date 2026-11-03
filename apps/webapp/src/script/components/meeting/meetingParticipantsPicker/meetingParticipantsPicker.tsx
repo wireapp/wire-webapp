@@ -24,12 +24,6 @@ import {Button, Popover} from 'react-aria-components';
 
 import {ChevronDownIcon, getOverlayPortalContainer, InputLabel, SearchIcon} from '@wireapp/react-ui-kit';
 
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import type {ConversationState} from 'Repositories/conversation/ConversationState';
-import type {User} from 'Repositories/entity/User';
-import type {SearchRepository} from 'Repositories/search/searchRepository';
-import type {TeamRepository} from 'Repositories/team/TeamRepository';
-import type {TeamState} from 'Repositories/team/TeamState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {formatParticipantsFieldLabel} from './formatParticipantsFieldLabel';
@@ -50,6 +44,12 @@ import {
 import {isAllowedMeetingParticipant} from './participantPickerUtils';
 import {useMeetingParticipantsPicker} from './useMeetingParticipantsPicker';
 
+import type {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import type {ConversationState} from '../../../repositories/conversation/ConversationState';
+import type {User} from '../../../repositories/entity/User';
+import type {SearchRepository} from '../../../repositories/search/searchRepository';
+import type {TeamRepository} from '../../../repositories/team/TeamRepository';
+import type {TeamState} from '../../../repositories/team/TeamState';
 import {UserSearchableList} from '../../UserSearchableList';
 
 export interface MeetingParticipantsPickerProps {

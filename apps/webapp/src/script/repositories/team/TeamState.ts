@@ -25,14 +25,15 @@ import {UserType} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {ROLE, roleMap} from 'Repositories/user/userPermission';
-import {UserState} from 'Repositories/user/userState';
 import {Config} from 'src/script/Config';
 import {sortUsersByPriority} from 'Util/stringUtil';
 
 import {TeamEntity} from './TeamEntity';
+
+import {Conversation} from '../entity/Conversation';
+import {User} from '../entity/User';
+import {ROLE, roleMap} from '../user/userPermission';
+import {UserState} from '../user/userState';
 
 const millisecondsPerSecond = 1000;
 

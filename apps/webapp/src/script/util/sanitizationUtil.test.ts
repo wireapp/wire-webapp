@@ -17,7 +17,7 @@
  *
  */
 
-import {User} from 'Repositories/entity/User';
+import {User} from '../repositories/entity/User';
 import {assertNotNullOrUndefined} from '@sindresorhus/is';
 import {Declension, translate, getSelfName, getUserName} from 'Util/localizerUtil';
 

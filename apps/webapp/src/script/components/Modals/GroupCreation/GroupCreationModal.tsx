@@ -29,16 +29,6 @@ import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, Option, Select} from '@wireapp/react-ui-kit';
 
-import {ACCESS_STATE} from 'Repositories/conversation/AccessState';
-import {
-  ACCESS_TYPES,
-  teamPermissionsForAccessState,
-  toggleFeature,
-} from 'Repositories/conversation/ConversationAccessPermission';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
-import {UserState} from 'Repositories/user/userState';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
@@ -50,6 +40,16 @@ import {sortUsersByPriority} from 'Util/stringUtil';
 
 import {Config} from '../../../Config';
 import {isProtocolOption, ProtocolOption} from '../../../guards/Protocol';
+import {ACCESS_STATE} from '../../../repositories/conversation/AccessState';
+import {
+  ACCESS_TYPES,
+  teamPermissionsForAccessState,
+  toggleFeature,
+} from '../../../repositories/conversation/ConversationAccessPermission';
+import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import {User} from '../../../repositories/entity/User';
+import {TeamState} from '../../../repositories/team/TeamState';
+import {UserState} from '../../../repositories/user/userState';
 import {WebAppEvents} from '../../../webAppEvents';
 import {FadingScrollbar} from '../../fadingScrollbar';
 import * as Icon from '../../icon';

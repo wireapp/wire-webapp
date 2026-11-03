@@ -17,9 +17,9 @@
  *
  */
 
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {PropertiesService} from 'Repositories/properties/propertiesService';
-import {SelfService} from 'Repositories/self/SelfService';
+import {PropertiesRepository} from '../../../src/script/repositories/properties/propertiesRepository';
+import {PropertiesService} from '../../../src/script/repositories/properties/propertiesService';
+import {SelfService} from '../../../src/script/repositories/self/SelfService';
 import {PrimaryModal} from '../../../src/script/components/Modals/PrimaryModal';
 import {translate} from 'Util/localizerUtil';
 

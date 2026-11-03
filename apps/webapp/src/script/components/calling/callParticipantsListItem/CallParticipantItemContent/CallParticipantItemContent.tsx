@@ -21,7 +21,6 @@ import React, {type FunctionComponent} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {capitalizeFirstChar} from 'Util/stringUtil';
 
@@ -34,6 +33,7 @@ import {
   wrapper,
 } from './CallParticipantItemContent.styles';
 
+import {User} from '../../../../repositories/entity/User';
 import * as Icon from '../../../icon';
 import {UserInfo} from '../../../UserInfo';
 

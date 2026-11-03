@@ -22,8 +22,6 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Maybe, maybe} from 'true-myth';
 import {create} from 'zustand';
 
-import type {User} from 'Repositories/entity/User';
-
 import {
   emptyScheduleMeetingFormErrors,
   type ScheduleMeetingFormErrors,
@@ -34,6 +32,7 @@ import {
 } from './scheduleMeetingTypes';
 import {getScheduleMeetingFormErrors} from './scheduleMeetingValidation';
 
+import type {User} from '../../../repositories/entity/User';
 import {
   getDefaultMeetingEndDateTime,
   getDefaultScheduleMeetingStartDateTime,

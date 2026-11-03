@@ -20,9 +20,9 @@
 import {render} from '@testing-library/react';
 import ko from 'knockout';
 
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {FileAsset} from 'Repositories/entity/message/fileAsset';
-import {TeamState} from 'Repositories/team/TeamState';
+import {ContentMessage} from '../../../../../../repositories/entity/message/contentMessage';
+import {FileAsset} from '../../../../../../repositories/entity/message/fileAsset';
+import {TeamState} from '../../../../../../repositories/team/TeamState';
 import {StatusType} from 'src/script/message/statusType';
 import {
   createRootContextValueForTest,

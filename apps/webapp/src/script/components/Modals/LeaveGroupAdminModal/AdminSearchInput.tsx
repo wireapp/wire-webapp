@@ -25,7 +25,6 @@ import {FormatOptionLabelMeta} from 'react-select';
 
 import {Option, Select} from '@wireapp/react-ui-kit';
 
-import type {User} from 'Repositories/entity/User';
 import type {Translate} from 'Util/localizerUtil';
 
 import {
@@ -43,6 +42,7 @@ import {
   userNameStyles,
 } from './styles';
 
+import type {User} from '../../../repositories/entity/User';
 import {Avatar, AVATAR_SIZE} from '../../avatar';
 
 interface AdminSearchInputProps {

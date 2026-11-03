@@ -20,8 +20,8 @@
 import {renderHook} from '@testing-library/react';
 import {createDeterministicClock, type DeterministicClock} from '@enormora/clock/deterministic-clock';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {Message} from 'Repositories/entity/message/message';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {Message} from '../../../repositories/entity/message/message';
 import {translateForTest} from 'Util/test/translateForTest';
 import {createUuid} from 'Util/uuid';
 

@@ -22,12 +22,13 @@ import {Fragment, useCallback, useEffect, useRef} from 'react';
 import type {JSX} from '@emotion/react/jsx-runtime';
 import {container} from 'tsyringe';
 
-import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
-import {ElectronDesktopCapturerSource} from 'Repositories/media/MediaDevicesHandler';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {KEY} from 'Util/keyboardUtil';
 import {captureModalFocusContext} from 'Util/modalFocusUtil';
+
+import {CallingViewMode, CallState} from '../../repositories/calling/CallState';
+import {ElectronDesktopCapturerSource} from '../../repositories/media/MediaDevicesHandler';
 
 interface ChooseScreenProps {
   choose: (screenId: string) => void;

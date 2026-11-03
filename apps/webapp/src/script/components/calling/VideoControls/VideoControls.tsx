@@ -37,21 +37,6 @@ import {
   TabIndex,
 } from '@wireapp/react-ui-kit';
 
-import {Call} from 'Repositories/calling/Call';
-import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
-import {Participant} from 'Repositories/calling/Participant';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ElectronDesktopCapturerSource, MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
-import {useBackgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
-import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
-import {
-  BackgroundEffectSelection,
-  DEFAULT_BACKGROUND_EFFECT,
-  DEFAULT_BUILTIN_BACKGROUND_ID,
-} from 'Repositories/media/VideoBackgroundEffects';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
-import {TeamState} from 'Repositories/team/TeamState';
 import {Config} from 'src/script/Config';
 import {isCallViewOption} from 'src/script/guards/CallView';
 import {isMediaDevice} from 'src/script/guards/MediaDevice';
@@ -78,6 +63,21 @@ import {VideoControlsSelect} from './VideoControlsSelect/VideoControlsSelect';
 
 import {useActiveWindowMatchMedia} from '../../../hooks/useActiveWindowMatchMedia';
 import {useUserPropertyValue} from '../../../hooks/useUserProperty';
+import {Call} from '../../../repositories/calling/Call';
+import {CallingViewMode, CallState} from '../../../repositories/calling/CallState';
+import {Participant} from '../../../repositories/calling/Participant';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../../repositories/media/MediaDevicesHandler';
+import {useBackgroundEffectsStore} from '../../../repositories/media/useBackgroundEffectsStore';
+import {useMediaDevicesStore} from '../../../repositories/media/useMediaDevicesStore';
+import {
+  BackgroundEffectSelection,
+  DEFAULT_BACKGROUND_EFFECT,
+  DEFAULT_BUILTIN_BACKGROUND_ID,
+} from '../../../repositories/media/VideoBackgroundEffects';
+import {PropertiesRepository} from '../../../repositories/properties/propertiesRepository';
+import {PROPERTIES_TYPE} from '../../../repositories/properties/propertiesType';
+import {TeamState} from '../../../repositories/team/TeamState';
 import {WebAppEvents} from '../../../webAppEvents';
 import * as Icon from '../../icon';
 

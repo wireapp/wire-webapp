@@ -23,9 +23,9 @@ import ko from 'knockout';
 
 import {WebAppEvents} from '../../webAppEvents';
 
-import {ClientEntity} from 'Repositories/client/ClientEntity';
-import {User} from 'Repositories/entity/User';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
+import {ClientEntity} from '../client/ClientEntity';
+import {User} from '../entity/User';
+import {PropertiesRepository} from '../properties/propertiesRepository';
 import {createUuid} from 'Util/uuid';
 
 import {Notification, PreferenceNotificationRepository} from './PreferenceNotificationRepository';

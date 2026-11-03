@@ -22,12 +22,12 @@ import {useEffect, useState, type FunctionComponent} from 'react';
 import {isUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
 
-import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import type {FileAsset} from 'Repositories/entity/message/fileAsset';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {noop} from 'Util/util';
 
+import {AssetTransferState} from '../../../../../../../repositories/assets/assetTransferState';
+import type {FileAsset} from '../../../../../../../repositories/entity/message/fileAsset';
 import {useMessageFocusedTabIndex} from '../../../../util';
 import {AssetLoader} from '../assetLoader/assetLoader';
 

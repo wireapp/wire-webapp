@@ -20,7 +20,7 @@
 import {act, render, waitFor} from '@testing-library/react';
 import {assertNotNullOrUndefined} from '@sindresorhus/is';
 
-import {ClientEntity} from 'Repositories/client/ClientEntity';
+import {ClientEntity} from '../../../../../../../repositories/client/ClientEntity';
 import {withTheme} from 'src/script/auth/util/test/testUtil';
 import {
   createRootContextValueForTest,

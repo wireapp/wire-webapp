@@ -19,9 +19,9 @@
 
 import {CONVERSATION_ACCESS_ROLE, CONVERSATION_ACCESS} from '@wireapp/api-client/lib/conversation/';
 
-import {combinePermissions, hasPermissions} from 'Repositories/user/userPermission';
-
 import {ACCESS_STATE, TEAM} from './AccessState';
+
+import {combinePermissions, hasPermissions} from '../user/userPermission';
 
 const teamMemberPermissionBitPosition = 2;
 const servicePermissionBitPosition = 3;

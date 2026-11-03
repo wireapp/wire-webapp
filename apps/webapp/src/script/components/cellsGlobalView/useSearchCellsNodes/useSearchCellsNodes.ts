@@ -23,14 +23,14 @@ import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isNonEmptyString} from '@sindresorhus/is';
 import {useDebouncedCallback} from 'use-debounce';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {UserRepository} from 'Repositories/user/userRepository';
 import {getLogger, Logger} from 'Util/logger';
 
 import {getConversationsFromNodes} from './getConversationsFromNodes';
 import {getUsersFromNodes} from './getUsersFromNodes';
 
+import {CellsRepository} from '../../../repositories/cells/cellsRepository';
+import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import {UserRepository} from '../../../repositories/user/userRepository';
 import {transformCellsNodes} from '../../cells/common/transformCellsNodes/transformCellsNodes';
 import {
   GlobalDriveFiltersState,

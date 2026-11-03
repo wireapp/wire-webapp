@@ -21,7 +21,6 @@ import type {FunctionComponent} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
@@ -39,6 +38,7 @@ import {CellsNewMenu} from './cellsNewMenu/cellsNewMenu';
 import {CellsRefresh} from './cellsRefresh/cellsRefresh';
 import {CellsRootHomeIcon} from './cellsRootHomeIcon';
 
+import {CellsRepository} from '../../../../repositories/cells/cellsRepository';
 import {CellsSearchInput} from '../../../cellsSearchInput/cellsSearchInput';
 import {ConversationViewerPermissionBanner} from '../../conversationViewerPermissionBanner/conversationViewerPermissionBanner';
 import {CellsBreadcrumbs} from '../common/cellsBreadcrumbs/cellsBreadcrumbs';

@@ -21,8 +21,6 @@ import {useCallback, useEffect, useMemo, useRef, type FunctionComponent} from 'r
 
 import {container} from 'tsyringe';
 
-import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
-import {UserState} from 'Repositories/user/userState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {contentStyles} from './meeting.styles';
@@ -36,6 +34,9 @@ import {useMeetingPrepJoin} from './meetingPrep/useMeetingPrepJoin';
 import {useMeetingStore} from './meetingStore/meetingStoreProvider';
 import {MeetNowModal} from './meetNowModal/meetNowModal';
 import {ScheduleMeetingModal} from './scheduleMeetingModal';
+
+import {MediaStreamHandler} from '../../repositories/media/MediaStreamHandler';
+import {UserState} from '../../repositories/user/userState';
 
 export const Meetings: FunctionComponent = () => {
   const {fireAndForgetInvoker} = useApplicationContext();

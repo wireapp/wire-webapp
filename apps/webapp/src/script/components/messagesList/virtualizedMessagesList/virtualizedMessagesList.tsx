@@ -24,8 +24,6 @@ import {isNonEmptyArray, isNumber, isUndefined} from '@sindresorhus/is';
 import {useVirtualizer} from '@tanstack/react-virtual';
 import cx from 'classnames';
 
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
@@ -33,6 +31,8 @@ import {useLoadMessages} from './useLoadMessages';
 import {useScrollMessages} from './useScrollMessages';
 
 import {useRoveFocus} from '../../../hooks/useRoveFocus';
+import {MessageRepository} from '../../../repositories/conversation/MessageRepository';
+import {Conversation} from '../../../repositories/entity/Conversation';
 import {MarkerComponent} from '../message/marker';
 import {Message} from '../message/virtualizedMessage';
 import {MessagesListParams} from '../messageList.types';

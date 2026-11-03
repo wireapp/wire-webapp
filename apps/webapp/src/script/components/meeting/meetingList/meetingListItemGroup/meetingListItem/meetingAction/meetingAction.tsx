@@ -21,12 +21,12 @@ import {MouseEvent, type FunctionComponent} from 'react';
 
 import {IconButton, MoreIcon} from '@wireapp/react-ui-kit';
 
-import type {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {getMeetingActionEntries} from './getMeetingActionEntries';
 import {iconContainerStyle, iconStyles} from './meetingAction.styles';
 
+import type {User} from '../../../../../../repositories/entity/User';
 import {showContextMenu} from '../../../../../../ui/contextMenu';
 import type {MeetingInstance} from '../../../../types/meetingInstance';
 import {useDeleteMeeting} from '../../../../useDeleteMeeting';

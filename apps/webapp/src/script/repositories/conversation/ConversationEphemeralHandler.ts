@@ -23,13 +23,6 @@ import ko from 'knockout';
 
 import {Article, LinkPreview} from '@wireapp/protocol-messaging';
 
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {MediumImage} from 'Repositories/entity/message/mediumImage';
-import type {Message} from 'Repositories/entity/message/message';
-import {Text} from 'Repositories/entity/message/text';
-import type {EventService} from 'Repositories/event/EventService';
-import type {EventRecord} from 'Repositories/storage';
 import {getLogger, Logger} from 'Util/logger';
 import {clamp} from 'Util/numberUtil';
 import {obfuscate} from 'Util/stringUtil';
@@ -41,6 +34,13 @@ import {ConversationMapper} from './ConversationMapper';
 
 import {EphemeralStatusType} from '../../message/ephemeralStatusType';
 import {StatusType} from '../../message/statusType';
+import type {Conversation} from '../entity/Conversation';
+import type {ContentMessage} from '../entity/message/contentMessage';
+import {MediumImage} from '../entity/message/mediumImage';
+import type {Message} from '../entity/message/message';
+import {Text} from '../entity/message/text';
+import type {EventService} from '../event/EventService';
+import type {EventRecord} from '../storage';
 
 type ConversationTimerRange = {MAX: TIME_IN_MILLIS; MIN: TIME_IN_MILLIS};
 type ConversationEphemeralHandlerConfig = {

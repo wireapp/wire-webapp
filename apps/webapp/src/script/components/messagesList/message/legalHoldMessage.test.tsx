@@ -19,7 +19,7 @@
 
 import {render} from '@testing-library/react';
 
-import {LegalHoldMessage as LegalHoldMessageEntity} from 'Repositories/entity/message/legalHoldMessage';
+import {LegalHoldMessage as LegalHoldMessageEntity} from '../../../repositories/entity/message/legalHoldMessage';
 import {translateForTest} from 'Util/test/translateForTest';
 import {
   createRootContextValueForTest,

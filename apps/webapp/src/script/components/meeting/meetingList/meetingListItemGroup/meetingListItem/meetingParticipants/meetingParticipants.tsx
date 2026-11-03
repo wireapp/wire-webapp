@@ -22,8 +22,6 @@ import type {FunctionComponent} from 'react';
 import {isNullOrUndefined} from '@sindresorhus/is';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
@@ -31,6 +29,8 @@ import {wrapperStyles} from './meetingParticipants.styles';
 import {useMeetingConversation} from './useMeetingConversation';
 import {useMeetingParticipants} from './useMeetingParticipants';
 
+import type {Conversation} from '../../../../../../repositories/entity/Conversation';
+import type {User} from '../../../../../../repositories/entity/User';
 import {StackedAvatars} from '../../../../../avatar';
 
 interface MeetingParticipantsProps {

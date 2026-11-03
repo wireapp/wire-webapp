@@ -24,9 +24,6 @@ import {container} from 'tsyringe';
 
 import {TabIndex, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
-import {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
-import {UserRepository} from 'Repositories/user/userRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
@@ -46,6 +43,9 @@ import {
 } from './UserModal.styles';
 
 import {Config} from '../../../Config';
+import {User} from '../../../repositories/entity/User';
+import {TeamState} from '../../../repositories/team/TeamState';
+import {UserRepository} from '../../../repositories/user/userRepository';
 import {Core} from '../../../service/coreSingleton';
 import {FadingScrollbar} from '../../fadingScrollbar';
 import * as Icon from '../../icon';

@@ -26,9 +26,6 @@ import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
-import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from 'Repositories/entity/message/failedToAddUsersMessage';
-import {User} from 'Repositories/entity/User';
-import {UserState} from 'Repositories/user/userState';
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
@@ -41,6 +38,9 @@ import {backendErrorLink, warning} from './contentMessage/warnings/warnings.styl
 import {MessageTime} from './messageTime';
 import {useMessageFocusedTabIndex} from './util';
 
+import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from '../../../repositories/entity/message/failedToAddUsersMessage';
+import {User} from '../../../repositories/entity/User';
+import {UserState} from '../../../repositories/user/userState';
 import * as Icon from '../../icon';
 import {getUserNameWithTranslate} from '../../UserName';
 

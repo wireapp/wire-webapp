@@ -23,8 +23,6 @@ import {container} from 'tsyringe';
 
 import {Account} from '@wireapp/core';
 
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {User} from 'Repositories/entity/User';
 import {Core as CoreSingleton} from 'src/script/service/coreSingleton';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
@@ -33,6 +31,8 @@ import {initialiseMigrationOfProteusConversations, joinUnestablishedMixedConvers
 import {MLSMigrationStatus} from './migrationStatus';
 import {mlsMigrationLogger} from './MLSMigrationLogger';
 
+import {ConversationRepository} from '../../repositories/conversation/ConversationRepository';
+import {User} from '../../repositories/entity/User';
 import {isMLSSupportedByEnvironment} from '../isMLSSupportedByEnvironment';
 
 const MIGRATION_TASK_KEY = 'mls-migration';

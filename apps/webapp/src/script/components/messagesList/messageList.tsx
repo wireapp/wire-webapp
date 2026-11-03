@@ -24,17 +24,6 @@ import cx from 'classnames';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {DecryptErrorMessage} from 'Repositories/entity/message/decryptErrorMessage';
-import {MemberMessage} from 'Repositories/entity/message/memberMessage';
-import {Message as MessageEntity} from 'Repositories/entity/message/message';
-import {User} from 'Repositories/entity/User';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
-import type {UserRepository} from 'Repositories/user/userRepository';
 import {useRoveFocus} from 'src/script/hooks/useRoveFocus';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isLastReceivedMessage} from 'Util/conversationMessages';
@@ -51,6 +40,17 @@ import {groupMessagesBySenderAndTime, isMarker} from './utils/messagesGroup';
 import {updateScroll, FocusedElement} from './utils/scrollUpdater';
 import {useConversationReadBoundary} from './utils/useConversationReadBoundary';
 
+import {AssetRepository} from '../../repositories/assets/assetRepository';
+import {ConversationRepository} from '../../repositories/conversation/ConversationRepository';
+import {MessageRepository} from '../../repositories/conversation/MessageRepository';
+import {Conversation} from '../../repositories/entity/Conversation';
+import {ContentMessage} from '../../repositories/entity/message/contentMessage';
+import {DecryptErrorMessage} from '../../repositories/entity/message/decryptErrorMessage';
+import {MemberMessage} from '../../repositories/entity/message/memberMessage';
+import {Message as MessageEntity} from '../../repositories/entity/message/message';
+import {User} from '../../repositories/entity/User';
+import {ServiceEntity} from '../../repositories/integration/ServiceEntity';
+import type {UserRepository} from '../../repositories/user/userRepository';
 import {FadingScrollbar} from '../fadingScrollbar';
 
 const messageScrollDelayInMilliseconds = 10;

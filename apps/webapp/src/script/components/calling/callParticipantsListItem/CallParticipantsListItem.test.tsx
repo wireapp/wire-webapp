@@ -21,9 +21,9 @@ import {render} from '@testing-library/react';
 
 import {Availability} from '@wireapp/protocol-messaging';
 
-import {Participant} from 'Repositories/calling/Participant';
-import {User} from 'Repositories/entity/User';
-import {ROLE} from 'Repositories/user/userPermission';
+import {Participant} from '../../../repositories/calling/Participant';
+import {User} from '../../../repositories/entity/User';
+import {ROLE} from '../../../repositories/user/userPermission';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

@@ -18,24 +18,24 @@
  */
 
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
-import {ClientEvent, CONVERSATION} from 'Repositories/event/Client';
+import {ClientEvent, CONVERSATION} from '../event/Client';
 
 import {Article, LinkPreview, Mention} from '@wireapp/protocol-messaging';
 
 import {createMessageAddEvent} from 'test/helper/EventGenerator';
 
-import {AssetType} from 'Repositories/assets/assetType';
-import {EventBuilder} from 'Repositories/conversation/EventBuilder';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {User} from 'Repositories/entity/User';
+import {AssetType} from '../assets/assetType';
+import {EventBuilder} from './EventBuilder';
+import {Conversation} from '../entity/Conversation';
+import {ContentMessage} from '../entity/message/contentMessage';
+import {User} from '../entity/User';
 import {MentionEntity} from 'src/script/message/mentionEntity';
 import {translate} from 'Util/localizerUtil';
 import {arrayToBase64} from 'Util/util';
 import {createUuid} from 'Util/uuid';
 
-import {SystemMessage} from 'Repositories/entity/message/systemMessage';
-import {eventShouldBeStored} from 'Repositories/event/EventTypeHandling';
+import {SystemMessage} from '../entity/message/systemMessage';
+import {eventShouldBeStored} from '../event/EventTypeHandling';
 import {SystemMessageType} from 'src/script/message/systemMessageType';
 
 import {EventMapper} from './EventMapper';

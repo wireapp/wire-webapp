@@ -23,12 +23,6 @@ import {isNullOrUndefined} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
-import {ClientEntity} from 'Repositories/client/ClientEntity';
-import {ClientState} from 'Repositories/client/ClientState';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
 import {useUserIdentity} from 'src/script/hooks/useDeviceIdentities';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
@@ -37,6 +31,12 @@ import {DetailedDevice} from './components/detailedDevice';
 import {Device} from './components/device';
 import {DeviceDetailsPreferences} from './components/deviceDetailsPreferences';
 
+import {ClientEntity} from '../../../../../repositories/client/ClientEntity';
+import {ClientState} from '../../../../../repositories/client/ClientState';
+import {ConversationState} from '../../../../../repositories/conversation/ConversationState';
+import {CryptographyRepository} from '../../../../../repositories/cryptography/CryptographyRepository';
+import {Conversation} from '../../../../../repositories/entity/Conversation';
+import {User} from '../../../../../repositories/entity/User';
 import {PreferencesPage} from '../components/preferencesPage';
 
 interface DevicesPreferencesProps {

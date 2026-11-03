@@ -24,7 +24,6 @@ import {Maybe} from 'true-myth';
 
 import {Button, ButtonVariant, TrashIcon} from '@wireapp/react-ui-kit';
 
-import type {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
@@ -37,6 +36,7 @@ import {
 } from './cellsEmptyBinAction.styles';
 import {emptyBin, isEmptyBinRootPath} from './emptyBinAction';
 
+import type {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
 import {
   getCellsBackgroundActionEvidence,
   observeCellsBackgroundActionJobs,

@@ -23,8 +23,6 @@ import {isNan, isNullOrUndefined} from '@sindresorhus/is';
 
 import {FlexBox, Input, Select} from '@wireapp/react-ui-kit';
 
-import {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
@@ -43,6 +41,8 @@ import {
   getChatHistorySharingUnitOptions,
 } from '../../../components/Modals/CreateConversation/utils';
 import {RadioGroup} from '../../../components/Radio';
+import {User} from '../../../repositories/entity/User';
+import {TeamState} from '../../../repositories/team/TeamState';
 import {PanelHeader} from '../panelHeader';
 
 export interface AccessProps {

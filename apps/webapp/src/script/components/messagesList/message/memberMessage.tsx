@@ -21,12 +21,6 @@ import type {ReactElement, ReactNode, FunctionComponent} from 'react';
 
 import {Button, ButtonVariant, CollectionIcon, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
-import {
-  groupCreationHeaderSenderNameMarkerEnd,
-  groupCreationHeaderSenderNameMarkerStart,
-  MemberMessage as MemberMessageEntity,
-} from 'Repositories/entity/message/memberMessage';
-import {User} from 'Repositories/entity/User';
 import {Config} from 'src/script/Config';
 import {SystemMessageType} from 'src/script/message/systemMessageType';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -39,6 +33,12 @@ import {ConnectedMessage} from './memberMessage/connectedMessage';
 import {MessageContent} from './memberMessage/messageContent';
 import {MessageTime} from './messageTime';
 
+import {
+  groupCreationHeaderSenderNameMarkerEnd,
+  groupCreationHeaderSenderNameMarkerStart,
+  MemberMessage as MemberMessageEntity,
+} from '../../../repositories/entity/message/memberMessage';
+import {User} from '../../../repositories/entity/User';
 import * as Icon from '../../icon';
 
 type RenderGroupCreationHeaderOptions = {

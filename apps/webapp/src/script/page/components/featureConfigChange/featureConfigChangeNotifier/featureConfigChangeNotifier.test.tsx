@@ -23,7 +23,7 @@ import {Runtime} from '@wireapp/commons/lib/util/Runtime';
 
 import {PrimaryModal} from '../../../../components/Modals/PrimaryModal';
 import en from '../../../../../i18n/en-US.json';
-import {TeamState} from 'Repositories/team/TeamState';
+import {TeamState} from '../../../../repositories/team/TeamState';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

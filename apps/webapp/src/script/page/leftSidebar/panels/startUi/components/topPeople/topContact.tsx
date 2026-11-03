@@ -23,11 +23,11 @@ import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {User} from 'Repositories/entity/User';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 
 import {Avatar, AVATAR_SIZE} from '../../../../../../components/avatar';
+import {User} from '../../../../../../repositories/entity/User';
 
 interface TopContactProps {
   clickOnUser?: (userEntity: User, event: React.UIEvent) => void;

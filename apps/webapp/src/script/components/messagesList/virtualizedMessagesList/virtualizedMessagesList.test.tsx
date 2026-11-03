@@ -25,11 +25,11 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import ko from 'knockout';
 import {noop} from 'noop-esm';
 
-import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import {AssetRepository} from '../../../repositories/assets/assetRepository';
+import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import {MessageRepository} from '../../../repositories/conversation/MessageRepository';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {User} from '../../../repositories/entity/User';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

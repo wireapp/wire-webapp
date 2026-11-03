@@ -19,8 +19,8 @@
 import {render} from '@testing-library/react';
 
 import en from '../../../../../i18n/en-US.json';
-import {User} from 'Repositories/entity/User';
-import type {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
+import {User} from '../../../../repositories/entity/User';
+import type {PropertiesRepository} from '../../../../repositories/properties/propertiesRepository';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {
   createRootContextValueForTest,

@@ -19,7 +19,7 @@
 
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 
-import {Conversation} from 'Repositories/entity/Conversation';
+import {Conversation} from '../../../../repositories/entity/Conversation';
 import {
   conversationFilters,
   conversationSearchFilter,

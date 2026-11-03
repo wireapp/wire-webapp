@@ -25,7 +25,7 @@ import {Maybe, toolbelt, type Result} from 'true-myth';
 import {act, render} from '@testing-library/react';
 
 import {MessageContent} from '../../common/messageContent/messageContent';
-import {User} from 'Repositories/entity/User';
+import {User} from '../../../../repositories/entity/User';
 import {unwrap} from 'Util/test/resultTestSupport';
 import {translateForTest} from 'Util/test/translateForTest';
 

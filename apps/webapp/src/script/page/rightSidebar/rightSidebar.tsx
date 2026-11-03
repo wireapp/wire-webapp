@@ -24,13 +24,6 @@ import {amplify} from 'amplify';
 import {CSSTransition, TransitionGroup} from 'react-transition-group';
 import {container} from 'tsyringe';
 
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {Message} from 'Repositories/entity/message/message';
-import {User} from 'Repositories/entity/User';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
-import {TeamState} from 'Repositories/team/TeamState';
-import {UserState} from 'Repositories/user/userState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {Access} from './access/access';
@@ -50,6 +43,13 @@ import {TimedMessages} from './timedMessages';
 import {isReadableMessage} from '../../guards/Message';
 import {isUserAppOrServiceEntity, isUserEntity} from '../../guards/Panel';
 import {isAppOrServiceEntity} from '../../guards/Service';
+import {ConversationState} from '../../repositories/conversation/ConversationState';
+import {Conversation} from '../../repositories/entity/Conversation';
+import {Message} from '../../repositories/entity/message/message';
+import {User} from '../../repositories/entity/User';
+import {ServiceEntity} from '../../repositories/integration/ServiceEntity';
+import {TeamState} from '../../repositories/team/TeamState';
+import {UserState} from '../../repositories/user/userState';
 import {Core} from '../../service/coreSingleton';
 import {ActionsViewModel} from '../../view_model/ActionsViewModel';
 import {ViewModelRepositories} from '../../view_model/MainViewModel';

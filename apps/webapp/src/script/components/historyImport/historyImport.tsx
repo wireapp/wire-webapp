@@ -23,15 +23,6 @@ import {isNonEmptyString} from '@sindresorhus/is';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {BackupRepository} from 'Repositories/backup/backupRepository';
-import {
-  CancelError,
-  DifferentAccountError,
-  IncompatibleBackupError,
-  IncompatibleBackupFormatError,
-  InvalidPassword,
-} from 'Repositories/backup/error';
-import {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {ContentState} from 'src/script/page/useAppState';
 import {checkBackupEncryption} from 'Util/backupUtil';
@@ -42,6 +33,15 @@ import {BackupFileUpload} from './backupFileUpload';
 
 import {Config} from '../../Config';
 import {MotionDuration} from '../../motion/MotionDuration';
+import {BackupRepository} from '../../repositories/backup/backupRepository';
+import {
+  CancelError,
+  DifferentAccountError,
+  IncompatibleBackupError,
+  IncompatibleBackupFormatError,
+  InvalidPassword,
+} from '../../repositories/backup/error';
+import {User} from '../../repositories/entity/User';
 import * as Icon from '../icon';
 import {PrimaryModal} from '../Modals/PrimaryModal';
 import {ProgressBar} from '../ProgressBar/ProgressBar';

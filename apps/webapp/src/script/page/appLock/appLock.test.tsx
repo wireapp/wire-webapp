@@ -25,12 +25,12 @@ import ko from 'knockout';
 import {WebAppEvents} from '../../webAppEvents';
 
 import en from '../../../i18n/en-US.json';
-import type {ClientRepository} from 'Repositories/client';
-import {User} from 'Repositories/entity/User/User';
-import {TeamState} from 'Repositories/team/TeamState';
-import {AppLockCrypto, AppLockRepository} from 'Repositories/user/appLockRepository';
-import {AppLockState} from 'Repositories/user/appLockState';
-import {UserState} from 'Repositories/user/userState';
+import type {ClientRepository} from '../../repositories/client';
+import {User} from '../../repositories/entity/User/User';
+import {TeamState} from '../../repositories/team/TeamState';
+import {AppLockCrypto, AppLockRepository} from '../../repositories/user/appLockRepository';
+import {AppLockState} from '../../repositories/user/appLockState';
+import {UserState} from '../../repositories/user/userState';
 import {withTheme, withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {
   createRootContextValueForTest,

@@ -25,16 +25,6 @@ import cx from 'classnames';
 
 import {Button, ButtonVariant, TabIndex} from '@wireapp/react-ui-kit';
 
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
-import {SearchRepository} from 'Repositories/search/searchRepository';
-import {TeamRepository} from 'Repositories/team/TeamRepository';
-import {TeamState} from 'Repositories/team/TeamState';
-import {generatePermissionHelpers} from 'Repositories/user/userPermission';
-import {UserState} from 'Repositories/user/userState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {checkAppsFeatureAvailability} from 'Util/featureUtil';
@@ -49,6 +39,16 @@ import {SearchInput} from '../../../components/SearchInput';
 import {ServiceList} from '../../../components/ServiceList/ServiceList';
 import {UserSearchableList} from '../../../components/UserSearchableList';
 import {getManageServicesUrl} from '../../../externalRoute';
+import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {User} from '../../../repositories/entity/User';
+import {IntegrationRepository} from '../../../repositories/integration/IntegrationRepository';
+import {ServiceEntity} from '../../../repositories/integration/ServiceEntity';
+import {SearchRepository} from '../../../repositories/search/searchRepository';
+import {TeamRepository} from '../../../repositories/team/TeamRepository';
+import {TeamState} from '../../../repositories/team/TeamState';
+import {generatePermissionHelpers} from '../../../repositories/user/userPermission';
+import {UserState} from '../../../repositories/user/userState';
 import {PanelHeader} from '../panelHeader';
 import {PanelEntity, PanelState} from '../rightSidebar';
 

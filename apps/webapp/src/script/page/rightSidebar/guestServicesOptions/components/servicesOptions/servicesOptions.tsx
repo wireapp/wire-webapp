@@ -19,9 +19,6 @@
 
 import {FC} from 'react';
 
-import {ACCESS_TYPES} from 'Repositories/conversation/ConversationAccessPermission';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {TeamState} from 'Repositories/team/TeamState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {checkAppsFeatureAvailability} from 'Util/featureUtil';
@@ -29,6 +26,9 @@ import {checkAppsFeatureAvailability} from 'Util/featureUtil';
 import {serviceOptionContainer} from './serviceOptions.styles';
 
 import {BaseToggle} from '../../../../../components/toggle/BaseToggle';
+import {ACCESS_TYPES} from '../../../../../repositories/conversation/ConversationAccessPermission';
+import {Conversation} from '../../../../../repositories/entity/Conversation';
+import {TeamState} from '../../../../../repositories/team/TeamState';
 
 interface ServicesOptionsProps {
   activeConversation: Conversation;

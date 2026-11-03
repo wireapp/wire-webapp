@@ -17,8 +17,8 @@
  *
  */
 
-import {ConversationLabelRepository} from 'Repositories/conversation/ConversationLabelRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
+import {ConversationLabelRepository} from '../../../src/script/repositories/conversation/ConversationLabelRepository';
+import {Conversation} from '../../../src/script/repositories/entity/Conversation';
 import {translate} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 

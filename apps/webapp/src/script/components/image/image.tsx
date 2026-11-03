@@ -27,9 +27,6 @@ import {container} from 'tsyringe';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
-import {MediumImage} from 'Repositories/entity/message/mediumImage';
-import {TeamState} from 'Repositories/team/TeamState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {getLogger, Logger} from 'Util/logger';
@@ -38,6 +35,9 @@ import {failedWrapperStyles, getImageStyle, getWrapperStyles} from './image.styl
 import {RestrictedImage} from './restrictedImage';
 
 import {Config} from '../../Config';
+import {AssetRemoteData} from '../../repositories/assets/assetRemoteData';
+import {MediumImage} from '../../repositories/entity/message/mediumImage';
+import {TeamState} from '../../repositories/team/TeamState';
 import {InViewport} from '../inViewport';
 import {
   AssetUrl,

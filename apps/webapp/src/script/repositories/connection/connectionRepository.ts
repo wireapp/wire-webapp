@@ -26,15 +26,6 @@ import type {UserConnectionData, UserUpdateData} from '@wireapp/api-client/lib/u
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import type {Conversation} from 'Repositories/entity/Conversation';
-import {MemberMessage} from 'Repositories/entity/message/memberMessage';
-import type {User} from 'Repositories/entity/User';
-import {EventRepository} from 'Repositories/event/EventRepository';
-import type {EventSource} from 'Repositories/event/EventSource';
-import {SelfService} from 'Repositories/self/SelfService';
-import {TeamService} from 'Repositories/team/TeamService';
-import type {UserRepository} from 'Repositories/user/userRepository';
-import {UserState} from 'Repositories/user/userState';
 import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {matchQualifiedIds} from 'Util/qualifiedId';
@@ -50,6 +41,15 @@ import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {Config} from '../../Config';
 import {SystemMessageType} from '../../message/systemMessageType';
 import {WebAppEvents} from '../../webAppEvents';
+import type {Conversation} from '../entity/Conversation';
+import {MemberMessage} from '../entity/message/memberMessage';
+import type {User} from '../entity/User';
+import {EventRepository} from '../event/EventRepository';
+import type {EventSource} from '../event/EventSource';
+import {SelfService} from '../self/SelfService';
+import {TeamService} from '../team/TeamService';
+import type {UserRepository} from '../user/userRepository';
+import {UserState} from '../user/userState';
 
 type ConnectionRequestResult = {connectionStatus: ConnectionStatus; conversationId: QualifiedId};
 type ConnectionsResult = {connections: ConnectionEntity[]; deadConnections: ConnectionEntity[]};

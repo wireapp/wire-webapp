@@ -33,8 +33,6 @@ import {
   ShowIcon,
 } from '@wireapp/react-ui-kit';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import type {Conversation} from 'Repositories/entity/Conversation';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
@@ -57,6 +55,8 @@ import {
 } from './FileHeader.styles';
 
 import {createRelativeTimestampFormatter, useRelativeTimestamp} from '../../../hooks/useRelativeTimestamp';
+import {CellsRepository} from '../../../repositories/cells/cellsRepository';
+import type {Conversation} from '../../../repositories/entity/Conversation';
 import {ChannelAvatar, GroupAvatar} from '../../avatar';
 import {FileTypeIcon} from '../../conversation/common/fileTypeIcon/fileTypeIcon';
 import {

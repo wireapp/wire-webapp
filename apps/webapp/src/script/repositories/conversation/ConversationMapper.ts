@@ -38,8 +38,6 @@ import {isObject} from 'underscore';
 
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ConversationRecord} from 'Repositories/storage/record/conversationRecord';
 import {type Translate} from 'Util/localizerUtil';
 
 import {ACCESS_STATE, type TEAM} from './AccessState';
@@ -49,6 +47,8 @@ import {NOTIFICATION_STATE} from './NotificationSetting';
 
 import {BaseError, BASE_ERROR_TYPE} from '../../error/baseError';
 import {ConversationError} from '../../error/conversationError';
+import {Conversation} from '../entity/Conversation';
+import {ConversationRecord} from '../storage/record/conversationRecord';
 
 const guestLinkAccessModeCount = 2;
 type TeamAccessState =

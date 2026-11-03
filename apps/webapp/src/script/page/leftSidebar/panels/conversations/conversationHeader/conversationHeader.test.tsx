@@ -24,7 +24,7 @@ import {act, render, screen} from '@testing-library/react';
 
 import {createDeterministicClock, type DeterministicClock} from '@enormora/clock/deterministic-clock';
 
-import {User} from 'Repositories/entity/User';
+import {User} from '../../../../../repositories/entity/User';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 import {

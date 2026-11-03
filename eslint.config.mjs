@@ -272,7 +272,7 @@ const webappImportOrderRule = [
       {pattern: '@wireapp/*', group: 'internal', position: 'before'},
       // Keep the remaining webapp aliases in one alphabetized group.
       {
-        pattern: '{Repositories,src,Util}/**',
+        pattern: '{src,Util}/**',
         group: 'internal',
         position: 'after',
       },

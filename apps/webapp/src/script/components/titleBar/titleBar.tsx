@@ -27,11 +27,6 @@ import {container} from 'tsyringe';
 
 import {CallIcon, IconButton, IconButtonVariant, QUERY, TabIndex, useMatchMedia} from '@wireapp/react-ui-kit';
 
-import {CallState} from 'Repositories/calling/CallState';
-import {ConversationFilter} from 'Repositories/conversation/ConversationFilter';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
 import {RightSidebarParams} from 'src/script/page/appMain';
 import {PanelState} from 'src/script/page/rightSidebar';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -48,6 +43,11 @@ import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {useConversationCall} from '../../hooks/useConversationCall';
 import {useNoInternetCallGuard} from '../../hooks/useNoInternetCallGuard/useNoInternetCallGuard';
+import {CallState} from '../../repositories/calling/CallState';
+import {ConversationFilter} from '../../repositories/conversation/ConversationFilter';
+import {Conversation} from '../../repositories/entity/Conversation';
+import {User} from '../../repositories/entity/User';
+import {TeamState} from '../../repositories/team/TeamState';
 import {WebAppEvents} from '../../webAppEvents';
 import {ConversationVerificationBadges} from '../badge';
 import {useCallAlertState} from '../calling/useCallAlertState';

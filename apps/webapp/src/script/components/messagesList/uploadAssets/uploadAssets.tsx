@@ -21,11 +21,12 @@ import type {FunctionComponent} from 'react';
 
 import {isEmptyArray, isNonEmptyArray, isUndefined} from '@sindresorhus/is';
 
-import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {UploadAssetItem} from './components/uploadAssetItem';
 import {uploadAssetsContainer} from './uploadAssets.styles';
+
+import {AssetRepository} from '../../../repositories/assets/assetRepository';
 
 interface Props {
   assetRepository: AssetRepository;

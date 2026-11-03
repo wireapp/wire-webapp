@@ -26,11 +26,6 @@ import ko from 'knockout';
 
 import {OutlineCheck} from '@wireapp/react-ui-kit';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {CompositeMessage} from 'Repositories/entity/message/compositeMessage';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import type {FileAsset as FileAssetType} from 'Repositories/entity/message/fileAsset';
-import type {User} from 'Repositories/entity/User';
 import {createRelativeTimestampFormatter, useRelativeTimestamp} from 'src/script/hooks/useRelativeTimestamp';
 import {StatusType} from 'src/script/message/statusType';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -49,6 +44,11 @@ import {CompleteFailureToSendWarning, PartialFailureToSendWarning} from './warni
 import {MessageActions} from '..';
 import {useClickOutside} from '../../../../hooks/useClickOutside';
 import {EphemeralStatusType} from '../../../../message/ephemeralStatusType';
+import {Conversation} from '../../../../repositories/entity/Conversation';
+import {CompositeMessage} from '../../../../repositories/entity/message/compositeMessage';
+import {ContentMessage} from '../../../../repositories/entity/message/contentMessage';
+import type {FileAsset as FileAssetType} from '../../../../repositories/entity/message/fileAsset';
+import type {User} from '../../../../repositories/entity/User';
 import {ContextMenuEntry} from '../../../../ui/contextMenu';
 import {FileFullscreenModalSourceConversationProvider} from '../../../FileFullscreenModal/FileFullscreenModalSourceConversationContext';
 import {EphemeralTimer} from '../ephemeralTimer';

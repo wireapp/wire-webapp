@@ -25,7 +25,7 @@ import {JobsTaskStatus, TreeNodeType} from 'cells-sdk-ts';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
-import type {CellsRepository} from 'Repositories/cells/cellsRepository';
+import type {CellsRepository} from '../../../../repositories/cells/cellsRepository';
 import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {
   createRootContextValueForTest,

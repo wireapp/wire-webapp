@@ -21,7 +21,6 @@ import {useEffect, useState, type FunctionComponent} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CellNode} from 'src/script/types/cellNode';
@@ -31,6 +30,7 @@ import {LegacyCellsMoveNodeModal} from './legacy/legacyCellsMoveNodeModal';
 import {useGetCellsFolders} from './useGetCellsFolders/useGetCellsFolders';
 import {useMoveCellsNode} from './useMoveCellNode/useMoveCellsNode';
 
+import {CellsRepository} from '../../../../../../../repositories/cells/cellsRepository';
 import {CellsModal} from '../../../../common/cellsModal/cellsModal';
 import {CellsNewNodeForm} from '../../../../common/cellsNewNodeForm/cellsNewNodeForm';
 import {getCellsFilesPath} from '../../../../common/getCellsFilesPath/getCellsFilesPath';

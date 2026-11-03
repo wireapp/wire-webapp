@@ -21,7 +21,7 @@ import {act, render, type RenderResult} from '@testing-library/react';
 import {ThemeProvider} from '@wireapp/react-ui-kit';
 import {Maybe} from 'true-myth';
 
-import type {UploadState} from 'Repositories/cells/upload';
+import type {UploadState} from '../../../repositories/cells/upload';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

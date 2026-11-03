@@ -39,7 +39,7 @@ import {noop} from 'noop-esm';
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
 import {getCellsFilesPath} from '../../../../common/getCellsFilesPath/getCellsFilesPath';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {CellsRepository} from '../../../../../../../repositories/cells/cellsRepository';
 import {
   createExecutingFireAndForgetInvokerForTest,
   createRootContextValueForTest,

@@ -23,13 +23,13 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {Button, ButtonVariant, DropdownMenu, PlusIcon} from '@wireapp/react-ui-kit';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {CellsNewFileModal} from './cellsNewFileModal/cellsNewFileModal';
 import {CellsNewFolderModal} from './cellsNewFolderModal/cellsNewFolderModal';
 import {buttonStyles, iconStyles} from './cellsNewMenu.styles';
 
+import {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
 import {
   CELLS_ACTION,
   useCellsActionPermissions,

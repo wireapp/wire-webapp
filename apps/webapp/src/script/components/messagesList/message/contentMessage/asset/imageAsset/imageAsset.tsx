@@ -22,12 +22,12 @@ import type {FunctionComponent} from 'react';
 
 import {CSSObject} from '@emotion/react';
 
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {MediumImage} from 'Repositories/entity/message/mediumImage';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 
+import {ContentMessage} from '../../../../../../repositories/entity/message/contentMessage';
+import {MediumImage} from '../../../../../../repositories/entity/message/mediumImage';
 import * as Icon from '../../../../../icon';
 import {AssetImage, GetAssetUrl, ImageLogger} from '../../../../../image';
 import {AssetLoader} from '../common/assetLoader/assetLoader';

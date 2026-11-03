@@ -24,7 +24,6 @@ import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, CallIcon, CloseIcon} from '@wireapp/react-ui-kit';
 
-import {UserState} from 'Repositories/user/userState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {handleEscDown} from 'Util/keyboardUtil';
 
@@ -34,6 +33,7 @@ import {wasMeetNowMeetingCreated} from './meetNowTypes';
 import {hasMeetNowFormErrors, useMeetNowModal} from './useMeetNowModal';
 import {useMeetNowSubmit} from './useMeetNowSubmit';
 
+import {UserState} from '../../../repositories/user/userState';
 import {ModalComponent} from '../../Modals/ModalComponent';
 import {
   bodyStyles,

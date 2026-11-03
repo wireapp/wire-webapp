@@ -21,9 +21,9 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {task} from 'true-myth';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {User} from 'Repositories/entity/User';
+import {Conversation} from '../../repositories/entity/Conversation';
+import type {ConversationRepository} from '../../repositories/conversation/ConversationRepository';
+import {User} from '../../repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';
 import {unwrapErr} from 'Util/test/resultTestSupport';
 

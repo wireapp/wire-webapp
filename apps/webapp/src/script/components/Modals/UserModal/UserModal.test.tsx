@@ -21,10 +21,10 @@ import {act, render, waitFor} from '@testing-library/react';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 
 import en from '../../../../i18n/en-US.json';
-import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
-import {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
-import {UserRepository} from 'Repositories/user/userRepository';
+import {ConnectionEntity} from '../../../repositories/connection/connectionEntity';
+import {User} from '../../../repositories/entity/User';
+import {TeamState} from '../../../repositories/team/TeamState';
+import {UserRepository} from '../../../repositories/user/userRepository';
 import {Config} from 'src/script/Config';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {translateForTest} from 'Util/test/translateForTest';

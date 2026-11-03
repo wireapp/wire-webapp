@@ -19,10 +19,11 @@
 
 import React from 'react';
 
-import {ClientNotificationData} from 'Repositories/notification/PreferenceNotificationRepository';
 import type {Translate as TranslationFunction} from 'Util/localizerUtil';
 
 import type {PrimaryModalTranslatedMessage} from './PrimaryModalTranslatedMessage';
+
+import {ClientNotificationData} from '../../../repositories/notification/PreferenceNotificationRepository';
 
 export type {
   PrimaryModalTranslatedComponent,

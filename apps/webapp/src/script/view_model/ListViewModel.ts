@@ -25,16 +25,6 @@ import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
 
-import type {CallingRepository} from 'Repositories/calling/CallingRepository';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {User} from 'Repositories/entity/User';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {SearchRepository} from 'Repositories/search/searchRepository';
-import type {TeamRepository} from 'Repositories/team/TeamRepository';
-import {TeamState} from 'Repositories/team/TeamState';
-import {UserState} from 'Repositories/user/userState';
 import {iterateItem} from 'Util/arrayUtil';
 import {isEscapeKey} from 'Util/keyboardUtil';
 import {type Translate} from 'Util/localizerUtil';
@@ -54,6 +44,16 @@ import {
 import {PanelState} from '../page/rightSidebar';
 import {useAppMainState} from '../page/state';
 import {ContentState, ListState, useAppState} from '../page/useAppState';
+import type {CallingRepository} from '../repositories/calling/CallingRepository';
+import type {ConversationRepository} from '../repositories/conversation/ConversationRepository';
+import {ConversationState} from '../repositories/conversation/ConversationState';
+import type {Conversation} from '../repositories/entity/Conversation';
+import type {User} from '../repositories/entity/User';
+import {PropertiesRepository} from '../repositories/properties/propertiesRepository';
+import {SearchRepository} from '../repositories/search/searchRepository';
+import type {TeamRepository} from '../repositories/team/TeamRepository';
+import {TeamState} from '../repositories/team/TeamState';
+import {UserState} from '../repositories/user/userState';
 import {setHistoryParam} from '../router/Router';
 import {showContextMenu} from '../ui/contextMenu';
 import {showLabelContextMenu} from '../ui/labelContextMenu';

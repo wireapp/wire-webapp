@@ -25,13 +25,6 @@ import {noop} from 'noop-esm';
 
 import {IAttachment} from '@wireapp/protocol-messaging';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
-import {MessageRepository, OutgoingQuote} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {EventRepository} from 'Repositories/event/EventRepository';
 import {Config} from 'src/script/Config';
 import {ConversationError} from 'src/script/error/conversationError';
 import {MentionEntity} from 'src/script/message/mentionEntity';
@@ -42,6 +35,13 @@ import {isErrorWithType} from 'src/script/util/typePredicateUtil';
 
 import {useSendFiles} from './useSendFiles/useSendFiles';
 
+import {CellsRepository} from '../../../../repositories/cells/cellsRepository';
+import {ConversationRepository} from '../../../../repositories/conversation/ConversationRepository';
+import {ConversationVerificationState} from '../../../../repositories/conversation/ConversationVerificationState';
+import {MessageRepository, OutgoingQuote} from '../../../../repositories/conversation/MessageRepository';
+import {Conversation} from '../../../../repositories/entity/Conversation';
+import {ContentMessage} from '../../../../repositories/entity/message/contentMessage';
+import {EventRepository} from '../../../../repositories/event/EventRepository';
 import {useFileUploadState} from '../../../conversation/useFilesUploadState/useFilesUploadState';
 import {PrimaryModal} from '../../../Modals/PrimaryModal';
 import {showWarningModal} from '../../../Modals/utils/showWarningModal';

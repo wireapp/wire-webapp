@@ -20,10 +20,10 @@
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {assertNotNullOrUndefined} from '@sindresorhus/is';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {VerificationMessage} from 'Repositories/entity/message/verificationMessage';
-import {User} from 'Repositories/entity/User';
-import {ClientEvent} from 'Repositories/event/Client';
+import {Conversation} from '../../entity/Conversation';
+import {VerificationMessage} from '../../entity/message/verificationMessage';
+import {User} from '../../entity/User';
+import {ClientEvent} from '../../event/Client';
 import {SuperType} from 'src/script/message/superType';
 import {VerificationMessageType} from 'src/script/message/verificationMessageType';
 import {translate} from 'Util/localizerUtil';

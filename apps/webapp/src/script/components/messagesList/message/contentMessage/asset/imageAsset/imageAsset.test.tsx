@@ -27,10 +27,10 @@ import {ThemeProvider} from '@wireapp/react-ui-kit';
 
 import type {AssetUrl} from '../common/useAssetTransfer/useAssetTransfer';
 import type {GetAssetUrl, ImageLogger} from '../../../../../image';
-import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {MediumImage} from 'Repositories/entity/message/mediumImage';
-import {User} from 'Repositories/entity/User';
+import {AssetRemoteData} from '../../../../../../repositories/assets/assetRemoteData';
+import {ContentMessage} from '../../../../../../repositories/entity/message/contentMessage';
+import {MediumImage} from '../../../../../../repositories/entity/message/mediumImage';
+import {User} from '../../../../../../repositories/entity/User';
 import {
   createExecutingFireAndForgetInvokerForTest,
   createRootContextValueForTest,

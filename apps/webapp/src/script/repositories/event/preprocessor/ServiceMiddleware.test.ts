@@ -17,11 +17,11 @@
  *
  */
 
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {EventBuilder} from 'Repositories/conversation/EventBuilder';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {UserRepository} from 'Repositories/user/userRepository';
+import {ConversationRepository} from '../../conversation/ConversationRepository';
+import {EventBuilder} from '../../conversation/EventBuilder';
+import {Conversation} from '../../entity/Conversation';
+import {User} from '../../entity/User';
+import {UserRepository} from '../../user/userRepository';
 import {createUuid} from 'Util/uuid';
 
 import {ServiceMiddleware} from './ServiceMiddleware';

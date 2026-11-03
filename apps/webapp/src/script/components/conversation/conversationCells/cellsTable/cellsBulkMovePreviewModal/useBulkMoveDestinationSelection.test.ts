@@ -22,7 +22,7 @@ import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {RestNode} from 'cells-sdk-ts';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
 import {
   createExecutingFireAndForgetInvokerForTest,
   createRootContextValueForTest,

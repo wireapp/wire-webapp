@@ -21,10 +21,9 @@ import type {FunctionComponent} from 'react';
 
 import {isNull} from '@sindresorhus/is';
 
-import {User} from 'Repositories/entity/User';
-
 import {avatarWrapperStyles, textStyles, wrapperStyles} from './cellsOwnerColumn.styles';
 
+import {User} from '../../../../../repositories/entity/User';
 import {Avatar, AVATAR_SIZE} from '../../../../avatar';
 import {showUserModal} from '../../../../Modals/UserModal';
 

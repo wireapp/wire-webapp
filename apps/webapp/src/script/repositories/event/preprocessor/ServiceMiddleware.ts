@@ -21,13 +21,13 @@ import {isTruthy, isUndefined} from '@sindresorhus/is';
 import {CONVERSATION_EVENT, ConversationMemberJoinEvent} from '@wireapp/api-client/lib/event/';
 import {UserType, type QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {MemberJoinEvent, OneToOneCreationEvent} from 'Repositories/conversation/EventBuilder';
-import {User} from 'Repositories/entity/User';
-import type {UserRepository} from 'Repositories/user/userRepository';
 import {getLogger, Logger} from 'Util/logger';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
+import type {ConversationRepository} from '../../conversation/ConversationRepository';
+import {MemberJoinEvent, OneToOneCreationEvent} from '../../conversation/EventBuilder';
+import {User} from '../../entity/User';
+import type {UserRepository} from '../../user/userRepository';
 import {ClientEvent} from '../Client';
 import {EventMiddleware, IncomingEvent} from '../EventProcessor';
 
