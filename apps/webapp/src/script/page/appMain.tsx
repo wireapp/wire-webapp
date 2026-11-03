@@ -50,6 +50,7 @@ import {UserState} from 'Repositories/user/userState';
 import {isUUID} from 'src/script/auth/util/stringUtil';
 import {Config} from 'src/script/Config';
 import {canUseMeetings} from 'Util/canUseMeetings';
+import {canUseTroubleshooter} from 'Util/canUseTroubleshooter';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
 
@@ -63,6 +64,7 @@ import {TeamCreationModalContainer} from './leftSidebar/panels/conversations/con
 import {SidebarTabs, useSidebarStore} from './leftSidebar/panels/conversations/useSidebarStore';
 import {MainContent} from './mainContent';
 import {PanelEntity, PanelState, RightSidebar} from './rightSidebar';
+import {useApplicationContext} from './rootProvider';
 import {useAppMainState, ViewType} from './state';
 import {ContentState, useAppState} from './useAppState';
 
@@ -108,6 +110,7 @@ export const AppMain: FunctionComponent<AppMainProps> = (properties: AppMainProp
     locked,
   } = properties;
   const translate = mainView.translate;
+  const {isFeatureToggleEnabled} = useApplicationContext();
   const apiContext = app.getAPIContext();
 
   useActiveWindow(window);
@@ -284,7 +287,9 @@ export const AppMain: FunctionComponent<AppMainProps> = (properties: AppMainProp
         return mainView.list.openPreferencesAudioVideo();
       },
       '/preferences/troubleshooting': () => {
-        return mainView.list.openPreferences(ContentState.PREFERENCES_TROUBLESHOOTING);
+        return canUseTroubleshooter(isFeatureToggleEnabled)
+          ? mainView.list.openPreferences(ContentState.PREFERENCES_TROUBLESHOOTING)
+          : navigate('/');
       },
       '/preferences/devices': () => {
         return mainView.list.openPreferencesDevices();

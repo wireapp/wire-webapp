@@ -32,8 +32,8 @@ import {
   PreferenceNotificationRepository,
 } from 'Repositories/notification/PreferenceNotificationRepository';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
-import {troubleshooterFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
+import {canUseTroubleshooter} from 'Util/canUseTroubleshooter';
 
 import {ListWrapper} from './listWrapper';
 
@@ -182,7 +182,7 @@ const Preferences: FunctionComponent<PreferencesProps> = ({
     },
     {
       IconComponent: Icon.NetworkIcon,
-      hidden: !isFeatureToggleEnabled(troubleshooterFeatureToggleName),
+      hidden: !canUseTroubleshooter(isFeatureToggleEnabled),
       id: ContentState.PREFERENCES_TROUBLESHOOTING,
       label: translate('preferencesTroubleshooting'),
       uieName: 'go-troubleshooting',
