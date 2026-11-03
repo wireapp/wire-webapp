@@ -3689,7 +3689,9 @@ describe('CellsTable restoring selected Bin items', () => {
     await user.click(screen.getByRole('checkbox', {name: 'Select b.txt'}));
     await user.click(screen.getByRole('button', {name: 'Restore'}));
     const confirmation = await screen.findByRole('dialog');
-    expect(within(confirmation).getByText(/The folder Reports with all its files will be restored\./)).toBeInTheDocument();
+    expect(
+      within(confirmation).getByText(/The folder Reports with all its files will be restored\./),
+    ).toBeInTheDocument();
     await user.click(within(confirmation).getByRole('button', {name: 'Restore Parent Folder'}));
 
     await waitFor(() => {

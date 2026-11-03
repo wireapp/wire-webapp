@@ -97,10 +97,11 @@ describe('resolveRestoreTargets', () => {
 
     const result = resolveRestoreTargets({selectedNodes: [inFirst, inSecond]});
 
-    expect(result.targets.map(target => {return (target.kind === 'parent' ? target.rootParentName : null)})).toEqual([
-      'First',
-      'Second',
-    ]);
+    expect(
+      result.targets.map(target => {
+        return target.kind === 'parent' ? target.rootParentName : null;
+      }),
+    ).toEqual(['First', 'Second']);
   });
 
   it('does not allow restore when the selected item is a viewer', () => {
