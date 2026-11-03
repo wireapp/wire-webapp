@@ -219,22 +219,6 @@ const hasSameSelection = (selectedNodeIds: ReadonlySet<string>, nodeIds: readonl
   );
 };
 
-const getPermanentDeleteReviewMessageKey = (
-  reason: PermanentDeleteReviewReason | null,
-): PermanentDeleteReviewMessageKey => {
-  switch (reason) {
-    case 'job-failed':
-      return 'cells.bulkDelete.jobFailed';
-    case 'refresh-failed':
-      return 'cells.bulkDelete.refreshFailed';
-    case 'still-visible':
-      return 'cells.bulkDelete.stillVisible';
-    case 'timed-out':
-    default:
-      return 'cells.bulkDelete.timedOut';
-  }
-};
-
 interface CapturedBulkMoveToBinSelection {
   nodeIds: string[];
   scopeKey: string;
