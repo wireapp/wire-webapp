@@ -1,0 +1,51 @@
+/*
+ * Wire
+ * Copyright (C) 2026 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import type {SharedDriveMoveStatusKind} from '../../sharedDriveUploadStatusContext';
+
+export type EmptyBinStatus =
+  'idle' | 'submitting' | 'processing' | 'completed' | 'partial' | 'failed' | 'unknown' | 'lookup-error';
+
+interface EmptyBinStatusInput {
+  readonly status: EmptyBinStatus;
+  readonly refreshFailed: boolean;
+}
+
+const kindByStatus: Readonly<Record<Exclude<EmptyBinStatus, 'idle' | 'completed'>, SharedDriveMoveStatusKind>> = {
+  submitting: 'processing',
+  processing: 'processing',
+  partial: 'partial',
+  failed: 'failed',
+  unknown: 'status-unknown',
+  'lookup-error': 'request-failed',
+};
+
+/** Maps the empty-Bin state to the popup status kind, or null when nothing should be shown. */
+export const getEmptyBinStatusKind = ({
+  status,
+  refreshFailed,
+}: EmptyBinStatusInput): SharedDriveMoveStatusKind | null => {
+  if (status === 'idle') {
+    return null;
+  }
+  if (status === 'completed') {
+    return refreshFailed ? 'finished-unknown' : 'completed';
+  }
+  return kindByStatus[status];
+};
