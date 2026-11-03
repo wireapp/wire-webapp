@@ -27,7 +27,11 @@ import {toProtobufCommitBundle} from './commitBundleUtil';
 
 describe('toProtobufCommitBundle', () => {
   it('encode commit bundles', () => {
-    const welcomeMessage = {serialize: jest.fn(() => Uint8Array.from([1]))} as unknown as Welcome;
+    const welcomeMessage = {
+      serialize: jest.fn(() => {
+        return Uint8Array.from([1]);
+      }),
+    } as unknown as Welcome;
     const payload: CommitBundle = {
       commit: Uint8Array.from([0]),
       welcome: welcomeMessage,
