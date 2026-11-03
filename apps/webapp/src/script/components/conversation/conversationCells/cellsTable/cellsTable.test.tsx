@@ -3493,6 +3493,59 @@ const createInternalDragTransfer = (): DataTransfer => {
   } as unknown as DataTransfer;
 };
 
+describe('CellsTable row modifier selection', () => {
+  it('selects files and folders with Command-click without opening them, then drags the selection', () => {
+    const originalHash = window.location.hash;
+    const {file} = renderCellsTable();
+    fireEvent.click(screen.getByRole('button', {name: file.name, hidden: true}), {metaKey: true});
+    fireEvent.click(screen.getByRole('button', {name: 'Marketing images', hidden: true}), {metaKey: true});
+
+    expect(screen.getByText('2 selected')).toBeInTheDocument();
+    expect(screen.getByRole('checkbox', {name: `Select ${file.name}`})).toBeChecked();
+    expect(screen.getByRole('checkbox', {name: 'Select Marketing images'})).toBeChecked();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(window.location.hash).toBe(originalHash);
+    expect(screen.getByRole('row', {name: /Wire logs\.pdf/})).toHaveAttribute('draggable', 'true');
+
+    fireEvent.click(screen.getByRole('button', {name: file.name, hidden: true}), {metaKey: true});
+    expect(screen.getByText('1 selected')).toBeInTheDocument();
+    expect(screen.getByRole('checkbox', {name: `Select ${file.name}`})).not.toBeChecked();
+  });
+
+  it('selects from the row and keeps the checkbox and menu interactions working', () => {
+    renderCellsTable();
+    const fileRow = screen.getByRole('row', {name: /Wire logs\.pdf/});
+
+    fireEvent.click(fileRow, {metaKey: true});
+    expect(screen.getByText('1 selected')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'}), {metaKey: true});
+    expect(screen.queryByRole('button', {name: 'Clear selection'})).not.toBeInTheDocument();
+    fireEvent.click(within(fileRow).getByRole('button', {name: 'cells.options.label'}), {metaKey: true});
+    expect(screen.queryByRole('button', {name: 'Clear selection'})).not.toBeInTheDocument();
+  });
+
+  it('keeps ordinary folder clicks for navigation and supports Control-click selection', () => {
+    const originalHash = window.location.hash;
+    try {
+      renderCellsTable();
+      fireEvent.click(screen.getByRole('button', {name: 'Marketing images', hidden: true}));
+      expect(window.location.hash).toContain('files/Marketing/images');
+      expect(screen.queryByRole('button', {name: 'Clear selection'})).not.toBeInTheDocument();
+
+      fireEvent.click(screen.getByRole('button', {name: 'Wire logs.pdf', hidden: true}), {ctrlKey: true});
+      expect(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'})).toBeChecked();
+    } finally {
+      window.location.hash = originalHash;
+    }
+  });
+
+  it('does not select a row when bulk selection is disabled', () => {
+    renderCellsTable({isBulkActionsEnabled: false});
+    fireEvent.click(screen.getByRole('button', {name: 'Wire logs.pdf', hidden: true}), {metaKey: true});
+    expect(screen.queryByRole('button', {name: 'Clear selection'})).not.toBeInTheDocument();
+  });
+});
+
 describe('CellsTable internal drag and drop', () => {
   it('moves every selected item into a folder without opening the Move dialog or uploading files', async () => {
     const moveNodes = jest

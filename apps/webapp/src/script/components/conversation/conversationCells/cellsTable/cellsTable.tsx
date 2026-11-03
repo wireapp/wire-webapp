@@ -751,6 +751,14 @@ export const CellsTable = ({
     tags: translate('cells.tableRow.tags'),
   };
   const cellLabels = getCellsTableDataCellLabels(labels);
+  const isRowSelectionEnabled =
+    isSelectionEnabled &&
+    !isBulkMoveOutcomeUnresolved &&
+    !isPermanentDeleteUnresolved &&
+    !isBulkMoveToBinNeedsReview &&
+    !isBulkMoveToBinPending &&
+    !bulkRestore.isPending &&
+    bulkRestore.reviewReason === null;
 
   const table = useReactTable({
     data: nodes,
@@ -766,14 +774,7 @@ export const CellsTable = ({
       onToggleSort,
       selectedNodeIds,
       onToggleSelection: handleToggleSelection,
-      selectionEnabled:
-        isSelectionEnabled &&
-        !isBulkMoveOutcomeUnresolved &&
-        !isPermanentDeleteUnresolved &&
-        !isBulkMoveToBinNeedsReview &&
-        !isBulkMoveToBinPending &&
-        !bulkRestore.isPending &&
-        bulkRestore.reviewReason === null,
+      selectionEnabled: isRowSelectionEnabled,
     }),
     getCoreRowModel: getCoreRowModel(),
   });
@@ -1580,6 +1581,24 @@ export const CellsTable = ({
                     data-folder-drop-active={activeFolderDropTargetId === node.id || undefined}
                     aria-selected={isSelectionEnabled && selectedNodeIds.has(node.id)}
                     data-uie-name="cells-table-row"
+                    onClickCapture={event => {
+                      if (!isRowSelectionEnabled || (!event.metaKey && !event.ctrlKey)) {
+                        return;
+                      }
+
+                      const target = event.target;
+                      if (!(target instanceof Element)) {
+                        return;
+                      }
+                      const control = target.closest('button, a, input, label, select, textarea');
+                      if (control !== null && control.closest('td')?.getAttribute('data-cell') !== labels.name) {
+                        return;
+                      }
+
+                      event.preventDefault();
+                      event.stopPropagation();
+                      handleToggleSelection(node.id, !selectedNodeIds.has(node.id));
+                    }}
                     draggable={canMoveSelection && selectedNodeIds.has(node.id)}
                     onDragStart={event => {
                       if (!canMoveSelection || !selectedNodeIds.has(node.id)) {
