@@ -67,6 +67,7 @@ export class CallingPage {
   readonly fullScreenGridTileMuteIcon: Locator;
   readonly selfVideoThumbnail: Locator;
   readonly participantNameLocator: Locator;
+  readonly minimizeButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -77,6 +78,7 @@ export class CallingPage {
     this.goFullScreen = page.locator('[data-uie-name="do-maximize-call"]');
     this.acceptCallButton = this.callCell.getByRole('button', {name: 'Accept'});
     this.leaveCallButton = this.callCell.getByRole('button', {name: 'Hang Up'});
+    this.minimizeButton = page.getByTestId( 'do-call-controls-video-minimize');
 
     this.gridTiles = this.page.getByTestId('item-grid');
 
@@ -107,6 +109,12 @@ export class CallingPage {
 
   async clickLeaveCallButton(): Promise<void> {
     await this.leaveCallButton.click();
+  }
+
+  async minimizeCall() {
+  if (await this.minimizeButton.isVisible()) {
+    await this.minimizeButton.click();
+  }
   }
 
   // ─── Visibility and Waits ───────────────────────────────────────────────

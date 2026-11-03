@@ -37,7 +37,8 @@
       "@wireapp/store-engine": ["../../libraries/store-engine/src/index.ts"],
       "@wireapp/store-engine-dexie": ["../../libraries/store-engine-dexie/src/index.ts"],
       "@wireapp/config": ["../../libraries/config/src/index.ts"],
-      "@wireapp/telemetry": ["../../libraries/telemetry/src/index.ts"]
+      "@wireapp/telemetry": ["../../libraries/telemetry/src/index.ts"],
+      "@enormora/clock/clock": [ "../../node_modules/@enormora/clock/clock.entry-point.d.ts" ]
     },
     "rootDirs": ["src"],
     "target": "ESNext",
