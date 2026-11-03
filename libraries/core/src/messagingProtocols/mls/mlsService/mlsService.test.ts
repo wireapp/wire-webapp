@@ -31,7 +31,7 @@ import {
 } from '@wireapp/api-client/lib/event';
 import {BackendError, BackendErrorLabel, StatusCode} from '@wireapp/api-client/lib/http';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
-import {Decoder} from 'bazinga64';
+import {Decoder} from '@wireapp/commons/lib/base64/decoder';
 
 import {randomUUID, UUID} from 'crypto';
 import {createFireAndForgetInvoker} from '@enormora/fire-and-forget';

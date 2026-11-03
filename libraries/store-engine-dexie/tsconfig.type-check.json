@@ -10,8 +10,7 @@
     "baseUrl": ".",
     "paths": {
       "@sindresorhus/is": ["../../node_modules/@sindresorhus/is/distribution/index.d.ts"],
-      "@wireapp/store-engine/lib/*": ["../store-engine/src/*"],
-      "@wireapp/store-engine": ["../store-engine/src/index.ts"]
+      "@wireapp/store-engine/lib/*": ["../store-engine/src/*"]
     }
   },
   "include": ["src/**/*"],

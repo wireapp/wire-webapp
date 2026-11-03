@@ -17,7 +17,7 @@
  *
  */
 
-import {Decoder} from 'bazinga64';
+import {Decoder} from '@wireapp/commons/lib/base64/decoder';
 import {Maybe, Task, result, task} from 'true-myth';
 
 import {LogFactory} from '@wireapp/commons';

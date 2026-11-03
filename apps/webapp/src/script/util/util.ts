@@ -18,7 +18,8 @@
  */
 
 import {isNull, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
-import {Decoder, Encoder} from 'bazinga64';
+import {Decoder} from '@wireapp/commons/lib/base64/decoder';
+import {Encoder} from '@wireapp/commons/lib/base64/encoder';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {noop} from 'noop-esm';
 

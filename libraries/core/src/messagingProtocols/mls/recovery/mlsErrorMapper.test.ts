@@ -19,7 +19,7 @@
 
 import {MLSStaleMessageError} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {Encoder} from 'bazinga64';
+import {Encoder} from '@wireapp/commons/lib/base64/encoder';
 
 import {CoreCryptoError, MlsError} from '@wireapp/core-crypto';
 

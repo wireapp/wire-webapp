@@ -19,7 +19,7 @@
 
 import type {Clock} from '@enormora/clock/clock';
 import {PreKey} from '@wireapp/api-client/lib/auth';
-import {Encoder} from 'bazinga64';
+import {Encoder} from '@wireapp/commons/lib/base64/encoder';
 import {deleteDB} from 'idb';
 import {result, task, type Result, type Task} from 'true-myth';
 

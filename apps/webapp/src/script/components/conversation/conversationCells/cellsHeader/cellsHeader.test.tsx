@@ -17,8 +17,11 @@
  *
  */
 
-import {render, screen, type RenderResult} from '@testing-library/react';
+import {act, render, screen, waitFor, type RenderResult} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+
+import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
+import {JobsTaskStatus, TreeNodeType} from 'cells-sdk-ts';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
@@ -31,6 +34,7 @@ import {
 import {translateForTest} from 'Util/test/translateForTest';
 
 import {CellsHeader} from './cellsHeader';
+import {getCellsFilesPath} from '../common/getCellsFilesPath/getCellsFilesPath';
 
 const cellsNewItemButtonLabel = 'cells.newItemMenu.button';
 const filter = {
@@ -43,6 +47,9 @@ const filter = {
 
 const defaultProperties = {
   onRefresh: jest.fn(),
+  onRefreshAfterEmptyBinOutcome: jest.fn().mockResolvedValue(true),
+  onEmptyBinSubmitted: jest.fn(),
+  getCurrentCellsPath: getCellsFilesPath,
   conversationName: 'Project Alpha',
   conversationQualifiedId: {id: 'conversation-id', domain: 'wire.com'},
   cellsRepository: {} as CellsRepository,
@@ -61,13 +68,16 @@ const defaultProperties = {
 
 const renderCellsHeader = (
   properties: Partial<typeof defaultProperties> & {
+    clock?: ReturnType<typeof createDeterministicClock>;
     onSelectionBarAnchorChange?: (anchor: HTMLDivElement | null) => void;
   } = {},
   isBulkActionsEnabled = true,
 ): RenderResult => {
+  const {clock, ...headerProperties} = properties;
   const wrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({
       translate: translateForTest,
+      clock,
       isFeatureToggleEnabled: featureToggleName => {
         return isBulkActionsEnabled && featureToggleName === driveBulkActionsFeatureToggleName;
       },
@@ -76,7 +86,7 @@ const renderCellsHeader = (
 
   return render(
     <StyledApp themeId={THEME_ID.DEFAULT}>
-      <CellsHeader {...defaultProperties} {...properties} />
+      <CellsHeader {...defaultProperties} {...headerProperties} />
     </StyledApp>,
     {wrapper},
   );
@@ -122,6 +132,128 @@ describe('CellsHeader', () => {
 
     expect(screen.queryByRole('textbox', {name: 'cells.search.placeholder'})).not.toBeInTheDocument();
     expect(screen.queryByRole('button', {name: 'Public links'})).not.toBeInTheDocument();
+  });
+
+  it('shows Empty Bin at the Bin root even when the current page has no visible rows', () => {
+    renderCellsHeader({
+      getCurrentCellsPath: () => {
+        return 'recycle_bin';
+      },
+      isInRecycleBin: true,
+      isSearchViewOpen: false,
+    });
+
+    const emptyBinButton = screen.getByRole('button', {name: 'cells.emptyBin.button'});
+    const headerButtons = screen.getAllByRole('button');
+
+    expect(emptyBinButton).toBeInTheDocument();
+    expect(headerButtons.indexOf(emptyBinButton)).toBeLessThan(
+      headerButtons.indexOf(screen.getByRole('button', {name: 'cells.refreshButton'})),
+    );
+  });
+
+  it('reports a failed Empty Bin refresh instead of treating it as successful', async () => {
+    const cellsRepository = {
+      lookupNodeByPath: jest.fn().mockResolvedValue({Type: TreeNodeType.Collection, Uuid: 'bin-root'}),
+      deleteNodes: jest.fn().mockResolvedValue({Status: 'Performed', BackgroundActions: []}),
+    } as unknown as CellsRepository;
+    const onRefresh = jest.fn();
+    const onRefreshAfterEmptyBinOutcome = jest.fn().mockResolvedValue(false);
+    renderCellsHeader({
+      cellsRepository,
+      getCurrentCellsPath: () => {
+        return 'recycle_bin';
+      },
+      isInRecycleBin: true,
+      isSearchViewOpen: false,
+      onRefresh,
+      onRefreshAfterEmptyBinOutcome,
+    });
+
+    await userEvent.click(screen.getByRole('button', {name: 'cells.emptyBin.button'}));
+    await userEvent.click(screen.getByRole('button', {name: 'cells.emptyBin.confirm'}));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('cells.emptyBin.refreshFailed');
+    expect(onRefreshAfterEmptyBinOutcome).toHaveBeenCalledTimes(1);
+    expect(onRefresh).not.toHaveBeenCalled();
+  });
+
+  it('keeps background Empty Bin work alive across nested Bin navigation', async () => {
+    const user = userEvent.setup();
+    const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
+    let currentPath = 'recycle_bin';
+    const getCurrentCellsPath = (): string => {
+      return currentPath;
+    };
+    const getBackgroundActionInfo = jest
+      .fn()
+      .mockResolvedValueOnce({Status: JobsTaskStatus.Running})
+      .mockResolvedValueOnce({Status: JobsTaskStatus.Finished});
+    const cellsRepository = {
+      lookupNodeByPath: jest.fn().mockResolvedValue({Type: TreeNodeType.Collection, Uuid: 'bin-root'}),
+      deleteNodes: jest.fn().mockResolvedValue({
+        Status: 'Background',
+        BackgroundActions: [{Name: 'delete', JobUuid: 'delete-job'}],
+      }),
+      getBackgroundActionInfo,
+    } as unknown as CellsRepository;
+    const onEmptyBinSubmitted = jest.fn();
+    const onRefreshAfterEmptyBinOutcome = jest.fn().mockResolvedValue(true);
+    const properties = {
+      ...defaultProperties,
+      cellsRepository,
+      getCurrentCellsPath,
+      isInRecycleBin: true,
+      isSearchViewOpen: false,
+      onEmptyBinSubmitted,
+      onRefreshAfterEmptyBinOutcome,
+    };
+    const rendered = renderCellsHeader({...properties, clock}, true);
+    const rerender = (): void => {
+      rendered.rerender(
+        <StyledApp themeId={THEME_ID.DEFAULT}>
+          <CellsHeader {...properties} />
+        </StyledApp>,
+      );
+    };
+
+    await user.click(screen.getByRole('button', {name: 'cells.emptyBin.button'}));
+    await user.click(screen.getByRole('button', {name: 'cells.emptyBin.confirm'}));
+    await waitFor(() => {
+      expect(getBackgroundActionInfo).toHaveBeenCalledTimes(1);
+    });
+    expect(screen.getByRole('status')).toHaveTextContent('cells.emptyBin.status.processing');
+
+    currentPath = 'recycle_bin/folder';
+    rerender();
+    expect(screen.queryByRole('button', {name: 'cells.emptyBin.button'})).not.toBeInTheDocument();
+    await act(async () => {
+      clock.advanceByMilliseconds(1000);
+      await Promise.resolve();
+    });
+    expect(getBackgroundActionInfo).toHaveBeenCalledTimes(1);
+
+    currentPath = 'recycle_bin';
+    rerender();
+    await waitFor(() => {
+      expect(screen.getByText('cells.emptyBin.status.completed')).toBeInTheDocument();
+    });
+    expect(getBackgroundActionInfo).toHaveBeenCalledTimes(2);
+    expect(cellsRepository.deleteNodes).toHaveBeenCalledTimes(1);
+    expect(onEmptyBinSubmitted).toHaveBeenCalledTimes(1);
+    expect(onRefreshAfterEmptyBinOutcome).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not show Empty Bin below the Bin root', () => {
+    renderCellsHeader({
+      getCurrentCellsPath: () => {
+        return 'recycle_bin/folder';
+      },
+      isInRecycleBin: true,
+      isSearchViewOpen: false,
+    });
+
+    expect(screen.queryByRole('button', {name: 'cells.emptyBin.button'})).not.toBeInTheDocument();
   });
 
   it('keeps search and filters available outside the recycle bin', () => {

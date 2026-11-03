@@ -18,9 +18,9 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {Decoder} from '@wireapp/commons/lib/base64/decoder';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import axios from 'axios';
-import {Decoder} from 'bazinga64';
 import {result, task, type Result, type Task} from 'true-myth';
 
 import {APIClient} from '@wireapp/api-client';

@@ -19,7 +19,7 @@
 
 import {ConversationMLSMessageAddEvent} from '@wireapp/api-client/lib/event';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {Decoder} from 'bazinga64';
+import {Decoder} from '@wireapp/commons/lib/base64/decoder';
 
 import {LogFactory, TimeUtil} from '@wireapp/commons';
 import {BufferedDecryptedMessage, ClientId, ConversationId, DecryptedMessage} from '@wireapp/core-crypto';
