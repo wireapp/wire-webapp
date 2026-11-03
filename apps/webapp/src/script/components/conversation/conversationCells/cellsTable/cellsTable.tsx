@@ -119,6 +119,7 @@ import {
   type SharedDriveMoveStatusKind,
   type SharedDriveMoveSummary,
 } from '../sharedDriveUploadStatusContext';
+import {useBulkActionStatusReporter} from '../useBulkActionStatusReporter';
 
 interface CellsTableProps {
   nodes: CellNode[];
@@ -374,6 +375,7 @@ export const CellsTable = ({
     reset: resetPermanentDeleteReconciliation,
   } = permanentDelete;
   const bulkRestoreModalId = useId();
+  const restoreStatusReporter = useBulkActionStatusReporter('restore');
   const bulkRestore = useBulkRestore({
     cellsRepository,
     clock,
@@ -385,6 +387,11 @@ export const CellsTable = ({
     onRefreshAndReportSuccess,
     onRestoreSettled: () => {
       setSelectedNodeIds(new Set());
+    },
+    onStatusChange: restoreStatusReporter.report,
+    onStatusCleared: restoreStatusReporter.clear,
+    reportError: error => {
+      console.error(error);
     },
   });
   const {reset: resetBulkRestore} = bulkRestore;
@@ -698,6 +705,11 @@ export const CellsTable = ({
       return;
     }
 
+    restoreStatusReporter.start(
+      currentSelectedNodes.map(node => {
+        return {id: node.id, name: node.name, isFolder: node.type === CellNodeType.FOLDER};
+      }),
+    );
     void bulkRestore.restore(currentResolution.targets, scopeKey);
   };
 
@@ -1455,14 +1467,8 @@ export const CellsTable = ({
             </Button>
           </div>
         )}
-        {bulkRestore.isPending && (
-          <div css={permanentDeleteProgressStyles} role="status" aria-live="polite">
-            <SharedDriveUploadSpinnerIcon color="var(--accent-color)" width={16} height={16} aria-hidden="true" />
-            <span>{translate('cells.bulkRestore.restoring')}</span>
-          </div>
-        )}
         {bulkRestore.reviewReason !== null && !bulkRestore.isPending && (
-          <div css={permanentDeleteProgressStyles} role="alert">
+          <div css={moveOutcomeMessageStyles} role="alert">
             <span>{translate('cells.restore.error')}</span>
             <Button
               variant={ButtonVariant.SECONDARY}

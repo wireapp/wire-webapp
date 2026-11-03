@@ -63,6 +63,9 @@ interface BulkRestoreTestSetup {
   readonly getBackgroundActionInfo: jest.Mock;
   readonly onRefreshAndReportSuccess: jest.Mock;
   readonly onRestoreSettled: jest.Mock;
+  readonly onStatusChange: jest.Mock;
+  readonly onStatusCleared: jest.Mock;
+  readonly reportError: jest.Mock;
   readonly options: UseBulkRestoreOptions;
 }
 
@@ -73,6 +76,9 @@ const createSetup = (): BulkRestoreTestSetup => {
   const getBackgroundActionInfo = jest.fn().mockResolvedValue({Status: JobsTaskStatus.Finished});
   const onRefreshAndReportSuccess = jest.fn().mockResolvedValue(true);
   const onRestoreSettled = jest.fn();
+  const onStatusChange = jest.fn();
+  const onStatusCleared = jest.fn();
+  const reportError = jest.fn();
   const options: UseBulkRestoreOptions = {
     cellsRepository: {restoreNodes, lookupNodeByPath, getBackgroundActionInfo},
     clock,
@@ -85,6 +91,9 @@ const createSetup = (): BulkRestoreTestSetup => {
     },
     onRefreshAndReportSuccess,
     onRestoreSettled,
+    onStatusChange,
+    onStatusCleared,
+    reportError,
   };
   return {
     clock,
@@ -93,6 +102,9 @@ const createSetup = (): BulkRestoreTestSetup => {
     getBackgroundActionInfo,
     onRefreshAndReportSuccess,
     onRestoreSettled,
+    onStatusChange,
+    onStatusCleared,
+    reportError,
     options,
   };
 };
@@ -215,6 +227,134 @@ describe('useBulkRestore', () => {
 
     expect(onRefreshAndReportSuccess).toHaveBeenCalledTimes(1);
     expect(onRestoreSettled).toHaveBeenCalledTimes(1);
+  });
+
+  it('reports processing and then completed for a performed restore', async () => {
+    const {onStatusChange, options} = createSetup();
+    const {result} = renderHook(() => {
+      return useBulkRestore(options);
+    });
+
+    await act(async () => {
+      await result.current.restore([selected('a.txt')], 'bin-scope');
+    });
+
+    expect(onStatusChange.mock.calls).toEqual([['processing'], ['completed']]);
+  });
+
+  it('reports the request-failed outcome', async () => {
+    const {restoreNodes, onStatusChange, options} = createSetup();
+    restoreNodes.mockRejectedValue(new Error('network'));
+    const {result} = renderHook(() => {
+      return useBulkRestore(options);
+    });
+
+    await act(async () => {
+      await result.current.restore([selected('a.txt')], 'bin-scope');
+    });
+
+    expect(onStatusChange.mock.calls).toEqual([['processing'], ['request-failed']]);
+  });
+
+  it('reports finished-unknown when the restore succeeded but the refresh failed', async () => {
+    const {onRefreshAndReportSuccess, onStatusChange, options} = createSetup();
+    onRefreshAndReportSuccess.mockResolvedValue(false);
+    const {result} = renderHook(() => {
+      return useBulkRestore(options);
+    });
+
+    await act(async () => {
+      await result.current.restore([selected('a.txt')], 'bin-scope');
+    });
+
+    expect(onStatusChange.mock.calls).toEqual([['processing'], ['finished-unknown']]);
+  });
+
+  it('clears the status once a review refresh succeeds', async () => {
+    const {restoreNodes, onStatusCleared, options} = createSetup();
+    restoreNodes.mockRejectedValue(new Error('network'));
+    const {result} = renderHook(() => {
+      return useBulkRestore(options);
+    });
+    await act(async () => {
+      await result.current.restore([selected('a.txt')], 'bin-scope');
+    });
+    expect(onStatusCleared).not.toHaveBeenCalled();
+
+    await act(async () => {
+      await result.current.refreshReview();
+    });
+
+    expect(onStatusCleared).toHaveBeenCalledTimes(1);
+  });
+
+  it('still reports the real outcome when the scope changed during the restore, without refreshing', async () => {
+    const {onRefreshAndReportSuccess, onRestoreSettled, onStatusChange, options} = createSetup();
+    const isCurrentScope = jest.fn().mockReturnValueOnce(true).mockReturnValue(false);
+    const {result} = renderHook(() => {
+      return useBulkRestore({...options, isCurrentScope});
+    });
+
+    await act(async () => {
+      await result.current.restore([selected('a.txt')], 'bin-scope');
+    });
+
+    expect(onStatusChange.mock.calls).toEqual([['processing'], ['completed']]);
+    expect(onRefreshAndReportSuccess).not.toHaveBeenCalled();
+    expect(onRestoreSettled).not.toHaveBeenCalled();
+  });
+
+  it('reports the error behind a failed restore request instead of swallowing it', async () => {
+    const error = new Error('network');
+    const {restoreNodes, reportError, options} = createSetup();
+    restoreNodes.mockRejectedValue(error);
+    const {result} = renderHook(() => {
+      return useBulkRestore(options);
+    });
+
+    await act(async () => {
+      await result.current.restore([selected('a.txt')], 'bin-scope');
+    });
+
+    expect(reportError).toHaveBeenCalledWith(error);
+  });
+
+  it('stops showing the review refresh as running once its deadline passes and ignores the late result', async () => {
+    const {clock, restoreNodes, onRefreshAndReportSuccess, onStatusCleared, options} = createSetup();
+    restoreNodes.mockRejectedValue(new Error('network'));
+    const {result} = renderHook(() => {
+      return useBulkRestore(options);
+    });
+    await act(async () => {
+      await result.current.restore([selected('a.txt')], 'bin-scope');
+    });
+    let resolveRefresh: (didRefresh: boolean) => void = () => {
+      return undefined;
+    };
+    onRefreshAndReportSuccess.mockReturnValueOnce(
+      new Promise<boolean>(resolve => {
+        resolveRefresh = resolve;
+      }),
+    );
+
+    let refreshRequest: Promise<void> | undefined;
+    act(() => {
+      refreshRequest = result.current.refreshReview();
+    });
+    expect(result.current.isRefreshingReview).toBe(true);
+
+    await act(async () => {
+      clock.advanceByMilliseconds(20_000);
+      await refreshRequest;
+    });
+    expect(result.current.isRefreshingReview).toBe(false);
+    expect(result.current.reviewReason).toBe('request-failed');
+
+    await act(async () => {
+      resolveRefresh(true);
+    });
+    expect(onStatusCleared).not.toHaveBeenCalled();
+    expect(result.current.reviewReason).toBe('request-failed');
   });
 
   it('ignores a second restore while one is pending', async () => {
