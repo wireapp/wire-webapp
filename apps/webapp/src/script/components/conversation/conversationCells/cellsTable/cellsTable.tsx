@@ -93,7 +93,6 @@ import {getPermanentDeleteStatusKind} from './getPermanentDeleteStatusKind';
 import {resolveRestoreTargets} from './restoreBinSelection/resolveRestoreTargets';
 import {showBulkRestoreModal} from './restoreBinSelection/showBulkRestoreModal';
 import {useBulkRestore} from './restoreBinSelection/useBulkRestore';
-import type {PermanentDeleteReviewReason} from './usePermanentDeleteReconciliation';
 import {usePermanentDeleteReconciliation} from './usePermanentDeleteReconciliation';
 
 import {
@@ -192,12 +191,6 @@ const preventDefaultFileDrop = (event: DragEvent<HTMLElement>): void => {
   event.stopPropagation();
 };
 
-type PermanentDeleteReviewMessageKey =
-  | 'cells.bulkDelete.jobFailed'
-  | 'cells.bulkDelete.refreshFailed'
-  | 'cells.bulkDelete.stillVisible'
-  | 'cells.bulkDelete.timedOut';
-
 // Selecting rows only makes sense when at least one of these is available, e.g. never for viewers.
 const BULK_ACTIONS = [CELLS_ACTION.MOVE, CELLS_ACTION.DELETE, CELLS_ACTION.RESTORE];
 
@@ -208,22 +201,6 @@ const hasSameSelection = (selectedNodeIds: ReadonlySet<string>, nodeIds: readonl
       return selectedNodeIds.has(nodeId);
     })
   );
-};
-
-const getPermanentDeleteReviewMessageKey = (
-  reason: PermanentDeleteReviewReason | null,
-): PermanentDeleteReviewMessageKey => {
-  switch (reason) {
-    case 'job-failed':
-      return 'cells.bulkDelete.jobFailed';
-    case 'refresh-failed':
-      return 'cells.bulkDelete.refreshFailed';
-    case 'still-visible':
-      return 'cells.bulkDelete.stillVisible';
-    case 'timed-out':
-    default:
-      return 'cells.bulkDelete.timedOut';
-  }
 };
 
 interface CapturedBulkMoveToBinSelection {
@@ -311,7 +288,9 @@ export const CellsTable = ({
   const canPerformCurrentDriveActionRef = useRef(canPerformCurrentDriveAction);
   canPerformCurrentDriveActionRef.current = canPerformCurrentDriveAction;
   const permanentDeleteModalId = useId();
-  const permanentDeleteStatusReporter = useBulkActionStatusReporter('permanentDelete');
+  const permanentDeleteStatusReporter = useBulkActionStatusReporter('permanentDelete', () => {
+    void handleRefreshAfterPermanentDeleteReview();
+  });
   const permanentDelete = usePermanentDeleteReconciliation({
     cellsRepository,
     clock,
@@ -342,9 +321,7 @@ export const CellsTable = ({
     isPending: isPermanentDeletePending,
     isRejected: isPermanentDeleteRejected,
     isUnresolved: isPermanentDeleteUnresolved,
-    isRefreshingReview: isRefreshingPermanentDeleteReview,
     isReconciling: isPermanentDeleteReconciling,
-    isRequestInFlight: isPermanentDeleteReconciliationRequestInFlight,
     reviewReason: permanentDeleteReviewReason,
     deletePermanently,
     refreshReview: handleRefreshAfterPermanentDeleteReview,
@@ -353,7 +330,9 @@ export const CellsTable = ({
     reset: resetPermanentDeleteReconciliation,
   } = permanentDelete;
   const bulkRestoreModalId = useId();
-  const restoreStatusReporter = useBulkActionStatusReporter('restore');
+  const restoreStatusReporter = useBulkActionStatusReporter('restore', () => {
+    void bulkRestore.refreshReview();
+  });
   const bulkRestore = useBulkRestore({
     cellsRepository,
     clock,
@@ -1366,36 +1345,6 @@ export const CellsTable = ({
                 {activeFolderDropTargetName}
               </span>
             </p>
-          </div>
-        )}
-        {isPermanentDeleteUnresolved && !isPermanentDeleteReconciling && (
-          <div css={moveOutcomeMessageStyles} role="alert">
-            <span>{translate(getPermanentDeleteReviewMessageKey(permanentDeleteReviewReason))}</span>
-            <Button
-              variant={ButtonVariant.SECONDARY}
-              type="button"
-              onClick={() => {
-                void handleRefreshAfterPermanentDeleteReview();
-              }}
-              disabled={isRefreshingPermanentDeleteReview || isPermanentDeleteReconciliationRequestInFlight}
-            >
-              {translate('cells.bulkAction.refresh')}
-            </Button>
-          </div>
-        )}
-        {bulkRestore.reviewReason !== null && !bulkRestore.isPending && (
-          <div css={moveOutcomeMessageStyles} role="alert">
-            <span>{translate('cells.restore.error')}</span>
-            <Button
-              variant={ButtonVariant.SECONDARY}
-              type="button"
-              onClick={() => {
-                void bulkRestore.refreshReview();
-              }}
-              disabled={bulkRestore.isRefreshingReview}
-            >
-              {translate('cells.bulkAction.refresh')}
-            </Button>
           </div>
         )}
         {isBulkMoveOutcomeUnresolved && (
