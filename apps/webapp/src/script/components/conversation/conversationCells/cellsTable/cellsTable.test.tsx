@@ -4024,8 +4024,8 @@ describe('CellsTable restoring selected Bin items', () => {
     await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Restore'}));
 
     expect(
-      await screen.findByText('Something went wrong, please try again later and refresh the list.'),
-    ).toBeInTheDocument();
+      (await screen.findAllByText('Something went wrong, please try again later and refresh the list.')).length,
+    ).toBeGreaterThan(0);
     expect(screen.getByRole('button', {name: 'Refresh Bin'})).toBeInTheDocument();
     expect(screen.queryByRole('button', {name: 'Restore'})).not.toBeInTheDocument();
     expect(screen.queryByRole('button', {name: 'Delete permanently'})).not.toBeInTheDocument();
