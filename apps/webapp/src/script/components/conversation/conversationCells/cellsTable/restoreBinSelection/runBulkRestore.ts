@@ -30,6 +30,7 @@ export interface BulkRestoreDependencies {
   lookupRootParentId: (rootParentName: string) => Promise<string>;
   restoreNodes: (params: {uuids: readonly string[]}) => Promise<RestPerformActionResponse>;
   observeJobs: (jobUuids: readonly string[]) => Promise<CellsBackgroundActionOutcome>;
+  reportError: (error: unknown) => void;
 }
 
 interface RunBulkRestoreParams extends BulkRestoreDependencies {
@@ -65,6 +66,7 @@ export const runBulkRestore = async ({
   lookupRootParentId,
   restoreNodes,
   observeJobs,
+  reportError,
 }: RunBulkRestoreParams): Promise<BulkRestoreOutcome> => {
   if (targets.length === 0) {
     return 'request-failed';
@@ -74,7 +76,8 @@ export const runBulkRestore = async ({
   try {
     const uuids = await resolveTargetIds(targets, lookupRootParentId);
     response = await restoreNodes({uuids});
-  } catch {
+  } catch (error) {
+    reportError(error);
     return 'request-failed';
   }
 

@@ -445,7 +445,6 @@
   "cells.bulkRestore.status.needsReview": "Restore needs review",
   "cells.bulkRestore.status.restored": "Restored {count} items",
   "cells.bulkRestore.status.restoring": "Restoring {count} items",
-  "cells.bulkRestore.restoring": "Restoring selected items…",
   "cells.clearFilters.button": "Clear all",
   "cells.deleteModal.description": "This will permanently delete the file {name} for all participants.",
   "cells.deleteModal.error": "Something went wrong, please try again later and refresh the list.",
