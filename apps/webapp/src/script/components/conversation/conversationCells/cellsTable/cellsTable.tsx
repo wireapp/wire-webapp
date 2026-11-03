@@ -1329,7 +1329,8 @@ export const CellsTable = ({
                         type="button"
                         aria-haspopup="dialog"
                         onClick={() => {
-                          const summary = {
+                          const summary: SharedDriveMoveSummary = {
+                            action: 'move',
                             items: selectedNodes.map(node => {
                               return {id: node.id, name: node.name, isFolder: node.type === CellNodeType.FOLDER};
                             }),
