@@ -108,6 +108,40 @@ describe('createCellsBinOperationController', () => {
     controller.dispose();
   });
 
+  it('continues a job after the last view detaches and exposes its result when a view returns', async () => {
+    const {cellsRepository, clock, controller} = createController();
+    cellsRepository.deleteNodes.mockResolvedValue({
+      Status: RestActionStatus.Background,
+      BackgroundActions: [{Name: 'delete', JobUuid: 'job-1'}],
+    });
+    cellsRepository.getBackgroundActionInfo.mockResolvedValue({Status: JobsTaskStatus.Running});
+    const detachedView = jest.fn();
+    const detach = controller.subscribe(detachedView);
+
+    startDelete(controller, 'move-to-bin');
+    await waitFor(() => {
+      expect(cellsRepository.getBackgroundActionInfo).toHaveBeenCalledTimes(1);
+    });
+    detach();
+    detachedView.mockClear();
+    cellsRepository.getBackgroundActionInfo.mockResolvedValue({Status: JobsTaskStatus.Finished});
+    clock.advanceByMilliseconds(1000);
+    await waitFor(() => {
+      expect(getSnapshot(controller)).toMatchObject({state: 'completed', isLocked: true});
+    });
+
+    const returnedView = jest.fn();
+    controller.subscribe(returnedView);
+    await controller.recheck(drive);
+
+    expect(detachedView).not.toHaveBeenCalled();
+    expect(returnedView).toHaveBeenCalled();
+    expect(getSnapshot(controller)).toMatchObject({state: 'completed', targetIds: ['node-1', 'node-2']});
+    expect(cellsRepository.deleteNodes).toHaveBeenCalledTimes(1);
+    expect(cellsRepository.getBackgroundActionInfo).toHaveBeenCalledTimes(2);
+    controller.dispose();
+  });
+
   it('deeply freezes a captured move summary before starting the request', async () => {
     const {controller} = createController();
     const summary = {
@@ -586,6 +620,31 @@ describe('createCellsBinOperationController', () => {
     controller.dispose();
   });
 
+  it('lets a returning view retry after a forced status read times out', async () => {
+    const {cellsRepository, clock, controller} = createController();
+    cellsRepository.deleteNodes.mockResolvedValue({
+      Status: RestActionStatus.Background,
+      BackgroundActions: [{Name: 'delete', JobUuid: 'job-1'}],
+    });
+    cellsRepository.getBackgroundActionInfo.mockResolvedValue({Status: JobsTaskStatus.Running});
+    startDelete(controller, 'move-to-bin');
+    await waitFor(() => {
+      expect(cellsRepository.getBackgroundActionInfo).toHaveBeenCalledTimes(1);
+    });
+    cellsRepository.getBackgroundActionInfo.mockReturnValueOnce(new Promise(jest.fn()));
+
+    const pendingRead = controller.recheckAll();
+    clock.advanceByMilliseconds(20_000);
+    await pendingRead;
+    cellsRepository.getBackgroundActionInfo.mockResolvedValue({Status: JobsTaskStatus.Finished});
+    await controller.recheck(drive);
+
+    expect(cellsRepository.getBackgroundActionInfo).toHaveBeenCalledTimes(3);
+    expect(getSnapshot(controller)).toMatchObject({state: 'completed', isLocked: true});
+    expect(cellsRepository.deleteNodes).toHaveBeenCalledTimes(1);
+    controller.dispose();
+  });
+
   it.each([
     [JobsTaskStatus.Finished, 'completed', undefined],
     [JobsTaskStatus.Error, 'needs-review', 'job-failed'],
@@ -875,6 +934,18 @@ describe('createCellsBinOperationController', () => {
     expect(getSnapshot(controller)?.reason).toBe('timed-out');
     expect(cellsRepository.deleteNodes).toHaveBeenCalledTimes(1);
     controller.dispose();
+  });
+
+  it('does not submit if a subscriber disposes the owner before the request starts', () => {
+    const {cellsRepository, controller} = createController();
+    controller.subscribe(() => {
+      controller.dispose();
+    });
+
+    startDelete(controller, 'move-to-bin');
+
+    expect(cellsRepository.deleteNodes).not.toHaveBeenCalled();
+    expect(getSnapshot(controller)).toBeUndefined();
   });
 
   it('stops polling and ignores late request completion after disposal', async () => {
