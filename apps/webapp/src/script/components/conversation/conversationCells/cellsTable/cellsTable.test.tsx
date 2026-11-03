@@ -3516,6 +3516,8 @@ describe('CellsTable row modifier selection', () => {
     renderCellsTable();
     const fileRow = screen.getByRole('row', {name: /Wire logs\.pdf/});
 
+    fireEvent.click(fileRow);
+    expect(screen.queryByRole('button', {name: 'Clear selection'})).not.toBeInTheDocument();
     fireEvent.click(fileRow, {metaKey: true});
     expect(screen.getByText('1 selected')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('checkbox', {name: 'Select Wire logs.pdf'}), {metaKey: true});
