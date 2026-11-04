@@ -28,20 +28,19 @@ import {container} from 'tsyringe';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
-import {SIGN_OUT_REASON} from 'src/script/auth/signOutReason';
-import {useAppSoftLock} from 'src/script/hooks/useAppSoftLock';
-import {useSingleInstance} from 'src/script/hooks/useSingleInstance';
-import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
-
 import {getOtherInstanceAction} from './getOtherInstanceAction';
 import {useAccentColor} from './hooks/useAccentColor';
 import {useTheme} from './hooks/useTheme';
 
 import {runClientVersionCheck} from '../../applicationPeriodicChecks/runClientVersionCheck';
 import {startApplicationPeriodicChecks} from '../../applicationPeriodicChecks/startApplicationPeriodicChecks';
+import {SIGN_OUT_REASON} from '../../auth/signOutReason';
 import {Config, Configuration} from '../../Config';
 import {markAsUnreadFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
 import {StartupFeatureToggleName} from '../../featureToggles/startupFeatureToggles';
+import {useAppSoftLock} from '../../hooks/useAppSoftLock';
+import {useSingleInstance} from '../../hooks/useSingleInstance';
+import {useUserPropertyValue} from '../../hooks/useUserProperty';
 import type {FetchLatestBuildMetadata} from '../../lifecycle/newVersionHandler';
 import {setAppLocale} from '../../localization/Localizer';
 import {App} from '../../main/app';

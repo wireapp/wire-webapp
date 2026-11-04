@@ -24,8 +24,6 @@ import {container} from 'tsyringe';
 
 import {TabIndex, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {useUserModalState} from './UserModal.state';
 import {
   unverifiedUserWarningIconStyle,
@@ -39,6 +37,7 @@ import {
 } from './UserModal.styles';
 
 import {Config} from '../../../Config';
+import {useApplicationContext} from '../../../page/rootProvider';
 import {User} from '../../../repositories/entity/User';
 import {TeamState} from '../../../repositories/team/TeamState';
 import {UserRepository} from '../../../repositories/user/userRepository';

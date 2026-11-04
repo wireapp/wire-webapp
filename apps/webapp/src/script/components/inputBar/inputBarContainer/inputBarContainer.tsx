@@ -21,8 +21,7 @@ import {ReactNode, type FunctionComponent} from 'react';
 
 import cx from 'classnames';
 
-import {useAppMainState} from 'src/script/page/state';
-
+import {useAppMainState} from '../../../page/state';
 import {IgnoreOutsideClickWrapper} from '../util/clickHandlers';
 
 interface InputBarContainerProps {

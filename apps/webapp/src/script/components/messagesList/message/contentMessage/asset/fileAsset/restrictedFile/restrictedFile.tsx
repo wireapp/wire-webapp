@@ -19,8 +19,7 @@
 
 import type {FunctionComponent} from 'react';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
+import {useApplicationContext} from '../../../../../../../page/rootProvider';
 import {FileAsset} from '../../../../../../../repositories/entity/message/fileAsset';
 import {trimFileExtension} from '../../../../../../../util/util';
 

@@ -26,8 +26,6 @@ import {amplify} from 'amplify';
 
 import {CollectionIcon, HideIcon, HistoryIcon, LockClosedIcon, UnlockedIcon} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {ConversationDetailsOption} from './conversationDetailsOption';
 
 import {
@@ -48,6 +46,7 @@ import {replaceReactComponents} from '../../../../../util/localizerUtil/reactLoc
 import {useChannelsFeatureFlag} from '../../../../../util/useChannelsFeatureFlag';
 import {ActionsViewModel} from '../../../../../view_model/ActionsViewModel';
 import {WebAppEvents} from '../../../../../webAppEvents';
+import {useApplicationContext} from '../../../../rootProvider';
 import {PanelEntity, PanelState} from '../../../rightSidebar';
 import {getConversationActions} from '../../utils/getConversationActions';
 import {ConversationDetailsBottomActions} from '../conversationDetailsBottomActions';

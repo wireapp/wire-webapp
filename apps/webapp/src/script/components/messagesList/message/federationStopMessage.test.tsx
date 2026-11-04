@@ -22,11 +22,11 @@ import {isNull} from '@sindresorhus/is';
 
 import en from '../../../../i18n/en-US.json';
 import {FederationStopMessage as FederationStopMessageEntity} from '../../../repositories/entity/message/federationStopMessage';
-import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
+import {withThemeAndRootContext} from '../../../auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../page/testSupport/rootContextTestSupport';
 import {setStrings, translate} from '../../../util/localizerUtil';
 
 import {FederationStopMessage} from './federationStopMessage';

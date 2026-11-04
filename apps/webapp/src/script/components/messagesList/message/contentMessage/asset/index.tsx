@@ -22,8 +22,6 @@ import type {FunctionComponent} from 'react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import cx from 'classnames';
 
-import {StatusType} from 'src/script/message/statusType';
-
 import {AudioAsset} from './audioAsset/audioAsset';
 import {FileAsset} from './fileAsset/fileAsset';
 import {ImageAsset} from './imageAsset';
@@ -35,6 +33,7 @@ import {TextMessageRenderer} from './textMessageRenderer';
 import {VideoAsset} from './videoAsset/videoAsset';
 
 import {MessageActions} from '../..';
+import {StatusType} from '../../../../../message/statusType';
 import {AssetType} from '../../../../../repositories/assets/assetType';
 import {Asset} from '../../../../../repositories/entity/message/asset';
 import {Button} from '../../../../../repositories/entity/message/button';

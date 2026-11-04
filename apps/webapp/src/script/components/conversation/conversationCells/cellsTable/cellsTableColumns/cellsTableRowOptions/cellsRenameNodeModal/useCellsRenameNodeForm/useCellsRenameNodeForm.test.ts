@@ -22,7 +22,7 @@ import {act, renderHook} from '@testing-library/react';
 import {Maybe} from 'true-myth';
 
 import {CellsRepository} from '../../../../../../../../repositories/cells/cellsRepository';
-import {CellNode, CellNodeType} from 'src/script/types/cellNode';
+import {CellNode, CellNodeType} from '../../../../../../../../types/cellNode';
 import {CELLS_SELF_USER_DRIVE_ROLE} from '../../../../../common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 
 import {useCellsRenameForm} from './useCellsRenameNodeForm';

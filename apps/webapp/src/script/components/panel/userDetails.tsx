@@ -23,8 +23,7 @@ import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import {ErrorBoundary} from 'react-error-boundary';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
+import {useApplicationContext} from '../../page/rootProvider';
 import {User} from '../../repositories/entity/User';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {WebAppEvents} from '../../webAppEvents';

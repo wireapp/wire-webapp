@@ -33,16 +33,6 @@ import {
   Tooltip,
 } from '@wireapp/react-ui-kit';
 
-import {getManageTeamUrl} from 'src/script/externalRoute';
-import {ConversationFolderTab} from 'src/script/page/leftSidebar/panels/conversations/conversationTab/conversationFolderTab';
-import {
-  isTabVisible,
-  SidebarTabs,
-  useSidebarStore,
-} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {Core} from 'src/script/service/coreSingleton';
-
 import {
   conversationsTitleWrapper,
   footerDisclaimer,
@@ -58,11 +48,13 @@ import {TeamCreationBanner} from './teamCreation/teamCreationBanner';
 import {openDebugToolbar} from '../../../../../components/configToolbar/debugToolbarEvents';
 import * as Icon from '../../../../../components/icon';
 import {Config} from '../../../../../Config';
+import {getManageTeamUrl} from '../../../../../externalRoute';
 import {ConversationRepository} from '../../../../../repositories/conversation/ConversationRepository';
 import {Conversation} from '../../../../../repositories/entity/Conversation';
 import {User} from '../../../../../repositories/entity/User';
 import {TeamState} from '../../../../../repositories/team/TeamState';
 import {FEATURES, hasAccessToFeature} from '../../../../../repositories/user/userPermission';
+import {Core} from '../../../../../service/coreSingleton';
 import {useKoSubscribableChildren} from '../../../../../util/componentUtil';
 import {isDataDogEnabled} from '../../../../../util/dataDog';
 import {getWebEnvironment} from '../../../../../util/environment';
@@ -73,10 +65,13 @@ import {
 import type {Translate} from '../../../../../util/localizerUtil/translationTypes';
 import {useChannelsFeatureFlag} from '../../../../../util/useChannelsFeatureFlag';
 import {useMeetingsFeatureFlag} from '../../../../../util/useMeetingsFeatureFlag';
+import {useApplicationContext} from '../../../../rootProvider';
 import {ContentState} from '../../../../useAppState';
 import {ConversationTab} from '../conversationTab';
+import {ConversationFolderTab} from '../conversationTab/conversationFolderTab';
 import {conversationFilters} from '../helpers';
 import {TabAndFilterSettings} from '../tabAndFilterSettings';
+import {isTabVisible, SidebarTabs, useSidebarStore} from '../useSidebarStore';
 
 const wireCloudUrl = 'https://app.wire.com';
 const environmentDisclaimerUrlMarker = createReactTranslationMarker('environment-disclaimer-url');

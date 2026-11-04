@@ -11,11 +11,11 @@
 import {act, renderHook} from '@testing-library/react';
 
 import {FileWithPreview, useFileUploadState} from '../../../conversation/useFilesUploadState/useFilesUploadState';
-import {Config} from 'src/script/Config';
-import {MessageHasher} from 'src/script/message/messageHasher';
+import {Config} from '../../../../Config';
+import {MessageHasher} from '../../../../message/messageHasher';
 
 import {useMessageSend} from './useMessageSend';
-import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {requireValueForTest} from '../../../../page/testSupport/rootContextTestSupport';
 
 const conversationId = 'conversation';
 

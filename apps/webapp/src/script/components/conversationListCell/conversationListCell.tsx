@@ -34,14 +34,13 @@ import cx from 'classnames';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {CellDescription} from './components/cellDescription';
 import {StatusIcon} from './components/statusIcon';
 
 import {useConversationCall} from '../../hooks/useConversationCall';
 import type {RegisterConversationElement} from '../../hooks/useConversationFocus';
 import {useNoInternetCallGuard} from '../../hooks/useNoInternetCallGuard/useNoInternetCallGuard';
+import {useApplicationContext} from '../../page/rootProvider';
 import type {Conversation} from '../../repositories/entity/Conversation';
 import {MediaType} from '../../repositories/media/MediaType';
 import {useKoSubscribableChildren} from '../../util/componentUtil';

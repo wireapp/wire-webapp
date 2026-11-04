@@ -23,7 +23,7 @@ import ko from 'knockout';
 import {CompositeMessage} from '../../../../../../repositories/entity/message/compositeMessage';
 
 import {MessageButton} from './messageButton';
-import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {requireValueForTest} from '../../../../../../page/testSupport/rootContextTestSupport';
 
 import {withTheme} from '../../../../../../auth/util/test/testUtil';
 

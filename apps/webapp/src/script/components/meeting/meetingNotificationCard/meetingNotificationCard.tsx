@@ -27,8 +27,6 @@ import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, CallIcon, CalendarIcon} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {
   meetingNotificationCardActionsStyles,
   meetingNotificationCardActionStyles,
@@ -40,6 +38,7 @@ import {
   meetingNotificationViewBtnStyles,
 } from './meetingNotificationCard.styles';
 
+import {useApplicationContext} from '../../../page/rootProvider';
 import {UserState} from '../../../repositories/user/userState';
 import {navigate} from '../../../router/Router';
 import type {Translate, TranslationKey} from '../../../util/localizerUtil';

@@ -24,8 +24,8 @@ import {Conversation} from '../../entity/Conversation';
 import {VerificationMessage} from '../../entity/message/verificationMessage';
 import {User} from '../../entity/User';
 import {ClientEvent} from '../../event/Client';
-import {SuperType} from 'src/script/message/superType';
-import {VerificationMessageType} from 'src/script/message/verificationMessageType';
+import {SuperType} from '../../../message/superType';
+import {VerificationMessageType} from '../../../message/verificationMessageType';
 import {translate} from '../../../util/localizerUtil';
 import {createUuid} from '../../../util/uuid';
 

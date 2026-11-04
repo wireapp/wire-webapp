@@ -20,19 +20,19 @@
 import {fireEvent, render, screen, waitFor} from '@testing-library/react';
 import ko from 'knockout';
 
-import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
+import {withThemeAndRootContext} from '../../../../auth/util/test/testUtil';
 import {
   createExecutingFireAndForgetInvokerForTest,
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {ConversationState} from 'src/script/repositories/conversation/ConversationState';
-import {User} from 'src/script/repositories/entity/User';
-import {SearchRepository} from 'src/script/repositories/search/searchRepository';
-import {TeamEntity} from 'src/script/repositories/team/TeamEntity';
-import {TeamRepository} from 'src/script/repositories/team/TeamRepository';
-import {TeamState} from 'src/script/repositories/team/TeamState';
-import {UserState} from 'src/script/repositories/user/userState';
+} from '../../../testSupport/rootContextTestSupport';
+import {ConversationState} from '../../../../repositories/conversation/ConversationState';
+import {User} from '../../../../repositories/entity/User';
+import {SearchRepository} from '../../../../repositories/search/searchRepository';
+import {TeamEntity} from '../../../../repositories/team/TeamEntity';
+import {TeamRepository} from '../../../../repositories/team/TeamRepository';
+import {TeamState} from '../../../../repositories/team/TeamState';
+import {UserState} from '../../../../repositories/user/userState';
 import {translateForTest} from '../../../../util/test/translateForTest';
 
 import {PeopleTab, PeopleTabProps, SearchResultsData} from './peopleTab';

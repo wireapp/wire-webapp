@@ -30,8 +30,6 @@ import {amplify} from 'amplify';
 
 import {Runtime} from '@wireapp/commons';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {loadFeatureConfig, saveFeatureConfig} from './featureConfigChangeNotifier.store';
 
 import {PrimaryModal} from '../../../../components/Modals/PrimaryModal';
@@ -48,6 +46,7 @@ import {type TranslationKey} from '../../../../util/localizerUtil';
 import {getLogger} from '../../../../util/logger';
 import {formatDuration} from '../../../../util/timeUtil';
 import {WebAppEvents} from '../../../../webAppEvents';
+import {useApplicationContext} from '../../../rootProvider';
 
 type Features =
   | 'FileSharing'

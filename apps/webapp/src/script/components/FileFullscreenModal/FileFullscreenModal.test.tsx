@@ -29,7 +29,7 @@ import {
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../page/testSupport/rootContextTestSupport';
 
 import {FileFullscreenModal} from './FileFullscreenModal';
 

@@ -24,8 +24,6 @@ import cx from 'classnames';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {useRoveFocus} from 'src/script/hooks/useRoveFocus';
-
 import {JumpToLastMessageButton} from './jumpToLastMessageButton';
 import {Message, MessageActions} from './message';
 import {MarkerComponent} from './message/marker';
@@ -36,6 +34,7 @@ import {groupMessagesBySenderAndTime, isMarker} from './utils/messagesGroup';
 import {updateScroll, FocusedElement} from './utils/scrollUpdater';
 import {useConversationReadBoundary} from './utils/useConversationReadBoundary';
 
+import {useRoveFocus} from '../../hooks/useRoveFocus';
 import {AssetRepository} from '../../repositories/assets/assetRepository';
 import {ConversationRepository} from '../../repositories/conversation/ConversationRepository';
 import {MessageRepository} from '../../repositories/conversation/MessageRepository';

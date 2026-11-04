@@ -21,10 +21,9 @@ import {useCallback, useEffect, useRef, useState, type FunctionComponent} from '
 
 import EmojiPicker, {EmojiClickData, EmojiStyle} from 'emoji-picker-react';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {styles} from './EmojisBar.styles';
 
+import {useApplicationContext} from '../../../../page/rootProvider';
 import {CallingRepository} from '../../../../repositories/calling/CallingRepository';
 
 interface EmojisBarProps {

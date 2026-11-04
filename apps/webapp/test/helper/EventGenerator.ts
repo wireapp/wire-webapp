@@ -33,7 +33,7 @@ import {
 import {Conversation} from '../../src/script/repositories/entity/Conversation';
 import {CONVERSATION} from '../../src/script/repositories/event/Client';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {StatusType} from 'src/script/message/statusType';
+import {StatusType} from '../../src/script/message/statusType';
 import {translate} from '../../src/script/util/localizerUtil';
 import {createUuid} from '../../src/script/util/uuid';
 

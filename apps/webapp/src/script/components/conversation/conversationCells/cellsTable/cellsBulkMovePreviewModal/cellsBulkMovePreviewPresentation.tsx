@@ -22,10 +22,9 @@ import {useEffect, useRef, type ChangeEvent, type FormEvent, type FunctionCompon
 import type {RestPerformActionResponse} from 'cells-sdk-ts';
 import type {Result} from 'true-myth';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {BulkMoveDestinationSelection} from './useBulkMoveDestinationSelection';
 
+import {useApplicationContext} from '../../../../../page/rootProvider';
 import {CellsModal} from '../../common/cellsModal/cellsModal';
 import {CellsNewNodeForm} from '../../common/cellsNewNodeForm/cellsNewNodeForm';
 import type {SharedDriveMoveItem, SharedDriveMoveSummary} from '../../sharedDriveUploadStatusContext';

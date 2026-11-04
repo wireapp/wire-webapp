@@ -22,8 +22,7 @@ import type {FunctionComponent} from 'react';
 import {CSSObject} from '@emotion/react';
 import cx from 'classnames';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
+import {useApplicationContext} from '../../page/rootProvider';
 import {Conversation} from '../../repositories/entity/Conversation';
 import {User} from '../../repositories/entity/User';
 import {useKoSubscribableChildren} from '../../util/componentUtil';

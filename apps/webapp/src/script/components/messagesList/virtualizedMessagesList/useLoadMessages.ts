@@ -22,8 +22,7 @@ import {useCallback, useEffect, useRef, useState} from 'react';
 import {isUndefined} from '@sindresorhus/is';
 import {Virtualizer} from '@tanstack/react-virtual';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
+import {useApplicationContext} from '../../../page/rootProvider';
 import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
 import {Conversation} from '../../../repositories/entity/Conversation';
 import {isLastReceivedMessage} from '../../../util/conversationMessages';

@@ -28,7 +28,7 @@ import {act, render, waitFor, type RenderResult} from '@testing-library/react';
 
 import {ContentMessage} from '../../../../../../repositories/entity/message/contentMessage';
 import {Text} from '../../../../../../repositories/entity/message/text';
-import {MentionEntity} from 'src/script/message/mentionEntity';
+import {MentionEntity} from '../../../../../../message/mentionEntity';
 import {translateForTest} from '../../../../../../util/test/translateForTest';
 import {unwrap} from '../../../../../../util/test/resultTestSupport';
 

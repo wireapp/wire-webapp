@@ -20,11 +20,11 @@
 import {fireEvent, render, screen} from '@testing-library/react';
 
 import {translateForTest} from '../../../util/test/translateForTest';
-import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
+import {withThemeAndRootContext} from '../../../auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../page/testSupport/rootContextTestSupport';
 
 import {MeetingMultiActionButton, MeetingMultiActionButtonProps} from './meetingMultiActionButton';
 

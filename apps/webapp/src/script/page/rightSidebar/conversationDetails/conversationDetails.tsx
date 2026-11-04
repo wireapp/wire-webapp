@@ -28,8 +28,6 @@ import {noop} from 'noop-esm';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {ConversationDetailsHeader} from './components/conversationDetailsHeader';
 import {ConversationDetailsOptions} from './components/conversationDetailsOptions';
 import {ConversationDetailsParticipants} from './components/conversationDetailsParticipants';
@@ -56,6 +54,7 @@ import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {sortUsersByPriority} from '../../../util/stringUtil';
 import {formatDuration} from '../../../util/timeUtil';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
+import {useApplicationContext} from '../../rootProvider';
 import {PanelHeader} from '../panelHeader';
 import {PanelEntity, PanelState} from '../rightSidebar';
 

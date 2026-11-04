@@ -25,11 +25,11 @@ import {FileAsset} from '../../../../repositories/entity/message/fileAsset';
 import {LinkPreview} from '../../../../repositories/entity/message/linkPreview';
 import {MediumImage} from '../../../../repositories/entity/message/mediumImage';
 import {Text} from '../../../../repositories/entity/message/text';
-import {MessageCategory} from 'src/script/message/messageCategory';
+import {MessageCategory} from '../../../../message/messageCategory';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../testSupport/rootContextTestSupport';
 import {translateForTest} from '../../../../util/test/translateForTest';
 import {createUuid} from '../../../../util/uuid';
 

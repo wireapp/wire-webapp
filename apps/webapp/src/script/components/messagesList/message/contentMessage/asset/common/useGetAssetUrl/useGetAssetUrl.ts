@@ -19,8 +19,7 @@
 
 import {useState, useCallback, useEffect} from 'react';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
+import {useApplicationContext} from '../../../../../../../page/rootProvider';
 import {AssetError} from '../../../../../../../repositories/assets/assetError';
 import {AssetRemoteData} from '../../../../../../../repositories/assets/assetRemoteData';
 import {AssetTransferState} from '../../../../../../../repositories/assets/assetTransferState';

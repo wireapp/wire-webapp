@@ -19,10 +19,9 @@
 
 import {useState, type FunctionComponent} from 'react';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {iconWrapperStyles, videoStyles} from './videoAssetSmall.styles';
 
+import {useApplicationContext} from '../../../../../../../../page/rootProvider';
 import {FileFullscreenModal} from '../../../../../../../FileFullscreenModal/FileFullscreenModal';
 import {FilePreviewPlayButton} from '../../common/filePreviewPlayButton/filePreviewPlayButton';
 import {MediaFilePreviewCard} from '../../common/mediaFilePreviewCard/mediaFilePreviewCard';

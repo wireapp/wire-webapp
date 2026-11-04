@@ -23,8 +23,6 @@ import cx from 'classnames';
 
 import {Tooltip} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {
   headerStyles,
   labelStyles,
@@ -32,6 +30,7 @@ import {
   participantListWrapperStyles,
 } from './CallingParticipantList.styles';
 
+import {useApplicationContext} from '../../../../page/rootProvider';
 import {CallingRepository} from '../../../../repositories/calling/CallingRepository';
 import {Participant} from '../../../../repositories/calling/Participant';
 import {Conversation} from '../../../../repositories/entity/Conversation';

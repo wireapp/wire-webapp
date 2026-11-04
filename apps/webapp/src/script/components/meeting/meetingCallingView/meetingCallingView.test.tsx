@@ -31,9 +31,9 @@ import {User} from '../../../repositories/entity/User';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import type {MainViewModel} from 'src/script/view_model/MainViewModel';
-import {buildMediaDevicesHandler} from 'src/script/auth/util/test/testUtil';
+} from '../../../page/testSupport/rootContextTestSupport';
+import type {MainViewModel} from '../../../view_model/MainViewModel';
+import {buildMediaDevicesHandler} from '../../../auth/util/test/testUtil';
 import {translateForTest} from '../../../util/test/translateForTest';
 import {createUuid} from '../../../util/uuid';
 

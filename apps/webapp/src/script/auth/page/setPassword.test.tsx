@@ -25,7 +25,7 @@ import {ValidationError} from '../module/action/validationError';
 import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/testUtil';
-import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {requireValueForTest} from '../../page/testSupport/rootContextTestSupport';
 
 const passwordInputId = 'enter-password';
 const setPasswordButtonId = 'do-set-password';

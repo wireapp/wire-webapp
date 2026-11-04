@@ -21,10 +21,9 @@ import type {FunctionComponent} from 'react';
 
 import {ChevronIcon, IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {chevronLeftStyles, chevronRightStyles, iconButtonStyles} from './Pagination.styles';
 
+import {useApplicationContext} from '../../../page/rootProvider';
 import {handleKeyDown, KEY} from '../../../util/keyboardUtil';
 
 interface PaginationArrowProps {

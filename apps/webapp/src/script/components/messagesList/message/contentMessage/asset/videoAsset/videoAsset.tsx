@@ -25,8 +25,7 @@ import {container} from 'tsyringe';
 
 import {TabIndex, Button, ButtonVariant, useTimeout} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
+import {useApplicationContext} from '../../../../../../page/rootProvider';
 import {AssetError} from '../../../../../../repositories/assets/assetError';
 import {AssetRepository} from '../../../../../../repositories/assets/assetRepository';
 import {AssetTransferState} from '../../../../../../repositories/assets/assetTransferState';

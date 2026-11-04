@@ -21,8 +21,6 @@ import {ChangeEvent, FC, KeyboardEvent, useEffect, useRef, useState} from 'react
 
 import {isNan, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {ConversationVerificationBadges} from '../../../../../components/badge';
 import * as Icon from '../../../../../components/icon';
 import {ConversationRepository} from '../../../../../repositories/conversation/ConversationRepository';
@@ -32,6 +30,7 @@ import {ServiceEntity} from '../../../../../repositories/integration/ServiceEnti
 import {useKoSubscribableChildren} from '../../../../../util/componentUtil';
 import {isEnterKey} from '../../../../../util/keyboardUtil';
 import {removeLineBreaks} from '../../../../../util/stringUtil';
+import {useApplicationContext} from '../../../../rootProvider';
 import {GroupDetails} from '../groupDetails/groupDetails';
 
 interface ConversationDetailsHeaderProps {

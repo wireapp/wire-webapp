@@ -24,7 +24,7 @@ import {ServiceEntity} from '../../repositories/integration/ServiceEntity';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../page/testSupport/rootContextTestSupport';
 
 import {Avatar} from './avatar';
 import {translateForTest} from '../../util/test/translateForTest';

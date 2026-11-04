@@ -17,8 +17,8 @@
  *
  */
 
-import {forTestsOnlyFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
-import {startupFeatureToggleQueryParameterName} from 'src/script/featureToggles/startupFeatureToggles';
+import {forTestsOnlyFeatureToggleName} from '../../../../src/script/featureToggles/startupFeatureToggleNames';
+import {startupFeatureToggleQueryParameterName} from '../../../../src/script/featureToggles/startupFeatureToggles';
 import {PageManager} from '../../pageManager';
 import {expect, test, withLogin} from '../../test.fixtures';
 

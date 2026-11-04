@@ -34,7 +34,7 @@ import {SharedDriveUploadStatusPopupHost} from './sharedDriveUploadStatusPopupHo
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../page/testSupport/rootContextTestSupport';
 import {translateForTest} from '../../../util/test/translateForTest';
 
 const conversationQualifiedId = 'conversation@example.com';

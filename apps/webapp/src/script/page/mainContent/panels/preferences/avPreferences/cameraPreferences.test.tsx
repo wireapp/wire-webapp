@@ -19,12 +19,12 @@
 
 import {render} from '@testing-library/react';
 
-import {Config} from 'src/script/Config';
-import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
+import {Config} from '../../../../../Config';
+import {withThemeAndRootContext} from '../../../../../auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../../testSupport/rootContextTestSupport';
 import {setStrings, translate} from '../../../../../util/localizerUtil';
 
 import type {MediaStreamHandler} from '../../../../../repositories/media/MediaStreamHandler';

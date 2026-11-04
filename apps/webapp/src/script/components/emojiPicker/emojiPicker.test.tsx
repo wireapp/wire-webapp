@@ -21,7 +21,7 @@ import React from 'react';
 
 import {render, waitFor} from '@testing-library/react';
 
-import {withTheme} from 'src/script/auth/util/test/testUtil';
+import {withTheme} from '../../auth/util/test/testUtil';
 import {translateForTest} from '../../util/test/translateForTest';
 
 import {EmojiPicker} from './emojiPicker';

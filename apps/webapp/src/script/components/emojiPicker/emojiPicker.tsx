@@ -22,11 +22,10 @@ import type {FunctionComponent, RefObject} from 'react';
 
 import {createPortal} from 'react-dom';
 
-import {useClickOutside} from 'src/script/hooks/useClickOutside';
-
 import {EmojiPickerAdapter, SkinTones} from './emojiPickerAdapter';
 import type {EmojiPickerSelection} from './emojiPickerAdapter';
 
+import {useClickOutside} from '../../hooks/useClickOutside';
 import {isEnterKey, isEscapeKey} from '../../util/keyboardUtil';
 import type {Translate} from '../../util/localizerUtil';
 import {IgnoreOutsideClickWrapper} from '../inputBar/util/clickHandlers';

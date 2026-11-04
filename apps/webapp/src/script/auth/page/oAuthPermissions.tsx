@@ -43,8 +43,6 @@ import {
   useMatchMedia,
 } from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {
   boxCSS,
   buttonCSS,
@@ -62,6 +60,7 @@ import {Page} from './page';
 
 import * as Icon from '../../components/icon';
 import {Config} from '../../Config';
+import {useApplicationContext} from '../../page/rootProvider';
 import {AssetRemoteData} from '../../repositories/assets/assetRemoteData';
 import {AssetRepository} from '../../repositories/assets/assetRepository';
 import {handleEscDown, handleKeyDown, KEY} from '../../util/keyboardUtil';

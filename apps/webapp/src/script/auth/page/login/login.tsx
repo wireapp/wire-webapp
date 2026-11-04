@@ -55,12 +55,11 @@ import {
   useMatchMedia,
 } from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {separator} from './login.styles';
 
 import {LogoFullIcon} from '../../../components/icon';
 import {Config} from '../../../Config';
+import {useApplicationContext} from '../../../page/rootProvider';
 import {getLogger} from '../../../util/logger';
 import {isBackendError} from '../../../util/typePredicateUtil';
 import {AccountAlreadyExistsModal} from '../../component/accountAlreadyExistsModal';

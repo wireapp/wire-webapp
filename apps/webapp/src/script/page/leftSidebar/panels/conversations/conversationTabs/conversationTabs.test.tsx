@@ -26,13 +26,13 @@ import {ConversationRepository} from '../../../../../repositories/conversation/C
 import {ConversationLabelRepository} from '../../../../../repositories/conversation/ConversationLabelRepository';
 import {User} from '../../../../../repositories/entity/User';
 import {TeamState} from '../../../../../repositories/team/TeamState';
-import {Config} from 'src/script/Config';
-import {Core} from 'src/script/service/coreSingleton';
-import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
+import {Config} from '../../../../../Config';
+import {Core} from '../../../../../service/coreSingleton';
+import {withThemeAndRootContext} from '../../../../../auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../../testSupport/rootContextTestSupport';
 import * as DataDog from '../../../../../util/dataDog';
 import * as Environment from '../../../../../util/environment';
 import {setStrings, translate} from '../../../../../util/localizerUtil';

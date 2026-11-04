@@ -23,10 +23,9 @@ import type {JSX} from '@emotion/react/jsx-runtime';
 
 import {Tooltip} from '@wireapp/react-ui-kit';
 
-import {RootContextValue, useApplicationContext} from 'src/script/page/rootProvider';
-
 import {badgesWrapper, icon} from './userStatusBadges.styles';
 
+import {RootContextValue, useApplicationContext} from '../../../../page/rootProvider';
 import * as Icon from '../../../icon';
 
 type CreateBadgeToComponentMapResult = {

@@ -24,11 +24,6 @@ import {Maybe, maybe} from 'true-myth';
 
 import {Button, ButtonVariant, CloseIcon, Loading} from '@wireapp/react-ui-kit';
 
-import {Config} from 'src/script/Config';
-import {renderNoCameraMessage} from 'src/script/page/mainContent/panels/preferences/avPreferences/cameraPreferences';
-import {InputLevel} from 'src/script/page/mainContent/panels/preferences/avPreferences/inputLevel';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {
   meetingPrepAvatarStyles,
   meetingPrepBodyStyles,
@@ -60,6 +55,10 @@ import type {
 } from './meetingPrepTypes';
 import {meetingPrepDeviceKinds, meetingPrepMediaKinds, meetingPrepPreviewErrors} from './meetingPrepTypes';
 
+import {Config} from '../../../Config';
+import {renderNoCameraMessage} from '../../../page/mainContent/panels/preferences/avPreferences/cameraPreferences';
+import {InputLevel} from '../../../page/mainContent/panels/preferences/avPreferences/inputLevel';
+import {useApplicationContext} from '../../../page/rootProvider';
 import type {User} from '../../../repositories/entity/User';
 import {useMediaDevicesStore} from '../../../repositories/media/useMediaDevicesStore';
 import {formatLocale} from '../../../util/timeUtil';

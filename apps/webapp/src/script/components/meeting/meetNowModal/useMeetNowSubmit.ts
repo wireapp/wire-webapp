@@ -19,11 +19,10 @@
 
 import {useState} from 'react';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import type {MeetNowFormState, MeetNowSubmitResult} from './meetNowTypes';
 import {submitMeetNow} from './submitMeetNow';
 
+import {useApplicationContext} from '../../../page/rootProvider';
 import {useMeetingPrepModal} from '../meetingPrep/useMeetingPrepModal';
 import {useMeetingStore} from '../meetingStore/meetingStoreProvider';
 

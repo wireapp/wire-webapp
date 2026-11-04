@@ -23,11 +23,10 @@ import {isNonEmptyString} from '@sindresorhus/is';
 
 import {Checkbox, CheckboxLabel, ChevronDownIcon} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {conversationIconStyles, conversationListStyles} from './meetingParticipantsPicker.styles';
 import {getConversationKey} from './participantPickerUtils';
 
+import {useApplicationContext} from '../../../page/rootProvider';
 import type {Conversation} from '../../../repositories/entity/Conversation';
 import {ChannelAvatar} from '../../avatar/channelAvatar';
 import {GroupAvatar} from '../../avatar/groupAvatar';

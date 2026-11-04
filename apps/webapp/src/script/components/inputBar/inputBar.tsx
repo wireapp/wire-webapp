@@ -25,8 +25,6 @@ import cx from 'classnames';
 import {LexicalEditor, $createTextNode, $insertNodes} from 'lexical';
 import {container} from 'tsyringe';
 
-import {disableMessagePreprocessingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
-
 import {MessageContent} from './common/messageContent/messageContent';
 import {FilePreviews} from './filePreviews/filePreviews';
 import {InputBarContainer} from './inputBarContainer/inputBarContainer';
@@ -44,6 +42,7 @@ import {usePing} from './usePing/usePing';
 import {useTypingIndicator} from './useTypingIndicator/useTypingIndicator';
 
 import {Config} from '../../Config';
+import {disableMessagePreprocessingFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
 import {useUserPropertyValue} from '../../hooks/useUserProperty';
 import {useApplicationContext} from '../../page/rootProvider';
 import {CellsRepository} from '../../repositories/cells/cellsRepository';

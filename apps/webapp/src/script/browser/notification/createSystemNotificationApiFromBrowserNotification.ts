@@ -29,8 +29,7 @@ import {
   systemNotificationErrorKinds,
   type SystemNotificationPermission,
   toSystemNotificationError,
-} from 'src/script/notification/systemNotificationTypes';
-
+} from '../../notification/systemNotificationTypes';
 import {getLogger} from '../../util/logger';
 import {WebAppEvents} from '../../webAppEvents';
 

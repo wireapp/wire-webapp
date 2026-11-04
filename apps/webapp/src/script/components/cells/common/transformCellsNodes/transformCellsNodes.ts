@@ -22,10 +22,9 @@ import {parseQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 import {RestNode} from 'cells-sdk-ts';
 import {Maybe, maybe} from 'true-myth';
 
-import {CellNode, CellNodeType} from 'src/script/types/cellNode';
-
 import {Conversation} from '../../../../repositories/entity/Conversation';
 import {User} from '../../../../repositories/entity/User';
+import {CellNode, CellNodeType} from '../../../../types/cellNode';
 import {matchQualifiedIds} from '../../../../util/qualifiedId';
 import {TIME_IN_MILLIS} from '../../../../util/timeUtil';
 import {formatBytes, getFileExtension, getName} from '../../../../util/util';

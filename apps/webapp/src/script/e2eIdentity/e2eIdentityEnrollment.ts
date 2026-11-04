@@ -27,8 +27,6 @@ import {container} from 'tsyringe';
 
 import {TypedEventEmitter} from '@wireapp/commons';
 
-import {Core} from 'src/script/service/coreSingleton';
-
 import {
   hasActiveCertificate,
   getActiveWireIdentity,
@@ -43,6 +41,7 @@ import {OIDCServiceStore} from './oidcService/oidcServiceStorage';
 
 import {PrimaryModal, removeCurrentModal} from '../components/Modals/PrimaryModal';
 import {UserState} from '../repositories/user/userState';
+import {Core} from '../service/coreSingleton';
 import {translate} from '../util/localizerUtil';
 import {getLogger} from '../util/logger';
 import {formatDelayTime, TIME_IN_MILLIS} from '../util/timeUtil';

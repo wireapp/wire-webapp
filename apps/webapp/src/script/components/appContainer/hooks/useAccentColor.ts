@@ -22,8 +22,7 @@ import {useEffect} from 'react';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {ACCENT_ID} from 'src/script/Config';
-
+import {ACCENT_ID} from '../../../Config';
 import {UserState} from '../../../repositories/user/userState';
 
 function setAccentColor(accentColor?: number): void {

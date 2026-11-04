@@ -25,9 +25,6 @@ import {container} from 'tsyringe';
 
 import {useMatchMedia} from '@wireapp/react-ui-kit';
 
-import {Config} from 'src/script/Config';
-import {useApplicationContext, useMainViewModel} from 'src/script/page/rootProvider';
-
 import {
   searchResultsHeadingStyles,
   searchResultsOverlayStyles,
@@ -62,12 +59,14 @@ import {withAutoReadGuard} from './utils/autoReadGuard';
 import {checkFileSharingPermission} from './utils/checkFileSharingPermission';
 import {parseAccountDeepLink} from './utils/parseAccountDeepLink';
 
+import {Config} from '../../Config';
 import {UserError} from '../../error/userError';
 import {isMouseRightClickEvent, isAuxRightClickEvent} from '../../guards/Mouse';
 import {isServiceEntity} from '../../guards/Service';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {RightSidebarParams} from '../../page/appMain';
 import {PanelState} from '../../page/rightSidebar';
+import {useApplicationContext, useMainViewModel} from '../../page/rootProvider';
 import {CallState} from '../../repositories/calling/CallState';
 import {createCellsRepositoryGateway} from '../../repositories/cells/cellsRepositoryGateway';
 import {createCellsUploadManager} from '../../repositories/cells/upload/manager';

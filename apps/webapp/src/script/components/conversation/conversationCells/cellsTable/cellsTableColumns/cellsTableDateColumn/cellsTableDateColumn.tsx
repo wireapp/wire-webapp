@@ -19,9 +19,8 @@
 
 import {useMemo, type FunctionComponent} from 'react';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {createRelativeTimestampFormatter, useRelativeTimestamp} from '../../../../../../hooks/useRelativeTimestamp';
+import {useApplicationContext} from '../../../../../../page/rootProvider';
 import {MessageTime} from '../../../../../messagesList/message/messageTime';
 
 interface CellsTableDateColumnProps {

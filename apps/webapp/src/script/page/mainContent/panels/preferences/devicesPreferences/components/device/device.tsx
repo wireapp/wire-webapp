@@ -23,15 +23,14 @@ import {isNonEmptyString} from '@sindresorhus/is';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {WireIdentity} from 'src/script/e2eIdentity';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {DeviceVerificationBadges} from '../../../../../../../components/badge';
 import * as Icon from '../../../../../../../components/icon';
+import {WireIdentity} from '../../../../../../../e2eIdentity';
 import {ClientEntity} from '../../../../../../../repositories/client';
 import {useKoSubscribableChildren} from '../../../../../../../util/componentUtil';
 import {handleKeyDown, KEY} from '../../../../../../../util/keyboardUtil';
 import {splitFingerprint} from '../../../../../../../util/stringUtil';
+import {useApplicationContext} from '../../../../../../rootProvider';
 import {FormattedId} from '../formattedId';
 
 interface DeviceProps {

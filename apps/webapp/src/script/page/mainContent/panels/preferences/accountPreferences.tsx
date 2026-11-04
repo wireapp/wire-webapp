@@ -25,12 +25,6 @@ import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
 
-import {getUserProfileUrl} from 'src/script/externalRoute';
-import {TeamCreationAccountHeader} from 'src/script/page/leftSidebar/panels/conversations/conversationTabs/teamCreation/teamCreationAccountHeader';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {ContentState} from 'src/script/page/useAppState';
-import {Core} from 'src/script/service/coreSingleton';
-
 import {AccountInput} from './accountPreferences/accountInput';
 import {AccountLink} from './accountPreferences/accountLink';
 import {AccountSecuritySection} from './accountPreferences/accountSecuritySection';
@@ -51,6 +45,7 @@ import {ErrorFallback} from '../../../../components/errorFallback';
 import {PrimaryModal} from '../../../../components/Modals/PrimaryModal';
 import {useEnrichedFields} from '../../../../components/panel/enrichedFields';
 import {Config} from '../../../../Config';
+import {getUserProfileUrl} from '../../../../externalRoute';
 import {ClientRepository} from '../../../../repositories/client';
 import {ConversationRepository} from '../../../../repositories/conversation/ConversationRepository';
 import {ConversationState} from '../../../../repositories/conversation/ConversationState';
@@ -59,9 +54,13 @@ import {PropertiesRepository} from '../../../../repositories/properties/properti
 import {TeamState} from '../../../../repositories/team/TeamState';
 import {AppLockRepository} from '../../../../repositories/user/appLockRepository';
 import type {UserRepository} from '../../../../repositories/user/userRepository';
+import {Core} from '../../../../service/coreSingleton';
 import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 import {getLogger} from '../../../../util/logger';
 import {AccentColorPicker} from '../../../accentColorPicker';
+import {TeamCreationAccountHeader} from '../../../leftSidebar/panels/conversations/conversationTabs/teamCreation/teamCreationAccountHeader';
+import {useApplicationContext} from '../../../rootProvider';
+import {ContentState} from '../../../useAppState';
 
 interface AccountPreferencesProps {
   appLockRepository: AppLockRepository;

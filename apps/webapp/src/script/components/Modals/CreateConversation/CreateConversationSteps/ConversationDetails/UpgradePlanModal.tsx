@@ -21,9 +21,6 @@ import type {FunctionComponent} from 'react';
 
 import {Button, Text} from '@wireapp/react-ui-kit';
 
-import {Config} from 'src/script/Config';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {
   salesModalWrapperCss,
   salesModalBodyCss,
@@ -33,6 +30,8 @@ import {
   salesModalBodyButtonCss,
 } from './ConversationDetails.styles';
 
+import {Config} from '../../../../../Config';
+import {useApplicationContext} from '../../../../../page/rootProvider';
 import {handleEscDown, handleKeyDown, KEY} from '../../../../../util/keyboardUtil';
 import {safeWindowOpen} from '../../../../../util/sanitizationUtil';
 import {ModalComponent} from '../../../ModalComponent';

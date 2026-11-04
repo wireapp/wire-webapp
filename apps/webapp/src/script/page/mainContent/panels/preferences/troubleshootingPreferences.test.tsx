@@ -31,11 +31,11 @@ import {
   MOCK_CONNECTION_DELAY_MILLISECONDS,
   MOCK_SCAN_DELAY_MILLISECONDS,
 } from '../../../../repositories/troubleshooter/troubleshooterService';
-import {Config} from 'src/script/Config';
+import {Config} from '../../../../Config';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../testSupport/rootContextTestSupport';
 import * as clipboard from '../../../../util/clipboardUtil';
 import * as utilities from '../../../../util/util';
 import {translateForTest} from '../../../../util/test/translateForTest';

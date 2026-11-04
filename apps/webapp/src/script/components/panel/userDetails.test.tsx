@@ -22,9 +22,9 @@ import {ReactElement} from 'react';
 import {render, type RenderResult} from '@testing-library/react';
 
 import {User} from '../../repositories/entity/User';
-import {RootProvider} from 'src/script/page/rootProvider';
+import {RootProvider} from '../../page/rootProvider';
 import {translateForTest} from '../../util/test/translateForTest';
-import {createRootContextValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {createRootContextValueForTest} from '../../page/testSupport/rootContextTestSupport';
 import {translate} from '../../util/localizerUtil';
 import {createUuid} from '../../util/uuid';
 

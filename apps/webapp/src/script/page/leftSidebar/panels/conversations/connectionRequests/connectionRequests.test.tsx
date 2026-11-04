@@ -23,7 +23,7 @@ import {translateForTest} from '../../../../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../../testSupport/rootContextTestSupport';
 import {createUuid} from '../../../../../util/uuid';
 
 import {ConnectionRequests} from './connectionRequests';

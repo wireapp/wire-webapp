@@ -21,14 +21,13 @@ import {useEffect, useState, type FunctionComponent} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {CellNode} from 'src/script/types/cellNode';
-
 import {LegacyCellsFoldersListModalContent} from './legacyCellsFoldersListModalContent';
 import {useLegacyGetCellsFolders} from './useLegacyGetCellsFolders';
 import {useLegacyMoveCellsNode} from './useLegacyMoveCellsNode';
 
+import {useApplicationContext} from '../../../../../../../../page/rootProvider';
 import {CellsRepository} from '../../../../../../../../repositories/cells/cellsRepository';
+import {CellNode} from '../../../../../../../../types/cellNode';
 import {CellsModal} from '../../../../../common/cellsModal/cellsModal';
 import {CellsNewNodeForm} from '../../../../../common/cellsNewNodeForm/cellsNewNodeForm';
 import {getCellsFilesPath} from '../../../../../common/getCellsFilesPath/getCellsFilesPath';

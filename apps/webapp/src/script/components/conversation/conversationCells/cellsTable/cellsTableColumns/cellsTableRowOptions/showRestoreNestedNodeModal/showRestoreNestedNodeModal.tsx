@@ -17,11 +17,10 @@
  *
  */
 
-import type {RootContextValue} from 'src/script/page/rootProvider';
-import {CellNodeType, CellNode} from 'src/script/types/cellNode';
-
 import {modalContentStyles} from './showRestoreNestedNodeModal.styles';
 
+import type {RootContextValue} from '../../../../../../../page/rootProvider';
+import {CellNodeType, CellNode} from '../../../../../../../types/cellNode';
 import {replaceReactComponents} from '../../../../../../../util/localizerUtil/reactLocalizerUtil';
 import {PrimaryModal} from '../../../../../../Modals/PrimaryModal';
 

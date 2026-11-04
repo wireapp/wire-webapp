@@ -21,7 +21,7 @@ import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 import {ClientAction, GenericMessage} from '@wireapp/protocol-messaging';
 import {CryptographyMapper} from '../../../cryptography/CryptographyMapper';
 import {EventMapper} from '../../../conversation/EventMapper';
-import {SystemMessageType} from 'src/script/message/systemMessageType';
+import {SystemMessageType} from '../../../../message/systemMessageType';
 
 import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 
@@ -29,7 +29,7 @@ import {AssetTransferState} from '../../../assets/assetTransferState';
 import {ConversationState} from '../../../conversation/ConversationState';
 import {Conversation} from '../../../entity/Conversation';
 import {User} from '../../../entity/User';
-import {EventError} from 'src/script/error/eventError';
+import {EventError} from '../../../../error/eventError';
 import {
   createAssetAddEvent,
   createMemberLeaveEvent,

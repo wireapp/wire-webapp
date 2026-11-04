@@ -25,15 +25,15 @@ import {ConnectionEntity} from '../../../repositories/connection/connectionEntit
 import {User} from '../../../repositories/entity/User';
 import {TeamState} from '../../../repositories/team/TeamState';
 import {UserRepository} from '../../../repositories/user/userRepository';
-import {Config} from 'src/script/Config';
-import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
+import {Config} from '../../../Config';
+import {withThemeAndRootContext} from '../../../auth/util/test/testUtil';
 import {translateForTest} from '../../../util/test/translateForTest';
 import {setStrings, translate} from '../../../util/localizerUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {Core} from 'src/script/service/coreSingleton';
+} from '../../../page/testSupport/rootContextTestSupport';
+import {Core} from '../../../service/coreSingleton';
 
 import {UserModal, UserModalProps} from './UserModal';
 import {showUserModal, useUserModalState} from './UserModal.state';

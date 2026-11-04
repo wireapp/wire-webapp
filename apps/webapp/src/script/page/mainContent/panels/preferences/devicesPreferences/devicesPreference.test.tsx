@@ -30,12 +30,12 @@ import {ConversationState} from '../../../../../repositories/conversation/Conver
 import {CryptographyRepository} from '../../../../../repositories/cryptography/CryptographyRepository';
 import {Conversation} from '../../../../../repositories/entity/Conversation';
 import {User} from '../../../../../repositories/entity/User';
-import {withTheme} from 'src/script/auth/util/test/testUtil';
+import {withTheme} from '../../../../../auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {Core} from 'src/script/service/coreSingleton';
+} from '../../../../testSupport/rootContextTestSupport';
+import {Core} from '../../../../../service/coreSingleton';
 import {createUuid} from '../../../../../util/uuid';
 
 import {DevicesPreferences} from './devicesPreference';

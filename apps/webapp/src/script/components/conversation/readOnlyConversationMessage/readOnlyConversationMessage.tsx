@@ -24,8 +24,7 @@ import ko from 'knockout';
 
 import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
+import {useApplicationContext} from '../../../page/rootProvider';
 import {CONVERSATION_READONLY_STATE} from '../../../repositories/conversation/ConversationRepository';
 import {Conversation} from '../../../repositories/entity/Conversation';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';

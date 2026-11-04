@@ -19,8 +19,6 @@
 
 import type {FunctionComponent} from 'react';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {FileHistoryContent} from './FileHistoryContent';
 import {FileHistoryHeader} from './FileHistoryHeader';
 import {fileHistoryModalWrapperCss, fileVersionRestoreModalWrapperCss} from './FileHistoryModal.styles';
@@ -28,6 +26,7 @@ import {FileRestoreConfirmContent} from './FileRestoreConfirmContent';
 import {useFileHistoryModal} from './hooks/useFileHistoryModal';
 import {useFileVersions} from './hooks/useFileVersions';
 
+import {useApplicationContext} from '../../../page/rootProvider';
 import {handleEscDown} from '../../../util/keyboardUtil';
 import {FileLoader} from '../../FileFullscreenModal/FileLoader/FileLoader';
 import {ModalComponent} from '../ModalComponent';

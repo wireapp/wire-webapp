@@ -25,18 +25,17 @@ import {container} from 'tsyringe';
 import {CALL_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {Config} from 'src/script/Config';
-import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useAppMainState, ViewType} from 'src/script/page/state';
-
 import {callingContainer} from './CallingCell.styles';
 import {CallingControls} from './CallingControls';
 import {CallingHeader} from './CallingHeader';
 import {usePressSpaceToUnmute} from './usePressSpaceToUnmute/usePressSpaceToUnmute';
 
+import {Config} from '../../../Config';
 import {useConversationCall} from '../../../hooks/useConversationCall';
 import {useNoInternetCallGuard} from '../../../hooks/useNoInternetCallGuard/useNoInternetCallGuard';
+import {useUserPropertyValue} from '../../../hooks/useUserProperty';
+import {useApplicationContext} from '../../../page/rootProvider';
+import {useAppMainState, ViewType} from '../../../page/state';
 import type {Call} from '../../../repositories/calling/Call';
 import type {CallingRepository} from '../../../repositories/calling/CallingRepository';
 import {CallingViewMode, CallState, MuteState} from '../../../repositories/calling/CallState';

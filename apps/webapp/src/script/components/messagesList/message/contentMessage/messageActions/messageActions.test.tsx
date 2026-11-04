@@ -24,7 +24,7 @@ import {ContentMessage} from '../../../../../repositories/entity/message/content
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../../../page/testSupport/rootContextTestSupport';
 import {translate} from '../../../../../util/localizerUtil';
 import {translateForTest} from '../../../../../util/test/translateForTest';
 import {createUuid} from '../../../../../util/uuid';

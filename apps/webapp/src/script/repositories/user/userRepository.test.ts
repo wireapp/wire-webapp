@@ -43,7 +43,7 @@ import {TeamState} from '../team/TeamState';
 import type {UserRecord} from '../storage';
 import type {Translate} from '../../util/localizerUtil';
 import {matchQualifiedIds} from '../../util/qualifiedId';
-import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {requireValueForTest} from '../../page/testSupport/rootContextTestSupport';
 import {translateForTest} from '../../util/test/translateForTest';
 import {createUuid} from '../../util/uuid';
 

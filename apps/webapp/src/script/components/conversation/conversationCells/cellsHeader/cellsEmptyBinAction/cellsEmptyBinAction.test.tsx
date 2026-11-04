@@ -30,11 +30,11 @@ import {
   CELLS_SELF_USER_DRIVE_ROLE,
 } from '../../common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import type {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
-import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
+import {driveBulkActionsFeatureToggleName} from '../../../../../featureToggles/startupFeatureToggleNames';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../../../page/testSupport/rootContextTestSupport';
 import {translateForTest} from '../../../../../util/test/translateForTest';
 
 import {CellsEmptyBinAction} from './cellsEmptyBinAction';

@@ -19,10 +19,9 @@
 
 import type {FunctionComponent} from 'react';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {wrapperStyles} from './cellsSearch.styles';
 
+import {useApplicationContext} from '../../../../page/rootProvider';
 import {CellsSearchInput} from '../../../cellsSearchInput/cellsSearchInput';
 
 interface CellsSearchProps {

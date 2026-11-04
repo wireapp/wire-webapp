@@ -21,10 +21,9 @@ import type {FunctionComponent} from 'react';
 
 import {container} from 'tsyringe';
 
-import {useApplicationContext, useMainViewModel} from 'src/script/page/rootProvider';
-
 import {meetingCallingViewStyles} from './meetingCallingView.styles';
 
+import {useApplicationContext, useMainViewModel} from '../../../page/rootProvider';
 import {CallState} from '../../../repositories/calling/CallState';
 import {TeamState} from '../../../repositories/team/TeamState';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';

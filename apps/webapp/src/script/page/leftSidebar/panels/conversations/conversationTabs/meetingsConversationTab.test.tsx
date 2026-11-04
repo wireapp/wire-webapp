@@ -23,12 +23,12 @@ import {createStore, type StoreApi} from 'zustand/vanilla';
 
 import type {MeetingStoreState} from '../../../../../components/meeting/meetingStore/createMeetingStore';
 import {MeetingStoreProvider} from '../../../../../components/meeting/meetingStore/meetingStoreProvider';
-import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
+import {withThemeAndRootContext} from '../../../../../auth/util/test/testUtil';
 import {
   createExecutingFireAndForgetInvokerForTest,
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../../testSupport/rootContextTestSupport';
 import {translateForTest} from '../../../../../util/test/translateForTest';
 
 import {MeetingsConversationTab} from './meetingsConversationTab';

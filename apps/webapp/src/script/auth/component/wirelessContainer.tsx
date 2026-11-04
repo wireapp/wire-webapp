@@ -23,10 +23,9 @@ import {FormattedMessage} from 'react-intl';
 
 import {CloseIcon, Content, Footer, Header, Link, Small} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {LogoFullIcon} from '../../components/icon';
 import {Config} from '../../Config';
+import {useApplicationContext} from '../../page/rootProvider';
 import {EXTERNAL_ROUTE} from '../externalRoute';
 
 interface WirelessContainerProps {

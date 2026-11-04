@@ -23,12 +23,11 @@ import {isNonEmptyString} from '@sindresorhus/is';
 
 import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {CellNode, CellNodeType} from 'src/script/types/cellNode';
-
 import {buttonStyles, iconStyles, textStyles} from './cellsTableRowOptions.styles';
 
+import {useApplicationContext} from '../../../../../page/rootProvider';
 import {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
+import {CellNode, CellNodeType} from '../../../../../types/cellNode';
 import {forcedDownloadFile} from '../../../../../util/util';
 import {openFolder} from '../../../common/openFolder/openFolder';
 import {useShouldRestrictGlobalDriveNodeActions} from '../../../common/useShouldRestrictGlobalDriveNodeActions/useShouldRestrictGlobalDriveNodeActions';

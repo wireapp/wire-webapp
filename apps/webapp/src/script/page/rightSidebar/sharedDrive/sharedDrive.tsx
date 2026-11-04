@@ -25,8 +25,6 @@ import {noop} from 'noop-esm';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {
   sharedDriveAvatarCss,
   sharedDriveContainerCss,
@@ -54,6 +52,7 @@ import {Conversation} from '../../../repositories/entity/Conversation';
 import {User} from '../../../repositories/entity/User';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {capitalizeFirstChar, sortUsersByPriority} from '../../../util/stringUtil';
+import {useApplicationContext} from '../../rootProvider';
 import {PanelHeader} from '../panelHeader';
 
 interface SharedDriveProps {

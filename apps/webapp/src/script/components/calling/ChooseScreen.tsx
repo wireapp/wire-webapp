@@ -22,8 +22,7 @@ import {Fragment, useCallback, useEffect, useRef} from 'react';
 import type {JSX} from '@emotion/react/jsx-runtime';
 import {container} from 'tsyringe';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
+import {useApplicationContext} from '../../page/rootProvider';
 import {CallingViewMode, CallState} from '../../repositories/calling/CallState';
 import {ElectronDesktopCapturerSource} from '../../repositories/media/MediaDevicesHandler';
 import {useKoSubscribableChildren} from '../../util/componentUtil';

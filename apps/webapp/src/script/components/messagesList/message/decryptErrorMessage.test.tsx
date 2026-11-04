@@ -30,7 +30,7 @@ import {setStrings, translate} from '../../../util/localizerUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../page/testSupport/rootContextTestSupport';
 
 import {DecryptErrorMessage} from './decryptErrorMessage';
 

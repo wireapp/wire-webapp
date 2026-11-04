@@ -21,15 +21,14 @@ import {type ReactNode, useEffect, useMemo, type FunctionComponent} from 'react'
 
 import {container} from 'tsyringe';
 
-import {createBrowserSystemNotificationApi} from 'src/script/browser/notification/createSystemNotificationApiFromBrowserNotification';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {createMeetingLifecycleDispatcher} from './createMeetingLifecycleDispatcher';
 import {createMeetingStore} from './createMeetingStore';
 import {MeetingStoreProvider} from './meetingStoreProvider';
 import {subscribeToMeetingConversationEvents} from './subscribeToMeetingConversationEvents';
 import {subscribeToMeetingLifecycleEvents} from './subscribeToMeetingLifecycleEvents';
 
+import {createBrowserSystemNotificationApi} from '../../../browser/notification/createSystemNotificationApiFromBrowserNotification';
+import {useApplicationContext} from '../../../page/rootProvider';
 import {UserState} from '../../../repositories/user/userState';
 import {getLogger} from '../../../util/logger';
 import {formatTimeShort} from '../../../util/timeUtil';

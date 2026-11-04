@@ -19,8 +19,7 @@
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 
-import {StatusType} from 'src/script/message/statusType';
-
+import {StatusType} from '../../../message/statusType';
 import {Message} from '../../../repositories/entity/message/message';
 
 const bottomStickThresholdInPixels = 100;

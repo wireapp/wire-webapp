@@ -24,14 +24,13 @@ import {useDebouncedCallback} from 'use-debounce';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import * as Icon from '../../../../components/icon';
 import {ServiceList} from '../../../../components/ServiceList/ServiceList';
 import {getManageServicesUrl} from '../../../../externalRoute';
 import {IntegrationRepository} from '../../../../repositories/integration/IntegrationRepository';
 import {ServiceEntity} from '../../../../repositories/integration/ServiceEntity';
 import {safeWindowOpen} from '../../../../util/sanitizationUtil';
+import {useApplicationContext} from '../../../rootProvider';
 
 const SEARCH_DEBOUNCE_MILLISECONDS = 300;
 

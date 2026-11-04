@@ -27,9 +27,6 @@ import {container} from 'tsyringe';
 
 import {STATE as CALL_STATE} from '@wireapp/avs';
 
-import {Config} from 'src/script/Config';
-import {useApplicationContext, useMainViewModel} from 'src/script/page/rootProvider';
-
 import {
   joinMeetingCall,
   joinMeetingCallErrors,
@@ -37,10 +34,12 @@ import {
   type JoinMeetingCallError,
 } from './joinMeetingCall';
 
+import {Config} from '../../Config';
 import {
   showCallNotEstablishedModal,
   useNoInternetCallGuard,
 } from '../../hooks/useNoInternetCallGuard/useNoInternetCallGuard';
+import {useApplicationContext, useMainViewModel} from '../../page/rootProvider';
 import type {CallMediaChoice} from '../../repositories/calling/callMediaChoice';
 import {CallState} from '../../repositories/calling/CallState';
 import {ConversationState} from '../../repositories/conversation/ConversationState';

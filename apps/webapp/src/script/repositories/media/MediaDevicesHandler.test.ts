@@ -20,7 +20,7 @@
 import {MediaDeviceType} from './MediaDeviceType';
 import {MediaDevicesHandler} from './MediaDevicesHandler';
 import {isUndefined} from '@sindresorhus/is';
-import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {requireValueForTest} from '../../page/testSupport/rootContextTestSupport';
 import {mediaDevicesStore} from './useMediaDevicesStore';
 import {loadValue, storeValue} from '../../util/storageUtil';
 

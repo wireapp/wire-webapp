@@ -24,7 +24,7 @@ import {ServiceEntity} from '../../repositories/integration/ServiceEntity';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../page/testSupport/rootContextTestSupport';
 import {createUuid} from '../../util/uuid';
 
 import {ServiceList} from './ServiceList';

@@ -23,8 +23,6 @@ import {amplify} from 'amplify';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {
   buttonCss,
   confirmLeaveModalBodyCss,
@@ -37,6 +35,7 @@ import {ModalComponent} from '../../../../../../components/Modals/ModalComponent
 import {EventName} from '../../../../../../repositories/tracking/eventName';
 import {Segmentation} from '../../../../../../repositories/tracking/segmentation';
 import {WebAppEvents} from '../../../../../../webAppEvents';
+import {useApplicationContext} from '../../../../../rootProvider';
 
 interface Props {
   isShown: boolean;

@@ -20,8 +20,6 @@
 import {isUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
-import {Config} from 'src/script/Config';
-
 import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {
   ModalOptions,
@@ -30,6 +28,7 @@ import {
   PrimaryModalTranslatedValue,
   PrimaryModalType,
 } from '../../components/Modals/PrimaryModal/PrimaryModalTypes';
+import {Config} from '../../Config';
 import type {Translate, TranslationKey} from '../../util/localizerUtil';
 import {WebAppEvents} from '../../webAppEvents';
 

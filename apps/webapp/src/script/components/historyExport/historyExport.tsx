@@ -25,10 +25,9 @@ import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, FlexBox} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {ContentState} from 'src/script/page/useAppState';
-
 import {Config} from '../../Config';
+import {useApplicationContext} from '../../page/rootProvider';
+import {ContentState} from '../../page/useAppState';
 import {CancelError} from '../../repositories/backup/error';
 import {ClientState} from '../../repositories/client/ClientState';
 import {User} from '../../repositories/entity/User';

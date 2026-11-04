@@ -19,10 +19,9 @@
 
 import {useState, type FunctionComponent} from 'react';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {containerStyles, imageStyles} from './imageAssetSmall.styles';
 
+import {useApplicationContext} from '../../../../../../../../page/rootProvider';
 import {FileFullscreenModal} from '../../../../../../../FileFullscreenModal/FileFullscreenModal';
 import {MediaFilePreviewCard} from '../../common/mediaFilePreviewCard/mediaFilePreviewCard';
 

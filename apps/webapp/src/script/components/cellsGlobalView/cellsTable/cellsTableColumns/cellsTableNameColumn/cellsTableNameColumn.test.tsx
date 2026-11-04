@@ -26,8 +26,8 @@ import {CELLS_SELF_USER_DRIVE_ROLE} from '../../../../conversation/conversationC
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {CellFile, CellNodeType} from 'src/script/types/cellNode';
+} from '../../../../../page/testSupport/rootContextTestSupport';
+import {CellFile, CellNodeType} from '../../../../../types/cellNode';
 import {translateForTest} from '../../../../../util/test/translateForTest';
 
 import {CellsTableNameColumn} from './cellsTableNameColumn';

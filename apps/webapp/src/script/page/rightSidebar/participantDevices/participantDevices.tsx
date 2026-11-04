@@ -19,13 +19,12 @@
 
 import {FC} from 'react';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {FadingScrollbar} from '../../../components/fadingScrollbar';
 import {UserDevices, UserDevicesState} from '../../../components/userDevices';
 import {useUserDevicesHistory} from '../../../hooks/useUserDevicesHistory';
 import type {User} from '../../../repositories/entity/User';
 import {ViewModelRepositories} from '../../../view_model/MainViewModel';
+import {useApplicationContext} from '../../rootProvider';
 import {PanelHeader} from '../panelHeader';
 
 interface ParticipantDevicesProps {

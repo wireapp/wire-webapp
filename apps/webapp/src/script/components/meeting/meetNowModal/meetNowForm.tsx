@@ -23,11 +23,10 @@ import {isNonEmptyString} from '@sindresorhus/is';
 
 import {CircleCloseIcon, ErrorMessage, getOverlayPortalContainer, Input} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {meetNowFormLayoutStyles} from './meetNowModal.styles';
 import type {MeetNowFormState} from './meetNowTypes';
 
+import {useApplicationContext} from '../../../page/rootProvider';
 import type {User} from '../../../repositories/entity/User';
 import {MeetingParticipantsPicker} from '../meetingParticipantsPicker';
 import {MeetingLinkForm} from '../shared/meetingLinkForm/meetingLinkForm';

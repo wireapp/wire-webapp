@@ -23,8 +23,8 @@ import {
   applockRefactoredFeatureToggleName,
   conversationListCollapseFeatureToggleName,
   forTestsOnlyFeatureToggleName,
-} from 'src/script/featureToggles/startupFeatureToggleNames';
-import {startupFeatureToggleQueryParameterName} from 'src/script/featureToggles/startupFeatureToggles';
+} from '../../../src/script/featureToggles/startupFeatureToggleNames';
+import {startupFeatureToggleQueryParameterName} from '../../../src/script/featureToggles/startupFeatureToggles';
 
 import {applyStartupFeatureToggleOverridesToUrl} from './startupFeatureToggleOverrides';
 

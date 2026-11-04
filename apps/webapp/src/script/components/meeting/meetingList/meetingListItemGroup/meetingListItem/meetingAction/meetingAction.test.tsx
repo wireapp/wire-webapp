@@ -35,7 +35,7 @@ import {translateForTest} from '../../../../../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../../../../page/testSupport/rootContextTestSupport';
 
 const start = new Date('2026-06-15T14:00:00.000Z');
 const end = new Date('2026-06-15T15:00:00.000Z');

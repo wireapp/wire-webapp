@@ -21,11 +21,10 @@ import type {FunctionComponent} from 'react';
 
 import {ConversationSettingsIcon, MLSVerified} from '@wireapp/react-ui-kit';
 
-import {SystemMessageType} from 'src/script/message/systemMessageType';
-
 import {SystemMessageBase} from './systemMessageBase';
 import {renderMemberRoleUpdateSystemMessageCaption, renderMlsSystemMessageCaption} from './systemMessageCaption';
 
+import {SystemMessageType} from '../../../../message/systemMessageType';
 import {AdminlessDeleteReminderMessage} from '../../../../repositories/entity/message/adminlessDeleteReminderMessage';
 import {E2EIVerificationMessage} from '../../../../repositories/entity/message/e2eiVerificationMessage';
 import {JoinedAfterMLSMigrationFinalisationMessage} from '../../../../repositories/entity/message/joinedAfterMlsMigrationFinalisationMessage';

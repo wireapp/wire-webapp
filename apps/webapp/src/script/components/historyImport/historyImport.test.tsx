@@ -31,8 +31,8 @@ import {
 import {PrimaryModal, removeCurrentModal} from '../Modals/PrimaryModal';
 import {BackupRepository} from '../../repositories/backup/backupRepository';
 import {User} from '../../repositories/entity/User';
-import * as RootProvider from 'src/script/page/rootProvider';
-import {RootContextValue} from 'src/script/page/rootProvider';
+import * as RootProvider from '../../page/rootProvider';
+import {RootContextValue} from '../../page/rootProvider';
 import * as BackupUtil from '../../util/backupUtil';
 import * as Util from '../../util/util';
 

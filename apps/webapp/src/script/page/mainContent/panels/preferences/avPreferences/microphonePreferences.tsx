@@ -21,8 +21,6 @@ import {useEffect, useState, type FunctionComponent} from 'react';
 
 import {useDebouncedCallback} from 'use-debounce';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {DeviceSelect} from './deviceSelect';
 import {InputLevel} from './inputLevel';
 
@@ -33,6 +31,7 @@ import {MediaStreamHandler} from '../../../../../repositories/media/MediaStreamH
 import {MediaType} from '../../../../../repositories/media/MediaType';
 import {useMediaDevicesStore} from '../../../../../repositories/media/useMediaDevicesStore';
 import {getLogger} from '../../../../../util/logger';
+import {useApplicationContext} from '../../../../rootProvider';
 import {PreferencesSection} from '../components/preferencesSection';
 
 const logger = getLogger('MicrophonePreferences');

@@ -28,11 +28,11 @@ import {PrimaryModal} from '../../../Modals/PrimaryModal';
 import {MessageContent} from '../../../Modals/PrimaryModal/Content/MessageContent';
 import en from '../../../../../i18n/en-US.json';
 import {User} from '../../../../repositories/entity/User';
-import {generateQualifiedIds} from 'src/script/auth/util/test/testUtil';
+import {generateQualifiedIds} from '../../../../auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../../page/testSupport/rootContextTestSupport';
 import {setStrings, translate} from '../../../../util/localizerUtil';
 import {translateForTest} from '../../../../util/test/translateForTest';
 

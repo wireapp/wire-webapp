@@ -19,14 +19,13 @@
 
 import {useCallback} from 'react';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {useMeetingStore} from './meetingStore/meetingStoreProvider';
 import {meetingSubmitErrors} from './meetingSubmitErrors';
 import {useScheduleMeetingModal} from './scheduleMeetingModal/useScheduleMeetingModal';
 import {getScheduleMeetingSubmitErrorTranslationKeys} from './shared/submit/meetingSubmitErrorKeys';
 import type {MeetingInstance} from './types/meetingInstance';
 
+import {useApplicationContext} from '../../page/rootProvider';
 import {PrimaryModal} from '../Modals/PrimaryModal';
 
 type UseEditMeetingResult = {editMeeting: (meetingInstance: MeetingInstance) => Promise<void>};

@@ -18,7 +18,6 @@
     "paths": {
       "@sindresorhus/is": ["../../node_modules/@sindresorhus/is/distribution/index.d.ts"],
     },
-    "rootDirs": ["src"],
     "target": "ESNext",
     "strict": true,
     "strictPropertyInitialization": false,

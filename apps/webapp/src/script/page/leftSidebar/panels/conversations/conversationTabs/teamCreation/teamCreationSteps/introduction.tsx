@@ -21,9 +21,6 @@ import type {ReactNode, FunctionComponent} from 'react';
 
 import {Button, CheckRoundIcon, Link} from '@wireapp/react-ui-kit';
 
-import {Config} from 'src/script/Config';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {StepProps} from './stepProps';
 import {
   checkIconCss,
@@ -33,7 +30,9 @@ import {
   modalButtonsCss,
 } from './teamCreationSteps.styles';
 
+import {Config} from '../../../../../../../Config';
 import {renderReactTranslation} from '../../../../../../../util/localizerUtil/reactLocalizerUtil';
+import {useApplicationContext} from '../../../../../../rootProvider';
 import {buttonCss} from '../teamCreation.styles';
 
 type RenderIntroductionListItemOptions = {

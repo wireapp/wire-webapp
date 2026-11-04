@@ -28,12 +28,11 @@ import {AnyAction, Dispatch} from 'redux';
 import {ValidationUtil} from '@wireapp/commons';
 import {Button, Checkbox, CheckboxLabel, Form, Input, Text} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {styles} from './accountForm.styles';
 import {Exception} from './exception';
 
 import {Config} from '../../Config';
+import {useApplicationContext} from '../../page/rootProvider';
 import {handleEnterDown} from '../../util/keyboardUtil';
 import {getLogger} from '../../util/logger';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';

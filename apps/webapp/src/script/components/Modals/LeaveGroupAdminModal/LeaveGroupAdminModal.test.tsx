@@ -23,12 +23,12 @@ import {act, fireEvent, render, waitFor, type RenderResult} from '@testing-libra
 
 import {User} from '../../../repositories/entity/User';
 import {generateConversation} from '../../../../../test/helper/ConversationGenerator';
-import {withTheme} from 'src/script/auth/util/test/testUtil';
+import {withTheme} from '../../../auth/util/test/testUtil';
 import {translateForTest} from '../../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../page/testSupport/rootContextTestSupport';
 
 import {LeaveGroupAdminModal} from './LeaveGroupAdminModal';
 import {useLeaveGroupAdminModalStore} from './useLeaveGroupAdminModalStore';

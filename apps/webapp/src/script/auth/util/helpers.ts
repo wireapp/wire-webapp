@@ -19,8 +19,8 @@
 
 import {container} from 'tsyringe';
 
-import {Config} from 'src/script/Config';
-import {Core} from 'src/script/service/coreSingleton';
+import {Config} from '../../Config';
+import {Core} from '../../service/coreSingleton';
 
 export function getEnterpriseLoginV2FF(): boolean {
   const core = container.resolve(Core);

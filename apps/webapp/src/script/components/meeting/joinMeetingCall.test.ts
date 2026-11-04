@@ -23,7 +23,7 @@ import {STATE as CALL_STATE, CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
 import {asyncNoop} from 'noop-esm';
 import {task} from 'true-myth';
 
-import {buildMediaDevicesHandler, createConversation, createSelfParticipant} from 'src/script/auth/util/test/testUtil';
+import {buildMediaDevicesHandler, createConversation, createSelfParticipant} from '../../auth/util/test/testUtil';
 import {joinMeetingCall, joinMeetingCallErrors, type JoinMeetingCallDeps} from './joinMeetingCall';
 import {unwrapErr} from '../../util/test/resultTestSupport';
 import {Call} from '../../repositories/calling/Call';
@@ -31,7 +31,7 @@ import type {Conversation} from '../../repositories/entity/Conversation';
 import type {ConversationRepository} from '../../repositories/conversation/ConversationRepository';
 import type {ConversationState} from '../../repositories/conversation/ConversationState';
 import type {CallingRepository} from '../../repositories/calling/CallingRepository';
-import type {CallingViewModel} from 'src/script/view_model/CallingViewModel';
+import type {CallingViewModel} from '../../view_model/CallingViewModel';
 
 const qualifiedConversationId = {domain: 'example.com', id: 'meeting-conversation-id'};
 const media = {cameraEnabled: true, microphoneEnabled: false};

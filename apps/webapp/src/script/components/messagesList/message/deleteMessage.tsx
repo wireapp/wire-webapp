@@ -21,11 +21,10 @@ import type {FunctionComponent} from 'react';
 
 import {noop} from 'noop-esm';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {MessageHeader} from './contentMessage/messageHeader';
 import {MessageTime} from './messageTime';
 
+import {useApplicationContext} from '../../../page/rootProvider';
 import {DeleteMessage as DeleteMessageEntity} from '../../../repositories/entity/message/deleteMessage';
 import {User} from '../../../repositories/entity/User';
 import {ServiceEntity} from '../../../repositories/integration/ServiceEntity';

@@ -26,9 +26,8 @@ import {z} from 'zod';
 
 import {Runtime} from '@wireapp/commons';
 
-import {createStringKeyValueStorageFromWebStorage} from 'src/script/browser/storage/createStringKeyValueStorageFromWebStorage';
-import {StringKeyValueStorage} from 'src/script/storage/stringKeyValueStorageTypes';
-
+import {createStringKeyValueStorageFromWebStorage} from '../browser/storage/createStringKeyValueStorageFromWebStorage';
+import {StringKeyValueStorage} from '../storage/stringKeyValueStorageTypes';
 import {getStorage} from '../util/localStorage';
 import {TIME_IN_MILLIS} from '../util/timeUtil';
 import {createUuid} from '../util/uuid';

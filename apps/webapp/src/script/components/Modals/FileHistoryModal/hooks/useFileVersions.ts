@@ -26,8 +26,7 @@ import {container} from 'tsyringe';
 
 import {parseQualifiedId} from '@wireapp/core';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
+import {useApplicationContext} from '../../../../page/rootProvider';
 import {CellsRepository} from '../../../../repositories/cells/cellsRepository';
 import {UserState} from '../../../../repositories/user/userState';
 import {getLogger} from '../../../../util/logger';

@@ -22,10 +22,9 @@ import type {FunctionComponent} from 'react';
 import {ClientClassification} from '@wireapp/api-client/lib/client';
 import cx from 'classnames';
 
-import {WireIdentity} from 'src/script/e2eIdentity';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
+import {WireIdentity} from '../../../../e2eIdentity';
 import {FormattedId} from '../../../../page/mainContent/panels/preferences/devicesPreferences/components/formattedId';
+import {useApplicationContext} from '../../../../page/rootProvider';
 import {type ClientEntity} from '../../../../repositories/client/ClientEntity';
 import {handleKeyDown, KEY} from '../../../../util/keyboardUtil';
 import {splitFingerprint} from '../../../../util/stringUtil';

@@ -45,13 +45,13 @@ import {
 import {User} from '../../../repositories/entity/User';
 import {TeamState} from '../../../repositories/team/TeamState';
 import {UserState} from '../../../repositories/user/userState';
-import {Config} from 'src/script/Config';
+import {Config} from '../../../Config';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {Core} from 'src/script/service/coreSingleton';
-import type {MainViewModel} from 'src/script/view_model/MainViewModel';
+} from '../../../page/testSupport/rootContextTestSupport';
+import {Core} from '../../../service/coreSingleton';
+import type {MainViewModel} from '../../../view_model/MainViewModel';
 import {translateForTest} from '../../../util/test/translateForTest';
 import {TIME_IN_MILLIS} from '../../../util/timeUtil';
 

@@ -25,8 +25,6 @@ import {isNonEmptyArray, isNonEmptyString, isNull, isNumber} from '@sindresorhus
 
 import {CloseIcon, Input, InputSubmitCombo, SearchIcon} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {FullSearchItem} from './fullSearch/fullSearchItem';
 import type {FullSearchProvider} from './fullSearch/useFullSearch';
 import {useFullSearch} from './fullSearch/useFullSearch';
@@ -36,6 +34,7 @@ import {getSearchRegex} from '../../../../repositories/search/fullTextSearch';
 import {isScrolledBottom} from '../../../../util/scrollHelpers';
 import {useEffectRef} from '../../../../util/useEffectRef';
 import {noop} from '../../../../util/util';
+import {useApplicationContext} from '../../../rootProvider';
 
 const MAX_VISIBLE_MESSAGES = 30;
 const PRE_MARKED_OFFSET = 20;

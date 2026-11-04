@@ -26,8 +26,8 @@ import {joinPreparedMeeting} from './joinPreparedMeeting';
 import type {CallingRepository} from '../../../repositories/calling/CallingRepository';
 import type {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
 import type {ConversationState} from '../../../repositories/conversation/ConversationState';
-import {createConversation} from 'src/script/auth/util/test/testUtil';
-import type {CallingViewModel} from 'src/script/view_model/CallingViewModel';
+import {createConversation} from '../../../auth/util/test/testUtil';
+import type {CallingViewModel} from '../../../view_model/CallingViewModel';
 import {translateForTest} from '../../../util/test/translateForTest';
 
 const qualifiedConversationId = {domain: 'example.com', id: 'meeting-conversation-id'};

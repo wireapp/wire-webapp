@@ -19,13 +19,12 @@
 
 import type {FunctionComponent} from 'react';
 
-import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {contentStyles, headingStyles, titleRowStyles, wrapperStyles} from './cellsHeader.styles';
 import {CellsRefresh} from './cellsRefresh/cellsRefresh';
 import {CellsSearch} from './cellsSearch/cellsSeach';
 
+import {driveBulkActionsFeatureToggleName} from '../../../featureToggles/startupFeatureToggleNames';
+import {useApplicationContext} from '../../../page/rootProvider';
 import {selectionBarAnchorStyles} from '../../cells/common/cellsSelectionBar/cellsSelectionBar.styles';
 import {CellsFiltersBar} from '../../conversation/conversationCells/common/cellsFiltersBar/cellsFiltersBar';
 import type {FilterConfig} from '../../conversation/conversationCells/common/cellsFiltersBar/filterConfig';

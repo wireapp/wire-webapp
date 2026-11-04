@@ -25,7 +25,7 @@ import {User} from '../../../repositories/entity/User';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../page/testSupport/rootContextTestSupport';
 import {KEY} from '../../../util/keyboardUtil';
 import {translateForTest} from '../../../util/test/translateForTest';
 

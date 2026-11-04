@@ -26,8 +26,6 @@ import {container} from 'tsyringe';
 import {Runtime} from '@wireapp/commons';
 import {TabIndex, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {PrimaryModal} from '../../../../../components/Modals/PrimaryModal';
 import {externalUrl, getManageTeamUrl} from '../../../../../externalRoute';
 import {User} from '../../../../../repositories/entity/User';
@@ -37,6 +35,7 @@ import {FEATURES, hasAccessToFeature} from '../../../../../repositories/user/use
 import {UserRepository} from '../../../../../repositories/user/userRepository';
 import {useKoSubscribableChildren} from '../../../../../util/componentUtil';
 import {WebAppEvents} from '../../../../../webAppEvents';
+import {useApplicationContext} from '../../../../rootProvider';
 import {PreferencesSection} from '../components/preferencesSection';
 
 interface AccountSecuritySectionProps {

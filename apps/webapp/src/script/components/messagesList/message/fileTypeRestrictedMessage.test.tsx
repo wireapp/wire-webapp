@@ -24,7 +24,7 @@ import {FileTypeRestrictedMessage as FileTypeRestrictedMessageEntity} from '../.
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../page/testSupport/rootContextTestSupport';
 import {setStrings, translate} from '../../../util/localizerUtil';
 
 import {FileTypeRestrictedMessage} from './fileTypeRestrictedMessage';

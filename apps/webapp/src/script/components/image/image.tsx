@@ -27,12 +27,11 @@ import {container} from 'tsyringe';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {failedWrapperStyles, getImageStyle, getWrapperStyles} from './image.styles';
 import {RestrictedImage} from './restrictedImage';
 
 import {Config} from '../../Config';
+import {useApplicationContext} from '../../page/rootProvider';
 import {AssetRemoteData} from '../../repositories/assets/assetRemoteData';
 import {MediumImage} from '../../repositories/entity/message/mediumImage';
 import {TeamState} from '../../repositories/team/TeamState';

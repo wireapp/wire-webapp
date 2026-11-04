@@ -24,14 +24,12 @@ import {useStore} from 'zustand';
 
 import {Button, ButtonVariant, ComputerIcon, Loading, NetworkBuildingIcon, WireLogoIcon} from '@wireapp/react-ui-kit';
 
-import {Config} from 'src/script/Config';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {PreferencesPage} from './components/preferencesPage';
 import {DiagnosticStatusIcon as StatusIcon} from './troubleshooting/diagnosticStatusIcon';
 import * as styles from './troubleshooting/troubleshooting.styles';
 
 import * as Icon from '../../../../components/icon';
+import {Config} from '../../../../Config';
 import type {
   TroubleshooterRepository,
   DiagnosticResult,
@@ -39,6 +37,7 @@ import type {
 import type {CheckId, CheckStatus} from '../../../../repositories/troubleshooter/troubleshooterService';
 import {copyText} from '../../../../util/clipboardUtil';
 import {downloadBlob} from '../../../../util/util';
+import {useApplicationContext} from '../../../rootProvider';
 
 const MILLISECONDS_PER_SECOND = 1_000;
 const statusTone = (status: CheckStatus): 'good' | 'warning' | 'bad' | 'muted' => {

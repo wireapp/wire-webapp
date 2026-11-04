@@ -23,10 +23,6 @@ import {isNonEmptyString} from '@sindresorhus/is';
 import {flexRender, getCoreRowModel, type Header, useReactTable} from '@tanstack/react-table';
 import {createPortal} from 'react-dom';
 
-import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {CellNode} from 'src/script/types/cellNode';
-
 import {CellsFilePreviewModal} from './cellsFilePreviewModal/cellsFilePreviewModal';
 import {
   headerCellStyles,
@@ -41,7 +37,10 @@ import {
 import {getCellsTableColumns, getCellsTableDataCellLabels} from './cellsTableColumns/cellsTableColumns';
 import {FilePreviewProvider} from './common/cellsFilePreviewModalContext/cellsFilePreviewModalContext';
 
+import {driveBulkActionsFeatureToggleName} from '../../../featureToggles/startupFeatureToggleNames';
+import {useApplicationContext} from '../../../page/rootProvider';
 import {CellsRepository} from '../../../repositories/cells/cellsRepository';
+import {CellNode} from '../../../types/cellNode';
 import {CellsSelectionBar} from '../../cells/common/cellsSelectionBar/cellsSelectionBar';
 import {CellsSortDirection} from '../../conversation/conversationCells/common/cellsSortIcon/cellsSortIcon';
 import {

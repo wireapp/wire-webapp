@@ -23,8 +23,7 @@ import {isNullOrUndefined} from '@sindresorhus/is';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
+import {useApplicationContext} from '../../../../page/rootProvider';
 import * as Icon from '../../../icon';
 
 interface ImageUploadButtonProps {

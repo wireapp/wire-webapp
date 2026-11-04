@@ -25,8 +25,6 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {partition} from 'underscore';
 import {useDebouncedCallback} from 'use-debounce';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {TopPeople} from './components/topPeople';
 
 import * as Icon from '../../../../components/icon';
@@ -45,6 +43,7 @@ import {getLogger} from '../../../../util/logger';
 import {safeWindowOpen} from '../../../../util/sanitizationUtil';
 import {sortByPriority} from '../../../../util/stringUtil';
 import {isBackendError} from '../../../../util/typePredicateUtil';
+import {useApplicationContext} from '../../../rootProvider';
 
 export type SearchResultsData = {contacts: User[]; others: User[]};
 

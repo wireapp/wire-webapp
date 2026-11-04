@@ -32,7 +32,7 @@ import {translateForTest} from '../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../page/testSupport/rootContextTestSupport';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
 import {withTheme, withThemeAndRootContext} from '../../auth/util/test/testUtil';

@@ -22,8 +22,6 @@ import {FC, useMemo, useState} from 'react';
 import {isNan, isNonEmptyArray, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {UsersReactions} from './userReactions';
 
 import {FadingScrollbar} from '../../../components/fadingScrollbar';
@@ -37,6 +35,7 @@ import {User} from '../../../repositories/entity/User';
 import {UserRepository} from '../../../repositories/user/userRepository';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {formatLocale} from '../../../util/timeUtil';
+import {useApplicationContext} from '../../rootProvider';
 import {PanelHeader} from '../panelHeader';
 import {PanelEntity, PanelState} from '../rightSidebar';
 

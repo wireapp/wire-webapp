@@ -22,8 +22,6 @@ import {ReactElement, useEffect, useRef, useState} from 'react';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isUndefined} from '@sindresorhus/is';
 
-import type {RootContextValue} from 'src/script/page/rootProvider';
-
 import {
   inputStyles,
   inputWrapperStyles,
@@ -47,6 +45,7 @@ import {
 } from './cellsShareModal.styles';
 import {useCellGlobalPublicLink} from './useCellGlobalPublicLink';
 
+import type {RootContextValue} from '../../../../../page/rootProvider';
 import {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
 import {createUuid} from '../../../../../util/uuid';
 import {CellsShareModalContent} from '../../../../cells/shareModal/cellsShareModalContent';

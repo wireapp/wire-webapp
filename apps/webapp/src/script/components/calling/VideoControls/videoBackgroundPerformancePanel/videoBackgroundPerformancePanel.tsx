@@ -24,8 +24,6 @@ import {Maybe} from 'true-myth';
 
 import {Button, ButtonVariant, CloseIcon, Option, Select} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {areCapabilityInfosEqual} from './capabilityInformationValidator';
 import {
   buttonBaseStyles,
@@ -43,6 +41,7 @@ import {
   performancePanelTitleStyles,
 } from './videoBackgroundPerformancePanel.styles';
 
+import {useApplicationContext} from '../../../../page/rootProvider';
 import {QualityMode} from '../../../../repositories/media/backgroundEffects';
 import {CapabilityInfo} from '../../../../repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
 import type {BackgroundEffectsHandler} from '../../../../repositories/media/backgroundEffectsHandler';

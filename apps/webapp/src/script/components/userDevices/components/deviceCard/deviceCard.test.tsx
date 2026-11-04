@@ -25,7 +25,7 @@ import type {ClientEntity} from '../../../../repositories/client/ClientEntity';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../../page/testSupport/rootContextTestSupport';
 
 import {DeviceCard} from './deviceCard';
 import {translateForTest} from '../../../../util/test/translateForTest';

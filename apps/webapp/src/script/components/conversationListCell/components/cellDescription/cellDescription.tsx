@@ -21,11 +21,10 @@ import type {FunctionComponent} from 'react';
 
 import cx from 'classnames';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {iconStyle} from './cellDescription.style';
 
 import {useLocalStorage} from '../../../../hooks/useLocalStorage';
+import {useApplicationContext} from '../../../../page/rootProvider';
 import {generateCellState} from '../../../../repositories/conversation/ConversationCellState';
 import {Conversation, UnreadState} from '../../../../repositories/entity/Conversation';
 import * as Icon from '../../../icon';

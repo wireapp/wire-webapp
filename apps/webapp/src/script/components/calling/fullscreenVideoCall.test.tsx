@@ -30,12 +30,12 @@ import {User} from '../../repositories/entity/User';
 import {PropertiesRepository} from '../../repositories/properties/propertiesRepository';
 import {PropertiesService} from '../../repositories/properties/propertiesService';
 import {SelfService} from '../../repositories/self/SelfService';
-import {buildCallingRepository, buildMediaDevicesHandler, withTheme} from 'src/script/auth/util/test/testUtil';
+import {buildCallingRepository, buildMediaDevicesHandler, withTheme} from '../../auth/util/test/testUtil';
 import {translateForTest} from '../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../page/testSupport/rootContextTestSupport';
 import {translate} from '../../util/localizerUtil';
 
 import {FullscreenVideoCall, FullscreenVideoCallProps} from './FullscreenVideoCall';

@@ -19,12 +19,11 @@
 
 import {isTruthy} from '@sindresorhus/is';
 
-import {categoryFromEvent} from 'src/script/message/messageCategorization';
-
 import type {EditableEvent} from './editedEventHandler';
 import {EventValidationError} from './EventValidationError';
 import {getCommonMessageUpdates} from './getCommonMessageUpdates';
 
+import {categoryFromEvent} from '../../../../../message/messageCategorization';
 import {MessageAddEvent} from '../../../../conversation/EventBuilder';
 import {StoredEvent} from '../../../../storage';
 import {CONVERSATION, ClientEvent} from '../../../Client';

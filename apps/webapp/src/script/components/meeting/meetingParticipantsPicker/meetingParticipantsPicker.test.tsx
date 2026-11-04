@@ -28,13 +28,13 @@ import type {ConversationRepository} from '../../../repositories/conversation/Co
 import type {SearchRepository} from '../../../repositories/search/searchRepository';
 import type {TeamRepository} from '../../../repositories/team/TeamRepository';
 import type {TeamState} from '../../../repositories/team/TeamState';
-import type {ConversationState} from 'src/script/repositories/conversation/ConversationState';
+import type {ConversationState} from '../../../repositories/conversation/ConversationState';
 import {
   createExecutingFireAndForgetInvokerForTest,
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
+} from '../../../page/testSupport/rootContextTestSupport';
+import {withThemeAndRootContext} from '../../../auth/util/test/testUtil';
 import {translateForTest} from '../../../util/test/translateForTest';
 
 import {formatParticipantsFieldLabel} from './formatParticipantsFieldLabel';

@@ -21,8 +21,7 @@ import type {FunctionComponent} from 'react';
 
 import {isEmptyString, isNonEmptyString} from '@sindresorhus/is';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
+import {useApplicationContext} from '../../../../../page/rootProvider';
 import {ConversationRepository} from '../../../../../repositories/conversation/ConversationRepository';
 import {handleEnterDown} from '../../../../../util/keyboardUtil';
 import {TextInput} from '../../../../TextInput';

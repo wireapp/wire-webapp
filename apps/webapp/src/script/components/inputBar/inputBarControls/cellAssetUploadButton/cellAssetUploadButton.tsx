@@ -19,8 +19,7 @@
 
 import type {FunctionComponent} from 'react';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
+import {useApplicationContext} from '../../../../page/rootProvider';
 import * as Icon from '../../../icon';
 
 interface CellAssetUploadButtonProps {
