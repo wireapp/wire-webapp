@@ -40,7 +40,7 @@ describe('PrimaryModal', () => {
     removeCurrentModal();
   });
 
-  it('replaces confirmation with a loading modal without closing it or allowing Escape', () => {
+  it('replaces confirmation with a loading modal and lets Escape dismiss it', () => {
     const close = jest.fn();
     render(withTheme(<PrimaryModalComponent translate={translateForTest} />), {wrapper: rootProviderWrapper});
     act(() => {
@@ -57,9 +57,9 @@ describe('PrimaryModal', () => {
     });
     expect(usePrimaryModalState.getState().currentModalId).toBe('upload');
     expect(usePrimaryModalState.getState().currentModalContent.currentType).toBe(PrimaryModal.type.LOADING);
-    fireEvent.keyDown(document, {key: 'Escape'});
-    expect(usePrimaryModalState.getState().currentModalId).toBe('upload');
     expect(close).not.toHaveBeenCalled();
+    fireEvent.keyDown(document, {key: 'Escape'});
+    expect(usePrimaryModalState.getState().currentModalId).toBeNull();
   });
 
   it('places an optional force choice after the actions and submits the selected value', () => {

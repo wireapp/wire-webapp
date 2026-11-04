@@ -278,7 +278,7 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
 
   const onKeyDown = useCallback(
     (event: KeyboardEvent) => {
-      if (isEscapeKey(event) && !showLoadingIndicator) {
+      if (isEscapeKey(event)) {
         removeCurrentModal();
         closeAction();
       }
@@ -289,7 +289,7 @@ export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate
         removeCurrentModal();
       }
     },
-    [closeAction, primaryAction, showLoadingIndicator],
+    [closeAction, primaryAction],
   );
 
   useEffect(() => {
