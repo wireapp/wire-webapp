@@ -22,6 +22,7 @@ import {StatusCodes as HTTP_STATUS, StatusCodes} from 'http-status-codes';
 import {asyncNoop} from 'noop-esm';
 
 import {AuthActionCreator} from './creator/';
+import {joinLinkAction} from './joinLinkAction';
 import {LabeledError} from './labeledError';
 import {LocalStorageAction, LocalStorageKey} from './localStorageAction';
 
@@ -39,6 +40,7 @@ import {LowDiskSpaceError} from '../../../core/storage/engine/error';
 import {toError} from '../../../util/toError';
 import {isAxiosError, isBackendError} from '../../../util/typePredicateUtil';
 import {currentLanguage} from '../../localeConfig';
+import {clearMeetingJoinParameters, type MeetingLink} from '../../util/joinLink';
 import type {Api, RootState, ThunkAction, ThunkDispatch} from '../reducer';
 import type {LoginDataState, RegistrationDataState} from '../reducer/authReducer';
 
@@ -67,25 +69,25 @@ export class AuthAction {
     const onBeforeLogin: LoginLifecycleFunction = async (dispatch, getState, {actions: {authAction}}) => {
       return dispatch(authAction.doSilentLogout());
     };
-    const onAfterLogin: LoginLifecycleFunction = async (
-      dispatch,
-      getState,
-      {actions: {localStorageAction, conversationAction}},
-    ) => {
-      const conversation = await dispatch(conversationAction.doJoinConversationByCode(key, code, uri, password));
-      if (conversation === undefined) {
+    const onAfterLogin: LoginLifecycleFunction = async dispatch => {
+      const result = await dispatch(joinLinkAction.doJoinByLink(key, code, uri, password));
+      if (isNullOrUndefined(result)) {
         return;
       }
-      const domain = conversation?.qualified_conversation?.domain;
-      await dispatch(
-        localStorageAction.setLocalStorage(LocalStorageKey.AUTH.LOGIN_CONVERSATION_KEY, {
-          conversation: conversation.conversation,
-          domain,
-        }),
-      );
+      await dispatch(joinLinkAction.doStoreJoinDestination(result));
     };
 
-    return this.doLoginPlain(loginData, onBeforeLogin, onAfterLogin, getEntropy);
+    return async dispatch => {
+      try {
+        await dispatch(this.doLoginPlain(loginData, onBeforeLogin, onAfterLogin, getEntropy));
+      } catch (error: unknown) {
+        if (isBackendError(error) && error.label === BackendErrorLabel.TOO_MANY_CLIENTS) {
+          clearMeetingJoinParameters();
+        }
+        throw error;
+      }
+      clearMeetingJoinParameters();
+    };
   };
 
   doLoginPlain = (
@@ -182,17 +184,35 @@ export class AuthAction {
     };
   };
 
-  doFinalizeSSOLogin = ({clientType}: {clientType: ClientType}): ThunkAction => {
+  doFinalizeSSOLogin = ({
+    clientType,
+    meetingLink,
+    password,
+  }: {
+    clientType: ClientType;
+    meetingLink?: MeetingLink;
+    password?: string;
+  }): ThunkAction => {
     return async (dispatch, getState, {core, actions: {clientAction, selfAction, localStorageAction}}) => {
       dispatch(AuthActionCreator.startLogin());
       try {
         await core.init(clientType);
         await this.persistClientData(clientType, dispatch, localStorageAction);
         await dispatch(selfAction.fetchSelf());
+        if (!isNullOrUndefined(meetingLink)) {
+          const result = await dispatch(joinLinkAction.doJoinMeetingLink(meetingLink, password));
+          await dispatch(joinLinkAction.doStoreJoinDestination(result));
+        }
         await dispatch(clientAction.doInitializeClient(clientType));
+        if (!isNullOrUndefined(meetingLink)) {
+          clearMeetingJoinParameters();
+        }
         dispatch(AuthActionCreator.successfulLogin());
       } catch (error: unknown) {
         if (isBackendError(error) && error.label === BackendErrorLabel.TOO_MANY_CLIENTS) {
+          if (!isNullOrUndefined(meetingLink)) {
+            clearMeetingJoinParameters();
+          }
           dispatch(AuthActionCreator.successfulLogin());
         } else {
           dispatch(AuthActionCreator.failedLogin(toError(error)));

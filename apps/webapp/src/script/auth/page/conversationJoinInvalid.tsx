@@ -19,29 +19,61 @@
 
 import React, {type FunctionComponent} from 'react';
 
+import {StatusCodes} from 'http-status-codes';
 import {FormattedMessage} from 'react-intl';
+import {useSelector} from 'react-redux';
 
 import {Config} from '../../Config';
 import {useApplicationContext} from '../../page/rootProvider';
 import {ContainerXS} from '../../uiKit/layout/container/container';
 import {H2} from '../../uiKit/typography/heading/heading';
 import {Text} from '../../uiKit/typography/text/text';
+import {Button} from '../../uiKit/inputs/button/button';
 import {WirelessContainer} from '../component/wirelessContainer';
+import {getError} from '../module/selector/conversationSelector';
+import {ROUTE} from '../route';
+import {getJoinLink, JOIN_LINK_KIND} from '../util/joinLink';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
-const ConversationJoinInvalid: FunctionComponent<Props> = ({}: Props) => {
+const MeetingJoinInvalid: FunctionComponent = () => {
+  const {translate} = useApplicationContext();
+  const meetingError = useSelector(getError);
+  const unsupported = meetingError?.label === 'meeting-api-unsupported';
+  const missing = meetingError?.code === StatusCodes.NOT_FOUND || meetingError?.label === 'meeting-not-found';
+  let meetingMessage: 'failed' | 'unsupported' | 'invalid' = 'failed';
+  if (unsupported) {
+    meetingMessage = 'unsupported';
+  } else if (missing) {
+    meetingMessage = 'invalid';
+  }
+
+  return (
+    <WirelessContainer>
+      <ContainerXS style={{margin: 'auto'}}>
+        <H2 data-uie-name="status-invalid-headline">{translate(`meetingJoin.${meetingMessage}Headline`)}</H2>
+        <Text data-uie-name="status-invalid-text">{translate(`meetingJoin.${meetingMessage}Description`)}</Text>
+        {!unsupported && !missing && (
+          <Button
+            onClick={() => {
+              window.location.hash = `#${ROUTE.MEETING_JOIN}`;
+            }}
+          >
+            {translate('meetingJoin.retry')}
+          </Button>
+        )}
+      </ContainerXS>
+    </WirelessContainer>
+  );
+};
+
+const ConversationJoinInvalidContent: FunctionComponent = () => {
   const {translate} = useApplicationContext();
   return (
     <WirelessContainer>
       <ContainerXS style={{margin: 'auto'}}>
         <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} data-uie-name="status-invalid-headline">
-          <FormattedMessage
-            id="conversationJoin.invalidHeadline"
-            values={{
-              brandName: Config.getConfig().BRAND_NAME,
-            }}
-          />
+          <FormattedMessage id="conversationJoin.invalidHeadline" values={{brandName: Config.getConfig().BRAND_NAME}} />
         </H2>
         <Text style={{fontSize: '1rem', marginTop: '10px'}} data-uie-name="status-invalid-text">
           {translate('conversationJoin.invalidSubhead')}
@@ -49,6 +81,10 @@ const ConversationJoinInvalid: FunctionComponent<Props> = ({}: Props) => {
       </ContainerXS>
     </WirelessContainer>
   );
+};
+
+const ConversationJoinInvalid: FunctionComponent<Props> = ({}: Props) => {
+  return getJoinLink().kind === JOIN_LINK_KIND.MEETING ? <MeetingJoinInvalid /> : <ConversationJoinInvalidContent />;
 };
 
 const ConversationJoinFull: FunctionComponent<Props> = ({}: Props) => {

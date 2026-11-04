@@ -17,7 +17,7 @@
  *
  */
 
-import {isNonEmptyString} from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import express, {type Request, type Response} from 'express';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {Maybe, maybe} from 'true-myth';
@@ -47,9 +47,7 @@ export function createJoinConversationRedirectUrl(query: JoinRedirectQuery): May
   return Maybe.just(`/auth/?${queryParameters.toString()}#/join-conversation`);
 }
 
-export function redirectToJoinConversation(request: Request, response: Response): void {
-  const redirectUrl = createJoinConversationRedirectUrl(request.query);
-
+function sendJoinRedirect(response: Response, redirectUrl: Maybe<string>): void {
   maybe.match(
     {
       Just: url => {
@@ -63,6 +61,33 @@ export function redirectToJoinConversation(request: Request, response: Response)
   );
 }
 
+export function redirectToJoinConversation(request: Request, response: Response): void {
+  sendJoinRedirect(response, createJoinConversationRedirectUrl(request.query));
+}
+
+export function createJoinMeetingRedirectUrl(
+  query: JoinRedirectQuery & {readonly domain?: unknown; readonly password?: unknown},
+): Maybe<string> {
+  const {key, code, domain, password} = query;
+  if (
+    !isNonEmptyString(key) ||
+    !isNonEmptyString(code) ||
+    !isNonEmptyString(domain) ||
+    (!isNullOrUndefined(password) && typeof password !== 'string')
+  ) {
+    return Maybe.nothing();
+  }
+  const params = new URLSearchParams({meeting_domain: domain, meeting_key: key, meeting_code: code});
+  if (typeof password === 'string') {
+    params.set('meeting_password', password);
+  }
+  return Maybe.just(`/auth/?${params.toString()}#/join-meeting`);
+}
+
+export function redirectToJoinMeeting(request: Request, response: Response): void {
+  sendJoinRedirect(response, createJoinMeetingRedirectUrl(request.query));
+}
+
 export function RedirectRoutes(config: ServerConfig, buildMetadata: BuildMetadata): express.Router {
   const router = express.Router();
 
@@ -73,6 +98,7 @@ export function RedirectRoutes(config: ServerConfig, buildMetadata: BuildMetadat
     return res.contentType('text/plain; charset=UTF-8').send(robotsContent);
   });
   router.get('/join/?', redirectToJoinConversation);
+  router.get('/meeting-join/?', redirectToJoinMeeting);
   router.get('/browser/?', (req, res, next) => {
     if (config.DEVELOPMENT) {
       return next();

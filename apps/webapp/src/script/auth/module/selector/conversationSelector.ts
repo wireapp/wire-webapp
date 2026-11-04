@@ -29,6 +29,9 @@ export const isFetching = (state: RootState): boolean => {
 export const getError = (state: RootState): ConversationInfoError | null => {
   return state.conversationState.error;
 };
+export const hasPassword = (state: RootState): boolean => {
+  return state.conversationState.hasPassword || state.conversationState.conversationInfo?.has_password === true;
+};
 export const conversationInfo = (state: RootState): ConversationJoinData | null => {
   return state.conversationState.conversationInfo;
 };

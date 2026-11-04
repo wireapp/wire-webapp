@@ -28,6 +28,10 @@ export const QUERY_KEY = {
   DESTINATION_URL: 'destination_url',
   ENVIRONMENT: 'env',
   IMMEDIATE_LOGIN: 'immediate_login',
+  MEETING_DOMAIN: 'meeting_domain',
+  MEETING_KEY: 'meeting_key',
+  MEETING_CODE: 'meeting_code',
+  MEETING_PASSWORD: 'meeting_password',
   JOIN_EXPIRES: 'expires_in',
   LANGUAGE: 'hl',
   LOCALE: 'hl',
@@ -55,6 +59,10 @@ const OAUTH_QUERY_KEYS = {
 };
 
 export const FORWARDED_QUERY_KEYS = [
+  QUERY_KEY.MEETING_DOMAIN,
+  QUERY_KEY.MEETING_KEY,
+  QUERY_KEY.MEETING_CODE,
+  QUERY_KEY.MEETING_PASSWORD,
   QUERY_KEY.ACCOUNT_ID,
   QUERY_KEY.ENVIRONMENT,
   QUERY_KEY.LOCALE,
@@ -74,6 +82,8 @@ export const ROUTE = {
   AUTHORIZE: '/authorize',
   CLIENTS: '/clients',
   CONVERSATION_JOIN: '/join-conversation',
+  MEETING_JOIN: '/join-meeting',
+  MEETING_JOIN_INVALID: '/join-meeting-invalid',
   CONVERSATION_JOIN_INVALID: '/join-conversation-invalid',
   CREATE_ACCOUNT: '/createaccount',
   CREATE_TEAM: '/createteam',

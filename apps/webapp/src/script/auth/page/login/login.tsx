@@ -63,6 +63,7 @@ import {LoginForm} from '../../component/loginForm';
 import {EXTERNAL_ROUTE} from '../../externalRoute';
 import {useRouteA11y} from '../../hooks/useRouteA11Y';
 import {actionRoot} from '../../module/action';
+import {joinLinkAction} from '../../module/action/joinLinkAction';
 import {LabeledError} from '../../module/action/labeledError';
 import {ValidationError} from '../../module/action/validationError';
 import {RootState, ThunkDispatch} from '../../module/reducer';
@@ -72,6 +73,7 @@ import * as ConversationSelector from '../../module/selector/conversationSelecto
 import {QUERY_KEY, ROUTE} from '../../route';
 import {parseError, parseValidationErrors} from '../../util/errorUtil';
 import {getEnterpriseLoginV2FF} from '../../util/helpers';
+import {getJoinLink, isJoinLinkPasswordError} from '../../util/joinLink';
 import {getOAuthQueryString, withOAuthQuery} from '../../util/oauthUtil';
 import {getPrefixedSSOCode} from '../../util/urlUtil';
 import {EntropyContainer} from '../entropyContainer';
@@ -88,7 +90,6 @@ const LoginComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> 
   authError,
   resetAuthError,
   doCheckConversationCode,
-  doGetConversationInfoByCode,
   doInit,
   doSetLocalStorage,
   doInitializeClient,
@@ -103,6 +104,7 @@ const LoginComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> 
   defaultSSOCode,
   isSendingTwoFactorCode,
   conversationInfo,
+  conversationHasPassword,
   conversationInfoFetching,
   embedded,
   account,
@@ -187,8 +189,7 @@ const LoginComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> 
   }, [defaultSSOCode, embedded, navigate]);
 
   useEffect(() => {
-    const queryConversationCode = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_CODE);
-    const queryConversationKey = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_KEY);
+    const {code: queryConversationCode, key: queryConversationKey} = getJoinLink();
 
     const keyAndCodeExistent = isNonEmptyString(queryConversationKey) && isNonEmptyString(queryConversationCode);
     if (keyAndCodeExistent) {
@@ -197,11 +198,8 @@ const LoginComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> 
       doCheckConversationCode(queryConversationKey, queryConversationCode).catch((error: unknown) => {
         logger.warn('Invalid conversation code', error);
       });
-      doGetConversationInfoByCode(queryConversationKey, queryConversationCode).catch((error: unknown) => {
-        logger.warn('Failed to fetch conversation info', error);
-      });
     }
-  }, [doCheckConversationCode, doGetConversationInfoByCode]);
+  }, [doCheckConversationCode]);
 
   const immediateLogin = useCallback(async () => {
     try {
@@ -250,13 +248,7 @@ const LoginComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> 
   ): Promise<void> => {
     setValidationErrors(validationErrors);
 
-    if (
-      !isLinkPasswordModalOpen &&
-      (conversationInfo?.has_password === true ||
-        (conversationError !== undefined &&
-          conversationError !== null &&
-          conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD))
-    ) {
+    if (!isLinkPasswordModalOpen && (conversationHasPassword || isJoinLinkPasswordError(conversationError))) {
       setConversationSubmitData(formLoginData);
       setIsLinkPasswordModalOpen(true);
       return;
@@ -273,7 +265,7 @@ const LoginComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> 
         try {
           await doLoginAndJoin(login, conversationKey, conversationCode, undefined, getEntropy, conversationPassword);
         } catch (error: unknown) {
-          if (isBackendError(error) && error.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD) {
+          if (isBackendError(error) && isJoinLinkPasswordError(error)) {
             await resetAuthError();
             setConversationSubmitData(formLoginData);
             setIsLinkPasswordModalOpen(true);
@@ -630,18 +622,20 @@ type MapStateToPropsResult = {
   loginData: LoginDataState;
   authError: Error | null;
   conversationInfo: ConversationJoinData | null;
+  conversationHasPassword: boolean;
   conversationInfoFetching: boolean;
   account: RegistrationDataState;
 };
 const mapStateToProps = (state: RootState): MapStateToPropsResult => {
   return {
     defaultSSOCode: AuthSelector.getDefaultSSOCode(state),
-    isFetching: AuthSelector.isFetching(state),
+    isFetching: AuthSelector.isFetching(state) || ConversationSelector.isFetching(state),
     conversationError: ConversationSelector.getError(state),
     isSendingTwoFactorCode: AuthSelector.isSendingTwoFactorCode(state),
     loginData: AuthSelector.getLoginData(state),
     authError: AuthSelector.getError(state),
     conversationInfo: ConversationSelector.conversationInfo(state),
+    conversationHasPassword: ConversationSelector.hasPassword(state),
     conversationInfoFetching: ConversationSelector.conversationInfoFetching(state),
     account: AuthSelector.getAccount(state),
   };
@@ -671,12 +665,11 @@ type MapDispatchToPropsResult = {
   pushEntropyData: (entropy: Uint8Array<ArrayBufferLike>) => Promise<void>;
   pushLoginData: (loginData: Partial<LoginDataState>) => Promise<void>;
   resetAuthError: () => Promise<void>;
-  doGetConversationInfoByCode: (key: string, code: string) => Promise<ConversationJoinData | undefined>;
 };
 const mapDispatchToProps = (dispatch: ThunkDispatch): MapDispatchToPropsResult => {
   return {
     doCheckConversationCode: (...args: Parameters<typeof actionRoot.conversationAction.doCheckConversationCode>) => {
-      return dispatch(actionRoot.conversationAction.doCheckConversationCode(...args));
+      return dispatch(joinLinkAction.doCheckJoinLink(...args));
     },
     doInit: (...args: Parameters<typeof actionRoot.authAction.doInit>) => {
       return dispatch(actionRoot.authAction.doInit(...args));
@@ -704,11 +697,6 @@ const mapDispatchToProps = (dispatch: ThunkDispatch): MapDispatchToPropsResult =
     },
     resetAuthError: (...args: Parameters<typeof actionRoot.authAction.resetAuthError>) => {
       return dispatch(actionRoot.authAction.resetAuthError(...args));
-    },
-    doGetConversationInfoByCode: (
-      ...args: Parameters<typeof actionRoot.conversationAction.doGetConversationInfoByCode>
-    ) => {
-      return dispatch(actionRoot.conversationAction.doGetConversationInfoByCode(...args));
     },
   };
 };
