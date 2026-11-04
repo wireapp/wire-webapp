@@ -48,6 +48,7 @@ import {
 import {bulkMoveReducer} from './bulkMoveState';
 import {CellsBulkMovePreviewModal} from './cellsBulkMovePreviewModal/cellsBulkMovePreviewModal';
 import {normalizeCellsPath} from './cellsBulkMovePreviewModal/normalizeCellsPath';
+import {isBulkMoveValid} from './cellsBulkMovePreviewModal/validateBulkMove';
 import {CellsBulkMoveToBinConfirmationModal} from './cellsBulkMoveToBinConfirmationModal';
 import {CellsFilePreviewModal} from './cellsFilePreviewModal/cellsFilePreviewModal';
 import {
