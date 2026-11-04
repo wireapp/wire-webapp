@@ -205,6 +205,9 @@ const translateSelectionForTest: Translate = (key, substitutions) => {
   if (key === 'cells.bulkRestore.confirmation.title') {
     return 'Restore selected items?';
   }
+  if (key === 'cells.bulkRestore.confirmation.button') {
+    return 'Restore selected items';
+  }
   if (key === 'cells.restoreRootNodeModal.file.headline') {
     return 'Restore file?';
   }
@@ -3629,7 +3632,7 @@ describe('CellsTable restoring selected Bin items', () => {
     await user.click(screen.getByRole('button', {name: 'Restore'}));
     const confirmation = await screen.findByRole('dialog');
     expect(within(confirmation).getByText('Restore 2 selected items to their original location?')).toBeInTheDocument();
-    await user.click(within(confirmation).getByRole('button', {name: 'Restore'}));
+    await user.click(within(confirmation).getByRole('button', {name: 'Restore selected items'}));
 
     await waitFor(() => {
       expect(repository.restoreNodes).toHaveBeenCalledTimes(1);
@@ -3712,7 +3715,8 @@ describe('CellsTable restoring selected Bin items', () => {
     expect(
       within(confirmation).getByText(/The folder Reports with all its files will be restored\./),
     ).toBeInTheDocument();
-    await user.click(within(confirmation).getByRole('button', {name: 'Restore Parent Folder'}));
+    expect(within(confirmation).getByText(/Restore 2 selected items to their original location/)).toBeInTheDocument();
+    await user.click(within(confirmation).getByRole('button', {name: 'Restore selected items'}));
 
     await waitFor(() => {
       expect(repository.restoreNodes).toHaveBeenCalledTimes(1);
@@ -3720,6 +3724,33 @@ describe('CellsTable restoring selected Bin items', () => {
     expect(repository.lookupNodeByPath).toHaveBeenCalledTimes(1);
     expect(repository.restoreNodes).toHaveBeenCalledWith({uuids: ['folder-uuid']});
   });
+
+  it.each([THEME_ID.LIGHT, THEME_ID.DARK])(
+    'summarizes a mixed restore alongside the deleted parent explanation in %s mode',
+    async themeId => {
+      const user = userEvent.setup();
+      const repository = createRepository();
+      renderCellsTable({
+        cellsRepository: repository,
+        themeId,
+        initialNodes: [createBinNode('standalone.txt'), createBinNode('nested.txt', 'Reports/nested.txt')],
+      });
+
+      await user.click(screen.getByRole('checkbox', {name: 'Select standalone.txt'}));
+      await user.click(screen.getByRole('checkbox', {name: 'Select nested.txt'}));
+      await user.click(screen.getByRole('button', {name: 'Restore'}));
+      const confirmation = await screen.findByRole('dialog');
+      expect(within(confirmation).getByText(/Restore 2 selected items to their original location/)).toBeInTheDocument();
+      expect(
+        within(confirmation).getByText(/The folder Reports with all its files will be restored/),
+      ).toBeInTheDocument();
+      await user.click(within(confirmation).getByRole('button', {name: 'Restore selected items'}));
+
+      await waitFor(() => {
+        return expect(repository.restoreNodes).toHaveBeenCalledWith({uuids: ['standalone.txt-id', 'folder-uuid']});
+      });
+    },
+  );
 
   it('does not send a request when the confirmation is cancelled', async () => {
     const user = userEvent.setup();

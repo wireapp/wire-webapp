@@ -70,11 +70,11 @@ export const showBulkRestoreModal = ({
     {
       primaryAction: {
         action: onRestore,
-        text: translate(hasParentRestore ? 'cells.restoreNestedNodeModal.button' : 'cells.options.restore'),
+        text: translate('cells.bulkRestore.confirmation.button'),
       },
       text: {
         message: hasParentRestore
-          ? `${translate('cells.restoreNestedNodeModal.description1')} ${translate('cells.restoreNestedNodeModal.description2', {name: parentNames.join(', ')})}`
+          ? `${translate('cells.bulkRestore.confirmation.multiple', {count: selectedNodes.length})} ${translate('cells.restoreNestedNodeModal.description1')} ${translate('cells.restoreNestedNodeModal.description2', {name: parentNames.join(', ')})}`
           : translate('cells.bulkRestore.confirmation.multiple', {count: selectedNodes.length}),
         title: translate('cells.bulkRestore.confirmation.title'),
       },

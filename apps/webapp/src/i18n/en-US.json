@@ -436,6 +436,7 @@
   "cells.bulkMoveToBin.requestFailed": "The request result is unknown. Refresh Drive and Bin before trying again.",
   "cells.bulkMoveToBin.statusUnknown": "The job status could not be checked. Refresh Drive and Bin before taking further action.",
   "cells.bulkRestore.confirmation.multiple": "Restore {count} selected items to their original location?",
+  "cells.bulkRestore.confirmation.button": "Restore selected items",
   "cells.bulkRestore.confirmation.title": "Restore selected items?",
   "cells.bulkRestore.restoring": "Restoring selected items…",
   "cells.clearFilters.button": "Clear all",
