@@ -21,14 +21,14 @@ import type {FunctionComponent} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {CellsNewNodeForm} from 'Components/conversation/conversationCells/common/cellsNewNodeForm/cellsNewNodeForm';
-import {useCellsNewFolderForm} from 'Components/conversation/conversationCells/common/useCellsNewNodeForm/useCellsNewFolderForm';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {descriptionStyles} from './cellsNewFolderModal.styles';
 
+import {CellsRepository} from '../../../../../../repositories/cells/cellsRepository';
 import {CellsModal} from '../../../common/cellsModal/cellsModal';
+import {CellsNewNodeForm} from '../../../common/cellsNewNodeForm/cellsNewNodeForm';
+import {useCellsNewFolderForm} from '../../../common/useCellsNewNodeForm/useCellsNewFolderForm';
 
 interface CellsNewFolderModalProps {
   isOpen: boolean;

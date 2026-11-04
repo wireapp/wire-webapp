@@ -19,9 +19,9 @@
 
 import {fireEvent, render, waitFor} from '@testing-library/react';
 
-import {GiphyRepository} from 'Repositories/extension/GiphyRepository';
+import {GiphyRepository} from '../../repositories/extension/GiphyRepository';
 import {withTheme} from 'src/script/auth/util/test/testUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

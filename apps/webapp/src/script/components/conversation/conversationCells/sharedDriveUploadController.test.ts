@@ -17,10 +17,14 @@
  *
  */
 
-import type {UploadSource, UploadState} from 'Repositories/cells/upload';
-import {createCellsUploadManager, type CellsUploadManager} from 'Repositories/cells/upload/manager';
-import type {CellsUploadGateway, CellsUploadGatewayError, UploadDraftRequest} from 'Repositories/cells/upload/gateway';
-import type {DraftIdentity} from 'Repositories/cells/upload/identity';
+import type {UploadSource, UploadState} from '../../../repositories/cells/upload';
+import {createCellsUploadManager, type CellsUploadManager} from '../../../repositories/cells/upload/manager';
+import type {
+  CellsUploadGateway,
+  CellsUploadGatewayError,
+  UploadDraftRequest,
+} from '../../../repositories/cells/upload/gateway';
+import type {DraftIdentity} from '../../../repositories/cells/upload/identity';
 import {Result, Task} from 'true-myth';
 
 import {

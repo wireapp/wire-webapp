@@ -19,11 +19,10 @@
 
 import React from 'react';
 
-import {KEY} from 'Util/keyboardUtil';
-
 import {navigate} from './Router';
 
 import {useAppMainState, ViewType} from '../page/state';
+import {KEY} from '../util/keyboardUtil';
 
 export const createNavigate = (link: string) => {
   return (event?: React.MouseEvent<Element, MouseEvent>) => {

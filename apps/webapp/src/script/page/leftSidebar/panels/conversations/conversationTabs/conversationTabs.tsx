@@ -33,13 +33,6 @@ import {
   Tooltip,
 } from '@wireapp/react-ui-kit';
 
-import {openDebugToolbar} from 'Components/configToolbar/debugToolbarEvents';
-import * as Icon from 'Components/icon';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
-import {FEATURES, hasAccessToFeature} from 'Repositories/user/userPermission';
 import {getManageTeamUrl} from 'src/script/externalRoute';
 import {ConversationFolderTab} from 'src/script/page/leftSidebar/panels/conversations/conversationTab/conversationFolderTab';
 import {
@@ -49,13 +42,6 @@ import {
 } from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {Core} from 'src/script/service/coreSingleton';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {isDataDogEnabled} from 'Util/dataDog';
-import {getWebEnvironment} from 'Util/environment';
-import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
-import type {Translate} from 'Util/localizerUtil/translationTypes';
-import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
-import {useMeetingsFeatureFlag} from 'Util/useMeetingsFeatureFlag';
 
 import {
   conversationsTitleWrapper,
@@ -69,7 +55,24 @@ import {MeetingsConversationTab} from './meetingsConversationTab';
 import {SettingsTab} from './settingsTab';
 import {TeamCreationBanner} from './teamCreation/teamCreationBanner';
 
+import {openDebugToolbar} from '../../../../../components/configToolbar/debugToolbarEvents';
+import * as Icon from '../../../../../components/icon';
 import {Config} from '../../../../../Config';
+import {ConversationRepository} from '../../../../../repositories/conversation/ConversationRepository';
+import {Conversation} from '../../../../../repositories/entity/Conversation';
+import {User} from '../../../../../repositories/entity/User';
+import {TeamState} from '../../../../../repositories/team/TeamState';
+import {FEATURES, hasAccessToFeature} from '../../../../../repositories/user/userPermission';
+import {useKoSubscribableChildren} from '../../../../../util/componentUtil';
+import {isDataDogEnabled} from '../../../../../util/dataDog';
+import {getWebEnvironment} from '../../../../../util/environment';
+import {
+  createReactTranslationMarker,
+  renderReactTranslation,
+} from '../../../../../util/localizerUtil/reactLocalizerUtil';
+import type {Translate} from '../../../../../util/localizerUtil/translationTypes';
+import {useChannelsFeatureFlag} from '../../../../../util/useChannelsFeatureFlag';
+import {useMeetingsFeatureFlag} from '../../../../../util/useMeetingsFeatureFlag';
 import {ContentState} from '../../../../useAppState';
 import {ConversationTab} from '../conversationTab';
 import {conversationFilters} from '../helpers';

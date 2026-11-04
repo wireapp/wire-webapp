@@ -19,11 +19,11 @@
 
 import {forwardRef, ReactNode, useState} from 'react';
 
-import {FileCard} from 'Components/fileCard/fileCard';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {contentWrapperStyles} from './videoAssetCard.styles';
 
+import {FileCard} from '../../../../../../../../fileCard/fileCard';
 import {FileAssetOptions} from '../../../fileAssetCard/common/fileAssetOptions/fileAssetOptions';
 import {FilePreviewModal} from '../../../fileAssetCard/common/filePreviewModal/filePreviewModal';
 

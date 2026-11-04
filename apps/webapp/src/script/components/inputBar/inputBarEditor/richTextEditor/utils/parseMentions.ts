@@ -20,9 +20,9 @@
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {LexicalEditor, $nodesOfType} from 'lexical';
 
-import {User} from 'Repositories/entity/User';
 import {MentionEntity} from 'src/script/message/mentionEntity';
 
+import {User} from '../../../../../repositories/entity/User';
 import {MentionNode} from '../nodes/mentionNode';
 
 export const parseMentions = (editor: LexicalEditor, textValue: string, mentions: User[]): MentionEntity[] => {

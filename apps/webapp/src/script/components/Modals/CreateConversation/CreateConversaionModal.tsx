@@ -19,8 +19,6 @@
 
 import type {FunctionComponent} from 'react';
 
-import {handleEscDown} from 'Util/keyboardUtil';
-
 import {ConfirmDiscardModal} from './ConversationType/ConfirmDiscardModal';
 import {createConversationModalWrapperCss} from './CreateConversation.styles';
 import {CreateConversationHeader} from './CreateConversationHeader';
@@ -31,6 +29,7 @@ import {CreateConversationSteps} from './CreateConversationSteps/CreateConversat
 import {useCreateConversationModal} from './hooks/useCreateConversationModal';
 import {ConversationType} from './types';
 
+import {handleEscDown} from '../../../util/keyboardUtil';
 import {ModalComponent} from '../ModalComponent';
 
 export const CreateConversationModal: FunctionComponent = () => {

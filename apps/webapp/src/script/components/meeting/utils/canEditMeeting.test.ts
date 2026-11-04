@@ -17,10 +17,10 @@
  *
  */
 
-import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
-import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
-import {User} from 'Repositories/entity/User';
-import {translateForTest} from 'Util/test/translateForTest';
+import type {MeetingInstance} from '../types/meetingInstance';
+import type {MeetingSeries} from '../types/meetingSeries';
+import {User} from '../../../repositories/entity/User';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 import {canEditMeeting} from './canEditMeeting';
 

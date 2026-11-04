@@ -18,7 +18,7 @@
  */
 
 import {createMessageAddEvent, createReactionEvent, toSavedEvent} from 'test/helper/EventGenerator';
-import {createUuid} from 'Util/uuid';
+import {createUuid} from '../../../../../util/uuid';
 
 import {handleReactionEvent} from './reactionEventHandler';
 

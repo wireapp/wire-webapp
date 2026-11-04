@@ -28,11 +28,11 @@ import {container} from 'tsyringe';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
-import {CallState} from 'Repositories/calling/CallState';
 import {useActiveWindow} from 'src/script/hooks/useActiveWindow';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import '../../../../../../style/default.less';
+import {CallState} from '../../../../../repositories/calling/CallState';
+import {useKoSubscribableChildren} from '../../../../../util/componentUtil';
 
 interface DetachedWindowProps {
   children: React.ReactNode;

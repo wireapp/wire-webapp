@@ -19,8 +19,9 @@
 
 import type {FunctionComponent} from 'react';
 
-import * as Icon from 'Components/icon';
 import {useApplicationContext} from 'src/script/page/rootProvider';
+
+import * as Icon from '../../../../../components/icon';
 
 interface ConversationDetailsBottomActionsProps {
   isDeviceActionEnabled: boolean;

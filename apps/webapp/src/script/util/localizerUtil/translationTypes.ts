@@ -17,7 +17,7 @@
  *
  */
 
-import en from 'I18n/en-US.json';
+import en from '../../../i18n/en-US.json';
 
 export type TranslationStrings = typeof en;
 export type TranslationKey = keyof TranslationStrings;

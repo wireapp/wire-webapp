@@ -25,23 +25,23 @@ import {ClientMLSError, ClientMLSErrorLabel} from '@wireapp/core/lib/messagingPr
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
-import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
-import {ConversationRoleRepository} from 'Repositories/conversation/ConversationRoleRepository';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {TeamEntity} from 'Repositories/team/TeamEntity';
-import {TeamState} from 'Repositories/team/TeamState';
-import {UserState} from 'Repositories/user/userState';
+import {PrimaryModalComponent} from '../Modals/PrimaryModal/PrimaryModal';
+import {ConnectionEntity} from '../../repositories/connection/connectionEntity';
+import {ConversationRoleRepository} from '../../repositories/conversation/ConversationRoleRepository';
+import {ConversationState} from '../../repositories/conversation/ConversationState';
+import {Conversation} from '../../repositories/entity/Conversation';
+import {User} from '../../repositories/entity/User';
+import {TeamEntity} from '../../repositories/team/TeamEntity';
+import {TeamState} from '../../repositories/team/TeamState';
+import {UserState} from '../../repositories/user/userState';
 import {withTheme} from 'src/script/auth/util/test/testUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {ActionsViewModel} from 'src/script/view_model/ActionsViewModel';
-import {noop} from 'Util/util';
+import {noop} from '../../util/util';
 
 import {ActionIdentifier, Actions, UserActions} from './userActions';
 import {SidebarTabs, useSidebarStore} from '../../page/leftSidebar/panels/conversations/useSidebarStore';

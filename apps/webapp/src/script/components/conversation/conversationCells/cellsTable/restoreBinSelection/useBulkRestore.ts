@@ -23,15 +23,14 @@ import type {Clock} from '@enormora/clock/clock';
 import {isUndefined} from '@sindresorhus/is';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {observeCellsBackgroundActionJobs} from 'Components/conversation/conversationCells/common/cellsBackgroundActionPolling/cellsBackgroundActionJobs';
-import {createBulkJobPollingPolicy} from 'Components/conversation/conversationCells/common/cellsBackgroundActionPolling/createBulkJobPollingPolicy';
-import {getCellsApiPath} from 'Components/conversation/conversationCells/common/getCellsApiPath/getCellsApiPath';
-import {RECYCLE_BIN_PATH} from 'Components/conversation/conversationCells/common/recycleBin/recycleBin';
-import type {CellsRepository} from 'Repositories/cells/cellsRepository';
-
 import type {RestoreTarget} from './resolveRestoreTargets';
 import {runBulkRestore, type BulkRestoreDependencies, type BulkRestoreOutcome} from './runBulkRestore';
 
+import type {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
+import {observeCellsBackgroundActionJobs} from '../../common/cellsBackgroundActionPolling/cellsBackgroundActionJobs';
+import {createBulkJobPollingPolicy} from '../../common/cellsBackgroundActionPolling/createBulkJobPollingPolicy';
+import {getCellsApiPath} from '../../common/getCellsApiPath/getCellsApiPath';
+import {RECYCLE_BIN_PATH} from '../../common/recycleBin/recycleBin';
 import type {SharedDriveMoveStatusKind} from '../../sharedDriveUploadStatusContext';
 
 const REVIEW_REFRESH_DEADLINE_MS = 20_000;

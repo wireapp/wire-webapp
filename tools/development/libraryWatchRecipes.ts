@@ -28,11 +28,8 @@ export const developmentLibraries: readonly DevelopmentLibrary[] = [
   {name: 'api-client', value: 'api-client', checked: true},
   {name: 'core', value: 'core'},
   {name: 'commons', value: 'commons'},
-  {name: 'bazinga64', value: 'bazinga64'},
   {name: 'config', value: 'config'},
-  {name: 'priority-queue', value: 'priority-queue'},
   {name: 'store-engine', value: 'store-engine'},
-  {name: 'store-engine-fs', value: 'store-engine-fs'},
   {name: 'store-engine-dexie', value: 'store-engine-dexie'},
   {name: 'telemetry', value: 'telemetry'},
 ];

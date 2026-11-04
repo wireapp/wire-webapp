@@ -20,7 +20,7 @@
 import {act, renderHook, waitFor} from '@testing-library/react';
 import {JobsTaskStatus} from 'cells-sdk-ts';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
-import type {CellsRepository} from 'Repositories/cells/cellsRepository';
+import type {CellsRepository} from '../../../../repositories/cells/cellsRepository';
 
 import {
   usePermanentDeleteReconciliation,

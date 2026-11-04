@@ -14,8 +14,8 @@ import {container} from 'tsyringe';
 import {
   CELLS_SELF_USER_DRIVE_ROLE,
   CellsSelfUserDriveRoleProvider,
-} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+} from '../../../../../../../../conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
+import {CellsRepository} from '../../../../../../../../../repositories/cells/cellsRepository';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {
   createRootContextValueForTest,

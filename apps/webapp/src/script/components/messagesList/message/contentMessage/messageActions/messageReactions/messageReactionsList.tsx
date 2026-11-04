@@ -21,14 +21,14 @@ import type {FunctionComponent} from 'react';
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {User} from 'Repositories/entity/User';
-import {ReactionMap} from 'Repositories/storage';
-import {getEmojiUnicode} from 'Util/emojiUtil';
-import type {Translate} from 'Util/localizerUtil';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-
 import {EmojiPill} from './emojiPill';
 import {messageReactionWrapper} from './messageReactions.styles';
+
+import {User} from '../../../../../../repositories/entity/User';
+import {ReactionMap} from '../../../../../../repositories/storage';
+import {getEmojiUnicode} from '../../../../../../util/emojiUtil';
+import type {Translate} from '../../../../../../util/localizerUtil';
+import {matchQualifiedIds} from '../../../../../../util/qualifiedId';
 
 export interface MessageReactionsListProps {
   translate: Translate;

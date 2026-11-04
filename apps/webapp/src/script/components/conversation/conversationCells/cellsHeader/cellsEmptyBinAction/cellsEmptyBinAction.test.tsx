@@ -30,14 +30,14 @@ import {JobsTaskStatus, type RestNode} from 'cells-sdk-ts';
 import {
   CellsSelfUserDriveRoleProvider,
   CELLS_SELF_USER_DRIVE_ROLE,
-} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
-import type {CellsRepository} from 'Repositories/cells/cellsRepository';
+} from '../../common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
+import type {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
 import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../../util/test/translateForTest';
 
 import {SharedDriveUploadStatusPopupHost} from '../../sharedDriveUploadStatusPopupHost';
 import {SharedDriveUploadStatusProvider} from '../../sharedDriveUploadStatusContext';

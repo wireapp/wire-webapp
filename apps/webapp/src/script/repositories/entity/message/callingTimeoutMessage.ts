@@ -19,11 +19,10 @@
 
 import {REASON as AVS_REASON} from '@wireapp/avs';
 
-import type {Translate} from 'Util/localizerUtil';
-
 import {Message} from './message';
 
 import {SuperType} from '../../../message/superType';
+import type {Translate} from '../../../util/localizerUtil';
 
 export class CallingTimeoutMessage extends Message {
   constructor(

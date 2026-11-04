@@ -22,14 +22,14 @@ import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {RestNode} from 'cells-sdk-ts';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
 import {
   createExecutingFireAndForgetInvokerForTest,
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../../util/test/translateForTest';
 
 import {useBulkMoveDestinationSelection} from './useBulkMoveDestinationSelection';
 

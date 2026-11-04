@@ -21,9 +21,9 @@ import ko from 'knockout';
 
 import {CALL_TYPE, CONV_TYPE, Wcall} from '@wireapp/avs';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
+import {Conversation} from '../entity/Conversation';
+import {User} from '../entity/User';
+import {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import {generateConversation} from 'test/helper/ConversationGenerator';
 
 import {Call} from './Call';
@@ -31,7 +31,7 @@ import {CallingRepository} from './CallingRepository';
 import {Participant} from './Participant';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 
 const createSelfParticipant = (): Participant => {
   const selfUser = new User('', '', translateForTest);

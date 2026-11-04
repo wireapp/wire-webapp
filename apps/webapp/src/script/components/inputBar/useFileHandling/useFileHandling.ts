@@ -22,10 +22,9 @@ import {useEffect, useState} from 'react';
 import {isNull} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
-import type {Translate} from 'Util/localizerUtil';
-
 import {useFilePaste} from './useFilePaste/useFilePaste';
 
+import type {Translate} from '../../../util/localizerUtil';
 import {WebAppEvents} from '../../../webAppEvents';
 
 interface UseFileHandlingProps {

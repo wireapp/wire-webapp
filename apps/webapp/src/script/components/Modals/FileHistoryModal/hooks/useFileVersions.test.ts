@@ -26,7 +26,7 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {useFileVersions} from './useFileVersions';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../util/test/translateForTest';
 
 // Mock the dependencies
 const mockGetNode = jest.fn();
@@ -54,7 +54,7 @@ jest.mock('tsyringe', () => {
   };
 });
 
-jest.mock('Util/util', () => {
+jest.mock('../../../../util/util', () => {
   return {
     forcedDownloadFile: (args: any) => {
       return mockForcedDownloadFile(args);

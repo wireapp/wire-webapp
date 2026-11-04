@@ -21,8 +21,8 @@ import type {Meeting as ApiMeeting} from '@wireapp/api-client/lib/meetings/meeti
 import {differenceInMilliseconds, isAfter, isValid, parseISO} from 'date-fns';
 import {result, Result} from 'true-myth';
 
-import {mapMeetingRecurrenceToOption} from 'Components/meeting/scheduleMeetingModal/scheduleMeetingRecurrence';
-import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
+import {mapMeetingRecurrenceToOption} from './scheduleMeetingModal/scheduleMeetingRecurrence';
+import type {MeetingSeries} from './types/meetingSeries';
 
 export type MapApiMeetingToSeriesError =
   'invalidStartTime' | 'invalidEndTime' | 'endNotAfterStart' | 'invalidRecurrenceUntil';

@@ -20,9 +20,10 @@
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {SystemMessageType} from 'src/script/message/systemMessageType';
-import type {Translate} from 'Util/localizerUtil';
 
 import {SystemMessage} from './systemMessage';
+
+import type {Translate} from '../../../util/localizerUtil';
 
 export class ProtocolUpdateMessage extends SystemMessage {
   constructor(

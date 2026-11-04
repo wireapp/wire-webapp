@@ -17,12 +17,12 @@
  *
  */
 
-import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
-import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
-import {getMeetingActionEntries} from 'Components/meeting/meetingList/meetingListItemGroup/meetingListItem/meetingAction/getMeetingActionEntries';
-import {MEETING_ACTION_TRANSLATION_KEYS} from 'Components/meeting/meetingList/meetingListItemGroup/meetingListItem/meetingAction/meetingActionTranslationKeys';
-import {User} from 'Repositories/entity/User';
-import {translateForTest} from 'Util/test/translateForTest';
+import type {MeetingInstance} from '../../../../types/meetingInstance';
+import type {MeetingSeries} from '../../../../types/meetingSeries';
+import {getMeetingActionEntries} from './getMeetingActionEntries';
+import {MEETING_ACTION_TRANSLATION_KEYS} from './meetingActionTranslationKeys';
+import {User} from '../../../../../../repositories/entity/User';
+import {translateForTest} from '../../../../../../util/test/translateForTest';
 import type {ContextMenuEntry} from '../../../../../../ui/contextMenu';
 
 const futureNowMilliseconds = Date.parse('2026-06-15T13:00:00.000Z');

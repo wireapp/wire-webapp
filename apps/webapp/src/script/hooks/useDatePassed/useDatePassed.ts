@@ -21,7 +21,7 @@ import {useCallback, useEffect, useRef} from 'react';
 
 import {isNull, isUndefined} from '@sindresorhus/is';
 
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
+import {TIME_IN_MILLIS} from '../../util/timeUtil';
 
 interface UseDatePassedProps {
   target: Date | null;

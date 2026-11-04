@@ -17,6 +17,6 @@
  *
  */
 
-import {getLogger} from 'Util/logger';
+import {getLogger} from '../../util/logger';
 
 export const mlsMigrationLogger = getLogger('MLSMigration');

@@ -25,25 +25,11 @@ import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
 
-import {UserVerificationBadges} from 'Components/badge';
-import {ErrorFallback} from 'Components/errorFallback';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {useEnrichedFields} from 'Components/panel/enrichedFields';
-import {ClientRepository} from 'Repositories/client';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {User} from 'Repositories/entity/User';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {TeamState} from 'Repositories/team/TeamState';
-import {AppLockRepository} from 'Repositories/user/appLockRepository';
-import type {UserRepository} from 'Repositories/user/userRepository';
 import {getUserProfileUrl} from 'src/script/externalRoute';
 import {TeamCreationAccountHeader} from 'src/script/page/leftSidebar/panels/conversations/conversationTabs/teamCreation/teamCreationAccountHeader';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {ContentState} from 'src/script/page/useAppState';
 import {Core} from 'src/script/service/coreSingleton';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {getLogger} from 'Util/logger';
 
 import {AccountInput} from './accountPreferences/accountInput';
 import {AccountLink} from './accountPreferences/accountLink';
@@ -60,7 +46,21 @@ import {UsernameInput} from './accountPreferences/usernameInput';
 import {PreferencesPage} from './components/preferencesPage';
 import {PreferencesSection} from './components/preferencesSection';
 
+import {UserVerificationBadges} from '../../../../components/badge';
+import {ErrorFallback} from '../../../../components/errorFallback';
+import {PrimaryModal} from '../../../../components/Modals/PrimaryModal';
+import {useEnrichedFields} from '../../../../components/panel/enrichedFields';
 import {Config} from '../../../../Config';
+import {ClientRepository} from '../../../../repositories/client';
+import {ConversationRepository} from '../../../../repositories/conversation/ConversationRepository';
+import {ConversationState} from '../../../../repositories/conversation/ConversationState';
+import {User} from '../../../../repositories/entity/User';
+import {PropertiesRepository} from '../../../../repositories/properties/propertiesRepository';
+import {TeamState} from '../../../../repositories/team/TeamState';
+import {AppLockRepository} from '../../../../repositories/user/appLockRepository';
+import type {UserRepository} from '../../../../repositories/user/userRepository';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
+import {getLogger} from '../../../../util/logger';
 import {AccentColorPicker} from '../../../accentColorPicker';
 
 interface AccountPreferencesProps {

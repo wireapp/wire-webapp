@@ -22,8 +22,8 @@ import type {FunctionComponent} from 'react';
 import {Maybe} from 'true-myth';
 import userEvent from '@testing-library/user-event';
 import {noop} from 'noop-esm';
-import type {UploadState} from 'Repositories/cells/upload';
-import type {Translate} from 'Util/localizerUtil';
+import type {UploadState} from '../../../repositories/cells/upload';
+import type {Translate} from '../../../util/localizerUtil';
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
 import {
   SharedDriveUploadStatusProvider,
@@ -35,7 +35,7 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 const conversationQualifiedId = 'conversation@example.com';
 const otherConversationQualifiedId = 'other@example.com';

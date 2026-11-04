@@ -23,25 +23,25 @@ import {render, waitFor} from '@testing-library/react';
 
 import {CALL_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 
-import {Call} from 'Repositories/calling/Call';
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {Participant} from 'Repositories/calling/Participant';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {TeamState} from 'Repositories/team/TeamState';
+import {Call} from '../../../repositories/calling/Call';
+import {CallingRepository} from '../../../repositories/calling/CallingRepository';
+import {Participant} from '../../../repositories/calling/Participant';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {User} from '../../../repositories/entity/User';
+import {PropertiesRepository} from '../../../repositories/properties/propertiesRepository';
+import {TeamState} from '../../../repositories/team/TeamState';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
   requireValueForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {CallActions} from 'src/script/view_model/CallingViewModel';
-import {createUuid} from 'Util/uuid';
+import {createUuid} from '../../../util/uuid';
 
 import {CallingCell, CallingCellProps} from './CallingCell';
 
 import {buildMediaDevicesHandler} from '../../../auth/util/test/testUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 const mockCallAlertState = {
@@ -49,7 +49,7 @@ const mockCallAlertState = {
   showAlert: false,
 };
 
-jest.mock('Components/calling/useCallAlertState', () => {
+jest.mock('../useCallAlertState', () => {
   return {
     useCallAlertState: jest.fn(() => {
       return mockCallAlertState;
@@ -57,7 +57,7 @@ jest.mock('Components/calling/useCallAlertState', () => {
   };
 });
 
-jest.mock('Components/inViewport', () => {
+jest.mock('../../inViewport', () => {
   return {
     InViewport: ({onVisible, children}: {onVisible: () => void; children: ReactNode}) => {
       require('react').useEffect(() => {

@@ -21,14 +21,14 @@ import {render} from '@testing-library/react';
 import {ClientClassification} from '@wireapp/api-client/lib/client/';
 import ko from 'knockout';
 
-import type {ClientEntity} from 'Repositories/client/ClientEntity';
+import type {ClientEntity} from '../../../../repositories/client/ClientEntity';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {DeviceCard} from './deviceCard';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../util/test/translateForTest';
 
 function createClientEntity(clientEntity: Partial<ClientEntity>): ClientEntity {
   const device: Partial<ClientEntity> = {

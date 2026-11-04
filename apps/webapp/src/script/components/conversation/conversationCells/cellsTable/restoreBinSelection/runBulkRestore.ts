@@ -19,10 +19,10 @@
 
 import {RestActionStatus, type RestPerformActionResponse} from 'cells-sdk-ts';
 
-import {getCellsBackgroundActionEvidence} from 'Components/conversation/conversationCells/common/cellsBackgroundActionPolling/cellsBackgroundActionJobs';
-import type {CellsBackgroundActionOutcome} from 'Components/conversation/conversationCells/common/cellsBackgroundActionPolling/cellsBackgroundActionPolling';
-
 import type {RestoreTarget} from './resolveRestoreTargets';
+
+import {getCellsBackgroundActionEvidence} from '../../common/cellsBackgroundActionPolling/cellsBackgroundActionJobs';
+import type {CellsBackgroundActionOutcome} from '../../common/cellsBackgroundActionPolling/cellsBackgroundActionPolling';
 
 export type BulkRestoreOutcome = 'completed' | 'request-failed' | 'partial' | 'failed' | 'status-unknown';
 

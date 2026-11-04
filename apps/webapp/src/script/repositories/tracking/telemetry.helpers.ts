@@ -19,10 +19,9 @@
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
-import {getWebEnvironment} from 'Util/environment';
-import {getLogger, Logger} from 'Util/logger';
-
 import {Config} from '../../Config';
+import {getWebEnvironment} from '../../util/environment';
+import {getLogger, Logger} from '../../util/logger';
 
 const logger: Logger = getLogger('TelemetryHelpers');
 

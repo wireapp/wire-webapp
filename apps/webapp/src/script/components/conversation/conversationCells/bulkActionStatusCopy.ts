@@ -17,14 +17,14 @@
  *
  */
 
-import type {Translate} from 'Util/localizerUtil';
-
 import {moveStatusMessageKey} from './sharedDriveMoveStatusMessages';
 import type {
   SharedDriveBulkAction,
   SharedDriveMoveStatus,
   SharedDriveMoveStatusKind,
 } from './sharedDriveUploadStatusContext';
+
+import type {Translate} from '../../../util/localizerUtil';
 
 type TranslationKey = Parameters<Translate>[0];
 type ReviewKind = Exclude<SharedDriveMoveStatusKind, 'processing' | 'completed'>;

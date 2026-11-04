@@ -29,8 +29,8 @@ import {SharedDriveUploadCompletedIcon, SharedDriveUploadSpinnerIcon} from '@wir
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from 'src/script/router/routerBindings';
-import {KEY} from 'Util/keyboardUtil';
 
+import {KEY} from '../../../util/keyboardUtil';
 import type {SharedDriveUploadController} from '../conversationCells/sharedDriveUploadController';
 import {
   getRepresentativeSharedDriveUploadStatus,

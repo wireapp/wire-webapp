@@ -19,15 +19,15 @@
 
 import {fireEvent, render} from '@testing-library/react';
 
-import {User} from 'Repositories/entity/User';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {User} from '../../repositories/entity/User';
+import {ServiceEntity} from '../../repositories/integration/ServiceEntity';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {Avatar} from './avatar';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),

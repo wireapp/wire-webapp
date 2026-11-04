@@ -22,11 +22,8 @@ import {useState} from 'react';
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {Accept, DropzoneInputProps, FileRejection, useDropzone, type DropzoneRootProps} from 'react-dropzone';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
 import {Config} from 'src/script/Config';
 import type {RootContextValue} from 'src/script/page/rootProvider';
-import {getLogger} from 'Util/logger';
 
 import {buildCellFileMetadata} from './buildCellFileMetadata/buildCellFileMetadata';
 import {createFileDropHandler} from './createFileDropHandler/createFileDropHandler';
@@ -34,6 +31,9 @@ import {validateFiles, ValidationResult} from './fileValidation/fileValidation';
 import {showFileDropzoneErrorModal} from './showFileDropzoneErrorModal/showFileDropzoneErrorModal';
 import {transformAcceptedFiles} from './transformAcceptedFiles/transformAcceptedFiles';
 
+import {CellsRepository} from '../../../repositories/cells/cellsRepository';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {getLogger} from '../../../util/logger';
 import {FileWithPreview, useFileUploadState} from '../useFilesUploadState/useFilesUploadState';
 import {buildCellsUploadPath} from '../utils/buildCellsUploadPath';
 import {checkFileSharingPermission} from '../utils/checkFileSharingPermission';

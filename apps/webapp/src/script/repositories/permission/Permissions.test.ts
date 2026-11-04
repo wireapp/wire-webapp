@@ -17,15 +17,10 @@
  *
  */
 
-import {AppPermissionState} from 'Repositories/notification/AppPermissionState';
-import {BrowserPermissionStatus} from 'Repositories/permission/BrowserPermissionStatus';
-import {
-  getPermissionState,
-  setPermissionState,
-  getPermissionStates,
-  initializePermissions,
-} from 'Repositories/permission/permissionHandlers';
-import {PermissionType} from 'Repositories/permission/PermissionType';
+import {AppPermissionState} from '../notification/AppPermissionState';
+import {BrowserPermissionStatus} from './BrowserPermissionStatus';
+import {getPermissionState, setPermissionState, getPermissionStates, initializePermissions} from './permissionHandlers';
+import {PermissionType} from './PermissionType';
 
 import {permissionsStore} from './Permissions.store';
 import {normalizePermissionState} from './Permissions.types';

@@ -20,17 +20,17 @@
 import {isUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {Config} from 'src/script/Config';
+
+import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {
   ModalOptions,
   PrimaryModalTranslatedComponent,
   PrimaryModalTranslatedTranslation,
   PrimaryModalTranslatedValue,
   PrimaryModalType,
-} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
-import {Config} from 'src/script/Config';
-import type {Translate, TranslationKey} from 'Util/localizerUtil';
-
+} from '../../components/Modals/PrimaryModal/PrimaryModalTypes';
+import type {Translate, TranslationKey} from '../../util/localizerUtil';
 import {WebAppEvents} from '../../webAppEvents';
 
 const hideSecondaryBtn = {hideSecondary: true};

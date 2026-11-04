@@ -18,17 +18,17 @@
 
 import {render} from '@testing-library/react';
 
-import en from 'I18n/en-US.json';
-import {User} from 'Repositories/entity/User';
-import type {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
+import en from '../../../../../i18n/en-US.json';
+import {User} from '../../../../repositories/entity/User';
+import type {PropertiesRepository} from '../../../../repositories/properties/propertiesRepository';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {setStrings, translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
-import {createUuid} from 'Util/uuid';
+import {setStrings, translate} from '../../../../util/localizerUtil';
+import {translateForTest} from '../../../../util/test/translateForTest';
+import {createUuid} from '../../../../util/uuid';
 
 import {OptionPreferences} from './optionPreferences';
 

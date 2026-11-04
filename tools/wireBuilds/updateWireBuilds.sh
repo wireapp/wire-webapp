@@ -8,12 +8,35 @@ set -euo pipefail
 
 webapp_repository_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 wire_builds_target_branch="${WIRE_BUILDS_TARGET_BRANCH:-main}"
+
+validate_maintenance_wire_builds_metadata() {
+  node "${webapp_repository_root}/tools/releaseCli/maintenanceReleaseCli.mts" \
+    validate-wire-builds-build-json \
+    --build-json-path build.json
+}
+
 case "${wire_builds_target_branch}" in
   main | dev)
+    if [[ "${WIRE_BUILDS_ALLOW_CUSTOM_BRANCHES:-false}" == 'true' ]]; then
+      echo "Maintenance distribution cannot update wire-builds/${wire_builds_target_branch}." >&2
+      exit 1
+    fi
     ;;
   *)
-    echo "Unsupported wire-builds target branch: ${wire_builds_target_branch}" >&2
-    exit 1
+    if [[ "${WIRE_BUILDS_ALLOW_CUSTOM_BRANCHES:-false}" != 'true' ]]; then
+      echo "Unsupported wire-builds target branch: ${wire_builds_target_branch}" >&2
+      exit 1
+    fi
+
+    validated_wire_builds_target_branch="$(node "${webapp_repository_root}/tools/releaseCli/maintenanceReleaseCli.mts" \
+      validate-wire-builds-branch "${wire_builds_target_branch}")"
+
+    if [[ "${validated_wire_builds_target_branch}" != "${wire_builds_target_branch}" ]]; then
+      echo "Validated wire-builds target branch does not match: ${wire_builds_target_branch}" >&2
+      exit 1
+    fi
+
+    validate_maintenance_wire_builds_metadata
     ;;
 esac
 chart_repository='https://s3-eu-west-1.amazonaws.com/public.wire.com/charts-webapp'
@@ -63,6 +86,10 @@ for retry_number in 1 2 3; do
 
     git fetch --depth 1 origin "${wire_builds_target_branch}"
     git reset --hard "origin/${wire_builds_target_branch}"
+
+    if [[ "${WIRE_BUILDS_ALLOW_CUSTOM_BRANCHES:-false}" == 'true' ]]; then
+      validate_maintenance_wire_builds_metadata
+    fi
 
     build_version_before="$(jq --raw-output '.version' build.json)"
     if wire_builds_fields_match; then

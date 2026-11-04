@@ -21,23 +21,23 @@ import {fireEvent, render, waitFor, act} from '@testing-library/react';
 import {noop} from 'noop-esm';
 import {container} from 'tsyringe';
 
-import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {FileAsset} from 'Repositories/entity/message/fileAsset';
-import {LinkPreview} from 'Repositories/entity/message/linkPreview';
-import {MediumImage} from 'Repositories/entity/message/mediumImage';
-import {Text} from 'Repositories/entity/message/text';
-import {User} from 'Repositories/entity/User';
+import {AssetRepository} from '../../../../repositories/assets/assetRepository';
+import {MessageRepository} from '../../../../repositories/conversation/MessageRepository';
+import {Conversation} from '../../../../repositories/entity/Conversation';
+import {ContentMessage} from '../../../../repositories/entity/message/contentMessage';
+import {FileAsset} from '../../../../repositories/entity/message/fileAsset';
+import {LinkPreview} from '../../../../repositories/entity/message/linkPreview';
+import {MediumImage} from '../../../../repositories/entity/message/mediumImage';
+import {Text} from '../../../../repositories/entity/message/text';
+import {User} from '../../../../repositories/entity/User';
 import {withTheme} from 'src/script/auth/util/test/testUtil';
 import {MessageCategory} from 'src/script/message/messageCategory';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
-import {createUuid} from 'Util/uuid';
+import {translateForTest} from '../../../../util/test/translateForTest';
+import {createUuid} from '../../../../util/uuid';
 
 import {Collection} from './collection';
 import {FullSearch} from './fullSearch';

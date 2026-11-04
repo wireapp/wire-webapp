@@ -21,11 +21,11 @@ import type {FunctionComponent} from 'react';
 
 import {isEmptyString, isNonEmptyString} from '@sindresorhus/is';
 
-import {TextInput} from 'Components/TextInput';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {handleEnterDown} from 'Util/keyboardUtil';
 
+import {ConversationRepository} from '../../../../../repositories/conversation/ConversationRepository';
+import {handleEnterDown} from '../../../../../util/keyboardUtil';
+import {TextInput} from '../../../../TextInput';
 import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';
 import {ConversationType} from '../../types';
 

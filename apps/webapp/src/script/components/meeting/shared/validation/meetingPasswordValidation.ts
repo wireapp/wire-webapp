@@ -18,8 +18,9 @@
  */
 
 import {ValidationError} from 'src/script/auth/module/action/validationError';
-import type {TranslationKey} from 'Util/localizerUtil';
-import {isValidPassword} from 'Util/stringUtil';
+
+import type {TranslationKey} from '../../../../util/localizerUtil';
+import {isValidPassword} from '../../../../util/stringUtil';
 
 export const meetingPasswordErrorKey = ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH as TranslationKey;
 export const meetingPasswordConfirmationErrorKey = ValidationError.FIELD.CONFIRM_PASSWORD

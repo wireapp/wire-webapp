@@ -24,16 +24,16 @@ import {StatusCodes} from 'http-status-codes';
 
 import {WebAppEvents} from '../../webAppEvents';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {SelfService} from 'Repositories/self/SelfService';
-import {TeamService} from 'Repositories/team/TeamService';
-import {UserRepository} from 'Repositories/user/userRepository';
+import {PrimaryModal} from '../../components/Modals/PrimaryModal';
+import {Conversation} from '../entity/Conversation';
+import {SelfService} from '../self/SelfService';
+import {TeamService} from '../team/TeamService';
+import {UserRepository} from '../user/userRepository';
 import {generateUser} from 'test/helper/UserGenerator';
-import type {Translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import type {Translate} from '../../util/localizerUtil';
+import {translateForTest} from '../../util/test/translateForTest';
 import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
-import {createUuid} from 'Util/uuid';
+import {createUuid} from '../../util/uuid';
 
 import {ConnectionEntity} from './connectionEntity';
 import {ConnectionRepository} from './connectionRepository';

@@ -18,8 +18,8 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {Decoder} from '@wireapp/commons/lib/base64/decoder';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
-import {Decoder} from 'bazinga64';
 
 import {TypedEventEmitter} from '@wireapp/commons';
 import {

@@ -20,15 +20,15 @@
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {act, render, screen} from '@testing-library/react';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {User} from 'Repositories/entity/User';
+import {Conversation} from '../../../../repositories/entity/Conversation';
+import {ContentMessage} from '../../../../repositories/entity/message/contentMessage';
+import {User} from '../../../../repositories/entity/User';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
-import {createUuid} from 'Util/uuid';
+import {translateForTest} from '../../../../util/test/translateForTest';
+import {createUuid} from '../../../../util/uuid';
 
 import {StatusIcon} from './statusIcon';
 

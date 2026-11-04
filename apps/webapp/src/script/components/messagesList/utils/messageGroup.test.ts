@@ -20,16 +20,16 @@
 import {isUndefined} from '@sindresorhus/is';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 
-import {EventMapper} from 'Repositories/conversation/EventMapper';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {Message} from 'Repositories/entity/message/message';
+import {EventMapper} from '../../../repositories/conversation/EventMapper';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {Message} from '../../../repositories/entity/message/message';
 import {createGroupCreationEvent, createMessageAddEvent} from 'test/helper/EventGenerator';
-import {translate} from 'Util/localizerUtil';
-import {getRandomNumber} from 'Util/numberUtil';
-import {createUuid} from 'Util/uuid';
+import {translate} from '../../../util/localizerUtil';
+import {getRandomNumber} from '../../../util/numberUtil';
+import {createUuid} from '../../../util/uuid';
 
 import {groupMessagesBySenderAndTime, isMarker} from './messagesGroup';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 describe('MessagesGroup', () => {

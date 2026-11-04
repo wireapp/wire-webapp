@@ -22,9 +22,9 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {IMention, Mention} from '@wireapp/protocol-messaging';
 
-import {PROTO_MESSAGE_TYPE} from 'Repositories/cryptography/ProtoMessageType';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-import {isUUID} from 'Util/validationUtil';
+import {PROTO_MESSAGE_TYPE} from '../repositories/cryptography/ProtoMessageType';
+import {matchQualifiedIds} from '../util/qualifiedId';
+import {isUUID} from '../util/validationUtil';
 
 type MentionEntityJSON = {
   length: number;

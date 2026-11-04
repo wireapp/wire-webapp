@@ -26,24 +26,16 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {E2EIVerificationMessage} from 'Components/messagesList/message/e2eiVerificationMessage';
-import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {OutgoingQuote} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {CompositeMessage} from 'Repositories/entity/message/compositeMessage';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {Text} from 'Repositories/entity/message/text';
-import {TeamState} from 'Repositories/team/TeamState';
 import {markAsUnreadFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {QuoteEntity} from 'src/script/message/quoteEntity';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {CallMessage} from './callMessage';
 import {CallTimeoutMessage} from './callTimeoutMessage';
 import {ContentMessageComponent} from './contentMessage';
 import {DecryptErrorMessage} from './decryptErrorMessage';
 import {DeleteMessage} from './deleteMessage';
+import {E2EIVerificationMessage} from './e2eiVerificationMessage';
 import {FailedToAddUsersMessage} from './failedToAddUsersMessage';
 import {FederationStopMessage} from './federationStopMessage';
 import {FileTypeRestrictedMessage} from './fileTypeRestrictedMessage';
@@ -54,7 +46,15 @@ import {PingMessage} from './pingMessage';
 import {SystemMessage} from './systemMessage';
 import {VerificationMessage} from './verificationMessage';
 
+import {AssetRepository} from '../../../repositories/assets/assetRepository';
+import {OutgoingQuote} from '../../../repositories/conversation/MessageRepository';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {CompositeMessage} from '../../../repositories/entity/message/compositeMessage';
+import {ContentMessage} from '../../../repositories/entity/message/contentMessage';
+import {Text} from '../../../repositories/entity/message/text';
+import {TeamState} from '../../../repositories/team/TeamState';
 import {ContextMenuEntry} from '../../../ui/contextMenu';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {WebAppEvents} from '../../../webAppEvents';
 
 import {MessageParams} from './index';

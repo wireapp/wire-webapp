@@ -21,9 +21,10 @@ import type {FunctionComponent} from 'react';
 
 import cx from 'classnames';
 
-import type {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
+
+import type {User} from '../../../../repositories/entity/User';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 
 interface NoDevicesFoundProps {
   noPadding: boolean;

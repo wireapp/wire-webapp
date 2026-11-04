@@ -20,9 +20,9 @@
 import {isNonEmptyString, isTruthy} from '@sindresorhus/is';
 import Long from 'long';
 
-import {ClientEvent} from 'Repositories/event/Client';
-import {LegacyEventRecord} from 'Repositories/storage/record/eventRecord';
-import {stringToUtf16BE, utf8ToUtf16BE} from 'Util/stringUtil';
+import {ClientEvent} from '../repositories/event/Client';
+import {LegacyEventRecord} from '../repositories/storage/record/eventRecord';
+import {stringToUtf16BE, utf8ToUtf16BE} from '../util/stringUtil';
 
 const locationCoordinatePrecisionScale = 1000;
 const millisecondsPerSecond = 1e3;

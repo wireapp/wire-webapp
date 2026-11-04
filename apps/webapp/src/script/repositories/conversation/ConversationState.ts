@@ -22,13 +22,6 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
-import {UserState} from 'Repositories/user/userState';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-import {sortGroupsByLastEvent} from 'Util/util';
-
 import {
   isMeetingConversation,
   isMLS1to1ConversationWithUser,
@@ -39,6 +32,13 @@ import {
   MLSConversation,
   ProteusConversation,
 } from './ConversationSelectors';
+
+import {matchQualifiedIds} from '../../util/qualifiedId';
+import {sortGroupsByLastEvent} from '../../util/util';
+import {Conversation} from '../entity/Conversation';
+import {User} from '../entity/User';
+import {TeamState} from '../team/TeamState';
+import {UserState} from '../user/userState';
 
 @singleton()
 export class ConversationState {

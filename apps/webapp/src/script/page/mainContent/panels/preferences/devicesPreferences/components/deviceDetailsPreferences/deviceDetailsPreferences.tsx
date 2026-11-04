@@ -23,13 +23,13 @@ import {isNonEmptyString} from '@sindresorhus/is';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {WireIdentity} from 'src/script/e2eIdentity';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {Config} from '../../../../../../../Config';
 import {MotionDuration} from '../../../../../../../motion/MotionDuration';
+import {ClientEntity} from '../../../../../../../repositories/client/ClientEntity';
+import {useKoSubscribableChildren} from '../../../../../../../util/componentUtil';
 import {contentStyle} from '../../../components/preferencesPage.styles';
 import {DetailedDevice} from '../detailedDevice';
 

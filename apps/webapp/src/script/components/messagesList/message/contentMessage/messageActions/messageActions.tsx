@@ -22,13 +22,8 @@ import {FC, useCallback, useRef, useState} from 'react';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 
-import {useClickOutside} from 'Hooks/useClickOutside';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {ContextMenuEntry, showContextMenu} from 'src/script/ui/contextMenu';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {isSpaceOrEnterKey, isTabKey} from 'Util/keyboardUtil';
-import {setContextMenuPosition} from 'Util/util';
 
 import {useMessageActionsState} from './messageActions.state';
 import {
@@ -42,6 +37,11 @@ import {
 import {MessageReactions} from './messageReactions/messageReactions';
 import {ReplyButton} from './replyButton';
 
+import {useClickOutside} from '../../../../../hooks/useClickOutside';
+import {ContentMessage} from '../../../../../repositories/entity/message/contentMessage';
+import {useKoSubscribableChildren} from '../../../../../util/componentUtil';
+import {isSpaceOrEnterKey, isTabKey} from '../../../../../util/keyboardUtil';
+import {setContextMenuPosition} from '../../../../../util/util';
 import {WebAppEvents} from '../../../../../webAppEvents';
 import {useMessageFocusedTabIndex} from '../../util';
 

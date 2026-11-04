@@ -19,14 +19,14 @@
 
 import {isTruthy} from '@sindresorhus/is';
 
+import {EditableEvent} from './editedEventHandler';
+
 import {
   CompositeMessageAddEvent,
   MessageAddEvent,
   MultipartMessageAddEvent,
-} from 'Repositories/conversation/EventBuilder';
-import {StoredEvent} from 'Repositories/storage';
-
-import {EditableEvent} from './editedEventHandler';
+} from '../../../../conversation/EventBuilder';
+import {StoredEvent} from '../../../../storage';
 
 function isCompositeEvent(event: EditableEvent): event is CompositeMessageAddEvent {
   return 'items' in event.data && Array.isArray(event.data.items);

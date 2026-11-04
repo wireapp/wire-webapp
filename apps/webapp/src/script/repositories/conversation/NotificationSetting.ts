@@ -17,7 +17,7 @@
  *
  */
 
-import {type Translate} from 'Util/localizerUtil';
+import {type Translate} from '../../util/localizerUtil';
 
 export const NOTIFICATION_STATE = {
   EVERYTHING: 0b00,

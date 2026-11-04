@@ -19,7 +19,7 @@
 
 import {isSameDay, startOfDay} from 'date-fns';
 
-import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
+import type {MeetingInstance} from '../types/meetingInstance';
 
 export type MeetingInstancesByDay = {
   day: Date;

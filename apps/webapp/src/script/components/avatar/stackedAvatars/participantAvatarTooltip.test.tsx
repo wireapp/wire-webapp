@@ -20,14 +20,14 @@
 import {act, fireEvent, render, screen, waitFor, type RenderResult} from '@testing-library/react';
 import {ThemeProvider} from '@wireapp/react-ui-kit';
 
-import {AVATAR_SIZE} from 'Components/avatar';
-import {User} from 'Repositories/entity/User';
+import {AVATAR_SIZE} from '..';
+import {User} from '../../../repositories/entity/User';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
-import type {Translate} from 'Util/localizerUtil';
+import {translateForTest} from '../../../util/test/translateForTest';
+import type {Translate} from '../../../util/localizerUtil';
 
 import {ParticipantAvatarTooltip} from './participantAvatarTooltip';
 

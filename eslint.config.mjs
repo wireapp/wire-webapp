@@ -270,9 +270,9 @@ const webappImportOrderRule = [
     pathGroups: [
       {pattern: 'react', group: 'external', position: 'before'},
       {pattern: '@wireapp/*', group: 'internal', position: 'before'},
-      // One group for all webapp TS path aliases — alphabetize sorts Components/…/Util/…/src/…
+      // Keep the remaining webapp alias in one alphabetized group.
       {
-        pattern: '{apps,Components,Hooks,I18n,Repositories,Resource,src,Util}/**',
+        pattern: 'src/**',
         group: 'internal',
         position: 'after',
       },
@@ -583,6 +583,7 @@ const productionConfigs = [
     files: [
       'tools/buildArtifact/**/*.ts',
       'tools/development/**/*.ts',
+      'tools/maintenanceRelease/**/*.ts',
       'tools/productionDistribution/**/*.ts',
       'tools/releaseSummary/**/*.ts',
       'tools/runtimeVerification/**/*.ts',
@@ -693,7 +694,7 @@ const productionConfigs = [
   {
     files: ['apps/webapp/**/*.{ts,tsx}'],
     rules: {
-      // Webapp path aliases (Util/*, Components/*, …) resolve to lowercase dirs on disk.
+      // Webapp path aliases resolve to lowercase dirs on disk.
       'import/no-unresolved': ['error', {caseSensitive: false}],
       // Pin alias import order so Linux CI and macOS agree on webapp path aliases.
       'import/order': webappImportOrderRule,

@@ -22,8 +22,8 @@ import type {Dispatch, KeyboardEvent as ReactKeyboardEvent, SetStateAction} from
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {isKey, isTabKey, KEY} from 'Util/keyboardUtil';
+import {Conversation} from '../repositories/entity/Conversation';
+import {isKey, isTabKey, KEY} from '../util/keyboardUtil';
 
 type FocusConversation = (conversationId: string) => boolean | 'pending';
 type RegisterConversationElement = (conversationId: string, element: HTMLElement) => () => void;

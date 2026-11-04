@@ -27,21 +27,26 @@ import {container} from 'tsyringe';
 
 import {STATE as CALL_STATE} from '@wireapp/avs';
 
+import {Config} from 'src/script/Config';
+import {useApplicationContext, useMainViewModel} from 'src/script/page/rootProvider';
+
 import {
   joinMeetingCall,
   joinMeetingCallErrors,
   type JoinMeetingCallDeps,
   type JoinMeetingCallError,
-} from 'Components/meeting/joinMeetingCall';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {showCallNotEstablishedModal, useNoInternetCallGuard} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard';
-import type {CallMediaChoice} from 'Repositories/calling/callMediaChoice';
-import {CallState} from 'Repositories/calling/CallState';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {Config} from 'src/script/Config';
-import {useApplicationContext, useMainViewModel} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {matchQualifiedIds} from 'Util/qualifiedId';
+} from './joinMeetingCall';
+
+import {
+  showCallNotEstablishedModal,
+  useNoInternetCallGuard,
+} from '../../hooks/useNoInternetCallGuard/useNoInternetCallGuard';
+import type {CallMediaChoice} from '../../repositories/calling/callMediaChoice';
+import {CallState} from '../../repositories/calling/CallState';
+import {ConversationState} from '../../repositories/conversation/ConversationState';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
+import {matchQualifiedIds} from '../../util/qualifiedId';
+import {PrimaryModal} from '../Modals/PrimaryModal';
 
 type JoinMeetingCallResultHandlers = {
   showConversationNotFoundModal: () => void;

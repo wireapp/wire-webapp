@@ -19,18 +19,18 @@
 
 import {isTruthy} from '@sindresorhus/is';
 
-import {
-  CompositeMessageAddEvent,
-  MessageAddEvent,
-  MultipartMessageAddEvent,
-} from 'Repositories/conversation/EventBuilder';
-import type {IdentifiedUpdatePayload} from 'Repositories/event/EventService';
-import {StoredEvent} from 'Repositories/storage';
 import {EventError} from 'src/script/error/eventError';
 
 import {getCommonMessageUpdates} from './getCommonMessageUpdates';
 
+import {
+  CompositeMessageAddEvent,
+  MessageAddEvent,
+  MultipartMessageAddEvent,
+} from '../../../../conversation/EventBuilder';
+import {StoredEvent} from '../../../../storage';
 import {ClientEvent, CONVERSATION} from '../../../Client';
+import type {IdentifiedUpdatePayload} from '../../../EventService';
 import {EventHandler, HandledEvents} from '../types';
 
 function throwValidationError(message: string): never {

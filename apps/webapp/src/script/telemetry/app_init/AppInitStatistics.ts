@@ -20,10 +20,9 @@
 import {isNan, isUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
-import {Logger, getLogger} from 'Util/logger';
-
 import {AppInitStatisticsValue} from './AppInitStatisticsValue';
 
+import {Logger, getLogger} from '../../util/logger';
 import {WebAppEvents} from '../../webAppEvents';
 
 export type AppStatistics = Partial<Record<AppInitStatisticsValue, string | number>>;

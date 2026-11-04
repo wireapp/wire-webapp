@@ -23,16 +23,17 @@ import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {RestPerformActionResponse} from 'cells-sdk-ts';
 import {Result, result, task} from 'true-myth';
 
+import {CellNode} from 'src/script/types/cellNode';
+
+import {isBulkMoveValid} from './validateBulkMove';
+
+import {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
 import {
   CELLS_ACTION,
   canPerformCellsAction,
   useCellsActionPermissions,
-} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
-import {getCellsApiPath} from 'Components/conversation/conversationCells/common/getCellsApiPath/getCellsApiPath';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {CellNode} from 'src/script/types/cellNode';
-
-import {isBulkMoveValid} from './validateBulkMove';
+} from '../../common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
+import {getCellsApiPath} from '../../common/getCellsApiPath/getCellsApiPath';
 
 interface UseMoveSelectedCellsNodesProps {
   conversationQualifiedId: QualifiedId;

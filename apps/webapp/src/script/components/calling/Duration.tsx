@@ -19,7 +19,7 @@
 
 import {useState, useEffect, type FunctionComponent} from 'react';
 
-import {formatSeconds} from 'Util/timeUtil';
+import {formatSeconds} from '../../util/timeUtil';
 
 const millisecondsPerSecond = 1000;
 

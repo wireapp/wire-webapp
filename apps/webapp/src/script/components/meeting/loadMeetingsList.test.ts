@@ -19,7 +19,7 @@
 
 import {task} from 'true-myth';
 
-import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
+import type {MeetingsRepository} from '../../repositories/meetings/meetingsRepository';
 
 import {loadMeetingsList} from './loadMeetingsList';
 

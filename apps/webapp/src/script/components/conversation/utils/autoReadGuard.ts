@@ -17,7 +17,7 @@
  *
  */
 
-import type {Conversation} from 'Repositories/entity/Conversation';
+import type {Conversation} from '../../../repositories/entity/Conversation';
 
 /**
  * Wraps a callback that advances the read state (read marker, read receipts) so it becomes a no-op

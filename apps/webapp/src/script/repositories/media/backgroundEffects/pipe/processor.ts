@@ -20,7 +20,7 @@
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {setTimeout} from 'worker-timers';
 
-import {getSafeLogger} from 'Repositories/media/backgroundEffects/helper/logger';
+import {getSafeLogger} from '../helper/logger';
 
 const defaultFramesPerSecond = 15;
 const millisecondsPerSecond = 1000;

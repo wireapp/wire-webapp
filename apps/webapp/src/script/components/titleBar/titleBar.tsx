@@ -27,17 +27,6 @@ import {container} from 'tsyringe';
 
 import {CallIcon, IconButton, IconButtonVariant, QUERY, TabIndex, useMatchMedia} from '@wireapp/react-ui-kit';
 
-import {ConversationVerificationBadges} from 'Components/badge';
-import {useCallAlertState} from 'Components/calling/useCallAlertState';
-import * as Icon from 'Components/icon';
-import {LegalHoldDot} from 'Components/LegalHoldDot';
-import {useConversationCall} from 'Hooks/useConversationCall';
-import {useNoInternetCallGuard} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard';
-import {CallState} from 'Repositories/calling/CallState';
-import {ConversationFilter} from 'Repositories/conversation/ConversationFilter';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
 import {RightSidebarParams} from 'src/script/page/appMain';
 import {PanelState} from 'src/script/page/rightSidebar';
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -45,14 +34,25 @@ import {useAppMainState, ViewType} from 'src/script/page/state';
 import {ContentState} from 'src/script/page/useAppState';
 import {CallActions} from 'src/script/view_model/CallingViewModel';
 import {ViewModelRepositories} from 'src/script/view_model/MainViewModel';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
-import type {Translate} from 'Util/localizerUtil/translationTypes';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
+import {useConversationCall} from '../../hooks/useConversationCall';
+import {useNoInternetCallGuard} from '../../hooks/useNoInternetCallGuard/useNoInternetCallGuard';
+import {CallState} from '../../repositories/calling/CallState';
+import {ConversationFilter} from '../../repositories/conversation/ConversationFilter';
+import {Conversation} from '../../repositories/entity/Conversation';
+import {User} from '../../repositories/entity/User';
+import {TeamState} from '../../repositories/team/TeamState';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
+import {handleKeyDown, KEY} from '../../util/keyboardUtil';
+import {createReactTranslationMarker, renderReactTranslation} from '../../util/localizerUtil/reactLocalizerUtil';
+import type {Translate} from '../../util/localizerUtil/translationTypes';
+import {matchQualifiedIds} from '../../util/qualifiedId';
+import {TIME_IN_MILLIS} from '../../util/timeUtil';
 import {WebAppEvents} from '../../webAppEvents';
+import {ConversationVerificationBadges} from '../badge';
+import {useCallAlertState} from '../calling/useCallAlertState';
+import * as Icon from '../icon';
+import {LegalHoldDot} from '../LegalHoldDot';
 
 interface TitleBarProps {
   callActions: CallActions;

@@ -24,22 +24,22 @@ import {container} from 'tsyringe';
 
 import {randomUUID} from 'crypto';
 
-import {ClientEntity} from 'Repositories/client/ClientEntity';
-import {ClientState} from 'Repositories/client/ClientState';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import {ClientEntity} from '../../../../../repositories/client/ClientEntity';
+import {ClientState} from '../../../../../repositories/client/ClientState';
+import {ConversationState} from '../../../../../repositories/conversation/ConversationState';
+import {CryptographyRepository} from '../../../../../repositories/cryptography/CryptographyRepository';
+import {Conversation} from '../../../../../repositories/entity/Conversation';
+import {User} from '../../../../../repositories/entity/User';
 import {withTheme} from 'src/script/auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {Core} from 'src/script/service/coreSingleton';
-import {createUuid} from 'Util/uuid';
+import {createUuid} from '../../../../../util/uuid';
 
 import {DevicesPreferences} from './devicesPreference';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../../util/test/translateForTest';
 
 function createDevice(): ClientEntity {
   const device = new ClientEntity(true, '', createUuid());

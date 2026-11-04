@@ -19,7 +19,7 @@
 
 import {fireEvent, render, screen} from '@testing-library/react';
 
-import type {Conversation} from 'Repositories/entity/Conversation';
+import type {Conversation} from '../../../repositories/entity/Conversation';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
@@ -27,7 +27,7 @@ import {
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 
 import {MeetingConversationsSearchableList} from './meetingConversationsSearchableList';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({

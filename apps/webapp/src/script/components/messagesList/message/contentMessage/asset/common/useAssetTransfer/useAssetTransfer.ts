@@ -23,12 +23,12 @@ import {isUndefined} from '@sindresorhus/is';
 import {noop} from 'noop-esm';
 import {container} from 'tsyringe';
 
-import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
-import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {FileAsset} from 'Repositories/entity/message/fileAsset';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {AssetRemoteData} from '../../../../../../../repositories/assets/assetRemoteData';
+import {AssetRepository} from '../../../../../../../repositories/assets/assetRepository';
+import {AssetTransferState} from '../../../../../../../repositories/assets/assetTransferState';
+import {ContentMessage} from '../../../../../../../repositories/entity/message/contentMessage';
+import {FileAsset} from '../../../../../../../repositories/entity/message/fileAsset';
+import {useKoSubscribableChildren} from '../../../../../../../util/componentUtil';
 
 export type AssetUrl = {
   url: string;

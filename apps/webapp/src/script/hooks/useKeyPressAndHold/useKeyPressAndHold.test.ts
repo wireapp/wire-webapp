@@ -19,7 +19,7 @@
 
 import {act, renderHook} from '@testing-library/react';
 
-import {KEY} from 'Util/keyboardUtil';
+import {KEY} from '../../util/keyboardUtil';
 
 import {useKeyPressAndHold} from './useKeyPressAndHold';
 

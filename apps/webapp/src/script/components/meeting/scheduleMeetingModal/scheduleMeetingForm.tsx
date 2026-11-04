@@ -37,24 +37,6 @@ import {
   TimePickerField,
 } from '@wireapp/react-ui-kit';
 
-import {MeetingParticipantsPicker} from 'Components/meeting/meetingParticipantsPicker';
-import {MeetingLinkForm} from 'Components/meeting/shared/meetingLinkForm/meetingLinkForm';
-import {useMeetingParticipants} from 'Components/meeting/shared/participants/useMeetingParticipants';
-import {
-  scheduleMeetingFormBottomWrapperCss,
-  scheduleMeetingFormColumnCss,
-  scheduleMeetingFormDividerCss,
-  scheduleMeetingFormLayoutCss,
-  scheduleMeetingFormLeftColumnCss,
-  scheduleMeetingParticipantsSectionCss,
-  scheduleMeetingRecurrenceSelectWrapperStyles,
-  scheduleMeetingSelectMenuPortalStyles,
-  scheduleMeetingTimeFieldsRowCss,
-  scheduleMeetingTitleClearButtonStyles,
-  scheduleMeetingTitleInputStyles,
-  scheduleMeetingTitleInputWrapperStyles,
-} from 'Components/meeting/shared/styles/meetingForm.styles';
-import type {User} from 'Repositories/entity/User';
 import {currentLanguage} from 'src/script/auth/localeConfig';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {getRegionalDateLocale} from 'src/script/util/timeUtil';
@@ -70,6 +52,25 @@ import {
   scheduleMeetingModes,
   type ScheduleMeetingRecurrenceOption,
 } from './scheduleMeetingTypes';
+
+import type {User} from '../../../repositories/entity/User';
+import {MeetingParticipantsPicker} from '../meetingParticipantsPicker';
+import {MeetingLinkForm} from '../shared/meetingLinkForm/meetingLinkForm';
+import {useMeetingParticipants} from '../shared/participants/useMeetingParticipants';
+import {
+  scheduleMeetingFormBottomWrapperCss,
+  scheduleMeetingFormColumnCss,
+  scheduleMeetingFormDividerCss,
+  scheduleMeetingFormLayoutCss,
+  scheduleMeetingFormLeftColumnCss,
+  scheduleMeetingParticipantsSectionCss,
+  scheduleMeetingRecurrenceSelectWrapperStyles,
+  scheduleMeetingSelectMenuPortalStyles,
+  scheduleMeetingTimeFieldsRowCss,
+  scheduleMeetingTitleClearButtonStyles,
+  scheduleMeetingTitleInputStyles,
+  scheduleMeetingTitleInputWrapperStyles,
+} from '../shared/styles/meetingForm.styles';
 
 const millisecondsPerSecond = 1000;
 const secondsPerMinute = 60;

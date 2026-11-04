@@ -19,7 +19,7 @@
 
 import React, {type FunctionComponent} from 'react';
 
-import {formatDateNumeral, formatTimeShort, fromUnixTime, TIME_IN_MILLIS} from 'Util/timeUtil';
+import {formatDateNumeral, formatTimeShort, fromUnixTime, TIME_IN_MILLIS} from '../../../util/timeUtil';
 
 interface MessageTimeProps {
   timestamp: number;

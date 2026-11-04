@@ -19,12 +19,12 @@
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 
-import {getLogger} from 'Util/logger';
-
 import {BrowserPermissionStatus} from './BrowserPermissionStatus';
 import {permissionsStore} from './Permissions.store';
 import {PermissionStateResult, UnifiedPermissionState} from './Permissions.types';
 import {PermissionType} from './PermissionType';
+
+import {getLogger} from '../../util/logger';
 
 const logger = getLogger('PermissionHandlers');
 

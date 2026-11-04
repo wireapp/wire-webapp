@@ -21,9 +21,9 @@ import type {FunctionComponent} from 'react';
 
 import {CallIcon} from '@wireapp/react-ui-kit';
 
-import {useMeetingStore} from 'Components/meeting/meetingStore/meetingStoreProvider';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
+import {useMeetingStore} from '../../../../../components/meeting/meetingStore/meetingStoreProvider';
 import {ConversationTab} from '../conversationTab';
 import {SidebarTabs} from '../useSidebarStore';
 

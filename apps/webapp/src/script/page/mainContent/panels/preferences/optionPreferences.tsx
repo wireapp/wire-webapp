@@ -23,21 +23,21 @@ import {amplify} from 'amplify';
 
 import {TabIndex, Checkbox, CheckboxLabel, IndicatorRangeInput} from '@wireapp/react-ui-kit';
 
-import {Theme} from 'Components/appContainer/hooks/useTheme';
-import {RadioGroup} from 'Components/Radio';
-import {RootFontSize, useRootFontSize} from 'Hooks/useRootFontSize';
-import {User} from 'Repositories/entity/User';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
-import type {Translate} from 'Util/localizerUtil/translationTypes';
 
 import {PreferencesPage} from './components/preferencesPage';
 import {PreferencesSection} from './components/preferencesSection';
 
+import {Theme} from '../../../../components/appContainer/hooks/useTheme';
+import {RadioGroup} from '../../../../components/Radio';
+import {RootFontSize, useRootFontSize} from '../../../../hooks/useRootFontSize';
+import {User} from '../../../../repositories/entity/User';
+import {PropertiesRepository} from '../../../../repositories/properties/propertiesRepository';
+import {PROPERTIES_TYPE} from '../../../../repositories/properties/propertiesType';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
+import {createReactTranslationMarker, renderReactTranslation} from '../../../../util/localizerUtil/reactLocalizerUtil';
+import type {Translate} from '../../../../util/localizerUtil/translationTypes';
 import {WebAppEvents} from '../../../../webAppEvents';
 
 interface OptionPreferencesProps {

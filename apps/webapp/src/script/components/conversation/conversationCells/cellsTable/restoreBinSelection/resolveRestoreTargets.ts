@@ -17,12 +17,10 @@
  *
  */
 
-import {
-  CELLS_ACTION,
-  canPerformCellsAction,
-} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
-import {RECYCLE_BIN_PATH} from 'Components/conversation/conversationCells/common/recycleBin/recycleBin';
 import {CellNode} from 'src/script/types/cellNode';
+
+import {CELLS_ACTION, canPerformCellsAction} from '../../common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
+import {RECYCLE_BIN_PATH} from '../../common/recycleBin/recycleBin';
 
 export type RestoreTarget =
   {kind: 'selected'; node: CellNode} | {kind: 'parent'; rootParentName: string; selectedNodes: CellNode[]};

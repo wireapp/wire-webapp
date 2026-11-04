@@ -17,13 +17,14 @@
  *
  */
 
-import {showRestoreNestedNodeModal} from 'Components/conversation/conversationCells/cellsTable/cellsTableColumns/cellsTableRowOptions/showRestoreNestedNodeModal/showRestoreNestedNodeModal';
-import {showRestoreRootNodeModal} from 'Components/conversation/conversationCells/cellsTable/cellsTableColumns/cellsTableRowOptions/showRestoreRootNodeModal/showRestoreRootNodeModal';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {RootContextValue} from 'src/script/page/rootProvider';
 import type {CellNode} from 'src/script/types/cellNode';
 
 import type {RestoreTarget} from './resolveRestoreTargets';
+
+import {PrimaryModal} from '../../../../Modals/PrimaryModal';
+import {showRestoreNestedNodeModal} from '../cellsTableColumns/cellsTableRowOptions/showRestoreNestedNodeModal/showRestoreNestedNodeModal';
+import {showRestoreRootNodeModal} from '../cellsTableColumns/cellsTableRowOptions/showRestoreRootNodeModal/showRestoreRootNodeModal';
 
 interface ShowBulkRestoreModalParams {
   selectedNodes: readonly CellNode[];

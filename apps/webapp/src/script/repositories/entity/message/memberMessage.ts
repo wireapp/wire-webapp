@@ -23,15 +23,14 @@ import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import ko from 'knockout';
 
-import {ClientEvent} from 'Repositories/event/Client';
-import {type Translate, Declension, getUserName} from 'Util/localizerUtil';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-import {capitalizeFirstChar} from 'Util/stringUtil';
-
 import {SystemMessage} from './systemMessage';
 
 import {SuperType} from '../../../message/superType';
 import {SystemMessageType} from '../../../message/systemMessageType';
+import {type Translate, Declension, getUserName} from '../../../util/localizerUtil';
+import {matchQualifiedIds} from '../../../util/qualifiedId';
+import {capitalizeFirstChar} from '../../../util/stringUtil';
+import {ClientEvent} from '../../event/Client';
 import {User} from '../User';
 
 export const groupCreationHeaderSenderNameMarkerStart = '__wire_group_creation_sender_name_start__';

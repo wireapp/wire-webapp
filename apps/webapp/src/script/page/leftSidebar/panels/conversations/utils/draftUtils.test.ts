@@ -17,7 +17,7 @@
  *
  */
 
-import {StorageKey} from 'Repositories/storage';
+import {StorageKey} from '../../../../../repositories/storage';
 import {generateConversation} from 'test/helper/ConversationGenerator';
 
 import {conversationHasDraft} from './draftUtils';

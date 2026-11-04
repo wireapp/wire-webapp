@@ -21,8 +21,8 @@ import {MediaDeviceType} from './MediaDeviceType';
 import {MediaDevicesHandler} from './MediaDevicesHandler';
 import {isUndefined} from '@sindresorhus/is';
 import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
-import {mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
-import {loadValue, storeValue} from 'Util/storageUtil';
+import {mediaDevicesStore} from './useMediaDevicesStore';
+import {loadValue, storeValue} from '../../util/storageUtil';
 
 /* npx jest --config apps/webapp/jest.config.ts --runTestsByPath src/script/repositories/media/MediaDevicesHandler.test.ts */
 describe('MediaDevicesHandler', () => {

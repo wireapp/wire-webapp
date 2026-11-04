@@ -20,16 +20,16 @@
 import {act, render, waitFor} from '@testing-library/react';
 import {assertNotNullOrUndefined} from '@sindresorhus/is';
 
-import {ClientEntity} from 'Repositories/client/ClientEntity';
+import {ClientEntity} from '../../../../../../../repositories/client/ClientEntity';
 import {withTheme} from 'src/script/auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {createUuid} from 'Util/uuid';
+import {createUuid} from '../../../../../../../util/uuid';
 
 import {DeviceDetailsPreferences} from './deviceDetailsPreferences';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../../../../util/test/translateForTest';
 
 describe('DeviceDetailsPreferences', () => {
   const rootContextValue = createRootContextValueForTest({translate: translateForTest});

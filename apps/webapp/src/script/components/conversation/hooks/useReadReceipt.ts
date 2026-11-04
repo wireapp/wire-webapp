@@ -23,9 +23,9 @@ import type {Clock, TimeoutIdentifier} from '@enormora/clock/clock';
 import {isNonEmptyArray, isUndefined} from '@sindresorhus/is';
 import {groupBy} from 'underscore';
 
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {Message} from 'Repositories/entity/message/message';
+import {MessageRepository} from '../../../repositories/conversation/MessageRepository';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {Message} from '../../../repositories/entity/message/message';
 
 type ReadMessageBuffer = {conversation: Conversation; message: Message};
 type ReadReceiptClock = Pick<Clock, 'setTimeout' | 'clearTimeout'>;

@@ -19,9 +19,10 @@
 
 import type {FunctionComponent} from 'react';
 
-import {FileAsset} from 'Repositories/entity/message/fileAsset';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {trimFileExtension} from 'Util/util';
+
+import {FileAsset} from '../../../../../../../repositories/entity/message/fileAsset';
+import {trimFileExtension} from '../../../../../../../util/util';
 
 interface RestrictedFileProps {
   asset?: FileAsset;

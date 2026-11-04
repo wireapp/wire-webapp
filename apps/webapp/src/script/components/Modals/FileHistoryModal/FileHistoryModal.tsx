@@ -19,9 +19,7 @@
 
 import type {FunctionComponent} from 'react';
 
-import {FileLoader} from 'Components/FileFullscreenModal/FileLoader/FileLoader';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {handleEscDown} from 'Util/keyboardUtil';
 
 import {FileHistoryContent} from './FileHistoryContent';
 import {FileHistoryHeader} from './FileHistoryHeader';
@@ -30,6 +28,8 @@ import {FileRestoreConfirmContent} from './FileRestoreConfirmContent';
 import {useFileHistoryModal} from './hooks/useFileHistoryModal';
 import {useFileVersions} from './hooks/useFileVersions';
 
+import {handleEscDown} from '../../../util/keyboardUtil';
+import {FileLoader} from '../../FileFullscreenModal/FileLoader/FileLoader';
 import {ModalComponent} from '../ModalComponent';
 
 export const FileHistoryModal: FunctionComponent = () => {

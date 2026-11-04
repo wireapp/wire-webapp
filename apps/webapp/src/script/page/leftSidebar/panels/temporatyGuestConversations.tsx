@@ -19,14 +19,14 @@
 
 import type {FunctionComponent} from 'react';
 
-import {CallingCell} from 'Components/calling/CallingCell';
-import * as Icon from 'Components/icon';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
 
+import {CallingCell} from '../../../components/calling/CallingCell';
+import * as Icon from '../../../components/icon';
+import {PrimaryModal} from '../../../components/Modals/PrimaryModal';
 import {Config} from '../../../Config';
+import {User} from '../../../repositories/entity/User';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {CallingViewModel} from '../../../view_model/CallingViewModel';
 import {ListViewModel} from '../../../view_model/ListViewModel';
 

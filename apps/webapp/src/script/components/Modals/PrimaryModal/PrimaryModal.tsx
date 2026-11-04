@@ -24,12 +24,7 @@ import {isNullOrUndefined} from '@sindresorhus/is';
 import {ValidationUtil} from '@wireapp/commons';
 import {ErrorMessage} from '@wireapp/react-ui-kit';
 
-import {CopyToClipboardButton} from 'Components/copyToClipboardButton';
-import {FadingScrollbar} from 'Components/fadingScrollbar';
 import {Config} from 'src/script/Config';
-import {isEnterKey, isEscapeKey} from 'Util/keyboardUtil';
-import type {Translate} from 'Util/localizerUtil';
-import {isValidPassword} from 'Util/stringUtil';
 
 import {CheckboxOption} from './CheckboxOption/CheckboxOption';
 import {MessageContent} from './Content/MessageContent';
@@ -46,6 +41,12 @@ import {PrimaryModalShell} from './PrimaryModalShell/PrimaryModalShell';
 import {usePrimaryModalState, showNextModalInQueue, defaultContent, removeCurrentModal} from './PrimaryModalState';
 import {ButtonAction, PrimaryModalType} from './PrimaryModalTypes';
 import {SecondaryButton} from './SecondaryButton/SecondaryButton';
+
+import {isEnterKey, isEscapeKey} from '../../../util/keyboardUtil';
+import type {Translate} from '../../../util/localizerUtil';
+import {isValidPassword} from '../../../util/stringUtil';
+import {CopyToClipboardButton} from '../../copyToClipboardButton';
+import {FadingScrollbar} from '../../fadingScrollbar';
 
 interface PrimaryModalComponentProps {
   readonly translate: Translate;
