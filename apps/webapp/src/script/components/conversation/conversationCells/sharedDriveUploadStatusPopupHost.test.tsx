@@ -180,6 +180,7 @@ describe('SharedDriveUploadStatusPopupHost', () => {
         {id: 'file-2', name: 'notes.txt', isFolder: false},
       ],
       destinationPath: 'Design reviews',
+      action: 'move',
     });
 
     expect(document.querySelectorAll('[data-uie-name="shared-drive-upload-status-popup"]')).toHaveLength(1);
@@ -192,6 +193,124 @@ describe('SharedDriveUploadStatusPopupHost', () => {
     expect(progress).not.toHaveAttribute('aria-valuenow');
     expect(progress).not.toHaveAttribute('aria-valuemax');
     expect(screen.getAllByRole('listitem')).toHaveLength(3);
+  });
+
+  it('shows restore progress with its own title, label and original-location destination', () => {
+    renderHost(createController(), conversationQualifiedId, true, true, translateMoveSummaryForTest, {
+      id: 'restore-job',
+      action: 'restore',
+      kind: 'processing',
+      items: [{id: 'file-1', name: 'mockup.pdf', isFolder: false}],
+      destinationPath: '',
+    });
+
+    expect(screen.getByText('cells.bulkRestore.status.restoring')).toBeInTheDocument();
+    expect(screen.getByText('to cells.bulkRestore.status.destination')).toBeInTheDocument();
+    expect(screen.getByRole('progressbar', {name: 'cells.bulkMove.processing'})).not.toHaveAttribute('aria-valuenow');
+  });
+
+  it('shows a completed restore with a full progress bar', () => {
+    renderHost(createController(), conversationQualifiedId, true, true, translateMoveSummaryForTest, {
+      id: 'restore-job',
+      action: 'restore',
+      kind: 'completed',
+      items: [{id: 'file-1', name: 'mockup.pdf', isFolder: false}],
+      destinationPath: '',
+    });
+
+    expect(screen.getByText('cells.bulkRestore.status.restored')).toBeInTheDocument();
+    expect(screen.getByRole('progressbar', {name: 'cells.bulkRestore.status.completed'})).toHaveAttribute(
+      'aria-valuenow',
+      '100',
+    );
+  });
+
+  it.each(['request-failed', 'partial', 'finished-unknown', 'failed', 'status-unknown'] as const)(
+    'announces a %s restore as needing review with the shared restore error',
+    kind => {
+      renderHost(createController(), conversationQualifiedId, true, true, translateMoveSummaryForTest, {
+        id: 'restore-job',
+        action: 'restore',
+        kind,
+        items: [{id: 'file-1', name: 'mockup.pdf', isFolder: false}],
+        destinationPath: '',
+      });
+
+      expect(screen.getByText('cells.bulkRestore.status.needsReview')).toBeInTheDocument();
+      expect(screen.getByRole('alert')).toHaveTextContent('cells.restore.error');
+      expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
+    },
+  );
+
+  it.each([
+    ['processing', 'cells.bulkDelete.status.deleting'],
+    ['completed', 'cells.bulkDelete.status.deleted'],
+  ] as const)('titles a %s permanent delete and shows no destination line', (kind, title) => {
+    renderHost(createController(), conversationQualifiedId, true, true, translateMoveSummaryForTest, {
+      id: 'delete-job',
+      action: 'permanentDelete',
+      kind,
+      items: [{id: 'file-1', name: 'mockup.pdf', isFolder: false}],
+      destinationPath: '',
+    });
+
+    expect(screen.getByText(title)).toBeInTheDocument();
+    expect(screen.queryByText(/^to /)).not.toBeInTheDocument();
+  });
+
+  it.each([
+    ['request-failed', 'cells.bulkDelete.rejected'],
+    ['failed', 'cells.bulkDelete.jobFailed'],
+    ['finished-unknown', 'cells.bulkDelete.refreshFailed'],
+    ['status-unknown', 'cells.bulkDelete.timedOut'],
+    ['partial', 'cells.bulkDelete.stillVisible'],
+  ] as const)('announces a %s permanent delete with its delete-specific message', (kind, message) => {
+    renderHost(createController(), conversationQualifiedId, true, true, translateMoveSummaryForTest, {
+      id: 'delete-job',
+      action: 'permanentDelete',
+      kind,
+      items: [{id: 'file-1', name: 'mockup.pdf', isFolder: false}],
+      destinationPath: '',
+    });
+
+    expect(screen.getByText('cells.bulkDelete.status.needsReview')).toBeInTheDocument();
+    expect(screen.getByRole('alert')).toHaveTextContent(message);
+  });
+
+  it.each([
+    ['processing', 'cells.emptyBin.status.processing'],
+    ['completed', 'cells.emptyBin.status.completed'],
+  ] as const)('titles a %s empty-Bin action and lists no items or destination', (kind, title) => {
+    renderHost(createController(), conversationQualifiedId, true, true, translateMoveSummaryForTest, {
+      id: 'empty-bin',
+      action: 'emptyBin',
+      kind,
+      items: [],
+      destinationPath: '',
+    });
+
+    expect(screen.getByText(title)).toBeInTheDocument();
+    expect(screen.queryAllByRole('listitem')).toHaveLength(0);
+    expect(screen.queryByText(/^to /)).not.toBeInTheDocument();
+  });
+
+  it.each([
+    ['request-failed', 'cells.emptyBin.status.lookup-error'],
+    ['partial', 'cells.emptyBin.status.partial'],
+    ['failed', 'cells.emptyBin.status.failed'],
+    ['status-unknown', 'cells.emptyBin.status.unknown'],
+    ['finished-unknown', 'cells.emptyBin.refreshFailed'],
+  ] as const)('announces a %s empty-Bin action with its existing message', (kind, message) => {
+    renderHost(createController(), conversationQualifiedId, true, true, translateMoveSummaryForTest, {
+      id: 'empty-bin',
+      action: 'emptyBin',
+      kind,
+      items: [],
+      destinationPath: '',
+    });
+
+    expect(screen.getByText('cells.emptyBin.status.needsReview')).toBeInTheDocument();
+    expect(screen.getByRole('alert')).toHaveTextContent(message);
   });
 
   it.each([
@@ -207,12 +326,55 @@ describe('SharedDriveUploadStatusPopupHost', () => {
       kind,
       items: [{id: 'file-1', name: 'mockup.pdf', isFolder: false}],
       destinationPath: 'Design reviews',
+      action: 'move',
     });
 
     expect(screen.getByRole('alert')).toHaveTextContent(warning);
     expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
     expect(screen.getByRole('listitem')).toHaveTextContent('mockup.pdf');
     expect(screen.getByRole('listitem')).not.toHaveTextContent(/failed/i);
+  });
+
+  it('offers a review button for a restore that needs review and runs its callback', async () => {
+    const user = userEvent.setup();
+    const onReview = jest.fn();
+    renderHost(createController(), conversationQualifiedId, true, true, translateMoveSummaryForTest, {
+      id: 'restore-job',
+      action: 'restore',
+      kind: 'status-unknown',
+      items: [{id: 'file-1', name: 'mockup.pdf', isFolder: false}],
+      destinationPath: '',
+      onReview,
+    });
+
+    await user.click(screen.getByRole('button', {name: 'cells.bulkAction.refresh'}));
+
+    expect(onReview).toHaveBeenCalledTimes(1);
+  });
+
+  it.each(['processing', 'completed'] as const)('does not offer the review button while %s', kind => {
+    renderHost(createController(), conversationQualifiedId, true, true, translateMoveSummaryForTest, {
+      id: 'restore-job',
+      action: 'restore',
+      kind,
+      items: [{id: 'file-1', name: 'mockup.pdf', isFolder: false}],
+      destinationPath: '',
+      onReview: jest.fn(),
+    });
+
+    expect(screen.queryByRole('button', {name: 'cells.bulkAction.refresh'})).not.toBeInTheDocument();
+  });
+
+  it('does not offer the review button when the status has no review callback', () => {
+    renderHost(createController(), conversationQualifiedId, true, true, translateMoveSummaryForTest, {
+      id: 'move-job',
+      action: 'move',
+      kind: 'partial',
+      items: [{id: 'file-1', name: 'mockup.pdf', isFolder: false}],
+      destinationPath: 'Design reviews',
+    });
+
+    expect(screen.queryByRole('button', {name: 'cells.bulkAction.refresh'})).not.toBeInTheDocument();
   });
 
   it('keeps a dismissed pending move hidden across status updates without cancelling it', async () => {
@@ -223,6 +385,7 @@ describe('SharedDriveUploadStatusPopupHost', () => {
       kind: 'processing',
       items: [{id: 'file-1', name: 'mockup.pdf', isFolder: false}],
       destinationPath: 'Design reviews',
+      action: 'move',
     });
 
     await user.click(screen.getByRole('button', {name: 'fileCardDefaultCloseButtonLabel'}));
@@ -245,6 +408,7 @@ describe('SharedDriveUploadStatusPopupHost', () => {
         {id: 'file-2', name: 'notes.txt', isFolder: false},
       ],
       destinationPath: 'Design reviews',
+      action: 'move',
     });
 
     expect(screen.getByText('Moved 3 items')).toBeInTheDocument();

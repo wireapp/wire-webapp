@@ -29,7 +29,10 @@ export interface SharedDriveMoveItem {
   readonly isFolder: boolean;
 }
 
+export type SharedDriveBulkAction = 'move' | 'restore' | 'permanentDelete' | 'emptyBin';
+
 export interface SharedDriveMoveSummary {
+  readonly action: SharedDriveBulkAction;
   readonly items: readonly SharedDriveMoveItem[];
   readonly destinationPath: string;
 }
@@ -40,6 +43,8 @@ export type SharedDriveMoveStatusKind =
 export interface SharedDriveMoveStatus extends SharedDriveMoveSummary {
   readonly id: string;
   readonly kind: SharedDriveMoveStatusKind;
+  /** Retries the check for an outcome that needs review; the popup offers it as a button when set. */
+  readonly onReview?: () => void;
 }
 
 type SharedDriveUploadStatusContextValue = {

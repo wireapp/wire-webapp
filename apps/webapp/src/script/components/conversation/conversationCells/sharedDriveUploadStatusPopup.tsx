@@ -81,8 +81,10 @@ interface SharedDriveMoveActivityProps {
   readonly isExpanded: boolean;
   readonly toggleLabel: string;
   readonly dismissLabel: string;
+  readonly reviewLabel?: string;
   readonly onToggle: () => void;
   readonly onDismiss: () => void;
+  readonly onReview?: () => void;
 }
 
 interface SharedDriveUploadStatusPopupProps {
@@ -448,8 +450,10 @@ export const SharedDriveUploadStatusPopup: FunctionComponent<
       isExpanded,
       toggleLabel,
       dismissLabel,
+      reviewLabel,
       onToggle,
       onDismiss,
+      onReview,
     } = props;
     const rowStatusKind = getMoveRowStatusKind(move);
     const rowsId = 'shared-drive-move-status-rows';
@@ -472,6 +476,11 @@ export const SharedDriveUploadStatusPopup: FunctionComponent<
             </span>
           </div>
           <div css={sharedDriveUploadStatusPopupHeaderActionsStyles}>
+            {isMoveWarning && onReview !== undefined && reviewLabel !== undefined && (
+              <button type="button" css={sharedDriveUploadStatusPopupHeaderCancelStyles} onClick={onReview}>
+                {reviewLabel}
+              </button>
+            )}
             <button
               type="button"
               css={sharedDriveUploadStatusPopupHeaderCancelStyles}

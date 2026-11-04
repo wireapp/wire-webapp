@@ -101,6 +101,7 @@ export const ConversationCells = memo(
     const [folderDropResetKey, setFolderDropResetKey] = useState(0);
     const [selectionBarAnchor, setSelectionBarAnchor] = useState<HTMLDivElement | null>(null);
     const [emptyBinSelectionResetKey, setEmptyBinSelectionResetKey] = useState(0);
+    const [isEmptyBinInProgress, setIsEmptyBinInProgress] = useState(false);
     const onUploadFiles = (): void | undefined => {
       return uploadInput.current?.click();
     };
@@ -393,6 +394,7 @@ export const ConversationCells = memo(
               onRefresh={handleRefresh}
               onRefreshAfterEmptyBinOutcome={handleRefreshAndReportSuccess}
               onEmptyBinSubmitted={handleEmptyBinSubmitted}
+              onEmptyBinInProgressChange={setIsEmptyBinInProgress}
               getCurrentCellsPath={getCellsFilesPath}
               conversationName={name}
               conversationQualifiedId={conversationQualifiedId}
@@ -428,7 +430,7 @@ export const ConversationCells = memo(
                 getDirectionFor={getDirectionFor}
                 isSortingEnabled={!isInRecycleBin}
                 onToggleSort={toggleSort}
-                selectionEnabled={!isSearchMode}
+                selectionEnabled={!isSearchMode && !isEmptyBinInProgress}
                 selectionScopeKey={`${conversationId}:${getCellsFilesPath()}:${isInRecycleBin ? 'bin' : 'files'}:${emptyBinSelectionResetKey}`}
                 selectionBarAnchor={selectionBarAnchor}
                 onFolderDropTargetChange={setActiveFolderDropTargetName}
