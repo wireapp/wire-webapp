@@ -128,7 +128,7 @@
     "browserslist": "4.29.5",
     "css-loader": "7.1.5",
     "cssnano": "7.1.9",
-    "fake-indexeddb": "6.2.5",
+    "fake-indexeddb": "6.2.7",
     "html-rspack-plugin": "6.1.11",
     "i18next-scanner": "4.6.0",
     "jest-canvas-mock": "2.5.8",
