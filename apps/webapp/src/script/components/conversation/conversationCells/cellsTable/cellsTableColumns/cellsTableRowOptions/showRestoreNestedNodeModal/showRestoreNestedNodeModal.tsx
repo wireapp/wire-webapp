@@ -28,11 +28,13 @@ export const showRestoreNestedNodeModal = ({
   node,
   onRestoreNode,
   parentNodeName,
+  modalId,
   translate,
 }: {
   node: CellNode;
   onRestoreNode: () => void;
   parentNodeName: string;
+  modalId?: string;
   translate: RootContextValue['translate'];
 }): void => {
   PrimaryModal.show(
@@ -70,7 +72,7 @@ export const showRestoreNestedNodeModal = ({
             : translate('cells.restoreNestedNodeModal.folder.headline'),
       },
     },
-    undefined,
+    modalId,
     translate,
   );
 };

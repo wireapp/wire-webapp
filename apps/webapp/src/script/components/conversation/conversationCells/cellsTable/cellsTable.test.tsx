@@ -3677,6 +3677,26 @@ describe('CellsTable restoring selected Bin items', () => {
     });
   });
 
+  it.each([
+    {description: 'a top-level file', path: 'a.txt'},
+    {description: 'a file inside a deleted folder', path: 'Reports/a.txt'},
+  ])('closes the single-item restore dialog when navigating away from $description', async ({path}) => {
+    const user = userEvent.setup();
+    const repository = createRepository();
+    const view = renderCellsTable({cellsRepository: repository, initialNodes: [createBinNode('a.txt', path)]});
+
+    await user.click(screen.getByRole('checkbox', {name: 'Select a.txt'}));
+    await user.click(screen.getByRole('button', {name: 'Restore'}));
+    expect(await screen.findByRole('dialog')).toBeInTheDocument();
+
+    view.rerenderWithSelectionScope('conversation:/other-folder');
+
+    await waitFor(() => {
+      return expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+    expect(repository.restoreNodes).not.toHaveBeenCalled();
+  });
+
   it('explains that a deleted parent is restored and restores a shared parent only once', async () => {
     const user = userEvent.setup();
     const repository = createRepository();
