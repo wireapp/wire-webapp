@@ -19,9 +19,11 @@
 
 import type {FunctionComponent} from 'react';
 
-import {actionsStyles, headingStyles, wrapperStyles} from 'Components/meeting/meetingHeader/meetingHeader.styles';
-import {MeetingMultiActionButton} from 'Components/meeting/meetingMultiActionButton/meetingMultiActionButton';
 import {useApplicationContext} from 'src/script/page/rootProvider';
+
+import {actionsStyles, headingStyles, wrapperStyles} from './meetingHeader.styles';
+
+import {MeetingMultiActionButton} from '../meetingMultiActionButton/meetingMultiActionButton';
 
 export const MeetingHeader: FunctionComponent = () => {
   const {translate} = useApplicationContext();

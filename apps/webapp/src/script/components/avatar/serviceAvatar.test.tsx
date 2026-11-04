@@ -19,8 +19,8 @@
 
 import {render} from '@testing-library/react';
 
-import {AVATAR_SIZE} from 'Components/avatar';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {AVATAR_SIZE} from './';
+import {ServiceEntity} from '../../repositories/integration/ServiceEntity';
 
 import {ServiceAvatar} from './serviceAvatar';
 

@@ -19,11 +19,10 @@
 
 import {escape} from 'underscore';
 
-import type {User} from 'Repositories/entity/User';
-
 import {Declension} from './localizerUtil.types';
 import type {Translate} from './translationTypes';
 
+import type {User} from '../../repositories/entity/User';
 import {sortUsersByPriority} from '../stringUtil';
 
 const finalNamePairCount = 2;

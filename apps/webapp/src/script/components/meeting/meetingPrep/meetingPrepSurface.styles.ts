@@ -19,7 +19,7 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {videoOptionsMenuStyles} from 'Components/calling/VideoControls/VideoControls.styles';
+import {videoOptionsMenuStyles} from '../../calling/VideoControls/VideoControls.styles';
 
 export const meetingPrepSurfaceStyles: CSSObject = {
   display: 'flex',

@@ -28,7 +28,9 @@ import {
 } from '@wireapp/api-client/lib/conversation';
 import {ConversationMLSMessageAddEvent, ConversationMLSWelcomeEvent} from '@wireapp/api-client/lib/event';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {Converter, Decoder, Encoder} from 'bazinga64';
+import {Converter} from '@wireapp/commons/lib/base64/converter';
+import {Decoder} from '@wireapp/commons/lib/base64/decoder';
+import {Encoder} from '@wireapp/commons/lib/base64/encoder';
 import {Task, task} from 'true-myth';
 
 import {APIClient} from '@wireapp/api-client';

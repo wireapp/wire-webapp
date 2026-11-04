@@ -21,11 +21,7 @@ import React, {type FunctionComponent} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/icon';
-import {UserInfo} from 'Components/UserInfo';
-import {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {capitalizeFirstChar} from 'Util/stringUtil';
 
 import {
   selfIndicator,
@@ -35,6 +31,11 @@ import {
   contentText,
   wrapper,
 } from './CallParticipantItemContent.styles';
+
+import {User} from '../../../../repositories/entity/User';
+import {capitalizeFirstChar} from '../../../../util/stringUtil';
+import * as Icon from '../../../icon';
+import {UserInfo} from '../../../UserInfo';
 
 interface CallParticipantItemContentProps {
   user: User;

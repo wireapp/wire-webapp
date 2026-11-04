@@ -25,7 +25,7 @@ import {Maybe, toolbelt, type Result} from 'true-myth';
 
 import {render} from '@testing-library/react';
 
-import {unwrap} from 'Util/test/resultTestSupport';
+import {unwrap} from '../../../../../../util/test/resultTestSupport';
 
 import {ReplaceCarriageReturnPlugin} from './replaceCarriageReturnPlugin';
 

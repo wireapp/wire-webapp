@@ -17,12 +17,12 @@
  *
  */
 
-import {removeCurrentModal} from 'Components/Modals/PrimaryModal';
-import {usePrimaryModalState} from 'Components/Modals/PrimaryModal/PrimaryModalState';
-import {User} from 'Repositories/entity/User/User';
-import type {Translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
-import {createUuid} from 'Util/uuid';
+import {removeCurrentModal} from '../../components/Modals/PrimaryModal';
+import {usePrimaryModalState} from '../../components/Modals/PrimaryModal/PrimaryModalState';
+import {User} from '../entity/User/User';
+import type {Translate} from '../../util/localizerUtil';
+import {translateForTest} from '../../util/test/translateForTest';
+import {createUuid} from '../../util/uuid';
 
 import {AppLockCrypto, AppLockRepository} from './appLockRepository';
 import {AppLockState} from './appLockState';

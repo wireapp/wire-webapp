@@ -19,13 +19,13 @@
 
 import {isUndefined} from '@sindresorhus/is';
 
-import {AssetType} from 'Repositories/assets/assetType';
-
 import type {FileAsset} from './fileAsset';
 import type {Location as LocationAsset} from './location';
 import type {MediumImage as MediumImageAsset} from './mediumImage';
 import type {Multipart as MultipartAsset} from './multipart';
 import type {Text as TextAsset} from './text';
+
+import {AssetType} from '../../assets/assetType';
 
 export class Asset {
   public file_type?: string;

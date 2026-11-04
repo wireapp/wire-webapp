@@ -23,36 +23,36 @@ import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {FEATURE_STATUS} from '@wireapp/api-client/lib/team/feature/';
 
-import {FileWithPreview} from 'Components/conversation/useFilesUploadState/useFilesUploadState';
-import {InputBar} from 'Components/inputBar/index';
-import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {EventRepository} from 'Repositories/event/EventRepository';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {PropertiesService} from 'Repositories/properties/propertiesService';
-import {SearchRepository} from 'Repositories/search/searchRepository';
-import {SelfService} from 'Repositories/self/SelfService';
-import {StorageRepository} from 'Repositories/storage';
-import {TeamState} from 'Repositories/team/TeamState';
+import {FileWithPreview} from '../conversation/useFilesUploadState/useFilesUploadState';
+import {InputBar} from './';
+import {AssetRepository} from '../../repositories/assets/assetRepository';
+import {CellsRepository} from '../../repositories/cells/cellsRepository';
+import {ConversationRepository} from '../../repositories/conversation/ConversationRepository';
+import {MessageRepository} from '../../repositories/conversation/MessageRepository';
+import {Conversation} from '../../repositories/entity/Conversation';
+import {User} from '../../repositories/entity/User';
+import {EventRepository} from '../../repositories/event/EventRepository';
+import {PropertiesRepository} from '../../repositories/properties/propertiesRepository';
+import {PropertiesService} from '../../repositories/properties/propertiesService';
+import {SearchRepository} from '../../repositories/search/searchRepository';
+import {SelfService} from '../../repositories/self/SelfService';
+import {StorageRepository} from '../../repositories/storage';
+import {TeamState} from '../../repositories/team/TeamState';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {Config} from 'src/script/Config';
 import {disableMessagePreprocessingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
-import {translate} from 'Util/localizerUtil';
+import {translate} from '../../util/localizerUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {createUuid} from 'Util/uuid';
+import {createUuid} from '../../util/uuid';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 import type {ReactNode} from 'react';
 
-jest.mock('Components/avatar', () => {
+jest.mock('../avatar', () => {
   return {
     AVATAR_SIZE: {X_LARGE: 'avatar-xl'},
     Avatar: () => {

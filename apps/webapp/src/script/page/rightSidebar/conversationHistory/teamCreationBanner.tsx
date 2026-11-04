@@ -23,8 +23,6 @@ import {Button, Text} from '@wireapp/react-ui-kit';
 
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {safeWindowOpen} from 'Util/sanitizationUtil';
 
 import {
   teamCreationBodyCss,
@@ -32,6 +30,9 @@ import {
   teamCreationTextCss,
   teamCreationWrapperCss,
 } from './conversationHistory.styles';
+
+import {handleKeyDown, KEY} from '../../../util/keyboardUtil';
+import {safeWindowOpen} from '../../../util/sanitizationUtil';
 
 export const TeamCreationBanner: FunctionComponent = () => {
   const {translate} = useApplicationContext();

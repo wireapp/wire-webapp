@@ -18,9 +18,10 @@
  */
 
 import {SystemMessageType} from 'src/script/message/systemMessageType';
-import {type Translate} from 'Util/localizerUtil';
 
 import {SystemMessage} from './systemMessage';
+
+import {type Translate} from '../../../util/localizerUtil';
 
 export class MLSMigrationFinalisationOngoingCallMessage extends SystemMessage {
   constructor(translate: Translate) {

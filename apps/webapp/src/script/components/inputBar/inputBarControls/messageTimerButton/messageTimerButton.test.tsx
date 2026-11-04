@@ -20,15 +20,15 @@
 import {fireEvent, render} from '@testing-library/react';
 import ko from 'knockout';
 
-import type {Conversation} from 'Repositories/entity/Conversation';
-import {TeamState} from 'Repositories/team/TeamState';
-import {translateForTest} from 'Util/test/translateForTest';
+import type {Conversation} from '../../../../repositories/entity/Conversation';
+import {TeamState} from '../../../../repositories/team/TeamState';
+import {translateForTest} from '../../../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import * as Context from 'src/script/ui/contextMenu';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
+import {TIME_IN_MILLIS} from '../../../../util/timeUtil';
 
 import {MessageTimerButton} from './messageTimerButton';
 

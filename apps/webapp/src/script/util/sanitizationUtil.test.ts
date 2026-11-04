@@ -17,12 +17,12 @@
  *
  */
 
-import {User} from 'Repositories/entity/User';
+import {User} from '../repositories/entity/User';
 import {assertNotNullOrUndefined} from '@sindresorhus/is';
-import {Declension, translate, getSelfName, getUserName} from 'Util/localizerUtil';
+import {Declension, translate, getSelfName, getUserName} from './localizerUtil';
 
 import {escapeRegex, safeWindowOpen} from './sanitizationUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from './test/translateForTest';
 
 describe('sanitizationUtil', () => {
   describe('escapeRegex', () => {

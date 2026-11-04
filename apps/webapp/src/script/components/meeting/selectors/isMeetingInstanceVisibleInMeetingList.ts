@@ -19,7 +19,7 @@
 
 import {startOfDay} from 'date-fns';
 
-import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
+import type {MeetingInstance} from '../types/meetingInstance';
 
 /**
  * Completed meetings stay in the list until local midnight on the day they start.

@@ -19,9 +19,9 @@
 
 import {Maybe} from 'true-myth';
 
-import {CellsSelfUserDriveRole} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 
+import {CellsSelfUserDriveRole} from '../../common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {resolveRestoreTargets} from './resolveRestoreTargets';
 
 const createBinNode = (

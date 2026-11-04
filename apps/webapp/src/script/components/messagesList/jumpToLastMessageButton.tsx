@@ -23,12 +23,11 @@ import {useDebouncedCallback} from 'use-debounce';
 
 import {ChevronIcon, IconButton} from '@wireapp/react-ui-kit';
 
-import {
-  jumpToLastMessageButtonStyles,
-  jumpToLastMessageChevronStyles,
-} from 'Components/messagesList/messageList.styles';
-import {Conversation} from 'Repositories/entity/Conversation';
 import {useApplicationContext} from 'src/script/page/rootProvider';
+
+import {jumpToLastMessageButtonStyles, jumpToLastMessageChevronStyles} from './messageList.styles';
+
+import {Conversation} from '../../repositories/entity/Conversation';
 
 interface JumpToLastMessageButtonProps {
   onGoToLastMessage: () => void;

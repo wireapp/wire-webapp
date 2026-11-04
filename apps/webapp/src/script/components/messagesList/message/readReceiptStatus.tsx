@@ -22,11 +22,12 @@ import {useEffect, useState, type FunctionComponent} from 'react';
 import {isFunction, isNonEmptyArray, isNonEmptyString} from '@sindresorhus/is';
 import cx from 'classnames';
 
-import {ReadIcon} from 'Components/icon';
-import {Message} from 'Repositories/entity/message/message';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {formatTimeShort} from 'Util/timeUtil';
+
+import {Message} from '../../../repositories/entity/message/message';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {formatTimeShort} from '../../../util/timeUtil';
+import {ReadIcon} from '../../icon';
 
 const DECIMAL_NUMBER_BASE = 10;
 

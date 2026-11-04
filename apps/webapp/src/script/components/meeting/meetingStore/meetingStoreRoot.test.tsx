@@ -37,14 +37,14 @@ import {amplify} from 'amplify';
 import {task} from 'true-myth';
 import {container} from 'tsyringe';
 
-import {useMeetingStore} from 'Components/meeting/meetingStore/meetingStoreProvider';
+import {useMeetingStore} from './meetingStoreProvider';
 import {
   MeetingNotificationKind,
   useMeetingNotificationStore,
-} from 'Components/meeting/meetingNotificationStore/meetingNotificationStore';
-import {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
-import {UserState} from 'Repositories/user/userState';
+} from '../meetingNotificationStore/meetingNotificationStore';
+import {User} from '../../../repositories/entity/User';
+import {TeamState} from '../../../repositories/team/TeamState';
+import {UserState} from '../../../repositories/user/userState';
 import {Config} from 'src/script/Config';
 import {
   createRootContextValueForTest,
@@ -52,8 +52,8 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {Core} from 'src/script/service/coreSingleton';
 import type {MainViewModel} from 'src/script/view_model/MainViewModel';
-import {translateForTest} from 'Util/test/translateForTest';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
+import {translateForTest} from '../../../util/test/translateForTest';
+import {TIME_IN_MILLIS} from '../../../util/timeUtil';
 
 import {MeetingStoreRoot} from './meetingStoreRoot';
 import type {FunctionComponent} from 'react';

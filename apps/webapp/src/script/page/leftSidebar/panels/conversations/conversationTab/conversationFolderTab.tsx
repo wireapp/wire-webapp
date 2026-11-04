@@ -22,10 +22,6 @@ import {ReactElement, useMemo, type FunctionComponent} from 'react';
 import {isNan, isNonEmptyArray, isNonEmptyString} from '@sindresorhus/is';
 import cx from 'classnames';
 
-import * as Icons from 'Components/icon';
-import {createLabel, LabelType} from 'Repositories/conversation/ConversationLabelRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
 import {Config} from 'src/script/Config';
 import {useFolderStore} from 'src/script/page/leftSidebar/panels/conversations/useFoldersStore';
 import {
@@ -35,7 +31,12 @@ import {
 } from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {ContextMenuEntry, showContextMenu} from 'src/script/ui/contextMenu';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
+
+import * as Icons from '../../../../../components/icon';
+import {createLabel, LabelType} from '../../../../../repositories/conversation/ConversationLabelRepository';
+import {ConversationRepository} from '../../../../../repositories/conversation/ConversationRepository';
+import {Conversation} from '../../../../../repositories/entity/Conversation';
+import {useKoSubscribableChildren} from '../../../../../util/componentUtil';
 
 interface ConversationFolderTabProps {
   title: string;

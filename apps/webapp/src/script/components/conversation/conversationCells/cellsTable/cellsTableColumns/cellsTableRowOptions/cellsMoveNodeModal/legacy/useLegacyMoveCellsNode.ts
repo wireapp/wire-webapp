@@ -22,9 +22,10 @@ import {useState} from 'react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {task} from 'true-myth';
 
-import {getCellsApiPath} from 'Components/conversation/conversationCells/common/getCellsApiPath/getCellsApiPath';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {CellNode} from 'src/script/types/cellNode';
+
+import {CellsRepository} from '../../../../../../../../repositories/cells/cellsRepository';
+import {getCellsApiPath} from '../../../../../common/getCellsApiPath/getCellsApiPath';
 
 interface UseLegacyMoveCellsNodeProps {
   cellsRepository: CellsRepository;

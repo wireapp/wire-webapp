@@ -43,13 +43,7 @@ import {
   useMatchMedia,
 } from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/icon';
-import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
-import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {handleEscDown, handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {toError} from 'Util/toError';
-import {loadDataUrl} from 'Util/util';
 
 import {
   boxCSS,
@@ -66,7 +60,13 @@ import {
 } from './oauthPermissions.styles';
 import {Page} from './page';
 
+import * as Icon from '../../components/icon';
 import {Config} from '../../Config';
+import {AssetRemoteData} from '../../repositories/assets/assetRemoteData';
+import {AssetRepository} from '../../repositories/assets/assetRepository';
+import {handleEscDown, handleKeyDown, KEY} from '../../util/keyboardUtil';
+import {toError} from '../../util/toError';
+import {loadDataUrl} from '../../util/util';
 import {actionRoot} from '../module/action';
 import {RootState, ThunkDispatch} from '../module/reducer';
 import * as SelfSelector from '../module/selector/selfSelector';

@@ -19,7 +19,7 @@
 
 import {act, renderHook} from '@testing-library/react';
 
-import {backgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
+import {backgroundEffectsStore} from '../../repositories/media/useBackgroundEffectsStore';
 
 import {useShowLoadingOverlay} from './useShowLoadingOverlay';
 

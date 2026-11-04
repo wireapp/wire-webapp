@@ -21,26 +21,26 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {task, type Task} from 'true-myth';
 import {createStore, type StoreApi} from 'zustand/vanilla';
 
-import {loadMeetingsList} from 'Components/meeting/loadMeetingsList';
-import {mapApiMeetingToSeries} from 'Components/meeting/mapApiMeetingToSeries';
-import {mapMeetingInstanceToScheduleFormState} from 'Components/meeting/mapMeetingInstanceToScheduleFormState';
-import {meetingSubmitErrors, type MeetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
-import type {ScheduleMeetingFormState} from 'Components/meeting/scheduleMeetingModal/scheduleMeetingTypes';
-import type {DeleteMeetingCommand} from 'Components/meeting/shared/service/deleteMeeting';
-import {type CreateMeetingSuccess, type MeetingSubmitSuccess} from 'Components/meeting/shared/service/meetingService';
+import type {MeetingStoreDeps} from './meetingStoreDeps';
+
+import type {User} from '../../../repositories/entity/User';
+import {getLogger} from '../../../util/logger';
+import {matchQualifiedIds} from '../../../util/qualifiedId';
+import {loadMeetingsList} from '../loadMeetingsList';
+import {mapApiMeetingToSeries} from '../mapApiMeetingToSeries';
+import {mapMeetingInstanceToScheduleFormState} from '../mapMeetingInstanceToScheduleFormState';
+import {meetingSubmitErrors, type MeetingSubmitErrors} from '../meetingSubmitErrors';
+import type {ScheduleMeetingFormState} from '../scheduleMeetingModal/scheduleMeetingTypes';
+import type {DeleteMeetingCommand} from '../shared/service/deleteMeeting';
+import {type CreateMeetingSuccess, type MeetingSubmitSuccess} from '../shared/service/meetingService';
 import type {
   MeetNowMeetingCommand,
   ScheduleMeetingCommand,
   UpdateMeetingCommand,
-} from 'Components/meeting/shared/types/meetingCommandTypes';
-import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
-import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
-import {toMeetingIdKey} from 'Components/meeting/utils/toMeetingIdKey';
-import type {User} from 'Repositories/entity/User';
-import {getLogger} from 'Util/logger';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-
-import type {MeetingStoreDeps} from './meetingStoreDeps';
+} from '../shared/types/meetingCommandTypes';
+import type {MeetingInstance} from '../types/meetingInstance';
+import type {MeetingSeries} from '../types/meetingSeries';
+import {toMeetingIdKey} from '../utils/toMeetingIdKey';
 
 const logger = getLogger('createMeetingStore');
 

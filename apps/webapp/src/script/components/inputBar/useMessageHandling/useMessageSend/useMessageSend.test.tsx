@@ -10,7 +10,7 @@
 
 import {act, renderHook} from '@testing-library/react';
 
-import {FileWithPreview, useFileUploadState} from 'Components/conversation/useFilesUploadState/useFilesUploadState';
+import {FileWithPreview, useFileUploadState} from '../../../conversation/useFilesUploadState/useFilesUploadState';
 import {Config} from 'src/script/Config';
 import {MessageHasher} from 'src/script/message/messageHasher';
 

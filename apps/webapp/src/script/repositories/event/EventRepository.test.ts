@@ -24,7 +24,7 @@ import {WebAppEvents} from '../../webAppEvents';
 import {amplify} from 'amplify';
 import {Runtime} from '@wireapp/commons';
 
-import {ClientConversationEvent} from 'Repositories/conversation/EventBuilder';
+import {ClientConversationEvent} from '../conversation/EventBuilder';
 import {Warnings} from '../../view_model/WarningsContainer';
 
 import {ClientEvent} from './Client';

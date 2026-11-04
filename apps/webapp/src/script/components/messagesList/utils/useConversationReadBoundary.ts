@@ -20,8 +20,8 @@
 import {useEffect, useRef, useState} from 'react';
 import type {Dispatch, MutableRefObject, SetStateAction} from 'react';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
 
 export type ConversationReadBoundary = {
   readonly timestamp: number;

@@ -20,9 +20,9 @@
 import {container} from 'tsyringe';
 
 import {TeamState} from 'src/script/repositories/team/TeamState';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {canUseMeetings} from './canUseMeetings';
+import {useKoSubscribableChildren} from './componentUtil';
 
 import {Core} from '../service/coreSingleton';
 

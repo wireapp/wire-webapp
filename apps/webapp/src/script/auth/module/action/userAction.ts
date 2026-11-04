@@ -17,10 +17,9 @@
  *
  */
 
-import {toError} from 'Util/toError';
-
 import {UserActionCreator} from './creator/';
 
+import {toError} from '../../../util/toError';
 import {currentLanguage} from '../../localeConfig';
 import type {ThunkAction} from '../reducer';
 

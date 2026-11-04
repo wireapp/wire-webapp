@@ -19,11 +19,12 @@
 
 import type {FunctionComponent} from 'react';
 
-import {UserRepository} from 'Repositories/user/userRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {getLogger} from 'Util/logger';
 
 import {AccountInput, useInputDone} from './accountInput';
+
+import {UserRepository} from '../../../../../repositories/user/userRepository';
+import {getLogger} from '../../../../../util/logger';
 
 interface NameInputProps {
   canEditProfile: boolean;

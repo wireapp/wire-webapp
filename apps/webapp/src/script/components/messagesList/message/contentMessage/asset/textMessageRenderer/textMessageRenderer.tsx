@@ -23,10 +23,11 @@ import {isNan, isNull} from '@sindresorhus/is';
 
 import {isKeyDownEvent} from 'src/script/guards/Event';
 import {isAuxClickEvent, isClickEvent} from 'src/script/guards/Mouse';
-import {getAllFocusableElements, setElementsTabIndex} from 'Util/focusUtil';
-import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 
 import {ShowMoreButton} from './showMoreButton';
+
+import {getAllFocusableElements, setElementsTabIndex} from '../../../../../../util/focusUtil';
+import {handleKeyDown, KEY} from '../../../../../../util/keyboardUtil';
 
 export type ElementType = 'markdownLink' | 'email' | 'mention';
 

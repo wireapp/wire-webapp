@@ -19,7 +19,7 @@
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
-import type {GlobalDriveFiltersState} from 'Components/conversation/conversationCells/common/driveFilters/driveFilters';
+import type {GlobalDriveFiltersState} from '../conversation/conversationCells/common/driveFilters/driveFilters';
 
 type GetGlobalDriveSelectionPropsResult = {selectionEnabled: boolean; selectionScopeKey: string};
 export const getGlobalDriveSelectionProps = (

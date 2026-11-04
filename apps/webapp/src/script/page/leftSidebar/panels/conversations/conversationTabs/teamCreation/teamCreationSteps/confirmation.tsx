@@ -24,8 +24,6 @@ import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, Checkbox, Link} from '@wireapp/react-ui-kit';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {TeamService} from 'Repositories/team/TeamService';
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
@@ -38,6 +36,8 @@ import {
   termsCheckboxWrapperCss,
 } from './teamCreationSteps.styles';
 
+import {PrimaryModal} from '../../../../../../../components/Modals/PrimaryModal';
+import {TeamService} from '../../../../../../../repositories/team/TeamService';
 import {buttonCss} from '../teamCreation.styles';
 
 export const Confirmation: FunctionComponent<StepProps> = ({

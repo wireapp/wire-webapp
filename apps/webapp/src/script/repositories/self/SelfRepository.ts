@@ -25,24 +25,23 @@ import {container} from 'tsyringe';
 
 import {TypedEventEmitter} from '@wireapp/commons';
 
-import {ClientEntity, ClientRepository} from 'Repositories/client';
-import type {User as UserEntity} from 'Repositories/entity/User';
-import {EventSource} from 'Repositories/event/EventSource';
-import {
-  FeatureUpdateType,
-  detectTeamFeatureUpdate,
-} from 'Repositories/team/TeamFeatureConfigChangeDetector/TeamFeatureConfigChangeDetector';
-import {TeamRepository} from 'Repositories/team/TeamRepository';
-import {UserRepository} from 'Repositories/user/userRepository';
-import {UserState} from 'Repositories/user/userState';
-import {Logger, getLogger} from 'Util/logger';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
-
 import {SelfService} from './SelfService';
 import {evaluateSelfSupportedProtocols} from './SelfSupportedProtocols/SelfSupportedProtocols';
 
 import {Core} from '../../service/coreSingleton';
+import {Logger, getLogger} from '../../util/logger';
+import {TIME_IN_MILLIS} from '../../util/timeUtil';
 import {WebAppEvents} from '../../webAppEvents';
+import {ClientEntity, ClientRepository} from '../client';
+import type {User as UserEntity} from '../entity/User';
+import {EventSource} from '../event/EventSource';
+import {
+  FeatureUpdateType,
+  detectTeamFeatureUpdate,
+} from '../team/TeamFeatureConfigChangeDetector/TeamFeatureConfigChangeDetector';
+import {TeamRepository} from '../team/TeamRepository';
+import {UserRepository} from '../user/userRepository';
+import {UserState} from '../user/userState';
 
 type Events = {selfSupportedProtocolsUpdated: CONVERSATION_PROTOCOL[]};
 

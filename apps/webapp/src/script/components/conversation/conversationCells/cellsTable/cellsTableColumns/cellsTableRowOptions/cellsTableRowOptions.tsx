@@ -23,22 +23,8 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
 
-import {useAppNotification} from 'Components/appNotification/appNotification';
-import {
-  CELLS_ACTION,
-  useCellsActionPermissions,
-} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
-import {openFolder} from 'Components/conversation/conversationCells/common/openFolder/openFolder';
-import {
-  isInRecycleBin,
-  isRootRecycleBinPath,
-} from 'Components/conversation/conversationCells/common/recycleBin/recycleBin';
-import {useFileHistoryModal} from 'Components/Modals/FileHistoryModal/hooks/useFileHistoryModal';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
-import {isFileEditable} from 'Util/fileTypeUtil';
-import {forcedDownloadFile} from 'Util/util';
 
 import {CellsMoveNodeModal} from './cellsMoveNodeModal/cellsMoveNodeModal';
 import {CellsRenameNodeModal} from './cellsRenameNodeModal/cellsRenameNodeModal';
@@ -52,6 +38,17 @@ import {useDeleteNode} from './useDeleteNode/useDeleteNode';
 import {useRestoreNestedNode} from './useRestoreNestedNode/useRestoreNestedNode';
 import {useRestoreParentNode} from './useRestoreParentNode/useRestoreParentNode';
 
+import {CellsRepository} from '../../../../../../repositories/cells/cellsRepository';
+import {isFileEditable} from '../../../../../../util/fileTypeUtil';
+import {forcedDownloadFile} from '../../../../../../util/util';
+import {useAppNotification} from '../../../../../appNotification/appNotification';
+import {useFileHistoryModal} from '../../../../../Modals/FileHistoryModal/hooks/useFileHistoryModal';
+import {
+  CELLS_ACTION,
+  useCellsActionPermissions,
+} from '../../../common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
+import {openFolder} from '../../../common/openFolder/openFolder';
+import {isInRecycleBin, isRootRecycleBinPath} from '../../../common/recycleBin/recycleBin';
 import {useCellsFilePreviewModal} from '../../common/cellsFilePreviewModalContext/cellsFilePreviewModalContext';
 import {showShareModal} from '../cellsNodeShareModal/cellsNodeShareModal';
 

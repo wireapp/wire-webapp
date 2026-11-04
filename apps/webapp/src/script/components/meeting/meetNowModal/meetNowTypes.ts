@@ -17,9 +17,9 @@
  *
  */
 
-import type {MeetingPasswordErrorKey} from 'Components/meeting/shared/validation/meetingPasswordValidation';
-import type {User} from 'Repositories/entity/User';
-import type {TranslationKey} from 'Util/localizerUtil';
+import type {User} from '../../../repositories/entity/User';
+import type {TranslationKey} from '../../../util/localizerUtil';
+import type {MeetingPasswordErrorKey} from '../shared/validation/meetingPasswordValidation';
 
 export type MeetNowFormState = {
   title: string;

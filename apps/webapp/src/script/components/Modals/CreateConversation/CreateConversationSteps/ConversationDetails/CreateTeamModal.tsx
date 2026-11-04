@@ -21,10 +21,8 @@ import type {FunctionComponent} from 'react';
 
 import {Button, Text} from '@wireapp/react-ui-kit';
 
-import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {useTeamCreationModal} from 'src/script/page/leftSidebar/panels/conversations/conversationTabs/teamCreation/useTeamCreationModal';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {handleEscDown, handleKeyDown, KEY} from 'Util/keyboardUtil';
 
 import {
   salesModalBodyButtonCss,
@@ -35,6 +33,8 @@ import {
   salesModalWrapperCss,
 } from './ConversationDetails.styles';
 
+import {handleEscDown, handleKeyDown, KEY} from '../../../../../util/keyboardUtil';
+import {ModalComponent} from '../../../ModalComponent';
 import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';
 
 export const CreateTeamModal: FunctionComponent = () => {

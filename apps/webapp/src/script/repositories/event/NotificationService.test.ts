@@ -19,8 +19,8 @@
 
 import {MemoryEngine} from '@wireapp/store-engine';
 
-import {StorageService} from 'Repositories/storage';
-import {StorageSchemata} from 'Repositories/storage/storageSchemata';
+import {StorageService} from '../storage';
+import {StorageSchemata} from '../storage/storageSchemata';
 
 import {NotificationService} from './NotificationService';
 

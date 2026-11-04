@@ -20,9 +20,9 @@
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import type {RestShareLink} from 'cells-sdk-ts';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {useCellPublicLink} from 'src/script/components/cells/common/useCellPublicLink/useCellPublicLink';
 
+import {CellsRepository} from '../../../../../../repositories/cells/cellsRepository';
 import {useCellsStore} from '../../../common/useCellsStore/useCellsStore';
 
 interface UseCellConversationPublicLinkParams {

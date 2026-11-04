@@ -19,10 +19,10 @@
 
 import {useCallback} from 'react';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {styles} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard.styles';
-import type {Translate} from 'Util/localizerUtil';
+import {styles} from './useNoInternetCallGuard.styles';
 
+import {PrimaryModal} from '../../components/Modals/PrimaryModal';
+import type {Translate} from '../../util/localizerUtil';
 import {useWarningsState} from '../../view_model/WarningsContainer/WarningsState';
 import {TYPE} from '../../view_model/WarningsContainer/WarningsTypes';
 

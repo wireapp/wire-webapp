@@ -22,7 +22,7 @@ import {renderHook} from '@testing-library/react';
 import {act} from 'react';
 import {noop} from 'noop-esm';
 
-import {Conversation} from 'Repositories/entity/Conversation';
+import {Conversation} from '../repositories/entity/Conversation';
 
 import {useConversationFocus} from './useConversationFocus';
 

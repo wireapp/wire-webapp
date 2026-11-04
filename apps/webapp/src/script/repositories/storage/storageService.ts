@@ -24,14 +24,13 @@ import {singleton} from 'tsyringe';
 import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
 import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 
-import {Logger, getLogger} from 'Util/logger';
-import {loadValue, storeValue} from 'Util/storageUtil';
-import {toError} from 'Util/toError';
-
 import {DexieDatabase} from './dexieDatabase';
 import {StorageSchemata} from './storageSchemata';
 
 import {StorageError} from '../../error/storageError';
+import {Logger, getLogger} from '../../util/logger';
+import {loadValue, storeValue} from '../../util/storageUtil';
+import {toError} from '../../util/toError';
 
 const emptyStorageInteger = 0n;
 

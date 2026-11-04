@@ -22,8 +22,8 @@ import ko from 'knockout';
 
 import {REASON} from '@wireapp/avs';
 
-import {CallingTimeoutMessage as CallTimeoutMessageEntity} from 'Repositories/entity/message/callingTimeoutMessage';
-import {translateForTest} from 'Util/test/translateForTest';
+import {CallingTimeoutMessage as CallTimeoutMessageEntity} from '../../../repositories/entity/message/callingTimeoutMessage';
+import {translateForTest} from '../../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

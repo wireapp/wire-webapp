@@ -31,8 +31,6 @@ import {AnyAction, Dispatch} from 'redux';
 import {ContainerXS, Loading, StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
 import {RootProvider} from 'src/script/page/rootProvider';
-import type {Translate} from 'Util/localizerUtil';
-import {getLogger} from 'Util/logger';
 
 import {ClientManager} from './clientManager';
 import {ConversationJoin} from './conversationJoin';
@@ -55,6 +53,8 @@ import {VerifyEmailLink} from './verifyEmailLink';
 
 import type englishMessages from '../../../i18n/en-US.json';
 import {Config} from '../../Config';
+import type {Translate} from '../../util/localizerUtil';
+import {getLogger} from '../../util/logger';
 import {MainViewModel} from '../../view_model/MainViewModel';
 import {RouteA11y} from '../component/routeA11Y';
 import {mapLanguage, normalizeLanguage} from '../localeConfig';
@@ -160,7 +160,7 @@ const RootComponent: FunctionComponent<RootProps & ConnectedProps & DispatchProp
   }, [doGetSSOSettings]);
 
   const loadLanguage = (language: string): LanguageMessages => {
-    return require(`I18n/${mapLanguage(language)}.json`);
+    return require(`../../../i18n/${mapLanguage(language)}.json`);
   };
 
   const navigate = (route: string): null => {

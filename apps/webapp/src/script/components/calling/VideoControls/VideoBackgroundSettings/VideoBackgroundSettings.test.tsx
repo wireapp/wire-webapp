@@ -19,8 +19,8 @@
 
 import {fireEvent, render, type RenderResult} from '@testing-library/react';
 
-import type {BuiltinBackground} from 'Repositories/media/VideoBackgroundEffects';
-import {translateForTest} from 'Util/test/translateForTest';
+import type {BuiltinBackground} from '../../../../repositories/media/VideoBackgroundEffects';
+import {translateForTest} from '../../../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

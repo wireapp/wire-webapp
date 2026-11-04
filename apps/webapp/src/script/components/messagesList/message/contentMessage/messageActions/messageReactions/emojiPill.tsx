@@ -26,14 +26,6 @@ import {task} from 'true-myth';
 
 import {Tooltip} from '@wireapp/react-ui-kit';
 
-import {useMessageFocusedTabIndex} from 'Components/messagesList/message/util';
-import type {User} from 'Repositories/entity/User';
-import {getEmojiTitleFromEmojiUnicode} from 'Util/emojiUtil';
-import {isTabKey} from 'Util/keyboardUtil';
-import type {Translate} from 'Util/localizerUtil';
-import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-
 import {EmojiChar} from './emojiChar';
 import {
   getReactionsButtonCSS,
@@ -45,6 +37,14 @@ import {
   messageReactionCount,
   userBoldStyle,
 } from './messageReactions.styles';
+
+import type {User} from '../../../../../../repositories/entity/User';
+import {getEmojiTitleFromEmojiUnicode} from '../../../../../../util/emojiUtil';
+import {isTabKey} from '../../../../../../util/keyboardUtil';
+import type {Translate} from '../../../../../../util/localizerUtil';
+import {replaceReactComponents} from '../../../../../../util/localizerUtil/reactLocalizerUtil';
+import {matchQualifiedIds} from '../../../../../../util/qualifiedId';
+import {useMessageFocusedTabIndex} from '../../../util';
 
 interface EmojiPillProps {
   translate: Translate;

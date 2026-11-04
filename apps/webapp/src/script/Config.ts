@@ -21,7 +21,7 @@ import {MINIMUM_API_VERSION} from '@wireapp/api-client/lib/config';
 
 import {Runtime} from '@wireapp/commons';
 
-import {createUuid} from 'Util/uuid';
+import {createUuid} from './util/uuid';
 
 import packageJson from '../../package.json';
 

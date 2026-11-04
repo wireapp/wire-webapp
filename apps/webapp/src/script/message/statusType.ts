@@ -17,7 +17,7 @@
  *
  */
 
-import {EventRecord} from 'Repositories/storage/record/eventRecord';
+import {EventRecord} from '../repositories/storage/record/eventRecord';
 
 /** Enum for different confirmation types */
 /* eslint-disable @typescript-eslint/no-magic-numbers -- Status members define persisted message values inline. */

@@ -1,5 +1,5 @@
 import {BackgroundEffectsController} from './backgroundEffectsController';
-import {backgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
+import {backgroundEffectsStore} from '../useBackgroundEffectsStore';
 import {SELFIE_MULTICLASS_MODEL_PATH, SELFIE_SEGMENTER_MODEL_PATH} from './pipe/options';
 
 describe('BackgroundEffectsController effective quality', () => {

@@ -25,26 +25,12 @@ import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
 
-import {PrimaryModal, usePrimaryModalState} from 'Components/Modals/PrimaryModal';
-import type {CallingRepository} from 'Repositories/calling/CallingRepository';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {User} from 'Repositories/entity/User';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {SearchRepository} from 'Repositories/search/searchRepository';
-import type {TeamRepository} from 'Repositories/team/TeamRepository';
-import {TeamState} from 'Repositories/team/TeamState';
-import {UserState} from 'Repositories/user/userState';
-import {iterateItem} from 'Util/arrayUtil';
-import {isEscapeKey} from 'Util/keyboardUtil';
-import {type Translate} from 'Util/localizerUtil';
-
 import type {ActionsViewModel} from './ActionsViewModel';
 import {CallingViewModel} from './CallingViewModel';
 import {ContentViewModel} from './ContentViewModel';
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 
+import {PrimaryModal, usePrimaryModalState} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
 import {
   getConversationListTab,
@@ -54,11 +40,24 @@ import {
 import {PanelState} from '../page/rightSidebar';
 import {useAppMainState} from '../page/state';
 import {ContentState, ListState, useAppState} from '../page/useAppState';
+import type {CallingRepository} from '../repositories/calling/CallingRepository';
+import type {ConversationRepository} from '../repositories/conversation/ConversationRepository';
+import {ConversationState} from '../repositories/conversation/ConversationState';
+import type {Conversation} from '../repositories/entity/Conversation';
+import type {User} from '../repositories/entity/User';
+import {PropertiesRepository} from '../repositories/properties/propertiesRepository';
+import {SearchRepository} from '../repositories/search/searchRepository';
+import type {TeamRepository} from '../repositories/team/TeamRepository';
+import {TeamState} from '../repositories/team/TeamState';
+import {UserState} from '../repositories/user/userState';
 import {setHistoryParam} from '../router/Router';
 import {showContextMenu} from '../ui/contextMenu';
 import {showLabelContextMenu} from '../ui/labelContextMenu';
 import {Shortcut} from '../ui/shortcut';
 import {ShortcutType} from '../ui/shortcutType';
+import {iterateItem} from '../util/arrayUtil';
+import {isEscapeKey} from '../util/keyboardUtil';
+import {type Translate} from '../util/localizerUtil';
 import {WebAppEvents} from '../webAppEvents';
 
 export class ListViewModel {
@@ -128,6 +127,7 @@ export class ListViewModel {
           ContentState.PREFERENCES_DEVICES,
           ContentState.PREFERENCES_OPTIONS,
           ContentState.PREFERENCES_AV,
+          ContentState.PREFERENCES_TROUBLESHOOTING,
         ];
 
         if (!Runtime.isDesktopApp()) {
@@ -285,6 +285,7 @@ export class ListViewModel {
       [ContentState.PREFERENCES_ABOUT]: '/preferences/about',
       [ContentState.PREFERENCES_ACCOUNT]: '/preferences/account',
       [ContentState.PREFERENCES_AV]: '/preferences/av',
+      [ContentState.PREFERENCES_TROUBLESHOOTING]: '/preferences/troubleshooting',
       [ContentState.PREFERENCES_DEVICES]: '/preferences/devices',
       [ContentState.PREFERENCES_OPTIONS]: '/preferences/options',
     };

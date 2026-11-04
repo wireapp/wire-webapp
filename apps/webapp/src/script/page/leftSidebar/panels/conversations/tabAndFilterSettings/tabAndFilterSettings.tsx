@@ -23,12 +23,9 @@ import {isNull, isNullOrUndefined} from '@sindresorhus/is';
 
 import {Checkbox, CheckboxLabel, TabIndex} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/icon';
 import {Config} from 'src/script/Config';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {handleEscDown, isEnterKey, isKey, isSpaceKey, KEY} from 'Util/keyboardUtil';
-import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {
   checkboxLabel,
@@ -40,6 +37,10 @@ import {
   filterButtonWrapper,
   roundCheckbox,
 } from './tabAndFilterSettings.styles';
+
+import * as Icon from '../../../../../components/icon';
+import {handleEscDown, isEnterKey, isKey, isSpaceKey, KEY} from '../../../../../util/keyboardUtil';
+import {useChannelsFeatureFlag} from '../../../../../util/useChannelsFeatureFlag';
 
 const CHANNEL_TAB_INSERT_INDEX = 2;
 

@@ -21,14 +21,14 @@ import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {task} from 'true-myth';
 
-import type {MeetingServiceDeps} from 'Components/meeting/meetingStore/meetingStoreDeps';
-import {meetingSubmitErrors} from 'Components/meeting/meetingSubmitErrors';
-import type {CallingRepository} from 'Repositories/calling/CallingRepository';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
-import {unwrapErr} from 'Util/test/resultTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
+import type {MeetingServiceDeps} from '../../meetingStore/meetingStoreDeps';
+import {meetingSubmitErrors} from '../../meetingSubmitErrors';
+import type {CallingRepository} from '../../../../repositories/calling/CallingRepository';
+import type {ConversationRepository} from '../../../../repositories/conversation/ConversationRepository';
+import {Conversation} from '../../../../repositories/entity/Conversation';
+import type {MeetingsRepository} from '../../../../repositories/meetings/meetingsRepository';
+import {unwrapErr} from '../../../../util/test/resultTestSupport';
+import {translateForTest} from '../../../../util/test/translateForTest';
 
 import {deleteMeetingForAll, deleteMeetingForMe} from './deleteMeeting';
 

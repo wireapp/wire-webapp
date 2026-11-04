@@ -21,7 +21,7 @@ import {Fragment, ReactNode} from 'react';
 
 import {isNonEmptyString, isUndefined} from '@sindresorhus/is';
 
-import type {Translate} from 'Util/localizerUtil';
+import type {Translate} from '../../../../util/localizerUtil';
 import {
   createReactTranslationMarker,
   ReactTranslationComponentReplacement,
@@ -29,8 +29,7 @@ import {
   ReactTranslationNodeReplacement,
   ReactTranslationValueReplacement,
   renderReactTranslation,
-} from 'Util/localizerUtil/reactLocalizerUtil';
-
+} from '../../../../util/localizerUtil/reactLocalizerUtil';
 import type {
   PrimaryModalTranslatedComponent,
   PrimaryModalTranslatedMessage,

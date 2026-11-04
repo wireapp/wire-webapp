@@ -18,7 +18,7 @@
  */
 
 import {ConversationOtrMessageAddEvent} from '@wireapp/api-client/lib/event';
-import {Decoder} from 'bazinga64';
+import {Decoder} from '@wireapp/commons/lib/base64/decoder';
 
 import {LogFactory} from '@wireapp/commons';
 import {ClientAction, GenericMessage} from '@wireapp/protocol-messaging';

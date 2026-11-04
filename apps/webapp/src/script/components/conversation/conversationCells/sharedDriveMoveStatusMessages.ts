@@ -17,9 +17,9 @@
  *
  */
 
-import type {Translate} from 'Util/localizerUtil';
-
 import type {SharedDriveMoveStatusKind} from './sharedDriveUploadStatusContext';
+
+import type {Translate} from '../../../util/localizerUtil';
 
 export const moveStatusMessageKey: Record<
   Exclude<SharedDriveMoveStatusKind, 'processing' | 'completed'>,

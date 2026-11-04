@@ -26,12 +26,12 @@ import {container} from 'tsyringe';
 
 import {parseQualifiedId} from '@wireapp/core';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {UserState} from 'Repositories/user/userState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {getLogger} from 'Util/logger';
-import {forcedDownloadFile, getFileExtension, getName} from 'Util/util';
 
+import {CellsRepository} from '../../../../repositories/cells/cellsRepository';
+import {UserState} from '../../../../repositories/user/userState';
+import {getLogger} from '../../../../util/logger';
+import {forcedDownloadFile, getFileExtension, getName} from '../../../../util/util';
 import {FileInfo, FileVersion} from '../types';
 import {groupVersionsByDate} from '../utils/fileVersionUtils';
 

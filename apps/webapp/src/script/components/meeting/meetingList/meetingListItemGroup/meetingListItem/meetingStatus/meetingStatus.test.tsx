@@ -19,12 +19,9 @@
 
 import {fireEvent, render, screen} from '@testing-library/react';
 
-import {
-  MeetingStatus,
-  type MeetingStatusProps,
-} from 'Components/meeting/meetingList/meetingListItemGroup/meetingListItem/meetingStatus/meetingStatus';
-import {MeetingTemporalStatuses} from 'Components/meeting/utils/meetingStatusUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {MeetingStatus, type MeetingStatusProps} from './meetingStatus';
+import {MeetingTemporalStatuses} from '../../../../utils/meetingStatusUtil';
+import {translateForTest} from '../../../../../../util/test/translateForTest';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {
   createRootContextValueForTest,

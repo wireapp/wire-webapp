@@ -20,7 +20,7 @@
 import {act} from 'react';
 import {render} from '@testing-library/react';
 
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 
 import {PasswordGeneratorButton} from './PasswordGeneratorButton';
 

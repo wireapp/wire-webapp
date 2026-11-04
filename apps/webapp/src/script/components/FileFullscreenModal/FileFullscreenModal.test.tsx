@@ -25,7 +25,7 @@ import {
   CELLS_SELF_USER_DRIVE_ROLE,
   CellsSelfUserDriveRoleProvider,
   type CellsSelfUserDriveRole,
-} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
+} from '../conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
@@ -33,7 +33,7 @@ import {
 
 import {FileFullscreenModal} from './FileFullscreenModal';
 
-jest.mock('Components/fullscreenModal/fullscreenModal', () => {
+jest.mock('../fullscreenModal/fullscreenModal', () => {
   return {
     FullscreenModal: ({children, isOpen}: any) => {
       return isOpen ? <div>{children}</div> : null;

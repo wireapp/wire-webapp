@@ -20,20 +20,20 @@
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-import type {CallingRepository} from 'Repositories/calling/CallingRepository';
-import type {ConnectionRepository} from 'Repositories/connection/connectionRepository';
-import type {ConnectionState} from 'Repositories/connection/connectionState';
-import type {EventRepository} from 'Repositories/event/EventRepository';
-import {EventService} from 'Repositories/event/EventService';
-import type {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import type {SelfRepository} from 'Repositories/self/SelfRepository';
-import type {TeamRepository} from 'Repositories/team/TeamRepository';
-import {TeamState} from 'Repositories/team/TeamState';
-import type {UserRepository} from 'Repositories/user/userRepository';
-import {UserState} from 'Repositories/user/userState';
+import type {CallingRepository} from '../calling/CallingRepository';
+import type {ConnectionRepository} from '../connection/connectionRepository';
+import type {ConnectionState} from '../connection/connectionState';
+import type {EventRepository} from '../event/EventRepository';
+import {EventService} from '../event/EventService';
+import type {PropertiesRepository} from '../properties/propertiesRepository';
+import type {SelfRepository} from '../self/SelfRepository';
+import type {TeamRepository} from '../team/TeamRepository';
+import {TeamState} from '../team/TeamState';
+import type {UserRepository} from '../user/userRepository';
+import {UserState} from '../user/userState';
 import {generateConversation} from 'test/helper/ConversationGenerator';
 import {generateUser} from 'test/helper/UserGenerator';
-import {translate} from 'Util/localizerUtil';
+import {translate} from '../../util/localizerUtil';
 
 jest.mock('./EventMapper', () => {
   return {EventMapper: jest.fn().mockReturnValue({})};

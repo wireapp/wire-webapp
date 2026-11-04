@@ -46,29 +46,13 @@ import {
   UploadIcon,
 } from '@wireapp/react-ui-kit';
 
-import {CellsBulkMovePreviewModal} from 'Components/conversation/conversationCells/cellsTable/cellsBulkMovePreviewModal/cellsBulkMovePreviewModal';
-import {CellsBulkMoveToBinConfirmationModal} from 'Components/conversation/conversationCells/cellsTable/cellsBulkMoveToBinConfirmationModal';
-import {
-  CELLS_ACTION,
-  canPerformCellsAction,
-  useCellsActionPermissions,
-} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
-import {getCellsFilesPath} from 'Components/conversation/conversationCells/common/getCellsFilesPath/getCellsFilesPath';
-import {isInRecycleBin} from 'Components/conversation/conversationCells/common/recycleBin/recycleBin';
-import {
-  useSharedDriveUploadStatus,
-  type SharedDriveMoveStatusKind,
-  type SharedDriveMoveSummary,
-} from 'Components/conversation/conversationCells/sharedDriveUploadStatusContext';
-import {PrimaryModal, removeCurrentModal, usePrimaryModalState} from 'Components/Modals/PrimaryModal';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import type {Conversation} from 'Repositories/entity/Conversation';
 import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
-import {formatBytes} from 'Util/util';
 
 import {bulkMoveReducer} from './bulkMoveState';
+import {CellsBulkMovePreviewModal} from './cellsBulkMovePreviewModal/cellsBulkMovePreviewModal';
+import {CellsBulkMoveToBinConfirmationModal} from './cellsBulkMoveToBinConfirmationModal';
 import {CellsFilePreviewModal} from './cellsFilePreviewModal/cellsFilePreviewModal';
 import {
   bulkActionButtonStyles,
@@ -104,15 +88,31 @@ import {useBulkRestore} from './restoreBinSelection/useBulkRestore';
 import type {PermanentDeleteReviewReason} from './usePermanentDeleteReconciliation';
 import {usePermanentDeleteReconciliation} from './usePermanentDeleteReconciliation';
 
+import {CellsRepository} from '../../../../repositories/cells/cellsRepository';
+import type {Conversation} from '../../../../repositories/entity/Conversation';
+import {formatBytes} from '../../../../util/util';
+import {PrimaryModal, removeCurrentModal, usePrimaryModalState} from '../../../Modals/PrimaryModal';
 import {
   getCellsBackgroundActionEvidence,
   observeCellsBackgroundActionJobs,
 } from '../common/cellsBackgroundActionPolling/cellsBackgroundActionJobs';
 import {createBulkJobPollingPolicy} from '../common/cellsBackgroundActionPolling/createBulkJobPollingPolicy';
+import {
+  CELLS_ACTION,
+  canPerformCellsAction,
+  useCellsActionPermissions,
+} from '../common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {CellsSortDirection} from '../common/cellsSortIcon/cellsSortIcon';
+import {getCellsFilesPath} from '../common/getCellsFilesPath/getCellsFilesPath';
+import {isInRecycleBin} from '../common/recycleBin/recycleBin';
 import {CellsSortField, SORTABLE_COLUMN_FIELD, toAriaSort} from '../common/useCellsSorting/useCellsSorting';
 import {getSharedDriveDroppedFiles} from '../getSharedDriveDroppedFiles';
 import {moveStatusMessageKey} from '../sharedDriveMoveStatusMessages';
+import {
+  useSharedDriveUploadStatus,
+  type SharedDriveMoveStatusKind,
+  type SharedDriveMoveSummary,
+} from '../sharedDriveUploadStatusContext';
 
 interface CellsTableProps {
   nodes: CellNode[];

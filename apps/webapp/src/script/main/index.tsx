@@ -32,26 +32,25 @@ import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
 
-import {AppContainer} from 'Components/appContainer/appContainer';
-import {doSimpleRedirect} from 'Repositories/LifeCycleRepository/LifeCycleRepository';
-import {StorageKey} from 'Repositories/storage';
-import {translate} from 'Util/localizerUtil';
-import {getLogger} from 'Util/logger';
-import {enableLogging} from 'Util/loggerUtil';
-import {loadValue} from 'Util/storageUtil';
-import {exposeWrapperGlobals} from 'Util/wrapper';
-
 import {createApplicationServices} from './createApplicationServices';
 
 import {SIGN_OUT_REASON} from '../auth/signOutReason';
+import {AppContainer} from '../components/appContainer/appContainer';
 import {Config} from '../Config';
 import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
 import {createIncrementalHttpRetryBackoffReset} from '../lifecycle/createIncrementalHttpRetryBackoffReset';
 import {createFetchLatestBuildMetadata} from '../lifecycle/newVersionHandler';
 import {retireLegacyServiceWorker} from '../lifecycle/retireLegacyServiceWorker';
 import {createApplicationObservabilityFromConfig} from '../observability/createApplicationObservabilityFromConfig';
+import {doSimpleRedirect} from '../repositories/LifeCycleRepository/LifeCycleRepository';
+import {StorageKey} from '../repositories/storage';
 import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';
+import {translate} from '../util/localizerUtil';
+import {getLogger} from '../util/logger';
+import {enableLogging} from '../util/loggerUtil';
+import {loadValue} from '../util/storageUtil';
+import {exposeWrapperGlobals} from '../util/wrapper';
 
 retireLegacyServiceWorker({
   serviceWorkerContainer: Maybe.of(navigator.serviceWorker),

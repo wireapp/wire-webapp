@@ -24,17 +24,17 @@ import {createElement} from 'react';
 
 import {render} from '@testing-library/react';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {MessageContent} from 'Components/Modals/PrimaryModal/Content/MessageContent';
-import en from 'I18n/en-US.json';
-import {User} from 'Repositories/entity/User';
+import {PrimaryModal} from '../../../Modals/PrimaryModal';
+import {MessageContent} from '../../../Modals/PrimaryModal/Content/MessageContent';
+import en from '../../../../../i18n/en-US.json';
+import {User} from '../../../../repositories/entity/User';
 import {generateQualifiedIds} from 'src/script/auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {setStrings, translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {setStrings, translate} from '../../../../util/localizerUtil';
+import {translateForTest} from '../../../../util/test/translateForTest';
 
 import {showMeetingPartialAddFailureModal} from './showMeetingPartialAddFailureModal';
 

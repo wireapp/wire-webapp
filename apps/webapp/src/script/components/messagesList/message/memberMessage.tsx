@@ -21,24 +21,25 @@ import type {ReactElement, ReactNode, FunctionComponent} from 'react';
 
 import {Button, ButtonVariant, CollectionIcon, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/icon';
-import {
-  groupCreationHeaderSenderNameMarkerEnd,
-  groupCreationHeaderSenderNameMarkerStart,
-  MemberMessage as MemberMessageEntity,
-} from 'Repositories/entity/message/memberMessage';
-import {User} from 'Repositories/entity/User';
 import {Config} from 'src/script/Config';
 import {SystemMessageType} from 'src/script/message/systemMessageType';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
 
 import {E2eEncryptionMessage} from './e2eEncryptionMessage/e2eEncryptionMessage';
 import {e2eMessageContentLinkCss} from './e2eEncryptionMessage/e2eEncryptionMessage.styles';
 import {ConnectedMessage} from './memberMessage/connectedMessage';
 import {MessageContent} from './memberMessage/messageContent';
 import {MessageTime} from './messageTime';
+
+import {
+  groupCreationHeaderSenderNameMarkerEnd,
+  groupCreationHeaderSenderNameMarkerStart,
+  MemberMessage as MemberMessageEntity,
+} from '../../../repositories/entity/message/memberMessage';
+import {User} from '../../../repositories/entity/User';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {replaceReactComponents} from '../../../util/localizerUtil/reactLocalizerUtil';
+import * as Icon from '../../icon';
 
 type RenderGroupCreationHeaderOptions = {
   readonly groupCreationHeader: string;

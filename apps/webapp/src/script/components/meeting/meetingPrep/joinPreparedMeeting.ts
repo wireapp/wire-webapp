@@ -19,16 +19,17 @@
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {joinMeetingCall, type JoinMeetingCallDeps} from 'Components/meeting/joinMeetingCall';
-import {handleJoinMeetingCallResult} from 'Components/meeting/useJoinMeetingCall';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {Config} from 'src/script/Config';
+
 import {
   showCallNotEstablishedModal,
   type NoInternetCallGuardCopy,
-} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard';
-import type {CallMediaChoice} from 'Repositories/calling/callMediaChoice';
-import {Config} from 'src/script/Config';
-import type {Translate} from 'Util/localizerUtil';
+} from '../../../hooks/useNoInternetCallGuard/useNoInternetCallGuard';
+import type {CallMediaChoice} from '../../../repositories/calling/callMediaChoice';
+import type {Translate} from '../../../util/localizerUtil';
+import {PrimaryModal} from '../../Modals/PrimaryModal';
+import {joinMeetingCall, type JoinMeetingCallDeps} from '../joinMeetingCall';
+import {handleJoinMeetingCallResult} from '../useJoinMeetingCall';
 
 export type JoinPreparedMeetingParams = {
   deps: JoinMeetingCallDeps;

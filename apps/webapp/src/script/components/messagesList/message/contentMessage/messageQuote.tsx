@@ -23,19 +23,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 
-import * as Icon from 'Components/icon';
-import {AssetImage} from 'Components/image';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {Multipart} from 'Repositories/entity/message/multipart';
-import {Text} from 'Repositories/entity/message/text';
-import {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {includesOnlyEmojis} from 'Util/emojiUtil';
-import {type Translate} from 'Util/localizerUtil';
-import {formatDateNumeral, formatTimeShort, isBeforeToday} from 'Util/timeUtil';
-import {isErrorWithType} from 'Util/typePredicateUtil';
 
 import {AudioAsset} from './asset/audioAsset/audioAsset';
 import {FileAsset} from './asset/fileAsset/fileAsset';
@@ -47,7 +35,19 @@ import {VideoAsset} from './asset/videoAsset/videoAsset';
 import {MessageActions} from '..';
 import {ConversationError} from '../../../../error/conversationError';
 import {QuoteEntity} from '../../../../message/quoteEntity';
+import type {Conversation} from '../../../../repositories/entity/Conversation';
+import {ContentMessage} from '../../../../repositories/entity/message/contentMessage';
+import {Multipart} from '../../../../repositories/entity/message/multipart';
+import {Text} from '../../../../repositories/entity/message/text';
+import {User} from '../../../../repositories/entity/User';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
+import {includesOnlyEmojis} from '../../../../util/emojiUtil';
+import {type Translate} from '../../../../util/localizerUtil';
+import {formatDateNumeral, formatTimeShort, isBeforeToday} from '../../../../util/timeUtil';
+import {isErrorWithType} from '../../../../util/typePredicateUtil';
 import {WebAppEvents} from '../../../../webAppEvents';
+import * as Icon from '../../../icon';
+import {AssetImage} from '../../../image';
 import {useMessageFocusedTabIndex} from '../util';
 
 function createPlaceholderMessage(translate: Translate): ContentMessage {

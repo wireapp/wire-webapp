@@ -17,7 +17,7 @@
  *
  */
 
-import {Asset} from 'Repositories/entity/message/asset';
+import {Asset} from '../repositories/entity/message/asset';
 
 import {getMessageAriaLabel} from './conversationMessages';
 

@@ -19,15 +19,15 @@
 
 import {queryByRole, render} from '@testing-library/react';
 import {ServicesOptions} from './servicesOptions';
-import {TeamState} from 'Repositories/team/TeamState';
+import {TeamState} from '../../../../../repositories/team/TeamState';
 import ko from 'knockout';
-import {Conversation} from 'Repositories/entity/Conversation';
+import {Conversation} from '../../../../../repositories/entity/Conversation';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../../util/test/translateForTest';
 
 type TestData = {
   protocol: CONVERSATION_PROTOCOL;

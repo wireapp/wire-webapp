@@ -22,14 +22,13 @@ import {AudioPreference, WebappProperties} from '@wireapp/api-client/lib/user/da
 import {amplify} from 'amplify';
 import {noop} from 'noop-esm';
 
-import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
-import {mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
-import {getLogger, Logger} from 'Util/logger';
-
 import {AudioPlayingType} from './audioPlayingType';
 import {AudioType} from './audioType';
 
+import {getLogger, Logger} from '../../util/logger';
 import {WebAppEvents} from '../../webAppEvents';
+import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
+import {mediaDevicesStore} from '../media/useMediaDevicesStore';
 
 /* eslint-disable @typescript-eslint/no-magic-numbers -- Playback outcomes define their existing numeric values inline. */
 enum AUDIO_PLAY_PERMISSION {

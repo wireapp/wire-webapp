@@ -22,9 +22,8 @@ import type {ConversationEvent} from '@wireapp/api-client/lib/event';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import type {ReactionType} from '@wireapp/core/lib/conversation/';
 
-import {ClientConversationEvent} from 'Repositories/conversation/EventBuilder';
-
 import {StatusType} from '../../../message/statusType';
+import {ClientConversationEvent} from '../../conversation/EventBuilder';
 
 export interface ReadReceipt {
   domain?: string;

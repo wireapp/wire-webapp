@@ -22,14 +22,14 @@ import {parseQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 import {RestNode} from 'cells-sdk-ts';
 import {Maybe, maybe} from 'true-myth';
 
-import {getSelfUserDriveRole} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
-import {formatBytes, getFileExtension, getName} from 'Util/util';
 
+import {Conversation} from '../../../../repositories/entity/Conversation';
+import {User} from '../../../../repositories/entity/User';
+import {matchQualifiedIds} from '../../../../util/qualifiedId';
+import {TIME_IN_MILLIS} from '../../../../util/timeUtil';
+import {formatBytes, getFileExtension, getName} from '../../../../util/util';
+import {getSelfUserDriveRole} from '../../../conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {getUserQualifiedIdFromNode} from '../getUserQualifiedIdFromNode/getUserQualifiedIdFromNode';
 
 export const transformCellsNodes = ({

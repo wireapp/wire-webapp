@@ -22,7 +22,8 @@ import {HTMLProps, useEffect, useRef, useState, type FunctionComponent} from 're
 import cx from 'classnames';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {getLogger} from 'Util/logger';
+
+import {getLogger} from '../../../../../util/logger';
 
 export interface InputLevelProps extends HTMLProps<HTMLDivElement> {
   disabled: boolean;

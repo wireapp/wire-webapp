@@ -21,8 +21,6 @@ import {ReactNode, type FunctionComponent} from 'react';
 
 import {AlertIcon} from '@wireapp/react-ui-kit';
 
-import {FileCard} from 'Components/fileCard/fileCard';
-
 import {
   alertIconStyles,
   errorLineStyles,
@@ -31,6 +29,7 @@ import {
   wrapperStyles,
 } from './mediaFilePreviewCard.styles';
 
+import {FileCard} from '../../../../fileCard/fileCard';
 import {FilePreviewDeleteButton} from '../filePreviewDeleteButton/filePreviewDeleteButton';
 import {FilePreviewErrorMoreButton} from '../filePreviewErrorMoreButton/filePreviewErrorMoreButton';
 

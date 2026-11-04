@@ -19,11 +19,11 @@
 
 import {useState, type FunctionComponent} from 'react';
 
-import {FileFullscreenModal} from 'Components/FileFullscreenModal/FileFullscreenModal';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {iconWrapperStyles, videoStyles} from './videoAssetSmall.styles';
 
+import {FileFullscreenModal} from '../../../../../../../FileFullscreenModal/FileFullscreenModal';
 import {FilePreviewPlayButton} from '../../common/filePreviewPlayButton/filePreviewPlayButton';
 import {MediaFilePreviewCard} from '../../common/mediaFilePreviewCard/mediaFilePreviewCard';
 import {hollowWrapperButtonStyles} from '../../multipartAssets.styles';

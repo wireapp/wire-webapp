@@ -23,10 +23,11 @@ import {isUndefined} from '@sindresorhus/is';
 
 import {PauseIcon, PlayIcon} from '@wireapp/react-ui-kit';
 
-import {useMessageFocusedTabIndex} from 'Components/messagesList/message/util';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {wrapperStyles, playButtonStyles, wrapperStylesFullscreen} from './videoPlayButton.styles';
+
+import {useMessageFocusedTabIndex} from '../../../../../../../util';
 
 interface VideoPlayButtonProps {
   mediaElement?: HTMLMediaElement;

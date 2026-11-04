@@ -19,8 +19,8 @@
 
 import {render} from '@testing-library/react';
 
-import {LegalHoldDot} from 'Components/LegalHoldDot';
-import {translateForTest} from 'Util/test/translateForTest';
+import {LegalHoldDot} from './';
+import {translateForTest} from '../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

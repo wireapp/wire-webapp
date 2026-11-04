@@ -22,11 +22,12 @@ import type {FunctionComponent} from 'react';
 import {CSSObject} from '@emotion/react';
 import cx from 'classnames';
 
-import * as Icon from 'Components/icon';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
+
+import {Conversation} from '../../repositories/entity/Conversation';
+import {User} from '../../repositories/entity/User';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
+import * as Icon from '../icon';
 
 function isClassified(users: User[], classifiedDomains: string[], conversationDomain?: string): boolean {
   // if a conversation is hosted on an unclassified domain it is not considered classified

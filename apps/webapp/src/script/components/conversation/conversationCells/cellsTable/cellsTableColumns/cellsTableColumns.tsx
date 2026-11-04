@@ -26,8 +26,6 @@ import {
 } from '@tanstack/react-table';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {CellsSelectionCheckbox} from 'Components/cells/common/cellsSelectionCheckbox/cellsSelectionCheckbox';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {CellNode} from 'src/script/types/cellNode';
 
 import {CellsTableDateColumn} from './cellsTableDateColumn/cellsTableDateColumn';
@@ -37,6 +35,8 @@ import {CellsTableRowOptions} from './cellsTableRowOptions/cellsTableRowOptions'
 import {CellsTableSharedColumn} from './cellsTableSharedColumn/cellsTableSharedColumn';
 import {CellsTagsColumn} from './cellsTagsColumn/cellsTagsColumn';
 
+import {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
+import {CellsSelectionCheckbox} from '../../../../cells/common/cellsSelectionCheckbox/cellsSelectionCheckbox';
 import {CellsSortDirection} from '../../common/cellsSortIcon/cellsSortIcon';
 import {CellsTableSortableHeader} from '../../common/cellsTableSortableHeader/cellsTableSortableHeader';
 import {CellsSortField} from '../../common/useCellsSorting/useCellsSorting';

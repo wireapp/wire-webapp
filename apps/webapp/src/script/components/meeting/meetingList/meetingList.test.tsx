@@ -24,10 +24,10 @@ import type {Virtualizer} from '@tanstack/react-virtual';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {createStore, type StoreApi} from 'zustand/vanilla';
 
-import type {UseMeetingListVirtualizer} from 'Components/meeting/meetingList/useMeetingListVirtualizer';
-import type {MeetingStoreState} from 'Components/meeting/meetingStore/createMeetingStore';
-import {MeetingStoreProvider} from 'Components/meeting/meetingStore/meetingStoreProvider';
-import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
+import type {UseMeetingListVirtualizer} from './useMeetingListVirtualizer';
+import type {MeetingStoreState} from '../meetingStore/createMeetingStore';
+import {MeetingStoreProvider} from '../meetingStore/meetingStoreProvider';
+import type {MeetingSeries} from '../types/meetingSeries';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
@@ -35,7 +35,7 @@ import {
   requireValueForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {MainViewModel} from 'src/script/view_model/MainViewModel';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 import {isMeetingListItemLastInDay, MeetingList, type MeetingListProps} from './meetingList';
 

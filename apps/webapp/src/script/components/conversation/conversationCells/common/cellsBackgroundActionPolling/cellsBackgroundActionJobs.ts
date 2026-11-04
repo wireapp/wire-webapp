@@ -27,9 +27,9 @@ import {
 import {noop} from 'noop-esm';
 import {Maybe, maybe, task, type Task} from 'true-myth';
 
-import type {CellsRepository} from 'Repositories/cells/cellsRepository';
-
 import {pollCellsBackgroundActionJobs, type CellsBackgroundActionPollingOptions} from './cellsBackgroundActionPolling';
+
+import type {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
 
 type CellsBackgroundActionName = 'move' | 'delete' | 'restore';
 

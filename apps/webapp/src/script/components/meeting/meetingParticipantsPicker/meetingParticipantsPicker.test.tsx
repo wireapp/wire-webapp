@@ -22,12 +22,12 @@ import {useState, type FunctionComponent} from 'react';
 import {fireEvent, render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import {User} from 'Repositories/entity/User';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import type {SearchRepository} from 'Repositories/search/searchRepository';
-import type {TeamRepository} from 'Repositories/team/TeamRepository';
-import type {TeamState} from 'Repositories/team/TeamState';
+import {User} from '../../../repositories/entity/User';
+import type {Conversation} from '../../../repositories/entity/Conversation';
+import type {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import type {SearchRepository} from '../../../repositories/search/searchRepository';
+import type {TeamRepository} from '../../../repositories/team/TeamRepository';
+import type {TeamState} from '../../../repositories/team/TeamState';
 import type {ConversationState} from 'src/script/repositories/conversation/ConversationState';
 import {
   createExecutingFireAndForgetInvokerForTest,
@@ -35,7 +35,7 @@ import {
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 import {formatParticipantsFieldLabel} from './formatParticipantsFieldLabel';
 import {MeetingParticipantsPicker} from './meetingParticipantsPicker';

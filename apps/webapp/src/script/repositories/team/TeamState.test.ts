@@ -21,9 +21,9 @@ import {UserType} from '@wireapp/api-client/lib/user';
 
 import {randomUUID} from 'crypto';
 
-import {User} from 'Repositories/entity/User';
-import {UserState} from 'Repositories/user/userState';
-import {translateForTest} from 'Util/test/translateForTest';
+import {User} from '../entity/User';
+import {UserState} from '../user/userState';
+import {translateForTest} from '../../util/test/translateForTest';
 
 import {TeamEntity} from './TeamEntity';
 import {TeamState} from './TeamState';

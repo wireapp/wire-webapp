@@ -23,13 +23,12 @@ import {container, singleton} from 'tsyringe';
 
 import {Account} from '@wireapp/core';
 
-import {supportsMLS} from 'Util/util';
-
 import {APIClient} from './apiClientSingleton';
 import {createStorageEngine, DatabaseTypes} from './storeEngineProvider';
 import {SystemCrypto, wrapSystemCrypto} from './utils/systemCryptoWrapper';
 
 import {Config} from '../Config';
+import {supportsMLS} from '../util/util';
 
 declare global {
   interface Window {

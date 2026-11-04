@@ -19,12 +19,12 @@
 
 import {stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 
-import {Avatar, AVATAR_SIZE} from 'Components/avatar';
-import type {FilterItem} from 'Components/conversation/conversationCells/common/cellsFiltersBar/filterConfig';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {User} from 'Repositories/entity/User';
-import {matchQualifiedIds} from 'Util/qualifiedId';
+import type {ConversationRepository} from '../../../../../repositories/conversation/ConversationRepository';
+import type {Conversation} from '../../../../../repositories/entity/Conversation';
+import type {User} from '../../../../../repositories/entity/User';
+import {matchQualifiedIds} from '../../../../../util/qualifiedId';
+import {Avatar, AVATAR_SIZE} from '../../../../avatar';
+import type {FilterItem} from '../cellsFiltersBar/filterConfig';
 
 export const getCreatedByFilterId = (user: User): string => {
   return stringifyQualifiedId(user.qualifiedId);

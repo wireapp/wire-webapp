@@ -28,10 +28,11 @@ import {
   SidebarInactiveIcon,
 } from '@wireapp/react-ui-kit';
 
-import {ZoomInIcon, ZoomOutIcon} from 'Components/icon';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {buttonStyles, pageNumberStyles, wrapperStyles} from './PdfControls.styles';
+
+import {ZoomInIcon, ZoomOutIcon} from '../../../icon';
 
 interface PdfControlsProps {
   sidebarOpen: boolean;

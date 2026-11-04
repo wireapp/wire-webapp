@@ -18,7 +18,7 @@
  */
 
 import {StorageError} from 'src/script/error/storageError';
-import {StorageSchemata, StorageService} from 'Repositories/storage/';
+import {StorageSchemata, StorageService} from '../../../src/script/repositories/storage/';
 
 describe('StorageRepository', () => {
   describe('save', () => {

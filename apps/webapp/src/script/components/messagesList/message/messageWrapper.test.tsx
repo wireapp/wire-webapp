@@ -22,22 +22,22 @@ import type {ComponentProps} from 'react';
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage as ContentMessageEntity} from 'Repositories/entity/message/contentMessage';
-import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/memberMessage';
-import {Text} from 'Repositories/entity/message/text';
-import {User} from 'Repositories/entity/User';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {ContentMessage as ContentMessageEntity} from '../../../repositories/entity/message/contentMessage';
+import {MemberMessage as MemberMessageEntity} from '../../../repositories/entity/message/memberMessage';
+import {Text} from '../../../repositories/entity/message/text';
+import {User} from '../../../repositories/entity/User';
 import {withTheme, withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {markAsUnreadFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import type {StartupFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {SystemMessageType} from 'src/script/message/systemMessageType';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {generateUser} from 'test/helper/UserGenerator';
-import {createUuid} from 'Util/uuid';
+import {createUuid} from '../../../util/uuid';
 
 import {MessageWrapper} from './messageWrapper';
 

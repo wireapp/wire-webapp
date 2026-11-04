@@ -19,8 +19,7 @@
 
 import {useEffect, useState, type FunctionComponent} from 'react';
 
-import * as Icon from 'Components/icon';
-
+import * as Icon from '../../../../../components/icon';
 import {ConversationTab} from '../conversationTab';
 import {SidebarTabs} from '../useSidebarStore';
 

@@ -25,24 +25,24 @@ import {AudioPreference, NotificationPreference, WebappProperties} from '@wireap
 import {amplify} from 'amplify';
 import ko from 'knockout';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
-import type {User} from 'Repositories/entity/User';
-import type {SelfService} from 'Repositories/self/SelfService';
-import {StorageKey} from 'Repositories/storage';
-import {isTelemetryEnabledAtCurrentEnvironment} from 'Repositories/tracking/telemetry.helpers';
-import {ConsentValue} from 'Repositories/user/consentValue';
-import {CONVERSATION_TYPING_INDICATOR_MODE} from 'Repositories/user/typingIndicatorMode';
 import {Config} from 'src/script/Config';
-import {Environment} from 'Util/environment';
-import {type Translate} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/logger';
-import {loadValue} from 'Util/storageUtil';
 
 import type {PropertiesService} from './propertiesService';
 import {PROPERTIES_TYPE, UserConsentStatus} from './propertiesType';
 
+import {PrimaryModal} from '../../components/Modals/PrimaryModal';
+import {PrimaryModalType} from '../../components/Modals/PrimaryModal/PrimaryModalTypes';
+import {Environment} from '../../util/environment';
+import {type Translate} from '../../util/localizerUtil';
+import {getLogger, Logger} from '../../util/logger';
+import {loadValue} from '../../util/storageUtil';
 import {WebAppEvents} from '../../webAppEvents';
+import type {User} from '../entity/User';
+import type {SelfService} from '../self/SelfService';
+import {StorageKey} from '../storage';
+import {isTelemetryEnabledAtCurrentEnvironment} from '../tracking/telemetry.helpers';
+import {ConsentValue} from '../user/consentValue';
+import {CONVERSATION_TYPING_INDICATOR_MODE} from '../user/typingIndicatorMode';
 
 const mergeWebappProperties = createDeepmerge();
 const nestedPreferencePathDepth = 2;

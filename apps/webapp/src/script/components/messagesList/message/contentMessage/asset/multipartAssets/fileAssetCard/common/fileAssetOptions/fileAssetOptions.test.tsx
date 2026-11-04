@@ -25,14 +25,14 @@ import userEvent from '@testing-library/user-event';
 import {
   CELLS_SELF_USER_DRIVE_ROLE,
   CellsSelfUserDriveRoleProvider,
-} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
+} from '../../../../../../../../conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {isFileEditable} from 'Util/fileTypeUtil';
+import {isFileEditable} from '../../../../../../../../../util/fileTypeUtil';
 
 import {FileAssetOptions} from './fileAssetOptions';
 

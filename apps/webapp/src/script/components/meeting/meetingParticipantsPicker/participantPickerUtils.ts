@@ -17,9 +17,9 @@
  *
  */
 
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {User} from 'Repositories/entity/User';
-import {matchQualifiedIds} from 'Util/qualifiedId';
+import type {Conversation} from '../../../repositories/entity/Conversation';
+import type {User} from '../../../repositories/entity/User';
+import {matchQualifiedIds} from '../../../util/qualifiedId';
 
 export const getConversationKey = (conversation: Conversation): string => {
   return `${conversation.qualifiedId.domain}-${conversation.qualifiedId.id}`;
