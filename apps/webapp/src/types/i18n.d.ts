@@ -1653,6 +1653,8 @@ declare module 'I18n/en-US.json' {
     'preferencesBackupKeyCopy': `Copy key`;
     'preferencesBackupKeyCopySub': `Paste it into your password manager.`;
     'preferencesBackupKeyCreate': `Create new key`;
+    'preferencesBackupKeyCredentialId': `{brandName} backup key · {account}`;
+    'preferencesBackupKeyCredentialIdFallback': `{brandName} backup key`;
     'preferencesBackupKeyDescription': `You need your encryption key to restore a backup. For security, {brandName} doesn’t show it again after setup. If you lost your copy, create a new key and save it.`;
     'preferencesBackupKeyDownload': `Download key file`;
     'preferencesBackupKeyDownloadSub': `Store it somewhere other than this computer.`;
@@ -1663,6 +1665,11 @@ declare module 'I18n/en-US.json' {
     'preferencesBackupKeyMissing': `Backups are encrypted with a key that only you have. Generate one to start backing up.`;
     'preferencesBackupKeyNewMessage': `New backups will use the new key. Backups made with your current key can only be restored with the current key.`;
     'preferencesBackupKeyNewTitle': `Create a new encryption key?`;
+    'preferencesBackupKeyOnePasswordNotes': `Encryption key for your Wire conversation backups (24 words). You need it to restore a backup on any device.`;
+    'preferencesBackupKeyPasswordManager': `Save to password manager`;
+    'preferencesBackupKeyPasswordManagerError': `Couldn’t open your password manager. Copy the key or download it instead.`;
+    'preferencesBackupKeyPasswordManagerPrompt': `Finish saving in your password manager’s prompt.`;
+    'preferencesBackupKeyPasswordManagerSub': `Recommended and most secure`;
     'preferencesBackupKeySaveSubtitle': `Backups are encrypted with this key. You need it to restore a backup on any device. {brandName} can’t recover it for you.`;
     'preferencesBackupKeySaveTitle': `Save your encryption key`;
     'preferencesBackupKeySaveWarning': `It’s only available on this screen. {brandName} won’t show it again.`;

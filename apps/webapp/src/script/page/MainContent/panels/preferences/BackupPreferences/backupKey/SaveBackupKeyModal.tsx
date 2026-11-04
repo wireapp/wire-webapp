@@ -17,9 +17,18 @@
  *
  */
 
-import {useEffect, useId, useRef, useState} from 'react';
+import {useCallback, useEffect, useId, useRef, useState} from 'react';
 
-import {AlertIcon, CheckIcon, Checkbox, CheckboxLabel, CopyIcon, DownloadIcon, TabIndex} from '@wireapp/react-ui-kit';
+import {
+  AlertIcon,
+  CheckIcon,
+  Checkbox,
+  CheckboxLabel,
+  CopyIcon,
+  DownloadIcon,
+  LockClosedIcon,
+  TabIndex,
+} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
@@ -28,6 +37,8 @@ import {handleEscDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {copyBackupKey, downloadBackupKey, generateBackupKey} from './BackupKey';
+import {isBrowserPasswordManagerAvailable, saveToBrowserPasswordManager} from './browserPasswordManager';
+import {OnePasswordSaveButton} from './OnePasswordSaveButton';
 import {
   bodyStyle,
   errorStyle,
@@ -37,22 +48,43 @@ import {
   optionsStyle,
   optionTextStyle,
   optionTitleStyle,
+  passwordManagerStyle,
   subtitleStyle,
   warningStyle,
 } from './SaveBackupKeyModal.styles';
 import {useBackupKeyStore} from './useBackupKeyStore';
 
 interface SaveBackupKeyModalProps {
+  /** Title of the password manager entry, see `getBackupKeyCredentialId` */
+  credentialId: string;
   onClose: () => void;
 }
 
 type Step = 'save' | 'skipWarning';
 
 /**
- * Generates a new backup encryption key and lets the user save it (copy or download).
+ * `prompted`: the browser or 1Password showed its save prompt. Neither reports back whether the user accepted it,
+ * so the key is never marked as saved automatically.
+ */
+type PasswordManagerStatus = 'idle' | 'prompted' | 'error';
+
+const getPasswordManagerSubText = (status: PasswordManagerStatus) => {
+  switch (status) {
+    case 'prompted':
+      return t('preferencesBackupKeyPasswordManagerPrompt');
+    case 'error':
+      return t('preferencesBackupKeyPasswordManagerError');
+    case 'idle':
+    default:
+      return t('preferencesBackupKeyPasswordManagerSub');
+  }
+};
+
+/**
+ * Generates a new backup encryption key and lets the user save it (password manager, copy or download).
  * The key is only committed to the store on Continue / Skip anyway; closing the modal discards it.
  */
-export const SaveBackupKeyModal = ({onClose}: SaveBackupKeyModalProps) => {
+export const SaveBackupKeyModal = ({credentialId, onClose}: SaveBackupKeyModalProps) => {
   const brandName = Config.getConfig().BRAND_NAME;
   const setKey = useBackupKeyStore(state => state.setKey);
 
@@ -62,15 +94,18 @@ export const SaveBackupKeyModal = ({onClose}: SaveBackupKeyModalProps) => {
   const [isDownloaded, setIsDownloaded] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [showError, setShowError] = useState(false);
+  const [passwordManagerStatus, setPasswordManagerStatus] = useState<PasswordManagerStatus>('idle');
+  const [isOnePasswordAvailable, setIsOnePasswordAvailable] = useState(false);
+  const [isBrowserPasswordManager] = useState(isBrowserPasswordManagerAvailable);
 
   const titleId = useId();
   const checkboxId = useId();
-  const copyButtonRef = useRef<HTMLButtonElement>(null);
+  const firstOptionRef = useRef<HTMLButtonElement>(null);
   const backButtonRef = useRef<HTMLButtonElement>(null);
 
   // Move focus into the modal so keyboard navigation (and Esc) work right away
   useEffect(() => {
-    (step === 'save' ? copyButtonRef : backButtonRef).current?.focus();
+    (step === 'save' ? firstOptionRef : backButtonRef).current?.focus();
   }, [step]);
 
   const markSaved = () => {
@@ -87,6 +122,20 @@ export const SaveBackupKeyModal = ({onClose}: SaveBackupKeyModalProps) => {
       // Clipboard not available, the user can still download the key file
     }
   };
+
+  const onSaveToBrowserPasswordManager = async () => {
+    try {
+      await saveToBrowserPasswordManager(credentialId, pendingKey);
+      setPasswordManagerStatus('prompted');
+    } catch {
+      setPasswordManagerStatus('error');
+    }
+  };
+
+  // 1Password shows its own save dialog and doesn't report the result, same as the browser prompt
+  const onOnePasswordSaveRequested = useCallback(() => setPasswordManagerStatus('prompted'), []);
+
+  const showPasswordManager = isBrowserPasswordManager || isOnePasswordAvailable;
 
   const onDownload = () => {
     downloadBackupKey(pendingKey);
@@ -148,8 +197,41 @@ export const SaveBackupKeyModal = ({onClose}: SaveBackupKeyModalProps) => {
             </div>
 
             <div css={optionsStyle}>
+              <div css={passwordManagerStyle(showPasswordManager)} data-uie-name="backup-key-password-manager">
+                {isBrowserPasswordManager ? (
+                  <button
+                    ref={firstOptionRef}
+                    type="button"
+                    css={optionStyle(false)}
+                    onClick={onSaveToBrowserPasswordManager}
+                    data-uie-name="do-save-backup-key-password-manager"
+                  >
+                    <LockClosedIcon />
+                    <span css={optionTextStyle}>
+                      <span css={optionTitleStyle}>{t('preferencesBackupKeyPasswordManager')}</span>
+                      <span css={optionSubStyle} data-uie-name="backup-key-password-manager-status">
+                        {getPasswordManagerSubText(passwordManagerStatus)}
+                      </span>
+                    </span>
+                  </button>
+                ) : (
+                  <span css={optionTextStyle}>
+                    <span css={optionTitleStyle}>{t('preferencesBackupKeyPasswordManager')}</span>
+                    <span css={optionSubStyle} data-uie-name="backup-key-password-manager-status">
+                      {getPasswordManagerSubText(passwordManagerStatus)}
+                    </span>
+                  </span>
+                )}
+                <OnePasswordSaveButton
+                  credentialId={credentialId}
+                  backupKey={pendingKey}
+                  onAvailabilityChange={setIsOnePasswordAvailable}
+                  onSaveRequested={onOnePasswordSaveRequested}
+                />
+              </div>
+
               <button
-                ref={copyButtonRef}
+                ref={isBrowserPasswordManager ? undefined : firstOptionRef}
                 type="button"
                 css={optionStyle(isCopied)}
                 onClick={onCopy}

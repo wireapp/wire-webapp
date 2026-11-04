@@ -91,6 +91,13 @@ export const optionStyle = (isDone: boolean): CSSObject => ({
   },
 });
 
+/** Kept in the DOM while hidden, so the 1Password extension can detect its button */
+export const passwordManagerStyle = (isVisible: boolean): CSSObject => ({
+  display: isVisible ? 'flex' : 'none',
+  flexDirection: 'column',
+  gap: 8,
+});
+
 export const optionTextStyle: CSSObject = {
   display: 'flex',
   flexDirection: 'column',

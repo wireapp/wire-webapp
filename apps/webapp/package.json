@@ -21,6 +21,7 @@
     "translate:generate-types": "nx translate-generate-types webapp"
   },
   "dependencies": {
+    "@1password/save-button": "1.3.0",
     "@datadog/browser-logs": "5.35.1",
     "@datadog/browser-rum": "5.35.1",
     "@emotion/react": "11.14.0",

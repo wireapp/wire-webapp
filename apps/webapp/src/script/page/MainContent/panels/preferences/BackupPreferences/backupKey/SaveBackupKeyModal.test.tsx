@@ -17,13 +17,14 @@
  *
  */
 
-import {fireEvent, render, waitFor} from '@testing-library/react';
+import {act, fireEvent, render, waitFor} from '@testing-library/react';
 
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {copyText} from 'Util/ClipboardUtil';
 import {downloadBlob} from 'Util/util';
 
 import {isValidBackupKey} from './BackupKey';
+import {isBrowserPasswordManagerAvailable, saveToBrowserPasswordManager} from './browserPasswordManager';
 import {SaveBackupKeyModal} from './SaveBackupKeyModal';
 import {useBackupKeyStore} from './useBackupKeyStore';
 
@@ -31,17 +32,45 @@ jest.mock('Util/ClipboardUtil', () => ({
   copyText: jest.fn().mockResolvedValue(undefined),
 }));
 
+jest.mock('./browserPasswordManager', () => ({
+  isBrowserPasswordManagerAvailable: jest.fn().mockReturnValue(false),
+  saveToBrowserPasswordManager: jest.fn().mockResolvedValue(undefined),
+}));
+
+let mockOnePassword: {available: boolean; onSaveRequested?: () => void} = {available: false};
+jest.mock('./OnePasswordSaveButton', () => ({
+  OnePasswordSaveButton: ({
+    onAvailabilityChange,
+    onSaveRequested,
+  }: {
+    onAvailabilityChange: (isAvailable: boolean) => void;
+    onSaveRequested: () => void;
+  }) => {
+    const {useEffect} = jest.requireActual('react');
+    useEffect(() => {
+      onAvailabilityChange(mockOnePassword.available);
+      mockOnePassword.onSaveRequested = onSaveRequested;
+    }, [onAvailabilityChange, onSaveRequested]);
+    return null;
+  },
+}));
+
 jest.mock('Util/util', () => ({
   ...jest.requireActual('Util/util'),
   downloadBlob: jest.fn(),
 }));
 
-const renderModal = (onClose = jest.fn()) => render(withTheme(<SaveBackupKeyModal onClose={onClose} />));
+const CREDENTIAL_ID = 'Wire backup key · kim@example.com';
+
+const renderModal = (onClose = jest.fn()) =>
+  render(withTheme(<SaveBackupKeyModal credentialId={CREDENTIAL_ID} onClose={onClose} />));
 
 describe('SaveBackupKeyModal', () => {
   beforeEach(() => {
     useBackupKeyStore.getState().clearKey();
     jest.clearAllMocks();
+    (isBrowserPasswordManagerAvailable as jest.Mock).mockReturnValue(false);
+    mockOnePassword = {available: false};
   });
 
   it('shows an error when continuing without saving the key', () => {
@@ -121,5 +150,65 @@ describe('SaveBackupKeyModal', () => {
 
     expect(onClose).toHaveBeenCalled();
     expect(useBackupKeyStore.getState().key).toBeUndefined();
+  });
+
+  describe('password manager', () => {
+    const isPasswordManagerVisible = (element: HTMLElement) => getComputedStyle(element).display !== 'none';
+
+    it('is hidden when no password manager is available', () => {
+      const {getByTestId} = renderModal();
+
+      expect(isPasswordManagerVisible(getByTestId('backup-key-password-manager'))).toBe(false);
+      expect(document.activeElement?.getAttribute('data-uie-name')).toBe('do-copy-backup-key');
+    });
+
+    it('saves to the browser password manager without marking the key as saved', async () => {
+      (isBrowserPasswordManagerAvailable as jest.Mock).mockReturnValue(true);
+      const {getByTestId} = renderModal();
+
+      expect(isPasswordManagerVisible(getByTestId('backup-key-password-manager'))).toBe(true);
+      expect(document.activeElement?.getAttribute('data-uie-name')).toBe('do-save-backup-key-password-manager');
+
+      fireEvent.click(getByTestId('do-save-backup-key-password-manager'));
+
+      await waitFor(() =>
+        expect(getByTestId('backup-key-password-manager-status').textContent).toBe(
+          'preferencesBackupKeyPasswordManagerPrompt',
+        ),
+      );
+      const [credentialId, key] = (saveToBrowserPasswordManager as jest.Mock).mock.calls[0];
+      expect(credentialId).toBe(CREDENTIAL_ID);
+      expect(isValidBackupKey(key)).toBe(true);
+      // The browser doesn't tell whether the user accepted its prompt
+      expect((getByTestId('backup-key-saved-checkbox') as HTMLInputElement).checked).toBe(false);
+    });
+
+    it('shows an error when the browser password manager fails', async () => {
+      (isBrowserPasswordManagerAvailable as jest.Mock).mockReturnValue(true);
+      (saveToBrowserPasswordManager as jest.Mock).mockRejectedValueOnce(new Error('NotAllowedError'));
+      const {getByTestId} = renderModal();
+
+      fireEvent.click(getByTestId('do-save-backup-key-password-manager'));
+
+      await waitFor(() =>
+        expect(getByTestId('backup-key-password-manager-status').textContent).toBe(
+          'preferencesBackupKeyPasswordManagerError',
+        ),
+      );
+    });
+
+    it('shows the 1Password option when the extension enables it, without marking the key as saved', async () => {
+      mockOnePassword = {available: true};
+      const {getByTestId} = renderModal();
+
+      await waitFor(() => expect(isPasswordManagerVisible(getByTestId('backup-key-password-manager'))).toBe(true));
+      act(() => mockOnePassword.onSaveRequested?.());
+
+      expect(getByTestId('backup-key-password-manager-status').textContent).toBe(
+        'preferencesBackupKeyPasswordManagerPrompt',
+      );
+      // 1Password doesn't report back whether the item was saved
+      expect((getByTestId('backup-key-saved-checkbox') as HTMLInputElement).checked).toBe(false);
+    });
   });
 });

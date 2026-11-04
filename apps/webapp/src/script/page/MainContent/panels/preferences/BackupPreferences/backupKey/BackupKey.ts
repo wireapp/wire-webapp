@@ -20,7 +20,9 @@
 import {generateMnemonic, validateMnemonic} from '@scure/bip39';
 import {wordlist} from '@scure/bip39/wordlists/english';
 
+import {Config} from 'src/script/Config';
 import {copyText} from 'Util/ClipboardUtil';
+import {t} from 'Util/LocalizerUtil';
 import {downloadBlob} from 'Util/util';
 
 /**
@@ -45,3 +47,21 @@ export const copyBackupKey = (key: string): Promise<void> => copyText(key);
 /** The key file contains only the mnemonic, without a trailing newline (same as Android). */
 export const downloadBackupKey = (key: string): number =>
   downloadBlob(new Blob([key], {type: 'text/plain;charset=utf-8'}), BACKUP_KEY_FILE_NAME);
+
+export interface BackupKeyAccount {
+  email?: string;
+  username?: string;
+  name?: string;
+}
+
+/**
+ * Title/id of the password manager entry, e.g. "Wire backup key · kim@example.com" (same as Android).
+ * Must differ from the account login, otherwise browsers offer to update the account password.
+ */
+export const getBackupKeyCredentialId = ({email, username, name}: BackupKeyAccount): string => {
+  const brandName = Config.getConfig().BRAND_NAME;
+  const account = email || (username ? `@${username}` : '') || name;
+  return account
+    ? t('preferencesBackupKeyCredentialId', {account, brandName})
+    : t('preferencesBackupKeyCredentialIdFallback', {brandName});
+};

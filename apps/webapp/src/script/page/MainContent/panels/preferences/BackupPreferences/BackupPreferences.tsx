@@ -23,9 +23,12 @@ import {AlertIcon, Button, ButtonVariant, HistoryIcon, LockClosedIcon, ShieldIco
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {RadioGroup} from 'Components/Radio';
+import {User} from 'Repositories/entity/User';
 import {Config} from 'src/script/Config';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
+import {getBackupKeyCredentialId} from './backupKey/BackupKey';
 import {SaveBackupKeyModal} from './backupKey/SaveBackupKeyModal';
 import {useBackupKeyStore} from './backupKey/useBackupKeyStore';
 import {mockBackupPreferencesState} from './BackupPreferences.mock';
@@ -58,6 +61,7 @@ import {PreferencesPage} from '../components/PreferencesPage';
 import {PreferencesSection} from '../components/PreferencesSection';
 
 interface BackupPreferencesProps {
+  selfUser: User;
   state?: BackupPreferencesViewState;
 }
 
@@ -82,7 +86,7 @@ const getStatusLine = (enabled: boolean, paused: boolean, frequency: BackupFrequ
   }
 };
 
-export const BackupPreferences = ({state = mockBackupPreferencesState}: BackupPreferencesProps) => {
+export const BackupPreferences = ({selfUser, state = mockBackupPreferencesState}: BackupPreferencesProps) => {
   const {adminEnforced, run, location, lastBackup, nextBackup} = state;
   const brandName = Config.getConfig().BRAND_NAME;
 
@@ -90,6 +94,7 @@ export const BackupPreferences = ({state = mockBackupPreferencesState}: BackupPr
   const [frequency, setFrequency] = useState(state.frequency);
   const [isSaveKeyModalOpen, setIsSaveKeyModalOpen] = useState(false);
   const hasKey = useBackupKeyStore(keyState => !!keyState.key);
+  const {email, username, name} = useKoSubscribableChildren(selfUser, ['email', 'username', 'name']);
 
   const statusTitleId = useId();
   const statusLineId = useId();
@@ -312,7 +317,12 @@ export const BackupPreferences = ({state = mockBackupPreferencesState}: BackupPr
         </div>
       </PreferencesSection>
 
-      {isSaveKeyModalOpen && <SaveBackupKeyModal onClose={() => setIsSaveKeyModalOpen(false)} />}
+      {isSaveKeyModalOpen && (
+        <SaveBackupKeyModal
+          credentialId={getBackupKeyCredentialId({email, username, name})}
+          onClose={() => setIsSaveKeyModalOpen(false)}
+        />
+      )}
     </PreferencesPage>
   );
 };

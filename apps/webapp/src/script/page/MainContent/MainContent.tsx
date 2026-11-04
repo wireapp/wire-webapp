@@ -212,7 +212,7 @@ const MainContent = ({
                 className={cx('preferences-page preferences-backup', incomingCssClass)}
                 ref={removeAnimationsClass}
               >
-                <BackupPreferences />
+                <BackupPreferences selfUser={selfUser} />
               </div>
             )}
 

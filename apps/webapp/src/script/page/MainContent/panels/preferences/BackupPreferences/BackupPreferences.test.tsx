@@ -22,14 +22,26 @@ import {fireEvent, render} from '@testing-library/react';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {User} from 'Repositories/entity/User';
 
 import {BackupPreferences} from './BackupPreferences';
 import {mockBackupPreferencesState} from './BackupPreferences.mock';
 import {BackupPreferencesViewState} from './BackupPreferences.types';
 import {useBackupKeyStore} from './backupKey/useBackupKeyStore';
 
+jest.mock('./backupKey/OnePasswordSaveButton', () => ({
+  OnePasswordSaveButton: () => null,
+}));
+
 const renderWithState = (overrides: Partial<BackupPreferencesViewState> = {}) =>
-  render(withTheme(<BackupPreferences state={{...mockBackupPreferencesState, ...overrides}} />));
+  render(
+    withTheme(
+      <BackupPreferences
+        selfUser={new User('user-id', 'wire.com')}
+        state={{...mockBackupPreferencesState, ...overrides}}
+      />,
+    ),
+  );
 
 describe('BackupPreferences', () => {
   beforeEach(() => {

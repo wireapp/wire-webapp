@@ -27,8 +27,13 @@ import {
   BACKUP_KEY_WORD_COUNT,
   downloadBackupKey,
   generateBackupKey,
+  getBackupKeyCredentialId,
   isValidBackupKey,
 } from './BackupKey';
+
+jest.mock('Util/LocalizerUtil', () => ({
+  t: (key: string, substitutions?: Record<string, string>) => `${key}:${substitutions?.account ?? ''}`,
+}));
 
 jest.mock('Util/util', () => ({
   downloadBlob: jest.fn(),
@@ -104,5 +109,19 @@ describe('BackupKey', () => {
     expect(fileName).toBe('wire-backup-key.txt');
     expect(blob.type).toContain('text/plain');
     expect(await readBlob(blob)).toBe(key);
+  });
+
+  describe('getBackupKeyCredentialId', () => {
+    it('prefers email, then handle, then name', () => {
+      expect(getBackupKeyCredentialId({email: 'kim@example.com', username: 'kim', name: 'Kim'})).toBe(
+        'preferencesBackupKeyCredentialId:kim@example.com',
+      );
+      expect(getBackupKeyCredentialId({username: 'kim', name: 'Kim'})).toBe('preferencesBackupKeyCredentialId:@kim');
+      expect(getBackupKeyCredentialId({name: 'Kim'})).toBe('preferencesBackupKeyCredentialId:Kim');
+    });
+
+    it('falls back to a generic title', () => {
+      expect(getBackupKeyCredentialId({})).toBe('preferencesBackupKeyCredentialIdFallback:');
+    });
   });
 });
