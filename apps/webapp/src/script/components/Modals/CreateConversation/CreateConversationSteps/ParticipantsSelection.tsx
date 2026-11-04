@@ -22,10 +22,9 @@ import {useMemo, useState, type FunctionComponent} from 'react';
 import {isUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {participantsSelectionListCss, participantsSelectionSearchCss} from './CreateConversationSteps.styles';
 
+import {useApplicationContext} from '../../../../page/rootProvider';
 import {TeamState} from '../../../../repositories/team/TeamState';
 import {UserState} from '../../../../repositories/user/userState';
 import {useKoSubscribableChildren} from '../../../../util/componentUtil';

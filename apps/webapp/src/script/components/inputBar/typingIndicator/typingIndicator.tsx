@@ -19,8 +19,6 @@
 
 import type {FunctionComponent} from 'react';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {
   dotOneStyles,
   dotThreeStyles,
@@ -32,6 +30,7 @@ import {
 } from './typingIndicator.styles';
 import {useTypingIndicatorState} from './useTypingIndicatorState/useTypingIndicatorState';
 
+import {useApplicationContext} from '../../../page/rootProvider';
 import {Avatar, AVATAR_SIZE} from '../../avatar';
 import * as Icon from '../../icon';
 

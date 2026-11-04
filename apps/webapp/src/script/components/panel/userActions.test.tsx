@@ -34,13 +34,13 @@ import {User} from '../../repositories/entity/User';
 import {TeamEntity} from '../../repositories/team/TeamEntity';
 import {TeamState} from '../../repositories/team/TeamState';
 import {UserState} from '../../repositories/user/userState';
-import {withTheme} from 'src/script/auth/util/test/testUtil';
+import {withTheme} from '../../auth/util/test/testUtil';
 import {translateForTest} from '../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {ActionsViewModel} from 'src/script/view_model/ActionsViewModel';
+} from '../../page/testSupport/rootContextTestSupport';
+import {ActionsViewModel} from '../../view_model/ActionsViewModel';
 import {noop} from '../../util/util';
 
 import {ActionIdentifier, Actions, UserActions} from './userActions';

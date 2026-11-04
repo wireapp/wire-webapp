@@ -25,11 +25,11 @@ import {task} from 'true-myth';
 import {asyncNoop, noop} from 'noop-esm';
 
 import {Conversation} from '../../../repositories/entity/Conversation';
-import {withTheme} from 'src/script/auth/util/test/testUtil';
+import {withTheme} from '../../../auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../page/testSupport/rootContextTestSupport';
 import {translateForTest} from '../../../util/test/translateForTest';
 
 import {ConversationMapper} from '../../../repositories/conversation/ConversationMapper';

@@ -19,11 +19,6 @@
 
 import type {Config} from 'jest';
 import {createRequire} from 'node:module';
-import {fileURLToPath} from 'url';
-import {dirname} from 'path';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 const rootJestConfiguration = createRequire(import.meta.url)('../../jest.config.js') as Pick<
   Config,
   'coverageReporters' | 'reporters'
@@ -61,7 +56,6 @@ const config: Config = {
       statements: 48,
     },
   },
-  moduleDirectories: ['node_modules', __dirname],
   // Must be in sync with tsconfig.json >> paths
   moduleNameMapper: {
     '^@enormora/clock/clock$': '<rootDir>/../../node_modules/@enormora/clock/clock.entry-point.js',

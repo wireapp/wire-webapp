@@ -21,10 +21,9 @@ import type {FunctionComponent} from 'react';
 
 import {REASON} from '@wireapp/avs';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {MessageTime} from './messageTime';
 
+import {useApplicationContext} from '../../../page/rootProvider';
 import {CallingTimeoutMessage} from '../../../repositories/entity/message/callingTimeoutMessage';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import * as Icon from '../../icon';

@@ -19,8 +19,7 @@
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {Config} from 'src/script/Config';
-
+import {Config} from '../../../Config';
 import {
   showCallNotEstablishedModal,
   type NoInternetCallGuardCopy,

@@ -37,10 +37,6 @@ import {
   TimePickerField,
 } from '@wireapp/react-ui-kit';
 
-import {currentLanguage} from 'src/script/auth/localeConfig';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {getRegionalDateLocale} from 'src/script/util/timeUtil';
-
 import {
   SCHEDULE_MEETING_RECURRENCE_OPTIONS,
   SCHEDULE_MEETING_RECURRENCE_TRANSLATION_KEYS,
@@ -53,7 +49,10 @@ import {
   type ScheduleMeetingRecurrenceOption,
 } from './scheduleMeetingTypes';
 
+import {currentLanguage} from '../../../auth/localeConfig';
+import {useApplicationContext} from '../../../page/rootProvider';
 import type {User} from '../../../repositories/entity/User';
+import {getRegionalDateLocale} from '../../../util/timeUtil';
 import {MeetingParticipantsPicker} from '../meetingParticipantsPicker';
 import {MeetingLinkForm} from '../shared/meetingLinkForm/meetingLinkForm';
 import {useMeetingParticipants} from '../shared/participants/useMeetingParticipants';

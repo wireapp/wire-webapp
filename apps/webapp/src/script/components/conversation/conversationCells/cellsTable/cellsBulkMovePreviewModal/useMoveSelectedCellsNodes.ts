@@ -23,11 +23,10 @@ import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {RestPerformActionResponse} from 'cells-sdk-ts';
 import {Result, result, task} from 'true-myth';
 
-import {CellNode} from 'src/script/types/cellNode';
-
 import {isBulkMoveValid} from './validateBulkMove';
 
 import {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
+import {CellNode} from '../../../../../types/cellNode';
 import {
   CELLS_ACTION,
   canPerformCellsAction,

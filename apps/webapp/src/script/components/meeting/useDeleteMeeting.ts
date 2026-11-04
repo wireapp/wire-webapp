@@ -19,13 +19,12 @@
 
 import {useCallback} from 'react';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {useMeetingStore} from './meetingStore/meetingStoreProvider';
 import {type DeleteMeetingModalMode, showDeleteMeetingModal} from './shared/delete/showDeleteMeetingModal';
 import {submitDeleteMeeting} from './shared/submit/submitDeleteMeeting';
 import type {MeetingInstance} from './types/meetingInstance';
 
+import {useApplicationContext} from '../../page/rootProvider';
 import type {User} from '../../repositories/entity/User';
 
 type UseDeleteMeetingResult = {

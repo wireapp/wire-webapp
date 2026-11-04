@@ -23,14 +23,13 @@ import {Maybe, Task, task} from 'true-myth';
 
 import {STATE as CALL_STATE} from '@wireapp/avs';
 
-import type {CallingViewModel} from 'src/script/view_model/CallingViewModel';
-
 import type {CallingRepository} from '../../repositories/calling/CallingRepository';
 import type {CallMediaChoice} from '../../repositories/calling/callMediaChoice';
 import type {ConversationRepository} from '../../repositories/conversation/ConversationRepository';
 import {isMLSCapableConversation} from '../../repositories/conversation/ConversationSelectors';
 import type {ConversationState} from '../../repositories/conversation/ConversationState';
 import type {Conversation} from '../../repositories/entity/Conversation';
+import type {CallingViewModel} from '../../view_model/CallingViewModel';
 
 export const joinMeetingCallErrors = {
   conversationNotFound: 'conversationNotFound',

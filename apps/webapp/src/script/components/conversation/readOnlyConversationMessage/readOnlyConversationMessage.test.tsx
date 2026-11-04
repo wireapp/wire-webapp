@@ -27,7 +27,7 @@ import {ConnectionEntity} from '../../../repositories/connection/connectionEntit
 import {CONVERSATION_READONLY_STATE} from '../../../repositories/conversation/ConversationRepository';
 import {Conversation} from '../../../repositories/entity/Conversation';
 import {User} from '../../../repositories/entity/User';
-import {withTheme} from 'src/script/auth/util/test/testUtil';
+import {withTheme} from '../../../auth/util/test/testUtil';
 
 import {ReadOnlyConversationMessage} from './readOnlyConversationMessage';
 import {translateForTest} from '../../../util/test/translateForTest';

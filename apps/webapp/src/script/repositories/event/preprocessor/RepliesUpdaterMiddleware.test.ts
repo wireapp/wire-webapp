@@ -19,7 +19,7 @@
 
 import {Conversation} from '../../entity/Conversation';
 import {User} from '../../entity/User';
-import {QuoteEntity} from 'src/script/message/quoteEntity';
+import {QuoteEntity} from '../../../message/quoteEntity';
 import {
   createMessageAddEvent,
   createMultipartMessageAddEvent,

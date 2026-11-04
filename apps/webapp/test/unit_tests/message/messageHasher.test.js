@@ -18,7 +18,7 @@
  */
 
 import {ClientEvent} from '../../../src/script/repositories/event/Client';
-import {MessageHasher} from 'src/script/message/messageHasher';
+import {MessageHasher} from '../../../src/script/message/messageHasher';
 import {bytesToHex} from '../../../src/script/util/stringUtil';
 
 describe('MessageHasher', () => {

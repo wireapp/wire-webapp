@@ -21,11 +21,10 @@ import {isNan} from '@sindresorhus/is';
 import {ADD_PERMISSION} from '@wireapp/api-client/lib/conversation';
 import {container} from 'tsyringe';
 
-import type {RootContextValue} from 'src/script/page/rootProvider';
-
 import {ChatHistory, ConversationAccess, ConversationType, HistorySharingUnit} from './types';
 
 import {Config} from '../../../Config';
+import type {RootContextValue} from '../../../page/rootProvider';
 import {TeamState} from '../../../repositories/team/TeamState';
 import type {PrimaryModalTranslatedMessage} from '../PrimaryModal/PrimaryModalTypes';
 

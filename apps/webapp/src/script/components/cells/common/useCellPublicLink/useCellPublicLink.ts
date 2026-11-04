@@ -23,10 +23,9 @@ import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isNonEmptyString} from '@sindresorhus/is';
 import type {RestShareLink} from '@wireapp/api-client/lib/cells';
 
-import {Config} from 'src/script/Config';
-import type {CellNode} from 'src/script/types/cellNode';
-
+import {Config} from '../../../../Config';
 import {CellsRepository} from '../../../../repositories/cells/cellsRepository';
+import type {CellNode} from '../../../../types/cellNode';
 
 type PublicLinkStatus = 'idle' | 'loading' | 'error' | 'success';
 

@@ -22,8 +22,7 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import {VerificationMessageType} from 'src/script/message/verificationMessageType';
-
+import {VerificationMessageType} from '../../../../message/verificationMessageType';
 import {getLogger, Logger} from '../../../../util/logger';
 import {WebAppEvents} from '../../../../webAppEvents';
 import {Conversation} from '../../../entity/Conversation';

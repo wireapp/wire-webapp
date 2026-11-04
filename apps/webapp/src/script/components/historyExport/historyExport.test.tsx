@@ -22,9 +22,9 @@ import {render, waitFor} from '@testing-library/react';
 import {PrimaryModal, removeCurrentModal} from '../Modals/PrimaryModal';
 import {ClientState} from '../../repositories/client/ClientState';
 import {User} from '../../repositories/entity/User';
-import * as RootProvider from 'src/script/page/rootProvider';
-import {RootContextValue} from 'src/script/page/rootProvider';
-import {MainViewModel} from 'src/script/view_model/MainViewModel';
+import * as RootProvider from '../../page/rootProvider';
+import {RootContextValue} from '../../page/rootProvider';
+import {MainViewModel} from '../../view_model/MainViewModel';
 
 import {HistoryExport} from './historyExport';
 import {translateForTest} from '../../util/test/translateForTest';

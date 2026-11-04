@@ -61,8 +61,8 @@ import {CALL_TYPE, CONV_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 import {WebAppEvents} from '../../webAppEvents';
 
 import {PrimaryModal} from '../../components/Modals/PrimaryModal';
-import {buildMediaDevicesHandler, createSelfParticipant} from 'src/script/auth/util/test/testUtil';
-import {SystemMessageType} from 'src/script/message/systemMessageType';
+import {buildMediaDevicesHandler, createSelfParticipant} from '../../auth/util/test/testUtil';
+import {SystemMessageType} from '../../message/systemMessageType';
 import {Call} from '../calling/Call';
 import {CallingRepository} from '../calling/CallingRepository';
 import {CallState} from '../calling/CallState';
@@ -87,8 +87,8 @@ import {TeamRepository} from '../team/TeamRepository';
 import {TeamState} from '../team/TeamState';
 import {UserRepository} from '../user/userRepository';
 import {UserState} from '../user/userState';
-import {Config} from 'src/script/Config';
-import {ConversationError} from 'src/script/error/conversationError';
+import {Config} from '../../Config';
+import {ConversationError} from '../../error/conversationError';
 import {
   generateConversation as _generateConversation,
   generateAPIConversation,
@@ -97,7 +97,7 @@ import {createDeleteEvent, createMessageAddEvent} from '../../../../test/helper/
 import type {Translate} from '../../util/localizerUtil';
 import {translateForTest} from '../../util/test/translateForTest';
 import {escapeRegex} from '../../util/sanitizationUtil';
-import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {requireValueForTest} from '../../page/testSupport/rootContextTestSupport';
 import {createUuid} from '../../util/uuid';
 
 import {ConversationDatabaseData, ConversationMapper} from './ConversationMapper';

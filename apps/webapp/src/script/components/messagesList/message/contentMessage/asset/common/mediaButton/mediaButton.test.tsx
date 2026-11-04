@@ -26,7 +26,7 @@ import {FileAsset} from '../../../../../../../repositories/entity/message/fileAs
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../../../../../page/testSupport/rootContextTestSupport';
 
 import {MediaButton, MediaButtonProps} from './mediaButton';
 import {translateForTest} from '../../../../../../../util/test/translateForTest';

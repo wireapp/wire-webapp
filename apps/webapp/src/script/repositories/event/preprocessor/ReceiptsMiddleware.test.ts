@@ -27,7 +27,7 @@ import type {EventService} from '../EventService';
 import type {IncomingEvent} from '../EventProcessor';
 import {ConfirmationEvent} from '../../conversation/EventBuilder';
 import {User} from '../../entity/User';
-import {StatusType} from 'src/script/message/statusType';
+import {StatusType} from '../../../message/statusType';
 import {createUuid} from '../../../util/uuid';
 
 import {ReceiptsMiddleware} from './ReceiptsMiddleware';

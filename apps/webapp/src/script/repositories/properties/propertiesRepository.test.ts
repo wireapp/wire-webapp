@@ -19,7 +19,7 @@
 
 import {User} from '../entity/User';
 import type {SelfService} from '../self/SelfService';
-import type {APIClient} from 'src/script/service/apiClientSingleton';
+import type {APIClient} from '../../service/apiClientSingleton';
 import {translateForTest} from '../../util/test/translateForTest';
 
 import {PropertiesRepository} from './propertiesRepository';

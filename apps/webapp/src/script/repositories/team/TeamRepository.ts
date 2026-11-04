@@ -38,8 +38,6 @@ import {partition} from 'underscore';
 import {Runtime, TypedEventEmitter} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
 
-import {Config} from 'src/script/Config';
-
 import {TeamEntity} from './TeamEntity';
 import {TeamMapper} from './TeamMapper';
 import {TeamMemberEntity} from './TeamMemberEntity';
@@ -47,6 +45,7 @@ import {TeamService} from './TeamService';
 import {TeamState} from './TeamState';
 
 import {PrimaryModal} from '../../components/Modals/PrimaryModal';
+import {Config} from '../../Config';
 import {scheduleRecurringTask, updateRemoteConfigLogger} from '../../lifecycle/updateRemoteConfigs';
 import {getMLSMigrationStatus, MLSMigrationStatus} from '../../mls/MLSMigration/migrationStatus';
 import {APIClient} from '../../service/apiClientSingleton';

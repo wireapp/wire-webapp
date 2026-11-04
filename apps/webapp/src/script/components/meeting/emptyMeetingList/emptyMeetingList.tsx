@@ -21,8 +21,6 @@ import type {FunctionComponent} from 'react';
 
 import {Button, ButtonVariant, CalendarIcon, CallIcon} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {
   emptyListActionButtonContainerStyles,
   emptyListActionButtonsStyles,
@@ -31,6 +29,7 @@ import {
   emptyListStyles,
 } from './emptyListStyles';
 
+import {useApplicationContext} from '../../../page/rootProvider';
 import {useMeetingActions} from '../useMeetingActions';
 
 export interface EmptyMeetingListProps {

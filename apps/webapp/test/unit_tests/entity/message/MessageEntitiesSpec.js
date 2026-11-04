@@ -21,7 +21,7 @@ import {ContentMessage} from '../../../../src/script/repositories/entity/message
 import {FileAsset} from '../../../../src/script/repositories/entity/message/fileAsset';
 import {MediumImage} from '../../../../src/script/repositories/entity/message/mediumImage';
 import {Text} from '../../../../src/script/repositories/entity/message/text';
-import {StatusType} from 'src/script/message/statusType';
+import {StatusType} from '../../../../src/script/message/statusType';
 import {translate} from '../../../../src/script/util/localizerUtil';
 import {translateForTest} from '../../../../src/script/util/test/translateForTest';
 

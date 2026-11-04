@@ -25,13 +25,12 @@ import {AudioPreference, NotificationPreference, WebappProperties} from '@wireap
 import {amplify} from 'amplify';
 import ko from 'knockout';
 
-import {Config} from 'src/script/Config';
-
 import type {PropertiesService} from './propertiesService';
 import {PROPERTIES_TYPE, UserConsentStatus} from './propertiesType';
 
 import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {PrimaryModalType} from '../../components/Modals/PrimaryModal/PrimaryModalTypes';
+import {Config} from '../../Config';
 import {Environment} from '../../util/environment';
 import {type Translate} from '../../util/localizerUtil';
 import {getLogger, Logger} from '../../util/logger';

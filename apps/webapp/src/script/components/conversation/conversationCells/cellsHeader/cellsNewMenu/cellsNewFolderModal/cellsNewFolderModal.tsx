@@ -21,10 +21,9 @@ import type {FunctionComponent} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {descriptionStyles} from './cellsNewFolderModal.styles';
 
+import {useApplicationContext} from '../../../../../../page/rootProvider';
 import {CellsRepository} from '../../../../../../repositories/cells/cellsRepository';
 import {CellsModal} from '../../../common/cellsModal/cellsModal';
 import {CellsNewNodeForm} from '../../../common/cellsNewNodeForm/cellsNewNodeForm';

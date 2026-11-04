@@ -26,10 +26,6 @@ import ko from 'knockout';
 
 import {OutlineCheck} from '@wireapp/react-ui-kit';
 
-import {createRelativeTimestampFormatter, useRelativeTimestamp} from 'src/script/hooks/useRelativeTimestamp';
-import {StatusType} from 'src/script/message/statusType';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {ContentAsset} from './asset';
 import {deliveredMessageIndicator, messageBodyWrapper, messageEphemeralTimer} from './contentMessage.styles';
 import {MessageActionsMenu} from './messageActions/messageActions';
@@ -41,7 +37,10 @@ import {CompleteFailureToSendWarning, PartialFailureToSendWarning} from './warni
 
 import {MessageActions} from '..';
 import {useClickOutside} from '../../../../hooks/useClickOutside';
+import {createRelativeTimestampFormatter, useRelativeTimestamp} from '../../../../hooks/useRelativeTimestamp';
 import {EphemeralStatusType} from '../../../../message/ephemeralStatusType';
+import {StatusType} from '../../../../message/statusType';
+import {useApplicationContext} from '../../../../page/rootProvider';
 import {Conversation} from '../../../../repositories/entity/Conversation';
 import {CompositeMessage} from '../../../../repositories/entity/message/compositeMessage';
 import {ContentMessage} from '../../../../repositories/entity/message/contentMessage';

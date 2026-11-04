@@ -17,8 +17,7 @@
  *
  */
 
-import {ValidationError} from 'src/script/auth/module/action/validationError';
-
+import {ValidationError} from '../../../../auth/module/action/validationError';
 import type {TranslationKey} from '../../../../util/localizerUtil';
 import {isValidPassword} from '../../../../util/stringUtil';
 

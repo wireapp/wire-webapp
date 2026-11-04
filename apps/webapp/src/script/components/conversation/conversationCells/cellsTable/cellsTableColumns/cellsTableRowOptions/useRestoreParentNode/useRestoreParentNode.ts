@@ -20,9 +20,8 @@
 import {isUndefined} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {CellNode} from 'src/script/types/cellNode';
-
 import {CellsRepository} from '../../../../../../../repositories/cells/cellsRepository';
+import {CellNode} from '../../../../../../../types/cellNode';
 import {getCellsApiPath} from '../../../../common/getCellsApiPath/getCellsApiPath';
 import {openBreadcrumb} from '../../../../common/openBreadcrumb/openBreadcrumb';
 import {getNodeRootParentPath, RECYCLE_BIN_PATH} from '../../../../common/recycleBin/recycleBin';

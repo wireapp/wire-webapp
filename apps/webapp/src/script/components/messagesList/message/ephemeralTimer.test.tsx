@@ -23,7 +23,7 @@ import {Message} from '../../../repositories/entity/message/message';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../page/testSupport/rootContextTestSupport';
 import {translateForTest} from '../../../util/test/translateForTest';
 
 import {EphemeralTimer} from './ephemeralTimer';

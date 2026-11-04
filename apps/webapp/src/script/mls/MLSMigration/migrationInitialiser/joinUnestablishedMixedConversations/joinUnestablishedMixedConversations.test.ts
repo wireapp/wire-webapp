@@ -24,8 +24,8 @@ import {result, task} from 'true-myth';
 import {MixedConversation} from '../../../../repositories/conversation/ConversationSelectors';
 import {Conversation} from '../../../../repositories/entity/Conversation';
 import {User} from '../../../../repositories/entity/User';
-import {Core} from 'src/script/service/coreSingleton';
-import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {Core} from '../../../../service/coreSingleton';
+import {requireValueForTest} from '../../../../page/testSupport/rootContextTestSupport';
 import {TestFactory} from '../../../../../../test/helper/TestFactory';
 import {createUuid} from '../../../../util/uuid';
 

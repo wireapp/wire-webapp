@@ -28,7 +28,7 @@ import {
   createExecutingFireAndForgetInvokerForTest,
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../../../../page/testSupport/rootContextTestSupport';
 
 import {MultipartAssets} from './multipartAssets';
 import {translateForTest} from '../../../../../../util/test/translateForTest';

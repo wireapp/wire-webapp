@@ -21,9 +21,9 @@ import type {FunctionComponent} from 'react';
 
 import {IconButton, IconButtonVariant, ReloadIcon} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {buttonStyles} from './cellsRefresh.styles';
+
+import {useApplicationContext} from '../../../../../page/rootProvider';
 
 interface CellsRefreshProps {
   onRefresh: () => void;

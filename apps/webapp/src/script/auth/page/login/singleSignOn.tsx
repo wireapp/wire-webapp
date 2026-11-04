@@ -45,12 +45,11 @@ import {
   useMatchMedia,
 } from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {SingleSignOnForm} from './singleSignOnForm';
 
 import {LogoFullIcon} from '../../../components/icon';
 import {Config} from '../../../Config';
+import {useApplicationContext} from '../../../page/rootProvider';
 import {calculateChildWindowPosition} from '../../../util/DOM/caculateChildWindowPosition';
 import {getLogger} from '../../../util/logger';
 import {WebAppEvents} from '../../../webAppEvents';

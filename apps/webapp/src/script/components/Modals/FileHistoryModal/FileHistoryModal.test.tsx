@@ -19,7 +19,7 @@
 
 import {fireEvent, render, screen, waitFor} from '@testing-library/react';
 
-import {withTheme} from 'src/script/auth/util/test/testUtil';
+import {withTheme} from '../../../auth/util/test/testUtil';
 
 import {FileHistoryModal} from './FileHistoryModal';
 import {useFileHistoryModal} from './hooks/useFileHistoryModal';

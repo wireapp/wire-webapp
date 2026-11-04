@@ -44,9 +44,9 @@ import {
   createExecutingFireAndForgetInvokerForTest,
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
-import {CellNode} from 'src/script/types/cellNode';
+} from '../../../../../../../page/testSupport/rootContextTestSupport';
+import {driveBulkActionsFeatureToggleName} from '../../../../../../../featureToggles/startupFeatureToggleNames';
+import {CellNode} from '../../../../../../../types/cellNode';
 import {translateForTest} from '../../../../../../../util/test/translateForTest';
 
 import {CellsMoveNodeModal} from './cellsMoveNodeModal';

@@ -23,12 +23,11 @@ import {isNonEmptyArray} from '@sindresorhus/is';
 
 import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 
-import {Config} from 'src/script/Config';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {MessageTime} from './messageTime';
 import {useMessageFocusedTabIndex} from './util';
 
+import {Config} from '../../../Config';
+import {useApplicationContext} from '../../../page/rootProvider';
 import {FederationStopMessage as FederationStopMessageEntity} from '../../../repositories/entity/message/federationStopMessage';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {createReactTranslationMarker, renderReactTranslation} from '../../../util/localizerUtil/reactLocalizerUtil';

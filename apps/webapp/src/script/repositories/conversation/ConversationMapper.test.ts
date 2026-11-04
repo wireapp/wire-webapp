@@ -39,7 +39,7 @@ import ko from 'knockout';
 
 import {Conversation} from '../entity/Conversation';
 import {ContentMessage} from '../entity/message/contentMessage';
-import {BaseError} from 'src/script/error/baseError';
+import {BaseError} from '../../error/baseError';
 import {translate} from '../../util/localizerUtil';
 import {createUuid} from '../../util/uuid';
 

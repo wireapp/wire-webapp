@@ -26,10 +26,6 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {markAsUnreadFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
-import {QuoteEntity} from 'src/script/message/quoteEntity';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {CallMessage} from './callMessage';
 import {CallTimeoutMessage} from './callTimeoutMessage';
 import {ContentMessageComponent} from './contentMessage';
@@ -46,6 +42,9 @@ import {PingMessage} from './pingMessage';
 import {SystemMessage} from './systemMessage';
 import {VerificationMessage} from './verificationMessage';
 
+import {markAsUnreadFeatureToggleName} from '../../../featureToggles/startupFeatureToggleNames';
+import {QuoteEntity} from '../../../message/quoteEntity';
+import {useApplicationContext} from '../../../page/rootProvider';
 import {AssetRepository} from '../../../repositories/assets/assetRepository';
 import {OutgoingQuote} from '../../../repositories/conversation/MessageRepository';
 import {Conversation} from '../../../repositories/entity/Conversation';

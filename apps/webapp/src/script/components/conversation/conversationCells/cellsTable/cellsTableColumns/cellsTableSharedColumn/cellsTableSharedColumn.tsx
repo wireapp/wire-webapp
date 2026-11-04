@@ -19,8 +19,6 @@
 
 import type {FunctionComponent} from 'react';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {
   wrapperStyles,
   iconWrapperStyles,
@@ -29,6 +27,7 @@ import {
   iconStyles,
 } from './cellsTableSharedColumn.styles';
 
+import {useApplicationContext} from '../../../../../../page/rootProvider';
 import {LinkIcon} from '../../../../../icon';
 
 interface CellsTableSharedColumnProps {

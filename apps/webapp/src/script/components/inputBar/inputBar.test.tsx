@@ -38,14 +38,14 @@ import {SearchRepository} from '../../repositories/search/searchRepository';
 import {SelfService} from '../../repositories/self/SelfService';
 import {StorageRepository} from '../../repositories/storage';
 import {TeamState} from '../../repositories/team/TeamState';
-import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
-import {Config} from 'src/script/Config';
-import {disableMessagePreprocessingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
+import {withThemeAndRootContext} from '../../auth/util/test/testUtil';
+import {Config} from '../../Config';
+import {disableMessagePreprocessingFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
 import {translate} from '../../util/localizerUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../page/testSupport/rootContextTestSupport';
 import {createUuid} from '../../util/uuid';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';

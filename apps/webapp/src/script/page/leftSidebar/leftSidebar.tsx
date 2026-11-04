@@ -24,17 +24,16 @@ import cx from 'classnames';
 
 import {useMatchMedia} from '@wireapp/react-ui-kit';
 
-import {conversationListCollapseFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {Conversations} from './panels/conversations';
 import {getIsConversationListCollapsed, SidebarTabs, useSidebarStore} from './panels/conversations/useSidebarStore';
 import {TemporaryGuestConversations} from './panels/temporatyGuestConversations';
 
 import {MeetingNotificationHost} from '../../components/meeting/meetingNotificationHost/meetingNotificationHost';
+import {conversationListCollapseFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
 import {User} from '../../repositories/entity/User';
 import {ListViewModel} from '../../view_model/ListViewModel';
 import {WebAppEvents} from '../../webAppEvents';
+import {useApplicationContext} from '../rootProvider';
 import {ListState, useAppState} from '../useAppState';
 
 type LeftSidebarProps = {

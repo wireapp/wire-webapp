@@ -23,8 +23,6 @@ import {isNan, isNullOrUndefined} from '@sindresorhus/is';
 
 import {FlexBox, Input, Select} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {
   conversationHistoryContainerCss,
   conversationHistoryCustomCss,
@@ -43,6 +41,7 @@ import {RadioGroup} from '../../../components/Radio';
 import {User} from '../../../repositories/entity/User';
 import {TeamState} from '../../../repositories/team/TeamState';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {useApplicationContext} from '../../rootProvider';
 import {PanelHeader} from '../panelHeader';
 
 export interface AccessProps {

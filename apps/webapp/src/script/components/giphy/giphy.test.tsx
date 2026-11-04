@@ -20,12 +20,12 @@
 import {fireEvent, render, waitFor} from '@testing-library/react';
 
 import {GiphyRepository} from '../../repositories/extension/GiphyRepository';
-import {withTheme} from 'src/script/auth/util/test/testUtil';
+import {withTheme} from '../../auth/util/test/testUtil';
 import {translateForTest} from '../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../page/testSupport/rootContextTestSupport';
 
 import {Giphy, GiphyState} from '.';
 

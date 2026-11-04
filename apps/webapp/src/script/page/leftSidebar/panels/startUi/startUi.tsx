@@ -24,10 +24,6 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {MainViewModel} from 'src/script/view_model/MainViewModel';
-
 import {PeopleTab, SearchResultsData} from './peopleTab';
 import {ServicesTab} from './servicesTab';
 
@@ -47,6 +43,9 @@ import {TeamState} from '../../../../repositories/team/TeamState';
 import {generatePermissionHelpers} from '../../../../repositories/user/userPermission';
 import {UserRepository} from '../../../../repositories/user/userRepository';
 import {UserState} from '../../../../repositories/user/userState';
+import {MainViewModel} from '../../../../view_model/MainViewModel';
+import {useApplicationContext} from '../../../rootProvider';
+import {SidebarTabs, useSidebarStore} from '../conversations/useSidebarStore';
 import {ListWrapper} from '../listWrapper';
 
 type StartUIProps = {

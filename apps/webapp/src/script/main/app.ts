@@ -38,13 +38,12 @@ import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
 
-import {createBrowserSystemNotificationApi} from 'src/script/browser/notification/createSystemNotificationApiFromBrowserNotification';
-
 import {refreshApplication} from './applicationRefresh';
 import {reportStartupFailure} from './reportStartupFailure';
 
 import '../../style/default.less';
 import {SIGN_OUT_REASON} from '../auth/signOutReason';
+import {createBrowserSystemNotificationApi} from '../browser/notification/createSystemNotificationApiFromBrowserNotification';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config, Configuration} from '../Config';
 import {E2EIHandler} from '../e2eIdentity';

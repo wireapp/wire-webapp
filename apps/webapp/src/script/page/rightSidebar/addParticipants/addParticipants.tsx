@@ -25,8 +25,6 @@ import cx from 'classnames';
 
 import {Button, ButtonVariant, TabIndex} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {FadingScrollbar} from '../../../components/fadingScrollbar';
 import * as Icon from '../../../components/icon';
 import {SearchInput} from '../../../components/SearchInput';
@@ -49,6 +47,7 @@ import {handleKeyDown, KEY} from '../../../util/keyboardUtil';
 import {getLogger} from '../../../util/logger';
 import {safeWindowOpen} from '../../../util/sanitizationUtil';
 import {compareTransliteration, sortByPriority, sortUsersByPriority} from '../../../util/stringUtil';
+import {useApplicationContext} from '../../rootProvider';
 import {PanelHeader} from '../panelHeader';
 import {PanelEntity, PanelState} from '../rightSidebar';
 

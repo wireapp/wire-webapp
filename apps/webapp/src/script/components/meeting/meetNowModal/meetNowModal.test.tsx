@@ -33,14 +33,14 @@ import {ConversationState} from '../../../repositories/conversation/Conversation
 import {User} from '../../../repositories/entity/User';
 import {TeamState} from '../../../repositories/team/TeamState';
 import {UserState} from '../../../repositories/user/userState';
-import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
+import {withThemeAndRootContext} from '../../../auth/util/test/testUtil';
 import {
   createExecutingFireAndForgetInvokerForTest,
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {MainViewModel} from 'src/script/view_model/MainViewModel';
-import {useWarningsState} from 'src/script/view_model/WarningsContainer/WarningsState';
+} from '../../../page/testSupport/rootContextTestSupport';
+import {MainViewModel} from '../../../view_model/MainViewModel';
+import {useWarningsState} from '../../../view_model/WarningsContainer/WarningsState';
 import {KEY} from '../../../util/keyboardUtil';
 import {translateForTest} from '../../../util/test/translateForTest';
 

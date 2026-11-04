@@ -29,15 +29,14 @@ import {container} from 'tsyringe';
 import {UrlUtil} from '@wireapp/commons';
 import {Button, ButtonVariant, ContainerXS, ErrorMessage, Text} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {Core} from 'src/script/service/coreSingleton';
-
 import {Page} from './page';
 
 import {LogoFullIcon} from '../../components/icon';
 import {Config} from '../../Config';
 import {useSingleInstance} from '../../hooks/useSingleInstance';
 import '../../localization/Localizer';
+import {useApplicationContext} from '../../page/rootProvider';
+import {Core} from '../../service/coreSingleton';
 import {isDataDogEnabled} from '../../util/dataDog';
 import {getWebEnvironment} from '../../util/environment';
 import {actionRoot} from '../module/action';

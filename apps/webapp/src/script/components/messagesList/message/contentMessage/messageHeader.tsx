@@ -24,10 +24,9 @@ import {isNonEmptyString} from '@sindresorhus/is';
 
 import {Tooltip} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {headerIconBadge, headerLabelBadge, headerIconSizeM, headerIconSizeS} from './messageHeader.styles';
 
+import {useApplicationContext} from '../../../../page/rootProvider';
 import {ContentMessage} from '../../../../repositories/entity/message/contentMessage';
 import {DeleteMessage} from '../../../../repositories/entity/message/deleteMessage';
 import {User} from '../../../../repositories/entity/User';

@@ -37,13 +37,6 @@ import {
   TabIndex,
 } from '@wireapp/react-ui-kit';
 
-import {Config} from 'src/script/Config';
-import {isCallViewOption} from 'src/script/guards/CallView';
-import {isMediaDevice} from 'src/script/guards/MediaDevice';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {ContextMenuEntry, showContextMenu} from 'src/script/ui/contextMenu';
-import {CallViewTab} from 'src/script/view_model/CallingViewModel';
-
 import {EmojisBar} from './EmojisBar/EmojisBar';
 import {VideoCallCancelButton} from './VideoCallCancelButton/VideoCallCancelButton';
 import {
@@ -59,8 +52,12 @@ import {
 } from './VideoControls.styles';
 import {VideoControlsSelect} from './VideoControlsSelect/VideoControlsSelect';
 
+import {Config} from '../../../Config';
+import {isCallViewOption} from '../../../guards/CallView';
+import {isMediaDevice} from '../../../guards/MediaDevice';
 import {useActiveWindowMatchMedia} from '../../../hooks/useActiveWindowMatchMedia';
 import {useUserPropertyValue} from '../../../hooks/useUserProperty';
+import {useApplicationContext} from '../../../page/rootProvider';
 import {Call} from '../../../repositories/calling/Call';
 import {CallingViewMode, CallState} from '../../../repositories/calling/CallState';
 import {Participant} from '../../../repositories/calling/Participant';
@@ -76,8 +73,10 @@ import {
 import {PropertiesRepository} from '../../../repositories/properties/propertiesRepository';
 import {PROPERTIES_TYPE} from '../../../repositories/properties/propertiesType';
 import {TeamState} from '../../../repositories/team/TeamState';
+import {ContextMenuEntry, showContextMenu} from '../../../ui/contextMenu';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {handleKeyDown, isEscapeKey, KEY} from '../../../util/keyboardUtil';
+import {CallViewTab} from '../../../view_model/CallingViewModel';
 import {WebAppEvents} from '../../../webAppEvents';
 import * as Icon from '../../icon';
 

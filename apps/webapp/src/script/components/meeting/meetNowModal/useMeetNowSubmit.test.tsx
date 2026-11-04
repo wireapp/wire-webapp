@@ -31,9 +31,9 @@ import type {ConversationState} from '../../../repositories/conversation/Convers
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {MainViewModel} from 'src/script/view_model/MainViewModel';
-import {useWarningsState} from 'src/script/view_model/WarningsContainer/WarningsState';
+} from '../../../page/testSupport/rootContextTestSupport';
+import {MainViewModel} from '../../../view_model/MainViewModel';
+import {useWarningsState} from '../../../view_model/WarningsContainer/WarningsState';
 import {translateForTest} from '../../../util/test/translateForTest';
 
 import {type MeetNowSubmitResult, meetNowSubmitResults, wasMeetNowMeetingCreated} from './meetNowTypes';

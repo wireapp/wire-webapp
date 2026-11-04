@@ -27,11 +27,11 @@ import {
   CellsSelfUserDriveRoleProvider,
 } from '../../../../../../../../conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 
-import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
+import {withThemeAndRootContext} from '../../../../../../../../../auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../../../../../../../page/testSupport/rootContextTestSupport';
 import {isFileEditable} from '../../../../../../../../../util/fileTypeUtil';
 
 import {FileAssetOptions} from './fileAssetOptions';

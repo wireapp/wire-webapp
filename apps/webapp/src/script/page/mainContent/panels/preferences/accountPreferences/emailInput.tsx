@@ -21,14 +21,13 @@ import type {FunctionComponent} from 'react';
 
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {AccountInput, useInputDone} from './accountInput';
 
 import {PrimaryModal} from '../../../../../components/Modals/PrimaryModal';
 import {UserRepository} from '../../../../../repositories/user/userRepository';
 import {getLogger} from '../../../../../util/logger';
 import {isErrorWithCode} from '../../../../../util/typePredicateUtil';
+import {useApplicationContext} from '../../../../rootProvider';
 
 interface EmailInputProps {
   canEditProfile: boolean;

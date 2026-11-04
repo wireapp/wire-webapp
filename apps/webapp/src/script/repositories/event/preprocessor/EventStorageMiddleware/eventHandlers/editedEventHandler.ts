@@ -19,10 +19,9 @@
 
 import {isTruthy} from '@sindresorhus/is';
 
-import {EventError} from 'src/script/error/eventError';
-
 import {getCommonMessageUpdates} from './getCommonMessageUpdates';
 
+import {EventError} from '../../../../../error/eventError';
 import {
   CompositeMessageAddEvent,
   MessageAddEvent,

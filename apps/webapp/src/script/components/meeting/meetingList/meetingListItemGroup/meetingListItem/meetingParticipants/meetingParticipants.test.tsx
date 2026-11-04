@@ -33,7 +33,7 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
   requireValueForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../../../../page/testSupport/rootContextTestSupport';
 import {MeetingParticipants} from './meetingParticipants';
 
 const qualifiedConversation: QualifiedId = {id: 'conversation-id', domain: 'example.com'};

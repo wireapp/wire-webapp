@@ -19,8 +19,7 @@
 
 import {useEffect} from 'react';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
+import {useApplicationContext} from '../../../../../page/rootProvider';
 import {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
 import {useAllCellsTagsStore} from '../useAllCellsTagsStore/useAllCellsTagsStore';
 

@@ -21,8 +21,7 @@ import type {FunctionComponent} from 'react';
 
 import {container} from 'tsyringe';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
+import {useApplicationContext} from '../../../page/rootProvider';
 import {ConversationState} from '../../../repositories/conversation/ConversationState';
 import {LegalHoldMessage as LegalHoldMessageEntity} from '../../../repositories/entity/message/legalHoldMessage';
 import {LegalHoldDot} from '../../LegalHoldDot';

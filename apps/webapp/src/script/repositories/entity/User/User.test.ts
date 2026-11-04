@@ -18,7 +18,7 @@
  */
 
 import {ClientEntity} from '../../client/ClientEntity';
-import {ACCENT_ID} from 'src/script/Config';
+import {ACCENT_ID} from '../../../Config';
 import {TIME_IN_MILLIS} from '../../../util/timeUtil';
 
 import {User} from './User';

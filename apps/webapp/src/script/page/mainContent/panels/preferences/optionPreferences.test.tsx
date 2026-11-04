@@ -21,11 +21,11 @@ import {render} from '@testing-library/react';
 import en from '../../../../../i18n/en-US.json';
 import {User} from '../../../../repositories/entity/User';
 import type {PropertiesRepository} from '../../../../repositories/properties/propertiesRepository';
-import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
+import {withThemeAndRootContext} from '../../../../auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../testSupport/rootContextTestSupport';
 import {setStrings, translate} from '../../../../util/localizerUtil';
 import {translateForTest} from '../../../../util/test/translateForTest';
 import {createUuid} from '../../../../util/uuid';

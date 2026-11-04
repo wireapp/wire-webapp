@@ -21,9 +21,6 @@ import type {FunctionComponent} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {CellsEmptyBinAction} from './cellsEmptyBinAction/cellsEmptyBinAction';
 import {
   actionsStyles,
@@ -38,6 +35,8 @@ import {CellsNewMenu} from './cellsNewMenu/cellsNewMenu';
 import {CellsRefresh} from './cellsRefresh/cellsRefresh';
 import {CellsRootHomeIcon} from './cellsRootHomeIcon';
 
+import {driveBulkActionsFeatureToggleName} from '../../../../featureToggles/startupFeatureToggleNames';
+import {useApplicationContext} from '../../../../page/rootProvider';
 import {CellsRepository} from '../../../../repositories/cells/cellsRepository';
 import {CellsSearchInput} from '../../../cellsSearchInput/cellsSearchInput';
 import {ConversationViewerPermissionBanner} from '../../conversationViewerPermissionBanner/conversationViewerPermissionBanner';

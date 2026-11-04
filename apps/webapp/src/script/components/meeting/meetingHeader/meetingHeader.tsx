@@ -19,10 +19,9 @@
 
 import type {FunctionComponent} from 'react';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {actionsStyles, headingStyles, wrapperStyles} from './meetingHeader.styles';
 
+import {useApplicationContext} from '../../../page/rootProvider';
 import {MeetingMultiActionButton} from '../meetingMultiActionButton/meetingMultiActionButton';
 
 export const MeetingHeader: FunctionComponent = () => {

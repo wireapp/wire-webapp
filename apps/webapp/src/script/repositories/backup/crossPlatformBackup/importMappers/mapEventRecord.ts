@@ -19,9 +19,8 @@
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 
-import {MessageCategory} from 'src/script/message/messageCategory';
-
 import {CPBLogger} from '..';
+import {MessageCategory} from '../../../../message/messageCategory';
 import {ClientEvent} from '../../../event/Client';
 import {EventRecord} from '../../../storage';
 import {BackupMessageContent, BackupMessage} from '../CPB.library';

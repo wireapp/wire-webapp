@@ -19,8 +19,7 @@
 
 import type {FunctionComponent} from 'react';
 
-import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
-
+import {SidebarTabs, useSidebarStore} from '../../../page/leftSidebar/panels/conversations/useSidebarStore';
 import {IntegrationRepository} from '../../../repositories/integration/IntegrationRepository';
 import {ServiceEntity} from '../../../repositories/integration/ServiceEntity';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';

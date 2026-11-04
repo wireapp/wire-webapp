@@ -24,11 +24,10 @@ import {container} from 'tsyringe';
 
 import {Muted, Option, Select} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {channelSettingsTextCss} from './ConversationDetails.styles';
 import {CustomHistorySharingOption} from './CustomHistorySharingOption';
 
+import {useApplicationContext} from '../../../../../page/rootProvider';
 import {TeamState} from '../../../../../repositories/team/TeamState';
 import {useChannelsFeatureFlag} from '../../../../../util/useChannelsFeatureFlag';
 import {RadioGroup} from '../../../../Radio';

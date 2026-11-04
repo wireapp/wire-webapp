@@ -26,7 +26,7 @@ import {
 } from '../../../src/script/repositories/conversation/ConversationLabelRepository';
 import {Conversation} from '../../../src/script/repositories/entity/Conversation';
 import {PropertiesService} from '../../../src/script/repositories/properties/propertiesService';
-import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
+import {SidebarTabs, useSidebarStore} from '../../../src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {translate} from '../../../src/script/util/localizerUtil';
 import {createUuid} from '../../../src/script/util/uuid';
 

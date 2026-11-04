@@ -19,10 +19,9 @@
 
 import type {FunctionComponent} from 'react';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {videoStyles, iconWrapperStyles} from './videoPreviewCard.styles';
 
+import {useApplicationContext} from '../../../../page/rootProvider';
 import {FilePreviewPlayButton} from '../common/filePreviewPlayButton/filePreviewPlayButton';
 import {MediaFilePreviewCard} from '../common/mediaFilePreviewCard/mediaFilePreviewCard';
 

@@ -34,11 +34,10 @@ import {
   Switch,
 } from '@wireapp/react-ui-kit';
 
-import {Config} from 'src/script/Config';
-import {type RootContextValue} from 'src/script/page/rootProvider';
-
 import {CellsShareExpirationFields, type CellsShareExpirationSelection} from './cellsShareExpirationFields';
 
+import {Config} from '../../../Config';
+import {type RootContextValue} from '../../../page/rootProvider';
 import {CellsTableLoader} from '../../conversation/conversationCells/common/cellsTableLoader/cellsTableLoader';
 import {CopyToClipboardButton} from '../../copyToClipboardButton/copyToClipboardButton';
 import * as Icon from '../../icon';

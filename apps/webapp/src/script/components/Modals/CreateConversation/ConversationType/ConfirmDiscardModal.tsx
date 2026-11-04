@@ -21,8 +21,6 @@ import type {FunctionComponent} from 'react';
 
 import {Button, ButtonVariant, FlexBox, Text} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {
   confirmConversationTypeContainerCss,
   confirmConversationHeaderCss,
@@ -31,6 +29,7 @@ import {
   confirmConversationButtonCss,
 } from './ConversationType.styles';
 
+import {useApplicationContext} from '../../../../page/rootProvider';
 import {handleEscDown, handleKeyDown, KEY} from '../../../../util/keyboardUtil';
 import {ModalComponent} from '../../ModalComponent';
 import {useCreateConversationModal} from '../hooks/useCreateConversationModal';

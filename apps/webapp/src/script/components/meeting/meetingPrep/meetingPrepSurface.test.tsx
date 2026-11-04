@@ -26,7 +26,7 @@ import {User} from '../../../repositories/entity/User';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../page/testSupport/rootContextTestSupport';
 import type {Translate} from '../../../util/localizerUtil';
 
 import {MeetingPrepSurface} from './meetingPrepSurface';

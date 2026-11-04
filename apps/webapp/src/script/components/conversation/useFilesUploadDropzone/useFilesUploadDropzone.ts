@@ -22,15 +22,14 @@ import {useState} from 'react';
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {Accept, DropzoneInputProps, FileRejection, useDropzone, type DropzoneRootProps} from 'react-dropzone';
 
-import {Config} from 'src/script/Config';
-import type {RootContextValue} from 'src/script/page/rootProvider';
-
 import {buildCellFileMetadata} from './buildCellFileMetadata/buildCellFileMetadata';
 import {createFileDropHandler} from './createFileDropHandler/createFileDropHandler';
 import {validateFiles, ValidationResult} from './fileValidation/fileValidation';
 import {showFileDropzoneErrorModal} from './showFileDropzoneErrorModal/showFileDropzoneErrorModal';
 import {transformAcceptedFiles} from './transformAcceptedFiles/transformAcceptedFiles';
 
+import {Config} from '../../../Config';
+import type {RootContextValue} from '../../../page/rootProvider';
 import {CellsRepository} from '../../../repositories/cells/cellsRepository';
 import {Conversation} from '../../../repositories/entity/Conversation';
 import {getLogger} from '../../../util/logger';

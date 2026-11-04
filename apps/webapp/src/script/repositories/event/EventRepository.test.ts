@@ -33,7 +33,7 @@ import {EventSource} from './EventSource';
 import {NOTIFICATION_HANDLING_STATE} from './NotificationHandlingState';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
-import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {requireValueForTest} from '../../page/testSupport/rootContextTestSupport';
 
 const testFactory = new TestFactory();
 

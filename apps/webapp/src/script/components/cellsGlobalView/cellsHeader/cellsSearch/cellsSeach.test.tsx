@@ -26,7 +26,7 @@ import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../../page/testSupport/rootContextTestSupport';
 import type {Translate} from '../../../../util/localizerUtil';
 
 import {CellsSearch} from './cellsSeach';

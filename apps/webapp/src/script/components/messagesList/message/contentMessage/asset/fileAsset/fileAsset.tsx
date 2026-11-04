@@ -23,10 +23,9 @@ import {isNan, isNonEmptyString} from '@sindresorhus/is';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {RestrictedFile} from './restrictedFile/restrictedFile';
 
+import {useApplicationContext} from '../../../../../../page/rootProvider';
 import {AssetTransferState} from '../../../../../../repositories/assets/assetTransferState';
 import type {ContentMessage} from '../../../../../../repositories/entity/message/contentMessage';
 import type {FileAsset as FileAssetType} from '../../../../../../repositories/entity/message/fileAsset';

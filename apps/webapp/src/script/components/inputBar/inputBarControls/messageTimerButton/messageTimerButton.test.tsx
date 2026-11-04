@@ -26,8 +26,8 @@ import {translateForTest} from '../../../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import * as Context from 'src/script/ui/contextMenu';
+} from '../../../../page/testSupport/rootContextTestSupport';
+import * as Context from '../../../../ui/contextMenu';
 import {TIME_IN_MILLIS} from '../../../../util/timeUtil';
 
 import {MessageTimerButton} from './messageTimerButton';

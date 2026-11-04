@@ -24,13 +24,12 @@ import {container} from 'tsyringe';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {createConversationHeaderContainerCss} from './CreateConversation.styles';
 import {CreateConversationSubmit} from './CreateConversationSubmit';
 import {useCreateConversationModal} from './hooks/useCreateConversationModal';
 import {ConversationType, ConversationCreationStep} from './types';
 
+import {useApplicationContext} from '../../../page/rootProvider';
 import {UserState} from '../../../repositories/user/userState';
 import * as Icon from '../../icon';
 

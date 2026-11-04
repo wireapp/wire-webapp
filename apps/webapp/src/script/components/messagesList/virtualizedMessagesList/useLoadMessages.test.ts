@@ -29,7 +29,7 @@ import {
   createExecutingFireAndForgetInvokerForTest,
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../page/testSupport/rootContextTestSupport';
 import {translateForTest} from '../../../util/test/translateForTest';
 
 import {useLoadMessages} from './useLoadMessages';

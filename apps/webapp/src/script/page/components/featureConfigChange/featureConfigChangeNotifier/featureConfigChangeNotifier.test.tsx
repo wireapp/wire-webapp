@@ -27,7 +27,7 @@ import {TeamState} from '../../../../repositories/team/TeamState';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../testSupport/rootContextTestSupport';
 import {setStrings, translate} from '../../../../util/localizerUtil';
 
 import {FeatureConfigChangeNotifier} from './featureConfigChangeNotifier';

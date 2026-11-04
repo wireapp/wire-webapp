@@ -36,13 +36,13 @@ import {ConversationVerificationState} from '../../repositories/conversation/Con
 import {Conversation} from '../../repositories/entity/Conversation';
 import {User} from '../../repositories/entity/User';
 import {TeamState} from '../../repositories/team/TeamState';
-import {withTheme} from 'src/script/auth/util/test/testUtil';
-import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
-import {ContentState} from 'src/script/page/useAppState';
+import {withTheme} from '../../auth/util/test/testUtil';
+import {withThemeAndRootContext} from '../../auth/util/test/testUtil';
+import {ContentState} from '../../page/useAppState';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../page/testSupport/rootContextTestSupport';
 import {setStrings, translate} from '../../util/localizerUtil';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';

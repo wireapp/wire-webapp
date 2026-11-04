@@ -43,7 +43,7 @@ import {
 } from '@wireapp/protocol-messaging';
 
 import {ClientEvent} from '../event/Client';
-import {CryptographyError} from 'src/script/error/cryptographyError';
+import {CryptographyError} from '../../error/cryptographyError';
 import {arrayToBase64} from '../../util/util';
 import {createUuid} from '../../util/uuid';
 

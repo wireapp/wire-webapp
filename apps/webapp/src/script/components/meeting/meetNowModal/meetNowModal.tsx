@@ -24,14 +24,13 @@ import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, CallIcon, CloseIcon} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {MEET_NOW_FORM_ID, MeetNowForm} from './meetNowForm';
 import {meetNowModalWrapperStyles} from './meetNowModal.styles';
 import {wasMeetNowMeetingCreated} from './meetNowTypes';
 import {hasMeetNowFormErrors, useMeetNowModal} from './useMeetNowModal';
 import {useMeetNowSubmit} from './useMeetNowSubmit';
 
+import {useApplicationContext} from '../../../page/rootProvider';
 import {UserState} from '../../../repositories/user/userState';
 import {handleEscDown} from '../../../util/keyboardUtil';
 import {ModalComponent} from '../../Modals/ModalComponent';

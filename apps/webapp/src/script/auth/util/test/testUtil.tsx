@@ -68,7 +68,7 @@ import {MediaDevicesHandler} from '../../../repositories/media/MediaDevicesHandl
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../page/testSupport/rootContextTestSupport';
 import {setStrings, translate} from '../../../util/localizerUtil';
 import {translateForTest} from '../../../util/test/translateForTest';
 import {createUuid} from '../../../util/uuid';

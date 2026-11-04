@@ -11,7 +11,7 @@
 import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import {SidebarTabs} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
+import {SidebarTabs} from '../useSidebarStore';
 
 import {ConversationTab} from './conversationTab';
 

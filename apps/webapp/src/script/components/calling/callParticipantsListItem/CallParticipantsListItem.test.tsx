@@ -27,7 +27,7 @@ import {ROLE} from '../../../repositories/user/userPermission';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../page/testSupport/rootContextTestSupport';
 import {translate} from '../../../util/localizerUtil';
 import {createUuid} from '../../../util/uuid';
 

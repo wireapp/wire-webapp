@@ -20,14 +20,13 @@
 import {isNonEmptyString, isNullOrUndefined, isTruthy} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
-import {replaceBrowserLocation} from 'src/script/navigation/browserLocation';
-
 import {SIGN_OUT_REASON} from '../../auth/signOutReason';
 import {URLParameter} from '../../auth/urlParameter';
 import {useTypingIndicatorState} from '../../components/inputBar/typingIndicator';
 import {BaseError} from '../../error/baseError';
 import {ClientError} from '../../error/clientError';
 import {externalUrl} from '../../externalRoute';
+import {replaceBrowserLocation} from '../../navigation/browserLocation';
 import type {Core} from '../../service/coreSingleton';
 import {getLogger, Logger} from '../../util/logger';
 import {includesString} from '../../util/stringUtil';

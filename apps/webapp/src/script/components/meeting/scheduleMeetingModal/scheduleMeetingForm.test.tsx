@@ -23,12 +23,12 @@ import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {Maybe, maybe} from 'true-myth';
 
 import type {User} from '../../../repositories/entity/User';
-import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
+import {withThemeAndRootContext} from '../../../auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import type {MainViewModel} from 'src/script/view_model/MainViewModel';
+} from '../../../page/testSupport/rootContextTestSupport';
+import type {MainViewModel} from '../../../view_model/MainViewModel';
 import {translateForTest} from '../../../util/test/translateForTest';
 
 import {ScheduleMeetingForm} from './scheduleMeetingForm';

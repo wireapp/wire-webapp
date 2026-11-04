@@ -23,11 +23,11 @@ import ko from 'knockout';
 import {ContentMessage} from '../../../../../../repositories/entity/message/contentMessage';
 import {FileAsset} from '../../../../../../repositories/entity/message/fileAsset';
 import {TeamState} from '../../../../../../repositories/team/TeamState';
-import {StatusType} from 'src/script/message/statusType';
+import {StatusType} from '../../../../../../message/statusType';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../../../../page/testSupport/rootContextTestSupport';
 import {translateForTest} from '../../../../../../util/test/translateForTest';
 
 import {FileAsset as FileAssetComponent} from './fileAsset';

@@ -25,7 +25,7 @@ import {Conversation} from '../../../../../repositories/entity/Conversation';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../../testSupport/rootContextTestSupport';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {translateForTest} from '../../../../../util/test/translateForTest';
 

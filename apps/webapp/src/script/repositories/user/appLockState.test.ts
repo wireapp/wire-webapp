@@ -21,7 +21,7 @@ import {FEATURE_STATUS} from '@wireapp/api-client/lib/team/feature/';
 import {container} from 'tsyringe';
 
 import {TeamState} from '../team/TeamState';
-import {Config} from 'src/script/Config';
+import {Config} from '../../Config';
 import {AppLockState} from './appLockState';
 
 describe('AppLockState', () => {

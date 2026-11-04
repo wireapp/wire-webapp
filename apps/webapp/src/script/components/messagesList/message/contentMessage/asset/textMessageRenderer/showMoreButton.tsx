@@ -21,8 +21,7 @@ import {FC, HTMLProps} from 'react';
 
 import cx from 'classnames';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
+import {useApplicationContext} from '../../../../../../page/rootProvider';
 import * as Icon from '../../../../../icon';
 import {useMessageFocusedTabIndex} from '../../../util';
 

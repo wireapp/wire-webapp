@@ -30,8 +30,6 @@ import {AnyAction, Dispatch} from 'redux';
 
 import {ContainerXS, Loading, StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
-import {RootProvider} from 'src/script/page/rootProvider';
-
 import {ClientManager} from './clientManager';
 import {ConversationJoin} from './conversationJoin';
 import {ConversationJoinInvalid} from './conversationJoinInvalid';
@@ -53,6 +51,7 @@ import {VerifyEmailLink} from './verifyEmailLink';
 
 import type englishMessages from '../../../i18n/en-US.json';
 import {Config} from '../../Config';
+import {RootProvider} from '../../page/rootProvider';
 import type {Translate} from '../../util/localizerUtil';
 import {getLogger} from '../../util/logger';
 import {MainViewModel} from '../../view_model/MainViewModel';

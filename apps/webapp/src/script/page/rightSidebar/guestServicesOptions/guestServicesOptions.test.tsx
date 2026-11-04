@@ -28,7 +28,7 @@ import {TeamState} from '../../../repositories/team/TeamState';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../testSupport/rootContextTestSupport';
 
 import {GuestServicesOptions} from './guestServicesOptions';
 

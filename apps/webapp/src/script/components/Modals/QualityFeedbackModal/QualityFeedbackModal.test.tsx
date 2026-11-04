@@ -38,7 +38,7 @@ import {UserState} from '../../../repositories/user/userState';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../page/testSupport/rootContextTestSupport';
 
 import {QualityFeedbackModal} from './QualityFeedbackModal';
 import {translateForTest} from '../../../util/test/translateForTest';

@@ -19,8 +19,7 @@
 
 import type {FunctionComponent} from 'react';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
+import {useApplicationContext} from '../../../../../page/rootProvider';
 import type {Location} from '../../../../../repositories/entity/message/location';
 import {getMapsUrl} from '../../../../../util/locationUtil';
 

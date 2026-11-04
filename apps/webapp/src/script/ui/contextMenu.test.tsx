@@ -21,7 +21,7 @@ import '@testing-library/jest-dom';
 import {act, screen, waitFor} from '@testing-library/react';
 
 import {showContextMenu} from './contextMenu';
-import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {requireValueForTest} from '../page/testSupport/rootContextTestSupport';
 
 import * as ActiveWindowMod from '../hooks/useActiveWindow';
 

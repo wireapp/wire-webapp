@@ -23,8 +23,6 @@ import {isNonEmptyString} from '@sindresorhus/is';
 
 import {Input, ErrorMessage, Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {RootContextValue, useApplicationContext} from 'src/script/page/rootProvider';
-
 import {
   buttonGroupStyles,
   buttonStyles,
@@ -34,6 +32,7 @@ import {
   titleStyles,
 } from './linkDialog.styles';
 
+import {RootContextValue, useApplicationContext} from '../../../../../../page/rootProvider';
 import * as Icon from '../../../../../icon';
 import {ModalComponent} from '../../../../../Modals/ModalComponent';
 import {validateUrl} from '../../utils/url';

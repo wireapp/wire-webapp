@@ -22,12 +22,11 @@ import {ACCESS_TYPE, FEATURE_KEY, FEATURE_STATUS, Role} from '@wireapp/api-clien
 import type {FeatureList} from '@wireapp/api-client/lib/team';
 import {container} from 'tsyringe';
 
-import {Config} from 'src/script/Config';
-import {ConversationState} from 'src/script/repositories/conversation/ConversationState';
-import {TeamState} from 'src/script/repositories/team/TeamState';
-
 import {useKoSubscribableChildren} from './componentUtil';
 
+import {Config} from '../Config';
+import {ConversationState} from '../repositories/conversation/ConversationState';
+import {TeamState} from '../repositories/team/TeamState';
 import {Core} from '../service/coreSingleton';
 
 type ChannelsFeatureFlagState = {

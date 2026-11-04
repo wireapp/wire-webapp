@@ -29,9 +29,6 @@ import {container} from 'tsyringe';
 
 import {QUERY, StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
 
-import {isUUID} from 'src/script/auth/util/stringUtil';
-import {Config} from 'src/script/Config';
-
 import {AppLock} from './appLock';
 import {useE2EIFeatureConfigUpdate} from './components/featureConfigChange/featureConfigChangeHandler/features/useE2eIFeatureConfigUpdate';
 import {FeatureConfigChangeNotifier} from './components/featureConfigChange/featureConfigChangeNotifier';
@@ -45,6 +42,7 @@ import {PanelEntity, PanelState, RightSidebar} from './rightSidebar';
 import {useAppMainState, ViewType} from './state';
 import {ContentState, useAppState} from './useAppState';
 
+import {isUUID} from '../auth/util/stringUtil';
 import {CallingContainer} from '../components/calling/CallingOverlayContainer';
 import {ChooseScreen} from '../components/calling/ChooseScreen';
 import {DetachedCallingCell} from '../components/calling/DetachedCallingCell';
@@ -56,6 +54,7 @@ import {GroupCreationModal} from '../components/Modals/GroupCreation/GroupCreati
 import {LegalHoldModal} from '../components/Modals/LegalHoldModal/LegalHoldModal';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {showUserModal, UserModal} from '../components/Modals/UserModal';
+import {Config} from '../Config';
 import {useActiveWindow} from '../hooks/useActiveWindow';
 import {useInitializeRootFontSize} from '../hooks/useRootFontSize';
 import {App} from '../main/app';

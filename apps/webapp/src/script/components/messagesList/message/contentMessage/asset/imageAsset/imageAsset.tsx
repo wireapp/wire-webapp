@@ -22,8 +22,7 @@ import type {FunctionComponent} from 'react';
 
 import {CSSObject} from '@emotion/react';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
+import {useApplicationContext} from '../../../../../../page/rootProvider';
 import {ContentMessage} from '../../../../../../repositories/entity/message/contentMessage';
 import {MediumImage} from '../../../../../../repositories/entity/message/mediumImage';
 import {useKoSubscribableChildren} from '../../../../../../util/componentUtil';

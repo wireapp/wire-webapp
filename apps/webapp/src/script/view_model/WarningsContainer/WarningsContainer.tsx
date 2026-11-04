@@ -23,13 +23,12 @@ import cx from 'classnames';
 
 import {Runtime} from '@wireapp/commons';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {closeWarning, useWarningsState} from './WarningsState';
 import {CONFIG, TYPE} from './WarningsTypes';
 
 import * as Icon from '../../components/icon';
 import {Config} from '../../Config';
+import {useApplicationContext} from '../../page/rootProvider';
 import {createReactTranslationMarker, renderReactTranslation} from '../../util/localizerUtil/reactLocalizerUtil';
 import type {Translate} from '../../util/localizerUtil/translationTypes';
 import {afterRender} from '../../util/util';

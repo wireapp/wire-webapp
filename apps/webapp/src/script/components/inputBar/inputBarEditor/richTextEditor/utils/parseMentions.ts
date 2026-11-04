@@ -20,8 +20,7 @@
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {LexicalEditor, $nodesOfType} from 'lexical';
 
-import {MentionEntity} from 'src/script/message/mentionEntity';
-
+import {MentionEntity} from '../../../../../message/mentionEntity';
 import {User} from '../../../../../repositories/entity/User';
 import {MentionNode} from '../nodes/mentionNode';
 

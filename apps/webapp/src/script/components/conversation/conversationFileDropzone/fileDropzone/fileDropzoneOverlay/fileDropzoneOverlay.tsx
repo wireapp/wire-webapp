@@ -24,8 +24,6 @@ import type {CSSObject} from '@emotion/serialize';
 
 import {BlockIcon, SaveIcon} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext, type RootContextValue} from 'src/script/page/rootProvider';
-
 import {
   iconStyles,
   uploadIconStyles,
@@ -34,6 +32,8 @@ import {
   descriptionStyles,
   titleStyles,
 } from './fileDropzoneOverlay.styles';
+
+import {useApplicationContext, type RootContextValue} from '../../../../../page/rootProvider';
 
 export type FileDropzoneOverlayMode = 'upload' | 'restricted';
 

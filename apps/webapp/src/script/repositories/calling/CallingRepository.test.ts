@@ -53,7 +53,7 @@ import {EventRepository} from '../event/EventRepository';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {MediaType} from '../media/MediaType';
 import {UserRepository} from '../user/userRepository';
-import type {ServerTimeHandler} from 'src/script/time/serverTimeHandler';
+import type {ServerTimeHandler} from '../../time/serverTimeHandler';
 import {TestFactory} from '../../../../test/helper/TestFactory';
 import {createUuid} from '../../util/uuid';
 
@@ -80,7 +80,7 @@ import {ConversationState} from '../conversation/ConversationState';
 import {Translate} from '../../util/localizerUtil';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {BackgroundEffectSelection} from '../media/VideoBackgroundEffects';
-import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {requireValueForTest} from '../../page/testSupport/rootContextTestSupport';
 import {NoAudioInputError} from '../../error/noAudioInputError';
 
 type AudioFlowStat = {

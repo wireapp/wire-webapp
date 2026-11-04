@@ -27,7 +27,7 @@ import {
   type SystemNotificationApi,
   type SystemNotificationPermission,
   type SystemNotificationRequest,
-} from 'src/script/notification/systemNotificationTypes';
+} from '../../notification/systemNotificationTypes';
 
 import {
   createSystemNotificationApiFromBrowserNotification,

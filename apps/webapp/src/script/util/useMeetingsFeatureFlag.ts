@@ -19,11 +19,10 @@
 
 import {container} from 'tsyringe';
 
-import {TeamState} from 'src/script/repositories/team/TeamState';
-
 import {canUseMeetings} from './canUseMeetings';
 import {useKoSubscribableChildren} from './componentUtil';
 
+import {TeamState} from '../repositories/team/TeamState';
 import {Core} from '../service/coreSingleton';
 
 type MeetingsFeatureFlagState = {isMeetingsEnabled: boolean};

@@ -19,9 +19,8 @@
 
 import {useState} from 'react';
 
-import {Config} from 'src/script/Config';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
+import {Config} from '../../../Config';
+import {useApplicationContext} from '../../../page/rootProvider';
 import {MessageRepository} from '../../../repositories/conversation/MessageRepository';
 import {Conversation} from '../../../repositories/entity/Conversation';
 import {TIME_IN_MILLIS} from '../../../util/timeUtil';

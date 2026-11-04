@@ -18,7 +18,7 @@
  */
 
 import {AssetUploadData} from '@wireapp/api-client/lib/asset/';
-import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {requireValueForTest} from '../../page/testSupport/rootContextTestSupport';
 import {container} from 'tsyringe';
 
 import {createUuid} from '../../util/uuid';

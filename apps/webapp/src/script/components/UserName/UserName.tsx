@@ -17,8 +17,7 @@
  *
  */
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
+import {useApplicationContext} from '../../page/rootProvider';
 import {User} from '../../repositories/entity/User';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {type Translate} from '../../util/localizerUtil';

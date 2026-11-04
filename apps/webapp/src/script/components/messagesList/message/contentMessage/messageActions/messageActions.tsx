@@ -22,9 +22,6 @@ import {FC, useCallback, useRef, useState} from 'react';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {ContextMenuEntry, showContextMenu} from 'src/script/ui/contextMenu';
-
 import {useMessageActionsState} from './messageActions.state';
 import {
   messageActionsGroup,
@@ -38,7 +35,9 @@ import {MessageReactions} from './messageReactions/messageReactions';
 import {ReplyButton} from './replyButton';
 
 import {useClickOutside} from '../../../../../hooks/useClickOutside';
+import {useApplicationContext} from '../../../../../page/rootProvider';
 import {ContentMessage} from '../../../../../repositories/entity/message/contentMessage';
+import {ContextMenuEntry, showContextMenu} from '../../../../../ui/contextMenu';
 import {useKoSubscribableChildren} from '../../../../../util/componentUtil';
 import {isSpaceOrEnterKey, isTabKey} from '../../../../../util/keyboardUtil';
 import {setContextMenuPosition} from '../../../../../util/util';

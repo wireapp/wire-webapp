@@ -31,11 +31,8 @@ import {TeamState} from '../../repositories/team/TeamState';
 import {AppLockCrypto, AppLockRepository} from '../../repositories/user/appLockRepository';
 import {AppLockState} from '../../repositories/user/appLockState';
 import {UserState} from '../../repositories/user/userState';
-import {withTheme, withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
-import {
-  createRootContextValueForTest,
-  createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+import {withTheme, withThemeAndRootContext} from '../../auth/util/test/testUtil';
+import {createRootContextValueForTest, createRootProviderWrapperForTest} from '../testSupport/rootContextTestSupport';
 import {setStrings, translate} from '../../util/localizerUtil';
 import {translateForTest} from '../../util/test/translateForTest';
 import {createUuid} from '../../util/uuid';

@@ -23,8 +23,8 @@ import {AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
 import {generateConversation as _generateConversation} from '../../../../test/helper/ConversationGenerator';
 import {TestFactory} from '../../../../test/helper/TestFactory';
 import {generateUser} from '../../../../test/helper/UserGenerator';
-import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
-import {Core} from 'src/script/service/coreSingleton';
+import {requireValueForTest} from '../../page/testSupport/rootContextTestSupport';
+import {Core} from '../../service/coreSingleton';
 
 import {ConversationRepository} from './ConversationRepository';
 

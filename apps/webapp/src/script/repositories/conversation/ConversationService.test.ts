@@ -23,7 +23,7 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {ClientEvent} from '../event/Client';
 import type {EventService} from '../event/EventService';
 import type {EventRecord, StorageService} from '../storage';
-import {StatusType} from 'src/script/message/statusType';
+import {StatusType} from '../../message/statusType';
 
 import {MessageCategory} from '../../message/messageCategory';
 import type {APIClient} from '../../service/apiClientSingleton';

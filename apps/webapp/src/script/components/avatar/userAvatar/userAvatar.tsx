@@ -25,8 +25,7 @@ import {container} from 'tsyringe';
 import {Availability as AvailabilityType} from '@wireapp/protocol-messaging';
 import {COLOR} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
+import {useApplicationContext} from '../../../page/rootProvider';
 import {User} from '../../../repositories/entity/User';
 import {TeamState} from '../../../repositories/team/TeamState';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';

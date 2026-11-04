@@ -21,7 +21,7 @@ import {User} from '../../data/user';
 import {PageManager} from '../../pageManager';
 import {getImageFilePath, getLocalQRCodeValue, ImageQRCodeFileName} from '../../utils/sendImage.util';
 import {getTextFilePath, getVideoFilePath, TextFileName, VideoFileName} from '../../utils/asset.util';
-import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
+import {driveBulkActionsFeatureToggleName} from '../../../../src/script/featureToggles/startupFeatureToggleNames';
 
 import {test, expect, withLogin} from '../../test.fixtures';
 import {connectWithUser, createGroup} from '../../utils/userActions';

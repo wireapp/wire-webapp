@@ -27,15 +27,15 @@ import {ContentMessage as ContentMessageEntity} from '../../../repositories/enti
 import {MemberMessage as MemberMessageEntity} from '../../../repositories/entity/message/memberMessage';
 import {Text} from '../../../repositories/entity/message/text';
 import {User} from '../../../repositories/entity/User';
-import {withTheme, withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
-import {markAsUnreadFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
-import type {StartupFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
-import {SystemMessageType} from 'src/script/message/systemMessageType';
+import {withTheme, withThemeAndRootContext} from '../../../auth/util/test/testUtil';
+import {markAsUnreadFeatureToggleName} from '../../../featureToggles/startupFeatureToggleNames';
+import type {StartupFeatureToggleName} from '../../../featureToggles/startupFeatureToggleNames';
+import {SystemMessageType} from '../../../message/systemMessageType';
 import {translateForTest} from '../../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../page/testSupport/rootContextTestSupport';
 import {generateUser} from '../../../../../test/helper/UserGenerator';
 import {createUuid} from '../../../util/uuid';
 

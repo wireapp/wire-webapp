@@ -19,8 +19,6 @@
 
 import type {FunctionComponent} from 'react';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {CallingCell} from '../../../components/calling/CallingCell';
 import * as Icon from '../../../components/icon';
 import {PrimaryModal} from '../../../components/Modals/PrimaryModal';
@@ -29,6 +27,7 @@ import {User} from '../../../repositories/entity/User';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {CallingViewModel} from '../../../view_model/CallingViewModel';
 import {ListViewModel} from '../../../view_model/ListViewModel';
+import {useApplicationContext} from '../../rootProvider';
 
 type TemporaryGuestConversations = {
   callingViewModel: CallingViewModel;

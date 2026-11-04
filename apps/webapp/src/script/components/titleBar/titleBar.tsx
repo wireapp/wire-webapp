@@ -27,16 +27,13 @@ import {container} from 'tsyringe';
 
 import {CallIcon, IconButton, IconButtonVariant, QUERY, TabIndex, useMatchMedia} from '@wireapp/react-ui-kit';
 
-import {RightSidebarParams} from 'src/script/page/appMain';
-import {PanelState} from 'src/script/page/rightSidebar';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useAppMainState, ViewType} from 'src/script/page/state';
-import {ContentState} from 'src/script/page/useAppState';
-import {CallActions} from 'src/script/view_model/CallingViewModel';
-import {ViewModelRepositories} from 'src/script/view_model/MainViewModel';
-
 import {useConversationCall} from '../../hooks/useConversationCall';
 import {useNoInternetCallGuard} from '../../hooks/useNoInternetCallGuard/useNoInternetCallGuard';
+import {RightSidebarParams} from '../../page/appMain';
+import {PanelState} from '../../page/rightSidebar';
+import {useApplicationContext} from '../../page/rootProvider';
+import {useAppMainState, ViewType} from '../../page/state';
+import {ContentState} from '../../page/useAppState';
 import {CallState} from '../../repositories/calling/CallState';
 import {ConversationFilter} from '../../repositories/conversation/ConversationFilter';
 import {Conversation} from '../../repositories/entity/Conversation';
@@ -48,6 +45,8 @@ import {createReactTranslationMarker, renderReactTranslation} from '../../util/l
 import type {Translate} from '../../util/localizerUtil/translationTypes';
 import {matchQualifiedIds} from '../../util/qualifiedId';
 import {TIME_IN_MILLIS} from '../../util/timeUtil';
+import {CallActions} from '../../view_model/CallingViewModel';
+import {ViewModelRepositories} from '../../view_model/MainViewModel';
 import {WebAppEvents} from '../../webAppEvents';
 import {ConversationVerificationBadges} from '../badge';
 import {useCallAlertState} from '../calling/useCallAlertState';
