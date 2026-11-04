@@ -31,6 +31,7 @@ import {MicrophonePreferences} from './avPreferences/microphonePreferences';
 import {SaveCallLogs} from './avPreferences/saveCallLogs';
 import {SendCallLogs} from './avPreferences/sendCallLogs';
 import {PreferencesPage} from './components/preferencesPage';
+import {PreferencesSection} from './components/preferencesSection';
 import {useCameraReloadOnCallEnd} from './useCameraReloadOnCallEnd';
 
 import {useInitializeMediaDevices} from '../../../../hooks/useInitializeMediaDevices';
@@ -55,7 +56,7 @@ const AVPreferencesComponent: FunctionComponent<AVPreferencesProps> = ({
   callingRepository,
   deviceSupport,
 }: AVPreferencesProps) => {
-  const {translate,  isFeatureToggleEnabled} = useApplicationContext();
+  const {translate, isFeatureToggleEnabled} = useApplicationContext();
   const devicesHandler = container.resolve(MediaDevicesHandler);
   const constraintsHandler = container.resolve(MediaConstraintsHandler);
   const streamHandler = container.resolve(MediaStreamHandler);
@@ -103,12 +104,14 @@ const AVPreferencesComponent: FunctionComponent<AVPreferencesProps> = ({
           return callingRepository.refreshAudioInput();
         }}
       />
-      {callingRepository.supportsCalling &&
-        (isFeatureToggleEnabled(sendCallLogsFeatureToggleName) ? (
-          <SendCallLogs callingRepository={callingRepository} />
-        ) : (
+      {callingRepository.supportsCalling && (
+        <PreferencesSection title={translate('preferencesOptionsCallLogs')}>
           <SaveCallLogs callingRepository={callingRepository} />
-        ))}
+          {isFeatureToggleEnabled(sendCallLogsFeatureToggleName) && (
+            <SendCallLogs callingRepository={callingRepository} />
+          )}
+        </PreferencesSection>
+      )}
     </PreferencesPage>
   );
 };

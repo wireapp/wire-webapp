@@ -25,17 +25,17 @@ import {container} from 'tsyringe';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
-import type {CallingRepository} from 'Repositories/calling/CallingRepository';
+import {PrimaryModal, removeCurrentModal} from '../../../../../components/Modals/PrimaryModal';
+import type {CallingRepository} from '../../../../../repositories/calling/CallingRepository';
 import {
   CallLogsReport,
   CallLogsErrorStatus,
   CallLogsService,
   createMockCallLogsService,
   createHttpCallLogsService,
-} from 'Repositories/calling/callLogsService';
-import {useCallLogsUploadSettings} from 'Repositories/calling/callLogsUploadSettings';
-import {UserState} from 'Repositories/user/userState';
+} from '../../../../../repositories/calling/callLogsService';
+import {useCallLogsUploadSettings} from '../../../../../repositories/calling/callLogsUploadSettings';
+import {UserState} from '../../../../../repositories/user/userState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {
@@ -46,7 +46,6 @@ import {
 } from './sendCallLogs.styles';
 
 import {Config} from '../../../../../Config';
-import {PreferencesSection} from '../components/preferencesSection';
 
 interface SendCallLogsProps {
   callingRepository: CallingRepository;
@@ -193,22 +192,22 @@ const SendCallLogs = ({
   };
 
   return (
-    <PreferencesSection title={translate('preferencesOptionsCallLogs')}>
+    <>
       <div className="preferences-option">
         <Button
           variant={ButtonVariant.TERTIARY}
           onClick={sendCallLogs}
           data-uie-name="send-call-logs"
-          aria-describedby="call-logs-description"
+          aria-describedby="send-call-logs-description"
           type="button"
         >
           {translate('preferencesOptionsCallLogsSend')}
         </Button>
       </div>
-      <p id="call-logs-description" className="preferences-detail">
+      <p id="send-call-logs-description" className="preferences-detail">
         {translate('preferencesOptionsCallLogsSendDetail', {brandName})}
       </p>
-    </PreferencesSection>
+    </>
   );
 };
 

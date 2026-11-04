@@ -21,7 +21,10 @@ import {useState} from 'react';
 
 import {Button, Input} from '@wireapp/react-ui-kit';
 
-import {callLogsServerAddressSchema, useCallLogsUploadSettings} from 'Repositories/calling/callLogsUploadSettings';
+import {
+  callLogsServerAddressSchema,
+  useCallLogsUploadSettings,
+} from '../../repositories/calling/callLogsUploadSettings';
 
 export const CallLogsUploadSettings = () => {
   const {mode, serverAddress, setMode, setServerAddress} = useCallLogsUploadSettings();

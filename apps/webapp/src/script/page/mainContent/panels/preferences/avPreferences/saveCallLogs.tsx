@@ -31,7 +31,6 @@ import type {CallingRepository} from '../../../../../repositories/calling/Callin
 import {UserState} from '../../../../../repositories/user/userState';
 import {getCurrentDate} from '../../../../../util/timeUtil';
 import {downloadBlob} from '../../../../../util/util';
-import {PreferencesSection} from '../components/preferencesSection';
 
 interface SaveCallLogsProps {
   callingRepository: CallingRepository;
@@ -76,22 +75,22 @@ const SaveCallLogs: FunctionComponent<SaveCallLogsProps> = ({
     }
   };
   return (
-    <PreferencesSection title={translate('preferencesOptionsCallLogs')}>
+    <>
       <div className="preferences-option">
         <Button
           variant={ButtonVariant.TERTIARY}
           onClick={saveCallLogs}
           data-uie-name="get-call-logs"
-          aria-describedby="call-logs-description"
+          aria-describedby="save-call-logs-description"
           type="button"
         >
           {translate('preferencesOptionsCallLogsGet')}
         </Button>
       </div>
-      <p id="call-logs-description" className="preferences-detail">
+      <p id="save-call-logs-description" className="preferences-detail">
         {translate('preferencesOptionsCallLogsDetail', {brandName})}
       </p>
-    </PreferencesSection>
+    </>
   );
 };
 

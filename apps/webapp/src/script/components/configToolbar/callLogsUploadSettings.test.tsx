@@ -26,7 +26,7 @@ import {
   callLogsServerAddressSchema,
   defaultCallLogsServerAddress,
   useCallLogsUploadSettings,
-} from 'Repositories/calling/callLogsUploadSettings';
+} from '../../repositories/calling/callLogsUploadSettings';
 
 import {CallLogsUploadSettings} from './callLogsUploadSettings';
 
