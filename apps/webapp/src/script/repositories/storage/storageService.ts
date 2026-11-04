@@ -22,9 +22,9 @@ import {Dexie, Transaction} from 'dexie';
 import {singleton} from 'tsyringe';
 
 import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
-import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 
 import {DexieDatabase} from './dexieDatabase';
+import {IndexedDBEngine} from './indexedDatabaseEngine';
 import {StorageSchemata} from './storageSchemata';
 
 import {StorageError} from '../../error/storageError';

@@ -30,7 +30,6 @@ export const developmentLibraries: readonly DevelopmentLibrary[] = [
   {name: 'commons', value: 'commons'},
   {name: 'config', value: 'config'},
   {name: 'store-engine', value: 'store-engine'},
-  {name: 'store-engine-dexie', value: 'store-engine-dexie'},
   {name: 'telemetry', value: 'telemetry'},
 ];
 
