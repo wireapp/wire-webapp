@@ -25,13 +25,12 @@ import {container} from 'tsyringe';
 
 import {TypedEventEmitter} from '@wireapp/commons';
 
-import {Logger, getLogger} from 'Util/logger';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
-
 import {SelfService} from './SelfService';
 import {evaluateSelfSupportedProtocols} from './SelfSupportedProtocols/SelfSupportedProtocols';
 
 import {Core} from '../../service/coreSingleton';
+import {Logger, getLogger} from '../../util/logger';
+import {TIME_IN_MILLIS} from '../../util/timeUtil';
 import {WebAppEvents} from '../../webAppEvents';
 import {ClientEntity, ClientRepository} from '../client';
 import type {User as UserEntity} from '../entity/User';

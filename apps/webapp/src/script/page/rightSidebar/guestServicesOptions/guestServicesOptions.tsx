@@ -20,7 +20,6 @@
 import {FC, useState} from 'react';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {GuestOptions} from './components/guestOptions';
 import {ServicesOptions} from './components/servicesOptions';
@@ -32,6 +31,7 @@ import {ConversationRepository} from '../../../repositories/conversation/Convers
 import {Conversation} from '../../../repositories/entity/Conversation';
 import {TeamRepository} from '../../../repositories/team/TeamRepository';
 import {TeamState} from '../../../repositories/team/TeamState';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {PanelHeader} from '../panelHeader';
 
 interface GuestServicesOptionsProps {

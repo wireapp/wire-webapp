@@ -28,8 +28,8 @@ import {Bold, Button, ButtonVariant, Link, LinkVariant} from '@wireapp/react-ui-
 
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {matchQualifiedIds} from 'Util/qualifiedId';
 
+import {matchQualifiedIds} from '../../../../../../util/qualifiedId';
 import {useMessageFocusedTabIndex} from '../../../util';
 import {backendErrorLink, button, warning, wrapper} from '../warnings.styles';
 

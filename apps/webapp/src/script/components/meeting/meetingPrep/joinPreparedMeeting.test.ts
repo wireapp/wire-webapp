@@ -28,7 +28,7 @@ import type {ConversationRepository} from '../../../repositories/conversation/Co
 import type {ConversationState} from '../../../repositories/conversation/ConversationState';
 import {createConversation} from 'src/script/auth/util/test/testUtil';
 import type {CallingViewModel} from 'src/script/view_model/CallingViewModel';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 const qualifiedConversationId = {domain: 'example.com', id: 'meeting-conversation-id'};
 const media = {cameraEnabled: false, microphoneEnabled: true};

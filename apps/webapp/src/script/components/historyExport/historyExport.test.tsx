@@ -27,7 +27,7 @@ import {RootContextValue} from 'src/script/page/rootProvider';
 import {MainViewModel} from 'src/script/view_model/MainViewModel';
 
 import {HistoryExport} from './historyExport';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 
 describe('HistoryExport', () => {
   beforeEach(() => {

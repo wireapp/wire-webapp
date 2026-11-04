@@ -29,7 +29,7 @@ import {PrimaryModalComponent} from './PrimaryModal';
 import {PrimaryModalType} from './PrimaryModalTypes';
 
 import {PrimaryModal, removeCurrentModal} from '.';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),

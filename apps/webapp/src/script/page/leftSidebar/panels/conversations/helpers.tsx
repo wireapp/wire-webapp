@@ -19,14 +19,13 @@
 
 import {isEmptyString, isNan, isNull} from '@sindresorhus/is';
 
-import {matchQualifiedIds} from 'Util/qualifiedId';
-import {replaceAccents} from 'Util/stringUtil';
-import {isConversationEntity} from 'Util/typePredicateUtil';
-
 import {SidebarTabs} from './useSidebarStore';
 
 import {ConversationLabel} from '../../../../repositories/conversation/ConversationLabelRepository';
 import {Conversation} from '../../../../repositories/entity/Conversation';
+import {matchQualifiedIds} from '../../../../util/qualifiedId';
+import {replaceAccents} from '../../../../util/stringUtil';
+import {isConversationEntity} from '../../../../util/typePredicateUtil';
 
 export const conversationFilters = {
   hasUnread: (conv: Conversation) => {

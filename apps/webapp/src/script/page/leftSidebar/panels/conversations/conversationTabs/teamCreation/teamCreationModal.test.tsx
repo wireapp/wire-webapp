@@ -29,7 +29,7 @@ import {
 
 import {TeamCreationModal} from './teamCreationModal';
 import {useTeamCreationModal} from './useTeamCreationModal';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../../../util/test/translateForTest';
 
 jest.mock('../../../../../../repositories/team/TeamService');
 

@@ -25,10 +25,6 @@ import ko from 'knockout';
 import {container} from 'tsyringe';
 import {isError} from 'underscore';
 
-import {type Translate} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/logger';
-import {isConversationEntity} from 'Util/typePredicateUtil';
-
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
@@ -53,6 +49,9 @@ import type {UserRepository} from '../repositories/user/userRepository';
 import {UserState} from '../repositories/user/userState';
 import {generateConversationUrl} from '../router/routeGenerator';
 import {navigate, setHistoryParam} from '../router/Router';
+import {type Translate} from '../util/localizerUtil';
+import {getLogger, Logger} from '../util/logger';
+import {isConversationEntity} from '../util/typePredicateUtil';
 import {WebAppEvents} from '../webAppEvents';
 
 interface ShowConversationOptions {

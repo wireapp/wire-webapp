@@ -24,11 +24,10 @@ import {ClientInfo} from '@wireapp/core/lib/client/';
 
 import {Runtime} from '@wireapp/commons';
 
-import {toError} from 'Util/toError';
-
 import {ClientActionCreator} from './creator/';
 
 import {getClientMLSConfig} from '../../../repositories/client/clientMLSConfig';
+import {toError} from '../../../util/toError';
 import * as StringUtil from '../../util/stringUtil';
 import type {ThunkAction} from '../reducer';
 

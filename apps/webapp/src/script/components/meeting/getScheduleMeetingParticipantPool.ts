@@ -17,11 +17,10 @@
  *
  */
 
-import {sortUsersByPriority} from 'Util/stringUtil';
-
 import type {User} from '../../repositories/entity/User';
 import type {TeamState} from '../../repositories/team/TeamState';
 import type {UserState} from '../../repositories/user/userState';
+import {sortUsersByPriority} from '../../util/stringUtil';
 
 export const getScheduleMeetingParticipantPool = (userState: UserState, teamState: TeamState): User[] => {
   const contacts = teamState.isTeam()

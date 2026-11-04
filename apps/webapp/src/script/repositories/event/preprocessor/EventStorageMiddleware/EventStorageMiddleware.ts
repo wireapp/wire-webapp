@@ -21,14 +21,13 @@ import {isNonEmptyString, isTruthy, isUndefined} from '@sindresorhus/is';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 import {container} from 'tsyringe';
 
-import {matchQualifiedIds} from 'Util/qualifiedId';
-import {fixWebsocketString} from 'Util/stringUtil';
-
 import {handleLinkPreviewEvent, handleEditEvent, handleAssetEvent, handleReactionEvent} from './eventHandlers';
 import {EventValidationError} from './eventHandlers/EventValidationError';
 import {HandledEvents, DBOperation} from './types';
 
 import {isEventRecordFailed, isEventRecordWithFederationError} from '../../../../message/statusType';
+import {matchQualifiedIds} from '../../../../util/qualifiedId';
+import {fixWebsocketString} from '../../../../util/stringUtil';
 import {ConversationState} from '../../../conversation/ConversationState';
 import {User} from '../../../entity/User';
 import type {EventRecord} from '../../../storage';

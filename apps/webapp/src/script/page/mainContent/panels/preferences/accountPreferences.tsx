@@ -30,8 +30,6 @@ import {TeamCreationAccountHeader} from 'src/script/page/leftSidebar/panels/conv
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {ContentState} from 'src/script/page/useAppState';
 import {Core} from 'src/script/service/coreSingleton';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {getLogger} from 'Util/logger';
 
 import {AccountInput} from './accountPreferences/accountInput';
 import {AccountLink} from './accountPreferences/accountLink';
@@ -61,6 +59,8 @@ import {PropertiesRepository} from '../../../../repositories/properties/properti
 import {TeamState} from '../../../../repositories/team/TeamState';
 import {AppLockRepository} from '../../../../repositories/user/appLockRepository';
 import type {UserRepository} from '../../../../repositories/user/userRepository';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
+import {getLogger} from '../../../../util/logger';
 import {AccentColorPicker} from '../../../accentColorPicker';
 
 interface AccountPreferencesProps {

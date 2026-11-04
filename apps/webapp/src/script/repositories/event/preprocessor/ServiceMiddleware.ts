@@ -21,9 +21,8 @@ import {isTruthy, isUndefined} from '@sindresorhus/is';
 import {CONVERSATION_EVENT, ConversationMemberJoinEvent} from '@wireapp/api-client/lib/event/';
 import {UserType, type QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {getLogger, Logger} from 'Util/logger';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-
+import {getLogger, Logger} from '../../../util/logger';
+import {matchQualifiedIds} from '../../../util/qualifiedId';
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
 import {MemberJoinEvent, OneToOneCreationEvent} from '../../conversation/EventBuilder';
 import {User} from '../../entity/User';

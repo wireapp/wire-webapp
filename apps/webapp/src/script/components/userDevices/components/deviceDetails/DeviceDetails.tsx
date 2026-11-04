@@ -28,12 +28,6 @@ import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 import {WireIdentity} from 'src/script/e2eIdentity';
 import {MLSDeviceDetails} from 'src/script/page/mainContent/panels/preferences/devicesPreferences/components/mlsDeviceDetails';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
-import type {Translate} from 'Util/localizerUtil/translationTypes';
-import type {Logger} from 'Util/logger';
-import {splitFingerprint} from 'Util/stringUtil';
-import {toError} from 'Util/toError';
 
 import {Config} from '../../../../Config';
 import {MotionDuration} from '../../../../motion/MotionDuration';
@@ -44,6 +38,12 @@ import {ConversationState} from '../../../../repositories/conversation/Conversat
 import type {MessageRepository} from '../../../../repositories/conversation/MessageRepository';
 import type {CryptographyRepository} from '../../../../repositories/cryptography/CryptographyRepository';
 import type {User} from '../../../../repositories/entity/User';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
+import {createReactTranslationMarker, renderReactTranslation} from '../../../../util/localizerUtil/reactLocalizerUtil';
+import type {Translate} from '../../../../util/localizerUtil/translationTypes';
+import type {Logger} from '../../../../util/logger';
+import {splitFingerprint} from '../../../../util/stringUtil';
+import {toError} from '../../../../util/toError';
 
 interface DeviceDetailsProps {
   clickToShowSelfFingerprint: () => void;

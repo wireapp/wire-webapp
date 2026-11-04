@@ -21,7 +21,7 @@ import {MeetingRecurrenceFrequency} from '@wireapp/api-client/lib/meetings/meeti
 import {maybe} from 'true-myth';
 
 import {User} from '../../repositories/entity/User';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 
 import {mapUpdateCommandToUpdateMeeting} from './mapUpdateCommandToUpdateMeeting';
 import type {UpdateMeetingCommand} from './shared/types/meetingCommandTypes';

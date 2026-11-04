@@ -31,12 +31,12 @@ import {
 } from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {ContextMenuEntry, showContextMenu} from 'src/script/ui/contextMenu';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import * as Icons from '../../../../../components/icon';
 import {createLabel, LabelType} from '../../../../../repositories/conversation/ConversationLabelRepository';
 import {ConversationRepository} from '../../../../../repositories/conversation/ConversationRepository';
 import {Conversation} from '../../../../../repositories/entity/Conversation';
+import {useKoSubscribableChildren} from '../../../../../util/componentUtil';
 
 interface ConversationFolderTabProps {
   title: string;

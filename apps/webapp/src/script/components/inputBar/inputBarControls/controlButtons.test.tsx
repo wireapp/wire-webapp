@@ -23,7 +23,7 @@ import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 
 import {Conversation} from '../../../repositories/entity/Conversation';
 import {Config} from 'src/script/Config';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

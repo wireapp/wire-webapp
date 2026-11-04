@@ -23,7 +23,6 @@ import {Button, CheckRoundIcon, Link} from '@wireapp/react-ui-kit';
 
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
 
 import {StepProps} from './stepProps';
 import {
@@ -34,6 +33,7 @@ import {
   modalButtonsCss,
 } from './teamCreationSteps.styles';
 
+import {renderReactTranslation} from '../../../../../../../util/localizerUtil/reactLocalizerUtil';
 import {buttonCss} from '../teamCreation.styles';
 
 type RenderIntroductionListItemOptions = {

@@ -26,10 +26,10 @@ import {Conversation} from '../../../repositories/entity/Conversation';
 import type {User} from '../../../repositories/entity/User';
 import {TestFactory} from 'test/helper/TestFactory';
 import {generateUser} from 'test/helper/UserGenerator';
-import {createUuid} from 'Util/uuid';
+import {createUuid} from '../../../util/uuid';
 
 import {finaliseMigrationOfMixedConversations} from './migrationFinaliser';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 const createMixedConversation = (): MixedConversation => {
   const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.MIXED, translateForTest);

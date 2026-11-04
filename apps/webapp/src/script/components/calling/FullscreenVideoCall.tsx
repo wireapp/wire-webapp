@@ -40,10 +40,6 @@ import {useActiveWindowMatchMedia} from 'src/script/hooks/useActiveWindowMatchMe
 import {useToggleState} from 'src/script/hooks/useToggleState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CallViewTab} from 'src/script/view_model/CallingViewModel';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
-import {handleKeyDown, isTabKey, KEY} from 'Util/keyboardUtil';
-import {preventFocusOutside} from 'Util/util';
 
 import {CallingParticipantList} from './CallingCell/CallIngParticipantList';
 import {Duration} from './Duration';
@@ -76,6 +72,10 @@ import {BUILTIN_BACKGROUNDS} from '../../repositories/media/VideoBackgroundEffec
 import type {BackgroundEffectSelection} from '../../repositories/media/VideoBackgroundEffects';
 import {PropertiesRepository} from '../../repositories/properties/propertiesRepository';
 import {TeamState} from '../../repositories/team/TeamState';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
+import {isDetachedCallingFeatureEnabled} from '../../util/isDetachedCallingFeatureEnabled';
+import {handleKeyDown, isTabKey, KEY} from '../../util/keyboardUtil';
+import {preventFocusOutside} from '../../util/util';
 import {useWarningsState} from '../../view_model/WarningsContainer/WarningsState';
 import {CONFIG, TYPE} from '../../view_model/WarningsContainer/WarningsTypes';
 import {WebAppEvents} from '../../webAppEvents';

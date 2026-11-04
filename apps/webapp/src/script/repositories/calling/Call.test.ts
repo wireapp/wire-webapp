@@ -31,7 +31,7 @@ import {CallingRepository} from './CallingRepository';
 import {Participant} from './Participant';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 
 const createSelfParticipant = (): Participant => {
   const selfUser = new User('', '', translateForTest);

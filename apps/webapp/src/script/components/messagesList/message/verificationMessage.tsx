@@ -23,12 +23,12 @@ import {amplify} from 'amplify';
 
 import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {Declension, joinNames} from 'Util/localizerUtil';
-import {capitalizeFirstChar} from 'Util/stringUtil';
 
 import {VerificationMessageType} from '../../../message/verificationMessageType';
 import {VerificationMessage as VerificationMessageEntity} from '../../../repositories/entity/message/verificationMessage';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {Declension, joinNames} from '../../../util/localizerUtil';
+import {capitalizeFirstChar} from '../../../util/stringUtil';
 import {WebAppEvents} from '../../../webAppEvents';
 import {VerificationIcon} from '../../VerificationIcon';
 

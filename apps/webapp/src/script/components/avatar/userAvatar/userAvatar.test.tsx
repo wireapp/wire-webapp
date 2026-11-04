@@ -31,7 +31,7 @@ import {
 import {UserAvatar} from './userAvatar';
 
 import {AVATAR_SIZE, STATE} from '../avatar';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),

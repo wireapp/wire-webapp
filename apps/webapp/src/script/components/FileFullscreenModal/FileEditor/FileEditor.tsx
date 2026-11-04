@@ -25,12 +25,12 @@ import {container} from 'tsyringe';
 
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import * as styles from './FileEditor.styles';
 import {validateCollaboraUrl} from './validateCollaboraUrl';
 
 import {CellsRepository} from '../../../repositories/cells/cellsRepository';
+import {TIME_IN_MILLIS} from '../../../util/timeUtil';
 import {PrimaryModal} from '../../Modals/PrimaryModal';
 import {removeCurrentModal} from '../../Modals/PrimaryModal/PrimaryModalState';
 import {FileLoader} from '../FileLoader/FileLoader';

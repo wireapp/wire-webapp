@@ -24,8 +24,8 @@ import {FormattedMessage} from 'react-intl';
 
 import {ErrorMessage} from '@wireapp/react-ui-kit';
 
-import {errorHandlerStrings} from 'Util/errorUtil';
-import {validationErrorStrings} from 'Util/validationUtil';
+import {errorHandlerStrings} from '../../util/errorUtil';
+import {validationErrorStrings} from '../../util/validationUtil';
 
 type LabelledErrorValue = {
   label: string;

@@ -37,8 +37,8 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {KEY} from 'Util/keyboardUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {KEY} from '../../../util/keyboardUtil';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 import {ScheduleMeetingModal} from './scheduleMeetingModal';
 import {useScheduleMeetingModal} from './useScheduleMeetingModal';

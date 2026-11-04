@@ -30,16 +30,16 @@ import {Conversation} from '../entity/Conversation';
 import {ContentMessage} from '../entity/message/contentMessage';
 import {User} from '../entity/User';
 import {MentionEntity} from 'src/script/message/mentionEntity';
-import {translate} from 'Util/localizerUtil';
-import {arrayToBase64} from 'Util/util';
-import {createUuid} from 'Util/uuid';
+import {translate} from '../../util/localizerUtil';
+import {arrayToBase64} from '../../util/util';
+import {createUuid} from '../../util/uuid';
 
 import {SystemMessage} from '../entity/message/systemMessage';
 import {eventShouldBeStored} from '../event/EventTypeHandling';
 import {SystemMessageType} from 'src/script/message/systemMessageType';
 
 import {EventMapper} from './EventMapper';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 describe('Event Mapper', () => {

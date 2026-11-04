@@ -21,9 +21,9 @@ import {render} from '@testing-library/react';
 
 import {Message} from '../../../../../../../repositories/entity/message/message';
 import {User} from '../../../../../../../repositories/entity/User';
-import {translateForTest} from 'Util/test/translateForTest';
-import * as TimeUtil from 'Util/timeUtil';
-import {createUuid} from 'Util/uuid';
+import {translateForTest} from '../../../../../../../util/test/translateForTest';
+import * as TimeUtil from '../../../../../../../util/timeUtil';
+import {createUuid} from '../../../../../../../util/uuid';
 
 import {AssetHeader} from './assetHeader';
 

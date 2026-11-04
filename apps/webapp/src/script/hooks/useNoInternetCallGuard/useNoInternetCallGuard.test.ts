@@ -20,7 +20,7 @@
 import {act, renderHook} from '@testing-library/react';
 
 import {PrimaryModal} from '../../components/Modals/PrimaryModal';
-import type {TranslationKey} from 'Util/localizerUtil';
+import type {TranslationKey} from '../../util/localizerUtil';
 
 import {useNoInternetCallGuard} from './useNoInternetCallGuard';
 

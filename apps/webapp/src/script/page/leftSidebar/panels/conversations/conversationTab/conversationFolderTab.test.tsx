@@ -23,7 +23,7 @@ import {noop} from 'noop-esm';
 import * as Icon from '../../../../../components/icon';
 import {createLabel, LabelType} from '../../../../../repositories/conversation/ConversationLabelRepository';
 import {Conversation} from '../../../../../repositories/entity/Conversation';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

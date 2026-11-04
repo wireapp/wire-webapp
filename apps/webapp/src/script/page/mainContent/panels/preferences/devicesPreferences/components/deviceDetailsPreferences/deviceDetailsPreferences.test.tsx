@@ -26,10 +26,10 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {createUuid} from 'Util/uuid';
+import {createUuid} from '../../../../../../../util/uuid';
 
 import {DeviceDetailsPreferences} from './deviceDetailsPreferences';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../../../../util/test/translateForTest';
 
 describe('DeviceDetailsPreferences', () => {
   const rootContextValue = createRootContextValueForTest({translate: translateForTest});

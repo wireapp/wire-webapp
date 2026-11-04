@@ -23,10 +23,10 @@ import {isUndefined} from '@sindresorhus/is';
 import {Virtualizer} from '@tanstack/react-virtual';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {isLastReceivedMessage} from 'Util/conversationMessages';
 
 import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
 import {Conversation} from '../../../repositories/entity/Conversation';
+import {isLastReceivedMessage} from '../../../util/conversationMessages';
 
 const viewportCenterDivisor = 2;
 const messageLoadDebounceInMilliseconds = 100;

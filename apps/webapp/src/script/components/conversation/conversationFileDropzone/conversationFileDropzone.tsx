@@ -22,10 +22,9 @@ import {ReactNode, type FunctionComponent} from 'react';
 import cx from 'classnames';
 import {DropzoneInputProps, DropzoneRootProps} from 'react-dropzone';
 
-import {incomingCssClass, removeAnimationsClass} from 'Util/util';
-
 import {FileDropzone} from './fileDropzone/fileDropzone';
 
+import {incomingCssClass, removeAnimationsClass} from '../../../util/util';
 import {DropFileArea} from '../../dropFileArea';
 
 interface ConversationFileDropzoneProps {

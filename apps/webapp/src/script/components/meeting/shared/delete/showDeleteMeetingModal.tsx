@@ -21,13 +21,12 @@ import {noop} from 'noop-esm';
 
 import {TrashIcon} from '@wireapp/react-ui-kit';
 
-import type {Translate, TranslationKey} from 'Util/localizerUtil';
-
 import {
   deleteMeetingConfirmButtonContentStyles,
   deleteMeetingConfirmButtonIconStyles,
 } from './showDeleteMeetingModal.styles';
 
+import type {Translate, TranslationKey} from '../../../../util/localizerUtil';
 import {PrimaryModal} from '../../../Modals/PrimaryModal';
 
 export type DeleteMeetingModalMode = 'forAll' | 'forMe';

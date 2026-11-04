@@ -31,9 +31,9 @@ import {ConversationMapper} from '../conversation/ConversationMapper';
 import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
 import 'src/script/localization/Localizer';
 import {StatusType} from 'src/script/message/statusType';
-import {translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
-import {createUuid} from 'Util/uuid';
+import {translate} from '../../util/localizerUtil';
+import {translateForTest} from '../../util/test/translateForTest';
+import {createUuid} from '../../util/uuid';
 
 import {Conversation} from './Conversation';
 import {ContentMessage} from './message/contentMessage';

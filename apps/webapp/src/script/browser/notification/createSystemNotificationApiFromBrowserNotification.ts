@@ -30,8 +30,8 @@ import {
   type SystemNotificationPermission,
   toSystemNotificationError,
 } from 'src/script/notification/systemNotificationTypes';
-import {getLogger} from 'Util/logger';
 
+import {getLogger} from '../../util/logger';
 import {WebAppEvents} from '../../webAppEvents';
 
 type SystemNotificationLogger = {

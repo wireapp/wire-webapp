@@ -25,11 +25,11 @@ import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
-import {forcedDownloadFile} from 'Util/util';
 
 import {buttonStyles, iconStyles, textStyles} from './cellsTableRowOptions.styles';
 
 import {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
+import {forcedDownloadFile} from '../../../../../util/util';
 import {openFolder} from '../../../common/openFolder/openFolder';
 import {useShouldRestrictGlobalDriveNodeActions} from '../../../common/useShouldRestrictGlobalDriveNodeActions/useShouldRestrictGlobalDriveNodeActions';
 import {useCellsFilePreviewModal} from '../../common/cellsFilePreviewModalContext/cellsFilePreviewModalContext';

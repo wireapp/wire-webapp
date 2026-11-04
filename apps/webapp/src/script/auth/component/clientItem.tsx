@@ -50,10 +50,10 @@ import {
 } from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {isEnterKey} from 'Util/keyboardUtil';
-import {splitFingerprint} from 'Util/stringUtil';
-import {isBackendError} from 'Util/typePredicateUtil';
 
+import {isEnterKey} from '../../util/keyboardUtil';
+import {splitFingerprint} from '../../util/stringUtil';
+import {isBackendError} from '../../util/typePredicateUtil';
 import {ValidationError} from '../module/action/validationError';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 

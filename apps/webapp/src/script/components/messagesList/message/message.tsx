@@ -23,10 +23,6 @@ import {isFunction, isNull} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import cx from 'classnames';
 
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {getAllFocusableElements, setElementsTabIndex} from 'Util/focusUtil';
-import {isTabKey} from 'Util/keyboardUtil';
-
 import {ElementType, MessageDetails} from './contentMessage/asset/textMessageRenderer';
 import {MessageWrapper} from './messageWrapper';
 import {ScrollToElement} from './types';
@@ -42,6 +38,9 @@ import type {User} from '../../../repositories/entity/User';
 import {ServiceEntity} from '../../../repositories/integration/ServiceEntity';
 import {TeamState} from '../../../repositories/team/TeamState';
 import type {UserRepository} from '../../../repositories/user/userRepository';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {getAllFocusableElements, setElementsTabIndex} from '../../../util/focusUtil';
+import {isTabKey} from '../../../util/keyboardUtil';
 import {InViewport} from '../../inViewport';
 
 export interface MessageActions {

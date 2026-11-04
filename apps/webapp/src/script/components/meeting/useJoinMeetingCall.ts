@@ -29,8 +29,6 @@ import {STATE as CALL_STATE} from '@wireapp/avs';
 
 import {Config} from 'src/script/Config';
 import {useApplicationContext, useMainViewModel} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import {
   joinMeetingCall,
@@ -46,6 +44,8 @@ import {
 import type {CallMediaChoice} from '../../repositories/calling/callMediaChoice';
 import {CallState} from '../../repositories/calling/CallState';
 import {ConversationState} from '../../repositories/conversation/ConversationState';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
+import {matchQualifiedIds} from '../../util/qualifiedId';
 import {PrimaryModal} from '../Modals/PrimaryModal';
 
 type JoinMeetingCallResultHandlers = {

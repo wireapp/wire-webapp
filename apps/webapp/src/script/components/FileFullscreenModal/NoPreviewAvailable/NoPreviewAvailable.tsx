@@ -22,8 +22,8 @@ import type {FunctionComponent} from 'react';
 import {Button} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {forcedDownloadFile, getFileNameWithExtension} from 'Util/util';
 
+import {forcedDownloadFile, getFileNameWithExtension} from '../../../util/util';
 import {
   CELLS_ACTION,
   useCellsActionPermissions,

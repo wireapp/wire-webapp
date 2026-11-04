@@ -21,7 +21,7 @@ import {task} from 'true-myth';
 
 import {meetingSubmitErrors} from '../../meetingSubmitErrors';
 import {PrimaryModal} from '../../../Modals/PrimaryModal';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../util/test/translateForTest';
 
 import {showMeetingConversationRenameFailedModal} from './showMeetingConversationRenameFailedModal';
 

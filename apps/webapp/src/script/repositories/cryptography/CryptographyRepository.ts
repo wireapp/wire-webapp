@@ -23,11 +23,10 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import type {ProteusService} from '@wireapp/core/lib/index';
 import {container} from 'tsyringe';
 
-import {getLogger, Logger} from 'Util/logger';
-
 import {CryptographyMapper} from './CryptographyMapper';
 
 import {Core} from '../../service/coreSingleton';
+import {getLogger, Logger} from '../../util/logger';
 
 export interface SignalingKeys {
   enckey: string;

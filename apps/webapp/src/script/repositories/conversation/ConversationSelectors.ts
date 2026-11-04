@@ -27,8 +27,7 @@ import {
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {matchQualifiedIds} from 'Util/qualifiedId';
-
+import {matchQualifiedIds} from '../../util/qualifiedId';
 import {Conversation} from '../entity/Conversation';
 
 export type ProteusConversation = Conversation & {protocol: CONVERSATION_PROTOCOL.PROTEUS};

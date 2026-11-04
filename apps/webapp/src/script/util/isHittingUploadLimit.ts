@@ -17,7 +17,7 @@
  *
  */
 
-import type {Translate} from 'Util/localizerUtil';
+import type {Translate} from './localizerUtil';
 
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {AssetRepository} from '../repositories/assets/assetRepository';

@@ -28,9 +28,10 @@ import {Runtime} from '@wireapp/commons';
 
 import {createStringKeyValueStorageFromWebStorage} from 'src/script/browser/storage/createStringKeyValueStorageFromWebStorage';
 import {StringKeyValueStorage} from 'src/script/storage/stringKeyValueStorageTypes';
-import {getStorage} from 'Util/localStorage';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
-import {createUuid} from 'Util/uuid';
+
+import {getStorage} from '../util/localStorage';
+import {TIME_IN_MILLIS} from '../util/timeUtil';
+import {createUuid} from '../util/uuid';
 
 const CONFIG = {
   INTERVAL: TIME_IN_MILLIS.SECOND,

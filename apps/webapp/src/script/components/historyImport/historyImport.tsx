@@ -25,9 +25,6 @@ import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {ContentState} from 'src/script/page/useAppState';
-import {checkBackupEncryption} from 'Util/backupUtil';
-import {getLogger} from 'Util/logger';
-import {loadFileBuffer} from 'Util/util';
 
 import {BackupFileUpload} from './backupFileUpload';
 
@@ -42,6 +39,9 @@ import {
   InvalidPassword,
 } from '../../repositories/backup/error';
 import {User} from '../../repositories/entity/User';
+import {checkBackupEncryption} from '../../util/backupUtil';
+import {getLogger} from '../../util/logger';
+import {loadFileBuffer} from '../../util/util';
 import * as Icon from '../icon';
 import {PrimaryModal} from '../Modals/PrimaryModal';
 import {ProgressBar} from '../ProgressBar/ProgressBar';

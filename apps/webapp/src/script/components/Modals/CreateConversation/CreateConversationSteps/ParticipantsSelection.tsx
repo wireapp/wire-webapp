@@ -23,13 +23,13 @@ import {isUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {sortUsersByPriority} from 'Util/stringUtil';
 
 import {participantsSelectionListCss, participantsSelectionSearchCss} from './CreateConversationSteps.styles';
 
 import {TeamState} from '../../../../repositories/team/TeamState';
 import {UserState} from '../../../../repositories/user/userState';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
+import {sortUsersByPriority} from '../../../../util/stringUtil';
 import {FadingScrollbar} from '../../../fadingScrollbar';
 import {SearchInput} from '../../../SearchInput';
 import {UserSearchableList} from '../../../UserSearchableList';

@@ -31,9 +31,6 @@ import {QUERY, StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
 
 import {isUUID} from 'src/script/auth/util/stringUtil';
 import {Config} from 'src/script/Config';
-import {canUseMeetings} from 'Util/canUseMeetings';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
 
 import {AppLock} from './appLock';
 import {useE2EIFeatureConfigUpdate} from './components/featureConfigChange/featureConfigChangeHandler/features/useE2eIFeatureConfigUpdate';
@@ -79,6 +76,9 @@ import {UserState} from '../repositories/user/userState';
 import {generateConversationUrl} from '../router/routeGenerator';
 import {configureRouterClock, configureRoutes, navigate} from '../router/Router';
 import {Core} from '../service/coreSingleton';
+import {canUseMeetings} from '../util/canUseMeetings';
+import {useKoSubscribableChildren} from '../util/componentUtil';
+import {isDetachedCallingFeatureEnabled} from '../util/isDetachedCallingFeatureEnabled';
 import {MainViewModel} from '../view_model/MainViewModel';
 import {useWarningOffset} from '../view_model/WarningsContainer/useWarningOffset';
 import {WarningsContainer} from '../view_model/WarningsContainer/WarningsContainer';

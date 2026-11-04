@@ -24,9 +24,6 @@ import ko from 'knockout';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {ContextMenuEntry, showContextMenu} from 'src/script/ui/contextMenu';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {isSpaceOrEnterKey, isTabKey} from 'Util/keyboardUtil';
-import {setContextMenuPosition} from 'Util/util';
 
 import {useMessageActionsState} from './messageActions.state';
 import {
@@ -42,6 +39,9 @@ import {ReplyButton} from './replyButton';
 
 import {useClickOutside} from '../../../../../hooks/useClickOutside';
 import {ContentMessage} from '../../../../../repositories/entity/message/contentMessage';
+import {useKoSubscribableChildren} from '../../../../../util/componentUtil';
+import {isSpaceOrEnterKey, isTabKey} from '../../../../../util/keyboardUtil';
+import {setContextMenuPosition} from '../../../../../util/util';
 import {WebAppEvents} from '../../../../../webAppEvents';
 import {useMessageFocusedTabIndex} from '../../util';
 

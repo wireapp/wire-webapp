@@ -27,10 +27,10 @@ import {User} from '../../../../repositories/entity/User';
 import {Core} from 'src/script/service/coreSingleton';
 import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {TestFactory} from 'test/helper/TestFactory';
-import {createUuid} from 'Util/uuid';
+import {createUuid} from '../../../../util/uuid';
 
 import {joinUnestablishedMixedConversations} from '.';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../util/test/translateForTest';
 
 function getConversationServiceForTest(core: Core): NonNullable<NonNullable<Core['service']>['conversation']> {
   const service = requireValueForTest(core.service);

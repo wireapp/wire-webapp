@@ -27,11 +27,11 @@ import {container} from 'tsyringe';
 import type {E2eiConversationState} from '@wireapp/core-crypto';
 
 import {Core} from 'src/script/service/coreSingleton';
-import {base64ToArray} from 'Util/util';
 
 import {mapMLSStatus, MLSStatuses} from './mlsStatus';
 
 import {ConversationState} from '../repositories/conversation/ConversationState';
+import {base64ToArray} from '../util/util';
 
 export {MLSStatuses};
 

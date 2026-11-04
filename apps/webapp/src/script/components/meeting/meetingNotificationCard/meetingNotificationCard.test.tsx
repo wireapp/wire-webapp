@@ -28,9 +28,9 @@ import {useMeetingPrepModal} from '../meetingPrep/useMeetingPrepModal';
 import {useJoinMeetingCall} from '../useJoinMeetingCall';
 import {MeetingNotificationCard} from './meetingNotificationCard';
 import {type MeetingNotification, MeetingNotificationKind} from '../meetingNotificationStore/meetingNotificationStore';
-import {formatLocale} from 'Util/timeUtil';
-import {setStrings, translate, type Translate} from 'Util/localizerUtil';
-import type {Substitutions, TranslationKey} from 'Util/localizerUtil/translationTypes';
+import {formatLocale} from '../../../util/timeUtil';
+import {setStrings, translate, type Translate} from '../../../util/localizerUtil';
+import type {Substitutions, TranslationKey} from '../../../util/localizerUtil/translationTypes';
 import type {ReactElement} from 'react';
 import {
   createRootContextValueForTest,

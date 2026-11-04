@@ -24,8 +24,6 @@ import {Button, ButtonVariant, CollectionIcon, Link, LinkVariant} from '@wireapp
 import {Config} from 'src/script/Config';
 import {SystemMessageType} from 'src/script/message/systemMessageType';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
 
 import {E2eEncryptionMessage} from './e2eEncryptionMessage/e2eEncryptionMessage';
 import {e2eMessageContentLinkCss} from './e2eEncryptionMessage/e2eEncryptionMessage.styles';
@@ -39,6 +37,8 @@ import {
   MemberMessage as MemberMessageEntity,
 } from '../../../repositories/entity/message/memberMessage';
 import {User} from '../../../repositories/entity/User';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {replaceReactComponents} from '../../../util/localizerUtil/reactLocalizerUtil';
 import * as Icon from '../../icon';
 
 type RenderGroupCreationHeaderOptions = {

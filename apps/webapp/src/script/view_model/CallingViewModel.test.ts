@@ -23,8 +23,8 @@ import {GROUP_CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {LEAVE_CALL_REASON} from '../repositories/calling/enum/LeaveCallReason';
 import {Conversation} from '../repositories/entity/Conversation';
-import {type Translate} from 'Util/localizerUtil';
-import {createUuid} from 'Util/uuid';
+import {type Translate} from '../util/localizerUtil';
+import {createUuid} from '../util/uuid';
 
 import {
   buildCall,
@@ -34,7 +34,7 @@ import {
   mockCallingRepository,
 } from './CallingViewModel.mocks';
 import {AudioType} from '../repositories/audio/audioType';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 describe('CallingViewModel', () => {

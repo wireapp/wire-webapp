@@ -18,10 +18,10 @@
  */
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {type Translate} from 'Util/localizerUtil';
 
 import {User} from '../../repositories/entity/User';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
+import {type Translate} from '../../util/localizerUtil';
 
 interface UserNameProps {
   user: User;

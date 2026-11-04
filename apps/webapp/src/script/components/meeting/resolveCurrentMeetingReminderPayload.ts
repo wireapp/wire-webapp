@@ -20,11 +20,11 @@
 import {isUndefined} from '@sindresorhus/is';
 import {Maybe} from 'true-myth';
 
-import {matchQualifiedIds} from 'Util/qualifiedId';
-
 import type {MeetingReminderFirePayload} from './createMeetingReminderScheduler';
 import {getFirstMeetingInstanceOnOrAfter} from './selectors/getMeetingInstancesInRange';
 import type {MeetingSeries} from './types/meetingSeries';
+
+import {matchQualifiedIds} from '../../util/qualifiedId';
 
 export const resolveCurrentMeetingReminderPayload = (
   meetingSeries: readonly MeetingSeries[],

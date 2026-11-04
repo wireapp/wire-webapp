@@ -29,10 +29,10 @@ import {
   createRootProviderWrapperForTest,
   requireValueForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {createUuid} from 'Util/uuid';
+import {createUuid} from '../../util/uuid';
 
 import {GroupVideoGridTile} from './GroupVideoGridTile';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 
 const loadingOverlaySelector = '[data-uie-name="background-effect-initializing"]';
 const rootProviderWrapper = createRootProviderWrapperForTest(

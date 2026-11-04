@@ -28,11 +28,6 @@ import {Button, ButtonVariant, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import type {Translate, TranslationKey} from 'Util/localizerUtil';
-import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
-import type {ReactTranslationMarker} from 'Util/localizerUtil/reactLocalizerUtil';
-import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import {backendErrorLink, warning} from './contentMessage/warnings/warnings.styles';
 import {MessageTime} from './messageTime';
@@ -41,6 +36,11 @@ import {useMessageFocusedTabIndex} from './util';
 import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from '../../../repositories/entity/message/failedToAddUsersMessage';
 import {User} from '../../../repositories/entity/User';
 import {UserState} from '../../../repositories/user/userState';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import type {Translate, TranslationKey} from '../../../util/localizerUtil';
+import type {ReactTranslationMarker} from '../../../util/localizerUtil/reactLocalizerUtil';
+import {createReactTranslationMarker, renderReactTranslation} from '../../../util/localizerUtil/reactLocalizerUtil';
+import {matchQualifiedIds} from '../../../util/qualifiedId';
 import * as Icon from '../../icon';
 import {getUserNameWithTranslate} from '../../UserName';
 

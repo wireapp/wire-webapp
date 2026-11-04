@@ -30,7 +30,7 @@ import {
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../../util/test/translateForTest';
 
 import {CellsBulkMovePreviewModal} from './cellsBulkMovePreviewModal';
 

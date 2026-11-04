@@ -18,7 +18,7 @@
  */
 
 import {AssetType} from '../../assets/assetType';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 import {ContentMessage} from './contentMessage';
 import {FileAsset} from './fileAsset';

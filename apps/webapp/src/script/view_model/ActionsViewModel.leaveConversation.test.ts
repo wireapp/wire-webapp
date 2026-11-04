@@ -33,9 +33,9 @@ import {SelfRepository} from '../repositories/self/SelfRepository';
 import {TeamState} from '../repositories/team/TeamState';
 import {UserState} from '../repositories/user/userState';
 import {generateConversation} from 'test/helper/ConversationGenerator';
-import type {Translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
-import {createUuid} from 'Util/uuid';
+import type {Translate} from '../util/localizerUtil';
+import {translateForTest} from '../util/test/translateForTest';
+import {createUuid} from '../util/uuid';
 
 import {ActionsViewModel} from './ActionsViewModel';
 import {MainViewModel} from './MainViewModel';

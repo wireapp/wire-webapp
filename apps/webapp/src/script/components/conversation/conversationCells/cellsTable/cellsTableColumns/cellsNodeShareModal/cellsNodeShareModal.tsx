@@ -23,7 +23,6 @@ import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isUndefined} from '@sindresorhus/is';
 
 import type {RootContextValue} from 'src/script/page/rootProvider';
-import {createUuid} from 'Util/uuid';
 
 import {
   inputStyles,
@@ -49,6 +48,7 @@ import {
 import {useCellConversationPublicLink} from './useCellConversationPublicLink';
 
 import {CellsRepository} from '../../../../../../repositories/cells/cellsRepository';
+import {createUuid} from '../../../../../../util/uuid';
 import {CellsShareModalContent} from '../../../../../cells/shareModal/cellsShareModalContent';
 import {serializeShareModalInput} from '../../../../../cells/shareModal/shareModalSerializer';
 import {useCellExpirationToggle} from '../../../../../cells/shareModal/useCellExpirationToggle';

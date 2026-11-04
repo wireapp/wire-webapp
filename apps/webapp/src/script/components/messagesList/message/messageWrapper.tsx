@@ -29,7 +29,6 @@ import {container} from 'tsyringe';
 import {markAsUnreadFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {QuoteEntity} from 'src/script/message/quoteEntity';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {CallMessage} from './callMessage';
 import {CallTimeoutMessage} from './callTimeoutMessage';
@@ -55,6 +54,7 @@ import {ContentMessage} from '../../../repositories/entity/message/contentMessag
 import {Text} from '../../../repositories/entity/message/text';
 import {TeamState} from '../../../repositories/team/TeamState';
 import {ContextMenuEntry} from '../../../ui/contextMenu';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {WebAppEvents} from '../../../webAppEvents';
 
 import {MessageParams} from './index';

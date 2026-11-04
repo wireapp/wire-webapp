@@ -36,9 +36,9 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import * as clipboard from 'Util/clipboardUtil';
-import * as utilities from 'Util/util';
-import {translateForTest} from 'Util/test/translateForTest';
+import * as clipboard from '../../../../util/clipboardUtil';
+import * as utilities from '../../../../util/util';
+import {translateForTest} from '../../../../util/test/translateForTest';
 
 import {TroubleshootingPreferences} from './troubleshootingPreferences';
 

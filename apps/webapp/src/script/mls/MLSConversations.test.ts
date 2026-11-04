@@ -36,7 +36,7 @@ import {UserState} from '../repositories/user/userState';
 import {Core} from 'src/script/service/coreSingleton';
 import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {TestFactory} from 'test/helper/TestFactory';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../util/test/translateForTest';
 
 import {
   classifyLocal,

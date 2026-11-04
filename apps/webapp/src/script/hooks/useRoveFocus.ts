@@ -21,7 +21,7 @@
 
 import {useCallback, useState, type Dispatch, type SetStateAction, KeyboardEvent as ReactKeyboardEvent} from 'react';
 
-import {isKey, isTabKey, KEY} from 'Util/keyboardUtil';
+import {isKey, isTabKey, KEY} from '../util/keyboardUtil';
 
 type RoveFocusState = {
   focusedId: string | undefined;

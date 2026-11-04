@@ -21,12 +21,11 @@ import {useMemo} from 'react';
 
 import {container} from 'tsyringe';
 
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {sortUsersByPriority} from 'Util/stringUtil';
-
 import type {User} from '../../../../repositories/entity/User';
 import {TeamState} from '../../../../repositories/team/TeamState';
 import {UserState} from '../../../../repositories/user/userState';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
+import {sortUsersByPriority} from '../../../../util/stringUtil';
 
 export const useMeetingParticipants = (): {users: User[]} => {
   const userState = container.resolve(UserState);

@@ -29,8 +29,6 @@ import {container} from 'tsyringe';
 
 import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import type {MenuItem} from './panelActions';
 import {PanelActions} from './panelActions';
@@ -43,6 +41,8 @@ import {ConversationState} from '../../repositories/conversation/ConversationSta
 import {Conversation} from '../../repositories/entity/Conversation';
 import type {User} from '../../repositories/entity/User';
 import {TeamState} from '../../repositories/team/TeamState';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
+import {matchQualifiedIds} from '../../util/qualifiedId';
 import type {ActionsViewModel} from '../../view_model/ActionsViewModel';
 import {WebAppEvents} from '../../webAppEvents';
 import * as Icon from '../icon';

@@ -26,8 +26,8 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
-import type {Translate} from 'Util/localizerUtil';
+import {translateForTest} from '../../../util/test/translateForTest';
+import type {Translate} from '../../../util/localizerUtil';
 
 import {ParticipantAvatarTooltip} from './participantAvatarTooltip';
 

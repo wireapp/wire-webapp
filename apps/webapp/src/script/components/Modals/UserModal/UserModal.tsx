@@ -25,10 +25,6 @@ import {container} from 'tsyringe';
 import {TabIndex, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
-import type {Translate} from 'Util/localizerUtil/translationTypes';
 
 import {useUserModalState} from './UserModal.state';
 import {
@@ -47,6 +43,10 @@ import {User} from '../../../repositories/entity/User';
 import {TeamState} from '../../../repositories/team/TeamState';
 import {UserRepository} from '../../../repositories/user/userRepository';
 import {Core} from '../../../service/coreSingleton';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {handleKeyDown, KEY} from '../../../util/keyboardUtil';
+import {createReactTranslationMarker, renderReactTranslation} from '../../../util/localizerUtil/reactLocalizerUtil';
+import type {Translate} from '../../../util/localizerUtil/translationTypes';
 import {FadingScrollbar} from '../../fadingScrollbar';
 import * as Icon from '../../icon';
 import {EnrichedFields} from '../../panel/enrichedFields';

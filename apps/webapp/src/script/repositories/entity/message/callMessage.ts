@@ -19,12 +19,11 @@
 
 import ko from 'knockout';
 
-import {type Translate} from 'Util/localizerUtil';
-
 import {Message} from './message';
 
 import {CALL_MESSAGE_TYPE} from '../../../message/callMessageType';
 import {SuperType} from '../../../message/superType';
+import {type Translate} from '../../../util/localizerUtil';
 import type {TERMINATION_REASON} from '../../calling/enum/TerminationReason';
 
 export class CallMessage extends Message {

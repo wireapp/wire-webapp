@@ -24,7 +24,7 @@ import {asyncNoop, noop} from 'noop-esm';
 
 import {ConversationMapper} from '../../repositories/conversation/ConversationMapper';
 import {Conversation} from '../../repositories/entity/Conversation';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 
 import {canManuallyMigrateConversation, manuallyMigrateConversation} from './manualMigration';
 

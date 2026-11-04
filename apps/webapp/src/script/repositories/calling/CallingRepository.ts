@@ -61,19 +61,6 @@ import {
 import {AvsDebugger} from '@wireapp/avs-debugger';
 import {Runtime} from '@wireapp/commons';
 
-import {flatten} from 'Util/arrayUtil';
-import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
-import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
-import {type Translate} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/logger';
-import {captureModalFocusContext} from 'Util/modalFocusUtil';
-import {roundLogarithmic} from 'Util/numberUtil';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-import {copyStyles} from 'Util/renderElement';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
-import {toError} from 'Util/toError';
-import {createUuid} from 'Util/uuid';
-
 import {Call, SerializedConversationId} from './Call';
 import {NetworkQualityInfo, NetworkQualityInfoSchema, UNKNOWN_NETWORK_QUALITY} from './calling.schema';
 import {CallingEpochData} from './CallingEpochCache';
@@ -97,6 +84,18 @@ import {useActiveWindowState} from '../../hooks/useActiveWindow';
 import {APIClient} from '../../service/apiClientSingleton';
 import {Core} from '../../service/coreSingleton';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
+import {flatten} from '../../util/arrayUtil';
+import {calculateChildWindowPosition} from '../../util/DOM/caculateChildWindowPosition';
+import {isDetachedCallingFeatureEnabled} from '../../util/isDetachedCallingFeatureEnabled';
+import {type Translate} from '../../util/localizerUtil';
+import {getLogger, Logger} from '../../util/logger';
+import {captureModalFocusContext} from '../../util/modalFocusUtil';
+import {roundLogarithmic} from '../../util/numberUtil';
+import {matchQualifiedIds} from '../../util/qualifiedId';
+import {copyStyles} from '../../util/renderElement';
+import {TIME_IN_MILLIS} from '../../util/timeUtil';
+import {toError} from '../../util/toError';
+import {createUuid} from '../../util/uuid';
 import {Warnings} from '../../view_model/WarningsContainer';
 import {WebAppEvents} from '../../webAppEvents';
 import {isMLSConversation, MLSConversation} from '../conversation/ConversationSelectors';

@@ -24,7 +24,7 @@ import {User} from '../../repositories/entity/User';
 import {TemporaryGuestAvatar} from './temporaryGuestAvatar';
 
 import {AVATAR_SIZE, STATE} from '.';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 
 describe('TemporaryGuestAvatar', () => {
   it('shows expiration circle', async () => {

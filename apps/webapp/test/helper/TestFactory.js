@@ -63,7 +63,7 @@ import {UserRepository} from '../../src/script/repositories/user/userRepository'
 import {UserService} from '../../src/script/repositories/user/userService';
 import {UserState} from '../../src/script/repositories/user/userState';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
-import {translate} from 'Util/localizerUtil';
+import {translate} from '../../src/script/util/localizerUtil';
 
 import {entities} from '../api/payloads';
 import {MediaStreamHandler} from '../../src/script/repositories/media/MediaStreamHandler';

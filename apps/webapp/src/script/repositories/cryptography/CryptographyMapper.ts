@@ -55,16 +55,15 @@ import {
   ButtonAction,
 } from '@wireapp/protocol-messaging';
 
-import {getLogger, Logger} from 'Util/logger';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
-import {toError} from 'Util/toError';
-import {base64ToArray, arrayToBase64} from 'Util/util';
-
 import {PROTO_MESSAGE_TYPE} from './ProtoMessageType';
 
 import {CryptographyError} from '../../error/cryptographyError';
 import {StatusType} from '../../message/statusType';
 import {Core} from '../../service/coreSingleton';
+import {getLogger, Logger} from '../../util/logger';
+import {TIME_IN_MILLIS} from '../../util/timeUtil';
+import {toError} from '../../util/toError';
+import {base64ToArray, arrayToBase64} from '../../util/util';
 import {AssetTransferState} from '../assets/assetTransferState';
 import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
 import {ConversationEphemeralHandler} from '../conversation/ConversationEphemeralHandler';

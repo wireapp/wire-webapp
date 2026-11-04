@@ -21,9 +21,8 @@ import type {FunctionComponent} from 'react';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {Translate} from 'Util/localizerUtil';
-import {generateRandomPassword} from 'Util/stringUtil';
-
+import {Translate} from '../../util/localizerUtil';
+import {generateRandomPassword} from '../../util/stringUtil';
 import * as Icon from '../icon';
 
 interface PasswordGeneratorButtonProps {

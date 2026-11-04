@@ -30,11 +30,6 @@ import {
 } from 'src/script/mls/MLSMigration/manualMigration';
 import {useManualMigrationStore} from 'src/script/mls/MLSMigration/useManualMigrationStore';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {errorHandlerStrings} from 'Util/errorUtil';
-import type {TranslationKey} from 'Util/localizerUtil';
-import {isAxiosError, isBackendError} from 'Util/typePredicateUtil';
-import {useIsMounted} from 'Util/useIsMounted';
 
 import {ConversationProtocolDetails} from './conversationProtocolDetails';
 import {
@@ -51,6 +46,11 @@ import type {ConversationRepository} from '../../../repositories/conversation/Co
 import type {Conversation} from '../../../repositories/entity/Conversation';
 import type {User} from '../../../repositories/entity/User';
 import type {TeamState} from '../../../repositories/team/TeamState';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {errorHandlerStrings} from '../../../util/errorUtil';
+import type {TranslationKey} from '../../../util/localizerUtil';
+import {isAxiosError, isBackendError} from '../../../util/typePredicateUtil';
+import {useIsMounted} from '../../../util/useIsMounted';
 import {ModalComponent} from '../../Modals/ModalComponent';
 
 const REQUIRED_PROTOCOL_ACTIVATIONS = 5;

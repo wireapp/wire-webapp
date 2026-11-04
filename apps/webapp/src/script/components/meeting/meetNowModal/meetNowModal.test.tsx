@@ -41,8 +41,8 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {MainViewModel} from 'src/script/view_model/MainViewModel';
 import {useWarningsState} from 'src/script/view_model/WarningsContainer/WarningsState';
-import {KEY} from 'Util/keyboardUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {KEY} from '../../../util/keyboardUtil';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 import {MeetNowModal} from './meetNowModal';
 import {useMeetNowModal} from './useMeetNowModal';

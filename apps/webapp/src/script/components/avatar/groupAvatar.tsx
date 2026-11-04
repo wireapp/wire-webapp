@@ -19,8 +19,8 @@
 
 import type {FunctionComponent} from 'react';
 
-import {getGroupAvatarColors} from 'Util/avatarUtil';
-import {CSS_SQUARE} from 'Util/cssMixin';
+import {getGroupAvatarColors} from '../../util/avatarUtil';
+import {CSS_SQUARE} from '../../util/cssMixin';
 
 const thirdAvatarColorIndex = 2;
 

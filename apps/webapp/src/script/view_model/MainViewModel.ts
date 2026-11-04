@@ -20,8 +20,6 @@
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {container} from 'tsyringe';
 
-import {type Translate} from 'Util/localizerUtil';
-
 import {ActionsViewModel} from './ActionsViewModel';
 import {CallingViewModel} from './CallingViewModel';
 import {ContentViewModel} from './ContentViewModel';
@@ -57,6 +55,7 @@ import type {UserRepository} from '../repositories/user/userRepository';
 import {UserState} from '../repositories/user/userState';
 import {Core} from '../service/coreSingleton';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
+import {type Translate} from '../util/localizerUtil';
 
 type MainViewModelPanelConfig = {BREAKPOINT: number; WIDTH: number};
 type MainViewModelConfig = {PANEL: MainViewModelPanelConfig};

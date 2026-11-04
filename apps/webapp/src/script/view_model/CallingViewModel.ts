@@ -27,10 +27,6 @@ import {container} from 'tsyringe';
 import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {Availability} from '@wireapp/protocol-messaging';
 
-import {type Translate} from 'Util/localizerUtil';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-import {safeWindowOpen} from 'Util/sanitizationUtil';
-
 import '../components/calling/ChooseScreen';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import type {PrimaryModalTranslatedMessage} from '../components/Modals/PrimaryModal/PrimaryModalTypes';
@@ -57,6 +53,9 @@ import {PROPERTIES_TYPE} from '../repositories/properties/propertiesType';
 import type {TeamRepository} from '../repositories/team/TeamRepository';
 import {TeamState} from '../repositories/team/TeamState';
 import {ROLE} from '../repositories/user/userPermission';
+import {type Translate} from '../util/localizerUtil';
+import {matchQualifiedIds} from '../util/qualifiedId';
+import {safeWindowOpen} from '../util/sanitizationUtil';
 import {WebAppEvents} from '../webAppEvents';
 
 const callStateSettleDelayInMilliseconds = 1000;

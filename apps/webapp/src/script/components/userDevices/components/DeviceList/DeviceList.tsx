@@ -23,11 +23,11 @@ import cx from 'classnames';
 
 import {WireIdentity} from 'src/script/e2eIdentity';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {Config} from '../../../../Config';
 import type {ClientEntity} from '../../../../repositories/client/ClientEntity';
 import type {User} from '../../../../repositories/entity/User';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 import {DeviceCard} from '../deviceCard';
 
 interface DeviceListProps {

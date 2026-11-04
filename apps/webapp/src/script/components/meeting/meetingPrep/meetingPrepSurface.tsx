@@ -28,7 +28,6 @@ import {Config} from 'src/script/Config';
 import {renderNoCameraMessage} from 'src/script/page/mainContent/panels/preferences/avPreferences/cameraPreferences';
 import {InputLevel} from 'src/script/page/mainContent/panels/preferences/avPreferences/inputLevel';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {formatLocale} from 'Util/timeUtil';
 
 import {
   meetingPrepAvatarStyles,
@@ -63,6 +62,7 @@ import {meetingPrepDeviceKinds, meetingPrepMediaKinds, meetingPrepPreviewErrors}
 
 import type {User} from '../../../repositories/entity/User';
 import {useMediaDevicesStore} from '../../../repositories/media/useMediaDevicesStore';
+import {formatLocale} from '../../../util/timeUtil';
 import {Avatar, AVATAR_SIZE} from '../../avatar';
 import {groupVideoBackgroundInitializingOverlay} from '../../calling/GroupVideoGridTile.styles';
 import {useShowLoadingOverlay} from '../../calling/useShowLoadingOverlay';

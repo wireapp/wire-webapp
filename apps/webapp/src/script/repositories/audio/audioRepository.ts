@@ -22,11 +22,10 @@ import {AudioPreference, WebappProperties} from '@wireapp/api-client/lib/user/da
 import {amplify} from 'amplify';
 import {noop} from 'noop-esm';
 
-import {getLogger, Logger} from 'Util/logger';
-
 import {AudioPlayingType} from './audioPlayingType';
 import {AudioType} from './audioType';
 
+import {getLogger, Logger} from '../../util/logger';
 import {WebAppEvents} from '../../webAppEvents';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {mediaDevicesStore} from '../media/useMediaDevicesStore';

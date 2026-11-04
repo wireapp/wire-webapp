@@ -26,13 +26,13 @@ import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {formatDurationCaption, TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {PropertiesRepository} from '../../../../../repositories/properties/propertiesRepository';
 import {AppLockRepository} from '../../../../../repositories/user/appLockRepository';
 import {AppLockState} from '../../../../../repositories/user/appLockState';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from '../../../../../repositories/user/typingIndicatorMode';
+import {useKoSubscribableChildren} from '../../../../../util/componentUtil';
+import {formatDurationCaption, TIME_IN_MILLIS} from '../../../../../util/timeUtil';
 import {PreferencesSection} from '../components/preferencesSection';
 
 interface PrivacySectionProps {

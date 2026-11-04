@@ -25,9 +25,8 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import {groupBy} from 'underscore';
 
-import {matchQualifiedIds} from 'Util/qualifiedId';
-import {loadValue, resetStoreValue, storeValue} from 'Util/storageUtil';
-
+import {matchQualifiedIds} from '../../util/qualifiedId';
+import {loadValue, resetStoreValue, storeValue} from '../../util/storageUtil';
 import {WebAppEvents} from '../../webAppEvents';
 import type {ClientEntity} from '../client/ClientEntity';
 import type {User} from '../entity/User';

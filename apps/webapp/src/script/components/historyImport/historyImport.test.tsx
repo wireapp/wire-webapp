@@ -33,8 +33,8 @@ import {BackupRepository} from '../../repositories/backup/backupRepository';
 import {User} from '../../repositories/entity/User';
 import * as RootProvider from 'src/script/page/rootProvider';
 import {RootContextValue} from 'src/script/page/rootProvider';
-import * as BackupUtil from 'Util/backupUtil';
-import * as Util from 'Util/util';
+import * as BackupUtil from '../../util/backupUtil';
+import * as Util from '../../util/util';
 
 import {HistoryImport} from './historyImport';
 import type {Container} from 'react-dom/client';

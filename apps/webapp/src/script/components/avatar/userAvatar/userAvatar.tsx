@@ -26,10 +26,10 @@ import {Availability as AvailabilityType} from '@wireapp/protocol-messaging';
 import {COLOR} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {User} from '../../../repositories/entity/User';
 import {TeamState} from '../../../repositories/team/TeamState';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {AvailabilityIcon} from '../../availabilityIcon';
 import {useUserName} from '../../UserName';
 import {AVATAR_SIZE, STATE} from '../avatar';

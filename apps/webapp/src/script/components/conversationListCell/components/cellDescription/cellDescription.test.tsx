@@ -31,8 +31,8 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
-import {createUuid} from 'Util/uuid';
+import {translateForTest} from '../../../../util/test/translateForTest';
+import {createUuid} from '../../../../util/uuid';
 
 import {CellDescription} from './cellDescription';
 

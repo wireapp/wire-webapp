@@ -19,8 +19,7 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {matchQualifiedIds} from 'Util/qualifiedId';
-
+import {matchQualifiedIds} from '../../util/qualifiedId';
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 

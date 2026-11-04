@@ -22,8 +22,8 @@ import {FileAsset} from '../../../../src/script/repositories/entity/message/file
 import {MediumImage} from '../../../../src/script/repositories/entity/message/mediumImage';
 import {Text} from '../../../../src/script/repositories/entity/message/text';
 import {StatusType} from 'src/script/message/statusType';
-import {translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translate} from '../../../../src/script/util/localizerUtil';
+import {translateForTest} from '../../../../src/script/util/test/translateForTest';
 
 describe('Message Entities', () => {
   let message_et = null;

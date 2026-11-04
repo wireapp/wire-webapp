@@ -21,8 +21,7 @@ import {useState, type FunctionComponent} from 'react';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {copyText} from 'Util/clipboardUtil';
-
+import {copyText} from '../../util/clipboardUtil';
 import * as Icon from '../icon';
 
 interface CopyToClipboardButtonProps {

@@ -20,10 +20,9 @@
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {Dexie} from 'dexie';
 
-import {getLogger} from 'Util/logger';
-
 import {CPBackupImporter, BackupPeekResult, isCreatedBySameUser, BackupQualifiedId} from './CPB.library';
 
+import {getLogger} from '../../../util/logger';
 import {ClientEvent} from '../../event/Client';
 import {BackupService} from '../backupService';
 import {IncompatibleBackupError} from '../error';

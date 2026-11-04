@@ -36,7 +36,7 @@ import {
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import type {MainViewModel} from 'src/script/view_model/MainViewModel';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 import {useScheduleMeetingSubmit} from './useScheduleMeetingSubmit';
 import {useScheduleMeetingModal} from './useScheduleMeetingModal';

@@ -25,12 +25,12 @@ import {User} from '../entity/User';
 import {ACCENT_ID} from 'src/script/Config';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 import {entities, payload} from 'test/api/payloads';
-import {translate} from 'Util/localizerUtil';
-import {createUuid} from 'Util/uuid';
+import {translate} from '../../util/localizerUtil';
+import {createUuid} from '../../util/uuid';
 
 import {UserMapper} from './userMapper';
 import type {UserRecord} from '../storage';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 
 describe('User Mapper', () => {
   const mapper = new UserMapper(serverTimeHandler, translate);

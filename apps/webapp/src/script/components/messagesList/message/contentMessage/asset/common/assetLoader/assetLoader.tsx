@@ -21,8 +21,7 @@ import React, {type FunctionComponent} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-
+import {handleKeyDown, KEY} from '../../../../../../../util/keyboardUtil';
 import {CloseIcon} from '../../../../../../icon';
 
 const largeLoaderScale = 2;

@@ -29,8 +29,6 @@ import {Config} from 'src/script/Config';
 import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useAppMainState, ViewType} from 'src/script/page/state';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {isEnterKey, isSpaceOrEnterKey} from 'Util/keyboardUtil';
 
 import {callingContainer} from './CallingCell.styles';
 import {CallingControls} from './CallingControls';
@@ -48,6 +46,8 @@ import {PropertiesRepository} from '../../../repositories/properties/propertiesR
 import {PROPERTIES_TYPE} from '../../../repositories/properties/propertiesType';
 import {TeamState} from '../../../repositories/team/TeamState';
 import {generateConversationUrl} from '../../../router/routeGenerator';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {isEnterKey, isSpaceOrEnterKey} from '../../../util/keyboardUtil';
 import {CallActions, CallViewTab} from '../../../view_model/CallingViewModel';
 import {WebAppEvents} from '../../../webAppEvents';
 import {useAppNotification} from '../../appNotification';

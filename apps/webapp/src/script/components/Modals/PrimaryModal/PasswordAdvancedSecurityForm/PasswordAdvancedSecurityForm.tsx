@@ -21,7 +21,7 @@ import type {ReactElement, ChangeEvent, FormEvent, FunctionComponent} from 'reac
 
 import {Input} from '@wireapp/react-ui-kit';
 
-import type {Translate} from 'Util/localizerUtil';
+import type {Translate} from '../../../../util/localizerUtil';
 
 interface PasswordAdvancedSecurityFormProps {
   readonly translate: Translate;

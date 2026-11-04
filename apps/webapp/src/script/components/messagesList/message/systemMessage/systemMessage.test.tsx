@@ -25,8 +25,8 @@ import {ReceiptModeUpdateMessage} from '../../../../repositories/entity/message/
 import {RenameMessage} from '../../../../repositories/entity/message/renameMessage';
 import {SystemMessage as SystemMessageEntity} from '../../../../repositories/entity/message/systemMessage';
 import {JoinedAfterMLSMigrationFinalisationMessage} from '../../../../repositories/entity/message/joinedAfterMlsMigrationFinalisationMessage';
-import type {Translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import type {Translate} from '../../../../util/localizerUtil';
+import {translateForTest} from '../../../../util/test/translateForTest';
 
 import {SystemMessage} from './systemMessage';
 import {SystemMessageBase} from './systemMessageBase';

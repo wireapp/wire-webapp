@@ -25,14 +25,14 @@ import {isNan, isNonEmptyString} from '@sindresorhus/is';
 import {Config} from 'src/script/Config';
 import {MotionDuration} from 'src/script/motion/MotionDuration';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
-import type {Translate} from 'Util/localizerUtil/translationTypes';
-import {splitFingerprint} from 'Util/stringUtil';
 
 import {messageBodyWrapper} from './contentMessage/contentMessage.styles';
 
 import {FormattedId} from '../../../page/mainContent/panels/preferences/devicesPreferences/components/formattedId';
 import {DecryptErrorMessage as DecryptErrorMessageEntity} from '../../../repositories/entity/message/decryptErrorMessage';
+import {createReactTranslationMarker, renderReactTranslation} from '../../../util/localizerUtil/reactLocalizerUtil';
+import type {Translate} from '../../../util/localizerUtil/translationTypes';
+import {splitFingerprint} from '../../../util/stringUtil';
 import * as Icon from '../../icon';
 
 type DecryptErrorMessageProps = {

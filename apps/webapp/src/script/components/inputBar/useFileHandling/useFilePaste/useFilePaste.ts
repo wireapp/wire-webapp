@@ -19,10 +19,9 @@
 
 import {useCallback, useEffect} from 'react';
 
-import type {Translate} from 'Util/localizerUtil';
-import {formatLocale} from 'Util/timeUtil';
-import {getFileExtension, sanitizeFilename} from 'Util/util';
-
+import type {Translate} from '../../../../util/localizerUtil';
+import {formatLocale} from '../../../../util/timeUtil';
+import {getFileExtension, sanitizeFilename} from '../../../../util/util';
 import {checkFileSharingPermission} from '../../../conversation/utils/checkFileSharingPermission';
 
 interface UseFilePasteParams {

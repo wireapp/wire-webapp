@@ -19,8 +19,6 @@
 
 import {useState, type FunctionComponent} from 'react';
 
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-
 import {ConfirmLeaveModal} from './confirmLeaveModal';
 import {TeamCreationModal} from './teamCreationModal';
 import {useTeamCreationModal} from './useTeamCreationModal';
@@ -28,6 +26,7 @@ import {useTeamCreationModal} from './useTeamCreationModal';
 import {User} from '../../../../../../repositories/entity/User';
 import {TeamRepository} from '../../../../../../repositories/team/TeamRepository';
 import {UserRepository} from '../../../../../../repositories/user/userRepository';
+import {useKoSubscribableChildren} from '../../../../../../util/componentUtil';
 
 interface Props {
   selfUser: User;

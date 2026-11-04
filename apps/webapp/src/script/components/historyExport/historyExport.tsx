@@ -27,9 +27,6 @@ import {Button, ButtonVariant, FlexBox} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {ContentState} from 'src/script/page/useAppState';
-import {getLogger} from 'Util/logger';
-import {getCurrentDate} from 'Util/timeUtil';
-import {downloadBlob} from 'Util/util';
 
 import {Config} from '../../Config';
 import {CancelError} from '../../repositories/backup/error';
@@ -37,6 +34,9 @@ import {ClientState} from '../../repositories/client/ClientState';
 import {User} from '../../repositories/entity/User';
 import {EventName} from '../../repositories/tracking/eventName';
 import {Segmentation} from '../../repositories/tracking/segmentation';
+import {getLogger} from '../../util/logger';
+import {getCurrentDate} from '../../util/timeUtil';
+import {downloadBlob} from '../../util/util';
 import {WebAppEvents} from '../../webAppEvents';
 import {PrimaryModal} from '../Modals/PrimaryModal';
 import {ProgressBar} from '../ProgressBar/ProgressBar';

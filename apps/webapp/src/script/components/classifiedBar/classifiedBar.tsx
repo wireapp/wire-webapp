@@ -23,10 +23,10 @@ import {CSSObject} from '@emotion/react';
 import cx from 'classnames';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {Conversation} from '../../repositories/entity/Conversation';
 import {User} from '../../repositories/entity/User';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
 import * as Icon from '../icon';
 
 function isClassified(users: User[], classifiedDomains: string[], conversationDomain?: string): boolean {

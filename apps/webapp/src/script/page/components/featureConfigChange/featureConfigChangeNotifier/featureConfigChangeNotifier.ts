@@ -31,10 +31,6 @@ import {amplify} from 'amplify';
 import {Runtime} from '@wireapp/commons';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {type TranslationKey} from 'Util/localizerUtil';
-import {getLogger} from 'Util/logger';
-import {formatDuration} from 'Util/timeUtil';
 
 import {loadFeatureConfig, saveFeatureConfig} from './featureConfigChangeNotifier.store';
 
@@ -47,6 +43,10 @@ import type {
 import {ButtonAction} from '../../../../components/Modals/PrimaryModal/PrimaryModalTypes';
 import {Config} from '../../../../Config';
 import {TeamState} from '../../../../repositories/team/TeamState';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
+import {type TranslationKey} from '../../../../util/localizerUtil';
+import {getLogger} from '../../../../util/logger';
+import {formatDuration} from '../../../../util/timeUtil';
 import {WebAppEvents} from '../../../../webAppEvents';
 
 type Features =

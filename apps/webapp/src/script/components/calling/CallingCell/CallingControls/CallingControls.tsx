@@ -23,7 +23,6 @@ import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {cellControlsList, cellControlsWrapper} from './CallingControls.styles';
 
@@ -31,6 +30,7 @@ import {Call} from '../../../../repositories/calling/Call';
 import {DesktopScreenShareMenu} from '../../../../repositories/calling/CallState';
 import {Participant} from '../../../../repositories/calling/Participant';
 import {TeamState} from '../../../../repositories/team/TeamState';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 import {CallActions} from '../../../../view_model/CallingViewModel';
 import * as Icon from '../../../icon';
 import {useCallAlertState} from '../../useCallAlertState';

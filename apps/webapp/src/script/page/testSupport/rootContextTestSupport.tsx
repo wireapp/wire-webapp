@@ -25,9 +25,8 @@ import {createFireAndForgetInvoker, type FireAndForgetInvoker} from '@enormora/f
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {noop} from 'noop-esm';
 
-import type {Translate} from 'Util/localizerUtil';
-
 import {StartupFeatureToggleName} from '../../featureToggles/startupFeatureToggles';
+import type {Translate} from '../../util/localizerUtil';
 import {MainViewModel} from '../../view_model/MainViewModel';
 import {RootContextValue, RootProvider} from '../rootProvider';
 

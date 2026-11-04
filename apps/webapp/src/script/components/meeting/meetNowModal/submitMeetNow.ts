@@ -19,10 +19,9 @@
 
 import {task, type Task} from 'true-myth';
 
-import type {Translate} from 'Util/localizerUtil';
-
 import {meetNowSubmitResults, type MeetNowFormState, type MeetNowSubmitResult} from './meetNowTypes';
 
+import type {Translate} from '../../../util/localizerUtil';
 import {mapMeetNowFormToMeetingCommand} from '../mapMeetNowFormToMeetingCommand';
 import type {MeetingPrepSession} from '../meetingPrep/useMeetingPrepModal';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from '../meetingSubmitErrors';

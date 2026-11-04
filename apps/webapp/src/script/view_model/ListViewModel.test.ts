@@ -22,7 +22,7 @@ import {SidebarTabs, useSidebarStore} from '../page/leftSidebar/panels/conversat
 import {createExecutingFireAndForgetInvokerForTest} from '../page/testSupport/rootContextTestSupport';
 import {ContentState, ListState, useAppState} from '../page/useAppState';
 import * as Router from '../router/Router';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../util/test/translateForTest';
 
 type ListViewModelTestTeamRepository = {getTeam: jest.Mock<Promise<unknown>, []>};
 type ListViewModelTestFixture = {

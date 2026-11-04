@@ -33,7 +33,7 @@ import type {UserRepository} from '../user/userRepository';
 import {UserState} from '../user/userState';
 import {generateConversation} from 'test/helper/ConversationGenerator';
 import {generateUser} from 'test/helper/UserGenerator';
-import {translate} from 'Util/localizerUtil';
+import {translate} from '../../util/localizerUtil';
 
 jest.mock('./EventMapper', () => {
   return {EventMapper: jest.fn().mockReturnValue({})};

@@ -20,10 +20,10 @@
 import type {ReactNode, FunctionComponent} from 'react';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
-import type {Translate} from 'Util/localizerUtil/translationTypes';
 
 import {FileTypeRestrictedMessage as FileTypeRestrictedMessageEntity} from '../../../repositories/entity/message/fileTypeRestrictedMessage';
+import {createReactTranslationMarker, renderReactTranslation} from '../../../util/localizerUtil/reactLocalizerUtil';
+import type {Translate} from '../../../util/localizerUtil/translationTypes';
 
 interface FileTypeRestrictedMessageProps {
   message: FileTypeRestrictedMessageEntity;

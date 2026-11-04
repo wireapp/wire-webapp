@@ -32,7 +32,7 @@ import {TestFactory} from 'test/helper/TestFactory';
 import {Notifications} from './notifications';
 
 import {ViewModelRepositories} from '../../../view_model/MainViewModel';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 const testFactory = new TestFactory();

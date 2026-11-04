@@ -24,9 +24,6 @@ import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 
 import {RestrictedFile} from './restrictedFile/restrictedFile';
 
@@ -34,6 +31,9 @@ import {AssetTransferState} from '../../../../../../repositories/assets/assetTra
 import type {ContentMessage} from '../../../../../../repositories/entity/message/contentMessage';
 import type {FileAsset as FileAssetType} from '../../../../../../repositories/entity/message/fileAsset';
 import {TeamState} from '../../../../../../repositories/team/TeamState';
+import {useKoSubscribableChildren} from '../../../../../../util/componentUtil';
+import {handleKeyDown, KEY} from '../../../../../../util/keyboardUtil';
+import {formatBytes, getFileExtension, trimFileExtension} from '../../../../../../util/util';
 import {useMessageFocusedTabIndex} from '../../../util';
 import {AssetHeader} from '../common/assetHeader/assetHeader';
 import {AssetLoader} from '../common/assetLoader/assetLoader';

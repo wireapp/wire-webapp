@@ -31,7 +31,7 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {MultipartAssets} from './multipartAssets';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../../../util/test/translateForTest';
 
 jest.mock('../../../../../../hooks/useInView/useInView', () => {
   return {

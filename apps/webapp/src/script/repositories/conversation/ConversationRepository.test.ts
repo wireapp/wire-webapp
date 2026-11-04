@@ -94,11 +94,11 @@ import {
   generateAPIConversation,
 } from 'test/helper/ConversationGenerator';
 import {createDeleteEvent, createMessageAddEvent} from 'test/helper/EventGenerator';
-import type {Translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
-import {escapeRegex} from 'Util/sanitizationUtil';
+import type {Translate} from '../../util/localizerUtil';
+import {translateForTest} from '../../util/test/translateForTest';
+import {escapeRegex} from '../../util/sanitizationUtil';
 import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
-import {createUuid} from 'Util/uuid';
+import {createUuid} from '../../util/uuid';
 
 import {ConversationDatabaseData, ConversationMapper} from './ConversationMapper';
 import {CONVERSATION_READONLY_STATE, ConversationRepository} from './ConversationRepository';

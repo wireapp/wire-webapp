@@ -23,9 +23,9 @@ import {amplify} from 'amplify';
 import {WebAppEvents} from '../../webAppEvents';
 
 import {NOTIFICATION_HANDLING_STATE} from '../../repositories/event/NotificationHandlingState';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {getLogger} from 'Util/logger';
-import {translateForTest} from 'Util/test/translateForTest';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
+import {getLogger} from '../../util/logger';
+import {translateForTest} from '../../util/test/translateForTest';
 
 import {ContentState, useAppState} from '../useAppState';
 import {WindowTitleUpdater} from './windowTitleUpdater';
@@ -41,8 +41,8 @@ jest.mock('tsyringe', () => {
     },
   };
 });
-jest.mock('Util/componentUtil');
-jest.mock('Util/logger', () => {
+jest.mock('../../util/componentUtil');
+jest.mock('../../util/logger', () => {
   return {
     getLogger: jest.fn(() => {
       return {debug: jest.fn()};

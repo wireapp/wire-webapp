@@ -24,11 +24,11 @@ import cx from 'classnames';
 
 import {WireIdentity} from 'src/script/e2eIdentity';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {splitFingerprint} from 'Util/stringUtil';
 
 import {FormattedId} from '../../../../page/mainContent/panels/preferences/devicesPreferences/components/formattedId';
 import {type ClientEntity} from '../../../../repositories/client/ClientEntity';
+import {handleKeyDown, KEY} from '../../../../util/keyboardUtil';
+import {splitFingerprint} from '../../../../util/stringUtil';
 import {DeviceVerificationBadges} from '../../../badge';
 import * as Icon from '../../../icon';
 import {LegalHoldDot} from '../../../LegalHoldDot';

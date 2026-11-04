@@ -23,8 +23,6 @@ import {isNull} from '@sindresorhus/is';
 import {Maybe, maybe} from 'true-myth';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import type {Translate} from 'Util/localizerUtil';
-import {formatBytes} from 'Util/util';
 
 import {moveStatusMessageKey} from './sharedDriveMoveStatusMessages';
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
@@ -39,6 +37,9 @@ import {
 } from './sharedDriveUploadStatus';
 import {useSharedDriveUploadStatus, type SharedDriveMoveStatusKind} from './sharedDriveUploadStatusContext';
 import {SharedDriveUploadStatusPopup} from './sharedDriveUploadStatusPopup';
+
+import type {Translate} from '../../../util/localizerUtil';
+import {formatBytes} from '../../../util/util';
 
 interface SharedDriveUploadStatusPopupHostProps {
   readonly controller: SharedDriveUploadController;

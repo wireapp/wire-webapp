@@ -25,15 +25,15 @@ import {container} from 'tsyringe';
 import {useDebouncedCallback} from 'use-debounce';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {partition} from 'Util/arrayUtil';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-import {sortByPriority} from 'Util/stringUtil';
 
 import {ConversationState} from '../../repositories/conversation/ConversationState';
 import type {User} from '../../repositories/entity/User';
 import type {SearchRepository} from '../../repositories/search/searchRepository';
 import type {TeamRepository} from '../../repositories/team/TeamRepository';
 import {TeamState} from '../../repositories/team/TeamState';
+import {partition} from '../../util/arrayUtil';
+import {matchQualifiedIds} from '../../util/qualifiedId';
+import {sortByPriority} from '../../util/stringUtil';
 import {UserList} from '../userList';
 
 export type UserListProps = Omit<React.ComponentProps<typeof UserList>, 'conversationState' | 'teamState'> & {

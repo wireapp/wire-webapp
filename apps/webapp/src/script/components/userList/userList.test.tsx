@@ -27,8 +27,8 @@ import {UserList} from './userList';
 import {ConversationRepository} from '../../repositories/conversation/ConversationRepository';
 import {Conversation} from '../../repositories/entity/Conversation';
 import {User} from '../../repositories/entity/User';
-import type {Translate} from 'Util/localizerUtil/translationTypes';
-import {translateForTest} from 'Util/test/translateForTest';
+import type {Translate} from '../../util/localizerUtil/translationTypes';
+import {translateForTest} from '../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

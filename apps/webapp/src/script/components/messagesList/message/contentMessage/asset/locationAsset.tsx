@@ -20,9 +20,9 @@
 import type {FunctionComponent} from 'react';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {getMapsUrl} from 'Util/locationUtil';
 
 import type {Location} from '../../../../../repositories/entity/message/location';
+import {getMapsUrl} from '../../../../../util/locationUtil';
 
 interface LocationAssetProps {
   asset: Location;

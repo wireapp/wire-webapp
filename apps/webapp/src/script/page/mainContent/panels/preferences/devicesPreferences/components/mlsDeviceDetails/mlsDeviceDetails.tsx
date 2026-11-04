@@ -23,11 +23,11 @@ import {isNonEmptyString, isUndefined} from '@sindresorhus/is';
 
 import {E2EIHandler, MLSStatuses, WireIdentity} from 'src/script/e2eIdentity';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {splitFingerprint} from 'Util/stringUtil';
 
 import {styles} from './mlsDeviceDetails.styles';
 
 import {isKnownSignature, MLSPublicKeys} from '../../../../../../../repositories/client';
+import {splitFingerprint} from '../../../../../../../util/stringUtil';
 import {E2EICertificateDetails} from '../e2eiCertificateDetails';
 import {FormattedId} from '../formattedId';
 

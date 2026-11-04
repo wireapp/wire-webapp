@@ -35,14 +35,14 @@ import {
   createRootProviderWrapperForTest,
   requireValueForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {captureModalFocusContext} from 'Util/modalFocusUtil';
+import {captureModalFocusContext} from '../../util/modalFocusUtil';
 
 import {ChooseScreen} from './ChooseScreen';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 import type {Container} from 'react-dom/client';
 import type {OptionsReceived} from '@testing-library/dom/node_modules/pretty-format';
 
-jest.mock('Util/modalFocusUtil', () => {
+jest.mock('../../util/modalFocusUtil', () => {
   return {
     captureModalFocusContext: jest.fn(),
   };

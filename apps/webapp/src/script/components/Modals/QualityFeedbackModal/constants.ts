@@ -17,9 +17,9 @@
  *
  */
 
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
-
 import {RatingListItem} from './typings';
+
+import {TIME_IN_MILLIS} from '../../../util/timeUtil';
 
 export const ratingListItems: RatingListItem[] = [
   {value: 1, headingTranslationKey: 'qualityFeedback.bad'},

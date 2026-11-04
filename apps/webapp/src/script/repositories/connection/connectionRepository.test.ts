@@ -30,10 +30,10 @@ import {SelfService} from '../self/SelfService';
 import {TeamService} from '../team/TeamService';
 import {UserRepository} from '../user/userRepository';
 import {generateUser} from 'test/helper/UserGenerator';
-import type {Translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import type {Translate} from '../../util/localizerUtil';
+import {translateForTest} from '../../util/test/translateForTest';
 import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
-import {createUuid} from 'Util/uuid';
+import {createUuid} from '../../util/uuid';
 
 import {ConnectionEntity} from './connectionEntity';
 import {ConnectionRepository} from './connectionRepository';

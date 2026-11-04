@@ -26,7 +26,7 @@ import {createDeterministicClock, type DeterministicClock} from '@enormora/clock
 
 import {User} from '../../../../../repositories/entity/User';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

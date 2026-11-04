@@ -23,8 +23,8 @@ import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
 import {VerificationMessageType} from 'src/script/message/verificationMessageType';
-import {getLogger, Logger} from 'Util/logger';
 
+import {getLogger, Logger} from '../../../../util/logger';
 import {WebAppEvents} from '../../../../webAppEvents';
 import {Conversation} from '../../../entity/Conversation';
 import {UserState} from '../../../user/userState';

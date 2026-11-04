@@ -21,17 +21,16 @@ import {isNonEmptyString} from '@sindresorhus/is';
 import type {QualifiedId, SearchResult} from '@wireapp/api-client/lib/user/';
 import {container} from 'tsyringe';
 
-import {EMOJI_RANGES} from 'Util/emojiUtil';
+import {APIClient} from '../../service/apiClientSingleton';
+import {Core} from '../../service/coreSingleton';
+import {EMOJI_RANGES} from '../../util/emojiUtil';
 import {
   computeTransliteration,
   replaceAccents,
   sortByPriority,
   startsWith,
   transliterationIndex,
-} from 'Util/stringUtil';
-
-import {APIClient} from '../../service/apiClientSingleton';
-import {Core} from '../../service/coreSingleton';
+} from '../../util/stringUtil';
 import type {User} from '../entity/User';
 import {validateHandle} from '../user/userHandleGenerator';
 import type {UserRepository} from '../user/userRepository';

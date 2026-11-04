@@ -30,7 +30,6 @@ import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate} from 'src/script/router/routerBindings';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {CollectionDetails} from './collectionDetails';
 import {CollectionSection} from './collectionSection';
@@ -46,6 +45,7 @@ import {MessageRepository} from '../../../../repositories/conversation/MessageRe
 import {Conversation} from '../../../../repositories/entity/Conversation';
 import {ContentMessage} from '../../../../repositories/entity/message/contentMessage';
 import {User} from '../../../../repositories/entity/User';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 import {WebAppEvents} from '../../../../webAppEvents';
 
 type CollectionProps = {

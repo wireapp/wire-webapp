@@ -19,9 +19,6 @@
 
 import {isNan, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 
-import {getStorage} from 'Util/localStorage';
-import {getLogger, Logger} from 'Util/logger';
-
 import {detectCapabilities, Metrics, QualityMode} from './backgroundEffects';
 import {BackgroundEffectsController} from './backgroundEffects/backgroundEffectsController';
 import {CapabilityInfo} from './backgroundEffects/backgroundEffectsWorkerTypes';
@@ -36,6 +33,9 @@ import {
   DEFAULT_BUILTIN_BACKGROUND_ID,
   loadBackgroundSource,
 } from './VideoBackgroundEffects';
+
+import {getStorage} from '../../util/localStorage';
+import {getLogger, Logger} from '../../util/logger';
 
 const millisecondsPerSecond = 1000;
 const percentageScale = 100;

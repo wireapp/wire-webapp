@@ -31,19 +31,18 @@ import {container} from 'tsyringe';
 import {Runtime} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
 
-import {Declension, getUserName, type Translate} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/logger';
-import {getRenderedTextContent} from 'Util/messageRenderer';
-import {truncate} from 'Util/stringUtil';
-import {formatDuration, TIME_IN_MILLIS} from 'Util/timeUtil';
-import {ValidationUtilError} from 'Util/validationUtil';
-
 import {AppPermissionState} from './AppPermissionState';
 
 import {SuperType} from '../../message/superType';
 import {SystemMessageType} from '../../message/systemMessageType';
 import type {SystemNotificationApi, SystemNotificationHandle} from '../../notification/systemNotificationTypes';
 import {ContentState, useAppState} from '../../page/useAppState';
+import {Declension, getUserName, type Translate} from '../../util/localizerUtil';
+import {getLogger, Logger} from '../../util/logger';
+import {getRenderedTextContent} from '../../util/messageRenderer';
+import {truncate} from '../../util/stringUtil';
+import {formatDuration, TIME_IN_MILLIS} from '../../util/timeUtil';
+import {ValidationUtilError} from '../../util/validationUtil';
 import {Warnings} from '../../view_model/WarningsContainer';
 import {WebAppEvents} from '../../webAppEvents';
 import {AssetRepository} from '../assets/assetRepository';

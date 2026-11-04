@@ -26,8 +26,8 @@ import {
   MeetingNotificationKind,
   useMeetingNotificationStore,
 } from '../meetingNotificationStore/meetingNotificationStore';
-import type {Translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import type {Translate} from '../../../util/localizerUtil';
+import {translateForTest} from '../../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

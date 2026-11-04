@@ -24,10 +24,6 @@ import cx from 'classnames';
 import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {getLogger} from 'Util/logger';
-import {isErrorWithType} from 'Util/typePredicateUtil';
-import {formatBytes, validateProfileImageResolution} from 'Util/util';
 
 import {FileInput} from './fileInput';
 
@@ -37,6 +33,10 @@ import {Config} from '../../../../../Config';
 import {UserError} from '../../../../../error/userError';
 import {User} from '../../../../../repositories/entity/User';
 import {UserRepository} from '../../../../../repositories/user/userRepository';
+import {handleKeyDown, KEY} from '../../../../../util/keyboardUtil';
+import {getLogger} from '../../../../../util/logger';
+import {isErrorWithType} from '../../../../../util/typePredicateUtil';
+import {formatBytes, validateProfileImageResolution} from '../../../../../util/util';
 
 interface AvatarInputProps {
   isActivatedAccount: boolean;

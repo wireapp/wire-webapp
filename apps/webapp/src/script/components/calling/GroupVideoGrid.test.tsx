@@ -31,12 +31,12 @@ import {
   createRootProviderWrapperForTest,
   requireValueForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {translate} from 'Util/localizerUtil';
+import {translate} from '../../util/localizerUtil';
 
 import {GroupVideoGrid, GroupVideoGripProps} from './GroupVideoGrid';
 
 import {buildMediaDevicesHandler} from '../../auth/util/test/testUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 jest.mock('../avatar', () => {

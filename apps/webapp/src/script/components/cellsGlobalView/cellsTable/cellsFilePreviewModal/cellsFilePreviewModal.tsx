@@ -21,8 +21,7 @@ import type {FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 
-import {getFileTypeFromExtension} from 'Util/getFileTypeFromExtension/getFileTypeFromExtension';
-
+import {getFileTypeFromExtension} from '../../../../util/getFileTypeFromExtension/getFileTypeFromExtension';
 import {CellsSelfUserDriveRoleProvider} from '../../../conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {sortTagsAlphabetically} from '../../../conversation/conversationCells/common/sortTagsAlphabetically/sortTagsAlphabetically';
 import {FileFullscreenModal} from '../../../FileFullscreenModal/FileFullscreenModal';

@@ -22,7 +22,6 @@ import {FC} from 'react';
 import {isNullOrUndefined} from '@sindresorhus/is';
 
 import {MessageCategory} from 'src/script/message/messageCategory';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {isOfCategory} from './utils';
 
@@ -32,6 +31,7 @@ import {FileAsset} from '../../../../components/messagesList/message/contentMess
 import {LinkPreviewAsset} from '../../../../components/messagesList/message/contentMessage/asset/linkPreviewAssetComponent';
 import {ContentMessage} from '../../../../repositories/entity/message/contentMessage';
 import {MediumImage} from '../../../../repositories/entity/message/mediumImage';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 
 interface CollectionItemProps {
   allMessages: ContentMessage[];

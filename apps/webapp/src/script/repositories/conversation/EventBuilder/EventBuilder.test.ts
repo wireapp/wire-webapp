@@ -26,13 +26,13 @@ import {User} from '../../entity/User';
 import {ClientEvent} from '../../event/Client';
 import {SuperType} from 'src/script/message/superType';
 import {VerificationMessageType} from 'src/script/message/verificationMessageType';
-import {translate} from 'Util/localizerUtil';
-import {createUuid} from 'Util/uuid';
+import {translate} from '../../../util/localizerUtil';
+import {createUuid} from '../../../util/uuid';
 
 import {EventBuilder} from './EventBuilder';
 
 import {EventMapper} from '../EventMapper';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 describe('EventBuilder', () => {

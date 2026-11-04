@@ -22,10 +22,10 @@ import type {FunctionComponent} from 'react';
 import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {renderMessage} from 'Util/messageRenderer';
 
 import {ContentMessage} from '../../../repositories/entity/message/contentMessage';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {renderMessage} from '../../../util/messageRenderer';
 import {RestrictedVideo} from '../../asset/RestrictedVideo';
 import {ParticipantMicOnIcon} from '../../calling/ParticipantMicOnIcon';
 import * as Icon from '../../icon';

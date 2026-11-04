@@ -25,7 +25,7 @@ import {task} from 'true-myth';
 
 import {buildMediaDevicesHandler, createConversation, createSelfParticipant} from 'src/script/auth/util/test/testUtil';
 import {joinMeetingCall, joinMeetingCallErrors, type JoinMeetingCallDeps} from './joinMeetingCall';
-import {unwrapErr} from 'Util/test/resultTestSupport';
+import {unwrapErr} from '../../util/test/resultTestSupport';
 import {Call} from '../../repositories/calling/Call';
 import type {Conversation} from '../../repositories/entity/Conversation';
 import type {ConversationRepository} from '../../repositories/conversation/ConversationRepository';

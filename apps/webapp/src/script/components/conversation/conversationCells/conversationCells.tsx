@@ -27,8 +27,6 @@ import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {allowsAllFiles, hasAllowedExtension} from 'Util/fileTypeUtil';
 
 import {CellsHeader} from './cellsHeader/cellsHeader';
 import {CellsLoader} from './cellsLoader/cellsLoader';
@@ -67,6 +65,8 @@ import {CellsRepository} from '../../../repositories/cells/cellsRepository';
 import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
 import {Conversation} from '../../../repositories/entity/Conversation';
 import {UserRepository} from '../../../repositories/user/userRepository';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {allowsAllFiles, hasAllowedExtension} from '../../../util/fileTypeUtil';
 import {showFileDropzoneErrorModal} from '../useFilesUploadDropzone/showFileDropzoneErrorModal/showFileDropzoneErrorModal';
 
 interface ConversationCellsProps {

@@ -31,9 +31,9 @@ import type {ConversationRepository} from '../conversation/ConversationRepositor
 import {ClientEvent} from '../event/Client';
 import {StorageService} from '../storage';
 import {StorageSchemata} from '../storage/storageSchemata';
-import {noop} from 'Util/util';
-import {createUuid} from 'Util/uuid';
-import {WebWorker} from 'Util/worker';
+import {noop} from '../../util/util';
+import {createUuid} from '../../util/uuid';
+import {WebWorker} from '../../util/worker';
 
 import {Filename} from './backup.types';
 import {BackUpHeader, ENCRYPTED_BACKUP_FORMAT, ENCRYPTED_BACKUP_VERSION} from './backUpHeader';
@@ -46,7 +46,7 @@ import {handleZipEvent} from './zipWorker';
 
 import {Config} from '../../Config';
 import {DatabaseTypes, createStorageEngine} from '../../service/storeEngineProvider';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 
 const conversationId = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a';
 

@@ -27,8 +27,6 @@ import {container} from 'tsyringe';
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {copyText} from 'Util/clipboardUtil';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import * as Icon from '../../../../../components/icon';
 import {PrimaryModal} from '../../../../../components/Modals/PrimaryModal';
@@ -42,6 +40,8 @@ import {ConversationRepository} from '../../../../../repositories/conversation/C
 import {Conversation} from '../../../../../repositories/entity/Conversation';
 import {TeamRepository} from '../../../../../repositories/team/TeamRepository';
 import {TeamState} from '../../../../../repositories/team/TeamState';
+import {copyText} from '../../../../../util/clipboardUtil';
+import {useKoSubscribableChildren} from '../../../../../util/componentUtil';
 
 const COPY_LINK_CONFIRM_DURATION = 1500;
 

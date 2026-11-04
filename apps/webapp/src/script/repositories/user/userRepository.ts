@@ -44,14 +44,6 @@ import {flatten, uniq} from 'underscore';
 import {TypedEventEmitter, type AccentColor} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
 
-import {chunk, partition} from 'Util/arrayUtil';
-import {type Translate} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/logger';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-import {fixWebsocketString} from 'Util/stringUtil';
-import {toError} from 'Util/toError';
-import {isAxiosError, isBackendError, isErrorWithCode, isErrorWithType} from 'Util/typePredicateUtil';
-
 import {showAvailabilityModal} from './availabilityModal';
 import {ConsentValue} from './consentValue';
 import {UserMapper} from './userMapper';
@@ -63,6 +55,13 @@ import {useLegalHoldModalState} from '../../components/Modals/LegalHoldModal/Leg
 import {Config} from '../../Config';
 import {UserError} from '../../error/userError';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
+import {chunk, partition} from '../../util/arrayUtil';
+import {type Translate} from '../../util/localizerUtil';
+import {getLogger, Logger} from '../../util/logger';
+import {matchQualifiedIds} from '../../util/qualifiedId';
+import {fixWebsocketString} from '../../util/stringUtil';
+import {toError} from '../../util/toError';
+import {isAxiosError, isBackendError, isErrorWithCode, isErrorWithType} from '../../util/typePredicateUtil';
 import {WebAppEvents} from '../../webAppEvents';
 import {AssetRepository} from '../assets/assetRepository';
 import type {ClientRepository, QualifiedUserClientEntityMap} from '../client';

@@ -43,8 +43,6 @@ import {isMediaDevice} from 'src/script/guards/MediaDevice';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {ContextMenuEntry, showContextMenu} from 'src/script/ui/contextMenu';
 import {CallViewTab} from 'src/script/view_model/CallingViewModel';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {handleKeyDown, isEscapeKey, KEY} from 'Util/keyboardUtil';
 
 import {EmojisBar} from './EmojisBar/EmojisBar';
 import {VideoCallCancelButton} from './VideoCallCancelButton/VideoCallCancelButton';
@@ -78,6 +76,8 @@ import {
 import {PropertiesRepository} from '../../../repositories/properties/propertiesRepository';
 import {PROPERTIES_TYPE} from '../../../repositories/properties/propertiesType';
 import {TeamState} from '../../../repositories/team/TeamState';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {handleKeyDown, isEscapeKey, KEY} from '../../../util/keyboardUtil';
 import {WebAppEvents} from '../../../webAppEvents';
 import * as Icon from '../../icon';
 

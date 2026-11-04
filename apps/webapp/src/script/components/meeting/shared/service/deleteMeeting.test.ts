@@ -27,8 +27,8 @@ import type {CallingRepository} from '../../../../repositories/calling/CallingRe
 import type {ConversationRepository} from '../../../../repositories/conversation/ConversationRepository';
 import {Conversation} from '../../../../repositories/entity/Conversation';
 import type {MeetingsRepository} from '../../../../repositories/meetings/meetingsRepository';
-import {unwrapErr} from 'Util/test/resultTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
+import {unwrapErr} from '../../../../util/test/resultTestSupport';
+import {translateForTest} from '../../../../util/test/translateForTest';
 
 import {deleteMeetingForAll, deleteMeetingForMe} from './deleteMeeting';
 

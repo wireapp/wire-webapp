@@ -25,11 +25,11 @@ import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {splitFingerprint} from 'Util/stringUtil';
 
 import {FormattedId} from '../../../../page/mainContent/panels/preferences/devicesPreferences/components/formattedId';
 import {ClientState} from '../../../../repositories/client/ClientState';
 import type {CryptographyRepository} from '../../../../repositories/cryptography/CryptographyRepository';
+import {splitFingerprint} from '../../../../util/stringUtil';
 import {WebAppEvents} from '../../../../webAppEvents';
 import {DeviceCard} from '../deviceCard';
 

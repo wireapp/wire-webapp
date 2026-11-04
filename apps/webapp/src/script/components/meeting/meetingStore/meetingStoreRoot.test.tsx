@@ -52,8 +52,8 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {Core} from 'src/script/service/coreSingleton';
 import type {MainViewModel} from 'src/script/view_model/MainViewModel';
-import {translateForTest} from 'Util/test/translateForTest';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
+import {translateForTest} from '../../../util/test/translateForTest';
+import {TIME_IN_MILLIS} from '../../../util/timeUtil';
 
 import {MeetingStoreRoot} from './meetingStoreRoot';
 import type {FunctionComponent} from 'react';

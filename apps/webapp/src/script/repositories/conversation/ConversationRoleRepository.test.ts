@@ -23,12 +23,12 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 import {TeamEntity} from '../team/TeamEntity';
-import {createUuid} from 'Util/uuid';
+import {createUuid} from '../../util/uuid';
 
 import {ConversationRoleRepository, Permissions} from './ConversationRoleRepository';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 
 describe('ConversationRoleRepository', () => {
   const testFactory = new TestFactory();

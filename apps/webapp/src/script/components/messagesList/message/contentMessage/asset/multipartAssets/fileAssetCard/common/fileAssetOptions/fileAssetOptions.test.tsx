@@ -32,7 +32,7 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {isFileEditable} from 'Util/fileTypeUtil';
+import {isFileEditable} from '../../../../../../../../../util/fileTypeUtil';
 
 import {FileAssetOptions} from './fileAssetOptions';
 

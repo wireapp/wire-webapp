@@ -25,9 +25,6 @@ import {TabIndex, Checkbox, CheckboxLabel, IndicatorRangeInput} from '@wireapp/r
 
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
-import type {Translate} from 'Util/localizerUtil/translationTypes';
 
 import {PreferencesPage} from './components/preferencesPage';
 import {PreferencesSection} from './components/preferencesSection';
@@ -38,6 +35,9 @@ import {RootFontSize, useRootFontSize} from '../../../../hooks/useRootFontSize';
 import {User} from '../../../../repositories/entity/User';
 import {PropertiesRepository} from '../../../../repositories/properties/propertiesRepository';
 import {PROPERTIES_TYPE} from '../../../../repositories/properties/propertiesType';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
+import {createReactTranslationMarker, renderReactTranslation} from '../../../../util/localizerUtil/reactLocalizerUtil';
+import type {Translate} from '../../../../util/localizerUtil/translationTypes';
 import {WebAppEvents} from '../../../../webAppEvents';
 
 interface OptionPreferencesProps {

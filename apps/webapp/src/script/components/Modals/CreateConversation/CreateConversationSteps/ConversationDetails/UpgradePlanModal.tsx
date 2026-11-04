@@ -23,8 +23,6 @@ import {Button, Text} from '@wireapp/react-ui-kit';
 
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {handleEscDown, handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {safeWindowOpen} from 'Util/sanitizationUtil';
 
 import {
   salesModalWrapperCss,
@@ -35,6 +33,8 @@ import {
   salesModalBodyButtonCss,
 } from './ConversationDetails.styles';
 
+import {handleEscDown, handleKeyDown, KEY} from '../../../../../util/keyboardUtil';
+import {safeWindowOpen} from '../../../../../util/sanitizationUtil';
 import {ModalComponent} from '../../../ModalComponent';
 import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';
 

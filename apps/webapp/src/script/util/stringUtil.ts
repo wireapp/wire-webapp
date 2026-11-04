@@ -20,7 +20,7 @@
 import {isNonEmptyString} from '@sindresorhus/is';
 import getSlug from 'speakingurl';
 
-import {randomElement} from 'Util/arrayUtil';
+import {randomElement} from './arrayUtil';
 
 import type {User} from '../repositories/entity/User';
 

@@ -21,10 +21,9 @@ import {isTruthy} from '@sindresorhus/is';
 
 import {Quote} from '@wireapp/protocol-messaging';
 
-import {getLogger, Logger} from 'Util/logger';
-import {base64ToArray} from 'Util/util';
-
 import {QuoteEntity} from '../../../message/quoteEntity';
+import {getLogger, Logger} from '../../../util/logger';
+import {base64ToArray} from '../../../util/util';
 import {MessageAddEvent, MultipartMessageAddEvent, QuoteData} from '../../conversation/EventBuilder';
 import {StoredEvent} from '../../storage/record/eventRecord';
 import {ClientEvent} from '../Client';

@@ -19,14 +19,13 @@
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 
-import {getLogger} from 'Util/logger';
-
 import {ProgressCallback, FileData, Filename, FileDescriptor, Metadata} from './backup.types';
 import {BackupService} from './backupService';
 import {exportTable} from './crossPlatformBackup';
 import {CancelError, DifferentAccountError, IncompatiblePlatformError, InvalidMetaDataError} from './error';
 import {preprocessConversations, preprocessEvents, preprocessUsers} from './recordPreprocessors';
 
+import {getLogger} from '../../util/logger';
 import {User} from '../entity/User';
 import type {ConversationRecord, EventRecord, UserRecord} from '../storage';
 import {StorageSchemata} from '../storage/storageSchemata';

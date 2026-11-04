@@ -28,7 +28,7 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {PartialFailureToSendWarning} from './partialFailureToSend';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../../../util/test/translateForTest';
 
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),

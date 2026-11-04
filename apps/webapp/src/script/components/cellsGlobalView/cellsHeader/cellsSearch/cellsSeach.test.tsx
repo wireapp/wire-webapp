@@ -27,7 +27,7 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import type {Translate} from 'Util/localizerUtil';
+import type {Translate} from '../../../../util/localizerUtil';
 
 import {CellsSearch} from './cellsSeach';
 import type {JSX} from '@emotion/react/jsx-runtime';

@@ -20,12 +20,11 @@
 import {isNan, isNonEmptyArray, isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {UserType} from '@wireapp/api-client/lib/user';
 
-import {type Translate} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/logger';
-
 import {isSelfAPIUser} from './userGuards';
 
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
+import {type Translate} from '../../util/localizerUtil';
+import {getLogger, Logger} from '../../util/logger';
 import '../../view_model/bindings/CommonBindings';
 import {MappedAsset, mapProfileAssets, updateUserEntityAssets} from '../assets/assetMapper';
 import {User} from '../entity/User';

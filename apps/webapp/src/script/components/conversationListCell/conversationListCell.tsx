@@ -35,10 +35,6 @@ import cx from 'classnames';
 import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {isKey, isOneOfKeys, KEY} from 'Util/keyboardUtil';
-import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
-import {noop, setContextMenuPosition} from 'Util/util';
 
 import {CellDescription} from './components/cellDescription';
 import {StatusIcon} from './components/statusIcon';
@@ -48,6 +44,10 @@ import type {RegisterConversationElement} from '../../hooks/useConversationFocus
 import {useNoInternetCallGuard} from '../../hooks/useNoInternetCallGuard/useNoInternetCallGuard';
 import type {Conversation} from '../../repositories/entity/Conversation';
 import {MediaType} from '../../repositories/media/MediaType';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
+import {isKey, isOneOfKeys, KEY} from '../../util/keyboardUtil';
+import {useChannelsFeatureFlag} from '../../util/useChannelsFeatureFlag';
+import {noop, setContextMenuPosition} from '../../util/util';
 import {Avatar, AVATAR_SIZE, GroupAvatar, ChannelAvatar} from '../avatar';
 import {UserBlockedBadge} from '../badge';
 import {UserInfo} from '../UserInfo';

@@ -27,14 +27,6 @@ import {useMatchMedia} from '@wireapp/react-ui-kit';
 
 import {Config} from 'src/script/Config';
 import {useApplicationContext, useMainViewModel} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {isLastReceivedMessage} from 'Util/conversationMessages';
-import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from 'Util/fileTypeUtil';
-import {isHittingUploadLimit} from 'Util/isHittingUploadLimit';
-import {getLogger} from 'Util/logger';
-import {safeMailOpen, safeWindowOpen} from 'Util/sanitizationUtil';
-import {formatBytes} from 'Util/util';
-import {createUuid} from 'Util/uuid';
 
 import {
   searchResultsHeadingStyles,
@@ -88,6 +80,14 @@ import {Message} from '../../repositories/entity/message/message';
 import {User} from '../../repositories/entity/User';
 import {ServiceEntity} from '../../repositories/integration/ServiceEntity';
 import {TeamState} from '../../repositories/team/TeamState';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
+import {isLastReceivedMessage} from '../../util/conversationMessages';
+import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from '../../util/fileTypeUtil';
+import {isHittingUploadLimit} from '../../util/isHittingUploadLimit';
+import {getLogger} from '../../util/logger';
+import {safeMailOpen, safeWindowOpen} from '../../util/sanitizationUtil';
+import {formatBytes} from '../../util/util';
+import {createUuid} from '../../util/uuid';
 import {WebAppEvents} from '../../webAppEvents';
 import {CallingCell} from '../calling/CallingCell';
 import {Giphy} from '../giphy';

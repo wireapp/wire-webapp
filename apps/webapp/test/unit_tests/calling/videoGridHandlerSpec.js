@@ -24,7 +24,7 @@ import {Call} from '../../../src/script/repositories/calling/Call';
 import {Participant} from '../../../src/script/repositories/calling/Participant';
 import {getGrid} from '../../../src/script/repositories/calling/videoGridHandler';
 import {User} from '../../../src/script/repositories/entity/User';
-import {translate} from 'Util/localizerUtil';
+import {translate} from '../../../src/script/util/localizerUtil';
 
 describe('videoGridHandler', () => {
   let participants;

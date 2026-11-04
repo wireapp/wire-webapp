@@ -24,9 +24,9 @@ import {amplify} from 'amplify';
 import {ErrorBoundary} from 'react-error-boundary';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {User} from '../../repositories/entity/User';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {WebAppEvents} from '../../webAppEvents';
 import {Avatar, AVATAR_SIZE} from '../avatar';
 import {UserBlockedBadge, UserVerificationBadges} from '../badge';

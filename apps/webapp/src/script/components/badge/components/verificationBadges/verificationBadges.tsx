@@ -37,8 +37,6 @@ import {
 
 import {MLSStatuses, WireIdentity} from 'src/script/e2eIdentity/e2eIdentityVerification';
 import {RootContextValue, useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {waitFor} from 'Util/waitFor';
 
 import {useUserIdentity} from '../../../../hooks/useDeviceIdentities';
 import {ClientEntity} from '../../../../repositories/client';
@@ -47,6 +45,8 @@ import {checkUserHandle} from '../../../../repositories/conversation/Conversatio
 import {Conversation} from '../../../../repositories/entity/Conversation';
 import {User} from '../../../../repositories/entity/User';
 import {UserState} from '../../../../repositories/user/userState';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
+import {waitFor} from '../../../../util/waitFor';
 
 type VerificationBadgeContext = 'user' | 'conversation' | 'device';
 

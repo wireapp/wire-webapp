@@ -33,13 +33,12 @@ import {DecryptionError} from '@wireapp/core/lib/errors/decryptionError';
 import type {REASON as AVS_REASON} from '@wireapp/avs';
 import type {Asset, LegalHoldStatus} from '@wireapp/protocol-messaging';
 
-import {createUuid} from 'Util/uuid';
-
 import {BuildMessageAddParams} from './EventBuilder.types';
 
 import {E2EIVerificationMessageType} from '../../../message/e2eiVerificationMessageType';
 import {StatusType} from '../../../message/statusType';
 import {VerificationMessageType} from '../../../message/verificationMessageType';
+import {createUuid} from '../../../util/uuid';
 import {AssetTransferState} from '../../assets/assetTransferState';
 import type {Conversation} from '../../entity/Conversation';
 import type {Message} from '../../entity/message/message';

@@ -17,8 +17,7 @@
  *
  */
 
-import type {TranslationKey} from 'Util/localizerUtil';
-
+import type {TranslationKey} from '../../../../util/localizerUtil';
 import type {MeetingSubmitErrors} from '../../meetingSubmitErrors';
 import {type ScheduleMeetingMode, scheduleMeetingModes} from '../../scheduleMeetingModal/scheduleMeetingTypes';
 

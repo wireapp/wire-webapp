@@ -46,11 +46,6 @@ import {Cancelable, debounce} from 'underscore';
 
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
-import type {Translate} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/logger';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-import {truncate} from 'Util/stringUtil';
-
 import {CallMessage} from './message/callMessage';
 import type {ContentMessage} from './message/contentMessage';
 import type {Message} from './message/message';
@@ -63,6 +58,10 @@ import {ConversationError} from '../../error/conversationError';
 import {isContentMessage, isDeleteMessage} from '../../guards/Message';
 import {StatusType} from '../../message/statusType';
 import {ContentState, useAppState} from '../../page/useAppState';
+import type {Translate} from '../../util/localizerUtil';
+import {getLogger, Logger} from '../../util/logger';
+import {matchQualifiedIds} from '../../util/qualifiedId';
+import {truncate} from '../../util/stringUtil';
 import {WebAppEvents} from '../../webAppEvents';
 import {ClientRepository} from '../client';
 import {ConnectionEntity} from '../connection/connectionEntity';

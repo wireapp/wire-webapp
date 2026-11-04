@@ -19,10 +19,9 @@
 
 import {isEmptyString, isNan, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 
-import {getLogger} from 'Util/logger';
-
 import {Conversation} from '../../../../../repositories/entity/Conversation';
 import {StorageKey} from '../../../../../repositories/storage';
+import {getLogger} from '../../../../../util/logger';
 
 const logger = getLogger('draftUtils');
 

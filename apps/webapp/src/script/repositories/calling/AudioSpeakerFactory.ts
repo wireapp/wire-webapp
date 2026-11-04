@@ -19,7 +19,7 @@
 
 import {isNull} from '@sindresorhus/is';
 
-import {getLogger, Logger} from 'Util/logger';
+import {getLogger, Logger} from '../../util/logger';
 
 export class AudioSpeakerFactory {
   private static readonly logger: Logger = getLogger('AudioSpeakerFactory');

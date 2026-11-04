@@ -21,7 +21,7 @@ import {CSSObject} from '@emotion/serialize';
 
 import {Availability} from '@wireapp/protocol-messaging';
 
-import {CSS_SQUARE} from 'Util/cssMixin';
+import {CSS_SQUARE} from './cssMixin';
 
 import * as Icon from '../components/icon';
 

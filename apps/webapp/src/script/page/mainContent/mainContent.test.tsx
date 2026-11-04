@@ -23,7 +23,7 @@ import {User} from '../../repositories/entity/User';
 import type {AppLockRepository} from '../../repositories/user/appLockRepository';
 import {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../repositories/media/MediaDevicesHandler';
 import {ContentViewModel} from 'src/script/view_model/ContentViewModel';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 
 import {MainContent} from './mainContent';
 

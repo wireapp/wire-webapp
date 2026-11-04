@@ -24,7 +24,7 @@ import {AppLockRepository} from '../../../../../repositories/user/appLockReposit
 import {AppLockState} from '../../../../../repositories/user/appLockState';
 import {Config} from 'src/script/Config';
 import {withTheme} from 'src/script/auth/util/test/testUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

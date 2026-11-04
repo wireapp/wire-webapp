@@ -23,14 +23,13 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import type {Account} from '@wireapp/core';
 
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
-
 import {MLSMigrationStatus} from './migrationStatus';
 import {mlsMigrationLogger} from './MLSMigrationLogger';
 
 import type {ConversationRepository} from '../../repositories/conversation/ConversationRepository';
 import type {Conversation} from '../../repositories/entity/Conversation';
 import type {User} from '../../repositories/entity/User';
+import {TIME_IN_MILLIS} from '../../util/timeUtil';
 
 const MIGRATION_TASK_KEY = 'mls-migration';
 

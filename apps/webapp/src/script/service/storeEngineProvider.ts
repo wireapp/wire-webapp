@@ -24,9 +24,8 @@ import type {CRUDEngine} from '@wireapp/store-engine';
 import {MemoryEngine} from '@wireapp/store-engine';
 import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 
-import {getLogger} from 'Util/logger';
-
 import {DexieDatabase} from '../repositories/storage/dexieDatabase';
+import {getLogger} from '../util/logger';
 
 const storageEncryptionKeyLengthInBytes = 32;
 

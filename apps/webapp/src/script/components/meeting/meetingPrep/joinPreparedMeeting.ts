@@ -20,13 +20,13 @@
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {Config} from 'src/script/Config';
-import type {Translate} from 'Util/localizerUtil';
 
 import {
   showCallNotEstablishedModal,
   type NoInternetCallGuardCopy,
 } from '../../../hooks/useNoInternetCallGuard/useNoInternetCallGuard';
 import type {CallMediaChoice} from '../../../repositories/calling/callMediaChoice';
+import type {Translate} from '../../../util/localizerUtil';
 import {PrimaryModal} from '../../Modals/PrimaryModal';
 import {joinMeetingCall, type JoinMeetingCallDeps} from '../joinMeetingCall';
 import {handleJoinMeetingCallResult} from '../useJoinMeetingCall';

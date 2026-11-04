@@ -26,8 +26,6 @@ import {LexicalEditor, $createTextNode, $insertNodes} from 'lexical';
 import {container} from 'tsyringe';
 
 import {disableMessagePreprocessingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {MessageContent} from './common/messageContent/messageContent';
 import {FilePreviews} from './filePreviews/filePreviews';
@@ -62,6 +60,8 @@ import {StorageRepository} from '../../repositories/storage';
 import {TeamState} from '../../repositories/team/TeamState';
 import {EventName} from '../../repositories/tracking/eventName';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from '../../repositories/user/typingIndicatorMode';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
+import {TIME_IN_MILLIS} from '../../util/timeUtil';
 import {WebAppEvents} from '../../webAppEvents';
 import {Avatar, AVATAR_SIZE} from '../avatar';
 import {ConversationClassifiedBar} from '../classifiedBar/classifiedBar';

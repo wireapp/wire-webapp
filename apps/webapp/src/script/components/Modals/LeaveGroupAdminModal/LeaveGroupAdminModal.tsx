@@ -23,9 +23,6 @@ import {isNonEmptyObject, isNullOrUndefined} from '@sindresorhus/is';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {handleEscDown} from 'Util/keyboardUtil';
-import type {Translate} from 'Util/localizerUtil';
-
 import {AdminSearchInput} from './AdminSearchInput';
 import {
   actionGroupStyles,
@@ -38,6 +35,8 @@ import {
 } from './styles';
 import {useLeaveGroupAdminModalStore} from './useLeaveGroupAdminModalStore';
 
+import {handleEscDown} from '../../../util/keyboardUtil';
+import type {Translate} from '../../../util/localizerUtil';
 import * as Icon from '../../icon';
 import {ModalComponent} from '../ModalComponent';
 

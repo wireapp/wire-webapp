@@ -23,13 +23,12 @@ import {isOddInteger} from '@sindresorhus/is';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {formatDateShort} from 'Util/timeUtil';
-
 import {Avatar, AVATAR_SIZE} from '../../../../../components/avatar';
 import type {ContentMessage} from '../../../../../repositories/entity/message/contentMessage';
 import type {Text} from '../../../../../repositories/entity/message/text';
+import {useKoSubscribableChildren} from '../../../../../util/componentUtil';
+import {handleKeyDown, KEY} from '../../../../../util/keyboardUtil';
+import {formatDateShort} from '../../../../../util/timeUtil';
 
 interface FullSearchItemProps {
   formatText: (text: string) => {matches: number; parts: string[]};

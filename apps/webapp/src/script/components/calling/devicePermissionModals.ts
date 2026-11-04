@@ -20,8 +20,8 @@
 import {amplify} from 'amplify';
 
 import {Config} from 'src/script/Config';
-import type {Translate} from 'Util/localizerUtil';
 
+import type {Translate} from '../../util/localizerUtil';
 import {WebAppEvents} from '../../webAppEvents';
 import {PrimaryModal} from '../Modals/PrimaryModal';
 import type {PrimaryModalTranslatedMessage} from '../Modals/PrimaryModal/PrimaryModalTypes';

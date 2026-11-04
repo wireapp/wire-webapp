@@ -34,9 +34,9 @@ import {User} from '../../../repositories/entity/User';
 import {SearchRepository} from '../../../repositories/search/searchRepository';
 import {TeamRepository} from '../../../repositories/team/TeamRepository';
 import {UserRepository} from '../../../repositories/user/userRepository';
-import {translateForTest} from 'Util/test/translateForTest';
-import {setStrings, translate} from 'Util/localizerUtil';
-import {splitFingerprint} from 'Util/stringUtil';
+import {translateForTest} from '../../../util/test/translateForTest';
+import {setStrings, translate} from '../../../util/localizerUtil';
+import {splitFingerprint} from '../../../util/stringUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

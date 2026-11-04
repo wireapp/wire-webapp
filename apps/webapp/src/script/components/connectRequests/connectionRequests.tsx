@@ -27,11 +27,11 @@ import {Button, ButtonVariant, IconButton, IconButtonVariant, useMatchMedia} fro
 import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useAppMainState, ViewType} from 'src/script/page/state';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {User} from '../../repositories/entity/User';
 import {TeamState} from '../../repositories/team/TeamState';
 import {UserState} from '../../repositories/user/userState';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {Avatar, AVATAR_SIZE} from '../avatar';
 import {UserClassifiedBar} from '../classifiedBar/classifiedBar';
 import {UnverifiedUserWarning} from '../Modals/UserModal';

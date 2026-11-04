@@ -23,8 +23,6 @@ import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-
 import {ChooseScreen} from './ChooseScreen';
 import {FullscreenVideoCall} from './FullscreenVideoCall';
 import {useCallAlertState} from './useCallAlertState';
@@ -38,6 +36,7 @@ import {useVideoGrid} from '../../repositories/calling/videoGridHandler';
 import {MediaDevicesHandler} from '../../repositories/media/MediaDevicesHandler';
 import {useMediaDevicesStore} from '../../repositories/media/useMediaDevicesStore';
 import {PropertiesRepository} from '../../repositories/properties/propertiesRepository';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {CallViewTab} from '../../view_model/CallingViewModel';
 
 interface CallingContainerProps {

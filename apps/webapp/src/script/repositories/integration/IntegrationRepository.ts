@@ -22,15 +22,14 @@ import type {ConversationMemberJoinEvent} from '@wireapp/api-client/lib/event/';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {getLogger, Logger} from 'Util/logger';
-import {compareTransliteration, sortByPriority} from 'Util/stringUtil';
-import {toError} from 'Util/toError';
-
 import {IntegrationMapper} from './IntegrationMapper';
 import type {IntegrationService} from './IntegrationService';
 import {ProviderEntity} from './ProviderEntity';
 import {ServiceEntity} from './ServiceEntity';
 
+import {getLogger, Logger} from '../../util/logger';
+import {compareTransliteration, sortByPriority} from '../../util/stringUtil';
+import {toError} from '../../util/toError';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import {ConversationState} from '../conversation/ConversationState';
 import {MemberLeaveEvent} from '../conversation/EventBuilder';

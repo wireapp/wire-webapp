@@ -21,8 +21,7 @@ import {CSSObject} from '@emotion/react';
 
 import {Availability as AvailabilityProp} from '@wireapp/protocol-messaging';
 
-import {CSS_SQUARE} from 'Util/cssMixin';
-
+import {CSS_SQUARE} from '../../util/cssMixin';
 import {AVATAR_SIZE} from '../avatar';
 
 const defaultAvailabilityIconSizeInPixels = 8;

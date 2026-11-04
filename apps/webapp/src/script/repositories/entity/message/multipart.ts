@@ -23,12 +23,11 @@ import ko from 'knockout';
 
 import {IAttachment, ICellAsset} from '@wireapp/protocol-messaging';
 
-import {renderMessage} from 'Util/messageRenderer';
-
 import {Asset} from './asset';
 import type {LinkPreview} from './linkPreview';
 
 import type {MentionEntity} from '../../../message/mentionEntity';
+import {renderMessage} from '../../../util/messageRenderer';
 import {AssetType} from '../../assets/assetType';
 import {containsOnlyLink} from '../../conversation/linkPreviews/helpers';
 import {mediaParser} from '../../media/MediaParser';

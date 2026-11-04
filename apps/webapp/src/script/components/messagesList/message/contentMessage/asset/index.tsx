@@ -23,8 +23,6 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import cx from 'classnames';
 
 import {StatusType} from 'src/script/message/statusType';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {includesOnlyEmojis} from 'Util/emojiUtil';
 
 import {AudioAsset} from './audioAsset/audioAsset';
 import {FileAsset} from './fileAsset/fileAsset';
@@ -47,6 +45,8 @@ import type {Location} from '../../../../../repositories/entity/message/location
 import type {MediumImage} from '../../../../../repositories/entity/message/mediumImage';
 import {Multipart} from '../../../../../repositories/entity/message/multipart';
 import {Text} from '../../../../../repositories/entity/message/text';
+import {useKoSubscribableChildren} from '../../../../../util/componentUtil';
+import {includesOnlyEmojis} from '../../../../../util/emojiUtil';
 import {ReadIndicator} from '../../readIndicator';
 
 interface ContentAssetProps {

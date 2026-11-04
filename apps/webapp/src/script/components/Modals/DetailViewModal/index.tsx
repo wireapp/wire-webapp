@@ -24,12 +24,6 @@ import {isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 
-import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-import type {Translate} from 'Util/localizerUtil';
-import {renderElement} from 'Util/renderElement';
-import {preventFocusOutside} from 'Util/util';
-import {waitFor} from 'Util/waitFor';
-
 import {DetailViewModalFooter} from './DetailViewModalFooter';
 import {DetailViewModalHeader} from './DetailViewModalHeader';
 
@@ -43,6 +37,11 @@ import {Conversation} from '../../../repositories/entity/Conversation';
 import {ContentMessage} from '../../../repositories/entity/message/contentMessage';
 import {MediumImage} from '../../../repositories/entity/message/mediumImage';
 import {User} from '../../../repositories/entity/User';
+import {handleKeyDown, KEY} from '../../../util/keyboardUtil';
+import type {Translate} from '../../../util/localizerUtil';
+import {renderElement} from '../../../util/renderElement';
+import {preventFocusOutside} from '../../../util/util';
+import {waitFor} from '../../../util/waitFor';
 import {WebAppEvents} from '../../../webAppEvents';
 import {ZoomableImage} from '../../ZoomableImage';
 

@@ -31,7 +31,7 @@ import type {CallingRepository} from '../../../../../../repositories/calling/Cal
 import type {ConversationRepository} from '../../../../../../repositories/conversation/ConversationRepository';
 import {User} from '../../../../../../repositories/entity/User';
 import type {MeetingsRepository} from '../../../../../../repositories/meetings/meetingsRepository';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

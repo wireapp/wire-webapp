@@ -22,8 +22,6 @@ import type {FunctionComponent} from 'react';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {container} from 'tsyringe';
 
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-
 import {DetachedWindow} from './components/DetachedWindow';
 
 import {Call} from '../../../repositories/calling/Call';
@@ -31,6 +29,7 @@ import {CallingRepository} from '../../../repositories/calling/CallingRepository
 import {CallingViewMode, CallState, DesktopScreenShareMenu} from '../../../repositories/calling/CallState';
 import {PropertiesRepository} from '../../../repositories/properties/propertiesRepository';
 import {UserState} from '../../../repositories/user/userState';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {CallingContainer} from '../CallingOverlayContainer';
 import {WindowContextProvider} from '../useWindow';
 

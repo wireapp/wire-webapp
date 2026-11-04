@@ -37,7 +37,7 @@ import {Core} from 'src/script/service/coreSingleton';
 import {generateAPIConversation} from 'test/helper/ConversationGenerator';
 
 import {E2EICertificateDetails} from './e2eiCertificateDetails';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../../../../util/test/translateForTest';
 
 const generateIdentity = (status: MLSStatuses, credentialType = CredentialType.X509): WireIdentity => {
   return {

@@ -17,7 +17,7 @@
  *
  */
 
-import type {TranslationKey} from 'Util/localizerUtil';
+import type {TranslationKey} from '../../../util/localizerUtil';
 
 export type PrimaryModalTranslatedValue = {
   readonly alternatePlaceholders: readonly string[];

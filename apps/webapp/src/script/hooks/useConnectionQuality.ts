@@ -22,7 +22,7 @@ import {useEffect, useState} from 'react';
 import {isNull} from '@sindresorhus/is';
 import {noop} from 'noop-esm';
 
-import {getConnectionQualityHander} from 'Util/connectionQualityHandler';
+import {getConnectionQualityHander} from '../util/connectionQualityHandler';
 
 type ConnectionQualityState = {isSlow: boolean};
 

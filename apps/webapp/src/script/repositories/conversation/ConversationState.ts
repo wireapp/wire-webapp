@@ -22,9 +22,6 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
 
-import {matchQualifiedIds} from 'Util/qualifiedId';
-import {sortGroupsByLastEvent} from 'Util/util';
-
 import {
   isMeetingConversation,
   isMLS1to1ConversationWithUser,
@@ -36,6 +33,8 @@ import {
   ProteusConversation,
 } from './ConversationSelectors';
 
+import {matchQualifiedIds} from '../../util/qualifiedId';
+import {sortGroupsByLastEvent} from '../../util/util';
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 import {TeamState} from '../team/TeamState';

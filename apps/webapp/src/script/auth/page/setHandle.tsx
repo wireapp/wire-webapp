@@ -30,12 +30,12 @@ import {Button, ContainerXS, Form, Input, InputBlock, InputSubmitCombo, Text} fr
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {navigate} from 'src/script/router/Router';
-import {storeValue} from 'Util/storageUtil';
-import {isBackendError} from 'Util/typePredicateUtil';
 
 import {Page} from './page';
 
 import {StorageKey} from '../../repositories/storage';
+import {storeValue} from '../../util/storageUtil';
+import {isBackendError} from '../../util/typePredicateUtil';
 import {AcceptNewsModal} from '../component/acceptNewsModal';
 import {AccountRegistrationLayout} from '../component/accountRegistrationLayout';
 import {EXTERNAL_ROUTE} from '../externalRoute';

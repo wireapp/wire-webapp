@@ -27,7 +27,7 @@ import {User} from '../../../../../../repositories/entity/User';
 import {Conversation} from '../../../../../../repositories/entity/Conversation';
 import {ConversationState} from '../../../../../../repositories/conversation/ConversationState';
 import {UserState} from '../../../../../../repositories/user/userState';
-import {setStrings, translate} from 'Util/localizerUtil';
+import {setStrings, translate} from '../../../../../../util/localizerUtil';
 import en from '../../../../../../../i18n/en-US.json';
 import {
   createRootContextValueForTest,

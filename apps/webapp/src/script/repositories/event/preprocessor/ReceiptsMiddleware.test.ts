@@ -28,12 +28,12 @@ import type {IncomingEvent} from '../EventProcessor';
 import {ConfirmationEvent} from '../../conversation/EventBuilder';
 import {User} from '../../entity/User';
 import {StatusType} from 'src/script/message/statusType';
-import {createUuid} from 'Util/uuid';
+import {createUuid} from '../../../util/uuid';
 
 import {ReceiptsMiddleware} from './ReceiptsMiddleware';
 
 import {ClientEvent} from '../Client';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 type ReadReceiptEventServiceStub = {
   loadEvents: jest.Mock<Promise<unknown[]>, [conversationId: string, eventIds: string[]]>;

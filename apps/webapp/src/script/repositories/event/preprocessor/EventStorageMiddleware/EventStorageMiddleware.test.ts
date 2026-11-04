@@ -36,14 +36,14 @@ import {
   createMessageAddEvent,
   toSavedEvent,
 } from 'test/helper/EventGenerator';
-import {createUuid} from 'Util/uuid';
+import {createUuid} from '../../../../util/uuid';
 
 import {EventStorageMiddleware} from './EventStorageMiddleware';
 
 import {ClientEvent} from '../../Client';
 import {EventService} from '../../EventService';
 import {EventSource} from '../../EventSource';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 type MappedSessionResetEvent = Extract<

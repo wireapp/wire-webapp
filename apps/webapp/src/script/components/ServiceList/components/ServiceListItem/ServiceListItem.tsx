@@ -22,10 +22,10 @@ import type {FunctionComponent} from 'react';
 import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 
 import {ServiceEntity} from '../../../../repositories/integration/ServiceEntity';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
+import {handleKeyDown, KEY} from '../../../../util/keyboardUtil';
 import {Avatar, AVATAR_SIZE} from '../../../avatar';
 import {ParticipantItemContent} from '../../../participantItemContent';
 import {listItem, listWrapper} from '../../../participantItemContent/participantItem.styles';

@@ -19,11 +19,10 @@
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 
-import {getLogger} from 'Util/logger';
-
 import {QualityTier, QualityTierParams, TIER_DEFINITIONS} from './definitions';
 import {DEFAULT_TUNING} from './tuning';
 
+import {getLogger} from '../../../../util/logger';
 import type {Mode} from '../backgroundEffectsWorkerTypes';
 import type {PerformanceSample} from '../helper/samples';
 

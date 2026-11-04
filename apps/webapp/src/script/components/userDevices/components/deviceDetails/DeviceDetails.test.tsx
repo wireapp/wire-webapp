@@ -32,9 +32,9 @@ import {
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {ConversationState} from '../../../../repositories/conversation/ConversationState';
-import {setStrings, translate} from 'Util/localizerUtil';
-import type {Logger} from 'Util/logger';
-import {translateForTest} from 'Util/test/translateForTest';
+import {setStrings, translate} from '../../../../util/localizerUtil';
+import type {Logger} from '../../../../util/logger';
+import {translateForTest} from '../../../../util/test/translateForTest';
 
 import {Config} from '../../../../Config';
 

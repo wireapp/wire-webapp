@@ -23,7 +23,6 @@ import {isNullOrUndefined} from '@sindresorhus/is';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import {wrapperStyles} from './meetingParticipants.styles';
 import {useMeetingConversation} from './useMeetingConversation';
@@ -31,6 +30,7 @@ import {useMeetingParticipants} from './useMeetingParticipants';
 
 import type {Conversation} from '../../../../../../repositories/entity/Conversation';
 import type {User} from '../../../../../../repositories/entity/User';
+import {matchQualifiedIds} from '../../../../../../util/qualifiedId';
 import {StackedAvatars} from '../../../../../avatar';
 
 interface MeetingParticipantsProps {

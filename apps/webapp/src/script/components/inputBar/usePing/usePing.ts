@@ -21,10 +21,10 @@ import {useState} from 'react';
 
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {MessageRepository} from '../../../repositories/conversation/MessageRepository';
 import {Conversation} from '../../../repositories/entity/Conversation';
+import {TIME_IN_MILLIS} from '../../../util/timeUtil';
 import {PrimaryModal} from '../../Modals/PrimaryModal';
 
 const pingTimeoutInSeconds = 2;

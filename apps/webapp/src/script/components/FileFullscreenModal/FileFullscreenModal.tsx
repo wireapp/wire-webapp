@@ -21,11 +21,6 @@ import {useEffect, useState, type FunctionComponent} from 'react';
 
 import {Maybe} from 'true-myth';
 
-import {isFileEditable} from 'Util/fileTypeUtil';
-import {getFileTypeFromExtension} from 'Util/getFileTypeFromExtension/getFileTypeFromExtension';
-import {getBestPreviewSource} from 'Util/imageUtil';
-import {getFileExtensionFromUrl} from 'Util/util';
-
 import {FileEditor} from './FileEditor/FileEditor';
 import {useFileFullscreenModalSourceConversation} from './FileFullscreenModalSourceConversationContext';
 import {FileHeader} from './FileHeader/FileHeader';
@@ -35,6 +30,10 @@ import {NoPreviewAvailable} from './NoPreviewAvailable/NoPreviewAvailable';
 import {PDFViewer} from './PdfViewer/PdfViewer';
 
 import type {Conversation} from '../../repositories/entity/Conversation';
+import {isFileEditable} from '../../util/fileTypeUtil';
+import {getFileTypeFromExtension} from '../../util/getFileTypeFromExtension/getFileTypeFromExtension';
+import {getBestPreviewSource} from '../../util/imageUtil';
+import {getFileExtensionFromUrl} from '../../util/util';
 import {
   CELLS_ACTION,
   useCellsActionPermissions,

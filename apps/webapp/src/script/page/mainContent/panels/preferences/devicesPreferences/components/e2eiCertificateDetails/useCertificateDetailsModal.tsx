@@ -20,10 +20,10 @@
 import {useCallback, useEffect, useMemo, useState, type FunctionComponent} from 'react';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {downloadFile} from 'Util/util';
 
 import {PrimaryModal, removeCurrentModal} from '../../../../../../../components/Modals/PrimaryModal';
 import {ModalOptions} from '../../../../../../../components/Modals/PrimaryModal/PrimaryModalTypes';
+import {downloadFile} from '../../../../../../../util/util';
 
 const COPY_MESSAGE_TIMEOUT = 3000;
 const DOWNLOAD_CERTIFICATE_TIMEOUT = 500;

@@ -31,16 +31,16 @@ import {PropertiesRepository} from '../../repositories/properties/propertiesRepo
 import {PropertiesService} from '../../repositories/properties/propertiesService';
 import {SelfService} from '../../repositories/self/SelfService';
 import {buildCallingRepository, buildMediaDevicesHandler, withTheme} from 'src/script/auth/util/test/testUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {translate} from 'Util/localizerUtil';
+import {translate} from '../../util/localizerUtil';
 
 import {FullscreenVideoCall, FullscreenVideoCallProps} from './FullscreenVideoCall';
 import {CallingViewMode, CallState} from '../../repositories/calling/CallState';
-import {KEY} from 'Util/keyboardUtil';
+import {KEY} from '../../util/keyboardUtil';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 const useMatchMediaMock = useMatchMedia as jest.Mock;

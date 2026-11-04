@@ -20,11 +20,10 @@
 import {isTruthy} from '@sindresorhus/is';
 import type {Dexie, Transaction} from 'dexie';
 
-import {base64ToArray} from 'Util/util';
-
 import {ConversationRecord} from './record';
 
 import {categoryFromEvent} from '../../message/messageCategorization';
+import {base64ToArray} from '../../util/util';
 
 interface DexieSchema {
   schema: Record<string, string>;
