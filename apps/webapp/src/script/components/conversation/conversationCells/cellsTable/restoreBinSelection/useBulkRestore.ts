@@ -23,14 +23,14 @@ import type {Clock} from '@enormora/clock/clock';
 import {isUndefined} from '@sindresorhus/is';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {observeCellsBackgroundActionJobs} from 'Components/conversation/conversationCells/common/cellsBackgroundActionPolling/cellsBackgroundActionJobs';
-import {createBulkJobPollingPolicy} from 'Components/conversation/conversationCells/common/cellsBackgroundActionPolling/createBulkJobPollingPolicy';
-import {getCellsApiPath} from 'Components/conversation/conversationCells/common/getCellsApiPath/getCellsApiPath';
-import {RECYCLE_BIN_PATH} from 'Components/conversation/conversationCells/common/recycleBin/recycleBin';
-import type {CellsRepository} from 'Repositories/cells/cellsRepository';
-
 import type {RestoreTarget} from './resolveRestoreTargets';
 import {runBulkRestore, type BulkRestoreDependencies, type BulkRestoreOutcome} from './runBulkRestore';
+
+import type {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
+import {observeCellsBackgroundActionJobs} from '../../common/cellsBackgroundActionPolling/cellsBackgroundActionJobs';
+import {createBulkJobPollingPolicy} from '../../common/cellsBackgroundActionPolling/createBulkJobPollingPolicy';
+import {getCellsApiPath} from '../../common/getCellsApiPath/getCellsApiPath';
+import {RECYCLE_BIN_PATH} from '../../common/recycleBin/recycleBin';
 
 export type BulkRestoreReviewReason = Exclude<BulkRestoreOutcome, 'completed'> | 'refresh-failed';
 
@@ -64,12 +64,14 @@ export const useBulkRestore = (options: UseBulkRestoreOptions): BulkRestoreState
   const isMountedRef = useRef(true);
   const isPendingRef = useRef(false);
   const reviewReasonRef = useRef<BulkRestoreReviewReason | null>(null);
+  const generationRef = useRef(0);
   const cancelJobObservationRef = useRef<(() => void) | undefined>(undefined);
 
   useEffect(() => {
     isMountedRef.current = true;
     return () => {
       isMountedRef.current = false;
+      generationRef.current += 1;
       cancelJobObservationRef.current?.();
     };
   }, []);
@@ -122,6 +124,7 @@ export const useBulkRestore = (options: UseBulkRestoreOptions): BulkRestoreState
     }
 
     isPendingRef.current = true;
+    const generation = ++generationRef.current;
     setIsPending(true);
     try {
       const outcome = await runBulkRestore({
@@ -132,12 +135,20 @@ export const useBulkRestore = (options: UseBulkRestoreOptions): BulkRestoreState
         },
         observeJobs,
       });
-      if (!isMountedRef.current || !optionsRef.current.isCurrentScope(scopeKey)) {
+      if (
+        !isMountedRef.current ||
+        generationRef.current !== generation ||
+        !optionsRef.current.isCurrentScope(scopeKey)
+      ) {
         return;
       }
 
       const didRefresh = await refreshAndReportSuccess();
-      if (!isMountedRef.current || !optionsRef.current.isCurrentScope(scopeKey)) {
+      if (
+        !isMountedRef.current ||
+        generationRef.current !== generation ||
+        !optionsRef.current.isCurrentScope(scopeKey)
+      ) {
         return;
       }
 
@@ -147,8 +158,8 @@ export const useBulkRestore = (options: UseBulkRestoreOptions): BulkRestoreState
         updateReviewReason(outcome === 'completed' ? 'refresh-failed' : outcome);
       }
     } finally {
-      isPendingRef.current = false;
-      if (isMountedRef.current) {
+      if (isMountedRef.current && generationRef.current === generation) {
+        isPendingRef.current = false;
         setIsPending(false);
       }
     }
@@ -159,10 +170,11 @@ export const useBulkRestore = (options: UseBulkRestoreOptions): BulkRestoreState
       return;
     }
 
+    const generation = ++generationRef.current;
     setIsRefreshingReview(true);
     try {
       const didRefresh = await refreshAndReportSuccess();
-      if (!isMountedRef.current) {
+      if (!isMountedRef.current || generationRef.current !== generation) {
         return;
       }
 
@@ -171,13 +183,14 @@ export const useBulkRestore = (options: UseBulkRestoreOptions): BulkRestoreState
         optionsRef.current.onRestoreSettled();
       }
     } finally {
-      if (isMountedRef.current) {
+      if (isMountedRef.current && generationRef.current === generation) {
         setIsRefreshingReview(false);
       }
     }
   };
 
   const reset = useCallback((): void => {
+    generationRef.current += 1;
     cancelJobObservationRef.current?.();
     cancelJobObservationRef.current = undefined;
     isPendingRef.current = false;

@@ -22,7 +22,7 @@ import {act, renderHook, waitFor} from '@testing-library/react';
 import {JobsTaskStatus, RestActionStatus} from 'cells-sdk-ts';
 import {Maybe} from 'true-myth';
 
-import {CellNode, CellNodeType} from 'src/script/types/cellNode';
+import {CellNode, CellNodeType} from '../../../../../types/cellNode';
 
 import type {RestoreTarget} from './resolveRestoreTargets';
 import {useBulkRestore, type UseBulkRestoreOptions} from './useBulkRestore';
@@ -249,6 +249,88 @@ describe('useBulkRestore', () => {
     });
 
     expect(restoreNodes).not.toHaveBeenCalled();
+  });
+
+  it('keeps a new restore pending when an earlier scope finishes', async () => {
+    const {restoreNodes, onRestoreSettled, options} = createSetup();
+    const resolvers: Array<(response: {Status: RestActionStatus}) => void> = [];
+    restoreNodes.mockImplementation(() => {
+      return new Promise(resolve => {
+        resolvers.push(resolve);
+      });
+    });
+    let currentScope = 'A';
+    const {result} = renderHook(() => {
+      return useBulkRestore({
+        ...options,
+        isCurrentScope: scope => {
+          return scope === currentScope;
+        },
+      });
+    });
+
+    let restoreA: Promise<void> | undefined;
+    let restoreB: Promise<void> | undefined;
+    act(() => {
+      restoreA = result.current.restore([selected('a.txt')], 'A');
+    });
+    await waitFor(() => {
+      return expect(resolvers).toHaveLength(1);
+    });
+    act(() => {
+      currentScope = 'B';
+      result.current.reset();
+      restoreB = result.current.restore([selected('b.txt')], 'B');
+    });
+    await waitFor(() => {
+      return expect(resolvers).toHaveLength(2);
+    });
+
+    await act(async () => {
+      resolvers[0]({Status: RestActionStatus.Performed});
+      await restoreA;
+    });
+    expect(result.current.isPending).toBe(true);
+    expect(onRestoreSettled).not.toHaveBeenCalled();
+
+    await act(async () => {
+      resolvers[1]({Status: RestActionStatus.Performed});
+      await restoreB;
+    });
+    expect(result.current.isPending).toBe(false);
+    expect(onRestoreSettled).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not let an earlier review refresh clear a new scope selection', async () => {
+    const {restoreNodes, onRefreshAndReportSuccess, onRestoreSettled, options} = createSetup();
+    restoreNodes.mockRejectedValue(new Error('network'));
+    let resolveRefresh: ((success: boolean) => void) | undefined;
+    const {result} = renderHook(() => {
+      return useBulkRestore(options);
+    });
+    await act(async () => {
+      await result.current.restore([selected('a.txt')], 'A');
+    });
+    onRefreshAndReportSuccess.mockImplementationOnce(() => {
+      return new Promise(resolve => {
+        resolveRefresh = resolve;
+      });
+    });
+    let refreshA: Promise<void> | undefined;
+    act(() => {
+      refreshA = result.current.refreshReview();
+    });
+    expect(result.current.isRefreshingReview).toBe(true);
+    act(() => {
+      return result.current.reset();
+    });
+    await act(async () => {
+      resolveRefresh?.(true);
+      await refreshA;
+    });
+    expect(onRestoreSettled).not.toHaveBeenCalled();
+    expect(result.current.reviewReason).toBeNull();
+    expect(result.current.isRefreshingReview).toBe(false);
   });
 
   it('does not refresh or settle when the response arrives after unmount', async () => {
