@@ -187,6 +187,7 @@ function createConversationCoreForTest(): Core {
 function buildConversationRepository(
   translate: Translate,
   isMarkAsUnreadFeatureEnabled: boolean = false,
+  navigateToMeetingJoin?: (url: string) => void,
 ): ConversationRepositoryTestFixture {
   const teamState = new TeamState();
   const conversationState = new ConversationState();
@@ -240,6 +241,7 @@ function buildConversationRepository(
     conversationState,
     {} as any,
     core,
+    navigateToMeetingJoin,
   );
   return [
     conversationRepository,
@@ -301,6 +303,82 @@ describe('conversation group selection', () => {
 describe('ConversationRepository', () => {
   afterEach(() => {
     testFactory.dispose();
+  });
+  describe('native meeting links', () => {
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    it('routes an explicit conversation kind through the existing conversation join flow', async () => {
+      const navigate = jest.fn();
+      const showModal = jest.spyOn(PrimaryModal, 'show').mockImplementation(() => {
+        return undefined;
+      });
+      const [repository, {conversationService}] = buildConversationRepository(translateForTest, false, navigate);
+      conversationService.getConversationJoin = jest.fn().mockResolvedValue({
+        id: 'conversation-id',
+        name: 'Conversation',
+        has_password: false,
+      });
+
+      await repository['onJoinLink']({
+        detail: {kind: 'conversation', domain: 'example.com', key: 'key', code: 'code'},
+      });
+
+      expect(conversationService.getConversationJoin).toHaveBeenCalledWith('key', 'code');
+      expect(showModal).toHaveBeenCalledWith(
+        PrimaryModal.type.CONFIRM,
+        expect.any(Object),
+        undefined,
+        translateForTest,
+      );
+      expect(navigate).not.toHaveBeenCalled();
+    });
+
+    it.each([undefined, null, ''])('rejects a missing meeting domain: %s', async domain => {
+      const navigate = jest.fn();
+      const showModal = jest.spyOn(PrimaryModal, 'show').mockImplementation(() => {
+        return undefined;
+      });
+      const [repository] = buildConversationRepository(translateForTest, false, navigate);
+
+      await repository['onJoinLink']({detail: {kind: 'meeting', domain, key: 'key', code: 'code'}});
+
+      expect(navigate).not.toHaveBeenCalled();
+      expect(showModal).toHaveBeenCalledWith(
+        PrimaryModal.type.ACKNOWLEDGE,
+        expect.objectContaining({
+          text: {
+            message: 'meetingJoin.invalidDescription',
+            title: 'meetingJoin.invalidHeadline',
+          },
+        }),
+        undefined,
+        translateForTest,
+      );
+    });
+  });
+
+  it('routes native meeting events to meeting auth instead of conversation endpoints', async () => {
+    const navigate = jest.fn();
+    const [repository] = buildConversationRepository(translateForTest, false, navigate);
+    await repository['onJoinLink']({
+      detail: {
+        kind: 'meeting',
+        domain: 'example.com',
+        key: 'key&injected=1',
+        code: 'code#fragment',
+        password: 'secret',
+      },
+    });
+    expect(navigate).toHaveBeenCalledTimes(1);
+    const url = new URL(navigate.mock.calls[0][0], 'https://app.example.com');
+    expect(url.pathname).toBe('/meeting-join');
+    expect(url.searchParams.get('domain')).toBe('example.com');
+    expect(url.searchParams.get('key')).toBe('key&injected=1');
+    expect(url.searchParams.get('code')).toBe('code#fragment');
+    expect(url.searchParams.get('password')).toBe('secret');
+    expect(url.searchParams.get('injected')).toBeNull();
   });
 
   const originalPrimaryModalShow = PrimaryModal.show;

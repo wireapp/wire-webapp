@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect, useMemo, useRef, type FunctionComponent} from 'react';
+import {useCallback, useEffect, useRef, type FunctionComponent} from 'react';
 
 import {container} from 'tsyringe';
 
@@ -54,10 +54,6 @@ export const Meetings: FunctionComponent = () => {
     return state.loadMeetings;
   });
   const selfUser = container.resolve(UserState).self();
-  const preview = useMemo(() => {
-    return createMeetingPrepPreview(container.resolve(MediaStreamHandler));
-  }, []);
-  const joinMeeting = useMeetingPrepJoin();
 
   const refreshMeetings = useCallback(() => {
     return fireAndForgetInvoker.fireAndForget(loadMeetings);
@@ -84,12 +80,6 @@ export const Meetings: FunctionComponent = () => {
       <ScheduleMeetingModal />
       <MeetNowModal />
       <RotateMeetingLinkModal />
-      <MeetingPrepModal
-        participant={selfUser}
-        requestPreviewStream={preview.requestPreviewStream}
-        releasePreviewStream={preview.releasePreviewStream}
-        joinMeeting={joinMeeting}
-      />
     </div>
   );
 };
