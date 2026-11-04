@@ -81,6 +81,12 @@ import {
 import {getCellsTableColumns, getCellsTableDataCellLabels} from './cellsTableColumns/cellsTableColumns';
 import {CellsFilePreviewModalProvider} from './common/cellsFilePreviewModalContext/cellsFilePreviewModalContext';
 import {getBulkMoveOutcomeEvidence} from './getBulkMoveOutcomeEvidence';
+import {
+  getDriveDragNodes,
+  hasSameSelection,
+  INTERNAL_DRIVE_DRAG_TYPE,
+  type CapturedDriveDrag,
+} from './getDriveDragNodes';
 import {resolveRestoreTargets} from './restoreBinSelection/resolveRestoreTargets';
 import {showBulkRestoreModal} from './restoreBinSelection/showBulkRestoreModal';
 import {useBulkRestore} from './restoreBinSelection/useBulkRestore';
@@ -168,8 +174,6 @@ const CellsTableHeaderCell: FunctionComponent<CellsTableHeaderCellProps> = ({
   );
 };
 
-const INTERNAL_DRIVE_DRAG_TYPE = 'application/x-wire-drive-nodes';
-
 const dragEventContainsFiles = (event: DragEvent<HTMLElement>): boolean => {
   return Array.from(event.dataTransfer.types).includes('Files');
 };
@@ -215,15 +219,6 @@ type PermanentDeleteReviewMessageKey =
 // Selecting rows only makes sense when at least one of these is available, e.g. never for viewers.
 const BULK_ACTIONS = [CELLS_ACTION.MOVE, CELLS_ACTION.DELETE, CELLS_ACTION.RESTORE];
 
-const hasSameSelection = (selectedNodeIds: ReadonlySet<string>, nodeIds: readonly string[]): boolean => {
-  return (
-    selectedNodeIds.size === nodeIds.length &&
-    nodeIds.every(nodeId => {
-      return selectedNodeIds.has(nodeId);
-    })
-  );
-};
-
 const getPermanentDeleteCheckingMessageKey = (
   reason: PermanentDeleteReviewReason | null,
 ): PermanentDeleteCheckingMessageKey => {
@@ -252,11 +247,6 @@ const getPermanentDeleteReviewMessageKey = (
       return 'cells.bulkDelete.timedOut';
   }
 };
-
-interface CapturedDriveDrag {
-  nodeIds: string[];
-  scopeKey: string;
-}
 
 interface CapturedBulkMoveToBinSelection {
   nodeIds: string[];
@@ -1085,51 +1075,21 @@ export const CellsTable = ({
     }
   };
 
-  const getDriveDragNodes = (destination: CellNode, event: DragEvent<HTMLElement>): CellNode[] | null => {
-    const drag = activeDriveDrag.current;
-    if (
-      drag === null ||
-      !Array.from(event.dataTransfer.types).includes(INTERNAL_DRIVE_DRAG_TYPE) ||
-      drag.scopeKey !== selectionScopeKeyRef.current ||
-      !hasSameSelection(selectedNodeIdsRef.current, drag.nodeIds) ||
-      !canMoveSelection ||
-      destination.type !== CellNodeType.FOLDER ||
-      drag.nodeIds.includes(destination.id)
-    ) {
-      return null;
-    }
-
-    const selected = nodesRef.current.filter(node => {
-      return drag.nodeIds.includes(node.id);
+  const getDriveDragNodesForEvent = (destination: CellNode, event: DragEvent<HTMLElement>): CellNode[] | null => {
+    return getDriveDragNodes({
+      activeDrag: activeDriveDrag.current,
+      dataTransferTypes: Array.from(event.dataTransfer.types),
+      selectedNodeIds: selectedNodeIdsRef.current,
+      selectionScopeKey: selectionScopeKeyRef.current,
+      canMoveSelection,
+      destination,
+      nodes: nodesRef.current,
+      conversationQualifiedId,
     });
-    const destinationPath = normalizeCellsPath(destination.path, conversationQualifiedId);
-    const selectedPaths = selected.map(node => {
-      return normalizeCellsPath(node.path, conversationQualifiedId);
-    });
-    const parentPaths = selectedPaths.map(path => {
-      return path.split('/').slice(0, -1).join('/');
-    });
-    if (
-      selected.length !== drag.nodeIds.length ||
-      parentPaths.every(path => {
-        return path === destinationPath;
-      }) ||
-      !isBulkMoveValid({
-        conversationQualifiedId,
-        destinationPath,
-        selectedNodes: selected.map((node, index) => {
-          return {...node, path: selectedPaths[index]};
-        }),
-      })
-    ) {
-      return null;
-    }
-
-    return selected;
   };
 
   const handleDriveDrop = async (destination: CellNode, event: DragEvent<HTMLTableRowElement>): Promise<void> => {
-    const selected = getDriveDragNodes(destination, event);
+    const selected = getDriveDragNodesForEvent(destination, event);
     activeDriveDrag.current = null;
     setActiveFolderDropTarget(null, false);
     if (selected === null || isDropMoveSubmitting.current) {
@@ -1175,7 +1135,7 @@ export const CellsTable = ({
     return {
       onDragEnter: (event: DragEvent<HTMLTableRowElement>): void => {
         if (!dragEventContainsFiles(event)) {
-          if (getDriveDragNodes(node, event) !== null) {
+          if (getDriveDragNodesForEvent(node, event) !== null) {
             preventDefaultFileDrop(event);
             setActiveFolderDropTarget(node, false);
           }
@@ -1190,7 +1150,7 @@ export const CellsTable = ({
       },
       onDragOver: (event: DragEvent<HTMLTableRowElement>): void => {
         if (!dragEventContainsFiles(event)) {
-          const isValidTarget = getDriveDragNodes(node, event) !== null;
+          const isValidTarget = getDriveDragNodesForEvent(node, event) !== null;
           event.dataTransfer.dropEffect = isValidTarget ? 'move' : 'none';
           if (isValidTarget) {
             preventDefaultFileDrop(event);
