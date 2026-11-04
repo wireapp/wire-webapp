@@ -580,4 +580,55 @@ describe('useBulkRestore', () => {
 
     expect(onRefreshAndReportSuccess).toHaveBeenCalledTimes(1);
   });
+  describe('when the view changes while the Bin refreshes after the restore', () => {
+    it('still reports a completed restore whose refresh succeeded', async () => {
+      const {onRefreshAndReportSuccess, onStatusChange, options} = createSetup();
+      let isScopeCurrent = true;
+      onRefreshAndReportSuccess.mockImplementation(() => {
+        isScopeCurrent = false;
+        return Promise.resolve(true);
+      });
+      const {result} = renderHook(() => {
+        return useBulkRestore({
+          ...options,
+          isCurrentScope: () => {
+            return isScopeCurrent;
+          },
+        });
+      });
+
+      await act(async () => {
+        await result.current.restore([selected('a.txt')], 'bin-scope');
+      });
+
+      expect(onStatusChange).toHaveBeenLastCalledWith('completed');
+    });
+
+    it.each([
+      ['request-failed', () => {return Promise.reject(new Error('network'))}],
+      ['status-unknown', () => {return Promise.resolve({Status: RestActionStatus.Background, BackgroundActions: []})}],
+    ] as const)('still reports the %s outcome instead of leaving the popup on processing', async (outcome, respond) => {
+      const {restoreNodes, onRefreshAndReportSuccess, onStatusChange, options} = createSetup();
+      restoreNodes.mockImplementation(respond);
+      let isScopeCurrent = true;
+      onRefreshAndReportSuccess.mockImplementation(() => {
+        isScopeCurrent = false;
+        return Promise.resolve(true);
+      });
+      const {result} = renderHook(() => {
+        return useBulkRestore({
+          ...options,
+          isCurrentScope: () => {
+            return isScopeCurrent;
+          },
+        });
+      });
+
+      await act(async () => {
+        await result.current.restore([selected('a.txt')], 'bin-scope');
+      });
+
+      expect(onStatusChange).toHaveBeenLastCalledWith(outcome);
+    });
+  });
 });
