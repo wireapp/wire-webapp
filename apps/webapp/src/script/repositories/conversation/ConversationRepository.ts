@@ -108,6 +108,8 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {UserFilter} from 'Repositories/user/userFilter';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
+import {replaceBrowserLocation} from 'src/script/navigation/browserLocation';
+import {meetingJoinPath} from 'src/script/navigation/meetingJoin';
 import {getNextItem} from 'Util/arrayUtil';
 import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/fileTypeUtil';
 import {type Translate} from 'Util/localizerUtil';
@@ -291,6 +293,7 @@ export class ConversationRepository {
     private readonly conversationState = container.resolve(ConversationState),
     private readonly connectionState = container.resolve(ConnectionState),
     private readonly core = container.resolve(Core),
+    private readonly navigateToMeetingJoin = replaceBrowserLocation,
   ) {
     this.eventService = eventRepository.eventService;
     // we register a client mismatch handler agains the message repository so that we can react to missing members
@@ -474,7 +477,7 @@ export class ConversationRepository {
     this.eventService.addEventUpdatedListener(this.updateLocalMessageEntity);
     this.eventService.addEventDeletedListener(this.deleteLocalMessageEntity);
 
-    window.addEventListener<any>(WebAppEvents.CONVERSATION.JOIN, this.onConversationJoin);
+    window.addEventListener<any>(WebAppEvents.CONVERSATION.JOIN, this.onJoinLink);
 
     this.selfRepository.on('selfSupportedProtocolsUpdated', this.initAllLocal1To1Conversations);
     this.userRepository.on('supportedProtocolsUpdated', this.onUserSupportedProtocolsUpdated);
@@ -1749,6 +1752,21 @@ export class ConversationRepository {
       throw error;
     }
   }
+
+  private readonly onJoinLink = async (event: {
+    detail: {code: string; key: string; domain?: string | null; kind?: 'conversation' | 'meeting'; password?: string};
+  }): Promise<void> => {
+    if (event.detail.kind === 'meeting') {
+      const path = meetingJoinPath({...event.detail, domain: event.detail.domain ?? ''});
+      if (path.isNothing) {
+        this.showModal(this.translate('meetingJoin.invalidDescription'), this.translate('meetingJoin.invalidHeadline'));
+        return;
+      }
+      this.navigateToMeetingJoin(path.value);
+      return;
+    }
+    return this.onConversationJoin(event);
+  };
 
   /**
    * Starts the join public conversation flow.

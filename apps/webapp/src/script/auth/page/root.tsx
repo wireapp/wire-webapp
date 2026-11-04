@@ -241,6 +241,8 @@ const RootComponent: FunctionComponent<RootProps & ConnectedProps & DispatchProp
                 <Route path={ROUTE.CLIENTS} element={<ProtectedClientManager />} />
                 <Route path={ROUTE.CONVERSATION_JOIN_INVALID} element={<ConversationJoinInvalid />} />
                 <Route path={ROUTE.CONVERSATION_JOIN} element={<ConversationJoin />} />
+                <Route path={ROUTE.MEETING_JOIN} element={<ConversationJoin />} />
+                <Route path={ROUTE.MEETING_JOIN_INVALID} element={<ConversationJoinInvalid />} />
                 <Route path={ROUTE.HISTORY_INFO} element={<ProtectedHistoryInfo />} />
                 <Route path={`${ROUTE.AUTHORIZE}`} element={<ProtectedOAuthPermissions />} />
                 <Route path={ROUTE.CUSTOM_BACKEND} element={<CustomBackend />} />

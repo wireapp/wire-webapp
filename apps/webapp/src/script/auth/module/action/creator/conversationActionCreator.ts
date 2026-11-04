@@ -21,6 +21,8 @@ import type {ConversationJoinData} from '@wireapp/api-client/lib/conversation/da
 import type {ConversationEvent} from '@wireapp/api-client/lib/event/';
 import type {BackendError} from '@wireapp/api-client/lib/http/';
 
+import {JOIN_LINK_KIND} from '../../../util/joinLink';
+
 import type {AppAction} from '.';
 
 export enum CONVERSATION_ACTION {
@@ -33,6 +35,8 @@ export enum CONVERSATION_ACTION {
   CONVERSATION_CODE_JOIN_FAILED = 'CONVERSATION_CODE_JOIN_FAILED',
   CONVERSATION_CODE_JOIN_START = 'CONVERSATION_CODE_JOIN_START',
   CONVERSATION_CODE_JOIN_SUCCESS = 'CONVERSATION_CODE_JOIN_SUCCESS',
+  JOIN_LINK_PASSWORD_REQUIRED = 'JOIN_LINK_PASSWORD_REQUIRED',
+  MEETING_CODE_JOIN_SUCCESS = 'MEETING_CODE_JOIN_SUCCESS',
 }
 
 export type ConversationActions =
@@ -44,10 +48,13 @@ export type ConversationActions =
   | ConversationCodeGetInfoFailedAction
   | ConversationCodeJoinStartAction
   | ConversationCodeJoinSuccessAction
+  | JoinLinkPasswordRequiredAction
+  | MeetingCodeJoinSuccessAction
   | ConversationCodeJoinFailedAction;
 
 export interface ConversationCodeCheckStartAction extends AppAction {
   readonly type: CONVERSATION_ACTION.CONVERSATION_CODE_CHECK_START;
+  readonly kind?: typeof JOIN_LINK_KIND.MEETING;
 }
 export interface ConversationCodeCheckSuccessAction extends AppAction {
   readonly type: CONVERSATION_ACTION.CONVERSATION_CODE_CHECK_SUCCESS;
@@ -81,16 +88,28 @@ export interface ConversationCodeJoinFailedAction extends AppAction {
   readonly type: CONVERSATION_ACTION.CONVERSATION_CODE_JOIN_FAILED;
 }
 
+export interface MeetingCodeJoinSuccessAction extends AppAction {
+  readonly type: CONVERSATION_ACTION.MEETING_CODE_JOIN_SUCCESS;
+}
+
+export interface JoinLinkPasswordRequiredAction extends AppAction {
+  readonly type: CONVERSATION_ACTION.JOIN_LINK_PASSWORD_REQUIRED;
+}
+
 export class ConversationActionCreator {
-  static startConversationCodeCheck = (): ConversationCodeCheckStartAction => {
+  static startConversationCodeCheck = (kind?: typeof JOIN_LINK_KIND.MEETING): ConversationCodeCheckStartAction => {
     return {
       type: CONVERSATION_ACTION.CONVERSATION_CODE_CHECK_START,
+      ...(kind === JOIN_LINK_KIND.MEETING ? {kind} : {}),
     };
   };
   static successfulConversationCodeCheck = (): ConversationCodeCheckSuccessAction => {
     return {
       type: CONVERSATION_ACTION.CONVERSATION_CODE_CHECK_SUCCESS,
     };
+  };
+  static joinLinkPasswordRequired = (): JoinLinkPasswordRequiredAction => {
+    return {type: CONVERSATION_ACTION.JOIN_LINK_PASSWORD_REQUIRED};
   };
   static failedConversationCodeCheck = (error: Error): ConversationCodeCheckFailedAction => {
     return {
@@ -127,6 +146,9 @@ export class ConversationActionCreator {
       payload: data,
       type: CONVERSATION_ACTION.CONVERSATION_CODE_JOIN_SUCCESS,
     };
+  };
+  static successfulJoinMeetingByCode = (): MeetingCodeJoinSuccessAction => {
+    return {type: CONVERSATION_ACTION.MEETING_CODE_JOIN_SUCCESS};
   };
   static failedJoinConversationByCode = (error: Error | null): ConversationCodeJoinFailedAction => {
     return {

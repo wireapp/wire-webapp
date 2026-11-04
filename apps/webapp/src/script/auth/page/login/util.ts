@@ -33,6 +33,7 @@ import {actionRoot as ROOT_ACTIONS} from '../../module/action';
 import {ValidationError} from '../../module/action/validationError';
 import {ConversationState} from '../../module/reducer/conversationReducer';
 import {QUERY_KEY, ROUTE} from '../../route';
+import {isJoinLinkPasswordError, getJoinLink, JOIN_LINK_KIND} from '../../util/joinLink';
 
 export const requiresPasswordModal = (
   isOpen: boolean,
@@ -40,18 +41,25 @@ export const requiresPasswordModal = (
   conversationError: ConversationState['error'],
 ): boolean => {
   return (
-    !isOpen &&
-    (hasPassword ||
-      (!isNullOrUndefined(conversationError) &&
-        conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD))
+    !isOpen && (hasPassword || (!isNullOrUndefined(conversationError) && isJoinLinkPasswordError(conversationError)))
   );
 };
 
 export const buildDomainRedirectUrl = (welcomeUrl: string, existingQuery: string, clientType: ClientType): string => {
   const [path] = welcomeUrl.split('?');
+  const meeting = getJoinLink();
+  const meetingParams =
+    meeting.kind === JOIN_LINK_KIND.MEETING
+      ? {
+          [QUERY_KEY.MEETING_DOMAIN]: meeting.domain,
+          [QUERY_KEY.MEETING_KEY]: meeting.key,
+          [QUERY_KEY.MEETING_CODE]: meeting.code,
+          ...(isNullOrUndefined(meeting.password) ? {} : {[QUERY_KEY.MEETING_PASSWORD]: meeting.password}),
+        }
+      : {};
   return pathWithParams(
     path,
-    {[QUERY_KEY.CLIENT_TYPE]: clientType, [QUERY_KEY.SSO_AUTO_LOGIN]: true},
+    {...meetingParams, [QUERY_KEY.CLIENT_TYPE]: clientType, [QUERY_KEY.SSO_AUTO_LOGIN]: true},
     undefined,
     existingQuery,
   );

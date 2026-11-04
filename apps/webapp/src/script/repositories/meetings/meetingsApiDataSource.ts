@@ -17,7 +17,7 @@
  *
  */
 
-import type {Meeting, MeetingWithConversation} from '@wireapp/api-client/lib/meetings/meeting';
+import type {CreatedMeetingWithConversation, Meeting} from '@wireapp/api-client/lib/meetings/meeting';
 import type {MeetingsAPI} from '@wireapp/api-client/lib/meetings/meetingsApi';
 
 import type {MeetingsDataSource} from './meetingsDataSource';
@@ -25,7 +25,7 @@ import type {MeetingsDataSource} from './meetingsDataSource';
 export class MeetingsApiDataSource implements MeetingsDataSource {
   constructor(private readonly meetingsApi: MeetingsAPI) {}
 
-  createMeeting(...args: Parameters<MeetingsDataSource['createMeeting']>): Promise<MeetingWithConversation> {
+  createMeeting(...args: Parameters<MeetingsDataSource['createMeeting']>): Promise<CreatedMeetingWithConversation> {
     return this.meetingsApi.createMeeting(...args);
   }
 
