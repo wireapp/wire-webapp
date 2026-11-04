@@ -22,10 +22,6 @@ import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
 
-import {getLogger, Logger} from 'Util/logger';
-import {toError} from 'Util/toError';
-import {isErrorWithType} from 'Util/typePredicateUtil';
-
 import {MediaConstraintsHandler, ScreensharingMethods} from './MediaConstraintsHandler';
 import {MEDIA_STREAM_ERROR} from './MediaStreamError';
 import {isMediaStreamReadDeviceError, MEDIA_STREAM_ERROR_TYPES} from './MediaStreamErrorTypes';
@@ -34,6 +30,9 @@ import {MediaType} from './MediaType';
 import {MediaError} from '../../error/mediaError';
 import {NoAudioInputError} from '../../error/noAudioInputError';
 import {PermissionError} from '../../error/permissionError';
+import {getLogger, Logger} from '../../util/logger';
+import {toError} from '../../util/toError';
+import {isErrorWithType} from '../../util/typePredicateUtil';
 import {Warnings} from '../../view_model/WarningsContainer';
 import {CallingViewMode, CallState} from '../calling/CallState';
 import {BrowserPermissionStatus} from '../permission/BrowserPermissionStatus';

@@ -19,10 +19,10 @@
 
 import {ClientEntity} from '../../client/ClientEntity';
 import {ACCENT_ID} from 'src/script/Config';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
+import {TIME_IN_MILLIS} from '../../../util/timeUtil';
 
 import {User} from './User';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 describe('User', () => {
   describe('Initials', () => {

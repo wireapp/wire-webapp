@@ -25,16 +25,6 @@ import cx from 'classnames';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {handleEnterDown} from 'Util/keyboardUtil';
-import {
-  createReactTranslationMarker,
-  renderReactTranslation,
-  replaceReactComponents,
-} from 'Util/localizerUtil/reactLocalizerUtil';
-import type {Translate} from 'Util/localizerUtil/translationTypes';
-import {splitFingerprint} from 'Util/stringUtil';
-import {toError} from 'Util/toError';
-import {isErrorWithCode} from 'Util/typePredicateUtil';
 
 import {useLegalHoldModalState} from './LegalHoldModal.state';
 
@@ -46,6 +36,16 @@ import {CryptographyRepository} from '../../../repositories/cryptography/Cryptog
 import {User} from '../../../repositories/entity/User';
 import {SearchRepository} from '../../../repositories/search/searchRepository';
 import {TeamRepository} from '../../../repositories/team/TeamRepository';
+import {handleEnterDown} from '../../../util/keyboardUtil';
+import {
+  createReactTranslationMarker,
+  renderReactTranslation,
+  replaceReactComponents,
+} from '../../../util/localizerUtil/reactLocalizerUtil';
+import type {Translate} from '../../../util/localizerUtil/translationTypes';
+import {splitFingerprint} from '../../../util/stringUtil';
+import {toError} from '../../../util/toError';
+import {isErrorWithCode} from '../../../util/typePredicateUtil';
 import * as Icon from '../../icon';
 import {LegalHoldDot} from '../../LegalHoldDot';
 import {UserDevicesState, UserDevices} from '../../userDevices';

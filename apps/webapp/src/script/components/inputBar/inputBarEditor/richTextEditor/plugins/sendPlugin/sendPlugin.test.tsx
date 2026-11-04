@@ -27,7 +27,7 @@ import {useEffect, type FunctionComponent} from 'react';
 import {act, render} from '@testing-library/react';
 
 import {Config} from 'src/script/Config';
-import {unwrap} from 'Util/test/resultTestSupport';
+import {unwrap} from '../../../../../../util/test/resultTestSupport';
 
 import {editorConfig} from '../../editorConfig';
 import {SendPlugin} from './sendPlugin';

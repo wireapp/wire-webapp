@@ -22,9 +22,9 @@ import {FunctionComponent, useEffect} from 'react';
 import {Maybe} from 'true-myth';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {PrimaryModal} from '../../../components/Modals/PrimaryModal';
+import {TIME_IN_MILLIS} from '../../../util/timeUtil';
 
 const forceReloadDelayMultiplier = 60;
 

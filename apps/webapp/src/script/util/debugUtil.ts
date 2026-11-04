@@ -42,10 +42,9 @@ import {container} from 'tsyringe';
 
 import {AvsDebugger} from '@wireapp/avs-debugger';
 
-import {translate} from 'Util/localizerUtil';
-import {getStorage} from 'Util/localStorage';
-import {getLogger, Logger} from 'Util/logger';
-
+import {translate} from './localizerUtil';
+import {getStorage} from './localStorage';
+import {getLogger, Logger} from './logger';
 import {TIME_IN_MILLIS} from './timeUtil';
 import {downloadBlob} from './util';
 import {createUuid} from './uuid';

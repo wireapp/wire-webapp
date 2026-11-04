@@ -24,7 +24,7 @@ import {SELFIE_MULTICLASS_MODEL_PATH, SELFIE_SEGMENTER_MODEL_PATH} from './backg
 import {detectCapabilities} from './backgroundEffects';
 
 // Mocks
-jest.mock('Util/localStorage', () => {
+jest.mock('../../util/localStorage', () => {
   return {
     getStorage: jest.fn(),
   };
@@ -74,7 +74,7 @@ describe('BackgroundEffectsHandler', () => {
       setItem: jest.fn(),
     };
 
-    const {getStorage} = require('Util/localStorage');
+    const {getStorage} = require('../../util/localStorage');
     getStorage.mockReturnValue(mockStorage);
     (detectCapabilities as jest.Mock).mockReturnValue({webgl2: true});
   });

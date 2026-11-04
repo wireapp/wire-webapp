@@ -27,7 +27,7 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {LocationAsset} from './locationAsset';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../../util/test/translateForTest';
 
 describe('LocationAsset', () => {
   const rootProviderWrapper = createRootProviderWrapperForTest(

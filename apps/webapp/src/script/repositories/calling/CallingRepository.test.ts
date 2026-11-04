@@ -55,7 +55,7 @@ import {MediaType} from '../media/MediaType';
 import {UserRepository} from '../user/userRepository';
 import type {ServerTimeHandler} from 'src/script/time/serverTimeHandler';
 import {TestFactory} from 'test/helper/TestFactory';
-import {createUuid} from 'Util/uuid';
+import {createUuid} from '../../util/uuid';
 
 import {Call} from './Call';
 import {CallingRepository, MediaStreamQuery, setupDetachedWindowExternalLinksClick} from './CallingRepository';
@@ -70,14 +70,14 @@ import {buildMediaDevicesHandler, createConversation, createSelfParticipant} fro
 import {Core} from '../../service/coreSingleton';
 import {Warnings} from '../../view_model/WarningsContainer';
 import {z} from 'zod';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 import {MessageRepository} from '../conversation/MessageRepository';
 import {MediaStreamHandler} from '../media/MediaStreamHandler';
 import {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import {BackgroundEffectsHandler, ReleasableMediaStream} from '../media/backgroundEffectsHandler';
 import {APIClient} from '../../service/apiClientSingleton';
 import {ConversationState} from '../conversation/ConversationState';
-import {Translate} from 'Util/localizerUtil';
+import {Translate} from '../../util/localizerUtil';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {BackgroundEffectSelection} from '../media/VideoBackgroundEffects';
 import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';

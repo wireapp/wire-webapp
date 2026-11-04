@@ -25,10 +25,10 @@ import cx from 'classnames';
 import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {noop} from 'Util/util';
 
 import {DraggableClickWrapper} from '../../../components/draggableClickWrapper';
 import * as Icon from '../../../components/icon';
+import {noop} from '../../../util/util';
 
 interface PanelHeaderProps {
   onClose: () => void;

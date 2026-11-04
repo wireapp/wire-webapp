@@ -26,16 +26,16 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 
 import {Config} from 'src/script/Config';
-import {Environment} from 'Util/environment';
-import {type Translate} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/logger';
-import {loadValue} from 'Util/storageUtil';
 
 import type {PropertiesService} from './propertiesService';
 import {PROPERTIES_TYPE, UserConsentStatus} from './propertiesType';
 
 import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {PrimaryModalType} from '../../components/Modals/PrimaryModal/PrimaryModalTypes';
+import {Environment} from '../../util/environment';
+import {type Translate} from '../../util/localizerUtil';
+import {getLogger, Logger} from '../../util/logger';
+import {loadValue} from '../../util/storageUtil';
 import {WebAppEvents} from '../../webAppEvents';
 import type {User} from '../entity/User';
 import type {SelfService} from '../self/SelfService';

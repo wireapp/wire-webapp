@@ -17,11 +17,10 @@
  *
  */
 
-import type {Translate} from 'Util/localizerUtil';
-
 import {Message} from './message';
 
 import {SuperType} from '../../../message/superType';
+import type {Translate} from '../../../util/localizerUtil';
 
 export class DeleteMessage extends Message {
   public deleted_timestamp: null | number;

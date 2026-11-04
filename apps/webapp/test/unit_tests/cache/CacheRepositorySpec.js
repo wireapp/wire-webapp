@@ -21,7 +21,7 @@ import {amplify} from 'amplify';
 
 import {CacheRepository} from '../../../src/script/repositories/cache/cacheRepository';
 import {StorageKey} from '../../../src/script/repositories/storage/storageKey';
-import {createUuid} from 'Util/uuid';
+import {createUuid} from '../../../src/script/util/uuid';
 
 describe('CacheRepository', () => {
   const TEMP_KEY = 'should_be_deleted';

@@ -36,12 +36,12 @@ import {
   requireValueForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {CallActions} from 'src/script/view_model/CallingViewModel';
-import {createUuid} from 'Util/uuid';
+import {createUuid} from '../../../util/uuid';
 
 import {CallingCell, CallingCellProps} from './CallingCell';
 
 import {buildMediaDevicesHandler} from '../../../auth/util/test/testUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 const mockCallAlertState = {

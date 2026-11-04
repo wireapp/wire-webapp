@@ -26,9 +26,6 @@ import {UserType, QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import {type Translate} from 'Util/localizerUtil';
-import {isBackendError} from 'Util/typePredicateUtil';
-
 import type {MainViewModel} from './MainViewModel';
 
 import {useLeaveGroupAdminModalStore} from '../components/Modals/LeaveGroupAdminModal/useLeaveGroupAdminModalStore';
@@ -47,6 +44,8 @@ import type {ServiceEntity} from '../repositories/integration/ServiceEntity';
 import {SelfRepository} from '../repositories/self/SelfRepository';
 import {TeamState} from '../repositories/team/TeamState';
 import {UserState} from '../repositories/user/userState';
+import {type Translate} from '../util/localizerUtil';
+import {isBackendError} from '../util/typePredicateUtil';
 import {WebAppEvents} from '../webAppEvents';
 
 type ConnectionRequestResult = {connectionStatus: ConnectionStatus; conversationId: QualifiedId};

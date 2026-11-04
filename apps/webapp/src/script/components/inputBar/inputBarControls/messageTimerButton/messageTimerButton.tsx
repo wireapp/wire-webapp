@@ -26,13 +26,13 @@ import {container} from 'tsyringe';
 import {EphemeralTimings} from 'src/script/ephemeral/EphemeralTimings';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {showContextMenu, type ContextMenuEntry} from 'src/script/ui/contextMenu';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {isSpaceOrEnterKey} from 'Util/keyboardUtil';
-import {DurationUnit, formatDuration} from 'Util/timeUtil';
-import {setContextMenuPosition} from 'Util/util';
 
 import {Conversation} from '../../../../repositories/entity/Conversation';
 import {TeamState} from '../../../../repositories/team/TeamState';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
+import {isSpaceOrEnterKey} from '../../../../util/keyboardUtil';
+import {DurationUnit, formatDuration} from '../../../../util/timeUtil';
+import {setContextMenuPosition} from '../../../../util/util';
 import * as Icon from '../../../icon';
 
 interface MessageTimerButtonProps {

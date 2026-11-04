@@ -33,9 +33,9 @@ import {
 } from 'src/script/e2eIdentity';
 import {E2EIVerificationMessageType} from 'src/script/message/e2eiVerificationMessageType';
 import {Core} from 'src/script/service/coreSingleton';
-import {Logger, getLogger} from 'Util/logger';
-import {waitFor} from 'Util/waitFor';
 
+import {Logger, getLogger} from '../../../../util/logger';
+import {waitFor} from '../../../../util/waitFor';
 import {Conversation} from '../../../entity/Conversation';
 import {User} from '../../../entity/User';
 import {isMLSConversation, MLSCapableConversation, MLSConversation} from '../../ConversationSelectors';

@@ -25,7 +25,6 @@ import {isNonEmptyString} from '@sindresorhus/is';
 import {Tooltip} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {headerIconBadge, headerLabelBadge, headerIconSizeM, headerIconSizeS} from './messageHeader.styles';
 
@@ -33,6 +32,7 @@ import {ContentMessage} from '../../../../repositories/entity/message/contentMes
 import {DeleteMessage} from '../../../../repositories/entity/message/deleteMessage';
 import {User} from '../../../../repositories/entity/User';
 import {ServiceEntity} from '../../../../repositories/integration/ServiceEntity';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 import {AVATAR_SIZE, Avatar} from '../../../avatar';
 import {UserBlockedBadge} from '../../../badge';
 import * as Icon from '../../../icon';

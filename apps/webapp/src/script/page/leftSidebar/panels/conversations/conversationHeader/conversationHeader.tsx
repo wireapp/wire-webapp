@@ -27,8 +27,6 @@ import {CircleCloseIcon, IconButton, Input, SearchIcon} from '@wireapp/react-ui-
 import {useConversationSearch} from 'src/script/page/leftSidebar/panels/conversations/hooks/useConversationSearch';
 import {SidebarTabs} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {handleEnterDown, handleEscDown, isTabKey} from 'Util/keyboardUtil';
-import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {
   button,
@@ -48,6 +46,8 @@ import {useCreateConversationModal} from '../../../../../components/Modals/Creat
 import {ConversationLabel} from '../../../../../repositories/conversation/ConversationLabelRepository';
 import {User} from '../../../../../repositories/entity/User';
 import {generatePermissionHelpers} from '../../../../../repositories/user/userPermission';
+import {handleEnterDown, handleEscDown, isTabKey} from '../../../../../util/keyboardUtil';
+import {useChannelsFeatureFlag} from '../../../../../util/useChannelsFeatureFlag';
 import {WebAppEvents} from '../../../../../webAppEvents';
 
 export const conversationsPanelHeadingId = 'conversations-heading';

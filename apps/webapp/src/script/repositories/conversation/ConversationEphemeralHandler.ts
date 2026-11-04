@@ -23,17 +23,16 @@ import ko from 'knockout';
 
 import {Article, LinkPreview} from '@wireapp/protocol-messaging';
 
-import {getLogger, Logger} from 'Util/logger';
-import {clamp} from 'Util/numberUtil';
-import {obfuscate} from 'Util/stringUtil';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
-import {arrayToBase64, noop} from 'Util/util';
-
 import {AbstractConversationEventHandler} from './AbstractConversationEventHandler';
 import {ConversationMapper} from './ConversationMapper';
 
 import {EphemeralStatusType} from '../../message/ephemeralStatusType';
 import {StatusType} from '../../message/statusType';
+import {getLogger, Logger} from '../../util/logger';
+import {clamp} from '../../util/numberUtil';
+import {obfuscate} from '../../util/stringUtil';
+import {TIME_IN_MILLIS} from '../../util/timeUtil';
+import {arrayToBase64, noop} from '../../util/util';
 import type {Conversation} from '../entity/Conversation';
 import type {ContentMessage} from '../entity/message/contentMessage';
 import {MediumImage} from '../entity/message/mediumImage';

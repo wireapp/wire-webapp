@@ -22,7 +22,7 @@ import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
 import {Conversation} from '../../../src/script/repositories/entity/Conversation';
 import {ConversationType as ConversationTypeAttribute} from '../../../src/script/repositories/tracking/attribute';
 import * as trackingHelpers from '../../../src/script/repositories/tracking/helpers';
-import {createUuid} from 'Util/uuid';
+import {createUuid} from '../../../src/script/util/uuid';
 
 describe('trackingHelpers', () => {
   describe('getConversationType', () => {

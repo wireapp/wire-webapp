@@ -26,12 +26,11 @@ import ko from 'knockout';
 
 import {Availability} from '@wireapp/protocol-messaging';
 
-import type {Translate} from 'Util/localizerUtil';
-import {clamp} from 'Util/numberUtil';
-import {getFirstChar} from 'Util/stringUtil';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
-
 import {ACCENT_ID} from '../../../Config';
+import type {Translate} from '../../../util/localizerUtil';
+import {clamp} from '../../../util/numberUtil';
+import {getFirstChar} from '../../../util/stringUtil';
+import {TIME_IN_MILLIS} from '../../../util/timeUtil';
 import {WebAppEvents} from '../../../webAppEvents';
 import type {AssetRemoteData} from '../../assets/assetRemoteData';
 import type {ClientEntity} from '../../client/ClientEntity';

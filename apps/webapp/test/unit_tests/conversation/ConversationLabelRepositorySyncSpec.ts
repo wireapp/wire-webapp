@@ -27,8 +27,8 @@ import {
 import {Conversation} from '../../../src/script/repositories/entity/Conversation';
 import {PropertiesService} from '../../../src/script/repositories/properties/propertiesService';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
-import {translate} from 'Util/localizerUtil';
-import {createUuid} from 'Util/uuid';
+import {translate} from '../../../src/script/util/localizerUtil';
+import {createUuid} from '../../../src/script/util/uuid';
 
 describe('ConversationLabelRepository Synchronization', () => {
   let conversationLabelRepository: ConversationLabelRepository;

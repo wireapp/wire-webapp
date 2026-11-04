@@ -24,12 +24,12 @@ import cx from 'classnames';
 import {OutlineCheck} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {ReadReceiptStatus} from './readReceiptStatus';
 
 import {Message} from '../../../repositories/entity/message/message';
 import {PingMessage as PingMessageEntity} from '../../../repositories/entity/message/pingMessage';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
 
 interface PingMessageProps {
   message: PingMessageEntity;

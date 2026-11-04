@@ -23,11 +23,11 @@ import {isUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {noop} from 'Util/util';
 
 import {AssetTransferState} from '../../../../../../../repositories/assets/assetTransferState';
 import type {FileAsset} from '../../../../../../../repositories/entity/message/fileAsset';
+import {useKoSubscribableChildren} from '../../../../../../../util/componentUtil';
+import {noop} from '../../../../../../../util/util';
 import {useMessageFocusedTabIndex} from '../../../../util';
 import {AssetLoader} from '../assetLoader/assetLoader';
 

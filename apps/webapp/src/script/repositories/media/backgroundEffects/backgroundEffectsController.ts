@@ -19,8 +19,6 @@
 
 import {isNan, isNullOrUndefined} from '@sindresorhus/is';
 
-import {getLogger, Logger} from 'Util/logger';
-
 import {type CapabilityInfo, type EffectMode, type Metrics, Mode} from './backgroundEffectsWorkerTypes';
 import {detectCapabilities} from './helper/capability';
 import {PerformanceSample} from './helper/samples';
@@ -45,6 +43,7 @@ import {
 import {QUALITY_TIERS, QualityController} from './quality/qualityController';
 import {qualityTierFromModel} from './qualityTierMapping';
 
+import {getLogger, Logger} from '../../../util/logger';
 import {backgroundEffectsStore} from '../useBackgroundEffectsStore';
 import {BackgroundSource} from '../VideoBackgroundEffects';
 

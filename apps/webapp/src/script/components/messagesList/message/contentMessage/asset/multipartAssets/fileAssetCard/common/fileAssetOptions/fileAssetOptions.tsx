@@ -22,11 +22,11 @@ import type {FunctionComponent} from 'react';
 import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {isFileEditable} from 'Util/fileTypeUtil';
-import {forcedDownloadFile, getFileNameWithExtension} from 'Util/util';
 
 import {buttonStyles, iconStyles} from './fileAssetOptions.styles';
 
+import {isFileEditable} from '../../../../../../../../../util/fileTypeUtil';
+import {forcedDownloadFile, getFileNameWithExtension} from '../../../../../../../../../util/util';
 import {
   CELLS_ACTION,
   useCellsActionPermissions,

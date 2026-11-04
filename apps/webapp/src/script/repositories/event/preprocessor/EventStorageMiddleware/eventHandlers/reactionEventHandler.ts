@@ -19,10 +19,9 @@
 
 import {isTruthy} from '@sindresorhus/is';
 
-import {addReaction, userReactionMapToReactionMap} from 'Util/reactionUtil';
-
 import {EventValidationError} from './EventValidationError';
 
+import {addReaction, userReactionMapToReactionMap} from '../../../../../util/reactionUtil';
 import {MessageAddEvent, ReactionEvent} from '../../../../conversation/EventBuilder';
 import {StoredEvent} from '../../../../storage';
 import {CONVERSATION} from '../../../Client';

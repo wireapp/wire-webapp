@@ -36,11 +36,11 @@ import {Button, Checkbox, CheckboxLabel, ErrorMessage, Form, Input, InputBlock, 
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {APIClient} from 'src/script/service/apiClientSingleton';
-import {isBackendError} from 'Util/typePredicateUtil';
 
 import {buildDomainRedirectUrl, handleEnterpriseLogin, handleSSOBackendError, requiresPasswordModal} from './util';
 
 import {Config} from '../../../Config';
+import {isBackendError} from '../../../util/typePredicateUtil';
 import {JoinGuestLinkPasswordModal} from '../../component/joinGuestLinkPasswordModal';
 import {actionRoot as ROOT_ACTIONS} from '../../module/action';
 import {ValidationError} from '../../module/action/validationError';

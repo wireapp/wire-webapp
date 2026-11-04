@@ -22,8 +22,8 @@ import {useEffect, type FunctionComponent} from 'react';
 import {FallbackProps} from 'react-error-boundary';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {getLogger} from 'Util/logger';
 
+import {getLogger} from '../../util/logger';
 import {PrimaryModal} from '../Modals/PrimaryModal';
 
 const logger = getLogger('ErrorFallback');

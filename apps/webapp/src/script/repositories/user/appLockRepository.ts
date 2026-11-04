@@ -21,12 +21,11 @@ import {isNonEmptyString} from '@sindresorhus/is';
 import sodium, {ready} from 'libsodium-wrappers-sumo';
 import {container, singleton} from 'tsyringe';
 
-import type {Translate} from 'Util/localizerUtil';
-
 import {AppLockState} from './appLockState';
 import {UserState} from './userState';
 
 import {PrimaryModal} from '../../components/Modals/PrimaryModal';
+import type {Translate} from '../../util/localizerUtil';
 
 const APP_LOCK_STORAGE = 'app_lock';
 const APP_LOCK_ENABLED_STORAGE = 'app_lock_enabled';

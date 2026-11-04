@@ -23,7 +23,7 @@ import {randomUUID} from 'crypto';
 
 import {User} from '../entity/User';
 import {UserState} from '../user/userState';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 
 import {TeamEntity} from './TeamEntity';
 import {TeamState} from './TeamState';

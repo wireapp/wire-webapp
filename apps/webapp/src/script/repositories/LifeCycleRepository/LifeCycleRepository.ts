@@ -21,9 +21,6 @@ import {isNonEmptyString, isNullOrUndefined, isTruthy} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
 import {replaceBrowserLocation} from 'src/script/navigation/browserLocation';
-import {getLogger, Logger} from 'Util/logger';
-import {includesString} from 'Util/stringUtil';
-import {appendParameter} from 'Util/urlUtil';
 
 import {SIGN_OUT_REASON} from '../../auth/signOutReason';
 import {URLParameter} from '../../auth/urlParameter';
@@ -32,6 +29,9 @@ import {BaseError} from '../../error/baseError';
 import {ClientError} from '../../error/clientError';
 import {externalUrl} from '../../externalRoute';
 import type {Core} from '../../service/coreSingleton';
+import {getLogger, Logger} from '../../util/logger';
+import {includesString} from '../../util/stringUtil';
+import {appendParameter} from '../../util/urlUtil';
 import {WebAppEvents} from '../../webAppEvents';
 import {CacheRepository} from '../cache/cacheRepository';
 import type {ClientRepository} from '../client/ClientRepository';

@@ -34,7 +34,7 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {MainViewModel} from 'src/script/view_model/MainViewModel';
 import {useWarningsState} from 'src/script/view_model/WarningsContainer/WarningsState';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 import {type MeetNowSubmitResult, meetNowSubmitResults, wasMeetNowMeetingCreated} from './meetNowTypes';
 import {useMeetNowSubmit} from './useMeetNowSubmit';

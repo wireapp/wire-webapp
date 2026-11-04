@@ -19,7 +19,7 @@
 
 import {maybe} from 'true-myth';
 
-import {unwrap, unwrapErr} from 'Util/test/resultTestSupport';
+import {unwrap, unwrapErr} from '../../util/test/resultTestSupport';
 
 import {mapScheduleFormToUpdateMeetingCommand} from './mapScheduleFormToUpdateMeetingCommand';
 import type {ScheduleMeetingFormState} from './scheduleMeetingModal/scheduleMeetingTypes';

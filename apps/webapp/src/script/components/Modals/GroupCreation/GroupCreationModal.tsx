@@ -33,10 +33,6 @@ import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/c
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from 'src/script/router/routerBindings';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {checkAppsFeatureAvailability} from 'Util/featureUtil';
-import {handleEnterDown, handleEscDown, isKeyboardEvent} from 'Util/keyboardUtil';
-import {sortUsersByPriority} from 'Util/stringUtil';
 
 import {Config} from '../../../Config';
 import {isProtocolOption, ProtocolOption} from '../../../guards/Protocol';
@@ -50,6 +46,10 @@ import {ConversationRepository} from '../../../repositories/conversation/Convers
 import {User} from '../../../repositories/entity/User';
 import {TeamState} from '../../../repositories/team/TeamState';
 import {UserState} from '../../../repositories/user/userState';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {checkAppsFeatureAvailability} from '../../../util/featureUtil';
+import {handleEnterDown, handleEscDown, isKeyboardEvent} from '../../../util/keyboardUtil';
+import {sortUsersByPriority} from '../../../util/stringUtil';
 import {WebAppEvents} from '../../../webAppEvents';
 import {FadingScrollbar} from '../../fadingScrollbar';
 import * as Icon from '../../icon';

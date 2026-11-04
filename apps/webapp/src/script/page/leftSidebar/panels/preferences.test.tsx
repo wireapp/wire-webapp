@@ -22,7 +22,7 @@ import {render} from '@testing-library/react';
 import {Runtime} from '@wireapp/commons';
 
 import {troubleshooterFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

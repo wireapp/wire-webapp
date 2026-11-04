@@ -21,7 +21,6 @@ import {isUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
 import {Config} from 'src/script/Config';
-import type {Translate, TranslationKey} from 'Util/localizerUtil';
 
 import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {
@@ -31,6 +30,7 @@ import {
   PrimaryModalTranslatedValue,
   PrimaryModalType,
 } from '../../components/Modals/PrimaryModal/PrimaryModalTypes';
+import type {Translate, TranslationKey} from '../../util/localizerUtil';
 import {WebAppEvents} from '../../webAppEvents';
 
 const hideSecondaryBtn = {hideSecondary: true};

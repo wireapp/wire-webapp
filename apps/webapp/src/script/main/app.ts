@@ -39,14 +39,6 @@ import {container} from 'tsyringe';
 import {Runtime} from '@wireapp/commons';
 
 import {createBrowserSystemNotificationApi} from 'src/script/browser/notification/createSystemNotificationApiFromBrowserNotification';
-import {initializeDataDog} from 'Util/dataDog';
-import {DebugUtil} from 'Util/debugUtil';
-import {Environment} from 'Util/environment';
-import {type Translate} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/logger';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-import {durationFrom, formatCoarseDuration, TIME_IN_MILLIS} from 'Util/timeUtil';
-import {AppInitializationStep, checkIndexedDb, InitializationEventLogger} from 'Util/util';
 
 import {refreshApplication} from './applicationRefresh';
 import {reportStartupFailure} from './reportStartupFailure';
@@ -142,6 +134,14 @@ import {AppInitTelemetry} from '../telemetry/app_init/AppInitTelemetry';
 import {AppInitTimingsStep} from '../telemetry/app_init/AppInitTimingsStep';
 import {serverTimeHandler} from '../time/serverTimeHandler';
 import {WindowHandler} from '../ui/windowHandler';
+import {initializeDataDog} from '../util/dataDog';
+import {DebugUtil} from '../util/debugUtil';
+import {Environment} from '../util/environment';
+import {type Translate} from '../util/localizerUtil';
+import {getLogger, Logger} from '../util/logger';
+import {matchQualifiedIds} from '../util/qualifiedId';
+import {durationFrom, formatCoarseDuration, TIME_IN_MILLIS} from '../util/timeUtil';
+import {AppInitializationStep, checkIndexedDb, InitializationEventLogger} from '../util/util';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
 import {Warnings} from '../view_model/WarningsContainer';
 import {WebAppEvents} from '../webAppEvents';
@@ -256,7 +256,7 @@ export class App {
     this.repository = this._setupRepositories();
 
     if (config.FEATURE.ENABLE_DEBUG) {
-      import('Util/debugUtil').then(({DebugUtil}) => {
+      import('../util/debugUtil').then(({DebugUtil}) => {
         this.debug = new DebugUtil(this.repository);
         this.util = {debug: this.debug}; // Alias for QA
       });

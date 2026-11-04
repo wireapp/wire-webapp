@@ -22,11 +22,10 @@ import React, {useEffect, useRef, useState, type FunctionComponent} from 'react'
 import {isNan, isNull, isUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
 
-import {interpolate} from 'Util/arrayUtil';
-import {clamp} from 'Util/numberUtil';
-import {createUuid} from 'Util/uuid';
-
 import {FileAsset} from '../../../../../../../repositories/entity/message/fileAsset';
+import {interpolate} from '../../../../../../../util/arrayUtil';
+import {clamp} from '../../../../../../../util/numberUtil';
+import {createUuid} from '../../../../../../../util/uuid';
 
 const audioLevelValueCount = 256;
 const audioBarSlotWidth = 3;

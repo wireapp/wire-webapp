@@ -20,9 +20,8 @@
 import {isTruthy} from '@sindresorhus/is';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 
-import {getLogger, Logger} from 'Util/logger';
-
 import {StatusType} from '../../../message/statusType';
+import {getLogger, Logger} from '../../../util/logger';
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
 import {supportsReadReceipts} from '../../conversation/ConversationSelectors';
 import {ConfirmationEvent} from '../../conversation/EventBuilder';

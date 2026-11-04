@@ -23,13 +23,13 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 
 import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
-import {type Translate} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/logger';
-import {fixWebsocketString} from 'Util/stringUtil';
-import {TypedEventTarget} from 'Util/typedEventTarget';
-import {createUuid} from 'Util/uuid';
 
 import {PrimaryModal} from '../../components/Modals/PrimaryModal';
+import {type Translate} from '../../util/localizerUtil';
+import {getLogger, Logger} from '../../util/logger';
+import {fixWebsocketString} from '../../util/stringUtil';
+import {TypedEventTarget} from '../../util/typedEventTarget';
+import {createUuid} from '../../util/uuid';
 import {WebAppEvents} from '../../webAppEvents';
 import type {Conversation} from '../entity/Conversation';
 import type {PropertiesService} from '../properties/propertiesService';

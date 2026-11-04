@@ -30,7 +30,7 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {useGetAssetUrl} from './useGetAssetUrl';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../../../../util/test/translateForTest';
 
 type Result = {current: {url: string | undefined; isLoading: boolean; isError: boolean}} | undefined;
 type UseGetAssetUrlEnabledState = {

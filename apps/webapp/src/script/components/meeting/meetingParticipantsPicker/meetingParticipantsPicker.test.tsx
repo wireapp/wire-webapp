@@ -35,7 +35,7 @@ import {
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 import {formatParticipantsFieldLabel} from './formatParticipantsFieldLabel';
 import {MeetingParticipantsPicker} from './meetingParticipantsPicker';

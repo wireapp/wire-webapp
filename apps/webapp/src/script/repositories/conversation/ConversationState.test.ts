@@ -27,7 +27,7 @@ import {TeamState} from '../team/TeamState';
 import {UserState} from '../user/userState';
 
 import {ConversationState} from './ConversationState';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 
 function createConversationState(): ConversationState {
   return new ConversationState(new UserState(), new TeamState());

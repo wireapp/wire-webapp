@@ -20,8 +20,8 @@
 import {act, renderHook} from '@testing-library/react';
 
 import * as checkFileSharingPermissionModule from '../../../conversation/utils/checkFileSharingPermission';
-import type {Translate} from 'Util/localizerUtil';
-import * as TimeUtil from 'Util/timeUtil';
+import type {Translate} from '../../../../util/localizerUtil';
+import * as TimeUtil from '../../../../util/timeUtil';
 
 import {useFilePaste} from './useFilePaste';
 
@@ -33,7 +33,7 @@ jest.mock('../../../conversation/utils/checkFileSharingPermission', () => {
   };
 });
 
-jest.mock('Util/timeUtil', () => {
+jest.mock('../../../../util/timeUtil', () => {
   return {
     formatLocale: jest.fn(),
   };

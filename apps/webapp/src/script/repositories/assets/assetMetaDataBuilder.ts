@@ -19,10 +19,10 @@
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 
-import {chunk} from 'Util/arrayUtil';
-import {capToByte, rootMeanSquare} from 'Util/numberUtil';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
-import {loadFileBuffer} from 'Util/util';
+import {chunk} from '../../util/arrayUtil';
+import {capToByte, rootMeanSquare} from '../../util/numberUtil';
+import {TIME_IN_MILLIS} from '../../util/timeUtil';
+import {loadFileBuffer} from '../../util/util';
 
 export type AudioMetadata = {durationInMillis: number; normalizedLoudness: Uint8Array};
 export type VideoMetadata = {

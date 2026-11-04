@@ -24,9 +24,6 @@ import {match, P} from 'ts-pattern';
 
 import {Account, MLSService} from '@wireapp/core';
 
-import {getLogger} from 'Util/logger';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-
 import {ConversationRepository} from '../repositories/conversation/ConversationRepository';
 import {
   isMLSCapableConversation,
@@ -41,6 +38,8 @@ import {ConversationState} from '../repositories/conversation/ConversationState'
 import {Conversation} from '../repositories/entity/Conversation';
 import {User} from '../repositories/entity/User';
 import {UserState} from '../repositories/user/userState';
+import {getLogger} from '../util/logger';
+import {matchQualifiedIds} from '../util/qualifiedId';
 
 const logger = getLogger('Webapp/MLSConversations');
 

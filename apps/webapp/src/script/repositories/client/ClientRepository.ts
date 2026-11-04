@@ -29,13 +29,6 @@ import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
 
-import {type Translate} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/logger';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-import {loadValue} from 'Util/storageUtil';
-import {toError} from 'Util/toError';
-import {isAxiosError, isErrorWithCode, isErrorWithType} from 'Util/typePredicateUtil';
-
 import {ClientEntity} from './ClientEntity';
 import {constructClientId, parseClientId} from './ClientIdUtil';
 import {ClientMapper} from './ClientMapper';
@@ -47,6 +40,12 @@ import {SIGN_OUT_REASON} from '../../auth/signOutReason';
 import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {ClientError} from '../../error/clientError';
 import {Core} from '../../service/coreSingleton';
+import {type Translate} from '../../util/localizerUtil';
+import {getLogger, Logger} from '../../util/logger';
+import {matchQualifiedIds} from '../../util/qualifiedId';
+import {loadValue} from '../../util/storageUtil';
+import {toError} from '../../util/toError';
+import {isAxiosError, isErrorWithCode, isErrorWithType} from '../../util/typePredicateUtil';
 import {WebAppEvents} from '../../webAppEvents';
 import type {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {User} from '../entity/User';

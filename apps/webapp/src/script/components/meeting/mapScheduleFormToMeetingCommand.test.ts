@@ -21,8 +21,8 @@ import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {maybe} from 'true-myth';
 
 import {User} from '../../repositories/entity/User';
-import {translateForTest} from 'Util/test/translateForTest';
-import {unwrap, unwrapErr} from 'Util/test/resultTestSupport';
+import {translateForTest} from '../../util/test/translateForTest';
+import {unwrap, unwrapErr} from '../../util/test/resultTestSupport';
 
 import {mapScheduleFormToMeetingCommand} from './mapScheduleFormToMeetingCommand';
 import type {ScheduleMeetingFormState} from './scheduleMeetingModal/scheduleMeetingTypes';

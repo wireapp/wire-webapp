@@ -21,12 +21,11 @@ import {isEmptyArray, isNonEmptyArray} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 
-import {renderMessage} from 'Util/messageRenderer';
-
 import {Asset} from './asset';
 import type {LinkPreview} from './linkPreview';
 
 import type {MentionEntity} from '../../../message/mentionEntity';
+import {renderMessage} from '../../../util/messageRenderer';
 import {AssetType} from '../../assets/assetType';
 import {containsOnlyLink} from '../../conversation/linkPreviews/helpers';
 import {mediaParser} from '../../media/MediaParser';

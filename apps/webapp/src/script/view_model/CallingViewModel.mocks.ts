@@ -22,8 +22,6 @@ import {container} from 'tsyringe';
 
 import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
 
-import {type Translate} from 'Util/localizerUtil';
-
 import {CallingViewModel} from './CallingViewModel';
 
 import type {AudioRepository} from '../repositories/audio/audioRepository';
@@ -33,6 +31,7 @@ import {CallState} from '../repositories/calling/CallState';
 import {Conversation} from '../repositories/entity/Conversation';
 import {MediaDevicesHandler} from '../repositories/media/MediaDevicesHandler';
 import {Core} from '../service/coreSingleton';
+import {type Translate} from '../util/localizerUtil';
 
 export const mockCallingRepository = {
   startCall: jest.fn(),

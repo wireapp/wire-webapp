@@ -25,7 +25,7 @@ import {CellsRepository} from '../../../repositories/cells/cellsRepository';
 import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
 import {UserRepository} from '../../../repositories/user/userRepository';
 import {createExecutingFireAndForgetInvokerForTest} from 'src/script/page/testSupport/rootContextTestSupport';
-import type {Logger} from 'Util/logger';
+import type {Logger} from '../../../util/logger';
 
 import {useSearchCellsNodes} from './useSearchCellsNodes';
 

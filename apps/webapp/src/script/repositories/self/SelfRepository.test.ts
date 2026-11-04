@@ -26,7 +26,7 @@ import {container} from 'tsyringe';
 import {ClientEntity} from '../client';
 import {TestFactory} from 'test/helper/TestFactory';
 import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
+import {TIME_IN_MILLIS} from '../../util/timeUtil';
 
 import {SelfRepository} from './SelfRepository';
 import * as SelfSupportedProtocols from './SelfSupportedProtocols/SelfSupportedProtocols';

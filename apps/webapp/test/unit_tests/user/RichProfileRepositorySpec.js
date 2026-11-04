@@ -18,7 +18,7 @@
  */
 
 import {RichProfileRepository} from '../../../src/script/repositories/user/richProfileRepository';
-import {createUuid} from 'Util/uuid';
+import {createUuid} from '../../../src/script/util/uuid';
 
 describe('RichProfileRepository', () => {
   let richProfileRepository;

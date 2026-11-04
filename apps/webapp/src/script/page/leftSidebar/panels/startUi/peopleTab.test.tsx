@@ -33,7 +33,7 @@ import {TeamEntity} from 'src/script/repositories/team/TeamEntity';
 import {TeamRepository} from 'src/script/repositories/team/TeamRepository';
 import {TeamState} from 'src/script/repositories/team/TeamState';
 import {UserState} from 'src/script/repositories/user/userState';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../util/test/translateForTest';
 
 import {PeopleTab, PeopleTabProps, SearchResultsData} from './peopleTab';
 

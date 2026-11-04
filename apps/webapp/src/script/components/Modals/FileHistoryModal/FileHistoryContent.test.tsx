@@ -28,7 +28,7 @@ import {
 
 import {FileHistoryContent} from './FileHistoryContent';
 import {FileVersion} from './types';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 type RenderFileHistoryContent = (fileVersions: Record<string, FileVersion[]>) => ReturnType<typeof render>;
 

@@ -47,7 +47,7 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {CellNode} from 'src/script/types/cellNode';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../../../../util/test/translateForTest';
 
 import {CellsMoveNodeModal} from './cellsMoveNodeModal';
 import type {JSX} from '@emotion/react/jsx-runtime';

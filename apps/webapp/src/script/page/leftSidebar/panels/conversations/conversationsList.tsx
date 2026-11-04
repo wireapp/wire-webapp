@@ -38,10 +38,6 @@ import {WIDTH} from '@wireapp/react-ui-kit';
 
 import {useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {isKeyboardEvent} from 'Util/keyboardUtil';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-import {isConversationEntity} from 'Util/typePredicateUtil';
 
 import {ConnectionRequests} from './connectionRequests';
 import {
@@ -66,6 +62,10 @@ import {Conversation} from '../../../../repositories/entity/Conversation';
 import {User} from '../../../../repositories/entity/User';
 import {generateConversationUrl} from '../../../../router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from '../../../../router/routerBindings';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
+import {isKeyboardEvent} from '../../../../util/keyboardUtil';
+import {matchQualifiedIds} from '../../../../util/qualifiedId';
+import {isConversationEntity} from '../../../../util/typePredicateUtil';
 import {ListViewModel} from '../../../../view_model/ListViewModel';
 import {useAppMainState, ViewType} from '../../../state';
 import {ContentState} from '../../../useAppState';

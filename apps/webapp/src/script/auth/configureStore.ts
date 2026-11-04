@@ -28,9 +28,9 @@ import {
 } from 'redux';
 import {withExtraArgument} from 'redux-thunk';
 
-import {LOGGER_NAMESPACE} from 'Util/logger';
-
 import {reducers, type RootState} from './module/reducer';
+
+import {LOGGER_NAMESPACE} from '../util/logger';
 
 type AuthStore = Store<RootState, AnyAction>;
 

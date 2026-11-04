@@ -24,8 +24,6 @@ import {amplify} from 'amplify';
 import {CSSTransition, TransitionGroup} from 'react-transition-group';
 import {container} from 'tsyringe';
 
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-
 import {Access} from './access/access';
 import {AddParticipants} from './addParticipants';
 import {ConversationDetails} from './conversationDetails';
@@ -51,6 +49,7 @@ import {ServiceEntity} from '../../repositories/integration/ServiceEntity';
 import {TeamState} from '../../repositories/team/TeamState';
 import {UserState} from '../../repositories/user/userState';
 import {Core} from '../../service/coreSingleton';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {ActionsViewModel} from '../../view_model/ActionsViewModel';
 import {ViewModelRepositories} from '../../view_model/MainViewModel';
 import {WebAppEvents} from '../../webAppEvents';

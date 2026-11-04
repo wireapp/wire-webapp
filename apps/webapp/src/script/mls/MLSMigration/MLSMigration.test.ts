@@ -21,8 +21,8 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {asyncNoop} from 'noop-esm';
 
 import {generateConversation} from 'test/helper/ConversationGenerator';
-import {translateForTest} from 'Util/test/translateForTest';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
+import {translateForTest} from '../../util/test/translateForTest';
+import {TIME_IN_MILLIS} from '../../util/timeUtil';
 
 import {Conversation} from '../../repositories/entity/Conversation';
 import {User} from '../../repositories/entity/User';

@@ -34,9 +34,6 @@ import {
 } from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
-import {forcedDownloadFile, getFileNameWithExtension} from 'Util/util';
 
 import {
   headerStyles,
@@ -57,6 +54,9 @@ import {
 import {createRelativeTimestampFormatter, useRelativeTimestamp} from '../../../hooks/useRelativeTimestamp';
 import {CellsRepository} from '../../../repositories/cells/cellsRepository';
 import type {Conversation} from '../../../repositories/entity/Conversation';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {useChannelsFeatureFlag} from '../../../util/useChannelsFeatureFlag';
+import {forcedDownloadFile, getFileNameWithExtension} from '../../../util/util';
 import {ChannelAvatar, GroupAvatar} from '../../avatar';
 import {FileTypeIcon} from '../../conversation/common/fileTypeIcon/fileTypeIcon';
 import {

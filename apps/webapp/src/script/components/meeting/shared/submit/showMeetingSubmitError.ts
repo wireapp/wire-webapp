@@ -17,10 +17,9 @@
  *
  */
 
-import type {Translate} from 'Util/localizerUtil';
-
 import type {MeetingSubmitErrorTranslationKeys} from './meetingSubmitErrorKeys';
 
+import type {Translate} from '../../../../util/localizerUtil';
 import {PrimaryModal} from '../../../Modals/PrimaryModal';
 import type {MeetingSubmitErrors} from '../../meetingSubmitErrors';
 

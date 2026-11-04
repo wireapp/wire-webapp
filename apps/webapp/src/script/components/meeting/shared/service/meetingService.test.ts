@@ -29,8 +29,8 @@ import type {ConversationRepository} from '../../../../repositories/conversation
 import {Conversation} from '../../../../repositories/entity/Conversation';
 import {User} from '../../../../repositories/entity/User';
 import type {MeetingsRepository} from '../../../../repositories/meetings/meetingsRepository';
-import {translateForTest} from 'Util/test/translateForTest';
-import {unwrapErr} from 'Util/test/resultTestSupport';
+import {translateForTest} from '../../../../util/test/translateForTest';
+import {unwrapErr} from '../../../../util/test/resultTestSupport';
 
 import {meetNowMeeting, scheduleMeeting, updateMeeting} from './meetingService';
 import type {ScheduleMeetingCommand, UpdateMeetingCommand} from '../types/meetingCommandTypes';

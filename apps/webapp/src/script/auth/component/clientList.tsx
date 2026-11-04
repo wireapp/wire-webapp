@@ -28,10 +28,9 @@ import {useNavigate} from 'react-router';
 import {UrlUtil} from '@wireapp/commons';
 import {ContainerXS, Loading} from '@wireapp/react-ui-kit';
 
-import {getLogger} from 'Util/logger';
-
 import {ClientItem} from './clientItem';
 
+import {getLogger} from '../../util/logger';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import * as LocalStorageAction from '../module/action/localStorageAction';
 import {RootState, ThunkDispatch} from '../module/reducer';

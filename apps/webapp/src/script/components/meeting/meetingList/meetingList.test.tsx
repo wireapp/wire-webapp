@@ -35,7 +35,7 @@ import {
   requireValueForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {MainViewModel} from 'src/script/view_model/MainViewModel';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 import {isMeetingListItemLastInDay, MeetingList, type MeetingListProps} from './meetingList';
 

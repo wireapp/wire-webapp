@@ -32,12 +32,6 @@ import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
 
-import {translate} from 'Util/localizerUtil';
-import {getLogger} from 'Util/logger';
-import {enableLogging} from 'Util/loggerUtil';
-import {loadValue} from 'Util/storageUtil';
-import {exposeWrapperGlobals} from 'Util/wrapper';
-
 import {createApplicationServices} from './createApplicationServices';
 
 import {SIGN_OUT_REASON} from '../auth/signOutReason';
@@ -52,6 +46,11 @@ import {doSimpleRedirect} from '../repositories/LifeCycleRepository/LifeCycleRep
 import {StorageKey} from '../repositories/storage';
 import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';
+import {translate} from '../util/localizerUtil';
+import {getLogger} from '../util/logger';
+import {enableLogging} from '../util/loggerUtil';
+import {loadValue} from '../util/storageUtil';
+import {exposeWrapperGlobals} from '../util/wrapper';
 
 retireLegacyServiceWorker({
   serviceWorkerContainer: Maybe.of(navigator.serviceWorker),

@@ -20,10 +20,9 @@
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 
-import {matchQualifiedIds} from 'Util/qualifiedId';
-
 import type {MeetingLifecycleDispatcher} from './createMeetingLifecycleDispatcher';
 
+import {matchQualifiedIds} from '../../../util/qualifiedId';
 import {WebAppEvents} from '../../../webAppEvents';
 import type {MeetingCancellationOptions} from '../meetingNotificationEventHandlers';
 import type {MeetingSeries} from '../types/meetingSeries';

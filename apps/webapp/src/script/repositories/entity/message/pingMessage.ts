@@ -19,11 +19,10 @@
 
 import ko from 'knockout';
 
-import {type Translate} from 'Util/localizerUtil';
-
 import {Message} from './message';
 
 import {SuperType} from '../../../message/superType';
+import {type Translate} from '../../../util/localizerUtil';
 import {ReactionMap} from '../../storage';
 
 const pingAnimationDurationInMilliseconds = 2000;

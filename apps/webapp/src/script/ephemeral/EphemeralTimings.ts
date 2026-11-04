@@ -17,7 +17,7 @@
  *
  */
 
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
+import {TIME_IN_MILLIS} from '../util/timeUtil';
 
 const shortMessageLifetimeInSeconds = 10;
 const shortMessageLifetimeInMinutes = 5;

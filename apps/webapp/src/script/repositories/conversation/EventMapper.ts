@@ -28,13 +28,6 @@ import {container} from 'tsyringe';
 
 import {LinkPreview, Mention} from '@wireapp/protocol-messaging';
 
-import {type Translate} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/logger';
-import {userReactionMapToReactionMap} from 'Util/reactionUtil';
-import {toError} from 'Util/toError';
-import {isErrorWithType} from 'Util/typePredicateUtil';
-import {base64ToArray} from 'Util/util';
-
 import {
   ClientConversationEvent,
   CompositeMessageAddEvent,
@@ -58,6 +51,12 @@ import {QuoteEntity} from '../../message/quoteEntity';
 import {StatusType} from '../../message/statusType';
 import {SystemMessageType} from '../../message/systemMessageType';
 import {APIClient} from '../../service/apiClientSingleton';
+import {type Translate} from '../../util/localizerUtil';
+import {getLogger, Logger} from '../../util/logger';
+import {userReactionMapToReactionMap} from '../../util/reactionUtil';
+import {toError} from '../../util/toError';
+import {isErrorWithType} from '../../util/typePredicateUtil';
+import {base64ToArray} from '../../util/util';
 import {AssetRemoteData} from '../assets/assetRemoteData';
 import {AssetTransferState} from '../assets/assetTransferState';
 import {TERMINATION_REASON} from '../calling/enum/TerminationReason';

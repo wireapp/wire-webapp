@@ -25,10 +25,6 @@ import cx from 'classnames';
 import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {useRoveFocus} from 'src/script/hooks/useRoveFocus';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {isLastReceivedMessage} from 'Util/conversationMessages';
-import {onHitTopOrBottom} from 'Util/DOM/onHitTopOrBottom';
-import {useResizeObserver} from 'Util/DOM/resizeObserver';
 
 import {JumpToLastMessageButton} from './jumpToLastMessageButton';
 import {Message, MessageActions} from './message';
@@ -51,6 +47,10 @@ import {Message as MessageEntity} from '../../repositories/entity/message/messag
 import {User} from '../../repositories/entity/User';
 import {ServiceEntity} from '../../repositories/integration/ServiceEntity';
 import type {UserRepository} from '../../repositories/user/userRepository';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
+import {isLastReceivedMessage} from '../../util/conversationMessages';
+import {onHitTopOrBottom} from '../../util/DOM/onHitTopOrBottom';
+import {useResizeObserver} from '../../util/DOM/resizeObserver';
 import {FadingScrollbar} from '../fadingScrollbar';
 
 const messageScrollDelayInMilliseconds = 10;

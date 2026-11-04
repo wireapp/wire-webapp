@@ -24,7 +24,7 @@ import {act, fireEvent, render, waitFor, type RenderResult} from '@testing-libra
 import {User} from '../../../repositories/entity/User';
 import {generateConversation} from 'test/helper/ConversationGenerator';
 import {withTheme} from 'src/script/auth/util/test/testUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

@@ -20,11 +20,11 @@
 import {useId, type FunctionComponent} from 'react';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {authorLabel, description, header, panel} from './serviceDetails.styles';
 
 import type {ServiceEntity} from '../../repositories/integration/ServiceEntity';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {Avatar, AVATAR_SIZE} from '../avatar';
 
 interface ServiceDetailsProps {

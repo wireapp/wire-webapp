@@ -26,10 +26,10 @@ import {WebAppEvents} from '../../webAppEvents';
 import {ClientEntity} from '../client/ClientEntity';
 import {User} from '../entity/User';
 import {PropertiesRepository} from '../properties/propertiesRepository';
-import {createUuid} from 'Util/uuid';
+import {createUuid} from '../../util/uuid';
 
 import {Notification, PreferenceNotificationRepository} from './PreferenceNotificationRepository';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 
 describe('PreferenceNotificationRepository', () => {
   const user = new User(createUuid(), '', translateForTest);

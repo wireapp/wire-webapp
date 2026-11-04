@@ -32,13 +32,13 @@ import {StartupFeatureToggleName, startupFeatureToggleNames} from 'src/script/fe
 import {updateLocationSearchForStartupFeatureToggle} from 'src/script/featureToggles/startupFeatureToggleQueryParameters';
 import {useClickOutside} from 'src/script/hooks/useClickOutside';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {CoreCryptoLogLevel} from 'Util/debugUtil';
-import {getLogger} from 'Util/logger';
 
 import {wrapperStyles} from './configToolbar.styles';
 import {openDebugToolbarEventName} from './debugToolbarEvents';
 
 import {ConversationState} from '../../repositories/conversation/ConversationState';
+import {CoreCryptoLogLevel} from '../../util/debugUtil';
+import {getLogger} from '../../util/logger';
 
 const timeComponentDigitCount = 2;
 

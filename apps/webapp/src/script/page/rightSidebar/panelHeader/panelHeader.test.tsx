@@ -25,7 +25,7 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {PanelHeader} from './panelHeader';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 const goBackUie = 'back-button';
 const closeUie = 'do-close';

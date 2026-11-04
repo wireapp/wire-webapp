@@ -19,7 +19,7 @@
 
 import {ContentMessage} from '../entity/message/contentMessage';
 import type {EventService} from '../event/EventService';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 
 import {ConversationEphemeralHandler} from './ConversationEphemeralHandler';
 

@@ -22,11 +22,6 @@ import {isValid} from 'date-fns';
 import {escape} from 'underscore';
 import {create} from 'zustand';
 
-import {getLogger} from 'Util/logger';
-import {formatLocale} from 'Util/timeUtil';
-import {noop} from 'Util/util';
-import {createUuid} from 'Util/uuid';
-
 import {
   ButtonAction,
   ModalContent,
@@ -40,6 +35,10 @@ import {
 
 import {Config} from '../../../Config';
 import {ClientNotificationData} from '../../../repositories/notification/PreferenceNotificationRepository';
+import {getLogger} from '../../../util/logger';
+import {formatLocale} from '../../../util/timeUtil';
+import {noop} from '../../../util/util';
+import {createUuid} from '../../../util/uuid';
 
 type PrimaryModalState = {
   errorMessage: string | null;

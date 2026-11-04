@@ -23,10 +23,9 @@ import cx from 'classnames';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-
 import {User} from '../../../../../../repositories/entity/User';
+import {useKoSubscribableChildren} from '../../../../../../util/componentUtil';
+import {handleKeyDown, KEY} from '../../../../../../util/keyboardUtil';
 import {Avatar, AVATAR_SIZE} from '../../../../../avatar';
 import * as Icon from '../../../../../icon';
 

@@ -26,9 +26,9 @@ import cx from 'classnames';
 import {Availability} from '@wireapp/protocol-messaging';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {availabilityStatus} from 'Util/availabilityStatus';
 
 import {ContextMenuEntry} from '../../../../../ui/contextMenu';
+import {availabilityStatus} from '../../../../../util/availabilityStatus';
 import {WebAppEvents} from '../../../../../webAppEvents';
 
 interface AvailabilityInputProps {

@@ -67,7 +67,6 @@ const config: Config = {
     '^@enormora/clock/clock$': '<rootDir>/../../node_modules/@enormora/clock/clock.entry-point.js',
     '^@enormora/clock/deterministic-clock$': '<rootDir>/../../node_modules/@enormora/clock/deterministic-clock.js',
     '^@enormora/fire-and-forget$': '<rootDir>/../../node_modules/@enormora/fire-and-forget/index.js',
-    'Util/(.*)': '<rootDir>/src/script/util/$1',
     '^react$': '<rootDir>/../../node_modules/react',
     '^react/(.*)$': '<rootDir>/../../node_modules/react/$1',
     '.*\\.glsl': 'jest-transform-stub',

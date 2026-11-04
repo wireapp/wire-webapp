@@ -67,10 +67,10 @@ import {QuoteEntity} from 'src/script/message/quoteEntity';
 import {SystemMessageType} from 'src/script/message/systemMessageType';
 import {ContentState, useAppState} from 'src/script/page/useAppState';
 import {entities, payload} from 'test/api/payloads';
-import type {Translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
-import {truncate} from 'Util/stringUtil';
-import {createUuid} from 'Util/uuid';
+import type {Translate} from '../../util/localizerUtil';
+import {translateForTest} from '../../util/test/translateForTest';
+import {truncate} from '../../util/stringUtil';
+import {createUuid} from '../../util/uuid';
 import {createExecutingFireAndForgetInvokerForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {NotificationRepository} from './NotificationRepository';

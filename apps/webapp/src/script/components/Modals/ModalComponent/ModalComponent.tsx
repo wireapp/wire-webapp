@@ -27,8 +27,6 @@ import {createPortal} from 'react-dom';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {noop, preventFocusOutside} from 'Util/util';
-
 import {
   ModalContentStyles,
   ModalContentVisibleStyles,
@@ -36,6 +34,7 @@ import {
   ModalOverlayVisibleStyles,
 } from './ModalComponent.styles';
 
+import {noop, preventFocusOutside} from '../../../util/util';
 import {LoadingIcon} from '../../icon';
 
 interface ModalComponentProps extends HTMLProps<HTMLDivElement> {

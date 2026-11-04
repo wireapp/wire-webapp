@@ -26,11 +26,11 @@ import {Runtime, UrlUtil} from '@wireapp/commons';
 import {COLOR, ContainerXS, FlexBox, Text} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {afterRender} from 'Util/util';
 
 import {Page} from './page';
 
 import {LogoIcon} from '../../components/icon';
+import {afterRender} from '../../util/util';
 import {actionRoot} from '../module/action';
 import {ThunkDispatch} from '../module/reducer';
 import {QUERY_KEY} from '../route';

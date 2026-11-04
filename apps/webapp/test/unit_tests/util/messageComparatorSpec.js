@@ -18,8 +18,8 @@
  */
 
 import {Text} from '../../../src/script/repositories/entity/message/text';
-import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
-import {createUuid} from 'Util/uuid';
+import {areMentionsDifferent, isTextDifferent} from '../../../src/script/util/messageComparator';
+import {createUuid} from '../../../src/script/util/uuid';
 
 describe('MessageComparator', () => {
   it('areMentionsDifferent', () => {

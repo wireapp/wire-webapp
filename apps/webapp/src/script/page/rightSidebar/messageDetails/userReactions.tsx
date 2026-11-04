@@ -22,9 +22,6 @@ import {Fragment} from 'react';
 import type {JSX} from '@emotion/react/jsx-runtime';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {getEmojiTitleFromEmojiUnicode, getEmojiUnicode} from 'Util/emojiUtil';
-import {capitalizeFirstChar} from 'Util/stringUtil';
-
 import {panelContentTitleStyles} from './messageDetails.styles';
 
 import {EmojiChar} from '../../../components/messagesList/message/contentMessage/messageActions/messageReactions/emojiChar';
@@ -35,6 +32,8 @@ import {
 import {UserList} from '../../../components/userList';
 import {User} from '../../../repositories/entity/User';
 import {ReactionMap} from '../../../repositories/storage';
+import {getEmojiTitleFromEmojiUnicode, getEmojiUnicode} from '../../../util/emojiUtil';
+import {capitalizeFirstChar} from '../../../util/stringUtil';
 
 interface UsersReactionsProps {
   reactions: ReactionMap;

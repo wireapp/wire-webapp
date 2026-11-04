@@ -23,12 +23,12 @@ import type {JSX} from '@emotion/react/jsx-runtime';
 import {container} from 'tsyringe';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {KEY} from 'Util/keyboardUtil';
-import {captureModalFocusContext} from 'Util/modalFocusUtil';
 
 import {CallingViewMode, CallState} from '../../repositories/calling/CallState';
 import {ElectronDesktopCapturerSource} from '../../repositories/media/MediaDevicesHandler';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
+import {KEY} from '../../util/keyboardUtil';
+import {captureModalFocusContext} from '../../util/modalFocusUtil';
 
 interface ChooseScreenProps {
   choose: (screenId: string) => void;

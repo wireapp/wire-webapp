@@ -61,23 +61,6 @@ import {partition} from 'underscore';
 
 import {Asset, Availability, Confirmation, GenericMessage} from '@wireapp/protocol-messaging';
 
-import {
-  cancelSendingLinkPreview,
-  clearLinkPreviewSendingState,
-  shouldSendLinkPreviewForMessage,
-} from 'Util/linkPreviewSender';
-import {type Translate, Declension, joinNames} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/logger';
-import {isMarkdownText} from 'Util/markdownUtil';
-import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
-import {roundLogarithmic} from 'Util/numberUtil';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-import {capitalizeFirstChar} from 'Util/stringUtil';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
-import {isBackendError, isErrorWithCode} from 'Util/typePredicateUtil';
-import {loadUrlBlob, supportsMLS} from 'Util/util';
-import {createUuid} from 'Util/uuid';
-
 import {findDeletedClients} from './ClientMismatchUtil';
 import {ConversationRepository} from './ConversationRepository';
 import {isMLSConversation, supportsReadReceipts} from './ConversationSelectors';
@@ -96,6 +79,22 @@ import {QuoteEntity} from '../../message/quoteEntity';
 import {StatusType} from '../../message/statusType';
 import {Core} from '../../service/coreSingleton';
 import {ServerTimeHandler} from '../../time/serverTimeHandler';
+import {
+  cancelSendingLinkPreview,
+  clearLinkPreviewSendingState,
+  shouldSendLinkPreviewForMessage,
+} from '../../util/linkPreviewSender';
+import {type Translate, Declension, joinNames} from '../../util/localizerUtil';
+import {getLogger, Logger} from '../../util/logger';
+import {isMarkdownText} from '../../util/markdownUtil';
+import {areMentionsDifferent, isTextDifferent} from '../../util/messageComparator';
+import {roundLogarithmic} from '../../util/numberUtil';
+import {matchQualifiedIds} from '../../util/qualifiedId';
+import {capitalizeFirstChar} from '../../util/stringUtil';
+import {TIME_IN_MILLIS} from '../../util/timeUtil';
+import {isBackendError, isErrorWithCode} from '../../util/typePredicateUtil';
+import {loadUrlBlob, supportsMLS} from '../../util/util';
+import {createUuid} from '../../util/uuid';
 import {WebAppEvents} from '../../webAppEvents';
 import {buildMetadata, ImageMetadata, isAudio, isImage, isVideo} from '../assets/assetMetaDataBuilder';
 import {AssetRepository} from '../assets/assetRepository';

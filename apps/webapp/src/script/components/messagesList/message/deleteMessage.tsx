@@ -22,7 +22,6 @@ import type {FunctionComponent} from 'react';
 import {noop} from 'noop-esm';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {formatTimeShort, fromUnixTime, TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {MessageHeader} from './contentMessage/messageHeader';
 import {MessageTime} from './messageTime';
@@ -30,6 +29,7 @@ import {MessageTime} from './messageTime';
 import {DeleteMessage as DeleteMessageEntity} from '../../../repositories/entity/message/deleteMessage';
 import {User} from '../../../repositories/entity/User';
 import {ServiceEntity} from '../../../repositories/integration/ServiceEntity';
+import {formatTimeShort, fromUnixTime, TIME_IN_MILLIS} from '../../../util/timeUtil';
 
 interface DeleteMessageProps {
   message: DeleteMessageEntity;

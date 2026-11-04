@@ -39,11 +39,6 @@ import {Runtime, TypedEventEmitter} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
 
 import {Config} from 'src/script/Config';
-import {Environment} from 'Util/environment';
-import {type Translate} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/logger';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
-import {loadDataUrl} from 'Util/util';
 
 import {TeamEntity} from './TeamEntity';
 import {TeamMapper} from './TeamMapper';
@@ -55,6 +50,11 @@ import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {scheduleRecurringTask, updateRemoteConfigLogger} from '../../lifecycle/updateRemoteConfigs';
 import {getMLSMigrationStatus, MLSMigrationStatus} from '../../mls/MLSMigration/migrationStatus';
 import {APIClient} from '../../service/apiClientSingleton';
+import {Environment} from '../../util/environment';
+import {type Translate} from '../../util/localizerUtil';
+import {getLogger, Logger} from '../../util/logger';
+import {TIME_IN_MILLIS} from '../../util/timeUtil';
+import {loadDataUrl} from '../../util/util';
 import {WebAppEvents} from '../../webAppEvents';
 import {AssetRepository} from '../assets/assetRepository';
 import {User} from '../entity/User';

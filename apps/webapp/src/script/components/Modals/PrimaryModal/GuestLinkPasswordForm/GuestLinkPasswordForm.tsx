@@ -22,8 +22,8 @@ import type {FormEvent, FunctionComponent} from 'react';
 import {Form} from '@wireapp/react-ui-kit';
 
 import {Config} from 'src/script/Config';
-import type {Translate} from 'Util/localizerUtil';
 
+import type {Translate} from '../../../../util/localizerUtil';
 import {PasswordFields} from '../../../PasswordFields/PasswordFields';
 import {PasswordGeneratorButton} from '../../../PasswordGeneratorButton';
 

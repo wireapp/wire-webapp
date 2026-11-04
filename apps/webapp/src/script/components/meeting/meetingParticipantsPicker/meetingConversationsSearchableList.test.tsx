@@ -27,7 +27,7 @@ import {
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 
 import {MeetingConversationsSearchableList} from './meetingConversationsSearchableList';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({

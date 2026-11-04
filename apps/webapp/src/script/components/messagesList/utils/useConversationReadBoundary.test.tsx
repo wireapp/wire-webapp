@@ -22,7 +22,7 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {Conversation} from '../../../repositories/entity/Conversation';
 import {Message} from '../../../repositories/entity/message/message';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 import {useConversationReadBoundary} from './useConversationReadBoundary';
 

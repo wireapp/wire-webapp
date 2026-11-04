@@ -44,8 +44,8 @@ import {
 
 import {ClientEvent} from '../event/Client';
 import {CryptographyError} from 'src/script/error/cryptographyError';
-import {arrayToBase64} from 'Util/util';
-import {createUuid} from 'Util/uuid';
+import {arrayToBase64} from '../../util/util';
+import {createUuid} from '../../util/uuid';
 
 import {CryptographyMapper} from './CryptographyMapper';
 import {PROTO_MESSAGE_TYPE} from './ProtoMessageType';

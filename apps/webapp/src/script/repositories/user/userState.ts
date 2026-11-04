@@ -20,10 +20,9 @@
 import ko from 'knockout';
 import {singleton} from 'tsyringe';
 
-import {translate} from 'Util/localizerUtil';
-import {sortUsersByPriority} from 'Util/stringUtil';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
-
+import {translate} from '../../util/localizerUtil';
+import {sortUsersByPriority} from '../../util/stringUtil';
+import {TIME_IN_MILLIS} from '../../util/timeUtil';
 import {User} from '../entity/User';
 
 @singleton()

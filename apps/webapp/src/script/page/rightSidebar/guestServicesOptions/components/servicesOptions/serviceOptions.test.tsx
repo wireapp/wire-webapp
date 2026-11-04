@@ -27,7 +27,7 @@ import {
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../../util/test/translateForTest';
 
 type TestData = {
   protocol: CONVERSATION_PROTOCOL;

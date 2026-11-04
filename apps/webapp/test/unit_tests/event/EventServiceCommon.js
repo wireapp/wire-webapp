@@ -23,7 +23,7 @@ import {StorageSchemata} from '../../../src/script/repositories/storage/storageS
 import {ConversationError} from 'src/script/error/conversationError';
 import {StorageError} from 'src/script/error/storageError';
 import {MessageCategory} from 'src/script/message/messageCategory';
-import {createUuid} from 'Util/uuid';
+import {createUuid} from '../../../src/script/util/uuid';
 
 import {TestFactory} from '../../helper/TestFactory';
 

@@ -20,8 +20,8 @@
 import {act, cleanup, fireEvent, render} from '@testing-library/react';
 
 import en from '../../../i18n/en-US.json';
-import {setStrings, translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {setStrings, translate} from '../../util/localizerUtil';
+import {translateForTest} from '../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

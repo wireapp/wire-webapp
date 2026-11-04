@@ -23,8 +23,6 @@ import {isNan, isNonEmptyArray, isNonEmptyString, isNullOrUndefined} from '@sind
 import cx from 'classnames';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {formatLocale} from 'Util/timeUtil';
 
 import {UsersReactions} from './userReactions';
 
@@ -37,6 +35,8 @@ import {Conversation} from '../../../repositories/entity/Conversation';
 import {ContentMessage} from '../../../repositories/entity/message/contentMessage';
 import {User} from '../../../repositories/entity/User';
 import {UserRepository} from '../../../repositories/user/userRepository';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {formatLocale} from '../../../util/timeUtil';
 import {PanelHeader} from '../panelHeader';
 import {PanelEntity, PanelState} from '../rightSidebar';
 

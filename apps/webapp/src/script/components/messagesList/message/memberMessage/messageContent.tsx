@@ -27,13 +27,13 @@ import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import {Config} from 'src/script/Config';
 import {SystemMessageType} from 'src/script/message/systemMessageType';
 import {useApplicationContext, type RootContextValue} from 'src/script/page/rootProvider';
-import {Declension, joinNames} from 'Util/localizerUtil';
-import {createReactTranslationMarker, replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
-import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import {MemberMessage as MemberMessageEntity} from '../../../../repositories/entity/message/memberMessage';
 import {User} from '../../../../repositories/entity/User';
 import {ClientEvent} from '../../../../repositories/event/Client';
+import {Declension, joinNames} from '../../../../util/localizerUtil';
+import {createReactTranslationMarker, replaceReactComponents} from '../../../../util/localizerUtil/reactLocalizerUtil';
+import {matchQualifiedIds} from '../../../../util/qualifiedId';
 
 export const CONFIG = {
   MAX_USERS_VISIBLE: 17,

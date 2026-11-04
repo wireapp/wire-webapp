@@ -21,12 +21,12 @@ import {isArray, isNullOrUndefined, isNonEmptyString} from '@sindresorhus/is';
 
 import {Runtime} from '@wireapp/commons';
 
-import {getLogger, Logger} from 'Util/logger';
-import {loadValue, storeValue} from 'Util/storageUtil';
-
 import {MediaDeviceType} from './MediaDeviceType';
 import {resolveActiveDeviceId} from './resolveActiveDeviceId';
 import {mediaDevicesStore} from './useMediaDevicesStore';
+
+import {getLogger, Logger} from '../../util/logger';
+import {loadValue, storeValue} from '../../util/storageUtil';
 
 export type ElectronDesktopCapturerSource = {
   readonly display_id: string;

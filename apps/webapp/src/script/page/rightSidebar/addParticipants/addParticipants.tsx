@@ -26,12 +26,6 @@ import cx from 'classnames';
 import {Button, ButtonVariant, TabIndex} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {checkAppsFeatureAvailability} from 'Util/featureUtil';
-import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {getLogger} from 'Util/logger';
-import {safeWindowOpen} from 'Util/sanitizationUtil';
-import {compareTransliteration, sortByPriority, sortUsersByPriority} from 'Util/stringUtil';
 
 import {FadingScrollbar} from '../../../components/fadingScrollbar';
 import * as Icon from '../../../components/icon';
@@ -49,6 +43,12 @@ import {TeamRepository} from '../../../repositories/team/TeamRepository';
 import {TeamState} from '../../../repositories/team/TeamState';
 import {generatePermissionHelpers} from '../../../repositories/user/userPermission';
 import {UserState} from '../../../repositories/user/userState';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {checkAppsFeatureAvailability} from '../../../util/featureUtil';
+import {handleKeyDown, KEY} from '../../../util/keyboardUtil';
+import {getLogger} from '../../../util/logger';
+import {safeWindowOpen} from '../../../util/sanitizationUtil';
+import {compareTransliteration, sortByPriority, sortUsersByPriority} from '../../../util/stringUtil';
 import {PanelHeader} from '../panelHeader';
 import {PanelEntity, PanelState} from '../rightSidebar';
 

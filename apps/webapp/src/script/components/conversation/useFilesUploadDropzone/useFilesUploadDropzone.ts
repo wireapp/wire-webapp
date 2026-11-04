@@ -24,7 +24,6 @@ import {Accept, DropzoneInputProps, FileRejection, useDropzone, type DropzoneRoo
 
 import {Config} from 'src/script/Config';
 import type {RootContextValue} from 'src/script/page/rootProvider';
-import {getLogger} from 'Util/logger';
 
 import {buildCellFileMetadata} from './buildCellFileMetadata/buildCellFileMetadata';
 import {createFileDropHandler} from './createFileDropHandler/createFileDropHandler';
@@ -34,6 +33,7 @@ import {transformAcceptedFiles} from './transformAcceptedFiles/transformAccepted
 
 import {CellsRepository} from '../../../repositories/cells/cellsRepository';
 import {Conversation} from '../../../repositories/entity/Conversation';
+import {getLogger} from '../../../util/logger';
 import {FileWithPreview, useFileUploadState} from '../useFilesUploadState/useFilesUploadState';
 import {buildCellsUploadPath} from '../utils/buildCellsUploadPath';
 import {checkFileSharingPermission} from '../utils/checkFileSharingPermission';

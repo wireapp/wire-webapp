@@ -21,12 +21,11 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {task, type Task} from 'true-myth';
 import {createStore, type StoreApi} from 'zustand/vanilla';
 
-import {getLogger} from 'Util/logger';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-
 import type {MeetingStoreDeps} from './meetingStoreDeps';
 
 import type {User} from '../../../repositories/entity/User';
+import {getLogger} from '../../../util/logger';
+import {matchQualifiedIds} from '../../../util/qualifiedId';
 import {loadMeetingsList} from '../loadMeetingsList';
 import {mapApiMeetingToSeries} from '../mapApiMeetingToSeries';
 import {mapMeetingInstanceToScheduleFormState} from '../mapMeetingInstanceToScheduleFormState';

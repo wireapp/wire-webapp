@@ -26,12 +26,6 @@ import type {UserConnectionData, UserUpdateData} from '@wireapp/api-client/lib/u
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import {type Translate} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/logger';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-import {toError} from 'Util/toError';
-import {isBackendError} from 'Util/typePredicateUtil';
-
 import type {ConnectionEntity} from './connectionEntity';
 import {ConnectionMapper} from './connectionMapper';
 import type {ConnectionService} from './connectionService';
@@ -40,6 +34,11 @@ import {ConnectionState} from './connectionState';
 import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {Config} from '../../Config';
 import {SystemMessageType} from '../../message/systemMessageType';
+import {type Translate} from '../../util/localizerUtil';
+import {getLogger, Logger} from '../../util/logger';
+import {matchQualifiedIds} from '../../util/qualifiedId';
+import {toError} from '../../util/toError';
+import {isBackendError} from '../../util/typePredicateUtil';
 import {WebAppEvents} from '../../webAppEvents';
 import type {Conversation} from '../entity/Conversation';
 import {MemberMessage} from '../entity/message/memberMessage';

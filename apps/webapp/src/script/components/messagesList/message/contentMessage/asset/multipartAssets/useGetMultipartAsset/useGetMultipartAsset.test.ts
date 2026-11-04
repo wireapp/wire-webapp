@@ -28,7 +28,7 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {useGetMultipartAsset} from './useGetMultipartAsset';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../../../../util/test/translateForTest';
 
 const mockNode: RestNode = {
   Path: '/path/to/test.pdf',

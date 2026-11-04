@@ -27,13 +27,13 @@ import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {User} from '../entity/User';
 import {ClientRecord} from '../storage/record/clientRecord';
 import {ClientError} from 'src/script/error/clientError';
-import {type Translate} from 'Util/localizerUtil';
+import {type Translate} from '../../util/localizerUtil';
 
 import {ClientRepository, ClientMapper, ClientEntity} from './.';
 
 import {entities} from '../../../../test/api/payloads';
 import {TestFactory} from '../../../../test/helper/TestFactory';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 
 describe('ClientRepository', () => {
   const originalPrimaryModalShow = PrimaryModal.show;

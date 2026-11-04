@@ -27,9 +27,6 @@ import {amplify} from 'amplify';
 import {CollectionIcon, HideIcon, HistoryIcon, LockClosedIcon, UnlockedIcon} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
-import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {ConversationDetailsOption} from './conversationDetailsOption';
 
@@ -46,6 +43,9 @@ import {supportsReadReceipts} from '../../../../../repositories/conversation/Con
 import {Conversation} from '../../../../../repositories/entity/Conversation';
 import {User} from '../../../../../repositories/entity/User';
 import {TeamState} from '../../../../../repositories/team/TeamState';
+import {useKoSubscribableChildren} from '../../../../../util/componentUtil';
+import {replaceReactComponents} from '../../../../../util/localizerUtil/reactLocalizerUtil';
+import {useChannelsFeatureFlag} from '../../../../../util/useChannelsFeatureFlag';
 import {ActionsViewModel} from '../../../../../view_model/ActionsViewModel';
 import {WebAppEvents} from '../../../../../webAppEvents';
 import {PanelEntity, PanelState} from '../../../rightSidebar';

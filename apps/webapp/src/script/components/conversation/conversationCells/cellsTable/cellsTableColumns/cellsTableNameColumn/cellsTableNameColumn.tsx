@@ -22,7 +22,6 @@ import type {FunctionComponent} from 'react';
 import {FolderIcon, PlayIcon} from '@wireapp/react-ui-kit';
 
 import {CellFile, CellNode, CellNodeType} from 'src/script/types/cellNode';
-import {getFileExtension} from 'Util/util';
 
 import {
   desktopNameStyles,
@@ -33,6 +32,7 @@ import {
   wrapperStyles,
 } from './cellsTableNameColumn.styles';
 
+import {getFileExtension} from '../../../../../../util/util';
 import {FileTypeIcon} from '../../../../common/fileTypeIcon/fileTypeIcon';
 import {openFolder} from '../../../common/openFolder/openFolder';
 import {useCellsFilePreviewModal} from '../../common/cellsFilePreviewModalContext/cellsFilePreviewModalContext';

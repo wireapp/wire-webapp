@@ -26,10 +26,10 @@ import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
 
 import {Config} from 'src/script/Config';
-import {sortUsersByPriority} from 'Util/stringUtil';
 
 import {TeamEntity} from './TeamEntity';
 
+import {sortUsersByPriority} from '../../util/stringUtil';
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 import {ROLE, roleMap} from '../user/userPermission';

@@ -24,14 +24,13 @@ import {amplify} from 'amplify';
 import {match} from 'ts-pattern';
 import {container} from 'tsyringe';
 
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import type {Translate} from 'Util/localizerUtil';
-import {getLogger} from 'Util/logger';
-
 import {Config} from '../../Config';
 import {ConversationState} from '../../repositories/conversation/ConversationState';
 import {NOTIFICATION_HANDLING_STATE} from '../../repositories/event/NotificationHandlingState';
 import {UserState} from '../../repositories/user/userState';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
+import type {Translate} from '../../util/localizerUtil';
+import {getLogger} from '../../util/logger';
 import {WebAppEvents} from '../../webAppEvents';
 import {ContentState, useAppState} from '../useAppState';
 

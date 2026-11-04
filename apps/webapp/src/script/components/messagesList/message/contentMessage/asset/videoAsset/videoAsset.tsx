@@ -26,9 +26,6 @@ import {container} from 'tsyringe';
 import {TabIndex, Button, ButtonVariant, useTimeout} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {formatSeconds} from 'Util/timeUtil';
-import {useEffectRef} from 'Util/useEffectRef';
 
 import {AssetError} from '../../../../../../repositories/assets/assetError';
 import {AssetRepository} from '../../../../../../repositories/assets/assetRepository';
@@ -36,6 +33,9 @@ import {AssetTransferState} from '../../../../../../repositories/assets/assetTra
 import type {ContentMessage} from '../../../../../../repositories/entity/message/contentMessage';
 import type {FileAsset as FileAssetType} from '../../../../../../repositories/entity/message/fileAsset';
 import {TeamState} from '../../../../../../repositories/team/TeamState';
+import {useKoSubscribableChildren} from '../../../../../../util/componentUtil';
+import {formatSeconds} from '../../../../../../util/timeUtil';
+import {useEffectRef} from '../../../../../../util/useEffectRef';
 import {RestrictedVideo} from '../../../../../asset/RestrictedVideo';
 import {MediaButton} from '../common/mediaButton/mediaButton';
 import {SeekBar} from '../common/seekBar/seekBar';

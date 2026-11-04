@@ -19,8 +19,6 @@
 
 import type {FunctionComponent} from 'react';
 
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-
 import {
   callStatusIcons,
   cameraIcon,
@@ -30,6 +28,7 @@ import {
 } from './CallParticipantsListItem.styles';
 
 import {Participant} from '../../../repositories/calling/Participant';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import * as Icon from '../../icon';
 import {ParticipantMicOnIcon} from '../ParticipantMicOnIcon';
 

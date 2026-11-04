@@ -24,11 +24,6 @@ import {amplify} from 'amplify';
 import cx from 'classnames';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {includesOnlyEmojis} from 'Util/emojiUtil';
-import {type Translate} from 'Util/localizerUtil';
-import {formatDateNumeral, formatTimeShort, isBeforeToday} from 'Util/timeUtil';
-import {isErrorWithType} from 'Util/typePredicateUtil';
 
 import {AudioAsset} from './asset/audioAsset/audioAsset';
 import {FileAsset} from './asset/fileAsset/fileAsset';
@@ -45,6 +40,11 @@ import {ContentMessage} from '../../../../repositories/entity/message/contentMes
 import {Multipart} from '../../../../repositories/entity/message/multipart';
 import {Text} from '../../../../repositories/entity/message/text';
 import {User} from '../../../../repositories/entity/User';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
+import {includesOnlyEmojis} from '../../../../util/emojiUtil';
+import {type Translate} from '../../../../util/localizerUtil';
+import {formatDateNumeral, formatTimeShort, isBeforeToday} from '../../../../util/timeUtil';
+import {isErrorWithType} from '../../../../util/typePredicateUtil';
 import {WebAppEvents} from '../../../../webAppEvents';
 import * as Icon from '../../../icon';
 import {AssetImage} from '../../../image';

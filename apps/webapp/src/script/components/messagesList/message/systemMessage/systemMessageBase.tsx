@@ -19,9 +19,8 @@
 
 import {ReactNode, type FunctionComponent} from 'react';
 
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-
 import {SystemMessage} from '../../../../repositories/entity/message/systemMessage';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 import {MessageTime} from '../messageTime';
 
 interface SystemMessageProps {

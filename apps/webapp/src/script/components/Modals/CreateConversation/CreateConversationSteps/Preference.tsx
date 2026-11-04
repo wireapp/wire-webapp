@@ -24,10 +24,10 @@ import {container} from 'tsyringe';
 
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {checkAppsFeatureAvailability} from 'Util/featureUtil';
 
 import {TeamState} from '../../../../repositories/team/TeamState';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
+import {checkAppsFeatureAvailability} from '../../../../util/featureUtil';
 import {AppsDisabledNote} from '../../../Note/AppsDisabledNote/AppsDisabledNote';
 import {InfoToggle} from '../../../toggle/InfoToggle';
 import {useCreateConversationModal} from '../hooks/useCreateConversationModal';

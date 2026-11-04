@@ -52,13 +52,12 @@ import {MLSServiceEvents} from '@wireapp/core/lib/messagingProtocols/mls';
 import {Task, task} from 'true-myth';
 import {container} from 'tsyringe';
 
-import {getLogger} from 'Util/logger';
-
 import {MLSCapableConversation} from './ConversationSelectors';
 
 import {MessageCategory} from '../../message/messageCategory';
 import {APIClient} from '../../service/apiClientSingleton';
 import {Core} from '../../service/coreSingleton';
+import {getLogger} from '../../util/logger';
 import type {Conversation as ConversationEntity} from '../entity/Conversation';
 import {ClientEvent} from '../event/Client';
 import type {EventService} from '../event/EventService';

@@ -25,7 +25,6 @@ import {FolderIcon, PlayIcon, Tooltip, ViewerAccessIcon} from '@wireapp/react-ui
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CellFile, CellNode, CellNodeType} from 'src/script/types/cellNode';
-import {getFileExtension} from 'Util/util';
 
 import {
   desktopNameStyles,
@@ -38,6 +37,7 @@ import {
   wrapperStyles,
 } from './cellsTableNameColumn.styles';
 
+import {getFileExtension} from '../../../../../util/util';
 import {FileTypeIcon} from '../../../../conversation/common/fileTypeIcon/fileTypeIcon';
 import {openFolder} from '../../../common/openFolder/openFolder';
 import {useShouldRestrictGlobalDriveNodeActions} from '../../../common/useShouldRestrictGlobalDriveNodeActions/useShouldRestrictGlobalDriveNodeActions';

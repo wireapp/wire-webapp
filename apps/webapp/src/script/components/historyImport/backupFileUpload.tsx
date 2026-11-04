@@ -22,8 +22,8 @@ import {useRef, type FunctionComponent} from 'react';
 import {TabIndex, Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 
+import {handleKeyDown, KEY} from '../../util/keyboardUtil';
 import {CONFIG as HistoryExportConfig} from '../historyExport';
 
 interface BackupFileUploadProps {

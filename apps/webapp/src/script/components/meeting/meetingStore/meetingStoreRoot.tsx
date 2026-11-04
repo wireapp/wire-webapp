@@ -23,9 +23,6 @@ import {container} from 'tsyringe';
 
 import {createBrowserSystemNotificationApi} from 'src/script/browser/notification/createSystemNotificationApiFromBrowserNotification';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {getLogger} from 'Util/logger';
-import {formatTimeShort} from 'Util/timeUtil';
-import {useMeetingsFeatureFlag} from 'Util/useMeetingsFeatureFlag';
 
 import {createMeetingLifecycleDispatcher} from './createMeetingLifecycleDispatcher';
 import {createMeetingStore} from './createMeetingStore';
@@ -34,6 +31,9 @@ import {subscribeToMeetingConversationEvents} from './subscribeToMeetingConversa
 import {subscribeToMeetingLifecycleEvents} from './subscribeToMeetingLifecycleEvents';
 
 import {UserState} from '../../../repositories/user/userState';
+import {getLogger} from '../../../util/logger';
+import {formatTimeShort} from '../../../util/timeUtil';
+import {useMeetingsFeatureFlag} from '../../../util/useMeetingsFeatureFlag';
 import {createMeetingReminderOsNotifier} from '../createMeetingReminderOsNotifier';
 import {createMeetingReminderScheduler} from '../createMeetingReminderScheduler';
 import {createBrowserDeviceTimeZone} from '../deviceTimeZone';

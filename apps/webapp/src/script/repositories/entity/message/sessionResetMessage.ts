@@ -17,11 +17,10 @@
  *
  */
 
-import {type Translate} from 'Util/localizerUtil';
-
 import {SystemMessage} from './systemMessage';
 
 import {SystemMessageType} from '../../../message/systemMessageType';
+import {type Translate} from '../../../util/localizerUtil';
 
 export const createSessionResetMessage = (translate: Translate): SystemMessage => {
   const message = new SystemMessage(translate);

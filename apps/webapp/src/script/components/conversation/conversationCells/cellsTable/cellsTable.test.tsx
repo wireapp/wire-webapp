@@ -37,8 +37,8 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
-import type {Translate} from 'Util/localizerUtil/translationTypes';
-import {translateForTest} from 'Util/test/translateForTest';
+import type {Translate} from '../../../../util/localizerUtil/translationTypes';
+import {translateForTest} from '../../../../util/test/translateForTest';
 import type {SharedDriveUploadController} from '../sharedDriveUploadController';
 import {SharedDriveUploadStatusProvider} from '../sharedDriveUploadStatusContext';
 import {SharedDriveUploadStatusPopupHost} from '../sharedDriveUploadStatusPopupHost';

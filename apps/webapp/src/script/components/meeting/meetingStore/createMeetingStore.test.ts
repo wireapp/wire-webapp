@@ -33,8 +33,8 @@ import {Conversation} from '../../../repositories/entity/Conversation';
 import {EventRepository} from '../../../repositories/event/EventRepository';
 import {EventSource} from '../../../repositories/event/EventSource';
 import type {MeetingsRepository} from '../../../repositories/meetings/meetingsRepository';
-import {unwrap, unwrapErr} from 'Util/test/resultTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
+import {unwrap, unwrapErr} from '../../../util/test/resultTestSupport';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 import {createMeetingStore} from './createMeetingStore';
 import type {MeetingStoreDeps, MeetingStoreServiceTasks} from './meetingStoreDeps';

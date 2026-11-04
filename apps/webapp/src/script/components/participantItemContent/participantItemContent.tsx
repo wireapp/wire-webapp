@@ -22,8 +22,6 @@ import React, {type FunctionComponent} from 'react';
 import {isNonEmptyString} from '@sindresorhus/is';
 import ko from 'knockout';
 
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-
 import {
   contentInfoWrapper,
   contentInfoText,
@@ -38,6 +36,7 @@ import {
 
 import {User} from '../../repositories/entity/User';
 import {ServiceEntity} from '../../repositories/integration/ServiceEntity';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {UserBlockedBadge, UserVerificationBadges} from '../badge';
 import * as Icon from '../icon';
 import {UserInfo} from '../UserInfo';

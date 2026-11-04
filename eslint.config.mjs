@@ -270,9 +270,9 @@ const webappImportOrderRule = [
     pathGroups: [
       {pattern: 'react', group: 'external', position: 'before'},
       {pattern: '@wireapp/*', group: 'internal', position: 'before'},
-      // Keep the remaining webapp aliases in one alphabetized group.
+      // Keep the remaining webapp alias in one alphabetized group.
       {
-        pattern: '{src,Util}/**',
+        pattern: 'src/**',
         group: 'internal',
         position: 'after',
       },

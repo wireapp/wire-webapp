@@ -24,13 +24,13 @@ import {User} from '../../entity/User';
 import {MessageHasher} from 'src/script/message/messageHasher';
 import {QuoteEntity} from 'src/script/message/quoteEntity';
 import {createMessageAddEvent, createMultipartMessageAddEvent, toSavedEvent} from 'test/helper/EventGenerator';
-import {arrayToBase64} from 'Util/util';
-import {createUuid} from 'Util/uuid';
+import {arrayToBase64} from '../../../util/util';
+import {createUuid} from '../../../util/uuid';
 
 import {QuotedMessageMiddleware} from './QuoteDecoderMiddleware';
 
 import {EventService} from '../EventService';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 function buildQuotedMessageMiddleware(): readonly [

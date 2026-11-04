@@ -23,9 +23,6 @@ import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {ClientClassification} from '@wireapp/api-client/lib/client/';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {partition} from 'Util/arrayUtil';
-import {getLogger} from 'Util/logger';
-import {capitalizeFirstChar} from 'Util/stringUtil';
 
 import {DeviceDetails} from './components/deviceDetails';
 import {DeviceList} from './components/DeviceList';
@@ -38,6 +35,9 @@ import {ClientRepository, ClientEntity} from '../../repositories/client';
 import {MessageRepository} from '../../repositories/conversation/MessageRepository';
 import {CryptographyRepository} from '../../repositories/cryptography/CryptographyRepository';
 import {User} from '../../repositories/entity/User';
+import {partition} from '../../util/arrayUtil';
+import {getLogger} from '../../util/logger';
+import {capitalizeFirstChar} from '../../util/stringUtil';
 
 export interface UserDevicesHistoryEntry {
   headline: string;

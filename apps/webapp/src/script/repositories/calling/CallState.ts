@@ -25,11 +25,10 @@ import {singleton} from 'tsyringe';
 
 import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 
-import {matchQualifiedIds} from 'Util/qualifiedId';
-
 import {Call} from './Call';
 
 import {Config} from '../../Config';
+import {matchQualifiedIds} from '../../util/qualifiedId';
 import {CallViewTab} from '../../view_model/CallingViewModel';
 import {WebAppEvents} from '../../webAppEvents';
 import type {ElectronDesktopCapturerSource} from '../media/MediaDevicesHandler';

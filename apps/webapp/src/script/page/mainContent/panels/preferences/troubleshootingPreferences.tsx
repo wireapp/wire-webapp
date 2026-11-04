@@ -26,8 +26,6 @@ import {Button, ButtonVariant, ComputerIcon, Loading, NetworkBuildingIcon, WireL
 
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {copyText} from 'Util/clipboardUtil';
-import {downloadBlob} from 'Util/util';
 
 import {PreferencesPage} from './components/preferencesPage';
 import {DiagnosticStatusIcon as StatusIcon} from './troubleshooting/diagnosticStatusIcon';
@@ -39,6 +37,8 @@ import type {
   DiagnosticResult,
 } from '../../../../repositories/troubleshooter/troubleshooterRepository';
 import type {CheckId, CheckStatus} from '../../../../repositories/troubleshooter/troubleshooterService';
+import {copyText} from '../../../../util/clipboardUtil';
+import {downloadBlob} from '../../../../util/util';
 
 const MILLISECONDS_PER_SECOND = 1_000;
 const statusTone = (status: CheckStatus): 'good' | 'warning' | 'bad' | 'muted' => {

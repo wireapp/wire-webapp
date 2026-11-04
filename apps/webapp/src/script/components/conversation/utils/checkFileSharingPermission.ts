@@ -19,9 +19,8 @@
 
 import {container} from 'tsyringe';
 
-import type {Translate} from 'Util/localizerUtil';
-
 import {TeamState} from '../../../repositories/team/TeamState';
+import type {Translate} from '../../../util/localizerUtil';
 import {showWarningModal} from '../../Modals/utils/showWarningModal';
 
 /**

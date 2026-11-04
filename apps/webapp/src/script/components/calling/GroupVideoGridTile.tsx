@@ -25,8 +25,6 @@ import {VIDEO_STATE} from '@wireapp/avs';
 import {Loading, TabIndex} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {isEnterKey} from 'Util/keyboardUtil';
 
 import {
   groupVideoActiveSpeaker,
@@ -43,6 +41,8 @@ import {useShowLoadingOverlay} from './useShowLoadingOverlay';
 import {Video} from './Video';
 
 import type {Participant} from '../../repositories/calling/Participant';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
+import {isEnterKey} from '../../util/keyboardUtil';
 import {Avatar, AVATAR_SIZE} from '../avatar';
 import * as Icon from '../icon';
 

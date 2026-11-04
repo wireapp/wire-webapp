@@ -28,7 +28,7 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {DeviceCard} from './deviceCard';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../util/test/translateForTest';
 
 function createClientEntity(clientEntity: Partial<ClientEntity>): ClientEntity {
   const device: Partial<ClientEntity> = {

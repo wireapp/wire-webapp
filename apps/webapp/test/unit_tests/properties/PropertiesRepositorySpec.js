@@ -21,7 +21,7 @@ import {PropertiesRepository} from '../../../src/script/repositories/properties/
 import {PropertiesService} from '../../../src/script/repositories/properties/propertiesService';
 import {SelfService} from '../../../src/script/repositories/self/SelfService';
 import {PrimaryModal} from '../../../src/script/components/Modals/PrimaryModal';
-import {translate} from 'Util/localizerUtil';
+import {translate} from '../../../src/script/util/localizerUtil';
 
 describe('PropertiesRepository', () => {
   let propertiesRepository = undefined;

@@ -20,8 +20,8 @@
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {PrimaryModal} from '../../components/Modals/PrimaryModal';
-import type {Translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import type {Translate} from '../../util/localizerUtil';
+import {translateForTest} from '../../util/test/translateForTest';
 
 import {ACCESS_STATE} from './AccessState';
 import {ConversationStateHandler} from './ConversationStateHandler';

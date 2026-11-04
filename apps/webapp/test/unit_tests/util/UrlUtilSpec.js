@@ -26,7 +26,7 @@ import {
   cleanURL,
   getLinksFromHtml,
   prependProtocol,
-} from 'Util/urlUtil';
+} from '../../../src/script/util/urlUtil';
 
 describe('UrlUtil', () => {
   describe('appendParameter', () => {

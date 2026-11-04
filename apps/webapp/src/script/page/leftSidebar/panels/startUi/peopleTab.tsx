@@ -26,11 +26,6 @@ import {partition} from 'underscore';
 import {useDebouncedCallback} from 'use-debounce';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {getLogger} from 'Util/logger';
-import {safeWindowOpen} from 'Util/sanitizationUtil';
-import {sortByPriority} from 'Util/stringUtil';
-import {isBackendError} from 'Util/typePredicateUtil';
 
 import {TopPeople} from './components/topPeople';
 
@@ -45,6 +40,11 @@ import {TeamRepository} from '../../../../repositories/team/TeamRepository';
 import {TeamState} from '../../../../repositories/team/TeamState';
 import {UserRepository} from '../../../../repositories/user/userRepository';
 import {UserState} from '../../../../repositories/user/userState';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
+import {getLogger} from '../../../../util/logger';
+import {safeWindowOpen} from '../../../../util/sanitizationUtil';
+import {sortByPriority} from '../../../../util/stringUtil';
+import {isBackendError} from '../../../../util/typePredicateUtil';
 
 export type SearchResultsData = {contacts: User[]; others: User[]};
 

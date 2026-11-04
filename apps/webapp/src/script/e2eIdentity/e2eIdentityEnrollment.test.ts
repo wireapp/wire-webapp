@@ -32,13 +32,13 @@ import {User} from '../repositories/entity/User';
 import {UserState} from '../repositories/user/userState';
 import {Core} from 'src/script/service/coreSingleton';
 import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
-import * as util from 'Util/util';
+import * as util from '../util/util';
 
 import {E2EIHandler} from './e2eIdentityEnrollment';
 import * as e2eIdentityVerification from './e2eIdentityVerification';
 import {getEnrollmentStore} from './enrollment.store';
 import {OIDCServiceStore} from './oidcService/oidcServiceStorage';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 jest.mock('./oidcService', () => {

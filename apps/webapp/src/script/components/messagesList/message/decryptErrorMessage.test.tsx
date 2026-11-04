@@ -25,8 +25,8 @@ import {ProteusErrors} from '@wireapp/core/lib/messagingProtocols/proteus';
 import en from '../../../../i18n/en-US.json';
 import {DecryptErrorMessage as DecryptErrorMessageEntity} from '../../../repositories/entity/message/decryptErrorMessage';
 import {User} from '../../../repositories/entity/User';
-import {translateForTest} from 'Util/test/translateForTest';
-import {setStrings, translate} from 'Util/localizerUtil';
+import {translateForTest} from '../../../util/test/translateForTest';
+import {setStrings, translate} from '../../../util/localizerUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

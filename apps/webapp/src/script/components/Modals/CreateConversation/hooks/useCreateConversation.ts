@@ -30,8 +30,6 @@ import {useSidebarStore, SidebarTabs} from 'src/script/page/leftSidebar/panels/c
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigateKeyboard, createNavigate} from 'src/script/router/routerBindings';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {isKeyboardEvent} from 'Util/keyboardUtil';
 
 import {ACCESS_STATE, type TEAM as TEAMType2} from '../../../../repositories/conversation/AccessState';
 import {
@@ -41,6 +39,8 @@ import {
   ACCESS_MODES,
 } from '../../../../repositories/conversation/ConversationAccessPermission';
 import {TeamState} from '../../../../repositories/team/TeamState';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
+import {isKeyboardEvent} from '../../../../util/keyboardUtil';
 import {WebAppEvents} from '../../../../webAppEvents';
 import {PrimaryModal} from '../../PrimaryModal';
 import {useCreateConversationModal} from '../hooks/useCreateConversationModal';

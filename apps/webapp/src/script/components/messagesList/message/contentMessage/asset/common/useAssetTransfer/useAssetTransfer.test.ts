@@ -25,8 +25,8 @@ import {AssetRepository} from '../../../../../../../repositories/assets/assetRep
 import {AssetTransferState} from '../../../../../../../repositories/assets/assetTransferState';
 import {ContentMessage} from '../../../../../../../repositories/entity/message/contentMessage';
 import {FileAsset} from '../../../../../../../repositories/entity/message/fileAsset';
-import {translateForTest} from 'Util/test/translateForTest';
-import {createUuid} from 'Util/uuid';
+import {translateForTest} from '../../../../../../../util/test/translateForTest';
+import {createUuid} from '../../../../../../../util/uuid';
 
 import {useAssetTransfer} from './useAssetTransfer';
 

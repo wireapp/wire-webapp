@@ -23,10 +23,9 @@ import {isNonEmptyString} from '@sindresorhus/is';
 
 import {Button, ButtonVariant, COLOR} from '@wireapp/react-ui-kit';
 
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {noop} from 'Util/util';
-
 import type {CompositeMessage} from '../../../../../../repositories/entity/message/compositeMessage';
+import {useKoSubscribableChildren} from '../../../../../../util/componentUtil';
+import {noop} from '../../../../../../util/util';
 
 interface MessageButtonProps {
   id: string;

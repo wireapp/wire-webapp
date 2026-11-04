@@ -25,7 +25,6 @@ import {useVirtualizer} from '@tanstack/react-virtual';
 import cx from 'classnames';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {useLoadMessages} from './useLoadMessages';
 import {useScrollMessages} from './useScrollMessages';
@@ -33,6 +32,7 @@ import {useScrollMessages} from './useScrollMessages';
 import {useRoveFocus} from '../../../hooks/useRoveFocus';
 import {MessageRepository} from '../../../repositories/conversation/MessageRepository';
 import {Conversation} from '../../../repositories/entity/Conversation';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {MarkerComponent} from '../message/marker';
 import {Message} from '../message/virtualizedMessage';
 import {MessagesListParams} from '../messageList.types';

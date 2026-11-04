@@ -19,7 +19,7 @@
 
 import {MemberMessage} from '../../../repositories/entity/message/memberMessage';
 import {ClientEvent} from '../../../repositories/event/Client';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 import {filterMessages} from './messagesFilter';
 

@@ -26,8 +26,8 @@ import {act, render} from '@testing-library/react';
 
 import {MessageContent} from '../../common/messageContent/messageContent';
 import {User} from '../../../../repositories/entity/User';
-import {unwrap} from 'Util/test/resultTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
+import {unwrap} from '../../../../util/test/resultTestSupport';
+import {translateForTest} from '../../../../util/test/translateForTest';
 
 import {RichTextEditor} from './richTextEditor';
 

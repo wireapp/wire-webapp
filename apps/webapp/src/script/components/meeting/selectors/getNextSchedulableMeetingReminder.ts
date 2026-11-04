@@ -20,10 +20,9 @@
 import {isUndefined} from '@sindresorhus/is';
 import {Maybe} from 'true-myth';
 
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
-
 import {getFirstMeetingInstanceOnOrAfter, getNextMeetingInstance} from './getMeetingInstancesInRange';
 
+import {TIME_IN_MILLIS} from '../../../util/timeUtil';
 import type {MeetingInstance} from '../types/meetingInstance';
 import type {MeetingSeries} from '../types/meetingSeries';
 

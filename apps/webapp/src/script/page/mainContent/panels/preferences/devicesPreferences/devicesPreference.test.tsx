@@ -36,10 +36,10 @@ import {
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {Core} from 'src/script/service/coreSingleton';
-import {createUuid} from 'Util/uuid';
+import {createUuid} from '../../../../../util/uuid';
 
 import {DevicesPreferences} from './devicesPreference';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../../util/test/translateForTest';
 
 function createDevice(): ClientEntity {
   const device = new ClientEntity(true, '', createUuid());

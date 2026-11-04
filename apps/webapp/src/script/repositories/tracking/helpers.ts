@@ -22,13 +22,12 @@ import {amplify} from 'amplify';
 
 import {Runtime} from '@wireapp/commons';
 
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
-
 import {ConversationType, UserType, PlatformType} from './attribute';
 import {EventName} from './eventName';
 import {Segmentation} from './segmentation';
 
 import {RatingListLabel} from '../../components/Modals/QualityFeedbackModal/typings';
+import {TIME_IN_MILLIS} from '../../util/timeUtil';
 import {WebAppEvents} from '../../webAppEvents';
 import {Call} from '../calling/Call';
 import {Conversation} from '../entity/Conversation';

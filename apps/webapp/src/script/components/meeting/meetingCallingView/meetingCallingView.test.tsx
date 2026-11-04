@@ -34,8 +34,8 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import type {MainViewModel} from 'src/script/view_model/MainViewModel';
 import {buildMediaDevicesHandler} from 'src/script/auth/util/test/testUtil';
-import {translateForTest} from 'Util/test/translateForTest';
-import {createUuid} from 'Util/uuid';
+import {translateForTest} from '../../../util/test/translateForTest';
+import {createUuid} from '../../../util/uuid';
 
 import {MeetingCallingView} from './meetingCallingView';
 

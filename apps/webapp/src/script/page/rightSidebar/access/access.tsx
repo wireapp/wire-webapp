@@ -25,8 +25,6 @@ import {ADD_PERMISSION, CONVERSATION_ACCESS} from '@wireapp/api-client/lib/conve
 import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {conversationAccessContainerCss, conversationAccessContentCss} from './access.styles';
 
@@ -40,6 +38,8 @@ import {RadioGroup} from '../../../components/Radio';
 import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
 import {ConversationRoleRepository} from '../../../repositories/conversation/ConversationRoleRepository';
 import {Conversation} from '../../../repositories/entity/Conversation';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {useChannelsFeatureFlag} from '../../../util/useChannelsFeatureFlag';
 import {PanelHeader} from '../panelHeader';
 
 export interface AccessProps {

@@ -42,13 +42,6 @@ import {
 } from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {Core} from 'src/script/service/coreSingleton';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {isDataDogEnabled} from 'Util/dataDog';
-import {getWebEnvironment} from 'Util/environment';
-import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
-import type {Translate} from 'Util/localizerUtil/translationTypes';
-import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
-import {useMeetingsFeatureFlag} from 'Util/useMeetingsFeatureFlag';
 
 import {
   conversationsTitleWrapper,
@@ -70,6 +63,16 @@ import {Conversation} from '../../../../../repositories/entity/Conversation';
 import {User} from '../../../../../repositories/entity/User';
 import {TeamState} from '../../../../../repositories/team/TeamState';
 import {FEATURES, hasAccessToFeature} from '../../../../../repositories/user/userPermission';
+import {useKoSubscribableChildren} from '../../../../../util/componentUtil';
+import {isDataDogEnabled} from '../../../../../util/dataDog';
+import {getWebEnvironment} from '../../../../../util/environment';
+import {
+  createReactTranslationMarker,
+  renderReactTranslation,
+} from '../../../../../util/localizerUtil/reactLocalizerUtil';
+import type {Translate} from '../../../../../util/localizerUtil/translationTypes';
+import {useChannelsFeatureFlag} from '../../../../../util/useChannelsFeatureFlag';
+import {useMeetingsFeatureFlag} from '../../../../../util/useMeetingsFeatureFlag';
 import {ContentState} from '../../../../useAppState';
 import {ConversationTab} from '../conversationTab';
 import {conversationFilters} from '../helpers';

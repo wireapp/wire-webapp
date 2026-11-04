@@ -48,7 +48,7 @@ import {TestFactory} from 'test/helper/TestFactory';
 
 import {Conversations, shouldClearDeepLinkForTab} from './';
 import {SidebarTabs, useSidebarStore} from './useSidebarStore';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../util/test/translateForTest';
 
 type ConversationsProps = React.ComponentProps<typeof Conversations>;
 

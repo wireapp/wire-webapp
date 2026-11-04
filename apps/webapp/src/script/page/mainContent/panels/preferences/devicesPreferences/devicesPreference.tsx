@@ -25,7 +25,6 @@ import {container} from 'tsyringe';
 
 import {useUserIdentity} from 'src/script/hooks/useDeviceIdentities';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {DetailedDevice} from './components/detailedDevice';
 import {Device} from './components/device';
@@ -37,6 +36,7 @@ import {ConversationState} from '../../../../../repositories/conversation/Conver
 import {CryptographyRepository} from '../../../../../repositories/cryptography/CryptographyRepository';
 import {Conversation} from '../../../../../repositories/entity/Conversation';
 import {User} from '../../../../../repositories/entity/User';
+import {useKoSubscribableChildren} from '../../../../../util/componentUtil';
 import {PreferencesPage} from '../components/preferencesPage';
 
 interface DevicesPreferencesProps {

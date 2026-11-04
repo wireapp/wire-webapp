@@ -41,11 +41,11 @@ import {PropertiesRepository} from '../properties/propertiesRepository';
 import {SelfService} from '../self/SelfService';
 import {TeamState} from '../team/TeamState';
 import type {UserRecord} from '../storage';
-import type {Translate} from 'Util/localizerUtil';
-import {matchQualifiedIds} from 'Util/qualifiedId';
+import type {Translate} from '../../util/localizerUtil';
+import {matchQualifiedIds} from '../../util/qualifiedId';
 import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
-import {createUuid} from 'Util/uuid';
+import {translateForTest} from '../../util/test/translateForTest';
+import {createUuid} from '../../util/uuid';
 
 import {ConsentValue} from './consentValue';
 import {UserRepository} from './userRepository';

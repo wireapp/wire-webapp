@@ -23,10 +23,10 @@ import {isFunction, isNonEmptyArray, isNonEmptyString} from '@sindresorhus/is';
 import cx from 'classnames';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {formatTimeShort} from 'Util/timeUtil';
 
 import {Message} from '../../../repositories/entity/message/message';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {formatTimeShort} from '../../../util/timeUtil';
 import {ReadIcon} from '../../icon';
 
 const DECIMAL_NUMBER_BASE = 10;

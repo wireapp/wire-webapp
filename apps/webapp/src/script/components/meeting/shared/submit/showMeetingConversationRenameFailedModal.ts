@@ -20,8 +20,7 @@
 import {noop} from 'noop-esm';
 import type {Task} from 'true-myth';
 
-import type {Translate} from 'Util/localizerUtil';
-
+import type {Translate} from '../../../../util/localizerUtil';
 import {PrimaryModal} from '../../../Modals/PrimaryModal';
 import {meetingSubmitErrors, type MeetingSubmitErrors} from '../../meetingSubmitErrors';
 

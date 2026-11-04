@@ -25,10 +25,6 @@ import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
 
-import {iterateItem} from 'Util/arrayUtil';
-import {isEscapeKey} from 'Util/keyboardUtil';
-import {type Translate} from 'Util/localizerUtil';
-
 import type {ActionsViewModel} from './ActionsViewModel';
 import {CallingViewModel} from './CallingViewModel';
 import {ContentViewModel} from './ContentViewModel';
@@ -59,6 +55,9 @@ import {showContextMenu} from '../ui/contextMenu';
 import {showLabelContextMenu} from '../ui/labelContextMenu';
 import {Shortcut} from '../ui/shortcut';
 import {ShortcutType} from '../ui/shortcutType';
+import {iterateItem} from '../util/arrayUtil';
+import {isEscapeKey} from '../util/keyboardUtil';
+import {type Translate} from '../util/localizerUtil';
 import {WebAppEvents} from '../webAppEvents';
 
 export class ListViewModel {

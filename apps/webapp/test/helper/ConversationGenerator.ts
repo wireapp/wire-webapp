@@ -38,8 +38,8 @@ import {ConversationStatus} from '../../src/script/repositories/conversation/Con
 import {ConversationVerificationState} from '../../src/script/repositories/conversation/ConversationVerificationState';
 import {Conversation} from '../../src/script/repositories/entity/Conversation';
 import {User} from '../../src/script/repositories/entity/User';
-import {translate} from 'Util/localizerUtil';
-import {createUuid} from 'Util/uuid';
+import {translate} from '../../src/script/util/localizerUtil';
+import {createUuid} from '../../src/script/util/uuid';
 
 interface GenerateAPIConversationParams {
   id?: QualifiedId;

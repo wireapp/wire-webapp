@@ -19,10 +19,9 @@
 
 import type {FunctionComponent} from 'react';
 
-import {formatSeconds} from 'Util/timeUtil';
-
 import {wrapperStyles, playButtonWrapperStyles, seekbarStyles, timeStyles} from './videoControls.styles';
 
+import {formatSeconds} from '../../../../../../../../../util/timeUtil';
 import {SeekBar} from '../../../../common/seekBar/seekBar';
 import {VideoPlayButton} from '../common/videoPlayButton/videoPlayButton';
 

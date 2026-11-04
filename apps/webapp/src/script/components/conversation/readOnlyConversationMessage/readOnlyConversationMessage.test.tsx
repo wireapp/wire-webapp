@@ -30,7 +30,7 @@ import {User} from '../../../repositories/entity/User';
 import {withTheme} from 'src/script/auth/util/test/testUtil';
 
 import {ReadOnlyConversationMessage} from './readOnlyConversationMessage';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 const generateConversation = (
   readOnlyState: CONVERSATION_READONLY_STATE | null = null,

@@ -19,8 +19,8 @@
 
 import type {RootContextValue} from 'src/script/page/rootProvider';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
-import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
 
+import {replaceReactComponents} from '../../../../../../../util/localizerUtil/reactLocalizerUtil';
 import {PrimaryModal} from '../../../../../../Modals/PrimaryModal';
 
 export const showMoveToRecycleBinModal = ({

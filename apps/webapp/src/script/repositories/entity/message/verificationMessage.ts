@@ -21,13 +21,12 @@ import ko from 'knockout';
 
 import {QualifiedUserId} from '@wireapp/protocol-messaging';
 
-import type {Translate} from 'Util/localizerUtil';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-
 import {Message} from './message';
 
 import {SuperType} from '../../../message/superType';
 import {VerificationMessageType} from '../../../message/verificationMessageType';
+import type {Translate} from '../../../util/localizerUtil';
+import {matchQualifiedIds} from '../../../util/qualifiedId';
 import type {User} from '../User';
 
 export class VerificationMessage extends Message {

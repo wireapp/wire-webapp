@@ -33,9 +33,8 @@ import type {
 } from 'cells-sdk-ts';
 import {container, singleton} from 'tsyringe';
 
-import {createUuid} from 'Util/uuid';
-
 import {APIClient} from '../../service/apiClientSingleton';
+import {createUuid} from '../../util/uuid';
 
 interface CellsConfig {
   pydio: {

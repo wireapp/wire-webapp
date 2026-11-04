@@ -22,7 +22,7 @@ import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 
 import {type AddNotificationInput, MeetingNotificationKind} from './meetingNotificationStore/meetingNotificationStore';
 import type {MeetingSeries} from './types/meetingSeries';
-import {matchQualifiedIds} from 'Util/qualifiedId';
+import {matchQualifiedIds} from '../../util/qualifiedId';
 
 import {
   createMeetingNotificationEventHandlers,

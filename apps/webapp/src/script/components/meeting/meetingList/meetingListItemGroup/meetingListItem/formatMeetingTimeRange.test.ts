@@ -18,7 +18,7 @@
  */
 
 import {formatMeetingTimeRange} from './formatMeetingTimeRange';
-import {getRegionalDateLocale, setRegionalDateLocale} from 'Util/timeUtil';
+import {getRegionalDateLocale, setRegionalDateLocale} from '../../../../../util/timeUtil';
 
 describe('formatMeetingTimeRange', () => {
   it('places the meridiem once for a same-period range', () => {

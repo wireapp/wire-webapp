@@ -24,14 +24,14 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {Conversation} from '../../../../../repositories/entity/Conversation';
 import {User} from '../../../../../repositories/entity/User';
 import {ServiceEntity} from '../../../../../repositories/integration/ServiceEntity';
-import {createUuid} from 'Util/uuid';
+import {createUuid} from '../../../../../util/uuid';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {ConversationDetailsHeader} from './conversationDetailsHeader';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../../util/test/translateForTest';
 
 const participant = new User('id', '', translateForTest);
 const service = new ServiceEntity({id: 'id'});

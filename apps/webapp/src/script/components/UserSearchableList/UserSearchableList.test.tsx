@@ -30,7 +30,7 @@ import {User} from 'src/script/repositories/entity/User';
 import type {SearchRepository} from 'src/script/repositories/search/searchRepository';
 import type {TeamRepository} from 'src/script/repositories/team/TeamRepository';
 import type {TeamState} from 'src/script/repositories/team/TeamState';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 
 import {UserSearchableList, UserListProps} from './UserSearchableList';
 

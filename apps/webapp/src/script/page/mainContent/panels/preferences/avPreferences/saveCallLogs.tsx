@@ -24,13 +24,13 @@ import {container} from 'tsyringe';
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {getCurrentDate} from 'Util/timeUtil';
-import {downloadBlob} from 'Util/util';
 
 import {PrimaryModal} from '../../../../../components/Modals/PrimaryModal';
 import {Config} from '../../../../../Config';
 import type {CallingRepository} from '../../../../../repositories/calling/CallingRepository';
 import {UserState} from '../../../../../repositories/user/userState';
+import {getCurrentDate} from '../../../../../util/timeUtil';
+import {downloadBlob} from '../../../../../util/util';
 import {PreferencesSection} from '../components/preferencesSection';
 
 interface SaveCallLogsProps {

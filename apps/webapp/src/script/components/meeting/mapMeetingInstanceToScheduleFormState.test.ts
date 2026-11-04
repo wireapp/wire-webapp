@@ -25,7 +25,7 @@ import {maybe} from 'true-myth';
 import type {MeetingInstance} from './types/meetingInstance';
 import type {MeetingSeries} from './types/meetingSeries';
 import {User} from '../../repositories/entity/User';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 
 import {mapMeetingInstanceToScheduleFormState} from './mapMeetingInstanceToScheduleFormState';
 

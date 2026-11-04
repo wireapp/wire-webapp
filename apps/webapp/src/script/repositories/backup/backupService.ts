@@ -22,8 +22,7 @@ import {Dexie} from 'dexie';
 import DexieBatch from 'dexie-batch';
 import {container} from 'tsyringe';
 
-import {Logger, getLogger} from 'Util/logger';
-
+import {Logger, getLogger} from '../../util/logger';
 import {CONVERSATION} from '../event/Client';
 import {StorageService, type EventRecord} from '../storage';
 

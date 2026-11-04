@@ -30,8 +30,8 @@ import {
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
-import type {Translate} from 'Util/localizerUtil/translationTypes';
-import {translateForTest} from 'Util/test/translateForTest';
+import type {Translate} from '../../../util/localizerUtil/translationTypes';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 import {CellsTable} from './cellsTable';
 

@@ -26,8 +26,8 @@ import {useEffect, type FunctionComponent} from 'react';
 import {render} from '@testing-library/react';
 
 import {User} from '../../../../../../repositories/entity/User';
-import {translateForTest} from 'Util/test/translateForTest';
-import {unwrap} from 'Util/test/resultTestSupport';
+import {translateForTest} from '../../../../../../util/test/translateForTest';
+import {unwrap} from '../../../../../../util/test/resultTestSupport';
 
 import {MentionNode} from '../../nodes/mentionNode';
 import {editorConfig} from '../../editorConfig';

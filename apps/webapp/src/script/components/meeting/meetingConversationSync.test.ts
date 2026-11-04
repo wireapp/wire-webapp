@@ -24,8 +24,8 @@ import {task} from 'true-myth';
 import {Conversation} from '../../repositories/entity/Conversation';
 import type {ConversationRepository} from '../../repositories/conversation/ConversationRepository';
 import {User} from '../../repositories/entity/User';
-import {translateForTest} from 'Util/test/translateForTest';
-import {unwrapErr} from 'Util/test/resultTestSupport';
+import {translateForTest} from '../../util/test/translateForTest';
+import {unwrapErr} from '../../util/test/resultTestSupport';
 
 import {meetingConversationSyncErrors, syncMeetingConversationParticipants} from './meetingConversationSync';
 

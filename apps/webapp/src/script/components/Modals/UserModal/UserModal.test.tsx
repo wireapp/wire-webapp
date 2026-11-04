@@ -27,8 +27,8 @@ import {TeamState} from '../../../repositories/team/TeamState';
 import {UserRepository} from '../../../repositories/user/userRepository';
 import {Config} from 'src/script/Config';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
-import {translateForTest} from 'Util/test/translateForTest';
-import {setStrings, translate} from 'Util/localizerUtil';
+import {translateForTest} from '../../../util/test/translateForTest';
+import {setStrings, translate} from '../../../util/localizerUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

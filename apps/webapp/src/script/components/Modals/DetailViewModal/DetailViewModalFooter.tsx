@@ -25,13 +25,12 @@ import {ReactionType} from '@wireapp/core/lib/conversation';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {isTabKey} from 'Util/keyboardUtil';
-import type {Translate} from 'Util/localizerUtil';
-
 import {MessageRepository} from '../../../repositories/conversation/MessageRepository';
 import {Conversation} from '../../../repositories/entity/Conversation';
 import {ContentMessage} from '../../../repositories/entity/message/contentMessage';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {isTabKey} from '../../../util/keyboardUtil';
+import type {Translate} from '../../../util/localizerUtil';
 import {DownloadButton} from '../../messagesList/message/contentMessage/messageActions/downloadButton';
 import {useMessageActionsState} from '../../messagesList/message/contentMessage/messageActions/messageActions.state';
 import {

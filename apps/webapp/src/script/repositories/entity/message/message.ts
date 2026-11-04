@@ -23,9 +23,6 @@ import ko from 'knockout';
 
 import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
-import {type Translate, getUserName} from 'Util/localizerUtil';
-import {formatDateNumeral, formatDurationCaption, formatTimeShort, fromUnixTime, TIME_IN_MILLIS} from 'Util/timeUtil';
-
 import {CallingTimeoutMessage} from './callingTimeoutMessage';
 import type {CallMessage} from './callMessage';
 import type {CompositeMessage} from './compositeMessage';
@@ -50,6 +47,14 @@ import {EphemeralStatusType} from '../../../message/ephemeralStatusType';
 import type {MessageCategory} from '../../../message/messageCategory';
 import {StatusType} from '../../../message/statusType';
 import {SuperType} from '../../../message/superType';
+import {type Translate, getUserName} from '../../../util/localizerUtil';
+import {
+  formatDateNumeral,
+  formatDurationCaption,
+  formatTimeShort,
+  fromUnixTime,
+  TIME_IN_MILLIS,
+} from '../../../util/timeUtil';
 import {AssetTransferState} from '../../assets/assetTransferState';
 import {AssetType} from '../../assets/assetType';
 import type {ReadReceipt} from '../../storage/record/eventRecord';

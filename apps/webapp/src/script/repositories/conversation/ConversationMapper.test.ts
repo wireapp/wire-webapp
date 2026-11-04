@@ -40,8 +40,8 @@ import ko from 'knockout';
 import {Conversation} from '../entity/Conversation';
 import {ContentMessage} from '../entity/message/contentMessage';
 import {BaseError} from 'src/script/error/baseError';
-import {translate} from 'Util/localizerUtil';
-import {createUuid} from 'Util/uuid';
+import {translate} from '../../util/localizerUtil';
+import {createUuid} from '../../util/uuid';
 
 import {ACCESS_STATE} from './AccessState';
 import {ConversationDatabaseData, ConversationMapper, SelfStatusUpdateDatabaseData} from './ConversationMapper';
@@ -51,7 +51,7 @@ import {ConversationVerificationState} from './ConversationVerificationState';
 import {NOTIFICATION_STATE} from './NotificationSetting';
 
 import {entities, payload} from '../../../../test/api/payloads';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 
 describe('ConversationMapper', () => {
   describe('mapConversations', () => {

@@ -23,17 +23,16 @@ import ko from 'knockout';
 
 import {CALL_TYPE, CONV_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 
-import {chunk, getDifference, partition} from 'Util/arrayUtil';
-import {getLogger, Logger} from 'Util/logger';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-import {sortUsersByPriority} from 'Util/stringUtil';
-
 import {AudioSpeakerFactory} from './AudioSpeakerFactory';
 import {CallingEpochCache} from './CallingEpochCache';
 import {MuteState} from './CallState';
 import type {ClientId, Participant} from './Participant';
 
 import {Config} from '../../Config';
+import {chunk, getDifference, partition} from '../../util/arrayUtil';
+import {getLogger, Logger} from '../../util/logger';
+import {matchQualifiedIds} from '../../util/qualifiedId';
+import {sortUsersByPriority} from '../../util/stringUtil';
 import {Conversation} from '../entity/Conversation';
 import {CanvasMediaStreamMixer} from '../media/CanvasMediaStreamMixer';
 import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';

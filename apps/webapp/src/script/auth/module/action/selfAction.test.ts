@@ -21,7 +21,7 @@ import type {Self} from '@wireapp/api-client/lib/self/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {SelfActionCreator} from './creator/';
-import {toError} from 'Util/toError';
+import {toError} from '../../../util/toError';
 
 import {mockStoreFactory} from '../../util/test/mockStoreFactory';
 

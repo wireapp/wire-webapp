@@ -41,15 +41,15 @@ import {TeamState} from '../../repositories/team/TeamState';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {Config} from 'src/script/Config';
 import {disableMessagePreprocessingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
-import {translate} from 'Util/localizerUtil';
+import {translate} from '../../util/localizerUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {createUuid} from 'Util/uuid';
+import {createUuid} from '../../util/uuid';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 import type {ReactNode} from 'react';
 
 jest.mock('../avatar', () => {

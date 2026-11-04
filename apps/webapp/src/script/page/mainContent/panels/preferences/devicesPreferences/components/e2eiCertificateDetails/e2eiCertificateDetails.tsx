@@ -26,12 +26,12 @@ import {TabIndex, Button, ButtonVariant} from '@wireapp/react-ui-kit';
 import {E2EIHandler, MLSStatuses, WireIdentity} from 'src/script/e2eIdentity';
 import {useCertificateStatus} from 'src/script/hooks/useCertificateStatus';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {getLogger} from 'Util/logger';
 
 import {styles} from './e2eiCertificateDetails.styles';
 import {useCertificateDetailsModal} from './useCertificateDetailsModal';
 
 import {VerificationBadges} from '../../../../../../../components/badge';
+import {getLogger} from '../../../../../../../util/logger';
 
 const logger = getLogger('E2EICertificateDetails');
 

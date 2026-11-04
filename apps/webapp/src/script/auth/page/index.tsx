@@ -31,8 +31,6 @@ import {Button, ButtonVariant, ContainerXS, ErrorMessage, Text} from '@wireapp/r
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {Core} from 'src/script/service/coreSingleton';
-import {isDataDogEnabled} from 'Util/dataDog';
-import {getWebEnvironment} from 'Util/environment';
 
 import {Page} from './page';
 
@@ -40,6 +38,8 @@ import {LogoFullIcon} from '../../components/icon';
 import {Config} from '../../Config';
 import {useSingleInstance} from '../../hooks/useSingleInstance';
 import '../../localization/Localizer';
+import {isDataDogEnabled} from '../../util/dataDog';
+import {getWebEnvironment} from '../../util/environment';
 import {actionRoot} from '../module/action';
 import {bindActionCreators, RootState, type ThunkAction} from '../module/reducer';
 import * as AuthSelector from '../module/selector/authSelector';

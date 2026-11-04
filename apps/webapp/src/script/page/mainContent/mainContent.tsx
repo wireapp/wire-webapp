@@ -25,9 +25,6 @@ import {CSSTransition, SwitchTransition} from 'react-transition-group';
 import {container} from 'tsyringe';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {useMeetingsFeatureFlag} from 'Util/useMeetingsFeatureFlag';
-import {incomingCssClass, removeAnimationsClass} from 'Util/util';
 
 import {Collection} from './panels/collection';
 import {AboutPreferences} from './panels/preferences/aboutPreferences';
@@ -55,6 +52,9 @@ import {createTroubleshooterRepository} from '../../repositories/troubleshooter/
 import {createMockTroubleshooterService} from '../../repositories/troubleshooter/troubleshooterService';
 import {AppLockRepository} from '../../repositories/user/appLockRepository';
 import {UserState} from '../../repositories/user/userState';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
+import {useMeetingsFeatureFlag} from '../../util/useMeetingsFeatureFlag';
+import {incomingCssClass, removeAnimationsClass} from '../../util/util';
 import {RightSidebarParams} from '../appMain';
 import {PanelState} from '../rightSidebar';
 import {ContentState, useAppState} from '../useAppState';

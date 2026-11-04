@@ -23,11 +23,11 @@ import type {FunctionComponent} from 'react';
 import {CSSObject} from '@emotion/react';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 
 import {ContentMessage} from '../../../../../../repositories/entity/message/contentMessage';
 import {MediumImage} from '../../../../../../repositories/entity/message/mediumImage';
+import {useKoSubscribableChildren} from '../../../../../../util/componentUtil';
+import {handleKeyDown, KEY} from '../../../../../../util/keyboardUtil';
 import * as Icon from '../../../../../icon';
 import {AssetImage, GetAssetUrl, ImageLogger} from '../../../../../image';
 import {AssetLoader} from '../common/assetLoader/assetLoader';

@@ -25,13 +25,13 @@ import {
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {Conversation} from '../entity/Conversation';
-import {translate} from 'Util/localizerUtil';
+import {translate} from '../../util/localizerUtil';
 
 import {ConversationFilter} from './ConversationFilter';
 import {ConversationDatabaseData, ConversationMapper} from './ConversationMapper';
 import {ConversationStatus} from './ConversationStatus';
 import {ConversationVerificationState} from './ConversationVerificationState';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 
 describe('ConversationFilter', () => {
   describe('showCallControls', () => {

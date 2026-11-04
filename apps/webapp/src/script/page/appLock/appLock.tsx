@@ -30,10 +30,6 @@ import {Button, ButtonVariant, Checkbox, CheckboxLabel, Input, Link, LinkVariant
 import {SIGN_OUT_REASON} from 'src/script/auth/signOutReason';
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
-import type {ReactTranslationValueReplacement} from 'Util/localizerUtil/reactLocalizerUtil';
-import type {Translate} from 'Util/localizerUtil/translationTypes';
 
 import {applockStyles} from './appLock.styles';
 
@@ -43,6 +39,10 @@ import {ClientRepository} from '../../repositories/client';
 import {ClientState} from '../../repositories/client/ClientState';
 import {AppLockRepository} from '../../repositories/user/appLockRepository';
 import {AppLockState} from '../../repositories/user/appLockState';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
+import type {ReactTranslationValueReplacement} from '../../util/localizerUtil/reactLocalizerUtil';
+import {createReactTranslationMarker, renderReactTranslation} from '../../util/localizerUtil/reactLocalizerUtil';
+import type {Translate} from '../../util/localizerUtil/translationTypes';
 import {WebAppEvents} from '../../webAppEvents';
 
 const millisecondsPerSecond = 1000;

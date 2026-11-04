@@ -26,7 +26,7 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {setStrings, translate} from 'Util/localizerUtil';
+import {setStrings, translate} from '../../../../../../util/localizerUtil';
 
 import {CompleteFailureToSendWarning} from './completeFailureToSend';
 

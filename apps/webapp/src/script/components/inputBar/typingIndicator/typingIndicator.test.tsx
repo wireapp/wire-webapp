@@ -28,7 +28,7 @@ import {
 
 import {TypingIndicator, TypingIndicatorProps} from './typingIndicator';
 import {useTypingIndicatorState} from './useTypingIndicatorState/useTypingIndicatorState';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 function createUser(id: string, name: string): User {
   const user = new User(id, '', translateForTest);

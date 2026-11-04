@@ -29,9 +29,6 @@ import {noop} from 'noop-esm';
 import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {sortUsersByPriority} from 'Util/stringUtil';
-import {formatDuration} from 'Util/timeUtil';
 
 import {ConversationDetailsHeader} from './components/conversationDetailsHeader';
 import {ConversationDetailsOptions} from './components/conversationDetailsOptions';
@@ -55,6 +52,9 @@ import {TeamRepository} from '../../../repositories/team/TeamRepository';
 import {TeamState} from '../../../repositories/team/TeamState';
 import {Shortcut} from '../../../ui/shortcut';
 import {ShortcutType} from '../../../ui/shortcutType';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {sortUsersByPriority} from '../../../util/stringUtil';
+import {formatDuration} from '../../../util/timeUtil';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {PanelHeader} from '../panelHeader';
 import {PanelEntity, PanelState} from '../rightSidebar';

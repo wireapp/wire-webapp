@@ -33,9 +33,9 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import * as DataDog from 'Util/dataDog';
-import * as Environment from 'Util/environment';
-import {setStrings, translate} from 'Util/localizerUtil';
+import * as DataDog from '../../../../../util/dataDog';
+import * as Environment from '../../../../../util/environment';
+import {setStrings, translate} from '../../../../../util/localizerUtil';
 
 import en from '../../../../../../i18n/en-US.json';
 
