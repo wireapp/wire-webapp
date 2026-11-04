@@ -3588,9 +3588,9 @@ describe('CellsTable internal drag and drop', () => {
   });
 
   it.each([
-    {destination: 'itself', targetName: 'Source'},
-    {destination: 'a descendant', targetName: 'Child'},
-  ])('does not move a selected folder into $destination', ({targetName}) => {
+    {destination: 'itself', targetAccessibleName: /Source/},
+    {destination: 'a descendant', targetAccessibleName: /Child/},
+  ])('does not move a selected folder into $destination', ({targetAccessibleName}) => {
     const moveNodes = jest.fn();
     const folder = createNode({id: 'source-id', name: 'Source', path: 'conversation-id@example.com/Source'});
     const child = createNode({id: 'child-id', name: 'Child', path: 'conversation-id@example.com/Source/Child'});
@@ -3598,7 +3598,7 @@ describe('CellsTable internal drag and drop', () => {
     fireEvent.click(screen.getByRole('checkbox', {name: 'Select Source'}));
     const transfer = createInternalDragTransfer();
     fireEvent.dragStart(screen.getByRole('row', {name: /Source/}), {dataTransfer: transfer});
-    const target = screen.getByRole('row', {name: new RegExp(targetName)});
+    const target = screen.getByRole('row', {name: targetAccessibleName});
     fireEvent.dragOver(target, {dataTransfer: transfer});
     fireEvent.drop(target, {dataTransfer: transfer});
 
