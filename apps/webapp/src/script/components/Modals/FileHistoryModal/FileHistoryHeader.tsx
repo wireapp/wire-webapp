@@ -21,8 +21,6 @@ import type {FunctionComponent} from 'react';
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {
   fileHistoryCloseButtonCss,
   fileHistoryHeaderContainerCss,
@@ -33,6 +31,7 @@ import {
 import {useFileHistoryModal} from './hooks/useFileHistoryModal';
 import {FileInfo} from './types';
 
+import {useApplicationContext} from '../../../page/rootProvider';
 import {FileTypeIcon} from '../../conversation/common/fileTypeIcon/fileTypeIcon';
 import {FileLoader} from '../../FileFullscreenModal/FileLoader/FileLoader';
 import * as Icon from '../../icon';

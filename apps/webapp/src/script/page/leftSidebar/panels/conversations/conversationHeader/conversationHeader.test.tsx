@@ -25,12 +25,12 @@ import {act, render, screen} from '@testing-library/react';
 import {createDeterministicClock, type DeterministicClock} from '@enormora/clock/deterministic-clock';
 
 import {User} from '../../../../../repositories/entity/User';
-import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
+import {withThemeAndRootContext} from '../../../../../auth/util/test/testUtil';
 import {translateForTest} from '../../../../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../../testSupport/rootContextTestSupport';
 
 import {ConversationHeaderComponent} from './conversationHeader';
 

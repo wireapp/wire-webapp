@@ -24,8 +24,6 @@ import {isNullOrUndefined} from '@sindresorhus/is';
 import {ValidationUtil} from '@wireapp/commons';
 import {ErrorMessage} from '@wireapp/react-ui-kit';
 
-import {Config} from 'src/script/Config';
-
 import {CheckboxOption} from './CheckboxOption/CheckboxOption';
 import {MessageContent} from './Content/MessageContent';
 import {GuestLinkPasswordForm} from './GuestLinkPasswordForm/GuestLinkPasswordForm';
@@ -42,6 +40,7 @@ import {usePrimaryModalState, showNextModalInQueue, defaultContent, removeCurren
 import {ButtonAction, PrimaryModalType} from './PrimaryModalTypes';
 import {SecondaryButton} from './SecondaryButton/SecondaryButton';
 
+import {Config} from '../../../Config';
 import {isEnterKey, isEscapeKey} from '../../../util/keyboardUtil';
 import type {Translate} from '../../../util/localizerUtil';
 import {isValidPassword} from '../../../util/stringUtil';

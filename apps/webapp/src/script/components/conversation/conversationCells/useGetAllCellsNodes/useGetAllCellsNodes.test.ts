@@ -22,7 +22,7 @@ import {RestNode, RestNodeCollection} from 'cells-sdk-ts';
 
 import {CellsRepository} from '../../../../repositories/cells/cellsRepository';
 import {UserRepository} from '../../../../repositories/user/userRepository';
-import {createExecutingFireAndForgetInvokerForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {createExecutingFireAndForgetInvokerForTest} from '../../../../page/testSupport/rootContextTestSupport';
 
 import {useGetAllCellsNodes} from './useGetAllCellsNodes';
 

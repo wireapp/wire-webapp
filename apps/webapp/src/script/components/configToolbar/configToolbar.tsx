@@ -27,16 +27,15 @@ import {container} from 'tsyringe';
 
 import {Button, Input, Switch} from '@wireapp/react-ui-kit';
 
-import {Config, Configuration} from 'src/script/Config';
-import {StartupFeatureToggleName, startupFeatureToggleNames} from 'src/script/featureToggles/startupFeatureToggleNames';
-import {updateLocationSearchForStartupFeatureToggle} from 'src/script/featureToggles/startupFeatureToggleQueryParameters';
-import {useClickOutside} from 'src/script/hooks/useClickOutside';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {CallLogsUploadSettings} from './callLogsUploadSettings';
 import {wrapperStyles} from './configToolbar.styles';
 import {openDebugToolbarEventName} from './debugToolbarEvents';
 
+import {Config, Configuration} from '../../Config';
+import {StartupFeatureToggleName, startupFeatureToggleNames} from '../../featureToggles/startupFeatureToggleNames';
+import {updateLocationSearchForStartupFeatureToggle} from '../../featureToggles/startupFeatureToggleQueryParameters';
+import {useClickOutside} from '../../hooks/useClickOutside';
+import {useApplicationContext} from '../../page/rootProvider';
 import {ConversationState} from '../../repositories/conversation/ConversationState';
 import {CoreCryptoLogLevel} from '../../util/debugUtil';
 import {getLogger} from '../../util/logger';

@@ -25,13 +25,12 @@ import {container} from 'tsyringe';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {WireIdentity} from 'src/script/e2eIdentity';
-import {MLSDeviceDetails} from 'src/script/page/mainContent/panels/preferences/devicesPreferences/components/mlsDeviceDetails';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {Config} from '../../../../Config';
+import {WireIdentity} from '../../../../e2eIdentity';
 import {MotionDuration} from '../../../../motion/MotionDuration';
 import {FormattedId} from '../../../../page/mainContent/panels/preferences/devicesPreferences/components/formattedId';
+import {MLSDeviceDetails} from '../../../../page/mainContent/panels/preferences/devicesPreferences/components/mlsDeviceDetails';
+import {useApplicationContext} from '../../../../page/rootProvider';
 import type {ClientRepository, ClientEntity} from '../../../../repositories/client';
 import {isMLSConversation} from '../../../../repositories/conversation/ConversationSelectors';
 import {ConversationState} from '../../../../repositories/conversation/ConversationState';

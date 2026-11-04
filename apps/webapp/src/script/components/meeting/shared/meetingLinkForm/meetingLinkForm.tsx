@@ -19,14 +19,13 @@
 
 import type {FunctionComponent} from 'react';
 
-import {Config} from 'src/script/Config';
-
 import {
   embeddedPasswordActionsStyles,
   embeddedPasswordSectionStyles,
   passwordFieldsStyles,
 } from './meetingLinkForm.styles';
 
+import {Config} from '../../../../Config';
 import {CopyToClipboardButton} from '../../../copyToClipboardButton';
 import {PasswordFields, type PasswordFieldsProps} from '../../../PasswordFields/PasswordFields';
 import {PasswordGeneratorButton} from '../../../PasswordGeneratorButton';

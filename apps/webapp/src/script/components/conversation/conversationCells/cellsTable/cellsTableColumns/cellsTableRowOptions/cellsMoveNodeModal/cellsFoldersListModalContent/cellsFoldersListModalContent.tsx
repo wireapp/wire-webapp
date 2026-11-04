@@ -21,14 +21,13 @@ import type {FunctionComponent} from 'react';
 
 import {isNonEmptyArray} from '@sindresorhus/is';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {CellsCreateNewFolderHint} from './cellsCreateNewFolderHint/cellsCreateNewFolderHint';
 import {CellsFolderList} from './cellsFolderList/cellsFolderList';
 import {CellsFolderListEmpty} from './cellsFolderListEmpty/cellsFolderListEmpty';
 import {CellsFolderListLoading} from './cellsFolderListLoading/cellsFolderListLoading';
 import {breadcrumbsWrapperStyles, listWrapperStyles} from './cellsFoldersListModalContent.styles';
 
+import {useApplicationContext} from '../../../../../../../../page/rootProvider';
 import {CellsBreadcrumbs} from '../../../../../common/cellsBreadcrumbs/cellsBreadcrumbs';
 import {getBreadcrumbsFromPath} from '../../../../../common/getBreadcrumbsFromPath/getBreadcrumbsFromPath';
 

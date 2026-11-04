@@ -46,10 +46,6 @@ import {
   UploadIcon,
 } from '@wireapp/react-ui-kit';
 
-import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {CellNode, CellNodeType} from 'src/script/types/cellNode';
-
 import {bulkMoveReducer} from './bulkMoveState';
 import {CellsBulkMovePreviewModal} from './cellsBulkMovePreviewModal/cellsBulkMovePreviewModal';
 import {CellsBulkMoveToBinConfirmationModal} from './cellsBulkMoveToBinConfirmationModal';
@@ -84,8 +80,11 @@ import {getBulkMoveOutcomeEvidence} from './getBulkMoveOutcomeEvidence';
 import type {PermanentDeleteReviewReason} from './usePermanentDeleteReconciliation';
 import {usePermanentDeleteReconciliation} from './usePermanentDeleteReconciliation';
 
+import {driveBulkActionsFeatureToggleName} from '../../../../featureToggles/startupFeatureToggleNames';
+import {useApplicationContext} from '../../../../page/rootProvider';
 import {CellsRepository} from '../../../../repositories/cells/cellsRepository';
 import type {Conversation} from '../../../../repositories/entity/Conversation';
+import {CellNode, CellNodeType} from '../../../../types/cellNode';
 import {formatBytes} from '../../../../util/util';
 import {PrimaryModal, removeCurrentModal, usePrimaryModalState} from '../../../Modals/PrimaryModal';
 import {

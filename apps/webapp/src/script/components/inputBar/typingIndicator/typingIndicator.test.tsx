@@ -24,7 +24,7 @@ import {User} from '../../../repositories/entity/User';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../page/testSupport/rootContextTestSupport';
 
 import {TypingIndicator, TypingIndicatorProps} from './typingIndicator';
 import {useTypingIndicatorState} from './useTypingIndicatorState/useTypingIndicatorState';

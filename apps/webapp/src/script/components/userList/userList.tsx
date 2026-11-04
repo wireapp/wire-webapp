@@ -25,11 +25,10 @@ import {container} from 'tsyringe';
 
 import {ChevronDownIcon} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {UserListItem} from './components/userListItem';
 import {collapseButton, collapseIcon} from './userList.styles';
 
+import {useApplicationContext} from '../../page/rootProvider';
 import type {ConversationRepository} from '../../repositories/conversation/ConversationRepository';
 import {ConversationState} from '../../repositories/conversation/ConversationState';
 import type {Conversation} from '../../repositories/entity/Conversation';

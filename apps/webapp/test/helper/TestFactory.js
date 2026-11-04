@@ -50,9 +50,9 @@ import {PropertiesService} from '../../src/script/repositories/properties/proper
 import {SearchRepository} from '../../src/script/repositories/search/searchRepository';
 import {SelfService} from '../../src/script/repositories/self/SelfService';
 import {SelfRepository} from '../../src/script/repositories/self/SelfRepository';
-import {Core} from 'src/script/service/coreSingleton';
-import {APIClient} from 'src/script/service/apiClientSingleton';
-import {createStorageEngine, DatabaseTypes} from 'src/script/service/storeEngineProvider';
+import {Core} from '../../src/script/service/coreSingleton';
+import {APIClient} from '../../src/script/service/apiClientSingleton';
+import {createStorageEngine, DatabaseTypes} from '../../src/script/service/storeEngineProvider';
 import {StorageService} from '../../src/script/repositories/storage';
 import {StorageRepository} from '../../src/script/repositories/storage/storageRepository';
 import {TeamRepository} from '../../src/script/repositories/team/TeamRepository';
@@ -62,7 +62,7 @@ import {EventTrackingRepository} from '../../src/script/repositories/tracking/ev
 import {UserRepository} from '../../src/script/repositories/user/userRepository';
 import {UserService} from '../../src/script/repositories/user/userService';
 import {UserState} from '../../src/script/repositories/user/userState';
-import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
+import {serverTimeHandler} from '../../src/script/time/serverTimeHandler';
 import {translate} from '../../src/script/util/localizerUtil';
 
 import {entities} from '../api/payloads';

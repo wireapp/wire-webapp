@@ -26,9 +26,8 @@ import {countBy, map} from 'underscore';
 
 import {Bold, Button, ButtonVariant, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
-import {Config} from 'src/script/Config';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
+import {Config} from '../../../../../../Config';
+import {useApplicationContext} from '../../../../../../page/rootProvider';
 import {matchQualifiedIds} from '../../../../../../util/qualifiedId';
 import {useMessageFocusedTabIndex} from '../../../util';
 import {backendErrorLink, button, warning, wrapper} from '../warnings.styles';

@@ -19,8 +19,7 @@
 
 import {useMemo, type FunctionComponent} from 'react';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
+import {useApplicationContext} from '../../../../page/rootProvider';
 import {generateCellState} from '../../../../repositories/conversation/ConversationCellState';
 import {ConversationStatusIcon} from '../../../../repositories/conversation/ConversationStatusIcon';
 import type {Conversation} from '../../../../repositories/entity/Conversation';

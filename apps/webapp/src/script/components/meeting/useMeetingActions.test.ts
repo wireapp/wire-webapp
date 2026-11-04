@@ -25,7 +25,7 @@ import {useMeetingActions} from './useMeetingActions';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../page/testSupport/rootContextTestSupport';
 import {translateForTest} from '../../util/test/translateForTest';
 
 const clock = createDeterministicClock({

@@ -22,7 +22,7 @@ import {render} from '@testing-library/react';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../../page/testSupport/rootContextTestSupport';
 
 import {UserStatusBadges} from './userStatusBadges';
 import {translateForTest} from '../../../../util/test/translateForTest';

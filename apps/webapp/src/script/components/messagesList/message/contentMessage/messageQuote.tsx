@@ -23,8 +23,6 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {AudioAsset} from './asset/audioAsset/audioAsset';
 import {FileAsset} from './asset/fileAsset/fileAsset';
 import {LocationAsset} from './asset/locationAsset';
@@ -35,6 +33,7 @@ import {VideoAsset} from './asset/videoAsset/videoAsset';
 import {MessageActions} from '..';
 import {ConversationError} from '../../../../error/conversationError';
 import {QuoteEntity} from '../../../../message/quoteEntity';
+import {useApplicationContext} from '../../../../page/rootProvider';
 import type {Conversation} from '../../../../repositories/entity/Conversation';
 import {ContentMessage} from '../../../../repositories/entity/message/contentMessage';
 import {Multipart} from '../../../../repositories/entity/message/multipart';

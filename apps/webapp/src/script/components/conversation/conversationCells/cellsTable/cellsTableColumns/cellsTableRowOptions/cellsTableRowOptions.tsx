@@ -23,9 +23,6 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {CellNode, CellNodeType} from 'src/script/types/cellNode';
-
 import {CellsMoveNodeModal} from './cellsMoveNodeModal/cellsMoveNodeModal';
 import {CellsRenameNodeModal} from './cellsRenameNodeModal/cellsRenameNodeModal';
 import {buttonStyles, iconStyles, textStyles} from './cellsTableRowOptions.styles';
@@ -38,7 +35,9 @@ import {useDeleteNode} from './useDeleteNode/useDeleteNode';
 import {useRestoreNestedNode} from './useRestoreNestedNode/useRestoreNestedNode';
 import {useRestoreParentNode} from './useRestoreParentNode/useRestoreParentNode';
 
+import {useApplicationContext} from '../../../../../../page/rootProvider';
 import {CellsRepository} from '../../../../../../repositories/cells/cellsRepository';
+import {CellNode, CellNodeType} from '../../../../../../types/cellNode';
 import {isFileEditable} from '../../../../../../util/fileTypeUtil';
 import {forcedDownloadFile} from '../../../../../../util/util';
 import {useAppNotification} from '../../../../../appNotification/appNotification';

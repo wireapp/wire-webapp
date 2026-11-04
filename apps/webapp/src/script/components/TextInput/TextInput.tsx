@@ -23,10 +23,9 @@ import {isNonEmptyString} from '@sindresorhus/is';
 
 import {CheckIcon, COLOR} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {cancelButtonCSS, containerCSS, errorMessageCSS, getIconCSS, getInputCSS, getLabelCSS} from './TextInput.styles';
 
+import {useApplicationContext} from '../../page/rootProvider';
 import {isTabKey} from '../../util/keyboardUtil';
 import * as Icon from '../icon';
 

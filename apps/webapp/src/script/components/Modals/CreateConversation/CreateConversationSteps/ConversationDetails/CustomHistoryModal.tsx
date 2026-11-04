@@ -23,8 +23,7 @@ import {isNan} from '@sindresorhus/is';
 
 import {Button, ButtonVariant, FlexBox, Input, Select, Text} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
+import {useApplicationContext} from '../../../../../page/rootProvider';
 import {handleEscDown, handleKeyDown, KEY} from '../../../../../util/keyboardUtil';
 import {ModalComponent} from '../../../ModalComponent';
 import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';

@@ -18,10 +18,10 @@
  */
 
 import {asyncNoop} from 'noop-esm';
-import {PageManager} from 'test/e2e_tests/pageManager';
+import {PageManager} from '../../pageManager';
 
 import {test, expect, withLogin} from '../../test.fixtures';
-import {sendConnectionRequest} from 'test/e2e_tests/utils/userActions';
+import {sendConnectionRequest} from '../../utils/userActions';
 
 test(
   '1:1 Video call with device switch and screenshare',

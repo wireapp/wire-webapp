@@ -25,8 +25,6 @@ import {amplify} from 'amplify';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {FadingScrollbar} from '../../../components/fadingScrollbar';
 import * as Icon from '../../../components/icon';
 import {EnrichedFields} from '../../../components/panel/enrichedFields';
@@ -44,6 +42,7 @@ import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {handleKeyDown, KEY} from '../../../util/keyboardUtil';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {WebAppEvents} from '../../../webAppEvents';
+import {useApplicationContext} from '../../rootProvider';
 import {PanelHeader} from '../panelHeader';
 import {PanelEntity} from '../rightSidebar';
 

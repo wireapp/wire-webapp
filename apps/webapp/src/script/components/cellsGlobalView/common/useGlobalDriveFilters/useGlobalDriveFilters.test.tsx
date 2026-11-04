@@ -32,8 +32,8 @@ import {TeamState} from '../../../../repositories/team/TeamState';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {Core} from 'src/script/service/coreSingleton';
+} from '../../../../page/testSupport/rootContextTestSupport';
+import {Core} from '../../../../service/coreSingleton';
 import {translateForTest} from '../../../../util/test/translateForTest';
 
 import {useGlobalDriveFilters} from './useGlobalDriveFilters';

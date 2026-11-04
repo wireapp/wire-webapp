@@ -26,10 +26,9 @@ import {AnyAction, Dispatch} from 'redux';
 
 import {Button, ContainerXS, Form, H1, Input} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {Page} from './page';
 
+import {useApplicationContext} from '../../page/rootProvider';
 import {toError} from '../../util/toError';
 import {Exception} from '../component/exception';
 import {actionRoot} from '../module/action';

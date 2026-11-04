@@ -21,8 +21,6 @@ import {memo, useCallback, useEffect, useRef, useState, type FunctionComponent, 
 
 import {useDebouncedCallback} from 'use-debounce';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {DeviceSelect} from './deviceSelect';
 
 import * as Icon from '../../../../../components/icon';
@@ -36,6 +34,7 @@ import {
 } from '../../../../../util/localizerUtil/reactLocalizerUtil';
 import type {Translate} from '../../../../../util/localizerUtil/translationTypes';
 import {getLogger} from '../../../../../util/logger';
+import {useApplicationContext} from '../../../../rootProvider';
 import {PreferencesSection} from '../components/preferencesSection';
 
 const logger = getLogger('CameraPreferences');

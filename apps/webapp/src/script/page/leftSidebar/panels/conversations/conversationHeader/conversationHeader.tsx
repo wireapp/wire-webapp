@@ -24,10 +24,6 @@ import {amplify} from 'amplify';
 
 import {CircleCloseIcon, IconButton, Input, SearchIcon} from '@wireapp/react-ui-kit';
 
-import {useConversationSearch} from 'src/script/page/leftSidebar/panels/conversations/hooks/useConversationSearch';
-import {SidebarTabs} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {
   button,
   collapsedHeader,
@@ -49,6 +45,9 @@ import {generatePermissionHelpers} from '../../../../../repositories/user/userPe
 import {handleEnterDown, handleEscDown, isTabKey} from '../../../../../util/keyboardUtil';
 import {useChannelsFeatureFlag} from '../../../../../util/useChannelsFeatureFlag';
 import {WebAppEvents} from '../../../../../webAppEvents';
+import {useApplicationContext} from '../../../../rootProvider';
+import {useConversationSearch} from '../hooks/useConversationSearch';
+import {SidebarTabs} from '../useSidebarStore';
 
 export const conversationsPanelHeadingId = 'conversations-heading';
 

@@ -21,8 +21,6 @@ import type {FunctionComponent} from 'react';
 
 import {FolderIcon} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {
   arrowIconStyles,
   buttonStyles,
@@ -33,6 +31,7 @@ import {
   navigateButtonStyles,
 } from './cellsFolderList.styles';
 
+import {useApplicationContext} from '../../../../../../../../../page/rootProvider';
 import {ChevronRight} from '../../../../../../../../icon';
 
 interface CellsFolderListProps {

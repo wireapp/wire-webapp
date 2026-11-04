@@ -22,17 +22,17 @@ import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 
 import {randomInt} from 'crypto';
 
-import {generateUser} from 'test/helper/UserGenerator';
+import {generateUser} from '../../../../../test/helper/UserGenerator';
 
 import en from '../../../../i18n/en-US.json';
 import {MemberMessage as MemberMessageEntity} from '../../../repositories/entity/message/memberMessage';
 import {User} from '../../../repositories/entity/User';
-import {withTheme, withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
-import {SystemMessageType} from 'src/script/message/systemMessageType';
+import {withTheme, withThemeAndRootContext} from '../../../auth/util/test/testUtil';
+import {SystemMessageType} from '../../../message/systemMessageType';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../page/testSupport/rootContextTestSupport';
 import {setStrings, translate} from '../../../util/localizerUtil';
 
 import {MemberMessage} from './memberMessage';

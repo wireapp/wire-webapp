@@ -24,12 +24,11 @@ import {isNonEmptyArray, isNumber, isUndefined} from '@sindresorhus/is';
 import {useVirtualizer} from '@tanstack/react-virtual';
 import cx from 'classnames';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {useLoadMessages} from './useLoadMessages';
 import {useScrollMessages} from './useScrollMessages';
 
 import {useRoveFocus} from '../../../hooks/useRoveFocus';
+import {useApplicationContext} from '../../../page/rootProvider';
 import {MessageRepository} from '../../../repositories/conversation/MessageRepository';
 import {Conversation} from '../../../repositories/entity/Conversation';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';

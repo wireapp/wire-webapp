@@ -25,11 +25,11 @@ import {ContentMessage} from '../../../../repositories/entity/message/contentMes
 import {LinkPreview} from '../../../../repositories/entity/message/linkPreview';
 import {Text} from '../../../../repositories/entity/message/text';
 import {User} from '../../../../repositories/entity/User';
-import {QuoteEntity} from 'src/script/message/quoteEntity';
+import {QuoteEntity} from '../../../../message/quoteEntity';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../../page/testSupport/rootContextTestSupport';
 import {translateForTest} from '../../../../util/test/translateForTest';
 import {createUuid} from '../../../../util/uuid';
 

@@ -27,13 +27,13 @@ import {PropertiesRepository} from '../../../../repositories/properties/properti
 import {TeamState} from '../../../../repositories/team/TeamState';
 import {AppLockRepository} from '../../../../repositories/user/appLockRepository';
 import type {UserRepository} from '../../../../repositories/user/userRepository';
-import {Config} from 'src/script/Config';
-import {withTheme} from 'src/script/auth/util/test/testUtil';
+import {Config} from '../../../../Config';
+import {withTheme} from '../../../../auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {Core} from 'src/script/service/coreSingleton';
+} from '../../../testSupport/rootContextTestSupport';
+import {Core} from '../../../../service/coreSingleton';
 import {translateForTest} from '../../../../util/test/translateForTest';
 
 import {AccountPreferences} from './accountPreferences';

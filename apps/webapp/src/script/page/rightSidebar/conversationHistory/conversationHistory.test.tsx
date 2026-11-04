@@ -22,11 +22,11 @@ import {container} from 'tsyringe';
 
 import {User} from '../../../repositories/entity/User';
 import {TeamState} from '../../../repositories/team/TeamState';
-import {withTheme} from 'src/script/auth/util/test/testUtil';
+import {withTheme} from '../../../auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../testSupport/rootContextTestSupport';
 import {translateForTest} from '../../../util/test/translateForTest';
 
 import {ConversationHistory} from './conversationHistory';

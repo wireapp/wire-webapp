@@ -19,8 +19,7 @@
 
 import {Maybe} from 'true-myth';
 
-import {CellsSelfUserDriveRole} from 'src/script/components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
-
+import {CellsSelfUserDriveRole} from '../components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {Conversation} from '../repositories/entity/Conversation';
 import {User} from '../repositories/entity/User';
 

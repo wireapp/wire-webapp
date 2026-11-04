@@ -21,11 +21,10 @@ import {useEffect, FC, useState, HTMLProps, useRef, type FunctionComponent} from
 
 import {isNan, isNull} from '@sindresorhus/is';
 
-import {isKeyDownEvent} from 'src/script/guards/Event';
-import {isAuxClickEvent, isClickEvent} from 'src/script/guards/Mouse';
-
 import {ShowMoreButton} from './showMoreButton';
 
+import {isKeyDownEvent} from '../../../../../../guards/Event';
+import {isAuxClickEvent, isClickEvent} from '../../../../../../guards/Mouse';
 import {getAllFocusableElements, setElementsTabIndex} from '../../../../../../util/focusUtil';
 import {handleKeyDown, KEY} from '../../../../../../util/keyboardUtil';
 

@@ -23,13 +23,12 @@ import {isNonEmptyString} from '@sindresorhus/is';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {ContentState} from 'src/script/page/useAppState';
-
 import {BackupFileUpload} from './backupFileUpload';
 
 import {Config} from '../../Config';
 import {MotionDuration} from '../../motion/MotionDuration';
+import {useApplicationContext} from '../../page/rootProvider';
+import {ContentState} from '../../page/useAppState';
 import {BackupRepository} from '../../repositories/backup/backupRepository';
 import {
   CancelError,

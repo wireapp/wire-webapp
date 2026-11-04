@@ -21,8 +21,6 @@ import React, {type FunctionComponent} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {CallParticipantItemContent} from './CallParticipantItemContent';
 import {
   callParticipantListItemWrapper,
@@ -33,6 +31,7 @@ import {
 import {CallParticipantsListItemHandRaiseIcon} from './CallParticipantsListItemHandRaiseIcon';
 import {CallParticipantStatusIcons} from './CallParticipantStatusIcons';
 
+import {useApplicationContext} from '../../../page/rootProvider';
 import {Participant} from '../../../repositories/calling/Participant';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {handleKeyDown, KEY} from '../../../util/keyboardUtil';

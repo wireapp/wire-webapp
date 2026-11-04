@@ -22,9 +22,8 @@ import {useEffect, useState} from 'react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Result, result, task} from 'true-myth';
 
-import {CellNode} from 'src/script/types/cellNode';
-
 import {CellsRepository} from '../../../../../../../../repositories/cells/cellsRepository';
+import {CellNode} from '../../../../../../../../types/cellNode';
 import {getCellsApiPath} from '../../../../../common/getCellsApiPath/getCellsApiPath';
 
 interface UseMoveCellsNodeProps {

@@ -21,8 +21,6 @@ import type {FunctionComponent} from 'react';
 
 import {isNonEmptyArray} from '@sindresorhus/is';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import * as Icon from '../../../../../components/icon';
 import {ServiceList} from '../../../../../components/ServiceList';
 import {UserList} from '../../../../../components/userList';
@@ -30,6 +28,7 @@ import {ConversationRepository} from '../../../../../repositories/conversation/C
 import {Conversation} from '../../../../../repositories/entity/Conversation';
 import {User} from '../../../../../repositories/entity/User';
 import {ServiceEntity} from '../../../../../repositories/integration/ServiceEntity';
+import {useApplicationContext} from '../../../../rootProvider';
 
 interface ConversationDetailsParticipantsProps {
   activeConversation: Conversation;

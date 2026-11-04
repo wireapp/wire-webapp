@@ -27,9 +27,9 @@ import {
   getConversationsWithHeadings,
   getTabConversations,
   scrollToConversation,
-} from 'src/script/page/leftSidebar/panels/conversations/helpers';
-import {generateConversation} from 'test/helper/ConversationGenerator';
-import {generateUser} from 'test/helper/UserGenerator';
+} from './helpers';
+import {generateConversation} from '../../../../../../test/helper/ConversationGenerator';
+import {generateUser} from '../../../../../../test/helper/UserGenerator';
 
 import {SidebarTabs} from './useSidebarStore';
 

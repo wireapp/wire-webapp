@@ -22,10 +22,9 @@ import {UIEvent, useRef, type FunctionComponent} from 'react';
 import {isNullOrUndefined, isUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {AssetHeader} from './common/assetHeader/assetHeader';
 
+import {useApplicationContext} from '../../../../../page/rootProvider';
 import type {ContentMessage} from '../../../../../repositories/entity/message/contentMessage';
 import type {Text} from '../../../../../repositories/entity/message/text';
 import {useKoSubscribableChildren} from '../../../../../util/componentUtil';

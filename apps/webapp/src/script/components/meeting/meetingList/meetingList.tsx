@@ -24,8 +24,6 @@ import {isSameDay, startOfDay} from 'date-fns';
 
 import {Button, ButtonVariant, Loading} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {
   meetingDayHeaderStyles,
   meetingListContainerStyles,
@@ -43,6 +41,7 @@ import {MeetingListItem} from './meetingListItemGroup/meetingListItem/meetingLis
 import {useLoadMoreMeetingListItems} from './useLoadMoreMeetingListItems';
 import {useMeetingListVirtualizer, type UseMeetingListVirtualizer} from './useMeetingListVirtualizer';
 
+import {useApplicationContext} from '../../../page/rootProvider';
 import type {User} from '../../../repositories/entity/User';
 import {TIME_IN_MILLIS} from '../../../util/timeUtil';
 import {emptyListContainerStyles} from '../emptyMeetingList/emptyListStyles';

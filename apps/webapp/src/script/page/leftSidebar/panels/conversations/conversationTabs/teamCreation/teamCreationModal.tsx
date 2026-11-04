@@ -21,8 +21,6 @@ import {useEffect, useState, type FunctionComponent} from 'react';
 
 import {amplify} from 'amplify';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {teamCreationModalBodyCss, teamCreationModalWrapperCss} from './teamCreation.styles';
 import {Confirmation} from './teamCreationSteps/confirmation';
 import {Form} from './teamCreationSteps/form';
@@ -35,6 +33,7 @@ import {ModalComponent} from '../../../../../../components/Modals/ModalComponent
 import {EventName} from '../../../../../../repositories/tracking/eventName';
 import {Segmentation} from '../../../../../../repositories/tracking/segmentation';
 import {WebAppEvents} from '../../../../../../webAppEvents';
+import {useApplicationContext} from '../../../../../rootProvider';
 
 enum Step {
   Introduction = 'Introduction',

@@ -28,7 +28,7 @@ import {createUuid} from '../../../../../util/uuid';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../../testSupport/rootContextTestSupport';
 
 import {ConversationDetailsHeader} from './conversationDetailsHeader';
 import {translateForTest} from '../../../../../util/test/translateForTest';

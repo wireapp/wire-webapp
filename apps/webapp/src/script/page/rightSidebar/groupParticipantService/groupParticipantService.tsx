@@ -23,8 +23,6 @@ import {isNullOrUndefined} from '@sindresorhus/is';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {FadingScrollbar} from '../../../components/fadingScrollbar';
 import * as Icon from '../../../components/icon';
 import {ServiceDetails} from '../../../components/panel/serviceDetails';
@@ -38,6 +36,7 @@ import {generatePermissionHelpers} from '../../../repositories/user/userPermissi
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {handleKeyDown, KEY} from '../../../util/keyboardUtil';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
+import {useApplicationContext} from '../../rootProvider';
 import {PanelHeader} from '../panelHeader';
 
 interface GroupParticipantServiceProps {

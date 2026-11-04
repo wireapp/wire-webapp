@@ -21,11 +21,10 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {Account} from '@wireapp/core';
 
-import {initMLSGroupConversation} from 'src/script/mls/MLSConversations';
-
 import {ConversationRepository} from '../../../../repositories/conversation/ConversationRepository';
 import {isMixedConversation, MixedConversation} from '../../../../repositories/conversation/ConversationSelectors';
 import {Conversation} from '../../../../repositories/entity/Conversation';
+import {initMLSGroupConversation} from '../../../MLSConversations';
 import {mlsMigrationLogger} from '../../MLSMigrationLogger';
 
 interface JoinUnestablishedMixedConversationsParams {

@@ -21,9 +21,6 @@ import type {FunctionComponent} from 'react';
 
 import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 
-import {Config} from 'src/script/Config';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {
   adminlessDeleteReminderContainerCss,
   adminlessDeleteReminderIconCss,
@@ -31,6 +28,8 @@ import {
   adminlessDeleteReminderTextContainerCss,
 } from './adminlessDeleteReminderMessage.styles';
 
+import {Config} from '../../../../Config';
+import {useApplicationContext} from '../../../../page/rootProvider';
 import {AdminlessDeleteReminderMessage as AdminlessDeleteReminderMessageEntity} from '../../../../repositories/entity/message/adminlessDeleteReminderMessage';
 import {replaceReactComponents} from '../../../../util/localizerUtil/reactLocalizerUtil';
 import {formatLocale} from '../../../../util/timeUtil';

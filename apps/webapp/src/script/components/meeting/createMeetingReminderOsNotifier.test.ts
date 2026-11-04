@@ -33,7 +33,7 @@ import {
   systemNotificationErrorKinds,
   type SystemNotificationApi,
   type SystemNotificationRequest,
-} from 'src/script/notification/systemNotificationTypes';
+} from '../../notification/systemNotificationTypes';
 
 import {
   createMeetingReminderOsNotifier,

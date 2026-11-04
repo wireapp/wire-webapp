@@ -20,8 +20,6 @@
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
-import type {RootContextValue} from 'src/script/page/rootProvider';
-
 import * as Icon from '../../../../components/icon';
 import {MenuItem} from '../../../../components/panel/panelActions';
 import {Config} from '../../../../Config';
@@ -30,6 +28,7 @@ import {Conversation} from '../../../../repositories/entity/Conversation';
 import * as UserPermission from '../../../../repositories/user/userPermission';
 import {ActionsViewModel} from '../../../../view_model/ActionsViewModel';
 import {WebAppEvents} from '../../../../webAppEvents';
+import type {RootContextValue} from '../../../rootProvider';
 
 interface GetConversationActionsParams {
   conversationEntity: Conversation;

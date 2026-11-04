@@ -35,10 +35,9 @@ import {
   Tooltip,
 } from '@wireapp/react-ui-kit';
 
-import {MLSStatuses, WireIdentity} from 'src/script/e2eIdentity/e2eIdentityVerification';
-import {RootContextValue, useApplicationContext} from 'src/script/page/rootProvider';
-
+import {MLSStatuses, WireIdentity} from '../../../../e2eIdentity/e2eIdentityVerification';
 import {useUserIdentity} from '../../../../hooks/useDeviceIdentities';
+import {RootContextValue, useApplicationContext} from '../../../../page/rootProvider';
 import {ClientEntity} from '../../../../repositories/client';
 import {ConversationVerificationState} from '../../../../repositories/conversation/ConversationVerificationState';
 import {checkUserHandle} from '../../../../repositories/conversation/ConversationVerificationStateHandler';

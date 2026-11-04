@@ -17,10 +17,10 @@
  *
  */
 
-import {PageManager} from 'test/e2e_tests/pageManager';
+import {PageManager} from '../../pageManager';
 
 import {test, expect, LOGIN_TIMEOUT} from '../../test.fixtures';
-import {getUser} from 'test/e2e_tests/data/user';
+import {getUser} from '../../data/user';
 
 test('SSO login with claimed domain', {tag: ['@TC-8781', '@regression']}, async ({context, createPage}) => {
   const page = await createPage(context);

@@ -49,8 +49,7 @@ import {
   TrashIcon,
 } from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
+import {useApplicationContext} from '../../page/rootProvider';
 import {isEnterKey} from '../../util/keyboardUtil';
 import {splitFingerprint} from '../../util/stringUtil';
 import {isBackendError} from '../../util/typePredicateUtil';

@@ -22,7 +22,6 @@ import {memo, type FunctionComponent} from 'react';
 import {container} from 'tsyringe';
 
 import {sendCallLogsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
-import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {AudioOutPreferences} from './avPreferences/audioOutPreferences';
 import {CallOptions} from './avPreferences/callOptions';
@@ -41,6 +40,7 @@ import {MediaDevicesHandler} from '../../../../repositories/media/MediaDevicesHa
 import type {MediaDeviceType} from '../../../../repositories/media/MediaDeviceType';
 import {MediaStreamHandler} from '../../../../repositories/media/MediaStreamHandler';
 import type {PropertiesRepository} from '../../../../repositories/properties/propertiesRepository';
+import {useApplicationContext} from '../../../rootProvider';
 
 interface AVPreferencesProps {
   callingRepository: CallingRepository;

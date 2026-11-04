@@ -23,8 +23,7 @@ import {isNullOrUndefined} from '@sindresorhus/is';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
+import {useApplicationContext} from '../../../../page/rootProvider';
 import {User} from '../../../../repositories/entity/User';
 import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 import {Avatar, AVATAR_SIZE} from '../../../avatar';

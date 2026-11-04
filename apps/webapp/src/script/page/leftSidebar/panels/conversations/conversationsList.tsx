@@ -36,9 +36,6 @@ import {useDebouncedCallback} from 'use-debounce';
 
 import {WIDTH} from '@wireapp/react-ui-kit';
 
-import {useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {ConnectionRequests} from './connectionRequests';
 import {
   conversationsList,
@@ -48,6 +45,7 @@ import {
   virtualizationStyles,
 } from './conversationsList.styles';
 import {getConversationsToDisplay} from './helpers';
+import {useSidebarStore} from './useSidebarStore';
 
 import {ConversationListCell} from '../../../../components/conversationListCell';
 import type {RegisterConversationElement} from '../../../../hooks/useConversationFocus';
@@ -67,6 +65,7 @@ import {isKeyboardEvent} from '../../../../util/keyboardUtil';
 import {matchQualifiedIds} from '../../../../util/qualifiedId';
 import {isConversationEntity} from '../../../../util/typePredicateUtil';
 import {ListViewModel} from '../../../../view_model/ListViewModel';
+import {useApplicationContext} from '../../../rootProvider';
 import {useAppMainState, ViewType} from '../../../state';
 import {ContentState} from '../../../useAppState';
 

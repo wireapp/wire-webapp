@@ -25,11 +25,11 @@ import {render} from '@testing-library/react';
 import {usePrimaryModalState} from '../../../components/Modals/PrimaryModal';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import type {DeterministicClock} from '@enormora/clock/deterministic-clock';
-import {MainViewModel} from 'src/script/view_model/MainViewModel';
+import {MainViewModel} from '../../../view_model/MainViewModel';
 import {translate} from '../../../util/localizerUtil';
 import {TIME_IN_MILLIS} from '../../../util/timeUtil';
 
-import {RootProvider} from 'src/script/page/rootProvider';
+import {RootProvider} from '../../rootProvider';
 import {createRootContextValueForTest} from '../../testSupport/rootContextTestSupport';
 import {ForceReloadModal} from './forceReloadModal';
 import {translateForTest} from '../../../util/test/translateForTest';

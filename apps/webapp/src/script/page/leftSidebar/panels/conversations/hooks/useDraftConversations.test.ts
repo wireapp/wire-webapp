@@ -21,7 +21,7 @@ import {act, renderHook, waitFor} from '@testing-library/react';
 import {amplify} from 'amplify';
 
 import {StorageKey} from '../../../../../repositories/storage';
-import {generateConversation} from 'test/helper/ConversationGenerator';
+import {generateConversation} from '../../../../../../../test/helper/ConversationGenerator';
 
 import {useDraftConversations} from './useDraftConversations';
 

@@ -18,7 +18,7 @@
  */
 
 import {Locator, Page} from '@playwright/test';
-import {User} from 'test/e2e_tests/data/user';
+import {User} from '../../../data/user';
 
 export class RegistrationPage {
   readonly passwordPolicyInfo: Locator;

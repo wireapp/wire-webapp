@@ -23,10 +23,9 @@ import {isNan} from '@sindresorhus/is';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {ephemeralTimerBackgroundStyle, ephemeralTimerDialStyle} from './ephemeralTimer.styles';
 
+import {useApplicationContext} from '../../../page/rootProvider';
 import type {Message} from '../../../repositories/entity/message/message';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 

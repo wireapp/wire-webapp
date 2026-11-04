@@ -22,8 +22,8 @@ import {MouseEvent as ReactMouseEvent} from 'react';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {parseQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 
-import {generateConversationUrl} from 'src/script/router/routeGenerator';
-import {createNavigate} from 'src/script/router/routerBindings';
+import {generateConversationUrl} from '../../../../../router/routeGenerator';
+import {createNavigate} from '../../../../../router/routerBindings';
 
 interface OpenFolderParams {
   path: string;

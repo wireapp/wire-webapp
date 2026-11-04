@@ -28,11 +28,10 @@ import {AnyAction, Dispatch} from 'redux';
 
 import {Button, ContainerXS, Link, Paragraph, Text} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {Page} from './page';
 
 import {Config} from '../../Config';
+import {useApplicationContext} from '../../page/rootProvider';
 import {handleEnterDown} from '../../util/keyboardUtil';
 import {actionRoot} from '../module/action/';
 import {bindActionCreators, RootState, type ThunkAction} from '../module/reducer';

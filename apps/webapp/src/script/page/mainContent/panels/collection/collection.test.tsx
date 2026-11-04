@@ -30,12 +30,12 @@ import {LinkPreview} from '../../../../repositories/entity/message/linkPreview';
 import {MediumImage} from '../../../../repositories/entity/message/mediumImage';
 import {Text} from '../../../../repositories/entity/message/text';
 import {User} from '../../../../repositories/entity/User';
-import {withTheme} from 'src/script/auth/util/test/testUtil';
-import {MessageCategory} from 'src/script/message/messageCategory';
+import {withTheme} from '../../../../auth/util/test/testUtil';
+import {MessageCategory} from '../../../../message/messageCategory';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../testSupport/rootContextTestSupport';
 import {translateForTest} from '../../../../util/test/translateForTest';
 import {createUuid} from '../../../../util/uuid';
 

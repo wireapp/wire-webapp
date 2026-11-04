@@ -27,8 +27,8 @@ import {
   createExecutingFireAndForgetInvokerForTest,
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {CellNode, CellNodeType} from 'src/script/types/cellNode';
+} from '../../../../../page/testSupport/rootContextTestSupport';
+import {CellNode, CellNodeType} from '../../../../../types/cellNode';
 import {translateForTest} from '../../../../../util/test/translateForTest';
 
 import {useBulkMoveDestinationSelection} from './useBulkMoveDestinationSelection';

@@ -21,8 +21,7 @@ import type {FunctionComponent} from 'react';
 
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
+import {useApplicationContext} from '../../../../page/rootProvider';
 import {ProtocolUpdateMessage as ProtocolUpdateMessageEntity} from '../../../../repositories/entity/message/protocolUpdateMessage';
 import {SystemMessage} from '../../../../repositories/entity/message/systemMessage';
 import {type Translate} from '../../../../util/localizerUtil';

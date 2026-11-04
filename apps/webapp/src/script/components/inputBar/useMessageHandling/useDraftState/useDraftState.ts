@@ -21,8 +21,7 @@ import {useCallback} from 'react';
 
 import {LexicalEditor, CLEAR_EDITOR_COMMAND} from 'lexical';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
+import {useApplicationContext} from '../../../../page/rootProvider';
 import {MessageRepository} from '../../../../repositories/conversation/MessageRepository';
 import {Conversation} from '../../../../repositories/entity/Conversation';
 import {StorageRepository} from '../../../../repositories/storage';

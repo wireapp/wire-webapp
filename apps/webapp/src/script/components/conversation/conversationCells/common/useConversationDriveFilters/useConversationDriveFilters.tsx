@@ -19,8 +19,7 @@
 
 import {useCallback, useMemo, useState} from 'react';
 
-import type {RootContextValue} from 'src/script/page/rootProvider';
-
+import type {RootContextValue} from '../../../../../page/rootProvider';
 import {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
 import {ConversationRepository} from '../../../../../repositories/conversation/ConversationRepository';
 import type {FilterConfig, FilterItem} from '../cellsFiltersBar/filterConfig';

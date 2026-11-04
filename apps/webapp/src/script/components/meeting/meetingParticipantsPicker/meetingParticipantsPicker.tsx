@@ -24,8 +24,6 @@ import {Button, Popover} from 'react-aria-components';
 
 import {ChevronDownIcon, getOverlayPortalContainer, InputLabel, SearchIcon} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {formatParticipantsFieldLabel} from './formatParticipantsFieldLabel';
 import {MeetingConversationsSearchableList} from './meetingConversationsSearchableList';
 import {
@@ -44,6 +42,7 @@ import {
 import {isAllowedMeetingParticipant} from './participantPickerUtils';
 import {useMeetingParticipantsPicker} from './useMeetingParticipantsPicker';
 
+import {useApplicationContext} from '../../../page/rootProvider';
 import type {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
 import type {ConversationState} from '../../../repositories/conversation/ConversationState';
 import type {User} from '../../../repositories/entity/User';

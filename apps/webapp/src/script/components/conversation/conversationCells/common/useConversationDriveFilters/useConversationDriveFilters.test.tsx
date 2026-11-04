@@ -24,7 +24,7 @@ import type {ConversationRepository} from '../../../../../repositories/conversat
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../../../page/testSupport/rootContextTestSupport';
 import {translateForTest} from '../../../../../util/test/translateForTest';
 
 import type {FilterConfig, PopoverFilterConfig} from '../cellsFiltersBar/filterConfig';

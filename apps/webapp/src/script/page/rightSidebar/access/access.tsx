@@ -24,8 +24,6 @@ import {ADD_PERMISSION, CONVERSATION_ACCESS} from '@wireapp/api-client/lib/conve
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {conversationAccessContainerCss, conversationAccessContentCss} from './access.styles';
 
 import {FadingScrollbar} from '../../../components/fadingScrollbar';
@@ -40,6 +38,7 @@ import {ConversationRoleRepository} from '../../../repositories/conversation/Con
 import {Conversation} from '../../../repositories/entity/Conversation';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {useChannelsFeatureFlag} from '../../../util/useChannelsFeatureFlag';
+import {useApplicationContext} from '../../rootProvider';
 import {PanelHeader} from '../panelHeader';
 
 export interface AccessProps {

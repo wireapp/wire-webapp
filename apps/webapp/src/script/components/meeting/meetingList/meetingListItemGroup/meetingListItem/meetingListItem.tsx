@@ -21,8 +21,6 @@ import {memo, useMemo, type FunctionComponent} from 'react';
 
 import {CalendarIcon} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {formatMeetingTimeRange} from './formatMeetingTimeRange';
 import {MeetingAction} from './meetingAction/meetingAction';
 import {
@@ -41,6 +39,7 @@ import {
 import {MeetingParticipants} from './meetingParticipants/meetingParticipants';
 import {MeetingStatus} from './meetingStatus/meetingStatus';
 
+import {useApplicationContext} from '../../../../../page/rootProvider';
 import type {User} from '../../../../../repositories/entity/User';
 import {useMeetingPrepModal} from '../../../meetingPrep/useMeetingPrepModal';
 import {SCHEDULE_MEETING_RECURRENCE_TRANSLATION_KEYS} from '../../../scheduleMeetingModal/scheduleMeetingRecurrence';

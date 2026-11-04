@@ -22,8 +22,7 @@ import {useEffect, useState, type FunctionComponent} from 'react';
 import {isUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
+import {useApplicationContext} from '../../../../../../../page/rootProvider';
 import {AssetTransferState} from '../../../../../../../repositories/assets/assetTransferState';
 import type {FileAsset} from '../../../../../../../repositories/entity/message/fileAsset';
 import {useKoSubscribableChildren} from '../../../../../../../util/componentUtil';

@@ -23,8 +23,8 @@ import type {Conversation} from '../../../repositories/entity/Conversation';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
+} from '../../../page/testSupport/rootContextTestSupport';
+import {withThemeAndRootContext} from '../../../auth/util/test/testUtil';
 
 import {MeetingConversationsSearchableList} from './meetingConversationsSearchableList';
 import {translateForTest} from '../../../util/test/translateForTest';

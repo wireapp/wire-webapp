@@ -27,14 +27,13 @@ import {ClientMLSError, ClientMLSErrorLabel} from '@wireapp/core/lib/messagingPr
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import type {MenuItem} from './panelActions';
 import {PanelActions} from './panelActions';
 import {listCSS} from './panelActions/panelActions.styles';
 import {SingleAction} from './singleAction/singleAction';
 
+import {SidebarTabs, useSidebarStore} from '../../page/leftSidebar/panels/conversations/useSidebarStore';
+import {useApplicationContext} from '../../page/rootProvider';
 import {ACCESS_STATE} from '../../repositories/conversation/AccessState';
 import type {ConversationRoleRepository} from '../../repositories/conversation/ConversationRoleRepository';
 import {ConversationState} from '../../repositories/conversation/ConversationState';

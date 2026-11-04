@@ -54,8 +54,8 @@ import {translateForTest} from '../../../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {ListViewModel} from 'src/script/view_model/ListViewModel';
+} from '../../../testSupport/rootContextTestSupport';
+import {ListViewModel} from '../../../../view_model/ListViewModel';
 import {SidebarTabs, useSidebarStore} from './useSidebarStore';
 
 import {ConversationsList} from './conversationsList';

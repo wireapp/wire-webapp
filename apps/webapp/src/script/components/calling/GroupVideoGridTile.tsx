@@ -24,8 +24,6 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {VIDEO_STATE} from '@wireapp/avs';
 import {Loading, TabIndex} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {
   groupVideoActiveSpeaker,
   groupVideoActiveSpeakerTile,
@@ -40,6 +38,7 @@ import {
 import {useShowLoadingOverlay} from './useShowLoadingOverlay';
 import {Video} from './Video';
 
+import {useApplicationContext} from '../../page/rootProvider';
 import type {Participant} from '../../repositories/calling/Participant';
 import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {isEnterKey} from '../../util/keyboardUtil';

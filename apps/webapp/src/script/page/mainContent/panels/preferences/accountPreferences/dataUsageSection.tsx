@@ -23,14 +23,13 @@ import {amplify} from 'amplify';
 
 import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {PropertiesRepository} from '../../../../../repositories/properties/propertiesRepository';
 import {PROPERTIES_TYPE} from '../../../../../repositories/properties/propertiesType';
 import {TeamState} from '../../../../../repositories/team/TeamState';
 import {getForcedErrorReportingStatus} from '../../../../../repositories/tracking/telemetry.helpers';
 import {ConsentValue} from '../../../../../repositories/user/consentValue';
 import {WebAppEvents} from '../../../../../webAppEvents';
+import {useApplicationContext} from '../../../../rootProvider';
 import {PreferencesSection} from '../components/preferencesSection';
 
 interface DataUsageSectionProps {

@@ -21,10 +21,9 @@ import {useEffect, useState, type FunctionComponent} from 'react';
 
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {uploadingProgressText} from './uploadAssetItem.styles';
 
+import {useApplicationContext} from '../../../../../page/rootProvider';
 import {AssetRepository} from '../../../../../repositories/assets/assetRepository';
 import {ProgressBar} from '../../../../ProgressBar';
 

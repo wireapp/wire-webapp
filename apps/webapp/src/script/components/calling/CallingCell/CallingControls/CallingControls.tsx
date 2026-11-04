@@ -22,10 +22,9 @@ import type {FunctionComponent} from 'react';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {cellControlsList, cellControlsWrapper} from './CallingControls.styles';
 
+import {useApplicationContext} from '../../../../page/rootProvider';
 import {Call} from '../../../../repositories/calling/Call';
 import {DesktopScreenShareMenu} from '../../../../repositories/calling/CallState';
 import {Participant} from '../../../../repositories/calling/Participant';

@@ -21,8 +21,7 @@ import type {FunctionComponent} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
+import {useApplicationContext} from '../../../page/rootProvider';
 import {ContentMessage} from '../../../repositories/entity/message/contentMessage';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {renderMessage} from '../../../util/messageRenderer';

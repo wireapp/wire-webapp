@@ -18,9 +18,9 @@
 
 import type {Page} from '@playwright/test';
 
-import type {User} from 'test/e2e_tests/data/user';
-import {PageManager} from 'test/e2e_tests/pageManager';
-import {LOGIN_TIMEOUT, type Team} from 'test/e2e_tests/test.fixtures';
+import type {User} from '../data/user';
+import {PageManager} from '../pageManager';
+import {LOGIN_TIMEOUT, type Team} from '../test.fixtures';
 
 export const loginWithMeetingsEnabled = (user: Pick<User, 'email' | 'password'>) => {
   return async (page: Page) => {

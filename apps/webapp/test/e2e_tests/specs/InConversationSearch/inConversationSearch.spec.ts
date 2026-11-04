@@ -17,11 +17,11 @@
  *
  */
 
-import {User} from 'test/e2e_tests/data/user';
-import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, expect, withLogin} from 'test/e2e_tests/test.fixtures';
-import {getAudioFilePath, getTextFilePath, shareAssetHelper} from 'test/e2e_tests/utils/asset.util';
-import {getImageFilePath} from 'test/e2e_tests/utils/sendImage.util';
+import {User} from '../../data/user';
+import {PageManager} from '../../pageManager';
+import {test, expect, withLogin} from '../../test.fixtures';
+import {getAudioFilePath, getTextFilePath, shareAssetHelper} from '../../utils/asset.util';
+import {getImageFilePath} from '../../utils/sendImage.util';
 import {connectWithUser, createGroup} from '../../utils/userActions';
 
 test.describe('In Conversation Search', () => {

@@ -24,7 +24,7 @@ import {container} from 'tsyringe';
 import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
 import {WebAppEvents} from '../../../webAppEvents';
 
-import {TestFactory} from 'test/helper/TestFactory';
+import {TestFactory} from '../../../../../test/helper/TestFactory';
 
 import {useCallAlertState} from '../../calling/useCallAlertState';
 import {CALL_QUALITY_FEEDBACK_KEY} from './constants';
@@ -38,7 +38,7 @@ import {UserState} from '../../../repositories/user/userState';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../page/testSupport/rootContextTestSupport';
 
 import {QualityFeedbackModal} from './QualityFeedbackModal';
 import {translateForTest} from '../../../util/test/translateForTest';

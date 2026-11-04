@@ -40,7 +40,7 @@ import {splitFingerprint} from '../../../util/stringUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../page/testSupport/rootContextTestSupport';
 
 import {LegalHoldModal, LegalHoldModalProps, LegalHoldModalType} from './LegalHoldModal';
 

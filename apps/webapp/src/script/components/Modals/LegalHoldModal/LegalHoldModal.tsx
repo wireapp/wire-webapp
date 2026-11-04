@@ -24,11 +24,10 @@ import {LegalHoldMemberStatus} from '@wireapp/api-client/lib/team/legalhold/';
 import cx from 'classnames';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {useLegalHoldModalState} from './LegalHoldModal.state';
 
 import {useUserDevicesHistory} from '../../../hooks/useUserDevicesHistory';
+import {useApplicationContext} from '../../../page/rootProvider';
 import {ClientRepository} from '../../../repositories/client';
 import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
 import {MessageRepository} from '../../../repositories/conversation/MessageRepository';

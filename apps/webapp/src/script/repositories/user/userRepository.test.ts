@@ -27,9 +27,9 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '../../webAppEvents';
 
-import {entities} from 'test/api/payloads';
-import {TestFactory} from 'test/helper/TestFactory';
-import {generateAPIUser} from 'test/helper/UserGenerator';
+import {entities} from '../../../../test/api/payloads';
+import {TestFactory} from '../../../../test/helper/TestFactory';
+import {generateAPIUser} from '../../../../test/helper/UserGenerator';
 
 import {AssetRepository} from '../assets/assetRepository';
 import {ClientRepository} from '../client';
@@ -43,7 +43,7 @@ import {TeamState} from '../team/TeamState';
 import type {UserRecord} from '../storage';
 import type {Translate} from '../../util/localizerUtil';
 import {matchQualifiedIds} from '../../util/qualifiedId';
-import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {requireValueForTest} from '../../page/testSupport/rootContextTestSupport';
 import {translateForTest} from '../../util/test/translateForTest';
 import {createUuid} from '../../util/uuid';
 

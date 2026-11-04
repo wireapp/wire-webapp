@@ -22,14 +22,13 @@ import {FormEvent, useState, type FunctionComponent} from 'react';
 import {isNonEmptyString} from '@sindresorhus/is';
 import cx from 'classnames';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {AccountInput, useInputDone} from './accountInput';
 
 import {UserError} from '../../../../../error/userError';
 import {validateHandle} from '../../../../../repositories/user/userHandleGenerator';
 import {UserRepository} from '../../../../../repositories/user/userRepository';
 import {isErrorWithType} from '../../../../../util/typePredicateUtil';
+import {useApplicationContext} from '../../../../rootProvider';
 
 enum UserNameState {
   AVAILABLE = 'AVAILABLE',

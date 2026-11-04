@@ -23,14 +23,13 @@ import {isNull, isUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import {LexicalEditor} from 'lexical';
 
-import type {RootContextValue} from 'src/script/page/rootProvider';
-
 import {useDraftState} from './useDraftState/useDraftState';
 import {useMessageEditing} from './useMessageEditing/useMessageEditing';
 import {useMessageReply} from './useMessageReply/useMessageReply';
 import {useMessageSend} from './useMessageSend/useMessageSend';
 import {useOutsideInputClick} from './useOutsideInputClick/useOutsideInputClick';
 
+import type {RootContextValue} from '../../../page/rootProvider';
 import {CellsRepository} from '../../../repositories/cells/cellsRepository';
 import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
 import {MessageRepository, type OutgoingQuote} from '../../../repositories/conversation/MessageRepository';

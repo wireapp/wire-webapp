@@ -26,11 +26,11 @@ import type {ClientRepository} from '../../../../repositories/client';
 import type {CryptographyRepository} from '../../../../repositories/cryptography/CryptographyRepository';
 import {User} from '../../../../repositories/entity/User';
 import type {MessageRepository} from '../../../../repositories/conversation/MessageRepository';
-import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
+import {withThemeAndRootContext} from '../../../../auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../../page/testSupport/rootContextTestSupport';
 import {ConversationState} from '../../../../repositories/conversation/ConversationState';
 import {setStrings, translate} from '../../../../util/localizerUtil';
 import type {Logger} from '../../../../util/logger';

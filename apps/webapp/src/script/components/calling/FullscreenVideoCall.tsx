@@ -36,11 +36,6 @@ import {
   TabIndex,
 } from '@wireapp/react-ui-kit';
 
-import {useActiveWindowMatchMedia} from 'src/script/hooks/useActiveWindowMatchMedia';
-import {useToggleState} from 'src/script/hooks/useToggleState';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {CallViewTab} from 'src/script/view_model/CallingViewModel';
-
 import {CallingParticipantList} from './CallingCell/CallIngParticipantList';
 import {Duration} from './Duration';
 import {
@@ -59,6 +54,9 @@ import {VideoBackgroundPerformancePanel} from './VideoControls/videoBackgroundPe
 import {VideoBackgroundSettings} from './VideoControls/VideoBackgroundSettings/VideoBackgroundSettings';
 import {VideoControls} from './VideoControls/VideoControls';
 
+import {useActiveWindowMatchMedia} from '../../hooks/useActiveWindowMatchMedia';
+import {useToggleState} from '../../hooks/useToggleState';
+import {useApplicationContext} from '../../page/rootProvider';
 import type {Call} from '../../repositories/calling/Call';
 import {CallingRepository} from '../../repositories/calling/CallingRepository';
 import {CallingViewMode, CallState, MuteState} from '../../repositories/calling/CallState';
@@ -76,6 +74,7 @@ import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {isDetachedCallingFeatureEnabled} from '../../util/isDetachedCallingFeatureEnabled';
 import {handleKeyDown, isTabKey, KEY} from '../../util/keyboardUtil';
 import {preventFocusOutside} from '../../util/util';
+import {CallViewTab} from '../../view_model/CallingViewModel';
 import {useWarningsState} from '../../view_model/WarningsContainer/WarningsState';
 import {CONFIG, TYPE} from '../../view_model/WarningsContainer/WarningsTypes';
 import {WebAppEvents} from '../../webAppEvents';

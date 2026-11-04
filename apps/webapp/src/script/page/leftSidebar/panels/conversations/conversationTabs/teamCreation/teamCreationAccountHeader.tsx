@@ -21,8 +21,6 @@ import type {FunctionComponent} from 'react';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {
   bannerHeaderContainerCss,
   teamUpgradeAccountBannerContainerCss,
@@ -32,6 +30,7 @@ import {
 import {useTeamCreationModal} from './useTeamCreationModal';
 
 import * as Icon from '../../../../../../components/icon';
+import {useApplicationContext} from '../../../../../rootProvider';
 
 export const TeamCreationAccountHeader: FunctionComponent = () => {
   const {translate} = useApplicationContext();

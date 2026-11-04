@@ -19,11 +19,11 @@
 
 import {render, fireEvent, act} from '@testing-library/react';
 
-import {withTheme} from 'src/script/auth/util/test/testUtil';
+import {withTheme} from '../../../auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../page/testSupport/rootContextTestSupport';
 
 import {PrimaryModalComponent} from './PrimaryModal';
 import {PrimaryModalType} from './PrimaryModalTypes';

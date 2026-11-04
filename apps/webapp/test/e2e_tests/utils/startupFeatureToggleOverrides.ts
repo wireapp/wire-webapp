@@ -19,8 +19,11 @@
 
 import {isUndefined} from '@sindresorhus/is';
 
-import {StartupFeatureToggleName, startupFeatureToggleNames} from 'src/script/featureToggles/startupFeatureToggleNames';
-import {updateLocationSearchForStartupFeatureToggle} from 'src/script/featureToggles/startupFeatureToggleQueryParameters';
+import {
+  StartupFeatureToggleName,
+  startupFeatureToggleNames,
+} from '../../../src/script/featureToggles/startupFeatureToggleNames';
+import {updateLocationSearchForStartupFeatureToggle} from '../../../src/script/featureToggles/startupFeatureToggleQueryParameters';
 
 export type StartupFeatureToggleOverrides = Readonly<Partial<Record<StartupFeatureToggleName, boolean>>>;
 

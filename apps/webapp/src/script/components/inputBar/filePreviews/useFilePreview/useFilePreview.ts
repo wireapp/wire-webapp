@@ -20,9 +20,8 @@
 import {isNonEmptyString} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {Config} from 'src/script/Config';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
+import {Config} from '../../../../Config';
+import {useApplicationContext} from '../../../../page/rootProvider';
 import {CellsRepository} from '../../../../repositories/cells/cellsRepository';
 import {getFileExtension, trimFileExtension, formatBytes} from '../../../../util/util';
 import {FileWithPreview, useFileUploadState} from '../../../conversation/useFilesUploadState/useFilesUploadState';

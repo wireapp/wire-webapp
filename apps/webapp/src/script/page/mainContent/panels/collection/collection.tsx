@@ -26,11 +26,6 @@ import {amplify} from 'amplify';
 
 import {ChevronIcon, SecondaryButton} from '@wireapp/react-ui-kit';
 
-import {Config} from 'src/script/Config';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {generateConversationUrl} from 'src/script/router/routeGenerator';
-import {createNavigate} from 'src/script/router/routerBindings';
-
 import {CollectionDetails} from './collectionDetails';
 import {CollectionSection} from './collectionSection';
 import {FullSearch} from './fullSearch';
@@ -38,6 +33,7 @@ import {Category, isOfCategory} from './utils';
 
 import * as Icon from '../../../../components/icon';
 import {showDetailViewModal} from '../../../../components/Modals/DetailViewModal';
+import {Config} from '../../../../Config';
 import {MessageCategory} from '../../../../message/messageCategory';
 import {AssetRepository} from '../../../../repositories/assets/assetRepository';
 import {ConversationRepository} from '../../../../repositories/conversation/ConversationRepository';
@@ -45,8 +41,11 @@ import {MessageRepository} from '../../../../repositories/conversation/MessageRe
 import {Conversation} from '../../../../repositories/entity/Conversation';
 import {ContentMessage} from '../../../../repositories/entity/message/contentMessage';
 import {User} from '../../../../repositories/entity/User';
+import {generateConversationUrl} from '../../../../router/routeGenerator';
+import {createNavigate} from '../../../../router/routerBindings';
 import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 import {WebAppEvents} from '../../../../webAppEvents';
+import {useApplicationContext} from '../../../rootProvider';
 
 type CollectionProps = {
   conversation: Conversation;

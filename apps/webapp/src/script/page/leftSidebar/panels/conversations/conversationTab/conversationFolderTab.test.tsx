@@ -27,8 +27,8 @@ import {translateForTest} from '../../../../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {TestFactory} from 'test/helper/TestFactory';
+} from '../../../../testSupport/rootContextTestSupport';
+import {TestFactory} from '../../../../../../../test/helper/TestFactory';
 
 import {ConversationFolderTab} from './conversationFolderTab';
 

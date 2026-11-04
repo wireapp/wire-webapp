@@ -21,11 +21,11 @@ import {act, render, waitFor} from '@testing-library/react';
 import {assertNotNullOrUndefined} from '@sindresorhus/is';
 
 import {ClientEntity} from '../../../../../../../repositories/client/ClientEntity';
-import {withTheme} from 'src/script/auth/util/test/testUtil';
+import {withTheme} from '../../../../../../../auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../../../../testSupport/rootContextTestSupport';
 import {createUuid} from '../../../../../../../util/uuid';
 
 import {DeviceDetailsPreferences} from './deviceDetailsPreferences';

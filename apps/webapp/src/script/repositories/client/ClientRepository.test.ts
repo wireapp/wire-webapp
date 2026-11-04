@@ -26,7 +26,7 @@ import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 
 import {User} from '../entity/User';
 import {ClientRecord} from '../storage/record/clientRecord';
-import {ClientError} from 'src/script/error/clientError';
+import {ClientError} from '../../error/clientError';
 import {type Translate} from '../../util/localizerUtil';
 
 import {ClientRepository, ClientMapper, ClientEntity} from './.';

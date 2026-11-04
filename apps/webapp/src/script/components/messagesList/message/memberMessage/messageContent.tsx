@@ -24,10 +24,9 @@ import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 
-import {Config} from 'src/script/Config';
-import {SystemMessageType} from 'src/script/message/systemMessageType';
-import {useApplicationContext, type RootContextValue} from 'src/script/page/rootProvider';
-
+import {Config} from '../../../../Config';
+import {SystemMessageType} from '../../../../message/systemMessageType';
+import {useApplicationContext, type RootContextValue} from '../../../../page/rootProvider';
 import {MemberMessage as MemberMessageEntity} from '../../../../repositories/entity/message/memberMessage';
 import {User} from '../../../../repositories/entity/User';
 import {ClientEvent} from '../../../../repositories/event/Client';

@@ -20,7 +20,7 @@
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {act, render, screen} from '@testing-library/react';
 
-import enUS from 'src/i18n/en-US.json';
+import enUS from '../../../../../i18n/en-US.json';
 import {createSessionResetMessage} from '../../../../repositories/entity/message/sessionResetMessage';
 import {User} from '../../../../repositories/entity/User';
 import {translateForTest} from '../../../../util/test/translateForTest';

@@ -19,11 +19,11 @@
 
 import {fireEvent, render, screen, waitFor} from '@testing-library/react';
 
-import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
+import {withThemeAndRootContext} from '../../../../../auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../../testSupport/rootContextTestSupport';
 import {translateForTest} from '../../../../../util/test/translateForTest';
 
 import type {MediaConstraintsHandler} from '../../../../../repositories/media/MediaConstraintsHandler';

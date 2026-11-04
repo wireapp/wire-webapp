@@ -33,9 +33,9 @@ import {ConversationStatus} from '../repositories/conversation/ConversationStatu
 import {Conversation} from '../repositories/entity/Conversation';
 import {User} from '../repositories/entity/User';
 import {UserState} from '../repositories/user/userState';
-import {Core} from 'src/script/service/coreSingleton';
-import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
-import {TestFactory} from 'test/helper/TestFactory';
+import {Core} from '../service/coreSingleton';
+import {requireValueForTest} from '../page/testSupport/rootContextTestSupport';
+import {TestFactory} from '../../../test/helper/TestFactory';
 import {translateForTest} from '../util/test/translateForTest';
 
 import {

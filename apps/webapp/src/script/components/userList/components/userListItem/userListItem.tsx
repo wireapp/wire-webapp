@@ -21,9 +21,8 @@ import React, {ChangeEvent, useId, type FunctionComponent} from 'react';
 
 import {TabIndex, Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {UserlistMode} from '../..';
+import {useApplicationContext} from '../../../../page/rootProvider';
 import {User} from '../../../../repositories/entity/User';
 import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 import {capitalizeFirstChar} from '../../../../util/stringUtil';

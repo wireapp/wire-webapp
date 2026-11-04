@@ -34,8 +34,8 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
   requireValueForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {CallActions} from 'src/script/view_model/CallingViewModel';
+} from '../../../page/testSupport/rootContextTestSupport';
+import {CallActions} from '../../../view_model/CallingViewModel';
 import {createUuid} from '../../../util/uuid';
 
 import {CallingCell, CallingCellProps} from './CallingCell';

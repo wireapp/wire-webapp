@@ -21,10 +21,9 @@ import type {FunctionComponent} from 'react';
 
 import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {buttonStyles, iconStyles} from './fileAssetOptions.styles';
 
+import {useApplicationContext} from '../../../../../../../../../page/rootProvider';
 import {isFileEditable} from '../../../../../../../../../util/fileTypeUtil';
 import {forcedDownloadFile, getFileNameWithExtension} from '../../../../../../../../../util/util';
 import {

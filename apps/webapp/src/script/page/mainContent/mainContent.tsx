@@ -24,8 +24,6 @@ import cx from 'classnames';
 import {CSSTransition, SwitchTransition} from 'react-transition-group';
 import {container} from 'tsyringe';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {Collection} from './panels/collection';
 import {AboutPreferences} from './panels/preferences/aboutPreferences';
 import {AccountPreferences} from './panels/preferences/accountPreferences';
@@ -57,6 +55,7 @@ import {useMeetingsFeatureFlag} from '../../util/useMeetingsFeatureFlag';
 import {incomingCssClass, removeAnimationsClass} from '../../util/util';
 import {RightSidebarParams} from '../appMain';
 import {PanelState} from '../rightSidebar';
+import {useApplicationContext} from '../rootProvider';
 import {ContentState, useAppState} from '../useAppState';
 
 export const ANIMATED_PAGE_TRANSITION_DURATION = 500;

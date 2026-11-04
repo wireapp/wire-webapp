@@ -22,8 +22,6 @@ import {useCallback, useEffect, useState, type FunctionComponent} from 'react';
 import {isNull} from '@sindresorhus/is';
 import {Maybe, maybe} from 'true-myth';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {moveStatusMessageKey} from './sharedDriveMoveStatusMessages';
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
 import {
@@ -38,6 +36,7 @@ import {
 import {useSharedDriveUploadStatus, type SharedDriveMoveStatusKind} from './sharedDriveUploadStatusContext';
 import {SharedDriveUploadStatusPopup} from './sharedDriveUploadStatusPopup';
 
+import {useApplicationContext} from '../../../page/rootProvider';
 import type {Translate} from '../../../util/localizerUtil';
 import {formatBytes} from '../../../util/util';
 

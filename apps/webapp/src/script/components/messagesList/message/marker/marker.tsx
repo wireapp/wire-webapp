@@ -24,13 +24,12 @@ import {isNull} from '@sindresorhus/is';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {createRelativeTimestampFormatter, useRelativeTimestamp} from 'src/script/hooks/useRelativeTimestamp';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {dayMarkerStyle, baseMarkerStyle, notVirtualizedMarkerStyle} from './marker.styles';
 import {getMessagesGroupLabel} from './marker.utils';
 
 import {Config} from '../../../../Config';
+import {createRelativeTimestampFormatter, useRelativeTimestamp} from '../../../../hooks/useRelativeTimestamp';
+import {useApplicationContext} from '../../../../page/rootProvider';
 import {Marker} from '../../utils/messagesGroup';
 import {MessageTime} from '../messageTime';
 import {ScrollToElement} from '../types';

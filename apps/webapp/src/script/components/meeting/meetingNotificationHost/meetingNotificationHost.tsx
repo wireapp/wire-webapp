@@ -21,8 +21,6 @@ import {useEffect, useRef, type FunctionComponent} from 'react';
 
 import {ChevronIcon} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {
   meetingNotificationHostButtonStyles,
   meetingNotificationHostContainerStyles,
@@ -35,6 +33,7 @@ import {
   meetingNotificationHostStyles,
 } from './meetingNotificationHost.styles';
 
+import {useApplicationContext} from '../../../page/rootProvider';
 import {MeetingNotificationCard} from '../meetingNotificationCard/meetingNotificationCard';
 import {useMeetingNotificationStore} from '../meetingNotificationStore/meetingNotificationStore';
 

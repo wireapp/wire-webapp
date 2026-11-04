@@ -30,8 +30,8 @@ import {ConversationState} from '../repositories/conversation/ConversationState'
 import {Conversation} from '../repositories/entity/Conversation';
 import {User} from '../repositories/entity/User';
 import {UserState} from '../repositories/user/userState';
-import {Core} from 'src/script/service/coreSingleton';
-import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {Core} from '../service/coreSingleton';
+import {requireValueForTest} from '../page/testSupport/rootContextTestSupport';
 import * as util from '../util/util';
 
 import {E2EIHandler} from './e2eIdentityEnrollment';

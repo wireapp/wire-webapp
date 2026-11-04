@@ -27,14 +27,12 @@ import {container} from 'tsyringe';
 import {ValidationUtil} from '@wireapp/commons';
 import {Button, ButtonVariant, Checkbox, CheckboxLabel, Input, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
-import {SIGN_OUT_REASON} from 'src/script/auth/signOutReason';
-import {Config} from 'src/script/Config';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {applockStyles} from './appLock.styles';
 
+import {SIGN_OUT_REASON} from '../../auth/signOutReason';
 import * as Icon from '../../components/icon';
 import {ModalComponent} from '../../components/Modals/ModalComponent';
+import {Config} from '../../Config';
 import {ClientRepository} from '../../repositories/client';
 import {ClientState} from '../../repositories/client/ClientState';
 import {AppLockRepository} from '../../repositories/user/appLockRepository';
@@ -44,6 +42,7 @@ import type {ReactTranslationValueReplacement} from '../../util/localizerUtil/re
 import {createReactTranslationMarker, renderReactTranslation} from '../../util/localizerUtil/reactLocalizerUtil';
 import type {Translate} from '../../util/localizerUtil/translationTypes';
 import {WebAppEvents} from '../../webAppEvents';
+import {useApplicationContext} from '../rootProvider';
 
 const millisecondsPerSecond = 1000;
 

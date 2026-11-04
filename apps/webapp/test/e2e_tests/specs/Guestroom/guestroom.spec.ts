@@ -1,8 +1,8 @@
 import {Page} from 'playwright/test';
-import {getUser, User} from 'test/e2e_tests/data/user';
-import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, expect, withLogin, Team, LOGIN_TIMEOUT, withGuestUser} from 'test/e2e_tests/test.fixtures';
-import {createGroup, sendConnectionRequest} from 'test/e2e_tests/utils/userActions';
+import {getUser, User} from '../../data/user';
+import {PageManager} from '../../pageManager';
+import {test, expect, withLogin, Team, LOGIN_TIMEOUT, withGuestUser} from '../../test.fixtures';
+import {createGroup, sendConnectionRequest} from '../../utils/userActions';
 
 /**
  * Navigates through the UI to generate a guest invitation link for a specific group.

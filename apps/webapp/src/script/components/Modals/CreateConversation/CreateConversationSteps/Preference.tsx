@@ -22,9 +22,8 @@ import {useEffect, type FunctionComponent} from 'react';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {container} from 'tsyringe';
 
-import {Config} from 'src/script/Config';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
+import {Config} from '../../../../Config';
+import {useApplicationContext} from '../../../../page/rootProvider';
 import {TeamState} from '../../../../repositories/team/TeamState';
 import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 import {checkAppsFeatureAvailability} from '../../../../util/featureUtil';

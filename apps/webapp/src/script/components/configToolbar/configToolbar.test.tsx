@@ -12,11 +12,14 @@ import {act, render, screen} from '@testing-library/react';
 
 import userEvent from '@testing-library/user-event';
 
-import {withTheme, withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
+import {
+  withTheme,
+  withThemeAndRootContext,
+} from '../../auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../page/testSupport/rootContextTestSupport';
 import {translateForTest} from '../../util/test/translateForTest';
 
 import {sendCallLogsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';

@@ -25,10 +25,9 @@ import {UserType} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
 
-import {Config} from 'src/script/Config';
-
 import {TeamEntity} from './TeamEntity';
 
+import {Config} from '../../Config';
 import {sortUsersByPriority} from '../../util/stringUtil';
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';

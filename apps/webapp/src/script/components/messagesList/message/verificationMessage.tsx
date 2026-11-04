@@ -21,10 +21,9 @@ import {useMemo, type FunctionComponent} from 'react';
 
 import {amplify} from 'amplify';
 
-import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {VerificationMessageType} from '../../../message/verificationMessageType';
+import {SidebarTabs, useSidebarStore} from '../../../page/leftSidebar/panels/conversations/useSidebarStore';
+import {useApplicationContext} from '../../../page/rootProvider';
 import {VerificationMessage as VerificationMessageEntity} from '../../../repositories/entity/message/verificationMessage';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {Declension, joinNames} from '../../../util/localizerUtil';

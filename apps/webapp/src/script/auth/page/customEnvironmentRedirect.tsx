@@ -25,11 +25,10 @@ import {connect} from 'react-redux';
 import {Runtime, UrlUtil} from '@wireapp/commons';
 import {COLOR, ContainerXS, FlexBox, Text} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {Page} from './page';
 
 import {LogoIcon} from '../../components/icon';
+import {useApplicationContext} from '../../page/rootProvider';
 import {afterRender} from '../../util/util';
 import {actionRoot} from '../module/action';
 import {ThunkDispatch} from '../module/reducer';

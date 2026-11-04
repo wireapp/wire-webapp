@@ -37,14 +37,14 @@ import {User} from '../../../../repositories/entity/User';
 import {ConversationState} from '../../../../repositories/conversation/ConversationState';
 import {SearchRepository} from '../../../../repositories/search/searchRepository';
 import {UserRepository} from '../../../../repositories/user/userRepository';
-import {withTheme, withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
+import {withTheme, withThemeAndRootContext} from '../../../../auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import {ContentState, ListState, useAppState} from 'src/script/page/useAppState';
-import * as Router from 'src/script/router/Router';
-import {TestFactory} from 'test/helper/TestFactory';
+} from '../../../testSupport/rootContextTestSupport';
+import {ContentState, ListState, useAppState} from '../../../useAppState';
+import * as Router from '../../../../router/Router';
+import {TestFactory} from '../../../../../../test/helper/TestFactory';
 
 import {Conversations, shouldClearDeepLinkForTab} from './';
 import {SidebarTabs, useSidebarStore} from './useSidebarStore';

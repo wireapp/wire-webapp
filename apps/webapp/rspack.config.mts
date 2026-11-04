@@ -316,8 +316,6 @@ function createRspackConfiguration(mode: 'development' | 'production' = 'product
     resolve: {
       alias: {
         '@enormora/fire-and-forget$': path.resolve(rootPath, 'node_modules/@enormora/fire-and-forget/index.js'),
-        src: path.resolve(configDirectoryPath, 'src'),
-        test: path.resolve(configDirectoryPath, 'test'),
       },
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.svg'],
       fallback: {

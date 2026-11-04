@@ -21,16 +21,15 @@ import type {ReactElement, ReactNode, FunctionComponent} from 'react';
 
 import {Button, ButtonVariant, CollectionIcon, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
-import {Config} from 'src/script/Config';
-import {SystemMessageType} from 'src/script/message/systemMessageType';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {E2eEncryptionMessage} from './e2eEncryptionMessage/e2eEncryptionMessage';
 import {e2eMessageContentLinkCss} from './e2eEncryptionMessage/e2eEncryptionMessage.styles';
 import {ConnectedMessage} from './memberMessage/connectedMessage';
 import {MessageContent} from './memberMessage/messageContent';
 import {MessageTime} from './messageTime';
 
+import {Config} from '../../../Config';
+import {SystemMessageType} from '../../../message/systemMessageType';
+import {useApplicationContext} from '../../../page/rootProvider';
 import {
   groupCreationHeaderSenderNameMarkerEnd,
   groupCreationHeaderSenderNameMarkerStart,

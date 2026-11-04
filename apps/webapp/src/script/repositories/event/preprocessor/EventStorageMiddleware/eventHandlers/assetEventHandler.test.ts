@@ -18,7 +18,7 @@
  */
 
 import {AssetTransferState} from '../../../../assets/assetTransferState';
-import {createAssetAddEvent, toSavedEvent} from 'test/helper/EventGenerator';
+import {createAssetAddEvent, toSavedEvent} from '../../../../../../../test/helper/EventGenerator';
 
 import {handleAssetEvent} from './assetEventHandler';
 

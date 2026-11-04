@@ -35,12 +35,6 @@ import {useShallow} from 'zustand/react/shallow';
 
 import {useMatchMedia} from '@wireapp/react-ui-kit';
 
-import {Preferences} from 'src/script/page/leftSidebar/panels/preferences';
-import {ANIMATED_PAGE_TRANSITION_DURATION} from 'src/script/page/mainContent';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useAppMainState, ViewType} from 'src/script/page/state';
-import {ContentState, ListState, useAppState} from 'src/script/page/useAppState';
-
 import {ConversationCallingView} from './conversationCallingView/conversationCallingView';
 import {ConversationHeader, conversationsPanelHeadingId} from './conversationHeader';
 import {ConversationListCollapseHandle} from './conversationListCollapseHandle';
@@ -88,7 +82,12 @@ import {useChannelsFeatureFlag} from '../../../../util/useChannelsFeatureFlag';
 import {useMeetingsFeatureFlag} from '../../../../util/useMeetingsFeatureFlag';
 import {ListViewModel} from '../../../../view_model/ListViewModel';
 import {WebAppEvents} from '../../../../webAppEvents';
+import {ANIMATED_PAGE_TRANSITION_DURATION} from '../../../mainContent';
+import {useApplicationContext} from '../../../rootProvider';
+import {useAppMainState, ViewType} from '../../../state';
+import {ContentState, ListState, useAppState} from '../../../useAppState';
 import {ListWrapper} from '../listWrapper';
+import {Preferences} from '../preferences';
 import {StartUI} from '../startUi';
 
 export const shouldClearDeepLinkForTab = (tab: SidebarTabs): boolean => {

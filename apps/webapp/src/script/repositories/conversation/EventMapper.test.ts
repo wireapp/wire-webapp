@@ -22,21 +22,21 @@ import {ClientEvent, CONVERSATION} from '../event/Client';
 
 import {Article, LinkPreview, Mention} from '@wireapp/protocol-messaging';
 
-import {createMessageAddEvent} from 'test/helper/EventGenerator';
+import {createMessageAddEvent} from '../../../../test/helper/EventGenerator';
 
 import {AssetType} from '../assets/assetType';
 import {EventBuilder} from './EventBuilder';
 import {Conversation} from '../entity/Conversation';
 import {ContentMessage} from '../entity/message/contentMessage';
 import {User} from '../entity/User';
-import {MentionEntity} from 'src/script/message/mentionEntity';
+import {MentionEntity} from '../../message/mentionEntity';
 import {translate} from '../../util/localizerUtil';
 import {arrayToBase64} from '../../util/util';
 import {createUuid} from '../../util/uuid';
 
 import {SystemMessage} from '../entity/message/systemMessage';
 import {eventShouldBeStored} from '../event/EventTypeHandling';
-import {SystemMessageType} from 'src/script/message/systemMessageType';
+import {SystemMessageType} from '../../message/systemMessageType';
 
 import {EventMapper} from './EventMapper';
 import {translateForTest} from '../../util/test/translateForTest';

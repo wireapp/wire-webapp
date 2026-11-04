@@ -26,8 +26,6 @@ import {container} from 'tsyringe';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import * as Icon from '../../../../../components/icon';
 import {PrimaryModal} from '../../../../../components/Modals/PrimaryModal';
 import {RadioGroup} from '../../../../../components/Radio';
@@ -42,6 +40,7 @@ import {TeamRepository} from '../../../../../repositories/team/TeamRepository';
 import {TeamState} from '../../../../../repositories/team/TeamState';
 import {copyText} from '../../../../../util/clipboardUtil';
 import {useKoSubscribableChildren} from '../../../../../util/componentUtil';
+import {useApplicationContext} from '../../../../rootProvider';
 
 const COPY_LINK_CONFIRM_DURATION = 1500;
 

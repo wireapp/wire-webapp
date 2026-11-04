@@ -25,8 +25,7 @@ import {container} from 'tsyringe';
 
 import {Availability} from '@wireapp/protocol-messaging';
 
-import {RootContextValue, useApplicationContext} from 'src/script/page/rootProvider';
-
+import {RootContextValue, useApplicationContext} from '../../page/rootProvider';
 import type {User} from '../../repositories/entity/User';
 import {RichProfileRepository} from '../../repositories/user/richProfileRepository';
 import {availabilityStatus, availabilityTranslationKeys} from '../../util/availabilityStatus';

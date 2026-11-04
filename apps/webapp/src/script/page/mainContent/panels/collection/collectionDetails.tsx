@@ -19,8 +19,6 @@
 
 import {Fragment, type FunctionComponent} from 'react';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {CollectionItem} from './collectionItem';
 
 import {FadingScrollbar} from '../../../../components/fadingScrollbar';
@@ -29,6 +27,7 @@ import {ContentMessage} from '../../../../repositories/entity/message/contentMes
 import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 import {formatLocale, isThisYear, isToday} from '../../../../util/timeUtil';
 import {noop} from '../../../../util/util';
+import {useApplicationContext} from '../../../rootProvider';
 
 interface CollectionDetailsProps {
   conversation: Conversation;

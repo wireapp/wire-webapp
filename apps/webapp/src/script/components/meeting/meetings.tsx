@@ -21,8 +21,6 @@ import {useCallback, useEffect, useMemo, useRef, type FunctionComponent} from 'r
 
 import {container} from 'tsyringe';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {contentStyles} from './meeting.styles';
 import {MeetingCallingView} from './meetingCallingView/meetingCallingView';
 import {meetingsContentWrapperStyles} from './meetingCallingView/meetingCallingView.styles';
@@ -35,6 +33,7 @@ import {useMeetingStore} from './meetingStore/meetingStoreProvider';
 import {MeetNowModal} from './meetNowModal/meetNowModal';
 import {ScheduleMeetingModal} from './scheduleMeetingModal';
 
+import {useApplicationContext} from '../../page/rootProvider';
 import {MediaStreamHandler} from '../../repositories/media/MediaStreamHandler';
 import {UserState} from '../../repositories/user/userState';
 

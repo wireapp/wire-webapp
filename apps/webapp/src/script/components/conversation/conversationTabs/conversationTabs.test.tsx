@@ -25,7 +25,7 @@ import type {UploadState} from '../../../repositories/cells/upload';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../page/testSupport/rootContextTestSupport';
 import {translateForTest} from '../../../util/test/translateForTest';
 
 import type {SharedDriveUploadController} from '../conversationCells/sharedDriveUploadController';

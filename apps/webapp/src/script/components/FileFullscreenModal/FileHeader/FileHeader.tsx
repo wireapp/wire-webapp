@@ -33,8 +33,6 @@ import {
   ShowIcon,
 } from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/rootProvider';
-
 import {
   headerStyles,
   leftColumnStyles,
@@ -52,6 +50,7 @@ import {
 } from './FileHeader.styles';
 
 import {createRelativeTimestampFormatter, useRelativeTimestamp} from '../../../hooks/useRelativeTimestamp';
+import {useApplicationContext} from '../../../page/rootProvider';
 import {CellsRepository} from '../../../repositories/cells/cellsRepository';
 import type {Conversation} from '../../../repositories/entity/Conversation';
 import {useKoSubscribableChildren} from '../../../util/componentUtil';

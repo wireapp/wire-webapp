@@ -44,8 +44,8 @@ import {UserState} from '../../../repositories/user/userState';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
-import 'src/script/util/test/mock/localStorageMock';
+} from '../../testSupport/rootContextTestSupport';
+import '../../../util/test/mock/localStorageMock';
 import {translate} from '../../../util/localizerUtil';
 import {translateForTest} from '../../../util/test/translateForTest';
 import {createUuid} from '../../../util/uuid';

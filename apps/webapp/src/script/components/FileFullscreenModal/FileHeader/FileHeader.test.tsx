@@ -25,11 +25,11 @@ import {
   CellsSelfUserDriveRoleProvider,
 } from '../../conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {CellsRepository} from '../../../repositories/cells/cellsRepository';
-import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
+import {withThemeAndRootContext} from '../../../auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../page/testSupport/rootContextTestSupport';
 
 import {FileHeader, getConversationIconType} from './FileHeader';
 import type {ReactNode} from 'react';

@@ -17,10 +17,9 @@
  *
  */
 
-import {SystemMessageType} from 'src/script/message/systemMessageType';
-
 import {SystemMessage} from './systemMessage';
 
+import {SystemMessageType} from '../../../message/systemMessageType';
 import {type Translate} from '../../../util/localizerUtil';
 
 export class OneToOneMigratedToMlsMessage extends SystemMessage {
