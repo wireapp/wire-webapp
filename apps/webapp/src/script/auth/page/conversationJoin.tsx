@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useState, useRef, FormEvent, type FunctionComponent} from 'react';
+import {FormEvent, type FunctionComponent, useEffect, useRef, useState} from 'react';
 
 import {isNan, isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {connect} from 'react-redux';
@@ -36,6 +36,7 @@ import type {ConversationEvent} from '../../apiClient/event/conversationEvent';
 import {BackendErrorLabel} from '../../apiClient/http/backendErrorLabel';
 import {UrlUtil} from '../../commons/util';
 import {Config} from '../../Config';
+import type {JoinLinkResult} from '../../navigation/meetingJoinDestination';
 import {useApplicationContext} from '../../page/rootProvider';
 import {Column, Columns} from '../../uiKit/layout/column/column';
 import {H1} from '../../uiKit/typography/heading/heading';
@@ -47,6 +48,7 @@ import {JoinGuestLinkPasswordModal} from '../component/joinGuestLinkPasswordModa
 import {WirelessContainer} from '../component/wirelessContainer';
 import {EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action';
+import {joinLinkAction} from '../module/action/joinLinkAction';
 import {ValidationError} from '../module/action/validationError';
 import {RootState, ThunkDispatch} from '../module/reducer';
 import * as AuthSelector from '../module/selector/authSelector';
@@ -55,31 +57,31 @@ import * as ConversationSelector from '../module/selector/conversationSelector';
 import * as SelfSelector from '../module/selector/selfSelector';
 import {QUERY_KEY, ROUTE} from '../route';
 import * as AccentColor from '../util/accentColor';
+import {clearMeetingJoinParameters, getJoinLink, isJoinLinkPasswordError, JOIN_LINK_KIND} from '../util/joinLink';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
 const ConversationJoinComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> = ({
   doCheckConversationCode,
   doJoinConversationByCode,
+  doStoreJoinDestination,
   doInit,
   doRegisterWireless,
   setLastEventDate,
   doLogout,
-  doGetConversationInfoByCode,
   selfName,
   conversationError,
   hasLoadedClients,
   isFetchingAuth,
   isFetchingConversation,
   conversationInfo,
+  conversationHasPassword,
   conversationInfoFetching,
   generalError,
   doGetAllClients,
 }: Props & ConnectedProps & DispatchProps) => {
   const {translate} = useApplicationContext();
   const nameInput = useRef<HTMLInputElement>(null);
-
-  const conversationHasPassword = conversationInfo?.has_password;
 
   const [accentColor] = useState(AccentColor.STRONG_BLUE);
   const [isJoinGuestLinkPasswordModalOpen, setIsJoinGuestLinkPasswordModalOpen] = useState<boolean>(false);
@@ -98,10 +100,11 @@ const ConversationJoinComponent: FunctionComponent<Props & ConnectedProps & Disp
   const isFetching = isFetchingAuth || isFetchingConversation || conversationInfoFetching;
 
   const isWirePublicInstance = Config.getConfig().BRAND_NAME === 'Wire';
+  const joinLink = getJoinLink();
 
   useEffect(() => {
-    const localConversationCode = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_CODE);
-    const localConversationKey = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_KEY);
+    const localConversationCode = joinLink.code;
+    const localConversationKey = joinLink.key;
     const parsedExpiresIn = parseInt(UrlUtil.getURLParameter(QUERY_KEY.JOIN_EXPIRES), 10);
     const localExpiresIn = parsedExpiresIn !== 0 && !isNan(parsedExpiresIn) ? parsedExpiresIn : undefined;
 
@@ -114,7 +117,6 @@ const ConversationJoinComponent: FunctionComponent<Props & ConnectedProps & Disp
       .then(async () => {
         if (isNonEmptyString(localConversationCode) && isNonEmptyString(localConversationKey)) {
           await doCheckConversationCode(localConversationKey, localConversationCode);
-          await doGetConversationInfoByCode(localConversationKey, localConversationCode);
         }
         await doGetAllClients();
       })
@@ -124,7 +126,7 @@ const ConversationJoinComponent: FunctionComponent<Props & ConnectedProps & Disp
         }
         setIsValidLink(false);
       });
-  }, [doCheckConversationCode, doGetAllClients, doGetConversationInfoByCode, doInit]);
+  }, [doCheckConversationCode, doGetAllClients, doInit, joinLink.code, joinLink.key]);
 
   const routeToApp = (conversation: string = '', domain: string = ''): void => {
     const conversationPath = isNonEmptyString(conversation)
@@ -135,7 +137,7 @@ const ConversationJoinComponent: FunctionComponent<Props & ConnectedProps & Disp
   };
 
   const getConversationInfoAndJoin = async (password?: string): Promise<void> => {
-    if (!isJoinGuestLinkPasswordModalOpen && conversationHasPassword === true) {
+    if (!isJoinGuestLinkPasswordModalOpen && conversationHasPassword) {
       setIsJoinGuestLinkPasswordModalOpen(true);
       return;
     }
@@ -143,17 +145,26 @@ const ConversationJoinComponent: FunctionComponent<Props & ConnectedProps & Disp
       if (!isNonEmptyString(conversationCode) || !isNonEmptyString(conversationKey)) {
         throw Error('Conversation code or key missing');
       }
-      const conversationEvent = await doJoinConversationByCode(conversationKey, conversationCode, undefined, password);
+      const joinedLink = await doJoinConversationByCode(conversationKey, conversationCode, undefined, password);
+      if (isNullOrUndefined(joinedLink)) {
+        routeToApp();
+        return;
+      }
       /* When we join a conversation, we create the join event before loading the webapp.
        * That means that when the webapp loads and tries to fetch the notificationStream is will get the join event once again and will try to handle it
        * Here we set the core's lastEventDate so that it knows that this duplicated event should be skipped
        */
-      await setLastEventDate(isNonEmptyString(conversationEvent?.time) ? new Date(conversationEvent.time) : new Date());
-
-      routeToApp(conversationEvent?.conversation, conversationEvent?.qualified_conversation?.domain ?? '');
+      if (isNullOrUndefined(joinedLink.meetingPrep)) {
+        await setLastEventDate(isNonEmptyString(joinedLink.eventTime) ? new Date(joinedLink.eventTime) : new Date());
+        routeToApp(joinedLink.conversation.id, joinedLink.conversation.domain);
+        return;
+      }
+      await doStoreJoinDestination(joinedLink);
+      clearMeetingJoinParameters();
+      routeToApp();
     } catch (error: unknown) {
       setIsSubmitingName(false);
-      if (isBackendError(error) && error.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD) {
+      if (isBackendError(error) && isJoinLinkPasswordError(error)) {
         setIsJoinGuestLinkPasswordModalOpen(true);
         return;
       }
@@ -163,7 +174,7 @@ const ConversationJoinComponent: FunctionComponent<Props & ConnectedProps & Disp
   };
 
   const handleSubmit = async (entropyData?: Uint8Array, password?: string): Promise<void> => {
-    if (!isJoinGuestLinkPasswordModalOpen && conversationHasPassword === true) {
+    if (!isJoinGuestLinkPasswordModalOpen && conversationHasPassword) {
       setIsJoinGuestLinkPasswordModalOpen(true);
       return;
     }
@@ -240,7 +251,12 @@ const ConversationJoinComponent: FunctionComponent<Props & ConnectedProps & Disp
   };
 
   if (!isValidLink) {
-    return <Navigate to={ROUTE.CONVERSATION_JOIN_INVALID} replace />;
+    return (
+      <Navigate
+        to={joinLink.kind === JOIN_LINK_KIND.MEETING ? ROUTE.MEETING_JOIN_INVALID : ROUTE.CONVERSATION_JOIN_INVALID}
+        replace
+      />
+    );
   }
 
   const isFullConversation =
@@ -277,9 +293,11 @@ const ConversationJoinComponent: FunctionComponent<Props & ConnectedProps & Disp
         <AppAlreadyOpen />
         <div style={{display: 'flex', alignItems: 'center', flexDirection: 'column', marginBottom: '2rem'}}>
           <H1 style={{fontWeight: 500, marginTop: '0', marginBottom: '1rem'}} data-uie-name="status-join-headline">
-            {translate('conversationJoin.mainHeadline')}
+            {translate(
+              joinLink.kind === JOIN_LINK_KIND.MEETING ? 'meetingJoin.joinHeadline' : 'conversationJoin.mainHeadline',
+            )}
           </H1>
-          {!isWirePublicInstance && (
+          {!isWirePublicInstance && joinLink.kind !== JOIN_LINK_KIND.MEETING && (
             <Muted data-uie-name="status-join-subhead">
               {translate('conversationJoin.headline', {domain: window.location.hostname})}
             </Muted>
@@ -327,6 +345,7 @@ type MapStateToPropsResult = {
   selfName: string | false | undefined;
   conversationError: (Error & {label?: string; code?: number; message?: string}) | null;
   conversationInfo: ConversationJoinData | null;
+  conversationHasPassword: boolean;
   conversationInfoFetching: boolean;
   generalError: Error | null;
 };
@@ -339,6 +358,7 @@ const mapStateToProps = (state: RootState): MapStateToPropsResult => {
     selfName: !SelfSelector.isTemporaryGuest(state) && SelfSelector.getSelfName(state),
     conversationError: ConversationSelector.getError(state),
     conversationInfo: ConversationSelector.conversationInfo(state),
+    conversationHasPassword: ConversationSelector.hasPassword(state),
     conversationInfoFetching: ConversationSelector.conversationInfoFetching(state),
     generalError: AuthSelector.getError(state),
   };
@@ -346,16 +366,16 @@ const mapStateToProps = (state: RootState): MapStateToPropsResult => {
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
 type MapDispatchToPropsResult = {
+  doStoreJoinDestination: (result: JoinLinkResult) => Promise<void>;
   doGetAllClients: () => Promise<RegisteredClient[]>;
   doCheckConversationCode: (key: string, code: string, uri?: string | undefined) => Promise<void>;
-  doGetConversationInfoByCode: (key: string, code: string) => Promise<ConversationJoinData | undefined>;
   doInit: (options?: {isImmediateLogin: boolean; shouldValidateLocalClient: boolean} | undefined) => Promise<void>;
   doJoinConversationByCode: (
     key: string,
     code: string,
     uri?: string | undefined,
     password?: string | undefined,
-  ) => Promise<ConversationEvent>;
+  ) => Promise<JoinLinkResult | undefined>;
   doLogout: () => Promise<void>;
   doRegisterWireless: (
     registrationData: RegisterData,
@@ -366,16 +386,14 @@ type MapDispatchToPropsResult = {
 };
 const mapDispatchToProps = (dispatch: ThunkDispatch): MapDispatchToPropsResult => {
   return {
+    doStoreJoinDestination: result => {
+      return dispatch(joinLinkAction.doStoreJoinDestination(result));
+    },
     doGetAllClients: (...args: Parameters<typeof ROOT_ACTIONS.clientAction.doGetAllClients>) => {
       return dispatch(ROOT_ACTIONS.clientAction.doGetAllClients(...args));
     },
     doCheckConversationCode: (...args: Parameters<typeof ROOT_ACTIONS.conversationAction.doCheckConversationCode>) => {
-      return dispatch(ROOT_ACTIONS.conversationAction.doCheckConversationCode(...args));
-    },
-    doGetConversationInfoByCode: (
-      ...args: Parameters<typeof ROOT_ACTIONS.conversationAction.doGetConversationInfoByCode>
-    ) => {
-      return dispatch(ROOT_ACTIONS.conversationAction.doGetConversationInfoByCode(...args));
+      return dispatch(joinLinkAction.doCheckJoinLink(...args));
     },
     doInit: (...args: Parameters<typeof ROOT_ACTIONS.authAction.doInit>) => {
       return dispatch(ROOT_ACTIONS.authAction.doInit(...args));
@@ -383,7 +401,7 @@ const mapDispatchToProps = (dispatch: ThunkDispatch): MapDispatchToPropsResult =
     doJoinConversationByCode: (
       ...args: Parameters<typeof ROOT_ACTIONS.conversationAction.doJoinConversationByCode>
     ) => {
-      return dispatch(ROOT_ACTIONS.conversationAction.doJoinConversationByCode(...args));
+      return dispatch(joinLinkAction.doJoinByLink(...args));
     },
     doLogout: (...args: Parameters<typeof ROOT_ACTIONS.authAction.doLogout>) => {
       return dispatch(ROOT_ACTIONS.authAction.doLogout(...args));

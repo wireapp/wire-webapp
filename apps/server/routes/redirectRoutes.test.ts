@@ -2,7 +2,12 @@ import {type Request, type Response} from 'express';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {Maybe} from 'true-myth';
 
-import {createJoinConversationRedirectUrl, redirectToJoinConversation} from './redirectRoutes';
+import {
+  createJoinConversationRedirectUrl,
+  redirectToJoinConversation,
+  createJoinMeetingRedirectUrl,
+  redirectToJoinMeeting,
+} from './redirectRoutes';
 
 type JoinRedirectResponse = {
   readonly response: Response;
@@ -101,5 +106,47 @@ describe('RedirectRoutes join redirect', () => {
       '/auth/?join_key=key&join_code=code#/join-conversation',
     );
     expect(sendStatus).not.toHaveBeenCalled();
+  });
+});
+
+describe('meeting join redirect', () => {
+  it('preserves meeting credentials and password in the existing auth join flow', () => {
+    const value = createJoinMeetingRedirectUrl({
+      domain: 'example.com',
+      key: 'key&other=unsafe',
+      code: 'code#fragment',
+      password: 'secret',
+    }).unwrapOr('');
+    const url = new URL(value, 'https://app.example.com');
+    expect(url.pathname).toBe('/auth/');
+    expect(url.hash).toBe('#/join-meeting');
+    expect(url.searchParams.get('meeting_domain')).toBe('example.com');
+    expect(url.searchParams.get('meeting_key')).toBe('key&other=unsafe');
+    expect(url.searchParams.get('meeting_code')).toBe('code#fragment');
+    expect(url.searchParams.get('meeting_password')).toBe('secret');
+    expect(url.searchParams.get('join_key')).toBeNull();
+    expect(url.searchParams.get('other')).toBeNull();
+  });
+  it.each([
+    {key: 'key', code: 'code'},
+    {domain: 'example.com', code: 'code'},
+    {domain: 'example.com', key: 'key'},
+    {domain: ['a', 'b'], key: 'key', code: 'code'},
+    {domain: 'example.com', key: {}, code: 'code'},
+    {domain: 'example.com', key: 'key', code: ['a', 'b']},
+    {domain: 'example.com', key: 'key', code: 'code', password: ['a', 'b']},
+  ])('rejects malformed meeting queries: %j', query => {
+    const {response, sendStatus, redirect} = createJoinRedirectResponse();
+    redirectToJoinMeeting(createJoinRedirectRequest(query), response);
+    expect(sendStatus).toHaveBeenCalledWith(400);
+    expect(redirect).not.toHaveBeenCalled();
+  });
+  it('redirects valid meeting URLs with HTTP 302', () => {
+    const {response, redirect} = createJoinRedirectResponse();
+    redirectToJoinMeeting(createJoinRedirectRequest({domain: 'example.com', key: 'key', code: 'code'}), response);
+    expect(redirect).toHaveBeenCalledWith(
+      302,
+      '/auth/?meeting_domain=example.com&meeting_key=key&meeting_code=code#/join-meeting',
+    );
   });
 });
