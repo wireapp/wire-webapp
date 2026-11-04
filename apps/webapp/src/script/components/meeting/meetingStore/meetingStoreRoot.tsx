@@ -20,6 +20,7 @@
 import {type ReactNode, useEffect, useMemo, type FunctionComponent} from 'react';
 
 import {container} from 'tsyringe';
+import {ThemeProvider} from '@wireapp/react-ui-kit';
 
 import {Availability} from '@wireapp/protocol-messaging';
 
@@ -47,6 +48,7 @@ import {
 } from '../meetingNotificationStore/meetingNotificationStore';
 import {MeetingPrepModalHost} from '../meetingPrep/meetingPrepModalHost';
 import {useMeetingPrepModal} from '../meetingPrep/useMeetingPrepModal';
+import {MeetingPrepModalHost} from '../meetingPrep/meetingPrepModalHost';
 import {resolveCurrentMeetingReminderPayload} from '../resolveCurrentMeetingReminderPayload';
 import {deleteMeetingForAll, deleteMeetingForMe} from '../shared/service/deleteMeeting';
 import {meetNowMeeting, scheduleMeeting, updateMeeting} from '../shared/service/meetingService';

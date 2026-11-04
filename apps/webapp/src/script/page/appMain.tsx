@@ -29,6 +29,8 @@ import {Maybe} from 'true-myth';
 import {container} from 'tsyringe';
 
 import {AppLock} from './appLock';
+import {openLoginMeetingPrep} from '../navigation/meetingJoinDestination';
+import {useMeetingPrepModal} from '../components/meeting/meetingPrep/useMeetingPrepModal';
 import {useE2EIFeatureConfigUpdate} from './components/featureConfigChange/featureConfigChangeHandler/features/useE2eIFeatureConfigUpdate';
 import {FeatureConfigChangeNotifier} from './components/featureConfigChange/featureConfigChangeNotifier';
 import {ForceReloadModal} from './components/forceReloadModal/forceReloadModal';
@@ -333,9 +335,25 @@ export const AppMain: FunctionComponent<AppMainProps> = (properties: AppMainProp
     const conversationRedirect = localStorage.getItem(App.LOCAL_STORAGE_LOGIN_CONVERSATION_KEY);
 
     if (isNonEmptyString(conversationRedirect)) {
-      const {conversation, domain} = JSON.parse(conversationRedirect)?.data;
+      const destination = JSON.parse(conversationRedirect)?.data;
       localStorage.removeItem(App.LOCAL_STORAGE_LOGIN_CONVERSATION_KEY);
-      window.location.replace(`#/conversation/${conversation}${isTruthy(domain) ? `/${domain}` : ''}`);
+      const openedMeetingPrep = openLoginMeetingPrep(destination, useMeetingPrepModal.getState().open);
+      if (openedMeetingPrep) {
+        const session = useMeetingPrepModal.getState().session;
+        if (session.isJust) {
+          navigate(
+            canUseMeetings({
+              isTeamMeetingsFeatureEnabled: teamState.isMeetingsEnabled(),
+              apiVersion: core.backendFeatures.version,
+            })
+              ? '/meetings'
+              : generateConversationUrl(session.value.qualifiedConversationId),
+          );
+        }
+      } else {
+        const {conversation, domain} = destination;
+        window.location.replace(`#/conversation/${conversation}${isTruthy(domain) ? `/${domain}` : ''}`);
+      }
     }
 
     repositories.properties.checkTelemetrySharingPermission();
