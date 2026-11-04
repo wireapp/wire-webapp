@@ -44,7 +44,7 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {ContentState, ListState, useAppState} from 'src/script/page/useAppState';
 import * as Router from 'src/script/router/Router';
-import {TestFactory} from 'test/helper/TestFactory';
+import {TestFactory} from '../../../../../../test/helper/TestFactory';
 
 import {Conversations, shouldClearDeepLinkForTab} from './';
 import {SidebarTabs, useSidebarStore} from './useSidebarStore';

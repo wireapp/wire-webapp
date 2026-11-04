@@ -31,8 +31,8 @@ import type {TeamRepository} from '../team/TeamRepository';
 import {TeamState} from '../team/TeamState';
 import type {UserRepository} from '../user/userRepository';
 import {UserState} from '../user/userState';
-import {generateConversation} from 'test/helper/ConversationGenerator';
-import {generateUser} from 'test/helper/UserGenerator';
+import {generateConversation} from '../../../../test/helper/ConversationGenerator';
+import {generateUser} from '../../../../test/helper/UserGenerator';
 import {translate} from '../../util/localizerUtil';
 
 jest.mock('./EventMapper', () => {

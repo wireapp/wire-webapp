@@ -20,7 +20,11 @@
 import {Conversation} from '../../entity/Conversation';
 import {User} from '../../entity/User';
 import {QuoteEntity} from 'src/script/message/quoteEntity';
-import {createMessageAddEvent, createMultipartMessageAddEvent, toSavedEvent} from 'test/helper/EventGenerator';
+import {
+  createMessageAddEvent,
+  createMultipartMessageAddEvent,
+  toSavedEvent,
+} from '../../../../../test/helper/EventGenerator';
 import {createUuid} from '../../../util/uuid';
 
 import {RepliesUpdaterMiddleware} from './RepliesUpdaterMiddleware';

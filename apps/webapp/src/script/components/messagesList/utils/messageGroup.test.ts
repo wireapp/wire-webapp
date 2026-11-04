@@ -23,7 +23,7 @@ import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import {EventMapper} from '../../../repositories/conversation/EventMapper';
 import {Conversation} from '../../../repositories/entity/Conversation';
 import {Message} from '../../../repositories/entity/message/message';
-import {createGroupCreationEvent, createMessageAddEvent} from 'test/helper/EventGenerator';
+import {createGroupCreationEvent, createMessageAddEvent} from '../../../../../test/helper/EventGenerator';
 import {translate} from '../../../util/localizerUtil';
 import {getRandomNumber} from '../../../util/numberUtil';
 import {createUuid} from '../../../util/uuid';

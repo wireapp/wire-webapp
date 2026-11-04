@@ -36,7 +36,7 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {generateUser} from 'test/helper/UserGenerator';
+import {generateUser} from '../../../../../test/helper/UserGenerator';
 import {createUuid} from '../../../util/uuid';
 
 import {MessageWrapper} from './messageWrapper';

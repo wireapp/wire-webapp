@@ -25,7 +25,7 @@ import {
   createOngoingMeetingWindow,
   formatMeetingDateIso,
   formatMeetingTimeLabel,
-} from 'test/e2e_tests/utils/meetingTime.util';
+} from '../../../utils/meetingTime.util';
 import type {Request} from 'playwright-core';
 
 const MEETINGS_LIST_TIMEOUT_MS = 30_000;

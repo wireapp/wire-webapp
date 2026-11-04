@@ -24,7 +24,7 @@ import {Availability} from '@wireapp/protocol-messaging';
 import {User} from '../entity/User';
 import {ACCENT_ID} from 'src/script/Config';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
-import {entities, payload} from 'test/api/payloads';
+import {entities, payload} from '../../../../test/api/payloads';
 import {translate} from '../../util/localizerUtil';
 import {createUuid} from '../../util/uuid';
 

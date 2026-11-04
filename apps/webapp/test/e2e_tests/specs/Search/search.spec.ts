@@ -17,8 +17,8 @@
  *
  */
 
-import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, expect, withLogin} from 'test/e2e_tests/test.fixtures';
+import {PageManager} from '../../pageManager';
+import {test, expect, withLogin} from '../../test.fixtures';
 import {createGroup} from '../../utils/userActions';
 
 test.describe('Search', () => {

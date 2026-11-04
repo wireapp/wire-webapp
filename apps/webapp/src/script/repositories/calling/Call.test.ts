@@ -24,7 +24,7 @@ import {CALL_TYPE, CONV_TYPE, Wcall} from '@wireapp/avs';
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 import {MediaDevicesHandler} from '../media/MediaDevicesHandler';
-import {generateConversation} from 'test/helper/ConversationGenerator';
+import {generateConversation} from '../../../../test/helper/ConversationGenerator';
 
 import {Call} from './Call';
 import {CallingRepository} from './CallingRepository';

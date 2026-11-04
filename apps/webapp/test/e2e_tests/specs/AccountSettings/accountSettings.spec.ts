@@ -17,10 +17,10 @@
  *
  */
 
-import {getUser, User} from 'test/e2e_tests/data/user';
-import {readRequiredEnvironmentVariable} from 'test/e2e_tests/environment/readRequiredEnvironmentVariable';
-import {PageManager} from 'test/e2e_tests/pageManager';
-import {connectWithUser, loginUser, logOutUser} from 'test/e2e_tests/utils/userActions';
+import {getUser, User} from '../../data/user';
+import {readRequiredEnvironmentVariable} from '../../environment/readRequiredEnvironmentVariable';
+import {PageManager} from '../../pageManager';
+import {connectWithUser, loginUser, logOutUser} from '../../utils/userActions';
 
 import {test, expect, LOGIN_TIMEOUT, withLogin} from '../../test.fixtures';
 

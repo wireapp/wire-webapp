@@ -66,7 +66,7 @@ import {MentionEntity} from 'src/script/message/mentionEntity';
 import {QuoteEntity} from 'src/script/message/quoteEntity';
 import {SystemMessageType} from 'src/script/message/systemMessageType';
 import {ContentState, useAppState} from 'src/script/page/useAppState';
-import {entities, payload} from 'test/api/payloads';
+import {entities, payload} from '../../../../test/api/payloads';
 import type {Translate} from '../../util/localizerUtil';
 import {translateForTest} from '../../util/test/translateForTest';
 import {truncate} from '../../util/stringUtil';

@@ -22,7 +22,7 @@ import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 
 import {randomInt} from 'crypto';
 
-import {generateUser} from 'test/helper/UserGenerator';
+import {generateUser} from '../../../../../test/helper/UserGenerator';
 
 import en from '../../../../i18n/en-US.json';
 import {MemberMessage as MemberMessageEntity} from '../../../repositories/entity/message/memberMessage';

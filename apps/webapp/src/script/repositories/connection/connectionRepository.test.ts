@@ -29,7 +29,7 @@ import {Conversation} from '../entity/Conversation';
 import {SelfService} from '../self/SelfService';
 import {TeamService} from '../team/TeamService';
 import {UserRepository} from '../user/userRepository';
-import {generateUser} from 'test/helper/UserGenerator';
+import {generateUser} from '../../../../test/helper/UserGenerator';
 import type {Translate} from '../../util/localizerUtil';
 import {translateForTest} from '../../util/test/translateForTest';
 import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';

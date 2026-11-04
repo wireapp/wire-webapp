@@ -18,7 +18,7 @@
  */
 
 import {asyncNoop} from 'noop-esm';
-import {PageManager} from 'test/e2e_tests/pageManager';
+import {PageManager} from '../../pageManager';
 import {test, expect, withLogin} from '../../test.fixtures';
 
 test(

@@ -92,8 +92,8 @@ import {ConversationError} from 'src/script/error/conversationError';
 import {
   generateConversation as _generateConversation,
   generateAPIConversation,
-} from 'test/helper/ConversationGenerator';
-import {createDeleteEvent, createMessageAddEvent} from 'test/helper/EventGenerator';
+} from '../../../../test/helper/ConversationGenerator';
+import {createDeleteEvent, createMessageAddEvent} from '../../../../test/helper/EventGenerator';
 import type {Translate} from '../../util/localizerUtil';
 import {translateForTest} from '../../util/test/translateForTest';
 import {escapeRegex} from '../../util/sanitizationUtil';
