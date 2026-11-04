@@ -29,7 +29,7 @@ import {CallLogsErrorStatus, createMockCallLogsService} from '../../../../../rep
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+} from '../../../../testSupport/rootContextTestSupport';
 import {translateForTest} from '../../../../../util/test/translateForTest';
 
 import {Config} from '../../../../../Config';

@@ -36,7 +36,7 @@ import {
 } from '../../../../../repositories/calling/callLogsService';
 import {useCallLogsUploadSettings} from '../../../../../repositories/calling/callLogsUploadSettings';
 import {UserState} from '../../../../../repositories/user/userState';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+import {useApplicationContext} from '../../../../rootProvider';
 
 import {
   callLogsModalBodyStyles,

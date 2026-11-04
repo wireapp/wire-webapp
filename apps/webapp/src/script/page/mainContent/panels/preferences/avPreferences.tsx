@@ -21,7 +21,7 @@ import {memo, type FunctionComponent} from 'react';
 
 import {container} from 'tsyringe';
 
-import {sendCallLogsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
+import {sendCallLogsFeatureToggleName} from '../../../../featureToggles/startupFeatureToggleNames';
 
 import {AudioOutPreferences} from './avPreferences/audioOutPreferences';
 import {CallOptions} from './avPreferences/callOptions';
