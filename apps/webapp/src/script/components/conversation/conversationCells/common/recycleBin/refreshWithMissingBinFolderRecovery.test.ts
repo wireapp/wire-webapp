@@ -17,13 +17,10 @@
  *
  */
 
-import {AxiosError, AxiosHeaders, type AxiosResponse} from 'axios';
-
 import {refreshWithMissingBinFolderRecovery} from './refreshWithMissingBinFolderRecovery';
 
-const createHttpError = (status: number): AxiosError => {
-  const response = {status, statusText: '', data: {}, headers: {}, config: {headers: new AxiosHeaders()}};
-  return new AxiosError('Request failed', 'ERR_BAD_REQUEST', undefined, undefined, response as AxiosResponse);
+const createHttpError = (status: number): Error => {
+  return Object.assign(new Error('Request failed'), {isAxiosError: true, response: {status}});
 };
 
 interface SetupOptions {
