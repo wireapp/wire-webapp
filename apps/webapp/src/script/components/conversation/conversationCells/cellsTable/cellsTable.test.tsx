@@ -3857,7 +3857,7 @@ describe('CellsTable restoring selected Bin items', () => {
     await user.click(screen.getByRole('checkbox', {name: 'Select a.txt'}));
     await user.click(screen.getByRole('checkbox', {name: 'Select b.txt'}));
     await user.click(screen.getByRole('button', {name: 'Restore'}));
-    await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Restore'}));
+    await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Restore selected items'}));
 
     expect(await screen.findByText('cells.bulkRestore.status.restoring')).toBeInTheDocument();
     expect(screen.getByRole('progressbar', {name: 'Processing'})).toBeInTheDocument();
