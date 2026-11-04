@@ -20,6 +20,7 @@
 import {type ReactNode, useEffect, useMemo, type FunctionComponent} from 'react';
 
 import {container} from 'tsyringe';
+import {ThemeProvider} from '@wireapp/react-ui-kit';
 
 import {Availability} from '@wireapp/protocol-messaging';
 
@@ -45,6 +46,7 @@ import {
   useMeetingNotificationStore,
 } from '../meetingNotificationStore/meetingNotificationStore';
 import {useMeetingPrepModal} from '../meetingPrep/useMeetingPrepModal';
+import {MeetingPrepModalHost} from '../meetingPrep/meetingPrepModalHost';
 import {resolveCurrentMeetingReminderPayload} from '../resolveCurrentMeetingReminderPayload';
 import {deleteMeetingForAll, deleteMeetingForMe} from '../shared/service/deleteMeeting';
 import {meetNowMeeting, scheduleMeeting, updateMeeting} from '../shared/service/meetingService';
@@ -62,6 +64,9 @@ type MeetingStoreRootProps = {
 export const MeetingStoreRoot: FunctionComponent<MeetingStoreRootProps> = ({children}: MeetingStoreRootProps) => {
   const {mainViewModel, clock, translate} = useApplicationContext();
   const {isMeetingsEnabled} = useMeetingsFeatureFlag();
+  const meetingPrepSession = useMeetingPrepModal(state => {
+    return state.session;
+  });
   const {
     meetings: meetingsRepository,
     conversation: conversationRepository,
@@ -212,5 +217,14 @@ export const MeetingStoreRoot: FunctionComponent<MeetingStoreRootProps> = ({chil
     };
   }, [isMeetingsEnabled, store, clock, mainViewModel, translate]);
 
-  return <MeetingStoreProvider store={store}>{children}</MeetingStoreProvider>;
+  return (
+    <MeetingStoreProvider store={store}>
+      {children}
+      {meetingPrepSession.isJust && (
+        <ThemeProvider>
+          <MeetingPrepModalHost />
+        </ThemeProvider>
+      )}
+    </MeetingStoreProvider>
+  );
 };
