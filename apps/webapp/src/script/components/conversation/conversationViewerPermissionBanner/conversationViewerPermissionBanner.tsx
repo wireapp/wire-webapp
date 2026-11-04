@@ -24,6 +24,12 @@ import {CloseIcon} from '@wireapp/react-ui-kit';
 import {Config} from '../../../Config';
 import {useApplicationContext} from '../../../page/rootProvider';
 
+import {
+  dismissConversationViewerPermissionBanner,
+  getSessionStorage,
+  isConversationViewerPermissionBannerDismissed,
+} from './conversationViewerPermissionBannerStorage';
+
 interface ConversationViewerPermissionBannerProps {
   conversationId: string;
 }
@@ -33,9 +39,9 @@ export const ConversationViewerPermissionBanner: FunctionComponent<ConversationV
 }) => {
   const {translate} = useApplicationContext();
   const sharedDriveSupportUrl = Config.getConfig().URL.SUPPORT.SHARED_DRIVE;
-  const dismissedKey = `conversation-viewer-permission-banner-dismissed:${conversationId}`;
+  const storage = getSessionStorage();
   const [isVisible, setIsVisible] = useState(() => {
-    return sessionStorage.getItem(dismissedKey) !== 'true';
+    return !isConversationViewerPermissionBannerDismissed(storage, conversationId);
   });
 
   if (!isVisible) {
@@ -62,7 +68,7 @@ export const ConversationViewerPermissionBanner: FunctionComponent<ConversationV
         className="conversation-viewer-permission-banner__close"
         aria-label={translate('accessibility.rightPanel.close')}
         onClick={() => {
-          sessionStorage.setItem(dismissedKey, 'true');
+          dismissConversationViewerPermissionBanner(storage, conversationId);
           setIsVisible(false);
         }}
       >
