@@ -19,13 +19,13 @@
 
 import type {MeetingsDataSource} from './meetingsDataSource';
 
-import type {Meeting, MeetingWithConversation} from '../../apiClient/meetings/meeting';
+import type {CreatedMeetingWithConversation, Meeting, MeetingWithConversation} from '../../apiClient/meetings/meeting';
 import type {MeetingsAPI} from '../../apiClient/meetings/meetingsApi';
 
 export class MeetingsApiDataSource implements MeetingsDataSource {
   constructor(private readonly meetingsApi: MeetingsAPI) {}
 
-  createMeeting(...args: Parameters<MeetingsDataSource['createMeeting']>): Promise<MeetingWithConversation> {
+  createMeeting(...args: Parameters<MeetingsDataSource['createMeeting']>): Promise<CreatedMeetingWithConversation> {
     return this.meetingsApi.createMeeting(...args);
   }
 
