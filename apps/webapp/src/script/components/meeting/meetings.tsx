@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect, useMemo, useRef, type FunctionComponent} from 'react';
+import {useCallback, useEffect, useRef, type FunctionComponent} from 'react';
 
 import {container} from 'tsyringe';
 
@@ -26,14 +26,10 @@ import {MeetingCallingView} from 'Components/meeting/meetingCallingView/meetingC
 import {meetingsContentWrapperStyles} from 'Components/meeting/meetingCallingView/meetingCallingView.styles';
 import {MeetingHeader} from 'Components/meeting/meetingHeader/meetingHeader';
 import {MeetingList} from 'Components/meeting/meetingList/meetingList';
-import {createMeetingPrepPreview} from 'Components/meeting/meetingPrep/createMeetingPrepPreview';
-import {MeetingPrepModal} from 'Components/meeting/meetingPrep/meetingPrepModal';
-import {useMeetingPrepJoin} from 'Components/meeting/meetingPrep/useMeetingPrepJoin';
 import {useMeetingStore} from 'Components/meeting/meetingStore/meetingStoreProvider';
 import {MeetNowModal} from 'Components/meeting/meetNowModal/meetNowModal';
 import {RotateMeetingLinkModal} from 'Components/meeting/rotateMeetingLinkModal/rotateMeetingLinkModal';
 import {ScheduleMeetingModal} from 'Components/meeting/scheduleMeetingModal';
-import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import {UserState} from 'Repositories/user/userState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
@@ -53,10 +49,6 @@ export const Meetings: FunctionComponent = () => {
     return state.loadMeetings;
   });
   const selfUser = container.resolve(UserState).self();
-  const preview = useMemo(() => {
-    return createMeetingPrepPreview(container.resolve(MediaStreamHandler));
-  }, []);
-  const joinMeeting = useMeetingPrepJoin();
 
   const refreshMeetings = useCallback(() => {
     return fireAndForgetInvoker.fireAndForget(loadMeetings);
@@ -83,12 +75,6 @@ export const Meetings: FunctionComponent = () => {
       <ScheduleMeetingModal />
       <MeetNowModal />
       <RotateMeetingLinkModal />
-      <MeetingPrepModal
-        participant={selfUser}
-        requestPreviewStream={preview.requestPreviewStream}
-        releasePreviewStream={preview.releasePreviewStream}
-        joinMeeting={joinMeeting}
-      />
     </div>
   );
 };

@@ -27,10 +27,144 @@ import type {APIClient} from '@wireapp/api-client';
 import type {TypeUtil} from '@wireapp/commons';
 
 import {AuthActionCreator} from './creator/';
+import {conversationAction} from './conversationAction';
 
+import {getJoinLink} from '../../util/joinLink';
 import {mockStoreFactory} from '../../util/test/mockStoreFactory';
+import {initialRootState} from '../reducer';
 
 import {ActionRoot, actionRoot} from './';
+
+describe.each(['password', 'SSO'] as const)('Meeting link login with %s', mode => {
+  const conversation = {id: 'conversation-id', domain: 'example.com'};
+  const meeting = {
+    qualified_id: {id: 'meeting-id', domain: 'example.com'},
+    qualified_conversation: conversation,
+    title: 'Meeting',
+    start_time: '2026-01-01T12:00:00Z',
+  };
+
+  beforeEach(() => {
+    window.history.replaceState(
+      {},
+      '',
+      '/auth/?meeting_domain=example.com&meeting_key=key&meeting_code=code&meeting_password=secret#/join-meeting',
+    );
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+    window.history.replaceState({}, '', '/');
+    window.localStorage.removeItem('LOGIN_CONVERSATION_KEY');
+    window.localStorage.removeItem('__amplify__z.storage.StorageKey.AUTH.PERSIST');
+  });
+
+  const createLogin = (initializeClient: () => Promise<void>): {login: () => Promise<void>; sendJSON: jest.Mock} => {
+    const sendJSON = jest.fn().mockResolvedValue({data: meeting});
+    const store = mockStoreFactory({
+      apiClient: {backendFeatures: {version: 19}, transport: {http: {sendJSON}}},
+      core: {login: jest.fn().mockResolvedValue(undefined), init: jest.fn().mockResolvedValue(undefined)},
+      actions: {
+        ...actionRoot,
+        authAction: {
+          ...actionRoot.authAction,
+          doSilentLogout: () => {
+            return async () => {
+              return undefined;
+            };
+          },
+        },
+        selfAction: {
+          fetchSelf: () => {
+            return async () => {
+              return undefined;
+            };
+          },
+        },
+        clientAction: {
+          doInitializeClient: () => {
+            return async () => {
+              return initializeClient();
+            };
+          },
+        },
+      },
+      localStorage: window.localStorage,
+    })(initialRootState);
+    const login = (): Promise<void> => {
+      const link = getJoinLink();
+      if (mode === 'SSO') {
+        return store.dispatch(
+          actionRoot.authAction.doFinalizeSSOLogin({
+            clientType: ClientType.PERMANENT,
+            ...(link.kind === 'meeting' ? {meetingLink: link} : {}),
+          }),
+        );
+      }
+      return store.dispatch(
+        actionRoot.authAction.doLoginAndJoin(
+          {email: 'test@example.com', password: 'login-password', clientType: ClientType.PERMANENT},
+          'key',
+          'code',
+        ),
+      );
+    };
+    return {login, sendJSON};
+  };
+
+  it('keeps meeting credentials after client initialization fails and retries the meeting endpoint', async () => {
+    const error = new Error('Client initialization failed');
+    const initializeClient = jest.fn().mockRejectedValueOnce(error).mockResolvedValueOnce(undefined);
+    const conversationJoin = jest.spyOn(conversationAction, 'doJoinConversationByCode');
+    const {login, sendJSON} = createLogin(initializeClient);
+
+    await expect(login()).rejects.toBe(error);
+    expect(getJoinLink()).toEqual({
+      kind: 'meeting',
+      domain: 'example.com',
+      key: 'key',
+      code: 'code',
+      password: 'secret',
+    });
+
+    await login();
+
+    expect(initializeClient).toHaveBeenCalledTimes(2);
+    expect(sendJSON).toHaveBeenCalledTimes(2);
+    expect(sendJSON).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({
+        method: 'post',
+        url: '/meeting/example.com/key/code/join',
+        params: {password: 'secret'},
+      }),
+    );
+    expect(conversationJoin).not.toHaveBeenCalled();
+    expect(window.location.search).toBe('');
+    expect(JSON.parse(window.localStorage.getItem('LOGIN_CONVERSATION_KEY') ?? '{}').data).toEqual({
+      conversation: conversation.id,
+      domain: conversation.domain,
+      meetingPrep: {
+        meetingTitle: meeting.title,
+        meetingStartTime: meeting.start_time,
+        qualifiedMeetingId: meeting.qualified_id,
+        qualifiedConversationId: conversation,
+      },
+    });
+  });
+
+  it('clears meeting credentials at the device-limit handoff and keeps the destination', async () => {
+    const error = new BackendError('Device limit', BackendErrorLabel.TOO_MANY_CLIENTS, HTTP_STATUS.FORBIDDEN);
+    const {login} = createLogin(jest.fn().mockRejectedValue(error));
+
+    await expect(login()).rejects.toBe(error);
+
+    expect(window.location.search).toBe('');
+    expect(JSON.parse(window.localStorage.getItem('LOGIN_CONVERSATION_KEY') ?? '{}').data.meetingPrep).toEqual(
+      expect.objectContaining({qualifiedConversationId: conversation}),
+    );
+  });
+});
 
 describe('AuthAction', () => {
   it('authenticates a user successfully', async () => {

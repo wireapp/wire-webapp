@@ -23,8 +23,7 @@ import {isError, isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import type {DomainData} from '@wireapp/api-client/lib/account/domainData';
 import {ClientType} from '@wireapp/api-client/lib/client/index';
 import type {ConversationJoinData} from '@wireapp/api-client/lib/conversation/data';
-import type {ConversationEvent} from '@wireapp/api-client/lib/event';
-import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
+import {BackendError} from '@wireapp/api-client/lib/http';
 import {isValidEmail, PATTERN} from '@wireapp/commons/lib/util/ValidationUtil';
 import {FormattedMessage} from 'react-intl';
 import {connect, useDispatch} from 'react-redux';
@@ -34,6 +33,7 @@ import {container} from 'tsyringe';
 import {Runtime, UrlUtil} from '@wireapp/commons';
 import {Button, Checkbox, CheckboxLabel, ErrorMessage, Form, Input, InputBlock, Loading} from '@wireapp/react-ui-kit';
 
+import type {JoinLinkResult} from 'src/script/navigation/meetingJoinDestination';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {APIClient} from 'src/script/service/apiClientSingleton';
 import {isBackendError} from 'Util/typePredicateUtil';
@@ -43,6 +43,7 @@ import {buildDomainRedirectUrl, handleEnterpriseLogin, handleSSOBackendError, re
 import {Config} from '../../../Config';
 import {JoinGuestLinkPasswordModal} from '../../component/joinGuestLinkPasswordModal';
 import {actionRoot as ROOT_ACTIONS} from '../../module/action';
+import {joinLinkAction} from '../../module/action/joinLinkAction';
 import {ValidationError} from '../../module/action/validationError';
 import {RootState, ThunkDispatch} from '../../module/reducer';
 import type {LoginDataState, RegistrationDataState} from '../../module/reducer/authReducer';
@@ -51,6 +52,7 @@ import * as ConversationSelector from '../../module/selector/conversationSelecto
 import {QUERY_KEY, ROUTE} from '../../route';
 import {parseError, parseValidationErrors} from '../../util/errorUtil';
 import {getEnterpriseLoginV2FF} from '../../util/helpers';
+import {getJoinLink, isJoinLinkPasswordError, JOIN_LINK_KIND, type MeetingLink} from '../../util/joinLink';
 import {logoutReasonStrings} from '../../util/logoutUtil';
 import {getSearchParams, SSO_CODE_PREFIX} from '../../util/urlUtil';
 
@@ -69,6 +71,7 @@ const SingleSignOnFormComponent: FunctionComponent<SingleSignOnFormProps & Conne
   authError,
   conversationError,
   conversationInfo,
+  conversationHasPassword,
   conversationInfoFetching,
   resetAuthError,
   validateSSOCode,
@@ -77,7 +80,6 @@ const SingleSignOnFormComponent: FunctionComponent<SingleSignOnFormProps & Conne
   doGetDomainInfo,
   doCheckConversationCode,
   doJoinConversationByCode,
-  doGetConversationInfoByCode,
   doNavigate,
   pushAccountRegistrationData,
   pushLoginData,
@@ -104,10 +106,7 @@ const SingleSignOnFormComponent: FunctionComponent<SingleSignOnFormProps & Conne
   const [shouldAutoLogin, setShouldAutoLogin] = useState(false);
 
   const [isLinkPasswordModalOpen, setIsLinkPasswordModalOpen] = useState<boolean>(
-    conversationInfo?.has_password === true ||
-      (conversationError !== undefined &&
-        conversationError !== null &&
-        conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD),
+    requiresPasswordModal(false, conversationHasPassword, conversationError),
   );
   const isEnterpriseLoginV2Enabled = getEnterpriseLoginV2FF();
 
@@ -117,9 +116,12 @@ const SingleSignOnFormComponent: FunctionComponent<SingleSignOnFormProps & Conne
       const strippedCode = stripPrefix(code);
       await validateSSOCode(strippedCode);
       await doLogin(strippedCode);
-      await doFinalizeSSOLogin({clientType});
+      const link = getJoinLink();
+      await doFinalizeSSOLogin(
+        link.kind === JOIN_LINK_KIND.MEETING ? {clientType, meetingLink: link, password} : {clientType},
+      );
       const hasKeyAndCode = isNonEmptyString(conversationKey) && isNonEmptyString(conversationCode);
-      if (hasKeyAndCode) {
+      if (link.kind === JOIN_LINK_KIND.CONVERSATION && hasKeyAndCode) {
         await doJoinConversationByCode(conversationKey, conversationCode, undefined, password);
       }
 
@@ -139,13 +141,8 @@ const SingleSignOnFormComponent: FunctionComponent<SingleSignOnFormProps & Conne
   );
 
   useEffect(() => {
-    setIsLinkPasswordModalOpen(
-      conversationInfo?.has_password === true ||
-        (conversationError !== undefined &&
-          conversationError !== null &&
-          conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD),
-    );
-  }, [conversationError, conversationInfo?.has_password]);
+    setIsLinkPasswordModalOpen(requiresPasswordModal(false, conversationHasPassword, conversationError));
+  }, [conversationError, conversationHasPassword]);
 
   useEffect(() => {
     const queryAutoLogin = UrlUtil.hasURLParameter(QUERY_KEY.SSO_AUTO_LOGIN);
@@ -168,11 +165,10 @@ const SingleSignOnFormComponent: FunctionComponent<SingleSignOnFormProps & Conne
     if (isNonEmptyString(queryLogoutReason)) {
       setLogoutReason(queryLogoutReason);
     }
-  }, [doCheckConversationCode, doGetConversationInfoByCode]);
+  }, []);
 
   useEffect(() => {
-    const queryConversationCode = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_CODE);
-    const queryConversationKey = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_KEY);
+    const {code: queryConversationCode, key: queryConversationKey} = getJoinLink();
 
     const keyAndCodeExistent = isNonEmptyString(queryConversationKey) && isNonEmptyString(queryConversationCode);
     if (keyAndCodeExistent) {
@@ -183,12 +179,8 @@ const SingleSignOnFormComponent: FunctionComponent<SingleSignOnFormProps & Conne
         console.warn('Invalid conversation code', error);
         setIsValidLink(false);
       });
-      doGetConversationInfoByCode(queryConversationKey, queryConversationCode).catch((error: unknown) => {
-        console.warn('Failed to fetch conversation info', error);
-        setIsValidLink(false);
-      });
     }
-  }, [doCheckConversationCode, doGetConversationInfoByCode]);
+  }, [doCheckConversationCode]);
 
   useEffect(() => {
     if (isNonEmptyString(initialCode) && initialCode !== codeOrMail) {
@@ -225,7 +217,7 @@ const SingleSignOnFormComponent: FunctionComponent<SingleSignOnFormProps & Conne
         return;
       }
 
-      if (requiresPasswordModal(isLinkPasswordModalOpen, conversationInfo?.has_password ?? false, conversationError)) {
+      if (requiresPasswordModal(isLinkPasswordModalOpen, conversationHasPassword, conversationError)) {
         setIsLinkPasswordModalOpen(true);
         return;
       }
@@ -269,6 +261,10 @@ const SingleSignOnFormComponent: FunctionComponent<SingleSignOnFormProps & Conne
         }
       } catch (error: unknown) {
         setIsLoading(false);
+        if (isJoinLinkPasswordError(error)) {
+          setIsLinkPasswordModalOpen(true);
+          return;
+        }
         if (isBackendError(error)) {
           handleSSOBackendError(error, {navigate, resetAuthError, setSsoError});
         }
@@ -279,7 +275,7 @@ const SingleSignOnFormComponent: FunctionComponent<SingleSignOnFormProps & Conne
       codeOrMail,
       codeOrMailInput,
       conversationError,
-      conversationInfo?.has_password,
+      conversationHasPassword,
       dispatch,
       doGetDomainInfo,
       doNavigate,
@@ -294,10 +290,27 @@ const SingleSignOnFormComponent: FunctionComponent<SingleSignOnFormProps & Conne
   );
 
   useEffect(() => {
-    if (shouldAutoLogin && isNonEmptyString(initialCode) && initialCode === codeOrMail) {
-      void handleSubmit();
+    if (
+      shouldAutoLogin &&
+      isNonEmptyString(initialCode) &&
+      initialCode === codeOrMail &&
+      !isFetching &&
+      !conversationInfoFetching
+    ) {
+      setShouldAutoLogin(false);
+      if (!isLinkPasswordModalOpen) {
+        void handleSubmit();
+      }
     }
-  }, [codeOrMail, handleSubmit, initialCode, shouldAutoLogin]);
+  }, [
+    codeOrMail,
+    conversationInfoFetching,
+    handleSubmit,
+    initialCode,
+    isFetching,
+    isLinkPasswordModalOpen,
+    shouldAutoLogin,
+  ]);
 
   const stripPrefix = (prefixedCode: string): string => {
     return prefixedCode.trim().toLowerCase().replace(SSO_CODE_PREFIX, '');
@@ -364,7 +377,16 @@ const SingleSignOnFormComponent: FunctionComponent<SingleSignOnFormProps & Conne
         />
       )}
       <Form style={{marginTop: 30}} data-uie-name="sso" onSubmit={handleSubmit}>
-        {!isValidLink && <Navigate to={ROUTE.CONVERSATION_JOIN_INVALID} replace />}
+        {!isValidLink && (
+          <Navigate
+            to={
+              getJoinLink().kind === JOIN_LINK_KIND.MEETING
+                ? ROUTE.MEETING_JOIN_INVALID
+                : ROUTE.CONVERSATION_JOIN_INVALID
+            }
+            replace
+          />
+        )}
         <InputBlock>
           <Input
             id={inputName}
@@ -426,16 +448,18 @@ type MapStateToPropsResult = {
   authError: Error | null;
   conversationError: (Error & {label?: string; code?: number; message?: string}) | null;
   conversationInfo: ConversationJoinData | null;
+  conversationHasPassword: boolean;
   conversationInfoFetching: boolean;
   loginData: LoginDataState;
 };
 const mapStateToProps = (state: RootState): MapStateToPropsResult => {
   return {
-    isFetching: AuthSelector.isFetching(state),
+    isFetching: AuthSelector.isFetching(state) || ConversationSelector.isFetching(state),
     account: AuthSelector.getAccount(state),
     authError: AuthSelector.getError(state),
     conversationError: ConversationSelector.getError(state),
     conversationInfo: ConversationSelector.conversationInfo(state),
+    conversationHasPassword: ConversationSelector.hasPassword(state),
     conversationInfoFetching: ConversationSelector.conversationInfoFetching(state),
     loginData: AuthSelector.getLoginData(state),
   };
@@ -444,15 +468,14 @@ const mapStateToProps = (state: RootState): MapStateToPropsResult => {
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
 type MapDispatchToPropsResult = {
   doCheckConversationCode: (key: string, code: string, uri?: string | undefined) => Promise<void>;
-  doFinalizeSSOLogin: (args_0: {clientType: ClientType}) => Promise<void>;
+  doFinalizeSSOLogin: (args: {clientType: ClientType; meetingLink?: MeetingLink; password?: string}) => Promise<void>;
   doGetDomainInfo: (domain: string) => Promise<DomainData>;
   doJoinConversationByCode: (
     key: string,
     code: string,
     uri?: string | undefined,
     password?: string | undefined,
-  ) => Promise<ConversationEvent>;
-  doGetConversationInfoByCode: (key: string, code: string) => Promise<ConversationJoinData | undefined>;
+  ) => Promise<JoinLinkResult | undefined>;
   doNavigate: (url: string) => void;
   resetAuthError: () => Promise<void>;
   validateSSOCode: (code: string) => Promise<void>;
@@ -462,10 +485,10 @@ type MapDispatchToPropsResult = {
 const mapDispatchToProps = (dispatch: ThunkDispatch): MapDispatchToPropsResult => {
   return {
     doCheckConversationCode: (...args: Parameters<typeof ROOT_ACTIONS.conversationAction.doCheckConversationCode>) => {
-      return dispatch(ROOT_ACTIONS.conversationAction.doCheckConversationCode(...args));
+      return dispatch(joinLinkAction.doCheckJoinLink(...args));
     },
-    doFinalizeSSOLogin: (...args: Parameters<typeof ROOT_ACTIONS.authAction.doFinalizeSSOLogin>) => {
-      return dispatch(ROOT_ACTIONS.authAction.doFinalizeSSOLogin(...args));
+    doFinalizeSSOLogin: args => {
+      return dispatch(ROOT_ACTIONS.authAction.doFinalizeSSOLogin(args));
     },
     doGetDomainInfo: (...args: Parameters<typeof ROOT_ACTIONS.authAction.doGetDomainInfo>) => {
       return dispatch(ROOT_ACTIONS.authAction.doGetDomainInfo(...args));
@@ -473,12 +496,7 @@ const mapDispatchToProps = (dispatch: ThunkDispatch): MapDispatchToPropsResult =
     doJoinConversationByCode: (
       ...args: Parameters<typeof ROOT_ACTIONS.conversationAction.doJoinConversationByCode>
     ) => {
-      return dispatch(ROOT_ACTIONS.conversationAction.doJoinConversationByCode(...args));
-    },
-    doGetConversationInfoByCode: (
-      ...args: Parameters<typeof ROOT_ACTIONS.conversationAction.doGetConversationInfoByCode>
-    ) => {
-      return dispatch(ROOT_ACTIONS.conversationAction.doGetConversationInfoByCode(...args));
+      return dispatch(joinLinkAction.doJoinByLink(...args));
     },
     doNavigate: (...args: Parameters<typeof ROOT_ACTIONS.navigationAction.doNavigate>) => {
       return dispatch(ROOT_ACTIONS.navigationAction.doNavigate(...args));
