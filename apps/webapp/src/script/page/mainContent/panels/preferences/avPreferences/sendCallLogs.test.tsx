@@ -20,7 +20,7 @@
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {task} from 'true-myth';
 import {ThemeProvider} from '@wireapp/react-ui-kit';
-import {fireEvent, render, screen} from '@testing-library/react';
+import {act, fireEvent, render, screen} from '@testing-library/react';
 
 import {PrimaryModal} from '../../../../../components/Modals/PrimaryModal';
 import type {CallingRepository} from '../../../../../repositories/calling/CallingRepository';
@@ -79,15 +79,21 @@ describe('SendCallLogs', () => {
     expect(show.mock.calls[0][0]).toBe(PrimaryModal.type.OPTION);
 
     const replace = jest.spyOn(PrimaryModal, 'replace').mockReturnValue(undefined);
-    const completion = show.mock.calls[0][1].primaryAction?.action?.(true);
+    let completion: unknown;
+    act(() => {
+      completion = show.mock.calls[0][1].primaryAction?.action?.(true);
+    });
     expect(send).toHaveBeenCalledTimes(1);
     expect(send.mock.calls[0][0]).toBeInstanceOf(File);
     expect(send.mock.calls[0][0].name).toMatch(/-c44a-Calling_1970-01-01\.log$/);
     expect(send.mock.calls[0][1]).toEqual({force: true});
-    expect(replace.mock.calls[0][0]).toBe(PrimaryModal.type.LOADING);
-    expect(replace.mock.calls[0][1]).toMatchObject({preventClose: true, hideCloseBtn: true});
-    clock.advanceByMilliseconds(2_000);
-    await completion;
+    expect(replace).not.toHaveBeenCalled();
+    expect(screen.getByRole('button')).toBeDisabled();
+    await act(async () => {
+      clock.advanceByMilliseconds(2_000);
+      await completion;
+    });
+    expect(screen.getByRole('button')).toBeEnabled();
     expect(show.mock.calls[1][0]).toBe(PrimaryModal.type.ACKNOWLEDGE);
     expect(show.mock.calls[1][1].text?.title).toBe(translateForTest('modalCallLogsSuccessTitle'));
     render(<>{show.mock.calls[1][1].text?.message}</>);
@@ -140,7 +146,9 @@ describe('SendCallLogs', () => {
       {wrapper},
     );
     fireEvent.click(screen.getByRole('button'));
-    await show.mock.calls[0][1].primaryAction?.action?.(false);
+    await act(async () => {
+      await show.mock.calls[0][1].primaryAction?.action?.(false);
+    });
     expect(sendCallLogs.mock.calls[0]).toEqual([expect.any(File), {force: false}]);
     expect(show.mock.calls[1][1].text?.message).toBe(translateForTest(key));
   });

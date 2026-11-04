@@ -111,6 +111,8 @@ const reportSchema = z.object({
   improvised_span_ids: z.number().int().nonnegative(),
 });
 
+const UPLOAD_TIMEOUT_MILLISECONDS = 30_000;
+
 export const createHttpCallLogsService = (
   serverAddress: string,
   fetchRequest: typeof fetch = fetch,
@@ -127,6 +129,7 @@ export const createHttpCallLogsService = (
             body: request.body,
             credentials: 'omit',
             redirect: 'error',
+            signal: AbortSignal.timeout(UPLOAD_TIMEOUT_MILLISECONDS),
           });
         },
       )

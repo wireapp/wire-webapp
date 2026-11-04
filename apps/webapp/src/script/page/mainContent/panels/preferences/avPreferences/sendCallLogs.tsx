@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode, useMemo} from 'react';
+import {ReactNode, useMemo, useState} from 'react';
 
 import type {CSSObject} from '@emotion/react';
 import {Maybe} from 'true-myth';
@@ -72,6 +72,7 @@ const SendCallLogs = ({
   callLogsService,
   userState = container.resolve(UserState),
 }: SendCallLogsProps) => {
+  const [isUploading, setIsUploading] = useState(false);
   const {translate, clock} = useApplicationContext();
   const brandName = Config.getConfig().BRAND_NAME;
   const mockService = useMemo(() => {
@@ -136,18 +137,8 @@ const SendCallLogs = ({
         primaryAction: {
           text: translate('modalCallLogsSendConfirm'),
           action: (force: boolean) => {
-            PrimaryModal.replace(
-              PrimaryModal.type.LOADING,
-              {
-                preventClose: true,
-                hideCloseBtn: true,
-                text: {
-                  title: translate('modalCallLogsSending'),
-                  message: translate('modalCallLogsSendingMessage'),
-                },
-              },
-              translate,
-            );
+            removeCurrentModal();
+            setIsUploading(true);
             const truncatedId = Maybe.of(userState.self())
               .map(user => {
                 return user.id.slice(0, OBFUSCATION_TRUNCATE_TO);
@@ -159,11 +150,11 @@ const SendCallLogs = ({
             const file = new File([messageLog.join('\r\n')], filename, {type: 'text/plain;charset=utf-8'});
             return service.sendCallLogs(file, {force}).match({
               Resolved: report => {
-                removeCurrentModal();
+                setIsUploading(false);
                 showReport(report);
               },
               Rejected: error => {
-                removeCurrentModal();
+                setIsUploading(false);
                 showMessage(
                   translate('modalCallLogsSendErrorTitle'),
                   translate(callLogsErrorTranslationKeys[error.status]),
@@ -197,11 +188,12 @@ const SendCallLogs = ({
         <Button
           variant={ButtonVariant.TERTIARY}
           onClick={sendCallLogs}
+          disabled={isUploading}
           data-uie-name="send-call-logs"
           aria-describedby="send-call-logs-description"
           type="button"
         >
-          {translate('preferencesOptionsCallLogsSend')}
+          {translate(isUploading ? 'modalCallLogsSending' : 'preferencesOptionsCallLogsSend')}
         </Button>
       </div>
       <p id="send-call-logs-description" className="preferences-detail">
