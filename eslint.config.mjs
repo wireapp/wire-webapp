@@ -628,7 +628,6 @@ const productionConfigs = [
       'libraries/commons/**/*.{ts,tsx}',
       'libraries/core/**/*.{ts,tsx}',
       'libraries/store-engine/**/*.{ts,tsx}',
-      'libraries/store-engine-dexie/**/*.{ts,tsx}',
       'libraries/react-ui-kit/**/*.{ts,tsx}',
     ],
     rules: {
