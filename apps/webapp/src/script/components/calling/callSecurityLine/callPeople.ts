@@ -17,7 +17,7 @@
  *
  */
 
-import type {Participant} from 'Repositories/calling/Participant';
+import type {Participant} from '../../../repositories/calling/Participant';
 
 /** One person in the call. Several devices of the same person are one CallPerson. */
 export interface CallPerson {
@@ -26,8 +26,8 @@ export interface CallPerson {
 }
 
 export interface CallPeopleChange {
-  readonly joined: CallPerson[];
-  readonly left: CallPerson[];
+  readonly joined: readonly CallPerson[];
+  readonly left: readonly CallPerson[];
 }
 
 /**

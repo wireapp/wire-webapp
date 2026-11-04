@@ -19,6 +19,8 @@
 
 import {CSSObject, keyframes} from '@emotion/react';
 
+import {media} from '@wireapp/react-ui-kit';
+
 const easeOutQuint = 'cubic-bezier(0.22, 1, 0.36, 1)';
 
 const fadeIn = keyframes({
@@ -68,9 +70,9 @@ export const callSecurityRootStyles: CSSObject = {
 };
 
 export const callSecurityButtonStyles: CSSObject = {
+  ...callSecurityLineTintedStyles,
   border: 'none',
   margin: 0,
-  backgroundColor: 'color-mix(in srgb, var(--success-color) 12%, transparent)',
   color: 'inherit',
   cursor: 'pointer',
   font: 'inherit',
@@ -85,18 +87,12 @@ export const callSecurityButtonStyles: CSSObject = {
   },
 };
 
-export const callSecurityInfoIconStyles: CSSObject = {
-  width: 11,
-  height: 11,
-  flexShrink: 0,
-};
-
 export const callSecurityExplainerStyles: CSSObject = {
   position: 'absolute',
   zIndex: 20,
   top: 'calc(100% + 8px)',
-  left: '50%',
-  width: 340,
+  left: 0,
+  width: 'min(340px, calc(100vw - 16px))',
   padding: '14px 16px 16px',
   border: '1px solid var(--foreground-fade-16)',
   borderRadius: 12,
@@ -104,7 +100,11 @@ export const callSecurityExplainerStyles: CSSObject = {
   boxShadow: '0 8px 24px rgba(0, 0, 0, 0.14)',
   color: 'var(--main-color)',
   textAlign: 'left',
-  transform: 'translateX(-50%)',
+
+  [media.tabletUp]: {
+    left: '50%',
+    transform: 'translateX(-50%)',
+  },
 };
 
 export const callSecurityExplainerHeadStyles: CSSObject = {

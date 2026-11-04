@@ -17,10 +17,12 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
 /** Two arrows turning around each other. Used when call encryption keys are updated. */
-export const UpdateIcon = (props: SVGIconProps) => {
+export const UpdateIcon: FunctionComponent<SVGIconProps> = props => {
   return (
     <SVGIcon realWidth={12} realHeight={12} {...props}>
       <path

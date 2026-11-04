@@ -18,6 +18,7 @@
  */
 
 import type {Clock, TimeoutIdentifier} from '@enormora/clock/clock';
+import {Maybe, maybe} from 'true-myth';
 
 import type {CallPeopleChange, CallPerson} from './callPeople';
 
@@ -27,6 +28,9 @@ export const KEY_UPDATE_HOLD_IN_MILLISECONDS = 4000;
 export const KEY_UPDATE_MAX_IN_A_ROW_IN_MILLISECONDS = 8000;
 /** After the cap is hit, changes are only counted during this period, then shown as one summary. */
 export const KEY_UPDATE_QUIET_IN_MILLISECONDS = 30_000;
+/** A pause after a message hides that resets the consecutive update limit. */
+export const KEY_UPDATE_COOL_DOWN_IN_MILLISECONDS = KEY_UPDATE_HOLD_IN_MILLISECONDS;
+const microsecondsPerMillisecond = 1_000n;
 
 export type KeyUpdateMessage =
   | {readonly type: 'joined'; readonly name: string}
@@ -39,8 +43,6 @@ interface KeyUpdateEvent {
 }
 
 export interface KeyUpdateQueue {
-  /** Changes before this time are ignored. Used to let the intro sentence finish undisturbed. */
-  readonly absorbUntil: (unixEpochMilliseconds: number) => void;
   readonly push: (change: CallPeopleChange) => void;
   readonly dispose: () => void;
 }
@@ -69,7 +71,8 @@ const toSummaryMessage = (events: KeyUpdateEvent[]): KeyUpdateMessage => {
 /**
  * Turns join and leave changes into the messages shown on the call security line:
  * - each change shows for 4 s; a second one waits its turn
- * - never more than 8 s in a row: any further change starts a 30 s quiet period where changes are only counted
+ * - never more than 8 s in a row: a further change while showing or within 4 s after hiding starts
+ *   a 30 s quiet period where changes are only counted
  * - at the end of a quiet period, one summary, followed by another quiet period while changes keep coming
  * - a person who drops and comes back before their leave has shown shows nothing; once a leave has shown,
  *   coming back shows as joined, because the keys are updated again
@@ -78,37 +81,40 @@ export const createKeyUpdateQueue = ({clock, onMessageChange}: KeyUpdateQueueOpt
   let isShowing = false;
   let isQuiet = false;
   let shownInARowInMilliseconds = 0;
-  let pendingEvent: KeyUpdateEvent | undefined;
+  let pendingEvent: Maybe<KeyUpdateEvent> = Maybe.nothing();
   let countedEvents: KeyUpdateEvent[] = [];
-  let absorbedUntil = 0;
-  let timeoutIdentifier: TimeoutIdentifier | undefined;
+  let hiddenAtInMicroseconds = clock.currentMonotonicMicroseconds;
+  let timeoutIdentifier: Maybe<TimeoutIdentifier> = Maybe.nothing();
 
-  const schedule = (handler: () => void, delayInMilliseconds: number) => {
-    timeoutIdentifier = clock.setTimeout(() => {
-      timeoutIdentifier = undefined;
-      handler();
-    }, delayInMilliseconds);
+  const schedule = (handler: () => void, delayInMilliseconds: number): void => {
+    timeoutIdentifier = Maybe.just(
+      clock.setTimeout(() => {
+        timeoutIdentifier = Maybe.nothing();
+        handler();
+      }, delayInMilliseconds),
+    );
   };
 
-  const hide = () => {
+  const hide = (): void => {
     isShowing = false;
+    hiddenAtInMicroseconds = clock.currentMonotonicMicroseconds;
     onMessageChange(undefined);
   };
 
-  const show = (message: KeyUpdateMessage, onHoldEnd: () => void) => {
+  const show = (message: KeyUpdateMessage, onHoldEnd: () => void): void => {
     isShowing = true;
     shownInARowInMilliseconds += KEY_UPDATE_HOLD_IN_MILLISECONDS;
     onMessageChange(message);
     schedule(onHoldEnd, KEY_UPDATE_HOLD_IN_MILLISECONDS);
   };
 
-  const startQuiet = () => {
+  const startQuiet = (): void => {
     isQuiet = true;
     shownInARowInMilliseconds = 0;
     schedule(endQuiet, KEY_UPDATE_QUIET_IN_MILLISECONDS);
   };
 
-  const endQuiet = () => {
+  const endQuiet = (): void => {
     const events = countedEvents;
     countedEvents = [];
 
@@ -124,10 +130,10 @@ export const createKeyUpdateQueue = ({clock, onMessageChange}: KeyUpdateQueueOpt
     });
   };
 
-  const endHold = () => {
-    if (pendingEvent !== undefined) {
-      const nextEvent = pendingEvent;
-      pendingEvent = undefined;
+  const endHold = (): void => {
+    if (maybe.isJust(pendingEvent)) {
+      const nextEvent = pendingEvent.value;
+      pendingEvent = Maybe.nothing();
       show(toMessage(nextEvent), endHold);
       return;
     }
@@ -136,28 +142,41 @@ export const createKeyUpdateQueue = ({clock, onMessageChange}: KeyUpdateQueueOpt
 
     if (countedEvents.length > 0) {
       startQuiet();
-    } else {
-      shownInARowInMilliseconds = 0;
     }
   };
 
-  const enqueue = (event: KeyUpdateEvent) => {
+  const fitsInARow = (): boolean => {
+    return shownInARowInMilliseconds + KEY_UPDATE_HOLD_IN_MILLISECONDS <= KEY_UPDATE_MAX_IN_A_ROW_IN_MILLISECONDS;
+  };
+
+  const hasCooledDown = (): boolean => {
+    const coolDownInMicroseconds = BigInt(KEY_UPDATE_COOL_DOWN_IN_MILLISECONDS) * microsecondsPerMillisecond;
+    return clock.currentMonotonicMicroseconds - hiddenAtInMicroseconds >= coolDownInMicroseconds;
+  };
+
+  const enqueue = (event: KeyUpdateEvent): void => {
     if (isQuiet) {
       countedEvents.push(event);
       return;
     }
 
-    if (!isShowing) {
+    if (!isShowing && hasCooledDown()) {
       shownInARowInMilliseconds = 0;
+    }
+
+    if (!isShowing && fitsInARow()) {
       show(toMessage(event), endHold);
       return;
     }
 
-    const fitsInARow =
-      shownInARowInMilliseconds + KEY_UPDATE_HOLD_IN_MILLISECONDS <= KEY_UPDATE_MAX_IN_A_ROW_IN_MILLISECONDS;
+    if (!isShowing) {
+      countedEvents.push(event);
+      startQuiet();
+      return;
+    }
 
-    if (pendingEvent === undefined && fitsInARow) {
-      pendingEvent = event;
+    if (maybe.isNothing(pendingEvent) && fitsInARow()) {
+      pendingEvent = Maybe.just(event);
       return;
     }
 
@@ -172,29 +191,24 @@ export const createKeyUpdateQueue = ({clock, onMessageChange}: KeyUpdateQueueOpt
 
   /** Drops a leave that has not shown yet. Returns whether there was one. */
   const dropUnshownLeave = (personKey: string): boolean => {
-    if (pendingEvent !== undefined && isLeaveOf(personKey)(pendingEvent)) {
-      pendingEvent = undefined;
+    const isLeaveOfPerson = isLeaveOf(personKey);
+
+    if (maybe.isJust(pendingEvent) && isLeaveOfPerson(pendingEvent.value)) {
+      pendingEvent = Maybe.nothing();
       return true;
     }
 
-    const countedCount = countedEvents.length;
-    countedEvents = countedEvents.filter(event => {
-      return !isLeaveOf(personKey)(event);
+    const remainingEvents = countedEvents.filter(event => {
+      return !isLeaveOfPerson(event);
     });
+    const hasDropped = remainingEvents.length < countedEvents.length;
+    countedEvents = remainingEvents;
 
-    return countedEvents.length < countedCount;
+    return hasDropped;
   };
 
   return {
-    absorbUntil: unixEpochMilliseconds => {
-      absorbedUntil = unixEpochMilliseconds;
-    },
-
     push: ({joined, left}) => {
-      if (clock.currentUnixEpochMilliseconds < absorbedUntil) {
-        return;
-      }
-
       left.forEach(person => {
         enqueue({type: 'left', person});
       });
@@ -208,9 +222,9 @@ export const createKeyUpdateQueue = ({clock, onMessageChange}: KeyUpdateQueueOpt
     },
 
     dispose: () => {
-      if (timeoutIdentifier !== undefined) {
-        clock.clearTimeout(timeoutIdentifier);
-        timeoutIdentifier = undefined;
+      if (maybe.isJust(timeoutIdentifier)) {
+        clock.clearTimeout(timeoutIdentifier.value);
+        timeoutIdentifier = Maybe.nothing();
       }
     },
   };

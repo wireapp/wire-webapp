@@ -32,7 +32,12 @@ const person = (name: string): CallPerson => {
   return {key: `${name}@wire.test`, name};
 };
 
-const setUp = () => {
+const setUp = (): {
+  clock: ReturnType<typeof createDeterministicClock>;
+  queue: ReturnType<typeof createKeyUpdateQueue>;
+  messages: Array<KeyUpdateMessage | undefined>;
+  current: () => KeyUpdateMessage | undefined;
+} => {
   const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
   const messages: Array<KeyUpdateMessage | undefined> = [];
   const queue = createKeyUpdateQueue({
@@ -41,7 +46,7 @@ const setUp = () => {
       messages.push(message);
     },
   });
-  const current = () => {
+  const current = (): KeyUpdateMessage | undefined => {
     return messages[messages.length - 1];
   };
 
@@ -117,15 +122,32 @@ describe('createKeyUpdateQueue', () => {
     expect(current()).toEqual({type: 'joined', name: 'Carol'});
   });
 
-  it('ignores changes while absorbing, for the intro', () => {
+  it('starts the quiet period for a third change just after consecutive holds', () => {
     const {clock, queue, messages} = setUp();
 
-    queue.absorbUntil(5000);
     queue.push({joined: [person('Alice')], left: []});
-    clock.advanceByMilliseconds(5000);
+    clock.advanceByMilliseconds(4500);
     queue.push({joined: [person('Bob')], left: []});
+    clock.advanceByMilliseconds(4500);
+    queue.push({joined: [person('Carol')], left: []});
 
-    expect(messages).toEqual([{type: 'joined', name: 'Bob'}]);
+    expect(messages).toEqual([{type: 'joined', name: 'Alice'}, undefined, {type: 'joined', name: 'Bob'}, undefined]);
+
+    clock.advanceByMilliseconds(KEY_UPDATE_QUIET_IN_MILLISECONDS);
+    expect(messages.at(-1)).toEqual({type: 'joined', name: 'Carol'});
+  });
+
+  it('resets the consecutive update limit after a full cool-down', () => {
+    const {clock, queue, current} = setUp();
+
+    queue.push({joined: [person('Alice')], left: []});
+    clock.advanceByMilliseconds(KEY_UPDATE_HOLD_IN_MILLISECONDS);
+    clock.advanceByMilliseconds(KEY_UPDATE_HOLD_IN_MILLISECONDS);
+    queue.push({joined: [person('Bob')], left: []});
+    clock.advanceByMilliseconds(KEY_UPDATE_HOLD_IN_MILLISECONDS);
+    queue.push({joined: [person('Carol')], left: []});
+
+    expect(current()).toEqual({type: 'joined', name: 'Carol'});
   });
 
   it('keeps a burst of 100 joins over 120 s to about 20 s on screen, never more than 8 s in a row', () => {

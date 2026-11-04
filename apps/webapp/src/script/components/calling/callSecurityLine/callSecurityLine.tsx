@@ -17,16 +17,14 @@
  *
  */
 
-import {useCallback, useEffect, useId, useRef, useState} from 'react';
+import {type ReactElement, useCallback, useEffect, useId, useRef, useState} from 'react';
+
+import {isNullOrUndefined} from '@sindresorhus/is';
+import {Maybe, maybe} from 'true-myth';
+import {match} from 'ts-pattern';
 
 import {STATE as CALL_STATE} from '@wireapp/avs';
 import {CloseIcon, InfoIcon, LockClosedIcon, ShieldIcon, UpdateIcon} from '@wireapp/react-ui-kit';
-
-import type {Participant} from 'Repositories/calling/Participant';
-import {Config} from 'src/script/Config';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {isEscapeKey} from 'Util/keyboardUtil';
-import type {Translate} from 'Util/localizerUtil';
 
 import {CallPerson, diffCallPeople, getCallPeople} from './callPeople';
 import {
@@ -41,7 +39,6 @@ import {
   callSecurityExplainerTitleStyles,
   callSecurityFadeInStyles,
   callSecurityIconStyles,
-  callSecurityInfoIconStyles,
   callSecurityLabelStyles,
   callSecurityLineStyles,
   callSecurityLineTintedStyles,
@@ -49,9 +46,13 @@ import {
   callSecurityRootStyles,
   callSecuritySeparatorStyles,
   callSecurityUpdateIconStyles,
-} from './CallSecurityLine.styles';
+} from './callSecurityLine.styles';
 import {createKeyUpdateQueue, KeyUpdateMessage, KeyUpdateQueue} from './keyUpdateQueue';
 
+import {useApplicationContext} from '../../../page/rootProvider';
+import type {Participant} from '../../../repositories/calling/Participant';
+import {isEscapeKey} from '../../../util/keyboardUtil';
+import type {Translate} from '../../../util/localizerUtil';
 import {Duration} from '../Duration';
 
 /** How long the "Only people in this call…" sentence stays before the line settles. */
@@ -60,6 +61,7 @@ export const CALL_SECURITY_INTRO_DURATION_IN_MILLISECONDS = 3000;
 export const CALL_SECURITY_INTRO_ABSORB_IN_MILLISECONDS = 2000;
 /** Screen readers hear at most one key update in this period, so a busy call does not flood them. */
 export const CALL_SECURITY_ANNOUNCEMENT_INTERVAL_IN_MILLISECONDS = 30_000;
+const microsecondsPerMillisecond = 1_000n;
 
 type CallSecurityPhase = 'connecting' | 'intro' | 'resting';
 
@@ -68,7 +70,7 @@ const getCallSecurityPhase = (
   startedAt: number | undefined,
   nowInMilliseconds: number,
 ): CallSecurityPhase => {
-  if (callConnectionState !== CALL_STATE.MEDIA_ESTAB || startedAt === undefined) {
+  if (callConnectionState !== CALL_STATE.MEDIA_ESTAB || isNullOrUndefined(startedAt)) {
     return 'connecting';
   }
 
@@ -76,66 +78,71 @@ const getCallSecurityPhase = (
 };
 
 const getKeyUpdateDetail = (translate: Translate, message: KeyUpdateMessage): string => {
-  if (message.type === 'joined') {
-    return translate('callSecurityJoined', {name: message.name});
-  }
-
-  if (message.type === 'left') {
-    return translate('callSecurityLeft', {name: message.name});
-  }
-
-  if (message.leftCount === 0) {
-    return translate('callSecurityPeopleJoined', {count: message.joinedCount});
-  }
-
-  if (message.joinedCount === 0) {
-    return translate('callSecurityPeopleLeft', {count: message.leftCount});
-  }
-
-  return translate('callSecurityPeopleJoinedAndLeft', {
-    joinedCount: message.joinedCount,
-    leftCount: message.leftCount,
-  });
+  return match(message)
+    .with({type: 'joined'}, ({name}) => {
+      return translate('callSecurityJoined', {name});
+    })
+    .with({type: 'left'}, ({name}) => {
+      return translate('callSecurityLeft', {name});
+    })
+    .with({type: 'summary', leftCount: 0}, ({joinedCount}) => {
+      return translate('callSecurityPeopleJoined', {count: joinedCount});
+    })
+    .with({type: 'summary', joinedCount: 0}, ({leftCount}) => {
+      return translate('callSecurityPeopleLeft', {count: leftCount});
+    })
+    .with({type: 'summary'}, ({joinedCount, leftCount}) => {
+      return translate('callSecurityPeopleJoinedAndLeft', {joinedCount, leftCount});
+    })
+    .exhaustive();
 };
 
 interface CallSecurityLineProps {
-  callConnectionState: CALL_STATE;
-  participants: Participant[];
-  startedAt?: number;
+  readonly callConnectionState: CALL_STATE;
+  readonly participants: readonly Participant[];
+  readonly startedAt?: number;
+  readonly brandName: string;
+  readonly supportUrl?: string;
 }
 
 /**
  * The line under the call title that tells participants the call is end-to-end encrypted.
- * It replaces the plain call timer when FEATURE_ENABLE_CALL_SECURITY_LINE is on.
+ * It replaces the plain call timer when the call-security-line startup feature toggle is on.
  *
  * - connecting: until the call media is established
  * - intro: for 3 s after the call is established (startedAt), so reopening the call view does not replay it
  * - resting: lock, "End-to-end encrypted", duration, info icon; the line is a button that opens the explainer
  * - updating: "Updating encryption keys · {name} joined" when the set of people in the call changes (see keyUpdateQueue)
  */
-export const CallSecurityLine = ({callConnectionState, participants, startedAt}: CallSecurityLineProps) => {
+export const CallSecurityLine = ({
+  callConnectionState,
+  participants,
+  startedAt,
+  brandName,
+  supportUrl,
+}: CallSecurityLineProps): ReactElement => {
   const {translate, clock} = useApplicationContext();
   const [phase, setPhase] = useState<CallSecurityPhase>(() => {
     return getCallSecurityPhase(callConnectionState, startedAt, clock.currentUnixEpochMilliseconds);
   });
   const [isExplainerOpen, setIsExplainerOpen] = useState(false);
-  const [keyUpdate, setKeyUpdate] = useState<KeyUpdateMessage>();
-  const keyUpdateQueueRef = useRef<KeyUpdateQueue | undefined>(undefined);
-  const previousPeopleRef = useRef<ReadonlyMap<string, CallPerson> | undefined>(undefined);
+  const [keyUpdate, setKeyUpdate] = useState<Maybe<KeyUpdateMessage>>(Maybe.nothing());
+  const keyUpdateQueueRef = useRef<Maybe<KeyUpdateQueue>>(Maybe.nothing());
+  const previousPeopleRef = useRef<Maybe<ReadonlyMap<string, CallPerson>>>(Maybe.nothing());
   const [announcement, setAnnouncement] = useState('');
-  const lastAnnouncedAtRef = useRef<number | undefined>(undefined);
-  const rootRef = useRef<HTMLSpanElement>(null);
+  const lastAnnouncedAtRef = useRef<Maybe<bigint>>(Maybe.nothing());
+  const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const explainerId = useId();
-
-  const brandName = Config.getConfig().BRAND_NAME;
-  const supportUrl = Config.getConfig().URL.SUPPORT.CALL_ENCRYPTION;
 
   useEffect((): void | (() => void) => {
     const currentPhase = getCallSecurityPhase(callConnectionState, startedAt, clock.currentUnixEpochMilliseconds);
     setPhase(currentPhase);
+    if (currentPhase !== 'resting') {
+      setIsExplainerOpen(false);
+    }
 
-    if (currentPhase !== 'intro' || startedAt === undefined) {
+    if (currentPhase !== 'intro' || isNullOrUndefined(startedAt)) {
       return undefined;
     }
 
@@ -151,22 +158,19 @@ export const CallSecurityLine = ({callConnectionState, participants, startedAt}:
   }, [callConnectionState, startedAt, clock]);
 
   useEffect(() => {
-    const keyUpdateQueue = createKeyUpdateQueue({clock, onMessageChange: setKeyUpdate});
-    keyUpdateQueueRef.current = keyUpdateQueue;
+    const keyUpdateQueue = createKeyUpdateQueue({
+      clock,
+      onMessageChange: message => {
+        setKeyUpdate(Maybe.of(message));
+      },
+    });
+    keyUpdateQueueRef.current = Maybe.just(keyUpdateQueue);
 
     return () => {
       keyUpdateQueue.dispose();
-      keyUpdateQueueRef.current = undefined;
+      keyUpdateQueueRef.current = Maybe.nothing();
     };
   }, [clock]);
-
-  useEffect(() => {
-    if (startedAt !== undefined) {
-      keyUpdateQueueRef.current?.absorbUntil(
-        startedAt + CALL_SECURITY_INTRO_DURATION_IN_MILLISECONDS + CALL_SECURITY_INTRO_ABSORB_IN_MILLISECONDS,
-      );
-    }
-  }, [startedAt, clock]);
 
   // call.participants is mutated in place, so the array reference does not change on a join or leave.
   // The signature does, and makes the effect below run.
@@ -175,33 +179,54 @@ export const CallSecurityLine = ({callConnectionState, participants, startedAt}:
   useEffect(() => {
     const nextPeople = getCallPeople(participants);
     const previousPeople = previousPeopleRef.current;
-    previousPeopleRef.current = nextPeople;
+    previousPeopleRef.current = Maybe.just(nextPeople);
 
     // The first list, and the people already in the call while it connects, are the starting point, not changes.
-    if (previousPeople === undefined || phase === 'connecting') {
+    if (
+      maybe.isNothing(previousPeople) ||
+      callConnectionState !== CALL_STATE.MEDIA_ESTAB ||
+      isNullOrUndefined(startedAt)
+    ) {
       return;
     }
 
-    keyUpdateQueueRef.current?.push(diffCallPeople(previousPeople, nextPeople));
-  }, [participants, peopleSignature, phase]);
+    if (
+      clock.currentUnixEpochMilliseconds <
+      startedAt + CALL_SECURITY_INTRO_DURATION_IN_MILLISECONDS + CALL_SECURITY_INTRO_ABSORB_IN_MILLISECONDS
+    ) {
+      return;
+    }
+
+    const queue = keyUpdateQueueRef.current;
+    if (maybe.isJust(queue)) {
+      queue.value.push(diffCallPeople(previousPeople.value, nextPeople));
+    }
+  }, [participants, peopleSignature, callConnectionState, startedAt, clock]);
+
+  const keyUpdateDetail = maybe.isJust(keyUpdate) ? getKeyUpdateDetail(translate, keyUpdate.value) : undefined;
+  const keyUpdateSentence = isNullOrUndefined(keyUpdateDetail)
+    ? undefined
+    : `${translate('callSecurityUpdatingKeys')}. ${keyUpdateDetail}`;
 
   useEffect(() => {
-    if (keyUpdate === undefined) {
+    if (isNullOrUndefined(keyUpdateSentence)) {
       // Cleared between updates, so the same sentence later is announced again.
       setAnnouncement('');
       return;
     }
 
-    const now = clock.currentUnixEpochMilliseconds;
+    const now = clock.currentMonotonicMicroseconds;
     const lastAnnouncedAt = lastAnnouncedAtRef.current;
+    const announcementIntervalInMicroseconds =
+      BigInt(CALL_SECURITY_ANNOUNCEMENT_INTERVAL_IN_MILLISECONDS) * microsecondsPerMillisecond;
 
-    if (lastAnnouncedAt !== undefined && now - lastAnnouncedAt < CALL_SECURITY_ANNOUNCEMENT_INTERVAL_IN_MILLISECONDS) {
+    if (maybe.isJust(lastAnnouncedAt) && now - lastAnnouncedAt.value < announcementIntervalInMicroseconds) {
       return;
     }
 
-    lastAnnouncedAtRef.current = now;
-    setAnnouncement(`${translate('callSecurityUpdatingKeys')}. ${getKeyUpdateDetail(translate, keyUpdate)}`);
-  }, [keyUpdate, clock, translate]);
+    lastAnnouncedAtRef.current = Maybe.just(now);
+    setAnnouncement(keyUpdateSentence);
+  }, [keyUpdate, keyUpdateSentence, clock]);
 
   const closeExplainer = useCallback(() => {
     setIsExplainerOpen(false);
@@ -213,17 +238,17 @@ export const CallSecurityLine = ({callConnectionState, participants, startedAt}:
   useEffect((): void | (() => void) => {
     const ownerDocument = rootRef.current?.ownerDocument;
 
-    if (!isExplainerOpen || ownerDocument === undefined) {
+    if (!isExplainerOpen || isNullOrUndefined(ownerDocument)) {
       return undefined;
     }
 
-    const handleKeyDown = (event: KeyboardEvent) => {
+    const handleKeyDown = (event: KeyboardEvent): void => {
       if (isEscapeKey(event)) {
         closeExplainer();
       }
     };
-    const handlePointerDown = (event: MouseEvent) => {
-      if (rootRef.current !== null && !rootRef.current.contains(event.target as Node)) {
+    const handlePointerDown = (event: MouseEvent): void => {
+      if (rootRef.current !== null && !event.composedPath().includes(rootRef.current)) {
         setIsExplainerOpen(false);
       }
     };
@@ -265,7 +290,7 @@ export const CallSecurityLine = ({callConnectionState, participants, startedAt}:
   }
 
   return (
-    <span key="resting" ref={rootRef} css={callSecurityRootStyles}>
+    <div key="resting" ref={rootRef} css={callSecurityRootStyles}>
       <span className="visually-hidden" aria-live="polite" data-uie-name="call-security-announcement">
         {announcement}
       </span>
@@ -273,7 +298,11 @@ export const CallSecurityLine = ({callConnectionState, participants, startedAt}:
         ref={triggerRef}
         type="button"
         css={[callSecurityLineStyles, callSecurityButtonStyles]}
-        aria-label={translate('callSecurityShowDetails')}
+        aria-label={
+          isNullOrUndefined(keyUpdateSentence)
+            ? translate('callSecurityShowDetails')
+            : `${keyUpdateSentence}. ${translate('callSecurityShowDetails')}`
+        }
         aria-expanded={isExplainerOpen}
         aria-controls={explainerId}
         onClick={() => {
@@ -282,9 +311,9 @@ export const CallSecurityLine = ({callConnectionState, participants, startedAt}:
           });
         }}
         data-uie-name="call-security-line"
-        data-uie-value={keyUpdate === undefined ? 'resting' : 'updating'}
+        data-uie-value={maybe.isNothing(keyUpdate) ? 'resting' : 'updating'}
       >
-        {keyUpdate === undefined ? (
+        {maybe.isNothing(keyUpdate) ? (
           <span key="encrypted" css={callSecurityContentStyles}>
             <LockClosedIcon color="var(--success-color)" css={callSecurityIconStyles} aria-hidden="true" />
             <span css={callSecurityLabelStyles}>{translate('callSecurityEncrypted')}</span>
@@ -295,22 +324,22 @@ export const CallSecurityLine = ({callConnectionState, participants, startedAt}:
           </span>
         ) : (
           // A new key keeps the fade and the turn replaying when one update follows another.
-          <span key={getKeyUpdateDetail(translate, keyUpdate)} css={callSecurityContentStyles}>
+          <span key={keyUpdateDetail} css={callSecurityContentStyles}>
             <UpdateIcon color="var(--success-color)" css={callSecurityUpdateIconStyles} aria-hidden="true" />
             <span css={callSecurityLabelStyles}>{translate('callSecurityUpdatingKeys')}</span>
             <span css={callSecuritySeparatorStyles} aria-hidden="true">
               ·
             </span>
-            <span>{getKeyUpdateDetail(translate, keyUpdate)}</span>
+            <span>{keyUpdateDetail}</span>
           </span>
         )}
-        <InfoIcon color="var(--foreground-fade-56)" css={callSecurityInfoIconStyles} aria-hidden="true" />
+        <InfoIcon color="var(--foreground-fade-56)" css={callSecurityIconStyles} aria-hidden="true" />
       </button>
 
       {isExplainerOpen && (
         <div
           id={explainerId}
-          role="dialog"
+          role="region"
           aria-labelledby={`${explainerId}-title`}
           css={callSecurityExplainerStyles}
           data-uie-name="call-security-explainer"
@@ -333,7 +362,7 @@ export const CallSecurityLine = ({callConnectionState, participants, startedAt}:
             </button>
           </div>
           <p css={callSecurityExplainerBodyStyles}>{translate('callSecurityExplainerBody', {brandName})}</p>
-          {supportUrl !== undefined && supportUrl !== '' && (
+          {Boolean(supportUrl) && (
             <a
               css={callSecurityExplainerLinkStyles}
               href={supportUrl}
@@ -346,6 +375,6 @@ export const CallSecurityLine = ({callConnectionState, participants, startedAt}:
           )}
         </div>
       )}
-    </span>
+    </div>
   );
 };

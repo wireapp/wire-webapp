@@ -17,13 +17,14 @@
  *
  */
 
-import {Participant} from 'Repositories/calling/Participant';
-import {User} from 'Repositories/entity/User';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 import {diffCallPeople, getCallPeople} from './callPeople';
 
-const createUser = (id: string, name: string, isMe = false) => {
+import {Participant} from '../../../repositories/calling/Participant';
+import {User} from '../../../repositories/entity/User';
+
+const createUser = (id: string, name: string, isMe = false): User => {
   const user = new User(id, 'wire.test', translateForTest);
   user.name(name);
   user.isMe = isMe;
