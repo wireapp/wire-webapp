@@ -20,7 +20,7 @@
 import {JobsTaskStatus, RestActionStatus, type RestPerformActionResponse} from 'cells-sdk-ts';
 import {Maybe} from 'true-myth';
 
-import {CellNode, CellNodeType} from 'src/script/types/cellNode';
+import {CellNode, CellNodeType} from '../../../../../types/cellNode';
 
 import {runBulkRestore, type BulkRestoreDependencies} from './runBulkRestore';
 import type {RestoreTarget} from './resolveRestoreTargets';
