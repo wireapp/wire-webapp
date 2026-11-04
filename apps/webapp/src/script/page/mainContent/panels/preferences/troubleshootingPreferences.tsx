@@ -124,7 +124,14 @@ export const TroubleshootingPreferences = ({repository}: {repository: Troublesho
           </div>
           <p>{translate('troubleshooter.connectionDescription', {brandName})}</p>
           {state.connection
-            .map(() => {
+            .map(result => {
+              if ('status' in result.data) {
+                return (
+                  <p key="connection-result" role="status">
+                    {translate('troubleshooter.connectionSucceeded')}
+                  </p>
+                );
+              }
               return (
                 <>
                   <div css={styles.routeStyles}>
@@ -293,9 +300,19 @@ export const TroubleshootingPreferences = ({repository}: {repository: Troublesho
             </Button>
           </div>
           <p>{translate('troubleshooter.reportDescription', {brandName})}</p>
-          <p css={styles.mutedStyles}>{translate('troubleshooter.mockNotice')}</p>
+          <p css={styles.mutedStyles}>{translate('troubleshooter.scanMockNotice')}</p>
         </section>
-        {state.error.isJust && <p role="alert">{translate('troubleshooter.testError')}</p>}
+        {state.error
+          .map(error => {
+            const message =
+              error.name === 'TimeoutError' ? 'troubleshooter.connectionTimeout' : 'troubleshooter.testError';
+            return (
+              <p key="test-error" role="alert">
+                {translate(message)}
+              </p>
+            );
+          })
+          .unwrapOr(<></>)}
       </div>
     </PreferencesPage>
   );

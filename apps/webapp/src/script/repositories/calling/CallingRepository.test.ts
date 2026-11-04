@@ -275,6 +275,18 @@ describe('CallingRepository', () => {
     return wCall && wCall.destroy(wUser);
   });
 
+  it('waits for the AVS test close and reports setup timeouts', async () => {
+    const startTest = jest.spyOn(wCall, 'startTest').mockReturnValue(0);
+    const testId = `avs-connection-test:${selfUser.id}:${clientId}`;
+    const result = callingRepository.startConnectionTest();
+    const rejection = expect(result).rejects.toMatchObject({name: 'TimeoutError'});
+
+    expect(startTest).toHaveBeenCalledWith(wUser, 0);
+    await callingRepository['callClosed'](REASON.NORMAL, 'unrelated-call');
+    await callingRepository['callClosed'](REASON.TIMEOUT, testId);
+    await rejection;
+  });
+
   describe('SFT request destinations', () => {
     it('rejects an untrusted callback before POST and returns the existing AVS failure response', async () => {
       const {repository, requestConfig, sendRequest, postSftRequest, sftResponse, avsUser, requestContext} =

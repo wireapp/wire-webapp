@@ -30,7 +30,7 @@ export type DiagnosticCheck = {
   address: string;
   port: number;
 };
-export type ConnectionResult = {route: 'relay'; devices: 'ok'};
+export type ConnectionResult = {route: 'relay'; devices: 'ok'} | {status: 'connected'};
 export type ScanResult = {checks: readonly DiagnosticCheck[]};
 export type TroubleshooterService = {
   testConnection: () => Task<ConnectionResult, Error>;
@@ -39,6 +39,25 @@ export type TroubleshooterService = {
 
 export const MOCK_CONNECTION_DELAY_MILLISECONDS = 1_500;
 export const MOCK_SCAN_DELAY_MILLISECONDS = 3_000;
+
+export const createAvsTroubleshooterService = (
+  clock: Clock,
+  startConnectionTest: () => Promise<void>,
+): TroubleshooterService => {
+  return {
+    ...createMockTroubleshooterService(clock),
+    testConnection: () => {
+      return task.fromPromise(
+        startConnectionTest().then((): ConnectionResult => {
+          return {status: 'connected'};
+        }),
+        error => {
+          return error instanceof Error ? error : new Error('AVS connection test failed');
+        },
+      );
+    },
+  };
+};
 
 // Fixtures only: no microphone, camera or network access is performed.
 export const createMockTroubleshooterService = (clock: Clock): TroubleshooterService => {
