@@ -17,7 +17,7 @@
  *
  */
 
-import {useState} from 'react';
+import {useState, type JSX} from 'react';
 
 import {Button, Input} from '@wireapp/react-ui-kit';
 
@@ -26,7 +26,7 @@ import {
   useCallLogsUploadSettings,
 } from '../../repositories/calling/callLogsUploadSettings';
 
-export const CallLogsUploadSettings = () => {
+export const CallLogsUploadSettings = (): JSX.Element => {
   const {mode, serverAddress, setMode, setServerAddress} = useCallLogsUploadSettings();
   const [address, setAddress] = useState(serverAddress);
   const parsedAddress = callLogsServerAddressSchema.safeParse(address);

@@ -21,8 +21,6 @@ import {memo, type FunctionComponent} from 'react';
 
 import {container} from 'tsyringe';
 
-import {sendCallLogsFeatureToggleName} from '../../../../featureToggles/startupFeatureToggleNames';
-
 import {AudioOutPreferences} from './avPreferences/audioOutPreferences';
 import {CallOptions} from './avPreferences/callOptions';
 import {CameraPreferences} from './avPreferences/cameraPreferences';
@@ -33,6 +31,7 @@ import {PreferencesPage} from './components/preferencesPage';
 import {PreferencesSection} from './components/preferencesSection';
 import {useCameraReloadOnCallEnd} from './useCameraReloadOnCallEnd';
 
+import {sendCallLogsFeatureToggleName} from '../../../../featureToggles/startupFeatureToggleNames';
 import {useInitializeMediaDevices} from '../../../../hooks/useInitializeMediaDevices';
 import type {CallingRepository} from '../../../../repositories/calling/CallingRepository';
 import {MediaConstraintsHandler} from '../../../../repositories/media/MediaConstraintsHandler';

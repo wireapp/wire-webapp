@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode, useMemo, useState} from 'react';
+import {ReactNode, useMemo, useState, type JSX} from 'react';
 
 import type {CSSObject} from '@emotion/react';
 import {Maybe} from 'true-myth';
@@ -25,7 +25,15 @@ import {container} from 'tsyringe';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
+import {
+  callLogsModalBodyStyles,
+  confirmationMessageStyles,
+  mockNoticeStyles,
+  reportStyles,
+} from './sendCallLogs.styles';
+
 import {PrimaryModal, removeCurrentModal} from '../../../../../components/Modals/PrimaryModal';
+import {Config} from '../../../../../Config';
 import type {CallingRepository} from '../../../../../repositories/calling/CallingRepository';
 import {
   CallLogsReport,
@@ -37,15 +45,6 @@ import {
 import {useCallLogsUploadSettings} from '../../../../../repositories/calling/callLogsUploadSettings';
 import {UserState} from '../../../../../repositories/user/userState';
 import {useApplicationContext} from '../../../../rootProvider';
-
-import {
-  callLogsModalBodyStyles,
-  confirmationMessageStyles,
-  mockNoticeStyles,
-  reportStyles,
-} from './sendCallLogs.styles';
-
-import {Config} from '../../../../../Config';
 
 interface SendCallLogsProps {
   callingRepository: CallingRepository;
@@ -71,7 +70,7 @@ const SendCallLogs = ({
   callingRepository,
   callLogsService,
   userState = container.resolve(UserState),
-}: SendCallLogsProps) => {
+}: SendCallLogsProps): JSX.Element => {
   const [isUploading, setIsUploading] = useState(false);
   const {translate, clock} = useApplicationContext();
   const brandName = Config.getConfig().BRAND_NAME;
@@ -83,11 +82,11 @@ const SendCallLogs = ({
     return callLogsService ?? (mode === 'server' ? createHttpCallLogsService(serverAddress) : mockService);
   }, [callLogsService, mode, serverAddress, mockService]);
 
-  const showMessage = (title: string, message: ReactNode, bodyCSS: CSSObject = {}) => {
+  const showMessage = (title: string, message: ReactNode, bodyCSS: CSSObject = {}): void => {
     PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {bodyCSS, text: {title, message}}, undefined, translate);
   };
 
-  const showReport = (report: CallLogsReport) => {
+  const showReport = (report: CallLogsReport): void => {
     showMessage(
       translate('modalCallLogsSuccessTitle'),
       <div>
@@ -120,7 +119,7 @@ const SendCallLogs = ({
     );
   };
 
-  const sendCallLogs = () => {
+  const sendCallLogs = (): void => {
     const messageLog = callingRepository.getCallLog();
     if (messageLog === undefined || messageLog.length === 0) {
       showMessage(translate('modalCallEmptyLogHeadline'), translate('modalCallEmptyLogMessage'));
