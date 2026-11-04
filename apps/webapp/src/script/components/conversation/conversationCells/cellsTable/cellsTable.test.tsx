@@ -1501,7 +1501,7 @@ describe('CellsTable selection', () => {
         refreshResolvers[1](true);
         await Promise.all(pendingRefreshes);
       });
-      expect((await screen.findByRole('alert'))).toHaveTextContent(
+      expect(await screen.findByRole('alert')).toHaveTextContent(
         'Selected items still appear in the Bin. The action remains blocked until they disappear.',
       );
       expect(screen.getByRole('button', {name: 'Refresh Bin'})).toBeEnabled();
@@ -1652,9 +1652,7 @@ describe('CellsTable selection', () => {
       await user.click(screen.getByRole('button', {name: 'Delete permanently'}));
       await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Delete'}));
 
-      expect(
-        await screen.findByText('cells.bulkDelete.status.deleting'),
-      ).toBeInTheDocument();
+      expect(await screen.findByText('cells.bulkDelete.status.deleting')).toBeInTheDocument();
       expect(screen.queryByRole('alert')).not.toBeInTheDocument();
       await waitFor(() => {
         expect(onRefreshAndReportSuccess).toHaveBeenCalledTimes(1);
@@ -1713,9 +1711,7 @@ describe('CellsTable selection', () => {
       await user.click(screen.getByRole('button', {name: 'Delete permanently'}));
       await user.click(within(await screen.findByRole('dialog')).getByRole('button', {name: 'Delete'}));
 
-      expect(
-        await screen.findByText('cells.bulkDelete.status.deleting'),
-      ).toBeInTheDocument();
+      expect(await screen.findByText('cells.bulkDelete.status.deleting')).toBeInTheDocument();
       expect(onRefreshAndReportSuccess).toHaveBeenCalledTimes(1);
       expect(repository.deleteNodes).toHaveBeenCalledTimes(1);
       view.unmount();

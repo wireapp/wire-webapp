@@ -344,8 +344,8 @@ describe('CellsEmptyBinAction', () => {
         cellsRepository,
         role: CELLS_SELF_USER_DRIVE_ROLE.VIEWER,
         getCurrentCellsPath: () => {
-              return 'recycle_bin';
-            },
+          return 'recycle_bin';
+        },
         onRefreshAfterEmptyBinOutcome,
         onEmptyBinSubmitted,
         onInProgressChange: jest.fn(),
@@ -429,15 +429,15 @@ describe('CellsEmptyBinAction', () => {
     });
     const rerender = (): void => {
       rendered.rerender(
-      createEmptyBinTree({
-        cellsRepository,
-        role: CELLS_SELF_USER_DRIVE_ROLE.EDITOR,
-        getCurrentCellsPath: getCurrentCellsPath,
-        onRefreshAfterEmptyBinOutcome,
-        onEmptyBinSubmitted,
-        onInProgressChange: jest.fn(),
-      }),
-    );
+        createEmptyBinTree({
+          cellsRepository,
+          role: CELLS_SELF_USER_DRIVE_ROLE.EDITOR,
+          getCurrentCellsPath: getCurrentCellsPath,
+          onRefreshAfterEmptyBinOutcome,
+          onEmptyBinSubmitted,
+          onInProgressChange: jest.fn(),
+        }),
+      );
     };
 
     await user.click(screen.getByRole('button', {name: 'cells.emptyBin.button'}));
