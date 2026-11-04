@@ -17,15 +17,18 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {UserRepository} from 'Repositories/user/userRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {getLogger} from 'Util/logger';
-import {isErrorWithCode} from 'Util/typePredicateUtil';
 
 import {AccountInput, useInputDone} from './accountInput';
+
+import {PrimaryModal} from '../../../../../components/Modals/PrimaryModal';
+import {UserRepository} from '../../../../../repositories/user/userRepository';
+import {getLogger} from '../../../../../util/logger';
+import {isErrorWithCode} from '../../../../../util/typePredicateUtil';
 
 interface EmailInputProps {
   canEditProfile: boolean;
@@ -35,12 +38,12 @@ interface EmailInputProps {
 
 const logger = getLogger('EmailInput');
 
-const EmailInput = ({email, canEditProfile, userRepository}: EmailInputProps) => {
+const EmailInput: FunctionComponent<EmailInputProps> = ({email, canEditProfile, userRepository}: EmailInputProps) => {
   const emailInputDone = useInputDone();
   const {translate} = useApplicationContext();
 
   const changeEmail = async (enteredEmail: string): Promise<void> => {
-    const showWarning = (title: string, message: string) => {
+    const showWarning = (title: string, message: string): void => {
       PrimaryModal.show(
         PrimaryModal.type.ACKNOWLEDGE,
         {

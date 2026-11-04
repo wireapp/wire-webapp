@@ -17,7 +17,7 @@
  *
  */
 
-import {CSSProperties, useEffect, useMemo, useRef, useState} from 'react';
+import {CSSProperties, useEffect, useMemo, useRef, useState, type FunctionComponent} from 'react';
 
 import {CSSObject} from '@emotion/react';
 import {isNullOrUndefined} from '@sindresorhus/is';
@@ -35,17 +35,18 @@ import {
   Tooltip,
 } from '@wireapp/react-ui-kit';
 
-import {useUserIdentity} from 'Hooks/useDeviceIdentities';
-import {ClientEntity} from 'Repositories/client';
-import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
-import {checkUserHandle} from 'Repositories/conversation/ConversationVerificationStateHandler';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {UserState} from 'Repositories/user/userState';
 import {MLSStatuses, WireIdentity} from 'src/script/e2eIdentity/e2eIdentityVerification';
 import {RootContextValue, useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {waitFor} from 'Util/waitFor';
+
+import {useUserIdentity} from '../../../../hooks/useDeviceIdentities';
+import {ClientEntity} from '../../../../repositories/client';
+import {ConversationVerificationState} from '../../../../repositories/conversation/ConversationVerificationState';
+import {checkUserHandle} from '../../../../repositories/conversation/ConversationVerificationStateHandler';
+import {Conversation} from '../../../../repositories/entity/Conversation';
+import {User} from '../../../../repositories/entity/User';
+import {UserState} from '../../../../repositories/user/userState';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
+import {waitFor} from '../../../../util/waitFor';
 
 type VerificationBadgeContext = 'user' | 'conversation' | 'device';
 
@@ -76,7 +77,8 @@ const title = (isMLSConversation = false): CSSProperties => {
   };
 };
 
-const useConversationVerificationState = (conversation: Conversation) => {
+type UseConversationVerificationStateResult = {MLS: MLSStatuses | undefined; proteus: ConversationVerificationState};
+const useConversationVerificationState = (conversation: Conversation): UseConversationVerificationStateResult => {
   const {verification_state: proteusVerificationState, mlsVerificationState} = useKoSubscribableChildren(conversation, [
     'verification_state',
     'mlsVerificationState',
@@ -101,15 +103,11 @@ const getMLSStatuses = ({identities, user}: {identities?: WireIdentity[]; user?:
   });
 };
 
-export const UserVerificationBadges = ({
-  user,
-  groupId,
-  isSelfUser,
-}: {
+export const UserVerificationBadges: FunctionComponent<{
   user: User;
   groupId?: string;
   isSelfUser?: boolean;
-}) => {
+}> = ({user, groupId, isSelfUser}: {user: User; groupId?: string; isSelfUser?: boolean}) => {
   const {is_verified: isProteusVerified} = useKoSubscribableChildren(user, ['is_verified']);
   const {deviceIdentities} = useUserIdentity(user.qualifiedId, groupId, isSelfUser);
 
@@ -132,7 +130,11 @@ export const UserVerificationBadges = ({
   return <VerificationBadges context="user" isProteusVerified={isProteusVerified} MLSStatus={status} />;
 };
 
-export const DeviceVerificationBadges = ({
+export const DeviceVerificationBadges: FunctionComponent<{
+  device: ClientEntity;
+  getIdentity?: (deviceId: string) => WireIdentity | undefined;
+  isE2EIEnabled?: boolean;
+}> = ({
   device,
   getIdentity,
   isE2EIEnabled = false,
@@ -156,7 +158,7 @@ export const DeviceVerificationBadges = ({
       active = false;
     };
 
-    async function loadUser() {
+    async function loadUser(): Promise<void> {
       if (isNullOrUndefined(identity)) {
         return;
       }
@@ -186,7 +188,10 @@ type ConversationVerificationBadgeProps = {
   displayTitle?: boolean;
 };
 
-export const ConversationVerificationBadges = ({conversation, displayTitle}: ConversationVerificationBadgeProps) => {
+export const ConversationVerificationBadges: FunctionComponent<ConversationVerificationBadgeProps> = ({
+  conversation,
+  displayTitle,
+}: ConversationVerificationBadgeProps) => {
   const {MLS, proteus} = useConversationVerificationState(conversation);
 
   return (
@@ -200,7 +205,12 @@ export const ConversationVerificationBadges = ({conversation, displayTitle}: Con
   );
 };
 
-const MLSVerificationBadge = ({
+const MLSVerificationBadge: FunctionComponent<{
+  MLSStatus?: MLSStatuses;
+  context: VerificationBadgeContext;
+  tooltipId: string;
+  translate: RootContextValue['translate'];
+}> = ({
   context,
   MLSStatus,
   tooltipId,
@@ -217,7 +227,14 @@ const MLSVerificationBadge = ({
     'data-uie-value': MLSStatus,
   };
 
-  const TooltipIcon = ({children, body, ...props}: {body: string; children: React.ReactNode}) => {
+  const TooltipIcon: FunctionComponent<{body: string; children: React.ReactNode}> = ({
+    children,
+    body,
+    ...props
+  }: {
+    body: string;
+    children: React.ReactNode;
+  }) => {
     return (
       <>
         <div id={tooltipId} role="tooltip" aria-label={body}></div>
@@ -269,7 +286,7 @@ const MLSVerificationBadge = ({
   return null;
 };
 
-export const VerificationBadges = ({
+export const VerificationBadges: FunctionComponent<VerificationBadgesProps> = ({
   conversationProtocol,
   isProteusVerified = false,
   MLSStatus,

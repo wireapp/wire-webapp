@@ -22,7 +22,7 @@ import {expect, Page, TestInfo} from 'playwright/test';
 import {User} from '../data/user';
 import {PageManager} from '../pageManager';
 
-export const loginUser = async (user: User, pageManager: PageManager) => {
+export const loginUser = async (user: User, pageManager: PageManager): Promise<void> => {
   const {pages} = pageManager.webapp;
   await pages.singleSignOn().isSSOPageVisible();
   await pages.singleSignOn().enterEmailOnSSOPage(user.email);
@@ -30,7 +30,7 @@ export const loginUser = async (user: User, pageManager: PageManager) => {
   await pages.login().signInButton.click();
 };
 
-export const logOutUser = async (pageManager: PageManager, shouldDeleteClient = false) => {
+export const logOutUser = async (pageManager: PageManager, shouldDeleteClient = false): Promise<void> => {
   const {pages, components, modals} = pageManager.webapp;
   await components.conversationSidebar().clickPreferencesButton();
   await pages.account().clickLogoutButton();
@@ -46,7 +46,7 @@ export const sendTextMessageToConversation = async (
   pageManager: PageManager,
   conversation: string,
   message: string,
-) => {
+): Promise<void> => {
   const {pages} = pageManager.webapp;
   await pages.conversationList().getConversation(conversation).open();
   await pages.conversation().sendMessage(message);
@@ -58,7 +58,7 @@ export const createGroup = async (
   conversationName: string,
   user: User[],
   features?: {cells?: boolean},
-) => {
+): Promise<void> => {
   await pages.conversationList().clickCreateGroup();
 
   if (features?.cells) {
@@ -78,7 +78,7 @@ export const createGroup = async (
  * Opens the connections tab, searches for the given user and starts a conversation with him
  * Note: This util only works if both users are part of the same team.
  */
-export async function connectWithUser(sender: Page | PageManager, receiver: Pick<User, 'username'>) {
+export async function connectWithUser(sender: Page | PageManager, receiver: Pick<User, 'username'>): Promise<void> {
   const {pages, modals, components} = ('webapp' in sender ? sender : PageManager.from(sender)).webapp;
   await components.conversationSidebar().clickConnectButton();
   await pages.startUI().searchInput.fill(receiver.username);
@@ -90,7 +90,7 @@ export async function connectWithUser(sender: Page | PageManager, receiver: Pick
  * Opens the connections tab, searches for the given user and sends a connection request
  * Note: This util only works if both users are NOT in the same team
  */
-export async function sendConnectionRequest(sender: Page | PageManager, receiver: User) {
+export async function sendConnectionRequest(sender: Page | PageManager, receiver: User): Promise<void> {
   const {pages, modals, components} = ('webapp' in sender ? sender : PageManager.from(sender)).webapp;
   await components.conversationSidebar().clickConnectButton();
 
@@ -103,7 +103,7 @@ export async function sendConnectionRequest(sender: Page | PageManager, receiver
   await modals.userProfile().clickConnectButton();
 }
 
-export const handleAppLockState = async (pageManager: PageManager, appLockPassCode: string) => {
+export const handleAppLockState = async (pageManager: PageManager, appLockPassCode: string): Promise<void> => {
   const {modals} = pageManager.webapp;
   const appLockModal = modals.appLock();
 
@@ -125,7 +125,7 @@ export async function createAndSaveBackup(
   pageManager: PageManager,
   password?: string,
   filenamePrefix?: string,
-) {
+): Promise<string> {
   const {pages, modals} = pageManager.webapp;
 
   await pages.account().clickBackUpButton();

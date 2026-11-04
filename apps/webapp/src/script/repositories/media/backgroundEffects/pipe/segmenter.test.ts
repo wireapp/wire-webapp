@@ -18,13 +18,9 @@
  */
 
 import {isUndefined} from '@sindresorhus/is';
-import type {WorkerProcessVideoTrackOptions} from 'Repositories/media/backgroundEffects/pipe/options';
-import {defaultWorkerOpts} from 'Repositories/media/backgroundEffects/pipe/options';
-import {
-  getSegmenterModelUpdatedOptions,
-  runSegmenter,
-  updateSegmenterOptions,
-} from 'Repositories/media/backgroundEffects/pipe/segmenter';
+import type {WorkerProcessVideoTrackOptions} from './options';
+import {defaultWorkerOpts} from './options';
+import {getSegmenterModelUpdatedOptions, runSegmenter, updateSegmenterOptions} from './segmenter';
 import {ImageSegmenter} from '@mediapipe/tasks-vision';
 
 jest.mock('@enormora/clock/clock', () => {
@@ -84,7 +80,7 @@ jest.mock('./filter', () => {
   };
 });
 
-jest.mock('Repositories/media/backgroundEffects/helper/logger', () => {
+jest.mock('../helper/logger', () => {
   return {
     getSafeLogger: jest.fn(() => {
       return {
@@ -97,7 +93,7 @@ jest.mock('Repositories/media/backgroundEffects/helper/logger', () => {
   };
 });
 
-jest.mock('Repositories/media/backgroundEffects/helper/metrics', () => {
+jest.mock('../helper/metrics', () => {
   return {
     createMetricsWindow: jest.fn(() => {
       return {};
@@ -621,7 +617,7 @@ describe('segmenter tests', () => {
 
         await runSegmenter(canvas, readable, options, jest.fn(), jest.fn());
 
-        const createFrame = (timestamp: number) => {
+        const createFrame = (timestamp: number): VideoFrame => {
           return {
             codedWidth: 640,
             codedHeight: 480,

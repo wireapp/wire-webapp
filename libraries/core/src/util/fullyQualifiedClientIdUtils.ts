@@ -42,7 +42,9 @@ export const parseFullQualifiedClientId = (qualifiedId: string): ParsedFullyQual
   return {user, client, domain};
 };
 
-export const mapQualifiedUserClientIdsToFullyQualifiedClientIds = (qualifiedUserMap: QualifiedUserClientMap) => {
+export const mapQualifiedUserClientIdsToFullyQualifiedClientIds = (
+  qualifiedUserMap: QualifiedUserClientMap,
+): ClientIdStringType[] => {
   return Object.entries(qualifiedUserMap).flatMap(([domain, users]) => {
     const clients = Object.entries(users);
     return clients.flatMap(([userId, clients]) => {

@@ -24,8 +24,8 @@ import {flattenUserMap} from '@wireapp/core/lib/conversation/message/userClients
 import {isQualifiedUserClients} from '@wireapp/core/lib/util';
 import {difference, intersection} from 'underscore';
 
-import {User} from 'Repositories/entity/User';
-import {matchQualifiedIds} from 'Util/qualifiedId';
+import {matchQualifiedIds} from '../../util/qualifiedId';
+import {User} from '../entity/User';
 
 type UserClient = {clients: string[]; userId: QualifiedId};
 
@@ -55,7 +55,7 @@ export function extractClientDiff(
   const deletedClients = flattenUserMap(allDeleted);
   const missingClients = flattenUserMap(missing);
 
-  const toClientDiff = ({userId, data}: {data: string[]; userId: QualifiedId}) => {
+  const toClientDiff = ({userId, data}: {data: string[]; userId: QualifiedId}): UserClient => {
     return {clients: data, userId};
   };
 

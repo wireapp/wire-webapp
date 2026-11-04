@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {
   ButtonsGroup,
   ChevronDownIcon,
@@ -26,10 +28,11 @@ import {
   SidebarInactiveIcon,
 } from '@wireapp/react-ui-kit';
 
-import {ZoomInIcon, ZoomOutIcon} from 'Components/icon';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {buttonStyles, pageNumberStyles, wrapperStyles} from './PdfControls.styles';
+
+import {ZoomInIcon, ZoomOutIcon} from '../../../icon';
 
 interface PdfControlsProps {
   sidebarOpen: boolean;
@@ -46,7 +49,7 @@ interface PdfControlsProps {
 const MIN_ZOOM_SCALE = 1;
 const MAX_ZOOM_SCALE = 2;
 
-export const PdfControls = ({
+export const PdfControls: FunctionComponent<PdfControlsProps> = ({
   sidebarOpen,
   onToggleSidebar,
   scale,

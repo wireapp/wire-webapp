@@ -17,18 +17,17 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {useEffect, useState, type FunctionComponent} from 'react';
 
 import {useDebouncedCallback} from 'use-debounce';
 
 import {ChevronIcon, IconButton} from '@wireapp/react-ui-kit';
 
-import {
-  jumpToLastMessageButtonStyles,
-  jumpToLastMessageChevronStyles,
-} from 'Components/messagesList/messageList.styles';
-import {Conversation} from 'Repositories/entity/Conversation';
 import {useApplicationContext} from 'src/script/page/rootProvider';
+
+import {jumpToLastMessageButtonStyles, jumpToLastMessageChevronStyles} from './messageList.styles';
+
+import {Conversation} from '../../repositories/entity/Conversation';
 
 interface JumpToLastMessageButtonProps {
   onGoToLastMessage: () => void;
@@ -37,7 +36,10 @@ interface JumpToLastMessageButtonProps {
 
 const LAST_MESSAGE_VISIBILITY_DEBOUNCE_MILLISECONDS = 200;
 
-export const JumpToLastMessageButton = ({onGoToLastMessage, conversation}: JumpToLastMessageButtonProps) => {
+export const JumpToLastMessageButton: FunctionComponent<JumpToLastMessageButtonProps> = ({
+  onGoToLastMessage,
+  conversation,
+}: JumpToLastMessageButtonProps) => {
   const {translate} = useApplicationContext();
   const [isLastMessageVisible, setIsLastMessageVisible] = useState(conversation.isLastMessageVisible());
 

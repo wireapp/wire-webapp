@@ -25,7 +25,7 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../util/test/translateForTest';
 
 import {FileDropzone} from './fileDropzone';
 
@@ -33,7 +33,7 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
 );
 
-const renderFileDropzone = (isFileDropAllowed: boolean) => {
+const renderFileDropzone = (isFileDropAllowed: boolean): void => {
   const result = render(
     <StyledApp themeId={THEME_ID.DEFAULT}>
       <FileDropzone isDragAccept isFileDropAllowed={isFileDropAllowed} rootProps={{}} inputProps={{}}>

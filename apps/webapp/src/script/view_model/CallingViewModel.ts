@@ -26,38 +26,37 @@ import {container} from 'tsyringe';
 
 import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {Availability} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
-import 'Components/calling/ChooseScreen';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import type {PrimaryModalTranslatedMessage} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
-import type {AudioRepository} from 'Repositories/audio/audioRepository';
-import {AudioType} from 'Repositories/audio/audioType';
-import type {Call} from 'Repositories/calling/Call';
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import type {CallMediaChoice} from 'Repositories/calling/callMediaChoice';
-import {CallState, DesktopScreenShareMenu} from 'Repositories/calling/CallState';
-import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/LeaveCallReason';
-import {isMeetingConversation} from 'Repositories/conversation/ConversationSelectors';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {User} from 'Repositories/entity/User';
-import type {ElectronDesktopCapturerSource, MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
-import type {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
-import {mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
-import {isPermissionGranted} from 'Repositories/permission/permissionHandlers';
-import {PermissionType} from 'Repositories/permission/PermissionType';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
-import type {TeamRepository} from 'Repositories/team/TeamRepository';
-import {TeamState} from 'Repositories/team/TeamState';
-import {ROLE} from 'Repositories/user/userPermission';
-import {type Translate} from 'Util/localizerUtil';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-import {safeWindowOpen} from 'Util/sanitizationUtil';
-
+import '../components/calling/ChooseScreen';
+import {PrimaryModal} from '../components/Modals/PrimaryModal';
+import type {PrimaryModalTranslatedMessage} from '../components/Modals/PrimaryModal/PrimaryModalTypes';
 import {Config} from '../Config';
+import type {AudioRepository} from '../repositories/audio/audioRepository';
+import {AudioType} from '../repositories/audio/audioType';
+import type {Call} from '../repositories/calling/Call';
+import {CallingRepository} from '../repositories/calling/CallingRepository';
+import type {CallMediaChoice} from '../repositories/calling/callMediaChoice';
+import {CallState, DesktopScreenShareMenu} from '../repositories/calling/CallState';
+import {LEAVE_CALL_REASON} from '../repositories/calling/enum/LeaveCallReason';
+import {isMeetingConversation} from '../repositories/conversation/ConversationSelectors';
+import {ConversationState} from '../repositories/conversation/ConversationState';
+import {ConversationVerificationState} from '../repositories/conversation/ConversationVerificationState';
+import type {Conversation} from '../repositories/entity/Conversation';
+import type {User} from '../repositories/entity/User';
+import type {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../repositories/media/MediaDevicesHandler';
+import type {MediaStreamHandler} from '../repositories/media/MediaStreamHandler';
+import {mediaDevicesStore} from '../repositories/media/useMediaDevicesStore';
+import {isPermissionGranted} from '../repositories/permission/permissionHandlers';
+import {PermissionType} from '../repositories/permission/PermissionType';
+import {PropertiesRepository} from '../repositories/properties/propertiesRepository';
+import {PROPERTIES_TYPE} from '../repositories/properties/propertiesType';
+import type {TeamRepository} from '../repositories/team/TeamRepository';
+import {TeamState} from '../repositories/team/TeamState';
+import {ROLE} from '../repositories/user/userPermission';
+import {type Translate} from '../util/localizerUtil';
+import {matchQualifiedIds} from '../util/qualifiedId';
+import {safeWindowOpen} from '../util/sanitizationUtil';
+import {WebAppEvents} from '../webAppEvents';
 
 const callStateSettleDelayInMilliseconds = 1000;
 
@@ -220,7 +219,7 @@ export class CallingViewModel {
       }
     });
 
-    const showE2EICallModal = (conversationEntity: Conversation, media?: CallMediaChoice) => {
+    const showE2EICallModal = (conversationEntity: Conversation, media?: CallMediaChoice): void => {
       PrimaryModal.show(
         PrimaryModal.type.CONFIRM,
         {
@@ -250,7 +249,7 @@ export class CallingViewModel {
       );
     };
 
-    const showMaxUsersToCallModalWithoutConfirm = (conversationEntity: Conversation, media?: CallMediaChoice) => {
+    const showMaxUsersToCallModalWithoutConfirm = (conversationEntity: Conversation, media?: CallMediaChoice): void => {
       const memberCount = conversationEntity.participating_user_ets().length;
 
       PrimaryModal.show(
@@ -480,7 +479,7 @@ export class CallingViewModel {
     });
   }
 
-  private showRestrictedConferenceCallingModal() {
+  private showRestrictedConferenceCallingModal(): void {
     if (this.teamState.isInTeam(this.selfUser())) {
       if (this.selfUser().teamRole() === ROLE.OWNER) {
         PrimaryModal.show(
@@ -594,7 +593,7 @@ export class CallingViewModel {
     return isPermissionGranted(PermissionType.CAMERA);
   }
 
-  readonly onCancelScreenSelection = () => {
+  readonly onCancelScreenSelection = (): void => {
     this.callState.selectableScreens([]);
     this.callState.selectableWindows([]);
   };

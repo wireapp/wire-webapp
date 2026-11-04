@@ -12,7 +12,7 @@ declare global {
  *
  * **Important**: Don't use this function within playwright directly, only in the browser e.g. within `page.evaluate()`.
  */
-const stubNotifications = () => {
+const stubNotifications = (): void => {
   const notificationRepository = window.wire?.app?.repository?.notification;
   if (!notificationRepository?.notifications)
     throw new Error("Can't stub notifications - Notifications array wasn't initialized yet");
@@ -37,7 +37,9 @@ const stubNotifications = () => {
  * Retrieve the notifications stored in the global variable of the page's window.
  * The function serializes the important properties of the Notification object to pass them to the playwright environment.
  */
-const getNotifications = async (page: Page) => {
+type InterceptedNotification = Pick<Window['__wireNotifications'][number], 'title' | 'body' | 'data' | 'icon'>;
+type GetNotificationsResult = Promise<InterceptedNotification[]>;
+const getNotifications = async (page: Page): GetNotificationsResult => {
   return await page.evaluate(() =>
     /**
      * It's necessary to construct a new object containing the important properties of the notification
@@ -61,7 +63,7 @@ const clickNotification = async (
   page: Page,
   notification: {title?: string; body?: string},
   options?: {timeout?: number},
-) => {
+): Promise<void> => {
   // Create a boxed test step so this action shows up like a normal one in the trace viewer
   await test.step(
     `Click notification ${JSON.stringify(notification)}`,
@@ -107,7 +109,14 @@ const clickNotification = async (
  * await expect.poll(() => getNotifications()).toHaveLength(1):
  * ```
  */
-export const interceptNotifications = async (page: Page) => {
+type InterceptNotificationsResult = Promise<{
+  getNotifications: () => GetNotificationsResult;
+  clickNotification: (
+    notification: {title?: string; body?: string},
+    options?: {timeout?: number} | undefined,
+  ) => Promise<void>;
+}>;
+export const interceptNotifications = async (page: Page): InterceptNotificationsResult => {
   await page.evaluate(stubNotifications);
 
   return {

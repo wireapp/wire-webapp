@@ -17,7 +17,7 @@
  *
  */
 
-import {render, screen} from '@testing-library/react';
+import {render, screen, type RenderResult} from '@testing-library/react';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
@@ -26,11 +26,15 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 import {CellsHeader} from './cellsHeader';
 
-const renderCellsHeader = (isBulkActionsEnabled: boolean, onSelectionBarAnchorChange: jest.Mock, searchValue = '') => {
+const renderCellsHeader = (
+  isBulkActionsEnabled: boolean,
+  onSelectionBarAnchorChange: jest.Mock,
+  searchValue = '',
+): RenderResult => {
   const wrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({
       translate: translateForTest,

@@ -19,29 +19,42 @@
 
 import ko from 'knockout';
 import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation';
-import {FEATURE_KEY, FEATURE_STATUS} from '@wireapp/api-client/lib/team';
+import {FEATURE_KEY, FEATURE_STATUS, type FeatureList} from '@wireapp/api-client/lib/team';
 
-import {useLeaveGroupAdminModalStore} from 'Components/Modals/LeaveGroupAdminModal/useLeaveGroupAdminModalStore';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {ConnectionRepository} from 'Repositories/connection/connectionRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {User} from 'Repositories/entity/User';
-import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
-import {SelfRepository} from 'Repositories/self/SelfRepository';
-import {TeamState} from 'Repositories/team/TeamState';
-import {UserState} from 'Repositories/user/userState';
+import {useLeaveGroupAdminModalStore} from '../components/Modals/LeaveGroupAdminModal/useLeaveGroupAdminModalStore';
+import {PrimaryModal} from '../components/Modals/PrimaryModal';
+import {CellsRepository} from '../repositories/cells/cellsRepository';
+import {ConnectionRepository} from '../repositories/connection/connectionRepository';
+import {ConversationRepository} from '../repositories/conversation/ConversationRepository';
+import {MessageRepository} from '../repositories/conversation/MessageRepository';
+import {User} from '../repositories/entity/User';
+import {IntegrationRepository} from '../repositories/integration/IntegrationRepository';
+import {SelfRepository} from '../repositories/self/SelfRepository';
+import {TeamState} from '../repositories/team/TeamState';
+import {UserState} from '../repositories/user/userState';
 import {generateConversation} from 'test/helper/ConversationGenerator';
-import type {Translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
-import {createUuid} from 'Util/uuid';
+import type {Translate} from '../util/localizerUtil';
+import {translateForTest} from '../util/test/translateForTest';
+import {createUuid} from '../util/uuid';
 
 import {ActionsViewModel} from './ActionsViewModel';
 import {MainViewModel} from './MainViewModel';
 import {UserType} from '@wireapp/api-client/lib/user';
 
 // ─── helpers ────────────────────────────────────────────────────────────────
+
+type ActionsViewModelTestFixture = {
+  readonly vm: ActionsViewModel;
+  readonly setMemberConversationRole: jest.Mock;
+  readonly leaveConversationMock: jest.Mock;
+};
+type BuildActionsViewModelOptions = {
+  selfUser?: User;
+  teamFeatures?: FeatureList;
+  setMemberConversationRole?: jest.Mock;
+  leaveConversationMock?: jest.Mock;
+  translate: Translate;
+};
 
 /** Create a User that passes every eligibility criterion in leaveConversation. */
 function makeEligibleUser(id = createUuid()): User {
@@ -59,19 +72,14 @@ const featureWithPreventAdminLessGroups = {
   [FEATURE_KEY.PREVENT_ADMIN_LESS_GROUPS]: {status: FEATURE_STATUS.ENABLED},
 } as any;
 
-function buildActionsViewModel({
-  selfUser = new User('self-id', 'example.com', translateForTest),
-  teamFeatures = undefined as any,
-  setMemberConversationRole = jest.fn().mockResolvedValue(undefined),
-  leaveConversationMock = jest.fn().mockResolvedValue(undefined),
-  translate,
-}: {
-  selfUser?: User;
-  teamFeatures?: any;
-  setMemberConversationRole?: jest.Mock;
-  leaveConversationMock?: jest.Mock;
-  translate: Translate;
-}) {
+function buildActionsViewModel(options: BuildActionsViewModelOptions): ActionsViewModelTestFixture {
+  const {
+    selfUser = new User('self-id', 'example.com', translateForTest),
+    teamFeatures,
+    setMemberConversationRole = jest.fn().mockResolvedValue(undefined),
+    leaveConversationMock = jest.fn().mockResolvedValue(undefined),
+    translate,
+  } = options;
   const mockUserState = {self: ko.observable(selfUser)} as unknown as UserState;
   const mockTeamState = {teamFeatures: ko.observable(teamFeatures)} as unknown as TeamState;
 

@@ -33,7 +33,7 @@ type Session = {
  * @param sessionTable The indexedDB table where the sessions are stored
  * @param defaultDomain The domain to add to the unqualified session ids
  */
-export async function migrateToQualifiedSessionIds(storeEngine: CRUDEngine, defaultDomain: string) {
+export async function migrateToQualifiedSessionIds(storeEngine: CRUDEngine, defaultDomain: string): Promise<void> {
   const isFullyQualified = /^[^@]+@[A-F0-9-]+@/i;
   const updatedSessions = (await storeEngine.readAll<Session>(sessionTableName))
     .filter(session => {

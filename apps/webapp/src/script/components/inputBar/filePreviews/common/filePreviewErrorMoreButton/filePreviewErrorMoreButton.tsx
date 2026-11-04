@@ -17,26 +17,30 @@
  *
  */
 
-import {KeyboardEvent, MouseEvent as ReactMouseEvent} from 'react';
+import {KeyboardEvent, MouseEvent as ReactMouseEvent, type FunctionComponent} from 'react';
 
 import {MoreIcon} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {showContextMenu} from 'src/script/ui/contextMenu';
-import {isSpaceOrEnterKey} from 'Util/keyboardUtil';
-import {setContextMenuPosition} from 'Util/util';
 
 import {buttonStyles, iconStyles} from './filePreviewErrorMoreButton.styles';
+
+import {isSpaceOrEnterKey} from '../../../../../util/keyboardUtil';
+import {setContextMenuPosition} from '../../../../../util/util';
 
 interface FilePreviewErrorMoreButtonProps {
   onDelete: () => void;
   onRetry: () => void;
 }
 
-export const FilePreviewErrorMoreButton = ({onDelete, onRetry}: FilePreviewErrorMoreButtonProps) => {
+export const FilePreviewErrorMoreButton: FunctionComponent<FilePreviewErrorMoreButtonProps> = ({
+  onDelete,
+  onRetry,
+}: FilePreviewErrorMoreButtonProps) => {
   const {translate} = useApplicationContext();
 
-  const showOptionsMenu = (event: ReactMouseEvent<HTMLButtonElement> | MouseEvent) => {
+  const showOptionsMenu = (event: ReactMouseEvent<HTMLButtonElement> | MouseEvent): void => {
     const retryLabel = translate('conversationFilePreviewErrorRetry');
     const removeLabel = translate('conversationFilePreviewErrorRemove');
 
@@ -50,7 +54,7 @@ export const FilePreviewErrorMoreButton = ({onDelete, onRetry}: FilePreviewError
     });
   };
 
-  const handleKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
+  const handleKeyDown = (event: KeyboardEvent<HTMLButtonElement>): void => {
     if (isSpaceOrEnterKey(event.key)) {
       const newEvent = setContextMenuPosition(event);
       showOptionsMenu(newEvent);

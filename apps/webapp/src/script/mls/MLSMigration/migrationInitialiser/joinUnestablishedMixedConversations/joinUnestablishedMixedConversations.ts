@@ -21,11 +21,11 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {Account} from '@wireapp/core';
 
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {isMixedConversation, MixedConversation} from 'Repositories/conversation/ConversationSelectors';
-import {Conversation} from 'Repositories/entity/Conversation';
 import {initMLSGroupConversation} from 'src/script/mls/MLSConversations';
 
+import {ConversationRepository} from '../../../../repositories/conversation/ConversationRepository';
+import {isMixedConversation, MixedConversation} from '../../../../repositories/conversation/ConversationSelectors';
+import {Conversation} from '../../../../repositories/entity/Conversation';
 import {mlsMigrationLogger} from '../../MLSMigrationLogger';
 
 interface JoinUnestablishedMixedConversationsParams {
@@ -37,7 +37,7 @@ export const joinUnestablishedMixedConversations = async (
   conversationRepository: ConversationRepository,
   selfUserId: QualifiedId,
   {core}: JoinUnestablishedMixedConversationsParams,
-) => {
+): Promise<void> => {
   const mixedConversations = conversations.filter(isMixedConversation);
   mlsMigrationLogger.info(`Found ${mixedConversations.length} "mixed" conversations, joining unestablished ones...`);
 
@@ -54,7 +54,7 @@ export const joinUnestablishedMixedConversation = async (
   selfUserId: QualifiedId,
   {core}: JoinUnestablishedMixedConversationsParams,
   shouldRetry = true,
-) => {
+): Promise<void> => {
   if (mixedConversation.epoch > 0) {
     return initMLSGroupConversation(mixedConversation, conversationRepository, {
       core,

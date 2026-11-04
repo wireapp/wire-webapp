@@ -20,10 +20,11 @@
 import {ReactNode} from 'react';
 
 import {render} from '@testing-library/react';
+import {Maybe} from 'true-myth';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {CellsRepository} from '../../../../../../repositories/cells/cellsRepository';
 import {createFireAndForgetInvokerForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 import {CELLS_SELF_USER_DRIVE_ROLE} from '../../../common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
@@ -31,8 +32,9 @@ import {CELLS_SELF_USER_DRIVE_ROLE} from '../../../common/cellsSelfUserDriveRole
 import {CellShareModalContent} from './cellsNodeShareModal';
 
 import {useCellsStore} from '../../../common/useCellsStore/useCellsStore';
+import type {JSX} from '@emotion/react/jsx-runtime';
 
-const withTheme = (component: ReactNode) => {
+const withTheme = (component: ReactNode): JSX.Element => {
   return <StyledApp themeId={THEME_ID.DEFAULT}>{component}</StyledApp>;
 };
 
@@ -47,6 +49,7 @@ describe('CellShareModalContent', () => {
       path: '/file.pdf',
       mimeType: 'application/pdf',
       sizeMb: '1',
+      sizeBytes: Maybe.nothing(),
       extension: 'pdf',
       uploadedAtTimestamp: Date.now(),
       owner: 'owner',

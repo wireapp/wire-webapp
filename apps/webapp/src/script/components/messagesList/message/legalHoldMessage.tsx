@@ -17,20 +17,23 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {container} from 'tsyringe';
 
-import {LegalHoldDot} from 'Components/LegalHoldDot';
-import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {LegalHoldMessage as LegalHoldMessageEntity} from 'Repositories/entity/message/legalHoldMessage';
 import {useApplicationContext} from 'src/script/page/rootProvider';
+
+import {ConversationState} from '../../../repositories/conversation/ConversationState';
+import {LegalHoldMessage as LegalHoldMessageEntity} from '../../../repositories/entity/message/legalHoldMessage';
+import {LegalHoldDot} from '../../LegalHoldDot';
+import {useLegalHoldModalState} from '../../Modals/LegalHoldModal/LegalHoldModal.state';
 
 interface LegalHoldMessageProps {
   conversationState?: ConversationState;
   message: LegalHoldMessageEntity;
 }
 
-const LegalHoldMessage = ({
+const LegalHoldMessage: FunctionComponent<LegalHoldMessageProps> = ({
   message,
   conversationState = container.resolve(ConversationState),
 }: LegalHoldMessageProps) => {
@@ -38,7 +41,7 @@ const LegalHoldMessage = ({
   const {showUsers} = useLegalHoldModalState(state => {
     return state;
   });
-  const showLegalHold = () => {
+  const showLegalHold = (): void => {
     return showUsers(false, conversationState.activeConversation());
   };
 

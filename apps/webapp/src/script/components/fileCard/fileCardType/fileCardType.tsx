@@ -17,11 +17,13 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {categoryStyles, wrapperStyles} from './fileCardType.styles';
 
 import {useFileCardContext} from '../common/fileCardContext/fileCardContext';
 
-export const FileCardType = () => {
+export const FileCardType: FunctionComponent = () => {
   const {extension, size} = useFileCardContext();
   return (
     <p css={wrapperStyles}>

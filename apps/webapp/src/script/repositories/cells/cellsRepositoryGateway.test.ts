@@ -20,7 +20,10 @@ const source: UploadSource = {
   size: 7,
 };
 
-const createRepository = () => {
+type CellsRepositoryGatewayTestRepository = jest.Mocked<Parameters<typeof createCellsRepositoryGateway>[0]>;
+type CellsRepositoryDraftIdentity = Awaited<ReturnType<CellsRepositoryGatewayTestRepository['uploadNodeDraft']>>;
+
+const createRepository = (): CellsRepositoryGatewayTestRepository => {
   return {
     uploadNodeDraft: jest.fn().mockResolvedValue({uuid: identity.resourceUuid, versionId: identity.versionId}),
     promoteNodeDraft: jest.fn().mockResolvedValue(undefined),
@@ -206,7 +209,7 @@ describe('createCellsRepositoryGateway', () => {
   });
 
   it('lets manager cancellation abort the controller forwarded to the repository', async () => {
-    const {promise: uploadPromise, resolve: resolveUpload} = Promise.withResolvers<void>();
+    const {promise: uploadPromise, resolve: resolveUpload} = Promise.withResolvers<CellsRepositoryDraftIdentity>();
     const repository = createRepository();
     repository.uploadNodeDraft.mockImplementation(() => {
       return uploadPromise;
@@ -234,7 +237,7 @@ describe('createCellsRepositoryGateway', () => {
 
     await manager.cancel(identity.uploadId);
     expect(controller?.signal.aborted).toBe(true);
-    resolveUpload();
+    resolveUpload({uuid: identity.resourceUuid, versionId: identity.versionId});
     await start;
   });
 

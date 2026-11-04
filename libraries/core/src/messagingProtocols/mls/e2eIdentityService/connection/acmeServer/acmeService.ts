@@ -44,6 +44,14 @@ import {
   LocalCertificateRootResponseSchema,
   FederationCrossSignedCertificatesResponseSchema,
   CrlResponseSchema,
+  NewAccountResponseData,
+  NewOrderResponseData,
+  AuthorizationResponseData,
+  DpopChallengeResponseData,
+  OidcChallengeResponseData,
+  CheckStatusOfOrderResponseData,
+  FinalizeOrderResponseData,
+  GetCertificateResponseData,
 } from './schema';
 
 import {AcmeChallenge, AcmeDirectory} from '../../e2eiService.types';
@@ -60,7 +68,7 @@ export class AcmeService {
 
   constructor(private discoveryUrl: string) {}
 
-  private get acmeBaseUrl() {
+  private get acmeBaseUrl(): string {
     const {origin} = new URL(this.discoveryUrl);
     return origin;
   }
@@ -156,7 +164,10 @@ export class AcmeService {
     }
   }
 
-  public async createNewAccount(url: AcmeDirectory['newAccount'], payload: Uint8Array) {
+  public async createNewAccount(
+    url: AcmeDirectory['newAccount'],
+    payload: Uint8Array,
+  ): Promise<PostJoseRequestReturnValue<NewAccountResponseData>> {
     return this.postJoseRequest({
       payload,
       schema: NewAccountResponseSchema,
@@ -164,7 +175,10 @@ export class AcmeService {
     });
   }
 
-  public async createNewOrder(url: AcmeDirectory['newOrder'], payload: Uint8Array) {
+  public async createNewOrder(
+    url: AcmeDirectory['newOrder'],
+    payload: Uint8Array,
+  ): Promise<PostJoseRequestReturnValue<NewOrderResponseData>> {
     return this.postJoseRequest({
       payload,
       schema: NewOrderResponseSchema,
@@ -173,7 +187,10 @@ export class AcmeService {
     });
   }
 
-  public async getAuthorization(url: string, payload: Uint8Array) {
+  public async getAuthorization(
+    url: string,
+    payload: Uint8Array,
+  ): Promise<PostJoseRequestReturnValue<AuthorizationResponseData>> {
     return this.postJoseRequest({
       payload,
       schema: AuthorizationResponseSchema,
@@ -181,7 +198,10 @@ export class AcmeService {
     });
   }
 
-  public async validateDpopChallenge(url: AcmeChallenge['url'], payload: Uint8Array) {
+  public async validateDpopChallenge(
+    url: AcmeChallenge['url'],
+    payload: Uint8Array,
+  ): Promise<PostJoseRequestReturnValue<DpopChallengeResponseData>> {
     return this.postJoseRequest({
       payload,
       schema: DpopChallengeResponseSchema,
@@ -189,7 +209,10 @@ export class AcmeService {
     });
   }
 
-  public async validateOidcChallenge(url: AcmeChallenge['url'], payload: Uint8Array) {
+  public async validateOidcChallenge(
+    url: AcmeChallenge['url'],
+    payload: Uint8Array,
+  ): Promise<PostJoseRequestReturnValue<OidcChallengeResponseData>> {
     return this.postJoseRequest({
       payload,
       schema: OidcChallengeResponseSchema,
@@ -197,7 +220,10 @@ export class AcmeService {
     });
   }
 
-  public async checkStatusOfOrder(url: string, payload: Uint8Array) {
+  public async checkStatusOfOrder(
+    url: string,
+    payload: Uint8Array,
+  ): Promise<PostJoseRequestReturnValue<CheckStatusOfOrderResponseData>> {
     return this.postJoseRequest({
       payload,
       schema: CheckStatusOfOrderResponseSchema,
@@ -205,7 +231,10 @@ export class AcmeService {
     });
   }
 
-  public async finalizeOrder(url: string, payload: Uint8Array) {
+  public async finalizeOrder(
+    url: string,
+    payload: Uint8Array,
+  ): Promise<PostJoseRequestReturnValue<FinalizeOrderResponseData>> {
     return this.postJoseRequest({
       payload,
       schema: FinalizeOrderResponseSchema,
@@ -213,7 +242,10 @@ export class AcmeService {
     });
   }
 
-  public async getCertificate(url: string, payload: Uint8Array) {
+  public async getCertificate(
+    url: string,
+    payload: Uint8Array,
+  ): Promise<PostJoseRequestReturnValue<GetCertificateResponseData>> {
     return this.postJoseRequest({
       payload,
       schema: GetCertificateResponseSchema,

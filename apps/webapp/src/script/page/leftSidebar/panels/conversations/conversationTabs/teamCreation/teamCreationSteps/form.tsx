@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {Button, ButtonVariant, Input} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -26,12 +28,12 @@ import {modalButtonsCss} from './teamCreationSteps.styles';
 
 import {buttonCss} from '../teamCreation.styles';
 
-export const Form = ({onNextStep, onPreviousStep, teamName, setTeamName}: StepProps) => {
+export const Form: FunctionComponent<StepProps> = ({onNextStep, onPreviousStep, teamName, setTeamName}: StepProps) => {
   const {translate} = useApplicationContext();
   const trimmedTeamName = teamName.trim();
   const isValidTeamName = trimmedTeamName.length > 0;
 
-  function handleNextStep() {
+  function handleNextStep(): void {
     if (!isValidTeamName) {
       return;
     }

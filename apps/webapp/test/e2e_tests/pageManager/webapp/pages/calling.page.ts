@@ -20,7 +20,33 @@
 import {Page, Locator} from '@playwright/test';
 
 import {FullScreenCallPage} from './fullScreenCall.page';
+import type {User} from '../../../data/user';
 
+type MaximizeCellResult = Promise<{
+  sendReaction: (emoji: '\uD83D\uDC4D') => Promise<void>;
+  getReaction: (options?: {emoji?: '\uD83D\uDC4D'; sender?: Pick<User, 'fullName'>}) => Locator;
+  toggleParticipantsBtn: Locator;
+  toggleHandRaise: () => Promise<void>;
+  selfVideoThumbnail: Locator;
+  gridTiles: Locator;
+  toggleParticipantsList: () => Promise<void>;
+  getCallingParticipant: (userName: string) => Locator & {
+    muteIcon: Locator;
+    guestIcon: Locator;
+    activeSpeakerIcon: Locator;
+    videoIcon: Locator;
+    screenShareIcon: Locator;
+    menuButton: Locator;
+    openContextMenu: () => Promise<Locator & {muteButton: Locator; muteOthersButton: Locator}>;
+  };
+  getGridTile: (name: string) => Locator & {muteIcon: Locator; videoElement: Locator};
+  goToNextPage: () => Promise<void>;
+  goToPreviousPage: () => Promise<void>;
+  toggleScreenShareButton: Locator;
+  toggleVideoButton: Locator;
+}>;
+
+type GetGridTileResult = Locator & {muteIcon: Locator};
 export class CallingPage {
   private readonly page: Page;
 
@@ -67,19 +93,19 @@ export class CallingPage {
     this.participantNameLocator = page.locator('[data-uie-name="call-participant-name"]');
   }
 
-  async clickAcceptCallButton() {
+  async clickAcceptCallButton(): Promise<void> {
     await this.acceptCallButton.click();
   }
 
-  async clickToggleVideoButton() {
+  async clickToggleVideoButton(): Promise<void> {
     await this.toggleVideoButton.click();
   }
 
-  async clickToggleScreenShareButton() {
+  async clickToggleScreenShareButton(): Promise<void> {
     await this.toggleScreenShareButton.click();
   }
 
-  async clickLeaveCallButton() {
+  async clickLeaveCallButton(): Promise<void> {
     await this.leaveCallButton.click();
   }
 
@@ -111,22 +137,22 @@ export class CallingPage {
 
   // ─── Fullscreen Controls ────────────────────────────────────────────────
 
-  async maximizeCell() {
+  async maximizeCell(): MaximizeCellResult {
     await this.goFullScreen.click();
     return FullScreenCallPage(this.page);
   }
 
   // ─── Mute Controls ──────────────────────────────────────────────────────
 
-  async toggleMute() {
+  async toggleMute(): Promise<void> {
     await this.toggleMuteButton.click();
   }
 
-  async muteSelfInFullScreen() {
+  async muteSelfInFullScreen(): Promise<void> {
     return await this.fullScreenMuteButton.click();
   }
 
-  async unmuteSelfInFullScreen() {
+  async unmuteSelfInFullScreen(): Promise<void> {
     await this.fullScreenMuteButton.click();
   }
 
@@ -134,7 +160,7 @@ export class CallingPage {
     return this.fullScreenMuteButton.isVisible();
   }
 
-  getGridTile(name: string) {
+  getGridTile(name: string): GetGridTileResult {
     const tile = this.gridTiles.filter({hasText: name});
 
     return Object.assign(tile, {

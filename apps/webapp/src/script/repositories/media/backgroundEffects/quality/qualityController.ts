@@ -19,17 +19,12 @@
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 
-import type {PerformanceSample} from 'Repositories/media/backgroundEffects/helper/samples';
-import {
-  QualityTier,
-  QualityTierParams,
-  TIER_DEFINITIONS,
-} from 'Repositories/media/backgroundEffects/quality/definitions';
-import {getLogger} from 'Util/logger';
-
+import {QualityTier, QualityTierParams, TIER_DEFINITIONS} from './definitions';
 import {DEFAULT_TUNING} from './tuning';
 
+import {getLogger} from '../../../../util/logger';
 import type {Mode} from '../backgroundEffectsWorkerTypes';
+import type {PerformanceSample} from '../helper/samples';
 
 const DEFAULT_TARGET_FPS = 15;
 const MILLISECONDS_PER_SECOND = 1000;

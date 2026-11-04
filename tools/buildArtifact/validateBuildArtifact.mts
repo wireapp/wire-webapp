@@ -19,14 +19,15 @@
  *
  */
 
+import {Maybe} from 'true-myth';
+
 import {appendFileSync} from 'node:fs';
 
-import {Maybe} from 'true-myth';
+import type {BuildMetadata} from '@wireapp/config';
 
 import {readBuildArtifactHtmlDocuments, readBuildArtifactMetadata} from './buildArtifactArchive.ts';
 import {validateBuildArtifactMetadata} from './buildArtifactMetadata.ts';
 import {formatBuildArtifactMetadataOutputs} from './buildArtifactMetadataOutput.ts';
-import type {BuildMetadata} from '@wireapp/config';
 
 function readRequiredEnvironmentValue(environmentVariableName: string): string {
   const environmentValue = Maybe.of<string>(process.env[environmentVariableName]).andThen(value => {
@@ -83,7 +84,7 @@ function run(): void {
     const metadata = validateArtifact();
 
     writeMetadataOutputs(metadata);
-    console.log(JSON.stringify(metadata));
+    console.info(JSON.stringify(metadata));
   } catch (error: unknown) {
     console.error(error);
     process.exitCode = 1;

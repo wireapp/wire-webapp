@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {Button, ButtonVariant, PlusIcon} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
@@ -27,7 +29,9 @@ interface CellsCreateNewFolderHintProps {
   onCreate: () => void;
 }
 
-export const CellsCreateNewFolderHint = ({onCreate}: CellsCreateNewFolderHintProps) => {
+export const CellsCreateNewFolderHint: FunctionComponent<CellsCreateNewFolderHintProps> = ({
+  onCreate,
+}: CellsCreateNewFolderHintProps) => {
   const {translate} = useApplicationContext();
 
   return (

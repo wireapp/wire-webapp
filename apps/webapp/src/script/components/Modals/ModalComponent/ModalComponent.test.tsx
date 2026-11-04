@@ -17,7 +17,7 @@
  *
  */
 
-import {act, fireEvent, render} from '@testing-library/react';
+import {act, fireEvent, render, type RenderResult} from '@testing-library/react';
 
 import {withTheme} from 'src/script/auth/util/test/testUtil';
 import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
@@ -36,7 +36,7 @@ const renderModal = ({
   onBgClick?: () => void;
   onOpened?: () => void;
   onClosed?: () => void;
-} = {}) => {
+} = {}): RenderResult => {
   return render(
     withTheme(
       <ModalComponent

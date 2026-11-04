@@ -17,10 +17,10 @@
  *
  */
 
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {WebAppEvents} from '../../../src/script/webAppEvents';
 
-import {EventTrackingRepository} from 'Repositories/tracking/eventTrackingRepository';
-import {resetStoreValue, storeValue} from 'Util/storageUtil';
+import {EventTrackingRepository} from '../../../src/script/repositories/tracking/eventTrackingRepository';
+import {resetStoreValue, storeValue} from '../../../src/script/util/storageUtil';
 
 import {TestFactory} from '../../helper/TestFactory';
 

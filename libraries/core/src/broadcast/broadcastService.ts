@@ -41,7 +41,7 @@ export class BroadcastService {
     genericMessage: GenericMessage,
     recipients: QualifiedUserClients,
     onClientMismatch?: (mismatch: MessageSendingStatus) => void | boolean | Promise<boolean>,
-  ) {
+  ): Promise<MessageSendingStatus> {
     const plainTextArray = GenericMessage.encode(genericMessage).finish();
     const send = (): Promise<MessageSendingStatus> => {
       return this.messageService.sendMessage(this.apiClient.validatedClientId, recipients, plainTextArray, {

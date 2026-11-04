@@ -20,7 +20,7 @@
 import assert from 'node:assert';
 import {result} from 'true-myth';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
 
 import {useAllCellsTagsStore, validateGetAllTagsResponse} from './useAllCellsTagsStore';
 

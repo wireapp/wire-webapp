@@ -30,7 +30,7 @@ export class AboutPage {
     this.termsOfUseLink = this.wireSection.getByRole('link', {name: 'Terms of Use'});
   }
 
-  async clickTermsOfUseLink() {
+  async clickTermsOfUseLink(): Promise<void> {
     await this.termsOfUseLink.click();
   }
 }

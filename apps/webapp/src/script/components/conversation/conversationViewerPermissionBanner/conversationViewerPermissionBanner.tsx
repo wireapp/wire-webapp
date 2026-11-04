@@ -17,14 +17,14 @@
  *
  */
 
-import {useState} from 'react';
+import {useState, type FunctionComponent} from 'react';
 
 import {CloseIcon} from '@wireapp/react-ui-kit';
 
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-export const ConversationViewerPermissionBanner = () => {
+export const ConversationViewerPermissionBanner: FunctionComponent = () => {
   const {translate} = useApplicationContext();
   const sharedDriveSupportUrl = Config.getConfig().URL.SUPPORT.SHARED_DRIVE;
   const [isVisible, setIsVisible] = useState(true);

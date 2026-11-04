@@ -19,14 +19,13 @@
 
 import {container} from 'tsyringe';
 
-import {supportsMLS} from 'Util/util';
-
 import {APIClient} from '../service/apiClientSingleton';
+import {supportsMLS} from '../util/util';
 
 /**
  * Will check if MLS is supported by client (whether MLS feature is enabled and secret store is supported) and backend (whether used api version supports MLS and backend removal key is present).
  */
-export const isMLSSupportedByEnvironment = async () => {
+export const isMLSSupportedByEnvironment = async (): Promise<boolean> => {
   const isMLSSupportedByClient = supportsMLS();
 
   if (!isMLSSupportedByClient) {

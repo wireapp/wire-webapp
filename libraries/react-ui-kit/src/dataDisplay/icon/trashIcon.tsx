@@ -17,9 +17,11 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
-export const TrashIcon = (props: SVGIconProps) => {
+export const TrashIcon: FunctionComponent<SVGIconProps> = props => {
   return (
     <SVGIcon realWidth={14} realHeight={16} {...props}>
       <path d="M5 2H1a1 1 0 0 0-1 1v1h14V3a1 1 0 0 0-1-1H9a2 2 0 1 0-4 0zM1 6h12l-.8 8c-.11 1.1-1.09 2-2.2 2H4c-1.1 0-2.09-.89-2.2-2L1 6z" />

@@ -19,8 +19,8 @@
 
 import {render} from '@testing-library/react';
 
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
-import {translateForTest} from 'Util/test/translateForTest';
+import {ServiceEntity} from '../../repositories/integration/ServiceEntity';
+import {translateForTest} from '../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

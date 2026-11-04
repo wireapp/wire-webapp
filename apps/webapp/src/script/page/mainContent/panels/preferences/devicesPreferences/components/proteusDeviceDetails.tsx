@@ -17,22 +17,27 @@
  *
  */
 
-import {useId} from 'react';
+import {useId, type FunctionComponent} from 'react';
 
-import {VerificationBadges} from 'Components/badge';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {splitFingerprint} from 'Util/stringUtil';
-import {formatTimestamp} from 'Util/timeUtil';
 
 import {type DeviceProps} from './detailedDevice';
 import {FormattedId} from './formattedId';
+
+import {VerificationBadges} from '../../../../../../components/badge';
+import {splitFingerprint} from '../../../../../../util/stringUtil';
+import {formatTimestamp} from '../../../../../../util/timeUtil';
 
 interface ProteusDeviceDetailsProps extends Omit<DeviceProps, 'getDeviceIdentity'> {
   isProteusVerified?: boolean;
   showVerificationStatus?: boolean;
 }
 
-export const ProteusDeviceDetails = ({device, fingerprint, isProteusVerified}: ProteusDeviceDetailsProps) => {
+export const ProteusDeviceDetails: FunctionComponent<ProteusDeviceDetailsProps> = ({
+  device,
+  fingerprint,
+  isProteusVerified,
+}: ProteusDeviceDetailsProps) => {
   const {translate} = useApplicationContext();
   const proteusLabelId = useId();
 

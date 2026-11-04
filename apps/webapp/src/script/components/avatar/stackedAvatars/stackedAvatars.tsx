@@ -17,12 +17,13 @@
  *
  */
 
-import type {User} from 'Repositories/entity/User';
+import type {FunctionComponent} from 'react';
 
 import {getStackedAvatarDisplay} from './getStackedAvatarDisplay';
 import {ParticipantAvatarTooltip} from './participantAvatarTooltip';
 import {overflowCountStyles, wrapperStyles} from './stackedAvatars.styles';
 
+import type {User} from '../../../repositories/entity/User';
 import {AVATAR_SIZE} from '../avatar';
 
 interface StackedAvatarsProps {
@@ -34,7 +35,7 @@ interface StackedAvatarsProps {
   dataUieName?: string;
 }
 
-export const StackedAvatars = ({
+export const StackedAvatars: FunctionComponent<StackedAvatarsProps> = ({
   participants,
   getParticipantLabel,
   avatarSize = AVATAR_SIZE.X_SMALL,

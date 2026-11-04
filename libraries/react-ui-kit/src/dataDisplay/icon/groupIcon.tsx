@@ -17,11 +17,13 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
 const defaultGroupIconSize = 16;
 
-export const GroupIcon = (props: SVGIconProps) => {
+export const GroupIcon: FunctionComponent<SVGIconProps> = props => {
   return (
     <SVGIcon
       realWidth={props.width ?? defaultGroupIconSize}

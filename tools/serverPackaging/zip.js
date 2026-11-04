@@ -17,9 +17,13 @@
  *
  */
 
+const archiver = require('archiver');
+
 const fs = require('fs');
 const path = require('path');
-const archiver = require('archiver');
+
+const {createPackagedServerManifest, findLocalWorkspaceDependencyPackages} = require('./workspaceDependencies.ts');
+
 const archive = archiver('zip');
 
 const ROOT_PATH = path.resolve(__dirname, '../..');
@@ -33,27 +37,44 @@ if (!fs.existsSync(S3_PATH)) {
 }
 const output = fs.createWriteStream(path.join(S3_PATH, 'ebs.zip'));
 
-// Read and modify package.json to handle workspace dependencies
-const packageJson = JSON.parse(fs.readFileSync(path.join(SERVER_PATH, 'package.json'), 'utf8'));
+// Read local workspace package metadata and mark bundled dependencies with their package versions.
+const serverPackageManifest = JSON.parse(fs.readFileSync(path.join(SERVER_PATH, 'package.json'), 'utf8'));
+const librariesDirectory = path.join(ROOT_PATH, 'libraries');
+const workspacePackages = fs
+  .readdirSync(librariesDirectory, {withFileTypes: true})
+  .filter(libraryDirectory => {
+    return libraryDirectory.isDirectory();
+  })
+  .map(libraryDirectory => {
+    return path.join(librariesDirectory, libraryDirectory.name);
+  })
+  .flatMap(workspacePackageDirectory => {
+    const packageManifestPath = path.join(workspacePackageDirectory, 'package.json');
 
-// Convert workspace:* dependencies to "*" version - they're pre-bundled in node_modules
-const workspaceDeps = [];
-if (packageJson.dependencies) {
-  Object.keys(packageJson.dependencies).forEach(dep => {
-    if (packageJson.dependencies[dep].startsWith('workspace:')) {
-      console.log(`Marking workspace dependency as pre-bundled: ${dep}`);
-      workspaceDeps.push(dep);
-      // Read version from the library's package.json
-      const libPkgPath = path.join(ROOT_PATH, 'libraries', dep.replace('@wireapp/', ''), 'package.json');
-      if (fs.existsSync(libPkgPath)) {
-        const libPkg = JSON.parse(fs.readFileSync(libPkgPath, 'utf8'));
-        packageJson.dependencies[dep] = libPkg.version;
-      } else {
-        packageJson.dependencies[dep] = '*';
-      }
+    if (!fs.existsSync(packageManifestPath)) {
+      return [];
     }
+
+    return [
+      {
+        directoryPath: workspacePackageDirectory,
+        manifest: JSON.parse(fs.readFileSync(packageManifestPath, 'utf8')),
+      },
+    ];
   });
-}
+const workspaceDependencyPackages = findLocalWorkspaceDependencyPackages({
+  dependencies: serverPackageManifest.dependencies || {},
+  workspacePackages,
+});
+
+workspaceDependencyPackages.forEach(workspacePackage => {
+  console.info(`Marking workspace dependency as pre-bundled: ${workspacePackage.manifest.name}`);
+});
+
+const packageJson = createPackagedServerManifest({
+  serverPackageManifest,
+  workspacePackages,
+});
 
 // Write modified package.json to a temp file
 const tempPackageJsonPath = path.join(DIST_PATH, 'package.json.tmp');

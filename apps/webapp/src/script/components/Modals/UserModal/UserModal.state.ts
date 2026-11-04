@@ -20,7 +20,7 @@
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {create} from 'zustand';
 
-import {noop} from 'Util/util';
+import {noop} from '../../../util/util';
 
 type UserModalState = {
   userId: QualifiedId | null;
@@ -52,7 +52,7 @@ const useUserModalState = create<UserModalState>(set => {
   };
 });
 
-const showUserModal = (userId: QualifiedId, onClose = noop) => {
+const showUserModal = (userId: QualifiedId, onClose = noop): void => {
   const {updateOnClose, updateUserId} = useUserModalState.getState();
   updateUserId(userId);
   updateOnClose(onClose);

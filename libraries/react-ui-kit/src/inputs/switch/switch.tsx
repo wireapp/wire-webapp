@@ -80,7 +80,7 @@ export const Switch = forwardRef<HTMLInputElement, SwitchProps>(
     const resolvedDisabledColor =
       (isDarkTheme ? (disabledColorDark ?? disabledColor) : disabledColor) ?? switchTheme?.disabledColor;
     const isInteractionDisabled = Boolean(disabled === true || showLoading);
-    const handleToggle = (nextChecked: boolean) => {
+    const handleToggle = (nextChecked: boolean): void => {
       if (isInteractionDisabled) {
         return;
       }

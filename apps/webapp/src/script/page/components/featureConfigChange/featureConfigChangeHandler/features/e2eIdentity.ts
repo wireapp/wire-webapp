@@ -22,9 +22,9 @@ import {isNonEmptyString, isTruthy, isUndefined} from '@sindresorhus/is';
 import {FEATURE_STATUS, FEATURE_KEY, FeatureList} from '@wireapp/api-client/lib/team';
 
 import {E2EIHandler} from 'src/script/e2eIdentity';
-import {supportsMLS} from 'Util/util';
 
 import {hasE2EIVerificationExpiration, hasMLSDefaultProtocol} from '../../../../../guards/Protocol';
+import {supportsMLS} from '../../../../../util/util';
 
 export const getE2EIConfig = (config: FeatureList): FeatureList[FEATURE_KEY.MLSE2EID] | undefined => {
   if (!supportsMLS()) {

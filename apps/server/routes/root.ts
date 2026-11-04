@@ -21,7 +21,7 @@ import {Request, Router} from 'express';
 import geolite2 from 'geolite2';
 import maxmind, {CountryResponse} from 'maxmind';
 
-async function addGeoIP(req: Request) {
+async function addGeoIP(req: Request): Promise<void> {
   let countryCode = '';
 
   try {
@@ -47,7 +47,7 @@ async function addGeoIP(req: Request) {
   req.app.locals.country = countryCode;
 }
 
-const Root = () => {
+const Root = (): Router[] => {
   return [
     Router().get('/', (_req, res) => {
       return res.render('index');

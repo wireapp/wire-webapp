@@ -18,7 +18,7 @@
  */
 
 import {isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
-import type {AddedClient, PublicClient} from '@wireapp/api-client/lib/client';
+import type {AddedClient, PublicClient, RegisteredClient} from '@wireapp/api-client/lib/client';
 import {
   UserEvent,
   UserLegalHoldDisableEvent,
@@ -43,32 +43,6 @@ import {flatten, uniq} from 'underscore';
 
 import {TypedEventEmitter, type AccentColor} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
-import {AssetRepository} from 'Repositories/assets/assetRepository';
-import type {ClientRepository, QualifiedUserClientEntityMap} from 'Repositories/client';
-import {ClientEntity} from 'Repositories/client/ClientEntity';
-import {ClientMapper} from 'Repositories/client/ClientMapper';
-import type {ConnectionEntity} from 'Repositories/connection/connectionEntity';
-import {flattenUserClientsQualifiedIds} from 'Repositories/conversation/userClientsUtils';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {USER} from 'Repositories/event/Client';
-import {EventRepository} from 'Repositories/event/EventRepository';
-import type {EventSource} from 'Repositories/event/EventSource';
-import type {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
-import type {SelfService} from 'Repositories/self/SelfService';
-import {UserRecord} from 'Repositories/storage';
-import {TeamState} from 'Repositories/team/TeamState';
-import {chunk, partition} from 'Util/arrayUtil';
-import {type Translate} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/logger';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-import {fixWebsocketString} from 'Util/stringUtil';
-import {toError} from 'Util/toError';
-import {isAxiosError, isBackendError, isErrorWithCode, isErrorWithType} from 'Util/typePredicateUtil';
 
 import {showAvailabilityModal} from './availabilityModal';
 import {ConsentValue} from './consentValue';
@@ -77,9 +51,34 @@ import type {UserService} from './userService';
 import {UserState} from './userState';
 
 import {SIGN_OUT_REASON} from '../../auth/signOutReason';
+import {useLegalHoldModalState} from '../../components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {Config} from '../../Config';
 import {UserError} from '../../error/userError';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
+import {chunk, partition} from '../../util/arrayUtil';
+import {type Translate} from '../../util/localizerUtil';
+import {getLogger, Logger} from '../../util/logger';
+import {matchQualifiedIds} from '../../util/qualifiedId';
+import {fixWebsocketString} from '../../util/stringUtil';
+import {toError} from '../../util/toError';
+import {isAxiosError, isBackendError, isErrorWithCode, isErrorWithType} from '../../util/typePredicateUtil';
+import {WebAppEvents} from '../../webAppEvents';
+import {AssetRepository} from '../assets/assetRepository';
+import type {ClientRepository, QualifiedUserClientEntityMap} from '../client';
+import {ClientEntity} from '../client/ClientEntity';
+import {ClientMapper} from '../client/ClientMapper';
+import type {ConnectionEntity} from '../connection/connectionEntity';
+import {flattenUserClientsQualifiedIds} from '../conversation/userClientsUtils';
+import {Conversation} from '../entity/Conversation';
+import {User} from '../entity/User';
+import {USER} from '../event/Client';
+import {EventRepository} from '../event/EventRepository';
+import type {EventSource} from '../event/EventSource';
+import type {PropertiesRepository} from '../properties/propertiesRepository';
+import {PROPERTIES_TYPE} from '../properties/propertiesType';
+import type {SelfService} from '../self/SelfService';
+import {UserRecord} from '../storage';
+import {TeamState} from '../team/TeamState';
 
 const connectionUpdateDebounceInMilliseconds = 100;
 const maximumUserClients = 8;
@@ -90,6 +89,17 @@ type GetUserOptions = {
    * Note that it will return a user considered `deleted` if the user is not found in memory
    */
   localOnly?: boolean;
+};
+type RawUserLookupResult = {found: APIClientUser[]; failed: QualifiedId[]};
+type UserDirectoryLookupResult = {
+  found: APIClientUser[];
+  failed?: QualifiedId[];
+  not_found?: QualifiedId[];
+};
+type UserRepositoryConfig = {
+  MAXIMUM_TEAM_SIZE_BROADCAST: number;
+  MINIMUM_PICTURE_SIZE: {HEIGHT: number; WIDTH: number};
+  MINIMUM_USERNAME_LENGTH: number;
 };
 
 function generateQualifiedId(userData: {id: string; qualified_id?: QualifiedId; domain?: string}): QualifiedId {
@@ -115,7 +125,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
   public readonly userMapper: UserMapper;
   public getTeamMembersFromUsers: (users: User[]) => Promise<void>;
 
-  static get CONFIG() {
+  static get CONFIG(): UserRepositoryConfig {
     return {
       MAXIMUM_TEAM_SIZE_BROADCAST: 500,
       MINIMUM_PICTURE_SIZE: {
@@ -157,7 +167,10 @@ export class UserRepository extends TypedEventEmitter<Events> {
   /**
    * Listener for incoming user events.
    */
-  private readonly onUserEvent = async (eventJson: UserEvent | UserAvailabilityEvent, source: EventSource) => {
+  private readonly onUserEvent = async (
+    eventJson: UserEvent | UserAvailabilityEvent,
+    source: EventSource,
+  ): Promise<void> => {
     this.logger.info(`User Event: '${eventJson.type}' (Source: ${source})`);
 
     switch (eventJson.type) {
@@ -303,7 +316,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
   /**
    * Persists a conversation state in the database.
    */
-  private readonly saveUserInDb = (user: APIClientUser) => {
+  private readonly saveUserInDb = (user: APIClientUser): Promise<void> => {
     return this.userService.saveUserInDb(user);
   };
 
@@ -511,7 +524,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
    * @deprecated
    * TODO(Federation): This code cannot be used with federation and will be replaced with our core.
    */
-  removeClientFromUser = async (userId: QualifiedId, clientId: string) => {
+  removeClientFromUser = async (userId: QualifiedId, clientId: string): Promise<User> => {
     await this.clientRepository.removeClient(userId, clientId);
     const userEntity = await this.getUserById(userId);
     userEntity.removeClient(clientId);
@@ -593,10 +606,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
     }
   }
 
-  private async fetchRawUsers(
-    userIds: QualifiedId[],
-    defaultDomain: string,
-  ): Promise<{found: APIClientUser[]; failed: QualifiedId[]}> {
+  private async fetchRawUsers(userIds: QualifiedId[], defaultDomain: string): Promise<RawUserLookupResult> {
     const chunksOfUserIds = chunk<QualifiedId>(
       userIds.filter(({id}) => {
         return isNonEmptyString(id);
@@ -604,7 +614,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
       Config.getConfig().MAXIMUM_USERS_PER_REQUEST,
     );
 
-    const getChunk = async (chunkOfUserIds: QualifiedId[]) => {
+    const getChunk = async (chunkOfUserIds: QualifiedId[]): Promise<RawUserLookupResult> => {
       const chunkOfQualifiedUserIds = chunkOfUserIds.map(({id, domain}) => {
         return {
           domain: isNonEmptyString(domain) ? domain : defaultDomain,
@@ -913,7 +923,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
     return knownUserEntities.concat(userEntities);
   }
 
-  getUserListFromBackend(userIds: QualifiedId[]) {
+  getUserListFromBackend(userIds: QualifiedId[]): Promise<UserDirectoryLookupResult> {
     return this.userService.getUsers(userIds);
   }
 
@@ -953,7 +963,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
     return user;
   };
 
-  async refreshUsers(userIds: QualifiedId[]) {
+  async refreshUsers(userIds: QualifiedId[]): Promise<Promise<User>[]> {
     const {found: users} = await this.fetchRawUsers(userIds, this.userState.self().domain);
     return users.map(user => {
       return this.updateSavedUser(user);
@@ -979,7 +989,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
     return this.updateUser(userId, {supported_protocols: supportedProtocols});
   }
 
-  public async getAllSelfClients() {
+  public async getAllSelfClients(): Promise<RegisteredClient[]> {
     return this.clientRepository.getAllSelfClients();
   }
 

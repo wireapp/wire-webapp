@@ -19,17 +19,20 @@
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 
-import {User} from 'Repositories/entity/User';
-import {StorageSchemata} from 'Repositories/storage/storageSchemata';
-import {getLogger} from 'Util/logger';
-
 import {ProgressCallback, FileData, Filename, FileDescriptor, Metadata} from './backup.types';
 import {BackupService} from './backupService';
 import {exportTable} from './crossPlatformBackup';
 import {CancelError, DifferentAccountError, IncompatiblePlatformError, InvalidMetaDataError} from './error';
 import {preprocessConversations, preprocessEvents, preprocessUsers} from './recordPreprocessors';
 
+import {getLogger} from '../../util/logger';
+import {User} from '../entity/User';
+import type {ConversationRecord, EventRecord, UserRecord} from '../storage';
+import {StorageSchemata} from '../storage/storageSchemata';
+
 const logger = getLogger('wire:backup:LegacyBackup');
+
+type LegacyBackupHistory = Record<string, ConversationRecord[] | EventRecord[] | UserRecord[]>;
 
 export const createMetaData = (user: User, clientId: string, backupService: BackupService): Metadata => {
   return {
@@ -80,14 +83,12 @@ interface ImportLegacyBackupToDatabaseParams {
   fileData: FileData;
   backupService: BackupService;
 }
+type LegacyBackupImportResult = {archiveVersion: number; fileDescriptors: FileDescriptor[]};
 export const importLegacyBackupToDatabase = async ({
   user,
   fileData,
   backupService,
-}: ImportLegacyBackupToDatabaseParams): Promise<{
-  archiveVersion: number;
-  fileDescriptors: FileDescriptor[];
-}> => {
+}: ImportLegacyBackupToDatabaseParams): Promise<LegacyBackupImportResult> => {
   // Import legacy backup
   if (isNullOrUndefined(fileData[Filename.METADATA])) {
     throw new InvalidMetaDataError();
@@ -114,11 +115,11 @@ export const exportHistory = async (
   progressCallback: ProgressCallback,
   backupService: BackupService,
   checkCancelStatus: () => boolean,
-) => {
+): Promise<LegacyBackupHistory> => {
   const [conversationTable, eventsTable, usersTable] = backupService.getTables();
-  const tableData: Record<string, any[]> = {};
+  const tableData: LegacyBackupHistory = {};
 
-  const checkIfCancelled = () => {
+  const checkIfCancelled = (): void => {
     if (checkCancelStatus()) {
       throw new CancelError();
     }

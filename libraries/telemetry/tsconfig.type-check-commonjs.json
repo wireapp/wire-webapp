@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.commonjs.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "incremental": true,
+    "tsBuildInfoFile": "../../target/buildcache/telemetry-commonjs-type-check.tsbuildinfo"
+  }
+}

@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {Rotation} from './arrowIcon';
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
@@ -31,7 +33,7 @@ const rotation: Rotation = {
   right: 270,
 };
 
-export const DropdownFilledIcon = ({direction = 'down', ...props}: DropdownFilledIconProps) => {
+export const DropdownFilledIcon: FunctionComponent<DropdownFilledIconProps> = ({direction = 'down', ...props}) => {
   return (
     <SVGIcon realWidth={10} realHeight={5} {...props}>
       <path

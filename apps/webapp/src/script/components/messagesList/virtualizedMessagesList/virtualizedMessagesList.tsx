@@ -17,34 +17,36 @@
  *
  */
 
-import {MutableRefObject, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
+import {useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type FunctionComponent} from 'react';
 
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isNonEmptyArray, isNumber, isUndefined} from '@sindresorhus/is';
 import {useVirtualizer} from '@tanstack/react-virtual';
 import cx from 'classnames';
 
-import {MarkerComponent} from 'Components/messagesList/message/marker';
-import {Message} from 'Components/messagesList/message/virtualizedMessage';
-import {MessagesListParams} from 'Components/messagesList/messageList.types';
-import {UploadAssets} from 'Components/messagesList/uploadAssets';
-import {verticallyCenterMessage} from 'Components/messagesList/utils/helpers';
-import {filterMessages} from 'Components/messagesList/utils/messagesFilter';
-import {useLoadConversation} from 'Components/messagesList/utils/useLoadConversation';
-import {useScrollToLastUnreadMessage} from 'Components/messagesList/utils/useScrollToLastUnreadMessage';
+import {useApplicationContext} from 'src/script/page/rootProvider';
+
+import {useLoadMessages} from './useLoadMessages';
+import {useScrollMessages} from './useScrollMessages';
+
+import {useRoveFocus} from '../../../hooks/useRoveFocus';
+import {MessageRepository} from '../../../repositories/conversation/MessageRepository';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {MarkerComponent} from '../message/marker';
+import {Message} from '../message/virtualizedMessage';
+import {MessagesListParams} from '../messageList.types';
+import {UploadAssets} from '../uploadAssets';
+import {verticallyCenterMessage} from '../utils/helpers';
+import {filterMessages} from '../utils/messagesFilter';
+import {useConversationReadBoundary} from '../utils/useConversationReadBoundary';
+import {useLoadConversation} from '../utils/useLoadConversation';
+import {useScrollToLastUnreadMessage} from '../utils/useScrollToLastUnreadMessage';
 import {
   getVirtualizedMessagesGroupItemKey,
   groupMessagesBySenderAndTime,
   isMarker,
-} from 'Components/messagesList/utils/virtualizedMessagesGroup';
-import {useLoadMessages} from 'Components/messagesList/virtualizedMessagesList/useLoadMessages';
-import {useScrollMessages} from 'Components/messagesList/virtualizedMessagesList/useScrollMessages';
-import {useRoveFocus} from 'Hooks/useRoveFocus';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-
+} from '../utils/virtualizedMessagesGroup';
 import {VirtualizedJumpToLastMessageButton} from '../virtualizedJumpToLastMessageButton';
 
 const messageHighlightDurationInMilliseconds = 5000;
@@ -55,7 +57,6 @@ const MARKER_ESTIMATE = 56;
 
 interface Props extends Omit<MessagesListParams, 'isRightSidebarOpen' | 'onLoading'> {
   parentElement: HTMLDivElement;
-  conversationLastReadTimestamp: MutableRefObject<number>;
   onLoading: (isLoading: boolean) => void;
 }
 
@@ -83,8 +84,9 @@ async function loadMessagesForTimestampSelection(options: LoadMessagesForTimesta
   });
 }
 
-export const VirtualizedMessagesList = ({
+export const VirtualizedMessagesList: FunctionComponent<Props> = ({
   conversation,
+  cancelPendingReadReceiptsForConversation,
   parentElement,
   assetRepository,
   selfUser,
@@ -104,7 +106,6 @@ export const VirtualizedMessagesList = ({
   messageActions,
   isMsgElementsFocusable,
   setMsgElementsFocusable,
-  conversationLastReadTimestamp,
   updateConversationLastRead,
   onLoading,
   isConversationLoaded,
@@ -136,9 +137,14 @@ export const VirtualizedMessagesList = ({
   });
 
   const filteredMessages = filterMessages(allMessages);
+  const {
+    timestamp: conversationLastReadTimestamp,
+    timestampReference: conversationLastReadTimestampReference,
+    setTimestamp: setConversationLastReadTimestamp,
+  } = useConversationReadBoundary(conversation);
 
   const groupedMessages = useMemo(() => {
-    return groupMessagesBySenderAndTime(filteredMessages, conversationLastReadTimestamp.current);
+    return groupMessagesBySenderAndTime(filteredMessages, conversationLastReadTimestamp);
   }, [conversationLastReadTimestamp, filteredMessages]);
 
   const [highlightedMessage, setHighlightedMessage] = useState<string | undefined>(conversation.initialMessage()?.id);
@@ -198,7 +204,7 @@ export const VirtualizedMessagesList = ({
   const {loadConversation} = useLoadConversation({
     conversation,
     conversationRepository,
-    conversationLastReadTimestamp,
+    conversationLastReadTimestamp: conversationLastReadTimestampReference,
     onLoading,
   });
 
@@ -206,7 +212,7 @@ export const VirtualizedMessagesList = ({
   useScrollToLastUnreadMessage(virtualizer, {
     isConversationLoaded,
     groupedMessages,
-    conversationLastReadTimestamp,
+    conversationLastReadTimestamp: conversationLastReadTimestampReference,
   });
 
   // Hook for loading preceding / following messages when user scrolls to top / bottom
@@ -277,7 +283,9 @@ export const VirtualizedMessagesList = ({
     }
   }, [groupedMessages, highlightedMessage]);
 
-  const onJumpToLastMessageClick = async () => {
+  const onJumpToLastMessageClick = async (): Promise<void> => {
+    // jumping to the latest message is an explicit "read" action, resume auto-read
+    conversation.clearManualUnreadMarker();
     setHighlightedMessage(undefined);
     conversation.initialMessage(undefined);
 
@@ -288,7 +296,11 @@ export const VirtualizedMessagesList = ({
       await loadConversation(conversation);
     }
 
-    conversationLastReadTimestamp.current = allMessages[allMessages.length - 1].timestamp();
+    const newestMessage = allMessages.at(-1);
+    if (!isUndefined(newestMessage)) {
+      conversationLastReadTimestampReference.current = newestMessage.timestamp();
+      setConversationLastReadTimestamp(newestMessage.timestamp());
+    }
 
     const scrollTimeout = setTimeout(() => {
       virtualizer.scrollToIndex(groupedMessages.length - 1, {align: 'end'});
@@ -375,6 +387,7 @@ export const VirtualizedMessagesList = ({
                   hideHeader={item.shouldGroup}
                   messageActions={messageActions}
                   conversation={conversation}
+                  cancelPendingReadReceiptsForConversation={cancelPendingReadReceiptsForConversation}
                   hasReadReceiptsTurnedOn={conversationRepository.expectReadReceipt(conversation)}
                   isLastDeliveredMessage={lastDeliveredMessage?.id === item.message.id}
                   isHighlighted={

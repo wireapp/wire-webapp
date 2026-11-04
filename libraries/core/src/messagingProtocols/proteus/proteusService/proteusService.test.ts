@@ -17,6 +17,10 @@
  *
  */
 
+import type {APIClient} from '@wireapp/api-client';
+import type {PreKey} from '@wireapp/api-client/lib/auth';
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
+import type {CryptoClient} from './cryptoClient';
 import * as Recipients from '../utility/recipients';
 
 import {
@@ -41,6 +45,23 @@ import {NonFederatingBackendsError} from '../../../errors';
 import {generateQualifiedId, generateQualifiedIds} from '../../../testUtils';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
+type EncryptionTestSetup = {
+  services: {proteusService: ProteusService; apiClient: APIClient; cryptoClient: CryptoClient};
+  data: {
+    firstUser: {
+      id: QualifiedId;
+      clients: {first: string; second: string};
+      sessions: {first: string; second: string};
+    };
+    secondUser: {id: QualifiedId; clients: {first: string}; sessions: {first: string}};
+    message: string;
+    messageBuffer: Uint8Array<ArrayBuffer>;
+    encryptedMessageBuffer: Uint8Array<ArrayBuffer>;
+    validPreKey: PreKey;
+    domain: string;
+  };
+};
+
 jest.mock('./cryptoClient/coreCryptoWrapper/prekeysTracker', () => {
   return {
     PrekeyTracker: jest.fn().mockImplementation(() => {
@@ -62,7 +83,7 @@ jest.mock('../utility/recipients', () => {
 });
 const MockedRecipients = Recipients as jest.Mocked<typeof Recipients>;
 
-const prepareDataForEncryption = async () => {
+const prepareDataForEncryption = async (): Promise<EncryptionTestSetup> => {
   const [proteusService, {cryptoClient, apiClient}] = await buildProteusService();
 
   const domain = 'staging.zinfra.io';

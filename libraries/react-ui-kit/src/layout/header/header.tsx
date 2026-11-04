@@ -18,6 +18,7 @@
  */
 
 import * as React from 'react';
+import {type FunctionComponent} from 'react';
 
 import {CSSObject} from '@emotion/react';
 
@@ -32,6 +33,6 @@ export const headerStyle: <T>(props: HeaderProps<T>) => CSSObject = () => {
   };
 };
 
-export const Header = (props: HeaderProps) => {
+export const Header: FunctionComponent<HeaderProps> = props => {
   return <header css={headerStyle(props)} {...props} />;
 };

@@ -45,23 +45,6 @@ import {container} from 'tsyringe';
 import {Cancelable, debounce} from 'underscore';
 
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
-import {ClientRepository} from 'Repositories/client';
-import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
-import {ACCESS_STATE} from 'Repositories/conversation/AccessState';
-import {ConversationRepository, CONVERSATION_READONLY_STATE} from 'Repositories/conversation/ConversationRepository';
-import {isProteusTeam1to1Conversation, isSelfConversation} from 'Repositories/conversation/ConversationSelectors';
-import {ConversationStatus} from 'Repositories/conversation/ConversationStatus';
-import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
-import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting';
-import {ConversationRecord} from 'Repositories/storage/record/conversationRecord';
-import {TeamState} from 'Repositories/team/TeamState';
-import type {Translate} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/logger';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-import {truncate} from 'Util/stringUtil';
 
 import {CallMessage} from './message/callMessage';
 import type {ContentMessage} from './message/contentMessage';
@@ -69,11 +52,27 @@ import type {Message} from './message/message';
 import {PingMessage} from './message/pingMessage';
 import type {User} from './User';
 
+import {useLegalHoldModalState} from '../../components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {Config} from '../../Config';
 import {ConversationError} from '../../error/conversationError';
 import {isContentMessage, isDeleteMessage} from '../../guards/Message';
 import {StatusType} from '../../message/statusType';
 import {ContentState, useAppState} from '../../page/useAppState';
+import type {Translate} from '../../util/localizerUtil';
+import {getLogger, Logger} from '../../util/logger';
+import {matchQualifiedIds} from '../../util/qualifiedId';
+import {truncate} from '../../util/stringUtil';
+import {WebAppEvents} from '../../webAppEvents';
+import {ClientRepository} from '../client';
+import {ConnectionEntity} from '../connection/connectionEntity';
+import {ACCESS_STATE} from '../conversation/AccessState';
+import {ConversationRepository, CONVERSATION_READONLY_STATE} from '../conversation/ConversationRepository';
+import {isProteusTeam1to1Conversation, isSelfConversation} from '../conversation/ConversationSelectors';
+import {ConversationStatus} from '../conversation/ConversationStatus';
+import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
+import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
+import {ConversationRecord} from '../storage/record/conversationRecord';
+import {TeamState} from '../team/TeamState';
 
 const userSearchDebounceInMilliseconds = 100;
 const decimalRadix = 10;
@@ -172,6 +171,12 @@ export class Conversation {
   public readonly isTeamOnly: ko.PureComputed<boolean>;
   public readonly last_event_timestamp: ko.Observable<number>;
   public readonly last_read_timestamp: ko.Observable<number>;
+  /** The locally selected message from which this conversation is manually unread. */
+  public readonly manualUnreadTimestamp: ko.Observable<number | undefined>;
+  /** Read boundary used for local unread presentation and history loading. */
+  public readonly effectiveReadTimestamp: ko.PureComputed<number>;
+  /** While true, viewing messages does not advance the read marker (in-memory only) */
+  public readonly isAutoReadSuppressed: ko.Observable<boolean>;
   public readonly legalHoldStatus: ko.Observable<LegalHoldStatus>;
   public readonly localMessageTimer: ko.Observable<number>;
   public readonly messages_unordered: ko.ObservableArray<Message>;
@@ -407,6 +412,12 @@ export class Conversation {
     this.cleared_timestamp = ko.observable(0);
     this.last_event_timestamp = ko.observable(0);
     this.last_read_timestamp = ko.observable(0);
+    this.manualUnreadTimestamp = ko.observable<number | undefined>(undefined);
+    this.effectiveReadTimestamp = ko.pureComputed(() => {
+      const manualUnreadTimestamp = this.manualUnreadTimestamp();
+      return isUndefined(manualUnreadTimestamp) ? this.last_read_timestamp() : manualUnreadTimestamp - 1;
+    });
+    this.isAutoReadSuppressed = ko.observable(false);
     this.last_server_timestamp = ko.observable(0);
     this.mutedTimestamp = ko.observable(0);
     this.initialMessage = ko.observable();
@@ -591,12 +602,18 @@ export class Conversation {
       for (let index = messages.length - 1; index >= 0; index--) {
         const messageEntity = messages[index];
         if (messageEntity.visible()) {
+          const isOwnContentMessage = messageEntity.user().isMe && !messageEntity.isSystem();
           const isReadMessage =
-            messageEntity.timestamp() <= this.last_read_timestamp() ||
-            (messageEntity.user().isMe && !messageEntity.isSystem());
+            messageEntity.timestamp() <= this.effectiveReadTimestamp() ||
+            (isOwnContentMessage && isUndefined(this.manualUnreadTimestamp()));
 
           if (isReadMessage) {
             break;
+          }
+
+          if (isOwnContentMessage) {
+            // Manually marked as unread: own messages are not counted but do not end the unread range
+            continue;
           }
 
           const isMissedCall = messageEntity.isCall() && !messageEntity.wasCompleted();
@@ -638,6 +655,10 @@ export class Conversation {
     });
 
     this.hasUnread = ko.pureComputed(() => {
+      if (isNumber(this.manualUnreadTimestamp())) {
+        return true;
+      }
+
       const isIgnored = this.isRequest() || this.showNotificationsNothing();
       if (isIgnored) {
         return false;
@@ -750,13 +771,13 @@ export class Conversation {
     return {domain: this.domain, id: this.id};
   }
 
-  private hasInitializedUsers() {
+  private hasInitializedUsers(): boolean {
     const hasMappedUsers =
       isNonEmptyArray(this.participating_user_ets()) || isEmptyArray(this.participating_user_ids());
     return !isUndefined(this.selfUser()) && hasMappedUsers;
   }
 
-  private _initSubscriptions() {
+  private _initSubscriptions(): void {
     [
       this.archivedState,
       this.readOnlyState,
@@ -767,6 +788,7 @@ export class Conversation {
       this.isGhostGroup,
       this.last_event_timestamp,
       this.last_read_timestamp,
+      this.manualUnreadTimestamp,
       this.last_server_timestamp,
       this.mutedState,
       this.mutedTimestamp,
@@ -797,6 +819,9 @@ export class Conversation {
    * If there are any incoming messages, they will be moved to the regular messages.
    */
   release(): void {
+    // Leaving the conversation resumes auto-read, a manual unread marker stays until the user reads again
+    this.isAutoReadSuppressed(false);
+
     // If there are no unread messages, we can remove all messages from memory (we will keep the unread messages)
     if (isEmptyArray(this.unreadState().allEvents)) {
       this.removeMessages();
@@ -809,7 +834,7 @@ export class Conversation {
     }
   }
 
-  public isAdmin(userId: QualifiedId) {
+  public isAdmin(userId: QualifiedId): boolean {
     return this.roles()[userId.id] === DefaultConversationRoleName.WIRE_ADMIN;
   }
 
@@ -856,13 +881,39 @@ export class Conversation {
       );
     }
 
-    const updatedTimestamp = forceUpdate ? timestamp : this._incrementTimeOnly(entityTimestamp(), timestamp);
+    const currentTimestamp = entityTimestamp();
+    const updatedTimestamp = forceUpdate ? timestamp : this._incrementTimeOnly(currentTimestamp, timestamp);
+
+    if (type === TIMESTAMP_TYPE.LAST_READ && timestamp > currentTimestamp) {
+      this.clearManualUnreadMarkerIfReadThrough(timestamp);
+    }
 
     if (updatedTimestamp !== false) {
       entityTimestamp(updatedTimestamp);
     }
 
     return updatedTimestamp;
+  }
+
+  /**
+   * Mark the conversation as unread starting at (and including) the given message.
+   * The state is local to this device and does not change the synchronized read timestamp.
+   */
+  markUnreadFrom(message: Message): void {
+    this.manualUnreadTimestamp(message.timestamp());
+    this.isAutoReadSuppressed(true);
+  }
+
+  clearManualUnreadMarker(): void {
+    this.manualUnreadTimestamp(undefined);
+    this.isAutoReadSuppressed(false);
+  }
+
+  clearManualUnreadMarkerIfReadThrough(timestamp: number): void {
+    const manualUnreadTimestamp = this.manualUnreadTimestamp();
+    if (isNumber(manualUnreadTimestamp) && timestamp >= manualUnreadTimestamp) {
+      this.clearManualUnreadMarker();
+    }
   }
 
   /**
@@ -886,10 +937,10 @@ export class Conversation {
       return;
     }
 
-    const messageWithLinkPreview = () => {
+    const messageWithLinkPreview = (): Message => {
       return this._findDuplicate(messageEntity.id, messageEntity.from);
     };
-    const editedMessage = () => {
+    const editedMessage = (): Message | undefined => {
       const replacingMessageId = (messageEntity as ContentMessage).replacing_message_id;
       return replacingMessageId !== undefined ? this._findDuplicate(replacingMessageId, messageEntity.from) : undefined;
     };
@@ -941,7 +992,10 @@ export class Conversation {
     for (let counter = message_ets.length - 1; counter >= 0; counter--) {
       const message_et = message_ets[counter];
       if (message_et?.user()?.isMe) {
-        this.updateTimestamps(message_et);
+        // Loading history must not clear a manual "unread" marker by moving the read timestamp forward
+        if (isUndefined(this.manualUnreadTimestamp())) {
+          this.updateTimestamps(message_et);
+        }
         break;
       }
     }
@@ -1250,6 +1304,8 @@ export class Conversation {
   };
 
   serialize(): ConversationRecord {
+    const manualUnreadTimestamp = this.manualUnreadTimestamp();
+
     return {
       access: this.accessModes ?? [],
       access_role: this.accessRole ?? [],
@@ -1268,6 +1324,7 @@ export class Conversation {
       id: this.id,
       is_guest: this.isGuest(),
       is_ghost_group: this.isGhostGroup(),
+      ...(isNumber(manualUnreadTimestamp) ? {manual_unread_timestamp: manualUnreadTimestamp} : {}),
       last_event_timestamp: this.last_event_timestamp(),
       last_read_timestamp: this.last_read_timestamp(),
       last_server_timestamp: this.last_server_timestamp(),

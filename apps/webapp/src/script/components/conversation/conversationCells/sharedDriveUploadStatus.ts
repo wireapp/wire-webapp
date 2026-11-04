@@ -19,9 +19,9 @@
 
 import {isNan, isNull, isNonEmptyString, isUndefined} from '@sindresorhus/is';
 
-import type {UploadState} from 'Repositories/cells/upload';
-
 import type {SharedDriveUploadController} from './sharedDriveUploadController';
+
+import type {UploadState} from '../../../repositories/cells/upload';
 
 export type SharedDriveUploadStatusKind = 'queued' | 'uploading' | 'uploaded' | 'failed';
 

@@ -43,30 +43,42 @@ const magicNumberOptions = {
 
 const ignores = [
   '.git/',
+  'target/',
+  'config/',
+  'temp/',
   'docs/',
   'bin/',
   '**/node_modules/',
+  '**/.yalc/',
   'apps/webapp/assets/',
   'resource/',
   '**/dist/**',
   '**/build/**',
   '**/coverage/**',
+  '**/test-results/',
+  '**/playwright-report/',
+  '**/blob-report/',
+  '**/playwright/.cache/',
   'apps/webapp/resource/',
   '**/*.config.*',
   'apps/webapp/*.config.*',
+  '!apps/webapp/jest.config.ts',
+  '!apps/webapp/playwright.config.ts',
+  '!apps/webapp/playwright.rspack.config.ts',
   '!apps/webapp/rspack.config.mts',
+  '!apps/webapp/rspack.config.dev.mts',
   '!apps/webapp/rspack.config.public.mts',
+  '!libraries/config/src/client.config.ts',
+  '!libraries/config/src/server.config.ts',
   '!**/*.config.test.*',
   '!**/*.config.spec.*',
   'apps/server/bin/copy_server_assets.js',
-  'apps/server/coverage/',
   'apps/server/dist/',
   'apps/server/node_modules/',
   'apps/webapp/src/ext/',
   'apps/webapp/src/script/localization/**/webapp*.js',
   'apps/webapp/src/worker/',
   'apps/webapp/src/script/components/icon.tsx',
-  'apps/webapp/playwright-report/',
   'libraries/core/lib/',
   'libraries/api-client/lib/',
   'libraries/core/.tmp/',
@@ -87,6 +99,12 @@ const productionFileIgnorePatterns = [
   '**/*.spec.*',
   '**/jest.setup.*',
   'apps/webapp/.copyconfigrc.js',
+  'apps/webapp/jest.config.ts',
+  'apps/webapp/playwright.config.ts',
+  'apps/webapp/playwright.rspack.config.ts',
+  'apps/webapp/rspack.config*.mts',
+  'libraries/config/src/client.config.ts',
+  'libraries/config/src/server.config.ts',
   'libraries/react-ui-kit/emotion.d.ts',
 ];
 
@@ -252,9 +270,9 @@ const webappImportOrderRule = [
     pathGroups: [
       {pattern: 'react', group: 'external', position: 'before'},
       {pattern: '@wireapp/*', group: 'internal', position: 'before'},
-      // One group for all webapp TS path aliases — alphabetize sorts Components/…/Util/…/src/…
+      // Keep the remaining webapp alias in one alphabetized group.
       {
-        pattern: '{apps,Components,Hooks,I18n,Repositories,Resource,src,Util}/**',
+        pattern: 'src/**',
         group: 'internal',
         position: 'after',
       },
@@ -416,7 +434,11 @@ const productionConfigs = [
     },
   },
   {
-    files: ['apps/webapp/rspack.config.mts', 'apps/webapp/rspack.config.public.mts'],
+    files: [
+      'apps/webapp/rspack.config.mts',
+      'apps/webapp/rspack.config.dev.mts',
+      'apps/webapp/rspack.config.public.mts',
+    ],
     languageOptions: {
       parser: tsParser,
       parserOptions: {
@@ -539,6 +561,43 @@ const productionConfigs = [
     },
   },
   {
+    files: ['apps/webapp/jest.config.ts'],
+    languageOptions: {
+      parserOptions: {
+        projectService: {
+          allowDefaultProject: ['apps/webapp/jest.config.ts'],
+        },
+      },
+    },
+  },
+  {
+    files: ['apps/webapp/playwright.config.ts', 'apps/webapp/playwright.rspack.config.ts'],
+    languageOptions: {
+      parserOptions: {
+        project: './apps/webapp/tsconfig.playwright.json',
+        projectService: false,
+      },
+    },
+  },
+  {
+    files: [
+      'tools/buildArtifact/**/*.ts',
+      'tools/development/**/*.ts',
+      'tools/maintenanceRelease/**/*.ts',
+      'tools/productionDistribution/**/*.ts',
+      'tools/releaseSummary/**/*.ts',
+      'tools/runtimeVerification/**/*.ts',
+      'tools/serverPackaging/**/*.ts',
+      'tools/testReporting/**/*.ts',
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: './tsconfig.tools.json',
+        projectService: false,
+      },
+    },
+  },
+  {
     files: ['tools/releaseGithub/**/*.ts'],
     languageOptions: {
       parserOptions: {
@@ -566,7 +625,7 @@ const productionConfigs = [
     },
   },
   {
-    files: ['tools/buildArtifact/**/*.mts', 'tools/runtimeVerification/**/*.mts'],
+    files: ['tools/buildArtifact/**/*.mts', 'tools/configuration/**/*.mts', 'tools/runtimeVerification/**/*.mts'],
     languageOptions: {
       parserOptions: {
         project: './tsconfig.tools.json',
@@ -588,12 +647,10 @@ const productionConfigs = [
   {
     files: [
       'apps/server/**/*.{ts,tsx}',
+      'tools/configuration/**/*.{ts,mts}',
       'libraries/api-client/**/*.{ts,tsx}',
       'libraries/commons/**/*.{ts,tsx}',
-      'libraries/certificate-check/**/*.{ts,tsx}',
       'libraries/core/**/*.{ts,tsx}',
-      'libraries/copy-config/**/*.{ts,tsx}',
-      'libraries/license-collector/**/*.{ts,tsx}',
       'libraries/store-engine/**/*.{ts,tsx}',
       'libraries/store-engine-dexie/**/*.{ts,tsx}',
       'libraries/react-ui-kit/**/*.{ts,tsx}',
@@ -637,7 +694,7 @@ const productionConfigs = [
   {
     files: ['apps/webapp/**/*.{ts,tsx}'],
     rules: {
-      // Webapp path aliases (Util/*, Components/*, …) resolve to lowercase dirs on disk.
+      // Webapp path aliases resolve to lowercase dirs on disk.
       'import/no-unresolved': ['error', {caseSensitive: false}],
       // Pin alias import order so Linux CI and macOS agree on webapp path aliases.
       'import/order': webappImportOrderRule,
@@ -776,6 +833,7 @@ const testTypeScriptFilePatterns = [
   'apps/**/jest.setup.ts',
   'libraries/**/jest.setup.ts',
   'tools/**/*.test.ts',
+  'tools/**/*.test.mts',
 ];
 
 const testTsxFilePatterns = testTypeScriptFilePatterns.map(filePattern => filePattern.replaceAll('.ts', '.tsx'));
@@ -866,6 +924,96 @@ const config = [
   },
   ...productionConfigs,
   {
+    files: ['apps/webapp/jest.config.ts'],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        project: './apps/webapp/tsconfig.eslint.json',
+        projectService: false,
+        tsconfigRootDir: repositoryRootDirectory,
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+      },
+      globals: {
+        ...runtimeGlobals,
+        NodeJS: 'readonly',
+      },
+    },
+  },
+  {
+    files: ['apps/webapp/playwright.config.ts', 'apps/webapp/playwright.rspack.config.ts'],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        project: './apps/webapp/tsconfig.playwright.json',
+        projectService: false,
+        tsconfigRootDir: repositoryRootDirectory,
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+      },
+      globals: {
+        ...runtimeGlobals,
+        NodeJS: 'readonly',
+      },
+    },
+  },
+  {
+    files: [
+      'apps/webapp/rspack.config.mts',
+      'apps/webapp/rspack.config.dev.mts',
+      'apps/webapp/rspack.config.public.mts',
+    ],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        project: './apps/webapp/tsconfig.rspack.json',
+        projectService: false,
+        tsconfigRootDir: repositoryRootDirectory,
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+      },
+      globals: {
+        ...runtimeGlobals,
+        NodeJS: 'readonly',
+      },
+    },
+    rules: {
+      // Rspack's config loader requires default exports for these configuration files.
+      'import/no-default-export': 'off',
+    },
+  },
+  {
+    files: ['libraries/config/src/client.config.ts', 'libraries/config/src/server.config.ts'],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: repositoryRootDirectory,
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+      },
+      globals: {
+        ...runtimeGlobals,
+        NodeJS: 'readonly',
+      },
+    },
+  },
+  {
+    files: ['**/*.{ts,tsx,mts,cts}'],
+    plugins: {
+      '@typescript-eslint': typescriptPlugin,
+    },
+    rules: {
+      '@typescript-eslint/explicit-function-return-type': [
+        'error',
+        {
+          allowExpressions: true,
+          allowTypedFunctionExpressions: true,
+        },
+      ],
+    },
+  },
+  {
     files: ['apps/webapp/**/*.{ts,tsx}'],
     settings: {
       'import-x/resolver-next': webappImportResolvers,
@@ -885,7 +1033,7 @@ const config = [
     },
   },
   {
-    // Webpack needs this computed require to include the selected locale JSON module.
+    // Keep this computed require so the bundler includes the selected locale JSON module.
     files: ['apps/webapp/src/script/auth/page/root.tsx'],
     rules: {
       'import/no-dynamic-require': 'off',

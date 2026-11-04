@@ -17,22 +17,22 @@
  *
  */
 
-import {useCallback, useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useRef, useState, type FunctionComponent} from 'react';
 
 import {Node} from '@wireapp/api-client/lib/cells';
 import {Maybe, result} from 'true-myth';
 import {container} from 'tsyringe';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {removeCurrentModal} from 'Components/Modals/PrimaryModal/PrimaryModalState';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import * as styles from './FileEditor.styles';
 import {validateCollaboraUrl} from './validateCollaboraUrl';
 
+import {CellsRepository} from '../../../repositories/cells/cellsRepository';
+import {TIME_IN_MILLIS} from '../../../util/timeUtil';
+import {PrimaryModal} from '../../Modals/PrimaryModal';
+import {removeCurrentModal} from '../../Modals/PrimaryModal/PrimaryModalState';
 import {FileLoader} from '../FileLoader/FileLoader';
 
 const REFRESH_BUFFER_SECONDS = 10; // Refresh 10 seconds before expiry for safety
@@ -41,7 +41,7 @@ interface FileEditorProps {
   id: string;
 }
 
-export const FileEditor = ({id}: FileEditorProps) => {
+export const FileEditor: FunctionComponent<FileEditorProps> = ({id}: FileEditorProps) => {
   const cellsRepository = container.resolve(CellsRepository);
   const {fireAndForgetInvoker, translate} = useApplicationContext();
   const [node, setNode] = useState<Node | null>(null);

@@ -22,13 +22,14 @@ import {isNonEmptyString} from '@sindresorhus/is';
 import * as telemetry from '@wireapp/telemetry';
 
 import {Config} from 'src/script/Config';
-import {createUuid} from 'Util/uuid';
+
+import {createUuid} from '../../util/uuid';
 
 let telemetryInitialized = false;
 
 const REPORTING_DEVICE_ID = 'REPORTING_DEVICE_ID';
 
-const getDeviceId = () => {
+const getDeviceId = (): string => {
   let deviceId = window.localStorage.getItem(REPORTING_DEVICE_ID);
   if (!isNonEmptyString(deviceId)) {
     deviceId = createUuid();
@@ -57,7 +58,7 @@ export enum PageView {
   ACCOUNT_COMPLETION_SCREEN_4 = 'account_completion_screen_4',
 }
 
-export const isTelemetryEnabled = () => {
+export const isTelemetryEnabled = (): boolean => {
   const {COUNTLY_ENABLE_LOGGING, COUNTLY_API_KEY} = Config.getConfig();
 
   if (!COUNTLY_ENABLE_LOGGING || !isNonEmptyString(COUNTLY_API_KEY) || !telemetry.isLoaded()) {
@@ -67,7 +68,7 @@ export const isTelemetryEnabled = () => {
   return true;
 };
 
-export const initializeTelemetry = () => {
+export const initializeTelemetry = (): void => {
   const {VERSION, COUNTLY_API_KEY, COUNTLY_SERVER_URL} = Config.getConfig();
 
   if (!isTelemetryEnabled()) {
@@ -97,7 +98,7 @@ export const initializeTelemetry = () => {
   });
 };
 
-export const trackTelemetryEvent = (eventName: EventName, segmentation?: SegmentationRecord) => {
+export const trackTelemetryEvent = (eventName: EventName, segmentation?: SegmentationRecord): void => {
   const {VERSION} = Config.getConfig();
 
   if (!telemetryInitialized) {
@@ -116,7 +117,7 @@ export const trackTelemetryEvent = (eventName: EventName, segmentation?: Segment
   telemetry.trackEvent(telemetryEvent);
 };
 
-export const trackTelemetryPageView = (pageView: PageView) => {
+export const trackTelemetryPageView = (pageView: PageView): void => {
   if (!telemetryInitialized) {
     return;
   }
@@ -124,7 +125,7 @@ export const trackTelemetryPageView = (pageView: PageView) => {
   telemetry.trackPageView(pageView);
 };
 
-export const resetTelemetrySession = () => {
+export const resetTelemetrySession = (): void => {
   window.localStorage.removeItem(REPORTING_DEVICE_ID);
   telemetryInitialized = false;
   telemetry.endSession();

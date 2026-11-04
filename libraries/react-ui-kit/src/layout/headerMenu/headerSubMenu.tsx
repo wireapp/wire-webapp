@@ -18,6 +18,7 @@
  */
 
 import * as React from 'react';
+import {type FunctionComponent} from 'react';
 
 import {CSSObject} from '@emotion/react';
 
@@ -64,7 +65,7 @@ const desktopStyledHeaderSubMenuStyle: (theme: Theme, props: DesktopStyledHeader
 
 export const DESKTOP_HEADER_SUB_MENU_CLASSNAME = 'desktopStyledHeaderSubMenu';
 
-export const DesktopStyledHeaderSubMenu = (props: DesktopStyledHeaderSubMenuProps) => {
+export const DesktopStyledHeaderSubMenu: FunctionComponent<DesktopStyledHeaderSubMenuProps> = props => {
   return (
     <div
       className={DESKTOP_HEADER_SUB_MENU_CLASSNAME}
@@ -95,7 +96,7 @@ const mobileStyledHeaderSubMenuStyle: (props: MobileStyledHeaderSubMenuProps) =>
   };
 };
 
-export const MobileStyledHeaderSubMenu = (props: MobileStyledHeaderSubMenuProps) => {
+export const MobileStyledHeaderSubMenu: FunctionComponent<MobileStyledHeaderSubMenuProps> = props => {
   return <span css={mobileStyledHeaderSubMenuStyle(props)} {...props} />;
 };
 

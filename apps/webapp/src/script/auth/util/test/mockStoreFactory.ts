@@ -19,7 +19,7 @@
 
 import type {Clock} from '@enormora/clock/clock';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
-import createMockStore from 'redux-mock-store';
+import createMockStore, {type MockStoreCreator} from 'redux-mock-store';
 import {withExtraArgument} from 'redux-thunk';
 
 import {APIClient} from '@wireapp/api-client';
@@ -34,15 +34,26 @@ interface MockStoreParameters {
   actions?: TypeUtil.RecursivePartial<ActionRoot>;
   apiClient?: TypeUtil.RecursivePartial<APIClient>;
   core?: TypeUtil.RecursivePartial<Account>;
-  getConfig?: () => any;
+  getConfig?: () => MockAuthConfig;
   localStorage?: Storage;
 }
+
+type MockAuthConfig = {
+  APP_INSTANCE_ID: string;
+  FEATURE: {
+    CHECK_CONSENT: boolean;
+    DEFAULT_LOGIN_TEMPORARY_CLIENT: boolean;
+    ENABLE_ACCOUNT_REGISTRATION: boolean;
+    ENABLE_DEBUG: boolean;
+    ENABLE_SSO: boolean;
+  };
+};
 
 const defaultActions = actionRoot;
 const defaultClient = new APIClient({urls: APIClient.BACKEND.STAGING});
 const defaultCore = new Account(defaultClient);
 const defaultLocalStorage = window.localStorage;
-const defaultGetConfig = () => {
+const defaultGetConfig = (): MockAuthConfig => {
   return {
     APP_INSTANCE_ID: 'app-id',
     FEATURE: {
@@ -63,7 +74,7 @@ export const mockStoreFactory = (
     getConfig: defaultGetConfig,
     localStorage: defaultLocalStorage,
   },
-) => {
+): MockStoreCreator<TypeUtil.RecursivePartial<RootState>, ThunkDispatch> => {
   const {
     actions,
     apiClient,

@@ -93,7 +93,7 @@ const isImageAsset = (contentType: string, infoObject: unknown): infoObject is I
  * @param infoObject
  * @returns metadata for the asset
  */
-export const buildMetaData = (contentType: string, infoObject: unknown, metaObject: unknown) => {
+export const buildMetaData = (contentType: string, infoObject: unknown, metaObject: unknown): AssetMetaData | null => {
   let metaData: AssetMetaData | null;
 
   if (isAudioAsset(contentType, metaObject)) {

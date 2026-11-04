@@ -24,9 +24,9 @@ export const useClickOutside = (
   onClick: (e: MouseEvent) => void,
   exclude?: RefObject<Element | null>,
   windowDocument = window.document,
-) => {
+): void => {
   useEffect(() => {
-    const handleClick = (event: MouseEvent) => {
+    const handleClick = (event: MouseEvent): void => {
       const isOutsideClick =
         ref.current !== null && ref.current !== event.target && !ref.current.contains(event.target as Node);
       if (isOutsideClick) {

@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {ViewerAccessIcon} from '@wireapp/react-ui-kit';
 
 import {viewerAccessLabelStyles} from './cellsViewerAccessLabel.styles';
@@ -26,7 +28,10 @@ interface CellsViewerAccessLabelProps {
   iconUieName?: string;
 }
 
-export const CellsViewerAccessLabel = ({label, iconUieName}: CellsViewerAccessLabelProps) => {
+export const CellsViewerAccessLabel: FunctionComponent<CellsViewerAccessLabelProps> = ({
+  label,
+  iconUieName,
+}: CellsViewerAccessLabelProps) => {
   return (
     <div css={viewerAccessLabelStyles}>
       <span data-uie-name={iconUieName} aria-hidden="true">

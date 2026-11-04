@@ -17,7 +17,9 @@
  *
  */
 
-export const WavesPattern = () => {
+import type {FunctionComponent} from 'react';
+
+export const WavesPattern: FunctionComponent = () => {
   return (
     <svg
       css={{

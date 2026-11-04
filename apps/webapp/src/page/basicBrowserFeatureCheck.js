@@ -20,7 +20,7 @@
 /*
  * This file cannot be converted to TS!
  *
- * Since we are using `sourceMap` for both development and production, `webpack`
+ * Since we are using `sourceMap` for both development and production, `Rspack`
  * wraps any compiled JS with additional code, which can already break in the oldest
  * browsers (for instance, `globalThis`).
  *

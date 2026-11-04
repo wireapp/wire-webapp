@@ -17,17 +17,18 @@
  *
  */
 
-import {render} from '@testing-library/react';
+import {render, type RenderResult} from '@testing-library/react';
+import {Maybe} from 'true-myth';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
-import {CELLS_SELF_USER_DRIVE_ROLE} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
+import {CELLS_SELF_USER_DRIVE_ROLE} from '../../../../conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {CellFile, CellNodeType} from 'src/script/types/cellNode';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../../util/test/translateForTest';
 
 import {CellsTableNameColumn} from './cellsTableNameColumn';
 
@@ -42,6 +43,7 @@ const file: CellFile = {
   name: 'file.pdf',
   extension: 'pdf',
   sizeMb: '1 MB',
+  sizeBytes: Maybe.nothing(),
   uploadedAtTimestamp: 1700000000000,
   owner: 'John Doe',
   conversationName: 'Marketing Team',
@@ -58,7 +60,7 @@ const renderNameColumn = ({
   selfUserDriveRole = CELLS_SELF_USER_DRIVE_ROLE.VIEWER,
 }: {
   selfUserDriveRole?: CellFile['selfUserDriveRole'];
-} = {}) => {
+} = {}): RenderResult => {
   const portalRoot = document.createElement('div');
   portalRoot.id = 'wire-app';
   document.body.append(portalRoot);

@@ -17,16 +17,21 @@
  *
  */
 
-import {CloseIcon} from 'Components/icon';
+import type {FunctionComponent} from 'react';
+
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {buttonStyles, iconStyles} from './filePreviewDeleteButton.styles';
+
+import {CloseIcon} from '../../../../icon';
 
 interface FilePreviewDeleteButtonProps {
   onDelete: () => void;
 }
 
-export const FilePreviewDeleteButton = ({onDelete}: FilePreviewDeleteButtonProps) => {
+export const FilePreviewDeleteButton: FunctionComponent<FilePreviewDeleteButtonProps> = ({
+  onDelete,
+}: FilePreviewDeleteButtonProps) => {
   const {translate} = useApplicationContext();
   const label = translate('conversationFilePreviewDeleteButtonLabel');
   return (

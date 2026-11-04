@@ -17,15 +17,15 @@
  *
  */
 
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState, type FunctionComponent} from 'react';
 
 import {isNan, isNull, isUndefined} from '@sindresorhus/is';
 import cx from 'classnames';
 
-import {FileAsset} from 'Repositories/entity/message/fileAsset';
-import {interpolate} from 'Util/arrayUtil';
-import {clamp} from 'Util/numberUtil';
-import {createUuid} from 'Util/uuid';
+import {FileAsset} from '../../../../../../../repositories/entity/message/fileAsset';
+import {interpolate} from '../../../../../../../util/arrayUtil';
+import {clamp} from '../../../../../../../util/numberUtil';
+import {createUuid} from '../../../../../../../util/uuid';
 
 const audioLevelValueCount = 256;
 const audioBarSlotWidth = 3;
@@ -39,7 +39,7 @@ interface AudioSeekBarProps {
   disabled: boolean;
 }
 
-const AudioSeekBar = ({asset, audioElement, disabled}: AudioSeekBarProps) => {
+const AudioSeekBar: FunctionComponent<AudioSeekBarProps> = ({asset, audioElement, disabled}: AudioSeekBarProps) => {
   const [svgWidth, setSvgWidth] = useState(0);
   const [path, setPath] = useState('');
   const [loudness, setLoudness] = useState<number[]>([]);
@@ -98,11 +98,11 @@ const AudioSeekBar = ({asset, audioElement, disabled}: AudioSeekBarProps) => {
     setPath(newPath);
   }, [svgWidth]);
 
-  const updateSvgWidth = () => {
+  const updateSvgWidth = (): void => {
     return setSvgWidth(svgNode.current?.clientWidth ?? 0);
   };
 
-  const onLevelClick = (event: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
+  const onLevelClick = (event: React.MouseEvent<SVGSVGElement, MouseEvent>): void => {
     if (isNull(svgNode.current)) {
       return;
     }
@@ -114,11 +114,11 @@ const AudioSeekBar = ({asset, audioElement, disabled}: AudioSeekBarProps) => {
     onTimeUpdate();
   };
 
-  const onAudioEnded = () => {
+  const onAudioEnded = (): void => {
     return setPosition(0);
   };
 
-  const onTimeUpdate = () => {
+  const onTimeUpdate = (): void => {
     if (audioElement.duration !== 0 && !isNan(audioElement.duration)) {
       setPosition(audioElement.currentTime / audioElement.duration);
     }

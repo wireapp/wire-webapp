@@ -17,15 +17,20 @@
  *
  */
 
-import * as Icon from 'Components/icon';
+import type {FunctionComponent} from 'react';
+
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {handleKeyDown, KEY} from 'Util/keyboardUtil';
+
+import {handleKeyDown, KEY} from '../../../../util/keyboardUtil';
+import * as Icon from '../../../icon';
 
 interface VideoCallCancelButtonProps {
   onAction: () => void;
 }
 
-export const VideoCallCancelButton = ({onAction}: VideoCallCancelButtonProps) => {
+export const VideoCallCancelButton: FunctionComponent<VideoCallCancelButtonProps> = ({
+  onAction,
+}: VideoCallCancelButtonProps) => {
   const {translate} = useApplicationContext();
 
   return (

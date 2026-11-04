@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {CSSObject} from '@emotion/react';
 
 import {TextProps} from '../../typography';
@@ -45,10 +47,10 @@ export const menuContentStyle: <T>(props: MenuContentProps<T>) => CSSObject = pr
   };
 };
 
-const filterMenuContentProps = (props: MenuContentProps) => {
+const filterMenuContentProps = (props: MenuContentProps): Object => {
   return filterProps(props, ['open']);
 };
 
-export const MenuContent = (props: MenuContentProps) => {
+export const MenuContent: FunctionComponent<MenuContentProps> = props => {
   return <div css={menuContentStyle(props)} {...filterMenuContentProps(props)} />;
 };

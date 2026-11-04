@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {SortAscendingIcon, SortDescendingIcon, SortNeutralIcon} from '@wireapp/react-ui-kit';
 
 import {sortIconStyles} from './cellsSortIcon.styles';
@@ -36,7 +38,7 @@ interface CellsSortIconProps {
   direction?: CellsSortDirection;
 }
 
-export const CellsSortIcon = ({direction}: CellsSortIconProps) => {
+export const CellsSortIcon: FunctionComponent<CellsSortIconProps> = ({direction}: CellsSortIconProps) => {
   const sortState = direction ?? DEFAULT_SORT_STATE;
   const SortIcon = SORT_ICON_BY_STATE[sortState];
 

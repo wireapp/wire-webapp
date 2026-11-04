@@ -59,6 +59,7 @@ import {AccountService} from './account/';
 import {LoginSanitizer} from './auth/';
 import {BroadcastService} from './broadcast/';
 import {ClientInfo, ClientService} from './client/';
+import type {MetaClient} from './client/clientService';
 import {ConnectionService} from './connection/';
 import {ConnectionState} from './connectionState/connectionState';
 import {AssetService, ConversationService} from './conversation/';
@@ -87,7 +88,11 @@ import {
 import {CoreCallbacks, SecretCrypto} from './messagingProtocols/mls/types';
 import {NewClient, ProteusService} from './messagingProtocols/proteus';
 import {CryptoClientType} from './messagingProtocols/proteus/proteusService/cryptoClient';
-import {wipeCoreCryptoDb} from './messagingProtocols/proteus/proteusService/cryptoClient/coreCryptoWrapper';
+import {
+  wipeCoreCryptoDb,
+  CoreCryptoWrapper,
+} from './messagingProtocols/proteus/proteusService/cryptoClient/coreCryptoWrapper';
+import type {CryptoboxWrapper} from './messagingProtocols/proteus/proteusService/cryptoClient/cryptoboxWrapper';
 import {deleteIdentity} from './messagingProtocols/proteus/proteusService/identityClearer';
 import {HandledEventPayload, NotificationService, NotificationSource} from './notification/';
 import {createFlushableQueue, isQueueFlushedError} from './queue/flushableQueue';
@@ -100,6 +105,9 @@ import {TeamService} from './team/';
 import {UserService} from './user/';
 import {LocalStorageStore} from './util/localStorageStore';
 import {RecurringTaskScheduler} from './util/recurringTaskScheduler';
+
+type CryptoClientWithProtocol =
+  readonly [CryptoClientType.CORE_CRYPTO, CoreCryptoWrapper] | readonly [CryptoClientType.CRYPTOBOX, CryptoboxWrapper];
 
 const defaultCertificateLifetimeInDays = 90;
 
@@ -281,7 +289,7 @@ export class Account extends TypedEventEmitter<Events> {
    *   - useVersion(0, 1, true) > version 1 is used
    * @return The highest version that is both supported by client and backend
    */
-  public useAPIVersion = async (min: number, max: number, allowDev?: boolean) => {
+  public useAPIVersion = async (min: number, max: number, allowDev?: boolean): Promise<BackendFeatures> => {
     const features = await this.apiClient.useVersion(min, max, allowDev);
     this.backendFeatures = features;
     return features;
@@ -314,7 +322,7 @@ export class Account extends TypedEventEmitter<Events> {
     getAllConversations: getAllConversationsCallback;
     /** number of seconds the certificate should be valid (default 90 days) */
     certificateTtl?: number;
-  }) => {
+  }): Promise<void> => {
     const context = this.apiClient.context;
     const domain = context?.domain ?? '';
 
@@ -429,7 +437,7 @@ export class Account extends TypedEventEmitter<Events> {
     return client;
   };
 
-  public getLocalClient() {
+  public getLocalClient(): Promise<MetaClient | undefined> | undefined {
     return this.service?.client.loadClient();
   }
 
@@ -438,7 +446,7 @@ export class Account extends TypedEventEmitter<Events> {
    *
    * @returns The local existing client or undefined if the client does not exist or is not valid (non existing on backend)
    */
-  public initClient = async (client: RegisteredClient, mlsConfig?: InitClientOptions) => {
+  public initClient = async (client: RegisteredClient, mlsConfig?: InitClientOptions): Promise<RegisteredClient> => {
     if (this.service === undefined || this.apiClient.context === undefined || this.storeEngine === undefined) {
       throw new Error('Services are not set.');
     }
@@ -468,7 +476,7 @@ export class Account extends TypedEventEmitter<Events> {
     context: Context,
     storeEngine: CRUDEngine,
     encryptedStore: EncryptedStore,
-  ) => {
+  ): Promise<CryptoClientWithProtocol> => {
     const baseConfig = {
       nbPrekeys: this.options.nbPrekeys,
       onNewPrekeys: async (prekeys: PreKey[]) => {
@@ -511,7 +519,7 @@ export class Account extends TypedEventEmitter<Events> {
    * - what is the groupId of a conversation
    * @param coreCallbacks
    */
-  configureCoreCallbacks = (coreCallbacks: CoreCallbacks) => {
+  configureCoreCallbacks = (coreCallbacks: CoreCallbacks): void => {
     this.coreCallbacks = coreCallbacks;
   };
 
@@ -1037,7 +1045,7 @@ export class Account extends TypedEventEmitter<Events> {
     };
   };
 
-  private readonly handleNotificationQueueError = (error: unknown) => {
+  private readonly handleNotificationQueueError = (error: unknown): void => {
     if (!(error instanceof Error)) {
       throw error;
     }
@@ -1052,7 +1060,9 @@ export class Account extends TypedEventEmitter<Events> {
     }
   };
 
-  private readonly acknowledgeSynchronizationNotification = (notification: ConsumableNotificationSynchronization) => {
+  private readonly acknowledgeSynchronizationNotification = (
+    notification: ConsumableNotificationSynchronization,
+  ): void => {
     this.apiClient.transport.ws.acknowledgeConsumableNotificationSynchronization(notification);
   };
 
@@ -1081,7 +1091,7 @@ export class Account extends TypedEventEmitter<Events> {
     notification: ConsumableNotificationSynchronization,
     onConnectionStateChanged: (state: ConnectionState) => void,
     connectionContext: WebSocketConnectionContext | undefined,
-  ) => {
+  ): Promise<void> => {
     const markerId = notification.data.marker_id;
     const currentMarkerId = this.apiClient.transport.http.accessTokenStore.markerToken;
     const markerPresent = Boolean(markerId);
@@ -1160,7 +1170,7 @@ export class Account extends TypedEventEmitter<Events> {
     }
   };
 
-  public getNotificationEventTime = (backendEvent: Events.BackendEvent) => {
+  public getNotificationEventTime = (backendEvent: Events.BackendEvent): string | null => {
     if ('time' in backendEvent && typeof backendEvent.time === 'string') {
       return backendEvent.time;
     }
@@ -1274,18 +1284,18 @@ export class Account extends TypedEventEmitter<Events> {
    * they will be resent next time the connection is opened
    * this is to avoid duplicate decryption of notifications
    */
-  private readonly pauseAndFlushNotificationQueue = () => {
+  private readonly pauseAndFlushNotificationQueue = (): void => {
     this.notificationProcessingQueue.queue.pause();
     this.notificationProcessingQueue.flush();
     this.logger.info('Notification processing queue paused and flushed');
   };
 
-  public readonly pauseNotificationQueue = () => {
+  public readonly pauseNotificationQueue = (): void => {
     this.notificationProcessingQueue.queue.pause();
     this.logger.info('Notification processing queue paused');
   };
 
-  public readonly resumeNotificationQueue = () => {
+  public readonly resumeNotificationQueue = (): void => {
     this.notificationProcessingQueue.queue.start();
     this.logger.info('Notification processing queue resumed');
   };
@@ -1302,7 +1312,7 @@ export class Account extends TypedEventEmitter<Events> {
     handleNotification: (notification: ConsumableNotification, source: NotificationSource) => Promise<void>,
     handleLegacyNotification: (notification: Notification, source: NotificationSource) => Promise<void>,
     useLegacy: boolean,
-  ) => {
+  ): void => {
     this.logger.info('Setting up WebSocket listeners');
     this.apiClient.transport.ws.removeAllListeners(WebSocketClient.TOPIC.ON_MESSAGE);
 
@@ -1358,7 +1368,7 @@ export class Account extends TypedEventEmitter<Events> {
    * the WebSocket transport, unblocking the backend so it resumes sending updates
    * then we remove the flag.
    */
-  private readonly reactToMissedNotification = () => {
+  private readonly reactToMissedNotification = (): void => {
     this.logger.info('Reacting to missed notification from consumable async websocket');
     const localStorageKey = 'has_missing_notification';
 
@@ -1376,7 +1386,7 @@ export class Account extends TypedEventEmitter<Events> {
     AccountLocalStorageStore.remove(localStorageKey);
   };
 
-  public getClientCapabilities = () => {
+  public getClientCapabilities = (): ClientCapability[] => {
     return this.currentClient?.capabilities ?? [];
   };
 
@@ -1392,23 +1402,23 @@ export class Account extends TypedEventEmitter<Events> {
     return !Account.checkIsConsumable(notification);
   };
 
-  private readonly generateDbName = (context: Context) => {
+  private readonly generateDbName = (context: Context): string => {
     const clientType = context.clientType === ClientType.NONE ? '' : `@${context.clientType}`;
     return `wire@${this.apiClient.config.urls.name}@${context.userId}${clientType}`;
   };
 
-  private readonly generateCoreDbName = (context: Context) => {
+  private readonly generateCoreDbName = (context: Context): string => {
     return `core-${this.generateDbName(context)}`;
   };
 
-  private readonly generateEncryptedDbName = (context: Context) => {
+  private readonly generateEncryptedDbName = (context: Context): string => {
     return `secrets-${this.generateDbName(context)}`;
   };
 
   private readonly initEngine = async (context: Context, encryptedStore: EncryptedStore): Promise<CRUDEngine> => {
     const dbName = this.generateDbName(context);
     this.logger.debug(`Initialising store with name "${dbName}"...`);
-    const openDb = async () => {
+    const openDb = async (): Promise<CRUDEngine | MemoryEngine> => {
       const dbKey = await generateSecretKey({keyId: 'db-key', keySize: 32, secretsDb: encryptedStore});
       const initializedDb = await this.options.createStore?.(dbName, dbKey.key);
       if (initializedDb !== undefined) {
@@ -1456,7 +1466,7 @@ export class Account extends TypedEventEmitter<Events> {
     return commonConfig[FEATURE_KEY.MLS]?.status === FEATURE_STATUS.ENABLED;
   };
 
-  private readonly isMLSConversationRecoveryEnabled = async () => {
+  private readonly isMLSConversationRecoveryEnabled = async (): Promise<boolean> => {
     const commonConfig = (await this.service?.team.getCommonFeatureConfig()) ?? {};
     return commonConfig[FEATURE_KEY.ALLOWED_GLOBAL_OPERATIONS]?.config?.mlsConversationReset === true;
   };

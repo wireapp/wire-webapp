@@ -30,7 +30,7 @@ interface OpenBreadcrumbParams {
   event?: ReactMouseEvent<Element, MouseEvent>;
 }
 
-export const openBreadcrumb = ({conversationQualifiedId, path, event}: OpenBreadcrumbParams) => {
+export const openBreadcrumb = ({conversationQualifiedId, path, event}: OpenBreadcrumbParams): void => {
   createNavigate(
     generateConversationUrl({
       id: conversationQualifiedId.id,

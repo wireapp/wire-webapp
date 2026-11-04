@@ -10,7 +10,7 @@ set -euo pipefail
 script_directory="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 if [[ "${PRODUCTION_TAG}" == v* ]]; then
-  node ./tools/releaseCli/releaseMetadataCli.mts validate-webapp-production-tag "${PRODUCTION_TAG}" >/dev/null
+  node "${script_directory}/../releaseCli/releaseMetadataCli.mts" validate-webapp-production-tag "${PRODUCTION_TAG}" >/dev/null
 elif [[ ! "${PRODUCTION_TAG}" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}\.[1-9][0-9]*-production$ ]]; then
   echo "Production tag must be YYYY-MM-DD.N-production or a stable WebApp SemVer tag: ${PRODUCTION_TAG}" >&2
   exit 1
@@ -47,13 +47,10 @@ for required_context_path in \
   "${DISTRIBUTION_CONTEXT_PATH}/apps/server/dist" \
   "${DISTRIBUTION_CONTEXT_PATH}/libraries/config/lib" \
   "${DISTRIBUTION_CONTEXT_PATH}/package.json" \
-  "${DISTRIBUTION_CONTEXT_PATH}/yarn.lock" \
-  "${DISTRIBUTION_CONTEXT_PATH}/.yarnrc.yml" \
   "${DISTRIBUTION_CONTEXT_PATH}/.npmrc" \
-  "${DISTRIBUTION_CONTEXT_PATH}/.yarn" \
-  "${DISTRIBUTION_CONTEXT_PATH}/bin/yarn" \
   "${DISTRIBUTION_CONTEXT_PATH}/apps/server/package.json" \
   "${DISTRIBUTION_CONTEXT_PATH}/libraries/config/package.json" \
+  "${DISTRIBUTION_CONTEXT_PATH}/package-lock.json" \
   "${DISTRIBUTION_CONTEXT_PATH}/run.sh" \
   "${DISTRIBUTION_CONTEXT_PATH}/.env.defaults"; do
   if [[ ! -e "${required_context_path}" ]]; then

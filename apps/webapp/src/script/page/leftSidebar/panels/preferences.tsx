@@ -17,26 +17,27 @@
  *
  */
 
-import React, {useEffect} from 'react';
+import React, {useEffect, type FunctionComponent} from 'react';
 
 import {amplify} from 'amplify';
 
 import {Runtime} from '@wireapp/commons';
 import {TabIndex} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
-import * as Icon from 'Components/icon';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {
-  ClientNotificationData,
-  Notification,
-  PreferenceNotificationRepository,
-} from 'Repositories/notification/PreferenceNotificationRepository';
-import {TeamRepository} from 'Repositories/team/TeamRepository';
+import {troubleshooterFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {ListWrapper} from './listWrapper';
 
+import * as Icon from '../../../components/icon';
+import {PrimaryModal} from '../../../components/Modals/PrimaryModal';
+import {
+  ClientNotificationData,
+  Notification,
+  PreferenceNotificationRepository,
+} from '../../../repositories/notification/PreferenceNotificationRepository';
+import {TeamRepository} from '../../../repositories/team/TeamRepository';
+import {WebAppEvents} from '../../../webAppEvents';
 import {ContentState, useAppState} from '../../useAppState';
 
 type PreferencesProps = {
@@ -58,7 +59,7 @@ const showNotification = (
   type: string,
   aggregatedNotifications: Notification[],
   translate: ReturnType<typeof useApplicationContext>['translate'],
-) => {
+): void => {
   switch (type) {
     case PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT: {
       PrimaryModal.show(
@@ -97,7 +98,13 @@ const showNotification = (
 
 const NEW_DEVICE_NOTIFICATION_STATES = [ContentState.PREFERENCES_ACCOUNT, ContentState.PREFERENCES_DEVICES];
 
-const PreferenceItem = ({onSelect, isSelected, label, uieName, IconComponent}: PreferencesItemProps) => {
+const PreferenceItem: FunctionComponent<PreferencesItemProps> = ({
+  onSelect,
+  isSelected,
+  label,
+  uieName,
+  IconComponent,
+}: PreferencesItemProps) => {
   return (
     <li
       role="tab"
@@ -121,13 +128,13 @@ const PreferenceItem = ({onSelect, isSelected, label, uieName, IconComponent}: P
   );
 };
 
-const Preferences = ({
+const Preferences: FunctionComponent<PreferencesProps> = ({
   teamRepository,
   preferenceNotificationRepository,
   onPreferenceItemClick,
   onClose,
 }: PreferencesProps) => {
-  const {translate} = useApplicationContext();
+  const {translate, isFeatureToggleEnabled} = useApplicationContext();
   const contentState = useAppState(state => {
     return state.contentState;
   });
@@ -172,6 +179,13 @@ const Preferences = ({
       id: ContentState.PREFERENCES_AV,
       label: translate('preferencesAV'),
       uieName: 'go-audio-video',
+    },
+    {
+      IconComponent: Icon.NetworkIcon,
+      hidden: !isFeatureToggleEnabled(troubleshooterFeatureToggleName),
+      id: ContentState.PREFERENCES_TROUBLESHOOTING,
+      label: translate('preferencesTroubleshooting'),
+      uieName: 'go-troubleshooting',
     },
     {
       IconComponent: Icon.AboutIcon,

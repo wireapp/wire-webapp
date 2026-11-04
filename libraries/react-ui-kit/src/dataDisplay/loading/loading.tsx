@@ -18,6 +18,7 @@
  */
 
 import * as React from 'react';
+import {type FunctionComponent} from 'react';
 
 import {keyframes} from '@emotion/react';
 import {isUndefined} from '@sindresorhus/is';
@@ -33,7 +34,12 @@ export interface LoadingProps<T = SVGSVGElement> extends React.SVGProps<T> {
   size?: number;
 }
 
-export const Loading = ({progress = undefined, size = 43, color = '#218fd1', ...props}: LoadingProps) => {
+export const Loading: FunctionComponent<LoadingProps> = ({
+  progress = undefined,
+  size = 43,
+  color = '#218fd1',
+  ...props
+}) => {
   const pathLength = 125.68;
   const rotationOffset = -0.75;
   const rotationDelay = DURATION.EXTRA_LONG * rotationOffset;

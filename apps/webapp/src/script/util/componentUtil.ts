@@ -30,6 +30,7 @@ type SubscribableValue<T> = T extends {(): infer Value} ? Value : never;
 type UnwrappedValues<T, S = Subscribables<T>> = {
   [Key in keyof S]: SubscribableValue<S[Key]>;
 };
+type SubscribableDisposal = {dispose: () => void};
 
 const resolveObservables = <C extends keyof Subscribables<P>, P extends Partial<Record<C, ko.Subscribable>>>(
   object: P,
@@ -57,7 +58,7 @@ const subscribeProperties = <C extends keyof Subscribables<P>, P extends Partial
   object: P,
   onUpdate: (updates: Partial<UnwrappedValues<Pick<P, C>>>) => void,
   children?: C[],
-) => {
+): SubscribableDisposal => {
   const properties =
     children ??
     (Object.keys(object).filter(key => {

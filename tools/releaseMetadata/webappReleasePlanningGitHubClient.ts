@@ -37,6 +37,7 @@ export type WebAppReleasePlanningPullRequest = {
   readonly title: string;
   readonly baseBranch: string;
   readonly mergedAt: Maybe<string>;
+  readonly mergeCommitSha: Maybe<string>;
   readonly labels: readonly string[];
 };
 
@@ -66,6 +67,11 @@ const githubPullRequestResponseSchema = z.object({
   number: z.number().int().positive(),
   title: z.string().min(1),
   merged_at: z.string().min(1).nullable(),
+  merge_commit_sha: z
+    .string()
+    .regex(/^[0-9a-f]{40}$/i)
+    .nullable()
+    .optional(),
   base: z.object({
     ref: z.string().min(1),
   }),
@@ -98,6 +104,9 @@ function parsePullRequestPage(githubResponse: unknown): Result<ParsedPullRequest
       title: pullRequest.title,
       baseBranch: pullRequest.base.ref,
       mergedAt: Maybe.of(pullRequest.merged_at),
+      mergeCommitSha: Maybe.of(pullRequest.merge_commit_sha).map(mergeCommitSha => {
+        return mergeCommitSha.toLowerCase();
+      }),
       labels: pullRequest.labels.map(label => {
         return label.name;
       }),

@@ -36,7 +36,7 @@ export class ValidationError extends Error {
     this.label = label;
   }
 
-  is = (label: string) => {
+  is = (label: string): boolean => {
     return this.label === label;
   };
 

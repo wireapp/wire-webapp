@@ -22,18 +22,21 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {randomUUID} from 'crypto';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {TeamState} from 'Repositories/team/TeamState';
-import {UserState} from 'Repositories/user/userState';
+import {Conversation} from '../entity/Conversation';
+import {TeamState} from '../team/TeamState';
+import {UserState} from '../user/userState';
 
 import {ConversationState} from './ConversationState';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 
-function createConversationState() {
+function createConversationState(): ConversationState {
   return new ConversationState(new UserState(), new TeamState());
 }
 
-function createConversation(protocol: CONVERSATION_PROTOCOL = CONVERSATION_PROTOCOL.PROTEUS, type?: CONVERSATION_TYPE) {
+function createConversation(
+  protocol: CONVERSATION_PROTOCOL = CONVERSATION_PROTOCOL.PROTEUS,
+  type?: CONVERSATION_TYPE,
+): Conversation {
   const conversation = new Conversation(randomUUID(), '', protocol, translateForTest);
   if (protocol === CONVERSATION_PROTOCOL.MLS) {
     conversation.groupId = `groupid-${randomUUID()}`;
@@ -108,6 +111,19 @@ describe('ConversationState', () => {
       expect(conversationState.conversations()).toHaveLength(2);
       expect(conversationState.visibleConversations()).toEqual([regularConversation]);
       expect(conversationState.findConversation(meetingConversation.qualifiedId)).toBe(meetingConversation);
+    });
+
+    it('includes a manually unread conversation without incoming unread messages', () => {
+      const conversationState = createConversationState();
+      const conversation = createConversation();
+      conversationState.conversations([conversation]);
+
+      expect(conversationState.unreadConversations()).toEqual([]);
+
+      conversation.manualUnreadTimestamp(123);
+
+      expect(conversation.unreadState().allMessages).toEqual([]);
+      expect(conversationState.unreadConversations()).toEqual([conversation]);
     });
   });
 

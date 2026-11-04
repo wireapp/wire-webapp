@@ -17,16 +17,18 @@
  *
  */
 
-import {MessagesList} from 'Components/messagesList/messageList';
-import {MessagesListParams} from 'Components/messagesList/messageList.types';
+import type {FunctionComponent} from 'react';
 
+import {MessagesList} from './messageList';
+import {MessagesListParams} from './messageList.types';
 import {VirtualizedMessageListWrapper} from './virtualizedMessageListWrapper';
 
 import {Config} from '../../Config';
 
-export const MessageListWrapper = ({
+export const MessageListWrapper: FunctionComponent<MessagesListParams> = ({
   assetRepository,
   conversation,
+  cancelPendingReadReceiptsForConversation,
   selfUser,
   conversationRepository,
   messageRepository,
@@ -55,6 +57,7 @@ export const MessageListWrapper = ({
     return (
       <VirtualizedMessageListWrapper
         conversation={conversation}
+        cancelPendingReadReceiptsForConversation={cancelPendingReadReceiptsForConversation}
         selfUser={selfUser}
         conversationRepository={conversationRepository}
         assetRepository={assetRepository}
@@ -84,6 +87,7 @@ export const MessageListWrapper = ({
   return (
     <MessagesList
       conversation={conversation}
+      cancelPendingReadReceiptsForConversation={cancelPendingReadReceiptsForConversation}
       selfUser={selfUser}
       conversationRepository={conversationRepository}
       assetRepository={assetRepository}

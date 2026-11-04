@@ -17,12 +17,10 @@
  *
  */
 
-import {useEffect, useRef} from 'react';
+import {useEffect, useRef, type FunctionComponent} from 'react';
 
 import {ChevronIcon} from '@wireapp/react-ui-kit';
 
-import {MeetingNotificationCard} from 'Components/meeting/meetingNotificationCard/meetingNotificationCard';
-import {useMeetingNotificationStore} from 'Components/meeting/meetingNotificationStore/meetingNotificationStore';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {
@@ -37,11 +35,16 @@ import {
   meetingNotificationHostStyles,
 } from './meetingNotificationHost.styles';
 
+import {MeetingNotificationCard} from '../meetingNotificationCard/meetingNotificationCard';
+import {useMeetingNotificationStore} from '../meetingNotificationStore/meetingNotificationStore';
+
 type MeetingNotificationHostProps = {
   isStandalone: boolean;
 };
 
-export const MeetingNotificationHost = ({isStandalone}: MeetingNotificationHostProps) => {
+export const MeetingNotificationHost: FunctionComponent<MeetingNotificationHostProps> = ({
+  isStandalone,
+}: MeetingNotificationHostProps) => {
   const {translate} = useApplicationContext();
   const notifications = useMeetingNotificationStore(state => {
     return state.notifications;
@@ -56,7 +59,7 @@ export const MeetingNotificationHost = ({isStandalone}: MeetingNotificationHostP
       return;
     }
 
-    const collapseWhenClickedOutside = (event: MouseEvent) => {
+    const collapseWhenClickedOutside = (event: MouseEvent): void => {
       const target = event.target;
       const isInsideNotificationHost =
         target instanceof Node &&

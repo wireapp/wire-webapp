@@ -17,9 +17,11 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
-export const PlusIcon = (props: SVGIconProps) => {
+export const PlusIcon: FunctionComponent<SVGIconProps> = props => {
   return (
     <SVGIcon realWidth={16} realHeight={16} {...props}>
       <path d="M0 7v2h7v7h2V9h7V7H9V0H7v7z" />

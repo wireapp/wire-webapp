@@ -19,8 +19,7 @@
 
 import {forwardRef} from 'react';
 
-import * as Icon from 'Components/icon';
-
+import * as Icon from '../../../icon';
 import {removeCurrentModal} from '../PrimaryModalState';
 
 interface ModalHeaderProps {

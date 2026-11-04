@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode} from 'react';
+import {ReactNode, type FunctionComponent} from 'react';
 
 import {CloseIcon, IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
 
@@ -31,7 +31,7 @@ interface CellsModalHeaderProps {
   children: ReactNode;
 }
 
-export const CellsModalHeader = ({children}: CellsModalHeaderProps) => {
+export const CellsModalHeader: FunctionComponent<CellsModalHeaderProps> = ({children}: CellsModalHeaderProps) => {
   const {onClose} = useCellsModal();
   const {translate} = useApplicationContext();
 

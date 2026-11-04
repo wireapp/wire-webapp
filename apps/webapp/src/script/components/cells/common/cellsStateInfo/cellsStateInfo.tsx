@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {SearchIcon} from '@wireapp/react-ui-kit';
 
 import {
@@ -45,7 +47,11 @@ type SearchCellsStateInfoProps = {
 
 type CellsStateInfoProps = DefaultCellsStateInfoProps | SearchCellsStateInfoProps;
 
-export const CellsStateInfo = ({heading, description, variant = 'default'}: CellsStateInfoProps) => {
+export const CellsStateInfo: FunctionComponent<CellsStateInfoProps> = ({
+  heading,
+  description,
+  variant = 'default',
+}: CellsStateInfoProps) => {
   if (variant === 'search') {
     return (
       <div css={searchStateWrapperStyles} role="status">

@@ -17,11 +17,12 @@
  *
  */
 
-import * as Icon from 'Components/icon';
+import type {FunctionComponent} from 'react';
 
+import * as Icon from '../../../../../components/icon';
 import {SidebarStatus, useSidebarStore} from '../useSidebarStore';
 
-export const FolderIcon = () => {
+export const FolderIcon: FunctionComponent = () => {
   const {status} = useSidebarStore();
   const isSideBarOpen = status === SidebarStatus.OPEN;
 

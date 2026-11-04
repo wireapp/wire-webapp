@@ -20,14 +20,15 @@
 import {act, renderHook, waitFor} from '@testing-library/react';
 import {RestNode, RestNodeCollection} from 'cells-sdk-ts';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {UserRepository} from 'Repositories/user/userRepository';
+import {CellsRepository} from '../../../../repositories/cells/cellsRepository';
+import {UserRepository} from '../../../../repositories/user/userRepository';
 import {createExecutingFireAndForgetInvokerForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {useGetAllCellsNodes} from './useGetAllCellsNodes';
 
 import type {CellsSort} from '../common/useCellsSorting/useCellsSorting';
 import {useCellsStore} from '../common/useCellsStore/useCellsStore';
+import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 
 const CONV_ID = 'conv-abc';
 const DOMAIN = 'staging.zinfra.io';
@@ -52,6 +53,17 @@ function createDeferred<T>(): PromiseWithResolvers<T> {
   return Promise.withResolvers<T>();
 }
 
+type RenderGetAllNodesHookResult = {
+  rerender: (props?: {enabled: boolean; sort: CellsSort | null} | undefined) => void;
+  result: {
+    current: {
+      refresh: (options?: {preserveStatusOnError?: boolean}) => Promise<boolean>;
+      setOffset: (nextOffset: number) => void;
+    };
+  };
+  unmount: () => void;
+  fireAndForgetInvoker: FireAndForgetInvoker;
+};
 function renderGetAllNodesHook({
   cellsRepository = createFakeCellsRepository(),
   userRepository = createFakeUserRepository(),
@@ -64,7 +76,7 @@ function renderGetAllNodesHook({
   enabled?: boolean;
   fireAndForgetInvoker?: ReturnType<typeof createExecutingFireAndForgetInvokerForTest>;
   sort?: CellsSort | null;
-} = {}) {
+} = {}): RenderGetAllNodesHookResult {
   return {
     fireAndForgetInvoker,
     ...renderHook(
@@ -86,7 +98,7 @@ function renderGetAllNodesHook({
 describe('useGetAllCellsNodes', () => {
   beforeEach(() => {
     useCellsStore.getState().clearAll({conversationId: CONV_ID});
-    window.location.hash = `/conversation/${CONV_ID}/${DOMAIN}/files`;
+    window.history.replaceState({}, '', `#/conversation/${CONV_ID}/${DOMAIN}/files`);
   });
 
   it('does not write to the store when disabled mid-flight', async () => {
@@ -111,6 +123,31 @@ describe('useGetAllCellsNodes', () => {
     });
 
     expect(useCellsStore.getState().getNodes({conversationId: CONV_ID})).toHaveLength(0);
+  });
+
+  it('preserves the existing table state when an outcome refresh fails', async () => {
+    useCellsStore.getState().setStatus('idle');
+    useCellsStore.getState().setError(null);
+    const cellsRepository = {
+      getAllNodes: jest
+        .fn()
+        .mockResolvedValueOnce({Nodes: [createRestNode('moved-file.txt')]})
+        .mockRejectedValueOnce(new Error('Refresh failed')),
+    } as FakeCellsRepository;
+    const {fireAndForgetInvoker, result} = renderGetAllNodesHook({cellsRepository});
+    await act(() => {
+      return fireAndForgetInvoker.waitUntilAllSettled();
+    });
+    expect(useCellsStore.getState().status).toBe('success');
+
+    await act(async () => {
+      await expect(result.current.refresh({preserveStatusOnError: true})).rejects.toThrow('Refresh failed');
+    });
+
+    expect(cellsRepository.getAllNodes).toHaveBeenCalledTimes(2);
+    expect(useCellsStore.getState().status).toBe('success');
+    expect(useCellsStore.getState().getNodes({conversationId: CONV_ID})).toHaveLength(1);
+    expect(useCellsStore.getState().error).toEqual(new Error('Refresh failed'));
   });
 
   it('keeps the browse order natural when no sort is selected', async () => {

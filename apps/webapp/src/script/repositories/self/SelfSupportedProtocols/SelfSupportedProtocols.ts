@@ -36,7 +36,7 @@ interface SelfSupportedProtocolsSelfClientsHandler {
  * - Proteus is in the list of supported protocols
  * - MLS migration is enabled but not finalised
  */
-const isProteusSupported = (teamHandler: SelfSupportedProtocolsTeamHandler) => {
+const isProteusSupported = (teamHandler: SelfSupportedProtocolsTeamHandler): boolean => {
   const teamSupportedProtocols = teamHandler.getTeamSupportedProtocols();
   const mlsMigrationStatus = teamHandler.getTeamMLSMigrationStatus();
 

@@ -114,7 +114,7 @@ const validateFileSize = ({files, maxSize, translate}: ValidateFileSizeParams): 
     return file.size > maxSize;
   });
 
-  const getMessage = () => {
+  const getMessage = (): string => {
     if (oversizedImages.length > 0 && oversizedFiles.length > 0) {
       return translate('conversationFileUploadFailedTooLargeFilesAndImagesMessage', {
         maxImageSize: imageMaxSizeInMB,

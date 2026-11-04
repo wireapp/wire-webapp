@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {useEffect, useState, type FunctionComponent} from 'react';
 import * as React from 'react';
 
 import {CSSObject} from '@emotion/react';
@@ -28,7 +28,7 @@ import {Theme} from '../../identity/theme';
 import {noop} from '../../utils/util';
 import {InputProps, inputStyle} from '../input';
 
-const CodeInputWrapper = (props: React.HTMLProps<HTMLDivElement>) => {
+const CodeInputWrapper: FunctionComponent<React.HTMLProps<HTMLDivElement>> = props => {
   return (
     <div
       css={{
@@ -96,7 +96,7 @@ export interface CodeInputProps<T = HTMLInputElement> extends InputProps<T> {
   codePlaceholder?: string;
 }
 
-export const CodeInput = ({
+export const CodeInput: FunctionComponent<CodeInputProps> = ({
   style,
   digits = 6,
   markInvalid,
@@ -104,7 +104,7 @@ export const CodeInput = ({
   disabled,
   codeInputLabel,
   codePlaceholder,
-}: CodeInputProps) => {
+}) => {
   const [values, setValues] = useState(Array(digits).fill(''));
   const inputs = Array(digits);
 
@@ -114,32 +114,32 @@ export const CodeInput = ({
       | React.TouchEvent<HTMLInputElement>
       | React.KeyboardEvent<HTMLInputElement>
       | React.FocusEvent<HTMLInputElement>,
-  ) => {
+  ): void => {
     const target = event.target as HTMLInputElement;
     target.select();
   };
 
   const forceSelectionPreventDefault = (
     event: React.MouseEvent<HTMLInputElement> | React.TouchEvent<HTMLInputElement>,
-  ) => {
+  ): void => {
     forceSelection(event);
     event.preventDefault();
   };
 
-  const nextField = (currentFieldIndex: number) => {
+  const nextField = (currentFieldIndex: number): void => {
     const nextFieldIndex = currentFieldIndex + 1;
     if (nextFieldIndex < digits) {
       inputs[nextFieldIndex].focus();
     }
   };
 
-  const previousField = (currentFieldIndex: number) => {
+  const previousField = (currentFieldIndex: number): void => {
     if (currentFieldIndex > 0) {
       inputs[currentFieldIndex - 1].focus();
     }
   };
 
-  const setValue = (fieldIndex: number, value: string) => {
+  const setValue = (fieldIndex: number, value: string): void => {
     if (/^[0-9]?$/.test(value)) {
       const valuesCopy = values.slice();
       valuesCopy[fieldIndex] = value;
@@ -150,7 +150,7 @@ export const CodeInput = ({
     }
   };
 
-  const handleKeyDown = (fieldIndex: number, {key}: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (fieldIndex: number, {key}: React.KeyboardEvent<HTMLInputElement>): void => {
     switch (key) {
       case 'Backspace':
         setValue(fieldIndex, '');
@@ -168,7 +168,7 @@ export const CodeInput = ({
     }
   };
 
-  const handlePaste = (fieldIndex: number, event: React.ClipboardEvent<HTMLInputElement>) => {
+  const handlePaste = (fieldIndex: number, event: React.ClipboardEvent<HTMLInputElement>): void => {
     const pastedValue = event.clipboardData.getData('Text');
     const cleanedPaste = pastedValue.replace(/[^0-9]/g, '');
     if (/^[0-9]+$/.test(cleanedPaste)) {
@@ -184,7 +184,7 @@ export const CodeInput = ({
   }, [values]);
 
   const labelId = React.useId();
-  const getDigitAriaLabel = (value: string) => {
+  const getDigitAriaLabel = (value: string): string => {
     return Boolean(value) ? `${codePlaceholder}, ${value}` : `${codePlaceholder}`;
   };
 

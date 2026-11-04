@@ -19,15 +19,15 @@
 
 import {render, waitFor} from '@testing-library/react';
 
-import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
-import {ClientState} from 'Repositories/client/ClientState';
-import {User} from 'Repositories/entity/User';
+import {PrimaryModal, removeCurrentModal} from '../Modals/PrimaryModal';
+import {ClientState} from '../../repositories/client/ClientState';
+import {User} from '../../repositories/entity/User';
 import * as RootProvider from 'src/script/page/rootProvider';
 import {RootContextValue} from 'src/script/page/rootProvider';
 import {MainViewModel} from 'src/script/view_model/MainViewModel';
 
 import {HistoryExport} from './historyExport';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 
 describe('HistoryExport', () => {
   beforeEach(() => {

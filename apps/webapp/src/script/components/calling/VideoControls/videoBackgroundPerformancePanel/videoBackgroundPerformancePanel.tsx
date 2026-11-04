@@ -17,14 +17,16 @@
  *
  */
 
-import {ReactNode, useCallback, useEffect, useMemo, useState} from 'react';
+import {ReactNode, useCallback, useEffect, useMemo, useState, type FunctionComponent} from 'react';
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {Maybe} from 'true-myth';
 
 import {Button, ButtonVariant, CloseIcon, Option, Select} from '@wireapp/react-ui-kit';
 
-import {areCapabilityInfosEqual} from 'Components/calling/VideoControls/videoBackgroundPerformancePanel/capabilityInformationValidator';
+import {useApplicationContext} from 'src/script/page/rootProvider';
+
+import {areCapabilityInfosEqual} from './capabilityInformationValidator';
 import {
   buttonBaseStyles,
   buttonNeutralStyles,
@@ -39,12 +41,12 @@ import {
   performancePanelResetButtonStyles,
   performancePanelStyles,
   performancePanelTitleStyles,
-} from 'Components/calling/VideoControls/videoBackgroundPerformancePanel/videoBackgroundPerformancePanel.styles';
-import {QualityMode} from 'Repositories/media/backgroundEffects';
-import {CapabilityInfo} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
-import type {BackgroundEffectsHandler} from 'Repositories/media/backgroundEffectsHandler';
-import {RenderMetrics, useBackgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+} from './videoBackgroundPerformancePanel.styles';
+
+import {QualityMode} from '../../../../repositories/media/backgroundEffects';
+import {CapabilityInfo} from '../../../../repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
+import type {BackgroundEffectsHandler} from '../../../../repositories/media/backgroundEffectsHandler';
+import {RenderMetrics, useBackgroundEffectsStore} from '../../../../repositories/media/useBackgroundEffectsStore';
 
 type PerformancePanelProps = {
   backgroundEffectsHandler: BackgroundEffectsHandler;
@@ -64,7 +66,8 @@ const formatValue = (value?: string | number | null): string => {
   return value === null || value === undefined || value === '' ? '-' : String(value);
 };
 
-const getMetricRows = (renderMetrics: RenderMetrics) => {
+type GetMetricRowsResult = never[] | {label: string; value: string}[];
+const getMetricRows = (renderMetrics: RenderMetrics): GetMetricRowsResult => {
   return Maybe.of(renderMetrics)
     .map(metrics => {
       return [
@@ -87,7 +90,8 @@ const getMetricRows = (renderMetrics: RenderMetrics) => {
     .unwrapOr([]);
 };
 
-const getCapabilityRows = (capabilityInfo: CapabilityInfo | null | undefined) => {
+type GetCapabilityRowsResult = never[] | {label: string; value: string}[];
+const getCapabilityRows = (capabilityInfo: CapabilityInfo | null | undefined): GetCapabilityRowsResult => {
   return Maybe.of(capabilityInfo)
     .map(info => {
       return [
@@ -109,7 +113,7 @@ type MetricsDisplayProps = {
   readonly capabilityInfo: CapabilityInfo;
 };
 
-const MetricRow = ({label, value}: MetricRowProps) => {
+const MetricRow: FunctionComponent<MetricRowProps> = ({label, value}: MetricRowProps) => {
   return (
     <div css={metricsRowStyles}>
       <span css={metricsLabelStyles}>{label}</span>
@@ -120,7 +124,7 @@ const MetricRow = ({label, value}: MetricRowProps) => {
 
 const POLLING_INTERVAL = 500;
 
-const MetricsDisplay = ({capabilityInfo}: MetricsDisplayProps) => {
+const MetricsDisplay: FunctionComponent<MetricsDisplayProps> = ({capabilityInfo}: MetricsDisplayProps) => {
   const renderMetrics = useBackgroundEffectsStore(state => {
     return state.metrics;
   });
@@ -152,7 +156,9 @@ const qualitySelectOptions = QUALITY_OPTIONS.map(option => {
   };
 });
 
-export const VideoBackgroundPerformancePanel = ({backgroundEffectsHandler}: PerformancePanelProps) => {
+export const VideoBackgroundPerformancePanel: FunctionComponent<PerformancePanelProps> = ({
+  backgroundEffectsHandler,
+}: PerformancePanelProps) => {
   const {translate} = useApplicationContext();
   const isPerformancePanelEnabled = useBackgroundEffectsStore(state => {
     return state.isPerformancePanelEnabled;
@@ -207,7 +213,7 @@ export const VideoBackgroundPerformancePanel = ({backgroundEffectsHandler}: Perf
       return;
     }
 
-    const syncCapabilities = () => {
+    const syncCapabilities = (): void => {
       const current = backgroundEffectsHandler.getCapabilityInfo();
       setCapabilityInfo(prev => {
         return areCapabilityInfosEqual(Maybe.of(prev), Maybe.of(current)) ? prev : current;
@@ -230,7 +236,7 @@ export const VideoBackgroundPerformancePanel = ({backgroundEffectsHandler}: Perf
     }
   }, [isPerformancePanelEnabled, isPanelOpen]);
 
-  const togglePerformancePanel = () => {
+  const togglePerformancePanel = (): void => {
     setIsPanelOpen(prev => {
       return !prev;
     });

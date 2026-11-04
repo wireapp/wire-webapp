@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {Link, LinkVariant, ShieldIcon} from '@wireapp/react-ui-kit';
 
 import {Config} from 'src/script/Config';
@@ -36,7 +38,9 @@ interface E2eEncryptionMessageProps {
   isCellsConversation: boolean;
 }
 
-export const E2eEncryptionMessage = ({isCellsConversation}: E2eEncryptionMessageProps) => {
+export const E2eEncryptionMessage: FunctionComponent<E2eEncryptionMessageProps> = ({
+  isCellsConversation,
+}: E2eEncryptionMessageProps) => {
   const {translate} = useApplicationContext();
 
   return (

@@ -19,44 +19,14 @@
 
 import {UIEvent, useCallback, useEffect, useMemo, useState, type ReactElement} from 'react';
 
-import {isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
+import {isNonEmptyString, isNullOrUndefined, isNumber, isUndefined} from '@sindresorhus/is';
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {container} from 'tsyringe';
 
 import {useMatchMedia} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {CallingCell} from 'Components/calling/CallingCell';
-import {parseAccountDeepLink} from 'Components/conversation/utils/parseAccountDeepLink';
-import {Giphy} from 'Components/giphy';
-import {InputBar} from 'Components/inputBar';
-import {MessageListWrapper} from 'Components/messagesList/messageListWrapper';
-import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {showUserModal} from 'Components/Modals/UserModal';
-import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
-import {TitleBar} from 'Components/titleBar';
-import {CallState} from 'Repositories/calling/CallState';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {Conversation as ConversationEntity} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {DecryptErrorMessage} from 'Repositories/entity/message/decryptErrorMessage';
-import {MemberMessage} from 'Repositories/entity/message/memberMessage';
-import {Message} from 'Repositories/entity/message/message';
-import {User} from 'Repositories/entity/User';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
-import {TeamState} from 'Repositories/team/TeamState';
 import {Config} from 'src/script/Config';
-import {sharedDriveDirectUploadFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext, useMainViewModel} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {isLastReceivedMessage} from 'Util/conversationMessages';
-import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from 'Util/fileTypeUtil';
-import {isHittingUploadLimit} from 'Util/isHittingUploadLimit';
-import {getLogger} from 'Util/logger';
-import {safeMailOpen, safeWindowOpen} from 'Util/sanitizationUtil';
-import {formatBytes} from 'Util/util';
-import {createUuid} from 'Util/uuid';
 
 import {
   searchResultsHeadingStyles,
@@ -88,7 +58,9 @@ import {ConversationViewerPermissionBanner} from './conversationViewerPermission
 import {useReadReceiptSender} from './hooks/useReadReceipt';
 import {ReadOnlyConversationMessage} from './readOnlyConversationMessage';
 import {useFilesUploadDropzone} from './useFilesUploadDropzone/useFilesUploadDropzone';
+import {withAutoReadGuard} from './utils/autoReadGuard';
 import {checkFileSharingPermission} from './utils/checkFileSharingPermission';
+import {parseAccountDeepLink} from './utils/parseAccountDeepLink';
 
 import {UserError} from '../../error/userError';
 import {isMouseRightClickEvent, isAuxRightClickEvent} from '../../guards/Mouse';
@@ -96,9 +68,37 @@ import {isServiceEntity} from '../../guards/Service';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {RightSidebarParams} from '../../page/appMain';
 import {PanelState} from '../../page/rightSidebar';
+import {CallState} from '../../repositories/calling/CallState';
 import {createCellsRepositoryGateway} from '../../repositories/cells/cellsRepositoryGateway';
 import {createCellsUploadManager} from '../../repositories/cells/upload/manager';
+import {ConversationState} from '../../repositories/conversation/ConversationState';
+import {Conversation as ConversationEntity} from '../../repositories/entity/Conversation';
+import {ContentMessage} from '../../repositories/entity/message/contentMessage';
+import {DecryptErrorMessage} from '../../repositories/entity/message/decryptErrorMessage';
+import {MemberMessage} from '../../repositories/entity/message/memberMessage';
+import {Message} from '../../repositories/entity/message/message';
+import {User} from '../../repositories/entity/User';
+import {ServiceEntity} from '../../repositories/integration/ServiceEntity';
+import {TeamState} from '../../repositories/team/TeamState';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
+import {isLastReceivedMessage} from '../../util/conversationMessages';
+import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from '../../util/fileTypeUtil';
+import {isHittingUploadLimit} from '../../util/isHittingUploadLimit';
+import {getLogger} from '../../util/logger';
+import {safeMailOpen, safeWindowOpen} from '../../util/sanitizationUtil';
+import {formatBytes} from '../../util/util';
+import {createUuid} from '../../util/uuid';
+import {WebAppEvents} from '../../webAppEvents';
+import {CallingCell} from '../calling/CallingCell';
+import {Giphy} from '../giphy';
+import {InputBar} from '../inputBar';
 import {ElementType, MessageDetails} from '../messagesList/message/contentMessage/asset/textMessageRenderer';
+import {MessageListWrapper} from '../messagesList/messageListWrapper';
+import {showDetailViewModal} from '../Modals/DetailViewModal';
+import {PrimaryModal} from '../Modals/PrimaryModal';
+import {showUserModal} from '../Modals/UserModal';
+import {showWarningModal} from '../Modals/utils/showWarningModal';
+import {TitleBar} from '../titleBar';
 
 interface ConversationProps {
   readonly teamState: TeamState;
@@ -138,11 +138,12 @@ function ConversationContent({
   const isVirtualizedMessagesListEnabled = CONFIG.FEATURE.ENABLE_VIRTUALIZED_MESSAGES_LIST;
 
   const mainViewModel = useMainViewModel();
-  const {fireAndForgetInvoker, isFeatureToggleEnabled, translate} = useApplicationContext();
+  const {fireAndForgetInvoker, translate, clock} = useApplicationContext();
   const {content: contentViewModel} = mainViewModel;
   const {conversationRepository, repositories} = contentViewModel;
   const sharedDriveUploadController = useMemo(() => {
-    const createSource = (file: File) => {
+    type CreateSourceResult = {blob: File; name: string; contentType: string; size: number};
+    const createSource = (file: File): CreateSourceResult => {
       return {blob: file, name: file.name, contentType: file.type, size: file.size};
     };
     const uploadManager = createCellsUploadManager({
@@ -195,7 +196,10 @@ function ConversationContent({
 
   const [activeTabIndex, setActiveTabIndex] = useState(0);
 
-  const {addReadReceiptToBatch} = useReadReceiptSender(repositories.message);
+  const {addReadReceiptToBatch, cancelPendingReadReceiptsForConversation} = useReadReceiptSender({
+    messageSender: repositories.message,
+    clock,
+  });
 
   useEffect(() => {
     if (!isVirtualizedMessagesListEnabled) {
@@ -313,12 +317,12 @@ function ConversationContent({
     [repositories.asset, translate, uploadFiles, uploadImages],
   );
 
-  const openGiphy = (text: string) => {
+  const openGiphy = (text: string): void => {
     setInputValue(text);
     setIsGiphyModalOpen(true);
   };
 
-  const closeGiphy = () => {
+  const closeGiphy = (): void => {
     return setIsGiphyModalOpen(false);
   };
 
@@ -335,7 +339,7 @@ function ConversationContent({
     }
   };
 
-  const showUserDetails = async (userEntity: User | ServiceEntity) => {
+  const showUserDetails = async (userEntity: User | ServiceEntity): Promise<void> => {
     const isSingleModeConversation = is1to1 || isRequest;
 
     const isUserEntity = !isServiceEntity(userEntity);
@@ -359,23 +363,23 @@ function ConversationContent({
     openRightSidebar(panelId, {entity: serviceEntity ?? userEntity}, true);
   };
 
-  const showParticipants = (participants: User[]) => {
+  const showParticipants = (participants: User[]): void => {
     if (!isNullOrUndefined(activeConversation)) {
       openRightSidebar(PanelState.CONVERSATION_PARTICIPANTS, {entity: activeConversation, highlighted: participants});
     }
   };
 
-  const showMessageDetails = (message: Message, showReactions = false) => {
+  const showMessageDetails = (message: Message, showReactions = false): void => {
     if (!is1to1) {
       openRightSidebar(PanelState.MESSAGE_DETAILS, {entity: message, showReactions}, true);
     }
   };
 
-  const showMessageReactions = (message: Message, showReactions = true) => {
+  const showMessageReactions = (message: Message, showReactions = true): void => {
     openRightSidebar(PanelState.MESSAGE_DETAILS, {entity: message, showReactions}, true);
   };
 
-  const handleEmailClick = (event: Event, messageDetails: MessageDetails) => {
+  const handleEmailClick = (event: Event, messageDetails: MessageDetails): boolean => {
     if (isUndefined(messageDetails.href)) {
       event.preventDefault();
 
@@ -386,7 +390,7 @@ function ConversationContent({
     return false;
   };
 
-  const openUserProfile = async (id: string, domain?: string) => {
+  const openUserProfile = async (id: string, domain?: string): Promise<void> => {
     if (!teamState.isProfileLinkEnabled()) {
       PrimaryModal.show(
         PrimaryModal.type.ACKNOWLEDGE,
@@ -418,7 +422,7 @@ function ConversationContent({
     }
   };
 
-  const handleMarkdownLinkClick = (event: MouseEvent | KeyboardEvent, messageDetails: MessageDetails) => {
+  const handleMarkdownLinkClick = (event: MouseEvent | KeyboardEvent, messageDetails: MessageDetails): boolean => {
     if (isUndefined(messageDetails.href)) {
       event.preventDefault();
 
@@ -484,7 +488,7 @@ function ConversationContent({
     return false;
   };
 
-  const userMentionClick = (messageDetails: MessageDetails) => {
+  const userMentionClick = (messageDetails: MessageDetails): void => {
     const userId = messageDetails.userId;
     const domain = messageDetails.userDomain;
 
@@ -510,7 +514,7 @@ function ConversationContent({
       userId: '',
       userDomain: '',
     },
-  ) => {
+  ): boolean => {
     if (isMouseRightClickEvent(event) || isAuxRightClickEvent(event)) {
       // Default browser behavior on right click
       return true;
@@ -549,7 +553,7 @@ function ConversationContent({
   };
 
   const onSessionResetClick = async (messageEntity: DecryptErrorMessage): Promise<void> => {
-    const resetProgress = () => {
+    const resetProgress = (): void => {
       setTimeout(() => {
         PrimaryModal.show(PrimaryModal.type.SESSION_RESET, {}, undefined, translate);
       }, MotionDuration.LONG);
@@ -599,11 +603,11 @@ function ConversationContent({
         }
       }
 
-      const updateLastRead = () => {
+      const updateLastRead = (): void => {
         conversationEntity.setTimestamp(messageEntity.timestamp(), ConversationEntity.TIMESTAMP_TYPE.LAST_READ);
       };
 
-      const startTimer = async () => {
+      const startTimer = async (): Promise<void> => {
         if (messageEntity.conversation_id === conversationEntity.id) {
           repositories.conversation.checkMessageTimer(messageEntity as ContentMessage);
         }
@@ -615,6 +619,15 @@ function ConversationContent({
 
       const isUnreadMessage = messageTimestamp > conversationEntity.last_read_timestamp();
       const isNotOwnMessage = !messageEntity.user().isMe;
+      const manualUnreadTimestamp = conversationEntity.manualUnreadTimestamp();
+
+      if (isNumber(manualUnreadTimestamp) && messageTimestamp >= manualUnreadTimestamp) {
+        callbacks.push(
+          withAutoReadGuard(conversationEntity, () => {
+            conversationEntity.clearManualUnreadMarker();
+          }),
+        );
+      }
 
       let shouldSendReadReceipt = false;
 
@@ -632,22 +645,26 @@ function ConversationContent({
       }
 
       if (isLastReceivedMessage(messageEntity, conversationEntity)) {
-        callbacks.push(() => {
-          return updateConversationLastRead(conversationEntity, messageEntity);
-        });
+        callbacks.push(
+          withAutoReadGuard(conversationEntity, () => {
+            return updateConversationLastRead(conversationEntity, messageEntity);
+          }),
+        );
       }
 
       if (isUnreadMessage && isNotOwnMessage) {
-        callbacks.push(updateLastRead);
+        callbacks.push(withAutoReadGuard(conversationEntity, updateLastRead));
         if (shouldSendReadReceipt) {
-          callbacks.push(() => {
-            return addReadReceiptToBatch(conversationEntity, messageEntity);
-          });
+          callbacks.push(
+            withAutoReadGuard(conversationEntity, () => {
+              return addReadReceiptToBatch(conversationEntity, messageEntity);
+            }),
+          );
         }
       }
 
       return () => {
-        const trigger = () => {
+        const trigger = (): void => {
           return callbacks.forEach(callback => {
             callback();
           });
@@ -677,7 +694,6 @@ function ConversationContent({
 
   const isCellsEnabled =
     Config.getConfig().FEATURE.ENABLE_CELLS && activeConversation?.cellsState() !== CONVERSATION_CELLS_STATE.DISABLED;
-  const isSharedDriveDirectUploadFeatureEnabled = isFeatureToggleEnabled(sharedDriveDirectUploadFeatureToggleName);
   const isFileUploadAllowed = isConversationFileUploadAllowed({
     conversationTeamId: activeConversation?.teamId,
     selfUserTeamId: activeConversation?.selfUser()?.teamId,
@@ -697,7 +713,7 @@ function ConversationContent({
       cellsRepository: repositories.cells,
       conversation: activeConversation,
       isCellsEnabled: isCellsEnabled,
-      isDisabled: isFileTabActive && !isSharedDriveDirectUploadFeatureEnabled,
+      isDisabled: false,
       isFileDropAllowed: isFileUploadAllowed,
       translate,
     });
@@ -756,7 +772,7 @@ function ConversationContent({
                       onIndexChange={setActiveTabIndex}
                       conversationQualifiedId={activeConversation.qualifiedId}
                       sharedDriveUploadController={sharedDriveUploadController}
-                      isUploadStatusIndicatorEnabled={isSharedDriveDirectUploadFeatureEnabled}
+                      isUploadStatusIndicatorEnabled
                     />
                   </div>
                   {isSharedDriveSearchViewOpen && (
@@ -784,7 +800,7 @@ function ConversationContent({
                         onCloseSearchView={() => {
                           return setIsSharedDriveSearchViewOpen(false);
                         }}
-                        isUploadFilesEnabled={isSharedDriveDirectUploadFeatureEnabled && isFileUploadAllowed}
+                        isFileUploadAllowed={isFileUploadAllowed}
                         showViewerPermission={showViewerPermission}
                       />
                     </SharedDriveUploadProvider>
@@ -841,6 +857,7 @@ function ConversationContent({
                 setMsgElementsFocusable={setMsgElementsFocusable}
                 isRightSidebarOpen={isRightSidebarOpen}
                 updateConversationLastRead={updateConversationLastRead}
+                cancelPendingReadReceiptsForConversation={cancelPendingReadReceiptsForConversation}
               />
 
               {showViewerPermission && !isFileTabActive && <ConversationViewerPermissionBanner />}
@@ -884,7 +901,7 @@ function ConversationContent({
             <SharedDriveUploadStatusPopupHost
               controller={sharedDriveUploadController}
               conversationQualifiedId={`${activeConversation.qualifiedId.id}@${activeConversation.qualifiedId.domain}`}
-              isEnabled={isSharedDriveDirectUploadFeatureEnabled}
+              isEnabled
               isFileTabActive={isFileTabActive}
             />
           </SharedDriveUploadStatusProvider>

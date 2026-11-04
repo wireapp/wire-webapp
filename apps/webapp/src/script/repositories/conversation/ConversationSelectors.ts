@@ -27,8 +27,8 @@ import {
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {matchQualifiedIds} from 'Util/qualifiedId';
+import {matchQualifiedIds} from '../../util/qualifiedId';
+import {Conversation} from '../entity/Conversation';
 
 export type ProteusConversation = Conversation & {protocol: CONVERSATION_PROTOCOL.PROTEUS};
 export type MixedConversation = Conversation & {groupId: string; protocol: CONVERSATION_PROTOCOL.MIXED};
@@ -146,11 +146,15 @@ const is1to1ConversationWithUser = <Protocol extends CONVERSATION_PROTOCOL.PROTE
   };
 };
 
-export const isProteus1to1ConversationWithUser = (userId: QualifiedId) => {
+export const isProteus1to1ConversationWithUser = (
+  userId: QualifiedId,
+): ((conversation: Conversation) => conversation is ProtocolToConversationType[CONVERSATION_PROTOCOL.PROTEUS]) => {
   return is1to1ConversationWithUser(userId, CONVERSATION_PROTOCOL.PROTEUS);
 };
 
-export const isMLS1to1ConversationWithUser = (userId: QualifiedId) => {
+export const isMLS1to1ConversationWithUser = (
+  userId: QualifiedId,
+): ((conversation: Conversation) => conversation is ProtocolToConversationType[CONVERSATION_PROTOCOL.MLS]) => {
   return is1to1ConversationWithUser(userId, CONVERSATION_PROTOCOL.MLS);
 };
 

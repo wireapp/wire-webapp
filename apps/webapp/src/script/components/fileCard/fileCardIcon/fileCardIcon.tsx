@@ -17,19 +17,20 @@
  *
  */
 
-import {AlertIcon, UnavailableFileIcon} from '@wireapp/react-ui-kit';
+import type {FunctionComponent} from 'react';
 
-import {FileTypeIcon} from 'Components/conversation/common/fileTypeIcon/fileTypeIcon';
+import {AlertIcon, UnavailableFileIcon} from '@wireapp/react-ui-kit';
 
 import {errorIconStyles, unavailableIconStyles} from './fileCardIcon.styles';
 
+import {FileTypeIcon} from '../../conversation/common/fileTypeIcon/fileTypeIcon';
 import {useFileCardContext} from '../common/fileCardContext/fileCardContext';
 
 interface FileCardIconProps {
   type?: 'file' | 'error' | 'unavailable';
 }
 
-export const FileCardIcon = ({type = 'file'}: FileCardIconProps) => {
+export const FileCardIcon: FunctionComponent<FileCardIconProps> = ({type = 'file'}: FileCardIconProps) => {
   const {extension} = useFileCardContext();
 
   if (type === 'error') {

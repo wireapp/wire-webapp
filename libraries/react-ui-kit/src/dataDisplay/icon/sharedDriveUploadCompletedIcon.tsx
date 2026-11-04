@@ -17,13 +17,15 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {useTheme} from '@emotion/react';
 
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
 import {COLOR_V2, THEME_ID, Theme} from '../../identity';
 
-export const SharedDriveUploadCompletedIcon = ({color, ...props}: SVGIconProps) => {
+export const SharedDriveUploadCompletedIcon: FunctionComponent<SVGIconProps> = ({color, ...props}) => {
   const theme = useTheme() as Theme;
   const isDarkTheme = theme?.themeId === THEME_ID.DARK;
   const resolvedColor = color ?? (isDarkTheme ? COLOR_V2.BLUE_DARK_500 : COLOR_V2.BLUE_LIGHT_500);

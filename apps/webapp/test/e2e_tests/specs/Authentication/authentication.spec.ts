@@ -185,7 +185,10 @@ test.describe('Authentication', () => {
     'I want to make sure i connect to webapp only through TLS >= 1.3 connection',
     {tag: ['@TC-3480', '@regression']},
     async () => {
-      const requestWithTlsVersion = (versions: {min?: SecureVersion; max?: SecureVersion}) => {
+      const requestWithTlsVersion = (versions: {
+        min?: SecureVersion;
+        max?: SecureVersion;
+      }): Promise<IncomingMessage> => {
         return new Promise<IncomingMessage>((res, rej) => {
           https.get(webAppPath, {minVersion: versions.min, maxVersion: versions.max}, res).on('error', rej);
         });
@@ -253,6 +256,15 @@ test.describe('Authentication', () => {
         modals: device2Modals,
         components: device2Components,
       } = PageManager.from(await createPage(withLogin(user, {confirmNewHistory: true}))).webapp;
+
+      // Keeps device 1's logout running longer than the one second single-instance check interval, so a check
+      // always lands while logout is in progress instead of only on slow runs.
+      await device1Page.route('**/clients/*', async route => {
+        if (route.request().method() === 'DELETE') {
+          await device1Page.waitForTimeout(2_000);
+        }
+        await route.continue();
+      });
 
       await device2Components.conversationSidebar().clickPreferencesButton();
       await device2Pages.settings().devicesButton.click();

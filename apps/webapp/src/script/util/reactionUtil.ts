@@ -20,9 +20,9 @@
 import {isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {ReactionMap, UserReactionMap} from 'Repositories/storage';
-
 import {matchQualifiedIds} from './qualifiedId';
+
+import {ReactionMap, UserReactionMap} from '../repositories/storage';
 
 function isReactionMap(reactions: UserReactionMap | ReactionMap): reactions is ReactionMap {
   return Array.isArray(reactions);
@@ -52,7 +52,11 @@ export function userReactionMapToReactionMap(userReactions: UserReactionMap | Re
   }, []);
 }
 
-export function addReaction(reactions: ReactionMap, reactionsStr: string, userId: QualifiedId) {
+export function addReaction(
+  reactions: ReactionMap,
+  reactionsStr: string,
+  userId: QualifiedId,
+): [reaction: string, userIds: {domain: string; id: string}[]][] {
   const userReactions = reactionsStr.split(',');
 
   // First step is to remove all of this user's reactions

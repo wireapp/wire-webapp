@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import type {CSSObject} from '@emotion/react';
 
 import type {SVGIconProps} from './svgIcon';
@@ -34,7 +36,7 @@ const spinnerStyles: CSSObject = {
   },
 };
 
-export const SharedDriveUploadStatusIcon = (props: SVGIconProps) => {
+export const SharedDriveUploadStatusIcon: FunctionComponent<SVGIconProps> = props => {
   return (
     <svg width="24" height="25" viewBox="0 0 24 25" fill="none" {...props}>
       <circle cx="12" cy="12" r="11.25" fill="none" stroke="var(--accent-color-highlight, #e7f0fa)" strokeWidth="1.5" />

@@ -20,7 +20,7 @@
 import type {QualifiedId, UserAsset as APIClientUserAsset} from '@wireapp/api-client/lib/user/';
 import ko from 'knockout';
 
-import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
+import {AssetRemoteData} from '../assets/assetRemoteData';
 
 type ServiceType = 'Service' | 'App';
 
@@ -53,10 +53,10 @@ export class ServiceEntity {
   category?: string;
   author?: ko.Observable<string>;
   type: ServiceType;
-  get isService() {
+  get isService(): boolean {
     return this.type === 'Service';
   }
-  get isApp() {
+  get isApp(): boolean {
     return this.type === 'App';
   }
 

@@ -17,6 +17,8 @@
  *
  */
 
+import type {JSX} from 'react';
+
 import {components, GroupBase, IndicatorsContainerProps} from 'react-select';
 
 import {Option} from '../select';
@@ -27,7 +29,7 @@ export const SelectIndicatorsContainer = <
 >({
   children,
   ...restProps
-}: IndicatorsContainerProps<Option, IsMulti, Group>) => {
+}: IndicatorsContainerProps<Option, IsMulti, Group>): JSX.Element => {
   const value = restProps.getValue();
   const displaySelectedOptionsCount = Array.isArray(value) && value.length > 1;
 

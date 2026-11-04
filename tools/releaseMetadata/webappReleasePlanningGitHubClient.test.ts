@@ -32,6 +32,7 @@ type PullRequestResponseOptions = {
   readonly title: string;
   readonly baseBranch: string;
   readonly mergedAt: string | null;
+  readonly mergeCommitSha?: string | null;
   readonly labels: readonly unknown[];
 };
 
@@ -50,6 +51,7 @@ function createPullRequestResponse(options: PullRequestResponseOptions): Readonl
     title: options.title,
     base: {ref: options.baseBranch},
     merged_at: options.mergedAt,
+    merge_commit_sha: options.mergeCommitSha === undefined ? 'a'.repeat(40) : options.mergeCommitSha,
     labels: options.labels,
   };
 }
@@ -62,6 +64,7 @@ function createValidPullRequestResponse(
     title: options.title ?? 'Add a release planning feature',
     baseBranch: options.baseBranch ?? 'main',
     mergedAt: options.mergedAt ?? '2026-10-12T08:00:00Z',
+    mergeCommitSha: options.mergeCommitSha,
     labels: options.labels ?? [{name: 'semver:minor'}],
   });
 }
@@ -108,6 +111,7 @@ describe('WebApp release planning GitHub client', () => {
         title: 'Add a release planning feature',
         baseBranch: 'main',
         mergedAt: Maybe.just('2026-10-12T08:00:00Z'),
+        mergeCommitSha: Maybe.just('a'.repeat(40)),
         labels: ['semver:minor', 'product'],
       },
     ]);
@@ -118,6 +122,22 @@ describe('WebApp release planning GitHub client', () => {
       '/repos/wireapp/wire-webapp/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/pulls',
     );
     expect(actualRequest.headers.Authorization).toBe('Bearer github-token');
+  });
+
+  it('represents a missing merge commit SHA without inventing an association', async () => {
+    const fakeHttpClient = createFakeHttpClient({
+      responseForRequest() {
+        return [createValidPullRequestResponse({mergeCommitSha: null})];
+      },
+    });
+    const githubClient = createClient(fakeHttpClient.httpClient);
+
+    const actualPullRequestsResult = await githubClient.listPullRequestsForCommit({commitSha: 'a'.repeat(40)});
+
+    assert(actualPullRequestsResult.isOk);
+    const firstPullRequest = actualPullRequestsResult.value.at(0);
+    assert(firstPullRequest !== undefined);
+    expect(firstPullRequest.mergeCommitSha.isNothing).toBe(true);
   });
 
   it('supports pagination based on the raw response item count', async () => {
@@ -165,6 +185,20 @@ describe('WebApp release planning GitHub client', () => {
     const githubClient = createClient(fakeHttpClient.httpClient);
 
     const actualPullRequestsResult = await githubClient.listPullRequestsForCommit({commitSha: 'd'.repeat(40)});
+
+    assert(actualPullRequestsResult.isErr);
+    expect(actualPullRequestsResult.error.message).toBe('Malformed GitHub pull request response');
+  });
+
+  it('rejects a malformed pull request merge commit SHA', async () => {
+    const fakeHttpClient = createFakeHttpClient({
+      responseForRequest() {
+        return [createValidPullRequestResponse({mergeCommitSha: 'not-a-commit-sha'})];
+      },
+    });
+    const githubClient = createClient(fakeHttpClient.httpClient);
+
+    const actualPullRequestsResult = await githubClient.listPullRequestsForCommit({commitSha: 'a'.repeat(40)});
 
     assert(actualPullRequestsResult.isErr);
     expect(actualPullRequestsResult.error.message).toBe('Malformed GitHub pull request response');

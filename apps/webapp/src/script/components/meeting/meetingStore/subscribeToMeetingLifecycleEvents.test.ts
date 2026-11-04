@@ -18,7 +18,7 @@
  */
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {WebAppEvents} from '../../../webAppEvents';
 import {amplify} from 'amplify';
 
 import type {MeetingLifecycleDispatcher} from './createMeetingLifecycleDispatcher';
@@ -46,7 +46,13 @@ const createDispatcherDouble = (): MeetingLifecycleDispatcherDouble => {
 describe('subscribeToMeetingLifecycleEvents', () => {
   const activeUnsubscribeCallbacks: (() => void)[] = [];
 
-  const subscribe = (dispatcher: MeetingLifecycleDispatcherDouble) => {
+  type SubscribeResult = {
+    notifyMeetingChange: jest.Mock<any, any, any>;
+    notifyUpdate: jest.Mock<any, any, any>;
+    onMeetingCancelled: jest.Mock<any, any, any>;
+    unsubscribe: () => void;
+  };
+  const subscribe = (dispatcher: MeetingLifecycleDispatcherDouble): SubscribeResult => {
     const notifyMeetingChange = jest.fn();
     const notifyUpdate = jest.fn();
     const onMeetingCancelled = jest.fn();

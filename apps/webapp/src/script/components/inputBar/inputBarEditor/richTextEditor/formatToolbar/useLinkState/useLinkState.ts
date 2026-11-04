@@ -53,7 +53,16 @@ interface SavedSelection {
   focus: SelectionPoint;
 }
 
-export const useLinkState = () => {
+type UseLinkStateResult = {
+  formatLink: () => void;
+  insertLink: (url: string, text?: string) => void;
+  isModalOpen: boolean;
+  closeModal: () => void;
+  selectedText: string;
+  linkUrl: string;
+  linkNode: LinkNode | null;
+};
+export const useLinkState = (): UseLinkStateResult => {
   const [editor] = useLexicalComposerContext();
   const {isOpen, open, close} = useModalState();
   const {editingLink, setEditingLink, resetLinkState} = useLinkEditing();

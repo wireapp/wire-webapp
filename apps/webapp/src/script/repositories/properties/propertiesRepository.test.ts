@@ -17,10 +17,10 @@
  *
  */
 
-import {User} from 'Repositories/entity/User';
-import type {SelfService} from 'Repositories/self/SelfService';
+import {User} from '../entity/User';
+import type {SelfService} from '../self/SelfService';
 import type {APIClient} from 'src/script/service/apiClientSingleton';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 
 import {PropertiesRepository} from './propertiesRepository';
 import {PropertiesService} from './propertiesService';

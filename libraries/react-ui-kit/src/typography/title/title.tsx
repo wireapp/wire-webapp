@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {CSSObject} from '@emotion/react';
 
 import {COLOR} from '../../identity';
@@ -35,7 +37,7 @@ const titleStyle: <T>(theme: Theme, props: TitleProps<T>) => CSSObject = (
   };
 };
 
-export const Title = (props: TitleProps) => {
+export const Title: FunctionComponent<TitleProps> = props => {
   return (
     <div
       css={(theme: Theme) => {

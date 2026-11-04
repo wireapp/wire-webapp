@@ -17,7 +17,7 @@
  *
  */
 
-import {search} from 'Repositories/search/fullTextSearch';
+import {search} from '../../../src/script/repositories/search/fullTextSearch';
 
 describe('FullTextSearch', () => {
   describe('search', () => {

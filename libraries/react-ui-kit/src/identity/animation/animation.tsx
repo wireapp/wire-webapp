@@ -17,7 +17,7 @@
  *
  */
 
-import {HTMLAttributes, HTMLProps, ReactNode, useRef} from 'react';
+import {HTMLAttributes, HTMLProps, ReactNode, useRef, type FunctionComponent} from 'react';
 
 import {ClassNames} from '@emotion/react';
 import type {CSSObject} from '@emotion/react';
@@ -69,11 +69,11 @@ type TransitionContainerProps = HTMLProps<any> & {
   exit?: boolean;
 };
 
-export const TransitionContainer = (props: TransitionContainerProps) => {
+export const TransitionContainer: FunctionComponent<TransitionContainerProps> = props => {
   return <TransitionGroup {...props} />;
 };
 
-export const Transition = ({animationStyle, timeout, children, ...props}: TransitionProps) => {
+export const Transition: FunctionComponent<TransitionProps> = ({animationStyle, timeout, children, ...props}) => {
   const nodeRef = useRef<HTMLDivElement>(null);
 
   return (
@@ -89,7 +89,12 @@ export const Transition = ({animationStyle, timeout, children, ...props}: Transi
   );
 };
 
-export const Opacity = ({startValue = 0, endValue = 1, timeout = DURATION.DEFAULT, ...props}: OpacityProps) => {
+export const Opacity: FunctionComponent<OpacityProps> = ({
+  startValue = 0,
+  endValue = 1,
+  timeout = DURATION.DEFAULT,
+  ...props
+}) => {
   return (
     <Transition
       {...props}
@@ -112,12 +117,12 @@ export const Opacity = ({startValue = 0, endValue = 1, timeout = DURATION.DEFAUL
   );
 };
 
-export const YAxisMovement = ({
+export const YAxisMovement: FunctionComponent<MovementProps> = ({
   startValue = '-100%',
   endValue = '0%',
   timeout = DURATION.DEFAULT,
   ...props
-}: MovementProps) => {
+}) => {
   return (
     <Transition
       {...props}
@@ -140,12 +145,12 @@ export const YAxisMovement = ({
   );
 };
 
-export const XAxisMovement = ({
+export const XAxisMovement: FunctionComponent<MovementProps> = ({
   startValue = '-100%',
   endValue = '0%',
   timeout = DURATION.DEFAULT,
   ...props
-}: MovementProps) => {
+}) => {
   return (
     <Transition
       {...props}
@@ -168,7 +173,12 @@ export const XAxisMovement = ({
   );
 };
 
-export const Slide = ({startValue = '-100%', endValue = '0%', timeout = DURATION.DEFAULT, ...props}: MovementProps) => {
+export const Slide: FunctionComponent<MovementProps> = ({
+  startValue = '-100%',
+  endValue = '0%',
+  timeout = DURATION.DEFAULT,
+  ...props
+}) => {
   return (
     <Transition
       {...props}
@@ -191,16 +201,16 @@ export const Slide = ({startValue = '-100%', endValue = '0%', timeout = DURATION
   );
 };
 
-export const LeftRightMovement = (props: MovementProps) => {
+export const LeftRightMovement: FunctionComponent<MovementProps> = props => {
   return <XAxisMovement startValue="-100vh" endValue="0vh" {...props} />;
 };
-export const RightLeftMovement = (props: MovementProps) => {
+export const RightLeftMovement: FunctionComponent<MovementProps> = props => {
   return <XAxisMovement startValue="100vh" endValue="0vh" {...props} />;
 };
 
-export const TopDownMovement = (props: MovementProps) => {
+export const TopDownMovement: FunctionComponent<MovementProps> = props => {
   return <YAxisMovement startValue="-100%" endValue="0%" {...props} />;
 };
-export const BottomUpMovement = (props: MovementProps) => {
+export const BottomUpMovement: FunctionComponent<MovementProps> = props => {
   return <YAxisMovement startValue="100%" endValue="0%" {...props} />;
 };

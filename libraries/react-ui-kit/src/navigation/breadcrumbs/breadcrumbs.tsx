@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode} from 'react';
+import {ReactNode, type FunctionComponent} from 'react';
 
 import {BreadcrumbItem} from './breadcrumbItem/breadcrumbItem';
 import {BreadcrumbLeaf} from './breadcrumbLeaf/breadcrumbLeaf';
@@ -50,11 +50,11 @@ interface BreadcrumbsProps {
  * <Breadcrumbs items={[{name: 'Home'}, {name: 'Folder'}, {name: 'Subfolder'}]} onItemClick={() => {}} />
  * ```
  */
-export const Breadcrumbs = ({
+export const Breadcrumbs: FunctionComponent<BreadcrumbsProps> = ({
   maxNotCombinedItems = DEFAULT_MAX_VISIBLE_BREADCRUMBS,
   items,
   onItemClick,
-}: BreadcrumbsProps) => {
+}) => {
   if (items.length <= maxNotCombinedItems) {
     return (
       <ol css={listStyles}>

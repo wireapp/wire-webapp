@@ -18,9 +18,10 @@
  */
 
 import * as React from 'react';
+import {type FunctionComponent} from 'react';
 
 type FooterProps = React.HTMLProps<HTMLElement>;
 
-export const Footer = (props: FooterProps) => {
+export const Footer: FunctionComponent<FooterProps> = props => {
   return <footer {...props} />;
 };

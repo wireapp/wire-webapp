@@ -31,7 +31,7 @@ export const useArrowsNavigation = ({
   pagesCount,
   onNextPage,
   onPreviousPage,
-}: UseArrowsNavigationParams) => {
+}: UseArrowsNavigationParams): void => {
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
       if (event.key === 'ArrowRight' && currentPage < pagesCount) {

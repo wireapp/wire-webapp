@@ -21,12 +21,14 @@
 
 const fs = require('fs-extra');
 const path = require('path');
+const {findLocalWorkspaceDependencyPackages} = require('../../../tools/serverPackaging/workspaceDependencies.ts');
 
 const srcFolder = '../';
 const serverOutputDirectory = path.resolve(
   process.env.WIRE_WEBAPP_SERVER_OUTPUT_PATH ?? path.resolve(__dirname, '../dist'),
 );
 const npmModulesFolder = '../../../node_modules/';
+const librariesDirectory = path.resolve(__dirname, '../../../libraries');
 
 const assetFolders = ['.ebextensions/', 'robots/', 'templates/', 'certificate'];
 
@@ -39,30 +41,47 @@ fs.copySync(
   path.resolve(serverOutputDirectory, 'libs/wire/telemetry/embed.js'),
 );
 
-// Bundle all workspace dependencies for deployment
-// Read server's package.json to find workspace dependencies
+// Bundle all local workspace dependencies for deployment.
 const serverPackageJson = require('../package.json');
-const workspaceDeps = Object.entries(serverPackageJson.dependencies || {})
-  .filter(([, version]) => version.startsWith('workspace:'))
-  .map(([name]) => name);
+const workspacePackages = fs
+  .readdirSync(librariesDirectory, {withFileTypes: true})
+  .filter(libraryDirectory => {
+    return libraryDirectory.isDirectory();
+  })
+  .map(libraryDirectory => {
+    return path.join(librariesDirectory, libraryDirectory.name);
+  })
+  .flatMap(workspacePackageDirectory => {
+    const packageManifestPath = path.join(workspacePackageDirectory, 'package.json');
 
-console.log('Bundling workspace dependencies:', workspaceDeps.join(', '));
+    if (!fs.existsSync(packageManifestPath)) {
+      return [];
+    }
 
-workspaceDeps.forEach(depName => {
-  // Map package name to library folder (e.g., @wireapp/config -> config)
-  const libName = depName.split('/').pop(); // Extract last part after /
+    return [
+      {
+        directoryPath: workspacePackageDirectory,
+        manifest: fs.readJsonSync(packageManifestPath),
+      },
+    ];
+  });
+const workspaceDependencyPackages = findLocalWorkspaceDependencyPackages({
+  dependencies: serverPackageJson.dependencies || {},
+  workspacePackages,
+});
 
-  // Find the library in the monorepo
-  const libraryPath = path.resolve(__dirname, '../../../libraries', libName);
+console.log(
+  'Bundling workspace dependencies:',
+  workspaceDependencyPackages.map(workspacePackage => workspacePackage.manifest.name).join(', '),
+);
 
-  if (!fs.existsSync(libraryPath)) {
-    throw new Error(`Workspace dependency ${depName} not found at ${libraryPath}`);
-  }
-
+workspaceDependencyPackages.forEach(workspacePackage => {
+  const dependencyName = workspacePackage.manifest.name;
+  const libraryPath = workspacePackage.directoryPath;
   // Copy the package to node_modules preserving structure
-  const packageDest = path.resolve(serverOutputDirectory, 'node_modules', depName);
+  const packageDest = path.resolve(serverOutputDirectory, 'node_modules', dependencyName);
 
-  console.log(`  - Bundling ${depName} from ${libraryPath}`);
+  console.log(`  - Bundling ${dependencyName} from ${libraryPath}`);
 
   // Ensure the directory exists
   fs.ensureDirSync(packageDest);
@@ -76,6 +95,6 @@ workspaceDeps.forEach(depName => {
   if (fs.existsSync(libSrc)) {
     fs.copySync(libSrc, path.join(packageDest, 'lib'));
   } else {
-    throw new Error(`Compiled lib directory not found for ${depName} at ${libSrc}. Did you run the build?`);
+    throw new Error(`Compiled lib directory not found for ${dependencyName} at ${libSrc}. Did you run the build?`);
   }
 });

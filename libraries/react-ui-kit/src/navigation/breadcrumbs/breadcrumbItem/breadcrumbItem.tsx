@@ -17,7 +17,7 @@
  *
  */
 
-import {MouseEvent as ReactMouseEvent, ReactNode} from 'react';
+import {MouseEvent as ReactMouseEvent, ReactNode, type FunctionComponent} from 'react';
 
 import {activeItemStyles, buttonStyles, listItemStyles} from './breadcrumbItem.styles';
 
@@ -29,7 +29,7 @@ interface BreadcrumbItemProps {
   isFirst: boolean;
 }
 
-export const BreadcrumbItem = ({name, icon, isActive, onClick, isFirst}: BreadcrumbItemProps) => {
+export const BreadcrumbItem: FunctionComponent<BreadcrumbItemProps> = ({name, icon, isActive, onClick, isFirst}) => {
   return (
     <li css={listItemStyles}>
       {isActive ? (

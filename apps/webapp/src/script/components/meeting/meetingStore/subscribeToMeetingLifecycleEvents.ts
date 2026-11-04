@@ -20,13 +20,12 @@
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import type {MeetingCancellationOptions} from 'Components/meeting/meetingNotificationEventHandlers';
-import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-
 import type {MeetingLifecycleDispatcher} from './createMeetingLifecycleDispatcher';
+
+import {matchQualifiedIds} from '../../../util/qualifiedId';
+import {WebAppEvents} from '../../../webAppEvents';
+import type {MeetingCancellationOptions} from '../meetingNotificationEventHandlers';
+import type {MeetingSeries} from '../types/meetingSeries';
 
 export type SubscribeToMeetingLifecycleEventsDependencies = {
   dispatcher: MeetingLifecycleDispatcher;
@@ -47,11 +46,11 @@ export const subscribeToMeetingLifecycleEvents = ({
   notifyUpdate,
   onMeetingCancelled,
 }: SubscribeToMeetingLifecycleEventsDependencies): (() => void) => {
-  const onMeetingCreated = (meetingId: QualifiedId) => {
+  const onMeetingCreated = (meetingId: QualifiedId): void => {
     dispatcher.enqueueMeetingSync(meetingId);
   };
 
-  const onMeetingUpdated = (meetingId: QualifiedId, actorId: QualifiedId) => {
+  const onMeetingUpdated = (meetingId: QualifiedId, actorId: QualifiedId): void => {
     if (matchQualifiedIds(actorId, getSelfUserQualifiedId())) {
       dispatcher.enqueueMeetingSync(meetingId);
       return;
@@ -60,7 +59,7 @@ export const subscribeToMeetingLifecycleEvents = ({
     dispatcher.enqueueMeetingSync(meetingId, notifyUpdate);
   };
 
-  const onMeetingMemberAdded = (meetingId: QualifiedId, actorId: QualifiedId) => {
+  const onMeetingMemberAdded = (meetingId: QualifiedId, actorId: QualifiedId): void => {
     if (matchQualifiedIds(actorId, getSelfUserQualifiedId())) {
       dispatcher.enqueueMeetingSync(meetingId);
       return;
@@ -69,7 +68,7 @@ export const subscribeToMeetingLifecycleEvents = ({
     dispatcher.enqueueMeetingSync(meetingId, notifyMeetingChange);
   };
 
-  const onMeetingDeleted = (meetingId: QualifiedId, actorId: QualifiedId) => {
+  const onMeetingDeleted = (meetingId: QualifiedId, actorId: QualifiedId): void => {
     onMeetingCancelled(meetingId, {
       notify: !matchQualifiedIds(actorId, getSelfUserQualifiedId()),
     });
@@ -77,7 +76,7 @@ export const subscribeToMeetingLifecycleEvents = ({
     dispatcher.enqueueMeetingRemoval(meetingId);
   };
 
-  const onMissedEvents = () => {
+  const onMissedEvents = (): void => {
     dispatcher.enqueueInitialLoad();
   };
 

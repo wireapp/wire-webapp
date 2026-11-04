@@ -24,10 +24,10 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../../util/test/translateForTest';
 
-import type {MediaConstraintsHandler} from 'Repositories/media/MediaConstraintsHandler';
-import type {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
+import type {MediaConstraintsHandler} from '../../../../../repositories/media/MediaConstraintsHandler';
+import type {PropertiesRepository} from '../../../../../repositories/properties/propertiesRepository';
 
 import {CallOptions} from './callOptions';
 
@@ -52,7 +52,11 @@ function createPropertiesRepositoryForTest(): PropertiesRepository {
   } as unknown as PropertiesRepository;
 }
 
-function renderCallOptions(parameters: RenderCallOptionsParameters = {}) {
+type RenderCallOptionsResult = {
+  constraintsHandler: MediaConstraintsHandler;
+  refreshAudioInput: jest.Mock<Promise<MediaStream>, any, any>;
+};
+function renderCallOptions(parameters: RenderCallOptionsParameters = {}): RenderCallOptionsResult {
   const {hasActiveCall = false, agcPreference = false} = parameters;
   const constraintsHandler = {
     getAgcPreference: jest.fn(() => {

@@ -19,8 +19,8 @@
 
 import {amplify} from 'amplify';
 
-import {StorageKey} from 'Repositories/storage/storageKey';
-import {resetStoreValue} from 'Util/storageUtil';
+import {resetStoreValue} from '../../util/storageUtil';
+import {StorageKey} from '../storage/storageKey';
 
 export class CacheRepository {
   /**

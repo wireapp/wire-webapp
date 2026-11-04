@@ -42,7 +42,7 @@ export class Account extends EventEmitter {
     cancelTask: jest.fn(),
   };
 
-  get hasMLSDevice() {
+  get hasMLSDevice(): boolean {
     return true;
   }
   configureMLSCallbacks = jest.fn();

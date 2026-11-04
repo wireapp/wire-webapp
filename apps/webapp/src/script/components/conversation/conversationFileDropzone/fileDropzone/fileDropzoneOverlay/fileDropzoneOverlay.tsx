@@ -17,6 +17,11 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
+import type {JSX} from '@emotion/react/jsx-runtime';
+import type {CSSObject} from '@emotion/serialize';
+
 import {BlockIcon, SaveIcon} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext, type RootContextValue} from 'src/script/page/rootProvider';
@@ -37,11 +42,12 @@ interface FileDropzoneOverlayProps {
   mode: FileDropzoneOverlayMode;
 }
 
+type GetOverlayPropertiesResult = {styles: CSSObject; icon: JSX.Element; title: string; description: string};
 const getOverlayProperties = (
   mode: FileDropzoneOverlayMode,
   isActive: boolean,
   translate: RootContextValue['translate'],
-) => {
+): GetOverlayPropertiesResult => {
   let styles = overlayStyles;
   if (isActive) {
     styles = overlayActiveStyles;
@@ -64,7 +70,10 @@ const getOverlayProperties = (
   };
 };
 
-export const FileDropzoneOverlay = ({isActive, mode}: FileDropzoneOverlayProps) => {
+export const FileDropzoneOverlay: FunctionComponent<FileDropzoneOverlayProps> = ({
+  isActive,
+  mode,
+}: FileDropzoneOverlayProps) => {
   const {translate} = useApplicationContext();
   const {styles, icon, title, description} = getOverlayProperties(mode, isActive, translate);
 

@@ -19,20 +19,19 @@
 
 import {isEmptyArray, isNonEmptyArray, isNumber, isUndefined} from '@sindresorhus/is';
 
-import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {FileAsset} from 'Repositories/entity/message/fileAsset';
-import type {MemberMessage} from 'Repositories/entity/message/memberMessage';
-import type {SystemMessage} from 'Repositories/entity/message/systemMessage';
-import type {Text} from 'Repositories/entity/message/text';
-import {type Translate} from 'Util/localizerUtil';
-import {getRenderedTextContent} from 'Util/messageRenderer';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-
 import {ConversationStatusIcon} from './ConversationStatusIcon';
 
 import {ConversationError} from '../../error/conversationError';
 import {E2EIVerificationMessageType} from '../../message/e2eiVerificationMessageType';
+import {type Translate} from '../../util/localizerUtil';
+import {getRenderedTextContent} from '../../util/messageRenderer';
+import {matchQualifiedIds} from '../../util/qualifiedId';
+import {AssetTransferState} from '../assets/assetTransferState';
+import type {Conversation} from '../entity/Conversation';
+import type {FileAsset} from '../entity/message/fileAsset';
+import type {MemberMessage} from '../entity/message/memberMessage';
+import type {SystemMessage} from '../entity/message/systemMessage';
+import type {Text} from '../entity/message/text';
 
 enum ACTIVITY_TYPE {
   CALL = 'ConversationCellState.ACTIVITY_TYPE.CALL',
@@ -369,6 +368,18 @@ const _getStateGhostGroup: ConversationCellStateDefinition = {
   },
 };
 
+const _getStateManualUnread: ConversationCellStateDefinition = {
+  description: (conversationEntity: Conversation, translate: Translate) => {
+    return _accumulateSummary(conversationEntity, translate, conversationEntity.showNotificationsMentionsAndReplies());
+  },
+  icon: () => {
+    return ConversationStatusIcon.MANUAL_UNREAD;
+  },
+  match: (conversationEntity: Conversation) => {
+    return isNumber(conversationEntity.manualUnreadTimestamp());
+  },
+};
+
 const _getStateUnreadMessage: ConversationCellStateDefinition = {
   description: (conversationEntity: Conversation, translate: Translate): string => {
     const unreadState = conversationEntity.unreadState();
@@ -468,6 +479,7 @@ export const generateCellState = (
   const states = [
     _getStateRemoved,
     _getStateGhostGroup,
+    _getStateManualUnread,
     _getStateMuted,
     _getStateAlert,
     _getStateGroupActivity,

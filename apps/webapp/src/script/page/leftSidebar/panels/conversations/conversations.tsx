@@ -17,7 +17,15 @@
  *
  */
 
-import {KeyboardEvent as ReactKeyBoardEvent, useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {
+  KeyboardEvent as ReactKeyBoardEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type FunctionComponent,
+} from 'react';
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
@@ -26,33 +34,12 @@ import {container} from 'tsyringe';
 import {useShallow} from 'zustand/react/shallow';
 
 import {useMatchMedia} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {MeetingNotificationHost} from 'Components/meeting/meetingNotificationHost/meetingNotificationHost';
-import {useConversationFocus} from 'Hooks/useConversationFocus';
-import {CallState} from 'Repositories/calling/CallState';
-import {createLabel} from 'Repositories/conversation/ConversationLabelRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
-import {PreferenceNotificationRepository} from 'Repositories/notification/PreferenceNotificationRepository';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {SearchRepository} from 'Repositories/search/searchRepository';
-import {TeamRepository} from 'Repositories/team/TeamRepository';
-import {TeamState} from 'Repositories/team/TeamState';
-import {EventName} from 'Repositories/tracking/eventName';
-import {UserRepository} from 'Repositories/user/userRepository';
-import {UserState} from 'Repositories/user/userState';
 import {Preferences} from 'src/script/page/leftSidebar/panels/preferences';
 import {ANIMATED_PAGE_TRANSITION_DURATION} from 'src/script/page/mainContent';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {ContentState, ListState, useAppState} from 'src/script/page/useAppState';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
-import {useMeetingsFeatureFlag} from 'Util/useMeetingsFeatureFlag';
 
 import {ConversationCallingView} from './conversationCallingView/conversationCallingView';
 import {ConversationHeader, conversationsPanelHeadingId} from './conversationHeader';
@@ -75,11 +62,32 @@ import {
   useSidebarStore,
 } from './useSidebarStore';
 
+import {MeetingNotificationHost} from '../../../../components/meeting/meetingNotificationHost/meetingNotificationHost';
 import {Config} from '../../../../Config';
+import {useConversationFocus} from '../../../../hooks/useConversationFocus';
+import {CallState} from '../../../../repositories/calling/CallState';
+import {createLabel} from '../../../../repositories/conversation/ConversationLabelRepository';
+import {ConversationRepository} from '../../../../repositories/conversation/ConversationRepository';
+import {ConversationState} from '../../../../repositories/conversation/ConversationState';
+import type {Conversation} from '../../../../repositories/entity/Conversation';
+import {User} from '../../../../repositories/entity/User';
+import {IntegrationRepository} from '../../../../repositories/integration/IntegrationRepository';
+import {PreferenceNotificationRepository} from '../../../../repositories/notification/PreferenceNotificationRepository';
+import {PropertiesRepository} from '../../../../repositories/properties/propertiesRepository';
+import {SearchRepository} from '../../../../repositories/search/searchRepository';
+import {TeamRepository} from '../../../../repositories/team/TeamRepository';
+import {TeamState} from '../../../../repositories/team/TeamState';
+import {EventName} from '../../../../repositories/tracking/eventName';
+import {UserRepository} from '../../../../repositories/user/userRepository';
+import {UserState} from '../../../../repositories/user/userState';
 import {generateConversationUrl} from '../../../../router/routeGenerator';
 import {setHistoryParam} from '../../../../router/Router';
 import {createNavigateKeyboard} from '../../../../router/routerBindings';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
+import {useChannelsFeatureFlag} from '../../../../util/useChannelsFeatureFlag';
+import {useMeetingsFeatureFlag} from '../../../../util/useMeetingsFeatureFlag';
 import {ListViewModel} from '../../../../view_model/ListViewModel';
+import {WebAppEvents} from '../../../../webAppEvents';
 import {ListWrapper} from '../listWrapper';
 import {StartUI} from '../startUi';
 
@@ -106,7 +114,7 @@ type ConversationsProps = {
   isConversationListCollapseEnabled: boolean;
 };
 
-export const Conversations = ({
+export const Conversations: FunctionComponent<ConversationsProps> = ({
   integrationRepository,
   searchRepository,
   teamRepository,
@@ -250,7 +258,8 @@ export const Conversations = ({
     searchPingsConversations: translate('searchPingsConversations'),
   };
 
-  const getTabConversationsForFilter = (filter: string) => {
+  type GetTabConversationsForFilterResult = {conversations: Conversation[]; searchInputPlaceholder: string};
+  const getTabConversationsForFilter = (filter: string): GetTabConversationsForFilterResult => {
     return getTabConversations({
       currentTab,
       conversations,
@@ -310,7 +319,7 @@ export const Conversations = ({
     groupParticipantsConversations,
     isGroupParticipantsVisible,
   ]);
-  const hasSearchTabResult = (query: string) => {
+  const hasSearchTabResult = (query: string): boolean => {
     const queryConversations = getTabConversationsForFilter(query).conversations;
     const queryGroupParticipants = getGroupParticipantsConversations({
       currentTab,
@@ -379,7 +388,7 @@ export const Conversations = ({
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.UI.CONVERSATION_LIST_UNCOLLAPSE);
   }, [isConversationListCollapsed, setConversationListStatus]);
 
-  const toggleConversationList = () => {
+  const toggleConversationList = (): void => {
     const willCollapse = conversationListStatus === ConversationListStatus.EXPANDED;
     setConversationListStatus(willCollapse ? ConversationListStatus.COLLAPSED : ConversationListStatus.EXPANDED);
     amplify.publish(
@@ -389,7 +398,7 @@ export const Conversations = ({
   };
 
   useEffect(() => {
-    const handleConversationShow = (conversation?: Conversation) => {
+    const handleConversationShow = (conversation?: Conversation): void => {
       if (isNullOrUndefined(conversation)) {
         return;
       }
@@ -546,7 +555,7 @@ export const Conversations = ({
   );
 
   useEffect(() => {
-    const openFavorites = () => {
+    const openFavorites = (): void => {
       return changeTab(SidebarTabs.FAVORITES);
     };
     conversationLabelRepository.addEventListener('conversation-favorited', openFavorites);

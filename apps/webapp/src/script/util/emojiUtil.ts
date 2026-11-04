@@ -39,17 +39,17 @@ export const EMOJI_RANGES =
     }, []);
 
 const UNICODE_RANGE_REGEXP = new RegExp(`[${EMOJI_RANGES.join('')}]`, 'g');
-const removeWhitespace = (string: string) => {
+const removeWhitespace = (string: string): string => {
   return string.replace(/\s+/g, '');
 };
-const removeEmojis = (string: string) => {
+const removeEmojis = (string: string): string => {
   return string.replace(UNICODE_RANGE_REGEXP, '');
 };
-const isValidString = (string: string) => {
+const isValidString = (string: string): boolean => {
   return typeof string === 'string' && string.length > 0;
 };
 
-export const includesOnlyEmojis = (text: string) => {
+export const includesOnlyEmojis = (text: string): boolean => {
   return isValidString(text) && removeEmojis(removeWhitespace(text)).length === 0;
 };
 
@@ -104,7 +104,7 @@ export const getEmojiTitleFromEmojiUnicode = (emojiUnicode: string): string => {
   return emojiDictionary.get(unicodeWithoutSkinModifier) ?? '';
 };
 
-export function getEmojiUnicode(emojis: string) {
+export function getEmojiUnicode(emojis: string): string {
   const hexCode = 16;
   const padding = 4;
   const unicode = [...emojis]

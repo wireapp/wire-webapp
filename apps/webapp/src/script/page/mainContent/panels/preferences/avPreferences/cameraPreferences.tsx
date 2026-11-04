@@ -17,23 +17,25 @@
  *
  */
 
-import {memo, useCallback, useEffect, useRef, useState} from 'react';
-import type {ReactNode} from 'react';
+import {memo, useCallback, useEffect, useRef, useState, type FunctionComponent, ReactNode} from 'react';
 
 import {useDebouncedCallback} from 'use-debounce';
 
-import * as Icon from 'Components/icon';
-import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
-import {MediaType} from 'Repositories/media/MediaType';
-import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {createReactTranslationMarker, renderReactTranslation} from 'Util/localizerUtil/reactLocalizerUtil';
-import type {Translate} from 'Util/localizerUtil/translationTypes';
-import {getLogger} from 'Util/logger';
 
 import {DeviceSelect} from './deviceSelect';
 
+import * as Icon from '../../../../../components/icon';
 import {Config} from '../../../../../Config';
+import {MediaStreamHandler} from '../../../../../repositories/media/MediaStreamHandler';
+import {MediaType} from '../../../../../repositories/media/MediaType';
+import {useMediaDevicesStore} from '../../../../../repositories/media/useMediaDevicesStore';
+import {
+  createReactTranslationMarker,
+  renderReactTranslation,
+} from '../../../../../util/localizerUtil/reactLocalizerUtil';
+import type {Translate} from '../../../../../util/localizerUtil/translationTypes';
+import {getLogger} from '../../../../../util/logger';
 import {PreferencesSection} from '../components/preferencesSection';
 
 const logger = getLogger('CameraPreferences');
@@ -55,7 +57,7 @@ type RenderNoCameraMessageOptions = {
   readonly translate: Translate;
 };
 
-function renderNoCameraMessage(options: RenderNoCameraMessageOptions): ReactNode {
+export function renderNoCameraMessage(options: RenderNoCameraMessageOptions): ReactNode {
   const {brandName, translate} = options;
   const translatedText = translate(
     'preferencesAVNoCamera',
@@ -103,7 +105,11 @@ function renderNoCameraMessage(options: RenderNoCameraMessageOptions): ReactNode
   );
 }
 
-const CameraPreferencesComponent = ({streamHandler, refreshStream, hasActiveCameraStream}: CameraPreferencesProps) => {
+const CameraPreferencesComponent: FunctionComponent<CameraPreferencesProps> = ({
+  streamHandler,
+  refreshStream,
+  hasActiveCameraStream,
+}: CameraPreferencesProps) => {
   const {translate} = useApplicationContext();
   const [isRequesting, setIsRequesting] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
@@ -149,7 +155,7 @@ const CameraPreferencesComponent = ({streamHandler, refreshStream, hasActiveCame
   // Debounce to handle rapid device changes (removeAllDevices + enumerateDevices)
   const debouncedRequestStream = useDebouncedCallback(requestStream, DEBOUNCE_TIMEOUT);
 
-  const cleanUpVideoSrc = () => {
+  const cleanUpVideoSrc = (): void => {
     if (videoElement.current !== null) {
       videoElement.current.srcObject = null;
     }

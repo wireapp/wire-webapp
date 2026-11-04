@@ -17,21 +17,25 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {Button, ButtonVariant, CalendarIcon, CallIcon} from '@wireapp/react-ui-kit';
+
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {
   callingButtonGroupStyles,
   callingButtonIconStyles,
   callingButtonStyles,
-} from 'Components/meeting/meetingMultiActionButton/meetingMultiActionButton.styles';
-import {useMeetingActions} from 'Components/meeting/useMeetingActions';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+} from './meetingMultiActionButton.styles';
+
+import {useMeetingActions} from '../useMeetingActions';
 
 export interface MeetingMultiActionButtonProps {
   useMeetingActionsHook?: typeof useMeetingActions;
 }
 
-export const MeetingMultiActionButton = ({
+export const MeetingMultiActionButton: FunctionComponent<MeetingMultiActionButtonProps> = ({
   useMeetingActionsHook = useMeetingActions,
 }: MeetingMultiActionButtonProps) => {
   const {translate} = useApplicationContext();

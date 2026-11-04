@@ -24,7 +24,7 @@ import {Cryptobox} from '@wireapp/cryptobox';
 import {keys as ProteusKeys} from '@wireapp/proteus';
 import {CRUDEngine} from '@wireapp/store-engine';
 
-import {CryptoClient} from './cryptoClient.types';
+import {CryptoClient, InitialPrekeys} from './cryptoClient.types';
 
 import {toArrayBuffer} from '../../../../util/bufferUtils';
 
@@ -32,7 +32,7 @@ type Config = {
   onNewPrekeys: (prekeys: PreKey[]) => void;
 };
 
-export function buildClient(storeEngine: CRUDEngine, config: Config & {nbPrekeys: number}) {
+export function buildClient(storeEngine: CRUDEngine, config: Config & {nbPrekeys: number}): CryptoboxWrapper {
   const cryptobox = new Cryptobox(storeEngine, config.nbPrekeys);
   return new CryptoboxWrapper(cryptobox, config);
 }
@@ -51,11 +51,11 @@ export class CryptoboxWrapper implements CryptoClient {
     });
   }
 
-  getNativeClient() {
+  getNativeClient(): Cryptobox {
     return this.cryptobox;
   }
 
-  async encrypt(sessions: string[], plainText: Uint8Array) {
+  async encrypt(sessions: string[], plainText: Uint8Array): Promise<Map<string, Uint8Array>> {
     const encryptedPayloads: [string, Uint8Array][] = [];
     for (const sessionId of sessions) {
       const encrypted = await this.cryptobox.encrypt(sessionId, plainText);
@@ -64,15 +64,15 @@ export class CryptoboxWrapper implements CryptoClient {
     return new Map(encryptedPayloads);
   }
 
-  decrypt(sessionId: string, message: Uint8Array) {
+  decrypt(sessionId: string, message: Uint8Array): Promise<Uint8Array> {
     return this.cryptobox.decrypt(sessionId, toArrayBuffer(message.buffer));
   }
 
-  async init() {
+  async init(): Promise<void> {
     await this.cryptobox.load();
   }
 
-  async create(_nbPrekeys: number, entropy?: Uint8Array) {
+  async create(_nbPrekeys: number, entropy?: Uint8Array): Promise<InitialPrekeys> {
     const initialPrekeys = await this.cryptobox.create(entropy);
     const prekeys = initialPrekeys
       .map(preKey => {
@@ -96,20 +96,20 @@ export class CryptoboxWrapper implements CryptoClient {
     };
   }
 
-  async getFingerprint() {
+  async getFingerprint(): Promise<string> {
     return this.cryptobox.getIdentity().public_key.fingerprint();
   }
 
-  async getRemoteFingerprint(sessionId: string) {
+  async getRemoteFingerprint(sessionId: string): Promise<string> {
     const session = await this.cryptobox.session_load(sessionId);
     return session.fingerprint_remote();
   }
 
-  sessionFromMessage(sessionId: string, message: Uint8Array) {
+  sessionFromMessage(sessionId: string, message: Uint8Array): Promise<Uint8Array> {
     return this.decrypt(sessionId, message);
   }
 
-  async consumePrekey() {
+  async consumePrekey(): Promise<void> {
     // Cryptobox is keeping track of consumed prekeys internally
   }
 
@@ -117,7 +117,7 @@ export class CryptoboxWrapper implements CryptoClient {
     return void (await this.cryptobox.session_from_prekey(sessionId, toArrayBuffer(prekey.buffer)));
   }
 
-  async sessionExists(sessionId: string) {
+  async sessionExists(sessionId: string): Promise<boolean> {
     try {
       return (await this.cryptobox.session_load(sessionId)) !== undefined;
     } catch {
@@ -125,29 +125,29 @@ export class CryptoboxWrapper implements CryptoClient {
     }
   }
 
-  async saveSession() {
+  async saveSession(): Promise<void> {
     // Cryptobox saves sessions automatically
   }
 
-  async deleteSession(sessionId: string) {
+  async deleteSession(sessionId: string): Promise<void> {
     await this.cryptobox.session_delete(sessionId);
   }
 
-  async newPrekey() {
+  async newPrekey(): Promise<PreKey> {
     // CryptoBox is generating prekeys internally
     return {id: 0, key: ''};
   }
 
-  async debugBreakSession(sessionId: string) {
+  async debugBreakSession(sessionId: string): Promise<void> {
     const session = await this.cryptobox.session_load(sessionId);
     session.session.session_states = {};
 
     this.cryptobox['cachedSessions'].set(sessionId, session);
   }
 
-  async debugResetIdentity() {
+  async debugResetIdentity(): Promise<void> {
     await this.cryptobox.create();
   }
 
-  async wipe() {}
+  async wipe(): Promise<void> {}
 }

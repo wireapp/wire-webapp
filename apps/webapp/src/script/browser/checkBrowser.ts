@@ -21,11 +21,11 @@
  * This file gets compiled and injected separately into the auth and root
  * index.html, to not include any advanced (possibly not supported by
  * browser) JS.
- * Since we are using `sourceMap` for both development and production, `webpack`
+ * Since we are using `sourceMap` for both development and production, `Rspack`
  * wraps this compiled JS onto its code, which can already break in the oldest
  * browsers.
  * For this reason, we have all primitive feature detections in a separate static JS
- * file, `src/page/browser.js`, that doesn't get compiled by webpack.
+ * file, `src/page/browser.js`, that doesn't get compiled by Rspack.
  * We need to keep this file as TS in the codebase and not merge with the static JS,
  * to have the possibility to use config values and constants
  *

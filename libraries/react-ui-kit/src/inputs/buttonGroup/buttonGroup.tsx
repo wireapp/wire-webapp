@@ -17,7 +17,7 @@
  *
  */
 
-import {ButtonHTMLAttributes, forwardRef, ReactNode} from 'react';
+import {ButtonHTMLAttributes, forwardRef, ReactNode, type JSX} from 'react';
 
 import {CSSObject} from '@emotion/react';
 import {isNullOrUndefined} from '@sindresorhus/is';
@@ -64,7 +64,7 @@ type GroupedButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 interface ButtonGroupProps {
   children: ReactNode;
 }
-const ButtonGroup = ({children}: ButtonGroupProps) => {
+const ButtonGroup = ({children}: ButtonGroupProps): JSX.Element => {
   return (
     <div
       css={(theme: Theme) => {

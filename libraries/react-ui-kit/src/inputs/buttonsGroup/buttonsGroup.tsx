@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode} from 'react';
+import {ReactNode, type FunctionComponent, type JSX} from 'react';
 
 import {wrapperStyles} from './buttonsGroup.styles';
 
@@ -28,15 +28,15 @@ interface ButtonsGroupProps {
   children: ReactNode;
 }
 
-export const ButtonsGroup = ({children}: ButtonsGroupProps) => {
+export const ButtonsGroup = ({children}: ButtonsGroupProps): JSX.Element => {
   return <div css={wrapperStyles}>{children}</div>;
 };
 
-const Button = (props: Omit<ButtonProps, 'variant' | 'group'>) => {
+const Button: FunctionComponent<Omit<ButtonProps, 'variant' | 'group'>> = props => {
   return <ButtonComponent variant={ButtonVariant.TERTIARY} group {...props} />;
 };
 
-const IconButton = (props: Omit<IconButtonProps, 'variant' | 'group'>) => {
+const IconButton: FunctionComponent<Omit<IconButtonProps, 'variant' | 'group'>> = props => {
   return <IconButtonComponent variant={IconButtonVariant.PRIMARY} group {...props} />;
 };
 

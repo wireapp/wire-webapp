@@ -17,13 +17,16 @@
  *
  */
 
-import {CellsModal} from 'Components/conversation/conversationCells/common/cellsModal/cellsModal';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import type {FunctionComponent} from 'react';
+
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 
 import {CellsRenameForm} from './cellsRenameForm/cellsRenameForm';
 import {useCellsRenameForm} from './useCellsRenameNodeForm/useCellsRenameNodeForm';
+
+import {CellsRepository} from '../../../../../../../repositories/cells/cellsRepository';
+import {CellsModal} from '../../../../common/cellsModal/cellsModal';
 
 interface CellsRenameNodeModalProps {
   isOpen: boolean;
@@ -33,7 +36,7 @@ interface CellsRenameNodeModalProps {
   onRefresh: () => void;
 }
 
-export const CellsRenameNodeModal = ({
+export const CellsRenameNodeModal: FunctionComponent<CellsRenameNodeModalProps> = ({
   isOpen,
   onClose,
   node,

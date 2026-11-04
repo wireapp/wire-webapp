@@ -17,21 +17,21 @@
  *
  */
 
-import {render, screen} from '@testing-library/react';
+import {render, screen, type RenderResult} from '@testing-library/react';
 import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {ThemeProvider} from '@wireapp/react-ui-kit';
 
-import {MeetingStoreProvider} from 'Components/meeting/meetingStore/meetingStoreProvider';
-import {createMeetingStore} from 'Components/meeting/meetingStore/createMeetingStore';
-import type {MeetingStoreServiceTasks} from 'Components/meeting/meetingStore/meetingStoreDeps';
+import {MeetingStoreProvider} from '../../../../meetingStore/meetingStoreProvider';
+import {createMeetingStore, type MeetingStore} from '../../../../meetingStore/createMeetingStore';
+import type {MeetingStoreServiceTasks} from '../../../../meetingStore/meetingStoreDeps';
 import {MeetingAction} from './meetingAction';
-import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
-import type {MeetingSeries} from 'Components/meeting/types/meetingSeries';
-import type {CallingRepository} from 'Repositories/calling/CallingRepository';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {User} from 'Repositories/entity/User';
-import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
-import {translateForTest} from 'Util/test/translateForTest';
+import type {MeetingInstance} from '../../../../types/meetingInstance';
+import type {MeetingSeries} from '../../../../types/meetingSeries';
+import type {CallingRepository} from '../../../../../../repositories/calling/CallingRepository';
+import type {ConversationRepository} from '../../../../../../repositories/conversation/ConversationRepository';
+import {User} from '../../../../../../repositories/entity/User';
+import type {MeetingsRepository} from '../../../../../../repositories/meetings/meetingsRepository';
+import {translateForTest} from '../../../../../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
@@ -54,7 +54,7 @@ const series: MeetingSeries = {
 const meetingInstance: MeetingInstance = {meetingSeries: series, start, end};
 const selfUser = new User('host-id', 'example.com', translateForTest);
 
-const createMeetingStoreForTest = () => {
+const createMeetingStoreForTest = (): MeetingStore => {
   return createMeetingStore({
     meetingsRepository: {} as MeetingsRepository,
     conversationRepository: {} as ConversationRepository,
@@ -75,7 +75,7 @@ const renderAction = (
   now: string,
   user = selfUser,
   clock = createDeterministicClock({initialUnixEpochMicroseconds: BigInt(Date.parse(now)) * 1_000n}),
-) => {
+): RenderResult => {
   return render(
     <MeetingStoreProvider store={createMeetingStoreForTest()}>
       <ThemeProvider>

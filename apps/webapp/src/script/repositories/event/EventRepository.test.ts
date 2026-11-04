@@ -20,11 +20,11 @@
 import {isUndefined} from '@sindresorhus/is';
 import {BackendEvent, CONVERSATION_EVENT, MEETING_EVENT, USER_EVENT} from '@wireapp/api-client/lib/event/';
 import {ConnectionState} from '@wireapp/core';
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {WebAppEvents} from '../../webAppEvents';
 import {amplify} from 'amplify';
 import {Runtime} from '@wireapp/commons';
 
-import {ClientConversationEvent} from 'Repositories/conversation/EventBuilder';
+import {ClientConversationEvent} from '../conversation/EventBuilder';
 import {Warnings} from '../../view_model/WarningsContainer';
 
 import {ClientEvent} from './Client';
@@ -540,26 +540,26 @@ describe('EventRepository', () => {
 
     describe('WebSocket reconnection logic', () => {
       // Flushes all pending microtasks and macrotasks so async closures settle
-      const flushPromises = () => {
+      const flushPromises = (): Promise<void> => {
         return new Promise<void>(resolve => {
           return setTimeout(resolve, 0);
         });
       };
 
-      const getVisibilityHandler = () => {
+      const getVisibilityHandler = (): (() => void) => {
         return (document.addEventListener as jest.Mock).mock.calls.find(([name]: [string]) => {
           return name === 'visibilitychange';
         })?.[1] as () => void;
       };
 
-      const triggerVisibility = () => {
+      const triggerVisibility = (): void => {
         Object.defineProperty(document, 'visibilityState', {value: 'visible', configurable: true});
         getVisibilityHandler()();
       };
 
       // Calls connectWebSocket, captures the onConnectionStateChanged callback,
       // transitions to LIVE, and clears mock call counts ready for assertions.
-      const setup = async () => {
+      const setup = async (): Promise<(state: ConnectionState) => void> => {
         let stateCallback: ((state: ConnectionState) => void) | undefined;
         mockAccount.listen.mockImplementation(({onConnectionStateChanged}: any) => {
           stateCallback = onConnectionStateChanged;

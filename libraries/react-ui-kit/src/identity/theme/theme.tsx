@@ -18,6 +18,7 @@
  */
 
 import * as React from 'react';
+import {type FunctionComponent} from 'react';
 
 import {ThemeProvider as EmotionThemeProvider} from '@emotion/react';
 
@@ -375,6 +376,6 @@ export interface ThemeProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   children: React.ReactNode;
 }
 
-export const ThemeProvider = ({theme = themes[THEME_ID.DEFAULT], ...props}: ThemeProps) => {
+export const ThemeProvider: FunctionComponent<ThemeProps> = ({theme = themes[THEME_ID.DEFAULT], ...props}) => {
   return <EmotionThemeProvider theme={theme} {...props} />;
 };

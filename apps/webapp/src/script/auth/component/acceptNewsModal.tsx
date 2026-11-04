@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import React, {type FunctionComponent} from 'react';
 
 import {FormattedMessage} from 'react-intl';
 
@@ -32,7 +32,7 @@ interface Props {
   onDecline: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
-const AcceptNewsModal = ({onConfirm, onDecline}: Props) => {
+const AcceptNewsModal: FunctionComponent<Props> = ({onConfirm, onDecline}: Props) => {
   const {translate} = useApplicationContext();
   return (
     <Modal>

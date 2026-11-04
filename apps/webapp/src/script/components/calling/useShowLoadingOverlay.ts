@@ -19,18 +19,19 @@
 
 import {useCallback, useEffect, useState} from 'react';
 
-import {useBackgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
+import {useBackgroundEffectsStore} from '../../repositories/media/useBackgroundEffectsStore';
 
 type ProcessedVideoStream = {
   stream: MediaStream;
   release: () => void;
 };
 
+type UseShowLoadingOverlayResult = {onVideoCanPlay: () => void; showLoadingOverlay: boolean};
 const useShowLoadingOverlay = (
   isSelfParticipant: boolean,
   hasActiveVideo: boolean,
   processedVideoStream?: ProcessedVideoStream,
-) => {
+): UseShowLoadingOverlayResult => {
   const isBackgroundEffectInitializing = useBackgroundEffectsStore(state => {
     return state.isInitializing;
   });
@@ -38,7 +39,7 @@ const useShowLoadingOverlay = (
 
   useEffect(() => {
     setIsVideoReady(false);
-  }, [processedVideoStream]);
+  }, [hasActiveVideo, processedVideoStream]);
 
   const onVideoCanPlay = useCallback(() => {
     setIsVideoReady(true);

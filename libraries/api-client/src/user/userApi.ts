@@ -300,7 +300,7 @@ export class UserAPI {
       config.params.size = limit;
     }
 
-    const handleRequest = async () => {
+    const handleRequest = async (): Promise<SearchResult> => {
       try {
         const response = await this.client.sendJSON<SearchResult>(config);
         return response.data;

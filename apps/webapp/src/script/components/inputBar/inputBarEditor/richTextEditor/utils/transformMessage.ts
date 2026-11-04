@@ -21,11 +21,11 @@ import {$getRoot} from 'lexical';
 
 import {findAndTransformEmoji} from '../plugins/inlineEmojiReplacementPlugin';
 
-export const transformMessage = ({replaceEmojis, markdown}: {replaceEmojis: boolean; markdown: string}) => {
+export const transformMessage = ({replaceEmojis, markdown}: {replaceEmojis: boolean; markdown: string}): string => {
   return replaceEmojis ? findAndTransformEmoji(markdown) : markdown;
 };
 
-export const getRawMessageText = () => {
+export const getRawMessageText = (): string => {
   return $getRoot()
     .getChildren()
     .map(node => {

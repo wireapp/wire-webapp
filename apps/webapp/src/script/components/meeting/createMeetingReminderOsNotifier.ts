@@ -19,15 +19,16 @@
 
 import {Maybe, maybe, result} from 'true-myth';
 
-import type {MeetingReminderFirePayload} from 'Components/meeting/createMeetingReminderScheduler';
 import type {
   SystemNotificationApi,
   SystemNotificationHandle,
   SystemNotificationPermission,
 } from 'src/script/notification/systemNotificationTypes';
-import type {Translate} from 'Util/localizerUtil';
 
+import type {MeetingReminderFirePayload} from './createMeetingReminderScheduler';
 import {toMeetingIdKey} from './utils/toMeetingIdKey';
+
+import type {Translate} from '../../util/localizerUtil';
 
 type MeetingReminderOsNotifierLogger = {
   info: (message: string, context?: unknown) => void;

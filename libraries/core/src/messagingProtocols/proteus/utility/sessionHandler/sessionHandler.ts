@@ -28,7 +28,7 @@ import {
 import {PreKey} from '@wireapp/api-client/lib/auth';
 import {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId, QualifiedUserPreKeyBundleMap} from '@wireapp/api-client/lib/user';
-import {Decoder} from 'bazinga64';
+import {Decoder} from '@wireapp/commons/lib/base64/decoder';
 import {Logger} from 'logdown';
 
 import {APIClient} from '@wireapp/api-client';
@@ -37,6 +37,12 @@ import {SessionId} from './sessionHandler.types';
 
 import {flattenUserMap} from '../../../../conversation/message/userClientsUtil';
 import {CryptoClient} from '../../proteusService/cryptoClient';
+
+type CreateSessionsResult = {
+  sessions: string[];
+  unknowns?: QualifiedUserClients;
+  failed: [QualifiedId, ...QualifiedId[]] | undefined;
+};
 
 interface ConstructSessionIdParams {
   userId: QualifiedId;
@@ -120,7 +126,11 @@ const initSession = async (
  * Create sessions for legacy/qualified clients (umberella function).
  * @param {userClientMap} map of domain to (map of user IDs to client IDs) or map of user IDs containg the lists of clients
  */
-const createSessions = async ({recipients, apiClient, cryptoClient}: CreateSessionsProps) => {
+const createSessions = async ({
+  recipients,
+  apiClient,
+  cryptoClient,
+}: CreateSessionsProps): Promise<CreateSessionsResult> => {
   const {qualified_user_client_prekeys: prekeysBundle, failed_to_list: failed} =
     await apiClient.api.user.postMultiPreKeyBundles(recipients);
 
@@ -223,7 +233,7 @@ interface DeleteSessionParams {
   clientId: string;
   cryptoClient: CryptoClient;
 }
-async function deleteSession(params: DeleteSessionParams) {
+async function deleteSession(params: DeleteSessionParams): Promise<void> {
   const sessionId = constructSessionId(params);
   await params.cryptoClient.deleteSession(sessionId);
 }

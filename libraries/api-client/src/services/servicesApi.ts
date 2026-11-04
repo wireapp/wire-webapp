@@ -29,9 +29,10 @@ import {
   ServiceMessage,
 } from './service';
 
-import {AssetOptions, AssetAPI} from '../asset';
+import {AssetOptions, AssetAPI, AssetResponse} from '../asset';
+import {AssetUploadData} from '../asset/assetApi.schema';
 import {PreKey} from '../auth';
-import {HttpClient, ProgressCallback} from '../http';
+import {HttpClient, ProgressCallback, RequestCancelable} from '../http';
 
 export class ServicesAPI {
   constructor(
@@ -181,14 +182,22 @@ export class ServicesAPI {
    * Upload an asset.
    * Note that resumable uploads are not currently supported for services.
    */
-  public postAsset(asset: Uint8Array, options?: AssetOptions, progressCallback?: ProgressCallback) {
+  public postAsset(
+    asset: Uint8Array,
+    options?: AssetOptions,
+    progressCallback?: ProgressCallback,
+  ): RequestCancelable<AssetUploadData> {
     return this.assetAPI.postServiceAsset(asset, options, progressCallback);
   }
 
   /**
    * Download an asset.
    */
-  public getAsset(assetId: string, token?: string | null, progressCallback?: ProgressCallback) {
+  public getAsset(
+    assetId: string,
+    token?: string | null,
+    progressCallback?: ProgressCallback,
+  ): RequestCancelable<AssetResponse> {
     return this.assetAPI.getServiceAsset(assetId, token, progressCallback);
   }
 

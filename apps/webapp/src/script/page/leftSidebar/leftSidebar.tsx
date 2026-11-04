@@ -17,16 +17,13 @@
  *
  */
 
-import {useEffect} from 'react';
+import {useEffect, type FunctionComponent} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
 
 import {useMatchMedia} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {MeetingNotificationHost} from 'Components/meeting/meetingNotificationHost/meetingNotificationHost';
-import {User} from 'Repositories/entity/User';
 import {conversationListCollapseFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
@@ -34,7 +31,10 @@ import {Conversations} from './panels/conversations';
 import {getIsConversationListCollapsed, SidebarTabs, useSidebarStore} from './panels/conversations/useSidebarStore';
 import {TemporaryGuestConversations} from './panels/temporatyGuestConversations';
 
+import {MeetingNotificationHost} from '../../components/meeting/meetingNotificationHost/meetingNotificationHost';
+import {User} from '../../repositories/entity/User';
 import {ListViewModel} from '../../view_model/ListViewModel';
+import {WebAppEvents} from '../../webAppEvents';
 import {ListState, useAppState} from '../useAppState';
 
 type LeftSidebarProps = {
@@ -43,7 +43,11 @@ type LeftSidebarProps = {
   isActivatedAccount: boolean;
 };
 
-export const LeftSidebar = ({listViewModel, selfUser, isActivatedAccount}: LeftSidebarProps) => {
+export const LeftSidebar: FunctionComponent<LeftSidebarProps> = ({
+  listViewModel,
+  selfUser,
+  isActivatedAccount,
+}: LeftSidebarProps) => {
   const {conversationRepository, propertiesRepository} = listViewModel;
   const repositories = listViewModel.contentViewModel.repositories;
 
@@ -63,7 +67,7 @@ export const LeftSidebar = ({listViewModel, selfUser, isActivatedAccount}: LeftS
   const isStandalone = currentTab === SidebarTabs.CELLS || currentTab === SidebarTabs.MEETINGS;
 
   useEffect(() => {
-    function openCreateGroupModal() {
+    function openCreateGroupModal(): void {
       amplify.publish(WebAppEvents.CONVERSATION.CREATE_GROUP, 'conversation_details');
     }
 

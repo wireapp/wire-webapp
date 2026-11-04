@@ -38,6 +38,7 @@ export type VerificationResult =
 
 const datadogReferencePattern = /@datadog\/browser-logs|@datadog\/browser-rum|datadoghq\.eu/g;
 const publicProductionArtifactDirectory = 'apps/server/dist/static';
+const artifactDirectoryArgumentIndex = 2;
 
 function isScannedPublicProductionArtifactFile(filePath: string): boolean {
   return (
@@ -69,7 +70,7 @@ export function getPublicProductionArtifactFilePaths(artifactDirectory: string):
     }
   }
 
-  return artifactFilePaths.sort();
+  return artifactFilePaths.toSorted();
 }
 
 export function getDatadogReferencesInFile(filePath: string): readonly DatadogReference[] {
@@ -121,19 +122,21 @@ export function verifyPublicProductionBundle(artifactDirectory: string): Verific
 
 function printVerificationResult(result: VerificationResult): void {
   if (result.status === 'passed') {
-    console.log(`No Datadog SDK references found in ${result.checkedFileCount} public production artifact files.`);
+    console.info(`No Datadog SDK references found in ${result.checkedFileCount} public production artifact files.`);
     return;
   }
 
   for (const reference of result.references) {
-    console.log(`${reference.filePath}:${reference.lineNumber}: ${reference.matchedText}`);
+    console.info(`${reference.filePath}:${reference.lineNumber}: ${reference.matchedText}`);
   }
 
   console.error('Datadog SDK references were found in the public production bundle.');
   process.exitCode = 1;
 }
 
-function main(artifactDirectory: string = process.argv[2] ?? publicProductionArtifactDirectory): void {
+function main(
+  artifactDirectory: string = process.argv[artifactDirectoryArgumentIndex] ?? publicProductionArtifactDirectory,
+): void {
   try {
     const result = verifyPublicProductionBundle(artifactDirectory);
     printVerificationResult(result);

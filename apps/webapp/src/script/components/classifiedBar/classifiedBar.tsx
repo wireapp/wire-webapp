@@ -17,14 +17,17 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {CSSObject} from '@emotion/react';
 import cx from 'classnames';
 
-import * as Icon from 'Components/icon';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
+
+import {Conversation} from '../../repositories/entity/Conversation';
+import {User} from '../../repositories/entity/User';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
+import * as Icon from '../icon';
 
 function isClassified(users: User[], classifiedDomains: string[], conversationDomain?: string): boolean {
   // if a conversation is hosted on an unclassified domain it is not considered classified
@@ -52,7 +55,12 @@ interface UserClassifiedBarProps extends ClassifiedBarProps {
   users: User[];
 }
 
-export const UserClassifiedBar = ({users, conversationDomain, classifiedDomains, style}: UserClassifiedBarProps) => {
+export const UserClassifiedBar: FunctionComponent<UserClassifiedBarProps> = ({
+  users,
+  conversationDomain,
+  classifiedDomains,
+  style,
+}: UserClassifiedBarProps) => {
   const {translate} = useApplicationContext();
 
   if (typeof classifiedDomains === 'undefined') {
@@ -78,7 +86,10 @@ interface ConversationClassifiedBarProps extends ClassifiedBarProps {
   conversation: Conversation;
 }
 
-export const ConversationClassifiedBar = ({conversation, ...classifiedBarProps}: ConversationClassifiedBarProps) => {
+export const ConversationClassifiedBar: FunctionComponent<ConversationClassifiedBarProps> = ({
+  conversation,
+  ...classifiedBarProps
+}: ConversationClassifiedBarProps) => {
   const {allUserEntities: users} = useKoSubscribableChildren(conversation, ['allUserEntities']);
   return <UserClassifiedBar users={users} conversationDomain={conversation.domain} {...classifiedBarProps} />;
 };

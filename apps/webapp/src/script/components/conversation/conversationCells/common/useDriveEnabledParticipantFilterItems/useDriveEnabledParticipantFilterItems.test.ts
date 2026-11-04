@@ -17,12 +17,12 @@
  *
  */
 
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import type {ConversationRepository} from '../../../../../repositories/conversation/ConversationRepository';
+import type {Conversation} from '../../../../../repositories/entity/Conversation';
+import {User} from '../../../../../repositories/entity/User';
 
 import {getDriveEnabledParticipants} from './useDriveEnabledParticipantFilterItems';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../../util/test/translateForTest';
 
 const createUser = ({id, domain = 'example.com', name}: {id: string; domain?: string; name: string}): User => {
   const user = new User(id, domain, translateForTest);

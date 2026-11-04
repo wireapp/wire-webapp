@@ -49,14 +49,16 @@ export const formatMeetingDateIso = (date: Date): string => {
   return `${year}-${month}-${day}`;
 };
 
-export const createOngoingMeetingWindow = (now = new Date()) => {
+type CreateOngoingMeetingWindowResult = {start: Date; end: Date};
+export const createOngoingMeetingWindow = (now = new Date()): CreateOngoingMeetingWindowResult => {
   const start = roundDateDownToFifteenMinutes(new Date(now.getTime() - 30 * 60 * 1000));
   const end = roundDateUpToFifteenMinutes(new Date(now.getTime() + 2 * 60 * 60 * 1000));
 
   return {start, end};
 };
 
-export const createEndedMeetingWindow = (now = new Date()) => {
+type CreateEndedMeetingWindowResult = {start: Date; end: Date};
+export const createEndedMeetingWindow = (now = new Date()): CreateEndedMeetingWindowResult => {
   const end = roundDateDownToFifteenMinutes(new Date(now.getTime() - 15 * 60 * 1000));
   const start = roundDateDownToFifteenMinutes(new Date(end.getTime() - 60 * 60 * 1000));
 

@@ -17,11 +17,11 @@
  *
  */
 
-import {AssetType} from 'Repositories/assets/assetType';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {Asset} from 'Repositories/entity/message/asset';
-import type {FileAsset as FileAssetType} from 'Repositories/entity/message/fileAsset';
-import type {Message} from 'Repositories/entity/message/message';
+import {AssetType} from '../repositories/assets/assetType';
+import {Conversation} from '../repositories/entity/Conversation';
+import {Asset} from '../repositories/entity/message/asset';
+import type {FileAsset as FileAssetType} from '../repositories/entity/message/fileAsset';
+import type {Message} from '../repositories/entity/message/message';
 
 interface MessageDataType {
   senderName: string;

@@ -32,7 +32,7 @@ import {
   COMMAND_PRIORITY_EDITOR,
 } from 'lexical';
 
-import {isTabKey} from 'Util/keyboardUtil';
+import {isTabKey} from '../../../../../../util/keyboardUtil';
 
 const ON_SHIFT_TAB: LexicalCommand<KeyboardEvent> = createCommand('ON_SHIFT_TAB');
 interface GlobalEventsPluginProps {
@@ -46,7 +46,7 @@ export function GlobalEventsPlugin({onShiftTab, onArrowUp, onEscape, onBlur}: Gl
   const [editor] = useLexicalComposerContext();
 
   useLayoutEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
+    const onKeyDown = (event: KeyboardEvent): void => {
       // "Shift" + "Tab"
       if (event.shiftKey && isTabKey(event)) {
         editor.dispatchCommand(ON_SHIFT_TAB, event);

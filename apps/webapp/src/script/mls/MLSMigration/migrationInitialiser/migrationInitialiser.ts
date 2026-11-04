@@ -24,9 +24,8 @@ import {
   ProteusConversation,
   isMixedConversation,
   isProteusConversation,
-} from 'Repositories/conversation/ConversationSelectors';
-import {Conversation} from 'Repositories/entity/Conversation';
-
+} from '../../../repositories/conversation/ConversationSelectors';
+import {Conversation} from '../../../repositories/entity/Conversation';
 import {mlsMigrationLogger} from '../MLSMigrationLogger';
 
 interface MigrationInitConversationHandler {
@@ -54,7 +53,7 @@ export const initialiseMigrationOfProteusConversations = async (
   conversations: Conversation[],
   selfUserId: QualifiedId,
   {updateConversationProtocol, tryEstablishingMLSGroup}: MigrationInitConversationHandler,
-) => {
+): Promise<void> => {
   const proteusConversations = conversations.filter(isProteusConversation);
   if (proteusConversations.length < 1) {
     return;
@@ -73,7 +72,7 @@ const initialiseMigrationOfProteusConversation = async (
   proteusConversation: ProteusConversation,
   selfUserId: QualifiedId,
   {updateConversationProtocol, tryEstablishingMLSGroup}: MigrationInitConversationHandler,
-) => {
+): Promise<void> => {
   mlsMigrationLogger.info(
     `Initialising MLS migration for "proteus" conversation: ${proteusConversation.qualifiedId.id}`,
   );

@@ -110,7 +110,7 @@ export const handleEnterpriseLogin = async ({
   dispatch: Dispatch;
   navigate: (route: string) => void;
   apiClient: APIClient;
-}) => {
+}): Promise<void> => {
   const ssoCodeResponse = await apiClient.api.account.getSSOCodeByEmail(email);
 
   if (isString(ssoCodeResponse.sso_code)) {

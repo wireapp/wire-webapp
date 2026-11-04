@@ -33,7 +33,10 @@ const invalidTransition = (state: UploadState, action: UploadAction): Result<Upl
   return Result.err({kind: 'invalidTransition', from: state.kind, action: action.type});
 };
 
-const transitionFromQueued = (state: Extract<UploadState, {kind: 'queued'}>, action: UploadAction) => {
+const transitionFromQueued = (
+  state: Extract<UploadState, {kind: 'queued'}>,
+  action: UploadAction,
+): Result<UploadState, UploadLifecycleError> => {
   if (action.type === 'startUpload') {
     return Result.ok<UploadState, UploadLifecycleError>({
       kind: 'uploading',
@@ -54,7 +57,10 @@ const transitionFromQueued = (state: Extract<UploadState, {kind: 'queued'}>, act
   return invalidTransition(state, action);
 };
 
-const transitionFromUploading = (state: Extract<UploadState, {kind: 'uploading'}>, action: UploadAction) => {
+const transitionFromUploading = (
+  state: Extract<UploadState, {kind: 'uploading'}>,
+  action: UploadAction,
+): Result<UploadState, UploadLifecycleError> => {
   if (action.type === 'progress') {
     return Result.ok<UploadState, UploadLifecycleError>({...state, progress: normalizeProgress(action.progress)});
   }
@@ -87,7 +93,10 @@ const transitionFromUploading = (state: Extract<UploadState, {kind: 'uploading'}
   return invalidTransition(state, action);
 };
 
-const transitionFromDraftReady = (state: Extract<UploadState, {kind: 'draftReady'}>, action: UploadAction) => {
+const transitionFromDraftReady = (
+  state: Extract<UploadState, {kind: 'draftReady'}>,
+  action: UploadAction,
+): Result<UploadState, UploadLifecycleError> => {
   if (action.type === 'publish') {
     return Result.ok<UploadState, UploadLifecycleError>({...state, kind: 'publishing'});
   }
@@ -99,7 +108,10 @@ const transitionFromDraftReady = (state: Extract<UploadState, {kind: 'draftReady
   return invalidTransition(state, action);
 };
 
-const transitionFromUploadFailed = (state: Extract<UploadState, {kind: 'uploadFailed'}>, action: UploadAction) => {
+const transitionFromUploadFailed = (
+  state: Extract<UploadState, {kind: 'uploadFailed'}>,
+  action: UploadAction,
+): Result<UploadState, UploadLifecycleError> => {
   if (action.type === 'retryUpload') {
     return Result.ok<UploadState, UploadLifecycleError>({
       kind: 'queued',
@@ -111,7 +123,10 @@ const transitionFromUploadFailed = (state: Extract<UploadState, {kind: 'uploadFa
   return invalidTransition(state, action);
 };
 
-const transitionFromPublishing = (state: Extract<UploadState, {kind: 'publishing'}>, action: UploadAction) => {
+const transitionFromPublishing = (
+  state: Extract<UploadState, {kind: 'publishing'}>,
+  action: UploadAction,
+): Result<UploadState, UploadLifecycleError> => {
   if (action.type === 'publishSucceeded') {
     return Result.ok<UploadState, UploadLifecycleError>({...state, kind: 'published'});
   }
@@ -128,7 +143,10 @@ const transitionFromPublishing = (state: Extract<UploadState, {kind: 'publishing
   return invalidTransition(state, action);
 };
 
-const transitionFromPublishFailed = (state: Extract<UploadState, {kind: 'publishFailed'}>, action: UploadAction) => {
+const transitionFromPublishFailed = (
+  state: Extract<UploadState, {kind: 'publishFailed'}>,
+  action: UploadAction,
+): Result<UploadState, UploadLifecycleError> => {
   if (action.type === 'retryPublish') {
     return Result.ok<UploadState, UploadLifecycleError>({
       kind: 'draftReady',
@@ -140,7 +158,10 @@ const transitionFromPublishFailed = (state: Extract<UploadState, {kind: 'publish
   return invalidTransition(state, action);
 };
 
-const transitionFromDiscarding = (state: Extract<UploadState, {kind: 'discarding'}>, action: UploadAction) => {
+const transitionFromDiscarding = (
+  state: Extract<UploadState, {kind: 'discarding'}>,
+  action: UploadAction,
+): Result<UploadState, UploadLifecycleError> => {
   if (action.type === 'discardSucceeded') {
     return Result.ok<UploadState, UploadLifecycleError>({
       kind: 'discarded',
@@ -161,7 +182,10 @@ const transitionFromDiscarding = (state: Extract<UploadState, {kind: 'discarding
   return invalidTransition(state, action);
 };
 
-const transitionFromDiscardFailed = (state: Extract<UploadState, {kind: 'discardFailed'}>, action: UploadAction) => {
+const transitionFromDiscardFailed = (
+  state: Extract<UploadState, {kind: 'discardFailed'}>,
+  action: UploadAction,
+): Result<UploadState, UploadLifecycleError> => {
   if (action.type === 'retryDiscard') {
     return Result.ok<UploadState, UploadLifecycleError>({
       kind: 'draftReady',

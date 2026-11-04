@@ -17,13 +17,13 @@
  *
  */
 
-import {useRef, useState} from 'react';
-
-import {FileAsset} from 'Repositories/entity/message/fileAsset';
-import {createUuid} from 'Util/uuid';
+import {useRef, useState, type FunctionComponent} from 'react';
 
 import {svgStyles, svgStylesDisabled} from './audioSeekBar.styles';
 import {useAudioSeekBar} from './useAudioSeekBar/useAudioSeekBar';
+
+import {FileAsset} from '../../../../../../../../repositories/entity/message/fileAsset';
+import {createUuid} from '../../../../../../../../util/uuid';
 
 interface AudioSeekBarNewProps {
   asset: FileAsset;
@@ -31,7 +31,11 @@ interface AudioSeekBarNewProps {
   disabled?: boolean;
 }
 
-export const AudioSeekBarNew = ({asset, audioElement, disabled = false}: AudioSeekBarNewProps) => {
+export const AudioSeekBarNew: FunctionComponent<AudioSeekBarNewProps> = ({
+  asset,
+  audioElement,
+  disabled = false,
+}: AudioSeekBarNewProps) => {
   const svgNode = useRef<SVGSVGElement>(null);
   const [clipId] = useState(`clip-${createUuid()}`);
 

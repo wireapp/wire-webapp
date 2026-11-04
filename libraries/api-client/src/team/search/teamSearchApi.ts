@@ -58,7 +58,7 @@ export class TeamSearchAPI {
       url: `${TeamAPI.URL.TEAMS}/${teamId}/${TeamSearchAPI.URL.SEARCH}`,
     };
 
-    const handleRequest = async () => {
+    const handleRequest = async (): Promise<TeamSearchResult> => {
       try {
         const response = await this.client.sendJSON<TeamSearchResult>(config);
         return response.data;

@@ -21,18 +21,18 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {CredentialType, E2eiConversationState} from '@wireapp/core/lib/messagingProtocols/mls';
 import {asyncNoop, noop} from 'noop-esm';
 
-import {Conversation} from 'Repositories/entity/Conversation';
+import {Conversation} from '../../../entity/Conversation';
 import * as e2eIdentity from 'src/script/e2eIdentity';
 import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {Core} from 'src/script/service/coreSingleton';
-import {createUuid} from 'Util/uuid';
-import {waitFor} from 'Util/waitFor';
+import {createUuid} from '../../../../util/uuid';
+import {waitFor} from '../../../../util/waitFor';
 
 import {MLSConversationVerificationStateHandler} from './MLSStateHandler';
 
 import {ConversationState} from '../../ConversationState';
 import {ConversationVerificationState} from '../../ConversationVerificationState';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../util/test/translateForTest';
 
 jest.mock('src/script/e2eIdentity', () => {
   return {
@@ -123,7 +123,7 @@ describe('MLSConversationVerificationStateHandler', () => {
   it('should do nothing if MLS service is not available', () => {
     getCoreServiceForTest().mls = undefined;
 
-    const t = () => {
+    const t = (): MLSConversationVerificationStateHandler => {
       return new MLSConversationVerificationStateHandler('domain', noop, asyncNoop, conversationState, core);
     };
 

@@ -17,9 +17,11 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
-export const EditDocumentIcon = ({...props}: SVGIconProps) => {
+export const EditDocumentIcon: FunctionComponent<SVGIconProps> = ({...props}) => {
   return (
     <SVGIcon realWidth={12} realHeight={12} {...props}>
       <path

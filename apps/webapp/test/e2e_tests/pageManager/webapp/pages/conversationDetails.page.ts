@@ -22,6 +22,12 @@ import {GuestOptionsPage} from './guestOptions.page';
 
 type NotificationLevel = 'Everything' | 'Mentions and replies' | 'Nothing';
 
+type GetParticipantResult = Locator & {
+  roleIcon: Locator;
+  availabilityIcon: Locator;
+  federatedIcon: Locator;
+  openDetails: () => Promise<void>;
+};
 export class ConversationDetailsPage {
   private readonly page: Page;
 
@@ -71,11 +77,11 @@ export class ConversationDetailsPage {
     this.protocol = this.conversationDetails.getByLabel('Protocol');
   }
 
-  async waitForSidebar() {
+  async waitForSidebar(): Promise<void> {
     await this.conversationDetails.waitFor({state: 'visible'});
   }
 
-  async isOpen(conversationName: string) {
+  async isOpen(conversationName: string): Promise<boolean> {
     return (
       (await this.page
         .locator('#right-column .conversation-details__header')
@@ -84,15 +90,15 @@ export class ConversationDetailsPage {
     );
   }
 
-  async clickAddPeopleButton() {
+  async clickAddPeopleButton(): Promise<void> {
     await this.addPeopleButton.click();
   }
 
-  async clickSelectedUsersButton() {
+  async clickSelectedUsersButton(): Promise<void> {
     await this.page.locator('#add-participants').getByTestId('do-toggle-selected-search-list').click();
   }
 
-  async addUsersToConversation(fullNames: string[]) {
+  async addUsersToConversation(fullNames: string[]): Promise<void> {
     for (const fullName of fullNames) {
       await this.searchList.locator(`li div[aria-label*="${fullName}"]`).click();
       // Wait for the user to be selected (checkbox should be checked)
@@ -103,7 +109,7 @@ export class ConversationDetailsPage {
     await this.page.locator('#add-participants').getByTestId('do-create').click();
   }
 
-  async isUserPartOfConversationAsAdmin(fullName: string) {
+  async isUserPartOfConversationAsAdmin(fullName: string): Promise<boolean> {
     const userLocator = this.page
       .locator('#conversation-details')
       .getByTestId('list-admins')
@@ -113,7 +119,7 @@ export class ConversationDetailsPage {
     return userLocator.isVisible();
   }
 
-  async isUserPartOfConversationAsMember(fullName: string) {
+  async isUserPartOfConversationAsMember(fullName: string): Promise<boolean> {
     const userLocator = this.page
       .locator('#conversation-details')
       .getByTestId('list-members')
@@ -123,7 +129,7 @@ export class ConversationDetailsPage {
     return userLocator.isVisible();
   }
 
-  getParticipant(fullName: string) {
+  getParticipant(fullName: string): GetParticipantResult {
     const baseLocator = this.getLocatorByUser(fullName);
 
     return Object.assign(baseLocator, {
@@ -136,7 +142,7 @@ export class ConversationDetailsPage {
     });
   }
 
-  getLocatorByUser(fullName: string) {
+  getLocatorByUser(fullName: string): Locator {
     return this.page
       .locator('#conversation-details')
       .getByTestId('list-users')
@@ -144,12 +150,12 @@ export class ConversationDetailsPage {
       .and(this.page.locator(`[data-uie-value="${fullName}"]`));
   }
 
-  async clickArchiveButton() {
+  async clickArchiveButton(): Promise<void> {
     await this.archiveButton.click();
   }
 
   /** Opens the self deleting messages panel, selects the given value and closes it again */
-  async setSelfDeletingMessages(value: 'Off' | '10 seconds') {
+  async setSelfDeletingMessages(value: 'Off' | '10 seconds'): Promise<void> {
     await this.selfDeletingMessageButton.click();
     const selfDeletingMessagesPanel = this.page.locator('#timed-messages');
     // The radio options are currently not accessible so accessible locators can't be used
@@ -158,7 +164,7 @@ export class ConversationDetailsPage {
   }
 
   /** Opens the guests panel, creates a link for guests to join the group, closes the panel and returns the created link */
-  async createGuestLink(options?: Parameters<ReturnType<typeof GuestOptionsPage>['createLink']>[0]) {
+  async createGuestLink(options?: Parameters<ReturnType<typeof GuestOptionsPage>['createLink']>[0]): Promise<string> {
     await this.guestOptionsButton.click();
 
     const guestOptionsPage = GuestOptionsPage(this.page);
@@ -168,7 +174,7 @@ export class ConversationDetailsPage {
     return link;
   }
 
-  async addServiceToConversation(serviceName: string) {
+  async addServiceToConversation(serviceName: string): Promise<void> {
     // Click on the Services/Apps tab
     const servicesTab = this.page.locator('#add-participants').getByTestId('do-add-services');
     await servicesTab.click();
@@ -193,7 +199,7 @@ export class ConversationDetailsPage {
     await addServiceButton.click();
   }
 
-  async removeServiceFromConversation(serviceName: string) {
+  async removeServiceFromConversation(serviceName: string): Promise<void> {
     // Services appear in the members list with item-service test id
     const serviceLocator = this.page
       .locator('#conversation-details')
@@ -207,7 +213,7 @@ export class ConversationDetailsPage {
     await removeServiceButton.click();
   }
 
-  async isServicePartOfConversation(serviceName: string) {
+  async isServicePartOfConversation(serviceName: string): Promise<boolean> {
     const serviceLocator = this.page
       .locator('#conversation-details')
       .getByTestId('item-service')
@@ -216,19 +222,19 @@ export class ConversationDetailsPage {
     return serviceLocator.isVisible();
   }
 
-  async clickBlockConversationButton() {
+  async clickBlockConversationButton(): Promise<void> {
     await this.blockConversationButton.click();
   }
 
-  async openGuestOptions() {
+  async openGuestOptions(): Promise<void> {
     await this.guestOptionsButton.click();
   }
 
-  async clickClearConversationContentButton() {
+  async clickClearConversationContentButton(): Promise<void> {
     await this.clearConversationContentButton.click();
   }
 
-  async setNotifications(level: NotificationLevel) {
+  async setNotifications(level: NotificationLevel): Promise<void> {
     await this.notificationsButton.click();
     await this.selectNotificationsLevel(level);
 
@@ -236,11 +242,11 @@ export class ConversationDetailsPage {
     await this.page.getByRole('button', {name: 'Go back'}).click();
   }
 
-  async selectNotificationsLevel(level: NotificationLevel) {
+  async selectNotificationsLevel(level: NotificationLevel): Promise<void> {
     await this.page.getByRole('radiogroup').getByText(level).click();
   }
 
-  async changeConversationName(newConversationName: string) {
+  async changeConversationName(newConversationName: string): Promise<void> {
     await this.editConversationNameButton.click();
     await this.textFieldForConversationName.fill(newConversationName);
     await this.textFieldForConversationName.press('Enter');

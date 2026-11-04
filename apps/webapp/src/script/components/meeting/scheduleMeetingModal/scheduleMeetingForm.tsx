@@ -17,7 +17,7 @@
  *
  */
 
-import type {ComponentProps} from 'react';
+import type {ComponentProps, FunctionComponent} from 'react';
 import {useCallback, useEffect, useMemo, useRef} from 'react';
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
@@ -37,24 +37,6 @@ import {
   TimePickerField,
 } from '@wireapp/react-ui-kit';
 
-import {MeetingParticipantsPicker} from 'Components/meeting/meetingParticipantsPicker';
-import {MeetingLinkForm} from 'Components/meeting/shared/meetingLinkForm/meetingLinkForm';
-import {useMeetingParticipants} from 'Components/meeting/shared/participants/useMeetingParticipants';
-import {
-  scheduleMeetingFormBottomWrapperCss,
-  scheduleMeetingFormColumnCss,
-  scheduleMeetingFormDividerCss,
-  scheduleMeetingFormLayoutCss,
-  scheduleMeetingFormLeftColumnCss,
-  scheduleMeetingParticipantsSectionCss,
-  scheduleMeetingRecurrenceSelectWrapperStyles,
-  scheduleMeetingSelectMenuPortalStyles,
-  scheduleMeetingTimeFieldsRowCss,
-  scheduleMeetingTitleClearButtonStyles,
-  scheduleMeetingTitleInputStyles,
-  scheduleMeetingTitleInputWrapperStyles,
-} from 'Components/meeting/shared/styles/meetingForm.styles';
-import type {User} from 'Repositories/entity/User';
 import {currentLanguage} from 'src/script/auth/localeConfig';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {getRegionalDateLocale} from 'src/script/util/timeUtil';
@@ -70,6 +52,25 @@ import {
   scheduleMeetingModes,
   type ScheduleMeetingRecurrenceOption,
 } from './scheduleMeetingTypes';
+
+import type {User} from '../../../repositories/entity/User';
+import {MeetingParticipantsPicker} from '../meetingParticipantsPicker';
+import {MeetingLinkForm} from '../shared/meetingLinkForm/meetingLinkForm';
+import {useMeetingParticipants} from '../shared/participants/useMeetingParticipants';
+import {
+  scheduleMeetingFormBottomWrapperCss,
+  scheduleMeetingFormColumnCss,
+  scheduleMeetingFormDividerCss,
+  scheduleMeetingFormLayoutCss,
+  scheduleMeetingFormLeftColumnCss,
+  scheduleMeetingParticipantsSectionCss,
+  scheduleMeetingRecurrenceSelectWrapperStyles,
+  scheduleMeetingSelectMenuPortalStyles,
+  scheduleMeetingTimeFieldsRowCss,
+  scheduleMeetingTitleClearButtonStyles,
+  scheduleMeetingTitleInputStyles,
+  scheduleMeetingTitleInputWrapperStyles,
+} from '../shared/styles/meetingForm.styles';
 
 const millisecondsPerSecond = 1000;
 const secondsPerMinute = 60;
@@ -96,7 +97,7 @@ export interface ScheduleMeetingFormProps {
   selfUser: User;
 }
 
-export const ScheduleMeetingForm = ({
+export const ScheduleMeetingForm: FunctionComponent<ScheduleMeetingFormProps> = ({
   isOpen,
   mode,
   formState,
@@ -198,7 +199,7 @@ export const ScheduleMeetingForm = ({
     })
     .unwrapOr(null);
 
-  const handleDateChange = (date: Parameters<ComponentProps<typeof DatePickerField>['onChange']>[0]) => {
+  const handleDateChange = (date: Parameters<ComponentProps<typeof DatePickerField>['onChange']>[0]): void => {
     if (date === null) {
       onStartChange(maybe.nothing());
       return;
@@ -217,7 +218,7 @@ export const ScheduleMeetingForm = ({
     onStartChange(Maybe.of(adjustedStart));
   };
 
-  const handleTimeChange = (value: Parameters<ComponentProps<typeof TimePickerField>['onChange']>[0]) => {
+  const handleTimeChange = (value: Parameters<ComponentProps<typeof TimePickerField>['onChange']>[0]): void => {
     if (value === null || formState.start.isNothing) {
       onStartChange(maybe.nothing());
       return;
@@ -227,7 +228,7 @@ export const ScheduleMeetingForm = ({
     onStartChange(Maybe.of(nextStart));
   };
 
-  const handleEndTimeChange = (value: Parameters<ComponentProps<typeof TimePickerField>['onChange']>[0]) => {
+  const handleEndTimeChange = (value: Parameters<ComponentProps<typeof TimePickerField>['onChange']>[0]): void => {
     if (value === null || formState.end.isNothing) {
       onEndChange(maybe.nothing());
       return;

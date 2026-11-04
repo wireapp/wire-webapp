@@ -46,20 +46,20 @@ export const Pagination: React.FC<PaginationProps> = ({
   const isLastPage = currentPage === numberOfPages - 1;
   const isFirstPage = currentPage === 0;
 
-  const renderPageList = () => {
+  const renderPageList = (): React.JSX.Element[] => {
     const lastPageIndex = numberOfPages - 1;
     const spanLength = 1;
     const endLength = 1;
     const skipLength = 1;
     const normalizeCount = endLength + skipLength + spanLength;
-    const dots = (key: string) => {
+    const dots = (key: string): React.JSX.Element => {
       return (
         <Bold key={key} fontSize={'11px'}>
           {'…'}
         </Bold>
       );
     };
-    const renderPageNumber = (pageIndex: number) => {
+    const renderPageNumber = (pageIndex: number): React.JSX.Element => {
       return currentPage === pageIndex ? (
         <Bold
           fontSize={'11px'}

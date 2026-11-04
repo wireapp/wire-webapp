@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect} from 'react';
+import React, {useEffect, type FunctionComponent} from 'react';
 
 import {connect} from 'react-redux';
 import {useNavigate} from 'react-router';
@@ -35,7 +35,9 @@ import {ROUTE} from '../route';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
-const VerifyEmailLinkComponent = ({hasSelfEmail}: Props & ConnectedProps) => {
+const VerifyEmailLinkComponent: FunctionComponent<Props & ConnectedProps> = ({
+  hasSelfEmail,
+}: Props & ConnectedProps) => {
   const {translate} = useApplicationContext();
   const navigate = useNavigate();
 
@@ -75,7 +77,8 @@ const VerifyEmailLinkComponent = ({hasSelfEmail}: Props & ConnectedProps) => {
 };
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
-const mapStateToProps = (state: RootState) => {
+type MapStateToPropsResult = {hasSelfEmail: boolean};
+const mapStateToProps = (state: RootState): MapStateToPropsResult => {
   return {
     hasSelfEmail: SelfSelector.hasSelfEmail(state),
   };

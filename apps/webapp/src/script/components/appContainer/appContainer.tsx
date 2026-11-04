@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState, type FunctionComponent} from 'react';
 
 import type {Clock} from '@enormora/clock/clock';
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
@@ -27,25 +27,20 @@ import ky from 'ky';
 import {container} from 'tsyringe';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {MeetingStoreRoot} from 'Components/meeting/meetingStore/meetingStoreRoot';
-import {LeaveGroupAdminModal} from 'Components/Modals/LeaveGroupAdminModal/LeaveGroupAdminModal';
-import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
-import {QualityFeedbackModal} from 'Components/Modals/QualityFeedbackModal';
-import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
 import {SIGN_OUT_REASON} from 'src/script/auth/signOutReason';
 import {useAppSoftLock} from 'src/script/hooks/useAppSoftLock';
 import {useSingleInstance} from 'src/script/hooks/useSingleInstance';
 import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
-import type {Translate} from 'Util/localizerUtil';
 
+import {getOtherInstanceAction} from './getOtherInstanceAction';
 import {useAccentColor} from './hooks/useAccentColor';
 import {useTheme} from './hooks/useTheme';
 
 import {runClientVersionCheck} from '../../applicationPeriodicChecks/runClientVersionCheck';
 import {startApplicationPeriodicChecks} from '../../applicationPeriodicChecks/startApplicationPeriodicChecks';
 import {Config, Configuration} from '../../Config';
+import {markAsUnreadFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
 import {StartupFeatureToggleName} from '../../featureToggles/startupFeatureToggles';
 import type {FetchLatestBuildMetadata} from '../../lifecycle/newVersionHandler';
 import {setAppLocale} from '../../localization/Localizer';
@@ -53,11 +48,18 @@ import {App} from '../../main/app';
 import type {ApplicationObservability} from '../../observability/applicationObservability';
 import {AppMain} from '../../page/appMain';
 import {RootProvider} from '../../page/rootProvider';
+import {PROPERTIES_TYPE} from '../../repositories/properties/propertiesType';
 import {APIClient} from '../../service/apiClientSingleton';
 import {Core} from '../../service/coreSingleton';
+import type {Translate} from '../../util/localizerUtil';
 import {TIME_IN_MILLIS} from '../../util/timeUtil';
 import {MainViewModel} from '../../view_model/MainViewModel';
+import {WebAppEvents} from '../../webAppEvents';
 import {AppLoader} from '../appLoader/index';
+import {MeetingStoreRoot} from '../meeting/meetingStore/meetingStoreRoot';
+import {LeaveGroupAdminModal} from '../Modals/LeaveGroupAdminModal/LeaveGroupAdminModal';
+import {PrimaryModalComponent} from '../Modals/PrimaryModal/PrimaryModal';
+import {QualityFeedbackModal} from '../Modals/QualityFeedbackModal';
 
 type AppProps = {
   readonly config: Configuration;
@@ -73,7 +75,7 @@ type AppProps = {
   readonly translate: Translate;
 };
 
-export const AppContainer = (properties: AppProps) => {
+export const AppContainer: FunctionComponent<AppProps> = (properties: AppProps) => {
   const {
     config,
     clientType,
@@ -88,6 +90,7 @@ export const AppContainer = (properties: AppProps) => {
     translate,
   } = properties;
   setAppLocale();
+  const isMarkAsUnreadFeatureEnabled = isFeatureToggleEnabled(markAsUnreadFeatureToggleName);
   const app = useMemo(() => {
     return new App(
       container.resolve(Core),
@@ -96,8 +99,9 @@ export const AppContainer = (properties: AppProps) => {
       translate,
       clock,
       fireAndForgetInvoker,
+      {isMarkAsUnreadFeatureEnabled},
     );
-  }, [config, fireAndForgetInvoker, translate, clock]);
+  }, [config, fireAndForgetInvoker, translate, clock, isMarkAsUnreadFeatureEnabled]);
   const enableAutoLogin = Config.getConfig().FEATURE.ENABLE_AUTO_LOGIN;
   // Publishing application on the global scope for debug and testing purposes.
   window.wire.app = app;
@@ -129,7 +133,7 @@ export const AppContainer = (properties: AppProps) => {
   useEffect(() => {
     // Prevent Chrome (and Electron) from pushing the content out of the
     // viewport when using form elements (e.g. in the preferences)
-    const resetWindowScroll = () => {
+    const resetWindowScroll = (): void => {
       return window.scrollTo(0, 0);
     };
     document.addEventListener('scroll', resetWindowScroll);
@@ -181,14 +185,19 @@ export const AppContainer = (properties: AppProps) => {
     };
   }, [clock, doesApplicationNeedForceReload, fireAndForgetInvoker, isFeatureToggleEnabled, mainView, translate]);
 
-  if (hasOtherInstance) {
-    // Automatically sign out the user if the user has multiple tabs open
-    if (enableAutoLogin) {
-      amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.MULTIPLE_TABS);
-    } else {
-      app.repository.lifeCycle.redirectToLogin(SIGN_OUT_REASON.MULTIPLE_TABS);
-    }
+  const otherInstanceAction = getOtherInstanceAction({
+    hasOtherInstance,
+    isLoggingOut: app.repository.lifeCycle.getIsLoggingOut(),
+    isAutoLoginEnabled: enableAutoLogin,
+  });
 
+  if (otherInstanceAction === 'sign-out') {
+    amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.MULTIPLE_TABS);
+    return null;
+  }
+
+  if (otherInstanceAction === 'redirect-to-login') {
+    app.repository.lifeCycle.redirectToLogin(SIGN_OUT_REASON.MULTIPLE_TABS);
     return null;
   }
 

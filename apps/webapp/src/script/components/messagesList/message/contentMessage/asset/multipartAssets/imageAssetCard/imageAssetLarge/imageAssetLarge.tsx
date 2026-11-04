@@ -17,7 +17,7 @@
  *
  */
 
-import {CSSProperties, useState} from 'react';
+import {CSSProperties, useState, type FunctionComponent} from 'react';
 
 import {Maybe} from 'true-myth';
 
@@ -25,7 +25,6 @@ import {ICellAsset} from '@wireapp/protocol-messaging';
 import {UnavailableFileIcon} from '@wireapp/react-ui-kit';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {getBestPreviewSource} from 'Util/imageUtil';
 
 import {
   containerStyles,
@@ -38,6 +37,7 @@ import {
   loaderIconStyles,
 } from './imageAssetLarge.styles';
 
+import {getBestPreviewSource} from '../../../../../../../../util/imageUtil';
 import {FileFullscreenModal} from '../../../../../../../FileFullscreenModal/FileFullscreenModal';
 
 interface ImageAssetLargeProps {
@@ -52,7 +52,7 @@ interface ImageAssetLargeProps {
   id: string;
 }
 
-export const ImageAssetLarge = ({
+export const ImageAssetLarge: FunctionComponent<ImageAssetLargeProps> = ({
   id,
   filePreviewUrl,
   fileUrl,

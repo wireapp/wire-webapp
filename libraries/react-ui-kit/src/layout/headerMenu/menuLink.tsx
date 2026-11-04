@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {CSSObject} from '@emotion/react';
 
 import {DESKTOP_HEADER_SUB_MENU_CLASSNAME} from './headerSubMenu';
@@ -75,11 +77,11 @@ export const menuLinkStyle: <T>(theme: Theme, props: MenuLinkProps<T>) => CSSObj
 
 export const MENU_LINK_CLASSNAME = 'menu-link';
 
-export const filterMenuLinkProps = (props: MenuLinkProps) => {
+export const filterMenuLinkProps = (props: MenuLinkProps): Object => {
   return filterProps(filterLinkProps(props) as MenuLinkProps, ['button']);
 };
 
-export const MenuLink = ({children, ...props}: MenuLinkProps) => {
+export const MenuLink: FunctionComponent<MenuLinkProps> = ({children, ...props}) => {
   return (
     <a
       className={MENU_LINK_CLASSNAME}

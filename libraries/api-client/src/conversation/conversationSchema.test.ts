@@ -18,8 +18,9 @@
  */
 
 import {ADD_PERMISSION, CONVERSATION_ACCESS, CONVERSATION_CELLS_STATE, CONVERSATION_TYPE} from './conversation';
-import {conversationSchema} from './conversationSchema';
+import {conversationMembersSchema, conversationSchema} from './conversationSchema';
 import {CONVERSATION_PROTOCOL} from '../team';
+import {SERVICE_MEMBER_STATUS} from './otherMember';
 
 describe('conversationSchema', () => {
   const validConversation = {
@@ -47,6 +48,24 @@ describe('conversationSchema', () => {
       others: [],
     },
   };
+
+  it.each([
+    CONVERSATION_TYPE.REGULAR,
+    CONVERSATION_TYPE.SELF,
+    CONVERSATION_TYPE.ONE_TO_ONE,
+    CONVERSATION_TYPE.CONNECT,
+    CONVERSATION_TYPE.GLOBAL_TEAM,
+  ])('accepts numeric conversation type %s', conversationType => {
+    const actualConversation = conversationSchema.parse({...validConversation, type: conversationType});
+
+    expect(actualConversation.type).toBe(conversationType);
+  });
+
+  it.each(['REGULAR', '0', -1, 5])('rejects invalid conversation type %s', conversationType => {
+    const actualResult = conversationSchema.safeParse({...validConversation, type: conversationType});
+
+    expect(actualResult.success).toBe(false);
+  });
 
   it('accepts null add_permission on canonical conversation responses', () => {
     const result = conversationSchema.safeParse({
@@ -76,5 +95,37 @@ describe('conversationSchema', () => {
     }
 
     expect(result.data.add_permission).toBe(ADD_PERMISSION.ADMINS);
+  });
+
+  it('defaults other member status and normalizes nullable self member fields', () => {
+    const actualMembers = conversationMembersSchema.parse({
+      self: {
+        id: 'self-user-id',
+        status_ref: '0.0',
+        status_time: '1970-01-01T00:00:00.000Z',
+      },
+      others: [
+        {
+          id: 'other-user-id',
+          hidden_ref: null,
+          service: null,
+        },
+      ],
+    });
+
+    expect(actualMembers.self).toMatchObject({
+      id: 'self-user-id',
+      hidden_ref: null,
+      otr_archived_ref: null,
+      otr_muted_ref: null,
+      otr_muted_status: null,
+      service: null,
+    });
+    expect(actualMembers.others.at(0)).toMatchObject({
+      id: 'other-user-id',
+      hidden_ref: null,
+      status: SERVICE_MEMBER_STATUS.REGULAR_MEMBER,
+    });
+    expect(actualMembers.others.at(0)?.service).toBeUndefined();
   });
 });

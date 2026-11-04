@@ -17,14 +17,16 @@
  *
  */
 
-import {CallingCell} from 'Components/calling/CallingCell';
-import * as Icon from 'Components/icon';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {User} from 'Repositories/entity/User';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
+import type {FunctionComponent} from 'react';
 
+import {useApplicationContext} from 'src/script/page/rootProvider';
+
+import {CallingCell} from '../../../components/calling/CallingCell';
+import * as Icon from '../../../components/icon';
+import {PrimaryModal} from '../../../components/Modals/PrimaryModal';
 import {Config} from '../../../Config';
+import {User} from '../../../repositories/entity/User';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
 import {CallingViewModel} from '../../../view_model/CallingViewModel';
 import {ListViewModel} from '../../../view_model/ListViewModel';
 
@@ -34,7 +36,11 @@ type TemporaryGuestConversations = {
   selfUser: User;
 };
 
-const TemporaryGuestConversations = ({selfUser, listViewModel, callingViewModel}: TemporaryGuestConversations) => {
+const TemporaryGuestConversations: FunctionComponent<TemporaryGuestConversations> = ({
+  selfUser,
+  listViewModel,
+  callingViewModel,
+}: TemporaryGuestConversations) => {
   const {translate} = useApplicationContext();
   const {expirationIsUrgent, expirationRemainingText} = useKoSubscribableChildren(selfUser, [
     'expirationIsUrgent',
@@ -43,7 +49,7 @@ const TemporaryGuestConversations = ({selfUser, listViewModel, callingViewModel}
 
   const {activeCalls} = useKoSubscribableChildren(callingViewModel, ['activeCalls']);
   const isAccountCreationEnabled = Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION;
-  const openPreferences = () => {
+  const openPreferences = (): void => {
     void listViewModel.openPreferencesAccount();
   };
 

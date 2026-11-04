@@ -17,10 +17,13 @@
  *
  */
 
-import {CallingCell} from 'Components/calling/CallingCell';
-import {Call} from 'Repositories/calling/Call';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
+import type {FunctionComponent} from 'react';
+
 import {ListViewModel} from 'src/script/view_model/ListViewModel';
+
+import {CallingCell} from '../../../../../components/calling/CallingCell';
+import {Call} from '../../../../../repositories/calling/Call';
+import {PropertiesRepository} from '../../../../../repositories/properties/propertiesRepository';
 
 type ConversationCallingViewProps = {
   activeCalls: Call[];
@@ -29,7 +32,7 @@ type ConversationCallingViewProps = {
   propertiesRepository: PropertiesRepository;
 };
 
-export const ConversationCallingView = ({
+export const ConversationCallingView: FunctionComponent<ConversationCallingViewProps> = ({
   activeCalls,
   listViewModel,
   classifiedDomains,

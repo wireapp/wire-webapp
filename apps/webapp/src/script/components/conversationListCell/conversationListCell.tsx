@@ -24,31 +24,33 @@ import React, {
   useCallback,
   useRef,
   useState,
+  type FunctionComponent,
 } from 'react';
 
 import {CSSObject} from '@emotion/react';
-import {isNullOrUndefined, isUndefined} from '@sindresorhus/is';
+import {isNullOrUndefined, isNumber, isUndefined} from '@sindresorhus/is';
 import {CONVERSATION_ACCESS} from '@wireapp/api-client/lib/conversation/';
 import cx from 'classnames';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {Avatar, AVATAR_SIZE, GroupAvatar, ChannelAvatar} from 'Components/avatar';
-import {UserBlockedBadge} from 'Components/badge';
-import {CellDescription} from 'Components/conversationListCell/components/cellDescription';
-import {UserInfo} from 'Components/UserInfo';
-import {useConversationCall} from 'Hooks/useConversationCall';
-import type {RegisterConversationElement} from 'Hooks/useConversationFocus';
-import {useNoInternetCallGuard} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import {MediaType} from 'Repositories/media/MediaType';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {isKey, isOneOfKeys, KEY} from 'Util/keyboardUtil';
-import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
-import {noop, setContextMenuPosition} from 'Util/util';
 
+import {CellDescription} from './components/cellDescription';
 import {StatusIcon} from './components/statusIcon';
+
+import {useConversationCall} from '../../hooks/useConversationCall';
+import type {RegisterConversationElement} from '../../hooks/useConversationFocus';
+import {useNoInternetCallGuard} from '../../hooks/useNoInternetCallGuard/useNoInternetCallGuard';
+import type {Conversation} from '../../repositories/entity/Conversation';
+import {MediaType} from '../../repositories/media/MediaType';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
+import {isKey, isOneOfKeys, KEY} from '../../util/keyboardUtil';
+import {useChannelsFeatureFlag} from '../../util/useChannelsFeatureFlag';
+import {noop, setContextMenuPosition} from '../../util/util';
+import {Avatar, AVATAR_SIZE, GroupAvatar, ChannelAvatar} from '../avatar';
+import {UserBlockedBadge} from '../badge';
+import {UserInfo} from '../UserInfo';
 
 interface ConversationListCellProps {
   conversation: Conversation;
@@ -67,7 +69,7 @@ interface ConversationListCellProps {
   registerConversationElement?: RegisterConversationElement;
 }
 
-export const ConversationListCell = ({
+export const ConversationListCell: FunctionComponent<ConversationListCellProps> = ({
   showJoinButton,
   conversation,
   onJoinCall,
@@ -98,6 +100,7 @@ export const ConversationListCell = ({
     isChannel,
     isGroupOrChannel,
     isGhostGroup,
+    manualUnreadTimestamp,
   } = useKoSubscribableChildren(conversation, [
     'isGroup',
     'is1to1',
@@ -111,6 +114,7 @@ export const ConversationListCell = ({
     'isChannel',
     'isGroupOrChannel',
     'isGhostGroup',
+    'manualUnreadTimestamp',
   ]);
 
   const guardCall = useNoInternetCallGuard({
@@ -149,6 +153,8 @@ export const ConversationListCell = ({
 
   if (unreadMessagesCount > 0) {
     accessibilityParts.push(`${unreadMessagesCount} ${translate('conversationLabelUnread')}`);
+  } else if (isNumber(manualUnreadTimestamp)) {
+    accessibilityParts.push(translate('conversationLabelUnread'));
   }
 
   if (isMutedConversation) {
@@ -172,13 +178,13 @@ export const ConversationListCell = ({
   // Button is disabled if either local state or call state indicates joining
   const isButtonDisabled = isJoiningCallRef.current || isCallConnecting;
 
-  const openContextMenu = (event: MouseEvent | React.MouseEvent<Element, MouseEvent>) => {
+  const openContextMenu = (event: MouseEvent | React.MouseEvent<Element, MouseEvent>): void => {
     event.stopPropagation();
     event.preventDefault();
     rightClick(conversation, event);
   };
 
-  const handleJoinCall = async (event: React.MouseEvent) => {
+  const handleJoinCall = async (event: React.MouseEvent): Promise<void> => {
     event.preventDefault();
 
     // Check ref first for immediate synchronous protection
@@ -200,7 +206,7 @@ export const ConversationListCell = ({
     }
   };
 
-  const handleDivKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+  const handleDivKeyDown = (event: React.KeyboardEvent<HTMLDivElement>): void => {
     if (event.key === KEY.SPACE || event.key === KEY.ENTER) {
       onClick(event);
     } else if (isKey(event, KEY.ARROW_RIGHT)) {
@@ -213,7 +219,7 @@ export const ConversationListCell = ({
     handleArrowKeyDown(event);
   };
 
-  const handleContextKeyDown = (event: React.KeyboardEvent) => {
+  const handleContextKeyDown = (event: React.KeyboardEvent): void => {
     if (event.key === KEY.SPACE || event.key === KEY.ENTER) {
       const newEvent = setContextMenuPosition(event);
       rightClick(conversation, newEvent);

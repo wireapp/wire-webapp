@@ -17,13 +17,14 @@
  *
  */
 
-import {useRef} from 'react';
+import {useRef, type FunctionComponent} from 'react';
 
 import {TabIndex, Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {CONFIG as HistoryExportConfig} from 'Components/historyExport';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {handleKeyDown, KEY} from 'Util/keyboardUtil';
+
+import {handleKeyDown, KEY} from '../../util/keyboardUtil';
+import {CONFIG as HistoryExportConfig} from '../historyExport';
 
 interface BackupFileUploadProps {
   onFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -32,7 +33,7 @@ interface BackupFileUploadProps {
   cssClassName?: string;
 }
 
-const BackupFileUpload = ({
+const BackupFileUpload: FunctionComponent<BackupFileUploadProps> = ({
   onFileChange,
   backupImportHeadLine,
   variant,
@@ -41,7 +42,7 @@ const BackupFileUpload = ({
   const {translate} = useApplicationContext();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const fileInputClick = () => {
+  const fileInputClick = (): void | undefined => {
     return fileInputRef.current?.click();
   };
 

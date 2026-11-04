@@ -28,12 +28,12 @@ export class CellsConversationFilesPage {
     this.searchInput = page.getByRole('textbox', {name: 'Search files and folders'});
   }
 
-  async searchFile(fileName: string) {
+  async searchFile(fileName: string): Promise<void> {
     await this.searchInput.clear();
     await this.searchInput.fill(fileName);
   }
 
-  getFile(fileName: string) {
+  getFile(fileName: string): Locator {
     return this.filesList.getByRole('button', {name: fileName});
   }
 }

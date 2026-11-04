@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {CSSObject} from '@emotion/react';
 
 import {COLOR} from '../../identity';
@@ -42,7 +44,7 @@ const labelStyle: <T>(theme: Theme, props: LabelProps<T>) => CSSObject = (
   };
 };
 
-export const Label = (props: LabelProps) => {
+export const Label: FunctionComponent<LabelProps> = props => {
   return (
     // eslint-disable-next-line jsx-a11y/label-has-associated-control
     <label
@@ -65,7 +67,7 @@ const labelLinkStyle: <T>(theme: Theme, props: LabelLinkProps<T>) => CSSObject =
   };
 };
 
-export const LabelLink = ({children, ...props}: LabelProps<HTMLAnchorElement>) => {
+export const LabelLink: FunctionComponent<LabelProps<HTMLAnchorElement>> = ({children, ...props}) => {
   return (
     <a
       css={(theme: Theme) => {

@@ -28,7 +28,7 @@ export const getCellsApiPath = ({
 }: {
   conversationQualifiedId: QualifiedId;
   currentPath?: string;
-}) => {
+}): string => {
   const {domain, id} = conversationQualifiedId;
 
   // When there’re no files/folders in the bin, the api returns 404.

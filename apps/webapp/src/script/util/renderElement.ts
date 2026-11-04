@@ -36,7 +36,7 @@ const roots = new Map<
   }
 >();
 
-const cleanUpElement = (elementId: string) => {
+const cleanUpElement = (elementId: string): void => {
   const root = roots.get(elementId);
   if (!isUndefined(root) && !isUndefined(root.elementContainer)) {
     root.reactRoot.unmount();
@@ -46,7 +46,7 @@ const cleanUpElement = (elementId: string) => {
   }
 };
 
-const generateStyleString = (style: Partial<CSSStyleDeclaration>) => {
+const generateStyleString = (style: Partial<CSSStyleDeclaration>): string => {
   let styleString = '';
 
   Object.entries(style).forEach(([key, value]) => {
@@ -90,7 +90,7 @@ const renderElement = <T extends RenderElement>(
       reactRoot,
     });
 
-    const onClose = () => {
+    const onClose = (): void => {
       cleanUpElement(parentElementId);
       props.onClose?.();
     };
@@ -105,7 +105,7 @@ const renderElement = <T extends RenderElement>(
  * @param source the source document object
  * @param target the target document object
  */
-const copyStyles = (source: Document, target: Document) => {
+const copyStyles = (source: Document, target: Document): void => {
   const targetHead = target.head;
 
   const elements = source.head.querySelectorAll('link, style');

@@ -17,11 +17,13 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
 import {COLOR} from '../../identity';
 
-export const RecordBoldIcon = ({color = COLOR.TEXT, ...props}: SVGIconProps) => {
+export const RecordBoldIcon: FunctionComponent<SVGIconProps> = ({color = COLOR.TEXT, ...props}) => {
   return (
     <SVGIcon realWidth={20} realHeight={16} color={color} {...props}>
       <path fill="none" d="M0 0H24V24H0z" />

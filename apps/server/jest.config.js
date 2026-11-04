@@ -17,9 +17,10 @@
  *
  */
 
-const isContinuousIntegrationEnvironment = process.env.CI === 'true';
+const rootJestConfiguration = require('../../jest.config.js');
 
 module.exports = {
+  displayName: 'server',
   preset: '../../jest.preset.js',
   collectCoverageFrom: [
     '*.{js,ts}',
@@ -27,11 +28,12 @@ module.exports = {
     'util/**/*.{js,ts}',
     '!**/*.d.ts',
     '!**/*.test.{js,ts}',
-    '!babel.config.js',
     '!jest.config.js',
     '!dist/**',
     '!bin/**',
   ],
+  cacheDirectory: '../../target/jest/cache',
+  coverageDirectory: '../../target/coverage/apps/server',
   coverageThreshold: {
     global: {
       branches: 20,
@@ -40,17 +42,14 @@ module.exports = {
       statements: 18,
     },
   },
-  coverageReporters: isContinuousIntegrationEnvironment ? ['html', 'lcov', 'text-summary'] : undefined,
+  coverageReporters: rootJestConfiguration.coverageReporters,
+  passWithNoTests: true,
   moduleDirectories: ['node_modules', __dirname],
   moduleNameMapper: {
     '^@enormora/objectory$': '<rootDir>/../../node_modules/@enormora/objectory/main.js',
   },
-  reporters: isContinuousIntegrationEnvironment ? ['github-actions', 'summary'] : ['default'],
+  reporters: rootJestConfiguration.reporters,
   testEnvironment: 'node',
   testPathIgnorePatterns: ['<rootDir>/dist'],
   transformIgnorePatterns: ['/node_modules/(?!(true-myth|@sindresorhus/is|@enormora/objectory)/)'],
-  transform: {
-    '^.+\\.(ts|tsx)$': 'babel-jest',
-    '^.+\\.(js|jsx)$': 'babel-jest',
-  },
 };

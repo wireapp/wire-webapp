@@ -20,7 +20,7 @@
 import {noop} from 'noop-esm';
 
 import {choosePipeline, detectCapabilities} from './capability';
-import {CapabilityInfo} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
+import {CapabilityInfo} from '../backgroundEffectsWorkerTypes';
 import * as capabilityModule from './capability';
 
 describe('capability', () => {

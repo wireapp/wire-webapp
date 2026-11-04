@@ -21,9 +21,9 @@ import {MouseEvent, useCallback, useEffect, useMemo, useState} from 'react';
 
 import {isNan, isNull, isUndefined} from '@sindresorhus/is';
 
-import {FileAsset} from 'Repositories/entity/message/fileAsset';
-import {interpolate} from 'Util/arrayUtil';
-import {clamp} from 'Util/numberUtil';
+import {FileAsset} from '../../../../../../../../../repositories/entity/message/fileAsset';
+import {interpolate} from '../../../../../../../../../util/arrayUtil';
+import {clamp} from '../../../../../../../../../util/numberUtil';
 
 const audioBarWidthUnits = 2;
 const audioBarSlotWidth = 3;
@@ -45,7 +45,8 @@ interface AudioState {
 const LEVELS_PER_WIDTH = 3;
 const NORMALIZED_LOUDNESS = 256;
 
-export const useAudioSeekBar = ({asset, audioElement, svgRef}: UseAudioSeekBarProps) => {
+type UseAudioSeekBarResult = {path: string; position: number; onLevelClick: (event: MouseEvent<SVGSVGElement>) => void};
+export const useAudioSeekBar = ({asset, audioElement, svgRef}: UseAudioSeekBarProps): UseAudioSeekBarResult => {
   const [{svgWidth, position, loudness}, setState] = useState<AudioState>({
     svgWidth: 0,
     position: 0,

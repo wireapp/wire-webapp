@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useState} from 'react';
+import {useCallback, useState, type Dispatch, type SetStateAction} from 'react';
 
 import {LinkNode} from '@lexical/link';
 
@@ -31,7 +31,12 @@ interface Link {
   } | null;
 }
 
-export const useLinkEditing = () => {
+type UseLinkEditingResult = {
+  editingLink: Link;
+  setEditingLink: Dispatch<SetStateAction<Link>>;
+  resetLinkState: (closeModal: () => void) => void;
+};
+export const useLinkEditing = (): UseLinkEditingResult => {
   const [editingLink, setEditingLink] = useState<Link>({
     text: '',
     url: '',

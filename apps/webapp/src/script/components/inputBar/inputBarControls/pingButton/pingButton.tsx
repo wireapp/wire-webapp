@@ -17,15 +17,18 @@
  *
  */
 
-import * as Icon from 'Components/icon';
+import type {FunctionComponent} from 'react';
+
 import {useApplicationContext} from 'src/script/page/rootProvider';
+
+import * as Icon from '../../../icon';
 
 interface PingButtonProps {
   onClick: () => void;
   isDisabled: boolean;
 }
 
-export const PingButton = ({isDisabled, onClick}: PingButtonProps) => {
+export const PingButton: FunctionComponent<PingButtonProps> = ({isDisabled, onClick}: PingButtonProps) => {
   const {translate} = useApplicationContext();
 
   return (

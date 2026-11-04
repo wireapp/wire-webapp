@@ -17,9 +17,11 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
-export const MinusIcon = (props: SVGIconProps) => {
+export const MinusIcon: FunctionComponent<SVGIconProps> = props => {
   return (
     <SVGIcon realWidth={16} realHeight={2} {...props}>
       <path d="M0 0h16v2H0z" />

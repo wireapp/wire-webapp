@@ -45,6 +45,7 @@ type GracePeriod = {
   /** end date of the grace period (unix timestamp) */
   end: number;
 };
+type EnrollmentTimerResult = {isSnoozable: boolean; firingDate: number};
 
 /**
  * Will return a suitable snooze time based on the grace period
@@ -109,7 +110,7 @@ export function getEnrollmentTimer(
   e2eiActivatedAt: number,
   teamGracePeriodDuration: number,
   clock: Clock,
-) {
+): EnrollmentTimerResult {
   if (identity?.status === MLSStatuses.EXPIRED) {
     return {isSnoozable: false, firingDate: clock.currentUnixEpochMilliseconds};
   }
@@ -136,7 +137,7 @@ export function hasGracePeriodStartedForSelfClient(
   e2eiActivatedAt: number,
   teamGracePeriodDuration: number,
   clock: Clock,
-) {
+): boolean {
   const deadline = getGracePeriod(identity, e2eiActivatedAt, teamGracePeriodDuration, clock);
   return clock.currentUnixEpochMilliseconds >= deadline.start;
 }

@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {FormattedMessage} from 'react-intl';
@@ -29,19 +29,19 @@ import {container} from 'tsyringe';
 import {UrlUtil} from '@wireapp/commons';
 import {Button, ButtonVariant, ContainerXS, ErrorMessage, Text} from '@wireapp/react-ui-kit';
 
-import {LogoFullIcon} from 'Components/icon';
-import {useSingleInstance} from 'Hooks/useSingleInstance';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {Core} from 'src/script/service/coreSingleton';
-import {isDataDogEnabled} from 'Util/dataDog';
-import {getWebEnvironment} from 'Util/environment';
 
 import {Page} from './page';
 
+import {LogoFullIcon} from '../../components/icon';
 import {Config} from '../../Config';
+import {useSingleInstance} from '../../hooks/useSingleInstance';
 import '../../localization/Localizer';
+import {isDataDogEnabled} from '../../util/dataDog';
+import {getWebEnvironment} from '../../util/environment';
 import {actionRoot} from '../module/action';
-import {bindActionCreators, RootState} from '../module/reducer';
+import {bindActionCreators, RootState, type ThunkAction} from '../module/reducer';
 import * as AuthSelector from '../module/selector/authSelector';
 import {QUERY_KEY, ROUTE} from '../route';
 import {getEnterpriseLoginV2FF} from '../util/helpers';
@@ -50,7 +50,10 @@ import {getPrefixedSSOCode} from '../util/urlUtil';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
-const IndexComponent = ({defaultSSOCode, doInit}: Props & ConnectedProps & DispatchProps) => {
+const IndexComponent: FunctionComponent<Props & ConnectedProps & DispatchProps> = ({
+  defaultSSOCode,
+  doInit,
+}: Props & ConnectedProps & DispatchProps) => {
   const {clock, translate} = useApplicationContext();
   const navigate = useNavigate();
   const {hasOtherInstance} = useSingleInstance(clock);
@@ -186,14 +189,18 @@ const IndexComponent = ({defaultSSOCode, doInit}: Props & ConnectedProps & Dispa
 };
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
-const mapStateToProps = (state: RootState) => {
+type MapStateToPropsResult = {defaultSSOCode: string | undefined};
+const mapStateToProps = (state: RootState): MapStateToPropsResult => {
   return {
     defaultSSOCode: AuthSelector.getDefaultSSOCode(state),
   };
 };
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => {
+type MapDispatchToPropsResult = {
+  doInit: (options?: {isImmediateLogin: boolean; shouldValidateLocalClient: boolean}) => ThunkAction;
+};
+const mapDispatchToProps = (dispatch: Dispatch<AnyAction>): MapDispatchToPropsResult => {
   return bindActionCreators(
     {
       doInit: actionRoot.authAction.doInit,

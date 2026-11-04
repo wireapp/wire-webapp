@@ -17,45 +17,45 @@
  *
  */
 
-import React, {useCallback, useEffect, useRef} from 'react';
+import React, {useCallback, useEffect, useRef, type FunctionComponent} from 'react';
 
 import {isUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
 import {CALL_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {TabIndex} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {useAppNotification} from 'Components/appNotification/index';
-import {callingContainer} from 'Components/calling/CallingCell/CallingCell.styles';
-import {CallingControls} from 'Components/calling/CallingCell/CallingControls';
-import {CallingHeader} from 'Components/calling/CallingCell/CallingHeader';
-import {GroupVideoGrid} from 'Components/calling/GroupVideoGrid';
-import {useCallAlertState} from 'Components/calling/useCallAlertState';
-import {ConversationClassifiedBar} from 'Components/classifiedBar/classifiedBar';
-import * as Icon from 'Components/icon';
-import {useMeetingNotificationStore} from 'Components/meeting/meetingNotificationStore/meetingNotificationStore';
-import {useConversationCall} from 'Hooks/useConversationCall';
-import {useNoInternetCallGuard} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard';
-import type {Call} from 'Repositories/calling/Call';
-import type {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {CallingViewMode, CallState, MuteState} from 'Repositories/calling/CallState';
-import type {Participant} from 'Repositories/calling/Participant';
-import {useVideoGrid} from 'Repositories/calling/videoGridHandler';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
-import {TeamState} from 'Repositories/team/TeamState';
 import {Config} from 'src/script/Config';
 import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useAppMainState, ViewType} from 'src/script/page/state';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {isEnterKey, isSpaceOrEnterKey} from 'Util/keyboardUtil';
 
+import {callingContainer} from './CallingCell.styles';
+import {CallingControls} from './CallingControls';
+import {CallingHeader} from './CallingHeader';
 import {usePressSpaceToUnmute} from './usePressSpaceToUnmute/usePressSpaceToUnmute';
 
+import {useConversationCall} from '../../../hooks/useConversationCall';
+import {useNoInternetCallGuard} from '../../../hooks/useNoInternetCallGuard/useNoInternetCallGuard';
+import type {Call} from '../../../repositories/calling/Call';
+import type {CallingRepository} from '../../../repositories/calling/CallingRepository';
+import {CallingViewMode, CallState, MuteState} from '../../../repositories/calling/CallState';
+import type {Participant} from '../../../repositories/calling/Participant';
+import {useVideoGrid} from '../../../repositories/calling/videoGridHandler';
+import {PropertiesRepository} from '../../../repositories/properties/propertiesRepository';
+import {PROPERTIES_TYPE} from '../../../repositories/properties/propertiesType';
+import {TeamState} from '../../../repositories/team/TeamState';
 import {generateConversationUrl} from '../../../router/routeGenerator';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {isEnterKey, isSpaceOrEnterKey} from '../../../util/keyboardUtil';
 import {CallActions, CallViewTab} from '../../../view_model/CallingViewModel';
+import {WebAppEvents} from '../../../webAppEvents';
+import {useAppNotification} from '../../appNotification';
+import {ConversationClassifiedBar} from '../../classifiedBar/classifiedBar';
+import * as Icon from '../../icon';
+import {useMeetingNotificationStore} from '../../meeting/meetingNotificationStore/meetingNotificationStore';
+import {GroupVideoGrid} from '../GroupVideoGrid';
+import {useCallAlertState} from '../useCallAlertState';
 
 interface VideoCallProps {
   hasAccessToCamera?: boolean;
@@ -80,7 +80,7 @@ export type CallingCellProps = VideoCallProps & AnsweringControlsProps;
 
 export type CallLabel = {dataUieName: string; text: string};
 
-export const CallingCell = ({
+export const CallingCell: FunctionComponent<CallingCellProps> = ({
   classifiedDomains,
   isTemporaryUser,
   call,
@@ -235,7 +235,7 @@ export const CallingCell = ({
   });
 
   useEffect(() => {
-    const screenSharingEndedHandler = () => {
+    const screenSharingEndedHandler = (): void => {
       screenSharingEndedNotification.show();
     };
 
@@ -297,7 +297,7 @@ export const CallingCell = ({
       const answerCallShortcut = !event.shiftKey && event.ctrlKey && isEnterKey(event);
       const hangUpCallShortcut = event.ctrlKey && event.shiftKey && isEnterKey(event);
 
-      const removeEventListener = () => {
+      const removeEventListener = (): void => {
         return window.removeEventListener('keydown', answerOrRejectCall);
       };
 
@@ -362,7 +362,7 @@ export const CallingCell = ({
     cameraStatus: translate(selfSharesCamera ? 'cameraStatusOn' : 'cameraStatusOff'),
   });
 
-  const toggleDetachedWindow = () => {
+  const toggleDetachedWindow = (): void => {
     if (isDetachedWindow) {
       fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
         await callingRepository.setViewModeMinimized();

@@ -21,18 +21,17 @@ import {isNonEmptyString, isTruthy, isUndefined} from '@sindresorhus/is';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 import {container} from 'tsyringe';
 
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {User} from 'Repositories/entity/User';
-import type {EventRecord} from 'Repositories/storage';
-import {UserFilter} from 'Repositories/user/userFilter';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-import {fixWebsocketString} from 'Util/stringUtil';
-
 import {handleLinkPreviewEvent, handleEditEvent, handleAssetEvent, handleReactionEvent} from './eventHandlers';
 import {EventValidationError} from './eventHandlers/EventValidationError';
 import {HandledEvents, DBOperation} from './types';
 
 import {isEventRecordFailed, isEventRecordWithFederationError} from '../../../../message/statusType';
+import {matchQualifiedIds} from '../../../../util/qualifiedId';
+import {fixWebsocketString} from '../../../../util/stringUtil';
+import {ConversationState} from '../../../conversation/ConversationState';
+import {User} from '../../../entity/User';
+import type {EventRecord} from '../../../storage';
+import {UserFilter} from '../../../user/userFilter';
 import {CONVERSATION} from '../../Client';
 import {EventMiddleware, IncomingEvent} from '../../EventProcessor';
 import {EventService} from '../../EventService';
@@ -57,7 +56,7 @@ export class EventStorageMiddleware implements EventMiddleware {
     private readonly conversationState: ConversationState = container.resolve(ConversationState),
   ) {}
 
-  async processEvent(event: IncomingEvent, source: EventSource) {
+  async processEvent(event: IncomingEvent, source: EventSource): Promise<IncomingEvent | EventRecord> {
     event = decodeConversationNameForStorage(event, source);
     if (!eventShouldBeStored(event)) {
       return event;
@@ -100,7 +99,7 @@ export class EventStorageMiddleware implements EventMiddleware {
     return {type: 'insert', event};
   }
 
-  private validateEvent(event: HandledEvents, source: EventSource, duplicateEvent?: EventRecord) {
+  private validateEvent(event: HandledEvents, source: EventSource, duplicateEvent?: EventRecord): void {
     if (event.type === CONVERSATION_EVENT.MEMBER_LEAVE && source !== EventSource.NOTIFICATION_STREAM) {
       /*
         When we receive a `member-leave` event that is not from the notification stream
@@ -157,7 +156,7 @@ export class EventStorageMiddleware implements EventMiddleware {
     }
   }
 
-  private async execDBOperation(operation: DBOperation, conversationId: string) {
+  private async execDBOperation(operation: DBOperation, conversationId: string): Promise<HandledEvents | EventRecord> {
     switch (operation.type) {
       case 'insert':
         return this.eventService.saveEvent(operation.event);

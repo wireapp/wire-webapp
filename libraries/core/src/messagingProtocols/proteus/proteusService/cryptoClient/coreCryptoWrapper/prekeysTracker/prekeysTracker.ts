@@ -57,11 +57,11 @@ export class PrekeyTracker {
     return prekeys;
   }
 
-  setInitialState(nbPrekeys: number) {
+  setInitialState(nbPrekeys: number): number {
     return this.prekeyState.addPrekeys(nbPrekeys);
   }
 
-  async consumePrekey() {
+  async consumePrekey(): Promise<void> {
     const nbPrekeys = this.prekeyState.consumePrekey();
     const missingPrekeys = this.numberOfMissingPrekeys(nbPrekeys);
     if (missingPrekeys > 0) {

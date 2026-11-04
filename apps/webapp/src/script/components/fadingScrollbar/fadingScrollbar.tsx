@@ -42,7 +42,7 @@ export function parseColor(color: string): [number, number, number, number] {
   return [+red, +green, +blue, +alpha];
 }
 
-const fadeStep = (state: number, {step, goal}: {step: number; goal: number}) => {
+const fadeStep = (state: number, {step, goal}: {step: number; goal: number}): number | false => {
   const hasReachedGoal = step < 0 ? state <= goal : state >= goal;
   if (hasReachedGoal) {
     return false;
@@ -55,7 +55,7 @@ export const FadingScrollbar = forwardRef<HTMLDivElement, React.HTMLAttributes<H
   const initalColor = useRef<[number, number, number, number] | undefined>(undefined);
   const currentAlpha = useRef<number>(0);
 
-  const getInitialColor = (element: HTMLElement) => {
+  const getInitialColor = (element: HTMLElement): [number, number, number, number] => {
     if (initalColor.current === undefined) {
       initalColor.current = parseColor(window.getComputedStyle(element).getPropertyValue('--scrollbar-color'));
       currentAlpha.current = initalColor.current[rgbaAlphaComponentIndex];
@@ -63,7 +63,7 @@ export const FadingScrollbar = forwardRef<HTMLDivElement, React.HTMLAttributes<H
     return initalColor.current;
   };
 
-  function animate(animation: 'fadein' | 'fadeout', element: HTMLElement) {
+  function animate(animation: 'fadein' | 'fadeout', element: HTMLElement): void {
     const newColor = getInitialColor(element).slice();
     const nextAlpha = fadeStep(currentAlpha.current, animations[animation]);
     if (nextAlpha === false) {
@@ -79,16 +79,16 @@ export const FadingScrollbar = forwardRef<HTMLDivElement, React.HTMLAttributes<H
     });
   }
 
-  function startAnimation(animation: 'fadein' | 'fadeout', element: HTMLElement) {
+  function startAnimation(animation: 'fadein' | 'fadeout', element: HTMLElement): void {
     if (!isAnimating.current) {
       animate(animation, element);
     }
   }
 
-  const fadeIn = (element: HTMLElement) => {
+  const fadeIn = (element: HTMLElement): void => {
     return startAnimation('fadein', element);
   };
-  const fadeOut = (element: HTMLElement) => {
+  const fadeOut = (element: HTMLElement): void => {
     return startAnimation('fadeout', element);
   };
 
@@ -96,7 +96,7 @@ export const FadingScrollbar = forwardRef<HTMLDivElement, React.HTMLAttributes<H
     return fadeOut(element);
   }, config.DEBOUNCE_THRESHOLD);
 
-  const fadeInIdle = (element: HTMLElement) => {
+  const fadeInIdle = (element: HTMLElement): void => {
     fadeIn(element);
     debouncedFadeOut(element);
   };

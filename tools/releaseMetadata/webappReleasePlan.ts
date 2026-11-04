@@ -19,7 +19,7 @@
 
 import {Result, Task} from 'true-myth';
 
-import {validatePullRequestReleaseImpact} from './pullRequestReleaseImpact.ts';
+import {validatePullRequestSemverPolicy} from './pullRequestReleaseImpact.ts';
 import type {PullRequestReleaseImpact} from './pullRequestReleaseImpact.ts';
 import type {ReadWebAppReleaseHistoryOptions, WebAppReleaseHistory} from './webappReleaseHistoryGit.ts';
 import type {
@@ -80,6 +80,102 @@ type DiscoverPullRequestsForCommitsOptions = {
   readonly discoveredPullRequestNumbers: ReadonlySet<number>;
 };
 
+type SelectPullRequestForCommitOptions = {
+  readonly commitSha: string;
+  readonly associatedPullRequests: readonly WebAppReleasePlanningPullRequest[];
+};
+
+function isIntermediateTargetBranch(targetBranch: string): boolean {
+  return targetBranch !== 'main' && /^(?:release|maintenance)\/[^/]+$/.test(targetBranch) === false;
+}
+
+function selectPullRequestForCommit(
+  options: SelectPullRequestForCommitOptions,
+): Result<WebAppReleasePlanningPullRequest, Error> {
+  const {commitSha, associatedPullRequests} = options;
+  const mergedPullRequests = [
+    ...new Map(
+      associatedPullRequests
+        .filter(pullRequest => {
+          return pullRequest.mergedAt.isJust;
+        })
+        .map(pullRequest => {
+          return [pullRequest.number, pullRequest] as const;
+        }),
+    ).values(),
+  ];
+  const mergedMainPullRequests = mergedPullRequests.filter(pullRequest => {
+    return pullRequest.baseBranch === 'main';
+  });
+
+  if (mergedMainPullRequests.length > 1) {
+    const pullRequestNumbers = mergedMainPullRequests
+      .map(pullRequest => {
+        return `#${pullRequest.number}`;
+      })
+      .join(', ');
+
+    return Result.err(
+      new Error(
+        `More than one merged pull request targeting main is associated with commit ${commitSha}: ${pullRequestNumbers}`,
+      ),
+    );
+  }
+
+  const matchingMainPullRequest = mergedMainPullRequests.at(0);
+  if (matchingMainPullRequest !== undefined) {
+    return Result.ok(matchingMainPullRequest);
+  }
+
+  const mergedIntermediatePullRequests = mergedPullRequests.filter(pullRequest => {
+    return isIntermediateTargetBranch(pullRequest.baseBranch);
+  });
+  const attributableIntermediatePullRequests = mergedIntermediatePullRequests.filter(pullRequest => {
+    return (
+      pullRequest.mergeCommitSha.isJust && pullRequest.mergeCommitSha.value.toLowerCase() === commitSha.toLowerCase()
+    );
+  });
+
+  if (attributableIntermediatePullRequests.length > 1) {
+    const pullRequestNumbers = attributableIntermediatePullRequests
+      .map(pullRequest => {
+        return `#${pullRequest.number}`;
+      })
+      .join(', ');
+
+    return Result.err(
+      new Error(
+        `More than one merged pull request targeting an intermediate branch has merge commit ${commitSha}: ${pullRequestNumbers}`,
+      ),
+    );
+  }
+
+  const attributablePullRequest = attributableIntermediatePullRequests.at(0);
+  if (attributablePullRequest !== undefined) {
+    return Result.ok(attributablePullRequest);
+  }
+
+  const associatedPullRequestDetails = mergedIntermediatePullRequests
+    .map(pullRequest => {
+      const mergeCommit = pullRequest.mergeCommitSha.isJust
+        ? pullRequest.mergeCommitSha.value
+        : 'missing merge commit SHA';
+
+      return `#${pullRequest.number} (${pullRequest.baseBranch}, ${mergeCommit})`;
+    })
+    .join(', ');
+  const associationDetails =
+    associatedPullRequestDetails.length > 0
+      ? `; merged intermediate-branch associations: ${associatedPullRequestDetails}`
+      : '';
+
+  return Result.err(
+    new Error(
+      `No merged pull request targeting main or a uniquely attributable intermediate branch is associated with commit ${commitSha}${associationDetails}`,
+    ),
+  );
+}
+
 function discoverPullRequestsForCommits(
   options: DiscoverPullRequestsForCommitsOptions,
   dependencies: DiscoverWebAppReleasePullRequestsDependencies,
@@ -95,45 +191,12 @@ function discoverPullRequestsForCommits(
       return new Error(`Unable to discover pull requests for commit ${commitSha}: ${error.message}`, {cause: error});
     })
     .andThen(associatedPullRequests => {
-      const mergedMainPullRequests = [
-        ...new Map(
-          associatedPullRequests
-            .filter(pullRequest => {
-              return pullRequest.baseBranch === 'main' && pullRequest.mergedAt.isJust;
-            })
-            .map(pullRequest => {
-              return [pullRequest.number, pullRequest] as const;
-            }),
-        ).values(),
-      ];
-
-      if (mergedMainPullRequests.length === 0) {
-        return Task.reject<readonly WebAppReleasePlanningPullRequest[], Error>(
-          new Error(`No merged pull request targeting main is associated with commit ${commitSha}`),
-        );
+      const selectedPullRequestResult = selectPullRequestForCommit({commitSha, associatedPullRequests});
+      if (selectedPullRequestResult.isErr) {
+        return Task.reject<readonly WebAppReleasePlanningPullRequest[], Error>(selectedPullRequestResult.error);
       }
 
-      if (mergedMainPullRequests.length > 1) {
-        const pullRequestNumbers = mergedMainPullRequests
-          .map(pullRequest => {
-            return `#${pullRequest.number}`;
-          })
-          .join(', ');
-
-        return Task.reject<readonly WebAppReleasePlanningPullRequest[], Error>(
-          new Error(
-            `More than one merged pull request targeting main is associated with commit ${commitSha}: ${pullRequestNumbers}`,
-          ),
-        );
-      }
-
-      const matchingPullRequest = mergedMainPullRequests.at(0);
-      if (matchingPullRequest === undefined) {
-        return Task.reject<readonly WebAppReleasePlanningPullRequest[], Error>(
-          new Error(`Unable to select a merged pull request for commit ${commitSha}`),
-        );
-      }
-
+      const matchingPullRequest = selectedPullRequestResult.value;
       const discoveredPullRequests = options.discoveredPullRequestNumbers.has(matchingPullRequest.number)
         ? options.discoveredPullRequests
         : [...options.discoveredPullRequests, matchingPullRequest];
@@ -172,7 +235,7 @@ function validatePullRequestImpacts(
 ): Result<readonly PullRequestReleaseImpactRecord[], Error> {
   return pullRequests.reduce((pullRequestImpactsResult, pullRequest) => {
     return pullRequestImpactsResult.andThen(pullRequestImpacts => {
-      const releaseImpactResult = validatePullRequestReleaseImpact({
+      const releaseImpactResult = validatePullRequestSemverPolicy({
         targetBranch: pullRequest.baseBranch,
         labels: pullRequest.labels,
       });

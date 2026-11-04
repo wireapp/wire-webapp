@@ -18,6 +18,7 @@
  */
 
 import * as React from 'react';
+import {type FunctionComponent} from 'react';
 
 import {CSSObject} from '@emotion/react';
 
@@ -39,11 +40,11 @@ const menuModalWrapperStyle: CSSObject = {
   padding: 0,
 };
 
-const MenuModalWrapper = (props: OverlayWrapperProps) => {
+const MenuModalWrapper: FunctionComponent<OverlayWrapperProps> = props => {
   return <div css={menuModalWrapperStyle} {...props} />;
 };
 
-const MenuModalBody = (props: React.HTMLProps<HTMLDivElement>) => {
+const MenuModalBody: FunctionComponent<React.HTMLProps<HTMLDivElement>> = props => {
   return (
     <div
       css={(theme: Theme) => {
@@ -70,7 +71,7 @@ const MenuModalBody = (props: React.HTMLProps<HTMLDivElement>) => {
   );
 };
 
-const MenuModalContent = (props: React.HTMLProps<HTMLUListElement>) => {
+const MenuModalContent: FunctionComponent<React.HTMLProps<HTMLUListElement>> = props => {
   return (
     <ul
       css={{
@@ -95,7 +96,7 @@ const modalBackgroundStyle: CSSObject = {
   background: 'rgba(50, 54, 57, 0.4)',
 };
 
-const MenuModalBackground = (props: OverlayBackgroundProps) => {
+const MenuModalBackground: FunctionComponent<OverlayBackgroundProps> = props => {
   return <div css={modalBackgroundStyle} {...props} />;
 };
 
@@ -103,11 +104,11 @@ interface MenuModalProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   onBackgroundClick?: () => void;
 }
 
-export const MenuModal = ({
+export const MenuModal: FunctionComponent<MenuModalProps & React.HTMLProps<HTMLDivElement>> = ({
   children = null,
   onBackgroundClick = noop,
   ...props
-}: MenuModalProps & React.HTMLProps<HTMLDivElement>) => {
+}) => {
   return (
     <MenuModalWrapper {...props}>
       <MenuModalBody>
@@ -120,7 +121,10 @@ export const MenuModal = ({
 
 export type MenuItemProps<T = HTMLLIElement> = React.HTMLProps<T>;
 
-export const MenuItem = ({children = null, ...props}: MenuItemProps & React.HTMLProps<HTMLLIElement>) => {
+export const MenuItem: FunctionComponent<MenuItemProps & React.HTMLProps<HTMLLIElement>> = ({
+  children = null,
+  ...props
+}) => {
   return (
     <li
       css={(theme: Theme) => {

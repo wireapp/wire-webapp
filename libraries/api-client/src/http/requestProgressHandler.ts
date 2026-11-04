@@ -21,7 +21,9 @@ import {AxiosProgressEvent} from 'axios';
 
 export type ProgressCallback = (progress: number) => void;
 
-export const handleProgressEvent = (progressCallback?: ProgressCallback) => {
+export const handleProgressEvent = (
+  progressCallback?: ProgressCallback,
+): ((progressEvent: AxiosProgressEvent) => void) | undefined => {
   if (progressCallback === undefined) {
     return undefined;
   }

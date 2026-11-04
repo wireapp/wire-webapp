@@ -193,7 +193,7 @@ export class SelfAPI {
    * Update self user's list of supported-protocols
    * @param supportedProtocols The list of supported protocols
    */
-  public async putSupportedProtocols(supportedProtocols: CONVERSATION_PROTOCOL[]) {
+  public async putSupportedProtocols(supportedProtocols: CONVERSATION_PROTOCOL[]): Promise<void> {
     const config: AxiosRequestConfig = {
       data: {supported_protocols: supportedProtocols},
       method: 'put',

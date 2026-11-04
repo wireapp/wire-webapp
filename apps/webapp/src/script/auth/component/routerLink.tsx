@@ -17,13 +17,15 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {Link, LinkProps as ReactRouterLinkProps} from 'react-router';
 
 import {LinkProps, linkStyle, Theme} from '@wireapp/react-ui-kit';
 
 type RouterLinkProps = LinkProps & ReactRouterLinkProps;
 
-const RouterLink = (props: RouterLinkProps) => {
+const RouterLink: FunctionComponent<RouterLinkProps> = (props: RouterLinkProps) => {
   return (
     <Link
       css={(theme: Theme) => {

@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import createCache from '@emotion/cache';
 import {CacheProvider} from '@emotion/react';
 import weakMemoize from '@emotion/weak-memoize';
@@ -26,11 +28,11 @@ import {container} from 'tsyringe';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
-import {CallState} from 'Repositories/calling/CallState';
 import {useActiveWindow} from 'src/script/hooks/useActiveWindow';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import '../../../../../../style/default.less';
+import {CallState} from '../../../../../repositories/calling/CallState';
+import {useKoSubscribableChildren} from '../../../../../util/componentUtil';
 
 interface DetachedWindowProps {
   children: React.ReactNode;
@@ -42,7 +44,10 @@ const memoizedCreateCacheWithContainer = weakMemoize((container: HTMLHeadElement
   return newCache;
 });
 
-export const DetachedWindow = ({children, callState = container.resolve(CallState)}: DetachedWindowProps) => {
+export const DetachedWindow: FunctionComponent<DetachedWindowProps> = ({
+  children,
+  callState = container.resolve(CallState),
+}: DetachedWindowProps) => {
   const {detachedWindow} = useKoSubscribableChildren(callState, ['detachedWindow']);
 
   useActiveWindow(detachedWindow);

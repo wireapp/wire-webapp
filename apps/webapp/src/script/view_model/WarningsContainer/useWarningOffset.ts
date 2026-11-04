@@ -20,7 +20,9 @@
 import {useWarningsState} from './WarningsState';
 import {CONFIG, TYPE} from './WarningsTypes';
 
-export const useWarningOffset = () => {
+type WarningOffsetState = {hasLargeOffset: boolean; hasSmallOffset: boolean};
+
+export const useWarningOffset = (): WarningOffsetState => {
   const warnings = useWarningsState(state => {
     return state.warnings;
   });

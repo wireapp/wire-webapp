@@ -19,7 +19,7 @@
 
 import {chunk} from '@wireapp/commons/lib/util/ArrayUtil';
 import {proteus as ProtobufOTR} from '@wireapp/protocol-messaging/web/otr';
-import {AxiosRequestConfig, isAxiosError} from 'axios';
+import {AxiosRequestConfig, AxiosResponse, isAxiosError} from 'axios';
 
 import {
   ADD_PERMISSION,
@@ -289,7 +289,10 @@ export class ConversationAPI {
     await this.client.sendJSON(config);
   }
 
-  public async getSubconversationGroupInfo(conversationId: QualifiedId, subconversationId: SUBCONVERSATION_ID) {
+  public async getSubconversationGroupInfo(
+    conversationId: QualifiedId,
+    subconversationId: SUBCONVERSATION_ID,
+  ): Promise<Uint8Array<ArrayBuffer>> {
     const baseUrl = this.generateBaseConversationUrl(conversationId);
     const url = `${baseUrl}/${ConversationAPI.URL.SUBCONVERSATIONS}/${subconversationId}/${ConversationAPI.URL.GROUP_INFO}`;
 
@@ -385,7 +388,7 @@ export class ConversationAPI {
   /**
    * see https://staging-nginz-https.zinfra.io/api/swagger-ui/#/default/get_conversations__cnv_domain___cnv__groupinfo
    */
-  public async getGroupInfo({id, domain}: QualifiedId) {
+  public async getGroupInfo({id, domain}: QualifiedId): Promise<Uint8Array<ArrayBuffer>> {
     const url = `/conversations/${domain}/${id}/${ConversationAPI.URL.GROUP_INFO}`;
     const response = await this.client.sendRequest<ArrayBuffer>({
       url,
@@ -865,7 +868,7 @@ export class ConversationAPI {
    * @param conversationId The conversation ID to add the users to
    * @param users List of users to add to a conversation
    */
-  public async postMembers(conversationId: QualifiedId, users: QualifiedId[]) {
+  public async postMembers(conversationId: QualifiedId, users: QualifiedId[]): Promise<ConversationMemberJoinEvent> {
     const config: AxiosRequestConfig = {
       data: {
         conversation_role: DefaultConversationRoleName.WIRE_MEMBER,
@@ -900,7 +903,10 @@ export class ConversationAPI {
    * @param conversationId The conversation ID to add the users to
    * @param users List of users to add to a conversation
    */
-  public async putMembers(conversationId: QualifiedId, users: QualifiedId[]) {
+  public async putMembers(
+    conversationId: QualifiedId,
+    users: QualifiedId[],
+  ): Promise<AxiosResponse<ConversationMemberJoinEvent>> {
     const config: AxiosRequestConfig = {
       data: {
         conversation_role: DefaultConversationRoleName.WIRE_MEMBER,
@@ -1008,7 +1014,7 @@ export class ConversationAPI {
     return response.data;
   }
 
-  public async resetMLSConversation({groupId, epoch}: {groupId: string; epoch: number}) {
+  public async resetMLSConversation({groupId, epoch}: {groupId: string; epoch: number}): Promise<void> {
     const config: AxiosRequestConfig = {
       method: 'post',
       url: `/${ConversationAPI.URL.MLS}/${ConversationAPI.URL.RESET_CONVERSATION}`,

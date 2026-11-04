@@ -20,15 +20,15 @@
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {Dexie} from 'dexie';
 
-import {ClientEvent} from 'Repositories/event/Client';
-import {getLogger} from 'Util/logger';
-
 import {CPBackupImporter, BackupPeekResult, isCreatedBySameUser, BackupQualifiedId} from './CPB.library';
 
+import {getLogger} from '../../../util/logger';
+import {ClientEvent} from '../../event/Client';
 import {BackupService} from '../backupService';
 import {IncompatibleBackupError} from '../error';
 
 export const CPBLogger = getLogger('wire:backup:CPB');
+type CrossPlatformBackupMetadata = {archiveVersion: string; isEncrypted: boolean; isUserBackup: boolean};
 
 export const isCPBackup = async (data: ArrayBuffer | Blob): Promise<boolean> => {
   if (!(data instanceof ArrayBuffer)) {
@@ -50,11 +50,7 @@ export const isCPBackup = async (data: ArrayBuffer | Blob): Promise<boolean> => 
 export const peekCrossPlatformData = async (
   fileBytes: ArrayBuffer,
   userId?: BackupQualifiedId,
-): Promise<{
-  archiveVersion: string;
-  isEncrypted: boolean;
-  isUserBackup: boolean;
-}> => {
+): Promise<CrossPlatformBackupMetadata> => {
   const backupImporter = new CPBackupImporter();
   const backupData = new Uint8Array(fileBytes);
   const result = await backupImporter.peekFileData(backupData);
@@ -93,7 +89,7 @@ interface ExportTableParams<T> {
   table: Dexie.Table<T>;
   preprocessor: (tableRows: any[]) => any[];
 }
-export const exportTable = async <T>({backupService, preprocessor, table}: ExportTableParams<T>) => {
+export const exportTable = async <T>({backupService, preprocessor, table}: ExportTableParams<T>): Promise<T[]> => {
   const tableData: T[] = [];
 
   await backupService.exportTable(table, tableRows => {

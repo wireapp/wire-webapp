@@ -17,23 +17,23 @@
  *
  */
 
-import {useEffect} from 'react';
+import {useEffect, type FunctionComponent} from 'react';
 
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {container} from 'tsyringe';
 
-import {AppsDisabledNote} from 'Components/Note/AppsDisabledNote/AppsDisabledNote';
-import {InfoToggle} from 'Components/toggle/InfoToggle';
-import {TeamState} from 'Repositories/team/TeamState';
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {checkAppsFeatureAvailability} from 'Util/featureUtil';
 
+import {TeamState} from '../../../../repositories/team/TeamState';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
+import {checkAppsFeatureAvailability} from '../../../../util/featureUtil';
+import {AppsDisabledNote} from '../../../Note/AppsDisabledNote/AppsDisabledNote';
+import {InfoToggle} from '../../../toggle/InfoToggle';
 import {useCreateConversationModal} from '../hooks/useCreateConversationModal';
 import {getSharedDrivePermissionHint} from '../utils';
 
-export const Preference = () => {
+export const Preference: FunctionComponent = () => {
   const {translate} = useApplicationContext();
   const {
     isCellsEnabled,

@@ -17,9 +17,14 @@
  *
  */
 
-import {useCallback, useState} from 'react';
+import {useCallback, useState, type Dispatch, type SetStateAction} from 'react';
 
-export const useCellPasswordToggle = () => {
+type UseCellPasswordToggleResult = {
+  isEnabled: boolean;
+  toggle: () => void;
+  setIsEnabled: Dispatch<SetStateAction<boolean>>;
+};
+export const useCellPasswordToggle = (): UseCellPasswordToggleResult => {
   const [isEnabled, setIsEnabled] = useState(false);
 
   const toggle = useCallback(() => {

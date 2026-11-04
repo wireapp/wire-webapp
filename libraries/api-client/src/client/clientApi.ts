@@ -166,7 +166,7 @@ export class ClientAPI {
    * @param {string} clientId The client to upload the key packages for
    * @param {string[]} keyPackages The key packages to upload
    */
-  public async replaceMLSKeyPackages(clientId: string, keyPackages: string[], ciphersuites: string) {
+  public async replaceMLSKeyPackages(clientId: string, keyPackages: string[], ciphersuites: string): Promise<void> {
     const config: AxiosRequestConfig = {
       data: {key_packages: keyPackages},
       method: 'PUT',
@@ -184,7 +184,7 @@ export class ClientAPI {
    * @param {string} clientId The client to upload the key packages for
    * @param {string[]} keyPackages The key packages to upload
    */
-  public async uploadMLSKeyPackages(clientId: string, keyPackages: string[]) {
+  public async uploadMLSKeyPackages(clientId: string, keyPackages: string[]): Promise<void> {
     const config: AxiosRequestConfig = {
       data: {key_packages: keyPackages},
       method: 'POST',
@@ -200,7 +200,7 @@ export class ClientAPI {
    * @param {string} clientId The client to delete the key packages for
    * @param {string[]} keyPackageRefs The key package references to delete
    */
-  public async deleteMLSKeyPackages(clientId: string, keyPackageRefs: string[]) {
+  public async deleteMLSKeyPackages(clientId: string, keyPackageRefs: string[]): Promise<void> {
     const maxKeyPackages = 1000;
     if (keyPackageRefs.length > maxKeyPackages) {
       throw new Error(
@@ -307,7 +307,10 @@ export class ClientAPI {
     return NonceSchema.parse(headers)[NonceKey];
   }
 
-  public async getAccessToken(clientId: string, dpopToken: Uint8Array) {
+  public async getAccessToken(
+    clientId: string,
+    dpopToken: Uint8Array,
+  ): Promise<{token: string; type: 'DPoP'; expires_in: number}> {
     const ResponseSchema = z.object({
       expires_in: z.number().min(1),
       token: z.string().min(1),

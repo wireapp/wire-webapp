@@ -17,26 +17,27 @@
  *
  */
 
-import {useEffect, useMemo, useState} from 'react';
+import {useEffect, useMemo, useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {ClientClassification} from '@wireapp/api-client/lib/client/';
 
-import {useUserIdentity} from 'Hooks/useDeviceIdentities';
-import {ClientRepository, ClientEntity} from 'Repositories/client';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
-import {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {partition} from 'Util/arrayUtil';
-import {getLogger} from 'Util/logger';
-import {capitalizeFirstChar} from 'Util/stringUtil';
 
 import {DeviceDetails} from './components/deviceDetails';
 import {DeviceList} from './components/DeviceList';
 import {NoDevicesFound} from './components/NoDevicesFound';
 import {SelfFingerprint} from './components/SelfFingerprint';
 import {FIND_MODE, UserDevicesState} from './userDevices.types';
+
+import {useUserIdentity} from '../../hooks/useDeviceIdentities';
+import {ClientRepository, ClientEntity} from '../../repositories/client';
+import {MessageRepository} from '../../repositories/conversation/MessageRepository';
+import {CryptographyRepository} from '../../repositories/cryptography/CryptographyRepository';
+import {User} from '../../repositories/entity/User';
+import {partition} from '../../util/arrayUtil';
+import {getLogger} from '../../util/logger';
+import {capitalizeFirstChar} from '../../util/stringUtil';
 
 export interface UserDevicesHistoryEntry {
   headline: string;
@@ -61,7 +62,7 @@ interface UserDevicesProps {
   groupId?: string;
 }
 
-export const UserDevices = ({
+export const UserDevices: FunctionComponent<UserDevicesProps> = ({
   noPadding = false,
   current,
   user,
@@ -101,7 +102,7 @@ export const UserDevices = ({
     })();
   }, [clientRepository, logger, user]);
 
-  const clickOnDevice = (clientEntity: ClientEntity) => {
+  const clickOnDevice = (clientEntity: ClientEntity): void => {
     setSelectedClient(clientEntity);
     const headline = user.isMe
       ? (clientEntity.label ?? clientEntity.model ?? '')
@@ -109,7 +110,7 @@ export const UserDevices = ({
     goTo(UserDevicesState.DEVICE_DETAILS, headline !== '' ? headline : '');
   };
 
-  const clickToShowSelfFingerprint = () => {
+  const clickToShowSelfFingerprint = (): void => {
     goTo(UserDevicesState.SELF_FINGERPRINT, translate('participantDevicesSelfFingerprint'));
   };
 

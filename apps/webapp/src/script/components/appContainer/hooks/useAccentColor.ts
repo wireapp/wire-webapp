@@ -22,10 +22,11 @@ import {useEffect} from 'react';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {UserState} from 'Repositories/user/userState';
 import {ACCENT_ID} from 'src/script/Config';
 
-function setAccentColor(accentColor?: number) {
+import {UserState} from '../../../repositories/user/userState';
+
+function setAccentColor(accentColor?: number): void {
   const accentColorClassId = accentColor ?? ACCENT_ID.BLUE;
   const accentClassPrefix = 'main-accent-color-';
   const bodyClassList = document.body.classList;
@@ -40,7 +41,7 @@ function setAccentColor(accentColor?: number) {
   bodyClassList.add(`${accentClassPrefix}${accentColorClassId}`);
 }
 
-export function useAccentColor() {
+export function useAccentColor(): void {
   const userState = container.resolve(UserState);
   useEffect(() => {
     const accentColor = ko.pureComputed(() => {

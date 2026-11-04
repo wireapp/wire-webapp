@@ -17,17 +17,10 @@
  *
  */
 
-import {memo} from 'react';
+import {memo, type FunctionComponent} from 'react';
 
 import {container} from 'tsyringe';
 
-import {useInitializeMediaDevices} from 'Hooks/useInitializeMediaDevices';
-import type {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {MediaConstraintsHandler} from 'Repositories/media/MediaConstraintsHandler';
-import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
-import type {MediaDeviceType} from 'Repositories/media/MediaDeviceType';
-import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
-import type {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {sendCallLogsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
@@ -40,6 +33,14 @@ import {SendCallLogs} from './avPreferences/sendCallLogs';
 import {PreferencesPage} from './components/preferencesPage';
 import {useCameraReloadOnCallEnd} from './useCameraReloadOnCallEnd';
 
+import {useInitializeMediaDevices} from '../../../../hooks/useInitializeMediaDevices';
+import type {CallingRepository} from '../../../../repositories/calling/CallingRepository';
+import {MediaConstraintsHandler} from '../../../../repositories/media/MediaConstraintsHandler';
+import {MediaDevicesHandler} from '../../../../repositories/media/MediaDevicesHandler';
+import type {MediaDeviceType} from '../../../../repositories/media/MediaDeviceType';
+import {MediaStreamHandler} from '../../../../repositories/media/MediaStreamHandler';
+import type {PropertiesRepository} from '../../../../repositories/properties/propertiesRepository';
+
 interface AVPreferencesProps {
   callingRepository: CallingRepository;
   propertiesRepository: PropertiesRepository;
@@ -49,8 +50,12 @@ interface AVPreferencesProps {
   >;
 }
 
-const AVPreferencesComponent = ({propertiesRepository, callingRepository, deviceSupport}: AVPreferencesProps) => {
-  const {translate, isFeatureToggleEnabled} = useApplicationContext();
+const AVPreferencesComponent: FunctionComponent<AVPreferencesProps> = ({
+  propertiesRepository,
+  callingRepository,
+  deviceSupport,
+}: AVPreferencesProps) => {
+  const {translate,  isFeatureToggleEnabled} = useApplicationContext();
   const devicesHandler = container.resolve(MediaDevicesHandler);
   const constraintsHandler = container.resolve(MediaConstraintsHandler);
   const streamHandler = container.resolve(MediaStreamHandler);

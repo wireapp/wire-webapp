@@ -17,18 +17,19 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {isNonEmptyString} from '@sindresorhus/is';
 
-import {CellsSelfUserDriveRoleProvider} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
-import {FileFullscreenModal} from 'Components/FileFullscreenModal/FileFullscreenModal';
-import {getFileTypeFromExtension} from 'Util/getFileTypeFromExtension/getFileTypeFromExtension';
-
+import {getFileTypeFromExtension} from '../../../../util/getFileTypeFromExtension/getFileTypeFromExtension';
+import {CellsSelfUserDriveRoleProvider} from '../../../conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {sortTagsAlphabetically} from '../../../conversation/conversationCells/common/sortTagsAlphabetically/sortTagsAlphabetically';
+import {FileFullscreenModal} from '../../../FileFullscreenModal/FileFullscreenModal';
 import {useCellsFilePreviewModal} from '../common/cellsFilePreviewModalContext/cellsFilePreviewModalContext';
 
 // This component is duplicated across global view and conversation view
 // TODO: Abstract when it starts to grow / feels right
-export const CellsFilePreviewModal = () => {
+export const CellsFilePreviewModal: FunctionComponent = () => {
   const {selectedFile, handleCloseFile, isEditMode} = useCellsFilePreviewModal();
 
   if (selectedFile === null) {
@@ -38,7 +39,7 @@ export const CellsFilePreviewModal = () => {
   const {url, extension, name, owner, uploadedAtTimestamp, previewPdfUrl, previewImageUrl, tags, conversationName} =
     selectedFile;
 
-  const getFileUrl = () => {
+  const getFileUrl = (): string | undefined => {
     const type = getFileTypeFromExtension(extension);
 
     if (['pdf', 'image'].includes(type)) {

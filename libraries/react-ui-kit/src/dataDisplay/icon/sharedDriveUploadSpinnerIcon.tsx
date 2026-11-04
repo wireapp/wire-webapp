@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {useTheme} from '@emotion/react';
 
 import {SVGIcon, SVGIconProps} from './svgIcon';
@@ -29,13 +31,13 @@ interface SharedDriveUploadSpinnerIconProps extends SVGIconProps {
   trackColorDark?: string;
 }
 
-export const SharedDriveUploadSpinnerIcon = ({
+export const SharedDriveUploadSpinnerIcon: FunctionComponent<SharedDriveUploadSpinnerIconProps> = ({
   color,
   colorDark,
   trackColor,
   trackColorDark,
   ...props
-}: SharedDriveUploadSpinnerIconProps) => {
+}) => {
   const theme = useTheme() as Theme;
   const isDarkTheme = theme?.themeId === THEME_ID.DARK;
   const resolvedColor =

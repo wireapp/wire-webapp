@@ -17,19 +17,20 @@
  *
  */
 
-import {FC, ReactNode} from 'react';
+import {FC, ReactNode, type FunctionComponent} from 'react';
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 import ko from 'knockout';
 
 import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/icon';
-import {CONVERSATION_READONLY_STATE} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
+
+import {CONVERSATION_READONLY_STATE} from '../../../repositories/conversation/ConversationRepository';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {replaceReactComponents} from '../../../util/localizerUtil/reactLocalizerUtil';
+import * as Icon from '../../icon';
 
 interface ReadOnlyConversationMessageProps {
   reloadApp: () => void;
@@ -132,7 +133,11 @@ export const ReadOnlyConversationMessage: FC<ReadOnlyConversationMessageProps> =
   return null;
 };
 
-const ReadOnlyConversationMessageBase = ({children}: {children: ReactNode}) => {
+const ReadOnlyConversationMessageBase: FunctionComponent<{children: ReactNode}> = ({
+  children,
+}: {
+  children: ReactNode;
+}) => {
   return (
     <div className="readonly-message-header readonly-message-container">
       <div className="readonly-message-header-icon readonly-message-header-icon--svg">

@@ -26,6 +26,8 @@ import {
   RestShareLink,
   RestVersion,
   RestPerformActionResponse,
+  RestBackgroundAction,
+  JobsTaskStatus,
 } from 'cells-sdk-ts';
 import {v4 as uuidv4} from 'uuid';
 
@@ -69,6 +71,7 @@ describe('CellsAPI', () => {
       getByUuid: jest.fn(),
       lookup: jest.fn(),
       performAction: jest.fn(),
+      backgroundActionInfo: jest.fn(),
       create: jest.fn(),
       promoteVersion: jest.fn(),
       deleteVersion: jest.fn(),
@@ -780,6 +783,123 @@ describe('CellsAPI', () => {
     });
   });
 
+  describe.each([
+    {method: 'deleteNodes' as const, action: 'delete'},
+    {method: 'restoreNodes' as const, action: 'restore'},
+  ])('$method', ({method, action}) => {
+    it('submits file and folder UUIDs in one request and preserves all background jobs', async () => {
+      const response: RestPerformActionResponse = {
+        Status: 'Background',
+        BackgroundActions: [
+          {JobUuid: 'first-job', Name: action},
+          {JobUuid: 'second-job', Name: action},
+        ],
+      };
+      mockNodeServiceApi.performAction.mockResolvedValueOnce(createMockResponse(response));
+
+      const result = await cellsAPI[method]({uuids: ['file-uuid', 'folder-uuid']});
+
+      expect(mockNodeServiceApi.performAction).toHaveBeenCalledTimes(1);
+      expect(mockNodeServiceApi.performAction).toHaveBeenCalledWith(
+        action,
+        expect.objectContaining({Nodes: [{Uuid: 'file-uuid'}, {Uuid: 'folder-uuid'}]}),
+        undefined,
+        {'axios-retry': {retries: 0}},
+      );
+      expect(result).toBe(response);
+    });
+
+    it('returns an immediate result without inventing background jobs', async () => {
+      const response: RestPerformActionResponse = {Status: 'Performed'};
+      mockNodeServiceApi.performAction.mockResolvedValueOnce(createMockResponse(response));
+
+      await expect(cellsAPI[method]({uuids: ['file-uuid']})).resolves.toBe(response);
+    });
+
+    it('drops blank targets and preserves the original non-blank UUIDs', async () => {
+      mockNodeServiceApi.performAction.mockResolvedValueOnce(createMockResponse({Status: 'Performed'}));
+
+      await cellsAPI[method]({uuids: ['file-uuid', '  ', 'folder-uuid', '\t']});
+
+      expect(mockNodeServiceApi.performAction).toHaveBeenCalledWith(
+        action,
+        expect.objectContaining({Nodes: [{Uuid: 'file-uuid'}, {Uuid: 'folder-uuid'}]}),
+        undefined,
+        {'axios-retry': {retries: 0}},
+      );
+    });
+
+    it.each([{uuids: []}, {uuids: ['']}, {uuids: [' ', '\t']}])(
+      'rejects when no non-blank targets remain: $uuids',
+      async ({uuids}) => {
+        await expect(cellsAPI[method]({uuids})).rejects.toThrow('At least one non-empty node UUID is required');
+
+        expect(mockNodeServiceApi.performAction).not.toHaveBeenCalled();
+      },
+    );
+
+    it('rejects calls before initialization without sending a request', async () => {
+      const uninitializedAPI = new CellsAPI({
+        accessTokenStore: {} as AccessTokenStore,
+        httpClientConfig: {} as never,
+      });
+
+      await expect(uninitializedAPI[method]({uuids: ['file-uuid']})).rejects.toThrow('CellsAPI is not initialized');
+
+      expect(mockNodeServiceApi.performAction).not.toHaveBeenCalled();
+    });
+
+    it('submits duplicate targets only once', async () => {
+      mockNodeServiceApi.performAction.mockResolvedValueOnce(createMockResponse({Status: 'Performed'}));
+
+      await cellsAPI[method]({uuids: ['file-uuid', 'file-uuid']});
+
+      expect(mockNodeServiceApi.performAction).toHaveBeenCalledWith(
+        action,
+        expect.objectContaining({Nodes: [{Uuid: 'file-uuid'}]}),
+        undefined,
+        {'axios-retry': {retries: 0}},
+      );
+    });
+
+    it('propagates request failures without resubmitting the action', async () => {
+      const error = new Error('Action failed');
+      mockNodeServiceApi.performAction.mockRejectedValueOnce(error);
+
+      await expect(cellsAPI[method]({uuids: ['file-uuid', 'folder-uuid']})).rejects.toBe(error);
+
+      expect(mockNodeServiceApi.performAction).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('batch delete options', () => {
+    it('defaults to recycling rather than permanent deletion', async () => {
+      mockNodeServiceApi.performAction.mockResolvedValueOnce(createMockResponse({}));
+
+      await cellsAPI.deleteNodes({uuids: ['file-uuid', 'folder-uuid']});
+
+      expect(mockNodeServiceApi.performAction).toHaveBeenCalledWith(
+        'delete',
+        {Nodes: [{Uuid: 'file-uuid'}, {Uuid: 'folder-uuid'}], DeleteOptions: {PermanentDelete: false}},
+        undefined,
+        {'axios-retry': {retries: 0}},
+      );
+    });
+
+    it('sends permanent deletion only when explicitly requested', async () => {
+      mockNodeServiceApi.performAction.mockResolvedValueOnce(createMockResponse({}));
+
+      await cellsAPI.deleteNodes({uuids: ['file-uuid', 'folder-uuid'], permanently: true});
+
+      expect(mockNodeServiceApi.performAction).toHaveBeenCalledWith(
+        'delete',
+        {Nodes: [{Uuid: 'file-uuid'}, {Uuid: 'folder-uuid'}], DeleteOptions: {PermanentDelete: true}},
+        undefined,
+        {'axios-retry': {retries: 0}},
+      );
+    });
+  });
+
   describe('moveNode', () => {
     it('moves a file to the target path', async () => {
       const currentPath = '/current/file.txt';
@@ -871,6 +991,61 @@ describe('CellsAPI', () => {
         AwaitTimeout: '5000ms',
       });
       expect(result).toEqual(mockResponse);
+    });
+  });
+
+  describe('getBackgroundActionInfo', () => {
+    it.each(['move', 'delete', 'restore'] as const)('retrieves status for a background %s action', async name => {
+      const response: RestBackgroundAction = {
+        JobUuid: 'action-job',
+        Name: name,
+        Status: JobsTaskStatus.Finished,
+      };
+      mockNodeServiceApi.backgroundActionInfo.mockResolvedValueOnce(createMockResponse(response));
+
+      await expect(cellsAPI.getBackgroundActionInfo({name, jobUuid: 'action-job'})).resolves.toBe(response);
+      expect(mockNodeServiceApi.backgroundActionInfo).toHaveBeenCalledWith(name, 'action-job');
+    });
+
+    it('propagates status lookup errors', async () => {
+      const error = new Error('Status lookup failed');
+      mockNodeServiceApi.backgroundActionInfo.mockRejectedValueOnce(error);
+
+      await expect(cellsAPI.getBackgroundActionInfo({name: 'move', jobUuid: 'move-job'})).rejects.toBe(error);
+    });
+  });
+
+  describe('moveNodes', () => {
+    it('moves all paths in one action and returns the Cells result', async () => {
+      const currentPaths = ['/current/file.txt', '/current/folder'];
+      const targetPath = '/new-location';
+      const mockResponse: RestPerformActionResponse = {
+        AffectedNodes: [],
+        BackgroundActions: [{JobUuid: 'move-job', Name: 'move'}],
+      } as RestPerformActionResponse;
+      mockNodeServiceApi.performAction.mockResolvedValueOnce(createMockResponse(mockResponse));
+
+      const result = await cellsAPI.moveNodes({currentPaths, targetPath});
+
+      expect(mockNodeServiceApi.performAction).toHaveBeenCalledTimes(1);
+      expect(mockNodeServiceApi.performAction).toHaveBeenCalledWith('move', {
+        Nodes: currentPaths.map(Path => {
+          return {Path};
+        }),
+        CopyMoveOptions: {TargetIsParent: true, TargetPath: targetPath},
+        AwaitStatus: 'Finished',
+        AwaitTimeout: '5000ms',
+      });
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('propagates errors when the move action fails', async () => {
+      const error = new Error('Move operation failed');
+      mockNodeServiceApi.performAction.mockRejectedValueOnce(error);
+
+      await expect(
+        cellsAPI.moveNodes({currentPaths: ['/current/file.txt', '/current/folder'], targetPath: '/target'}),
+      ).rejects.toBe(error);
     });
   });
 

@@ -25,7 +25,7 @@ import {resolve as resolveFileSystemPath} from 'node:path';
 import process from 'node:process';
 import {fileURLToPath} from 'node:url';
 
-import {validatePullRequestReleaseImpact} from '../releaseMetadata/pullRequestReleaseImpact.ts';
+import {validatePullRequestSemverPolicy} from '../releaseMetadata/pullRequestReleaseImpact.ts';
 import type {ValidatePullRequestReleaseImpactOptions} from '../releaseMetadata/pullRequestReleaseImpact.ts';
 
 type PullRequestSemverPolicyCommandOptions = {
@@ -75,7 +75,7 @@ function readPolicyInput(
 
 export function runPullRequestSemverPolicyCommand(options: PullRequestSemverPolicyCommandOptions): number {
   const {environment, dependencies} = options;
-  const policyResult = readPolicyInput(environment).andThen(validatePullRequestReleaseImpact);
+  const policyResult = readPolicyInput(environment).andThen(validatePullRequestSemverPolicy);
 
   return policyResult.match({
     Ok(releaseImpact) {

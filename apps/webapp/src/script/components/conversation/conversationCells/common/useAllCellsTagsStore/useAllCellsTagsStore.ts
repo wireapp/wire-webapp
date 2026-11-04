@@ -21,8 +21,7 @@ import {Result, result} from 'true-myth';
 import {z} from 'zod';
 import {create} from 'zustand';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-
+import {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
 import {sortTagsAlphabetically} from '../sortTagsAlphabetically/sortTagsAlphabetically';
 
 interface AllCellsTagsState {

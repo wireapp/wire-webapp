@@ -20,7 +20,7 @@
 import {BackendClientE2E} from './backendClient.e2e';
 
 export class UserRepositoryE2E extends BackendClientE2E {
-  public async deleteUser(userPassword: string, token: string) {
+  public async deleteUser(userPassword: string, token: string): Promise<void> {
     await this.axiosInstance.delete('self', {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -31,7 +31,7 @@ export class UserRepositoryE2E extends BackendClientE2E {
     });
   }
 
-  public async setUniqueUsername(username: string, token: string) {
+  public async setUniqueUsername(username: string, token: string): Promise<void> {
     await this.axiosInstance.put(
       'self/handle',
       {handle: username},

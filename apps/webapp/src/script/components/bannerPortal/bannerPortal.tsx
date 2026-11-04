@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode, useRef} from 'react';
+import {ReactNode, useRef, type FunctionComponent} from 'react';
 
 import {createPortal} from 'react-dom';
 
@@ -32,12 +32,12 @@ interface Props {
   children: ReactNode;
 }
 
-export const BannerPortal = ({onClose, positionX = 0, positionY = 0, children}: Props) => {
+export const BannerPortal: FunctionComponent<Props> = ({onClose, positionX = 0, positionY = 0, children}: Props) => {
   const bannerRef = useRef<HTMLDivElement | null>(null);
 
   const {activeWindow} = useActiveWindowState.getState();
 
-  const updateRef = (element: HTMLDivElement | null) => {
+  const updateRef = (element: HTMLDivElement | null): void => {
     bannerRef.current = element;
 
     if (element === null) {

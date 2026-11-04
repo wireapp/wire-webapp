@@ -27,9 +27,10 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import type {Translate} from 'Util/localizerUtil';
+import type {Translate} from '../../../../util/localizerUtil';
 
 import {CellsSearch} from './cellsSeach';
+import type {JSX} from '@emotion/react/jsx-runtime';
 
 const translate: Translate = translationKey => {
   if (translationKey === 'cells.search.allFilesPlaceholder') {
@@ -41,7 +42,7 @@ const translate: Translate = translationKey => {
 
 const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate}));
 
-const wrapper = ({children}: {children: ReactNode}) => {
+const wrapper = ({children}: {children: ReactNode}): JSX.Element => {
   return <StyledApp themeId={THEME_ID.DEFAULT}>{rootProviderWrapper({children})}</StyledApp>;
 };
 

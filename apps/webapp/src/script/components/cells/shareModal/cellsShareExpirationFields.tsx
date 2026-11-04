@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useMemo, useState} from 'react';
+import {useEffect, useMemo, useState, type FunctionComponent} from 'react';
 
 import {DateValue, getLocalTimeZone, today} from '@internationalized/date';
 import {isNull, isNullOrUndefined, isNonEmptyString, isUndefined} from '@sindresorhus/is';
@@ -98,7 +98,8 @@ export interface CellsShareExpirationSelection {
   time: Option | null;
 }
 
-const parseTimeLabel = (value: string | number) => {
+type ParseTimeLabelResult = {hour24: number; minutes: number};
+const parseTimeLabel = (value: string | number): ParseTimeLabelResult => {
   const [timePart, periodPart] = `${value}`.trim().split(' ');
   const [hourPart, minutePart] = (isNonEmptyString(timePart) ? timePart : '').split(':');
   const hour = Number(hourPart);
@@ -157,7 +158,7 @@ const getInitialState = (dateTime: Date | null | undefined): {time: Option; date
   };
 };
 
-export const CellsShareExpirationFields = ({
+export const CellsShareExpirationFields: FunctionComponent<CellsShareExpirationFieldsProps> = ({
   labels,
   errorText,
   dateTime,

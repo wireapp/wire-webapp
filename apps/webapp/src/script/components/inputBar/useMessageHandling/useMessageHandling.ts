@@ -23,15 +23,6 @@ import {isNull, isUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import {LexicalEditor} from 'lexical';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {EventRepository} from 'Repositories/event/EventRepository';
-import {StorageRepository} from 'Repositories/storage';
 import type {RootContextValue} from 'src/script/page/rootProvider';
 
 import {useDraftState} from './useDraftState/useDraftState';
@@ -40,6 +31,15 @@ import {useMessageReply} from './useMessageReply/useMessageReply';
 import {useMessageSend} from './useMessageSend/useMessageSend';
 import {useOutsideInputClick} from './useOutsideInputClick/useOutsideInputClick';
 
+import {CellsRepository} from '../../../repositories/cells/cellsRepository';
+import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import {MessageRepository, type OutgoingQuote} from '../../../repositories/conversation/MessageRepository';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {ContentMessage} from '../../../repositories/entity/message/contentMessage';
+import {EventRepository} from '../../../repositories/event/EventRepository';
+import {StorageRepository} from '../../../repositories/storage';
+import {WebAppEvents} from '../../../webAppEvents';
+import type {DraftState} from '../common/draftState/draftState';
 import {MessageContent} from '../common/messageContent/messageContent';
 
 interface UseMessageHandlingProps {
@@ -56,6 +56,27 @@ interface UseMessageHandlingProps {
   translate: RootContextValue['translate'];
 }
 
+type UseMessageHandlingResult = {
+  draftState: {
+    reset: () => void;
+    load: () => Promise<DraftState>;
+    save: (editorState: string, text: string, replyId?: string) => Promise<void>;
+  };
+  editedMessage: ContentMessage | undefined;
+  replyMessageEntity: ContentMessage | null;
+  isEditing: boolean;
+  isReplying: boolean;
+  sendMessage: () => Promise<void>;
+  cancelSending: () => void;
+  cancelMessageEditing: (callback?: () => void) => void;
+  cancelMessageReply: (resetDraft?: boolean) => void;
+  cancelMesssageEditing: () => void;
+  editMessage: (messageEntity?: ContentMessage) => void;
+  replyMessage: (messageEntity: ContentMessage) => void;
+  generateQuote: () => Promise<OutgoingQuote | undefined>;
+  isSending: boolean;
+  isSendingDisabled: boolean;
+};
 export const useMessageHandling = ({
   messageContent,
   conversation,
@@ -68,7 +89,7 @@ export const useMessageHandling = ({
   pastedFile,
   sendPastedFile,
   translate,
-}: UseMessageHandlingProps) => {
+}: UseMessageHandlingProps): UseMessageHandlingResult => {
   const {isEditing, editedMessage, editMessage: editMessageCallback, cancelMessageEditing} = useMessageEditing();
 
   const {isReplying, replyMessage: replyMessageCallback, replyMessageEntity} = useMessageReply();

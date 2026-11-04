@@ -19,7 +19,7 @@
 
 import {useCallback, useEffect, useRef} from 'react';
 
-import {KEY} from 'Util/keyboardUtil';
+import {KEY} from '../../util/keyboardUtil';
 
 interface KeyPressAndHoldParams {
   key: (typeof KEY)[keyof typeof KEY];
@@ -37,7 +37,7 @@ export const useKeyPressAndHold = ({
   holdDelayMs,
   enabled = true,
   activeWindow = window,
-}: KeyPressAndHoldParams) => {
+}: KeyPressAndHoldParams): void => {
   const hasTriggeredRef = useRef(false);
   const holdTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isKeyDownRef = useRef(false);

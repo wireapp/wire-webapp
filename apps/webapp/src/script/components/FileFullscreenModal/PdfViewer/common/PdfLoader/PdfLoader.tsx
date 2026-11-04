@@ -17,8 +17,10 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {loaderIconStyles} from './PdfLoader.styles';
 
-export const PdfLoader = () => {
+export const PdfLoader: FunctionComponent = () => {
   return <div className="icon-spinner spin" css={loaderIconStyles} />;
 };

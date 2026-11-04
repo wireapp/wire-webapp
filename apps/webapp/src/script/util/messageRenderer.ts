@@ -161,7 +161,7 @@ markdownit.renderer.rules.paragraph_close = () => {
   return '';
 };
 
-const renderMention = (mentionData: MentionText) => {
+const renderMention = (mentionData: MentionText): string => {
   const elementClasses = mentionData.isSelfMentioned ? ' self-mention' : '';
   let elementAttributes = mentionData.isSelfMentioned
     ? ' data-uie-name="label-self-mention" role="button"'
@@ -179,8 +179,8 @@ markdownit.normalizeLinkText = text => {
   return text;
 };
 
-export const renderMessage = (message: string, selfId?: QualifiedId, mentionEntities: MentionEntity[] = []) => {
-  const createMentionHash = (mention: MentionEntity) => {
+export const renderMessage = (message: string, selfId?: QualifiedId, mentionEntities: MentionEntity[] = []): string => {
+  const createMentionHash = (mention: MentionEntity): string => {
     return `@@${window.btoa(JSON.stringify(mention)).replace(/=/g, '')}`;
   };
 
@@ -260,7 +260,7 @@ export const renderMessage = (message: string, selfId?: QualifiedId, mentionEnti
   });
 
   markdownit.renderer.rules.link_open = (tokens, idx, options, env, self) => {
-    const cleanString = (hashedString: string) => {
+    const cleanString = (hashedString: string): string => {
       return escape(removeMentionsHashes(hashedString));
     };
     const link = tokens[idx];

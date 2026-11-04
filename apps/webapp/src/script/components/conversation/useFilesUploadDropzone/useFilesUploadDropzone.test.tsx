@@ -6,7 +6,7 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 import {useFilesUploadDropzone} from './useFilesUploadDropzone';
 
@@ -16,7 +16,12 @@ const conversation = {
 };
 const wrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
 
-const createRepository = () => {
+type CreateRepositoryResult = {
+  uploadNodeDraft: jest.Mock<any, any, any>;
+  cancelUpload: jest.Mock<any, any, any>;
+  deleteNodeDraft: jest.Mock<any, any, any>;
+};
+const createRepository = (): CreateRepositoryResult => {
   return {
     uploadNodeDraft: jest.fn(),
     cancelUpload: jest.fn(),

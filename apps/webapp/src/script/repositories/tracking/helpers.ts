@@ -21,22 +21,23 @@ import {isNonEmptyString, isTruthy, isUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
 import {Runtime} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
-import {Call} from 'Repositories/calling/Call';
-import {Conversation} from 'Repositories/entity/Conversation';
-import type {User} from 'Repositories/entity/User';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {ConversationType, UserType, PlatformType} from './attribute';
 import {EventName} from './eventName';
 import {Segmentation} from './segmentation';
 
+import {RatingListLabel} from '../../components/Modals/QualityFeedbackModal/typings';
+import {TIME_IN_MILLIS} from '../../util/timeUtil';
+import {WebAppEvents} from '../../webAppEvents';
+import {Call} from '../calling/Call';
+import {Conversation} from '../entity/Conversation';
+import type {User} from '../entity/User';
+
 export interface GuestAttributes {
   is_allow_guests: boolean;
   user_type: UserType;
 }
+type ParticipantTypes = {guests: number; temporaryGuests: number; users: number};
 
 /**
  * Get corresponding tracking attribute for conversation type.
@@ -54,7 +55,7 @@ export function getGuestAttributes(conversationEntity: Conversation): GuestAttri
   const isTeamConversation = isNonEmptyString(conversationEntity.teamId);
   if (isTeamConversation) {
     const isAllowGuests = !conversationEntity.isTeamOnly();
-    const _getUserType = (_conversationEntity: Conversation) => {
+    const _getUserType = (_conversationEntity: Conversation): UserType => {
       const selfUser = _conversationEntity.selfUser();
       if (selfUser !== undefined && selfUser.isTemporaryGuest()) {
         return UserType.TEMPORARY_GUEST;
@@ -75,10 +76,7 @@ export function getGuestAttributes(conversationEntity: Conversation): GuestAttri
   };
 }
 
-export function getParticipantTypes(
-  userEntities: User[],
-  countSelf?: boolean,
-): {guests: number; temporaryGuests: number; users: number} {
+export function getParticipantTypes(userEntities: User[], countSelf?: boolean): ParticipantTypes {
   const initialValue = {guests: 0, temporaryGuests: 0, users: countSelf === true ? 1 : 0};
   return userEntities.reduce((accumulator, userEntity) => {
     if (userEntity.isTemporaryGuest()) {
@@ -108,7 +106,15 @@ export function getPlatform(): PlatformType {
   return Runtime.isMacOS() ? PlatformType.DESKTOP_MACOS : PlatformType.DESKTOP_LINUX;
 }
 
-export function trackCallQualityFeedback({call, score, label}: {call?: Call; score?: number; label: RatingListLabel}) {
+export function trackCallQualityFeedback({
+  call,
+  score,
+  label,
+}: {
+  call?: Call;
+  score?: number;
+  label: RatingListLabel;
+}): void {
   if (isUndefined(call)) {
     return;
   }

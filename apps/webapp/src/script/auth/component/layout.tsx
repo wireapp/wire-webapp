@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode} from 'react';
+import {ReactNode, type FunctionComponent} from 'react';
 
 import {WavesPattern} from '@wireapp/react-ui-kit/lib/images/wavesPattern';
 
@@ -29,7 +29,7 @@ import {bodyCss, contentContainerCss, leftSectionCss, whiteFontCss} from './layo
 
 import {Config} from '../../Config';
 
-export const Layout = ({children}: {children: ReactNode}) => {
+export const Layout: FunctionComponent<{children: ReactNode}> = ({children}: {children: ReactNode}) => {
   const {translate} = useApplicationContext();
   return (
     <FlexBox css={bodyCss}>

@@ -17,9 +17,11 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
-export const PauseIcon = (props: SVGIconProps) => {
+export const PauseIcon: FunctionComponent<SVGIconProps> = props => {
   return (
     <SVGIcon realWidth={16} realHeight={16} {...props}>
       <path d="M3 0H6V16H3V0ZM10 0H13V16H10V0Z" fillRule="evenodd" clipRule="evenodd" />

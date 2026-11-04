@@ -17,8 +17,9 @@
  *
  */
 
-import {shouldRestrictCellsViewerActions} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 import {CellNode} from 'src/script/types/cellNode';
+
+import {shouldRestrictCellsViewerActions} from '../../../conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
 
 export const useShouldRestrictGlobalDriveNodeActions = (node: CellNode): boolean => {
   return shouldRestrictCellsViewerActions({

@@ -32,9 +32,9 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
-import {CONVERSATION_READONLY_STATE} from 'Repositories/conversation/ConversationRepository';
-import {ConversationStatus} from 'Repositories/conversation/ConversationStatus';
-import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
+import {CONVERSATION_READONLY_STATE} from '../../conversation/ConversationRepository';
+import {ConversationStatus} from '../../conversation/ConversationStatus';
+import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
 
 export interface ConversationRecord {
   access_role: CONVERSATION_LEGACY_ACCESS_ROLE | CONVERSATION_ACCESS_ROLE[];
@@ -57,6 +57,8 @@ export interface ConversationRecord {
   id: string;
   initial_protocol?: CONVERSATION_PROTOCOL;
   is_guest: boolean;
+  /** Local-only message timestamp from which this conversation is manually unread. */
+  manual_unread_timestamp?: number;
   last_event_timestamp: number;
   last_read_timestamp: number;
   last_server_timestamp: number;

@@ -22,11 +22,11 @@ import {$getSelection, $isRangeSelection, $isTextNode, LexicalNode, RangeSelecti
 
 const PUNCTUATION = '\\.,\\*\\?\\$\\|#{}\\(\\)\\^\\[\\]\\\\/!%\'"~=<>_:;\\s';
 
-const VALID_CHARS = (triggers: string[]) => {
+const VALID_CHARS = (triggers: string[]): string => {
   return `(?!${triggers.join('|')})[^${PUNCTUATION}]`;
 };
 
-export function getNextSibling(node: LexicalNode) {
+export function getNextSibling(node: LexicalNode): LexicalNode | null {
   let nextSibling = node.getNextSibling();
 
   while (nextSibling !== null && nextSibling.getType() === 'zeroWidth') {
@@ -36,7 +36,7 @@ export function getNextSibling(node: LexicalNode) {
   return nextSibling;
 }
 
-export function getPreviousSibling(node: LexicalNode) {
+export function getPreviousSibling(node: LexicalNode): LexicalNode | null {
   let previousSibling = node.getPreviousSibling();
 
   while (previousSibling !== null && previousSibling.getType() === 'zeroWidth') {
@@ -46,7 +46,7 @@ export function getPreviousSibling(node: LexicalNode) {
   return previousSibling;
 }
 
-function isWordChar(char: string, triggers: string[]) {
+function isWordChar(char: string, triggers: string[]): boolean {
   return new RegExp(VALID_CHARS(triggers)).test(char);
 }
 

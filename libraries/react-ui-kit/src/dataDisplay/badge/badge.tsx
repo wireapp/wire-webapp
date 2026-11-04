@@ -17,9 +17,13 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {textStyles, wrapperStyles} from './badge.styles';
 
-export const Badge = ({children}: {children: string}) => {
+type BadgeProps = {children: string};
+
+export const Badge: FunctionComponent<BadgeProps> = ({children}) => {
   return (
     <div css={wrapperStyles}>
       <span css={textStyles}>{children}</span>

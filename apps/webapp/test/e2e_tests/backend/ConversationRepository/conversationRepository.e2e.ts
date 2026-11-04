@@ -33,8 +33,9 @@ type Conversation = {
   name: string;
 };
 
+type GetAuthHeadersResult = {headers: {Authorization: string; 'Content-Type': string}};
 export class ConversationRepositoryE2E extends BackendClientE2E {
-  private getAuthHeaders(token: string) {
+  private getAuthHeaders(token: string): GetAuthHeadersResult {
     return {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -62,7 +63,7 @@ export class ConversationRepositoryE2E extends BackendClientE2E {
     inviterToken: string,
     teamId: string,
     conversationName?: string,
-  ) {
+  ): Promise<void> {
     await this.axiosInstance.post(
       'conversations',
       {
@@ -81,7 +82,7 @@ export class ConversationRepositoryE2E extends BackendClientE2E {
     );
   }
 
-  async createGroupConversation(token: string, data: createGroupConversationDataParams) {
+  async createGroupConversation(token: string, data: createGroupConversationDataParams): Promise<any> {
     const conversationData = createGroupConversationData(data);
     try {
       const response = await this.axiosInstance.post('conversations', conversationData, this.getAuthHeaders(token));
@@ -97,7 +98,7 @@ export class ConversationRepositoryE2E extends BackendClientE2E {
     token: string,
     conversationPartnerId: string,
     options?: {protocol?: 'proteus' | 'mls'},
-  ) {
+  ): Promise<string | undefined> {
     const conversations = await this.listAllConversations(token);
 
     const conversation = conversations.find(conversation => {
@@ -113,7 +114,7 @@ export class ConversationRepositoryE2E extends BackendClientE2E {
     return conversation?.qualified_id.id;
   }
 
-  async getGroupConversation(token: string, conversationName: string) {
+  async getGroupConversation(token: string, conversationName: string): Promise<string | undefined> {
     const conversations = await this.listAllConversations(token);
     return conversations.find(conv => {
       return conv.name === conversationName;

@@ -17,11 +17,11 @@
  *
  */
 
-import type {ReactElement, ChangeEvent, FormEvent} from 'react';
+import type {ReactElement, ChangeEvent, FormEvent, FunctionComponent} from 'react';
 
 import {Input} from '@wireapp/react-ui-kit';
 
-import type {Translate} from 'Util/localizerUtil';
+import type {Translate} from '../../../../util/localizerUtil';
 
 interface PasswordAdvancedSecurityFormProps {
   readonly translate: Translate;
@@ -34,7 +34,7 @@ interface PasswordAdvancedSecurityFormProps {
   error?: ReactElement;
 }
 
-export const PasswordAdvancedSecurityForm = ({
+export const PasswordAdvancedSecurityForm: FunctionComponent<PasswordAdvancedSecurityFormProps> = ({
   translate,
   onSubmit,
   inputValue,

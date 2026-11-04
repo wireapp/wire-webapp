@@ -17,7 +17,7 @@
  *
  */
 
-import {createContext, type ReactNode, useContext, useMemo} from 'react';
+import {createContext, type ReactNode, useContext, useMemo, type FunctionComponent} from 'react';
 
 import {Maybe} from 'true-myth';
 import {useStore} from 'zustand';
@@ -33,7 +33,10 @@ type MeetingStoreProviderProps = {
   children: ReactNode;
 };
 
-export const MeetingStoreProvider = ({store, children}: MeetingStoreProviderProps) => {
+export const MeetingStoreProvider: FunctionComponent<MeetingStoreProviderProps> = ({
+  store,
+  children,
+}: MeetingStoreProviderProps) => {
   const value = useMemo(() => {
     return Maybe.just(store);
   }, [store]);

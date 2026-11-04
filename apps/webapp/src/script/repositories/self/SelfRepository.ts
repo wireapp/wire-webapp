@@ -24,24 +24,24 @@ import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
 import {TypedEventEmitter} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {ClientEntity, ClientRepository} from 'Repositories/client';
-import {EventSource} from 'Repositories/event/EventSource';
-import {
-  FeatureUpdateType,
-  detectTeamFeatureUpdate,
-} from 'Repositories/team/TeamFeatureConfigChangeDetector/TeamFeatureConfigChangeDetector';
-import {TeamRepository} from 'Repositories/team/TeamRepository';
-import {UserRepository} from 'Repositories/user/userRepository';
-import {UserState} from 'Repositories/user/userState';
-import {Logger, getLogger} from 'Util/logger';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {SelfService} from './SelfService';
 import {evaluateSelfSupportedProtocols} from './SelfSupportedProtocols/SelfSupportedProtocols';
 
 import {Core} from '../../service/coreSingleton';
+import {Logger, getLogger} from '../../util/logger';
+import {TIME_IN_MILLIS} from '../../util/timeUtil';
+import {WebAppEvents} from '../../webAppEvents';
+import {ClientEntity, ClientRepository} from '../client';
+import type {User as UserEntity} from '../entity/User';
+import {EventSource} from '../event/EventSource';
+import {
+  FeatureUpdateType,
+  detectTeamFeatureUpdate,
+} from '../team/TeamFeatureConfigChangeDetector/TeamFeatureConfigChangeDetector';
+import {TeamRepository} from '../team/TeamRepository';
+import {UserRepository} from '../user/userRepository';
+import {UserState} from '../user/userState';
 
 type Events = {selfSupportedProtocolsUpdated: CONVERSATION_PROTOCOL[]};
 
@@ -83,7 +83,7 @@ export class SelfRepository extends TypedEventEmitter<Events> {
     await this.refreshSelfSupportedProtocols();
   };
 
-  private get selfUser() {
+  private get selfUser(): UserEntity {
     const selfUser = this.userState.self();
     if (isNullOrUndefined(selfUser)) {
       throw new Error('Self user is not available');
@@ -97,7 +97,7 @@ export class SelfRepository extends TypedEventEmitter<Events> {
   }: {
     prevFeatureList?: FeatureList;
     newFeatureList?: FeatureList;
-  }) => {
+  }): Promise<void> => {
     const mlsFeatureUpdate = detectTeamFeatureUpdate({prevFeatureList, newFeatureList}, FEATURE_KEY.MLS);
 
     // Nothing to do if MLS feature was not changed
@@ -133,7 +133,7 @@ export class SelfRepository extends TypedEventEmitter<Events> {
   private handleMLSMigrationFeatureUpdate = async (featureUpdate: {
     prevFeatureList?: FeatureList;
     newFeatureList?: FeatureList;
-  }) => {
+  }): Promise<void> => {
     // MLS Migration feature config is also considered when evaluating self supported protocols
     // We still allow proteus to be used if migration is enabled (but startTime has not been reached yet),
     // or when migration is enabled, started and not finalised yet (finaliseRegardlessAfter has not arrived yet)
@@ -147,7 +147,7 @@ export class SelfRepository extends TypedEventEmitter<Events> {
   private handleDownloadPathFeatureUpdate = async (featureUpdate: {
     prevFeatureList?: FeatureList;
     newFeatureList?: FeatureList;
-  }) => {
+  }): Promise<void> => {
     const {type, next} = detectTeamFeatureUpdate(featureUpdate, FEATURE_KEY.ENFORCE_DOWNLOAD_PATH);
 
     if (type === FeatureUpdateType.UNCHANGED) {
@@ -159,7 +159,7 @@ export class SelfRepository extends TypedEventEmitter<Events> {
     );
   };
 
-  private handleDownloadPathUpdate = (dlPath?: string) => {
+  private handleDownloadPathUpdate = (dlPath?: string): void => {
     amplify.publish(WebAppEvents.TEAM.DOWNLOAD_PATH_UPDATE, dlPath);
   };
 
@@ -222,7 +222,7 @@ export class SelfRepository extends TypedEventEmitter<Events> {
    * Will initialise the intervals for checking (and updating if necessary) self supported protocols.
    * Should be called only once on app load.
    */
-  public async initialisePeriodicSelfSupportedProtocolsCheck() {
+  public async initialisePeriodicSelfSupportedProtocolsCheck(): Promise<void> {
     // We update supported protocols of self user on initial app load and then in 24 hours intervals
     await this.refreshSelfSupportedProtocols();
 

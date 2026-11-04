@@ -10,7 +10,7 @@
 
 import {act, renderHook} from '@testing-library/react';
 
-import type {FileWithPreview} from 'Components/conversation/useFilesUploadState/useFilesUploadState';
+import type {FileWithPreview} from '../../../../conversation/useFilesUploadState/useFilesUploadState';
 
 import {useSendFiles} from './useSendFiles';
 

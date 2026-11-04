@@ -17,22 +17,22 @@
  *
  */
 
-import React from 'react';
+import React, {type FunctionComponent} from 'react';
 
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {container} from 'tsyringe';
 
 import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {AppLockRepository} from 'Repositories/user/appLockRepository';
-import {AppLockState} from 'Repositories/user/appLockState';
-import {CONVERSATION_TYPING_INDICATOR_MODE} from 'Repositories/user/typingIndicatorMode';
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {formatDurationCaption, TIME_IN_MILLIS} from 'Util/timeUtil';
 
+import {PropertiesRepository} from '../../../../../repositories/properties/propertiesRepository';
+import {AppLockRepository} from '../../../../../repositories/user/appLockRepository';
+import {AppLockState} from '../../../../../repositories/user/appLockState';
+import {CONVERSATION_TYPING_INDICATOR_MODE} from '../../../../../repositories/user/typingIndicatorMode';
+import {useKoSubscribableChildren} from '../../../../../util/componentUtil';
+import {formatDurationCaption, TIME_IN_MILLIS} from '../../../../../util/timeUtil';
 import {PreferencesSection} from '../components/preferencesSection';
 
 interface PrivacySectionProps {
@@ -41,7 +41,7 @@ interface PrivacySectionProps {
   propertiesRepository: PropertiesRepository;
 }
 
-const PrivacySection = ({
+const PrivacySection: FunctionComponent<PrivacySectionProps> = ({
   propertiesRepository,
   appLockRepository,
   appLockState = container.resolve(AppLockState),
@@ -64,7 +64,7 @@ const PrivacySection = ({
     'typingIndicatorMode',
   ]);
 
-  const changeReceiptMode = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const changeReceiptMode = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const isChecked = event.target.checked;
 
     void propertiesRepository.updateProperty(
@@ -73,7 +73,7 @@ const PrivacySection = ({
     );
   };
 
-  const handleTypingModeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleTypingModeChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const isChecked = event.target.checked;
 
     void propertiesRepository.updateProperty(

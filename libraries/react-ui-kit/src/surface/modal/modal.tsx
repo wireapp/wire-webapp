@@ -17,7 +17,7 @@
  *
  */
 
-import {CSSProperties} from 'react';
+import {CSSProperties, type FunctionComponent} from 'react';
 import * as React from 'react';
 
 import {CSSObject} from '@emotion/react';
@@ -63,11 +63,11 @@ const modalBodyStyle: <T>(theme: Theme, props: ModalBodyProps<T>) => CSSObject =
   };
 };
 
-const filterModalBodyProps = (props: ModalBodyProps) => {
+const filterModalBodyProps = (props: ModalBodyProps): Object => {
   return filterProps(props, ['fullscreen']);
 };
 
-const ModalBody = (props: ModalBodyProps) => {
+const ModalBody: FunctionComponent<ModalBodyProps> = props => {
   return (
     <div
       css={(theme: Theme) => {
@@ -78,7 +78,7 @@ const ModalBody = (props: ModalBodyProps) => {
   );
 };
 
-const ModalClose = (props: SVGIconProps<SVGSVGElement>) => {
+const ModalClose: FunctionComponent<SVGIconProps<SVGSVGElement>> = props => {
   return (
     <CloseIcon
       width={16}
@@ -115,7 +115,7 @@ const modalBackgroundStyle: CSSObject = {
   backgroundColor: 'rgba(50, 54, 57, 0.4)',
 };
 
-const ModalBackground = (props: OverlayBackgroundProps) => {
+const ModalBackground: FunctionComponent<OverlayBackgroundProps> = props => {
   return <div css={modalBackgroundStyle} {...props} />;
 };
 

@@ -24,17 +24,6 @@ import {amplify} from 'amplify';
 import {CSSTransition, TransitionGroup} from 'react-transition-group';
 import {container} from 'tsyringe';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {Message} from 'Repositories/entity/message/message';
-import {User} from 'Repositories/entity/User';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
-import {TeamState} from 'Repositories/team/TeamState';
-import {UserState} from 'Repositories/user/userState';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-
 import {Access} from './access/access';
 import {AddParticipants} from './addParticipants';
 import {ConversationDetails} from './conversationDetails';
@@ -52,9 +41,18 @@ import {TimedMessages} from './timedMessages';
 import {isReadableMessage} from '../../guards/Message';
 import {isUserAppOrServiceEntity, isUserEntity} from '../../guards/Panel';
 import {isAppOrServiceEntity} from '../../guards/Service';
+import {ConversationState} from '../../repositories/conversation/ConversationState';
+import {Conversation} from '../../repositories/entity/Conversation';
+import {Message} from '../../repositories/entity/message/message';
+import {User} from '../../repositories/entity/User';
+import {ServiceEntity} from '../../repositories/integration/ServiceEntity';
+import {TeamState} from '../../repositories/team/TeamState';
+import {UserState} from '../../repositories/user/userState';
 import {Core} from '../../service/coreSingleton';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
 import {ActionsViewModel} from '../../view_model/ActionsViewModel';
 import {ViewModelRepositories} from '../../view_model/MainViewModel';
+import {WebAppEvents} from '../../webAppEvents';
 import {RightSidebarParams} from '../appMain';
 import {useAppMainState} from '../state';
 import {ContentState} from '../useAppState';
@@ -145,22 +143,22 @@ const RightSidebar: FC<RightSidebarProps> = ({
   const messageEntity = !isNullOrUndefined(currentEntity) && isReadableMessage(currentEntity) ? currentEntity : null;
   const serviceEntity = !isNullOrUndefined(currentEntity) && isAppOrServiceEntity(currentEntity) ? currentEntity : null;
 
-  const goToRoot = () => {
+  const goToRoot = (): void => {
     return rightSidebar.goToRoot(isNullOrUndefined(activeConversation) ? null : activeConversation);
   };
 
-  const closePanel = () => {
+  const closePanel = (): void => {
     return rightSidebar.close();
   };
 
-  const togglePanel = (newState: PanelState, entity: PanelEntity | null, isAddMode: boolean = false) => {
+  const togglePanel = (newState: PanelState, entity: PanelEntity | null, isAddMode: boolean = false): void => {
     setAnimatePanelToLeft(true);
     rightSidebar.goTo(newState, {entity, isAddMode});
   };
 
   const onBackClick = (
     entity: PanelEntity | null = isNullOrUndefined(activeConversation) ? null : activeConversation,
-  ) => {
+  ): void => {
     const previousHistory = rightSidebar.history.slice(0, -1);
     const hasPreviousHistory = isNonEmptyArray(previousHistory);
     setAnimatePanelToLeft(false);
@@ -180,12 +178,12 @@ const RightSidebar: FC<RightSidebarProps> = ({
     rightSidebar.goTo(PanelState.CONVERSATION_DETAILS, {entity});
   };
 
-  const showDevices = (entity: User) => {
+  const showDevices = (entity: User): void => {
     rightSidebar.goTo(PanelState.PARTICIPANT_DEVICES, {entity});
     setAnimatePanelToLeft(true);
   };
 
-  const switchContent = (newContentState: string) => {
+  const switchContent = (newContentState: string): void => {
     const isCollectionState = newContentState === ContentState.COLLECTION;
 
     if (isCollectionState && isNonEmptyString(currentState)) {
@@ -391,7 +389,12 @@ const RightSidebar: FC<RightSidebarProps> = ({
             />
           )}
           {currentState === PanelState.CONVERSATION_HISTORY && (
-            <ConversationHistory onClose={closePanel} onGoBack={onBackClick} />
+            <ConversationHistory
+              onClose={closePanel}
+              onGoBack={onBackClick}
+              selfUser={selfUser}
+              teamState={teamState}
+            />
           )}
         </>
       </Animated>

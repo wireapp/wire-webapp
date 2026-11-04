@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactElement} from 'react';
+import {ReactElement, type JSX} from 'react';
 
 import {CSSObject, useTheme} from '@emotion/react';
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
@@ -99,7 +99,7 @@ export const Select = <IsMulti extends boolean = false, Group extends GroupBase<
   hideControl = false,
   menuMatchControlWidth = false,
   ...props
-}: SelectProps<IsMulti, Group>) => {
+}: SelectProps<IsMulti, Group>): JSX.Element => {
   const theme = useTheme();
   const hasError = !!Boolean(error);
 

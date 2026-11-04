@@ -22,16 +22,17 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {result, task} from 'true-myth';
 import {container} from 'tsyringe';
 
-import {ConversationDatabaseData, ConversationMapper} from 'Repositories/conversation/ConversationMapper';
-import {User} from 'Repositories/entity/User';
+import {ConversationDatabaseData, ConversationMapper} from '../../../../repositories/conversation/ConversationMapper';
+import type {Conversation as ConversationEntity} from '../../../../repositories/entity/Conversation';
+import {User} from '../../../../repositories/entity/User';
 import {Core} from 'src/script/service/coreSingleton';
 import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {TestFactory} from 'test/helper/TestFactory';
-import {translate} from 'Util/localizerUtil';
-import {createUuid} from 'Util/uuid';
+import {translate} from '../../../../util/localizerUtil';
+import {createUuid} from '../../../../util/uuid';
 
 import {joinConversationsAfterMigrationFinalisation} from '.';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../util/test/translateForTest';
 
 function getConversationServiceForTest(core: Core): NonNullable<NonNullable<Core['service']>['conversation']> {
   const service = requireValueForTest(core.service);
@@ -112,7 +113,7 @@ const createConversation = (
   type: CONVERSATION_TYPE,
   selfUser: User,
   groupId?: string,
-) => {
+): ConversationEntity => {
   const conversationRecord = createMockedDBConversationEntry(id, domain, initialProtocol, protocol, type);
 
   const [conversation] = ConversationMapper.mapConversations([conversationRecord], 1, translate);
@@ -127,7 +128,7 @@ const createConversation = (
   return conversation;
 };
 
-const mockSafeEpoch = (core: Core) => {
+const mockSafeEpoch = (core: Core): void => {
   (core.service?.mls as unknown as {getSafeEpoch: jest.Mock}).getSafeEpoch = jest
     .fn()
     .mockResolvedValue(task.resolve(1));

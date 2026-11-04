@@ -40,15 +40,15 @@ export const readLocalFile = (filePath: string): Promise<Buffer> => {
   });
 };
 
-export const getVideoFilePath = () => {
+export const getVideoFilePath = (): string => {
   return path.join(fileTransferAssetsDir, VideoFileName);
 };
 
-export const getAudioFilePath = () => {
+export const getAudioFilePath = (): string => {
   return path.join(fileTransferAssetsDir, AudioFileName);
 };
 
-export const getTextFilePath = () => {
+export const getTextFilePath = (): string => {
   return path.join(fileTransferAssetsDir, TextFileName);
 };
 
@@ -74,7 +74,11 @@ export const isAssetDownloaded = async (filePath: string): Promise<boolean> => {
   }
 };
 
-export const shareAssetHelper = async (filePath: string | readonly string[], page: Page, buttonLocator: Locator) => {
+export const shareAssetHelper = async (
+  filePath: string | readonly string[],
+  page: Page,
+  buttonLocator: Locator,
+): Promise<void> => {
   const fileChooserPromise = page.waitForEvent('filechooser');
   await buttonLocator.click();
   const fileChooser = await fileChooserPromise;

@@ -19,26 +19,21 @@
 
 'use strict';
 
-const nxResolver = require('@nx/jest/plugins/resolver');
-
 const commonJsExportConditions = ['node', 'node-addons', 'require', 'default'];
 const importExportConditions = ['node', 'node-addons', 'import', 'default'];
-
-const mergeExportConditions = exportConditions =>
-  [...new Set(exportConditions)].filter(exportCondition => exportCondition !== undefined);
 
 module.exports = (modulePath, resolverOptions) => {
   try {
     // Prefer CommonJS exports so Jest internals and dual-published packages stay compatible.
-    return nxResolver(modulePath, {
+    return resolverOptions.defaultResolver(modulePath, {
       ...resolverOptions,
-      conditions: mergeExportConditions(commonJsExportConditions),
+      conditions: commonJsExportConditions,
     });
   } catch (commonJsResolutionError) {
     try {
-      return nxResolver(modulePath, {
+      return resolverOptions.defaultResolver(modulePath, {
         ...resolverOptions,
-        conditions: mergeExportConditions(importExportConditions),
+        conditions: importExportConditions,
       });
     } catch {
       throw commonJsResolutionError;

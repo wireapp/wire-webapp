@@ -28,15 +28,15 @@ import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {WebAppEvents} from '../../../../webAppEvents';
 
-import {CallState} from 'Repositories/calling/CallState';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {SearchRepository} from 'Repositories/search/searchRepository';
-import {UserRepository} from 'Repositories/user/userRepository';
+import {CallState} from '../../../../repositories/calling/CallState';
+import {ConversationRepository} from '../../../../repositories/conversation/ConversationRepository';
+import {Conversation} from '../../../../repositories/entity/Conversation';
+import {User} from '../../../../repositories/entity/User';
+import {ConversationState} from '../../../../repositories/conversation/ConversationState';
+import {SearchRepository} from '../../../../repositories/search/searchRepository';
+import {UserRepository} from '../../../../repositories/user/userRepository';
 import {withTheme, withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
@@ -48,11 +48,11 @@ import {TestFactory} from 'test/helper/TestFactory';
 
 import {Conversations, shouldClearDeepLinkForTab} from './';
 import {SidebarTabs, useSidebarStore} from './useSidebarStore';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../util/test/translateForTest';
 
 type ConversationsProps = React.ComponentProps<typeof Conversations>;
 
-const create1to1Conversation = (userName: string) => {
+const create1to1Conversation = (userName: string): Conversation => {
   const conversation = new Conversation(userName, 'domain', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
   const user = new User(`${userName}-id`, 'domain', translateForTest);
   user.name(userName);

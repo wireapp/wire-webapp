@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode, useRef} from 'react';
+import {ReactNode, useRef, type FunctionComponent} from 'react';
 
 import {$convertToMarkdownString} from '@lexical/markdown';
 import {ClearEditorPlugin} from '@lexical/react/LexicalClearEditorPlugin';
@@ -32,11 +32,6 @@ import {RichTextPlugin} from '@lexical/react/LexicalRichTextPlugin';
 import {isNull, isNullOrUndefined} from '@sindresorhus/is';
 import {LexicalEditor, EditorState} from 'lexical';
 import {noop} from 'noop-esm';
-
-import {DraftState} from 'Components/inputBar/common/draftState/draftState';
-import {MessageContent} from 'Components/inputBar/common/messageContent/messageContent';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {User} from 'Repositories/entity/User';
 
 import {editorConfig} from './editorConfig';
 import {FormatToolbar} from './formatToolbar/formatToolbar';
@@ -64,6 +59,11 @@ import {parseMentions} from './utils/parseMentions';
 import {getRawMessageText, transformMessage} from './utils/transformMessage';
 import {useEditorDraftState} from './utils/useEditorDraftState';
 
+import {ContentMessage} from '../../../../repositories/entity/message/contentMessage';
+import {User} from '../../../../repositories/entity/User';
+import {DraftState} from '../../common/draftState/draftState';
+import {MessageContent} from '../../common/messageContent/messageContent';
+
 interface RichTextEditorProps {
   placeholder: string;
   replaceEmojis: boolean;
@@ -85,7 +85,7 @@ interface RichTextEditorProps {
   onSetup?: (editor: LexicalEditor) => void;
 }
 
-export const RichTextEditor = ({
+export const RichTextEditor: FunctionComponent<RichTextEditorProps> = ({
   placeholder,
   children,
   hasLocalEphemeralTimer,
@@ -116,7 +116,7 @@ export const RichTextEditor = ({
     disableMessagePreprocessing,
   });
 
-  const handleChange = (editorState: EditorState) => {
+  const handleChange = (editorState: EditorState): void => {
     editorState.read(() => {
       if (isNull(editorRef.current)) {
         return;

@@ -67,6 +67,6 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
 Button.displayName = 'Button';
 
-export const filterButtonProps = (props: ButtonProps) => {
+export const filterButtonProps = (props: ButtonProps): Object => {
   return filterProps(filterTextProps(props) as ButtonProps, ['backgroundColor', 'noCapital']);
 };

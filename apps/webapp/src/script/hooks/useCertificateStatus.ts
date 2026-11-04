@@ -23,11 +23,10 @@ import {isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
 import {noop} from 'noop-esm';
 
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
-
 import {E2EIHandler, MLSStatuses, WireIdentity} from '../e2eIdentity';
+import {TIME_IN_MILLIS} from '../util/timeUtil';
 
-const getCertificateStatus = (identity?: WireIdentity, isSelfWithinGracePeriod: boolean = false) => {
+const getCertificateStatus = (identity?: WireIdentity, isSelfWithinGracePeriod: boolean = false): MLSStatuses => {
   if (isUndefined(identity) || identity.credentialType === CredentialType.Basic) {
     return MLSStatuses.NOT_ACTIVATED;
   }

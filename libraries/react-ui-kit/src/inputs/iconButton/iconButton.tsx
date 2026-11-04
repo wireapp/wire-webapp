@@ -141,6 +141,6 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(({child
 
 IconButton.displayName = 'IconButton';
 
-const filterButtonProps = (props: IconButtonProps) => {
+const filterButtonProps = (props: IconButtonProps): Object => {
   return filterProps(filterTextProps(props) as IconButtonProps, ['backgroundColor']);
 };

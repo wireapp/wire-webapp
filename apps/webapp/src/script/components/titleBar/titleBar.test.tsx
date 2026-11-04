@@ -25,17 +25,17 @@ import {isNull} from '@sindresorhus/is';
 
 import {Runtime} from '@wireapp/commons';
 import * as uiKit from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {WebAppEvents} from '../../webAppEvents';
 
-import en from 'I18n/en-US.json';
-import ru from 'I18n/ru-RU.json';
-import {TitleBar} from 'Components/titleBar';
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {CallState} from 'Repositories/calling/CallState';
-import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
+import en from '../../../i18n/en-US.json';
+import ru from '../../../i18n/ru-RU.json';
+import {TitleBar} from './';
+import {CallingRepository} from '../../repositories/calling/CallingRepository';
+import {CallState} from '../../repositories/calling/CallState';
+import {ConversationVerificationState} from '../../repositories/conversation/ConversationVerificationState';
+import {Conversation} from '../../repositories/entity/Conversation';
+import {User} from '../../repositories/entity/User';
+import {TeamState} from '../../repositories/team/TeamState';
 import {withTheme} from 'src/script/auth/util/test/testUtil';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {ContentState} from 'src/script/page/useAppState';
@@ -43,12 +43,12 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {setStrings, translate} from 'Util/localizerUtil';
+import {setStrings, translate} from '../../util/localizerUtil';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
 import {PanelState} from '../../page/rightSidebar/rightSidebar';
 import {ViewModelRepositories} from '../../view_model/MainViewModel';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 jest.mock('@wireapp/react-ui-kit', () => {
@@ -58,7 +58,7 @@ jest.mock('@wireapp/react-ui-kit', () => {
   };
 });
 
-jest.mock('Components/calling/useCallAlertState', () => {
+jest.mock('../calling/useCallAlertState', () => {
   return {
     useCallAlertState: () => {
       return {
@@ -91,7 +91,29 @@ const callActions = {
   toggleScreenshare: jest.fn(),
 };
 
-const getDefaultProps = (callingRepository: CallingRepository, conversation: Conversation) => {
+type GetDefaultPropsResult = {
+  callActions: {
+    answer: jest.Mock<any, any, any>;
+    changePage: jest.Mock<any, any, any>;
+    leave: jest.Mock<any, any, any>;
+    reject: jest.Mock<any, any, any>;
+    startAudio: jest.Mock<any, any, any>;
+    startVideo: jest.Mock<any, any, any>;
+    switchCameraInput: jest.Mock<any, any, any>;
+    switchScreenInput: jest.Mock<any, any, any>;
+    toggleCamera: jest.Mock<any, any, any>;
+    toggleMute: jest.Mock<any, any, any>;
+    toggleScreenshare: jest.Mock<any, any, any>;
+  };
+  callState: CallState;
+  conversation: Conversation;
+  openRightSidebar: jest.Mock<any, any, any>;
+  repositories: ViewModelRepositories;
+  teamState: TeamState;
+  selfUser: User;
+  withBottomDivider: boolean;
+};
+const getDefaultProps = (callingRepository: CallingRepository, conversation: Conversation): GetDefaultPropsResult => {
   return {
     callActions,
     callState: new CallState(),
@@ -507,18 +529,18 @@ describe('TitleBar', () => {
   );
 });
 
-function createUser(activated: boolean = true) {
+function createUser(activated: boolean = true): User {
   const user = new User('', '', translateForTest);
   user.isTemporaryGuest(!activated);
   return user;
 }
 
-function createTeamState(team?: Partial<TeamState>) {
+function createTeamState(team?: Partial<TeamState>): TeamState {
   const teamState = new TeamState();
   return Object.assign(teamState, team) as TeamState;
 }
 
-function createConversationEntity(conversation?: Partial<Conversation>) {
+function createConversationEntity(conversation?: Partial<Conversation>): Conversation {
   const conversationEntity = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
   return Object.assign(conversationEntity, conversation) as Conversation;
 }

@@ -21,12 +21,12 @@ import {useCallback} from 'react';
 
 import {LexicalEditor, CLEAR_EDITOR_COMMAND} from 'lexical';
 
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {StorageRepository} from 'Repositories/storage';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {sanitizeMarkdown} from 'Util/markdownUtil';
 
+import {MessageRepository} from '../../../../repositories/conversation/MessageRepository';
+import {Conversation} from '../../../../repositories/entity/Conversation';
+import {StorageRepository} from '../../../../repositories/storage';
+import {sanitizeMarkdown} from '../../../../util/markdownUtil';
 import {DraftState, loadDraftState, saveDraftState} from '../../common/draftState/draftState';
 
 interface UseDraftStateProps {
@@ -39,6 +39,11 @@ interface UseDraftStateProps {
   replyMessageEntityId?: string;
 }
 
+type UseDraftStateResult = {
+  reset: () => void;
+  load: () => Promise<DraftState>;
+  save: (editorState: string, text: string, replyId?: string) => Promise<void>;
+};
 export const useDraftState = ({
   conversation,
   storageRepository,
@@ -47,7 +52,7 @@ export const useDraftState = ({
   onLoad,
   editedMessageId,
   replyMessageEntityId,
-}: UseDraftStateProps) => {
+}: UseDraftStateProps): UseDraftStateResult => {
   const {fireAndForgetInvoker} = useApplicationContext();
 
   const reset = useCallback(() => {
@@ -60,7 +65,7 @@ export const useDraftState = ({
     return draftState;
   }, [conversation, messageRepository, onLoad, storageRepository]);
 
-  const save = async (editorState: string, text: string, replyId = '') => {
+  const save = async (editorState: string, text: string, replyId = ''): Promise<void> => {
     fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
       await saveDraftState({
         storageRepository,

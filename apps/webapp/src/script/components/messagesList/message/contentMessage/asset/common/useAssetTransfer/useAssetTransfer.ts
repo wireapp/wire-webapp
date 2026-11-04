@@ -23,19 +23,33 @@ import {isUndefined} from '@sindresorhus/is';
 import {noop} from 'noop-esm';
 import {container} from 'tsyringe';
 
-import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
-import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {FileAsset} from 'Repositories/entity/message/fileAsset';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {AssetRemoteData} from '../../../../../../../repositories/assets/assetRemoteData';
+import {AssetRepository} from '../../../../../../../repositories/assets/assetRepository';
+import {AssetTransferState} from '../../../../../../../repositories/assets/assetTransferState';
+import {ContentMessage} from '../../../../../../../repositories/entity/message/contentMessage';
+import {FileAsset} from '../../../../../../../repositories/entity/message/fileAsset';
+import {useKoSubscribableChildren} from '../../../../../../../util/componentUtil';
 
 export type AssetUrl = {
   url: string;
   dispose: () => void;
 };
 
-export const useAssetTransfer = (message?: ContentMessage, assetRepository = container.resolve(AssetRepository)) => {
+type UseAssetTransferResult = {
+  cancelUpload: () => void;
+  downloadAsset: (fileAsset: FileAsset) => Promise<number | void>;
+  isDownloading: boolean;
+  isPendingUpload: boolean;
+  isUploaded: boolean;
+  isUploading: boolean;
+  getAssetUrl: (resource: AssetRemoteData, acceptedMimeTypes?: string[]) => Promise<AssetUrl>;
+  transferState: AssetTransferState;
+  uploadProgress: number;
+};
+export const useAssetTransfer = (
+  message?: ContentMessage,
+  assetRepository = container.resolve(AssetRepository),
+): UseAssetTransferResult => {
   const asset = message?.getFirstAsset() as FileAsset;
   const [uploadProgress, setUploadProgress] = useState<number>(0);
 

@@ -21,8 +21,9 @@ import {isNonEmptyArray} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {RestNode} from 'cells-sdk-ts';
 
-import {getUserQualifiedIdFromNode} from 'Components/cells/common/getUserQualifiedIdFromNode/getUserQualifiedIdFromNode';
-import {UserRepository} from 'Repositories/user/userRepository';
+import type {User} from '../../../../repositories/entity/User';
+import {UserRepository} from '../../../../repositories/user/userRepository';
+import {getUserQualifiedIdFromNode} from '../../../cells/common/getUserQualifiedIdFromNode/getUserQualifiedIdFromNode';
 
 const getQualifiedIdKey = ({domain, id}: QualifiedId): string => {
   return `${domain}/${id}`;
@@ -52,7 +53,7 @@ export const getUsersFromNodes = async ({
 }: {
   nodes: RestNode[];
   userRepository: UserRepository;
-}) => {
+}): Promise<User[]> => {
   if (!isNonEmptyArray(nodes)) {
     return [];
   }

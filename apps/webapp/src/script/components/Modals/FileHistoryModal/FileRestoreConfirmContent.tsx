@@ -17,9 +17,10 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/icon';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {
@@ -31,13 +32,19 @@ import {
   restoreModalTitleCss,
 } from './FileHistoryModal.styles';
 
+import * as Icon from '../../icon';
+
 interface FileRestoreConfirmModalProps {
   isLoading: boolean;
   onClose: () => void;
   onConfirm: () => void;
 }
 
-export const FileRestoreConfirmContent = ({isLoading, onClose, onConfirm}: FileRestoreConfirmModalProps) => {
+export const FileRestoreConfirmContent: FunctionComponent<FileRestoreConfirmModalProps> = ({
+  isLoading,
+  onClose,
+  onConfirm,
+}: FileRestoreConfirmModalProps) => {
   const {translate} = useApplicationContext();
 
   return (

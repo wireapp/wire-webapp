@@ -17,7 +17,7 @@
  *
  */
 
-import {ComponentType} from 'react';
+import {ComponentType, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 import cx from 'classnames';
@@ -39,7 +39,7 @@ interface DeviceSelectProps {
   value: string;
 }
 
-const DeviceSelect = ({
+const DeviceSelect: FunctionComponent<DeviceSelectProps> = ({
   isRequesting = false,
   devices,
   value,

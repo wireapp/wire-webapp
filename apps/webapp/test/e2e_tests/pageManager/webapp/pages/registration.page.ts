@@ -47,18 +47,18 @@ export class RegistrationPage {
     this.termsLabel = page.locator('label[for="accept-terms"]');
   }
 
-  async fillInUserInfo(user: User) {
+  async fillInUserInfo(user: User): Promise<void> {
     await this.nameInput.fill(`${user.firstName} ${user.lastName}`);
     await this.emailInput.fill(user.email);
     await this.passwordInput.fill(user.password);
     await this.confirmPasswordInput.fill(user.password);
   }
 
-  async toggleTermsCheckbox() {
+  async toggleTermsCheckbox(): Promise<void> {
     await this.termsCheckbox.dispatchEvent('click');
   }
 
-  async clickSubmitButton() {
+  async clickSubmitButton(): Promise<void> {
     await this.submitButton.click();
   }
 }

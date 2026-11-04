@@ -17,15 +17,17 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import cx from 'classnames';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {Avatar, AVATAR_SIZE, GroupAvatar} from 'Components/avatar';
-import {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 
+import {Avatar, AVATAR_SIZE, GroupAvatar} from '../../../../../components/avatar';
+import {User} from '../../../../../repositories/entity/User';
+import {handleKeyDown, KEY} from '../../../../../util/keyboardUtil';
 import {ContentState, useAppState} from '../../../../useAppState';
 
 interface ConnectionRequestsProps {
@@ -33,7 +35,10 @@ interface ConnectionRequestsProps {
   onConnectionRequestClick: () => void;
 }
 
-export const ConnectionRequests = ({connectionRequests, onConnectionRequestClick}: ConnectionRequestsProps) => {
+export const ConnectionRequests: FunctionComponent<ConnectionRequestsProps> = ({
+  connectionRequests,
+  onConnectionRequestClick,
+}: ConnectionRequestsProps) => {
   const {translate} = useApplicationContext();
   const contentState = useAppState(state => {
     return state.contentState;

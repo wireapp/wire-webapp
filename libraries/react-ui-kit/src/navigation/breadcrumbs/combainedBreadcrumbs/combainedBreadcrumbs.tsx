@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode} from 'react';
+import {ReactNode, type FunctionComponent} from 'react';
 
 import {buttonStyles, itemStyles} from './combainedBreadcrumbs.styles';
 
@@ -28,7 +28,7 @@ interface CombainedBreadcrumbsProps {
   onItemClick: (item: {name: string}) => void;
 }
 
-export const CombainedBreadcrumbs = ({items, onItemClick}: CombainedBreadcrumbsProps) => {
+export const CombainedBreadcrumbs: FunctionComponent<CombainedBreadcrumbsProps> = ({items, onItemClick}) => {
   return (
     <DropdownMenu>
       <DropdownMenu.Trigger asChild>

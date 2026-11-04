@@ -17,7 +17,16 @@
  *
  */
 
-import {HTMLProps, MouseEvent, FocusEvent, ReactNode, useRef, useState} from 'react';
+import {
+  HTMLProps,
+  MouseEvent,
+  FocusEvent,
+  ReactNode,
+  ReactPortal,
+  useRef,
+  useState,
+  type FunctionComponent,
+} from 'react';
 
 import {CSSObject} from '@emotion/react';
 import {isNullOrUndefined} from '@sindresorhus/is';
@@ -82,8 +91,8 @@ interface TooltipArrowProps {
   wrapperRect: DOMRect;
 }
 
-const TooltipArrow = ({wrapperRect}: TooltipArrowProps) => {
-  const tooltipArrowRef = (element: HTMLDivElement | null) => {
+const TooltipArrow: FunctionComponent<TooltipArrowProps> = ({wrapperRect}) => {
+  const tooltipArrowRef = (element: HTMLDivElement | null): void => {
     if (isNullOrUndefined(element)) {
       return;
     }
@@ -122,7 +131,7 @@ interface PortalProps {
   selector?: string;
 }
 
-const PortalComponent = ({children, wrapperRect, selector = '#wire-app'}: PortalProps) => {
+const PortalComponent = ({children, wrapperRect, selector = '#wire-app'}: PortalProps): ReactPortal | null => {
   const [isTouchingTop, setIsTouchingTop] = useState(false);
   const targetElement = document.querySelector(selector);
 
@@ -130,7 +139,7 @@ const PortalComponent = ({children, wrapperRect, selector = '#wire-app'}: Portal
     return null;
   }
 
-  const tooltipRef = (element: HTMLDivElement | null) => {
+  const tooltipRef = (element: HTMLDivElement | null): void => {
     if (isNullOrUndefined(element)) {
       return;
     }
@@ -186,24 +195,24 @@ export interface TooltipProps<T = HTMLDivElement> extends HTMLProps<T> {
   selector?: string;
 }
 
-const filterTooltipProps = (props: TooltipProps) => {
+const filterTooltipProps = (props: TooltipProps): Object => {
   return filterProps(props, ['body', 'selector']);
 };
 
-export const Tooltip = ({children, ...props}: TooltipProps) => {
+export const Tooltip: FunctionComponent<TooltipProps> = ({children, ...props}) => {
   const [isHovered, setIsHovered] = useState(false);
   const wrapperRectRef = useRef<DOMRect | undefined>(undefined);
 
   const filteredProps = filterTooltipProps(props);
   const {body, selector = '#wire-app'} = props;
 
-  const onElementEnter = ({currentTarget}: MouseEvent | FocusEvent) => {
+  const onElementEnter = ({currentTarget}: MouseEvent | FocusEvent): void => {
     const wrapperRect = currentTarget.getBoundingClientRect();
     setIsHovered(true);
     wrapperRectRef.current = wrapperRect;
   };
 
-  const onElementLeave = () => {
+  const onElementLeave = (): void => {
     return setIsHovered(false);
   };
 

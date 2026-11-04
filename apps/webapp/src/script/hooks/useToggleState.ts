@@ -19,7 +19,9 @@
 
 import {useCallback, useState} from 'react';
 
-export const useToggleState = (initialState = false) => {
+type ToggleState = readonly [boolean, () => void];
+
+export const useToggleState = (initialState = false): ToggleState => {
   const [state, setState] = useState(initialState);
   const toggle = useCallback(() => {
     return setState(currentState => {

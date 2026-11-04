@@ -49,7 +49,7 @@ export const getAllFocusableElements = (
  * @param elements list of elements
  * @param isFocusable current message focus state
  */
-export const setElementsTabIndex = (elements: NodeListOf<HTMLElement> | [], isFocusable: boolean) => {
+export const setElementsTabIndex = (elements: NodeListOf<HTMLElement> | [], isFocusable: boolean): void => {
   if (elements.length > 0) {
     elements.forEach(element => {
       setElementTabIndex(element, isFocusable);
@@ -62,6 +62,6 @@ export const setElementsTabIndex = (elements: NodeListOf<HTMLElement> | [], isFo
  * @param element an element
  * @param isFocusable current message focus state
  */
-const setElementTabIndex = (element: Element, isFocusable: boolean) => {
+const setElementTabIndex = (element: Element, isFocusable: boolean): void => {
   element.setAttribute('tabindex', isFocusable ? '0' : '-1');
 };

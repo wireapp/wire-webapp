@@ -17,6 +17,8 @@
  *
  */
 
+import type {JSX} from 'react';
+
 import {components, DropdownIndicatorProps, GroupBase} from 'react-select';
 
 import {ArrowDown} from '../../../dataDisplay/icon/arrowDown';
@@ -27,7 +29,7 @@ export const BaseSelectDropdownIndicator = <
   Group extends GroupBase<Option> = GroupBase<Option>,
 >(
   props: DropdownIndicatorProps<Option, IsMulti, Group>,
-) => {
+): JSX.Element => {
   const {menuIsOpen} = props.selectProps;
 
   return (

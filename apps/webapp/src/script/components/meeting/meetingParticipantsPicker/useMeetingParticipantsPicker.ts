@@ -17,14 +17,18 @@
  *
  */
 
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type RefObject,
+  type Dispatch,
+  type SetStateAction,
+} from 'react';
 
 import {isNullOrUndefined} from '@sindresorhus/is';
-
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {User} from 'Repositories/entity/User';
-import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import {
   getConversationKey,
@@ -32,6 +36,11 @@ import {
   mergeConversationUsersIntoSelection,
   mergeUsersIntoSelection,
 } from './participantPickerUtils';
+
+import type {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import type {Conversation} from '../../../repositories/entity/Conversation';
+import type {User} from '../../../repositories/entity/User';
+import {matchQualifiedIds} from '../../../util/qualifiedId';
 
 interface UseMeetingParticipantsPickerOptions {
   disabled: boolean;
@@ -42,6 +51,20 @@ interface UseMeetingParticipantsPickerOptions {
   conversationRepository?: Pick<ConversationRepository, 'getAllGroupConversations'>;
 }
 
+type UseMeetingParticipantsPickerResult = {
+  handleOpenChange: (open: boolean) => void;
+  handleSelectedUsersChange: (users: User[]) => void;
+  handleSelectConversation: (conversation: Conversation) => void;
+  isContactsOpen: boolean;
+  isConversationsOpen: boolean;
+  isOpen: boolean;
+  matchingConversations: Conversation[];
+  popoverRef: RefObject<HTMLDivElement | null>;
+  selectedConversationIds: Set<string>;
+  setIsContactsOpen: Dispatch<SetStateAction<boolean>>;
+  setIsConversationsOpen: Dispatch<SetStateAction<boolean>>;
+  triggerRef: RefObject<HTMLDivElement | null>;
+};
 export const useMeetingParticipantsPicker = ({
   disabled,
   filter,
@@ -49,7 +72,7 @@ export const useMeetingParticipantsPicker = ({
   onSelectedUsersChange,
   onFilterChange,
   conversationRepository,
-}: UseMeetingParticipantsPickerOptions) => {
+}: UseMeetingParticipantsPickerOptions): UseMeetingParticipantsPickerResult => {
   const [isOpen, setIsOpen] = useState(false);
   const [isContactsOpen, setIsContactsOpen] = useState(false);
   const [isConversationsOpen, setIsConversationsOpen] = useState(false);
@@ -136,7 +159,7 @@ export const useMeetingParticipantsPicker = ({
       return;
     }
 
-    const handlePointerDown = (event: PointerEvent) => {
+    const handlePointerDown = (event: PointerEvent): void => {
       const target = event.target as Node;
       const trigger = triggerRef.current;
       const popover = popoverRef.current;
@@ -151,7 +174,7 @@ export const useMeetingParticipantsPicker = ({
       handleOpenChange(false);
     };
 
-    const handleKeyDown = (event: KeyboardEvent) => {
+    const handleKeyDown = (event: KeyboardEvent): void => {
       if (event.key === 'Escape') {
         event.preventDefault();
         event.stopPropagation();

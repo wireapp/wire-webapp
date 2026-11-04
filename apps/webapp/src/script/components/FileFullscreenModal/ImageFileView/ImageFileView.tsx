@@ -17,10 +17,13 @@
  *
  */
 
-import {ZoomableImage} from 'Components/ZoomableImage/ZoomableImage';
+import type {FunctionComponent} from 'react';
+
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {imageWrapperStyles, wrapperStyles} from './ImageFileView.styles';
+
+import {ZoomableImage} from '../../ZoomableImage/ZoomableImage';
 
 interface ImageFileViewProps {
   src?: string;
@@ -28,7 +31,11 @@ interface ImageFileViewProps {
   timestamp: number;
 }
 
-export const ImageFileView = ({src, senderName, timestamp}: ImageFileViewProps) => {
+export const ImageFileView: FunctionComponent<ImageFileViewProps> = ({
+  src,
+  senderName,
+  timestamp,
+}: ImageFileViewProps) => {
   const {translate} = useApplicationContext();
 
   return (

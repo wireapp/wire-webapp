@@ -24,17 +24,6 @@ import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
 import * as telemetry from '@wireapp/telemetry';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import type {ContributedSegmentations, MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {ClientEvent} from 'Repositories/event/Client';
-import {TeamState} from 'Repositories/team/TeamState';
-import {UserState} from 'Repositories/user/userState';
-import {getLogger, Logger} from 'Util/logger';
-import {loadValue, storeValue, resetStoreValue} from 'Util/storageUtil';
-import {includesString} from 'Util/stringUtil';
-import {getParameter} from 'Util/urlUtil';
-import {createUuid} from 'Util/uuid';
 
 import {EventName} from './eventName';
 import {getPlatform} from './helpers';
@@ -49,8 +38,30 @@ import {UserData} from './userData';
 import {URLParameter} from '../../auth/urlParameter';
 import {Config} from '../../Config';
 import {APIClient} from '../../service/apiClientSingleton';
+import {getLogger, Logger} from '../../util/logger';
+import {loadValue, storeValue, resetStoreValue} from '../../util/storageUtil';
+import {includesString} from '../../util/stringUtil';
+import {getParameter} from '../../util/urlUtil';
+import {createUuid} from '../../util/uuid';
+import {WebAppEvents} from '../../webAppEvents';
+import type {ContributedSegmentations, MessageRepository} from '../conversation/MessageRepository';
+import {ClientEvent} from '../event/Client';
+import {TeamState} from '../team/TeamState';
+import {UserState} from '../user/userState';
 
 const TEAM_SIZE_THRESHOLD_VALUE = 6;
+
+type EventTrackingRepositoryConfig = {
+  USER_ANALYTICS: {
+    API_KEY: string;
+    CLIENT_TYPE: string;
+    COUNTLY_DEVICE_ID_LOCAL_STORAGE_KEY: string;
+    COUNTLY_FAILED_TO_MIGRATE_DEVICE_ID: string;
+    COUNTLY_SYNCED_AT_LEAST_ONCE_LOCAL_STORAGE_KEY: string;
+    COUNTLY_UNSYNCED_DEVICE_ID_LOCAL_STORAGE_KEY: string;
+    DISABLED_DOMAINS: string[];
+  };
+};
 
 type HttpRetryReportingClient = {
   readonly on: (
@@ -83,7 +94,7 @@ export class EventTrackingRepository {
   private telemetryInitialized: boolean = false;
   isErrorReportingActivated: boolean = false;
 
-  static get CONFIG() {
+  static get CONFIG(): EventTrackingRepositoryConfig {
     return {
       USER_ANALYTICS: {
         API_KEY: window.wire.env.ANALYTICS_API_KEY,
@@ -109,7 +120,7 @@ export class EventTrackingRepository {
     this.logger.info('EventTrackingRepository initialized');
   }
 
-  public readonly onUserEvent = (eventJson: any) => {
+  public readonly onUserEvent = (eventJson: any): void => {
     const type = eventJson.type;
     if (type === ClientEvent.USER.DATA_TRANSFER && this.teamState.isTeam()) {
       this.telemetryLogger.info('Received data transfer event with new telemetry tracking id', eventJson.data);
@@ -119,7 +130,7 @@ export class EventTrackingRepository {
     }
   };
 
-  public migrateDeviceId = async (newId: string) => {
+  public migrateDeviceId = async (newId: string): Promise<void> => {
     if (!telemetry.isLoaded()) {
       this.telemetryLogger.warn('Telemetry is not available');
       return;
@@ -215,7 +226,7 @@ export class EventTrackingRepository {
     await this.toggleTelemetry(isConsentGiven);
   }
 
-  private readonly toggleTelemetry = async (isEnabled: boolean) => {
+  private readonly toggleTelemetry = async (isEnabled: boolean): Promise<void> => {
     if (isEnabled && this.isDomainAllowedForAnalytics()) {
       telemetry.addAllConsentFeatures();
       this.telemetryLogger.info('Consent was given due to user preferences');

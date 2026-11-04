@@ -17,17 +17,12 @@
  *
  */
 
-import {CSSProperties, ReactNode, useEffect, useId, useRef} from 'react';
+import {CSSProperties, ReactNode, useEffect, useId, useRef, type FunctionComponent} from 'react';
 
 import {match} from 'ts-pattern';
 
 import {BlurHighIcon, BlurLowIcon, CircleIcon} from '@wireapp/react-ui-kit';
 
-import {FadingScrollbar} from 'Components/fadingScrollbar';
-import * as Icon from 'Components/icon';
-import {RadioGroup} from 'Components/Radio';
-import {BackgroundEffectsQuality} from 'Repositories/media/useBackgroundEffectsStore';
-import type {BackgroundEffectSelection, BuiltinBackground} from 'Repositories/media/VideoBackgroundEffects';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {
@@ -45,6 +40,11 @@ import {
 } from './VideoBackgroundSettings.styles';
 
 import {Config} from '../../../../Config';
+import {BackgroundEffectsQuality} from '../../../../repositories/media/useBackgroundEffectsStore';
+import type {BackgroundEffectSelection, BuiltinBackground} from '../../../../repositories/media/VideoBackgroundEffects';
+import {FadingScrollbar} from '../../../fadingScrollbar';
+import * as Icon from '../../../icon';
+import {RadioGroup} from '../../../Radio';
 
 interface VideoBackgroundSettingsProps {
   selectedEffect: BackgroundEffectSelection;
@@ -109,7 +109,7 @@ interface BackgroundTileProps {
   disabled?: boolean;
 }
 
-const BackgroundTile = ({
+const BackgroundTile: FunctionComponent<BackgroundTileProps> = ({
   effect,
   selectedEffect,
   onSelectEffect,
@@ -139,7 +139,7 @@ const BackgroundTile = ({
   );
 };
 
-const WebGLNotAvailableHint = ({translate}: {translate: Translate}) => {
+const WebGLNotAvailableHint: FunctionComponent<{translate: Translate}> = ({translate}: {translate: Translate}) => {
   return (
     <p css={backgroundEffectPanelHintStyles}>
       {translate('videoCallBackgroundNoWebGLHint')}{' '}
@@ -150,7 +150,7 @@ const WebGLNotAvailableHint = ({translate}: {translate: Translate}) => {
   );
 };
 
-export const VideoBackgroundSettings = ({
+export const VideoBackgroundSettings: FunctionComponent<VideoBackgroundSettingsProps> = ({
   selectedEffect,
   backgrounds,
   onSelectEffect,

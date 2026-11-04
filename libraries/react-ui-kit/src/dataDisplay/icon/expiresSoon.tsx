@@ -17,11 +17,13 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
 import {Theme} from '../../identity';
 
-export const ExpiresSoon = (props: SVGIconProps) => {
+export const ExpiresSoon: FunctionComponent<SVGIconProps> = props => {
   return (
     <SVGIcon realWidth={17} realHeight={18} {...props}>
       <path

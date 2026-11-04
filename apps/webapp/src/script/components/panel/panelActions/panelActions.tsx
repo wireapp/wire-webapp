@@ -19,6 +19,8 @@
 
 import React from 'react';
 
+import type {JSX} from '@emotion/react/jsx-runtime';
+
 export interface MenuItem {
   click: () => void;
   Icon: React.FC<React.SVGProps<SVGSVGElement>>;
@@ -30,7 +32,7 @@ interface PanelActionsProps {
   items: MenuItem[];
 }
 
-export const PanelActions = ({items}: PanelActionsProps) => {
+export const PanelActions = ({items}: PanelActionsProps): JSX.Element[] => {
   return items.map(({click, identifier, Icon, label}) => {
     return (
       <li key={identifier}>

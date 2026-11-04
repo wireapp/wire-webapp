@@ -23,7 +23,7 @@ const WindowContext = React.createContext<Window>(window);
 
 export const WindowContextProvider = WindowContext.Provider;
 
-export const useWindow = () => {
+export const useWindow = (): Window => {
   const currentWindow = useContext(WindowContext);
   return currentWindow;
 };

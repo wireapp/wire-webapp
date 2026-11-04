@@ -17,9 +17,11 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
-export const HamburgerIcon = (props: SVGIconProps) => {
+export const HamburgerIcon: FunctionComponent<SVGIconProps> = props => {
   return (
     <SVGIcon realWidth={16} realHeight={12} {...props}>
       <path fillRule="evenodd" clipRule="evenodd" d="M0 2V0H16V2H0ZM0 7H16V5H0V7ZM0 12H16V10H0V12Z" />

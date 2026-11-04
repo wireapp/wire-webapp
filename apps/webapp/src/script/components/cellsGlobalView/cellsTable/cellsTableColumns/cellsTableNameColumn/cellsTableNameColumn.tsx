@@ -17,16 +17,14 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {isNonEmptyString} from '@sindresorhus/is';
 
 import {FolderIcon, PlayIcon, Tooltip, ViewerAccessIcon} from '@wireapp/react-ui-kit';
 
-import {openFolder} from 'Components/cellsGlobalView/common/openFolder/openFolder';
-import {useShouldRestrictGlobalDriveNodeActions} from 'Components/cellsGlobalView/common/useShouldRestrictGlobalDriveNodeActions/useShouldRestrictGlobalDriveNodeActions';
-import {FileTypeIcon} from 'Components/conversation/common/fileTypeIcon/fileTypeIcon';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CellFile, CellNode, CellNodeType} from 'src/script/types/cellNode';
-import {getFileExtension} from 'Util/util';
 
 import {
   desktopNameStyles,
@@ -39,13 +37,19 @@ import {
   wrapperStyles,
 } from './cellsTableNameColumn.styles';
 
+import {getFileExtension} from '../../../../../util/util';
+import {FileTypeIcon} from '../../../../conversation/common/fileTypeIcon/fileTypeIcon';
+import {openFolder} from '../../../common/openFolder/openFolder';
+import {useShouldRestrictGlobalDriveNodeActions} from '../../../common/useShouldRestrictGlobalDriveNodeActions/useShouldRestrictGlobalDriveNodeActions';
 import {useCellsFilePreviewModal} from '../../common/cellsFilePreviewModalContext/cellsFilePreviewModalContext';
 
 interface CellsTableNameColumnProps {
   node: CellNode;
 }
 
-export const CellsTableNameColumn = ({node}: CellsTableNameColumnProps) => {
+export const CellsTableNameColumn: FunctionComponent<CellsTableNameColumnProps> = ({
+  node,
+}: CellsTableNameColumnProps) => {
   return (
     <>
       <span css={mobileNameStyles}>{node.name}</span>
@@ -60,7 +64,7 @@ export const CellsTableNameColumn = ({node}: CellsTableNameColumnProps) => {
   );
 };
 
-const FileNameColumn = ({file}: {file: CellFile}) => {
+const FileNameColumn: FunctionComponent<{file: CellFile}> = ({file}: {file: CellFile}) => {
   const {translate} = useApplicationContext();
   const {id, handleOpenFile, selectedFile} = useCellsFilePreviewModal();
 
@@ -112,7 +116,13 @@ const FileNameColumn = ({file}: {file: CellFile}) => {
   );
 };
 
-const FolderNameColumn = ({name, path}: {name: string; path: string}) => {
+const FolderNameColumn: FunctionComponent<{name: string; path: string}> = ({
+  name,
+  path,
+}: {
+  name: string;
+  path: string;
+}) => {
   return (
     <>
       <FolderIcon width={24} height={24} />

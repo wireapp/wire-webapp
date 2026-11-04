@@ -18,6 +18,7 @@
  */
 
 import * as React from 'react';
+import {type FunctionComponent} from 'react';
 
 import {CSSObject} from '@emotion/react';
 
@@ -50,11 +51,11 @@ const styledAppContainerStyle: (
   };
 };
 
-const filterStyledAppProps = (props: Partial<StyledAppProps>) => {
+const filterStyledAppProps = (props: Partial<StyledAppProps>): Object => {
   return filterProps(props, ['backgroundColor', 'themeId', 'theme']);
 };
 
-const StyledAppContainer = (props: React.HTMLProps<HTMLDivElement> & BackgroundColorProps) => {
+const StyledAppContainer: FunctionComponent<React.HTMLProps<HTMLDivElement> & BackgroundColorProps> = props => {
   return (
     <div
       css={(theme: Theme) => {

@@ -19,12 +19,12 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {matchQualifiedIds} from 'Util/qualifiedId';
+import {matchQualifiedIds} from '../../util/qualifiedId';
+import {Conversation} from '../entity/Conversation';
+import {User} from '../entity/User';
 
 export class UserFilter {
-  static isParticipant(conversationEntity: Conversation, userId: QualifiedId) {
+  static isParticipant(conversationEntity: Conversation, userId: QualifiedId): boolean {
     const index = conversationEntity.allUserEntities().findIndex((user: User) => {
       return matchQualifiedIds(userId, user);
     });

@@ -17,12 +17,15 @@
  *
  */
 
+const rootJestConfiguration = require('../../jest.config.js');
+
 module.exports = {
   displayName: 'react-ui-kit-lib',
   testEnvironment: 'jsdom',
-  runInBand: true,
   clearMocks: true,
-  coverageDirectory: '../../coverage/libraries/react-ui-kit',
+  cacheDirectory: '../../target/jest/cache',
+  coverageDirectory: '../../target/coverage/libraries/react-ui-kit',
+  coverageReporters: rootJestConfiguration.coverageReporters,
   testMatch: ['<rootDir>/src/**/?(*.)+(spec|test).[jt]s?(x)'],
   testPathIgnorePatterns: ['lib/'],
   coveragePathIgnorePatterns: ['lib/'],
@@ -53,4 +56,5 @@ module.exports = {
   },
   transformIgnorePatterns: ['/node_modules/(?!(@sindresorhus/is|noop-esm)/)'],
   snapshotSerializers: ['@emotion/jest/serializer'],
+  reporters: rootJestConfiguration.reporters,
 };

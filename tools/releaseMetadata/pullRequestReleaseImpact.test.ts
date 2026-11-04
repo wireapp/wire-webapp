@@ -19,7 +19,11 @@
 
 import assert from 'node:assert';
 
-import {resolvePullRequestReleaseImpact, validatePullRequestReleaseImpact} from './pullRequestReleaseImpact.ts';
+import {
+  resolvePullRequestReleaseImpact,
+  validatePullRequestReleaseImpact,
+  validatePullRequestSemverPolicy,
+} from './pullRequestReleaseImpact.ts';
 import type {PullRequestReleaseImpact} from './pullRequestReleaseImpact.ts';
 
 const releaseImpactCases: readonly {readonly label: string; readonly impact: PullRequestReleaseImpact}[] = [
@@ -145,5 +149,45 @@ describe('pull request target-branch release-impact policy', () => {
     assert(actualResult.isErr);
     expect(actualResult.error.message).toContain('Unsupported pull request target branch');
     expect(actualResult.error.message).toContain('main, release/*, or maintenance/*');
+  });
+});
+
+describe('pull request-time SemVer policy', () => {
+  it.each(releaseImpactCases)('accepts $label targeting an intermediate branch', options => {
+    const actualResult = validatePullRequestSemverPolicy({
+      targetBranch: 'WPB-29385-picker-foundation',
+      labels: [options.label],
+    });
+
+    assert(actualResult.isOk);
+    expect(actualResult.value).toBe(options.impact);
+  });
+
+  it.each([
+    {labels: [], diagnostic: 'no release-impact label'},
+    {labels: ['semver:patch', 'semver:minor'], diagnostic: 'conflicting release-impact labels'},
+  ])('rejects $labels targeting an intermediate branch', options => {
+    const actualResult = validatePullRequestSemverPolicy({
+      targetBranch: 'WPB-29385-picker-foundation',
+      labels: options.labels,
+    });
+
+    assert(actualResult.isErr);
+    expect(actualResult.error.message).toContain(options.diagnostic);
+    expect(actualResult.error.message).not.toContain('Unsupported pull request target branch');
+  });
+
+  it('applies release-branch restrictions after an intermediate PR is retargeted', () => {
+    const labels = ['semver:minor'];
+    const intermediateResult = validatePullRequestSemverPolicy({
+      targetBranch: 'WPB-29385-picker-foundation',
+      labels,
+    });
+    const releaseBranchResult = validatePullRequestSemverPolicy({targetBranch: 'release/1.1.0', labels});
+
+    assert(intermediateResult.isOk);
+    expect(intermediateResult.value).toBe('minor');
+    assert(releaseBranchResult.isErr);
+    expect(releaseBranchResult.error.message).toContain('allow only semver:patch or semver:none');
   });
 });

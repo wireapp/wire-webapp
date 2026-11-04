@@ -116,7 +116,7 @@ export const inputStyle: <T>(theme: Theme, props: InputProps<T>, hasError?: bool
 export const INPUT_CLASSNAME = 'wireinput';
 export const INPUT_GROUP = 'input-group';
 
-const filterInputProps = (props: InputProps) => {
+const filterInputProps = (props: InputProps): Object => {
   return filterProps(props, ['className', 'markInvalid', 'placeholderTextTransform']);
 };
 
@@ -138,7 +138,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps<HTMLInputElem
     const isPasswordInput = type === 'password';
     const toggledPasswordType = isPasswordVisible ? 'text' : 'password';
 
-    const toggleSetPassword = () => {
+    const toggleSetPassword = (): void => {
       return setTogglePassword(prevState => {
         return !prevState;
       });

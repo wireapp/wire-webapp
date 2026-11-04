@@ -17,10 +17,12 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {ArrowProps, rotation} from './arrowIcon';
 import {SVGIcon} from './svgIcon';
 
-export const ChevronIcon = ({direction = 'right', ...props}: ArrowProps) => {
+export const ChevronIcon: FunctionComponent<ArrowProps> = ({direction = 'right', ...props}) => {
   return (
     <SVGIcon realWidth={5} realHeight={8} {...props}>
       <path transform={`rotate(${rotation[direction]} 3 4)`} d="M0 .92L.94 0 5 4 .94 8 0 7.08 3.13 4z" />

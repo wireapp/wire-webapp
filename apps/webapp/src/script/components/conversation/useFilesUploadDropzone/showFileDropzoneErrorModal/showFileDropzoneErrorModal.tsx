@@ -17,14 +17,16 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {isNonEmptyArray} from '@sindresorhus/is';
 
-import {FileTypeIcon} from 'Components/conversation/common/fileTypeIcon/fileTypeIcon';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import type {Translate} from 'Util/localizerUtil';
-import {getFileExtension} from 'Util/util';
-
 import {fileNameStyles, itemStyles, listStyles} from './showFileDropzoneErrorModal.styles';
+
+import type {Translate} from '../../../../util/localizerUtil';
+import {getFileExtension} from '../../../../util/util';
+import {PrimaryModal} from '../../../Modals/PrimaryModal';
+import {FileTypeIcon} from '../../common/fileTypeIcon/fileTypeIcon';
 
 interface ShowFileDropzoneErrorModalParams {
   title: string;
@@ -38,7 +40,7 @@ export const showFileDropzoneErrorModal = ({
   message,
   invalidFiles,
   translate,
-}: ShowFileDropzoneErrorModalParams) => {
+}: ShowFileDropzoneErrorModalParams): void => {
   // Timeout needed to display a modal
   setTimeout(() => {
     PrimaryModal.show(
@@ -60,7 +62,7 @@ export const showFileDropzoneErrorModal = ({
   }, 0);
 };
 
-const InvalidFilesList = ({invalidFiles}: {invalidFiles: File[]}) => {
+const InvalidFilesList: FunctionComponent<{invalidFiles: File[]}> = ({invalidFiles}: {invalidFiles: File[]}) => {
   return (
     <ul css={listStyles}>
       {invalidFiles.map(file => {

@@ -84,7 +84,10 @@ export class NotificationService extends TypedEventEmitter<Events> {
     this.database = new NotificationDatabaseRepository(storeEngine);
   }
 
-  private async getAllNotifications(since: string, abortController?: AbortController) {
+  private async getAllNotifications(
+    since: string,
+    abortController?: AbortController,
+  ): ReturnType<NotificationBackendRepository['getAllNotifications']> {
     const clientId = this.apiClient.clientId;
     return this.backend.getAllNotifications(clientId, since, abortController);
   }
@@ -194,7 +197,11 @@ export class NotificationService extends TypedEventEmitter<Events> {
    * @param source
    * @param lastEventDate?
    */
-  private isOutdatedEvent(event: {time: string; type: string}, source: NotificationSource, lastEventDate?: Date) {
+  private isOutdatedEvent(
+    event: {time: string; type: string},
+    source: NotificationSource,
+    lastEventDate?: Date,
+  ): boolean {
     return isOutdatedNotificationStreamEvent(event, source, lastEventDate);
   }
 

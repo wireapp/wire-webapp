@@ -17,15 +17,18 @@
  *
  */
 
-import {FileAsset} from 'Repositories/entity/message/fileAsset';
+import type {FunctionComponent} from 'react';
+
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {trimFileExtension} from 'Util/util';
+
+import {FileAsset} from '../../../../../../../repositories/entity/message/fileAsset';
+import {trimFileExtension} from '../../../../../../../util/util';
 
 interface RestrictedFileProps {
   asset?: FileAsset;
 }
 
-const RestrictedFile = ({asset}: RestrictedFileProps) => {
+const RestrictedFile: FunctionComponent<RestrictedFileProps> = ({asset}: RestrictedFileProps) => {
   const {translate} = useApplicationContext();
   const fileName =
     asset?.file_name !== undefined && asset.file_name !== '' ? trimFileExtension(asset.file_name) : undefined;

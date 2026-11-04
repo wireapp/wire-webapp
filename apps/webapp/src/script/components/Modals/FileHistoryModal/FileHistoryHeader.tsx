@@ -17,11 +17,10 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {isNullOrUndefined} from '@sindresorhus/is';
 
-import {FileTypeIcon} from 'Components/conversation/common/fileTypeIcon/fileTypeIcon';
-import {FileLoader} from 'Components/FileFullscreenModal/FileLoader/FileLoader';
-import * as Icon from 'Components/icon';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {
@@ -34,7 +33,11 @@ import {
 import {useFileHistoryModal} from './hooks/useFileHistoryModal';
 import {FileInfo} from './types';
 
-export const FileHistoryHeader = ({file}: {file?: FileInfo}) => {
+import {FileTypeIcon} from '../../conversation/common/fileTypeIcon/fileTypeIcon';
+import {FileLoader} from '../../FileFullscreenModal/FileLoader/FileLoader';
+import * as Icon from '../../icon';
+
+export const FileHistoryHeader: FunctionComponent<{file?: FileInfo}> = ({file}: {file?: FileInfo}) => {
   const {translate} = useApplicationContext();
   const {hideModal} = useFileHistoryModal();
 

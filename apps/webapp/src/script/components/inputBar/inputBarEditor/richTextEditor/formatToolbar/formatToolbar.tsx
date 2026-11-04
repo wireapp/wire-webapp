@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {FORMAT_TEXT_COMMAND, TextFormatType} from 'lexical';
@@ -34,7 +36,6 @@ import {
   LinkIcon,
 } from '@wireapp/react-ui-kit';
 
-import {FormatSeparator} from 'Components/inputBar/common/formatSeparator/formatSeparator';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {FormatButton} from './formatButton/formatButton';
@@ -47,11 +48,13 @@ import {useLinkState} from './useLinkState/useLinkState';
 import {useListState} from './useListState/useListState';
 import {useToolbarState} from './useToolbarState/useToolbarState';
 
+import {FormatSeparator} from '../../../common/formatSeparator/formatSeparator';
+
 interface FormatToolbarProps {
   isEditing: boolean;
 }
 
-export const FormatToolbar = ({isEditing}: FormatToolbarProps) => {
+export const FormatToolbar: FunctionComponent<FormatToolbarProps> = ({isEditing}: FormatToolbarProps) => {
   const [editor] = useLexicalComposerContext();
   const {translate} = useApplicationContext();
 
@@ -67,7 +70,7 @@ export const FormatToolbar = ({isEditing}: FormatToolbarProps) => {
 
   const {formatLink, insertLink, isModalOpen, closeModal, selectedText, linkUrl, linkNode} = useLinkState();
 
-  const formatText = (format: Extract<TextFormatType, 'bold' | 'italic' | 'strikethrough' | 'code'>) => {
+  const formatText = (format: Extract<TextFormatType, 'bold' | 'italic' | 'strikethrough' | 'code'>): void => {
     editor.dispatchCommand(FORMAT_TEXT_COMMAND, format);
   };
 

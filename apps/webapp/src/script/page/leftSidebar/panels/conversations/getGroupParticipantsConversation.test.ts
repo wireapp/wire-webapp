@@ -17,8 +17,8 @@
  *
  */
 
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {SearchRepository} from 'Repositories/search/searchRepository';
+import {ConversationRepository} from '../../../../repositories/conversation/ConversationRepository';
+import {SearchRepository} from '../../../../repositories/search/searchRepository';
 
 import {getGroupParticipantsConversations} from './getGroupParticipantsConversation';
 import {SidebarTabs} from './useSidebarStore';
@@ -28,7 +28,16 @@ const normalizeQuery = jest.fn((query: string) => {
   return {query: query.trim().toLowerCase(), isHandleQuery: false};
 });
 
-const createParams = (conversationsFilter: string) => {
+type CreateParamsResult = {
+  currentTab: SidebarTabs;
+  conversationRepository: ConversationRepository;
+  searchRepository: SearchRepository;
+  conversationsFilter: string;
+  favoriteConversations: never[];
+  conversations: never[];
+  archivedConversations: never[];
+};
+const createParams = (conversationsFilter: string): CreateParamsResult => {
   return {
     currentTab: SidebarTabs.RECENT,
     conversationRepository: {getGroupsByName} as unknown as ConversationRepository,

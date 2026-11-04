@@ -17,7 +17,7 @@
  *
  */
 
-import {useMemo} from 'react';
+import {useMemo, type FunctionComponent} from 'react';
 
 import {Select} from '@wireapp/react-ui-kit';
 
@@ -37,7 +37,10 @@ interface CellsPageSizeSelectProps {
   onSizeChange: ({value}: {value: string}) => void;
 }
 
-export const CellsPageSizeSelect = ({pageSize, onSizeChange}: CellsPageSizeSelectProps) => {
+export const CellsPageSizeSelect: FunctionComponent<CellsPageSizeSelectProps> = ({
+  pageSize,
+  onSizeChange,
+}: CellsPageSizeSelectProps) => {
   const {translate} = useApplicationContext();
   const currentOption = useMemo(() => {
     return {value: `${pageSize}`, label: `${pageSize}`};

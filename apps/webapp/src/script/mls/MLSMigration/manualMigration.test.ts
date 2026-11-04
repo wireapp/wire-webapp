@@ -22,9 +22,9 @@ import {CONVERSATION_PROTOCOL, FEATURE_STATUS} from '@wireapp/api-client/lib/tea
 import {Maybe, task} from 'true-myth';
 import {asyncNoop, noop} from 'noop-esm';
 
-import {ConversationMapper} from 'Repositories/conversation/ConversationMapper';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {translateForTest} from 'Util/test/translateForTest';
+import {ConversationMapper} from '../../repositories/conversation/ConversationMapper';
+import {Conversation} from '../../repositories/entity/Conversation';
+import {translateForTest} from '../../util/test/translateForTest';
 
 import {canManuallyMigrateConversation, manuallyMigrateConversation} from './manualMigration';
 
@@ -33,7 +33,23 @@ const feature = {
   config: {allowManualMigration: true, startTime: '2099-01-01T00:00:00Z'},
 };
 const selfUser = {teamId: 'team', qualifiedId: {id: 'self', domain: 'example.com'}};
-const createConversation = (protocol = CONVERSATION_PROTOCOL.PROTEUS) => {
+type ManualMigrationDependencies = Parameters<typeof manuallyMigrateConversation>[0];
+type ManualMigrationRepository = jest.Mocked<ManualMigrationDependencies['repository']>;
+type UpdateConversationProtocolArguments = Parameters<
+  ManualMigrationDependencies['repository']['updateConversationProtocol']
+>;
+type EstablishManualMLSGroupOptions = Parameters<
+  ManualMigrationDependencies['repository']['tryEstablishingMLSGroup']
+>[0];
+type EnsureManualConversationOptions = Parameters<
+  ManualMigrationDependencies['repository']['safeEnsureConversationExists']
+>[0];
+type ManualMigrationTestFixture = {
+  deps: ManualMigrationDependencies;
+  repository: ManualMigrationRepository;
+};
+
+const createConversation = (protocol = CONVERSATION_PROTOCOL.PROTEUS): Conversation => {
   const conversation = new Conversation('conversation', 'example.com', protocol, translateForTest);
   conversation.type(CONVERSATION_TYPE.REGULAR);
   conversation.teamId = 'team';
@@ -41,14 +57,20 @@ const createConversation = (protocol = CONVERSATION_PROTOCOL.PROTEUS) => {
   conversation.groupId = protocol === CONVERSATION_PROTOCOL.PROTEUS ? '' : 'group';
   return conversation;
 };
-const arrange = (protocol = CONVERSATION_PROTOCOL.PROTEUS) => {
+const arrange = (protocol = CONVERSATION_PROTOCOL.PROTEUS): ManualMigrationTestFixture => {
   const conversation = createConversation(protocol);
-  const repository = {
-    updateConversationProtocol: jest.fn(async (current: Conversation, next: CONVERSATION_PROTOCOL) => {
-      return ConversationMapper.updateProperties(current, {protocol: next, groupId: 'group'});
+  const repository: ManualMigrationRepository = {
+    updateConversationProtocol: jest.fn(
+      async (current: UpdateConversationProtocolArguments[0], next: UpdateConversationProtocolArguments[1]) => {
+        return ConversationMapper.updateProperties(current, {protocol: next, groupId: 'group'});
+      },
+    ),
+    tryEstablishingMLSGroup: jest.fn(async (options: EstablishManualMLSGroupOptions) => {
+      void options;
+      return asyncNoop();
     }),
-    tryEstablishingMLSGroup: jest.fn(asyncNoop),
-    safeEnsureConversationExists: jest.fn(() => {
+    safeEnsureConversationExists: jest.fn((options: EnsureManualConversationOptions) => {
+      void options;
       return task.resolve().map(noop);
     }),
   };

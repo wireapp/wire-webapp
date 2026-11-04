@@ -41,7 +41,7 @@ const onIntersect: IntersectionObserverCallback = entries => {
     const {onVisible, onVisibilityChange, requireFullyInView, allowBiggerThanViewport} = observedElement;
     const isFullyInView = intersectionRatio >= tolerance;
 
-    const isBiggerThanRoot = () => {
+    const isBiggerThanRoot = (): boolean => {
       return (
         allowBiggerThanViewport === true &&
         rootBounds !== null &&
@@ -108,7 +108,7 @@ const trackElement = (
   return observer.observe(element);
 };
 
-const removeElement = (element: Element) => {
+const removeElement = (element: Element): void => {
   observedElements.delete(element);
   observer.unobserve(element);
 };

@@ -17,20 +17,12 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {useEffect, useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 import {flexRender, getCoreRowModel, type Header, useReactTable} from '@tanstack/react-table';
 import {createPortal} from 'react-dom';
 
-import {CellsSelectionBar} from 'Components/cells/common/cellsSelectionBar/cellsSelectionBar';
-import {CellsSortDirection} from 'Components/conversation/conversationCells/common/cellsSortIcon/cellsSortIcon';
-import {
-  CellsSortField,
-  SORTABLE_COLUMN_FIELD,
-  toAriaSort,
-} from 'Components/conversation/conversationCells/common/useCellsSorting/useCellsSorting';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CellNode} from 'src/script/types/cellNode';
@@ -49,6 +41,15 @@ import {
 import {getCellsTableColumns, getCellsTableDataCellLabels} from './cellsTableColumns/cellsTableColumns';
 import {FilePreviewProvider} from './common/cellsFilePreviewModalContext/cellsFilePreviewModalContext';
 
+import {CellsRepository} from '../../../repositories/cells/cellsRepository';
+import {CellsSelectionBar} from '../../cells/common/cellsSelectionBar/cellsSelectionBar';
+import {CellsSortDirection} from '../../conversation/conversationCells/common/cellsSortIcon/cellsSortIcon';
+import {
+  CellsSortField,
+  SORTABLE_COLUMN_FIELD,
+  toAriaSort,
+} from '../../conversation/conversationCells/common/useCellsSorting/useCellsSorting';
+
 interface CellsTableProps {
   nodes: CellNode[];
   cellsRepository: CellsRepository;
@@ -66,7 +67,11 @@ interface CellsTableHeaderCellProps {
   isSortingEnabled: boolean;
 }
 
-const CellsTableHeaderCell = ({header, getDirectionFor, isSortingEnabled}: CellsTableHeaderCellProps) => {
+const CellsTableHeaderCell: FunctionComponent<CellsTableHeaderCellProps> = ({
+  header,
+  getDirectionFor,
+  isSortingEnabled,
+}: CellsTableHeaderCellProps) => {
   const sortField = SORTABLE_COLUMN_FIELD[header.column.id];
   const ariaSort = isSortingEnabled && isNonEmptyString(sortField) ? toAriaSort(getDirectionFor(sortField)) : undefined;
 
@@ -84,7 +89,7 @@ const CellsTableHeaderCell = ({header, getDirectionFor, isSortingEnabled}: Cells
   );
 };
 
-export const CellsTable = ({
+export const CellsTable: FunctionComponent<CellsTableProps> = ({
   nodes,
   cellsRepository,
   getDirectionFor,

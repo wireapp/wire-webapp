@@ -17,9 +17,11 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
-export const CallIcon = (props: SVGIconProps) => {
+export const CallIcon: FunctionComponent<SVGIconProps> = props => {
   return (
     <SVGIcon realWidth={20} realHeight={14} {...props}>
       <path

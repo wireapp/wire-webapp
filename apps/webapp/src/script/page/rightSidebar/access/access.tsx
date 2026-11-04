@@ -17,26 +17,29 @@
  *
  */
 
-import {useState} from 'react';
+import {useState, type FunctionComponent} from 'react';
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {ADD_PERMISSION, CONVERSATION_ACCESS} from '@wireapp/api-client/lib/conversation/';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {FadingScrollbar} from 'Components/fadingScrollbar';
-import {ConversationAccess} from 'Components/Modals/CreateConversation/types';
-import {getConversationAccessOptions, getConversationManagerOptions} from 'Components/Modals/CreateConversation/utils';
-import {RadioGroup} from 'Components/Radio';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {ConversationRoleRepository} from 'Repositories/conversation/ConversationRoleRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {conversationAccessContainerCss, conversationAccessContentCss} from './access.styles';
 
+import {FadingScrollbar} from '../../../components/fadingScrollbar';
+import {ConversationAccess} from '../../../components/Modals/CreateConversation/types';
+import {
+  getConversationAccessOptions,
+  getConversationManagerOptions,
+} from '../../../components/Modals/CreateConversation/utils';
+import {RadioGroup} from '../../../components/Radio';
+import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import {ConversationRoleRepository} from '../../../repositories/conversation/ConversationRoleRepository';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {useChannelsFeatureFlag} from '../../../util/useChannelsFeatureFlag';
 import {PanelHeader} from '../panelHeader';
 
 export interface AccessProps {
@@ -47,7 +50,7 @@ export interface AccessProps {
   activeConversation: Conversation;
 }
 
-export const Access = ({
+export const Access: FunctionComponent<AccessProps> = ({
   onGoBack,
   onClose,
   activeConversation,
@@ -64,7 +67,7 @@ export const Access = ({
 
   const {isPublicChannelsEnabled} = useChannelsFeatureFlag();
 
-  const updateAddPermission = async (addPermission: ADD_PERMISSION) => {
+  const updateAddPermission = async (addPermission: ADD_PERMISSION): Promise<void> => {
     if (!isNullOrUndefined(activeConversation.qualifiedId)) {
       await conversationRepository.updateAddPermission(activeConversation.qualifiedId, addPermission);
     }

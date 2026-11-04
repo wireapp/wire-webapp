@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {VideoAssetPlayer} from './videoAssetPlayer/videoAssetPlayer';
 import {VideoAssetSmall} from './videoAssetSmall/videoAssetSmall';
 
@@ -33,7 +35,7 @@ interface VideoAssetCardProps {
   id: string;
 }
 
-export const VideoAssetCard = ({
+export const VideoAssetCard: FunctionComponent<VideoAssetCardProps> = ({
   variant,
   src,
   extension,

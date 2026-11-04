@@ -46,7 +46,7 @@ const valueFromType = (availabilityType: Availability.Type): string => {
   throw new UserError(BaseError.TYPE.INVALID_PARAMETER, BaseError.MESSAGE.INVALID_PARAMETER);
 };
 
-export const protoFromType = (availabilityType: Availability.Type) => {
+export const protoFromType = (availabilityType: Availability.Type): Availability.Type => {
   const typeValue = valueFromType(availabilityType).toUpperCase() as keyof typeof Availability.Type;
   return Availability.Type[typeValue];
 };

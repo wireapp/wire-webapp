@@ -24,21 +24,21 @@ import {randomInt} from 'crypto';
 
 import {generateUser} from 'test/helper/UserGenerator';
 
-import en from 'I18n/en-US.json';
-import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/memberMessage';
-import {User} from 'Repositories/entity/User';
+import en from '../../../../i18n/en-US.json';
+import {MemberMessage as MemberMessageEntity} from '../../../repositories/entity/message/memberMessage';
+import {User} from '../../../repositories/entity/User';
 import {withTheme, withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {SystemMessageType} from 'src/script/message/systemMessageType';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {setStrings, translate} from 'Util/localizerUtil';
+import {setStrings, translate} from '../../../util/localizerUtil';
 
 import {MemberMessage} from './memberMessage';
 import {CONFIG} from './memberMessage/messageContent';
 
-jest.mock('Components/avatar', () => {
+jest.mock('../../avatar', () => {
   return {
     AVATAR_SIZE: {
       X_LARGE: 'avatar-xl',
@@ -71,7 +71,10 @@ function withTranslationStrings(
   };
 }
 
-function createMemberMessage({systemType, type}: {systemType?: SystemMessageType; type?: string}, users?: User[]) {
+function createMemberMessage(
+  {systemType, type}: {systemType?: SystemMessageType; type?: string},
+  users?: User[],
+): MemberMessageEntity {
   const message = new MemberMessageEntity(translate);
   if (systemType !== undefined) {
     message.memberMessageType = systemType;

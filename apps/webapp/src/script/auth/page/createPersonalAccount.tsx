@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {useNavigate} from 'react-router';
 
 import {FlexBox} from '@wireapp/react-ui-kit';
@@ -33,10 +35,10 @@ import {BackButton} from '../component/backButton';
 import {EXTERNAL_ROUTE} from '../externalRoute';
 import {ROUTE} from '../route';
 
-export const CreatePersonalAccount = () => {
+export const CreatePersonalAccount: FunctionComponent = () => {
   const {translate} = useApplicationContext();
   const navigate = useNavigate();
-  const onSubmit = () => {
+  const onSubmit = (): void => {
     if (Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY) {
       navigate(ROUTE.SET_ENTROPY);
     } else {

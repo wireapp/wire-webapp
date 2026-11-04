@@ -25,29 +25,29 @@ import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/';
 import {amplify} from 'amplify';
 
 import {CollectionIcon, HideIcon, HistoryIcon, LockClosedIcon, UnlockedIcon} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
+
+import {useApplicationContext} from 'src/script/page/rootProvider';
+
+import {ConversationDetailsOption} from './conversationDetailsOption';
 
 import {
   CELLS_SELF_USER_DRIVE_ROLE,
   getSelfUserDriveRole,
-} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
-import * as Icon from 'Components/icon';
-import {PanelActions} from 'Components/panel/panelActions';
-import {ReceiptModeToggle} from 'Components/toggle/ReceiptModeToggle';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {ConversationRoleRepository} from 'Repositories/conversation/ConversationRoleRepository';
-import {supportsReadReceipts} from 'Repositories/conversation/ConversationSelectors';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
-import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
-
-import {ConversationDetailsOption} from './conversationDetailsOption';
-
+} from '../../../../../components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
+import * as Icon from '../../../../../components/icon';
+import {PanelActions} from '../../../../../components/panel/panelActions';
+import {ReceiptModeToggle} from '../../../../../components/toggle/ReceiptModeToggle';
+import {ConversationRepository} from '../../../../../repositories/conversation/ConversationRepository';
+import {ConversationRoleRepository} from '../../../../../repositories/conversation/ConversationRoleRepository';
+import {supportsReadReceipts} from '../../../../../repositories/conversation/ConversationSelectors';
+import {Conversation} from '../../../../../repositories/entity/Conversation';
+import {User} from '../../../../../repositories/entity/User';
+import {TeamState} from '../../../../../repositories/team/TeamState';
+import {useKoSubscribableChildren} from '../../../../../util/componentUtil';
+import {replaceReactComponents} from '../../../../../util/localizerUtil/reactLocalizerUtil';
+import {useChannelsFeatureFlag} from '../../../../../util/useChannelsFeatureFlag';
 import {ActionsViewModel} from '../../../../../view_model/ActionsViewModel';
+import {WebAppEvents} from '../../../../../webAppEvents';
 import {PanelEntity, PanelState} from '../../../rightSidebar';
 import {getConversationActions} from '../../utils/getConversationActions';
 import {ConversationDetailsBottomActions} from '../conversationDetailsBottomActions';
@@ -172,46 +172,47 @@ function ConversationDetailsOptionsContent({
   const canEditTimeout = roleRepository.canToggleTimeout(activeConversation) && !isCellsConversation;
   const canEditReadReceipts = roleRepository.canToggleReadReceipts(activeConversation);
 
-  const openNotificationsPanel = () => {
+  const openNotificationsPanel = (): void => {
     return togglePanel(PanelState.NOTIFICATIONS, activeConversation);
   };
 
-  const openTimedMessagePanel = () => {
+  const openTimedMessagePanel = (): void => {
     return togglePanel(PanelState.TIMED_MESSAGES, activeConversation);
   };
 
-  const openSharedDrivePanel = () => {
+  const openSharedDrivePanel = (): void => {
     return togglePanel(PanelState.SHARED_DRIVE, activeConversation);
   };
 
-  const openGuestPanel = () => {
+  const openGuestPanel = (): void => {
     return togglePanel(PanelState.GUEST_OPTIONS, activeConversation);
   };
 
-  const openServicePanel = () => {
+  const openServicePanel = (): void => {
     return togglePanel(PanelState.SERVICES_OPTIONS, activeConversation);
   };
 
-  const showNotifications = () => {
+  const showNotifications = (): void => {
     return togglePanel(PanelState.NOTIFICATIONS, activeConversation);
   };
 
-  const openAccessPanel = () => {
+  const openAccessPanel = (): void => {
     return togglePanel(PanelState.ACCESS, activeConversation);
   };
 
-  const openConversationHistoryPanel = () => {
+  const openConversationHistoryPanel = (): void => {
     return togglePanel(PanelState.CONVERSATION_HISTORY, activeConversation);
   };
 
-  const openParticipantDevices = () => {
+  const openParticipantDevices = (): void => {
     if (isUndefined(firstParticipant)) {
       throw new Error('Cannot open participant devices without a participant');
     }
     togglePanel(PanelState.PARTICIPANT_DEVICES, firstParticipant, false, 'left');
   };
 
-  const getSharedDriveStatusTranslationKey = () => {
+  const getSharedDriveStatusTranslationKey = ():
+    'cells.sharedDriveAccess.editorAccess' | 'cells.sharedDriveAccess.viewerAccess' => {
     return selfUserDriveRole === CELLS_SELF_USER_DRIVE_ROLE.EDITOR
       ? 'cells.sharedDriveAccess.editorAccess'
       : 'cells.sharedDriveAccess.viewerAccess';

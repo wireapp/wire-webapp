@@ -26,13 +26,13 @@ import {Scope} from '../page/oAuthPermissions';
  * @param location window.location
  * @returns OAuthBody
  */
-export const oAuthParams = (location: Location) => {
+export const oAuthParams = (location: Location): OAuthBody => {
   const queryString = getOAuthQueryString(location);
   const params = new URLSearchParams(queryString ?? location.hash);
   return Object.fromEntries(params) as unknown as OAuthBody;
 };
 
-export const getOAuthQueryString = (location: Location) => {
+export const getOAuthQueryString = (location: Location): string => {
   const hash = location.hash;
   const queryParamIndex = hash.indexOf('?');
   return hash.substring(queryParamIndex);
@@ -43,7 +43,7 @@ export const getOAuthQueryString = (location: Location) => {
  * @param oauthBody oauth body object
  * @returns Scope[]
  */
-export const oAuthScope = (oauthBody: OAuthBody) => {
+export const oAuthScope = (oauthBody: OAuthBody): Scope[] => {
   return oauthBody.scope.split(/\+|%20|\s/).filter(scope => {
     return Object.values(Scope).includes(scope as Scope);
   }) as Scope[];
@@ -54,6 +54,6 @@ export const oAuthScope = (oauthBody: OAuthBody) => {
  * @param Scopes Scopes accepted by the app
  * @returns string
  */
-export const oAuthScopesToString = (scopes: Scope[]) => {
+export const oAuthScopesToString = (scopes: Scope[]): string => {
   return scopes.join(' ');
 };

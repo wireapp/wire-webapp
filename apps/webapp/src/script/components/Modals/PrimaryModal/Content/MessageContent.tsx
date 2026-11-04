@@ -17,12 +17,13 @@
  *
  */
 
-import {isNullOrUndefined, isString, isUndefined} from '@sindresorhus/is';
+import type {FunctionComponent} from 'react';
 
-import type {Translate} from 'Util/localizerUtil';
+import {isNullOrUndefined, isString, isUndefined} from '@sindresorhus/is';
 
 import {TranslatedMessageContent} from './TranslatedMessageContent';
 
+import type {Translate} from '../../../../util/localizerUtil';
 import type {PrimaryModalTranslatedMessage} from '../PrimaryModalTranslatedMessage';
 
 interface MessageContentProps {
@@ -31,7 +32,11 @@ interface MessageContentProps {
   translate: Translate;
 }
 
-export const MessageContent = ({message, translatedMessage, translate}: MessageContentProps) => {
+export const MessageContent: FunctionComponent<MessageContentProps> = ({
+  message,
+  translatedMessage,
+  translate,
+}: MessageContentProps) => {
   const hasMessage = !isNullOrUndefined(message);
   const hasTranslatedMessage = !isUndefined(translatedMessage);
 

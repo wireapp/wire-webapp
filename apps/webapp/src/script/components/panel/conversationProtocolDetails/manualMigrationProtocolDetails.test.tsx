@@ -24,20 +24,20 @@ import ko from 'knockout';
 import {task} from 'true-myth';
 import {asyncNoop, noop} from 'noop-esm';
 
-import {Conversation} from 'Repositories/entity/Conversation';
+import {Conversation} from '../../../repositories/entity/Conversation';
 import {withTheme} from 'src/script/auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 
-import {ConversationMapper} from 'Repositories/conversation/ConversationMapper';
+import {ConversationMapper} from '../../../repositories/conversation/ConversationMapper';
 
 import {ManualMigrationProtocolDetails} from './manualMigrationProtocolDetails';
 
 const wrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
-const createConversation = (protocol = CONVERSATION_PROTOCOL.PROTEUS) => {
+const createConversation = (protocol = CONVERSATION_PROTOCOL.PROTEUS): Conversation => {
   const conversation = new Conversation('conversation', 'example.com', protocol, translateForTest);
   conversation.type(CONVERSATION_TYPE.REGULAR);
   conversation.teamId = 'team';
@@ -45,7 +45,33 @@ const createConversation = (protocol = CONVERSATION_PROTOCOL.PROTEUS) => {
   conversation.groupId = protocol === CONVERSATION_PROTOCOL.PROTEUS ? '' : 'group';
   return conversation;
 };
-const arrange = () => {
+type ArrangeResult = {
+  props: {
+    repository: {
+      updateConversationProtocol: jest.Mock<
+        Promise<Conversation>,
+        [conversation: Conversation, protocol: CONVERSATION_PROTOCOL],
+        any
+      >;
+      tryEstablishingMLSGroup: jest.Mock<Promise<void>, unknown[], any>;
+      safeEnsureConversationExists: jest.Mock<task.Task<void, never>, [], any>;
+    };
+    teamState: {teamFeatures: ko.Observable<FeatureList | undefined>};
+    conversation: Conversation;
+    selfUser: {teamId: string; qualifiedId: {id: string; domain: string}};
+  };
+  repository: {
+    updateConversationProtocol: jest.Mock<
+      Promise<Conversation>,
+      [conversation: Conversation, protocol: CONVERSATION_PROTOCOL],
+      any
+    >;
+    tryEstablishingMLSGroup: jest.Mock<Promise<void>, unknown[], any>;
+    safeEnsureConversationExists: jest.Mock<task.Task<void, never>, [], any>;
+  };
+  teamState: {teamFeatures: ko.Observable<FeatureList | undefined>};
+};
+const arrange = (): ArrangeResult => {
   const repository = {
     updateConversationProtocol: jest.fn(async (conversation: Conversation, protocol: CONVERSATION_PROTOCOL) => {
       return ConversationMapper.updateProperties(conversation, {protocol, groupId: 'group'});
@@ -72,7 +98,7 @@ const arrange = () => {
   return {props, repository, teamState};
 };
 
-const activate = (count = 5) => {
+const activate = (count = 5): void => {
   for (let i = 0; i < count; i += 1) {
     fireEvent.click(screen.getByRole('button', {name: 'modalCreateGroupProtocolHeading PROTEUS'}));
   }

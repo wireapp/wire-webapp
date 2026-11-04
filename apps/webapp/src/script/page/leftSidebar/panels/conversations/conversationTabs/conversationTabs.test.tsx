@@ -17,23 +17,27 @@
  *
  */
 
-import {render} from '@testing-library/react';
+import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ko from 'knockout';
+import {container} from 'tsyringe';
 
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {ConversationLabelRepository} from 'Repositories/conversation/ConversationLabelRepository';
-import {User} from 'Repositories/entity/User';
+import {ConversationRepository} from '../../../../../repositories/conversation/ConversationRepository';
+import {ConversationLabelRepository} from '../../../../../repositories/conversation/ConversationLabelRepository';
+import {User} from '../../../../../repositories/entity/User';
+import {TeamState} from '../../../../../repositories/team/TeamState';
+import {Config} from 'src/script/Config';
+import {Core} from 'src/script/service/coreSingleton';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import * as DataDog from 'Util/dataDog';
-import * as Environment from 'Util/environment';
-import {setStrings, translate} from 'Util/localizerUtil';
+import * as DataDog from '../../../../../util/dataDog';
+import * as Environment from '../../../../../util/environment';
+import {setStrings, translate} from '../../../../../util/localizerUtil';
 
-import en from 'I18n/en-US.json';
+import en from '../../../../../../i18n/en-US.json';
 
 import {ConversationTabs} from './conversationTabs';
 import {SidebarTabs} from '../useSidebarStore';
@@ -88,8 +92,33 @@ function withInternalEnvironment(testFunction: TranslationTestFunction): Isolate
   };
 }
 
+function withTeamCreationEnabled(testFunction: TranslationTestFunction): IsolatedTranslationTestFunction {
+  return async function runWithTeamCreationEnabled(): Promise<void> {
+    const core = container.resolve(Core);
+    const teamState = container.resolve(TeamState);
+    const originalVersion = core.backendFeatures.version;
+    core.backendFeatures.version = 7;
+    const isInTeamSpy = jest.spyOn(teamState, 'isInTeam').mockReturnValue(false);
+    const realConfig = Config.getConfig();
+    const configSpy = jest.spyOn(Config, 'getConfig').mockReturnValue({
+      ...realConfig,
+      FEATURE: {...realConfig.FEATURE, ENABLE_TEAM_CREATION: true},
+      MIN_TEAM_CREATION_SUPPORTED_API_VERSION: 7,
+    });
+
+    try {
+      await testFunction();
+    } finally {
+      core.backendFeatures.version = originalVersion;
+      configSpy.mockRestore();
+      isInTeamSpy.mockRestore();
+    }
+  };
+}
+
 function renderConversationTabs(
   rootProviderWrapper: ReturnType<typeof createRootProviderWrapperForTest>,
+  selfUser = new User('self-user', '', translate),
 ): ReturnType<typeof render> {
   return render(
     <div id="wire-app">
@@ -107,13 +136,39 @@ function renderConversationTabs(
           currentTab={SidebarTabs.RECENT}
           onClickPreferences={jest.fn()}
           showNotificationsBadge={false}
-          selfUser={new User('self-user', '', translate)}
+          selfUser={selfUser}
         />,
         rootProviderWrapper,
       )}
     </div>,
   );
 }
+
+describe('ConversationTabs — team creation banner', () => {
+  it(
+    'hides the team creation banner for temporary guests',
+    withTeamCreationEnabled(
+      withTranslationStrings(en, () => {
+        const selfUser = new User('self-user', '', translate);
+        selfUser.isTemporaryGuest(true);
+        renderConversationTabs(translationRootProviderWrapper, selfUser);
+        expect(screen.queryByRole('button', {name: translate('teamUpgradeBannerButtonText')})).not.toBeInTheDocument();
+      }),
+    ),
+  );
+
+  it(
+    'shows the team creation banner for regular users',
+    withTeamCreationEnabled(
+      withTranslationStrings(en, () => {
+        const selfUser = new User('self-user', '', translate);
+        selfUser.isTemporaryGuest(false);
+        renderConversationTabs(translationRootProviderWrapper, selfUser);
+        expect(screen.queryByRole('button', {name: translate('teamUpgradeBannerButtonText')})).toBeInTheDocument();
+      }),
+    ),
+  );
+});
 
 describe('ConversationTabs', () => {
   it(

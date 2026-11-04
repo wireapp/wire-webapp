@@ -17,13 +17,14 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+import type {FormEvent, MouseEvent, ChangeEvent} from 'react';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {CellsNewNodeFormValidationCopy} from './cellsNodeFormUtils';
 import {useCellsNewNodeFormBase} from './useCellsNewNodeFormBase';
 
+import {CellsRepository} from '../../../../../repositories/cells/cellsRepository';
 import {getCellsApiPath} from '../getCellsApiPath/getCellsApiPath';
 
 interface UseCellsNewFolderFormProps {
@@ -35,6 +36,14 @@ interface UseCellsNewFolderFormProps {
   validationCopy: CellsNewNodeFormValidationCopy;
 }
 
+type UseCellsNewFolderFormResult = {
+  name: string;
+  error: string | null;
+  isSubmitting: boolean;
+  handleSubmit: (formEvent: FormEvent<HTMLFormElement> | MouseEvent<HTMLButtonElement>) => Promise<void>;
+  handleChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  handleClear: () => void;
+};
 export const useCellsNewFolderForm = ({
   cellsRepository,
   conversationQualifiedId,
@@ -42,8 +51,8 @@ export const useCellsNewFolderForm = ({
   currentPath,
   isOpen,
   validationCopy,
-}: UseCellsNewFolderFormProps) => {
-  const createFolder = async (name: string) => {
+}: UseCellsNewFolderFormProps): UseCellsNewFolderFormResult => {
+  const createFolder = async (name: string): Promise<void> => {
     const path = getCellsApiPath({conversationQualifiedId, currentPath});
     await cellsRepository.createFolder({path, name});
     onSuccess();

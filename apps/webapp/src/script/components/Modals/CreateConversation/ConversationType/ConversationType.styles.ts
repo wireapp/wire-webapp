@@ -69,7 +69,17 @@ export const conversationFeatureContainerCss: CSSObject = {
   marginTop: '0.75rem',
 };
 
-export const conversationOptionContainerCss = (isSelected: boolean) => {
+type ConversationOptionContainerCssResult = {
+  display: string;
+  justifyContent: string;
+  alignItems: string;
+  background: string;
+  borderRadius: string;
+  padding: string;
+  border: string;
+  cursor: string;
+};
+export const conversationOptionContainerCss = (isSelected: boolean): ConversationOptionContainerCssResult => {
   return {
     display: 'flex',
     justifyContent: 'space-between',

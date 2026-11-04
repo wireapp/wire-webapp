@@ -17,13 +17,15 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {isNonEmptyString} from '@sindresorhus/is';
 
 import {Button, ButtonVariant, COLOR} from '@wireapp/react-ui-kit';
 
-import type {CompositeMessage} from 'Repositories/entity/message/compositeMessage';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {noop} from 'Util/util';
+import type {CompositeMessage} from '../../../../../../repositories/entity/message/compositeMessage';
+import {useKoSubscribableChildren} from '../../../../../../util/componentUtil';
+import {noop} from '../../../../../../util/util';
 
 interface MessageButtonProps {
   id: string;
@@ -32,7 +34,12 @@ interface MessageButtonProps {
   onClick?: () => void;
 }
 
-export const MessageButton = ({id, label, message, onClick = noop}: MessageButtonProps) => {
+export const MessageButton: FunctionComponent<MessageButtonProps> = ({
+  id,
+  label,
+  message,
+  onClick = noop,
+}: MessageButtonProps) => {
   const {errorButtonId, errorMessage, selectedButtonId, waitingButtonId} = useKoSubscribableChildren(message, [
     'errorButtonId',
     'errorMessage',

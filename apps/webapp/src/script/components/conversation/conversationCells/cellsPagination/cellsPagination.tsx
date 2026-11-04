@@ -17,11 +17,10 @@
  *
  */
 
-import {useCallback} from 'react';
+import {useCallback, type FunctionComponent} from 'react';
 
 import {FlexBox, IconButton} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/icon';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {CellsPageList} from './cellsPageList/cellsPageList';
@@ -39,6 +38,8 @@ import {
   arrowNextIconDisabledStyles,
 } from './cellsPagination.styles';
 
+import * as Icon from '../../../icon';
+
 interface CellsPaginationProps {
   currentPage?: number;
   numberOfPages?: number;
@@ -50,7 +51,7 @@ interface CellsPaginationProps {
   setPageSize: (page: number) => void;
 }
 
-export const CellsPagination = ({
+export const CellsPagination: FunctionComponent<CellsPaginationProps> = ({
   currentPage = 0,
   numberOfPages = 1,
   goToPage,

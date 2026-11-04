@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {Rotation} from './arrowIcon';
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
@@ -31,7 +33,7 @@ const rotation: Rotation = {
   right: 270,
 };
 
-export const TriangleIcon = ({direction = 'down', ...props}: Props) => {
+export const TriangleIcon: FunctionComponent<Props> = ({direction = 'down', ...props}) => {
   return (
     <SVGIcon realWidth={8} realHeight={8} {...props}>
       <path transform={`rotate(${rotation[direction]} 4 4)`} fillRule="evenodd" d="M0 2h8L4 7" />

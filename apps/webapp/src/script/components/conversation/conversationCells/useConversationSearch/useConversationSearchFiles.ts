@@ -24,12 +24,11 @@ import {isNonEmptyStringAndNotWhitespace} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {useDebouncedCallback} from 'use-debounce';
 
-import {transformCellsNodes} from 'Components/cells/common/transformCellsNodes/transformCellsNodes';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {UserRepository} from 'Repositories/user/userRepository';
-
 import {createRequestVersionGate} from './requestVersionGate';
 
+import {CellsRepository} from '../../../../repositories/cells/cellsRepository';
+import {UserRepository} from '../../../../repositories/user/userRepository';
+import {transformCellsNodes} from '../../../cells/common/transformCellsNodes/transformCellsNodes';
 import {
   ConversationDriveFiltersState,
   hasActiveSearchParams,
@@ -58,12 +57,24 @@ type ClearSearchRefreshOptions = {
   preserveFilters: boolean;
 };
 
+type ClearSearchOptions = {
+  preserveFilters?: boolean;
+  preserveInputValue?: boolean;
+};
+
 const DEBOUNCE_TIME = 300;
 
 const normalizeSearchQuery = (query: string): string => {
   return isNonEmptyStringAndNotWhitespace(query) ? query.trim() : '';
 };
 
+type UseConversationSearchFilesResult = {
+  searchValue: string;
+  handleSearch: (value: string) => void;
+  handleReload: () => Promise<void>;
+  handleClearSearch: (options?: ClearSearchOptions) => void;
+  loadMore: (offset: number) => Promise<void>;
+};
 export const useConversationSearchFiles = ({
   cellsRepository,
   userRepository,
@@ -73,7 +84,7 @@ export const useConversationSearchFiles = ({
   filters,
   onClear,
   sort,
-}: UseConversationSearchFilesProps) => {
+}: UseConversationSearchFilesProps): UseConversationSearchFilesResult => {
   const {setNodes, appendNodes, setStatus, setPagination, setError, clearAll} = useCellsStore();
 
   const [searchValue, setSearchValue] = useState('');
@@ -255,10 +266,9 @@ export const useConversationSearchFiles = ({
     });
   };
 
-  const handleClearSearch = ({
-    preserveFilters = true,
-    preserveInputValue = false,
-  }: {preserveFilters?: boolean; preserveInputValue?: boolean} = {}) => {
+  const handleClearSearch = (options: ClearSearchOptions = {}): void => {
+    const {preserveFilters = true, preserveInputValue = false} = options;
+
     searchNodesDebounced.cancel();
     requestVersionGate.current.invalidate();
     if (!preserveInputValue) {

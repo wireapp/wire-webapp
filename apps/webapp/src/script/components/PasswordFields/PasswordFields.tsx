@@ -17,13 +17,16 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {ValidationUtil} from '@wireapp/commons';
 import {ErrorMessage, Input} from '@wireapp/react-ui-kit';
 
 import {Config} from 'src/script/Config';
-import type {Translate} from 'Util/localizerUtil';
 
 import {errorMessageStyles} from './PasswordFields.styles';
+
+import type {Translate} from '../../util/localizerUtil';
 
 export interface PasswordFieldsProps {
   readonly translate: Translate;
@@ -39,7 +42,7 @@ export interface PasswordFieldsProps {
   isPasswordConfirmationMarkInvalid: boolean;
 }
 
-export const PasswordFields = ({
+export const PasswordFields: FunctionComponent<PasswordFieldsProps> = ({
   translate,
   required = true,
   passwordError,
@@ -109,13 +112,10 @@ export const PasswordFields = ({
   );
 };
 
-const PasswordFieldsErrorMessage = ({
-  translate,
-  message,
-}: {
+const PasswordFieldsErrorMessage: FunctionComponent<{
   translate: PasswordFieldsProps['translate'];
   message?: React.ReactNode;
-}) => {
+}> = ({translate, message}: {translate: PasswordFieldsProps['translate']; message?: React.ReactNode}) => {
   return (
     <ErrorMessage data-uie-name="primary-modals-error-message" css={errorMessageStyles}>
       {message ??

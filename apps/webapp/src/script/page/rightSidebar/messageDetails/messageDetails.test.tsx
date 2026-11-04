@@ -20,19 +20,19 @@
 import {render, waitFor} from '@testing-library/react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {User} from 'Repositories/entity/User';
-import {SearchRepository} from 'Repositories/search/searchRepository';
-import {TeamRepository} from 'Repositories/team/TeamRepository';
-import {UserRepository} from 'Repositories/user/userRepository';
+import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {ContentMessage} from '../../../repositories/entity/message/contentMessage';
+import {User} from '../../../repositories/entity/User';
+import {SearchRepository} from '../../../repositories/search/searchRepository';
+import {TeamRepository} from '../../../repositories/team/TeamRepository';
+import {UserRepository} from '../../../repositories/user/userRepository';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
-import {createUuid} from 'Util/uuid';
+import {translateForTest} from '../../../util/test/translateForTest';
+import {createUuid} from '../../../util/uuid';
 
 import {MessageDetails} from './messageDetails';
 
@@ -45,7 +45,15 @@ let searchRepository: SearchRepository;
 const rootContextValue = createRootContextValueForTest({translate: translateForTest});
 const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
-const getDefaultParams = (showReactions: boolean = false) => {
+type GetDefaultParamsResult = {
+  conversationRepository: ConversationRepository;
+  onClose: jest.Mock<any, any, any>;
+  searchRepository: SearchRepository;
+  showReactions: boolean;
+  teamRepository: TeamRepository;
+  updateEntity: jest.Mock<any, any, any>;
+};
+const getDefaultParams = (showReactions: boolean = false): GetDefaultParamsResult => {
   return {
     conversationRepository,
     onClose: jest.fn(),

@@ -17,14 +17,18 @@
  *
  */
 
-import {Notification} from '@wireapp/api-client/lib/notification';
+import {Notification, NotificationAPI} from '@wireapp/api-client/lib/notification';
 
 import {APIClient} from '@wireapp/api-client';
 
 export class NotificationBackendRepository {
   constructor(private readonly apiClient: APIClient) {}
 
-  public async getAllNotifications(clientId?: string, lastNotificationId?: string, abortController?: AbortController) {
+  public async getAllNotifications(
+    clientId?: string,
+    lastNotificationId?: string,
+    abortController?: AbortController,
+  ): ReturnType<NotificationAPI['getAllNotifications']> {
     return this.apiClient.api.notification.getAllNotifications(clientId, lastNotificationId, abortController);
   }
 

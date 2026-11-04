@@ -23,10 +23,10 @@ import {CONVERSATION_PROTOCOL, FEATURE_KEY, FEATURE_STATUS} from '@wireapp/api-c
 import {UserType} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
-import {ClientEntity} from 'Repositories/client';
+import {ClientEntity} from '../client';
 import {TestFactory} from 'test/helper/TestFactory';
 import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
+import {TIME_IN_MILLIS} from '../../util/timeUtil';
 
 import {SelfRepository} from './SelfRepository';
 import * as SelfSupportedProtocols from './SelfSupportedProtocols/SelfSupportedProtocols';
@@ -35,7 +35,15 @@ import {Core} from '../../service/coreSingleton';
 
 const testFactory = new TestFactory();
 
-const generateMLSFeatureConfig = (supportedProtocols: CONVERSATION_PROTOCOL[]) => {
+type MLSFeatureConfig = {
+  allowedCipherSuites: number[];
+  defaultCipherSuite: number;
+  defaultProtocol: CONVERSATION_PROTOCOL;
+  protocolToggleUsers: string[];
+  supportedProtocols: CONVERSATION_PROTOCOL[];
+};
+
+const generateMLSFeatureConfig = (supportedProtocols: CONVERSATION_PROTOCOL[]): MLSFeatureConfig => {
   return {
     allowedCipherSuites: [1],
     defaultCipherSuite: 1,

@@ -17,11 +17,11 @@
  *
  */
 
-import {UIEvent} from 'react';
+import {UIEvent, type FunctionComponent} from 'react';
 
 import {css, SerializedStyles} from '@emotion/react';
 
-import {handleKeyDown, KEY} from 'Util/keyboardUtil';
+import {handleKeyDown, KEY} from '../../util/keyboardUtil';
 
 interface DeviceToggleButtonProps {
   currentDevice: string;
@@ -30,8 +30,13 @@ interface DeviceToggleButtonProps {
   styles?: SerializedStyles;
 }
 
-const DeviceToggleButton = ({currentDevice, devices, onChooseDevice, styles}: DeviceToggleButtonProps) => {
-  const selectNextDevice = (event: UIEvent) => {
+const DeviceToggleButton: FunctionComponent<DeviceToggleButtonProps> = ({
+  currentDevice,
+  devices,
+  onChooseDevice,
+  styles,
+}: DeviceToggleButtonProps) => {
+  const selectNextDevice = (event: UIEvent): void => {
     event.preventDefault();
     event.stopPropagation();
     const currentDeviceIndex = devices.indexOf(currentDevice);

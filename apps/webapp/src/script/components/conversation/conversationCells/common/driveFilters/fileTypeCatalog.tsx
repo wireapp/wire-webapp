@@ -31,7 +31,7 @@ import {
   VideoFileIcon,
 } from '@wireapp/react-ui-kit';
 
-import type {TranslationKey} from 'Util/localizerUtil';
+import type {TranslationKey} from '../../../../../util/localizerUtil';
 
 type FileTypeLabelKey = Extract<TranslationKey, `cells.fileType.${string}`>;
 

@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState, type FunctionComponent} from 'react';
 
 import {isTruthy, isUndefined} from '@sindresorhus/is';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/conversationReceiptModeUpdateData';
@@ -28,38 +28,38 @@ import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, Option, Select} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {FadingScrollbar} from 'Components/fadingScrollbar';
-import * as Icon from 'Components/icon';
-import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {AppsDisabledNote} from 'Components/Note/AppsDisabledNote/AppsDisabledNote';
-import {SearchInput} from 'Components/SearchInput';
-import {TextInput} from 'Components/TextInput';
-import {InfoToggle} from 'Components/toggle/InfoToggle';
-import {UserSearchableList} from 'Components/UserSearchableList';
-import {ACCESS_STATE} from 'Repositories/conversation/AccessState';
-import {
-  ACCESS_TYPES,
-  teamPermissionsForAccessState,
-  toggleFeature,
-} from 'Repositories/conversation/ConversationAccessPermission';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
-import {UserState} from 'Repositories/user/userState';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from 'src/script/router/routerBindings';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {checkAppsFeatureAvailability} from 'Util/featureUtil';
-import {handleEnterDown, handleEscDown, isKeyboardEvent} from 'Util/keyboardUtil';
-import {sortUsersByPriority} from 'Util/stringUtil';
 
 import {Config} from '../../../Config';
 import {isProtocolOption, ProtocolOption} from '../../../guards/Protocol';
+import {ACCESS_STATE} from '../../../repositories/conversation/AccessState';
+import {
+  ACCESS_TYPES,
+  teamPermissionsForAccessState,
+  toggleFeature,
+} from '../../../repositories/conversation/ConversationAccessPermission';
+import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import {User} from '../../../repositories/entity/User';
+import {TeamState} from '../../../repositories/team/TeamState';
+import {UserState} from '../../../repositories/user/userState';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {checkAppsFeatureAvailability} from '../../../util/featureUtil';
+import {handleEnterDown, handleEscDown, isKeyboardEvent} from '../../../util/keyboardUtil';
+import {sortUsersByPriority} from '../../../util/stringUtil';
+import {WebAppEvents} from '../../../webAppEvents';
+import {FadingScrollbar} from '../../fadingScrollbar';
+import * as Icon from '../../icon';
+import {AppsDisabledNote} from '../../Note/AppsDisabledNote/AppsDisabledNote';
+import {SearchInput} from '../../SearchInput';
+import {TextInput} from '../../TextInput';
+import {InfoToggle} from '../../toggle/InfoToggle';
+import {UserSearchableList} from '../../UserSearchableList';
 import {getSharedDrivePermissionHint} from '../CreateConversation/utils';
+import {ModalComponent} from '../ModalComponent';
 import {PrimaryModal} from '../PrimaryModal';
 
 interface GroupCreationModalProps {
@@ -72,7 +72,7 @@ enum GroupCreationModalState {
   PREFERENCES = 'GroupCreationModal.STATE.PREFERENCES',
 }
 
-const GroupCreationModal = ({
+const GroupCreationModal: FunctionComponent<GroupCreationModalProps> = ({
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
 }: GroupCreationModalProps) => {
@@ -151,7 +151,7 @@ const GroupCreationModal = ({
   );
 
   useEffect(() => {
-    const showCreateGroup = (_eventName: string, userEntity?: User) => {
+    const showCreateGroup = (_eventName: string, userEntity?: User): void => {
       setEnableReadReceipts(isTeam);
       setIsShown(true);
       setGroupCreationState(GroupCreationModalState.PREFERENCES);
@@ -243,11 +243,11 @@ const GroupCreationModal = ({
   const maxNameLength = ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
   const maxSize = ConversationRepository.CONFIG.GROUP.MAX_SIZE;
 
-  const onOpen = () => {
+  const onOpen = (): void => {
     setAccessState(isAppsFeatureAvailable ? ACCESS_STATE.TEAM.GUESTS_SERVICES : ACCESS_STATE.TEAM.GUEST_ROOM);
   };
 
-  const onClose = () => {
+  const onClose = (): void => {
     setIsCreatingConversation(false);
     setNameError('');
     setGroupName('');
@@ -349,7 +349,7 @@ const GroupCreationModal = ({
     }
   };
 
-  const onGroupNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onGroupNameChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const {value} = event.target;
 
     const trimmedNameInput = value.trim();
@@ -367,7 +367,7 @@ const GroupCreationModal = ({
     setNameError('');
   };
 
-  const onProtocolChange = (option: Option | null) => {
+  const onProtocolChange = (option: Option | null): void => {
     if (!isProtocolOption(option)) {
       return;
     }
@@ -398,10 +398,10 @@ const GroupCreationModal = ({
     const newAccessState = toggleFeature(feature, accessState);
     setAccessState(newAccessState);
   };
-  const clickOnToggleServicesMode = () => {
+  const clickOnToggleServicesMode = (): void => {
     return clickOnToggle(ACCESS_TYPES.SERVICE);
   };
-  const clickOnToggleGuestMode = () => {
+  const clickOnToggleGuestMode = (): void => {
     return clickOnToggle(teamPermissionsForAccessState(ACCESS_STATE.TEAM.GUEST_FEATURES));
   };
   const clickOnBack = (): void => {

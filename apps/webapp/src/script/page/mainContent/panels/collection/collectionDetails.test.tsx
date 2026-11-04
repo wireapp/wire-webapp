@@ -19,24 +19,24 @@
 
 import {render} from '@testing-library/react';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {FileAsset} from 'Repositories/entity/message/fileAsset';
-import {LinkPreview} from 'Repositories/entity/message/linkPreview';
-import {MediumImage} from 'Repositories/entity/message/mediumImage';
-import {Text} from 'Repositories/entity/message/text';
+import {Conversation} from '../../../../repositories/entity/Conversation';
+import {ContentMessage} from '../../../../repositories/entity/message/contentMessage';
+import {FileAsset} from '../../../../repositories/entity/message/fileAsset';
+import {LinkPreview} from '../../../../repositories/entity/message/linkPreview';
+import {MediumImage} from '../../../../repositories/entity/message/mediumImage';
+import {Text} from '../../../../repositories/entity/message/text';
 import {MessageCategory} from 'src/script/message/messageCategory';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
-import {createUuid} from 'Util/uuid';
+import {translateForTest} from '../../../../util/test/translateForTest';
+import {createUuid} from '../../../../util/uuid';
 
 import {CollectionDetails} from './collectionDetails';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-jest.mock('Components/image', () => {
+jest.mock('../../../../components/image', () => {
   return {
     AssetImage: () => {
       return <div>Image</div>;
@@ -44,7 +44,7 @@ jest.mock('Components/image', () => {
     __esModule: true,
   };
 });
-jest.mock('Components/messagesList/message/contentMessage/asset/audioAsset/audioAsset', () => {
+jest.mock('../../../../components/messagesList/message/contentMessage/asset/audioAsset/audioAsset', () => {
   return {
     AudioAsset: () => {
       return <div>Audio</div>;
@@ -52,7 +52,7 @@ jest.mock('Components/messagesList/message/contentMessage/asset/audioAsset/audio
     __esModule: true,
   };
 });
-jest.mock('Components/messagesList/message/contentMessage/asset/fileAsset/fileAsset', () => {
+jest.mock('../../../../components/messagesList/message/contentMessage/asset/fileAsset/fileAsset', () => {
   return {
     FileAsset: () => {
       return <div>File</div>;
@@ -60,7 +60,7 @@ jest.mock('Components/messagesList/message/contentMessage/asset/fileAsset/fileAs
     __esModule: true,
   };
 });
-jest.mock('Components/messagesList/message/contentMessage/asset/linkPreviewAssetComponent', () => {
+jest.mock('../../../../components/messagesList/message/contentMessage/asset/linkPreviewAssetComponent', () => {
   return {
     LinkPreviewAsset: () => {
       return <div>Link Preview</div>;
@@ -69,7 +69,7 @@ jest.mock('Components/messagesList/message/contentMessage/asset/linkPreviewAsset
   };
 });
 
-const createImageMessage = (timestamp: number = Date.now()) => {
+const createImageMessage = (timestamp: number = Date.now()): ContentMessage => {
   const message = new ContentMessage(createUuid(), translateForTest);
   message.timestamp(timestamp);
   const image = new MediumImage(createUuid());
@@ -79,7 +79,7 @@ const createImageMessage = (timestamp: number = Date.now()) => {
   return message;
 };
 
-const createFileMessage = () => {
+const createFileMessage = (): ContentMessage => {
   const message = new ContentMessage(createUuid(), translateForTest);
   const file = new FileAsset(createUuid());
   message.assets.push(file);
@@ -87,7 +87,7 @@ const createFileMessage = () => {
   return message;
 };
 
-const createLinkMessage = () => {
+const createLinkMessage = (): ContentMessage => {
   const message = new ContentMessage(createUuid(), translateForTest);
   const link = new Text(createUuid());
   link.previews.push(new LinkPreview({}));
@@ -96,7 +96,7 @@ const createLinkMessage = () => {
   return message;
 };
 
-const createAudioMessage = () => {
+const createAudioMessage = (): ContentMessage => {
   const message = new ContentMessage(createUuid(), translateForTest);
   const audio = new FileAsset(createUuid());
   spyOn(audio, 'isAudio').and.returnValue(true);

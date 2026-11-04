@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState, type FunctionComponent} from 'react';
 
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {useLexicalNodeSelection} from '@lexical/react/useLexicalNodeSelection';
@@ -44,10 +44,9 @@ import {
   BaseSelection,
 } from 'lexical';
 
-import {KEY} from 'Util/keyboardUtil';
-
 import {$isMentionNode} from './mentionNode';
 
+import {KEY} from '../../../../../util/keyboardUtil';
 import {getNextSibling, getPreviousSibling} from '../utils/getSelectionInfo';
 
 interface MentionComponentProps {
@@ -57,7 +56,7 @@ interface MentionComponentProps {
   classNameFocused?: string;
 }
 
-export const Mention = (props: MentionComponentProps) => {
+export const Mention: FunctionComponent<MentionComponentProps> = (props: MentionComponentProps) => {
   const {mention, className = '', classNameFocused = '', nodeKey} = props;
   const [editor] = useLexicalComposerContext();
   const [isSelected, setSelected, clearSelection] = useLexicalNodeSelection(nodeKey);

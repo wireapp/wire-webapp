@@ -26,11 +26,11 @@ import {Maybe} from 'true-myth';
 import {EventEmitter} from 'events';
 
 import {LogFactory, TimeUtil} from '@wireapp/commons';
-import {PriorityQueue} from '@wireapp/priority-queue';
 
 import {createAbortableWait} from './abortableWait';
 import {createIncrementalRetryBackoffPolicy, IncrementalRetryBackoffState} from './incrementalRetryBackoff';
 import {createIncrementalRetryBackoffRunner} from './incrementalRetryBackoffRunner';
+import {PriorityQueue} from './priorityQueue/priorityQueue';
 
 import {
   AccessTokenData,
@@ -175,7 +175,7 @@ export class HttpClient extends EventEmitter {
     return this.enableGzip;
   }
 
-  public getBaseUrl() {
+  public getBaseUrl(): string {
     return `${this.config.urls.rest}${this.versionPrefix}`;
   }
 
@@ -253,7 +253,7 @@ export class HttpClient extends EventEmitter {
 
       return response;
     } catch (error: unknown) {
-      const retryWithTokenRefresh = async () => {
+      const retryWithTokenRefresh = async (): Promise<AxiosResponse<T>> => {
         this.logger.warn(`Access token refresh triggered for "${config.method}" request to "${config.url}".`);
         await this.refreshAccessToken();
         config['axios-retry'] = {

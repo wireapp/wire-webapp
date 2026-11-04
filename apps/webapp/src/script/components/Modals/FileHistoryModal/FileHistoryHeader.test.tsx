@@ -19,10 +19,10 @@
 
 import {ReactElement} from 'react';
 
-import {render, screen, fireEvent} from '@testing-library/react';
+import {render, screen, fireEvent, type RenderResult} from '@testing-library/react';
 
 import {RootProvider} from 'src/script/page/rootProvider';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 import {createRootContextValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {FileHistoryHeader} from './FileHistoryHeader';
@@ -32,7 +32,7 @@ jest.mock('./hooks/useFileHistoryModal');
 
 const mockedUseFileHistoryModal = jest.mocked(useFileHistoryModal);
 
-function renderWithRootProvider(element: ReactElement) {
+function renderWithRootProvider(element: ReactElement): RenderResult {
   return render(
     <RootProvider value={createRootContextValueForTest({translate: translateForTest})}>{element}</RootProvider>,
   );

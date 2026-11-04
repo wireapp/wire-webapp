@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {CSSObject} from '@emotion/react';
 
 import {COLOR_V2} from '../../identity/colorsV2/colorsV2';
@@ -34,7 +36,7 @@ export const textLinkStyle: <T>(theme: Theme, props: TextLinkProps<T>) => CSSObj
   };
 };
 
-export const TextLink = ({children, ...props}: TextLinkProps<HTMLAnchorElement>) => {
+export const TextLink: FunctionComponent<TextLinkProps<HTMLAnchorElement>> = ({children, ...props}) => {
   return (
     <a
       css={(theme: Theme) => {

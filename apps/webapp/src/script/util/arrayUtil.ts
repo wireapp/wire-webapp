@@ -21,7 +21,7 @@ import {isFiniteNumber, isNonEmptyArray, isUndefined} from '@sindresorhus/is';
 
 export function chunk<T>(array: T[], size: number): T[][];
 export function chunk(array: Float32Array, size: number): Float32Array[];
-export function chunk<T>(array: T[] | Float32Array, size: number) {
+export function chunk<T>(array: T[] | Float32Array, size: number): (T[] | Float32Array<ArrayBufferLike>)[] {
   const chunks: (T[] | Float32Array)[] = [];
   for (let index = 0, length = array.length; index < length; index += size) {
     chunks.push(array.slice(index, index + size));
@@ -75,7 +75,7 @@ export const getNextItem = <T>(array: T[], currentItem: T): T | undefined => {
  * @param length new length
  * @returns new array with interpolated values
  */
-export const interpolate = (array: number[], length: number) => {
+export const interpolate = (array: number[], length: number): number[] => {
   const newArray = [];
   const scaleFactor = (array.length - 1) / (length - 1);
 
@@ -93,7 +93,7 @@ export const interpolate = (array: number[], length: number) => {
   return newArray;
 };
 
-export const isLastItem = <T>(array: T[], item: T) => {
+export const isLastItem = <T>(array: T[], item: T): boolean => {
   return array.indexOf(item) === array.length - 1;
 };
 
@@ -126,7 +126,7 @@ export const iterateItem = <T>(array: T[], currentItem: T, reverse = false): T |
  * @param array source
  * @returns random element
  */
-export const randomElement = <T>(array: T[] = []) => {
+export const randomElement = <T>(array: T[] = []): T => {
   return array[Math.floor(Math.random() * array.length)];
 };
 

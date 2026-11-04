@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {wrapperStyles} from './videoPlayOverlay.styles';
 
 import {VideoPlayButton} from '../common/videoPlayButton/videoPlayButton';
@@ -29,7 +31,7 @@ interface VideoPlayOverlayProps {
   isFocusable: boolean;
 }
 
-export const VideoPlayOverlay = ({
+export const VideoPlayOverlay: FunctionComponent<VideoPlayOverlayProps> = ({
   isPlaying,
   videoElement,
   handlePlay,

@@ -18,6 +18,7 @@
  */
 
 import * as React from 'react';
+import {type FunctionComponent} from 'react';
 
 import {CSSObject} from '@emotion/react';
 
@@ -34,6 +35,6 @@ export const contentStyle: <T>(props: ContentProps<T>) => CSSObject = () => {
   };
 };
 
-export const Content = (props: ContentProps) => {
+export const Content: FunctionComponent<ContentProps> = props => {
   return <div css={contentStyle(props)} {...props} />;
 };

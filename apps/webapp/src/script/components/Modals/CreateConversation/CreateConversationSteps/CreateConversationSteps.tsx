@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {FlexBox} from '@wireapp/react-ui-kit';
 
 import {ConversationDetails} from './ConversationDetails/ConversationDetails';
@@ -31,7 +33,7 @@ import {ConversationTypeContainer} from '../ConversationType/ConversationTypeCon
 import {useCreateConversationModal} from '../hooks/useCreateConversationModal';
 import {ConversationCreationStep} from '../types';
 
-export const CreateConversationSteps = () => {
+export const CreateConversationSteps: FunctionComponent = () => {
   const {conversationCreationStep} = useCreateConversationModal();
 
   if (conversationCreationStep === ConversationCreationStep.ParticipantsSelection) {

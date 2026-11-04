@@ -17,7 +17,7 @@
  *
  */
 
-import type {FormEvent} from 'react';
+import type {FormEvent, FunctionComponent} from 'react';
 
 interface InputFormProps {
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
@@ -26,7 +26,12 @@ interface InputFormProps {
   onInputChange: (value: string) => void;
 }
 
-export const InputForm = ({onSubmit, inputValue, inputPlaceholder, onInputChange}: InputFormProps) => {
+export const InputForm: FunctionComponent<InputFormProps> = ({
+  onSubmit,
+  inputValue,
+  inputPlaceholder,
+  onInputChange,
+}: InputFormProps) => {
   return (
     <form onSubmit={onSubmit}>
       <label htmlFor="modal-input" className="visually-hidden">

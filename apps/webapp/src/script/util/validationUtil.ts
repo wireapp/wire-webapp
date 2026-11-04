@@ -38,7 +38,7 @@ export class ValidationUtilError extends Error {
   }
 }
 
-export const isValidUsername = (username: string) => {
+export const isValidUsername = (username: string): boolean => {
   return /^@?[a-z_0-9.-]{2,256}$/.test(username);
 };
 

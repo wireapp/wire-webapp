@@ -17,20 +17,23 @@
  *
  */
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import {Conversation} from '../../entity/Conversation';
+import {User} from '../../entity/User';
 import {QuoteEntity} from 'src/script/message/quoteEntity';
 import {createMessageAddEvent, createMultipartMessageAddEvent, toSavedEvent} from 'test/helper/EventGenerator';
-import {createUuid} from 'Util/uuid';
+import {createUuid} from '../../../util/uuid';
 
 import {RepliesUpdaterMiddleware} from './RepliesUpdaterMiddleware';
 
 import {ClientEvent} from '../Client';
 import {EventService} from '../EventService';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-function buildRepliesUpdaterMiddleware() {
+function buildRepliesUpdaterMiddleware(): readonly [
+  RepliesUpdaterMiddleware,
+  {readonly eventService: jest.Mocked<EventService>},
+] {
   const eventService = {
     loadEvent: jest.fn((): never[] => {
       return [];
@@ -52,8 +55,8 @@ describe('QuotedMessageMiddleware', () => {
       const [repliesUpdaterMiddleware, {eventService}] = buildRepliesUpdaterMiddleware();
       const originalMessage = toSavedEvent(createMessageAddEvent());
       const replies = [
-        createMessageAddEvent({dataOverrides: {quote: {message_id: originalMessage.id} as any}}),
-        createMessageAddEvent({dataOverrides: {quote: {message_id: originalMessage.id} as any}}),
+        toSavedEvent(createMessageAddEvent({dataOverrides: {quote: {message_id: originalMessage.id} as any}})),
+        toSavedEvent(createMessageAddEvent({dataOverrides: {quote: {message_id: originalMessage.id} as any}})),
       ];
       eventService.loadEvent.mockResolvedValue(originalMessage);
       eventService.loadEventsReplyingToMessage.mockResolvedValue(replies);
@@ -104,12 +107,16 @@ describe('QuotedMessageMiddleware', () => {
       const [repliesUpdaterMiddleware, {eventService}] = buildRepliesUpdaterMiddleware();
       const originalMessage = toSavedEvent(createMultipartMessageAddEvent());
       const replies = [
-        createMultipartMessageAddEvent({
-          dataOverrides: {text: {content: '', quote: {message_id: originalMessage.id} as any}},
-        }),
-        createMultipartMessageAddEvent({
-          dataOverrides: {text: {content: '', quote: {message_id: originalMessage.id} as any}},
-        }),
+        toSavedEvent(
+          createMultipartMessageAddEvent({
+            dataOverrides: {text: {content: '', quote: {message_id: originalMessage.id} as any}},
+          }),
+        ),
+        toSavedEvent(
+          createMultipartMessageAddEvent({
+            dataOverrides: {text: {content: '', quote: {message_id: originalMessage.id} as any}},
+          }),
+        ),
       ];
       eventService.loadEvent.mockResolvedValue(originalMessage);
       eventService.loadEventsReplyingToMessage.mockResolvedValue(replies);
@@ -173,12 +180,16 @@ describe('QuotedMessageMiddleware', () => {
     it('updates multipart quotes when replying to a regular message that is edited', async () => {
       const [repliesUpdaterMiddleware, {eventService}] = buildRepliesUpdaterMiddleware();
       const originalMessage = toSavedEvent(createMessageAddEvent());
-      const multipartReply = createMultipartMessageAddEvent({
-        dataOverrides: {text: {content: '', quote: {message_id: originalMessage.id} as any}},
-      });
-      const regularReply = createMessageAddEvent({
-        dataOverrides: {quote: {message_id: originalMessage.id} as any},
-      });
+      const multipartReply = toSavedEvent(
+        createMultipartMessageAddEvent({
+          dataOverrides: {text: {content: '', quote: {message_id: originalMessage.id} as any}},
+        }),
+      );
+      const regularReply = toSavedEvent(
+        createMessageAddEvent({
+          dataOverrides: {quote: {message_id: originalMessage.id} as any},
+        }),
+      );
       eventService.loadEvent.mockResolvedValue(originalMessage);
       eventService.loadEventsReplyingToMessage.mockResolvedValue([multipartReply, regularReply]);
 

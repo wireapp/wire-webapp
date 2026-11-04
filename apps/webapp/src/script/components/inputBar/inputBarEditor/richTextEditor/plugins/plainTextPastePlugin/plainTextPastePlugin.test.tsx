@@ -27,7 +27,7 @@ import {render} from '@testing-library/react';
 
 import {PlainTextPastePlugin} from './plainTextPastePlugin';
 
-const EditorCapturePlugin = ({onReady}: {onReady: (editor: LexicalEditor) => void}) => {
+const EditorCapturePlugin = ({onReady}: {onReady: (editor: LexicalEditor) => void}): null => {
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {
@@ -37,7 +37,8 @@ const EditorCapturePlugin = ({onReady}: {onReady: (editor: LexicalEditor) => voi
   return null;
 };
 
-const renderPlugin = () => {
+type RenderPluginResult = {editor: LexicalEditor; onError: jest.Mock<any, any, any>};
+const renderPlugin = (): RenderPluginResult => {
   const onError = jest.fn();
   const onReady = jest.fn<void, [LexicalEditor]>();
 
@@ -53,7 +54,8 @@ const renderPlugin = () => {
   return {editor: onReady.mock.calls[0][0], onError};
 };
 
-const createPasteEvent = (plainText: string) => {
+type CreatePasteEventResult = {event: ClipboardEvent; preventDefault: jest.Mock<any, any, any>};
+const createPasteEvent = (plainText: string): CreatePasteEventResult => {
   const preventDefault = jest.fn();
   const event = {
     clipboardData: {

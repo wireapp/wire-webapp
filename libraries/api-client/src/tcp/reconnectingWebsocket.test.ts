@@ -220,7 +220,7 @@ describe('ReconnectingWebsocket', () => {
     websocketFactory: Maybe.nothing(),
   };
 
-  const getServerAddress = () => {
+  const getServerAddress = (): Promise<string> => {
     if (isUndefined(server) === false) {
       const address = server.address();
       if (isNullOrUndefined(address) === true || isString(address) === true) {

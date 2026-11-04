@@ -17,12 +17,16 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {wrapperStyles, countStyles, listStyles, listItemStyles} from './badgesWithTooltip.styles';
 
 import {Badge} from '../badge';
 import {Tooltip} from '../tooltip';
 
-export const BadgesWithTooltip = ({items}: {items: string[]}) => {
+type BadgesWithTooltipProps = {items: string[]};
+
+export const BadgesWithTooltip: FunctionComponent<BadgesWithTooltipProps> = ({items}) => {
   if (items.length === 1) {
     return <BadgeWithCount item={items[0]} count={items.length} />;
   }
@@ -34,7 +38,9 @@ export const BadgesWithTooltip = ({items}: {items: string[]}) => {
   );
 };
 
-const BadgeWithCount = ({item, count}: {item: string; count: number}) => {
+type BadgeWithCountProps = {item: string; count: number};
+
+const BadgeWithCount: FunctionComponent<BadgeWithCountProps> = ({item, count}) => {
   return (
     <div css={wrapperStyles}>
       <Badge>{item}</Badge>
@@ -43,7 +49,9 @@ const BadgeWithCount = ({item, count}: {item: string; count: number}) => {
   );
 };
 
-const BadgeList = ({items}: {items: string[]}) => {
+type BadgeListProps = {items: string[]};
+
+const BadgeList: FunctionComponent<BadgeListProps> = ({items}) => {
   return (
     <ul css={listStyles}>
       {items.map(item => {

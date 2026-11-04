@@ -34,15 +34,15 @@ export class RegisterSuccessPage {
     );
   }
 
-  async clickOpenWireWebButton() {
+  async clickOpenWireWebButton(): Promise<void> {
     await this.openWireWebButton.click();
   }
 
-  async clickManageTeamButton() {
+  async clickManageTeamButton(): Promise<void> {
     await this.manageTeamButton.click();
   }
 
-  async isTeamSignUpSuccessMessageVisible() {
+  async isTeamSignUpSuccessMessageVisible(): Promise<boolean> {
     return await this.teamSignUpSuccessMessage.isVisible();
   }
 }

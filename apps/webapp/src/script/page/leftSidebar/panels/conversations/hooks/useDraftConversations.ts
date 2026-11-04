@@ -23,10 +23,9 @@ import {isNonEmptyArray, isNonEmptyString} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import {useDebouncedCallback} from 'use-debounce';
 
-import {DRAFT_STATE_CHANGED_EVENT} from 'Components/inputBar/common/draftState/draftState';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {StorageKey} from 'Repositories/storage';
-
+import {DRAFT_STATE_CHANGED_EVENT} from '../../../../../components/inputBar/common/draftState/draftState';
+import {Conversation} from '../../../../../repositories/entity/Conversation';
+import {StorageKey} from '../../../../../repositories/storage';
 import {conversationHasDraft} from '../utils/draftUtils';
 
 const draftCheckDebounceInMilliseconds = 200;
@@ -84,19 +83,19 @@ export const useDraftConversations = (conversations: Conversation[]): Conversati
     checkForDrafts();
 
     // Listen for draft changes in the current tab
-    const handleDraftChange = () => {
+    const handleDraftChange = (): void => {
       debouncedCheck();
     };
 
     // Listen for storage changes from other tabs
-    const handleStorageChange = (event: StorageEvent) => {
+    const handleStorageChange = (event: StorageEvent): void => {
       if (event.key?.includes(StorageKey.CONVERSATION.INPUT) === true) {
         debouncedCheck();
       }
     };
 
     // Listen for visibility changes to check when tab becomes active
-    const handleVisibilityChange = () => {
+    const handleVisibilityChange = (): void => {
       if (document.visibilityState === 'visible') {
         checkForDrafts();
       }

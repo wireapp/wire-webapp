@@ -37,11 +37,11 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import ko from 'knockout';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {Conversation} from '../entity/Conversation';
+import {ContentMessage} from '../entity/message/contentMessage';
 import {BaseError} from 'src/script/error/baseError';
-import {translate} from 'Util/localizerUtil';
-import {createUuid} from 'Util/uuid';
+import {translate} from '../../util/localizerUtil';
+import {createUuid} from '../../util/uuid';
 
 import {ACCESS_STATE} from './AccessState';
 import {ConversationDatabaseData, ConversationMapper, SelfStatusUpdateDatabaseData} from './ConversationMapper';
@@ -51,39 +51,39 @@ import {ConversationVerificationState} from './ConversationVerificationState';
 import {NOTIFICATION_STATE} from './NotificationSetting';
 
 import {entities, payload} from '../../../../test/api/payloads';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 
 describe('ConversationMapper', () => {
   describe('mapConversations', () => {
     it('throws an error for unexpected parameters', () => {
-      const functionCallUndefinedParam = () => {
+      const functionCallUndefinedParam = (): Conversation[] => {
         //@ts-expect-error
         return ConversationMapper.mapConversations();
       };
 
       expect(functionCallUndefinedParam).toThrow(BaseError.MESSAGE.MISSING_PARAMETER);
 
-      const functionCallEmtpyArray = () => {
+      const functionCallEmtpyArray = (): Conversation[] => {
         return ConversationMapper.mapConversations([], 1, translate);
       };
 
       expect(functionCallEmtpyArray).toThrow(BaseError.MESSAGE.INVALID_PARAMETER);
 
-      const functionCallWrongType = () => {
+      const functionCallWrongType = (): Conversation[] => {
         //@ts-expect-error
         return ConversationMapper.mapConversations('Conversation');
       };
 
       expect(functionCallWrongType).toThrow(BaseError.MESSAGE.INVALID_PARAMETER);
 
-      const functionCallUndefinedInArray = () => {
+      const functionCallUndefinedInArray = (): Conversation[] => {
         // @ts-expect-error intentionally exercises an invalid array item
         return ConversationMapper.mapConversations([undefined], 1, translate);
       };
 
       expect(functionCallUndefinedInArray).toThrow(BaseError.MESSAGE.MISSING_PARAMETER);
 
-      const functionCallStringInArray = () => {
+      const functionCallStringInArray = (): Conversation[] => {
         //@ts-expect-error
         return ConversationMapper.mapConversations(['Conversation']);
       };
@@ -119,6 +119,35 @@ describe('ConversationMapper', () => {
       expect(conversationEntity['mutedTimestamp']()).toEqual(expectedMutedTimestamp);
       expect(conversationEntity.last_event_timestamp()).toBe(initialTimestamp);
       expect(conversationEntity.last_server_timestamp()).toBe(initialTimestamp);
+    });
+
+    it('rehydrates a local manual unread timestamp without changing canonical read state', () => {
+      const lastReadTimestamp = Date.now();
+      const manualUnreadTimestamp = lastReadTimestamp - 1000;
+      const conversationData = {
+        ...entities.conversation,
+        members: undefined,
+        last_read_timestamp: lastReadTimestamp,
+        manual_unread_timestamp: manualUnreadTimestamp,
+      } as ConversationDatabaseData;
+
+      const [conversationEntity] = ConversationMapper.mapConversations([conversationData], 1, translate);
+
+      expect(conversationEntity.manualUnreadTimestamp()).toBe(manualUnreadTimestamp);
+      expect(conversationEntity.last_read_timestamp()).toBe(lastReadTimestamp);
+      expect(conversationEntity.effectiveReadTimestamp()).toBe(manualUnreadTimestamp - 1);
+    });
+
+    it('ignores a malformed persisted manual unread timestamp', () => {
+      const conversationData = {
+        ...entities.conversation,
+        members: undefined,
+        manual_unread_timestamp: 'invalid',
+      } as unknown as ConversationDatabaseData;
+
+      const [conversationEntity] = ConversationMapper.mapConversations([conversationData], 1, translate);
+
+      expect(conversationEntity.manualUnreadTimestamp()).toBeUndefined();
     });
 
     it('maps a backend conversation roles', () => {
@@ -361,6 +390,34 @@ describe('ConversationMapper', () => {
       const updatedConversationEntity = ConversationMapper.updateSelfStatus(conversationEntity, selfStatus);
 
       expect(updatedConversationEntity.last_event_timestamp()).toBe(timestamp);
+    });
+
+    it('does not change the local manual unread marker for unrelated self status updates', () => {
+      conversationEntity.manualUnreadTimestamp(123);
+      const selfStatus: Partial<SelfStatusUpdateDatabaseData> = {last_event_timestamp: Date.now()};
+      const updatedConversationEntity = ConversationMapper.updateSelfStatus(conversationEntity, selfStatus);
+
+      expect(updatedConversationEntity.manualUnreadTimestamp()).toBe(123);
+    });
+
+    it('preserves a local manual unread marker when a stale synchronized read state arrives', () => {
+      conversationEntity.last_read_timestamp(500);
+      conversationEntity.manualUnreadTimestamp(100);
+
+      ConversationMapper.updateSelfStatus(conversationEntity, {last_read_timestamp: 200});
+
+      expect(conversationEntity.last_read_timestamp()).toBe(500);
+      expect(conversationEntity.manualUnreadTimestamp()).toBe(100);
+    });
+
+    it('clears a local manual unread marker when a newer synchronized read state arrives', () => {
+      conversationEntity.last_read_timestamp(500);
+      conversationEntity.manualUnreadTimestamp(100);
+
+      ConversationMapper.updateSelfStatus(conversationEntity, {last_read_timestamp: 600});
+
+      expect(conversationEntity.last_read_timestamp()).toBe(600);
+      expect(conversationEntity.manualUnreadTimestamp()).toBeUndefined();
     });
 
     it('can update the self status using otr_archived', () => {

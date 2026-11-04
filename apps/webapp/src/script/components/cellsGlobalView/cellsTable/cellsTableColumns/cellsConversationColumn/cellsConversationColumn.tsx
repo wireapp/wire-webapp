@@ -17,22 +17,27 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {isUndefined} from '@sindresorhus/is';
 
-import {GroupAvatar, ChannelAvatar} from 'Components/avatar';
-import {openConversation} from 'Components/cellsGlobalView/common/openConversation/openConversation';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
-
 import {avatarWrapperStyles, textStyles, wrapperStyles} from './cellsConversationColumn.styles';
+
+import {Conversation} from '../../../../../repositories/entity/Conversation';
+import {useKoSubscribableChildren} from '../../../../../util/componentUtil';
+import {useChannelsFeatureFlag} from '../../../../../util/useChannelsFeatureFlag';
+import {GroupAvatar, ChannelAvatar} from '../../../../avatar';
+import {openConversation} from '../../../common/openConversation/openConversation';
 
 interface CellsConversationColumnProps {
   conversation?: Conversation;
   name: string;
 }
 
-export const CellsConversationColumn = ({conversation, name}: CellsConversationColumnProps) => {
+export const CellsConversationColumn: FunctionComponent<CellsConversationColumnProps> = ({
+  conversation,
+  name,
+}: CellsConversationColumnProps) => {
   if (isUndefined(conversation)) {
     return <span css={textStyles}>{name}</span>;
   }
@@ -40,7 +45,11 @@ export const CellsConversationColumn = ({conversation, name}: CellsConversationC
   return <ConversationAvatar conversation={conversation} />;
 };
 
-const ConversationAvatar = ({conversation}: {conversation: Conversation}) => {
+const ConversationAvatar: FunctionComponent<{conversation: Conversation}> = ({
+  conversation,
+}: {
+  conversation: Conversation;
+}) => {
   const {isChannel, display_name: displayName} = useKoSubscribableChildren(conversation, ['isChannel', 'display_name']);
   const {isChannelsEnabled} = useChannelsFeatureFlag();
 

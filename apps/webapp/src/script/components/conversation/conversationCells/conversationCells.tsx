@@ -21,17 +21,12 @@ import {memo, useCallback, useEffect, useRef, useState} from 'react';
 
 import {isNonEmptyArray} from '@sindresorhus/is';
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
+import {task} from 'true-myth';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {UserRepository} from 'Repositories/user/userRepository';
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {allowsAllFiles, hasAllowedExtension} from 'Util/fileTypeUtil';
 
 import {CellsHeader} from './cellsHeader/cellsHeader';
 import {CellsLoader} from './cellsLoader/cellsLoader';
@@ -45,7 +40,7 @@ import {
 import {getCellsApiPath} from './common/getCellsApiPath/getCellsApiPath';
 import {getCellsFilesPath} from './common/getCellsFilesPath/getCellsFilesPath';
 import {getLoadMoreOffset} from './common/loadMorePagination/loadMorePagination';
-import {isInRecycleBin as isCurrentPathInRecycleBin} from './common/recycleBin/recycleBin';
+import {isInRecycleBin as isCurrentPathInRecycleBin, RECYCLE_BIN_PATH} from './common/recycleBin/recycleBin';
 import {useCellsSorting} from './common/useCellsSorting/useCellsSorting';
 import {useCellsStore} from './common/useCellsStore/useCellsStore';
 import {useConversationDriveFilters} from './common/useConversationDriveFilters/useConversationDriveFilters';
@@ -66,6 +61,12 @@ import {useOnPresignedUrlExpired} from './useOnPresignedUrlExpired/useOnPresigne
 import {useRefreshCellsState} from './useRefreshCellsState/useRefreshCellsState';
 import {useSharedDriveFileDrop} from './useSharedDriveFileDrop';
 
+import {CellsRepository} from '../../../repositories/cells/cellsRepository';
+import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {UserRepository} from '../../../repositories/user/userRepository';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {allowsAllFiles, hasAllowedExtension} from '../../../util/fileTypeUtil';
 import {showFileDropzoneErrorModal} from '../useFilesUploadDropzone/showFileDropzoneErrorModal/showFileDropzoneErrorModal';
 
 interface ConversationCellsProps {
@@ -76,7 +77,7 @@ interface ConversationCellsProps {
   isSearchViewOpen: boolean;
   onOpenSearchView: () => void;
   onCloseSearchView: () => void;
-  isUploadFilesEnabled: boolean;
+  isFileUploadAllowed: boolean;
   showViewerPermission: boolean;
 }
 
@@ -89,7 +90,7 @@ export const ConversationCells = memo(
     isSearchViewOpen,
     onOpenSearchView,
     onCloseSearchView,
-    isUploadFilesEnabled,
+    isFileUploadAllowed,
     showViewerPermission,
   }: ConversationCellsProps) => {
     const {fireAndForgetInvoker, translate} = useApplicationContext();
@@ -99,10 +100,11 @@ export const ConversationCells = memo(
     const [activeFolderDropTargetName, setActiveFolderDropTargetName] = useState<string | null>(null);
     const [folderDropResetKey, setFolderDropResetKey] = useState(0);
     const [selectionBarAnchor, setSelectionBarAnchor] = useState<HTMLDivElement | null>(null);
-    const onUploadFiles = () => {
+    const [emptyBinSelectionResetKey, setEmptyBinSelectionResetKey] = useState(0);
+    const onUploadFiles = (): void | undefined => {
       return uploadInput.current?.click();
     };
-    const onUploadFolder = () => {
+    const onUploadFolder = (): void | undefined => {
       return folderUploadInput.current?.click();
     };
     const {
@@ -213,13 +215,57 @@ export const ConversationCells = memo(
       fireAndForgetInvoker.fireAndForget(refresh);
     }, [fireAndForgetInvoker, handleReload, isSearchMode, refresh]);
 
+    const handleEmptyBinSubmitted = useCallback((): void => {
+      setEmptyBinSelectionResetKey(currentKey => {
+        return currentKey + 1;
+      });
+    }, []);
+
+    const handleRefreshAndReportSuccess = useCallback(async (): Promise<boolean> => {
+      const refreshResult = await task.tryOrElse(
+        error => {
+          console.error(error);
+          return error;
+        },
+        () => {
+          return refresh({preserveStatusOnError: true});
+        },
+      );
+      return refreshResult.isOk && refreshResult.value;
+    }, [refresh]);
+
+    const handleRefreshAfterBulkMoveToBinOutcome = useCallback(async (): Promise<boolean> => {
+      const [sourceResult, binResult] = await Promise.all([
+        task.tryOrElse(
+          error => {
+            return error;
+          },
+          () => {
+            return refresh({preserveStatusOnError: true});
+          },
+        ),
+        task.tryOrElse(
+          error => {
+            return error;
+          },
+          () => {
+            return cellsRepository.getAllNodes({
+              path: getCellsApiPath({conversationQualifiedId, currentPath: RECYCLE_BIN_PATH}),
+              deleted: true,
+            });
+          },
+        ),
+      ]);
+      return sourceResult.isOk && sourceResult.value && binResult.isOk;
+    }, [cellsRepository, conversationQualifiedId, refresh]);
+
     const sharedDriveUploadPath = getCellsApiPath({conversationQualifiedId, currentPath: getCellsFilesPath()});
     const sharedDriveConversationQualifiedId = `${conversationQualifiedId.id}@${conversationQualifiedId.domain}`;
 
     useEffect(() => {
       sharedDriveUploadController.updateRefresh(sharedDriveConversationQualifiedId, handleRefresh);
     }, [handleRefresh, sharedDriveConversationQualifiedId, sharedDriveUploadController]);
-    const canUploadToSharedDrive = isUploadFilesEnabled && !showViewerPermission;
+    const canUploadToSharedDrive = isFileUploadAllowed && !showViewerPermission;
     const maxSharedDriveUploadFileSize = Config.getConfig().MAXIMUM_ASSET_FILE_SIZE_CELLS;
     const handleSharedDriveUploadRejection = useCallback(
       (rejection: SharedDriveDropRejection): void => {
@@ -329,7 +375,7 @@ export const ConversationCells = memo(
       <CellsSelfUserDriveRoleProvider selfUserDriveRole={selfUserDriveRole}>
         <SharedDriveDropzone
           dragStateResetKey={folderDropResetKey}
-          isEnabled={isCellsStateReady && isUploadFilesEnabled && !isInRecycleBin}
+          isEnabled={isCellsStateReady && !isInRecycleBin}
           isFileDropAllowed={canUploadToSharedDrive}
           isOverlaySuppressed={activeFolderDropTargetName !== null}
           onDragStateReset={resetSharedDriveDropState}
@@ -345,6 +391,9 @@ export const ConversationCells = memo(
             />
             <CellsHeader
               onRefresh={handleRefresh}
+              onRefreshAfterEmptyBinOutcome={handleRefreshAndReportSuccess}
+              onEmptyBinSubmitted={handleEmptyBinSubmitted}
+              getCurrentCellsPath={getCellsFilesPath}
               conversationName={name}
               conversationQualifiedId={conversationQualifiedId}
               cellsRepository={cellsRepository}
@@ -356,7 +405,7 @@ export const ConversationCells = memo(
               onSearchClear={handleClearSearch}
               onUploadFiles={onUploadFiles}
               onUploadFolder={onUploadFolder}
-              isUploadFilesEnabled={isUploadFilesEnabled}
+              isUploadFilesEnabled={canUploadToSharedDrive}
               filters={filters}
               showViewerPermission={showViewerPermission}
               onSelectionBarAnchorChange={setSelectionBarAnchor}
@@ -364,11 +413,14 @@ export const ConversationCells = memo(
             {isTableVisible && (
               <CellsTable
                 nodes={isLoading ? [] : nodes}
+                isNodesLoading={isLoading}
                 cellsRepository={cellsRepository}
                 conversation={activeConversation}
                 conversationQualifiedId={conversationQualifiedId}
                 conversationName={name}
                 onRefresh={handleRefresh}
+                onRefreshAndReportSuccess={handleRefreshAndReportSuccess}
+                onRefreshAfterBulkMoveToBinOutcome={handleRefreshAfterBulkMoveToBinOutcome}
                 // opening a folder must close search view and open the browse view
                 // with that folder (and breadcrumbs)
                 onCloseSearchView={handleSearchViewClosure}
@@ -377,7 +429,7 @@ export const ConversationCells = memo(
                 isSortingEnabled={!isInRecycleBin}
                 onToggleSort={toggleSort}
                 selectionEnabled={!isSearchMode}
-                selectionScopeKey={`${conversationId}:${getCellsFilesPath()}:${isInRecycleBin ? 'bin' : 'files'}`}
+                selectionScopeKey={`${conversationId}:${getCellsFilesPath()}:${isInRecycleBin ? 'bin' : 'files'}:${emptyBinSelectionResetKey}`}
                 selectionBarAnchor={selectionBarAnchor}
                 onFolderDropTargetChange={setActiveFolderDropTargetName}
                 onDropFilesToFolder={!isInRecycleBin && canUploadToSharedDrive ? handleDropFilesToFolder : undefined}

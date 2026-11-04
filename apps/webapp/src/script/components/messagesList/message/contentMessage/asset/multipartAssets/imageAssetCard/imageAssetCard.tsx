@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {ICellAsset} from '@wireapp/protocol-messaging';
 
 import {ImageAssetLarge} from './imageAssetLarge/imageAssetLarge';
@@ -36,7 +38,7 @@ interface ImageAssetCardProps {
   id: string;
 }
 
-export const ImageAssetCard = ({
+export const ImageAssetCard: FunctionComponent<ImageAssetCardProps> = ({
   id,
   filePreviewUrl,
   fileUrl,

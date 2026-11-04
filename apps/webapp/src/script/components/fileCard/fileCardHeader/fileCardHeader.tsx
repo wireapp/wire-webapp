@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode} from 'react';
+import {ReactNode, type FunctionComponent} from 'react';
 
 import {wrapperStyles} from './fileCardHeader.styles';
 
@@ -25,7 +25,7 @@ interface FileCardHeaderProps {
   children: ReactNode;
 }
 
-export const FileCardHeader = ({children}: FileCardHeaderProps) => {
+export const FileCardHeader: FunctionComponent<FileCardHeaderProps> = ({children}: FileCardHeaderProps) => {
   return (
     <header css={wrapperStyles} data-file-card="header">
       {children}

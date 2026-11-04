@@ -17,8 +17,7 @@
  *
  */
 
-import type {Translate} from 'Util/localizerUtil';
-
+import type {Translate} from '../../../util/localizerUtil';
 import {PrimaryModal} from '../PrimaryModal';
 
 export const showWarningModal = (title: string, message: string, translate: Translate): void => {

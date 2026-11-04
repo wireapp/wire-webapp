@@ -25,7 +25,7 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {ShowMoreButton} from './showMoreButton';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../../../util/test/translateForTest';
 
 describe('ShowMoreButton', () => {
   const rootProviderWrapper = createRootProviderWrapperForTest(

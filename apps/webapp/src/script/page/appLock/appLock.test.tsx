@@ -22,23 +22,23 @@ import {FEATURE_STATUS} from '@wireapp/api-client/lib/team/feature/';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {WebAppEvents} from '../../webAppEvents';
 
-import en from 'I18n/en-US.json';
-import type {ClientRepository} from 'Repositories/client';
-import {User} from 'Repositories/entity/User/User';
-import {TeamState} from 'Repositories/team/TeamState';
-import {AppLockCrypto, AppLockRepository} from 'Repositories/user/appLockRepository';
-import {AppLockState} from 'Repositories/user/appLockState';
-import {UserState} from 'Repositories/user/userState';
+import en from '../../../i18n/en-US.json';
+import type {ClientRepository} from '../../repositories/client';
+import {User} from '../../repositories/entity/User/User';
+import {TeamState} from '../../repositories/team/TeamState';
+import {AppLockCrypto, AppLockRepository} from '../../repositories/user/appLockRepository';
+import {AppLockState} from '../../repositories/user/appLockState';
+import {UserState} from '../../repositories/user/userState';
 import {withTheme, withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {setStrings, translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
-import {createUuid} from 'Util/uuid';
+import {setStrings, translate} from '../../util/localizerUtil';
+import {translateForTest} from '../../util/test/translateForTest';
+import {createUuid} from '../../util/uuid';
 
 import {AppLock, APPLOCK_STATE} from './appLock';
 
@@ -83,7 +83,7 @@ const createTeamState = ({
   enforceAppLock?: boolean;
   inactivityTimeoutSecs?: number;
   status?: string;
-} = {}) => {
+} = {}): TeamState => {
   const teamState = new TeamState();
   jest.spyOn(teamState, 'isTeam').mockImplementation(
     ko.pureComputed(() => {
@@ -103,13 +103,13 @@ const createTeamState = ({
   return teamState;
 };
 
-const createAppLockState = (teamState?: TeamState) => {
+const createAppLockState = (teamState?: TeamState): AppLockState => {
   teamState = teamState ?? createTeamState();
   const appLockState = new AppLockState(teamState);
   return appLockState;
 };
 
-const createAppLockRepository = (appLockState?: AppLockState) => {
+const createAppLockRepository = (appLockState?: AppLockState): AppLockRepository => {
   const userState = new UserState();
   appLockState = appLockState ?? createAppLockState();
   userState.self(new User(createUuid(), '', translateForTest));

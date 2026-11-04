@@ -17,41 +17,42 @@
  *
  */
 
-import {act, fireEvent, render, waitFor} from '@testing-library/react';
+import {act, fireEvent, render, waitFor, type RenderResult} from '@testing-library/react';
 
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {FEATURE_STATUS} from '@wireapp/api-client/lib/team/feature/';
 
-import {FileWithPreview} from 'Components/conversation/useFilesUploadState/useFilesUploadState';
-import {InputBar} from 'Components/inputBar/index';
-import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {EventRepository} from 'Repositories/event/EventRepository';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {PropertiesService} from 'Repositories/properties/propertiesService';
-import {SearchRepository} from 'Repositories/search/searchRepository';
-import {SelfService} from 'Repositories/self/SelfService';
-import {StorageRepository} from 'Repositories/storage';
-import {TeamState} from 'Repositories/team/TeamState';
+import {FileWithPreview} from '../conversation/useFilesUploadState/useFilesUploadState';
+import {InputBar} from './';
+import {AssetRepository} from '../../repositories/assets/assetRepository';
+import {CellsRepository} from '../../repositories/cells/cellsRepository';
+import {ConversationRepository} from '../../repositories/conversation/ConversationRepository';
+import {MessageRepository} from '../../repositories/conversation/MessageRepository';
+import {Conversation} from '../../repositories/entity/Conversation';
+import {User} from '../../repositories/entity/User';
+import {EventRepository} from '../../repositories/event/EventRepository';
+import {PropertiesRepository} from '../../repositories/properties/propertiesRepository';
+import {PropertiesService} from '../../repositories/properties/propertiesService';
+import {SearchRepository} from '../../repositories/search/searchRepository';
+import {SelfService} from '../../repositories/self/SelfService';
+import {StorageRepository} from '../../repositories/storage';
+import {TeamState} from '../../repositories/team/TeamState';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {Config} from 'src/script/Config';
 import {disableMessagePreprocessingFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
-import {translate} from 'Util/localizerUtil';
+import {translate} from '../../util/localizerUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {createUuid} from 'Util/uuid';
+import {createUuid} from '../../util/uuid';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
+import type {ReactNode} from 'react';
 
-jest.mock('Components/avatar', () => {
+jest.mock('../avatar', () => {
   return {
     AVATAR_SIZE: {X_LARGE: 'avatar-xl'},
     Avatar: () => {
@@ -83,7 +84,8 @@ describe('InputBar', () => {
   });
 
   let propertiesRepository: PropertiesRepository;
-  const createRootProviderWrapper = () => {
+  type CreateRootProviderWrapperResult = (properties: {readonly children: ReactNode}) => ReactNode;
+  const createRootProviderWrapper = (): CreateRootProviderWrapperResult => {
     return createRootProviderWrapperForTest(
       createRootContextValueForTest({
         translate: translateForTest,
@@ -91,7 +93,30 @@ describe('InputBar', () => {
     );
   };
 
-  const getDefaultProps = () => {
+  type GetDefaultPropsResult = {
+    assetRepository: AssetRepository;
+    conversation: Conversation;
+    cellsRepository: CellsRepository;
+    files: FileWithPreview[];
+    conversationRepository: ConversationRepository;
+    eventRepository: EventRepository;
+    messageRepository: MessageRepository;
+    openGiphy: jest.Mock<any, any, any>;
+    propertiesRepository: PropertiesRepository;
+    searchRepository: SearchRepository;
+    storageRepository: StorageRepository;
+    isCellsEnabled: boolean;
+    teamState: TeamState;
+    selfUser: User;
+    onShiftTab: jest.Mock<any, any, any>;
+    uploadDroppedFiles: jest.Mock<any, any, any>;
+    uploadImages: jest.Mock<any, any, any>;
+    uploadPastedFiles: jest.Mock<any, any, any>;
+    uploadFiles: jest.Mock<any, any, any>;
+    onCellImageUpload: jest.Mock<any, any, any>;
+    onCellAssetUpload: jest.Mock<any, any, any>;
+  };
+  const getDefaultProps = (): GetDefaultPropsResult => {
     return {
       assetRepository: new AssetRepository(),
       conversation: new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest),
@@ -211,7 +236,7 @@ describe('InputBar', () => {
       FEATURE: {...defaultConfig.FEATURE, ENABLE_MESSAGE_FORMAT_BUTTONS: true},
     });
 
-    const renderWithMessagePreprocessingDisabled = (isDisabled: boolean) => {
+    const renderWithMessagePreprocessingDisabled = (isDisabled: boolean): RenderResult => {
       const featureToggleRootContextValue = createRootContextValueForTest({
         isFeatureToggleEnabled: (featureToggleName: string) => {
           return featureToggleName === disableMessagePreprocessingFeatureToggleName && isDisabled;

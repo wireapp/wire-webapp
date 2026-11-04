@@ -17,9 +17,9 @@
  *
  */
 
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import type {EventService} from 'Repositories/event/EventService';
-import {translateForTest} from 'Util/test/translateForTest';
+import {ContentMessage} from '../entity/message/contentMessage';
+import type {EventService} from '../event/EventService';
+import {translateForTest} from '../../util/test/translateForTest';
 
 import {ConversationEphemeralHandler} from './ConversationEphemeralHandler';
 

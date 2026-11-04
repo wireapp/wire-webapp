@@ -21,13 +21,12 @@ import {isTruthy, isUndefined} from '@sindresorhus/is';
 import {CONVERSATION_EVENT, ConversationMemberJoinEvent} from '@wireapp/api-client/lib/event/';
 import {UserType, type QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {MemberJoinEvent, OneToOneCreationEvent} from 'Repositories/conversation/EventBuilder';
-import {User} from 'Repositories/entity/User';
-import type {UserRepository} from 'Repositories/user/userRepository';
-import {getLogger, Logger} from 'Util/logger';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-
+import {getLogger, Logger} from '../../../util/logger';
+import {matchQualifiedIds} from '../../../util/qualifiedId';
+import type {ConversationRepository} from '../../conversation/ConversationRepository';
+import {MemberJoinEvent, OneToOneCreationEvent} from '../../conversation/EventBuilder';
+import {User} from '../../entity/User';
+import type {UserRepository} from '../../user/userRepository';
 import {ClientEvent} from '../Client';
 import {EventMiddleware, IncomingEvent} from '../EventProcessor';
 
@@ -45,7 +44,7 @@ export class ServiceMiddleware implements EventMiddleware {
     this.logger = getLogger('ServiceMiddleware');
   }
 
-  processEvent(event: IncomingEvent) {
+  processEvent(event: IncomingEvent): Promise<IncomingEvent> {
     switch (event.type) {
       case ClientEvent.CONVERSATION.ONE2ONE_CREATION:
         return this.process1To1ConversationCreationEvent(event);
@@ -58,7 +57,7 @@ export class ServiceMiddleware implements EventMiddleware {
     }
   }
 
-  private async processMemberJoinEvent(event: MemberJoinEvent | ConversationMemberJoinEvent) {
+  private async processMemberJoinEvent(event: MemberJoinEvent | ConversationMemberJoinEvent): Promise<IncomingEvent> {
     this.logger.info(`Preprocessing event of type ${event.type}`);
 
     const {conversation: conversationId, qualified_conversation, data: eventData} = event;
@@ -92,20 +91,22 @@ export class ServiceMiddleware implements EventMiddleware {
     return userIds;
   }
 
-  private async process1To1ConversationCreationEvent(event: OneToOneCreationEvent) {
+  private async process1To1ConversationCreationEvent(event: OneToOneCreationEvent): Promise<IncomingEvent> {
     this.logger.info(`Preprocessing event of type ${event.type}`);
     const hasService = await this.containsService(event.data.userIds);
     return hasService ? this.decorateWithHasServiceFlag(event) : event;
   }
 
-  private async containsService(users: QualifiedId[]) {
+  private async containsService(users: QualifiedId[]): Promise<boolean> {
     const userEntities = await this.userRepository.getUsersById(users);
     return userEntities.some(userEntity => {
       return userEntity.isService || userEntity.type === UserType.APP;
     });
   }
 
-  private decorateWithHasServiceFlag(event: MemberJoinEvent | ConversationMemberJoinEvent | OneToOneCreationEvent) {
+  private decorateWithHasServiceFlag(
+    event: MemberJoinEvent | ConversationMemberJoinEvent | OneToOneCreationEvent,
+  ): IncomingEvent {
     const updatedData = {...event.data, has_service: true};
     return {...event, data: updatedData} as IncomingEvent;
   }

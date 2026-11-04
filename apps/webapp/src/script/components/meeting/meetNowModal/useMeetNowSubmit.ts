@@ -19,14 +19,19 @@
 
 import {useState} from 'react';
 
-import {useMeetingPrepModal} from 'Components/meeting/meetingPrep/useMeetingPrepModal';
-import {useMeetingStore} from 'Components/meeting/meetingStore/meetingStoreProvider';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import type {MeetNowFormState, MeetNowSubmitResult} from './meetNowTypes';
 import {submitMeetNow} from './submitMeetNow';
 
-export const useMeetNowSubmit = () => {
+import {useMeetingPrepModal} from '../meetingPrep/useMeetingPrepModal';
+import {useMeetingStore} from '../meetingStore/meetingStoreProvider';
+
+type UseMeetNowSubmitResult = {
+  isSubmitting: boolean;
+  submit: (formState: MeetNowFormState) => Promise<MeetNowSubmitResult>;
+};
+export const useMeetNowSubmit = (): UseMeetNowSubmitResult => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const {translate, clock} = useApplicationContext();
   const meetNowMeeting = useMeetingStore(state => {

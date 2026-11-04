@@ -21,25 +21,25 @@ import {fireEvent, render} from '@testing-library/react';
 
 import {CALL_TYPE, VIDEO_STATE} from '@wireapp/avs';
 
-import {Call} from 'Repositories/calling/Call';
-import {Participant} from 'Repositories/calling/Participant';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {backgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
+import {Call} from '../../repositories/calling/Call';
+import {Participant} from '../../repositories/calling/Participant';
+import {Conversation} from '../../repositories/entity/Conversation';
+import {User} from '../../repositories/entity/User';
+import {backgroundEffectsStore} from '../../repositories/media/useBackgroundEffectsStore';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
   requireValueForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {translate} from 'Util/localizerUtil';
+import {translate} from '../../util/localizerUtil';
 
 import {GroupVideoGrid, GroupVideoGripProps} from './GroupVideoGrid';
 
 import {buildMediaDevicesHandler} from '../../auth/util/test/testUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-jest.mock('Components/avatar', () => {
+jest.mock('../avatar', () => {
   return {
     AVATAR_SIZE: {MEDIUM: 'medium', LARGE: 'large'},
     Avatar: () => {
@@ -56,7 +56,7 @@ const createMockParticipant = (
   userId: string,
   clientId: string,
   {isMuted = false, isAudioEstablished = true}: {isMuted?: boolean; isAudioEstablished?: boolean},
-) => {
+): Participant => {
   const user = new User(userId, '', translateForTest);
 
   const participant = new Participant(user, clientId);
@@ -66,7 +66,7 @@ const createMockParticipant = (
   return participant;
 };
 
-const createMockCall = () => {
+const createMockCall = (): Call => {
   return new Call(
     {domain: '', id: ''},
     new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest),
@@ -77,7 +77,7 @@ const createMockCall = () => {
   );
 };
 
-const createMediaStream = () => {
+const createMediaStream = (): MediaStream => {
   return {
     getVideoTracks: jest.fn(() => {
       return [];

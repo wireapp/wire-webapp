@@ -31,7 +31,18 @@ function createEvent(files: readonly File[]): ChangeEvent<HTMLInputElement> {
   return {target: {files, value: 'selected'}} as unknown as ChangeEvent<HTMLInputElement>;
 }
 
-function createDependencies() {
+type CreateDependenciesResult = {
+  fireAndForgetInvoker: FireAndForgetInvoker;
+  sharedDriveUploadController: SharedDriveUploadController;
+  onRefresh: jest.Mock<any, any, any>;
+  onReject: jest.Mock<any, any, any>;
+  conversationQualifiedId: string;
+  isUploadFilesEnabled: boolean;
+  isInRecycleBin: boolean;
+  maxFileSize: number;
+  isAcceptedFile: jest.Mock<boolean, [_: File], any>;
+};
+function createDependencies(): CreateDependenciesResult {
   const fireAndForgetInvoker: FireAndForgetInvoker = {
     fireAndForget: jest.fn(),
     waitUntilAllSettled: jest.fn().mockResolvedValue(undefined),
@@ -58,7 +69,7 @@ function createDependencies() {
   };
 }
 
-function getUploadAction(fireAndForgetInvoker: FireAndForgetInvoker) {
+function getUploadAction(fireAndForgetInvoker: FireAndForgetInvoker): () => Promise<unknown> {
   return (fireAndForgetInvoker.fireAndForget as jest.MockedFunction<FireAndForgetInvoker['fireAndForget']>).mock
     .calls[0][0];
 }

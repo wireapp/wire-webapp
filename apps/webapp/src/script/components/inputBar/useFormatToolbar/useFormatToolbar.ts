@@ -21,14 +21,15 @@ import {useState} from 'react';
 
 import {amplify} from 'amplify';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {StorageKey} from 'Repositories/storage';
-import {EventName} from 'Repositories/tracking/eventName';
 import {Config} from 'src/script/Config';
-import {loadValue, storeValue} from 'Util/storageUtil';
 
-export const useFormatToolbar = () => {
+import {StorageKey} from '../../../repositories/storage';
+import {EventName} from '../../../repositories/tracking/eventName';
+import {loadValue, storeValue} from '../../../util/storageUtil';
+import {WebAppEvents} from '../../../webAppEvents';
+
+type UseFormatToolbarResult = {open: boolean; handleClick: () => void};
+export const useFormatToolbar = (): UseFormatToolbarResult => {
   const [open, setOpen] = useState(() => {
     const messageFormatButtonsEnabled = Config.getConfig().FEATURE.ENABLE_MESSAGE_FORMAT_BUTTONS;
     const storageValue = loadValue<boolean>(StorageKey.INPUT.SHOW_FORMATTING);
@@ -40,7 +41,7 @@ export const useFormatToolbar = () => {
     return false;
   });
 
-  const handleClick = () => {
+  const handleClick = (): void => {
     const nextValue = !open;
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.INPUT.FORMAT_TEXT[nextValue ? 'ENABLED' : 'DISABLED']);
     storeValue(StorageKey.INPUT.SHOW_FORMATTING, nextValue);

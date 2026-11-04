@@ -36,6 +36,9 @@ export interface DecodedHeader {
   memlimit: number;
 }
 
+type BackupHeaderReadResult = {decodedHeader: DecodedHeader; headerSize: number};
+type BackupHeaderDecodeResult = BackupHeaderReadResult & {decodingError: string | null};
+
 export const ENCRYPTED_BACKUP_FORMAT = 'WBUX';
 export const ENCRYPTED_BACKUP_VERSION = '03';
 export const ERROR_TYPES = {
@@ -64,7 +67,7 @@ export class BackUpHeader {
     this.password = password;
   }
 
-  async encodeHeader() {
+  async encodeHeader(): Promise<Uint8Array<ArrayBuffer>> {
     await ready;
     const {
       BACKUP_HEADER_FORMAT_LENGTH,
@@ -117,9 +120,7 @@ export class BackUpHeader {
     return nextPos;
   }
 
-  async decodeHeader(
-    encryptedDataSource: Uint8Array,
-  ): Promise<{decodingError: string | null; decodedHeader: DecodedHeader; headerSize: number}> {
+  async decodeHeader(encryptedDataSource: Uint8Array): Promise<BackupHeaderDecodeResult> {
     const dataSrc = new Uint8Array(encryptedDataSource);
     const {decodedHeader, headerSize} = this.readBackupHeader(dataSrc);
 
@@ -141,7 +142,7 @@ export class BackUpHeader {
     decodedHeader: DecodedHeader,
     expectedHashedUserId: Uint8Array,
     storedHashedUserId: Uint8Array,
-  ) {
+  ): string | null {
     const {format, version} = decodedHeader;
     if (!memcmp(expectedHashedUserId, storedHashedUserId)) {
       return ERROR_TYPES.INVALID_USER_ID;
@@ -153,7 +154,7 @@ export class BackUpHeader {
     return null;
   }
 
-  async generateChaCha20Key(header: DecodedHeader) {
+  async generateChaCha20Key(header: DecodedHeader): Promise<Uint8Array<ArrayBufferLike>> {
     await ready;
 
     return sodium.crypto_pwhash(
@@ -178,7 +179,7 @@ export class BackUpHeader {
     ) as Uint8Array;
   }
 
-  readBackupHeader(data: Uint8Array): {decodedHeader: DecodedHeader; headerSize: number} {
+  readBackupHeader(data: Uint8Array): BackupHeaderReadResult {
     const {
       BACKUP_HEADER_FORMAT_LENGTH,
       BACKUP_HEADER_EXTRA_GAP_LENGTH,

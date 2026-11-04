@@ -31,7 +31,17 @@ import {stringifyQualifiedId} from '../../../util/qualifiedIdUtil';
 import {RecurringTaskScheduler} from '../../../util/recurringTaskScheduler';
 import {MLSService} from '../mlsService';
 
-async function buildE2EIService(dbName = 'core-test-db') {
+type E2EIServiceTestSetup = readonly [
+  E2EIServiceExternal,
+  {
+    readonly coreCrypto: jest.Mocked<CoreCrypto>;
+    readonly mlsService: MLSService;
+    readonly recurringTaskScheduler: RecurringTaskScheduler;
+    readonly transactionContext: jest.Mocked<CoreCryptoContext>;
+  },
+];
+
+async function buildE2EIService(dbName = 'core-test-db'): Promise<E2EIServiceTestSetup> {
   const transactionContext = {
     e2eiIsPKIEnvSetup: jest.fn(),
     e2eiRegisterAcmeCA: jest.fn(),
@@ -84,7 +94,7 @@ function generateCoreCryptoIdentity({
   userId: string;
   status?: string;
   deviceId?: string;
-}) {
+}): WireIdentity {
   return {
     clientId: `${userId}:${deviceId}@elna.wire.link`,
     handle: 'adrian_wire2@elna.wire.link',

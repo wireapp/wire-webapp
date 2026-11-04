@@ -17,9 +17,11 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
-export const BlurHighIcon = (props: SVGIconProps) => {
+export const BlurHighIcon: FunctionComponent<SVGIconProps> = props => {
   return (
     <SVGIcon realWidth={23} realHeight={23} viewBox="0 0 23 23" {...props} xmlns="http://www.w3.org/2000/svg">
       <g clipPath="url(#clip0_3416_355)">

@@ -17,34 +17,35 @@
  *
  */
 
-import {type ReactNode, useEffect, useMemo} from 'react';
+import {type ReactNode, useEffect, useMemo, type FunctionComponent} from 'react';
 
 import {container} from 'tsyringe';
 
-import {createMeetingReminderOsNotifier} from 'Components/meeting/createMeetingReminderOsNotifier';
-import {createMeetingReminderScheduler} from 'Components/meeting/createMeetingReminderScheduler';
-import {createBrowserDeviceTimeZone} from 'Components/meeting/deviceTimeZone';
-import {createMeetingNotificationEventHandlers} from 'Components/meeting/meetingNotificationEventHandlers';
+import {createBrowserSystemNotificationApi} from 'src/script/browser/notification/createSystemNotificationApiFromBrowserNotification';
+import {useApplicationContext} from 'src/script/page/rootProvider';
+
+import {createMeetingLifecycleDispatcher} from './createMeetingLifecycleDispatcher';
+import {createMeetingStore} from './createMeetingStore';
+import {MeetingStoreProvider} from './meetingStoreProvider';
+import {subscribeToMeetingConversationEvents} from './subscribeToMeetingConversationEvents';
+import {subscribeToMeetingLifecycleEvents} from './subscribeToMeetingLifecycleEvents';
+
+import {UserState} from '../../../repositories/user/userState';
+import {getLogger} from '../../../util/logger';
+import {formatTimeShort} from '../../../util/timeUtil';
+import {useMeetingsFeatureFlag} from '../../../util/useMeetingsFeatureFlag';
+import {createMeetingReminderOsNotifier} from '../createMeetingReminderOsNotifier';
+import {createMeetingReminderScheduler} from '../createMeetingReminderScheduler';
+import {createBrowserDeviceTimeZone} from '../deviceTimeZone';
+import {createMeetingNotificationEventHandlers} from '../meetingNotificationEventHandlers';
 import {
   MeetingNotificationKind,
   useMeetingNotificationStore,
-} from 'Components/meeting/meetingNotificationStore/meetingNotificationStore';
-import {useMeetingPrepModal} from 'Components/meeting/meetingPrep/useMeetingPrepModal';
-import {createMeetingStore} from 'Components/meeting/meetingStore/createMeetingStore';
-import {MeetingStoreProvider} from 'Components/meeting/meetingStore/meetingStoreProvider';
-import {resolveCurrentMeetingReminderPayload} from 'Components/meeting/resolveCurrentMeetingReminderPayload';
-import {deleteMeetingForAll, deleteMeetingForMe} from 'Components/meeting/shared/service/deleteMeeting';
-import {meetNowMeeting, scheduleMeeting, updateMeeting} from 'Components/meeting/shared/service/meetingService';
-import {UserState} from 'Repositories/user/userState';
-import {createBrowserSystemNotificationApi} from 'src/script/browser/notification/createSystemNotificationApiFromBrowserNotification';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {getLogger} from 'Util/logger';
-import {formatTimeShort} from 'Util/timeUtil';
-import {useMeetingsFeatureFlag} from 'Util/useMeetingsFeatureFlag';
-
-import {createMeetingLifecycleDispatcher} from './createMeetingLifecycleDispatcher';
-import {subscribeToMeetingConversationEvents} from './subscribeToMeetingConversationEvents';
-import {subscribeToMeetingLifecycleEvents} from './subscribeToMeetingLifecycleEvents';
+} from '../meetingNotificationStore/meetingNotificationStore';
+import {useMeetingPrepModal} from '../meetingPrep/useMeetingPrepModal';
+import {resolveCurrentMeetingReminderPayload} from '../resolveCurrentMeetingReminderPayload';
+import {deleteMeetingForAll, deleteMeetingForMe} from '../shared/service/deleteMeeting';
+import {meetNowMeeting, scheduleMeeting, updateMeeting} from '../shared/service/meetingService';
 
 const logger = getLogger('MeetingStoreRoot');
 
@@ -56,7 +57,7 @@ type MeetingStoreRootProps = {
  * Owns the single meeting store of a signed-in session and keeps it in sync with the
  * meeting lifecycle events, independently of whether the meetings view is currently rendered.
  */
-export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
+export const MeetingStoreRoot: FunctionComponent<MeetingStoreRootProps> = ({children}: MeetingStoreRootProps) => {
   const {mainViewModel, clock, translate} = useApplicationContext();
   const {isMeetingsEnabled} = useMeetingsFeatureFlag();
   const {
@@ -161,7 +162,8 @@ export const MeetingStoreRoot = ({children}: MeetingStoreRootProps) => {
       },
     });
 
-    const getSelfUserQualifiedId = () => {
+    type GetSelfUserQualifiedIdResult = {domain: string; id: string};
+    const getSelfUserQualifiedId = (): GetSelfUserQualifiedIdResult => {
       return container.resolve(UserState).self().qualifiedId;
     };
 

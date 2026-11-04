@@ -17,29 +17,29 @@
  *
  */
 
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, FlexBox} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {ProgressBar} from 'Components/ProgressBar/ProgressBar';
-import {CancelError} from 'Repositories/backup/error';
-import {ClientState} from 'Repositories/client/ClientState';
-import {User} from 'Repositories/entity/User';
-import {EventName} from 'Repositories/tracking/eventName';
-import {Segmentation} from 'Repositories/tracking/segmentation';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {ContentState} from 'src/script/page/useAppState';
-import {getLogger} from 'Util/logger';
-import {getCurrentDate} from 'Util/timeUtil';
-import {downloadBlob} from 'Util/util';
 
 import {Config} from '../../Config';
+import {CancelError} from '../../repositories/backup/error';
+import {ClientState} from '../../repositories/client/ClientState';
+import {User} from '../../repositories/entity/User';
+import {EventName} from '../../repositories/tracking/eventName';
+import {Segmentation} from '../../repositories/tracking/segmentation';
+import {getLogger} from '../../util/logger';
+import {getCurrentDate} from '../../util/timeUtil';
+import {downloadBlob} from '../../util/util';
+import {WebAppEvents} from '../../webAppEvents';
+import {PrimaryModal} from '../Modals/PrimaryModal';
+import {ProgressBar} from '../ProgressBar/ProgressBar';
 
 enum ExportState {
   COMPRESSING = 'ExportState.STATE.COMPRESSING',
@@ -64,7 +64,11 @@ interface HistoryExportProps {
   readonly clientState?: ClientState;
 }
 
-const HistoryExport = ({switchContent, user, clientState = container.resolve(ClientState)}: HistoryExportProps) => {
+const HistoryExport: FunctionComponent<HistoryExportProps> = ({
+  switchContent,
+  user,
+  clientState = container.resolve(ClientState),
+}: HistoryExportProps) => {
   const {mainViewModel, translate} = useApplicationContext();
 
   const [historyState, setHistoryState] = useState<ExportState>(ExportState.PREPARING);
@@ -130,7 +134,7 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
     [dismissExport],
   );
 
-  const downloadArchiveFile = () => {
+  const downloadArchiveFile = (): void => {
     const {
       FEATURE: {ENABLE_CROSS_PLATFORM_BACKUP_EXPORT},
     } = Config.getConfig();
@@ -148,7 +152,7 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
     }
   };
 
-  const onCancel = () => {
+  const onCancel = (): void => {
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.HISTORY.BACKUP_CANCELLED, {
       [Segmentation.GENERAL.STEP]: Segmentation.BACKUP_CREATION.CANCELLATION_STEP.DURING_BACKUP,
     });

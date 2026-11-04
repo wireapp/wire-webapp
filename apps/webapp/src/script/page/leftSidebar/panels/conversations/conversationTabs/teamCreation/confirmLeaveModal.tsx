@@ -17,15 +17,12 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {amplify} from 'amplify';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
-import * as Icon from 'Components/icon';
-import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {EventName} from 'Repositories/tracking/eventName';
-import {Segmentation} from 'Repositories/tracking/segmentation';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {
@@ -35,23 +32,29 @@ import {
   confirmLeaveModalWrapperCss,
 } from './teamCreation.styles';
 
+import * as Icon from '../../../../../../components/icon';
+import {ModalComponent} from '../../../../../../components/Modals/ModalComponent';
+import {EventName} from '../../../../../../repositories/tracking/eventName';
+import {Segmentation} from '../../../../../../repositories/tracking/segmentation';
+import {WebAppEvents} from '../../../../../../webAppEvents';
+
 interface Props {
   isShown: boolean;
   onClose: () => void;
   onLeave: () => void;
 }
 
-export const ConfirmLeaveModal = ({isShown, onClose, onLeave}: Props) => {
+export const ConfirmLeaveModal: FunctionComponent<Props> = ({isShown, onClose, onLeave}: Props) => {
   const {translate} = useApplicationContext();
 
-  const closeHandler = () => {
+  const closeHandler = (): void => {
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.USER.PERSONAL_TEAM_CREATION.FLOW_CANCELLED, {
       step: Segmentation.TEAM_CREATION_STEP.MODAL_CONTINUE_CLICKED,
     });
     onClose();
   };
 
-  const leaveHandler = () => {
+  const leaveHandler = (): void => {
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.USER.PERSONAL_TEAM_CREATION.FLOW_CANCELLED, {
       step: Segmentation.TEAM_CREATION_STEP.MODAL_LEAVE_CLICKED,
     });

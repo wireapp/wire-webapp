@@ -17,10 +17,11 @@
  *
  */
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {RootContextValue} from 'src/script/page/rootProvider';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
-import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
+
+import {replaceReactComponents} from '../../../../../../../util/localizerUtil/reactLocalizerUtil';
+import {PrimaryModal} from '../../../../../../Modals/PrimaryModal';
 
 export const showMoveToRecycleBinModal = ({
   node,
@@ -30,7 +31,7 @@ export const showMoveToRecycleBinModal = ({
   node: CellNode;
   onMoveToRecycleBin: (uuid: string) => void;
   translate: RootContextValue['translate'];
-}) => {
+}): void => {
   PrimaryModal.show(
     PrimaryModal.type.CONFIRM,
     {

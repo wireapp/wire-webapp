@@ -17,7 +17,7 @@
  *
  */
 
-import {useId} from 'react';
+import {useId, type FunctionComponent} from 'react';
 
 import {isUndefined} from '@sindresorhus/is';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
@@ -41,7 +41,7 @@ interface ConversationProtocolDetailsProps {
   onProtocolActivated?: () => void;
 }
 
-export const ConversationProtocolDetails = ({
+export const ConversationProtocolDetails: FunctionComponent<ConversationProtocolDetailsProps> = ({
   protocol,
   cipherSuite,
   onProtocolActivated,

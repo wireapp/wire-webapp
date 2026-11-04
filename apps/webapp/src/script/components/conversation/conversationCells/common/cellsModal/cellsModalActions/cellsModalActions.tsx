@@ -17,23 +17,20 @@
  *
  */
 
-import {MouseEvent, ReactNode} from 'react';
+import {MouseEvent, ReactNode, type FunctionComponent} from 'react';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {buttonStyles, actionsWrapperStyles} from './cellsModalActions.styles';
 
-export const CellsModalActions = ({children}: {children: ReactNode}) => {
+export const CellsModalActions: FunctionComponent<{children: ReactNode}> = ({children}: {children: ReactNode}) => {
   return <div css={actionsWrapperStyles}>{children}</div>;
 };
 
-export const CellsModalSecondaryButton = ({
-  children,
-  onClick,
-}: {
+export const CellsModalSecondaryButton: FunctionComponent<{
   children: ReactNode;
   onClick: (event: MouseEvent<HTMLButtonElement>) => void;
-}) => {
+}> = ({children, onClick}: {children: ReactNode; onClick: (event: MouseEvent<HTMLButtonElement>) => void}) => {
   return (
     <Button variant={ButtonVariant.SECONDARY} type="button" onClick={onClick} css={buttonStyles}>
       {children}
@@ -41,7 +38,12 @@ export const CellsModalSecondaryButton = ({
   );
 };
 
-export const CellsModalPrimaryButton = ({
+export const CellsModalPrimaryButton: FunctionComponent<{
+  children: ReactNode;
+  onClick: (event: MouseEvent<HTMLButtonElement>) => void;
+  isDisabled?: boolean;
+  isLoading?: boolean;
+}> = ({
   children,
   onClick,
   isDisabled,

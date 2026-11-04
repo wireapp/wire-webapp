@@ -17,9 +17,8 @@
  *
  */
 
-import {selectionBarAnchorStyles} from 'Components/cells/common/cellsSelectionBar/cellsSelectionBar.styles';
-import {CellsFiltersBar} from 'Components/conversation/conversationCells/common/cellsFiltersBar/cellsFiltersBar';
-import type {FilterConfig} from 'Components/conversation/conversationCells/common/cellsFiltersBar/filterConfig';
+import type {FunctionComponent} from 'react';
+
 import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
@@ -27,6 +26,9 @@ import {contentStyles, headingStyles, titleRowStyles, wrapperStyles} from './cel
 import {CellsRefresh} from './cellsRefresh/cellsRefresh';
 import {CellsSearch} from './cellsSearch/cellsSeach';
 
+import {selectionBarAnchorStyles} from '../../cells/common/cellsSelectionBar/cellsSelectionBar.styles';
+import {CellsFiltersBar} from '../../conversation/conversationCells/common/cellsFiltersBar/cellsFiltersBar';
+import type {FilterConfig} from '../../conversation/conversationCells/common/cellsFiltersBar/filterConfig';
 import {CellsTableLoader} from '../common/cellsTableLoader/cellsTableLoader';
 
 interface CellsHeaderProps {
@@ -39,7 +41,7 @@ interface CellsHeaderProps {
   onSelectionBarAnchorChange?: (anchor: HTMLDivElement | null) => void;
 }
 
-export const CellsHeader = ({
+export const CellsHeader: FunctionComponent<CellsHeaderProps> = ({
   searchValue,
   onSearch,
   onClearSearch,

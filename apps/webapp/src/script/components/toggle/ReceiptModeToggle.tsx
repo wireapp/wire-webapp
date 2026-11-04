@@ -17,7 +17,7 @@
  *
  */
 
-import {useRef} from 'react';
+import {useRef, type FunctionComponent} from 'react';
 
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import cx from 'classnames';
@@ -32,9 +32,13 @@ interface ReceiptModeToggleProps {
   disabled?: boolean;
 }
 
-const ReceiptModeToggle = ({receiptMode, onReceiptModeChanged, disabled = false}: ReceiptModeToggleProps) => {
+const ReceiptModeToggle: FunctionComponent<ReceiptModeToggleProps> = ({
+  receiptMode,
+  onReceiptModeChanged,
+  disabled = false,
+}: ReceiptModeToggleProps) => {
   const {translate} = useApplicationContext();
-  const updateValue = () => {
+  const updateValue = (): void => {
     if (!disabled) {
       const newReceiptMode = receiptMode !== RECEIPT_MODE.ON ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF;
       onReceiptModeChanged(newReceiptMode);

@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import React, {type FunctionComponent} from 'react';
 
 import {render, act, fireEvent, waitFor} from '@testing-library/react';
 
@@ -25,7 +25,7 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../../../util/test/translateForTest';
 
 import {MessageReactions, MessageReactionsProps} from './messageReactions';
 
@@ -56,7 +56,7 @@ describe('MessageReactions', () => {
   it('outside click should close the emoji picker', async () => {
     let currentMsgActionName = defaultProps.currentMsgActionName; // preserve initial value
 
-    const MessageReactionsComponent = (props: MessageReactionsProps) => {
+    const MessageReactionsComponent: FunctionComponent<MessageReactionsProps> = (props: MessageReactionsProps) => {
       return (
         <div ref={wrapperRef}>
           <MessageReactions {...props} />

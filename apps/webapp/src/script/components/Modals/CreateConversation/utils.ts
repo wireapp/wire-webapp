@@ -21,17 +21,17 @@ import {isNan} from '@sindresorhus/is';
 import {ADD_PERMISSION} from '@wireapp/api-client/lib/conversation';
 import {container} from 'tsyringe';
 
-import type {PrimaryModalTranslatedMessage} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
-import {TeamState} from 'Repositories/team/TeamState';
 import type {RootContextValue} from 'src/script/page/rootProvider';
 
 import {ChatHistory, ConversationAccess, ConversationType, HistorySharingUnit} from './types';
 
 import {Config} from '../../../Config';
+import {TeamState} from '../../../repositories/team/TeamState';
+import type {PrimaryModalTranslatedMessage} from '../PrimaryModal/PrimaryModalTypes';
 
 export type Translate = RootContextValue['translate'];
 
-export const getSharedDrivePermissionHint = (translate: Translate) => {
+export const getSharedDrivePermissionHint = (translate: Translate): string => {
   return translate('modalCreateConversationAdminHint');
 };
 
@@ -42,7 +42,14 @@ export type NonFederatingParticipantsModalCopy = {
   readonly getTranslatedMessage: (backendString: string) => PrimaryModalTranslatedMessage;
 };
 
-export const getConversationAccessOptions = (translate: Translate, isPublicOptionEnabled = true) => {
+type GetConversationAccessOptionsResult = (
+  | {value: ConversationAccess; label: string; isDisabled: boolean}
+  | {value: ConversationAccess; label: string; isDisabled?: undefined}
+)[];
+export const getConversationAccessOptions = (
+  translate: Translate,
+  isPublicOptionEnabled = true,
+): GetConversationAccessOptionsResult => {
   return [
     {
       value: ConversationAccess.Public,
@@ -56,7 +63,8 @@ export const getConversationAccessOptions = (translate: Translate, isPublicOptio
   ];
 };
 
-export const getConversationManagerOptions = (translate: Translate) => {
+type GetConversationManagerOptionsResult = {value: ADD_PERMISSION; label: string}[];
+export const getConversationManagerOptions = (translate: Translate): GetConversationManagerOptionsResult => {
   return [
     {
       value: ADD_PERMISSION.ADMINS,
@@ -69,7 +77,8 @@ export const getConversationManagerOptions = (translate: Translate) => {
   ];
 };
 
-export const getConversationTypeOptions = (translate: Translate) => {
+type GetConversationTypeOptionsResult = {conversationType: ConversationType; label: string}[];
+export const getConversationTypeOptions = (translate: Translate): GetConversationTypeOptionsResult => {
   return [
     {
       conversationType: ConversationType.Channel,
@@ -82,7 +91,11 @@ export const getConversationTypeOptions = (translate: Translate) => {
   ];
 };
 
-export const getChatHistorySharingUnitOptions = (translate: Translate, historySharingQuantity: number) => {
+type GetChatHistorySharingUnitOptionsResult = {value: HistorySharingUnit; label: string}[];
+export const getChatHistorySharingUnitOptions = (
+  translate: Translate,
+  historySharingQuantity: number,
+): GetChatHistorySharingUnitOptionsResult => {
   const chatHistorySharingUnitOptions = [
     {
       value: HistorySharingUnit.Days,
@@ -110,13 +123,14 @@ export const getChatHistorySharingUnitOptions = (translate: Translate, historySh
   return chatHistorySharingUnitOptions;
 };
 
+type GetChatHistoryOptionsResult = {value: ChatHistory; label: string}[];
 export const getChatHistoryOptions = (
   translate: Translate,
   chatHistory: ChatHistory,
   historySharingQuantity: number,
   historySharingUnit: HistorySharingUnit,
   enableCustomHistory?: boolean,
-) => {
+): GetChatHistoryOptionsResult => {
   const teamState = container.resolve(TeamState);
   const chatHistorySharingUnitOptions = getChatHistorySharingUnitOptions(translate, historySharingQuantity);
 

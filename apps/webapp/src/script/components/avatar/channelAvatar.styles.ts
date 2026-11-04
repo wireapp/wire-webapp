@@ -19,9 +19,9 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {CSS_SQUARE} from 'Util/cssMixin';
-
 import {ChannelAvatarSize} from './channelAvatar';
+
+import {CSS_SQUARE} from '../../util/cssMixin';
 
 const channelAvatarSizeInPixels = 28;
 const smallChannelAvatarSizeInPixels = 16;

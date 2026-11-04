@@ -84,6 +84,7 @@ export interface DurationUnit {
   text: string;
   value: number;
 }
+type LocalizedDurationUnit = {plural: string; singular: string; symbol: string; value: TIME_IN_MILLIS};
 
 export enum TIME_IN_MILLIS {
   SECOND = millisecondsPerSecond,
@@ -174,7 +175,7 @@ export const getRegionalDateLocale = (): string => {
   return regionalDateLocale;
 };
 
-export const formatLocale = (date: FnDate | string | number, formatString: string) => {
+export const formatLocale = (date: FnDate | string | number, formatString: string): string => {
   return format(new Date(date), formatString, {locale: dateFnsLocale});
 };
 
@@ -186,7 +187,7 @@ function formatRegionalDate(date: FnDate | string | number, options: Intl.DateTi
  * Format the time as `12:00 AM`.
  * This is equivalent to momentjs' `LT` formatting
  */
-export const formatTimeShort = (date: FnDate | string | number) => {
+export const formatTimeShort = (date: FnDate | string | number): string => {
   return formatLocale(date, 'p');
 };
 
@@ -194,10 +195,10 @@ export const formatTimeShort = (date: FnDate | string | number) => {
  * Format the date as `May 29, 2020`.
  * This is equivalent to momentjs' `LL` formatting
  */
-export const formatDateShort = (date: FnDate | string | number) => {
+export const formatDateShort = (date: FnDate | string | number): string => {
   return formatLocale(date, 'PP');
 };
-export const formatDayMonth = (date: FnDate | string | number) => {
+export const formatDayMonth = (date: FnDate | string | number): string => {
   return formatDateShort(date)
     .replace(/[0-9]{4}/g, '')
     .replace(dateFnsLocale === de ? /^\s*|\s*$/g : /^\W|\W$|\W\W/, '');
@@ -214,7 +215,7 @@ export function formatDayMonthNumeral(date: FnDate | string | number): string {
   return formatRegionalDate(date, dayMonthNumeralFormatOptions);
 }
 
-const durationUnits = (translate: Translate) => {
+const durationUnits = (translate: Translate): LocalizedDurationUnit[] => {
   return [
     {
       plural: translate('ephemeralUnitsYears'),
@@ -387,10 +388,10 @@ export const formatTimestamp = (timestamp: number | string, longFormat: boolean 
   return formatLocale(time, format);
 };
 
-export const getCurrentDate = () => {
+export const getCurrentDate = (): string => {
   return new Date().toISOString().substring(0, isoDatePrefixLength);
 };
-export const getUnixTimestamp = () => {
+export const getUnixTimestamp = (): number => {
   return Math.floor(Date.now() / TIME_IN_MILLIS.SECOND);
 };
 export const isBeforeToday = (date: FnDate): boolean => {
@@ -399,14 +400,14 @@ export const isBeforeToday = (date: FnDate): boolean => {
 export const isYoungerThanMinute = (date: FnDate): boolean => {
   return differenceInMinutes(new Date(), date) < 1;
 };
-export const isYoungerThan1Hour = (date: FnDate) => {
+export const isYoungerThan1Hour = (date: FnDate): boolean => {
   return differenceInHours(new Date(), date) < 1;
 };
-export const isYoungerThan7Days = (date: FnDate) => {
+export const isYoungerThan7Days = (date: FnDate): boolean => {
   return differenceInDays(new Date(), date) < daysPerWeek;
 };
 
-export const fromNowLocale = (date: FnDate) => {
+export const fromNowLocale = (date: FnDate): string => {
   return formatDistanceToNow(date, {addSuffix: true, locale: dateFnsLocale});
 };
 
@@ -459,7 +460,7 @@ export const formatDelayTime = (delayTimeInMS: number, translate: Translate): st
  * @param duration - Duration in milliseconds
  * @returns Localized string of the coarsest applicable unit
  */
-export const formatCoarseDuration = (duration: number, translate: Translate) => {
+export const formatCoarseDuration = (duration: number, translate: Translate): string => {
   if (duration >= TIME_IN_MILLIS.DAY) {
     const days = Math.floor(duration / TIME_IN_MILLIS.DAY);
     return translate(`initProgressDays${days === 1 ? 'Singular' : 'Plural'}`, {time: days});
@@ -487,7 +488,7 @@ export const formatCoarseDuration = (duration: number, translate: Translate) => 
  * @param date - The past date to compare (Date or timestamp).
  * @returns Duration in milliseconds between now and the given date.
  */
-export const durationFrom = (date: Date | number | string) => {
+export const durationFrom = (date: Date | number | string): number => {
   return Date.now() - new Date(date).getTime();
 };
 

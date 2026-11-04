@@ -31,7 +31,7 @@ export class OutgoingConnectionPage {
     this.uniqueUsernameOutgoing = this.page.locator('.message-connected-username.label-username');
   }
 
-  getPendingConnectionIconLocator(fullName: string) {
+  getPendingConnectionIconLocator(fullName: string): Locator {
     return this.page
       .getByTestId('item-conversation')
       .and(this.page.locator(`[data-uie-value="${escapeHtml(fullName)}"]`))

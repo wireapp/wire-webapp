@@ -17,11 +17,11 @@
  *
  */
 
-import {KeyboardEvent as ReactKeyboardEvent, useCallback, useState} from 'react';
+import {KeyboardEvent as ReactKeyboardEvent, useCallback, useState, type FunctionComponent} from 'react';
 
 import userEvent from '@testing-library/user-event';
 import {act, fireEvent, render, screen} from '@testing-library/react';
-import {createDeterministicClock} from '@enormora/clock/deterministic-clock';
+import {createDeterministicClock, type DeterministicClock} from '@enormora/clock/deterministic-clock';
 
 import {useConversationSearch} from './useConversationSearch';
 
@@ -35,7 +35,7 @@ type SearchHarnessProps = {
   onTabHandled: (wasDefaultPrevented: boolean) => void;
 };
 
-const SearchHarness = ({
+const SearchHarness: FunctionComponent<SearchHarnessProps> = ({
   clock,
   onSearch,
   onEnter,
@@ -88,7 +88,16 @@ const SearchHarness = ({
   );
 };
 
-const renderSearch = (callbacks: Partial<Omit<SearchHarnessProps, 'clock'>> = {}) => {
+type RenderSearchResult = {
+  clock: DeterministicClock;
+  onSearch: ((value: string) => void) | jest.Mock<any, any, any>;
+  onEnter: (event: ReactKeyboardEvent<HTMLInputElement>) => boolean;
+  onTab: jest.Mock<any, any, any> | ((event: ReactKeyboardEvent<HTMLInputElement>) => void);
+  hasTabResult: (query: string) => boolean;
+  onBeforeTab: jest.Mock<any, any, any> | (() => void);
+  onTabHandled: jest.Mock<any, any, any> | ((wasDefaultPrevented: boolean) => void);
+};
+const renderSearch = (callbacks: Partial<Omit<SearchHarnessProps, 'clock'>> = {}): RenderSearchResult => {
   const clock = createDeterministicClock({initialUnixEpochMicroseconds: 0n});
   const onSearch = callbacks.onSearch ?? jest.fn();
   const onEnter =

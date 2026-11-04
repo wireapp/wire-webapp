@@ -17,19 +17,12 @@
  *
  */
 
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useRef, useState, type FunctionComponent} from 'react';
 
 import type {FireAndForgetInvoker} from '@enormora/fire-and-forget';
 import {isUndefined} from '@sindresorhus/is';
 
-import {CellsShareModalContent} from 'Components/cells/shareModal/cellsShareModalContent';
-import {serializeShareModalInput} from 'Components/cells/shareModal/shareModalSerializer';
-import {useCellExpirationToggle} from 'Components/cells/shareModal/useCellExpirationToggle';
-import {useCellPasswordToggle} from 'Components/cells/shareModal/useCellPasswordToggle';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import type {RootContextValue} from 'src/script/page/rootProvider';
-import {createUuid} from 'Util/uuid';
 
 import {
   inputStyles,
@@ -54,6 +47,13 @@ import {
 } from './cellsNodeShareModal.styles';
 import {useCellConversationPublicLink} from './useCellConversationPublicLink';
 
+import {CellsRepository} from '../../../../../../repositories/cells/cellsRepository';
+import {createUuid} from '../../../../../../util/uuid';
+import {CellsShareModalContent} from '../../../../../cells/shareModal/cellsShareModalContent';
+import {serializeShareModalInput} from '../../../../../cells/shareModal/shareModalSerializer';
+import {useCellExpirationToggle} from '../../../../../cells/shareModal/useCellExpirationToggle';
+import {useCellPasswordToggle} from '../../../../../cells/shareModal/useCellPasswordToggle';
+import {PrimaryModal} from '../../../../../Modals/PrimaryModal';
 import {useCellsStore} from '../../../common/useCellsStore/useCellsStore';
 
 interface ShareModalParams {
@@ -75,7 +75,7 @@ export const showShareModal = ({
   cellsRepository,
   fireAndForgetInvoker,
   translate,
-}: ShareModalParams) => {
+}: ShareModalParams): void => {
   const modalId = createUuid();
   PrimaryModal.show(
     PrimaryModal.type.CONFIRM,
@@ -113,7 +113,7 @@ export const showShareModal = ({
   );
 };
 
-export const CellShareModalContent = ({
+export const CellShareModalContent: FunctionComponent<ShareModalParams & {modalId: string}> = ({
   type,
   uuid,
   conversationId,
@@ -152,7 +152,7 @@ export const CellShareModalContent = ({
 
   const hasExistingPassword = Boolean(linkData?.PasswordRequired);
 
-  const handlePasswordToggle = () => {
+  const handlePasswordToggle = (): void => {
     if (isPasswordEnabled) {
       setWasPasswordDisabled(true);
       setIsEditingPassword(false);
@@ -168,7 +168,7 @@ export const CellShareModalContent = ({
     togglePassword();
   };
 
-  const handleChangePasswordClick = () => {
+  const handleChangePasswordClick = (): void => {
     setIsEditingPassword(true);
     setPasswordValue('');
   };

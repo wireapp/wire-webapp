@@ -19,7 +19,7 @@
 
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 
-import {Conversation} from 'Repositories/entity/Conversation';
+import {Conversation} from '../../../../repositories/entity/Conversation';
 import {
   conversationFilters,
   conversationSearchFilter,
@@ -294,7 +294,8 @@ describe('getTabConversations', () => {
     archivedConversations = [conversation4];
   });
 
-  const runTest = (currentTab: SidebarTabs, conversationsFilter: string) => {
+  type RunTestResult = {conversations: Conversation[]; searchInputPlaceholder: string};
+  const runTest = (currentTab: SidebarTabs, conversationsFilter: string): RunTestResult => {
     return getTabConversations({
       currentTab,
       conversations,

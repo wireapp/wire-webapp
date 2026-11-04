@@ -27,7 +27,7 @@ type UserAgentExpectation = readonly [
   expectedMobile: boolean,
 ];
 
-function parseUserAgentOrThrow(userAgent: string) {
+function parseUserAgentOrThrow(userAgent: string): NonNullable<ReturnType<typeof BrowserUtil.parseUserAgent>> {
   const parsedUserAgent = BrowserUtil.parseUserAgent(userAgent);
 
   if (parsedUserAgent === null) {

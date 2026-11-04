@@ -17,13 +17,23 @@
  *
  */
 
-import {useMemo} from 'react';
+import {useMemo, type FunctionComponent} from 'react';
 
 import {isUndefined} from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, CalendarIcon, CloseIcon} from '@wireapp/react-ui-kit';
 
+import {useApplicationContext} from 'src/script/page/rootProvider';
+
+import {ScheduleMeetingForm} from './scheduleMeetingForm';
+import {scheduleMeetingModes, wasScheduleMeetingPersisted} from './scheduleMeetingTypes';
+import {hasScheduleMeetingFormErrors, useScheduleMeetingModal} from './useScheduleMeetingModal';
+import {useScheduleMeetingSubmit} from './useScheduleMeetingSubmit';
+
+import {UserState} from '../../../repositories/user/userState';
+import {handleEscDown} from '../../../util/keyboardUtil';
+import {ModalComponent} from '../../Modals/ModalComponent';
 import {
   bodyStyles,
   closeButtonStyles,
@@ -34,18 +44,9 @@ import {
   submitButtonIconStyles,
   submitButtonStyles,
   wrapperStyles,
-} from 'Components/meeting/shared/styles/meetingModalShell.styles';
-import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {UserState} from 'Repositories/user/userState';
-import {useApplicationContext} from 'src/script/page/rootProvider';
-import {handleEscDown} from 'Util/keyboardUtil';
+} from '../shared/styles/meetingModalShell.styles';
 
-import {ScheduleMeetingForm} from './scheduleMeetingForm';
-import {scheduleMeetingModes, wasScheduleMeetingPersisted} from './scheduleMeetingTypes';
-import {hasScheduleMeetingFormErrors, useScheduleMeetingModal} from './useScheduleMeetingModal';
-import {useScheduleMeetingSubmit} from './useScheduleMeetingSubmit';
-
-export const ScheduleMeetingModal = () => {
+export const ScheduleMeetingModal: FunctionComponent = () => {
   const {fireAndForgetInvoker, translate, clock} = useApplicationContext();
   const {
     isOpen,
@@ -82,7 +83,7 @@ export const ScheduleMeetingModal = () => {
     };
   }, [errors, translate]);
 
-  const handleClose = () => {
+  const handleClose = (): void => {
     if (isSubmitting) {
       return;
     }
@@ -91,7 +92,7 @@ export const ScheduleMeetingModal = () => {
     reset(clock);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (): void => {
     const validationErrors = validate(clock);
     if (hasScheduleMeetingFormErrors(validationErrors)) {
       return;

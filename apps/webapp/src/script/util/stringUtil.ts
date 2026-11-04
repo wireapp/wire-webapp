@@ -20,8 +20,9 @@
 import {isNonEmptyString} from '@sindresorhus/is';
 import getSlug from 'speakingurl';
 
-import type {User} from 'Repositories/entity/User';
-import {randomElement} from 'Util/arrayUtil';
+import {randomElement} from './arrayUtil';
+
+import type {User} from '../repositories/entity/User';
 
 const obfuscationExtraCharacterRange = 10;
 const wordBoundarySearchLength = 25;
@@ -268,7 +269,7 @@ const accentsMap: Record<string, string> = {
  * @param text The string to replace accents its charachters
  * @returns new string with replaced accents charachters
  */
-export const replaceAccents = (text: string) => {
+export const replaceAccents = (text: string): string => {
   return getSlug(text, {custom: accentsMap, uric: true});
 };
 

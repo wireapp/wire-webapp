@@ -17,12 +17,12 @@
  *
  */
 
-import {HTMLProps, MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent} from 'react';
-
-import {User} from 'Repositories/entity/User';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {handleKeyDown, isKeyboardEvent, KEY} from 'Util/keyboardUtil';
+import {
+  HTMLProps,
+  MouseEvent as ReactMouseEvent,
+  KeyboardEvent as ReactKeyBoardEvent,
+  type FunctionComponent,
+} from 'react';
 
 import {PlaceholderAvatar} from './placeholderAvatar';
 import {ServiceAvatar} from './serviceAvatar';
@@ -30,6 +30,10 @@ import {TemporaryGuestAvatar} from './temporaryGuestAvatar';
 import {UserAvatar} from './userAvatar';
 
 import {isAppOrServiceEntity} from '../../guards/Service';
+import {User} from '../../repositories/entity/User';
+import {ServiceEntity} from '../../repositories/integration/ServiceEntity';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
+import {handleKeyDown, isKeyboardEvent, KEY} from '../../util/keyboardUtil';
 
 export enum AVATAR_SIZE {
   LARGE = 'avatar-l',
@@ -83,7 +87,7 @@ interface AvatarProps extends HTMLProps<HTMLDivElement> {
   hideProfilePicture?: boolean;
 }
 
-const Avatar = ({
+const Avatar: FunctionComponent<AvatarProps> = ({
   avatarSize = AVATAR_SIZE.LARGE,
   noBadge = false,
   noFilter = false,
@@ -94,7 +98,7 @@ const Avatar = ({
 }: AvatarProps) => {
   const handleAvatarInteraction = (
     event: ReactMouseEvent<HTMLDivElement, MouseEvent> | ReactKeyBoardEvent<HTMLDivElement>,
-  ) => {
+  ): void => {
     const parentNode = event.currentTarget.parentNode;
     if (parentNode !== null) {
       if (isKeyboardEvent(event)) {

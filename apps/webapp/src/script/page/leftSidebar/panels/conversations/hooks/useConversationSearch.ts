@@ -36,6 +36,13 @@ type ConversationSearchOptions = {
 
 const SEARCH_DELAY_IN_MILLISECONDS = 200;
 
+type UseConversationSearchResult = {
+  inputValue: string;
+  changeInput: (value: string) => void;
+  clear: () => void;
+  enter: (event: SearchEvent) => void;
+  tab: (event: SearchEvent) => void;
+};
 export const useConversationSearch = ({
   clock,
   filter,
@@ -44,7 +51,7 @@ export const useConversationSearch = ({
   onTab,
   hasTabResult,
   onBeforeTab,
-}: ConversationSearchOptions) => {
+}: ConversationSearchOptions): UseConversationSearchResult => {
   const [inputValue, setInputValue] = useState(filter);
   const pendingAction = useRef<PendingAction | null>(null);
   useEffect(() => {

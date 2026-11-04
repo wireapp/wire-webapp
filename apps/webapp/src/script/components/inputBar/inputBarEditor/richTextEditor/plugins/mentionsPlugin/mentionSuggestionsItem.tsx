@@ -23,11 +23,11 @@ import cx from 'classnames';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {Avatar, AVATAR_SIZE} from 'Components/avatar';
-import * as Icon from 'Components/icon';
-import {User} from 'Repositories/entity/User';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {handleKeyDown, KEY} from 'Util/keyboardUtil';
+import {User} from '../../../../../../repositories/entity/User';
+import {useKoSubscribableChildren} from '../../../../../../util/componentUtil';
+import {handleKeyDown, KEY} from '../../../../../../util/keyboardUtil';
+import {Avatar, AVATAR_SIZE} from '../../../../../avatar';
+import * as Icon from '../../../../../icon';
 
 type MentionSuggestionsItemProps = {
   isSelected: boolean;
@@ -45,7 +45,7 @@ const MentionSuggestionsItemComponent: React.ForwardRefRenderFunction<HTMLDivEle
     ['name', 'expirationRemainingText', 'isTemporaryGuest', 'isExternal', 'isDirectGuest'],
   );
 
-  const onClick = (event: React.UIEvent) => {
+  const onClick = (event: React.UIEvent): void => {
     event.preventDefault();
     onSuggestionClick();
   };

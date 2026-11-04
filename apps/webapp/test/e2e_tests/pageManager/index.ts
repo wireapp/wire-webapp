@@ -86,6 +86,7 @@ import {
   applyStartupFeatureToggleOverridesToUrl,
   StartupFeatureToggleOverrides,
 } from '../utils/startupFeatureToggleOverrides';
+import type {Response, BrowserContext, Request} from 'playwright-core';
 
 export const webAppPath = process.env.WEBAPP_URL ?? '';
 
@@ -128,39 +129,41 @@ export class PageManager {
     return applyStartupFeatureToggleOverridesToUrl(navigationUrl, startupFeatureToggles).toString();
   }
 
-  openMainPage = (options: WebAppNavigationOptions = {}) => {
+  openMainPage = (options: WebAppNavigationOptions = {}): Promise<Response | null> => {
     return this.page.goto(this.createNavigationUrl('/', options), {waitUntil: 'networkidle'});
   };
 
-  openLoginPage = async (options: WebAppNavigationOptions = {}) => {
+  openLoginPage = async (options: WebAppNavigationOptions = {}): Promise<void> => {
     await this.page.goto(this.createNavigationUrl('/auth/#/login', options));
   };
 
-  openRegistrationPage = async (options: WebAppNavigationOptions = {}) => {
+  openRegistrationPage = async (options: WebAppNavigationOptions = {}): Promise<void> => {
     await this.page.goto(this.createNavigationUrl('/auth/#/createaccount', options));
   };
 
-  openSSOPage = async (options: WebAppNavigationOptions = {}) => {
+  openSSOPage = async (options: WebAppNavigationOptions = {}): Promise<void> => {
     await this.page.goto(this.createNavigationUrl('/auth/#/sso', options), {waitUntil: 'commit', timeout: 120_000});
   };
 
-  openUrl = (url: string) => {
+  openUrl = (url: string): Promise<Response | null> => {
     return this.page.goto(url, {waitUntil: 'networkidle'});
   };
 
-  refreshPage = (options: {waitUntil?: 'load' | 'domcontentloaded' | 'networkidle'} = {waitUntil: 'networkidle'}) => {
+  refreshPage = (
+    options: {waitUntil?: 'load' | 'domcontentloaded' | 'networkidle'} = {waitUntil: 'networkidle'},
+  ): Promise<Response | null> => {
     return this.page.reload(options);
   };
 
-  waitForTimeout = (timeout: number) => {
+  waitForTimeout = (timeout: number): Promise<void> => {
     return this.page.waitForTimeout(timeout);
   };
 
-  getContext = () => {
+  getContext = (): BrowserContext => {
     return this.page.context();
   };
 
-  waitForRequest = (url: string) => {
+  waitForRequest = (url: string): Promise<Request> => {
     return this.page.waitForRequest(url);
   };
 

@@ -66,7 +66,7 @@ export class ConversationPage {
   readonly statusIndicator: Locator;
   readonly replyQuoteBoxAboveMessageInputField: Locator;
 
-  readonly getImageAltText = (user: User) => {
+  readonly getImageAltText = (user: User): string => {
     return `Image from ${user.fullName}`;
   };
 
@@ -131,54 +131,54 @@ export class ConversationPage {
       .and(this.page.locator(`[alt^="${this.getImageAltText(user)}"]`));
   }
 
-  async clickConversationTitle() {
+  async clickConversationTitle(): Promise<void> {
     await this.conversationTitle.click();
   }
 
-  async clickConversationInfoButton() {
+  async clickConversationInfoButton(): Promise<void> {
     await this.conversationInfoButton.click();
   }
 
-  async clickCallButton() {
+  async clickCallButton(): Promise<void> {
     await this.callButton.click();
   }
 
-  async clickFilesTab() {
+  async clickFilesTab(): Promise<void> {
     await this.filesTab.click();
   }
 
-  async clickMessagesTab() {
+  async clickMessagesTab(): Promise<void> {
     await this.messagesTab.click();
   }
 
-  async clickIgnoreButton() {
+  async clickIgnoreButton(): Promise<void> {
     await this.ignoreButton.click();
   }
 
-  async sendMessage(message: string) {
+  async sendMessage(message: string): Promise<void> {
     await this.messageInput.fill(message);
     await this.sendMessageButton.click();
   }
 
-  async typeMessage(message: string) {
+  async typeMessage(message: string): Promise<void> {
     await this.messageInput.click();
     // Use pressSequentially which simulates realistic typing with built-in delays
     await this.messageInput.pressSequentially(message, {delay: 100});
   }
 
-  async sendTypedMessage(message: string) {
+  async sendTypedMessage(message: string): Promise<void> {
     await this.messageInput.clear();
     await this.typeMessage(message);
     await this.sendMessageButton.click();
   }
 
-  async mentionUser(userFullName: string, searchQuery?: string) {
+  async mentionUser(userFullName: string, searchQuery?: string): Promise<void> {
     const textToType = searchQuery ? `@${searchQuery}` : `@${userFullName.slice(0, 3)}`;
     await this.messageInput.pressSequentially(textToType);
     await this.mentionSuggestions.filter({hasText: userFullName}).click({timeout: 5000});
   }
 
-  async replyToMessage(message: Locator) {
+  async replyToMessage(message: Locator): Promise<void> {
     // Allow full transaction of hovering and clicking to be retried
     await expect(async () => {
       await message.hover();
@@ -186,17 +186,17 @@ export class ConversationPage {
     }).toPass();
   }
 
-  async enableSelfDeletingMessages() {
+  async enableSelfDeletingMessages(): Promise<void> {
     await this.timerMessageButton.click();
     await this.timerTenSecondsButton.click();
   }
 
-  async disableSelfDeletingMessages() {
+  async disableSelfDeletingMessages(): Promise<void> {
     await this.timerMessageButton.click();
     await this.timerOffButton.click();
   }
 
-  async sendMessageWithUserMention(userFullName: string, messageText?: string) {
+  async sendMessageWithUserMention(userFullName: string, messageText?: string): Promise<void> {
     await this.messageInput.fill(''); // Clear the input initially
     await this.mentionUser(userFullName);
 
@@ -234,7 +234,7 @@ export class ConversationPage {
    * Open the options associated with a message
    * @returns the Locator of the now open context menu
    */
-  async openMessageOptions(message: Locator) {
+  async openMessageOptions(message: Locator): Promise<Locator> {
     await message.hover();
     await message.getByTestId('message-actions').getByTestId('go-options').click();
     // The context menu containing the edit button is positioned globally as an overlay
@@ -242,28 +242,28 @@ export class ConversationPage {
   }
 
   /** Click the "Edit" option within a messages options putting it into the message input so it can be updated */
-  async editMessage(message: Locator) {
+  async editMessage(message: Locator): Promise<void> {
     const menu = await this.openMessageOptions(message);
     await menu.getByRole('button', {name: 'Edit'}).click();
   }
 
-  async openMessageDetails(message: Locator) {
+  async openMessageDetails(message: Locator): Promise<void> {
     const menu = await this.openMessageOptions(message);
     await menu.getByRole('button', {name: 'Details'}).click();
   }
 
-  async deleteMessage(message: Locator, deleteFor: 'Me' | 'Everyone') {
+  async deleteMessage(message: Locator, deleteFor: 'Me' | 'Everyone'): Promise<void> {
     const menu = await this.openMessageOptions(message);
     await menu.getByRole('button', {name: `Delete for ${deleteFor}…`}).click();
     await new ConfirmModal(this.page).clickAction();
   }
 
-  async copyMessage(message: Locator) {
+  async copyMessage(message: Locator): Promise<void> {
     const menu = await this.openMessageOptions(message);
     await menu.getByRole('button', {name: 'Copy'}).click();
   }
 
-  async reactOnMessage(message: Locator, emojiType: EmojiReaction) {
+  async reactOnMessage(message: Locator, emojiType: EmojiReaction): Promise<void> {
     await message.hover();
 
     switch (emojiType) {
@@ -293,7 +293,7 @@ export class ConversationPage {
     return messageReactions.getByTestId('emoji-pill').and(this.page.locator(`[title="${emojiTitle}"]`));
   }
 
-  async clickImage(user: User) {
+  async clickImage(user: User): Promise<void> {
     const locator = this.getImageLocator(user);
 
     // Wait for at least one matching element to appear (optional timeout can be set)
@@ -302,7 +302,7 @@ export class ConversationPage {
     await locator.click();
   }
 
-  async playVideo() {
+  async playVideo(): Promise<void> {
     const videoPlayButton = this.page
       .getByTestId('item-message')
       .getByTestId('video-asset')
@@ -311,7 +311,7 @@ export class ConversationPage {
     await videoPlayButton.click();
   }
 
-  async playAudio() {
+  async playAudio(): Promise<void> {
     const audioPlayButton = this.page
       .getByTestId('item-message')
       .getByTestId('audio-asset')
@@ -319,23 +319,23 @@ export class ConversationPage {
     await audioPlayButton.click();
   }
 
-  async downloadFile(outputDir: string) {
+  async downloadFile(outputDir: string): Promise<string> {
     const downloadButton = this.page.getByTestId('item-message').getByTestId('file-asset');
 
     const filePath = await downloadAssetAndGetFilePath(this.page, downloadButton, outputDir);
     return filePath;
   }
 
-  async startCall() {
+  async startCall(): Promise<void> {
     const startCallButton = this.page.locator('[data-uie-name="do-call"]');
     await startCallButton.click();
   }
 
-  async toggleGroupInformation() {
+  async toggleGroupInformation(): Promise<void> {
     await this.openGroupInformationViaName.click();
   }
 
-  async makeUserAdmin(name: string) {
+  async makeUserAdmin(name: string): Promise<void> {
     await this.membersList
       .getByTestId('item-user')
       .and(this.page.locator(`[data-uie-value="${name}"]`))
@@ -343,7 +343,7 @@ export class ConversationPage {
     return this.makeAdminToggle.click();
   }
 
-  async removeMemberFromGroup(name: string) {
+  async removeMemberFromGroup(name: string): Promise<void> {
     await this.membersList
       .getByTestId('item-user')
       .and(this.page.locator(`[data-uie-value="${name}"]`))
@@ -352,7 +352,7 @@ export class ConversationPage {
     await new ConfirmModal(this.page).clickAction();
   }
 
-  async removeAdminFromGroup(name: string) {
+  async removeAdminFromGroup(name: string): Promise<void> {
     await this.adminsList
       .getByTestId('item-user')
       .and(this.page.locator(`[data-uie-value="${name}"]`))
@@ -360,15 +360,15 @@ export class ConversationPage {
     return this.removeUserButton.click();
   }
 
-  async leaveConversation() {
+  async leaveConversation(): Promise<void> {
     await this.leaveConversationButton.click();
   }
 
-  async clickAddMemberButton() {
+  async clickAddMemberButton(): Promise<void> {
     await this.addMemberButton.click();
   }
 
-  async sendPing() {
+  async sendPing(): Promise<void> {
     await this.pingButton.click();
   }
 
@@ -379,7 +379,7 @@ export class ConversationPage {
     return this.messageItems.getByTestId('element-message-ping');
   }
 
-  async getMessageReadReceipt(message: Locator) {
+  async getMessageReadReceipt(message: Locator): Promise<Locator> {
     await message.hover();
     return message.getByTestId('status-message-read-receipts');
   }

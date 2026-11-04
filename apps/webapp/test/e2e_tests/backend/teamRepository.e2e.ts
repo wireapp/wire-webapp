@@ -43,7 +43,7 @@ export class TeamRepositoryE2E extends BackendClientE2E {
     return (await response).data.id;
   }
 
-  async acceptTeamInvitation(teamInvitationCode: string, user: Pick<User, 'password' | 'token'>) {
+  async acceptTeamInvitation(teamInvitationCode: string, user: Pick<User, 'password' | 'token'>): Promise<void> {
     await this.axiosInstance.post(
       'teams/invitations/accept',
       {
@@ -59,7 +59,7 @@ export class TeamRepositoryE2E extends BackendClientE2E {
     );
   }
 
-  async addServiceToTeamWhitelist(teamId: string, service: Service, token: string) {
+  async addServiceToTeamWhitelist(teamId: string, service: Service, token: string): Promise<void> {
     await this.axiosInstance.post(
       `teams/${teamId}/services/whitelist`,
       {
@@ -76,7 +76,7 @@ export class TeamRepositoryE2E extends BackendClientE2E {
     );
   }
 
-  async deleteTeam(user: User, teamId: string) {
+  async deleteTeam(user: User, teamId: string): Promise<void> {
     await this.axiosInstance.request({
       url: `teams/${teamId}`,
       method: 'DELETE',
@@ -89,7 +89,7 @@ export class TeamRepositoryE2E extends BackendClientE2E {
     });
   }
 
-  public async upgradeTeam(teamId: string, user: User) {
+  public async upgradeTeam(teamId: string, user: User): Promise<void> {
     const billingInfo = {
       firstname: user.firstName,
       lastname: user.lastName,

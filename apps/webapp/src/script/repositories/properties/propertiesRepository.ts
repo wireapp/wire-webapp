@@ -25,32 +25,45 @@ import {AudioPreference, NotificationPreference, WebappProperties} from '@wireap
 import {amplify} from 'amplify';
 import ko from 'knockout';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
-import type {User} from 'Repositories/entity/User';
-import type {SelfService} from 'Repositories/self/SelfService';
-import {StorageKey} from 'Repositories/storage';
-import {isTelemetryEnabledAtCurrentEnvironment} from 'Repositories/tracking/telemetry.helpers';
-import {ConsentValue} from 'Repositories/user/consentValue';
-import {CONVERSATION_TYPING_INDICATOR_MODE} from 'Repositories/user/typingIndicatorMode';
 import {Config} from 'src/script/Config';
-import {Environment} from 'Util/environment';
-import {type Translate} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/logger';
-import {loadValue} from 'Util/storageUtil';
 
 import type {PropertiesService} from './propertiesService';
 import {PROPERTIES_TYPE, UserConsentStatus} from './propertiesType';
+
+import {PrimaryModal} from '../../components/Modals/PrimaryModal';
+import {PrimaryModalType} from '../../components/Modals/PrimaryModal/PrimaryModalTypes';
+import {Environment} from '../../util/environment';
+import {type Translate} from '../../util/localizerUtil';
+import {getLogger, Logger} from '../../util/logger';
+import {loadValue} from '../../util/storageUtil';
+import {WebAppEvents} from '../../webAppEvents';
+import type {User} from '../entity/User';
+import type {SelfService} from '../self/SelfService';
+import {StorageKey} from '../storage';
+import {isTelemetryEnabledAtCurrentEnvironment} from '../tracking/telemetry.helpers';
+import {ConsentValue} from '../user/consentValue';
+import {CONVERSATION_TYPING_INDICATOR_MODE} from '../user/typingIndicatorMode';
 
 const mergeWebappProperties = createDeepmerge();
 const nestedPreferencePathDepth = 2;
 const deeplyNestedPreferencePathDepth = 3;
 
+type PropertiesRepositoryConfig = {
+  WEBAPP_ACCOUNT_SETTINGS: string;
+  WIRE_MARKETING_CONSENT: {defaultValue: boolean; key: string};
+  WIRE_RECEIPT_MODE: {defaultValue: RECEIPT_MODE; key: string};
+  WIRE_TYPING_INDICATOR_MODE: {defaultValue: CONVERSATION_TYPING_INDICATOR_MODE; key: string};
+};
+type UserConsentStatusDetails = {
+  userConsentStatus: UserConsentStatus;
+  isMarketingConsentGiven: boolean;
+  isTelemetryConsentGiven: boolean;
+  isTelemetryEnabledAtCurrentEnvironment: boolean;
+};
+
 export class PropertiesRepository {
   // Value names are specified by the protocol but key names can be changed.
-  static get CONFIG() {
+  static get CONFIG(): PropertiesRepositoryConfig {
     return {
       WEBAPP_ACCOUNT_SETTINGS: 'webapp',
       WIRE_MARKETING_CONSENT: {
@@ -125,7 +138,7 @@ export class PropertiesRepository {
     /** @type {ko.Observable<ConsentValue | boolean>} */
   }
 
-  public getUserConsentStatus() {
+  public getUserConsentStatus(): UserConsentStatusDetails {
     const marketingConsent: ConsentValue | boolean | undefined = this.properties.settings.privacy.marketing_consent;
     const telemetryConsent: ConsentValue | boolean | undefined =
       this.properties.settings.privacy.telemetry_data_sharing;
@@ -165,7 +178,7 @@ export class PropertiesRepository {
       return;
     }
 
-    const toggleTelemetrySharing = (value: boolean) => {
+    const toggleTelemetrySharing = (value: boolean): void => {
       this.savePreference(PROPERTIES_TYPE.PRIVACY.TELEMETRY_SHARING, value);
       this.publishProperties();
     };

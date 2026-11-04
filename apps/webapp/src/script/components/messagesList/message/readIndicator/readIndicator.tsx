@@ -17,14 +17,16 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {isNonEmptyArray, isNonEmptyString} from '@sindresorhus/is';
 
-import * as Icon from 'Components/icon';
-import {Message} from 'Repositories/entity/message/message';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {formatTimeShort} from 'Util/timeUtil';
-
 import {ReadIndicatorContainer, ReadIndicatorStyles, ReadReceiptText} from './readIndicator.styles';
+
+import {Message} from '../../../../repositories/entity/message/message';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
+import {formatTimeShort} from '../../../../util/timeUtil';
+import * as Icon from '../../../icon';
 
 interface ReadIndicatorProps {
   message: Message;
@@ -33,7 +35,7 @@ interface ReadIndicatorProps {
   onClick?: (message: Message) => void;
 }
 
-export const ReadIndicator = ({
+export const ReadIndicator: FunctionComponent<ReadIndicatorProps> = ({
   message,
   is1to1Conversation = false,
   showIconOnly = false,

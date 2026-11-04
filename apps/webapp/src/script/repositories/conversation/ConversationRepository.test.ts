@@ -58,35 +58,35 @@ import {noop} from 'noop-esm';
 import {container} from 'tsyringe';
 
 import {CALL_TYPE, CONV_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {WebAppEvents} from '../../webAppEvents';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {buildMediaDevicesHandler, createSelfParticipant} from 'src/script/auth/util/test/testUtil';
 import {SystemMessageType} from 'src/script/message/systemMessageType';
-import {Call} from 'Repositories/calling/Call';
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {CallState} from 'Repositories/calling/CallState';
-import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/LeaveCallReason';
-import {ClientEntity} from 'Repositories/client/ClientEntity';
-import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
-import {ConnectionRepository} from 'Repositories/connection/connectionRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {CompositeMessage} from 'Repositories/entity/message/compositeMessage';
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {Message} from 'Repositories/entity/message/message';
-import {User} from 'Repositories/entity/User';
-import {ClientEvent, CONVERSATION} from 'Repositories/event/Client';
-import {EventSource} from 'Repositories/event/EventSource';
-import {EventRepository} from 'Repositories/event/EventRepository';
-import {EventService} from 'Repositories/event/EventService';
-import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
-import {SelfRepository} from 'Repositories/self/SelfRepository';
-import {LegacyEventRecord, StorageService} from 'Repositories/storage';
-import {StorageSchemata} from 'Repositories/storage/storageSchemata';
-import {TeamRepository} from 'Repositories/team/TeamRepository';
-import {TeamState} from 'Repositories/team/TeamState';
-import {UserRepository} from 'Repositories/user/userRepository';
-import {UserState} from 'Repositories/user/userState';
+import {Call} from '../calling/Call';
+import {CallingRepository} from '../calling/CallingRepository';
+import {CallState} from '../calling/CallState';
+import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
+import {ClientEntity} from '../client/ClientEntity';
+import {ConnectionEntity} from '../connection/connectionEntity';
+import {ConnectionRepository} from '../connection/connectionRepository';
+import {Conversation} from '../entity/Conversation';
+import {CompositeMessage} from '../entity/message/compositeMessage';
+import {ContentMessage} from '../entity/message/contentMessage';
+import {Message} from '../entity/message/message';
+import {User} from '../entity/User';
+import {ClientEvent, CONVERSATION} from '../event/Client';
+import {EventSource} from '../event/EventSource';
+import {EventRepository} from '../event/EventRepository';
+import {EventService} from '../event/EventService';
+import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
+import {SelfRepository} from '../self/SelfRepository';
+import {ConversationRecord, LegacyEventRecord, StorageService} from '../storage';
+import {StorageSchemata} from '../storage/storageSchemata';
+import {TeamRepository} from '../team/TeamRepository';
+import {TeamState} from '../team/TeamState';
+import {UserRepository} from '../user/userRepository';
+import {UserState} from '../user/userState';
 import {Config} from 'src/script/Config';
 import {ConversationError} from 'src/script/error/conversationError';
 import {
@@ -94,11 +94,11 @@ import {
   generateAPIConversation,
 } from 'test/helper/ConversationGenerator';
 import {createDeleteEvent, createMessageAddEvent} from 'test/helper/EventGenerator';
-import type {Translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
-import {escapeRegex} from 'Util/sanitizationUtil';
+import type {Translate} from '../../util/localizerUtil';
+import {translateForTest} from '../../util/test/translateForTest';
+import {escapeRegex} from '../../util/sanitizationUtil';
 import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
-import {createUuid} from 'Util/uuid';
+import {createUuid} from '../../util/uuid';
 
 import {ConversationDatabaseData, ConversationMapper} from './ConversationMapper';
 import {CONVERSATION_READONLY_STATE, ConversationRepository} from './ConversationRepository';
@@ -122,6 +122,29 @@ import {createMockHttpServer, MockHttpServer} from '../../../../test/helper/mock
 import {generateUser} from '../../../../test/helper/UserGenerator';
 import {Core} from '../../service/coreSingleton';
 
+type ConversationRepositoryTestDependencies = {
+  readonly conversationState: ConversationState;
+  readonly teamState: TeamState;
+  readonly userState: UserState;
+  readonly eventRepository: EventRepository;
+  readonly callingRepository: CallingRepository;
+  readonly userRepository: UserRepository;
+  readonly teamRepository: TeamRepository;
+  readonly messageRepository: MessageRepository;
+  readonly conversationService: ConversationService;
+  readonly core: Core;
+};
+type ConversationRepositoryTestFixture = readonly [ConversationRepository, ConversationRepositoryTestDependencies];
+type GeneratedConversation = {
+  members: {others: {qualified_id: QualifiedId}[]; self: {}};
+  name: string;
+  protocol: CONVERSATION_PROTOCOL;
+  qualified_id: QualifiedId;
+  receipt_mode: number;
+  team: string;
+  type: CONVERSATION_TYPE;
+};
+
 function getCoreConversationServiceForTest(): NonNullable<NonNullable<Core['service']>['conversation']> {
   const service = requireValueForTest(container.resolve(Core).service);
 
@@ -138,7 +161,10 @@ function getConversationServiceFromCoreForTest(core: Core): NonNullable<NonNulla
   return requireValueForTest(requireValueForTest(core.service).conversation);
 }
 
-function buildConversationRepository(translate: Translate) {
+function buildConversationRepository(
+  translate: Translate,
+  isMarkAsUnreadFeatureEnabled: boolean = false,
+): ConversationRepositoryTestFixture {
   const teamState = new TeamState();
   const conversationState = new ConversationState();
   // @ts-ignore
@@ -148,6 +174,12 @@ function buildConversationRepository(translate: Translate) {
     wipeMLSCapableConversation: noop,
     postBots: noop,
     saveConversationStateInDb: noop,
+    loadConversationStatesFromDb: async <RecordType>(): Promise<RecordType[]> => {
+      return [];
+    },
+    saveConversationsInDb: async (conversations: ConversationRecord[]): Promise<ConversationRecord[]> => {
+      return conversations;
+    },
     wipeMLSConversation: noop,
   } as ConversationService;
   const messageRepository = {setClientMismatchHandler: noop} as unknown as MessageRepository;
@@ -179,6 +211,7 @@ function buildConversationRepository(translate: Translate) {
     callingRepository,
     {} as any,
     translate,
+    {isMarkAsUnreadFeatureEnabled},
     userState,
     teamState,
     conversationState,
@@ -202,6 +235,46 @@ function buildConversationRepository(translate: Translate) {
   ] as const;
 }
 
+describe('conversation group selection', () => {
+  it('selects self-team groups separately from groups across all teams', () => {
+    const [conversationRepository, {conversationState, userState}] = buildConversationRepository(translateForTest);
+    const selfTeamId = 'self-team';
+    const selfUser = generateUser();
+    selfUser.teamId = selfTeamId;
+    userState.self(selfUser);
+
+    const selfTeamConversation = _generateConversation();
+    selfTeamConversation.teamId = selfTeamId;
+    const otherTeamConversation = _generateConversation();
+    otherTeamConversation.teamId = 'other-team';
+    const conversationWithoutTeam = _generateConversation();
+    conversationWithoutTeam.teamId = '';
+    const allGroupConversations = [selfTeamConversation, otherTeamConversation, conversationWithoutTeam];
+    conversationState.conversations(allGroupConversations);
+
+    const actualSelfTeamConversations = conversationRepository.getAllTeamGroupConversations();
+    const actualAllGroupConversations = conversationRepository.getAllGroupConversations();
+
+    expect(actualSelfTeamConversations).toEqual([selfTeamConversation]);
+    expect(actualAllGroupConversations).toEqual(allGroupConversations);
+  });
+
+  it('does not match empty conversation and self-user team IDs', () => {
+    const [conversationRepository, {conversationState, userState}] = buildConversationRepository(translateForTest);
+    const selfUser = generateUser();
+    selfUser.teamId = '';
+    userState.self(selfUser);
+
+    const conversationWithoutTeam = _generateConversation();
+    conversationWithoutTeam.teamId = '';
+    conversationState.conversations([conversationWithoutTeam]);
+
+    const actualConversations = conversationRepository.getAllTeamGroupConversations();
+
+    expect(actualConversations).toEqual([]);
+  });
+});
+
 describe('ConversationRepository', () => {
   const originalPrimaryModalShow = PrimaryModal.show;
   const testFactory = new TestFactory();
@@ -213,7 +286,7 @@ describe('ConversationRepository', () => {
   let storage_service: StorageService;
   const messageSenderId = createUuid();
 
-  const _findConversation = (conversation: Conversation, conversations: () => Conversation[]) => {
+  const _findConversation = (conversation: Conversation, conversations: () => Conversation[]): Conversation => {
     return ko.utils.arrayFirst(conversations(), _conversation => {
       return _conversation.id === conversation.id;
     });
@@ -2525,7 +2598,7 @@ describe('ConversationRepository', () => {
         };
       };
 
-      const saveMeetingConversation = async () => {
+      const saveMeetingConversation = async (): Promise<Conversation> => {
         const conversationRepository = requireValueForTest(testFactory.conversation_repository);
         const meetingConversation = _generateConversation({
           protocol: CONVERSATION_PROTOCOL.MLS,
@@ -3434,7 +3507,7 @@ describe('ConversationRepository', () => {
     otherMembers: QualifiedId[] = [],
     protocol = CONVERSATION_PROTOCOL.PROTEUS,
     type = CONVERSATION_TYPE.REGULAR,
-  ) {
+  ): GeneratedConversation {
     return {
       members: {
         others:
@@ -3494,6 +3567,64 @@ describe('ConversationRepository', () => {
       const conversations = await conversationRepository.loadConversations([], []);
 
       expect(conversations).toHaveLength(remoteConversations.found.length);
+    });
+
+    it('discards persisted manual unread state while disabled so it cannot return after re-enabling', async () => {
+      const existingConversation = _generateConversation();
+      existingConversation.last_read_timestamp(500);
+      existingConversation.manualUnreadTimestamp(100);
+      let persistedConversations: ConversationRecord[] = [existingConversation.serialize()];
+      const remoteConversations = {failed: [], found: []} as unknown as RemoteConversations;
+
+      const [disabledRepository] = buildConversationRepository(translateForTest, false);
+      const disabledConversationService = disabledRepository['conversationService'];
+      jest.spyOn(disabledConversationService, 'loadConversationStatesFromDb').mockImplementation(async () => {
+        return persistedConversations as unknown as ConversationDatabaseData[];
+      });
+      const saveDisabledState = jest
+        .spyOn(disabledConversationService, 'saveConversationsInDb')
+        .mockImplementation(async conversations => {
+          persistedConversations = conversations;
+          return conversations;
+        });
+
+      const disabledConversations = await disabledRepository['loadRemoteConversations'](remoteConversations, []);
+
+      expect(saveDisabledState).toHaveBeenCalledTimes(1);
+      expect(persistedConversations.at(0)).not.toHaveProperty('manual_unread_timestamp');
+      expect(persistedConversations.at(0)?.last_read_timestamp).toBe(500);
+      expect(disabledConversations.at(0)?.manualUnreadTimestamp()).toBeUndefined();
+
+      const [enabledRepository] = buildConversationRepository(translateForTest, true);
+      jest
+        .spyOn(enabledRepository['conversationService'], 'loadConversationStatesFromDb')
+        .mockImplementation(async () => {
+          return persistedConversations as unknown as ConversationDatabaseData[];
+        });
+
+      const enabledConversations = await enabledRepository['loadRemoteConversations'](remoteConversations, []);
+
+      expect(enabledConversations.at(0)?.manualUnreadTimestamp()).toBeUndefined();
+      expect(enabledConversations.at(0)?.last_read_timestamp()).toBe(500);
+    });
+
+    it('loads unread history from the local manual boundary without changing canonical read state', async () => {
+      const [conversationRepository] = buildConversationRepository(translateForTest, true);
+      const conversation = _generateConversation();
+      const firstUnreadMessage = new ContentMessage(createUuid(), translateForTest);
+      firstUnreadMessage.timestamp(300);
+      conversation.last_read_timestamp(200);
+      conversation.manualUnreadTimestamp(100);
+      conversation.messages_unordered.push(firstUnreadMessage);
+      const loadPrecedingEvents = jest
+        .spyOn(conversationRepository['eventService'], 'loadPrecedingEvents')
+        .mockResolvedValue([]);
+
+      await conversationRepository['getUnreadEvents'](conversation);
+
+      expect(loadPrecedingEvents).toHaveBeenCalledWith(conversation.id, new Date(100), new Date(300));
+      expect(conversation.last_read_timestamp()).toBe(200);
+      expect(conversation.manualUnreadTimestamp()).toBe(100);
     });
 
     it("does not load proteus 1:1 conversation if there's mls 1:1 conversation with the same user", async () => {

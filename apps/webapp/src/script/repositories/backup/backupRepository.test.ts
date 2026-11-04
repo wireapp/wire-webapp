@@ -26,13 +26,14 @@ import {generateConversation} from 'test/helper/ConversationGenerator';
 import {TestFactory} from 'test/helper/TestFactory';
 import {generateAPIUser} from 'test/helper/UserGenerator';
 
-import {User} from 'Repositories/entity/User';
-import {ClientEvent} from 'Repositories/event/Client';
-import {StorageService} from 'Repositories/storage';
-import {StorageSchemata} from 'Repositories/storage/storageSchemata';
-import {noop} from 'Util/util';
-import {createUuid} from 'Util/uuid';
-import {WebWorker} from 'Util/worker';
+import {User} from '../entity/User';
+import type {ConversationRepository} from '../conversation/ConversationRepository';
+import {ClientEvent} from '../event/Client';
+import {StorageService} from '../storage';
+import {StorageSchemata} from '../storage/storageSchemata';
+import {noop} from '../../util/util';
+import {createUuid} from '../../util/uuid';
+import {WebWorker} from '../../util/worker';
 
 import {Filename} from './backup.types';
 import {BackUpHeader, ENCRYPTED_BACKUP_FORMAT, ENCRYPTED_BACKUP_VERSION} from './backUpHeader';
@@ -45,7 +46,7 @@ import {handleZipEvent} from './zipWorker';
 
 import {Config} from '../../Config';
 import {DatabaseTypes, createStorageEngine} from '../../service/storeEngineProvider';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 
 const conversationId = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a';
 
@@ -76,7 +77,14 @@ const messages = [
   },
 ];
 
-async function buildBackupRepository() {
+type BackupRepositoryTestDependencies = {
+  readonly backupService: BackupService;
+  readonly conversationRepository: ConversationRepository;
+  readonly storageService: StorageService;
+};
+type BackupRepositoryTestFixture = readonly [BackupRepository, BackupRepositoryTestDependencies];
+
+async function buildBackupRepository(): Promise<BackupRepositoryTestFixture> {
   const storageService = container.resolve(StorageService);
   const engine = await createStorageEngine('test', DatabaseTypes.PERMANENT);
   storageService.init(engine);

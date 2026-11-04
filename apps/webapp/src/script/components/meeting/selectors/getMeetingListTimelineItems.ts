@@ -17,8 +17,9 @@
  *
  */
 
-import type {MeetingInstancesByDay} from 'Components/meeting/selectors/groupMeetingInstancesByDay';
-import type {MeetingInstance} from 'Components/meeting/types/meetingInstance';
+import type {MeetingInstancesByDay} from './groupMeetingInstancesByDay';
+
+import type {MeetingInstance} from '../types/meetingInstance';
 
 export type MeetingListTimelineItem =
   {type: 'dayHeader'; day: Date} | {type: 'meetingInstance'; day: Date; meetingInstance: MeetingInstance};

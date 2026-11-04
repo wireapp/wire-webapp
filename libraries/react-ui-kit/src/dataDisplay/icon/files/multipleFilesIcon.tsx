@@ -17,9 +17,11 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {SVGIcon, SVGIconProps} from '../svgIcon';
 
-export const MultipleFilesIcon = ({...props}: SVGIconProps) => {
+export const MultipleFilesIcon: FunctionComponent<SVGIconProps> = ({...props}) => {
   return (
     <SVGIcon realWidth={13} realHeight={16} fill="none" {...props}>
       <path

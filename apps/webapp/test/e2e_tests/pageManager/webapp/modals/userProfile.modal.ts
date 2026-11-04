@@ -56,15 +56,15 @@ export class UserProfileModal {
     this.openProfileButton = this.modal.getByTestId('go-profile');
   }
 
-  async isVisible() {
+  async isVisible(): Promise<boolean> {
     return await this.modal.isVisible();
   }
 
-  async clickConnectButton() {
+  async clickConnectButton(): Promise<void> {
     await this.connectButton.click();
   }
 
-  async clickStartConversation() {
+  async clickStartConversation(): Promise<void> {
     await this.startConversationButton.click();
   }
 }

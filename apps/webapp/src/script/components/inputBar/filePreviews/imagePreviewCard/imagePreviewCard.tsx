@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {imageStyles} from './imagePreviewCard.styles';
@@ -31,7 +33,13 @@ interface ImagePreviewCardProps {
   uploadProgress: number;
 }
 
-export const ImagePreviewCard = ({src, onDelete, onRetry, isError, uploadProgress}: ImagePreviewCardProps) => {
+export const ImagePreviewCard: FunctionComponent<ImagePreviewCardProps> = ({
+  src,
+  onDelete,
+  onRetry,
+  isError,
+  uploadProgress,
+}: ImagePreviewCardProps) => {
   const {translate} = useApplicationContext();
 
   return (

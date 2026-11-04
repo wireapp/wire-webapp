@@ -19,7 +19,8 @@
 
 import {RestNode} from 'cells-sdk-ts';
 
-export const transformNodesToCellsFolders = (nodes: RestNode[]) => {
+type TransformNodesToCellsFoldersResult = {id: string; name: string; path: string}[];
+export const transformNodesToCellsFolders = (nodes: RestNode[]): TransformNodesToCellsFoldersResult => {
   return nodes
     .filter(node => {
       return node.Type === 'COLLECTION';

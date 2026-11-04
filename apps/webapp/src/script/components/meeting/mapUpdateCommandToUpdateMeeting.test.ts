@@ -20,8 +20,8 @@
 import {MeetingRecurrenceFrequency} from '@wireapp/api-client/lib/meetings/meetingRecurrence';
 import {maybe} from 'true-myth';
 
-import {User} from 'Repositories/entity/User';
-import {translateForTest} from 'Util/test/translateForTest';
+import {User} from '../../repositories/entity/User';
+import {translateForTest} from '../../util/test/translateForTest';
 
 import {mapUpdateCommandToUpdateMeeting} from './mapUpdateCommandToUpdateMeeting';
 import type {UpdateMeetingCommand} from './shared/types/meetingCommandTypes';
@@ -33,7 +33,7 @@ const futureEndIso = futureEndDate.toISOString();
 const meetingId = {id: 'meeting-id', domain: 'example.com'};
 const qualifiedConversation = {id: 'conversation-id', domain: 'example.com'};
 
-const createUser = (id: string) => {
+const createUser = (id: string): User => {
   const user = new User(id, 'example.com', translateForTest);
   user.name(`User ${id}`);
   return user;

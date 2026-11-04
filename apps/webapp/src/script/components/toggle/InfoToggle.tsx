@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode, useId} from 'react';
+import {ReactNode, useId, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 import cx from 'classnames';
@@ -36,7 +36,7 @@ interface InfoToggleProps {
   adminHintForShareDrive?: string;
 }
 
-const InfoToggle = ({
+const InfoToggle: FunctionComponent<InfoToggleProps> = ({
   dataUieName,
   className = '',
   info,

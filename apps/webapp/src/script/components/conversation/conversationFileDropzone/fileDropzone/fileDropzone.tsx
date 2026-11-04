@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode} from 'react';
+import {ReactNode, type FunctionComponent} from 'react';
 
 import {DropzoneRootProps, DropzoneInputProps} from 'react-dropzone';
 
@@ -33,7 +33,13 @@ interface FileDropzoneProps {
   children: ReactNode;
 }
 
-export const FileDropzone = ({isDragAccept, isFileDropAllowed, rootProps, inputProps, children}: FileDropzoneProps) => {
+export const FileDropzone: FunctionComponent<FileDropzoneProps> = ({
+  isDragAccept,
+  isFileDropAllowed,
+  rootProps,
+  inputProps,
+  children,
+}: FileDropzoneProps) => {
   const {isDragging, wrapperRef} = useIsDragging();
   const overlayMode = isFileDropAllowed ? 'upload' : 'restricted';
 

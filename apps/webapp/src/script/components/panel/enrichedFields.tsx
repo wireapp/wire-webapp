@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useId, useState} from 'react';
+import {useEffect, useId, useState, type FunctionComponent} from 'react';
 
 import {isNonEmptyString} from '@sindresorhus/is';
 import type {RichInfoField} from '@wireapp/api-client/lib/user/richInfo';
@@ -25,12 +25,13 @@ import {container} from 'tsyringe';
 
 import {Availability} from '@wireapp/protocol-messaging';
 
-import type {User} from 'Repositories/entity/User';
-import {RichProfileRepository} from 'Repositories/user/richProfileRepository';
 import {RootContextValue, useApplicationContext} from 'src/script/page/rootProvider';
-import {availabilityStatus, availabilityTranslationKeys} from 'Util/availabilityStatus';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {noop} from 'Util/util';
+
+import type {User} from '../../repositories/entity/User';
+import {RichProfileRepository} from '../../repositories/user/richProfileRepository';
+import {availabilityStatus, availabilityTranslationKeys} from '../../util/availabilityStatus';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
+import {noop} from '../../util/util';
 
 interface EnrichedFieldsProps {
   onFieldsLoaded?: (richFields: RichInfoField[]) => void;
@@ -46,7 +47,7 @@ export const useEnrichedFields = (
   translate: RootContextValue['translate'],
   richProfileRepository: RichProfileRepository = container.resolve(RichProfileRepository),
   onFieldsLoaded: (richFields: RichInfoField[]) => void = noop,
-) => {
+): RichInfoField[] => {
   const [fields, setFields] = useState<RichInfoField[]>([]);
   const {email} = useKoSubscribableChildren(user, ['email']);
   useEffect(() => {
@@ -61,7 +62,7 @@ export const useEnrichedFields = (
       });
     }
 
-    const loadRichFields = async () => {
+    const loadRichFields = async (): Promise<void> => {
       try {
         const richProfile = await richProfileRepository.getUserRichProfile(user.id);
         returnFields.push(...(richProfile?.fields ?? []));
@@ -83,7 +84,7 @@ export const useEnrichedFields = (
   return fields;
 };
 
-const EnrichedFields = ({
+const EnrichedFields: FunctionComponent<EnrichedFieldsProps> = ({
   onFieldsLoaded = noop,
   showDomain = false,
   richProfileRepository = container.resolve(RichProfileRepository),

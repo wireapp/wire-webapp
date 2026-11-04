@@ -70,10 +70,10 @@ export function openTab(url: string): Window | null {
 
 export const SSO_CODE_PREFIX = 'wire-';
 
-export function getPrefixedSSOCode(code?: string) {
+export function getPrefixedSSOCode(code?: string): string {
   return isNonEmptyString(code) ? `${SSO_CODE_PREFIX}${code}` : '';
 }
 
-export const navigateTo = (url: string) => {
+export const navigateTo = (url: string): void => {
   window.location.assign(url);
 };

@@ -95,11 +95,11 @@ async function createAccount(): Promise<{account: Account; apiClient: APIClient}
   return {account, apiClient};
 }
 
-const waitFor = (assertion: () => void) => {
+const waitFor = (assertion: () => void): Promise<void> => {
   const maxAttempts = 500;
   let attempts = 0;
   return new Promise<void>(resolve => {
-    const attempt = () => {
+    const attempt = (): void => {
       attempts++;
       try {
         assertion();
@@ -314,7 +314,7 @@ describe('Account', () => {
     let dependencies: {account: Account; apiClient: APIClient};
     let server: WS;
 
-    const mockNotifications = (size: number) => {
+    const mockNotifications = (size: number): void => {
       const notifications = Array.from(new Array(size)).map(() => {
         return {
           id: uuidv4(),
@@ -618,7 +618,7 @@ describe('Account', () => {
       };
     };
 
-    const setup = async (mlsService: MlsServiceStub) => {
+    const setup = async (mlsService: MlsServiceStub): Promise<{account: Account}> => {
       const {account, apiClient} = await createAccount();
 
       if (!account.service) {
@@ -689,7 +689,7 @@ describe('Account', () => {
       const {account} = await setup(mlsService);
 
       const onConnectionStateChanged = jest.fn<void, [ConnectionState]>();
-      const liveTransitionCount = () => {
+      const liveTransitionCount = (): number => {
         return onConnectionStateChanged.mock.calls.filter(([state]) => {
           return state === ConnectionState.LIVE;
         }).length;

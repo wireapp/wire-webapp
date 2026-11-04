@@ -17,27 +17,29 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {ConversationSettingsIcon, MLSVerified} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/icon';
-import {AdminlessDeleteReminderMessage} from 'Repositories/entity/message/adminlessDeleteReminderMessage';
-import {E2EIVerificationMessage} from 'Repositories/entity/message/e2eiVerificationMessage';
-import {JoinedAfterMLSMigrationFinalisationMessage} from 'Repositories/entity/message/joinedAfterMlsMigrationFinalisationMessage';
-import {MemberRoleUpdateMessage} from 'Repositories/entity/message/memberRoleUpdateMessage';
-import {MessageTimerUpdateMessage} from 'Repositories/entity/message/messageTimerUpdateMessage';
-import {MLSConversationRecoveredMessage} from 'Repositories/entity/message/mlsConversationRecoveredMessage';
-import {MLSMigrationFinalisationOngoingCallMessage} from 'Repositories/entity/message/mlsMigrationFinalisationOngoingCallMessage';
-import {OneToOneMigratedToMlsMessage} from 'Repositories/entity/message/oneToOneMigratedToMlsMessage';
-import {ProtocolUpdateMessage} from 'Repositories/entity/message/protocolUpdateMessage';
-import {ReceiptModeUpdateMessage} from 'Repositories/entity/message/receiptModeUpdateMessage';
-import {RenameMessage} from 'Repositories/entity/message/renameMessage';
-import {SystemMessage as SystemMessageEntity} from 'Repositories/entity/message/systemMessage';
 import {SystemMessageType} from 'src/script/message/systemMessageType';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {SystemMessageBase} from './systemMessageBase';
 import {renderMemberRoleUpdateSystemMessageCaption, renderMlsSystemMessageCaption} from './systemMessageCaption';
 
+import {AdminlessDeleteReminderMessage} from '../../../../repositories/entity/message/adminlessDeleteReminderMessage';
+import {E2EIVerificationMessage} from '../../../../repositories/entity/message/e2eiVerificationMessage';
+import {JoinedAfterMLSMigrationFinalisationMessage} from '../../../../repositories/entity/message/joinedAfterMlsMigrationFinalisationMessage';
+import {MemberRoleUpdateMessage} from '../../../../repositories/entity/message/memberRoleUpdateMessage';
+import {MessageTimerUpdateMessage} from '../../../../repositories/entity/message/messageTimerUpdateMessage';
+import {MLSConversationRecoveredMessage} from '../../../../repositories/entity/message/mlsConversationRecoveredMessage';
+import {MLSMigrationFinalisationOngoingCallMessage} from '../../../../repositories/entity/message/mlsMigrationFinalisationOngoingCallMessage';
+import {OneToOneMigratedToMlsMessage} from '../../../../repositories/entity/message/oneToOneMigratedToMlsMessage';
+import {ProtocolUpdateMessage} from '../../../../repositories/entity/message/protocolUpdateMessage';
+import {ReceiptModeUpdateMessage} from '../../../../repositories/entity/message/receiptModeUpdateMessage';
+import {RenameMessage} from '../../../../repositories/entity/message/renameMessage';
+import {SystemMessage as SystemMessageEntity} from '../../../../repositories/entity/message/systemMessage';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
+import * as Icon from '../../../icon';
 import {AdminlessDeleteReminderMessage as AdminlessDeleteReminderMessageComponent} from '../adminlessDeleteReminderMessage';
 import {messageBodyWrapper} from '../contentMessage/contentMessage.styles';
 import {ProtocolUpdateMessage as ProtocolUpdateMessageComponent} from '../protocolUpdateMessage';
@@ -46,7 +48,7 @@ interface SystemMessageProps {
   message: SystemMessageEntity;
 }
 
-export const SystemMessage = ({message}: SystemMessageProps) => {
+export const SystemMessage: FunctionComponent<SystemMessageProps> = ({message}: SystemMessageProps) => {
   const {user} = useKoSubscribableChildren(message, ['user']);
   if (message.system_message_type === SystemMessageType.SESSION_RESET) {
     return <SystemMessageBase message={message} isSenderNameVisible={!user.isMe} icon={<Icon.InfoIcon />} />;

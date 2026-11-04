@@ -20,6 +20,7 @@
 import type {ConversationRolesList} from '@wireapp/api-client/lib/conversation/conversationRole';
 import type {FeatureList} from '@wireapp/api-client/lib/team/feature/';
 import {FEATURE_STATUS, FEATURE_KEY} from '@wireapp/api-client/lib/team/feature/';
+import type {TeamInvitation} from '@wireapp/api-client/lib/team/invitation/teamInvitation';
 import {TeamMigrationPayload} from '@wireapp/api-client/lib/team/invitation/teamMigrationPayload';
 import type {LegalHoldMemberData} from '@wireapp/api-client/lib/team/legalhold/';
 import type {MemberData, Members} from '@wireapp/api-client/lib/team/member/';
@@ -78,7 +79,7 @@ export class TeamService {
     return status === 'enabled';
   }
 
-  async upgradePersonalToTeamUser(payload: TeamMigrationPayload) {
+  async upgradePersonalToTeamUser(payload: TeamMigrationPayload): Promise<TeamInvitation> {
     return this.apiClient.api.teams.invitation.upgradePersonalToTeamUser(payload);
   }
 

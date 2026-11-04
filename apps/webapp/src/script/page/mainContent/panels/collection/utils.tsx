@@ -17,13 +17,12 @@
  *
  */
 
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-
 import {MessageCategory} from '../../../../message/messageCategory';
+import {ContentMessage} from '../../../../repositories/entity/message/contentMessage';
 
 export type Category = 'images' | 'links' | 'files' | 'audio';
 
-export const isOfCategory = (category: Category, message: ContentMessage) => {
+export const isOfCategory = (category: Category, message: ContentMessage): number | boolean | undefined => {
   const messageCategory = message.category;
   if (messageCategory === undefined) {
     return false;

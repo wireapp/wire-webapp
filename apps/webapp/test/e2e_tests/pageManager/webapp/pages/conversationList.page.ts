@@ -19,6 +19,33 @@
 
 import {Locator, Page} from '@playwright/test';
 
+type OpenContextMenuResult = Promise<
+  Locator & {
+    archiveButton: Locator;
+    unarchiveButton: Locator;
+    blockButton: Locator;
+    unblockButton: Locator;
+    addToFavoritesButton: Locator;
+    moveToButton: Locator;
+    notificationsButton: Locator;
+    clearContentButton: Locator;
+    leaveConversationButton: Locator;
+  }
+>;
+
+type GetConversationResult = Locator & {
+  userAvatar: Locator;
+  statusAvailabilityIcon: Locator;
+  unreadIndicator: Locator;
+  mutedIndicator: Locator;
+  mentionIndicator: Locator;
+  unreadReplyIndicator: Locator;
+  blockedIndicator: Locator;
+  joinCallButton: Locator;
+  open: () => Promise<GetConversationResult>;
+  openContextMenu: () => OpenContextMenuResult;
+};
+
 export class ConversationListPage {
   private readonly page: Page;
 
@@ -38,11 +65,11 @@ export class ConversationListPage {
     this.conversationListHeaderTitle = page.locator('[data-uie-name="conversation-list-header-title"]');
   }
 
-  async openPendingConnectionRequest() {
+  async openPendingConnectionRequest(): Promise<void> {
     await this.pendingConnectionRequest.click();
   }
 
-  async clickCreateGroup() {
+  async clickCreateGroup(): Promise<void> {
     await this.createGroupButton.click();
   }
 
@@ -57,14 +84,14 @@ export class ConversationListPage {
    * @param conversationName Name of the conversation to search for
    * @param options.protocol Only locate conversations matching this protocol (mls only works for 1on1 conversations as groups still use proteus) - Default: "mls"
    */
-  getConversation(conversationName: string, options?: {protocol?: 'mls' | 'proteus'}) {
+  getConversation(conversationName: string, options?: {protocol?: 'mls' | 'proteus'}): GetConversationResult {
     let conversation = this.page.getByTestId('item-conversation').filter({hasText: conversationName});
 
     if (options?.protocol) {
       conversation = conversation.and(this.page.locator(`[data-protocol="${options.protocol}"]`));
     }
 
-    const enhancedLocator = Object.assign(conversation, {
+    const enhancedLocator: GetConversationResult = Object.assign(conversation, {
       userAvatar: conversation.getByTestId('element-avatar-user'),
       statusAvailabilityIcon: conversation.getByTestId('status-availability-icon'),
       unreadIndicator: conversation.getByTitle('Unread message'),
@@ -75,7 +102,7 @@ export class ConversationListPage {
       joinCallButton: conversation.getByRole('button', {name: 'Join'}),
 
       // This is just syntactic sugar to allow capturing the enhanced locator from the open function
-      open: async () => {
+      open: async (): Promise<GetConversationResult> => {
         await conversation.click();
         return enhancedLocator;
       },
@@ -96,7 +123,7 @@ export class ConversationListPage {
    * const contextMenu = await pages.conversationList().openContextMenu(conversationLocator);
    * await contextMenu.archiveButton.click();
    */
-  async openContextMenu(conversation: Locator) {
+  async openContextMenu(conversation: Locator): OpenContextMenuResult {
     await conversation.getByRole('button', {name: 'Open conversation options'}).click();
 
     const contextMenu = this.page.getByRole('menu');

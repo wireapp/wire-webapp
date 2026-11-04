@@ -26,6 +26,7 @@ import React, {
   useCallback,
   useRef,
   RefObject,
+  type FunctionComponent,
 } from 'react';
 
 import {isNonEmptyString, isNullOrUndefined} from '@sindresorhus/is';
@@ -35,20 +36,8 @@ import {useDebouncedCallback} from 'use-debounce';
 
 import {WIDTH} from '@wireapp/react-ui-kit';
 
-import {ConversationListCell} from 'Components/conversationListCell';
-import type {RegisterConversationElement} from 'Hooks/useConversationFocus';
-import {Call} from 'Repositories/calling/Call';
-import {CallState} from 'Repositories/calling/CallState';
-import {ConversationLabel, ConversationLabelRepository} from 'Repositories/conversation/ConversationLabelRepository';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
 import {useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {isKeyboardEvent} from 'Util/keyboardUtil';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-import {isConversationEntity} from 'Util/typePredicateUtil';
 
 import {ConnectionRequests} from './connectionRequests';
 import {
@@ -60,8 +49,23 @@ import {
 } from './conversationsList.styles';
 import {getConversationsToDisplay} from './helpers';
 
+import {ConversationListCell} from '../../../../components/conversationListCell';
+import type {RegisterConversationElement} from '../../../../hooks/useConversationFocus';
+import {Call} from '../../../../repositories/calling/Call';
+import {CallState} from '../../../../repositories/calling/CallState';
+import {
+  ConversationLabel,
+  ConversationLabelRepository,
+} from '../../../../repositories/conversation/ConversationLabelRepository';
+import {ConversationState} from '../../../../repositories/conversation/ConversationState';
+import {Conversation} from '../../../../repositories/entity/Conversation';
+import {User} from '../../../../repositories/entity/User';
 import {generateConversationUrl} from '../../../../router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from '../../../../router/routerBindings';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
+import {isKeyboardEvent} from '../../../../util/keyboardUtil';
+import {matchQualifiedIds} from '../../../../util/qualifiedId';
+import {isConversationEntity} from '../../../../util/typePredicateUtil';
 import {ListViewModel} from '../../../../view_model/ListViewModel';
 import {useAppMainState, ViewType} from '../../../state';
 import {ContentState} from '../../../useAppState';
@@ -162,7 +166,7 @@ interface ConversationsListProps {
   cancelPendingFocusRef?: RefObject<(() => void) | null>;
 }
 
-export const ConversationsList = ({
+export const ConversationsList: FunctionComponent<ConversationsListProps> = ({
   conversations,
   conversationsFilter,
   conversationFocusCandidates,
@@ -226,7 +230,7 @@ export const ConversationsList = ({
     [joinableCalls],
   );
 
-  const onConnectionRequestClick = () => {
+  const onConnectionRequestClick = (): void => {
     setCurrentView(ViewType.MOBILE_CENTRAL_COLUMN);
     listViewModel.contentViewModel.switchContent(ContentState.CONNECTION_REQUESTS);
   };
@@ -447,7 +451,15 @@ export const ConversationsList = ({
     };
   });
 
-  const getCommonConversationRowProps = (conversation: Conversation) => {
+  type GetCommonConversationRowPropsResult = {
+    conversation: Conversation;
+    isFocused: boolean;
+    isActive: boolean;
+    showJoinButton: boolean;
+    handlersRef: React.RefObject<ConversationRowHandlers>;
+    registerConversationElement: RegisterConversationElement | undefined;
+  };
+  const getCommonConversationRowProps = (conversation: Conversation): GetCommonConversationRowPropsResult => {
     return {
       conversation,
       isFocused: currentFocus === conversation.id,

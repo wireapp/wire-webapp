@@ -23,8 +23,6 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {E2eiConversationState, MLSServiceEvents} from '@wireapp/core/lib/messagingProtocols/mls';
 import {StringifiedQualifiedId, stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
 import {
   E2EIHandler,
   getActiveWireIdentity,
@@ -35,9 +33,11 @@ import {
 } from 'src/script/e2eIdentity';
 import {E2EIVerificationMessageType} from 'src/script/message/e2eiVerificationMessageType';
 import {Core} from 'src/script/service/coreSingleton';
-import {Logger, getLogger} from 'Util/logger';
-import {waitFor} from 'Util/waitFor';
 
+import {Logger, getLogger} from '../../../../util/logger';
+import {waitFor} from '../../../../util/waitFor';
+import {Conversation} from '../../../entity/Conversation';
+import {User} from '../../../entity/User';
 import {isMLSConversation, MLSCapableConversation, MLSConversation} from '../../ConversationSelectors';
 import {ConversationState} from '../../ConversationState';
 import {ConversationVerificationState} from '../../ConversationVerificationState';
@@ -47,6 +47,11 @@ enum UserVerificationState {
   ALL_VALID = 0,
   SOME_INVALID = 1,
 }
+
+type ConversationCredentialVerification = {
+  userVerificationState: UserVerificationState;
+  userIdentities: Map<string, WireIdentity[]> | undefined;
+};
 
 export class MLSConversationVerificationStateHandler {
   private readonly logger: Logger;
@@ -78,7 +83,7 @@ export class MLSConversationVerificationStateHandler {
   private async degradeConversation(
     conversation: MLSConversation,
     userIdentities: Map<string, WireIdentity[]> | undefined,
-  ) {
+  ): Promise<void> {
     if (isUndefined(userIdentities)) {
       return;
     }
@@ -110,7 +115,7 @@ export class MLSConversationVerificationStateHandler {
    * Changes mls verification state to "verified"
    * @param conversation
    */
-  private async verifyConversation(conversation: MLSConversation) {
+  private async verifyConversation(conversation: MLSConversation): Promise<void> {
     const state = ConversationVerificationState.VERIFIED;
     conversation.mlsVerificationState(state);
     this.onConversationVerificationStateChange({
@@ -136,10 +141,7 @@ export class MLSConversationVerificationStateHandler {
 
   private checkAllUserCredentialsInConversation = async (
     conversation: MLSCapableConversation,
-  ): Promise<{
-    userVerificationState: UserVerificationState;
-    userIdentities: Map<string, WireIdentity[]> | undefined;
-  }> => {
+  ): Promise<ConversationCredentialVerification> => {
     const userIdentities = await getAllGroupUsersIdentities(conversation.groupId);
     const processedUserIds: Set<StringifiedQualifiedId> = new Set();
     let userVerificationState = UserVerificationState.ALL_VALID;

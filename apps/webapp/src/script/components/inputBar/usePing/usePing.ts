@@ -19,12 +19,13 @@
 
 import {useState} from 'react';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
+
+import {MessageRepository} from '../../../repositories/conversation/MessageRepository';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {TIME_IN_MILLIS} from '../../../util/timeUtil';
+import {PrimaryModal} from '../../Modals/PrimaryModal';
 
 const pingTimeoutInSeconds = 2;
 
@@ -34,14 +35,15 @@ interface UsePingProps {
   is1to1: boolean;
 }
 
-export const usePing = ({conversation, messageRepository, is1to1}: UsePingProps) => {
+type UsePingResult = {isPingDisabled: boolean; handlePing: () => void};
+export const usePing = ({conversation, messageRepository, is1to1}: UsePingProps): UsePingResult => {
   const {fireAndForgetInvoker, translate} = useApplicationContext();
   const [isPingDisabled, setIsPingDisabled] = useState(false);
 
   const maxUsersWithoutAlert = Config.getConfig().FEATURE.MAX_USERS_TO_PING_WITHOUT_ALERT;
   const enablePingConfirmation = Config.getConfig().FEATURE.ENABLE_PING_CONFIRMATION;
 
-  const pingConversation = () => {
+  const pingConversation = (): void => {
     setIsPingDisabled(true);
     fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
       await messageRepository.sendPing(conversation);
@@ -51,7 +53,7 @@ export const usePing = ({conversation, messageRepository, is1to1}: UsePingProps)
     });
   };
 
-  const handlePing = () => {
+  const handlePing = (): void => {
     if (isPingDisabled) {
       return;
     }

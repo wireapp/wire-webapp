@@ -17,16 +17,17 @@
  *
  */
 
-import {ReactNode, useEffect} from 'react';
+import {ReactNode, useEffect, type FunctionComponent} from 'react';
 
 import {isUndefined} from '@sindresorhus/is';
 
 import {PauseIcon, PlayIcon} from '@wireapp/react-ui-kit';
 
-import {useMessageFocusedTabIndex} from 'Components/messagesList/message/util';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {wrapperStyles, playButtonStyles, wrapperStylesFullscreen} from './videoPlayButton.styles';
+
+import {useMessageFocusedTabIndex} from '../../../../../../../util';
 
 interface VideoPlayButtonProps {
   mediaElement?: HTMLMediaElement;
@@ -38,7 +39,7 @@ interface VideoPlayButtonProps {
   isFullscreen?: boolean;
 }
 
-export const VideoPlayButton = ({
+export const VideoPlayButton: FunctionComponent<VideoPlayButtonProps> = ({
   mediaElement,
   onPlay,
   onPause,
@@ -86,7 +87,7 @@ interface VideoButtonProps {
   tabIndex: number;
 }
 
-const VideoButton = ({
+const VideoButton: FunctionComponent<VideoButtonProps> = ({
   label,
   isDisabled = false,
   isFullscreen = false,

@@ -27,13 +27,16 @@ import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/testUtil';
 
-function createMockedURLSearchParams(value: string) {
+type MockedURLSearchParamsInstance = URLSearchParams & {get(): string};
+type MockedURLSearchParamsConstructor = new () => MockedURLSearchParamsInstance;
+
+function createMockedURLSearchParams(value: string): MockedURLSearchParamsConstructor {
   return class MockedURLSearchParams extends window.URLSearchParams {
     constructor() {
       super();
     }
 
-    get() {
+    get(): string {
       return value;
     }
   };

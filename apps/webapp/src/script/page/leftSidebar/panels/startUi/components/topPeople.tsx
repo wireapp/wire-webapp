@@ -17,11 +17,11 @@
  *
  */
 
-import React from 'react';
-
-import {User} from 'Repositories/entity/User';
+import React, {type FunctionComponent} from 'react';
 
 import {TopContact} from './topPeople/topContact';
+
+import {User} from '../../../../../repositories/entity/User';
 
 const defaultTopPeopleLimit = 9;
 
@@ -31,7 +31,7 @@ interface TopPeopleProps {
   users: User[];
 }
 
-const TopPeople = ({clickOnUser, max, users}: TopPeopleProps) => {
+const TopPeople: FunctionComponent<TopPeopleProps> = ({clickOnUser, max, users}: TopPeopleProps) => {
   max ??= defaultTopPeopleLimit;
   const displayedUsers = users.slice(0, max);
   const searchListItems = displayedUsers.map(user => {

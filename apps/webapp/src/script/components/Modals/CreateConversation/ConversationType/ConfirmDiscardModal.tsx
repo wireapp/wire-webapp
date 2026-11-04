@@ -17,11 +17,11 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {Button, ButtonVariant, FlexBox, Text} from '@wireapp/react-ui-kit';
 
-import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {handleEscDown, handleKeyDown, KEY} from 'Util/keyboardUtil';
 
 import {
   confirmConversationTypeContainerCss,
@@ -31,6 +31,8 @@ import {
   confirmConversationButtonCss,
 } from './ConversationType.styles';
 
+import {handleEscDown, handleKeyDown, KEY} from '../../../../util/keyboardUtil';
+import {ModalComponent} from '../../ModalComponent';
 import {useCreateConversationModal} from '../hooks/useCreateConversationModal';
 
 interface ConfirmDiscardModalProps {
@@ -38,7 +40,10 @@ interface ConfirmDiscardModalProps {
   onSubmit: () => void;
 }
 
-export const ConfirmDiscardModal = ({onCancel, onSubmit}: ConfirmDiscardModalProps) => {
+export const ConfirmDiscardModal: FunctionComponent<ConfirmDiscardModalProps> = ({
+  onCancel,
+  onSubmit,
+}: ConfirmDiscardModalProps) => {
   const {translate} = useApplicationContext();
   const {isConfirmDiscardModalOpen} = useCreateConversationModal();
 

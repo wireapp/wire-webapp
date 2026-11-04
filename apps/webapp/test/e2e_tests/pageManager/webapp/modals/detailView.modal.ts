@@ -39,31 +39,31 @@ export class DetailViewModal {
     this.closeButton = this.mainWindow.locator('header').getByTestId('do-close-detail-view');
   }
 
-  async waitForVisibility() {
+  async waitForVisibility(): Promise<void> {
     await this.mainWindow.waitFor({state: 'visible'});
   }
 
-  async isVisible() {
+  async isVisible(): Promise<boolean> {
     return await this.mainWindow.isVisible();
   }
 
-  async isImageVisible() {
+  async isImageVisible(): Promise<boolean> {
     return await this.image.isVisible();
   }
 
-  async getImageScreenshot() {
+  async getImageScreenshot(): Promise<Buffer<ArrayBufferLike>> {
     return await this.image.screenshot();
   }
 
-  async givePlusOneReaction() {
+  async givePlusOneReaction(): Promise<void> {
     await this.plusOneButton.click();
   }
 
-  async closeModal() {
+  async closeModal(): Promise<void> {
     await this.closeButton.click();
   }
 
-  async downloadAsset(outputDir: string) {
+  async downloadAsset(outputDir: string): Promise<string> {
     return await downloadAssetAndGetFilePath(this.page, this.downloadButton, outputDir);
   }
 }

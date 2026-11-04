@@ -20,7 +20,7 @@
 import {render, fireEvent} from '@testing-library/react';
 import {noop} from 'noop-esm';
 
-import {CopyIcon, EditIcon, PickupIcon} from 'Components/icon';
+import {CopyIcon, EditIcon, PickupIcon} from '../../icon';
 
 import {PanelActions, MenuItem} from './panelActions';
 

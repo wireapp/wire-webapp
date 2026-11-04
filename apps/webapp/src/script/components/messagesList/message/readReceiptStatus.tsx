@@ -17,16 +17,17 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {useEffect, useState, type FunctionComponent} from 'react';
 
 import {isFunction, isNonEmptyArray, isNonEmptyString} from '@sindresorhus/is';
 import cx from 'classnames';
 
-import {ReadIcon} from 'Components/icon';
-import {Message} from 'Repositories/entity/message/message';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {formatTimeShort} from 'Util/timeUtil';
+
+import {Message} from '../../../repositories/entity/message/message';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {formatTimeShort} from '../../../util/timeUtil';
+import {ReadIcon} from '../../icon';
 
 const DECIMAL_NUMBER_BASE = 10;
 
@@ -36,7 +37,11 @@ interface ReadReceiptStatusProps {
   onClickDetails?: (message: Message) => void;
 }
 
-export const ReadReceiptStatus = ({message, is1to1Conversation, onClickDetails}: ReadReceiptStatusProps) => {
+export const ReadReceiptStatus: FunctionComponent<ReadReceiptStatusProps> = ({
+  message,
+  is1to1Conversation,
+  onClickDetails,
+}: ReadReceiptStatusProps) => {
   const {translate} = useApplicationContext();
   const [readReceiptText, setReadReceiptText] = useState('');
   const {readReceipts} = useKoSubscribableChildren(message, ['readReceipts']);

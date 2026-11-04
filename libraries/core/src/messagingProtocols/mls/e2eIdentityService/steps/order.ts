@@ -61,7 +61,12 @@ export interface FinalizeOrderParams {
   nonce: Nonce;
   orderUrl: OrderUrl;
 }
-export const finalizeOrder = async ({identity, nonce, orderUrl, connection}: FinalizeOrderParams) => {
+export const finalizeOrder = async ({
+  identity,
+  nonce,
+  orderUrl,
+  connection,
+}: FinalizeOrderParams): Promise<{certificateUrl: string; nonce: string}> => {
   const statusReqBody = await identity.checkOrderRequest(orderUrl, nonce);
   const statusResponse = await connection.checkStatusOfOrder(orderUrl, statusReqBody);
 

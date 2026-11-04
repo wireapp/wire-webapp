@@ -19,22 +19,23 @@
 
 import {useCallback, useMemo, useState} from 'react';
 
+import type {RootContextValue} from 'src/script/page/rootProvider';
+
+import {CellsRepository} from '../../../../repositories/cells/cellsRepository';
+import {ConversationRepository} from '../../../../repositories/conversation/ConversationRepository';
 import type {
   FilterConfig,
   FilterItem,
-} from 'Components/conversation/conversationCells/common/cellsFiltersBar/filterConfig';
+} from '../../../conversation/conversationCells/common/cellsFiltersBar/filterConfig';
 import {
   type GlobalDriveFiltersState,
   getActiveGlobalDriveFilterType,
   isFilterTypeDisabled,
-} from 'Components/conversation/conversationCells/common/driveFilters/driveFilters';
-import {FILE_TYPE_CATALOG} from 'Components/conversation/conversationCells/common/driveFilters/fileTypeCatalog';
-import {useDriveEnabledConversationFilterItems} from 'Components/conversation/conversationCells/common/useDriveEnabledConversationFilterItems/useDriveEnabledConversationFilterItems';
-import {useDriveEnabledParticipantFilterItems} from 'Components/conversation/conversationCells/common/useDriveEnabledParticipantFilterItems/useDriveEnabledParticipantFilterItems';
-import {useGetAllTags} from 'Components/conversation/conversationCells/common/useGetAllTags/useGetAllTags';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import type {RootContextValue} from 'src/script/page/rootProvider';
+} from '../../../conversation/conversationCells/common/driveFilters/driveFilters';
+import {FILE_TYPE_CATALOG} from '../../../conversation/conversationCells/common/driveFilters/fileTypeCatalog';
+import {useDriveEnabledConversationFilterItems} from '../../../conversation/conversationCells/common/useDriveEnabledConversationFilterItems/useDriveEnabledConversationFilterItems';
+import {useDriveEnabledParticipantFilterItems} from '../../../conversation/conversationCells/common/useDriveEnabledParticipantFilterItems/useDriveEnabledParticipantFilterItems';
+import {useGetAllTags} from '../../../conversation/conversationCells/common/useGetAllTags/useGetAllTags';
 
 export const useGlobalDriveFilters = ({
   cellsRepository,

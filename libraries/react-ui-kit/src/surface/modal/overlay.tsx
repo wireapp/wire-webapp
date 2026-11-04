@@ -18,6 +18,7 @@
  */
 
 import * as React from 'react';
+import {type FunctionComponent} from 'react';
 
 import {CSSObject} from '@emotion/react';
 
@@ -40,11 +41,11 @@ export const overlayWrapperStyle: CSSObject = {
   zIndex: 9997,
 };
 
-export const OverlayWrapper = (props: OverlayWrapperProps) => {
+export const OverlayWrapper: FunctionComponent<OverlayWrapperProps> = props => {
   return <div css={overlayWrapperStyle} {...props} />;
 };
 
-export const OverlayContent = (props: React.HTMLProps<HTMLDivElement>) => {
+export const OverlayContent: FunctionComponent<React.HTMLProps<HTMLDivElement>> = props => {
   return (
     <div
       css={{
@@ -83,7 +84,7 @@ export const overlayBackgroundStyle: CSSObject = {
   zIndex: 9998,
 };
 
-export const OverlayBackground = (props: OverlayBackgroundProps) => {
+export const OverlayBackground: FunctionComponent<OverlayBackgroundProps> = props => {
   return <div css={overlayBackgroundStyle} {...props} />;
 };
 
@@ -91,7 +92,7 @@ export interface OverlayProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   onBackgroundClick?: () => void;
 }
 
-export const Overlay = ({onBackgroundClick = noop, children = null, ...props}: OverlayProps) => {
+export const Overlay: FunctionComponent<OverlayProps> = ({onBackgroundClick = noop, children = null, ...props}) => {
   return (
     <OverlayWrapper {...props} data-uie-name="modal">
       <OverlayContent>{children}</OverlayContent>

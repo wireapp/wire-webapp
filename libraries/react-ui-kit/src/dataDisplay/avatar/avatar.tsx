@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {useEffect, useState, type FunctionComponent} from 'react';
 
 import {CSSObject} from '@emotion/react';
 import {isNonEmptyString} from '@sindresorhus/is';
@@ -77,7 +77,7 @@ const avatarStyle: <T>(props: AvatarProps<T>) => CSSObject = ({
   };
 };
 
-const filteredAvatarProps = (props: AvatarProps) => {
+const filteredAvatarProps = (props: AvatarProps): Object => {
   return filterProps(props, [
     'size',
     'forceInitials',
@@ -90,7 +90,7 @@ const filteredAvatarProps = (props: AvatarProps) => {
   ]);
 };
 
-export const Avatar = (props: AvatarProps) => {
+export const Avatar: FunctionComponent<AvatarProps> = props => {
   const {url, forceInitials, name, fetchImage, isAvatarGridItem} = props;
   const [scale, setScale] = useState(0);
   useEffect(() => {
@@ -100,7 +100,7 @@ export const Avatar = (props: AvatarProps) => {
       });
     }
   }, [url]);
-  const getInitials = (name: string = '') => {
+  const getInitials = (name: string = ''): string => {
     return name
       .split(' ')
       .filter(Boolean)

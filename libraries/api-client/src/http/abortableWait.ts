@@ -39,7 +39,7 @@ export function createAbortableWait(dependencies: AbortableWaitDependencies): Ab
       return new Promise((resolve, reject) => {
         const abortSignalOrUndefined = abortSignal.unwrapOr(undefined);
 
-        const handleAbort = () => {
+        const handleAbort = (): void => {
           clearTimeout(timeoutIdentifier);
           abortSignalOrUndefined?.removeEventListener('abort', handleAbort);
           reject(new Error('The wait was aborted.'));

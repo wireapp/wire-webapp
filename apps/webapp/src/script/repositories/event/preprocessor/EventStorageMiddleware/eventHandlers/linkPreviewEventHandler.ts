@@ -19,17 +19,25 @@
 
 import {isTruthy} from '@sindresorhus/is';
 
-import {MessageAddEvent} from 'Repositories/conversation/EventBuilder';
-import {StoredEvent} from 'Repositories/storage';
 import {categoryFromEvent} from 'src/script/message/messageCategorization';
 
+import type {EditableEvent} from './editedEventHandler';
 import {EventValidationError} from './EventValidationError';
 import {getCommonMessageUpdates} from './getCommonMessageUpdates';
 
+import {MessageAddEvent} from '../../../../conversation/EventBuilder';
+import {StoredEvent} from '../../../../storage';
 import {CONVERSATION, ClientEvent} from '../../../Client';
+import type {IdentifiedUpdatePayload} from '../../../EventService';
 import {EventHandler, HandledEvents} from '../types';
 
-function getLinkPreviewUpdates(originalEvent: StoredEvent<MessageAddEvent>, newEvent: MessageAddEvent) {
+type LinkPreviewMessageUpdates = EditableEvent & Partial<IdentifiedUpdatePayload> & {server_time: string};
+type StoredLinkPreviewMessageUpdates = LinkPreviewMessageUpdates & Pick<IdentifiedUpdatePayload, 'primary_key'>;
+
+function getLinkPreviewUpdates(
+  originalEvent: StoredEvent<MessageAddEvent>,
+  newEvent: MessageAddEvent,
+): LinkPreviewMessageUpdates {
   const commonUpdates = getCommonMessageUpdates(originalEvent, newEvent);
 
   return {
@@ -71,7 +79,10 @@ function validateLinkPreviewEvent(
   return true;
 }
 
-function computeEventUpdates(originalEvent: StoredEvent<MessageAddEvent>, newEvent: MessageAddEvent) {
+function computeEventUpdates(
+  originalEvent: StoredEvent<MessageAddEvent>,
+  newEvent: MessageAddEvent,
+): StoredLinkPreviewMessageUpdates {
   const primaryKeyUpdate = {primary_key: originalEvent.primary_key};
   const updates = getLinkPreviewUpdates(originalEvent, newEvent);
 

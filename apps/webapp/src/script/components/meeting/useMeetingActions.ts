@@ -17,11 +17,13 @@
  *
  */
 
-import {useMeetNowModal} from 'Components/meeting/meetNowModal/useMeetNowModal';
-import {useScheduleMeetingModal} from 'Components/meeting/scheduleMeetingModal';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-export const useMeetingActions = () => {
+import {useMeetNowModal} from './meetNowModal/useMeetNowModal';
+import {useScheduleMeetingModal} from './scheduleMeetingModal';
+
+type UseMeetingActionsResult = {handleMeetNow: () => void; handleScheduleMeeting: () => void};
+export const useMeetingActions = (): UseMeetingActionsResult => {
   const {clock} = useApplicationContext();
   const openCreate = useScheduleMeetingModal(state => {
     return state.openCreate;
@@ -30,11 +32,11 @@ export const useMeetingActions = () => {
     return state.open;
   });
 
-  const handleMeetNow = () => {
+  const handleMeetNow = (): void => {
     openMeetNow();
   };
 
-  const handleScheduleMeeting = () => {
+  const handleScheduleMeeting = (): void => {
     openCreate(clock);
   };
 

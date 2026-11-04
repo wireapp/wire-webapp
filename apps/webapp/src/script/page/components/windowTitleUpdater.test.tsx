@@ -17,15 +17,15 @@
  *
  */
 
-import {act, render} from '@testing-library/react';
+import {act, render, type RenderResult} from '@testing-library/react';
 import {amplify} from 'amplify';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {WebAppEvents} from '../../webAppEvents';
 
-import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {getLogger} from 'Util/logger';
-import {translateForTest} from 'Util/test/translateForTest';
+import {NOTIFICATION_HANDLING_STATE} from '../../repositories/event/NotificationHandlingState';
+import {useKoSubscribableChildren} from '../../util/componentUtil';
+import {getLogger} from '../../util/logger';
+import {translateForTest} from '../../util/test/translateForTest';
 
 import {ContentState, useAppState} from '../useAppState';
 import {WindowTitleUpdater} from './windowTitleUpdater';
@@ -41,8 +41,8 @@ jest.mock('tsyringe', () => {
     },
   };
 });
-jest.mock('Util/componentUtil');
-jest.mock('Util/logger', () => {
+jest.mock('../../util/componentUtil');
+jest.mock('../../util/logger', () => {
   return {
     getLogger: jest.fn(() => {
       return {debug: jest.fn()};
@@ -75,7 +75,7 @@ describe('WindowTitleUpdater', () => {
   let connectionRequests: unknown[];
   let unreadConversations: unknown[];
 
-  const renderWindowTitleUpdater = () => {
+  const renderWindowTitleUpdater = (): RenderResult => {
     return render(<WindowTitleUpdater translate={translateForTest} />);
   };
 
@@ -86,7 +86,7 @@ describe('WindowTitleUpdater', () => {
     return latestSubscribeCall[1];
   };
 
-  const publishNotificationState = (notificationState: NOTIFICATION_HANDLING_STATE) => {
+  const publishNotificationState = (notificationState: NOTIFICATION_HANDLING_STATE): void => {
     act(() => {
       activeNotificationStateHandlers.forEach(notificationStateHandler => {
         notificationStateHandler(notificationState);

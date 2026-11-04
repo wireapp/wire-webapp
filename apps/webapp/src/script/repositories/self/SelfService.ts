@@ -22,6 +22,7 @@ import type {TraceState} from '@wireapp/api-client/lib/http/';
 import type {Consent, Self} from '@wireapp/api-client/lib/self/';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import type {UserUpdate} from '@wireapp/api-client/lib/user/';
+import type {SelfService as CoreSelfService} from '@wireapp/core/lib/self';
 import {container} from 'tsyringe';
 
 import {APIClient} from '../../service/apiClientSingleton';
@@ -33,7 +34,7 @@ export class SelfService {
     private readonly core = container.resolve(Core),
   ) {}
 
-  private get coreSelfService() {
+  private get coreSelfService(): CoreSelfService {
     const selfService = this.core.service?.self;
     if (isNullOrUndefined(selfService)) {
       throw new Error('Self service not available');

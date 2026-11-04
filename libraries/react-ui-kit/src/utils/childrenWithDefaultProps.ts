@@ -24,9 +24,11 @@ export interface ChildrenProps<T extends Element, P extends React.HTMLProps<T>> 
   defaultProps: P;
 }
 
+type ChildrenWithDefaultPropsResult = React.ReactNode[] | null | undefined;
+
 export const childrenWithDefaultProps = <E extends Element, P extends React.HTMLProps<E>>(
   props: ChildrenProps<E, P>,
-) => {
+): ChildrenWithDefaultPropsResult => {
   return React.Children.map<React.ReactNode, React.ReactNode>(props.children, node => {
     if (typeof node === 'string') {
       return node;

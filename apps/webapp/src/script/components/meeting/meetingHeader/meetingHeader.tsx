@@ -17,11 +17,15 @@
  *
  */
 
-import {actionsStyles, headingStyles, wrapperStyles} from 'Components/meeting/meetingHeader/meetingHeader.styles';
-import {MeetingMultiActionButton} from 'Components/meeting/meetingMultiActionButton/meetingMultiActionButton';
+import type {FunctionComponent} from 'react';
+
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-export const MeetingHeader = () => {
+import {actionsStyles, headingStyles, wrapperStyles} from './meetingHeader.styles';
+
+import {MeetingMultiActionButton} from '../meetingMultiActionButton/meetingMultiActionButton';
+
+export const MeetingHeader: FunctionComponent = () => {
   const {translate} = useApplicationContext();
 
   return (

@@ -19,18 +19,18 @@
 
 import {ReactElement} from 'react';
 
-import {render} from '@testing-library/react';
+import {render, type RenderResult} from '@testing-library/react';
 
-import {User} from 'Repositories/entity/User';
+import {User} from '../../repositories/entity/User';
 import {RootProvider} from 'src/script/page/rootProvider';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 import {createRootContextValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
-import {translate} from 'Util/localizerUtil';
-import {createUuid} from 'Util/uuid';
+import {translate} from '../../util/localizerUtil';
+import {createUuid} from '../../util/uuid';
 
 import {UserDetails} from './userDetails';
 
-jest.mock('Components/avatar', () => {
+jest.mock('../avatar', () => {
   return {
     Avatar: () => {
       return <div data-testid="mock-avatar" />;
@@ -39,7 +39,7 @@ jest.mock('Components/avatar', () => {
   };
 });
 
-function renderWithRootProvider(element: ReactElement) {
+function renderWithRootProvider(element: ReactElement): RenderResult {
   return render(
     <RootProvider value={createRootContextValueForTest({translate: translateForTest})}>{element}</RootProvider>,
   );

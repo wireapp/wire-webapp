@@ -17,15 +17,10 @@
  *
  */
 
-import {AppPermissionState} from 'Repositories/notification/AppPermissionState';
-import {BrowserPermissionStatus} from 'Repositories/permission/BrowserPermissionStatus';
-import {
-  getPermissionState,
-  setPermissionState,
-  getPermissionStates,
-  initializePermissions,
-} from 'Repositories/permission/permissionHandlers';
-import {PermissionType} from 'Repositories/permission/PermissionType';
+import {AppPermissionState} from '../notification/AppPermissionState';
+import {BrowserPermissionStatus} from './BrowserPermissionStatus';
+import {getPermissionState, setPermissionState, getPermissionStates, initializePermissions} from './permissionHandlers';
+import {PermissionType} from './PermissionType';
 
 import {permissionsStore} from './Permissions.store';
 import {normalizePermissionState} from './Permissions.types';
@@ -34,13 +29,13 @@ import {normalizePermissionState} from './Permissions.types';
 class MockNotificationRepository {
   constructor() {}
 
-  updatePermissionState(permissionState: string) {
+  updatePermissionState(permissionState: string): boolean | undefined {
     const normalizedState = normalizePermissionState(permissionState as NotificationPermission);
     setPermissionState(PermissionType.NOTIFICATIONS, normalizedState);
     return this.checkPermissionState();
   }
 
-  checkPermissionState() {
+  checkPermissionState(): boolean | undefined {
     const permissionState = getPermissionState(PermissionType.NOTIFICATIONS);
     switch (permissionState) {
       case BrowserPermissionStatus.GRANTED:

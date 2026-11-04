@@ -17,11 +17,10 @@
  *
  */
 
-import {ReactNode} from 'react';
+import {ReactNode, type FunctionComponent} from 'react';
 
-import {SystemMessage} from 'Repositories/entity/message/systemMessage';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-
+import {SystemMessage} from '../../../../repositories/entity/message/systemMessage';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
 import {MessageTime} from '../messageTime';
 
 interface SystemMessageProps {
@@ -31,7 +30,12 @@ interface SystemMessageProps {
   captionContent?: ReactNode;
 }
 
-export const SystemMessageBase = ({message, isSenderNameVisible = false, icon, captionContent}: SystemMessageProps) => {
+export const SystemMessageBase: FunctionComponent<SystemMessageProps> = ({
+  message,
+  isSenderNameVisible = false,
+  icon,
+  captionContent,
+}: SystemMessageProps) => {
   const {unsafeSenderName, timestamp} = useKoSubscribableChildren(message, ['unsafeSenderName', 'timestamp']);
 
   return (

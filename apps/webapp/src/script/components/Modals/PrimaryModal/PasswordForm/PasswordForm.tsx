@@ -17,7 +17,7 @@
  *
  */
 
-import type {FormEvent} from 'react';
+import type {FormEvent, FunctionComponent} from 'react';
 
 interface PasswordFormProps {
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
@@ -26,7 +26,12 @@ interface PasswordFormProps {
   onInputChange: (value: string) => void;
 }
 
-export const PasswordForm = ({onSubmit, inputPlaceholder, inputValue, onInputChange}: PasswordFormProps) => {
+export const PasswordForm: FunctionComponent<PasswordFormProps> = ({
+  onSubmit,
+  inputPlaceholder,
+  inputValue,
+  onInputChange,
+}: PasswordFormProps) => {
   return (
     <form onSubmit={onSubmit}>
       <label htmlFor="modal_pswd" className="visually-hidden">

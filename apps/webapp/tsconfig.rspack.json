@@ -5,8 +5,10 @@
     "moduleResolution": "NodeNext",
     "allowImportingTsExtensions": true,
     "noEmit": true,
+    "incremental": true,
+    "tsBuildInfoFile": "../../target/buildcache/webapp-rspack-type-check.tsbuildinfo",
     "types": ["node"]
   },
-  "include": ["rspack.config.mts", "rspack.config.public.mts"],
+  "include": ["rspack.config.mts", "rspack.config.dev.mts", "rspack.config.public.mts"],
   "exclude": ["node_modules"]
 }

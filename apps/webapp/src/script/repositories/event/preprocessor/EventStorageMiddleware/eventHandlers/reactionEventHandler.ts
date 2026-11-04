@@ -19,16 +19,21 @@
 
 import {isTruthy} from '@sindresorhus/is';
 
-import {MessageAddEvent, ReactionEvent} from 'Repositories/conversation/EventBuilder';
-import {StoredEvent} from 'Repositories/storage';
-import {addReaction, userReactionMapToReactionMap} from 'Util/reactionUtil';
-
 import {EventValidationError} from './EventValidationError';
 
+import {addReaction, userReactionMapToReactionMap} from '../../../../../util/reactionUtil';
+import {MessageAddEvent, ReactionEvent} from '../../../../conversation/EventBuilder';
+import {StoredEvent} from '../../../../storage';
 import {CONVERSATION} from '../../../Client';
 import {EventHandler} from '../types';
 
-function computeEventUpdates(target: StoredEvent<MessageAddEvent>, reactionEvent: ReactionEvent) {
+type ReactionEventUpdates = {
+  primary_key: string;
+  reactions: ReturnType<typeof addReaction>;
+  version: number;
+};
+
+function computeEventUpdates(target: StoredEvent<MessageAddEvent>, reactionEvent: ReactionEvent): ReactionEventUpdates {
   const version = (target.version ?? 1) + 1;
   const {
     data: {reaction},

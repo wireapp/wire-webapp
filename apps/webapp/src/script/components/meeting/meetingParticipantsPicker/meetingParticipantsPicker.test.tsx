@@ -17,17 +17,17 @@
  *
  */
 
-import {useState} from 'react';
+import {useState, type FunctionComponent} from 'react';
 
 import {fireEvent, render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import {User} from 'Repositories/entity/User';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import type {SearchRepository} from 'Repositories/search/searchRepository';
-import type {TeamRepository} from 'Repositories/team/TeamRepository';
-import type {TeamState} from 'Repositories/team/TeamState';
+import {User} from '../../../repositories/entity/User';
+import type {Conversation} from '../../../repositories/entity/Conversation';
+import type {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import type {SearchRepository} from '../../../repositories/search/searchRepository';
+import type {TeamRepository} from '../../../repositories/team/TeamRepository';
+import type {TeamState} from '../../../repositories/team/TeamState';
 import type {ConversationState} from 'src/script/repositories/conversation/ConversationState';
 import {
   createExecutingFireAndForgetInvokerForTest,
@@ -35,7 +35,7 @@ import {
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 import {formatParticipantsFieldLabel} from './formatParticipantsFieldLabel';
 import {MeetingParticipantsPicker} from './meetingParticipantsPicker';
@@ -49,7 +49,7 @@ const CONTACTS_LABEL = 'userListContactsWithCount';
 const SELECTED_CONTACTS_LABEL = 'userListSelectedContacts';
 const NO_MATCHES_LABEL = 'searchListNoMatches';
 
-const createUser = (id: string, name: string, handle: string) => {
+const createUser = (id: string, name: string, handle: string): User => {
   const user = new User(id, 'example.com', translateForTest);
   user.name(name);
   user.username(handle);
@@ -62,7 +62,7 @@ const createConversation = (
   members: User[],
   channel = false,
   {removed = false, archived = false, cleared = false}: {removed?: boolean; archived?: boolean; cleared?: boolean} = {},
-) => {
+): Conversation => {
   return {
     display_name: () => {
       return name;
@@ -136,7 +136,14 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
   }),
 );
 
-const ControlledPicker = ({
+const ControlledPicker: FunctionComponent<{
+  initialSelected?: User[];
+  initialFilter?: string;
+  searchByName?: (query: string, teamId?: string) => Promise<User[]>;
+  availableUsers?: User[];
+  label?: string;
+  conversationRepository?: Pick<ConversationRepository, 'getAllGroupConversations'>;
+}> = ({
   initialSelected = [],
   initialFilter = '',
   searchByName = searchRepositoryDouble.searchByName,
@@ -175,7 +182,7 @@ const ControlledPicker = ({
   );
 };
 
-const getSearchInput = (accessibleName = PARTICIPANTS_LABEL) => {
+const getSearchInput = (accessibleName = PARTICIPANTS_LABEL): HTMLElement => {
   return screen.getByRole('combobox', {name: accessibleName});
 };
 

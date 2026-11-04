@@ -17,15 +17,14 @@
  *
  */
 
-import {$createParagraphNode, $createTextNode} from 'lexical';
+import {$createParagraphNode, $createTextNode, type ParagraphNode} from 'lexical';
 
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {Text} from 'Repositories/entity/message/text';
-
+import {ContentMessage} from '../../../../../../../repositories/entity/message/contentMessage';
+import {Text} from '../../../../../../../repositories/entity/message/text';
 import {$createMentionNode} from '../../../nodes/mentionNode';
 import {createNodes} from '../../../utils/generateNodes';
 
-export const getRawMarkdownNodesWithMentions = (message: ContentMessage) => {
+export const getRawMarkdownNodesWithMentions = (message: ContentMessage): ParagraphNode => {
   const firstAsset = message.getFirstAsset() as Text;
   const newMentions = firstAsset.mentions().slice();
   const nodes = createNodes(newMentions, firstAsset.text);

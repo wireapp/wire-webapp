@@ -19,7 +19,7 @@
 
 import {ReactElement} from 'react';
 
-import {fireEvent} from '@testing-library/react';
+import {fireEvent, type RenderResult} from '@testing-library/react';
 
 import {Success} from './success';
 
@@ -49,7 +49,7 @@ describe('Success', () => {
     jest.clearAllMocks();
   });
 
-  const renderComponent = (component: ReactElement) => {
+  const renderComponent = (component: ReactElement): RenderResult => {
     return mountComponent(component, mockStoreFactory()(initialRootState));
   };
 

@@ -19,8 +19,8 @@
 
 import {render} from '@testing-library/react';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {translateForTest} from 'Util/test/translateForTest';
+import {PrimaryModal} from '../Modals/PrimaryModal';
+import {translateForTest} from '../../util/test/translateForTest';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

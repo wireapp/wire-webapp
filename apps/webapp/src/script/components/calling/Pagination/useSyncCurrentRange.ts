@@ -33,7 +33,7 @@ export const useSyncCurrentRange = ({
   totalPages,
   setCurrentStart,
   visibleDots,
-}: SyncCurrentRange) => {
+}: SyncCurrentRange): void => {
   useEffect(() => {
     if (visibleDots > totalPages) {
       return;

@@ -17,23 +17,26 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {noop} from 'noop-esm';
 
-import {DeleteMessage as DeleteMessageEntity} from 'Repositories/entity/message/deleteMessage';
-import {User} from 'Repositories/entity/User';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {formatTimeShort, fromUnixTime, TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {MessageHeader} from './contentMessage/messageHeader';
 import {MessageTime} from './messageTime';
+
+import {DeleteMessage as DeleteMessageEntity} from '../../../repositories/entity/message/deleteMessage';
+import {User} from '../../../repositories/entity/User';
+import {ServiceEntity} from '../../../repositories/integration/ServiceEntity';
+import {formatTimeShort, fromUnixTime, TIME_IN_MILLIS} from '../../../util/timeUtil';
 
 interface DeleteMessageProps {
   message: DeleteMessageEntity;
   onClickAvatar?: (user: User | ServiceEntity) => void;
 }
 
-const DeleteMessage = ({message, onClickAvatar = noop}: DeleteMessageProps) => {
+const DeleteMessage: FunctionComponent<DeleteMessageProps> = ({message, onClickAvatar = noop}: DeleteMessageProps) => {
   const {translate} = useApplicationContext();
   const deletedTimeStamp = message.deleted_timestamp ?? 0;
 

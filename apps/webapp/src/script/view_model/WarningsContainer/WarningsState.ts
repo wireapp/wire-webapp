@@ -21,16 +21,14 @@ import {isNullOrUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import {create} from 'zustand';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {AppPermissionState} from 'Repositories/notification/AppPermissionState';
-import type {Substitutions, TranslationKey} from 'Util/localizerUtil';
-import {safeWindowOpen} from 'Util/sanitizationUtil';
-
 import {TYPE} from './WarningsTypes';
 
+import {PrimaryModal} from '../../components/Modals/PrimaryModal';
 import {Config} from '../../Config';
+import {AppPermissionState} from '../../repositories/notification/AppPermissionState';
+import type {Substitutions, TranslationKey} from '../../util/localizerUtil';
+import {safeWindowOpen} from '../../util/sanitizationUtil';
+import {WebAppEvents} from '../../webAppEvents';
 
 type WarningsState = {
   name: string;
@@ -82,14 +80,14 @@ const getVisibleWarning = (): TYPE => {
   return visibleWarning;
 };
 
-const hideWarning = (type = getVisibleWarning()) => {
+const hideWarning = (type = getVisibleWarning()): void => {
   const {warnings, removeWarning} = useWarningsState.getState();
   if (warnings.includes(type)) {
     removeWarning(type);
   }
 };
 
-const showWarning = (type: TYPE, info?: {name: string}) => {
+const showWarning = (type: TYPE, info?: {name: string}): void => {
   const {setName, addWarning} = useWarningsState.getState();
   const visibleWarning = getVisibleWarning();
   const connectivityTypes = [TYPE.CONNECTIVITY_RECONNECT, TYPE.NO_INTERNET];

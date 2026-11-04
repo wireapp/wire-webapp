@@ -40,7 +40,7 @@ interface EnrollmentStore {
 
 export const getEnrollmentStore = ({id: userId, domain}: QualifiedId, clientId: string): EnrollmentStore => {
   const clientStoreId = constructFullyQualifiedClientId(userId, clientId, domain);
-  const constructKey = (key: string) => {
+  const constructKey = (key: string): string => {
     return `${clientStoreId}_${key}`;
   };
 

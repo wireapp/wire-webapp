@@ -18,16 +18,20 @@
  */
 
 import {isUndefined} from '@sindresorhus/is';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {DeviceIdentity} from '@wireapp/core/lib/messagingProtocols/mls';
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
+import type {ConversationService} from '@wireapp/core/lib/conversation';
+import {DeviceIdentity, type E2EIServiceExternal} from '@wireapp/core/lib/messagingProtocols/mls';
 import {StringifiedQualifiedId, stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 import {container} from 'tsyringe';
 
-import {ConversationState} from 'Repositories/conversation/ConversationState';
+import type {E2eiConversationState} from '@wireapp/core-crypto';
+
 import {Core} from 'src/script/service/coreSingleton';
-import {base64ToArray} from 'Util/util';
 
 import {mapMLSStatus, MLSStatuses} from './mlsStatus';
+
+import {ConversationState} from '../repositories/conversation/ConversationState';
+import {base64ToArray} from '../util/util';
 
 export {MLSStatuses};
 
@@ -35,7 +39,7 @@ export type WireIdentity = Omit<DeviceIdentity, 'status'> & {
   status: MLSStatuses;
 };
 
-export function getE2EIdentityService() {
+export function getE2EIdentityService(): E2EIServiceExternal {
   const e2eIdentityService = container.resolve(Core).service?.e2eIdentity;
   if (isUndefined(e2eIdentityService)) {
     throw new Error('trying to query E2EIdentity data in an non-e2eidentity environment');
@@ -43,7 +47,7 @@ export function getE2EIdentityService() {
   return e2eIdentityService;
 }
 
-export function getCoreConversationService() {
+export function getCoreConversationService(): ConversationService {
   const conversationService = container.resolve(Core).service?.conversation;
   if (isUndefined(conversationService)) {
     throw new Error('Conversation service not available');
@@ -68,17 +72,22 @@ function mapUserIdentities(
   return mappedUsers;
 }
 
-export async function getUsersIdentities(groupId: string, userIds: QualifiedId[]) {
+export async function getUsersIdentities(
+  groupId: string,
+  userIds: QualifiedId[],
+): Promise<Map<`${string}@${string}`, WireIdentity[]> | undefined> {
   const userVerifications = await getE2EIdentityService().getUsersIdentities(groupId, userIds);
   return !isUndefined(userVerifications) ? mapUserIdentities(userVerifications) : userVerifications;
 }
 
-export async function getAllGroupUsersIdentities(groupId: string) {
+export async function getAllGroupUsersIdentities(
+  groupId: string,
+): Promise<Map<`${string}@${string}`, WireIdentity[]> | undefined> {
   const userVerifications = await getE2EIdentityService().getAllGroupUsersIdentities(groupId);
   return !isUndefined(userVerifications) ? mapUserIdentities(userVerifications) : userVerifications;
 }
 
-export async function getConversationVerificationState(groupId: string) {
+export async function getConversationVerificationState(groupId: string): Promise<E2eiConversationState> {
   return getE2EIdentityService().getConversationState(base64ToArray(groupId));
 }
 
@@ -129,6 +138,6 @@ export async function getActiveWireIdentity(): Promise<WireIdentity | undefined>
   return selfDeviceIdentity;
 }
 
-export async function isFreshMLSSelfClient() {
+export async function isFreshMLSSelfClient(): Promise<boolean> {
   return getE2EIdentityService().isFreshMLSSelfClient();
 }

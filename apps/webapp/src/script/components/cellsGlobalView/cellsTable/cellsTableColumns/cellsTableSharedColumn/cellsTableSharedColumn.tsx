@@ -17,16 +17,21 @@
  *
  */
 
-import {LinkIcon} from 'Components/icon';
+import type {FunctionComponent} from 'react';
+
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {wrapperStyles, iconWrapperStyles, textStyles, wrapperStylesHidden} from './cellsTableSharedColumn.styles';
+
+import {LinkIcon} from '../../../../icon';
 
 interface CellsTableSharedColumnProps {
   isShared: boolean;
 }
 
-export const CellsTableSharedColumn = ({isShared}: CellsTableSharedColumnProps) => {
+export const CellsTableSharedColumn: FunctionComponent<CellsTableSharedColumnProps> = ({
+  isShared,
+}: CellsTableSharedColumnProps) => {
   const {translate} = useApplicationContext();
   const sharedLabel = isShared
     ? translate('cells.tableRow.shared.truthyValue')

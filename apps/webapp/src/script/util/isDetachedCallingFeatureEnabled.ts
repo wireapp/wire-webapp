@@ -21,7 +21,7 @@ import {Runtime} from '@wireapp/commons';
 
 import {Config} from '../Config';
 
-export const isDetachedCallingFeatureEnabled = () => {
+export const isDetachedCallingFeatureEnabled = (): boolean => {
   if (!Config.getConfig().FEATURE.ENABLE_DETACHED_CALLING_WINDOW) {
     return false;
   }

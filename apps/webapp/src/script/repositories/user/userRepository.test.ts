@@ -17,7 +17,6 @@
  *
  */
 
-import {generateUUID} from '@datadog/browser-core';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {USER_EVENT, UserUpdateEvent} from '@wireapp/api-client/lib/event';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
@@ -26,27 +25,27 @@ import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {Availability} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {WebAppEvents} from '../../webAppEvents';
 
 import {entities} from 'test/api/payloads';
 import {TestFactory} from 'test/helper/TestFactory';
 import {generateAPIUser} from 'test/helper/UserGenerator';
 
-import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {ClientRepository} from 'Repositories/client';
-import {ClientMapper} from 'Repositories/client/ClientMapper';
-import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
-import {User} from 'Repositories/entity/User';
-import {EventRepository} from 'Repositories/event/EventRepository';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {SelfService} from 'Repositories/self/SelfService';
-import {TeamState} from 'Repositories/team/TeamState';
-import type {UserRecord} from 'Repositories/storage';
-import type {Translate} from 'Util/localizerUtil';
-import {matchQualifiedIds} from 'Util/qualifiedId';
+import {AssetRepository} from '../assets/assetRepository';
+import {ClientRepository} from '../client';
+import {ClientMapper} from '../client/ClientMapper';
+import {ConnectionEntity} from '../connection/connectionEntity';
+import {User} from '../entity/User';
+import {EventRepository} from '../event/EventRepository';
+import {PropertiesRepository} from '../properties/propertiesRepository';
+import {SelfService} from '../self/SelfService';
+import {TeamState} from '../team/TeamState';
+import type {UserRecord} from '../storage';
+import type {Translate} from '../../util/localizerUtil';
+import {matchQualifiedIds} from '../../util/qualifiedId';
 import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
-import {createUuid} from 'Util/uuid';
+import {translateForTest} from '../../util/test/translateForTest';
+import {createUuid} from '../../util/uuid';
 
 import {ConsentValue} from './consentValue';
 import {UserRepository} from './userRepository';
@@ -56,7 +55,19 @@ import {UserState} from './userState';
 import {serverTimeHandler} from '../../time/serverTimeHandler';
 
 const testFactory = new TestFactory();
-async function buildUserRepository(translate: Translate) {
+type UserRepositoryTestDependencies = {
+  readonly userService: UserService;
+  readonly assetRepository: AssetRepository;
+  readonly selfService: SelfService;
+  readonly clientRepository: ClientRepository;
+  readonly serverTimeHandler: typeof serverTimeHandler;
+  readonly propertyRepository: PropertiesRepository;
+  readonly userState: UserState;
+  readonly teamState: TeamState;
+};
+type UserRepositoryTestFixture = readonly [UserRepository, UserRepositoryTestDependencies];
+
+async function buildUserRepository(translate: Translate): Promise<UserRepositoryTestFixture> {
   const storageRepo = await testFactory.exposeStorageActors();
 
   const userService = new UserService(storageRepo['storageService']);
@@ -93,7 +104,7 @@ async function buildUserRepository(translate: Translate) {
   ] as const;
 }
 
-function createConnections(users: APIClientUser[]) {
+function createConnections(users: APIClientUser[]): ConnectionEntity[] {
   return users.map(user => {
     const connection = new ConnectionEntity();
     connection.userId = user.qualified_id;
@@ -492,7 +503,7 @@ describe('UserRepository', () => {
 
     it("should update user's supportedProtocols", async () => {
       const [userRepository, {userState}] = await buildUserRepository(translateForTest);
-      const user = new User(generateUUID(), '', translateForTest);
+      const user = new User(createUuid(), '', translateForTest);
       userState.users.push(user);
       userState.self(user);
       const initialSupportedProtocols = [CONVERSATION_PROTOCOL.PROTEUS];
@@ -515,8 +526,8 @@ describe('UserRepository', () => {
 
     it("should emit supportedProtocolsUpdate event after user's supported protocols were updated", async () => {
       const [userRepository, {userState}] = await buildUserRepository(translateForTest);
-      const user = new User(generateUUID(), '', translateForTest);
-      const selfUser = new User(generateUUID(), '', translateForTest);
+      const user = new User(createUuid(), '', translateForTest);
+      const selfUser = new User(createUuid(), '', translateForTest);
 
       userState.users.push(user);
       userState.self(selfUser);
@@ -548,10 +559,10 @@ describe('UserRepository', () => {
 
     it("should not emit supportedProtocolsUpdate event if user's supported protocols remain unchanged", async () => {
       const [userRepository, {userState}] = await buildUserRepository(translateForTest);
-      const user = new User(generateUUID(), '', translateForTest);
+      const user = new User(createUuid(), '', translateForTest);
       userState.users.push(user);
 
-      const selfUser = new User(generateUUID(), '', translateForTest);
+      const selfUser = new User(createUuid(), '', translateForTest);
       userState.self(selfUser);
 
       const initialSupportedProtocols = [CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS];
@@ -578,10 +589,10 @@ describe('UserRepository', () => {
 
     it('should not emit supportedProtocolsUpdate event if the event did not contain supported protocols', async () => {
       const [userRepository, {userState}] = await buildUserRepository(translateForTest);
-      const user = new User(generateUUID(), '', translateForTest);
+      const user = new User(createUuid(), '', translateForTest);
       userState.users.push(user);
 
-      const selfUser = new User(generateUUID(), '', translateForTest);
+      const selfUser = new User(createUuid(), '', translateForTest);
       userState.self(selfUser);
 
       const initialSupportedProtocols = [CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS];

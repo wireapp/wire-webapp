@@ -22,10 +22,10 @@ export const loadState = (key: string): number | undefined => {
   return storedState === null ? undefined : parseInt(storedState, 10);
 };
 
-export const saveState = (key: string, firedAt: number) => {
+export const saveState = (key: string, firedAt: number): void => {
   localStorage.setItem(key, firedAt.toString());
 };
 
-export const deleteState = (key: string) => {
+export const deleteState = (key: string): void => {
   localStorage.removeItem(key);
 };

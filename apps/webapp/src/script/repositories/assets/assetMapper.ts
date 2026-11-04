@@ -21,10 +21,10 @@ import {isNonEmptyString, isUndefined} from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import type {UserAsset as APIClientUserAsset} from '@wireapp/api-client/lib/user/';
 
-import type {User} from 'Repositories/entity/User';
-import type {ServiceEntity} from 'Repositories/integration/ServiceEntity';
-
 import {AssetRemoteData} from './assetRemoteData';
+
+import type {User} from '../entity/User';
+import type {ServiceEntity} from '../integration/ServiceEntity';
 
 export type MappedAsset = Record<string, AssetRemoteData>;
 
@@ -46,7 +46,7 @@ export const mapProfileAssets = (userId: QualifiedId, assets: APIClientUserAsset
     }, {});
 };
 
-export const updateUserEntityAssets = (userEntity: User | ServiceEntity, mappedAssets: MappedAsset = {}) => {
+export const updateUserEntityAssets = (userEntity: User | ServiceEntity, mappedAssets: MappedAsset = {}): void => {
   const {preview, medium} = mappedAssets;
   if (!isUndefined(preview)) {
     userEntity.previewPictureResource(preview);

@@ -17,17 +17,23 @@
  *
  */
 
+import type {JSX} from 'react';
+
 import {CSSObject} from '@emotion/react';
 import {isNonEmptyString} from '@sindresorhus/is';
 import {components, GroupBase, MenuProps} from 'react-select';
 
 import {Option} from '../select';
 
+type SelectMenuComponentType<IsMulti extends boolean, Group extends GroupBase<Option>> = ((
+  props: MenuProps<Option, IsMulti, Group>,
+) => JSX.Element) & {displayName: string};
+
 export const SelectMenu = <IsMulti extends boolean = false, Group extends GroupBase<Option> = GroupBase<Option>>(
   dataUieName: string,
   css?: CSSObject,
-) => {
-  function SelectMenuComponent(props: MenuProps<Option, IsMulti, Group>) {
+): SelectMenuComponentType<IsMulti, Group> => {
+  function SelectMenuComponent(props: MenuProps<Option, IsMulti, Group>): JSX.Element {
     const {children} = props;
 
     return (

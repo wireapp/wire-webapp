@@ -21,7 +21,7 @@ import {useCallback, useEffect, useRef} from 'react';
 
 import {isNull, isUndefined} from '@sindresorhus/is';
 
-import {TIME_IN_MILLIS} from 'Util/timeUtil';
+import {TIME_IN_MILLIS} from '../../util/timeUtil';
 
 interface UseDatePassedProps {
   target: Date | null;
@@ -29,7 +29,7 @@ interface UseDatePassedProps {
   enabled?: boolean;
 }
 
-export const useDatePassed = ({target, callback, enabled = true}: UseDatePassedProps) => {
+export const useDatePassed = ({target, callback, enabled = true}: UseDatePassedProps): void => {
   const hasPassed = useRef(false);
   const intervalId = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
   const targetTime = useRef<number | null>(null);

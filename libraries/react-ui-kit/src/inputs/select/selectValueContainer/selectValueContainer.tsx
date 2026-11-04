@@ -17,7 +17,7 @@
  *
  */
 
-import {Children, ReactNode} from 'react';
+import {Children, ReactNode, type JSX} from 'react';
 
 import {components, GroupBase, ValueContainerProps} from 'react-select';
 
@@ -29,7 +29,7 @@ export const SelectValueContainer = <
 >({
   children,
   ...restProps
-}: ValueContainerProps<Option, IsMulti, Group>) => {
+}: ValueContainerProps<Option, IsMulti, Group>): JSX.Element => {
   const childArray = Children.toArray(children);
 
   return (
@@ -39,9 +39,9 @@ export const SelectValueContainer = <
   );
 };
 
-const renderValue = (value: ReactNode) => {
+const renderValue = (value: ReactNode): ReactNode => {
   if (Array.isArray(value)) {
-    const currentValue = (valueIndex: number) => {
+    const currentValue = (valueIndex: number): ReactNode => {
       return value[valueIndex].props.children;
     };
 

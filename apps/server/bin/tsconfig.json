@@ -3,7 +3,10 @@
   "compilerOptions": {
     "module": "nodenext",
     "moduleResolution": "nodenext",
-    "types": ["node"]
+    "types": ["node"],
+    "noEmit": true,
+    "incremental": true,
+    "tsBuildInfoFile": "../../../target/buildcache/server-bin-type-check.tsbuildinfo"
   },
   "include": ["./*.mts"]
 }

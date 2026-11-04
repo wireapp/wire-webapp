@@ -17,16 +17,16 @@
  *
  */
 
-import {act, render} from '@testing-library/react';
+import {act, render, type RenderResult} from '@testing-library/react';
 import {ThemeProvider} from '@wireapp/react-ui-kit';
 import {Maybe} from 'true-myth';
 
-import type {UploadState} from 'Repositories/cells/upload';
+import type {UploadState} from '../../../repositories/cells/upload';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 import type {SharedDriveUploadController} from '../conversationCells/sharedDriveUploadController';
 import type {DismissedUpload} from '../conversationCells/sharedDriveUploadStatus';
@@ -65,7 +65,8 @@ type TestController = SharedDriveUploadController & {
   subscribe: jest.MockedFunction<SharedDriveUploadController['subscribe']>;
 };
 
-const createController = (state: UploadState | null = null) => {
+type CreateControllerResult = {controller: TestController; setState: (nextState: UploadState | null) => void};
+const createController = (state: UploadState | null = null): CreateControllerResult => {
   let currentState = state;
   let notify: () => void = () => {
     return undefined;
@@ -100,7 +101,7 @@ const renderTabs = (
   controller: SharedDriveUploadController,
   isUploadStatusIndicatorEnabled = true,
   dismissedUpload: Maybe<DismissedUpload> = Maybe.nothing<DismissedUpload>(),
-) => {
+): RenderResult => {
   return render(
     <ThemeProvider>
       <SharedDriveUploadStatusProvider initialDismissedUpload={dismissedUpload}>

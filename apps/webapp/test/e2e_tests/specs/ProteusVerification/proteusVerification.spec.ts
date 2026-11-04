@@ -25,7 +25,7 @@ import {connectWithUser, createGroup, sendConnectionRequest} from 'test/e2e_test
 const verifyCrossDeviceTrust = async (
   userAPages: PageManager['webapp']['pages'],
   userBPages: PageManager['webapp']['pages'],
-) => {
+): Promise<void> => {
   for (const userPages of [userAPages, userBPages]) {
     await userPages.conversation().clickConversationInfoButton();
     await userPages.conversationDetails().devicesButton.click();

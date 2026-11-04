@@ -30,15 +30,15 @@ export class SetUsernamePage {
     this.errorMessage = page.getByTestId('error-message');
   }
 
-  async setUsername(username: string) {
+  async setUsername(username: string): Promise<void> {
     await this.handleInput.fill(username);
   }
 
-  async getHandleInputValue() {
+  async getHandleInputValue(): Promise<string> {
     return (await this.handleInput.inputValue()) ?? '';
   }
 
-  async clickNextButton() {
+  async clickNextButton(): Promise<void> {
     await this.nextButton.click();
   }
 }

@@ -18,6 +18,7 @@
  */
 
 import * as React from 'react';
+import {type FunctionComponent} from 'react';
 
 import {CSSObject} from '@emotion/react';
 
@@ -37,6 +38,6 @@ export const lineStyle: <T>(props: LineProps<T>) => CSSObject = ({color = COLOR.
   };
 };
 
-export const Line = (props: LineProps) => {
+export const Line: FunctionComponent<LineProps> = props => {
   return <hr css={lineStyle(props)} {...props} />;
 };

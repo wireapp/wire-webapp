@@ -17,7 +17,7 @@
  *
  */
 
-import {useState} from 'react';
+import {useState, type FunctionComponent} from 'react';
 import * as React from 'react';
 
 import {MenuContent} from './menuContent';
@@ -32,10 +32,15 @@ export interface HeaderMenuProps<T = HTMLDivElement> extends React.HTMLProps<T> 
   closeMenuLabel?: string;
 }
 
-export const HeaderMenu = ({children, logoElement = null, centerElement = null, ...props}: HeaderMenuProps) => {
+export const HeaderMenu: FunctionComponent<HeaderMenuProps> = ({
+  children,
+  logoElement = null,
+  centerElement = null,
+  ...props
+}) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const toggleMenu = () => {
+  const toggleMenu = (): void => {
     if (typeof window !== 'undefined') {
       window.scrollTo(0, 0);
       setIsOpen(current => {
@@ -44,7 +49,7 @@ export const HeaderMenu = ({children, logoElement = null, centerElement = null, 
     }
   };
 
-  const closeMenu = () => {
+  const closeMenu = (): void => {
     return setIsOpen(false);
   };
 

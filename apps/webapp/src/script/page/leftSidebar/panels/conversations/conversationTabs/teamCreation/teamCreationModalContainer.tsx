@@ -17,16 +17,16 @@
  *
  */
 
-import {useState} from 'react';
-
-import {User} from 'Repositories/entity/User';
-import {TeamRepository} from 'Repositories/team/TeamRepository';
-import {UserRepository} from 'Repositories/user/userRepository';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {useState, type FunctionComponent} from 'react';
 
 import {ConfirmLeaveModal} from './confirmLeaveModal';
 import {TeamCreationModal} from './teamCreationModal';
 import {useTeamCreationModal} from './useTeamCreationModal';
+
+import {User} from '../../../../../../repositories/entity/User';
+import {TeamRepository} from '../../../../../../repositories/team/TeamRepository';
+import {UserRepository} from '../../../../../../repositories/user/userRepository';
+import {useKoSubscribableChildren} from '../../../../../../util/componentUtil';
 
 interface Props {
   selfUser: User;
@@ -34,12 +34,16 @@ interface Props {
   userRepository: UserRepository;
 }
 
-export const TeamCreationModalContainer = ({selfUser, userRepository, teamRepository}: Props) => {
+export const TeamCreationModalContainer: FunctionComponent<Props> = ({
+  selfUser,
+  userRepository,
+  teamRepository,
+}: Props) => {
   const {isModalOpen, hideModal} = useTeamCreationModal();
   const [isLeaveConfirmModalVisible, setIsLeaveConfirmModalVisible] = useState(false);
   const {name} = useKoSubscribableChildren(selfUser, ['name']);
 
-  const modalCloseHandler = async () => {
+  const modalCloseHandler = async (): Promise<void> => {
     hideModal();
     setIsLeaveConfirmModalVisible(false);
 

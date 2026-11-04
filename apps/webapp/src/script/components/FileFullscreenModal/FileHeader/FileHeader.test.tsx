@@ -17,14 +17,14 @@
  *
  */
 
-import {render, screen} from '@testing-library/react';
+import {render, screen, type RenderResult} from '@testing-library/react';
 import {container} from 'tsyringe';
 
 import {
   CELLS_SELF_USER_DRIVE_ROLE,
   CellsSelfUserDriveRoleProvider,
-} from 'Components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+} from '../../conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
+import {CellsRepository} from '../../../repositories/cells/cellsRepository';
 import {withThemeAndRootContext} from 'src/script/auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
@@ -32,8 +32,9 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {FileHeader, getConversationIconType} from './FileHeader';
+import type {ReactNode} from 'react';
 
-const translate = (key: string) => {
+const translate = (key: string): string => {
   return (
     {
       'cells.imageFullScreenModal.closeButton': 'Close',
@@ -57,7 +58,8 @@ const defaultProps = {
   onFileContentRefresh: jest.fn(),
 };
 
-const createWrapper = () => {
+type CreateWrapperResult = (properties: {readonly children: ReactNode}) => ReactNode;
+const createWrapper = (): CreateWrapperResult => {
   return createRootProviderWrapperForTest(
     createRootContextValueForTest({
       translate,
@@ -74,7 +76,7 @@ describe('FileHeader', () => {
     container.reset();
   });
 
-  const renderHeader = ({props = {}}: {props?: Partial<Parameters<typeof FileHeader>[0]>} = {}) => {
+  const renderHeader = ({props = {}}: {props?: Partial<Parameters<typeof FileHeader>[0]>} = {}): RenderResult => {
     return render(
       withThemeAndRootContext(
         <CellsSelfUserDriveRoleProvider selfUserDriveRole={CELLS_SELF_USER_DRIVE_ROLE.VIEWER}>

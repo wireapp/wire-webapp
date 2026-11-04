@@ -25,30 +25,30 @@ import cx from 'classnames';
 
 import {Button, ButtonVariant, TabIndex} from '@wireapp/react-ui-kit';
 
-import {FadingScrollbar} from 'Components/fadingScrollbar';
-import * as Icon from 'Components/icon';
-import {SearchInput} from 'Components/SearchInput';
-import {ServiceList} from 'Components/ServiceList/ServiceList';
-import {UserSearchableList} from 'Components/UserSearchableList';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
-import {SearchRepository} from 'Repositories/search/searchRepository';
-import {TeamRepository} from 'Repositories/team/TeamRepository';
-import {TeamState} from 'Repositories/team/TeamState';
-import {generatePermissionHelpers} from 'Repositories/user/userPermission';
-import {UserState} from 'Repositories/user/userState';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {checkAppsFeatureAvailability} from 'Util/featureUtil';
-import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {getLogger} from 'Util/logger';
-import {safeWindowOpen} from 'Util/sanitizationUtil';
-import {compareTransliteration, sortByPriority, sortUsersByPriority} from 'Util/stringUtil';
 
+import {FadingScrollbar} from '../../../components/fadingScrollbar';
+import * as Icon from '../../../components/icon';
+import {SearchInput} from '../../../components/SearchInput';
+import {ServiceList} from '../../../components/ServiceList/ServiceList';
+import {UserSearchableList} from '../../../components/UserSearchableList';
 import {getManageServicesUrl} from '../../../externalRoute';
+import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {User} from '../../../repositories/entity/User';
+import {IntegrationRepository} from '../../../repositories/integration/IntegrationRepository';
+import {ServiceEntity} from '../../../repositories/integration/ServiceEntity';
+import {SearchRepository} from '../../../repositories/search/searchRepository';
+import {TeamRepository} from '../../../repositories/team/TeamRepository';
+import {TeamState} from '../../../repositories/team/TeamState';
+import {generatePermissionHelpers} from '../../../repositories/user/userPermission';
+import {UserState} from '../../../repositories/user/userState';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {checkAppsFeatureAvailability} from '../../../util/featureUtil';
+import {handleKeyDown, KEY} from '../../../util/keyboardUtil';
+import {getLogger} from '../../../util/logger';
+import {safeWindowOpen} from '../../../util/sanitizationUtil';
+import {compareTransliteration, sortByPriority, sortUsersByPriority} from '../../../util/stringUtil';
 import {PanelHeader} from '../panelHeader';
 import {PanelEntity, PanelState} from '../rightSidebar';
 
@@ -227,7 +227,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
   const manageServicesUrl = getManageServicesUrl('client_landing');
   const isSearching = searchInput.length > ENABLE_IS_SEARCHING_LENGTH;
 
-  const onAddPeople = () => {
+  const onAddPeople = (): void => {
     return setCurrentState(PARTICIPANTS_STATE.ADD_PEOPLE);
   };
 
@@ -239,29 +239,29 @@ const AddParticipants: FC<AddParticipantsProps> = ({
     [integrationRepository],
   );
 
-  const onAddServices = async () => {
+  const onAddServices = async (): Promise<void> => {
     setCurrentState(PARTICIPANTS_STATE.ADD_SERVICE);
 
     await searchServices(searchInput);
   };
 
-  const openManageServices = () => {
+  const openManageServices = (): void => {
     if (isNonEmptyString(manageServicesUrl)) {
       safeWindowOpen(manageServicesUrl);
     }
   };
 
-  const onServiceSelect = (entity: ServiceEntity) => {
+  const onServiceSelect = (entity: ServiceEntity): void => {
     return togglePanel(PanelState.GROUP_PARTICIPANT_SERVICE, entity, true);
   };
 
-  const addUsers = async () => {
+  const addUsers = async (): Promise<void> => {
     const userEntities = selectedContacts.slice();
 
     await conversationRepository.addUsers(activeConversation, userEntities);
   };
 
-  const onAddParticipants = async () => {
+  const onAddParticipants = async (): Promise<void> => {
     await addUsers();
     onBack();
   };

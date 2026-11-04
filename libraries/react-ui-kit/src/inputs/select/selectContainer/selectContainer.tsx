@@ -17,6 +17,8 @@
  *
  */
 
+import type {JSX} from 'react';
+
 import {components, ContainerProps, GroupBase} from 'react-select';
 
 import {TabIndex} from '../../../utils/enums';
@@ -29,7 +31,7 @@ const selectContainerInnerStyles = {
 
 export const SelectContainer = <IsMulti extends boolean = false, Group extends GroupBase<Option> = GroupBase<Option>>(
   props: ContainerProps<Option, IsMulti, Group>,
-) => {
+): JSX.Element => {
   return (
     <components.SelectContainer {...props}>
       <div tabIndex={TabIndex.FOCUSABLE} css={selectContainerInnerStyles}>

@@ -17,7 +17,7 @@
  *
  */
 
-import {useState} from 'react';
+import {useState, type FunctionComponent} from 'react';
 
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
@@ -38,7 +38,7 @@ interface ImageAssetSmallProps {
   id: string;
 }
 
-export const ImageAssetSmall = ({
+export const ImageAssetSmall: FunctionComponent<ImageAssetSmallProps> = ({
   id,
   filePreviewUrl,
   fileUrl,

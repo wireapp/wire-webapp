@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useRef} from 'react';
+import {useEffect, useRef, type JSX} from 'react';
 
 import {isNonEmptyArray, isNonEmptyString} from '@sindresorhus/is';
 import {components, GroupBase, OptionProps, OptionsOrGroups} from 'react-select';
@@ -26,10 +26,14 @@ import {CheckIcon} from '../../../dataDisplay/icon';
 import {Theme} from '../../../identity/theme';
 import {Option} from '../select';
 
+type SelectOptionComponentType<IsMulti extends boolean, Group extends GroupBase<Option>> = ((
+  props: OptionProps<Option, IsMulti, Group>,
+) => JSX.Element) & {displayName: string};
+
 export const SelectOption = <IsMulti extends boolean = false, Group extends GroupBase<Option> = GroupBase<Option>>(
   dataUieName: string,
-) => {
-  function SelectOptionComponent(props: OptionProps<Option, IsMulti, Group>) {
+): SelectOptionComponentType<IsMulti, Group> => {
+  function SelectOptionComponent(props: OptionProps<Option, IsMulti, Group>): JSX.Element {
     const {children, data, isMulti, isSelected, options} = props;
     const selectedOptionRef = useRef<HTMLDivElement>(null);
 

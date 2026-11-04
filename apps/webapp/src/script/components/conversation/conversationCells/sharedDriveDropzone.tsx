@@ -17,7 +17,7 @@
  *
  */
 
-import {DragEvent, ReactNode, useCallback, useEffect, useRef, useState} from 'react';
+import {DragEvent, ReactNode, useCallback, useEffect, useRef, useState, type FunctionComponent} from 'react';
 
 import {BlockIcon} from '@wireapp/react-ui-kit';
 
@@ -55,7 +55,7 @@ const preventDefaultFileDrop = (event: DragEvent<HTMLElement>): void => {
   event.stopPropagation();
 };
 
-const UploadFilesIcon = () => {
+const UploadFilesIcon: FunctionComponent = () => {
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path
@@ -68,7 +68,7 @@ const UploadFilesIcon = () => {
   );
 };
 
-export const SharedDriveDropzone = ({
+export const SharedDriveDropzone: FunctionComponent<SharedDriveDropzoneProps> = ({
   children,
   dragStateResetKey,
   isEnabled,

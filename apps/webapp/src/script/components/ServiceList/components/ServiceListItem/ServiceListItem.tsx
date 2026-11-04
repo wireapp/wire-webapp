@@ -17,26 +17,29 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {Avatar, AVATAR_SIZE} from 'Components/avatar';
-import {ParticipantItemContent} from 'Components/participantItemContent';
-import {listItem, listWrapper} from 'Components/participantItemContent/participantItem.styles';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {handleKeyDown, KEY} from 'Util/keyboardUtil';
+
+import {ServiceEntity} from '../../../../repositories/integration/ServiceEntity';
+import {useKoSubscribableChildren} from '../../../../util/componentUtil';
+import {handleKeyDown, KEY} from '../../../../util/keyboardUtil';
+import {Avatar, AVATAR_SIZE} from '../../../avatar';
+import {ParticipantItemContent} from '../../../participantItemContent';
+import {listItem, listWrapper} from '../../../participantItemContent/participantItem.styles';
 
 interface ServiceListItemProps {
   service: ServiceEntity;
   onClick: (service: ServiceEntity) => void;
 }
 
-export const ServiceListItem = ({service, onClick}: ServiceListItemProps) => {
+export const ServiceListItem: FunctionComponent<ServiceListItemProps> = ({service, onClick}: ServiceListItemProps) => {
   const {translate} = useApplicationContext();
   const {name: serviceName} = useKoSubscribableChildren(service, ['name']);
 
-  const onServiceClick = () => {
+  const onServiceClick = (): void => {
     return onClick(service);
   };
 

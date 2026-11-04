@@ -4,6 +4,8 @@
     "noEmit": true,
     "types": ["node", "jest"],
     "noUncheckedIndexedAccess": false,
+    "incremental": true,
+    "tsBuildInfoFile": "../../target/buildcache/store-engine-type-check.tsbuildinfo",
     "baseUrl": ".",
     "paths": {
       "@sindresorhus/is": ["../../node_modules/@sindresorhus/is/distribution/index.d.ts"]

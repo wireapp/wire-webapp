@@ -17,12 +17,13 @@
  *
  */
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {RootContextValue} from 'src/script/page/rootProvider';
 import {CellNodeType, CellNode} from 'src/script/types/cellNode';
-import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
 
 import {modalContentStyles} from './showRestoreNestedNodeModal.styles';
+
+import {replaceReactComponents} from '../../../../../../../util/localizerUtil/reactLocalizerUtil';
+import {PrimaryModal} from '../../../../../../Modals/PrimaryModal';
 
 export const showRestoreNestedNodeModal = ({
   node,
@@ -34,7 +35,7 @@ export const showRestoreNestedNodeModal = ({
   onRestoreNode: () => void;
   parentNodeName: string;
   translate: RootContextValue['translate'];
-}) => {
+}): void => {
   PrimaryModal.show(
     PrimaryModal.type.CONFIRM,
     {

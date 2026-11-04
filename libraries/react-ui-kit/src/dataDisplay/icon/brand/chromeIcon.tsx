@@ -17,9 +17,11 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {SVGIcon, SVGIconProps} from '../svgIcon';
 
-export const ChromeIcon = (props: SVGIconProps) => {
+export const ChromeIcon: FunctionComponent<SVGIconProps> = props => {
   return (
     <SVGIcon realWidth={32} realHeight={32} {...props}>
       <path

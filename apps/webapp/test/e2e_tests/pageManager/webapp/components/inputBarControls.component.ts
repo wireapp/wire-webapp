@@ -44,21 +44,21 @@ export class InputBarControls {
     this.messageInput = page.getByTestId('input-message');
   }
 
-  async clickShareImage(imageFilePath: string) {
+  async clickShareImage(imageFilePath: string): Promise<void> {
     await shareAssetHelper(imageFilePath, this.page, this.shareImage);
     await this.page.waitForTimeout(3_000); // Wait for the file to be processed
   }
 
-  async clickShareFile(filePath: string) {
+  async clickShareFile(filePath: string): Promise<void> {
     await shareAssetHelper(filePath, this.page, this.shareFile);
     await this.page.waitForTimeout(3_000); // Wait for the file to be processed
   }
 
-  async clickPing() {
+  async clickPing(): Promise<void> {
     await this.ping.click();
   }
 
-  async setEphemeralTimerTo(choice: (typeof EPHEMERAL_TIMER_CHOICES)[number]) {
+  async setEphemeralTimerTo(choice: (typeof EPHEMERAL_TIMER_CHOICES)[number]): Promise<void> {
     await this.setEphemeralTimer.click();
     const buttons = this.page.getByTestId('message-timer-menu');
     await buttons.last().waitFor({state: 'visible'});
@@ -75,11 +75,11 @@ export class InputBarControls {
     }
   }
 
-  async setMessageInput(message: string) {
+  async setMessageInput(message: string): Promise<void> {
     await this.messageInput.fill(message);
   }
 
-  async clickSendMessage() {
+  async clickSendMessage(): Promise<void> {
     await this.sendMessage.click();
   }
 }

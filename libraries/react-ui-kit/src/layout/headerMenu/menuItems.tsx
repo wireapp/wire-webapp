@@ -18,6 +18,7 @@
  */
 
 import * as React from 'react';
+import {type FunctionComponent} from 'react';
 
 import {CSSObject} from '@emotion/react';
 
@@ -48,11 +49,11 @@ export const menuItemsStyle: <T>(theme: Theme, props: MenuItemsProps<T>) => CSSO
   };
 };
 
-const filterMenuItemProps = (props: MenuItemsProps) => {
+const filterMenuItemProps = (props: MenuItemsProps): Object => {
   return filterProps(props, ['open']);
 };
 
-export const MenuItems = (props: MenuItemsProps) => {
+export const MenuItems: FunctionComponent<MenuItemsProps> = props => {
   return (
     <div
       css={(theme: Theme) => {

@@ -53,7 +53,7 @@ export const imageCardStyles: CSSObject = {
   ...smallCardStyles,
 };
 
-export const videoCardStyles = (isSingleAsset: boolean) => {
+export const videoCardStyles = (isSingleAsset: boolean): CSSObject => {
   return {
     ...(isSingleAsset ? largeCardStyles : smallCardStyles),
   };

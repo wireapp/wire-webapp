@@ -20,19 +20,19 @@
 import {isNan, isUndefined} from '@sindresorhus/is';
 import {amplify} from 'amplify';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {Logger, getLogger} from 'Util/logger';
-
 import {AppInitStatisticsValue} from './AppInitStatisticsValue';
 
+import {Logger, getLogger} from '../../util/logger';
+import {WebAppEvents} from '../../webAppEvents';
+
 export type AppStatistics = Partial<Record<AppInitStatisticsValue, string | number>>;
+type AppInitStatisticsConfig = {LOG_LENGTH_KEY: number; LOG_LENGTH_VALUE: number};
 
 export class AppInitStatistics {
   private readonly logger: Logger;
   private readonly statistics: AppStatistics;
 
-  static get CONFIG() {
+  static get CONFIG(): AppInitStatisticsConfig {
     return {
       LOG_LENGTH_KEY: 17,
       LOG_LENGTH_VALUE: 11,

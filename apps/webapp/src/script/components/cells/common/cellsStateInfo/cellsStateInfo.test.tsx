@@ -24,8 +24,9 @@ import {render, screen} from '@testing-library/react';
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
 import {CellsStateInfo} from './cellsStateInfo';
+import type {JSX} from '@emotion/react/jsx-runtime';
 
-const withTheme = (component: ReactNode) => {
+const withTheme = (component: ReactNode): JSX.Element => {
   return <StyledApp themeId={THEME_ID.DEFAULT}>{component}</StyledApp>;
 };
 

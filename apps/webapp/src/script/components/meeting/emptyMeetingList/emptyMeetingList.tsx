@@ -17,7 +17,11 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {Button, ButtonVariant, CalendarIcon, CallIcon} from '@wireapp/react-ui-kit';
+
+import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {
   emptyListActionButtonContainerStyles,
@@ -25,15 +29,17 @@ import {
   emptyListBodyStyles,
   emptyListHeadingStyles,
   emptyListStyles,
-} from 'Components/meeting/emptyMeetingList/emptyListStyles';
-import {useMeetingActions} from 'Components/meeting/useMeetingActions';
-import {useApplicationContext} from 'src/script/page/rootProvider';
+} from './emptyListStyles';
+
+import {useMeetingActions} from '../useMeetingActions';
 
 export interface EmptyMeetingListProps {
   useMeetingActionsHook?: typeof useMeetingActions;
 }
 
-export const EmptyMeetingList = ({useMeetingActionsHook = useMeetingActions}: EmptyMeetingListProps) => {
+export const EmptyMeetingList: FunctionComponent<EmptyMeetingListProps> = ({
+  useMeetingActionsHook = useMeetingActions,
+}: EmptyMeetingListProps) => {
   const {translate} = useApplicationContext();
   const {handleMeetNow, handleScheduleMeeting} = useMeetingActionsHook();
 

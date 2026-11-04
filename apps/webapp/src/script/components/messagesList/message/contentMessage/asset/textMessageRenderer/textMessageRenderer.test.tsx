@@ -25,7 +25,7 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {TextMessageRenderer} from './textMessageRenderer';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../../../util/test/translateForTest';
 
 describe('TextMessageRenderer', () => {
   const rootProviderWrapper = createRootProviderWrapperForTest(

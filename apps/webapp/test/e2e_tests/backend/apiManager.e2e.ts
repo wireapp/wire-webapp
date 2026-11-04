@@ -40,6 +40,20 @@ import {User} from '../data/user';
 
 const TEST_API_VERSION = `v13`;
 
+type CreateTeamOwnerResult = Promise<{
+  teamId: string;
+  qualifiedId: {domain: string; id: string};
+  id: string;
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  fullName: string;
+  username: string;
+  devices: string[];
+  token: string;
+  locale?: 'en-US' | 'de-DE';
+}>;
 export class ApiManagerE2E {
   user: UserRepositoryE2E;
   auth: AuthRepositoryE2E;
@@ -76,7 +90,7 @@ export class ApiManagerE2E {
     this.scim = new ScimRepositoryE2E(backendConfig);
   }
 
-  async addDevicesToUser(user: User, numberOfDevices: number) {
+  async addDevicesToUser(user: User, numberOfDevices: number): Promise<void> {
     const token = user.token ?? (await this.auth.loginUser(user)).data.access_token;
     const isMlsEnabled = await this.featureConfig.isFeatureEnabled(token, FEATURE_KEY.MLS);
     for (let i = 0; i < numberOfDevices; i++) {
@@ -86,7 +100,7 @@ export class ApiManagerE2E {
     }
   }
 
-  async createPersonalUser(user: User, invitationCode?: string) {
+  async createPersonalUser(user: User, invitationCode?: string): Promise<void> {
     // 1. Register
     const registerResponse = await this.auth.registerUser(user, invitationCode);
     const zuidCookie = this.extractCookieFromRegisterResponse(registerResponse);
@@ -106,7 +120,7 @@ export class ApiManagerE2E {
     await this.user.setUniqueUsername(user.username, user.token);
   }
 
-  async deletePersonalUser(user: User) {
+  async deletePersonalUser(user: User): Promise<void> {
     await this.user.deleteUser(user.password, user.token);
   }
 
@@ -139,7 +153,7 @@ export class ApiManagerE2E {
     throw new Error(`${featureKey} feature is not enabled after waiting for ${timeout / 1000} seconds`);
   }
 
-  async createTeamOwner(user: User, teamName: string) {
+  async createTeamOwner(user: User, teamName: string): CreateTeamOwnerResult {
     // 1. Book email
     await this.auth.bookEmail(user.email);
 
@@ -167,7 +181,7 @@ export class ApiManagerE2E {
     };
   }
 
-  async connectUsers(connectionInitiator: User, connectionReceiver: User) {
+  async connectUsers(connectionInitiator: User, connectionReceiver: User): Promise<void> {
     if (!connectionInitiator.token) {
       throw new Error(`User1 ${connectionInitiator.username} has no token and can't be used for connection`);
     }
@@ -178,18 +192,18 @@ export class ApiManagerE2E {
     await this.acceptConnectionRequest(connectionReceiver);
   }
 
-  async acceptConnectionRequest(user: User) {
+  async acceptConnectionRequest(user: User): Promise<void> {
     const token = user.token ?? (await this.auth.loginUser(user)).data.access_token;
     const listOfConnections = await this.connection.getConnectionsList(token);
     await this.connection.acceptConnectionRequest(token, listOfConnections.data.connections[0].to);
   }
 
-  async enableConferenceCallingFeature(teamId: string) {
+  async enableConferenceCallingFeature(teamId: string): Promise<void> {
     await this.brig.unlockConferenceCallingFeature(teamId);
     await this.brig.enableConferenceCallingBackdoorViaBackdoorTeam(teamId);
   }
 
-  async enableChannelsFeature(teamId: string) {
+  async enableChannelsFeature(teamId: string): Promise<void> {
     await this.brig.unlockChannelFeature(teamId);
     await this.brig.enableChannelsFeature(teamId);
   }

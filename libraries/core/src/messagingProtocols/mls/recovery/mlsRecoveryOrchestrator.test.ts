@@ -30,6 +30,7 @@ import {
   PolicyTable,
   OperationName,
   RecoveryActionKind,
+  OrchestratorDeps,
 } from './mlsRecoveryOrchestrator';
 
 function qid(id = 'conv-1'): QualifiedId {
@@ -41,7 +42,7 @@ function makeMapperReturning(err: DomainMlsError): MlsErrorMapper {
 }
 
 describe('MlsRecoveryOrchestrator', () => {
-  const baseDeps = () => {
+  const baseDeps = (): Record<keyof OrchestratorDeps, jest.Mock> => {
     return {
       joinViaExternalCommit: jest.fn().mockResolvedValue(undefined),
       resetAndReestablish: jest.fn().mockResolvedValue(undefined),
@@ -303,7 +304,7 @@ describe('MlsRecoveryOrchestrator', () => {
       operationName: OperationName.handleWelcome,
       qualifiedConversationId: qid('same') as QualifiedId,
     } as const;
-    const callBack = () => {
+    const callBack = (): Promise<never> => {
       return Promise.reject(new Error('orphan'));
     };
 

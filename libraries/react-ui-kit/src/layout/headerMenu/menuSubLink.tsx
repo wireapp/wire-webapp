@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {CSSObject} from '@emotion/react';
 
 import {Theme} from '../../identity';
@@ -60,7 +62,7 @@ export const menuSubLinkStyle: <T>(theme: Theme, props: MenuSubLinkProps<T>) => 
   };
 };
 
-export const MenuSubLink = (props: MenuSubLinkProps) => {
+export const MenuSubLink: FunctionComponent<MenuSubLinkProps> = props => {
   return (
     <div
       css={(theme: Theme) => {

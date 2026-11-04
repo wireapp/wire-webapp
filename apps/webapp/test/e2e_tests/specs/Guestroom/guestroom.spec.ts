@@ -13,7 +13,11 @@ import {createGroup, sendConnectionRequest} from 'test/e2e_tests/utils/userActio
  * * @returns A promise that resolves to the generated guest link string.
  */
 
-const generateGroupGuestsLink = async (pages: PageManager['webapp']['pages'], groupName: string, password?: string) => {
+const generateGroupGuestsLink = async (
+  pages: PageManager['webapp']['pages'],
+  groupName: string,
+  password?: string,
+): Promise<string> => {
   await pages.conversationList().getConversation(groupName).open();
   await pages.conversation().toggleGroupInformation();
   await pages.conversationDetails().openGuestOptions();

@@ -17,7 +17,7 @@
  *
  */
 
-import {createContext, useContext, ReactNode, useMemo} from 'react';
+import {createContext, useContext, ReactNode, useMemo, type FunctionComponent} from 'react';
 
 import {isNull} from '@sindresorhus/is';
 
@@ -27,7 +27,7 @@ interface CellsModalContextType {
 
 export const CellsModalContext = createContext<CellsModalContextType | null>(null);
 
-export const useCellsModal = () => {
+export const useCellsModal = (): CellsModalContextType => {
   const context = useContext(CellsModalContext);
   if (isNull(context)) {
     throw new Error('useCellsModal must be used within a CellsModalProvider');
@@ -40,7 +40,10 @@ interface CellsModalProviderProps {
   onClose: () => void;
 }
 
-export const CellsModalProvider = ({children, onClose}: CellsModalProviderProps) => {
+export const CellsModalProvider: FunctionComponent<CellsModalProviderProps> = ({
+  children,
+  onClose,
+}: CellsModalProviderProps) => {
   return (
     <CellsModalContext.Provider
       value={useMemo(() => {

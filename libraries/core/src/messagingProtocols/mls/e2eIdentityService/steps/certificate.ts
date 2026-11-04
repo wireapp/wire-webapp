@@ -26,7 +26,12 @@ interface GetCertificateParams {
   nonce: Nonce;
   certificateUrl: string;
 }
-export const getCertificate = async ({certificateUrl, connection, identity, nonce}: GetCertificateParams) => {
+export const getCertificate = async ({
+  certificateUrl,
+  connection,
+  identity,
+  nonce,
+}: GetCertificateParams): Promise<{certificate: string; nonce: string}> => {
   const reqBody = await identity.certificateRequest(nonce);
 
   const certificateResponse = await connection.getCertificate(certificateUrl, reqBody);

@@ -17,26 +17,30 @@
  *
  */
 
-import {useRef} from 'react';
+import {useRef, type FunctionComponent} from 'react';
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/icon';
 import {useApplicationContext} from 'src/script/page/rootProvider';
+
+import * as Icon from '../../../icon';
 
 interface AssetUploadButtonProps {
   onSelectFiles: (files: File[]) => void;
   acceptedFileTypes?: string[];
 }
 
-export const AssetUploadButton = ({onSelectFiles, acceptedFileTypes}: AssetUploadButtonProps) => {
+export const AssetUploadButton: FunctionComponent<AssetUploadButtonProps> = ({
+  onSelectFiles,
+  acceptedFileTypes,
+}: AssetUploadButtonProps) => {
   const {translate} = useApplicationContext();
   const fileRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const {files} = event.target;
 
     if (isNullOrUndefined(files)) {

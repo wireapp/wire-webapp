@@ -19,7 +19,7 @@
 
 import {task} from 'true-myth';
 
-import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
+import type {MeetingsRepository} from '../../repositories/meetings/meetingsRepository';
 
 import {loadMeetingsList} from './loadMeetingsList';
 
@@ -36,7 +36,7 @@ describe('loadMeetingsList', () => {
     tzid: 'Europe/Berlin',
   };
 
-  const createRepository = (getMeetingsList: jest.Mock) => {
+  const createRepository = (getMeetingsList: jest.Mock): MeetingsRepository => {
     return {getMeetingsList} as unknown as MeetingsRepository;
   };
 

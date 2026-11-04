@@ -24,28 +24,13 @@ import ko from 'knockout';
 import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {PrimaryModal, usePrimaryModalState} from 'Components/Modals/PrimaryModal';
-import type {CallingRepository} from 'Repositories/calling/CallingRepository';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {User} from 'Repositories/entity/User';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {SearchRepository} from 'Repositories/search/searchRepository';
-import type {TeamRepository} from 'Repositories/team/TeamRepository';
-import {TeamState} from 'Repositories/team/TeamState';
-import {UserState} from 'Repositories/user/userState';
-import {iterateItem} from 'Util/arrayUtil';
-import {isEscapeKey} from 'Util/keyboardUtil';
-import {type Translate} from 'Util/localizerUtil';
 
 import type {ActionsViewModel} from './ActionsViewModel';
 import {CallingViewModel} from './CallingViewModel';
 import {ContentViewModel} from './ContentViewModel';
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 
+import {PrimaryModal, usePrimaryModalState} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
 import {
   getConversationListTab,
@@ -55,11 +40,25 @@ import {
 import {PanelState} from '../page/rightSidebar';
 import {useAppMainState} from '../page/state';
 import {ContentState, ListState, useAppState} from '../page/useAppState';
+import type {CallingRepository} from '../repositories/calling/CallingRepository';
+import type {ConversationRepository} from '../repositories/conversation/ConversationRepository';
+import {ConversationState} from '../repositories/conversation/ConversationState';
+import type {Conversation} from '../repositories/entity/Conversation';
+import type {User} from '../repositories/entity/User';
+import {PropertiesRepository} from '../repositories/properties/propertiesRepository';
+import {SearchRepository} from '../repositories/search/searchRepository';
+import type {TeamRepository} from '../repositories/team/TeamRepository';
+import {TeamState} from '../repositories/team/TeamState';
+import {UserState} from '../repositories/user/userState';
 import {setHistoryParam} from '../router/Router';
 import {showContextMenu} from '../ui/contextMenu';
 import {showLabelContextMenu} from '../ui/labelContextMenu';
 import {Shortcut} from '../ui/shortcut';
 import {ShortcutType} from '../ui/shortcutType';
+import {iterateItem} from '../util/arrayUtil';
+import {isEscapeKey} from '../util/keyboardUtil';
+import {type Translate} from '../util/localizerUtil';
+import {WebAppEvents} from '../webAppEvents';
 
 export class ListViewModel {
   private readonly userState: UserState;
@@ -83,7 +82,7 @@ export class ListViewModel {
   public readonly selfUser: ko.Subscribable<User>;
   private readonly visibleListItems: ko.PureComputed<(string | Conversation)[]>;
 
-  get isFederated() {
+  get isFederated(): boolean {
     return this.mainViewModel.isFederated;
   }
 
@@ -128,6 +127,7 @@ export class ListViewModel {
           ContentState.PREFERENCES_DEVICES,
           ContentState.PREFERENCES_OPTIONS,
           ContentState.PREFERENCES_AV,
+          ContentState.PREFERENCES_TROUBLESHOOTING,
         ];
 
         if (!Runtime.isDesktopApp()) {
@@ -146,7 +146,7 @@ export class ListViewModel {
     this._initSubscriptions();
   }
 
-  private readonly _initSubscriptions = () => {
+  private readonly _initSubscriptions = (): void => {
     amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, (conversation?: Conversation) => {
       this.openConversations(conversation?.archivedState());
     });
@@ -188,7 +188,7 @@ export class ListViewModel {
     await this.callingViewModel.callActions.answer(call);
   };
 
-  readonly changeNotificationSetting = () => {
+  readonly changeNotificationSetting = (): void => {
     if (this.isProAccount()) {
       const {rightSidebar} = useAppMainState.getState();
       rightSidebar.goTo(PanelState.NOTIFICATIONS, {entity: this.conversationState.activeConversation() ?? null});
@@ -197,15 +197,15 @@ export class ListViewModel {
     }
   };
 
-  readonly goToNext = () => {
+  readonly goToNext = (): void => {
     this.iterateActiveItem(true);
   };
 
-  readonly goToPrevious = () => {
+  readonly goToPrevious = (): void => {
     this.iterateActiveItem(false);
   };
 
-  onKeyDownListView = (keyboardEvent: KeyboardEvent) => {
+  onKeyDownListView = (keyboardEvent: KeyboardEvent): void => {
     const {currentModalId} = usePrimaryModalState.getState();
     const {currentTab} = useSidebarStore.getState();
 
@@ -221,14 +221,14 @@ export class ListViewModel {
     }
   };
 
-  private readonly iterateActiveItem = (reverse = false) => {
+  private readonly iterateActiveItem = (reverse = false): void => {
     const {listState} = useAppState.getState();
     const isStatePreferences = listState === ListState.PREFERENCES;
 
     return isStatePreferences ? this.iterateActivePreference(reverse) : this.iterateActiveConversation(reverse);
   };
 
-  private readonly iterateActiveConversation = (reverse: boolean) => {
+  private readonly iterateActiveConversation = (reverse: boolean): void => {
     const {contentState} = useAppState.getState();
 
     const isStateRequests = contentState === ContentState.CONNECTION_REQUESTS;
@@ -247,7 +247,7 @@ export class ListViewModel {
     }
   };
 
-  private readonly iterateActivePreference = (reverse: boolean) => {
+  private readonly iterateActivePreference = (reverse: boolean): void => {
     const {contentState} = useAppState.getState();
     let activePreference = contentState;
     const isDeviceDetails = activePreference === ContentState.PREFERENCES_DEVICE_DETAILS;
@@ -263,7 +263,7 @@ export class ListViewModel {
     }
   };
 
-  private switchListAndSetTab = (listState: ListState, tab: SidebarTabs) => {
+  private switchListAndSetTab = (listState: ListState, tab: SidebarTabs): void => {
     useSidebarStore.getState().setCurrentTab(tab);
     this.switchList(listState);
   };
@@ -285,6 +285,7 @@ export class ListViewModel {
       [ContentState.PREFERENCES_ABOUT]: '/preferences/about',
       [ContentState.PREFERENCES_ACCOUNT]: '/preferences/account',
       [ContentState.PREFERENCES_AV]: '/preferences/av',
+      [ContentState.PREFERENCES_TROUBLESHOOTING]: '/preferences/troubleshooting',
       [ContentState.PREFERENCES_DEVICES]: '/preferences/devices',
       [ContentState.PREFERENCES_OPTIONS]: '/preferences/options',
     };

@@ -13,7 +13,7 @@ Wire for Web's communication core.
 ### Installation
 
 ```bash
-yarn add @wireapp/core
+npm install @wireapp/core
 ```
 
 ### Setup

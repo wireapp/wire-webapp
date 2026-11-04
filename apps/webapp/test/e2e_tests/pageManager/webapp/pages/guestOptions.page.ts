@@ -20,8 +20,19 @@
 import {Page} from '@playwright/test';
 import {GuestLinkPasswordModal} from '../modals/guestLinkPassword.modal';
 import {ConfirmModal} from '../modals/confirm.modal';
+import type {Locator} from 'playwright-core';
 
-export const GuestOptionsPage = (page: Page) => {
+type GuestOptionsPageResult = {
+  backButton: Locator;
+  createLink: (options?: {password?: string}) => Promise<string>;
+  revokeLink: () => Promise<void>;
+  toggleGuests: () => Promise<void>;
+  guestsToggle: Locator;
+  passwordSecuredRadioButton: Locator;
+  createLinkButton: Locator;
+  guestLink: Locator;
+};
+export const GuestOptionsPage = (page: Page): GuestOptionsPageResult => {
   const panel = page.getByRole('complementary').filter({has: page.getByRole('heading', {name: 'Guests'})});
   const createPasswordModal = new GuestLinkPasswordModal(page);
 
@@ -34,7 +45,7 @@ export const GuestOptionsPage = (page: Page) => {
 
   const guestLink = panel.getByRole('button', {name: /https:\/\/.+\/conversation-join\//});
 
-  const createLink = async (options?: {password?: string}) => {
+  const createLink = async (options?: {password?: string}): Promise<string> => {
     if (options?.password) {
       await passwordSecuredRadioButton.click();
     } else {
@@ -59,12 +70,12 @@ export const GuestOptionsPage = (page: Page) => {
     return guestLinkText;
   };
 
-  const revokeLink = async () => {
+  const revokeLink = async (): Promise<void> => {
     await revokeLinkButton.click();
     await new ConfirmModal(page).actionButton.click();
   };
 
-  const toggleGuests = async () => {
+  const toggleGuests = async (): Promise<void> => {
     await guestsToggle.click();
     await new ConfirmModal(page).actionButton.click();
   };

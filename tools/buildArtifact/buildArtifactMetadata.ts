@@ -18,10 +18,10 @@
  */
 
 import {Maybe, Result} from 'true-myth';
+import {match, P} from 'ts-pattern';
 
 import {isBuildMetadata} from '@wireapp/config';
 import type {BuildMetadata} from '@wireapp/config';
-import {match, P} from 'ts-pattern';
 
 export type BuildArtifactHtmlDocument = {
   readonly archiveFilePath: string;
@@ -36,11 +36,13 @@ export type BuildArtifactMetadataValidationInput = {
 };
 
 const localStaticAssetDirectoryNames = ['assets', 'audio', 'ext', 'font', 'image', 'min', 'proto', 'style', 'worker'];
+const firstAttributeValueCaptureIndex = 1;
+const attributeValueCaptureEndIndex = 4;
 const htmlResourceAttributePattern = /\b(?:src|href)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'`=<>]+))/giu;
 
 function readHtmlResourceAttributeValues(htmlContents: string): readonly string[] {
   return [...htmlContents.matchAll(htmlResourceAttributePattern)].flatMap(attributeMatch => {
-    const attributeValueCaptures = attributeMatch.slice(1, 4);
+    const attributeValueCaptures = attributeMatch.slice(firstAttributeValueCaptureIndex, attributeValueCaptureEndIndex);
 
     return match(attributeValueCaptures)
       .with([P.string, P._, P._], ([doubleQuotedAttributeValue]) => {

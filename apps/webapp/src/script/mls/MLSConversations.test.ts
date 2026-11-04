@@ -26,17 +26,17 @@ import {randomUUID} from 'crypto';
 
 import {Account, MLSService} from '@wireapp/core';
 
-import {ConversationService} from 'Repositories/conversation/ConversationService';
-import {MLSConversation} from 'Repositories/conversation/ConversationSelectors';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {ConversationStatus} from 'Repositories/conversation/ConversationStatus';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {UserState} from 'Repositories/user/userState';
+import {ConversationService} from '../repositories/conversation/ConversationService';
+import {MLSConversation} from '../repositories/conversation/ConversationSelectors';
+import {ConversationState} from '../repositories/conversation/ConversationState';
+import {ConversationStatus} from '../repositories/conversation/ConversationStatus';
+import {Conversation} from '../repositories/entity/Conversation';
+import {User} from '../repositories/entity/User';
+import {UserState} from '../repositories/user/userState';
 import {Core} from 'src/script/service/coreSingleton';
 import {requireValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {TestFactory} from 'test/helper/TestFactory';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../util/test/translateForTest';
 
 import {
   classifyLocal,
@@ -67,13 +67,13 @@ function createMLSConversation(type?: CONVERSATION_TYPE, epoch = 0): MLSConversa
   return conversation as MLSConversation;
 }
 
-function createMLSConversations(nbConversations: number, type?: CONVERSATION_TYPE) {
+function createMLSConversations(nbConversations: number, type?: CONVERSATION_TYPE): MLSConversation[] {
   return Array.from(new Array(nbConversations)).map(() => {
     return createMLSConversation(type);
   });
 }
 
-function mockSafeEpoch(core: {service?: Core['service']}) {
+function mockSafeEpoch(core: {service?: Core['service']}): void {
   (core.service?.mls as unknown as {getSafeEpoch: jest.Mock}).getSafeEpoch = jest
     .fn()
     .mockResolvedValue(task.resolve(1));
@@ -498,7 +498,9 @@ describe('MLSConversations', () => {
   describe('fetchRemoteEpoch', () => {
     const conversationId: QualifiedId = {id: 'conv-id', domain: 'wire.com'};
 
-    const makeConversationService = (response: ReturnType<typeof result.ok> | ReturnType<typeof result.err>) => {
+    const makeConversationService = (
+      response: ReturnType<typeof result.ok> | ReturnType<typeof result.err>,
+    ): ConversationService => {
       return {
         getSafeConversationById: jest.fn().mockResolvedValue(task.fromResult(response)),
       } as unknown as ConversationService;
@@ -574,11 +576,21 @@ describe('MLSConversations', () => {
     const groupId = 'group-id';
     const conversationId: QualifiedId = {id: 'conv-id', domain: 'wire.com'};
 
-    const makeDeps = (overrides: {
+    type EnsureMLSGroupOverrides = {
       existsLocally?: boolean;
       safeEpoch?: ReturnType<typeof result.ok> | ReturnType<typeof result.err>;
       safeRemote?: ReturnType<typeof result.ok> | ReturnType<typeof result.err>;
-    }) => {
+    };
+    type EnsureMLSGroupTestFixture = {
+      deps: Parameters<typeof ensureMLSGroupIsEstablished>[2];
+      spies: {
+        wipeMLSConversation: jest.Mock;
+        joinByExternalCommit: jest.Mock;
+        establishMLSGroupConversationCore: jest.Mock;
+      };
+    };
+
+    const makeDeps = (overrides: EnsureMLSGroupOverrides): EnsureMLSGroupTestFixture => {
       const wipeMLSConversation = jest.fn().mockResolvedValue(undefined);
       const joinByExternalCommit = jest.fn().mockResolvedValue(undefined);
       const establishMLSGroupConversationCore = jest.fn().mockResolvedValue(undefined);

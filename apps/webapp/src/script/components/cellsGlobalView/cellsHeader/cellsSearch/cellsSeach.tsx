@@ -17,10 +17,13 @@
  *
  */
 
-import {CellsSearchInput} from 'Components/cellsSearchInput/cellsSearchInput';
+import type {FunctionComponent} from 'react';
+
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
 import {wrapperStyles} from './cellsSearch.styles';
+
+import {CellsSearchInput} from '../../../cellsSearchInput/cellsSearchInput';
 
 interface CellsSearchProps {
   searchValue: string;
@@ -28,7 +31,11 @@ interface CellsSearchProps {
   onClearSearch: () => void;
 }
 
-export const CellsSearch = ({searchValue, onSearch, onClearSearch}: CellsSearchProps) => {
+export const CellsSearch: FunctionComponent<CellsSearchProps> = ({
+  searchValue,
+  onSearch,
+  onClearSearch,
+}: CellsSearchProps) => {
   const {translate} = useApplicationContext();
 
   return (

@@ -18,12 +18,16 @@
  */
 
 import type {Config} from 'jest';
+import {createRequire} from 'node:module';
 import {fileURLToPath} from 'url';
 import {dirname} from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const isContinuousIntegrationEnvironment = process.env.CI === 'true';
+const rootJestConfiguration = createRequire(import.meta.url)('../../jest.config.js') as Pick<
+  Config,
+  'coverageReporters' | 'reporters'
+>;
 
 process.env.TZ = 'UTC';
 
@@ -46,6 +50,9 @@ const config: Config = {
   displayName: 'webapp',
   preset: '../../jest.preset.js',
   collectCoverageFrom: ['src/script/**/*.{ts,tsx}', '!src/script/util/test/**/*.*'],
+  cacheDirectory: '../../target/jest/cache',
+  coverageDirectory: '../../target/coverage/apps/webapp',
+  coverageReporters: rootJestConfiguration.coverageReporters,
   coverageThreshold: {
     global: {
       branches: 39,
@@ -60,18 +67,11 @@ const config: Config = {
     '^@enormora/clock/clock$': '<rootDir>/../../node_modules/@enormora/clock/clock.entry-point.js',
     '^@enormora/clock/deterministic-clock$': '<rootDir>/../../node_modules/@enormora/clock/deterministic-clock.js',
     '^@enormora/fire-and-forget$': '<rootDir>/../../node_modules/@enormora/fire-and-forget/index.js',
-    'Components/(.*)': '<rootDir>/src/script/components/$1',
-    'Hooks/(.*)': '<rootDir>/src/script/hooks/$1',
-    'I18n/(.*)': '<rootDir>/src/i18n/$1',
-    'Repositories/(.*)': '<rootDir>/src/script/repositories/$1',
-    'Resource/(.*)': '<rootDir>/resource/$1',
-    'Util/(.*)': '<rootDir>/src/script/util/$1',
     '^react$': '<rootDir>/../../node_modules/react',
     '^react/(.*)$': '<rootDir>/../../node_modules/react/$1',
     '.*\\.glsl': 'jest-transform-stub',
   },
-  coverageReporters: isContinuousIntegrationEnvironment ? ['html', 'lcov', 'text-summary'] : undefined,
-  reporters: isContinuousIntegrationEnvironment ? ['github-actions', 'summary'] : ['default'],
+  reporters: rootJestConfiguration.reporters,
   resolver: '<rootDir>/jest.resolver.cjs',
   setupFilesAfterEnv: ['<rootDir>/setupTests.js'],
   testEnvironment: 'jsdom',
@@ -89,5 +89,4 @@ const config: Config = {
   },
 };
 
-// eslint-disable-next-line import/no-default-export
 export default config;

@@ -17,6 +17,7 @@
  *
  */
 
+import type {ProteusService} from './proteusService';
 import * as GenericMessageParams from '../utility/getGenericMessageParams';
 
 import {APIClient} from '@wireapp/api-client';
@@ -37,7 +38,7 @@ const MockedGenericMessageParams = GenericMessageParams as jest.Mocked<typeof Ge
 
 const apiClients: APIClient[] = [];
 
-const prepareProteusService = async () => {
+const prepareProteusService = async (): Promise<ProteusService> => {
   const [proteusService, {apiClient}] = await buildProteusService();
   apiClients.push(apiClient);
 

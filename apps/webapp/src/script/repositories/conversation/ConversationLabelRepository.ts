@@ -22,17 +22,17 @@ import {USER_EVENT} from '@wireapp/api-client/lib/event/';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {PropertiesService} from 'Repositories/properties/propertiesService';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
-import {type Translate} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/logger';
-import {fixWebsocketString} from 'Util/stringUtil';
-import {TypedEventTarget} from 'Util/typedEventTarget';
-import {createUuid} from 'Util/uuid';
+
+import {PrimaryModal} from '../../components/Modals/PrimaryModal';
+import {type Translate} from '../../util/localizerUtil';
+import {getLogger, Logger} from '../../util/logger';
+import {fixWebsocketString} from '../../util/stringUtil';
+import {TypedEventTarget} from '../../util/typedEventTarget';
+import {createUuid} from '../../util/uuid';
+import {WebAppEvents} from '../../webAppEvents';
+import type {Conversation} from '../entity/Conversation';
+import type {PropertiesService} from '../properties/propertiesService';
 
 export enum LabelType {
   Custom = 0,
@@ -117,7 +117,7 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
     return {labels: labelJson};
   };
 
-  readonly unmarshal = (labelJson: LabelProperty) => {
+  readonly unmarshal = (labelJson: LabelProperty): void => {
     const labels = labelJson.labels.map(({id, type, name, conversations}): ConversationLabel => {
       return {
         conversations: ko.observableArray(
@@ -140,7 +140,7 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
     this.labels(labels);
   };
 
-  readonly saveLabels = () => {
+  readonly saveLabels = (): void => {
     const currentData = this.marshal();
     const storedData = localStorage.getItem(ConversationLabelRepository.LocalStorageKey);
     let parsedStoredData: LabelProperty | null = null;
@@ -167,7 +167,7 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
     }
   };
 
-  loadLabels = async () => {
+  loadLabels = async (): Promise<void> => {
     try {
       const conversationLabelJson = localStorage.getItem(ConversationLabelRepository.LocalStorageKey);
       let localData: LabelProperty | null = null;
@@ -235,12 +235,12 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
     }
   };
 
-  private persistValues = (data?: LabelProperty) => {
+  private persistValues = (data?: LabelProperty): void => {
     const values = data ?? this.marshal();
     localStorage.setItem(ConversationLabelRepository.LocalStorageKey, JSON.stringify(values));
   };
 
-  readonly onUserEvent = (event: any) => {
+  readonly onUserEvent = (event: any): void => {
     if (event.type === USER_EVENT.PROPERTIES_SET && event.key === propertiesKey) {
       const normalizedLabels = event.value?.labels?.map((label: ConversationLabelJson) => {
         return {
@@ -257,13 +257,13 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
     }
   };
 
-  readonly getGroupsWithoutLabel = (conversations = this.conversations()) => {
+  readonly getGroupsWithoutLabel = (conversations = this.conversations()): Conversation[] => {
     return conversations.filter(conversation => {
       return conversation.isGroupOrChannel() && !this.allLabeledConversations().includes(conversation);
     });
   };
 
-  readonly getContactsWithoutLabel = (conversations = this.conversations()) => {
+  readonly getContactsWithoutLabel = (conversations = this.conversations()): Conversation[] => {
     return conversations.filter(conversation => {
       return !conversation.isGroupOrChannel() && !this.allLabeledConversations().includes(conversation);
     });
@@ -359,7 +359,10 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
     return ids;
   };
 
-  readonly getConversationCustomLabel = (conversation: Conversation, includeFavorites: boolean = false) => {
+  readonly getConversationCustomLabel = (
+    conversation: Conversation,
+    includeFavorites: boolean = false,
+  ): ConversationLabel | undefined => {
     return this.labels().find(({type, conversations}) => {
       return (includeFavorites || type === LabelType.Custom) && conversations().includes(conversation);
     });
@@ -433,7 +436,7 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
     }
   };
 
-  readonly addConversationToNewLabel = (conversation: Conversation) => {
+  readonly addConversationToNewLabel = (conversation: Conversation): void => {
     const {setCurrentTab} = useSidebarStore.getState();
     PrimaryModal.show(
       PrimaryModal.type.INPUT,

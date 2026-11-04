@@ -17,6 +17,8 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {Bold} from '@wireapp/react-ui-kit';
 
 import {listStyles, numberActiveStyles, numberStyles} from './cellsPageList.styles';
@@ -31,7 +33,11 @@ const VISIBLE_PAGES_AROUND_CURRENT = 1;
 const VISIBLE_PAGES_AT_EDGES = 1;
 const MIN_PAGES_FOR_ELLIPSIS = 1;
 
-export const CellsPageList = ({currentPage = 0, numberOfPages = 1, goToPage}: CellsPageListProps) => {
+export const CellsPageList: FunctionComponent<CellsPageListProps> = ({
+  currentPage = 0,
+  numberOfPages = 1,
+  goToPage,
+}: CellsPageListProps) => {
   const lastPageIndex = numberOfPages - 1;
 
   const normalizedCurrent = Math.min(
@@ -95,7 +101,11 @@ interface PaginationPageNumberProps {
   goToPage: (pageIndex: number) => void;
 }
 
-const PaginationPageNumber = ({pageIndex, isCurrent, goToPage}: PaginationPageNumberProps) => {
+const PaginationPageNumber: FunctionComponent<PaginationPageNumberProps> = ({
+  pageIndex,
+  isCurrent,
+  goToPage,
+}: PaginationPageNumberProps) => {
   const pageNumber = pageIndex + 1;
 
   if (isCurrent) {
@@ -124,7 +134,7 @@ const PaginationPageNumber = ({pageIndex, isCurrent, goToPage}: PaginationPageNu
   );
 };
 
-const PaginationEllipsis = () => {
+const PaginationEllipsis: FunctionComponent = () => {
   return (
     <li>
       <Bold css={numberStyles}>...</Bold>

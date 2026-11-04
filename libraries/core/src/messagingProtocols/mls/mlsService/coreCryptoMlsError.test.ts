@@ -99,7 +99,10 @@ describe('CoreCryptoMLSError helpers', () => {
   });
 
   describe('abort reason based guards', () => {
-    function makeRejectedError(reason: string) {
+    function makeRejectedError(reason: string): {
+      type: ErrorType;
+      context: {type: MlsErrorType; context: {reason: string}};
+    } {
       return {
         type: ErrorType.Mls,
         context: {

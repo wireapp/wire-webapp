@@ -17,10 +17,13 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 
 import {dotStyles, dotButtonStyles} from './Pagination.styles';
+
+import {handleKeyDown, KEY} from '../../../util/keyboardUtil';
 
 interface PaginationDotProps {
   page: number;
@@ -29,7 +32,12 @@ interface PaginationDotProps {
   onClick: (page: number) => void;
 }
 
-export const PaginationDot = ({page, isCurrentPage, isSmaller, onClick}: PaginationDotProps) => {
+export const PaginationDot: FunctionComponent<PaginationDotProps> = ({
+  page,
+  isCurrentPage,
+  isSmaller,
+  onClick,
+}: PaginationDotProps) => {
   const {translate} = useApplicationContext();
 
   return (

@@ -17,13 +17,12 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {Button, Text} from '@wireapp/react-ui-kit';
 
-import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {handleEscDown, handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {safeWindowOpen} from 'Util/sanitizationUtil';
 
 import {
   salesModalWrapperCss,
@@ -34,17 +33,20 @@ import {
   salesModalBodyButtonCss,
 } from './ConversationDetails.styles';
 
+import {handleEscDown, handleKeyDown, KEY} from '../../../../../util/keyboardUtil';
+import {safeWindowOpen} from '../../../../../util/sanitizationUtil';
+import {ModalComponent} from '../../../ModalComponent';
 import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';
 
-export const UpgradePlanModal = () => {
+export const UpgradePlanModal: FunctionComponent = () => {
   const {translate} = useApplicationContext();
   const {isUpgradeTeamModalOpen, setIsUpgradeTeamModalOpen} = useCreateConversationModal();
 
-  const onCancel = () => {
+  const onCancel = (): void => {
     setIsUpgradeTeamModalOpen(false);
   };
 
-  const onSubmit = () => {
+  const onSubmit = (): void => {
     setIsUpgradeTeamModalOpen(false);
     safeWindowOpen(Config.getConfig().URL.TEAMS_BASE);
   };

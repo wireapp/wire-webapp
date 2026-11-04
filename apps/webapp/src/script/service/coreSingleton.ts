@@ -18,17 +18,17 @@
  */
 
 import {isUndefined} from '@sindresorhus/is';
+import type {CRUDEngine} from '@wireapp/store-engine/lib/engine';
 import {container, singleton} from 'tsyringe';
 
 import {Account} from '@wireapp/core';
-
-import {supportsMLS} from 'Util/util';
 
 import {APIClient} from './apiClientSingleton';
 import {createStorageEngine, DatabaseTypes} from './storeEngineProvider';
 import {SystemCrypto, wrapSystemCrypto} from './utils/systemCryptoWrapper';
 
 import {Config} from '../Config';
+import {supportsMLS} from '../util/util';
 
 declare global {
   interface Window {
@@ -67,7 +67,7 @@ export class Core extends Account {
       nbPrekeys: 100,
     });
   }
-  get storage() {
+  get storage(): CRUDEngine | undefined {
     return this['storeEngine'];
   }
 }

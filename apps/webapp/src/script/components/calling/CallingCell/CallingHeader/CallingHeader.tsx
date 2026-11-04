@@ -17,14 +17,11 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {TabIndex, IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
 
-import {Avatar, AVATAR_SIZE, ChannelAvatar, GroupAvatar} from 'Components/avatar';
-import {Duration} from 'Components/calling/Duration';
-import * as Icon from 'Components/icon';
-import {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
 
 import {
   callAvatar,
@@ -37,7 +34,12 @@ import {
   detachedWindowButton,
 } from './CallingHeader.styles';
 
+import {User} from '../../../../repositories/entity/User';
 import {createNavigate, createNavigateKeyboard} from '../../../../router/routerBindings';
+import {isDetachedCallingFeatureEnabled} from '../../../../util/isDetachedCallingFeatureEnabled';
+import {Avatar, AVATAR_SIZE, ChannelAvatar, GroupAvatar} from '../../../avatar';
+import * as Icon from '../../../icon';
+import {Duration} from '../../Duration';
 
 interface CallingHeaderProps {
   isMeeting: boolean;
@@ -61,7 +63,7 @@ interface CallingHeaderProps {
   conversationID: string;
 }
 
-export const CallingHeader = ({
+export const CallingHeader: FunctionComponent<CallingHeaderProps> = ({
   isMeeting,
   isGroupCall,
   isChannel,

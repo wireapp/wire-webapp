@@ -17,9 +17,12 @@
  *
  */
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import {Maybe} from 'true-myth';
+
 import {CellsSelfUserDriveRole} from 'src/script/components/conversation/conversationCells/common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
+
+import {Conversation} from '../repositories/entity/Conversation';
+import {User} from '../repositories/entity/User';
 
 export enum CellNodeType {
   FILE = 'file',
@@ -33,6 +36,7 @@ interface CellNodeGeneral {
   mimeType?: string;
   name: string;
   sizeMb: string;
+  sizeBytes: Maybe<number>;
   previewImageUrl?: string;
   previewPdfUrl?: string;
   uploadedAtTimestamp: number;

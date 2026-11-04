@@ -21,11 +21,11 @@ import {useCallback, useEffect, useMemo} from 'react';
 
 import {amplify} from 'amplify';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {MessageRepository, OutgoingQuote} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
 import {Config} from 'src/script/Config';
+
+import {MessageRepository, OutgoingQuote} from '../../../repositories/conversation/MessageRepository';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {WebAppEvents} from '../../../webAppEvents';
 
 interface UseGiphyProps {
   text: string;
@@ -37,6 +37,11 @@ interface UseGiphyProps {
   cancelMesssageEditing: () => void;
 }
 
+type UseGiphyResult = {
+  showGiphyButton: boolean;
+  handleGifClick: () => void;
+  sendGiphy: (gifUrl: string, tag: string) => void;
+};
 export const useGiphy = ({
   text,
   maxLength,
@@ -45,7 +50,7 @@ export const useGiphy = ({
   messageRepository,
   conversation,
   cancelMesssageEditing,
-}: UseGiphyProps) => {
+}: UseGiphyProps): UseGiphyResult => {
   const isMessageFormatButtonsFlagEnabled = Config.getConfig().FEATURE.ENABLE_MESSAGE_FORMAT_BUTTONS;
 
   const showGiphyButton = useMemo(() => {
@@ -55,7 +60,7 @@ export const useGiphy = ({
     return text.length > 0 && text.length <= maxLength;
   }, [text.length, maxLength, isMessageFormatButtonsFlagEnabled]);
 
-  const handleGifClick = () => {
+  const handleGifClick = (): void => {
     return openGiphy(text);
   };
 

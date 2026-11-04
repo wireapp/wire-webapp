@@ -21,15 +21,15 @@ import {USER_EVENT} from '@wireapp/api-client/lib/event/';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {WebAppEvents} from '../../webAppEvents';
 
-import {ClientEntity} from 'Repositories/client/ClientEntity';
-import {User} from 'Repositories/entity/User';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {createUuid} from 'Util/uuid';
+import {ClientEntity} from '../client/ClientEntity';
+import {User} from '../entity/User';
+import {PropertiesRepository} from '../properties/propertiesRepository';
+import {createUuid} from '../../util/uuid';
 
 import {Notification, PreferenceNotificationRepository} from './PreferenceNotificationRepository';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../util/test/translateForTest';
 
 describe('PreferenceNotificationRepository', () => {
   const user = new User(createUuid(), '', translateForTest);

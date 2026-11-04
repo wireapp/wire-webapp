@@ -24,13 +24,12 @@ import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {$getRoot, $setSelection} from 'lexical';
 
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-
 import {getMentionMarkdownTransformer} from './getMentionMarkdownTransformer/getMentionMarkdownTransformer';
 import {getMentionNodesFromMessage} from './getMentionNodesFromMessage/getMentionNodesFromMessage';
 import {getRawMarkdownNodesWithMentions} from './getRawMarkdownFromMessage/getRawMarkdownFromMessage';
 import {wrapMentionsWithTags} from './wrapMentionsWithTags/wrapMentionsWithTags';
 
+import {ContentMessage} from '../../../../../../repositories/entity/message/contentMessage';
 import {markdownTransformers} from '../../utils/markdownTransformers';
 
 type Props = {

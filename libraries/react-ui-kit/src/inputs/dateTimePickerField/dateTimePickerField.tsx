@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useMemo} from 'react';
+import {useCallback, useMemo, type FunctionComponent} from 'react';
 
 import {DateValue} from '@internationalized/date';
 import {isNonEmptyString} from '@sindresorhus/is';
@@ -69,7 +69,7 @@ export interface DateTimePickerFieldProps {
   minTimeForToday?: Date | null;
 }
 
-export const DateTimePickerField = ({
+export const DateTimePickerField: FunctionComponent<DateTimePickerFieldProps> = ({
   value,
   onChange,
   dataUieName,
@@ -89,7 +89,7 @@ export const DateTimePickerField = ({
   minValue,
   minTime = null,
   minTimeForToday = null,
-}: DateTimePickerFieldProps) => {
+}) => {
   const labelId = `${dataUieName}-label`;
   const selectedDate = useMemo(() => {
     return value !== null ? dateValueFromDate(value) : null;

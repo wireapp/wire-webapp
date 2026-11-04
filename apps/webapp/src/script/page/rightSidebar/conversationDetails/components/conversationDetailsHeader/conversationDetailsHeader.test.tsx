@@ -21,17 +21,17 @@ import {render, fireEvent} from '@testing-library/react';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
-import {createUuid} from 'Util/uuid';
+import {Conversation} from '../../../../../repositories/entity/Conversation';
+import {User} from '../../../../../repositories/entity/User';
+import {ServiceEntity} from '../../../../../repositories/integration/ServiceEntity';
+import {createUuid} from '../../../../../util/uuid';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {ConversationDetailsHeader} from './conversationDetailsHeader';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../../../util/test/translateForTest';
 
 const participant = new User('id', '', translateForTest);
 const service = new ServiceEntity({id: 'id'});
@@ -42,7 +42,17 @@ conversation.type(CONVERSATION_TYPE.REGULAR);
 const rootContextValue = createRootContextValueForTest({translate: translateForTest});
 const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
-const getDefaultProps = () => {
+type GetDefaultPropsResult = {
+  isActiveGroupParticipant: boolean;
+  canRenameGroup: boolean;
+  updateConversationName: jest.Mock<any, any, any>;
+  userParticipants: User[];
+  serviceParticipants: ServiceEntity[];
+  allUsersCount: number;
+  isTeam: boolean;
+  conversation: Conversation;
+};
+const getDefaultProps = (): GetDefaultPropsResult => {
   return {
     isActiveGroupParticipant: true,
     canRenameGroup: true,

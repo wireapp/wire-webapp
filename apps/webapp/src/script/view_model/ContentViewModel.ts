@@ -25,22 +25,9 @@ import ko from 'knockout';
 import {container} from 'tsyringe';
 import {isError} from 'underscore';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import type {Message} from 'Repositories/entity/message/message';
-import type {UserRepository} from 'Repositories/user/userRepository';
-import {UserState} from 'Repositories/user/userState';
-import {type Translate} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/logger';
-import {isConversationEntity} from 'Util/typePredicateUtil';
-
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 
+import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
 import {ConversationError} from '../error/conversationError';
 import '../page/leftSidebar';
@@ -53,8 +40,19 @@ import '../page/mainContent';
 import {PanelState} from '../page/rightSidebar';
 import {useAppMainState} from '../page/state';
 import {ContentState, useAppState} from '../page/useAppState';
+import type {ConversationRepository} from '../repositories/conversation/ConversationRepository';
+import {ConversationState} from '../repositories/conversation/ConversationState';
+import {MessageRepository} from '../repositories/conversation/MessageRepository';
+import {Conversation} from '../repositories/entity/Conversation';
+import type {Message} from '../repositories/entity/message/message';
+import type {UserRepository} from '../repositories/user/userRepository';
+import {UserState} from '../repositories/user/userState';
 import {generateConversationUrl} from '../router/routeGenerator';
 import {navigate, setHistoryParam} from '../router/Router';
+import {type Translate} from '../util/localizerUtil';
+import {getLogger, Logger} from '../util/logger';
+import {isConversationEntity} from '../util/typePredicateUtil';
+import {WebAppEvents} from '../webAppEvents';
 
 interface ShowConversationOptions {
   exposeMessage?: Message;
@@ -80,7 +78,7 @@ export class ContentViewModel {
   previousConversation?: Conversation;
   userRepository: UserRepository;
 
-  get isFederated() {
+  get isFederated(): boolean {
     return this.mainViewModel.isFederated;
   }
 
@@ -99,7 +97,7 @@ export class ContentViewModel {
     this.messageRepository = repositories.message;
     this.logger = getLogger('ContentViewModel');
 
-    const showMostRecentConversation = () => {
+    const showMostRecentConversation = (): void => {
       const mostRecentConversation = this.conversationState.getMostRecentConversation();
       this.showConversation(mostRecentConversation);
     };
@@ -127,7 +125,7 @@ export class ContentViewModel {
     this._initSubscriptions();
   }
 
-  private _initSubscriptions() {
+  private _initSubscriptions(): void {
     amplify.subscribe(WebAppEvents.CONTENT.SWITCH, this.switchContent);
     amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, this.showConversation);
   }
@@ -370,7 +368,7 @@ export class ContentViewModel {
     return newState;
   };
 
-  private readonly showContent = (newContentState: ContentState) => {
+  private readonly showContent = (newContentState: ContentState): void => {
     const {setContentState} = useAppState.getState();
     setContentState(newContentState);
 

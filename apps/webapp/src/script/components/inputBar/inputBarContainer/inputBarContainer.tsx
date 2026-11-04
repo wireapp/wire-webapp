@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode} from 'react';
+import {ReactNode, type FunctionComponent} from 'react';
 
 import cx from 'classnames';
 
@@ -29,7 +29,7 @@ interface InputBarContainerProps {
   children: ReactNode;
 }
 
-export const InputBarContainer = ({children}: InputBarContainerProps) => {
+export const InputBarContainer: FunctionComponent<InputBarContainerProps> = ({children}: InputBarContainerProps) => {
   const {rightSidebar} = useAppMainState.getState();
   const lastItem = rightSidebar.history.length - 1;
   const currentState = rightSidebar.history[lastItem];

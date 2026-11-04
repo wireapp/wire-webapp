@@ -21,16 +21,16 @@ import type {Clock} from '@enormora/clock/clock';
 import {isNonEmptyString} from '@sindresorhus/is';
 import {result, Result} from 'true-myth';
 
-import {ScheduleFormErrors, scheduleFormErrors} from 'Components/meeting/scheduleFormErrors';
-import {requireScheduleMeetingTimes} from 'Components/meeting/scheduleMeetingModal/requireScheduleMeetingTimes';
+import {ScheduleFormErrors, scheduleFormErrors} from './scheduleFormErrors';
+import {requireScheduleMeetingTimes} from './scheduleMeetingModal/requireScheduleMeetingTimes';
 import {
   emptyScheduleMeetingFormErrors,
   scheduleMeetingModes,
   type ScheduleMeetingFormErrors,
   type ScheduleMeetingFormState,
-} from 'Components/meeting/scheduleMeetingModal/scheduleMeetingTypes';
-import {validateScheduleMeetingForm} from 'Components/meeting/scheduleMeetingModal/scheduleMeetingValidation';
-import type {ScheduleMeetingCommand} from 'Components/meeting/shared/types/meetingCommandTypes';
+} from './scheduleMeetingModal/scheduleMeetingTypes';
+import {validateScheduleMeetingForm} from './scheduleMeetingModal/scheduleMeetingValidation';
+import type {ScheduleMeetingCommand} from './shared/types/meetingCommandTypes';
 
 const mapScheduleFormErrorToFormErrors = (error: ScheduleFormErrors): ScheduleMeetingFormErrors => {
   switch (error) {

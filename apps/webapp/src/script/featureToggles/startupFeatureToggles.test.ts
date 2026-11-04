@@ -27,8 +27,9 @@ import {
   conversationListCollapseFeatureToggleName,
   disableMessagePreprocessingFeatureToggleName,
   driveBulkActionsFeatureToggleName,
+  markAsUnreadFeatureToggleName,
+  troubleshooterFeatureToggleName,
   sendCallLogsFeatureToggleName,
-  sharedDriveDirectUploadFeatureToggleName,
   startupFeatureToggleNames,
   forTestsOnlyFeatureToggleName,
 } from './startupFeatureToggleNames';
@@ -38,8 +39,9 @@ const featureToggleNamesWithDedicatedExistenceTests = [
   conversationListCollapseFeatureToggleName,
   forTestsOnlyFeatureToggleName,
   disableMessagePreprocessingFeatureToggleName,
-  sharedDriveDirectUploadFeatureToggleName,
   driveBulkActionsFeatureToggleName,
+  markAsUnreadFeatureToggleName,
+  troubleshooterFeatureToggleName,
   sendCallLogsFeatureToggleName,
 ] as const;
 
@@ -49,6 +51,20 @@ describe('startupFeatureToggles', function () {
 
     expect(startupFeatureToggles.isFeatureToggleEnabled(applockRefactoredFeatureToggleName)).toBe(false);
     expect(startupFeatureToggles.enabledFeatureToggleNames).toEqual([]);
+  });
+
+  it('keeps the troubleshooter disabled by default', () => {
+    const toggles = createStartupFeatureTogglesFromLocationSearch('');
+
+    expect(toggles.isFeatureToggleEnabled(troubleshooterFeatureToggleName)).toBe(false);
+  });
+
+  it('enables the troubleshooter when selected in developer settings', () => {
+    const toggles = createStartupFeatureTogglesFromLocationSearch(
+      `?${startupFeatureToggleQueryParameterName}=${troubleshooterFeatureToggleName}`,
+    );
+
+    expect(toggles.isFeatureToggleEnabled(troubleshooterFeatureToggleName)).toBe(true);
   });
 
   it('keeps sending call logs disabled by default and enables it through developer settings', () => {
@@ -65,6 +81,12 @@ describe('startupFeatureToggles', function () {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch('');
 
     expect(startupFeatureToggles.isFeatureToggleEnabled(driveBulkActionsFeatureToggleName)).toBe(false);
+  });
+
+  it('keeps Mark as unread disabled by default', () => {
+    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch('');
+
+    expect(startupFeatureToggles.isFeatureToggleEnabled(markAsUnreadFeatureToggleName)).toBe(false);
   });
 
   it('enables Drive bulk actions when selected in developer settings', () => {
@@ -150,12 +172,12 @@ describe('startupFeatureToggles', function () {
     expect(startupFeatureToggles.isFeatureToggleEnabled(disableMessagePreprocessingFeatureToggleName)).toBe(true);
   });
 
-  it('enables the shared drive direct upload feature toggle when present in the query parameter', () => {
+  it('enables the mark as unread feature toggle when present in the query parameter', () => {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
-      `?${startupFeatureToggleQueryParameterName}=${sharedDriveDirectUploadFeatureToggleName}`,
+      `?${startupFeatureToggleQueryParameterName}=${markAsUnreadFeatureToggleName}`,
     );
 
-    expect(startupFeatureToggles.isFeatureToggleEnabled(sharedDriveDirectUploadFeatureToggleName)).toBe(true);
+    expect(startupFeatureToggles.isFeatureToggleEnabled(markAsUnreadFeatureToggleName)).toBe(true);
   });
 
   it('trims whitespace around feature toggle names', () => {
@@ -200,8 +222,9 @@ describe('startupFeatureToggles', function () {
       conversationListCollapseFeatureToggleName,
       forTestsOnlyFeatureToggleName,
       disableMessagePreprocessingFeatureToggleName,
-      sharedDriveDirectUploadFeatureToggleName,
       driveBulkActionsFeatureToggleName,
+      markAsUnreadFeatureToggleName,
+      troubleshooterFeatureToggleName,
       sendCallLogsFeatureToggleName,
     ]);
   });

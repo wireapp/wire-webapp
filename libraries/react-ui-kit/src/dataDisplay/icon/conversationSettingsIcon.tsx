@@ -17,9 +17,11 @@
  *
  */
 
+import type {FunctionComponent} from 'react';
+
 import {SVGIcon, SVGIconProps} from './svgIcon';
 
-export const ConversationSettingsIcon = (props: SVGIconProps) => {
+export const ConversationSettingsIcon: FunctionComponent<SVGIconProps> = props => {
   return (
     <SVGIcon realWidth={14} realHeight={14} {...props}>
       <path

@@ -17,15 +17,14 @@
  *
  */
 
-import {MutableRefObject} from 'react';
+import {MutableRefObject, type FunctionComponent} from 'react';
 
 import {LexicalEditor} from 'lexical';
 
-import {ContentMessage} from 'Repositories/entity/message/contentMessage';
-import {User} from 'Repositories/entity/User';
-
 import {RichTextEditor} from './richTextEditor';
 
+import {ContentMessage} from '../../../repositories/entity/message/contentMessage';
+import {User} from '../../../repositories/entity/User';
 import {DraftState} from '../common/draftState/draftState';
 import {MessageContent} from '../common/messageContent/messageContent';
 
@@ -54,7 +53,7 @@ interface InputBarEditorProps {
   children: React.ReactNode;
 }
 
-export const InputBarEditor = ({
+export const InputBarEditor: FunctionComponent<InputBarEditorProps> = ({
   editorRef,
   editedMessage,
   inputPlaceholder,

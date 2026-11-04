@@ -21,6 +21,7 @@ import {type RefObject, useCallback, useEffect, useRef} from 'react';
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 
+type UseOnMultipleClicksResult = {activate: () => void; reset: () => void};
 export const useOnMultipleClicks = ({
   count,
   elementRef,
@@ -33,7 +34,7 @@ export const useOnMultipleClicks = ({
   elementRef: RefObject<HTMLElement | null>;
   enabled: boolean;
   onActivate: () => void;
-}) => {
+}): UseOnMultipleClicksResult => {
   const tapsCountRef = useRef(0);
   const reset = useCallback(() => {
     tapsCountRef.current = 0;
@@ -46,7 +47,7 @@ export const useOnMultipleClicks = ({
   }, [enabled, reset]);
 
   useEffect(() => {
-    const resetOnOtherClick = (event: MouseEvent) => {
+    const resetOnOtherClick = (event: MouseEvent): void => {
       const target = event.target;
       const element = elementRef.current;
       if (
@@ -64,7 +65,7 @@ export const useOnMultipleClicks = ({
     };
   }, [elementRef, elementSelector, reset]);
 
-  const activate = () => {
+  const activate = (): void => {
     if (!enabled || isNullOrUndefined(elementRef.current)) {
       reset();
       return;

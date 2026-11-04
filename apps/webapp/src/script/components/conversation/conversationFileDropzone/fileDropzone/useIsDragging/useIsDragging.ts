@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useRef, useState, type RefObject} from 'react';
 
 import {isNull} from '@sindresorhus/is';
 
@@ -25,7 +25,8 @@ import {isNull} from '@sindresorhus/is';
  * It's used to detect if the user is dragging a file over the dropzone.
  * Instead of using status from useDropzone, we use the native drag and drop events, which are more reliable.
  */
-export const useIsDragging = () => {
+type UseIsDraggingResult = {isDragging: boolean; wrapperRef: RefObject<HTMLDivElement | null>};
+export const useIsDragging = (): UseIsDraggingResult => {
   const [isDragging, setIsDragging] = useState(false);
 
   const wrapperRef = useRef<HTMLDivElement>(null);

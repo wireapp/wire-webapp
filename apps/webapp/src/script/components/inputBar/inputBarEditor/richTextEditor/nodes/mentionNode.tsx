@@ -19,6 +19,7 @@
 
 import {ReactElement} from 'react';
 
+import type {JSX} from '@emotion/react/jsx-runtime';
 import {
   SerializedLexicalNode,
   Spread,
@@ -56,23 +57,30 @@ function convertElement(domNode: HTMLElement): DOMConversionOutput | null {
 /**
  * This node is used to represent a mention used in the MentionPlugin.
  */
+type ExportDOMResult = {element: HTMLSpanElement};
+
+type ImportDOMResult = {
+  span: (
+    domNode: HTMLElement,
+  ) => {conversion: (domNode: HTMLElement) => DOMConversionOutput | null; priority: 0} | null;
+};
 export class MentionNode extends DecoratorNode<ReactElement> {
   __value: string;
   __trigger: string;
 
-  static getType() {
+  static getType(): string {
     return 'Mention';
   }
 
-  static clone(node: MentionNode) {
+  static clone(node: MentionNode): MentionNode {
     return new MentionNode(node.__trigger, node.__value, node.__key);
   }
 
-  static importJSON(serializedNode: SerializedMentionNode) {
+  static importJSON(serializedNode: SerializedMentionNode): MentionNode {
     return $createMentionNode(serializedNode.trigger, serializedNode.value);
   }
 
-  exportDOM() {
+  exportDOM(): ExportDOMResult {
     const element = document.createElement('span');
     element.setAttribute('data-lexical-mention', 'true');
     element.setAttribute('data-lexical-mention-trigger', this.__trigger);
@@ -81,7 +89,7 @@ export class MentionNode extends DecoratorNode<ReactElement> {
     return {element};
   }
 
-  static importDOM() {
+  static importDOM(): ImportDOMResult {
     return {
       span: (domNode: HTMLElement) => {
         if (!domNode.hasAttribute('data-lexical-mention')) {
@@ -110,15 +118,15 @@ export class MentionNode extends DecoratorNode<ReactElement> {
     };
   }
 
-  createDOM() {
+  createDOM(): HTMLSpanElement {
     return document.createElement('span');
   }
 
-  getTextContent() {
+  getTextContent(): string {
     return this.__trigger + this.__value;
   }
 
-  updateDOM() {
+  updateDOM(): boolean {
     return false;
   }
 
@@ -132,12 +140,12 @@ export class MentionNode extends DecoratorNode<ReactElement> {
     return self.__value;
   }
 
-  setValue(value: string) {
+  setValue(value: string): void {
     const self = this.getWritable();
     self.__value = value;
   }
 
-  decorate(_editor: LexicalEditor, config: EditorConfig) {
+  decorate(_editor: LexicalEditor, config: EditorConfig): JSX.Element {
     const themeMentions = config.theme.mentions;
     const theme: Record<string, string> =
       typeof themeMentions === 'object' && themeMentions !== null ? themeMentions : {};

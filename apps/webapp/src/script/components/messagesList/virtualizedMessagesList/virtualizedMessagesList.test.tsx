@@ -20,24 +20,26 @@
 import type {ComponentProps} from 'react';
 
 import {render} from '@testing-library/react';
-import type {Virtualizer} from '@tanstack/react-virtual';
+import type {useVirtualizer as useVirtualizerFunction, Virtualizer} from '@tanstack/react-virtual';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import ko from 'knockout';
 import {noop} from 'noop-esm';
 
-import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import {AssetRepository} from '../../../repositories/assets/assetRepository';
+import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import {MessageRepository} from '../../../repositories/conversation/MessageRepository';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {User} from '../../../repositories/entity/User';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
   requireValueForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {translateForTest} from 'Util/test/translateForTest';
+import {translateForTest} from '../../../util/test/translateForTest';
 
 import {VirtualizedMessagesList} from './virtualizedMessagesList';
+
+type VirtualizerModule = {readonly useVirtualizer: typeof useVirtualizerFunction};
 
 function createMessageListProperties(): ComponentProps<typeof VirtualizedMessagesList> {
   return {
@@ -50,9 +52,9 @@ function createMessageListProperties(): ComponentProps<typeof VirtualizedMessage
     messageRepository: {} as MessageRepository,
     selfUser: new User('self', '', translateForTest),
     parentElement: document.createElement('div'),
-    conversationLastReadTimestamp: {current: 0},
     isConversationLoaded: false,
     isMsgElementsFocusable: false,
+    cancelPendingReadReceiptsForConversation: noop,
     cancelConnectionRequest: noop,
     getVisibleCallback: () => {
       return undefined;
@@ -82,7 +84,7 @@ describe('VirtualizedMessagesList', () => {
     {cachedHeightPixels: 1, expectedHeightPixels: 1},
   ])('preserves cached measurement fallback for $cachedHeightPixels pixels', options => {
     const {cachedHeightPixels, expectedHeightPixels} = options;
-    const virtualizerModule = jest.requireActual<typeof import('@tanstack/react-virtual')>('@tanstack/react-virtual');
+    const virtualizerModule = jest.requireActual<VirtualizerModule>('@tanstack/react-virtual');
     const useVirtualizer = jest.spyOn(virtualizerModule, 'useVirtualizer');
     const properties = createMessageListProperties();
     const renderedList = render(<VirtualizedMessagesList {...properties} />, {

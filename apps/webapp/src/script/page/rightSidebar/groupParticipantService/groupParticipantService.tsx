@@ -23,20 +23,20 @@ import {isNullOrUndefined} from '@sindresorhus/is';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {FadingScrollbar} from 'Components/fadingScrollbar';
-import * as Icon from 'Components/icon';
-import {ServiceDetails} from 'Components/panel/serviceDetails';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
-import {TeamRepository} from 'Repositories/team/TeamRepository';
-import {generatePermissionHelpers} from 'Repositories/user/userPermission';
 import {useApplicationContext} from 'src/script/page/rootProvider';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 
+import {FadingScrollbar} from '../../../components/fadingScrollbar';
+import * as Icon from '../../../components/icon';
+import {ServiceDetails} from '../../../components/panel/serviceDetails';
+import {ConversationRepository} from '../../../repositories/conversation/ConversationRepository';
+import {Conversation} from '../../../repositories/entity/Conversation';
+import {User} from '../../../repositories/entity/User';
+import {IntegrationRepository} from '../../../repositories/integration/IntegrationRepository';
+import {ServiceEntity} from '../../../repositories/integration/ServiceEntity';
+import {TeamRepository} from '../../../repositories/team/TeamRepository';
+import {generatePermissionHelpers} from '../../../repositories/user/userPermission';
+import {useKoSubscribableChildren} from '../../../util/componentUtil';
+import {handleKeyDown, KEY} from '../../../util/keyboardUtil';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {PanelHeader} from '../panelHeader';
 
@@ -88,16 +88,16 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
 
   const showActions = isActiveParticipant && serviceUser !== undefined && inTeam;
 
-  const onOpen = () => {
+  const onOpen = (): void => {
     void actionsViewModel.open1to1ConversationWithService(serviceEntity);
   };
 
-  const onRemove = (user: User) => {
+  const onRemove = (user: User): void => {
     void actionsViewModel.removeFromConversation(activeConversation, user);
     onBack();
   };
 
-  const onAdd = () => {
+  const onAdd = (): void => {
     if (serviceEntity.isService) {
       void integrationRepository.addServiceToExistingConversation(activeConversation, serviceEntity);
     } else if (serviceEntity.qualifiedId !== undefined) {
