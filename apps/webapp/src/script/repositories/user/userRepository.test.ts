@@ -27,9 +27,9 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '../../webAppEvents';
 
-import {entities} from 'test/api/payloads';
-import {TestFactory} from 'test/helper/TestFactory';
-import {generateAPIUser} from 'test/helper/UserGenerator';
+import {entities} from '../../../../test/api/payloads';
+import {TestFactory} from '../../../../test/helper/TestFactory';
+import {generateAPIUser} from '../../../../test/helper/UserGenerator';
 
 import {AssetRepository} from '../assets/assetRepository';
 import {ClientRepository} from '../client';

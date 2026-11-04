@@ -27,7 +27,7 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {TestFactory} from 'test/helper/TestFactory';
+import {TestFactory} from '../../../../../test/helper/TestFactory';
 
 import {Notifications} from './notifications';
 

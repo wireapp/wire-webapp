@@ -17,9 +17,9 @@
  *
  */
 
-import {getUser, User} from 'test/e2e_tests/data/user';
-import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, withLogin, expect} from 'test/e2e_tests/test.fixtures';
+import {getUser, User} from '../../data/user';
+import {PageManager} from '../../pageManager';
+import {test, withLogin, expect} from '../../test.fixtures';
 import {loginUser} from '../../utils/userActions';
 import deTranslations from '../../../../src/i18n/de-DE.json';
 import enTranslations from '../../../../src/i18n/en-US.json';

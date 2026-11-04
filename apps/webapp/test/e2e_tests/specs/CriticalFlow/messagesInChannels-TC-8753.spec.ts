@@ -17,9 +17,9 @@
  *
  */
 
-import {PageManager} from 'test/e2e_tests/pageManager';
-import {getVideoFilePath, getAudioFilePath, getTextFilePath, isAssetDownloaded} from 'test/e2e_tests/utils/asset.util';
-import {getImageFilePath, getLocalQRCodeValue} from 'test/e2e_tests/utils/sendImage.util';
+import {PageManager} from '../../pageManager';
+import {getVideoFilePath, getAudioFilePath, getTextFilePath, isAssetDownloaded} from '../../utils/asset.util';
+import {getImageFilePath, getLocalQRCodeValue} from '../../utils/sendImage.util';
 
 import {test, expect, withLogin} from '../../test.fixtures';
 

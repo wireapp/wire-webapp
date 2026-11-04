@@ -21,7 +21,7 @@ import {MemoryEngine} from '@wireapp/store-engine';
 
 import {StorageService} from '../storage';
 import {StorageSchemata} from '../storage/storageSchemata';
-import {createMessageAddEvent, toSavedEvent} from 'test/helper/EventGenerator';
+import {createMessageAddEvent, toSavedEvent} from '../../../../test/helper/EventGenerator';
 
 import {EventService} from './EventService';
 

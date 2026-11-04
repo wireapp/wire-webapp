@@ -17,9 +17,9 @@
  *
  */
 
-import {User} from 'test/e2e_tests/data/user';
-import {PageManager} from 'test/e2e_tests/pageManager';
-import {handleAppLockState, loginUser} from 'test/e2e_tests/utils/userActions';
+import {User} from '../../data/user';
+import {PageManager} from '../../pageManager';
+import {handleAppLockState, loginUser} from '../../utils/userActions';
 
 import {test, expect, withLogin, LOGIN_TIMEOUT} from '../../test.fixtures';
 

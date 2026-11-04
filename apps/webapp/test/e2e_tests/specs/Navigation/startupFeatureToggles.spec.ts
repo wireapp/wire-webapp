@@ -19,8 +19,8 @@
 
 import {forTestsOnlyFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {startupFeatureToggleQueryParameterName} from 'src/script/featureToggles/startupFeatureToggles';
-import {PageManager} from 'test/e2e_tests/pageManager';
-import {expect, test, withLogin} from 'test/e2e_tests/test.fixtures';
+import {PageManager} from '../../pageManager';
+import {expect, test, withLogin} from '../../test.fixtures';
 
 test.describe('Startup feature toggles on navigation', () => {
   test(

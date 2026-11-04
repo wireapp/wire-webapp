@@ -54,7 +54,7 @@ import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {MediaType} from '../media/MediaType';
 import {UserRepository} from '../user/userRepository';
 import type {ServerTimeHandler} from 'src/script/time/serverTimeHandler';
-import {TestFactory} from 'test/helper/TestFactory';
+import {TestFactory} from '../../../../test/helper/TestFactory';
 import {createUuid} from '../../util/uuid';
 
 import {Call} from './Call';

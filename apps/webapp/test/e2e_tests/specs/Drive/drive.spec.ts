@@ -17,10 +17,10 @@
  *
  */
 
-import {User} from 'test/e2e_tests/data/user';
-import {PageManager} from 'test/e2e_tests/pageManager';
-import {getImageFilePath, getLocalQRCodeValue, ImageQRCodeFileName} from 'test/e2e_tests/utils/sendImage.util';
-import {getTextFilePath, getVideoFilePath, TextFileName, VideoFileName} from 'test/e2e_tests/utils/asset.util';
+import {User} from '../../data/user';
+import {PageManager} from '../../pageManager';
+import {getImageFilePath, getLocalQRCodeValue, ImageQRCodeFileName} from '../../utils/sendImage.util';
+import {getTextFilePath, getVideoFilePath, TextFileName, VideoFileName} from '../../utils/asset.util';
 import {driveBulkActionsFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 
 import {test, expect, withLogin} from '../../test.fixtures';

@@ -17,8 +17,8 @@
  *
  */
 
-import {PageManager} from 'test/e2e_tests/pageManager';
-import {createGroup, sendTextMessageToConversation} from 'test/e2e_tests/utils/userActions';
+import {PageManager} from '../../pageManager';
+import {createGroup, sendTextMessageToConversation} from '../../utils/userActions';
 
 import {test, expect, withLogin} from '../../test.fixtures';
 

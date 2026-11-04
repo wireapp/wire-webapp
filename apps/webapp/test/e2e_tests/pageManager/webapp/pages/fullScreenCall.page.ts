@@ -19,7 +19,7 @@
 
 import {Page} from '@playwright/test';
 
-import {User} from 'test/e2e_tests/data/user';
+import {User} from '../../../data/user';
 import type {Locator} from 'playwright-core';
 
 type FullScreenCallPageResult = {

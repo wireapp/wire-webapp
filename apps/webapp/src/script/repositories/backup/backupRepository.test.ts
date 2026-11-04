@@ -22,9 +22,9 @@ import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {container} from 'tsyringe';
 import {omit} from 'underscore';
 
-import {generateConversation} from 'test/helper/ConversationGenerator';
-import {TestFactory} from 'test/helper/TestFactory';
-import {generateAPIUser} from 'test/helper/UserGenerator';
+import {generateConversation} from '../../../../test/helper/ConversationGenerator';
+import {TestFactory} from '../../../../test/helper/TestFactory';
+import {generateAPIUser} from '../../../../test/helper/UserGenerator';
 
 import {User} from '../entity/User';
 import type {ConversationRepository} from '../conversation/ConversationRepository';

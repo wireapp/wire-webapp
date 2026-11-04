@@ -20,14 +20,8 @@
 import {Locator} from '@playwright/test';
 import {Buffer} from 'node:buffer';
 
-import {
-  AudioFileName,
-  getAudioFilePath,
-  getTextFilePath,
-  readLocalFile,
-  TextFileName,
-} from 'test/e2e_tests/utils/asset.util';
-import {PageManager} from 'test/e2e_tests/pageManager';
+import {AudioFileName, getAudioFilePath, getTextFilePath, readLocalFile, TextFileName} from '../../utils/asset.util';
+import {PageManager} from '../../pageManager';
 
 import {test, expect, withLogin} from '../../test.fixtures';
 import {connectWithUser, createGroup, sendConnectionRequest} from '../../utils/userActions';

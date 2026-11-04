@@ -17,18 +17,18 @@
  *
  */
 
-import {User} from 'test/e2e_tests/data/user';
-import {PageManager} from 'test/e2e_tests/pageManager';
+import {User} from '../../data/user';
+import {PageManager} from '../../pageManager';
 
-import {test, expect, withLogin} from 'test/e2e_tests/test.fixtures';
-import {getAudioFilePath, getTextFilePath, shareAssetHelper, TextFileName} from 'test/e2e_tests/utils/asset.util';
+import {test, expect, withLogin} from '../../test.fixtures';
+import {getAudioFilePath, getTextFilePath, shareAssetHelper, TextFileName} from '../../utils/asset.util';
 import {Locator} from 'playwright/test';
-import {getImageFilePath, ImageQRCodeFileName} from 'test/e2e_tests/utils/sendImage.util';
+import {getImageFilePath, ImageQRCodeFileName} from '../../utils/sendImage.util';
 import {Buffer} from 'node:buffer';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import {tmpdir} from 'node:os';
-import {connectWithUser, createGroup} from 'test/e2e_tests/utils/userActions';
+import {connectWithUser, createGroup} from '../../utils/userActions';
 
 interface DragAndDropOptions {
   buffer: Buffer;

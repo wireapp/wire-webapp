@@ -17,8 +17,8 @@
  *
  */
 
-import {getUser} from 'test/e2e_tests/data/user';
-import {completeRegistrationForm, goToPersonalRegistration} from 'test/e2e_tests/utils/registration.util';
+import {getUser} from '../../data/user';
+import {completeRegistrationForm, goToPersonalRegistration} from '../../utils/registration.util';
 
 import {test, expect} from '../../test.fixtures';
 
