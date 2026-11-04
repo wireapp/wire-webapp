@@ -150,15 +150,18 @@ export const useBulkRestore = (options: UseBulkRestoreOptions): BulkRestoreState
       }
 
       const didRefresh = await refreshAndReportSuccess();
+      const statusKind = outcome === 'completed' && !didRefresh ? 'finished-unknown' : outcome;
       if (!isMountedRef.current || !optionsRef.current.isCurrentScope(scopeKey)) {
+        // Refreshing can itself move the view (e.g. to the Bin root); still report so the popup is not left processing.
+        optionsRef.current.onStatusChange(statusKind);
         return;
       }
 
-      if (outcome === 'completed' && didRefresh) {
+      if (statusKind === 'completed') {
         optionsRef.current.onStatusChange('completed');
         optionsRef.current.onRestoreSettled();
       } else {
-        optionsRef.current.onStatusChange(outcome === 'completed' ? 'finished-unknown' : outcome);
+        optionsRef.current.onStatusChange(statusKind);
         updateReviewReason(outcome === 'completed' ? 'refresh-failed' : outcome);
       }
     } finally {
