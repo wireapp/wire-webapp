@@ -25,10 +25,12 @@ import {PrimaryModal} from '../../../../../../Modals/PrimaryModal';
 export const showRestoreRootNodeModal = ({
   node,
   onRestoreNode,
+  modalId,
   translate,
 }: {
   node: CellNode;
   onRestoreNode: () => void;
+  modalId?: string;
   translate: RootContextValue['translate'];
 }): void => {
   PrimaryModal.show(
@@ -63,7 +65,7 @@ export const showRestoreRootNodeModal = ({
             : translate('cells.restoreRootNodeModal.folder.headline'),
       },
     },
-    undefined,
+    modalId,
     translate,
   );
 };
