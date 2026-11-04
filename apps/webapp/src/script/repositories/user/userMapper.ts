@@ -18,7 +18,7 @@
  */
 
 import {isNan, isNonEmptyArray, isNonEmptyString, isNullOrUndefined, isUndefined} from '@sindresorhus/is';
-import {UserType} from '@wireapp/api-client/lib/user';
+import {ContactStatusState, UserType} from '@wireapp/api-client/lib/user';
 
 import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
@@ -115,6 +115,7 @@ export class UserMapper {
       availability,
       app,
       assets,
+      contact_status: contactStatus,
       deleted,
       email,
       expires_at: expirationDate,
@@ -151,6 +152,10 @@ export class UserMapper {
 
     if (!isNullOrUndefined(supportedProtocols)) {
       userEntity.supportedProtocols(supportedProtocols);
+    }
+
+    if (!isNullOrUndefined(contactStatus)) {
+      userEntity.isPendingOnboarding(contactStatus.state === ContactStatusState.NON_CONTACTABLE);
     }
 
     if (isNonEmptyString(expirationDate)) {

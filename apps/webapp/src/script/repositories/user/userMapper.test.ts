@@ -17,7 +17,7 @@
  *
  */
 
-import {UserAsset, UserAssetType} from '@wireapp/api-client/lib/user';
+import {ContactStatusState, UserAsset, UserAssetType} from '@wireapp/api-client/lib/user';
 
 import {Availability} from '@wireapp/protocol-messaging';
 
@@ -172,6 +172,35 @@ describe('User Mapper', () => {
       const updated_user_et = mapper.updateUserFromObject(user_et, data, '');
 
       expect(updated_user_et.username()).toBe(entities.user.jane_roe.handle);
+    });
+
+    it('marks the user as pending onboarding when they are not contactable', () => {
+      const userEntity = new User('', '', translateForTest);
+      userEntity.id = entities.user.john_doe.id;
+      const data = {contact_status: {state: ContactStatusState.NON_CONTACTABLE}, id: userEntity.id};
+      mapper.updateUserFromObject(userEntity, data, '');
+
+      expect(userEntity.isPendingOnboarding()).toBe(true);
+    });
+
+    it('clears the pending onboarding state when the user becomes contactable', () => {
+      const userEntity = new User('', '', translateForTest);
+      userEntity.id = entities.user.john_doe.id;
+      userEntity.isPendingOnboarding(true);
+      const data = {contact_status: {state: ContactStatusState.CONTACTABLE}, id: userEntity.id};
+      mapper.updateUserFromObject(userEntity, data, '');
+
+      expect(userEntity.isPendingOnboarding()).toBe(false);
+    });
+
+    it('keeps the pending onboarding state when the contact status is missing', () => {
+      const userEntity = new User('', '', translateForTest);
+      userEntity.id = entities.user.john_doe.id;
+      userEntity.isPendingOnboarding(true);
+      const data = {id: userEntity.id, name: entities.user.jane_roe.name};
+      mapper.updateUserFromObject(userEntity, data, '');
+
+      expect(userEntity.isPendingOnboarding()).toBe(true);
     });
 
     it("converts user's expiration date to local timestamp", () => {

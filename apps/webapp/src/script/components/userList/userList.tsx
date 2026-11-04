@@ -58,6 +58,7 @@ interface UserListProps {
   noSelfInteraction?: boolean;
   noUnderline?: boolean;
   showArrow?: boolean;
+  showPendingOnboarding?: boolean;
   onClick?: (userEntity: User, event: MouseEvent | KeyboardEvent | ChangeEvent) => void;
   onSelectUser?: (user: User) => void;
   reducedUserCount?: number;
@@ -89,6 +90,7 @@ export const UserList: FunctionComponent<UserListProps> = ({
   showEmptyAdmin = false,
   noSelfInteraction = false,
   showArrow = false,
+  showPendingOnboarding = false,
   teamState = container.resolve(TeamState),
   isSelectable = false,
   onSelectUser,
@@ -168,6 +170,7 @@ export const UserList: FunctionComponent<UserListProps> = ({
             onClick={onClickOrKeyPressed}
             onKeyDown={onUserKeyPressed}
             showArrow={showArrow}
+            showPendingOnboarding={showPendingOnboarding}
           />
         </li>
       );
@@ -185,6 +188,7 @@ export const UserList: FunctionComponent<UserListProps> = ({
       onUserKeyPressed,
       selectedUsers,
       showArrow,
+      showPendingOnboarding,
       teamState,
     ],
   );

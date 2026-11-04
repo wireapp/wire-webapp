@@ -17,7 +17,7 @@
  *
  */
 
-import type {FunctionComponent} from 'react';
+import {useId, type FunctionComponent} from 'react';
 
 import {isNullOrUndefined} from '@sindresorhus/is';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
@@ -36,6 +36,11 @@ import type {MenuItem} from './panelActions';
 import {PanelActions} from './panelActions';
 import {listCSS} from './panelActions/panelActions.styles';
 import {SingleAction} from './singleAction/singleAction';
+import {
+  pendingOnboardingInfoStyle,
+  pendingOnboardingMessageStyle,
+  pendingOnboardingTitleStyle,
+} from './userActions.styles';
 
 import {ACCESS_STATE} from '../../repositories/conversation/AccessState';
 import type {ConversationRoleRepository} from '../../repositories/conversation/ConversationRoleRepository';
@@ -136,6 +141,7 @@ const UserActions: FunctionComponent<UserActionsProps> = ({
     isConnected,
     isOutgoingRequest,
     isIncomingRequest,
+    isPendingOnboarding,
   } = useKoSubscribableChildren(user, [
     'isAvailable',
     'isTemporaryGuest',
@@ -146,7 +152,9 @@ const UserActions: FunctionComponent<UserActionsProps> = ({
     'isCanceled',
     'isUnknown',
     'isConnected',
+    'isPendingOnboarding',
   ]);
+  const pendingOnboardingInfoId = useId();
   const isTeamMember = teamState.isInTeam(user);
 
   const {setCurrentTab: setCurrentSidebarTab} = useSidebarStore();
@@ -247,6 +255,11 @@ const UserActions: FunctionComponent<UserActionsProps> = ({
           Icon: Icon.MessageIcon,
           identifier: ActionIdentifier[Actions.START_CONVERSATION],
           label: translate('groupParticipantActionStartConversation'),
+          ...(isModal &&
+            isPendingOnboarding && {
+              disabled: true,
+              descriptionId: pendingOnboardingInfoId,
+            }),
         }
       : undefined;
 
@@ -391,16 +404,28 @@ const UserActions: FunctionComponent<UserActionsProps> = ({
     return !isNullOrUndefined(item);
   });
 
-  return items.length === 1 && isModal ? (
-    <SingleAction
-      oneButtonPerRow={items[0].identifier === ActionIdentifier[Actions.START_CONVERSATION]}
-      item={items[0]}
-      onCancel={onAction}
-    />
-  ) : (
-    <ul css={listCSS}>
-      <PanelActions items={items} />
-    </ul>
+  const pendingOnboardingInfo = start1To1Conversation?.disabled === true && (
+    <div id={pendingOnboardingInfoId} css={pendingOnboardingInfoStyle} data-uie-name="status-pending-onboarding-info">
+      <p css={pendingOnboardingTitleStyle}>{translate('userOnboardingPending')}</p>
+      <p css={pendingOnboardingMessageStyle}>{translate('userOnboardingPendingStartConversationInfo')}</p>
+    </div>
+  );
+
+  return (
+    <>
+      {pendingOnboardingInfo}
+      {items.length === 1 && isModal ? (
+        <SingleAction
+          oneButtonPerRow={items[0].identifier === ActionIdentifier[Actions.START_CONVERSATION]}
+          item={items[0]}
+          onCancel={onAction}
+        />
+      ) : (
+        <ul css={listCSS}>
+          <PanelActions items={items} />
+        </ul>
+      )}
+    </>
   );
 };
 
