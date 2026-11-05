@@ -19,7 +19,7 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {CellNode, CellNodeType} from 'src/script/types/cellNode';
+import {CellNode, CellNodeType} from '../../../../types/cellNode';
 
 import {normalizeCellsPath} from './cellsBulkMovePreviewModal/normalizeCellsPath';
 import {isBulkMoveValid} from './cellsBulkMovePreviewModal/validateBulkMove';

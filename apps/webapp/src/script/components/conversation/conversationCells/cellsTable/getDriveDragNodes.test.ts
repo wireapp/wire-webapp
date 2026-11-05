@@ -17,7 +17,7 @@
  *
  */
 
-import {CellNode, CellNodeType} from 'src/script/types/cellNode';
+import {CellNode, CellNodeType} from '../../../../types/cellNode';
 
 import {getDriveDragNodes, INTERNAL_DRIVE_DRAG_TYPE, type GetDriveDragNodesOptions} from './getDriveDragNodes';
 
