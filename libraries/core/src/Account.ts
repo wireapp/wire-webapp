@@ -794,7 +794,18 @@ export class Account extends TypedEventEmitter<Events> {
       this.notificationProcessingQueue.resume();
 
       if (useLegacy) {
-        await legacyProcessNotificationStream(abortController);
+        try {
+          await legacyProcessNotificationStream(abortController);
+        } catch (error: unknown) {
+          this.logger.error('Failed legacy notification stream processing after WebSocket open', error);
+
+          if (abortController.signal.aborted === true) {
+            return;
+          }
+
+          this.pauseAndFlushNotificationQueue();
+          onConnectionStateChanged(ConnectionState.CLOSED);
+        }
       }
     });
 

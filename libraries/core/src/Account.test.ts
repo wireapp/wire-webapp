@@ -471,6 +471,31 @@ describe('Account', () => {
         });
       });
 
+      it('reports CLOSED without unlocking when legacy catch-up fails after WebSocket open', async () => {
+        const notificationService = dependencies.account.service?.notification;
+        if (notificationService === undefined) {
+          throw new Error('Account notification service must be initialized');
+        }
+
+        jest
+          .spyOn(notificationService, 'legacyProcessNotificationStream')
+          .mockRejectedValue(new Error('Catch-up failed'));
+        const unlock = jest.spyOn(dependencies.apiClient.transport.ws, 'unlock');
+        const onConnectionStateChanged = jest.fn<void, [ConnectionState]>();
+        const disconnect = await dependencies.account.listen({useLegacy: true, onConnectionStateChanged});
+
+        try {
+          await waitFor(() => {
+            expect(onConnectionStateChanged).toHaveBeenCalledWith(ConnectionState.CLOSED);
+          });
+          expect(onConnectionStateChanged).toHaveBeenCalledWith(ConnectionState.PROCESSING_NOTIFICATIONS);
+          expect(onConnectionStateChanged).not.toHaveBeenCalledWith(ConnectionState.LIVE);
+          expect(unlock).not.toHaveBeenCalled();
+        } finally {
+          disconnect();
+        }
+      });
+
       it('does stop processing messages if websocket connection is aborted', async () => {
         jest
           .spyOn(dependencies.account, 'getClientCapabilities')
