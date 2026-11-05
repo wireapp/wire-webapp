@@ -3531,7 +3531,6 @@ describe('CellsTable row modifier selection', () => {
     expect(screen.queryByRole('button', {name: 'Clear selection'})).not.toBeInTheDocument();
   });
 });
-
 describe('CellsTable internal drag and drop', () => {
   it('moves every selected item into a folder without opening the Move dialog or uploading files', async () => {
     const moveNodes = jest
@@ -3573,9 +3572,9 @@ describe('CellsTable internal drag and drop', () => {
   });
 
   it.each([
-    {destination: 'itself', targetName: 'Source'},
-    {destination: 'a descendant', targetName: 'Child'},
-  ])('does not move a selected folder into $destination', ({targetName}) => {
+    {destination: 'itself', targetAccessibleName: /Source/},
+    {destination: 'a descendant', targetAccessibleName: /Child/},
+  ])('does not move a selected folder into $destination', ({targetAccessibleName}) => {
     const moveNodes = jest.fn();
     const folder = createNode({id: 'source-id', name: 'Source', path: 'conversation-id@example.com/Source'});
     const child = createNode({id: 'child-id', name: 'Child', path: 'conversation-id@example.com/Source/Child'});
@@ -3583,7 +3582,7 @@ describe('CellsTable internal drag and drop', () => {
     fireEvent.click(screen.getByRole('checkbox', {name: 'Select Source'}));
     const transfer = createInternalDragTransfer();
     fireEvent.dragStart(screen.getByRole('row', {name: /Source/}), {dataTransfer: transfer});
-    const target = screen.getByRole('row', {name: new RegExp(targetName)});
+    const target = screen.getByRole('row', {name: targetAccessibleName});
     fireEvent.dragOver(target, {dataTransfer: transfer});
     fireEvent.drop(target, {dataTransfer: transfer});
 
@@ -3655,6 +3654,7 @@ describe('CellsTable internal drag and drop', () => {
       cellsRepository: {moveNodes} as unknown as CellsRepository,
       selfUserDriveRole: CELLS_SELF_USER_DRIVE_ROLE.VIEWER,
     });
+    expect(screen.queryByRole('checkbox', {name: 'Select Wire logs.pdf'})).not.toBeInTheDocument();
     const source = screen.getByRole('row', {name: /Wire logs\.pdf/});
     expect(source).toHaveAttribute('draggable', 'false');
     const transfer = createInternalDragTransfer();

@@ -1080,14 +1080,6 @@ export const CellsTable = ({
     setActiveFolderDropTargetName(null);
   }, [folderDropResetKey]);
 
-  const setActiveFolderDropTarget = (node: CellNode | null, isFileUpload = true): void => {
-    setActiveFolderDropTargetId(node?.id ?? null);
-    setActiveFolderDropTargetName(isFileUpload ? (node?.name ?? null) : null);
-    if (isFileUpload) {
-      onFolderDropTargetChange?.(node?.name ?? null);
-    }
-  };
-
   const getDriveDragNodesForEvent = (destination: CellNode, event: DragEvent<HTMLElement>): CellNode[] | null => {
     return getDriveDragNodes({
       activeDrag: activeDriveDrag.current,
@@ -1096,9 +1088,17 @@ export const CellsTable = ({
       selectionScopeKey: selectionScopeKeyRef.current,
       canMoveSelection,
       destination,
-      nodes: nodesRef.current,
+      nodes,
       conversationQualifiedId,
     });
+  };
+
+  const setActiveFolderDropTarget = (node: CellNode | null, isFileUpload = true): void => {
+    setActiveFolderDropTargetId(node?.id ?? null);
+    setActiveFolderDropTargetName(isFileUpload ? (node?.name ?? null) : null);
+    if (isFileUpload) {
+      onFolderDropTargetChange?.(node?.name ?? null);
+    }
   };
 
   const handleDriveDrop = async (destination: CellNode, event: DragEvent<HTMLTableRowElement>): Promise<void> => {
