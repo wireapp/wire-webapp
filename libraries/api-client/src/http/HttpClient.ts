@@ -181,9 +181,12 @@ export class HttpClient extends EventEmitter {
 
       return response;
     } catch (error) {
+      if (abortController?.signal.aborted === true || config.signal?.aborted === true) {
+        throw error;
+      }
       const retryWithTokenRefresh = async () => {
         this.logger.warn('Access token refresh triggered by an authenticated request');
-        await this.refreshAccessToken();
+        await this.refreshAccessToken(abortController?.signal);
         config['axios-retry'] = {
           retries: 0,
         };

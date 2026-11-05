@@ -41,6 +41,24 @@ describe('HttpClient', () => {
   };
 
   describe('"_sendRequest"', () => {
+    it('does not recover authentication from a late response to a cancelled request', async () => {
+      const client = new HttpClient(testConfig, new AccessTokenStore());
+      const lifetime = new AbortController();
+      let rejectRequest: (error: unknown) => void = () => {};
+      jest.spyOn(client.client, 'request').mockImplementation(() => {
+        return new Promise((_resolve, reject) => { rejectRequest = reject; });
+      });
+      const refresh = jest.spyOn(client, 'refreshAccessToken');
+      const invalidSession = jest.fn();
+      client.on(HttpClient.TOPIC.ON_INVALID_TOKEN, invalidSession);
+      const request = client._sendRequest({config: {method: 'get', url: '/cookies'}, abortController: lifetime});
+      lifetime.abort();
+      const responseFailure = {isAxiosError: true, response: {status: StatusCode.UNAUTHORIZED}};
+      rejectRequest(responseFailure);
+      await expect(request).rejects.toBe(responseFailure);
+      expect(refresh).not.toHaveBeenCalled();
+      expect(invalidSession).not.toHaveBeenCalled();
+    });
     it('passes refresh cancellation to HTTP and does not save a late token', async () => {
       const store = new AccessTokenStore();
       const client = new HttpClient(testConfig, store);
