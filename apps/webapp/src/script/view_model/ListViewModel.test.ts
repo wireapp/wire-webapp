@@ -136,6 +136,7 @@ describe('ListViewModel', () => {
   it.each([
     [ContentState.PREFERENCES_ABOUT, '/preferences/about'],
     [ContentState.PREFERENCES_ACCOUNT, '/preferences/account'],
+    [ContentState.PREFERENCES_SECURITY, '/preferences/security'],
     [ContentState.PREFERENCES_AV, '/preferences/av'],
     [ContentState.PREFERENCES_DEVICES, '/preferences/devices'],
     [ContentState.PREFERENCES_OPTIONS, '/preferences/options'],

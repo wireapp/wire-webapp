@@ -136,6 +136,10 @@ const useWindowTitle = (translate: Translate) => {
         return translate('preferencesAccount');
       })
 
+      .with(ContentState.PREFERENCES_SECURITY, () => {
+        return translate('preferencesSecurity');
+      })
+
       .with(ContentState.PREFERENCES_AV, () => {
         return translate('preferencesAV');
       })

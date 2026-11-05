@@ -17,7 +17,7 @@
  *
  */
 
-import {render} from '@testing-library/react';
+import {fireEvent, render} from '@testing-library/react';
 
 import {Runtime} from '@wireapp/commons';
 
@@ -26,6 +26,7 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
+import {ContentState} from 'src/script/page/useAppState';
 
 import {Preferences} from './preferences';
 
@@ -44,6 +45,8 @@ describe('Preferences', () => {
     jest.spyOn(Runtime, 'isSupportingLegacyCalling').mockReturnValue(false);
     const {getByText, queryByText} = render(<Preferences {...defaultParams} />, {wrapper: rootProviderWrapper});
     expect(getByText('preferencesAccount')).not.toBeNull();
+    fireEvent.click(getByText('preferencesSecurity'));
+    expect(defaultParams.onPreferenceItemClick).toHaveBeenCalledWith(ContentState.PREFERENCES_SECURITY);
     expect(getByText('preferencesDevices')).not.toBeNull();
     expect(getByText('preferencesOptions')).not.toBeNull();
     expect(queryByText('preferencesAbout')).not.toBeNull();

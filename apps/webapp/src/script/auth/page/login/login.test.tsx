@@ -17,7 +17,7 @@
  *
  */
 
-import {fireEvent, render, waitFor} from '@testing-library/react';
+import {fireEvent, render, waitFor, screen} from '@testing-library/react';
 import {ClientType} from '@wireapp/api-client/lib/client';
 import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import {Runtime, TypeUtil} from '@wireapp/commons';
@@ -64,6 +64,21 @@ describe('Login', () => {
       );
     });
 
+    await waitFor(() => {
+      expect(getByTestId('do-totp-login-verify')).toBeInTheDocument();
+    });
+    fireEvent.paste(screen.getAllByRole('textbox')[0], {
+      clipboardData: {
+        getData: () => {
+          return '123456';
+        },
+      },
+    });
+    fireEvent.click(getByTestId('do-totp-login-verify'));
+    await waitFor(() => {
+      expect(getByTestId('do-totp-remind-later')).toBeInTheDocument();
+    });
+    fireEvent.click(getByTestId('do-totp-remind-later'));
     expect(historyPushSpy).toHaveBeenCalledWith(expect.any(Object), expect.any(String), `#${ROUTE.HISTORY_INFO}`);
   });
 
@@ -126,6 +141,21 @@ describe('Login', () => {
       );
     });
 
+    await waitFor(() => {
+      expect(getByTestId('do-totp-login-verify')).toBeInTheDocument();
+    });
+    fireEvent.paste(screen.getAllByRole('textbox')[0], {
+      clipboardData: {
+        getData: () => {
+          return '123456';
+        },
+      },
+    });
+    fireEvent.click(getByTestId('do-totp-login-verify'));
+    await waitFor(() => {
+      expect(getByTestId('do-totp-remind-later')).toBeInTheDocument();
+    });
+    fireEvent.click(getByTestId('do-totp-remind-later'));
     expect(historyPushSpy).toHaveBeenCalledWith(expect.any(Object), expect.any(String), `#${ROUTE.HISTORY_INFO}`);
   });
 

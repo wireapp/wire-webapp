@@ -27,3 +27,4 @@ export * from './picture';
 export * from './self';
 export * from './selfApi';
 export * from './ssoSignature';
+export * from './totp';

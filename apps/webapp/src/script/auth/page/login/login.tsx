@@ -27,6 +27,7 @@ import {StatusCodes} from 'http-status-codes';
 import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
 import {useNavigate} from 'react-router';
+import {Maybe} from 'true-myth';
 
 import {Runtime, UrlUtil} from '@wireapp/commons';
 import {
@@ -55,6 +56,8 @@ import {
 } from '@wireapp/react-ui-kit';
 
 import {LogoFullIcon} from 'Components/icon';
+import {PostLoginTwoFactorSetup} from 'Components/twoFactor/postLoginTwoFactorSetup';
+import {TwoFactorLoginPreview} from 'Components/twoFactor/twoFactorLoginPreview';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {getLogger} from 'Util/logger';
 import {isBackendError} from 'Util/typePredicateUtil';
@@ -76,6 +79,7 @@ import {ValidationError} from '../../module/action/validationError';
 import {RootState, ThunkDispatch} from '../../module/reducer';
 import * as AuthSelector from '../../module/selector/authSelector';
 import * as ConversationSelector from '../../module/selector/conversationSelector';
+import * as SelfSelector from '../../module/selector/selfSelector';
 import {QUERY_KEY, ROUTE} from '../../route';
 import {parseError, parseValidationErrors} from '../../util/errorUtil';
 import {getEnterpriseLoginV2FF} from '../../util/helpers';
@@ -113,8 +117,9 @@ const LoginComponent = ({
   conversationInfoFetching,
   embedded,
   account,
+  selfEmail,
 }: Props & ConnectedProps & DispatchProps) => {
-  const {translate} = useApplicationContext();
+  const {translate, clock} = useApplicationContext();
   const millisecondsPerSecond = 1000;
   const secondsPerMinute = 60;
   const twoFactorExpiryMinutes = 10;
@@ -139,7 +144,15 @@ const LoginComponent = ({
 
   const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE, window.location.hash);
 
-  const [routeAction, setRouteAction] = useState<'login' | 'verify'>('login');
+  const [routeAction, setRouteAction] = useState<'login' | 'verify' | 'authenticator-preview' | 'setup'>('login');
+  const [postLoginSetup, setPostLoginSetup] = useState<Maybe<{email: string; password: string}>>(Maybe.nothing());
+  const clearSetupPassword = useCallback(() => {
+    setPostLoginSetup(current => {
+      return current.map(value => {
+        return {...value, password: ''};
+      });
+    });
+  }, []);
 
   // this triggers the hook every time screen changes under the same route
   useRouteA11y(routeAction);
@@ -241,6 +254,18 @@ const LoginComponent = ({
     }
   }, [immediateLogin, isEntropyRequired, isOauth]);
 
+  const continueAfterLogin = () => {
+    setPostLoginSetup(Maybe.nothing());
+    if (isOauth) {
+      return navigate(`${ROUTE.AUTHORIZE}/${getOAuthQueryString(window.location)}`);
+    }
+    if (shouldDisplayWarning) {
+      setIsAccountAlreadyExistsModalOpen(true);
+      return;
+    }
+    navigate(ROUTE.HISTORY_INFO);
+  };
+
   const handleSubmit = async (
     formLoginData: Partial<LoginData>,
     validationErrors: Error[] = [],
@@ -283,18 +308,12 @@ const LoginComponent = ({
         await doLogin(login, getEntropy);
       }
 
-      if (isOauth) {
-        const queryString = getOAuthQueryString(window.location);
-
-        return navigate(`${ROUTE.AUTHORIZE}/${queryString}`);
-      }
-
-      if (shouldDisplayWarning) {
-        setIsAccountAlreadyExistsModalOpen(true);
+      if (isNonEmptyString(login.password)) {
+        setPostLoginSetup(Maybe.just({email: login.email ?? '', password: String(login.password)}));
+        setRouteAction('authenticator-preview');
         return;
       }
-
-      return navigate(ROUTE.HISTORY_INFO);
+      continueAfterLogin();
     } catch (error: unknown) {
       if (isBackendError(error)) {
         switch (error.label) {
@@ -328,7 +347,10 @@ const LoginComponent = ({
               await doSendTwoFactorCode(twoFactorTarget);
               setTwoFactorLoginData(login);
               setRouteAction('verify');
-              await doSetLocalStorage(QUERY_KEY.JOIN_EXPIRES, Date.now() + twoFactorExpiryMilliseconds);
+              await doSetLocalStorage(
+                QUERY_KEY.JOIN_EXPIRES,
+                clock.currentUnixEpochMilliseconds + twoFactorExpiryMilliseconds,
+              );
             }
             break;
           }
@@ -398,6 +420,26 @@ const LoginComponent = ({
     setIsAccountAlreadyExistsModalOpen(false);
     return navigate(ROUTE.HISTORY_INFO);
   };
+
+  if (postLoginSetup.isJust) {
+    if (routeAction === 'authenticator-preview') {
+      return (
+        <TwoFactorLoginPreview
+          onContinue={() => {
+            return setRouteAction('setup');
+          }}
+        />
+      );
+    }
+    return (
+      <PostLoginTwoFactorSetup
+        email={selfEmail ?? postLoginSetup.value.email}
+        password={postLoginSetup.value.password}
+        onCredentialsConsumed={clearSetupPassword}
+        onContinue={continueAfterLogin}
+      />
+    );
+  }
 
   return (
     <Page withSideBar={isEnterpriseLoginV2Enabled && embedded !== true}>
@@ -631,6 +673,7 @@ const mapStateToProps = (state: RootState) => {
     conversationInfo: ConversationSelector.conversationInfo(state),
     conversationInfoFetching: ConversationSelector.conversationInfoFetching(state),
     account: AuthSelector.getAccount(state),
+    selfEmail: SelfSelector.getSelfEmail(state),
   };
 };
 

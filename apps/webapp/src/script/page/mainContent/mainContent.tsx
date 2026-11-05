@@ -51,6 +51,7 @@ import {AccountPreferences} from './panels/preferences/accountPreferences';
 import {AVPreferences} from './panels/preferences/avPreferences';
 import {DevicesPreferences} from './panels/preferences/devicesPreferences';
 import {OptionPreferences} from './panels/preferences/optionPreferences';
+import {SecurityPreferences} from './panels/preferences/securityPreferences';
 
 import {RightSidebarParams} from '../appMain';
 import {PanelState} from '../rightSidebar';
@@ -148,6 +149,7 @@ const MainContent = ({
     [ContentState.COLLECTION]: translate('accessibility.headings.collection'),
     [ContentState.PREFERENCES_ABOUT]: translate('accessibility.headings.preferencesAbout'),
     [ContentState.PREFERENCES_ACCOUNT]: translate('accessibility.headings.preferencesAccount'),
+    [ContentState.PREFERENCES_SECURITY]: translate('preferencesSecurity'),
     [ContentState.PREFERENCES_AV]: translate('accessibility.headings.preferencesAV'),
     [ContentState.PREFERENCES_DEVICES]: translate('accessibility.headings.preferencesDevices'),
     [ContentState.PREFERENCES_OPTIONS]: translate('accessibility.headings.preferencesOptions'),
@@ -209,6 +211,16 @@ const MainContent = ({
                   isActivatedAccount={isActivatedAccount}
                   appLockRepository={appLockRepository}
                 />
+              </div>
+            )}
+
+            {contentState === ContentState.PREFERENCES_SECURITY && (
+              <div
+                id="preferences-security"
+                className={cx('preferences-page preferences-security', incomingCssClass)}
+                ref={removeAnimationsClass}
+              >
+                <SecurityPreferences selfUser={selfUser} />
               </div>
             )}
 

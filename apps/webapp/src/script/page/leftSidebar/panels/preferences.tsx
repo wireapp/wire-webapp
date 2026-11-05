@@ -95,6 +95,10 @@ const showNotification = (
   }
 };
 
+const SecurityIcon = () => {
+  return <Icon.ShieldIcon css={{path: {fill: 'inherit'}}} />;
+};
+
 const NEW_DEVICE_NOTIFICATION_STATES = [ContentState.PREFERENCES_ACCOUNT, ContentState.PREFERENCES_DEVICES];
 
 const PreferenceItem = ({onSelect, isSelected, label, uieName, IconComponent}: PreferencesItemProps) => {
@@ -153,6 +157,12 @@ const Preferences = ({
       id: ContentState.PREFERENCES_ACCOUNT,
       label: translate('preferencesAccount'),
       uieName: 'go-account',
+    },
+    {
+      IconComponent: SecurityIcon,
+      id: ContentState.PREFERENCES_SECURITY,
+      label: translate('preferencesSecurity'),
+      uieName: 'go-security',
     },
     {
       IconComponent: Icon.DevicesIcon,

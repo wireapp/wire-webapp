@@ -29,6 +29,8 @@ import {useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {MeetingNotificationHost} from 'Components/meeting/meetingNotificationHost/meetingNotificationHost';
+import {RecoveryCodeReminder} from 'Components/twoFactor/recoveryCodeReminder';
+import {TwoFactorReminder} from 'Components/twoFactor/twoFactorReminder';
 import {useConversationFocus} from 'Hooks/useConversationFocus';
 import {CallState} from 'Repositories/calling/CallState';
 import {createLabel} from 'Repositories/conversation/ConversationLabelRepository';
@@ -149,12 +151,17 @@ export const Conversations = ({
   const {isChannelsEnabled} = useChannelsFeatureFlag();
   const [conversationsFilter, setConversationsFilter] = useState<string>('');
   const [searchResetToken, setSearchResetToken] = useState(0);
+  // Temporary reminder visibility/deadline until the policy API is available.
+  const [twoFactorReminderDismissed, setTwoFactorReminderDismissed] = useState(false);
   const {classifiedDomains, isTeam} = useKoSubscribableChildren(teamState, ['classifiedDomains', 'isTeam']);
   const {isMeetingsEnabled} = useMeetingsFeatureFlag();
   const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
   const {notifications} = useKoSubscribableChildren(preferenceNotificationRepository, ['notifications']);
 
-  const {isTemporaryGuest} = useKoSubscribableChildren(selfUser, ['isTemporaryGuest']);
+  const {isTemporaryGuest, isAdminOrOwner} = useKoSubscribableChildren(selfUser, [
+    'isTemporaryGuest',
+    'isAdminOrOwner',
+  ]);
 
   const {
     activeConversation,
@@ -727,6 +734,34 @@ export const Conversations = ({
             classifiedDomains={classifiedDomains}
             propertiesRepository={propertiesRepository}
           />
+        }
+        before={
+          <>
+            {/* Always show this preview until recovery status is available from the API. */}
+            {!isTemporaryGuest && !isPreferences && !isCells && !isMeetings && !isConversationListCollapsed && (
+              <RecoveryCodeReminder codesLeft={9} />
+            )}
+            {isTeam &&
+              !isTemporaryGuest &&
+              !selfUser.isNoPasswordSSO &&
+              !isPreferences &&
+              !isCells &&
+              !isMeetings &&
+              !isConversationListCollapsed &&
+              !twoFactorReminderDismissed && (
+                <TwoFactorReminder
+                  isAdmin={isAdminOrOwner}
+                  daysLeft={45}
+                  deadline="2026-12-06"
+                  onDismiss={() => {
+                    return setTwoFactorReminderDismissed(true);
+                  }}
+                  onSetup={() => {
+                    return onClickPreferences(ContentState.PREFERENCES_SECURITY);
+                  }}
+                />
+              )}
+          </>
         }
         notificationHost={<MeetingNotificationHost isStandalone={false} />}
       >

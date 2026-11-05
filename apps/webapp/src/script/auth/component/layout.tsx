@@ -23,34 +23,73 @@ import {WavesPattern} from '@wireapp/react-ui-kit/lib/images/wavesPattern';
 
 import {Bold, COLOR_V2, FlexBox, Link, Logo, Text} from '@wireapp/react-ui-kit';
 
+import {ShieldIcon} from 'Components/icon';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 
-import {bodyCss, contentContainerCss, leftSectionCss, whiteFontCss} from './layout.styles';
+import {bodyCss, contentContainerCss, leftSectionCss, whiteFontCss, setupSidebarStyles} from './layout.styles';
 
 import {Config} from '../../Config';
 
-export const Layout = ({children}: {children: ReactNode}) => {
+interface LayoutProps {
+  children: ReactNode;
+  variant?: 'login' | 'two-factor';
+  activeStep?: number;
+}
+
+export const Layout = ({children, variant = 'login', activeStep = 0}: LayoutProps) => {
   const {translate} = useApplicationContext();
   return (
     <FlexBox css={bodyCss}>
       <div css={leftSectionCss}>
-        <Logo color={COLOR_V2.WHITE} scale={1.9} ariaLabel={translate('accessibility.logo.wire')} />
-        <div css={{margin: '4rem 0'}}>
-          <Text bold css={whiteFontCss} fontSize="1.5rem">
-            {translate('layoutSidebarHeader')}
-          </Text>
-          <br />
-          <div css={{marginTop: '0.5rem'}}>
-            <Text css={{...whiteFontCss, lineHeight: '1.5rem'}}>{translate('layoutSidebarContent')}</Text>
-            <br />
-            <Link href={Config.getConfig().URL.WEBSITE_BASE} target="_blank" rel="noopener noreferrer">
-              <Bold css={{...whiteFontCss, textDecoration: 'underline'}}> {translate('layoutSidebarLink')}</Bold>
-            </Link>
-          </div>
-        </div>
-        <span aria-hidden="true">
-          <WavesPattern />
-        </span>
+        {variant === 'two-factor' ? (
+          <aside css={setupSidebarStyles}>
+            <div>
+              <div className="two-factor-sidebar-icon">
+                <ShieldIcon aria-hidden="true" />
+              </div>
+              <h2>{translate('preferencesSecurityProtectAccount')}</h2>
+              <p>{translate('preferencesSecurityProtectAccountDetail')}</p>
+            </div>
+            <ol>
+              {[
+                translate('preferencesSecurityLinkAppStep'),
+                translate('preferencesSecurityEnterCodeStep'),
+                translate('preferencesSecuritySaveRecoveryCodes'),
+              ].map((label, index) => {
+                return (
+                  <li
+                    key={label}
+                    className={index + 1 <= activeStep ? 'active' : ''}
+                    aria-current={index + 1 === activeStep ? 'step' : false}
+                  >
+                    <span>{index + 1}</span>
+                    {label}
+                  </li>
+                );
+              })}
+            </ol>
+          </aside>
+        ) : (
+          <>
+            <Logo color={COLOR_V2.WHITE} scale={1.9} ariaLabel={translate('accessibility.logo.wire')} />
+            <div css={{margin: '4rem 0'}}>
+              <Text bold css={whiteFontCss} fontSize="1.5rem">
+                {translate('layoutSidebarHeader')}
+              </Text>
+              <br />
+              <div css={{marginTop: '0.5rem'}}>
+                <Text css={{...whiteFontCss, lineHeight: '1.5rem'}}>{translate('layoutSidebarContent')}</Text>
+                <br />
+                <Link href={Config.getConfig().URL.WEBSITE_BASE} target="_blank" rel="noopener noreferrer">
+                  <Bold css={{...whiteFontCss, textDecoration: 'underline'}}> {translate('layoutSidebarLink')}</Bold>
+                </Link>
+              </div>
+            </div>
+            <span aria-hidden="true">
+              <WavesPattern />
+            </span>
+          </>
+        )}
       </div>
 
       <div css={contentContainerCss}>{children}</div>

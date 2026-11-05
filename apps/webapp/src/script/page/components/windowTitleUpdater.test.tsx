@@ -122,6 +122,14 @@ describe('WindowTitleUpdater', () => {
     });
   });
 
+  it('uses the Security title when the security settings page is open', () => {
+    (useAppState as unknown as jest.Mock).mockImplementation(selector => {
+      return selector({contentState: ContentState.PREFERENCES_SECURITY, setUnreadMessagesCount});
+    });
+    renderWindowTitleUpdater();
+    expect(document.title).toBe(`${translateForTest('preferencesSecurity')} · Wire`);
+  });
+
   it('keeps one active subscription across rerenders and uses the same handler to unsubscribe', () => {
     const {rerender, unmount} = renderWindowTitleUpdater();
     const firstNotificationStateHandler = latestNotificationStateHandler();

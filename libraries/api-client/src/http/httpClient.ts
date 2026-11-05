@@ -235,6 +235,11 @@ export class HttpClient extends EventEmitter {
       };
     }
     const skipLogout = config.requestOptions?.skipLogout === true;
+    const apiVersion = config.requestOptions?.apiVersion;
+    let versionPrefix = this.versionPrefix;
+    if (apiVersion !== undefined) {
+      versionPrefix = apiVersion > 0 ? `/v${apiVersion}` : '';
+    }
 
     try {
       const response = await this.client.request<T>({
@@ -244,7 +249,7 @@ export class HttpClient extends EventEmitter {
         url:
           config.url !== undefined && config.url.startsWith(AuthAPI.URL.ACCESS)
             ? config.url
-            : `${this.versionPrefix}${config.url}`,
+            : `${versionPrefix}${config.url}`,
         maxBodyLength: FILE_SIZE_100_MB,
         maxContentLength: FILE_SIZE_100_MB,
       });

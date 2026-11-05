@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {useState} from 'react';
 import * as React from 'react';
 
 import {CSSObject} from '@emotion/react';
@@ -76,13 +76,14 @@ const digitInputStyle: <T>(theme: Theme, props: DigitInputProps<T>) => CSSObject
 };
 
 const DigitInput = React.forwardRef<HTMLInputElement, DigitInputProps<HTMLInputElement>>((props, ref) => {
+  const {markInvalid, ...inputProps} = props;
   return (
     <input
       ref={ref}
       css={(theme: Theme) => {
-        return digitInputStyle(theme, props);
+        return digitInputStyle(theme, {...inputProps, markInvalid});
       }}
-      {...props}
+      {...inputProps}
     />
   );
 });
@@ -91,6 +92,7 @@ export interface CodeInputProps<T = HTMLInputElement> extends InputProps<T> {
   autoFocus?: boolean;
   digits?: number;
   markInvalid?: boolean;
+  onCodeChange?: (code: string) => void;
   onCodeComplete?: (completeCode?: string) => void;
   codeInputLabel?: string;
   codePlaceholder?: string;
@@ -100,6 +102,7 @@ export const CodeInput = ({
   style,
   digits = 6,
   markInvalid,
+  onCodeChange = noop,
   onCodeComplete = noop,
   disabled,
   codeInputLabel,
@@ -139,11 +142,20 @@ export const CodeInput = ({
     }
   };
 
+  const reportCode = (nextValues: string[]) => {
+    const code = nextValues.join('');
+    onCodeChange(code);
+    if (code.length === digits) {
+      onCodeComplete(code);
+    }
+  };
+
   const setValue = (fieldIndex: number, value: string) => {
     if (/^[0-9]?$/.test(value)) {
       const valuesCopy = values.slice();
       valuesCopy[fieldIndex] = value;
       setValues(valuesCopy);
+      reportCode(valuesCopy);
       if (isNonEmptyString(value)) {
         nextField(fieldIndex);
       }
@@ -172,20 +184,18 @@ export const CodeInput = ({
     const pastedValue = event.clipboardData.getData('Text');
     const cleanedPaste = pastedValue.replace(/[^0-9]/g, '');
     if (/^[0-9]+$/.test(cleanedPaste)) {
-      setValues(values.slice(0, fieldIndex).concat(cleanedPaste.split('')).slice(0, digits));
+      const pastedDigits = values.slice(0, fieldIndex).concat(cleanedPaste.split('')).slice(0, digits);
+      const nextValues = values.map((existingDigit, digitIndex) => {
+        return pastedDigits[digitIndex] ?? existingDigit;
+      });
+      setValues(nextValues);
+      reportCode(nextValues);
     }
   };
 
-  useEffect(() => {
-    const completeCode = values.join('');
-    if (completeCode.length === digits) {
-      onCodeComplete(completeCode);
-    }
-  }, [values]);
-
   const labelId = React.useId();
   const getDigitAriaLabel = (value: string) => {
-    return Boolean(value) ? `${codePlaceholder}, ${value}` : `${codePlaceholder}`;
+    return isNonEmptyString(value) ? `${codePlaceholder}, ${value}` : `${codePlaceholder}`;
   };
 
   return (
@@ -216,6 +226,7 @@ export const CodeInput = ({
                 return handleKeyDown(digitIndex, event);
               }}
               onKeyUp={forceSelection}
+              onChange={noop}
               markInvalid={markInvalid}
               ref={(node): void => {
                 inputs[digitIndex] = node;

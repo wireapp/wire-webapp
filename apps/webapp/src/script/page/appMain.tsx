@@ -280,6 +280,9 @@ export const AppMain = (properties: AppMainProps) => {
       '/preferences/account': () => {
         return mainView.list.openPreferencesAccount();
       },
+      '/preferences/security': () => {
+        return mainView.list.openPreferences(ContentState.PREFERENCES_SECURITY);
+      },
       '/preferences/av': () => {
         return mainView.list.openPreferencesAudioVideo();
       },

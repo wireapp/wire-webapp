@@ -81,6 +81,25 @@ describe('HttpClient', () => {
   };
 
   describe('"_sendRequest"', () => {
+    it('overrides the API version per request while retaining authentication and the negotiated version', async () => {
+      const token = mockedAccessTokenStore.accessTokenData;
+      assert(token);
+      const authorization = `${token.token_type} ${token.access_token}`;
+      const backend = nock(testConfig.urls.rest, {reqheaders: {authorization}})
+        .get('/v19/self/totp')
+        .reply(StatusCode.OK, [])
+        .get('/v17/self')
+        .reply(StatusCode.OK, {})
+        .get(AuthAPI.URL.ACCESS)
+        .reply(StatusCode.OK, {});
+      const client = new HttpClient(testConfig, mockedAccessTokenStore as AccessTokenStore);
+      client.useVersion(17);
+      await client.sendJSON({method: 'get', url: '/self/totp', requestOptions: {apiVersion: 19}});
+      await client.sendJSON({method: 'get', url: '/self'});
+      await client.sendJSON({method: 'get', url: AuthAPI.URL.ACCESS, requestOptions: {apiVersion: 19}});
+      expect(backend.isDone()).toBe(true);
+    });
+
     it('retries on 403 token expired error', async () => {
       nock(testConfig.urls.rest).get(AuthAPI.URL.ACCESS).once().reply(StatusCode.FORBIDDEN, {
         code: StatusCode.FORBIDDEN,

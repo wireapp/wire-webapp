@@ -78,3 +78,38 @@ export const registrationLayoutListItemContainerCss: CSSObject = {
 export const registrationLayoutListItemIconCss: CSSObject = {
   marginTop: '4px',
 };
+
+export const setupSidebarStyles: CSSObject = {
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'space-between',
+  height: '100%',
+  color: '#fff',
+  h2: {fontFamily: 'inherit', fontSize: '1.5rem', lineHeight: '2rem', fontWeight: 600, margin: '4rem 0 0.5rem'},
+  p: {fontFamily: 'inherit', fontSize: '1rem', fontWeight: 400, lineHeight: '1.5rem', margin: 0, color: '#fff'},
+  '.two-factor-sidebar-icon': {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    background: 'rgba(255,255,255,.1)',
+    color: '#fff',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    svg: {width: 22, height: 22, fill: 'currentColor', path: {fill: 'currentColor'}},
+  },
+  ol: {listStyle: 'none', padding: 0, margin: '32px 0 0'},
+  li: {display: 'flex', alignItems: 'center', gap: 10, marginTop: 12, fontSize: 13, opacity: 0.45},
+  '.active': {opacity: 1},
+  '.active span': {background: '#fff', color: '#000'},
+  'li span': {
+    width: 22,
+    height: 22,
+    border: '1.5px solid #fff',
+    borderRadius: '50%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+};

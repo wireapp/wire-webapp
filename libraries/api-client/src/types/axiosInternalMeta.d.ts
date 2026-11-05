@@ -22,6 +22,8 @@ import 'axios';
 declare module 'axios' {
   interface AxiosRequestConfig {
     requestOptions?: {
+      /** Override the negotiated version for endpoints introduced in a newer API. */
+      apiVersion?: number;
       skipLogout?: boolean;
       skipIncrementalRetryBackoff?: boolean;
     };
