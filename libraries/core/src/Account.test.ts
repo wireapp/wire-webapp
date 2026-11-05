@@ -30,7 +30,7 @@ import {ConversationAPI} from '@wireapp/api-client/lib/conversation';
 import {BackendEvent} from '@wireapp/api-client/lib/event';
 import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {NotificationAPI} from '@wireapp/api-client/lib/notification';
-import {ConsumableEvent} from '@wireapp/api-client/lib/notification/ConsumableNotification';
+import {ConsumableEvent, ConsumableNotificationEvent} from '@wireapp/api-client/lib/notification/ConsumableNotification';
 import {Self, SelfAPI} from '@wireapp/api-client/lib/self';
 import {WebSocketClient} from '@wireapp/api-client/lib/tcp';
 import {ReconnectingWebsocket} from '@wireapp/api-client/lib/tcp/ReconnectingWebsocket';
@@ -352,6 +352,53 @@ describe('Account', () => {
     });
 
     describe('listen', () => {
+      it('acknowledges an async notification with an empty payload', async () => {
+        const notification: ConsumableNotificationEvent = {
+          type: ConsumableEvent.EVENT,
+          data: {delivery_tag: 7, event: {id: 'empty-notification', payload: []}},
+        };
+        const acknowledge = jest.spyOn(dependencies.apiClient.transport.ws, 'acknowledgeNotification');
+        const onNotificationStreamProgress = jest.fn();
+        const handleEvent = jest.fn();
+        // Exercise the real timestamp reader rather than this suite's general timestamp stub.
+        jest.spyOn(dependencies.account, 'getNotificationEventTime').mockRestore();
+
+        await dependencies.account['decryptAckEmitNotification']({
+          notification,
+          handleEvent,
+          source: NotificationSource.WEBSOCKET,
+          onNotificationStreamProgress,
+        });
+
+        expect(acknowledge).toHaveBeenCalledWith(notification);
+        expect(handleEvent).not.toHaveBeenCalled();
+        expect(onNotificationStreamProgress).not.toHaveBeenCalled();
+      });
+
+      it('passes an empty legacy notification to processing without reading an absent timestamp', async () => {
+        const notificationService = dependencies.account.service?.notification;
+        if (notificationService === undefined) {
+          throw new Error('Expected initialized notification service');
+        }
+        const processNotification = jest.spyOn(notificationService, 'handleNotification');
+        const onNotificationStreamProgress = jest.fn();
+        const notification = {id: 'empty-notification', payload: []};
+        jest.spyOn(dependencies.account, 'getNotificationEventTime').mockRestore();
+        dependencies.account.resumeNotificationQueue();
+        const handleNotification = dependencies.account['createLegacyNotificationHandler']({
+          handleEvent: jest.fn(),
+          onNotificationStreamProgress,
+          getCurrentWebSocketConnectionContext: () => {return undefined;},
+        });
+
+        await handleNotification(notification, NotificationSource.NOTIFICATION_STREAM);
+        await waitFor(() => {
+          expect(processNotification).toHaveBeenCalledWith(notification, NotificationSource.NOTIFICATION_STREAM);
+        });
+
+        expect(onNotificationStreamProgress).not.toHaveBeenCalled();
+      });
+
       it('removes only account listeners so retry reporting survives application reconnects', async () => {
         const webSocket = dependencies.apiClient.transport.ws;
         const clientService = dependencies.account.service?.client;

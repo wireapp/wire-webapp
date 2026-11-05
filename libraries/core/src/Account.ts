@@ -936,7 +936,11 @@ export class Account extends TypedEventEmitter<Events> {
         .push(async () => {
           try {
             const start = Date.now();
-            const notificationTime = this.getNotificationEventTime(notification.payload[0]);
+            const firstNotificationPayload = notification.payload[0];
+            const notificationTime =
+              firstNotificationPayload === undefined
+                ? undefined
+                : this.getNotificationEventTime(firstNotificationPayload);
             this.logger.info(
               `[WebSocketLifecycle] layer=account event=legacy-notification-start${getWebSocketLifecycleContext(getCurrentWebSocketConnectionContext())}`,
             );
@@ -1070,7 +1074,9 @@ export class Account extends TypedEventEmitter<Events> {
       );
       const payloads = this.service!.notification.handleNotification(notification.data.event, source);
 
-      const notificationTime = this.getNotificationEventTime(notification.data.event.payload[0]);
+      const firstNotificationPayload = notification.data.event.payload[0];
+      const notificationTime =
+        firstNotificationPayload === undefined ? undefined : this.getNotificationEventTime(firstNotificationPayload);
       if (this.connectionState !== ConnectionState.LIVE && notificationTime) {
         onNotificationStreamProgress(notificationTime);
       }
