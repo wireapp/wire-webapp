@@ -20,7 +20,7 @@
 import {useCallback, useEffect, useRef, useState, type FunctionComponent} from 'react';
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
-import {Maybe} from 'true-myth';
+import {Maybe, maybe} from 'true-myth';
 
 import {Button, ButtonVariant, TrashIcon} from '@wireapp/react-ui-kit';
 
@@ -32,6 +32,7 @@ import {
   statusStyles,
 } from './cellsEmptyBinAction.styles';
 import {emptyBin, isEmptyBinRootPath} from './emptyBinAction';
+import {getEmptyBinStatusKind, type EmptyBinStatus} from './getEmptyBinStatusKind';
 
 import {driveBulkActionsFeatureToggleName} from '../../../../../featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from '../../../../../page/rootProvider';
@@ -45,13 +46,11 @@ import {
   CELLS_ACTION,
   useCellsActionPermissions,
 } from '../../common/cellsSelfUserDriveRole/cellsSelfUserDriveRoleContext';
+import {useBulkActionStatusReporter} from '../../useBulkActionStatusReporter';
 
 const BACKGROUND_DELETE_STATUS_POLL_INTERVAL_MS = 1000;
 const BACKGROUND_DELETE_STATUS_RETRY_BACKOFF_FACTOR = 2;
 const MAX_BACKGROUND_DELETE_STATUS_RETRIES = 5;
-
-type EmptyBinStatus =
-  'idle' | 'submitting' | 'processing' | 'completed' | 'partial' | 'failed' | 'unknown' | 'lookup-error';
 
 interface CellsEmptyBinActionProps {
   cellsRepository: CellsRepository;
@@ -59,6 +58,7 @@ interface CellsEmptyBinActionProps {
   getCurrentCellsPath: () => string;
   onRefreshAfterEmptyBinOutcome: () => Promise<boolean>;
   onEmptyBinSubmitted: () => void;
+  onInProgressChange: (isInProgress: boolean) => void;
 }
 
 export const CellsEmptyBinAction: FunctionComponent<CellsEmptyBinActionProps> = ({
@@ -67,6 +67,7 @@ export const CellsEmptyBinAction: FunctionComponent<CellsEmptyBinActionProps> = 
   getCurrentCellsPath,
   onRefreshAfterEmptyBinOutcome,
   onEmptyBinSubmitted,
+  onInProgressChange,
 }: CellsEmptyBinActionProps) => {
   const {clock, isFeatureToggleEnabled, translate} = useApplicationContext();
   const canPerformCellsAction = useCellsActionPermissions();
@@ -78,6 +79,7 @@ export const CellsEmptyBinAction: FunctionComponent<CellsEmptyBinActionProps> = 
   const [backgroundJobUuids, setBackgroundJobUuids] = useState<string[]>([]);
   const requestPending = useRef(false);
   const isMounted = useRef(false);
+  const statusReporter = useBulkActionStatusReporter('emptyBin');
 
   const isFeatureEnabled = isFeatureToggleEnabled(driveBulkActionsFeatureToggleName);
   const currentCellsPath = getCurrentCellsPath();
@@ -110,6 +112,34 @@ export const CellsEmptyBinAction: FunctionComponent<CellsEmptyBinActionProps> = 
       setIsConfirmationOpen(false);
     }
   }, [canEmptyBin]);
+
+  const {report: reportStatus, clear: clearStatus, isProcessing: isStatusProcessing} = statusReporter;
+  useEffect(() => {
+    const statusKind = getEmptyBinStatusKind({status, refreshFailed});
+    if (maybe.isNothing(statusKind)) {
+      clearStatus();
+      return;
+    }
+    reportStatus(statusKind.value);
+  }, [clearStatus, refreshFailed, reportStatus, status]);
+
+  useEffect(() => {
+    return () => {
+      // Leaving while the outcome is unknown must not leave the popup stuck on progress.
+      if (isStatusProcessing()) {
+        reportStatus('status-unknown');
+      }
+    };
+  }, [isStatusProcessing, reportStatus]);
+
+  const isInProgress = status === 'submitting' || status === 'processing' || requiresReview;
+  useEffect(() => {
+    onInProgressChange(isInProgress);
+    // Leaving the Bin view must not keep the parent's lock (e.g. disabled row selection) on other views.
+    return () => {
+      onInProgressChange(false);
+    };
+  }, [isInProgress, onInProgressChange]);
 
   const refreshAfterOutcome = useCallback(async (): Promise<boolean> => {
     if (!isSameBinView()) {
@@ -212,6 +242,7 @@ export const CellsEmptyBinAction: FunctionComponent<CellsEmptyBinActionProps> = 
     requestPending.current = true;
     setIsSubmitting(true);
     setIsConfirmationOpen(false);
+    statusReporter.start([]);
     setStatus('submitting');
     setRefreshFailed(false);
 
@@ -288,6 +319,8 @@ export const CellsEmptyBinAction: FunctionComponent<CellsEmptyBinActionProps> = 
 
   const statusMessage = status === 'idle' ? '' : translate(`cells.emptyBin.status.${status}`);
   const isErrorStatus = ['partial', 'failed', 'unknown', 'lookup-error'].includes(status) || refreshFailed;
+  // Progress and outcomes live in the status popup; only show inline what the user has to act on.
+  const isActionRequired = requiresReview || (status === 'unknown' && backgroundJobUuids.length > 0);
 
   return (
     <div css={actionStyles}>
@@ -304,7 +337,7 @@ export const CellsEmptyBinAction: FunctionComponent<CellsEmptyBinActionProps> = 
         {translate('cells.emptyBin.button')}
       </Button>
 
-      {status !== 'idle' && (
+      {isActionRequired && (
         <div css={statusStyles} role={isErrorStatus ? 'alert' : 'status'} aria-live="polite">
           <span>{statusMessage}</span>
           {refreshFailed && <span>{translate('cells.emptyBin.refreshFailed')}</span>}

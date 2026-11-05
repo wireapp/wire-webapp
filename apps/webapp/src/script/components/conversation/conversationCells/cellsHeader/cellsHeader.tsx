@@ -67,6 +67,7 @@ interface CellsHeaderProps {
   onSelectionBarAnchorChange?: (anchor: HTMLDivElement | null) => void;
   onRefreshAfterEmptyBinOutcome: () => Promise<boolean>;
   onEmptyBinSubmitted: () => void;
+  onEmptyBinInProgressChange: (isInProgress: boolean) => void;
   getCurrentCellsPath: () => string;
 }
 
@@ -89,6 +90,7 @@ export const CellsHeader: FunctionComponent<CellsHeaderProps> = ({
   onSelectionBarAnchorChange,
   onRefreshAfterEmptyBinOutcome,
   onEmptyBinSubmitted,
+  onEmptyBinInProgressChange,
   getCurrentCellsPath,
 }: CellsHeaderProps) => {
   const {translate, isFeatureToggleEnabled} = useApplicationContext();
@@ -131,6 +133,7 @@ export const CellsHeader: FunctionComponent<CellsHeaderProps> = ({
                 getCurrentCellsPath={getCurrentCellsPath}
                 onRefreshAfterEmptyBinOutcome={onRefreshAfterEmptyBinOutcome}
                 onEmptyBinSubmitted={onEmptyBinSubmitted}
+                onInProgressChange={onEmptyBinInProgressChange}
               />
             )}
             <div css={actionsStyles}>
