@@ -194,6 +194,17 @@ export class ReconnectingWebsocket {
   };
 
   public connect(): void {
+    this.stopPinging();
+    if (this.socket !== undefined && this.socket.readyState !== WEBSOCKET_STATE.CLOSED) {
+      try {
+        this.socket.reconnect(CloseEventCode.NORMAL_CLOSURE);
+      } catch (error: unknown) {
+        this.logger.warn('Failed to reconnect WebSocket in place', error);
+      }
+
+      return;
+    }
+
     this.socket = this.getReconnectingWebsocket();
     this.socket.onmessage = this.internalOnMessage;
     this.socket.onerror = this.internalOnError;

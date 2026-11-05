@@ -111,6 +111,31 @@ describe('ReconnectingWebsocket', () => {
     }
   });
 
+  it('reuses the active wrapper when connect is called again', async () => {
+    const serverAddress = getServerAddress();
+    const websocket = createRWS(() => {
+      return serverAddress;
+    });
+    await new Promise<void>(resolve => {
+      websocket.setOnOpen(() => {
+        resolve();
+      });
+      websocket.connect();
+    });
+
+    const originalSocket = websocket['socket'];
+    if (originalSocket === undefined) {
+      throw new Error('Expected an open WebSocket wrapper');
+    }
+
+    const reconnect = jest.spyOn(originalSocket, 'reconnect');
+    websocket.connect();
+
+    expect(websocket['socket']).toBe(originalSocket);
+    expect(reconnect).toHaveBeenCalledTimes(1);
+    expect(reconnect).toHaveBeenCalledWith(1000);
+  });
+
   it('calls "onReconnect", "onOpen" and "onClose"', done => {
     const onReconnect = jest.fn().mockReturnValue(getServerAddress());
     const RWS = createRWS(onReconnect);
