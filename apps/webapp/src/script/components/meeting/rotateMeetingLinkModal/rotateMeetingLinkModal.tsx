@@ -25,7 +25,6 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Button, ButtonVariant, CloseIcon, ErrorMessage} from '@wireapp/react-ui-kit';
 
 import {showMeetingLinkConfirmation} from 'Components/meeting/meetingLinkConfirmation/meetingLinkConfirmation';
-import {rotateMeetingLinkDescription} from 'Components/meeting/rotateMeetingLinkModal/rotateMeetingLinkModal.styles';
 import {RotateMeetingLinkWarningModal} from 'Components/meeting/rotateMeetingLinkModal/rotateMeetingLinkWarningModal';
 import {MeetingLinkForm} from 'Components/meeting/shared/meetingLinkForm/meetingLinkForm';
 import {
@@ -166,7 +165,6 @@ export const RotateMeetingLinkModal = () => {
         </header>
         <div css={bodyStyles}>
           <form id="rotate-meeting-link-form" onSubmit={handleSubmit} noValidate>
-            <p css={rotateMeetingLinkDescription}>{translate('meetings.rotateLink.description')}</p>
             <MeetingLinkForm
               translate={translate}
               onGeneratePassword={password => {
