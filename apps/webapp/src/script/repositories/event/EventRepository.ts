@@ -28,6 +28,7 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
+import {Runtime} from '@wireapp/commons';
 import {Account, ConnectionState, ProcessedEventPayload} from '@wireapp/core';
 import {PromiseQueue} from '@wireapp/promise-queue';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -68,6 +69,7 @@ export class EventRepository {
   static get CONFIG() {
     return {
       E_CALL_EVENT_LIFETIME: TIME_IN_MILLIS.SECOND * 30,
+      HEARTBEAT_INTERVAL: TIME_IN_MILLIS.SECOND * 30,
       IGNORED_ERRORS: [
         CryptographyError.TYPE.IGNORED_ASSET,
         CryptographyError.TYPE.IGNORED_PREVIEW,
@@ -145,6 +147,7 @@ export class EventRepository {
         return;
       }
       case ConnectionState.CLOSED: {
+        this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.CLOSED);
         Warnings.showWarning(Warnings.TYPE.NO_INTERNET);
         return;
       }
@@ -202,38 +205,155 @@ export class EventRepository {
     dryRun = false,
   ): Promise<void> {
     await this.handleTimeDrift();
-    const connect = () => {
-      // We make sure there is only be a single active connection to the WebSocket.
-      this.disconnectWebSocket?.();
-      return new Promise<void>(async resolve => {
-        this.disconnectWebSocket = await account.listen({
+
+    const cleanupHandlers: Array<() => void> = [];
+    let actualDisconnect: () => void = () => {};
+    let connectionInProgress = false;
+    let healthCheckInProgress = false;
+    let currentConnectionState: ConnectionState | undefined;
+
+    const connect = async () => {
+      if (connectionInProgress) {
+        this.logger.info('Connection attempt already in progress, skipping...');
+        return;
+      }
+
+      connectionInProgress = true;
+      actualDisconnect();
+      try {
+        actualDisconnect = await account.listen({
           useLegacy,
           onConnectionStateChanged: connectionState => {
+            currentConnectionState = connectionState;
             this.updateConnectivitityStatus(connectionState);
-            if (connectionState === ConnectionState.LIVE) {
-              resolve();
-            }
           },
           onEvent: this.handleIncomingEvent,
           onMissedNotifications: this.triggerMissedSystemEventMessageRendering,
           onNotificationStreamProgress: onNotificationStreamProgress,
           dryRun,
         });
-      });
+      } catch {
+        actualDisconnect = () => {};
+      } finally {
+        connectionInProgress = false;
+      }
     };
 
-    window.addEventListener('online', () => {
+    const handleOnline = () => {
+      if (!navigator.onLine) {
+        return;
+      }
+
       this.logger.info('Internet connection regained. Re-establishing WebSocket connection...');
-      connect();
-    });
+      void connect();
+    };
 
-    window.addEventListener('offline', () => {
+    const verifyConnectionHealthAndReconnect = async (reason: 'Focus' | 'Visibility' | 'Heartbeat') => {
+      if (!navigator.onLine) {
+        return;
+      }
+
+      if (connectionInProgress) {
+        this.logger.info(`${reason}: Reconnection already in progress, skipping health verification...`);
+        return;
+      }
+
+      const isTransitioningConnectionState =
+        currentConnectionState === ConnectionState.CONNECTING ||
+        currentConnectionState === ConnectionState.PROCESSING_NOTIFICATIONS;
+      if (isTransitioningConnectionState) {
+        this.logger.info(`${reason}: Connection is transitioning, skipping health verification...`);
+        return;
+      }
+
+      if (this.notificationHandlingState() === NOTIFICATION_HANDLING_STATE.CLOSED) {
+        this.logger.info(`${reason}: Connection is closed and app is online, attempting reconnection...`);
+        await connect();
+        return;
+      }
+
+      if (healthCheckInProgress) {
+        this.logger.info(`${reason}: Connection health check already in progress, skipping...`);
+        return;
+      }
+
+      healthCheckInProgress = true;
+      try {
+        let isHealthy: boolean;
+        try {
+          isHealthy = await account.isWebsocketHealthy();
+        } catch {
+          this.logger.warn(`${reason}: Failed to verify WebSocket health, reconnecting...`);
+          isHealthy = false;
+        }
+        if (!isHealthy) {
+          this.logger.warn(`${reason}: WebSocket appears unhealthy, reconnecting...`);
+          await connect();
+        }
+      } finally {
+        healthCheckInProgress = false;
+      }
+    };
+
+    const handleOffline = () => {
       this.logger.warn('Internet connection lost');
-      this.disconnectWebSocket();
+      actualDisconnect();
       Warnings.showWarning(Warnings.TYPE.NO_INTERNET);
+    };
+
+    if (Runtime.isElectron()) {
+      // In Electron, use window focus events instead of visibilitychange
+      const handleFocus = () => {
+        if (navigator.onLine) {
+          this.logger.info('Window focused, verifying connection...');
+          void verifyConnectionHealthAndReconnect('Focus');
+        }
+      };
+
+      window.addEventListener('focus', handleFocus);
+      cleanupHandlers.push(() => window.removeEventListener('focus', handleFocus));
+    } else {
+      // In browser, use visibilitychange
+      const handleVisibilityChange = () => {
+        if (document.visibilityState === 'visible' && navigator.onLine) {
+          this.logger.info('Tab became visible, verifying connection...');
+          void verifyConnectionHealthAndReconnect('Visibility');
+        }
+      };
+
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+      cleanupHandlers.push(() => {
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+      });
+    }
+
+    // Online/Offline handlers work for both environments
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    cleanupHandlers.push(() => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
     });
 
-    return connect();
+    // Heartbeat intentionally verifies connection health while online, even when the
+    // connection is not CLOSED, to detect stale "open-but-unhealthy" websocket states.
+    const heartbeatInterval = window.setInterval(() => {
+      void verifyConnectionHealthAndReconnect('Heartbeat');
+    }, EventRepository.CONFIG.HEARTBEAT_INTERVAL);
+
+    cleanupHandlers.push(() => {
+      window.clearInterval(heartbeatInterval);
+    });
+
+    // Connect first to get the actual disconnect function
+    await connect();
+
+    // Then override disconnect to include cleanup
+    this.disconnectWebSocket = () => {
+      cleanupHandlers.forEach(cleanup => cleanup());
+      actualDisconnect();
+    };
   }
 
   /**
