@@ -20,17 +20,44 @@
 import type {CSSObject} from '@emotion/react';
 
 export const embeddedPasswordSectionStyles: CSSObject = {
+  containerType: 'inline-size',
   display: 'flex',
   flexDirection: 'column',
   gap: '16px',
+  '&:not(:first-child)': {
+    borderTop: '1px solid var(--border-color)',
+    paddingTop: '24px',
+  },
+};
+
+export const embeddedPasswordHeadingStyles: CSSObject = {
+  fontSize: '14px',
+  fontWeight: 600,
+  margin: '0 0 4px',
+};
+
+export const embeddedPasswordDescriptionStyles: CSSObject = {
+  fontSize: '12px',
+  margin: 0,
 };
 
 export const embeddedPasswordActionsStyles: CSSObject = {
   display: 'grid',
   gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
   gap: '16px',
-  '& > div > *': {
+  '& > div > button': {
+    marginBottom: 0,
     width: '100%',
+  },
+  '@container (max-width: 380px)': {
+    gap: '8px',
+    '& > div > button': {
+      fontSize: '12px',
+      padding: '4px 6px',
+    },
+    '& > div > button > svg': {
+      marginRight: '4px',
+    },
   },
 };
 
